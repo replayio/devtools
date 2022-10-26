@@ -96,6 +96,10 @@ export function getTestUrl(testRoute: string): string {
   return `http://${host}:3000/tests/${testRoute}?${queryParams.join("&")}`;
 }
 
+export async function stopHovering(page: Page): Promise<void> {
+  await page.mouse.move(0, 0);
+}
+
 export async function takeScreenshot(
   page: Page,
   locator: Locator,
@@ -152,8 +156,10 @@ async function takeScreenshotHelper(
   }
 }
 
-export async function stopHovering(page: Page): Promise<void> {
-  await page.mouse.move(0, 0);
+export async function typeCommandKey(page: Page, key: string) {
+  await page.keyboard.down(getCommandKey());
+  await page.keyboard.type(key);
+  await page.keyboard.up(getCommandKey());
 }
 
 export async function waitFor(

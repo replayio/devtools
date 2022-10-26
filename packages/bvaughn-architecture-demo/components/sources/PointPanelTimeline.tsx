@@ -63,12 +63,17 @@ export default function PointPanelTimeline({
 
   const badgeStyle = getBadgeStyleVars(point.badge);
 
-  const onTimelineClick = async () => {
-    if (isPending || hoverTime === 0) {
+  const onTimelineClick = async (event: MouseEvent) => {
+    if (isPending) {
       return;
     }
 
-    const point = await imperativelyGetClosestPointForTime(client, hoverTime);
+    const currentTarget = event.currentTarget as HTMLDivElement;
+    const rect = currentTarget.getBoundingClientRect();
+    const relativeX = event.clientX - rect.x;
+    const percentage = Math.max(0, Math.min(1, relativeX / rect.width));
+    const time = Math.round(duration * percentage);
+    const point = await imperativelyGetClosestPointForTime(client, time);
 
     update(hoverTime, point);
   };
@@ -91,22 +96,32 @@ export default function PointPanelTimeline({
     <>
       <button
         className={styles.PreviousHitPointButton}
+        data-test-name="PreviousHitPointButton"
         disabled={isPending || !previousButtonEnabled}
         onClick={goToPrevious}
       >
         <Icon className={styles.PreviousHitPointButtonIcon} type="arrow-left" />
       </button>
       {tooManyPointsToFind ? (
-        <div className={styles.HitPointsLabelTooMany} style={badgeStyle as CSSProperties}>
+        <div
+          className={styles.HitPointsLabelTooMany}
+          data-test-name="LogPointStatus"
+          style={badgeStyle as CSSProperties}
+        >
           -
         </div>
       ) : (
-        <div className={styles.HitPointsLabel} style={badgeStyle as CSSProperties}>
+        <div
+          className={styles.HitPointsLabel}
+          data-test-name="LogPointStatus"
+          style={badgeStyle as CSSProperties}
+        >
           {label}
         </div>
       )}
       <button
         className={styles.NextHitPointButton}
+        data-test-name="NextHitPointButton"
         disabled={isPending || !nextButtonEnabled}
         onClick={goToNext}
       >
@@ -114,6 +129,8 @@ export default function PointPanelTimeline({
       </button>
       <div
         className={isPending ? styles.HitPointTimelineDisabled : styles.HitPointTimeline}
+        data-test-name="PointPanelTimeline"
+        data-test-state={isPending ? "disabled" : "enabled"}
         onClick={onTimelineClick}
         onMouseLeave={onTimelineMouseLeave}
         onMouseMove={onTimelineMouseMove}

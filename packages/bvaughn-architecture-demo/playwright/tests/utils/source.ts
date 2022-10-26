@@ -1,7 +1,15 @@
 import { expect, Locator, Page } from "@playwright/test";
 import chalk from "chalk";
 
-import { clearTextArea, debugPrint, delay, getCommandKey, stopHovering } from "./general";
+import {
+  clearTextArea,
+  debugPrint,
+  delay,
+  getCommandKey,
+  stopHovering,
+  typeCommandKey,
+  waitFor,
+} from "./general";
 
 type Badge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow";
 
@@ -200,6 +208,16 @@ export async function focusOnSource(page: Page) {
   await expect(sourcesRoot).toBeFocused();
 }
 
+function getNextHitPointButton(page: Page, lineNumber: number): Locator {
+  const pointPanelLocator = getPointPanelLocator(page, lineNumber);
+  return pointPanelLocator.locator(`[data-test-name="NextHitPointButton"]`);
+}
+
+function getPreviousHitPointButton(page: Page, lineNumber: number): Locator {
+  const pointPanelLocator = getPointPanelLocator(page, lineNumber);
+  return pointPanelLocator.locator(`[data-test-name="PreviousHitPointButton"]`);
+}
+
 export function getPointPanelLocator(page: Page, lineNumber: number): Locator {
   return page.locator(`[data-test-id=PointPanel-${lineNumber}]`);
 }
@@ -240,21 +258,82 @@ export async function goToLine(page: Page, lineNumber: number) {
 
   await focusOnSource(page);
 
-  await page.keyboard.down(getCommandKey());
-  await page.keyboard.type("o");
-  await page.keyboard.up(getCommandKey());
+  await typeCommandKey(page, "o");
 
   const input = page.locator('[data-test-id="SourceFileNameSearchInput"]');
   await expect(input).toBeFocused();
 
+  // Hack
+  // Center input on the screen to help reduce flakiness with visual tests
+  // Back of how the typing scrolls the Source file as each character is entered,
+  // the fastest way to do this is to over-type and then erase a character.
   await clearTextArea(page, input);
-  await page.keyboard.type(`:${lineNumber}`);
+  await page.keyboard.type(`:${lineNumber}0`);
+  await page.keyboard.press("Backspace");
   await page.keyboard.press("Enter");
 
   await expect(lineLocator).toBeVisible();
 
   // Give the list time to render and settle.
   await delay(1000);
+}
+
+export async function goToLogPointTimelineTime(page: Page, lineNumber: number, percentage: number) {
+  if (percentage < 0 || percentage > 1) {
+    throw Error(`Invalid percentage ${percentage} (must be between 0-1)`);
+  }
+
+  const pointPanelLocator = getPointPanelLocator(page, lineNumber);
+  const timelineLocator = pointPanelLocator.locator(`[data-test-name="PointPanelTimeline"]`);
+
+  const isVisible = await timelineLocator.isVisible();
+  if (!isVisible) {
+    throw Error(`No log point found for line ${lineNumber}`);
+  }
+
+  await debugPrint(
+    page,
+    `Seek to ${chalk.bold(percentage)}% using point panel on line ${chalk.bold(lineNumber)}`,
+    "goToLogPointTimelineTime"
+  );
+
+  const height = await timelineLocator.evaluate(element => element.getBoundingClientRect().height);
+  const width = await timelineLocator.evaluate(element => element.getBoundingClientRect().width);
+  const x = width * percentage;
+  const y = height / 2;
+
+  await timelineLocator.hover({ force: true, position: { x, y } });
+  await delay(1000);
+  await timelineLocator.click({ force: true, position: { x, y } });
+  await delay(1000);
+
+  await waitForTimelineToUpdate(timelineLocator);
+}
+
+export async function goToNextHitPoint(page: Page, lineNumber: number) {
+  const buttonLocator = getNextHitPointButton(page, lineNumber);
+
+  const isVisible = await buttonLocator.isVisible();
+  if (!isVisible) {
+    throw Error(`No log point found for line ${lineNumber}`);
+  }
+
+  const isEnabled = await buttonLocator.isEnabled();
+  if (!isEnabled) {
+    throw Error(`Next hit point button is disabled for line ${lineNumber}`);
+  }
+
+  await debugPrint(
+    page,
+    `Going to next hit point for line ${chalk.bold(lineNumber)}`,
+    "goToLogPointTimelineTime"
+  );
+
+  await buttonLocator.click({ force: true });
+
+  const pointPanelLocator = getPointPanelLocator(page, lineNumber);
+  const timelineLocator = pointPanelLocator.locator(`[data-test-name="PointPanelTimeline"]`);
+  await waitForTimelineToUpdate(timelineLocator);
 }
 
 export async function goToNextSourceSearchResult(page: Page) {
@@ -267,6 +346,32 @@ export async function goToNextSourceSearchResult(page: Page) {
   );
 
   await page.click('[data-test-id="SourceSearchGoToNextButton"]');
+}
+
+export async function goToPreviousHitPoint(page: Page, lineNumber: number) {
+  const buttonLocator = getPreviousHitPointButton(page, lineNumber);
+
+  const isVisible = await buttonLocator.isVisible();
+  if (!isVisible) {
+    throw Error(`No log point found for line ${lineNumber}`);
+  }
+
+  const isEnabled = await buttonLocator.isEnabled();
+  if (!isEnabled) {
+    throw Error(`Previous hit point button is disabled for line ${lineNumber}`);
+  }
+
+  await debugPrint(
+    page,
+    `Going to previous hit point for line ${chalk.bold(lineNumber)}`,
+    "goToLogPointTimelineTime"
+  );
+
+  await buttonLocator.click({ force: true });
+
+  const pointPanelLocator = getPointPanelLocator(page, lineNumber);
+  const timelineLocator = pointPanelLocator.locator(`[data-test-name="PointPanelTimeline"]`);
+  await waitForTimelineToUpdate(timelineLocator);
 }
 
 export async function goToPreviousSourceSearchResult(page: Page) {
@@ -469,9 +574,7 @@ export async function searchSourceText(page: Page, text: string) {
 
   await debugPrint(page, `Searching source for text "${chalk.bold(text)}"`, "searchSourceText");
 
-  await page.keyboard.down(getCommandKey());
-  await page.keyboard.type("f");
-  await page.keyboard.up(getCommandKey());
+  await typeCommandKey(page, "f");
 
   const input = page.locator('[data-test-id="SourceSearchInput"]');
   await expect(input).toBeFocused();
@@ -489,9 +592,7 @@ export async function searchSourcesByName(page: Page, text: string) {
     "searchSourcesByName"
   );
 
-  await page.keyboard.down(getCommandKey());
-  await page.keyboard.type("o");
-  await page.keyboard.up(getCommandKey());
+  await typeCommandKey(page, "o");
 
   const input = page.locator('[data-test-id="SourceFileNameSearchInput"]');
   await expect(input).toBeFocused();
@@ -539,4 +640,88 @@ export async function toggleLogPointBadge(
     );
     await targetButton.click();
   }
+}
+
+export async function verifyHitPointButtonsEnabled(
+  page: Page,
+  options: {
+    nextEnabled?: boolean;
+    lineNumber: number;
+    previousEnabled?: boolean;
+  }
+): Promise<void> {
+  const { lineNumber, nextEnabled, previousEnabled } = options;
+
+  const expectedNextEnabled = nextEnabled !== false;
+  const expectedPreviousEnabled = previousEnabled !== false;
+
+  const previousButton = getPreviousHitPointButton(page, lineNumber);
+  const nextButton = getNextHitPointButton(page, lineNumber);
+
+  await debugPrint(
+    page,
+    `Verifying hit point previous button ${chalk.bold(
+      expectedPreviousEnabled ? "enabled" : "disabled"
+    )} and next button ${chalk.bold(
+      expectedNextEnabled ? "enabled" : "disabled"
+    )} for line ${chalk.bold(options.lineNumber)}`,
+    "verifyHitPointButtonsEnabled"
+  );
+
+  await waitFor(async () => {
+    const actualNextEnabled = await nextButton.isEnabled();
+    const actualPreviousEnabled = await previousButton.isEnabled();
+
+    const nextMatches = actualNextEnabled === expectedNextEnabled;
+    const previousMatches = actualPreviousEnabled === expectedPreviousEnabled;
+
+    if (!nextMatches && !previousMatches) {
+      throw `Waiting for previous button to be ${
+        expectedPreviousEnabled ? "enabled" : "disabled"
+      } and next button to be ${expectedNextEnabled ? "enabled" : "disabled"}`;
+    } else if (!nextMatches) {
+      throw `Waiting for next button to be ${expectedNextEnabled ? "enabled" : "disabled"}`;
+    } else if (!previousMatches) {
+      throw `Waiting for previous button to be ${expectedPreviousEnabled ? "enabled" : "disabled"}`;
+    }
+  });
+}
+
+export async function verifyLogPointStep(
+  page: Page,
+  expectedStatus: string,
+  options: {
+    lineNumber: number;
+    sourceId: string;
+  }
+): Promise<void> {
+  const { lineNumber, sourceId } = options;
+
+  await debugPrint(
+    page,
+    `Verifying log point status "${chalk.bold(expectedStatus)}" for line ${chalk.bold(
+      options.lineNumber
+    )}`,
+    "verifyLogPointStep"
+  );
+
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
+  const statusLocator = lineLocator.locator('[data-test-name="LogPointStatus"]');
+
+  const actualStatus = await statusLocator.textContent();
+
+  expect(actualStatus).toBe(expectedStatus);
+}
+
+async function waitForTimelineToUpdate(timelineLocator: Locator) {
+  // Give the click time to start processing.
+  await delay(1000);
+
+  // Wait for the time-to-execution-point mapping request to finish.
+  await waitFor(async () => {
+    const state = await timelineLocator.getAttribute("data-test-state");
+    if (state !== "enabled") {
+      throw "Timeline is not enabled";
+    }
+  });
 }
