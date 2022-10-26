@@ -138,7 +138,7 @@ function RecordingRow({
         <div className="flex-grow px-1 py-3 overflow-hidden whitespace-pre overflow-ellipsis">
           <div className="flex flex-row items-center space-x-4 overflow-hidden">
             <div className="flex-shrink-0 w-16 overflow-hidden rounded-sm h-9 bg-chrome">
-              <LazyLoad height={36} scrollContainer=".recording-list" once>
+              <LazyLoad height={36} scrollContainer="#recording-list" once>
                 <ItemScreenshot recordingId={recording.id} />
               </LazyLoad>
             </div>

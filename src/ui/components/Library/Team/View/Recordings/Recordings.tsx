@@ -39,7 +39,7 @@ export function Recordings({
 
   return (
     <div
-      className={`recording-list flex flex-col space-y-0 overflow-y-auto rounded-md text-sm shadow-md ${styles.recordingList}`}
+      className={`flex flex-col space-y-0 overflow-y-auto rounded-md text-sm shadow-md ${styles.recordingList}`}
     >
       {shownRecordings.map((r, i) => (
         <RecordingRow
