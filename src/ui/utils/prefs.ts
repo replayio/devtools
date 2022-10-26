@@ -36,7 +36,7 @@ pref("devtools.features.profileWorkerThreads", false);
 pref("devtools.features.protocolTimeline", false);
 pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.resolveRecording", false);
-pref("devtools.features.chromiumNetMonitor", false);
+pref("devtools.features.chromiumNetMonitor", true);
 
 export const prefs = new PrefsHelper("devtools", {
   colorScheme: ["String", "colorScheme"],
