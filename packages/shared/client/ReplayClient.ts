@@ -1,4 +1,3 @@
-import { insert } from "@bvaughn/src/utils/array";
 import {
   ContentType,
   createPauseResult,
@@ -33,6 +32,7 @@ import {
   PointRange,
   BreakpointId,
 } from "@replayio/protocol";
+import { insert } from "bvaughn-architecture-demo/src/utils/array";
 import { compareExecutionPoints } from "bvaughn-architecture-demo/src/utils/time";
 import uniqueId from "lodash/uniqueId";
 import analysisManager from "protocol/analysisManager";
