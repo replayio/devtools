@@ -1,9 +1,11 @@
 import Icon from "@bvaughn/components/Icon";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
+import { imperativelyGetClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
 import { isExecutionPointsGreaterThan, isExecutionPointsLessThan } from "@bvaughn/src/utils/time";
 import { TimeStampedPoint } from "@replayio/protocol";
-import { CSSProperties, useContext } from "react";
+import { CSSProperties, MouseEvent, useContext, useState } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { HitPointStatus, Point } from "shared/client/types";
 
 import styles from "./PointPanelTimeline.module.css";
@@ -19,6 +21,7 @@ export default function PointPanelTimeline({
   hitPointStatus: HitPointStatus;
   point: Point;
 }) {
+  const client = useContext(ReplayClientContext);
   const { duration } = useContext(SessionContext);
   const {
     executionPoint: currentExecutionPoint,
@@ -26,6 +29,8 @@ export default function PointPanelTimeline({
     time: currentTime,
     update,
   } = useContext(TimelineContext);
+
+  const [hoverTime, setHoverTime] = useState<number>(0);
 
   const [currentHitPoint, currentHitPointIndex] = findHitPoint(hitPoints, currentExecutionPoint);
 
@@ -58,6 +63,30 @@ export default function PointPanelTimeline({
 
   const badgeStyle = getBadgeStyleVars(point.badge);
 
+  const onTimelineClick = async () => {
+    if (isPending || hoverTime === 0) {
+      return;
+    }
+
+    const point = await imperativelyGetClosestPointForTime(client, hoverTime);
+
+    update(hoverTime, point);
+  };
+
+  const onTimelineMouseLeave = () => {
+    setHoverTime(0);
+  };
+
+  const onTimelineMouseMove = (event: MouseEvent) => {
+    const currentTarget = event.currentTarget as HTMLDivElement;
+    const rect = currentTarget.getBoundingClientRect();
+    const relativeX = event.clientX - rect.x;
+    const percentage = Math.max(0, Math.min(1, relativeX / rect.width));
+    const time = Math.round(duration * percentage);
+
+    setHoverTime(time);
+  };
+
   return (
     <>
       <button
@@ -83,13 +112,33 @@ export default function PointPanelTimeline({
       >
         <Icon className={styles.NextHitPointButtonIcon} type="arrow-right" />
       </button>
-      <div className={isPending ? styles.HitPointTimelineDisabled : styles.HitPointTimeline}>
+      <div
+        className={isPending ? styles.HitPointTimelineDisabled : styles.HitPointTimeline}
+        onClick={onTimelineClick}
+        onMouseLeave={onTimelineMouseLeave}
+        onMouseMove={onTimelineMouseMove}
+      >
+        <div className={styles.HitPointTimelineBackground} />
         <div
-          className={styles.CurrentTimeProgressBar}
+          className={
+            !isPending && hoverTime > 0 && hoverTime < currentTime
+              ? styles.ProgressBarPartiallyOpaque
+              : styles.ProgressBarOpaque
+          }
           style={{
             width: `${(100 * currentTime) / duration}%`,
           }}
         />
+        {!isPending && hoverTime > 0 && (
+          <div
+            className={
+              hoverTime < currentTime ? styles.ProgressBarOpaque : styles.ProgressBarPartiallyOpaque
+            }
+            style={{
+              width: `${(100 * hoverTime) / duration}%`,
+            }}
+          />
+        )}
         {hitPoints.map(hitPoint => (
           <button
             className={

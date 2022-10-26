@@ -305,3 +305,6 @@ test("scroll position should be restored when switching between sources", async 
   await openSourceFile(page, altSourceId);
   await expect(await line100.isVisible()).toBe(true);
 });
+
+// TODO [source viewer]
+// Test clicking in log point panel timeline updates the current time
