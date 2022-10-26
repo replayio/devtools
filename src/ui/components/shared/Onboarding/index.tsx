@@ -48,7 +48,7 @@ export function OnboardingContent({
 }: {
   children: React.ReactChild | (React.ReactChild | null)[];
 }) {
-  return <div className="relative flex flex-col items-center space-y-4">{children}</div>;
+  return <div className="relative flex flex-col items-center space-y-4 text-bodyColor">{children}</div>;
 }
 
 export function OnboardingHeader({ children }: { children: string }) {
