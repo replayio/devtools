@@ -125,7 +125,7 @@ function ObjectWrapper({
       <div className={styles.HeaderWrapper} data-test-name="SourcePreviewInspectorHeader">
         <div className={styles.Header}>{header}</div>
       </div>
-      <div className={styles.InspectorWrapper}>
+      <div className={styles.FixedSizeInspectorWrapper}>
         <Suspense fallback={<Loader />}>
           <PropertiesRenderer object={objectWithPreview} pauseId={pauseId} />
         </Suspense>
