@@ -16,7 +16,7 @@ import {
   Value,
 } from "@replayio/protocol";
 
-import cloneDeep from "lodash/cloneDeep";
+import { isCommandError, ProtocolError } from "shared/utils/error";
 
 import { client } from "../socket";
 import { defer, assert, Deferred, EventEmitter } from "../utils";
@@ -265,13 +265,23 @@ export class Pause {
     await this.createWaiter;
 
     if (!this.frameSteps.has(frameId)) {
-      const { steps } = await this.sendMessage(client.Pause.getFrameSteps, {
-        frameId,
-      });
-      for (const step of steps) {
-        this.ThreadFront.updateMappedLocation(step.frame);
+      try {
+        const { steps } = await this.sendMessage(client.Pause.getFrameSteps, {
+          frameId,
+        });
+        for (const step of steps) {
+          this.ThreadFront.updateMappedLocation(step.frame);
+        }
+        this.frameSteps.set(frameId, steps);
+      } catch (e) {
+        // "There are too many points to complete this operation"
+        // is expected if the frame is too long and should not be treated as an error.
+        if (isCommandError(e, ProtocolError.TooManyPoints)) {
+          this.frameSteps.set(frameId, []);
+        } else {
+          throw e;
+        }
       }
-      this.frameSteps.set(frameId, steps);
     }
     return this.frameSteps.get(frameId)!;
   }
