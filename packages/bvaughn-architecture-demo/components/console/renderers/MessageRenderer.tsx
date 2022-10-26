@@ -55,7 +55,7 @@ function MessageRenderer({
     }
   }, [isFocused]);
 
-  const stack = message.stack || [];
+  const stack = message.stack || EMPTY_ARRAY;
   const frames = message.data.frames || EMPTY_ARRAY;
   const frame =
     stack.length > 0 && frames.length > 0
