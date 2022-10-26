@@ -4,7 +4,7 @@ import { RequestResponse } from "../ProtocolMessagesStore";
 import styles from "./shared.module.css";
 
 export function RequestResponseHeaderRenderer({ message }: { message: RequestResponse }) {
-  let status = "Loading";
+  let status = null;
   if (message.error !== null) {
     status = "Failed";
   } else if (message.duration !== null) {
@@ -14,14 +14,14 @@ export function RequestResponseHeaderRenderer({ message }: { message: RequestRes
   return (
     <>
       <span className={styles.HeaderPrimary}>{message.request.method}</span>
-      <small className={styles.HeaderSecondary}>({status})</small>
+      {status && <small className={styles.HeaderSecondary}>({status})</small>}
     </>
   );
 }
 
 export function RequestResponseRenderer({ message }: { message: RequestResponse }) {
   return (
-    <div>
+    <>
       <div className={styles.SubHeader}>
         Request <small>({message.request.id})</small>
       </div>
@@ -38,6 +38,6 @@ export function RequestResponseRenderer({ message }: { message: RequestResponse 
           <pre className={styles.Pre}>{JSON.stringify(message.response.result, null, 2)}</pre>
         </>
       )}
-    </div>
+    </>
   );
 }

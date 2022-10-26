@@ -1,17 +1,41 @@
-.List {
+.ProtocolViewer {
+  background-color: var(--background-color-contrast-2);
   width: 100%;
   border-radius: 0.5rem;
+  overflow: auto;
   display: flex;
   flex-direction: column;
   justify-content: stretch;
-  background-color: var(--background-color-contrast-2);
-}
-
-.Item {
-  border-bottom: 1px solid var(--border-color-light);
 }
 
 .Header {
+  flex: 0 0 auto;
+  padding: 0.5rem;
+  font-size: var(--font-size-large);
+  color: var(--color-default);
+  display: flex;
+  align-items: center;
+}
+
+.SearchInput {
+  margin: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 0.25rem;
+}
+
+.List {
+  flex: 1 1 auto;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+}
+
+.ListItem {
+  border-bottom: 1px solid var(--border-color-light);
+}
+
+.ListItemHeader {
   display: flex;
   align-items: center;
   padding: 0.25rem 0.5rem;
@@ -20,8 +44,8 @@
   cursor: pointer;
 }
 
-.Children {
+.ListItemChildren {
   background-color: var(--background-color-light);
-  padding: 0.5rem;
+  padding: 0;
   margin: 0;
 }

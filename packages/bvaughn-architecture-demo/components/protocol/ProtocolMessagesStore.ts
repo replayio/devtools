@@ -3,6 +3,10 @@ import { CommandMethods } from "@replayio/protocol";
 import { CommandResponse } from "protocol/socket";
 import { Request } from "protocol/socket";
 
+export type Event = {
+  type: "Event";
+} & any;
+
 export type RequestResponse = {
   type: "RequestResponse";
   duration: number | null;
@@ -10,10 +14,6 @@ export type RequestResponse = {
   request: Request<CommandMethods>;
   response: CommandResponse | null;
 };
-
-export type Event = {
-  type: "Event";
-} & any;
 
 export type SocketError = {
   type: "SocketError";
