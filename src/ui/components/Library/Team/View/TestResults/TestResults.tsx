@@ -24,7 +24,7 @@ export function TestResults({ recordings }: { recordings: Recording[] }) {
 
   return (
     <div
-      className={`recording-list flex flex-col mb-1 overflow-y-auto text-sm rounded-t-xl border-b border-chrome no-scrollbar ${styles.recordingList}`}
+      className={`flex flex-col mb-1 overflow-y-auto text-sm rounded-t-xl border-b border-chrome no-scrollbar ${styles.recordingList}`}
     >
       {shownRecordings.map((r, i) => (
         <TestResultRow key={i} recording={r} />
