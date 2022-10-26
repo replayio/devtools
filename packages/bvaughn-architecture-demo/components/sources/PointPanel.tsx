@@ -230,11 +230,21 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
           {hasCondition && (
             <div className={styles.Row}>
               <div className={styles.ContentPrefixLabel}>if</div>
-              <div
-                className={styles.ContentWrapper}
-                onClick={showTooManyPointsMessage ? undefined : startEditing}
-              >
-                <SyntaxHighlightedLine code={point.condition!} />
+              <div className={styles.ContentWrapper}>
+                <div
+                  className={styles.Content}
+                  onClick={showTooManyPointsMessage ? undefined : startEditing}
+                >
+                  <SyntaxHighlightedLine code={point.condition!} />
+                </div>
+                <button
+                  className={styles.EditButton}
+                  disabled={isPending}
+                  onClick={showTooManyPointsMessage ? undefined : startEditing}
+                  data-test-name="PointPanel-EditButton"
+                >
+                  <Icon className={styles.EditButtonIcon} type="edit" />
+                </button>
               </div>
             </div>
           )}
