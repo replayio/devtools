@@ -1,0 +1,27 @@
+.List {
+  width: 100%;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  background-color: var(--background-color-contrast-2);
+}
+
+.Item {
+  border-bottom: 1px solid var(--border-color-light);
+}
+
+.Header {
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  width: 100%;
+  user-select: none;
+  cursor: pointer;
+}
+
+.Children {
+  background-color: var(--background-color-light);
+  padding: 0.5rem;
+  margin: 0;
+}

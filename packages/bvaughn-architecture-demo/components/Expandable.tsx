@@ -10,6 +10,7 @@ function noopOnChange(value: boolean) {}
 
 export default function Expandable({
   children,
+  childrenClassName = "",
   className = "",
   defaultOpen = false,
   header,
@@ -18,6 +19,7 @@ export default function Expandable({
   useBlockLayoutWhenExpanded = true,
 }: {
   children: ReactNode;
+  childrenClassName?: string;
   className?: string;
   defaultOpen?: boolean;
   header: ReactNode;
@@ -81,7 +83,10 @@ export default function Expandable({
       </span>
 
       <LazyOffscreen mode={isOpen ? "visible" : "hidden"}>
-        <span className={styles.Children} data-test-name="ExpandableChildren">
+        <span
+          className={`${childrenClassName} ${styles.Children}`}
+          data-test-name="ExpandableChildren"
+        >
           {children}
         </span>
       </LazyOffscreen>

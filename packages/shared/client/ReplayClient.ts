@@ -32,6 +32,7 @@ import {
   PointRange,
   BreakpointId,
 } from "@replayio/protocol";
+import { initProtocolMessagesStore } from "bvaughn-architecture-demo/components/protocol/ProtocolMessagesStore";
 import { insert } from "bvaughn-architecture-demo/src/utils/array";
 import { compareExecutionPoints } from "bvaughn-architecture-demo/src/utils/time";
 import uniqueId from "lodash/uniqueId";
@@ -190,6 +191,8 @@ export class ReplayClient implements ReplayClientInterface {
   // Apps that use the protocol package directly should use the configure method instead.
   async initialize(recordingId: RecordingId, accessToken: string | null): Promise<SessionId> {
     this._recordingId = recordingId;
+
+    initProtocolMessagesStore();
 
     const socket = initSocket(this._dispatchURL);
     await waitForOpenConnection(socket!);

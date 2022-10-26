@@ -115,6 +115,15 @@ type AnalysisCallbacks = {
 let gSessionCallbacks: SessionCallbacks | undefined;
 export let gAnalysisCallbacks: Map<string, AnalysisCallbacks> = new Map();
 
+export function setSessionCallbacks(sessionCallbacks: SessionCallbacks) {
+  if (gSessionCallbacks !== undefined) {
+    console.error("Session callbacks can only be set once");
+    return;
+  }
+
+  gSessionCallbacks = sessionCallbacks;
+}
+
 export async function createSession(
   recordingId: string,
   loadPoint: string | undefined,
@@ -127,7 +136,7 @@ export async function createSession(
     experimentalSettings,
   });
 
-  gSessionCallbacks = sessionCallbacks;
+  setSessionCallbacks(sessionCallbacks);
 
   return sessionId;
 }

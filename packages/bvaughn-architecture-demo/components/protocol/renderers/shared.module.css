@@ -1,0 +1,18 @@
+.HeaderPrimary,
+.HeaderSecondary {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.HeaderPrimary {
+  flex: 1 1 auto;
+}
+.HeaderSecondary {
+  flex: 0 1 auto;
+}
+
+.Pre {
+  margin: 0;
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-small);
+  overflow: auto;
+}
