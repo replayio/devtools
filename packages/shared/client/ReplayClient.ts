@@ -1,3 +1,4 @@
+import { insert } from "@bvaughn/src/utils/array";
 import {
   ContentType,
   createPauseResult,
@@ -32,6 +33,7 @@ import {
   PointRange,
   BreakpointId,
 } from "@replayio/protocol";
+import { compareExecutionPoints } from "bvaughn-architecture-demo/src/utils/time";
 import uniqueId from "lodash/uniqueId";
 import analysisManager from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
@@ -390,10 +392,13 @@ export class ReplayClient implements ReplayClientInterface {
             onAnalysisResult: results => {
               results.forEach(({ value }) => {
                 if (value.match) {
-                  collectedHitPoints.push({
+                  const timeStampedPoint = {
                     point: value.point,
                     time: value.time,
-                  });
+                  };
+                  insert<TimeStampedPoint>(collectedHitPoints, timeStampedPoint, (a, b) =>
+                    compareExecutionPoints(a.point, b.point)
+                  );
                 }
               });
             },
@@ -428,7 +433,11 @@ export class ReplayClient implements ReplayClientInterface {
               }
             },
             onAnalysisPoints: (pointDescriptions: PointDescription[]) => {
-              collectedHitPoints.push(...pointDescriptions);
+              pointDescriptions.forEach(timeStampedPoint => {
+                insert<TimeStampedPoint>(collectedHitPoints, timeStampedPoint, (a, b) =>
+                  compareExecutionPoints(a.point, b.point)
+                );
+              });
             },
           }
         );
