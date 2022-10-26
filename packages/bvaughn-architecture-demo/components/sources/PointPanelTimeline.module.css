@@ -56,14 +56,26 @@
 .HitPointTimeline,
 .HitPointTimelineDisabled {
   position: relative;
-  background-color: var(--background-color-contrast-1);
   flex: 1 1 auto;
-  border-radius: 0.5rem;
-  height: 0.5rem;
+  height: 1.5rem;
   transition: opacity 250ms;
+
+  /* Gives mouse-move handler a larger target */
+  border-bottom: 0.5rem solid transparent;
+  border-top: 0.5rem solid transparent;
+}
+.HitPointTimeline {
+  cursor: pointer;
 }
 .HitPointTimelineDisabled {
   opacity: 0.5;
+}
+
+.HitPointTimelineBackground {
+  width: 100%;
+  height: 0.5rem;
+  background-color: var(--background-color-contrast-1);
+  border-radius: 0.5rem;
 }
 
 .HitPointButton,
@@ -94,10 +106,15 @@
   z-index: 3;
 }
 
-.CurrentTimeProgressBar {
+.ProgressBarOpaque,
+.ProgressBarPartiallyOpaque {
   position: absolute;
   top: 0;
   left: 0;
   height: 0.5rem;
   background-color: var(--color-brand);
+  border-radius: 0.5rem;
+}
+.ProgressBarPartiallyOpaque {
+  opacity: 0.5;
 }

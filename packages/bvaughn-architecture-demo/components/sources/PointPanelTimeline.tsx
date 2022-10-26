@@ -1,9 +1,11 @@
 import Icon from "@bvaughn/components/Icon";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
+import { imperativelyGetClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
 import { isExecutionPointsGreaterThan, isExecutionPointsLessThan } from "@bvaughn/src/utils/time";
 import { TimeStampedPoint } from "@replayio/protocol";
-import { CSSProperties, useContext } from "react";
+import { CSSProperties, MouseEvent, useContext, useState } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { HitPointStatus, Point } from "shared/client/types";
 
 import styles from "./PointPanelTimeline.module.css";
@@ -19,6 +21,7 @@ export default function PointPanelTimeline({
   hitPointStatus: HitPointStatus;
   point: Point;
 }) {
+  const client = useContext(ReplayClientContext);
   const { duration } = useContext(SessionContext);
   const {
     executionPoint: currentExecutionPoint,
@@ -26,6 +29,8 @@ export default function PointPanelTimeline({
     time: currentTime,
     update,
   } = useContext(TimelineContext);
+
+  const [hoverTime, setHoverTime] = useState<number>(0);
 
   const [currentHitPoint, currentHitPointIndex] = findHitPoint(hitPoints, currentExecutionPoint);
 
@@ -58,38 +63,99 @@ export default function PointPanelTimeline({
 
   const badgeStyle = getBadgeStyleVars(point.badge);
 
+  const onTimelineClick = async (event: MouseEvent) => {
+    if (isPending) {
+      return;
+    }
+
+    const currentTarget = event.currentTarget as HTMLDivElement;
+    const rect = currentTarget.getBoundingClientRect();
+    const relativeX = event.clientX - rect.x;
+    const percentage = Math.max(0, Math.min(1, relativeX / rect.width));
+    const time = Math.round(duration * percentage);
+    const point = await imperativelyGetClosestPointForTime(client, time);
+
+    update(hoverTime, point);
+  };
+
+  const onTimelineMouseLeave = () => {
+    setHoverTime(0);
+  };
+
+  const onTimelineMouseMove = (event: MouseEvent) => {
+    const currentTarget = event.currentTarget as HTMLDivElement;
+    const rect = currentTarget.getBoundingClientRect();
+    const relativeX = event.clientX - rect.x;
+    const percentage = Math.max(0, Math.min(1, relativeX / rect.width));
+    const time = Math.round(duration * percentage);
+
+    setHoverTime(time);
+  };
+
   return (
     <>
       <button
         className={styles.PreviousHitPointButton}
+        data-test-name="PreviousHitPointButton"
         disabled={isPending || !previousButtonEnabled}
         onClick={goToPrevious}
       >
         <Icon className={styles.PreviousHitPointButtonIcon} type="arrow-left" />
       </button>
       {tooManyPointsToFind ? (
-        <div className={styles.HitPointsLabelTooMany} style={badgeStyle as CSSProperties}>
+        <div
+          className={styles.HitPointsLabelTooMany}
+          data-test-name="LogPointStatus"
+          style={badgeStyle as CSSProperties}
+        >
           -
         </div>
       ) : (
-        <div className={styles.HitPointsLabel} style={badgeStyle as CSSProperties}>
+        <div
+          className={styles.HitPointsLabel}
+          data-test-name="LogPointStatus"
+          style={badgeStyle as CSSProperties}
+        >
           {label}
         </div>
       )}
       <button
         className={styles.NextHitPointButton}
+        data-test-name="NextHitPointButton"
         disabled={isPending || !nextButtonEnabled}
         onClick={goToNext}
       >
         <Icon className={styles.NextHitPointButtonIcon} type="arrow-right" />
       </button>
-      <div className={isPending ? styles.HitPointTimelineDisabled : styles.HitPointTimeline}>
+      <div
+        className={isPending ? styles.HitPointTimelineDisabled : styles.HitPointTimeline}
+        data-test-name="PointPanelTimeline"
+        data-test-state={isPending ? "disabled" : "enabled"}
+        onClick={onTimelineClick}
+        onMouseLeave={onTimelineMouseLeave}
+        onMouseMove={onTimelineMouseMove}
+      >
+        <div className={styles.HitPointTimelineBackground} />
         <div
-          className={styles.CurrentTimeProgressBar}
+          className={
+            !isPending && hoverTime > 0 && hoverTime < currentTime
+              ? styles.ProgressBarPartiallyOpaque
+              : styles.ProgressBarOpaque
+          }
           style={{
             width: `${(100 * currentTime) / duration}%`,
           }}
         />
+        {!isPending && hoverTime > 0 && (
+          <div
+            className={
+              hoverTime < currentTime ? styles.ProgressBarOpaque : styles.ProgressBarPartiallyOpaque
+            }
+            style={{
+              width: `${(100 * hoverTime) / duration}%`,
+            }}
+          />
+        )}
         {hitPoints.map(hitPoint => (
           <button
             className={

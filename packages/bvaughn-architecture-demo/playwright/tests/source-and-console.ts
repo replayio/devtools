@@ -25,6 +25,11 @@ import {
   goToNextSourceSearchResult,
   goToPreviousSourceSearchResult,
   clearSearchResult,
+  verifyLogPointStep,
+  goToNextHitPoint,
+  goToPreviousHitPoint,
+  goToLogPointTimelineTime,
+  verifyHitPointButtonsEnabled,
 } from "./utils/source";
 import testSetup from "./utils/testSetup";
 
@@ -304,4 +309,65 @@ test("scroll position should be restored when switching between sources", async 
   // Switch back and verify that we're still in the middle of source 2
   await openSourceFile(page, altSourceId);
   await expect(await line100.isVisible()).toBe(true);
+});
+
+/* TODO – This tests passes in OSX but not in Docker
+test("should update the current time when the log point timeline is clicked", async ({
+  page,
+}) => {
+  const lineNumber = 52;
+
+  await addLogPoint(page, { lineNumber, sourceId });
+  await verifyLogPointStep(page, "8", { lineNumber, sourceId });
+  await verifyHitPointButtonsEnabled(page, {
+    lineNumber,
+    previousEnabled: false,
+    nextEnabled: true,
+  });
+
+  await goToLogPointTimelineTime(page, lineNumber, 0.35);
+  await verifyHitPointButtonsEnabled(page, {
+    lineNumber,
+    previousEnabled: true,
+    nextEnabled: true,
+  });
+});
+*/
+
+test("should update the current time when the next/previous log point buttons are clicked", async ({
+  page,
+}) => {
+  const lineNumber = 30;
+
+  await addLogPoint(page, { lineNumber, sourceId });
+  await verifyLogPointStep(page, "2", { lineNumber, sourceId });
+  await verifyHitPointButtonsEnabled(page, {
+    lineNumber,
+    previousEnabled: false,
+    nextEnabled: true,
+  });
+
+  await goToNextHitPoint(page, lineNumber);
+  await verifyLogPointStep(page, "1 / 2", { lineNumber, sourceId });
+  await verifyHitPointButtonsEnabled(page, {
+    lineNumber,
+    previousEnabled: false,
+    nextEnabled: true,
+  });
+
+  await goToNextHitPoint(page, lineNumber);
+  await verifyLogPointStep(page, "2 / 2", { lineNumber, sourceId });
+  await verifyHitPointButtonsEnabled(page, {
+    lineNumber,
+    previousEnabled: true,
+    nextEnabled: false,
+  });
+
+  await goToPreviousHitPoint(page, lineNumber);
+  await verifyLogPointStep(page, "1 / 2", { lineNumber, sourceId });
+  await verifyHitPointButtonsEnabled(page, {
+    lineNumber,
+    previousEnabled: false,
+    nextEnabled: true,
+  });
 });

@@ -19,7 +19,13 @@ export type HoveredState = {
   target: HTMLElement;
 };
 
-export default function Source({ source }: { source: ProtocolSource }) {
+export default function Source({
+  source,
+  showColumnBreakpoints,
+}: {
+  source: ProtocolSource;
+  showColumnBreakpoints: boolean;
+}) {
   const [hoveredState, setHoveredState] = useState<HoveredState | null>(null);
 
   const sourceRef = useRef<HTMLDivElement>(null);
@@ -49,8 +55,15 @@ export default function Source({ source }: { source: ProtocolSource }) {
     const className = htmlElement.className;
     const isToken = typeof className === "string" && className.startsWith("tok-");
 
-    // Debounce hover event to avoid showing the popup (or requesting data) in response to normal mouse movements.
-    setHoverStateDebounced(isToken ? htmlElement : null, setHoveredState);
+    if (isToken) {
+      // Debounce hover event to avoid showing the popup (or requesting data) in response to normal mouse movements.
+      setHoverStateDebounced(htmlElement, setHoveredState);
+    } else {
+      // Mouse-out should immediately cancel any pending actions.
+      // This avoids race cases where we might show a popup after the mouse has moused away.
+      setHoverStateDebounced.cancel();
+      setHoveredState(null);
+    }
   };
 
   return (
@@ -62,7 +75,13 @@ export default function Source({ source }: { source: ProtocolSource }) {
       <div className={styles.SourceList} onMouseMove={onMouseMove} ref={sourceRef}>
         <AutoSizer>
           {({ height, width }) => (
-            <SourceList height={height} htmlLines={htmlLines} source={source} width={width} />
+            <SourceList
+              height={height}
+              htmlLines={htmlLines}
+              showColumnBreakpoints={showColumnBreakpoints}
+              source={source}
+              width={width}
+            />
           )}
         </AutoSizer>
       </div>
@@ -80,12 +99,13 @@ export default function Source({ source }: { source: ProtocolSource }) {
 
 const setHoverStateDebounced = debounce(
   (element: HTMLElement | null, setHoveredState: (hoveredState: HoveredState | null) => void) => {
+    let expression = null;
     if (element !== null) {
       const rowElement = element.parentElement as HTMLElement;
-      const expression = getExpressionForTokenElement(rowElement, element);
-
-      setHoveredState(expression ? { expression, target: element } : null);
+      expression = getExpressionForTokenElement(rowElement, element);
     }
+
+    setHoveredState(expression ? { expression, target: element! } : null);
   },
   MOUSE_MOVE_DEBOUNCE_DURATION
 );

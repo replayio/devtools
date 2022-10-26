@@ -4,10 +4,13 @@ import Focuser from "@bvaughn/components/console/Focuser";
 import Icon from "@bvaughn/components/Icon";
 import Initializer from "@bvaughn/components/Initializer";
 import Input from "@bvaughn/components/console/Input";
+import LazyOffscreen from "@bvaughn/components/LazyOffscreen";
 import Loader from "@bvaughn/components/Loader";
+import ProtocolViewer from "@bvaughn/components/protocol/ProtocolViewer";
 import SourceExplorer from "@bvaughn/components/sources/SourceExplorer";
 import Sources from "@bvaughn/components/sources/Sources";
 import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
+import { InspectorContext } from "@bvaughn/src/contexts/InspectorContext";
 import { KeyboardModifiersContextRoot } from "@bvaughn/src/contexts/KeyboardModifiersContext";
 import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
 import { SourcesContextRoot } from "@bvaughn/src/contexts/SourcesContext";
@@ -27,7 +30,6 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { hasFlag } from "shared/utils/url";
 
 import styles from "./index.module.css";
-import { InspectorContext } from "@bvaughn/src/contexts/InspectorContext";
 
 // TODO There's a potential hot loop in this code when an error happens (e.g. Linker too old to support Console.findMessagesInRange)
 // where React keeps quickly retrying after an error is thrown, rather than rendering an error boundary.
@@ -46,15 +48,17 @@ export default function HomePage() {
     () => false
   );
 
+  type Panel = "comments" | "protocol-viewer" | "sources";
+
   // Used to record mock data for e2e tests when a URL parameter is present:
   const client = useContext(ReplayClientContext);
   const replayClientRecorder = useMemo(() => {
     return recordFlag ? createReplayClientRecorder(client) : client;
   }, [client, recordFlag]);
-  const [panel, setPanel] = useState("sources");
+  const [panel, setPanel] = useState<Panel>("sources");
   const [isPending, startTransition] = useTransition();
 
-  const setPanelTransition = (panel: string) => {
+  const setPanelTransition = (panel: Panel) => {
     startTransition(() => setPanel(panel));
   };
 
@@ -94,11 +98,25 @@ export default function HomePage() {
                         >
                           <Icon className={styles.TabIcon} type="source-explorer" />
                         </button>
+                        <button
+                          className={panel === "protocol-viewer" ? styles.TabSelected : styles.Tab}
+                          disabled={isPending}
+                          onClick={() => setPanelTransition("protocol-viewer")}
+                        >
+                          <Icon className={styles.TabIcon} type="protocol-viewer" />
+                        </button>
                       </div>
                       <div className={styles.CommentsContainer}>
                         <Suspense fallback={<Loader />}>
-                          {panel == "comments" && <CommentList />}
-                          {panel == "sources" && <SourceExplorer />}
+                          <LazyOffscreen mode={panel == "comments" ? "visible" : "hidden"}>
+                            <CommentList />
+                          </LazyOffscreen>
+                          <LazyOffscreen mode={panel == "protocol-viewer" ? "visible" : "hidden"}>
+                            <ProtocolViewer />
+                          </LazyOffscreen>
+                          <LazyOffscreen mode={panel == "sources" ? "visible" : "hidden"}>
+                            <SourceExplorer />
+                          </LazyOffscreen>
                         </Suspense>
                       </div>
                       <div className={styles.SourcesContainer}>

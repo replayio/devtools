@@ -10,6 +10,7 @@
   color: var(--color-default);
 }
 
+.FixedSizeInspectorWrapper,
 .InspectorWrapper {
   max-height: 250px !important;
   max-width: 400px;
@@ -17,6 +18,10 @@
   padding: 0.5rem;
   display: flex;
   flex-direction: column;
+}
+.FixedSizeInspectorWrapper {
+  height: 250px !important;
+  width: 400px;
 }
 
 .Inspector {
