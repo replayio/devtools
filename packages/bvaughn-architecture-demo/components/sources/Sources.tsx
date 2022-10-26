@@ -129,7 +129,7 @@ function Sources() {
                 mode={sourceId === focusedSourceId ? "visible" : "hidden"}
               >
                 <Suspense fallback={<Loader className={styles.Loader} />}>
-                  <Source source={source!} />
+                  <Source source={source!} showColumnBreakpoints={true} />
                 </Suspense>
               </LazyOffscreen>
             );

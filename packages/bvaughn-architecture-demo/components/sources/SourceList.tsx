@@ -36,11 +36,13 @@ const LINE_HEIGHT_WITH_CONDITIONAL_POINT = 18 + 120;
 export default function SourceList({
   height,
   htmlLines,
+  showColumnBreakpoints,
   source,
   width,
 }: {
   height: number;
   htmlLines: string[];
+  showColumnBreakpoints: boolean;
   source: ProtocolSource;
   width: number;
 }) {
@@ -129,6 +131,7 @@ export default function SourceList({
       minHitCount,
       points,
       setShowHitCounts,
+      showColumnBreakpoints,
       showHitCounts,
       source,
     }),
@@ -143,6 +146,7 @@ export default function SourceList({
       minHitCount,
       points,
       showHitCounts,
+      showColumnBreakpoints,
       setShowHitCounts,
       source,
     ]

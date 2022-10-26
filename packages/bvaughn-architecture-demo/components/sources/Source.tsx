@@ -19,7 +19,13 @@ export type HoveredState = {
   target: HTMLElement;
 };
 
-export default function Source({ source }: { source: ProtocolSource }) {
+export default function Source({
+  source,
+  showColumnBreakpoints,
+}: {
+  source: ProtocolSource;
+  showColumnBreakpoints: boolean;
+}) {
   const [hoveredState, setHoveredState] = useState<HoveredState | null>(null);
 
   const sourceRef = useRef<HTMLDivElement>(null);
@@ -69,7 +75,13 @@ export default function Source({ source }: { source: ProtocolSource }) {
       <div className={styles.SourceList} onMouseMove={onMouseMove} ref={sourceRef}>
         <AutoSizer>
           {({ height, width }) => (
-            <SourceList height={height} htmlLines={htmlLines} source={source} width={width} />
+            <SourceList
+              height={height}
+              htmlLines={htmlLines}
+              showColumnBreakpoints={showColumnBreakpoints}
+              source={source}
+              width={width}
+            />
           )}
         </AutoSizer>
       </div>

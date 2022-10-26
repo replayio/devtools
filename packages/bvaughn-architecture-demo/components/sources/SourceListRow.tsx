@@ -25,6 +25,7 @@ export type ItemData = {
   minHitCount: number | null;
   points: Point[];
   setShowHitCounts: (value: boolean) => void;
+  showColumnBreakpoints: boolean;
   showHitCounts: boolean;
   source: ProtocolSource;
 };
@@ -47,6 +48,7 @@ const SourceListRow = memo(
       minHitCount,
       points,
       setShowHitCounts,
+      showColumnBreakpoints,
       showHitCounts,
       source,
     } = data;
@@ -82,7 +84,7 @@ const SourceListRow = memo(
     }
 
     let lineSegments = null;
-    if (point?.shouldLog) {
+    if (showColumnBreakpoints && point?.shouldLog) {
       const { id, location, shouldBreak } = point;
 
       if (location.column === 0) {
