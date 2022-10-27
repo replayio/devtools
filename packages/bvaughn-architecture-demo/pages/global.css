@@ -3,7 +3,9 @@ body {
   padding: 0;
   margin: 0;
   font-family: var(--font-family-default);
-  font-size: var(--font-size-regular);
+
+  /* Root font size should match the legacy app so that REMs are consistent */
+  font-size: var(--font-size-large);
 }
 
 * {

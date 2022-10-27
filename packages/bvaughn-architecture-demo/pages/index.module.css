@@ -1,3 +1,8 @@
+.HorizontalContainer,
+.VerticalContainer {
+  font-size: var(--font-size-regular);
+}
+
 .VerticalContainer {
   display: flex;
   flex-direction: column;

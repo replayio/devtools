@@ -8,6 +8,7 @@
   border-bottom-right-radius: 0.5rem;
   background-color: var(--background-color-contrast-2);
   word-break: break-all;
+  font-size: var(--font-size-regular);
 }
 .ConsoleRoot:focus {
   outline: none;

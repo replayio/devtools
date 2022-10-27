@@ -1,8 +1,8 @@
 .Popup {
   position: absolute;
-  top: 1ch;
-  left: 1ch;
-  right: 1ch;
+  top: 0.5rem;
+  left: 0.5rem;
+  right: 0.5rem;
   background-color: var(--background-color-contrast-1);
   border-radius: 0.25rem;
 }

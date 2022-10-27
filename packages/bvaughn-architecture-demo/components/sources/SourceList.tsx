@@ -29,9 +29,11 @@ import { findPointForLocation } from "./utils/points";
 
 // HACK
 // We could swap this out for something that lazily measures row height.
-const LINE_HEIGHT = 18;
-const LINE_HEIGHT_WITH_POINT = 18 + 84;
-const LINE_HEIGHT_WITH_CONDITIONAL_POINT = 18 + 120;
+const POINT_PANEL_HEIGHT = 88;
+const CONDITIONAL_POINT_PANEL_HEIGHT = 128;
+const LINE_HEIGHT = 15;
+const LINE_HEIGHT_WITH_POINT = LINE_HEIGHT + POINT_PANEL_HEIGHT;
+const LINE_HEIGHT_WITH_CONDITIONAL_POINT = LINE_HEIGHT + CONDITIONAL_POINT_PANEL_HEIGHT;
 
 export default function SourceList({
   height,
@@ -177,12 +179,16 @@ export default function SourceList({
       // This won't quite work the same as a non-windowed solution; it's an approximation.
       const container = innerRef.current;
       if (container) {
-        const maxLineWidth = maxLineWidthRef.current;
-        const width = container.parentElement!.scrollWidth;
-        if (width > maxLineWidth) {
-          maxLineWidthRef.current = width;
+        let maxLineWidth = 0;
+        for (let index = 0; index < container.children.length; index++) {
+          const child = container.children[index];
+          maxLineWidth = Math.max(maxLineWidth, child.clientWidth);
+        }
 
-          container.style.setProperty("--max-line-width", `${width}px`);
+        if (maxLineWidth > maxLineWidthRef.current) {
+          maxLineWidthRef.current = maxLineWidth;
+
+          container.style.setProperty("--max-line-width", `${maxLineWidth}px`);
         }
       }
     },
@@ -195,9 +201,12 @@ export default function SourceList({
     showHitCounts && maxHitCount !== null ? `${formatHitCount(maxHitCount)}`.length : 0;
 
   const style = {
+    "--conditional-point-panel-height": `${CONDITIONAL_POINT_PANEL_HEIGHT}px`,
     "--hit-count-size": `${maxHitCountStringLength}ch`,
+    "--line-height": `${LINE_HEIGHT}px`,
     "--line-number-size": `${maxLineNumberStringLength + 1}ch`,
     "--list-width": `${width}px`,
+    "--point-panel-height": `${POINT_PANEL_HEIGHT}px`,
   };
 
   return (

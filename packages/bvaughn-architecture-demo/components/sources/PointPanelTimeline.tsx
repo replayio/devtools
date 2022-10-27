@@ -163,7 +163,12 @@ export default function PointPanelTimeline({
             }
             disabled={isPending}
             key={hitPoint.point}
-            onClick={() => update(hitPoint.time, hitPoint.point)}
+            onClick={(event: MouseEvent) => {
+              event.stopPropagation();
+              event.preventDefault();
+
+              update(hitPoint.time, hitPoint.point);
+            }}
             style={{
               left: `${(100 * hitPoint.time) / duration}%`,
             }}

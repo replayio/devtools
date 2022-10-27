@@ -1,12 +1,12 @@
 .BadgePicker {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.25rem;
+  height: 1.25rem;
   position: relative;
 }
 
 .BadgePickerButton {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.25rem;
+  height: 1.25rem;
   flex-grow: 0;
   flex-shrink: 0;
   background: none;
@@ -55,8 +55,8 @@
   top: 0;
   left: 0;
   display: flex;
-  height: 1.5rem;
-  width: 1.5rem;
+  height: 1.25rem;
+  width: 1.25rem;
 }
 .BadgePickerOpen {
   z-index: 1;
@@ -67,21 +67,21 @@
 
 .BadgePickerPopOut {
   background-color: var(--background-color-contrast-2);
-  border-radius: 1.5rem;
+  border-radius: 1.25rem;
   display: flex;
   align-items: center;
-  padding-left: 1.5rem;
+  padding-left: 1.25rem;
 }
 
 .BadgePickerOpen .BadgePickerPopOut {
   animation: expand 250ms ease-out;
   animation-fill-mode: forwards;
-  width: 1.5rem;
+  width: 1.25rem;
 }
 .BadgePickerClosed .BadgePickerPopOut {
   animation: contract 250ms ease-out;
   animation-fill-mode: forwards;
-  width: 9rem;
+  width: 7.5rem;
   pointer-events: none;
 }
 
@@ -146,18 +146,18 @@
 @keyframes expand {
   0% {
     opacity: 0;
-    width: 1.5rem;
+    width: 1.25rem;
   }
   25% {
     opacity: 1;
   }
   100% {
-    width: 9rem;
+    width: 7.5rem;
   }
 }
 @keyframes contract {
   0% {
-    width: 9rem;
+    width: 7.5rem;
   }
   75% {
     opacity: 1;
