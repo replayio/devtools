@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { toggleProtocolMessages, verifyConsoleMessage } from "./utils/console";
-import { getTestUrl, takeScreenshot } from "./utils/general";
+import { delay, getTestUrl, takeScreenshot } from "./utils/general";
 import {
   addBreakPoint,
   addLogPoint,
@@ -159,6 +159,9 @@ test("should handle too many points to find", async ({ page }) => {
 
 test("should handle too many points to run analysis", async ({ page }) => {
   await addLogPoint(page, { sourceId, lineNumber: 70 });
+
+  // Give the analysis a little extra time to run.
+  await delay(1000);
 
   const popup = getPointPanelLocator(page, 70);
   await takeScreenshot(page, popup, "log-point-message-too-many-points-to-run-analysis");
