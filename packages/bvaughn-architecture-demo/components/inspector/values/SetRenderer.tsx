@@ -12,13 +12,20 @@ const MAX_PROPERTIES_TO_PREVIEW = 5;
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
 export default function SetRenderer({ context, object, pauseId }: ObjectPreviewRendererProps) {
-  const { containerEntries = [], containerEntryCount = 0, overflow = false } = object.preview || {};
+  const { containerEntries = [], containerEntryCount, overflow = false } = object.preview || {};
   const showOverflowMarker = overflow || containerEntries.length > MAX_PROPERTIES_TO_PREVIEW;
 
   const slice = containerEntries.slice(0, MAX_PROPERTIES_TO_PREVIEW);
 
-  if (containerEntryCount === 0) {
-    return <>{object.className} (0)</>;
+  if (containerEntryCount === undefined) {
+    return <>{object.className}</>;
+  } else if (containerEntryCount === 0) {
+    return (
+      <>
+        {object.className}
+        <span className={styles.ArrayLength}>({containerEntryCount})</span>
+      </>
+    );
   } else {
     let propertiesList: ReactNode[] | null = null;
     if (context !== "nested") {
