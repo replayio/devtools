@@ -2,10 +2,10 @@ import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersConte
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { PointInstance, PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { TerminalContext, TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
-import { EventLog, getEventTypeEntryPoints } from "@bvaughn/src/suspense/EventsCache";
-import { getExceptions, UncaughtException } from "@bvaughn/src/suspense/ExceptionsCache";
-import { getMessages, ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
-import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
+import { EventLog, getEventTypeEntryPointsSuspense } from "@bvaughn/src/suspense/EventsCache";
+import { getExceptionsSuspense, UncaughtException } from "@bvaughn/src/suspense/ExceptionsCache";
+import { getMessagesSuspense, ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
+import { getHitPointsForLocationSuspense } from "@bvaughn/src/suspense/PointsCache";
 import { loggableSort } from "@bvaughn/src/utils/loggables";
 import { isInNodeModules } from "@bvaughn/src/utils/messages";
 import { suspendInParallel } from "@bvaughn/src/utils/suspense";
@@ -73,11 +73,11 @@ export function LoggablesContextRoot({
   // Load the event type data from the protocol and flatten into a single array (to be filtered and sorted below).
   const eventLogs = useMemo<EventLog[]>(() => {
     return suspendInParallel(
-      ...eventTypesToLoad.map(eventType => () => getEventTypeEntryPoints(client, eventType))
+      ...eventTypesToLoad.map(eventType => () => getEventTypeEntryPointsSuspense(client, eventType))
     ).flat();
   }, [client, eventTypesToLoad]);
 
-  const { messages } = getMessages(client, focusRange);
+  const { messages } = getMessagesSuspense(client, focusRange);
 
   // Pre-filter in-focus messages by non text based search criteria.
   const preFilteredMessages = useMemo<ProtocolMessage[]>(() => {
@@ -117,7 +117,7 @@ export function LoggablesContextRoot({
   // We may suspend based on this value, so let's this value changes at sync priority,
   let exceptions: UncaughtException[] = EMPTY_ARRAY;
   if (showExceptions) {
-    exceptions = getExceptions(client, focusRange);
+    exceptions = getExceptionsSuspense(client, focusRange);
   }
 
   // Trim eventLogs and logPoints by focusRange.
@@ -137,7 +137,7 @@ export function LoggablesContextRoot({
 
     points.forEach(point => {
       if (point.shouldLog) {
-        const [hitPoints, status] = getHitPointsForLocation(
+        const [hitPoints, status] = getHitPointsForLocationSuspense(
           client,
           point.location,
           point.condition,

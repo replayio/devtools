@@ -2,7 +2,7 @@ import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContex
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import {
   getCachedMinMaxSourceHitCounts,
-  getSourceHitCounts,
+  getSourceHitCountsSuspense,
 } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
 import { resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
@@ -27,7 +27,7 @@ export default function useLineHitCounts(sourceEditor: SourceEditor | null) {
   const { range: focusRange } = useContext(FocusContext);
   const hitCounts =
     sourceId && visibleLines
-      ? getSourceHitCounts(replayClient, sourceId, visibleLines, focusRange)
+      ? getSourceHitCountsSuspense(replayClient, sourceId, visibleLines, focusRange)
       : null;
 
   // Min/max hit counts are used to determine heat map color.

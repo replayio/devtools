@@ -1,8 +1,11 @@
 import { PointDescription, SourceId, TimeStampedPointRange } from "@replayio/protocol";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import { getHitPointsForLocation } from "bvaughn-architecture-demo/src/suspense/PointsCache";
-import { getSource, getSourceHitCounts } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
+import {
+  getSource,
+  getSourceHitCountsSuspense,
+} from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
 import classNames from "classnames";
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
@@ -144,7 +147,7 @@ function QuickActions({
 
   const lineNumber = lineIndex + 1;
 
-  const [hitPoints, hitPointStatus] = getHitPointsForLocation(
+  const [hitPoints, hitPointStatus] = getHitPointsForLocationSuspense(
     replayClient,
     {
       sourceId,
@@ -278,7 +281,12 @@ function ToggleWidgetButton() {
   // It should always add a new Point for the left-most column, regardless of the column breakpoints setting.
   let firstBreakableColumnIndex: number | null = null;
 
-  const hitCounts = getSourceHitCounts(replayClient, focusedSourceId, visibleLines, focusRange);
+  const hitCounts = getSourceHitCountsSuspense(
+    replayClient,
+    focusedSourceId,
+    visibleLines,
+    focusRange
+  );
   const hitCountsForLine = hitCounts.get(lineNumber)!;
   if (hitCountsForLine) {
     firstBreakableColumnIndex = hitCountsForLine.firstBreakableColumnIndex;

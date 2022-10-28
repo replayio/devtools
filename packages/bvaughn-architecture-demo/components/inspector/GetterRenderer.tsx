@@ -1,7 +1,10 @@
 import Expandable from "@bvaughn/components/Expandable";
 import Icon from "@bvaughn/components/Icon";
 import Loader from "@bvaughn/components/Loader";
-import { getObjectProperty, getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
+import {
+  getObjectPropertySuspense,
+  getObjectWithPreviewSuspense,
+} from "@bvaughn/src/suspense/ObjectPreviews";
 import { protocolValueToClientValue, Value as ClientValue } from "@bvaughn/src/utils/protocol";
 import {
   Object as ProtocolObject,
@@ -46,7 +49,7 @@ export default function GetterRenderer({
   const [invokeGetter, setInvokeGetter] = useState(false);
 
   const getterValue = invokeGetter
-    ? getObjectProperty(client, pauseId, parentObjectId, name!)
+    ? getObjectPropertySuspense(client, pauseId, parentObjectId, name!)
     : null;
 
   const getterClientValueRef = useRef<ClientValue>(null);
@@ -67,7 +70,11 @@ export default function GetterRenderer({
     case "object":
     case "regexp":
     case "set": {
-      getterValueWithPreview = getObjectWithPreview(client, pauseId, getterClientValue.objectId!);
+      getterValueWithPreview = getObjectWithPreviewSuspense(
+        client,
+        pauseId,
+        getterClientValue.objectId!
+      );
       if (getterValueWithPreview == null) {
         throw Error(`Could not find object with ID "${getterClientValue.objectId}"`);
       }

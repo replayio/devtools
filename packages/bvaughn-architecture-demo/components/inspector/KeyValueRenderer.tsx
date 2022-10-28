@@ -1,6 +1,6 @@
 import Expandable from "@bvaughn/components/Expandable";
 import Loader from "@bvaughn/components/Loader";
-import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
+import { getObjectWithPreviewSuspense } from "@bvaughn/src/suspense/ObjectPreviews";
 import { Object as ProtocolObject, PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import classNames from "classnames";
 import { ReactNode, Suspense, useContext, useState } from "react";
@@ -57,7 +57,7 @@ export default function KeyValueRenderer({
       case "object":
       case "regexp":
       case "set": {
-        objectWithPreview = getObjectWithPreview(client, pauseId, objectId!);
+        objectWithPreview = getObjectWithPreviewSuspense(client, pauseId, objectId!);
         if (objectWithPreview == null) {
           throw Error(`Could not find object with ID "${objectId}"`);
         }
@@ -67,12 +67,12 @@ export default function KeyValueRenderer({
           // This is because text node children and HTML element children are treated differently.
           // Text node children may be rendered as part of the inline preview, if there is only one child.
           if (objectWithPreview.preview!.overflow) {
-            objectWithPreview = getObjectWithPreview(client, pauseId, objectId!, true);
+            objectWithPreview = getObjectWithPreviewSuspense(client, pauseId, objectId!, true);
           }
 
           const childNodes = objectWithPreview.preview?.node?.childNodes ?? [];
           const htmlElementChildren = childNodes.filter(childNodeId => {
-            const childNode = getObjectWithPreview(client, pauseId, childNodeId);
+            const childNode = getObjectWithPreviewSuspense(client, pauseId, childNodeId);
             return childNode.className !== "Text";
           });
 

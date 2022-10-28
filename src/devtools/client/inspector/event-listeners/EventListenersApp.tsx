@@ -13,7 +13,7 @@ import { XHTMLNode } from "./XHTMLNode";
 import { onViewSourceInDebugger } from "devtools/client/webconsole/actions/toolbox";
 import { useAppSelector } from "ui/setup/hooks";
 import { getSelectedDomNodeId } from "devtools/client/inspector/markup/reducers/markup";
-import { getObjectWithPreview } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 export const EventListenersApp = () => {
@@ -60,7 +60,7 @@ export const EventListenersApp = () => {
   }
 
   // Suspend until we have the data for the node, which we _should_
-  const nodeWithPreview = getObjectWithPreview(
+  const nodeWithPreview = getObjectWithPreviewSuspense(
     replayClient,
     pauseId,
     selectedDomNodeId

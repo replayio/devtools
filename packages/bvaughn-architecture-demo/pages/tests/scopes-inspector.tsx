@@ -1,9 +1,12 @@
 import Inspector from "@bvaughn/components/inspector";
 import ScopesInspector from "@bvaughn/components/inspector/ScopesInspector";
 import Loader from "@bvaughn/components/Loader";
-import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
-import { evaluate, getPauseForExecutionPoint } from "@bvaughn/src/suspense/PauseCache";
-import { getClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
+import { getObjectWithPreviewSuspense } from "@bvaughn/src/suspense/ObjectPreviews";
+import {
+  evaluateSuspense,
+  getPauseForExecutionPointSuspense,
+} from "@bvaughn/src/suspense/PauseCache";
+import { getClosestPointForTimeSuspense } from "@bvaughn/src/suspense/PointsCache";
 import { Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -27,15 +30,20 @@ function Scopes() {
 function Suspender() {
   const replayClient = useContext(ReplayClientContext);
 
-  const point = getClosestPointForTime(replayClient, 1000);
-  const { pauseId } = getPauseForExecutionPoint(replayClient, point);
+  const point = getClosestPointForTimeSuspense(replayClient, 1000);
+  const { pauseId } = getPauseForExecutionPointSuspense(replayClient, point);
 
   // This code is roughly approximating the shape of data from the Scopes panel.
 
-  const { returned: globalValue } = evaluate(replayClient, pauseId, null, "globalValues");
-  const { returned: windowValue } = evaluate(replayClient, pauseId, null, "window");
+  const { returned: globalValue } = evaluateSuspense(replayClient, pauseId, null, "globalValues");
+  const { returned: windowValue } = evaluateSuspense(replayClient, pauseId, null, "window");
 
-  const globalClientValue = getObjectWithPreview(replayClient, pauseId, globalValue?.object!, true);
+  const globalClientValue = getObjectWithPreviewSuspense(
+    replayClient,
+    pauseId,
+    globalValue?.object!,
+    true
+  );
 
   const fakeScopeProperties = [
     { name: "<this>", object: windowValue!.object },

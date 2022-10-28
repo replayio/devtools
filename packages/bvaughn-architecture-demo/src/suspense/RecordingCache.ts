@@ -4,7 +4,7 @@ import { ReplayClientInterface } from "shared/client/types";
 let recordingCapabilitiesPromise: Promise<RecordingCapabilities> | null = null;
 let recordingCapabilities: RecordingCapabilities | null = null;
 
-export function getRecordingCapabilities(
+export function getRecordingCapabilitiesSuspense(
   replayClient: ReplayClientInterface
 ): RecordingCapabilities {
   if (recordingCapabilities !== null) {

@@ -1,5 +1,5 @@
 import Loader from "@bvaughn/components/Loader";
-import { getEventCategoryCounts } from "@bvaughn/src/suspense/EventsCache";
+import { getEventCategoryCountsSuspense } from "@bvaughn/src/suspense/EventsCache";
 import type { EventCategory as EventCategoryType } from "@bvaughn/src/suspense/EventsCache";
 import { ChangeEvent, Suspense, useContext, useMemo, useState, useTransition } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -47,7 +47,7 @@ function EventsListCategories({
 }) {
   const client = useContext(ReplayClientContext);
 
-  const eventCategoryCounts = getEventCategoryCounts(client);
+  const eventCategoryCounts = getEventCategoryCountsSuspense(client);
 
   const [commonEventCategories, otherEventCategories] = useMemo<
     [EventCategoryType[], EventCategoryType[]]

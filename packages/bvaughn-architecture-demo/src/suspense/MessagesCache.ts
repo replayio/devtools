@@ -56,7 +56,7 @@ let lastFilteredMessages: ProtocolMessage[] | null = null;
 // or throws a Wakeable to be resolved once messages have been fetched.
 //
 // This method is Suspense friendly; it is meant to be called from a React component during render.
-export function getMessages(
+export function getMessagesSuspense(
   client: ReplayClientInterface,
   focusRange: TimeStampedPointRange | null
 ): MessageData {

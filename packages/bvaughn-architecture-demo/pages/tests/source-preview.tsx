@@ -1,8 +1,11 @@
 import SourcePreviewInspector from "@bvaughn/components/inspector/SourcePreviewInspector";
 import Loader from "@bvaughn/components/Loader";
-import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
-import { evaluate, getPauseForExecutionPoint } from "@bvaughn/src/suspense/PauseCache";
-import { getClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
+import { getObjectWithPreviewSuspense } from "@bvaughn/src/suspense/ObjectPreviews";
+import {
+  evaluateSuspense,
+  getPauseForExecutionPointSuspense,
+} from "@bvaughn/src/suspense/PauseCache";
+import { getClosestPointForTimeSuspense } from "@bvaughn/src/suspense/PointsCache";
 import { Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -25,11 +28,11 @@ function SourcePreview() {
 
 function Suspender() {
   const replayClient = useContext(ReplayClientContext);
-  const point = getClosestPointForTime(replayClient, 1000);
-  const { pauseId } = getPauseForExecutionPoint(replayClient, point);
-  const { returned } = evaluate(replayClient, pauseId, null, "globalValues");
+  const point = getClosestPointForTimeSuspense(replayClient, 1000);
+  const { pauseId } = getPauseForExecutionPointSuspense(replayClient, point);
+  const { returned } = evaluateSuspense(replayClient, pauseId, null, "globalValues");
 
-  const objectWithPreview = getObjectWithPreview(replayClient, pauseId, returned!.object!);
+  const objectWithPreview = getObjectWithPreviewSuspense(replayClient, pauseId, returned!.object!);
   return (
     <>
       {objectWithPreview.preview!.properties!.map(property => (

@@ -18,11 +18,11 @@ describe("MessagesCache", () => {
 
   async function getMessagesHelper(range: TimeStampedPointRange | null): Promise<MessageData> {
     try {
-      return getMessages(client as any as ReplayClientInterface, range);
+      return getMessagesSuspense(client as any as ReplayClientInterface, range);
     } catch (promise) {
       await promise;
 
-      return getMessages(client as any as ReplayClientInterface, range);
+      return getMessagesSuspense(client as any as ReplayClientInterface, range);
     }
   }
 
@@ -44,7 +44,7 @@ describe("MessagesCache", () => {
   }
 
   let client: { [key: string]: jest.Mock };
-  let getMessages: (
+  let getMessagesSuspense: (
     client: ReplayClientInterface,
     range: TimeStampedPointRange | null
   ) => Promise<MessageData>;
@@ -54,7 +54,7 @@ describe("MessagesCache", () => {
 
     // Clear and recreate cached data between tests.
     const module = require("./MessagesCache");
-    getMessages = module.getMessages;
+    getMessagesSuspense = module.getMessagesSuspense;
   });
 
   afterEach(() => {
@@ -229,13 +229,13 @@ describe("MessagesCache", () => {
 
     client.findMessages.mockImplementation(() => promise1);
     try {
-      getMessages(client as any as ReplayClientInterface, toTSPR(0, 1));
+      getMessagesSuspense(client as any as ReplayClientInterface, toTSPR(0, 1));
     } catch (promise) {}
     expect(client.findMessages).toHaveBeenCalledTimes(1);
 
     client.findMessages.mockImplementation(() => promise2);
     try {
-      getMessages(client as any as ReplayClientInterface, toTSPR(2, 3));
+      getMessagesSuspense(client as any as ReplayClientInterface, toTSPR(2, 3));
     } catch (promise) {}
     expect(client.findMessages).toHaveBeenCalledTimes(2);
 

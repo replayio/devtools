@@ -6,7 +6,7 @@ import { setToolboxLayout } from "ui/actions/layout";
 import Icon from "../shared/Icon";
 import PortalDropdown from "../shared/PortalDropdown";
 import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
-import { getRecordingCapabilities } from "./getRecordingCapabilities";
+import { getRecordingCapabilitiesSuspense } from "./getRecordingCapabilities";
 
 const LAYOUT_ICONS = {
   bottom: "dock-bottom",
@@ -65,7 +65,7 @@ export default function ToolboxOptions() {
   const button = <Icon filename={LAYOUT_ICONS[toolboxLayout]} className="bg-iconColor" />;
   const collapseDropdown = () => setExpanded(false);
 
-  const recordingCapabilities = getRecordingCapabilities();
+  const recordingCapabilities = getRecordingCapabilitiesSuspense();
 
   let layoutOptions: ReactNode = null;
 

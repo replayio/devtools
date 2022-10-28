@@ -54,7 +54,7 @@ const locationAndTimeToValueMap: Map<string, Record<AnalysisResults>> = new Map(
 // TODO (FE-469) Filter in-memory if the range gets smaller (and we haven't overflowed)
 // Currently we re-run the analysis which seems wasteful.
 
-export function runAnalysis(
+export function runAnalysisSuspense(
   client: ReplayClientInterface,
   focusRange: PointRange | null,
   location: Location,

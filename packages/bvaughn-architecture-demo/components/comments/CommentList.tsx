@@ -1,5 +1,5 @@
 import AvatarImage from "@bvaughn/components/AvatarImage";
-import { getCommentList } from "@bvaughn/src/suspense/CommentsCache";
+import { getCommentListSuspense } from "@bvaughn/src/suspense/CommentsCache";
 import { GraphQLClientContext } from "@bvaughn/src/contexts/GraphQLClientContext";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
@@ -14,7 +14,7 @@ import styles from "./CommentList.module.css";
 export default function CommentList() {
   const graphQLClient = useContext(GraphQLClientContext);
   const { accessToken, recordingId } = useContext(SessionContext);
-  const commentList = getCommentList(graphQLClient, recordingId, accessToken);
+  const commentList = getCommentListSuspense(graphQLClient, recordingId, accessToken);
 
   return (
     <ErrorBoundary>

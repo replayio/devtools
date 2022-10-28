@@ -1,6 +1,6 @@
 import Inspector from "@bvaughn/components/inspector";
 import Loader from "@bvaughn/components/Loader";
-import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
+import { getObjectWithPreviewSuspense } from "@bvaughn/src/suspense/ObjectPreviews";
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import { ForwardedRef, forwardRef, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -76,7 +76,7 @@ function ObjectWrapper({
 
   const { name, objectId, type } = clientValue;
 
-  const objectWithPreview = getObjectWithPreview(client, pauseId, objectId!);
+  const objectWithPreview = getObjectWithPreviewSuspense(client, pauseId, objectId!);
   if (objectWithPreview == null) {
     throw Error(`Could not find object with ID "${objectId!}"`);
   }

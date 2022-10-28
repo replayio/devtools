@@ -40,7 +40,7 @@ let eventTypeToEntryPointMap = new Map<EventHandlerType, Record<EventLog[]>>();
 let eventCategoryCounts: EventCategory[] | null = null;
 let inProgressEventCategoryCountsWakeable: Wakeable<EventCategory[]> | null = null;
 
-export function getEventCategoryCounts(client: ReplayClientInterface): EventCategory[] {
+export function getEventCategoryCountsSuspense(client: ReplayClientInterface): EventCategory[] {
   if (eventCategoryCounts !== null) {
     return eventCategoryCounts;
   }
@@ -54,7 +54,7 @@ export function getEventCategoryCounts(client: ReplayClientInterface): EventCate
   throw inProgressEventCategoryCountsWakeable;
 }
 
-export function getEventTypeEntryPoints(
+export function getEventTypeEntryPointsSuspense(
   client: ReplayClientInterface,
   eventType: EventHandlerType
 ): EventLog[] {

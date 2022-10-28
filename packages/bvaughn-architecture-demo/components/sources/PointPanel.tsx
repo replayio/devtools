@@ -6,7 +6,7 @@ import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { addComment as addCommentGraphQL } from "@bvaughn/src/graphql/Comments";
-import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
+import { getHitPointsForLocationSuspense } from "@bvaughn/src/suspense/PointsCache";
 import { validate } from "@bvaughn/src/utils/points";
 import {
   Suspense,
@@ -51,7 +51,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
   const { accessToken, recordingId } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: curentTime } = useContext(TimelineContext);
 
-  const [hitPoints, hitPointStatus] = getHitPointsForLocation(
+  const [hitPoints, hitPointStatus] = getHitPointsForLocationSuspense(
     client,
     point.location,
     null,

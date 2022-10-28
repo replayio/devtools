@@ -1,4 +1,4 @@
-import { getSourceContents } from "@bvaughn/src/suspense/SourcesCache";
+import { getSourceContentsSuspense } from "@bvaughn/src/suspense/SourcesCache";
 import { parse } from "@bvaughn/src/suspense/SyntaxParsingCache";
 import { getSourceFileName } from "@bvaughn/src/utils/source";
 import { newSource as ProtocolSource } from "@replayio/protocol";
@@ -49,7 +49,7 @@ function SuspendingSource({
   const fileName = getSourceFileName(source, true) || "unknown";
 
   const client = useContext(ReplayClientContext);
-  const sourceContents = getSourceContents(client, source.sourceId);
+  const sourceContents = getSourceContentsSuspense(client, source.sourceId);
 
   // TODO Incrementally parse code using SourceContext -> visibleLines
   const code = sourceContents.contents;

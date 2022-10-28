@@ -2,7 +2,7 @@ import { Value } from "@replayio/protocol";
 import Loader from "bvaughn-architecture-demo/components/Loader";
 import Inspector from "bvaughn-architecture-demo/components/inspector";
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
-import { getRecordingCapabilities } from "bvaughn-architecture-demo/src/suspense/RecordingCache";
+import { getRecordingCapabilitiesSuspense } from "bvaughn-architecture-demo/src/suspense/RecordingCache";
 import { useEagerEvaluateExpression } from "devtools/client/webconsole/utils/autocomplete-eager";
 import debounce from "lodash/debounce";
 import { ThreadFront } from "protocol/thread";
@@ -69,7 +69,7 @@ type Props = {
 
 function EagerEvalFooterSuspends({ expression, completedExpression }: Props) {
   const replayClient = useContext(ReplayClientContext);
-  const recordingCapabilities = getRecordingCapabilities(replayClient);
+  const recordingCapabilities = getRecordingCapabilitiesSuspense(replayClient);
 
   if (!recordingCapabilities.supportsEagerEvaluation) {
     return null;

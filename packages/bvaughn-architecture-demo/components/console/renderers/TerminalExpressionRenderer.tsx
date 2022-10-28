@@ -7,7 +7,7 @@ import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersConte
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
-import { evaluate } from "@bvaughn/src/suspense/PauseCache";
+import { evaluateSuspense } from "@bvaughn/src/suspense/PauseCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
 import {
@@ -132,7 +132,7 @@ function EvaluatedContent({ terminalExpression }: { terminalExpression: Terminal
     [point, time]
   );
 
-  const result = evaluate(client, pauseId, frameId, terminalExpression.expression);
+  const result = evaluateSuspense(client, pauseId, frameId, terminalExpression.expression);
   const { exception, returned } = result;
 
   let children: ReactNode | null = null;

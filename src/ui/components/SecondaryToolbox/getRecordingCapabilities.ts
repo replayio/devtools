@@ -4,7 +4,7 @@ import { RecordingCapabilities } from "protocol/thread/thread";
 let recordingCapabilitiesPromise: Promise<RecordingCapabilities> | null = null;
 let recordingCapabilities: RecordingCapabilities | null = null;
 
-export function getRecordingCapabilities(): RecordingCapabilities {
+export function getRecordingCapabilitiesSuspense(): RecordingCapabilities {
   if (recordingCapabilities !== null) {
     return recordingCapabilities;
   } else {

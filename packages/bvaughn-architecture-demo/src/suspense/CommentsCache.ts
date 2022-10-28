@@ -18,7 +18,7 @@ function createCommentRecord(): CommentRecord {
   };
 }
 
-export function getCommentList(
+export function getCommentListSuspense(
   graphQLClient: GraphQLClientInterface,
   recordingId: RecordingId,
   accessToken: string | null
