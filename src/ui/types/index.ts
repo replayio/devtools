@@ -165,11 +165,13 @@ export type TestMetadata = {
 };
 
 export type TestItem = {
-  id?: string;
   title: string;
-  path?: string[];
   relativePath?: string;
   result: TestResult;
+  relativeStartTime: number;
+  steps: TestStep[];
+  id?: string;
+  path?: string[];
   error?: TestItemError;
 };
 
@@ -178,6 +180,14 @@ type TestItemError = {
   line?: number;
   column?: number;
 };
+
+export type TestStep = {
+  args: string[];
+  name: string;
+  duration: number;
+  relativeStartTime: number;
+  error?: TestItemError;
+}
 
 // https://github.com/Replayio/replay-cli/blob/main/packages/replay/metadata/source.ts
 
