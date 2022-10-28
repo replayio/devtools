@@ -29,8 +29,8 @@ import { findPointForLocation } from "./utils/points";
 
 // HACK
 // We could swap this out for something that lazily measures row height.
-const POINT_PANEL_HEIGHT = 88;
-const CONDITIONAL_POINT_PANEL_HEIGHT = 128;
+const POINT_PANEL_HEIGHT = 90;
+const CONDITIONAL_POINT_PANEL_HEIGHT = 130;
 const LINE_HEIGHT = 15;
 const LINE_HEIGHT_WITH_POINT = LINE_HEIGHT + POINT_PANEL_HEIGHT;
 const LINE_HEIGHT_WITH_CONDITIONAL_POINT = LINE_HEIGHT + CONDITIONAL_POINT_PANEL_HEIGHT;

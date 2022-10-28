@@ -1,7 +1,7 @@
 :root {
-  --font-family-default: Inter, sans-serif;
-  --font-family-monospace: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    "Courier New", monospace;
+  --font-family-default: sans-serif;
+  --font-family-monospace: Menlo, ui-monospace, SFMono-Regular, Monaco, Consolas, Liberation Mono,
+    Courier New, monospace;
 
   --font-size-large: 16px;
   --font-size-regular: 12px;

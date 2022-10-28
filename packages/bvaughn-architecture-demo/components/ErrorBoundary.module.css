@@ -1,21 +1,21 @@
 .Error {
-  padding: 0.5rem;
+  padding: 0.5em;
   text-align: center;
   background-color: var(--background-color-error);
   color: var(--color-default);
 }
 
 .Logo {
-  height: 3rem;
+  height: 3em;
   color: var(--color-error);
-  margin-bottom: 1rem;
+  margin-bottom: 1em;
   display: inline-block;
 }
 
 .Header {
   font-family: var(--font-family-default);
   font-size: var(--font-size-large);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.5em;
 }
 
 .Message {

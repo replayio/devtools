@@ -5,7 +5,7 @@
 }
 
 .Header {
-  padding: 0.5rem;
+  padding: 0.5em;
   border-bottom: 1px solid var(--border-color);
   color: var(--color-default);
 }
@@ -15,7 +15,7 @@
   max-height: 250px !important;
   max-width: 400px;
   overflow: auto;
-  padding: 0.5rem;
+  padding: 0.5em;
   display: flex;
   flex-direction: column;
 }

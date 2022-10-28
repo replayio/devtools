@@ -1,12 +1,12 @@
 .List {
   height: 100%;
-  border-radius: 0.5rem;
+  border-radius: 0.5em;
   background-color: var(--background-color-contrast-2);
   overflow: auto;
 }
 
 .Header {
-  padding: 0.5rem;
+  padding: 0.5em;
   font-size: var(--font-size-large);
   color: var(--color-default);
   display: flex;
@@ -24,6 +24,6 @@
 }
 
 .Avatar {
-  height: 2rem;
-  width: 2rem;
+  height: 2em;
+  width: 2em;
 }
