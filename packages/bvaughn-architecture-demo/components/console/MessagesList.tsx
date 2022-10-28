@@ -1,7 +1,7 @@
 import Icon from "@bvaughn/components/Icon";
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
-import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
+import { getMessagesSuspense } from "@bvaughn/src/suspense/MessagesCache";
 import {
   getLoggableExecutionPoint,
   isEventLog,
@@ -68,7 +68,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
 
   // TRICKY
   // Message filtering is done client-side, but overflow/counts are server-side so it comes from Suspense.
-  const { countAfter, countBefore, didOverflow } = getMessages(replayClient, focusRange);
+  const { countAfter, countBefore, didOverflow } = getMessagesSuspense(replayClient, focusRange);
 
   // This component only needs to render a pending UI when a focus changes,
   // because this might require an async backend request.

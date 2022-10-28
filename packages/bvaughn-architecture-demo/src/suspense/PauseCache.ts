@@ -19,7 +19,7 @@ const executionPointToPauseMap: Map<ExecutionPoint, Record<Pause>> = new Map();
 const executionPointToPauseIdMap: Map<ExecutionPoint, PauseId> = new Map();
 const pauseIdToPauseDataMap: Map<PauseId, Record<PauseData>> = new Map();
 
-export function evaluate(
+export function evaluateSuspense(
   client: ReplayClientInterface,
   pauseId: PauseId,
   frameId: FrameId | null,
@@ -45,7 +45,7 @@ export function evaluate(
   }
 }
 
-export function getPauseData(client: ReplayClientInterface, pauseId: PauseId) {
+export function getPauseDataSuspense(client: ReplayClientInterface, pauseId: PauseId) {
   let record = pauseIdToPauseDataMap.get(pauseId);
   if (record == null) {
     record = {
@@ -69,7 +69,7 @@ export function getCachedPauseIdForExecutionPoint(executionPoint: ExecutionPoint
   return executionPointToPauseIdMap.get(executionPoint) || null;
 }
 
-export function getPauseForExecutionPoint(
+export function getPauseForExecutionPointSuspense(
   client: ReplayClientInterface,
   executionPoint: ExecutionPoint
 ): Pause {

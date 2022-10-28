@@ -1,7 +1,7 @@
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import { getSourceHitCounts } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { getSourceHitCountsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import React, { ReactNode, Suspense, useContext, useEffect } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { KeyModifiers } from "ui/components/KeyModifiers";
@@ -66,7 +66,7 @@ function LineNumberTooltipSuspends({ keyModifiers }: Props) {
 
   const hitCountsForAllLines =
     source && visibleLines
-      ? getSourceHitCounts(replayClient, source.id, visibleLines, focusRange)
+      ? getSourceHitCountsSuspense(replayClient, source.id, visibleLines, focusRange)
       : null;
 
   let hitsForHoveredLine: number | null = null;

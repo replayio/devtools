@@ -51,7 +51,7 @@ function notifyStatusSubscribers(): void {
   tooManyPointsListeners.forEach(callback => callback());
 }
 
-export function getExceptions(
+export function getExceptionsSuspense(
   client: ReplayClientInterface,
   focusRange: TimeStampedPointRange | null
 ): UncaughtException[] {

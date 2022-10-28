@@ -227,7 +227,7 @@ export function getCachedHitPointsForLocation(
   return null;
 }
 
-export function getClosestPointForTime(
+export function getClosestPointForTimeSuspense(
   client: ReplayClientInterface,
   time: number
 ): ExecutionPoint {
@@ -275,7 +275,7 @@ function getClosestPointInPointsBoundingTime(
     : pointsBoundingTime.after.point;
 }
 
-export function getHitPointsForLocation(
+export function getHitPointsForLocationSuspense(
   client: ReplayClientInterface,
   location: Location,
   condition: string | null,

@@ -3,7 +3,7 @@ import {
   InspectableTimestampedPointContext,
   InspectorContext,
 } from "@bvaughn/src/contexts/InspectorContext";
-import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
+import { getObjectWithPreviewSuspense } from "@bvaughn/src/suspense/ObjectPreviews";
 import { filterNonEnumerableProperties, Value as ClientValue } from "@bvaughn/src/utils/protocol";
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import { MouseEvent, useContext } from "react";
@@ -59,7 +59,7 @@ export default function HTMLElementRenderer({
   const childNodes = object.preview?.node?.childNodes ?? [];
   let inlineText: string | null = null;
   if (childNodes.length === 1) {
-    const childNode = getObjectWithPreview(client, pauseId, childNodes[0]);
+    const childNode = getObjectWithPreviewSuspense(client, pauseId, childNodes[0]);
     if (childNode.className === "Text") {
       inlineText = childNode.preview?.node?.nodeValue || null;
     }

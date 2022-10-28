@@ -3,7 +3,7 @@ import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { KeyboardModifiersContext } from "@bvaughn/src/contexts/KeyboardModifiersContext";
 import { AddPoint, DeletePoints, EditPoint } from "@bvaughn/src/contexts/PointsContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
-import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
+import { getHitPointsForLocationSuspense } from "@bvaughn/src/suspense/PointsCache";
 import {
   compareExecutionPoints,
   isExecutionPointsGreaterThan,
@@ -51,7 +51,7 @@ export default function HoverButton({
     const [hitPoints, hitPointStatus] =
       lineHitCounts.count >= TOO_MANY_POINTS_TO_FIND
         ? [null, null]
-        : getHitPointsForLocation(
+        : getHitPointsForLocationSuspense(
             client,
             {
               column: lineHitCounts.firstBreakableColumnIndex,

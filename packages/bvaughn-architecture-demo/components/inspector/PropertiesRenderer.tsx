@@ -1,6 +1,6 @@
 import Expandable from "@bvaughn/components/Expandable";
 import Loader from "@bvaughn/components/Loader";
-import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
+import { getObjectWithPreviewSuspense } from "@bvaughn/src/suspense/ObjectPreviews";
 import { mergePropertiesAndGetterValues } from "@bvaughn/src/utils/protocol";
 import {
   ContainerEntry as ProtocolContainerEntry,
@@ -37,7 +37,7 @@ export default function PropertiesRenderer({
   // If we have an ObjectPreview already, use it.
   // If we just have an Object, then Suspend while we fetch preview data.
   if (object.preview == null || object.preview.overflow) {
-    object = getObjectWithPreview(client, pauseId, object.objectId, true);
+    object = getObjectWithPreviewSuspense(client, pauseId, object.objectId, true);
   }
 
   const { className, objectId, preview } = object;
@@ -63,7 +63,7 @@ export default function PropertiesRenderer({
   const prototypeId = preview?.prototypeId ?? null;
   let prototype = null;
   if (prototypeId) {
-    prototype = getObjectWithPreview(client, pauseId, prototypeId);
+    prototype = getObjectWithPreviewSuspense(client, pauseId, prototypeId);
   }
 
   let EntriesRenderer: FC<EntriesRendererProps> = ContainerEntriesRenderer;

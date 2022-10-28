@@ -45,7 +45,7 @@ export function preCacheSources(value: ProtocolSource[]): void {
   sources = toIndexedSources(value);
 }
 
-export function getSources(client: ReplayClientInterface) {
+export function getSourcesSuspense(client: ReplayClientInterface) {
   if (sources !== null) {
     return sources;
   }
@@ -64,7 +64,7 @@ export function getSources(client: ReplayClientInterface) {
 // This method can be used by non-React code to prefetch/prime the Suspense cache by loading object properties.
 export async function getSourcesHelper(client: ReplayClientInterface): Promise<ProtocolSource[]> {
   try {
-    return getSources(client);
+    return getSourcesSuspense(client);
   } catch (errorOrPromise) {
     if (
       errorOrPromise != null &&
@@ -82,7 +82,7 @@ export function getSource(
   client: ReplayClientInterface,
   sourceId: ProtocolSourceId
 ): ProtocolSource | null {
-  const sources = getSources(client);
+  const sources = getSourcesSuspense(client);
   return sources.find(source => source.sourceId === sourceId) || null;
 }
 
@@ -94,7 +94,7 @@ export function getSourceIfAlreadyLoaded(sourceId: ProtocolSourceId): ProtocolSo
   return null;
 }
 
-export function getSourceContents(
+export function getSourceContentsSuspense(
   client: ReplayClientInterface,
   sourceId: ProtocolSourceId
 ): ProtocolSourceContents {
@@ -125,7 +125,7 @@ export async function getSourceContentsHelper(
   sourceId: ProtocolSourceId
 ): Promise<ProtocolSourceContents> {
   try {
-    return getSourceContents(client, sourceId);
+    return getSourceContentsSuspense(client, sourceId);
   } catch (errorOrPromise) {
     if (
       errorOrPromise != null &&
@@ -153,7 +153,7 @@ export function getCachedMinMaxSourceHitCounts(
   return sourceIdToMinMaxHitCountsMap.get(key) || [null, null];
 }
 
-export function getSourceHitCounts(
+export function getSourceHitCountsSuspense(
   client: ReplayClientInterface,
   sourceId: ProtocolSourceId,
   locationRange: SourceLocationRange,
@@ -317,7 +317,7 @@ export function isIndexedSource(source: ProtocolSource): source is IndexedSource
 }
 
 export function getSourcesToDisplay(client: ReplayClientInterface): ProtocolSource[] {
-  const sources = getSources(client);
+  const sources = getSourcesSuspense(client);
   return sources.filter(source => source.kind !== "inlineScript");
 }
 

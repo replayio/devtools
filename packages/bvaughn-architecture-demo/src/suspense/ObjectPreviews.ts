@@ -113,7 +113,7 @@ export function getObjectThrows(pauseId: PauseId, objectId: ObjectId): Object {
 // Suspends if no Object can be found, or if one is found without a Preview.
 // This method should only be called during render.
 // The Objects it returns are guaranteed to contain preview information.
-export function getObjectWithPreview(
+export function getObjectWithPreviewSuspense(
   client: ReplayClientInterface,
   pauseId: PauseId,
   objectId: ObjectId,
@@ -153,7 +153,7 @@ export async function getObjectWithPreviewHelper(
   noOverflow: boolean = false
 ): Promise<Object> {
   try {
-    return getObjectWithPreview(client, pauseId, objectId, noOverflow);
+    return getObjectWithPreviewSuspense(client, pauseId, objectId, noOverflow);
   } catch (errorOrPromise) {
     if (
       errorOrPromise != null &&
@@ -167,7 +167,7 @@ export async function getObjectWithPreviewHelper(
   }
 }
 
-export function getObjectProperty(
+export function getObjectPropertySuspense(
   client: ReplayClientInterface,
   pauseId: PauseId,
   objectId: ObjectId,
@@ -208,7 +208,7 @@ export async function getObjectPropertyHelper(
   propertyName: string
 ): Promise<ProtocolValue> {
   try {
-    return getObjectProperty(client, pauseId, objectId, propertyName);
+    return getObjectPropertySuspense(client, pauseId, objectId, propertyName);
   } catch (errorOrPromise) {
     if (
       errorOrPromise != null &&

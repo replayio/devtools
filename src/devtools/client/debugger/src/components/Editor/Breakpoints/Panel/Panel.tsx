@@ -18,7 +18,7 @@ import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { UnsafeFocusRegion } from "ui/state/timeline";
-import { getHitPointsForLocation } from "bvaughn-architecture-demo/src/suspense/PointsCache";
+import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import { Point } from "shared/client/types";
 import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
 
@@ -76,7 +76,7 @@ function Panel({
   const unsafeFocusRegionForSuspense = useDeferredValue(unsafeFocusRegion);
   const [hitPoints, hitPointStatus] =
     breakpointForSuspense != null
-      ? getHitPointsForLocation(
+      ? getHitPointsForLocationSuspense(
           replayClient,
           breakpointForSuspense.location,
           breakpointForSuspense.condition,

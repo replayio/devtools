@@ -4,7 +4,7 @@ import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersConte
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { getStatus, subscribeForStatus } from "@bvaughn/src/suspense/ExceptionsCache";
 import { isInNodeModules } from "@bvaughn/src/utils/messages";
-import { CategoryCounts, getMessages } from "@bvaughn/src/suspense/MessagesCache";
+import { CategoryCounts, getMessagesSuspense } from "@bvaughn/src/suspense/MessagesCache";
 import camelCase from "lodash/camelCase";
 import React, { ReactNode, Suspense, useContext, useMemo, useSyncExternalStore } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -12,7 +12,7 @@ import { Badge, Checkbox } from "design";
 
 import EventsList from "./EventsList";
 import styles from "./FilterToggles.module.css";
-import { getRecordingCapabilities } from "@bvaughn/src/suspense/RecordingCache";
+import { getRecordingCapabilitiesSuspense } from "@bvaughn/src/suspense/RecordingCache";
 
 export default function FilterToggles() {
   const {
@@ -26,7 +26,7 @@ export default function FilterToggles() {
   } = useContext(ConsoleFiltersContext);
 
   const replayClient = useContext(ReplayClientContext);
-  const recordingCapabilities = getRecordingCapabilities(replayClient);
+  const recordingCapabilities = getRecordingCapabilitiesSuspense(replayClient);
 
   const status = useSyncExternalStore(subscribeForStatus, getStatus, getStatus);
   let exceptionsBadge = null;
@@ -142,7 +142,7 @@ function ToggleCategoryCount({ category }: { category: keyof CategoryCounts }) {
   const { range: focusRange } = useContext(FocusContext);
   const client = useContext(ReplayClientContext);
 
-  const { categoryCounts } = getMessages(client, focusRange);
+  const { categoryCounts } = getMessagesSuspense(client, focusRange);
   const count = categoryCounts[category];
 
   return count === 0 ? null : <Badge label={count} />;
@@ -152,7 +152,7 @@ function NodeModulesCount() {
   const client = useContext(ReplayClientContext);
   const { range } = useContext(FocusContext);
 
-  const { messages } = getMessages(client, range);
+  const { messages } = getMessagesSuspense(client, range);
 
   const count = useMemo(() => {
     return messages.filter(message => isInNodeModules(message)).length;

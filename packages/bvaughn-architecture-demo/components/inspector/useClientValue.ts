@@ -1,4 +1,7 @@
-import { getCachedObject, getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
+import {
+  getCachedObject,
+  getObjectWithPreviewSuspense,
+} from "@bvaughn/src/suspense/ObjectPreviews";
 import { protocolValueToClientValue, Value as ClientValue } from "@bvaughn/src/utils/protocol";
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import { useContext, useMemo } from "react";
@@ -16,7 +19,7 @@ export default function useClientValue(
     // Typically we will have already cached this data from a previous request.
     // There may be edge cases where this is not true though (see BAC-2095).
     // As a workaround, just-in-time fetch the data before calling protocolValueToClientValue().
-    getObjectWithPreview(client, pauseId, objectId);
+    getObjectWithPreviewSuspense(client, pauseId, objectId);
   }
 
   return useMemo(

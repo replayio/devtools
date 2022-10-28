@@ -36,11 +36,11 @@ describe("ExceptionsCache", () => {
     range: TimeStampedPointRange | null
   ): Promise<UncaughtException[]> {
     try {
-      return getExceptions(client as any as ReplayClientInterface, range);
+      return getExceptionsSuspense(client as any as ReplayClientInterface, range);
     } catch (promise) {
       await promise;
 
-      return getExceptions(client as any as ReplayClientInterface, range);
+      return getExceptionsSuspense(client as any as ReplayClientInterface, range);
     }
   }
 
@@ -53,7 +53,7 @@ describe("ExceptionsCache", () => {
   }
 
   let client: { [key: string]: jest.Mock };
-  let getExceptions: (
+  let getExceptionsSuspense: (
     client: ReplayClientInterface,
     range: TimeStampedPointRange | null
   ) => Promise<UncaughtException[]>;
@@ -65,7 +65,7 @@ describe("ExceptionsCache", () => {
 
     // Clear and recreate cached data between tests.
     const module = require("./ExceptionsCache");
-    getExceptions = module.getExceptions;
+    getExceptionsSuspense = module.getExceptionsSuspense;
     getStatus = module.getStatus;
     subscribeForStatus = module.subscribeForStatus;
   });
@@ -271,12 +271,12 @@ describe("ExceptionsCache", () => {
 
     client.runAnalysis.mockImplementation(() => promise1);
     try {
-      getExceptions(client as any as ReplayClientInterface, toTSPR(0, 1));
+      getExceptionsSuspense(client as any as ReplayClientInterface, toTSPR(0, 1));
     } catch (promise) {}
 
     client.runAnalysis.mockImplementation(() => promise2);
     try {
-      getExceptions(client as any as ReplayClientInterface, toTSPR(2, 3));
+      getExceptionsSuspense(client as any as ReplayClientInterface, toTSPR(2, 3));
     } catch (promise) {}
 
     resolvePromise2();

@@ -19,8 +19,11 @@ describe("PointsCache", () => {
     condition: string | null,
     focusRange: TimeStampedPointRange | null
   ) => HitPointsAndStatusTuple;
-  let getClosestPointForTime: (client: ReplayClientInterface, time: number) => ExecutionPoint;
-  let getHitPointsForLocation: (
+  let getClosestPointForTimeSuspense: (
+    client: ReplayClientInterface,
+    time: number
+  ) => ExecutionPoint;
+  let getHitPointsForLocationSuspense: (
     client: ReplayClientInterface,
     location: Location,
     condition: string | null,
@@ -39,8 +42,8 @@ describe("PointsCache", () => {
     // Clear and recreate cached data between tests.
     const module = require("./PointsCache");
     getCachedHitPointsForLocation = module.getCachedHitPointsForLocation;
-    getClosestPointForTime = module.getClosestPointForTime;
-    getHitPointsForLocation = module.getHitPointsForLocation;
+    getClosestPointForTimeSuspense = module.getClosestPointForTimeSuspense;
+    getHitPointsForLocationSuspense = module.getHitPointsForLocationSuspense;
     imperativelyGetClosestPointForTime = module.imperativelyGetClosestPointForTime;
     preCacheExecutionPointForTime = module.preCacheExecutionPointForTime;
   });
@@ -53,11 +56,11 @@ describe("PointsCache", () => {
   describe("getClosestPointForTime", () => {
     async function getClosestPointForTimeHelper(time: number): Promise<ExecutionPoint> {
       try {
-        return getClosestPointForTime(replayClient, time);
+        return getClosestPointForTimeSuspense(replayClient, time);
       } catch (promise) {
         await promise;
 
-        return getClosestPointForTime(replayClient, time);
+        return getClosestPointForTimeSuspense(replayClient, time);
       }
     }
 
@@ -128,11 +131,11 @@ describe("PointsCache", () => {
       focusRange: TimeStampedPointRange | null
     ): Promise<HitPointsAndStatusTuple> {
       try {
-        return getHitPointsForLocation(replayClient, location, conditional, focusRange);
+        return getHitPointsForLocationSuspense(replayClient, location, conditional, focusRange);
       } catch (promise) {
         await promise;
 
-        return getHitPointsForLocation(replayClient, location, conditional, focusRange);
+        return getHitPointsForLocationSuspense(replayClient, location, conditional, focusRange);
       }
     }
 
@@ -274,9 +277,9 @@ describe("PointsCache", () => {
         throw Error("Expected");
       });
 
-      expect(await getClosestPointForTime(replayClient, 0)).toBe("0");
-      expect(await getClosestPointForTime(replayClient, 2)).toBe("2");
-      expect(await getClosestPointForTime(replayClient, 9)).toBe("9");
+      expect(await getClosestPointForTimeSuspense(replayClient, 0)).toBe("0");
+      expect(await getClosestPointForTimeSuspense(replayClient, 2)).toBe("2");
+      expect(await getClosestPointForTimeSuspense(replayClient, 9)).toBe("9");
 
       expect(await imperativelyGetClosestPointForTime(replayClient, 0)).toBe("0");
       expect(await imperativelyGetClosestPointForTime(replayClient, 2)).toBe("2");

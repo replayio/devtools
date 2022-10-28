@@ -8,7 +8,7 @@ import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
-import { runAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
+import { runAnalysisSuspense } from "@bvaughn/src/suspense/AnalysisCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
 import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
@@ -131,7 +131,7 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
     ? { begin: focusRange.begin.point, end: focusRange.end.point }
     : null;
 
-  const analysisResults = runAnalysis(
+  const analysisResults = runAnalysisSuspense(
     client,
     pointRange,
     point.location,

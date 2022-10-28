@@ -3,7 +3,7 @@ import {
   ObjectId as ProtocolObjectId,
   PauseId as ProtocolPauseId,
 } from "@replayio/protocol";
-import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
+import { getObjectWithPreviewSuspense } from "@bvaughn/src/suspense/ObjectPreviews";
 import { useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -48,7 +48,7 @@ function HTMLChildRenderer({
   const client = useContext(ReplayClientContext);
 
   // Filter out empty text nodes to avoid displaying a bunch of white space entries.
-  const object = getObjectWithPreview(client, pauseId, objectId);
+  const object = getObjectWithPreviewSuspense(client, pauseId, objectId);
   if (isEmptyTextNode(object)) {
     return null;
   }

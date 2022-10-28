@@ -23,7 +23,7 @@ import { setSelectedPanel } from "ui/actions/layout";
 import { ReduxAnnotationsContext } from "./redux-devtools/redux-annotations";
 import NewConsoleRoot from "./NewConsole";
 import Loader from "../shared/Loader";
-import { getRecordingCapabilities } from "./getRecordingCapabilities";
+import { getRecordingCapabilitiesSuspense } from "./getRecordingCapabilities";
 import { useFeature } from "ui/hooks/settings";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
@@ -143,7 +143,7 @@ function SecondaryToolbox() {
   const reduxAnnotations = useContext(ReduxAnnotationsContext);
   const dispatch = useAppDispatch();
 
-  const recordingCapabilities = getRecordingCapabilities();
+  const recordingCapabilities = getRecordingCapabilitiesSuspense();
   const { value: chromiumNetMonitorEnabled } = useFeature("chromiumNetMonitor");
 
   if (selectedPanel === "react-components" && !hasReactComponents) {

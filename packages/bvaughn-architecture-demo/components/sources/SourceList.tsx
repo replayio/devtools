@@ -4,7 +4,7 @@ import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
 import useLocalStorage from "@bvaughn/src/hooks/useLocalStorage";
 import {
   getCachedMinMaxSourceHitCounts,
-  getSourceHitCounts,
+  getSourceHitCountsSuspense,
 } from "@bvaughn/src/suspense/SourcesCache";
 import { newSource as ProtocolSource } from "@replayio/protocol";
 import {
@@ -86,7 +86,7 @@ export default function SourceList({
   const [showHitCounts, setShowHitCounts] = useLocalStorage<boolean>(togglesLocalStorageKey, true);
 
   const hitCounts = visibleLines
-    ? getSourceHitCounts(client, sourceId, visibleLines, focusRange)
+    ? getSourceHitCountsSuspense(client, sourceId, visibleLines, focusRange)
     : null;
 
   const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);

@@ -1,7 +1,7 @@
 import Popup from "@bvaughn/components/Popup";
 import useCurrentPause from "@bvaughn/src/hooks/useCurrentPause";
-import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
-import { evaluate } from "@bvaughn/src/suspense/PauseCache";
+import { getObjectWithPreviewSuspense } from "@bvaughn/src/suspense/ObjectPreviews";
+import { evaluateSuspense } from "@bvaughn/src/suspense/PauseCache";
 import { createPauseResult as Pause, Property, Scope } from "@replayio/protocol";
 import { RefObject, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { FixedSizeList as List } from "react-window";
@@ -93,10 +93,11 @@ function AutoCompleteListInner({
     // Evaluate the properties of an object (expressionHead)
     const pauseId = pause.pauseId;
     const frameId = pause.data.frames?.[0]?.frameId ?? null;
-    const maybeResult = evaluate(replayClient, pauseId, frameId, expressionHead).returned || null;
+    const maybeResult =
+      evaluateSuspense(replayClient, pauseId, frameId, expressionHead).returned || null;
     const maybeResultId = maybeResult?.object;
     if (maybeResultId) {
-      const { preview } = getObjectWithPreview(
+      const { preview } = getObjectWithPreviewSuspense(
         replayClient,
         pause.pauseId,
         maybeResultId,
@@ -110,7 +111,7 @@ function AutoCompleteListInner({
       const maybeGlobalObject = scopes[scopes.length - 1];
       const maybeGlobalObjectId = maybeGlobalObject?.object;
       if (maybeGlobalObjectId) {
-        const { preview } = getObjectWithPreview(
+        const { preview } = getObjectWithPreviewSuspense(
           replayClient,
           pause.pauseId,
           maybeGlobalObjectId,

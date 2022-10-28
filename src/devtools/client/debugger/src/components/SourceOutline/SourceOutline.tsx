@@ -1,7 +1,7 @@
 import { Location } from "@replayio/protocol";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import { getSourceHitCounts } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { getSourceHitCountsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import classnames from "classnames";
 import React, {
   useRef,
@@ -50,7 +50,7 @@ export function SourceOutline({
 
   const hitCounts =
     selectedSource && visibleLines
-      ? getSourceHitCounts(replayClient, selectedSource.id, visibleLines, focusRange)
+      ? getSourceHitCountsSuspense(replayClient, selectedSource.id, visibleLines, focusRange)
       : null;
 
   const [filter, setFilter] = useState("");

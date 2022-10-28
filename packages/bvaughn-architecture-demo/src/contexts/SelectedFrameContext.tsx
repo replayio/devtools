@@ -5,7 +5,7 @@ import useLoadedRegions from "../hooks/useRegions";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { TimelineContext } from "./TimelineContext";
 import { isPointInRegions } from "shared/utils/time";
-import { getPauseForExecutionPoint } from "../suspense/PauseCache";
+import { getPauseForExecutionPointSuspense } from "../suspense/PauseCache";
 
 interface PauseAndFrameId {
   pauseId: PauseId;
@@ -41,7 +41,7 @@ function SelectedFrameContextAdapter() {
 
   const isLoaded = loadedRegions !== null && isPointInRegions(executionPoint, loadedRegions.loaded);
 
-  const pause = isLoaded ? getPauseForExecutionPoint(client, executionPoint) : undefined;
+  const pause = isLoaded ? getPauseForExecutionPointSuspense(client, executionPoint) : undefined;
 
   const pauseId = pause?.pauseId;
   const frameId = pause?.stack?.[0] ?? null;

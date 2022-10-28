@@ -1,6 +1,6 @@
 import { SelectedFrameContext } from "@bvaughn/src/contexts/SelectedFrameContext";
 import useCurrentPause from "@bvaughn/src/hooks/useCurrentPause";
-import { evaluate } from "@bvaughn/src/suspense/PauseCache";
+import { evaluateSuspense } from "@bvaughn/src/suspense/PauseCache";
 import { createPauseResult as Pause, Value as ProtocolValue } from "@replayio/protocol";
 import { RefObject, Suspense, useContext, useEffect, useRef } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -29,7 +29,7 @@ function SuspendingPreviewPopup({ containerRef, dismiss, expression, pause, targ
 
   let value: ProtocolValue | null = null;
   if (frameId !== null && pauseId !== null) {
-    const result = evaluate(client, pauseId, frameId, expression);
+    const result = evaluateSuspense(client, pauseId, frameId, expression);
 
     value = result.returned || null;
   }

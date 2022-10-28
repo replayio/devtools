@@ -1,8 +1,8 @@
 import type { PointDescription } from "@replayio/protocol";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import { getHitPointsForLocation } from "bvaughn-architecture-demo/src/suspense/PointsCache";
-import { getSourceHitCounts } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
+import { getSourceHitCountsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { selectors } from "ui/reducers";
@@ -23,7 +23,12 @@ function PreviewMarkers() {
 
   let firstColumnWithHitCounts = null;
   if (focusedSourceId !== null && hoveredLineIndex !== null && visibleLines !== null) {
-    const hitCounts = getSourceHitCounts(replayClient, focusedSourceId, visibleLines, focusRange);
+    const hitCounts = getSourceHitCountsSuspense(
+      replayClient,
+      focusedSourceId,
+      visibleLines,
+      focusRange
+    );
     const hitCountsForLine = hitCounts.get(hoveredLineIndex + 1)!;
     if (hitCountsForLine) {
       firstColumnWithHitCounts = hitCountsForLine.firstBreakableColumnIndex;
@@ -32,7 +37,7 @@ function PreviewMarkers() {
 
   const [hitPoints, hitPointStatus] =
     focusedSourceId !== null && firstColumnWithHitCounts !== null && hoveredLineIndex !== null
-      ? getHitPointsForLocation(
+      ? getHitPointsForLocationSuspense(
           replayClient,
           {
             sourceId: focusedSourceId,

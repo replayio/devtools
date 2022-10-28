@@ -45,7 +45,7 @@ export function createReplayClientForProduction(): ReplayClientInterface {
 let caughtError: Error | null = null;
 let encoded: string | null = null;
 let wakeable: Wakeable<string> | null = null;
-function getEncoded(host: string, fixtureDataPath: string): string {
+function getEncodedSuspense(host: string, fixtureDataPath: string): string {
   if (encoded === null) {
     if (caughtError !== null) {
       throw caughtError;
@@ -87,7 +87,7 @@ export function useReplayClientForTesting(): ReplayClientInterface {
     if (debug) {
       return replayClient;
     } else if (host && fixtureDataPath) {
-      const encoded = getEncoded(host, fixtureDataPath);
+      const encoded = getEncodedSuspense(host, fixtureDataPath);
       const decoded = decode(encoded);
 
       const { additionalData, entries } = decoded;
