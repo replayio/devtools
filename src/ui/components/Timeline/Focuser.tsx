@@ -3,7 +3,6 @@ import React, { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { setFocusRegion, setTimelineToTime } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
-import { UnsafeFocusRegion } from "ui/state/timeline";
 import {
   getPositionFromTime,
   getTimeFromPosition,

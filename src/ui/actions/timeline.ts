@@ -108,10 +108,17 @@ export function jumpToInitialPausePoint(): UIThunkAction {
     const initialPausePoint = await getInitialPausePoint(ThreadFront.recordingId!);
 
     if (initialPausePoint) {
-      const range = (initialPausePoint as any).focusRegion;
-      if (range) {
-        dispatch(setFocusRegionBeginTime(range.begin.time, false));
-        dispatch(setFocusRegionEndTime(range.end.time, true));
+      const focusRegion =
+        "focusRegion" in initialPausePoint ? initialPausePoint.focusRegion : undefined;
+      if (focusRegion) {
+        dispatch(
+          newFocusRegion({
+            ...focusRegion,
+            beginTime: focusRegion.begin.time,
+            endTime: focusRegion.end.time,
+          })
+        );
+        dispatch(syncFocusedRegion());
       }
       point = initialPausePoint.point;
       hasFrames = initialPausePoint.hasFrames;
@@ -206,12 +213,20 @@ export function updatePausePointParams({
     point,
     time: `${time}`,
     hasFrames: `${hasFrames}`,
-    focusRegion: undefined,
+    focusRegion: encodeFocusRegion(focusRegion),
   };
-  if (focusRegion) {
-    params.focusRegion = encodeObjectToURL(rangeForFocusRegion(focusRegion));
-  }
   updateUrlWithParams(params);
+}
+
+export function updateFocusRegionParam(): UIThunkAction<void> {
+  return (dispatch, getState) => {
+    const focusRegion = getFocusRegion(getState());
+    updateUrlWithParams({ focusRegion: encodeFocusRegion(focusRegion) });
+  };
+}
+
+function encodeFocusRegion(focusRegion: FocusRegion | null) {
+  return focusRegion ? encodeObjectToURL(rangeForFocusRegion(focusRegion)) : undefined;
 }
 
 export function seek(
@@ -588,6 +603,7 @@ export function setFocusRegionEndTime(endTime: number, sync: boolean): UIThunkAc
 
     if (sync) {
       dispatch(syncFocusedRegion());
+      dispatch(updateFocusRegionParam());
     }
   };
 }
@@ -612,6 +628,7 @@ export function setFocusRegionBeginTime(beginTime: number, sync: boolean): UIThu
 
     if (sync) {
       dispatch(syncFocusedRegion());
+      dispatch(updateFocusRegionParam());
     }
   };
 }

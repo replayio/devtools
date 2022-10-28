@@ -1,8 +1,12 @@
 import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { exitFocusMode, setFocusRegion, syncFocusedRegion } from "ui/actions/timeline";
+import {
+  exitFocusMode,
+  setFocusRegion,
+  syncFocusedRegion,
+  updateFocusRegionParam,
+} from "ui/actions/timeline";
 import { getFocusRegionBackup, getShowFocusModeControls } from "ui/reducers/timeline";
-import { UnsafeFocusRegion } from "ui/state/timeline";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { PrimaryButton, SecondaryButton } from "../shared/Button";
@@ -14,7 +18,7 @@ export default function FocusModePopout() {
   const showFocusModeControls = useAppSelector(getShowFocusModeControls);
 
   const dispatch = useAppDispatch();
-  const focusRegionBackup = useAppSelector(getFocusRegionBackup) as UnsafeFocusRegion;
+  const focusRegionBackup = useAppSelector(getFocusRegionBackup);
 
   const hideModal = () => dispatch(exitFocusMode());
 
@@ -32,6 +36,7 @@ export default function FocusModePopout() {
   };
   const savePendingChanges = () => {
     dispatch(syncFocusedRegion());
+    dispatch(updateFocusRegionParam());
     trackEvent("timeline.save_focus");
 
     hideModal();

@@ -6,7 +6,7 @@ import {
   displayedBeginForFocusRegion,
   mergeSortedPointLists,
 } from "ui/utils/timeline";
-import { FocusRegion, HoveredItem, TimelineState, UnsafeFocusRegion } from "ui/state/timeline";
+import { FocusRegion, HoveredItem, TimelineState } from "ui/state/timeline";
 import sortBy from "lodash/sortBy";
 import { UIThunkAction } from "ui/actions";
 
@@ -94,7 +94,7 @@ export const pointsReceivedThunk = (points: TimeStampedPoint[]): UIThunkAction =
   return (dispatch, getState) => {
     const state = getState() as UIState;
     dispatch(pointsReceived(points));
-    const focusRegion = getFocusRegion(state) as UnsafeFocusRegion | null;
+    const focusRegion = getFocusRegion(state);
     if (!focusRegion) {
       return;
     }
