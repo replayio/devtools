@@ -7,6 +7,10 @@ import {
 import { ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { Point } from "shared/client/types";
 
+import { useAppSelector } from "ui/setup/hooks";
+
+import { getSourceDetailsEntities } from "ui/reducers/sources";
+
 import Breakpoint from "./Breakpoint";
 import BreakpointHeading from "./BreakpointHeading";
 
@@ -22,6 +26,8 @@ export default function Breakpoints({
   const { deletePoints, points } = useContext(PointsContext);
   const [headlessEditor, setHeadlessEditor] = useState<any>(null);
 
+  const sourceDetailsEntities = useAppSelector(getSourceDetailsEntities);
+
   useEffect(() => {
     (async () => {
       await waitForEditor();
@@ -32,9 +38,18 @@ export default function Breakpoints({
   const filteredAndSortedPoints = useMemo(
     () =>
       points
-        .filter(type === "breakpoint" ? point => point.shouldBreak : point => point.shouldLog)
+        .filter(point => {
+          // It's possible we may not have source entries for these source IDs.
+          // Either we might not have sources fetched yet,
+          // or there could be obsolete persisted source IDs for points.
+          // Ensure we only show points that have valid sources available.
+          const sourceExists = !!sourceDetailsEntities[point.location.sourceId];
+          const matchesType = type === "breakpoint" ? point.shouldBreak : point.shouldLog;
+
+          return sourceExists && matchesType;
+        })
         .sort((a, b) => a.location.line - b.location.line),
-    [points, type]
+    [points, type, sourceDetailsEntities]
   );
 
   const sourceIdToPointsMap = useMemo(() => {
