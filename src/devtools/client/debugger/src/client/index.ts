@@ -4,8 +4,11 @@
 
 import { newSource, Frame } from "@replayio/protocol";
 import type { ThreadFront as TF } from "protocol/thread";
+import { ReplayClientInterface } from "shared/client/types";
 import type { UIStore } from "ui/actions";
 import { allSourcesReceived } from "ui/reducers/sources";
+
+import { getSourcesHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 
 import { verifyPrefSchema } from "../utils/prefs";
 
@@ -13,17 +16,21 @@ import { resumed, paused } from "../actions/pause";
 
 let store: UIStore;
 
-async function setupDebugger(ThreadFront: typeof TF) {
-  const sources: newSource[] = [];
-  await ThreadFront.findSources(newSource => sources.push(newSource));
+async function setupDebugger(ThreadFront: typeof TF, replayClient: ReplayClientInterface) {
+  const sources = await getSourcesHelper(replayClient);
 
   store.dispatch(allSourcesReceived(sources));
+  ThreadFront.markSourcesLoaded();
 }
 
-export function bootstrap(_store: UIStore, ThreadFront: typeof TF) {
+export function bootstrap(
+  _store: UIStore,
+  ThreadFront: typeof TF,
+  replayClient: ReplayClientInterface
+) {
   store = _store;
 
-  setupDebugger(ThreadFront);
+  setupDebugger(ThreadFront, replayClient);
 
   verifyPrefSchema();
 

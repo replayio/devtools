@@ -295,10 +295,16 @@ export class ReplayClient implements ReplayClientInterface {
   async findSources(): Promise<Source[]> {
     const sources: Source[] = [];
 
-    await this._threadFront.findSources((source: Source) => {
-      sources.push(source);
-    });
+    await this.waitForSession();
+    const sessionId = this.getSessionIdThrows();
 
+    const newSourceListener = (source: Source) => {
+      sources.push(source);
+    };
+    client.Debugger.addNewSourceListener(newSourceListener);
+    await client.Debugger.findSources({}, sessionId);
+
+    client.Debugger.removeNewSourceListener(newSourceListener);
     return sources;
   }
 

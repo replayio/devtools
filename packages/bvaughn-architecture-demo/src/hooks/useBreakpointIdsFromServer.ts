@@ -3,11 +3,15 @@ import { useContext, useEffect, useRef } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point, PointId } from "shared/client/types";
 import { getBreakpointPositionsAsync } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { ReplayClientInterface } from "shared/client/types";
+import { getSourcesHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 
 // Breakpoints must be synced with the server so the stepping controls will work.
 export default function useBreakpointIdsFromServer(
   points: Point[],
-  editPoint: (id: PointId, partialPoint: Partial<Point>) => void
+  editPoint: (id: PointId, partialPoint: Partial<Point>) => void,
+  deletePoints: (...ids: PointId[]) => void,
+  replayClient: ReplayClientInterface
 ): void {
   const client = useContext(ReplayClientContext);
 
@@ -24,16 +28,43 @@ export default function useBreakpointIdsFromServer(
           // Here we _need_ to make sure we have breakable positions before we try to add the points,
           // as the backend will throw "Invalid Location" errors if you add points and haven't asked for positions.
 
+          // First, ensure we wait until the client has fetched sources.
+          // There's no point (hah!) in restoring breakpoints until after
+          // we have sources to work with, and it's also possible that
+          // some persisted points have obsolete source IDs.
+          const allSources = await getSourcesHelper(replayClient);
+
+          const allSourceIds = new Set<string>();
+          for (let source of allSources) {
+            allSourceIds.add(source.sourceId);
+          }
           const sourcesWithFetchedPositions = new Set<string>();
 
+          const pointsToRemove: string[] = [];
+
           for (let point of points) {
-            if (!sourcesWithFetchedPositions.has(point.location.sourceId)) {
-              sourcesWithFetchedPositions.add(point.location.sourceId);
+            const { sourceId } = point.location;
+            if (!allSourceIds.has(sourceId)) {
+              // It's possible this persisted point has an obsolete
+              // `sourceId`. Ignore it, and we'll remove it at the end.
+              pointsToRemove.push(point.id);
+              continue;
+            }
+
+            if (!sourcesWithFetchedPositions.has(sourceId)) {
+              sourcesWithFetchedPositions.add(sourceId);
+              // We haven't fetched breakable positions for this yet. Get them.
               await getBreakpointPositionsAsync(client, point.location.sourceId);
             }
+            // _Now_ we can tell the backend about this breakpoint.
             client.breakpointAdded(point.location, point.condition).then(serverIds => {
               pointIdToBreakpointIdMap.set(point.id, serverIds);
             });
+          }
+
+          if (pointsToRemove.length > 0) {
+            // Sync up the points in memory to remove any obsolete points we saw.
+            deletePoints(...pointsToRemove);
           }
         } else {
           // The user has probably been interacting with the app and we _should_ have breakable positions
@@ -80,5 +111,5 @@ export default function useBreakpointIdsFromServer(
     }
 
     setUpBreakpoints();
-  }, [client, editPoint, points]);
+  }, [client, editPoint, deletePoints, points, replayClient]);
 }

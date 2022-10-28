@@ -193,7 +193,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   setupSourcesListeners(startAppListening);
   setupMarkup(store, startAppListening);
 
-  dbgClient.bootstrap(store, ThreadFront);
+  dbgClient.bootstrap(store, ThreadFront, replayClient);
 
   const socket = initSocket(dispatchUrl);
   if (typeof window !== "undefined") {

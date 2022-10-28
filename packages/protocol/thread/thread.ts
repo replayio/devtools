@@ -397,28 +397,14 @@ class _ThreadFront {
     this.emit("paused", { point, hasFrames, time });
   }
 
-  async findSources(onSource: (source: newSource) => void) {
-    const sessionId = await this.waitForSession();
-
-    const allSources: newSource[] = [];
-    const newSourceListener = (source: newSource) => {
-      allSources.push(source);
-    };
-    client.Debugger.addNewSourceListener(newSourceListener);
-    await client.Debugger.findSources({}, sessionId);
-    if (!this.hasAllSources) {
-      this.hasAllSources = true;
-      this.allSourcesWaiter.resolve();
-    }
-    client.Debugger.removeNewSourceListener(newSourceListener);
-
-    for (const source of allSources) {
-      onSource(source);
-    }
-  }
-
   async ensureAllSources() {
     await this.allSourcesWaiter.promise;
+  }
+
+  public markSourcesLoaded() {
+    // Called by `debugger/src/client/index`, in `setupDebugger()`.
+    // Sources are now fetched via `SourcesCache`.
+    this.allSourcesWaiter.resolve();
   }
 
   getBreakpointPositionsCompressed(
