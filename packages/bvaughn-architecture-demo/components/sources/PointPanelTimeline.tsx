@@ -2,11 +2,17 @@ import Icon from "@bvaughn/components/Icon";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { imperativelyGetClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
-import { isExecutionPointsGreaterThan, isExecutionPointsLessThan } from "@bvaughn/src/utils/time";
+import {
+  formatTimestamp,
+  isExecutionPointsGreaterThan,
+  isExecutionPointsLessThan,
+} from "@bvaughn/src/utils/time";
 import { TimeStampedPoint } from "@replayio/protocol";
-import { CSSProperties, MouseEvent, useContext, useState } from "react";
+import { CSSProperties, MouseEvent, useContext, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { HitPointStatus, Point } from "shared/client/types";
+import Popup from "../Popup";
 
 import styles from "./PointPanelTimeline.module.css";
 import { getBadgeStyleVars } from "./utils/getBadgeStyleVars";
@@ -30,6 +36,10 @@ export default function PointPanelTimeline({
     update,
   } = useContext(TimelineContext);
 
+  const [hoverCoordinates, setHoverCoordinates] = useState<{
+    clientX: number;
+    clientY: number;
+  } | null>(null);
   const [hoverTime, setHoverTime] = useState<number>(0);
 
   const [currentHitPoint, currentHitPointIndex] = findHitPoint(hitPoints, currentExecutionPoint);
@@ -80,6 +90,7 @@ export default function PointPanelTimeline({
 
   const onTimelineMouseLeave = () => {
     setHoverTime(0);
+    setHoverCoordinates(null);
   };
 
   const onTimelineMouseMove = (event: MouseEvent) => {
@@ -90,6 +101,7 @@ export default function PointPanelTimeline({
     const time = Math.round(duration * percentage);
 
     setHoverTime(time);
+    setHoverCoordinates({ clientX: event.clientX, clientY: event.clientY });
   };
 
   return (
@@ -174,7 +186,41 @@ export default function PointPanelTimeline({
             }}
           />
         ))}
+        {hoverTime !== null && hoverCoordinates !== null && (
+          <TimeTooltip
+            clientX={hoverCoordinates.clientX}
+            clientY={hoverCoordinates.clientY}
+            time={hoverTime}
+          />
+        )}
       </div>
     </>
+  );
+}
+
+function TimeTooltip({
+  clientX,
+  clientY,
+  time,
+}: {
+  clientX: number;
+  clientY: number;
+  time: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const tooltip = ref.current!;
+    const rect = tooltip.getBoundingClientRect();
+
+    tooltip.style.left = `${clientX - rect.width / 2}px`;
+    tooltip.style.top = `${clientY - rect.height}px`;
+  });
+
+  return createPortal(
+    <div className={styles.TimeTool} ref={ref}>
+      {formatTimestamp(time)}
+    </div>,
+    document.body
   );
 }
