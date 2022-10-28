@@ -10,6 +10,7 @@ import {
   useState,
   useTransition,
 } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point, PointId } from "shared/client/types";
 
 import useBreakpointIdsFromServer from "../hooks/useBreakpointIdsFromServer";
@@ -40,6 +41,7 @@ export const PointsContext = createContext<PointsContextType>(null as any);
 
 export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   const { recordingId } = useContext(SessionContext);
+  const replayClient = useContext(ReplayClientContext);
 
   // Both high-pri state and transition state should be managed by useLocalStorage,
   // Else values from other tabs will only be synced to the high-pri state.
@@ -114,7 +116,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     [setPointsHelper]
   );
 
-  useBreakpointIdsFromServer(points, editPoint);
+  useBreakpointIdsFromServer(points, editPoint, deletePoints, replayClient);
 
   const context = useMemo(
     () => ({ addPoint, deletePoints, editPoint, isPending, points, pointsForAnalysis }),
