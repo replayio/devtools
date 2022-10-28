@@ -3,7 +3,7 @@ import clamp from "lodash/clamp";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import sortedLastIndexBy from "lodash/sortedLastIndexBy";
 import { assert } from "protocol/utils";
-import { FocusRegion, UnsafeFocusRegion, ZoomRegion } from "ui/state/timeline";
+import { FocusRegion, ZoomRegion } from "ui/state/timeline";
 
 import { timelineMarkerWidth } from "../constants";
 
@@ -26,13 +26,11 @@ export function getPixelDistance({
 }
 
 export function displayedBeginForFocusRegion(focusRegion: FocusRegion) {
-  const unsafe = focusRegion as UnsafeFocusRegion;
-  return unsafe.beginTime;
+  return focusRegion.beginTime;
 }
 
 export function displayedEndForFocusRegion(focusRegion: FocusRegion) {
-  const unsafe = focusRegion as UnsafeFocusRegion;
-  return unsafe.endTime;
+  return focusRegion.endTime;
 }
 
 // Get the position of a time on the visible part of the timeline,
@@ -237,8 +235,7 @@ export function isTimeInRegions(time: number, regions?: TimeStampedPointRange[])
 }
 
 export function rangeForFocusRegion(focusRegion: FocusRegion): TimeStampedPointRange {
-  const unsafe = focusRegion as UnsafeFocusRegion;
-  return { begin: unsafe.begin || { time: 0, point: "0" }, end: unsafe.end };
+  return { begin: focusRegion.begin || { time: 0, point: "0" }, end: focusRegion.end };
 }
 
 export const overlap = (a: TimeStampedPointRange[], b: TimeStampedPointRange[]) => {

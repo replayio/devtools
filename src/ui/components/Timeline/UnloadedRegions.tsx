@@ -5,7 +5,6 @@ import { getLoadedRegions } from "ui/reducers/app";
 import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
 import { getVisiblePosition, overlap } from "ui/utils/timeline";
 import { TimeStampedPointRange } from "@replayio/protocol";
-import { UnsafeFocusRegion } from "ui/state/timeline";
 
 export const UnloadedRegions: FC = () => {
   const loadedRegions = useAppSelector(getLoadedRegions);
@@ -29,15 +28,14 @@ export const UnloadedRegions: FC = () => {
   if (focusRegion) {
     // Even though we technically focus on the nearest points,
     // We should only show the user a range defining their specified times.
-    const unsafe = focusRegion as UnsafeFocusRegion;
     const userVisibleTimeStampedPointRange: TimeStampedPointRange = {
       begin: {
-        point: unsafe.begin.point,
-        time: unsafe.beginTime,
+        point: focusRegion.begin.point,
+        time: focusRegion.beginTime,
       },
       end: {
-        point: unsafe.end.point,
-        time: unsafe.endTime,
+        point: focusRegion.end.point,
+        time: focusRegion.endTime,
       },
     };
 

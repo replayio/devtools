@@ -17,7 +17,6 @@ import { Nag } from "ui/hooks/users";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { UnsafeFocusRegion } from "ui/state/timeline";
 import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import { Point } from "shared/client/types";
 import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
@@ -71,43 +70,41 @@ function Panel({
   // To avoid unintentionally suspending in result to such an update, we use a deferred value.
   // Deferred values automatically lag slightly behind synchronous updates.
   const replayClient = useContext(ReplayClientContext);
-  const unsafeFocusRegion = focusRegion ? (focusRegion as UnsafeFocusRegion) : null;
   const breakpointForSuspense = useDeferredValue(breakpoint);
-  const unsafeFocusRegionForSuspense = useDeferredValue(unsafeFocusRegion);
+  const focusRegionForSuspense = useDeferredValue(focusRegion);
   const [hitPoints, hitPointStatus] =
     breakpointForSuspense != null
       ? getHitPointsForLocationSuspense(
           replayClient,
           breakpointForSuspense.location,
           breakpointForSuspense.condition,
-          unsafeFocusRegionForSuspense
+          focusRegionForSuspense
         )
       : [null, null];
 
   // If we were fully using concurrent APIs, updates to something like focus range or breakpoint would be done in a transition,
   // which would expose an "is pending" flag that we could use to show e.g. "Loading..." while we're updating breakpoints.
   // In this case, since we're using the deferred API for this, we have to calculate the "is pending" flag ourselves.
-  const isPending =
-    unsafeFocusRegion !== unsafeFocusRegionForSuspense || breakpoint !== breakpointForSuspense;
+  const isPending = focusRegion !== focusRegionForSuspense || breakpoint !== breakpointForSuspense;
 
   // HACK
   // The TimeStampedPoints within the focus region are always at least as large as (often larger than) the user-defined time range.
   // Because of this, hit points may be returned that fall outside of the user's selection.
   // We should filter these out before passing them to the BreakpointNavigation component.
   const filteredHitPoints = useMemo(() => {
-    if (unsafeFocusRegionForSuspense == null) {
+    if (focusRegionForSuspense == null) {
       return hitPoints;
     } else {
       return hitPoints
         ? hitPoints.filter(hitPoint => {
             return (
-              hitPoint.time >= unsafeFocusRegionForSuspense.beginTime &&
-              hitPoint.time <= unsafeFocusRegionForSuspense.endTime
+              hitPoint.time >= focusRegionForSuspense.beginTime &&
+              hitPoint.time <= focusRegionForSuspense.endTime
             );
           })
         : null;
     }
-  }, [hitPoints, unsafeFocusRegionForSuspense]);
+  }, [hitPoints, focusRegionForSuspense]);
 
   const pausedOnHit = !!hitPoints?.some(
     ({ point, time }) => point == executionPoint && time == currentTime
