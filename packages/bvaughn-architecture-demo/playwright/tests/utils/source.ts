@@ -640,6 +640,8 @@ export async function toggleLogPointBadge(
     );
     await targetButton.click();
   }
+
+  await stopHovering(page);
 }
 
 export async function verifyHitPointButtonsEnabled(
