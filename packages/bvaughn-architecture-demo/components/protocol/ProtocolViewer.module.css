@@ -1,7 +1,7 @@
 .ProtocolViewer {
   background-color: var(--background-color-contrast-2);
   width: 100%;
-  border-radius: 0.5rem;
+  border-radius: 0.5em;
   overflow: auto;
   display: flex;
   flex-direction: column;
@@ -10,7 +10,7 @@
 
 .Header {
   flex: 0 0 auto;
-  padding: 0.5rem;
+  padding: 0.5em;
   font-size: var(--font-size-large);
   color: var(--color-default);
   display: flex;
@@ -18,9 +18,9 @@
 }
 
 .SearchInput {
-  margin: 0.25rem 0.5rem;
+  margin: 0.25em 0.5em;
   border: none;
-  border-radius: 0.25rem;
+  border-radius: 0.25em;
 }
 
 .List {
@@ -38,7 +38,7 @@
 .ListItemHeader {
   display: flex;
   align-items: center;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25em 0.5em;
   width: 100%;
   user-select: none;
   cursor: pointer;

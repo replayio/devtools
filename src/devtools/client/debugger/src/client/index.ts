@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { newSource, Frame } from "@replayio/protocol";
+import { Frame } from "@replayio/protocol";
 import type { ThreadFront as TF } from "protocol/thread";
 import { ReplayClientInterface } from "shared/client/types";
 import type { UIStore } from "ui/actions";
@@ -20,7 +20,6 @@ async function setupDebugger(ThreadFront: typeof TF, replayClient: ReplayClientI
   const sources = await getSourcesHelper(replayClient);
 
   store.dispatch(allSourcesReceived(sources));
-  ThreadFront.markSourcesLoaded();
 }
 
 export function bootstrap(

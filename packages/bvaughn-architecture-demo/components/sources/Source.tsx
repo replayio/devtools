@@ -3,9 +3,11 @@ import { parse } from "@bvaughn/src/suspense/SyntaxParsingCache";
 import { getSourceFileName } from "@bvaughn/src/utils/source";
 import { newSource as ProtocolSource } from "@replayio/protocol";
 import debounce from "lodash/debounce";
-import { MouseEvent, useContext, useRef, useState } from "react";
+import { MouseEvent, Suspense, useContext, useRef, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+
+import Loader from "../Loader";
 
 import PreviewPopup from "./PreviewPopup";
 import styles from "./Source.module.css";
@@ -20,6 +22,20 @@ export type HoveredState = {
 };
 
 export default function Source({
+  source,
+  showColumnBreakpoints,
+}: {
+  source: ProtocolSource;
+  showColumnBreakpoints: boolean;
+}) {
+  return (
+    <Suspense fallback={<Loader className={styles.Loader} />}>
+      <SuspendingSource source={source} showColumnBreakpoints={showColumnBreakpoints} />
+    </Suspense>
+  );
+}
+
+function SuspendingSource({
   source,
   showColumnBreakpoints,
 }: {

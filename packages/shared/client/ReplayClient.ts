@@ -296,15 +296,19 @@ export class ReplayClient implements ReplayClientInterface {
     const sources: Source[] = [];
 
     await this.waitForSession();
+
     const sessionId = this.getSessionIdThrows();
 
     const newSourceListener = (source: Source) => {
       sources.push(source);
     };
+
     client.Debugger.addNewSourceListener(newSourceListener);
     await client.Debugger.findSources({}, sessionId);
-
     client.Debugger.removeNewSourceListener(newSourceListener);
+
+    this._threadFront.markSourcesLoaded();
+
     return sources;
   }
 

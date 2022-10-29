@@ -6,7 +6,7 @@
 
 .Frame {
   grid-column: 1 / -1;
-  padding-left: 1rem;
+  padding-left: 1em;
   display: flex;
   width: 100%;
   gap: 1ch;

@@ -7,21 +7,21 @@
 }
 
 .ToggleButton {
-  min-height: 1rem;
+  min-height: 1em;
 }
 
 .ArrowContainer {
-  width: 0.75rem;
-  height: 1rem;
+  width: 0.75em;
+  height: 1em;
   position: relative;
 }
 
 .ArrowCollapsed,
 .ArrowExpanded {
-  transform-origin: 0.5rem 0.5rem;
+  transform-origin: 0.5em 0.5em;
   transition: transform 200ms;
-  width: 1rem;
-  height: 1rem;
+  width: 1em;
+  height: 1em;
   margin-right: 0.5ch;
   display: inline-block;
 }
@@ -31,14 +31,14 @@
 
 .ArrowIcon {
   fill: var(--collapsible-toggle-color);
-  width: 1rem;
-  height: 1rem;
+  width: 1em;
+  height: 1em;
   display: inline-block;
 }
 
 .Children {
-  margin-left: 0.5rem;
-  padding-left: 0.5rem;
+  margin-left: 0.5em;
+  padding-left: 0.5em;
   display: flex;
   flex-direction: column;
 }

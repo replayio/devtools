@@ -23,6 +23,7 @@ import Loader from "../Loader";
 
 import AutoComplete from "./AutoComplete/AutoComplete";
 import BadgePicker from "./BadgePicker";
+import CommentButton from "./CommentButton";
 import styles from "./PointPanel.module.css";
 import PointPanelTimeline from "./PointPanelTimeline";
 import SyntaxHighlightedLine from "./SyntaxHighlightedLine";
@@ -35,7 +36,7 @@ export default function SourcePanelWrapper({
   point: Point;
 }) {
   return (
-    <Suspense fallback={<Loader />}>
+    <Suspense fallback={<Loader className={`${styles.Loader} ${className}`} />}>
       <PointPanel className={className} point={point} />
     </Suspense>
   );
@@ -107,78 +108,84 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
     };
 
     return (
-      <div className={`${styles.Point} ${className}`} data-test-id={`PointPanel-${lineNumber}`}>
-        <div className={styles.MainColumn}>
-          {hasCondition && (
-            <div className={styles.Row}>
-              <div className={styles.ContentPrefixLabel}>if</div>
+      <div className={`${styles.Panel} ${className}`} data-test-id={`PointPanel-${lineNumber}`}>
+        <div className={styles.LayoutRow}>
+          <div className={styles.MainColumn}>
+            {hasCondition && (
+              <div className={styles.FixedHeightRow}>
+                <div className={styles.ContentPrefixLabel}>if</div>
+                <div
+                  className={
+                    isConditionValid ? styles.ContentWrapper : styles.ContentWrapperInvalid
+                  }
+                >
+                  <div className={styles.Content}>
+                    <AutoComplete
+                      autoFocus
+                      className={styles.ContentInput}
+                      dataTestName="PointPanel-ConditionInput"
+                      onCancel={onCancel}
+                      onChange={onEditableConditionChange}
+                      onSubmit={onSubmit}
+                      value={editableCondition}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+            <div className={styles.FixedHeightRow}>
+              {hasCondition && <div className={styles.ContentPrefixLabel}>log</div>}
               <div
-                className={isConditionValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}
+                className={isContentValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}
               >
+                <BadgePicker point={point} />
                 <div className={styles.Content}>
                   <AutoComplete
                     autoFocus
                     className={styles.ContentInput}
-                    dataTestName="PointPanel-ConditionInput"
+                    dataTestName="PointPanel-ContentInput"
                     onCancel={onCancel}
-                    onChange={onEditableConditionChange}
+                    onChange={onEditableContentChange}
                     onSubmit={onSubmit}
-                    value={editableCondition}
+                    value={editableContent}
                   />
                 </div>
               </div>
             </div>
-          )}
-          <div className={styles.Row}>
-            {hasCondition && <div className={styles.ContentPrefixLabel}>log</div>}
-            <div className={isContentValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}>
-              <BadgePicker point={point} />
-              <div className={styles.Content}>
-                <AutoComplete
-                  autoFocus
-                  className={styles.ContentInput}
-                  dataTestName="PointPanel-ContentInput"
-                  onCancel={onCancel}
-                  onChange={onEditableContentChange}
-                  onSubmit={onSubmit}
-                  value={editableContent}
-                />
+            {!hasCondition && (
+              <div className={styles.FixedHeightRow}>
+                <button
+                  className={styles.AddConditionButton}
+                  data-test-name="PointPanel-AddConditionButton"
+                  disabled={isPending}
+                  onClick={onAddConditionClick}
+                >
+                  Add conditional
+                </button>
               </div>
-            </div>
+            )}
           </div>
-          {!hasCondition && (
-            <div className={styles.Row}>
+          <div className={styles.SecondaryColumn}>
+            <div className={styles.FixedHeightRow}>
               <button
-                className={styles.AddConditionButton}
-                data-test-name="PointPanel-AddConditionButton"
-                disabled={isPending}
-                onClick={onAddConditionClick}
+                className={styles.SaveButton}
+                data-test-name="PointPanel-SaveButton"
+                disabled={isPending || !isContentValid || !isConditionValid || !hasChanged}
+                onClick={onSubmit}
               >
-                Add conditional
+                Save
               </button>
             </div>
-          )}
-        </div>
-        <div className={styles.SecondaryColumn}>
-          <div className={styles.Row}>
-            <button
-              className={styles.SaveButton}
-              data-test-name="PointPanel-SaveButton"
-              disabled={isPending || !isContentValid || !isConditionValid || !hasChanged}
-              onClick={onSubmit}
-            >
-              Save
-            </button>
-          </div>
-          <div className={styles.Row}>
-            <button
-              className={styles.CancelButton}
-              data-test-name="PointPanel-CancelButton"
-              disabled={isPending}
-              onClick={onCancel}
-            >
-              Cancel
-            </button>
+            <div className={styles.FixedHeightRow}>
+              <button
+                className={styles.CancelButton}
+                data-test-name="PointPanel-CancelButton"
+                disabled={isPending}
+                onClick={onCancel}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -201,7 +208,6 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
     };
 
     const addComment = () => {
-      console.log("addComment:", addComment, "accessToken?", accessToken);
       if (accessToken === null) {
         return;
       }
@@ -225,75 +231,66 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
     };
 
     return (
-      <div className={`${styles.Point} ${className}`} data-test-id={`PointPanel-${lineNumber}`}>
-        <div className={styles.MainColumn}>
-          {hasCondition && (
-            <div className={styles.Row}>
-              <div className={styles.ContentPrefixLabel}>if</div>
-              <div className={styles.ContentWrapper}>
-                <div
-                  className={styles.Content}
-                  onClick={showTooManyPointsMessage ? undefined : startEditing}
-                >
-                  <SyntaxHighlightedLine code={point.condition!} />
+      <div className={`${styles.Panel} ${className}`} data-test-id={`PointPanel-${lineNumber}`}>
+        <div className={styles.LayoutRow}>
+          <div className={styles.MainColumn}>
+            {hasCondition && (
+              <div className={styles.FixedHeightRow}>
+                <div className={styles.ContentPrefixLabel}>if</div>
+                <div className={styles.ContentWrapper}>
+                  <div
+                    className={styles.Content}
+                    onClick={showTooManyPointsMessage ? undefined : startEditing}
+                  >
+                    <SyntaxHighlightedLine code={point.condition!} />
+                  </div>
+                  <button
+                    className={styles.EditButton}
+                    disabled={isPending}
+                    onClick={showTooManyPointsMessage ? undefined : startEditing}
+                    data-test-name="PointPanel-EditButton"
+                  >
+                    <Icon className={styles.EditButtonIcon} type="edit" />
+                  </button>
                 </div>
-                <button
-                  className={styles.EditButton}
-                  disabled={isPending}
-                  onClick={showTooManyPointsMessage ? undefined : startEditing}
-                  data-test-name="PointPanel-EditButton"
-                >
-                  <Icon className={styles.EditButtonIcon} type="edit" />
-                </button>
-              </div>
-            </div>
-          )}
-          <div className={styles.Row}>
-            {hasCondition && <div className={styles.ContentPrefixLabel}>log</div>}
-            {showTooManyPointsMessage ? (
-              <div className={styles.ContentWrapperTooManyPoints}>
-                Use Focus Mode to reduce the number of hits.
-              </div>
-            ) : (
-              <div className={styles.ContentWrapper}>
-                <BadgePicker point={point} />
-                <div
-                  className={styles.Content}
-                  onClick={showTooManyPointsMessage ? undefined : startEditing}
-                >
-                  <SyntaxHighlightedLine code={point.content} />
-                </div>
-                <button
-                  className={styles.EditButton}
-                  disabled={isPending}
-                  onClick={showTooManyPointsMessage ? undefined : startEditing}
-                  data-test-name="PointPanel-EditButton"
-                >
-                  <Icon className={styles.EditButtonIcon} type="edit" />
-                </button>
               </div>
             )}
+            <div className={styles.FixedHeightRow}>
+              {hasCondition && <div className={styles.ContentPrefixLabel}>log</div>}
+              {showTooManyPointsMessage ? (
+                <div className={styles.ContentWrapperTooManyPoints}>
+                  Use Focus Mode to reduce the number of hits.
+                </div>
+              ) : (
+                <div className={styles.ContentWrapper}>
+                  <BadgePicker point={point} />
+                  <div
+                    className={styles.Content}
+                    onClick={showTooManyPointsMessage ? undefined : startEditing}
+                  >
+                    <SyntaxHighlightedLine code={point.content} />
+                  </div>
+                  <button
+                    className={styles.EditButton}
+                    disabled={isPending}
+                    onClick={showTooManyPointsMessage ? undefined : startEditing}
+                    data-test-name="PointPanel-EditButton"
+                  >
+                    <Icon className={styles.EditButtonIcon} type="edit" />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-          <div className={styles.Row}>
-            <PointPanelTimeline
-              hitPoints={hitPoints}
-              hitPointStatus={hitPointStatus}
-              point={point}
-            />
-          </div>
+          {accessToken !== null && (
+            <div className={styles.SecondaryColumn}>
+              <CommentButton disabled={isPending} hitPoints={hitPoints} onClick={addComment} />
+            </div>
+          )}
         </div>
-        {accessToken !== null && (
-          <div className={styles.SecondaryColumn}>
-            <button
-              className={styles.CommentButton}
-              disabled={isPending}
-              data-test-name="PointPanel-AddCommentButton"
-              onClick={addComment}
-            >
-              <Icon className={styles.CommentButtonIcon} type="comment" />
-            </button>
-          </div>
-        )}
+        <div className={styles.FixedHeightRow}>
+          <PointPanelTimeline hitPoints={hitPoints} hitPointStatus={hitPointStatus} point={point} />
+        </div>
       </div>
     );
   }

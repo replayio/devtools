@@ -1,5 +1,5 @@
 .List {
-  border-radius: 0.25rem;
+  border-radius: 0.25em;
   background-color: var(--background-color-default);
   border: 1px solid var(--border-color);
 

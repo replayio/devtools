@@ -3,6 +3,8 @@ body {
   padding: 0;
   margin: 0;
   font-family: var(--font-family-default);
+
+  /* Root font size should match the legacy app so that ems are consistent */
   font-size: var(--font-size-regular);
 }
 
@@ -18,4 +20,8 @@ body {
 :root.theme-light {
   background-color: var(--background-color-default);
   color: var(--color-default);
+}
+
+button {
+  font-size: inherit;
 }

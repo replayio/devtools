@@ -1,8 +1,7 @@
-import Loader from "@bvaughn/components/Loader";
 import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
 import { getSource } from "@bvaughn/src/suspense/SourcesCache";
 import { getSourceFileName } from "@bvaughn/src/utils/source";
-import { KeyboardEvent, MouseEvent, Suspense, useContext, useRef } from "react";
+import { KeyboardEvent, MouseEvent, useContext, useRef } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Icon from "../Icon";
@@ -128,9 +127,7 @@ function Sources() {
                 key={sourceId}
                 mode={sourceId === focusedSourceId ? "visible" : "hidden"}
               >
-                <Suspense fallback={<Loader className={styles.Loader} />}>
-                  <Source source={source!} showColumnBreakpoints={true} />
-                </Suspense>
+                <Source source={source!} showColumnBreakpoints={true} />
               </LazyOffscreen>
             );
           })}

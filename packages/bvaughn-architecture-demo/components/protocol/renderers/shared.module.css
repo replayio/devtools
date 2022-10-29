@@ -13,11 +13,11 @@
 .SubHeader {
   font-size: var(--font-size-small);
   text-align: right;
-  margin: 0.5rem;
+  margin: 0.5em;
 }
 
 .Pre {
-  margin: 0.5rem;
+  margin: 0.5em;
   font-family: var(--font-family-monospace);
   font-size: var(--font-size-small);
   overflow: auto;

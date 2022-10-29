@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   gap: 1ch;
-  padding: 0.5rem;
+  padding: 0.5em;
   user-select: none;
 }
 
@@ -26,19 +26,19 @@
 }
 
 .Avatar {
-  height: 1.5rem;
-  width: 1.5rem;
-  border-radius: 1.5rem;
+  height: 1.5em;
+  width: 1.5em;
+  border-radius: 1.5em;
 }
 
 .Content {
-  padding: 0.5rem;
+  padding: 0.5em;
 }
 
 .PublishedReply,
 .UnpublishedReply {
-  padding-left: 0.5rem;
-  padding-right: 0.25rem;
+  padding-left: 0.5em;
+  padding-right: 0.25em;
 }
 .UnpublishedReply {
   background-color: var(--background-color-contrast-1);
@@ -50,9 +50,9 @@
   background: var(--background-color-contrast-1);
   color: var(--color-default);
   border: 2px solid var(--background-color-contrast-2);
-  padding: 0.5rem;
+  padding: 0.5em;
   display: flex;
-  border-radius: 0.25rem;
+  border-radius: 0.25em;
   cursor: pointer;
 }
 .Button:hover {
@@ -63,8 +63,8 @@
 }
 
 .Icon {
-  width: 1rem;
-  height: 1rem;
+  width: 1em;
+  height: 1em;
   fill: currentColor;
   display: inline-block;
 }
@@ -75,12 +75,12 @@
   color: var(--color-brand);
   outline: none;
   border: none;
-  padding: 0.5rem;
+  padding: 0.5em;
   background-color: var(--background-color-contrast-1);
   color: var(--color-default);
   border: 2px solid var(--background-color-contrast-2);
-  border-radius: 0.25rem;
-  margin: 0.25rem;
+  border-radius: 0.25em;
+  margin: 0.25em;
 }
 .ReplyButton:focus {
   border: 2px solid var(--color-brand);
@@ -90,11 +90,11 @@
   width: 100%;
   outline: none;
   border: none;
-  padding: 0.5rem;
+  padding: 0.5em;
   background-color: var(--background-color-contrast-1);
   border: 2px solid var(--background-color-contrast-2);
   color: var(--color-default);
-  border-radius: 0.25rem;
+  border-radius: 0.25em;
   font-family: var(--font-family-default);
 }
 .Input:focus {

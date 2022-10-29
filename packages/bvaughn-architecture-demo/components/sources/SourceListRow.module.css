@@ -1,3 +1,7 @@
+.Row {
+  min-width: var(--max-line-width);
+}
+
 .LineWithHits,
 .LineWithoutHits {
   white-space: pre-wrap;
@@ -22,12 +26,12 @@
 .HoverButton {
   position: absolute;
   top: 0;
-  left: 0.5rem;
+  left: 0.25em;
   z-index: 5;
 
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 0.5rem;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 0.5em;
 
   display: none;
   align-items: center;
@@ -51,23 +55,24 @@
 }
 
 .HoverButton:hover:not(.HoverButton:disabled) {
-  top: -0.25rem;
-  left: 0.25rem;
-  width: 2rem;
-  height: 2rem;
+  top: -0.25em;
+  left: 0;
+  width: 2em;
+  height: 2em;
+  transition: all 100ms;
 }
 
-.HoverButtonIcon {
-  width: 1.5rem;
-  height: 1.5rem;
-  fill: currentColor;
+.HoverButton:hover:not(.HoverButton:disabled) .HoverButtonIcon {
+  width: 1.5em;
+  height: 1.5em;
 }
 
 .BreakpointIcon,
 .DisabledBreakpointIcon,
+.HoverButtonIcon,
 .Icon {
-  width: 1rem;
-  height: 1rem;
+  width: 1em;
+  height: 1em;
   display: inline-block;
 }
 .BreakpointIcon,
@@ -83,7 +88,7 @@
 }
 
 .LineNumber {
-  height: 1.5rem;
+  height: var(--line-height);
   width: var(--line-number-size);
   display: flex;
   flex-shrink: 0;
@@ -208,7 +213,7 @@
   padding: 0;
   margin: 0 0.5ch;
   cursor: pointer;
-  height: 1rem;
+  height: 1em;
 }
 
 .LineSegmentsAndPointPanel {

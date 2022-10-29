@@ -1,11 +1,11 @@
 .Input {
-  height: 1.5rem;
+  height: 1.5em;
   background-color: var(--background-color-default);
   color: var(--color-default);
-  padding: 0 0.25rem;
-  margin: 0.25rem 0.25rem 0.25rem 0;
+  padding: 0 0.25em;
+  margin: 0.25em 0.25em 0.25em 0;
   border: 2px solid transparent;
-  border-radius: 0.25rem;
+  border-radius: 0.25em;
   outline: none;
 }
 .Input:focus {

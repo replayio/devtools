@@ -1,7 +1,7 @@
 import Icon from "@bvaughn/components/Icon";
 import { AddPoint, DeletePoints, EditPoint } from "@bvaughn/src/contexts/PointsContext";
 import { newSource as ProtocolSource } from "@replayio/protocol";
-import { CSSProperties, memo, Suspense, useState } from "react";
+import { memo, Suspense, useState } from "react";
 import { areEqual } from "react-window";
 import { LineNumberToHitCountMap } from "shared/client/types";
 import { Point } from "shared/client/types";
@@ -20,7 +20,6 @@ export type ItemData = {
   editPoint: EditPoint;
   hitCounts: LineNumberToHitCountMap | null;
   htmlLines: string[];
-  lineHeight: number;
   maxHitCount: number | null;
   minHitCount: number | null;
   points: Point[];
@@ -43,7 +42,6 @@ const SourceListRow = memo(
       editPoint,
       hitCounts,
       htmlLines,
-      lineHeight,
       maxHitCount,
       minHitCount,
       points,
@@ -177,15 +175,18 @@ const SourceListRow = memo(
 
     return (
       <div
+        className={styles.Row}
         data-test-id={`SourceLine-${lineNumber}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        style={
-          {
-            ...style,
-            "--line-height": `${lineHeight}px`,
-          } as CSSProperties
-        }
+        style={{
+          ...style,
+
+          // Each row should grow as much as needed to fit its code/content.
+          // The parent list will measure rows after render and adjust the min-width of the list.
+          // This prevents horizontal scrolling from jumping as new rows are rendered.
+          width: undefined,
+        }}
       >
         <div className={lineHasHits ? styles.LineWithHits : styles.LineWithoutHits}>
           <div className={styles.LineNumber} data-test-id={`SourceLine-LineNumber-${lineNumber}`}>

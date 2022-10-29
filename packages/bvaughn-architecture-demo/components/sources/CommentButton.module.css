@@ -1,0 +1,85 @@
+.Container {
+  flex-grow: 0;
+  flex-shrink: 0;
+  height: 2em;
+  width: 2em;
+  position: relative;
+}
+
+.Button {
+  position: absolute;
+  right: 0;
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0.5em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2em;
+  min-width: 2em;
+  border-radius: 2em;
+}
+
+.PausedStyle {
+  background-color: var(--background-color-secondary-button);
+  color: var(--color-secondary-button);
+}
+
+.NotPausedStyle {
+  background-color: var(--background-color-primary-button);
+  color: var(--color-primary-button);
+}
+
+.ButtonLabel {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  padding: 0;
+  white-space: nowrap;
+  color: var(--color-primary-button);
+}
+
+.Button:hover .ButtonLabel {
+  animation: expand 250ms ease-out;
+  animation-fill-mode: forwards;
+}
+.Closed .ButtonLabel {
+  animation: contract 250ms ease-out;
+  animation-fill-mode: forwards;
+}
+
+.ButtonIcon {
+  height: 1em;
+  width: 1em;
+  fill: currentColor;
+}
+
+@keyframes expand {
+  0% {
+    opacity: 0;
+    width: 0;
+    padding: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    width: 13ch;
+    padding: 0 1ch;
+  }
+}
+@keyframes contract {
+  0% {
+    width: 10ch;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    width: 0;
+    opacity: 0;
+  }
+}
