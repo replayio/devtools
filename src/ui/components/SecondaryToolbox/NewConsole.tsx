@@ -3,7 +3,6 @@ import { ConsoleSearchContext } from "bvaughn-architecture-demo/components/conso
 import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
 import React, { KeyboardEvent, useContext } from "react";
 import { getSelectedFrameId } from "devtools/client/debugger/src/selectors";
-import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import JSTerm from "devtools/client/webconsole/components/Input/JSTerm";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
@@ -23,14 +22,12 @@ export default function NewConsoleRoot() {
   );
 
   return (
-    <InspectorContextReduxAdapter>
-      <NewConsole
-        nagHeader={<ConsoleNag />}
-        showFiltersByDefault={consoleFilterDrawerDefaultsToOpen}
-        showSearchInputByDefault={false}
-        terminalInput={<JSTermWrapper />}
-      />
-    </InspectorContextReduxAdapter>
+    <NewConsole
+      nagHeader={<ConsoleNag />}
+      showFiltersByDefault={consoleFilterDrawerDefaultsToOpen}
+      showSearchInputByDefault={false}
+      terminalInput={<JSTermWrapper />}
+    />
   );
 }
 

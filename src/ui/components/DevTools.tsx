@@ -41,6 +41,7 @@ import { PointsContextRoot } from "bvaughn-architecture-demo/src/contexts/Points
 import TimelineContextAdapter from "./SecondaryToolbox/TimelineContextAdapter";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
 import SelectedFrameContextWrapper from "./SelectedFrameContextAdapter";
+import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 
 const Viewer = React.lazy(() => import("./Viewer"));
 
@@ -204,12 +205,14 @@ function _DevTools({
             <PointsContextRoot>
               <TimelineContextAdapter>
                 <TerminalContextAdapter>
-                  <KeyModifiers>
-                    <Header />
-                    <Body />
-                    {showCommandPalette ? <CommandPaletteModal /> : null}
-                    <KeyboardShortcuts />
-                  </KeyModifiers>
+                  <InspectorContextReduxAdapter>
+                    <KeyModifiers>
+                      <Header />
+                      <Body />
+                      {showCommandPalette ? <CommandPaletteModal /> : null}
+                      <KeyboardShortcuts />
+                    </KeyModifiers>
+                  </InspectorContextReduxAdapter>
                 </TerminalContextAdapter>
               </TimelineContextAdapter>
             </PointsContextRoot>
