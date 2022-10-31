@@ -1,11 +1,11 @@
 import useCurrentPause from "@bvaughn/src/hooks/useCurrentPause";
 import { SourceId } from "@replayio/protocol";
-import { Suspense } from "react";
+import { Suspense, useContext } from "react";
 
 import styles from "./CurrentLineHighlight.module.css";
+import { SourceSearchContext } from "./SourceSearchContext";
 
 type Props = {
-  currentSearchResultLineIndex: number | null;
   lineNumber: number;
   sourceId: SourceId;
 };
@@ -17,11 +17,9 @@ export default function CurrentLineHighlight(props: Props) {
     </Suspense>
   );
 }
-function CurrentLineHighlightSuspends({
-  currentSearchResultLineIndex,
-  lineNumber,
-  sourceId,
-}: Props) {
+function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
+  const [sourceSearchState] = useContext(SourceSearchContext);
+
   const pauseData = useCurrentPause();
   if (pauseData !== null && pauseData.data && pauseData.data.frames) {
     // TODO [source viewer]
@@ -44,7 +42,12 @@ function CurrentLineHighlightSuspends({
     }
   }
 
-  if (currentSearchResultLineIndex !== null && currentSearchResultLineIndex + 1 === lineNumber) {
+  const searchLineIndex =
+    sourceSearchState.index < sourceSearchState.results.length
+      ? sourceSearchState.results[sourceSearchState.index]
+      : null;
+
+  if (sourceSearchState.currentScopeId === sourceId && searchLineIndex === lineNumber - 1) {
     return (
       <div className={styles.CurrentSearchResult} data-test-name="CurrentSearchResultHighlight" />
     );

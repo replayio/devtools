@@ -28,7 +28,6 @@ import {
   verifyLogPointStep,
   goToNextHitPoint,
   goToPreviousHitPoint,
-  goToLogPointTimelineTime,
   verifyHitPointButtonsEnabled,
 } from "./utils/source";
 import testSetup from "./utils/testSetup";
@@ -179,10 +178,10 @@ test("should support fuzzy file search", async ({ page }) => {
 
 test("should support jumping to a line in the active source file", async ({ page }) => {
   await openSourceFile(page, sourceId);
-  await goToLine(page, 77);
+  await goToLine(page, sourceId, 77);
   const sourceLocator = getSourceLocator(page, sourceId);
   await takeScreenshot(page, sourceLocator, "go-to-last-line");
-  await goToLine(page, 1);
+  await goToLine(page, sourceId, 1);
   await takeScreenshot(page, sourceLocator, "go-to-first-line");
 });
 
@@ -261,23 +260,23 @@ test("should not erase break point when logging is toggled", async ({ page }) =>
 test("should support continue to next and previous functionality", async ({ page }) => {
   // Continue to next should be enabled initially;
   // Continue to previous should not be.
-  await expect(await isContinueToNextButtonEnabled(page, 14)).toBe(true);
-  await expect(await isContinueToPreviousButtonEnabled(page, 14)).toBe(false);
+  await expect(await isContinueToNextButtonEnabled(page, sourceId, 14)).toBe(true);
+  await expect(await isContinueToPreviousButtonEnabled(page, sourceId, 14)).toBe(false);
 
   // Go to line 14.
   await expect(await isLineCurrentExecutionPoint(page, 14)).toBe(false);
-  await continueTo(page, { lineNumber: 14, direction: "next" });
+  await continueTo(page, { lineNumber: 14, direction: "next", sourceId });
   await expect(await isLineCurrentExecutionPoint(page, 14)).toBe(true);
 
   // Continue to next and previous buttons should both now be disabled for line 14.
   // Continue to previous should be enabled for line 13
   // And continue to next should be enabled for line 15.
-  await expect(await isContinueToNextButtonEnabled(page, 13)).toBe(false);
-  await expect(await isContinueToPreviousButtonEnabled(page, 13)).toBe(true);
-  await expect(await isContinueToNextButtonEnabled(page, 14)).toBe(false);
-  await expect(await isContinueToPreviousButtonEnabled(page, 14)).toBe(false);
-  await expect(await isContinueToNextButtonEnabled(page, 15)).toBe(true);
-  await expect(await isContinueToPreviousButtonEnabled(page, 15)).toBe(false);
+  await expect(await isContinueToNextButtonEnabled(page, sourceId, 13)).toBe(false);
+  await expect(await isContinueToPreviousButtonEnabled(page, sourceId, 13)).toBe(true);
+  await expect(await isContinueToNextButtonEnabled(page, sourceId, 14)).toBe(false);
+  await expect(await isContinueToPreviousButtonEnabled(page, sourceId, 14)).toBe(false);
+  await expect(await isContinueToNextButtonEnabled(page, sourceId, 15)).toBe(true);
+  await expect(await isContinueToPreviousButtonEnabled(page, sourceId, 15)).toBe(false);
 });
 
 test("should allow log point badge colors to be toggled", async ({ page }) => {
@@ -295,13 +294,13 @@ test("should allow log point badge colors to be toggled", async ({ page }) => {
 test("scroll position should be restored when switching between sources", async ({ page }) => {
   // Scroll to the bottom of source 1
   await openSourceFile(page, sourceId);
-  await goToLine(page, 77);
+  await goToLine(page, sourceId, 77);
   const line77 = getSourceLineLocator(page, sourceId, 77);
   await expect(await line77.isVisible()).toBe(true);
 
   // Open source 2 and scroll to the middle
   await openSourceFile(page, altSourceId);
-  await goToLine(page, 100);
+  await goToLine(page, altSourceId, 100);
   const line100 = getSourceLineLocator(page, altSourceId, 100);
   await expect(await line100.isVisible()).toBe(true);
 

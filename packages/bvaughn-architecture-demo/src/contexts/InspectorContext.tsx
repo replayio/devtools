@@ -4,7 +4,8 @@ import {
   PauseId,
   Value as ProtocolValue,
 } from "@replayio/protocol";
-import { createContext } from "react";
+import { createContext, PropsWithChildren, useCallback, useContext, useMemo } from "react";
+import { SourcesContext } from "./SourcesContext";
 
 type InspectFunctionDefinition = (mappedLocation: MappedLocation) => void;
 
@@ -40,3 +41,32 @@ export const InspectorContext = createContext<InspectorContextType>({
   inspectHTMLElement: null,
   showCommentsPanel: null,
 });
+
+export function InspectorContextRoot({
+  children,
+  showCommentsPanel,
+  showSourcesPanel,
+}: PropsWithChildren & {
+  showCommentsPanel: () => void;
+  showSourcesPanel: () => void;
+}) {
+  const { openSource } = useContext(SourcesContext);
+
+  const inspectFunctionDefinition = useCallback<InspectFunctionDefinition>(
+    (mappedLocation: MappedLocation) => {
+      const location = mappedLocation.length > 0 ? mappedLocation[mappedLocation.length - 1] : null;
+      if (location) {
+        openSource(location.sourceId, location.line);
+        showSourcesPanel();
+      }
+    },
+    [openSource, showSourcesPanel]
+  );
+
+  const context = useMemo(
+    () => ({ inspectFunctionDefinition, inspectHTMLElement: null, showCommentsPanel }),
+    [inspectFunctionDefinition, showCommentsPanel]
+  );
+
+  return <InspectorContext.Provider value={context}>{children}</InspectorContext.Provider>;
+}
