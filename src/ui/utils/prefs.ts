@@ -27,6 +27,7 @@ pref("devtools.features.commentAttachments", false);
 pref("devtools.features.consoleFilterDrawerDefaultsToOpen", false);
 pref("devtools.features.disableUnHitLines", false);
 pref("devtools.features.enableLargeText", false);
+pref("devtools.features.newSourceViewer", false);
 pref("devtools.features.enableQueryCache", false);
 pref("devtools.features.hitCounts", true);
 pref("devtools.features.logProtocol", false);
@@ -62,6 +63,7 @@ export const features = new PrefsHelper("devtools.features", {
   commentAttachments: ["Bool", "commentAttachments"],
   consoleFilterDrawerDefaultsToOpen: ["Bool", "consoleFilterDrawerDefaultsToOpen"],
   enableQueryCache: ["Bool", "enableQueryCache"],
+  newSourceViewer: ["Bool", "newSourceViewer"],
   disableUnHitLines: ["Bool", "disableUnHitLines"],
   enableLargeText: ["Bool", "enableLargeText"],
   hitCounts: ["Bool", "hitCounts"],
