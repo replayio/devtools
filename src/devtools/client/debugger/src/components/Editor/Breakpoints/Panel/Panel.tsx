@@ -184,8 +184,9 @@ function Panel({
             key={breakpoint?.id}
             breakpoint={breakpoint}
             editing={editing}
-            hitPoints={isPending ? null : filteredHitPoints}
-            hitPointStatus={isPending ? null : hitPointStatus}
+            hitPoints={filteredHitPoints}
+            hitPointStatus={hitPointStatus}
+            isTransitionPending={isPending}
             showCondition={showCondition}
             setShowCondition={setShowCondition}
           />
