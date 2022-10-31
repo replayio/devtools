@@ -24,7 +24,6 @@ import { formatHitCount } from "./utils/formatHitCount";
 import SourceListRow, { ItemData } from "./SourceListRow";
 import styles from "./SourceList.module.css";
 import { SourceSearchContext } from "./SourceSearchContext";
-import { SourceFileNameSearchContext } from "./SourceFileNameSearchContext";
 import { findPointForLocation } from "./utils/points";
 
 // HACK
@@ -50,25 +49,31 @@ export default function SourceList({
 }) {
   const { sourceId } = source;
 
-  const [sourceFileNameSearchState, sourceFileNameSearchActions] = useContext(
-    SourceFileNameSearchContext
-  );
+  const { range: focusRange } = useContext(FocusContext);
+  const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
+  const client = useContext(ReplayClientContext);
+  const {
+    focusedLineNumber,
+    focusedSourceId,
+    markUpdateProcessed,
+    pendingFocusUpdate,
+    setVisibleLines,
+    visibleLines,
+  } = useContext(SourcesContext);
+
   useEffect(() => {
-    const { pendingUpdateForScope, goToLineNumber } = sourceFileNameSearchState;
-    if (pendingUpdateForScope === null) {
+    if (pendingFocusUpdate === null || focusedLineNumber === null || focusedSourceId !== sourceId) {
       return;
     }
 
-    if (goToLineNumber !== null && goToLineNumber > 0) {
-      const list = listRef.current;
-      if (list) {
-        const lineIndex = goToLineNumber - 1;
-        list.scrollToItem(lineIndex, "smart");
-      }
-
-      sourceFileNameSearchActions.markUpdateProcessed();
+    const list = listRef.current;
+    if (list) {
+      const lineIndex = focusedLineNumber - 1;
+      list.scrollToItem(lineIndex, "smart");
     }
-  }, [sourceFileNameSearchActions, sourceFileNameSearchState]);
+
+    markUpdateProcessed();
+  }, [focusedLineNumber, focusedSourceId, markUpdateProcessed, pendingFocusUpdate, sourceId]);
 
   const [sourceSearchState, sourceSearchActions] = useContext(SourceSearchContext);
   useLayoutEffect(() => {
@@ -89,11 +94,6 @@ export default function SourceList({
       sourceSearchActions.markUpdateProcessed();
     }
   }, [sourceId, sourceSearchActions, sourceSearchState]);
-
-  const { range: focusRange } = useContext(FocusContext);
-  const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
-  const client = useContext(ReplayClientContext);
-  const { setVisibleLines, visibleLines } = useContext(SourcesContext);
 
   const togglesLocalStorageKey = `Replay:ShowHitCounts`;
   const [showHitCounts, setShowHitCounts] = useLocalStorage<boolean>(togglesLocalStorageKey, true);
@@ -126,17 +126,9 @@ export default function SourceList({
     prevPointsRef.current = points;
   }, [points]);
 
-  let currentSearchResultLineIndex: number | null = null;
-  if (sourceFileNameSearchState.enabled && sourceFileNameSearchState.goToLineNumber !== null) {
-    currentSearchResultLineIndex = sourceFileNameSearchState.goToLineNumber - 1;
-  } else if (sourceSearchState.enabled && sourceSearchState.results.length) {
-    currentSearchResultLineIndex = sourceSearchState.results[sourceSearchState.index]!;
-  }
-
   const itemData = useMemo<ItemData>(
     () => ({
       addPoint,
-      currentSearchResultLineIndex,
       deletePoints,
       editPoint,
       hitCounts,
@@ -152,7 +144,6 @@ export default function SourceList({
     }),
     [
       addPoint,
-      currentSearchResultLineIndex,
       deletePoints,
       editPoint,
       hitCounts,

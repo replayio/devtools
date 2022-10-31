@@ -1,10 +1,11 @@
 import { getSourceFileName } from "@bvaughn/src/utils/source";
-import { newSource as ProtocolSource } from "@replayio/protocol";
+import { newSource as ProtocolSource, SourceId } from "@replayio/protocol";
 import sortedIndexBy from "lodash/sortedIndexBy";
-import { useMemo, useState } from "react";
+import { useContext, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import useSearch from "./useSearch";
 import type { Actions as SearchActions, State as SearchState } from "./useSearch";
+import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
 
 export type Item = ProtocolSource;
 export type Result = {
@@ -70,39 +71,69 @@ export type Actions = SearchActions & {
   setSources: (sources: ProtocolSource[]) => void;
 };
 
-export type State = SearchState<Item, Result> & {
+export type GoToLineState = {
   goToLineMode: boolean;
   goToLineNumber: number | null;
 };
 
+export type State = SearchState<Item, Result> & GoToLineState;
+
 export default function useSourceFileNameSearch(): [State, Actions] {
+  const { focusedSourceId, openSource } = useContext(SourcesContext);
+
+  const focusedSourceIdRef = useRef<SourceId | null>(null);
+
   const [sources, setSources] = useState<ProtocolSource[]>([]);
 
   const [state, dispatch] = useSearch<ProtocolSource, Result>(sources, search);
+  const [goToLineState, setGoToLineState] = useState<GoToLineState>({
+    goToLineMode: false,
+    goToLineNumber: null,
+  });
+
+  useLayoutEffect(() => {
+    focusedSourceIdRef.current = focusedSourceId;
+  }, [focusedSourceId]);
 
   const externalActions = useMemo(
     () => ({
       ...dispatch,
+      search: (query: string) => {
+        dispatch.search(query);
+
+        const goToLineMode = query.startsWith(":");
+        let goToLineNumber: number | null = null;
+        if (goToLineMode) {
+          const parsed = parseInt(query.slice(1), 10);
+          if (!Number.isNaN(parsed)) {
+            goToLineNumber = parsed;
+          }
+        }
+
+        setGoToLineState({
+          goToLineMode,
+          goToLineNumber,
+        });
+
+        if (goToLineNumber !== null) {
+          const sourceId = focusedSourceIdRef.current;
+          if (sourceId != null) {
+            openSource(sourceId, goToLineNumber);
+          }
+        }
+      },
       setSources,
     }),
-    [dispatch]
+    [dispatch, openSource]
   );
 
-  const externalState = useMemo(() => {
-    const goToLineMode = state.query.startsWith(":");
-    let goToLineNumber: number | null = null;
-    if (goToLineMode) {
-      const parsed = parseInt(state.query.slice(1), 10);
-      if (!Number.isNaN(parsed)) {
-        goToLineNumber = parsed;
-      }
-    }
-    return {
+  const externalState = useMemo(
+    () => ({
       ...state,
-      goToLineMode,
-      goToLineNumber,
-    };
-  }, [state]);
+      ...goToLineState,
+    }),
+    [goToLineState, state]
+  );
 
   return [externalState, externalActions];
 }

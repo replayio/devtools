@@ -31,11 +31,11 @@ export async function addBreakPoint(
   );
 
   await openSourceFile(page, sourceId);
-  await goToLine(page, lineNumber);
+  await goToLine(page, sourceId, lineNumber);
 
   const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
 
-  await hoverOverLine(page, { lineNumber });
+  await hoverOverLine(page, { lineNumber, sourceId });
 
   const toggle = lineLocator.locator('[data-test-name="BreakpointToggle"]');
   const state = await toggle.getAttribute("data-test-state");
@@ -65,11 +65,11 @@ export async function addLogPoint(
   );
 
   await openSourceFile(page, sourceId);
-  await goToLine(page, lineNumber);
+  await goToLine(page, sourceId, lineNumber);
 
   const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
 
-  await hoverOverLine(page, { lineNumber });
+  await hoverOverLine(page, { lineNumber, sourceId });
 
   const toggle = lineLocator.locator('[data-test-name="LogPointToggle"]');
   const state = await toggle.getAttribute("data-test-state");
@@ -99,7 +99,7 @@ export async function continueTo(
   options: {
     direction: "next" | "previous";
     lineNumber: number;
-    sourceId?: string;
+    sourceId: string;
   }
 ) {
   const { direction, lineNumber, sourceId } = options;
@@ -117,12 +117,13 @@ export async function continueTo(
   if (sourceId != null) {
     await openSourceFile(page, sourceId);
   }
-  await goToLine(page, lineNumber);
+  await goToLine(page, sourceId, lineNumber);
 
   const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
 
   const stopHovering = await hoverOverLine(page, {
     lineNumber,
+    sourceId,
     withMetaKey: true,
     withShiftKey: direction === "previous",
   });
@@ -154,11 +155,11 @@ export async function editLogPoint(
   );
 
   await openSourceFile(page, sourceId);
-  await goToLine(page, lineNumber);
+  await goToLine(page, sourceId, lineNumber);
 
   const pointPanelLocator = getPointPanelLocator(page, options.lineNumber);
   if (!(await pointPanelLocator.isVisible())) {
-    await hoverOverLine(page, { lineNumber });
+    await hoverOverLine(page, { lineNumber, sourceId });
   }
 
   const editButtonLocator = await pointPanelLocator.locator(
@@ -247,8 +248,8 @@ export function getSearchSourceLocator(page: Page): Locator {
   return page.locator(`[data-test-id="SourceSearch"]`);
 }
 
-export async function goToLine(page: Page, lineNumber: number) {
-  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+export async function goToLine(page: Page, sourceId: string, lineNumber: number) {
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
   const lineIsVisible = await lineLocator.isVisible();
   if (lineIsVisible) {
     return;
@@ -263,19 +264,11 @@ export async function goToLine(page: Page, lineNumber: number) {
   const input = page.locator('[data-test-id="SourceFileNameSearchInput"]');
   await expect(input).toBeFocused();
 
-  // Hack
-  // Center input on the screen to help reduce flakiness with visual tests
-  // Back of how the typing scrolls the Source file as each character is entered,
-  // the fastest way to do this is to over-type and then erase a character.
   await clearTextArea(page, input);
-  await page.keyboard.type(`:${lineNumber}0`);
-  await page.keyboard.press("Backspace");
+  await page.keyboard.type(`:${lineNumber}`);
   await page.keyboard.press("Enter");
 
   await expect(lineLocator).toBeVisible();
-
-  // Give the list time to render and settle.
-  await delay(1000);
 }
 
 export async function goToLogPointTimelineTime(page: Page, lineNumber: number, percentage: number) {
@@ -390,11 +383,12 @@ export async function hoverOverLine(
   page: Page,
   options: {
     lineNumber: number;
+    sourceId: string;
     withMetaKey?: boolean;
     withShiftKey?: boolean;
   }
 ): Promise<AsyncFunction> {
-  const { lineNumber, withMetaKey, withShiftKey } = options;
+  const { lineNumber, sourceId, withMetaKey, withShiftKey } = options;
 
   let suffix = "";
   if (withMetaKey || withShiftKey) {
@@ -409,7 +403,7 @@ export async function hoverOverLine(
   }
   await debugPrint(page, `Hovering over line ${chalk.bold(lineNumber)} ${suffix}`, "hoverOverLine");
 
-  await goToLine(page, lineNumber);
+  await goToLine(page, sourceId, lineNumber);
 
   if (withShiftKey) {
     await page.keyboard.down("Shift");
@@ -443,12 +437,14 @@ export async function isContinueToButtonEnabled(
   options: {
     direction: "previous" | "next";
     lineNumber: number;
+    sourceId: string;
   }
 ): Promise<boolean> {
-  const { direction, lineNumber } = options;
+  const { direction, lineNumber, sourceId } = options;
 
   const stopHovering = await hoverOverLine(page, {
     lineNumber,
+    sourceId,
     withMetaKey: true,
     withShiftKey: direction === "previous",
   });
@@ -464,16 +460,18 @@ export async function isContinueToButtonEnabled(
 
 export async function isContinueToNextButtonEnabled(
   page: Page,
+  sourceId: string,
   lineNumber: number
 ): Promise<boolean> {
-  return isContinueToButtonEnabled(page, { direction: "next", lineNumber });
+  return isContinueToButtonEnabled(page, { direction: "next", lineNumber, sourceId });
 }
 
 export async function isContinueToPreviousButtonEnabled(
   page: Page,
+  sourceId: string,
   lineNumber: number
 ): Promise<boolean> {
-  return isContinueToButtonEnabled(page, { direction: "previous", lineNumber });
+  return isContinueToButtonEnabled(page, { direction: "previous", lineNumber, sourceId });
 }
 
 export async function isLineCurrentExecutionPoint(
@@ -505,6 +503,8 @@ export async function openSourceFile(page: Page, sourceId: string) {
 
     await page.locator(`[data-test-id="SourceExplorerSource-${sourceId}"]`).click();
   }
+
+  await expect(getSourceLocator(page, sourceId)).toBeVisible();
 }
 
 export async function removeBreakPoint(
@@ -523,11 +523,11 @@ export async function removeBreakPoint(
   );
 
   await openSourceFile(page, sourceId);
-  await goToLine(page, lineNumber);
+  await goToLine(page, sourceId, lineNumber);
 
   const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
 
-  await hoverOverLine(page, { lineNumber });
+  await hoverOverLine(page, { lineNumber, sourceId });
 
   const toggle = lineLocator.locator('[data-test-name="BreakpointToggle"]');
   const state = await toggle.getAttribute("data-test-state");
@@ -554,11 +554,11 @@ export async function removeLogPoint(
   );
 
   await openSourceFile(page, sourceId);
-  await goToLine(page, lineNumber);
+  await goToLine(page, sourceId, lineNumber);
 
   const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
 
-  await hoverOverLine(page, { lineNumber });
+  await hoverOverLine(page, { lineNumber, sourceId });
 
   const toggle = lineLocator.locator('[data-test-name="LogPointToggle"]');
   const state = await toggle.getAttribute("data-test-state");
@@ -612,7 +612,7 @@ export async function toggleLogPointBadge(
   const { badge, lineNumber, sourceId } = options;
 
   await openSourceFile(page, sourceId);
-  await goToLine(page, lineNumber);
+  await goToLine(page, sourceId, lineNumber);
 
   const pointPanelLocator = getPointPanelLocator(page, options.lineNumber);
 

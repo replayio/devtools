@@ -15,7 +15,6 @@ import { findPointForLocation } from "./utils/points";
 
 export type ItemData = {
   addPoint: AddPoint;
-  currentSearchResultLineIndex: number | null;
   deletePoints: DeletePoints;
   editPoint: EditPoint;
   hitCounts: LineNumberToHitCountMap | null;
@@ -37,7 +36,6 @@ const SourceListRow = memo(
 
     const {
       addPoint,
-      currentSearchResultLineIndex,
       deletePoints,
       editPoint,
       hitCounts,
@@ -217,11 +215,7 @@ const SourceListRow = memo(
           )}
 
           <div className={styles.LineSegmentsAndPointPanel}>
-            <CurrentLineHighlight
-              currentSearchResultLineIndex={currentSearchResultLineIndex}
-              lineNumber={lineNumber}
-              sourceId={sourceId}
-            />
+            <CurrentLineHighlight lineNumber={lineNumber} sourceId={sourceId} />
 
             {lineSegments}
 

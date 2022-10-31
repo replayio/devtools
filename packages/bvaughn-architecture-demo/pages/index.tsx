@@ -10,7 +10,7 @@ import ProtocolViewer from "@bvaughn/components/protocol/ProtocolViewer";
 import SourceExplorer from "@bvaughn/components/sources/SourceExplorer";
 import Sources from "@bvaughn/components/sources/Sources";
 import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
-import { InspectorContext } from "@bvaughn/src/contexts/InspectorContext";
+import { InspectorContextRoot } from "@bvaughn/src/contexts/InspectorContext";
 import { KeyboardModifiersContextRoot } from "@bvaughn/src/contexts/KeyboardModifiersContext";
 import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
 import SelectedFrameContextWrapper from "@bvaughn/src/contexts/SelectedFrameContext";
@@ -20,6 +20,7 @@ import { TimelineContextRoot } from "@bvaughn/src/contexts/TimelineContext";
 import usePreferredColorScheme from "@bvaughn/src/hooks/usePreferredColorScheme";
 import React, {
   Suspense,
+  useCallback,
   useContext,
   useMemo,
   useState,
@@ -38,6 +39,8 @@ import styles from "./index.module.css";
 
 const recordData = hasFlag("record");
 
+type Panel = "comments" | "protocol-viewer" | "sources";
+
 export default function HomePage() {
   // TODO As we finalize the client implementation to interface with Replay backend,
   // we can inject a wrapper here that also reports cache hits and misses to this UI in a debug panel.
@@ -48,8 +51,6 @@ export default function HomePage() {
     () => new URL(window.location.href).searchParams.has("record"),
     () => false
   );
-
-  type Panel = "comments" | "protocol-viewer" | "sources";
 
   // Used to record mock data for e2e tests when a URL parameter is present:
   const client = useContext(ReplayClientContext);
@@ -63,22 +64,19 @@ export default function HomePage() {
     startTransition(() => setPanel(panel));
   };
 
-  usePreferredColorScheme();
+  const showCommentsPanel = useCallback(() => setPanel("comments"), []);
+  const showSourcesPanel = useCallback(() => setPanel("sources"), []);
 
-  const inspectorContext = useMemo(
-    () => ({
-      inspectFunctionDefinition: null,
-      inspectHTMLElement: null,
-      showCommentsPanel: () => setPanel("comments"),
-    }),
-    []
-  );
+  usePreferredColorScheme();
 
   const content = (
     <Initializer>
-      <InspectorContext.Provider value={inspectorContext}>
-        <KeyboardModifiersContextRoot>
-          <SourcesContextRoot>
+      <KeyboardModifiersContextRoot>
+        <SourcesContextRoot>
+          <InspectorContextRoot
+            showCommentsPanel={showCommentsPanel}
+            showSourcesPanel={showSourcesPanel}
+          >
             <PointsContextRoot>
               <TimelineContextRoot>
                 <FocusContextRoot>
@@ -151,9 +149,9 @@ export default function HomePage() {
                 </FocusContextRoot>
               </TimelineContextRoot>
             </PointsContextRoot>
-          </SourcesContextRoot>
-        </KeyboardModifiersContextRoot>
-      </InspectorContext.Provider>
+          </InspectorContextRoot>
+        </SourcesContextRoot>
+      </KeyboardModifiersContextRoot>
     </Initializer>
   );
 
