@@ -19,8 +19,7 @@ export const getEventLabel = (event: ReplayEvent) => {
   const { label } = getReplayEvent(kind);
 
   if (kind === "navigation") {
-    const url = new URL(event.url);
-    return <span title={event.url}>{url.host}</span>;
+    return <span title={event.url}>{event.url}</span>;
   }
 
   if ("key" in event) {
@@ -67,5 +66,5 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
 }
 
 const Label = ({ children }: { children: ReactNode }) => (
-  <div className="overflow-hidden overflow-ellipsis whitespace-pre font-normal">{children}</div>
+  <div className="overflow-hidden font-normal whitespace-pre overflow-ellipsis">{children}</div>
 );
