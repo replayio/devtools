@@ -1,3 +1,4 @@
+import { useApolloClient } from "@apollo/client";
 import {
   SessionContext,
   SessionContextType,
@@ -12,6 +13,7 @@ import { useAppSelector } from "ui/setup/hooks";
 export default function SessionContextAdapter({ children }: { children: ReactNode }) {
   const recordingId = useGetRecordingId();
   const currentUserInfo = useGetUserInfo();
+  const apolloClient = useApolloClient();
 
   const duration = useAppSelector(getRecordingDuration)!;
 
@@ -22,8 +24,15 @@ export default function SessionContextAdapter({ children }: { children: ReactNod
       duration,
       recordingId,
       sessionId: ThreadFront.sessionId!,
+      refetchUser: () => {
+        // Force Apollo to refetch the user data on demand,
+        // such as dismissing a nag from the console.
+        apolloClient.refetchQueries({
+          include: ["GetUser"],
+        });
+      },
     }),
-    [currentUserInfo, duration, recordingId]
+    [currentUserInfo, duration, recordingId, apolloClient]
   );
 
   return <SessionContext.Provider value={sessionContext}>{children}</SessionContext.Provider>;
