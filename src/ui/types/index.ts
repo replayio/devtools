@@ -187,7 +187,7 @@ export type TestStep = {
   duration: number;
   relativeStartTime: number;
   error?: TestItemError;
-}
+};
 
 // https://github.com/Replayio/replay-cli/blob/main/packages/replay/metadata/source.ts
 

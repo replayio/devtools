@@ -28,7 +28,9 @@ export function useFetchCypressSpec() {
         return;
       }
 
-      const sources = sourceList.filter(source => source.url?.includes(file) && source.kind === "sourceMapped");
+      const sources = sourceList.filter(
+        source => source.url?.includes(file) && source.kind === "sourceMapped"
+      );
 
       // If the recording does not include sourcemaps
       // then it likely wont be able to find the spec file
