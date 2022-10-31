@@ -1,15 +1,19 @@
+import { FrameId, PauseId } from "@replayio/protocol";
 import { useContext, useEffect, useRef } from "react";
 
 import { SelectedFrameContext } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
 import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
 import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
-import useCurrentPause from "bvaughn-architecture-demo/src/hooks/useCurrentPause";
+import useCurrentPauseIdSuspense from "bvaughn-architecture-demo/src/hooks/useCurrentPauseIdSuspense";
+import { getFramesSuspense } from "bvaughn-architecture-demo/src/suspense/FrameCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Icon from "../Icon";
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
 import styles from "./Input.module.css";
 
 export default function Input() {
+  const replayClient = useContext(ReplayClientContext);
   const [searchState, searchActions] = useContext(ConsoleSearchContext);
   const { addMessage } = useContext(TerminalContext);
   const { executionPoint, time } = useContext(TimelineContext);
@@ -25,10 +29,18 @@ export default function Input() {
     searchStateVisibleRef.current = searchState.visible;
   }, [searchState.visible]);
 
-  const currentPause = useCurrentPause();
   const { selectedPauseAndFrameId } = useContext(SelectedFrameContext);
-  const frameId = selectedPauseAndFrameId?.frameId ?? currentPause?.stack?.[0] ?? null;
-  const pauseId = selectedPauseAndFrameId?.pauseId ?? currentPause?.pauseId ?? null;
+  let pauseId: PauseId | null = useCurrentPauseIdSuspense();
+  let frameId: FrameId | null = null;
+  if (selectedPauseAndFrameId) {
+    pauseId = selectedPauseAndFrameId.pauseId;
+    frameId = selectedPauseAndFrameId.frameId;
+  } else {
+    if (pauseId) {
+      const frames = getFramesSuspense(replayClient, pauseId);
+      frameId = frames?.[0]?.frameId ?? null;
+    }
+  }
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {

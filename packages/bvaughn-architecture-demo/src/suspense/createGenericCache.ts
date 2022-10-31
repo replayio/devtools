@@ -9,6 +9,14 @@ export interface GenericCache<TParams extends Array<any>, TValue> {
   getValueSuspense(...args: TParams): TValue;
   getValueAsync(...args: TParams): Promise<TValue>;
   getValueIfCached(...args: TParams): { value: TValue } | undefined;
+  addValue(value: TValue, ...args: TParams): void;
+}
+
+export interface GenericCache2<TExtra, TParams extends Array<any>, TValue> {
+  getValueSuspense(extra: TExtra, ...args: TParams): TValue;
+  getValueAsync(extra: TExtra, ...args: TParams): Promise<TValue>;
+  getValueIfCached(...args: TParams): { value: TValue } | undefined;
+  addValue(value: TValue, ...args: TParams): void;
 }
 
 interface HookState<TValue> {
@@ -21,9 +29,25 @@ export function createGenericCache<TParams extends Array<any>, TValue>(
   fetchValue: (...args: TParams) => Promise<TValue> | TValue,
   getCacheKey: (...args: TParams) => string
 ): GenericCache<TParams, TValue> {
+  const cache = createGenericCache2<undefined, TParams, TValue>(
+    (_, ...args) => fetchValue(...args),
+    (...args) => getCacheKey(...args)
+  );
+  return {
+    getValueSuspense: (...args) => cache.getValueSuspense(undefined, ...args),
+    getValueAsync: (...args) => cache.getValueAsync(undefined, ...args),
+    getValueIfCached: (...args) => cache.getValueIfCached(...args),
+    addValue: (value, ...args) => cache.addValue(value, ...args),
+  };
+}
+
+export function createGenericCache2<TExtra, TParams extends Array<any>, TValue>(
+  fetchValue: (extra: TExtra, ...args: TParams) => Promise<TValue>,
+  getCacheKey: (...args: TParams) => string
+): GenericCache2<TExtra, TParams, TValue> {
   const recordMap = new Map<string, Record<TValue>>();
 
-  function getOrCreateRecord(...args: TParams): Record<TValue> {
+  function getOrCreateRecord(extra: TExtra, ...args: TParams): Record<TValue> {
     const cacheKey = getCacheKey(...args);
 
     let record = recordMap.get(cacheKey);
@@ -36,7 +60,7 @@ export function createGenericCache<TParams extends Array<any>, TValue>(
 
       recordMap.set(cacheKey, record);
 
-      fetchAndStoreValue(record, record.value, ...args).catch(handleError);
+      fetchAndStoreValue(record, record.value, extra, ...args).catch(handleError);
     }
 
     return record;
@@ -45,10 +69,11 @@ export function createGenericCache<TParams extends Array<any>, TValue>(
   async function fetchAndStoreValue(
     record: Record<TValue>,
     wakeable: Wakeable<TValue>,
+    extra: TExtra,
     ...args: TParams
   ) {
     try {
-      const value = await fetchValue(...args);
+      const value = await fetchValue(extra, ...args);
 
       record.status = STATUS_RESOLVED;
       record.value = value;
@@ -63,8 +88,8 @@ export function createGenericCache<TParams extends Array<any>, TValue>(
   }
 
   return {
-    getValueSuspense(...args: TParams): TValue {
-      const record = getOrCreateRecord(...args);
+    getValueSuspense(extra: TExtra, ...args: TParams): TValue {
+      const record = getOrCreateRecord(extra, ...args);
       if (record.status === STATUS_RESOLVED) {
         return record.value;
       } else {
@@ -72,8 +97,8 @@ export function createGenericCache<TParams extends Array<any>, TValue>(
       }
     },
 
-    async getValueAsync(...args: TParams): Promise<TValue> {
-      const record = getOrCreateRecord(...args);
+    async getValueAsync(extra: TExtra, ...args: TParams): Promise<TValue> {
+      const record = getOrCreateRecord(extra, ...args);
       switch (record.status) {
         case STATUS_PENDING: {
           return await record.value;
@@ -97,6 +122,13 @@ export function createGenericCache<TParams extends Array<any>, TValue>(
         case STATUS_REJECTED: {
           throw record.value;
         }
+      }
+    },
+
+    addValue(value: TValue, ...args: TParams) {
+      const cacheKey = getCacheKey(...args);
+      if (!recordMap.has(cacheKey)) {
+        recordMap.set(cacheKey, { status: STATUS_RESOLVED, value });
       }
     },
   };

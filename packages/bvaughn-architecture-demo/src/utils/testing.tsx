@@ -175,6 +175,7 @@ export function createMockReplayClient() {
       frames: [],
       data: {},
     })),
+    ensureSourcesLoaded: jest.fn().mockImplementation(async () => undefined),
     evaluateExpression: jest.fn().mockImplementation(async () => ({ data: {} })),
     findKeyboardEvents: jest.fn().mockImplementation(async () => []),
     findMessages: jest.fn().mockImplementation(async () => ({ messages: [], overflow: false })),
@@ -203,6 +204,7 @@ export function createMockReplayClient() {
       supportsRepaintingGraphics: false,
     })),
     getRecordingId: jest.fn().mockImplementation(async () => "fake-recording-id"),
+    getScope: jest.fn().mockImplementation(async () => {}),
     getSessionEndpoint: jest.fn().mockImplementation(async () => ({
       point: "1000",
       time: 1000,

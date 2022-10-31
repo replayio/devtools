@@ -7,6 +7,7 @@ import {
   responseBodyData,
 } from "@replayio/protocol";
 
+import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
 import { createFrame } from "devtools/client/debugger/src/client/create";
 import { Context } from "devtools/client/debugger/src/reducers/pause";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
@@ -86,7 +87,7 @@ export function hideRequestDetails() {
 }
 
 export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront, protocolClient }) => {
+  return async (dispatch, getState, { ThreadFront, protocolClient, replayClient }) => {
     let state = getState();
     const request = getRequestById(state, requestId);
     const loadedRegions = getLoadedRegions(state);
@@ -109,7 +110,8 @@ export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
 
     const timeStampedPoint = requestSummary.point;
     const pause = ThreadFront.ensurePause(timeStampedPoint.point, timeStampedPoint.time);
-    const frames = (await pause.getFrames())?.filter(Boolean) || [];
+    await pause.ensureLoaded();
+    const frames = (await getFramesAsync(replayClient, pause.pauseId!)) || [];
     await ThreadFront.ensureAllSources();
     state = getState();
     const formattedFrames = frames?.map((frame, i) =>
