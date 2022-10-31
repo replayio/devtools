@@ -4,7 +4,7 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useFetchCypressSpec } from "ui/hooks/useFetchCypressSpec";
 import { getRecordingDuration } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { TestItem, TestResult } from "ui/types";
+import { TestItem, TestResult, TestStep } from "ui/types";
 import { getFormattedTime } from "ui/utils/timeline";
 import { selectLocation } from "../../actions/sources";
 import { getThreadContext } from "../../selectors";
@@ -30,7 +30,7 @@ export default function TestInfo({
         </div>
         {recordingDuration ? <div>{getFormattedTime(recordingDuration)}</div> : null}
       </div>
-      <div className="flex flex-col px-4 py-2 space-y-1">
+      <div className="flex flex-col py-2 space-y-1">
         {testCases.map((t, i) => (
           <TestCase test={t} key={i} location={cypressResults?.[i]?.location} />
         ))}
@@ -41,6 +41,7 @@ export default function TestInfo({
 
 function TestCase({ test, location }: { test: TestItem; location?: SourceLocation }) {
   const [expandError, setExpandError] = useState(false);
+  const [expandSteps, setExpandSteps] = useState(false);
   const dispatch = useAppDispatch();
   const cx = useAppSelector(getThreadContext);
 
@@ -49,33 +50,79 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
       dispatch(selectLocation(cx, location as any));
     }
   };
+  const toggleExpand = () => {
+    setExpandSteps(!expandSteps);
+  };
+  const expandable = test.steps || test.error;
 
   return (
-    <div className="flex flex-col gap-1">
-      <button
-        className="flex flex-row items-center gap-1 group"
-        onClick={onClick}
-        disabled={!location}
-      >
-        <Status result={test.result} />
-        <div
-          className={`overflow-hidden whitespace-pre overflow-ellipsis ${
-            location ? "group-hover:underline" : ""
-          }`}
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-row items-center justify-between gap-1 pl-4 transition group hover:bg-chrome">
+        <button
+          onClick={toggleExpand}
+          disabled={!expandable}
+          className="flex flex-row items-center flex-grow gap-1 overflow-hidden"
         >
-          {test.title}
-        </div>
-      </button>
-      {test.error ? (
-        <div className="space-y-1 ml-7">
-          <div className={`font-mono overflow-hidden ${!expandError ? "truncate" : ""}`}>
-            {test.error.message}
+          <Status result={test.result} />
+          {test.steps ? (
+            <MaterialIcon>{expandSteps ? "expand_more" : "chevron_right"}</MaterialIcon>
+          ) : null}
+          <div
+            className={`overflow-hidden whitespace-pre overflow-ellipsis ${
+              expandable ? "group-hover:underline" : ""
+            }`}
+          >
+            {test.title}
           </div>
-          <button className="hover:underline" onClick={() => setExpandError(!expandError)}>
-            Show {expandError ? "less" : "more"}
+        </button>
+        {location ? (
+          <button onClick={onClick} title="Go To Source">
+            <MaterialIcon>description</MaterialIcon>
           </button>
-        </div>
+        ) : null}
+      </div>
+      {expandSteps ? (
+        <>
+          {test.error ? (
+            <div className="space-y-1 ml-7">
+              <div className="font-bold">Error</div>
+              <div className="p-2 space-y-1 bg-chrome">
+                <div className={`font-mono overflow-hidden ${!expandError ? "truncate" : ""}`}>
+                  {test.error.message}
+                </div>
+                <button className="hover:underline" onClick={() => setExpandError(!expandError)}>
+                  Show {expandError ? "less" : "more"}
+                </button>
+              </div>
+            </div>
+          ) : null}
+          {test.steps ? <TestSteps steps={test.steps} startTime={test.relativeStartTime} /> : null}
+        </>
       ) : null}
+    </div>
+  );
+}
+
+function TestSteps({ steps, startTime }: { steps: TestStep[]; startTime: number }) {
+  return (
+    <div className="flex flex-col pl-8 space-y-1">
+      <div className="font-bold">Steps</div>
+      <div className="flex flex-col gap-1 p-2 bg-chrome">
+        {steps?.map((s, i) => (
+          <div key={i} className="flex items-center justify-between overflow-hidden">
+            <div className="flex items-center space-x-2 overflow-hidden whitespace-pre">
+              <MaterialIcon outlined className={s.error ? "text-red-500" : "text-green-500"}>
+                {s.error ? "close" : "done"}
+              </MaterialIcon>
+              <div className="overflow-hidden overflow-ellipsis">{s.name}</div>
+              <div className="overflow-hidden whitespace-pre opacity-50">
+                {s.args?.length ? `${s.args.toString()}` : ""}
+              </div>
+            </div>
+            {/* <div>{getFormattedTime(s.relativeStartTime)}</div> */}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
