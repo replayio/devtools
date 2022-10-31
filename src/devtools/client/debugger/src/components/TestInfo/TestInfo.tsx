@@ -69,7 +69,11 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
             {test.title}
           </div>
         </button>
-        {location ? <button onClick={onClick}>source</button> : null}
+        {location ? (
+          <button onClick={onClick} title="Go To Source">
+            <MaterialIcon>description</MaterialIcon>
+          </button>
+        ) : null}
       </div>
       {expandSteps ? (
         <>
@@ -100,13 +104,11 @@ function TestSteps({ steps, startTime }: { steps: TestStep[]; startTime: number 
       <div className="flex flex-col gap-1 p-2 bg-chrome">
         {steps?.map((s, i) => (
           <div key={i} className="flex items-center justify-between overflow-hidden">
-            <div className="flex items-center space-x-2">
-              <div className={s.error ? "visible" : "invisible"}>
-                <MaterialIcon outlined className="text-red-500">
-                  highlight_off
-                </MaterialIcon>
-              </div>
-              <div>{s.name}</div>
+            <div className="flex items-center space-x-2 overflow-hidden whitespace-pre">
+              <MaterialIcon outlined className={s.error ? "text-red-500" : "text-green-500"}>
+                {s.error ? "close" : "done"}
+              </MaterialIcon>
+              <div className="overflow-hidden overflow-ellipsis">{s.name}</div>
               <div className="overflow-hidden whitespace-pre opacity-50">
                 {s.args?.length ? `${s.args.toString()}` : ""}
               </div>
