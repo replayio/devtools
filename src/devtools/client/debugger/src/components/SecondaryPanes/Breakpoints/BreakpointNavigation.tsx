@@ -20,6 +20,7 @@ type ExternalProps = {
   hitPoints: TimeStampedPoint[] | null;
   hitPointStatus: HitPointStatus | null;
   showCondition: boolean;
+  isTransitionPending: boolean;
   setShowCondition: (showCondition: boolean) => void;
 };
 
@@ -40,6 +41,7 @@ function BreakpointNavigation({
   executionPoint,
   hitPoints,
   hitPointStatus,
+  isTransitionPending,
   seek,
   setShowCondition,
   showCondition,
@@ -89,6 +91,7 @@ function BreakpointNavigation({
     <div
       className={classnames("breakpoint-navigation justify-between p-1.5 pr-4 pt-2", {
         empty: isEmpty,
+        "bp-nav-pending": isTransitionPending,
       })}
     >
       <BreakpointNavigationCommands prev={prev} next={next} navigateToPoint={navigateToPoint} />

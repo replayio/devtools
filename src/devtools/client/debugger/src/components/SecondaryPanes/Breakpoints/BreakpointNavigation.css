@@ -5,6 +5,11 @@
   align-items: center;
 }
 
+.breakpoint-navigation.bp-nav-pending {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 .breakpoint-navigation.empty .breakpoint-navigation-status-container,
 .breakpoint-navigation.empty .breakpoint-navigation-status {
   width: 100%;
