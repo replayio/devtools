@@ -71,6 +71,7 @@ export default function Initializer({
           duration: endpoint.time,
           recordingId: activeRecordingId,
           sessionId,
+          refetchUser: () => {},
         });
       };
 
