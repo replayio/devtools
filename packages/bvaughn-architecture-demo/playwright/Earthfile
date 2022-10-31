@@ -32,6 +32,9 @@ playwright-test-image:
 playwright-save-test-image:
     FROM +playwright-test-image --CMD="yarn test --update-snapshots"
 
+playwright-save-video:
+    FROM +playwright-test-image --CMD="RECORD_VIDEO=true VISUAL_DEBUG=true node run_tests_for_earthly.js"
+
 playwright-update-snapshots:
     ARG --required HOST
     FROM +install
