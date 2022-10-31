@@ -11,6 +11,7 @@
 }
 
 .SubHeader {
+  color: var(--color-dimmer);
   font-size: var(--font-size-small);
   text-align: right;
   margin: 0.5em;

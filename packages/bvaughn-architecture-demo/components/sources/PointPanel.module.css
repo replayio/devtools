@@ -80,6 +80,7 @@
   white-space: pre;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: var(--font-size-regular);
 }
 
 .AddConditionButton,

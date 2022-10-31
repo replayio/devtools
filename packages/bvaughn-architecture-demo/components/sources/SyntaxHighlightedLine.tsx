@@ -5,7 +5,7 @@ import Loader from "../Loader";
 
 import styles from "./SyntaxHighlightedLine.module.css";
 
-type Props = { code: string; editable?: boolean };
+type Props = { code: string; editable?: boolean; fileExtension?: string };
 
 export default function SyntaxHighlightedLine({ code, editable }: Props) {
   return (
@@ -15,14 +15,14 @@ export default function SyntaxHighlightedLine({ code, editable }: Props) {
   );
 }
 
-function SyntaxHighlightedLineSuspends({ code, editable = false }: Props) {
-  const htmlLines = parse(code, "fake.js") || [];
+function SyntaxHighlightedLineSuspends({ code, editable = false, fileExtension = ".js" }: Props) {
+  const htmlLines = parse(code, fileExtension) || [];
 
   return (
     <span
       className={styles.Code}
       contentEditable={editable}
-      dangerouslySetInnerHTML={{ __html: htmlLines.join("") }}
+      dangerouslySetInnerHTML={{ __html: htmlLines.join("\n") }}
     />
   );
 }

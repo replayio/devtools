@@ -1,4 +1,7 @@
+import SyntaxHighlightedLine from "@bvaughn/components/sources/SyntaxHighlightedLine";
 import { formatDuration } from "@bvaughn/src/utils/time";
+import { ReactNode, useMemo } from "react";
+
 import { RequestResponse } from "../ProtocolMessagesStore";
 
 import styles from "./shared.module.css";
@@ -20,24 +23,35 @@ export function RequestResponseHeaderRenderer({ message }: { message: RequestRes
 }
 
 export function RequestResponseRenderer({ message }: { message: RequestResponse }) {
+  const { error, request, response } = message;
+
+  const errorCode = useMemo(() => (error ? JSON.stringify(error, null, 2) : null), [error]);
+  const requestCode = useMemo(() => JSON.stringify(request, null, 2), [request]);
+  const responseCode = useMemo(
+    () => (response ? JSON.stringify(response.result, null, 2) : null),
+    [response]
+  );
+
   return (
     <>
-      <div className={styles.SubHeader}>
-        Request <small>({message.request.id})</small>
-      </div>
-      <pre className={styles.Pre}>{JSON.stringify(message.request.params, null, 2)}</pre>
-      {message.error && (
-        <>
-          <div className={styles.SubHeader}>Error</div>
-          <pre className={styles.Pre}>{JSON.stringify(message.error, null, 2)}</pre>
-        </>
-      )}
-      {message.response && (
-        <>
-          <div className={styles.SubHeader}>Response</div>
-          <pre className={styles.Pre}>{JSON.stringify(message.response.result, null, 2)}</pre>
-        </>
-      )}
+      <Section code={requestCode} header="Request" />
+      <Section code={responseCode} header="Response" />
+      <Section code={errorCode} header="Error" />
+    </>
+  );
+}
+
+function Section({ code, header }: { code: string | null; header: string }) {
+  if (code === null || code === "{}") {
+    return null;
+  }
+
+  return (
+    <>
+      <div className={styles.SubHeader}>{header}</div>
+      <pre className={styles.Pre}>
+        <SyntaxHighlightedLine code={code} fileExtension=".json" />
+      </pre>
     </>
   );
 }
