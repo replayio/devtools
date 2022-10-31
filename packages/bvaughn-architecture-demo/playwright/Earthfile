@@ -30,8 +30,8 @@ playwright-test-image:
     SAVE IMAGE playwright-run-test
 
 playwright-save-test-image:
-    FROM +playwright-run-test-image --CMD="yarn test --update-snapshots"
- 
+    FROM +playwright-test-image --CMD="yarn test --update-snapshots"
+
 playwright-update-snapshots:
     ARG --required HOST
     FROM +install
