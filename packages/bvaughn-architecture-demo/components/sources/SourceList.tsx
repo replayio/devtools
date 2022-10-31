@@ -50,22 +50,33 @@ export default function SourceList({
 }) {
   const { sourceId } = source;
 
-  const [sourceFileNameSearchState] = useContext(SourceFileNameSearchContext);
-
-  const { goToLineNumber } = sourceFileNameSearchState;
+  const [sourceFileNameSearchState, sourceFileNameSearchActions] = useContext(
+    SourceFileNameSearchContext
+  );
   useEffect(() => {
+    const { pendingUpdateForScope, goToLineNumber } = sourceFileNameSearchState;
+    if (pendingUpdateForScope === null) {
+      return;
+    }
+
     if (goToLineNumber !== null && goToLineNumber > 0) {
       const list = listRef.current;
       if (list) {
         const lineIndex = goToLineNumber - 1;
         list.scrollToItem(lineIndex, "smart");
       }
-    }
-  }, [goToLineNumber]);
 
-  const [sourceSearchState] = useContext(SourceSearchContext);
+      sourceFileNameSearchActions.markUpdateProcessed();
+    }
+  }, [sourceFileNameSearchActions, sourceFileNameSearchState]);
+
+  const [sourceSearchState, sourceSearchActions] = useContext(SourceSearchContext);
   useLayoutEffect(() => {
-    const { enabled, index, results } = sourceSearchState;
+    const { pendingUpdateForScope, enabled, index, results } = sourceSearchState;
+    if (pendingUpdateForScope === null || pendingUpdateForScope !== sourceId) {
+      return;
+    }
+
     if (enabled) {
       if (results.length > 0) {
         const lineIndex = results[index];
@@ -74,8 +85,10 @@ export default function SourceList({
           list.scrollToItem(lineIndex, "smart");
         }
       }
+
+      sourceSearchActions.markUpdateProcessed();
     }
-  }, [sourceSearchState]);
+  }, [sourceId, sourceSearchActions, sourceSearchState]);
 
   const { range: focusRange } = useContext(FocusContext);
   const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);

@@ -19,6 +19,10 @@ export type State<Item, Result> = {
   };
   currentScopeId: ScopeId | null;
 
+  // UI did react to change in source state
+  // This is an escape hatch since e.g. scrolling is often async and imperative
+  pendingUpdateForScope: ScopeId | null;
+
   // Global state (applies to all scopes)
   // If individual cached scope is out of sync (e.g. with query) then it needs to be re-searched
   enabled: boolean;
@@ -31,19 +35,21 @@ export type State<Item, Result> = {
 };
 
 export type Action<Item, Result> =
-  | { type: "enable" }
   | { type: "disable" }
+  | { type: "enable" }
   | { type: "increment"; by: number }
+  | { type: "markUpdateProcessed" }
   | { type: "updateCurrentScopeId"; scopeId: ScopeId | null }
   | { type: "updateItems"; items: Item[] }
   | { type: "updateQuery"; query: string }
   | { type: "updateResults"; index: number; results: Result[] };
 
 export type Actions = {
-  enable: () => void;
   disable: () => void;
+  enable: () => void;
   goToNext: () => void;
   goToPrevious: () => void;
+  markUpdateProcessed: () => void;
   search: (query: string) => void;
 };
 
@@ -52,16 +58,16 @@ function reducer<Item, Result>(
   action: Action<Item, Result>
 ): State<Item, Result> {
   switch (action.type) {
-    case "enable": {
-      return {
-        ...state,
-        enabled: true,
-      };
-    }
     case "disable": {
       return {
         ...state,
         enabled: false,
+      };
+    }
+    case "enable": {
+      return {
+        ...state,
+        enabled: true,
       };
     }
     case "increment": {
@@ -88,12 +94,19 @@ function reducer<Item, Result>(
                 index: newIndex,
               },
             },
+            pendingUpdateForScope: currentScopeId,
             index: newIndex,
           };
         }
       }
 
       return state;
+    }
+    case "markUpdateProcessed": {
+      return {
+        ...state,
+        pendingUpdateForScope: null,
+      };
     }
     case "updateCurrentScopeId": {
       const { scopeId } = action;
@@ -130,6 +143,7 @@ function reducer<Item, Result>(
         },
         currentScopeId: scopeId,
         index: cachedScope.index,
+        pendingUpdateForScope: null,
         results: cachedScope.results,
       };
     }
@@ -191,6 +205,7 @@ function reducer<Item, Result>(
               },
             },
             index,
+            pendingUpdateForScope: currentScopeId,
             results,
           };
         }
@@ -217,6 +232,7 @@ export default function useSearch<Item, Result>(
       currentScopeId: null,
       enabled: false,
       index: -1,
+      pendingUpdateForScope: null,
       query: "",
       results: [],
     }
@@ -232,11 +248,12 @@ export default function useSearch<Item, Result>(
   const prevResults = currentScope != null ? currentScope.results : EMPTY_ARRAY;
   const itemsChanged = currentScope == null || currentScope.items !== items;
   const queryChanged = currentScope == null || currentScope.query !== deferredQuery;
+  const scopeIdChanged = currentScopeId !== scopeId;
 
   // State will not update within the scope of the rest of this function,
   // so don't read any more values from it after dispatch.
 
-  if (currentScopeId !== scopeId) {
+  if (scopeIdChanged) {
     dispatch({ type: "updateCurrentScopeId", scopeId });
   }
 
@@ -269,12 +286,18 @@ export default function useSearch<Item, Result>(
     }
 
     dispatch({ type: "updateResults", index, results });
+
+    if (scopeIdChanged) {
+      // Don't schedule a pending update if results were updated as the result of a scope change.
+      dispatch({ type: "markUpdateProcessed" });
+    }
   }
 
   const actions = useMemo<Actions>(
     () => ({
-      enable: () => dispatch({ type: "enable" }),
       disable: () => dispatch({ type: "disable" }),
+      enable: () => dispatch({ type: "enable" }),
+      markUpdateProcessed: () => dispatch({ type: "markUpdateProcessed" }),
       goToNext: () => dispatch({ type: "increment", by: 1 }),
       goToPrevious: () => dispatch({ type: "increment", by: -1 }),
       search: (query: string) => dispatch({ type: "updateQuery", query }),
