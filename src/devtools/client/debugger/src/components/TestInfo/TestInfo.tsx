@@ -50,20 +50,26 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
       dispatch(selectLocation(cx, location as any));
     }
   };
+  const toggleExpand = () => {
+    setExpandSteps(!expandSteps);
+  };
+  const expandable = test.steps || test.error;
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-row items-center justify-between gap-1 pl-4 transition group hover:bg-chrome">
         <button
-          onClick={() => setExpandSteps(!expandSteps)}
+          onClick={toggleExpand}
+          disabled={!expandable}
           className="flex flex-row items-center flex-grow gap-1 overflow-hidden"
         >
           <Status result={test.result} />
-          {/* <div className="font-mono">{expandSteps ? "v" : ">"}</div> */}
-          <MaterialIcon>{expandSteps ? "expand_more" : "chevron_right"}</MaterialIcon>
+          {test.steps ? (
+            <MaterialIcon>{expandSteps ? "expand_more" : "chevron_right"}</MaterialIcon>
+          ) : null}
           <div
             className={`overflow-hidden whitespace-pre overflow-ellipsis ${
-              location ? "group-hover:underline" : ""
+              expandable ? "group-hover:underline" : ""
             }`}
           >
             {test.title}
@@ -90,7 +96,7 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
               </div>
             </div>
           ) : null}
-          <TestSteps steps={test.steps} startTime={test.relativeStartTime} />
+          {test.steps ? <TestSteps steps={test.steps} startTime={test.relativeStartTime} /> : null}
         </>
       ) : null}
     </div>
