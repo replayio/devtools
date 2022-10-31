@@ -1,10 +1,6 @@
 import classnames from "classnames";
 import { closeTab } from "devtools/client/debugger/src/actions/tabs";
-import {
-  getActiveSearch,
-  getThreadContext,
-  ThreadContext,
-} from "devtools/client/debugger/src/selectors";
+import { getActiveSearch, getThreadContext } from "devtools/client/debugger/src/selectors";
 import { getDocument } from "devtools/client/debugger/src/utils/editor";
 import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
 import { RefObject, useEffect, useMemo, useRef, useState } from "react";

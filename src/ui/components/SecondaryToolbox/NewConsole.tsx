@@ -13,7 +13,6 @@ import { ThreadFront } from "protocol/thread/thread";
 import { ConsoleNag } from "../shared/Nags/Nags";
 
 import styles from "./NewConsole.module.css";
-import TimelineContextAdapter from "./TimelineContextAdapter";
 import useTerminalHistory from "./useTerminalHistory";
 import { useAppSelector } from "ui/setup/hooks";
 
@@ -24,16 +23,14 @@ export default function NewConsoleRoot() {
   );
 
   return (
-    <TimelineContextAdapter>
-      <InspectorContextReduxAdapter>
-        <NewConsole
-          nagHeader={<ConsoleNag />}
-          showFiltersByDefault={consoleFilterDrawerDefaultsToOpen}
-          showSearchInputByDefault={false}
-          terminalInput={<JSTermWrapper />}
-        />
-      </InspectorContextReduxAdapter>
-    </TimelineContextAdapter>
+    <InspectorContextReduxAdapter>
+      <NewConsole
+        nagHeader={<ConsoleNag />}
+        showFiltersByDefault={consoleFilterDrawerDefaultsToOpen}
+        showSearchInputByDefault={false}
+        terminalInput={<JSTermWrapper />}
+      />
+    </InspectorContextReduxAdapter>
   );
 }
 

@@ -38,6 +38,7 @@ import SessionContextAdapter from "./SessionContextAdapter";
 import tokenManager, { TokenState } from "ui/utils/tokenManager";
 import { isTest } from "ui/utils/environment";
 import { PointsContextRoot } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import TimelineContextAdapter from "./SecondaryToolbox/TimelineContextAdapter";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
 import SelectedFrameContextWrapper from "./SelectedFrameContextAdapter";
 
@@ -201,14 +202,16 @@ function _DevTools({
         <FocusContextReduxAdapter>
           <SelectedFrameContextWrapper>
             <PointsContextRoot>
-              <TerminalContextAdapter>
-                <KeyModifiers>
-                  <Header />
-                  <Body />
-                  {showCommandPalette ? <CommandPaletteModal /> : null}
-                  <KeyboardShortcuts />
-                </KeyModifiers>
-              </TerminalContextAdapter>
+              <TimelineContextAdapter>
+                <TerminalContextAdapter>
+                  <KeyModifiers>
+                    <Header />
+                    <Body />
+                    {showCommandPalette ? <CommandPaletteModal /> : null}
+                    <KeyboardShortcuts />
+                  </KeyModifiers>
+                </TerminalContextAdapter>
+              </TimelineContextAdapter>
             </PointsContextRoot>
           </SelectedFrameContextWrapper>
         </FocusContextReduxAdapter>
