@@ -1,7 +1,7 @@
 import { ThreadFront } from "protocol/thread";
 import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useAppSelector } from "ui/setup/hooks";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { UIState } from "ui/state";
@@ -44,8 +44,6 @@ import InspectorContextReduxAdapter from "devtools/client/debugger/src/component
 import usePreferredFontSize from "@bvaughn/src/hooks/usePreferredFontSize";
 import { useFeature } from "ui/hooks/settings";
 import { SelectedFrameContextRoot } from "@bvaughn/src/contexts/SelectedFrameContext";
-import { findClosestFunctionNameThunk } from "devtools/client/debugger/src/utils/ast";
-import { SourceLocation } from "@replayio/protocol";
 
 const Viewer = React.lazy(() => import("./Viewer"));
 
@@ -117,7 +115,6 @@ function _DevTools({
   showCommandPalette,
   uploadComplete,
 }: DevToolsProps) {
-  const dispatch = useAppDispatch();
   const { isAuthenticated } = useAuth0();
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
@@ -130,15 +127,6 @@ function _DevTools({
 
   const { value: enableLargeText } = useFeature("enableLargeText");
   usePreferredFontSize(enableLargeText);
-
-  const findClosestFunctionName = useCallback(
-    (sourceId: string, location: SourceLocation) => {
-      // Quirky but legal: use a thunk for a one-shot selection
-      // without subscribing to the store directly
-      return dispatch(findClosestFunctionNameThunk(sourceId, location));
-    },
-    [dispatch]
-  );
 
   useEffect(() => {
     import("./Viewer");
@@ -216,7 +204,7 @@ function _DevTools({
 
   return (
     <SessionContextAdapter>
-      <SourcesContextAdapter findClosestFunctionName={findClosestFunctionName}>
+      <SourcesContextAdapter>
         <FocusContextReduxAdapter>
           <PointsContextRoot>
             <TimelineContextAdapter>
