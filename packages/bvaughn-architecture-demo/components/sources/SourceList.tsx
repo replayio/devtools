@@ -25,6 +25,7 @@ import SourceListRow, { ItemData } from "./SourceListRow";
 import styles from "./SourceList.module.css";
 import { SourceSearchContext } from "./SourceSearchContext";
 import { findPointForLocation } from "./utils/points";
+import getScrollbarWidth from "./utils/getScrollbarWidth";
 
 // HACK
 // We could swap this out for something that lazily measures row height.
@@ -33,26 +34,6 @@ const CONDITIONAL_POINT_PANEL_HEIGHT = 130;
 const LINE_HEIGHT = 15;
 const LINE_HEIGHT_WITH_POINT = LINE_HEIGHT + POINT_PANEL_HEIGHT;
 const LINE_HEIGHT_WITH_CONDITIONAL_POINT = LINE_HEIGHT + CONDITIONAL_POINT_PANEL_HEIGHT;
-
-const calculateScrollbarWidth = () => {
-  // Magic util to determine scrollbar width: https://stackoverflow.com/a/60008044/62937
-  let scrollbox = document.createElement("div");
-
-  // Make box scrollable
-  scrollbox.style.overflow = "scroll";
-
-  // Append box to document
-  document.body.appendChild(scrollbox);
-
-  // Measure inner width of box
-  const scrollBarWidth = scrollbox.offsetWidth - scrollbox.clientWidth;
-
-  // Remove box
-  document.body.removeChild(scrollbox);
-  return scrollBarWidth;
-};
-
-const actualScrollbarWidth = calculateScrollbarWidth();
 
 export default function SourceList({
   height,
@@ -68,6 +49,8 @@ export default function SourceList({
   width: number;
 }) {
   const { sourceId } = source;
+
+  const scrollbarWidth = useMemo(getScrollbarWidth, []);
 
   const { range: focusRange } = useContext(FocusContext);
   const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
@@ -233,7 +216,7 @@ export default function SourceList({
   const maxHitCountStringLength =
     showHitCounts && maxHitCount !== null ? `${formatHitCount(maxHitCount)}`.length : 0;
 
-  const widthMinusScrollbar = width - actualScrollbarWidth;
+  const widthMinusScrollbar = width - scrollbarWidth;
 
   const style = {
     "--conditional-point-panel-height": `${CONDITIONAL_POINT_PANEL_HEIGHT}px`,
