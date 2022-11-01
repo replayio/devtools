@@ -193,7 +193,7 @@
     "postcss": "^8.4.12",
     "postcss-loader": "^6.2.1",
     "prettier": "^2.6.2",
-    "prettier-plugin-tailwindcss": "^0.1.7",
+    "prettier-plugin-tailwindcss": "^0.1.13",
     "raw-loader": "^4.0.2",
     "sharp": "^0.30.3",
     "storybook-addon-root-attribute": "^1.0.2",
