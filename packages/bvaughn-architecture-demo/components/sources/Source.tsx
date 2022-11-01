@@ -1,18 +1,18 @@
-import { getSourceContentsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
-import { parse } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
-import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
 import { newSource as ProtocolSource } from "@replayio/protocol";
 import debounce from "lodash/debounce";
 import { MouseEvent, Suspense, useContext, useLayoutEffect, useRef, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
+
+import { getSourceContentsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { parse } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
+import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Loader from "../Loader";
-
 import PreviewPopup from "./PreviewPopup";
-import styles from "./Source.module.css";
 import SourceList from "./SourceList";
 import getExpressionForTokenElement from "./utils/getExpressionForTokenElement";
+import styles from "./Source.module.css";
 
 const MOUSE_MOVE_DEBOUNCE_DURATION = 250;
 

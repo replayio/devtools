@@ -1,20 +1,22 @@
+import { useRouter } from "next/dist/client/router";
 import React, { useState } from "react";
+import { ConnectedProps, connect } from "react-redux";
+
+import { setModal } from "ui/actions/app";
+import { setExpectedError } from "ui/actions/errors";
+import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import Modal from "ui/components/shared/NewModal";
-import { connect, ConnectedProps } from "react-redux";
-import { useAppDispatch } from "ui/setup/hooks";
+import hooks from "ui/hooks";
+import { useRequestRecordingAccess } from "ui/hooks/recordings";
 import * as selectors from "ui/reducers/app";
+import { useAppDispatch } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import { ErrorActions, ExpectedError, UnexpectedError } from "ui/state/app";
-import hooks from "ui/hooks";
-import { setModal } from "ui/actions/app";
-import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "./Dialog";
-import { PrimaryButton } from "./Button";
-import { useRouter } from "next/dist/client/router";
-import { BubbleViewportWrapper } from "./Viewport";
 import { getRecordingId } from "ui/utils/recording";
-import { setExpectedError } from "ui/actions/errors";
-import { useRequestRecordingAccess } from "ui/hooks/recordings";
-import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
+
+import { PrimaryButton } from "./Button";
+import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "./Dialog";
+import { BubbleViewportWrapper } from "./Viewport";
 
 export function PopupBlockedError() {
   return (

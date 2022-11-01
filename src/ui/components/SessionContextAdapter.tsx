@@ -1,12 +1,13 @@
 import { useApolloClient } from "@apollo/client";
+import { ReactNode, useMemo } from "react";
+
 import {
   SessionContext,
   SessionContextType,
 } from "bvaughn-architecture-demo/src/contexts/SessionContext";
 import { ThreadFront } from "protocol/thread";
-import { useGetUserInfo } from "ui/hooks/users";
-import { ReactNode, useMemo } from "react";
 import { useGetRecordingId } from "ui/hooks/recordings";
+import { useGetUserInfo } from "ui/hooks/users";
 import { getRecordingDuration } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 

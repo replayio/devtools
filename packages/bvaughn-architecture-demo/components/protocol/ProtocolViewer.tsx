@@ -1,10 +1,9 @@
 import { useMemo, useState, useSyncExternalStore } from "react";
 
 import Expandable from "../Expandable";
-
 import { getProtocolMessages, subscribe } from "./ProtocolMessagesStore";
-import styles from "./ProtocolViewer.module.css";
 import { getHeaderMessageRenderer, getMessageRenderer } from "./renderers";
+import styles from "./ProtocolViewer.module.css";
 
 export default function ProtocolViewer() {
   const [filterByText, setFilterByText] = useState("");

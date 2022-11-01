@@ -4,12 +4,11 @@
 
 //
 
-import { parse } from "../url";
-
-import { nodeHasChildren } from "./utils";
-
-import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
 import { SourceDetails } from "ui/reducers/sources";
+
+import { parse } from "../url";
+import type { ParentMap, TreeDirectory, TreeNode, TreeSource } from "./types";
+import { nodeHasChildren } from "./utils";
 
 /*
  * Gets domain from url (without www prefix)

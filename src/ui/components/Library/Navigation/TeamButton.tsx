@@ -2,14 +2,16 @@ import classNames from "classnames";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { MouseEvent } from "react";
+
 import { setModal } from "ui/actions/app";
+import { MY_LIBRARY_TEAM } from "ui/components/Library/Team/TeamContextRoot";
+import Icon from "ui/components/shared/Icon";
 import { MY_LIBRARY } from "ui/components/UploadScreen/libraryConstants";
 import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
 import { useAppDispatch } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
+
 import styles from "../Library.module.css";
-import { MY_LIBRARY_TEAM } from "ui/components/Library/Team/TeamContextRoot";
-import Icon from "ui/components/shared/Icon";
 
 export function TeamButton({
   label,

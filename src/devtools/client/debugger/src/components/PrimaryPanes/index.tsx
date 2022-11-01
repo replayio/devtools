@@ -6,19 +6,19 @@
 
 import classnames from "classnames";
 import React from "react";
+import { ConnectedProps, connect } from "react-redux";
+
 import { useFeature } from "ui/hooks/settings";
 import { UIState } from "ui/state";
 
 import actions from "../../actions";
-import { getSelectedPrimaryPaneTab, getContext, getSourcesCollapsed } from "../../selectors";
-
-import Outline from "../SourceOutline/SourceOutline";
-import SourcesTree from "./SourcesTree";
-import { connect, ConnectedProps } from "react-redux";
-
-import QuickOpenButton from "./QuickOpenButton";
-import { Accordion, AccordionPane } from "@recordreplay/accordion";
+import { getContext, getSelectedPrimaryPaneTab, getSourcesCollapsed } from "../../selectors";
 import { useDebuggerPrefs } from "../../utils/prefs";
+import Outline from "../SourceOutline/SourceOutline";
+import QuickOpenButton from "./QuickOpenButton";
+import SourcesTree from "./SourcesTree";
+
+import { Accordion, AccordionPane } from "@recordreplay/accordion";
 
 function PrimaryPanes(props: PropsFromRedux) {
   const { value: outlineExpanded, update: updateOutlineExpanded } =

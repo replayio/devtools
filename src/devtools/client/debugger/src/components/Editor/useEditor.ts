@@ -1,24 +1,27 @@
 import { Location } from "@replayio/protocol";
+import debounce from "lodash/debounce";
+import { RefObject, useContext, useLayoutEffect, useRef, useState } from "react";
+
 import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { getBreakpointPositionsAsync } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import { updateCursorPosition, updateViewport } from "devtools/client/debugger/src/actions/ui";
 import {
-  getSymbols,
-  getThreadContext,
   SymbolEntry,
   ThreadContext,
+  getSymbols,
+  getThreadContext,
 } from "devtools/client/debugger/src/selectors";
 import {
   clearDocuments,
   clearEditor,
   endOperation,
-  lineAtHeight,
   getDocument,
   getEditor,
   getSourceLocationFromMouseEvent,
   hasDocument,
+  lineAtHeight,
   onLineMouseOver,
   onMouseScroll,
   onTokenMouseOver,
@@ -34,20 +37,18 @@ import type {
   SourceEditor,
 } from "devtools/client/debugger/src/utils/editor/source-editor";
 import { getIndentation } from "devtools/client/debugger/src/utils/indentation";
-import { resizeToggleButton, resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
-import debounce from "lodash/debounce";
-import { RefObject, useContext, useLayoutEffect, useRef, useState } from "react";
+import { resizeBreakpointGutter, resizeToggleButton } from "devtools/client/debugger/src/utils/ui";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
-import { isFirefox } from "ui/utils/environment";
 import {
-  getSelectedSource,
-  getSelectedLocation,
-  getSelectedSourceWithContent,
-  SourceDetails,
   SourceContent,
+  SourceDetails,
+  getSelectedLocation,
+  getSelectedSource,
+  getSelectedSourceWithContent,
 } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { isFirefox } from "ui/utils/environment";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 
 import useEditorBreakpoints from "./Breakpoints/useBreakpoints";

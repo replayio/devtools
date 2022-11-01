@@ -1,4 +1,5 @@
 import { MockedResponse } from "@apollo/client/testing";
+
 import { GetUserSettings } from "graphql/GetUserSettings";
 import { GET_USER_SETTINGS } from "ui/graphql/settings";
 

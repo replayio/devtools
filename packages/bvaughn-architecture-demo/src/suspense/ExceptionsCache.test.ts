@@ -1,9 +1,9 @@
 import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
+
 import { ReplayClientInterface } from "shared/client/types";
 import { CommandError } from "shared/utils/error";
 
 import { createMockReplayClient } from "../utils/testing";
-
 import { Status, UncaughtException } from "./ExceptionsCache";
 
 describe("ExceptionsCache", () => {

@@ -1,8 +1,8 @@
+import { Meta, Story } from "@storybook/react";
 import React, { ComponentProps } from "react";
 
-import { Story, Meta } from "@storybook/react";
-
 import RequestTable from "ui/components/NetworkMonitor/RequestTable";
+
 import { requestSummary } from "./utils";
 
 export default {

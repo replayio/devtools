@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 export default function Warning({ children, link }: { children: React.ReactNode; link?: string }) {
@@ -9,7 +10,7 @@ export default function Warning({ children, link }: { children: React.ReactNode;
   }
 
   return (
-    <div className="flex flex-col message error font-sans leading-tight">
+    <div className="message error flex flex-col font-sans leading-tight">
       <div className="flex items-center space-x-1 py-1">
         <MaterialIcon>error</MaterialIcon>
         <span className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre">

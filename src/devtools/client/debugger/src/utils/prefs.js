@@ -2,10 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { asyncStoreHelper } from "devtools/shared/async-store-helper";
-import { PrefsHelper } from "devtools/client/shared/prefs";
 import { useEffect, useState } from "react";
 
+import { PrefsHelper } from "devtools/client/shared/prefs";
+import { asyncStoreHelper } from "devtools/shared/async-store-helper";
 import Services, { prefs as prefsService } from "devtools/shared/services";
 
 // Schema version to bump when the async store format has changed incompatibly

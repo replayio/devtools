@@ -1,11 +1,12 @@
+import classNames from "classnames";
 import type { MouseEventHandler } from "react";
 import { forwardRef, useRef, useState } from "react";
-import classNames from "classnames";
 import mergeRefs from "react-merge-refs";
 import { Transition } from "react-transition-group";
-import styles from "./AddCommentButton.module.css";
 
 import { Icon } from "design/Icon";
+
+import styles from "./AddCommentButton.module.css";
 
 interface AddCommentButtonProps {
   /** Changes the button state to reflect the current active comment is paused on a hit. */

@@ -1,5 +1,6 @@
 import sortBy from "lodash/sortBy";
 import React, { useMemo } from "react";
+
 import CommentCard from "ui/components/Comments/CommentCard";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";

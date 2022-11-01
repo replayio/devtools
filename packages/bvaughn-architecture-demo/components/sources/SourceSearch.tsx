@@ -1,9 +1,8 @@
 import { ChangeEvent, KeyboardEvent, RefObject, useContext } from "react";
 
 import Icon from "../Icon";
-
-import styles from "./SourceSearch.module.css";
 import { SourceSearchContext } from "./SourceSearchContext";
+import styles from "./SourceSearch.module.css";
 
 export default function SourceSearch({
   containerRef,

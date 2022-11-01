@@ -1,12 +1,15 @@
-import React, { useEffect, useRef, Suspense } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import React, { Suspense, useEffect, useRef } from "react";
+import { ConnectedProps, connect } from "react-redux";
+
+import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import { UIState } from "ui/state";
-import Nodes from "./Nodes";
+
 import { getNodeInfo } from "../selectors/markup";
-const LoadingProgressBar = require("ui/components/shared/LoadingProgressBar").default;
 import { HTMLBreadcrumbs } from "./HTMLBreadcrumbs";
 import { InspectorSearch } from "./InspectorSearch";
-import KeyShortcuts from "devtools/client/shared/key-shortcuts";
+import Nodes from "./Nodes";
+
+const LoadingProgressBar = require("ui/components/shared/LoadingProgressBar").default;
 
 export interface MarkupProps {}
 

@@ -1,11 +1,12 @@
-import React from "react";
 import classnames from "classnames";
+import React from "react";
+
+import { Redacted, RedactedSpan } from "ui/components/Redacted";
+
 import { highlightMatches } from "../../utils/project-search";
 import { getRelativePathWithoutFile, getURL } from "../../utils/sources-tree";
 import AccessibleImage from "../shared/AccessibleImage";
-import { RedactedSpan, Redacted } from "ui/components/Redacted";
-
-import { SourceResultEntry, SourceMatchEntry } from "./search";
+import { SourceMatchEntry, SourceResultEntry } from "./search";
 
 interface FTIProps {
   item: SourceResultEntry | SourceMatchEntry;

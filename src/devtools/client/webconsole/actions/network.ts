@@ -1,11 +1,12 @@
-import { RequestInfo, RequestEventInfo, responseBodyData } from "@replayio/protocol";
+import { RequestEventInfo, RequestInfo, responseBodyData } from "@replayio/protocol";
+
 import type { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { UIStore, UIThunkAction } from "ui/actions";
 import {
-  newNetworkRequests,
-  newResponseBodyParts,
-  newRequestBodyParts,
   networkRequestsLoaded,
+  newNetworkRequests,
+  newRequestBodyParts,
+  newResponseBodyParts,
 } from "ui/actions/network";
 
 let onResponseBodyPart: (responseBodyParts: responseBodyData) => void;

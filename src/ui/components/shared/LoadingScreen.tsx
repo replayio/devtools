@@ -1,10 +1,12 @@
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
+
 import { getAwaitingSourcemaps, getLoadingFinished, getUploading } from "ui/reducers/app";
 import { UIState } from "ui/state";
+
 import { LoadingTips } from "./LoadingTips";
-import { BubbleViewportWrapper } from "./Viewport";
 import ReplayLogo from "./ReplayLogo";
+import { BubbleViewportWrapper } from "./Viewport";
 
 export function LoadingScreenTemplate({
   children,
@@ -15,7 +17,7 @@ export function LoadingScreenTemplate({
 }) {
   return (
     <BubbleViewportWrapper>
-      <div className="relative flex flex-col items-center p-8 py-12 space-y-1 rounded-lg shadow-sm w-96 bg-loadingBoxes">
+      <div className="relative flex w-96 flex-col items-center space-y-1 rounded-lg bg-loadingBoxes p-8 py-12 shadow-sm">
         <div className="flex flex-col items-center space-y-8">
           <ReplayLogo size="md" />
           {children}

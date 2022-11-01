@@ -1,6 +1,7 @@
 import classNames from "classnames";
-import { useAppSelector } from "ui/setup/hooks";
+
 import { selectors } from "ui/reducers";
+import { useAppSelector } from "ui/setup/hooks";
 import { getVisiblePosition } from "ui/utils/timeline";
 
 import { EditMode } from ".";

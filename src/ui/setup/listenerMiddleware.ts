@@ -1,11 +1,12 @@
-import { createListenerMiddleware, addListener, nanoid } from "@reduxjs/toolkit";
-import type { TypedStartListening, TypedAddListener } from "@reduxjs/toolkit";
+import { addListener, createListenerMiddleware, nanoid } from "@reduxjs/toolkit";
+import type { TypedAddListener, TypedStartListening } from "@reduxjs/toolkit";
 import type { AnyListenerPredicate } from "@reduxjs/toolkit/dist/listenerMiddleware/types";
+
 import type { UIThunkAction } from "ui/actions";
+import type { UIState } from "ui/state";
+import { ThunkExtraArgs, extraThunkArgs } from "ui/utils/thunk";
 
 import type { AppDispatch } from "./store";
-import type { UIState } from "ui/state";
-import { extraThunkArgs, ThunkExtraArgs } from "ui/utils/thunk";
 
 export const listenerMiddleware = createListenerMiddleware({
   extra: extraThunkArgs,

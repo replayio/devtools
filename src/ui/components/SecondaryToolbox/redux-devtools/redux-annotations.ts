@@ -4,9 +4,9 @@ import { Annotation, TimeStampedPoint } from "@replayio/protocol";
 import { createContext } from "react";
 
 import type {
-  UpdateStateRequest,
-  SplitMessage,
   PageScriptToContentScriptMessageForwardedToMonitors,
+  SplitMessage,
+  UpdateStateRequest,
 } from "./api";
 
 export interface ReduxActionAnnotation<State = unknown> extends TimeStampedPoint {

@@ -1,18 +1,18 @@
+import React, { useEffect, useRef, useState } from "react";
+import { ConnectedProps, connect } from "react-redux";
+
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import React, { useEffect, useRef, useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { actions } from "ui/actions";
 import { hideRequestDetails, selectAndFetchRequest } from "ui/actions/network";
 import { getFocusedEvents, getFocusedRequests, getSelectedRequestId } from "ui/reducers/network";
 import { getCurrentTime } from "ui/reducers/timeline";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import { timeMixpanelEvent } from "ui/utils/mixpanel";
 import { trackEvent } from "ui/utils/telemetry";
 
 import LoadingProgressBar from "../shared/LoadingProgressBar";
-
 import { FilterLayout } from "./FilterLayout";
 import RequestDetails from "./RequestDetails";
 import RequestTable from "./RequestTable";

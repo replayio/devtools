@@ -1,13 +1,10 @@
 import type { UIStore, UIThunkAction } from "ui/actions";
-
-import { AppStartListening } from "ui/setup/listenerMiddleware";
-
 import { isInspectorSelected } from "ui/reducers/app";
+import { AppStartListening } from "ui/setup/listenerMiddleware";
+import { getBoundingRectAsync, getComputedStyleAsync } from "ui/suspense/styleCaches";
 
-import { getComputedStyleAsync, getBoundingRectAsync } from "ui/suspense/styleCaches";
 import { nodeSelected } from "../../markup/reducers/markup";
-
-import { layoutUpdated, LAYOUT_NUMERIC_FIELDS, Layout } from "../reducers/box-model";
+import { LAYOUT_NUMERIC_FIELDS, Layout, layoutUpdated } from "../reducers/box-model";
 
 export function setupBoxModel(store: UIStore, startAppListening: AppStartListening) {
   // Any time a new node is selected in the "Markup" panel,

@@ -1,14 +1,15 @@
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { TimeStampedPoint } from "@replayio/protocol";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import sortBy from "lodash/sortBy";
+
+import { UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
+import { FocusRegion, HoveredItem, TimelineState } from "ui/state/timeline";
 import {
-  displayedEndForFocusRegion,
   displayedBeginForFocusRegion,
+  displayedEndForFocusRegion,
   mergeSortedPointLists,
 } from "ui/utils/timeline";
-import { FocusRegion, HoveredItem, TimelineState } from "ui/state/timeline";
-import sortBy from "lodash/sortBy";
-import { UIThunkAction } from "ui/actions";
 
 function initialTimelineState(): TimelineState {
   return {

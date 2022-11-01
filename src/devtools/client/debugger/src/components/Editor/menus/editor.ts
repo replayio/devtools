@@ -5,14 +5,15 @@
 //
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { PauseId } from "@replayio/protocol";
+
 import type { Context, PauseAndFrameId } from "devtools/client/debugger/src/reducers/pause";
+import type { SourceDetails, SourcesState } from "ui/reducers/sources";
 import type { AppDispatch } from "ui/setup/store";
 
-import { copyToTheClipboard } from "../../../utils/clipboard";
 import actions from "../../../actions";
+import { copyToTheClipboard } from "../../../utils/clipboard";
 import { getRawSourceURL } from "../../../utils/source";
 import { getSourcemapVisualizerURLSuspense } from "../../../utils/sourceVisualizations";
-import type { SourceDetails, SourcesState } from "ui/reducers/sources";
 
 type EditorActions = ReturnType<typeof editorItemActions>;
 

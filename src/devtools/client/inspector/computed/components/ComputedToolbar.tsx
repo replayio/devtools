@@ -1,7 +1,9 @@
-import React, { FormEvent, useRef } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import Checkbox from "ui/components/shared/Forms/Checkbox";
 import debounce from "lodash/debounce";
+import React, { FormEvent, useRef } from "react";
+import { ConnectedProps, connect } from "react-redux";
+
+import Checkbox from "ui/components/shared/Forms/Checkbox";
+
 import { setComputedPropertySearch, setShowBrowserStyles } from "../actions";
 
 function ComputedToolbar(props: PropsFromRedux) {

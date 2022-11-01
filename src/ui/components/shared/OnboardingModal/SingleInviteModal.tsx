@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useEffect } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
+
 import * as actions from "ui/actions/app";
 import { useRedirectToTeam } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
@@ -8,14 +9,13 @@ import { PendingWorkspaceInvitation } from "ui/types";
 
 import { OnboardingContent, OnboardingModalContainer } from "../Onboarding/index";
 import Spinner from "../Spinner";
-
 import DownloadReplayModal from "./DownloadReplayModal";
 
 function ModalLoader() {
   return (
     <OnboardingModalContainer>
       <OnboardingContent>
-        <Spinner className="w-4 h-4 text-gray-500 animate-spin" />
+        <Spinner className="h-4 w-4 animate-spin text-gray-500" />
       </OnboardingContent>
     </OnboardingModalContainer>
   );

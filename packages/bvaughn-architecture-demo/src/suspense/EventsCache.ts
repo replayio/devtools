@@ -3,10 +3,12 @@ import {
   ExecutionPoint,
   Frame,
   Location,
-  Object as RecordReplayObject,
   PauseId,
+  Object as RecordReplayObject,
 } from "@replayio/protocol";
+
 import { ReplayClientInterface } from "shared/client/types";
+
 import { STANDARD_EVENT_CATEGORIES } from "../constants";
 import { createWakeable } from "../utils/suspense";
 import { preCacheObjects } from "./ObjectPreviews";

@@ -1,7 +1,8 @@
-import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
-import { getSource } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { Location as ProtocolLocation } from "@replayio/protocol";
 import { MouseEvent, useContext } from "react";
+
+import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
+import { getSource } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import styles from "./Source.module.css";

@@ -2,12 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-import { showMenu } from "devtools/shared/contextmenu";
-import { copyToTheClipboard } from "../../../utils/clipboard";
 import kebabCase from "lodash/kebabCase";
 
 import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
+//
+import { showMenu } from "devtools/shared/contextmenu";
+
+import { copyToTheClipboard } from "../../../utils/clipboard";
 
 function formatMenuElement(label: string, accesskey: string, click: () => void, disabled = false) {
   const id = `node-menu-${kebabCase(label)}`;

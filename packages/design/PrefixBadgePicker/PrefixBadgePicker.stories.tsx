@@ -1,4 +1,5 @@
 import { Meta } from "@storybook/react";
+
 import { PrefixBadgePicker } from "design";
 
 export default {

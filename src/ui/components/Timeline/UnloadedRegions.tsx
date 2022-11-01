@@ -1,10 +1,11 @@
+import { TimeStampedPointRange } from "@replayio/protocol";
 import clamp from "lodash/clamp";
 import { FC } from "react";
-import { useAppSelector } from "ui/setup/hooks";
+
 import { getLoadedRegions } from "ui/reducers/app";
 import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
+import { useAppSelector } from "ui/setup/hooks";
 import { getVisiblePosition, overlap } from "ui/utils/timeline";
-import { TimeStampedPointRange } from "@replayio/protocol";
 
 export const UnloadedRegions: FC = () => {
   const loadedRegions = useAppSelector(getLoadedRegions);

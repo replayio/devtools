@@ -1,6 +1,6 @@
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { replayPlayback, startPlayback, stopPlayback } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 import { displayedEndForFocusRegion } from "ui/utils/timeline";
 

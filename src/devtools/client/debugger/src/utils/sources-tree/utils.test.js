@@ -6,8 +6,7 @@
 import { makeMockSource } from "devtools/client/debugger/src/utils/test-mockup";
 
 import { isNotJavaScript } from "../source";
-
-import { getRelativePath, isExactUrlMatch, getPathWithoutThread } from "./utils";
+import { getPathWithoutThread, getRelativePath, isExactUrlMatch } from "./utils";
 
 describe("sources tree", () => {
   describe("isExactUrlMatch", () => {

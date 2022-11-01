@@ -1,18 +1,19 @@
+import { SourceId } from "@replayio/protocol";
 import React, { PureComponent } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
 
-import type { UIState } from "ui/state";
-import actions from "../../../actions";
-import { getTruncatedFileName, getSourceQueryString, getFileURL } from "../../../utils/source";
-import { getContext } from "../../../selectors";
-import { features } from "../../../utils/prefs";
-import { getExecutionPoint } from "../../../reducers/pause";
-import { CloseButton } from "../../shared/Button";
-import { Redacted } from "ui/components/Redacted";
-import { getHasSiblingOfSameName, MiniSource, getSourceDetails } from "ui/reducers/sources";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import { Point } from "shared/client/types";
-import { SourceId } from "@replayio/protocol";
+import { Redacted } from "ui/components/Redacted";
+import { MiniSource, getHasSiblingOfSameName, getSourceDetails } from "ui/reducers/sources";
+import type { UIState } from "ui/state";
+
+import actions from "../../../actions";
+import { getExecutionPoint } from "../../../reducers/pause";
+import { getContext } from "../../../selectors";
+import { features } from "../../../utils/prefs";
+import { getFileURL, getSourceQueryString, getTruncatedFileName } from "../../../utils/source";
+import { CloseButton } from "../../shared/Button";
 
 type BHExtraProps = {
   sourceId: SourceId;

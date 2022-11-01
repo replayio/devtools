@@ -1,4 +1,5 @@
 import React from "react";
+
 import { setModal } from "ui/actions/app";
 import { AvatarImage } from "ui/components/Avatar";
 import { useGetUserInfo } from "ui/hooks/users";
@@ -13,13 +14,13 @@ export default function Profile() {
   };
 
   return (
-    <button className="flex flex-row p-4 space-x-2 bg-black/20" onClick={handleSettingsClick}>
-      <AvatarImage src={picture} className="w-8 h-8 rounded-full avatar hover:cursor-pointer" />
+    <button className="flex flex-row space-x-2 bg-black/20 p-4" onClick={handleSettingsClick}>
+      <AvatarImage src={picture} className="avatar h-8 w-8 rounded-full hover:cursor-pointer" />
       <div className="flex flex-col">
-        <div className="overflow-hidden text-sm text-left text-white whitespace-pre overflow-ellipsis">
+        <div className="overflow-hidden overflow-ellipsis whitespace-pre text-left text-sm text-white">
           {name}
         </div>
-        <span className="text-xs text-left">View settings</span>
+        <span className="text-left text-xs">View settings</span>
       </div>
     </button>
   );

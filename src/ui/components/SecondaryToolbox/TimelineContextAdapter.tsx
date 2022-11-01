@@ -1,8 +1,4 @@
 import { ExecutionPoint, PauseId } from "@replayio/protocol";
-import {
-  TimelineContext,
-  TimelineContextType,
-} from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 import React, {
   PropsWithChildren,
   useCallback,
@@ -11,6 +7,11 @@ import React, {
   useState,
   useTransition,
 } from "react";
+
+import {
+  TimelineContext,
+  TimelineContextType,
+} from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 import { getCachedPauseIdForExecutionPoint } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { Pause, ThreadFront } from "protocol/thread";
 import { seek } from "ui/actions/timeline";

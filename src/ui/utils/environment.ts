@@ -1,6 +1,7 @@
 import { MockedResponse } from "@apollo/client/testing";
 import { TimeStampedPointRange } from "@replayio/protocol";
 import { Editor } from "codemirror";
+
 import { injectCustomSocketSendMessageForTesting } from "protocol/socket";
 
 export interface MockEnvironment {

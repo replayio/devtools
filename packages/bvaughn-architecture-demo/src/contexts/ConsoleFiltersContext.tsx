@@ -1,13 +1,14 @@
 import { EventHandlerType } from "@replayio/protocol";
 import {
-  createContext,
   PropsWithChildren,
+  createContext,
   useCallback,
   useContext,
   useMemo,
   useState,
   useTransition,
 } from "react";
+
 import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
 
 import { SessionContext } from "./SessionContext";

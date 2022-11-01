@@ -1,10 +1,11 @@
 import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import clamp from "lodash/clamp";
+
 import { gPaintPoints, hasAllPaintPoints } from "protocol/graphics";
-import { useAppSelector } from "ui/setup/hooks";
 import { useFeature } from "ui/hooks/settings";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getZoomRegion } from "ui/reducers/timeline";
+import { useAppSelector } from "ui/setup/hooks";
 
 const Span = ({
   regions,

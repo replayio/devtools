@@ -1,10 +1,10 @@
 import React from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+
 import { toggleFocusMode } from "ui/actions/timeline";
 import { getShowFocusModeControls } from "ui/reducers/timeline";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import Icon from "../shared/Icon";
-
 import styles from "./EditFocusButton.module.css";
 
 export const EditFocusButton = () => {

@@ -1,3 +1,5 @@
+import { Suspense, useContext } from "react";
+
 import Inspector from "bvaughn-architecture-demo/components/inspector";
 import ScopesInspector from "bvaughn-architecture-demo/components/inspector/ScopesInspector";
 import Loader from "bvaughn-architecture-demo/components/Loader";
@@ -7,11 +9,10 @@ import {
   getPauseForExecutionPointSuspense,
 } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { getClosestPointForTimeSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
-import { Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import styles from "./styles.module.css";
 import createTest from "./utils/createTest";
+import styles from "./styles.module.css";
 
 const DEFAULT_RECORDING_ID = "9fd8381f-05e6-40c2-8b4f-59e40c2c3886";
 

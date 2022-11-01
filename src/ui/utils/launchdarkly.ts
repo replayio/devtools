@@ -1,7 +1,8 @@
 import * as LDClient from "launchdarkly-js-client-sdk";
 import { useEffect, useState } from "react";
-import { isDevelopment } from "ui/utils/environment";
+
 import { UserInfo } from "ui/hooks/users";
+import { isDevelopment } from "ui/utils/environment";
 
 const DEFAULT_FLAGS = {
   "maintenance-mode": false,

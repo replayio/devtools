@@ -2,12 +2,12 @@ import test from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
 import {
+  findConsoleMessage,
   openConsolePanel,
+  setConsoleMessageAsFocusEnd,
+  setConsoleMessageAsFocusStart,
   verifyConsoleMessage,
   verifyTrimmedConsoleMessages,
-  setConsoleMessageAsFocusStart,
-  setConsoleMessageAsFocusEnd,
-  findConsoleMessage,
 } from "../helpers/console-panel";
 import { openSource } from "../helpers/source-explorer-panel";
 import { addLogpoint } from "../helpers/source-panel";

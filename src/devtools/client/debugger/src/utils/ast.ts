@@ -4,16 +4,17 @@
 
 // Check whether location A starts after location B
 import type { SourceLocation } from "@replayio/protocol";
-import {
-  SymbolDeclarations,
-  ClassDeclaration,
-  FunctionDeclaration,
-  SymbolEntry,
-} from "../reducers/ast";
-import { LoadingStatus } from "ui/utils/LoadingStatus";
-import { UIThunkAction } from "ui/actions";
 
 import { getSymbolEntryForSource } from "devtools/client/debugger/src/reducers/ast";
+import { UIThunkAction } from "ui/actions";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
+
+import {
+  ClassDeclaration,
+  FunctionDeclaration,
+  SymbolDeclarations,
+  SymbolEntry,
+} from "../reducers/ast";
 
 export interface PositionRange {
   start: SourceLocation;

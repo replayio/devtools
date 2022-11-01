@@ -1,4 +1,5 @@
-import { RequestInfo, RequestEventInfo } from "@replayio/protocol";
+import { RequestEventInfo, RequestInfo } from "@replayio/protocol";
+
 import { CanonicalRequestType, RequestSummary } from "ui/components/NetworkMonitor/utils";
 
 export const eventsFor = (

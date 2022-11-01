@@ -1,7 +1,9 @@
 import { ReactNode, useContext } from "react";
+
 import { isReplayBrowser } from "ui/utils/environment";
-import styles from "../../../Library.module.css";
+
 import { FilterContext } from "../FilterContext";
+import styles from "../../../Library.module.css";
 
 export function RecordingsError() {
   const { filter, setAppliedText } = useContext(FilterContext);
@@ -12,7 +14,7 @@ export function RecordingsError() {
       <>
         <div>
           No results found.
-          <span onClick={() => setAppliedText("")} className="pl-2 underline cursor-pointer">
+          <span onClick={() => setAppliedText("")} className="cursor-pointer pl-2 underline">
             Show all replays?
           </span>
         </div>
@@ -26,9 +28,9 @@ export function RecordingsError() {
 
   return (
     <section
-      className={`flex flex-grow flex-col items-center justify-center space-y-1 text-lg h-3/4 ${styles.recordingsBackground}`}
+      className={`flex h-3/4 flex-grow flex-col items-center justify-center space-y-1 text-lg ${styles.recordingsBackground}`}
     >
-      <div className="p-6 m-24 text-bodyColor">{msg}</div>
+      <div className="m-24 p-6 text-bodyColor">{msg}</div>
     </section>
   );
 }

@@ -6,12 +6,11 @@
 
 import * as t from "@babel/types";
 
-import createSimplePath from "./utils/simple-path";
 import { traverseAst } from "./utils/ast";
-import { isFunction, getCode, getFunctionParameterNames } from "./utils/helpers";
-
-import { inferClassName } from "./utils/inferClassName";
 import getFunctionName from "./utils/getFunctionName";
+import { getCode, getFunctionParameterNames, isFunction } from "./utils/helpers";
+import { inferClassName } from "./utils/inferClassName";
+import createSimplePath from "./utils/simple-path";
 
 let symbolDeclarations = new Map();
 

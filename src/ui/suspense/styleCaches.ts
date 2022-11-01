@@ -6,7 +6,6 @@ import {
   getObjectWithPreviewHelper,
   preCacheObjects,
 } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
-
 import { RuleFront } from "devtools/client/inspector/rules/models/fronts/rule";
 import { ReplayClientInterface } from "shared/client/types";
 

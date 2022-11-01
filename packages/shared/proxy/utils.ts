@@ -1,4 +1,5 @@
 import { Thennable } from "bvaughn-architecture-demo/src/suspense/types";
+
 import { Entry } from "./types";
 
 export function findMatch(entries: Entry[], prop: string, args: any[] | null): Entry | null {

@@ -1,14 +1,14 @@
 import React from "react";
-import { useAppDispatch } from "ui/setup/hooks";
+
 import { createFloatingCodeComment } from "ui/actions/comments";
 import { ContextMenu as ContextMenuType } from "ui/actions/contextMenus";
 import { useGetRecordingId } from "ui/hooks/recordings";
+import { useAppDispatch } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
+import useAuth0 from "ui/utils/useAuth0";
 
 import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
-
 import { ContextMenu } from "./index";
-import useAuth0 from "ui/utils/useAuth0";
 
 export default function GutterContextMenu({
   close,

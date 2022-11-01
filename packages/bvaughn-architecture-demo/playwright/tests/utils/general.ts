@@ -1,9 +1,9 @@
 import {
-  expect,
   Locator,
   LocatorScreenshotOptions,
   Page,
   PageScreenshotOptions,
+  expect,
 } from "@playwright/test";
 import chalk from "chalk";
 

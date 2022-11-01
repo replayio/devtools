@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import React from "react";
+
 import MaterialIcon from "./MaterialIcon";
 
 export function TrialEnd({
@@ -31,7 +32,7 @@ export function TrialEnd({
       <MaterialIcon iconSize="xl" className="text-gray-700">
         timer
       </MaterialIcon>
-      <span className="overflow-hidden text-gray-500 whitespace-pre overflow-ellipsis">
+      <span className="overflow-hidden overflow-ellipsis whitespace-pre text-gray-500">
         {expiresIn > 1 ? (
           <span>Trial expires in {expiresIn} days</span>
         ) : expiresIn == 1 ? (

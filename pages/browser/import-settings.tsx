@@ -1,6 +1,8 @@
-import React from "react";
 import Link from "next/link";
+import React from "react";
+
 import { getButtonClasses } from "ui/components/shared/Button";
+import { LoginLink } from "ui/components/shared/Login/Login";
 import {
   OnboardingActions,
   OnboardingBody,
@@ -9,7 +11,6 @@ import {
   OnboardingHeader,
   OnboardingModalContainer,
 } from "ui/components/shared/Onboarding";
-import { LoginLink } from "ui/components/shared/Login/Login";
 
 function launchMigrationWizard(e: React.MouseEvent<HTMLAnchorElement>) {
   e.preventDefault();
@@ -44,7 +45,7 @@ export default function ImportSettings() {
             </a>
           </LoginLink>
         </OnboardingActions>
-        <iframe id="migrationFrame" className="w-0 h-0" />
+        <iframe id="migrationFrame" className="h-0 w-0" />
       </OnboardingContentWrapper>
     </OnboardingModalContainer>
   );

@@ -1,12 +1,11 @@
 import { SearchSourceContentsMatch } from "@replayio/protocol";
-
-import { trackEvent } from "ui/utils/telemetry";
 import groupBy from "lodash/groupBy";
-import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/sourceVisualizations";
 
-import { sliceCodePoints } from "ui/utils/codePointString";
-import { SourceDetails } from "ui/reducers/sources";
+import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/sourceVisualizations";
 import { ReplayClientInterface } from "shared/client/types";
+import { SourceDetails } from "ui/reducers/sources";
+import { sliceCodePoints } from "ui/utils/codePointString";
+import { trackEvent } from "ui/utils/telemetry";
 
 export interface SourceMatchEntry {
   type: "MATCH";

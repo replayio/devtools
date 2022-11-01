@@ -1,10 +1,10 @@
 import React from "react";
+
 import ManagedTree from "../shared/ManagedTree";
 import { FullTextItem } from "./FullTextItem";
 import { FullTextSummary } from "./FullTextSummary";
-
-import { SourceResultEntry, SourceMatchEntry } from "./search";
 import type { FTSState } from "./index";
+import { SourceMatchEntry, SourceResultEntry } from "./search";
 
 type EitherEntry = SourceResultEntry | SourceMatchEntry;
 

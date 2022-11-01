@@ -6,16 +6,18 @@
 
 import React from "react";
 
-import LogpointsPane from "./LogpointsPane";
-import BreakpointsPane from "./BreakpointsPane";
-import NewFrames from "./Frames/NewFrames";
-import { Accordion, AccordionPane } from "@recordreplay/accordion";
-import CommandBar from "./CommandBar";
-import FrameTimeline from "./FrameTimeline";
-import NewScopes from "./NewScopes";
-import { useDebuggerPrefs } from "../../utils/prefs";
-import { getPauseId } from "../../reducers/pause";
 import { useAppSelector } from "ui/setup/hooks";
+
+import { getPauseId } from "../../reducers/pause";
+import { useDebuggerPrefs } from "../../utils/prefs";
+import BreakpointsPane from "./BreakpointsPane";
+import CommandBar from "./CommandBar";
+import NewFrames from "./Frames/NewFrames";
+import FrameTimeline from "./FrameTimeline";
+import LogpointsPane from "./LogpointsPane";
+import NewScopes from "./NewScopes";
+
+import { Accordion, AccordionPane } from "@recordreplay/accordion";
 
 export default function SecondaryPanes() {
   const pauseId = useAppSelector(getPauseId);

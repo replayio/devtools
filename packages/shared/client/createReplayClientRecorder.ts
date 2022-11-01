@@ -1,5 +1,6 @@
 import createRecorder from "shared/proxy/createRecorder";
 import { Entry } from "shared/proxy/types";
+
 import { encode } from "./encoder";
 import { ReplayClientInterface } from "./types";
 

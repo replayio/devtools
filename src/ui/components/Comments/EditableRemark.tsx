@@ -1,4 +1,5 @@
 import { ReactNode, useMemo, useState } from "react";
+
 import { useUpdateComment, useUpdateCommentReply } from "ui/hooks/comments/comments";
 import useDeleteComment from "ui/hooks/comments/useDeleteComment";
 import useDeleteCommentReply from "ui/hooks/comments/useDeleteCommentReply";
@@ -11,12 +12,11 @@ import { User } from "ui/types";
 import { formatRelativeTime } from "ui/utils/comments";
 
 import { AvatarImage } from "../Avatar";
-
 import TipTapEditor from "./CommentEditor/TipTapEditor";
-import styles from "./EditableRemark.module.css";
 import { FocusContext } from "./FocusContext";
 import LoomComment from "./LoomComment";
 import RemarkDropDown from "./RemarkDropDown";
+import styles from "./EditableRemark.module.css";
 
 export default function EditableRemark({
   remark,

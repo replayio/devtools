@@ -1,5 +1,7 @@
 import { Action } from "@reduxjs/toolkit";
+
 import { trackEvent } from "ui/utils/telemetry";
+
 import { InspectorActiveTab } from "../reducers";
 
 export type SetActiveTabAction = Action<"set_active_inspector_tab"> & {

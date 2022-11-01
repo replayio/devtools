@@ -7,7 +7,7 @@ import Spinner from "../shared/Spinner";
 export function LibrarySpinner() {
   return (
     <div className="flex justify-center p-4">
-      <Spinner className="w-4 h-4 text-gray-500 animate-spin" />
+      <Spinner className="h-4 w-4 animate-spin text-gray-500" />
     </div>
   );
 }

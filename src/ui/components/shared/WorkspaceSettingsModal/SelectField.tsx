@@ -1,5 +1,6 @@
 import React from "react";
-import { FieldProps, Field } from "./Field";
+
+import { Field, FieldProps } from "./Field";
 
 export function SelectField({
   children,

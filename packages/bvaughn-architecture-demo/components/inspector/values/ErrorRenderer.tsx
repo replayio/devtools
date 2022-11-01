@@ -1,5 +1,4 @@
 import { ObjectPreviewRendererProps } from "./types";
-
 import styles from "./shared.module.css";
 
 // Renders a protocol ObjectPreview representing an Error with a format of:

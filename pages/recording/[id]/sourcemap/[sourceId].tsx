@@ -1,17 +1,18 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+
 // eslint-disable-next-line no-restricted-imports
-import { initSocket, client } from "protocol/socket";
-import { useAppDispatch, useAppStore } from "ui/setup/hooks";
+import { client, initSocket } from "protocol/socket";
+import renderSourcemap from "third-party/sourcemap-visualizer/sourcemapVisualizer";
 import { UIStore } from "ui/actions";
-import { ExpectedError } from "ui/state/app";
 import { onUnprocessedRegions, setAppMode } from "ui/actions/app";
 import { getAccessibleRecording } from "ui/actions/session";
-import tokenManager from "ui/utils/tokenManager";
-import { useGetRecordingId } from "ui/hooks/recordings";
-import renderSourcemap from "third-party/sourcemap-visualizer/sourcemapVisualizer";
-import LoadingScreen from "ui/components/shared/LoadingScreen";
 import { ExpectedErrorScreen } from "ui/components/shared/Error";
+import LoadingScreen from "ui/components/shared/LoadingScreen";
+import { useGetRecordingId } from "ui/hooks/recordings";
+import { useAppDispatch, useAppStore } from "ui/setup/hooks";
+import { ExpectedError } from "ui/state/app";
+import tokenManager from "ui/utils/tokenManager";
 
 type SourcemapResult =
   | {

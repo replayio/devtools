@@ -1,4 +1,5 @@
 import { ExecutionPoint } from "@replayio/protocol";
+
 import { compareNumericStrings } from "protocol/utils";
 
 export function pointEquals(p1: ExecutionPoint, p2: ExecutionPoint) {

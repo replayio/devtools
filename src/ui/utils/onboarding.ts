@@ -1,5 +1,6 @@
-import { isReplayBrowser } from "ui/utils/environment";
 import { Nag } from "ui/hooks/users";
+import { isReplayBrowser } from "ui/utils/environment";
+
 import { shouldShowNag } from "./user";
 
 function queryParams() {

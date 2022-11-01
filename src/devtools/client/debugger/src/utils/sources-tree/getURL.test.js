@@ -2,8 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { getURL } from "./getURL";
 import { makeMockSource } from "devtools/client/debugger/src/utils/test-mockup";
+
+import { getURL } from "./getURL";
 
 function createMockSource(props) {
   const rv = {

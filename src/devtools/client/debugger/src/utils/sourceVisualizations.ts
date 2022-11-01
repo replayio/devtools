@@ -1,22 +1,24 @@
 import { Dictionary } from "@reduxjs/toolkit";
 import type { SourceId } from "@replayio/protocol";
+import sortBy from "lodash/sortBy";
+
 import { getMappedLocationSuspense } from "bvaughn-architecture-demo/src/suspense/MappedLocationCache";
 import { getBreakpointPositionsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
-import sortBy from "lodash/sortBy";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
 import {
   SourceDetails,
-  isOriginalSource,
+  SourcesState,
   getBestNonSourceMappedSourceId,
   getBestSourceMappedSourceId,
-  SourcesState,
+  isOriginalSource,
 } from "ui/reducers/sources";
 import { getPauseFrameSuspense } from "ui/suspense/frameCache";
+
 import { CursorPosition } from "../components/Editor/Footer";
-import { isNodeModule, isBowerComponent } from "./source";
 import { PauseAndFrameId } from "../reducers/pause";
+import { isBowerComponent, isNodeModule } from "./source";
 
 export function getSourceIDsToSearch(
   sourcesById: Record<string, SourceDetails>,

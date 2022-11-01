@@ -1,10 +1,10 @@
 // Routines for managing and rendering graphics data fetched over the WRP.
-import { TimeStampedPoint, MouseEvent, ScreenShot, PaintPoint } from "@replayio/protocol";
+import { MouseEvent, PaintPoint, ScreenShot, TimeStampedPoint } from "@replayio/protocol";
 import maxBy from "lodash/maxBy";
 
 import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
 import { ThreadFront } from "./thread";
-import { assert, binarySearch, defer, Deferred } from "./utils";
+import { Deferred, assert, binarySearch, defer } from "./utils";
 
 const MINIMUM_VIDEO_CONTENT = 5000;
 

@@ -1,5 +1,7 @@
-import hooks from "ui/hooks";
 import sortBy from "lodash/sortBy";
+
+import hooks from "ui/hooks";
+
 import { TeamButton } from "./TeamButton";
 
 export function Invitations() {

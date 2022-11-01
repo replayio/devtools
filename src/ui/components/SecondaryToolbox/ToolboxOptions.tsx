@@ -1,11 +1,13 @@
 import React, { ReactNode, useState } from "react";
+
+import { setToolboxLayout } from "ui/actions/layout";
+import { getToolboxLayout } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ToolboxLayout } from "ui/state/layout";
-import { getToolboxLayout } from "ui/reducers/layout";
-import { setToolboxLayout } from "ui/actions/layout";
+
+import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
 import Icon from "../shared/Icon";
 import PortalDropdown from "../shared/PortalDropdown";
-import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
 import { getRecordingCapabilitiesSuspense } from "./getRecordingCapabilities";
 
 const LAYOUT_ICONS = {

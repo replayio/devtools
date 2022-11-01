@@ -2,52 +2,52 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import React, { Component } from "react";
-import { connect, ConnectedProps } from "react-redux";
 import { Dictionary } from "@reduxjs/toolkit";
 import fuzzyAldrin from "fuzzaldrin-plus";
-
-import type { UIState } from "ui/state";
-
-import { basename } from "../utils/path";
 import debounce from "lodash/debounce";
-import actions from "../actions";
+import React, { Component } from "react";
+import { ConnectedProps, connect } from "react-redux";
+
+import { setViewMode } from "ui/actions/layout";
+import { getViewMode } from "ui/reducers/layout";
 import {
+  SourceDetails,
+  getAllSourceDetails,
+  getSelectedSource,
+  getSourceContentsLoaded,
+  getSourcesLoading,
+  getSourcesToDisplayByUrl,
+} from "ui/reducers/sources";
+import type { UIState } from "ui/state";
+import { trackEvent } from "ui/utils/telemetry";
+
+import actions from "../actions";
+import { getGlobalFunctions, isGlobalFunctionsLoading } from "../reducers/ast";
+import {
+  getContext,
   getQuickOpenEnabled,
+  getQuickOpenProject,
   getQuickOpenQuery,
   getQuickOpenType,
-  getQuickOpenProject,
+  getShowOnlyOpenSources,
+  getSourcesForTabs,
   getSymbols,
   getTabs,
   isSymbolsLoading,
-  getContext,
-  getShowOnlyOpenSources,
-  getSourcesForTabs,
 } from "../selectors";
-import {
-  getAllSourceDetails,
-  getSelectedSource,
-  getSourcesLoading,
-  getSourceContentsLoaded,
-  getSourcesToDisplayByUrl,
-  SourceDetails,
-} from "ui/reducers/sources";
-import { setViewMode } from "ui/actions/layout";
-import { getViewMode } from "ui/reducers/layout";
 import { memoizeLast } from "../utils/memoizeLast";
-import { scrollList } from "../utils/result-list";
+import { basename } from "../utils/path";
 import {
-  formatSymbols,
-  parseLineColumn,
+  SearchResult,
   formatShortcutResults,
   formatSources,
-  SearchResult,
+  formatSymbols,
+  parseLineColumn,
 } from "../utils/quick-open";
+import { scrollList } from "../utils/result-list";
 import Modal from "./shared/Modal";
-import SearchInput from "./shared/SearchInput";
 import ResultList from "./shared/ResultList";
-import { trackEvent } from "ui/utils/telemetry";
-import { getGlobalFunctions, isGlobalFunctionsLoading } from "../reducers/ast";
+import SearchInput from "./shared/SearchInput";
 
 const maxResults = 100;
 

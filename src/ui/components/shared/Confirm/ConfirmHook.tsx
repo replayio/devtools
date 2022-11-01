@@ -1,16 +1,17 @@
 import omit from "lodash/omit";
 import uniqueId from "lodash/uniqueId";
 import React, {
-  createContext,
   ReactNode,
+  createContext,
   useCallback,
   useContext,
   useEffect,
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { ConfirmModal } from "./ConfirmModal";
+
 import { ConfirmOptions } from "./ConfirmDialog";
+import { ConfirmModal } from "./ConfirmModal";
 
 const ConfirmContext = createContext<{
   confirmations: { [id: number]: ConfirmOptions };

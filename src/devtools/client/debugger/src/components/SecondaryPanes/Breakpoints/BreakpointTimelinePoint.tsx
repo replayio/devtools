@@ -1,9 +1,10 @@
 import { PointDescription, TimeStampedPoint } from "@replayio/protocol";
 import classnames from "classnames";
+import { MouseEvent, memo } from "react";
+import { ConnectedProps, connect } from "react-redux";
+
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
-import { memo, MouseEvent } from "react";
-import { connect, ConnectedProps } from "react-redux";
 import { Point } from "shared/client/types";
 import { actions } from "ui/actions";
 import { Circle } from "ui/components/Timeline/Marker";

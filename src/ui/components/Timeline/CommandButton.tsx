@@ -1,6 +1,7 @@
-import React, { MouseEventHandler } from "react";
-import { SVG } from "image/svg";
 import classnames from "classnames";
+import React, { MouseEventHandler } from "react";
+
+import { SVG } from "image/svg";
 
 const images = {
   next: SVG.NextButton,

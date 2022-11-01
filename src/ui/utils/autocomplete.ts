@@ -1,15 +1,15 @@
-import { Scope as ProtocolScope, Object as ProtocolObject } from "@replayio/protocol";
+import generate from "@babel/generator";
 import { parseExpression } from "@babel/parser";
 import {
+  CallExpression,
+  Identifier,
+  StringLiteral,
+  isCallExpression as _isCallExpression,
   isIdentifier as _isIdentifier,
   isMemberExpression as _isMemberExpression,
   isStringLiteral as _isStringLiteral,
-  isCallExpression as _isCallExpression,
-  StringLiteral,
-  Identifier,
-  CallExpression,
 } from "@babel/types";
-import generate from "@babel/generator";
+import { Object as ProtocolObject, Scope as ProtocolScope } from "@replayio/protocol";
 import { filter } from "fuzzaldrin-plus";
 
 type PropertyExpression = {

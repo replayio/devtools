@@ -1,41 +1,42 @@
 import {
+  BreakpointId,
   ContentType,
-  createPauseResult,
+  Result as EvaluationResult,
   ExecutionPoint,
   FrameId,
-  getPointsBoundingTimeResult as PointsBoundingTime,
+  FunctionMatch,
   loadedRegions as LoadedRegions,
   Location,
+  MappedLocation,
   Message,
-  newSource as Source,
   ObjectId,
   ObjectPreviewLevel,
   PauseData,
   PauseId,
   PointDescription,
+  PointRange,
+  getPointsBoundingTimeResult as PointsBoundingTime,
+  RecordingId,
+  Result,
+  SameLineSourceLocations,
+  SearchSourceContentsMatch,
+  SessionId,
+  newSource as Source,
+  SourceId,
   TimeRange,
   TimeStampedPoint,
   TimeStampedPointRange,
-  RecordingId,
-  Result as EvaluationResult,
-  SearchSourceContentsMatch,
-  searchSourceContentsMatches,
-  SessionId,
-  SourceId,
+  createPauseResult,
   functionsMatches,
-  FunctionMatch,
   keyboardEvents,
   navigationEvents,
-  Result,
-  MappedLocation,
-  SameLineSourceLocations,
-  PointRange,
-  BreakpointId,
+  searchSourceContentsMatches,
 } from "@replayio/protocol";
+import uniqueId from "lodash/uniqueId";
+
 import { initProtocolMessagesStore } from "bvaughn-architecture-demo/components/protocol/ProtocolMessagesStore";
 import { insert } from "bvaughn-architecture-demo/src/utils/array";
 import { compareExecutionPoints } from "bvaughn-architecture-demo/src/utils/time";
-import uniqueId from "lodash/uniqueId";
 import analysisManager from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
@@ -44,11 +45,11 @@ import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { RecordingCapabilities } from "protocol/thread/thread";
 import { binarySearch, compareNumericStrings, defer } from "protocol/utils";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
-import { isCommandError, ProtocolError } from "shared/utils/error";
+import { ProtocolError, isCommandError } from "shared/utils/error";
 
 import {
-  HitPointsAndStatusTuple,
   HitPointStatus,
+  HitPointsAndStatusTuple,
   LineNumberToHitCountMap,
   Point,
   ReplayClientEvents,

@@ -1,6 +1,7 @@
-import { getSourcesHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { newSource as ProtocolSource } from "@replayio/protocol";
-import { createContext, ReactNode, useContext, useEffect, useMemo } from "react";
+import { ReactNode, createContext, useContext, useEffect, useMemo } from "react";
+
+import { getSourcesHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useSourceFileNameSearch, { Actions, State } from "./hooks/useSourceFileNameSearch";

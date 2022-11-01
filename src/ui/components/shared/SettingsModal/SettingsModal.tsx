@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import Modal from "ui/components/shared/Modal";
-import SettingsNavigation from "./SettingsNavigation";
-import SettingsBody from "./SettingsBody";
-
-import { Settings } from "./types";
-
 import classnames from "classnames";
+import React, { useEffect, useState } from "react";
+
+import Modal from "ui/components/shared/Modal";
+
+import SettingsBody from "./SettingsBody";
+import SettingsNavigation from "./SettingsNavigation";
+import { Settings } from "./types";
 
 export default function SettingsModal<T extends string, P extends Record<string, unknown>>({
   tab,

@@ -1,25 +1,25 @@
 import {
-  configureStore,
-  combineReducers,
-  Store,
+  AnyAction,
   Middleware,
   Reducer,
+  Store,
   ThunkDispatch,
-  AnyAction,
+  combineReducers,
+  configureStore,
 } from "@reduxjs/toolkit";
 import { Immer } from "immer";
-import { isDevelopment, skipTelemetry } from "ui/utils/environment";
+
+import tabsReducer from "devtools/client/debugger/src/reducers/tabs";
 import { UIAction } from "ui/actions";
-import { UIState } from "ui/state";
-import { ThunkExtraArgs, extraThunkArgs } from "ui/utils/thunk";
-import LogRocket from "ui/utils/logrocket";
 import appReducer from "ui/reducers/app";
 import layoutReducer from "ui/reducers/layout";
-import tabsReducer from "devtools/client/debugger/src/reducers/tabs";
-
-import { context } from "ui/setup/redux/middleware/context";
 import protocolMessages from "ui/reducers/protocolMessages";
 import sources from "ui/reducers/sources";
+import { context } from "ui/setup/redux/middleware/context";
+import { UIState } from "ui/state";
+import { isDevelopment, skipTelemetry } from "ui/utils/environment";
+import LogRocket from "ui/utils/logrocket";
+import { ThunkExtraArgs, extraThunkArgs } from "ui/utils/thunk";
 
 import { listenerMiddleware } from "./listenerMiddleware";
 

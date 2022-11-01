@@ -2,8 +2,8 @@ import classNames from "classnames";
 import React, { useLayoutEffect, useRef } from "react";
 import { Row } from "react-table";
 
-import styles from "./RequestTable.module.css";
 import { RequestSummary } from "./utils";
+import styles from "./RequestTable.module.css";
 
 export const RequestRow = ({
   currentTime,

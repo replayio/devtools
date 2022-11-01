@@ -1,8 +1,8 @@
+import { MouseEvent, useContext } from "react";
+
 import Icon from "bvaughn-architecture-demo/components/Icon";
 import { ConsoleFiltersContext } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
 import { Event } from "bvaughn-architecture-demo/src/suspense/EventsCache";
-import { MouseEvent, useContext } from "react";
-
 import { Badge, Checkbox } from "design";
 
 import styles from "./EventType.module.css";

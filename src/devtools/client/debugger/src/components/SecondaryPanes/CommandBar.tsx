@@ -2,13 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import React, { useEffect } from "react";
+
 import actions from "devtools/client/debugger/src/actions/index";
 import CommandBarButton from "devtools/client/debugger/src/components/shared/Button/CommandBarButton";
 import { getSelectedFrameId, getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import Services from "devtools/shared/services";
-import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { useGetFrames } from "ui/suspense/frameCache";
 import { useGetFrameSteps } from "ui/suspense/frameStepsCache";

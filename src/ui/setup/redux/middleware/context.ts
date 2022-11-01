@@ -2,10 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import type { AnyAction, Middleware } from "@reduxjs/toolkit";
+
+import type { ThreadContext } from "devtools/client/debugger/src/reducers/pause";
 //
 import type { UIState } from "ui/state";
-import type { ThreadContext } from "devtools/client/debugger/src/reducers/pause";
-import type { AnyAction, Middleware } from "@reduxjs/toolkit";
 
 // TODO This legacy documentation may be outdated with Replay
 

@@ -1,7 +1,9 @@
-import React, { FC, useState } from "react";
-const DeclarationValue = require("../../rules/components/DeclarationValue");
-import { DeclarationState } from "../reducers/rules";
 import classnames from "classnames";
+import React, { FC, useState } from "react";
+
+import { DeclarationState } from "../reducers/rules";
+
+const DeclarationValue = require("../../rules/components/DeclarationValue");
 
 type DeclarationProps = {
   declaration: DeclarationState;

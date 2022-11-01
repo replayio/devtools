@@ -1,3 +1,15 @@
+import {
+  MouseEvent,
+  ReactNode,
+  Suspense,
+  memo,
+  useContext,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
 import Icon from "bvaughn-architecture-demo/components/Icon";
 import Inspector from "bvaughn-architecture-demo/components/inspector";
 import ClientValueValueRenderer from "bvaughn-architecture-demo/components/inspector/values/ClientValueValueRenderer";
@@ -10,22 +22,10 @@ import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/Timeline
 import { evaluateSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { primitiveToClientValue } from "bvaughn-architecture-demo/src/utils/protocol";
 import { formatTimestamp } from "bvaughn-architecture-demo/src/utils/time";
-import {
-  memo,
-  MouseEvent,
-  ReactNode,
-  Suspense,
-  useContext,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
 import MessageHoverButton from "../MessageHoverButton";
-
 import styles from "./shared.module.css";
 
 function TerminalExpressionRenderer({

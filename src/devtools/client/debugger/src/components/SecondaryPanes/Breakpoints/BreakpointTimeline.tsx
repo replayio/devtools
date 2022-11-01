@@ -1,10 +1,11 @@
 import { PointDescription, TimeStampedPoint } from "@replayio/protocol";
 import classnames from "classnames";
+import React, { MouseEvent, useMemo, useRef, useState } from "react";
+import { ConnectedProps, connect } from "react-redux";
+
 import TimeTooltip from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/TimeTooltip";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
-import React, { useState, useRef, useMemo, MouseEvent } from "react";
-import { connect, ConnectedProps } from "react-redux";
 import { HitPointStatus } from "shared/client/types";
 import { actions as UIActions } from "ui/actions";
 import PortalTooltip from "ui/components/shared/PortalTooltip";

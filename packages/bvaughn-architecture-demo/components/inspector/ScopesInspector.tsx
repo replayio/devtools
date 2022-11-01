@@ -1,7 +1,8 @@
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
+import { Suspense } from "react";
+
 import Expandable from "bvaughn-architecture-demo/components/Expandable";
 import Loader from "bvaughn-architecture-demo/components/Loader";
-import { Suspense } from "react";
 
 import Inspector from "./Inspector";
 import styles from "./ScopesInspector.module.css";

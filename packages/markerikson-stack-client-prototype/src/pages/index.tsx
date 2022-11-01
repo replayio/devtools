@@ -1,16 +1,15 @@
-import React, { Suspense, useContext, useEffect } from "react";
-import type { NextPage } from "next";
 import classnames from "classnames";
-import styles from "../styles/Home.module.css";
+import type { NextPage } from "next";
+import React, { Suspense, useContext, useEffect } from "react";
 
-import { SessionContext } from "../contexts/SessionContext";
 import { useAppSelector } from "../app/hooks";
-
 import Loader from "../components/Loader";
-import { SourcesTree } from "../features/sourcesTree/SourcesTree";
-import { SourceContent } from "../features/sources/SourceContent";
+import { SessionContext } from "../contexts/SessionContext";
 import { SelectedLocationHits } from "../features/sources/SelectedLocationHits";
 import { SelectedPointStackFrames } from "../features/sources/SelectedPointStackFrames";
+import { SourceContent } from "../features/sources/SourceContent";
+import { SourcesTree } from "../features/sourcesTree/SourcesTree";
+import styles from "../styles/Home.module.css";
 
 const IndexPage: NextPage = () => {
   const sessionData = useContext(SessionContext);

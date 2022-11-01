@@ -1,8 +1,8 @@
-import { parse } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
 import { Suspense } from "react";
 
-import Loader from "../Loader";
+import { parse } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
 
+import Loader from "../Loader";
 import styles from "./SyntaxHighlightedLine.module.css";
 
 type Props = { code: string; editable?: boolean; fileExtension?: string };

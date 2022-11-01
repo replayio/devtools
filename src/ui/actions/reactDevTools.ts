@@ -1,8 +1,8 @@
-import { Annotation } from "@replayio/protocol";
-import type { ThreadFront as TF } from "protocol/thread";
 import { Action } from "@reduxjs/toolkit";
+import { Annotation } from "@replayio/protocol";
 import debounce from "lodash/debounce";
 
+import type { ThreadFront as TF } from "protocol/thread";
 import { Annotation as ParsedAnnotation } from "ui/state/reactDevTools";
 
 import { UIStore } from ".";

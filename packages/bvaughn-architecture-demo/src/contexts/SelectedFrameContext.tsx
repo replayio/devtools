@@ -1,21 +1,23 @@
 import { FrameId, PauseId } from "@replayio/protocol";
+import isEqual from "lodash/isEqual";
 import {
-  createContext,
   Dispatch,
   PropsWithChildren,
   SetStateAction,
   Suspense,
+  createContext,
   useContext,
   useLayoutEffect,
   useMemo,
   useState,
 } from "react";
-import isEqual from "lodash/isEqual";
-import useLoadedRegions from "../hooks/useRegions";
+
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { TimelineContext } from "./TimelineContext";
 import { isPointInRegions } from "shared/utils/time";
+
+import useLoadedRegions from "../hooks/useRegions";
 import { getPauseForExecutionPointHelper } from "../suspense/PauseCache";
+import { TimelineContext } from "./TimelineContext";
 
 interface PauseAndFrameId {
   pauseId: PauseId;

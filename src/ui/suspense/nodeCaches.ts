@@ -1,11 +1,11 @@
 import {
-  PauseId,
-  ProtocolClient,
-  Object as ProtocolObject,
-  Node as ProtocolNode,
-  PauseData,
   EventListener,
   NodeBounds,
+  PauseData,
+  PauseId,
+  ProtocolClient,
+  Node as ProtocolNode,
+  Object as ProtocolObject,
 } from "@replayio/protocol";
 import uniqBy from "lodash/uniqBy";
 
@@ -14,7 +14,6 @@ import {
   getObjectWithPreviewHelper,
   preCacheObjects,
 } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
-
 import { ReplayClientInterface } from "shared/client/types";
 
 type NodeFetchOptions =

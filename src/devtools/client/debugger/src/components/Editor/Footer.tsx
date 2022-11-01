@@ -1,7 +1,8 @@
-import React, { memo, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { Suspense, memo, useEffect, useLayoutEffect, useRef, useState } from "react";
+
 import ErrorBoundary from "ui/components/ErrorBoundary";
-import { useAppSelector } from "ui/setup/hooks";
 import { getSelectedSource } from "ui/reducers/sources";
+import { useAppSelector } from "ui/setup/hooks";
 import { localStorageGetItem, localStorageSetItem } from "ui/utils/storage";
 
 import SourcemapToggleSuspends from "./SourcemapToggle";

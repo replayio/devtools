@@ -1,9 +1,11 @@
 import React from "react";
+import { ConnectedProps, connect } from "react-redux";
+
+import { UIState } from "ui/state";
+
+import { setComputedPropertyExpanded } from "../actions";
 import { ComputedPropertyState } from "../state";
 import ComputedProperty from "./ComputedProperty";
-import { setComputedPropertyExpanded } from "../actions";
-import { UIState } from "ui/state";
-import { connect, ConnectedProps } from "react-redux";
 
 function isHidden(property: ComputedPropertyState, search: string, showBrowserStyles: boolean) {
   if (property.selectors.length === 0 && !showBrowserStyles) {

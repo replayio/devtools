@@ -1,4 +1,5 @@
 import { createContext } from "react";
+
 import { createReplayClientForProduction } from "shared/utils/client";
 
 import { ReplayClientInterface } from "./types";

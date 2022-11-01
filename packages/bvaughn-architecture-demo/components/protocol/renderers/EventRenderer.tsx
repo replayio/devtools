@@ -1,8 +1,8 @@
-import SyntaxHighlightedLine from "bvaughn-architecture-demo/components/sources/SyntaxHighlightedLine";
 import { useMemo } from "react";
 
-import { Event } from "../ProtocolMessagesStore";
+import SyntaxHighlightedLine from "bvaughn-architecture-demo/components/sources/SyntaxHighlightedLine";
 
+import { Event } from "../ProtocolMessagesStore";
 import styles from "./shared.module.css";
 
 export function EventHeaderRenderer({ message }: { message: Event }) {

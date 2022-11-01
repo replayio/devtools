@@ -4,12 +4,12 @@
 
 //
 
+import { SourceDetails } from "ui/reducers/sources";
+
 import { addToTree } from "./addToTree";
 import { collapseTree } from "./collapseTree";
+import type { TreeDirectory, TreeNode } from "./types";
 import { createDirectoryNode, createParentMap } from "./utils";
-
-import type { TreeNode, TreeDirectory } from "./types";
-import { SourceDetails } from "ui/reducers/sources";
 
 type SourcesMap = Record<string, SourceDetails>;
 

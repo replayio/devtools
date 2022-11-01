@@ -1,4 +1,5 @@
 import React from "react";
+
 import Modal from "../NewModal";
 import { ConfirmDialog, ConfirmOptions } from "./ConfirmDialog";
 

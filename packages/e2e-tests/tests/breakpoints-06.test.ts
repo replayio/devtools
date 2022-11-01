@@ -1,4 +1,4 @@
-import test, { expect, Page } from "@playwright/test";
+import test, { Page, expect } from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
 import { findConsoleMessage } from "../helpers/console-panel";

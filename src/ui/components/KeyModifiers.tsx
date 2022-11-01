@@ -1,5 +1,5 @@
-import { createContext, FC, ReactNode, useEffect, useState } from "react";
 import debounce from "lodash/debounce";
+import { FC, ReactNode, createContext, useEffect, useState } from "react";
 
 export interface KeyModifiers {
   meta: boolean;

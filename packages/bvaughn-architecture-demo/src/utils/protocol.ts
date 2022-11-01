@@ -1,13 +1,14 @@
 import {
   NamedValue,
+  PropertyConfigurationFlags,
   NamedValue as ProtocolNamedValue,
-  newSource as ProtocolSource,
   ObjectId as ProtocolObjectId,
   PauseId as ProtocolPauseId,
   Property as ProtocolProperty,
-  PropertyConfigurationFlags,
+  newSource as ProtocolSource,
   Value as ProtocolValue,
 } from "@replayio/protocol";
+
 import { getObjectThrows } from "../suspense/ObjectPreviews";
 
 type ValueType =

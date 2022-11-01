@@ -1,6 +1,6 @@
 import {
-  CustomAction,
   DispatchAction as AppDispatchAction,
+  CustomAction,
   LibConfig,
   SetPersistAction,
   UPDATE_STATE,

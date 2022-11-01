@@ -1,26 +1,28 @@
 import React, { useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { useAppSelector } from "ui/setup/hooks";
+import { ConnectedProps, connect } from "react-redux";
+
+import { actions } from "ui/actions";
+import { AvatarImage } from "ui/components/Avatar";
 import Modal from "ui/components/shared/NewModal";
-import { CopyButton } from "./ReplayLink";
-import hooks from "ui/hooks";
-import * as selectors from "ui/reducers/app";
-import { UIState } from "ui/state";
-import { OperationsData } from "ui/types";
 import {
-  getUniqueDomains,
   Privacy,
   ToggleShowPrivacyButton,
+  getUniqueDomains,
 } from "ui/components/UploadScreen/Privacy";
-import { CollaboratorRequest, Recording } from "ui/types";
-import { actions } from "ui/actions";
-import Collaborators from "./Collaborators";
-import MaterialIcon from "../MaterialIcon";
-import PrivacyDropdown from "./PrivacyDropdown";
-import { AvatarImage } from "ui/components/Avatar";
-import { PrimaryButton } from "../Button";
+import hooks from "ui/hooks";
 import { useHasNoRole } from "ui/hooks/recordings";
+import * as selectors from "ui/reducers/app";
 import { getRecordingTarget } from "ui/reducers/app";
+import { useAppSelector } from "ui/setup/hooks";
+import { UIState } from "ui/state";
+import { OperationsData } from "ui/types";
+import { CollaboratorRequest, Recording } from "ui/types";
+
+import { PrimaryButton } from "../Button";
+import MaterialIcon from "../MaterialIcon";
+import Collaborators from "./Collaborators";
+import PrivacyDropdown from "./PrivacyDropdown";
+import { CopyButton } from "./ReplayLink";
 
 function SharingModalWrapper(props: PropsFromRedux) {
   const opts = props.modalOptions;
@@ -60,14 +62,14 @@ function CollaboratorRequests({ recording }: { recording: Recording }) {
       <div className="space-y-1.5 overflow-auto" style={{ maxHeight: "160px" }}>
         {displayedRequests.map((c, i) => (
           <div
-            className="flex items-center justify-between p-2 space-x-2 rounded-lg hover:bg-theme-base-90"
+            className="hover:bg-theme-base-90 flex items-center justify-between space-x-2 rounded-lg p-2"
             key={i}
           >
             <div className="flex items-center space-x-2">
-              <div className="flex-shrink-0 w-8 overflow-hidden rounded-full">
+              <div className="w-8 flex-shrink-0 overflow-hidden rounded-full">
                 <AvatarImage src={c.user.picture} />
               </div>
-              <span className="overflow-hidden whitespace-pre overflow-ellipsis">
+              <span className="overflow-hidden overflow-ellipsis whitespace-pre">
                 {c.user.name}
               </span>
             </div>
@@ -89,8 +91,8 @@ function CollaboratorsSection({ recording }: { recording: Recording }) {
   }
 
   return (
-    <section className="p-8 space-y-4 bg-menuBgcolor">
-      <div className="flex flex-col justify-between w-full space-y-3">
+    <section className="space-y-4 bg-menuBgcolor p-8">
+      <div className="flex w-full flex-col justify-between space-y-3">
         <div className="w-full space-y-4">
           <div className="space-y-1.5">
             <div className="font-bold">Add People</div>
@@ -129,14 +131,14 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
       <div
-        className="relative flex flex-row overflow-hidden text-sm rounded-lg shadow-xl sharing-modal"
+        className="sharing-modal relative flex flex-row overflow-hidden rounded-lg text-sm shadow-xl"
         style={{ width: showPrivacy ? 720 : 460 }}
       >
         <div className="flex flex-col space-y-0" style={{ width: 460 }}>
           <CollaboratorsSection recording={recording} />
-          <section className="flex flex-row items-center justify-between flex-grow px-8 pt-8 space-x-2 bg-menuHoverBgcolor">
+          <section className="flex flex-grow flex-row items-center justify-between space-x-2 bg-menuHoverBgcolor px-8 pt-8">
             <div className="flex flex-row items-start space-x-3 overflow-hidden">
-              <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 mt-1 font-bold bg-blue-200 rounded-full">
+              <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-200 font-bold">
                 <MaterialIcon className="text-blue-600" iconSize="xl">
                   people
                 </MaterialIcon>
@@ -150,7 +152,7 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
             <CopyButton recording={recording} />
           </section>
           {recording.operations ? (
-            <section className="px-8 pb-6 bg-menuHoverBgcolor">
+            <section className="bg-menuHoverBgcolor px-8 pb-6">
               <ToggleShowPrivacyButton
                 showPrivacy={showPrivacy}
                 operations={recording.operations}

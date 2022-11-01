@@ -3,16 +3,15 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { Frame } from "@replayio/protocol";
+
+import { getSourcesHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import type { ThreadFront as TF } from "protocol/thread";
 import { ReplayClientInterface } from "shared/client/types";
 import type { UIStore } from "ui/actions";
 import { allSourcesReceived } from "ui/reducers/sources";
 
-import { getSourcesHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
-
+import { paused, resumed } from "../actions/pause";
 import { verifyPrefSchema } from "../utils/prefs";
-
-import { resumed, paused } from "../actions/pause";
 
 let store: UIStore;
 

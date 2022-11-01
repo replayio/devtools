@@ -1,21 +1,21 @@
-import { Action, Store, ThunkAction, AnyAction } from "@reduxjs/toolkit";
+import { Action, AnyAction, Store, ThunkAction } from "@reduxjs/toolkit";
 
-import type { AppStore } from "ui/setup/store";
-
-import * as appActions from "./app";
-import * as timelineActions from "./timeline";
-import * as sessionActions from "./session";
-import * as commentsActions from "./comments";
-import * as layoutActions from "./layout";
-import * as markupActions from "devtools/client/inspector/markup/actions/markup";
-import * as reactDevToolsActions from "./reactDevTools";
-import { ThunkExtraArgs } from "ui/utils/thunk";
-import { UIState } from "ui/state";
-import { ReactDevToolsAction } from "./reactDevTools";
 import debuggerActions from "devtools/client/debugger/src/actions";
 import { QuickOpenActions } from "devtools/client/debugger/src/actions/quick-open";
-import { NetworkAction } from "./network";
+import * as markupActions from "devtools/client/inspector/markup/actions/markup";
+import type { AppStore } from "ui/setup/store";
+import { UIState } from "ui/state";
+import { ThunkExtraArgs } from "ui/utils/thunk";
+
+import * as appActions from "./app";
+import * as commentsActions from "./comments";
+import * as layoutActions from "./layout";
 import { LayoutAction } from "./layout";
+import { NetworkAction } from "./network";
+import * as reactDevToolsActions from "./reactDevTools";
+import { ReactDevToolsAction } from "./reactDevTools";
+import * as sessionActions from "./session";
+import * as timelineActions from "./timeline";
 
 export type UIAction = LayoutAction | NetworkAction | ReactDevToolsAction | QuickOpenActions;
 

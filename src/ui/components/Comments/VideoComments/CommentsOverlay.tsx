@@ -1,10 +1,12 @@
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { selectors } from "ui/reducers";
+import { ConnectedProps, connect } from "react-redux";
+
 import hooks from "ui/hooks";
-import VideoComment from "./VideoComment";
+import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { Comment } from "ui/state/comments";
+
+import VideoComment from "./VideoComment";
 
 function findComment({ comments, currentTime }: { comments: Comment[]; currentTime: number }) {
   return comments.filter(

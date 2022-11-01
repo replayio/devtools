@@ -1,3 +1,12 @@
+import React, {
+  ReactNode,
+  unstable_useCacheRefresh as useCacheRefresh,
+  useContext,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
+
 import AvatarImage from "bvaughn-architecture-demo/components/AvatarImage";
 import Icon from "bvaughn-architecture-demo/components/Icon";
 import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
@@ -11,14 +20,6 @@ import {
 } from "bvaughn-architecture-demo/src/graphql/Comments";
 import { Comment, User, UserInfo } from "bvaughn-architecture-demo/src/graphql/types";
 import { formatRelativeTime } from "bvaughn-architecture-demo/src/utils/time";
-import React, {
-  ReactNode,
-  unstable_useCacheRefresh as useCacheRefresh,
-  useContext,
-  useRef,
-  useState,
-  useTransition,
-} from "react";
 
 import styles from "./Comment.module.css";
 

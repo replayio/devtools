@@ -2,16 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import type { SourceLocation } from "@replayio/protocol";
 import { nanoid } from "@reduxjs/toolkit";
-import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
-import type { UIThunkAction } from "ui/actions";
-import type { ThreadContext } from "devtools/client/debugger/src/reducers/pause";
+import type { SourceLocation } from "@replayio/protocol";
 
-import { getExpressionFromCoords } from "../utils/editor/get-expression";
-import { isSelectedFrameVisible, getSelectedFrameAsync } from "../selectors";
+import type { ThreadContext } from "devtools/client/debugger/src/reducers/pause";
+import type { UIThunkAction } from "ui/actions";
+import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
 import { getSelectedSource } from "ui/reducers/sources";
-import { getPreview, previewCleared, previewStarted, previewLoaded } from "../reducers/preview";
+
+import { getPreview, previewCleared, previewLoaded, previewStarted } from "../reducers/preview";
+import { getSelectedFrameAsync, isSelectedFrameVisible } from "../selectors";
+import { getExpressionFromCoords } from "../utils/editor/get-expression";
 
 export function isConsole(expression: string) {
   return /^console/.test(expression);

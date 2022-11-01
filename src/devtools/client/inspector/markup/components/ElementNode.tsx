@@ -1,7 +1,7 @@
 import { Attr } from "@replayio/protocol";
-import React, { PureComponent, MouseEvent } from "react";
-import { NodeInfo } from "../reducers/markup";
+import React, { MouseEvent, PureComponent } from "react";
 
+import { NodeInfo } from "../reducers/markup";
 import NodeAttribute from "./NodeAttribute";
 import TextNode from "./TextNode";
 

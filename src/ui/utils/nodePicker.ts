@@ -1,5 +1,6 @@
-import { getDevicePixelRatio } from "protocol/graphics";
 import { NodeBounds } from "@replayio/protocol";
+
+import { getDevicePixelRatio } from "protocol/graphics";
 
 export interface NodePickerOpts {
   onHovering?: (nodeId: string | null) => void;

@@ -1,3 +1,12 @@
+import {
+  Suspense,
+  unstable_useCacheRefresh as useCacheRefresh,
+  useContext,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
+
 import Icon from "bvaughn-architecture-demo/components/Icon";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
@@ -8,25 +17,16 @@ import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/Timeline
 import { addComment as addCommentGraphQL } from "bvaughn-architecture-demo/src/graphql/Comments";
 import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import { validate } from "bvaughn-architecture-demo/src/utils/points";
-import {
-  Suspense,
-  unstable_useCacheRefresh as useCacheRefresh,
-  useContext,
-  useMemo,
-  useState,
-  useTransition,
-} from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 
 import Loader from "../Loader";
-
 import AutoComplete from "./AutoComplete/AutoComplete";
 import BadgePicker from "./BadgePicker";
 import CommentButton from "./CommentButton";
-import styles from "./PointPanel.module.css";
 import PointPanelTimeline from "./PointPanelTimeline";
 import SyntaxHighlightedLine from "./SyntaxHighlightedLine";
+import styles from "./PointPanel.module.css";
 
 export default function SourcePanelWrapper({
   className,

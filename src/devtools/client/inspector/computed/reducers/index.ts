@@ -1,6 +1,6 @@
-import { createReducer, ReducerObject } from "../../shared/reducer-object";
-import { ComputedState } from "../state";
+import { ReducerObject, createReducer } from "../../shared/reducer-object";
 import { ComputedAction } from "../actions";
+import { ComputedState } from "../state";
 
 const INITIAL_COMPUTED: ComputedState = {
   properties: [],

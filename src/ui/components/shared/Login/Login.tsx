@@ -1,21 +1,22 @@
 import { gql } from "@apollo/client";
 import { ExclamationIcon } from "@heroicons/react/outline";
-import Services from "devtools/shared/services";
 import Link from "next/link";
 import React, { ReactNode, useEffect, useState } from "react";
-import { getLoginReferrerParam } from "ui/utils/environment";
+
+import Services from "devtools/shared/services";
+import { GetConnection, GetConnectionVariables } from "graphql/GetConnection";
 import { query } from "ui/utils/apolloClient";
+import { getAuthClientId, getAuthHost } from "ui/utils/auth";
 import { requestBrowserLogin, setUserInBrowserPrefs } from "ui/utils/browser";
+import { getLoginReferrerParam } from "ui/utils/environment";
 import { isTeamMemberInvite } from "ui/utils/onboarding";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 import useAuth0 from "ui/utils/useAuth0";
 
-const isOSX = Services.appinfo.OS === "Darwin";
-
 import { PrimaryLgButton } from "../Button";
 import { OnboardingContentWrapper, OnboardingModalContainer } from "../Onboarding";
-import { GetConnection, GetConnectionVariables } from "graphql/GetConnection";
-import { getAuthClientId, getAuthHost } from "ui/utils/auth";
+
+const isOSX = Services.appinfo.OS === "Darwin";
 
 enum LoginReferrer {
   default = "default",

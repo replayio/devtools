@@ -1,9 +1,19 @@
+import React, {
+  Suspense,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+  useTransition,
+} from "react";
+
 import CommentList from "bvaughn-architecture-demo/components/comments/CommentList";
 import ConsoleRoot from "bvaughn-architecture-demo/components/console";
 import Focuser from "bvaughn-architecture-demo/components/console/Focuser";
+import Input from "bvaughn-architecture-demo/components/console/Input";
 import Icon from "bvaughn-architecture-demo/components/Icon";
 import Initializer from "bvaughn-architecture-demo/components/Initializer";
-import Input from "bvaughn-architecture-demo/components/console/Input";
 import LazyOffscreen from "bvaughn-architecture-demo/components/LazyOffscreen";
 import Loader from "bvaughn-architecture-demo/components/Loader";
 import ProtocolViewer from "bvaughn-architecture-demo/components/protocol/ProtocolViewer";
@@ -18,15 +28,6 @@ import { SourcesContextRoot } from "bvaughn-architecture-demo/src/contexts/Sourc
 import { TerminalContextRoot } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
 import { TimelineContextRoot } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 import usePreferredColorScheme from "bvaughn-architecture-demo/src/hooks/usePreferredColorScheme";
-import React, {
-  Suspense,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  useSyncExternalStore,
-  useTransition,
-} from "react";
 import createReplayClientRecorder from "shared/client/createReplayClientRecorder";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { hasFlag } from "shared/utils/url";

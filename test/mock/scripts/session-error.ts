@@ -1,16 +1,17 @@
 // Test getting a session error on startup.
 
-import { runTest, devtoolsURL } from "../src/runTest";
-import { installMockEnvironmentInPage, MockHandlerHelpers } from "../src/mockEnvironment";
+import { Page } from "@recordreplay/playwright";
 import { v4 as uuid } from "uuid";
+
 import {
+  createGetRecordingMock,
+  createGetUserMock,
   createRecordingOwnerUserIdMock,
   createUserSettingsMock,
-  createGetUserMock,
-  createGetRecordingMock,
 } from "../src/graphql";
-import { basicMessageHandlers, basicBindings } from "../src/handlers";
-import { Page } from "@recordreplay/playwright";
+import { basicBindings, basicMessageHandlers } from "../src/handlers";
+import { MockHandlerHelpers, installMockEnvironmentInPage } from "../src/mockEnvironment";
+import { devtoolsURL, runTest } from "../src/runTest";
 
 const recordingId = uuid();
 const userId = uuid();

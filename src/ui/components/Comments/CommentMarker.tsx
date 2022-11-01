@@ -1,6 +1,7 @@
 import classnames from "classnames";
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
+
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";

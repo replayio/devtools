@@ -1,7 +1,7 @@
 import React from "react";
+import { Column } from "react-table";
 
 import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
-import { Column } from "react-table";
 
 export default function ColumnsDropdown({ columns }: { columns: Column[] }) {
   const ColumnItem = ({ column }: { column: Column }) => {

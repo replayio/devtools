@@ -1,5 +1,6 @@
-import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 import { useContext, useLayoutEffect, useRef } from "react";
+
+import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 
 import styles from "./CurrentTimeIndicator.module.css";
 

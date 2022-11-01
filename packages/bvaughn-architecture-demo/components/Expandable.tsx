@@ -1,8 +1,8 @@
 import React, { KeyboardEvent, MouseEvent, ReactNode, useState, useTransition } from "react";
 
-import styles from "./Expandable.module.css";
 import Icon from "./Icon";
 import LazyOffscreen from "./LazyOffscreen";
+import styles from "./Expandable.module.css";
 
 export type RenderChildrenFunction = () => ReactNode;
 

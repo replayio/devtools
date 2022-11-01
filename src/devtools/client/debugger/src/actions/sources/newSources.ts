@@ -1,16 +1,15 @@
-import { getContext } from "../../selectors";
 import { getTabs, tabsRestored } from "devtools/client/debugger/src/reducers/tabs";
-
 import {
-  allSourcesReceived,
   SourceDetails,
+  allSourcesReceived,
   getAllSourceDetails,
-  getSourceToDisplayForUrl,
   getSourceToDisplayById,
+  getSourceToDisplayForUrl,
 } from "ui/reducers/sources";
-
 import { getPreviousPersistedLocation } from "ui/reducers/sources";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
+
+import { getContext } from "../../selectors";
 
 // Delay adding these until the store is created
 export const setupSourcesListeners = (startAppListening: AppStartListening) => {

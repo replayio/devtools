@@ -1,13 +1,13 @@
 import React, { useContext } from "react";
+
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { setModal } from "ui/actions/app";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getSelectedSource } from "ui/reducers/sources";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { showAlternateSource } from "../../actions/sources/select";
 import { getSelectedFrameId } from "../../reducers/pause";
 import { getAlternateSourceIdSuspense } from "../../utils/sourceVisualizations";
-
 import { CursorPosition } from "./Footer";
 import Toggle from "./Toggle";
 

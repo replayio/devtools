@@ -2,7 +2,6 @@ import React, { MutableRefObject, useRef, useState } from "react";
 import { act } from "react-dom/test-utils";
 
 import { render } from "../utils/testing";
-
 import useSearchDOM from "./useSearchDOM";
 import type { Actions, State } from "./useSearchDOM";
 

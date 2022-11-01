@@ -1,8 +1,3 @@
-import {
-  NewTerminalExpression,
-  TerminalContext,
-  TerminalExpression,
-} from "bvaughn-architecture-demo/src/contexts/TerminalContext";
 import React, {
   PropsWithChildren,
   useCallback,
@@ -11,6 +6,12 @@ import React, {
   useState,
   useTransition,
 } from "react";
+
+import {
+  NewTerminalExpression,
+  TerminalContext,
+  TerminalExpression,
+} from "bvaughn-architecture-demo/src/contexts/TerminalContext";
 
 export default function TerminalContextController({ children }: PropsWithChildren) {
   const [isPending, startTransition] = useTransition();

@@ -1,7 +1,7 @@
 import { TimeStampedPointRange } from "@replayio/protocol";
 import {
-  createContext,
   PropsWithChildren,
+  createContext,
   useCallback,
   useContext,
   useEffect,
@@ -9,6 +9,7 @@ import {
   useState,
   useTransition,
 } from "react";
+
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useDebouncedCallback from "../hooks/useDebouncedCallback";
@@ -18,7 +19,6 @@ import {
   preCacheExecutionPointForTime,
 } from "../suspense/PointsCache";
 import { Range } from "../types";
-
 import { SessionContext } from "./SessionContext";
 
 const FOCUS_DEBOUNCE_DURATION = 250;

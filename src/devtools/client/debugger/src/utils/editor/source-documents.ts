@@ -4,12 +4,12 @@
 
 import type { Doc } from "codemirror";
 
+import type { SourceContent, SourceContentValue, SourceDetails } from "ui/reducers/sources";
+
+import { SymbolDeclarations } from "../../selectors";
+import { isMinified } from "../isMinified";
 import { getMode } from "../source";
 import type { SourceEditor } from "./source-editor";
-import type { SourceDetails, SourceContent, SourceContentValue } from "ui/reducers/sources";
-
-import { isMinified } from "../isMinified";
-import { SymbolDeclarations } from "../../selectors";
 
 let sourceDocs: Record<string, Doc> = {};
 

@@ -1,12 +1,10 @@
 import type {
   CallStack,
-  loadedRegions,
   Location,
   MappedLocation,
   Message,
   MessageLevel,
   MessageSource,
-  newSource,
   ObjectId,
   PauseData,
   PauseId,
@@ -16,6 +14,8 @@ import type {
   TimeStampedPoint,
   TimeStampedPointRange,
   Value,
+  loadedRegions,
+  newSource,
 } from "@replayio/protocol";
 
 export const DEFAULT_SOURCE_ID = "fake-source-id";

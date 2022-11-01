@@ -1,6 +1,8 @@
 import { Frame, NamedValue, ObjectId, PauseId, Scope } from "@replayio/protocol";
+
 import { getCachedObject } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { assert } from "protocol/utils";
+
 import { simplifyDisplayName } from "../frames";
 
 export interface ConvertedBindingsScope {

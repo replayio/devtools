@@ -1,11 +1,12 @@
 import classnames from "classnames";
+import React, { PureComponent, Suspense } from "react";
+import { ConnectedProps, connect } from "react-redux";
+
 import {
   Context,
-  getSelectedFrameId,
   PauseFrame,
+  getSelectedFrameId,
 } from "devtools/client/debugger/src/reducers/pause";
-import React, { PureComponent, Suspense } from "react";
-import { connect, ConnectedProps } from "react-redux";
 import { Point } from "shared/client/types";
 import type { UIState } from "ui/state";
 import { getPauseFrameSuspense } from "ui/suspense/frameCache";
@@ -13,9 +14,7 @@ import { getPauseFrameSuspense } from "ui/suspense/frameCache";
 import actions from "../../../actions";
 import { getContext } from "../../../selectors";
 import { compareSourceLocation } from "../../../utils/location";
-
 import { CloseButton } from "../../shared/Button";
-
 import BreakpointOptions from "./BreakpointOptions";
 
 const mapStateToProps = (state: UIState) => ({

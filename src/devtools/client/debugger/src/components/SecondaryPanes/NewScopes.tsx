@@ -1,18 +1,19 @@
-import { Suspense } from "react";
 import { PauseId, Value } from "@replayio/protocol";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { getSelectedFrameId } from "../../selectors";
-import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
-import { getPreferredGeneratedSources } from "ui/reducers/sources";
-import { enterFocusMode as enterFocusModeAction } from "ui/actions/timeline";
-import { ConvertedScope, convertScopes } from "../../utils/pause/scopes/convertScopes";
-import { getFrameSuspense } from "ui/suspense/frameCache";
-import { getScopesSuspense, pickScopes } from "ui/suspense/scopeCache";
-import { Redacted } from "ui/components/Redacted";
+import { Suspense } from "react";
+
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import Inspector from "bvaughn-architecture-demo/components/inspector/Inspector";
 import ScopesInspector from "bvaughn-architecture-demo/components/inspector/ScopesInspector";
+import { enterFocusMode as enterFocusModeAction } from "ui/actions/timeline";
+import { Redacted } from "ui/components/Redacted";
+import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
+import { getPreferredGeneratedSources } from "ui/reducers/sources";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { getFrameSuspense } from "ui/suspense/frameCache";
+import { getScopesSuspense, pickScopes } from "ui/suspense/scopeCache";
 
+import { getSelectedFrameId } from "../../selectors";
+import { ConvertedScope, convertScopes } from "../../utils/pause/scopes/convertScopes";
 import styles from "./NewObjectInspector.module.css";
 
 function ScopesRenderer() {

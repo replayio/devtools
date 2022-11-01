@@ -1,9 +1,11 @@
-import { Auth0Context, Auth0ContextInterface, Auth0Provider, AppState } from "@auth0/auth0-react";
+import { AppState, Auth0Context, Auth0ContextInterface, Auth0Provider } from "@auth0/auth0-react";
 import jwt_decode from "jwt-decode";
 import React, { ReactNode } from "react";
-import { assert, defer, Deferred } from "protocol/utils";
-import { listenForAccessToken } from "./browser";
+
+import { Deferred, assert, defer } from "protocol/utils";
+
 import { getAuthClientId, getAuthHost } from "./auth";
+import { listenForAccessToken } from "./browser";
 import { pingTelemetry } from "./replay-telemetry";
 
 const domain = getAuthHost();

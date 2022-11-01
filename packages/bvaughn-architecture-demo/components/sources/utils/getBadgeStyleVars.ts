@@ -1,4 +1,5 @@
 import { CSSProperties } from "react";
+
 import { Badge } from "shared/client/types";
 
 export function getBadgeStyleVars(badge: Badge | null): CSSProperties {

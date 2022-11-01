@@ -6,47 +6,42 @@
 
 // Dependencies
 import React, { Component } from "react";
-
-import { connect, ConnectedProps } from "react-redux";
-
-import type { UIState } from "ui/state";
-
-// Selectors
-import {
-  getShownSource,
-  getExpandedState,
-  getFocusedSourceItem,
-  getContext,
-} from "../../selectors";
+import { ConnectedProps, connect } from "react-redux";
 
 import {
-  getSelectedSource,
-  getSourcesLoading,
   SourceDetails,
+  getSelectedSource,
   getSourceDetailsCount,
+  getSourcesLoading,
   getSourcesToDisplayByUrl,
 } from "ui/reducers/sources";
+import type { UIState } from "ui/state";
+import { trackEvent } from "ui/utils/telemetry";
 
 // Actions
 import actions from "../../actions";
-
-// Components
-import SourcesTreeItem from "./SourcesTreeItem";
-import ManagedTree from "../shared/ManagedTree";
-
+// Selectors
+import {
+  getContext,
+  getExpandedState,
+  getFocusedSourceItem,
+  getShownSource,
+} from "../../selectors";
 // Utils
 import {
+  SourcesMap,
   createTree,
   getDirectories,
-  isDirectory,
   getSourceFromNode,
+  isDirectory,
   nodeHasChildren,
   updateTree,
-  SourcesMap,
 } from "../../utils/sources-tree";
-import { parse } from "../../utils/url";
-import { trackEvent } from "ui/utils/telemetry";
 import { TreeDirectory, TreeNode, TreeSource } from "../../utils/sources-tree/types";
+import { parse } from "../../utils/url";
+import ManagedTree from "../shared/ManagedTree";
+// Components
+import SourcesTreeItem from "./SourcesTreeItem";
 
 type $FixTypeLater = any;
 

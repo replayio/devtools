@@ -5,13 +5,12 @@ import {
 } from "@replayio/protocol";
 import { ReactNode, Suspense, useState } from "react";
 
-import HTMLChildrenRenderer from "./HTMLChildrenRenderer";
 import Icon from "../Icon";
 import LazyOffscreen from "../LazyOffscreen";
 import Loader from "../Loader";
-
-import styles from "./HTMLExpandable.module.css";
+import HTMLChildrenRenderer from "./HTMLChildrenRenderer";
 import HTMLElementRenderer from "./values/HTMLElementRenderer";
+import styles from "./HTMLExpandable.module.css";
 
 export type RenderChildrenFunction = () => ReactNode;
 

@@ -4,9 +4,8 @@
 
 //
 
+import type { ParentMap, TreeDirectory, TreeNode, TreeSource } from "./types";
 import { createDirectoryNode } from "./utils";
-
-import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
 
 /**
  * Take an existing source tree, and return a new one with collapsed nodes.

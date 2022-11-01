@@ -4,11 +4,12 @@
 
 //
 
-import { createParentMap } from "./utils";
 import flattenDeep from "lodash/flattenDeep";
 
-import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
 import { SourceDetails } from "ui/reducers/sources";
+
+import type { ParentMap, TreeDirectory, TreeNode, TreeSource } from "./types";
+import { createParentMap } from "./utils";
 
 function findSourceItem(sourceTree: TreeDirectory, source: SourceDetails) {
   function _traverse(subtree: TreeNode) {

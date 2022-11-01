@@ -1,18 +1,16 @@
+import fs from "fs";
 // Ported from https://github.com/bgotink/playwright-coverage
 import path from "path";
-import fs from "fs";
-import { Reporter, ReporterOnStartOptions } from "@jest/reporters";
-import type { Config as JestConfig } from "@jest/types";
-import { AggregatedResult, AssertionResult, Test, TestResult } from "@jest/test-result";
-import glob from "glob";
-
-import { CoverageMapData, createCoverageMap } from "istanbul-lib-coverage";
-import { createContext, Watermarks } from "istanbul-lib-report";
-import { create, ReportType, ReportOptions } from "istanbul-reports";
-
-import { Remote, wrap } from "comlink";
 import { Worker } from "worker_threads";
+import { Reporter, ReporterOnStartOptions } from "@jest/reporters";
+import { AggregatedResult, AssertionResult, Test, TestResult } from "@jest/test-result";
+import type { Config as JestConfig } from "@jest/types";
+import { Remote, wrap } from "comlink";
 import nodeEndpoint from "comlink/dist/umd/node-adapter";
+import glob from "glob";
+import { CoverageMapData, createCoverageMap } from "istanbul-lib-coverage";
+import { Watermarks, createContext } from "istanbul-lib-report";
+import { ReportOptions, ReportType, create } from "istanbul-reports";
 
 import type { CoverageWorker } from "./worker.js";
 

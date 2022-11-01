@@ -1,8 +1,9 @@
-import * as Sentry from "@sentry/browser";
 import crypto from "crypto";
-import Document, { Html, Head, Main, NextScript } from "next/document";
-import { setErrorHandler } from "protocol/utils";
+import * as Sentry from "@sentry/browser";
+import Document, { Head, Html, Main, NextScript } from "next/document";
 import React from "react";
+
+import { setErrorHandler } from "protocol/utils";
 import { getAuthHost } from "ui/utils/auth";
 import { isDevelopment } from "ui/utils/environment";
 

@@ -3,16 +3,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ProtocolClient } from "@replayio/protocol";
-const Services = require("devtools/shared/services");
-import RuleModel, { NodeWithId } from "devtools/client/inspector/rules/models/rule";
-import { RuleFront } from "./fronts/rule";
-import { StyleFront } from "./fronts/style";
-import { assert } from "protocol/utils";
-import TextProperty, { ComputedProperty } from "./text-property";
 
 import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import RuleModel, { NodeWithId } from "devtools/client/inspector/rules/models/rule";
+import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
 import { getAppliedRulesAsync } from "ui/suspense/styleCaches";
+
+import { RuleFront } from "./fronts/rule";
+import { StyleFront } from "./fronts/style";
+import TextProperty, { ComputedProperty } from "./text-property";
+
+const Services = require("devtools/shared/services");
 
 var NON_ASCII = "[^\\x00-\\x7F]";
 var ESCAPE = "\\\\[^\n\r]";

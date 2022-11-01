@@ -7,6 +7,7 @@ import {
 import sortBy from "lodash/sortBy";
 import sortedUniqBy from "lodash/sortedUniqBy";
 import { createSelector } from "reselect";
+
 import { isPointInRegions } from "shared/utils/time";
 import { NetworkAction } from "ui/actions/network";
 import { partialRequestsToCompleteSummaries } from "ui/components/NetworkMonitor/utils";

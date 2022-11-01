@@ -1,11 +1,12 @@
 import type { SourceLocation } from "@replayio/protocol";
+import debounce from "lodash/debounce";
+import { PureComponent, RefObject } from "react";
+import { ConnectedProps, connect } from "react-redux";
+
 import { updatePreview } from "devtools/client/debugger/src/actions/preview";
 import { previewCleared } from "devtools/client/debugger/src/reducers/preview";
 import { getPreview, getThreadContext } from "devtools/client/debugger/src/selectors";
 import SourceEditor from "devtools/client/debugger/src/utils/editor/source-editor";
-import debounce from "lodash/debounce";
-import { PureComponent, RefObject } from "react";
-import { connect, ConnectedProps } from "react-redux";
 import type { UIState } from "ui/state";
 
 import Popup from "./Popup";

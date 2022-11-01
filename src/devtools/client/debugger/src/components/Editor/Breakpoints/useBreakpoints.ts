@@ -1,11 +1,12 @@
+import classNames from "classnames";
+import { useContext, useEffect } from "react";
+
 import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import { getDocument, resizeBreakpointGutter } from "devtools/client/debugger/src/utils/editor";
 import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
 import { features } from "devtools/client/debugger/src/utils/prefs";
-import { useContext, useEffect } from "react";
 import { getSelectedSource } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
-import classNames from "classnames";
 
 const { codeFolding } = features;
 

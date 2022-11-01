@@ -1,8 +1,9 @@
-import React from "react";
 import classnames from "classnames";
+import React from "react";
+
+import { ClassDeclaration, FunctionDeclaration } from "../../reducers/ast";
 import { isFunctionDeclaration } from "./isFunctionSymbol";
 import { SourceOutlineFunction } from "./SourceOutlineFunction";
-import { FunctionDeclaration, ClassDeclaration } from "../../reducers/ast";
 
 export const SourceOutlineClass = React.memo(function OutlineClassFunctions({
   klass,

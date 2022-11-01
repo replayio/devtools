@@ -1,10 +1,12 @@
 import React, { FC } from "react";
+
+import { getLoadingPageTipSeed } from "ui/actions/app";
+import { useAppSelector } from "ui/setup/hooks";
+
+import LightbulbIcon from "../../../image/zypsy/lightbulb-icon.svg";
 import CloudIcon from "../../../image/zypsy/zypsy-security-icon1.svg";
 import KeyIcon from "../../../image/zypsy/zypsy-security-icon2.svg";
 import ShieldIcon from "../../../image/zypsy/zypsy-security-icon3.svg";
-import LightbulbIcon from "../../../image/zypsy/lightbulb-icon.svg";
-import { getLoadingPageTipSeed } from "ui/actions/app";
-import { useAppSelector } from "ui/setup/hooks";
 
 const TIPS = [
   {

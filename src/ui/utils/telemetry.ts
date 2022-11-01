@@ -1,10 +1,11 @@
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
-import { skipTelemetry } from "ui/utils/environment";
-import { Recording } from "ui/types";
 
-import { prefs } from "./prefs";
+import { Recording } from "ui/types";
+import { skipTelemetry } from "ui/utils/environment";
+
 import { initializeMixpanel, trackMixpanelEvent } from "./mixpanel";
+import { prefs } from "./prefs";
 import { pingTelemetry } from "./replay-telemetry";
 
 const timings: Record<string, number> = {};

@@ -1,4 +1,5 @@
 import React from "react";
+
 import { ExperimentalUserSettings } from "ui/types";
 
 export type Settings<T extends string, P extends Record<string, unknown>> = Setting<T, P>[];

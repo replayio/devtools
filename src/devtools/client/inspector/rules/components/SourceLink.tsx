@@ -1,4 +1,5 @@
 import React, { FC } from "react";
+
 import { SourceLink as SourceLinkType } from "../models/rule";
 
 type SourceLinkProps = {

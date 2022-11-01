@@ -1,13 +1,15 @@
 import React from "react";
-import SecondaryToolbox from "./SecondaryToolbox";
-import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import { prefs } from "ui/utils/prefs";
-import Video from "ui/components/Video";
-import { useAppSelector } from "ui/setup/hooks";
-import { getShowVideoPanel, getToolboxLayout } from "ui/reducers/layout";
-import { getRecordingTarget } from "ui/reducers/app";
-import { ToolboxLayout } from "ui/state/layout";
+
 import { getPaneCollapse } from "devtools/client/debugger/src/selectors";
+import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
+import Video from "ui/components/Video";
+import { getRecordingTarget } from "ui/reducers/app";
+import { getShowVideoPanel, getToolboxLayout } from "ui/reducers/layout";
+import { useAppSelector } from "ui/setup/hooks";
+import { ToolboxLayout } from "ui/state/layout";
+import { prefs } from "ui/utils/prefs";
+
+import SecondaryToolbox from "./SecondaryToolbox";
 import Toolbox from "./Toolbox";
 
 const useGetShowVideo = () => {

@@ -1,19 +1,21 @@
 import { RecordingId } from "@replayio/protocol";
-import React, { useState } from "react";
-import { useAppDispatch } from "ui/setup/hooks";
-import { Recording } from "ui/types";
-import MaterialIcon from "../../../../../shared/MaterialIcon";
-import hooks from "ui/hooks";
-import { WorkspaceId } from "ui/state/app";
-import { Dropdown, DropdownItem } from "../../../../LibraryDropdown";
-import PortalDropdown from "../../../../../shared/PortalDropdown";
 import classNames from "classnames";
-import MoveRecordingMenu from "./MoveRecordingMenu";
-import { useConfirm } from "../../../../../shared/Confirm";
-import { useIsPublicEnabled } from "ui/utils/org";
+import React, { useState } from "react";
+
 import { setModal } from "ui/actions/app";
-import { useGetUserPermissions } from "ui/hooks/users";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
+import hooks from "ui/hooks";
+import { useGetUserPermissions } from "ui/hooks/users";
+import { useAppDispatch } from "ui/setup/hooks";
+import { WorkspaceId } from "ui/state/app";
+import { Recording } from "ui/types";
+import { useIsPublicEnabled } from "ui/utils/org";
+
+import { useConfirm } from "../../../../../shared/Confirm";
+import MaterialIcon from "../../../../../shared/MaterialIcon";
+import PortalDropdown from "../../../../../shared/PortalDropdown";
+import { Dropdown, DropdownItem } from "../../../../LibraryDropdown";
+import MoveRecordingMenu from "./MoveRecordingMenu";
 
 function DeleteOption({
   onOptionClick,

@@ -1,9 +1,13 @@
+import { useContext, useMemo, useState } from "react";
+
 import Icon from "bvaughn-architecture-demo/components/Icon";
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import { getSourcesToDisplay, isIndexedSource } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import {
+  getSourcesToDisplay,
+  isIndexedSource,
+} from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { protocolSourcesToSourceTree } from "bvaughn-architecture-demo/src/utils/protocol";
 import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
-import { useContext, useMemo, useState } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import styles from "./SourceExplorer.module.css";

@@ -1,13 +1,14 @@
 import classNames from "classnames";
 import React, { useEffect, useRef } from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+
 import { setFocusRegion, setTimelineToTime } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import {
+  displayedBeginForFocusRegion,
+  displayedEndForFocusRegion,
   getPositionFromTime,
   getTimeFromPosition,
-  displayedEndForFocusRegion,
-  displayedBeginForFocusRegion,
 } from "ui/utils/timeline";
 
 import { EditMode } from ".";

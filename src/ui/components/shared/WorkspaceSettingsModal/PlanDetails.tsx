@@ -1,7 +1,9 @@
-import React from "react";
-import { SubscriptionWithPricing } from "ui/types";
-import { ExpirationRow } from "./ExpirationRow";
 import startCase from "lodash/startCase";
+import React from "react";
+
+import { SubscriptionWithPricing } from "ui/types";
+
+import { ExpirationRow } from "./ExpirationRow";
 import {
   cycleCharge,
   cycleDiscount,

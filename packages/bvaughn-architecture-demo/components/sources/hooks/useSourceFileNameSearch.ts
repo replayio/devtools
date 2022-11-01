@@ -1,11 +1,12 @@
-import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
 import { newSource as ProtocolSource, SourceId } from "@replayio/protocol";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import { useContext, useLayoutEffect, useMemo, useRef, useState } from "react";
 
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
+
 import useSearch from "./useSearch";
 import type { Actions as SearchActions, State as SearchState } from "./useSearch";
-import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 
 export type Item = ProtocolSource;
 export type Result = {

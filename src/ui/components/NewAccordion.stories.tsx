@@ -1,6 +1,6 @@
+import { Meta, Story } from "@storybook/react";
 import React, { useState } from "react";
 
-import { Story, Meta } from "@storybook/react";
 import { Accordion, AccordionItem, AccordionPane } from "@recordreplay/accordion";
 
 const lorem = [

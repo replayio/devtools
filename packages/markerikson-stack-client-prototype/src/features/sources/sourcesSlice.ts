@@ -1,19 +1,18 @@
 import {
+  EntityId,
+  EntityState,
+  PayloadAction,
   createEntityAdapter,
   createSelector,
   createSlice,
-  EntityState,
-  PayloadAction,
-  EntityId,
 } from "@reduxjs/toolkit";
-import { newSource, SourceKind } from "@replayio/protocol";
+import { SourceKind, newSource } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 import keyBy from "lodash/keyBy";
 import omit from "lodash/omit";
 
-import type { AppState } from "../../app/store";
-
 import { api } from "../../app/api";
+import type { AppState } from "../../app/store";
 
 export interface SourceDetails {
   canonicalId: string;

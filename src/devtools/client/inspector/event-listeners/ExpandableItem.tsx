@@ -1,5 +1,5 @@
 import cx from "classnames";
-import React, { ReactNode, useState, FC } from "react";
+import React, { FC, ReactNode, useState } from "react";
 
 type ExpandableItemProps = {
   header: ReactNode;

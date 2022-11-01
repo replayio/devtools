@@ -1,14 +1,6 @@
-import Expandable from "bvaughn-architecture-demo/components/Expandable";
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import Loader from "bvaughn-architecture-demo/components/Loader";
 import {
-  getObjectPropertySuspense,
-  getObjectWithPreviewSuspense,
-} from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
-import { protocolValueToClientValue, Value as ClientValue } from "bvaughn-architecture-demo/src/utils/protocol";
-import {
-  Object as ProtocolObject,
   PauseId,
+  Object as ProtocolObject,
   Property as ProtocolProperty,
   Value as ProtocolValue,
 } from "@replayio/protocol";
@@ -22,13 +14,25 @@ import {
   useState,
   useTransition,
 } from "react";
+
+import Expandable from "bvaughn-architecture-demo/components/Expandable";
+import Icon from "bvaughn-architecture-demo/components/Icon";
+import Loader from "bvaughn-architecture-demo/components/Loader";
+import {
+  getObjectPropertySuspense,
+  getObjectWithPreviewSuspense,
+} from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import {
+  Value as ClientValue,
+  protocolValueToClientValue,
+} from "bvaughn-architecture-demo/src/utils/protocol";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import HTMLExpandable from "./HTMLExpandable";
-import styles from "./GetterRenderer.module.css";
 import PropertiesRenderer from "./PropertiesRenderer";
 import useClientValue from "./useClientValue";
 import ValueRenderer from "./ValueRenderer";
+import styles from "./GetterRenderer.module.css";
 
 export default function GetterRenderer({
   parentObjectId,

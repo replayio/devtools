@@ -2,20 +2,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import { Location } from "@replayio/protocol";
 //
 import { PureComponent, Suspense } from "react";
 
+import { useAppSelector } from "ui/setup/hooks";
+
+import { getDebugLineLocationSuspense } from "../../selectors";
 import {
-  toEditorColumn,
-  getDocument,
-  startOperation,
   endOperation,
+  getDocument,
   getTokenEnd,
+  startOperation,
+  toEditorColumn,
 } from "../../utils/editor";
 import { getIndentation } from "../../utils/indentation";
-import { getDebugLineLocationSuspense } from "../../selectors";
-import { Location } from "@replayio/protocol";
-import { useAppSelector } from "ui/setup/hooks";
 
 const lineClass = "new-debug-line";
 

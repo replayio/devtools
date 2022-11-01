@@ -1,4 +1,5 @@
 import React, { Dispatch, SetStateAction } from "react";
+
 import { Toggle } from "ui/components/shared/Forms";
 
 export default function PrivacyToggle({

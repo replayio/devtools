@@ -1,13 +1,15 @@
-import React from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import classnames from "classnames";
-import { isTest } from "ui/utils/environment";
-import hooks from "ui/hooks";
+import React from "react";
+
 import { setViewMode } from "ui/actions/layout";
-import { ViewMode } from "ui/state/layout";
-import { getViewMode } from "ui/reducers/layout";
+import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
+import { getViewMode } from "ui/reducers/layout";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { ViewMode } from "ui/state/layout";
+import { isTest } from "ui/utils/environment";
 import { shouldShowNag } from "ui/utils/user";
+
 import MaterialIcon from "../shared/MaterialIcon";
 
 const MODES = [

@@ -1,7 +1,10 @@
 import React, { useRef } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
+
 import { UIState } from "ui/state";
-import { getNode, getRootNodeId } from "../selectors/markup";
+import { cancelBubbling, preventDefault } from "ui/utils/key-shortcuts";
+import useKeyShortcuts from "ui/utils/use-key-shortcuts";
+
 import {
   onDownKey,
   onLeftKey,
@@ -10,10 +13,9 @@ import {
   onRightKey,
   onUpKey,
 } from "../actions/markup";
-import useKeyShortcuts from "ui/utils/use-key-shortcuts";
-import { cancelBubbling, preventDefault } from "ui/utils/key-shortcuts";
-import Node from "./Node";
+import { getNode, getRootNodeId } from "../selectors/markup";
 import { MarkupProps } from "./MarkupApp";
+import Node from "./Node";
 
 function Nodes(props: MarkupProps & PropsFromRedux) {
   const { node, onUpKey, onDownKey, onLeftKey, onRightKey, onPageUpKey, onPageDownKey } = props;

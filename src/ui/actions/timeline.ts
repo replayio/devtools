@@ -1,38 +1,39 @@
 import { ExecutionPoint, PauseId } from "@replayio/protocol";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import sortedLastIndexBy from "lodash/sortedLastIndexBy";
+
+import { framePositionsCleared, resumed } from "devtools/client/debugger/src/reducers/pause";
 import {
-  getGraphicsAtTime,
   gPaintPoints,
-  paintGraphics,
+  getFirstMeaningfulPaint,
+  getGraphicsAtTime,
   mostRecentIndex,
   mostRecentPaintOrMouseEvent,
-  nextPaintOrMouseEvent,
   nextPaintEvent,
+  nextPaintOrMouseEvent,
+  paintGraphics,
   previousPaintEvent,
-  getFirstMeaningfulPaint,
-  timeIsBeyondKnownPaints,
   screenshotCache,
+  timeIsBeyondKnownPaints,
 } from "protocol/graphics";
 import { DownloadCancelledError } from "protocol/screenshot-cache";
 import { ThreadFront } from "protocol/thread";
 import { Pause } from "protocol/thread/pause";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { waitForTime } from "protocol/utils";
-
 import { getFirstComment } from "ui/hooks/comments/comments";
 import {
   getCurrentTime,
   getFocusRegion,
-  getHoveredItem,
   getHoverTime,
+  getHoveredItem,
   getPlayback,
   getPlaybackPrecachedTime,
   getRecordingDuration,
-  getZoomRegion,
   getShowFocusModeControls,
-  setPlaybackPrecachedTime,
+  getZoomRegion,
   pointsReceivedThunk,
+  setPlaybackPrecachedTime,
 } from "ui/reducers/timeline";
 import { FocusRegion, HoveredItem } from "ui/state/timeline";
 import {
@@ -57,8 +58,6 @@ import {
   setPlaybackStalled,
   setTimelineState,
 } from "../reducers/timeline";
-import { framePositionsCleared, resumed } from "devtools/client/debugger/src/reducers/pause";
-
 import { getLoadedRegions, isPointInLoadingRegion } from "./app";
 import type { UIStore, UIThunkAction } from "./index";
 

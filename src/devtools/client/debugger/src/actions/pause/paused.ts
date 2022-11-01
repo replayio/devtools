@@ -3,19 +3,18 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import type { UIThunkAction } from "ui/actions";
-
-import { getThreadContext } from "../../selectors";
+import { isPointInLoadingRegion } from "ui/reducers/app";
 import { getSelectedLocation } from "ui/reducers/sources";
+import { getFramesAsync } from "ui/suspense/frameCache";
+import { trackEvent } from "ui/utils/telemetry";
 
 import {
+  frameSelected,
+  pauseCreationFailed,
   pauseRequestedAt,
   paused as pausedAction,
-  pauseCreationFailed,
-  frameSelected,
 } from "../../reducers/pause";
-import { trackEvent } from "ui/utils/telemetry";
-import { isPointInLoadingRegion } from "ui/reducers/app";
-import { getFramesAsync } from "ui/suspense/frameCache";
+import { getThreadContext } from "../../selectors";
 import { getSelectedFrameAsync } from "../../selectors/pause";
 
 type $FixTypeLater = any;

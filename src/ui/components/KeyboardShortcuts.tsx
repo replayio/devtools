@@ -1,18 +1,20 @@
 import { useEffect, useMemo } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { useFeature } from "ui/hooks/settings";
-import { UIState } from "ui/state";
-import { UIThunkAction } from "ui/actions";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
+import { ConnectedProps, connect } from "react-redux";
+
+import { closeQuickOpen, toggleQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import * as dbgActions from "devtools/client/debugger/src/actions/ui";
-import { toggleQuickOpen, closeQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { getActiveSearch, getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
-import { trackEvent } from "ui/utils/telemetry";
-import { getCommandPaletteInput } from "./CommandPalette/SearchInput";
-import { isEditableElement, addGlobalShortcut, removeGlobalShortcut } from "ui/utils/key-shortcuts";
+import { UIThunkAction } from "ui/actions";
+import { actions } from "ui/actions";
 import { useGetRecordingId } from "ui/hooks/recordings";
+import { useFeature } from "ui/hooks/settings";
+import { selectors } from "ui/reducers";
+import { UIState } from "ui/state";
+import { addGlobalShortcut, isEditableElement, removeGlobalShortcut } from "ui/utils/key-shortcuts";
+import { trackEvent } from "ui/utils/telemetry";
 import useAuth0 from "ui/utils/useAuth0";
+
+import { getCommandPaletteInput } from "./CommandPalette/SearchInput";
 
 const closeOpenModalsOnEscape = (e: KeyboardEvent): UIThunkAction => {
   return (dispatch, getState) => {

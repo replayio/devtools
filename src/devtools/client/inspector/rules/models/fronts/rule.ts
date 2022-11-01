@@ -1,7 +1,6 @@
-import { Rule, Object as ProtocolObject } from "@replayio/protocol";
+import { Object as ProtocolObject, Rule } from "@replayio/protocol";
 
 import { getCachedObject } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
-
 import { assert } from "protocol/utils";
 
 import { StyleFront } from "./style";

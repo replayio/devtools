@@ -1,14 +1,16 @@
+import { filter } from "fuzzaldrin-plus";
 import clamp from "lodash/clamp";
 import React, { ChangeEvent, useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
+
 import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { ExperimentalUserSettings } from "ui/types";
+
 import CommandButton from "./CommandButton";
 import SearchInput from "./SearchInput";
-import { filter } from "fuzzaldrin-plus";
 import styles from "./CommandPalette.module.css";
 
 export type Command = {

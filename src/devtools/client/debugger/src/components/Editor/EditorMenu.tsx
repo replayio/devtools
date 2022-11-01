@@ -5,15 +5,15 @@
 //
 
 import { Component } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
+
 import { showMenu } from "devtools/shared/contextmenu";
-
-import type { UIState } from "ui/state";
-import type { AppDispatch } from "ui/setup/store";
-import { getThreadContext, getPauseId, getSelectedFrameId } from "../../selectors";
 import { SourceDetails } from "ui/reducers/sources";
+import type { AppDispatch } from "ui/setup/store";
+import type { UIState } from "ui/state";
 
-import { editorMenuItems, editorItemActions } from "./menus/editor";
+import { getPauseId, getSelectedFrameId, getThreadContext } from "../../selectors";
+import { editorItemActions, editorMenuItems } from "./menus/editor";
 
 interface EditorMenuProps {
   selectedSource: SourceDetails;

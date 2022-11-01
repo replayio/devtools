@@ -1,21 +1,22 @@
+import "reactjs-popup/dist/index.css";
+import { TimeStampedPoint } from "@replayio/protocol";
 import classNames from "classnames";
+import React, { Dispatch, SetStateAction } from "react";
+
 import { AddCommentButton } from "design";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
-import React, { Dispatch, SetStateAction } from "react";
-import "reactjs-popup/dist/index.css";
-import { useAppDispatch } from "ui/setup/hooks";
 import { createFloatingCodeComment, createFrameComment } from "ui/actions/comments";
 import { enterFocusMode } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { useGetRecordingId } from "ui/hooks/recordings";
+import { useAppDispatch } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
+import useAuth0 from "ui/utils/useAuth0";
 
 import Condition from "./Condition";
 import Log from "./Log";
 import Popup from "./Popup";
-import useAuth0 from "ui/utils/useAuth0";
-import { TimeStampedPoint } from "@replayio/protocol";
 
 export type Input = "condition" | "content";
 

@@ -1,12 +1,13 @@
 import { Value } from "@replayio/protocol";
-import Loader from "bvaughn-architecture-demo/components/Loader";
-import Inspector from "bvaughn-architecture-demo/components/inspector";
+import debounce from "lodash/debounce";
+import React, { FC, Suspense, useContext, useEffect, useMemo, useRef, useState } from "react";
+
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
+import Inspector from "bvaughn-architecture-demo/components/inspector";
+import Loader from "bvaughn-architecture-demo/components/Loader";
 import { getRecordingCapabilitiesSuspense } from "bvaughn-architecture-demo/src/suspense/RecordingCache";
 import { useEagerEvaluateExpression } from "devtools/client/webconsole/utils/autocomplete-eager";
-import debounce from "lodash/debounce";
 import { ThreadFront } from "protocol/thread";
-import React, { FC, useEffect, useRef, useState, useMemo, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 function useEagerEvalPreview(expression: string) {

@@ -1,16 +1,17 @@
 import React from "react";
-import { useAppSelector } from "ui/setup/hooks";
+
 import { getNonLoadingTimeRanges } from "ui/reducers/app";
 import {
-  getHoverTime,
   getFocusRegion,
+  getHoverTime,
   getShowFocusModeControls,
   getZoomRegion,
 } from "ui/reducers/timeline";
+import { useAppSelector } from "ui/setup/hooks";
 import {
-  getVisiblePosition,
   displayedBeginForFocusRegion,
   displayedEndForFocusRegion,
+  getVisiblePosition,
 } from "ui/utils/timeline";
 
 const getTimestamp = (time?: number) => {

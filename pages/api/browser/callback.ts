@@ -1,5 +1,6 @@
 import jwtDecode from "jwt-decode";
 import type { NextApiRequest, NextApiResponse } from "next";
+
 import { getAuthClientId, getAuthHost } from "ui/utils/auth";
 import { pingTelemetry } from "ui/utils/replay-telemetry";
 

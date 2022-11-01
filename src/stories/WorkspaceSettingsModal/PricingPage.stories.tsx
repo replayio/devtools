@@ -1,9 +1,8 @@
+import { Meta, Story } from "@storybook/react";
 import React, { ComponentProps } from "react";
 
-import { Story, Meta } from "@storybook/react";
-
-import { WorkspaceSubscriptionStatus } from "ui/types";
 import { PricingPage } from "ui/components/shared/WorkspaceSettingsModal/PricingPage";
+import { WorkspaceSubscriptionStatus } from "ui/types";
 
 export default {
   title: "Workspace Settings Modal/Plan Details",

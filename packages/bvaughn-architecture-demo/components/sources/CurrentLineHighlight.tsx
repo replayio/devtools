@@ -1,9 +1,10 @@
-import useCurrentPause from "bvaughn-architecture-demo/src/hooks/useCurrentPause";
 import { SourceId } from "@replayio/protocol";
 import { Suspense, useContext } from "react";
 
-import styles from "./CurrentLineHighlight.module.css";
+import useCurrentPause from "bvaughn-architecture-demo/src/hooks/useCurrentPause";
+
 import { SourceSearchContext } from "./SourceSearchContext";
+import styles from "./CurrentLineHighlight.module.css";
 
 type Props = {
   lineNumber: number;

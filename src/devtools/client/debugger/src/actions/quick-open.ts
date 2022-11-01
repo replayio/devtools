@@ -6,10 +6,10 @@ import { UIThunkAction } from "ui/actions";
 
 import { fetchGlobalFunctions } from "../reducers/ast";
 import {
-  openQuickOpen as openQuickOpenAction,
-  setQuickOpenQuery,
   closeQuickOpen,
   getQuickOpenEnabled,
+  openQuickOpen as openQuickOpenAction,
+  setQuickOpenQuery,
 } from "../reducers/quick-open";
 
 // TODO This is a workaround solely to allow dispatching without errors.

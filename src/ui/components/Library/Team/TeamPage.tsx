@@ -1,12 +1,13 @@
 import { useContext } from "react";
 
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
+
 import { ParamHandler } from "./ParamHandlers/ParamHandler";
 import {
-  TeamContext,
   MY_LIBRARY_TEAM,
-  TeamContextRoot,
   MyLibraryContextRoot,
+  TeamContext,
+  TeamContextRoot,
 } from "./TeamContextRoot";
 import { ViewPage } from "./View/ViewPage";
 

@@ -1,9 +1,10 @@
-import { useAppDispatch } from "ui/setup/hooks";
+import { AddCommentButton } from "design";
 import { createNetworkRequestComment } from "ui/actions/comments";
 import { useGetRecordingId } from "ui/hooks/recordings";
-import { AddCommentButton } from "design";
-import { RequestSummary } from "./utils";
+import { useAppDispatch } from "ui/setup/hooks";
 import useAuth0 from "ui/utils/useAuth0";
+
+import { RequestSummary } from "./utils";
 
 export default function AddNetworkRequestCommentButton({
   request,

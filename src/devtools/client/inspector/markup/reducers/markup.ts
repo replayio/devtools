@@ -1,14 +1,15 @@
-import { createSlice, createEntityAdapter, PayloadAction, EntityState } from "@reduxjs/toolkit";
-import { BoxModel, PseudoType } from "@replayio/protocol";
 // Side-effectful import - needed to initialize these prefs
 import "devtools/client/inspector/prefs";
+import { EntityState, PayloadAction, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import { BoxModel, PseudoType } from "@replayio/protocol";
+import { Attr } from "@replayio/protocol";
+
+import { UIState } from "ui/state";
+
 const Services = require("devtools/shared/services");
 
 const ATTR_COLLAPSE_ENABLED_PREF = "devtools.markup.collapseAttributes";
 const ATTR_COLLAPSE_LENGTH_PREF = "devtools.markup.collapseAttributeLength";
-
-import { Attr } from "@replayio/protocol";
-import { UIState } from "ui/state";
 
 export interface NodeInfo {
   // A list of the node's attributes.

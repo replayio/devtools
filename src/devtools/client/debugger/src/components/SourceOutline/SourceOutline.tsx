@@ -1,32 +1,31 @@
 import { Location } from "@replayio/protocol";
-import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
-import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import { getSourceHitCountsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import classnames from "classnames";
 import React, {
-  useRef,
-  useCallback,
-  useMemo,
-  useState,
-  useEffect,
   Suspense,
+  useCallback,
   useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
+
+import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { getSourceHitCountsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import Spinner from "ui/components/shared/Spinner";
-import { getSelectedSource, SourceDetails } from "ui/reducers/sources";
+import { SourceDetails, getSelectedSource } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 
 import { selectLocation } from "../../actions/sources";
-import { FunctionDeclaration, ClassDeclaration, getSymbols } from "../../reducers/ast";
-import { getContext, getCursorPosition, SymbolEntry } from "../../selectors";
+import { ClassDeclaration, FunctionDeclaration, getSymbols } from "../../reducers/ast";
+import { SymbolEntry, getContext, getCursorPosition } from "../../selectors";
 import { findClosestEnclosedSymbol } from "../../utils/ast";
-
 import OutlineFilter from "../PrimaryPanes/OutlineFilter";
-
 import { getOutlineSymbols } from "./getOutlineSymbols";
 import { isFunctionDeclaration } from "./isFunctionSymbol";
 import { SourceOutlineClass } from "./SourceOutlineClass";

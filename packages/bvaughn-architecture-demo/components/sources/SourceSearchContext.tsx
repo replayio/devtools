@@ -1,6 +1,7 @@
+import { ReactNode, createContext, useContext, useEffect, useMemo } from "react";
+
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { getSourceContentsHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
-import { createContext, ReactNode, useContext, useEffect, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useSourceSearch, { Actions, SetScope, State } from "./hooks/useSourceSearch";

@@ -1,5 +1,6 @@
-import { renderFocused } from "bvaughn-architecture-demo/src/utils/testing";
 import { fireEvent, screen } from "@testing-library/react";
+
+import { renderFocused } from "bvaughn-architecture-demo/src/utils/testing";
 
 import Focuser from "./Focuser";
 

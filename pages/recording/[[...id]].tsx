@@ -2,9 +2,9 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { GetStaticProps } from "next/types";
 import React, { useContext, useEffect, useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { useAppDispatch, useAppStore } from "ui/setup/hooks";
-import { isTest } from "ui/utils/environment";
+import { ConnectedProps, connect } from "react-redux";
+
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { setModal } from "ui/actions/app";
 import { setExpectedError } from "ui/actions/errors";
 import { getAccessibleRecording } from "ui/actions/session";
@@ -12,22 +12,23 @@ import DevTools from "ui/components/DevTools";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 import {
   getRecordingMetadata,
+  useGetRawRecordingIdWithSlug,
   useGetRecording,
   useGetRecordingId,
-  useGetRawRecordingIdWithSlug,
   useSubscribeRecording,
 } from "ui/hooks/recordings";
+import useConfigureReplayClientInterop from "ui/hooks/useReplayClient";
 import setupDevtools from "ui/setup/dynamic/devtools";
+import { useAppDispatch, useAppStore } from "ui/setup/hooks";
 import { Recording as RecordingInfo } from "ui/types";
+import { isTest } from "ui/utils/environment";
 import { extractIdAndSlug } from "ui/utils/helpers";
 import { startUploadWaitTracking } from "ui/utils/mixpanel";
 import { getRecordingURL } from "ui/utils/recording";
+import { trackEvent } from "ui/utils/telemetry";
 import useToken from "ui/utils/useToken";
-import useConfigureReplayClientInterop from "ui/hooks/useReplayClient";
 
 import Upload from "./upload";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { trackEvent } from "ui/utils/telemetry";
 
 interface MetadataProps {
   metadata?: {

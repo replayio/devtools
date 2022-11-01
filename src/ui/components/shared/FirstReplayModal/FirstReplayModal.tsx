@@ -1,19 +1,21 @@
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { launchAndRecordUrl } from "ui/utils/environment";
+import { ConnectedProps, connect } from "react-redux";
+
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
+import { launchAndRecordUrl } from "ui/utils/environment";
 import { trackEvent } from "ui/utils/telemetry";
+
 import { PrimaryLgButton } from "../Button";
 import { TextInputCopy } from "../NewWorkspaceModal/InvitationLink";
 import {
-  OnboardingBody,
   OnboardingActions,
-  OnboardingHeader,
-  OnboardingModalContainer,
+  OnboardingBody,
   OnboardingContent,
   OnboardingContentWrapper,
+  OnboardingHeader,
+  OnboardingModalContainer,
 } from "../Onboarding/index";
 
 export const REPLAY_DEMO_URL = "https://static.replay.io/demo/";

@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
 import Head from "next/head";
+import type { ReactNode } from "react";
 
 import iconSprite from "../Icon/sprite.svg";
 

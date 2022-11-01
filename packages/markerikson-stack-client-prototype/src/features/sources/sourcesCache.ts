@@ -1,8 +1,8 @@
 import { unstable_getCacheForType as getCacheForType } from "react";
-import type { AppStore } from "../../app/store";
 
-import { api, SourceGroups } from "../../app/api";
-import { openSourceDetails, SourceDetails } from "./sourcesSlice";
+import { SourceGroups, api } from "../../app/api";
+import type { AppStore } from "../../app/store";
+import { SourceDetails, openSourceDetails } from "./sourcesSlice";
 
 /*
  * This entire file is _mostly_ WIP PROOF OF CONCEPT!

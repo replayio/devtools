@@ -4,8 +4,9 @@
 
 //
 
-import { annotateFrames } from "./annotateFrames";
 import { makeMockFrameWithURL } from "devtools/client/debugger/src/utils/test-mockup";
+
+import { annotateFrames } from "./annotateFrames";
 
 describe("annotateFrames", () => {
   it("should return Angular", () => {

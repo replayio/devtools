@@ -1,9 +1,11 @@
 import classNames from "classnames";
-import { getSelectedSource } from "ui/reducers/sources";
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
+
 import * as actions from "ui/actions/app";
+import { getSelectedSource } from "ui/reducers/sources";
 import { UIState } from "ui/state";
+
 import { PrimaryButton } from "../Button";
 import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "../Dialog";
 import Modal from "../NewModal";
@@ -33,7 +35,7 @@ function SourcemapSetupModal({ hideModal, selectedSource }: PropsFromRedux) {
         <DialogTitle>Replay is better with sourcemaps</DialogTitle>
         <DialogDescription>{msg}</DialogDescription>
         <DialogActions>
-          <div className="flex flex-col items-center w-full">
+          <div className="flex w-full flex-col items-center">
             <PrimaryButton color="blue" onClick={onClick}>{`Show me how`}</PrimaryButton>
           </div>
         </DialogActions>

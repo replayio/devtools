@@ -6,8 +6,8 @@ import { PointsContextRoot } from "bvaughn-architecture-demo/src/contexts/Points
 import { SourcesContextRoot } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { TimelineContextRoot } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 
-import styles from "./styles.module.css";
 import createTest from "./utils/createTest";
+import styles from "./styles.module.css";
 
 const DEFAULT_RECORDING_ID = "aeaf1d96-c47a-4584-87cf-4f9bd9f65d85";
 

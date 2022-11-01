@@ -1,13 +1,13 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+
 import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { setTimelineState } from "ui/reducers/timeline";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getTimeFromPosition } from "ui/utils/timeline";
 
 import Comments from "../Comments";
 import ProtocolTimeline from "../ProtocolTimeline";
-
 import Capsule from "./Capsule";
 import CurrentTimeIndicator from "./CurrentTimeIndicator";
 import Focuser from "./Focuser";

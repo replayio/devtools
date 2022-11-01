@@ -4,6 +4,7 @@
 
 //
 import React, { Component } from "react";
+
 import { Tree } from "./tree";
 
 class ManagedTree extends Component {

@@ -1,15 +1,17 @@
 import classnames from "classnames";
-import React, { useState, useEffect } from "react";
-import hooks from "ui/hooks";
-import { WorkspaceUser, WorkspaceUserRole } from "ui/types";
-import PortalDropdown from "ui/components/shared/PortalDropdown";
-import { connect, ConnectedProps } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { ConnectedProps, connect } from "react-redux";
+
 import * as actions from "ui/actions/app";
-import MaterialIcon from "../MaterialIcon";
 import { AvatarImage } from "ui/components/Avatar";
-import { useConfirm } from "../Confirm";
 import { Dropdown, DropdownDivider, DropdownItem } from "ui/components/Library/LibraryDropdown";
 import { useRedirectToTeam } from "ui/components/Library/Team/utils";
+import PortalDropdown from "ui/components/shared/PortalDropdown";
+import hooks from "ui/hooks";
+import { WorkspaceUser, WorkspaceUserRole } from "ui/types";
+
+import { useConfirm } from "../Confirm";
+import MaterialIcon from "../MaterialIcon";
 
 type WorkspaceMemberProps = {
   member: WorkspaceUser;
@@ -178,7 +180,7 @@ export function NonRegisteredWorkspaceMember({
       <div className="grid items-center justify-center" style={{ width: "28px", height: "28px" }}>
         <MaterialIcon iconSize="xl">mail_outline</MaterialIcon>
       </div>
-      <div className="flex-grow overflow-hidden whitespace-pre overflow-ellipsis">
+      <div className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre">
         {member.email}
       </div>
       <PortalDropdown
@@ -283,10 +285,10 @@ function WorkspaceMember({ member, hideModal, isAdmin, canLeave = false }: Works
     <li className="flex flex-row items-center space-x-1.5">
       <AvatarImage
         src={member.user!.picture}
-        className="rounded-full avatar"
+        className="avatar rounded-full"
         style={{ width: "28px", height: "28px" }}
       />
-      <div className="flex-grow overflow-hidden whitespace-pre overflow-ellipsis" data-private>
+      <div className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre" data-private>
         {member.user!.name}
       </div>
       <Role member={member} hideModal={hideModal} isAdmin={isAdmin} canLeave={canLeave} />

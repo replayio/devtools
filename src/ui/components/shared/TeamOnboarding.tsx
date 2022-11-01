@@ -1,31 +1,32 @@
+import { useRouter } from "next/router";
 import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { removeUrlParameters } from "ui/utils/environment";
+import { ConnectedProps, connect } from "react-redux";
+
+import { CreateNewWorkspace_createWorkspace_workspace } from "graphql/CreateNewWorkspace";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
+import { removeUrlParameters } from "ui/utils/environment";
 import { isValidTeamName, validateEmail } from "ui/utils/helpers";
+import { trackEvent } from "ui/utils/telemetry";
+
+import { useRedirectToTeam } from "../Library/Team/utils";
 import { PrimaryLgButton } from "./Button";
 import { TextInput } from "./Forms";
+import InvitationLink from "./NewWorkspaceModal/InvitationLink";
+import { DownloadingPage } from "./Onboarding/DownloadingPage";
+import { DownloadPage } from "./Onboarding/DownloadPage";
 import {
+  NextButton,
   OnboardingActions,
   OnboardingBody,
   OnboardingButton,
   OnboardingContent,
   OnboardingContentWrapper,
   OnboardingHeader,
-  NextButton,
   OnboardingModalContainer,
 } from "./Onboarding/index";
-import InvitationLink from "./NewWorkspaceModal/InvitationLink";
 import { WorkspaceMembers } from "./WorkspaceSettingsModal/WorkspaceSettingsModal";
-import { trackEvent } from "ui/utils/telemetry";
-
-import { DownloadPage } from "./Onboarding/DownloadPage";
-import { DownloadingPage } from "./Onboarding/DownloadingPage";
-import { useRouter } from "next/router";
-import { useRedirectToTeam } from "../Library/Team/utils";
-import { CreateNewWorkspace_createWorkspace_workspace } from "graphql/CreateNewWorkspace";
 
 const DOWNLOAD_PAGE_INDEX = 4;
 
@@ -114,7 +115,7 @@ function TeamNamePage({
         <OnboardingHeader>What should we call you?</OnboardingHeader>
         <OnboardingBody>{`Keep it simple! Your company name is perfect`}</OnboardingBody>
       </OnboardingContent>
-      <div className="flex flex-col w-full py-3">
+      <div className="flex w-full flex-col py-3">
         <TextInput
           value={inputValue}
           onChange={onChange}
@@ -184,8 +185,8 @@ function TeamMemberInvitationPage({ newWorkspace, onSkipToDownload }: SlideBodyP
         <OnboardingBody>{`Replay is for your whole team. Invite anyone you’d like to record and discuss replays with`}</OnboardingBody>
       </OnboardingContent>
       <div className="w-9/12 space-y-3 text-xl">
-        <form className="flex flex-col w-full space-y-3 text-xl" onSubmit={handleAddMember}>
-          <div className="flex flex-row flex-grow space-x-3 text-black">
+        <form className="flex w-full flex-col space-y-3 text-xl" onSubmit={handleAddMember}>
+          <div className="flex flex-grow flex-row space-x-3 text-black">
             <TextInput
               placeholder="Email address"
               value={inputValue}

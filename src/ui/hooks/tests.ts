@@ -1,4 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
+import orderBy from "lodash/orderBy";
+
 import {
   GetTest,
   GetTestVariables,
@@ -17,7 +19,6 @@ import {
   GetTestsRunsForWorkspaceVariables,
   GetTestsRunsForWorkspace_node_Workspace_testRuns,
 } from "graphql/GetTestsRunsForWorkspace";
-import orderBy from "lodash/orderBy";
 import { assert } from "protocol/utils";
 import { WorkspaceId } from "ui/state/app";
 import { Recording } from "ui/types";

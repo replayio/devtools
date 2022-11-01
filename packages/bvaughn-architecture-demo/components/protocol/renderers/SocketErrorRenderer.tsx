@@ -1,8 +1,8 @@
-import SyntaxHighlightedLine from "bvaughn-architecture-demo/components/sources/SyntaxHighlightedLine";
 import { useMemo } from "react";
 
-import { SocketError } from "../ProtocolMessagesStore";
+import SyntaxHighlightedLine from "bvaughn-architecture-demo/components/sources/SyntaxHighlightedLine";
 
+import { SocketError } from "../ProtocolMessagesStore";
 import styles from "./shared.module.css";
 
 export function SocketErrorHeaderRenderer({ message }: { message: SocketError }) {

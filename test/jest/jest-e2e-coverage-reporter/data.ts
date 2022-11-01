@@ -1,13 +1,13 @@
+import { promises as fs } from "fs";
+import { posix } from "path";
+import { URL, pathToFileURL } from "url";
 // Original source: https://github.com/bgotink/playwright-coverage
 import type { ProcessCov } from "@bcoe/v8-coverage";
+import type { SourceMapInput } from "@jridgewell/trace-mapping";
 import type { Suite, TestResult } from "@playwright/test/reporter";
-import { promises as fs } from "fs";
 import { createCoverageMap } from "istanbul-lib-coverage";
 // @ts-ignore
 import { isMatch } from "micromatch";
-import { posix } from "path";
-import type { SourceMapInput } from "@jridgewell/trace-mapping";
-import { pathToFileURL, URL } from "url";
 import v8ToIstanbul from "v8-to-istanbul";
 
 export const attachmentName = "@bgotink/playwright-coverage";

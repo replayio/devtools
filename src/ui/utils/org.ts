@@ -1,5 +1,6 @@
 import { useGetNonPendingWorkspaces } from "ui/hooks/workspaces";
 import { Workspace, WorkspaceSettings } from "ui/types";
+
 import { useGetTeamIdFromRoute } from "../components/Library/Team/utils";
 
 export function getDefaultOrganizationSettings(): WorkspaceSettings {

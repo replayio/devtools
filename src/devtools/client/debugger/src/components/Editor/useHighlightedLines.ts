@@ -1,24 +1,25 @@
 import { Doc } from "codemirror";
-import range from "lodash/range";
 import isEmpty from "lodash/isEmpty";
+import range from "lodash/range";
+import { useLayoutEffect, useRef } from "react";
+
 import { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import {
-  getHighlightedLineRange,
-  getSelectedFrameSuspense,
   HighlightedRange,
   PauseFrame,
+  getHighlightedLineRange,
+  getSelectedFrameSuspense,
 } from "devtools/client/debugger/src/selectors";
-import SourceEditor from "devtools/client/debugger/src/utils/editor/source-editor";
 import { endOperation, startOperation } from "devtools/client/debugger/src/utils/editor";
 import {
   getDocument,
   hasDocument,
 } from "devtools/client/debugger/src/utils/editor/source-documents";
-import { useLayoutEffect, useRef } from "react";
+import SourceEditor from "devtools/client/debugger/src/utils/editor/source-editor";
 import {
+  SourceContent,
   getSelectedLocation,
   getSelectedSourceWithContent,
-  SourceContent,
 } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
 

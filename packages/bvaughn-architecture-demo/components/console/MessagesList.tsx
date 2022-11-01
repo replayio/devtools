@@ -1,6 +1,17 @@
+import {
+  ForwardedRef,
+  KeyboardEvent,
+  MutableRefObject,
+  ReactNode,
+  forwardRef,
+  useContext,
+  useMemo,
+} from "react";
+
 import Icon from "bvaughn-architecture-demo/components/Icon";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
+import useLoadedRegions from "bvaughn-architecture-demo/src/hooks/useRegions";
 import { getMessagesSuspense } from "bvaughn-architecture-demo/src/suspense/MessagesCache";
 import {
   getLoggableExecutionPoint,
@@ -10,29 +21,22 @@ import {
   isTerminalExpression,
   isUncaughtException,
 } from "bvaughn-architecture-demo/src/utils/loggables";
-import { isExecutionPointsLessThan, isExecutionPointsWithinRange } from "bvaughn-architecture-demo/src/utils/time";
 import {
-  ForwardedRef,
-  forwardRef,
-  KeyboardEvent,
-  MutableRefObject,
-  ReactNode,
-  useContext,
-  useMemo,
-} from "react";
+  isExecutionPointsLessThan,
+  isExecutionPointsWithinRange,
+} from "bvaughn-architecture-demo/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { isPointInRegions } from "shared/utils/time";
 
+import { ConsoleSearchContext } from "./ConsoleSearchContext";
+import CurrentTimeIndicator from "./CurrentTimeIndicator";
 import { Loggable, LoggablesContext } from "./LoggablesContext";
-import styles from "./MessagesList.module.css";
 import EventLogRenderer from "./renderers/EventLogRenderer";
-import MessageRenderer from "./renderers/MessageRenderer";
 import LogPointRenderer from "./renderers/LogPointRenderer";
+import MessageRenderer from "./renderers/MessageRenderer";
 import TerminalExpressionRenderer from "./renderers/TerminalExpressionRenderer";
 import UncaughtExceptionRenderer from "./renderers/UncaughtExceptionRenderer";
-import { ConsoleSearchContext } from "./ConsoleSearchContext";
-import useLoadedRegions from "bvaughn-architecture-demo/src/hooks/useRegions";
-import { isPointInRegions } from "shared/utils/time";
-import CurrentTimeIndicator from "./CurrentTimeIndicator";
+import styles from "./MessagesList.module.css";
 
 type CurrentTimeIndicatorPlacement = Loggable | "begin" | "end";
 

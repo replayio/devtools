@@ -1,5 +1,5 @@
+import { RenderResult, act, render as rtlRender } from "@testing-library/react";
 import { useEffect } from "react";
-import { act, render as rtlRender, RenderResult } from "@testing-library/react";
 
 import useSearch, { Actions, ScopeId, SearchFunction, State } from "./useSearch";
 

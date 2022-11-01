@@ -1,10 +1,12 @@
 import React, { useContext } from "react";
+
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import Icon from "ui/components/shared/Icon";
+import { getSelectedSource } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
+
 import { getSelectedFrameId } from "../../reducers/pause";
-import { getSelectedSource } from "ui/reducers/sources";
 import { getSourcemapVisualizerURLSuspense } from "../../utils/sourceVisualizations";
 import { CursorPosition } from "./Footer";
 
@@ -40,7 +42,7 @@ export default function SourcemapVisualizerLinkSuspends({
         <Icon
           size="small"
           filename="external"
-          className="cursor-pointer bg-iconColor group-hover:bg-primaryAccent mr-1"
+          className="mr-1 cursor-pointer bg-iconColor group-hover:bg-primaryAccent"
         />
         Show Source Map
       </a>

@@ -1,39 +1,40 @@
 import { ApolloError } from "@apollo/client";
+import { Action } from "@reduxjs/toolkit";
 import { uploadedData } from "@replayio/protocol";
 import * as Sentry from "@sentry/react";
 
 import {
-  addEventListener,
   CommandRequest,
   CommandResponse,
-  createSession,
   ExperimentalSettings,
+  addEventListener,
+  createSession,
 } from "protocol/socket";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { assert, waitForTime } from "protocol/utils";
-import { isTest, isMock } from "ui/utils/environment";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import { getRecording } from "ui/hooks/recordings";
 import { getUserSettings } from "ui/hooks/settings";
 import { getUserId, getUserInfo } from "ui/hooks/users";
 import {
-  setTrialExpired,
-  setCurrentPoint,
   clearExpectedError,
   getExpectedError,
+  setCurrentPoint,
+  setTrialExpired,
 } from "ui/reducers/app";
 import * as selectors from "ui/reducers/app";
 import {
+  ProtocolEvent,
+  errorReceived,
   eventReceived,
   requestSent,
-  errorReceived,
   responseReceived,
-  ProtocolEvent,
 } from "ui/reducers/protocolMessages";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import { Recording } from "ui/types";
 import { extractGraphQLError } from "ui/utils/apolloClient";
+import { isMock, isTest } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
 import { endMixpanelSession } from "ui/utils/mixpanel";
 import { features, prefs } from "ui/utils/prefs";
@@ -41,10 +42,9 @@ import { registerRecording, trackEvent } from "ui/utils/telemetry";
 import tokenManager from "ui/utils/tokenManager";
 import { subscriptionExpired } from "ui/utils/workspace";
 
-import { setUnexpectedError, setExpectedError } from "./errors";
+import { setExpectedError, setUnexpectedError } from "./errors";
 import { setViewMode } from "./layout";
 import { jumpToInitialPausePoint } from "./timeline";
-import { Action } from "@reduxjs/toolkit";
 
 export { setUnexpectedError, setExpectedError };
 

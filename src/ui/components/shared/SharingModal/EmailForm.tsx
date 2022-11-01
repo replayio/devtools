@@ -1,10 +1,12 @@
+import { CheckCircleIcon, ExclamationCircleIcon, PaperAirplaneIcon } from "@heroicons/react/solid";
 import { RecordingId } from "@replayio/protocol";
 import React, { Dispatch, SetStateAction, useState } from "react";
+
 import hooks from "ui/hooks";
-import Spinner from "../Spinner";
-import { CheckCircleIcon, PaperAirplaneIcon, ExclamationCircleIcon } from "@heroicons/react/solid";
 import { validateEmail } from "ui/utils/helpers";
+
 import { TextInput } from "../Forms";
+import Spinner from "../Spinner";
 
 type ActionStatus = "pending" | "loading" | "error" | "completed";
 
@@ -21,7 +23,7 @@ function AutocompleteAction({
         className="inline-flex items-center space-x-1.5 rounded-md border border-transparent bg-primaryAccent px-2.5 py-1.5 font-medium text-buttontextColor focus:outline-none"
         disabled
       >
-        <Spinner className="w-4 h-4 animate-spin text-buttontextColor" />
+        <Spinner className="h-4 w-4 animate-spin text-buttontextColor" />
         <span>Inviting</span>
       </button>
     );
@@ -31,7 +33,7 @@ function AutocompleteAction({
         className="inline-flex items-center space-x-1 rounded-md border border-transparent bg-green-600 px-2.5 py-1.5 font-medium text-buttontextColor focus:outline-none"
         disabled
       >
-        <CheckCircleIcon className="w-4 h-4 text-buttontextColor" />
+        <CheckCircleIcon className="h-4 w-4 text-buttontextColor" />
         <span>Invited</span>
       </button>
     );
@@ -41,7 +43,7 @@ function AutocompleteAction({
         className="inline-flex items-center space-x-1 rounded-md border border-transparent bg-red-600 px-2.5 py-1.5 font-medium text-buttontextColor focus:outline-none"
         disabled
       >
-        <ExclamationCircleIcon className="w-4 h-4 text-buttontextColor" />
+        <ExclamationCircleIcon className="h-4 w-4 text-buttontextColor" />
         <span>Unknown User</span>
       </button>
     );
@@ -52,7 +54,7 @@ function AutocompleteAction({
       className="inline-flex items-center space-x-1 rounded-md border border-transparent bg-primaryAccent px-2.5 py-1.5 font-medium text-buttontextColor hover:bg-primaryAccentHover focus:outline-none"
       onClick={handleSubmit}
     >
-      <PaperAirplaneIcon className="w-4 h-4 transform rotate-90 text-buttontextColor" />
+      <PaperAirplaneIcon className="h-4 w-4 rotate-90 transform text-buttontextColor" />
       <span>Add</span>
     </button>
   );

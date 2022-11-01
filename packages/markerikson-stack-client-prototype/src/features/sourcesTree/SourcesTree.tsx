@@ -1,24 +1,22 @@
-import { useMemo } from "react";
 import classnames from "classnames";
-import Expandable from "@bvaughn/components/Expandable";
+import { useMemo } from "react";
 
 import { useAppDispatch, useAppSelector, useAppStore } from "../../app/hooks";
-
 import { sourceEntrySelected } from "../sources/selectedSourcesSlice";
+import { getSourceDetails } from "../sources/sourcesCache";
 import {
-  openSourceDetailsEntities,
   SourceDetails,
   SourceDetailsEntities,
+  openSourceDetailsEntities,
 } from "../sources/sourcesSlice";
-import { getSourceDetails } from "../sources/sourcesCache";
-import { parseSourcesTree, SourceTreeNode } from "./treeUtils";
-
+import { SourceTreeNode, parseSourcesTree } from "./treeUtils";
 import "./variables.css";
 import styles from "./SourcesTree.module.css";
-
 import fileIcon from "./images/file-small.svg";
 import folderIcon from "./images/folder.svg";
 import globeIcon from "./images/globe-small.svg";
+
+import Expandable from "@bvaughn/components/Expandable";
 
 interface STIProps {
   node: SourceTreeNode;

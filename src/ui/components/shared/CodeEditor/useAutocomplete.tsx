@@ -1,26 +1,27 @@
-import { useCallback, useState, useEffect, useRef, useContext } from "react";
+import uniq from "lodash/uniq";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+
+import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import {
+  PauseAndFrameId,
+  getPauseId,
+  getSelectedFrameId,
+} from "devtools/client/debugger/src/reducers/pause";
+import { getEvaluatedProperties } from "devtools/client/webconsole/utils/autocomplete-eager";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { getPreferredGeneratedSources } from "ui/reducers/sources";
+import { useAppSelector } from "ui/setup/hooks";
+import { getFramesAsync } from "ui/suspense/frameCache";
+import { PickedScopes, getScopesAsync, pickScopes } from "ui/suspense/scopeCache";
+import {
+  ObjectFetcher,
   fuzzyFilter,
   getAutocompleteMatches,
   getLastExpression,
   getPropertyExpression,
   insertAutocompleteMatch,
   normalizeString,
-  ObjectFetcher,
 } from "ui/utils/autocomplete";
-import uniq from "lodash/uniq";
-import { useAppSelector } from "ui/setup/hooks";
-import {
-  getPauseId,
-  getSelectedFrameId,
-  PauseAndFrameId,
-} from "devtools/client/debugger/src/reducers/pause";
-import { getEvaluatedProperties } from "devtools/client/webconsole/utils/autocomplete-eager";
-import { PickedScopes, getScopesAsync, pickScopes } from "ui/suspense/scopeCache";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
-import { getPreferredGeneratedSources } from "ui/reducers/sources";
-import { getFramesAsync } from "ui/suspense/frameCache";
 
 // turns an async getMatches function into a hook
 function useGetAsyncMatches(

@@ -2,7 +2,6 @@ import classNames from "classnames";
 import { useEffect, useMemo, useState } from "react";
 
 import MaterialIcon from "../shared/MaterialIcon";
-
 import { RawBody } from "./content";
 
 const BodyDownload = ({ raw, filename }: { raw: RawBody; filename: string }) => {

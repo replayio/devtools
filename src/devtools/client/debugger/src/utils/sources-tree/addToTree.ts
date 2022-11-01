@@ -4,22 +4,21 @@
 
 //
 
-import { isInvalidUrl } from "../source";
-
-import {
-  nodeHasChildren,
-  isPathDirectory,
-  partIsFile,
-  createSourceNode,
-  createDirectoryNode,
-} from "./utils";
-import { createTreeNodeMatcher, findNodeInContents } from "./treeOrder";
-import { getURL } from "./getURL";
-
-// import type { Source } from "../../reducers/sources";
-import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
-import type { ParsedUrl } from "./getURL";
 import { SourceDetails } from "ui/reducers/sources";
+
+import { isInvalidUrl } from "../source";
+import { getURL } from "./getURL";
+import type { ParsedUrl } from "./getURL";
+import { createTreeNodeMatcher, findNodeInContents } from "./treeOrder";
+// import type { Source } from "../../reducers/sources";
+import type { ParentMap, TreeDirectory, TreeNode, TreeSource } from "./types";
+import {
+  createDirectoryNode,
+  createSourceNode,
+  isPathDirectory,
+  nodeHasChildren,
+  partIsFile,
+} from "./utils";
 
 function createNodeInTree(part: string, path: string, tree: TreeDirectory, index: number) {
   const node = createDirectoryNode(part, path, []);

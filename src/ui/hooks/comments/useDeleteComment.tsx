@@ -1,4 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
+
 import { DeleteComment, DeleteCommentVariables } from "graphql/DeleteComment";
 
 export default function useDeleteComment() {

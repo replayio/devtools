@@ -1,4 +1,5 @@
 import React from "react";
+
 import ComputedProperties from "./ComputedProperties";
 import ComputedToolbar from "./ComputedToolbar";
 

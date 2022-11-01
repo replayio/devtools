@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import React from "react";
 import ReactDOM from "react-dom";
+
 import { useFeature } from "ui/hooks/settings";
 
 type StaticTooltipProps = {

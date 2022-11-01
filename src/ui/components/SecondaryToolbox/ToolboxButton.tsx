@@ -1,6 +1,7 @@
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { setShowVideoPanel } from "ui/actions/layout";
 import { getShowVideoPanel } from "ui/reducers/layout";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+
 import Icon from "../shared/Icon";
 
 interface ToolboxButtonProps {

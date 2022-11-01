@@ -1,6 +1,7 @@
 import React from "react";
-import useAuth0 from "ui/utils/useAuth0";
+
 import Avatar from "ui/components/Avatar";
+import useAuth0 from "ui/utils/useAuth0";
 
 const LoginButton = () => {
   const { loginAndReturn, isAuthenticated, logout, user } = useAuth0();

@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { useAppDispatch } from "ui/setup/hooks";
+
 import { setModal } from "ui/actions/app";
 import useAddCommentReply from "ui/hooks/comments/useAddCommentReply";
+import { useAppDispatch } from "ui/setup/hooks";
 import { Comment } from "ui/state/comments";
 import { features } from "ui/utils/prefs";
 import useAuth0 from "ui/utils/useAuth0";
 
 import MaterialIcon from "../shared/MaterialIcon";
-
 import styles from "./CommentReplyButton.module.css";
 
 export default function CommentReplyButton({ comment }: { comment: Comment }) {

@@ -1,29 +1,29 @@
-import React, { ReactNode, useEffect, createContext } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { isTest } from "ui/utils/environment";
-import { actions } from "ui/actions";
-import { ModalType } from "ui/state/app";
-import useAuth0 from "ui/utils/useAuth0";
+import React, { ReactNode, createContext, useEffect } from "react";
+import { ConnectedProps, connect } from "react-redux";
 
-import AppErrors from "./shared/Error";
-import LoginModal from "./shared/LoginModal";
-import RenameReplayModal from "./shared/Modals/RenameReplayModal";
-import * as selectors from "ui/reducers/app";
-import { getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
-import { UIState } from "ui/state";
-import { Nag, useGetUserInfo } from "ui/hooks/users";
-
-import LoadingScreen from "./shared/LoadingScreen";
-import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
-import { ConfirmRenderer } from "./shared/Confirm";
-import PrivacyModal from "./shared/PrivacyModal";
-import LoomModal from "./shared/LoomModal";
-import NewAttachment from "./shared/NewAttachment";
 import QuickOpenModal from "devtools/client/debugger/src/components/QuickOpenModal";
+import { getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
+import { actions } from "ui/actions";
 import hooks from "ui/hooks";
-import { shouldShowNag } from "ui/utils/user";
+import { Nag, useGetUserInfo } from "ui/hooks/users";
+import * as selectors from "ui/reducers/app";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { UIState } from "ui/state";
+import { ModalType } from "ui/state/app";
+import { isTest } from "ui/utils/environment";
 import { trackEvent } from "ui/utils/telemetry";
+import useAuth0 from "ui/utils/useAuth0";
+import { shouldShowNag } from "ui/utils/user";
+
+import { ConfirmRenderer } from "./shared/Confirm";
+import AppErrors from "./shared/Error";
+import LoadingScreen from "./shared/LoadingScreen";
+import LoginModal from "./shared/LoginModal";
+import LoomModal from "./shared/LoomModal";
+import RenameReplayModal from "./shared/Modals/RenameReplayModal";
+import NewAttachment from "./shared/NewAttachment";
+import PrivacyModal from "./shared/PrivacyModal";
+import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
 
 const LaunchBrowserModal = React.lazy(() => import("./shared/LaunchBrowserModal"));
 const NewWorkspaceModal = React.lazy(() => import("./shared/NewWorkspaceModal"));

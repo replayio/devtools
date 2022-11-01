@@ -4,8 +4,9 @@
 
 //
 
-import { formatCopyName, formatDisplayName, simplifyDisplayName } from "./displayName";
 import { makeMockFrame, makeMockSource } from "devtools/client/debugger/src/utils/test-mockup";
+
+import { formatCopyName, formatDisplayName, simplifyDisplayName } from "./displayName";
 
 describe("formatCopyName", () => {
   it("simple", () => {

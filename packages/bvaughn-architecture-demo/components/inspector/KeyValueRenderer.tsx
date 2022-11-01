@@ -1,16 +1,17 @@
+import { PauseId, Object as ProtocolObject, Value as ProtocolValue } from "@replayio/protocol";
+import classNames from "classnames";
+import { ReactNode, Suspense, useContext, useState } from "react";
+
 import Expandable from "bvaughn-architecture-demo/components/Expandable";
 import Loader from "bvaughn-architecture-demo/components/Loader";
 import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
-import { Object as ProtocolObject, PauseId, Value as ProtocolValue } from "@replayio/protocol";
-import classNames from "classnames";
-import { ReactNode, Suspense, useContext, useState } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import HTMLExpandable from "./HTMLExpandable";
-import styles from "./KeyValueRenderer.module.css";
 import PropertiesRenderer from "./PropertiesRenderer";
 import useClientValue from "./useClientValue";
 import ValueRenderer from "./ValueRenderer";
+import styles from "./KeyValueRenderer.module.css";
 
 // Renders a protocol Object/ObjectPreview as a key+value pair.
 //

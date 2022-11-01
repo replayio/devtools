@@ -1,10 +1,11 @@
 import { PointDescription, TimeStampedPoint } from "@replayio/protocol";
 import classnames from "classnames";
-import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import findLast from "lodash/findLast";
-import { compareNumericStrings } from "protocol/utils";
 import React, { Suspense, useEffect } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
+
+import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
+import { compareNumericStrings } from "protocol/utils";
 import { HitPointStatus, Point } from "shared/client/types";
 import { actions } from "ui/actions";
 import Icon from "ui/components/shared/Icon";

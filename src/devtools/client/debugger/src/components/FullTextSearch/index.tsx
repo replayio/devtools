@@ -2,26 +2,23 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import React, { useRef, useReducer, useContext } from "react";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import React, { useContext, useReducer, useRef } from "react";
 
-import Checkbox from "ui/components/shared/Forms/Checkbox";
-import { trackEvent } from "ui/utils/telemetry";
-
-import { useAppSelector, useAppDispatch } from "ui/setup/hooks";
-
-import { getSourceDetailsEntities, SourceDetails } from "ui/reducers/sources";
-import { selectSpecificLocation } from "devtools/client/debugger/src/actions/sources";
 import { doSearchForHighlight } from "devtools/client/debugger/src/actions/file-search";
+import { selectSpecificLocation } from "devtools/client/debugger/src/actions/sources";
 import { focusFullTextInput } from "devtools/client/debugger/src/reducers/ui";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import Checkbox from "ui/components/shared/Forms/Checkbox";
+import { SourceDetails, getSourceDetailsEntities } from "ui/reducers/sources";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { trackEvent } from "ui/utils/telemetry";
+
 import { getContext, getFullTextSearchFocus } from "../../selectors";
-
 import { getEditor } from "../../utils/editor";
-
 import { FullTextFilter } from "./FullTextFilter";
 import { FullTextResults } from "./FullTextResults";
-import { search, SourceResultEntry, SourceMatchEntry } from "./search";
+import { SourceMatchEntry, SourceResultEntry, search } from "./search";
 
 function sanitizeQuery(query: string) {
   // no '\' at end of query

@@ -9,11 +9,11 @@ import {
   TimeStampedPoint,
 } from "@replayio/protocol";
 import jsTokens from "js-tokens";
+
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
 import { preCacheObjects } from "./ObjectPreviews";
-
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 type Value = any;

@@ -1,8 +1,11 @@
 import { Value as ProtocolValue } from "@replayio/protocol";
-import { ReplayClientInterface } from "shared/client/types";
 
-import { getObjectWithPreviewHelper, getObjectThrows } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import {
+  getObjectThrows,
+  getObjectWithPreviewHelper,
+} from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { protocolValueToClientValue } from "bvaughn-architecture-demo/src/utils/protocol";
+import { ReplayClientInterface } from "shared/client/types";
 
 // like JSON, but including `undefined`
 export type JSONishValue =

@@ -1,6 +1,6 @@
+import { Meta, Story } from "@storybook/react";
 import React, { ComponentProps } from "react";
 
-import { Story, Meta } from "@storybook/react";
 import Sharing from "ui/components/UploadScreen/Sharing";
 import { getDefaultOrganizationSettings } from "ui/utils/org";
 

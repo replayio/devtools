@@ -1,8 +1,9 @@
-import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import classnames from "classnames";
+import { useContext, useLayoutEffect } from "react";
+
+import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import { getDocument } from "devtools/client/debugger/src/utils/editor/source-documents";
 import SourceEditor from "devtools/client/debugger/src/utils/editor/source-editor";
-import { useContext, useLayoutEffect } from "react";
 import { Point } from "shared/client/types";
 import { features } from "ui/utils/prefs";
 

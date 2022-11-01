@@ -1,6 +1,7 @@
 import "ui/setup/dynamic/inspector";
-
 import classnames from "classnames";
+import React, { FC, ReactNode, useMemo } from "react";
+
 import ComputedApp from "devtools/client/inspector/computed/components/ComputedApp";
 import LayoutApp from "devtools/client/inspector/layout/components/LayoutApp";
 import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
@@ -8,7 +9,6 @@ import { prefs } from "devtools/client/inspector/prefs";
 import { RulesApp } from "devtools/client/inspector/rules/components/RulesApp";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import { assert } from "protocol/utils";
-import React, { FC, ReactNode, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { ResponsiveTabs } from "../../shared/components/ResponsiveTabs";

@@ -1,8 +1,8 @@
-import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
+import { Action, ThunkAction, configureStore } from "@reduxjs/toolkit";
 
-import { api } from "./api";
 import selectedSourcesReducer from "../features/sources/selectedSourcesSlice";
 import sourcesReducer from "../features/sources/sourcesSlice";
+import { api } from "./api";
 
 export function makeStore() {
   return configureStore({

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+
 import {
   exitFocusMode,
   setFocusRegion,
@@ -7,11 +7,11 @@ import {
   updateFocusRegionParam,
 } from "ui/actions/timeline";
 import { getFocusRegionBackup, getShowFocusModeControls } from "ui/reducers/timeline";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { PrimaryButton, SecondaryButton } from "../shared/Button";
 import Icon from "../shared/Icon";
-
 import styles from "./FocusModePopout.module.css";
 
 export default function FocusModePopout() {

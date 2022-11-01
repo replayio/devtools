@@ -4,16 +4,16 @@
 
 "use strict";
 
-import type { UIThunkAction } from "ui/actions";
-import { setSelectedPanel } from "ui/actions/layout";
-import { setHoveredItem, clearHoveredItem } from "ui/actions/timeline";
-import { isRegionLoaded } from "ui/reducers/app";
 import { selectSource } from "devtools/client/debugger/src/actions/sources";
 import { showSource } from "devtools/client/debugger/src/actions/ui";
-import { getContext } from "devtools/client/debugger/src/selectors";
-import { getSourceDetails, getSourceToDisplayForUrl } from "ui/reducers/sources";
 import { openSourceLink } from "devtools/client/debugger/src/actions/ui";
+import { getContext } from "devtools/client/debugger/src/selectors";
 import { nodeSelected } from "devtools/client/inspector/markup/reducers/markup";
+import type { UIThunkAction } from "ui/actions";
+import { setSelectedPanel } from "ui/actions/layout";
+import { clearHoveredItem, setHoveredItem } from "ui/actions/timeline";
+import { isRegionLoaded } from "ui/reducers/app";
+import { getSourceDetails, getSourceToDisplayForUrl } from "ui/reducers/sources";
 
 type $FixTypeLater = any;
 

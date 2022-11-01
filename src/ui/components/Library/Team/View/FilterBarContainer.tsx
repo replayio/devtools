@@ -1,6 +1,7 @@
 import LaunchButton from "ui/components/shared/LaunchButton";
-import styles from "../../Library.module.css";
+
 import { FilterBar } from "./FilterBar";
+import styles from "../../Library.module.css";
 
 export function FilterBarContainer() {
   return (

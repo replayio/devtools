@@ -1,9 +1,11 @@
 import { useContext, useState } from "react";
+
+import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
+import { useGetWorkspace } from "ui/hooks/workspaces";
+
 import PortalDropdown from "../../../shared/PortalDropdown";
 import { Dropdown, DropdownDivider, DropdownItem } from "../../LibraryDropdown";
 import { View, ViewContext } from "./ViewContextRoot";
-import { useGetWorkspace } from "ui/hooks/workspaces";
-import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 
 const daysInSeconds = (days: number) => 1000 * 60 * 60 * 24 * days;
 
@@ -56,7 +58,7 @@ export function FilterDropdown() {
   const button = (
     <div className="flex space-x-2 rounded-md border border-textFieldBorder bg-themeTextFieldBgcolor px-2.5 py-1.5 text-sm text-themeTextFieldColor">
       <div className="text-sm">{buttonLabel}</div>
-      <div className="text-sm material-icons">expand_more</div>
+      <div className="material-icons text-sm">expand_more</div>
     </div>
   );
 

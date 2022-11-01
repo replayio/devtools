@@ -2,19 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { createSlice, createAsyncThunk, PayloadAction, AnyAction } from "@reduxjs/toolkit";
-import type { Location, TimeStampedPoint, Value, PauseId, FrameId } from "@replayio/protocol";
-import type { UIState } from "ui/state";
-import { getPreferredLocation } from "ui/reducers/sources";
-
+import { AnyAction, PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import type { FrameId, Location, PauseId, TimeStampedPoint, Value } from "@replayio/protocol";
 import findLast from "lodash/findLast";
-import { compareNumericStrings } from "protocol/utils";
-import { SourceDetails } from "ui/reducers/sources";
 
-import { ThunkExtraArgs } from "ui/utils/thunk";
+import { compareNumericStrings } from "protocol/utils";
+import { getPreferredLocation } from "ui/reducers/sources";
+import { SourceDetails } from "ui/reducers/sources";
 import { getContextFromAction } from "ui/setup/redux/middleware/context";
+import type { UIState } from "ui/state";
 import { getFramesAsync } from "ui/suspense/frameCache";
 import { getFrameStepsAsync } from "ui/suspense/frameStepsCache";
+import { ThunkExtraArgs } from "ui/utils/thunk";
 
 export interface Context {
   navigateCounter: number;

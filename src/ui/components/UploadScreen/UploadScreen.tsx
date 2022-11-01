@@ -1,20 +1,22 @@
-import React, { useState, useEffect, ReactNode, SetStateAction, Dispatch } from "react";
-import hooks from "ui/hooks";
-import ReplayTitle from "./ReplayTitle";
+import React, { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
+
 import Modal from "ui/components/shared/NewModal";
-import { Recording, ExperimentalUserSettings } from "ui/types";
-import LoadingScreen from "../shared/LoadingScreen";
+import hooks from "ui/hooks";
 import { useGetRecordingId } from "ui/hooks/recordings";
-import { trackEvent } from "ui/utils/telemetry";
-import { MY_LIBRARY } from "./libraryConstants";
-import Sharing from "./Sharing";
-import { Privacy, ToggleShowPrivacyButton } from "./Privacy";
-import { UploadRecordingTrialEnd } from "./UploadRecordingTrialEnd";
-import { BubbleViewportWrapper } from "../shared/Viewport";
+import { ExperimentalUserSettings, Recording } from "ui/types";
 import { showDurationWarning } from "ui/utils/recording";
-import ReplayLogo from "../shared/ReplayLogo";
+import { trackEvent } from "ui/utils/telemetry";
 import { decodeWorkspaceId } from "ui/utils/workspace";
+
 import Icon from "../shared/Icon";
+import LoadingScreen from "../shared/LoadingScreen";
+import ReplayLogo from "../shared/ReplayLogo";
+import { BubbleViewportWrapper } from "../shared/Viewport";
+import { MY_LIBRARY } from "./libraryConstants";
+import { Privacy, ToggleShowPrivacyButton } from "./Privacy";
+import ReplayTitle from "./ReplayTitle";
+import Sharing from "./Sharing";
+import { UploadRecordingTrialEnd } from "./UploadRecordingTrialEnd";
 
 type UploadScreenProps = {
   recording: Recording;

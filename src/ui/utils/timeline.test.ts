@@ -1,4 +1,4 @@
-import { ZoomRegion, FocusRegion } from "ui/state/timeline";
+import { FocusRegion, ZoomRegion } from "ui/state/timeline";
 
 import {
   filterToFocusRegion,

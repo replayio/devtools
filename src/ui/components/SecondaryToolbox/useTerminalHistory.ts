@@ -1,6 +1,7 @@
 import { RecordingId } from "@replayio/protocol";
-import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
 import { useCallback } from "react";
+
+import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
 
 export default function useTerminalHistory(
   recordingId: RecordingId,

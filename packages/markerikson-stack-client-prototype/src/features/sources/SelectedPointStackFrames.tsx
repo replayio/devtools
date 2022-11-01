@@ -3,9 +3,9 @@ import { skipToken } from "@reduxjs/toolkit/dist/query";
 import { useGetPauseQuery } from "../../app/api";
 import { useAppSelector, useAppStore } from "../../app/hooks";
 import {
+  openSourceDetails,
   openSourceDetailsEntities,
   selectCanonicalSourceName,
-  openSourceDetails,
 } from "./sourcesSlice";
 
 export const SelectedPointStackFrames = () => {

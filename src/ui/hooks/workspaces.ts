@@ -1,5 +1,13 @@
-import { gql, useQuery, useMutation } from "@apollo/client";
-import { assert } from "protocol/utils";
+import { gql, useMutation, useQuery } from "@apollo/client";
+
+import {
+  ActivateWorkspaceSubscription,
+  ActivateWorkspaceSubscriptionVariables,
+} from "graphql/ActivateWorkspaceSubscription";
+import {
+  CancelWorkspaceSubscription,
+  CancelWorkspaceSubscriptionVariables,
+} from "graphql/CancelWorkspaceSubscription";
 import {
   CreateNewWorkspace,
   CreateNewWorkspaceVariables,
@@ -14,13 +22,39 @@ import {
   DeleteWorkspaceAPIKey,
   DeleteWorkspaceAPIKeyVariables,
 } from "graphql/DeleteWorkspaceAPIKey";
+import {
+  DeleteWorkspacePaymentMethod,
+  DeleteWorkspacePaymentMethodVariables,
+} from "graphql/DeleteWorkspacePaymentMethod";
 import { GetNonPendingWorkspaces } from "graphql/GetNonPendingWorkspaces";
 import { GetPendingWorkspaces } from "graphql/GetPendingWorkspaces";
 import { GetWorkspaceApiKeys, GetWorkspaceApiKeysVariables } from "graphql/GetWorkspaceApiKeys";
 import {
+  GetWorkspaceSubscription,
+  GetWorkspaceSubscriptionVariables,
+} from "graphql/GetWorkspaceSubscription";
+import {
+  PrepareWorkspacePaymentMethod,
+  PrepareWorkspacePaymentMethodVariables,
+} from "graphql/PrepareWorkspacePaymentMethod";
+import {
+  SetWorkspaceDefaultPaymentMethod,
+  SetWorkspaceDefaultPaymentMethodVariables,
+} from "graphql/SetWorkspaceDefaultPaymentMethod";
+import {
   UpdateWorkspaceCodeDomainLimitations,
   UpdateWorkspaceCodeDomainLimitationsVariables,
 } from "graphql/UpdateWorkspaceCodeDomainLimitations";
+import { UpdateWorkspaceLogo, UpdateWorkspaceLogoVariables } from "graphql/UpdateWorkspaceLogo";
+import {
+  UpdateWorkspaceMemberRole,
+  UpdateWorkspaceMemberRoleVariables,
+} from "graphql/UpdateWorkspaceMemberRole";
+import {
+  UpdateWorkspaceSettings,
+  UpdateWorkspaceSettingsVariables,
+} from "graphql/UpdateWorkspaceSettings";
+import { assert } from "protocol/utils";
 import {
   ACTIVATE_WORKSPACE_SUBSCRIPTION,
   ADD_WORKSPACE_API_KEY,
@@ -34,39 +68,6 @@ import {
   UPDATE_WORKSPACE_MEMBER_ROLE,
 } from "ui/graphql/workspaces";
 import { PendingWorkspaceInvitation, Subscription, Workspace } from "ui/types";
-import { UpdateWorkspaceLogo, UpdateWorkspaceLogoVariables } from "graphql/UpdateWorkspaceLogo";
-import {
-  UpdateWorkspaceSettings,
-  UpdateWorkspaceSettingsVariables,
-} from "graphql/UpdateWorkspaceSettings";
-import {
-  UpdateWorkspaceMemberRole,
-  UpdateWorkspaceMemberRoleVariables,
-} from "graphql/UpdateWorkspaceMemberRole";
-import {
-  SetWorkspaceDefaultPaymentMethod,
-  SetWorkspaceDefaultPaymentMethodVariables,
-} from "graphql/SetWorkspaceDefaultPaymentMethod";
-import {
-  DeleteWorkspacePaymentMethod,
-  DeleteWorkspacePaymentMethodVariables,
-} from "graphql/DeleteWorkspacePaymentMethod";
-import {
-  GetWorkspaceSubscription,
-  GetWorkspaceSubscriptionVariables,
-} from "graphql/GetWorkspaceSubscription";
-import {
-  ActivateWorkspaceSubscription,
-  ActivateWorkspaceSubscriptionVariables,
-} from "graphql/ActivateWorkspaceSubscription";
-import {
-  CancelWorkspaceSubscription,
-  CancelWorkspaceSubscriptionVariables,
-} from "graphql/CancelWorkspaceSubscription";
-import {
-  PrepareWorkspacePaymentMethod,
-  PrepareWorkspacePaymentMethodVariables,
-} from "graphql/PrepareWorkspacePaymentMethod";
 
 const NO_WORKSPACES: Workspace[] = [];
 

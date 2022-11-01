@@ -4,9 +4,8 @@
 
 //
 
-import { nodeHasChildren, isExactUrlMatch } from "./utils";
-
-import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
+import type { ParentMap, TreeDirectory, TreeNode, TreeSource } from "./types";
+import { isExactUrlMatch, nodeHasChildren } from "./utils";
 
 /**
  * Look at the nodes in the source tree, and determine the index of where to

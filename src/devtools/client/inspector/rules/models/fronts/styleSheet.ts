@@ -1,4 +1,4 @@
-import { StyleSheet, Object as ProtocolObject } from "@replayio/protocol";
+import { Object as ProtocolObject, StyleSheet } from "@replayio/protocol";
 
 import { assert } from "protocol/utils";
 

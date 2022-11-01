@@ -1,38 +1,39 @@
+import { Action } from "@reduxjs/toolkit";
 import { RecordingId } from "@replayio/protocol";
+import escapeHtml from "escape-html";
+
 import {
   handleUnstableSourceIds,
   selectLocation,
 } from "devtools/client/debugger/src/actions/sources/select";
 import { fetchSymbolsForSource, getSymbols } from "devtools/client/debugger/src/reducers/ast";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
+import { findClosestFunction } from "devtools/client/debugger/src/utils/ast";
+import {
+  getCodeMirror,
+  waitForEditor,
+} from "devtools/client/debugger/src/utils/editor/create-editor";
+import { getFilenameFromURL } from "devtools/client/debugger/src/utils/sources-tree/getURL";
+import type { ThreadFront as ThreadFrontType } from "protocol/thread";
+import { waitForTime } from "protocol/utils";
+import { RequestSummary } from "ui/components/NetworkMonitor/utils";
+import { ADD_COMMENT_MUTATION, AddCommentMutation } from "ui/hooks/comments/useAddComment";
+import { selectors } from "ui/reducers";
 import {
   getPreferredGeneratedSources,
   getPreferredSourceId,
   getSourceDetailsEntities,
   getTextAtLocation,
 } from "ui/reducers/sources";
-import { findClosestFunction } from "devtools/client/debugger/src/utils/ast";
-import {
-  waitForEditor,
-  getCodeMirror,
-} from "devtools/client/debugger/src/utils/editor/create-editor";
-import { getFilenameFromURL } from "devtools/client/debugger/src/utils/sources-tree/getURL";
-import escapeHtml from "escape-html";
-import type { ThreadFront as ThreadFrontType } from "protocol/thread";
-import { waitForTime } from "protocol/utils";
-import { Action } from "@reduxjs/toolkit";
-import { RequestSummary } from "ui/components/NetworkMonitor/utils";
-import { AddCommentMutation, ADD_COMMENT_MUTATION } from "ui/hooks/comments/useAddComment";
-import { selectors } from "ui/reducers";
 import { getCurrentTime } from "ui/reducers/timeline";
-import { Comment, Reply, SourceLocation, CommentOptions } from "ui/state/comments";
-import { trackEvent } from "ui/utils/telemetry";
+import { UIState } from "ui/state";
+import { Comment, CommentOptions, Reply, SourceLocation } from "ui/state/comments";
 import { mutate } from "ui/utils/apolloClient";
+import { trackEvent } from "ui/utils/telemetry";
 
 import type { UIThunkAction } from "./index";
 import { setSelectedPrimaryPanel } from "./layout";
 import { seek } from "./timeline";
-import { UIState } from "ui/state";
 
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
 

@@ -1,6 +1,7 @@
-import { assert } from "protocol/utils";
 import React, { PureComponent } from "react";
+
 import NodeConstants from "devtools/shared/dom-node-constants";
+import { assert } from "protocol/utils";
 
 interface TextNodeProps {
   type: number;

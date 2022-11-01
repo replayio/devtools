@@ -1,32 +1,34 @@
-import { Suspense, useMemo } from "react";
 import { PauseId } from "@replayio/protocol";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { Suspense, useMemo } from "react";
+
+import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import {
   Context,
+  PauseFrame,
   getFrameworkGroupingState,
   getPauseId,
   getSelectedFrameId,
   getThreadContext,
-  PauseFrame,
 } from "devtools/client/debugger/src/selectors";
+import { Pause } from "protocol/thread/pause";
+import { ThreadFront } from "protocol/thread/thread";
+import { assert } from "protocol/utils";
+import { enterFocusMode as enterFocusModeAction } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getSourcesLoading } from "ui/reducers/sources";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { getPauseFramesSuspense } from "ui/suspense/frameCache";
+import { getAsyncParentPauseIdSuspense } from "ui/suspense/util";
+import { isPointInRegions } from "ui/utils/timeline";
+
 import { selectFrame as selectFrameAction } from "../../../actions/pause/selectFrame";
 import { toggleFrameworkGrouping as setFrameworkGroupingAction } from "../../../reducers/ui";
-import { enterFocusMode as enterFocusModeAction } from "ui/actions/timeline";
-import { getAsyncParentPauseIdSuspense } from "ui/suspense/util";
-import { collapseFrames, formatCopyName } from "../../../utils/pause/frames";
 import { copyToTheClipboard } from "../../../utils/clipboard";
-import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
+import { getAllCachedPauseFrames } from "../../../utils/frames";
+import { collapseFrames, formatCopyName } from "../../../utils/pause/frames";
 import Frame from "./Frame";
 import Group from "./Group";
 import { CommonFrameComponentProps } from ".";
-import { getAllCachedPauseFrames } from "../../../utils/frames";
-import { getPauseFramesSuspense } from "ui/suspense/frameCache";
-import { isPointInRegions } from "ui/utils/timeline";
-import { Pause } from "protocol/thread/pause";
-import { assert } from "protocol/utils";
-import { ThreadFront } from "protocol/thread/thread";
 
 function FramesRenderer({
   panel,

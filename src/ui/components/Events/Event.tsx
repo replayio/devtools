@@ -1,10 +1,10 @@
 import classNames from "classnames";
 import React, { KeyboardEvent, MouseEvent, ReactNode } from "react";
+
 import { ReplayEvent } from "ui/state/app";
 import { getFormattedTime } from "ui/utils/timeline";
 
 import MaterialIcon from "../shared/MaterialIcon";
-
 import { getReplayEvent } from "./eventKinds";
 
 type EventProps = {

@@ -1,4 +1,8 @@
 import "bvaughn-architecture-demo/components/sources/CodeMirror.css";
+import { KeyboardEvent, useContext, useEffect, useLayoutEffect, useRef } from "react";
+
+import LazyOffscreen from "bvaughn-architecture-demo/components/LazyOffscreen";
+import Source from "bvaughn-architecture-demo/components/sources/Source";
 import { SourceFileNameSearchContextRoot } from "bvaughn-architecture-demo/components/sources/SourceFileNameSearchContext";
 import SourceSearch from "bvaughn-architecture-demo/components/sources/SourceSearch";
 import {
@@ -6,15 +10,12 @@ import {
   SourceSearchContextRoot,
 } from "bvaughn-architecture-demo/components/sources/SourceSearchContext";
 import { KeyboardModifiersContextRoot } from "bvaughn-architecture-demo/src/contexts/KeyboardModifiersContext";
-import LazyOffscreen from "bvaughn-architecture-demo/components/LazyOffscreen";
-import Source from "bvaughn-architecture-demo/components/sources/Source";
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { getSource } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
-import { KeyboardEvent, useContext, useEffect, useLayoutEffect, useRef } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useFeature } from "ui/hooks/settings";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getSelectedLocation, getSelectedLocationHasScrolled } from "ui/reducers/sources";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { setViewport } from "../../selectors";
 

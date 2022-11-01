@@ -1,9 +1,11 @@
 import React from "react";
-import hooks from "ui/hooks";
-import { CheckboxRow } from "./CheckboxRow";
-import { CombinedExperimentalUserSettings } from "ui/types";
-import { useFeature } from "ui/hooks/settings";
+
 import Icon from "ui/components/shared/Icon";
+import hooks from "ui/hooks";
+import { useFeature } from "ui/hooks/settings";
+import { CombinedExperimentalUserSettings } from "ui/types";
+
+import { CheckboxRow } from "./CheckboxRow";
 
 type ExperimentalKey = keyof CombinedExperimentalUserSettings;
 interface ExperimentalSetting {

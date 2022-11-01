@@ -1,8 +1,9 @@
-import React from "react";
 import classnames from "classnames";
-import { Setting, Settings } from "./types";
+import React from "react";
+
 import MaterialIcon from "../MaterialIcon";
 import { SettingsHeader } from "./SettingsBody";
+import { Setting, Settings } from "./types";
 
 interface SettingNavigationItemProps<T extends string, P extends Record<string, unknown>> {
   setting: Setting<T, P>;

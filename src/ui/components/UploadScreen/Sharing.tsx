@@ -1,12 +1,14 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
-import hooks from "ui/hooks";
-import TeamSelect from "./TeamSelect";
-import { Workspace } from "ui/types";
-import { Toggle } from "../shared/Forms";
-import SettingsPreview from "./SettingsPreview";
 import classNames from "classnames";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+
+import hooks from "ui/hooks";
+import { Workspace } from "ui/types";
 import { isPublicDisabled } from "ui/utils/org";
+
+import { Toggle } from "../shared/Forms";
 import { MY_LIBRARY } from "./libraryConstants";
+import SettingsPreview from "./SettingsPreview";
+import TeamSelect from "./TeamSelect";
 
 type SharingProps = {
   workspaces: Workspace[];

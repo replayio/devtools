@@ -1,10 +1,10 @@
-import { filterNonEnumerableProperties } from "bvaughn-architecture-demo/src/utils/protocol";
 import { ReactNode } from "react";
 
-import ValueRenderer from "../ValueRenderer";
+import { filterNonEnumerableProperties } from "bvaughn-architecture-demo/src/utils/protocol";
 
-import styles from "./shared.module.css";
+import ValueRenderer from "../ValueRenderer";
 import { ObjectPreviewRendererProps } from "./types";
+import styles from "./shared.module.css";
 
 const MAX_PROPERTIES_TO_PREVIEW = 5;
 

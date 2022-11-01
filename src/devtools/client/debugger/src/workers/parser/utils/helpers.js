@@ -4,8 +4,8 @@
 
 //
 
-import * as t from "@babel/types";
 import generate from "@babel/generator";
+import * as t from "@babel/types";
 
 export function isFunction(node) {
   return (

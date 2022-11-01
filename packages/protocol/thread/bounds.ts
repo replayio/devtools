@@ -1,7 +1,6 @@
 import { ObjectId, Rect } from "@replayio/protocol";
 
 import { DisallowEverythingProxyHandler } from "../utils";
-
 import { Pause } from "./pause";
 
 // Used by the highlighter when showing the bounding client rect of a node

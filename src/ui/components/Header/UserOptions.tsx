@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
+
 import * as actions from "ui/actions/app";
 import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";

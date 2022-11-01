@@ -1,7 +1,11 @@
 import classNames from "classnames";
-import ClientValueValueRenderer from "bvaughn-architecture-demo/components/inspector/values/ClientValueValueRenderer";
+import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
+import { useLayoutEffect } from "react";
+import { Suspense, memo, useContext } from "react";
+
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import Inspector from "bvaughn-architecture-demo/components/inspector";
+import ClientValueValueRenderer from "bvaughn-architecture-demo/components/inspector/values/ClientValueValueRenderer";
 import Loader from "bvaughn-architecture-demo/components/Loader";
 import { ConsoleFiltersContext } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
@@ -11,16 +15,12 @@ import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/Timeline
 import { runAnalysisSuspense } from "bvaughn-architecture-demo/src/suspense/AnalysisCache";
 import { primitiveToClientValue } from "bvaughn-architecture-demo/src/utils/protocol";
 import { formatTimestamp } from "bvaughn-architecture-demo/src/utils/time";
-import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
-import { useLayoutEffect } from "react";
-import { memo, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Badge } from "shared/client/types";
 
 import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
 import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
-
 import styles from "./shared.module.css";
 
 const NEW_BADGE_THRESHOLD = 5_000;

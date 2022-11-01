@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 // export const CodeMirror = require("codemirror");
-import type { Editor, Doc, DocOrEditor } from "codemirror";
+import type { Doc, DocOrEditor, Editor } from "codemirror";
 import { default as CodeMirror } from "codemirror";
 
 require("codemirror/mode/javascript/javascript");

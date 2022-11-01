@@ -1,9 +1,10 @@
-import { useContext, useState, useEffect } from "react";
-import { useAppSelector } from "ui/setup/hooks";
-import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
+import { SearchSourceContentsMatch, SourceLocation } from "@replayio/protocol";
+import { useContext, useEffect, useState } from "react";
+
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { getAllSourceDetails, getSourcesLoading } from "ui/reducers/sources";
-import { SourceLocation, SearchSourceContentsMatch } from "@replayio/protocol";
+import { useAppSelector } from "ui/setup/hooks";
 
 export type CypressResult = {
   test: string;

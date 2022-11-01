@@ -1,17 +1,19 @@
 import { RecordingId } from "@replayio/protocol";
+import classNames from "classnames";
 import React, { useState } from "react";
+
+import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
 import { WorkspaceId } from "ui/state/app";
-import { Dropdown, DropdownItem } from "../../../../LibraryDropdown";
-import { DisabledButton, getButtonClasses } from "../../../../../shared/Button";
-import MaterialIcon from "../../../../../shared/MaterialIcon";
-import classNames from "classnames";
-import PortalDropdown from "../../../../../shared/PortalDropdown";
-import MoveRecordingMenu from "../RecordingListItem/MoveRecordingMenu";
-import { useConfirm } from "../../../../../shared/Confirm";
 import { Recording } from "ui/types";
 import { useIsPublicEnabled } from "ui/utils/org";
-import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
+
+import { DisabledButton, getButtonClasses } from "../../../../../shared/Button";
+import { useConfirm } from "../../../../../shared/Confirm";
+import MaterialIcon from "../../../../../shared/MaterialIcon";
+import PortalDropdown from "../../../../../shared/PortalDropdown";
+import { Dropdown, DropdownItem } from "../../../../LibraryDropdown";
+import MoveRecordingMenu from "../RecordingListItem/MoveRecordingMenu";
 
 const getConfirmOptions = (
   count: number,

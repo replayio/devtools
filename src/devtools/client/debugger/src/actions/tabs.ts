@@ -10,18 +10,17 @@
  */
 
 import { UIThunkAction } from "ui/actions";
-import type { Context } from "../reducers/pause";
-
-import { removeDocument } from "../utils/editor";
-import { selectSource } from "./sources";
-
-import { getSourceTabs, getNewSelectedSourceId } from "../selectors";
 import {
-  getSourceToDisplayForUrl,
-  isOriginalSource,
   MiniSource,
   SourceDetails,
+  getSourceToDisplayForUrl,
+  isOriginalSource,
 } from "ui/reducers/sources";
+
+import type { Context } from "../reducers/pause";
+import { getNewSelectedSourceId, getSourceTabs } from "../selectors";
+import { removeDocument } from "../utils/editor";
+import { selectSource } from "./sources";
 
 export function updateTab(source: SourceDetails, framework: string) {
   const { url, id: sourceId } = source;

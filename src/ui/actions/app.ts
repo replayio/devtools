@@ -1,9 +1,34 @@
-import { UIStore, UIThunkAction } from ".";
-import { unprocessedRegions, KeyboardEvent, NodeBounds } from "@replayio/protocol";
-import * as selectors from "ui/reducers/app";
-import { Canvas, ReplayEvent, ReplayNavigationEvent, EventKind } from "ui/state/app";
+import { KeyboardEvent, NodeBounds, unprocessedRegions } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
+
+import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
+import { shallowEqual } from "devtools/client/debugger/src/utils/compare";
+import { prefs } from "devtools/client/debugger/src/utils/prefs";
+import { ThreadFront as ThreadFrontType } from "protocol/thread";
+import { ReplayClientInterface } from "shared/client/types";
+import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
+import * as selectors from "ui/reducers/app";
+import { getTheme } from "ui/reducers/app";
+import { getShowVideoPanel } from "ui/reducers/layout";
+import { Canvas, EventKind, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
+import { getBoundingRectsAsync } from "ui/suspense/nodeCaches";
 import { compareBigInt } from "ui/utils/helpers";
+import { getRecordingId } from "ui/utils/recording";
+
+import {
+  durationSeen,
+  getIsIndexed,
+  getLoadingStatusSlow,
+  loadReceivedEvents,
+  setCanvas as setCanvasAction,
+  setIsNodePickerActive,
+  setLoadedRegions,
+  setLoadingStatusSlow,
+  setModal,
+  setMouseTargetsLoading,
+  setSessionId,
+  updateTheme,
+} from "../reducers/app";
 import {
   hideCommandPalette,
   setSelectedPanel,
@@ -12,35 +37,10 @@ import {
   setToolboxLayout,
   setViewMode,
 } from "./layout";
-import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
-import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
-import { getRecordingId } from "ui/utils/recording";
-import { prefs } from "devtools/client/debugger/src/utils/prefs";
-import { shallowEqual } from "devtools/client/debugger/src/utils/compare";
-import { ThreadFront as ThreadFrontType } from "protocol/thread";
-import { getTheme } from "ui/reducers/app";
-import { getShowVideoPanel } from "ui/reducers/layout";
-import { getBoundingRectsAsync } from "ui/suspense/nodeCaches";
+import { toggleFocusMode } from "./timeline";
+import { UIStore, UIThunkAction } from ".";
 
 export * from "../reducers/app";
-
-import {
-  getIsIndexed,
-  getLoadingStatusSlow,
-  durationSeen,
-  setMouseTargetsLoading,
-  setLoadedRegions,
-  setLoadingStatusSlow,
-  updateTheme,
-  setSessionId,
-  setModal,
-  loadReceivedEvents,
-  setIsNodePickerActive,
-  setCanvas as setCanvasAction,
-} from "../reducers/app";
-
-import { toggleFocusMode } from "./timeline";
-import { ReplayClientInterface } from "shared/client/types";
 
 const supportsPerformanceNow =
   typeof performance !== "undefined" && typeof performance.now === "function";

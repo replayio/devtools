@@ -1,14 +1,15 @@
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
+
 import * as actions from "ui/actions/app";
 import { AvatarImage } from "ui/components/Avatar";
 import hooks from "ui/hooks";
-import { useGetUserInfo, UserInfo } from "ui/hooks/users";
+import { useBoolPref, useFeature } from "ui/hooks/settings";
+import { UserInfo, useGetUserInfo } from "ui/hooks/users";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { SettingsTabTitle } from "ui/state/app";
 import useAuth0 from "ui/utils/useAuth0";
-import { useFeature, useBoolPref } from "ui/hooks/settings";
 
 import APIKeys from "../APIKeys";
 import ExternalLink from "../ExternalLink";
@@ -16,7 +17,6 @@ import SettingsModal from "../SettingsModal";
 import { SettingsBodyHeader } from "../SettingsModal/SettingsBody";
 import { Settings } from "../SettingsModal/types";
 import { CheckboxRow } from "./CheckboxRow";
-
 import ExperimentalSettings from "./ExperimentalSettings";
 import PreferencesSettings from "./PreferencesSettings";
 

@@ -1,36 +1,8 @@
-import "../src/test-prep";
-
-import { SystemProvider } from "design";
-import { useAuth0 } from "@auth0/auth0-react";
-import Head from "next/head";
-import type { AppContext, AppProps } from "next/app";
-import { useRouter } from "next/router";
-import NextApp from "next/app";
-import { setRepaintAfterEvaluationsExperimentalFlag } from "protocol/thread/thread";
-import React, { ReactNode, useEffect, useState } from "react";
-import { Provider } from "react-redux";
-import { Store } from "@reduxjs/toolkit";
-import LoadingScreen from "ui/components/shared/LoadingScreen";
-import ErrorBoundary from "ui/components/ErrorBoundary";
-import _App from "ui/components/App";
-import { bootstrapApp } from "ui/setup";
-import { ConfirmProvider } from "ui/components/shared/Confirm";
-import MaintenanceModeScreen from "ui/components/MaintenanceMode";
-import { InstallRouteListener } from "ui/utils/routeListener";
-import { useLaunchDarkly } from "ui/utils/launchdarkly";
-import { pingTelemetry } from "ui/utils/replay-telemetry";
-import tokenManager from "ui/utils/tokenManager";
-import { ApolloWrapper } from "ui/components/ApolloWrapper";
-import { configureMockEnvironmentForTesting, isMock } from "ui/utils/environment";
-import { features } from "ui/utils/prefs";
-
 import "image/image.css";
 import "image/icon.css";
 import "tailwindcss/tailwind.css";
-import "../src/base.css";
 import "devtools/client/debugger/src/components/variables.css";
 import "devtools/client/themes/variables.css";
-
 /////////////////// here be dragons ... ////////////////////
 import "codemirror/lib/codemirror.css";
 import "devtools/client/debugger/src/components/A11yIntention.css";
@@ -117,6 +89,33 @@ import "ui/components/Timeline/Timeline.css";
 import "ui/components/Timeline/Tooltip.css";
 import "ui/components/Toolbox.css";
 import "packages/third-party/sourcemap-visualizer/sourcemapVisualizer.css";
+import "../src/test-prep";
+import { useAuth0 } from "@auth0/auth0-react";
+import { Store } from "@reduxjs/toolkit";
+import type { AppContext, AppProps } from "next/app";
+import NextApp from "next/app";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { ReactNode, useEffect, useState } from "react";
+import { Provider } from "react-redux";
+
+import { SystemProvider } from "design";
+import { setRepaintAfterEvaluationsExperimentalFlag } from "protocol/thread/thread";
+import { ApolloWrapper } from "ui/components/ApolloWrapper";
+import _App from "ui/components/App";
+import ErrorBoundary from "ui/components/ErrorBoundary";
+import MaintenanceModeScreen from "ui/components/MaintenanceMode";
+import { ConfirmProvider } from "ui/components/shared/Confirm";
+import LoadingScreen from "ui/components/shared/LoadingScreen";
+import { bootstrapApp } from "ui/setup";
+import { configureMockEnvironmentForTesting, isMock } from "ui/utils/environment";
+import { useLaunchDarkly } from "ui/utils/launchdarkly";
+import { features } from "ui/utils/prefs";
+import { pingTelemetry } from "ui/utils/replay-telemetry";
+import { InstallRouteListener } from "ui/utils/routeListener";
+import tokenManager from "ui/utils/tokenManager";
+
+import "../src/base.css";
 
 if (isMock()) {
   // If this is an end to end test, bootstrap the mock environment.

@@ -1,7 +1,8 @@
 import clamp from "lodash/clamp";
-import { useAppSelector } from "ui/setup/hooks";
+
 import { getLoadedRegions } from "ui/reducers/app";
 import { getZoomRegion } from "ui/reducers/timeline";
+import { useAppSelector } from "ui/setup/hooks";
 import { overlap } from "ui/utils/timeline";
 
 import styles from "./LoadingProgressBars.module.css";

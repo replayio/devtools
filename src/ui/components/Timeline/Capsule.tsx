@@ -1,18 +1,18 @@
 import classNames from "classnames";
 import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
-import { useAppSelector } from "ui/setup/hooks";
+
 import { getLoadedAndIndexedProgress, getLoadingStatusSlow } from "ui/actions/app";
 import ExternalLink from "ui/components/shared/ExternalLink";
+import { useFeature } from "ui/hooks/settings";
 import useModalDismissSignal from "ui/hooks/useModalDismissSignal";
 import { getBasicProcessingProgress, getShowFocusModeControls } from "ui/reducers/timeline";
+import { useAppSelector } from "ui/setup/hooks";
 
 import Icon from "../shared/Icon";
-
-import styles from "./Capsule.module.css";
 import { EditFocusButton } from "./EditFocusButton";
 import FocusInputs from "./FocusInputs";
-import { useFeature } from "ui/hooks/settings";
+import styles from "./Capsule.module.css";
 
 const SHOW_SLOW_LOADING_POP_OUT_AFTER_DELAY = 1000;
 

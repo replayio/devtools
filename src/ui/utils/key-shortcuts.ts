@@ -1,6 +1,7 @@
-import Services from "devtools/shared/services";
-import EventEmitter from "devtools/shared/event-emitter";
 import { KeyCodes } from "devtools/client/shared/keycodes";
+import EventEmitter from "devtools/shared/event-emitter";
+import Services from "devtools/shared/services";
+
 import { usesWindow } from "../../ssr";
 
 const isOSX = Services.appinfo.OS === "Darwin";

@@ -74,7 +74,9 @@ export interface GetWorkspaceRecordings_node_Workspace {
   recordings: GetWorkspaceRecordings_node_Workspace_recordings | null;
 }
 
-export type GetWorkspaceRecordings_node = GetWorkspaceRecordings_node_Recording | GetWorkspaceRecordings_node_Workspace;
+export type GetWorkspaceRecordings_node =
+  | GetWorkspaceRecordings_node_Recording
+  | GetWorkspaceRecordings_node_Workspace;
 
 export interface GetWorkspaceRecordings {
   node: GetWorkspaceRecordings_node | null;

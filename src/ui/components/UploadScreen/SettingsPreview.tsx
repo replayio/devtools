@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import React from "react";
+
 import { Workspace } from "ui/types";
 import { getOrganizationSettings } from "ui/utils/org";
 
@@ -59,7 +60,7 @@ export default function SettingsPreview({
     <button
       className={classNames(
         !canEdit && "cursor-default",
-        "flex w-full flex-row items-center justify-between hover:text-primaryAccent focus:outline-none focus:text-primaryAccentHover"
+        "flex w-full flex-row items-center justify-between hover:text-primaryAccent focus:text-primaryAccentHover focus:outline-none"
       )}
       type="button"
       onClick={canEdit ? onClick : undefined}

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
+import type { ParentMap, TreeDirectory, TreeNode, TreeSource } from "./types";
 
 export function formatTree(tree: TreeNode, depth = 0, str = "") {
   const whitespace = new Array(depth * 2).join(" ");

@@ -1,4 +1,5 @@
 import { MockedResponse } from "@apollo/client/testing";
+
 import { GetActiveSessions, GetActiveSessionsVariables } from "graphql/GetActiveSessions";
 import { GET_ACTIVE_SESSIONS } from "ui/graphql/sessions";
 

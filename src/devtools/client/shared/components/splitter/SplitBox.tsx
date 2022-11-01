@@ -1,6 +1,7 @@
-import { CSSProperties, FC, ReactNode, useEffect, useRef, useState } from "react";
-import debounce from "lodash/debounce";
 import cx from "classnames";
+import debounce from "lodash/debounce";
+import { CSSProperties, FC, ReactNode, useEffect, useRef, useState } from "react";
+
 import Draggable from "devtools/client/shared/components/splitter/Draggable";
 
 const dispatchResize = debounce(() => window.dispatchEvent(new Event("resize")), 50);

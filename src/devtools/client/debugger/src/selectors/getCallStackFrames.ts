@@ -3,9 +3,10 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import type { Dictionary } from "@reduxjs/toolkit";
-import type { PauseFrame } from "../reducers/pause";
 
 import { SourceDetails } from "ui/reducers/sources";
+
+import type { PauseFrame } from "../reducers/pause";
 import { annotateFrames } from "../utils/pause/frames";
 
 function getLocation(frame: PauseFrame) {

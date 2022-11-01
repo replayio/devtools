@@ -1,23 +1,47 @@
-import { MouseEvent, sessionError, TimeStampedPoint, uploadedData } from "@replayio/protocol";
-import { ActionCreatorWithoutPayload } from "@reduxjs/toolkit";
-import debounce from "lodash/debounce";
 // Side-effectful import, has to be imported before event-listeners
 // Ordering matters here
 import "devtools/client/inspector/prefs";
+import { ActionCreatorWithoutPayload } from "@reduxjs/toolkit";
+import { bindActionCreators } from "@reduxjs/toolkit";
+import { MouseEvent, TimeStampedPoint, sessionError, uploadedData } from "@replayio/protocol";
+import debounce from "lodash/debounce";
+
+import {
+  getCachedObject,
+  getObjectPropertyHelper,
+  getObjectThrows,
+  getObjectWithPreviewHelper,
+} from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import { setupSourcesListeners } from "devtools/client/debugger/src/actions/sources";
 import * as dbgClient from "devtools/client/debugger/src/client";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
 import { bootstrapWorkers } from "devtools/client/debugger/src/utils/bootstrap";
 import { setupDebuggerHelper } from "devtools/client/debugger/src/utils/dbg";
+import { setupBoxModel } from "devtools/client/inspector/boxmodel/actions/box-model";
+import { setupMarkup } from "devtools/client/inspector/markup/actions/markup";
+import * as inspectorReducers from "devtools/client/inspector/reducers";
+import { setupRules } from "devtools/client/inspector/rules/actions/rules";
 import { setupNetwork } from "devtools/client/webconsole/actions/network";
 import { initOutputSyntaxHighlighting } from "devtools/client/webconsole/utils/syntax-highlighted";
+import { setPointsReceivedCallback as setAnalysisPointsReceivedCallback } from "protocol/analysisManager";
 import { Canvas, setAllPaintsReceivedCallback, setupGraphics } from "protocol/graphics";
+import {
+  setMouseDownEventsCallback,
+  setPausedonPausedAtTimeCallback,
+  setPlaybackStatusCallback,
+  setPointsReceivedCallback,
+  setRefreshGraphicsCallback,
+  setVideoUrlCallback,
+} from "protocol/graphics";
 // eslint-disable-next-line no-restricted-imports
-import { initSocket, addEventListener, client as protocolClient } from "protocol/socket";
+import { addEventListener, initSocket, client as protocolClient } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
-import { bindActionCreators } from "@reduxjs/toolkit";
-import { actions, UIStore } from "ui/actions";
+import { ReplayClientInterface } from "shared/client/types";
+import { UIStore, actions } from "ui/actions";
+import { setCanvas } from "ui/actions/app";
 import { setupReactDevTools } from "ui/actions/reactDevTools";
+import { precacheScreenshots } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import app, { loadReceivedEvents, setVideoUrl } from "ui/reducers/app";
 import contextMenus from "ui/reducers/contextMenus";
@@ -30,38 +54,13 @@ import timeline, {
   pointsReceivedThunk,
   setPlaybackStalled,
 } from "ui/reducers/timeline";
-import type { ThunkExtraArgs } from "ui/utils/thunk";
-import {
-  setMouseDownEventsCallback,
-  setPausedonPausedAtTimeCallback,
-  setPlaybackStatusCallback,
-  setPointsReceivedCallback,
-  setRefreshGraphicsCallback,
-  setVideoUrlCallback,
-} from "protocol/graphics";
-import { setPointsReceivedCallback as setAnalysisPointsReceivedCallback } from "protocol/analysisManager";
-
-import { extendStore, AppStore } from "../store";
-import { startAppListening } from "../listenerMiddleware";
-import * as inspectorReducers from "devtools/client/inspector/reducers";
-import { setupSourcesListeners } from "devtools/client/debugger/src/actions/sources";
-import { setupMarkup } from "devtools/client/inspector/markup/actions/markup";
-import { setupBoxModel } from "devtools/client/inspector/boxmodel/actions/box-model";
-import { setupRules } from "devtools/client/inspector/rules/actions/rules";
-import {
-  getCachedObject,
-  getObjectThrows,
-  getObjectWithPreviewHelper,
-  getObjectPropertyHelper,
-} from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
-
-import { setCanvas } from "ui/actions/app";
-import { precacheScreenshots } from "ui/actions/timeline";
-import { UnexpectedError } from "ui/state/app";
-
 import { UIState } from "ui/state";
+import { UnexpectedError } from "ui/state/app";
 import { setupGetPreferredLocation } from "ui/utils/preferredLocation";
-import { ReplayClientInterface } from "shared/client/types";
+import type { ThunkExtraArgs } from "ui/utils/thunk";
+
+import { startAppListening } from "../listenerMiddleware";
+import { AppStore, extendStore } from "../store";
 
 const { setupApp, setupTimeline } = actions;
 

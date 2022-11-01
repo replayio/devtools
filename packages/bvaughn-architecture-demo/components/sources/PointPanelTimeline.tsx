@@ -1,12 +1,3 @@
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
-import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
-import { imperativelyGetClosestPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
-import {
-  formatTimestamp,
-  isExecutionPointsGreaterThan,
-  isExecutionPointsLessThan,
-} from "bvaughn-architecture-demo/src/utils/time";
 import { TimeStampedPoint } from "@replayio/protocol";
 import {
   CSSProperties,
@@ -18,12 +9,22 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+
+import Icon from "bvaughn-architecture-demo/components/Icon";
+import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
+import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
+import { imperativelyGetClosestPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
+import {
+  formatTimestamp,
+  isExecutionPointsGreaterThan,
+  isExecutionPointsLessThan,
+} from "bvaughn-architecture-demo/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { HitPointStatus, Point } from "shared/client/types";
 
-import styles from "./PointPanelTimeline.module.css";
 import { getBadgeStyleVars } from "./utils/getBadgeStyleVars";
 import { findHitPoint, findHitPointAfter, findHitPointBefore } from "./utils/points";
+import styles from "./PointPanelTimeline.module.css";
 
 export default function PointPanelTimeline({
   hitPoints,

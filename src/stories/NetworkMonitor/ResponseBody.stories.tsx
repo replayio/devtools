@@ -1,6 +1,8 @@
+import { Meta, Story } from "@storybook/react";
 import React, { ComponentProps } from "react";
-import { Story, Meta } from "@storybook/react";
+
 import { _ResponseBody as ResponseBody } from "ui/components/NetworkMonitor/ResponseBody";
+
 import { requestSummary } from "./utils";
 
 export default {

@@ -1,14 +1,15 @@
 const Services = require("devtools/shared/services");
+
 import React, { FC, useCallback, useMemo, useState } from "react";
 
-import Accordion from "devtools/client/shared/components/Accordion";
 import { Rule } from "devtools/client/inspector/rules/components/Rule";
 import { Rules } from "devtools/client/inspector/rules/components/Rules";
 import { Toolbar } from "devtools/client/inspector/rules/components/Toolbar";
-
+import Accordion from "devtools/client/shared/components/Accordion";
 import { useAppSelector } from "ui/setup/hooks";
-import { RuleState } from "../reducers/rules";
+
 import { RuleInheritance } from "../models/rule";
+import { RuleState } from "../reducers/rules";
 
 const SHOW_PSEUDO_ELEMENTS_PREF = "devtools.inspector.show_pseudo_elements";
 

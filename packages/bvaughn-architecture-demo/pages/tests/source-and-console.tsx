@@ -8,8 +8,8 @@ import { SourcesContextRoot } from "bvaughn-architecture-demo/src/contexts/Sourc
 import { TerminalContextRoot } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
 import { TimelineContextRoot } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 
-import styles from "./styles.module.css";
 import createTest from "./utils/createTest";
+import styles from "./styles.module.css";
 
 const DEFAULT_RECORDING_ID = "dbd4da74-cf42-41fb-851d-69bed67debcf";
 

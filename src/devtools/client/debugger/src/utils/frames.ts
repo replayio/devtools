@@ -1,8 +1,10 @@
 import { PauseId } from "@replayio/protocol";
+
 import { ThreadFront } from "protocol/thread/thread";
 import { SourcesState } from "ui/reducers/sources";
 import { getPauseFramesIfCached } from "ui/suspense/frameCache";
 import { getFrameStepsIfCached } from "ui/suspense/frameStepsCache";
+
 import { PauseFrame } from "../selectors";
 
 // returns all cached frames from the given pauseId and its async parent pauseIds
