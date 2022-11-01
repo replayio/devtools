@@ -11,7 +11,7 @@
     "@lezer/common_bvaughn": "npm:@lezer/common@1.0.1",
     "@lezer/highlight_bvaughn": "npm:@lezer/highlight@1.1.1",
     "@replayio/protocol": "^0.32.2",
-    "date-fns": "^2.28.0",
+    "date-fns": "^2.29.3",
     "design": "workspace:*",
     "js-tokens": "^8.0.0",
     "lodash": "^4.17.21",

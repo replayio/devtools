@@ -9159,7 +9159,7 @@ __metadata:
     "@replayio/protocol": ^0.32.2
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
-    date-fns: ^2.28.0
+    date-fns: ^2.29.3
     design: "workspace:*"
     jest: ^28.0.2
     jest-environment-jsdom: ^28.0.2
@@ -10830,10 +10830,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"date-fns@npm:^2.28.0":
-  version: 2.28.0
-  resolution: "date-fns@npm:2.28.0"
-  checksum: a0516b2e4f99b8bffc6cc5193349f185f195398385bdcaf07f17c2c4a24473c99d933eb0018be4142a86a6d46cb0b06be6440ad874f15e795acbedd6fd727a1f
+"date-fns@npm:^2.29.3":
+  version: 2.29.3
+  resolution: "date-fns@npm:2.29.3"
+  checksum: e01cf5b62af04e05dfff921bb9c9933310ed0e1ae9a81eb8653452e64dc841acf7f6e01e1a5ae5644d0337e9a7f936175fd2cb6819dc122fdd9c5e86c56be484
   languageName: node
   linkType: hard
 
@@ -20726,7 +20726,7 @@ __metadata:
     comlink: ^4.3.1
     cookie: ^0.4.2
     css-loader: ^6.7.1
-    date-fns: ^2.28.0
+    date-fns: ^2.29.3
     design: "workspace:*"
     dotenv: ^16.0.0
     escape-html: ^1.0.3
