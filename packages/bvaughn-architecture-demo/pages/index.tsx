@@ -13,7 +13,7 @@ import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
 import { InspectorContextRoot } from "@bvaughn/src/contexts/InspectorContext";
 import { KeyboardModifiersContextRoot } from "@bvaughn/src/contexts/KeyboardModifiersContext";
 import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
-import SelectedFrameContextWrapper from "@bvaughn/src/contexts/SelectedFrameContext";
+import { SelectedFrameContextRoot } from "@bvaughn/src/contexts/SelectedFrameContext";
 import { SourcesContextRoot } from "@bvaughn/src/contexts/SourcesContext";
 import { TerminalContextRoot } from "@bvaughn/src/contexts/TerminalContext";
 import { TimelineContextRoot } from "@bvaughn/src/contexts/TimelineContext";
@@ -80,7 +80,7 @@ export default function HomePage() {
             <PointsContextRoot>
               <TimelineContextRoot>
                 <FocusContextRoot>
-                  <SelectedFrameContextWrapper>
+                  <SelectedFrameContextRoot>
                     <div className={styles.VerticalContainer}>
                       <div className={styles.HorizontalContainer}>
                         <div className={styles.ToolBar}>
@@ -145,7 +145,7 @@ export default function HomePage() {
                         </Suspense>
                       </div>
                     </div>
-                  </SelectedFrameContextWrapper>
+                  </SelectedFrameContextRoot>
                 </FocusContextRoot>
               </TimelineContextRoot>
             </PointsContextRoot>

@@ -40,10 +40,10 @@ import { isTest } from "ui/utils/environment";
 import { PointsContextRoot } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import TimelineContextAdapter from "./SecondaryToolbox/TimelineContextAdapter";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
-import SelectedFrameContextWrapper from "./SelectedFrameContextAdapter";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import usePreferredFontSize from "@bvaughn/src/hooks/usePreferredFontSize";
 import { useFeature } from "ui/hooks/settings";
+import { SelectedFrameContextRoot } from "@bvaughn/src/contexts/SelectedFrameContext";
 
 const Viewer = React.lazy(() => import("./Viewer"));
 
@@ -206,9 +206,9 @@ function _DevTools({
     <SessionContextAdapter>
       <SourcesContextAdapter>
         <FocusContextReduxAdapter>
-          <SelectedFrameContextWrapper>
-            <PointsContextRoot>
-              <TimelineContextAdapter>
+          <PointsContextRoot>
+            <TimelineContextAdapter>
+              <SelectedFrameContextRoot>
                 <TerminalContextAdapter>
                   <InspectorContextReduxAdapter>
                     <KeyModifiers>
@@ -219,9 +219,9 @@ function _DevTools({
                     </KeyModifiers>
                   </InspectorContextReduxAdapter>
                 </TerminalContextAdapter>
-              </TimelineContextAdapter>
-            </PointsContextRoot>
-          </SelectedFrameContextWrapper>
+              </SelectedFrameContextRoot>
+            </TimelineContextAdapter>
+          </PointsContextRoot>
         </FocusContextReduxAdapter>
       </SourcesContextAdapter>
     </SessionContextAdapter>
