@@ -89,7 +89,7 @@
     "react-merge-refs": "^1.1.0",
     "react-redux": "^8.0.2",
     "react-table": "^7.7.0",
-    "react-tooltip": "^4.2.21",
+    "react-tooltip": "^4.4.3",
     "react-transition-group": "^4.4.2",
     "react-virtualized-auto-sizer": "^1.0.6",
     "react-window": "^1.8.8",
