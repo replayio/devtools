@@ -2,15 +2,28 @@
   --font-family-default: sans-serif;
   --font-family-monospace: Menlo, ui-monospace, SFMono-Regular, Monaco, Consolas, Liberation Mono,
     Courier New, monospace;
+}
 
+:root,
+:root.prefers-default-font-size {
   --font-size-large: 16px;
   --font-size-regular: 12px;
   --font-size-small: 10px;
   --font-size-tiny: 8px;
 }
 
+:root.prefers-large-font-size {
+  --font-size-large: 20px;
+  --font-size-regular: 14px;
+  --font-size-small: 12px;
+  --font-size-tiny: 10px;
+}
+
+:root,
 :root.theme-dark {
   --color-transparent: rgba(0, 0, 0, 0);
+
+  --scroll-thumb-color: #454950;
 
   --background-color-contrast-1: #0e1119;
   --background-color-contrast-2: #192230;
@@ -119,6 +132,8 @@
 
 :root.theme-light {
   --color-transparent: rgba(255, 255, 255, 0);
+
+  --scroll-thumb-color: #aaaaaa;
 
   --background-color-contrast-1: #e6e6e6;
   --background-color-contrast-2: #ffffff;

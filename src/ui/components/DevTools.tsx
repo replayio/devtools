@@ -42,6 +42,8 @@ import TimelineContextAdapter from "./SecondaryToolbox/TimelineContextAdapter";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
 import SelectedFrameContextWrapper from "./SelectedFrameContextAdapter";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
+import usePreferredFontSize from "@bvaughn/src/hooks/usePreferredFontSize";
+import { useFeature } from "ui/hooks/settings";
 
 const Viewer = React.lazy(() => import("./Viewer"));
 
@@ -122,6 +124,9 @@ function _DevTools({
     () => recording?.user && !recording.user.internal,
     [recording]
   );
+
+  const { value: enableLargeText } = useFeature("enableLargeText");
+  usePreferredFontSize(enableLargeText);
 
   useEffect(() => {
     import("./Viewer");
