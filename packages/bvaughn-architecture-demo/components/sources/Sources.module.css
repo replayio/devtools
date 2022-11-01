@@ -41,7 +41,6 @@
 
 .Content {
   background-color: var(--background-color-contrast-2);
-  border: 1px solid var(--background-color-contrast-1);
   border-bottom-right-radius: 0.5em;
   padding: 0;
   flex: 1 1 auto;

@@ -25,3 +25,23 @@ body {
 button {
   font-size: inherit;
 }
+
+::-webkit-scrollbar {
+  width: 0.75em;
+  height: 0.75em;
+  background: transparent;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 0.75em;
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 0.75em;
+  background: var(--background-color-contrast-4);
+}

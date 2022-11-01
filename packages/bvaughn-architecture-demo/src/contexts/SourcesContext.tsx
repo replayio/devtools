@@ -18,7 +18,7 @@ type SourcesContextType = {
   hoveredLineIndex: number | null;
   hoveredLineNode: HTMLElement | null;
   isPending: boolean;
-  markUpdateProcessed: () => void;
+  markPendingFocusUpdateProcessed: () => void;
   openSource: (sourceId: SourceId, lineNumber?: number) => void;
   openSourceIds: SourceId[];
   pendingFocusUpdate: boolean;
@@ -141,14 +141,14 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
         visibleLinesBySourceId: prevVisibleLinesBySourceId,
       } = state;
 
-      // Only bail out if pendingFocusUpdate is also true;
-      // This ensures we re-scroll to a focused line if the user has scrolled away.
-      if (
-        lineNumber === prevFocusedLineNumber &&
-        sourceId === prevFocusedSourceId &&
-        prevPendingFocusUpdate
-      ) {
-        return state;
+      if (sourceId === prevFocusedSourceId) {
+        if (prevPendingFocusUpdate) {
+          // Only bail out if pendingFocusUpdate is also true;
+          // This ensures we re-scroll to a focused line if the user has scrolled away.
+          if (lineNumber === null || lineNumber === prevFocusedLineNumber) {
+            return state;
+          }
+        }
       }
 
       let openSourceIds = prevOpenSourceIds;
@@ -252,7 +252,7 @@ export function SourcesContextRoot({ children }: PropsWithChildren) {
     });
   }, []);
 
-  const markUpdateProcessed = useCallback(() => {
+  const markPendingFocusUpdateProcessed = useCallback(() => {
     startTransition(() => {
       dispatch({ type: "mark_update_processed" });
     });
@@ -301,7 +301,7 @@ export function SourcesContextRoot({ children }: PropsWithChildren) {
 
       closeSource,
       isPending,
-      markUpdateProcessed,
+      markPendingFocusUpdateProcessed,
       openSource,
       setHoveredLocation,
       setVisibleLines,
@@ -309,7 +309,7 @@ export function SourcesContextRoot({ children }: PropsWithChildren) {
     [
       closeSource,
       isPending,
-      markUpdateProcessed,
+      markPendingFocusUpdateProcessed,
       openSource,
       setHoveredLocation,
       setVisibleLines,

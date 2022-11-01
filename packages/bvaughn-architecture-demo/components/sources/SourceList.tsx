@@ -55,14 +55,14 @@ export default function SourceList({
   const {
     focusedLineNumber,
     focusedSourceId,
-    markUpdateProcessed,
+    markPendingFocusUpdateProcessed,
     pendingFocusUpdate,
     setVisibleLines,
     visibleLines,
   } = useContext(SourcesContext);
 
   useEffect(() => {
-    if (pendingFocusUpdate === null || focusedLineNumber === null || focusedSourceId !== sourceId) {
+    if (pendingFocusUpdate === null || focusedLineNumber === null || focusedSourceId === null) {
       return;
     }
 
@@ -70,10 +70,19 @@ export default function SourceList({
     if (list) {
       const lineIndex = focusedLineNumber - 1;
       list.scrollToItem(lineIndex, "smart");
-    }
 
-    markUpdateProcessed();
-  }, [focusedLineNumber, focusedSourceId, markUpdateProcessed, pendingFocusUpdate, sourceId]);
+      // Important!
+      // Don't mark the update processed until we have actually scrolled to the line.
+      // The Source viewer might be suspended, loading data, and we don't want to drop the scroll action.
+      markPendingFocusUpdateProcessed();
+    }
+  }, [
+    focusedLineNumber,
+    focusedSourceId,
+    markPendingFocusUpdateProcessed,
+    pendingFocusUpdate,
+    sourceId,
+  ]);
 
   const [sourceSearchState, sourceSearchActions] = useContext(SourceSearchContext);
   useLayoutEffect(() => {
@@ -173,7 +182,7 @@ export default function SourceList({
     [points, sourceId]
   );
 
-  const maxLineWidthRef = useRef<number>(0);
+  const longestLineWidthRef = useRef<number>(0);
 
   const onItemsRendered = useCallback(
     ({ visibleStartIndex, visibleStopIndex }: ListOnItemsRenderedProps) => {
@@ -183,16 +192,16 @@ export default function SourceList({
       // This won't quite work the same as a non-windowed solution; it's an approximation.
       const container = innerRef.current;
       if (container) {
-        let maxLineWidth = 0;
+        let longestLineWidth = 0;
         for (let index = 0; index < container.children.length; index++) {
           const child = container.children[index];
-          maxLineWidth = Math.max(maxLineWidth, child.clientWidth);
+          longestLineWidth = Math.max(longestLineWidth, child.clientWidth);
         }
 
-        if (maxLineWidth > maxLineWidthRef.current) {
-          maxLineWidthRef.current = maxLineWidth;
+        if (longestLineWidth > longestLineWidthRef.current) {
+          longestLineWidthRef.current = longestLineWidth;
 
-          container.style.setProperty("--max-line-width", `${maxLineWidth}px`);
+          container.style.setProperty("--longest-line-width", `${longestLineWidth}px`);
         }
       }
     },

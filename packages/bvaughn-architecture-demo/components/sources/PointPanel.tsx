@@ -222,7 +222,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
           hasFrames: true,
           isPublished: false,
           point: currentExecutionPoint,
-          sourceLocation: location,
+          sourceLocation: point.location,
           time: curentTime,
         });
 
