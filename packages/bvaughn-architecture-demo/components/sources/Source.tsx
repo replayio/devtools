@@ -1,6 +1,6 @@
-import { getSourceContentsSuspense } from "@bvaughn/src/suspense/SourcesCache";
-import { parse } from "@bvaughn/src/suspense/SyntaxParsingCache";
-import { getSourceFileName } from "@bvaughn/src/utils/source";
+import { getSourceContentsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { parse } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
+import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
 import { newSource as ProtocolSource } from "@replayio/protocol";
 import debounce from "lodash/debounce";
 import { MouseEvent, Suspense, useContext, useLayoutEffect, useRef, useState } from "react";

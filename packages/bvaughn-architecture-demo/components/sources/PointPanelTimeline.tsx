@@ -1,12 +1,12 @@
-import Icon from "@bvaughn/components/Icon";
-import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
-import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
-import { imperativelyGetClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
+import Icon from "bvaughn-architecture-demo/components/Icon";
+import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
+import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
+import { imperativelyGetClosestPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import {
   formatTimestamp,
   isExecutionPointsGreaterThan,
   isExecutionPointsLessThan,
-} from "@bvaughn/src/utils/time";
+} from "bvaughn-architecture-demo/src/utils/time";
 import { TimeStampedPoint } from "@replayio/protocol";
 import {
   CSSProperties,

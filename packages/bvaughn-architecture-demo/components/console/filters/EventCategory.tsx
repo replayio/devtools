@@ -1,5 +1,5 @@
-import Expandable from "@bvaughn/components/Expandable";
-import type { EventCategory as EventCategoryType } from "@bvaughn/src/suspense/EventsCache";
+import Expandable from "bvaughn-architecture-demo/components/Expandable";
+import type { EventCategory as EventCategoryType } from "bvaughn-architecture-demo/src/suspense/EventsCache";
 import { Badge } from "design";
 import { useMemo } from "react";
 

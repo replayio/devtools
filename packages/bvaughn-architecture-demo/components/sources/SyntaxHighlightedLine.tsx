@@ -1,4 +1,4 @@
-import { parse } from "@bvaughn/src/suspense/SyntaxParsingCache";
+import { parse } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
 import { Suspense } from "react";
 
 import Loader from "../Loader";

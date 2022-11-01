@@ -1,4 +1,4 @@
-import { mergePropertiesAndGetterValues } from "@bvaughn/src/utils/protocol";
+import { mergePropertiesAndGetterValues } from "bvaughn-architecture-demo/src/utils/protocol";
 import { ReactNode, useMemo } from "react";
 
 import KeyValueRenderer from "../KeyValueRenderer";

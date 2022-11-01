@@ -1,8 +1,8 @@
-import Icon from "@bvaughn/components/Icon";
-import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
-import { getSourcesToDisplay, isIndexedSource } from "@bvaughn/src/suspense/SourcesCache";
-import { protocolSourcesToSourceTree } from "@bvaughn/src/utils/protocol";
-import { getSourceFileName } from "@bvaughn/src/utils/source";
+import Icon from "bvaughn-architecture-demo/components/Icon";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { getSourcesToDisplay, isIndexedSource } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { protocolSourcesToSourceTree } from "bvaughn-architecture-demo/src/utils/protocol";
+import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
 import { useContext, useMemo, useState } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 

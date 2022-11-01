@@ -1,9 +1,9 @@
-import Icon from "@bvaughn/components/Icon";
-import { GraphQLClientContext } from "@bvaughn/src/contexts/GraphQLClientContext";
-import { InspectorContext } from "@bvaughn/src/contexts/InspectorContext";
-import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
-import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
-import { addComment as addCommentGraphQL } from "@bvaughn/src/graphql/Comments";
+import Icon from "bvaughn-architecture-demo/components/Icon";
+import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
+import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
+import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
+import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
+import { addComment as addCommentGraphQL } from "bvaughn-architecture-demo/src/graphql/Comments";
 import { ExecutionPoint, Location } from "@replayio/protocol";
 import {
   MouseEvent,
@@ -15,10 +15,10 @@ import {
 } from "react";
 
 import styles from "./MessageHoverButton.module.css";
-import { useDismissNag } from "@bvaughn/src/hooks/useDismissNag";
-import { isExecutionPointsGreaterThan } from "@bvaughn/src/utils/time";
+import { useDismissNag } from "bvaughn-architecture-demo/src/hooks/useDismissNag";
+import { isExecutionPointsGreaterThan } from "bvaughn-architecture-demo/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { Nag } from "@bvaughn/src/graphql/types";
+import { Nag } from "bvaughn-architecture-demo/src/graphql/types";
 
 export default function MessageHoverButton({
   executionPoint,

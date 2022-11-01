@@ -1,11 +1,11 @@
-import Expandable from "@bvaughn/components/Expandable";
-import Icon from "@bvaughn/components/Icon";
-import Loader from "@bvaughn/components/Loader";
+import Expandable from "bvaughn-architecture-demo/components/Expandable";
+import Icon from "bvaughn-architecture-demo/components/Icon";
+import Loader from "bvaughn-architecture-demo/components/Loader";
 import {
   getObjectPropertySuspense,
   getObjectWithPreviewSuspense,
-} from "@bvaughn/src/suspense/ObjectPreviews";
-import { protocolValueToClientValue, Value as ClientValue } from "@bvaughn/src/utils/protocol";
+} from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import { protocolValueToClientValue, Value as ClientValue } from "bvaughn-architecture-demo/src/utils/protocol";
 import {
   Object as ProtocolObject,
   PauseId,

@@ -1,7 +1,7 @@
-import { SelectedFrameContext } from "@bvaughn/src/contexts/SelectedFrameContext";
-import { TerminalContext } from "@bvaughn/src/contexts/TerminalContext";
-import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
-import useCurrentPause from "@bvaughn/src/hooks/useCurrentPause";
+import { SelectedFrameContext } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
+import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
+import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
+import useCurrentPause from "bvaughn-architecture-demo/src/hooks/useCurrentPause";
 import { useContext, useEffect, useRef } from "react";
 
 import Icon from "../Icon";

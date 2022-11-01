@@ -1,15 +1,15 @@
-import "@bvaughn/components/sources/CodeMirror.css";
-import { SourceFileNameSearchContextRoot } from "@bvaughn/components/sources/SourceFileNameSearchContext";
-import SourceSearch from "@bvaughn/components/sources/SourceSearch";
+import "bvaughn-architecture-demo/components/sources/CodeMirror.css";
+import { SourceFileNameSearchContextRoot } from "bvaughn-architecture-demo/components/sources/SourceFileNameSearchContext";
+import SourceSearch from "bvaughn-architecture-demo/components/sources/SourceSearch";
 import {
   SourceSearchContext,
   SourceSearchContextRoot,
-} from "@bvaughn/components/sources/SourceSearchContext";
-import { KeyboardModifiersContextRoot } from "@bvaughn/src/contexts/KeyboardModifiersContext";
-import LazyOffscreen from "@bvaughn/components/LazyOffscreen";
-import Source from "@bvaughn/components/sources/Source";
-import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
-import { getSource } from "@bvaughn/src/suspense/SourcesCache";
+} from "bvaughn-architecture-demo/components/sources/SourceSearchContext";
+import { KeyboardModifiersContextRoot } from "bvaughn-architecture-demo/src/contexts/KeyboardModifiersContext";
+import LazyOffscreen from "bvaughn-architecture-demo/components/LazyOffscreen";
+import Source from "bvaughn-architecture-demo/components/sources/Source";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { getSource } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { KeyboardEvent, useContext, useEffect, useLayoutEffect, useRef } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useFeature } from "ui/hooks/settings";

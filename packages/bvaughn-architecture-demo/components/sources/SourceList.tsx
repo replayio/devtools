@@ -1,11 +1,11 @@
-import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
-import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
-import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
-import useLocalStorage from "@bvaughn/src/hooks/useLocalStorage";
+import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
+import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
 import {
   getCachedMinMaxSourceHitCounts,
   getSourceHitCountsSuspense,
-} from "@bvaughn/src/suspense/SourcesCache";
+} from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { newSource as ProtocolSource } from "@replayio/protocol";
 import {
   CSSProperties,

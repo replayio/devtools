@@ -1,5 +1,5 @@
-import Icon from "@bvaughn/components/Icon";
-import { AddPoint, DeletePoints, EditPoint } from "@bvaughn/src/contexts/PointsContext";
+import Icon from "bvaughn-architecture-demo/components/Icon";
+import { AddPoint, DeletePoints, EditPoint } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import { newSource as ProtocolSource } from "@replayio/protocol";
 import { memo, Suspense, useState } from "react";
 import { areEqual } from "react-window";

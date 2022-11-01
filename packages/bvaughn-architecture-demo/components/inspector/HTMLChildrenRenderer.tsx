@@ -3,7 +3,7 @@ import {
   ObjectId as ProtocolObjectId,
   PauseId as ProtocolPauseId,
 } from "@replayio/protocol";
-import { getObjectWithPreviewSuspense } from "@bvaughn/src/suspense/ObjectPreviews";
+import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 

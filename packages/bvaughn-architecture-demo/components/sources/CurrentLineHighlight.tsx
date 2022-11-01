@@ -1,4 +1,4 @@
-import useCurrentPause from "@bvaughn/src/hooks/useCurrentPause";
+import useCurrentPause from "bvaughn-architecture-demo/src/hooks/useCurrentPause";
 import { SourceId } from "@replayio/protocol";
 import { Suspense, useContext } from "react";
 

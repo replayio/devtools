@@ -1,5 +1,5 @@
-import Icon from "@bvaughn/components/Icon";
-import { InspectorContext } from "@bvaughn/src/contexts/InspectorContext";
+import Icon from "bvaughn-architecture-demo/components/Icon";
+import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
 import { MouseEvent, useContext } from "react";
 
 import styles from "./shared.module.css";

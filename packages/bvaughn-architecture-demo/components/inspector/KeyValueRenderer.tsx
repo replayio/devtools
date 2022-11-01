@@ -1,6 +1,6 @@
-import Expandable from "@bvaughn/components/Expandable";
-import Loader from "@bvaughn/components/Loader";
-import { getObjectWithPreviewSuspense } from "@bvaughn/src/suspense/ObjectPreviews";
+import Expandable from "bvaughn-architecture-demo/components/Expandable";
+import Loader from "bvaughn-architecture-demo/components/Loader";
+import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { Object as ProtocolObject, PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import classNames from "classnames";
 import { ReactNode, Suspense, useContext, useState } from "react";

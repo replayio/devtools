@@ -1,7 +1,7 @@
-import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
-import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
-import useLoadedRegions from "@bvaughn/src/hooks/useRegions";
-import { formatTimestamp } from "@bvaughn/src/utils/time";
+import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
+import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
+import useLoadedRegions from "bvaughn-architecture-demo/src/hooks/useRegions";
+import { formatTimestamp } from "bvaughn-architecture-demo/src/utils/time";
 import { TimeStampedPointRange } from "@replayio/protocol";
 import React, { MutableRefObject, useContext, useEffect, useRef, useState } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";

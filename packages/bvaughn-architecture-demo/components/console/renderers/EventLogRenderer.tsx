@@ -1,15 +1,15 @@
-import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
-import Inspector from "@bvaughn/components/inspector";
-import Loader from "@bvaughn/components/Loader";
-import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
-import { EventLog } from "@bvaughn/src/suspense/EventsCache";
-import { formatTimestamp } from "@bvaughn/src/utils/time";
+import { ConsoleFiltersContext } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
+import Inspector from "bvaughn-architecture-demo/components/inspector";
+import Loader from "bvaughn-architecture-demo/components/Loader";
+import { InspectableTimestampedPointContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
+import { EventLog } from "bvaughn-architecture-demo/src/suspense/EventsCache";
+import { formatTimestamp } from "bvaughn-architecture-demo/src/utils/time";
 import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 
 import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
-import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
+import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 

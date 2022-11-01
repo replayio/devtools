@@ -1,5 +1,5 @@
-import SyntaxHighlightedLine from "@bvaughn/components/sources/SyntaxHighlightedLine";
-import { formatDuration } from "@bvaughn/src/utils/time";
+import SyntaxHighlightedLine from "bvaughn-architecture-demo/components/sources/SyntaxHighlightedLine";
+import { formatDuration } from "bvaughn-architecture-demo/src/utils/time";
 import { ReactNode, useMemo } from "react";
 
 import { RequestResponse } from "../ProtocolMessagesStore";

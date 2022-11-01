@@ -1,7 +1,7 @@
-import Icon from "@bvaughn/components/Icon";
-import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
-import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
-import { getMessagesSuspense } from "@bvaughn/src/suspense/MessagesCache";
+import Icon from "bvaughn-architecture-demo/components/Icon";
+import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
+import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
+import { getMessagesSuspense } from "bvaughn-architecture-demo/src/suspense/MessagesCache";
 import {
   getLoggableExecutionPoint,
   isEventLog,
@@ -9,8 +9,8 @@ import {
   isProtocolMessage,
   isTerminalExpression,
   isUncaughtException,
-} from "@bvaughn/src/utils/loggables";
-import { isExecutionPointsLessThan, isExecutionPointsWithinRange } from "@bvaughn/src/utils/time";
+} from "bvaughn-architecture-demo/src/utils/loggables";
+import { isExecutionPointsLessThan, isExecutionPointsWithinRange } from "bvaughn-architecture-demo/src/utils/time";
 import {
   ForwardedRef,
   forwardRef,
@@ -30,7 +30,7 @@ import LogPointRenderer from "./renderers/LogPointRenderer";
 import TerminalExpressionRenderer from "./renderers/TerminalExpressionRenderer";
 import UncaughtExceptionRenderer from "./renderers/UncaughtExceptionRenderer";
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
-import useLoadedRegions from "@bvaughn/src/hooks/useRegions";
+import useLoadedRegions from "bvaughn-architecture-demo/src/hooks/useRegions";
 import { isPointInRegions } from "shared/utils/time";
 import CurrentTimeIndicator from "./CurrentTimeIndicator";
 

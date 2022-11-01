@@ -41,9 +41,9 @@ import { PointsContextRoot } from "bvaughn-architecture-demo/src/contexts/Points
 import TimelineContextAdapter from "./SecondaryToolbox/TimelineContextAdapter";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
-import usePreferredFontSize from "@bvaughn/src/hooks/usePreferredFontSize";
+import usePreferredFontSize from "bvaughn-architecture-demo/src/hooks/usePreferredFontSize";
 import { useFeature } from "ui/hooks/settings";
-import { SelectedFrameContextRoot } from "@bvaughn/src/contexts/SelectedFrameContext";
+import { SelectedFrameContextRoot } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
 
 const Viewer = React.lazy(() => import("./Viewer"));
 

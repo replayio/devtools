@@ -1,4 +1,4 @@
-import { filterNonEnumerableProperties } from "@bvaughn/src/utils/protocol";
+import { filterNonEnumerableProperties } from "bvaughn-architecture-demo/src/utils/protocol";
 import { ReactNode } from "react";
 
 import ValueRenderer from "../ValueRenderer";

@@ -1,12 +1,12 @@
-import ConsoleRoot from "@bvaughn/components/console";
-import SourceExplorer from "@bvaughn/components/sources/SourceExplorer";
-import Sources from "@bvaughn/components/sources/Sources";
-import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
-import { KeyboardModifiersContextRoot } from "@bvaughn/src/contexts/KeyboardModifiersContext";
-import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
-import { SourcesContextRoot } from "@bvaughn/src/contexts/SourcesContext";
-import { TerminalContextRoot } from "@bvaughn/src/contexts/TerminalContext";
-import { TimelineContextRoot } from "@bvaughn/src/contexts/TimelineContext";
+import ConsoleRoot from "bvaughn-architecture-demo/components/console";
+import SourceExplorer from "bvaughn-architecture-demo/components/sources/SourceExplorer";
+import Sources from "bvaughn-architecture-demo/components/sources/Sources";
+import { FocusContextRoot } from "bvaughn-architecture-demo/src/contexts/FocusContext";
+import { KeyboardModifiersContextRoot } from "bvaughn-architecture-demo/src/contexts/KeyboardModifiersContext";
+import { PointsContextRoot } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { SourcesContextRoot } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { TerminalContextRoot } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
+import { TimelineContextRoot } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 
 import styles from "./styles.module.css";
 import createTest from "./utils/createTest";

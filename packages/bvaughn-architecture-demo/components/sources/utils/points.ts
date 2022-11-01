@@ -2,7 +2,7 @@ import {
   compareExecutionPoints,
   isExecutionPointsGreaterThan,
   isExecutionPointsLessThan,
-} from "@bvaughn/src/utils/time";
+} from "bvaughn-architecture-demo/src/utils/time";
 import { ExecutionPoint, SourceId, TimeStampedPoint } from "@replayio/protocol";
 import { binarySearch } from "protocol/utils";
 import { Point } from "shared/client/types";

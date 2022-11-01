@@ -1,6 +1,6 @@
-import { SelectedFrameContext } from "@bvaughn/src/contexts/SelectedFrameContext";
-import useCurrentPause from "@bvaughn/src/hooks/useCurrentPause";
-import { evaluateSuspense } from "@bvaughn/src/suspense/PauseCache";
+import { SelectedFrameContext } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
+import useCurrentPause from "bvaughn-architecture-demo/src/hooks/useCurrentPause";
+import { evaluateSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { createPauseResult as Pause, Value as ProtocolValue } from "@replayio/protocol";
 import { RefObject, Suspense, useContext, useEffect, useRef } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";

@@ -1,5 +1,5 @@
-import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
-import { getSourceContentsHelper } from "@bvaughn/src/suspense/SourcesCache";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { getSourceContentsHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { createContext, ReactNode, useContext, useEffect, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 

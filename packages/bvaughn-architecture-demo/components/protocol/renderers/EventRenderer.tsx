@@ -1,4 +1,4 @@
-import SyntaxHighlightedLine from "@bvaughn/components/sources/SyntaxHighlightedLine";
+import SyntaxHighlightedLine from "bvaughn-architecture-demo/components/sources/SyntaxHighlightedLine";
 import { useMemo } from "react";
 
 import { Event } from "../ProtocolMessagesStore";

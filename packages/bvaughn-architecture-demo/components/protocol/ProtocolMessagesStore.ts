@@ -1,4 +1,4 @@
-import { setSessionCallbacks } from "@bvaughn/../protocol/socket";
+import { setSessionCallbacks } from "bvaughn-architecture-demo/../protocol/socket";
 import { CommandMethods } from "@replayio/protocol";
 import { CommandResponse } from "protocol/socket";
 import { Request } from "protocol/socket";

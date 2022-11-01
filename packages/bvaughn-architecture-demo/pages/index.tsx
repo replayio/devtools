@@ -1,23 +1,23 @@
-import CommentList from "@bvaughn/components/comments/CommentList";
-import ConsoleRoot from "@bvaughn/components/console";
-import Focuser from "@bvaughn/components/console/Focuser";
-import Icon from "@bvaughn/components/Icon";
-import Initializer from "@bvaughn/components/Initializer";
-import Input from "@bvaughn/components/console/Input";
-import LazyOffscreen from "@bvaughn/components/LazyOffscreen";
-import Loader from "@bvaughn/components/Loader";
-import ProtocolViewer from "@bvaughn/components/protocol/ProtocolViewer";
-import SourceExplorer from "@bvaughn/components/sources/SourceExplorer";
-import Sources from "@bvaughn/components/sources/Sources";
-import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
-import { InspectorContextRoot } from "@bvaughn/src/contexts/InspectorContext";
-import { KeyboardModifiersContextRoot } from "@bvaughn/src/contexts/KeyboardModifiersContext";
-import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
-import { SelectedFrameContextRoot } from "@bvaughn/src/contexts/SelectedFrameContext";
-import { SourcesContextRoot } from "@bvaughn/src/contexts/SourcesContext";
-import { TerminalContextRoot } from "@bvaughn/src/contexts/TerminalContext";
-import { TimelineContextRoot } from "@bvaughn/src/contexts/TimelineContext";
-import usePreferredColorScheme from "@bvaughn/src/hooks/usePreferredColorScheme";
+import CommentList from "bvaughn-architecture-demo/components/comments/CommentList";
+import ConsoleRoot from "bvaughn-architecture-demo/components/console";
+import Focuser from "bvaughn-architecture-demo/components/console/Focuser";
+import Icon from "bvaughn-architecture-demo/components/Icon";
+import Initializer from "bvaughn-architecture-demo/components/Initializer";
+import Input from "bvaughn-architecture-demo/components/console/Input";
+import LazyOffscreen from "bvaughn-architecture-demo/components/LazyOffscreen";
+import Loader from "bvaughn-architecture-demo/components/Loader";
+import ProtocolViewer from "bvaughn-architecture-demo/components/protocol/ProtocolViewer";
+import SourceExplorer from "bvaughn-architecture-demo/components/sources/SourceExplorer";
+import Sources from "bvaughn-architecture-demo/components/sources/Sources";
+import { FocusContextRoot } from "bvaughn-architecture-demo/src/contexts/FocusContext";
+import { InspectorContextRoot } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
+import { KeyboardModifiersContextRoot } from "bvaughn-architecture-demo/src/contexts/KeyboardModifiersContext";
+import { PointsContextRoot } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { SelectedFrameContextRoot } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
+import { SourcesContextRoot } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { TerminalContextRoot } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
+import { TimelineContextRoot } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
+import usePreferredColorScheme from "bvaughn-architecture-demo/src/hooks/usePreferredColorScheme";
 import React, {
   Suspense,
   useCallback,

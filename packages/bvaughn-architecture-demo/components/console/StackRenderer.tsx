@@ -1,5 +1,5 @@
-import Loader from "@bvaughn/components/Loader";
-import { getSource } from "@bvaughn/src/suspense/SourcesCache";
+import Loader from "bvaughn-architecture-demo/components/Loader";
+import { getSource } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { CallStack, Frame, FrameId } from "@replayio/protocol";
 import React, { memo, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";

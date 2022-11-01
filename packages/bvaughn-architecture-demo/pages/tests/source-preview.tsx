@@ -1,11 +1,11 @@
-import SourcePreviewInspector from "@bvaughn/components/inspector/SourcePreviewInspector";
-import Loader from "@bvaughn/components/Loader";
-import { getObjectWithPreviewSuspense } from "@bvaughn/src/suspense/ObjectPreviews";
+import SourcePreviewInspector from "bvaughn-architecture-demo/components/inspector/SourcePreviewInspector";
+import Loader from "bvaughn-architecture-demo/components/Loader";
+import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import {
   evaluateSuspense,
   getPauseForExecutionPointSuspense,
-} from "@bvaughn/src/suspense/PauseCache";
-import { getClosestPointForTimeSuspense } from "@bvaughn/src/suspense/PointsCache";
+} from "bvaughn-architecture-demo/src/suspense/PauseCache";
+import { getClosestPointForTimeSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import { Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 

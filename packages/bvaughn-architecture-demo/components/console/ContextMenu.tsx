@@ -1,8 +1,8 @@
-import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
-import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
-import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
-import useModalDismissSignal from "@bvaughn/src/hooks/useModalDismissSignal";
-import { getLoggableTime, isPointInstance } from "@bvaughn/src/utils/loggables";
+import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
+import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
+import useModalDismissSignal from "bvaughn-architecture-demo/src/hooks/useModalDismissSignal";
+import { getLoggableTime, isPointInstance } from "bvaughn-architecture-demo/src/utils/loggables";
 import { useContext, useRef } from "react";
 import { Badge } from "shared/client/types";
 

@@ -1,7 +1,7 @@
-import Expandable from "@bvaughn/components/Expandable";
-import Loader from "@bvaughn/components/Loader";
-import { getObjectWithPreviewSuspense } from "@bvaughn/src/suspense/ObjectPreviews";
-import { mergePropertiesAndGetterValues } from "@bvaughn/src/utils/protocol";
+import Expandable from "bvaughn-architecture-demo/components/Expandable";
+import Loader from "bvaughn-architecture-demo/components/Loader";
+import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import { mergePropertiesAndGetterValues } from "bvaughn-architecture-demo/src/utils/protocol";
 import {
   ContainerEntry as ProtocolContainerEntry,
   NamedValue,

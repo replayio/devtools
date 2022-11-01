@@ -1,4 +1,4 @@
-import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
+import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import { useContext, useState } from "react";
 import { Badge, Point } from "shared/client/types";
 import Icon from "../Icon";

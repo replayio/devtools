@@ -2,7 +2,7 @@ import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import {
   getCachedObject,
   getObjectWithPreviewSuspense,
-} from "@bvaughn/src/suspense/ObjectPreviews";
+} from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { FC, memo, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 

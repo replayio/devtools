@@ -1,6 +1,6 @@
-import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
-import { getSource } from "@bvaughn/src/suspense/SourcesCache";
-import { getSourceFileName } from "@bvaughn/src/utils/source";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { getSource } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
 import { KeyboardEvent, MouseEvent, useContext, useRef } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 

@@ -1,5 +1,5 @@
-import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
-import { getSourceFileName } from "@bvaughn/src/utils/source";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
 import { ChangeEvent, KeyboardEvent, RefObject, useContext, useEffect, useRef } from "react";
 
 import Icon from "../Icon";

@@ -1,4 +1,4 @@
-import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
+import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 import { TimeStampedPoint } from "@replayio/protocol";
 import { useContext, useMemo, useState } from "react";
 

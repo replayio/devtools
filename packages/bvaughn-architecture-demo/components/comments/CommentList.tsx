@@ -1,9 +1,9 @@
-import AvatarImage from "@bvaughn/components/AvatarImage";
-import { getCommentListSuspense } from "@bvaughn/src/suspense/CommentsCache";
-import { GraphQLClientContext } from "@bvaughn/src/contexts/GraphQLClientContext";
-import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
-import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
-import Loader from "@bvaughn/components/Loader";
+import AvatarImage from "bvaughn-architecture-demo/components/AvatarImage";
+import { getCommentListSuspense } from "bvaughn-architecture-demo/src/suspense/CommentsCache";
+import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
+import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
+import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
+import Loader from "bvaughn-architecture-demo/components/Loader";
 import { Suspense, useContext } from "react";
 
 import Comment from "./Comment";

@@ -1,7 +1,7 @@
-import { ConsoleFiltersContextRoot } from "@bvaughn/src/contexts/ConsoleFiltersContext";
-import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
-import Icon from "@bvaughn/components/Icon";
-import Loader from "@bvaughn/components/Loader";
+import { ConsoleFiltersContextRoot } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
+import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
+import Icon from "bvaughn-architecture-demo/components/Icon";
+import Loader from "bvaughn-architecture-demo/components/Loader";
 import {
   KeyboardEvent,
   ReactNode,
@@ -12,8 +12,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { TerminalContext } from "@bvaughn/src/contexts/TerminalContext";
-import useLocalStorage from "@bvaughn/src/hooks/useLocalStorage";
+import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
+import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
 import classNames from "classnames";
 
 import { ConsoleContextMenuContextRoot } from "./ConsoleContextMenuContext";
@@ -25,7 +25,7 @@ import { LoggablesContextRoot } from "./LoggablesContext";
 import MessagesList from "./MessagesList";
 import ConsoleSearch from "./ConsoleSearch";
 import { ConsoleSearchContext, ConsoleSearchContextRoot } from "./ConsoleSearchContext";
-import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
+import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
 
 export default function ConsoleRoot({
   nagHeader = null,
