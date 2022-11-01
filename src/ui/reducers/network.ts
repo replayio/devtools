@@ -7,17 +7,16 @@ import {
 import sortBy from "lodash/sortBy";
 import sortedUniqBy from "lodash/sortedUniqBy";
 import { createSelector } from "reselect";
+import { isPointInRegions } from "shared/utils/time";
 import { NetworkAction } from "ui/actions/network";
 import { partialRequestsToCompleteSummaries } from "ui/components/NetworkMonitor/utils";
 import { UIState } from "ui/state";
 import {
+  displayedBeginForFocusRegion,
   displayedEndForFocusRegion,
   filterToFocusRegion,
-  displayedBeginForFocusRegion,
-  filterToLoadedRegions,
 } from "ui/utils/timeline";
 
-import { getLoadedRegions } from "./app";
 import { getFocusRegion } from "./timeline";
 
 export type NetworkState = {
@@ -107,21 +106,28 @@ export const getFocusedEvents = createSelector(getEvents, getFocusRegion, (event
   return events.filter(e => e.time > beginTime && e.time <= endTime);
 });
 
+type GetFocusedRequestsReturn = [
+  requests: RequestInfo[],
+  filterBeforeCount: number,
+  filterAfterCount: number
+];
+
 export const getFocusedRequests = createSelector(
-  getLoadedRegions,
   getRequests,
   getFocusRegion,
-  (loadedRegions, requests, focusRegion) => {
-    if (loadedRegions?.loaded == null || loadedRegions.loaded.length === 0) {
-      return [];
+  (requests, focusRegion): GetFocusedRequestsReturn => {
+    let filteredRequests = requests;
+    let filteredBeforeCount = 0;
+    let filteredAfterCount = 0;
+
+    if (focusRegion != null) {
+      [filteredRequests, filteredBeforeCount, filteredAfterCount] = filterToFocusRegion(
+        filteredRequests,
+        focusRegion
+      );
     }
 
-    let filteredRequests = filterToLoadedRegions(requests, loadedRegions.loaded);
-    if (focusRegion) {
-      filteredRequests = filterToFocusRegion(filteredRequests, focusRegion);
-    }
-
-    return filteredRequests;
+    return [filteredRequests, filteredBeforeCount, filteredAfterCount];
   }
 );
 

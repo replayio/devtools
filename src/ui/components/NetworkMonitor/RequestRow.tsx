@@ -8,6 +8,7 @@ import { RequestSummary } from "./utils";
 export const RequestRow = ({
   currentTime,
   isFirstInFuture,
+  isInLoadedRegion,
   isInPast,
   isSelected,
   onClick,
@@ -17,6 +18,7 @@ export const RequestRow = ({
 }: {
   currentTime: number;
   isFirstInFuture: boolean;
+  isInLoadedRegion: boolean;
   isInPast: boolean;
   isSelected: boolean;
   onClick: (row: RequestSummary) => void;
@@ -50,6 +52,7 @@ export const RequestRow = ({
         [styles.current]: isFirstInFuture,
         [styles.selected]: isSelected,
         [styles.future]: !isInPast,
+        [styles.unloaded]: !isInLoadedRegion,
       })}
       onClick={() => onClick(row.original)}
       onContextMenu={onContextMenu}

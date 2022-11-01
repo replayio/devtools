@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Row, TableInstance } from "react-table";
 import { setFocusRegionEndTime, setFocusRegionBeginTime } from "ui/actions/timeline";
-import { getLoadedRegions } from "ui/reducers/app";
 import type { AppDispatch } from "ui/setup/store";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -15,6 +14,8 @@ import { HeaderGroups } from "./HeaderGroups";
 import { RequestRow } from "./RequestRow";
 import styles from "./RequestTable.module.css";
 import { RequestSummary } from "./utils";
+import { getLoadedRegions } from "ui/reducers/app";
+import { isTimeInRegions } from "ui/utils/timeline";
 
 interface ContextMenuData {
   pageX: number;
@@ -26,6 +27,8 @@ const RequestTable = ({
   className,
   currentTime,
   data,
+  filteredAfterCount,
+  filteredBeforeCount,
   onRowSelect,
   seek,
   selectedRequest,
@@ -34,6 +37,8 @@ const RequestTable = ({
   className?: string;
   currentTime: number;
   data: RequestSummary[];
+  filteredAfterCount: number;
+  filteredBeforeCount: number;
   onRowSelect: (request: RequestSummary) => void;
   seek: (point: string, time: number, hasFrames: boolean, pauseId?: string | undefined) => boolean;
   selectedRequest?: RequestSummary;
@@ -87,7 +92,12 @@ const RequestTable = ({
         {...getTableProps()}
       >
         <HeaderGroups columns={columns as any} headerGroups={headerGroups} />
+
         <div className="relative w-fit min-w-full overflow-y-auto" {...getTableBodyProps()}>
+          {filteredBeforeCount > 0 && (
+            <div className={styles.banner}>{filteredBeforeCount} requests filtered before</div>
+          )}
+
           {rows.map((row: Row<RequestSummary>) => {
             let firstInFuture = false;
             if (inPast && row.original.point.time >= currentTime) {
@@ -95,12 +105,17 @@ const RequestTable = ({
               firstInFuture = true;
             }
 
+            const isInLoadedRegion = loadedRegions
+              ? isTimeInRegions(row.original.point.time, loadedRegions.loaded)
+              : false;
+
             prepareRow(row);
 
             return (
               <RequestRow
                 currentTime={currentTime}
                 isFirstInFuture={firstInFuture}
+                isInLoadedRegion={isInLoadedRegion}
                 isInPast={inPast}
                 isSelected={selectedRequest?.id === row.original.id}
                 key={row.getRowProps().key}
@@ -117,6 +132,10 @@ const RequestTable = ({
               [styles.end]: data.every(r => (r.point?.time || 0) < currentTime),
             })}
           />
+
+          {filteredAfterCount > 0 && (
+            <div className={styles.banner}>{filteredAfterCount} requests filtered after</div>
+          )}
         </div>
       </div>
 
