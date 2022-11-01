@@ -142,10 +142,12 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
       } = state;
 
       if (sourceId === prevFocusedSourceId) {
-        if (prevPendingFocusUpdate) {
-          // Only bail out if pendingFocusUpdate is also true;
-          // This ensures we re-scroll to a focused line if the user has scrolled away.
-          if (lineNumber === null || lineNumber === prevFocusedLineNumber) {
+        // If sources are equal we may be able to bail out.
+        if (lineNumber === null || lineNumber === prevFocusedLineNumber) {
+          // If the same line was specified (or no line) we may be able to bail out.
+          if (prevPendingFocusUpdate) {
+            // Only bail out if pendingFocusUpdate is also true;
+            // This ensures we re-scroll to a focused line if the user has scrolled away.
             return state;
           }
         }

@@ -51,7 +51,13 @@ function NewSourceAdapter() {
       return;
     }
 
-    openSource(location.sourceId, location?.line);
+    // TRICKY
+    // Legacy code passes 1-based line numbers around,
+    // Except when a filed is opened (e.g. by clicking on the file tab) in which cases it passes 0.
+    // We ignore the 0 because it breaks scroll state preservation between tabs.
+    const lineNumber = location?.line ?? 0;
+
+    openSource(location.sourceId, lineNumber > 0 ? lineNumber : undefined);
   }, [location, openSource]);
 
   // Sync the lines currently rendered by the new Source list to Redux.
