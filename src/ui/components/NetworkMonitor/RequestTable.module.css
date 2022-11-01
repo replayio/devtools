@@ -12,6 +12,16 @@ table.requests {
   cursor: pointer;
 }
 
+.banner {
+  background: var(--body-bgcolor);
+  border-top: 2px solid transparent;
+  border-bottom: 2px solid transparent;
+  padding: 0.25rem;
+}
+.banner:not(:first-child) {
+  border-top: 2px solid var(--theme-toolbar-background);
+}
+
 .row:is(:hover, :focus-visible) {
   outline: 0;
   background-color: var(--theme-toolbar-background);

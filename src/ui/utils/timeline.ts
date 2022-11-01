@@ -295,9 +295,9 @@ export function isFocusRegionSubset(
 export function filterToFocusRegion<T extends TimeStampedPoint>(
   sortedPoints: T[],
   focusRegion: FocusRegion | null
-): T[] {
+): [filtered: T[], filteredBeforeCount: number, filteredAfterCount: number] {
   if (!focusRegion) {
-    return sortedPoints;
+    return [sortedPoints, 0, 0];
   }
 
   const { begin: beginPoint, end: endPoint } = rangeForFocusRegion(focusRegion);
@@ -305,7 +305,11 @@ export function filterToFocusRegion<T extends TimeStampedPoint>(
   const beginIndex = sortedIndexBy(sortedPoints, beginPoint, ({ point }) => BigInt(point));
   const endIndex = sortedLastIndexBy(sortedPoints, endPoint, ({ point }) => BigInt(point));
 
-  return sortedPoints.slice(beginIndex, endIndex);
+  const filteredBeforeCount = beginIndex;
+  const filteredAfterCount = sortedPoints.length - endIndex;
+  const filtered = sortedPoints.slice(beginIndex, endIndex);
+
+  return [filtered, filteredBeforeCount, filteredAfterCount];
 }
 
 function assertSorted(a: TimeStampedPoint[]) {

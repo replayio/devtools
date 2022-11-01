@@ -4,18 +4,20 @@ import {
   RequestInfo,
   ResponseBodyData,
 } from "@replayio/protocol";
-
-import { UIState } from "ui/state";
-import { NetworkAction } from "ui/actions/network";
 import sortBy from "lodash/sortBy";
 import sortedUniqBy from "lodash/sortedUniqBy";
-import { getFocusRegion } from "./timeline";
+import { createSelector } from "reselect";
+import { isPointInRegions } from "shared/utils/time";
+import { NetworkAction } from "ui/actions/network";
 import { partialRequestsToCompleteSummaries } from "ui/components/NetworkMonitor/utils";
+import { UIState } from "ui/state";
 import {
+  displayedBeginForFocusRegion,
   displayedEndForFocusRegion,
   filterToFocusRegion,
-  displayedBeginForFocusRegion,
 } from "ui/utils/timeline";
+
+import { getFocusRegion } from "./timeline";
 
 export type NetworkState = {
   events: RequestEventInfo[];
@@ -94,23 +96,40 @@ const update = (state: NetworkState = initialState(), action: NetworkAction): Ne
 
 export const getEvents = (state: UIState) => state.network.events;
 export const getRequests = (state: UIState) => state.network.requests;
-export const getFocusedEvents = (state: UIState) => {
-  const events = getEvents(state);
-  const focusRegion = getFocusRegion(state);
 
+export const getFocusedEvents = createSelector(getEvents, getFocusRegion, (events, focusRegion) => {
   if (!focusRegion) {
     return events;
   }
   const beginTime = displayedBeginForFocusRegion(focusRegion);
   const endTime = displayedEndForFocusRegion(focusRegion);
   return events.filter(e => e.time > beginTime && e.time <= endTime);
-};
-export const getFocusedRequests = (state: UIState) => {
-  const requests = getRequests(state);
-  const focusRegion = getFocusRegion(state);
+});
 
-  return filterToFocusRegion(requests, focusRegion);
-};
+type GetFocusedRequestsReturn = [
+  requests: RequestInfo[],
+  filterBeforeCount: number,
+  filterAfterCount: number
+];
+
+export const getFocusedRequests = createSelector(
+  getRequests,
+  getFocusRegion,
+  (requests, focusRegion): GetFocusedRequestsReturn => {
+    let filteredRequests = requests;
+    let filteredBeforeCount = 0;
+    let filteredAfterCount = 0;
+
+    if (focusRegion != null) {
+      [filteredRequests, filteredBeforeCount, filteredAfterCount] = filterToFocusRegion(
+        filteredRequests,
+        focusRegion
+      );
+    }
+
+    return [filteredRequests, filteredBeforeCount, filteredAfterCount];
+  }
+);
 
 export const getResponseBodies = (state: UIState) => state.network.responseBodies;
 export const getRequestBodies = (state: UIState) => state.network.requestBodies;

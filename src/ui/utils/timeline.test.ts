@@ -214,21 +214,23 @@ describe("overlap", () => {
 
 describe("filterToFocusRegion", () => {
   it("will not include points before the region", () => {
-    expect(filterToFocusRegion([point(5)], focusRegion(10, 20))).toEqual([]);
+    expect(filterToFocusRegion([point(5)], focusRegion(10, 20))).toEqual([[], 1, 0]);
   });
   it("will not include points after the region", () => {
-    expect(filterToFocusRegion([point(25)], focusRegion(10, 20))).toEqual([]);
+    expect(filterToFocusRegion([point(25)], focusRegion(10, 20))).toEqual([[], 0, 1]);
   });
   it("will include points inside the region", () => {
     expect(filterToFocusRegion([point(5), point(15), point(25)], focusRegion(10, 20))).toEqual([
-      point(15),
+      [point(15)],
+      1,
+      1,
     ]);
   });
   it("will include points on the boundaries the region", () => {
     expect(filterToFocusRegion([point(10), point(15), point(20)], focusRegion(10, 20))).toEqual([
-      point(10),
-      point(15),
-      point(20),
+      [point(10), point(15), point(20)],
+      0,
+      0,
     ]);
   });
 });
