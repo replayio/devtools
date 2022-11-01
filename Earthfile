@@ -42,6 +42,6 @@ test-architecture-demo-save-snapshots:
 test-architecture-demo-save-video:
   FROM earthly/dind:alpine
   WITH DOCKER --load devtools:latest=+image --load playwright-test-image=(./packages/bvaughn-architecture-demo/playwright+playwright-save-video --HOST=devtools)
-    RUN docker network create --driver bridge integration && docker run -d -p 3000 --network integration --name devtools devtools && docker run -v /test-results:/playwright/test-results --network integration playwright-test-image
+    RUN docker network create --driver bridge integration && docker run -d -p 3000 --network integration --name devtools devtools && docker run -v /test-results:/playwright/test-results --network integration playwright-test-image || true
   END
   SAVE ARTIFACT ./test-results AS LOCAL ./packages/bvaughn-architecture-demo/playwright/test-results
