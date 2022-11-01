@@ -1,4 +1,4 @@
-import { SourceId } from "@replayio/protocol";
+import { SourceId, SourceLocation } from "@replayio/protocol";
 import {
   createContext,
   PropsWithChildren,
@@ -10,6 +10,8 @@ import {
 import { SourceLocationRange } from "shared/client/types";
 
 const VISIBLE_LINES_BUCKET_SIZE = 100;
+
+export type FindClosestFunctionName = (sourceId: string, location: SourceLocation) => string | null;
 
 type SourcesContextType = {
   closeSource: (sourceId: SourceId) => void;
@@ -24,6 +26,7 @@ type SourcesContextType = {
   pendingFocusUpdate: boolean;
   setHoveredLocation: (lineIndex: number | null, lineNode: HTMLElement | null) => void;
   setVisibleLines: (startIndex: number | null, stopIndex: number | null) => void;
+  findClosestFunctionName: FindClosestFunctionName;
 
   // Tracking which lines are currently visible in the editor enables queries to be scoped
   // in a way that reduces the work required by the backend to analyze large source files.
@@ -243,7 +246,16 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
 
 export const SourcesContext = createContext<SourcesContextType>(null as any);
 
-export function SourcesContextRoot({ children }: PropsWithChildren) {
+const defaultFindClosestFunctionByName = () => null;
+
+export type SourcesContextRootProps = PropsWithChildren<{
+  findClosestFunctionName?: FindClosestFunctionName;
+}>;
+
+export function SourcesContextRoot({
+  children,
+  findClosestFunctionName = defaultFindClosestFunctionByName,
+}: SourcesContextRootProps) {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
   const [isPending, startTransition] = useTransition();
@@ -307,6 +319,7 @@ export function SourcesContextRoot({ children }: PropsWithChildren) {
       openSource,
       setHoveredLocation,
       setVisibleLines,
+      findClosestFunctionName,
     }),
     [
       closeSource,
@@ -316,6 +329,7 @@ export function SourcesContextRoot({ children }: PropsWithChildren) {
       setHoveredLocation,
       setVisibleLines,
       state,
+      findClosestFunctionName,
     ]
   );
 

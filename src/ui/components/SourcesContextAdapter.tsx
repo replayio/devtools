@@ -1,6 +1,7 @@
 import {
   SourcesContext,
   SourcesContextRoot,
+  SourcesContextRootProps,
 } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { getShownSource } from "devtools/client/debugger/src/selectors";
 import { ReactNode, useContext, useLayoutEffect } from "react";
@@ -8,9 +9,12 @@ import { useAppSelector } from "ui/setup/hooks";
 
 // Relays information about the active source from Redux to the newer SourcesContext.
 // This information is consumed, along with other state (like the hovered line number) by the PointsContext.
-export default function SourcesContextWrapper({ children }: { children: ReactNode }) {
+export default function SourcesContextWrapper({
+  children,
+  findClosestFunctionName,
+}: SourcesContextRootProps) {
   return (
-    <SourcesContextRoot>
+    <SourcesContextRoot findClosestFunctionName={findClosestFunctionName}>
       <SourcesContextAdapter>{children}</SourcesContextAdapter>
     </SourcesContextRoot>
   );
