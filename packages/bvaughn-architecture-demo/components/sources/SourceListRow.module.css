@@ -1,5 +1,5 @@
 .Row {
-  min-width: var(--max-line-width);
+  min-width: max(var(--longest-line-width), var(--list-width));
 }
 
 .LineWithHits,

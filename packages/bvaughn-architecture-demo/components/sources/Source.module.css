@@ -10,7 +10,7 @@
 
 .SourceList {
   margin: 0;
-  overflow: auto;
+  overflow: hidden;
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;

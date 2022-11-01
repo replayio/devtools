@@ -215,8 +215,6 @@ const SourceListRow = memo(
           )}
 
           <div className={styles.LineSegmentsAndPointPanel}>
-            <CurrentLineHighlight lineNumber={lineNumber} sourceId={sourceId} />
-
             {lineSegments}
 
             {isHovered && (
@@ -238,6 +236,8 @@ const SourceListRow = memo(
 
           {point?.shouldLog && <PointPanel className={styles.PointPanel} point={point} />}
         </div>
+
+        <CurrentLineHighlight lineNumber={lineNumber} sourceId={sourceId} />
       </div>
     );
   },
