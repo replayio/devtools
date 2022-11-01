@@ -11,3 +11,4 @@ index.html
 packages/third-party/
 *.tsbuildinfo
 *.json
+*.yaml

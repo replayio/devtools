@@ -20,3 +20,7 @@ lint:
         - public
         - src/graphql
         - test/fixtures
+        - "**/*.config.js"
+        - packages/import-sort-style-replay
+        - "./.trunk" 
+        - "./test"
