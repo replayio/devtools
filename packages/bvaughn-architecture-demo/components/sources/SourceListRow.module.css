@@ -48,9 +48,8 @@
   transition: all 100ms;
 }
 .HoverButton:disabled {
-  background-color: var(--background-color-tertiary-button);
-  color: var(--color-tertiary-button);
-  opacity: 0.5;
+  background-color: var(--background-color-disabled-button);
+  color: var(--color-disabled-button);
   cursor: default;
 }
 

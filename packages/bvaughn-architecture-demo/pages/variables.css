@@ -36,6 +36,7 @@
   --background-color-primary-button: #09a6e9;
   --background-color-secondary-button: #f02d5e;
   --background-color-tertiary-button: #929292;
+  --background-color-disabled-button: #454950;
   --background-color-current-execution-point: #25364e;
   --background-color-current-search-result: #42381f;
   --background-color-warning: #42381f;
@@ -49,6 +50,7 @@
   --color-primary-button: #ffffff;
   --color-secondary-button: #ffffff;
   --color-tertiary-button: #000000;
+  --color-disabled-button: #ffffff;
   --color-warning: #fce2a1;
   --border-color: #e1e6ed;
   --border-color-light: #18181a;
@@ -146,6 +148,7 @@
   --background-color-primary-button: #09a6e9;
   --background-color-secondary-button: #f02d5e;
   --background-color-tertiary-button: #929292;
+  --background-color-disabled-button: #666666;
   --background-color-current-execution-point: #eaf3ff;
   --background-color-current-search-result: #fffac8;
   --background-color-warning: #fffac8;
@@ -164,6 +167,7 @@
   --color-primary-button: #ffffff;
   --color-secondary-button: #ffffff;
   --color-tertiary-button: #ffffff;
+  --color-disabled-button: #ffffff;
   --color-warning: #6c5914;
 
   --color-hit-counts-bar-0: #d9dad9;
