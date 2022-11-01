@@ -92,6 +92,19 @@ export function getPauseForExecutionPointSuspense(
   }
 }
 
+export async function getPauseForExecutionPointHelper(
+  client: ReplayClientInterface,
+  executionPoint: ExecutionPoint
+): Promise<Pause> {
+  try {
+    return getPauseForExecutionPointSuspense(client, executionPoint);
+  } catch (promise) {
+    await promise;
+
+    return getPauseForExecutionPointSuspense(client, executionPoint);
+  }
+}
+
 async function fetchEvaluationResult(
   client: ReplayClientInterface,
   pauseId: PauseId,
