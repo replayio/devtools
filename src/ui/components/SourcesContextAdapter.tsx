@@ -20,17 +20,13 @@ function SourcesContextAdapter({ children }: { children: ReactNode }) {
   const shownSource = useAppSelector(getShownSource);
   const shownSourceId = shownSource ? shownSource.id : null;
 
-  const { closeSource, focusedSourceId, openSource } = useContext(SourcesContext);
+  const { focusedSourceId, openSource } = useContext(SourcesContext);
 
   useLayoutEffect(() => {
-    if (shownSourceId === null) {
-      if (focusedSourceId !== null) {
-        closeSource(focusedSourceId);
-      }
-    } else {
+    if (shownSourceId !== null && shownSourceId !== focusedSourceId) {
       openSource(shownSourceId);
     }
-  }, [closeSource, focusedSourceId, openSource, shownSourceId]);
+  }, [focusedSourceId, openSource, shownSourceId]);
 
   return children as any;
 }
