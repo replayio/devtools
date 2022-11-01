@@ -212,6 +212,10 @@ describe("overlap", () => {
   });
 });
 
+describe("getFocusedRequests", () => {
+  // TODO [FE-865] Add tests
+});
+
 describe("filterToFocusRegion", () => {
   it("will not include points before the region", () => {
     expect(filterToFocusRegion([point(5)], focusRegion(10, 20))).toEqual([]);

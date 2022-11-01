@@ -7,14 +7,14 @@ import {
 import sortBy from "lodash/sortBy";
 import sortedUniqBy from "lodash/sortedUniqBy";
 import { createSelector } from "reselect";
+import { isPointInRegions } from "shared/utils/time";
 import { NetworkAction } from "ui/actions/network";
 import { partialRequestsToCompleteSummaries } from "ui/components/NetworkMonitor/utils";
 import { UIState } from "ui/state";
 import {
+  displayedBeginForFocusRegion,
   displayedEndForFocusRegion,
   filterToFocusRegion,
-  displayedBeginForFocusRegion,
-  filterToLoadedRegions,
 } from "ui/utils/timeline";
 
 import { getLoadedRegions } from "./app";
@@ -107,21 +107,70 @@ export const getFocusedEvents = createSelector(getEvents, getFocusRegion, (event
   return events.filter(e => e.time > beginTime && e.time <= endTime);
 });
 
+type GetFocusedRequestsReturn = [
+  requests: RequestInfo[],
+  filterBeforeCount: number,
+  filterAfterCount: number,
+  filterTotalCount: number
+];
+
 export const getFocusedRequests = createSelector(
   getLoadedRegions,
   getRequests,
   getFocusRegion,
-  (loadedRegions, requests, focusRegion) => {
-    if (loadedRegions?.loaded == null || loadedRegions.loaded.length === 0) {
-      return [];
+  (regions, requests, focusRegion): GetFocusedRequestsReturn => {
+    const loadedRegions = regions?.loaded;
+    if (loadedRegions == null || loadedRegions.length === 0) {
+      return [[], 0, 0, requests.length];
     }
 
-    let filteredRequests = filterToLoadedRegions(requests, loadedRegions.loaded);
+    let filteredBeforeCount = 0;
+    let filteredAfterCount = 0;
+    let filterTotalCount = 0;
+
+    // TODO [FE-865] Can we skip this if there are no loading/unloaded regions?
+
+    // TODO [FE-865] If loaded and focused regions are both present, but don't overlap, return only the total count.
+
+    let earliestLoadedPoint: BigInt | null = null;
+    let latestLoadedPoint: BigInt | null = null;
+    loadedRegions.forEach(region => {
+      const beginPoint = BigInt(region.begin.point);
+      if (earliestLoadedPoint == null || beginPoint < earliestLoadedPoint) {
+        earliestLoadedPoint = beginPoint;
+      }
+      const endPoint = BigInt(region.end.point);
+      if (latestLoadedPoint == null || endPoint > latestLoadedPoint) {
+        latestLoadedPoint = endPoint;
+      }
+    });
+
+    let filteredRequests = requests.filter(request => {
+      const isInLoadedRegion = isPointInRegions(request.point, loadedRegions);
+
+      if (!isInLoadedRegion) {
+        filterTotalCount++;
+
+        const point = BigInt(request.point);
+        if (point < earliestLoadedPoint!) {
+          filteredBeforeCount++;
+        } else if (point > earliestLoadedPoint!) {
+          filteredAfterCount++;
+        }
+      }
+
+      return isInLoadedRegion;
+    });
+
     if (focusRegion) {
-      filteredRequests = filterToFocusRegion(filteredRequests, focusRegion);
+      const result = filterToFocusRegion(filteredRequests, focusRegion);
+      filteredRequests = result[0];
+      filteredBeforeCount += result[1];
+      filteredAfterCount += result[2];
+      filterTotalCount += result[1] + result[2];
     }
 
-    return filteredRequests;
+    return [filteredRequests, filteredBeforeCount, filteredAfterCount, filterTotalCount];
   }
 );
 

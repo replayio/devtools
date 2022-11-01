@@ -25,12 +25,15 @@ export const NetworkMonitor = ({
   events,
   loading,
   requests,
+  requestsAfterFilterCount,
+  requestsBeforeFilterCount,
   seek,
 }: PropsFromRedux) => {
   const selectedRequestId = useAppSelector(getSelectedRequestId);
   const dispatch = useAppDispatch();
   const [types, setTypes] = useState<Set<CanonicalRequestType>>(new Set([]));
   const [vert, setVert] = useState<boolean>(false);
+  console.log("NetworkMonitor", requestsBeforeFilterCount, requestsAfterFilterCount, requests);
 
   const container = useRef<HTMLDivElement>(null);
 
@@ -109,8 +112,10 @@ export const NetworkMonitor = ({
                   startPanel={
                     <RequestTable
                       table={table}
-                      data={data}
                       currentTime={currentTime}
+                      data={data}
+                      filteredAfterCount={requestsAfterFilterCount}
+                      filteredBeforeCount={requestsBeforeFilterCount}
                       onRowSelect={row => {
                         trackEvent("net_monitor.select_request_row");
                         dispatch(selectAndFetchRequest(row.id));
@@ -146,13 +151,20 @@ export const NetworkMonitor = ({
 };
 
 const connector = connect(
-  (state: UIState) => ({
-    currentTime: getCurrentTime(state),
-    cx: getThreadContext(state),
-    events: getFocusedEvents(state),
-    loading: state.network.loading,
-    requests: getFocusedRequests(state),
-  }),
+  (state: UIState) => {
+    const [requests, requestsBeforeFilterCount, requestsAfterFilterCount] =
+      getFocusedRequests(state);
+
+    return {
+      currentTime: getCurrentTime(state),
+      cx: getThreadContext(state),
+      events: getFocusedEvents(state),
+      loading: state.network.loading,
+      requests,
+      requestsAfterFilterCount,
+      requestsBeforeFilterCount,
+    };
+  },
   {
     seek: actions.seek,
   }
