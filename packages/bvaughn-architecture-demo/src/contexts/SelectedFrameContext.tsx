@@ -30,7 +30,15 @@ export function SelectedFrameContextRoot({ children }: PropsWithChildren<{}>) {
     () => ({ selectedPauseAndFrameId, setSelectedPauseAndFrameId }),
     [selectedPauseAndFrameId, setSelectedPauseAndFrameId]
   );
-  return <SelectedFrameContext.Provider value={context}>{children}</SelectedFrameContext.Provider>;
+
+  return (
+    <SelectedFrameContext.Provider value={context}>
+      <Suspense>
+        <SelectedFrameContextAdapter />
+      </Suspense>
+      {children}
+    </SelectedFrameContext.Provider>
+  );
 }
 
 function SelectedFrameContextAdapter() {
@@ -52,15 +60,4 @@ function SelectedFrameContextAdapter() {
   }
 
   return null;
-}
-
-export default function SelectedFrameContextWrapper({ children }: PropsWithChildren<{}>) {
-  return (
-    <SelectedFrameContextRoot>
-      <Suspense>
-        <SelectedFrameContextAdapter />
-      </Suspense>
-      {children}
-    </SelectedFrameContextRoot>
-  );
 }

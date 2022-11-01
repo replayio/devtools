@@ -25,6 +25,7 @@ import SourceListRow, { ItemData } from "./SourceListRow";
 import styles from "./SourceList.module.css";
 import { SourceSearchContext } from "./SourceSearchContext";
 import { findPointForLocation } from "./utils/points";
+import getScrollbarWidth from "./utils/getScrollbarWidth";
 
 // HACK
 // We could swap this out for something that lazily measures row height.
@@ -48,6 +49,8 @@ export default function SourceList({
   width: number;
 }) {
   const { sourceId } = source;
+
+  const scrollbarWidth = useMemo(getScrollbarWidth, []);
 
   const { range: focusRange } = useContext(FocusContext);
   const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
@@ -213,12 +216,14 @@ export default function SourceList({
   const maxHitCountStringLength =
     showHitCounts && maxHitCount !== null ? `${formatHitCount(maxHitCount)}`.length : 0;
 
+  const widthMinusScrollbar = width - scrollbarWidth;
+
   const style = {
     "--conditional-point-panel-height": `${CONDITIONAL_POINT_PANEL_HEIGHT}px`,
     "--hit-count-size": `${maxHitCountStringLength}ch`,
     "--line-height": `${LINE_HEIGHT}px`,
     "--line-number-size": `${maxLineNumberStringLength + 1}ch`,
-    "--list-width": `${width}px`,
+    "--list-width": `${widthMinusScrollbar}px`,
     "--point-panel-height": `${POINT_PANEL_HEIGHT}px`,
   };
 

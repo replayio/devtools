@@ -1,12 +1,7 @@
-import {
-  ExecutionPoint,
-  MappedLocation,
-  PauseId,
-  Value as ProtocolValue,
-} from "@replayio/protocol";
+import { MappedLocation } from "@replayio/protocol";
 import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
 import React, { ReactNode, useCallback, useMemo } from "react";
-import { onViewSourceInDebugger, openNodeInInspector } from "devtools/client/webconsole/actions";
+import { onViewSourceInDebugger } from "devtools/client/webconsole/actions";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getSourceDetailsEntities } from "ui/reducers/sources";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";

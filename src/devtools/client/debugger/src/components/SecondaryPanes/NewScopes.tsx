@@ -9,7 +9,6 @@ import { ConvertedScope, convertScopes } from "../../utils/pause/scopes/convertS
 import { getFrameSuspense } from "ui/suspense/frameCache";
 import { getScopesSuspense, pickScopes } from "ui/suspense/scopeCache";
 import { Redacted } from "ui/components/Redacted";
-import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import Inspector from "bvaughn-architecture-demo/components/inspector/Inspector";
 import ScopesInspector from "bvaughn-architecture-demo/components/inspector/ScopesInspector";
@@ -91,11 +90,9 @@ export default function Scopes() {
     <div className="scopes-content">
       <Redacted className="pane scopes-list" data-test-name="ScopesList">
         <ErrorBoundary fallback={<div className="pane-info">Error loading scopes</div>}>
-          <InspectorContextReduxAdapter>
-            <Suspense fallback={<div className="pane-info">Loading…</div>}>
-              <ScopesRenderer />
-            </Suspense>
-          </InspectorContextReduxAdapter>
+          <Suspense fallback={<div className="pane-info">Loading…</div>}>
+            <ScopesRenderer />
+          </Suspense>
         </ErrorBoundary>
       </Redacted>
     </div>

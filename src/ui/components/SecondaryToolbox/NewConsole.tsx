@@ -3,7 +3,6 @@ import { ConsoleSearchContext } from "bvaughn-architecture-demo/components/conso
 import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
 import React, { KeyboardEvent, useContext } from "react";
 import { getSelectedFrameId } from "devtools/client/debugger/src/selectors";
-import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import JSTerm from "devtools/client/webconsole/components/Input/JSTerm";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
@@ -13,7 +12,6 @@ import { ThreadFront } from "protocol/thread/thread";
 import { ConsoleNag } from "../shared/Nags/Nags";
 
 import styles from "./NewConsole.module.css";
-import TimelineContextAdapter from "./TimelineContextAdapter";
 import useTerminalHistory from "./useTerminalHistory";
 import { useAppSelector } from "ui/setup/hooks";
 
@@ -24,16 +22,12 @@ export default function NewConsoleRoot() {
   );
 
   return (
-    <TimelineContextAdapter>
-      <InspectorContextReduxAdapter>
-        <NewConsole
-          nagHeader={<ConsoleNag />}
-          showFiltersByDefault={consoleFilterDrawerDefaultsToOpen}
-          showSearchInputByDefault={false}
-          terminalInput={<JSTermWrapper />}
-        />
-      </InspectorContextReduxAdapter>
-    </TimelineContextAdapter>
+    <NewConsole
+      nagHeader={<ConsoleNag />}
+      showFiltersByDefault={consoleFilterDrawerDefaultsToOpen}
+      showSearchInputByDefault={false}
+      terminalInput={<JSTermWrapper />}
+    />
   );
 }
 

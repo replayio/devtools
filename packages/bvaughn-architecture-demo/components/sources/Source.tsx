@@ -3,7 +3,7 @@ import { parse } from "@bvaughn/src/suspense/SyntaxParsingCache";
 import { getSourceFileName } from "@bvaughn/src/utils/source";
 import { newSource as ProtocolSource } from "@replayio/protocol";
 import debounce from "lodash/debounce";
-import { MouseEvent, Suspense, useContext, useRef, useState } from "react";
+import { MouseEvent, Suspense, useContext, useLayoutEffect, useRef, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -50,6 +50,15 @@ function SuspendingSource({
 
   const client = useContext(ReplayClientContext);
   const sourceContents = getSourceContentsSuspense(client, source.sourceId);
+
+  useLayoutEffect(
+    () => () => {
+      // If a hover preview is visible when this Source is hidden for Offscreen
+      // make sure to clean it up so it doesn't remain visible.
+      setHoveredState(null);
+    },
+    []
+  );
 
   // TODO Incrementally parse code using SourceContext -> visibleLines
   const code = sourceContents.contents;

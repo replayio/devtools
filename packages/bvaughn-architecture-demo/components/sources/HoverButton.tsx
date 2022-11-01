@@ -4,6 +4,7 @@ import { KeyboardModifiersContext } from "@bvaughn/src/contexts/KeyboardModifier
 import { AddPoint, DeletePoints, EditPoint } from "@bvaughn/src/contexts/PointsContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { getHitPointsForLocationSuspense } from "@bvaughn/src/suspense/PointsCache";
+import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
 import {
   compareExecutionPoints,
   isExecutionPointsGreaterThan,
@@ -42,6 +43,7 @@ export default function HoverButton({
   const { isMetaKeyActive, isShiftKeyActive } = useContext(KeyboardModifiersContext);
   const client = useContext(ReplayClientContext);
   const { executionPoint, update } = useContext(TimelineContext);
+  const { findClosestFunctionName } = useContext(SourcesContext);
 
   if (isMetaKeyActive) {
     if (lineHitCounts === null) {
@@ -100,7 +102,18 @@ export default function HoverButton({
       }
 
       const fileName = source?.url?.split("/")?.pop();
-      const content = `"${fileName}", ${lineNumber}`;
+      let content = `"${fileName}", ${lineNumber}`;
+      const location = {
+        column: lineHitCounts.firstBreakableColumnIndex,
+        line: lineNumber,
+        sourceId: source.sourceId,
+      };
+      if (source?.sourceId) {
+        const closestFunctionName = findClosestFunctionName(source?.sourceId, location);
+        if (closestFunctionName) {
+          content = `"${closestFunctionName}", ${lineNumber}`;
+        }
+      }
 
       if (point) {
         editPoint(point.id, { content, shouldLog: true });
@@ -112,11 +125,7 @@ export default function HoverButton({
             content,
             shouldLog: true,
           },
-          {
-            column: lineHitCounts.firstBreakableColumnIndex,
-            line: lineNumber,
-            sourceId: source.sourceId,
-          }
+          location
         );
       }
     };

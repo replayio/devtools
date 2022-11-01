@@ -38,6 +38,7 @@ export function KeyboardModifiersContextRoot({ children }: PropsWithChildren<{}>
           break;
       }
     };
+
     const onKeyUp = (event: KeyboardEvent) => {
       switch (event.key) {
         case "Meta":
@@ -55,14 +56,27 @@ export function KeyboardModifiersContextRoot({ children }: PropsWithChildren<{}>
       }
     };
 
+    const onMouseMove = (event: MouseEvent) => {
+      const nextMetaKeyActive = event.metaKey;
+      const nextShiftKeyActive = event.shiftKey;
+      if (nextMetaKeyActive !== isMetaKeyActive || nextShiftKeyActive !== isShiftKeyActive) {
+        startTransition(() => {
+          setIsMetaKeyActive(nextMetaKeyActive);
+          setIsShiftKeyActive(nextShiftKeyActive);
+        });
+      }
+    };
+
     document.body.addEventListener("keydown", onKeyDown);
     document.body.addEventListener("keyup", onKeyUp);
+    document.body.addEventListener("mousemove", onMouseMove);
 
     return () => {
       document.body.removeEventListener("keydown", onKeyDown);
       document.body.removeEventListener("keyup", onKeyUp);
+      document.body.removeEventListener("mousemove", onMouseMove);
     };
-  }, []);
+  }, [isMetaKeyActive, isShiftKeyActive]);
 
   const context = useMemo(
     () => ({

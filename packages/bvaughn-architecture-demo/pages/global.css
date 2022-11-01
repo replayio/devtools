@@ -12,12 +12,7 @@ body {
   box-sizing: border-box;
 }
 
-:root.theme-dark {
-  background-color: var(--background-color-default);
-  color: var(--color-default);
-}
-
-:root.theme-light {
+:root {
   background-color: var(--background-color-default);
   color: var(--color-default);
 }
@@ -43,5 +38,5 @@ button {
 
 ::-webkit-scrollbar-thumb {
   border-radius: 0.75em;
-  background: var(--background-color-contrast-4);
+  background: var(--scroll-thumb-color);
 }

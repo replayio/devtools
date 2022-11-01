@@ -29,6 +29,11 @@ export default function getExpressionForTokenElement(
     currentTokenElement = children[index - 1] as HTMLElement;
     if (currentTokenElement.nodeName === "#text") {
       break;
+    } else {
+      const textContent = currentTokenElement.textContent;
+      if (textContent === null || textContent.trim() === "") {
+        break;
+      }
     }
 
     if (currentTokenElement.className !== "tok-punctuation") {

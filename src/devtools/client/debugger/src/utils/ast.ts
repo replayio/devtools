@@ -11,6 +11,9 @@ import {
   SymbolEntry,
 } from "../reducers/ast";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
+import { UIThunkAction } from "ui/actions";
+
+import { getSymbolEntryForSource } from "devtools/client/debugger/src/reducers/ast";
 
 export interface PositionRange {
   start: SourceLocation;
@@ -78,6 +81,20 @@ export function findClosestFunction(symbolsEntry: SymbolEntry, location: SourceL
   }
 
   return findClosestofSymbol(symbolsEntry.symbols!.functions, location);
+}
+
+export function findClosestFunctionNameThunk(
+  sourceId: string,
+  location: SourceLocation
+): UIThunkAction<string | null> {
+  return (dispatch, getState) => {
+    // Quirky but legal: use a thunk for a one-shot selection
+    // without subscribing to the store directly
+    const symbols = getSymbolEntryForSource(getState(), sourceId);
+
+    const closestFunction = symbols ? findClosestFunction(symbols, location) : null;
+    return closestFunction?.name ?? null;
+  };
 }
 
 export function findClosestClass(symbolsEntry: SymbolEntry, location: SourceLocation) {

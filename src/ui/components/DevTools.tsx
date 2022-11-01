@@ -1,5 +1,5 @@
 import { ThreadFront } from "protocol/thread";
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { useAppSelector } from "ui/setup/hooks";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
@@ -38,8 +38,12 @@ import SessionContextAdapter from "./SessionContextAdapter";
 import tokenManager, { TokenState } from "ui/utils/tokenManager";
 import { isTest } from "ui/utils/environment";
 import { PointsContextRoot } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import TimelineContextAdapter from "./SecondaryToolbox/TimelineContextAdapter";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
-import SelectedFrameContextWrapper from "./SelectedFrameContextAdapter";
+import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
+import usePreferredFontSize from "@bvaughn/src/hooks/usePreferredFontSize";
+import { useFeature } from "ui/hooks/settings";
+import { SelectedFrameContextRoot } from "@bvaughn/src/contexts/SelectedFrameContext";
 
 const Viewer = React.lazy(() => import("./Viewer"));
 
@@ -121,6 +125,9 @@ function _DevTools({
     [recording]
   );
 
+  const { value: enableLargeText } = useFeature("enableLargeText");
+  usePreferredFontSize(enableLargeText);
+
   useEffect(() => {
     import("./Viewer");
   }, []);
@@ -199,18 +206,22 @@ function _DevTools({
     <SessionContextAdapter>
       <SourcesContextAdapter>
         <FocusContextReduxAdapter>
-          <SelectedFrameContextWrapper>
-            <PointsContextRoot>
-              <TerminalContextAdapter>
-                <KeyModifiers>
-                  <Header />
-                  <Body />
-                  {showCommandPalette ? <CommandPaletteModal /> : null}
-                  <KeyboardShortcuts />
-                </KeyModifiers>
-              </TerminalContextAdapter>
-            </PointsContextRoot>
-          </SelectedFrameContextWrapper>
+          <PointsContextRoot>
+            <TimelineContextAdapter>
+              <SelectedFrameContextRoot>
+                <TerminalContextAdapter>
+                  <InspectorContextReduxAdapter>
+                    <KeyModifiers>
+                      <Header />
+                      <Body />
+                      {showCommandPalette ? <CommandPaletteModal /> : null}
+                      <KeyboardShortcuts />
+                    </KeyModifiers>
+                  </InspectorContextReduxAdapter>
+                </TerminalContextAdapter>
+              </SelectedFrameContextRoot>
+            </TimelineContextAdapter>
+          </PointsContextRoot>
         </FocusContextReduxAdapter>
       </SourcesContextAdapter>
     </SessionContextAdapter>

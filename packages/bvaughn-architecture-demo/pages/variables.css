@@ -2,15 +2,28 @@
   --font-family-default: sans-serif;
   --font-family-monospace: Menlo, ui-monospace, SFMono-Regular, Monaco, Consolas, Liberation Mono,
     Courier New, monospace;
+}
 
+:root,
+:root.prefers-default-font-size {
   --font-size-large: 16px;
   --font-size-regular: 12px;
   --font-size-small: 10px;
   --font-size-tiny: 8px;
 }
 
+:root.prefers-large-font-size {
+  --font-size-large: 20px;
+  --font-size-regular: 14px;
+  --font-size-small: 12px;
+  --font-size-tiny: 10px;
+}
+
+:root,
 :root.theme-dark {
   --color-transparent: rgba(0, 0, 0, 0);
+
+  --scroll-thumb-color: #454950;
 
   --background-color-contrast-1: #0e1119;
   --background-color-contrast-2: #192230;
@@ -23,6 +36,7 @@
   --background-color-primary-button: #09a6e9;
   --background-color-secondary-button: #f02d5e;
   --background-color-tertiary-button: #929292;
+  --background-color-disabled-button: #454950;
   --background-color-current-execution-point: #25364e;
   --background-color-current-search-result: #42381f;
   --background-color-warning: #42381f;
@@ -36,6 +50,7 @@
   --color-primary-button: #ffffff;
   --color-secondary-button: #ffffff;
   --color-tertiary-button: #000000;
+  --color-disabled-button: #ffffff;
   --color-warning: #fce2a1;
   --border-color: #e1e6ed;
   --border-color-light: #18181a;
@@ -120,6 +135,8 @@
 :root.theme-light {
   --color-transparent: rgba(255, 255, 255, 0);
 
+  --scroll-thumb-color: #aaaaaa;
+
   --background-color-contrast-1: #e6e6e6;
   --background-color-contrast-2: #ffffff;
   --background-color-contrast-3: #82888c;
@@ -131,6 +148,7 @@
   --background-color-primary-button: #09a6e9;
   --background-color-secondary-button: #f02d5e;
   --background-color-tertiary-button: #929292;
+  --background-color-disabled-button: #666666;
   --background-color-current-execution-point: #eaf3ff;
   --background-color-current-search-result: #fffac8;
   --background-color-warning: #fffac8;
@@ -149,6 +167,7 @@
   --color-primary-button: #ffffff;
   --color-secondary-button: #ffffff;
   --color-tertiary-button: #ffffff;
+  --color-disabled-button: #ffffff;
   --color-warning: #6c5914;
 
   --color-hit-counts-bar-0: #d9dad9;
