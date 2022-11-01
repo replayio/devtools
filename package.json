@@ -126,7 +126,7 @@
     "@storybook/builder-webpack5": "^6.4.21",
     "@storybook/manager-webpack5": "^6.4.20",
     "@storybook/react": "^6.5.9",
-    "@tailwindcss/forms": "^0.5.0",
+    "@tailwindcss/forms": "^0.5.3",
     "@testing-library/jest-dom": "^5.16.3",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^14.1.0",
