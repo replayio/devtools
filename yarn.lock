@@ -16899,10 +16899,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"logrocket@npm:^2.2.1":
-  version: 2.2.1
-  resolution: "logrocket@npm:2.2.1"
-  checksum: 23d2880b921e940a17bc711bdd7eef2a87cd607decb98c1e5659bea017baf1ac8225dda7cde9e45ab9b02fcf7a205faed9693db0dc79d77780c45ba4bdd23122
+"logrocket@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "logrocket@npm:3.0.1"
+  checksum: aa0024101d3696a81f56330726b75bcb20d880a58987f12e61cf83b9bca23964bc3928388ecb0a7bbfb83046db50a9318903de5a812c04ca1deb78b6601fdad1
   languageName: node
   linkType: hard
 
@@ -20761,7 +20761,7 @@ __metadata:
     jwt-decode: ^3.1.2
     launchdarkly-js-client-sdk: ^2.21.0
     lodash: ^4.17.21
-    logrocket: ^2.2.1
+    logrocket: ^3.0.1
     logrocket-react: ^5.0.1
     mini-css-extract-plugin: ^2.6.0
     mixpanel-browser: ^2.43.0
