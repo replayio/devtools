@@ -34,6 +34,26 @@ const LINE_HEIGHT = 15;
 const LINE_HEIGHT_WITH_POINT = LINE_HEIGHT + POINT_PANEL_HEIGHT;
 const LINE_HEIGHT_WITH_CONDITIONAL_POINT = LINE_HEIGHT + CONDITIONAL_POINT_PANEL_HEIGHT;
 
+const calculateScrollbarWidth = () => {
+  // Magic util to determine scrollbar width: https://stackoverflow.com/a/60008044/62937
+  let scrollbox = document.createElement("div");
+
+  // Make box scrollable
+  scrollbox.style.overflow = "scroll";
+
+  // Append box to document
+  document.body.appendChild(scrollbox);
+
+  // Measure inner width of box
+  const scrollBarWidth = scrollbox.offsetWidth - scrollbox.clientWidth;
+
+  // Remove box
+  document.body.removeChild(scrollbox);
+  return scrollBarWidth;
+};
+
+const actualScrollbarWidth = calculateScrollbarWidth();
+
 export default function SourceList({
   height,
   htmlLines,
@@ -213,12 +233,14 @@ export default function SourceList({
   const maxHitCountStringLength =
     showHitCounts && maxHitCount !== null ? `${formatHitCount(maxHitCount)}`.length : 0;
 
+  const widthMinusScrollbar = width - actualScrollbarWidth;
+
   const style = {
     "--conditional-point-panel-height": `${CONDITIONAL_POINT_PANEL_HEIGHT}px`,
     "--hit-count-size": `${maxHitCountStringLength}ch`,
     "--line-height": `${LINE_HEIGHT}px`,
     "--line-number-size": `${maxLineNumberStringLength + 1}ch`,
-    "--list-width": `${width}px`,
+    "--list-width": `${widthMinusScrollbar}px`,
     "--point-panel-height": `${POINT_PANEL_HEIGHT}px`,
   };
 
