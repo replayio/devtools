@@ -152,7 +152,7 @@
 }
 
 .LineHitCountBar {
-  flex: 0 0 1ch;
+  flex: 0 0 0.5em;
   height: var(--line-height);
 }
 .LineHitCountBar0 {
