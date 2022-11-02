@@ -29,7 +29,14 @@ image:
 test-architecture-demo:
   FROM earthly/dind:alpine
   WITH DOCKER --load devtools:latest=+image --load playwright-test-image=(./packages/bvaughn-architecture-demo/playwright+playwright-test-image --HOST=devtools)
-    RUN docker network create --driver bridge integration && docker run -d -p 3000 --network integration --name devtools devtools && docker run --network integration playwright-test-image
+    RUN docker network create --driver bridge integration && docker run -d -p 3000 --network integration --name devtools devtools && docker run -v /test-results:/playwright/test-results --network integration playwright-test-image
+
+  END
+  # TODO(dmiller): this should probably use TRY/FINALLY
+  IF [ -f /test-results/playwright_error ]
+    SAVE ARTIFACT ./test-results AS LOCAL ./packages/bvaughn-architecture-demo/playwright/test-results
+    RUN echo "test run failed" && \
+      exit 0
   END
 
 test-architecture-demo-save-snapshots:

@@ -11,7 +11,7 @@ const { join } = require("path");
 // If the "playwright_error" file exists, Earthly will save the "test-results" folder as an artifact.
 // If the "test-results" artifact is saved, the GitHub Workflow will infer failure.
 
-const FAIL_PATH = join(__dirname, "playwright_error");
+const FAIL_PATH = join(__dirname, "test-results", "playwright_error");
 
 if (existsSync(FAIL_PATH)) {
   console.log("Removing prev playwright_error file");
