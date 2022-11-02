@@ -5,15 +5,33 @@ import {
 } from "bvaughn-architecture-demo/src/contexts/SessionContext";
 import { ThreadFront } from "protocol/thread";
 import { useGetUserInfo } from "ui/hooks/users";
-import { ReactNode, useMemo } from "react";
+import { ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { getRecordingDuration } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { getSourceContentsHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 
 export default function SessionContextAdapter({ children }: { children: ReactNode }) {
   const recordingId = useGetRecordingId();
   const currentUserInfo = useGetUserInfo();
   const apolloClient = useApolloClient();
+
+  // TODO [source viewer]
+  // HACK Pre-cache the source contents so we can simulate the streaming source viewer later.
+  const [didPreFetchSources, setDidPreFetchSources] = useState(false);
+  const client = useContext(ReplayClientContext);
+  useEffect(() => {
+    async function load() {
+      const sources = await client.findSources();
+
+      await Promise.all(sources.map(source => getSourceContentsHelper(client, source.sourceId)));
+
+      setDidPreFetchSources(true);
+    }
+
+    load();
+  }, [client]);
 
   const duration = useAppSelector(getRecordingDuration)!;
 
@@ -35,5 +53,7 @@ export default function SessionContextAdapter({ children }: { children: ReactNod
     [currentUserInfo, duration, recordingId, apolloClient]
   );
 
-  return <SessionContext.Provider value={sessionContext}>{children}</SessionContext.Provider>;
+  return didPreFetchSources ? (
+    <SessionContext.Provider value={sessionContext}>{children}</SessionContext.Provider>
+  ) : null;
 }

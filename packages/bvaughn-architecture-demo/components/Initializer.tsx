@@ -9,7 +9,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { SessionContext, SessionContextType } from "../src/contexts/SessionContext";
 import { UserInfo } from "../src/graphql/types";
 import { getCurrentUserInfo } from "../src/graphql/User";
-import { preCacheSources } from "../src/suspense/SourcesCache";
+import { getSourceContentsHelper, preCacheSources } from "../src/suspense/SourcesCache";
 
 import Loader from "./Loader";
 import styles from "./Initializer.module.css";
@@ -64,6 +64,10 @@ export default function Initializer({
         if (activeAccessToken) {
           currentUserInfo = await getCurrentUserInfo(activeAccessToken);
         }
+
+        // TODO [source viewer]
+        // HACK Pre-cache the source contents so we can simulate the streaming source viewer later.
+        await Promise.all(sources.map(source => getSourceContentsHelper(client, source.sourceId)));
 
         setContext({
           accessToken: activeAccessToken,

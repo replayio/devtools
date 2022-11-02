@@ -53,6 +53,8 @@ import { binarySearch, compareNumericStrings, defer } from "protocol/utils";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { isCommandError, ProtocolError } from "shared/utils/error";
 
+import streamSourceContents from "./fixtures/streamSourceContents";
+
 import {
   HitPointsAndStatusTuple,
   HitPointStatus,
@@ -811,6 +813,8 @@ export class ReplayClient implements ReplayClientInterface {
     }) => void,
     onSourceContentsChunk: ({ chunk, sourceId }: { chunk: string; sourceId: SourceId }) => void
   ): Promise<void> {
+    await streamSourceContents(sourceId, maxChunkSize, onSourceContentsInfo, onSourceContentsChunk);
+    /*
     const sessionId = this.getSessionIdThrows();
 
     // TODO [streaming source viewer] Import generated types from Replay protocol
@@ -840,6 +844,7 @@ export class ReplayClient implements ReplayClientInterface {
       // @ts-ignore TODO [streaming source viewer] Don't use the generic API
       removeEventListener("Debugger.sourceContentsInfo", onSourceContentsInfoWrapper);
     }
+    */
   }
 
   _dispatchEvent(type: ReplayClientEvents, ...args: any[]): void {
