@@ -10,6 +10,7 @@ import { useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserInfo } from "ui/hooks/users";
 import { getRecordingDuration } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
+import { trackEvent } from "ui/utils/telemetry";
 
 export default function SessionContextAdapter({ children }: { children: ReactNode }) {
   const recordingId = useGetRecordingId();
@@ -32,6 +33,9 @@ export default function SessionContextAdapter({ children }: { children: ReactNod
           include: ["GetUser"],
         });
       },
+      // Convince TS that the function types line up, since the
+      // context version just accepts `string` and not `MixPanelEvent`
+      trackEvent: trackEvent as SessionContextType["trackEvent"],
     }),
     [currentUserInfo, duration, recordingId, apolloClient]
   );
