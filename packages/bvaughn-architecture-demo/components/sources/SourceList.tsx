@@ -26,14 +26,7 @@ import styles from "./SourceList.module.css";
 import { SourceSearchContext } from "./SourceSearchContext";
 import { findPointForLocation } from "./utils/points";
 import getScrollbarWidth from "./utils/getScrollbarWidth";
-
-// HACK
-// We could swap this out for something that lazily measures row height.
-const POINT_PANEL_HEIGHT = 90;
-const CONDITIONAL_POINT_PANEL_HEIGHT = 130;
-const LINE_HEIGHT = 15;
-const LINE_HEIGHT_WITH_POINT = LINE_HEIGHT + POINT_PANEL_HEIGHT;
-const LINE_HEIGHT_WITH_CONDITIONAL_POINT = LINE_HEIGHT + CONDITIONAL_POINT_PANEL_HEIGHT;
+import useFontBasedListMeasurents from "./hooks/useFontBasedListMeasurents";
 
 export default function SourceList({
   height,
@@ -52,6 +45,9 @@ export default function SourceList({
 
   const scrollbarWidth = useMemo(getScrollbarWidth, []);
 
+  const innerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<List>(null);
+
   const { range: focusRange } = useContext(FocusContext);
   const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
   const client = useContext(ReplayClientContext);
@@ -63,6 +59,14 @@ export default function SourceList({
     setVisibleLines,
     visibleLines,
   } = useContext(SourcesContext);
+
+  const {
+    conditionalPointPanelHeight,
+    pointPanelHeight,
+    lineHeight,
+    lineHeightWithConditionalPoint,
+    lineHeightWithPoint,
+  } = useFontBasedListMeasurents(listRef);
 
   useEffect(() => {
     if (pendingFocusUpdate === null || focusedLineNumber === null || focusedSourceId === null) {
@@ -116,9 +120,6 @@ export default function SourceList({
 
   const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
 
-  const innerRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<List>(null);
-
   const prevPointsRef = useRef<Point[]>([]);
   useLayoutEffect(() => {
     const list = listRef.current;
@@ -145,7 +146,7 @@ export default function SourceList({
       editPoint,
       hitCounts,
       htmlLines,
-      lineHeight: LINE_HEIGHT,
+      lineHeight,
       maxHitCount,
       minHitCount,
       points,
@@ -160,6 +161,7 @@ export default function SourceList({
       editPoint,
       hitCounts,
       htmlLines,
+      lineHeight,
       maxHitCount,
       minHitCount,
       points,
@@ -175,14 +177,14 @@ export default function SourceList({
       const lineNumber = index + 1;
       const point = findPointForLocation(points, sourceId, lineNumber);
       if (point === null || !point.shouldLog) {
-        return LINE_HEIGHT;
+        return lineHeight;
       } else if (point.condition !== null) {
-        return LINE_HEIGHT_WITH_CONDITIONAL_POINT;
+        return lineHeightWithConditionalPoint;
       } else {
-        return LINE_HEIGHT_WITH_POINT;
+        return lineHeightWithPoint;
       }
     },
-    [points, sourceId]
+    [lineHeight, lineHeightWithConditionalPoint, lineHeightWithPoint, points, sourceId]
   );
 
   const longestLineWidthRef = useRef<number>(0);
@@ -219,18 +221,18 @@ export default function SourceList({
   const widthMinusScrollbar = width - scrollbarWidth;
 
   const style = {
-    "--conditional-point-panel-height": `${CONDITIONAL_POINT_PANEL_HEIGHT}px`,
+    "--conditional-point-panel-height": `${conditionalPointPanelHeight}px`,
     "--hit-count-size": `${maxHitCountStringLength}ch`,
-    "--line-height": `${LINE_HEIGHT}px`,
+    "--line-height": `${lineHeight}px`,
     "--line-number-size": `${maxLineNumberStringLength + 1}ch`,
     "--list-width": `${widthMinusScrollbar}px`,
-    "--point-panel-height": `${POINT_PANEL_HEIGHT}px`,
+    "--point-panel-height": `${pointPanelHeight}px`,
   };
 
   return (
     <List
       className={styles.List}
-      estimatedItemSize={LINE_HEIGHT}
+      estimatedItemSize={lineHeight}
       height={height}
       innerRef={innerRef}
       itemCount={numLines}

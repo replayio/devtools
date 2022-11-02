@@ -280,7 +280,7 @@ test("should support continue to next and previous functionality", async ({ page
   await expect(await isContinueToNextButtonEnabled(page, sourceId, 15)).toBe(true);
   await expect(await isContinueToPreviousButtonEnabled(page, sourceId, 15)).toBe(false);
 });
-*
+*/
 
 test("should allow log point badge colors to be toggled", async ({ page }) => {
   const pointPanelLocator = getPointPanelLocator(page, 13);

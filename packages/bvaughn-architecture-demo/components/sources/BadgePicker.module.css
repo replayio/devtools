@@ -11,9 +11,10 @@
 .BadgePickerButton {
   width: var(--badge-picker-button-size);
   height: var(--badge-picker-button-size);
+  border-radius: var(--badge-picker-button-size);
+  background-color: var(--background-color-contrast-2);
   flex-grow: 0;
   flex-shrink: 0;
-  background: none;
   padding: 0;
   border: 0;
   margin: 0;
@@ -90,16 +91,18 @@
 }
 
 .UnicornBadge {
+  height: 0.5em;
+  width: 0.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: visible;
-  position: relative;
-  margin: 0;
 }
 .Unicorn {
   display: inline-block;
+  flex: 0 0 var(--badge-picker-icon-size);
   width: var(--badge-picker-icon-size);
   height: var(--badge-picker-icon-size);
-  margin-top: -0.25em;
-  margin-left: -0.25em;
   background-image: url(../../public/unicorn.svg) !important;
   background-size: auto 100%;
 }

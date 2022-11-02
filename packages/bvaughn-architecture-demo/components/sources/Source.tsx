@@ -44,6 +44,17 @@ function SuspendingSource({
 }) {
   const [hoveredState, setHoveredState] = useState<HoveredState | null>(null);
 
+  useLayoutEffect(() => {
+    if (hoveredState) {
+      const target = hoveredState.target;
+      target.classList.add(styles.HoveredTarget);
+
+      return () => {
+        target.classList.remove(styles.HoveredTarget);
+      };
+    }
+  }, [hoveredState]);
+
   const sourceRef = useRef<HTMLDivElement>(null);
 
   const fileName = getSourceFileName(source, true) || "unknown";

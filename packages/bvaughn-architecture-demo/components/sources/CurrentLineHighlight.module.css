@@ -11,6 +11,8 @@
 
 .CurrentExecutionPoint {
   background: var(--background-color-current-execution-point);
+  border-top: 1px solid var(--border-color-current-execution-point);
+  border-bottom: 1px solid var(--border-color-current-execution-point);
 }
 
 .CurrentSearchResult {
