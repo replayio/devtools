@@ -48,7 +48,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
   const { showCommentsPanel } = useContext(InspectorContext);
   const { editPoint } = useContext(PointsContext);
   const client = useContext(ReplayClientContext);
-  const { accessToken, recordingId } = useContext(SessionContext);
+  const { accessToken, recordingId, trackEvent } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: curentTime } = useContext(TimelineContext);
 
   const [hitPoints, hitPointStatus] = getHitPointsForLocationSuspense(
@@ -89,10 +89,12 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
     };
 
     const onEditableContentChange = (newContent: string) => {
+      trackEvent("breakpoint.set_log");
       setEditableContent(newContent);
     };
 
     const onEditableConditionChange = (newCondition: string) => {
+      trackEvent("breakpoint.set_condition");
       setEditableCondition(newCondition);
     };
 
@@ -202,6 +204,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
     }
 
     const startEditing = () => {
+      trackEvent("breakpoint.start_edit");
       setEditableCondition(point.condition || null);
       setEditableContent(point.content);
       setIsEditing(true);
@@ -216,6 +219,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
         if (showCommentsPanel !== null) {
           showCommentsPanel();
         }
+        trackEvent("breakpoint.add_comment");
 
         await addCommentGraphQL(graphQLClient, accessToken, recordingId, {
           content: "",
