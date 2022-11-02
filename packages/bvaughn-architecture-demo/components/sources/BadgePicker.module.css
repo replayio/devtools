@@ -11,9 +11,10 @@
 .BadgePickerButton {
   width: var(--badge-picker-button-size);
   height: var(--badge-picker-button-size);
+  border-radius: var(--badge-picker-button-size);
+  background-color: var(--background-color-contrast-2);
   flex-grow: 0;
   flex-shrink: 0;
-  background: none;
   padding: 0;
   border: 0;
   margin: 0;
