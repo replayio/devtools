@@ -87,14 +87,15 @@
 }
 
 .LineNumber {
+  background-color: var(--background-color-contrast-2);
   height: var(--line-height);
-  width: var(--line-number-size);
+  width: calc(var(--line-number-size) + 2ch);
   display: flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: flex-end;
   font-size: var(--font-size-small);
-  margin: 0 1ch;
+  padding: 0 1ch;
   color: var(--color-dim);
   user-select: none;
   position: relative;
