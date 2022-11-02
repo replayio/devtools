@@ -8,11 +8,18 @@ import {
   isExecutionPointsLessThan,
 } from "@bvaughn/src/utils/time";
 import { TimeStampedPoint } from "@replayio/protocol";
-import { CSSProperties, MouseEvent, useContext, useLayoutEffect, useRef, useState } from "react";
+import {
+  CSSProperties,
+  MouseEvent,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { HitPointStatus, Point } from "shared/client/types";
-import Popup from "../Popup";
 
 import styles from "./PointPanelTimeline.module.css";
 import { getBadgeStyleVars } from "./utils/getBadgeStyleVars";
@@ -42,6 +49,16 @@ export default function PointPanelTimeline({
   } | null>(null);
   const [hoverTime, setHoverTime] = useState<number>(0);
 
+  // When the user seeks to a new time, we should immediately update to reflect their intent.
+  const [optimisticTime, setOptimisticTime] = useState<number | null>(null);
+  const progressBarTime = isPending && optimisticTime !== null ? optimisticTime : currentTime;
+
+  useEffect(() => {
+    // Reset this whenever the actual time changes;
+    // It's only meant to be something shown temporarily.
+    setOptimisticTime(null);
+  }, [currentTime]);
+
   const [currentHitPoint, currentHitPointIndex] = findHitPoint(hitPoints, currentExecutionPoint);
 
   const firstHitPoint = hitPoints.length > 0 ? hitPoints[0] : null;
@@ -54,12 +71,14 @@ export default function PointPanelTimeline({
   const goToPrevious = () => {
     const [prevHitPoint] = findHitPointBefore(hitPoints, currentExecutionPoint);
     if (prevHitPoint !== null) {
+      setOptimisticTime(prevHitPoint.time);
       update(prevHitPoint.time, prevHitPoint.point);
     }
   };
   const goToNext = () => {
     const [nextHitPoint] = findHitPointAfter(hitPoints, currentExecutionPoint);
     if (nextHitPoint !== null) {
+      setOptimisticTime(nextHitPoint.time);
       update(nextHitPoint.time, nextHitPoint.point);
     }
   };
@@ -85,6 +104,7 @@ export default function PointPanelTimeline({
     const time = Math.round(duration * percentage);
     const point = await imperativelyGetClosestPointForTime(client, time);
 
+    setOptimisticTime(hoverTime);
     update(hoverTime, point);
   };
 
@@ -150,18 +170,20 @@ export default function PointPanelTimeline({
         <div className={styles.HitPointTimelineBackground} />
         <div
           className={
-            !isPending && hoverTime > 0 && hoverTime < currentTime
+            !isPending && hoverTime > 0 && hoverTime < progressBarTime
               ? styles.ProgressBarPartiallyOpaque
               : styles.ProgressBarOpaque
           }
           style={{
-            width: `${(100 * currentTime) / duration}%`,
+            width: `${(100 * progressBarTime) / duration}%`,
           }}
         />
         {!isPending && hoverTime > 0 && (
           <div
             className={
-              hoverTime < currentTime ? styles.ProgressBarOpaque : styles.ProgressBarPartiallyOpaque
+              hoverTime < progressBarTime
+                ? styles.ProgressBarOpaque
+                : styles.ProgressBarPartiallyOpaque
             }
             style={{
               width: `${(100 * hoverTime) / duration}%`,
@@ -179,6 +201,7 @@ export default function PointPanelTimeline({
               event.stopPropagation();
               event.preventDefault();
 
+              setOptimisticTime(hitPoint.time);
               update(hitPoint.time, hitPoint.point);
             }}
             style={{
