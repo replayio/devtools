@@ -23,16 +23,21 @@ export default function TestInfo({
   const recordingDuration = useAppSelector(getRecordingDuration);
   const cypressResults = useFetchCypressSpec();
 
+  console.log({ testCases });
+
   return (
-    <div className="flex flex-col space-y-1 px-4 py-2">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1">
-          {result ? <Status result={result} /> : null}
-          <div className="font-bold">{spec}</div>
+    <div className="flex flex-col px-4 py-2 space-y-1">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 overflow-hidden">
+          {/* {result ? <Status result={result} /> : null} */}
+          <div className="overflow-hidden">
+            <div className="overflow-hidden font-bold whitespace-pre overflow-ellipsis">{spec}</div>
+            <TestResultsSummary testCases={testCases} />
+          </div>
         </div>
         {recordingDuration ? <div>{getFormattedTime(recordingDuration)}</div> : null}
       </div>
-      <div className="flex flex-col space-y-1 py-2">
+      <div className="flex flex-col">
         {testCases.map((t, i) => (
           <TestCase test={t} key={i} location={cypressResults?.[i]?.location} />
         ))}
@@ -41,11 +46,33 @@ export default function TestInfo({
   );
 }
 
+function TestResultsSummary({ testCases }: { testCases: TestItem[] }) {
+  const failed = testCases.filter(c => c.result === "failed").length;
+  const passed = testCases.filter(c => c.result === "passed").length;
+
+  return (
+    <div className="flex gap-1">
+      <div className="flex items-center gap-1">
+        <MaterialIcon iconSize="2xl" outlined className="text-green-500">
+          done
+        </MaterialIcon>
+        <div>{passed}</div>
+      </div>
+      <div className="flex items-center gap-1">
+        <MaterialIcon iconSize="2xl" outlined className="text-red-500">
+          close
+        </MaterialIcon>
+        <div>{failed}</div>
+      </div>
+    </div>
+  );
+}
+
 function TestCase({ test, location }: { test: TestItem; location?: SourceLocation }) {
-  const [expandError, setExpandError] = useState(false);
   const [expandSteps, setExpandSteps] = useState(false);
   const dispatch = useAppDispatch();
   const cx = useAppSelector(getThreadContext);
+  const expandable = test.steps || test.error;
 
   const onClick = () => {
     if (location) {
@@ -53,28 +80,29 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
     }
   };
   const toggleExpand = () => {
+    if (!expandable) {
+      return;
+    }
     setExpandSteps(!expandSteps);
   };
-  const expandable = test.steps || test.error;
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="group flex flex-row items-center justify-between gap-1 pl-4 transition hover:bg-chrome">
+    <div className="flex flex-col">
+      <div className="flex flex-row items-center justify-between gap-1 py-1 transition group hover:bg-chrome">
         <button
           onClick={toggleExpand}
           disabled={!expandable}
-          className="flex flex-grow flex-row items-center gap-1 overflow-hidden"
+          className="flex flex-row items-center flex-grow gap-1 overflow-hidden"
         >
           <Status result={test.result} />
           {test.steps ? (
             <MaterialIcon>{expandSteps ? "expand_more" : "chevron_right"}</MaterialIcon>
           ) : null}
-          <div
-            className={`overflow-hidden overflow-ellipsis whitespace-pre ${
-              expandable ? "group-hover:underline" : ""
-            }`}
-          >
-            {test.title}
+          <div className="flex flex-col items-start">
+            <div className="overflow-hidden whitespace-pre overflow-ellipsis">{test.title}</div>
+            {test.error ? (
+              <div className="overflow-hidden font-mono text-red-500">{test.error.message}</div>
+            ) : null}
           </div>
         </button>
         {location ? (
@@ -83,48 +111,38 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
           </button>
         ) : null}
       </div>
-      {expandSteps ? (
-        <>
-          {test.error ? (
-            <div className="ml-7 space-y-1">
-              <div className="font-bold">Error</div>
-              <div className="space-y-1 bg-chrome p-2">
-                <div className={`overflow-hidden font-mono ${!expandError ? "truncate" : ""}`}>
-                  {test.error.message}
-                </div>
-                <button className="hover:underline" onClick={() => setExpandError(!expandError)}>
-                  Show {expandError ? "less" : "more"}
-                </button>
-              </div>
-            </div>
-          ) : null}
-          {test.steps ? <TestSteps steps={test.steps} startTime={test.relativeStartTime} /> : null}
-        </>
-      ) : null}
+      {expandSteps ? <TestSteps test={test} startTime={test.relativeStartTime} /> : null}
     </div>
   );
 }
 
-function TestSteps({ steps, startTime }: { steps: TestStep[]; startTime: number }) {
+function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
+  const { steps, error } = test;
+
   return (
-    <div className="flex flex-col space-y-1 pl-8">
-      <div className="font-bold">Steps</div>
-      <div className="flex flex-col gap-1 bg-chrome p-2">
-        {steps?.map((s, i) => (
-          <div key={i} className="flex items-center justify-between overflow-hidden">
-            <div className="flex items-center space-x-2 overflow-hidden whitespace-pre">
-              <MaterialIcon outlined className={s.error ? "text-red-500" : "text-green-500"}>
-                {s.error ? "close" : "done"}
-              </MaterialIcon>
-              <div className="overflow-hidden overflow-ellipsis">{s.name}</div>
-              <div className="overflow-hidden whitespace-pre opacity-50">
-                {s.args?.length ? `${s.args.toString()}` : ""}
-              </div>
+    <div className="flex flex-col py-2 pl-4">
+      {steps?.map((s, i) => (
+        <div
+          key={i}
+          className="flex items-center justify-between px-2 py-1 overflow-hidden border-b border-gray-300 bg-chrome"
+        >
+          <div className="flex items-center space-x-2 overflow-hidden font-mono whitespace-pre">
+            <div className="overflow-hidden overflow-ellipsis">{s.name}</div>
+            <div className="overflow-hidden whitespace-pre opacity-50">
+              {s.args?.length ? `${s.args.toString()}` : ""}
             </div>
-            {/* <div>{getFormattedTime(s.relativeStartTime)}</div> */}
           </div>
-        ))}
-      </div>
+          {/* <div>{getFormattedTime(s.relativeStartTime)}</div> */}
+        </div>
+      ))}
+      {test.error ? (
+        <div className="text-red-700 bg-red-200 border-l-2 border-red-800">
+          <div className="p-2 font-bold">Error</div>
+          <div className="p-2 space-y-1 overflow-hidden font-mono truncate bg-red-100">
+            {test.error.message}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -136,7 +154,7 @@ function Status({ result }: { result: TestResult }) {
       outlined
       className={result === "passed" ? "text-green-500" : "text-red-500"}
     >
-      {result === "passed" ? "check_circle" : "highlight_off"}
+      {result === "passed" ? "done" : "close"}
     </MaterialIcon>
   );
 }
