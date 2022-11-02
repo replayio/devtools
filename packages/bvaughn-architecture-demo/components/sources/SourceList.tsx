@@ -15,6 +15,7 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import { ListOnItemsRenderedProps, VariableSizeList as List } from "react-window";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -26,14 +27,32 @@ import styles from "./SourceList.module.css";
 import { SourceSearchContext } from "./SourceSearchContext";
 import { findPointForLocation } from "./utils/points";
 import getScrollbarWidth from "./utils/getScrollbarWidth";
+import useClassListObserver from "./hooks/useClassListObserver";
 
 // HACK
 // We could swap this out for something that lazily measures row height.
-const POINT_PANEL_HEIGHT = 90;
-const CONDITIONAL_POINT_PANEL_HEIGHT = 130;
-const LINE_HEIGHT = 15;
-const LINE_HEIGHT_WITH_POINT = LINE_HEIGHT + POINT_PANEL_HEIGHT;
-const LINE_HEIGHT_WITH_CONDITIONAL_POINT = LINE_HEIGHT + CONDITIONAL_POINT_PANEL_HEIGHT;
+// There are only a small number of variations though, so...
+type Sizes = {
+  conditionalPointPanelHeight: number;
+  pointPanelHeight: number;
+  lineHeight: number;
+  lineHeightWithPoint: number;
+  lineHeightWithConditionalPoint: number;
+};
+const SIZES_FONT_SIZE_REGULAR: Sizes = {
+  conditionalPointPanelHeight: 130,
+  pointPanelHeight: 90,
+  lineHeight: 15,
+  lineHeightWithPoint: 15 + 90,
+  lineHeightWithConditionalPoint: 15 + 130,
+};
+const SIZES_FONT_SIZE_LARGE: Sizes = {
+  conditionalPointPanelHeight: 156,
+  pointPanelHeight: 108,
+  lineHeight: 16,
+  lineHeightWithPoint: 16 + 108,
+  lineHeightWithConditionalPoint: 16 + 156,
+};
 
 export default function SourceList({
   height,
@@ -63,6 +82,30 @@ export default function SourceList({
     setVisibleLines,
     visibleLines,
   } = useContext(SourcesContext);
+
+  const [sizes, setSizes] = useState<Sizes>(SIZES_FONT_SIZE_REGULAR);
+  const {
+    conditionalPointPanelHeight,
+    pointPanelHeight,
+    lineHeight,
+    lineHeightWithConditionalPoint,
+    lineHeightWithPoint,
+  } = sizes;
+
+  // Listen for font-size changes.
+  useClassListObserver(document.body.parentElement!, (classList: DOMTokenList) => {
+    const prefersLargeFontSize = classList.contains("prefers-large-font-size");
+    if (prefersLargeFontSize) {
+      setSizes(SIZES_FONT_SIZE_LARGE);
+    } else {
+      setSizes(SIZES_FONT_SIZE_REGULAR);
+    }
+
+    const list = listRef.current;
+    if (list) {
+      list.resetAfterIndex(0);
+    }
+  });
 
   useEffect(() => {
     if (pendingFocusUpdate === null || focusedLineNumber === null || focusedSourceId === null) {
@@ -145,7 +188,7 @@ export default function SourceList({
       editPoint,
       hitCounts,
       htmlLines,
-      lineHeight: LINE_HEIGHT,
+      lineHeight,
       maxHitCount,
       minHitCount,
       points,
@@ -160,6 +203,7 @@ export default function SourceList({
       editPoint,
       hitCounts,
       htmlLines,
+      lineHeight,
       maxHitCount,
       minHitCount,
       points,
@@ -175,14 +219,14 @@ export default function SourceList({
       const lineNumber = index + 1;
       const point = findPointForLocation(points, sourceId, lineNumber);
       if (point === null || !point.shouldLog) {
-        return LINE_HEIGHT;
+        return lineHeight;
       } else if (point.condition !== null) {
-        return LINE_HEIGHT_WITH_CONDITIONAL_POINT;
+        return lineHeightWithConditionalPoint;
       } else {
-        return LINE_HEIGHT_WITH_POINT;
+        return lineHeightWithPoint;
       }
     },
-    [points, sourceId]
+    [lineHeight, lineHeightWithConditionalPoint, lineHeightWithPoint, points, sourceId]
   );
 
   const longestLineWidthRef = useRef<number>(0);
@@ -219,18 +263,18 @@ export default function SourceList({
   const widthMinusScrollbar = width - scrollbarWidth;
 
   const style = {
-    "--conditional-point-panel-height": `${CONDITIONAL_POINT_PANEL_HEIGHT}px`,
+    "--conditional-point-panel-height": `${conditionalPointPanelHeight}px`,
     "--hit-count-size": `${maxHitCountStringLength}ch`,
-    "--line-height": `${LINE_HEIGHT}px`,
+    "--line-height": `${lineHeight}px`,
     "--line-number-size": `${maxLineNumberStringLength + 1}ch`,
     "--list-width": `${widthMinusScrollbar}px`,
-    "--point-panel-height": `${POINT_PANEL_HEIGHT}px`,
+    "--point-panel-height": `${pointPanelHeight}px`,
   };
 
   return (
     <List
       className={styles.List}
-      estimatedItemSize={LINE_HEIGHT}
+      estimatedItemSize={lineHeight}
       height={height}
       innerRef={innerRef}
       itemCount={numLines}
