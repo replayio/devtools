@@ -215,5 +215,6 @@ export function createMockReplayClient() {
     runAnalysis: jest.fn().mockImplementation(async () => []),
     searchFunctions: jest.fn().mockImplementation(async () => {}),
     searchSources: jest.fn().mockImplementation(async () => {}),
+    streamSourceContents: jest.fn().mockImplementation(async () => {}),
   };
 }

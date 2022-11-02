@@ -1,10 +1,13 @@
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
+import { StreamingParser } from "@bvaughn/src/suspense/SyntaxParsingCache";
 import useLocalStorage from "@bvaughn/src/hooks/useLocalStorage";
 import {
   getCachedMinMaxSourceHitCounts,
   getSourceHitCountsSuspense,
+  getStreamingSourceContents,
+  StreamingSourceContents,
 } from "@bvaughn/src/suspense/SourcesCache";
 import { newSource as ProtocolSource } from "@replayio/protocol";
 import {
@@ -15,6 +18,7 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
+  useSyncExternalStore,
 } from "react";
 import { ListOnItemsRenderedProps, VariableSizeList as List } from "react-window";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -30,15 +34,17 @@ import useFontBasedListMeasurents from "./hooks/useFontBasedListMeasurents";
 
 export default function SourceList({
   height,
-  htmlLines,
   showColumnBreakpoints,
   source,
+  streamingParser,
+  streamingSourceContents,
   width,
 }: {
   height: number;
-  htmlLines: string[];
   showColumnBreakpoints: boolean;
   source: ProtocolSource;
+  streamingParser: StreamingParser;
+  streamingSourceContents: StreamingSourceContents;
   width: number;
 }) {
   const { sourceId } = source;
@@ -67,6 +73,12 @@ export default function SourceList({
     lineHeightWithConditionalPoint,
     lineHeightWithPoint,
   } = useFontBasedListMeasurents(listRef);
+
+  const lineCount = useSyncExternalStore(
+    streamingSourceContents.subscribe,
+    () => streamingSourceContents.lineCount,
+    () => streamingSourceContents.lineCount
+  );
 
   useEffect(() => {
     if (pendingFocusUpdate === null || focusedLineNumber === null || focusedSourceId === null) {
@@ -145,7 +157,6 @@ export default function SourceList({
       deletePoints,
       editPoint,
       hitCounts,
-      htmlLines,
       lineHeight,
       maxHitCount,
       minHitCount,
@@ -154,13 +165,13 @@ export default function SourceList({
       showColumnBreakpoints,
       showHitCounts,
       source,
+      streamingParser,
     }),
     [
       addPoint,
       deletePoints,
       editPoint,
       hitCounts,
-      htmlLines,
       lineHeight,
       maxHitCount,
       minHitCount,
@@ -169,6 +180,7 @@ export default function SourceList({
       showColumnBreakpoints,
       setShowHitCounts,
       source,
+      streamingParser,
     ]
   );
 
@@ -213,8 +225,7 @@ export default function SourceList({
     [setVisibleLines]
   );
 
-  const numLines = htmlLines.length;
-  const maxLineNumberStringLength = `${numLines}`.length;
+  const maxLineNumberStringLength = `${lineCount}`.length;
   const maxHitCountStringLength =
     showHitCounts && maxHitCount !== null ? `${formatHitCount(maxHitCount)}`.length : 0;
 
@@ -235,7 +246,7 @@ export default function SourceList({
       estimatedItemSize={lineHeight}
       height={height}
       innerRef={innerRef}
-      itemCount={numLines}
+      itemCount={lineCount || 0}
       itemData={itemData}
       itemSize={getItemSize}
       onItemsRendered={onItemsRendered}

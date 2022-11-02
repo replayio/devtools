@@ -18,6 +18,8 @@ import { createGenericCache } from "./createGenericCache";
 
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
+const DEFAULT_MAX_CHUNK_SIZE = 100_000;
+
 export type ProtocolSourceContents = {
   contents: string;
   contentType: ProtocolContentType;
@@ -28,17 +30,33 @@ export type IndexedSource = ProtocolSource & {
   doesContentHashChange: boolean;
 };
 
+export type StreamSubscriber = () => void;
+export type UnsubscribeFromStream = () => void;
+
+export type StreamingSourceContents = {
+  codeUnitCount: number | null;
+  complete: boolean;
+  contents: string | null;
+  contentType: ProtocolContentType | null;
+  lineCount: number | null;
+  sourceId: ProtocolSourceId;
+  subscribe(subscriber: StreamSubscriber): UnsubscribeFromStream;
+};
+
 let inProgressSourcesWakeable: Wakeable<ProtocolSource[]> | null = null;
 let sources: ProtocolSource[] | null = null;
 
 type MinMaxHitCountTuple = [minHitCount: number, maxHitCount: number];
 
-const sourceIdToHitCountsMap: Map<string, Record<LineNumberToHitCountMap>> = new Map();
-const sourceIdToMinMaxHitCountsMap: Map<string, MinMaxHitCountTuple> = new Map();
-
+const sourceIdToHitCountsMap: Map<ProtocolSourceId, Record<LineNumberToHitCountMap>> = new Map();
+const sourceIdToMinMaxHitCountsMap: Map<ProtocolSourceId, MinMaxHitCountTuple> = new Map();
 const sourceIdToSourceContentsMap: Map<
   ProtocolSourceId,
   Record<ProtocolSourceContents>
+> = new Map();
+const sourceIdToStreamingSourceContentsMap: Map<
+  ProtocolSourceId,
+  Record<StreamingSourceContents>
 > = new Map();
 
 export function preCacheSources(value: ProtocolSource[]): void {
@@ -94,6 +112,11 @@ export function getSourceIfAlreadyLoaded(sourceId: ProtocolSourceId): ProtocolSo
   return null;
 }
 
+export function getCachedSourceContents(sourceId: ProtocolSourceId): ProtocolSourceContents | null {
+  const record = sourceIdToSourceContentsMap.get(sourceId);
+  return record?.status === STATUS_RESOLVED ? record.value : null;
+}
+
 export function getSourceContentsSuspense(
   client: ReplayClientInterface,
   sourceId: ProtocolSourceId
@@ -109,6 +132,31 @@ export function getSourceContentsSuspense(
 
     // Suspense caches fire and forget; errors will be handled within the fetch function.
     fetchSourceContents(client, sourceId, record, record.value);
+  }
+
+  if (record!.status === STATUS_RESOLVED) {
+    return record!.value;
+  } else {
+    throw record!.value;
+  }
+}
+
+export function getStreamingSourceContents(
+  client: ReplayClientInterface,
+  sourceId: ProtocolSourceId,
+  maxChunkSize: number = DEFAULT_MAX_CHUNK_SIZE
+): StreamingSourceContents {
+  let record = sourceIdToStreamingSourceContentsMap.get(sourceId);
+  if (record == null) {
+    record = {
+      status: STATUS_PENDING,
+      value: createWakeable<StreamingSourceContents>(),
+    };
+
+    sourceIdToStreamingSourceContentsMap.set(sourceId, record);
+
+    // Suspense caches fire and forget; errors will be handled within the fetch function.
+    fetchStreamingSourceContents(client, sourceId, maxChunkSize, record, record.value);
   }
 
   if (record!.status === STATUS_RESOLVED) {
@@ -251,6 +299,77 @@ async function fetchSourceContents(
 
     record.status = STATUS_RESOLVED;
     record.value = sourceContents;
+
+    wakeable.resolve(record.value);
+  } catch (error) {
+    record.status = STATUS_REJECTED;
+    record.value = error;
+
+    wakeable.reject(error);
+  }
+}
+
+async function fetchStreamingSourceContents(
+  client: ReplayClientInterface,
+  sourceId: ProtocolSourceId,
+  maxChunkSize: number,
+  record: Record<StreamingSourceContents>,
+  wakeable: Wakeable<StreamingSourceContents>
+) {
+  try {
+    const subscribers: Set<StreamSubscriber> = new Set();
+    const streamingSourceContents: StreamingSourceContents = {
+      codeUnitCount: null,
+      complete: false,
+      contents: null,
+      contentType: null,
+      lineCount: null,
+      sourceId,
+      subscribe(subscriber: StreamSubscriber) {
+        subscribers.add(subscriber);
+        return () => {
+          subscribers.delete(subscriber);
+        };
+      },
+    };
+
+    const notifySubscribers = () => {
+      subscribers.forEach(subscriber => subscriber());
+    };
+
+    // Fire and forget; data streams in.
+    client
+      .streamSourceContents(
+        sourceId,
+        maxChunkSize,
+        ({ codeUnitCount, contentType, lineCount }) => {
+          streamingSourceContents.codeUnitCount = codeUnitCount;
+          streamingSourceContents.contentType = contentType;
+          streamingSourceContents.lineCount = lineCount;
+          notifySubscribers();
+        },
+        ({ chunk }) => {
+          if (streamingSourceContents.contents === null) {
+            streamingSourceContents.contents = chunk;
+          } else {
+            streamingSourceContents.contents += chunk;
+          }
+
+          const isComplete =
+            streamingSourceContents.contents.length === streamingSourceContents.codeUnitCount;
+          if (isComplete) {
+            streamingSourceContents.complete = true;
+          }
+
+          notifySubscribers();
+        }
+      )
+      .then(() => {
+        subscribers.clear();
+      });
+
+    record.status = STATUS_RESOLVED;
+    record.value = streamingSourceContents;
 
     wakeable.resolve(record.value);
   } catch (error) {

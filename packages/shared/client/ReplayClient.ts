@@ -37,8 +37,15 @@ import { insert } from "bvaughn-architecture-demo/src/utils/array";
 import { compareExecutionPoints } from "bvaughn-architecture-demo/src/utils/time";
 import uniqueId from "lodash/uniqueId";
 import analysisManager from "protocol/analysisManager";
-// eslint-disable-next-line no-restricted-imports
-import { client, initSocket } from "protocol/socket";
+import {
+  addEventListener,
+  // eslint-disable-next-line no-restricted-imports
+  client,
+  initSocket,
+  removeEventListener,
+  // eslint-disable-next-line no-restricted-imports
+  sendMessage,
+} from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { RecordingCapabilities } from "protocol/thread/thread";
@@ -50,7 +57,6 @@ import {
   HitPointsAndStatusTuple,
   HitPointStatus,
   LineNumberToHitCountMap,
-  Point,
   ReplayClientEvents,
   ReplayClientInterface,
   RunAnalysisParams,
@@ -548,6 +554,7 @@ export class ReplayClient implements ReplayClientInterface {
       { sourceId },
       sessionId
     );
+
     return { contents, contentType };
   }
 
@@ -786,6 +793,53 @@ export class ReplayClient implements ReplayClientInterface {
         reject(error);
       }
     });
+  }
+
+  async streamSourceContents(
+    sourceId: SourceId,
+    maxChunkSize: number,
+    onSourceContentsInfo: ({
+      codeUnitCount,
+      contentType,
+      lineCount,
+      sourceId,
+    }: {
+      codeUnitCount: number;
+      contentType: ContentType;
+      lineCount: number;
+      sourceId: SourceId;
+    }) => void,
+    onSourceContentsChunk: ({ chunk, sourceId }: { chunk: string; sourceId: SourceId }) => void
+  ): Promise<void> {
+    const sessionId = this.getSessionIdThrows();
+
+    // TODO [streaming source viewer] Import generated types from Replay protocol
+    const onSourceContentsChunkWrapper = (params: any) => {
+      if (params.sourceId === sourceId) {
+        onSourceContentsChunk(params);
+      }
+    };
+    // TODO [streaming source viewer] Import generated types from Replay protocol
+    const onSourceContentsInfoWrapper = (params: any) => {
+      if (params.sourceId === sourceId) {
+        onSourceContentsInfo(params);
+      }
+    };
+
+    try {
+      // @ts-ignore TODO [streaming source viewer] Don't use the generic API
+      addEventListener("Debugger.sourceContentsChunk", onSourceContentsChunkWrapper);
+      // @ts-ignore TODO [streaming source viewer] Don't use the generic API
+      addEventListener("Debugger.sourceContentsInfo", onSourceContentsInfoWrapper);
+
+      // @ts-ignore TODO [streaming source viewer] Don't use the generic API
+      await sendMessage("Debugger.streamSourceContents", { maxChunkSize, sourceId }, sessionId);
+    } finally {
+      // @ts-ignore TODO [streaming source viewer] Don't use the generic API
+      removeEventListener("Debugger.sourceContentsChunk", onSourceContentsChunkWrapper);
+      // @ts-ignore TODO [streaming source viewer] Don't use the generic API
+      removeEventListener("Debugger.sourceContentsInfo", onSourceContentsInfoWrapper);
+    }
   }
 
   _dispatchEvent(type: ReplayClientEvents, ...args: any[]): void {
