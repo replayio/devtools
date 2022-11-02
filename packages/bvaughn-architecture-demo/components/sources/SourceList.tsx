@@ -15,7 +15,6 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
-  useState,
 } from "react";
 import { ListOnItemsRenderedProps, VariableSizeList as List } from "react-window";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -27,32 +26,7 @@ import styles from "./SourceList.module.css";
 import { SourceSearchContext } from "./SourceSearchContext";
 import { findPointForLocation } from "./utils/points";
 import getScrollbarWidth from "./utils/getScrollbarWidth";
-import useClassListObserver from "./hooks/useClassListObserver";
-
-// HACK
-// We could swap this out for something that lazily measures row height.
-// There are only a small number of variations though, so...
-type Sizes = {
-  conditionalPointPanelHeight: number;
-  pointPanelHeight: number;
-  lineHeight: number;
-  lineHeightWithPoint: number;
-  lineHeightWithConditionalPoint: number;
-};
-const SIZES_FONT_SIZE_REGULAR: Sizes = {
-  conditionalPointPanelHeight: 130,
-  pointPanelHeight: 90,
-  lineHeight: 15,
-  lineHeightWithPoint: 15 + 90,
-  lineHeightWithConditionalPoint: 15 + 130,
-};
-const SIZES_FONT_SIZE_LARGE: Sizes = {
-  conditionalPointPanelHeight: 156,
-  pointPanelHeight: 108,
-  lineHeight: 16,
-  lineHeightWithPoint: 16 + 108,
-  lineHeightWithConditionalPoint: 16 + 156,
-};
+import useFontBasedListMeasurents from "./hooks/useFontBasedListMeasurents";
 
 export default function SourceList({
   height,
@@ -71,6 +45,9 @@ export default function SourceList({
 
   const scrollbarWidth = useMemo(getScrollbarWidth, []);
 
+  const innerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<List>(null);
+
   const { range: focusRange } = useContext(FocusContext);
   const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
   const client = useContext(ReplayClientContext);
@@ -83,29 +60,13 @@ export default function SourceList({
     visibleLines,
   } = useContext(SourcesContext);
 
-  const [sizes, setSizes] = useState<Sizes>(SIZES_FONT_SIZE_REGULAR);
   const {
     conditionalPointPanelHeight,
     pointPanelHeight,
     lineHeight,
     lineHeightWithConditionalPoint,
     lineHeightWithPoint,
-  } = sizes;
-
-  // Listen for font-size changes.
-  useClassListObserver(document.body.parentElement!, (classList: DOMTokenList) => {
-    const prefersLargeFontSize = classList.contains("prefers-large-font-size");
-    if (prefersLargeFontSize) {
-      setSizes(SIZES_FONT_SIZE_LARGE);
-    } else {
-      setSizes(SIZES_FONT_SIZE_REGULAR);
-    }
-
-    const list = listRef.current;
-    if (list) {
-      list.resetAfterIndex(0);
-    }
-  });
+  } = useFontBasedListMeasurents(listRef);
 
   useEffect(() => {
     if (pendingFocusUpdate === null || focusedLineNumber === null || focusedSourceId === null) {
@@ -158,9 +119,6 @@ export default function SourceList({
     : null;
 
   const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
-
-  const innerRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<List>(null);
 
   const prevPointsRef = useRef<Point[]>([]);
   useLayoutEffect(() => {
