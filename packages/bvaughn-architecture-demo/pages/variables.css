@@ -47,6 +47,7 @@
   --color-dim: #aaaaaa;
   --color-dimmer: #666666;
   --color-error: #ffb3d2;
+  --color-toggle-active: #6ba6ff;
   --color-primary-button: #ffffff;
   --color-secondary-button: #ffffff;
   --color-tertiary-button: #000000;
@@ -166,6 +167,7 @@
   --color-dim: #666666;
   --color-dimmer: #aaaaaa;
   --color-error: #ff0000;
+  --color-toggle-active: #2979ef;
   --color-primary-button: #ffffff;
   --color-secondary-button: #ffffff;
   --color-tertiary-button: #ffffff;

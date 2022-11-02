@@ -2,20 +2,25 @@ import { useDeferredValue, useMemo, useReducer } from "react";
 
 const EMPTY_ARRAY: any[] = [];
 
-export type CachedScope<Item, Result> = {
+export type CachedScope<Item, Result, QueryData> = {
   index: number;
   items: Item[];
   results: Result[];
   query: string;
+  queryData: QueryData | null;
 };
 
 export type ScopeId = string;
 
-export type SearchFunction<Item, Result> = (query: string, items: Item[]) => Result[];
+export type SearchFunction<Item, Result, QueryData = never> = (
+  query: string,
+  items: Item[],
+  queryData?: QueryData | null
+) => Result[];
 
-export type State<Item, Result> = {
+export type State<Item, Result, QueryData = never> = {
   cachedScopes: {
-    [id: ScopeId]: CachedScope<Item, Result>;
+    [id: ScopeId]: CachedScope<Item, Result, QueryData>;
   };
   currentScopeId: ScopeId | null;
 
@@ -27,6 +32,7 @@ export type State<Item, Result> = {
   // If individual cached scope is out of sync (e.g. with query) then it needs to be re-searched
   enabled: boolean;
   query: string;
+  queryData: QueryData | null;
 
   // Copied from the currently-active scope
   // so that callers don't need to be aware of State's shape
@@ -34,29 +40,29 @@ export type State<Item, Result> = {
   results: Result[];
 };
 
-export type Action<Item, Result> =
+export type Action<Item, Result, QueryData = never> =
   | { type: "disable" }
   | { type: "enable" }
   | { type: "increment"; by: number }
   | { type: "markUpdateProcessed" }
   | { type: "updateCurrentScopeId"; scopeId: ScopeId | null }
   | { type: "updateItems"; items: Item[] }
-  | { type: "updateQuery"; query: string }
+  | { type: "updateQuery"; query: string; queryData: QueryData | null }
   | { type: "updateResults"; index: number; results: Result[] };
 
-export type Actions = {
+export type Actions<QueryData = never> = {
   disable: () => void;
   enable: () => void;
   goToNext: () => void;
   goToPrevious: () => void;
   markUpdateProcessed: () => void;
-  search: (query: string) => void;
+  search: (query: string, queryData?: QueryData) => void;
 };
 
-function reducer<Item, Result>(
-  state: State<Item, Result>,
-  action: Action<Item, Result>
-): State<Item, Result> {
+function reducer<Item, Result, QueryData = never>(
+  state: State<Item, Result, QueryData>,
+  action: Action<Item, Result, QueryData>
+): State<Item, Result, QueryData> {
   switch (action.type) {
     case "disable": {
       return {
@@ -131,6 +137,7 @@ function reducer<Item, Result>(
           index: -1,
           items: EMPTY_ARRAY,
           query: "",
+          queryData: null,
           results: EMPTY_ARRAY,
         };
       }
@@ -171,15 +178,16 @@ function reducer<Item, Result>(
       return state;
     }
     case "updateQuery": {
-      const { query } = action;
+      const { query, queryData } = action;
 
       // This should only update the global query;
       // per-scope query should only be updated along with results
 
-      if (query !== state.query) {
+      if (query !== state.query || queryData !== state.queryData) {
         return {
           ...state,
           query,
+          queryData,
         };
       } else {
         return state;
@@ -187,7 +195,7 @@ function reducer<Item, Result>(
     }
     case "updateResults": {
       const { index, results } = action;
-      const { currentScopeId, query } = state;
+      const { currentScopeId, query, queryData } = state;
 
       const cachedScopes = state.cachedScopes;
       if (currentScopeId !== null) {
@@ -201,6 +209,7 @@ function reducer<Item, Result>(
                 ...currentScope,
                 index,
                 query,
+                queryData,
                 results,
               },
             },
@@ -216,38 +225,40 @@ function reducer<Item, Result>(
   }
 }
 
-export default function useSearch<Item, Result>(
+export default function useSearch<Item, Result, QueryData = never>(
   items: Item[],
-  stableSearch: SearchFunction<Item, Result>,
+  stableSearch: SearchFunction<Item, Result, QueryData>,
   scopeId?: ScopeId | null
-): [State<Item, Result>, Actions] {
+): [State<Item, Result, QueryData>, Actions<QueryData>] {
   if (scopeId == null) {
     scopeId = "default";
   }
 
-  const [state, dispatch] = useReducer<React.Reducer<State<Item, Result>, Action<Item, Result>>>(
-    reducer,
-    {
-      cachedScopes: {},
-      currentScopeId: null,
-      enabled: false,
-      index: -1,
-      pendingUpdateForScope: null,
-      query: "",
-      results: [],
-    }
-  );
+  const [state, dispatch] = useReducer<
+    React.Reducer<State<Item, Result, QueryData>, Action<Item, Result, QueryData>>
+  >(reducer, {
+    cachedScopes: {},
+    currentScopeId: null,
+    enabled: false,
+    index: -1,
+    pendingUpdateForScope: null,
+    query: "",
+    queryData: null,
+    results: [],
+  });
 
-  const { cachedScopes, currentScopeId, query } = state;
+  const { cachedScopes, currentScopeId, query, queryData } = state;
 
   // Let React update search text at high priority and results at lower priority;
   // this keeps the search text input updating quick and feeling responsive to user input.
   const deferredQuery = useDeferredValue(query);
+  const deferredQueryData = useDeferredValue(queryData);
 
   const currentScope = scopeId !== null ? cachedScopes[scopeId] : null;
   const prevResults = currentScope != null ? currentScope.results : EMPTY_ARRAY;
   const itemsChanged = currentScope == null || currentScope.items !== items;
   const queryChanged = currentScope == null || currentScope.query !== deferredQuery;
+  const queryDataChanged = currentScope == null || currentScope.queryData !== deferredQueryData;
   const scopeIdChanged = currentScopeId !== scopeId;
 
   // State will not update within the scope of the rest of this function,
@@ -258,16 +269,18 @@ export default function useSearch<Item, Result>(
   }
 
   // Any time our search inputs change, re-run the search function.
-  if (itemsChanged || queryChanged) {
+  if (itemsChanged || queryChanged || queryDataChanged) {
     if (itemsChanged) {
       dispatch({ type: "updateItems", items });
     }
 
-    if (queryChanged) {
-      dispatch({ type: "updateQuery", query: deferredQuery });
+    if (queryChanged || queryDataChanged) {
+      dispatch({ type: "updateQuery", query: deferredQuery, queryData: deferredQueryData });
     }
 
-    const results = deferredQuery ? stableSearch(deferredQuery, items) : EMPTY_ARRAY;
+    const results = deferredQuery
+      ? stableSearch(deferredQuery, items, deferredQueryData)
+      : EMPTY_ARRAY;
 
     let prevIndex = currentScope?.index ?? -1;
     let index = -1;
@@ -293,19 +306,20 @@ export default function useSearch<Item, Result>(
     }
   }
 
-  const actions = useMemo<Actions>(
+  const actions = useMemo<Actions<QueryData>>(
     () => ({
       disable: () => dispatch({ type: "disable" }),
       enable: () => dispatch({ type: "enable" }),
       markUpdateProcessed: () => dispatch({ type: "markUpdateProcessed" }),
       goToNext: () => dispatch({ type: "increment", by: 1 }),
       goToPrevious: () => dispatch({ type: "increment", by: -1 }),
-      search: (query: string) => dispatch({ type: "updateQuery", query }),
+      search: (query: string, queryData?: QueryData) =>
+        dispatch({ type: "updateQuery", query, queryData: queryData || null }),
     }),
     []
   );
 
-  const externalState = useMemo<State<Item, Result>>(() => state, [state]);
+  const externalState = useMemo<State<Item, Result, QueryData>>(() => state, [state]);
 
   return [externalState, actions];
 }
