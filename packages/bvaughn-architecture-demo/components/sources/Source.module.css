@@ -24,3 +24,7 @@
   justify-content: center;
   color: var(--color-dim);
 }
+
+.HoveredTarget {
+  filter: var(--token-active-filter-color) !important;
+}

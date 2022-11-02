@@ -1,5 +1,6 @@
 .theme-dark {
-  --token-hover-background-color: #42381f;
+  --token-hover-filter-color: brightness(1.25);
+  --token-active-filter-color: brightness(1.5);
   --token-comment-color: #8f8f92;
   --token-definition-color: #fefefe;
   --token-local-color: #fefefe;
@@ -17,7 +18,8 @@
 }
 
 .theme-light {
-  --token-hover-background-color: #fffac8;
+  --token-hover-filter-color: brightness(0.8);
+  --token-active-filter-color: brightness(0.6);
   --token-comment-color: #737373;
   --token-definition-color: #3172e0;
   --token-local-color: #4e4e52;
