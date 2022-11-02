@@ -10,6 +10,7 @@ import {
   DeletePoints,
   EditPoint,
 } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
@@ -49,6 +50,7 @@ export default function HoverButton({
   const client = useContext(ReplayClientContext);
   const { executionPoint, update } = useContext(TimelineContext);
   const { findClosestFunctionName } = useContext(SourcesContext);
+  const { trackEvent } = useContext(SessionContext);
 
   if (isMetaKeyActive) {
     if (lineHitCounts === null) {
@@ -123,8 +125,9 @@ export default function HoverButton({
       if (point) {
         editPoint(point.id, { content, shouldLog: true });
       } else {
-        // TODO The legacy app uses the closest function name for the content (if there is one).
-        // This app doesn't yet have logic for parsing source contents though.
+        // Distinct from "breakpoint.add" apparently
+        trackEvent("breakpoint.plus_click");
+
         addPoint(
           {
             content,
@@ -140,6 +143,7 @@ export default function HoverButton({
         if (!point.shouldLog || point.shouldBreak) {
           editPoint(point.id, { shouldLog: !point.shouldLog });
         } else {
+          trackEvent("breakpoint.minus_click");
           deletePoints(point.id);
         }
       }

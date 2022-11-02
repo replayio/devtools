@@ -40,6 +40,7 @@ export async function render(
     recordingId: "fakeRecordingId",
     sessionId: "fakeSessionId",
     refetchUser: () => {},
+    trackEvent: () => {},
     ...options?.sessionContext,
   };
 

@@ -36,7 +36,7 @@ export default function PointPanelTimeline({
   point: Point;
 }) {
   const client = useContext(ReplayClientContext);
-  const { duration } = useContext(SessionContext);
+  const { duration, trackEvent } = useContext(SessionContext);
   const {
     executionPoint: currentExecutionPoint,
     isPending,
@@ -59,6 +59,16 @@ export default function PointPanelTimeline({
     // It's only meant to be something shown temporarily.
     setOptimisticTime(null);
   }, [currentTime]);
+
+  useEffect(() => {
+    const hasError = hitPointStatus !== "complete";
+
+    if (!hasError && hitPoints !== null) {
+      trackEvent(hitPoints.length > 0 ? "breakpoint.has_hits" : "breakpoint.no_hits", {
+        hits: hitPoints.length,
+      });
+    }
+  }, [hitPoints, hitPointStatus, trackEvent]);
 
   const [currentHitPoint, currentHitPointIndex] = findHitPoint(hitPoints, currentExecutionPoint);
 

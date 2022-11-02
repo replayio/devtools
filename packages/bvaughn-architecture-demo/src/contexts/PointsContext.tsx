@@ -40,7 +40,7 @@ export type PointsContextType = {
 export const PointsContext = createContext<PointsContextType>(null as any);
 
 export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
-  const { recordingId } = useContext(SessionContext);
+  const { recordingId, trackEvent } = useContext(SessionContext);
   const replayClient = useContext(ReplayClientContext);
 
   // Both high-pri state and transition state should be managed by useLocalStorage,
@@ -79,23 +79,30 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
         location,
       };
 
+      trackEvent("breakpoint.add");
+      // TODO Determine if we should track "breakpoint.add_column" here
+
       setPointsHelper((prevPoints: Point[]) => {
         const index = sortedIndexBy(prevPoints, point, ({ location }) => location.line);
 
         return prevPoints.slice(0, index).concat([point], prevPoints.slice(index));
       });
     },
-    [setPointsHelper]
+    [setPointsHelper, trackEvent]
   );
 
   const deletePoints = useCallback(
-    (...ids: PointId[]) =>
-      setPointsHelper((prevPoints: Point[]) => prevPoints.filter(point => !ids.includes(point.id))),
-    [setPointsHelper]
+    (...ids: PointId[]) => {
+      trackEvent("breakpoint.remove");
+      setPointsHelper((prevPoints: Point[]) => prevPoints.filter(point => !ids.includes(point.id)));
+    },
+
+    [setPointsHelper, trackEvent]
   );
 
   const editPoint = useCallback(
     (id: PointId, partialPoint: Partial<Point>) => {
+      trackEvent("breakpoint.edit");
       setPointsHelper((prevPoints: Point[]) => {
         const index = prevPoints.findIndex(point => point.id === id);
         if (index >= 0) {
@@ -113,7 +120,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
         throw Error(`Could not find point with id "${id}"`);
       });
     },
-    [setPointsHelper]
+    [setPointsHelper, trackEvent]
   );
 
   useBreakpointIdsFromServer(points, editPoint, deletePoints, replayClient);

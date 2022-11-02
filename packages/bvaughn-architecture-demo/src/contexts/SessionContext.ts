@@ -9,6 +9,7 @@ export type SessionContextType = {
   recordingId: string;
   sessionId: string;
   refetchUser: () => void;
+  trackEvent: (event: string, ...args: any[]) => void;
 };
 
 export const SessionContext = createContext<SessionContextType>(null as any);
