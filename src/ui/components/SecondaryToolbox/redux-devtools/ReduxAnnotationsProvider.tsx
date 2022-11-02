@@ -1,7 +1,8 @@
+import React, { useEffect, useRef, useState } from "react";
+
 import { ThreadFront } from "protocol/thread";
-import React, { useState, useEffect, useRef } from "react";
-import { useAppDispatch } from "ui/setup/hooks";
 import { useFeature } from "ui/hooks/settings";
+import { useAppDispatch } from "ui/setup/hooks";
 
 import { ReduxAnnotationsContext, processReduxAnnotations } from "./redux-annotations";
 import type { ReduxActionAnnotation } from "./redux-annotations";

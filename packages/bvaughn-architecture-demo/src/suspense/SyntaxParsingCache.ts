@@ -1,3 +1,4 @@
+import { htmlLanguage } from "@codemirror/lang-html";
 import {
   javascriptLanguage,
   jsxLanguage,
@@ -5,7 +6,6 @@ import {
   typescriptLanguage,
 } from "@codemirror/lang-javascript";
 import { jsonLanguage } from "@codemirror/lang-json";
-import { htmlLanguage } from "@codemirror/lang-html";
 import { LRLanguage, ensureSyntaxTree } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
 import { classHighlighter, highlightTree } from "@lezer/highlight";

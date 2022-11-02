@@ -1,14 +1,14 @@
 import { RequestEventInfo, RequestInfo } from "@replayio/protocol";
 import { useMemo } from "react";
 import {
-  useGlobalFilter,
+  TableInstance,
   useBlockLayout,
+  useGlobalFilter,
   useResizeColumns,
   useTable,
-  TableInstance,
 } from "react-table";
 
-import { CanonicalRequestType, partialRequestsToCompleteSummaries, RequestSummary } from "./utils";
+import { CanonicalRequestType, RequestSummary, partialRequestsToCompleteSummaries } from "./utils";
 
 export default function Table({
   children,

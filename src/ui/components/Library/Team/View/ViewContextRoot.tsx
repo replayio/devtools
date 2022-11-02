@@ -1,9 +1,11 @@
 import { useRouter } from "next/router";
-import { createContext, ReactNode, useContext, useEffect } from "react";
+import { ReactNode, createContext, useContext, useEffect } from "react";
+
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
-import { useFilters } from "./useFilters";
-import { FilterContext } from "./FilterContext";
+
 import { TeamContext } from "../TeamContextRoot";
+import { FilterContext } from "./FilterContext";
+import { useFilters } from "./useFilters";
 
 type ViewContainerContextType = {
   view: View;

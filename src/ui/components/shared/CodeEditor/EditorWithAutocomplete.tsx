@@ -1,13 +1,12 @@
 import { Editor } from "codemirror";
 import React, { useRef } from "react";
 
-import useAutocomplete from "./useAutocomplete";
-
+import { getCursorIndex, getRemainingCompletedTextAfterCursor } from "ui/utils/autocomplete";
 import { isTest } from "ui/utils/environment";
 
 import AutocompleteMatches, { AutocompleteMatchesOptions } from "./AutocompleteMatches";
 import ControlledCodeMirror, { ControlledCodeMirrorOptions } from "./ControlledCodeMirror";
-import { getCursorIndex, getRemainingCompletedTextAfterCursor } from "ui/utils/autocomplete";
+import useAutocomplete from "./useAutocomplete";
 
 export enum Keys {
   BACKSPACE = "Backspace",

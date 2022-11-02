@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+
 import hooks from "ui/hooks";
 import { useFeature, useStringPref } from "ui/hooks/settings";
 import { EmailSubscription } from "ui/hooks/users";
 import { getThemePreference } from "ui/reducers/app";
 import { updateTheme } from "ui/reducers/app";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AppTheme } from "ui/state/app";
 
 import { SelectMenu } from "../Forms";
 import Checkbox from "../Forms/Checkbox";
-
 import { CheckboxRow } from "./CheckboxRow";
 
 const EMAIL_NOTIFICATIONS = {
@@ -51,7 +51,7 @@ function NotificationPreferences({
     <div className="space-y-4">
       <div className="text-lg">Notifications</div>
       <div>Choose which email updates you would like to receive:</div>
-      <div className="flex flex-col p-1 space-y-2">
+      <div className="flex flex-col space-y-2 p-1">
         {Object.entries(EMAIL_NOTIFICATIONS).map(([emailType, content]: string[], i) => (
           <Notification
             {...{ content, unsubscribedEmailTypes }}
@@ -89,9 +89,9 @@ function PrivacyPreferences() {
   return (
     <div className="space-y-4">
       <div className="text-lg">Privacy</div>
-      <div className="flex flex-col p-1 space-y-2">
+      <div className="flex flex-col space-y-2 p-1">
         <label
-          className="flex items-center space-x-2 cursor-pointer"
+          className="flex cursor-pointer items-center space-x-2"
           data-private
           htmlFor="disableLogRocket"
         >
@@ -168,7 +168,7 @@ function UiPreferences() {
         </div>
       )}
       <label
-        className="flex items-center p-1 space-x-2 cursor-pointer"
+        className="flex cursor-pointer items-center space-x-2 p-1"
         data-private
         htmlFor="enable-large-text"
       >

@@ -1,8 +1,8 @@
 import test from "@playwright/test";
 
 import { startTest } from "../helpers";
-import { waitForScopeValue, waitForPaused } from "../helpers/pause-information-panel";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
+import { waitForPaused, waitForScopeValue } from "../helpers/pause-information-panel";
 
 test("node_spawn: Basic subprocess spawning", async ({ page }) => {
   await startTest(page, "node/spawn.js");

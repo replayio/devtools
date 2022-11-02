@@ -1,12 +1,10 @@
-import Head from "next/head";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
+import Head from "next/head";
 
 import ErrorBoundary from "../components/ErrorBoundary";
-
 import "./global.css";
 import "./variables.css";
-
 // Used by syntax highlighter
 import "../components/sources/CodeMirror.css";
 

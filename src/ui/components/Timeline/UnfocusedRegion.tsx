@@ -1,11 +1,12 @@
 import clamp from "lodash/clamp";
-import { useAppSelector } from "ui/setup/hooks";
+
 import { selectors } from "ui/reducers";
+import { useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 import {
-  getVisiblePosition,
-  displayedEndForFocusRegion,
   displayedBeginForFocusRegion,
+  displayedEndForFocusRegion,
+  getVisiblePosition,
 } from "ui/utils/timeline";
 
 export default function UnfocusedRegion() {

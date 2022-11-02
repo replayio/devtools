@@ -117,7 +117,7 @@ function getSourceNames(source) {
     return data;
   }
 
-  let short, long, host;
+  let host, long, short;
   const sourceStr = source ? String(source) : "";
 
   // If `data:...` uri

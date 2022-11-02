@@ -1,16 +1,17 @@
-import SourcePreviewInspector from "@bvaughn/components/inspector/SourcePreviewInspector";
-import Loader from "@bvaughn/components/Loader";
-import { getObjectWithPreviewSuspense } from "@bvaughn/src/suspense/ObjectPreviews";
+import { Suspense, useContext } from "react";
+
+import SourcePreviewInspector from "bvaughn-architecture-demo/components/inspector/SourcePreviewInspector";
+import Loader from "bvaughn-architecture-demo/components/Loader";
+import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import {
   evaluateSuspense,
   getPauseForExecutionPointSuspense,
-} from "@bvaughn/src/suspense/PauseCache";
-import { getClosestPointForTimeSuspense } from "@bvaughn/src/suspense/PointsCache";
-import { Suspense, useContext } from "react";
+} from "bvaughn-architecture-demo/src/suspense/PauseCache";
+import { getClosestPointForTimeSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import styles from "./styles.module.css";
 import createTest from "./utils/createTest";
+import styles from "./styles.module.css";
 
 const DEFAULT_RECORDING_ID = "9fd8381f-05e6-40c2-8b4f-59e40c2c3886";
 

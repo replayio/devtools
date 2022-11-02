@@ -1,5 +1,4 @@
 import { SocketWillClose } from "../ProtocolMessagesStore";
-
 import styles from "./shared.module.css";
 
 export function SocketWillCloseHeaderRenderer({ message }: { message: SocketWillClose }) {

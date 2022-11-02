@@ -4,18 +4,17 @@
 
 import React, { PureComponent } from "react";
 import ReactDOM from "react-dom";
-import { connect, ConnectedProps } from "react-redux";
-import type { UIState } from "ui/state";
+import { ConnectedProps, connect } from "react-redux";
 
-import { getSelectedSource, SourceDetails } from "ui/reducers/sources";
-import { trackEvent } from "ui/utils/telemetry";
 import { getToolboxLayout } from "ui/reducers/layout";
+import { SourceDetails, getSelectedSource } from "ui/reducers/sources";
+import type { UIState } from "ui/state";
+import { trackEvent } from "ui/utils/telemetry";
 
 import actions from "../../actions";
 import { openQuickOpen as openQuickOpenAction } from "../../actions/quick-open";
 import { getSourcesForTabs } from "../../selectors";
 import { isPretty } from "../../utils/source";
-
 import CommandPaletteButton from "./CommandPaletteButton";
 import Tab from "./Tab";
 

@@ -1,9 +1,8 @@
 import { ReactNode } from "react";
 
 import ValueRenderer from "../ValueRenderer";
-
-import styles from "./shared.module.css";
 import { ObjectPreviewRendererProps } from "./types";
+import styles from "./shared.module.css";
 
 const MAX_PROPERTIES_TO_PREVIEW = 5;
 

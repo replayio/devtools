@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+
 import { isValidTimeString } from "ui/utils/timeline";
 
 import styles from "./EditableTimeInput.module.css";

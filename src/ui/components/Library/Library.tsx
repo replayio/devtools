@@ -1,17 +1,19 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
+
+import { useGetTeamRouteParams, useRedirectToTeam } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
+import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
 import { UserInfo } from "ui/hooks/users";
 import { ExperimentalUserSettings } from "ui/types";
-import { useGetTeamRouteParams, useRedirectToTeam } from "ui/components/Library/Team/utils";
 import logrocket from "ui/utils/logrocket";
 import useAuth0 from "ui/utils/useAuth0";
+
 import LoadingScreen from "../shared/LoadingScreen";
 import { LibraryNags } from "./LibraryNags";
 import Navigation from "./Navigation/Navigation";
-import { TeamPage } from "./Team/TeamPage";
 import { MY_LIBRARY_TEAM } from "./Team/TeamContextRoot";
-import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
+import { TeamPage } from "./Team/TeamPage";
 
 // This acts like a wrapper for useGetTeamRouteParams. In case the user does not specify a team,
 // this hook initializes a team based on their default workspace.

@@ -1,12 +1,12 @@
 import test from "@playwright/test";
 
 import { startTest } from "../helpers";
-import { reverseStepOverToLine } from "../helpers/pause-information-panel";
 import {
+  executeAndVerifyTerminalExpression,
   openConsolePanel,
   warpToMessage,
-  executeAndVerifyTerminalExpression,
 } from "../helpers/console-panel";
+import { reverseStepOverToLine } from "../helpers/pause-information-panel";
 import { openSource } from "../helpers/source-explorer-panel";
 import { addLogpoint } from "../helpers/source-panel";
 

@@ -1,9 +1,9 @@
 import { useFeature } from "ui/hooks/settings";
 import { Comment } from "ui/state/comments";
 
-import styles from "./CommentPreview.module.css";
 import CommentSource from "./TranscriptComments/CommentSource";
 import NetworkRequestPreview from "./TranscriptComments/NetworkRequestPreview";
+import styles from "./CommentPreview.module.css";
 
 export default function CommentPreview({ comment }: { comment: Comment }) {
   if (comment.sourceLocation) {

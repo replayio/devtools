@@ -1,8 +1,5 @@
 import { TextDecoder } from "util";
 
-// @ts-ignore
-global.TextDecoder = TextDecoder;
-
 import {
   BodyPartsToUInt8Array,
   Displayable,
@@ -12,6 +9,9 @@ import {
   StringToObjectMaybe,
   URLEncodedToPlaintext,
 } from "./content";
+
+// @ts-ignore
+global.TextDecoder = TextDecoder;
 
 export interface BodyData {
   offset: number;

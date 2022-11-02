@@ -1,25 +1,25 @@
 import {
-  createEntityAdapter,
-  createSelector,
-  createSlice,
   Dictionary,
   EntityState,
   PayloadAction,
+  createEntityAdapter,
+  createSelector,
+  createSlice,
 } from "@reduxjs/toolkit";
-import { Location, MappedLocation, newSource, SourceKind } from "@replayio/protocol";
+import { Location, MappedLocation, SourceKind, newSource } from "@replayio/protocol";
 
-import { UIThunkAction } from "ui/actions";
-import { UIState } from "ui/state";
-import { newSourcesToCompleteSourceDetails } from "ui/utils/sources";
-import { parser } from "devtools/client/debugger/src/utils/bootstrap";
-import { listenForCondition } from "ui/setup/listenerMiddleware";
-import { LoadingStatus } from "ui/utils/LoadingStatus";
+import { preCacheSources } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import type { PartialLocation } from "devtools/client/debugger/src/actions/sources";
+import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 // TODO Move prefs out of reducers and load this separately
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { getTextAtPosition } from "devtools/client/debugger/src/utils/source";
 import { assert } from "protocol/utils";
-import { preCacheSources } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { UIThunkAction } from "ui/actions";
+import { listenForCondition } from "ui/setup/listenerMiddleware";
+import { UIState } from "ui/state";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
+import { newSourcesToCompleteSourceDetails } from "ui/utils/sources";
 
 export interface SourceDetails {
   isSourceMapped: boolean;

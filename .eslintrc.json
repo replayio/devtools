@@ -11,72 +11,68 @@
   },
   "ignorePatterns": [
     "!.storybook",
-    "packages/bvaughn-architecture-demo/playwright/protocol-fixtures/"
+    "packages/bvaughn-architecture-demo/playwright/protocol-fixtures/",
+    "**/*.config.js",
+    "**/*.json"
   ],
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true
     },
     "ecmaVersion": 2018,
-    "project": ["tsconfig.json"],
+    "project": ["tsconfig.eslint.json"],
     "sourceType": "module"
   },
   "plugins": ["import", "react", "prettier"],
-  "rules": {
-    "curly": "error",
-    "import/order": [
-      "off",
-      {
-        "groups": ["builtin", "external", "internal", "parent", "sibling", "index", "object"],
-        "newlines-between": "always",
-        "alphabetize": {
-          "order": "asc",
-          "caseInsensitive": true
-        }
-      }
-    ],
-    "import/prefer-default-export": 0,
-    "no-nested-ternary": 0,
-    "no-param-reassign": 0,
-    "no-restricted-syntax": 0,
-    "no-restricted-imports": [
-      "error",
-      {
-        "paths": [
+  "overrides": [
+    {
+      "files": ["{src,packages,pages}/**/*.{js,jsx,ts,tsx}"],
+      "rules": {
+        "curly": "error",
+        "import/prefer-default-export": 0,
+        "no-nested-ternary": 0,
+        "no-param-reassign": 0,
+        "no-restricted-syntax": 0,
+        "no-restricted-imports": [
+          "error",
           {
-            "name": "react-redux",
-            "importNames": ["useDispatch", "useSelector"],
-            "message": "Please import 'useAppDispatch/useAppSelector' from 'ui/setup/hooks' instead."
-          },
-          {
-            "name": "protocol/socket",
-            "importNames": ["client", "sendMessage", "log"],
-            "message": "Please use ThreadFront."
-          },
-          {
-            "name": "lodash",
-            "message": "Please import lodash functions directly."
+            "paths": [
+              {
+                "name": "react-redux",
+                "importNames": ["useDispatch", "useSelector"],
+                "message": "Please import 'useAppDispatch/useAppSelector' from 'ui/setup/hooks' instead."
+              },
+              {
+                "name": "protocol/socket",
+                "importNames": ["client", "sendMessage", "log"],
+                "message": "Please use ThreadFront."
+              },
+              {
+                "name": "lodash",
+                "message": "Please import lodash functions directly."
+              }
+            ]
           }
-        ]
+        ],
+        "react/button-has-type": 0,
+        "react/forbid-prop-types": 0,
+        "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
+        "react-hooks/exhaustive-deps": "error", // Checks effect dependencies
+        "react/jsx-filename-extension": 0,
+        "react/jsx-one-expression-per-line": 0,
+        "react/jsx-props-no-spreading": 0,
+        "react/no-children-prop": 0,
+        "react/no-find-dom-node": 0,
+        "react/no-render-return-value": 0,
+        "react/no-string-refs": 0,
+        "react/no-unescaped-entities": 0,
+        "react/prop-types": 0,
+        "react/react-in-jsx-scope": 0,
+        "react/require-default-props": 0,
+        "sort-vars": "error"
       }
-    ],
-    "react/button-has-type": 0,
-    "react/forbid-prop-types": 0,
-    "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
-    "react-hooks/exhaustive-deps": "error", // Checks effect dependencies
-    "react/jsx-filename-extension": 0,
-    "react/jsx-one-expression-per-line": 0,
-    "react/jsx-props-no-spreading": 0,
-    "react/no-children-prop": 0,
-    "react/no-find-dom-node": 0,
-    "react/no-render-return-value": 0,
-    "react/no-string-refs": 0,
-    "react/no-unescaped-entities": 0,
-    "react/prop-types": 0,
-    "react/react-in-jsx-scope": 0,
-    "react/require-default-props": 0,
-    "sort-vars": "error"
-  },
+    }
+  ],
   "settings": {
     "react": {
       "version": "18.1"

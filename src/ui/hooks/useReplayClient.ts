@@ -1,8 +1,9 @@
 import type { Object } from "@replayio/protocol";
+import { useContext, useEffect } from "react";
+
 import { preCacheObject } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { stringify } from "bvaughn-architecture-demo/src/utils/string";
 import { Pause, ThreadFront } from "protocol/thread";
-import { useContext, useEffect } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 /** 

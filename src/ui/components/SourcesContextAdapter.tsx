@@ -1,12 +1,13 @@
 import { SourceLocation } from "@replayio/protocol";
+import { PropsWithChildren, ReactNode, useCallback, useContext, useLayoutEffect } from "react";
+
 import {
   SourcesContext,
   SourcesContextRoot,
 } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { getShownSource } from "devtools/client/debugger/src/selectors";
-import { PropsWithChildren, ReactNode, useCallback, useContext, useLayoutEffect } from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { findClosestFunctionNameThunk } from "devtools/client/debugger/src/utils/ast";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 // Relays information about the active source from Redux to the newer SourcesContext.
 // This information is consumed, along with other state (like the hovered line number) by the PointsContext.

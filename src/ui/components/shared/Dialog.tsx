@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import React, { HTMLProps } from "react";
+
 import ReplayLogo from "./ReplayLogo";
 
 export type DialogPropTypes = HTMLProps<HTMLDivElement> & { showFooterLinks?: boolean };
@@ -17,29 +18,29 @@ export function Dialog({ children, className, showFooterLinks, ...props }: Dialo
       </div>
 
       {!!showFooterLinks ? (
-          <div className="grid grid-cols-1 gap-1 pt-4 text-xs text-gray-400 place-items-center">
-            <div>
-              <div className="flex space-x-2">
-                <div>
-                  <a className="hover:underline" href="http://docs.replay.io">
-                    Documentation
-                  </a>
-                </div>
-                <div className="text-gray-300">•</div>
-                <div>
-                  <a className="hover:underline" href="http://replay.io/discord/">
-                    Discord
-                  </a>
-                </div>
-                <div className="text-gray-300">•</div>
-                <div>
-                  <a className="hover:underline" href="mailto:support@replay.io">
-                    Email support
-                  </a>
-                </div>
+        <div className="grid grid-cols-1 place-items-center gap-1 pt-4 text-xs text-gray-400">
+          <div>
+            <div className="flex space-x-2">
+              <div>
+                <a className="hover:underline" href="http://docs.replay.io">
+                  Documentation
+                </a>
+              </div>
+              <div className="text-gray-300">•</div>
+              <div>
+                <a className="hover:underline" href="http://replay.io/discord/">
+                  Discord
+                </a>
+              </div>
+              <div className="text-gray-300">•</div>
+              <div>
+                <a className="hover:underline" href="mailto:support@replay.io">
+                  Email support
+                </a>
               </div>
             </div>
           </div>
+        </div>
       ) : null}
     </>
   );
@@ -67,7 +68,7 @@ export const DialogDescription = ({
   ...props
 }: HTMLProps<HTMLParagraphElement>) => {
   return (
-    <p {...props} className="mb-2 text-sm text-center whitespace-pre-wrap text-themeBase-70">
+    <p {...props} className="mb-2 whitespace-pre-wrap text-center text-sm text-themeBase-70">
       {children}
     </p>
   );

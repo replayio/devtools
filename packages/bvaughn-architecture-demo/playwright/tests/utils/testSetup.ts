@@ -1,6 +1,6 @@
-import { ConsoleMessage, test } from "@playwright/test";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
+import { ConsoleMessage, test } from "@playwright/test";
 
 type Entry = {
   prop: string;

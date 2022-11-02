@@ -6,7 +6,6 @@ import { useContext, useMemo, useState } from "react";
 
 import { useGetSourceTextQuery } from "../../app/api";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-
 import { locationSelected } from "./selectedSourcesSlice";
 
 export const SourceContent = () => {

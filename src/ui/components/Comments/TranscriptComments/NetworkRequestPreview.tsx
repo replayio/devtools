@@ -1,13 +1,13 @@
 import classNames from "classnames";
 import React from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+
 import { setSelectedPanel } from "ui/actions/layout";
 import { selectAndFetchRequest } from "ui/actions/network";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getSummaryById } from "ui/reducers/network";
 import { getFocusRegion } from "ui/reducers/timeline";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
-
 import { trackEvent } from "ui/utils/telemetry";
 import { isInFocusSpan } from "ui/utils/timeline";
 

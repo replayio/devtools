@@ -3,7 +3,6 @@ import { createTestStore } from "test/testUtils";
 import { UIStore } from "ui/actions";
 
 import * as actions from "../actions/timeline";
-
 import {
   getCurrentTime,
   getFocusRegion,

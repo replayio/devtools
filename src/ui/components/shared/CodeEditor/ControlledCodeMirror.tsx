@@ -1,8 +1,7 @@
+import "codemirror/mode/javascript/javascript";
 import { Editor, EditorChange } from "codemirror";
 import React, { FC, useRef } from "react";
 import { Controlled as CodeMirror } from "react-codemirror2";
-
-import "codemirror/mode/javascript/javascript";
 
 export type ControlledCodeMirrorOptions = {
   autofocus: boolean;

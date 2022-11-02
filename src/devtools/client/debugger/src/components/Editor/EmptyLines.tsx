@@ -1,8 +1,9 @@
 import { SourceId } from "@replayio/protocol";
+import { useContext, useEffect, useRef } from "react";
+
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { getBreakpointPositionsAsync } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
-import { useEffect, useContext, useRef } from "react";
 import { replayClient } from "shared/client/ReplayClientContext";
 
 interface ELProps {

@@ -2,17 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import { Dictionary } from "@reduxjs/toolkit";
 import type { FunctionMatch, Location } from "@replayio/protocol";
 
-import { endTruncateStr } from "./utils";
-import { memoizeLast } from "./memoizeLast";
-import { getTruncatedFileName, getSourceClassnames, getSourceQueryString } from "./source";
-
 import { SourceDetails } from "ui/reducers/sources";
-import { FunctionDeclaration, SymbolEntry } from "../reducers/ast";
-import { Dictionary } from "@reduxjs/toolkit";
-import { SearchTypes } from "../reducers/quick-open";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
+
+import { FunctionDeclaration, SymbolEntry } from "../reducers/ast";
+import { SearchTypes } from "../reducers/quick-open";
+import { memoizeLast } from "./memoizeLast";
+import { getSourceClassnames, getSourceQueryString, getTruncatedFileName } from "./source";
+import { endTruncateStr } from "./utils";
 
 export const MODIFIERS: Record<string, SearchTypes> = {
   "@": "functions",

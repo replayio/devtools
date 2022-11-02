@@ -1,7 +1,9 @@
 import React, { Suspense } from "react";
+
 import Frames from "devtools/client/debugger/src/components/SecondaryPanes/Frames/NewFrames";
-import { RequestSummary } from "./utils";
 import { getPauseIdForPointSuspense } from "ui/suspense/util";
+
+import { RequestSummary } from "./utils";
 
 function StackTrace({ request }: { request: RequestSummary }) {
   const pauseId = getPauseIdForPointSuspense(request.point.point, request.point.time);

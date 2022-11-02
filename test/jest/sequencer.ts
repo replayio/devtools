@@ -1,8 +1,8 @@
-import Sequencer, { ShardOptions } from "@jest/test-sequencer";
-import { Test } from "@jest/test-result";
-import slash from "slash";
 import * as crypto from "crypto";
 import * as path from "path";
+import { Test } from "@jest/test-result";
+import Sequencer, { ShardOptions } from "@jest/test-sequencer";
+import slash from "slash";
 
 export default class CustomSequencer extends Sequencer {
   /**

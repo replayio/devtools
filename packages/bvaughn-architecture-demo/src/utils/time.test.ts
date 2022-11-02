@@ -1,4 +1,5 @@
 import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
+
 import { formatDuration, formatTimestamp, isRangeEqual, isRangeSubset } from "./time";
 
 describe("Time util", () => {

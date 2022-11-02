@@ -4,25 +4,23 @@
 
 //
 
-import React, { Component } from "react";
-import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
+import React, { Component } from "react";
+import { ConnectedProps, connect } from "react-redux";
 
 import { showMenu } from "devtools/shared/contextmenu";
-import type { UIState } from "ui/state";
-import type { ContextMenuItem } from "../../reducers/types";
-import type { SourceDetails } from "ui/reducers/sources";
-
-import SourceIcon from "../shared/SourceIcon";
-import AccessibleImage from "../shared/AccessibleImage";
 import { Redacted } from "ui/components/Redacted";
-
-import { getContext } from "../../selectors";
+import type { SourceDetails } from "ui/reducers/sources";
 import { getHasSiblingOfSameName, getSourceContent, isFulfilled } from "ui/reducers/sources";
+import type { UIState } from "ui/state";
 
-import { getSourceQueryString } from "../../utils/source";
-import { isDirectory, getPathWithoutThread } from "../../utils/sources-tree";
+import type { ContextMenuItem } from "../../reducers/types";
+import { getContext } from "../../selectors";
 import { copyToTheClipboard } from "../../utils/clipboard";
+import { getSourceQueryString } from "../../utils/source";
+import { getPathWithoutThread, isDirectory } from "../../utils/sources-tree";
+import AccessibleImage from "../shared/AccessibleImage";
+import SourceIcon from "../shared/SourceIcon";
 
 type $FixTypeLater = any;
 

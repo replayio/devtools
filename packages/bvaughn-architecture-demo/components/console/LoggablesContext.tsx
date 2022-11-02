@@ -1,24 +1,37 @@
-import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
-import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
-import { PointInstance, PointsContext } from "@bvaughn/src/contexts/PointsContext";
-import { TerminalContext, TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
-import { EventLog, getEventTypeEntryPointsSuspense } from "@bvaughn/src/suspense/EventsCache";
-import { getExceptionsSuspense, UncaughtException } from "@bvaughn/src/suspense/ExceptionsCache";
-import { getMessagesSuspense, ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
-import { getHitPointsForLocationSuspense } from "@bvaughn/src/suspense/PointsCache";
-import { loggableSort } from "@bvaughn/src/utils/loggables";
-import { isInNodeModules } from "@bvaughn/src/utils/messages";
-import { suspendInParallel } from "@bvaughn/src/utils/suspense";
-import { isExecutionPointsWithinRange } from "@bvaughn/src/utils/time";
 import { EventHandlerType } from "@replayio/protocol";
 import {
-  createContext,
   MutableRefObject,
   ReactNode,
+  createContext,
   useContext,
   useLayoutEffect,
   useMemo,
 } from "react";
+
+import { ConsoleFiltersContext } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
+import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
+import { PointInstance, PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import {
+  TerminalContext,
+  TerminalExpression,
+} from "bvaughn-architecture-demo/src/contexts/TerminalContext";
+import {
+  EventLog,
+  getEventTypeEntryPointsSuspense,
+} from "bvaughn-architecture-demo/src/suspense/EventsCache";
+import {
+  UncaughtException,
+  getExceptionsSuspense,
+} from "bvaughn-architecture-demo/src/suspense/ExceptionsCache";
+import {
+  ProtocolMessage,
+  getMessagesSuspense,
+} from "bvaughn-architecture-demo/src/suspense/MessagesCache";
+import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
+import { loggableSort } from "bvaughn-architecture-demo/src/utils/loggables";
+import { isInNodeModules } from "bvaughn-architecture-demo/src/utils/messages";
+import { suspendInParallel } from "bvaughn-architecture-demo/src/utils/suspense";
+import { isExecutionPointsWithinRange } from "bvaughn-architecture-demo/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 export type Loggable =

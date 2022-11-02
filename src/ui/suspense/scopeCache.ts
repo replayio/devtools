@@ -1,4 +1,5 @@
 import { FrameId, MappedLocation, PauseId, Scope, SourceId } from "@replayio/protocol";
+
 import { createGenericCache } from "bvaughn-architecture-demo/src/suspense/createGenericCache";
 import { Pause, ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";

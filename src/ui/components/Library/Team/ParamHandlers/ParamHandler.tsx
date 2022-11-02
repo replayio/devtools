@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+
 import { SettingsHandler } from "./SettingsHandler";
 
 export function ParamHandler() {

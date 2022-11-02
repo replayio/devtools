@@ -3,14 +3,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { Node } from "@replayio/protocol";
-const CssLogic = require("third-party/css-logic/shared-inspector-css-logic");
+
 import TextProperty from "devtools/client/inspector/rules/models/text-property";
-import { RuleFront } from "./fronts/rule";
-import { StyleFront } from "./fronts/style";
 import { assert } from "protocol/utils";
 import CSSProperties from "third-party/css/css-properties";
-const { parseNamedDeclarations } = require("third-party/css/parsing-utils");
+
 import ElementStyle from "./element-style";
+import { RuleFront } from "./fronts/rule";
+import { StyleFront } from "./fronts/style";
+
+const CssLogic = require("third-party/css-logic/shared-inspector-css-logic");
+const { parseNamedDeclarations } = require("third-party/css/parsing-utils");
 const Services = require("devtools/shared/services");
 
 export interface NodeWithId {

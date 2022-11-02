@@ -2,7 +2,6 @@ import { Message, TimeStampedPointRange } from "@replayio/protocol";
 
 import { ReplayClientInterface } from "../../../shared/client/types";
 import { isFirefoxInternalMessage } from "../utils/messages";
-
 import { createWakeable } from "../utils/suspense";
 import {
   isExecutionPointsGreaterThan,
@@ -10,7 +9,6 @@ import {
   isRangeEqual,
   isRangeSubset,
 } from "../utils/time";
-
 import { preCacheObjects } from "./ObjectPreviews";
 import { Wakeable } from "./types";
 

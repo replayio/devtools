@@ -1,25 +1,27 @@
-import React, { ChangeEvent, useState, useMemo } from "react";
+import React, { ChangeEvent, useMemo, useState } from "react";
+
 import * as actions from "ui/actions/app";
+import { useRedirectToTeam } from "ui/components/Library/Team/utils";
+import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
-import { useAppSelector, useAppDispatch } from "ui/setup/hooks";
 import * as selectors from "ui/reducers/app";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { WorkspaceUser } from "ui/types";
 import { validateEmail } from "ui/utils/helpers";
+import { trackEvent } from "ui/utils/telemetry";
+
+import Base64Image from "../Base64Image";
+import { Button, DisabledButton, PrimaryButton } from "../Button";
+import { useConfirm } from "../Confirm";
 import { TextInput } from "../Forms";
 import InvitationLink from "../NewWorkspaceModal/InvitationLink";
 import SettingsModal from "../SettingsModal";
 import { Settings } from "../SettingsModal/types";
-import WorkspaceAPIKeys from "./WorkspaceAPIKeys";
-import WorkspaceSubscription from "./WorkspaceSubscription";
-import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember";
-import { Button, DisabledButton, PrimaryButton } from "../Button";
-import { useConfirm } from "../Confirm";
 import GeneralSettings from "./GeneralSettings";
 import OrganizationSettings from "./OrganizationSettings";
-import Base64Image from "../Base64Image";
-import { trackEvent } from "ui/utils/telemetry";
-import { useRedirectToTeam } from "ui/components/Library/Team/utils";
-import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
+import WorkspaceAPIKeys from "./WorkspaceAPIKeys";
+import WorkspaceMember, { NonRegisteredWorkspaceMember } from "./WorkspaceMember";
+import WorkspaceSubscription from "./WorkspaceSubscription";
 
 export function WorkspaceMembers({
   members,

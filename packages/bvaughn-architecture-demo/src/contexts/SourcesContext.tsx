@@ -1,12 +1,13 @@
 import { SourceId, SourceLocation } from "@replayio/protocol";
 import {
-  createContext,
   PropsWithChildren,
+  createContext,
   useCallback,
   useMemo,
   useReducer,
   useTransition,
 } from "react";
+
 import { SourceLocationRange } from "shared/client/types";
 
 const VISIBLE_LINES_BUCKET_SIZE = 100;

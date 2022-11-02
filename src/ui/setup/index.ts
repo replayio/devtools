@@ -1,30 +1,3 @@
-import { bootstrapStore } from "./store";
-import { registerStoreObserver, updatePrefs } from "./prefs";
-import { setupAppHelper } from "./helpers";
-import { setupDOMHelpers } from "./dom";
-import { setTelemetryContext, setupTelemetry } from "ui/utils/telemetry";
-import { UIStore } from "ui/actions";
-import { getTheme, initialAppState } from "ui/reducers/app";
-import tokenManager from "ui/utils/tokenManager";
-import { setAccessTokenInBrowserPrefs, setUserInBrowserPrefs } from "ui/utils/browser";
-import { getUserInfo } from "ui/hooks/users";
-import { getUserSettings } from "ui/hooks/settings";
-import { initLaunchDarkly } from "ui/utils/launchdarkly";
-import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
-import { syncInitialLayoutState } from "ui/reducers/layout";
-import { trackEvent } from "ui/utils/telemetry";
-import { Recording } from "ui/types";
-import { getRecording } from "ui/hooks/recordings";
-import { getRecordingId } from "ui/utils/recording";
-import { getReplaySession } from "ui/setup/prefs";
-import type { LayoutState } from "ui/state/layout";
-import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
-import { EMPTY_TABS } from "devtools/client/debugger/src/reducers/tabs";
-import { getCorrespondingSourceIds } from "ui/reducers/sources";
-import { ThreadFront } from "protocol/thread";
-import { replayClient } from "shared/client/ReplayClientContext";
-import { ReplayClient } from "shared/client/ReplayClient";
-import { getPreferredLocation } from "ui/utils/preferredLocation";
 import {
   ExecutionPoint,
   loadedRegions as LoadedRegions,
@@ -32,10 +5,39 @@ import {
   PauseData,
   PauseId,
 } from "@replayio/protocol";
-import { addPauseDataListener } from "protocol/thread/pause";
+
 import { preCacheObjects } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { trackExecutionPointPauseIds } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { preCacheExecutionPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
+import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
+import { EMPTY_TABS } from "devtools/client/debugger/src/reducers/tabs";
+import { ThreadFront } from "protocol/thread";
+import { addPauseDataListener } from "protocol/thread/pause";
+import { ReplayClient } from "shared/client/ReplayClient";
+import { replayClient } from "shared/client/ReplayClientContext";
+import { UIStore } from "ui/actions";
+import { getRecording } from "ui/hooks/recordings";
+import { getUserSettings } from "ui/hooks/settings";
+import { getUserInfo } from "ui/hooks/users";
+import { getTheme, initialAppState } from "ui/reducers/app";
+import { syncInitialLayoutState } from "ui/reducers/layout";
+import { getCorrespondingSourceIds } from "ui/reducers/sources";
+import { getReplaySession } from "ui/setup/prefs";
+import type { LayoutState } from "ui/state/layout";
+import { Recording } from "ui/types";
+import { setAccessTokenInBrowserPrefs, setUserInBrowserPrefs } from "ui/utils/browser";
+import { initLaunchDarkly } from "ui/utils/launchdarkly";
+import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
+import { getPreferredLocation } from "ui/utils/preferredLocation";
+import { getRecordingId } from "ui/utils/recording";
+import { setTelemetryContext, setupTelemetry } from "ui/utils/telemetry";
+import { trackEvent } from "ui/utils/telemetry";
+import tokenManager from "ui/utils/tokenManager";
+
+import { setupDOMHelpers } from "./dom";
+import { setupAppHelper } from "./helpers";
+import { registerStoreObserver, updatePrefs } from "./prefs";
+import { bootstrapStore } from "./store";
 
 declare global {
   interface Window {

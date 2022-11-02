@@ -1,4 +1,4 @@
-import { FunctionDeclaration, ClassDeclaration } from "../../reducers/ast";
+import { ClassDeclaration, FunctionDeclaration } from "../../reducers/ast";
 
 export function isFunctionDeclaration(
   symbol: FunctionDeclaration | ClassDeclaration

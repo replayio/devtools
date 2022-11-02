@@ -4,34 +4,30 @@
 
 //
 
+import classnames from "classnames";
+import debounce from "lodash/debounce";
 import PropTypes from "prop-types";
 import React, { Component, ContextType } from "react";
-import { connect, ConnectedProps } from "react-redux";
-
-import type { UIState } from "ui/state";
-
-import { CloseButton } from "../shared/Button";
-import AccessibleImage from "../shared/AccessibleImage";
-import actions from "../../actions";
-import {
-  getActiveSearch,
-  getFileSearchQuery,
-  getFileSearchModifiers,
-  getFileSearchResults,
-  getContext,
-} from "../../selectors";
-import { getSelectedSource, getSourceContent, isFulfilled } from "ui/reducers/sources";
-
-import { removeOverlay } from "../../utils/editor";
-
-import { scrollList } from "../../utils/result-list";
-import classnames from "classnames";
-
-import SearchInput from "../shared/SearchInput";
-import debounce from "lodash/debounce";
+import { ConnectedProps, connect } from "react-redux";
 
 import type { Modifiers } from "devtools/client/debugger/src/reducers/file-search";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
+import { getSelectedSource, getSourceContent, isFulfilled } from "ui/reducers/sources";
+import type { UIState } from "ui/state";
+
+import actions from "../../actions";
+import {
+  getActiveSearch,
+  getContext,
+  getFileSearchModifiers,
+  getFileSearchQuery,
+  getFileSearchResults,
+} from "../../selectors";
+import { removeOverlay } from "../../utils/editor";
+import { scrollList } from "../../utils/result-list";
+import AccessibleImage from "../shared/AccessibleImage";
+import { CloseButton } from "../shared/Button";
+import SearchInput from "../shared/SearchInput";
 import ShortcutsContext from "./ShortcutsContext";
 
 function getShortcuts() {

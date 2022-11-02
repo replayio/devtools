@@ -1,13 +1,15 @@
-import { TestRun } from "ui/hooks/tests";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/RecordingListItem";
-import { useContext } from "react";
-import { RunStats } from "./RunStats";
-import { AttributeContainer } from "./AttributeContainer";
-import styles from "../../../Library.module.css";
 import Link from "next/link";
+import { useContext } from "react";
+
+import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { TestRun } from "ui/hooks/tests";
+
 import { TeamContext } from "../../TeamContextRoot";
+import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/RecordingListItem";
+import { AttributeContainer } from "./AttributeContainer";
+import { RunStats } from "./RunStats";
 import { TestRunsContext } from "./TestRunsContextRoot";
+import styles from "../../../Library.module.css";
 
 function Title({ testRun }: { testRun: TestRun }) {
   const title = testRun.commitTitle || "Unknown";
@@ -15,7 +17,7 @@ function Title({ testRun }: { testRun: TestRun }) {
   const formatted = title.length > 80 ? title.slice(0, 80) + "..." : title;
 
   return (
-    <div className="flex pr-2 overflow-hidden font-medium wrap shrink grow-0 text-ellipsis whitespace-nowrap">
+    <div className="wrap flex shrink grow-0 overflow-hidden text-ellipsis whitespace-nowrap pr-2 font-medium">
       {formatted}
     </div>
   );
@@ -69,7 +71,7 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
         onClick={onClick}
       >
         <Status failCount={failCount} />
-        <div className="flex flex-col flex-grow space-y-1 overflow-hidden">
+        <div className="flex flex-grow flex-col space-y-1 overflow-hidden">
           <div className="flex flex-row justify-between space-x-3">
             <Title testRun={testRun} />
             <RunStats testRun={testRun} />

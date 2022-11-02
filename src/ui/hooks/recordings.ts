@@ -1,58 +1,60 @@
-import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
-import { query } from "ui/utils/apolloClient";
-import { Recording, RecordingRole, User, Workspace } from "ui/types";
-import { WorkspaceId } from "ui/state/app";
-import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
-import { useGetUserId } from "./users";
-import { GET_RECORDING, GET_RECORDING_USER_ID, SUBSCRIBE_RECORDING } from "ui/graphql/recordings";
-import { useRouter } from "next/router";
-import { extractIdAndSlug } from "ui/utils/helpers";
-import { getRecordingId } from "ui/utils/recording";
+import { ApolloError, gql, useMutation, useQuery } from "@apollo/client";
 import { RecordingId } from "@replayio/protocol";
-import {
-  SetRecordingIsPrivate,
-  SetRecordingIsPrivateVariables,
-} from "graphql/SetRecordingIsPrivate";
-import {
-  UpdateRecordingWorkspace,
-  UpdateRecordingWorkspaceVariables,
-} from "graphql/UpdateRecordingWorkspace";
-import { DeleteRecording, DeleteRecordingVariables } from "graphql/DeleteRecording";
-import { InitializeRecording, InitializeRecordingVariables } from "graphql/InitializeRecording";
-import { UpdateRecordingTitle, UpdateRecordingTitleVariables } from "graphql/UpdateRecordingTitle";
-import {
-  RequestRecordingAccess,
-  RequestRecordingAccessVariables,
-} from "graphql/RequestRecordingAccess";
+import { useRouter } from "next/router";
+import { useEffect, useMemo } from "react";
+
 import {
   AcceptRecordingCollaboratorRequest,
   AcceptRecordingCollaboratorRequestVariables,
 } from "graphql/AcceptRecordingCollaboratorRequest";
-import { GetRecording, GetRecordingVariables, GetRecording_recording } from "graphql/GetRecording";
-import { GetRecordingUserId, GetRecordingUserIdVariables } from "graphql/GetRecordingUserId";
+import { DeleteRecording, DeleteRecordingVariables } from "graphql/DeleteRecording";
 import {
   GetMyRecordings,
   GetMyRecordingsVariables,
   GetMyRecordings_viewer_recordings_edges_node,
 } from "graphql/GetMyRecordings";
-import { getRecordingPhoto, getRecordingPhotoVariables } from "graphql/getRecordingPhoto";
 import {
   GetOwnerAndCollaborators,
   GetOwnerAndCollaboratorsVariables,
 } from "graphql/GetOwnerAndCollaborators";
+import { GetRecording, GetRecordingVariables, GetRecording_recording } from "graphql/GetRecording";
+import { getRecordingPhoto, getRecordingPhotoVariables } from "graphql/getRecordingPhoto";
 import { GetRecordingPrivacy, GetRecordingPrivacyVariables } from "graphql/GetRecordingPrivacy";
+import { GetRecordingUserId, GetRecordingUserIdVariables } from "graphql/GetRecordingUserId";
 import {
   GetWorkspaceRecordings,
   GetWorkspaceRecordingsVariables,
   GetWorkspaceRecordings_node_Workspace_recordings_edges,
   GetWorkspaceRecordings_node_Workspace_recordings_edges_node,
 } from "graphql/GetWorkspaceRecordings";
-import { useEffect, useMemo } from "react";
-import { assert } from "protocol/utils";
+import { InitializeRecording, InitializeRecordingVariables } from "graphql/InitializeRecording";
+import {
+  RequestRecordingAccess,
+  RequestRecordingAccessVariables,
+} from "graphql/RequestRecordingAccess";
+import {
+  SetRecordingIsPrivate,
+  SetRecordingIsPrivateVariables,
+} from "graphql/SetRecordingIsPrivate";
 import {
   UpdateRecordingResolution,
   UpdateRecordingResolutionVariables,
 } from "graphql/UpdateRecordingResolution";
+import { UpdateRecordingTitle, UpdateRecordingTitleVariables } from "graphql/UpdateRecordingTitle";
+import {
+  UpdateRecordingWorkspace,
+  UpdateRecordingWorkspaceVariables,
+} from "graphql/UpdateRecordingWorkspace";
+import { assert } from "protocol/utils";
+import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
+import { GET_RECORDING, GET_RECORDING_USER_ID, SUBSCRIBE_RECORDING } from "ui/graphql/recordings";
+import { WorkspaceId } from "ui/state/app";
+import { Recording, RecordingRole, User, Workspace } from "ui/types";
+import { query } from "ui/utils/apolloClient";
+import { extractIdAndSlug } from "ui/utils/helpers";
+import { getRecordingId } from "ui/utils/recording";
+
+import { useGetUserId } from "./users";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");

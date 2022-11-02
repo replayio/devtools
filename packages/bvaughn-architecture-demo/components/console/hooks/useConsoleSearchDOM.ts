@@ -1,10 +1,14 @@
-import { Loggable, LoggablesContext } from "@bvaughn/components/console/LoggablesContext";
-import useSearchDOM from "@bvaughn/src/hooks/useSearchDOM";
+import { MutableRefObject, useContext, useMemo, useState } from "react";
+
+import {
+  Loggable,
+  LoggablesContext,
+} from "bvaughn-architecture-demo/components/console/LoggablesContext";
+import useSearchDOM from "bvaughn-architecture-demo/src/hooks/useSearchDOM";
 import type {
   Actions as SearchActions,
   State as SearchState,
-} from "@bvaughn/src/hooks/useSearchDOM";
-import { MutableRefObject, useContext, useMemo, useState } from "react";
+} from "bvaughn-architecture-demo/src/hooks/useSearchDOM";
 
 const EMPTY_ARRAY: any[] = [];
 

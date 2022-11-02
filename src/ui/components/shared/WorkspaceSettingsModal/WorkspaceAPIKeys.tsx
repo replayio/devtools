@@ -1,5 +1,6 @@
-import { assert } from "protocol/utils";
 import React from "react";
+
+import { assert } from "protocol/utils";
 import hooks from "ui/hooks";
 import { ApiKey } from "ui/types";
 

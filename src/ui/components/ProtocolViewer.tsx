@@ -1,6 +1,4 @@
 import dynamic from "next/dynamic";
-import { CommandResponse } from "protocol/socket";
-import { ThreadFront } from "protocol/thread";
 import React, {
   MutableRefObject,
   ReactNode,
@@ -10,23 +8,26 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { useAppSelector } from "ui/setup/hooks";
+
+import { CommandResponse } from "protocol/socket";
+import { ThreadFront } from "protocol/thread";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserInfo } from "ui/hooks/users";
 import { getTheme } from "ui/reducers/app";
 import {
+  Recorded,
+  RequestSummary,
   getProtocolErrorMap,
   getProtocolRequestMap,
   getProtocolResponseMap,
-  Recorded,
-  RequestSummary,
 } from "ui/reducers/protocolMessages";
+import { useAppSelector } from "ui/setup/hooks";
 import { formatDuration, formatTimestamp } from "ui/utils/time";
 
-import styles from "./ProtocolViewer.module.css";
 import { PrimarySmButton } from "./shared/Button";
-import { useGetRecordingId } from "ui/hooks/recordings";
+import styles from "./ProtocolViewer.module.css";
 
 const ReactJson = dynamic(() => import("react-json-view"), {
   ssr: false,

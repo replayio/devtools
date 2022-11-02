@@ -1,21 +1,21 @@
 import classNames from "classnames";
 import React, { useState } from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Row, TableInstance } from "react-table";
-import { setFocusRegionEndTime, setFocusRegionBeginTime } from "ui/actions/timeline";
+
+import { setFocusRegionBeginTime, setFocusRegionEndTime } from "ui/actions/timeline";
+import { getLoadedRegions } from "ui/reducers/app";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import type { AppDispatch } from "ui/setup/store";
 import { trackEvent } from "ui/utils/telemetry";
+import { isTimeInRegions } from "ui/utils/timeline";
 
 import { ContextMenu } from "../ContextMenu";
 import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
 import Icon from "../shared/Icon";
-
 import { HeaderGroups } from "./HeaderGroups";
 import { RequestRow } from "./RequestRow";
-import styles from "./RequestTable.module.css";
 import { RequestSummary } from "./utils";
-import { getLoadedRegions } from "ui/reducers/app";
-import { isTimeInRegions } from "ui/utils/timeline";
+import styles from "./RequestTable.module.css";
 
 interface ContextMenuData {
   pageX: number;

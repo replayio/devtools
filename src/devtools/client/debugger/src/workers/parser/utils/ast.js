@@ -4,10 +4,11 @@
 
 //
 
-import parseScriptTags from "parse-script-tags";
 import * as babelParser from "@babel/parser";
 import * as t from "@babel/types";
 import isEmpty from "lodash/isEmpty";
+import parseScriptTags from "parse-script-tags";
+
 import { getSource } from "../sources";
 
 let ASTs = new Map();

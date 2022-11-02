@@ -1,5 +1,6 @@
 import { PrefsHelper } from "devtools/client/shared/prefs";
 import { pref } from "devtools/shared/services";
+
 import { isTest } from "./environment";
 
 const { asyncStoreHelper } = require("devtools/shared/async-store-helper");

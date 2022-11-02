@@ -1,7 +1,9 @@
 import classNames from "classnames";
 import React from "react";
+
 import hooks from "ui/hooks";
 import { Subscription } from "ui/types";
+
 import { formatPaymentMethod } from "./utils";
 
 export function DeleteConfirmation({

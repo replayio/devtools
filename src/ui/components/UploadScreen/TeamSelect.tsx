@@ -1,11 +1,11 @@
 import { SelectorIcon } from "@heroicons/react/solid";
 import React, { useState } from "react";
+
 import { useGetUserInfo } from "ui/hooks/users";
 import { Workspace } from "ui/types";
 
 import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
 import PortalDropdown from "../shared/PortalDropdown";
-
 import { personalWorkspace } from "./libraryConstants";
 
 const TeamSelectButton = ({

@@ -1,7 +1,8 @@
 import React, { ChangeEvent, KeyboardEvent, useContext } from "react";
+
 import { TextInput } from "../../../shared/Forms";
-import { FilterDropdown } from "./FilterDropdown";
 import { FilterContext } from "./FilterContext";
+import { FilterDropdown } from "./FilterDropdown";
 import { ViewContext } from "./ViewContextRoot";
 
 export function FilterBar() {
@@ -20,7 +21,7 @@ export function FilterBar() {
   const showFilterInput = ["recordings", "results"].includes(view);
 
   return (
-    <div className="relative flex items-center flex-grow space-x-3">
+    <div className="relative flex flex-grow items-center space-x-3">
       <FilterDropdown />
       {showFilterInput ? (
         <div className="flex flex-grow">

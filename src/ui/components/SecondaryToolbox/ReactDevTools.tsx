@@ -1,18 +1,19 @@
 import { ExecutionPoint, NodeBounds, ObjectId } from "@replayio/protocol";
 import React, { useContext } from "react";
 import { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import type { Store, Wall } from "react-devtools-inline/frontend";
 
+import {
+  getObjectPropertyHelper,
+  getObjectWithPreviewHelper,
+} from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
-import {
-  getObjectWithPreviewHelper,
-  getObjectPropertyHelper,
-} from "@bvaughn/src/suspense/ObjectPreviews";
-
-import { Annotation } from "ui/state/reactDevTools";
+import { fetchMouseTargetsForPause } from "ui/actions/app";
+import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactDevTools";
 import {
   getCurrentPoint,
   getTheme,
@@ -24,15 +25,12 @@ import {
   getProtocolCheckFailed,
   getReactInitPoint,
 } from "ui/reducers/reactDevTools";
-import { fetchMouseTargetsForPause } from "ui/actions/app";
-import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactDevTools";
-import { NodePicker as NodePickerClass, NodePickerOpts } from "ui/utils/nodePicker";
-import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
-import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
-import { getJSON } from "ui/utils/objectFetching";
-
-import type { Store, Wall } from "react-devtools-inline/frontend";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { Annotation } from "ui/state/reactDevTools";
 import { getMouseTarget } from "ui/suspense/nodeCaches";
+import { NodePicker as NodePickerClass, NodePickerOpts } from "ui/utils/nodePicker";
+import { getJSON } from "ui/utils/objectFetching";
+import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 
 type ReactDevToolsInlineModule = typeof import("react-devtools-inline/frontend");
 

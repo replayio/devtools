@@ -1,8 +1,9 @@
-import React from "react";
 import classNames from "classnames";
+import React from "react";
 
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getSelectedSource } from "ui/reducers/sources";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+
 import { deselectSource } from "../../actions/sources/select";
 
 export default function CommandPaletteButton() {

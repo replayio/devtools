@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ApiKey, ApiKeyResponse, ApiKeyScope } from "ui/types";
-import { useConfirm } from "./Confirm";
 
+import { ApiKey, ApiKeyResponse, ApiKeyScope } from "ui/types";
+
+import { useConfirm } from "./Confirm";
 import TextInput from "./Forms/TextInput";
 import MaterialIcon from "./MaterialIcon";
 
@@ -22,7 +23,7 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
   return (
     <>
       <div className="flex items-center justify-between space-x-3">
-        <div className="flex-auto w-0">
+        <div className="w-0 flex-auto">
           <div className="flex h-9 w-full items-center rounded-md border border-textFieldBorder bg-themeTextFieldBgcolor px-2.5 text-themeTextFieldColor text-primaryAccent">
             <input
               readOnly
@@ -34,7 +35,7 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
               <div className="text-primaryAccent">Copied</div>
             ) : (
               <MaterialIcon
-                className="w-5 cursor-pointer material-icons text-primaryAccent hover:text-primaryAccentHover"
+                className="material-icons w-5 cursor-pointer text-primaryAccent hover:text-primaryAccentHover"
                 iconSize="lg"
                 onClick={() => navigator.clipboard.writeText(keyValue!).then(() => setCopied(true))}
               >
@@ -64,9 +65,9 @@ function ApiKeyList({ apiKeys, onDelete }: { apiKeys: ApiKey[]; onDelete: (id: s
   }
 
   return (
-    <section className="flex flex-col flex-auto">
+    <section className="flex flex-auto flex-col">
       <h3 className="text-base font-semibold uppercase">API Keys</h3>
-      <div className="flex-auto h-0 overflow-auto">
+      <div className="h-0 flex-auto overflow-auto">
         {apiKeys.map(apiKey => {
           const usage =
             typeof apiKey.maxRecordings === "number"
@@ -140,7 +141,7 @@ export default function APIKeys({
   }, [keyValue]);
 
   return (
-    <div className="flex flex-col flex-auto h-0 space-y-8">
+    <div className="flex h-0 flex-auto flex-col space-y-8">
       <label className="setting-item">
         <div className="description">{description}</div>
       </label>

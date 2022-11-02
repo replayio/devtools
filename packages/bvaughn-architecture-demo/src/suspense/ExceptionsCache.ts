@@ -1,10 +1,10 @@
 import { TimeStampedPointRange } from "@replayio/protocol";
+
 import { ReplayClientInterface } from "shared/client/types";
-import { isCommandError, ProtocolError } from "shared/utils/error";
+import { ProtocolError, isCommandError } from "shared/utils/error";
 
 import { createWakeable } from "../utils/suspense";
 import { isRangeEqual, isRangeSubset } from "../utils/time";
-
 import { RemoteAnalysisResult } from "./AnalysisCache";
 import { preCacheObjects } from "./ObjectPreviews";
 import { Wakeable } from "./types";

@@ -2,11 +2,12 @@
 // It's just a bootstrap for things like auth that I didn't want to spend time actually implementing.
 
 import { ReactNode, useContext, useEffect, useRef, useState } from "react";
+
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
+import { setReplayClient } from "../app/api";
 import asyncInitializeClient from "../client/asyncInitializeClient";
 import { SessionContext, SessionContextType } from "../contexts/SessionContext";
-import { setReplayClient } from "../app/api";
 
 // HACK Hack around the fact that the initSocket() function is side effectful
 // and writes to an "app" global on the window object.

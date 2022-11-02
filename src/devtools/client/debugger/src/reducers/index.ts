@@ -9,15 +9,15 @@
  * @module reducers/index
  */
 
-import asyncRequests from "./async-requests";
-import pause from "./pause";
-import ui from "./ui";
-import fileSearch from "./file-search";
 import ast from "./ast";
+import asyncRequests from "./async-requests";
+import fileSearch from "./file-search";
+import pause from "./pause";
 import preview from "./preview";
 import quickOpen from "./quick-open";
 import sourceTree from "./source-tree";
 import threads from "./threads";
+import ui from "./ui";
 
 export default {
   asyncRequests,

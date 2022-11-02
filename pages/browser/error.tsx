@@ -1,5 +1,6 @@
 import { useRouter } from "next/dist/client/router";
 import React, { useEffect } from "react";
+
 import { ExpectedErrorScreen } from "ui/components/shared/Error";
 import { getAuthHost } from "ui/utils/auth";
 import useAuth0 from "ui/utils/useAuth0";

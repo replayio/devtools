@@ -1,6 +1,7 @@
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { EventMethods, EventParams } from "@replayio/protocol";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import cloneDeep from "lodash/cloneDeep";
+
 import { CommandRequest, CommandResponse } from "protocol/socket";
 import { UIState } from "ui/state";
 import { features } from "ui/utils/prefs";

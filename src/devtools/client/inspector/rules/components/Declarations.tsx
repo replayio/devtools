@@ -1,5 +1,7 @@
 import React, { FC } from "react";
+
 import { Declaration } from "devtools/client/inspector/rules/components/Declaration";
+
 import { DeclarationState } from "../reducers/rules";
 
 type DeclarationsProps = {

@@ -1,7 +1,9 @@
-import { handleError } from "protocol/utils";
 import { useEffect, useRef, useState } from "react";
-import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
+
+import { handleError } from "protocol/utils";
+
 import { createWakeable } from "../utils/suspense";
+import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 export interface GenericCache<TParams extends Array<any>, TValue> {
   getValueSuspense(...args: TParams): TValue;

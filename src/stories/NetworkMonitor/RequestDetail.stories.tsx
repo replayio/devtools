@@ -1,6 +1,5 @@
+import { Meta, Story } from "@storybook/react";
 import React, { ComponentProps } from "react";
-
-import { Story, Meta } from "@storybook/react";
 
 import RequestDetails from "ui/components/NetworkMonitor/RequestDetails";
 import { CanonicalRequestType } from "ui/components/NetworkMonitor/utils";

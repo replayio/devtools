@@ -5,10 +5,10 @@
 "use strict";
 
 import React from "react";
-import BoxModelMain from "./BoxModelMain";
-import { BoxModelProperties } from "./BoxModelProperties";
 
 import type { Layout } from "../reducers/box-model";
+import BoxModelMain from "./BoxModelMain";
+import { BoxModelProperties } from "./BoxModelProperties";
 
 function BoxModelInfo({ layout }: { layout: Layout }) {
   const { height = "-", position, width = "-" } = layout;

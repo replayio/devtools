@@ -9,3 +9,6 @@ packages/bvaughn-architecture-demo/playwright/protocol-fixtures/
 src/ui/utils/intercom.ts
 index.html
 packages/third-party/
+*.tsbuildinfo
+*.json
+*.yaml

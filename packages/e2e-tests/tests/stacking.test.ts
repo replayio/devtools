@@ -1,13 +1,12 @@
 import test from "@playwright/test";
-
-import { Locator, expect, Page } from "@playwright/test";
+import { Locator, Page, expect } from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import {
-  selectElementsRowWithText,
-  openElementsPanel,
   openAppliedRulesTab,
+  openElementsPanel,
+  selectElementsRowWithText,
 } from "../helpers/elements-panel";
 import { getBreakpointsAccordionPane } from "../helpers/pause-information-panel";
 import { mapLocators, waitFor } from "../helpers/utils";

@@ -1,5 +1,5 @@
-import { useAppDispatch } from "ui/setup/hooks";
 import { setModal } from "ui/actions/app";
+import { useAppDispatch } from "ui/setup/hooks";
 
 import styles from "./LoomComment.module.css";
 

@@ -1,5 +1,4 @@
 import { ObjectPreviewRendererProps } from "./types";
-
 import styles from "./shared.module.css";
 
 // Renders a protocol ObjectPreview representing a Date with a format of:

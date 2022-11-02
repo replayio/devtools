@@ -1,11 +1,13 @@
 import { SourceLocation } from "graphql";
 import { useState } from "react";
+
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useFetchCypressSpec } from "ui/hooks/useFetchCypressSpec";
 import { getRecordingDuration } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem, TestResult, TestStep } from "ui/types";
 import { getFormattedTime } from "ui/utils/timeline";
+
 import { selectLocation } from "../../actions/sources";
 import { getThreadContext } from "../../selectors";
 
@@ -22,7 +24,7 @@ export default function TestInfo({
   const cypressResults = useFetchCypressSpec();
 
   return (
-    <div className="flex flex-col px-4 py-2 space-y-1">
+    <div className="flex flex-col space-y-1 px-4 py-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
           {result ? <Status result={result} /> : null}
@@ -30,7 +32,7 @@ export default function TestInfo({
         </div>
         {recordingDuration ? <div>{getFormattedTime(recordingDuration)}</div> : null}
       </div>
-      <div className="flex flex-col py-2 space-y-1">
+      <div className="flex flex-col space-y-1 py-2">
         {testCases.map((t, i) => (
           <TestCase test={t} key={i} location={cypressResults?.[i]?.location} />
         ))}
@@ -57,18 +59,18 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-row items-center justify-between gap-1 pl-4 transition group hover:bg-chrome">
+      <div className="group flex flex-row items-center justify-between gap-1 pl-4 transition hover:bg-chrome">
         <button
           onClick={toggleExpand}
           disabled={!expandable}
-          className="flex flex-row items-center flex-grow gap-1 overflow-hidden"
+          className="flex flex-grow flex-row items-center gap-1 overflow-hidden"
         >
           <Status result={test.result} />
           {test.steps ? (
             <MaterialIcon>{expandSteps ? "expand_more" : "chevron_right"}</MaterialIcon>
           ) : null}
           <div
-            className={`overflow-hidden whitespace-pre overflow-ellipsis ${
+            className={`overflow-hidden overflow-ellipsis whitespace-pre ${
               expandable ? "group-hover:underline" : ""
             }`}
           >
@@ -84,10 +86,10 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
       {expandSteps ? (
         <>
           {test.error ? (
-            <div className="space-y-1 ml-7">
+            <div className="ml-7 space-y-1">
               <div className="font-bold">Error</div>
-              <div className="p-2 space-y-1 bg-chrome">
-                <div className={`font-mono overflow-hidden ${!expandError ? "truncate" : ""}`}>
+              <div className="space-y-1 bg-chrome p-2">
+                <div className={`overflow-hidden font-mono ${!expandError ? "truncate" : ""}`}>
                   {test.error.message}
                 </div>
                 <button className="hover:underline" onClick={() => setExpandError(!expandError)}>
@@ -105,9 +107,9 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
 
 function TestSteps({ steps, startTime }: { steps: TestStep[]; startTime: number }) {
   return (
-    <div className="flex flex-col pl-8 space-y-1">
+    <div className="flex flex-col space-y-1 pl-8">
       <div className="font-bold">Steps</div>
-      <div className="flex flex-col gap-1 p-2 bg-chrome">
+      <div className="flex flex-col gap-1 bg-chrome p-2">
         {steps?.map((s, i) => (
           <div key={i} className="flex items-center justify-between overflow-hidden">
             <div className="flex items-center space-x-2 overflow-hidden whitespace-pre">

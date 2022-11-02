@@ -1,4 +1,4 @@
-import { TimeRange, Location, TimeStampedPoint } from "@replayio/protocol";
+import { Location, TimeRange, TimeStampedPoint } from "@replayio/protocol";
 
 export interface ZoomRegion {
   endTime: number;

@@ -1,5 +1,6 @@
 import { TimeStampedPoint } from "@replayio/protocol";
 import sortedLastIndex from "lodash/sortedLastIndex";
+
 import { Badge, HitPointStatus } from "shared/client/types";
 import { getPrefixBadgeBackgroundColorClassName } from "ui/components/PrefixBadge";
 import { getCurrentTime } from "ui/reducers/timeline";

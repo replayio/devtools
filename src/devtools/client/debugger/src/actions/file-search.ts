@@ -3,12 +3,11 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { UIThunkAction } from "ui/actions";
-import type { Context } from "../reducers/pause";
-
-import { closeActiveSearch, clearHighlightLineRange } from "../reducers/ui";
-import { getFileSearchModifiers, getFileSearchQuery, getFileSearchResults } from "../selectors";
 import { getSelectedSourceWithContent, isFulfilled } from "ui/reducers/sources";
 
+import type { Context } from "../reducers/pause";
+import { clearHighlightLineRange, closeActiveSearch } from "../reducers/ui";
+import { getFileSearchModifiers, getFileSearchQuery, getFileSearchResults } from "../selectors";
 import {
   clearSearch,
   find,

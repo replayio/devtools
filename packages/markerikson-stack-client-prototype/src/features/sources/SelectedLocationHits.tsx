@@ -2,10 +2,10 @@ import { skipToken } from "@reduxjs/toolkit/dist/query";
 import type { HitCount, Location } from "@replayio/protocol";
 
 import {
-  useGetSourceTextQuery,
-  useGetSourceHitCountsQuery,
   useGetLineHitPointsQuery,
   useGetPauseQuery,
+  useGetSourceHitCountsQuery,
+  useGetSourceTextQuery,
 } from "../../app/api";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { pointSelected } from "./selectedSourcesSlice";

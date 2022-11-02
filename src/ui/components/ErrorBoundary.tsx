@@ -1,12 +1,13 @@
+import * as Sentry from "@sentry/react";
 import React, { ReactNode } from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { isDevelopment } from "ui/utils/environment";
-import { UnexpectedError } from "ui/state/app";
-import { getUnexpectedError } from "ui/reducers/app";
+
 import { setUnexpectedError } from "ui/actions/errors";
+import { getUnexpectedError } from "ui/reducers/app";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { UnexpectedError } from "ui/state/app";
+import { isDevelopment } from "ui/utils/environment";
 
 import { BlankViewportWrapper } from "./shared/Viewport";
-import * as Sentry from "@sentry/react";
 
 export const ReplayUpdatedError: UnexpectedError = {
   message: "Replay updated",

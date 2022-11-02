@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe, PaymentMethod } from "@stripe/stripe-js";
+import { PaymentMethod, loadStripe } from "@stripe/stripe-js";
+import React, { useEffect, useState } from "react";
 
 import { assert } from "protocol/utils";
-import { isDevelopment } from "ui/utils/environment";
 import hooks from "ui/hooks";
+import { Subscription } from "ui/types";
+import { isDevelopment } from "ui/utils/environment";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 import { SettingsHeader } from "../SettingsModal/SettingsBody";
-
 import { EnterPaymentMethod } from "./AddPaymentMethod";
 import { DeleteConfirmation } from "./DeleteConfirmation";
 import { Details } from "./Details";
 import { PricingPage } from "./PricingPage";
-import { getSubscriptionWithPricing, Views } from "./utils";
-import { Subscription } from "ui/types";
+import { Views, getSubscriptionWithPricing } from "./utils";
 
 // By default, we use the test key for local development and the live key
 // otherwise. Setting RECORD_REPLAY_STRIPE_LIVE to a truthy value will force

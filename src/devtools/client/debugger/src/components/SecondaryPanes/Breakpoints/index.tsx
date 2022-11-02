@@ -1,15 +1,14 @@
 import { SourceId } from "@replayio/protocol";
+import { ReactNode, useContext, useEffect, useMemo, useState } from "react";
+
 import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import {
   createHeadlessEditor,
   waitForEditor,
 } from "devtools/client/debugger/src/utils/editor/create-editor";
-import { ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { Point } from "shared/client/types";
-
-import { useAppSelector } from "ui/setup/hooks";
-
 import { getSourceDetailsEntities } from "ui/reducers/sources";
+import { useAppSelector } from "ui/setup/hooks";
 
 import Breakpoint from "./Breakpoint";
 import BreakpointHeading from "./BreakpointHeading";

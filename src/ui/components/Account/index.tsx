@@ -1,10 +1,12 @@
-import React, { useEffect } from "react";
-import { useAppDispatch } from "ui/setup/hooks";
-import { setLoadingFinished } from "ui/reducers/app";
-import useAuth0 from "ui/utils/useAuth0";
-import Login from "../shared/Login/Login";
 import { useRouter } from "next/router";
+import React, { useEffect } from "react";
+
+import { setLoadingFinished } from "ui/reducers/app";
+import { useAppDispatch } from "ui/setup/hooks";
+import useAuth0 from "ui/utils/useAuth0";
+
 import LoadingScreen from "../shared/LoadingScreen";
+import Login from "../shared/Login/Login";
 
 export default function Account() {
   const router = useRouter();

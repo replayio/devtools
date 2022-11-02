@@ -2,25 +2,24 @@ import {
   ExecutionPoint,
   Frame,
   FrameId,
-  ObjectId,
+  NodeBounds,
   Object as ObjectDescription,
+  ObjectId,
+  ObjectPreview,
+  PauseData,
   PauseId,
+  PointDescription,
   Scope,
   ScopeId,
   SessionId,
-  ObjectPreview,
-  PointDescription,
-  NodeBounds,
-  PauseData,
-  repaintGraphicsResult,
   Value,
+  repaintGraphicsResult,
 } from "@replayio/protocol";
 
-import { isCommandError, ProtocolError } from "shared/utils/error";
+import { ProtocolError, isCommandError } from "shared/utils/error";
 
 import { client } from "../socket";
-import { defer, assert, Deferred, EventEmitter } from "../utils";
-
+import { Deferred, EventEmitter, assert, defer } from "../utils";
 import type { ThreadFront as ThreadFrontType } from "./thread";
 
 const pausesById = new Map<PauseId, Pause>();

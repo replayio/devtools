@@ -1,5 +1,5 @@
+import { Node, PasteRule, markPasteRule, mergeAttributes, nodeInputRule } from "@tiptap/core";
 import { EditorState } from "prosemirror-state";
-import { Node, mergeAttributes, nodeInputRule, PasteRule, markPasteRule } from "@tiptap/core";
 
 export interface ReplayLinkOptions {
   HTMLAttributes: Record<string, any>;

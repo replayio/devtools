@@ -1,8 +1,9 @@
 import { Location, PauseId } from "@replayio/protocol";
 import classnames from "classnames";
-import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import React, { MouseEventHandler } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
+
+import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import { actions } from "ui/actions/index";
 import { timelineMarkerWidth as pointWidth } from "ui/constants";
 import { HoveredItem, ZoomRegion } from "ui/state/timeline";

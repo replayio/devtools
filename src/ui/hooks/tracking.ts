@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useAppSelector } from "ui/setup/hooks";
+
 import { getUploading } from "ui/reducers/app";
+import { useAppSelector } from "ui/setup/hooks";
 import { Recording } from "ui/types";
 import { trackTiming } from "ui/utils/telemetry";
 

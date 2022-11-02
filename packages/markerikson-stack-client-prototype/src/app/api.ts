@@ -1,16 +1,16 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import type {
-  newSource,
+  HitCount,
   Location,
   PointDescription,
-  HitCount,
-  createPauseResult,
   SessionId,
+  createPauseResult,
+  newSource,
 } from "@replayio/protocol";
-
 // eslint-disable-next-line no-restricted-imports
 import { Dictionary } from "lodash";
 import groupBy from "lodash/groupBy";
+
 // eslint-disable-next-line no-restricted-imports
 import { client } from "protocol/socket";
 import type { ReplayClientInterface } from "shared/client/types";

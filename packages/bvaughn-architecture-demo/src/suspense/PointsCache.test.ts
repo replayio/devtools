@@ -1,12 +1,13 @@
 import {
   ExecutionPoint,
-  getPointsBoundingTimeResult as PointsBoundingTime,
   Location,
+  getPointsBoundingTimeResult as PointsBoundingTime,
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
+
 import { HitPointsAndStatusTuple, ReplayClientInterface } from "shared/client/types";
-import { commandError, ProtocolError } from "shared/utils/error";
+import { ProtocolError, commandError } from "shared/utils/error";
 
 import { createMockReplayClient } from "../utils/testing";
 

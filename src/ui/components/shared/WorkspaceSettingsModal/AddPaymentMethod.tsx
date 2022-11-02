@@ -1,11 +1,13 @@
+import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { PaymentMethod } from "@stripe/stripe-js";
 import React, { useEffect, useState } from "react";
-import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+
 import hooks from "ui/hooks";
+
 import { Button } from "../Button";
+import { CountrySelect } from "./CountrySelect";
 import { FieldRow } from "./FieldRow";
 import { InputField } from "./InputField";
-import { CountrySelect } from "./CountrySelect";
-import { PaymentMethod } from "@stripe/stripe-js";
 
 export const getValue = (form: HTMLFormElement, field: string) => {
   const input = form.elements.namedItem(field);

@@ -1,21 +1,21 @@
-import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
-import { getSource } from "@bvaughn/src/suspense/SourcesCache";
-import { getSourceFileName } from "@bvaughn/src/utils/source";
 import { KeyboardEvent, MouseEvent, useContext, useRef } from "react";
+
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { getSource } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Icon from "../Icon";
 import LazyOffscreen from "../LazyOffscreen";
-
 import Source from "./Source";
-import styles from "./Sources.module.css";
+import SourceFileNameSearch from "./SourceFileNameSearch";
 import {
   SourceFileNameSearchContext,
   SourceFileNameSearchContextRoot,
 } from "./SourceFileNameSearchContext";
-import { SourceSearchContext, SourceSearchContextRoot } from "./SourceSearchContext";
 import SourceSearch from "./SourceSearch";
-import SourceFileNameSearch from "./SourceFileNameSearch";
+import { SourceSearchContext, SourceSearchContextRoot } from "./SourceSearchContext";
+import styles from "./Sources.module.css";
 
 export default function SourcesRoot() {
   return (

@@ -4,18 +4,20 @@
 
 //
 
-import React, { Component, Suspense } from "react";
-import { actions } from "ui/actions";
+import { Location, PointDescription } from "@replayio/protocol";
 import classnames from "classnames";
+import React, { Component, Suspense } from "react";
 import ReactTooltip from "react-tooltip";
-import { trackEvent } from "ui/utils/telemetry";
-import { getFrameStepsSuspense } from "ui/suspense/frameStepsCache";
-import { getPreferredLocation, getSelectedLocation, SourcesState } from "ui/reducers/sources";
+
 import { ThreadFront } from "protocol/thread/thread";
-import { PointDescription, Location } from "@replayio/protocol";
+import { actions } from "ui/actions";
+import { SourcesState, getPreferredLocation, getSelectedLocation } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { getFrameStepsSuspense } from "ui/suspense/frameStepsCache";
+import { trackEvent } from "ui/utils/telemetry";
+
 import { PartialLocation } from "../../actions/sources/select";
-import { getExecutionPoint, PauseFrame } from "../../reducers/pause";
+import { PauseFrame, getExecutionPoint } from "../../reducers/pause";
 import { getSelectedFrameSuspense } from "../../selectors/pause";
 
 function getBoundingClientRect(element?: HTMLElement) {

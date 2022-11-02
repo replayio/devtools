@@ -1,8 +1,9 @@
-import classnames from "classnames";
-import { useAppSelector } from "ui/setup/hooks";
 import { ChatAltIcon } from "@heroicons/react/solid";
-import { Comment } from "ui/state/comments";
+import classnames from "classnames";
+
 import { getCanvas } from "ui/actions/app";
+import { useAppSelector } from "ui/setup/hooks";
+import { Comment } from "ui/state/comments";
 
 const MARKER_DIAMETER = 28;
 const MARKER_RADIUS = 14;

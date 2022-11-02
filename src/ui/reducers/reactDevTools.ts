@@ -1,7 +1,7 @@
 import { compareNumericStrings } from "protocol/utils";
+import { ReactDevToolsAction } from "ui/actions/reactDevTools";
 import { UIState } from "ui/state";
 import { ReactDevToolsState } from "ui/state/reactDevTools";
-import { ReactDevToolsAction } from "ui/actions/reactDevTools";
 
 export default function update(
   state = {

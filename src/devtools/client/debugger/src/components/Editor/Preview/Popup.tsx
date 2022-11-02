@@ -1,9 +1,10 @@
+import { RefObject, useCallback } from "react";
+
 import Popover from "devtools/client/debugger/src/components/shared/Popover";
 import { previewCleared } from "devtools/client/debugger/src/reducers/preview";
 import type { PreviewState } from "devtools/client/debugger/src/reducers/preview";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
-import { RefObject, useCallback } from "react";
-import { useAppSelector, useAppDispatch } from "ui/setup/hooks";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import NewObjectInspector from "./NewObjectInspector";
 

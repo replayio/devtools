@@ -1,31 +1,31 @@
 import classNames from "classnames";
 import React, {
-  MouseEventHandler,
   Children,
   Dispatch,
+  FC,
+  MouseEventHandler,
   ReactElement,
   useEffect,
   useReducer,
   useRef,
-  FC,
 } from "react";
-import { HANDLE_HEIGHT, BORDER_HEIGHT, MIN_HEIGHT } from "./constants";
 
+import { BORDER_HEIGHT, HANDLE_HEIGHT, MIN_HEIGHT } from "./constants";
 import {
+  AccordionAction,
   collapseSection,
   containerResize,
   endResizing,
   expandSection,
+  getHeight,
   getInitialState,
   getIsCollapsed,
   getIsIndexResizable,
   getIsResizing,
-  getHeight,
   getResizingParams,
   reducer,
   resize,
   startResizing,
-  AccordionAction,
 } from "./reducer";
 
 // When I wrote this code God and I knew what I was doing. Now only God knows.

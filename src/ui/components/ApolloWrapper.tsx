@@ -1,17 +1,18 @@
-import React, { ReactNode, useState, useEffect } from "react";
 import { ApolloProvider, from } from "@apollo/client";
 import { MockedProvider, MockedResponse } from "@apollo/client/testing";
-import { getGraphqlMocksForTesting, isTest, isMock } from "ui/utils/environment";
-import useToken from "ui/utils/useToken";
+import React, { ReactNode, useEffect, useState } from "react";
+
 import { PopupBlockedError } from "ui/components/shared/Error";
 import {
-  createRetryLink,
+  clientWaiter,
+  createApolloCache,
+  createApolloClient,
   createErrorLink,
   createMockLink,
-  createApolloCache,
-  clientWaiter,
-  createApolloClient,
+  createRetryLink,
 } from "ui/utils/apolloClient";
+import { getGraphqlMocksForTesting, isMock, isTest } from "ui/utils/environment";
+import useToken from "ui/utils/useToken";
 
 export function ApolloWrapper({
   children,

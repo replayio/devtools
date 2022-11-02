@@ -1,9 +1,8 @@
 import { ChangeEvent, KeyboardEvent, Suspense, useRef, useState } from "react";
 
 import getExpressionFromString from "../utils/getExpressionFromString";
-
-import styles from "./AutoComplete.module.css";
 import AutoCompleteList from "./AutoCompleteList";
+import styles from "./AutoComplete.module.css";
 
 export default function AutoComplete({
   autoFocus,

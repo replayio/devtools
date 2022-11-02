@@ -5,16 +5,16 @@
 //
 
 import { getUnicodeUrl } from "devtools/client/shared/unicode-url";
-
-import type { SymbolDeclarations } from "../reducers/ast";
-import { SourceContent, MiniSource } from "ui/reducers/sources";
+import { MiniSource, SourceContent } from "ui/reducers/sources";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 
+import type { SymbolDeclarations } from "../reducers/ast";
 import { getURL } from "./sources-tree/getURL";
 import { truncateMiddleText } from "./text";
 import { parse as parseURL } from "./url";
-export { isMinified } from "./isMinified";
 import { endTruncateStr } from "./utils";
+
+export { isMinified } from "./isMinified";
 
 export const sourceTypes = {
   coffee: "coffeescript",

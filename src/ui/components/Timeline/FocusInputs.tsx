@@ -1,12 +1,13 @@
 import React from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+
 import { setFocusRegion } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import {
+  displayedBeginForFocusRegion,
   displayedEndForFocusRegion,
   getFormattedTime,
   getSecondsFromFormattedTime,
-  displayedBeginForFocusRegion,
 } from "ui/utils/timeline";
 
 import EditableTimeInput from "./EditableTimeInput";

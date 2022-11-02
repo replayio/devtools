@@ -1,6 +1,7 @@
 import React from "react";
-import { useAppSelector } from "ui/setup/hooks";
+
 import { selectors } from "ui/reducers";
+import { useAppSelector } from "ui/setup/hooks";
 
 import Marker from "./Marker";
 

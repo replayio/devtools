@@ -11,42 +11,41 @@ import {
   Annotation,
   BreakpointId,
   ExecutionPoint,
+  Frame,
   FrameId,
+  loadedRegions as LoadedRegions,
   Location,
   MappedLocation,
   Message,
-  missingRegions,
-  newSource,
   ObjectId,
+  PauseData,
   PauseDescription,
+  PauseId,
+  PointRange,
   RecordingId,
+  RequestEventInfo,
+  RequestInfo,
+  SameLineSourceLocations,
   ScreenShot,
   SessionId,
   SourceId,
   SourceKind,
   SourceLocation,
   TimeStamp,
-  unprocessedRegions,
-  loadedRegions as LoadedRegions,
-  SameLineSourceLocations,
-  RequestEventInfo,
-  RequestInfo,
-  responseBodyData,
-  requestBodyData,
-  findAnnotationsResult,
-  Frame,
-  PointRange,
-  PauseId,
-  PauseData,
   Value,
+  findAnnotationsResult,
+  missingRegions,
+  newSource,
+  requestBodyData,
+  responseBodyData,
+  unprocessedRegions,
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
 import { MappedLocationCache } from "../mapped-location-cache";
 import ScopeMapCache from "../scope-map-cache";
 import { client } from "../socket";
-import { defer, assert, EventEmitter } from "../utils";
-
+import { EventEmitter, assert, defer } from "../utils";
 import { Pause } from "./pause";
 
 export interface RecordingDescription {

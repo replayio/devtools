@@ -1,13 +1,13 @@
 import test, { expect } from "@playwright/test";
 
 import { startTest } from "../helpers";
-import { rewindToLine, stepOverToLine } from "../helpers/pause-information-panel";
 import {
-  openConsolePanel,
-  warpToMessage,
-  verifyConsoleMessage,
   findConsoleMessage,
+  openConsolePanel,
+  verifyConsoleMessage,
+  warpToMessage,
 } from "../helpers/console-panel";
+import { rewindToLine, stepOverToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
 
 test("node_object_preview: Showing console objects in node", async ({ page }) => {

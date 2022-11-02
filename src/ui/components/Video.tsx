@@ -1,20 +1,21 @@
-import { installObserver, refreshGraphics } from "protocol/graphics";
 import React, { FC, useEffect, useRef } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { ConnectedProps, connect } from "react-redux";
 
-import { selectors } from "../reducers";
+import { PreviewNodeHighlighter } from "devtools/client/inspector/markup/components/PreviewNodeHighlighter";
+import { installObserver, refreshGraphics } from "protocol/graphics";
+import { setShowVideoPanel } from "ui/actions/layout";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
 import CommentTool from "ui/components/shared/CommentTool";
 import hooks from "ui/hooks";
+import { getViewMode } from "ui/reducers/layout";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
+
+import { selectors } from "../reducers";
+import MaterialIcon from "./shared/MaterialIcon";
 import ReplayLogo from "./shared/ReplayLogo";
 import Spinner from "./shared/Spinner";
-import MaterialIcon from "./shared/MaterialIcon";
-import { setShowVideoPanel } from "ui/actions/layout";
-import { getViewMode } from "ui/reducers/layout";
 import Tooltip from "./shared/Tooltip";
-import { PreviewNodeHighlighter } from "devtools/client/inspector/markup/components/PreviewNodeHighlighter";
 
 const HideVideoButton: FC = () => {
   const dispatch = useAppDispatch();

@@ -5,9 +5,12 @@
 const { generateUUID } = require("devtools/shared/generate-uuid");
 const { hasCSSVariable } = require("devtools/client/inspector/rules/utils/utils");
 const { escapeCSSComment } = require("third-party/css/parsing-utils");
-import RuleModel from "./rule";
-import ElementStyle from "./element-style";
+
 import CSSProperties from "third-party/css/css-properties";
+
+import ElementStyle from "./element-style";
+import RuleModel from "./rule";
+
 const { OutputParser } = require("third-party/css/output-parser");
 
 export type Priority = "" | "important" | undefined;

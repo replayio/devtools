@@ -1,5 +1,6 @@
-import { Loggable } from "@bvaughn/components/console/LoggablesContext";
-import { createContext, PropsWithChildren, useCallback, useMemo, useState } from "react";
+import { PropsWithChildren, createContext, useCallback, useMemo, useState } from "react";
+
+import { Loggable } from "bvaughn-architecture-demo/components/console/LoggablesContext";
 
 export type Coordinates = {
   x: number;

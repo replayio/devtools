@@ -1,7 +1,9 @@
 import React from "react";
+
 import hooks from "ui/hooks";
+import { inUnpaidFreeTrial, subscriptionEndsIn } from "ui/utils/workspace";
+
 import { TrialEnd } from "../shared/TrialEnd";
-import { subscriptionEndsIn, inUnpaidFreeTrial } from "ui/utils/workspace";
 
 export function RecordingTrialEnd() {
   const recordingId = hooks.useGetRecordingId();

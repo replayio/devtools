@@ -9,10 +9,12 @@ export { onTokenMouseOver } from "./token-events";
 export { onLineMouseOver, onMouseScroll } from "./line-events";
 
 import { SourceLocation } from "graphql";
+
 import { SourceDetails } from "ui/reducers/sources";
+
 import { SearchQueryModifiers } from "../build-query";
 import { createEditor } from "./create-editor";
-import type { SourceEditor, EditorWithDoc } from "./source-editor";
+import type { EditorWithDoc, SourceEditor } from "./source-editor";
 import { findNext, findPrev } from "./source-search";
 
 let editor: SourceEditor | null;

@@ -1,8 +1,10 @@
-import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
-import React, { FC, useEffect, useRef } from "react";
-import { useAppDispatch } from "ui/setup/hooks";
 import cx from "classnames";
+import React, { FC, useEffect, useRef } from "react";
+
+import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
 import { actions } from "ui/actions";
+import { useAppDispatch } from "ui/setup/hooks";
+
 import { Command } from "./CommandPalette";
 import styles from "./CommandPalette.module.css";
 

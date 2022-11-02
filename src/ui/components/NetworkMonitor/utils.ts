@@ -10,6 +10,7 @@ import {
   TimeStampedPoint,
 } from "@replayio/protocol";
 import keyBy from "lodash/keyBy";
+
 import { compareNumericStrings } from "protocol/utils";
 
 export enum CanonicalRequestType {

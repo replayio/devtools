@@ -1,23 +1,24 @@
-import { preCacheExecutionPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import {
-  addEventHandlerEntryPointsParameters,
-  addFunctionEntryPointsParameters,
-  addLocationParameters,
   AnalysisEntry,
-  analysisError,
   AnalysisId,
-  analysisPoints,
-  analysisResult,
   ExecutionPoint,
   PointDescription,
   PointRange,
   TimeStampedPoint,
+  addEventHandlerEntryPointsParameters,
+  addFunctionEntryPointsParameters,
+  addLocationParameters,
+  analysisError,
+  analysisPoints,
+  analysisResult,
 } from "@replayio/protocol";
+
+import { preCacheExecutionPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import { addEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
+
 import { client } from "./socket";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "./thread/analysis";
-
 import { assert } from "./utils";
 
 // For more information about these params, see:

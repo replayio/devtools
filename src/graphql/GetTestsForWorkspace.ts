@@ -42,7 +42,9 @@ export interface GetTestsForWorkspace_node_Workspace {
   tests: GetTestsForWorkspace_node_Workspace_tests[] | null;
 }
 
-export type GetTestsForWorkspace_node = GetTestsForWorkspace_node_Recording | GetTestsForWorkspace_node_Workspace;
+export type GetTestsForWorkspace_node =
+  | GetTestsForWorkspace_node_Recording
+  | GetTestsForWorkspace_node_Workspace;
 
 export interface GetTestsForWorkspace {
   node: GetTestsForWorkspace_node | null;

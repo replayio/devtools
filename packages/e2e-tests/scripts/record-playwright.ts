@@ -1,4 +1,4 @@
-import replayPlaywright, { Page, BrowserType } from "@recordreplay/playwright";
+import replayPlaywright, { BrowserType, Page } from "@recordreplay/playwright";
 import * as cli from "@replayio/replay";
 import findLast from "lodash/findLast";
 

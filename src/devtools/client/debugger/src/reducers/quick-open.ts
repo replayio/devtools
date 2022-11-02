@@ -2,14 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+
 import { UIState } from "ui/state";
+
+import { parseQuickOpenQuery } from "../utils/quick-open";
+
 /**
  * Quick Open reducer
  * @module reducers/quick-open
  */
-
-import { parseQuickOpenQuery } from "../utils/quick-open";
 
 // Ref: `MODIFIERS` and `parseQuickOpenQuery` in `../utils/quick-open.js`
 export type SearchTypes =

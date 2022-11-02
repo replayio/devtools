@@ -1,13 +1,15 @@
 import { useContext } from "react";
+
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import hooks from "ui/hooks";
+
 import { TeamContext } from "../../TeamContextRoot";
 import { FilterContext } from "../FilterContext";
 import { TestResults } from "./TestResults";
 
 export function TestResultsPage() {
   return (
-    <div className="flex flex-col flex-grow p-4 space-y-2 overflow-auto">
+    <div className="flex flex-grow flex-col space-y-2 overflow-auto p-4">
       <TestResultsContent />
     </div>
   );
@@ -22,7 +24,7 @@ function TestResultsContent() {
 
   if (loading) {
     return (
-      <div className="flex flex-col flex-grow p-4 overflow-hidden">
+      <div className="flex flex-grow flex-col overflow-hidden p-4">
         <LibrarySpinner />
       </div>
     );

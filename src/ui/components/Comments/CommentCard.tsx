@@ -1,16 +1,17 @@
 import classNames from "classnames";
+
 import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { seekToComment } from "ui/actions/comments";
 import { getCurrentTime } from "ui/reducers/timeline";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Comment } from "ui/state/comments";
 import { isCommentContentEmpty } from "ui/utils/comments";
 
-import styles from "./CommentCard.module.css";
 import CommentPreview from "./CommentPreview";
 import CommentReplyButton from "./CommentReplyButton";
 import EditableRemark from "./EditableRemark";
 import ReplyCard from "./ReplyCard";
+import styles from "./CommentCard.module.css";
 
 export default function CommentCard({ comment }: { comment: Comment }) {
   const currentTime = useAppSelector(getCurrentTime);

@@ -1,10 +1,11 @@
-// Original source: https://github.com/bgotink/playwright-coverage
-import { mergeProcessCovs, ProcessCov, ScriptCov } from "@bcoe/v8-coverage";
+import { promises as fs } from "fs";
 import { parentPort } from "worker_threads";
+// Original source: https://github.com/bgotink/playwright-coverage
+import { ProcessCov, ScriptCov, mergeProcessCovs } from "@bcoe/v8-coverage";
+import type { SourceMapInput } from "@jridgewell/trace-mapping";
 import { expose } from "comlink";
 import nodeEndpoint from "comlink/dist/umd/node-adapter";
-import { promises as fs } from "fs";
-import type { SourceMapInput } from "@jridgewell/trace-mapping";
+
 import { convertToIstanbulCoverage, getSourceMap } from "./data";
 
 if (parentPort == null) {

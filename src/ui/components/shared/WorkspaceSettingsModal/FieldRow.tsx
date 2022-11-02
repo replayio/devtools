@@ -1,6 +1,6 @@
+import { Elements } from "@stripe/react-stripe-js";
 import classNames from "classnames";
 import React from "react";
-import { Elements } from "@stripe/react-stripe-js";
 
 export function FieldRow({ children, className, ...rest }: React.HTMLProps<HTMLDivElement>) {
   return (

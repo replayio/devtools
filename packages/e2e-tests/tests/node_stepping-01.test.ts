@@ -1,17 +1,17 @@
 import test, { Page, expect } from "@playwright/test";
 
 import { startTest } from "../helpers";
+import { executeAndVerifyTerminalExpression, warpToMessage } from "../helpers/console-panel";
 import {
+  openPauseInformationPanel,
   reverseStepOverToLine,
-  waitForFrameTimeline,
-  waitForScopeValue,
-  stepOverToLine,
-  verifyFramesCount,
   selectFrame,
   stepOutToLine,
-  openPauseInformationPanel,
+  stepOverToLine,
+  verifyFramesCount,
+  waitForFrameTimeline,
+  waitForScopeValue,
 } from "../helpers/pause-information-panel";
-import { warpToMessage, executeAndVerifyTerminalExpression } from "../helpers/console-panel";
 
 test("node_stepping-01: Test stepping in async frames and async call stacks", async ({ page }) => {
   await startTest(page, "node/async.js");

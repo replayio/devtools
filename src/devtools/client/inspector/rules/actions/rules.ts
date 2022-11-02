@@ -1,17 +1,15 @@
 import type { UIStore, UIThunkAction } from "ui/actions";
+import { isInspectorSelected } from "ui/reducers/app";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
 
-import { isInspectorSelected } from "ui/reducers/app";
-
-import { rulesUpdated } from "../reducers/rules";
 import { setComputedProperties } from "../../computed/actions";
 import {
-  nodeSelected,
   getMarkupNodeById,
   getSelectedDomNodeId,
+  nodeSelected,
 } from "../../markup/reducers/markup";
-
 import ElementStyle from "../models/element-style";
+import { rulesUpdated } from "../reducers/rules";
 
 export function setupRules(store: UIStore, startAppListening: AppStartListening) {
   // Any time a new node is selected in the "Markup" panel,

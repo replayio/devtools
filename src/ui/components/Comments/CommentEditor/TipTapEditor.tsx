@@ -1,14 +1,16 @@
-import classNames from "classnames";
 import Placeholder from "@tiptap/extension-placeholder";
-import { useEditor, EditorContent, Extension } from "@tiptap/react";
+import { EditorContent, Extension, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import classNames from "classnames";
 import React, { useEffect, useMemo, useRef } from "react";
+
 import { User } from "ui/types";
 import { parseCommentContent } from "ui/utils/comments";
 import useAuth0 from "ui/utils/useAuth0";
 
 import { ReplayLink } from "./replayLink";
 import styles from "./TipTapEditor.module.css";
+
 interface TipTapEditorProps {
   // TipTap core props
   autofocus: boolean;

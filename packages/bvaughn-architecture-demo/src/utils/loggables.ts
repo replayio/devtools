@@ -1,10 +1,12 @@
-import { Loggable } from "@bvaughn/components/console/LoggablesContext";
-import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
-import { TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
-import { EventLog } from "@bvaughn/src/suspense/EventsCache";
-import { UncaughtException } from "@bvaughn/src/suspense/ExceptionsCache";
-import { ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 import { ExecutionPoint } from "@replayio/protocol";
+
+import { Loggable } from "bvaughn-architecture-demo/components/console/LoggablesContext";
+import { PointInstance } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { TerminalExpression } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
+import { EventLog } from "bvaughn-architecture-demo/src/suspense/EventsCache";
+import { UncaughtException } from "bvaughn-architecture-demo/src/suspense/ExceptionsCache";
+import { ProtocolMessage } from "bvaughn-architecture-demo/src/suspense/MessagesCache";
+
 import { compareExecutionPoints } from "./time";
 
 export function isEventLog(loggable: Loggable): loggable is EventLog {

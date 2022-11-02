@@ -3,7 +3,9 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import type { SourceLocation } from "@replayio/protocol";
+
 import type { EditorWithDoc } from "./source-editor";
+
 //
 
 export function tokenAtTextPosition(cm: EditorWithDoc, { line, column }: SourceLocation) {

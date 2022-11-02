@@ -1,31 +1,31 @@
-import Icon from "@bvaughn/components/Icon";
-import Inspector from "@bvaughn/components/inspector";
-import ClientValueValueRenderer from "@bvaughn/components/inspector/values/ClientValueValueRenderer";
-import Loader from "@bvaughn/components/Loader";
-import SyntaxHighlightedExpression from "@bvaughn/components/SyntaxHighlightedExpression";
-import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
-import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
-import { TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
-import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
-import { evaluateSuspense } from "@bvaughn/src/suspense/PauseCache";
-import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
-import { formatTimestamp } from "@bvaughn/src/utils/time";
 import {
-  memo,
   MouseEvent,
   ReactNode,
   Suspense,
+  memo,
   useContext,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
+
+import Icon from "bvaughn-architecture-demo/components/Icon";
+import Inspector from "bvaughn-architecture-demo/components/inspector";
+import ClientValueValueRenderer from "bvaughn-architecture-demo/components/inspector/values/ClientValueValueRenderer";
+import Loader from "bvaughn-architecture-demo/components/Loader";
+import SyntaxHighlightedExpression from "bvaughn-architecture-demo/components/SyntaxHighlightedExpression";
+import { ConsoleFiltersContext } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
+import { InspectableTimestampedPointContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
+import { TerminalExpression } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
+import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
+import { evaluateSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
+import { primitiveToClientValue } from "bvaughn-architecture-demo/src/utils/protocol";
+import { formatTimestamp } from "bvaughn-architecture-demo/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
 import MessageHoverButton from "../MessageHoverButton";
-
 import styles from "./shared.module.css";
 
 function TerminalExpressionRenderer({

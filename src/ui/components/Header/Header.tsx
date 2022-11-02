@@ -1,26 +1,26 @@
 import { RecordingId } from "@replayio/protocol";
-import React, { useLayoutEffect, useRef, useState } from "react";
-
-import { connect, ConnectedProps } from "react-redux";
-import * as selectors from "ui/reducers/app";
-import Avatar from "ui/components/Avatar";
-import { useGetActiveSessions } from "ui/hooks/sessions";
-import ViewToggle, { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
-import UserOptions from "ui/components/Header/UserOptions";
-import hooks from "ui/hooks";
-import ShareButton from "./ShareButton";
-import useAuth0 from "ui/utils/useAuth0";
-import IconWithTooltip from "ui/components/shared/IconWithTooltip";
-import { Recording } from "ui/types";
-import { UIState } from "ui/state";
-import { getViewMode } from "ui/reducers/layout";
-
 import classNames from "classnames/bind";
-import { RecordingTrialEnd } from "./RecordingTrialEnd";
-import { trackEvent } from "ui/utils/telemetry";
+import React, { useLayoutEffect, useRef, useState } from "react";
+import { ConnectedProps, connect } from "react-redux";
 
-import css from "./Header.module.css";
+import Avatar from "ui/components/Avatar";
+import UserOptions from "ui/components/Header/UserOptions";
+import ViewToggle, { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
+import IconWithTooltip from "ui/components/shared/IconWithTooltip";
+import hooks from "ui/hooks";
+import { useGetActiveSessions } from "ui/hooks/sessions";
+import * as selectors from "ui/reducers/app";
+import { getViewMode } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
+import { UIState } from "ui/state";
+import { Recording } from "ui/types";
+import { trackEvent } from "ui/utils/telemetry";
+import useAuth0 from "ui/utils/useAuth0";
+
+import { RecordingTrialEnd } from "./RecordingTrialEnd";
+import ShareButton from "./ShareButton";
+import css from "./Header.module.css";
+
 const cx = classNames.bind(css);
 
 function pasteText(ev: React.ClipboardEvent) {

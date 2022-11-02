@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import React, { CSSProperties, ReactNode } from "react";
+
 import BubbleBackground from "./Onboarding/BubbleBackground";
 
 function FullViewportWrapper({
@@ -13,7 +14,7 @@ function FullViewportWrapper({
   return (
     <main
       className={classNames(
-        "bg-loadingBackground fixed z-50 flex h-full w-full items-center justify-center",
+        "fixed z-50 flex h-full w-full items-center justify-center bg-loadingBackground",
         classnames
       )}
     >

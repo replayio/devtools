@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+
+import { PrimaryButton, SecondaryButton } from "ui/components/shared/Button";
+import { useConfirm } from "ui/components/shared/Confirm";
 import hooks from "ui/hooks";
 import { PendingWorkspaceInvitation } from "ui/types";
-import { useConfirm } from "ui/components/shared/Confirm";
-import { PrimaryButton, SecondaryButton } from "ui/components/shared/Button";
+
 import { useRedirectToTeam } from "../../../utils";
 
 export default function PendingTeamPrompt({
@@ -39,8 +41,8 @@ export default function PendingTeamPrompt({
   }
 
   return (
-    <div className="absolute top-0 left-0 grid items-center w-full h-full">
-      <div className="flex flex-col max-w-lg px-12 py-8 mx-auto space-y-4 rounded-md shadow-lg bg-modalBgcolor">
+    <div className="absolute top-0 left-0 grid h-full w-full items-center">
+      <div className="mx-auto flex max-w-lg flex-col space-y-4 rounded-md bg-modalBgcolor px-12 py-8 shadow-lg">
         <div className="flex flex-col space-y-1">
           <div className="text-lg">
             You were invited to <strong>{name}</strong>

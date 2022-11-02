@@ -1,7 +1,9 @@
 import { Attr } from "@replayio/protocol";
 import React, { PureComponent } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
+
 import { UIState } from "ui/state";
+
 import { NodeInfo } from "../reducers/markup";
 
 const { truncateString } = require("devtools/shared/inspector/utils");

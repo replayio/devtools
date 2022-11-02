@@ -1,10 +1,9 @@
 import classNames from "classnames";
 import { useState } from "react";
 
-import MaterialIcon from "../shared/MaterialIcon";
-
-import { CanonicalRequestType, RequestTypeOptions } from "./utils";
 import Checkbox from "../shared/Forms/Checkbox";
+import MaterialIcon from "../shared/MaterialIcon";
+import { CanonicalRequestType, RequestTypeOptions } from "./utils";
 
 export const FilterLayout = ({
   setFilterValue,

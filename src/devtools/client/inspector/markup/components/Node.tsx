@@ -1,29 +1,29 @@
-import React, { PureComponent, MouseEvent, ReactElement } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import classnames from "classnames";
+import React, { MouseEvent, PureComponent, ReactElement } from "react";
+import { ConnectedProps, connect } from "react-redux";
+
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { assert } from "protocol/utils";
+import { UIState } from "ui/state";
+
+import { setActiveTab } from "../../actions";
+import {
+  collapseNode,
+  expandNode,
+  highlightNode,
+  selectNode,
+  toggleNodeExpanded,
+  unhighlightNode,
+} from "../actions/markup";
 import {
   getNode,
   getRootNodeId,
-  getSelectedNodeId,
   getScrollIntoViewNodeId,
+  getSelectedNodeId,
 } from "../selectors/markup";
-import { UIState } from "ui/state";
-
 import ElementNode from "./ElementNode";
 import ReadOnlyNode from "./ReadOnlyNode";
 import TextNode from "./TextNode";
-import classnames from "classnames";
-import { setActiveTab } from "../../actions";
-
-import {
-  selectNode,
-  highlightNode,
-  unhighlightNode,
-  expandNode,
-  collapseNode,
-  toggleNodeExpanded,
-} from "../actions/markup";
 
 interface NodeProps {
   nodeId: string;

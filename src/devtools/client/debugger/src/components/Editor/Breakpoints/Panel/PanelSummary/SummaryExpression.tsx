@@ -1,11 +1,14 @@
-import React from "react";
 import classNames from "classnames";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 import escapeHtml from "escape-html";
-import Popup from "./Popup";
-import hooks from "ui/hooks";
-const { getCodeMirror } = require("devtools/client/debugger/src/utils/editor/create-editor");
+import React from "react";
+
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
+import hooks from "ui/hooks";
+
+import Popup from "./Popup";
+
+const { getCodeMirror } = require("devtools/client/debugger/src/utils/editor/create-editor");
 
 export interface SummaryExpressionProps {
   value: string;

@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+
 import { setUnexpectedError } from "ui/actions/errors";
 import { ReplayUpdatedError } from "ui/components/ErrorBoundary";
 import { Redacted } from "ui/components/Redacted";
@@ -10,13 +11,11 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import useWidthObserver from "ui/utils/useWidthObserver";
 
 import { waitForEditor } from "../../utils/editor/create-editor";
-
 import WelcomeBox from "../WelcomeBox";
-
-import Editor from "./index";
-import EditorTabs from "./Tabs";
 import EditorFooter from "./Footer";
+import Editor from "./index";
 import NewSourceAdapter from "./NewSourceAdapter";
+import EditorTabs from "./Tabs";
 
 export const EditorPane = () => {
   const [loadingEditor, setLoadingEditor] = useState(true);

@@ -2,11 +2,11 @@ import { BodyData } from "@replayio/protocol";
 import classNames from "classnames";
 import { useMemo, useState } from "react";
 import ReactJson from "react-json-view";
-import { useAppSelector } from "ui/setup/hooks";
+
 import { getTheme } from "ui/reducers/app";
+import { useAppSelector } from "ui/setup/hooks";
 
 import MaterialIcon from "../shared/MaterialIcon";
-
 import BodyDownload from "./BodyDownload";
 import {
   BodyPartsToUInt8Array,

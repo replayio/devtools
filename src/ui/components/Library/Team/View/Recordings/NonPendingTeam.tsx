@@ -1,11 +1,13 @@
 import React, { useContext } from "react";
-import { Workspace } from "ui/types";
+
+import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import Base64Image from "ui/components/shared/Base64Image";
+import hooks from "ui/hooks";
+import { Workspace } from "ui/types";
+
 import { TeamContext } from "../../TeamContextRoot";
 import { FilterContext } from "../FilterContext";
-import hooks from "ui/hooks";
 import { RecordingsPageViewer } from "./RecordingsPageViewer";
-import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
 export function NonPendingTeamScreen({ team }: { team: Workspace }) {
   const { teamId } = useContext(TeamContext);
@@ -14,7 +16,7 @@ export function NonPendingTeamScreen({ team }: { team: Workspace }) {
 
   if (!team || loading) {
     return (
-      <div className="flex flex-col flex-grow p-4 overflow-hidden">
+      <div className="flex flex-grow flex-col overflow-hidden p-4">
         <LibrarySpinner />
       </div>
     );

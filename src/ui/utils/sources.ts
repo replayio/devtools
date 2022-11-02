@@ -1,5 +1,6 @@
 import { EntityId } from "@reduxjs/toolkit";
 import { newSource } from "@replayio/protocol";
+
 import { ArrayMap, assert } from "protocol/utils";
 import { SourceDetails } from "ui/reducers/sources";
 

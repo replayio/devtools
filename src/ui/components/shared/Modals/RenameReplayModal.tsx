@@ -1,9 +1,11 @@
 import classNames from "classnames";
 import React, { ChangeEvent, useState } from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+
 import { hideModal } from "ui/actions/app";
 import { useUpdateRecordingTitle } from "ui/hooks/recordings";
 import { getModalOptions } from "ui/reducers/app";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+
 import { PrimaryButton, SecondaryButton } from "../Button";
 import { Dialog, DialogActions, DialogTitle } from "../Dialog";
 import { TextInput } from "../Forms";

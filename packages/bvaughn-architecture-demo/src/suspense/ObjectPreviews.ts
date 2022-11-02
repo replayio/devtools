@@ -1,9 +1,7 @@
 import { Object, ObjectId, PauseId, Value as ProtocolValue } from "@replayio/protocol";
 
 import { ReplayClientInterface } from "../../../shared/client/types";
-
 import { createWakeable } from "../utils/suspense";
-
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 type ObjectMap = Map<ObjectId, Object>;

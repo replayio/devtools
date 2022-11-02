@@ -1,10 +1,11 @@
 import { Page } from "@playwright/test";
 import chalk from "chalk";
+
 import { RecordingTarget } from "protocol/thread/thread";
 
-const exampleRecordings = require("../examples.json");
-
 import { debugPrint } from "./utils";
+
+const exampleRecordings = require("../examples.json");
 
 export async function getRecordingTarget(page: Page): Promise<RecordingTarget> {
   return page.evaluate(async () => {

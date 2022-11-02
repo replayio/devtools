@@ -1,41 +1,39 @@
-import { Object as ProtocolObject, ProtocolClient } from "@replayio/protocol";
-import { assert, defer, Deferred } from "protocol/utils";
-import { UIState } from "ui/state";
-import { AppStartListening } from "ui/setup/listenerMiddleware";
-import { isInspectorSelected } from "ui/reducers/app";
+import { ProtocolClient, Object as ProtocolObject } from "@replayio/protocol";
+
+import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import { getPauseId, paused } from "devtools/client/debugger/src/reducers/pause";
+import { features } from "devtools/client/inspector/prefs";
+import NodeConstants from "devtools/shared/dom-node-constants";
+import { Deferred, assert, defer } from "protocol/utils";
+import { ReplayClientInterface } from "shared/client/types";
 import type { UIStore, UIThunkAction } from "ui/actions";
+import { isInspectorSelected } from "ui/reducers/app";
+import { AppStartListening } from "ui/setup/listenerMiddleware";
+import { UIState } from "ui/state";
 import { getNodeDataAsync, getNodeEventListenersAsync } from "ui/suspense/nodeCaches";
 import { getBoundingRectAsync, getComputedStyleAsync } from "ui/suspense/styleCaches";
 
 import {
-  resetMarkup,
+  NodeInfo,
+  SelectionReason,
   childrenAdded,
+  getSelectedDomNodeId,
   newRootAdded,
-  nodeSelected,
-  nodeHighlighted,
   nodeBoxModelLoaded,
+  nodeHighlighted,
   nodeHighlightingCleared,
+  nodeSelected,
+  resetMarkup,
   updateChildrenLoading,
   updateNodeExpanded,
   updateScrollIntoViewNode,
-  NodeInfo,
-  SelectionReason,
-  getSelectedDomNodeId,
 } from "../reducers/markup";
-
 import {
   getNodeInfo,
   getParentNodeId,
   getSelectedNodeId,
   isNodeExpanded,
 } from "../selectors/markup";
-
-import { paused, getPauseId } from "devtools/client/debugger/src/reducers/pause";
-
-import NodeConstants from "devtools/shared/dom-node-constants";
-import { features } from "devtools/client/inspector/prefs";
-import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
-import { ReplayClientInterface } from "shared/client/types";
 
 let rootNodeWaiter: Deferred<void> | undefined;
 

@@ -2,19 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import classNames from "classnames";
 //
 import React, { Component } from "react";
 
-import classNames from "classnames";
-
-import AccessibleImage from "../../shared/AccessibleImage";
-import { formatDisplayName } from "../../../utils/pause/frames";
-import { getFilename, getFileURL } from "../../../utils/source";
-import FrameMenu from "./FrameMenu";
-import FrameIndent from "./FrameIndent";
-import { trackEvent } from "ui/utils/telemetry";
-import { Redacted } from "ui/components/Redacted";
 import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
+import { Redacted } from "ui/components/Redacted";
+import { trackEvent } from "ui/utils/telemetry";
+
+import { formatDisplayName } from "../../../utils/pause/frames";
+import { getFileURL, getFilename } from "../../../utils/source";
+import AccessibleImage from "../../shared/AccessibleImage";
+import FrameIndent from "./FrameIndent";
+import FrameMenu from "./FrameMenu";
 import type { CommonFrameComponentProps } from "./index";
 
 type FrameNameOptions = Parameters<typeof formatDisplayName>[1];

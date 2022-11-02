@@ -1,4 +1,4 @@
-import { createContext, MutableRefObject, ReactNode, useMemo } from "react";
+import { MutableRefObject, ReactNode, createContext, useMemo } from "react";
 
 import useConsoleSearchDOM, { Actions, State } from "./hooks/useConsoleSearchDOM";
 

@@ -1,8 +1,9 @@
-import { act, render as rtlRender, RenderResult } from "@testing-library/react";
+import { RenderResult, act, render as rtlRender } from "@testing-library/react";
 import fetch from "isomorphic-fetch";
 import { ReactNode } from "react";
-import { ReplayClientInterface } from "shared/client/types";
+
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { ReplayClientInterface } from "shared/client/types";
 
 import {
   ConsoleFiltersContext,
@@ -10,9 +11,9 @@ import {
   ConsoleFiltersContextType,
 } from "../contexts/ConsoleFiltersContext";
 import { FocusContext, FocusContextType } from "../contexts/FocusContext";
+import { PointsContext, PointsContextType } from "../contexts/PointsContext";
 import { SessionContext, SessionContextType } from "../contexts/SessionContext";
 import { TimelineContext, TimelineContextType } from "../contexts/TimelineContext";
-import { PointsContext, PointsContextType } from "../contexts/PointsContext";
 
 // This particular method is written to enable testing the entire client.
 // The only context values it stubs out are the ReplayClient (ReplayClientContext).

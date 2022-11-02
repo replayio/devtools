@@ -1,9 +1,10 @@
 import { SameLineSourceLocations } from "@replayio/protocol";
+import { useContext, useEffect, useMemo } from "react";
+
 import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { getBreakpointPositionsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
-import { useContext, useEffect, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 import { useStringPref } from "ui/hooks/settings";

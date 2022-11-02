@@ -1,5 +1,5 @@
 import { captureException } from "@sentry/browser";
-import React, { Component, createElement, PropsWithChildren, ReactNode } from "react";
+import React, { Component, PropsWithChildren, ReactNode, createElement } from "react";
 
 import styles from "./ErrorBoundary.module.css";
 

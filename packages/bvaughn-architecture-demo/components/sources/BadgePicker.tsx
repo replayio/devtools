@@ -1,10 +1,11 @@
-import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { useContext, useState } from "react";
-import { Badge, Point } from "shared/client/types";
-import Icon from "../Icon";
 
-import styles from "./BadgePicker.module.css";
+import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { Badge, Point } from "shared/client/types";
+
+import Icon from "../Icon";
 import { getBadgeStyleVars } from "./utils/getBadgeStyleVars";
+import styles from "./BadgePicker.module.css";
 
 // Three states prevents close animation from being shown on mount.
 type State = "initial" | "open" | "closed";

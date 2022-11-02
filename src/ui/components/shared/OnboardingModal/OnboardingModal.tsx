@@ -1,8 +1,10 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
+
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
+
 import Modal from "../NewModal";
 
 const slides = [
@@ -53,7 +55,7 @@ function Navigation({
   };
 
   return (
-    <div className="text-base items-right">
+    <div className="items-right text-base">
       {/* <div className="flex flex-row items-center space-x-2">
         <input
           type="checkbox"
@@ -86,7 +88,7 @@ function OnboardingModal({ hideModal }: PropsFromRedux) {
   return (
     <Modal options={{ maskTransparency: "translucent" }}>
       <div
-        className="relative flex flex-col justify-between space-y-6 text-lg bg-white rounded-lg shadow-xl p-9"
+        className="relative flex flex-col justify-between space-y-6 rounded-lg bg-white p-9 text-lg shadow-xl"
         style={{ width: "520px" }}
       >
         <SlideContent headerText={header}>{content}</SlideContent>

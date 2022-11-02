@@ -1,5 +1,5 @@
-import iconSprite from "./sprite.svg";
 import type { IconNames } from "./types";
+import iconSprite from "./sprite.svg";
 
 export type IconProps = { name: IconNames; size?: number; className: string };
 

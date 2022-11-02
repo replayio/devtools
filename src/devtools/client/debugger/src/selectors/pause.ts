@@ -4,6 +4,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 import type { UIState } from "ui/state";
 import { getPauseFrameAsync, getPauseFrameSuspense } from "ui/suspense/frameCache";
+
 import { getSelectedFrameId } from "../reducers/pause";
 
 export function getSelectedFrameSuspense(state: UIState) {

@@ -1,7 +1,8 @@
 import userEvent from "@testing-library/user-event";
 import React from "react";
+
 import { loadFixtureData } from "test/testFixtureUtils";
-import { render, filterCommonTestWarnings, screen } from "test/testUtils";
+import { filterCommonTestWarnings, render, screen } from "test/testUtils";
 import { UIStore } from "ui/actions";
 import { setLoadingFinished, setModal } from "ui/actions/app";
 import { Recording } from "ui/types";

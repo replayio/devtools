@@ -4,10 +4,10 @@
 
 //
 
-import { parse } from "../url";
 import { getUnicodeHostname, getUnicodeUrlPath } from "devtools/client/shared/unicode-url";
-
 import type { MiniSource } from "ui/reducers/sources";
+
+import { parse } from "../url";
 
 export function getFilenameFromURL(url: string) {
   const { pathname } = parse(url);

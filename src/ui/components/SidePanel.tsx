@@ -1,15 +1,18 @@
 import React, { useState } from "react";
-import Events from "ui/components/Events";
-import ReplayInfo from "./Events/ReplayInfo";
+
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
-import StatusDropdown from "./shared/StatusDropdown";
+import TestInfo from "devtools/client/debugger/src/components/TestInfo/TestInfo";
+import Events from "ui/components/Events";
+import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
-import ProtocolViewer from "./ProtocolViewer";
+
 import CommentCardsList from "./Comments/CommentCardsList";
-import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
-import TestInfo from "devtools/client/debugger/src/components/TestInfo/TestInfo";
+import ReplayInfo from "./Events/ReplayInfo";
+import ProtocolViewer from "./ProtocolViewer";
+import StatusDropdown from "./shared/StatusDropdown";
+
 const FullTextSearch = require("devtools/client/debugger/src/components/FullTextSearch").default;
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
 const Accordion = require("devtools/client/debugger/src/components/shared/Accordion").default;
@@ -63,7 +66,7 @@ export default function SidePanel() {
 
   return (
     <div
-      className="w-full overflow-hidden text-xs rounded-lg bg-bodyBgcolor"
+      className="w-full overflow-hidden rounded-lg bg-bodyBgcolor text-xs"
       data-test-id="leftSidebar"
     >
       {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}

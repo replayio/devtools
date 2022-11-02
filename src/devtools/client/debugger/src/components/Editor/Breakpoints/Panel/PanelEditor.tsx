@@ -1,7 +1,8 @@
-import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import classnames from "classnames";
-import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import { useContext, useState } from "react";
+
+import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import { Point } from "shared/client/types";
 import { trackEvent } from "ui/utils/telemetry";
 

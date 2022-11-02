@@ -1,5 +1,7 @@
 import React from "react";
+
 import { useAcceptTOS } from "ui/hooks/users";
+
 import { PrimaryButton } from "./shared/Button";
 import ExternalLink from "./shared/ExternalLink";
 import { BubbleViewportWrapper } from "./shared/Viewport";
@@ -14,11 +16,11 @@ export default function TOSScreen() {
   return (
     <BubbleViewportWrapper>
       <div
-        className="relative flex flex-col items-center space-y-6 text-base bg-white rounded-lg shadow-xl p-9"
+        className="relative flex flex-col items-center space-y-6 rounded-lg bg-white p-9 text-base shadow-xl"
         style={{ width: "520px" }}
       >
-        <div className="space-y-4 place-content-center">
-          <img className="w-12 h-12 mx-auto" src="/images/logo.svg" />
+        <div className="place-content-center space-y-4">
+          <img className="mx-auto h-12 w-12" src="/images/logo.svg" />
         </div>
         <div className="text-2xl font-bold">Terms of Use</div>
         <div>
@@ -27,7 +29,7 @@ export default function TOSScreen() {
             href="https://replay.io/tos.html"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline text-primaryAccent"
+            className="text-primaryAccent underline"
           >
             Terms of Use
           </a>{" "}
@@ -48,7 +50,7 @@ export default function TOSScreen() {
           Besides these terms, we also publish a{" "}
           <ExternalLink
             href="https://replay.io/privacy.html"
-            className="underline text-primaryAccent"
+            className="text-primaryAccent underline"
           >
             Privacy Policy
           </ExternalLink>{" "}

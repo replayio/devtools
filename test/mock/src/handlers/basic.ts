@@ -1,4 +1,4 @@
-import { MockHandlerRecord, MockHandlerHelpers } from "../mockEnvironment";
+import { MockHandlerHelpers, MockHandlerRecord } from "../mockEnvironment";
 
 export function basicBindings() {
   return {

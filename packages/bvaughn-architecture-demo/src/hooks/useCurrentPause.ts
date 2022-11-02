@@ -1,11 +1,11 @@
 import { createPauseResult as Pause } from "@replayio/protocol";
 import { useContext } from "react";
+
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegions } from "shared/utils/time";
 
 import { TimelineContext } from "../contexts/TimelineContext";
 import { getPauseForExecutionPointSuspense } from "../suspense/PauseCache";
-
 import useLoadedRegions from "./useRegions";
 
 export default function useCurrentPause(): Pause | null {

@@ -1,6 +1,7 @@
-import React from "react";
 import { Menu } from "@headlessui/react";
 import classNames from "classnames";
+import React from "react";
+
 import Icon from "../shared/Icon";
 import styles from "./Library.module.css";
 
@@ -39,7 +40,7 @@ export function Dropdown({
   fontSizeClass?: "text-sm" | "text-base";
 }) {
   return (
-    <Menu as="div" className="inline-block text-left shadow-lg recording-options">
+    <Menu as="div" className="recording-options inline-block text-left shadow-lg">
       {({ open }) => (
         <Menu.Items
           static
@@ -102,7 +103,7 @@ export function DropdownItemContent({
           )}
         />
       </div>
-      <span className="overflow-hidden whitespace-pre overflow-ellipsis">{children}</span>
+      <span className="overflow-hidden overflow-ellipsis whitespace-pre">{children}</span>
     </div>
   );
 }

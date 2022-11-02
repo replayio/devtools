@@ -1,19 +1,19 @@
+import React, { KeyboardEvent, useContext } from "react";
+
 import NewConsole from "bvaughn-architecture-demo/components/console";
 import { ConsoleSearchContext } from "bvaughn-architecture-demo/components/console/ConsoleSearchContext";
 import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
-import React, { KeyboardEvent, useContext } from "react";
 import { getSelectedFrameId } from "devtools/client/debugger/src/selectors";
 import JSTerm from "devtools/client/webconsole/components/Input/JSTerm";
-import { useGetRecordingId } from "ui/hooks/recordings";
-import { useFeature } from "ui/hooks/settings";
 import { Pause } from "protocol/thread/pause";
 import { ThreadFront } from "protocol/thread/thread";
+import { useGetRecordingId } from "ui/hooks/recordings";
+import { useFeature } from "ui/hooks/settings";
+import { useAppSelector } from "ui/setup/hooks";
 
 import { ConsoleNag } from "../shared/Nags/Nags";
-
-import styles from "./NewConsole.module.css";
 import useTerminalHistory from "./useTerminalHistory";
-import { useAppSelector } from "ui/setup/hooks";
+import styles from "./NewConsole.module.css";
 
 // Adapter that connects the legacy app Redux stores to the newer React Context providers.
 export default function NewConsoleRoot() {

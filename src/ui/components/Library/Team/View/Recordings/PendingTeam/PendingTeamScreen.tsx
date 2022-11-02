@@ -1,9 +1,10 @@
 import React from "react";
-import { getDisplayedUrl } from "ui/utils/environment";
-import { PendingWorkspaceInvitation } from "ui/types";
 
-import PendingTeamPrompt from "./PendingTeamPrompt";
+import { PendingWorkspaceInvitation } from "ui/types";
+import { getDisplayedUrl } from "ui/utils/environment";
+
 import { getDurationString, getRelativeDate } from "../RecordingListItem/RecordingListItem";
+import PendingTeamPrompt from "./PendingTeamPrompt";
 
 const MOCK_DATA = [
   { date: "2021-12-01T18:37:44.077Z", user: { name: "Jaril" } },
@@ -31,31 +32,31 @@ const MOCK_DATA = [
 
 function MockRecordingRow({ date, name }: { date: string; name: string }) {
   return (
-    <div className="flex flex-row transition duration-200 border-b border-gray-200 cursor-pointer group hover:bg-gray-50">
-      <div className="flex-shrink-0 w-8 px-1 py-3 overflow-hidden whitespace-pre overflow-ellipsis" />
-      <div className="flex-grow px-1 py-3 overflow-hidden whitespace-pre overflow-ellipsis">
+    <div className="group flex cursor-pointer flex-row border-b border-gray-200 transition duration-200 hover:bg-gray-50">
+      <div className="w-8 flex-shrink-0 overflow-hidden overflow-ellipsis whitespace-pre px-1 py-3" />
+      <div className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre px-1 py-3">
         <div className="flex flex-row items-center space-x-4 overflow-hidden">
-          <div className="flex-shrink-0 w-16 overflow-hidden bg-gray-100 rounded-sm h-9" />
+          <div className="h-9 w-16 flex-shrink-0 overflow-hidden rounded-sm bg-gray-100" />
           <div className="flex flex-col space-y-0.5 overflow-hidden">
-            <div className="overflow-hidden text-gray-900 whitespace-pre overflow-ellipsis">
+            <div className="overflow-hidden overflow-ellipsis whitespace-pre text-gray-900">
               jQuery - TodoMVC
             </div>
             <div className="flex flex-row space-x-4 text-gray-500">
               <div
-                className="flex flex-row items-center space-x-1 overflow-hidden whitespace-pre overflow-ellipsis"
+                className="flex flex-row items-center space-x-1 overflow-hidden overflow-ellipsis whitespace-pre"
                 style={{ minWidth: "5rem" }}
               >
                 <img src="/images/timer.svg" className="w-3" />
                 <span>{getDurationString(Math.floor(Math.random() * 120000))}</span>
               </div>
               <div
-                className="flex flex-row items-center space-x-1 overflow-hidden whitespace-pre overflow-ellipsis"
+                className="flex flex-row items-center space-x-1 overflow-hidden overflow-ellipsis whitespace-pre"
                 style={{ minWidth: "6rem" }}
               >
                 <img src="/images/today.svg" className="w-3" />
                 <span>{getRelativeDate(date)}</span>
               </div>
-              <div className="overflow-hidden text-gray-400 whitespace-pre overflow-ellipsis">
+              <div className="overflow-hidden overflow-ellipsis whitespace-pre text-gray-400">
                 {getDisplayedUrl("https://todomvc.com/examples/jquery/#/all")}
               </div>
             </div>
@@ -63,13 +64,13 @@ function MockRecordingRow({ date, name }: { date: string; name: string }) {
         </div>
       </div>
 
-      <div className="flex-shrink-0 w-16 px-1 py-3 my-auto overflow-hidden whitespace-pre overflow-ellipsis">
+      <div className="my-auto w-16 flex-shrink-0 overflow-hidden overflow-ellipsis whitespace-pre px-1 py-3">
         {Math.random() > 0.5 ? "Private" : "Public"}
       </div>
-      <div className="flex-shrink-0 px-1 py-3 my-auto overflow-hidden whitespace-pre w-36 overflow-ellipsis">
+      <div className="my-auto w-36 flex-shrink-0 overflow-hidden overflow-ellipsis whitespace-pre px-1 py-3">
         {name}
       </div>
-      <div className="flex flex-row items-center flex-shrink-0 w-16 px-1 py-3 overflow-hidden whitespace-pre overflow-ellipsis">
+      <div className="flex w-16 flex-shrink-0 flex-row items-center overflow-hidden overflow-ellipsis whitespace-pre px-1 py-3">
         <div className="inline-block">
           <div className="flex flex-row space-x-1">
             <span>{Math.floor(Math.random() * 20)}</span>
@@ -77,7 +78,7 @@ function MockRecordingRow({ date, name }: { date: string; name: string }) {
           </div>
         </div>
       </div>
-      <div className="flex flex-row items-center justify-center flex-shrink-0 w-8 px-1 py-3" />
+      <div className="flex w-8 flex-shrink-0 flex-row items-center justify-center px-1 py-3" />
     </div>
   );
 }
@@ -89,7 +90,7 @@ export function PendingTeamScreen({ workspace }: { workspace: PendingWorkspaceIn
   const { name } = workspace;
 
   return (
-    <div className="flex flex-col w-full px-8 py-6 space-y-5 overflow-auto -5">
+    <div className="-5 flex w-full flex-col space-y-5 overflow-auto px-8 py-6">
       <div className="flex flex-row items-center justify-between">
         <div className="flex flex-row items-center space-x-2 text-2xl font-semibold">
           <span>{name}</span>
@@ -102,7 +103,7 @@ export function PendingTeamScreen({ workspace }: { workspace: PendingWorkspaceIn
         </div>
       </div>
       <div className="relative overflow-hidden">
-        <div className="flex flex-col overflow-y-auto text-sm rounded-md shadow-md bg-bodyBgcolor blur-sm filter">
+        <div className="flex flex-col overflow-y-auto rounded-md bg-bodyBgcolor text-sm shadow-md blur-sm filter">
           {MOCK_DATA.map((r, i) => (
             <MockRecordingRow date={r.date} key={i} name={r.user.name} />
           ))}

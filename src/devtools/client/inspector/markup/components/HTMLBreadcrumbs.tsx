@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from "react";
 import classnames from "classnames";
+import React, { useEffect, useRef } from "react";
 
-import { useAppSelector, useAppDispatch } from "ui/setup/hooks";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+
+import { highlightNode, selectNode, unhighlightNode } from "../actions/markup";
 import { NodeInfo } from "../reducers/markup";
-import { getMarkupNodes, getSelectedNodeId, getRootNodeId } from "../selectors/markup";
-import { selectNode, highlightNode, unhighlightNode } from "../actions/markup";
+import { getMarkupNodes, getRootNodeId, getSelectedNodeId } from "../selectors/markup";
 
 export function HTMLBreadcrumbs() {
   const dispatch = useAppDispatch();

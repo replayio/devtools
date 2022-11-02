@@ -1,26 +1,27 @@
-import {
-  prefs as debuggerPrefs,
-  asyncStore as debuggerAsyncPrefs,
-} from "devtools/client/debugger/src/utils/prefs";
 import { RecordingId } from "@replayio/protocol";
 import debounce from "lodash/debounce";
-import { UIStore } from "ui/actions";
-import { UIState } from "ui/state";
-import { prefs, asyncStore } from "ui/utils/prefs";
-import { getRecordingId } from "ui/utils/recording";
+
+import { getTabs } from "devtools/client/debugger/src/reducers/tabs";
 import {
+  asyncStore as debuggerAsyncPrefs,
+  prefs as debuggerPrefs,
+} from "devtools/client/debugger/src/utils/prefs";
+import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
+import { UIStore } from "ui/actions";
+import { getRecording } from "ui/hooks/recordings";
+import { getTheme } from "ui/reducers/app";
+import {
+  getLocalNags,
   getSelectedPanel,
   getSelectedPrimaryPanel,
-  getToolboxLayout,
   getShowVideoPanel,
+  getToolboxLayout,
   getViewMode,
-  getLocalNags,
 } from "ui/reducers/layout";
+import { UIState } from "ui/state";
 import { ToolboxLayout, ViewMode } from "ui/state/layout";
-import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
-import { getTabs } from "devtools/client/debugger/src/reducers/tabs";
-import { getTheme } from "ui/reducers/app";
-import { getRecording } from "ui/hooks/recordings";
+import { asyncStore, prefs } from "ui/utils/prefs";
+import { getRecordingId } from "ui/utils/recording";
 
 export interface ReplaySessions {
   [id: string]: ReplaySession;

@@ -3,14 +3,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
 
 import type { UIState } from "ui/state";
+
+import { BoxModel } from "../../boxmodel/components/BoxModel";
 
 const Services = require("devtools/shared/services");
 
 const Accordion = require("devtools/client/shared/components/Accordion");
-import { BoxModel } from "../../boxmodel/components/BoxModel";
 const BOXMODEL_OPENED_PREF = "devtools.layout.boxmodel.opened";
 
 const mapStateToProps = (state: UIState) => ({

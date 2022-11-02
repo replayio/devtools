@@ -4,9 +4,9 @@
 
 //
 
-import createSimplePath from "./simple-path";
 import { traverseAst } from "./ast";
 import { nodeContainsPosition } from "./contains";
+import createSimplePath from "./simple-path";
 
 export function getClosestPath(sourceId, location) {
   let closestPath = null;

@@ -1,4 +1,3 @@
-import { isDevelopment } from "ui/utils/environment";
 import type { UIThunkAction } from "ui/actions";
 import {
   setExpectedError as setExpectedErrorAction,
@@ -6,6 +5,7 @@ import {
 } from "ui/reducers/app";
 import type { UIState } from "ui/state";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
+import { isDevelopment } from "ui/utils/environment";
 import { getRecordingId } from "ui/utils/recording";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 

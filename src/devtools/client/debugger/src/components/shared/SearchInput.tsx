@@ -4,12 +4,11 @@
 
 //
 
+import classnames from "classnames";
 import React, { Component } from "react";
 
-import { CloseButton } from "./Button";
-
 import AccessibleImage from "./AccessibleImage";
-import classnames from "classnames";
+import { CloseButton } from "./Button";
 
 const arrowBtn = (
   onClick: ((e: any) => void) | undefined,

@@ -1,12 +1,13 @@
 import { ProtocolClient } from "@replayio/protocol";
-import type { ThreadFront } from "protocol/thread";
-import { ReplayClientInterface } from "shared/client/types";
+
 import type {
   getCachedObject,
+  getObjectPropertyHelper,
   getObjectThrows,
   getObjectWithPreviewHelper,
-  getObjectPropertyHelper,
 } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import type { ThreadFront } from "protocol/thread";
+import { ReplayClientInterface } from "shared/client/types";
 
 interface SuspenseObjectCache {
   getCachedObject: typeof getCachedObject;

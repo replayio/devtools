@@ -1,10 +1,12 @@
 import orderBy from "lodash/orderBy";
 import { useContext, useState } from "react";
-import { TestResultListItem } from "./TestResultListItem";
-import { Recording } from "ui/types";
-import styles from "../../../../Library.module.css";
+
 import Icon from "ui/components/shared/Icon";
+import { Recording } from "ui/types";
+
+import { TestResultListItem } from "./TestResultListItem";
 import { TestRunOverviewContext } from "./TestRunOverviewContainerContextType";
+import styles from "../../../../Library.module.css";
 
 export function RunResults() {
   const testRun = useContext(TestRunOverviewContext).testRun!;
@@ -14,7 +16,7 @@ export function RunResults() {
   const failedRecordings = sortedRecordings.filter(r => r.metadata?.test?.result !== "passed");
 
   return (
-    <div className="flex flex-col overflow-y-auto no-scrollbar">
+    <div className="no-scrollbar flex flex-col overflow-y-auto">
       <TestStatusGroup recordings={failedRecordings} label="Failed" />
       <TestStatusGroup recordings={passedRecordings} label="Passed" />
     </div>
@@ -46,7 +48,7 @@ function TestStatusGroup({ recordings, label }: { recordings: Recording[]; label
             filename="chevron"
             className={`${
               expanded ? "bg-iconColor" : "rotate-90"
-            } rotate bg-iconColor transition duration-140 ease-out`}
+            } rotate duration-140 bg-iconColor transition ease-out`}
             size="small"
           />
         </div>

@@ -1,9 +1,8 @@
 import { MutableRefObject, useContext } from "react";
 
 import Icon from "../Icon";
-
-import styles from "./ConsoleSearch.module.css";
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
+import styles from "./ConsoleSearch.module.css";
 
 export default function ConsoleSearch({
   className,

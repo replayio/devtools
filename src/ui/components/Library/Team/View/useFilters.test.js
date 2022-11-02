@@ -1,5 +1,6 @@
-import { encodeFilter } from "./useFilters";
 import cases from "jest-in-case";
+
+import { encodeFilter } from "./useFilters";
 
 cases("encodeFilters", ({ filter, query }) => expect(encodeFilter(filter)).toEqual(query), [
   { name: "basic", filter: "", query: "" },

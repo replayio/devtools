@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { useAppDispatch } from "ui/setup/hooks";
+
 import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
+import { useAppDispatch } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { useConfirm } from "../shared/Confirm";
 import MaterialIcon from "../shared/MaterialIcon";
 import PortalDropdown from "../shared/PortalDropdown";
-
 import styles from "./RemarkDropDown.module.css";
 
 export default function RemarkDropDown({

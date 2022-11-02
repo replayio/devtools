@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from "react";
 import classnames from "classnames";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { actions } from "../actions";
-import { selectors } from "../reducers";
+import classNames from "classnames";
+import React, { useEffect, useState } from "react";
 
+import { getPauseId } from "devtools/client/debugger/src/selectors";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-
-// TODO [ryanjduffy]: Refactor shared styling more completely
-import { trackEvent } from "ui/utils/telemetry";
-import { PrimaryPanelName } from "ui/state/layout";
-import classNames from "classnames";
-import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import hooks from "ui/hooks";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
-import { getPauseId } from "devtools/client/debugger/src/selectors";
+import { getSelectedPrimaryPanel } from "ui/reducers/layout";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { PrimaryPanelName } from "ui/state/layout";
 import { useGetFrames } from "ui/suspense/frameCache";
+// TODO [ryanjduffy]: Refactor shared styling more completely
+import { trackEvent } from "ui/utils/telemetry";
+
+import { actions } from "../actions";
+import { selectors } from "../reducers";
 
 function ToolbarButtonTab({ active }: { active: boolean }) {
   return (

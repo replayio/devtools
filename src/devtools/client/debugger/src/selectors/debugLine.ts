@@ -1,9 +1,8 @@
+import { getSourceContentsEntry } from "ui/reducers/sources";
 import { UIState } from "ui/state";
 
 import { getPausePreviewLocation } from "../reducers/pause";
-import { getSourceContentsEntry } from "ui/reducers/sources";
 import { hasDocument } from "../utils/editor";
-
 import { getSelectedFrameSuspense } from "./pause";
 
 export function getDebugLineLocationSuspense(state: UIState) {

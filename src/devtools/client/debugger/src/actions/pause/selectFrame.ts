@@ -2,11 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import type { UIThunkAction } from "ui/actions";
 import type { Context, PauseFrame } from "devtools/client/debugger/src/reducers/pause";
+import type { UIThunkAction } from "ui/actions";
 
-import { selectLocation } from "../sources";
 import { frameSelected } from "../../reducers/pause";
+import { selectLocation } from "../sources";
 
 /**
  * @memberof actions/pause

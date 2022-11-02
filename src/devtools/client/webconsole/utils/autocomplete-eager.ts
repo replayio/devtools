@@ -1,9 +1,10 @@
+import { PauseId, Value } from "@replayio/protocol";
+import { useMemo } from "react";
+
 import { getSelectedFrameId } from "devtools/client/debugger/src/selectors";
 import { ThreadFront } from "protocol/thread";
-import { useMemo } from "react";
 import { useAppSelector } from "ui/setup/hooks";
-import { getPropertiesForObject, ObjectFetcher } from "ui/utils/autocomplete";
-import { PauseId, Value } from "@replayio/protocol";
+import { ObjectFetcher, getPropertiesForObject } from "ui/utils/autocomplete";
 
 // Use eager eval to get the properties of the last complete object in the expression.
 // TODO I'm not sure how this is different than the scopes / properties parsing

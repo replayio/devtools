@@ -1,13 +1,14 @@
 import groupBy from "lodash/groupBy";
 import keyBy from "lodash/keyBy";
+
 import { LineNumberToHitCountMap } from "shared/client/types";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 
 import {
-  FunctionDeclaration,
-  ClassDeclaration,
-  SymbolEntry,
   AstLocation,
+  ClassDeclaration,
+  FunctionDeclaration,
+  SymbolEntry,
 } from "../../reducers/ast";
 import { fuzzySearch } from "../../utils/function";
 

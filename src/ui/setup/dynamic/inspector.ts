@@ -1,4 +1,4 @@
-import { prefs, features } from "devtools/client/inspector/prefs";
+import { features, prefs } from "devtools/client/inspector/prefs";
 
 declare global {
   interface AppHelpers {

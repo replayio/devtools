@@ -1,5 +1,6 @@
 import { ExecutionPoint } from "@replayio/protocol";
 import { createContext } from "react";
+
 import { UserInfo } from "../graphql/types";
 
 export type SessionContextType = {

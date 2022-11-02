@@ -1,12 +1,13 @@
 import hooks from "ui/hooks";
-import styles from "../Library.module.css";
 import { Workspace } from "ui/types";
-import { Invitations } from "./Invitations";
-import { TeamButton } from "./TeamButton";
-import Profile from "./Profile";
-import { NewTeamButton } from "./NewTeamButton";
-import { MY_LIBRARY_TEAM } from "../Team/TeamContextRoot";
+
 import { LibrarySpinner } from "../LibrarySpinner";
+import { MY_LIBRARY_TEAM } from "../Team/TeamContextRoot";
+import { Invitations } from "./Invitations";
+import { NewTeamButton } from "./NewTeamButton";
+import Profile from "./Profile";
+import { TeamButton } from "./TeamButton";
+import styles from "../Library.module.css";
 
 function Teams() {
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();

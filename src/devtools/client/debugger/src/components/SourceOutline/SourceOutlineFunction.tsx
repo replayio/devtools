@@ -1,6 +1,8 @@
-import React from "react";
 import classnames from "classnames";
+import React from "react";
+
 import { Redacted } from "ui/components/Redacted";
+
 import PreviewFunction from "../shared/PreviewFunction";
 import { FunctionDeclarationHits } from "./getOutlineSymbols";
 

@@ -1,7 +1,9 @@
-import { useAuth0 as useOrigAuth0, Auth0ContextInterface, LogoutOptions } from "@auth0/auth0-react";
+import { Auth0ContextInterface, LogoutOptions, useAuth0 as useOrigAuth0 } from "@auth0/auth0-react";
 import { useRouter } from "next/router";
-import { isTest, isMock } from "ui/utils/environment";
+
 import { useGetUserInfo } from "ui/hooks/users";
+import { isMock, isTest } from "ui/utils/environment";
+
 import { setAccessTokenInBrowserPrefs } from "./browser";
 import useToken from "./useToken";
 

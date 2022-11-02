@@ -4,21 +4,22 @@
 // Use the API key for the "Frontend E2E Test Team" that we have set up in admin,
 // as that should let us mark these recordings as public.
 
+import { existsSync, readFileSync, readdirSync, writeFileSync } from "fs";
+import { join } from "path";
 import { Page } from "@playwright/test";
-const playwright = require("@recordreplay/playwright");
-import { uploadRecording, listAllRecordings, removeRecording } from "@replayio/replay";
+import { listAllRecordings, removeRecording, uploadRecording } from "@replayio/replay";
 import axios from "axios";
 import chalk from "chalk";
 import { dots } from "cli-spinners";
-import { readdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import logUpdate from "log-update";
-import { join } from "path";
 import { v4 as uuidv4 } from "uuid";
 import yargs from "yargs";
 
 import config from "../config";
 import { recordNodeExample } from "./record-node";
 import { recordPlaywright, uploadLastRecording } from "./record-playwright";
+
+const playwright = require("@recordreplay/playwright");
 
 type Target = "all" | "browser" | "node";
 

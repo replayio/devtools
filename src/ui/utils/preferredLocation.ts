@@ -1,9 +1,10 @@
 import { MappedLocation } from "@replayio/protocol";
+
 import { ThreadFront } from "protocol/thread";
 import { UIStore } from "ui/actions";
 import {
-  getPreferredLocation as getPreferredLocationSelector,
   getCorrespondingSourceIds,
+  getPreferredLocation as getPreferredLocationSelector,
 } from "ui/reducers/sources";
 
 // TODO [hbenl] some components ask for preferred locations in render functions or effects

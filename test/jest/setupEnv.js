@@ -2,8 +2,8 @@
 require("fake-indexeddb/auto");
 require("@testing-library/jest-dom");
 
+import { basicBindings, basicMessageHandlers } from "../../test/mock/src/handlers";
 import { installMockEnvironment } from "../../test/mock/src/mockEnvironment";
-import { basicMessageHandlers, basicBindings } from "../../test/mock/src/handlers";
 
 // Code throws if there's no dispatchUrl set
 process.env.NEXT_PUBLIC_DISPATCH_URL = "wss://dummy.example.com";

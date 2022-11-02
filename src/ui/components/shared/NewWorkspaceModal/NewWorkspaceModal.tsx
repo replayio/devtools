@@ -8,19 +8,21 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { removeUrlParameters } from "ui/utils/environment";
+import { ConnectedProps, connect } from "react-redux";
+
+import { CreateNewWorkspace_createWorkspace_workspace } from "graphql/CreateNewWorkspace";
 import * as actions from "ui/actions/app";
+import { useRedirectToTeam } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
+import { removeUrlParameters } from "ui/utils/environment";
 import { isValidTeamName, validateEmail } from "ui/utils/helpers";
+
+import { useConfirm } from "../Confirm";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
 import { WorkspaceMembers } from "../WorkspaceSettingsModal/WorkspaceSettingsModal";
 import InvitationLink from "./InvitationLink";
-import { useConfirm } from "../Confirm";
-import { useRedirectToTeam } from "ui/components/Library/Team/utils";
-import { CreateNewWorkspace_createWorkspace_workspace } from "graphql/CreateNewWorkspace";
 
 function ModalButton({
   children,
@@ -53,9 +55,9 @@ function SlideContent({
   children: React.ReactElement | (React.ReactElement | null)[];
 }) {
   return (
-    <div className="flex flex-col flex-grow space-y-3 overflow-hidden">
+    <div className="flex flex-grow flex-col space-y-3 overflow-hidden">
       <h2 className="text-2xl ">{headerText}</h2>
-      <div className="flex flex-col flex-grow space-y-3 overflow-hidden text-gray-500">
+      <div className="flex flex-grow flex-col space-y-3 overflow-hidden text-gray-500">
         {children}
       </div>
     </div>
@@ -371,7 +373,7 @@ function OnboardingModal(props: PropsFromRedux) {
     <>
       <Modal options={{ maskTransparency: "translucent" }} onMaskClick={props.hideModal}>
         <div
-          className="relative flex flex-col justify-between p-4 space-y-2 text-sm rounded-lg shadow-xl text-modalColor bg-modalBgcolor backdrop-blur-sm"
+          className="text-modalColor relative flex flex-col justify-between space-y-2 rounded-lg bg-modalBgcolor p-4 text-sm shadow-xl backdrop-blur-sm"
           style={{ width: "480px" }}
         >
           {slide}

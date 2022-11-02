@@ -1,20 +1,20 @@
-import React, { useEffect, useMemo, useContext, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 
+import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import { getPauseId } from "devtools/client/debugger/src/reducers/pause";
+import { getSelectedDomNodeId } from "devtools/client/inspector/markup/reducers/markup";
+import { onViewSourceInDebugger } from "devtools/client/webconsole/actions/toolbox";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
-  getNodeEventListeners,
   EventListenerWithFunctionInfo,
   NodeWithPreview,
+  getNodeEventListeners,
 } from "ui/actions/event-listeners";
-import { getPauseId } from "devtools/client/debugger/src/reducers/pause";
-
 import { useAppDispatch } from "ui/setup/hooks";
+import { useAppSelector } from "ui/setup/hooks";
+
 import { ExpandableItem } from "./ExpandableItem";
 import { XHTMLNode } from "./XHTMLNode";
-import { onViewSourceInDebugger } from "devtools/client/webconsole/actions/toolbox";
-import { useAppSelector } from "ui/setup/hooks";
-import { getSelectedDomNodeId } from "devtools/client/inspector/markup/reducers/markup";
-import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 export const EventListenersApp = () => {
   const [listeners, setListeners] = useState<EventListenerWithFunctionInfo[]>([]);

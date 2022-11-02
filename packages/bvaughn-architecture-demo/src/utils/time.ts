@@ -1,9 +1,9 @@
-import differenceInMinutes from "date-fns/differenceInMinutes";
-import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
-import differenceInWeeks from "date-fns/differenceInWeeks";
-import differenceInMonths from "date-fns/differenceInMonths";
-import differenceInYears from "date-fns/differenceInYears";
 import { ExecutionPoint, PointRange, TimeStampedPointRange } from "@replayio/protocol";
+import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
+import differenceInMinutes from "date-fns/differenceInMinutes";
+import differenceInMonths from "date-fns/differenceInMonths";
+import differenceInWeeks from "date-fns/differenceInWeeks";
+import differenceInYears from "date-fns/differenceInYears";
 import padStart from "lodash/padStart";
 import prettyMilliseconds from "pretty-ms";
 

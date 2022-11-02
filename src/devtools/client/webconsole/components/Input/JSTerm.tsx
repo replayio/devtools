@@ -1,6 +1,6 @@
 import { Editor } from "codemirror";
 import React, { useEffect, useLayoutEffect, useState } from "react";
-import { useAppSelector } from "ui/setup/hooks";
+
 import {
   EditorWithAutocomplete,
   Keys,
@@ -8,6 +8,7 @@ import {
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { getIsInLoadedRegion } from "ui/reducers/app";
 import { getPlayback } from "ui/reducers/timeline";
+import { useAppSelector } from "ui/setup/hooks";
 
 import EagerEvalFooter from "./EagerEvalFooter";
 

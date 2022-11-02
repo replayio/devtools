@@ -1,14 +1,14 @@
-import Inspector from "@bvaughn/components/inspector";
-import Loader from "@bvaughn/components/Loader";
-import { getObjectWithPreviewSuspense } from "@bvaughn/src/suspense/ObjectPreviews";
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
-import { ForwardedRef, forwardRef, Suspense, useContext } from "react";
+import { ForwardedRef, Suspense, forwardRef, useContext } from "react";
+
+import Inspector from "bvaughn-architecture-demo/components/inspector";
+import Loader from "bvaughn-architecture-demo/components/Loader";
+import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import PropertiesRenderer from "./PropertiesRenderer";
-
-import styles from "./SourcePreviewInspector.module.css";
 import useClientValue from "./useClientValue";
+import styles from "./SourcePreviewInspector.module.css";
 
 type Props = {
   className?: string;

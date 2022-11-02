@@ -4,9 +4,11 @@
 
 //
 import type { Editor } from "codemirror";
-import type { SourceEditor as SE, CodeMirror as CM } from "./source-editor";
+
 import { assert } from "protocol/utils";
+
 import { features, prefs } from "../prefs";
+import type { CodeMirror as CM, SourceEditor as SE } from "./source-editor";
 
 let editorWaiter: Promise<typeof SE>;
 let SourceEditor: typeof SE;

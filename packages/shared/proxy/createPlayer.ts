@@ -1,5 +1,5 @@
-import { findMatch, isIterator } from "./utils";
 import { Entry } from "./types";
+import { findMatch, isIterator } from "./utils";
 
 export default function createPlayer<T>(entries: Entry[]): T {
   const proxy = new Proxy(

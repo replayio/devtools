@@ -1,33 +1,34 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
+
 import { RecordingTarget } from "protocol/thread/thread";
-import { getSystemColorSchemePreference } from "ui/utils/environment";
 import { getCurrentTime, getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import {
+  AppMode,
   AppState,
   AppTheme,
+  Canvas,
   EventKind,
-  ReplayEvent,
-  UploadInfo,
-  LoadedRegions,
   ExpectedError,
-  UnexpectedError,
+  LoadedRegions,
   ModalOptionsType,
   ModalType,
-  Canvas,
+  ReplayEvent,
   SettingsTabTitle,
-  AppMode,
+  UnexpectedError,
+  UploadInfo,
 } from "ui/state/app";
 import { Workspace } from "ui/types";
 import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
+import { getSystemColorSchemePreference } from "ui/utils/environment";
 import { compareBigInt } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
 import {
+  displayedBeginForFocusRegion,
   displayedEndForFocusRegion,
   isPointInRegions,
   isTimeInRegions,
   overlap,
-  displayedBeginForFocusRegion,
 } from "ui/utils/timeline";
 
 export const initialAppState: AppState = {

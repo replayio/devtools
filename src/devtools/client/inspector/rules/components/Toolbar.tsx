@@ -1,4 +1,5 @@
 import React, { FC } from "react";
+
 import { SearchBox } from "devtools/client/inspector/rules/components/SearchBox";
 
 type ToolbarProps = {

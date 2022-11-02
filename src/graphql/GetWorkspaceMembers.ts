@@ -47,7 +47,10 @@ export interface GetWorkspaceMembers_node_Workspace_members_edges_node_Workspace
   user: GetWorkspaceMembers_node_Workspace_members_edges_node_WorkspaceUserMember_user;
 }
 
-export type GetWorkspaceMembers_node_Workspace_members_edges_node = GetWorkspaceMembers_node_Workspace_members_edges_node_WorkspacePendingEmailMember | GetWorkspaceMembers_node_Workspace_members_edges_node_WorkspacePendingUserMember | GetWorkspaceMembers_node_Workspace_members_edges_node_WorkspaceUserMember;
+export type GetWorkspaceMembers_node_Workspace_members_edges_node =
+  | GetWorkspaceMembers_node_Workspace_members_edges_node_WorkspacePendingEmailMember
+  | GetWorkspaceMembers_node_Workspace_members_edges_node_WorkspacePendingUserMember
+  | GetWorkspaceMembers_node_Workspace_members_edges_node_WorkspaceUserMember;
 
 export interface GetWorkspaceMembers_node_Workspace_members_edges {
   __typename: "WorkspaceMemberEdge";
@@ -65,7 +68,9 @@ export interface GetWorkspaceMembers_node_Workspace {
   members: GetWorkspaceMembers_node_Workspace_members | null;
 }
 
-export type GetWorkspaceMembers_node = GetWorkspaceMembers_node_Recording | GetWorkspaceMembers_node_Workspace;
+export type GetWorkspaceMembers_node =
+  | GetWorkspaceMembers_node_Recording
+  | GetWorkspaceMembers_node_Workspace;
 
 export interface GetWorkspaceMembers {
   node: GetWorkspaceMembers_node | null;

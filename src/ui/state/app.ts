@@ -1,15 +1,17 @@
 import {
-  SessionId,
-  MouseEvent,
-  KeyboardEvent,
-  NavigationEvent,
-  KeyboardEventKind,
-  MouseEventKind,
   ExecutionPoint,
+  KeyboardEvent,
+  KeyboardEventKind,
+  MouseEvent,
+  MouseEventKind,
+  NavigationEvent,
+  SessionId,
   TimeStampedPointRange,
 } from "@replayio/protocol";
+
 import type { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
+
 import { Reply } from "./comments";
 
 export type ModalOptionsType = {

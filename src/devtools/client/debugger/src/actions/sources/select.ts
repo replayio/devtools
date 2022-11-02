@@ -10,31 +10,29 @@
 import { UIThunkAction } from "ui/actions";
 import { setSelectedPanel, setViewMode } from "ui/actions/layout";
 import { getToolboxLayout, getViewMode } from "ui/reducers/layout";
-
+import {
+  SourceDetails,
+  clearSelectedLocation,
+  getSelectedSource,
+  getSourceDetails,
+  getSourceIdToDisplayForUrl,
+  getSourceToDisplayForUrl,
+  loadSourceText,
+  locationSelected,
+  preferSource,
+} from "ui/reducers/sources";
+import { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 
+import { fetchSymbolsForSource } from "../../reducers/ast";
 import { Context } from "../../reducers/pause";
 import { getTabExists } from "../../reducers/tabs";
 import { closeActiveSearch } from "../../reducers/ui";
 import { setShownSource } from "../../reducers/ui";
-import {
-  loadSourceText,
-  getSelectedSource,
-  getSourceDetails,
-  SourceDetails,
-  locationSelected,
-  clearSelectedLocation,
-  getSourceIdToDisplayForUrl,
-  getSourceToDisplayForUrl,
-  preferSource,
-} from "ui/reducers/sources";
-import { getActiveSearch, getExecutionPoint, getThreadContext, getContext } from "../../selectors";
+import { getActiveSearch, getContext, getExecutionPoint, getThreadContext } from "../../selectors";
+import { getSelectedFrameAsync } from "../../selectors/pause";
 import { createLocation } from "../../utils/location";
 import { paused } from "../pause/paused";
-
-import { fetchSymbolsForSource } from "../../reducers/ast";
-import { UIState } from "ui/state";
-import { getSelectedFrameAsync } from "../../selectors/pause";
 
 export type PartialLocation = Parameters<typeof createLocation>[0];
 

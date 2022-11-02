@@ -47,7 +47,7 @@ function getTextClass(color: Colors) {
 }
 
 function getColorClasses(color: Colors, style: ButtonStyles) {
-  let textStyle, bgStyle;
+  let bgStyle, textStyle;
 
   if (style === "primary") {
     textStyle = getTextClass("white");

@@ -1,19 +1,20 @@
 import classNames from "classnames";
-import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
-import PanelTabs from "devtools/client/shared/components/PanelTabs";
 import sortBy from "lodash/sortBy";
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+
+import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
+import PanelTabs from "devtools/client/shared/components/PanelTabs";
 import { hideRequestDetails, selectAndFetchRequest } from "ui/actions/network";
 import { getLoadedRegions } from "ui/reducers/app";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { isPointInRegions } from "ui/utils/timeline";
 
 import AddNetworkRequestCommentButton from "./AddNetworkRequestCommentButton";
 import RequestBody from "./RequestBody";
-import styles from "./RequestDetails.module.css";
 import ResponseBody from "./ResponseBody";
-import { findHeader, RequestSummary } from "./utils";
 import StackTrace from "./StackTrace";
+import { RequestSummary, findHeader } from "./utils";
+import styles from "./RequestDetails.module.css";
 
 interface Detail {
   name: string;

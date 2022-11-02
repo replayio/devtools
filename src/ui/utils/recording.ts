@@ -1,7 +1,9 @@
 import slugify from "slugify";
+
 import { Recording } from "ui/types";
+
 import { usesWindow } from "../../ssr";
-import { extractIdAndSlug, SLUG_SEPARATOR } from "./helpers";
+import { SLUG_SEPARATOR, extractIdAndSlug } from "./helpers";
 
 const WARNING_MS = 60 * 2 * 1000;
 export const showDurationWarning = (recording: Recording) =>

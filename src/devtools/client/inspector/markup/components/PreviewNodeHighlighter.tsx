@@ -1,11 +1,11 @@
-import React from "react";
 import type { Quads } from "@replayio/protocol";
+import React from "react";
 
-import { useAppSelector } from "ui/setup/hooks";
 import { assert } from "protocol/utils";
+import { useAppSelector } from "ui/setup/hooks";
+import { Canvas } from "ui/state/app";
 
 import { NodeInfo, getNodeBoxModelById } from "../reducers/markup";
-import { Canvas } from "ui/state/app";
 
 // Note that the order of items in this array is important because it is used
 // for drawing the BoxModelHighlighter's path elements correctly.

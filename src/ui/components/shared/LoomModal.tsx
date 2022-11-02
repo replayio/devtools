@@ -1,8 +1,10 @@
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
+
 import * as actions from "ui/actions/app";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
+
 import Modal from "./NewModal";
 
 function LoomModal({ hideModal, modalOptions }: PropsFromRedux) {

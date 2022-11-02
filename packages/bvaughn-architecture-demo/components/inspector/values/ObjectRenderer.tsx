@@ -1,10 +1,10 @@
-import { mergePropertiesAndGetterValues } from "@bvaughn/src/utils/protocol";
 import { ReactNode, useMemo } from "react";
 
-import KeyValueRenderer from "../KeyValueRenderer";
+import { mergePropertiesAndGetterValues } from "bvaughn-architecture-demo/src/utils/protocol";
 
-import styles from "./shared.module.css";
+import KeyValueRenderer from "../KeyValueRenderer";
 import { ObjectPreviewRendererProps } from "./types";
+import styles from "./shared.module.css";
 
 const MAX_PROPERTIES_TO_PREVIEW = 5;
 

@@ -1,18 +1,23 @@
-import Icon from "@bvaughn/components/Icon";
-import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
-import { KeyboardModifiersContext } from "@bvaughn/src/contexts/KeyboardModifiersContext";
-import { AddPoint, DeletePoints, EditPoint } from "@bvaughn/src/contexts/PointsContext";
-import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
-import { getHitPointsForLocationSuspense } from "@bvaughn/src/suspense/PointsCache";
-import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
+import { ExecutionPoint, newSource as ProtocolSource, TimeStampedPoint } from "@replayio/protocol";
+import findLast from "lodash/findLast";
+import { useContext, useMemo } from "react";
+
+import Icon from "bvaughn-architecture-demo/components/Icon";
+import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
+import { KeyboardModifiersContext } from "bvaughn-architecture-demo/src/contexts/KeyboardModifiersContext";
+import {
+  AddPoint,
+  DeletePoints,
+  EditPoint,
+} from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
+import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import {
   compareExecutionPoints,
   isExecutionPointsGreaterThan,
   isExecutionPointsLessThan,
-} from "@bvaughn/src/utils/time";
-import { ExecutionPoint, newSource as ProtocolSource, TimeStampedPoint } from "@replayio/protocol";
-import findLast from "lodash/findLast";
-import { useContext, useMemo } from "react";
+} from "bvaughn-architecture-demo/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 import { LineHitCounts } from "shared/client/types";

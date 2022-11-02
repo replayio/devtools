@@ -1,12 +1,12 @@
+import sortBy from "lodash/sortBy";
+import React, { useMemo } from "react";
+import { ConnectedProps, connect } from "react-redux";
+
 import { useGetComments } from "ui/hooks/comments/comments";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { UIState } from "ui/state";
-import React, { useMemo } from "react";
-import { connect, ConnectedProps } from "react-redux";
 
 import { selectors } from "../../reducers";
-import sortBy from "lodash/sortBy";
-
 import CommentMarker from "./CommentMarker";
 
 function Comments({ hoveredItem }: PropsFromRedux) {

@@ -3,7 +3,8 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import cases from "jest-in-case";
-import { parseQuickOpenQuery, parseLineColumn } from "./quick-open";
+
+import { parseLineColumn, parseQuickOpenQuery } from "./quick-open";
 
 cases(
   "parseQuickOpenQuery utility",

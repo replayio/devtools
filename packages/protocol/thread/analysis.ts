@@ -1,5 +1,7 @@
 import { AnalysisEntry, Location, PointDescription } from "@replayio/protocol";
+
 import { ThreadFront } from "protocol/thread";
+
 import { AnalysisParams } from "../analysisManager";
 import { client, gAnalysisCallbacks } from "../socket";
 

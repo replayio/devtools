@@ -8,36 +8,35 @@ import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import { getCodeMirror } from "devtools/client/debugger/src/utils/editor";
 import type { UIThunkAction } from "ui/actions";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
+import {
+  SourceDetails,
+  getSelectedLocation,
+  getSelectedLocationHasScrolled,
+  getSourceContent,
+  getSourceDetails,
+} from "ui/reducers/sources";
 
 import { closeQuickOpen } from "../reducers/quick-open";
 import {
+  ActiveSearchType,
+  HighlightedRange,
   clearHighlightLineRange,
   highlightLineRange,
-  toggleActiveSearch,
-  setPrimaryPaneTab,
   setCursorPosition,
+  setPrimaryPaneTab,
   setViewport,
   sourcesDisplayed,
   sourcesPanelExpanded,
-  toggleStartPanel,
+  toggleActiveSearch,
   toggleSources,
-  ActiveSearchType,
-  HighlightedRange,
+  toggleStartPanel,
 } from "../reducers/ui";
-import { getActiveSearch, getQuickOpenEnabled, getFileSearchQuery, getContext } from "../selectors";
-import {
-  getSourceDetails,
-  getSelectedLocation,
-  getSourceContent,
-  getSelectedLocationHasScrolled,
-  SourceDetails,
-} from "ui/reducers/sources";
+import { getActiveSearch, getContext, getFileSearchQuery, getQuickOpenEnabled } from "../selectors";
 import { copyToTheClipboard } from "../utils/clipboard";
 import { getEditor, getLocationsInViewport } from "../utils/editor";
 import { resizeBreakpointGutter } from "../utils/ui";
-
 import { searchContents } from "./file-search";
-import { selectSource, selectLocation } from "./sources/select";
+import { selectLocation, selectSource } from "./sources/select";
 
 export {
   closeActiveSearch,

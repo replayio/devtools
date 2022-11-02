@@ -1,8 +1,8 @@
+import { Meta, Story } from "@storybook/react";
 import React, { ComponentProps } from "react";
 
-import { Story, Meta } from "@storybook/react";
-
 import NetworkMonitor from "ui/components/NetworkMonitor";
+
 import { requestProps } from "./utils";
 
 export default {

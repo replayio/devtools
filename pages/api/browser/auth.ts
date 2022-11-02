@@ -1,5 +1,6 @@
 import cookie from "cookie";
 import type { NextApiRequest, NextApiResponse } from "next";
+
 import { pingTelemetry } from "ui/utils/replay-telemetry";
 
 // patch in node-fetch for pingTelemetry without adding it to the FE bundle

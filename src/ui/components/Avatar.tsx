@@ -1,10 +1,12 @@
+import classNames from "classnames/bind";
 import React from "react";
+
 import { User } from "ui/types";
 import useAuth0 from "ui/utils/useAuth0";
 import { getAvatarColor } from "ui/utils/user";
 
-import classNames from "classnames/bind";
 import css from "./Avatar.module.css";
+
 const cx = classNames.bind(css);
 
 // The user image URLs that we get from Google sometimes fail to load, in that case

@@ -1,6 +1,6 @@
-import { useAppSelector } from "ui/setup/hooks";
 import { getNonLoadingTimeRanges } from "ui/reducers/app";
 import { getZoomRegion } from "ui/reducers/timeline";
+import { useAppSelector } from "ui/setup/hooks";
 import { TimeRange } from "ui/utils/app";
 
 const NonLoadingRegion = ({ range }: { range: TimeRange }) => {

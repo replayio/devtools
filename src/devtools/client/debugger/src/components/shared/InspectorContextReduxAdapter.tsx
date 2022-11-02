@@ -1,10 +1,11 @@
 import { MappedLocation } from "@replayio/protocol";
-import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
 import React, { ReactNode, useCallback, useMemo } from "react";
+
+import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
 import { onViewSourceInDebugger } from "devtools/client/webconsole/actions";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { getSourceDetailsEntities } from "ui/reducers/sources";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
+import { getSourceDetailsEntities } from "ui/reducers/sources";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 // Adapter that connects inspect-function and inspect-html-element actions with Redux.
 export default function InspectorContextReduxAdapter({ children }: { children: ReactNode }) {

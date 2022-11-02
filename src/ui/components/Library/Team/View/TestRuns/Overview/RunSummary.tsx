@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { useContext } from "react";
+
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { TestRun } from "ui/hooks/tests";
+
 import {
   getDurationString,
   getTruncatedRelativeDate,
@@ -16,7 +18,7 @@ function Title({ testRun }: { testRun: TestRun }) {
 
   return (
     <div className="flex flex-row items-center space-x-2 overflow-hidden">
-      <div className="overflow-hidden text-xl font-medium overflow-ellipsis whitespace-nowrap">
+      <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-medium">
         {title}
       </div>
     </div>
@@ -64,7 +66,7 @@ export function RunSummary() {
   const testRun = useContext(TestRunOverviewContext).testRun!;
 
   return (
-    <div className="flex flex-col p-4 mb-2 space-y-2 border-b border-themeBorder">
+    <div className="mb-2 flex flex-col space-y-2 border-b border-themeBorder p-4">
       <div className="flex flex-row justify-between">
         <Title testRun={testRun} />
         <RunStats testRun={testRun} />

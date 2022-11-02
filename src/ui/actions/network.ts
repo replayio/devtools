@@ -1,11 +1,12 @@
 import {
-  RequestInfo,
-  RequestEventInfo,
-  responseBodyData,
-  RequestId,
-  requestBodyData,
   Frame,
+  RequestEventInfo,
+  RequestId,
+  RequestInfo,
+  requestBodyData,
+  responseBodyData,
 } from "@replayio/protocol";
+
 import { createFrame } from "devtools/client/debugger/src/client/create";
 import { Context } from "devtools/client/debugger/src/reducers/pause";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";

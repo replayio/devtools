@@ -1,7 +1,7 @@
 import { ExecutionPoint, FrameId, PauseId } from "@replayio/protocol";
 import {
-  createContext,
   PropsWithChildren,
+  createContext,
   useCallback,
   useMemo,
   useState,

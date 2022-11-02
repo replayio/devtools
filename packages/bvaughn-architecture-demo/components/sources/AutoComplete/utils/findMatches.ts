@@ -1,5 +1,6 @@
-import { findIndexString, insertString } from "@bvaughn/src/utils/array";
 import { Property, Scope } from "@replayio/protocol";
+
+import { findIndexString, insertString } from "bvaughn-architecture-demo/src/utils/array";
 
 // const OBJECT_PROTOTYPE_PROPERTIES = Object.getOwnPropertyNames(Object.prototype);
 // const ARRAY_PROTOTYPE_PROPERTIES = Object.getOwnPropertyNames(Array.prototype);

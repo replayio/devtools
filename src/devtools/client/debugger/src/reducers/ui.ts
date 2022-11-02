@@ -2,15 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import type { Location } from "@replayio/protocol";
+
+import { SourceDetails } from "ui/reducers/sources";
 import type { UIState } from "ui/state";
 
 import { prefs } from "../utils/prefs";
-
 import { closeQuickOpen } from "./quick-open";
 import type { Range } from "./types";
-import { SourceDetails } from "ui/reducers/sources";
 
 export type ActiveSearchType = "project" | "file";
 

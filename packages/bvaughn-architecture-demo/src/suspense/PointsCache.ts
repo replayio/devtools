@@ -1,16 +1,16 @@
 import {
   ExecutionPoint,
-  getPointsBoundingTimeResult as PointsBoundingTime,
   Location,
+  getPointsBoundingTimeResult as PointsBoundingTime,
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
+
 import { HitPointsAndStatusTuple, ReplayClientInterface } from "shared/client/types";
-import { isCommandError, ProtocolError } from "shared/utils/error";
+import { ProtocolError, isCommandError } from "shared/utils/error";
 
 import { createWakeable } from "../utils/suspense";
 import { isExecutionPointsLessThan } from "../utils/time";
-
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 export type CachedPointsForTime = Map<number, ExecutionPoint>;

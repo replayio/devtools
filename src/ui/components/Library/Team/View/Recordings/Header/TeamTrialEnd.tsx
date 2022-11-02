@@ -1,9 +1,11 @@
 import { useRouter } from "next/router";
 import React from "react";
-import { useAppDispatch } from "ui/setup/hooks";
+
 import { setModal } from "ui/actions/app";
 import hooks from "ui/hooks";
+import { useAppDispatch } from "ui/setup/hooks";
 import { subscriptionEndsIn } from "ui/utils/workspace";
+
 import { TrialEnd } from "../../../../../shared/TrialEnd";
 
 export default function TeamTrialEnd({ currentWorkspaceId }: { currentWorkspaceId: string }) {
@@ -38,7 +40,7 @@ export default function TeamTrialEnd({ currentWorkspaceId }: { currentWorkspaceI
     <TrialEnd
       expiresIn={expiresIn}
       color="yellow"
-      className="py-2 cursor-pointer"
+      className="cursor-pointer py-2"
       onClick={onClick}
     />
   );

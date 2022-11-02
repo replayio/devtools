@@ -1,4 +1,5 @@
 import { Message, TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
+
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createMockReplayClient } from "../utils/testing";

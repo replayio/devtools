@@ -2,16 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { createSlice, createAsyncThunk, createEntityAdapter, EntityState } from "@reduxjs/toolkit";
-
-import { UIState } from "ui/state";
-import { ThunkExtraArgs } from "ui/utils/thunk";
-import { LoadingStatus } from "ui/utils/LoadingStatus";
-import { MiniSource, getSourceDetailsEntities, SourceDetails } from "ui/reducers/sources";
+import { EntityState, createAsyncThunk, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 
 import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/sourceVisualizations";
+import { MiniSource, SourceDetails, getSourceDetailsEntities } from "ui/reducers/sources";
+import { UIState } from "ui/state";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
+import { ThunkExtraArgs } from "ui/utils/thunk";
 
-import { formatProjectFunctions, SearchResult } from "../utils/quick-open";
+import { SearchResult, formatProjectFunctions } from "../utils/quick-open";
 
 export type AstPosition = { line: number; column: number };
 export type AstLocation = { end: AstPosition; start: AstPosition };

@@ -1,4 +1,4 @@
-import { test, Page } from "@playwright/test";
+import { Page, test } from "@playwright/test";
 
 import { toggleProtocolMessages } from "./utils/console";
 import { getTestUrl, takeScreenshot } from "./utils/general";

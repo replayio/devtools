@@ -14,6 +14,7 @@ const {
   SELECTOR_ELEMENT,
   SELECTOR_PSEUDO_CLASS,
 } = require("third-party/css/parsing-utils");
+
 import { ELEMENT_STYLE } from "shared/constants";
 
 const Types = require("devtools/client/inspector/rules/types");

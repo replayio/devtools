@@ -1,4 +1,5 @@
 import { Action } from "@reduxjs/toolkit";
+
 import {
   getLocalNags,
   getSelectedPanel,
@@ -7,13 +8,14 @@ import {
 } from "ui/reducers/layout";
 import { LocalNag } from "ui/setup/prefs";
 import {
-  ViewMode,
   PrimaryPanelName,
   SecondaryPanelName,
-  VIEWER_PANELS,
   ToolboxLayout,
+  VIEWER_PANELS,
+  ViewMode,
 } from "ui/state/layout";
 import { trackEvent } from "ui/utils/telemetry";
+
 import { UIThunkAction } from ".";
 
 type SetSelectedPrimaryPanelAction = Action<"set_selected_primary_panel"> & {

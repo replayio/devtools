@@ -3,19 +3,16 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import React, { Component, useRef } from "react";
-
-import { connect, ConnectedProps } from "react-redux";
-
-import type { UIState } from "ui/state";
-import actions from "../actions";
-import { setUnexpectedError } from "ui/actions/errors";
-import A11yIntention from "./A11yIntention";
-
-import { getSelectedPanel } from "ui/reducers/layout";
-import { useGetUserSettings } from "ui/hooks/settings";
+import { ConnectedProps, connect } from "react-redux";
 
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
+import { setUnexpectedError } from "ui/actions/errors";
+import { useGetUserSettings } from "ui/hooks/settings";
+import { getSelectedPanel } from "ui/reducers/layout";
+import type { UIState } from "ui/state";
 
+import actions from "../actions";
+import A11yIntention from "./A11yIntention";
 import { EditorPane } from "./Editor/EditorPane";
 import ShortcutsContext from "./Editor/ShortcutsContext";
 

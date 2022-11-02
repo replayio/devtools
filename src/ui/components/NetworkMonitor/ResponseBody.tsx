@@ -1,9 +1,11 @@
 import { ResponseBodyData } from "@replayio/protocol";
 import React from "react";
-import { useAppSelector } from "ui/setup/hooks";
+
 import { getSelectedResponseBody } from "ui/reducers/network";
+import { useAppSelector } from "ui/setup/hooks";
+
 import HttpBody from "./HttpBody";
-import { findHeader, RequestSummary } from "./utils";
+import { RequestSummary, findHeader } from "./utils";
 
 // Keep the internal implementation separate so we can mock it easily in storybook.
 export function _ResponseBody({

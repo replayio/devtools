@@ -1,17 +1,17 @@
 import {
-  createPauseResult as Pause,
   ExecutionPoint,
   FrameId,
+  createPauseResult as Pause,
   PauseData,
   PauseId,
   Result,
 } from "@replayio/protocol";
 import { captureException } from "@sentry/browser";
+
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
 import { preCacheObjects } from "./ObjectPreviews";
-
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 const evaluationResultsMap: Map<ExecutionPoint, Record<Result>> = new Map();

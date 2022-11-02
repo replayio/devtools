@@ -1,4 +1,5 @@
 import { Locator, Page } from "@playwright/test";
+
 import { debugPrint } from "./general";
 
 export async function toggleExpandable<T>(

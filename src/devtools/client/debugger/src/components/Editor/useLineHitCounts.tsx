@@ -1,3 +1,5 @@
+import { useContext, useEffect, useLayoutEffect, useMemo, useRef } from "react";
+
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import {
@@ -6,7 +8,6 @@ import {
 } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
 import { resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
-import { useContext, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { LineNumberToHitCountMap } from "shared/client/types";
 import { useFeature, useStringPref } from "ui/hooks/settings";

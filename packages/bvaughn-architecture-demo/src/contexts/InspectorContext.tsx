@@ -4,7 +4,8 @@ import {
   PauseId,
   Value as ProtocolValue,
 } from "@replayio/protocol";
-import { createContext, PropsWithChildren, useCallback, useContext, useMemo } from "react";
+import { PropsWithChildren, createContext, useCallback, useContext, useMemo } from "react";
+
 import { SourcesContext } from "./SourcesContext";
 
 type InspectFunctionDefinition = (mappedLocation: MappedLocation) => void;

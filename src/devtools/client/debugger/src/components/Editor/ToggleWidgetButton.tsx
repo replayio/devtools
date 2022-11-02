@@ -1,39 +1,40 @@
 import { PointDescription, SourceId, TimeStampedPointRange } from "@replayio/protocol";
+import classNames from "classnames";
+import findLast from "lodash/findLast";
+import React, {
+  FC,
+  MouseEvent,
+  MouseEventHandler,
+  ReactNode,
+  Suspense,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { createPortal } from "react-dom";
+
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import {
   getSource,
   getSourceHitCountsSuspense,
 } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
-import classNames from "classnames";
-import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { getExecutionPoint, getSymbols } from "devtools/client/debugger/src/selectors";
 import { findClosestFunction } from "devtools/client/debugger/src/utils/ast";
-import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
-import { createPortal } from "react-dom";
-import React, {
-  useState,
-  useEffect,
-  MouseEvent,
-  MouseEventHandler,
-  FC,
-  ReactNode,
-  Suspense,
-  useContext,
-} from "react";
-import { Point } from "shared/client/types";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { Point } from "shared/client/types";
 import { seek } from "ui/actions/timeline";
 import { KeyModifiers, KeyModifiersContext } from "ui/components/KeyModifiers";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { useFeature } from "ui/hooks/settings";
+import { Nag } from "ui/hooks/users";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { shouldShowNag } from "ui/utils/user";
-import { Nag } from "ui/hooks/users";
 
 import { AWESOME_BACKGROUND } from "./LineNumberTooltip";
 

@@ -1,25 +1,27 @@
-import React, { Suspense, useContext, useDeferredValue, useEffect, useMemo, useState } from "react";
 import classnames from "classnames";
-import PanelEditor from "./PanelEditor";
+import React, { Suspense, useContext, useDeferredValue, useEffect, useMemo, useState } from "react";
+import { ConnectedProps, connect } from "react-redux";
+
+import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import BreakpointNavigation from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation";
-import Widget from "./Widget";
-import { connect, ConnectedProps } from "react-redux";
-import type { UIState } from "ui/state";
-import { actions } from "ui/actions";
-import { selectors } from "ui/reducers";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
-import PanelSummary from "./PanelSummary";
-import FirstEditNag from "./FirstEditNag";
+import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
+import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { Point } from "shared/client/types";
+import { actions } from "ui/actions";
 import PrefixBadgeButton from "ui/components/PrefixBadge";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
-import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
+import { selectors } from "ui/reducers";
 import { getFocusRegion } from "ui/reducers/timeline";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
-import { Point } from "shared/client/types";
-import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
+import type { UIState } from "ui/state";
+
+import FirstEditNag from "./FirstEditNag";
+import PanelEditor from "./PanelEditor";
+import PanelSummary from "./PanelSummary";
+import Widget from "./Widget";
 
 const gutterOffset = 37;
 

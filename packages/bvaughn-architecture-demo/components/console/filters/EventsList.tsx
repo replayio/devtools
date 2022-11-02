@@ -1,7 +1,8 @@
-import Loader from "@bvaughn/components/Loader";
-import { getEventCategoryCountsSuspense } from "@bvaughn/src/suspense/EventsCache";
-import type { EventCategory as EventCategoryType } from "@bvaughn/src/suspense/EventsCache";
 import { ChangeEvent, Suspense, useContext, useMemo, useState, useTransition } from "react";
+
+import Loader from "bvaughn-architecture-demo/components/Loader";
+import { getEventCategoryCountsSuspense } from "bvaughn-architecture-demo/src/suspense/EventsCache";
+import type { EventCategory as EventCategoryType } from "bvaughn-architecture-demo/src/suspense/EventsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import EventCategory from "./EventCategory";

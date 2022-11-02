@@ -1,7 +1,9 @@
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
+
 import * as actions from "ui/actions/app";
 import { trackEvent } from "ui/utils/telemetry";
+
 import { PrimaryButton } from "../shared/Button";
 
 function ShareButton({ setModal }: PropsFromRedux) {

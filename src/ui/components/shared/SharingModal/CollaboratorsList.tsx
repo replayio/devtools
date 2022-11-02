@@ -1,8 +1,10 @@
 import React from "react";
-import { Recording, User } from "ui/types";
-import hooks from "ui/hooks";
-import MaterialIcon from "../MaterialIcon";
+
 import { AvatarImage } from "ui/components/Avatar";
+import hooks from "ui/hooks";
+import { Recording, User } from "ui/types";
+
+import MaterialIcon from "../MaterialIcon";
 
 export interface CollaboratorDbData {
   collaborationId: string;

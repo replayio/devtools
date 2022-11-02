@@ -1,7 +1,7 @@
-import { StyleDeclaration, Object as ProtocolObject } from "@replayio/protocol";
-import { ELEMENT_STYLE } from "shared/constants";
+import { Object as ProtocolObject, StyleDeclaration } from "@replayio/protocol";
 
 import { assert } from "protocol/utils";
+import { ELEMENT_STYLE } from "shared/constants";
 
 // Manages interaction with a CSSStyleDeclaration.
 // StyleFront represents an inline element style.

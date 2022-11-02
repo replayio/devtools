@@ -1,4 +1,4 @@
-import { ReactNode, unstable_Offscreen as Offscreen, useEffect, useRef } from "react";
+import { unstable_Offscreen as Offscreen, ReactNode, useEffect, useRef } from "react";
 
 // Wrapper around the Offscreen API that defers rendering the Offscreen tree initially,
 // until it's been explicitly marked as "visible".

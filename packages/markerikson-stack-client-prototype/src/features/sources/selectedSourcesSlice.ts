@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { PointDescription, Location } from "@replayio/protocol";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { Location, PointDescription } from "@replayio/protocol";
 
 type PartialLocation = Pick<Location, "line" | "column">;
 interface SourcesState {

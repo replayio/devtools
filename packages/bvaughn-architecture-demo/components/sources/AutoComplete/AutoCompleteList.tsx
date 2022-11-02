@@ -1,15 +1,16 @@
-import Popup from "@bvaughn/components/Popup";
-import useCurrentPause from "@bvaughn/src/hooks/useCurrentPause";
-import { getObjectWithPreviewSuspense } from "@bvaughn/src/suspense/ObjectPreviews";
-import { evaluateSuspense } from "@bvaughn/src/suspense/PauseCache";
 import { createPauseResult as Pause, Property, Scope } from "@replayio/protocol";
 import { RefObject, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { FixedSizeList as List } from "react-window";
+
+import Popup from "bvaughn-architecture-demo/components/Popup";
+import useCurrentPause from "bvaughn-architecture-demo/src/hooks/useCurrentPause";
+import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import { evaluateSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import styles from "./AutoCompleteList.module.css";
 import AutoCompleteListRow, { ItemData } from "./AutoCompleteListRow";
 import find from "./utils/findMatches";
+import styles from "./AutoCompleteList.module.css";
 
 const LINE_HEIGHT = 20;
 const MAX_LIST_HEIGHT = 200;

@@ -1,8 +1,9 @@
-import React, { CSSProperties, RefObject, useRef, useState, useCallback } from "react";
-
+import React, { CSSProperties, RefObject, useCallback, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+
 import { getToolboxLayout } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
+
 import { DropdownProps } from "./Dropdown";
 
 interface PortalDropdownProps extends DropdownProps {

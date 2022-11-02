@@ -1,5 +1,5 @@
-import * as React from "react";
 import classNames from "classnames";
+import * as React from "react";
 
 import styles from "./Checkbox.module.css";
 

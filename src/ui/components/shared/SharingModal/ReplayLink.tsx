@@ -1,7 +1,8 @@
 import React, { useRef, useState } from "react";
-import { trackEvent } from "ui/utils/telemetry";
-import { getRecordingURL } from "ui/utils/recording";
+
 import { Recording } from "ui/types";
+import { getRecordingURL } from "ui/utils/recording";
+import { trackEvent } from "ui/utils/telemetry";
 
 export function CopyButton({ recording }: { recording: Recording }) {
   const [showCopied, setShowCopied] = useState(false);
@@ -21,9 +22,9 @@ export function CopyButton({ recording }: { recording: Recording }) {
   };
 
   return (
-    <div className="relative flex flex-col items-center flex-shrink-0 copy-link">
+    <div className="copy-link relative flex flex-shrink-0 flex-col items-center">
       <button
-        className="p-2 py-1 transition border border-gray-400 rounded-lg hover:border-primaryAccent hover:bg-primaryAccent hover:text-white"
+        className="rounded-lg border border-gray-400 p-2 py-1 transition hover:border-primaryAccent hover:bg-primaryAccent hover:text-white"
         {...{ onClick }}
       >
         Copy Link
@@ -53,7 +54,7 @@ export function UrlCopy({ url }: { url: string }) {
   };
 
   return (
-    <div className="relative flex flex-col items-center copy-link">
+    <div className="copy-link relative flex flex-col items-center">
       <input
         className="text-sm"
         type="text"

@@ -1,21 +1,21 @@
 import { SourceId, TimeStampedPointRange } from "@replayio/protocol";
 import {
-  ContentType as ProtocolContentType,
-  newSource as ProtocolSource,
   PointRange,
+  ContentType as ProtocolContentType,
   SameLineSourceLocations as ProtocolSameLineSourceLocations,
+  newSource as ProtocolSource,
   SourceId as ProtocolSourceId,
 } from "@replayio/protocol";
+
 import {
   LineNumberToHitCountMap,
   ReplayClientInterface,
   SourceLocationRange,
 } from "shared/client/types";
-import { isCommandError, ProtocolError } from "shared/utils/error";
+import { ProtocolError, isCommandError } from "shared/utils/error";
 
 import { createWakeable } from "../utils/suspense";
 import { createGenericCache } from "./createGenericCache";
-
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 export type ProtocolSourceContents = {

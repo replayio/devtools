@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from "@playwright/test";
+import { Locator, Page, expect } from "@playwright/test";
 
 type ToolboxLayout = "bottom" | "full" | "ide" | "left";
 

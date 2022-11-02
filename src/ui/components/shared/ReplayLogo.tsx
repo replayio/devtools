@@ -1,8 +1,9 @@
-import { selector } from "devtools/client/inspector/rules/types";
 import React from "react";
-import { useAppSelector } from "ui/setup/hooks";
+
+import { selector } from "devtools/client/inspector/rules/types";
 import { useFeature } from "ui/hooks/settings";
 import { getTheme } from "ui/reducers/app";
+import { useAppSelector } from "ui/setup/hooks";
 import { AppTheme } from "ui/state/app";
 
 const logoSizes = {

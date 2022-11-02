@@ -1,29 +1,31 @@
-import { gql, useQuery, useMutation, DocumentNode } from "@apollo/client";
-import { query } from "ui/utils/apolloClient";
-import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
-import useAuth0 from "ui/utils/useAuth0";
-import type { ApiKey, ExperimentalUserSettings } from "../types";
-import { ADD_USER_API_KEY, DELETE_USER_API_KEY, GET_USER_SETTINGS } from "ui/graphql/settings";
-import { features, prefs } from "ui/utils/prefs";
-import { prefs as prefsService } from "devtools/shared/services";
+import { DocumentNode, gql, useMutation, useQuery } from "@apollo/client";
 import { useEffect, useMemo, useState } from "react";
-import { maybeTrackTeamChange } from "ui/utils/mixpanel";
+
+import { prefs as prefsService } from "devtools/shared/services";
+import { CreateUserAPIKey, CreateUserAPIKeyVariables } from "graphql/CreateUserAPIKey";
+import { DeleteUserAPIKey, DeleteUserAPIKeyVariables } from "graphql/DeleteUserAPIKey";
+import { GetUserSettings } from "graphql/GetUserSettings";
 import {
   UpdateUserDefaultWorkspace,
   UpdateUserDefaultWorkspaceVariables,
 } from "graphql/UpdateUserDefaultWorkspace";
-import { CreateUserAPIKey, CreateUserAPIKeyVariables } from "graphql/CreateUserAPIKey";
-import { DeleteUserAPIKey, DeleteUserAPIKeyVariables } from "graphql/DeleteUserAPIKey";
-import {
-  UpdateUserSettingsLogRocket,
-  UpdateUserSettingsLogRocketVariables,
-} from "graphql/UpdateUserSettingsLogRocket";
 import {
   UpdateUserSettingsEventLink,
   UpdateUserSettingsEventLinkVariables,
 } from "graphql/UpdateUserSettingsEventLink";
-import { GetUserSettings } from "graphql/GetUserSettings";
+import {
+  UpdateUserSettingsLogRocket,
+  UpdateUserSettingsLogRocketVariables,
+} from "graphql/UpdateUserSettingsLogRocket";
+import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
+import { ADD_USER_API_KEY, DELETE_USER_API_KEY, GET_USER_SETTINGS } from "ui/graphql/settings";
+import { query } from "ui/utils/apolloClient";
 import { isTest } from "ui/utils/environment";
+import { maybeTrackTeamChange } from "ui/utils/mixpanel";
+import { features, prefs } from "ui/utils/prefs";
+import useAuth0 from "ui/utils/useAuth0";
+
+import type { ApiKey, ExperimentalUserSettings } from "../types";
 
 const emptySettings: ExperimentalUserSettings = {
   apiKeys: [],

@@ -1,4 +1,5 @@
 import { ReplayClientInterface } from "shared/client/types";
+
 import { UserInfo } from "../graphql/types";
 import { getCurrentUserInfo } from "../graphql/User";
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
+
 import { prefs } from "ui/utils/prefs";
 
 interface WidgetProps {

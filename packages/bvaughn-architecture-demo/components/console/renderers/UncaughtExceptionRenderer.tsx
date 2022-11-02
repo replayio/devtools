@@ -1,21 +1,21 @@
-import Icon from "@bvaughn/components/Icon";
-import Inspector from "@bvaughn/components/inspector";
-import Loader from "@bvaughn/components/Loader";
-import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
-import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
-import Expandable from "@bvaughn/components/Expandable";
-import { UncaughtException } from "@bvaughn/src/suspense/ExceptionsCache";
-import { formatTimestamp } from "@bvaughn/src/utils/time";
 import { Value as ProtocolValue } from "@replayio/protocol";
 import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
-import { memo, Suspense, useContext } from "react";
+import { Suspense, memo, useContext } from "react";
+
+import Expandable from "bvaughn-architecture-demo/components/Expandable";
+import Icon from "bvaughn-architecture-demo/components/Icon";
+import Inspector from "bvaughn-architecture-demo/components/inspector";
+import Loader from "bvaughn-architecture-demo/components/Loader";
+import { ConsoleFiltersContext } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
+import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
+import { UncaughtException } from "bvaughn-architecture-demo/src/suspense/ExceptionsCache";
+import { formatTimestamp } from "bvaughn-architecture-demo/src/utils/time";
 
 import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
 import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 import StackRenderer from "../StackRenderer";
-
 import styles from "./shared.module.css";
 
 const EMPTY_ARRAY: any[] = [];

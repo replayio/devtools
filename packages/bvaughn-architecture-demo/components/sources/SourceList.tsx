@@ -1,11 +1,3 @@
-import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
-import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
-import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
-import useLocalStorage from "@bvaughn/src/hooks/useLocalStorage";
-import {
-  getCachedMinMaxSourceHitCounts,
-  getSourceHitCountsSuspense,
-} from "@bvaughn/src/suspense/SourcesCache";
 import { newSource as ProtocolSource } from "@replayio/protocol";
 import {
   CSSProperties,
@@ -16,17 +8,34 @@ import {
   useMemo,
   useRef,
 } from "react";
-import { ListOnItemsRenderedProps, VariableSizeList as List } from "react-window";
+import { VariableSizeList as List, ListOnItemsRenderedProps } from "react-window";
+
+import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
+import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
+import {
+  getCachedMinMaxSourceHitCounts,
+  getSourceHitCountsSuspense,
+} from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 
-import { formatHitCount } from "./utils/formatHitCount";
-import SourceListRow, { ItemData } from "./SourceListRow";
-import styles from "./SourceList.module.css";
-import { SourceSearchContext } from "./SourceSearchContext";
-import { findPointForLocation } from "./utils/points";
-import getScrollbarWidth from "./utils/getScrollbarWidth";
 import useFontBasedListMeasurents from "./hooks/useFontBasedListMeasurents";
+import SourceListRow, { ItemData } from "./SourceListRow";
+import { SourceSearchContext } from "./SourceSearchContext";
+import { formatHitCount } from "./utils/formatHitCount";
+import getScrollbarWidth from "./utils/getScrollbarWidth";
+import { findPointForLocation } from "./utils/points";
+import styles from "./SourceList.module.css";
+
+// HACK
+// We could swap this out for something that lazily measures row height.
+const POINT_PANEL_HEIGHT = 90;
+const CONDITIONAL_POINT_PANEL_HEIGHT = 130;
+const LINE_HEIGHT = 15;
+const LINE_HEIGHT_WITH_POINT = LINE_HEIGHT + POINT_PANEL_HEIGHT;
+const LINE_HEIGHT_WITH_CONDITIONAL_POINT = LINE_HEIGHT + CONDITIONAL_POINT_PANEL_HEIGHT;
 
 export default function SourceList({
   height,

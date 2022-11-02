@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export default function LoadingProgressBar({ initialProgress = 0 }) {
   const [displayedProgress, setDisplayedProgress] = useState(initialProgress);

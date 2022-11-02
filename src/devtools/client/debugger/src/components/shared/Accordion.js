@@ -6,7 +6,8 @@
 import classNames from "classnames";
 import findLastIndex from "lodash/findLastIndex";
 import lastIndexOf from "lodash/lastIndexOf";
-import React, { cloneElement, Component } from "react";
+import React, { Component, cloneElement } from "react";
+
 import AccessibleImage from "./AccessibleImage";
 
 class Accordion extends Component {

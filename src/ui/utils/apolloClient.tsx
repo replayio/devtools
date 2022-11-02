@@ -1,23 +1,24 @@
-import { defer } from "protocol/utils";
-import { memoizeLast } from "devtools/client/debugger/src/utils/memoizeLast";
 import {
   ApolloClient,
-  InMemoryCache,
-  NormalizedCacheObject,
-  from,
-  HttpLink,
   ApolloError,
-  split,
+  HttpLink,
+  InMemoryCache,
+  MutationOptions,
+  NormalizedCacheObject,
   OperationVariables,
   QueryOptions,
-  MutationOptions,
+  from,
+  split,
 } from "@apollo/client";
-import { getMainDefinition } from "@apollo/client/utilities";
-import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
-import { createClient } from "graphql-ws";
-import { MockedResponse, MockLink } from "@apollo/client/testing";
 import { onError } from "@apollo/client/link/error";
 import { RetryLink } from "@apollo/client/link/retry";
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
+import { MockLink, MockedResponse } from "@apollo/client/testing";
+import { getMainDefinition } from "@apollo/client/utilities";
+import { createClient } from "graphql-ws";
+
+import { memoizeLast } from "devtools/client/debugger/src/utils/memoizeLast";
+import { defer } from "protocol/utils";
 import { isE2ETest } from "ui/utils/environment";
 
 export let clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();

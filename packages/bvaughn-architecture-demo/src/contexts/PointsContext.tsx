@@ -1,21 +1,21 @@
 import { Location, TimeStampedPoint } from "@replayio/protocol";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import {
-  createContext,
   PropsWithChildren,
   SetStateAction,
+  createContext,
   useCallback,
   useContext,
   useMemo,
   useState,
   useTransition,
 } from "react";
+
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point, PointId } from "shared/client/types";
 
 import useBreakpointIdsFromServer from "../hooks/useBreakpointIdsFromServer";
 import useLocalStorage from "../hooks/useLocalStorage";
-
 import { SessionContext } from "./SessionContext";
 
 export type PointInstance = {

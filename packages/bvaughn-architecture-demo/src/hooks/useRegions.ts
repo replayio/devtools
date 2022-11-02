@@ -1,5 +1,6 @@
 import { loadedRegions as LoadedRegions } from "@replayio/protocol";
 import { useSyncExternalStore } from "react";
+
 import { ReplayClientInterface } from "shared/client/types";
 
 export default function useRegions(client: ReplayClientInterface): LoadedRegions | null {

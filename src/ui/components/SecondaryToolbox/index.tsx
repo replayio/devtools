@@ -1,30 +1,32 @@
-import LazyOffscreen from "bvaughn-architecture-demo/components/LazyOffscreen";
-import React, { FC, ReactNode, Suspense, useContext } from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import classnames from "classnames";
-import { RecordingCapabilities } from "protocol/thread/thread";
-import { NodePicker } from "../NodePicker";
-import { selectors } from "../../reducers";
-import ReactDevtoolsPanel from "./ReactDevTools";
-import { ReduxDevToolsPanel } from "./ReduxDevTools";
-import { SecondaryPanelName, ToolboxLayout } from "ui/state/layout";
-import { Redacted } from "../Redacted";
-import ToolboxOptions from "./ToolboxOptions";
-import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
-import { trackEvent } from "ui/utils/telemetry";
 import "ui/setup/dynamic/inspector";
-import NetworkMonitor from "../NetworkMonitor";
-import WaitForReduxSlice from "../WaitForReduxSlice";
-import ReplayLogo from "../shared/ReplayLogo";
-import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
-import { ShowVideoButton } from "./ToolboxButton";
-import SourcesTabLabel from "./SourcesTabLabel";
+import classnames from "classnames";
+import React, { FC, ReactNode, Suspense, useContext } from "react";
+
+import LazyOffscreen from "bvaughn-architecture-demo/components/LazyOffscreen";
+import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
+import { RecordingCapabilities } from "protocol/thread/thread";
 import { setSelectedPanel } from "ui/actions/layout";
-import { ReduxAnnotationsContext } from "./redux-devtools/redux-annotations";
-import NewConsoleRoot from "./NewConsole";
-import Loader from "../shared/Loader";
-import { getRecordingCapabilitiesSuspense } from "./getRecordingCapabilities";
 import { useFeature } from "ui/hooks/settings";
+import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { SecondaryPanelName, ToolboxLayout } from "ui/state/layout";
+import { trackEvent } from "ui/utils/telemetry";
+
+import { selectors } from "../../reducers";
+import NetworkMonitor from "../NetworkMonitor";
+import { NodePicker } from "../NodePicker";
+import { Redacted } from "../Redacted";
+import Loader from "../shared/Loader";
+import ReplayLogo from "../shared/ReplayLogo";
+import WaitForReduxSlice from "../WaitForReduxSlice";
+import { getRecordingCapabilitiesSuspense } from "./getRecordingCapabilities";
+import NewConsoleRoot from "./NewConsole";
+import ReactDevtoolsPanel from "./ReactDevTools";
+import { ReduxAnnotationsContext } from "./redux-devtools/redux-annotations";
+import { ReduxDevToolsPanel } from "./ReduxDevTools";
+import SourcesTabLabel from "./SourcesTabLabel";
+import { ShowVideoButton } from "./ToolboxButton";
+import ToolboxOptions from "./ToolboxOptions";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 

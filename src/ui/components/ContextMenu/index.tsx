@@ -1,5 +1,6 @@
 import React, { MutableRefObject, ReactNode, useRef } from "react";
 import ReactDOM from "react-dom";
+
 import useModalDismissSignal from "ui/hooks/useModalDismissSignal";
 
 export interface ContextMenuProps {

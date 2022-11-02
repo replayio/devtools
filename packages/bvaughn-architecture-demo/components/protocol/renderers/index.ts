@@ -6,7 +6,6 @@ import {
   SocketError,
   SocketWillClose,
 } from "../ProtocolMessagesStore";
-
 import { EventHeaderRenderer, EventRenderer } from "./EventRenderer";
 import { RequestResponseHeaderRenderer, RequestResponseRenderer } from "./RequestResponseRenderer";
 import { SocketErrorHeaderRenderer, SocketErrorRenderer } from "./SocketErrorRenderer";

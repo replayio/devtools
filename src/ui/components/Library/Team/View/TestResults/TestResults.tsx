@@ -1,10 +1,12 @@
 import sortBy from "lodash/sortBy";
 import { useMemo, useState } from "react";
+
 import { SecondaryButton } from "ui/components/shared/Button";
 import { Recording } from "ui/types";
-import styles from "../../../Library.module.css";
+
 import { RecordingsError } from "../Recordings/RecordingsError";
 import TestResultRow from "./TestResultRow";
+import styles from "../../../Library.module.css";
 
 export function TestResults({ recordings }: { recordings: Recording[] }) {
   const [showMore, toggleShowMore] = useState(false);
@@ -24,7 +26,7 @@ export function TestResults({ recordings }: { recordings: Recording[] }) {
 
   return (
     <div
-      className={`flex flex-col mb-1 overflow-y-auto text-sm rounded-t-xl border-b border-chrome no-scrollbar ${styles.recordingList}`}
+      className={`no-scrollbar mb-1 flex flex-col overflow-y-auto rounded-t-xl border-b border-chrome text-sm ${styles.recordingList}`}
     >
       {shownRecordings.map((r, i) => (
         <TestResultRow key={i} recording={r} />

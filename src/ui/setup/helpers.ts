@@ -1,11 +1,11 @@
-import { UIStore } from "ui/actions";
-import { getRecordingId } from "ui/utils/recording";
-import { prefs, features, asyncStore } from "ui/utils/prefs";
 import { asyncStore as debuggerAsyncStore } from "devtools/client/debugger/src/utils/prefs";
-
 // eslint-disable-next-line no-restricted-imports
-import { triggerEvent, sendMessage, client } from "protocol/socket";
-import { getReplaySession, ReplaySession } from "./prefs";
+import { client, sendMessage, triggerEvent } from "protocol/socket";
+import { UIStore } from "ui/actions";
+import { asyncStore, features, prefs } from "ui/utils/prefs";
+import { getRecordingId } from "ui/utils/recording";
+
+import { ReplaySession, getReplaySession } from "./prefs";
 
 declare global {
   interface Window {

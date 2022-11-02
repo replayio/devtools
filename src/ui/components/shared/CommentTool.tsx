@@ -1,10 +1,11 @@
 import classNames from "classnames";
-import React, { useState, useEffect, useRef } from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import React, { useEffect, useRef, useState } from "react";
+
 import { getAreMouseTargetsLoading, getCanvas } from "ui/actions/app";
 import { createFrameComment } from "ui/actions/comments";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { useGetRecordingId } from "ui/hooks/recordings";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Canvas } from "ui/state/app";
 import { Comment, Reply } from "ui/state/comments";
 import useAuth0 from "ui/utils/useAuth0";
@@ -124,7 +125,7 @@ export default function CommentTool({ comments }: { comments: (Comment | Reply)[
     <div style={parentStyle} className="absolute">
       <div
         className={classNames(
-          "absolute flex w-max items-center space-x-1.5 rounded-md bg-tooltipBgcolor text-tooltipColor bg-opacity-70 px-2.5 py-1 text-xs ",
+          "absolute flex w-max items-center space-x-1.5 rounded-md bg-tooltipBgcolor bg-opacity-70 px-2.5 py-1 text-xs text-tooltipColor ",
           !captionNode.current ? "invisible" : ""
         )}
         style={childStyle}

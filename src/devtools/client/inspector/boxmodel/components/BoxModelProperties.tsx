@@ -5,9 +5,9 @@
 "use strict";
 
 import React, { useState } from "react";
-import { ComputedProperty } from "./ComputedProperty";
 
 import type { Layout } from "../reducers/box-model";
+import { ComputedProperty } from "./ComputedProperty";
 
 interface BMProps {
   layout: Layout;

@@ -2,19 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import classNames from "classnames";
 //
 import React, { Component } from "react";
-import classNames from "classnames";
 
-import { getLibraryFromUrl } from "../../../utils/pause/frames";
 import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
 
-import FrameMenu from "./FrameMenu";
+import { getLibraryFromUrl } from "../../../utils/pause/frames";
 import AccessibleImage from "../../shared/AccessibleImage";
-import FrameComponent from "./Frame";
-
 import Badge from "../../shared/Badge";
+import FrameComponent from "./Frame";
 import FrameIndent from "./FrameIndent";
+import FrameMenu from "./FrameMenu";
 import type { CommonFrameComponentProps } from "./index";
 
 function FrameLocation({ frame, expanded }: { frame: PauseFrame; expanded: boolean }) {

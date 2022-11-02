@@ -5,6 +5,7 @@
 //
 
 import CodeMirror from "codemirror";
+
 import { getExpressionFromCoords } from "./get-expression";
 
 describe("get-expression", () => {

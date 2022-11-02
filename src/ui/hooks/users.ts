@@ -1,20 +1,22 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { mutate, query } from "ui/utils/apolloClient";
-import { GET_USER_INFO, GET_USER_ID, DISMISS_NAG } from "ui/graphql/users";
-import { getRecordingId } from "ui/utils/recording";
-import { sendTelemetryEvent } from "ui/utils/telemetry";
-import { useGetRecording } from "./recordings";
-import { Recording, Workspace } from "ui/types";
-import { useGetNonPendingWorkspaces } from "./workspaces";
+
+import { AcceptTOS, AcceptTOSVariables } from "graphql/AcceptTOS";
 import { DismissNag, DismissNagVariables } from "graphql/DismissNag";
+import { GetUser } from "graphql/GetUser";
+import { GetUserId } from "graphql/GetUserId";
 import { subscribeToEmailType, subscribeToEmailTypeVariables } from "graphql/subscribeToEmailType";
 import {
   unsubscribeToEmailType,
   unsubscribeToEmailTypeVariables,
 } from "graphql/unsubscribeToEmailType";
-import { AcceptTOS, AcceptTOSVariables } from "graphql/AcceptTOS";
-import { GetUserId } from "graphql/GetUserId";
-import { GetUser } from "graphql/GetUser";
+import { DISMISS_NAG, GET_USER_ID, GET_USER_INFO } from "ui/graphql/users";
+import { Recording, Workspace } from "ui/types";
+import { mutate, query } from "ui/utils/apolloClient";
+import { getRecordingId } from "ui/utils/recording";
+import { sendTelemetryEvent } from "ui/utils/telemetry";
+
+import { useGetRecording } from "./recordings";
+import { useGetNonPendingWorkspaces } from "./workspaces";
 
 export async function getUserId() {
   const result = await query<GetUserId>({ query: GET_USER_ID });

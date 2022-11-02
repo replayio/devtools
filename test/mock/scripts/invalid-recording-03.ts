@@ -1,14 +1,16 @@
 // Test that a failing GraphQL request during initialization shows an appropriate error.
 
-import { runTest, devtoolsURL } from "../src/runTest";
-import { installMockEnvironmentInPage } from "../src/mockEnvironment";
-import { v4 as uuid } from "uuid";
-import { createGetUserMock, createUserSettingsMock } from "../src/graphql";
-import { basicMessageHandlers, basicBindings } from "../src/handlers";
 import { Page } from "@recordreplay/playwright";
-import { GET_RECORDING } from "ui/graphql/recordings";
 import { GraphQLError } from "graphql";
+import { v4 as uuid } from "uuid";
+
+import { GET_RECORDING } from "ui/graphql/recordings";
+
+import { createGetUserMock, createUserSettingsMock } from "../src/graphql";
 import { cloneResponse } from "../src/graphql/utils";
+import { basicBindings, basicMessageHandlers } from "../src/handlers";
+import { installMockEnvironmentInPage } from "../src/mockEnvironment";
+import { devtoolsURL, runTest } from "../src/runTest";
 
 const errorMessage = "Error from GraphQL";
 const recordingId = uuid();

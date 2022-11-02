@@ -1,7 +1,8 @@
 // import { Root, UPDATE_STATE } from "@redux-devtools/app";
 import type { Root } from "@redux-devtools/app";
-import React, { useLayoutEffect, useRef, useState, useContext } from "react";
+import React, { useContext, useLayoutEffect, useRef, useState } from "react";
 import { batch } from "react-redux";
+
 import { useAppSelector } from "ui/setup/hooks";
 import type { UIState } from "ui/state";
 

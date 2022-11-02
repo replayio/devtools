@@ -1,5 +1,4 @@
 import { PrefsHelper } from "devtools/client/shared/prefs";
-
 import Services from "devtools/shared/services";
 
 const { pref } = Services;

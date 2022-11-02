@@ -1,17 +1,22 @@
-import Icon from "@bvaughn/components/Icon";
-import { AddPoint, DeletePoints, EditPoint } from "@bvaughn/src/contexts/PointsContext";
 import { newSource as ProtocolSource } from "@replayio/protocol";
-import { memo, Suspense, useState } from "react";
+import { Suspense, memo, useState } from "react";
 import { areEqual } from "react-window";
+
+import Icon from "bvaughn-architecture-demo/components/Icon";
+import {
+  AddPoint,
+  DeletePoints,
+  EditPoint,
+} from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import { LineNumberToHitCountMap } from "shared/client/types";
 import { Point } from "shared/client/types";
 
 import CurrentLineHighlight from "./CurrentLineHighlight";
 import HoverButton from "./HoverButton";
 import PointPanel from "./PointPanel";
-import styles from "./SourceListRow.module.css";
 import { formatHitCount } from "./utils/formatHitCount";
 import { findPointForLocation } from "./utils/points";
+import styles from "./SourceListRow.module.css";
 
 export type ItemData = {
   addPoint: AddPoint;

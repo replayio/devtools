@@ -1,17 +1,18 @@
 import {
-  ProtocolClient,
-  EventMethods,
-  EventParams,
+  AnalysisEntry,
   CommandMethods,
-  SessionId,
-  PauseId,
   CommandParams,
   CommandResult,
+  EventMethods,
+  EventParams,
+  PauseId,
+  PointDescription,
+  ProtocolClient,
+  SessionId,
   analysisPoints,
   analysisResult,
-  AnalysisEntry,
-  PointDescription,
 } from "@replayio/protocol";
+
 import { commandError } from "shared/utils/error";
 
 import { makeInfallible } from "./utils";

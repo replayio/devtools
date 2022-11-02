@@ -1,15 +1,13 @@
-import React, { useRef, useState, useLayoutEffect, useCallback } from "react";
-import classnames from "classnames";
 import { NodeBounds } from "@replayio/protocol";
+import classnames from "classnames";
+import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 
-import { useAppDispatch } from "ui/setup/hooks";
-import { ThreadFront } from "protocol/thread";
 import {
   highlightNode,
-  unhighlightNode,
   selectNode,
+  unhighlightNode,
 } from "devtools/client/inspector/markup/actions/markup";
-import { NodePicker as NodePickerClass } from "ui/utils/nodePicker";
+import { ThreadFront } from "protocol/thread";
 import {
   fetchMouseTargetsForPause,
   loadMouseTargets,
@@ -17,7 +15,9 @@ import {
   setMouseTargetsLoading,
 } from "ui/actions/app";
 import { setSelectedPanel } from "ui/actions/layout";
+import { useAppDispatch } from "ui/setup/hooks";
 import { getMouseTarget } from "ui/suspense/nodeCaches";
+import { NodePicker as NodePickerClass } from "ui/utils/nodePicker";
 
 interface Position {
   x: number;

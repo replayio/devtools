@@ -181,6 +181,8 @@
     "graphql": "15.8.0",
     "graphqurl": "^1.0.1",
     "identity-obj-proxy": "^3.0.0",
+    "import-sort": "^6.0.0",
+    "import-sort-style-replay": "workspace:*",
     "isomorphic-fetch": "^3.0.0",
     "istanbul-lib-coverage": "^3.2.0",
     "istanbul-lib-report": "^3.0.0",
@@ -193,6 +195,7 @@
     "postcss": "^8.4.12",
     "postcss-loader": "^6.2.1",
     "prettier": "^2.6.2",
+    "prettier-plugin-import-sort": "^0.0.7",
     "prettier-plugin-tailwindcss": "^0.1.7",
     "raw-loader": "^4.0.2",
     "sharp": "^0.30.3",
@@ -226,6 +229,10 @@
     "packages/*"
   ],
   "resolutions": {
+    "@babel/core": "7.18.5",
+    "@babel/parser": "7.18.5",
+    "@babel/traverse": "7.18.5",
+    "@babel/types": "7.18.4",
     "graphql": "15.8.0",
     "@auth0/auth0-react": "1.2.0",
     "react": "0.0.0-experimental-e7d0053e6-20220325",
@@ -233,5 +240,11 @@
     "react-is": "18.2.0",
     "ts-invariant": "0.10.3",
     "typescript": "4.6.3"
+  },
+  "importSort": {
+    ".js, .jsx, .ts, .tsx": {
+      "parser": "typescript",
+      "style": "replay"
+    }
   }
 }

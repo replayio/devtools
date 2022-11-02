@@ -1,9 +1,11 @@
 import React, { ReactNode, useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { removeUrlParameters } from "ui/utils/environment";
+import { ConnectedProps, connect } from "react-redux";
+
 import { actions } from "ui/actions";
 import { Nag, useDismissNag } from "ui/hooks/users";
+import { removeUrlParameters } from "ui/utils/environment";
 import { trackEvent } from "ui/utils/telemetry";
+
 import { PrimaryLgButton, SecondaryLgButton } from "../Button";
 import { DownloadingPage } from "../Onboarding/DownloadingPage";
 import { DownloadPage } from "../Onboarding/DownloadPage";

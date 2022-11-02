@@ -1,13 +1,3 @@
-import Icon from "@bvaughn/components/Icon";
-import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
-import { GraphQLClientContext } from "@bvaughn/src/contexts/GraphQLClientContext";
-import { InspectorContext } from "@bvaughn/src/contexts/InspectorContext";
-import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
-import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
-import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
-import { addComment as addCommentGraphQL } from "@bvaughn/src/graphql/Comments";
-import { getHitPointsForLocationSuspense } from "@bvaughn/src/suspense/PointsCache";
-import { validate } from "@bvaughn/src/utils/points";
 import {
   Suspense,
   unstable_useCacheRefresh as useCacheRefresh,
@@ -16,17 +6,27 @@ import {
   useState,
   useTransition,
 } from "react";
+
+import Icon from "bvaughn-architecture-demo/components/Icon";
+import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
+import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
+import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
+import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
+import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
+import { addComment as addCommentGraphQL } from "bvaughn-architecture-demo/src/graphql/Comments";
+import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
+import { validate } from "bvaughn-architecture-demo/src/utils/points";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 
 import Loader from "../Loader";
-
 import AutoComplete from "./AutoComplete/AutoComplete";
 import BadgePicker from "./BadgePicker";
 import CommentButton from "./CommentButton";
-import styles from "./PointPanel.module.css";
 import PointPanelTimeline from "./PointPanelTimeline";
 import SyntaxHighlightedLine from "./SyntaxHighlightedLine";
+import styles from "./PointPanel.module.css";
 
 export default function SourcePanelWrapper({
   className,

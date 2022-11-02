@@ -1,6 +1,8 @@
 import React from "react";
+
 import { Workspace } from "ui/types";
-import { subscriptionEndsIn, inUnpaidFreeTrial } from "ui/utils/workspace";
+import { inUnpaidFreeTrial, subscriptionEndsIn } from "ui/utils/workspace";
+
 import { TrialEnd } from "../shared/TrialEnd";
 
 export function UploadRecordingTrialEnd({

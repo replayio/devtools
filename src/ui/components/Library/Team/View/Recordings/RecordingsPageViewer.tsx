@@ -1,8 +1,10 @@
-import ViewerHeader from "./Header/RecordingsPageViewerHeader";
 import React, { useState } from "react";
+
 import { Recording } from "ui/types";
-import styles from "../../../Library.module.css";
+
+import ViewerHeader from "./Header/RecordingsPageViewerHeader";
 import { Recordings } from "./Recordings";
+import styles from "../../../Library.module.css";
 
 export function RecordingsPageViewer({
   recordings,
@@ -21,7 +23,7 @@ export function RecordingsPageViewer({
   return (
     <div className={`flex flex-grow flex-col overflow-hidden p-4 ${styles.libraryWrapper}`}>
       <div className="flex h-full space-x-2 overflow-y-auto">
-        <div className="flex flex-col flex-grow w-full space-y-5">
+        <div className="flex w-full flex-grow flex-col space-y-5">
           <ViewerHeader
             recordings={recordings}
             selectedIds={selectedIds}
@@ -31,7 +33,7 @@ export function RecordingsPageViewer({
             isEditing={isEditing}
             setIsEditing={setIsEditing}
           />
-          <div id="recording-list" className="flex-grow overflow-y-auto no-scrollbar">
+          <div id="recording-list" className="no-scrollbar flex-grow overflow-y-auto">
             <Recordings
               isEditing={isEditing}
               recordings={recordings}

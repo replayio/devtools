@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import React, { HTMLProps } from "react";
+
 import MaterialIcon from "./MaterialIcon";
 
 export default function Modal({
@@ -49,7 +50,7 @@ export default function Modal({
 export function ModalContent({ children }: { children: React.ReactChild | React.ReactChild[] }) {
   return (
     <div
-      className="relative justify-between text-lg bg-white rounded-lg shadow-xl p-9"
+      className="relative justify-between rounded-lg bg-white p-9 text-lg shadow-xl"
       style={{ width: "520px" }}
     >
       {children}

@@ -1,8 +1,10 @@
 import { RecordingId } from "@replayio/protocol";
 import React from "react";
+
 import hooks from "ui/hooks";
-import EmailForm from "./EmailForm";
+
 import CollaboratorsList from "./CollaboratorsList";
+import EmailForm from "./EmailForm";
 
 type CollaboratorsProps = {
   recordingId: RecordingId;

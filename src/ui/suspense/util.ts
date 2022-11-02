@@ -1,6 +1,8 @@
 import { PauseId, TimeStampedPointRange } from "@replayio/protocol";
+
 import { ThreadFront } from "protocol/thread";
 import { isPointInRegions } from "ui/utils/timeline";
+
 import { getFramesSuspense } from "./frameCache";
 import { getFrameStepsSuspense } from "./frameStepsCache";
 

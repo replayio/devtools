@@ -3,25 +3,25 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { AnyAction, createAction } from "@reduxjs/toolkit";
+import { createSelector } from "reselect";
+
+import {
+  MiniSource,
+  SourceDetails,
+  getSelectedLocation,
+  getSourceDetails,
+  getSourceDetailsEntities,
+  getSourceIdToDisplayForUrl,
+  locationSelected,
+} from "ui/reducers/sources";
 import type { UIState } from "ui/state";
+
+import { isSimilarTab } from "../utils/tabs";
 
 /**
  * Tabs reducer
  * @module reducers/tabs
  */
-
-import { createSelector } from "reselect";
-
-import { isSimilarTab } from "../utils/tabs";
-import {
-  getSourceDetails,
-  getSourceDetailsEntities,
-  getSelectedLocation,
-  SourceDetails,
-  MiniSource,
-  locationSelected,
-  getSourceIdToDisplayForUrl,
-} from "ui/reducers/sources";
 
 export interface Tab {
   sourceId: string | null;

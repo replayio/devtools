@@ -1,6 +1,7 @@
-import SourceEditor from "devtools/client/debugger/src/utils/editor/source-editor";
 import memoize from "lodash/memoize";
 import React from "react";
+
+import SourceEditor from "devtools/client/debugger/src/utils/editor/source-editor";
 import { Point } from "shared/client/types";
 import { RedactedSpan } from "ui/components/Redacted";
 import { getSelectedSource, getSourceContent } from "ui/reducers/sources";

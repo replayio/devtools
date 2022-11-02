@@ -5,14 +5,15 @@
 //
 
 import type { AnyAction } from "@reduxjs/toolkit";
+
 import type { UIState } from "ui/state";
+
+import { prefs } from "../utils/prefs";
 
 /**
  * File Search reducer
  * @module reducers/fileSearch
  */
-
-import { prefs } from "../utils/prefs";
 
 export type Modifiers = {
   caseSensitive: boolean;

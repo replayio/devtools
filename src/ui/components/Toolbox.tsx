@@ -1,4 +1,5 @@
 import React from "react";
+
 import DebuggerApp from "devtools/client/debugger/src/components/App";
 
 export default function Toolbox() {

@@ -1,16 +1,16 @@
 // This file is not really part of the architectural demo.
 // It's just a bootstrap for things like auth that I didn't want to spend time actually implementing.
 
-import { preCacheExecutionPointForTime } from "@bvaughn/src/suspense/PointsCache";
 import { loadedRegions as LoadedRegions } from "@replayio/protocol";
 import { ReactNode, useContext, useEffect, useRef, useState } from "react";
+
+import { preCacheExecutionPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { SessionContext, SessionContextType } from "../src/contexts/SessionContext";
 import { UserInfo } from "../src/graphql/types";
 import { getCurrentUserInfo } from "../src/graphql/User";
 import { preCacheSources } from "../src/suspense/SourcesCache";
-
 import Loader from "./Loader";
 import styles from "./Initializer.module.css";
 

@@ -2,6 +2,7 @@ import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import clamp from "lodash/clamp";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import sortedLastIndexBy from "lodash/sortedLastIndexBy";
+
 import { assert } from "protocol/utils";
 import { FocusRegion, ZoomRegion } from "ui/state/timeline";
 

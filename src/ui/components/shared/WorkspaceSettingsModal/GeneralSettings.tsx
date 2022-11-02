@@ -1,6 +1,8 @@
 import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
+
 import hooks from "ui/hooks";
+
 import useDebounceState from "./useDebounceState";
 
 const Label = ({ className, children }: { className?: string; children: React.ReactNode }) => {
@@ -95,7 +97,7 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
           </Input>
         ) : (
           <div className="w-8/12">
-            <div className="text-sm py-2">{name}</div>
+            <div className="py-2 text-sm">{name}</div>
           </div>
         )}
       </Row>

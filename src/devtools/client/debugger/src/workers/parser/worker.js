@@ -4,12 +4,12 @@
 
 //
 
-import { getSymbols, clearSymbols } from "./getSymbols";
-import { clearASTs } from "./utils/ast";
-import { setSource, clearSources } from "./sources";
-import { hasSyntaxError } from "./validate";
-
 import { workerHandler } from "devtools/shared/worker-utils";
+
+import { clearSymbols, getSymbols } from "./getSymbols";
+import { clearSources, setSource } from "./sources";
+import { clearASTs } from "./utils/ast";
+import { hasSyntaxError } from "./validate";
 
 function clearState() {
   clearASTs();

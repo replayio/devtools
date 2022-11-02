@@ -1,11 +1,11 @@
 import {
-  NamedValue as ProtocolNamedValue,
   PauseId,
+  NamedValue as ProtocolNamedValue,
   Value as ProtocolValue,
 } from "@replayio/protocol";
 
-import styles from "./Inspector.module.css";
 import KeyValueRenderer from "./KeyValueRenderer";
+import styles from "./Inspector.module.css";
 
 export default function Inspector({
   className,

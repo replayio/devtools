@@ -1,16 +1,17 @@
 import classnames from "classnames";
+import { RefObject, useEffect, useMemo, useRef, useState } from "react";
+
 import { closeTab } from "devtools/client/debugger/src/actions/tabs";
 import { getActiveSearch, getThreadContext } from "devtools/client/debugger/src/selectors";
 import { getDocument } from "devtools/client/debugger/src/utils/editor";
 import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
-import { RefObject, useEffect, useMemo, useRef, useState } from "react";
+import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import { ContextMenu, closeContextMenu } from "ui/actions/contextMenus";
 import GutterContextMenu from "ui/components/ContextMenu/GutterContextMenu";
 import { KeyModifiersContext } from "ui/components/KeyModifiers";
-import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import { EditorNag, NAG_HEIGHT } from "ui/components/shared/Nags/Nags";
 import { getContextMenu } from "ui/reducers/contextMenus";
-import { getSelectedSource, SourceDetails } from "ui/reducers/sources";
+import { SourceDetails, getSelectedSource } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import ColumnBreakpoints from "./ColumnBreakpoints";

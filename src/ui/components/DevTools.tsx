@@ -1,49 +1,48 @@
-import { ThreadFront } from "protocol/thread";
-import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { useAppSelector } from "ui/setup/hooks";
-import { clearTrialExpired, createSocket } from "ui/actions/session";
-import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
-import { UIState } from "ui/state";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ConnectedProps, connect } from "react-redux";
 
-import { selectors } from "../reducers";
-
-import Header from "./Header/index";
-import LoadingScreen from "./shared/LoadingScreen";
-import ReplayLogo from "./shared/ReplayLogo";
+import { PointsContextRoot } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { SelectedFrameContextRoot } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
+import usePreferredFontSize from "bvaughn-architecture-demo/src/hooks/usePreferredFontSize";
+import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
+import { getPaneCollapse } from "devtools/client/debugger/src/selectors";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-
+import { ThreadFront } from "protocol/thread";
+import { clearTrialExpired, createSocket } from "ui/actions/session";
+import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
+import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
+import { useFeature } from "ui/hooks/settings";
+import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
+import { useUserIsAuthor } from "ui/hooks/users";
+import { getViewMode } from "ui/reducers/layout";
+import { useAppSelector } from "ui/setup/hooks";
+import { UIState } from "ui/state";
+import { isTest } from "ui/utils/environment";
 import {
   endUploadWaitTracking,
   maybeSetGuestMixpanelContext,
   trackEventOnce,
 } from "ui/utils/mixpanel";
-import KeyboardShortcuts from "./KeyboardShortcuts";
-import { useUserIsAuthor } from "ui/hooks/users";
-import { CommandPaletteModal } from "./CommandPalette/CommandPaletteModal";
-import { ReduxAnnotationsProvider } from "./SecondaryToolbox/redux-devtools/ReduxAnnotationsProvider";
-import useAuth0 from "ui/utils/useAuth0";
-import { KeyModifiers } from "./KeyModifiers";
-import Toolbar from "./Toolbar";
-import Timeline from "./Timeline";
-import SidePanel from "./SidePanel";
-import Video from "./Video";
 import { prefs } from "ui/utils/prefs";
-import { getPaneCollapse } from "devtools/client/debugger/src/selectors";
-import { getViewMode } from "ui/reducers/layout";
-import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
-import SourcesContextAdapter from "./SourcesContextAdapter";
-import FocusContextReduxAdapter from "./FocusContextReduxAdapter";
-import SessionContextAdapter from "./SessionContextAdapter";
 import tokenManager, { TokenState } from "ui/utils/tokenManager";
-import { isTest } from "ui/utils/environment";
-import { PointsContextRoot } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import useAuth0 from "ui/utils/useAuth0";
+
+import { selectors } from "../reducers";
+import { CommandPaletteModal } from "./CommandPalette/CommandPaletteModal";
+import FocusContextReduxAdapter from "./FocusContextReduxAdapter";
+import Header from "./Header/index";
+import KeyboardShortcuts from "./KeyboardShortcuts";
+import { KeyModifiers } from "./KeyModifiers";
+import { ReduxAnnotationsProvider } from "./SecondaryToolbox/redux-devtools/ReduxAnnotationsProvider";
 import TimelineContextAdapter from "./SecondaryToolbox/TimelineContextAdapter";
-import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
-import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
-import usePreferredFontSize from "@bvaughn/src/hooks/usePreferredFontSize";
-import { useFeature } from "ui/hooks/settings";
-import { SelectedFrameContextRoot } from "@bvaughn/src/contexts/SelectedFrameContext";
+import SessionContextAdapter from "./SessionContextAdapter";
+import LoadingScreen from "./shared/LoadingScreen";
+import ReplayLogo from "./shared/ReplayLogo";
+import SidePanel from "./SidePanel";
+import SourcesContextAdapter from "./SourcesContextAdapter";
+import Timeline from "./Timeline";
+import Toolbar from "./Toolbar";
+import Video from "./Video";
 
 const Viewer = React.lazy(() => import("./Viewer"));
 

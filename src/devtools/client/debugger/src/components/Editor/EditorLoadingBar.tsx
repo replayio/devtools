@@ -1,5 +1,6 @@
 import React from "react";
 import { createPortal } from "react-dom";
+
 import LoadingProgressBar from "ui/components/shared/LoadingProgressBar";
 
 export default function EditorLoadingBar() {

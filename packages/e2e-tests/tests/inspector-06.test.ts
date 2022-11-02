@@ -1,6 +1,6 @@
 import test from "@playwright/test";
 
-import { startTest, openDevToolsTab } from "../helpers";
+import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import {
   activateInspectorTool,

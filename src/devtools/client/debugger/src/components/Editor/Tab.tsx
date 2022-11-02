@@ -4,18 +4,19 @@
 
 //
 
+import classnames from "classnames";
 import React, { PureComponent } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import { ConnectedProps, connect } from "react-redux";
 
-import { showMenu, buildMenu } from "devtools/shared/contextmenu";
-
-import SourceIcon from "../shared/SourceIcon";
-import { CloseButton } from "../shared/Button";
-import { copyToTheClipboard } from "../../utils/clipboard";
-
-import { UIState } from "ui/state";
+import { buildMenu, showMenu } from "devtools/shared/contextmenu";
 import { actions } from "ui/actions";
+import { Redacted } from "ui/components/Redacted";
+import { SourceDetails, getHasSiblingOfSameName, getSelectedSource } from "ui/reducers/sources";
+import { UIState } from "ui/state";
+import { trackEvent } from "ui/utils/telemetry";
 
+import { getActiveSearch, getContext, getSourcesForTabs } from "../../selectors";
+import { copyToTheClipboard } from "../../utils/clipboard";
 import {
   getFileURL,
   getRawSourceURL,
@@ -24,14 +25,8 @@ import {
   isPretty,
 } from "../../utils/source";
 import { getTabMenuItems } from "../../utils/tabs";
-
-import { getActiveSearch, getSourcesForTabs, getContext } from "../../selectors";
-
-import { getSelectedSource, getHasSiblingOfSameName, SourceDetails } from "ui/reducers/sources";
-
-import classnames from "classnames";
-import { trackEvent } from "ui/utils/telemetry";
-import { Redacted } from "ui/components/Redacted";
+import { CloseButton } from "../shared/Button";
+import SourceIcon from "../shared/SourceIcon";
 
 interface TabProps {
   source: SourceDetails;

@@ -1,11 +1,12 @@
+import { useEffect } from "react";
+
+import { setModal } from "ui/actions/app";
 import hooks from "ui/hooks";
+import { UserInfo } from "ui/hooks/users";
 import { useAppDispatch } from "ui/setup/hooks";
 import { Workspace } from "ui/types";
-import { UserInfo } from "ui/hooks/users";
 import { downloadReplay, firstReplay, singleInvitation } from "ui/utils/onboarding";
 import { trackEvent } from "ui/utils/telemetry";
-import { setModal } from "ui/actions/app";
-import { useEffect } from "react";
 
 function useGetNagPreRequisites() {
   const { loading: userInfoLoading, ...userInfo } = hooks.useGetUserInfo();

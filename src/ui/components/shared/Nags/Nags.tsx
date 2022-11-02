@@ -1,10 +1,12 @@
 import classNames from "classnames";
 import React, { useContext } from "react";
+
+import { LoggablesContext } from "bvaughn-architecture-demo/components/console/LoggablesContext";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { shouldShowNag } from "ui/utils/user";
+
 import MaterialIcon from "../MaterialIcon";
-import { LoggablesContext } from "@bvaughn/components/console/LoggablesContext";
 
 // This is very arbitrary but we need it to keep the editor
 // from running into overflow problems.

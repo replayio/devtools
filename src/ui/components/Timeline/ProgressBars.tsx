@@ -1,12 +1,13 @@
 import clamp from "lodash/clamp";
 import React from "react";
-import { useAppSelector } from "ui/setup/hooks";
+
 import {
   getCurrentTime,
   getHoverTime,
   getPlaybackPrecachedTime,
   getZoomRegion,
 } from "ui/reducers/timeline";
+import { useAppSelector } from "ui/setup/hooks";
 import { getVisiblePosition } from "ui/utils/timeline";
 
 export default function ProgressBars() {

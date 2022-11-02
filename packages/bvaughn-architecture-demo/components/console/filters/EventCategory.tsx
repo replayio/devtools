@@ -1,10 +1,11 @@
-import Expandable from "@bvaughn/components/Expandable";
-import type { EventCategory as EventCategoryType } from "@bvaughn/src/suspense/EventsCache";
-import { Badge } from "design";
 import { useMemo } from "react";
 
-import styles from "./EventCategory.module.css";
+import Expandable from "bvaughn-architecture-demo/components/Expandable";
+import type { EventCategory as EventCategoryType } from "bvaughn-architecture-demo/src/suspense/EventsCache";
+import { Badge } from "design";
+
 import EventType from "./EventType";
+import styles from "./EventCategory.module.css";
 
 export default function EventCategory({
   disabled,
