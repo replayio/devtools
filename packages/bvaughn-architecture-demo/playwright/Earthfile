@@ -3,10 +3,11 @@ VERSION 0.6
 install:
     FROM  mcr.microsoft.com/playwright:v1.25.1-focal
     RUN yarn set version 3.2.1
-    COPY . /playwright
     WORKDIR /playwright
+    COPY package.json yarn.lock .yarn .
     RUN yarn install
     RUN yarn playwright:install
+    COPY . .
     RUN node bust_earthly_cache.js
     EXPOSE 3000
 
