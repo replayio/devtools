@@ -6,15 +6,23 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useSourceSearch, { Actions, SetScope, State } from "./hooks/useSourceSearch";
 
-export const SourceSearchContext = createContext<[State, Actions]>(null as any);
+export type SearchModifiers = {
+  caseSensitive: boolean;
+  regex: boolean;
+  wholeWord: boolean;
+};
+
+export type SearchContextType = [State, Actions];
+
+export const SourceSearchContext = createContext<SearchContextType>(null as any);
 
 export function SourceSearchContextRoot({ children }: { children: ReactNode }) {
   const client = useContext(ReplayClientContext);
   const { focusedSourceId } = useContext(SourcesContext);
 
-  const [state, actions] = useSourceSearch();
+  const [state, dispatch] = useSourceSearch();
 
-  const context = useMemo<[State, Actions]>(() => [state, actions], [state, actions]);
+  const context = useMemo<SearchContextType>(() => [state, dispatch], [dispatch, state]);
 
   // Keep source search state in sync with the focused source.
   useEffect(() => {
@@ -27,8 +35,8 @@ export function SourceSearchContextRoot({ children }: { children: ReactNode }) {
       }
     }
 
-    updateSourceContents(focusedSourceId, actions.setScope);
-  }, [client, actions, focusedSourceId]);
+    updateSourceContents(focusedSourceId, dispatch.setScope);
+  }, [client, dispatch.setScope, focusedSourceId]);
 
   return <SourceSearchContext.Provider value={context}>{children}</SourceSearchContext.Provider>;
 }

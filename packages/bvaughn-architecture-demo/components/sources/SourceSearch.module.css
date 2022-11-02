@@ -1,18 +1,29 @@
 .Container {
-  display: flex;
   width: 100%;
-  align-items: center;
-  padding: 0.5em;
-  background-color: var(--background-color-contrast-2);
-  border-top: 1px solid var(--color-contrast);
+  height: 2.5em;
+  border: 2px solid transparent;
+  border-top-color: var(--color-contrast);
+  display: flex;
+}
+.Container:focus-within {
+  border-color: var(--color-brand);
 }
 
-.Icon {
+.InputAndResults {
+  flex: 1 1 auto;
+  padding: 0 0.5em;
+  display: flex;
+  align-items: center;
+  background-color: var(--background-color-contrast-2);
+}
+
+.SearchIcon {
   width: 2em;
   height: 2em;
   padding: 0.25em;
   flex: 0 0 2em;
   display: inline-block;
+  color: var(--color-dim);
 }
 
 .Input {
@@ -20,17 +31,18 @@
   height: 2em;
   padding: 0 0.5ch;
   background: none;
-  border: 2px solid transparent;
+  border: none;
   outline: none;
-  background-color: var(--background-color-default);
+  background-color: var(--background-color-contrast-2);
   color: var(--color-default);
 
   font-family: var(--font-family-monospace);
   font-size: var(--font-size-regular);
 }
 .Input:focus {
-  background-color: var(--background-color-contrast-1);
-  border-color: var(--color-brand);
+  outline: none;
+  border: none;
+  box-shadow: none;
 }
 
 .Results {
@@ -42,20 +54,52 @@
   margin-left: 0.5ch;
   padding: 0 0.5ch;
   font-size: var(--font-size-small);
+  color: var(--color-dim);
 }
 
 .ResultsIconButton {
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-regular);
   display: flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: none;
-  color: var(--color-default);
+  color: var(--color-dim);
   padding: 0;
-  width: 1em;
-  height: 1em;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 0.25em;
+}
+.ResultsIconButton:hover:not(.ResultsIconButton:disabled):not(.ResultsIconButtonActive) {
+  color: var(--color-default);
+}
+.ResultsIconButton:disabled {
+  color: var(--color-dimmer);
+}
+.ResultsIconButtonActive {
+  color: var(--background-color-primary-button);
 }
 
 .ResultsIcon {
-  width: 1em;
-  height: 1em;
+  width: 1.5em;
+  height: 1.5em;
   display: inline-block;
+  color: currentColor;
+}
+
+.Modifiers {
+  flex: 0 0 auto;
+  padding: 0 1ch;
+  gap: 1ch;
+  display: flex;
+  align-items: center;
+  background-color: var(--background-color-contrast-2);
+  border-left: 1px solid var(--background-color-default);
+  color: var(--color-dim);
+  user-select: none;
+}
+
+.WholeWordText {
+  text-decoration: underline;
 }
