@@ -30,12 +30,10 @@ export default function TestInfo({
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 overflow-hidden">
           {/* {result ? <Status result={result} /> : null} */}
-          <div className="overflow-hidden">
-            <div className="overflow-hidden font-bold whitespace-pre overflow-ellipsis">{spec}</div>
+          <div className="overflow-hidden">            
             <TestResultsSummary testCases={testCases} />
           </div>
         </div>
-        {recordingDuration ? <div>{getFormattedTime(recordingDuration)}</div> : null}
       </div>
       <div className="flex flex-col">
         {testCases.map((t, i) => (
@@ -51,15 +49,15 @@ function TestResultsSummary({ testCases }: { testCases: TestItem[] }) {
   const passed = testCases.filter(c => c.result === "passed").length;
 
   return (
-    <div className="flex gap-1">
+    <div className="flex gap-1 px-1 py-1">
       <div className="flex items-center gap-1">
-        <MaterialIcon iconSize="2xl" outlined className="text-green-500">
+        <MaterialIcon iconSize="lg" outlined className="text-green-500">
           done
         </MaterialIcon>
         <div>{passed}</div>
       </div>
       <div className="flex items-center gap-1">
-        <MaterialIcon iconSize="2xl" outlined className="text-red-500">
+        <MaterialIcon iconSize="lg" outlined className="text-red-500">
           close
         </MaterialIcon>
         <div>{failed}</div>
@@ -88,7 +86,7 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-row items-center justify-between gap-1 py-1 transition group hover:bg-chrome">
+      <div className="flex flex-row items-center justify-between gap-1 p-1 transition group hover:cursor-pointer hover:bg-[#FAFAFA] rounded-lg">
         <button
           onClick={toggleExpand}
           disabled={!expandable}
@@ -120,11 +118,11 @@ function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
   const { steps, error } = test;
 
   return (
-    <div className="flex flex-col py-2 pl-4">
+    <div className="flex flex-col py-2 pl-10 rounded-lg">
       {steps?.map((s, i) => (
         <div
           key={i}
-          className="flex items-center justify-between px-2 py-1 overflow-hidden border-b border-gray-300 bg-chrome"
+          className="flex items-center justify-between px-3 py-2 overflow-hidden border-b border-gray-100 bg-[#FAFAFA]"
         >
           <div className="flex items-center space-x-2 overflow-hidden font-mono whitespace-pre">
             <div className="overflow-hidden overflow-ellipsis">{s.name}</div>
@@ -150,9 +148,9 @@ function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
 function Status({ result }: { result: TestResult }) {
   return (
     <MaterialIcon
-      iconSize="2xl"
+      iconSize="sm"
       outlined
-      className={result === "passed" ? "text-green-500" : "text-red-500"}
+      className={result === "passed" ? "text-[#219653]" : "text-[#EB5757]"}
     >
       {result === "passed" ? "done" : "close"}
     </MaterialIcon>
