@@ -141,19 +141,6 @@ function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
   );
 }
 
-function StatusOld({ result }: { result: TestResult }) {
-  return (
-    <MaterialIcon
-      iconSize="sm"
-      outlined
-      className={result === "passed" ? "text-[#219653]" : "text-[#EB5757]"}
-    >
-      {result === "passed" ? "done" : "close"}
-    </MaterialIcon>
-  );
-}
-
-
 function Status({ result }: { result: TestResult }) {
   return (
     <>
