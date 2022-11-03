@@ -92,7 +92,7 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
           <div className="flex flex-col items-start text-bodyColor">
             <div className="overflow-hidden whitespace-pre overflow-ellipsis">{test.title}</div>
             {test.error ? (
-              <div className="overflow-hidden bg-red-100 py-1 px-2 rounded-lg mt-1">{test.error.message}</div>              
+              <div className="overflow-hidden bg-testsuitesErrorBgcolor py-1 px-2 rounded-lg mt-1">{test.error.message}</div>              
             ) : null}
           </div>
         </button>
@@ -115,7 +115,7 @@ function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
       {steps?.map((s, i) => (
         <div
           key={i}
-          className="flex items-center justify-between px-3 py-2 overflow-hidden border-b border-gray-100 bg-[#FAFAFA]"
+          className="flex items-center justify-between px-3 py-2 overflow-hidden border-b border-themeBase-90 bg-testsuitesStepsBgcolor"
         >
           <div className="flex items-center space-x-2 overflow-hidden whitespace-pre">
             <div className="overflow-hidden overflow-ellipsis font-medium text-bodyColor">{s.name}</div>
@@ -127,9 +127,9 @@ function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
         </div>
       ))}
       {test.error ? (
-        <div className="text-red-700 bg-red-200 border-l-2 border-red-500">
+        <div className="text-testsuitesErrorColor bg-testsuitesErrorBgcolor border-l-2 border-red-500">
           <div className="p-2 font-bold">Error</div>
-          <div className="p-2 space-y-1 overflow-hidden font-mono truncate bg-red-100">
+          <div className="p-2 space-y-1 overflow-hidden font-mono truncate bg-testsuitesErrorBgcolor">
             {test.error.message}
           </div>
         </div>
@@ -140,8 +140,8 @@ function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
 
 function Status({ result }: { result: TestResult }) {
   return (
-    <>
+    
     <Icon filename={result === "passed" ? "testsuites-success" : "testsuites-fail"} size="small" className={result === "passed" ? "bg-[#219653]" : "bg-[#EB5757]"} />
-        </>
+        
   );
 }
