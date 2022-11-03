@@ -92,7 +92,7 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
           <div className="flex flex-col items-start text-bodyColor">
             <div className="overflow-hidden whitespace-pre overflow-ellipsis">{test.title}</div>
             {test.error ? (
-              <div className="overflow-hidden bg-testsuitesErrorBgcolor py-1 px-2 rounded-lg mt-1">{test.error.message}</div>              
+              <div className="overflow-hidden bg-testsuitesErrorBgcolor py-1 px-2 rounded-lg mt-1 text-left">{test.error.message}</div>              
             ) : null}
           </div>
         </button>
@@ -132,7 +132,7 @@ function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
             <Icon filename="warning" size="small" className="bg-testsuitesErrorColor" />
             <div className="font-bold">Error</div>
           </div>
-          <div className="p-2 space-y-1 overflow-hidden font-mono truncate bg-testsuitesErrorBgcolor">
+          <div className="p-2 space-y-1 overflow-hidden font-mono wrap bg-testsuitesErrorBgcolor">
             {test.error.message}
           </div>
         </div>
