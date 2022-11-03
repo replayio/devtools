@@ -128,7 +128,10 @@ function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
       ))}
       {test.error ? (
         <div className="text-testsuitesErrorColor bg-testsuitesErrorBgcolor border-l-2 border-red-500">
-          <div className="p-2 font-bold">Error</div>
+          <div className="flex flex-row items-center p-2 space-x-1">
+            <Icon filename="warning" size="small" className="bg-testsuitesErrorColor" />
+            <div className="font-bold">Error</div>
+          </div>
           <div className="p-2 space-y-1 overflow-hidden font-mono truncate bg-testsuitesErrorBgcolor">
             {test.error.message}
           </div>
