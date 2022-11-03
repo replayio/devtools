@@ -7,6 +7,7 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
+  useSyncExternalStore,
 } from "react";
 import { VariableSizeList as List, ListOnItemsRenderedProps } from "react-window";
 
@@ -15,9 +16,11 @@ import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsCont
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
 import {
+  StreamingSourceContents,
   getCachedMinMaxSourceHitCounts,
   getSourceHitCountsSuspense,
 } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { StreamingParser } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 
@@ -39,15 +42,17 @@ const LINE_HEIGHT_WITH_CONDITIONAL_POINT = LINE_HEIGHT + CONDITIONAL_POINT_PANEL
 
 export default function SourceList({
   height,
-  htmlLines,
   showColumnBreakpoints,
   source,
+  streamingParser,
+  streamingSourceContents,
   width,
 }: {
   height: number;
-  htmlLines: string[];
   showColumnBreakpoints: boolean;
   source: ProtocolSource;
+  streamingParser: StreamingParser;
+  streamingSourceContents: StreamingSourceContents;
   width: number;
 }) {
   const { sourceId } = source;
@@ -76,6 +81,12 @@ export default function SourceList({
     lineHeightWithConditionalPoint,
     lineHeightWithPoint,
   } = useFontBasedListMeasurents(listRef);
+
+  const lineCount = useSyncExternalStore(
+    streamingSourceContents.subscribe,
+    () => streamingSourceContents.lineCount,
+    () => streamingSourceContents.lineCount
+  );
 
   useEffect(() => {
     if (pendingFocusUpdate === null || focusedLineNumber === null || focusedSourceId === null) {
@@ -154,7 +165,6 @@ export default function SourceList({
       deletePoints,
       editPoint,
       hitCounts,
-      htmlLines,
       lineHeight,
       maxHitCount,
       minHitCount,
@@ -163,13 +173,13 @@ export default function SourceList({
       showColumnBreakpoints,
       showHitCounts,
       source,
+      streamingParser,
     }),
     [
       addPoint,
       deletePoints,
       editPoint,
       hitCounts,
-      htmlLines,
       lineHeight,
       maxHitCount,
       minHitCount,
@@ -178,6 +188,7 @@ export default function SourceList({
       showColumnBreakpoints,
       setShowHitCounts,
       source,
+      streamingParser,
     ]
   );
 
@@ -222,8 +233,7 @@ export default function SourceList({
     [setVisibleLines]
   );
 
-  const numLines = htmlLines.length;
-  const maxLineNumberStringLength = `${numLines}`.length;
+  const maxLineNumberStringLength = `${lineCount}`.length;
   const maxHitCountStringLength =
     showHitCounts && maxHitCount !== null ? `${formatHitCount(maxHitCount)}`.length : 0;
 
@@ -244,7 +254,7 @@ export default function SourceList({
       estimatedItemSize={lineHeight}
       height={height}
       innerRef={innerRef}
-      itemCount={numLines}
+      itemCount={lineCount || 0}
       itemData={itemData}
       itemSize={getItemSize}
       onItemsRendered={onItemsRendered}

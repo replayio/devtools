@@ -1,5 +1,5 @@
 import { newSource as ProtocolSource } from "@replayio/protocol";
-import { Suspense, memo, useState } from "react";
+import { Suspense, memo, useMemo, useState, useSyncExternalStore } from "react";
 import { areEqual } from "react-window";
 
 import Icon from "bvaughn-architecture-demo/components/Icon";
@@ -8,12 +8,14 @@ import {
   DeletePoints,
   EditPoint,
 } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { StreamingParser } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
 import { LineNumberToHitCountMap } from "shared/client/types";
 import { Point } from "shared/client/types";
 
 import CurrentLineHighlight from "./CurrentLineHighlight";
 import HoverButton from "./HoverButton";
 import PointPanel from "./PointPanel";
+import SourceLineLoadingPlaceholder from "./SourceLineLoadingPlaceholder";
 import { formatHitCount } from "./utils/formatHitCount";
 import { findPointForLocation } from "./utils/points";
 import styles from "./SourceListRow.module.css";
@@ -23,7 +25,6 @@ export type ItemData = {
   deletePoints: DeletePoints;
   editPoint: EditPoint;
   hitCounts: LineNumberToHitCountMap | null;
-  htmlLines: string[];
   maxHitCount: number | null;
   minHitCount: number | null;
   points: Point[];
@@ -31,11 +32,14 @@ export type ItemData = {
   showColumnBreakpoints: boolean;
   showHitCounts: boolean;
   source: ProtocolSource;
+  streamingParser: StreamingParser;
 };
 
 const SourceListRow = memo(
   ({ data, index, style }: { data: ItemData; index: number; style: Object }) => {
     const [isHovered, setIsHovered] = useState(false);
+
+    const loadingPlaceholderWidth = useMemo(() => Math.round(5 + Math.random() * 30), []);
 
     const lineNumber = index + 1;
 
@@ -44,7 +48,6 @@ const SourceListRow = memo(
       deletePoints,
       editPoint,
       hitCounts,
-      htmlLines,
       maxHitCount,
       minHitCount,
       points,
@@ -52,13 +55,26 @@ const SourceListRow = memo(
       showColumnBreakpoints,
       showHitCounts,
       source,
+      streamingParser,
     } = data;
 
     const { sourceId } = source;
 
+    const parsedLines = useSyncExternalStore(
+      streamingParser.subscribe,
+      () => streamingParser.parsedLines,
+      () => streamingParser.parsedLines
+    );
+
+    const rawLines = useSyncExternalStore(
+      streamingParser.subscribe,
+      () => streamingParser.rawLines,
+      () => streamingParser.rawLines
+    );
+
     const lineHitCounts = hitCounts?.get(lineNumber) || null;
 
-    const html = htmlLines[index];
+    const html = index < parsedLines.length ? parsedLines[index] : null;
 
     const point = findPointForLocation(points, sourceId, lineNumber);
 
@@ -85,68 +101,81 @@ const SourceListRow = memo(
     }
 
     let lineSegments = null;
-    if (showColumnBreakpoints && point?.shouldLog) {
-      const { id, location, shouldBreak } = point;
+    if (html !== null) {
+      if (showColumnBreakpoints && point?.shouldLog) {
+        const { id, location, shouldBreak } = point;
 
-      if (location.column === 0) {
-        // Special case; much simpler.
-        lineSegments = (
-          <>
-            <button
-              className={styles.BreakpointButton}
-              onClick={() => editPoint(id, { shouldBreak: !shouldBreak })}
-            >
-              <Icon
-                className={shouldBreak ? styles.BreakpointIcon : styles.DisabledBreakpointIcon}
-                type="breakpoint"
-              />
-            </button>
-            <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: html }} />
-          </>
-        );
-      } else {
-        // HACK
-        // This could possibly be done in a smarter way?
-        const div = document.createElement("div");
-        div.innerHTML = html;
+        if (location.column === 0) {
+          // Special case; much simpler.
+          lineSegments = (
+            <>
+              <button
+                className={styles.BreakpointButton}
+                onClick={() => editPoint(id, { shouldBreak: !shouldBreak })}
+              >
+                <Icon
+                  className={shouldBreak ? styles.BreakpointIcon : styles.DisabledBreakpointIcon}
+                  type="breakpoint"
+                />
+              </button>
+              <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: html }} />
+            </>
+          );
+        } else {
+          // HACK
+          // This could possibly be done in a smarter way?
+          const div = document.createElement("div");
+          div.innerHTML = html;
 
-        let htmlAfter = "";
-        let htmlBefore = "";
-        let columnIndex = 0;
-        while (div.childNodes.length > 0) {
-          const child = div.childNodes[0];
+          let htmlAfter = "";
+          let htmlBefore = "";
+          let columnIndex = 0;
+          while (div.childNodes.length > 0) {
+            const child = div.childNodes[0];
 
-          htmlBefore += (child as HTMLElement).outerHTML || child.textContent;
+            htmlBefore += (child as HTMLElement).outerHTML || child.textContent;
 
-          child.remove();
+            child.remove();
 
-          columnIndex += child.textContent?.length || 0;
-          if (columnIndex >= location.column) {
-            htmlAfter = div.innerHTML;
-            break;
+            columnIndex += child.textContent?.length || 0;
+            if (columnIndex >= location.column) {
+              htmlAfter = div.innerHTML;
+              break;
+            }
           }
-        }
 
-        lineSegments = (
-          <>
-            <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: htmlBefore }} />
-            <button
-              className={styles.BreakpointButton}
-              onClick={() => editPoint(id, { shouldBreak: !shouldBreak })}
-            >
-              <Icon
-                className={shouldBreak ? styles.BreakpointIcon : styles.DisabledBreakpointIcon}
-                type="breakpoint"
+          lineSegments = (
+            <>
+              <pre
+                className={styles.LineSegment}
+                dangerouslySetInnerHTML={{ __html: htmlBefore }}
               />
-            </button>
-            <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: htmlAfter }} />
-          </>
+              <button
+                className={styles.BreakpointButton}
+                onClick={() => editPoint(id, { shouldBreak: !shouldBreak })}
+              >
+                <Icon
+                  className={shouldBreak ? styles.BreakpointIcon : styles.DisabledBreakpointIcon}
+                  type="breakpoint"
+                />
+              </button>
+              <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: htmlAfter }} />
+            </>
+          );
+        }
+      } else {
+        lineSegments = (
+          <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: html }} />
         );
       }
     } else {
-      lineSegments = (
-        <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: html }} />
-      );
+      const plainText = index < rawLines.length ? rawLines[index] : null;
+
+      if (plainText !== null) {
+        lineSegments = <pre className={styles.LineSegment}>{plainText}</pre>;
+      } else {
+        lineSegments = <SourceLineLoadingPlaceholder width={loadingPlaceholderWidth} />;
+      }
     }
 
     const toggleBreakpoint = () => {

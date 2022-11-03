@@ -3,14 +3,20 @@ import debounce from "lodash/debounce";
 import { MouseEvent, Suspense, useContext, useLayoutEffect, useRef, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 
-import { getSourceContentsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
-import { parse } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
-import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
+import {
+  StreamingSourceContents,
+  getStreamingSourceContentsSuspense,
+} from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import {
+  StreamingParser,
+  parseStreaming,
+} from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Loader from "../Loader";
 import PreviewPopup from "./PreviewPopup";
 import SourceList from "./SourceList";
+import StreamingSourceLoadingProgressHeader from "./StreamingSourceLoadingProgressHeader";
 import getExpressionForTokenElement from "./utils/getExpressionForTokenElement";
 import styles from "./Source.module.css";
 
@@ -30,19 +36,61 @@ export default function Source({
 }) {
   return (
     <Suspense fallback={<Loader className={styles.Loader} />}>
-      <SuspendingSource source={source} showColumnBreakpoints={showColumnBreakpoints} />
+      <SourceLoader source={source} showColumnBreakpoints={showColumnBreakpoints} />
     </Suspense>
   );
 }
 
-function SuspendingSource({
+function SourceLoader({
   source,
   showColumnBreakpoints,
 }: {
   source: ProtocolSource;
   showColumnBreakpoints: boolean;
 }) {
+  const client = useContext(ReplayClientContext);
+
+  const streamingSourceContents = getStreamingSourceContentsSuspense(client, source.sourceId);
+  if (source === null) {
+    return null;
+  }
+
+  const streamingParser = parseStreaming(streamingSourceContents);
+  if (streamingParser === null) {
+    return null;
+  }
+
+  return (
+    <SourceRenderer
+      showColumnBreakpoints={showColumnBreakpoints}
+      source={source}
+      streamingParser={streamingParser}
+      streamingSourceContents={streamingSourceContents}
+    />
+  );
+}
+
+function SourceRenderer({
+  showColumnBreakpoints,
+  source,
+  streamingParser,
+  streamingSourceContents,
+}: {
+  showColumnBreakpoints: boolean;
+  source: ProtocolSource;
+  streamingParser: StreamingParser;
+  streamingSourceContents: StreamingSourceContents;
+}) {
   const [hoveredState, setHoveredState] = useState<HoveredState | null>(null);
+
+  useLayoutEffect(
+    () => () => {
+      // If a hover preview is visible when this Source is hidden for Offscreen
+      // make sure to clean it up so it doesn't remain visible.
+      setHoveredState(null);
+    },
+    []
+  );
 
   useLayoutEffect(() => {
     if (hoveredState) {
@@ -56,27 +104,6 @@ function SuspendingSource({
   }, [hoveredState]);
 
   const sourceRef = useRef<HTMLDivElement>(null);
-
-  const fileName = getSourceFileName(source, true) || "unknown";
-
-  const client = useContext(ReplayClientContext);
-  const sourceContents = getSourceContentsSuspense(client, source.sourceId);
-
-  useLayoutEffect(
-    () => () => {
-      // If a hover preview is visible when this Source is hidden for Offscreen
-      // make sure to clean it up so it doesn't remain visible.
-      setHoveredState(null);
-    },
-    []
-  );
-
-  // TODO Incrementally parse code using SourceContext -> visibleLines
-  const code = sourceContents.contents;
-  const htmlLines = parse(code, fileName);
-  if (htmlLines === null) {
-    return null;
-  }
 
   const onMouseMove = ({ target }: MouseEvent) => {
     const source = sourceRef.current!;
@@ -113,13 +140,16 @@ function SuspendingSource({
           {({ height, width }) => (
             <SourceList
               height={height}
-              htmlLines={htmlLines}
               showColumnBreakpoints={showColumnBreakpoints}
               source={source}
+              streamingParser={streamingParser}
+              streamingSourceContents={streamingSourceContents}
               width={width}
             />
           )}
         </AutoSizer>
+
+        <StreamingSourceLoadingProgressHeader streamingParser={streamingParser} />
       </div>
       {hoveredState ? (
         <PreviewPopup
