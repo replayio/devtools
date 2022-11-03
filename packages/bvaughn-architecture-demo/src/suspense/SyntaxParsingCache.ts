@@ -142,6 +142,9 @@ function incrementalParser(fileName?: string, contentType?: ContentType): Increm
   ) {
     let codeToParse = code.slice(parsedCharacterIndex);
 
+    // Lezer doesn't like Windows newlines.
+    codeToParse = codeToParse.replace(/\r\n?|\n|\u2028|\u2029/g, "\n");
+
     if (codeToParse.length > maxCharacters || !isCodeComplete) {
       let index = maxCharacters - 1;
       while (index > 0 && codeToParse.charAt(index) !== "\n") {
