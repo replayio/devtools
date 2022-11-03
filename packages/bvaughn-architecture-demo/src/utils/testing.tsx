@@ -40,6 +40,7 @@ export async function render(
     recordingId: "fakeRecordingId",
     sessionId: "fakeSessionId",
     refetchUser: () => {},
+    trackEvent: () => {},
     ...options?.sessionContext,
   };
 
@@ -205,10 +206,6 @@ export function createMockReplayClient() {
       time: 1000,
     })),
     getSessionId: jest.fn().mockImplementation(async () => "fake-session-id"),
-    getSourceContents: jest.fn().mockImplementation(async () => ({
-      contents: "fake-source-contents",
-      contentType: "text/javascript",
-    })),
     getSourceHitCounts: jest.fn().mockImplementation(async () => new Map()),
     initialize: jest.fn().mockImplementation(async () => {}),
     loadRegion: jest.fn().mockImplementation(async () => {}),
@@ -216,5 +213,6 @@ export function createMockReplayClient() {
     runAnalysis: jest.fn().mockImplementation(async () => []),
     searchFunctions: jest.fn().mockImplementation(async () => {}),
     searchSources: jest.fn().mockImplementation(async () => {}),
+    streamSourceContents: jest.fn().mockImplementation(async () => {}),
   };
 }

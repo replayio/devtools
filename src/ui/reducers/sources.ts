@@ -9,6 +9,7 @@ import {
 import { Location, MappedLocation, SourceKind, newSource } from "@replayio/protocol";
 
 import { preCacheSources } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { getStreamingSourceContentsHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import type { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 // TODO Move prefs out of reducers and load this separately
@@ -223,15 +224,16 @@ export const loadSourceText = (sourceId: string): UIThunkAction<Promise<void>> =
     dispatch(sourceLoading(sourceId));
 
     try {
-      const response = await replayClient.getSourceContents(sourceId);
+      const { resolver } = await getStreamingSourceContentsHelper(replayClient, sourceId);
+      const { contents, contentType } = await resolver;
 
       parser.setSource(sourceId, {
         type: "text",
-        value: response.contents,
-        contentType: response.contentType,
+        value: contents,
+        contentType,
       });
 
-      dispatch(sourceLoaded({ sourceId, ...response }));
+      dispatch(sourceLoaded({ contents: contents!, contentType: contentType!, sourceId }));
     } catch (e) {
       dispatch(sourceErrored(sourceId));
     }

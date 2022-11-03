@@ -65,7 +65,9 @@ export async function addLogPoint(
   );
 
   await openSourceFile(page, sourceId);
-  await goToLine(page, sourceId, lineNumber);
+
+  // Overscroll by a little bit to ensure there's enough room for the point panel.
+  await goToLine(page, sourceId, lineNumber + 5);
 
   const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
 

@@ -136,7 +136,6 @@ export interface ReplayClientInterface {
   getRecordingId(): RecordingId | null;
   getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
   getSessionId(): SessionId | null;
-  getSourceContents(sourceId: SourceId): Promise<{ contents: string; contentType: ContentType }>;
   getSourceHitCounts(
     sourceId: SourceId,
     locationRange: SourceLocationRange,
@@ -160,5 +159,20 @@ export interface ReplayClientInterface {
       sourceIds?: string[];
     },
     onMatches: (matches: SearchSourceContentsMatch[]) => void
+  ): Promise<void>;
+  streamSourceContents(
+    sourceId: SourceId,
+    onSourceContentsInfo: ({
+      codeUnitCount,
+      contentType,
+      lineCount,
+      sourceId,
+    }: {
+      codeUnitCount: number;
+      contentType: ContentType;
+      lineCount: number;
+      sourceId: SourceId;
+    }) => void,
+    onSourceContentsChunk: ({ chunk, sourceId }: { chunk: string; sourceId: SourceId }) => void
   ): Promise<void>;
 }

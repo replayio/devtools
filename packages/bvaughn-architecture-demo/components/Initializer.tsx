@@ -72,6 +72,7 @@ export default function Initializer({
           recordingId: activeRecordingId,
           sessionId,
           refetchUser: () => {},
+          trackEvent: () => {},
         });
       };
 

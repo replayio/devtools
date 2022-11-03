@@ -3913,6 +3913,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@replayio/protocol@npm:^0.32.3":
+  version: 0.32.3
+  resolution: "@replayio/protocol@npm:0.32.3"
+  checksum: f8d6469ba734f654ce2c1a34552ccc24082f252b5b688848393b06821ac0cb8bd512802686c08321a05993906f7f77d77a15e09fb5750652f471de02fce9b90a
+  languageName: node
+  linkType: hard
+
 "@replayio/replay@npm:^0.10.0":
   version: 0.10.0
   resolution: "@replayio/replay@npm:0.10.0"
@@ -9129,7 +9136,7 @@ __metadata:
     "@lezer/common_bvaughn": "npm:@lezer/common@1.0.1"
     "@lezer/highlight_bvaughn": "npm:@lezer/highlight@1.1.1"
     "@playwright/test": ^1.23.1
-    "@replayio/protocol": ^0.32.2
+    "@replayio/protocol": ^0.32.3
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
     date-fns: ^2.28.0
@@ -20805,7 +20812,7 @@ __metadata:
     "@redux-devtools/app": ^2.1.4
     "@redux-devtools/extension": ^3.2.2
     "@reduxjs/toolkit": ^1.8.4
-    "@replayio/protocol": ^0.32.2
+    "@replayio/protocol": ^0.32.3
     "@replayio/replay": ^0.9.6
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0

@@ -28,17 +28,34 @@ export type IndexedSource = ProtocolSource & {
   doesContentHashChange: boolean;
 };
 
+export type StreamSubscriber = () => void;
+export type UnsubscribeFromStream = () => void;
+
+export type StreamingSourceContents = {
+  codeUnitCount: number | null;
+  complete: boolean;
+  contents: string | null;
+  contentType: ProtocolContentType | null;
+  lineCount: number | null;
+  resolver: Promise<StreamingSourceContents>;
+  sourceId: ProtocolSourceId;
+  subscribe(subscriber: StreamSubscriber): UnsubscribeFromStream;
+};
+
 let inProgressSourcesWakeable: Wakeable<ProtocolSource[]> | null = null;
 let sources: ProtocolSource[] | null = null;
 
 type MinMaxHitCountTuple = [minHitCount: number, maxHitCount: number];
 
-const sourceIdToHitCountsMap: Map<string, Record<LineNumberToHitCountMap>> = new Map();
-const sourceIdToMinMaxHitCountsMap: Map<string, MinMaxHitCountTuple> = new Map();
-
+const sourceIdToHitCountsMap: Map<ProtocolSourceId, Record<LineNumberToHitCountMap>> = new Map();
+const sourceIdToMinMaxHitCountsMap: Map<ProtocolSourceId, MinMaxHitCountTuple> = new Map();
 const sourceIdToSourceContentsMap: Map<
   ProtocolSourceId,
   Record<ProtocolSourceContents>
+> = new Map();
+const sourceIdToStreamingSourceContentsMap: Map<
+  ProtocolSourceId,
+  Record<StreamingSourceContents>
 > = new Map();
 
 export function preCacheSources(value: ProtocolSource[]): void {
@@ -94,21 +111,26 @@ export function getSourceIfAlreadyLoaded(sourceId: ProtocolSourceId): ProtocolSo
   return null;
 }
 
-export function getSourceContentsSuspense(
+export function getCachedSourceContents(sourceId: ProtocolSourceId): ProtocolSourceContents | null {
+  const record = sourceIdToSourceContentsMap.get(sourceId);
+  return record?.status === STATUS_RESOLVED ? record.value : null;
+}
+
+export function getStreamingSourceContentsSuspense(
   client: ReplayClientInterface,
   sourceId: ProtocolSourceId
-): ProtocolSourceContents {
-  let record = sourceIdToSourceContentsMap.get(sourceId);
+): StreamingSourceContents {
+  let record = sourceIdToStreamingSourceContentsMap.get(sourceId);
   if (record == null) {
     record = {
       status: STATUS_PENDING,
-      value: createWakeable<ProtocolSourceContents>(),
+      value: createWakeable<StreamingSourceContents>(),
     };
 
-    sourceIdToSourceContentsMap.set(sourceId, record);
+    sourceIdToStreamingSourceContentsMap.set(sourceId, record);
 
     // Suspense caches fire and forget; errors will be handled within the fetch function.
-    fetchSourceContents(client, sourceId, record, record.value);
+    fetchStreamingSourceContents(client, sourceId, record, record.value);
   }
 
   if (record!.status === STATUS_RESOLVED) {
@@ -120,22 +142,15 @@ export function getSourceContentsSuspense(
 
 // Wrapper method around getSourceContents Suspense method.
 // This method can be used by non-React code to prefetch/prime the Suspense cache by loading object properties.
-export async function getSourceContentsHelper(
+export async function getStreamingSourceContentsHelper(
   client: ReplayClientInterface,
   sourceId: ProtocolSourceId
-): Promise<ProtocolSourceContents> {
+): Promise<StreamingSourceContents> {
   try {
-    return getSourceContentsSuspense(client, sourceId);
+    return getStreamingSourceContentsSuspense(client, sourceId);
   } catch (errorOrPromise) {
-    if (
-      errorOrPromise != null &&
-      typeof errorOrPromise === "object" &&
-      errorOrPromise.hasOwnProperty("then")
-    ) {
-      return errorOrPromise as Promise<ProtocolSourceContents>;
-    } else {
-      throw errorOrPromise;
-    }
+    await errorOrPromise;
+    return getStreamingSourceContentsSuspense(client, sourceId);
   }
 }
 
@@ -240,17 +255,73 @@ async function fetchSources(client: ReplayClientInterface) {
   inProgressSourcesWakeable = null;
 }
 
-async function fetchSourceContents(
+async function fetchStreamingSourceContents(
   client: ReplayClientInterface,
   sourceId: ProtocolSourceId,
-  record: Record<ProtocolSourceContents>,
-  wakeable: Wakeable<ProtocolSourceContents>
+  record: Record<StreamingSourceContents>,
+  wakeable: Wakeable<StreamingSourceContents>
 ) {
   try {
-    const sourceContents = await client.getSourceContents(sourceId);
+    let notifyResolver: (streamingSourceContents: StreamingSourceContents) => void;
+    const resolver = new Promise<StreamingSourceContents>(resolve => {
+      notifyResolver = resolve;
+    });
+
+    const subscribers: Set<StreamSubscriber> = new Set();
+    const streamingSourceContents: StreamingSourceContents = {
+      codeUnitCount: null,
+      complete: false,
+      contents: null,
+      contentType: null,
+      lineCount: null,
+      resolver,
+      sourceId,
+      subscribe(subscriber: StreamSubscriber) {
+        subscribers.add(subscriber);
+        return () => {
+          subscribers.delete(subscriber);
+        };
+      },
+    };
+
+    const notifySubscribers = () => {
+      subscribers.forEach(subscriber => subscriber());
+    };
+
+    // Fire and forget; data streams in.
+    client
+      .streamSourceContents(
+        sourceId,
+        ({ codeUnitCount, contentType, lineCount }) => {
+          streamingSourceContents.codeUnitCount = codeUnitCount;
+          streamingSourceContents.contentType = contentType;
+          streamingSourceContents.lineCount = lineCount;
+          notifySubscribers();
+        },
+        ({ chunk }) => {
+          if (streamingSourceContents.contents === null) {
+            streamingSourceContents.contents = chunk;
+          } else {
+            streamingSourceContents.contents += chunk;
+          }
+
+          const isComplete =
+            streamingSourceContents.contents.length === streamingSourceContents.codeUnitCount;
+          if (isComplete) {
+            streamingSourceContents.complete = true;
+          }
+
+          notifySubscribers();
+        }
+      )
+      .then(() => {
+        subscribers.clear();
+
+        notifyResolver(streamingSourceContents);
+      });
 
     record.status = STATUS_RESOLVED;
-    record.value = sourceContents;
+    record.value = streamingSourceContents;
 
     wakeable.resolve(record.value);
   } catch (error) {

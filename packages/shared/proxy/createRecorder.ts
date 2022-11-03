@@ -1,23 +1,30 @@
-import { Entry } from "./types";
+import { Entry, ParamCall } from "./types";
 import { findMatch, isIterator, isThennable } from "./utils";
 
-type Options = {
+type Options<T> = {
   onAsyncRequestPending?: Function;
   onAsyncRequestResolved?: Function;
   onEntriesChanged?: (newEntry: Entry) => void;
+  overrides?: Partial<T>;
   sanitizeArgs?: (prop: string, args: any[] | null) => any[] | null;
   sanitizeResult?: (prop: string, result: any) => any;
+};
+
+export type RecorderAPI = {
+  callParamWithArgs: (paramIndex: number, ...args: any[]) => void;
+  holdUntil: () => () => void;
 };
 
 // Note that the Proxy recorder has some limitations:
 //   1. It does not support the event emitter pattern.
 //   2. Limited support is available for methods without args (e.g. `getState()`).
 //      Because there is no way to uniquely identify a method call without args, only the last value returned will be recorded.
-export default function createRecorder<T>(target: T, options?: Options): [T, Entry[]] {
+export default function createRecorder<T>(target: T, options?: Options<T>): [T, Entry[]] {
   const {
     onAsyncRequestPending = () => {},
     onAsyncRequestResolved = () => {},
     onEntriesChanged = (_: Entry) => {},
+    overrides = null,
     sanitizeArgs = (_: string, args: any[] | null) => args,
     sanitizeResult = (_: string, result: any) => result,
   } = options || {};
@@ -28,7 +35,12 @@ export default function createRecorder<T>(target: T, options?: Options): [T, Ent
 
   const entries: Entry[] = [];
 
-  function recordEntry(prop: string, args: any[] | null, returnValue: any) {
+  function recordEntry(
+    prop: string,
+    args: any[] | null,
+    returnValue: any,
+    paramCalls: ParamCall[] | null = null
+  ) {
     // If this prop has already been called with these params, store the latest value.
     const prevEntry = findMatch(entries, prop, args);
     let entry: Entry;
@@ -46,6 +58,10 @@ export default function createRecorder<T>(target: T, options?: Options): [T, Ent
         thennable: null,
       };
 
+      if (paramCalls !== null && paramCalls.length > 0) {
+        entry.paramCalls = paramCalls;
+      }
+
       entries.push(entry);
     }
 
@@ -59,21 +75,19 @@ export default function createRecorder<T>(target: T, options?: Options): [T, Ent
       const thennable = returnValue;
 
       returnValue = thennable.then((resolved: any) => {
-        returnValue = sanitizeResult(prop, resolved);
-
         if (thennable === entry.thennable) {
           // Only the latest request should update the shared entry.
           // For multiple matching calls, the player should always return the latest value.
-          entry.result = returnValue;
+          entry.result = resolved;
         }
 
         onAsyncRequestResolved();
         onEntriesChanged(entry);
 
-        return returnValue;
+        return resolved;
       });
     } else {
-      entry.result = returnValue = sanitizeResult(prop, returnValue);
+      entry.result = returnValue;
 
       onEntriesChanged(entry);
     }
@@ -86,14 +100,61 @@ export default function createRecorder<T>(target: T, options?: Options): [T, Ent
       const isGetter =
         hasOwnProperty(prop) && typeof getOwnPropertyDescriptor(prop)?.get === "function";
       if (isGetter) {
-        return recordEntry(prop, null, target[prop]);
+        let returnValue = target[prop];
+
+        if (isThennable(returnValue)) {
+          returnValue = returnValue.then(resolved => sanitizeResult(prop, resolved));
+        } else {
+          returnValue = sanitizeResult(prop, returnValue);
+        }
+
+        return recordEntry(prop, null, returnValue);
       } else {
         return (...args: any[]) => {
           if (isIterator(prop)) {
             return undefined;
           }
 
-          return recordEntry(prop, args, target[prop](...args));
+          const paramCalls: ParamCall[] = [];
+
+          let didRecord = false;
+          let shouldHold = false;
+
+          const recorderAPI: RecorderAPI = {
+            callParamWithArgs: (paramIndex: number, ...args: any[]) => {
+              paramCalls.push([paramIndex, args]);
+            },
+            holdUntil: () => {
+              shouldHold = true;
+              return () => {
+                shouldHold = false;
+                recordEntryWhenReady();
+              };
+            },
+          };
+
+          let returnValue =
+            overrides && overrides.hasOwnProperty(prop)
+              ? (overrides as any)[prop](...args.concat(recorderAPI))
+              : target[prop](...args);
+
+          if (isThennable(returnValue)) {
+            returnValue = returnValue.then(resolved => sanitizeResult(prop, resolved));
+          } else {
+            returnValue = sanitizeResult(prop, returnValue);
+          }
+
+          const recordEntryWhenReady = () => {
+            if (!shouldHold && !didRecord) {
+              didRecord = true;
+
+              recordEntry(prop, args, returnValue, paramCalls);
+            }
+          };
+
+          recordEntryWhenReady();
+
+          return returnValue;
         };
       }
     },

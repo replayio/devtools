@@ -1,5 +1,5 @@
 import createPlayer from "./createPlayer";
-import createRecorder from "./createRecorder";
+import createRecorder, { RecorderAPI } from "./createRecorder";
 import { Entry } from "./types";
 
 describe("proxy", () => {
@@ -267,7 +267,8 @@ describe("proxy", () => {
     const [recorder, entries] = createRecorder(new Target(), {
       sanitizeResult,
     });
-    expect(recorder.process(object)).toEqual(objectSanitizedResult);
+    const returnValue = recorder.process(object);
+    expect(returnValue).toEqual(objectSanitizedResult);
 
     expect(entries).toHaveLength(1);
     expect(entries).toMatchInlineSnapshot(`
@@ -511,6 +512,99 @@ describe("proxy", () => {
 
     // Events won't actually be emitted.
     expect(newHandler).not.toHaveBeenCalled();
+  });
+
+  test("should support overrides with custom param callbacks", () => {
+    class Target {
+      method(callbackA: Function, callbackB: Function, number: number) {
+        callbackA(number + 1);
+        callbackB(number / 2);
+        callbackA(number + 2);
+        return number * 2;
+      }
+    }
+
+    const instance = new Target();
+
+    function methodOverride(callbackA: Function, callbackB: Function, number: number) {
+      const recorderAPI = arguments[arguments.length - 1] as RecorderAPI;
+
+      const callbackAWrapper = (value: number) => {
+        recorderAPI.callParamWithArgs(0, value);
+        return callbackA(value);
+      };
+
+      const callbackBWrapper = (value: number) => {
+        recorderAPI.callParamWithArgs(1, value);
+        return callbackB(value);
+      };
+
+      return instance.method(callbackAWrapper, callbackBWrapper, number);
+    }
+
+    const [recorder, entries] = createRecorder(instance, { overrides: { method: methodOverride } });
+
+    const returnValue = recorder.method(
+      () => {},
+      () => {},
+      10
+    );
+    expect(returnValue).toBe(20);
+    expect(entries).toHaveLength(1);
+
+    const player = createPlayer<Target>(serialize(entries));
+    const callbackA = jest.fn();
+    const callbackB = jest.fn();
+    expect(player.method(callbackA, callbackB, 10)).toBe(20);
+    expect(callbackA).toHaveBeenCalledTimes(2);
+    expect(callbackA).toHaveBeenCalledWith(11);
+    expect(callbackA).toHaveBeenCalledWith(12);
+    expect(callbackB).toHaveBeenCalledTimes(1);
+    expect(callbackB).toHaveBeenCalledWith(5);
+  });
+
+  test("should support overrides with custom param callbacks called after return (aka events or debounced)", () => {
+    let debouncedCallback = (_: number) => {};
+    let flushRecord = () => {};
+
+    class Target {
+      method(callback: Function, number: number) {
+        debouncedCallback = (value: number) => callback(value);
+        return number * 2;
+      }
+    }
+
+    const instance = new Target();
+
+    function methodOverride(callback: Function, number: number) {
+      const recorderAPI = arguments[arguments.length - 1] as RecorderAPI;
+
+      flushRecord = recorderAPI.holdUntil();
+
+      const callbackWrapper = (value: number) => {
+        recorderAPI.callParamWithArgs(0, value);
+        return callback(value);
+      };
+
+      return instance.method(callbackWrapper, number);
+    }
+
+    const [recorder, entries] = createRecorder(instance, { overrides: { method: methodOverride } });
+
+    const returnValue = recorder.method(() => {}, 10);
+    expect(returnValue).toBe(20);
+    expect(entries).toHaveLength(0);
+    debouncedCallback(5);
+    debouncedCallback(15);
+    flushRecord();
+    expect(entries).toHaveLength(1);
+
+    const player = createPlayer<Target>(serialize(entries));
+    const callback = jest.fn();
+    expect(player.method(callback, 10)).toBe(20);
+    expect(callback).toHaveBeenCalledTimes(2);
+    expect(callback).toHaveBeenCalledWith(5);
+    expect(callback).toHaveBeenCalledWith(15);
   });
 
   // TODO Add a test case for Symbol.Iterator

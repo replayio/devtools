@@ -5,19 +5,26 @@ import useSearch, { Actions, ScopeId, SearchFunction, State } from "./useSearch"
 
 type Item = string;
 type Result = string;
+type QueryData = boolean;
 
 const DEFAULT_ITEMS: Item[] = ["foo", "bar", "baz"];
 const DEFAULT_SCOPE = "default";
 
-function stableSearch(query: string, items: Item[]) {
-  return items.filter(item => item.toLowerCase().includes(query.toLowerCase()));
+function stableSearch(query: string, items: Item[], caseSensitive: QueryData | null = false) {
+  const needle = caseSensitive ? query : query.toLowerCase();
+  return items.filter(item => {
+    if (!caseSensitive) {
+      item.toLowerCase();
+    }
+    return item.includes(needle);
+  });
 }
 
 describe("useSearch", () => {
-  let currentActions: Actions | null = null;
-  let currentState: State<Item, Result> | null = null;
+  let currentActions: Actions<QueryData> | null = null;
+  let currentState: State<Item, Result, QueryData> | null = null;
   let renderResult: RenderResult | null = null;
-  let stableSearchMock: jest.MockedFunction<SearchFunction<Item, Result>> = null as any;
+  let stableSearchMock: jest.MockedFunction<SearchFunction<Item, Result, QueryData>> = null as any;
 
   beforeEach(() => {
     stableSearchMock = jest.fn().mockImplementation(stableSearch);
@@ -28,7 +35,7 @@ describe("useSearch", () => {
   });
 
   function Component({ items, scopeId }: { items: Item[]; scopeId: ScopeId }) {
-    const [state, actions] = useSearch<Item, Result>(items, stableSearchMock, scopeId);
+    const [state, actions] = useSearch<Item, Result, QueryData>(items, stableSearchMock, scopeId);
 
     useEffect(() => {
       currentActions = actions;
@@ -66,21 +73,27 @@ describe("useSearch", () => {
     });
   }
 
-  function search(query: string) {
+  function search(query: string, queryData: QueryData = false) {
     act(() => {
-      currentActions?.search(query);
+      currentActions?.search(query, queryData);
     });
   }
 
-  it("should refine search results when query text or items change", async () => {
+  it("should refine search results when query text, items, or query data change", async () => {
     render(DEFAULT_ITEMS);
     search("b");
     expect(currentState?.results).toEqual(["bar", "baz"]);
 
-    search("ba");
+    search("bA");
     expect(currentState?.results).toEqual(["bar", "baz"]);
 
-    search("bar");
+    search("bAr");
+    expect(currentState?.results).toEqual(["bar"]);
+
+    search("bAr", true);
+    expect(currentState?.results).toEqual([]);
+
+    search("bAr", false);
     expect(currentState?.results).toEqual(["bar"]);
 
     search("q");
@@ -214,7 +227,7 @@ describe("useSearch", () => {
       expect(currentState?.results).toEqual(["bar", "baz"]);
     });
 
-    it("should (only) re-run search when query text changes", async () => {
+    it("should (only) re-run search when query or queryData changes", async () => {
       render(DEFAULT_ITEMS);
       expect(stableSearchMock).toHaveBeenCalledTimes(0);
 
@@ -226,6 +239,12 @@ describe("useSearch", () => {
 
       search("ba");
       expect(stableSearchMock).toHaveBeenCalledTimes(2);
+
+      search("ba", true);
+      expect(stableSearchMock).toHaveBeenCalledTimes(3);
+
+      render(DEFAULT_ITEMS);
+      expect(stableSearchMock).toHaveBeenCalledTimes(3);
     });
   });
 });

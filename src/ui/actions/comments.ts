@@ -2,6 +2,7 @@ import { Action } from "@reduxjs/toolkit";
 import { RecordingId } from "@replayio/protocol";
 import escapeHtml from "escape-html";
 
+import { getStreamingSourceContentsHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import {
   handleUnstableSourceIds,
   selectLocation,
@@ -192,8 +193,10 @@ export function createLabels(
 
     let snippet = getTextAtLocation(state, sourceLocation) || "";
     if (!snippet) {
-      const sourceContent = await replayClient.getSourceContents(sourceId);
-      const lineText = sourceContent.contents.split("\n")[line - 1];
+      const { resolver } = await getStreamingSourceContentsHelper(replayClient, sourceId);
+      const { contents } = await resolver;
+
+      const lineText = contents!.split("\n")[line - 1];
       snippet = lineText?.slice(0, 100).trim();
     }
     let secondary = "";
