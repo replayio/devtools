@@ -497,7 +497,7 @@
   --breakpoint-label: var(--cm-string);
   
   /* Testsuites (Dark) */
-  --testsuites-error-bgcolor: #D15550;
+  --testsuites-error-bgcolor: #770702;
   --testsuites-error-color: white;
   --testsuites-steps-bgcolor: var(--theme-base-100);
   
