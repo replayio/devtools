@@ -115,6 +115,7 @@
   - Menus
   - Code Mirror (Editor)
   - Breakpoints
+  - Testsuites
   - To Organise
   - (Previous styles; to organise)
   */
@@ -215,6 +216,11 @@
   --breakpoint-status: var(--body-color);
   --breakpoint-tip: var(--theme-highlight-purple);
   --breakpoint-label: var(--cm-string);
+  
+  /* Testsuites (Light) */
+  --testsuites-error-bgcolor: #FFE9E9;
+  --testsuites-error-color: red;
+  --testsuites-steps-bgcolor: #FAFAFA; 
 
   /* To organise (Light) */
   --jellyfish-bgcolor: rgba(255, 255, 255, 0.8);
@@ -389,6 +395,7 @@
   - Menus
   - Code Mirror (Editor)
   - Breakpoints
+  - Testsuites
   - To Organise
   - (Previous styles; to organise)
   */
@@ -488,7 +495,13 @@
   --breakpoint-status: var(--body-color);
   --breakpoint-tip: #fff;
   --breakpoint-label: var(--cm-string);
-
+  
+  /* Testsuites (Dark) */
+  --testsuites-error-bgcolor: #770702;
+  --testsuites-error-color: white;
+  --testsuites-steps-bgcolor: var(--theme-base-100);
+  
+  
   /* To organise (Dark) */
   --jellyfish-bgcolor: rgba(40, 40, 40, 0.8);
   --timejump-text: var(--buttontext-color);

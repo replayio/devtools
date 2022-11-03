@@ -13,6 +13,7 @@ import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
 import ProtocolViewer from "./ProtocolViewer";
 import MaterialIcon from "./shared/MaterialIcon";
+import Icon from "ui/components/shared/Icon";
 import StatusDropdown from "./shared/StatusDropdown";
 
 const FullTextSearch = require("devtools/client/debugger/src/components/FullTextSearch").default;
@@ -24,18 +25,14 @@ function TestResultsSummary({ testCases }: { testCases: TestItem[] }) {
   const passed = testCases.filter(c => c.result === "passed").length;
 
   return (
-    <div className="flex gap-1">
+    <div className="flex gap-2 px-1 py-1 ml-4">
       <div className="flex items-center gap-1">
-        <MaterialIcon iconSize="2xl" outlined className="text-green-500">
-          done
-        </MaterialIcon>
-        <div>{passed}</div>
+        <Icon filename="testsuites-success" size="small" className="bg-green-700" />
+        <div className="text-green-700 text-sm">{passed}</div>
       </div>
-      <div className="flex items-center gap-1">
-        <MaterialIcon iconSize="2xl" outlined className="text-red-500">
-          close
-        </MaterialIcon>
-        <div>{failed}</div>
+      <div className="flex items-center gap-1 mr-1">
+        <Icon filename="testsuites-fail" size="small" className="bg-red-500" />
+        <div className="text-red-500 text-sm">{failed}</div>
       </div>
     </div>
   );
@@ -65,11 +62,11 @@ export default function SidePanel() {
   if (recording?.metadata?.test?.tests?.length) {
     items.push({
       header: (
-        <div className="flex flex-row items-center">
-          <span className="flex-grow truncate">{recording?.metadata?.test?.file}</span>
-          <TestResultsSummary testCases={recording?.metadata?.test?.tests} />
-        </div>
-      ),
+         <div className="flex flex-row items-center">
+           <span className="flex-grow truncate">{recording?.metadata?.test?.file}</span>
+           <TestResultsSummary testCases={recording?.metadata?.test?.tests} />
+         </div>
+       ),
       buttons: null,
       className: "cyress-info flex-1 border-t overflow-hidden border-themeBorder",
       component: (
