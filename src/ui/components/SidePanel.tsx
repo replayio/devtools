@@ -40,7 +40,7 @@ export default function SidePanel() {
 
   if (recording?.metadata?.test?.tests?.length) {
     items.push({
-      header: `Test Info (${recording?.metadata?.test?.tests?.length})`,
+      header: `${recording?.metadata?.test?.file}`,
       buttons: null,
       className: "cyress-info flex-1 border-t overflow-hidden border-themeBorder",
       component: (

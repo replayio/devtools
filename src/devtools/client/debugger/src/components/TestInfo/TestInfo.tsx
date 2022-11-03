@@ -1,7 +1,7 @@
 import { SourceLocation } from "graphql";
 import { useState } from "react";
-
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import Icon from "ui/components/shared/Icon";
 import { useFetchCypressSpec } from "ui/hooks/useFetchCypressSpec";
 import { getRecordingDuration } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -90,10 +90,10 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
         <button
           onClick={toggleExpand}
           disabled={!expandable}
-          className="flex flex-row items-center flex-grow gap-1 overflow-hidden"
+          className="flex flex-row flex-grow gap-1 overflow-hidden"
         >
           <Status result={test.result} />
-          {test.steps ? (
+          {test.steps ? (            
             <MaterialIcon>{expandSteps ? "expand_more" : "chevron_right"}</MaterialIcon>
           ) : null}
           <div className="flex flex-col items-start">
