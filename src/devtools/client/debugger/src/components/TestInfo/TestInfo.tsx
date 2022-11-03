@@ -29,10 +29,7 @@ export default function TestInfo({
     <div className="flex flex-col px-4 py-2 space-y-1">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 overflow-hidden">
-          {/* {result ? <Status result={result} /> : null} */}
-          <div className="overflow-hidden">            
-            <TestResultsSummary testCases={testCases} />
-          </div>
+          {/* {result ? <Status result={result} /> : null} */}          
         </div>
       </div>
       <div className="flex flex-col">
