@@ -154,7 +154,7 @@ function identity(any: any) {
 }
 
 function urlToLanguage(fileName: string): LRLanguage {
-  const extension = fileName.split(".").pop();
+  const extension = fileName.split(".").pop()!.split("?").shift()!;
   switch (extension) {
     case "js":
       return javascriptLanguage;
