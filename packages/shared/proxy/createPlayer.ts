@@ -14,8 +14,17 @@ export default function createPlayer<T>(entries: Entry[]): T {
 
         return (...args: any[]) => {
           const logEntry = findMatch(entries, prop, args);
+
           if (logEntry != null) {
-            const { isAsync, result } = logEntry;
+            const { isAsync, paramCalls, result } = logEntry;
+
+            if (paramCalls) {
+              paramCalls.forEach(call => {
+                const callback = args[call[0]];
+                callback(...call[1]);
+              });
+            }
+
             return isAsync ? Promise.resolve(result) : result;
           } else {
             if (isIterator(prop)) {
