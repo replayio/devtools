@@ -35,6 +35,8 @@ import type { UIThunkAction } from "./index";
 import { setSelectedPrimaryPanel } from "./layout";
 import { seek } from "./timeline";
 
+import { getStreamingSourceContentsHelper } from "@bvaughn/src/suspense/SourcesCache";
+
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
 
 export function setHoveredComment(comment: any): SetHoveredComment {
@@ -192,8 +194,10 @@ export function createLabels(
 
     let snippet = getTextAtLocation(state, sourceLocation) || "";
     if (!snippet) {
-      const sourceContent = await replayClient.getSourceContents(sourceId);
-      const lineText = sourceContent.contents.split("\n")[line - 1];
+      const { resolver } = await getStreamingSourceContentsHelper(replayClient, sourceId);
+      const { contents } = await resolver;
+
+      const lineText = contents!.split("\n")[line - 1];
       snippet = lineText?.slice(0, 100).trim();
     }
     let secondary = "";

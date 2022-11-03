@@ -136,7 +136,6 @@ export interface ReplayClientInterface {
   getRecordingId(): RecordingId | null;
   getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
   getSessionId(): SessionId | null;
-  getSourceContents(sourceId: SourceId): Promise<{ contents: string; contentType: ContentType }>;
   getSourceHitCounts(
     sourceId: SourceId,
     locationRange: SourceLocationRange,

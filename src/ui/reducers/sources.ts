@@ -21,6 +21,8 @@ import { UIState } from "ui/state";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 import { newSourcesToCompleteSourceDetails } from "ui/utils/sources";
 
+import { getStreamingSourceContentsHelper } from "@bvaughn/src/suspense/SourcesCache";
+
 export interface SourceDetails {
   isSourceMapped: boolean;
   contentHash?: string;
@@ -223,15 +225,16 @@ export const loadSourceText = (sourceId: string): UIThunkAction<Promise<void>> =
     dispatch(sourceLoading(sourceId));
 
     try {
-      const response = await replayClient.getSourceContents(sourceId);
+      const { resolver } = await getStreamingSourceContentsHelper(replayClient, sourceId);
+      const { contents, contentType } = await resolver;
 
       parser.setSource(sourceId, {
         type: "text",
-        value: response.contents,
-        contentType: response.contentType,
+        value: contents,
+        contentType,
       });
 
-      dispatch(sourceLoaded({ sourceId, ...response }));
+      dispatch(sourceLoaded({ contents: contents!, contentType: contentType!, sourceId }));
     } catch (e) {
       dispatch(sourceErrored(sourceId));
     }

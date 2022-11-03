@@ -543,18 +543,6 @@ export class ReplayClient implements ReplayClientInterface {
     return this._sessionId;
   }
 
-  async getSourceContents(
-    sourceId: SourceId
-  ): Promise<{ contents: string; contentType: ContentType }> {
-    const sessionId = this.getSessionIdThrows();
-    const { contents, contentType } = await client.Debugger.getSourceContents(
-      { sourceId },
-      sessionId
-    );
-
-    return { contents, contentType };
-  }
-
   async getSourceHitCounts(
     sourceId: SourceId,
     locationRange: SourceLocationRange,

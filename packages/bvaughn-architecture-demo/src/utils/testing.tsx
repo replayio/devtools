@@ -206,10 +206,6 @@ export function createMockReplayClient() {
       time: 1000,
     })),
     getSessionId: jest.fn().mockImplementation(async () => "fake-session-id"),
-    getSourceContents: jest.fn().mockImplementation(async () => ({
-      contents: "fake-source-contents",
-      contentType: "text/javascript",
-    })),
     getSourceHitCounts: jest.fn().mockImplementation(async () => new Map()),
     initialize: jest.fn().mockImplementation(async () => {}),
     loadRegion: jest.fn().mockImplementation(async () => {}),
