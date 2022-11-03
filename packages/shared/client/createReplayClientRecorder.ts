@@ -1,4 +1,6 @@
-import createRecorder from "shared/proxy/createRecorder";
+import { SourceId, sourceContentsChunk, sourceContentsInfo } from "@replayio/protocol";
+
+import createRecorder, { RecorderAPI } from "shared/proxy/createRecorder";
 import { Entry } from "shared/proxy/types";
 
 import { encode } from "./encoder";
@@ -54,11 +56,43 @@ export default function createReplayClientRecorder(
     return args;
   }
 
+  async function streamSourceContents(
+    sourceId: SourceId,
+    onSourceContentsInfo: (params: sourceContentsInfo) => void,
+    onSourceContentsChunk: (params: sourceContentsChunk) => void
+  ) {
+    const recorderAPI = arguments[arguments.length - 1] as RecorderAPI;
+    const flushRecord = recorderAPI.holdUntil();
+
+    const onSourceContentsChunkWrapper = (params: sourceContentsChunk) => {
+      recorderAPI.callParamWithArgs(2, params);
+      onSourceContentsChunk(params);
+
+      // Events may be emitted after the streamSourceContents Promise has resolved because of throttling,
+      // so this call is necessary to let the Proxy know that it's safe to write the entry.
+      //
+      // We are assuming only one chunk per file because our e2e tests all use small source files.
+      flushRecord();
+    };
+
+    const onSourceContentsInfoWrapper = (params: sourceContentsInfo) => {
+      recorderAPI.callParamWithArgs(1, params);
+      onSourceContentsInfo(params);
+    };
+
+    return replayClient.streamSourceContents(
+      sourceId,
+      onSourceContentsInfoWrapper,
+      onSourceContentsChunkWrapper
+    );
+  }
+
   const [proxyReplayClient] = createRecorder<ReplayClientInterface>(replayClient, {
     onAsyncRequestPending,
     onAsyncRequestResolved,
     onEntriesChanged,
     sanitizeArgs,
+    overrides: { streamSourceContents },
   });
 
   return proxyReplayClient;

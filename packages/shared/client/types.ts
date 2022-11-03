@@ -161,4 +161,19 @@ export interface ReplayClientInterface {
     },
     onMatches: (matches: SearchSourceContentsMatch[]) => void
   ): Promise<void>;
+  streamSourceContents(
+    sourceId: SourceId,
+    onSourceContentsInfo: ({
+      codeUnitCount,
+      contentType,
+      lineCount,
+      sourceId,
+    }: {
+      codeUnitCount: number;
+      contentType: ContentType;
+      lineCount: number;
+      sourceId: SourceId;
+    }) => void,
+    onSourceContentsChunk: ({ chunk, sourceId }: { chunk: string; sourceId: SourceId }) => void
+  ): Promise<void>;
 }

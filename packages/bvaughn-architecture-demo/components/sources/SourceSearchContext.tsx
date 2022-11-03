@@ -1,7 +1,7 @@
 import { ReactNode, createContext, useContext, useEffect, useMemo } from "react";
 
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import { getSourceContentsHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { getStreamingSourceContentsHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useSourceSearch, { Actions, SetScope, State } from "./hooks/useSourceSearch";
@@ -28,8 +28,9 @@ export function SourceSearchContextRoot({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function updateSourceContents(focusedSourceId: string | null, setScope: SetScope) {
       if (focusedSourceId) {
-        const { contents: code } = await getSourceContentsHelper(client, focusedSourceId);
-        setScope(focusedSourceId, code);
+        const { resolver } = await getStreamingSourceContentsHelper(client, focusedSourceId);
+        const { contents: code } = await resolver;
+        setScope(focusedSourceId, code || "");
       } else {
         setScope(null, "");
       }

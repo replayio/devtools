@@ -1,0 +1,27 @@
+.Container {
+  height: 0.25em;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  overflow: hidden;
+  background-color: #aaaaaa;
+  transition: height 250ms ease-out;
+}
+
+.ParsedProgressBar,
+.RawProgressBar {
+  position: absolute;
+  top: 0;
+  width: 0;
+  height: 100%;
+  overflow: hidden;
+}
+.ParsedProgressBar {
+  background-color: #09a6e9;
+  transition: width 250ms ease-out, opacity 100ms ease-out;
+  opacity: 0;
+}
+.RawProgressBar {
+  background-color: #454950;
+  transition: width 250ms ease-out;
+}

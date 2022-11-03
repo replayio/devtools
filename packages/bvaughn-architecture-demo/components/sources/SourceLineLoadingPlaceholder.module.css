@@ -1,0 +1,22 @@
+.Shimmer {
+  display: inline-block;
+  height: 1em;
+  background-color: var(--background-color-contrast-3);
+  border-radius: 0.25em;
+
+  animation-name: shimmer;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}

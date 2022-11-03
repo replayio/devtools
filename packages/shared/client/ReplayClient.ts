@@ -31,7 +31,10 @@ import {
   keyboardEvents,
   navigationEvents,
   searchSourceContentsMatches,
+  sourceContentsChunk,
+  sourceContentsInfo,
 } from "@replayio/protocol";
+import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
 
 import { initProtocolMessagesStore } from "bvaughn-architecture-demo/components/protocol/ProtocolMessagesStore";
@@ -51,7 +54,6 @@ import {
   HitPointStatus,
   HitPointsAndStatusTuple,
   LineNumberToHitCountMap,
-  Point,
   ReplayClientEvents,
   ReplayClientInterface,
   RunAnalysisParams,
@@ -549,6 +551,7 @@ export class ReplayClient implements ReplayClientInterface {
       { sourceId },
       sessionId
     );
+
     return { contents, contentType };
   }
 
@@ -787,6 +790,49 @@ export class ReplayClient implements ReplayClientInterface {
         reject(error);
       }
     });
+  }
+
+  async streamSourceContents(
+    sourceId: SourceId,
+    onSourceContentsInfo: (params: sourceContentsInfo) => void,
+    onSourceContentsChunk: (params: sourceContentsChunk) => void
+  ): Promise<void> {
+    const sessionId = this.getSessionIdThrows();
+
+    let pendingChunk = "";
+
+    const callSourceContentsChunkThrottled = throttle(() => {
+      onSourceContentsChunk({ chunk: pendingChunk, sourceId });
+      pendingChunk = "";
+    }, 100);
+
+    const onSourceContentsChunkWrapper = (params: sourceContentsChunk) => {
+      // It's important to buffer the chunks before passing them along to subscribers.
+      // The backend decides how much text to send in each chunk,
+      // but if chunks are too small (and events are too close together)
+      // then we may schedule too many updates with React and causing a lot of memory pressure.
+      if (params.sourceId === sourceId) {
+        pendingChunk += params.chunk;
+
+        callSourceContentsChunkThrottled();
+      }
+    };
+
+    const onSourceContentsInfoWrapper = (params: sourceContentsInfo) => {
+      if (params.sourceId === sourceId) {
+        onSourceContentsInfo(params);
+      }
+    };
+
+    try {
+      client.Debugger.addSourceContentsChunkListener(onSourceContentsChunkWrapper);
+      client.Debugger.addSourceContentsInfoListener(onSourceContentsInfoWrapper);
+
+      await client.Debugger.streamSourceContents({ sourceId }, sessionId);
+    } finally {
+      client.Debugger.removeSourceContentsChunkListener(onSourceContentsChunkWrapper);
+      client.Debugger.removeSourceContentsInfoListener(onSourceContentsInfoWrapper);
+    }
   }
 
   _dispatchEvent(type: ReplayClientEvents, ...args: any[]): void {
