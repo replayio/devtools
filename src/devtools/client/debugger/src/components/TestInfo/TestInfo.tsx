@@ -89,7 +89,7 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
           {test.steps ? (            
             <MaterialIcon>{expandSteps ? "expand_more" : "chevron_right"}</MaterialIcon>
           ) : null}
-          <div className="flex flex-col items-start">
+          <div className="flex flex-col items-start text-bodyColor">
             <div className="overflow-hidden whitespace-pre overflow-ellipsis">{test.title}</div>
             {test.error ? (
               <div className="overflow-hidden bg-red-100 py-1 px-2 rounded-lg mt-1">{test.error.message}</div>              
