@@ -60,6 +60,8 @@ import {
   SourceLocationRange,
 } from "./types";
 
+const STREAMING_THROTTLE_DURATION = 100;
+
 // TODO How should the client handle concurrent requests?
 // Should we force serialization?
 // Should we cancel in-flight requests and start new ones?
@@ -788,11 +790,18 @@ export class ReplayClient implements ReplayClientInterface {
     const sessionId = this.getSessionIdThrows();
 
     let pendingChunk = "";
+    let pendingThrottlePromise: Promise<void> | null = null;
+    let resolvePendingThrottlePromise: Function | null = null;
 
     const callSourceContentsChunkThrottled = throttle(() => {
       onSourceContentsChunk({ chunk: pendingChunk, sourceId });
       pendingChunk = "";
-    }, 100);
+
+      if (resolvePendingThrottlePromise !== null) {
+        resolvePendingThrottlePromise();
+        pendingThrottlePromise = null;
+      }
+    }, STREAMING_THROTTLE_DURATION);
 
     const onSourceContentsChunkWrapper = (params: sourceContentsChunk) => {
       // It's important to buffer the chunks before passing them along to subscribers.
@@ -801,6 +810,12 @@ export class ReplayClient implements ReplayClientInterface {
       // then we may schedule too many updates with React and causing a lot of memory pressure.
       if (params.sourceId === sourceId) {
         pendingChunk += params.chunk;
+
+        if (pendingThrottlePromise === null) {
+          pendingThrottlePromise = new Promise(r => {
+            resolvePendingThrottlePromise = r;
+          });
+        }
 
         callSourceContentsChunkThrottled();
       }
@@ -817,6 +832,11 @@ export class ReplayClient implements ReplayClientInterface {
       client.Debugger.addSourceContentsInfoListener(onSourceContentsInfoWrapper);
 
       await client.Debugger.streamSourceContents({ sourceId }, sessionId);
+
+      // Don't resolve the outer Promise until the last chunk has been processed.
+      if (pendingThrottlePromise !== null) {
+        await pendingThrottlePromise;
+      }
     } finally {
       client.Debugger.removeSourceContentsChunkListener(onSourceContentsChunkWrapper);
       client.Debugger.removeSourceContentsInfoListener(onSourceContentsInfoWrapper);

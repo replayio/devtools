@@ -149,15 +149,8 @@ export async function getStreamingSourceContentsHelper(
   try {
     return getStreamingSourceContentsSuspense(client, sourceId);
   } catch (errorOrPromise) {
-    if (
-      errorOrPromise != null &&
-      typeof errorOrPromise === "object" &&
-      errorOrPromise.hasOwnProperty("then")
-    ) {
-      return errorOrPromise as Promise<StreamingSourceContents>;
-    } else {
-      throw errorOrPromise;
-    }
+    await errorOrPromise;
+    return getStreamingSourceContentsSuspense(client, sourceId);
   }
 }
 
