@@ -116,30 +116,6 @@ export function getCachedSourceContents(sourceId: ProtocolSourceId): ProtocolSou
   return record?.status === STATUS_RESOLVED ? record.value : null;
 }
 
-export function getSourceContentsSuspense(
-  client: ReplayClientInterface,
-  sourceId: ProtocolSourceId
-): ProtocolSourceContents {
-  let record = sourceIdToSourceContentsMap.get(sourceId);
-  if (record == null) {
-    record = {
-      status: STATUS_PENDING,
-      value: createWakeable<ProtocolSourceContents>(),
-    };
-
-    sourceIdToSourceContentsMap.set(sourceId, record);
-
-    // Suspense caches fire and forget; errors will be handled within the fetch function.
-    fetchSourceContents(client, sourceId, record, record.value);
-  }
-
-  if (record!.status === STATUS_RESOLVED) {
-    return record!.value;
-  } else {
-    throw record!.value;
-  }
-}
-
 export function getStreamingSourceContentsSuspense(
   client: ReplayClientInterface,
   sourceId: ProtocolSourceId
@@ -284,27 +260,6 @@ async function fetchSources(client: ReplayClientInterface) {
 
   inProgressSourcesWakeable!.resolve(sources!);
   inProgressSourcesWakeable = null;
-}
-
-async function fetchSourceContents(
-  client: ReplayClientInterface,
-  sourceId: ProtocolSourceId,
-  record: Record<ProtocolSourceContents>,
-  wakeable: Wakeable<ProtocolSourceContents>
-) {
-  try {
-    const sourceContents = await client.getSourceContents(sourceId);
-
-    record.status = STATUS_RESOLVED;
-    record.value = sourceContents;
-
-    wakeable.resolve(record.value);
-  } catch (error) {
-    record.status = STATUS_REJECTED;
-    record.value = error;
-
-    wakeable.reject(error);
-  }
 }
 
 async function fetchStreamingSourceContents(
