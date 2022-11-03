@@ -2,6 +2,7 @@ import { Action } from "@reduxjs/toolkit";
 import { RecordingId } from "@replayio/protocol";
 import escapeHtml from "escape-html";
 
+import { getStreamingSourceContentsHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import {
   handleUnstableSourceIds,
   selectLocation,
@@ -34,8 +35,6 @@ import { trackEvent } from "ui/utils/telemetry";
 import type { UIThunkAction } from "./index";
 import { setSelectedPrimaryPanel } from "./layout";
 import { seek } from "./timeline";
-
-import { getStreamingSourceContentsHelper } from "@bvaughn/src/suspense/SourcesCache";
 
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
 

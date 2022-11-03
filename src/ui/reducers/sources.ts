@@ -9,6 +9,7 @@ import {
 import { Location, MappedLocation, SourceKind, newSource } from "@replayio/protocol";
 
 import { preCacheSources } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { getStreamingSourceContentsHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import type { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 // TODO Move prefs out of reducers and load this separately
@@ -20,8 +21,6 @@ import { listenForCondition } from "ui/setup/listenerMiddleware";
 import { UIState } from "ui/state";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 import { newSourcesToCompleteSourceDetails } from "ui/utils/sources";
-
-import { getStreamingSourceContentsHelper } from "@bvaughn/src/suspense/SourcesCache";
 
 export interface SourceDetails {
   isSourceMapped: boolean;
