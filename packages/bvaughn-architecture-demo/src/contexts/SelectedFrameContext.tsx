@@ -1,6 +1,7 @@
 import { FrameId, PauseId } from "@replayio/protocol";
 import isEqual from "lodash/isEqual";
 import {
+  ComponentType,
   Dispatch,
   PropsWithChildren,
   SetStateAction,
@@ -34,12 +35,20 @@ export const SelectedFrameContext = createContext<SelectedFrameContextType>({
   setSelectedPauseAndFrameId: () => {},
 });
 
-export function SelectedFrameContextRoot({ children }: PropsWithChildren<{}>) {
+export function SelectedFrameContextRoot({
+  children,
+  SelectedFrameContextAdapter = DefaultSelectedFrameContextAdapter,
+}: PropsWithChildren & {
+  SelectedFrameContextAdapter?: ComponentType;
+}) {
   const [selectedPauseAndFrameId, setSelectedPauseAndFrameId] = useState<PauseAndFrameId | null>(
     null
   );
   const context = useMemo(
-    () => ({ selectedPauseAndFrameId, setSelectedPauseAndFrameId }),
+    () => ({
+      selectedPauseAndFrameId,
+      setSelectedPauseAndFrameId,
+    }),
     [selectedPauseAndFrameId, setSelectedPauseAndFrameId]
   );
 
@@ -53,7 +62,7 @@ export function SelectedFrameContextRoot({ children }: PropsWithChildren<{}>) {
   );
 }
 
-function SelectedFrameContextAdapter() {
+function DefaultSelectedFrameContextAdapter() {
   const client = useContext(ReplayClientContext);
   const loadedRegions = useLoadedRegions(client);
   const { executionPoint } = useContext(TimelineContext);
@@ -77,6 +86,8 @@ function SelectedFrameContextAdapter() {
         return;
       }
 
+      // TODO
+      // Select the top frame by default because the test harness doesn't have a Call Stack UI yet.
       const pauseId = pause.pauseId;
       const frameId = pause.stack?.[0] ?? null;
 
