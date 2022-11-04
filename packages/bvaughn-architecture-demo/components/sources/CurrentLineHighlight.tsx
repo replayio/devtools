@@ -2,9 +2,13 @@ import { SourceId } from "@replayio/protocol";
 import { Suspense, useContext } from "react";
 
 import useCurrentPause from "bvaughn-architecture-demo/src/hooks/useCurrentPause";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
+import { SelectedFrameContext } from "../../src/contexts/SelectedFrameContext";
 import { SourceSearchContext } from "./SourceSearchContext";
 import styles from "./CurrentLineHighlight.module.css";
+
+import { getPauseDataSuspense } from "@bvaughn/src/suspense/PauseCache";
 
 type Props = {
   lineNumber: number;
@@ -19,26 +23,30 @@ export default function CurrentLineHighlight(props: Props) {
   );
 }
 function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
+  const client = useContext(ReplayClientContext);
   const [sourceSearchState] = useContext(SourceSearchContext);
 
-  const pauseData = useCurrentPause();
-  if (pauseData !== null && pauseData.data && pauseData.data.frames) {
-    // TODO [source viewer]
-    // Top frame is not necessarily the selected frame.
-    // Look at Holger's new SelectedFrameContext (PR 7987)
-    const topFrame = pauseData.data.frames[0];
-    if (topFrame) {
-      if (
-        topFrame.location.find(
-          location => location.line === lineNumber && location.sourceId === sourceId
-        )
-      ) {
-        return (
-          <div
-            className={styles.CurrentExecutionPoint}
-            data-test-name="CurrentExecutionPointLineHighlight"
-          />
-        );
+  const { selectedPauseAndFrameId } = useContext(SelectedFrameContext);
+  const frameId = selectedPauseAndFrameId?.frameId || null;
+  const pauseId = selectedPauseAndFrameId?.pauseId || null;
+
+  if (pauseId !== null && frameId !== null) {
+    const pauseData = getPauseDataSuspense(client, pauseId);
+    if (pauseData !== null && pauseData.frames) {
+      const selectedFrame = pauseData.frames.find(frame => frame.frameId === frameId);
+      if (selectedFrame) {
+        if (
+          selectedFrame.location.find(
+            location => location.line === lineNumber && location.sourceId === sourceId
+          )
+        ) {
+          return (
+            <div
+              className={styles.CurrentExecutionPoint}
+              data-test-name="CurrentExecutionPointLineHighlight"
+            />
+          );
+        }
       }
     }
   }

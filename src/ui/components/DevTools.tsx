@@ -35,6 +35,7 @@ import KeyboardShortcuts from "./KeyboardShortcuts";
 import { KeyModifiers } from "./KeyModifiers";
 import { ReduxAnnotationsProvider } from "./SecondaryToolbox/redux-devtools/ReduxAnnotationsProvider";
 import TimelineContextAdapter from "./SecondaryToolbox/TimelineContextAdapter";
+import SelectedFrameContextAdapter from "./SelectedFrameContextAdapter";
 import SessionContextAdapter from "./SessionContextAdapter";
 import LoadingScreen from "./shared/LoadingScreen";
 import ReplayLogo from "./shared/ReplayLogo";
@@ -207,7 +208,7 @@ function _DevTools({
         <FocusContextReduxAdapter>
           <PointsContextRoot>
             <TimelineContextAdapter>
-              <SelectedFrameContextRoot>
+              <SelectedFrameContextRoot SelectedFrameContextAdapter={SelectedFrameContextAdapter}>
                 <TerminalContextAdapter>
                   <InspectorContextReduxAdapter>
                     <KeyModifiers>
