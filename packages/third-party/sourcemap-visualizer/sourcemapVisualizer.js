@@ -327,6 +327,15 @@ export default function renderSourcemap(source, sourcemap, url, document) {
 
     // Populate the file picker
     let initialSelectedIndex = -1;
+
+    // REPLAY: We want to display sources in sorted order in the dropdown, but the parsing logic
+    // relies on source indices, and needs those to be _unsorted_. We also need the unsorted
+    // indices while hovering to draw arrows correctly.
+    // Track the original unsorted indices in a map keyed by filename so we can pass those through.
+    const unsortedSourceIndices = new Map();
+    sm.sources.forEach( (source, i) => {
+      unsortedSourceIndices.set(source.name, i);
+    })    
     const sortedSources = sm.sources.slice().sort( (a, b) => a.name.localeCompare(b.name));
 
     for (let sources = sortedSources, i = 0, n = sortedSources.length; i < n; i++) {
@@ -347,6 +356,7 @@ export default function renderSourcemap(source, sourcemap, url, document) {
         const source = sortedSources[fileList.selectedIndex];
         originalTextArea = createTextArea({
           sourceIndex: fileList.selectedIndex,
+          unsortedSourceIndex: unsortedSourceIndices.get(source.name),
           text: source.content,
           mappings: source.data,
           mappingsOffset: 3,
@@ -603,7 +613,7 @@ export default function renderSourcemap(source, sourcemap, url, document) {
     return { lines, longestLineInColumns };
   }
 
-  function createTextArea({ sourceIndex, text, mappings, mappingsOffset, otherSource, originalName, bounds }) {
+  function createTextArea({ sourceIndex, unsortedSourceIndex, text, mappings, mappingsOffset, otherSource, originalName, bounds }) {
     const shadowWidth = 16;
     const textPaddingX = 5;
     const textPaddingY = 1;
@@ -832,6 +842,7 @@ export default function renderSourcemap(source, sourcemap, url, document) {
 
     return {
       sourceIndex,
+      unsortedSourceIndex,
       bounds,
 
       getHoverRect() {
@@ -929,7 +940,7 @@ export default function renderSourcemap(source, sourcemap, url, document) {
             if (sourceIndex !== null) {
               generatedTextArea.scrollTo(hover.mapping.generatedColumn, hover.mapping.generatedLine);
             } else {
-              if (originalTextArea.sourceIndex !== hover.mapping.originalSource) {
+              if (originalTextArea.unsortedSourceIndex !== hover.mapping.originalSource) {
                 fileList.selectedIndex = hover.mapping.originalSource;
                 fileList.onchange();
               }
@@ -1288,15 +1299,15 @@ export default function renderSourcemap(source, sourcemap, url, document) {
     c.fillRect((innerWidth >>> 1) - (splitterWidth >> 1), toolbarHeight, splitterWidth, innerHeight - toolbarHeight - statusBarHeight);
 
     // Draw the arrow between the two hover areas
-    if (hover && hover.mapping && originalTextArea && originalTextArea.sourceIndex === hover.mapping.originalSource) {
+    if (hover && hover.mapping && originalTextArea && originalTextArea.unsortedSourceIndex === hover.mapping.originalSource) {
       const originalHoverRect = originalTextArea.getHoverRect();
       const generatedHoverRect = generatedTextArea.getHoverRect();
       if (originalHoverRect && generatedHoverRect) {
         const textColor = bodyStyle.color;
         const originalBounds = originalTextArea.bounds();
         const generatedBounds = generatedTextArea.bounds();
-        const originalArrowHead = hover.sourceIndex === generatedTextArea.sourceIndex;
-        const generatedArrowHead = hover.sourceIndex === originalTextArea.sourceIndex;
+        const originalArrowHead = hover.sourceIndex === generatedTextArea.unsortedSourceIndex;
+        const generatedArrowHead = hover.sourceIndex === originalTextArea.unsortedSourceIndex;
         const [ox, oy, ow, oh] = originalHoverRect;
         const [gx, gy, , gh] = generatedHoverRect;
         const x1 = Math.min(ox + ow, originalBounds.x + originalBounds.width) + (originalArrowHead ? 10 : 2);
