@@ -16,7 +16,6 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@bvaughn/*": ["./*"],
       "design/*": ["../design/*"],
       "protocol/*": ["../protocol/*"],
       "shared/*": ["../shared/*"]

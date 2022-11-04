@@ -17,7 +17,7 @@
     "downlevelIteration": true,
     "baseUrl": ".",
     "paths": {
-      "@bvaughn/*": ["../bvaughn-architecture-demo/*"]
+      "bvaughn-architecture-demo/*": ["../bvaughn-architecture-demo/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "../bvaughn-architecture-demo/**/*.ts*"],
