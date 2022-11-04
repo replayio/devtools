@@ -129,14 +129,6 @@
    * See https://github.com/firefox-devtools/debugger.html/issues/7782.
    */
   display: none;
-  /*
-  background-color:var(--body-color);
-  display: inline-block;
-  width: 12px;
-  height:12px;
-  vertical-align: middle;
-  margin-inline-end:4px;
-  */
 }
 
 .expanded .img.annotation-logo {
@@ -161,6 +153,9 @@
 }
 
 /* Frameworks */
-:root.theme-dark .annotation-logo:not(.angular) {
-  background-color: var(--theme-highlight-blue);
+:root.theme-light .frames .img.annotation-logo:not(.angular) {
+  background-color: var(--blue-50);
+}
+:root.theme-dark .frames .img.annotation-logo:not(.angular) {
+  background-color: var(--blue-30);
 }
