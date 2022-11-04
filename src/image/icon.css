@@ -202,3 +202,13 @@ but without a background color so we can use hover effects
 .icon.tests {
   -webkit-mask-image: url(/icons/tests.svg);
 }
+
+/* testsuites */
+
+.icon.testsuites-success {
+  -webkit-mask-image: url(/icons/testsuites-success.svg);
+}
+
+.icon.testsuites-fail {
+  -webkit-mask-image: url(/icons/testsuites-fail.svg);
+}
