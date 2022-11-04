@@ -86,6 +86,8 @@ function DefaultSelectedFrameContextAdapter() {
         return;
       }
 
+      // TODO
+      // Select the top frame by default because the test harness doesn't have a Call Stack UI yet.
       const pauseId = pause.pauseId;
       const frameId = pause.stack?.[0] ?? null;
 
