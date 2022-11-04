@@ -54,7 +54,6 @@
 
 :root.theme-dark .frames .location {
   color: var(--body-color);
-  opacity: 0.6;
 }
 
 .frames .title {
@@ -126,6 +125,18 @@
 .frames .img.annotation-logo {
   margin-inline-end: 4px;
   background-color: var(--theme-tab-toolbar-background);
+}
+
+/* Frameworks */
+:root.theme-dark .frames .img.annotation-logo:not(.angular) {
+  background-color: var(--blue-30);
+}
+:root.theme-light .frames .img.annotation-logo:not(.angular) {
+  background-color: var(--blue-50);
+}
+:root.theme-dark .frames .selected .img.annotation-logo:not(.angular),
+:root.theme-light .frames .selected .img.annotation-logo:not(.angular) {
+  background-color: var(--theme-selection-color);
 }
 
 /*
