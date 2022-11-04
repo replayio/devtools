@@ -14,7 +14,7 @@ import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesCo
 import { getSource } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useFeature } from "ui/hooks/settings";
-import { getSelectedLocation, getSelectedLocationHasScrolled } from "ui/reducers/sources";
+import { getSelectedLocation } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { setViewport } from "../../selectors";

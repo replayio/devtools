@@ -7,6 +7,8 @@ import {
 } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { getShownSource } from "devtools/client/debugger/src/selectors";
 import { findClosestFunctionNameThunk } from "devtools/client/debugger/src/utils/ast";
+import { useFeature } from "ui/hooks/settings";
+import { getSelectedLocation } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 // Relays information about the active source from Redux to the newer SourcesContext.
@@ -30,17 +32,36 @@ export default function SourcesContextWrapper({ children }: PropsWithChildren) {
   );
 }
 
+// This adapter keeps the newer Points components in-sync with the Redux state.
+//
+// TODO [source viewer]
+// Once the new Source viewer is rolled out always-on, we should delete this adapter.
 function SourcesContextAdapter({ children }: { children: ReactNode }) {
-  const shownSource = useAppSelector(getShownSource);
-  const shownSourceId = shownSource ? shownSource.id : null;
+  const selectedLocation = useAppSelector(getSelectedLocation);
+  const selectedLineNumber = selectedLocation?.line || null;
+  const selectedSourceId = selectedLocation?.sourceId || null;
+
+  const { value: enableNewSourceViewer } = useFeature("newSourceViewer");
 
   const { focusedSourceId, openSource } = useContext(SourcesContext);
 
   useLayoutEffect(() => {
-    if (shownSourceId !== null && shownSourceId !== focusedSourceId) {
-      openSource(shownSourceId);
+    if (enableNewSourceViewer) {
+      // The new Source viewer has its own context adapter, NewSourceAdapter.
+      // This adapter can skip its update if the new Source viewer is enabled.
+      return;
     }
-  }, [focusedSourceId, openSource, shownSourceId]);
+
+    if (selectedSourceId !== null && selectedSourceId !== focusedSourceId) {
+      // TRICKY
+      // Legacy code passes 1-based line numbers around,
+      // Except when a filed is opened (e.g. by clicking on the file tab) in which cases it passes 0.
+      // We ignore the 0 because it breaks scroll state preservation between tabs.
+      const lineNumber = selectedLineNumber !== null ? selectedLineNumber + 1 : undefined;
+
+      openSource(selectedSourceId, lineNumber);
+    }
+  }, [enableNewSourceViewer, focusedSourceId, openSource, selectedLineNumber, selectedSourceId]);
 
   return children as any;
 }
