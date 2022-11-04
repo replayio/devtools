@@ -8,7 +8,6 @@ import { createFrame } from "devtools/client/debugger/src/client/create";
 import { PauseAndFrameId } from "devtools/client/debugger/src/reducers/pause";
 import { formatCallStackFrames } from "devtools/client/debugger/src/selectors/getCallStackFrames";
 import { Pause } from "protocol/thread/pause";
-import { ThreadFront } from "protocol/thread/thread";
 import { assert } from "protocol/utils";
 import { SourcesState } from "ui/reducers/sources";
 
