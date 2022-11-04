@@ -3,6 +3,8 @@ import escapeRegExp from "lodash/escapeRegExp";
 import isEqual from "lodash/isEqual";
 import { useMemo, useState } from "react";
 
+import { NEW_LINE_REGEX } from "bvaughn-architecture-demo/src/utils/string";
+
 import useSearch from "./useSearch";
 import type { Actions as SearchActions, State as SearchState } from "./useSearch";
 
@@ -74,7 +76,7 @@ export default function useSourceSearch(): [State, Actions] {
     wholeWord: false,
   });
 
-  const lines = useMemo(() => scope.code.split("\n"), [scope.code]);
+  const lines = useMemo(() => scope.code.split(NEW_LINE_REGEX), [scope.code]);
 
   const [state, dispatch] = useSearch<string, number, SearchModifiers>(
     lines,
