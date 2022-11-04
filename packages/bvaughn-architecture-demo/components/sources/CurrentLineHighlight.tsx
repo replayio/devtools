@@ -1,14 +1,12 @@
 import { SourceId } from "@replayio/protocol";
 import { Suspense, useContext } from "react";
 
-import useCurrentPause from "bvaughn-architecture-demo/src/hooks/useCurrentPause";
+import { getPauseDataSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { SelectedFrameContext } from "../../src/contexts/SelectedFrameContext";
 import { SourceSearchContext } from "./SourceSearchContext";
 import styles from "./CurrentLineHighlight.module.css";
-
-import { getPauseDataSuspense } from "@bvaughn/src/suspense/PauseCache";
 
 type Props = {
   lineNumber: number;
