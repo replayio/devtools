@@ -116,6 +116,8 @@ export interface ReplayClientInterface {
     sourceId: SourceId,
     range: SourceLocationRange | null
   ): Promise<SameLineSourceLocations[]>;
+  getCorrespondingLocations(location: Location): Location[];
+  getCorrespondingSourceIds(sourceId: SourceId): SourceId[];
   getEventCountForTypes(eventTypes: EventHandlerType[]): Promise<Record<string, number>>;
   getHitPointsForLocation(
     focusRange: TimeStampedPointRange | null,

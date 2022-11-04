@@ -1,5 +1,5 @@
 import { SourceId } from "@replayio/protocol";
-import { Suspense, useContext } from "react";
+import { Suspense, memo, useContext } from "react";
 
 import { getPauseDataSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -13,13 +13,14 @@ type Props = {
   sourceId: SourceId;
 };
 
-export default function CurrentLineHighlight(props: Props) {
+export default memo(function CurrentLineHighlight(props: Props) {
   return (
     <Suspense>
       <CurrentLineHighlightSuspends {...props} />
     </Suspense>
   );
-}
+});
+
 function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
   const client = useContext(ReplayClientContext);
   const [sourceSearchState] = useContext(SourceSearchContext);
@@ -31,12 +32,22 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
   if (pauseId !== null && frameId !== null) {
     const pauseData = getPauseDataSuspense(client, pauseId);
     if (pauseData !== null && pauseData.frames) {
+      const correspondingSourceIds = client.getCorrespondingSourceIds(sourceId);
       const selectedFrame = pauseData.frames.find(frame => frame.frameId === frameId);
       if (selectedFrame) {
         if (
-          selectedFrame.location.find(
-            location => location.line === lineNumber && location.sourceId === sourceId
-          )
+          selectedFrame.location.find(location => {
+            if (correspondingSourceIds.includes(location.sourceId)) {
+              const correspondingLocations = client.getCorrespondingLocations(location);
+              return (
+                correspondingLocations.findIndex(
+                  correspondingLocation =>
+                    correspondingLocation.line === lineNumber &&
+                    correspondingLocation.sourceId === sourceId
+                ) >= 0
+              );
+            }
+          })
         ) {
           return (
             <div

@@ -124,7 +124,7 @@ export class ReplayClient implements ReplayClientInterface {
   async breakpointAdded(location: Location, condition: string | null): Promise<BreakpointId[]> {
     const sessionId = this.getSessionIdThrows();
 
-    const correspondingLocations = this._getCorrespondingLocations(location);
+    const correspondingLocations = this.getCorrespondingLocations(location);
 
     const breakpointIds: BreakpointId[] = await Promise.all(
       correspondingLocations.map(async location => {
@@ -345,7 +345,7 @@ export class ReplayClient implements ReplayClientInterface {
     const collectedHitPoints: TimeStampedPoint[] = [];
     let status: HitPointStatus | null = null;
 
-    const locations = this._getCorrespondingLocations(location).map(location => ({ location }));
+    const locations = this.getCorrespondingLocations(location).map(location => ({ location }));
 
     // The backend doesn't support filtering hit points by condition, so we fall back to running analysis.
     // This is less efficient so we only do it if we have a condition.
@@ -524,6 +524,20 @@ export class ReplayClient implements ReplayClientInterface {
     return result;
   }
 
+  getCorrespondingLocations(location: Location): Location[] {
+    const { column, line, sourceId } = location;
+    const sourceIds = this.getCorrespondingSourceIds(sourceId);
+    return sourceIds.map(sourceId => ({
+      column,
+      line,
+      sourceId,
+    }));
+  }
+
+  getCorrespondingSourceIds(sourceId: SourceId): SourceId[] {
+    return this._threadFront.getCorrespondingSourceIds(sourceId);
+  }
+
   getPreferredLocation(locations: Location[]): Location | null {
     if (this._injectedGetPreferredLocation != null) {
       return this._injectedGetPreferredLocation(locations);
@@ -577,7 +591,7 @@ export class ReplayClient implements ReplayClientInterface {
         ...location,
         columns: location.columns.slice(0, 1),
       }));
-    const correspondingSourceIds = this._threadFront.getCorrespondingSourceIds(sourceId);
+    const correspondingSourceIds = this.getCorrespondingSourceIds(sourceId);
 
     const hitCounts: LineNumberToHitCountMap = new Map();
 
@@ -637,7 +651,7 @@ export class ReplayClient implements ReplayClientInterface {
     // Breakpoint positions must be loaded for all sources,
     // else future API calls for things like hit counts will fail with "invalid location"
     // See BAC-2370
-    const correspondingSourceIds = this._threadFront.getCorrespondingSourceIds(sourceId);
+    const correspondingSourceIds = this.getCorrespondingSourceIds(sourceId);
     await Promise.all(
       correspondingSourceIds.map(async currentSourceId => {
         const { lineLocations: currentLineLocations } =
@@ -757,7 +771,7 @@ export class ReplayClient implements ReplayClientInterface {
 
       let locations;
       if (location) {
-        locations = this._getCorrespondingLocations(location).map(location => ({ location }));
+        locations = this.getCorrespondingLocations(location).map(location => ({ location }));
       }
 
       const analysisParams = {
@@ -848,16 +862,6 @@ export class ReplayClient implements ReplayClientInterface {
     if (handlers) {
       handlers.forEach(handler => handler(...args));
     }
-  }
-
-  _getCorrespondingLocations(location: Location): Location[] {
-    const { column, line, sourceId } = location;
-    const sourceIds = this._threadFront.getCorrespondingSourceIds(sourceId);
-    return sourceIds.map(sourceId => ({
-      column,
-      line,
-      sourceId,
-    }));
   }
 
   _onLoadChanges = (loadedRegions: LoadedRegions) => {
