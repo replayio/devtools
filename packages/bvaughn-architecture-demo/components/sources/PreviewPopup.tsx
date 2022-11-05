@@ -16,7 +16,7 @@ type Props = {
   target: HTMLElement;
 };
 
-export default function PreviewPopup(props: Omit<Props, "pause">) {
+export default function PreviewPopup(props: Props) {
   return (
     <Suspense fallback={null}>
       <SuspendingPreviewPopup {...props} />

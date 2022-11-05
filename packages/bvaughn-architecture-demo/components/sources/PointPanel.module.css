@@ -30,6 +30,7 @@
   flex-direction: column;
   gap: 1em;
   align-items: flex-start;
+  overflow-x: auto;
 }
 
 .SecondaryColumn {
