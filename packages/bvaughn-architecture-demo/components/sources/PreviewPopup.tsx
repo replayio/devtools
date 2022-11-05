@@ -1,8 +1,7 @@
-import { createPauseResult as Pause, Value as ProtocolValue } from "@replayio/protocol";
+import { Value as ProtocolValue } from "@replayio/protocol";
 import { RefObject, Suspense, useContext, useEffect, useRef } from "react";
 
 import { SelectedFrameContext } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
-import useCurrentPause from "bvaughn-architecture-demo/src/hooks/useCurrentPause";
 import { evaluateSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -14,11 +13,10 @@ type Props = {
   containerRef: RefObject<HTMLElement>;
   dismiss: () => void;
   expression: string;
-  pause: Pause;
   target: HTMLElement;
 };
 
-function SuspendingPreviewPopup({ containerRef, dismiss, expression, pause, target }: Props) {
+function SuspendingPreviewPopup({ containerRef, dismiss, expression, target }: Props) {
   const client = useContext(ReplayClientContext);
 
   const popupRef = useRef<HTMLDivElement>(null);
@@ -56,7 +54,7 @@ function SuspendingPreviewPopup({ containerRef, dismiss, expression, pause, targ
       <Popup containerRef={containerRef} dismiss={dismiss} target={target} showTail={true}>
         <SourcePreviewInspector
           className={styles.Popup}
-          pauseId={pause.pauseId}
+          pauseId={pauseId}
           protocolValue={value}
           ref={popupRef}
         />
@@ -68,14 +66,9 @@ function SuspendingPreviewPopup({ containerRef, dismiss, expression, pause, targ
 }
 
 export default function PreviewPopup(props: Omit<Props, "pause">) {
-  const pause = useCurrentPause();
-  if (pause === null) {
-    return null;
-  }
-
   return (
     <Suspense fallback={null}>
-      <SuspendingPreviewPopup {...props} pause={pause} />
+      <SuspendingPreviewPopup {...props} />
     </Suspense>
   );
 }
