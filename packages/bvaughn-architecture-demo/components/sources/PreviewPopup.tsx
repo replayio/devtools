@@ -16,6 +16,14 @@ type Props = {
   target: HTMLElement;
 };
 
+export default function PreviewPopup(props: Omit<Props, "pause">) {
+  return (
+    <Suspense fallback={null}>
+      <SuspendingPreviewPopup {...props} />
+    </Suspense>
+  );
+}
+
 function SuspendingPreviewPopup({ containerRef, dismiss, expression, target }: Props) {
   const client = useContext(ReplayClientContext);
 
@@ -63,12 +71,4 @@ function SuspendingPreviewPopup({ containerRef, dismiss, expression, target }: P
   } else {
     return null;
   }
-}
-
-export default function PreviewPopup(props: Omit<Props, "pause">) {
-  return (
-    <Suspense fallback={null}>
-      <SuspendingPreviewPopup {...props} />
-    </Suspense>
-  );
 }
