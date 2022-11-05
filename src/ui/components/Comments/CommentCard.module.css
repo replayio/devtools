@@ -20,3 +20,10 @@
   width: 2px;
   background-color: var(--secondary-accent);
 }
+
+.CommentCard :global(code) {
+  padding: 2px;
+  border-radius: 3px;
+  background-color: var(--chrome);
+  color: var(--cm-variable);
+}
