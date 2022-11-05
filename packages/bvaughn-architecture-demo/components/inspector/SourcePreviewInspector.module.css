@@ -23,6 +23,7 @@
 .FixedSizeInspectorWrapper {
   height: 250px !important;
   width: 400px;
+  overflow-x: hidden;
 }
 
 .Inspector {
