@@ -32,14 +32,6 @@ import getScrollbarWidth from "./utils/getScrollbarWidth";
 import { findPointForLocation } from "./utils/points";
 import styles from "./SourceList.module.css";
 
-// HACK
-// We could swap this out for something that lazily measures row height.
-const POINT_PANEL_HEIGHT = 90;
-const CONDITIONAL_POINT_PANEL_HEIGHT = 130;
-const LINE_HEIGHT = 15;
-const LINE_HEIGHT_WITH_POINT = LINE_HEIGHT + POINT_PANEL_HEIGHT;
-const LINE_HEIGHT_WITH_CONDITIONAL_POINT = LINE_HEIGHT + CONDITIONAL_POINT_PANEL_HEIGHT;
-
 export default function SourceList({
   height,
   showColumnBreakpoints,
