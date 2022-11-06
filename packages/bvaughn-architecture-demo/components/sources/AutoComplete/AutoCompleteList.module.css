@@ -1,6 +1,7 @@
 .List {
   border-radius: 0.25em;
   background-color: var(--background-color-default);
+  color: var(--color-default);
   border: 1px solid var(--border-color);
 
   font-family: var(--font-family-monospace);
