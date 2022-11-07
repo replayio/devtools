@@ -371,7 +371,10 @@ async function fetchSourceHitCounts(
 
     wakeable.resolve(record.value);
   } catch (error) {
-    if (isCommandError(error, ProtocolError.TooManyLocationsToPerformAnalysis)) {
+    if (
+      isCommandError(error, ProtocolError.TooManyLocationsToPerformAnalysis) ||
+      isCommandError(error, ProtocolError.LinkerDoesNotSupportAction)
+    ) {
       record.status = STATUS_RESOLVED;
       record.value = new Map();
     } else {

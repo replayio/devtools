@@ -7,6 +7,7 @@ export enum ProtocolError {
   RecordingUnloaded = 38,
   TooManyLocationsToPerformAnalysis = 67,
   TooManyPoints = 55,
+  LinkerDoesNotSupportAction = 48,
 }
 
 export const commandError = (message: string, code: number): CommandError => {
@@ -26,6 +27,11 @@ export const isCommandError = (error: unknown, code: number): boolean => {
       // TODO [BAC-2330] The Analysis endpoint returns an error string instead of an error object.
       return error === "There are too many points to complete this operation";
     }
+  } else if (code === ProtocolError.LinkerDoesNotSupportAction) {
+    if (typeof error === "string") {
+      console.error("Unexpected error type encountered (string):", error);
+    }
+    return error === "The linker version used to make this recording does not support this action";
   }
 
   return false;
