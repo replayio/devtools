@@ -1,4 +1,3 @@
-import "bvaughn-architecture-demo/components/sources/CodeMirror.css";
 import { KeyboardEvent, useContext, useEffect, useLayoutEffect, useRef } from "react";
 
 import LazyOffscreen from "bvaughn-architecture-demo/components/LazyOffscreen";
@@ -18,6 +17,7 @@ import { getSelectedLocation } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { setViewport } from "../../selectors";
+import "bvaughn-architecture-demo/components/sources/CodeMirror.css";
 
 export default function NewSourceAdapterRoot() {
   return (

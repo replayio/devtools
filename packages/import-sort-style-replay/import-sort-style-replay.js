@@ -31,7 +31,8 @@ function sortImports(styleApi) {
     Boolean(imported.moduleName.match(/^(ui\/state|ui\/setup\/hooks)/));
 
   const isMainSrcFolder = imported => Boolean(imported.moduleName.match(/^(devtools|ui)/));
-  const isOtherSrcFolder = imported => Boolean(imported.moduleName.match(/^(graphql|image|test)/));
+  const isOtherSrcFolder = imported =>
+    Boolean(imported.moduleName.match(/^(graphql|image|test|src)/));
 
   const isStylesModule = imported => Boolean(imported.moduleName.match(/\.(s?css|less)$/));
   const isImageModule = imported =>
@@ -40,7 +41,7 @@ function sortImports(styleApi) {
   return [
     // Start with side-effectful imports
     // import "foo"
-    { match: and(hasNoMember, isAbsoluteModule) },
+    { match: and(hasNoMember, isAbsoluteModule, not(isStylesModule)) },
 
     // import "./foo"
     {
@@ -50,7 +51,7 @@ function sortImports(styleApi) {
     // Built-ins
     // import … from "fs";
     {
-      match: isNodeModule,
+      match: and(isNodeModule, not(isStylesModule)),
       sort: moduleName(naturally),
       sortNamedMembers: alias(unicode),
     },
@@ -61,9 +62,9 @@ function sortImports(styleApi) {
       // Any of these libraries, sorted alphabetically
       match: or(
         // import React from "react";
-        isReactEcosystemModule,
+        and(isReactEcosystemModule, not(isStylesModule)),
         // import uniq from 'lodash/uniq'
-        and(isInstalledModule(__filename), not(isRelativeModule))
+        and(isInstalledModule(__filename), not(isRelativeModule), not(isStylesModule))
       ),
       sort: moduleName(naturally),
       sortNamedMembers: alias(unicode),
@@ -73,19 +74,22 @@ function sortImports(styleApi) {
     // App-wide globals
     {
       // Any of these absolute imports, sorted alphabetically
-      match: or(
-        // import { useAppDispatch } from "ui/setup/hooks"
-        // import type { UIState } from "ui/state";
-        isGlobalReduxStoreConfig,
-        // import { ThreadFront } from "protocol/thread"
-        isProtocolModule,
-        // import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-        isNewPrototypeModule,
-        // import { Icon } from "design/Icon"
-        isOtherInternalPackageModule,
-        // import Popover from "devtools/client/debugger/src/components/shared/Popover"
-        isMainSrcFolder,
-        isOtherSrcFolder
+      match: and(
+        or(
+          // import { useAppDispatch } from "ui/setup/hooks"
+          // import type { UIState } from "ui/state";
+          isGlobalReduxStoreConfig,
+          // import { ThreadFront } from "protocol/thread"
+          isProtocolModule,
+          // import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+          isNewPrototypeModule,
+          // import { Icon } from "design/Icon"
+          isOtherInternalPackageModule,
+          // import Popover from "devtools/client/debugger/src/components/shared/Popover"
+          isMainSrcFolder,
+          isOtherSrcFolder
+        ),
+        not(isStylesModule)
       ),
       sort: moduleName(naturally),
       sortNamedMembers: alias(unicode),
@@ -102,7 +106,13 @@ function sortImports(styleApi) {
       sortNamedMembers: alias(unicode),
     },
 
-    // Local assets
+    // Assets
+
+    // import styles from "bvaughn/something/Component.css"
+    {
+      match: and(isStylesModule, not(isRelativeModule)),
+      sort: moduleName(naturally),
+    },
 
     // import "./styles.css";
     { match: and(hasNoMember, isRelativeModule, isStylesModule) },
