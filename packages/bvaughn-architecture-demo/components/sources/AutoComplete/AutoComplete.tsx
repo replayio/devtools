@@ -1,6 +1,7 @@
 import { ChangeEvent, KeyboardEvent, Suspense, useRef, useState } from "react";
 
 import getExpressionFromString from "../utils/getExpressionFromString";
+import updateStringWithExpression from "../utils/updateStringWithExpression";
 import AutoCompleteList from "./AutoCompleteList";
 import styles from "./AutoComplete.module.css";
 
@@ -33,14 +34,9 @@ export default function AutoComplete({
       onChangeProp(newValue);
     }
 
-    const cursorIndex = input.selectionStart;
-    const shouldAutoComplete =
-      cursorIndex === newValue.length &&
-      newValue.length > 0 &&
-      newValue.charAt(newValue.length - 1) !== " ";
-    const expression = shouldAutoComplete
-      ? getExpressionFromString(newValue, cursorIndex - 1)
-      : null;
+    const cursorIndex = input.selectionStart || value.length;
+    const shouldAutoComplete = newValue.length > 0 && newValue.charAt(newValue.length - 1) !== " ";
+    const expression = shouldAutoComplete ? getExpressionFromString(newValue, cursorIndex) : null;
 
     setExpression(expression);
   };
@@ -70,16 +66,8 @@ export default function AutoComplete({
     const input = inputRef.current;
     if (input) {
       const value = input.value;
-      let cursorIndex = input.selectionStart || value.length;
-      while (cursorIndex >= 0) {
-        const character = value.charAt(cursorIndex - 1);
-        if (character === "." || character === " ") {
-          break;
-        }
-        cursorIndex--;
-      }
-
-      const newValue = value.substr(0, cursorIndex) + match;
+      const cursorIndex = input.selectionStart || value.length;
+      const newValue = updateStringWithExpression(value, cursorIndex, match);
 
       onChangeProp(newValue);
 
