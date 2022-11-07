@@ -36,14 +36,26 @@ describe("updateStringWithExpression", () => {
   });
 
   it("should only replace the variable portion of a template string", () => {
-    expect(getExpressionHelper("URL: ${|win", "window")).toBe("URL: ${window");
-    expect(getExpressionHelper("URL: ${w|in", "window")).toBe("URL: ${window");
-    expect(getExpressionHelper("URL: ${wi|n", "window")).toBe("URL: ${window");
-    expect(getExpressionHelper("URL: ${win|", "window")).toBe("URL: ${window");
+    expect(getExpressionHelper("`URL: ${|win", "window")).toBe("`URL: ${window");
+    expect(getExpressionHelper("`URL: ${w|in", "window")).toBe("`URL: ${window");
+    expect(getExpressionHelper("`URL: ${wi|n", "window")).toBe("`URL: ${window");
+    expect(getExpressionHelper("`URL: ${win|", "window")).toBe("`URL: ${window");
 
-    expect(getExpressionHelper("URL: ${window.|loc", "location")).toBe("URL: ${window.location");
-    expect(getExpressionHelper("URL: ${window.l|oc", "location")).toBe("URL: ${window.location");
-    expect(getExpressionHelper("URL: ${window.lo|c", "location")).toBe("URL: ${window.location");
-    expect(getExpressionHelper("URL: ${window.loc|", "location")).toBe("URL: ${window.location");
+    expect(getExpressionHelper("`URL: ${window.|loc", "location")).toBe("`URL: ${window.location");
+    expect(getExpressionHelper("`URL: ${window.l|oc", "location")).toBe("`URL: ${window.location");
+    expect(getExpressionHelper("`URL: ${window.lo|c", "location")).toBe("`URL: ${window.location");
+    expect(getExpressionHelper("`URL: ${window.loc|", "location")).toBe("`URL: ${window.location");
+  });
+
+  it("should support replacing tokens in the middle of a larger string", () => {
+    expect(getExpressionHelper("foo, |bar, baz", "barber")).toBe("foo, barber, baz");
+    expect(getExpressionHelper("foo, b|ar, baz", "barber")).toBe("foo, barber, baz");
+    expect(getExpressionHelper("foo, ba|r, baz", "barber")).toBe("foo, barber, baz");
+    expect(getExpressionHelper("foo, bar|, baz", "barber")).toBe("foo, barber, baz");
+
+    expect(getExpressionHelper("foo bar.|pro three", "property")).toBe("foo bar.property three");
+    expect(getExpressionHelper("foo bar.p|ro three", "property")).toBe("foo bar.property three");
+    expect(getExpressionHelper("foo bar.pr|o three", "property")).toBe("foo bar.property three");
+    expect(getExpressionHelper("foo bar.pro| three", "property")).toBe("foo bar.property three");
   });
 });

@@ -118,4 +118,17 @@ describe("getExpressionFromString", () => {
     expect(getExpressionHelper("`foo ${bar.ba|z")).toBe("bar.baz");
     expect(getExpressionHelper("`foo ${bar.baz|")).toBe("bar.baz");
   });
+
+  it("should return expressions that are in the middle of a larger string", () => {
+    expect(getExpressionHelper("foo, |bar, baz")).toBe("bar");
+    expect(getExpressionHelper("foo, b|ar, baz")).toBe("bar");
+    expect(getExpressionHelper("foo, ba|r, baz")).toBe("bar");
+    expect(getExpressionHelper("foo, bar|, baz")).toBe("bar");
+
+    expect(getExpressionHelper("foo, bar.|prop, baz")).toBe("bar.prop");
+    expect(getExpressionHelper("foo, bar.p|rop, baz")).toBe("bar.prop");
+    expect(getExpressionHelper("foo, bar.pr|op, baz")).toBe("bar.prop");
+    expect(getExpressionHelper("foo, bar.pro|p, baz")).toBe("bar.prop");
+    expect(getExpressionHelper("foo, bar.prop|, baz")).toBe("bar.prop");
+  });
 });

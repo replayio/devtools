@@ -3,14 +3,23 @@ export default function updateStringWithExpression(
   cursorIndex: number,
   expression: string
 ): string {
-  let index = cursorIndex;
-  while (index >= 0) {
-    const character = string.charAt(index - 1);
-    if (character === "." || character === " " || character === "{") {
+  let startIndex = cursorIndex;
+  while (startIndex >= 0) {
+    const prevCharacter = string.charAt(startIndex - 1);
+    if (prevCharacter === "." || prevCharacter === " " || prevCharacter === "{") {
       break;
     }
-    index--;
+    startIndex--;
   }
 
-  return string.substring(0, index) + expression;
+  let endIndex = cursorIndex;
+  while (endIndex < string.length) {
+    const character = string.charAt(endIndex);
+    if (character === "." || character === " " || character === "}" || character === ",") {
+      break;
+    }
+    endIndex++;
+  }
+
+  return string.substring(0, startIndex) + expression + string.substring(endIndex);
 }

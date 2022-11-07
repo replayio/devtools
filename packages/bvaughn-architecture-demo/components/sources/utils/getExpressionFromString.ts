@@ -43,7 +43,7 @@ export default function getExpressionFromString(
   currentIndex = cursorIndex;
   while (currentIndex < expression.length) {
     const character = expression.charAt(currentIndex);
-    if (character === " " || character === "}") {
+    if (character === " " || character === "}" || character === ",") {
       break;
     }
 
