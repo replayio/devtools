@@ -143,4 +143,14 @@ describe("getExpressionFromString", () => {
     expect(getExpressionHelper('`URL: "${window.lo|c}"')).toBe("window.loc");
     expect(getExpressionHelper('`URL: "${window.loc|}"')).toBe("window.loc");
   });
+
+  it("should not consider property tokens to the right of the cursor as part of an expression", () => {
+    expect(getExpressionHelper('`URL: "${|window.loc}"')).toBe("window");
+    expect(getExpressionHelper('`URL: "${w|indow.loc}"')).toBe("window");
+    expect(getExpressionHelper('`URL: "${wi|ndow.loc}"')).toBe("window");
+    expect(getExpressionHelper('`URL: "${win|dow.loc}"')).toBe("window");
+    expect(getExpressionHelper('`URL: "${wind|ow.loc}"')).toBe("window");
+    expect(getExpressionHelper('`URL: "${windo|w.loc}"')).toBe("window");
+    expect(getExpressionHelper('`URL: "${window|.loc}"')).toBe("window");
+  });
 });

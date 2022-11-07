@@ -26,19 +26,38 @@ export default function AutoComplete({
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [expression, setExpression] = useState<string | null>(null);
+  const [cursorIndex, setCursorIndex] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    if (cursorIndex !== null) {
+      const input = inputRef.current;
+      if (input) {
+        input.setSelectionRange(cursorIndex, cursorIndex);
+        setCursorIndex(null);
+      }
+    }
+  }, [cursorIndex]);
 
   const onChange = (event: ChangeEvent) => {
     const input = event.currentTarget as HTMLInputElement;
     const newValue = input.value;
     if (newValue !== value) {
       onChangeProp(newValue);
+
+      updateExpression();
     }
+  };
 
-    const cursorIndex = input.selectionStart || value.length;
-    const shouldAutoComplete = newValue.length > 0 && newValue.charAt(newValue.length - 1) !== " ";
-    const expression = shouldAutoComplete ? getExpressionFromString(newValue, cursorIndex) : null;
+  const updateExpression = () => {
+    const input = inputRef.current;
+    if (input) {
+      const value = input.value;
+      const cursorIndex = input.selectionStart || value.length;
+      // const shouldAutoComplete = value.length > 0 && value.charAt(value.length - 1) !== " ";
+      const expression = getExpressionFromString(value, cursorIndex);
 
-    setExpression(expression);
+      setExpression(expression);
+    }
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
@@ -57,6 +76,11 @@ export default function AutoComplete({
         } else {
           onCancelProp();
         }
+        break;
+      }
+      case "ArrowLeft":
+      case "ArrowRight": {
+        updateExpression();
         break;
       }
     }
@@ -78,17 +102,6 @@ export default function AutoComplete({
 
     setExpression(null);
   };
-
-  const [cursorIndex, setCursorIndex] = useState<number | null>(null);
-  useLayoutEffect(() => {
-    if (cursorIndex !== null) {
-      const input = inputRef.current;
-      if (input) {
-        input.setSelectionRange(cursorIndex, cursorIndex);
-        setCursorIndex(null);
-      }
-    }
-  }, [cursorIndex]);
 
   return (
     <>
