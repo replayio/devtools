@@ -162,10 +162,6 @@ export class ReplayClient implements ReplayClientInterface {
     return response;
   }
 
-  async ensureSourcesLoaded(): Promise<void> {
-    await this._threadFront.ensureAllSources();
-  }
-
   async evaluateExpression(
     pauseId: PauseId,
     expression: string,
@@ -868,6 +864,10 @@ export class ReplayClient implements ReplayClientInterface {
       client.Debugger.removeSourceContentsChunkListener(onSourceContentsChunkWrapper);
       client.Debugger.removeSourceContentsInfoListener(onSourceContentsInfoWrapper);
     }
+  }
+
+  async waitForLoadedSources(): Promise<void> {
+    await this._threadFront.ensureAllSources();
   }
 
   _dispatchEvent(type: ReplayClientEvents, ...args: any[]): void {

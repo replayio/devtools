@@ -175,7 +175,6 @@ export function createMockReplayClient() {
       frames: [],
       data: {},
     })),
-    ensureSourcesLoaded: jest.fn().mockImplementation(async () => undefined),
     evaluateExpression: jest.fn().mockImplementation(async () => ({ data: {} })),
     findKeyboardEvents: jest.fn().mockImplementation(async () => []),
     findMessages: jest.fn().mockImplementation(async () => ({ messages: [], overflow: false })),
@@ -218,5 +217,6 @@ export function createMockReplayClient() {
     searchFunctions: jest.fn().mockImplementation(async () => {}),
     searchSources: jest.fn().mockImplementation(async () => {}),
     streamSourceContents: jest.fn().mockImplementation(async () => {}),
+    waitForLoadedSources: jest.fn().mockImplementation(async () => undefined),
   };
 }

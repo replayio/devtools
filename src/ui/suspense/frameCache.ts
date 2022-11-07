@@ -3,7 +3,7 @@ import { Frame, PauseId } from "@replayio/protocol";
 import { createUseGetValue } from "bvaughn-architecture-demo/src/suspense/createGenericCache";
 import {
   getFramesAsync as getFramesAsyncNew,
-  getFramesIfCached as getFramesIfCachedNew,
+  getFramesIfCached,
   getFramesSuspense as getFramesSuspenseNew,
 } from "bvaughn-architecture-demo/src/suspense/FrameCache";
 import { createFrame } from "devtools/client/debugger/src/client/create";
@@ -18,10 +18,6 @@ export function getFramesSuspense(pauseId: PauseId) {
 
 export function getFramesAsync(pauseId: PauseId) {
   return getFramesAsyncNew(replayClient, pauseId);
-}
-
-export function getFramesIfCached(pauseId: PauseId) {
-  return getFramesIfCachedNew(pauseId);
 }
 
 export const useGetFrames = createUseGetValue<[pauseId: PauseId | undefined], Frame[] | undefined>(

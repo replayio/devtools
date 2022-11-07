@@ -3,7 +3,6 @@ import { FrameId, PauseId, Scope, SourceId } from "@replayio/protocol";
 import {
   FrameScopes,
   getScopesAsync as getScopesAsyncNew,
-  getScopesIfCached as getScopesIfCachedNew,
   getScopesSuspense as getScopesSuspenseNew,
 } from "bvaughn-architecture-demo/src/suspense/ScopeCache";
 import { replayClient } from "shared/client/ReplayClientContext";
@@ -14,10 +13,6 @@ export function getScopesSuspense(pauseId: PauseId, frameId: FrameId) {
 
 export function getScopesAsync(pauseId: PauseId, frameId: FrameId) {
   return getScopesAsyncNew(replayClient, pauseId, frameId);
-}
-
-export function getScopesIfCached(pauseId: PauseId, frameId: FrameId) {
-  return getScopesIfCachedNew(pauseId, frameId);
 }
 
 export interface PickedScopes {

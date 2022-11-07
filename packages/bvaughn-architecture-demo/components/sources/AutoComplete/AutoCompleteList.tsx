@@ -3,8 +3,8 @@ import { RefObject, useContext, useEffect, useMemo, useRef, useState } from "rea
 import { FixedSizeList as List } from "react-window";
 
 import Popup from "bvaughn-architecture-demo/components/Popup";
+import { SelectedFrameContext } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
 import useCurrentPauseIdSuspense from "bvaughn-architecture-demo/src/hooks/useCurrentPauseIdSuspense";
-import { getFramesSuspense } from "bvaughn-architecture-demo/src/suspense/FrameCache";
 import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { evaluateSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { getScopesSuspense } from "bvaughn-architecture-demo/src/suspense/ScopeCache";
@@ -91,7 +91,7 @@ function AutoCompleteListInner({
   }, [expression]);
 
   let properties: Property[] | null = null;
-  const frameId = getFramesSuspense(replayClient, pauseId)?.[0]?.frameId ?? null;
+  const frameId = useContext(SelectedFrameContext).selectedPauseAndFrameId?.frameId ?? null;
   const scopes = frameId ? getScopesSuspense(replayClient, pauseId, frameId).generatedScopes : null;
   if (expressionHead) {
     // Evaluate the properties of an object (expressionHead)

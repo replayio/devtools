@@ -13,7 +13,7 @@ export const {
 } = createGenericCache2<ReplayClientInterface, [pauseId: PauseId], Frame[] | undefined>(
   async (client, pauseId) => {
     const framesResult = await client.getAllFrames(pauseId);
-    await client.ensureSourcesLoaded();
+    await client.waitForLoadedSources();
 
     // this will not cache the frames because we're not passing in framesResult.frames,
     // the frames will instead be cached when they're returned from this function

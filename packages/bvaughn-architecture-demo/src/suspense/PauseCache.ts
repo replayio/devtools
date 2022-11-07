@@ -8,6 +8,7 @@ import {
   PauseId,
   Result,
 } from "@replayio/protocol";
+import cloneDeep from "lodash/cloneDeep";
 
 import { ReplayClientInterface } from "shared/client/types";
 
@@ -23,7 +24,7 @@ export const {
 } = createGenericCache2<ReplayClientInterface, [executionPoint: ExecutionPoint], PauseId>(
   async (client, executionPoint) => {
     const createPauseResult = await client.createPause(executionPoint);
-    await client.ensureSourcesLoaded();
+    await client.waitForLoadedSources();
     cachePauseData(
       client,
       createPauseResult.pauseId,
@@ -46,7 +47,7 @@ export const {
 >(
   async (client, pauseId, frameId, expression) => {
     const result = await client.evaluateExpression(pauseId, expression, frameId);
-    await client.ensureSourcesLoaded();
+    await client.waitForLoadedSources();
     cachePauseData(client, pauseId, result.data);
     return { exception: result.exception, failed: result.failed, returned: result.returned };
   },
@@ -82,13 +83,14 @@ export function sortFramesAndUpdateLocations(
 ) {
   const frames = stack.map(frameId => rawFrames?.find(frame => frame.frameId === frameId));
   if (frames.every(frame => !!frame)) {
-    for (const frame of frames) {
-      updateMappedLocation(client, frame!.location);
+    const updatedFrames = frames.map(frame => cloneDeep(frame!));
+    for (const frame of updatedFrames) {
+      updateMappedLocation(client, frame.location);
       if (frame!.functionLocation) {
-        updateMappedLocation(client, frame!.functionLocation);
+        updateMappedLocation(client, frame.functionLocation);
       }
     }
-    return frames as Frame[];
+    return updatedFrames;
   }
 }
 

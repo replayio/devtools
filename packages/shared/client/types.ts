@@ -101,7 +101,6 @@ export interface ReplayClientInterface {
   breakpointRemoved(breakpointId: BreakpointId): Promise<void>;
   configure(sessionId: string): void;
   createPause(executionPoint: ExecutionPoint): Promise<createPauseResult>;
-  ensureSourcesLoaded(): Promise<void>;
   evaluateExpression(
     pauseId: PauseId,
     expression: string,
@@ -182,4 +181,5 @@ export interface ReplayClientInterface {
     }) => void,
     onSourceContentsChunk: ({ chunk, sourceId }: { chunk: string; sourceId: SourceId }) => void
   ): Promise<void>;
+  waitForLoadedSources(): Promise<void>;
 }

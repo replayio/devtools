@@ -4,9 +4,11 @@ import { useContext, useEffect, useRef } from "react";
 import { SelectedFrameContext } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
 import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
 import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
-import useCurrentPauseIdSuspense from "bvaughn-architecture-demo/src/hooks/useCurrentPauseIdSuspense";
+import useLoadedRegions from "bvaughn-architecture-demo/src/hooks/useRegions";
 import { getFramesSuspense } from "bvaughn-architecture-demo/src/suspense/FrameCache";
+import { getPauseIdForExecutionPointSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { isPointInRegions } from "shared/utils/time";
 
 import Icon from "../Icon";
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
@@ -17,6 +19,7 @@ export default function Input() {
   const [searchState, searchActions] = useContext(ConsoleSearchContext);
   const { addMessage } = useContext(TerminalContext);
   const { executionPoint, time } = useContext(TimelineContext);
+  const loadedRegions = useLoadedRegions(replayClient);
 
   const ref = useRef<HTMLInputElement>(null);
   const searchStateVisibleRef = useRef(false);
@@ -30,13 +33,15 @@ export default function Input() {
   }, [searchState.visible]);
 
   const { selectedPauseAndFrameId } = useContext(SelectedFrameContext);
-  let pauseId: PauseId | null = useCurrentPauseIdSuspense();
+  const isLoaded = loadedRegions !== null && isPointInRegions(executionPoint, loadedRegions.loaded);
+  let pauseId: PauseId | null = null;
   let frameId: FrameId | null = null;
   if (selectedPauseAndFrameId) {
     pauseId = selectedPauseAndFrameId.pauseId;
     frameId = selectedPauseAndFrameId.frameId;
   } else {
-    if (pauseId) {
+    if (isLoaded) {
+      pauseId = getPauseIdForExecutionPointSuspense(replayClient, executionPoint);
       const frames = getFramesSuspense(replayClient, pauseId);
       frameId = frames?.[0]?.frameId ?? null;
     }

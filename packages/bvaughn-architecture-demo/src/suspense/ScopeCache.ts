@@ -20,7 +20,7 @@ export const {
 } = createGenericCache2<ReplayClientInterface, [pauseId: PauseId, scopeId: ScopeId], Scope>(
   async (client, pauseId, scopeId) => {
     const result = await client.getScope(pauseId, scopeId);
-    await client.ensureSourcesLoaded();
+    await client.waitForLoadedSources();
     cachePauseData(client, pauseId, result.data);
     return result.data.scopes!.find(scope => scope.scopeId === scopeId)!;
   },
