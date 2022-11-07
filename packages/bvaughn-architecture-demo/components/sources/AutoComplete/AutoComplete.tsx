@@ -1,4 +1,4 @@
-import { ChangeEvent, KeyboardEvent, Suspense, useRef, useState } from "react";
+import { ChangeEvent, KeyboardEvent, Suspense, useLayoutEffect, useRef, useState } from "react";
 
 import getExpressionFromString from "../utils/getExpressionFromString";
 import updateStringWithExpression from "../utils/updateStringWithExpression";
@@ -67,15 +67,28 @@ export default function AutoComplete({
     if (input) {
       const value = input.value;
       const cursorIndex = input.selectionStart || value.length;
-      const newValue = updateStringWithExpression(value, cursorIndex, match);
+      const [newValue, newCursorIndex] = updateStringWithExpression(value, cursorIndex, match);
 
       onChangeProp(newValue);
+
+      setCursorIndex(newCursorIndex);
 
       input.focus();
     }
 
     setExpression(null);
   };
+
+  const [cursorIndex, setCursorIndex] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    if (cursorIndex !== null) {
+      const input = inputRef.current;
+      if (input) {
+        input.setSelectionRange(cursorIndex, cursorIndex);
+        setCursorIndex(null);
+      }
+    }
+  }, [cursorIndex]);
 
   return (
     <>

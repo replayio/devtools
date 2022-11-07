@@ -13,8 +13,23 @@ export default function getExpressionFromString(
     const element = document.createElement("div");
     element.innerHTML = line;
 
-    const lastChild = element.children[element.children.length - 1];
-    switch (lastChild.className) {
+    let childIndex = 0;
+    let textIndex = 0;
+    while (childIndex < element.children.length) {
+      const child = element.children[childIndex];
+      if (child.textContent !== null) {
+        textIndex += child.textContent.length;
+      }
+
+      if (textIndex >= cursorIndex) {
+        break;
+      } else {
+        childIndex++;
+      }
+    }
+
+    const child = element.children[Math.min(childIndex, element.children.length - 1)];
+    switch (child.className) {
       case "tok-bool":
         // Don't try to auto-complete booleans.
         return null;

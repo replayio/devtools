@@ -2,7 +2,7 @@ export default function updateStringWithExpression(
   string: string,
   cursorIndex: number,
   expression: string
-): string {
+): [newString: string, newCursorIndex: number] {
   let startIndex = cursorIndex;
   while (startIndex >= 0) {
     const prevCharacter = string.charAt(startIndex - 1);
@@ -21,5 +21,10 @@ export default function updateStringWithExpression(
     endIndex++;
   }
 
-  return string.substring(0, startIndex) + expression + string.substring(endIndex);
+  const head = string.substring(0, startIndex);
+  const tail = string.substring(endIndex);
+  const newString = head + expression + tail;
+  const newCursorIndex = head.length + expression.length;
+
+  return [newString, newCursorIndex];
 }

@@ -131,4 +131,16 @@ describe("getExpressionFromString", () => {
     expect(getExpressionHelper("foo, bar.pro|p, baz")).toBe("bar.prop");
     expect(getExpressionHelper("foo, bar.prop|, baz")).toBe("bar.prop");
   });
+
+  it("should return expressions that are in the middle of a template string", () => {
+    expect(getExpressionHelper('`URL: "${|win}"')).toBe("win");
+    expect(getExpressionHelper('`URL: "${w|in}"')).toBe("win");
+    expect(getExpressionHelper('`URL: "${wi|n}"')).toBe("win");
+    expect(getExpressionHelper('`URL: "${win|}"')).toBe("win");
+
+    expect(getExpressionHelper('`URL: "${window.|loc}"')).toBe("window.loc");
+    expect(getExpressionHelper('`URL: "${window.l|oc}"')).toBe("window.loc");
+    expect(getExpressionHelper('`URL: "${window.lo|c}"')).toBe("window.loc");
+    expect(getExpressionHelper('`URL: "${window.loc|}"')).toBe("window.loc");
+  });
 });
