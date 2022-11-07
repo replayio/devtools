@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useContext } from "react";
 
+import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { TestRun } from "ui/hooks/tests";
 
@@ -46,11 +47,11 @@ function Attributes({ testRun }: { testRun: TestRun }) {
 
 function Status({ failCount }: { failCount: number }) {
   return (
-    <div className={`flex items-center  ${failCount > 0 ? "text-red-500" : "text-green-500"} `}>
-      <MaterialIcon iconSize="2xl">{`${
-        failCount > 0 ? "highlight_off" : "check_circle"
-      } `}</MaterialIcon>
-    </div>
+    <Icon
+      filename={failCount > 0 ? "testsuites-fail" : "testsuites-success"}
+      size="medium"
+      className={failCount > 0 ? "bg-[#EB5757]" : "bg-[#219653]"}
+    />
   );
 }
 
@@ -63,7 +64,7 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
   return (
     <Link href={`/team/${teamId}/runs/${testRun.id}`}>
       <a
-        className={`flex cursor-pointer flex-row items-center space-x-3 rounded-sm border-b border-chrome bg-themeBase-100 px-3 py-3 ${
+        className={`flex cursor-pointer flex-row space-x-3 rounded-sm border-b border-chrome bg-themeBase-100 px-3 py-3 ${
           styles.libraryRow
         }     
       ${isSelected ? styles.libraryRowSelected : ""}
