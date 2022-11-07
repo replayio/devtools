@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import React, { PureComponent, Suspense } from "react";
+import React, { PureComponent, Suspense, useContext } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import {
@@ -7,7 +7,8 @@ import {
   PauseFrame,
   getSelectedFrameId,
 } from "devtools/client/debugger/src/reducers/pause";
-import { Point } from "shared/client/types";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { Point, ReplayClientInterface } from "shared/client/types";
 import type { UIState } from "ui/state";
 import { getPauseFrameSuspense } from "ui/suspense/frameCache";
 
@@ -33,7 +34,7 @@ interface PropsFromParent {
   onRemoveBreakpoint: (cx: Context, breakpoint: Point) => void;
   type: "logpoint" | "breakpoint";
 }
-type BreakpointProps = PropsFromRedux & PropsFromParent;
+type BreakpointProps = PropsFromRedux & PropsFromParent & { replayClient: ReplayClientInterface };
 
 type $FixTypeLater = any;
 
@@ -77,9 +78,9 @@ class Breakpoint extends PureComponent<BreakpointProps> {
   }
 
   render() {
-    const { breakpoint, editor, type, selectedFrameId, sourcesState } = this.props;
+    const { replayClient, breakpoint, editor, type, selectedFrameId, sourcesState } = this.props;
     const frame = selectedFrameId
-      ? getPauseFrameSuspense(selectedFrameId, sourcesState)
+      ? getPauseFrameSuspense(replayClient, selectedFrameId, sourcesState)
       : undefined;
 
     return (
@@ -105,9 +106,10 @@ class Breakpoint extends PureComponent<BreakpointProps> {
 const ConnectedBreakpoint = connector(Breakpoint);
 
 export default function BreakpointSuspenseWrapper(props: PropsFromParent) {
+  const replayClient = useContext(ReplayClientContext);
   return (
     <Suspense>
-      <ConnectedBreakpoint {...props} />
+      <ConnectedBreakpoint {...props} replayClient={replayClient} />
     </Suspense>
   );
 }

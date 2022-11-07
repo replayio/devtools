@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import { ReplayClientInterface } from "shared/client/types";
 import { getSelectedLocation } from "ui/reducers/sources";
 import type { UIState } from "ui/state";
 
@@ -11,9 +12,9 @@ import { getSelectedFrameAsync } from "../selectors/pause";
  * Checks to if the selected frame's source is currently
  * selected.
  */
-export async function isSelectedFrameVisible(state: UIState) {
+export async function isSelectedFrameVisible(replayClient: ReplayClientInterface, state: UIState) {
   const selectedLocation = getSelectedLocation(state);
-  const selectedFrame = await getSelectedFrameAsync(state);
+  const selectedFrame = await getSelectedFrameAsync(replayClient, state);
 
   if (!selectedFrame || !selectedLocation) {
     return false;

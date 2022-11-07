@@ -7,6 +7,7 @@ import { updatePreview } from "devtools/client/debugger/src/actions/preview";
 import { previewCleared } from "devtools/client/debugger/src/reducers/preview";
 import { getPreview, getThreadContext } from "devtools/client/debugger/src/selectors";
 import SourceEditor from "devtools/client/debugger/src/utils/editor/source-editor";
+import { ReplayClientInterface } from "shared/client/types";
 import type { UIState } from "ui/state";
 
 import Popup from "./Popup";
@@ -26,6 +27,7 @@ const connector = connect(mapStateToProps, {
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 type PreviewProps = PropsFromRedux & {
+  replayClient: ReplayClientInterface;
   editor: SourceEditor;
   containerRef: RefObject<HTMLDivElement>;
 };
@@ -84,12 +86,12 @@ class Preview extends PureComponent<PreviewProps, PreviewState> {
   };
 
   startPreview = debounce((target: HTMLElement, tokenPos: SourceLocation) => {
-    const { cx, editor, updatePreview } = this.props;
+    const { replayClient, cx, editor, updatePreview } = this.props;
 
     // Double-check status after timer runs
     if (cx?.isPaused && !this.state.selecting) {
       this.setState({ hoveredTarget: target });
-      updatePreview(cx, target, tokenPos, editor.codeMirror);
+      updatePreview(replayClient, cx, target, tokenPos, editor.codeMirror);
     }
   }, 100);
 

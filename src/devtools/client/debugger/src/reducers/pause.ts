@@ -6,12 +6,13 @@ import { AnyAction, PayloadAction, createAsyncThunk, createSlice } from "@reduxj
 import type { FrameId, Location, PauseId, TimeStampedPoint, Value } from "@replayio/protocol";
 import findLast from "lodash/findLast";
 
+import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
 import { compareNumericStrings } from "protocol/utils";
+import { ReplayClientInterface } from "shared/client/types";
 import { getPreferredLocation } from "ui/reducers/sources";
 import { SourceDetails } from "ui/reducers/sources";
 import { getContextFromAction } from "ui/setup/redux/middleware/context";
 import type { UIState } from "ui/state";
-import { getFramesAsync } from "ui/suspense/frameCache";
 import { getFrameStepsAsync } from "ui/suspense/frameStepsCache";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 
@@ -101,10 +102,10 @@ export const executeCommandOperation = createAsyncThunk<
   { state: UIState; extra: ThunkExtraArgs }
 >("pause/executeCommand", async ({ cx, command }, thunkApi) => {
   const { extra, getState } = thunkApi;
-  const { ThreadFront } = extra;
+  const { ThreadFront, replayClient } = extra;
   const state = getState();
   const loadedRegions = getLoadedRegions(state)!;
-  const nextPoint = await getResumePoint(state, command);
+  const nextPoint = await getResumePoint(replayClient, state, command);
 
   const resp = await ThreadFront[command](nextPoint, loadedRegions);
   if (!resp?.frame) {
@@ -271,13 +272,13 @@ export function getPausePreviewLocation(state: UIState) {
   return state.pause.pausePreviewLocation;
 }
 
-async function getResumePoint(state: UIState, type: string) {
+async function getResumePoint(replayClient: ReplayClientInterface, state: UIState, type: string) {
   const executionPoint = getExecutionPoint(state);
   const selectedFrameId = getSelectedFrameId(state);
   if (!executionPoint || !selectedFrameId) {
     return;
   }
-  const frames = await getFramesAsync(selectedFrameId.pauseId);
+  const frames = await getFramesAsync(replayClient, selectedFrameId.pauseId);
   const frame = frames?.find(frame => frame.frameId === selectedFrameId.frameId);
   if (!frames || !frame || frame === frames[0]) {
     return;

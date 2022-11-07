@@ -6,10 +6,11 @@
 
 import { Location, PointDescription } from "@replayio/protocol";
 import classnames from "classnames";
-import React, { Component, Suspense } from "react";
+import React, { Component, Suspense, useContext } from "react";
 import ReactTooltip from "react-tooltip";
 
 import { ThreadFront } from "protocol/thread/thread";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { actions } from "ui/actions";
 import { SourcesState, getPreferredLocation, getSelectedLocation } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -197,10 +198,11 @@ class FrameTimelineRenderer extends Component<FrameTimelineProps, FrameTimelineS
 }
 
 function FrameTimeline() {
+  const replayClient = useContext(ReplayClientContext);
   const sourcesState = useAppSelector(state => state.sources);
   const executionPoint = useAppSelector(getExecutionPoint);
   const selectedLocation = useAppSelector(getSelectedLocation);
-  const selectedFrame = useAppSelector(getSelectedFrameSuspense);
+  const selectedFrame = useAppSelector(state => getSelectedFrameSuspense(replayClient, state));
   const frameSteps = selectedFrame
     ? getFrameStepsSuspense(selectedFrame.pauseId, selectedFrame.protocolId)
     : undefined;

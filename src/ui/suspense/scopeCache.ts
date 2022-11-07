@@ -1,19 +1,6 @@
-import { FrameId, PauseId, Scope, SourceId } from "@replayio/protocol";
+import { Scope, SourceId } from "@replayio/protocol";
 
-import {
-  FrameScopes,
-  getFrameScopesAsync as getScopesAsyncNew,
-  getFrameScopesSuspense as getScopesSuspenseNew,
-} from "bvaughn-architecture-demo/src/suspense/ScopeCache";
-import { replayClient } from "shared/client/ReplayClientContext";
-
-export function getScopesSuspense(pauseId: PauseId, frameId: FrameId) {
-  return getScopesSuspenseNew(replayClient, pauseId, frameId);
-}
-
-export function getScopesAsync(pauseId: PauseId, frameId: FrameId) {
-  return getScopesAsyncNew(replayClient, pauseId, frameId);
-}
+import { FrameScopes } from "bvaughn-architecture-demo/src/suspense/ScopeCache";
 
 export interface PickedScopes {
   scopes: Scope[];

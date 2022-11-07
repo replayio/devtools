@@ -1,11 +1,12 @@
 import classnames from "classnames";
-import { RefObject, useEffect, useMemo, useRef, useState } from "react";
+import { RefObject, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { closeTab } from "devtools/client/debugger/src/actions/tabs";
 import { getActiveSearch, getThreadContext } from "devtools/client/debugger/src/selectors";
 import { getDocument } from "devtools/client/debugger/src/utils/editor";
 import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ContextMenu, closeContextMenu } from "ui/actions/contextMenus";
 import GutterContextMenu from "ui/components/ContextMenu/GutterContextMenu";
 import { KeyModifiersContext } from "ui/components/KeyModifiers";
@@ -125,6 +126,7 @@ function EditorInner({
   selectedSource: SourceDetails | null;
   setContextMenu: (event: MouseEvent | null) => void;
 }) {
+  const replayClient = useContext(ReplayClientContext);
   const dispatch = useAppDispatch();
 
   if (!selectedSource || !editor) {
@@ -145,11 +147,12 @@ function EditorInner({
       )}
       <DebugLine />
       <EmptyLines editor={editor} />
-      <Preview containerRef={containerRef} editor={editor} />
+      <Preview replayClient={replayClient} containerRef={containerRef} editor={editor} />
       <KeyModifiersContext.Consumer>
         {keyModifiers => <LineNumberTooltip keyModifiers={keyModifiers} />}
       </KeyModifiersContext.Consumer>
       <EditorMenu
+        replayClient={replayClient}
         clearContextMenu={() => setContextMenu(null)}
         contextMenu={contextMenu}
         editor={editor}

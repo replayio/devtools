@@ -4,8 +4,9 @@
 
 import { Location } from "@replayio/protocol";
 //
-import { PureComponent, Suspense } from "react";
+import { PureComponent, Suspense, useContext } from "react";
 
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppSelector } from "ui/setup/hooks";
 
 import { getDebugLineLocationSuspense } from "../../selectors";
@@ -105,7 +106,8 @@ class DebugLineRenderer extends PureComponent<DebugLineProps> {
 }
 
 function DebugLine() {
-  const location = useAppSelector(getDebugLineLocationSuspense);
+  const replayClient = useContext(ReplayClientContext);
+  const location = useAppSelector(state => getDebugLineLocationSuspense(replayClient, state));
   if (!location) {
     return null;
   }

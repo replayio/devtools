@@ -1,22 +1,25 @@
 import { PauseId, Value } from "@replayio/protocol";
-import { Suspense } from "react";
+import { Suspense, useContext } from "react";
 
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import Inspector from "bvaughn-architecture-demo/components/inspector/Inspector";
 import ScopesInspector from "bvaughn-architecture-demo/components/inspector/ScopesInspector";
+import { getScopesSuspense } from "bvaughn-architecture-demo/src/suspense/ScopeCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { enterFocusMode as enterFocusModeAction } from "ui/actions/timeline";
 import { Redacted } from "ui/components/Redacted";
 import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
 import { getPreferredGeneratedSources } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getFrameSuspense } from "ui/suspense/frameCache";
-import { getScopesSuspense, pickScopes } from "ui/suspense/scopeCache";
+import { pickScopes } from "ui/suspense/scopeCache";
 
 import { getSelectedFrameId } from "../../selectors";
 import { ConvertedScope, convertScopes } from "../../utils/pause/scopes/convertScopes";
 import styles from "./NewObjectInspector.module.css";
 
 function ScopesRenderer() {
+  const replayClient = useContext(ReplayClientContext);
   const preferredGeneratedSources = useAppSelector(getPreferredGeneratedSources);
   const selectedFrameId = useAppSelector(getSelectedFrameId);
   if (!selectedFrameId) {
@@ -27,12 +30,12 @@ function ScopesRenderer() {
     );
   }
 
-  const frame = getFrameSuspense(selectedFrameId);
+  const frame = getFrameSuspense(replayClient, selectedFrameId);
   if (!frame) {
     return null;
   }
   const { scopes: protocolScopes, originalScopesUnavailable } = pickScopes(
-    getScopesSuspense(selectedFrameId.pauseId, selectedFrameId.frameId),
+    getScopesSuspense(replayClient, selectedFrameId.pauseId, selectedFrameId.frameId),
     preferredGeneratedSources
   );
   const scopes = convertScopes(protocolScopes, frame, selectedFrameId.pauseId);

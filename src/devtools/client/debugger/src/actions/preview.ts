@@ -6,6 +6,7 @@ import { nanoid } from "@reduxjs/toolkit";
 import type { SourceLocation } from "@replayio/protocol";
 
 import type { ThreadContext } from "devtools/client/debugger/src/reducers/pause";
+import { ReplayClientInterface } from "shared/client/types";
 import type { UIThunkAction } from "ui/actions";
 import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
 import { getSelectedSource } from "ui/reducers/sources";
@@ -21,6 +22,7 @@ export function isConsole(expression: string) {
 type $FixTypeLater = any;
 
 export function updatePreview(
+  replayClient: ReplayClientInterface,
   cx: ThreadContext,
   target: HTMLElement,
   tokenPos: SourceLocation,
@@ -30,7 +32,10 @@ export function updatePreview(
     const cursorPos = target.getBoundingClientRect();
 
     const state = getState();
-    if (!isCurrentTimeInLoadedRegion(state) || !(await isSelectedFrameVisible(state))) {
+    if (
+      !isCurrentTimeInLoadedRegion(state) ||
+      !(await isSelectedFrameVisible(replayClient, state))
+    ) {
       return;
     }
 
@@ -62,7 +67,7 @@ export function setPreview(
   cursorPos: DOMRect,
   target: HTMLElement
 ): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront, replayClient }) => {
     dispatch(
       previewStarted({
         // TODO DOMRects shouldn't be in Redux
@@ -82,7 +87,7 @@ export function setPreview(
       return;
     }
 
-    const selectedFrame = await getSelectedFrameAsync(getState());
+    const selectedFrame = await getSelectedFrameAsync(replayClient, getState());
     if (!selectedFrame) {
       dispatch(previewCleared({ cx, previewId }));
       return;
