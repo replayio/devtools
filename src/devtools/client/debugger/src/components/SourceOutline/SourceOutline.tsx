@@ -12,6 +12,7 @@ import React, {
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
 
+import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { getSourceHitCountsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
@@ -187,12 +188,14 @@ export default function SourceOutlineWrapper() {
   );
 
   return (
-    <Suspense fallback={null}>
-      <SourceOutline
-        cursorPosition={cursorPosition || null}
-        selectedSource={selectedSource || null}
-        symbols={symbols}
-      />
-    </Suspense>
+    <ErrorBoundary>
+      <Suspense fallback={null}>
+        <SourceOutline
+          cursorPosition={cursorPosition || null}
+          selectedSource={selectedSource || null}
+          symbols={symbols}
+        />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
