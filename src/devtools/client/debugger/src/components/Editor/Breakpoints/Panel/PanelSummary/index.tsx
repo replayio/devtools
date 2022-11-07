@@ -1,4 +1,3 @@
-import "reactjs-popup/dist/index.css";
 import { TimeStampedPoint } from "@replayio/protocol";
 import classNames from "classnames";
 import React, { Dispatch, SetStateAction } from "react";
@@ -17,6 +16,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import Condition from "./Condition";
 import Log from "./Log";
 import Popup from "./Popup";
+import "reactjs-popup/dist/index.css";
 
 export type Input = "condition" | "content";
 

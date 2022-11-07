@@ -1,5 +1,3 @@
-import "devtools/client/debugger/src/components/SourceOutline/Outline.css";
-import "devtools/client/debugger/src/components/shared/PreviewFunction.css";
 import { Meta, Story } from "@storybook/react";
 import React, { ComponentProps } from "react";
 
@@ -7,6 +5,8 @@ import { SourceOutline } from "devtools/client/debugger/src/components/SourceOut
 import { SymbolDeclarations } from "devtools/client/debugger/src/reducers/ast";
 
 import symbols from "../fixtures/symbols";
+import "devtools/client/debugger/src/components/shared/PreviewFunction.css";
+import "devtools/client/debugger/src/components/SourceOutline/Outline.css";
 
 export default {
   title: "Soure Outline/Outline",
