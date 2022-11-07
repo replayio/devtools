@@ -1,6 +1,7 @@
-import { ChangeEvent, KeyboardEvent, Suspense, useRef, useState } from "react";
+import { ChangeEvent, KeyboardEvent, Suspense, useLayoutEffect, useRef, useState } from "react";
 
 import getExpressionFromString from "../utils/getExpressionFromString";
+import updateStringWithExpression from "../utils/updateStringWithExpression";
 import AutoCompleteList from "./AutoCompleteList";
 import styles from "./AutoComplete.module.css";
 
@@ -25,24 +26,37 @@ export default function AutoComplete({
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [expression, setExpression] = useState<string | null>(null);
+  const [cursorIndex, setCursorIndex] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    if (cursorIndex !== null) {
+      const input = inputRef.current;
+      if (input) {
+        input.setSelectionRange(cursorIndex, cursorIndex);
+        setCursorIndex(null);
+      }
+    }
+  }, [cursorIndex]);
 
   const onChange = (event: ChangeEvent) => {
     const input = event.currentTarget as HTMLInputElement;
     const newValue = input.value;
     if (newValue !== value) {
       onChangeProp(newValue);
+
+      updateExpression();
     }
+  };
 
-    const cursorIndex = input.selectionStart;
-    const shouldAutoComplete =
-      cursorIndex === newValue.length &&
-      newValue.length > 0 &&
-      newValue.charAt(newValue.length - 1) !== " ";
-    const expression = shouldAutoComplete
-      ? getExpressionFromString(newValue, cursorIndex - 1)
-      : null;
+  const updateExpression = () => {
+    const input = inputRef.current;
+    if (input) {
+      const value = input.value;
+      const cursorIndex = input.selectionStart || value.length;
+      const expression = getExpressionFromString(value, cursorIndex);
 
-    setExpression(expression);
+      setExpression(expression);
+    }
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
@@ -63,6 +77,11 @@ export default function AutoComplete({
         }
         break;
       }
+      case "ArrowLeft":
+      case "ArrowRight": {
+        updateExpression();
+        break;
+      }
     }
   };
 
@@ -70,18 +89,12 @@ export default function AutoComplete({
     const input = inputRef.current;
     if (input) {
       const value = input.value;
-      let cursorIndex = input.selectionStart || value.length;
-      while (cursorIndex >= 0) {
-        const character = value.charAt(cursorIndex - 1);
-        if (character === "." || character === " ") {
-          break;
-        }
-        cursorIndex--;
-      }
-
-      const newValue = value.substr(0, cursorIndex) + match;
+      const cursorIndex = input.selectionStart || value.length;
+      const [newValue, newCursorIndex] = updateStringWithExpression(value, cursorIndex, match);
 
       onChangeProp(newValue);
+
+      setCursorIndex(newCursorIndex);
 
       input.focus();
     }

@@ -18,7 +18,7 @@ interface HookState<TValue> {
 }
 
 export function createGenericCache<TParams extends Array<any>, TValue>(
-  fetchValue: (...args: TParams) => Promise<TValue>,
+  fetchValue: (...args: TParams) => Promise<TValue> | TValue,
   getCacheKey: (...args: TParams) => string
 ): GenericCache<TParams, TValue> {
   const recordMap = new Map<string, Record<TValue>>();

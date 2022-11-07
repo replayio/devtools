@@ -264,8 +264,8 @@ function incrementalParser(fileName?: string, contentType?: ContentType): Increm
   };
 }
 
-async function highlighter(code: string, fileName: string): Promise<string[] | null> {
-  const parser = await incrementalParser(fileName);
+export function highlighter(code: string, fileName: string): string[] | null {
+  const parser = incrementalParser(fileName);
   if (parser === null) {
     return null;
   }
