@@ -53,7 +53,6 @@ export default function AutoComplete({
     if (input) {
       const value = input.value;
       const cursorIndex = input.selectionStart || value.length;
-      // const shouldAutoComplete = value.length > 0 && value.charAt(value.length - 1) !== " ";
       const expression = getExpressionFromString(value, cursorIndex);
 
       setExpression(expression);
