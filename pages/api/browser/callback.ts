@@ -133,6 +133,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const authId = decodedToken.sub;
     pingTelemetry("devtools-auth", {
       origin: "browser",
+      authRequestId: id,
+      // Auth0 protects this value in its logs and only reveals the last 3
+      // characters so we'll do the same so we can still correlate without
+      // exposing anything
+      authorizationCode: `***************${code.substring(code.length - 3)}`,
       authId,
     });
 
