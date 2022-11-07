@@ -20,11 +20,11 @@ function ViewReplay({ passed, recordingId }: { passed: boolean; recordingId: Rec
           outlined
           className={
             passed
-              ? "text-green-500 group-hover:text-green-400"
-              : "text-red-500 group-hover:text-red-400"
+              ? "text-[#219653] group-hover:text-[green-500]"
+              : "text-[#EB5757] group-hover:text-red-500"
           }
         >
-          {passed ? "play_circle_filled" : "play_circle"}
+          {passed ? "play_circle" : "play_circle_filled"}
         </MaterialIcon>
       </a>
     </Link>
