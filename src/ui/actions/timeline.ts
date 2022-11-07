@@ -257,8 +257,8 @@ export function seek(
   };
 }
 
-export function seekToTime(targetTime: number): UIThunkAction {
-  return async (dispatch, _getState, { replayClient }) => {
+export function seekToTime(targetTime: number, autoPlay?: boolean): UIThunkAction {
+  return async (dispatch, _, { replayClient }) => {
     if (targetTime == null) {
       return;
     }
@@ -275,7 +275,12 @@ export function seekToTime(targetTime: number): UIThunkAction {
         bestPoint = pointNearTime;
       }
     } catch (e) {}
+
     dispatch(seek(bestPoint.point, targetTime, false));
+
+    if (autoPlay) {
+      dispatch(startPlayback());
+    }
   };
 }
 
@@ -318,12 +323,14 @@ export function startPlayback(): UIThunkAction {
   };
 }
 
-export function stopPlayback(): UIThunkAction {
-  return (dispatch, getState) => {
-    const playback = getPlayback(getState());
+export function stopPlayback(updateTime: boolean = true): UIThunkAction {
+  return async (dispatch, getState) => {
+    if (updateTime) {
+      const playback = getPlayback(getState());
 
-    if (playback) {
-      dispatch(seekToTime(playback.time));
+      if (playback) {
+        dispatch(seekToTime(playback.time));
+      }
     }
 
     dispatch(setTimelineState({ playback: null }));
