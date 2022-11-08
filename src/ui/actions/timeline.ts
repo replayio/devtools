@@ -63,6 +63,7 @@ import type { UIStore, UIThunkAction } from "./index";
 
 const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
 const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
+export const MAX_FOCUS_REGION_DURATION = 60_000;
 
 export async function setupTimeline(store: UIStore) {
   const dispatch = store.dispatch;
@@ -527,6 +528,13 @@ export function setFocusRegion(
         } else {
           endTime = beginTime;
         }
+      }
+
+      // Cap time to fit within max focus region size.
+      if (endTime === prevEndTime) {
+        endTime = Math.min(endTime, beginTime + MAX_FOCUS_REGION_DURATION);
+      } else {
+        beginTime = Math.max(beginTime, endTime - MAX_FOCUS_REGION_DURATION);
       }
 
       // Update the previous to match the handle that's being dragged.

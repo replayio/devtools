@@ -122,7 +122,7 @@ function Focuser({ editMode, setEditMode }: Props) {
           case "resize-end": {
             dispatch(
               setFocusRegion({
-                beginTime: beginTime,
+                beginTime,
                 endTime: mouseTime,
               })
             );
