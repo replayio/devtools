@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import { RefObject, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { RefObject, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { closeTab } from "devtools/client/debugger/src/actions/tabs";
 import { getActiveSearch, getThreadContext } from "devtools/client/debugger/src/selectors";
@@ -128,6 +128,7 @@ function EditorInner({
 }) {
   const replayClient = useContext(ReplayClientContext);
   const dispatch = useAppDispatch();
+  const clearContextMenu = useCallback(() => setContextMenu(null), [setContextMenu]);
 
   if (!selectedSource || !editor) {
     return null;
@@ -153,7 +154,7 @@ function EditorInner({
       </KeyModifiersContext.Consumer>
       <EditorMenu
         replayClient={replayClient}
-        clearContextMenu={() => setContextMenu(null)}
+        clearContextMenu={clearContextMenu}
         contextMenu={contextMenu}
         editor={editor}
         selectedSource={selectedSource}
