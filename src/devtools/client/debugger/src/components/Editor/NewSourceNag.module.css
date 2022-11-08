@@ -1,0 +1,16 @@
+.Nag {
+  background-color: var(--nag-background-color);
+  background: linear-gradient(
+    90deg,
+    var(--nag-gradient-color-begin),
+    var(--nag-gradient-color-end)
+  );
+  color: var(--nag-color);
+  padding: 0.25em 0.5em;
+  gap: 0.5em;
+  display: flex;
+  align-items: center;
+
+  font-weight: bold;
+  font-size: var(--font-size-regular);
+}

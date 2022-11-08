@@ -53,7 +53,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
   const { accessToken, recordingId, trackEvent } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: curentTime } = useContext(TimelineContext);
 
-  const [showNag, dismissNag] = useNag(Nag.FIRST_BREAKPOINT_EDIT);
+  const [showEditBreakpointNag, dismissEditBreakpointNag] = useNag(Nag.FIRST_BREAKPOINT_EDIT);
 
   const [hitPoints, hitPointStatus] = getHitPointsForLocationSuspense(
     client,
@@ -64,7 +64,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
 
   const invalidateCache = useCacheRefresh();
 
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(showEditBreakpointNag);
 
   const [isPending, startTransition] = useTransition();
 
@@ -107,6 +107,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
         editPoint(point.id, { condition: editableCondition || null, content: editableContent });
       }
       setIsEditing(false);
+      dismissEditBreakpointNag();
     };
 
     const onAddConditionClick = () => {
@@ -128,7 +129,9 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                   <div className={styles.Content}>
                     <AutoComplete
                       autoFocus
-                      className={styles.ContentInput}
+                      className={
+                        showEditBreakpointNag ? styles.ContentInputWithNag : styles.ContentInput
+                      }
                       dataTestName="PointPanel-ConditionInput"
                       onCancel={onCancel}
                       onChange={onEditableConditionChange}
@@ -148,7 +151,9 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                 <div className={styles.Content}>
                   <AutoComplete
                     autoFocus
-                    className={styles.ContentInput}
+                    className={
+                      showEditBreakpointNag ? styles.ContentInputWithNag : styles.ContentInput
+                    }
                     dataTestName="PointPanel-ContentInput"
                     onCancel={onCancel}
                     onChange={onEditableContentChange}
@@ -212,7 +217,6 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
       setEditableCondition(point.condition || null);
       setEditableContent(point.content);
       setIsEditing(true);
-      dismissNag();
     };
 
     const addComment = () => {
@@ -271,7 +275,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                   Use Focus Mode to reduce the number of hits.
                 </div>
               ) : (
-                <div className={showNag ? styles.ContentWrapperWithNag : styles.ContentWrapper}>
+                <div className={styles.ContentWrapper}>
                   <BadgePicker point={point} />
                   <div
                     className={styles.Content}

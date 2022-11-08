@@ -52,7 +52,6 @@
 
 .ContentWrapper,
 .ContentWrapperInvalid,
-.ContentWrapperWithNag,
 .ContentWrapperTooManyPoints {
   height: 100%;
   flex: 1;
@@ -69,10 +68,6 @@
 .ContentWrapperInvalid {
   background-color: var(--background-color-error);
   border-color: var(--border-color-error);
-}
-
-.ContentWrapperWithNag {
-  border-color: var(--color-nag);
 }
 
 .ContentWrapperTooManyPoints {
@@ -135,8 +130,13 @@
   width: 100%;
 }
 
-.ContentInput {
+.ContentInput,
+.ContentInputWithNag {
   width: 100%;
+}
+.ContentInputWithNag::selection {
+  background-color: var(--nag-background-color);
+  color: var(--nag-color);
 }
 
 .ContentPrefixLabel {
