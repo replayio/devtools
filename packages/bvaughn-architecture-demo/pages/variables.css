@@ -110,7 +110,14 @@
   --value-type-html-tag-bracket: #e6e9ec;
   --value-type-html-text: #d7d7db;
 
-  --badge-default-color: #898f95;
+  --point-panel-input-background-color: #464648;
+  --point-panel-button-background-color: #8a8f95;
+  --point-panel-button-background-color-disabled: #464648;
+  --point-panel-button-color: #0f1119;
+  --point-panel-button-color-disabled: #2a2b30;
+
+  --badge-picker-background-color: #18181a;
+  --badge-default-color: #8a8f95;
   --badge-default-contrast-color: #000;
   --badge-green-color: #69e261;
   --badge-green-contrast-color: #050;
@@ -225,7 +232,14 @@
   --value-type-html-tag-bracket: #0c0c0d;
   --value-type-html-text: #0c0c0d;
 
-  --badge-default-color: #dcdcdc;
+  --point-panel-input-background-color: #e6e6e6;
+  --point-panel-button-background-color: #e6e6e6;
+  --point-panel-button-background-color-disabled: #f0f0f0;
+  --point-panel-button-color: #747476;
+  --point-panel-button-color-disabled: #d3d3d4;
+
+  --badge-picker-background-color: #f9f9fa;
+  --badge-default-color: #e6e6e6;
   --badge-default-contrast-color: #000;
   --badge-green-color: #73cc6d;
   --badge-green-contrast-color: #fff;

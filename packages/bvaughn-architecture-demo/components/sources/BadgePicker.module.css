@@ -12,7 +12,7 @@
   width: var(--badge-picker-button-size);
   height: var(--badge-picker-button-size);
   border-radius: var(--badge-picker-button-size);
-  background-color: var(--background-color-contrast-2);
+  background-color: var(--badge-picker-background-color);
   flex-grow: 0;
   flex-shrink: 0;
   padding: 0;
@@ -28,14 +28,19 @@
   position: relative;
   z-index: 2;
 }
-
-.BadgePickerButtonIcon {
+.BadgePickerButtonIcon,
+.BadgePickerButtonToggleIcon {
   position: relative;
   flex: 0 0 0.5em;
   height: 0.5em;
   border-radius: 0.5em;
+
+  /*
+   * This variable maps to a dynamic value set by JavaScript based on the badge type.
+   * It does not correspond to a static CSS variable.
+   */
   background-color: var(--badge-background-color);
-  fill: var(--badge-background-color);
+  fill: var(--badge-color);
 }
 .BadgePickerButtonIcon:after {
   content: "";
@@ -52,6 +57,12 @@
 .BadgePickerPopOut .BadgePickerButtonCurrent .BadgePickerButtonIcon:after,
 .BadgePickerPopOut .BadgePickerButton:hover .BadgePickerButtonIcon:after {
   opacity: 0.25;
+}
+
+.BadgePickerButtonToggleIcon {
+  fill: var(--badge-default-color);
+  flex: 0 0 0.75em;
+  height: 0.75em;
 }
 
 .BadgePickerOpen,
@@ -71,7 +82,7 @@
 }
 
 .BadgePickerPopOut {
-  background-color: var(--background-color-contrast-2);
+  background-color: var(--badge-picker-background-color);
   border-radius: var(--badge-picker-button-size);
   display: flex;
   align-items: center;
