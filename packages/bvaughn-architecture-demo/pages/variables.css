@@ -116,6 +116,7 @@
   --value-type-html-text: #d7d7db;
 
   --point-panel-input-background-color: #464648;
+  --point-panel-timeline-background-color: #464648;
   --point-panel-button-background-color: #8a8f95;
   --point-panel-button-background-color-disabled: #464648;
   --point-panel-button-color: #0f1119;
@@ -243,6 +244,7 @@
   --value-type-html-text: #0c0c0d;
 
   --point-panel-input-background-color: #e6e6e6;
+  --point-panel-timeline-background-color: #e6e6e6;
   --point-panel-button-background-color: #e6e6e6;
   --point-panel-button-background-color-disabled: #f0f0f0;
   --point-panel-button-color: #747476;
