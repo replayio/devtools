@@ -42,7 +42,7 @@ export function createGenericCache<TParams extends Array<any>, TValue>(
 }
 
 export function createGenericCache2<TExtra, TParams extends Array<any>, TValue>(
-  fetchValue: (extra: TExtra, ...args: TParams) => Promise<TValue>,
+  fetchValue: (extra: TExtra, ...args: TParams) => Promise<TValue> | TValue,
   getCacheKey: (...args: TParams) => string
 ): GenericCache2<TExtra, TParams, TValue> {
   const recordMap = new Map<string, Record<TValue>>();
