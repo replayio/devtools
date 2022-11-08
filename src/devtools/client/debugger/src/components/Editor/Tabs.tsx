@@ -101,13 +101,11 @@ class Tabs extends PureComponent<PropsFromRedux> {
   }
 
   onTabDragStart = (source: SourceDetails, index: number) => {
-    trackEvent("tabs.drag_start");
     this.draggedSource = source;
     this.draggedSourceIndex = index;
   };
 
   onTabDragEnd = () => {
-    trackEvent("tabs.drag_stop");
     this.draggedSource = null;
     this.draggedSourceIndex = null;
   };

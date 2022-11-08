@@ -32,7 +32,6 @@ export default function UnfocusedRegion() {
         style={{
           width: `${clamp(start, 0, 100)}%`,
         }}
-        onClick={() => trackEvent("error.unfocused_timeline_click")}
       >
         <div className="unfocused-regions" />
       </div>
@@ -42,7 +41,6 @@ export default function UnfocusedRegion() {
         style={{
           width: `${clamp(end, 0, 100)}%`,
         }}
-        onClick={() => trackEvent("error.unfocused_timeline_click")}
       >
         <div className="unfocused-regions" />
       </div>
