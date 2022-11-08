@@ -48,6 +48,7 @@ import contextMenus from "ui/reducers/contextMenus";
 import network from "ui/reducers/network";
 import protocolMessages from "ui/reducers/protocolMessages";
 import reactDevTools from "ui/reducers/reactDevTools";
+import reporter from "ui/reducers/reporter";
 import timeline, {
   allPaintsReceived,
   paintsReceived,
@@ -61,6 +62,7 @@ import type { ThunkExtraArgs } from "ui/utils/thunk";
 
 import { startAppListening } from "../listenerMiddleware";
 import { AppStore, extendStore } from "../store";
+import { setupReporter } from "ui/actions/reporter";
 
 const { setupApp, setupTimeline } = actions;
 
@@ -165,6 +167,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     contextMenus,
     network,
     reactDevTools,
+    reporter,
     timeline,
     protocolMessages: protocolMessages,
     ...debuggerReducers,
@@ -225,7 +228,8 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   setupGraphics();
   initOutputSyntaxHighlighting();
   setupNetwork(store, ThreadFront);
-  setupReactDevTools(store, ThreadFront);
+  // setupReactDevTools(store, ThreadFront);
+  setupReporter(store, ThreadFront);
   setupBoxModel(store, startAppListening);
   setupRules(store, startAppListening);
   setupGetPreferredLocation(store);

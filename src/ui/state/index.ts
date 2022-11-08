@@ -21,6 +21,7 @@ import { ContextMenusState } from "../reducers/contextMenus";
 import { AppState } from "./app";
 import { LayoutState } from "./layout";
 import { ReactDevToolsState } from "./reactDevTools";
+import { ReporterState } from "./reporter";
 import { TimelineState } from "./timeline";
 
 // TODO Ideally this should be inferred from store setup
@@ -42,6 +43,7 @@ export interface UIState {
   protocolMessages: ProtocolMessagesState;
   quickOpen: QuickOpenState;
   reactDevTools: ReactDevToolsState;
+  reporter: ReporterState;
   rules: RulesState;
   sourceTree: SourceTreeState;
   tabs: TabsState;
