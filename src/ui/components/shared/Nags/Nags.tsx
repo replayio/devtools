@@ -58,7 +58,7 @@ export function EditorNag() {
     return null;
   }
 
-  return <NagHat subText="Now hover on a line number" nagType={Nag.FIRST_BREAKPOINT_ADD} />;
+  return <NagHat subText="Next, hover on a line number" nagType={Nag.FIRST_BREAKPOINT_ADD} />;
 }
 
 export function ConsoleNag() {
