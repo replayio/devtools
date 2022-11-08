@@ -25,12 +25,12 @@ function TestResultsSummary({ testCases }: { testCases: TestItem[] }) {
   const passed = testCases.filter(c => c.result === "passed").length;
 
   return (
-    <div className="flex gap-2 px-1 py-1 ml-4">
+    <div className="ml-4 flex gap-2 px-1 py-1">
       <div className="flex items-center gap-1">
         <Icon filename="testsuites-success" size="small" className="bg-green-700" />
         <div className="text-sm text-green-700">{passed}</div>
       </div>
-      <div className="flex items-center gap-1 mr-1">
+      <div className="mr-1 flex items-center gap-1">
         <Icon filename="testsuites-fail" size="small" className="bg-red-500" />
         <div className="text-sm text-red-500">{failed}</div>
       </div>
@@ -69,11 +69,7 @@ export default function SidePanel() {
       ),
       buttons: null,
       className: "cyress-info flex-1 border-t overflow-hidden border-themeBorder",
-      component: (
-        <TestInfo
-          testCases={recording?.metadata?.test.tests}
-        />
-      ),
+      component: <TestInfo testCases={recording?.metadata?.test.tests} />,
       opened: !cypressCollapsed,
       onToggle: () => setCypressCollapsed(!setCypressCollapsed),
     });
@@ -90,7 +86,7 @@ export default function SidePanel() {
 
   return (
     <div
-      className="w-full overflow-hidden text-xs rounded-lg bg-bodyBgcolor"
+      className="w-full overflow-hidden rounded-lg bg-bodyBgcolor text-xs"
       data-test-id="leftSidebar"
     >
       {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}

@@ -1,16 +1,10 @@
-import { Action } from "@reduxjs/toolkit";
 import { Annotation } from "@replayio/protocol";
 import debounce from "lodash/debounce";
 
 import type { ThreadFront as TF } from "protocol/thread";
-import { Annotation as ParsedAnnotation } from "ui/state/reactDevTools";
+import { addReporterAnnotations } from "ui/reducers/reporter";
 
 import { UIStore } from ".";
-
-export type AddAnnotationsAction = Action<"add_reporter_annotations"> & { annotations: ParsedAnnotation[] };
-
-export type ReporterAction =
-  | AddAnnotationsAction
 
 export async function setupReporter(store: UIStore, ThreadFront: typeof TF) {
   const kind = "replay-cypress";
@@ -24,7 +18,7 @@ export async function setupReporter(store: UIStore, ThreadFront: typeof TF) {
   const onAnnotationsReceived = debounce(() => {
     const filtered = receivedAnnotations.filter(a => a.kind === kind);
     store.dispatch(
-      addAnnotations(
+      addReporterAnnotations(
         filtered.map(({ point, time, contents }) => ({
           point,
           time,
@@ -39,8 +33,4 @@ export async function setupReporter(store: UIStore, ThreadFront: typeof TF) {
     receivedAnnotations.push(...annotations);
     onAnnotationsReceived();
   }, kind);
-}
-
-export function addAnnotations(annotations: ParsedAnnotation[]): AddAnnotationsAction {
-  return { type: "add_reporter_annotations", annotations };
 }

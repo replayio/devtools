@@ -1,9 +1,18 @@
+import { useMemo } from "react";
+
 import { useFetchCypressSpec } from "ui/hooks/useFetchCypressSpec";
-import { getReporterAnnotations } from "ui/reducers/reporter";
+import { Annotation, getReporterAnnotations } from "ui/reducers/reporter";
 import { useAppSelector } from "ui/setup/hooks";
 import { TestItem } from "ui/types";
 
 import { TestCase } from "./TestCase";
+
+function maybeCorrectTestTimes(testCases: TestItem[], annotations: Annotation[]) {
+  return testCases.map((t, i) => ({
+    ...t,
+    relativeStartTime: annotations?.[i]?.time ? annotations?.[i]?.time : t.relativeStartTime,
+  }));
+}
 
 export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
   const annotations = useAppSelector(getReporterAnnotations);
@@ -11,10 +20,10 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
 
   // The test start times in metadata may be incorrect. If we have the reporter annotations,
   // we can use those instead
-  const correctedTestCases = testCases.map((t, i) => ({
-    ...t,
-    relativeStartTime: annotations?.[i]?.time ? annotations?.[i]?.time : t.relativeStartTime,
-  }));
+  const correctedTestCases = useMemo(
+    () => maybeCorrectTestTimes(testCases, annotations),
+    [testCases, annotations]
+  );
 
   return (
     <div className="flex flex-col px-4 py-2 space-y-1">

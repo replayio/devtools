@@ -1,16 +1,16 @@
-import { SourceLocation } from "graphql";
+import { Location } from "@replayio/protocol";
 import { useState } from "react";
 
+import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem, TestResult } from "ui/types";
 
 import { selectLocation } from "../../actions/sources";
 import { getThreadContext } from "../../selectors";
-import Icon from "ui/components/shared/Icon";
 import { TestSteps } from "./TestSteps";
 
-export function TestCase({ test, location }: { test: TestItem; location?: SourceLocation }) {
+export function TestCase({ test, location }: { test: TestItem; location?: Location }) {
   const [expandSteps, setExpandSteps] = useState(false);
   const dispatch = useAppDispatch();
   const cx = useAppSelector(getThreadContext);
@@ -18,7 +18,7 @@ export function TestCase({ test, location }: { test: TestItem; location?: Source
 
   const onClick = () => {
     if (location) {
-      dispatch(selectLocation(cx, location as any));
+      dispatch(selectLocation(cx, location));
     }
   };
   const toggleExpand = () => {

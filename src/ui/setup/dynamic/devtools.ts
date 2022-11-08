@@ -41,6 +41,7 @@ import { ReplayClientInterface } from "shared/client/types";
 import { UIStore, actions } from "ui/actions";
 import { setCanvas } from "ui/actions/app";
 import { setupReactDevTools } from "ui/actions/reactDevTools";
+import { setupReporter } from "ui/actions/reporter";
 import { precacheScreenshots } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import app, { loadReceivedEvents, setVideoUrl } from "ui/reducers/app";
@@ -62,7 +63,6 @@ import type { ThunkExtraArgs } from "ui/utils/thunk";
 
 import { startAppListening } from "../listenerMiddleware";
 import { AppStore, extendStore } from "../store";
-import { setupReporter } from "ui/actions/reporter";
 
 const { setupApp, setupTimeline } = actions;
 
@@ -228,7 +228,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   setupGraphics();
   initOutputSyntaxHighlighting();
   setupNetwork(store, ThreadFront);
-  // setupReactDevTools(store, ThreadFront);
+  setupReactDevTools(store, ThreadFront);
   setupReporter(store, ThreadFront);
   setupBoxModel(store, startAppListening);
   setupRules(store, startAppListening);

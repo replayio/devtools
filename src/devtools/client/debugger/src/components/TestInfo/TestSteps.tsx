@@ -45,7 +45,6 @@ function TestStepItem({
   const dispatch = useAppDispatch();
 
   const onClick = (time: number) => {
-    console.log("navigate to", time);
     dispatch(seekToTime(time));
   };
 
