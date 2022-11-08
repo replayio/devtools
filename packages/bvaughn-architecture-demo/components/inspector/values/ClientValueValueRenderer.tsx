@@ -81,7 +81,7 @@ export default function ClientValueValueRenderer({
       <>
         {finalFormattedValue}
         <button
-          className="text-themeBodyColor inline rounded-md bg-chrome px-2 py-1"
+          className={styles.StringToggleButton}
           onClick={() => setIsStringExpanded(!isStringExpanded)}
         >
           {isStringExpanded ? "Less" : "More"}
