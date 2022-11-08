@@ -209,7 +209,10 @@ export default function Frames({
 
   return (
     <div className="pane frames" data-test-id="FramesPanel">
-      <ErrorBoundary fallback={<div className="pane-info empty">Error loading frames</div>}>
+      <ErrorBoundary
+        key={pauseId}
+        fallback={<div className="pane-info empty">Error loading frames</div>}
+      >
         <Suspense fallback={<div className="pane-info empty">Loading…</div>}>
           <div role="list">
             <FramesRenderer pauseId={pauseId} panel={panel} />
