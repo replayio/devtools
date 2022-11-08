@@ -16,15 +16,16 @@
   height: 1.5em;
   width: 1.5em;
   border-radius: 1.5em;
-  background-color: var(--background-color-tertiary-button);
-  color: var(--color-tertiary-button);
+  background-color: var(--point-panel-button-background-color);
+  color: var(--point-panel-button-color);
   padding: 0;
   transition: opacity 250ms;
 }
 
 .PreviousHitPointButton:disabled,
 .NextHitPointButton:disabled {
-  opacity: 0.5;
+  background-color: var(--point-panel-button-background-color-disabled);
+  color: var(--point-panel-button-color-disabled);
   cursor: default;
 }
 
@@ -36,7 +37,6 @@
 
 .HitPointsLabel,
 .HitPointsLabelTooMany {
-  background-color: var(--background-color-contrast-1);
   font-size: var(--font-size-tiny);
   display: flex;
   align-items: center;
@@ -49,8 +49,6 @@
   color: var(--badge-color);
 }
 .HitPointsLabelTooMany {
-  color: var(--color-dimmer);
-  color: var(--badge-color);
 }
 
 .HitPointTimeline,

@@ -32,7 +32,7 @@ export default function BadgePicker({ point }: { point: Point }) {
         onClick={() => (isOpen ? toggle(null) : setState("open"))}
       >
         {isOpen ? (
-          <Icon className={styles.BadgePickerButtonIcon} type="remove" />
+          <Icon className={styles.BadgePickerButtonToggleIcon} type="remove" />
         ) : (
           <BadgePickerButtonIcon badge={point.badge} />
         )}
