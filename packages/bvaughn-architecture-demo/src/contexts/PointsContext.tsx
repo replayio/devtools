@@ -37,6 +37,15 @@ export type PointsContextType = {
   pointsForAnalysis: Point[];
 };
 
+export const isValidPoint = (maybePoint: unknown): maybePoint is Point => {
+  return (
+    typeof maybePoint === "object" &&
+    typeof (maybePoint as Point)?.createdAtTime === "number" &&
+    typeof (maybePoint as Point)?.id === "string" &&
+    typeof (maybePoint as Point)?.location === "object"
+  );
+};
+
 export const PointsContext = createContext<PointsContextType>(null as any);
 
 export function PointsContextRoot({ children }: PropsWithChildren<{}>) {

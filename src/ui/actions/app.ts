@@ -1,6 +1,7 @@
 import { KeyboardEvent, NodeBounds, unprocessedRegions } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
+import { isValidPoint } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { shallowEqual } from "devtools/client/debugger/src/utils/compare";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
@@ -202,6 +203,56 @@ export function loadMouseTargets(): UIThunkAction {
   };
 }
 
+export function setBreakpointsFromClipboard(): UIThunkAction {
+  return async (dispatch, getState, { ThreadFront }) => {
+    const currentFocusedElement = document.activeElement;
+    let text = "";
+    try {
+      // The `readText()` API requires that the current DOM be focused somehow
+      document.body.focus();
+      text = await navigator.clipboard.readText();
+
+      // Was the clipboard data even valid JSON?
+      const parsedValue = JSON.parse(text);
+      // Assuming it was JSON, does it appear to be an array of Point objects?
+      if (Array.isArray(parsedValue) && parsedValue.every(isValidPoint)) {
+        // TODO [FE-874] This will need to change if we modify how we do per-recording persistence
+
+        // This value appears to be actual breakpoints. Our current implementation watches
+        //  for changes in `localStorage` and will auto-update itself when that event fires.
+        const storageKey = `${ThreadFront.recordingId!}::points`;
+        // Just reuse the text from the clipboard
+        localStorage.setItem(storageKey, text);
+        // Apparently the "storage" event only fires across tabs, and setting a value
+        // in the _same_ tab won't trigger it. Do that manually:
+        window.dispatchEvent(new Event("storage"));
+      }
+    } catch (err) {
+      if (err instanceof SyntaxError) {
+        console.error("Could not parse clipboard text as JSON:", `"${text}"`);
+      } else if (err instanceof DOMException) {
+        console.error("Could not copy clipboard text - document not focused", err);
+      } else {
+        console.error(err);
+      }
+    } finally {
+      if (currentFocusedElement && "focus" in currentFocusedElement) {
+        (currentFocusedElement as HTMLElement).focus();
+      }
+    }
+  };
+}
+
+export function copyBreakpointsToClipboard(): UIThunkAction {
+  return async (dispatch, getState, { ThreadFront }) => {
+    const storageKey = `${ThreadFront.recordingId!}::points`;
+    const currentPointsValue = localStorage.getItem(storageKey);
+    if (currentPointsValue) {
+      await navigator.clipboard.writeText(currentPointsValue);
+    }
+  };
+}
+
 export function executeCommand(key: CommandKey): UIThunkAction {
   return (dispatch, getState) => {
     const recordingId = getRecordingId();
@@ -269,6 +320,10 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       dispatch(setToolboxLayout("left"));
     } else if (key === "pin_to_bottom_right") {
       dispatch(setToolboxLayout("ide"));
+    } else if (key === "copy_points") {
+      dispatch(copyBreakpointsToClipboard());
+    } else if (key === "set_points") {
+      dispatch(setBreakpointsFromClipboard());
     }
 
     dispatch(hideCommandPalette());

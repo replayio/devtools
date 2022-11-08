@@ -19,6 +19,7 @@ export type Command = {
   shortcut?: string;
 };
 export type CommandKey =
+  | "copy_points"
   | "open_console"
   | "open_devtools"
   | "open_elements"
@@ -34,6 +35,7 @@ export type CommandKey =
   | "pin_to_bottom"
   | "pin_to_left"
   | "pin_to_bottom_right"
+  | "set_points"
   | "show_comments"
   | "show_console_filters"
   | "show_events"
@@ -72,6 +74,8 @@ const COMMANDS: readonly Command[] = [
   { key: "pin_to_bottom", label: "Pin Toolbox To Bottom" },
   { key: "pin_to_left", label: "Pin Toolbox To Left" },
   { key: "pin_to_bottom_right", label: "Pin Toolbox To Bottom Right" },
+  { key: "copy_points", label: "Copy Print Statement Settings to Clipboard" },
+  { key: "set_points", label: "Overwrite Print Statement Settings From Clipboard" },
 ] as const;
 
 const DEFAULT_COMMANDS: readonly CommandKey[] = [
