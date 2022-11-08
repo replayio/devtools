@@ -131,3 +131,10 @@
 .ArrayLength {
   color: var(--object-inspector-separator-color);
 }
+
+.StringToggleButton {
+  padding: 0.25rem 0.5rem;
+  background-color: var(--chrome);
+  border-radius: 0.375rem;
+  display: inline;
+}
