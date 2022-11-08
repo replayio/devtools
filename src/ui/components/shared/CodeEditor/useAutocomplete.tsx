@@ -3,7 +3,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
 import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
-import { getScopesAsync } from "bvaughn-architecture-demo/src/suspense/ScopeCache";
+import { getFrameScopesAsync } from "bvaughn-architecture-demo/src/suspense/ScopeCache";
 import {
   PauseAndFrameId,
   getPauseId,
@@ -74,7 +74,7 @@ function useGetScopeMatches(expression: string) {
         return [];
       }
       const frameScopes = pickScopes(
-        await getScopesAsync(replayClient, pauseId, topFrame.frameId),
+        await getFrameScopesAsync(replayClient, pauseId, topFrame.frameId),
         preferredGeneratedSources
       );
       if (!frameScopes) {

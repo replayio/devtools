@@ -4,7 +4,7 @@ import { Suspense, useContext } from "react";
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import Inspector from "bvaughn-architecture-demo/components/inspector/Inspector";
 import ScopesInspector from "bvaughn-architecture-demo/components/inspector/ScopesInspector";
-import { getScopesSuspense } from "bvaughn-architecture-demo/src/suspense/ScopeCache";
+import { getFrameScopesSuspense } from "bvaughn-architecture-demo/src/suspense/ScopeCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { enterFocusMode as enterFocusModeAction } from "ui/actions/timeline";
 import { Redacted } from "ui/components/Redacted";
@@ -35,7 +35,7 @@ function ScopesRenderer() {
     return null;
   }
   const { scopes: protocolScopes, originalScopesUnavailable } = pickScopes(
-    getScopesSuspense(replayClient, selectedFrameId.pauseId, selectedFrameId.frameId),
+    getFrameScopesSuspense(replayClient, selectedFrameId.pauseId, selectedFrameId.frameId),
     preferredGeneratedSources
   );
   const scopes = convertScopes(protocolScopes, frame, selectedFrameId.pauseId);
