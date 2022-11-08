@@ -133,6 +133,7 @@ export const getCurrentTime = (state: UIState) => state.timeline.currentTime;
 export const getHoverTime = (state: UIState) => state.timeline.hoverTime;
 export const getPlayback = (state: UIState) => state.timeline.playback;
 export const getShowFocusModeControls = (state: UIState) => state.timeline.showFocusModeControls;
+export const isPlaying = (state: UIState) => state.timeline.playback !== null;
 export const isPlaybackStalled = (state: UIState) => state.timeline.stalled;
 export const getUnprocessedRegions = (state: UIState) => state.timeline.unprocessedRegions;
 export const getRecordingDuration = (state: UIState) => state.timeline.recordingDuration;

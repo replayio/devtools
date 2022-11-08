@@ -1,8 +1,8 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import { MouseEvent, useLayoutEffect, useRef, useState } from "react";
 
-import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
+import { seekToTime, setTimelineToTime, stopPlayback } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
-import { setTimelineState } from "ui/reducers/timeline";
+import { isPlaying as isPlayingSelector, setTimelineState } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getTimeFromPosition } from "ui/utils/timeline";
 
@@ -30,10 +30,12 @@ export default function Timeline() {
   const hoverTime = useAppSelector(selectors.getHoverTime);
   const timelineDimensions = useAppSelector(selectors.getTimelineDimensions);
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
+  const isPlaying = useAppSelector(isPlayingSelector);
 
   const progressBarRef = useRef<HTMLDivElement>(null);
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [resumePlaybackOnMouseUp, setResumePlaybackOnMouseUp] = useState<boolean>(false);
 
   const [editMode, setEditMode] = useState<EditMode | null>(null);
   const [showLoadingProgress, setShowLoadingProgress] = useState<boolean>(false);
@@ -60,17 +62,23 @@ export default function Timeline() {
     };
   }, [dispatch]);
 
-  const onClick = (event: React.MouseEvent) => {
+  const onMouseDown = (event: MouseEvent) => {
+    if (isPlaying) {
+      setResumePlaybackOnMouseUp(true);
+      dispatch(stopPlayback(false));
+    }
+
     const mouseTime = getTimeFromPosition(
       event.pageX,
       progressBarRef.current!.getBoundingClientRect(),
       zoomRegion
     );
 
-    dispatch(seekToTime(mouseTime));
+    dispatch(setTimelineState({ currentTime: mouseTime }));
+    dispatch(setTimelineToTime(mouseTime, true));
   };
 
-  const onMouseMove = (event: React.MouseEvent) => {
+  const onMouseMove = (event: MouseEvent) => {
     const mouseTime = getTimeFromPosition(
       event.pageX,
       progressBarRef.current!.getBoundingClientRect(),
@@ -87,6 +95,20 @@ export default function Timeline() {
     }
   };
 
+  const onMouseUp = (event: MouseEvent) => {
+    const mouseTime = getTimeFromPosition(
+      event.pageX,
+      progressBarRef.current!.getBoundingClientRect(),
+      zoomRegion
+    );
+
+    dispatch(seekToTime(mouseTime, resumePlaybackOnMouseUp));
+
+    if (resumePlaybackOnMouseUp) {
+      setResumePlaybackOnMouseUp(false);
+    }
+  };
+
   return (
     <>
       <FocusModePopout />
@@ -97,10 +119,11 @@ export default function Timeline() {
 
         <div
           className="progress-bar-container"
-          onClick={onClick}
+          onMouseDown={onMouseDown}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           onMouseMove={onMouseMove}
+          onMouseUp={onMouseUp}
         >
           <div className="progress-bar-stack">
             <ProtocolTimeline />
