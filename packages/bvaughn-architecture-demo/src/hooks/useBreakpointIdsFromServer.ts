@@ -9,7 +9,7 @@ import { ReplayClientInterface } from "shared/client/types";
 
 // Breakpoints must be synced with the server so the stepping controls will work.
 export default function useBreakpointIdsFromServer(
-  points: Point[],
+  points: Point[] | undefined,
   editPoint: (id: PointId, partialPoint: Partial<Point>) => void,
   deletePoints: (...ids: PointId[]) => void,
   replayClient: ReplayClientInterface
@@ -20,6 +20,10 @@ export default function useBreakpointIdsFromServer(
   const pointIdToBreakpointIdMapRef = useRef<Map<PointId, BreakpointId[]>>(new Map());
 
   useEffect(() => {
+    if (points === undefined) {
+      return;
+    }
+
     async function setUpBreakpoints() {
       const pointIdToBreakpointIdMap = pointIdToBreakpointIdMapRef.current;
       const prevPoints = prevPointsRef.current;
