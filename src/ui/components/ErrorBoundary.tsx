@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { UnexpectedError } from "ui/state/app";
 import { isDevelopment } from "ui/utils/environment";
 
+import Error from "./shared/Error";
 import { BlankViewportWrapper } from "./shared/Viewport";
 
 export const ReplayUpdatedError: UnexpectedError = {
@@ -24,20 +25,22 @@ export default function ErrorBoundary({ children }: { children: ReactNode }) {
       return dispatch(setUnexpectedError(ReplayUpdatedError, true));
     }
 
-    if (error.name === "CommandError" || isDevelopment()) {
+    if (error.name === "CommandError") {
       return;
     }
 
-    setUnexpectedError({
-      message: "Unexpected error",
-      content: "An unexpected error occurred. Please refresh the page.",
-      action: "refresh",
-    });
+    dispatch(
+      setUnexpectedError({
+        message: "Unexpected error",
+        content: "Something went wrong, but you can refresh the page to try again.",
+        action: "refresh",
+      })
+    );
   };
 
   return (
     <Sentry.ErrorBoundary onError={onError}>
-      {unexpectedError ? <BlankViewportWrapper /> : children}
+      {unexpectedError ? <Error /> : children}
     </Sentry.ErrorBoundary>
   );
 }
