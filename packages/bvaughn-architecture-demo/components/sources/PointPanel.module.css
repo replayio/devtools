@@ -56,7 +56,7 @@
   height: 100%;
   flex: 1;
   background-color: var(--point-panel-input-background-color);
-  border: 1px solid transparent;
+  border: 2px solid transparent;
   padding: 0 0.5em;
   border-radius: 0.5em;
   display: flex;
@@ -72,7 +72,7 @@
 
 .ContentWrapperTooManyPoints {
   background-color: var(--background-color-error);
-  border: 1px solid var(--border-color-error);
+  border-color: var(--border-color-error);
   color: var(--color-error);
 }
 
@@ -130,8 +130,13 @@
   width: 100%;
 }
 
-.ContentInput {
+.ContentInput,
+.ContentInputWithNag {
   width: 100%;
+}
+.ContentInputWithNag::selection {
+  background-color: var(--nag-background-color);
+  color: var(--nag-color);
 }
 
 .ContentPrefixLabel {

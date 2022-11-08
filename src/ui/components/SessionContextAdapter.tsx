@@ -1,5 +1,5 @@
 import { useApolloClient } from "@apollo/client";
-import { ReactNode, useMemo } from "react";
+import { ReactNode, useCallback, useMemo } from "react";
 
 import {
   SessionContext,
@@ -17,6 +17,12 @@ export default function SessionContextAdapter({ children }: { children: ReactNod
   const currentUserInfo = useGetUserInfo();
   const apolloClient = useApolloClient();
 
+  const refetchUser = useCallback(() => {
+    apolloClient.refetchQueries({
+      include: ["GetUser"],
+    });
+  }, [apolloClient]);
+
   const duration = useAppSelector(getRecordingDuration)!;
 
   const sessionContext = useMemo<SessionContextType>(
@@ -26,18 +32,12 @@ export default function SessionContextAdapter({ children }: { children: ReactNod
       duration,
       recordingId,
       sessionId: ThreadFront.sessionId!,
-      refetchUser: () => {
-        // Force Apollo to refetch the user data on demand,
-        // such as dismissing a nag from the console.
-        apolloClient.refetchQueries({
-          include: ["GetUser"],
-        });
-      },
+      refetchUser,
       // Convince TS that the function types line up, since the
       // context version just accepts `string` and not `MixPanelEvent`
       trackEvent: trackEvent as SessionContextType["trackEvent"],
     }),
-    [currentUserInfo, duration, recordingId, apolloClient]
+    [currentUserInfo, duration, recordingId, refetchUser]
   );
 
   return <SessionContext.Provider value={sessionContext}>{children}</SessionContext.Provider>;

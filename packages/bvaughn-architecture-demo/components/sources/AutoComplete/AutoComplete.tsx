@@ -29,6 +29,15 @@ export default function AutoComplete({
   const [cursorIndex, setCursorIndex] = useState<number | null>(null);
 
   useLayoutEffect(() => {
+    if (autoFocus) {
+      const input = inputRef.current;
+      if (input) {
+        input.setSelectionRange(0, input.value.length);
+      }
+    }
+  }, [autoFocus]);
+
+  useLayoutEffect(() => {
     if (cursorIndex !== null) {
       const input = inputRef.current;
       if (input) {

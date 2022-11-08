@@ -15,6 +15,8 @@ import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsCont
 import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
 import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 import { addComment as addCommentGraphQL } from "bvaughn-architecture-demo/src/graphql/Comments";
+import { Nag } from "bvaughn-architecture-demo/src/graphql/types";
+import { useNag } from "bvaughn-architecture-demo/src/hooks/useNag";
 import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import { validate } from "bvaughn-architecture-demo/src/utils/points";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -51,6 +53,8 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
   const { accessToken, recordingId, trackEvent } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: curentTime } = useContext(TimelineContext);
 
+  const [showEditBreakpointNag, dismissEditBreakpointNag] = useNag(Nag.FIRST_BREAKPOINT_EDIT);
+
   const [hitPoints, hitPointStatus] = getHitPointsForLocationSuspense(
     client,
     point.location,
@@ -60,7 +64,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
 
   const invalidateCache = useCacheRefresh();
 
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(showEditBreakpointNag);
 
   const [isPending, startTransition] = useTransition();
 
@@ -103,6 +107,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
         editPoint(point.id, { condition: editableCondition || null, content: editableContent });
       }
       setIsEditing(false);
+      dismissEditBreakpointNag();
     };
 
     const onAddConditionClick = () => {
@@ -124,7 +129,9 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                   <div className={styles.Content}>
                     <AutoComplete
                       autoFocus
-                      className={styles.ContentInput}
+                      className={
+                        showEditBreakpointNag ? styles.ContentInputWithNag : styles.ContentInput
+                      }
                       dataTestName="PointPanel-ConditionInput"
                       onCancel={onCancel}
                       onChange={onEditableConditionChange}
@@ -144,7 +151,9 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                 <div className={styles.Content}>
                   <AutoComplete
                     autoFocus
-                    className={styles.ContentInput}
+                    className={
+                      showEditBreakpointNag ? styles.ContentInputWithNag : styles.ContentInput
+                    }
                     dataTestName="PointPanel-ContentInput"
                     onCancel={onCancel}
                     onChange={onEditableContentChange}

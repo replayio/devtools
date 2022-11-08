@@ -15,7 +15,7 @@ import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionCo
 import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 import { addComment as addCommentGraphQL } from "bvaughn-architecture-demo/src/graphql/Comments";
 import { Nag } from "bvaughn-architecture-demo/src/graphql/types";
-import { useDismissNag } from "bvaughn-architecture-demo/src/hooks/useDismissNag";
+import { useNag } from "bvaughn-architecture-demo/src/hooks/useNag";
 import { isExecutionPointsGreaterThan } from "bvaughn-architecture-demo/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -33,7 +33,7 @@ export default function MessageHoverButton({
   time: number;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
-  const dismissNag = useDismissNag();
+  const [_, dismissNag] = useNag(Nag.FIRST_CONSOLE_NAVIGATE);
   const [isHovered, setIsHovered] = useState(false);
 
   const { inspectFunctionDefinition, showCommentsPanel } = useContext(InspectorContext);
@@ -96,7 +96,7 @@ export default function MessageHoverButton({
         inspectFunctionDefinition([location]);
       }
 
-      dismissNag(Nag.FIRST_CONSOLE_NAVIGATE);
+      dismissNag();
     };
 
     const label =

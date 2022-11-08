@@ -17,6 +17,7 @@ import { getSelectedLocation } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { setViewport } from "../../selectors";
+import NewSourceNag from "./NewSourceNag";
 import "bvaughn-architecture-demo/components/sources/CodeMirror.css";
 
 export default function NewSourceAdapterRoot() {
@@ -95,6 +96,7 @@ function NewSourceAdapter() {
       ref={containerRef}
       tabIndex={0}
     >
+      <NewSourceNag />
       {openSourceIds.map(sourceId => {
         const source = getSource(replayClient, sourceId);
         return (

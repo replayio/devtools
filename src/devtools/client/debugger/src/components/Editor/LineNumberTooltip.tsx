@@ -10,7 +10,7 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { getSelectedSource } from "ui/reducers/sources";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 import { shouldShowNag } from "ui/utils/user";
 
