@@ -28,9 +28,9 @@ export const {
 );
 
 export const {
-  getValueSuspense: getScopesSuspense,
-  getValueAsync: getScopesAsync,
-  getValueIfCached: getScopesIfCached,
+  getValueSuspense: getFrameScopesSuspense,
+  getValueAsync: getFrameScopesAsync,
+  getValueIfCached: getFrameScopesIfCached,
 } = createGenericCache2<ReplayClientInterface, [pauseId: PauseId, frameId: FrameId], FrameScopes>(
   async (client, pauseId, frameId) => {
     const frame = (await getFramesAsync(client, pauseId))?.find(

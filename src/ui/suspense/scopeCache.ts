@@ -2,8 +2,8 @@ import { FrameId, PauseId, Scope, SourceId } from "@replayio/protocol";
 
 import {
   FrameScopes,
-  getScopesAsync as getScopesAsyncNew,
-  getScopesSuspense as getScopesSuspenseNew,
+  getFrameScopesAsync as getScopesAsyncNew,
+  getFrameScopesSuspense as getScopesSuspenseNew,
 } from "bvaughn-architecture-demo/src/suspense/ScopeCache";
 import { replayClient } from "shared/client/ReplayClientContext";
 

@@ -33,13 +33,14 @@ export default function Input() {
   }, [searchState.visible]);
 
   const { selectedPauseAndFrameId } = useContext(SelectedFrameContext);
-  const isLoaded = loadedRegions !== null && isPointInRegions(executionPoint, loadedRegions.loaded);
   let pauseId: PauseId | null = null;
   let frameId: FrameId | null = null;
   if (selectedPauseAndFrameId) {
     pauseId = selectedPauseAndFrameId.pauseId;
     frameId = selectedPauseAndFrameId.frameId;
   } else {
+    const isLoaded =
+      loadedRegions !== null && isPointInRegions(executionPoint, loadedRegions.loaded);
     if (isLoaded) {
       pauseId = getPauseIdForExecutionPointSuspense(replayClient, executionPoint);
       const frames = getFramesSuspense(replayClient, pauseId);

@@ -7,7 +7,7 @@ import { SelectedFrameContext } from "bvaughn-architecture-demo/src/contexts/Sel
 import useCurrentPauseIdSuspense from "bvaughn-architecture-demo/src/hooks/useCurrentPauseIdSuspense";
 import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { evaluateSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
-import { getScopesSuspense } from "bvaughn-architecture-demo/src/suspense/ScopeCache";
+import { getFrameScopesSuspense } from "bvaughn-architecture-demo/src/suspense/ScopeCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import AutoCompleteListRow, { ItemData } from "./AutoCompleteListRow";
@@ -92,7 +92,9 @@ function AutoCompleteListInner({
 
   let properties: Property[] | null = null;
   const frameId = useContext(SelectedFrameContext).selectedPauseAndFrameId?.frameId ?? null;
-  const scopes = frameId ? getScopesSuspense(replayClient, pauseId, frameId).generatedScopes : null;
+  const scopes = frameId
+    ? getFrameScopesSuspense(replayClient, pauseId, frameId).generatedScopes
+    : null;
   if (expressionHead) {
     // Evaluate the properties of an object (expressionHead)
     const maybeResult =
