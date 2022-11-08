@@ -68,7 +68,7 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
             <div className="overflow-hidden overflow-ellipsis whitespace-pre">{test.title}</div>
 
             {test.error ? (
-              <div className="mt-1 overflow-hidden rounded-lg bg-testsuitesErrorBgcolor py-1 px-2 text-left">
+              <div className="mt-1 overflow-hidden rounded-lg bg-testsuitesErrorBgcolor px-2 py-1 text-left font-mono ">
                 {test.error.message}
               </div>
             ) : null}
@@ -86,22 +86,18 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
 }
 
 function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
-  const { steps, error } = test;
+  const { steps } = test;
 
   return (
     <div className="flex flex-col rounded-lg py-2 pl-11">
       {steps?.map((s, i) => (
         <div
           key={i}
-          className="flex items-center justify-between overflow-hidden border-b border-themeBase-90 bg-testsuitesStepsBgcolor px-3 py-2"
+          className="flex items-center justify-between overflow-hidden border-b border-themeBase-90 bg-testsuitesStepsBgcolor px-3 py-2 font-mono"
         >
-          <div className="flex items-center space-x-2 overflow-hidden whitespace-pre">
-            <div className="overflow-hidden overflow-ellipsis font-medium text-bodyColor">
-              {s.name}
-            </div>
-            <div className="overflow-hidden whitespace-pre opacity-70">
-              {s.args?.length ? `${s.args.toString()}` : ""}
-            </div>
+          <div className="flex items-center space-x-2 overflow-hidden">
+            <div className="font-medium text-bodyColor">{s.name}</div>
+            <div className="opacity-70">{s.args?.length ? `${s.args.toString()}` : ""}</div>
           </div>
           {/* <div>{getFormattedTime(s.relativeStartTime)}</div> */}
         </div>
