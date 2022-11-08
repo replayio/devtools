@@ -90,12 +90,12 @@
 }
 
 .BadgePickerOpen .BadgePickerPopOut {
-  animation: expand 250ms ease-out;
+  animation: expand 125ms ease-out;
   animation-fill-mode: forwards;
   width: var(--badge-picker-button-size);
 }
 .BadgePickerClosed .BadgePickerPopOut {
-  animation: contract 250ms ease-out;
+  animation: contract 125ms ease-out;
   animation-fill-mode: forwards;
   width: calc(var(--badge-picker-button-size) * 6);
   pointer-events: none;
@@ -119,43 +119,43 @@
 }
 
 .BadgePickerOpen .BadgePickerPopOut .BadgePickerButton {
-  animation: fadein 100ms linear;
+  animation: fadein 50ms linear;
   animation-fill-mode: forwards;
   opacity: 0;
 }
 .BadgePickerOpen .BadgePickerPopOut .BadgePickerButton:nth-of-type(1) {
-  animation-delay: 50ms;
+  animation-delay: 25ms;
 }
 .BadgePickerOpen .BadgePickerPopOut .BadgePickerButton:nth-of-type(2) {
-  animation-delay: 100ms;
+  animation-delay: 50ms;
 }
 .BadgePickerOpen .BadgePickerPopOut .BadgePickerButton:nth-of-type(3) {
-  animation-delay: 150ms;
+  animation-delay: 75ms;
 }
 .BadgePickerOpen .BadgePickerPopOut .BadgePickerButton:nth-of-type(4) {
-  animation-delay: 200ms;
+  animation-delay: 100ms;
 }
 .BadgePickerOpen .BadgePickerPopOut .BadgePickerButton:nth-of-type(5) {
-  animation-delay: 250ms;
+  animation-delay: 125ms;
 }
 
 .BadgePickerClosed .BadgePickerPopOut .BadgePickerButton {
-  animation: fadeout 50ms linear;
+  animation: fadeout 25ms linear;
   animation-fill-mode: forwards;
   opacity: 1;
   pointer-events: none;
 }
 .BadgePickerClosed .BadgePickerPopOut .BadgePickerButton:nth-of-type(1) {
-  animation-delay: 200ms;
+  animation-delay: 80ms;
 }
 .BadgePickerClosed .BadgePickerPopOut .BadgePickerButton:nth-of-type(2) {
-  animation-delay: 150ms;
+  animation-delay: 60ms;
 }
 .BadgePickerClosed .BadgePickerPopOut .BadgePickerButton:nth-of-type(3) {
-  animation-delay: 100ms;
+  animation-delay: 40ms;
 }
 .BadgePickerClosed .BadgePickerPopOut .BadgePickerButton:nth-of-type(4) {
-  animation-delay: 50ms;
+  animation-delay: 20ms;
 }
 .BadgePickerClosed .BadgePickerPopOut .BadgePickerButton:nth-of-type(5) {
   animation-delay: 0ms;
