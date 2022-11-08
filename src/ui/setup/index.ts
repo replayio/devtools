@@ -1,13 +1,12 @@
 import {
-  ExecutionPoint,
+  CallStack,
   loadedRegions as LoadedRegions,
   Location,
   PauseData,
   PauseId,
 } from "@replayio/protocol";
 
-import { preCacheObjects } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
-import { trackExecutionPointPauseIds } from "bvaughn-architecture-demo/src/suspense/PauseCache";
+import { cachePauseData } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { preCacheExecutionPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
 import { EMPTY_TABS } from "devtools/client/debugger/src/reducers/tabs";
@@ -122,13 +121,8 @@ export async function bootstrapApp() {
   // Connect data in legacy Redux stores (like PauseData or points) to the newer Suspense caches.
   // This avoids requiring the new components from requesting redundant data.
   // In the case of PauseData, it's extra important– because the backend won't re-send the same data twice no matter how many times you ask for it.
-  addPauseDataListener((pauseId: PauseId, executionPoint: ExecutionPoint, pauseData: PauseData) => {
-    const { objects } = pauseData;
-    if (objects) {
-      preCacheObjects(pauseId, objects);
-    }
-
-    trackExecutionPointPauseIds(executionPoint, pauseId);
+  addPauseDataListener((pauseId: PauseId, pauseData: PauseData, stack?: CallStack) => {
+    cachePauseData(replayClient, pauseId, pauseData, stack);
   });
 
   // Listen for changes in loaded regions and pre-caches the points.

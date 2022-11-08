@@ -502,14 +502,6 @@ class _ThreadFront {
     return pause;
   }
 
-  async getFrames() {
-    if (!this.currentPointHasFrames) {
-      return [];
-    }
-
-    return await this.getCurrentPause().getFrames();
-  }
-
   getScopeMap(location: Location): Promise<Record<string, string>> {
     return this.scopeMaps.getScopeMap(location);
   }

@@ -22,6 +22,7 @@ import {
   RecordingId,
   Result,
   SameLineSourceLocations,
+  ScopeId,
   SearchSourceContentsMatch,
   SessionId,
   newSource as Source,
@@ -31,6 +32,8 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
   createPauseResult,
+  getAllFramesResult,
+  getScopeResult,
   keyboardEvents,
   navigationEvents,
 } from "@replayio/protocol";
@@ -110,7 +113,7 @@ export interface ReplayClientInterface {
   }>;
   findNavigationEvents(onKeyboardEvents: (events: navigationEvents) => void): Promise<void>;
   findSources(): Promise<Source[]>;
-  getAllFrames(pauseId: PauseId): Promise<PauseData>;
+  getAllFrames(pauseId: PauseId): Promise<getAllFramesResult>;
   getAnnotationKinds(): Promise<string[]>;
   getBreakpointPositions(
     sourceId: SourceId,
@@ -136,6 +139,7 @@ export interface ReplayClientInterface {
   getPreferredLocation(locations: Location[]): Location | null;
   getRecordingCapabilities(): Promise<RecordingCapabilities>;
   getRecordingId(): RecordingId | null;
+  getScope(pauseId: PauseId, scopeId: ScopeId): Promise<getScopeResult>;
   getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
   getSessionId(): SessionId | null;
   getSourceHitCounts(
@@ -177,4 +181,5 @@ export interface ReplayClientInterface {
     }) => void,
     onSourceContentsChunk: ({ chunk, sourceId }: { chunk: string; sourceId: SourceId }) => void
   ): Promise<void>;
+  waitForLoadedSources(): Promise<void>;
 }

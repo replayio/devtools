@@ -19,6 +19,7 @@ import {
   RecordingId,
   Result,
   SameLineSourceLocations,
+  ScopeId,
   SearchSourceContentsMatch,
   SessionId,
   newSource as Source,
@@ -28,6 +29,8 @@ import {
   TimeStampedPointRange,
   createPauseResult,
   functionsMatches,
+  getAllFramesResult,
+  getScopeResult,
   keyboardEvents,
   navigationEvents,
   searchSourceContentsMatches,
@@ -317,10 +320,10 @@ export class ReplayClient implements ReplayClientInterface {
     return sources;
   }
 
-  async getAllFrames(pauseId: PauseId): Promise<PauseData> {
+  async getAllFrames(pauseId: PauseId): Promise<getAllFramesResult> {
     const sessionId = this.getSessionIdThrows();
-    const { data } = await client.Pause.getAllFrames({}, sessionId, pauseId);
-    return data;
+    const result = await client.Pause.getAllFrames({}, sessionId, pauseId);
+    return result;
   }
 
   async getAnnotationKinds(): Promise<string[]> {
@@ -548,6 +551,12 @@ export class ReplayClient implements ReplayClientInterface {
 
   getRecordingId(): RecordingId | null {
     return this._recordingId;
+  }
+
+  async getScope(pauseId: PauseId, scopeId: ScopeId): Promise<getScopeResult> {
+    const sessionId = this.getSessionIdThrows();
+    const result = await client.Pause.getScope({ scope: scopeId }, sessionId, pauseId);
+    return result;
   }
 
   async getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint> {
@@ -855,6 +864,10 @@ export class ReplayClient implements ReplayClientInterface {
       client.Debugger.removeSourceContentsChunkListener(onSourceContentsChunkWrapper);
       client.Debugger.removeSourceContentsInfoListener(onSourceContentsInfoWrapper);
     }
+  }
+
+  async waitForLoadedSources(): Promise<void> {
+    await this._threadFront.ensureAllSources();
   }
 
   _dispatchEvent(type: ReplayClientEvents, ...args: any[]): void {

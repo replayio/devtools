@@ -1,11 +1,13 @@
-import { createPauseResult as Pause, Property, Scope } from "@replayio/protocol";
+import { PauseId, Property } from "@replayio/protocol";
 import { RefObject, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { FixedSizeList as List } from "react-window";
 
 import Popup from "bvaughn-architecture-demo/components/Popup";
-import useCurrentPause from "bvaughn-architecture-demo/src/hooks/useCurrentPause";
+import { SelectedFrameContext } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
+import useCurrentPauseIdSuspense from "bvaughn-architecture-demo/src/hooks/useCurrentPauseIdSuspense";
 import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { evaluateSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
+import { getFrameScopesSuspense } from "bvaughn-architecture-demo/src/suspense/ScopeCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import AutoCompleteListRow, { ItemData } from "./AutoCompleteListRow";
@@ -38,8 +40,8 @@ export default function AutoCompleteListOuter({
   // This hook suspends so we can't call other hooks after it.
   // There's no point in fetching further data though unless there's a pause (or an expression),
   // so we can bail out early after calling this hook.
-  const pause = useCurrentPause();
-  if (!expression || !pause) {
+  const pauseId = useCurrentPauseIdSuspense();
+  if (!expression || !pauseId) {
     return null;
   }
 
@@ -51,7 +53,7 @@ export default function AutoCompleteListOuter({
       inputRef={inputRef}
       onCancel={onCancel}
       onSubmit={onSubmit}
-      pause={pause}
+      pauseId={pauseId}
     />
   );
 }
@@ -63,7 +65,7 @@ function AutoCompleteListInner({
   inputRef,
   onCancel,
   onSubmit,
-  pause,
+  pauseId,
 }: {
   dataTestId?: string;
   dataTestName?: string;
@@ -71,7 +73,7 @@ function AutoCompleteListInner({
   inputRef: RefObject<HTMLInputElement>;
   onCancel: () => void;
   onSubmit: (value: string) => void;
-  pause: Pause;
+  pauseId: PauseId;
 }) {
   const replayClient = useContext(ReplayClientContext);
 
@@ -89,18 +91,19 @@ function AutoCompleteListInner({
   }, [expression]);
 
   let properties: Property[] | null = null;
-  let scopes: Scope[] | null = pause.data.scopes || null;
+  const frameId = useContext(SelectedFrameContext).selectedPauseAndFrameId?.frameId ?? null;
+  const scopes = frameId
+    ? getFrameScopesSuspense(replayClient, pauseId, frameId).generatedScopes
+    : null;
   if (expressionHead) {
     // Evaluate the properties of an object (expressionHead)
-    const pauseId = pause.pauseId;
-    const frameId = pause.data.frames?.[0]?.frameId ?? null;
     const maybeResult =
       evaluateSuspense(replayClient, pauseId, frameId, expressionHead).returned || null;
     const maybeResultId = maybeResult?.object;
     if (maybeResultId) {
       const { preview } = getObjectWithPreviewSuspense(
         replayClient,
-        pause.pauseId,
+        pauseId,
         maybeResultId,
         !PREVIEW_CAN_OVERFLOW
       );
@@ -114,7 +117,7 @@ function AutoCompleteListInner({
       if (maybeGlobalObjectId) {
         const { preview } = getObjectWithPreviewSuspense(
           replayClient,
-          pause.pauseId,
+          pauseId,
           maybeGlobalObjectId,
           !PREVIEW_CAN_OVERFLOW
         );

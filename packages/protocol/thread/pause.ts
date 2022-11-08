@@ -1,16 +1,11 @@
 import {
+  CallStack,
   ExecutionPoint,
-  Frame,
   FrameId,
   NodeBounds,
-  Object as ObjectDescription,
-  ObjectId,
-  ObjectPreview,
   PauseData,
   PauseId,
   PointDescription,
-  Scope,
-  ScopeId,
   SessionId,
   Value,
   repaintGraphicsResult,
@@ -26,11 +21,7 @@ const pausesById = new Map<PauseId, Pause>();
 const pausesByPoint = new Map<ExecutionPoint, Pause>();
 
 // Allow the new Object Inspector's Suspense cache to observe Pause data and pre-cache it.
-type PauseDataHandler = (
-  pauseId: PauseId,
-  executionPoint: ExecutionPoint,
-  pauseData: PauseData
-) => void;
+type PauseDataHandler = (pauseId: PauseId, pauseData: PauseData, stack?: CallStack) => void;
 const pauseDataHandlers: PauseDataHandler[] = [];
 export function addPauseDataListener(handler: PauseDataHandler): void {
   pauseDataHandlers.push(handler);
@@ -60,11 +51,7 @@ export class Pause {
   time: number | null;
   hasFrames: boolean | null;
   createWaiter: Promise<void> | null;
-  frames: Map<FrameId, Frame>;
-  scopes: Map<ScopeId, Scope>;
-  objects: Map<ObjectId, Object>;
   frameSteps: Map<string, PointDescription[]>;
-  stack: Frame[] | undefined;
   repaintGraphicsWaiter: Deferred<repaintGraphicsResult | null> | undefined;
   mouseTargets: NodeBounds[] | undefined;
 
@@ -84,10 +71,6 @@ export class Pause {
     this.hasFrames = null;
 
     this.createWaiter = null;
-
-    this.frames = new Map();
-    this.scopes = new Map();
-    this.objects = new Map();
 
     this.frameSteps = new Map();
 
@@ -120,10 +103,7 @@ export class Pause {
       this.point = point;
       this.time = time;
       this.hasFrames = !!stack && stack.length > 0;
-      this.addData(data);
-      if (stack) {
-        this.stack = stack.map(id => this.frames.get(id)!);
-      }
+      this.addData(data, stack);
       pausesById.set(pauseId, this);
     })();
   }
@@ -149,73 +129,18 @@ export class Pause {
     pausesById.set(pauseId, this);
   }
 
-  addData(...datas: PauseData[]) {
+  addData(data: PauseData, stack?: CallStack) {
     const pauseId = this.pauseId!;
-    const point = this.point!;
 
     // Event handlers must be called before processing the data.
     // Calling _updateDataFronts() will add ValueFronts and mutate the underlying data.
     if (pauseDataHandlers.length > 0) {
-      datas.forEach(data => {
-        pauseDataHandlers.forEach(handler => handler(pauseId, point, data));
-      });
+      pauseDataHandlers.forEach(handler => handler(pauseId, data, stack));
     }
-
-    datas.forEach(d => this._addDataObjects(d));
   }
 
   ensureLoaded() {
     return this.createWaiter;
-  }
-
-  private _addDataObjects({ frames, scopes, objects }: PauseData) {
-    (frames || []).forEach(f => {
-      if (!this.frames.has(f.frameId)) {
-        this.ThreadFront.updateMappedLocation(f.location);
-        this.ThreadFront.updateMappedLocation(f.functionLocation);
-        this.frames.set(f.frameId, f);
-      }
-    });
-    (scopes || []).forEach(s => {
-      if (!this.scopes.has(s.scopeId)) {
-        this.scopes.set(s.scopeId, s);
-      }
-    });
-    (objects || []).forEach(o => {
-      if (!this.objects.has(o.objectId)) {
-        this.objects.set(o.objectId, o);
-      }
-    });
-    this.emit("objects", objects || []);
-  }
-
-  async getFrames() {
-    assert(this.createWaiter, "no createWaiter");
-    await this.createWaiter;
-
-    if (this.hasFrames && !this.stack) {
-      const { frames, data } = await client.Pause.getAllFrames({}, this.sessionId, this.pauseId!);
-      this.addData(data);
-      this.stack = frames.map(id => this.frames.get(id)!);
-    }
-
-    return this.stack;
-  }
-
-  ensureScopeChain(scopeChain: ScopeId[]) {
-    return Promise.all(
-      scopeChain.map(async id => {
-        if (!this.scopes.has(id)) {
-          const { data } = await this.sendMessage(client.Pause.getScope, {
-            scope: id,
-          });
-          this.addData(data);
-        }
-        const scope = this.scopes.get(id);
-        assert(scope, `scope not found (scope ID: ${id})`);
-        return scope;
-      })
-    );
   }
 
   async sendMessage<P, R>(

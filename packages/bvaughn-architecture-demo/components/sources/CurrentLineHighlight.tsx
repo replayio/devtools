@@ -1,7 +1,7 @@
 import { SourceId } from "@replayio/protocol";
 import { Suspense, memo, useContext } from "react";
 
-import { getPauseDataSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
+import { getFramesSuspense } from "bvaughn-architecture-demo/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { SelectedFrameContext } from "../../src/contexts/SelectedFrameContext";
@@ -30,10 +30,10 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
   const pauseId = selectedPauseAndFrameId?.pauseId || null;
 
   if (pauseId !== null && frameId !== null) {
-    const pauseData = getPauseDataSuspense(client, pauseId);
-    if (pauseData !== null && pauseData.frames) {
+    const frames = getFramesSuspense(client, pauseId);
+    if (frames) {
       const correspondingSourceIds = client.getCorrespondingSourceIds(sourceId);
-      const selectedFrame = pauseData.frames.find(frame => frame.frameId === frameId);
+      const selectedFrame = frames.find(frame => frame.frameId === frameId);
       if (selectedFrame) {
         if (
           selectedFrame.location.find(location => {

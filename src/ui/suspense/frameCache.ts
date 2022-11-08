@@ -1,28 +1,24 @@
 import { Frame, PauseId } from "@replayio/protocol";
 
+import { createUseGetValue } from "bvaughn-architecture-demo/src/suspense/createGenericCache";
 import {
-  createGenericCache,
-  createUseGetValue,
-} from "bvaughn-architecture-demo/src/suspense/createGenericCache";
+  getFramesAsync as getFramesAsyncNew,
+  getFramesIfCached,
+  getFramesSuspense as getFramesSuspenseNew,
+} from "bvaughn-architecture-demo/src/suspense/FrameCache";
 import { createFrame } from "devtools/client/debugger/src/client/create";
 import { PauseAndFrameId } from "devtools/client/debugger/src/reducers/pause";
 import { formatCallStackFrames } from "devtools/client/debugger/src/selectors/getCallStackFrames";
-import { Pause } from "protocol/thread/pause";
-import { assert } from "protocol/utils";
+import { replayClient } from "shared/client/ReplayClientContext";
 import { SourcesState } from "ui/reducers/sources";
 
-export const {
-  getValueSuspense: getFramesSuspense,
-  getValueAsync: getFramesAsync,
-  getValueIfCached: getFramesIfCached,
-} = createGenericCache<[pauseId: PauseId], Frame[] | undefined>(
-  pauseId => {
-    const pause = Pause.getById(pauseId);
-    assert(pause, `no pause for ${pauseId}`);
-    return pause.getFrames();
-  },
-  pauseId => pauseId
-);
+export function getFramesSuspense(pauseId: PauseId) {
+  return getFramesSuspenseNew(replayClient, pauseId);
+}
+
+export function getFramesAsync(pauseId: PauseId) {
+  return getFramesAsyncNew(replayClient, pauseId);
+}
 
 export const useGetFrames = createUseGetValue<[pauseId: PauseId | undefined], Frame[] | undefined>(
   async pauseId => (pauseId ? await getFramesAsync(pauseId) : undefined),

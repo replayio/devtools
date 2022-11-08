@@ -12,7 +12,7 @@ import {
   TimelineContext,
   TimelineContextType,
 } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
-import { getCachedPauseIdForExecutionPoint } from "bvaughn-architecture-demo/src/suspense/PauseCache";
+import { getPauseIdForExecutionPointIfCached } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { Pause, ThreadFront } from "protocol/thread";
 import { seek } from "ui/actions/timeline";
 import { getCurrentPoint } from "ui/reducers/app";
@@ -38,7 +38,7 @@ export default function TimelineContextAdapter({ children }: PropsWithChildren) 
 
       // Pre-cache Pause data (required by legacy app code) before calling seek().
       // The new Console doesn't load this data but the old one requires it.
-      const cachedPauseId = getCachedPauseIdForExecutionPoint(executionPoint);
+      const cachedPauseId = getPauseIdForExecutionPointIfCached(executionPoint)?.value;
       if (cachedPauseId != null) {
         pauseId = cachedPauseId;
 

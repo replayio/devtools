@@ -13,11 +13,12 @@ import {
   useState,
 } from "react";
 
+import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegions } from "shared/utils/time";
 
 import useLoadedRegions from "../hooks/useRegions";
-import { getPauseForExecutionPointHelper } from "../suspense/PauseCache";
+import { getPauseIdForExecutionPointAsync } from "../suspense/PauseCache";
 import { TimelineContext } from "./TimelineContext";
 
 interface PauseAndFrameId {
@@ -78,7 +79,7 @@ function DefaultSelectedFrameContextAdapter() {
     let cancelled = false;
 
     async function getData() {
-      const pause = await getPauseForExecutionPointHelper(client, executionPoint);
+      const pauseId = await getPauseIdForExecutionPointAsync(client, executionPoint);
 
       // Edge case handle an update that rendered while we were awaiting data.
       // In the case we should skip any state update.
@@ -88,8 +89,7 @@ function DefaultSelectedFrameContextAdapter() {
 
       // TODO
       // Select the top frame by default because the test harness doesn't have a Call Stack UI yet.
-      const pauseId = pause.pauseId;
-      const frameId = pause.stack?.[0] ?? null;
+      const frameId = (await getFramesAsync(client, pauseId))?.[0]?.frameId;
 
       const pauseAndFrameId = frameId ? { pauseId, frameId } : null;
       setSelectedPauseAndFrameId(prevPauseAndFrameId => {

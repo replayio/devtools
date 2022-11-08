@@ -94,7 +94,10 @@ function FramesRenderer({
     <>
       {asyncSeparator}
       <PauseFrames pauseId={pauseId} frames={frames} panel={panel} />
-      <ErrorBoundary fallback={<div className="pane-info empty">Error loading frames</div>}>
+      <ErrorBoundary
+        key={pauseId}
+        fallback={<div className="pane-info empty">Error loading frames</div>}
+      >
         <Suspense fallback={<div className="pane-info empty">Loading async frames…</div>}>
           <FramesRenderer panel={panel} pauseId={pauseId} asyncIndex={asyncIndex + 1} />
         </Suspense>

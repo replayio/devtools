@@ -2,13 +2,14 @@ import { Action } from "@reduxjs/toolkit";
 import { RecordingId } from "@replayio/protocol";
 import escapeHtml from "escape-html";
 
+import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
 import { getStreamingSourceContentsHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import {
   handleUnstableSourceIds,
   selectLocation,
 } from "devtools/client/debugger/src/actions/sources/select";
 import { fetchSymbolsForSource, getSymbols } from "devtools/client/debugger/src/reducers/ast";
-import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
+import { getExecutionPoint, getPauseId } from "devtools/client/debugger/src/reducers/pause";
 import { findClosestFunction } from "devtools/client/debugger/src/utils/ast";
 import {
   getCodeMirror,
@@ -17,6 +18,7 @@ import {
 import { getFilenameFromURL } from "devtools/client/debugger/src/utils/sources-tree/getURL";
 import type { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { waitForTime } from "protocol/utils";
+import { ReplayClientInterface } from "shared/client/types";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { ADD_COMMENT_MUTATION, AddCommentMutation } from "ui/hooks/comments/useAddComment";
 import { selectors } from "ui/reducers";
@@ -84,7 +86,7 @@ export function createFrameComment(
   recordingId: RecordingId,
   breakpoint?: any
 ): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const state = getState();
     const currentTime = getCurrentTime(state);
     const executionPoint = getExecutionPoint(state);
@@ -92,7 +94,7 @@ export function createFrameComment(
     // Only try to generate a sourceLocation if there's a corresponding breakpoint for this frame comment.
     const sourceLocation = breakpoint
       ? breakpoint.location ||
-        (await getCurrentPauseSourceLocationWithTimeout(ThreadFront, getState))
+        (await getCurrentPauseSourceLocationWithTimeout(ThreadFront, replayClient, getState))
       : null;
 
     dispatch(
@@ -107,9 +109,13 @@ export function createFrameComment(
 
 function getCurrentPauseSourceLocationWithTimeout(
   ThreadFront: typeof ThreadFrontType,
+  replayClient: ReplayClientInterface,
   getState: () => UIState
 ) {
-  return Promise.race([getCurrentPauseSourceLocation(ThreadFront, getState), waitForTime(1000)]);
+  return Promise.race([
+    getCurrentPauseSourceLocation(ThreadFront, replayClient, getState),
+    waitForTime(1000),
+  ]);
 }
 
 export function createFloatingCodeComment(
@@ -228,9 +234,14 @@ export function seekToComment(item: Comment | Reply): UIThunkAction {
 
 async function getCurrentPauseSourceLocation(
   ThreadFront: typeof ThreadFrontType,
+  replayClient: ReplayClientInterface,
   getState: () => UIState
 ) {
-  const frame = (await ThreadFront.currentPause?.getFrames())?.[0];
+  const pauseId = getPauseId(getState());
+  if (!pauseId) {
+    return;
+  }
+  const frame = (await getFramesAsync(replayClient, pauseId))?.[0];
   if (!frame) {
     return;
   }

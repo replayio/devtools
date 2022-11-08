@@ -1,37 +1,19 @@
-import { FrameId, MappedLocation, PauseId, Scope, SourceId } from "@replayio/protocol";
+import { FrameId, PauseId, Scope, SourceId } from "@replayio/protocol";
 
-import { createGenericCache } from "bvaughn-architecture-demo/src/suspense/createGenericCache";
-import { Pause, ThreadFront } from "protocol/thread";
-import { assert } from "protocol/utils";
+import {
+  FrameScopes,
+  getFrameScopesAsync as getScopesAsyncNew,
+  getFrameScopesSuspense as getScopesSuspenseNew,
+} from "bvaughn-architecture-demo/src/suspense/ScopeCache";
+import { replayClient } from "shared/client/ReplayClientContext";
 
-interface FrameScopes {
-  frameLocation: MappedLocation;
-  generatedScopes: Scope[];
-  originalScopes: Scope[] | undefined;
+export function getScopesSuspense(pauseId: PauseId, frameId: FrameId) {
+  return getScopesSuspenseNew(replayClient, pauseId, frameId);
 }
 
-export const {
-  getValueSuspense: getScopesSuspense,
-  getValueAsync: getScopesAsync,
-  getValueIfCached: getScopesIfCached,
-} = createGenericCache<[pauseId: PauseId, frameId: FrameId], FrameScopes>(
-  async (pauseId, frameId) => {
-    const pause = Pause.getById(pauseId);
-    assert(pause, `no pause for ${pauseId}`);
-    // Wait until the pause is "created" to see if we have frames
-    await pause.createWaiter;
-    const frame = (await pause.getFrames())?.find(frame => frame.frameId === frameId);
-    assert(frame, `no frame with ID ${frameId} found in pause ${pauseId}`);
-
-    const generatedScopes = await pause.ensureScopeChain(frame.scopeChain);
-    const originalScopes = frame.originalScopeChain
-      ? await pause.ensureScopeChain(frame.originalScopeChain)
-      : undefined;
-
-    return { frameLocation: frame.location, generatedScopes, originalScopes };
-  },
-  (pauseId, frameId) => `${pauseId}:${frameId}`
-);
+export function getScopesAsync(pauseId: PauseId, frameId: FrameId) {
+  return getScopesAsyncNew(replayClient, pauseId, frameId);
+}
 
 export interface PickedScopes {
   scopes: Scope[];

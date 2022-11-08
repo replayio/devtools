@@ -203,6 +203,7 @@ export function createMockReplayClient() {
       supportsRepaintingGraphics: false,
     })),
     getRecordingId: jest.fn().mockImplementation(async () => "fake-recording-id"),
+    getScope: jest.fn().mockImplementation(async () => {}),
     getSessionEndpoint: jest.fn().mockImplementation(async () => ({
       point: "1000",
       time: 1000,
@@ -216,5 +217,6 @@ export function createMockReplayClient() {
     searchFunctions: jest.fn().mockImplementation(async () => {}),
     searchSources: jest.fn().mockImplementation(async () => {}),
     streamSourceContents: jest.fn().mockImplementation(async () => {}),
+    waitForLoadedSources: jest.fn().mockImplementation(async () => undefined),
   };
 }
