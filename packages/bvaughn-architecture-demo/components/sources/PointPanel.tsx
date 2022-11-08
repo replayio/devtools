@@ -15,6 +15,8 @@ import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsCont
 import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
 import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 import { addComment as addCommentGraphQL } from "bvaughn-architecture-demo/src/graphql/Comments";
+import { Nag } from "bvaughn-architecture-demo/src/graphql/types";
+import { useNag } from "bvaughn-architecture-demo/src/hooks/useNag";
 import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import { validate } from "bvaughn-architecture-demo/src/utils/points";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -50,6 +52,8 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
   const client = useContext(ReplayClientContext);
   const { accessToken, recordingId, trackEvent } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: curentTime } = useContext(TimelineContext);
+
+  const [showNag, dismissNag] = useNag(Nag.FIRST_BREAKPOINT_EDIT);
 
   const [hitPoints, hitPointStatus] = getHitPointsForLocationSuspense(
     client,
@@ -208,6 +212,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
       setEditableCondition(point.condition || null);
       setEditableContent(point.content);
       setIsEditing(true);
+      dismissNag();
     };
 
     const addComment = () => {
@@ -266,7 +271,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                   Use Focus Mode to reduce the number of hits.
                 </div>
               ) : (
-                <div className={styles.ContentWrapper}>
+                <div className={showNag ? styles.ContentWrapperWithNag : styles.ContentWrapper}>
                   <BadgePicker point={point} />
                   <div
                     className={styles.Content}

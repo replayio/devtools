@@ -31,18 +31,6 @@
 
   width: 1.5em;
   height: 1.5em;
-  border-radius: 0.5em;
-
-  display: none;
-  align-items: center;
-  justify-content: center;
-
-  outline: none;
-  border: none;
-  padding: 0;
-
-  background-color: var(--background-color-primary-button);
-  color: var(--color-primary-button);
 
   cursor: pointer;
   transition: all 100ms;

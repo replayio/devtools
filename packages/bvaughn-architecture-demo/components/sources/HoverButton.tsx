@@ -1,6 +1,6 @@
 import { ExecutionPoint, newSource as ProtocolSource, TimeStampedPoint } from "@replayio/protocol";
 import findLast from "lodash/findLast";
-import { useContext, useMemo } from "react";
+import { useContext } from "react";
 
 import Icon from "bvaughn-architecture-demo/components/Icon";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
@@ -13,6 +13,8 @@ import {
 import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
+import { Nag } from "bvaughn-architecture-demo/src/graphql/types";
+import { useNag } from "bvaughn-architecture-demo/src/hooks/useNag";
 import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import {
   compareExecutionPoints,
@@ -23,6 +25,8 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 import { LineHitCounts } from "shared/client/types";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
+
+import styles from "./HoverButton.module.css";
 
 export default function HoverButton({
   addPoint,
@@ -51,6 +55,8 @@ export default function HoverButton({
   const { executionPoint, update } = useContext(TimelineContext);
   const { findClosestFunctionName } = useContext(SourcesContext);
   const { trackEvent } = useContext(SessionContext);
+
+  const [showNag, dismissNag] = useNag(Nag.FIRST_BREAKPOINT_ADD);
 
   if (isMetaKeyActive) {
     if (lineHitCounts === null) {
@@ -90,7 +96,7 @@ export default function HoverButton({
 
     return (
       <button
-        className={buttonClassName}
+        className={`${buttonClassName} ${styles.Button}`}
         data-test-name="ContinueToButton"
         data-test-state={isShiftKeyActive ? "previous" : "next"}
         disabled={disabled}
@@ -107,6 +113,8 @@ export default function HoverButton({
       if (lineHitCounts === null) {
         return;
       }
+
+      dismissNag();
 
       const fileName = source?.url?.split("/")?.pop();
       let content = `"${fileName}", ${lineNumber}`;
@@ -151,7 +159,7 @@ export default function HoverButton({
 
     return (
       <button
-        className={buttonClassName}
+        className={`${buttonClassName} ${showNag ? styles.ButtonWithNag : styles.Button}`}
         data-test-name="LogPointToggle"
         data-test-state={point?.shouldLog ? "on" : "off"}
         onClick={point?.shouldLog ? togglePoint : addLogPoint}

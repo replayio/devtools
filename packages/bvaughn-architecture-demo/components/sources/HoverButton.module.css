@@ -1,0 +1,22 @@
+.Button,
+.ButtonWithNag {
+  border-radius: 0.5em;
+
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  outline: none;
+  border: none;
+  padding: 0;
+}
+
+.Button {
+  background-color: var(--background-color-primary-button);
+  color: var(--color-primary-button);
+}
+
+.ButtonWithNag {
+  background-color: var(--background-color-secondary-button);
+  color: var(--color-secondary-button);
+}
