@@ -1,7 +1,7 @@
 import { Doc } from "codemirror";
 import isEmpty from "lodash/isEmpty";
 import range from "lodash/range";
-import { useLayoutEffect, useRef } from "react";
+import { useContext, useLayoutEffect, useRef } from "react";
 
 import { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import {
@@ -16,6 +16,7 @@ import {
   hasDocument,
 } from "devtools/client/debugger/src/utils/editor/source-documents";
 import SourceEditor from "devtools/client/debugger/src/utils/editor/source-editor";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   SourceContent,
   getSelectedLocation,
@@ -32,7 +33,8 @@ type PrevProps = {
 
 // This hook combines legacy HighlightLine and HighlightLines "headless" components.
 export default function useHighlightedLines(editor: SourceEditor | null) {
-  const selectedFrame = useAppSelector(getSelectedFrameSuspense);
+  const replayClient = useContext(ReplayClientContext);
+  const selectedFrame = useAppSelector(state => getSelectedFrameSuspense(replayClient, state));
   const selectedLocation = useAppSelector(getSelectedLocation);
   const selectedSource = useAppSelector(getSelectedSourceWithContent) || null;
   const highlightedLineRange = useAppSelector(getHighlightedLineRange) || null;

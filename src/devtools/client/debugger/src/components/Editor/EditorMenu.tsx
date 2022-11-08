@@ -8,6 +8,7 @@ import { Component } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { showMenu } from "devtools/shared/contextmenu";
+import { ReplayClientInterface } from "shared/client/types";
 import { SourceDetails } from "ui/reducers/sources";
 import type { AppDispatch } from "ui/setup/store";
 import type { UIState } from "ui/state";
@@ -34,7 +35,7 @@ const connector = connect(mapStateToProps, dispatch => ({
 }));
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
-type FinalEMProps = EditorMenuProps & PropsFromRedux;
+type FinalEMProps = EditorMenuProps & PropsFromRedux & { replayClient: ReplayClientInterface };
 
 class EditorMenu extends Component<FinalEMProps> {
   UNSAFE_componentWillUpdate(nextProps: FinalEMProps) {
@@ -46,6 +47,7 @@ class EditorMenu extends Component<FinalEMProps> {
 
   showMenu(props: FinalEMProps) {
     const {
+      replayClient,
       cx,
       pauseId,
       selectedSource,
@@ -58,6 +60,7 @@ class EditorMenu extends Component<FinalEMProps> {
     showMenu(
       event,
       editorMenuItems({
+        replayClient,
         cx,
         editorActions,
         pauseId,

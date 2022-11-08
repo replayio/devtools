@@ -1,8 +1,9 @@
 import classnames from "classnames";
 import classNames from "classnames";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import { getPauseId } from "devtools/client/debugger/src/selectors";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
@@ -85,8 +86,9 @@ function ToolbarButton({
 }
 
 export default function Toolbar() {
+  const replayClient = useContext(ReplayClientContext);
   const pauseId = useAppSelector(getPauseId);
-  const frames = useGetFrames(pauseId);
+  const frames = useGetFrames(replayClient, pauseId);
   const hasFrames = !!frames.value?.length;
   const viewMode = useAppSelector(selectors.getViewMode);
   const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);

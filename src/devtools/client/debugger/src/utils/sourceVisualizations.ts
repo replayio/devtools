@@ -50,6 +50,7 @@ export function getSourceIDsToSearch(
 }
 
 function getSourceIdToVisualizeSuspense(
+  replayClient: ReplayClientInterface,
   selectedSource: SourceDetails | null | undefined,
   selectedFrameId: PauseAndFrameId | null,
   sourcesState: SourcesState,
@@ -64,7 +65,12 @@ function getSourceIdToVisualizeSuspense(
   }
 
   let alternateSourceId = selectedFrameId
-    ? getAlternateSourceIdFromSelectedFrameSuspense(selectedSource, selectedFrameId, sourcesState)
+    ? getAlternateSourceIdFromSelectedFrameSuspense(
+        replayClient,
+        selectedSource,
+        selectedFrameId,
+        sourcesState
+      )
     : undefined;
   if (!alternateSourceId) {
     alternateSourceId = getUniqueAlternateSourceId(
@@ -91,6 +97,7 @@ function getSourceIdToVisualizeSuspense(
 }
 
 export function getSourcemapVisualizerURLSuspense(
+  replayClient: ReplayClientInterface,
   selectedSource: SourceDetails | null | undefined,
   selectedFrameId: PauseAndFrameId | null,
   sourcesState: SourcesState,
@@ -101,6 +108,7 @@ export function getSourcemapVisualizerURLSuspense(
     return null;
   }
   const sourceId = getSourceIdToVisualizeSuspense(
+    replayClient,
     selectedSource,
     selectedFrameId,
     sourcesState,
@@ -126,11 +134,12 @@ interface AlternateSourceResult {
 }
 
 function getAlternateSourceIdFromSelectedFrameSuspense(
+  replayClient: ReplayClientInterface,
   selectedSource: SourceDetails,
   selectedFrameId: PauseAndFrameId,
   sourcesState: SourcesState
 ) {
-  const selectedFrame = getPauseFrameSuspense(selectedFrameId, sourcesState);
+  const selectedFrame = getPauseFrameSuspense(replayClient, selectedFrameId, sourcesState);
   if (selectedFrame?.location.sourceId === selectedSource.id) {
     return selectedFrame.alternateLocation?.sourceId;
   }
@@ -243,7 +252,12 @@ export function getAlternateSourceIdSuspense(
   }
 
   let alternateSourceId = selectedFrameId
-    ? getAlternateSourceIdFromSelectedFrameSuspense(selectedSource, selectedFrameId, sourcesState)
+    ? getAlternateSourceIdFromSelectedFrameSuspense(
+        client,
+        selectedSource,
+        selectedFrameId,
+        sourcesState
+      )
     : undefined;
   if (alternateSourceId) {
     return { sourceId: alternateSourceId };

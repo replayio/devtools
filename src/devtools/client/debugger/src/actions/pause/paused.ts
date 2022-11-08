@@ -2,10 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
 import type { UIThunkAction } from "ui/actions";
 import { isPointInLoadingRegion } from "ui/reducers/app";
 import { getSelectedLocation } from "ui/reducers/sources";
-import { getFramesAsync } from "ui/suspense/frameCache";
 import { trackEvent } from "ui/utils/telemetry";
 
 import {
@@ -30,7 +30,7 @@ export function paused({
   frame?: $FixTypeLater;
   time?: number;
 }): UIThunkAction {
-  return async function (dispatch, getState, { ThreadFront }) {
+  return async function (dispatch, getState, { ThreadFront, replayClient }) {
     dispatch(pauseRequestedAt());
 
     if (!isPointInLoadingRegion(getState(), executionPoint)) {
@@ -64,13 +64,13 @@ export function paused({
     // if there really _were_ frames at that specific point.
     // Now, we mimic that behavior by bailing out early if the passed-through `hasFrames` flag is false.
     // Yes, this means that `hasFrames` is a misleading name and we should fix that.
-    const frames = await getFramesAsync(pause.pauseId!);
+    const frames = await getFramesAsync(replayClient, pause.pauseId!);
     if (!frames?.length || hasFrames === false) {
       return;
     }
 
     dispatch(frameSelected({ cx, pauseId: pause.pauseId!, frameId: frames[0].frameId }));
-    const selectedFrame = frame || (await getSelectedFrameAsync(getState()));
+    const selectedFrame = frame || (await getSelectedFrameAsync(replayClient, getState()));
     if (selectedFrame) {
       const currentLocation = getSelectedLocation(getState());
       if (

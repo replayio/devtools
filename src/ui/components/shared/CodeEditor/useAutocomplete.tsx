@@ -1,7 +1,9 @@
 import uniq from "lodash/uniq";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 
+import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
 import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import { getFrameScopesAsync } from "bvaughn-architecture-demo/src/suspense/ScopeCache";
 import {
   PauseAndFrameId,
   getPauseId,
@@ -11,8 +13,7 @@ import { getEvaluatedProperties } from "devtools/client/webconsole/utils/autocom
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { getPreferredGeneratedSources } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
-import { getFramesAsync } from "ui/suspense/frameCache";
-import { PickedScopes, getScopesAsync, pickScopes } from "ui/suspense/scopeCache";
+import { PickedScopes, pickScopes } from "ui/suspense/scopeCache";
 import {
   ObjectFetcher,
   fuzzyFilter,
@@ -68,12 +69,12 @@ function useGetScopeMatches(expression: string) {
       if (!pauseId) {
         return [];
       }
-      const topFrame = (await getFramesAsync(pauseId))?.[0];
+      const topFrame = (await getFramesAsync(replayClient, pauseId))?.[0];
       if (!topFrame) {
         return [];
       }
       const frameScopes = pickScopes(
-        await getScopesAsync(pauseId, topFrame.frameId),
+        await getFrameScopesAsync(replayClient, pauseId, topFrame.frameId),
         preferredGeneratedSources
       );
       if (!frameScopes) {

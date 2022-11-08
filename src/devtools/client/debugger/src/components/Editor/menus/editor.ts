@@ -7,6 +7,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { PauseId } from "@replayio/protocol";
 
 import type { Context, PauseAndFrameId } from "devtools/client/debugger/src/reducers/pause";
+import { ReplayClientInterface } from "shared/client/types";
 import type { SourceDetails, SourcesState } from "ui/reducers/sources";
 import type { AppDispatch } from "ui/setup/store";
 
@@ -40,6 +41,7 @@ const showSourceMenuItem = (
 });
 
 const sourceMapItem = (
+  replayClient: ReplayClientInterface,
   pauseId: PauseId | undefined,
   selectedSource: SourceDetails,
   selectedFrameId: PauseAndFrameId | null,
@@ -49,6 +51,7 @@ const sourceMapItem = (
   if (pauseId) {
     try {
       visualizerURL = getSourcemapVisualizerURLSuspense(
+        replayClient,
         selectedSource,
         selectedFrameId,
         sourcesState
@@ -70,6 +73,7 @@ const sourceMapItem = (
 };
 
 export function editorMenuItems({
+  replayClient,
   cx,
   editorActions,
   pauseId,
@@ -77,6 +81,7 @@ export function editorMenuItems({
   selectedFrameId,
   sourcesState,
 }: {
+  replayClient: ReplayClientInterface;
   cx: Context;
   editorActions: EditorActions;
   pauseId: PauseId | undefined;
@@ -90,7 +95,7 @@ export function editorMenuItems({
     copySourceUri2Item(selectedSource),
     { type: "separator" },
     showSourceMenuItem(cx, selectedSource, editorActions),
-    sourceMapItem(pauseId, selectedSource, selectedFrameId, sourcesState)
+    sourceMapItem(replayClient, pauseId, selectedSource, selectedFrameId, sourcesState)
   );
 
   return items;

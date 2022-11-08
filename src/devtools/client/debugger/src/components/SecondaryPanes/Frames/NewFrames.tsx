@@ -1,5 +1,5 @@
 import { PauseId } from "@replayio/protocol";
-import { Suspense, useMemo } from "react";
+import { Suspense, useContext, useMemo } from "react";
 
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import {
@@ -12,7 +12,7 @@ import {
 } from "devtools/client/debugger/src/selectors";
 import { Pause } from "protocol/thread/pause";
 import { ThreadFront } from "protocol/thread/thread";
-import { assert } from "protocol/utils";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { enterFocusMode as enterFocusModeAction } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getSourcesLoading } from "ui/reducers/sources";
@@ -39,6 +39,7 @@ function FramesRenderer({
   pauseId: PauseId;
   asyncIndex?: number;
 }) {
+  const replayClient = useContext(ReplayClientContext);
   const sourcesState = useAppSelector(state => state.sources);
   const loadedRegions = useAppSelector(getLoadedRegions);
   const dispatch = useAppDispatch();
@@ -57,6 +58,7 @@ function FramesRenderer({
     ) : null;
 
   const asyncParentPauseId = getAsyncParentPauseIdSuspense(
+    replayClient,
     pauseId,
     asyncIndex,
     loadedRegions?.loaded
@@ -77,7 +79,7 @@ function FramesRenderer({
   }
 
   let frames = asyncParentPauseId
-    ? getPauseFramesSuspense(asyncParentPauseId, sourcesState)
+    ? getPauseFramesSuspense(replayClient, asyncParentPauseId, sourcesState)
     : undefined;
   if (asyncIndex > 0) {
     frames = frames?.slice(1);

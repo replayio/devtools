@@ -20,6 +20,7 @@ export default function SourcemapVisualizerLinkSuspends({
   const selectedFrameId = useAppSelector(getSelectedFrameId);
   const sourcesState = useAppSelector(state => state.sources);
   const visualizerURL = getSourcemapVisualizerURLSuspense(
+    client,
     selectedSource,
     selectedFrameId,
     sourcesState,
