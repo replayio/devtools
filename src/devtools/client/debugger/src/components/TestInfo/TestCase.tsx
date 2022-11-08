@@ -1,6 +1,7 @@
 import { Location } from "@replayio/protocol";
 import { useState } from "react";
 
+import { setFocusRegion } from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -27,6 +28,15 @@ export function TestCase({ test, location }: { test: TestItem; location?: Locati
     }
     setExpandSteps(!expandSteps);
   };
+
+  const onFocus = () => {
+    dispatch(
+      setFocusRegion({
+        beginTime: test.relativeStartTime,
+        endTime: test.relativeStartTime + test.duration,
+      })
+    );
+  }
 
   return (
     <div className="flex flex-col">
@@ -56,6 +66,9 @@ export function TestCase({ test, location }: { test: TestItem; location?: Locati
             <MaterialIcon>description</MaterialIcon>
           </button>
         ) : null}
+        <button onClick={onFocus} title="Go To Source">
+          <MaterialIcon>center_focus_strong</MaterialIcon>
+        </button>
       </div>
       {expandSteps ? <TestSteps test={test} startTime={test.relativeStartTime} /> : null}
     </div>
