@@ -42,7 +42,7 @@ export async function setupReactDevTools(store: UIStore, ThreadFront: typeof TF)
       )
     );
     receivedAnnotations = [];
-  }, 1_000);
+  }, 1000);
 
   ThreadFront.getAnnotations(annotations => {
     receivedAnnotations.push(...annotations);
