@@ -25,9 +25,8 @@ export default function ErrorBoundary({ children }: { children: ReactNode }) {
       return dispatch(setUnexpectedError(ReplayUpdatedError, true));
     }
 
-    if (error.name === "CommandError") {
-      return;
-    }
+    // Otherwise, if it's bubbled up this far, React is crashing anyway.
+    // Let's show the "Oops!" screen and tell the user to refresh.
 
     dispatch(
       setUnexpectedError({
