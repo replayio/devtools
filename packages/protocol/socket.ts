@@ -215,7 +215,10 @@ export async function sendMessage<M extends CommandMethods>(
 
     console.warn("Message failed", method, { code, id, message }, data);
 
-    throw commandError(message, code);
+    // Include details on the method and params in the error string so that we get more than
+    // _just_ "Internal Error" or similar
+    const finalMessage = `${message} (request: ${method}, ${JSON.stringify(params)})`;
+    throw commandError(finalMessage, code);
   }
 
   return response.result as any;
