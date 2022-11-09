@@ -16,6 +16,7 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
           index={i}
           startTime={startTime + s.relativeStartTime}
           argString={s.args?.toString()}
+          parentId={s.parentId}
         />
       ))}
       {test.error ? (
@@ -38,11 +39,13 @@ function TestStepItem({
   startTime,
   argString,
   index,
+  parentId,
 }: {
   testName: string;
   startTime: number;
   argString: string;
   index: number;
+  parentId?: string;
 }) {
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
@@ -59,7 +62,10 @@ function TestStepItem({
     >
       <div className="flex items-center space-x-2 overflow-hidden text-start">
         <div className="opacity-70">{index + 1}</div>
-        <div className={`font-medium text-bodyColor ${paused ? "font-bold" : ""}`}>{testName}</div>
+        <div className={`font-medium text-bodyColor ${paused ? "font-bold" : ""}`}>
+          {parentId ? "- " : ""}
+          {testName}
+        </div>
         <div className="opacity-70">{argString}</div>
       </div>
     </button>

@@ -188,6 +188,7 @@ export type TestStep = {
   name: string;
   duration: number;
   relativeStartTime: number;
+  parentId?: string;
   error?: TestItemError;
 };
 
