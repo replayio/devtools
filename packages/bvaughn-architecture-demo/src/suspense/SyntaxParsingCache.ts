@@ -61,7 +61,7 @@ async function streamingSourceContentsToStreamingParser(
 
   // TODO [source viewer]
   // Incrementally parse (more than just the first chunk)
-  let parsed = false;
+  let didParse = false;
 
   const streamingParser: StreamingParser = {
     parsedLines: [],
@@ -97,14 +97,23 @@ async function streamingSourceContentsToStreamingParser(
 
       streamingParser.rawProgress = source.contents.length / source.codeUnitCount!;
 
-      if (!parsed) {
+      // HACK [FE-925]
+      // Unprettified sources without source maps can have a lot of text on a single line.
+      // Mouse interactions (e.g. hover) sometimes crash the browser with such large text.
+      // A rough metric for identifying this type of file is to look at the average number of code units per line.
+      const badFormat =
+        source.lineCount !== null &&
+        source.codeUnitCount !== null &&
+        source.codeUnitCount / source.lineCount > 2_500;
+
+      if (!didParse && !badFormat) {
         if (streamingParser.rawProgress === 1 || source.contents.length >= maxCharacters) {
-          parsed = true;
+          didParse = true;
 
           const parser = incrementalParser(undefined, source.contentType!)!;
           parser.parseChunk(source.contents, source.complete, maxCharacters, maxTime);
 
-          // TODO [source viewer]
+          // TODO [FE-853]
           // Handle the case where the last line wasn't fully processed.
           // We could do a partial line, but that might be slow for long lines.
           streamingParser.parsedLines = parser.isComplete()

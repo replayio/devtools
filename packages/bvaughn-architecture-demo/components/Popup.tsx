@@ -10,6 +10,7 @@ type Dismiss = () => void;
 
 export default function Popup({
   children,
+  clientX = null,
   containerRef = null,
   dataTestId,
   dataTestName = "Popup",
@@ -19,6 +20,7 @@ export default function Popup({
   target,
 }: {
   children: ReactNode;
+  clientX?: number | null;
   containerRef?: RefObject<HTMLElement> | null;
   dataTestId?: string;
   dataTestName?: string;
@@ -87,8 +89,6 @@ export default function Popup({
       const popoverRect = popover.getBoundingClientRect();
       const targetRect = target.getBoundingClientRect();
 
-      let arrowUp = true;
-
       // Vertical alignment: Determined entirely by the target location within the parent container.
       // Targets in the top half of the container have popups displayed beneath them,
       // and targets in the bottom half of the container have popups displayed above them.
@@ -106,18 +106,19 @@ export default function Popup({
         popover.style.setProperty("top", `${popoverTop}px`);
 
         arrow.setAttribute("class", styles.DownArrow);
-
-        arrowUp = false;
       }
 
       // TODO
       // Handle horizontal positioning edge case if popup is outside of scroll area when rendered initially.
 
+      const horizontalAlignmentPoint =
+        clientX !== null ? clientX : targetRect.left + targetRect.width / 2;
+
       // Horizontal alignment: Prefer horizontally centered around the target
       // But don't go outside of the bounds of the container.
       const popoverLeftMin = containerRect.left;
       const popoverLeftMax = containerRect.left + containerRect.width - popoverRect.width;
-      const popoverLeftPreferred = targetRect.left + targetRect.width / 2 - popoverRect.width / 2;
+      const popoverLeftPreferred = horizontalAlignmentPoint - popoverRect.width / 2;
       const popoverLeft = Math.max(popoverLeftMin, Math.min(popoverLeftMax, popoverLeftPreferred));
       popover.style.setProperty("left", `${popoverLeft}px`);
 
@@ -126,7 +127,7 @@ export default function Popup({
       const arrowRect = arrow.getBoundingClientRect();
       const arrowLeftMin = targetRect.left;
       const arrowLeftMax = targetRect.left + targetRect.width - arrowRect.width;
-      const arrowLeftPreferred = targetRect.left + targetRect.width / 2 - arrowRect.width / 2;
+      const arrowLeftPreferred = horizontalAlignmentPoint - arrowRect.width / 2;
       const arrowLeft = Math.max(arrowLeftMin, Math.min(arrowLeftMax, arrowLeftPreferred));
       arrow.style.setProperty("margin-left", `${arrowLeft - popoverLeft}px`);
 
@@ -177,7 +178,7 @@ export default function Popup({
 
       clearMouseLeaveTimeout();
     };
-  }, [containerRef, showTail, target]);
+  }, [clientX, containerRef, showTail, target]);
 
   const blockEvent = (event: MouseEvent) => {
     event.preventDefault();

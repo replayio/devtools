@@ -172,7 +172,11 @@ const SourceListRow = memo(
       const plainText = index < rawLines.length ? rawLines[index] : null;
 
       if (plainText !== null) {
-        lineSegments = <pre className={styles.LineSegment}>{plainText}</pre>;
+        lineSegments = (
+          <pre className={styles.LineSegment} data-test-name="SourceListRow-LineSegment-PlainText">
+            {plainText}
+          </pre>
+        );
       } else {
         lineSegments = <SourceLineLoadingPlaceholder width={loadingPlaceholderWidth} />;
       }

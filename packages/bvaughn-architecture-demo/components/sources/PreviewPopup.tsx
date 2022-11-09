@@ -10,6 +10,7 @@ import Popup from "../Popup";
 import styles from "./PreviewPopup.module.css";
 
 type Props = {
+  clientX?: number | null;
   containerRef: RefObject<HTMLElement>;
   dismiss: () => void;
   expression: string;
@@ -24,7 +25,13 @@ export default function PreviewPopup(props: Props) {
   );
 }
 
-function SuspendingPreviewPopup({ containerRef, dismiss, expression, target }: Props) {
+function SuspendingPreviewPopup({
+  clientX = null,
+  containerRef,
+  dismiss,
+  expression,
+  target,
+}: Props) {
   const client = useContext(ReplayClientContext);
 
   const popupRef = useRef<HTMLDivElement>(null);
@@ -59,7 +66,13 @@ function SuspendingPreviewPopup({ containerRef, dismiss, expression, target }: P
 
   if (pauseId !== null && value !== null) {
     return (
-      <Popup containerRef={containerRef} dismiss={dismiss} target={target} showTail={true}>
+      <Popup
+        clientX={clientX}
+        containerRef={containerRef}
+        dismiss={dismiss}
+        target={target}
+        showTail={true}
+      >
         <SourcePreviewInspector
           className={styles.Popup}
           pauseId={pauseId}

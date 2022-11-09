@@ -182,28 +182,6 @@
   margin: 0;
 }
 
-.LineSegment :global(.tok-definition),
-.LineSegment :global(.tok-local),
-.LineSegment :global(.tok-keyword),
-.LineSegment :global(.tok-meta),
-.LineSegment :global(.tok-propertyName),
-.LineSegment :global(.tok-typeName),
-.LineSegment :global(.tok-variableName),
-.LineSegment :global(.tok-variableName2) {
-  transition: all 50ms ease;
-}
-
-.LineSegment :global(.tok-definition):hover,
-.LineSegment :global(.tok-local):hover,
-.LineSegment :global(.tok-keyword):hover,
-.LineSegment :global(.tok-meta):hover,
-.LineSegment :global(.tok-propertyName):hover,
-.LineSegment :global(.tok-typeName):hover,
-.LineSegment :global(.tok-variableName):hover,
-.LineSegment :global(.tok-variableName2):hover {
-  filter: var(--token-hover-filter-color);
-}
-
 .BreakpointButton {
   display: inline-block;
   background: transparent;
