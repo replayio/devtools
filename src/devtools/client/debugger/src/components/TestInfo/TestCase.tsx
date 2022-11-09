@@ -53,7 +53,6 @@ export function TestCase({ test, location }: { test: TestItem; location?: Locati
 
           <div className="flex flex-col items-start text-bodyColor">
             <div className="overflow-hidden overflow-ellipsis whitespace-pre">{test.title}</div>
-
             {test.error ? (
               <div className="mt-1 overflow-hidden rounded-lg bg-testsuitesErrorBgcolor px-2 py-1 text-left font-mono ">
                 {test.error.message}
@@ -61,14 +60,24 @@ export function TestCase({ test, location }: { test: TestItem; location?: Locati
             ) : null}
           </div>
         </button>
-        {location ? (
-          <button onClick={onClick} title="Go To Source">
-            <MaterialIcon>description</MaterialIcon>
+        <div className="flex gap-1 self-start">
+          {location ? (
+            <button
+              onClick={onClick}
+              title="Go To Source"
+              className="grid h-5 w-5 items-center justify-center hover:bg-menuHoverBgcolor"
+            >
+              <MaterialIcon>description</MaterialIcon>
+            </button>
+          ) : null}
+          <button
+            onClick={onFocus}
+            title="Focus on this test"
+            className="grid h-5 w-5 items-center justify-center hover:bg-menuHoverBgcolor"
+          >
+            <Icon filename="focus" />
           </button>
-        ) : null}
-        <button onClick={onFocus} title="Focus on this test">
-          <MaterialIcon>center_focus_strong</MaterialIcon>
-        </button>
+        </div>
       </div>
       {expandSteps ? <TestSteps test={test} startTime={test.relativeStartTime} /> : null}
     </div>
