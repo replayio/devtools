@@ -80,6 +80,15 @@ describe("getExpressionFromString", () => {
     expect(getExpressionHelper("1.12|")).toBe(null);
   });
 
+  it("should not return expressions that are part of a comment", () => {
+    expect(getExpressionHelper("|// Example")).toBe(null);
+    expect(getExpressionHelper("/|/ Example")).toBe(null);
+    expect(getExpressionHelper("//| Example")).toBe(null);
+    expect(getExpressionHelper("//| Example")).toBe(null);
+    expect(getExpressionHelper("// |Example")).toBe(null);
+    expect(getExpressionHelper("// Example|")).toBe(null);
+  });
+
   it("should not return expressions that are part of a string", () => {
     expect(getExpressionHelper('"|foo')).toBe(null);
     expect(getExpressionHelper('"f|oo')).toBe(null);
@@ -152,5 +161,32 @@ describe("getExpressionFromString", () => {
     expect(getExpressionHelper('`URL: "${wind|ow.loc}"')).toBe("window");
     expect(getExpressionHelper('`URL: "${windo|w.loc}"')).toBe("window");
     expect(getExpressionHelper('`URL: "${window|.loc}"')).toBe("window");
+  });
+
+  describe("minified/mangled code", () => {
+    it("keywords", () => {
+      expect(getExpressionHelper('!fu|nction(){"use strict";var e={4:function(e,t,n)')).toBe(
+        "function"
+      );
+
+      expect(getExpressionHelper('!function(){"use strict";v|ar e={4:function(e,t,n)')).toBe(null);
+    });
+
+    it("strings", () => {
+      expect(getExpressionHelper('!function(){"|use strict";var e={4:function(e,t')).toBe(null);
+      expect(getExpressionHelper('!function(){"use| strict";var e={4:function(e,t')).toBe(null);
+      expect(getExpressionHelper('!function(){"use |strict";var e={4:function(e,t')).toBe(null);
+      expect(getExpressionHelper('!function(){"use strict|";var e={4:function(e,t')).toBe(null);
+    });
+
+    it("numbers", () => {
+      expect(getExpressionHelper('!function(){"use strict";var e={|4:function(e,t,n)')).toBe(null);
+      expect(getExpressionHelper('!function(){"use strict";var e={4|:function(e,t')).toBe(null);
+    });
+
+    it("variables", () => {
+      expect(getExpressionHelper('!function(){"use strict";var e={4:function(e,|t,n)')).toBe("t");
+      expect(getExpressionHelper('!function(){"use strict";var e={4:function(e,t|')).toBe("t");
+    });
   });
 });

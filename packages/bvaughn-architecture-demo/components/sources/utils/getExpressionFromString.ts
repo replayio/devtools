@@ -1,70 +1,109 @@
 import { highlighter } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
 
 export default function getExpressionFromString(
-  expression: string,
+  string: string,
   cursorIndex: number
 ): string | null {
-  const parsed = highlighter(expression, ".js");
-  if (parsed == null || parsed.length === 0) {
+  const parsedString = highlighter(string, ".js");
+  if (parsedString == null || parsedString.length === 0) {
     return null;
-  } else {
-    const line = parsed[parsed.length - 1];
+  }
 
-    const element = document.createElement("div");
-    element.innerHTML = line;
+  const line = parsedString[parsedString.length - 1];
 
-    let childIndex = 0;
-    let textIndex = 0;
-    while (childIndex < element.children.length) {
-      const child = element.children[childIndex];
-      if (child.textContent !== null) {
-        textIndex += child.textContent.length;
-      }
+  const element = document.createElement("div");
+  element.innerHTML = line;
 
-      if (textIndex >= cursorIndex) {
-        break;
-      } else {
-        childIndex++;
-      }
+  let childIndex = 0;
+  let textIndex = 0;
+  while (childIndex < element.children.length) {
+    const child = element.children[childIndex];
+    if (child.textContent !== null) {
+      textIndex += child.textContent.length;
     }
 
-    const child = element.children[Math.min(childIndex, element.children.length - 1)];
-    switch (child.className) {
-      case "tok-bool":
-        // Don't try to auto-complete booleans.
-        return null;
-      case "tok-number":
-        // Don't try to auto-complete numbers.
-        return null;
-      case "tok-string":
-      case "tok-string2":
-        // Don't try to auto-complete strings.
-        return null;
+    if (textIndex >= cursorIndex) {
+      break;
+    } else {
+      childIndex++;
     }
   }
 
-  let token = "";
+  const child = element.children[Math.min(childIndex, element.children.length - 1)];
+  switch (child.className) {
+    case "tok-comment":
+    case "tok-string":
+    case "tok-string2":
+      // Don't try to auto-complete strings.
+      return null;
+  }
+
+  let expression = "";
   let currentIndex = cursorIndex - 1;
-  while (currentIndex >= 0) {
-    const character = expression.charAt(currentIndex);
-    if (character === " " || character === "{") {
-      break;
+  previousLoop: while (currentIndex >= 0) {
+    const character = string.charAt(currentIndex);
+    switch (character) {
+      case " ":
+      case ":":
+      case ";":
+      case "+":
+      case "{":
+      case ")":
+      case "!":
+      case ",":
+        break previousLoop;
     }
 
-    token = character + token;
+    expression = character + expression;
     currentIndex--;
   }
 
   currentIndex = cursorIndex;
-  while (currentIndex < expression.length) {
-    const character = expression.charAt(currentIndex);
-    if (character === " " || character === "}" || character === "," || character === ".") {
-      break;
+
+  nextLoop: while (currentIndex < string.length) {
+    const character = string.charAt(currentIndex);
+    switch (character) {
+      case " ":
+      case ":":
+      case ";":
+      case "+":
+      case "}":
+      case "(":
+      case ",":
+      case ".":
+        break nextLoop;
     }
 
-    token += character;
+    expression += character;
     currentIndex++;
   }
 
-  return token || null;
+  const parsedExpression = highlighter(expression, ".js");
+  if (parsedExpression == null || parsedExpression.length === 0) {
+    return null;
+  } else {
+    element.innerHTML = parsedExpression[0];
+    if (element.children.length === 1) {
+      const child = element.children[0];
+      switch (child.className) {
+        case "tok-bool":
+        case "tok-number":
+        case "tok-punctuation": {
+          // Don't try to auto-complete booleans, numbers, or punctuation marks.
+          return null;
+        }
+        case "tok-keyword": {
+          switch (expression) {
+            case "const":
+            case "let":
+            case "var":
+              return null;
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  return expression || null;
 }
