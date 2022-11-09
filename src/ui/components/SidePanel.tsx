@@ -69,13 +69,7 @@ export default function SidePanel() {
       ),
       buttons: null,
       className: "cyress-info flex-1 border-t overflow-hidden border-themeBorder",
-      component: (
-        <TestInfo
-          result={recording?.metadata?.test.result}
-          spec={recording?.metadata?.test.file}
-          testCases={recording?.metadata?.test.tests}
-        />
-      ),
+      component: <TestInfo testCases={recording?.metadata?.test.tests} />,
       opened: !cypressCollapsed,
       onToggle: () => setCypressCollapsed(!setCypressCollapsed),
     });

@@ -1,4 +1,4 @@
-import { SearchSourceContentsMatch, SourceLocation } from "@replayio/protocol";
+import { Location, SearchSourceContentsMatch } from "@replayio/protocol";
 import { useContext, useEffect, useState } from "react";
 
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -8,7 +8,7 @@ import { useAppSelector } from "ui/setup/hooks";
 
 export type CypressResult = {
   test: string;
-  location: SourceLocation;
+  location: Location;
 };
 
 export function useFetchCypressSpec() {
