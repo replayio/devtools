@@ -18,6 +18,10 @@ import { getSourcemapVisualizerURLSuspense } from "../../../utils/sourceVisualiz
 
 type EditorActions = ReturnType<typeof editorItemActions>;
 
+// TODO [FE-926] Review source editor context menu for re-adding later
+// This includes actual implementation (legacy FF menu vs something new),
+// as well as what menu items it should contain.
+
 // menu items
 
 const copySourceUri2Item = (selectedSource: SourceDetails) => ({

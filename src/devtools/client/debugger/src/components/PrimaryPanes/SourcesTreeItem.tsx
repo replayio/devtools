@@ -69,6 +69,9 @@ class SourceTreeItem extends Component<FinalSTIProps> {
   };
 
   onContextMenu = (event: React.MouseEvent, item: $FixTypeLater) => {
+    // TODO [FE-926] Review source editor context menu for re-adding later
+    // This includes actual implementation (legacy FF menu vs something new),
+    // as well as what menu items it should contain.
     const copySourceUri2Label = "Copy source URI";
     const copySourceUri2Key = "u";
 
