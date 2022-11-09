@@ -9,7 +9,7 @@ import {
   isRangeEqual,
   isRangeSubset,
 } from "../utils/time";
-import { preCacheObjects } from "./ObjectPreviews";
+import { cachePauseData } from "./PauseCache";
 import { Wakeable } from "./types";
 
 export type ProtocolMessage = Message & {
@@ -235,16 +235,11 @@ async function fetchMessages(
       lastFetchError = null;
       lastFetchedFocusRange = focusRange;
       lastFetchedMessages = protocolMessage;
-
-      // Pre-cache ObjectPreview data for this Message (PauseId).
-      // This will avoid us having to turn around and request it again when rendering the logs.
-      messages.forEach(message => {
-        const objects = message.data.objects;
-        if (objects) {
-          preCacheObjects(message.pauseId, objects);
-        }
-      });
     }
+
+    messages.forEach(message => {
+      cachePauseData(client, message.pauseId, message.data);
+    });
 
     wakeable.resolve(protocolMessage);
   } catch (error) {

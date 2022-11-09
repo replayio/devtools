@@ -1,11 +1,9 @@
-import { Frame, PauseId, ProtocolClient, Object as ProtocolObject } from "@replayio/protocol";
+import { PauseId, ProtocolClient, Object as ProtocolObject } from "@replayio/protocol";
 import uniqBy from "lodash/uniqBy";
 
 import { createGenericCache } from "bvaughn-architecture-demo/src/suspense/createGenericCache";
-import {
-  getObjectWithPreviewHelper,
-  preCacheObjects,
-} from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import { cachePauseData } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { RuleFront } from "devtools/client/inspector/rules/models/fronts/rule";
 import { ReplayClientInterface } from "shared/client/types";
 
@@ -33,9 +31,7 @@ export const {
 
     const uniqueRules = uniqBy(rules, rule => `${rule.rule}|${rule.pseudoElement}`);
 
-    if (data?.objects) {
-      preCacheObjects(pauseId, data.objects);
-    }
+    cachePauseData(replayClient, pauseId, data);
 
     const stylePromises: Promise<ProtocolObject>[] = [];
 

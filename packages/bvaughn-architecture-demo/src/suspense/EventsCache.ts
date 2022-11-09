@@ -11,7 +11,7 @@ import { ReplayClientInterface } from "shared/client/types";
 
 import { STANDARD_EVENT_CATEGORIES } from "../constants";
 import { createWakeable } from "../utils/suspense";
-import { preCacheObjects } from "./ObjectPreviews";
+import { cachePauseData } from "./PauseCache";
 import { Record, STATUS_PENDING, STATUS_RESOLVED, Wakeable } from "./types";
 
 export type Event = {
@@ -114,7 +114,7 @@ async function fetchEventTypeEntryPoints(
 
   // Pre-cache object previews that came back with our new analysis data.
   // This will avoid us having to turn around and request them again when rendering the logs.
-  entryPoints.forEach(entryPoint => preCacheObjects(entryPoint.pauseId, entryPoint.data.objects));
+  entryPoints.forEach(entryPoint => cachePauseData(client, entryPoint.pauseId, entryPoint.data));
 
   const eventLogs: EventLog[] = entryPoints.map(entryPoint => ({
     ...entryPoint,

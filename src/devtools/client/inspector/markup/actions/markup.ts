@@ -659,7 +659,7 @@ async function convertNode(
   const [nodeObject, computedStyle, eventListeners] = await Promise.all([
     getObjectWithPreviewHelper(replayClient, pauseId, nodeId),
     getComputedStyleAsync(client, sessionId, pauseId, nodeId),
-    getNodeEventListenersAsync(client, sessionId, pauseId, nodeId),
+    getNodeEventListenersAsync(client, replayClient, sessionId, pauseId, nodeId),
   ]);
 
   const node = nodeObject?.preview?.node;
