@@ -18,11 +18,14 @@ import PreviewPopup from "./PreviewPopup";
 import SourceList from "./SourceList";
 import StreamingSourceLoadingProgressHeader from "./StreamingSourceLoadingProgressHeader";
 import getExpressionForTokenElement from "./utils/getExpressionForTokenElement";
+import getExpressionFromString from "./utils/getExpressionFromString";
+import getTextAndCursorIndex from "./utils/getTextAndCursorIndex";
 import styles from "./Source.module.css";
 
 const MOUSE_MOVE_DEBOUNCE_DURATION = 250;
 
 export type HoveredState = {
+  clientX: number | null;
   expression: string;
   target: HTMLElement;
 };
@@ -94,28 +97,42 @@ function SourceRenderer({
 
   const sourceRef = useRef<HTMLDivElement>(null);
 
-  const onMouseMove = ({ target }: MouseEvent) => {
+  const onMouseMove = ({ clientX, clientY, target }: MouseEvent) => {
     const source = sourceRef.current!;
     if (!source.contains(target as Node)) {
       // Don't react to mouse move events within e.g. the preview popup.
       return;
     }
 
-    // HACK
-    // This is kind of a janky way to differentiate tokens from non-tokens but it works for now.
     const htmlElement = target as HTMLElement;
-    const className = htmlElement.className;
-    const isToken = typeof className === "string" && className.startsWith("tok-");
+    if (htmlElement.getAttribute("data-test-name") === "SourceListRow-LineSegment-PlainText") {
+      // Special case: plain text lines.
+      // These have no "tokens" that we can use for hit detection,
+      // So we fall back to browser selection APIs to determine what text the user is hovering over.
+      const textAndCursorIndex = getTextAndCursorIndex(clientX, clientY);
+      if (textAndCursorIndex) {
+        const [text, cursorIndex] = textAndCursorIndex;
 
-    if (isToken) {
-      // Debounce hover event to avoid showing the popup (or requesting data) in response to normal mouse movements.
-      setHoverStateDebounced(htmlElement, setHoveredState);
+        setHoverStateDebounced(htmlElement, text, cursorIndex, clientX, setHoveredState);
+        return;
+      }
     } else {
-      // Mouse-out should immediately cancel any pending actions.
-      // This avoids race cases where we might show a popup after the mouse has moused away.
-      setHoverStateDebounced.cancel();
-      setHoveredState(null);
+      // HACK
+      // This is kind of a janky way to differentiate tokens from non-tokens but it works for now.
+      const className = htmlElement.className;
+      const isToken = typeof className === "string" && className.startsWith("tok-");
+
+      if (isToken) {
+        // Debounce hover event to avoid showing the popup (or requesting data) in response to normal mouse movements.
+        setHoverStateDebounced(htmlElement, null, null, null, setHoveredState);
+        return;
+      }
     }
+
+    // Mouse-out should immediately cancel any pending actions.
+    // This avoids race cases where we might show a popup after the mouse has moused away.
+    setHoverStateDebounced.cancel();
+    setHoveredState(null);
   };
 
   return (
@@ -142,6 +159,7 @@ function SourceRenderer({
       </div>
       {hoveredState ? (
         <PreviewPopup
+          clientX={hoveredState.clientX}
           containerRef={sourceRef}
           dismiss={() => setHoveredState(null)}
           expression={hoveredState.expression}
@@ -153,14 +171,22 @@ function SourceRenderer({
 }
 
 const setHoverStateDebounced = debounce(
-  (element: HTMLElement | null, setHoveredState: (hoveredState: HoveredState | null) => void) => {
+  (
+    element: HTMLElement,
+    text: string | null,
+    cursorIndex: number | null,
+    clientX: number | null,
+    setHoveredState: (hoveredState: HoveredState | null) => void
+  ) => {
     let expression = null;
-    if (element !== null) {
+    if (text !== null && cursorIndex !== null) {
+      expression = getExpressionFromString(text, cursorIndex);
+    } else {
       const rowElement = element.parentElement as HTMLElement;
       expression = getExpressionForTokenElement(rowElement, element);
     }
 
-    setHoveredState(expression ? { expression, target: element! } : null);
+    setHoveredState(expression ? { clientX, expression, target: element! } : null);
   },
   MOUSE_MOVE_DEBOUNCE_DURATION
 );
