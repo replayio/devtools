@@ -60,16 +60,6 @@ export default function PointPanelTimeline({
     setOptimisticTime(null);
   }, [currentTime]);
 
-  useEffect(() => {
-    const hasError = hitPointStatus !== "complete";
-
-    if (!hasError && hitPoints !== null) {
-      trackEvent(hitPoints.length > 0 ? "breakpoint.has_hits" : "breakpoint.no_hits", {
-        hits: hitPoints.length,
-      });
-    }
-  }, [hitPoints, hitPointStatus, trackEvent]);
-
   const [currentHitPoint, currentHitPointIndex] = findHitPoint(hitPoints, currentExecutionPoint);
 
   const firstHitPoint = hitPoints.length > 0 ? hitPoints[0] : null;

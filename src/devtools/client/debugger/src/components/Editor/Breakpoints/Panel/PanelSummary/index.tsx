@@ -78,7 +78,6 @@ export default function PanelSummary({
   };
 
   if (isHot) {
-    trackEvent("breakpoint.too_many_points");
     return (
       <div className="summary flex items-center rounded-t bg-errorBgcolor text-errorColor">
         <Popup

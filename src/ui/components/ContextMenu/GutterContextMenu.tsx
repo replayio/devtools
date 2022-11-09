@@ -23,7 +23,6 @@ export default function GutterContextMenu({
 
   const addComment = (e: React.MouseEvent) => {
     e.stopPropagation();
-    trackEvent("gutter.add_comment");
     dispatch(
       createFloatingCodeComment(recordingId, {
         location: contextMenu.contextMenuItem.location,

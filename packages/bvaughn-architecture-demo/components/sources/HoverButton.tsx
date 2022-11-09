@@ -133,9 +133,6 @@ export default function HoverButton({
       if (point) {
         editPoint(point.id, { content, shouldLog: true });
       } else {
-        // Distinct from "breakpoint.add" apparently
-        trackEvent("breakpoint.plus_click");
-
         addPoint(
           {
             content,
@@ -151,7 +148,6 @@ export default function HoverButton({
         if (!point.shouldLog || point.shouldBreak) {
           editPoint(point.id, { shouldLog: !point.shouldLog });
         } else {
-          trackEvent("breakpoint.minus_click");
           deletePoints(point.id);
         }
       }

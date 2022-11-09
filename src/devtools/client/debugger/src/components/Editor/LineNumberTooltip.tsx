@@ -80,11 +80,6 @@ function LineNumberTooltipSuspends({ keyModifiers }: Props) {
     }
   }
 
-  useEffect(() => {
-    trackEvent(hitsForHoveredLine ? "breakpoint.preview_has_hits" : "breakpoint.preview_no_hits");
-    trackEvent("breakpoint.preview_hits", { hitsCount: hitsForHoveredLine });
-  }, [hitsForHoveredLine]);
-
   if (isMetaActive) {
     return null;
   } else if (hoveredLineIndex === null || hoveredLineNode === null) {

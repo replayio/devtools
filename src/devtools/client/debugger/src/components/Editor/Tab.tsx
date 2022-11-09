@@ -86,7 +86,6 @@ class Tab extends PureComponent<FinalTabProps> {
       ensureSourcesIsVisible,
     } = this.props;
 
-    trackEvent("tabs.context_menu");
     const tabCount = tabSources.length;
     const otherTabs = tabSources.filter(t => t.id !== tab);
     const sourceTab = tabSources.find(t => t.id == tab);

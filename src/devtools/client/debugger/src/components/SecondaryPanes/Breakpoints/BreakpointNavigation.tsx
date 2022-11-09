@@ -51,7 +51,6 @@ function BreakpointNavigation({
   const isEmpty = hitPoints === null || hitPoints.length === 0;
 
   const navigateToPoint = (point?: PointDescription) => {
-    trackEvent("breakpoint.navigate");
     if (point) {
       seek(point.point, point.time, true);
     }
@@ -63,14 +62,6 @@ function BreakpointNavigation({
     prev = findLast(hitPoints, p => compareNumericStrings(p.point, executionPoint) < 0);
     next = hitPoints.find(p => compareNumericStrings(p.point, executionPoint) > 0);
   }
-
-  useEffect(() => {
-    if (!error && hitPoints !== null) {
-      trackEvent(hitPoints.length > 0 ? "breakpoint.has_hits" : "breakpoint.no_hits", {
-        hits: hitPoints.length,
-      });
-    }
-  }, [error, hitPoints]);
 
   if (editing) {
     return (
