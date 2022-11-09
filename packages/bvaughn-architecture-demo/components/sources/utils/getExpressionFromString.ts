@@ -1,10 +1,10 @@
-import { highlighter } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
+import { parse } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
 
 export default function getExpressionFromString(
   string: string,
   cursorIndex: number
 ): string | null {
-  const parsedString = highlighter(string, ".js");
+  const parsedString = parse(string, ".js");
   if (parsedString == null || parsedString.length === 0) {
     return null;
   }
@@ -78,7 +78,7 @@ export default function getExpressionFromString(
     currentIndex++;
   }
 
-  const parsedExpression = highlighter(expression, ".js");
+  const parsedExpression = parse(expression, ".js");
   if (parsedExpression == null || parsedExpression.length === 0) {
     return null;
   } else {

@@ -273,7 +273,7 @@ function incrementalParser(fileName?: string, contentType?: ContentType): Increm
   };
 }
 
-export function highlighter(code: string, fileName: string): string[] | null {
+function highlighter(code: string, fileName: string): string[] | null {
   const parser = incrementalParser(fileName);
   if (parser === null) {
     return null;
