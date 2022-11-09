@@ -46,6 +46,7 @@ function TestStepItem({
 }) {
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
+  const paused = currentTime === startTime;
 
   const onClick = (time: number) => {
     dispatch(seekToTime(time));
@@ -58,9 +59,8 @@ function TestStepItem({
     >
       <div className="flex items-center space-x-2 overflow-hidden text-start">
         <div className="opacity-70">{index + 1}</div>
-        <div className="font-medium text-bodyColor">{testName}</div>
+        <div className={`font-medium text-bodyColor ${paused ? "font-bold" : ""}`}>{testName}</div>
         <div className="opacity-70">{argString}</div>
-        {currentTime === startTime ? <div>paused</div> : null}
       </div>
     </button>
   );

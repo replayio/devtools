@@ -6,6 +6,19 @@ import { addReporterAnnotations } from "ui/reducers/reporter";
 
 import { UIStore } from ".";
 
+function parseContents(contents: string) {
+  let parsed = JSON.parse(contents);
+
+  // We need to handle this differently based on the browser until
+  // we start sending the same payload down for Cypress annotations
+  // https://linear.app/replay/issue/SCS-256/cypress-annotations-payload-is-different-between-firefox-and-chromium
+  if (typeof parsed === "object") {
+    return JSON.parse(parsed.message)
+  } else {
+    return JSON.parse(parsed)
+  }
+}
+
 export async function setupReporter(store: UIStore, ThreadFront: typeof TF) {
   const kind = "replay-cypress";
   await ThreadFront.ensureAllSources();
@@ -22,7 +35,7 @@ export async function setupReporter(store: UIStore, ThreadFront: typeof TF) {
         filtered.map(({ point, time, contents }) => ({
           point,
           time,
-          message: JSON.parse(JSON.parse(contents)),
+          message: parseContents(contents),
         }))
       )
     );
