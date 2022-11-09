@@ -135,12 +135,14 @@ export default function PointPanelTimeline({
     setHoverCoordinates({ clientX: event.clientX, clientY: event.clientY });
   };
 
+  const disableButtons = isPending && optimisticTime === null;
+
   return (
     <>
       <button
         className={styles.PreviousHitPointButton}
         data-test-name="PreviousHitPointButton"
-        disabled={isPending || !previousButtonEnabled}
+        disabled={disableButtons || !previousButtonEnabled}
         onClick={goToPrevious}
       >
         <Icon className={styles.PreviousHitPointButtonIcon} type="arrow-left" />
@@ -165,7 +167,7 @@ export default function PointPanelTimeline({
       <button
         className={styles.NextHitPointButton}
         data-test-name="NextHitPointButton"
-        disabled={isPending || !nextButtonEnabled}
+        disabled={disableButtons || !nextButtonEnabled}
         onClick={goToNext}
       >
         <Icon className={styles.NextHitPointButtonIcon} type="arrow-right" />
