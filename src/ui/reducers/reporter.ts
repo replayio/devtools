@@ -4,10 +4,14 @@ import { ExecutionPoint } from "@replayio/protocol";
 import { compareNumericStrings } from "protocol/utils";
 import { UIState } from "ui/state";
 
+type CypressAnnotationMessage = {
+  event: "test:start",
+  titlePath: string[]
+};
 export interface Annotation {
   point: ExecutionPoint;
   time: number;
-  message: any;
+  message: CypressAnnotationMessage;
 }
 
 export interface ReporterState {
