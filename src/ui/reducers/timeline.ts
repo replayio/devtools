@@ -3,6 +3,7 @@ import { TimeStampedPoint } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 
 import { UIThunkAction } from "ui/actions";
+import { MAX_FOCUS_REGION_DURATION } from "ui/actions/timeline";
 import { UIState } from "ui/state";
 import { FocusRegion, HoveredItem, TimelineState } from "ui/state/timeline";
 import {
@@ -154,6 +155,17 @@ export const getBasicProcessingProgress = (state: UIState) => {
 };
 export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
 export const getFocusRegion = (state: UIState) => state.timeline.focusRegion;
+export const isMaximumFocusRegion = (state: UIState) => {
+  const focusRegion = state.timeline.focusRegion;
+  if (focusRegion) {
+    const duration = focusRegion.endTime - focusRegion.beginTime;
+    // JavaScript floating point numbers are not precise enough,
+    // so in order to avoid occasional flickers from rounding errors, fuzz it a bit.
+    return duration + 0.1 >= MAX_FOCUS_REGION_DURATION;
+  } else {
+    return false;
+  }
+};
 export const getFocusRegionBackup = (state: UIState) => state.timeline.focusRegionBackup;
 export const getIsInFocusMode = (state: UIState) =>
   state.timeline.focusRegion &&

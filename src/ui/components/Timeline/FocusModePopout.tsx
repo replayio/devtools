@@ -6,7 +6,11 @@ import {
   syncFocusedRegion,
   updateFocusRegionParam,
 } from "ui/actions/timeline";
-import { getFocusRegionBackup, getShowFocusModeControls } from "ui/reducers/timeline";
+import {
+  getFocusRegionBackup,
+  getShowFocusModeControls,
+  isMaximumFocusRegion,
+} from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -19,6 +23,7 @@ export default function FocusModePopout() {
 
   const dispatch = useAppDispatch();
   const focusRegionBackup = useAppSelector(getFocusRegionBackup);
+  const showMaxFocusRegionMessage = useAppSelector(isMaximumFocusRegion);
 
   const hideModal = () => dispatch(exitFocusMode());
 
@@ -75,6 +80,14 @@ export default function FocusModePopout() {
   const timelineNode = document.querySelector(".timeline");
   const timelineHeight = timelineNode!.getBoundingClientRect().height;
 
+  const message = showMaxFocusRegionMessage ? (
+    "Maximum window reached."
+  ) : (
+    <>
+      <strong>Focus mode</strong> lets you specify a region for your debugging.
+    </>
+  );
+
   return (
     <div className={styles.Container} style={{ bottom: `${timelineHeight}px` }}>
       <div className={styles.Mask} onClick={() => discardPendingChanges(true)} />
@@ -84,7 +97,7 @@ export default function FocusModePopout() {
         </div>
 
         <div className={styles.Text}>
-          <strong>Focus mode</strong> lets you specify a region for your debugging.{" "}
+          {message}{" "}
           <a
             href="https://docs.replay.io/reference-guide/focus-mode"
             rel="noreferrer noopener"
