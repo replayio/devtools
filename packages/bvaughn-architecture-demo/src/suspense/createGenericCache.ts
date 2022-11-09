@@ -1,20 +1,28 @@
 import { useEffect, useRef, useState } from "react";
 
 import { handleError } from "protocol/utils";
+import { isThennable } from "shared/proxy/utils";
 
 import { createWakeable } from "../utils/suspense";
-import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
+import {
+  Record,
+  STATUS_PENDING,
+  STATUS_REJECTED,
+  STATUS_RESOLVED,
+  Thennable,
+  Wakeable,
+} from "./types";
 
 export interface GenericCache<TParams extends Array<any>, TValue> {
   getValueSuspense(...args: TParams): TValue;
-  getValueAsync(...args: TParams): Promise<TValue>;
+  getValueAsync(...args: TParams): Thennable<TValue> | TValue;
   getValueIfCached(...args: TParams): { value: TValue } | undefined;
   addValue(value: TValue, ...args: TParams): void;
 }
 
 export interface GenericCache2<TExtra, TParams extends Array<any>, TValue> {
   getValueSuspense(extra: TExtra, ...args: TParams): TValue;
-  getValueAsync(extra: TExtra, ...args: TParams): Promise<TValue>;
+  getValueAsync(extra: TExtra, ...args: TParams): Thennable<TValue> | TValue;
   getValueIfCached(...args: TParams): { value: TValue } | undefined;
   addValue(value: TValue, ...args: TParams): void;
 }
@@ -26,7 +34,7 @@ interface HookState<TValue> {
 }
 
 export function createGenericCache<TParams extends Array<any>, TValue>(
-  fetchValue: (...args: TParams) => Promise<TValue> | TValue,
+  fetchValue: (...args: TParams) => Thennable<TValue> | TValue,
   getCacheKey: (...args: TParams) => string
 ): GenericCache<TParams, TValue> {
   const cache = createGenericCache2<undefined, TParams, TValue>(
@@ -42,7 +50,7 @@ export function createGenericCache<TParams extends Array<any>, TValue>(
 }
 
 export function createGenericCache2<TExtra, TParams extends Array<any>, TValue>(
-  fetchValue: (extra: TExtra, ...args: TParams) => Promise<TValue> | TValue,
+  fetchValue: (extra: TExtra, ...args: TParams) => Thennable<TValue> | TValue,
   getCacheKey: (...args: TParams) => string
 ): GenericCache2<TExtra, TParams, TValue> {
   const recordMap = new Map<string, Record<TValue>>();
@@ -73,7 +81,8 @@ export function createGenericCache2<TExtra, TParams extends Array<any>, TValue>(
     ...args: TParams
   ) {
     try {
-      const value = await fetchValue(extra, ...args);
+      const valueOrThennable = fetchValue(extra, ...args);
+      const value = isThennable(valueOrThennable) ? await valueOrThennable : valueOrThennable;
 
       record.status = STATUS_RESOLVED;
       record.value = value;
@@ -97,12 +106,10 @@ export function createGenericCache2<TExtra, TParams extends Array<any>, TValue>(
       }
     },
 
-    async getValueAsync(extra: TExtra, ...args: TParams): Promise<TValue> {
+    getValueAsync(extra: TExtra, ...args: TParams): Thennable<TValue> | TValue {
       const record = getOrCreateRecord(extra, ...args);
       switch (record.status) {
-        case STATUS_PENDING: {
-          return await record.value;
-        }
+        case STATUS_PENDING:
         case STATUS_RESOLVED: {
           return record.value;
         }
