@@ -13,6 +13,7 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
         <TestStepItem
           testName={s.name}
           key={i}
+          index={i}
           startTime={startTime + s.relativeStartTime}
           argString={s.args?.toString()}
         />
@@ -36,10 +37,12 @@ function TestStepItem({
   testName,
   startTime,
   argString,
+  index,
 }: {
   testName: string;
   startTime: number;
   argString: string;
+  index: number;
 }) {
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
@@ -53,7 +56,8 @@ function TestStepItem({
       onClick={() => onClick(startTime)}
       className="flex items-center justify-between px-3 py-2 overflow-hidden font-mono border-b border-themeBase-90 bg-testsuitesStepsBgcolor"
     >
-      <div className="flex items-center space-x-2 overflow-hidden">
+      <div className="flex items-center space-x-2 overflow-hidden text-start">
+        <div className="opacity-70">{index + 1}</div>
         <div className="font-medium text-bodyColor">{testName}</div>
         <div className="opacity-70">{argString}</div>
         {currentTime === startTime ? <div>paused</div> : null}
