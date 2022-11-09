@@ -36,15 +36,15 @@ export function TestCase({ test, location }: { test: TestItem; location?: Locati
         endTime: test.relativeStartTime + test.duration,
       })
     );
-  }
+  };
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-row items-center justify-between gap-1 p-1 transition rounded-lg group hover:cursor-pointer">
+      <div className="group flex flex-row items-center justify-between gap-1 rounded-lg p-1 transition hover:cursor-pointer">
         <button
           onClick={toggleExpand}
           disabled={!expandable}
-          className="flex flex-row flex-grow gap-1 overflow-hidden"
+          className="flex flex-grow flex-row gap-1 overflow-hidden"
         >
           <Status result={test.result} />
           {test.steps ? (
@@ -52,10 +52,10 @@ export function TestCase({ test, location }: { test: TestItem; location?: Locati
           ) : null}
 
           <div className="flex flex-col items-start text-bodyColor">
-            <div className="overflow-hidden whitespace-pre overflow-ellipsis">{test.title}</div>
+            <div className="overflow-hidden overflow-ellipsis whitespace-pre">{test.title}</div>
 
             {test.error ? (
-              <div className="px-2 py-1 mt-1 overflow-hidden font-mono text-left rounded-lg bg-testsuitesErrorBgcolor ">
+              <div className="mt-1 overflow-hidden rounded-lg bg-testsuitesErrorBgcolor px-2 py-1 text-left font-mono ">
                 {test.error.message}
               </div>
             ) : null}

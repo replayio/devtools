@@ -13,9 +13,9 @@ function parseContents(contents: string) {
   // we start sending the same payload down for Cypress annotations
   // https://linear.app/replay/issue/SCS-256/cypress-annotations-payload-is-different-between-firefox-and-chromium
   if (typeof parsed === "object") {
-    return JSON.parse(parsed.message)
+    return JSON.parse(parsed.message);
   } else {
-    return JSON.parse(parsed)
+    return JSON.parse(parsed);
   }
 }
 

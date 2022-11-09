@@ -8,7 +8,7 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
   const { steps } = test;
 
   return (
-    <div className="flex flex-col py-2 rounded-lg pl-11">
+    <div className="flex flex-col rounded-lg py-2 pl-11">
       {steps?.map((s, i) => (
         <TestStepItem
           testName={s.name}
@@ -20,11 +20,11 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
       ))}
       {test.error ? (
         <div className="border-l-2 border-red-500 bg-testsuitesErrorBgcolor text-testsuitesErrorColor">
-          <div className="flex flex-row items-center p-2 space-x-1">
+          <div className="flex flex-row items-center space-x-1 p-2">
             <Icon filename="warning" size="small" className="bg-testsuitesErrorColor" />
             <div className="font-bold">Error</div>
           </div>
-          <div className="p-2 space-y-1 overflow-hidden font-mono wrap bg-testsuitesErrorBgcolor">
+          <div className="wrap space-y-1 overflow-hidden bg-testsuitesErrorBgcolor p-2 font-mono">
             {test.error.message}
           </div>
         </div>
@@ -55,7 +55,7 @@ function TestStepItem({
   return (
     <button
       onClick={() => onClick(startTime)}
-      className="flex items-center justify-between px-3 py-2 overflow-hidden font-mono border-b border-themeBase-90 bg-testsuitesStepsBgcolor"
+      className="flex items-center justify-between overflow-hidden border-b border-themeBase-90 bg-testsuitesStepsBgcolor px-3 py-2 font-mono"
     >
       <div className="flex items-center space-x-2 overflow-hidden text-start">
         <div className="opacity-70">{index + 1}</div>

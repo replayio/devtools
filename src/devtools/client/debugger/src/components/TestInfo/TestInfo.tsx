@@ -26,8 +26,7 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
   );
 
   return (
-    <div className="flex flex-col px-4 py-2 space-y-1">
-      {annotations.length}
+    <div className="flex flex-col space-y-1 px-4 py-2">
       {correctedTestCases.map((t, i) => (
         <TestCase test={t} key={i} location={cypressResults?.[i]?.location} />
       ))}

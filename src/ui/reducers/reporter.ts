@@ -1,5 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { ExecutionPoint } from "@replayio/protocol";
+
 import { compareNumericStrings } from "protocol/utils";
 import { UIState } from "ui/state";
 
