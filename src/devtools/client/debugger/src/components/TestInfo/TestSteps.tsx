@@ -15,6 +15,7 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
           key={i}
           index={i}
           startTime={startTime + s.relativeStartTime}
+          duration={s.duration}
           argString={s.args?.toString()}
           parentId={s.parentId}
         />
@@ -37,19 +38,22 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
 function TestStepItem({
   testName,
   startTime,
+  duration,
   argString,
   index,
   parentId,
 }: {
   testName: string;
   startTime: number;
+  duration: number;
   argString: string;
   index: number;
   parentId?: string;
 }) {
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
-  const paused = currentTime === startTime;
+  // some chainers (`then`) don't have a duration, so let's bump it here so that it shows something in the UI
+  const paused = currentTime >= startTime && currentTime < startTime + (duration || 1);
 
   const onClick = () => {
     dispatch(seekToTime(startTime));
@@ -64,13 +68,15 @@ function TestStepItem({
   return (
     <button
       onClick={onClick}
-      className="flex items-center justify-between overflow-hidden border-b border-themeBase-90 bg-testsuitesStepsBgcolor px-3 py-2 font-mono"
+      className={`relative flex items-center overflow-hidden border-b border-l-4 border-themeBase-90 bg-testsuitesStepsBgcolor pl-1 pr-3 font-mono ${
+        paused ? "border-l-red-500" : "border-l-transparent"
+      }`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <div className="flex items-center space-x-2 overflow-hidden text-start">
+      <div className="flex flex-grow items-center space-x-2 overflow-hidden py-2 text-start">
         <div className="opacity-70">{index + 1}</div>
-        <div className={`font-medium text-bodyColor ${paused ? "font-bold" : ""}`}>
+        <div className={`whitespace-pre font-medium text-bodyColor ${paused ? "font-bold" : ""}`}>
           {parentId ? "- " : ""}
           {testName}
         </div>

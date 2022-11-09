@@ -50,7 +50,6 @@ export function TestCase({ test, location }: { test: TestItem; location?: Locati
           {test.steps ? (
             <MaterialIcon>{expandSteps ? "expand_more" : "chevron_right"}</MaterialIcon>
           ) : null}
-
           <div className="flex flex-col items-start text-bodyColor">
             <div className="overflow-hidden overflow-ellipsis whitespace-pre">{test.title}</div>
             {test.error ? (
