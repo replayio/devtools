@@ -1,0 +1,7 @@
+.sourceLocation {
+  color: var(--theme-icon-dimmed-color);
+}
+
+.sourceLocation:hover {
+  color: var(--theme-icon-color);
+}

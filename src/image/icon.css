@@ -133,6 +133,22 @@ but without a background color so we can use hover effects
   -webkit-mask-image: url(/icons/tool.svg);
 }
 
+.icon.click {
+  -webkit-mask-image: url(/icons/click.svg);
+}
+
+.icon.get {
+  -webkit-mask-image: url(/icons/get.svg);
+}
+
+.icon.keypress {
+  -webkit-mask-image: url(/icons/keypress.svg);
+}
+
+.icon.assert {
+  -webkit-mask-image: url(/icons/assert.svg);
+}
+
 .icon.reload {
   -webkit-mask-image: url(/icons/reload.svg);
 }

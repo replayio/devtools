@@ -7,10 +7,10 @@ import { useFetchCypressSpec } from "ui/hooks/useFetchCypressSpec";
 import { getRecordingDuration } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem, TestResult, TestStep } from "ui/types";
-import { getFormattedTime } from "ui/utils/timeline";
 
 import { selectLocation } from "../../actions/sources";
 import { getThreadContext } from "../../selectors";
+import styles from "./TestInfo.module.css";
 
 export default function TestInfo({
   spec,
@@ -52,7 +52,7 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
   };
 
   return (
-    <div className="flex flex-col">
+    <div className={`${styles.testInfo} flex flex-col`}>
       <div className="group flex flex-row items-center justify-between gap-1 rounded-lg p-1 transition hover:cursor-pointer">
         <button
           onClick={toggleExpand}
@@ -75,7 +75,7 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
           </div>
         </button>
         {location ? (
-          <button onClick={onClick} title="Go To Source">
+          <button className={styles.sourceLocation} onClick={onClick} title="Go To Source">
             <MaterialIcon>description</MaterialIcon>
           </button>
         ) : null}
@@ -85,23 +85,36 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
   );
 }
 
+const TestTypeIcons = {
+  assert: "assert",
+  eq: "assert",
+  get: "keypress",
+  type: "keypress",
+};
+
 function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
   const { steps } = test;
-
+  console.log({ steps });
   return (
-    <div className="flex flex-col rounded-lg py-2 pl-11">
-      {steps?.map((s, i) => (
-        <div
-          key={i}
-          className="flex items-center justify-between overflow-hidden border-b border-themeBase-90 bg-testsuitesStepsBgcolor px-3 py-2 font-mono"
-        >
-          <div className="flex items-center space-x-2 overflow-hidden">
-            <div className="font-medium text-bodyColor">{s.name}</div>
-            <div className="opacity-70">{s.args?.length ? `${s.args.toString()}` : ""}</div>
+    <div className="ml-11 flex flex-col rounded-2xl py-2">
+      {steps?.map((s, i) => {
+        const iconType = TestTypeIcons[s.name] || "keypress";
+        return (
+          <div
+            key={i}
+            className="flex items-center justify-between overflow-hidden border-b border-themeBase-90 bg-testsuitesStepsBgcolor py-2 font-mono"
+          >
+            <div className="flex items-center space-x-2 overflow-hidden pl-3  ">
+              <div className="w-4">{i + 1}</div>
+              <Icon filename={iconType} size="small" className="bg-gray-800" />
+
+              <div className="font-medium text-bodyColor">{s.name}</div>
+              <div className="opacity-70">{s.args?.length ? `${s.args.toString()}` : ""}</div>
+            </div>
+            {/* <div>{getFormattedTime(s.relativeStartTime)}</div> */}
           </div>
-          {/* <div>{getFormattedTime(s.relativeStartTime)}</div> */}
-        </div>
-      ))}
+        );
+      })}
       {test.error ? (
         <div className="border-l-2 border-red-500 bg-testsuitesErrorBgcolor text-testsuitesErrorColor">
           <div className="flex flex-row items-center space-x-1 p-2">
