@@ -1,4 +1,4 @@
-import { seekToTime } from "ui/actions/timeline";
+import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -48,14 +48,22 @@ function TestStepItem({
   const dispatch = useAppDispatch();
   const paused = currentTime === startTime;
 
-  const onClick = (time: number) => {
-    dispatch(seekToTime(time));
+  const onClick = () => {
+    dispatch(seekToTime(startTime));
+  };
+  const onMouseEnter = () => {
+    dispatch(setTimelineToTime(startTime));
+  };
+  const onMouseLeave = () => {
+    dispatch(setTimelineToTime(currentTime));
   };
 
   return (
     <button
-      onClick={() => onClick(startTime)}
+      onClick={onClick}
       className="flex items-center justify-between overflow-hidden border-b border-themeBase-90 bg-testsuitesStepsBgcolor px-3 py-2 font-mono"
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       <div className="flex items-center space-x-2 overflow-hidden text-start">
         <div className="opacity-70">{index + 1}</div>
