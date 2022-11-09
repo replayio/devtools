@@ -1,4 +1,4 @@
-import { FrameId, PauseId } from "@replayio/protocol";
+import { FrameId, Location, PauseId } from "@replayio/protocol";
 import isEqual from "lodash/isEqual";
 import {
   ComponentType,
@@ -28,12 +28,16 @@ interface PauseAndFrameId {
 
 export interface SelectedFrameContextType {
   selectedPauseAndFrameId: PauseAndFrameId | null;
+  previewLocation: Location | null;
   setSelectedPauseAndFrameId: Dispatch<SetStateAction<PauseAndFrameId | null>>;
+  setPreviewLocation: (location: Location | null) => void;
 }
 
 export const SelectedFrameContext = createContext<SelectedFrameContextType>({
   selectedPauseAndFrameId: null,
+  previewLocation: null,
   setSelectedPauseAndFrameId: () => {},
+  setPreviewLocation: () => {},
 });
 
 export function SelectedFrameContextRoot({
@@ -45,12 +49,16 @@ export function SelectedFrameContextRoot({
   const [selectedPauseAndFrameId, setSelectedPauseAndFrameId] = useState<PauseAndFrameId | null>(
     null
   );
+  const [previewLocation, setPreviewLocation] = useState<Location | null>(null);
+
   const context = useMemo(
     () => ({
       selectedPauseAndFrameId,
+      previewLocation,
       setSelectedPauseAndFrameId,
+      setPreviewLocation,
     }),
-    [selectedPauseAndFrameId, setSelectedPauseAndFrameId]
+    [selectedPauseAndFrameId, previewLocation, setSelectedPauseAndFrameId, setPreviewLocation]
   );
 
   return (

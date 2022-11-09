@@ -2,12 +2,21 @@ import isEqual from "lodash/isEqual";
 import { useContext, useEffect } from "react";
 
 import { SelectedFrameContext } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
-import { getSelectedFrameId } from "devtools/client/debugger/src/selectors";
+import {
+  getPausePreviewLocation,
+  getSelectedFrameId,
+} from "devtools/client/debugger/src/selectors";
 import { useAppSelector } from "ui/setup/hooks";
 
 export default function SelectedFrameContextAdapter() {
   const selectedPauseAndFrameIdRedux = useAppSelector(getSelectedFrameId);
-  const { selectedPauseAndFrameId, setSelectedPauseAndFrameId } = useContext(SelectedFrameContext);
+  const previewLocationRedux = useAppSelector(getPausePreviewLocation);
+  const {
+    selectedPauseAndFrameId,
+    previewLocation,
+    setSelectedPauseAndFrameId,
+    setPreviewLocation,
+  } = useContext(SelectedFrameContext);
 
   useEffect(() => {
     // We create a new pause-and-frame-id wrapper object each time we update,
@@ -15,7 +24,17 @@ export default function SelectedFrameContextAdapter() {
     if (!isEqual(selectedPauseAndFrameId, selectedPauseAndFrameIdRedux)) {
       setSelectedPauseAndFrameId(selectedPauseAndFrameIdRedux);
     }
-  }, [selectedPauseAndFrameId, selectedPauseAndFrameIdRedux, setSelectedPauseAndFrameId]);
+    if (previewLocation !== previewLocationRedux) {
+      setPreviewLocation(previewLocationRedux);
+    }
+  }, [
+    selectedPauseAndFrameId,
+    selectedPauseAndFrameIdRedux,
+    previewLocation,
+    previewLocationRedux,
+    setSelectedPauseAndFrameId,
+    setPreviewLocation,
+  ]);
 
   return null;
 }
