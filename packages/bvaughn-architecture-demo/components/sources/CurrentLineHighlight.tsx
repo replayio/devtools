@@ -25,7 +25,20 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
   const client = useContext(ReplayClientContext);
   const [sourceSearchState] = useContext(SourceSearchContext);
 
-  const { selectedPauseAndFrameId } = useContext(SelectedFrameContext);
+  const { selectedPauseAndFrameId, previewLocation } = useContext(SelectedFrameContext);
+
+  if (previewLocation?.sourceId === sourceId) {
+    if (previewLocation.line === lineNumber) {
+      return (
+        <div
+          className={styles.CurrentExecutionPoint}
+          data-test-name="CurrentExecutionPointLineHighlight"
+        />
+      );
+    }
+    return null;
+  }
+
   const frameId = selectedPauseAndFrameId?.frameId || null;
   const pauseId = selectedPauseAndFrameId?.pauseId || null;
 
