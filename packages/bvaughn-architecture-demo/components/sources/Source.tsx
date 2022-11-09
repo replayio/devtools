@@ -92,17 +92,6 @@ function SourceRenderer({
     []
   );
 
-  useLayoutEffect(() => {
-    if (hoveredState) {
-      const target = hoveredState.target;
-      target.classList.add(styles.HoveredTarget);
-
-      return () => {
-        target.classList.remove(styles.HoveredTarget);
-      };
-    }
-  }, [hoveredState]);
-
   const sourceRef = useRef<HTMLDivElement>(null);
 
   const onMouseMove = ({ target }: MouseEvent) => {
