@@ -66,7 +66,7 @@ export function TestCase({ test, location }: { test: TestItem; location?: Locati
             <MaterialIcon>description</MaterialIcon>
           </button>
         ) : null}
-        <button onClick={onFocus} title="Go To Source">
+        <button onClick={onFocus} title="Focus on this test">
           <MaterialIcon>center_focus_strong</MaterialIcon>
         </button>
       </div>

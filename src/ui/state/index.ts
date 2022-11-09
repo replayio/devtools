@@ -15,13 +15,13 @@ import { InspectorState } from "devtools/client/inspector/reducers";
 import { RulesState } from "devtools/client/inspector/rules/reducers/rules";
 import { NetworkState } from "ui/reducers/network";
 import { ProtocolMessagesState } from "ui/reducers/protocolMessages";
+import { ReporterState } from "ui/reducers/reporter";
 import type { SourcesState as NewSourcesState } from "ui/reducers/sources";
 
 import { ContextMenusState } from "../reducers/contextMenus";
 import { AppState } from "./app";
 import { LayoutState } from "./layout";
 import { ReactDevToolsState } from "./reactDevTools";
-import { ReporterState } from "./reporter";
 import { TimelineState } from "./timeline";
 
 // TODO Ideally this should be inferred from store setup
