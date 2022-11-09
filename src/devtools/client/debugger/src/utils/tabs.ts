@@ -1,6 +1,9 @@
 import type { Tab } from "../reducers/tabs";
 
 export function getTabMenuItems() {
+  // TODO [FE-926] Review source editor context menu for re-adding later
+  // This includes actual implementation (legacy FF menu vs something new),
+  // as well as what menu items it should contain.
   return {
     closeTab: {
       id: "node-menu-close-tab",

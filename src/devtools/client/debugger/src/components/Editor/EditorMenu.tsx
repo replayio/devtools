@@ -38,6 +38,10 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 type FinalEMProps = EditorMenuProps & PropsFromRedux & { replayClient: ReplayClientInterface };
 
 class EditorMenu extends Component<FinalEMProps> {
+  // TODO [FE-926] Review source editor context menu for re-adding later
+  // This includes actual implementation (legacy FF menu vs something new),
+  // as well as what menu items it should contain.
+  /*
   UNSAFE_componentWillUpdate(nextProps: FinalEMProps) {
     this.props.clearContextMenu();
     if (nextProps.contextMenu) {
@@ -70,6 +74,7 @@ class EditorMenu extends Component<FinalEMProps> {
       })
     );
   }
+  */
 
   render() {
     return null;
