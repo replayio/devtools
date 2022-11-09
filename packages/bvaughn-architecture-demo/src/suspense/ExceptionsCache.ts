@@ -6,7 +6,7 @@ import { ProtocolError, isCommandError } from "shared/utils/error";
 import { createWakeable } from "../utils/suspense";
 import { isRangeEqual, isRangeSubset } from "../utils/time";
 import { RemoteAnalysisResult } from "./AnalysisCache";
-import { preCacheObjects } from "./ObjectPreviews";
+import { cachePauseData } from "./PauseCache";
 import { Wakeable } from "./types";
 
 export type UncaughtException = RemoteAnalysisResult & {
@@ -129,8 +129,8 @@ async function fetchExceptions(client: ReplayClientInterface) {
     // Cache Object preview data since we have it.
     // This may save us from making unnecessary requests later.
     results.forEach(result => {
-      if (result.data.objects) {
-        preCacheObjects(result.pauseId, result.data.objects);
+      if (result.data) {
+        cachePauseData(client, result.pauseId, result.data);
       }
     });
 
@@ -175,23 +175,22 @@ const EXCEPTIONS_MAPPER = `
     finalData.objects.push(...(objects || []));
   }
 
-  function getTopFrame() {
-    const { data, frame: frameId } = sendCommand("Pause.getTopFrame");
-
-    return (data.frames || []).find((f) => f.frameId == frameId);
-  }
-
   const { pauseId, point, time } = input;
-  const { frameId, location } = getTopFrame();
+
   const {
-    data: { objects, scopes },
+    data: exceptionValueData,
     exception,
   } = sendCommand("Pause.getExceptionValue");
-  const {
-    data: { frames },
-  } = sendCommand("Pause.getAllFrames");
+  addPauseData(exceptionValueData);
 
-  addPauseData({ frames, objects, scopes });
+  const {
+    data: allFramesData,
+    frames,
+  } = sendCommand("Pause.getAllFrames");
+  addPauseData(allFramesData);
+
+  const topFrame = finalData.frames.find(f => f.frameId === frames[0]);
+  const location = topFrame.location;
 
   return [
     {

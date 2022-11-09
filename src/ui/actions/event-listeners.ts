@@ -3,7 +3,7 @@
 import { Dictionary } from "@reduxjs/toolkit";
 import type { Location, ObjectPreview, Object as ProtocolObject } from "@replayio/protocol";
 
-import { ThreadFront } from "protocol/thread";
+import { cachePauseData } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { SourceDetails, getPreferredLocation, getSourceDetailsEntities } from "ui/reducers/sources";
 import { UIState } from "ui/state";
 
@@ -118,12 +118,14 @@ export function getNodeEventListeners(
     const sourcesById = getSourceDetailsEntities(state);
 
     // We need to fetch "basic" event listeners from the protocol API
-    const { listeners } = await ThreadFront.currentPause.sendMessage(
+    const { listeners, data } = await ThreadFront.currentPause.sendMessage(
       protocolClient.DOM.getEventListeners,
       {
         node: nodeId,
       }
     );
+
+    cachePauseData(replayClient, pauseId, data);
 
     // Reformat those entries to add location/name/params data
     const formattedListenerEntries = listeners.map(listener => {

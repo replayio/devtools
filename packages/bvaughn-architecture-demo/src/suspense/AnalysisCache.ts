@@ -13,7 +13,7 @@ import jsTokens from "js-tokens";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
-import { preCacheObjects } from "./ObjectPreviews";
+import { cachePauseData } from "./PauseCache";
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 type Value = any;
@@ -213,11 +213,7 @@ async function runRemoteAnalysis(
 
     const resultsMap = new Map();
     results.forEach(result => {
-      const objects = result.data.objects;
-      if (objects) {
-        // Pre-cache pause data so we don't need to refetch when rendering in inspecting values in the console.
-        preCacheObjects(result.pauseId, objects);
-      }
+      cachePauseData(client, result.pauseId, result.data);
 
       resultsMap.set(result.point, {
         executionPoint: result.point,

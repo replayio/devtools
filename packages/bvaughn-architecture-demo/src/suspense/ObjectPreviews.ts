@@ -2,6 +2,7 @@ import { Object, ObjectId, PauseId, Value as ProtocolValue } from "@replayio/pro
 
 import { ReplayClientInterface } from "../../../shared/client/types";
 import { createWakeable } from "../utils/suspense";
+import { cachePauseData } from "./PauseCache";
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 type ObjectMap = Map<ObjectId, Object>;
@@ -273,17 +274,9 @@ async function fetchObjectProperty(
   propertyName: string
 ) {
   try {
-    const {
-      data: { objects },
-      returned,
-    } = await client.getObjectProperty(objectId, pauseId, propertyName);
+    const { data, returned } = await client.getObjectProperty(objectId, pauseId, propertyName);
 
-    // This response will contain the specific value we're searching for,
-    // but it may contain other nested objects as well.
-    // Pre-populate the cache with those objects so that we can avoid re-requesting them.
-    if (objects) {
-      preCacheObjects(pauseId, objects);
-    }
+    cachePauseData(client, pauseId, data);
 
     record.status = STATUS_RESOLVED;
     record.value = returned;
@@ -306,18 +299,15 @@ async function fetchObjectWithPreview(
   noOverflow: boolean = false
 ) {
   try {
-    const { objects = [] } = await client.getObjectWithPreview(
+    const data = await client.getObjectWithPreview(
       objectId,
       pauseId,
       noOverflow ? "full" : "canOverflow"
     );
 
-    // This response will contain the specific Object we're searching for,
-    // but it may contain other nested objects as well.
-    // Pre-populate the cache with those objects so that we can avoid re-requesting them.
-    preCacheObjects(pauseId, objects);
+    cachePauseData(client, pauseId, data);
 
-    // The preCacheObjects() will have updated the Record's status and value already.
+    // The cachePauseData() will have updated the Record's status and value already.
     wakeable.resolve(record.value);
   } catch (error) {
     record.status = STATUS_REJECTED;

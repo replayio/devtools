@@ -4,16 +4,12 @@ import {
   PauseData,
   PauseId,
   ProtocolClient,
-  Node as ProtocolNode,
   Object as ProtocolObject,
 } from "@replayio/protocol";
-import uniqBy from "lodash/uniqBy";
 
 import { createGenericCache } from "bvaughn-architecture-demo/src/suspense/createGenericCache";
-import {
-  getObjectWithPreviewHelper,
-  preCacheObjects,
-} from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import { cachePauseData } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 type NodeFetchOptions =
@@ -126,8 +122,8 @@ export const {
       }
     }
 
-    if (pauseData?.objects) {
-      preCacheObjects(pauseId, pauseData.objects);
+    if (pauseData) {
+      cachePauseData(replayClient, pauseId, pauseData);
     }
 
     if (!nodeIds.length) {
@@ -175,10 +171,16 @@ export const {
   getValueAsync: getNodeEventListenersAsync,
   getValueIfCached: getNodeEventListenersIfCached,
 } = createGenericCache<
-  [client: ProtocolClient, sessionId: string, pauseId: PauseId, nodeId: string],
+  [
+    client: ProtocolClient,
+    replayClient: ReplayClientInterface,
+    sessionId: string,
+    pauseId: PauseId,
+    nodeId: string
+  ],
   EventListener[] | undefined
 >(
-  async (client, sessionId, pauseId, nodeId) => {
+  async (client, replayClient, sessionId, pauseId, nodeId) => {
     const { listeners, data } = await client.DOM.getEventListeners(
       {
         node: nodeId,
@@ -186,13 +188,11 @@ export const {
       sessionId,
       pauseId
     );
-    if (data?.objects) {
-      preCacheObjects(pauseId, data.objects);
-    }
+    cachePauseData(replayClient, pauseId, data);
 
     return listeners;
   },
-  (client, sessionId, pauseId, nodeId) => `${pauseId}|${nodeId}`
+  (client, replayClient, sessionId, pauseId, nodeId) => `${pauseId}|${nodeId}`
 );
 
 export const {
