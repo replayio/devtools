@@ -12,10 +12,19 @@ export const {
   getValueAsync: getFrameStepsAsync,
   getValueIfCached: getFrameStepsIfCached,
 } = createGenericCache<[pauseId: PauseId, frameId: FrameId], PointDescription[] | undefined>(
-  (pauseId, frameId) => {
+  async (pauseId, frameId) => {
     const pause = Pause.getById(pauseId);
     assert(pause, `no pause for ${pauseId}`);
-    return pause.getFrameSteps(frameId);
+
+    // Handle potential errors by swallowing and returning `undefined`
+    // TODO [BAC-2459] This may not be necessary if the backend
+    // stops throwing internal errors
+    try {
+      const steps = await pause.getFrameSteps(frameId);
+      return steps;
+    } catch (err) {
+      return undefined;
+    }
   },
   (pauseId, frameId) => `${pauseId}:${frameId}`
 );
