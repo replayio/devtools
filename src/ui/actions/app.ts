@@ -86,7 +86,7 @@ export async function setupApp(
   const LOADING_STATUS_SLOW_THRESHOLD = 10000;
   let lastLoadChangeUpdateTime = now();
 
-  setInterval(function onLoadChangeInterval() {
+  function checkLoadingStatus() {
     const isLoadingFinished = getIsIndexed(store.getState());
     if (isLoadingFinished) {
       return;
@@ -105,7 +105,11 @@ export async function setupApp(
         store.dispatch(setLoadingStatusSlow(false));
       }
     }
-  }, 1000);
+
+    setTimeout(checkLoadingStatus, 1000);
+  }
+
+  checkLoadingStatus();
 
   ThreadFront.listenForLoadChanges(parameters => {
     lastLoadChangeUpdateTime = now();
@@ -115,7 +119,7 @@ export async function setupApp(
   });
 }
 
-export function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAction {
+export function onUnprocessedRegions({ regions }: unprocessedRegions): UIThunkAction {
   return dispatch => {
     dispatch(durationSeen(Math.max(...regions.map(r => r.end.time), 0)));
   };
