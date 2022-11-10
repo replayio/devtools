@@ -76,7 +76,8 @@ export default function AutoComplete({
       const cursorIndex = getCursorIndex(contentEditable);
       const expression = getExpressionFromString(value, cursorIndex);
 
-      setCursorClientX(getCursorClientX(contentEditable));
+      // Account for scrolling
+      setCursorClientX(getCursorClientX(contentEditable) - contentEditable.scrollLeft);
       setExpression(expression);
     }
   };
@@ -101,7 +102,11 @@ export default function AutoComplete({
       }
       case "ArrowLeft":
       case "ArrowRight": {
-        updateExpression();
+        // Once the cursor has updated, re-evaluate the expression.
+        // Wait until the end of the current frame (so the cursor location has updated).
+        // We could do this in a key-up handler instead, but it feels less responsive;
+        // there is a small amount of visual delay.
+        setTimeout(updateExpression);
         break;
       }
     }
@@ -147,7 +152,9 @@ export default function AutoComplete({
             dataTestName={dataTestName ? `${dataTestName}-List` : undefined}
             expression={expression}
             inputRef={contentEditableRef}
-            onCancel={onCancelProp}
+            onCancel={() => {
+              /* no-op */
+            }}
             onSubmit={onSubmit}
           />
         </Suspense>

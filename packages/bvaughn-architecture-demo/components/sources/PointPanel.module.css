@@ -53,6 +53,7 @@
 .ContentWrapper,
 .ContentWrapperInvalid,
 .ContentWrapperTooManyPoints {
+  overflow: auto;
   height: 100%;
   flex: 1;
   background-color: var(--point-panel-input-background-color);
@@ -77,10 +78,14 @@
 }
 
 .Content {
+  /* Allows height for horizontal scrollbar without shifting text */
+  height: 2.5em;
+  line-height: 2.5em;
+
   flex: 1 1 auto;
   white-space: pre;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-y: hidden;
+  overflow-x: auto;
   font-size: var(--font-size-regular);
 }
 

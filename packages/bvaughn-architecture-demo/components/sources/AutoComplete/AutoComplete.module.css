@@ -1,10 +1,20 @@
 .Input {
+  /* Allows height for horizontal scrollbar without shifting text */
+  height: 2.5em;
+  line-height: 2.5em;
+
   background: transparent;
   border: none;
   outline: none;
   padding: 0;
 
+  overflow-y: hidden;
+  overflow-x: auto;
+
   font-size: var(--font-size-regular);
   font-family: var(--font-family-monospace);
   color: var(--color-default);
+}
+.Input::-webkit-scrollbar {
+  height: 0.5em;
 }
