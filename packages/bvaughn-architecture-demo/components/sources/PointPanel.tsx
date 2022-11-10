@@ -157,6 +157,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                       className={
                         showEditBreakpointNag ? styles.ContentInputWithNag : styles.ContentInput
                       }
+                      dataTestId={`PointPanel-ConditionInput-${lineNumber}`}
                       dataTestName="PointPanel-ConditionInput"
                       onCancel={onCancel}
                       onChange={onEditableConditionChange}
@@ -179,6 +180,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                     className={
                       showEditBreakpointNag ? styles.ContentInputWithNag : styles.ContentInput
                     }
+                    dataTestId={`PointPanel-ContentInput-${lineNumber}`}
                     dataTestName="PointPanel-ContentInput"
                     onCancel={onCancel}
                     onChange={onEditableContentChange}

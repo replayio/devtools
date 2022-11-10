@@ -53,6 +53,7 @@ export async function addLogPoint(
     content?: string;
     condition?: string;
     lineNumber: number;
+    saveAfterEdit?: boolean;
     sourceId: string;
   }
 ) {
@@ -145,10 +146,11 @@ export async function editLogPoint(
     content?: string;
     condition?: string;
     lineNumber: number;
+    saveAfterEdit?: boolean;
     sourceId: string;
   }
 ) {
-  const { content, condition, lineNumber, sourceId } = options;
+  const { content, condition, lineNumber, saveAfterEdit = true, sourceId } = options;
 
   await debugPrint(
     page,
@@ -198,8 +200,10 @@ export async function editLogPoint(
     await conditionLocator.fill(condition);
   }
 
-  const saveButton = pointPanelLocator.locator('[data-test-name="PointPanel-SaveButton"]');
-  await saveButton.click({ force: true });
+  if (saveAfterEdit) {
+    const saveButton = pointPanelLocator.locator('[data-test-name="PointPanel-SaveButton"]');
+    await saveButton.click({ force: true });
+  }
 }
 
 export async function focusOnSource(page: Page) {
@@ -223,6 +227,20 @@ function getPreviousHitPointButton(page: Page, lineNumber: number): Locator {
 
 export function getPointPanelLocator(page: Page, lineNumber: number): Locator {
   return page.locator(`[data-test-id=PointPanel-${lineNumber}]`);
+}
+
+export function getPointPanelConditionAutoCompleteListLocator(
+  page: Page,
+  lineNumber: number
+): Locator {
+  return page.locator(`[data-test-id="PointPanel-ConditionInput-${lineNumber}-List"]`);
+}
+
+export function getPointPanelContentAutoCompleteListLocator(
+  page: Page,
+  lineNumber: number
+): Locator {
+  return page.locator(`[data-test-id="PointPanel-ContentInput-${lineNumber}-List"]`);
 }
 
 export function getSourceSearchResultsLabelLocator(page: Page): Locator {
