@@ -223,6 +223,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
     switch (hitPointStatus) {
       case "too-many-points-to-find":
       case "too-many-points-to-run-analysis":
+      case "unknown-error":
         showTooManyPointsMessage = true;
         break;
     }
