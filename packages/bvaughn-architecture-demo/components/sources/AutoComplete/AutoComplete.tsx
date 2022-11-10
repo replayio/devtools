@@ -1,8 +1,16 @@
-import { ChangeEvent, KeyboardEvent, Suspense, useLayoutEffect, useRef, useState } from "react";
+import { KeyboardEvent, Suspense, useLayoutEffect, useRef, useState } from "react";
+
+import { parse } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
 
 import getExpressionFromString from "../utils/getExpressionFromString";
 import updateStringWithExpression from "../utils/updateStringWithExpression";
 import AutoCompleteList from "./AutoCompleteList";
+import {
+  getCursorClientX,
+  getCursorIndex,
+  selectAllText,
+  setCursor,
+} from "./utils/contentEditable";
 import styles from "./AutoComplete.module.css";
 
 export default function AutoComplete({
@@ -24,46 +32,51 @@ export default function AutoComplete({
   onSubmit: () => void;
   value: string;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const contentEditableRef = useRef<HTMLDivElement>(null);
   const [expression, setExpression] = useState<string | null>(null);
+  const [cursorClientX, setCursorClientX] = useState<number | null>(null);
   const [cursorIndex, setCursorIndex] = useState<number | null>(null);
 
   useLayoutEffect(() => {
     if (autoFocus) {
-      const input = inputRef.current;
-      if (input) {
-        input.setSelectionRange(0, input.value.length);
+      const contentEditable = contentEditableRef.current;
+      if (contentEditable) {
+        selectAllText(contentEditable);
       }
     }
   }, [autoFocus]);
 
   useLayoutEffect(() => {
     if (cursorIndex !== null) {
-      const input = inputRef.current;
-      if (input) {
-        input.setSelectionRange(cursorIndex, cursorIndex);
+      const contentEditable = contentEditableRef.current;
+      if (contentEditable) {
+        setCursor(contentEditable, cursorIndex);
         setCursorIndex(null);
       }
     }
   }, [cursorIndex]);
 
-  const onChange = (event: ChangeEvent) => {
-    const input = event.currentTarget as HTMLInputElement;
-    const newValue = input.value;
-    if (newValue !== value) {
-      onChangeProp(newValue);
-
-      updateExpression();
+  const onInput = () => {
+    const contentEditable = contentEditableRef.current;
+    if (contentEditable) {
+      const cursorIndex = getCursorIndex(contentEditable);
+      const newValue = contentEditable.textContent || "";
+      if (newValue !== value) {
+        onChangeProp(newValue);
+        setCursorIndex(cursorIndex);
+        updateExpression();
+      }
     }
   };
 
   const updateExpression = () => {
-    const input = inputRef.current;
-    if (input) {
-      const value = input.value;
-      const cursorIndex = input.selectionStart || value.length;
+    const contentEditable = contentEditableRef.current;
+    if (contentEditable) {
+      const value = contentEditable.textContent || "";
+      const cursorIndex = getCursorIndex(contentEditable);
       const expression = getExpressionFromString(value, cursorIndex);
 
+      setCursorClientX(getCursorClientX(contentEditable));
       setExpression(expression);
     }
   };
@@ -71,8 +84,8 @@ export default function AutoComplete({
   const onKeyDown = (event: KeyboardEvent) => {
     switch (event.key) {
       case "Enter": {
+        event.preventDefault();
         if (!expression) {
-          event.preventDefault();
           onSubmitProp();
         }
         break;
@@ -95,41 +108,45 @@ export default function AutoComplete({
   };
 
   const onSubmit = (match: string) => {
-    const input = inputRef.current;
-    if (input) {
-      const value = input.value;
-      const cursorIndex = input.selectionStart || value.length;
+    const contentEditable = contentEditableRef.current;
+    if (contentEditable) {
+      const value = contentEditable.textContent || "";
+      const cursorIndex = getCursorIndex(contentEditable);
       const [newValue, newCursorIndex] = updateStringWithExpression(value, cursorIndex, match);
 
       onChangeProp(newValue);
-
       setCursorIndex(newCursorIndex);
 
-      input.focus();
+      contentEditable.focus();
     }
 
     setExpression(null);
   };
 
+  const lines = parse(value, ".js");
+  const html = lines && lines.length > 0 ? lines[0] : "";
+
   return (
     <>
-      <input
-        autoFocus={autoFocus}
+      <div
         className={`${className} ${styles.Input}`}
+        contentEditable
+        dangerouslySetInnerHTML={{ __html: html }}
         data-test-id={dataTestId}
         data-test-name={dataTestName}
-        onChange={onChange}
+        onInput={onInput}
         onKeyDown={onKeyDown}
-        ref={inputRef}
-        value={value}
+        ref={contentEditableRef}
+        tabIndex={0}
       />
       {expression && (
         <Suspense>
           <AutoCompleteList
+            cursorClientX={cursorClientX}
             dataTestId={dataTestId ? `${dataTestId}-List` : undefined}
             dataTestName={dataTestName ? `${dataTestName}-List` : undefined}
             expression={expression}
-            inputRef={inputRef}
+            inputRef={contentEditableRef}
             onCancel={onCancelProp}
             onSubmit={onSubmit}
           />

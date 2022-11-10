@@ -23,6 +23,7 @@ const MAX_LIST_HEIGHT = 200;
 const PREVIEW_CAN_OVERFLOW = false;
 
 export default function AutoCompleteListOuter({
+  cursorClientX,
   dataTestId,
   dataTestName,
   expression,
@@ -30,10 +31,11 @@ export default function AutoCompleteListOuter({
   onCancel,
   onSubmit,
 }: {
+  cursorClientX: number | null;
   dataTestId?: string;
   dataTestName?: string;
   expression: string | null;
-  inputRef: RefObject<HTMLInputElement>;
+  inputRef: RefObject<HTMLElement>;
   onCancel: () => void;
   onSubmit: (value: string) => void;
 }) {
@@ -47,6 +49,7 @@ export default function AutoCompleteListOuter({
 
   return (
     <AutoCompleteListInner
+      cursorClientX={cursorClientX}
       dataTestId={dataTestId}
       dataTestName={dataTestName}
       expression={expression}
@@ -59,6 +62,7 @@ export default function AutoCompleteListOuter({
 }
 
 function AutoCompleteListInner({
+  cursorClientX,
   dataTestId,
   dataTestName,
   expression,
@@ -67,10 +71,11 @@ function AutoCompleteListInner({
   onSubmit,
   pauseId,
 }: {
+  cursorClientX: number | null;
   dataTestId?: string;
   dataTestName?: string;
   expression: string;
-  inputRef: RefObject<HTMLInputElement>;
+  inputRef: RefObject<HTMLElement>;
   onCancel: () => void;
   onSubmit: (value: string) => void;
   pauseId: PauseId;
@@ -190,9 +195,11 @@ function AutoCompleteListInner({
 
   return (
     <Popup
+      clientX={cursorClientX}
       dataTestId={dataTestId}
       dataTestName={dataTestName}
       dismiss={onCancel}
+      horizontalAlignment="left"
       target={inputRef.current!}
     >
       <List
