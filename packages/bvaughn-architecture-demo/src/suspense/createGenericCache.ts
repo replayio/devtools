@@ -134,9 +134,7 @@ export function createGenericCache2<TExtra, TParams extends Array<any>, TValue>(
 
     addValue(value: TValue, ...args: TParams) {
       const cacheKey = getCacheKey(...args);
-      if (!recordMap.has(cacheKey)) {
-        recordMap.set(cacheKey, { status: STATUS_RESOLVED, value });
-      }
+      recordMap.set(cacheKey, { status: STATUS_RESOLVED, value });
     },
   };
 }
