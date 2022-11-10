@@ -97,7 +97,13 @@ function SourceRenderer({
 
   const sourceRef = useRef<HTMLDivElement>(null);
 
-  const onMouseMove = ({ clientX, clientY, target }: MouseEvent) => {
+  const onMouseMove = (event: MouseEvent) => {
+    const { clientX, clientY, defaultPrevented, target } = event;
+    if (defaultPrevented) {
+      // If something else (like the AutoComplete component) has prevented this event, ignore it.
+      return;
+    }
+
     const source = sourceRef.current!;
     if (!source.contains(target as Node)) {
       // Don't react to mouse move events within e.g. the preview popup.

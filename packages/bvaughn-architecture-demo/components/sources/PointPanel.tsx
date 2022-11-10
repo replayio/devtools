@@ -2,7 +2,9 @@ import {
   Suspense,
   unstable_useCacheRefresh as useCacheRefresh,
   useContext,
+  useEffect,
   useMemo,
+  useRef,
   useState,
   useTransition,
 } from "react";
@@ -55,6 +57,8 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
   const { accessToken, recordingId, trackEvent } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: curentTime } = useContext(TimelineContext);
 
+  const panelRef = useRef<HTMLDivElement>(null);
+
   const [showEditBreakpointNag, dismissEditBreakpointNag] = useNag(Nag.FIRST_BREAKPOINT_EDIT);
 
   const [hitPoints, hitPointStatus] = getHitPointsForLocationSuspense(
@@ -73,6 +77,20 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
 
   const [editableCondition, setEditableCondition] = useState(point.condition);
   const [editableContent, setEditableContent] = useState(point.content);
+
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (panel) {
+      // Prevent hovers over syntax highlighted tokens from showing preview popups.
+      const onMouseMove = (event: MouseEvent) => {
+        event.preventDefault();
+      };
+      panel.addEventListener("mousemove", onMouseMove, true);
+      return () => {
+        panel.removeEventListener("mousemove", onMouseMove, true);
+      };
+    }
+  });
 
   const isContentValid = useMemo(
     () => !!editableContent && validate(editableContent),
@@ -118,7 +136,11 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
     };
 
     return (
-      <div className={`${styles.Panel} ${className}`} data-test-id={`PointPanel-${lineNumber}`}>
+      <div
+        className={`${styles.Panel} ${className}`}
+        data-test-id={`PointPanel-${lineNumber}`}
+        ref={panelRef}
+      >
         <div className={styles.LayoutRow}>
           <div className={styles.MainColumn}>
             {hasCondition && (
@@ -248,7 +270,11 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
     };
 
     return (
-      <div className={`${styles.Panel} ${className}`} data-test-id={`PointPanel-${lineNumber}`}>
+      <div
+        className={`${styles.Panel} ${className}`}
+        data-test-id={`PointPanel-${lineNumber}`}
+        ref={panelRef}
+      >
         <div className={styles.LayoutRow}>
           <div className={styles.MainColumn}>
             {hasCondition && (
