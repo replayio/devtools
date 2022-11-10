@@ -6,4 +6,7 @@
 
   font-family: var(--font-family-monospace);
   font-size: var(--font-size-regular);
+
+  /* Override react-window inline style */
+  overflow-x: hidden !important;
 }

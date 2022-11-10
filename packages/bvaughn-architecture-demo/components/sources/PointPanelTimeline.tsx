@@ -89,7 +89,13 @@ export default function PointPanelTimeline({
       ? `${currentHitPointIndex + 1} / ${hitPoints.length}`
       : hitPoints.length;
 
-  const tooManyPointsToFind = hitPointStatus === "too-many-points-to-find";
+  let tooManyPointsToFind = false;
+  switch (hitPointStatus) {
+    case "too-many-points-to-find":
+    case "unknown-error":
+      tooManyPointsToFind = true;
+      break;
+  }
 
   const badgeStyle = getBadgeStyleVars(point.badge);
 

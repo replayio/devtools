@@ -16,6 +16,7 @@ export default function Popup({
   dataTestName = "Popup",
   dismiss,
   dismissOnMouseLeave = false,
+  horizontalAlignment = "center",
   showTail = false,
   target,
 }: {
@@ -26,6 +27,7 @@ export default function Popup({
   dataTestName?: string;
   dismiss: Dismiss;
   dismissOnMouseLeave?: boolean;
+  horizontalAlignment?: "left" | "center" | "right";
   showTail?: boolean;
   target: HTMLElement;
 }) {
@@ -49,7 +51,10 @@ export default function Popup({
   useLayoutEffect(() => {
     const arrow = arrowRef.current!;
     const container = containerRef?.current || document.body;
-    const popover = popoverRef.current!;
+    const popover = popoverRef.current;
+    if (!popover) {
+      return;
+    }
 
     let ignoreMouseLeaveEvents: boolean = false;
     let ignoreMouseLeaveEventTimeout: NodeJS.Timeout | null = null;
@@ -111,14 +116,32 @@ export default function Popup({
       // TODO
       // Handle horizontal positioning edge case if popup is outside of scroll area when rendered initially.
 
-      const horizontalAlignmentPoint =
-        clientX !== null ? clientX : targetRect.left + targetRect.width / 2;
-
       // Horizontal alignment: Prefer horizontally centered around the target
       // But don't go outside of the bounds of the container.
       const popoverLeftMin = containerRect.left;
       const popoverLeftMax = containerRect.left + containerRect.width - popoverRect.width;
-      const popoverLeftPreferred = horizontalAlignmentPoint - popoverRect.width / 2;
+
+      let horizontalAlignmentPoint;
+      let popoverLeftPreferred;
+
+      switch (horizontalAlignment) {
+        case "left":
+          horizontalAlignmentPoint = clientX !== null ? clientX : targetRect.left;
+          popoverLeftPreferred = horizontalAlignmentPoint;
+          break;
+        case "right":
+          horizontalAlignmentPoint =
+            clientX !== null ? clientX : targetRect.left + targetRect.width;
+          popoverLeftPreferred = horizontalAlignmentPoint - popoverRect.width;
+          break;
+        case "center":
+        default:
+          horizontalAlignmentPoint =
+            clientX !== null ? clientX : targetRect.left + targetRect.width / 2;
+          popoverLeftPreferred = horizontalAlignmentPoint - popoverRect.width / 2;
+          break;
+      }
+
       const popoverLeft = Math.max(popoverLeftMin, Math.min(popoverLeftMax, popoverLeftPreferred));
       popover.style.setProperty("left", `${popoverLeft}px`);
 
@@ -178,7 +201,7 @@ export default function Popup({
 
       clearMouseLeaveTimeout();
     };
-  }, [clientX, containerRef, showTail, target]);
+  }, [clientX, containerRef, horizontalAlignment, showTail, target]);
 
   const blockEvent = (event: MouseEvent) => {
     event.preventDefault();

@@ -1,12 +1,13 @@
 import { expect, test } from "@playwright/test";
 
 import { toggleProtocolMessages, verifyConsoleMessage } from "./utils/console";
-import { delay, getTestUrl, takeScreenshot } from "./utils/general";
+import { delay, getTestUrl, takeScreenshot, waitFor } from "./utils/general";
 import {
   addBreakPoint,
   addLogPoint,
   clearSearchResult,
-  continueTo,
+  editLogPoint,
+  getPointPanelContentAutoCompleteListLocator,
   getPointPanelLocator,
   getSearchSourceLocator,
   getSourceFileNameSearchResultsLocator,
@@ -18,9 +19,6 @@ import {
   goToNextSourceSearchResult,
   goToPreviousHitPoint,
   goToPreviousSourceSearchResult,
-  isContinueToNextButtonEnabled,
-  isContinueToPreviousButtonEnabled,
-  isLineCurrentExecutionPoint,
   openSourceFile,
   removeBreakPoint,
   removeLogPoint,
@@ -90,6 +88,39 @@ test("should run remote analysis for log points", async ({ page }) => {
   const keyValue = message.locator("[data-test-name=Expandable]");
   await keyValue.click();
   await takeScreenshot(page, message, "log-point-analysis-expanded-console");
+});
+
+test("should auto-suggestion text based on the current expression", async ({ page }) => {
+  await toggleProtocolMessages(page, false);
+  await addLogPoint(page, { sourceId, lineNumber: 28 });
+
+  // Select a pause and frame so auto-complete will work.
+  await goToNextHitPoint(page, 28);
+
+  await editLogPoint(page, { sourceId, lineNumber: 28, content: "win", saveAfterEdit: false });
+
+  const autoCompleteList = getPointPanelContentAutoCompleteListLocator(page, 28);
+  await waitFor(async () => expect(await autoCompleteList.isVisible()).toBe(true));
+  await takeScreenshot(page, autoCompleteList, "log-point-auto-complete-list-window");
+
+  // Select the 1st suggestion in the list: window
+  await page.keyboard.press("Enter");
+  const pointPanelLocator = getPointPanelLocator(page, 28);
+  await takeScreenshot(page, pointPanelLocator, "log-point-auto-complete-text-window");
+
+  await editLogPoint(page, {
+    sourceId,
+    lineNumber: 28,
+    content: "window.loc",
+    saveAfterEdit: false,
+  });
+  await waitFor(async () => expect(await autoCompleteList.isVisible()).toBe(true));
+  await takeScreenshot(page, autoCompleteList, "log-point-auto-complete-list-window.loc");
+
+  // Select the 2nd suggestion in the list: location
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await takeScreenshot(page, pointPanelLocator, "log-point-auto-complete-text-window.location");
 });
 
 test("should support conditional log points", async ({ page }) => {

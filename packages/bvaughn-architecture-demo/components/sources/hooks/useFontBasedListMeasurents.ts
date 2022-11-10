@@ -12,18 +12,18 @@ type Measurements = {
 };
 
 const REGULAR_SIZE: Measurements = {
-  conditionalPointPanelHeight: 130,
-  pointPanelHeight: 90,
+  conditionalPointPanelHeight: 138,
+  pointPanelHeight: 94,
   lineHeight: 15,
-  lineHeightWithPoint: 15 + 90,
-  lineHeightWithConditionalPoint: 15 + 130,
+  lineHeightWithPoint: 15 + 94,
+  lineHeightWithConditionalPoint: 15 + 138,
 };
 const LARGE_SIZE: Measurements = {
-  conditionalPointPanelHeight: 156,
-  pointPanelHeight: 108,
+  conditionalPointPanelHeight: 162,
+  pointPanelHeight: 111,
   lineHeight: 16,
-  lineHeightWithPoint: 16 + 108,
-  lineHeightWithConditionalPoint: 16 + 156,
+  lineHeightWithPoint: 16 + 111,
+  lineHeightWithConditionalPoint: 16 + 162,
 };
 
 // HACK

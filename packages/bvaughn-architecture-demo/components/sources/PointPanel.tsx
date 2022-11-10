@@ -1,4 +1,5 @@
 import {
+  MouseEvent,
   Suspense,
   unstable_useCacheRefresh as useCacheRefresh,
   useContext,
@@ -29,6 +30,8 @@ import CommentButton from "./CommentButton";
 import PointPanelTimeline from "./PointPanelTimeline";
 import SyntaxHighlightedLine from "./SyntaxHighlightedLine";
 import styles from "./PointPanel.module.css";
+
+type EditReason = "condition" | "content";
 
 export default function SourcePanelWrapper({
   className,
@@ -65,6 +68,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
   const invalidateCache = useCacheRefresh();
 
   const [isEditing, setIsEditing] = useState(showEditBreakpointNag);
+  const [editReason, setEditReason] = useState<EditReason | null>(null);
 
   const [isPending, startTransition] = useTransition();
 
@@ -82,6 +86,11 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
   const hasChanged = editableCondition !== point.condition || editableContent !== point.content;
 
   const lineNumber = point.location.line;
+
+  // Prevent hovers over syntax highlighted tokens from showing preview popups.
+  const onMouseMove = (event: MouseEvent) => {
+    event.preventDefault();
+  };
 
   if (isEditing) {
     const hasCondition = editableCondition !== null;
@@ -115,7 +124,11 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
     };
 
     return (
-      <div className={`${styles.Panel} ${className}`} data-test-id={`PointPanel-${lineNumber}`}>
+      <div
+        className={`${styles.Panel} ${className}`}
+        data-test-id={`PointPanel-${lineNumber}`}
+        onMouseMove={onMouseMove}
+      >
         <div className={styles.LayoutRow}>
           <div className={styles.MainColumn}>
             {hasCondition && (
@@ -128,10 +141,11 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                 >
                   <div className={styles.Content}>
                     <AutoComplete
-                      autoFocus
+                      autoFocus={editReason === "condition"}
                       className={
                         showEditBreakpointNag ? styles.ContentInputWithNag : styles.ContentInput
                       }
+                      dataTestId={`PointPanel-ConditionInput-${lineNumber}`}
                       dataTestName="PointPanel-ConditionInput"
                       onCancel={onCancel}
                       onChange={onEditableConditionChange}
@@ -150,10 +164,11 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                 <BadgePicker point={point} />
                 <div className={styles.Content}>
                   <AutoComplete
-                    autoFocus
+                    autoFocus={showEditBreakpointNag || editReason === "content"}
                     className={
                       showEditBreakpointNag ? styles.ContentInputWithNag : styles.ContentInput
                     }
+                    dataTestId={`PointPanel-ContentInput-${lineNumber}`}
                     dataTestName="PointPanel-ContentInput"
                     onCancel={onCancel}
                     onChange={onEditableContentChange}
@@ -208,15 +223,17 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
     switch (hitPointStatus) {
       case "too-many-points-to-find":
       case "too-many-points-to-run-analysis":
+      case "unknown-error":
         showTooManyPointsMessage = true;
         break;
     }
 
-    const startEditing = () => {
+    const startEditing = (editReason: EditReason | null = null) => {
       trackEvent("breakpoint.start_edit");
       setEditableCondition(point.condition || null);
       setEditableContent(point.content);
       setIsEditing(true);
+      setEditReason(editReason);
     };
 
     const addComment = () => {
@@ -244,7 +261,11 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
     };
 
     return (
-      <div className={`${styles.Panel} ${className}`} data-test-id={`PointPanel-${lineNumber}`}>
+      <div
+        className={`${styles.Panel} ${className}`}
+        data-test-id={`PointPanel-${lineNumber}`}
+        onMouseMove={onMouseMove}
+      >
         <div className={styles.LayoutRow}>
           <div className={styles.MainColumn}>
             {hasCondition && (
@@ -253,14 +274,14 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                 <div className={styles.ContentWrapper}>
                   <div
                     className={styles.Content}
-                    onClick={showTooManyPointsMessage ? undefined : startEditing}
+                    onClick={showTooManyPointsMessage ? undefined : () => startEditing("condition")}
                   >
                     <SyntaxHighlightedLine code={point.condition!} />
                   </div>
                   <button
                     className={styles.EditButton}
                     disabled={isPending}
-                    onClick={showTooManyPointsMessage ? undefined : startEditing}
+                    onClick={showTooManyPointsMessage ? undefined : () => startEditing("condition")}
                     data-test-name="PointPanel-EditButton"
                   >
                     <Icon className={styles.EditButtonIcon} type="edit" />
@@ -279,14 +300,14 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                   <BadgePicker point={point} />
                   <div
                     className={styles.Content}
-                    onClick={showTooManyPointsMessage ? undefined : startEditing}
+                    onClick={showTooManyPointsMessage ? undefined : () => startEditing("content")}
                   >
                     <SyntaxHighlightedLine code={point.content} />
                   </div>
                   <button
                     className={styles.EditButton}
                     disabled={isPending}
-                    onClick={showTooManyPointsMessage ? undefined : startEditing}
+                    onClick={showTooManyPointsMessage ? undefined : () => startEditing("content")}
                     data-test-name="PointPanel-EditButton"
                   >
                     <Icon className={styles.EditButtonIcon} type="edit" />
