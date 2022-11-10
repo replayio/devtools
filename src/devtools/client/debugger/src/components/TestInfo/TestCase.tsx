@@ -1,9 +1,12 @@
 import { Location } from "@replayio/protocol";
 import { useState } from "react";
+import { getRecordingDuration } from "ui/actions/app";
 
 import { setFocusRegion } from "ui/actions/timeline";
+import { getDuration } from "ui/components/Library/Team/View/TestRuns/utils";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { getFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem, TestResult } from "ui/types";
 
@@ -29,17 +32,8 @@ export function TestCase({ test, location }: { test: TestItem; location?: Locati
     setExpandSteps(!expandSteps);
   };
 
-  const onFocus = () => {
-    dispatch(
-      setFocusRegion({
-        beginTime: test.relativeStartTime,
-        endTime: test.relativeStartTime + test.duration,
-      })
-    );
-  };
-
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col group">
       <div className="group flex flex-row items-center justify-between gap-1 rounded-lg p-1 transition hover:cursor-pointer">
         <button
           onClick={toggleExpand}
@@ -59,7 +53,7 @@ export function TestCase({ test, location }: { test: TestItem; location?: Locati
             ) : null}
           </div>
         </button>
-        <div className="flex gap-1 self-start">
+        <div className={`flex gap-1 self-start group-hover:visible ${expandSteps ? "visible" : "invisible"}`}>
           {location ? (
             <button
               onClick={onClick}
@@ -69,18 +63,50 @@ export function TestCase({ test, location }: { test: TestItem; location?: Locati
               <MaterialIcon>description</MaterialIcon>
             </button>
           ) : null}
-          <button
-            onClick={onFocus}
-            title="Focus on this test"
-            className="grid h-5 w-5 items-center justify-center hover:bg-menuHoverBgcolor"
-          >
-            <Icon filename="focus" />
-          </button>
+          <FocusToggleButton test={test} />
         </div>
       </div>
       {expandSteps ? <TestSteps test={test} startTime={test.relativeStartTime} /> : null}
     </div>
   );
+}
+
+function FocusToggleButton({ test }: { test: TestItem }) {
+  const dispatch = useAppDispatch();
+  const duration = useAppSelector(getRecordingDuration);
+
+  const testStartTime = test.relativeStartTime;
+  const testEndTime = test.relativeStartTime + test.duration;
+  const focusRegion = useAppSelector(getFocusRegion);
+  const isFocused = focusRegion?.beginTime === testStartTime && focusRegion?.endTime === testEndTime
+
+  const onFocus = () => {
+    if (isFocused) {
+      dispatch(
+        setFocusRegion({
+          beginTime: 0,
+          endTime: duration,
+        })
+      );
+    } else {
+      dispatch(
+        setFocusRegion({
+          beginTime: testStartTime,
+          endTime: testEndTime,
+        })
+      );
+    }
+  };
+
+  return (
+    <button
+      onClick={onFocus}
+      title={isFocused ? "Reset Focus" : "Focus on this test"}
+      className={`grid h-5 w-5 items-center justify-center hover:bg-menuHoverBgcolor`}
+    >
+      <Icon filename="focus" />
+    </button>
+  )
 }
 
 export function Status({ result }: { result: TestResult }) {
