@@ -30,6 +30,8 @@ import PointPanelTimeline from "./PointPanelTimeline";
 import SyntaxHighlightedLine from "./SyntaxHighlightedLine";
 import styles from "./PointPanel.module.css";
 
+type EditReason = "condition" | "content";
+
 export default function SourcePanelWrapper({
   className,
   point,
@@ -65,6 +67,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
   const invalidateCache = useCacheRefresh();
 
   const [isEditing, setIsEditing] = useState(showEditBreakpointNag);
+  const [editReason, setEditReason] = useState<EditReason | null>(null);
 
   const [isPending, startTransition] = useTransition();
 
@@ -128,7 +131,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                 >
                   <div className={styles.Content}>
                     <AutoComplete
-                      autoFocus
+                      autoFocus={editReason === "condition"}
                       className={
                         showEditBreakpointNag ? styles.ContentInputWithNag : styles.ContentInput
                       }
@@ -150,7 +153,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                 <BadgePicker point={point} />
                 <div className={styles.Content}>
                   <AutoComplete
-                    autoFocus
+                    autoFocus={showEditBreakpointNag || editReason === "content"}
                     className={
                       showEditBreakpointNag ? styles.ContentInputWithNag : styles.ContentInput
                     }
@@ -212,11 +215,12 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
         break;
     }
 
-    const startEditing = () => {
+    const startEditing = (editReason: EditReason | null = null) => {
       trackEvent("breakpoint.start_edit");
       setEditableCondition(point.condition || null);
       setEditableContent(point.content);
       setIsEditing(true);
+      setEditReason(editReason);
     };
 
     const addComment = () => {
@@ -253,14 +257,14 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                 <div className={styles.ContentWrapper}>
                   <div
                     className={styles.Content}
-                    onClick={showTooManyPointsMessage ? undefined : startEditing}
+                    onClick={showTooManyPointsMessage ? undefined : () => startEditing("condition")}
                   >
                     <SyntaxHighlightedLine code={point.condition!} />
                   </div>
                   <button
                     className={styles.EditButton}
                     disabled={isPending}
-                    onClick={showTooManyPointsMessage ? undefined : startEditing}
+                    onClick={showTooManyPointsMessage ? undefined : () => startEditing("condition")}
                     data-test-name="PointPanel-EditButton"
                   >
                     <Icon className={styles.EditButtonIcon} type="edit" />
@@ -279,14 +283,14 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                   <BadgePicker point={point} />
                   <div
                     className={styles.Content}
-                    onClick={showTooManyPointsMessage ? undefined : startEditing}
+                    onClick={showTooManyPointsMessage ? undefined : () => startEditing("content")}
                   >
                     <SyntaxHighlightedLine code={point.content} />
                   </div>
                   <button
                     className={styles.EditButton}
                     disabled={isPending}
-                    onClick={showTooManyPointsMessage ? undefined : startEditing}
+                    onClick={showTooManyPointsMessage ? undefined : () => startEditing("content")}
                     data-test-name="PointPanel-EditButton"
                   >
                     <Icon className={styles.EditButtonIcon} type="edit" />
