@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
+import { getRecordingDuration } from "ui/actions/app";
+import { setFocusRegion } from "ui/actions/timeline";
 
 import { useFetchCypressSpec } from "ui/hooks/useFetchCypressSpec";
 import { Annotation, getReporterAnnotations } from "ui/reducers/reporter";
-import { useAppSelector } from "ui/setup/hooks";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem } from "ui/types";
 
 import { TestCase } from "./TestCase";
@@ -16,8 +18,10 @@ function maybeCorrectTestTimes(testCases: TestItem[], annotations: Annotation[])
 
 export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
   const [highlightedTest, setHighlightedTest] = useState<number | null>(null);
+  const dispatch = useAppDispatch();
   const annotations = useAppSelector(getReporterAnnotations);
   const cypressResults = useFetchCypressSpec();
+  const duration = useAppSelector(getRecordingDuration);
 
   // The test start times in metadata may be incorrect. If we have the reporter annotations,
   // we can use those instead
@@ -30,9 +34,19 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
     return highlightedTest === null || highlightedTest === index;
   }
 
+  const onReset = () => {
+    setHighlightedTest(null);
+    dispatch(
+      setFocusRegion({
+        beginTime: 0,
+        endTime: duration,
+      })
+    );
+  }
+
   return (
     <div className="flex flex-col space-y-1 px-4 py-2">
-      {highlightedTest !== null && <button onClick={() => setHighlightedTest(null)}>Show all ({testCases.length}) tests</button>}
+      {highlightedTest !== null && <button onClick={onReset}>Show all ({testCases.length}) tests</button>}
       {correctedTestCases.map((t, i) => (
         showTest(i) && <TestCase
           test={t}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
 import { getCurrentTime } from "ui/reducers/timeline";
@@ -54,7 +55,8 @@ function TestStepItem({
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
   // some chainers (`then`) don't have a duration, so let's bump it here so that it shows something in the UI
-  const paused = currentTime >= startTime && currentTime < startTime + (duration || 1);
+  const isPast = currentTime > startTime;
+  const isPaused = currentTime >= startTime && currentTime < startTime + (duration || 1);
 
   const onClick = () => {
     dispatch(seekToTime(startTime));
@@ -70,14 +72,14 @@ function TestStepItem({
     <button
       onClick={onClick}
       className={`relative flex items-center overflow-hidden border-b border-l-4 border-themeBase-90 bg-testsuitesStepsBgcolor pl-1 pr-3 font-mono ${
-        paused ? "border-l-red-500" : "border-l-transparent"
+        isPast ? "border-l-red-500" : isPaused ? "border-l-blue-500" : "border-l-transparent"
       }`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
       <div className="flex flex-grow items-center space-x-2 overflow-hidden py-2 text-start">
         <div className="opacity-70">{index + 1}</div>
-        <div className={`whitespace-pre font-medium text-bodyColor ${paused ? "font-bold" : ""}`}>
+        <div className={`whitespace-pre font-medium text-bodyColor ${isPaused ? "font-bold" : ""}`}>
           {parentId ? "- " : ""}
           {testName}
         </div>
