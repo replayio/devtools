@@ -1,4 +1,4 @@
-import "./global-css.ts";
+import "../src/global-css.ts";
 import "../src/test-prep";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Store } from "@reduxjs/toolkit";
