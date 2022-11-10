@@ -13,7 +13,7 @@ import {
 import { Pause } from "protocol/thread/pause";
 import { ThreadFront } from "protocol/thread/thread";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { enterFocusMode as enterFocusModeAction } from "ui/actions/timeline";
+import { enterFocusMode } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getSourcesLoading } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -69,7 +69,7 @@ function FramesRenderer({
         {asyncSeparator}
         <div className="pane-info empty">
           This part of the call stack is unavailable because it is outside{" "}
-          <span className="cursor-pointer underline" onClick={() => dispatch(enterFocusModeAction)}>
+          <span className="cursor-pointer underline" onClick={() => dispatch(enterFocusMode())}>
             your debugging window
           </span>
           .
@@ -198,7 +198,7 @@ export default function Frames({
       <div className="pane frames">
         <div className="pane-info empty">
           The call stack is unavailable because it is outside{" "}
-          <span className="cursor-pointer underline" onClick={() => dispatch(enterFocusModeAction)}>
+          <span className="cursor-pointer underline" onClick={() => dispatch(enterFocusMode())}>
             your debugging window
           </span>
           .
