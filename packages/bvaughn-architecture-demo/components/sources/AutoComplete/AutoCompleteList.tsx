@@ -1,10 +1,9 @@
-import { PauseId, Property } from "@replayio/protocol";
+import { FrameId, PauseId, Property } from "@replayio/protocol";
 import { RefObject, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { FixedSizeList as List } from "react-window";
 
 import Popup from "bvaughn-architecture-demo/components/Popup";
 import { SelectedFrameContext } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
-import useCurrentPauseIdSuspense from "bvaughn-architecture-demo/src/hooks/useCurrentPauseIdSuspense";
 import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { evaluateSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { getFrameScopesSuspense } from "bvaughn-architecture-demo/src/suspense/ScopeCache";
@@ -39,48 +38,15 @@ export default function AutoCompleteListOuter({
   onCancel: () => void;
   onSubmit: (value: string) => void;
 }) {
-  // This hook suspends so we can't call other hooks after it.
-  // There's no point in fetching further data though unless there's a pause (or an expression),
-  // so we can bail out early after calling this hook.
-  const pauseId = useCurrentPauseIdSuspense();
-  if (!expression || !pauseId) {
-    return null;
-  }
-
-  return (
-    <AutoCompleteListInner
-      cursorClientX={cursorClientX}
-      dataTestId={dataTestId}
-      dataTestName={dataTestName}
-      expression={expression}
-      inputRef={inputRef}
-      onCancel={onCancel}
-      onSubmit={onSubmit}
-      pauseId={pauseId}
-    />
-  );
-}
-
-function AutoCompleteListInner({
-  cursorClientX,
-  dataTestId,
-  dataTestName,
-  expression,
-  inputRef,
-  onCancel,
-  onSubmit,
-  pauseId,
-}: {
-  cursorClientX: number | null;
-  dataTestId?: string;
-  dataTestName?: string;
-  expression: string;
-  inputRef: RefObject<HTMLElement>;
-  onCancel: () => void;
-  onSubmit: (value: string) => void;
-  pauseId: PauseId;
-}) {
   const replayClient = useContext(ReplayClientContext);
+
+  const { selectedPauseAndFrameId } = useContext(SelectedFrameContext);
+  let pauseId: PauseId | null = null;
+  let frameId: FrameId | null = null;
+  if (selectedPauseAndFrameId) {
+    pauseId = selectedPauseAndFrameId.pauseId;
+    frameId = selectedPauseAndFrameId.frameId;
+  }
 
   const listRef = useRef<List>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
@@ -96,37 +62,39 @@ function AutoCompleteListInner({
   }, [expression]);
 
   let properties: Property[] | null = null;
-  const frameId = useContext(SelectedFrameContext).selectedPauseAndFrameId?.frameId ?? null;
-  const scopes = frameId
-    ? getFrameScopesSuspense(replayClient, pauseId, frameId).generatedScopes
-    : null;
-  if (expressionHead) {
-    // Evaluate the properties of an object (expressionHead)
-    const maybeResult =
-      evaluateSuspense(replayClient, pauseId, frameId, expressionHead).returned || null;
-    const maybeResultId = maybeResult?.object;
-    if (maybeResultId) {
-      const { preview } = getObjectWithPreviewSuspense(
-        replayClient,
-        pauseId,
-        maybeResultId,
-        !PREVIEW_CAN_OVERFLOW
-      );
-      properties = preview?.properties || null;
-    }
-  } else {
-    // Evaluate the properties of the global/window object
-    if (scopes && scopes.length > 0) {
-      const maybeGlobalObject = scopes[scopes.length - 1];
-      const maybeGlobalObjectId = maybeGlobalObject?.object;
-      if (maybeGlobalObjectId) {
+  const scopes =
+    frameId && pauseId
+      ? getFrameScopesSuspense(replayClient, pauseId, frameId).generatedScopes
+      : null;
+  if (pauseId) {
+    if (expressionHead) {
+      // Evaluate the properties of an object (expressionHead)
+      const maybeResult =
+        evaluateSuspense(replayClient, pauseId, frameId, expressionHead).returned || null;
+      const maybeResultId = maybeResult?.object;
+      if (maybeResultId) {
         const { preview } = getObjectWithPreviewSuspense(
           replayClient,
           pauseId,
-          maybeGlobalObjectId,
+          maybeResultId,
           !PREVIEW_CAN_OVERFLOW
         );
         properties = preview?.properties || null;
+      }
+    } else {
+      // Evaluate the properties of the global/window object
+      if (scopes && scopes.length > 0) {
+        const maybeGlobalObject = scopes[scopes.length - 1];
+        const maybeGlobalObjectId = maybeGlobalObject?.object;
+        if (maybeGlobalObjectId) {
+          const { preview } = getObjectWithPreviewSuspense(
+            replayClient,
+            pauseId,
+            maybeGlobalObjectId,
+            !PREVIEW_CAN_OVERFLOW
+          );
+          properties = preview?.properties || null;
+        }
       }
     }
   }
