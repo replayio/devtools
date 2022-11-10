@@ -1,5 +1,6 @@
 import { FrameId, MappedLocation, PauseId, Scope, ScopeId } from "@replayio/protocol";
 
+import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createGenericCache2 } from "./createGenericCache";
@@ -22,7 +23,9 @@ export const {
     const result = await client.getScope(pauseId, scopeId);
     await client.waitForLoadedSources();
     cachePauseData(client, pauseId, result.data);
-    return result.data.scopes!.find(scope => scope.scopeId === scopeId)!;
+    const cached: { value: Scope } | undefined = getScopeIfCached(pauseId, scopeId);
+    assert(cached, `Scope ${scopeId} for pause ${pauseId} not found in cache`);
+    return cached.value;
   },
   (pauseId, scopeId) => `${pauseId}:${scopeId}`
 );

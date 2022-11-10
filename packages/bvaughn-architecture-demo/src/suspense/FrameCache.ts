@@ -1,9 +1,10 @@
 import { Frame, PauseId } from "@replayio/protocol";
 
+import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createGenericCache2 } from "./createGenericCache";
-import { cachePauseData, sortFramesAndUpdateLocations } from "./PauseCache";
+import { cachePauseData } from "./PauseCache";
 
 export const {
   getValueSuspense: getFramesSuspense,
@@ -14,14 +15,10 @@ export const {
   async (client, pauseId) => {
     const framesResult = await client.getAllFrames(pauseId);
     await client.waitForLoadedSources();
-
-    // this will not cache the frames because we're not passing in framesResult.frames,
-    // the frames will instead be cached when they're returned from this function
-    cachePauseData(client, pauseId, framesResult.data);
-
-    if (framesResult.data.frames) {
-      return sortFramesAndUpdateLocations(client, framesResult.data.frames, framesResult.frames);
-    }
+    cachePauseData(client, pauseId, framesResult.data, framesResult.frames);
+    const cached: { value: Frame[] | undefined } | undefined = getFramesIfCached(pauseId);
+    assert(cached, `Frames for pause ${pauseId} not found in cache`);
+    return cached.value;
   },
   pauseId => pauseId
 );
