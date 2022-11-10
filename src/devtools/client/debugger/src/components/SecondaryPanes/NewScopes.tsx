@@ -6,7 +6,7 @@ import Inspector from "bvaughn-architecture-demo/components/inspector/Inspector"
 import ScopesInspector from "bvaughn-architecture-demo/components/inspector/ScopesInspector";
 import { getFrameScopesSuspense } from "bvaughn-architecture-demo/src/suspense/ScopeCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { enterFocusMode as enterFocusModeAction } from "ui/actions/timeline";
+import { enterFocusMode } from "ui/actions/timeline";
 import { Redacted } from "ui/components/Redacted";
 import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
 import { getPreferredGeneratedSources } from "ui/reducers/sources";
@@ -81,7 +81,7 @@ export default function Scopes() {
       <div className="pane">
         <div className="pane-info empty">
           Scope is unavailable because it is outside{" "}
-          <span className="cursor-pointer underline" onClick={() => dispatch(enterFocusModeAction)}>
+          <span className="cursor-pointer underline" onClick={() => dispatch(enterFocusMode())}>
             your debugging window
           </span>
           .
