@@ -87,36 +87,65 @@ function HeaderTitle({
   recordingId: RecordingId;
 }) {
   const [editing, setEditing] = useState(EditState.Inactive);
-  const inputNode = useRef<HTMLSpanElement>(null);
+  const inputNode = useRef<HTMLInputElement>(null);
+  const [title, setTitle] = useState(recording?.title ?? "Untitled");
   const updateRecordingTitle = hooks.useUpdateRecordingTitle();
   const canEditTitle = recording.userRole !== "none";
+  const isEditing = editing === EditState.Active;
 
-  const className = "ml-2 text-lg p-0.5 whitespace-pre overflow-hidden overflow-ellipsis";
+  const className =
+    "ml-2 text-lg p-0.5 whitespace-pre overflow-hidden overflow-ellipsis rounded-lg border-transparent hover:border-current focus:border-current";
 
   const onKeyPress: React.KeyboardEventHandler = (e: any) => {
     if (e.code == "Enter" || e.code == "Escape") {
       e.preventDefault();
-      inputNode.current!.blur();
+      saveOrReset(e.code === "Enter" ? EditState.Saving : EditState.Inactive);
     }
   };
   const onFocus = () => {
     trackEvent("header.edit_title");
     return editing === EditState.Inactive && setEditing(EditState.Active);
   };
+
+  const saveOrReset = (nextState = EditState.Saving) => {
+    if (!isEditing) {
+      return;
+    }
+
+    if (nextState === EditState.Inactive) {
+      setTitle(recording.title!);
+      setEditing(EditState.Inactive);
+    } else if (nextState === EditState.Saving) {
+      if (title !== recording.title) {
+        const finalTitle = title ?? "Untitled";
+        setTitle(finalTitle);
+        updateRecordingTitle(recordingId, finalTitle).then(() => {
+          setEditing(EditState.Inactive);
+        });
+        console.log("Saving new title: ", finalTitle);
+        setEditing(EditState.Saving);
+      } else {
+        setEditing(EditState.Inactive);
+      }
+    }
+
+    inputNode.current!.blur();
+  };
   const onBlur = () => {
     if (editing !== EditState.Active) {
       return;
     }
-    const currentValue = inputNode.current!.textContent || "";
+    const currentValue = inputNode.current!.value || "";
 
-    setEditing(EditState.Saving);
-    updateRecordingTitle(recordingId, currentValue).then(() => {
-      setEditing(EditState.Inactive);
-    });
+    // setEditing(EditState.Saving);
+
+    // updateRecordingTitle(recordingId, currentValue).then(() => {
+    //   setEditing(EditState.Inactive);
+    // });
   };
 
   const hasTitle = recording.title && recording.title.length > 0;
-  const displayTitle = hasTitle ? recording.title : "Untitled";
+  const displayTitle = isEditing ? title : hasTitle ? recording.title : "Untitled";
 
   useLayoutEffect(() => {
     if (!inputNode.current) {
@@ -124,11 +153,14 @@ function HeaderTitle({
     }
 
     if (!editing) {
-      inputNode.current.innerText = hasTitle ? recording.title! : "Untitled";
+      // inputNode.current.value = hasTitle ? recording.title! : "Untitled";
+      setTitle(hasTitle ? recording.title! : "Untitled");
     } else if (editing === EditState.Active && !hasTitle) {
-      inputNode.current.innerText = "";
-    } else if (editing === EditState.Saving && !inputNode.current.innerText) {
-      inputNode.current.innerText = "Untitled";
+      // inputNode.current.value = "";
+      setTitle("");
+    } else if (editing === EditState.Saving && !inputNode.current.value) {
+      // inputNode.current.value = "Untitled";
+      setTitle("Untitled");
     }
   }, [editing, hasTitle, recording.title]);
 
@@ -142,20 +174,28 @@ function HeaderTitle({
   }
 
   return (
-    <span
-      style={{ outline: "none", background: "inherit" }}
+    <input
+      style={{ outline: "none", background: "inherit", minWidth: 250 }}
       className={cx(className, "input m-5 focus:bg-blue-500", {
         italic: !hasTitle && !editing,
       })}
+      type="text"
       role="textbox"
       spellCheck="false"
-      contentEditable
-      onBlur={onBlur}
+      onBlur={() => saveOrReset()}
       onKeyPress={onKeyPress}
       onKeyDown={onKeyPress}
       onFocus={onFocus}
       onPaste={pasteText}
+      size={Math.min(Math.max(displayTitle?.length ?? 0, 75), 100)}
       ref={inputNode}
+      value={displayTitle ?? ""}
+      onChange={e => {
+        console.log("New value: ", e.target.value);
+        if (isEditing) {
+          setTitle(e.target.value);
+        }
+      }}
     />
   );
 }
@@ -180,7 +220,7 @@ function Header({ recordingTarget }: PropsFromRedux) {
 
   return (
     <div className={css.header}>
-      <div className="relative flex flex-grow flex-row items-center overflow-hidden">
+      <div className="relative flex flex-grow flex-row items-center overflow-hidden" tabIndex={-1}>
         {isAuthenticated && (
           <IconWithTooltip
             icon={backIcon}
