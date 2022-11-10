@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import IndeterminateLoader from "bvaughn-architecture-demo/components/IndeterminateLoader";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import { actions } from "ui/actions";
@@ -71,11 +72,7 @@ export const NetworkMonitor = ({
 
   if (loading) {
     timeMixpanelEvent("net_monitor.open_network_monitor");
-    return (
-      <div className="relative">
-        <LoadingProgressBar />
-      </div>
-    );
+    return <IndeterminateLoader />;
   }
 
   trackEvent("net_monitor.open_network_monitor");
