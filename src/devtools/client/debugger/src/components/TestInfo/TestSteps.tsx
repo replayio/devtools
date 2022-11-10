@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
 import { getCurrentTime } from "ui/reducers/timeline";

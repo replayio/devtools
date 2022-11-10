@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { useFetchCypressSpec } from "ui/hooks/useFetchCypressSpec";
 import { Annotation, getReporterAnnotations } from "ui/reducers/reporter";
@@ -15,6 +15,7 @@ function maybeCorrectTestTimes(testCases: TestItem[], annotations: Annotation[])
 }
 
 export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
+  const [highlightedTest, setHighlightedTest] = useState<number | null>(null);
   const annotations = useAppSelector(getReporterAnnotations);
   const cypressResults = useFetchCypressSpec();
 
@@ -25,10 +26,21 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
     [testCases, annotations]
   );
 
+  const showTest = (index: number) => {
+    return highlightedTest === null || highlightedTest === index;
+  }
+
   return (
     <div className="flex flex-col space-y-1 px-4 py-2">
+      {highlightedTest !== null && <button onClick={() => setHighlightedTest(null)}>Show all ({testCases.length}) tests</button>}
       {correctedTestCases.map((t, i) => (
-        <TestCase test={t} key={i} location={cypressResults?.[i]?.location} />
+        showTest(i) && <TestCase
+          test={t}
+          key={i}
+          location={cypressResults?.[i]?.location}
+          setHighlightedTest={() => setHighlightedTest(i)}
+          isHighlighted={i === highlightedTest}
+        />
       ))}
     </div>
   );
