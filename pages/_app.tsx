@@ -1,8 +1,12 @@
+// ordering of these may not matter but no reason to reorder them with trunk if
+// the goal is to move these to CSS modules eventually anyway
+// trunk-ignore-begin(prettier)
 import "image/image.css";
 import "image/icon.css";
 import "tailwindcss/tailwind.css";
 import "devtools/client/debugger/src/components/variables.css";
 import "devtools/client/themes/variables.css";
+
 /////////////////// here be dragons ... ////////////////////
 import "codemirror/lib/codemirror.css";
 import "devtools/client/debugger/src/components/A11yIntention.css";
@@ -89,6 +93,8 @@ import "ui/components/Timeline/Timeline.css";
 import "ui/components/Timeline/Tooltip.css";
 import "ui/components/Toolbox.css";
 import "packages/third-party/sourcemap-visualizer/sourcemapVisualizer.css";
+// trunk-ignore-end(prettier)
+
 import "../src/test-prep";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Store } from "@reduxjs/toolkit";
