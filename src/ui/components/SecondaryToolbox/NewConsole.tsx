@@ -1,4 +1,4 @@
-import React, { KeyboardEvent, useContext } from "react";
+import React, { KeyboardEvent, Suspense, useContext } from "react";
 
 import NewConsole from "bvaughn-architecture-demo/components/console";
 import { ConsoleSearchContext } from "bvaughn-architecture-demo/components/console/ConsoleSearchContext";

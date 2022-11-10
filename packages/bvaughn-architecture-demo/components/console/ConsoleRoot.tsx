@@ -12,6 +12,7 @@ import {
 
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import Icon from "bvaughn-architecture-demo/components/Icon";
+import IndeterminateLoader from "bvaughn-architecture-demo/components/IndeterminateLoader";
 import Loader from "bvaughn-architecture-demo/components/Loader";
 import { ConsoleFiltersContextRoot } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
 import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
@@ -44,25 +45,27 @@ export default function ConsoleRoot({
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <ConsoleContextMenuContextRoot>
-      <ConsoleFiltersContextRoot>
-        <LoggablesContextRoot messageListRef={messageListRef}>
-          <ConsoleSearchContextRoot
-            messageListRef={messageListRef}
-            searchInputRef={searchInputRef}
-            showSearchInputByDefault={showSearchInputByDefault}
-          >
-            <Console
+    <Suspense fallback={<IndeterminateLoader />}>
+      <ConsoleContextMenuContextRoot>
+        <ConsoleFiltersContextRoot>
+          <LoggablesContextRoot messageListRef={messageListRef}>
+            <ConsoleSearchContextRoot
               messageListRef={messageListRef}
-              nagHeader={nagHeader}
               searchInputRef={searchInputRef}
-              showFiltersByDefault={showFiltersByDefault}
-              terminalInput={terminalInput}
-            />
-          </ConsoleSearchContextRoot>
-        </LoggablesContextRoot>
-      </ConsoleFiltersContextRoot>
-    </ConsoleContextMenuContextRoot>
+              showSearchInputByDefault={showSearchInputByDefault}
+            >
+              <Console
+                messageListRef={messageListRef}
+                nagHeader={nagHeader}
+                searchInputRef={searchInputRef}
+                showFiltersByDefault={showFiltersByDefault}
+                terminalInput={terminalInput}
+              />
+            </ConsoleSearchContextRoot>
+          </LoggablesContextRoot>
+        </ConsoleFiltersContextRoot>
+      </ConsoleContextMenuContextRoot>
+    </Suspense>
   );
 }
 
