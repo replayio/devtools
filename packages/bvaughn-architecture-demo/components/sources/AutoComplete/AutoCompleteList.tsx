@@ -115,6 +115,8 @@ export default function AutoCompleteListOuter({
         case "Enter": {
           const match = matches[selectedIndex];
           if (match) {
+            event.preventDefault();
+            event.stopPropagation();
             onSubmit(match);
           }
           break;
@@ -145,9 +147,11 @@ export default function AutoCompleteListOuter({
       setSelectedIndex(matches.length - 1);
     }
 
-    document.body.addEventListener("keydown", onKeyDown);
+    // Use capture so we can prevent Enter events from submitting the outer text
+    // if the user is focused on a match in the auto-complete list.
+    document.body.addEventListener("keydown", onKeyDown, true);
     return () => {
-      document.body.removeEventListener("keydown", onKeyDown);
+      document.body.removeEventListener("keydown", onKeyDown, true);
     };
   }, [matches, onSubmit, selectedIndex]);
 

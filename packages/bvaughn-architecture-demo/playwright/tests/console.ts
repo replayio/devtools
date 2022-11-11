@@ -388,7 +388,8 @@ test("should evaluate terminal expressions at an execution point", async ({ page
   await seekToMessage(page, listItem);
 
   await page.fill("[data-test-id=ConsoleTerminalInput]", "location.href");
-  await page.keyboard.press("Enter");
+  await page.keyboard.press("Enter"); // Accept auto-complete suggestion
+  await page.keyboard.press("Enter"); // Submit expression
 
   const newListItem = await locateMessage(page, "terminal-expression");
   await takeScreenshot(page, newListItem, "terminal-expression-at-execution-point");
@@ -436,7 +437,8 @@ test("should show a button to clear terminal expressions", async ({ page }) => {
 
   // Add some expressions
   await page.fill("[data-test-id=ConsoleTerminalInput]", "location.href");
-  await page.keyboard.press("Enter");
+  await page.keyboard.press("Enter"); // Accept auto-complete suggestion
+  await page.keyboard.press("Enter"); // Submit expression
   await page.fill("[data-test-id=ConsoleTerminalInput]", "+/local");
   await page.keyboard.press("Enter");
 

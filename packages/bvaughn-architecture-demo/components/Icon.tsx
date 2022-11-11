@@ -43,6 +43,8 @@ export default function Icon({
     | "share"
     | "source-explorer"
     | "spinner"
+    | "terminal-prompt"
+    | "terminal-result"
     | "up"
     | "view-function-source"
     | "view-html-element"
@@ -193,6 +195,17 @@ export default function Icon({
     case "spinner":
       path =
         "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z";
+      break;
+    case "terminal-prompt":
+      path = (
+        <g>
+          <polygon points="6.41,6 5,7.41 9.58,12 5,16.59 6.41,18 12.41,12" />
+          <polygon points="13,6 11.59,7.41 16.17,12 11.59,16.59 13,18 19,12" />
+        </g>
+      );
+      break;
+    case "terminal-result":
+      path = "M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z";
       break;
     case "up":
       path = "M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z";

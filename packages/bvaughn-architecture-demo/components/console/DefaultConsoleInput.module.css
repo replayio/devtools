@@ -1,0 +1,39 @@
+.Container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0.25em 0;
+  gap: 0.25em;
+  color: var(--color-default);
+  border-bottom-right-radius: 0.5em;
+  border-top: 1px solid var(--background-color-default);
+}
+
+.PromptRow,
+.ResultRow {
+  display: flex;
+  flex-direction: Row;
+  align-items: center;
+  gap: 1ch;
+  min-height: 1.5em;
+  padding: 0 1ch;
+}
+
+.Input {
+  min-width: 100%;
+  outline: none;
+
+  line-height: 1.5em;
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-regular);
+}
+
+.Icon {
+  flex: 0 0 1em;
+  width: 1em;
+  height: 1em;
+  color: var(--color-dim);
+}

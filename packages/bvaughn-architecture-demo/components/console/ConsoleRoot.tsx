@@ -23,6 +23,7 @@ import { ConsoleContextMenuContextRoot } from "./ConsoleContextMenuContext";
 import ConsoleSearch from "./ConsoleSearch";
 import { ConsoleSearchContext, ConsoleSearchContextRoot } from "./ConsoleSearchContext";
 import ContextMenu from "./ContextMenu";
+import DefaultConsoleInput from "./DefaultConsoleInput";
 import FilterText from "./filters/FilterText";
 import FilterToggles from "./filters/FilterToggles";
 import { LoggablesContextRoot } from "./LoggablesContext";
@@ -33,7 +34,7 @@ export default function ConsoleRoot({
   nagHeader = null,
   showFiltersByDefault = true,
   showSearchInputByDefault = true,
-  terminalInput = null,
+  terminalInput = <DefaultConsoleInput />,
 }: {
   filterDrawerOpenDefault?: boolean;
   nagHeader?: ReactNode;

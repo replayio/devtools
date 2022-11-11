@@ -1,8 +1,4 @@
 .Input {
-  /* Allows height for horizontal scrollbar without shifting text */
-  height: 2.5em;
-  line-height: 2.5em;
-
   background: transparent;
   border: none;
   outline: none;

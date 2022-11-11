@@ -138,6 +138,11 @@
 .ContentInput,
 .ContentInputWithNag {
   width: 100%;
+
+  /* Allows height for horizontal scrollbar without shifting text */
+  height: 2.5em;
+  line-height: 1.5em;
+  padding: 0.5em 0;
 }
 .ContentInputWithNag::selection {
   background-color: var(--nag-background-color);
