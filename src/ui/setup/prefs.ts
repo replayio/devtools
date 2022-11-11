@@ -1,14 +1,10 @@
 import { RecordingId } from "@replayio/protocol";
 import debounce from "lodash/debounce";
 
-import { getTabs } from "devtools/client/debugger/src/reducers/tabs";
-import {
-  asyncStore as debuggerAsyncPrefs,
-  prefs as debuggerPrefs,
-} from "devtools/client/debugger/src/utils/prefs";
+import { Tab, getTabs } from "devtools/client/debugger/src/reducers/tabs";
+import { prefs as debuggerPrefs } from "devtools/client/debugger/src/utils/prefs";
 import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
 import { UIStore } from "ui/actions";
-import { getRecording } from "ui/hooks/recordings";
 import { getTheme } from "ui/reducers/app";
 import {
   getLocalNags,
@@ -19,7 +15,7 @@ import {
   getViewMode,
 } from "ui/reducers/layout";
 import { UIState } from "ui/state";
-import { ToolboxLayout, ViewMode } from "ui/state/layout";
+import { PrimaryPanelName, SecondaryPanelName, ToolboxLayout, ViewMode } from "ui/state/layout";
 import { asyncStore, prefs } from "ui/utils/prefs";
 import { getRecordingId } from "ui/utils/recording";
 
@@ -30,7 +26,10 @@ export interface ReplaySession {
   viewMode: ViewMode;
   showVideoPanel: boolean;
   toolboxLayout: ToolboxLayout;
-  localNags: string[];
+  selectedPrimaryPanel: PrimaryPanelName;
+  selectedPanel: SecondaryPanelName;
+  localNags: LocalNag[];
+  tabs: Tab[];
 }
 
 export function registerStoreObserver(
@@ -104,29 +103,11 @@ async function getReplaySessions() {
   return replaySessions;
 }
 
-export async function getReplaySession(recordingId: RecordingId) {
+export async function getReplaySession(
+  recordingId: RecordingId
+): Promise<ReplaySession | undefined> {
   return (await asyncStore.replaySessions)[recordingId];
 }
-
-export const getLocalReplaySessionPrefs = async () => {
-  const recordingId = getRecordingId();
-
-  // If we're in the library, there are no preferences to fetch.
-  if (!recordingId) {
-    return null;
-  }
-
-  let recording;
-  try {
-    recording = await getRecording(recordingId);
-  } catch (e) {
-    return null;
-  }
-
-  const session = await getReplaySession(recordingId);
-
-  return session;
-};
 
 export enum LocalNag {
   // Yank the user's select left sidebar panel to show the explorer (sources + outline)

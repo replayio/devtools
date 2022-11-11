@@ -56,16 +56,6 @@ export function getTabMenuItems() {
   };
 }
 
-export function isSimilarTab(tab: Tab, url: string, isOriginal?: boolean) {
-  return tab.url === url && tab.isOriginal === isOriginal;
-}
-
-export function persistTabs(tabs: Tab[]) {
-  return [...tabs]
-    .filter(tab => tab.url)
-    .map(tab => {
-      const newTab = { ...tab };
-      newTab.sourceId = null;
-      return newTab;
-    });
+export function persistTabs(tabs: Tab[]): Tab[] {
+  return tabs.filter(tab => tab.url).map(tab => ({ url: tab.url, sourceId: "" }));
 }

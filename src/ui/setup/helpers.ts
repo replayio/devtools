@@ -22,7 +22,7 @@ declare global {
     local: () => void;
     prod: () => void;
     clearIndexedDB: () => void;
-    replaySession: Promise<ReplaySession> | undefined;
+    replaySession: ReplaySession | undefined;
     triggerEvent: typeof triggerEvent;
     sendMessage: typeof sendMessage;
     releaseSession: () => void;
