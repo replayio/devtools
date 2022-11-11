@@ -17,17 +17,17 @@ import { isPointInRegions } from "shared/utils/time";
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
 import EagerEvaluationResult from "./EagerEvaluationResult";
 import useTerminalHistory from "./hooks/useTerminalHistory";
-import styles from "./DefaultConsoleInput.module.css";
+import styles from "./ConsoleInput.module.css";
 
-export default function DefaultConsoleInput() {
+export default function ConsoleInput() {
   return (
     <Suspense fallback={<Loader />}>
-      <DefaultConsoleInputSuspends />
+      <ConsoleInputSuspends />
     </Suspense>
   );
 }
 
-function DefaultConsoleInputSuspends() {
+function ConsoleInputSuspends() {
   const replayClient = useContext(ReplayClientContext);
   const [searchState, searchActions] = useContext(ConsoleSearchContext);
   const { addMessage } = useContext(TerminalContext);

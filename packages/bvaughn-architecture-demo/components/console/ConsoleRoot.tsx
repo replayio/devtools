@@ -20,10 +20,10 @@ import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/Terminal
 import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
 
 import { ConsoleContextMenuContextRoot } from "./ConsoleContextMenuContext";
+import ConsoleInput from "./ConsoleInput";
 import ConsoleSearch from "./ConsoleSearch";
 import { ConsoleSearchContext, ConsoleSearchContextRoot } from "./ConsoleSearchContext";
 import ContextMenu from "./ContextMenu";
-import DefaultConsoleInput from "./DefaultConsoleInput";
 import FilterText from "./filters/FilterText";
 import FilterToggles from "./filters/FilterToggles";
 import { LoggablesContextRoot } from "./LoggablesContext";
@@ -168,7 +168,7 @@ function Console({
 
             <MessagesList ref={messageListRef} />
 
-            <DefaultConsoleInput />
+            <ConsoleInput />
 
             <ConsoleSearch className={styles.Row} searchInputRef={searchInputRef} />
           </div>
