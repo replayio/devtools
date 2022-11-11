@@ -11,7 +11,6 @@ import React, {
 import CommentList from "bvaughn-architecture-demo/components/comments/CommentList";
 import ConsoleRoot from "bvaughn-architecture-demo/components/console";
 import Focuser from "bvaughn-architecture-demo/components/console/Focuser";
-import Input from "bvaughn-architecture-demo/components/console/Input";
 import Icon from "bvaughn-architecture-demo/components/Icon";
 import Initializer from "bvaughn-architecture-demo/components/Initializer";
 import LazyOffscreen from "bvaughn-architecture-demo/components/LazyOffscreen";
@@ -129,14 +128,7 @@ export default function HomePage() {
                         </div>
                         <div className={styles.ConsoleContainer}>
                           <TerminalContextRoot>
-                            <ConsoleRoot
-                              showSearchInputByDefault={false}
-                              terminalInput={
-                                <Suspense fallback={<Loader />}>
-                                  <Input />
-                                </Suspense>
-                              }
-                            />
+                            <ConsoleRoot showSearchInputByDefault={false} />
                           </TerminalContextRoot>
                         </div>
                       </div>

@@ -1,8 +1,4 @@
-import { Suspense } from "react";
-
 import ConsoleRoot from "bvaughn-architecture-demo/components/console";
-import Input from "bvaughn-architecture-demo/components/console/Input";
-import Loader from "bvaughn-architecture-demo/components/Loader";
 import { FocusContextRoot } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import { KeyboardModifiersContextRoot } from "bvaughn-architecture-demo/src/contexts/KeyboardModifiersContext";
 import { PointsContextRoot } from "bvaughn-architecture-demo/src/contexts/PointsContext";
@@ -25,14 +21,7 @@ function Console() {
               <div className={styles.Grid1Column}>
                 <div className={styles.VerticalContainer}>
                   <TerminalContextRoot>
-                    <ConsoleRoot
-                      showSearchInputByDefault={false}
-                      terminalInput={
-                        <Suspense fallback={<Loader />}>
-                          <Input />
-                        </Suspense>
-                      }
-                    />
+                    <ConsoleRoot showSearchInputByDefault={false} />
                   </TerminalContextRoot>
                 </div>
               </div>

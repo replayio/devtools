@@ -14,7 +14,7 @@ import {
 import styles from "./AutoComplete.module.css";
 
 export default function AutoComplete({
-  autoFocus,
+  autoFocus = false,
   className = "",
   dataTestId,
   dataTestName,
@@ -23,7 +23,7 @@ export default function AutoComplete({
   onSubmit: onSubmitProp,
   value,
 }: {
-  autoFocus: boolean;
+  autoFocus?: boolean;
   className: string;
   dataTestId?: string;
   dataTestName?: string;
@@ -86,9 +86,7 @@ export default function AutoComplete({
     switch (event.key) {
       case "Enter": {
         event.preventDefault();
-        if (!expression) {
-          onSubmitProp();
-        }
+        onSubmitProp();
         break;
       }
       case "Escape": {
