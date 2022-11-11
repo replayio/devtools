@@ -21,10 +21,10 @@ import { getUserInfo } from "ui/hooks/users";
 import { getTheme, initialAppState } from "ui/reducers/app";
 import { syncInitialLayoutState } from "ui/reducers/layout";
 import { getCorrespondingSourceIds } from "ui/reducers/sources";
-import { getReplaySession } from "ui/setup/prefs";
+import { ReplaySession, getReplaySession } from "ui/setup/prefs";
 import type { LayoutState } from "ui/state/layout";
 import { Recording } from "ui/types";
-import { setAccessTokenInBrowserPrefs, setUserInBrowserPrefs } from "ui/utils/browser";
+import { setUserInBrowserPrefs } from "ui/utils/browser";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
 import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
 import { getPreferredLocation } from "ui/utils/preferredLocation";
@@ -48,7 +48,10 @@ declare global {
 let store: UIStore;
 export type AppDispatch = typeof store.dispatch;
 
-const getDefaultSelectedPrimaryPanel = (session: any, recording?: Recording) => {
+const getDefaultSelectedPrimaryPanel = (
+  session: ReplaySession | undefined,
+  recording?: Recording
+) => {
   if (session) {
     return session.selectedPrimaryPanel;
   }

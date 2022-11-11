@@ -13,12 +13,13 @@ import { UIThunkAction } from "ui/actions";
 import {
   MiniSource,
   SourceDetails,
+  clearSelectedLocation,
   getSourceToDisplayForUrl,
   isOriginalSource,
 } from "ui/reducers/sources";
 
 import type { Context } from "../reducers/pause";
-import { getNewSelectedSourceId, getSourceTabs } from "../selectors";
+import { getNewSelectedSourceId, getTabs } from "../selectors";
 import { removeDocument } from "../utils/editor";
 import { selectSource } from "./sources";
 
@@ -32,14 +33,6 @@ export function updateTab(source: SourceDetails, framework: string) {
     framework,
     isOriginal,
     sourceId,
-  };
-}
-
-export function moveTab(url: string, tabIndex: number) {
-  return {
-    type: "MOVE_TAB",
-    url,
-    tabIndex,
   };
 }
 
@@ -59,11 +52,15 @@ export function closeTab(cx: Context, source: MiniSource): UIThunkAction {
   return (dispatch, getState) => {
     removeDocument(source.id);
 
-    const tabs = getSourceTabs(getState());
+    const tabs = getTabs(getState());
     dispatch({ type: "CLOSE_TAB", source });
 
     const sourceId = getNewSelectedSourceId(getState(), tabs);
-    dispatch(selectSource(cx, sourceId));
+    if (sourceId) {
+      dispatch(selectSource(cx, sourceId));
+    } else {
+      dispatch(clearSelectedLocation());
+    }
   };
 }
 
@@ -75,11 +72,15 @@ export function closeTabs(cx: Context, urls: string[]): UIThunkAction {
   return (dispatch, getState) => {
     const sources = urls.map(url => getSourceToDisplayForUrl(getState(), url)!).filter(Boolean);
 
-    const tabs = getSourceTabs(getState());
+    const tabs = getTabs(getState());
     sources.forEach(source => removeDocument(source.id));
     dispatch({ type: "CLOSE_TABS", sources });
 
     const sourceId = getNewSelectedSourceId(getState(), tabs);
-    dispatch(selectSource(cx, sourceId));
+    if (sourceId) {
+      dispatch(selectSource(cx, sourceId));
+    } else {
+      dispatch(clearSelectedLocation());
+    }
   };
 }

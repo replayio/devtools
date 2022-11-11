@@ -9,14 +9,10 @@ import {
   MiniSource,
   SourceDetails,
   getSelectedLocation,
-  getSourceDetails,
   getSourceDetailsEntities,
-  getSourceIdToDisplayForUrl,
   locationSelected,
 } from "ui/reducers/sources";
 import type { UIState } from "ui/state";
-
-import { isSimilarTab } from "../utils/tabs";
 
 /**
  * Tabs reducer
@@ -24,9 +20,7 @@ import { isSimilarTab } from "../utils/tabs";
  */
 
 export interface Tab {
-  sourceId: string | null;
-  framework?: string | null;
-  isOriginal?: boolean;
+  sourceId: string;
   url: string;
 }
 
@@ -39,7 +33,7 @@ export const tabsRestored = createAction<SourceDetails[]>("tabs/tabsRestored");
 export const EMPTY_TABS: Tab[] = [];
 
 function initialTabState() {
-  return { tabs: [] };
+  return { tabs: EMPTY_TABS };
 }
 
 function update(state: TabsState = initialTabState(), action: AnyAction) {
@@ -48,8 +42,6 @@ function update(state: TabsState = initialTabState(), action: AnyAction) {
     case "UPDATE_TAB":
       return updateTabList(state, action as any);
 
-    case "MOVE_TAB":
-      return moveTabInList(state, action as any);
     case "MOVE_TAB_BY_SOURCE_ID":
       return moveTabInListBySourceId(state, action as any);
 
@@ -60,7 +52,7 @@ function update(state: TabsState = initialTabState(), action: AnyAction) {
       return removeSourcesFromTabList(state, action as any);
 
     case tabsRestored.type:
-      return addVisibleTabs(state, action.payload);
+      return updateSourceIds(state, action.payload);
 
     case locationSelected.type: {
       return addSelectedSource(state, action.payload.source);
@@ -80,58 +72,30 @@ function update(state: TabsState = initialTabState(), action: AnyAction) {
  * @memberof reducers/tabs
  * @static
  */
-export function getNewSelectedSourceId(state: UIState, tabList: Tab[]) {
+export function getNewSelectedSourceId(state: UIState, tabListBeforeClosing: Tab[]) {
   const selectedLocation = getSelectedLocation(state);
-  const availableTabs = state.tabs.tabs;
   if (!selectedLocation) {
-    return "";
+    return;
   }
 
-  const selectedTab = getSourceDetails(state, selectedLocation.sourceId);
-  if (!selectedTab) {
-    return "";
+  const availableTabs = getTabs(state);
+  if (availableTabs.some(tab => tab.sourceId === selectedLocation.sourceId)) {
+    return selectedLocation.sourceId;
   }
 
-  const matchingTab = availableTabs.find(tab => isSimilarTab(tab, selectedTab.url!));
-
-  if (matchingTab) {
-    const selectedSourceId = getSourceIdToDisplayForUrl(state, selectedTab.url!);
-
-    if (selectedSourceId) {
-      return selectedSourceId;
-    }
-
-    return "";
-  }
-
-  const tabUrls = tabList.map(t => t.url);
-  const leftNeighborIndex = Math.max(tabUrls.indexOf(selectedTab.url!) - 1, 0);
+  const leftNeighborIndex = Math.max(
+    tabListBeforeClosing.findIndex(tab => tab.sourceId === selectedLocation.sourceId) - 1,
+    0
+  );
   const lastAvailbleTabIndex = availableTabs.length - 1;
   const newSelectedTabIndex = Math.min(leftNeighborIndex, lastAvailbleTabIndex);
   const availableTab = availableTabs[newSelectedTabIndex];
 
-  if (availableTab?.sourceId) {
-    return availableTab.sourceId;
-  }
-
-  return "";
-}
-
-function matchesSource(tab: Tab, source: MiniSource) {
-  return tab.sourceId === source.id || matchesUrl(tab, source);
-}
-
-function matchesUrl(tab: Tab, source: MiniSource) {
-  return tab.url === source.url;
+  return availableTab?.sourceId;
 }
 
 function addSelectedSource(state: TabsState, source: MiniSource) {
-  if (
-    state.tabs
-      .filter(({ sourceId }) => sourceId)
-      .map(({ sourceId }) => sourceId)
-      .includes(source.id)
-  ) {
+  if (state.tabs.some(tab => tab.sourceId === source.id)) {
     return state;
   }
 
@@ -141,11 +105,11 @@ function addSelectedSource(state: TabsState, source: MiniSource) {
   });
 }
 
-function addVisibleTabs(state: TabsState, sources: MiniSource[]) {
+function updateSourceIds(state: TabsState, sources: MiniSource[]) {
   const tabCount = state.tabs.filter(({ sourceId }) => sourceId).length;
   const tabs = state.tabs
     .map(tab => {
-      const source = sources.find(src => matchesUrl(tab, src));
+      const source = sources.find(src => tab.url === src.url);
       if (!source) {
         return tab;
       }
@@ -162,18 +126,13 @@ function addVisibleTabs(state: TabsState, sources: MiniSource[]) {
 
 function removeSourceFromTabList(state: TabsState, { source }: { source: MiniSource }) {
   const { tabs } = state;
-  const newTabs = tabs.filter(tab => !matchesSource(tab, source));
+  const newTabs = tabs.filter(tab => tab.sourceId !== source.id);
   return { tabs: newTabs };
 }
 
 function removeSourcesFromTabList(state: TabsState, { sources }: { sources: MiniSource[] }) {
   const { tabs } = state;
-
-  const newTabs = sources.reduce(
-    (tabList, source) => tabList.filter(tab => !matchesSource(tab, source)),
-    tabs
-  );
-
+  const newTabs = tabs.filter(tab => !sources.some(source => tab.sourceId === source.id));
   return { tabs: newTabs };
 }
 
@@ -186,18 +145,19 @@ function updateTabList(state: TabsState, { url, sourceId }: { url: string; sourc
   let { tabs } = state;
   // Set currentIndex to -1 for URL-less tabs so that they aren't
   // filtered by isSimilarTab
-  const currentIndex = url ? tabs.findIndex(tab => isSimilarTab(tab, url)) : -1;
+  const currentIndex = tabs.findIndex(tab => tab.sourceId === sourceId);
 
   if (currentIndex === -1) {
     const newTab = { url, sourceId };
     tabs = [newTab, ...tabs];
+    return { ...state, tabs };
   }
 
-  return { ...state, tabs };
+  return state;
 }
 
 // Source: https://github.com/sindresorhus/array-move/blob/main/index.js
-function arrayMove(array: any[], fromIndex: number, toIndex: number) {
+function arrayMove<T>(array: T[], fromIndex: number, toIndex: number): T[] {
   let resultArray = array;
   const startIndex = fromIndex < 0 ? array.length + fromIndex : fromIndex;
 
@@ -211,16 +171,6 @@ function arrayMove(array: any[], fromIndex: number, toIndex: number) {
   }
 
   return resultArray;
-}
-
-function moveTabInList(
-  state: TabsState,
-  { url, tabIndex: newIndex }: { url: string; tabIndex: number }
-) {
-  let { tabs } = state;
-  const currentIndex = tabs.findIndex(tab => tab.url == url);
-  tabs = arrayMove(tabs, currentIndex, newIndex);
-  return { tabs };
 }
 
 function moveTabInListBySourceId(
@@ -237,21 +187,16 @@ function moveTabInListBySourceId(
 
 export const getTabs = (state: UIState) => state?.tabs.tabs ?? EMPTY_TABS;
 
-export const getSourceTabs = createSelector(
-  (state: UIState) => state.tabs,
-  ({ tabs }) => tabs.filter(tab => tab.sourceId)
-);
-
 export const getSourcesForTabs = createSelector(
-  getSourceTabs,
+  getTabs,
   getSourceDetailsEntities,
   (tabs, detailsEntities) => {
-    return tabs.map(tab => detailsEntities[tab.sourceId!]!).filter(Boolean);
+    return tabs.map(tab => detailsEntities[tab.sourceId]!).filter(Boolean);
   }
 );
 
 export function getTabExists(state: UIState, sourceId: string) {
-  return !!getSourceTabs(state).find(tab => tab.sourceId == sourceId);
+  return !!getTabs(state).find(tab => tab.sourceId == sourceId);
 }
 
 export default update;
