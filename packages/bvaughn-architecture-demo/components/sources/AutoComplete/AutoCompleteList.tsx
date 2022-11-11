@@ -118,15 +118,22 @@ export default function AutoCompleteListOuter({
           if (match) {
             event.preventDefault();
             event.stopPropagation();
+
             onSubmit(match);
           }
           break;
         }
         case "ArrowDown": {
+          event.preventDefault();
+          event.stopPropagation();
+
           nextIndex = selectedIndex + 1 < matches.length ? selectedIndex + 1 : 0;
           break;
         }
         case "ArrowUp": {
+          event.preventDefault();
+          event.stopPropagation();
+
           nextIndex = selectedIndex > 0 ? selectedIndex - 1 : 0;
           break;
         }
