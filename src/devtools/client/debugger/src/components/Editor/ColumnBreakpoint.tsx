@@ -71,7 +71,7 @@ export default function ColumnBreakpoint({
     });
 
     const bookmark = doc.setBookmark(
-      { line: point.location.line, ch: point.location.column },
+      { line: point.location.line - 1, ch: point.location.column },
       { widget }
     );
 
