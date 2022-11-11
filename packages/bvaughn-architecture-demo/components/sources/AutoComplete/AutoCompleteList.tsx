@@ -112,7 +112,8 @@ export default function AutoCompleteListOuter({
     const onKeyDown = (event: KeyboardEvent) => {
       let nextIndex: number | null = null;
       switch (event.key) {
-        case "Enter": {
+        case "Enter":
+        case "Tab": {
           const match = matches[selectedIndex];
           if (match) {
             event.preventDefault();
