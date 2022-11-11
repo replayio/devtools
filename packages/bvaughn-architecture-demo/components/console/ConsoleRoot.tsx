@@ -34,13 +34,11 @@ export default function ConsoleRoot({
   nagHeader = null,
   showFiltersByDefault = true,
   showSearchInputByDefault = true,
-  terminalInput = <DefaultConsoleInput />,
 }: {
   filterDrawerOpenDefault?: boolean;
   nagHeader?: ReactNode;
   showFiltersByDefault?: boolean;
   showSearchInputByDefault?: boolean;
-  terminalInput?: ReactNode;
 }) {
   const messageListRef = useRef<HTMLElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -60,7 +58,6 @@ export default function ConsoleRoot({
                 nagHeader={nagHeader}
                 searchInputRef={searchInputRef}
                 showFiltersByDefault={showFiltersByDefault}
-                terminalInput={terminalInput}
               />
             </ConsoleSearchContextRoot>
           </LoggablesContextRoot>
@@ -75,14 +72,12 @@ function Console({
   nagHeader = null,
   searchInputRef,
   showFiltersByDefault = true,
-  terminalInput = null,
 }: {
   messageListRef: RefObject<HTMLElement>;
   filterDrawerOpenDefault?: boolean;
   nagHeader?: ReactNode;
   searchInputRef: RefObject<HTMLInputElement>;
   showFiltersByDefault?: boolean;
-  terminalInput?: ReactNode;
 }) {
   const [_, searchActions] = useContext(ConsoleSearchContext);
   const { clearMessages: clearConsoleEvaluations, messages: consoleEvaluations } =
@@ -173,13 +168,9 @@ function Console({
 
             <MessagesList ref={messageListRef} />
 
-            {terminalInput}
+            <DefaultConsoleInput />
 
-            <ConsoleSearch
-              className={styles.Row}
-              hideOnEscape={terminalInput !== null}
-              searchInputRef={searchInputRef}
-            />
+            <ConsoleSearch className={styles.Row} searchInputRef={searchInputRef} />
           </div>
         </ErrorBoundary>
       </Suspense>

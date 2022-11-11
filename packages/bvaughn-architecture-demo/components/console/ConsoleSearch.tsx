@@ -6,11 +6,9 @@ import styles from "./ConsoleSearch.module.css";
 
 export default function ConsoleSearch({
   className,
-  hideOnEscape,
   searchInputRef,
 }: {
   className: string;
-  hideOnEscape: boolean;
   searchInputRef: MutableRefObject<HTMLInputElement | null>;
 }) {
   const [searchState, searchActions] = useContext(ConsoleSearchContext);
@@ -22,10 +20,8 @@ export default function ConsoleSearch({
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
       case "Escape": {
-        if (hideOnEscape) {
-          event.preventDefault();
-          searchActions.hide();
-        }
+        event.preventDefault();
+        searchActions.hide();
         break;
       }
       case "Enter": {
