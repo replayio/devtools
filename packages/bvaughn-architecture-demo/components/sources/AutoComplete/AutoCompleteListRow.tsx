@@ -5,6 +5,7 @@ import styles from "./AutoCompleteListRow.module.css";
 export type ItemData = {
   matches: string[];
   onSubmit: (value: string) => void;
+  searchString: string;
   selectedIndex: number;
 };
 
@@ -17,7 +18,11 @@ export default function AutoCompleteListRow({
   index: number;
   style: CSSProperties;
 }) {
-  const match = data.matches[index];
+  const { matches, searchString } = data;
+
+  const match = matches[index];
+
+  let characterIndex = 0;
 
   return (
     <div
@@ -25,7 +30,19 @@ export default function AutoCompleteListRow({
       onClick={() => data.onSubmit(match)}
       style={style}
     >
-      {match}
+      {match.split("").map((char, index) => {
+        const searchCharacter = searchString[characterIndex];
+        if (char === searchCharacter) {
+          characterIndex++;
+          return (
+            <strong className={styles.Match} key={index}>
+              {char}
+            </strong>
+          );
+        } else {
+          return <span key={index}>{char}</span>;
+        }
+      })}
     </div>
   );
 }

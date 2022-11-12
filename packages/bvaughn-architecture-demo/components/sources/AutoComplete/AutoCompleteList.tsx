@@ -170,6 +170,7 @@ export default function AutoCompleteListOuter({
   const itemData: ItemData = {
     matches,
     onSubmit,
+    searchString: expressionTail || "",
     selectedIndex,
   };
 
