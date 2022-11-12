@@ -22,7 +22,49 @@ export default function AutoCompleteListRow({
 
   const match = matches[index];
 
-  let characterIndex = 0;
+  const children = [];
+
+  let currentSubString = "";
+  let currentSubStringIsMatch = null;
+  let searchIndex = 0;
+
+  for (let matchIndex = 0; matchIndex < match.length; matchIndex++) {
+    const searchCharacter = searchString[searchIndex];
+    const matchCharacter = match[matchIndex];
+    const isMatch = searchCharacter === matchCharacter;
+
+    if (isMatch) {
+      searchIndex++;
+    }
+
+    if (isMatch !== currentSubStringIsMatch) {
+      if (currentSubString.length > 0) {
+        children.push(
+          <span
+            key={children.length}
+            className={currentSubStringIsMatch ? styles.Match : undefined}
+          >
+            {currentSubString}
+          </span>
+        );
+
+        currentSubString = "";
+        currentSubStringIsMatch = isMatch;
+      }
+    }
+
+    currentSubString += matchCharacter;
+  }
+
+  if (currentSubString.length > 0) {
+    children.push(
+      <span key={children.length} className={currentSubStringIsMatch ? styles.Match : undefined}>
+        {currentSubString}
+      </span>
+    );
+
+    currentSubString = "";
+  }
 
   return (
     <div
@@ -30,19 +72,7 @@ export default function AutoCompleteListRow({
       onClick={() => data.onSubmit(match)}
       style={style}
     >
-      {match.split("").map((char, index) => {
-        const searchCharacter = searchString[characterIndex];
-        if (char === searchCharacter) {
-          characterIndex++;
-          return (
-            <strong className={styles.Match} key={index}>
-              {char}
-            </strong>
-          );
-        } else {
-          return <span key={index}>{char}</span>;
-        }
-      })}
+      {children}
     </div>
   );
 }
