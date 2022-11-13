@@ -17,6 +17,8 @@ import { cacheFrames } from "./FrameCache";
 import { preCacheObjects } from "./ObjectPreviews";
 import { cacheScope } from "./ScopeCache";
 
+const callStacksByPauseId: Map<PauseId, CallStack | null> = new Map();
+
 export const {
   getValueSuspense: getPauseIdForExecutionPointSuspense,
   getValueAsync: getPauseIdForExecutionPointAsync,
@@ -54,12 +56,18 @@ export const {
   (pauseId, frameId, expression) => `${pauseId}:${frameId}:${expression}`
 );
 
+export function getCachedCallStackForPauseId(pauseId: PauseId): CallStack | null {
+  return callStacksByPauseId.get(pauseId) || null;
+}
+
 export function cachePauseData(
   client: ReplayClientInterface,
   pauseId: PauseId,
   pauseData: PauseData,
   stack?: CallStack
 ) {
+  callStacksByPauseId.set(pauseId, stack || null);
+
   if (pauseData.objects) {
     preCacheObjects(pauseId, pauseData.objects);
   }
