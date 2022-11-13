@@ -5,6 +5,7 @@ import Icon from "bvaughn-architecture-demo/components/Icon";
 import Loader from "bvaughn-architecture-demo/components/Loader";
 import AutoComplete from "bvaughn-architecture-demo/components/sources/AutoComplete/AutoComplete";
 import { SelectedFrameContext } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
+import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
 import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
 import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 import useLoadedRegions from "bvaughn-architecture-demo/src/hooks/useRegions";
@@ -15,22 +16,28 @@ import { isPointInRegions } from "shared/utils/time";
 
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
 import EagerEvaluationResult from "./EagerEvaluationResult";
-import styles from "./DefaultConsoleInput.module.css";
+import useTerminalHistory from "./hooks/useTerminalHistory";
+import styles from "./ConsoleInput.module.css";
 
-export default function DefaultConsoleInput() {
+export default function ConsoleInput() {
   return (
     <Suspense fallback={<Loader />}>
-      <DefaultConsoleInputSuspends />
+      <ConsoleInputSuspends />
     </Suspense>
   );
 }
 
-function DefaultConsoleInputSuspends() {
+function ConsoleInputSuspends() {
   const replayClient = useContext(ReplayClientContext);
   const [searchState, searchActions] = useContext(ConsoleSearchContext);
   const { addMessage } = useContext(TerminalContext);
   const { executionPoint, time } = useContext(TimelineContext);
+  const { recordingId } = useContext(SessionContext);
+
   const loadedRegions = useLoadedRegions(replayClient);
+
+  const [historyIndex, setHistoryIndex] = useState<number | null>(null);
+  const [expressionHistory, addExpression] = useTerminalHistory(recordingId);
 
   const ref = useRef<HTMLInputElement>(null);
   const searchStateVisibleRef = useRef(false);
@@ -63,6 +70,43 @@ function DefaultConsoleInputSuspends() {
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
+      case "ArrowDown": {
+        event.preventDefault();
+
+        if (historyIndex !== null) {
+          if (historyIndex + 1 < expressionHistory.length) {
+            const newIndex = historyIndex + 1;
+            const newExpression = expressionHistory[newIndex];
+
+            setHistoryIndex(newIndex);
+            setExpression(newExpression);
+          } else {
+            setHistoryIndex(null);
+            setExpression("");
+          }
+        }
+        break;
+      }
+      case "ArrowUp": {
+        event.preventDefault();
+
+        let newIndex = null;
+        let newExpression = null;
+
+        if (historyIndex === null) {
+          newIndex = expressionHistory.length - 1;
+          newExpression = expressionHistory[newIndex];
+        } else {
+          newIndex = historyIndex - 1;
+          newExpression = expressionHistory[newIndex];
+        }
+
+        if (newIndex >= 0 && newExpression != null) {
+          setHistoryIndex(newIndex);
+          setExpression(newExpression);
+        }
+        break;
+      }
       case "f":
       case "F": {
         if (event.ctrlKey || event.metaKey) {
@@ -88,6 +132,9 @@ function DefaultConsoleInputSuspends() {
         point: executionPoint || "",
         time: time || 0,
       });
+
+      setHistoryIndex(null);
+      addExpression(expression);
 
       setExpression("");
     }
