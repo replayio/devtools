@@ -1,14 +1,14 @@
 .Panel {
   display: flex;
   flex-direction: column;
-  background-color: var(--background-color-light);
+  background-color: var(--point-panel-background-color);
   padding: 1em;
   gap: 1em;
 }
 
 .Loader {
   height: var(--point-panel-height);
-  background-color: var(--background-color-light);
+  background-color: var(--point-panel-background-color);
   padding: 1em;
   display: flex;
   align-items: center;
@@ -43,7 +43,7 @@
 
 .FixedHeightRow {
   width: 100%;
-  flex: 0 0 3em;
+  flex: 0 0 0em;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -57,7 +57,7 @@
   height: 100%;
   flex: 1;
   background-color: var(--background-color-inputs);
-  border: 2px solid transparent;
+  border: 2px solid var(--point-panel-input-border-color);
   padding: 0 0.5em;
   border-radius: 0.5em;
   display: flex;
@@ -102,12 +102,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: 2em;
 }
 
 .EditButtonIcon {
   height: 1.5em;
   width: 1.5em;
-  fill: var(--color-default);
+  fill: var(--point-panel-input-edit-button-color);
 }
 
 .SaveButton {
@@ -119,7 +120,7 @@
   padding: 0 2ch;
 }
 .SaveButton:disabled {
-  background-color: var(--background-color-tertiary-button);
+  background-color: var(--primary-accent);
   color: var(--color-tertiary-button);
   opacity: 0.5;
 }
@@ -128,7 +129,7 @@
 .CancelButton {
   text-decoration: underline;
   font-size: var(--font-size-small);
-  color: var(--color-dim);
+  color: var(--primary-accent-text);
 }
 
 .CancelButton {

@@ -1,8 +1,8 @@
 .Container {
   flex-grow: 0;
   flex-shrink: 0;
-  height: 2em;
-  width: 2em;
+  height: 2.5em;
+  width: 2.5em;
   position: relative;
 }
 
@@ -17,9 +17,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 2em;
-  min-width: 2em;
-  border-radius: 2em;
+  height: 2.5em;
+  min-width: 2.5em;
+  border-radius: 2.5em;
+  font-weight: 600;
+  font-family: "Inter";
 }
 
 .PausedStyle {
@@ -51,8 +53,8 @@
 }
 
 .ButtonIcon {
-  height: 1em;
-  width: 1em;
+  height: 1.25em;
+  width: 1.25em;
   fill: currentColor;
 }
 

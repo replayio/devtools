@@ -65,11 +65,10 @@
   --border-color-error: #7a4242;
   --border-color-warning: #6f5920;
 
-  --color-hit-counts-bar-0: #445064;
   --color-hit-counts-bar-1: #2563be;
   --color-hit-counts-bar-2: #6ba6ff;
   --color-hit-counts-bar-3: #baecfa;
-  --color-hit-counts-label-background-1: #1c2b45;
+  --color-hit-counts-label-background-1: #192436;
   --color-hit-counts-label-background-2: #25364e;
   --color-hit-counts-label-background-3: #30404e;
   --color-hit-counts-label-color: #a4c6f8;
@@ -116,11 +115,14 @@
   --value-type-html-tag-bracket: #e6e9ec;
   --value-type-html-text: #d7d7db;
 
-  --point-panel-timeline-background-color: #464648;
+  --point-panel-background-color: #10151c;
   --point-panel-button-background-color: #8a8f95;
+  --point-panel-input-border-color: #222c3d;
+  --point-panel-input-edit-button-color: #9cb1dd;
   --point-panel-button-background-color-disabled: #464648;
   --point-panel-button-color: #0f1119;
   --point-panel-button-color-disabled: #2a2b30;
+  --point-panel-button-color-disabled: #9eb6d0;
 
   --badge-picker-background-color: #18181a;
   --badge-default-color: #8a8f95;
@@ -193,11 +195,10 @@
   --color-disabled-button: #ffffff;
   --color-warning: #6c5914;
 
-  --color-hit-counts-bar-0: #d9dad9;
   --color-hit-counts-bar-1: #bbeafa;
   --color-hit-counts-bar-2: #69a6ff;
   --color-hit-counts-bar-3: #2979ef;
-  --color-hit-counts-label-background-1: #f6fcfe;
+  --color-hit-counts-label-background-1: #fbfbfb;
   --color-hit-counts-label-background-2: #eaf3ff;
   --color-hit-counts-label-background-3: #e2ebfe;
   --color-hit-counts-label-color: #47628b;
@@ -244,11 +245,18 @@
   --value-type-html-tag-bracket: #0c0c0d;
   --value-type-html-text: #0c0c0d;
 
+<<<<<<< HEAD
+=======
+  --point-panel-background-color: #eef1f7;
+  --point-panel-input-background-color: #e6e6e6;
+  --point-panel-input-border-color: #dae5fd;
+  --point-panel-input-edit-button-color: #82a7f9;
+>>>>>>> 8a97cad0d (Polish print statement panel)
   --point-panel-timeline-background-color: #e6e6e6;
   --point-panel-button-background-color: #e6e6e6;
   --point-panel-button-background-color-disabled: #f0f0f0;
   --point-panel-button-color: #747476;
-  --point-panel-button-color-disabled: #d3d3d4;
+  --point-panel-button-color-disabled: #c5dff9;
 
   --badge-picker-background-color: #f9f9fa;
   --badge-default-color: #e6e6e6;

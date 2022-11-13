@@ -145,7 +145,7 @@
   height: var(--line-height);
 }
 .LineHitCountBar0 {
-  background-color: var(--color-hit-counts-bar-0);
+  background-color: var(--point-panel-background-color);
 }
 .LineHitCountBar1 {
   background-color: var(--color-hit-counts-bar-1);
@@ -167,6 +167,7 @@
   color: var(--color-hit-counts-label-color);
 }
 .LineHitCountLabel0 {
+  background-color: var(--color-hit-counts-label-background-1);
 }
 .LineHitCountLabel1 {
   background-color: var(--color-hit-counts-label-background-1);

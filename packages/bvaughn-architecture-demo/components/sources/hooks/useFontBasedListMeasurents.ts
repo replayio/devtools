@@ -13,10 +13,10 @@ type Measurements = {
 
 const REGULAR_SIZE: Measurements = {
   conditionalPointPanelHeight: 138,
-  pointPanelHeight: 94,
-  lineHeight: 15,
-  lineHeightWithPoint: 15 + 94,
-  lineHeightWithConditionalPoint: 15 + 138,
+  pointPanelHeight: 84,
+  lineHeight: 17,
+  lineHeightWithPoint: 17 + 84,
+  lineHeightWithConditionalPoint: 17 + 138,
 };
 const LARGE_SIZE: Measurements = {
   conditionalPointPanelHeight: 162,

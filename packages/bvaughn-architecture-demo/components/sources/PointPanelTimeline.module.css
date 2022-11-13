@@ -13,41 +13,45 @@
 
 .PreviousHitPointButton,
 .NextHitPointButton {
-  height: 1.5em;
-  width: 1.5em;
-  border-radius: 1.5em;
-  background-color: var(--point-panel-button-background-color);
-  color: var(--point-panel-button-color);
+  height: 1.75em;
+  width: 1.75em;
+  border-radius: 1.75em;
+  background-color: var(--body-bgcolor);
+  color: var(--primary-accent);
   padding: 0;
   transition: opacity 250ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .PreviousHitPointButton:disabled,
 .NextHitPointButton:disabled {
-  background-color: var(--point-panel-button-background-color-disabled);
+  background-color: var(--body-bgcolor);
   color: var(--point-panel-button-color-disabled);
   cursor: default;
 }
 
 .PreviousHitPointButtonIcon,
 .NextHitPointButtonIcon {
-  height: 1.5em;
-  width: 1.5em;
+  height: 1.25em;
+  width: 1.25em;
 }
 
 .HitPointsLabel,
 .HitPointsLabelTooMany {
-  font-size: var(--font-size-tiny);
+  font-size: var(--font-size-medium);
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 3ch;
-  min-width: 10ch;
+  height: 1.75em;
+  min-width: 7ch;
   padding: 0 1ch;
   border-radius: 1em;
 
-  background-color: var(--badge-background-color);
-  color: var(--badge-color);
+  background-color: var(--body-bgcolor);
+  color: var(--primary-accent);
 }
 .HitPointsLabelTooMany {
 }
@@ -70,18 +74,18 @@
 
 .HitPointTimelineBackground {
   width: 100%;
-  height: 0.5em;
-  background-color: var(--point-panel-timeline-background-color);
-  border-radius: 0.5em;
+  height: 0.35em;
+  background-color: var(--body-bgcolor);
+  border-radius: 0.35em;
 }
 
 .HitPointButton,
 .HitPointButtonCurrent {
   position: absolute;
-  top: 1em;
+  top: 0.8em;
   margin: 0;
-  margin-top: -0.5em;
-  margin-left: -0.5em;
+  margin-top: -0.35em;
+  margin-left: -0.35em;
   padding: 0;
   border: 0;
   width: 1em;
@@ -107,9 +111,9 @@
 .ProgressBarPartiallyOpaque {
   position: absolute;
   left: 0;
-  height: 0.5em;
+  height: 0.35em;
   background-color: var(--color-brand);
-  border-radius: 0.5em;
+  border-radius: 0.35em;
 }
 .ProgressBarPartiallyOpaque {
   opacity: 0.5;
@@ -117,9 +121,9 @@
 
 .TimeTool {
   position: absolute;
-  padding: 0.25em 0.5em;
+  padding: 0.25em 0.35em;
   border-radius: 0.25em;
-  margin-top: -0.5em;
+  margin-top: -0.35em;
   background-color: var(--background-color-default);
   color: var(--color-default);
 }
