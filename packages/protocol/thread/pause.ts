@@ -51,7 +51,6 @@ export class Pause {
   time: number | null;
   hasFrames: boolean | null;
   createWaiter: Promise<void> | null;
-  frameSteps: Map<string, PointDescription[]>;
   repaintGraphicsWaiter: Deferred<repaintGraphicsResult | null> | undefined;
   mouseTargets: NodeBounds[] | undefined;
 
@@ -71,8 +70,6 @@ export class Pause {
     this.hasFrames = null;
 
     this.createWaiter = null;
-
-    this.frameSteps = new Map();
 
     EventEmitter.decorate<any, PauseEvent>(this);
   }
@@ -182,31 +179,5 @@ export class Pause {
     }
     this.repaintGraphicsWaiter.resolve(rv);
     return rv;
-  }
-
-  async getFrameSteps(frameId: FrameId) {
-    assert(this.createWaiter, "no createWaiter");
-    await this.createWaiter;
-
-    if (!this.frameSteps.has(frameId)) {
-      try {
-        const { steps } = await this.sendMessage(client.Pause.getFrameSteps, {
-          frameId,
-        });
-        for (const step of steps) {
-          this.ThreadFront.updateMappedLocation(step.frame);
-        }
-        this.frameSteps.set(frameId, steps);
-      } catch (e) {
-        // "There are too many points to complete this operation"
-        // is expected if the frame is too long and should not be treated as an error.
-        if (isCommandError(e, ProtocolError.TooManyPoints)) {
-          this.frameSteps.set(frameId, []);
-        } else {
-          throw e;
-        }
-      }
-    }
-    return this.frameSteps.get(frameId)!;
   }
 }

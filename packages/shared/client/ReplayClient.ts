@@ -340,6 +340,12 @@ export class ReplayClient implements ReplayClientInterface {
     return countsObject;
   }
 
+  async getFrameSteps(pauseId: PauseId, frameId: FrameId): Promise<PointDescription[]> {
+    const sessionId = this.getSessionIdThrows();
+    const { steps } = await client.Pause.getFrameSteps({ frameId }, sessionId, pauseId);
+    return steps;
+  }
+
   async getHitPointsForLocation(
     focusRange: TimeStampedPointRange | null,
     location: Location,

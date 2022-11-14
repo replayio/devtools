@@ -682,11 +682,6 @@ class _ThreadFront {
     await client.Network.findRequests({}, sessionId);
   }
 
-  getFrameSteps(pauseId: PauseId, frameId: FrameId) {
-    const pause = Pause.getById(pauseId)!;
-    return pause.getFrameSteps(frameId);
-  }
-
   // Replace the sourceId in a location with the first corresponding sourceId
   updateLocation(location: Location) {
     location.sourceId = this.getCorrespondingSourceIds(location.sourceId)[0];
