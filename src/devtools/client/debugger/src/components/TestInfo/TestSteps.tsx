@@ -1,7 +1,8 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
-import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
+import { playback, seekToTime, setTimelineToTime, startPlayback } from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem } from "ui/types";
@@ -23,6 +24,9 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
           argString={s.args?.toString()}
           parentId={s.parentId}
           error={!!s.error}
+          testEnd={test.steps[test.steps.length - 1].relativeStartTime + startTime}
+          testStart={test.steps[0].relativeStartTime + startTime}
+          isLast={steps.length - 1 === i}
         />
       ))}
       {test.error ? (
@@ -48,6 +52,9 @@ function TestStepItem({
   index,
   parentId,
   error,
+  testStart,
+  testEnd,
+  isLast,
 }: {
   testName: string;
   startTime: number;
@@ -56,6 +63,9 @@ function TestStepItem({
   index: number;
   parentId?: string;
   error?: boolean;
+  testEnd: number;
+  testStart: number;
+  isLast?: boolean;
 }) {
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
@@ -72,13 +82,22 @@ function TestStepItem({
   const onMouseLeave = () => {
     dispatch(setTimelineToTime(currentTime));
   };
+  const onPlayFromHere = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log("hi", { startTime, testEnd });
+    dispatch(startPlayback(testEnd));
+  };
+  const onReplay = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    dispatch(seekToTime(testStart, true));
+  };
 
   const pausedColor = error ? "border-l-red-500" : "border-l-green-500";
 
   return (
-    <button
+    <div
       onClick={onClick}
-      className={`relative flex items-center overflow-hidden border-b border-l-4 border-themeBase-90 bg-testsuitesStepsBgcolor pl-1 pr-3 font-mono ${
+      className={`group relative flex items-center overflow-hidden border-b border-l-4 border-themeBase-90 bg-testsuitesStepsBgcolor pl-1 pr-3 font-mono ${
         isPast || isPaused ? pausedColor : "border-l-transparent"
       }`}
       onMouseEnter={onMouseEnter}
@@ -92,6 +111,16 @@ function TestStepItem({
         </div>
         <div className="opacity-70">{argString}</div>
       </div>
-    </button>
+
+      {isLast && isPaused ? (
+        <div className="" onClick={onReplay}>
+          <MaterialIcon>replay</MaterialIcon>
+        </div>
+      ) : !isLast ? (
+        <div className="invisible group-hover:visible" onClick={onPlayFromHere}>
+          PFH
+        </div>
+      ) : null}
+    </div>
   );
 }

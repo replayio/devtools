@@ -299,7 +299,7 @@ export function togglePlayback(): UIThunkAction {
   };
 }
 
-export function startPlayback(): UIThunkAction {
+export function startPlayback(optTime?: number): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
     const currentTime = getCurrentTime(state);
@@ -308,7 +308,7 @@ export function startPlayback(): UIThunkAction {
       return;
     }
 
-    const endTime = getZoomRegion(state).endTime;
+    const endTime = optTime || getZoomRegion(state).endTime;
 
     const beginDate = Date.now();
     const beginTime = currentTime >= endTime ? 0 : currentTime;
@@ -347,7 +347,7 @@ export function replayPlayback(): UIThunkAction {
   };
 }
 
-function playback(beginTime: number, endTime: number): UIThunkAction {
+export function playback(beginTime: number, endTime: number): UIThunkAction {
   return async (dispatch, getState) => {
     let beginDate = Date.now();
     let currentDate = beginDate;
@@ -362,7 +362,8 @@ function playback(beginTime: number, endTime: number): UIThunkAction {
     };
     const shouldContinuePlayback = () => getPlayback(getState());
     prepareNextGraphics();
-
+    
+    console.log("again");
     while (shouldContinuePlayback()) {
       await new Promise(resolve => requestAnimationFrame(resolve));
       if (!shouldContinuePlayback()) {
