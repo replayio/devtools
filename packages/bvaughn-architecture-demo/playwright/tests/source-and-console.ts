@@ -117,8 +117,7 @@ test("should auto-suggestion text based on the current expression", async ({ pag
   await waitFor(async () => expect(await autoCompleteList.isVisible()).toBe(true));
   await takeScreenshot(page, autoCompleteList, "log-point-auto-complete-list-window.loc");
 
-  // Select the 2nd suggestion in the list: location
-  await page.keyboard.press("ArrowDown");
+  // Select the 1st suggestion in the list: location
   await page.keyboard.press("Enter");
   await takeScreenshot(page, pointPanelLocator, "log-point-auto-complete-text-window.location");
 });
