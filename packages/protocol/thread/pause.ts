@@ -5,10 +5,8 @@ import {
   NodeBounds,
   PauseData,
   PauseId,
-  PointDescription,
   SessionId,
   Value,
-  repaintGraphicsResult,
 } from "@replayio/protocol";
 
 import { ProtocolError, isCommandError } from "shared/utils/error";
@@ -51,7 +49,6 @@ export class Pause {
   time: number | null;
   hasFrames: boolean | null;
   createWaiter: Promise<void> | null;
-  repaintGraphicsWaiter: Deferred<repaintGraphicsResult | null> | undefined;
   mouseTargets: NodeBounds[] | undefined;
 
   // added by EventEmitter.decorate(ThreadFront)
@@ -163,21 +160,5 @@ export class Pause {
     const { returned, exception, failed, data } = result;
     this.addData(data);
     return { returned, exception, failed } as EvaluationResult;
-  }
-
-  async repaintGraphics(force = false) {
-    if (this.repaintGraphicsWaiter && !force) {
-      return this.repaintGraphicsWaiter.promise;
-    }
-    this.repaintGraphicsWaiter = defer();
-    let rv = null;
-    try {
-      await this.pauseIdWaiter.promise;
-      rv = await this.sendMessage(client.DOM.repaintGraphics, {});
-    } catch (e) {
-      console.error("DOM.repaintGraphics failed", e);
-    }
-    this.repaintGraphicsWaiter.resolve(rv);
-    return rv;
   }
 }

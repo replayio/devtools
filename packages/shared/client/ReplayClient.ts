@@ -33,6 +33,7 @@ import {
   getScopeResult,
   keyboardEvents,
   navigationEvents,
+  repaintGraphicsResult,
   searchSourceContentsMatches,
   sourceContentsChunk,
   sourceContentsInfo,
@@ -710,6 +711,11 @@ export class ReplayClient implements ReplayClientInterface {
         handlers.splice(index, 1);
       }
     }
+  }
+
+  repaintGraphics(pauseId: PauseId): Promise<repaintGraphicsResult> {
+    const sessionId = this.getSessionIdThrows();
+    return client.DOM.repaintGraphics({}, sessionId, pauseId);
   }
 
   /**

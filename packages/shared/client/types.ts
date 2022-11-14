@@ -37,6 +37,7 @@ import {
   getScopeResult,
   keyboardEvents,
   navigationEvents,
+  repaintGraphicsResult,
 } from "@replayio/protocol";
 
 import { AnalysisParams } from "protocol/analysisManager";
@@ -153,6 +154,7 @@ export interface ReplayClientInterface {
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   loadRegion(range: TimeRange, duration: number): Promise<void>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;
+  repaintGraphics(pauseId: PauseId): Promise<repaintGraphicsResult>;
   runAnalysis<Result>(analysisParams: RunAnalysisParams): Promise<Result[]>;
   searchFunctions(
     opts: {
