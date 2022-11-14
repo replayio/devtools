@@ -2,6 +2,7 @@
 node_modules
 public
 .github
+src/global-css.ts
 
 test/examples
 src/devtools/client/debugger/src/workers/parser/tests/fixtures

@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { GetStaticProps } from "next/types";
+import { GetServerSideProps, GetStaticProps } from "next/types";
 import React, { useContext, useEffect, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
@@ -209,7 +209,7 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 
 const ConnectedRecordingPage = connector(RecordingPage);
 
-export const getStaticProps: GetStaticProps = async function ({ params }) {
+export const getServerSideProps: GetServerSideProps = async function ({ params }) {
   const { id } = extractIdAndSlug(params?.id);
   return {
     props: {
@@ -217,10 +217,6 @@ export const getStaticProps: GetStaticProps = async function ({ params }) {
     },
   };
 };
-
-export async function getStaticPaths() {
-  return { fallback: "blocking", paths: [] };
-}
 
 type SSRProps = MetadataProps & { headOnly?: boolean };
 
