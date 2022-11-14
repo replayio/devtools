@@ -47,8 +47,17 @@ let sources: ProtocolSource[] | null = null;
 
 type MinMaxHitCountTuple = [minHitCount: number, maxHitCount: number];
 
-const sourceIdToHitCountsMap: Map<ProtocolSourceId, Record<LineNumberToHitCountMap>> = new Map();
-const sourceIdToMinMaxHitCountsMap: Map<ProtocolSourceId, MinMaxHitCountTuple> = new Map();
+type SourceIdAndFocusRange = string;
+
+// Source id, location range, and focus range to Record of hit counts;
+// this value is what drives Suspense.
+const hitCountRecordsMap: Map<string, Record<LineNumberToHitCountMap>> = new Map();
+// Source id and focus range to map of cached hit counts by line;
+// this map enables us to avoid re-requesting the same lines.
+const cachedHitCountsMap: Map<string, LineNumberToHitCountMap> = new Map();
+// Source id and focus range to the a tuple of min and max hit counts;
+// this value is updated as we fetch new hit counts for the source (and focus range)
+const minMaxHitCountsMap: Map<SourceIdAndFocusRange, MinMaxHitCountTuple> = new Map();
 const sourceIdToSourceContentsMap: Map<
   ProtocolSourceId,
   Record<ProtocolSourceContents>
@@ -158,14 +167,8 @@ export function getCachedMinMaxSourceHitCounts(
   sourceId: ProtocolSourceId,
   focusRange: TimeStampedPointRange | PointRange | null
 ): MinMaxHitCountTuple | [null, null] {
-  const pointRange = focusRange !== null ? toPointRange(focusRange) : null;
-
-  let key = `${sourceId}`;
-  if (pointRange !== null) {
-    key = `${key}:${pointRange.begin}:${pointRange.end}`;
-  }
-
-  return sourceIdToMinMaxHitCountsMap.get(key) || [null, null];
+  const key = sourceIdAndFocusRangeToKey(sourceId, focusRange);
+  return minMaxHitCountsMap.get(key) || [null, null];
 }
 
 export function getSourceHitCountsSuspense(
@@ -174,8 +177,6 @@ export function getSourceHitCountsSuspense(
   locationRange: SourceLocationRange,
   focusRange: TimeStampedPointRange | PointRange | null
 ): LineNumberToHitCountMap {
-  // TODO We could optimize this in some cases to filter in memory.
-
   // Focus range is tracked as TimeStampedPointRange.
   // For convenience, this public API accepts either type.
   let pointRange: PointRange | null = null;
@@ -195,14 +196,14 @@ export function getSourceHitCountsSuspense(
     key = `${key}:${pointRange.begin}:${pointRange.end}`;
   }
 
-  let record = sourceIdToHitCountsMap.get(key);
+  let record = hitCountRecordsMap.get(key);
   if (record == null) {
     record = {
       status: STATUS_PENDING,
       value: createWakeable<LineNumberToHitCountMap>(),
     };
 
-    sourceIdToHitCountsMap.set(key, record);
+    hitCountRecordsMap.set(key, record);
 
     // Suspense caches fire and forget; errors will be handled within the fetch function.
     fetchSourceHitCounts(client, sourceId, locationRange, pointRange, record, record.value);
@@ -342,32 +343,120 @@ async function fetchSourceHitCounts(
 ) {
   try {
     const [locations] = await getBreakpointPositionsAsync(client, sourceId);
-    const hitCounts = await client.getSourceHitCounts(
-      sourceId,
-      locationRange,
-      locations,
-      focusRange
-    );
 
-    {
+    // This Suspense cache works a little different from others,
+    // because the "key" includes a range of lines and we may have fetched some of them already.
+    // The first thing we should do then is decide if we need to fetch anything new,
+    // and then return a Map that contains the merged results.
+    //
+    // Note that we could also treat focus range in the same way (and refine in memory)
+    // but give that hit counts can overflow in some recordings (requiring the focus range to be shrunk)
+    // it's probably okay to just re-request when the focus range changes.
+
+    let protocolRequests: LineNumberToHitCountMap[] = [];
+
+    const key = sourceIdAndFocusRangeToKey(sourceId, focusRange);
+
+    let map = cachedHitCountsMap.get(key);
+    if (map == null) {
+      map = new Map(map);
+
+      cachedHitCountsMap.set(key, map);
+
+      // This is the first time we've fetched lines for this source+focus range.
+      // The fastest thing is to fetch all of them.
+      const hitCounts = await client.getSourceHitCounts(
+        sourceId,
+        locationRange,
+        locations,
+        focusRange
+      );
+
+      protocolRequests.push(hitCounts);
+    } else {
+      // We may have fetched some of these lines already.
+      // If so, we can skip fetching the ones we already have.
+
+      let startLineNumber = null;
+      let endLineNumber = null;
+      let promises: Promise<void>[] = [];
+
+      for (
+        let lineNumber = locationRange.start.line;
+        lineNumber <= locationRange.end.line;
+        lineNumber++
+      ) {
+        // If this is the last line, check if we should fetch a final chunk.
+        let shouldFetch = lineNumber === locationRange.end.line && startLineNumber !== null;
+
+        if (map.has(lineNumber)) {
+          // If we've reached the end of a range of unloaded lines, we should fetch them.
+          shouldFetch = startLineNumber != null;
+        } else {
+          if (startLineNumber === null) {
+            startLineNumber = lineNumber;
+          }
+          endLineNumber = lineNumber;
+        }
+
+        if (shouldFetch) {
+          const locationRange = {
+            start: {
+              line: startLineNumber!,
+              column: 0,
+            },
+            end: {
+              line: endLineNumber!,
+              column: Number.MAX_SAFE_INTEGER,
+            },
+          };
+
+          promises.push(
+            client
+              .getSourceHitCounts(sourceId, locationRange, locations, focusRange)
+              .then(hitCounts => {
+                protocolRequests.push(hitCounts);
+              })
+          );
+
+          startLineNumber = null;
+          endLineNumber = null;
+        }
+      }
+
+      if (promises.length > 0) {
+        await Promise.all(promises);
+      }
+    }
+
+    protocolRequests.forEach(hitCounts => {
+      hitCounts.forEach((hitCount, lineNumber) => {
+        map!.set(lineNumber, hitCount);
+      });
+
       // Refine cached min-max hit count as we load more information about a source.
       // Because hit counts may be filtered by a range of lines, this value may change as new information is loaded in.
-      const key =
-        focusRange === null ? `${sourceId}` : `${sourceId}:${focusRange.begin}:${focusRange.end}`;
-      let [minHitCount, maxHitCount] = sourceIdToMinMaxHitCountsMap.get(key) || [
-        Number.MAX_SAFE_INTEGER,
-        0,
-      ];
+      let [minHitCount, maxHitCount] = minMaxHitCountsMap.get(key) || [Number.MAX_SAFE_INTEGER, 0];
       hitCounts.forEach(hitCount => {
         const { count } = hitCount;
         minHitCount = Math.min(minHitCount, count);
         maxHitCount = Math.max(maxHitCount, count);
       });
-      sourceIdToMinMaxHitCountsMap.set(key, [minHitCount, maxHitCount]);
+      minMaxHitCountsMap.set(key, [minHitCount, maxHitCount]);
+    });
+
+    // At this point, we've fetched all of the data we need.
+    const mergedHitCounts: LineNumberToHitCountMap = new Map();
+    for (
+      let lineNumber = locationRange.start.line;
+      lineNumber <= locationRange.end.line;
+      lineNumber++
+    ) {
+      mergedHitCounts.set(lineNumber, map.get(lineNumber)!);
     }
 
     record.status = STATUS_RESOLVED;
-    record.value = hitCounts;
+    record.value = mergedHitCounts;
 
     wakeable.resolve(record.value);
   } catch (error) {
@@ -451,4 +540,16 @@ function toPointRange(range: TimeStampedPointRange | PointRange): PointRange {
       end: range.end.point,
     };
   }
+}
+
+function sourceIdAndFocusRangeToKey(
+  sourceId: ProtocolSourceId,
+  focusRange: TimeStampedPointRange | PointRange | null
+) {
+  let key = `${sourceId}`;
+  if (focusRange !== null) {
+    const pointRange = toPointRange(focusRange);
+    key = `${key}:${pointRange.begin}:${pointRange.end}`;
+  }
+  return key;
 }
