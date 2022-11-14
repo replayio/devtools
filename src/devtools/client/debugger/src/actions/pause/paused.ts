@@ -65,11 +65,16 @@ export function paused({
     // Now, we mimic that behavior by bailing out early if the passed-through `hasFrames` flag is false.
     // Yes, this means that `hasFrames` is a misleading name and we should fix that.
     const frames = await getFramesAsync(replayClient, pause.pauseId!);
-    if (!frames?.length || hasFrames === false) {
+    if (!frames?.length) {
       return;
     }
 
     dispatch(frameSelected({ cx, pauseId: pause.pauseId!, frameId: frames[0].frameId }));
+
+    if (hasFrames === false) {
+      return;
+    }
+
     const selectedFrame = frame || (await getSelectedFrameAsync(replayClient, getState()));
     if (selectedFrame) {
       const currentLocation = getSelectedLocation(getState());
