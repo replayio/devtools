@@ -222,7 +222,8 @@ export default function Login({
   const { loginWithRedirect, error } = useAuth0();
   const [sso, setSSO] = useState(false);
 
-  if (returnToPath.startsWith("/login")) {
+  const url = new URL(returnToPath, window.location.origin);
+  if (url.pathname === "/login" || (url.pathname === "/" && url.searchParams.has("state"))) {
     returnToPath = "/";
   }
 
