@@ -1,4 +1,4 @@
-import { ExecutionPoint, PauseData, PauseId } from "@replayio/protocol";
+import { ExecutionPoint, PauseId } from "@replayio/protocol";
 import React, {
   PropsWithChildren,
   useCallback,
@@ -12,10 +12,7 @@ import {
   TimelineContext,
   TimelineContextType,
 } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
-import {
-  getCachedCallStackForPauseId,
-  getPauseIdForExecutionPointIfCached,
-} from "bvaughn-architecture-demo/src/suspense/PauseCache";
+import { getPauseIdForExecutionPointIfCached } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { Pause, ThreadFront } from "protocol/thread";
 import { seek } from "ui/actions/timeline";
 import { getCurrentPoint } from "ui/reducers/app";
@@ -38,7 +35,6 @@ export default function TimelineContextAdapter({ children }: PropsWithChildren) 
   const update = useCallback(
     async (time: number, executionPoint: ExecutionPoint) => {
       let pauseId: PauseId | null = null;
-      let hasFrames = false;
 
       // Pre-cache Pause data (required by legacy app code) before calling seek().
       // The new Console doesn't load this data but the old one requires it.
@@ -48,12 +44,9 @@ export default function TimelineContextAdapter({ children }: PropsWithChildren) 
 
         const cachedPause = Pause.getById(cachedPauseId);
         if (!cachedPause) {
-          const stack = getCachedCallStackForPauseId(cachedPauseId);
-          hasFrames = stack !== null && stack.length > 0;
-
-          // It's okay to omit the PauseData parameter;
-          // The Suspense PauseCache has already cached the data in this case.
-          ThreadFront.instantiatePause(cachedPauseId, executionPoint, time, hasFrames);
+          const newPause = new Pause(ThreadFront);
+          newPause.instantiate(cachedPauseId, executionPoint, time, false);
+          await newPause.ensureLoaded();
         }
       } else {
         const pause = new Pause(ThreadFront);
@@ -63,7 +56,7 @@ export default function TimelineContextAdapter({ children }: PropsWithChildren) 
         pauseId = pause.pauseId;
       }
 
-      dispatch(seek(executionPoint, time, hasFrames, pauseId!));
+      dispatch(seek(executionPoint, time, false /* hasFrames */, pauseId!));
     },
     [dispatch]
   );
