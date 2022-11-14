@@ -9,12 +9,11 @@ import classnames from "classnames";
 import React, { Component, Suspense, useContext } from "react";
 import ReactTooltip from "react-tooltip";
 
-import { ThreadFront } from "protocol/thread/thread";
+import { getFrameStepsSuspense } from "bvaughn-architecture-demo/src/suspense/FrameStepsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { actions } from "ui/actions";
 import { SourcesState, getPreferredLocation, getSelectedLocation } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { getFrameStepsSuspense } from "ui/suspense/frameStepsCache";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { PartialLocation } from "../../actions/sources/select";
@@ -204,7 +203,7 @@ function FrameTimeline() {
   const selectedLocation = useAppSelector(getSelectedLocation);
   const selectedFrame = useAppSelector(state => getSelectedFrameSuspense(replayClient, state));
   const frameSteps = selectedFrame
-    ? getFrameStepsSuspense(selectedFrame.pauseId, selectedFrame.protocolId)
+    ? getFrameStepsSuspense(replayClient, selectedFrame.pauseId, selectedFrame.protocolId)
     : undefined;
   const dispatch = useAppDispatch();
 

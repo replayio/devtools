@@ -17,6 +17,7 @@ import {
   ObjectPreviewLevel,
   PauseData,
   PauseId,
+  PointDescription,
   PointRange,
   getPointsBoundingTimeResult as PointsBoundingTime,
   RecordingId,
@@ -122,6 +123,7 @@ export interface ReplayClientInterface {
   getCorrespondingLocations(location: Location): Location[];
   getCorrespondingSourceIds(sourceId: SourceId): SourceId[];
   getEventCountForTypes(eventTypes: EventHandlerType[]): Promise<Record<string, number>>;
+  getFrameSteps(pauseId: PauseId, frameId: FrameId): Promise<PointDescription[]>;
   getHitPointsForLocation(
     focusRange: TimeStampedPointRange | null,
     location: Location,

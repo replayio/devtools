@@ -94,7 +94,10 @@ export function sortFramesAndUpdateLocations(
   }
 }
 
-function updateMappedLocation(client: ReplayClientInterface, mappedLocation: MappedLocation) {
+export function updateMappedLocation(
+  client: ReplayClientInterface,
+  mappedLocation: MappedLocation
+) {
   for (const location of mappedLocation) {
     location.sourceId = client.getCorrespondingSourceIds(location.sourceId)[0];
   }

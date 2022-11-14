@@ -7,13 +7,13 @@ import type { FrameId, Location, PauseId, TimeStampedPoint, Value } from "@repla
 import findLast from "lodash/findLast";
 
 import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
+import { getFrameStepsAsync } from "bvaughn-architecture-demo/src/suspense/FrameStepsCache";
 import { compareNumericStrings } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
 import { getPreferredLocation } from "ui/reducers/sources";
 import { SourceDetails } from "ui/reducers/sources";
 import { getContextFromAction } from "ui/setup/redux/middleware/context";
 import type { UIState } from "ui/state";
-import { getFrameStepsAsync } from "ui/suspense/frameStepsCache";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 
 export interface Context {
@@ -283,7 +283,11 @@ async function getResumePoint(replayClient: ReplayClientInterface, state: UIStat
   if (!frames || !frame || frame === frames[0]) {
     return;
   }
-  const frameSteps = await getFrameStepsAsync(selectedFrameId.pauseId, selectedFrameId.frameId);
+  const frameSteps = await getFrameStepsAsync(
+    replayClient,
+    selectedFrameId.pauseId,
+    selectedFrameId.frameId
+  );
   if (!frameSteps) {
     return;
   }
