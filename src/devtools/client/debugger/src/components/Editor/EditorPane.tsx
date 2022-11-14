@@ -24,7 +24,7 @@ export const EditorPane = () => {
   const selectedSource = useAppSelector(getSelectedSource);
   const panelEl = useRef(null);
   const { value: enableLargeText } = useFeature("enableLargeText");
-  const { value: enableNewSourceViewer } = useFeature("newSourceViewer");
+  const { value: enableLegacySourceViewer } = useFeature("legacySourceViewer");
 
   const nodeWidth = useWidthObserver(panelEl);
 
@@ -64,7 +64,7 @@ export const EditorPane = () => {
         <EditorTabs />
         {selectedSource ? (
           <Redacted className="h-full">
-            {enableNewSourceViewer ? <NewSourceAdapter /> : <Editor />}
+            {enableLegacySourceViewer ? <Editor /> : <NewSourceAdapter />}
           </Redacted>
         ) : (
           <WelcomeBox />

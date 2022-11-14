@@ -41,12 +41,12 @@ function SourcesContextAdapter({ children }: { children: ReactNode }) {
   const selectedLineNumber = selectedLocation?.line || null;
   const selectedSourceId = selectedLocation?.sourceId || null;
 
-  const { value: enableNewSourceViewer } = useFeature("newSourceViewer");
+  const { value: enableLegacySourceViewer } = useFeature("legacySourceViewer");
 
   const { focusedSourceId, openSource } = useContext(SourcesContext);
 
   useLayoutEffect(() => {
-    if (enableNewSourceViewer) {
+    if (!enableLegacySourceViewer) {
       // The new Source viewer has its own context adapter, NewSourceAdapter.
       // This adapter can skip its update if the new Source viewer is enabled.
       return;
@@ -61,7 +61,7 @@ function SourcesContextAdapter({ children }: { children: ReactNode }) {
 
       openSource(selectedSourceId, lineNumber);
     }
-  }, [enableNewSourceViewer, focusedSourceId, openSource, selectedLineNumber, selectedSourceId]);
+  }, [enableLegacySourceViewer, focusedSourceId, openSource, selectedLineNumber, selectedSourceId]);
 
   return children as any;
 }

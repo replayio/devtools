@@ -3,7 +3,7 @@ import chalk from "chalk";
 
 import { openPauseInformationPanel } from "./pause-information-panel";
 import { openSource, openSourceExplorerPanel } from "./source-explorer-panel";
-import { clearTextArea, debugPrint, delay, mapLocators, waitFor } from "./utils";
+import { clearTextArea, debugPrint, delay, getCommandKey, mapLocators, waitFor } from "./utils";
 import { openDevToolsTab } from ".";
 
 export async function addBreakpoint(
@@ -32,62 +32,64 @@ export async function addBreakpoint(
   await scrollUntilLineIsVisible(page, lineNumber);
 
   const line = await getSourceLine(page, lineNumber);
-  await line.locator(".CodeMirror-linenumber").hover();
-  await line.locator(".CodeMirror-linenumber").click();
+  await line.locator('[data-test-id^="SourceLine-LineNumber"]').hover();
+  await line.locator('[data-test-id^="SourceLine-LineNumber"]').click();
 
   await waitForBreakpoint(page, options);
 }
 
 async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
-  let loopCounter = 0;
-
-  while (true) {
-    const visibleLineNumbers = await getVisibleLineNumbers(page);
-
-    if (visibleLineNumbers.includes(lineNumber)) {
-      break;
-    } else {
-      if (loopCounter > 10) {
-        throw new Error("Stuck in infinite scrolling loop looking for line: " + lineNumber);
-      }
-    }
-    // it must not be on screen, we have to scroll
-    const [first] = visibleLineNumbers;
-
-    const scrollUp = lineNumber < first;
-    const deltaY = scrollUp ? -500 : 500;
-    const scroller = page.locator(".CodeMirror-scroll").first();
-    await scroller.click();
-    await page.mouse.wheel(0, deltaY);
-    loopCounter++;
+  const lineLocator = await getSourceLine(page, lineNumber);
+  const lineIsVisible = await lineLocator.isVisible();
+  if (lineIsVisible) {
+    return;
   }
+
+  await debugPrint(page, `Scrolling to source line ${chalk.bold(lineNumber)}`, "goToLine");
+
+  await page.keyboard.down(getCommandKey());
+  await page.keyboard.type("g");
+  await page.keyboard.up(getCommandKey());
+
+  const input = page.locator("[data-test-id=QuickOpenInput]");
+  await input.focus();
+  await clearTextArea(page, input);
+  await page.keyboard.type(`:${lineNumber}`);
+  await page.keyboard.press("Enter");
+
+  await expect(lineLocator).toBeVisible();
 }
 
-async function getVisibleLineNumbers(page: Page) {
-  const lineNumberElements = page.locator(".CodeMirror-linenumber");
+async function getCurrentSource(page: Page): Promise<Locator | null> {
+  const sources = page.locator("[data-test-name=Source]");
+  for (let index = 0; index < (await sources.count()); index++) {
+    const source = sources.nth(index);
+    if (await source.isVisible()) {
+      return source;
+    }
+  }
 
-  // Start by finding all line number elements within the CodeMirror editor.
-  // For each element, retrieve its full bounding rect, and actual line number value.
-  const lineNumbersWithBounds = await lineNumberElements.evaluateAll(elements => {
-    const linesWithNumbers = elements.map(
-      el => [Number(el.textContent), el.getBoundingClientRect()] as const
-    );
-    return linesWithNumbers.sort((a, b) => {
-      // Sort lines in ascending numerical order
-      return a[0] - b[0];
-    });
-  });
+  return null;
+}
 
-  const codeMirrorElement = page.locator(".CodeMirror").first();
-  const codeMirrorBounds = await codeMirrorElement.evaluate(e => e.getBoundingClientRect());
+async function getVisibleLineNumbers(page: Page): Promise<number[]> {
+  const source = await getCurrentSource(page);
+  if (source === null) {
+    return [];
+  }
 
-  // If there's more lines than will fit on screen, CodeMirror will keep a buffer of up to
-  // 10 lines above or below the viewport. Filter it down to just lines that are visible.
-  const visibleLines = lineNumbersWithBounds
-    .filter(([lineNumber, lineBounds]) => {
-      return lineBounds.bottom > codeMirrorBounds.top && lineBounds.top < codeMirrorBounds.bottom;
-    })
-    .map(([lineNumber]) => lineNumber);
+  const visibleLines: number[] = [];
+
+  const lineNumbersLocator = source.locator('[data-test-id^="SourceLine-LineNumber"]');
+  for (let index = 0; index < (await lineNumbersLocator.count()); index++) {
+    const lineNumberLocator = lineNumbersLocator.nth(index);
+    if (await lineNumberLocator.isVisible()) {
+      const textContent = await lineNumberLocator.evaluate(
+        element => element.firstChild!.textContent
+      );
+      visibleLines.push(parseInt(textContent!));
+    }
+  }
 
   return visibleLines;
 }
@@ -118,15 +120,18 @@ export async function addLogpoint(
   }
 
   const line = await getSourceLine(page, lineNumber);
-  await line.waitFor();
-  await line.hover();
-  await line.locator('[data-test-id="ToggleLogpointButton"]').click();
+  const numberLocator = line.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
+  await numberLocator.waitFor();
+  await numberLocator.hover({ force: true });
+  const toggle = line.locator('[data-test-name="LogPointToggle"]');
+  await toggle.waitFor();
+  await toggle.click({ force: true });
 
   await waitForLogpoint(page, options);
 
   if (condition || content) {
-    const line = getSourceLine(page, lineNumber);
-    await line.locator('[data-test-name="LogpointContentSummary"]').click();
+    const line = await getSourceLine(page, lineNumber);
+    await line.locator('[data-test-name="PointPanel-EditButton"]').click();
 
     if (condition) {
       await debugPrint(
@@ -135,35 +140,27 @@ export async function addLogpoint(
         "addLogpoint"
       );
 
-      await line.locator('[data-test-name="EditLogpointConditionButton"]').click();
+      await line.locator('[data-test-name="PointPanel-AddConditionButton"]').click();
 
-      // Condition and content both have text areas.
-      await expect(line.locator("textarea")).toHaveCount(2);
-
-      const textArea = await line.locator("textarea").first();
-      await textArea.focus();
-      await clearTextArea(page, textArea);
+      const conditionInput = line.locator('[data-test-name="PointPanel-ConditionInput"]');
+      await conditionInput.focus();
+      await clearTextArea(page, conditionInput);
       await page.keyboard.type(condition);
     }
 
     if (content) {
       await debugPrint(page, `Setting log-point content "${chalk.bold(content)}"`, "addLogpoint");
 
-      // Condition and content both have text areas.
-      // Content will always be the last one regardless of whether the condition text area is visible.
-      const textArea = await line.locator("textarea").last();
-      await textArea.waitFor();
-      await textArea.focus();
-      await clearTextArea(page, textArea);
+      const contentInput = line.locator('[data-test-name="PointPanel-ContentInput"]');
+      await contentInput.focus();
+      await clearTextArea(page, contentInput);
       await page.keyboard.type(content);
     }
 
-    const saveButton = await line.locator('button[title="Save expression"]');
+    const saveButton = line.locator('[data-test-name="PointPanel-SaveButton"]');
     await expect(saveButton).toBeEnabled();
     await saveButton.click();
-
-    const textArea = await line.locator("textarea");
-    await textArea.waitFor({ state: "detached" });
+    await saveButton.waitFor({ state: "detached" });
   }
 }
 
@@ -180,17 +177,32 @@ export async function closeSource(page: Page, url: string): Promise<void> {
 }
 
 export async function getSelectedLineNumber(page: Page): Promise<number | null> {
-  const lineNumber = await page.locator(".new-debug-line .CodeMirror-linenumber");
+  let currentLineLocator = null;
+
+  const lineLocator = page.locator(`[data-test-id^=SourceLine`);
+  for (let index = 0; index < (await lineLocator.count()); index++) {
+    const line = lineLocator.nth(index);
+    const currentHighlight = lineLocator.locator(
+      '[data-test-name="CurrentExecutionPointLineHighlight"]'
+    );
+    if (await currentHighlight.isVisible()) {
+      currentLineLocator = line;
+      break;
+    }
+  }
+
+  if (currentLineLocator === null) {
+    return null;
+  }
+
+  const lineNumber = await currentLineLocator.locator(`[data-test-id^="SourceLine-LineNumber"`);
   const textContent = await lineNumber.textContent();
   return textContent !== null ? parseInt(textContent, 10) : null;
 }
 
-export function getSourceLine(page: Page, lineNumber: number): Locator {
-  return page
-    .locator(".CodeMirror-code div", {
-      has: page.locator(`.CodeMirror-linenumber:text-is("${lineNumber}")`),
-    })
-    .first();
+export async function getSourceLine(page: Page, lineNumber: number): Promise<Locator> {
+  const source = await getCurrentSource(page);
+  return source!.locator(`[data-test-id=SourceLine-${lineNumber}]`);
 }
 
 export function getSourceTab(page: Page, url: string): Locator {
@@ -250,8 +262,10 @@ export async function removeBreakpoint(
     await openSource(page, url);
   }
 
-  const line = await getSourceLine(page, lineNumber);
-  await line.locator(".CodeMirror-linenumber").click({ force: true });
+  const lineLocator = await getSourceLine(page, lineNumber);
+  const numberLocator = lineLocator.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
+  await numberLocator.hover({ force: true });
+  await numberLocator.click({ force: true });
 
   // We want to add a slight delay after removing a breakpoint so that the
   // breakpoint logic will have time to send protocol commands to the server,
@@ -298,6 +312,10 @@ export async function waitForBreakpoint(
   }
 }
 
+export function getPointPanelLocator(page: Page, lineNumber: number): Locator {
+  return page.locator(`[data-test-id=PointPanel-${lineNumber}]`);
+}
+
 export async function waitForLogpoint(
   page: Page,
   options: {
@@ -321,8 +339,8 @@ export async function waitForLogpoint(
     await openSource(page, url);
   }
 
-  const line = getSourceLine(page, lineNumber);
-  await line.locator(".CodeMirror-linewidget").waitFor();
+  const pointPanel = getPointPanelLocator(page, lineNumber);
+  await pointPanel.waitFor();
 }
 
 export async function verifyLogpointStep(
@@ -350,9 +368,7 @@ export async function verifyLogpointStep(
   );
 
   const line = await getSourceLine(page, lineNumber);
-  const status = line.locator(
-    `[data-test-name="LogpointPanel-BreakpointStatus"]:has-text("${expectedStatus}")`
-  );
+  const status = line.locator(`[data-test-name="LogPointStatus"]:has-text("${expectedStatus}")`);
   await status.waitFor({ state: "visible" });
 }
 
@@ -365,10 +381,10 @@ export async function waitForSelectedSource(page: Page, url: string) {
 
     // HACK Assume that the source file has loaded when the combined text of the first
     // 10 lines is no longer an empty string
-    const codeMirrorLines = editorPanel.locator(".CodeMirror-code .CodeMirror-line");
+    const lines = editorPanel.locator(`[data-test-id^=SourceLine]`);
 
-    const lineTexts = await mapLocators(codeMirrorLines, lineLocator => lineLocator.textContent());
-    const numLines = await codeMirrorLines.count();
+    const lineTexts = await mapLocators(lines, lineLocator => lineLocator.textContent());
+    const numLines = await lines.count();
 
     const combinedLineText = lineTexts
       .slice(0, 10)
