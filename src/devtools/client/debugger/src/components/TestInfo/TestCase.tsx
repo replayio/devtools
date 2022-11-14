@@ -2,7 +2,7 @@ import { Location } from "@replayio/protocol";
 import { useEffect, useState } from "react";
 
 import { getRecordingDuration } from "ui/actions/app";
-import { setFocusRegion } from "ui/actions/timeline";
+import { seekToTime, setFocusRegion } from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getFocusRegion } from "ui/reducers/timeline";
@@ -60,12 +60,14 @@ export function TestCase({
     }
   };
   const toggleExpand = () => {
+    console.log({ test });
+    const firstStep = test.steps?.[0];
+    if (firstStep) {
+      dispatch(seekToTime(firstStep.relativeStartTime + test.relativeStartTime));
+    }
+
     setHighlightedTest();
     onFocus();
-
-    if (!expandable) {
-      return;
-    }
   };
 
   useEffect(() => {
@@ -111,13 +113,6 @@ export function TestCase({
               <MaterialIcon>description</MaterialIcon>
             </button>
           ) : null}
-              {/* <button
-                onClick={onFocus}
-                title={isFocused ? "Reset Focus" : "Focus on this test"}
-                className={`grid h-5 w-5 items-center justify-center hover:bg-menuHoverBgcolor`}
-              >
-                <Icon filename="focus" />
-              </button> */}
         </div>
       </div>
       {expandSteps ? <TestSteps test={test} startTime={test.relativeStartTime} /> : null}

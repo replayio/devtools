@@ -9,6 +9,8 @@ import { TestItem } from "ui/types";
 export function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
   const { steps } = test;
 
+  console.log({ steps });
+
   return (
     <div className="flex flex-col rounded-lg py-2 pl-11">
       {steps?.map((s, i) => (
@@ -20,6 +22,7 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
           duration={s.duration}
           argString={s.args?.toString()}
           parentId={s.parentId}
+          error={!!s.error}
         />
       ))}
       {test.error ? (
@@ -44,6 +47,7 @@ function TestStepItem({
   argString,
   index,
   parentId,
+  error,
 }: {
   testName: string;
   startTime: number;
@@ -51,6 +55,7 @@ function TestStepItem({
   argString: string;
   index: number;
   parentId?: string;
+  error?: boolean;
 }) {
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
@@ -68,11 +73,13 @@ function TestStepItem({
     dispatch(setTimelineToTime(currentTime));
   };
 
+  const pausedColor = error ? "border-l-red-500" : "border-l-green-500";
+
   return (
     <button
       onClick={onClick}
       className={`relative flex items-center overflow-hidden border-b border-l-4 border-themeBase-90 bg-testsuitesStepsBgcolor pl-1 pr-3 font-mono ${
-        isPast ? "border-l-red-500" : isPaused ? "border-l-blue-500" : "border-l-transparent"
+        isPast || isPaused ? pausedColor : "border-l-transparent"
       }`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
