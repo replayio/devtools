@@ -2,6 +2,9 @@
 import { MouseEvent, PaintPoint, ScreenShot, TimeStampedPoint } from "@replayio/protocol";
 import maxBy from "lodash/maxBy";
 
+import { replayClient } from "shared/client/ReplayClientContext";
+
+import { repaintGraphics } from "./repainted-graphics-cache";
 import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
 import { ThreadFront } from "./thread";
 import { Deferred, assert, binarySearch, defer } from "./utils";
@@ -262,8 +265,8 @@ export async function repaint(force = false) {
 
   const { mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
   const pause = ThreadFront.getCurrentPause();
-
-  const rv = await pause.repaintGraphics(force);
+  await pause.ensureLoaded();
+  const rv = await repaintGraphics(replayClient, pause.pauseId!, force);
   graphicsFetched = true;
 
   if (didStall) {
