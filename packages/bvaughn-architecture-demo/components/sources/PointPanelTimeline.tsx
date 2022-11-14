@@ -86,7 +86,7 @@ export default function PointPanelTimeline({
 
   const label =
     currentHitPointIndex !== null
-      ? `${currentHitPointIndex + 1} / ${hitPoints.length}`
+      ? `${currentHitPointIndex + 1}/${hitPoints.length}`
       : hitPoints.length;
 
   let tooManyPointsToFind = false;

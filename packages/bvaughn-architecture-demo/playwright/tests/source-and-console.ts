@@ -383,7 +383,7 @@ test("should update the current time when the next/previous log point buttons ar
   });
 
   await goToNextHitPoint(page, lineNumber);
-  await verifyLogPointStep(page, "1 / 2", { lineNumber, sourceId });
+  await verifyLogPointStep(page, "1/2", { lineNumber, sourceId });
   await verifyHitPointButtonsEnabled(page, {
     lineNumber,
     previousEnabled: false,
@@ -391,7 +391,7 @@ test("should update the current time when the next/previous log point buttons ar
   });
 
   await goToNextHitPoint(page, lineNumber);
-  await verifyLogPointStep(page, "2 / 2", { lineNumber, sourceId });
+  await verifyLogPointStep(page, "2/2", { lineNumber, sourceId });
   await verifyHitPointButtonsEnabled(page, {
     lineNumber,
     previousEnabled: true,
@@ -399,7 +399,7 @@ test("should update the current time when the next/previous log point buttons ar
   });
 
   await goToPreviousHitPoint(page, lineNumber);
-  await verifyLogPointStep(page, "1 / 2", { lineNumber, sourceId });
+  await verifyLogPointStep(page, "1/2", { lineNumber, sourceId });
   await verifyHitPointButtonsEnabled(page, {
     lineNumber,
     previousEnabled: false,

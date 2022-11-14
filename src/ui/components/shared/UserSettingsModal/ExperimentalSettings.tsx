@@ -16,9 +16,9 @@ interface ExperimentalSetting {
 
 const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
   {
-    label: "New source viewer",
-    description: "Enable new source viewer and log point UIs",
-    key: "enableNewSourceViewer",
+    label: "Legacy source viewer",
+    description: "Enable legacy source viewer and log point UIs",
+    key: "enableLegacySourceViewer",
   },
   {
     label: "Column Breakpoints",
@@ -91,8 +91,8 @@ export default function ExperimentalSettings({}) {
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
 
-  const { value: enableNewSourceViewer, update: updateEnableNewSourceViewer } =
-    useFeature("newSourceViewer");
+  const { value: enableLegacySourceViewer, update: updateEnableNewSourceViewer } =
+    useFeature("legacySourceViewer");
 
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
@@ -113,8 +113,8 @@ export default function ExperimentalSettings({}) {
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
-    } else if (key == "enableNewSourceViewer") {
-      updateEnableNewSourceViewer(!enableNewSourceViewer);
+    } else if (key == "enableLegacySourceViewer") {
+      updateEnableNewSourceViewer(!enableLegacySourceViewer);
     } else if (key == "enableResolveRecording") {
       updateEnableResolveRecording(!enableResolveRecording);
     } else if (key === "hitCounts") {
@@ -134,7 +134,7 @@ export default function ExperimentalSettings({}) {
     basicProcessingLoadingBar,
     consoleFilterDrawerDefaultsToOpen,
     enableColumnBreakpoints,
-    enableNewSourceViewer,
+    enableLegacySourceViewer,
     enableResolveRecording,
     enableQueryCache,
     hitCounts,
