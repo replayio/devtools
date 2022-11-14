@@ -6,15 +6,15 @@ import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage
 export default function useTerminalHistory(
   recordingId: RecordingId,
   maxHistoryLength: number = 20
-): [string[], (value: string) => void] {
-  const [terminalExpressionHistory, setTerminalExpressionHistory] = useLocalStorage<string[]>(
-    `${recordingId}::terminalExpressionHistory`,
+): [expressionHistory: string[], addExpression: (value: string) => void] {
+  const [expressionHistory, setExpressionHistory] = useLocalStorage<string[]>(
+    `${recordingId}::expressionHistory`,
     []
   );
 
-  const setTerminalExpressionHistoryWrapper = useCallback<(value: string) => void>(
+  const addExpression = useCallback<(value: string) => void>(
     (command: string) => {
-      setTerminalExpressionHistory(prevHistory => {
+      setExpressionHistory(prevHistory => {
         const newHistory =
           prevHistory.length >= maxHistoryLength
             ? [...prevHistory.slice(1), command]
@@ -22,8 +22,8 @@ export default function useTerminalHistory(
         return newHistory;
       });
     },
-    [maxHistoryLength, setTerminalExpressionHistory]
+    [maxHistoryLength, setExpressionHistory]
   );
 
-  return [terminalExpressionHistory, setTerminalExpressionHistoryWrapper];
+  return [expressionHistory, addExpression];
 }

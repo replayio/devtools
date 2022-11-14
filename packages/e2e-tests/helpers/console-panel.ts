@@ -67,13 +67,11 @@ export async function executeTerminalExpression(page: Page, text: string): Promi
   // Wait for the Console to stop loading
   await consoleRoot.locator("text=Unavailable...").waitFor({ state: "hidden" });
 
-  const term = page.locator('[data-test-id="JSTerm"]');
-
-  const textArea = term.locator("textarea");
-  await textArea.focus();
-  await textArea.type(text);
-  await textArea.press("Escape"); // Close auto-complete dialog if open
-  await textArea.press("Enter");
+  const input = page.locator('[data-test-id="ConsoleTerminalInput"]');
+  await input.focus();
+  await input.type(text);
+  await input.press("Escape"); // Close auto-complete dialog if open
+  await input.press("Enter");
 }
 
 export async function executeAndVerifyTerminalExpression(
