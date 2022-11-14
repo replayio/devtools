@@ -112,20 +112,28 @@ export default function AutoCompleteListOuter({
     const onKeyDown = (event: KeyboardEvent) => {
       let nextIndex: number | null = null;
       switch (event.key) {
-        case "Enter": {
+        case "Enter":
+        case "Tab": {
           const match = matches[selectedIndex];
           if (match) {
             event.preventDefault();
             event.stopPropagation();
+
             onSubmit(match);
           }
           break;
         }
         case "ArrowDown": {
+          event.preventDefault();
+          event.stopPropagation();
+
           nextIndex = selectedIndex + 1 < matches.length ? selectedIndex + 1 : 0;
           break;
         }
         case "ArrowUp": {
+          event.preventDefault();
+          event.stopPropagation();
+
           nextIndex = selectedIndex > 0 ? selectedIndex - 1 : 0;
           break;
         }
@@ -162,6 +170,7 @@ export default function AutoCompleteListOuter({
   const itemData: ItemData = {
     matches,
     onSubmit,
+    searchString: expressionTail || "",
     selectedIndex,
   };
 

@@ -10,3 +10,7 @@
   background-color: var(--background-color-primary-button);
   color: var(--color-primary-button);
 }
+
+.Match {
+  font-weight: bold;
+}
