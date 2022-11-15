@@ -44,7 +44,7 @@
   cursor: pointer;
 }
 .EditableTitle:hover {
-  background-color: var(--theme-base-100);
+  background-color: var(--background-color-contrast-1);
 }
 .EditableTitle:focus {
   outline: none;
