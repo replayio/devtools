@@ -195,7 +195,7 @@ function ToggleViewButton({
 
   return (
     <button
-      title="Show source in devtools"
+      title={viewMode === "dev" ? "Expand the video" : "Show source in devtools"}
       className={`flex flex-row items-center hover:bg-menuHoverBgcolor ${
         isPaused ? "visible" : "invisible"
       }`}
