@@ -368,7 +368,6 @@ export function playback(beginTime: number, endTime: number): UIThunkAction {
     const shouldContinuePlayback = () => getPlayback(getState());
     prepareNextGraphics();
 
-    console.log("again");
     while (shouldContinuePlayback()) {
       await new Promise(resolve => requestAnimationFrame(resolve));
       if (!shouldContinuePlayback()) {

@@ -32,7 +32,6 @@ export function TestSteps({
     test.steps[test.steps.length - 1].duration;
 
   const onReplay = () => {
-    console.log("testEnd", { testEnd });
     dispatch(startPlayback({ beginTime: testStart, endTime: testEnd - 1 }));
   };
   const onPlayFromHere = (beginTime: number) => {
