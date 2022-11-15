@@ -61,26 +61,35 @@ export default function SidePanel() {
       ),
       buttons: null,
       className: "cyress-info flex-1 border-t overflow-hidden border-themeBorder",
-      component: <TestInfo testCases={recording?.metadata?.test.tests} highlightedTest={highlightedTest} setHighlightedTest={setHighlightedTest}/>,
+      component: (
+        <TestInfo
+          testCases={recording?.metadata?.test.tests}
+          highlightedTest={highlightedTest}
+          setHighlightedTest={setHighlightedTest}
+        />
+      ),
       opened: !cypressCollapsed,
       onToggle: () => setCypressCollapsed(!setCypressCollapsed),
     });
   } else {
-    items.push({
-      header: "Info",
-      buttons: resolveRecording ? <StatusDropdown /> : null,
-      className: "replay-info",
-      component: <ReplayInfo />,
-      opened: !replayInfoCollapsed,
-      onToggle: () => setReplayInfoCollapsed(!replayInfoCollapsed),
-    }, {
-      header: "Events",
-      buttons: null,
-      className: "events-info flex-1 border-t overflow-hidden border-themeBorder",
-      component: <Events />,
-      opened: !eventsCollapsed,
-      onToggle: () => setEventsCollapsed(!eventsCollapsed),
-    });
+    items.push(
+      {
+        header: "Info",
+        buttons: resolveRecording ? <StatusDropdown /> : null,
+        className: "replay-info",
+        component: <ReplayInfo />,
+        opened: !replayInfoCollapsed,
+        onToggle: () => setReplayInfoCollapsed(!replayInfoCollapsed),
+      },
+      {
+        header: "Events",
+        buttons: null,
+        className: "events-info flex-1 border-t overflow-hidden border-themeBorder",
+        component: <Events />,
+        opened: !eventsCollapsed,
+        onToggle: () => setEventsCollapsed(!eventsCollapsed),
+      }
+    );
   }
 
   return (

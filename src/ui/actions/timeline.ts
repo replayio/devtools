@@ -35,7 +35,7 @@ import {
   pointsReceivedThunk,
   setPlaybackPrecachedTime,
 } from "ui/reducers/timeline";
-import { FocusRegion, HoveredItem } from "ui/state/timeline";
+import { FocusRegion, HoveredItem, PlaybackOptions } from "ui/state/timeline";
 import {
   encodeObjectToURL,
   getPausePointParams,
@@ -299,12 +299,12 @@ export function togglePlayback(): UIThunkAction {
   };
 }
 
-type PlaybackOptions = {
-  beginTime: number | null;
-  endTime: number | null;
-}
-
-export function startPlayback({ beginTime: optBeginTime, endTime: optEndTime }: PlaybackOptions  = { beginTime: null, endTime: null }): UIThunkAction {
+export function startPlayback(
+  { beginTime: optBeginTime, endTime: optEndTime }: PlaybackOptions = {
+    beginTime: null,
+    endTime: null,
+  }
+): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
     const currentTime = getCurrentTime(state);

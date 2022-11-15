@@ -76,11 +76,15 @@ export function TestCase({
         <button
           onClick={toggleExpand}
           disabled={!expandable}
-          className="flex flex-grow flex-row gap-1 overflow-hidden group"
+          className="group flex flex-grow flex-row gap-1 overflow-hidden"
         >
           <Status result={test.result} />
           <div className="flex flex-col items-start text-bodyColor">
-            <div className={`overflow-hidden overflow-ellipsis whitespace-pre ${!isHighlighted ? "group-hover:underline" : ""}`}>
+            <div
+              className={`overflow-hidden overflow-ellipsis whitespace-pre ${
+                !isHighlighted ? "group-hover:underline" : ""
+              }`}
+            >
               {test.title}
             </div>
             {test.error ? (
