@@ -12,6 +12,7 @@ import { TestItem } from "ui/types";
 
 import { selectLocation } from "../../actions/sources";
 import { getThreadContext } from "../../selectors";
+import { ProgressBar } from "./ProgressBar";
 
 export function TestSteps({
   test,
@@ -104,7 +105,8 @@ function TestStepItem({
   const dispatch = useAppDispatch();
   const isPast = currentTime > startTime;
   // some chainers (`then`) don't have a duration, so let's bump it here (+1) so that it shows something in the UI
-  const isPaused = currentTime >= startTime && currentTime < startTime + (duration || 1);
+  const adjustedDuration = duration || 1;
+  const isPaused = currentTime >= startTime && currentTime < startTime + adjustedDuration;
 
   const onClick = () => dispatch(seekToTime(startTime));
   const onMouseEnter = () => dispatch(setTimelineToTime(startTime));
@@ -112,10 +114,14 @@ function TestStepItem({
 
   const pausedColor = error ? "border-l-red-500" : "border-l-primaryAccent";
 
+  // This math is bananas don't look here until this is cleaned up :)
+  const bump = isPaused || isPast ? 20 : 0;
+  const actualProgress = bump + 80 * ((currentTime - startTime) / adjustedDuration);
+  const progress = actualProgress > 100 ? 100 : actualProgress;
+
   return (
     <div
-      className={`group/step relative flex items-center overflow-hidden border-b border-l-4 border-themeBase-90 bg-testsuitesStepsBgcolor pl-1 pr-3 font-mono ${
-        // "border-l-transparent",
+      className={`group/step relative flex items-center gap-1 overflow-hidden border-b border-l-4 border-themeBase-90 bg-testsuitesStepsBgcolor pl-1 pr-3 font-mono ${
         isPast || isPaused ? pausedColor : "border-l-transparent"
       }`}
       onMouseEnter={onMouseEnter}
@@ -126,6 +132,7 @@ function TestStepItem({
         className="flex flex-grow items-center space-x-2 overflow-hidden py-2 text-start"
       >
         <div className="opacity-70">{index + 1}</div>
+        <ProgressBar progress={progress} />
         <div className={`whitespace-pre font-medium text-bodyColor ${isPaused ? "font-bold" : ""}`}>
           {parentId ? "- " : ""}
           {testName}
