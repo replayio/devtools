@@ -85,10 +85,6 @@ function KeyboardShortcuts({
       togglePaneCollapse();
     };
 
-    const toggleLineQuickOpenModal = (e: KeyboardEvent) => {
-      toggleQuickOpenModal(e, ":");
-    };
-
     const togglePalette = (e: KeyboardEvent) => {
       e.preventDefault();
       trackEvent("key_shortcut.show_command_palette");
@@ -155,7 +151,6 @@ function KeyboardShortcuts({
       // Can pre-fill the dialog with specific filter prefixes
       "CmdOrCtrl+Shift+O": toggleFunctionQuickOpenModal,
       "CmdOrCtrl+O": toggleProjectFunctionQuickOpenModal,
-      "CmdOrCtrl+G": toggleLineQuickOpenModal,
 
       "~": toggleProtocolTimeline,
 

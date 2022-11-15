@@ -98,9 +98,8 @@ function Console({
   const renderFilters = isMenuOpen || menuValueHasBeenToggled;
 
   const onKeyDown = (event: KeyboardEvent) => {
-    switch (event.key) {
-      case "f":
-      case "F":
+    switch (event.key.toLowerCase()) {
+      case "f": {
         if (event.ctrlKey || event.metaKey) {
           searchActions.show();
 
@@ -108,6 +107,23 @@ function Console({
           event.stopPropagation();
         }
         break;
+      }
+      case "g": {
+        if (event.ctrlKey || event.metaKey) {
+          // Unlike Enter / Shift+Enter, this event handler is external to the Search input
+          // so that we can mirror UIs like Chrome and Code and re-open the search UI if it's been closed
+          searchActions.show();
+          if (event.shiftKey) {
+            searchActions.goToPrevious();
+          } else {
+            searchActions.goToNext();
+          }
+
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        break;
+      }
     }
   };
 

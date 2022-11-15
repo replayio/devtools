@@ -29,7 +29,7 @@ export default function ConsoleInput() {
 
 function ConsoleInputSuspends() {
   const replayClient = useContext(ReplayClientContext);
-  const [searchState, searchActions] = useContext(ConsoleSearchContext);
+  const [searchState] = useContext(ConsoleSearchContext);
   const { addMessage } = useContext(TerminalContext);
   const { executionPoint, time } = useContext(TimelineContext);
   const { recordingId } = useContext(SessionContext);
@@ -104,15 +104,6 @@ function ConsoleInputSuspends() {
         if (newIndex >= 0 && newExpression != null) {
           setHistoryIndex(newIndex);
           setExpression(newExpression);
-        }
-        break;
-      }
-      case "f":
-      case "F": {
-        if (event.ctrlKey || event.metaKey) {
-          event.preventDefault();
-
-          searchActions.show();
         }
         break;
       }
