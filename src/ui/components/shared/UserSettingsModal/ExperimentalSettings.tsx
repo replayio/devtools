@@ -95,12 +95,9 @@ export default function ExperimentalSettings({}) {
   // TODO: This is bad and should be updated with a better generalized hook
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
-
   const { value: enableLegacySourceViewer, update: updateEnableNewSourceViewer } =
     useFeature("legacySourceViewer");
-
   const { value: cacheScanData, update: updateCacheScanData } = useFeature("cacheScanData");
-
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
 

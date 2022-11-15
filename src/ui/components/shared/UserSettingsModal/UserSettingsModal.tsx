@@ -129,6 +129,8 @@ function Advanced() {
   const { value: protocolTimeline, update: updateProtocolTimeline } =
     useFeature("protocolTimeline");
   const { value: logProtocol, update: updateLogProtocol } = useFeature("logProtocol");
+  const { value: newControllerOnRefresh, update: updateNewControllerOnRefresh } =
+    useFeature("newControllerOnRefresh");
 
   return (
     <div>
@@ -150,13 +152,21 @@ function Advanced() {
           description={""}
         />
       </div>
-
       <div className="mb-4">
         <CheckboxRow
           id={"protocol-viewer"}
           onChange={() => updateLogProtocol(!logProtocol)}
           checked={logProtocol}
           label={"View protocol requests and responses in the panel"}
+          description={""}
+        />
+      </div>
+      <div className="mb-4">
+        <CheckboxRow
+          id={"new-controller-on-refresh"}
+          onChange={() => updateNewControllerOnRefresh(!newControllerOnRefresh)}
+          checked={newControllerOnRefresh}
+          label={"Get a new controller upon each page refresh"}
           description={""}
         />
       </div>

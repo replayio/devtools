@@ -34,6 +34,7 @@ pref("devtools.features.enableQueryCache", false);
 pref("devtools.features.hitCounts", true);
 pref("devtools.features.logProtocol", false);
 pref("devtools.features.logProtocolEvents", false);
+pref("devtools.features.newControllerOnRefresh", false);
 pref("devtools.features.originalClassNames", false);
 pref("devtools.features.profileWorkerThreads", false);
 pref("devtools.features.protocolTimeline", false);
@@ -72,6 +73,7 @@ export const features = new PrefsHelper("devtools.features", {
   hitCounts: ["Bool", "hitCounts"],
   logProtocol: ["Bool", "logProtocol"],
   logProtocolEvents: ["Bool", "logProtocolEvents"],
+  newControllerOnRefresh: ["Bool", "newControllerOnRefresh"],
   originalClassNames: ["Bool", "originalClassNames"],
   profileWorkerThreads: ["Bool", "profileWorkerThreads"],
   protocolTimeline: ["Bool", "protocolTimeline"],

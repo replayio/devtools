@@ -196,14 +196,15 @@ export function createSocket(
       }
 
       const experimentalSettings: ExperimentalSettings = {
-        // Uncomment this to get a new session every time you refresh
-        // controllerKey: String(Math.floor(Math.random() * 10e8)),
         cacheScanData: !!features.cacheScanData,
         disableCache: !!prefs.disableCache,
         disableQueryCache: !features.enableQueryCache,
         listenForMetrics: !!prefs.listenForMetrics,
         profileWorkerThreads: !!features.profileWorkerThreads,
       };
+      if (features.newControllerOnRefresh) {
+        experimentalSettings.controllerKey = String(Date.now());
+      }
 
       const loadPoint = new URL(window.location.href).searchParams.get("point") || undefined;
 
