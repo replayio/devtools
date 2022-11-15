@@ -6,7 +6,7 @@ import Loader from "bvaughn-architecture-demo/components/Loader";
 import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import {
   evaluateSuspense,
-  getPauseIdForExecutionPointSuspense,
+  getPauseIdSuspense,
 } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { getClosestPointForTimeSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -31,8 +31,9 @@ function Scopes() {
 function Suspender() {
   const replayClient = useContext(ReplayClientContext);
 
-  const point = getClosestPointForTimeSuspense(replayClient, 1000);
-  const pauseId = getPauseIdForExecutionPointSuspense(replayClient, point);
+  const time = 1000;
+  const point = getClosestPointForTimeSuspense(replayClient, time);
+  const pauseId = getPauseIdSuspense(replayClient, point, time);
 
   // This code is roughly approximating the shape of data from the Scopes panel.
 

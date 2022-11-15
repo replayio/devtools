@@ -16,7 +16,6 @@ import {
   loadedRegions as LoadedRegions,
   Location,
   MappedLocation,
-  PauseData,
   PauseDescription,
   PauseId,
   RecordingId,
@@ -38,20 +37,29 @@ import {
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
-import { cachePauseData } from "bvaughn-architecture-demo/src/suspense/PauseCache";
+import {
+  cachePauseData,
+  getPauseIdForExecutionPointIfCached,
+} from "bvaughn-architecture-demo/src/suspense/PauseCache";
+import { getPauseIdAsync } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { MappedLocationCache } from "../mapped-location-cache";
 import ScopeMapCache from "../scope-map-cache";
 import { client } from "../socket";
 import { EventEmitter, assert, defer } from "../utils";
-import { Pause } from "./pause";
 
 export interface RecordingDescription {
   duration: TimeStamp;
   length?: number;
   lastScreen?: ScreenShot;
   commandLineArguments?: string[];
+}
+
+export interface Pause {
+  point: ExecutionPoint;
+  time: number;
+  pauseId: PauseId | null;
 }
 
 export interface Source {
@@ -107,7 +115,7 @@ function getRecordingTarget(buildId: string): RecordingTarget {
   return RecordingTarget.unknown;
 }
 
-type ThreadFrontEvent = "currentPause" | "paused" | "resumed";
+type ThreadFrontEvent = "paused" | "resumed";
 
 declare global {
   interface Window {
@@ -129,10 +137,7 @@ class _ThreadFront {
 
   currentPoint: ExecutionPoint = "0";
   currentTime: number = 0;
-  currentPointHasFrames: boolean = false;
-
-  // Any pause for the current point.
-  _currentPause: Pause | null = null;
+  private currentPauseId: PauseId | null = null;
 
   // Recording ID being examined.
   recordingId: RecordingId | null = null;
@@ -205,13 +210,22 @@ class _ThreadFront {
     });
   }
 
-  get currentPause(): Pause | null {
-    return this._currentPause;
+  get currentPause(): Pause {
+    return {
+      point: this.currentPoint,
+      time: this.currentTime,
+      pauseId:
+        this.currentPauseId ??
+        getPauseIdForExecutionPointIfCached(this.currentPoint)?.value ??
+        null,
+    };
   }
-  set currentPause(value: Pause | null) {
-    this._currentPause = value;
 
-    this.emit("currentPause", value);
+  async getCurrentPauseId(replayClient: ReplayClientInterface): Promise<PauseId> {
+    return (
+      this.currentPauseId ??
+      (await getPauseIdAsync(replayClient, this.currentPoint, this.currentTime))
+    );
   }
 
   async setSessionId(sessionId: SessionId) {
@@ -377,22 +391,17 @@ class _ThreadFront {
   timeWarp(point: ExecutionPoint, time: number, hasFrames?: boolean, frame?: Frame) {
     this.currentPoint = point;
     this.currentTime = time;
-    this.currentPointHasFrames = !!hasFrames;
-    this.currentPause = null;
+    this.currentPauseId = null;
     this.emit("paused", { point, hasFrames, time, frame });
   }
 
   timeWarpToPause(pause: Pause) {
-    const { point, time, hasFrames } = pause;
-    assert(
-      point && time && typeof hasFrames === "boolean",
-      "point, time or hasFrames not set on pause"
-    );
+    const { point, time, pauseId } = pause;
+    assert(point && time, "point or time not set on pause");
     this.currentPoint = point;
     this.currentTime = time;
-    this.currentPointHasFrames = hasFrames;
-    this.currentPause = pause;
-    this.emit("paused", { point, hasFrames, time });
+    this.currentPauseId = pauseId;
+    this.emit("paused", { point, hasFrames: true, time });
   }
 
   async ensureAllSources() {
@@ -467,40 +476,6 @@ class _ThreadFront {
     }
   }
 
-  ensurePause(point: ExecutionPoint, time: number) {
-    assert(this.sessionId, "no sessionId");
-    let pause = Pause.getByPoint(point);
-    if (pause) {
-      return pause;
-    }
-    pause = new Pause(this);
-    pause.create(point, time);
-    return pause;
-  }
-
-  getCurrentPause() {
-    if (!this.currentPause) {
-      this.currentPause = this.ensurePause(this.currentPoint, this.currentTime);
-    }
-    return this.currentPause;
-  }
-
-  instantiatePause(
-    pauseId: PauseId,
-    point: ExecutionPoint,
-    time: number,
-    hasFrames: boolean,
-    data: PauseData = {}
-  ) {
-    let pause = Pause.getByPoint(point);
-    if (pause) {
-      return pause;
-    }
-    pause = new Pause(this);
-    pause.instantiate(pauseId, point, time, hasFrames, data);
-    return pause;
-  }
-
   getScopeMap(location: Location): Promise<Record<string, string>> {
     return this.scopeMaps.getScopeMap(location);
   }
@@ -520,9 +495,9 @@ class _ThreadFront {
     frameId?: FrameId;
     pure?: boolean;
   }) {
-    const pause = pauseId ? Pause.getById(pauseId) : this.currentPause;
-    assert(pause, pauseId ? `no pause for pauseId ${pauseId}` : "no current pause");
-    await pause.ensureLoaded();
+    if (!pauseId) {
+      pauseId = await this.getCurrentPauseId(replayClient);
+    }
     const abilities = await this.recordingCapabilitiesWaiter.promise;
     const { result } = frameId
       ? await client.Pause.evaluateInFrame(
@@ -533,7 +508,7 @@ class _ThreadFront {
             pure: abilities.supportsPureEvaluation && pure,
           },
           this.sessionId!,
-          pause.pauseId!
+          pauseId
         )
       : await client.Pause.evaluateInGlobal(
           {
@@ -541,9 +516,9 @@ class _ThreadFront {
             pure: abilities.supportsPureEvaluation && pure,
           },
           this.sessionId!,
-          pause.pauseId!
+          pauseId
         );
-    cachePauseData(replayClient, pause.pauseId!, result.data);
+    cachePauseData(replayClient, pauseId, result.data);
 
     if (repaintAfterEvaluationsExperimentalFlag) {
       const { repaint } = await import("protocol/graphics");
@@ -648,7 +623,7 @@ class _ThreadFront {
     } catch {
       this.emit("paused", {
         point: this.currentPoint,
-        hasFrames: this.currentPointHasFrames,
+        hasFrames: true,
         time: this.currentTime,
       });
     }
