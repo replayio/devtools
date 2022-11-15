@@ -4,24 +4,21 @@ import { useState } from "react";
 import { setFocusRegion } from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem, TestResult } from "ui/types";
 
-import { selectLocation } from "../../actions/sources";
 import { getThreadContext } from "../../selectors";
 import { TestSteps } from "./TestSteps";
 
 export function TestCase({ test, location }: { test: TestItem; location?: Location }) {
   const [expandSteps, setExpandSteps] = useState(false);
+  const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
-  const cx = useAppSelector(getThreadContext);
   const expandable = test.steps || test.error;
+  const isPaused =
+    currentTime >= test.relativeStartTime && currentTime < test.relativeStartTime + test.duration;
 
-  const onClick = () => {
-    if (location) {
-      dispatch(selectLocation(cx, location));
-    }
-  };
   const toggleExpand = () => {
     if (!expandable) {
       return;
@@ -39,7 +36,11 @@ export function TestCase({ test, location }: { test: TestItem; location?: Locati
   };
 
   return (
-    <div className="flex flex-col">
+    <div
+      className={`flex flex-col border-t-2 ${
+        isPaused ? "border-t-red-500" : "border-t-transparent"
+      }`}
+    >
       <div className="group flex flex-row items-center justify-between gap-1 rounded-lg p-1 transition hover:cursor-pointer">
         <button
           onClick={toggleExpand}
@@ -59,16 +60,7 @@ export function TestCase({ test, location }: { test: TestItem; location?: Locati
             ) : null}
           </div>
         </button>
-        <div className="flex gap-1 self-start">
-          {location ? (
-            <button
-              onClick={onClick}
-              title="Go To Source"
-              className="grid h-5 w-5 items-center justify-center hover:bg-menuHoverBgcolor"
-            >
-              <MaterialIcon>description</MaterialIcon>
-            </button>
-          ) : null}
+{    expandSteps ?    <div className="flex gap-1 self-start">
           <button
             onClick={onFocus}
             title="Focus on this test"
@@ -76,9 +68,9 @@ export function TestCase({ test, location }: { test: TestItem; location?: Locati
           >
             <Icon filename="focus" />
           </button>
-        </div>
+        </div> : null}
       </div>
-      {expandSteps ? <TestSteps test={test} startTime={test.relativeStartTime} /> : null}
+      {expandSteps ? <TestSteps test={test} startTime={test.relativeStartTime} location={location} /> : null}
     </div>
   );
 }

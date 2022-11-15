@@ -1,10 +1,24 @@
+import { Location } from "@replayio/protocol";
+
 import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem } from "ui/types";
 
-export function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
+import { selectLocation } from "../../actions/sources";
+import { getThreadContext } from "../../selectors";
+
+export function TestSteps({
+  test,
+  startTime,
+  location,
+}: {
+  test: TestItem;
+  startTime: number;
+  location?: Location;
+}) {
   const { steps } = test;
 
   return (
@@ -18,6 +32,7 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
           duration={s.duration}
           argString={s.args?.toString()}
           parentId={s.parentId}
+          location={location}
         />
       ))}
       {test.error ? (
@@ -42,6 +57,7 @@ function TestStepItem({
   argString,
   index,
   parentId,
+  location,
 }: {
   testName: string;
   startTime: number;
@@ -49,7 +65,9 @@ function TestStepItem({
   argString: string;
   index: number;
   parentId?: string;
+  location?: Location;
 }) {
+  const cx = useAppSelector(getThreadContext);
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
   // some chainers (`then`) don't have a duration, so let's bump it here so that it shows something in the UI
@@ -65,10 +83,17 @@ function TestStepItem({
     dispatch(setTimelineToTime(currentTime));
   };
 
+  const onLocationClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (location) {
+      dispatch(selectLocation(cx, location));
+    }
+  };
+
   return (
-    <button
+    <div
       onClick={onClick}
-      className={`relative flex items-center overflow-hidden border-b border-l-4 border-themeBase-90 bg-testsuitesStepsBgcolor pl-1 pr-3 font-mono ${
+      className={`group relative flex items-center overflow-hidden border-b border-l-4 border-themeBase-90 bg-testsuitesStepsBgcolor pl-1 pr-3 font-mono ${
         paused ? "border-l-red-500" : "border-l-transparent"
       }`}
       onMouseEnter={onMouseEnter}
@@ -82,6 +107,15 @@ function TestStepItem({
         </div>
         <div className="opacity-70">{argString}</div>
       </div>
-    </button>
+      {location ? (
+        <div
+          onClick={onLocationClick}
+          title="Go To Source"
+          className="invisible grid h-5 w-5 items-center justify-center hover:bg-menuHoverBgcolor group-hover:visible"
+        >
+          <MaterialIcon>file_open</MaterialIcon>
+        </div>
+      ) : null}
+    </div>
   );
 }
