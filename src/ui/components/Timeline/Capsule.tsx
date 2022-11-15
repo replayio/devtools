@@ -1,8 +1,8 @@
 import classNames from "classnames";
-import React, { MutableRefObject, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 
-import { getLoadedAndIndexedProgress, getLoadingStatusSlow } from "ui/actions/app";
+import { getIndexedProgress, getLoadingStatusSlow } from "ui/actions/app";
 import ExternalLink from "ui/components/shared/ExternalLink";
 import { useFeature } from "ui/hooks/settings";
 import useModalDismissSignal from "ui/hooks/useModalDismissSignal";
@@ -21,7 +21,7 @@ export default function Capsule({
 }: {
   setShowLoadingProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const indexingProgress = Math.round(useAppSelector(getLoadedAndIndexedProgress) * 100);
+  const indexingProgress = Math.round(useAppSelector(getIndexedProgress) * 100);
   const basicProcessingProgress = Math.round(useAppSelector(getBasicProcessingProgress) * 100);
   let progress = indexingProgress;
   const { value: basicProcessingLoadingBar } = useFeature("basicProcessingLoadingBar");

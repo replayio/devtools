@@ -233,13 +233,13 @@ export const getIndexedAndLoadedRegions = createSelector(getLoadedRegions, loade
 // For example:
 // If 80% of the regions have been indexed and 50% have been loaded, this method would return 0.65.
 // If 100% of the regions have been indexed and 50% have been loaded, this method would return 0.75.
-export const getLoadedAndIndexedProgress = createSelector(getLoadedRegions, regions => {
+export const getIndexedProgress = createSelector(getLoadedRegions, regions => {
   if (!regions) {
     return 0;
   }
 
-  const { indexed, loaded, loading } = regions;
-  if (indexed == null || loaded == null || loading == null) {
+  const { indexed, loading } = regions;
+  if (indexed == null || loading == null) {
     return 0;
   }
 
@@ -251,17 +251,14 @@ export const getLoadedAndIndexedProgress = createSelector(getLoadedRegions, regi
     return 0;
   }
 
-  const totalLoadedTime = loaded.reduce((totalTime, { begin, end }) => {
-    return totalTime + end.time - begin.time;
-  }, 0);
   const totalIndexedTime = indexed.reduce((totalTime, { begin, end }) => {
     return totalTime + end.time - begin.time;
   }, 0);
 
-  return (totalLoadedTime + totalIndexedTime) / (totalLoadingTime * 2);
+  return totalIndexedTime / totalLoadingTime;
 });
 
-export const getIsIndexed = createSelector(getLoadedAndIndexedProgress, progress => progress === 1);
+export const getIsIndexed = createSelector(getIndexedProgress, progress => progress === 1);
 
 export const getNonLoadingTimeRanges = (state: UIState) => {
   const loadingRegions = getLoadedRegions(state)?.loading || [];

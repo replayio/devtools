@@ -100,7 +100,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
                   className="overflow-hidden overflow-ellipsis whitespace-pre"
                   title={recording.metadata.source?.branch}
                 >
-                  {time} ago
+                  {time === "Now" ? time : time + " ago"}
                 </div>
               </Row>
 

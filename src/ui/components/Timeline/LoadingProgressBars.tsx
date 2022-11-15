@@ -3,7 +3,6 @@ import clamp from "lodash/clamp";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getZoomRegion } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
-import { overlap } from "ui/utils/timeline";
 
 import styles from "./LoadingProgressBars.module.css";
 
@@ -16,9 +15,7 @@ export default function LoadingProgressBars() {
     return null;
   }
 
-  const completedRegions = loadedRegions
-    ? overlap(loadedRegions.indexed, loadedRegions.loaded)
-    : [];
+  const completedRegions = loadedRegions ? loadedRegions.indexed : [];
   const loadingRegions = loadedRegions ? loadedRegions.loading : [];
 
   return (

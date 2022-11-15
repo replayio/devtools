@@ -91,8 +91,9 @@ if (typeof window !== "undefined") {
 }
 
 export type ExperimentalSettings = {
-  controllerKey?: string;
   listenForMetrics: boolean;
+  cacheScanData?: boolean;
+  controllerKey?: string;
   disableCache?: boolean;
   disableQueryCache?: boolean;
   profileWorkerThreads?: boolean;

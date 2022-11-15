@@ -59,6 +59,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
       "Open the console filter settings by default when opening a Replay for the first time",
     key: "consoleFilterDrawerDefaultsToOpen",
   },
+  {
+    label: "Cache Scan Data",
+    description: "Cache the results of indexing the recording",
+    key: "cacheScanData",
+  },
 ];
 
 const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [];
@@ -94,6 +99,8 @@ export default function ExperimentalSettings({}) {
   const { value: enableLegacySourceViewer, update: updateEnableNewSourceViewer } =
     useFeature("legacySourceViewer");
 
+  const { value: cacheScanData, update: updateCacheScanData } = useFeature("cacheScanData");
+
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
 
@@ -127,16 +134,19 @@ export default function ExperimentalSettings({}) {
       updateBasicProcessingLoadingBar(!basicProcessingLoadingBar);
     } else if (key === "consoleFilterDrawerDefaultsToOpen") {
       updateConsoleFilterDrawerDefaultsToOpen(!consoleFilterDrawerDefaultsToOpen);
+    } else if (key === "cacheScanData") {
+      updateCacheScanData(!cacheScanData);
     }
   };
 
   const localSettings = {
     basicProcessingLoadingBar,
+    cacheScanData,
     consoleFilterDrawerDefaultsToOpen,
     enableColumnBreakpoints,
     enableLegacySourceViewer,
-    enableResolveRecording,
     enableQueryCache,
+    enableResolveRecording,
     hitCounts,
     profileWorkerThreads,
   };
