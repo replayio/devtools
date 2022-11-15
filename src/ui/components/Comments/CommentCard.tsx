@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { MouseEvent } from "react";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import { seekToComment } from "ui/actions/comments";
@@ -20,8 +21,14 @@ export default function CommentCard({ comment }: { comment: Comment }) {
 
   const dispatch = useAppDispatch();
 
-  const onClick = () => {
-    dispatch(seekToComment(comment));
+  const onClick = (event: MouseEvent) => {
+    event.stopPropagation();
+    dispatch(seekToComment(comment, false));
+  };
+
+  const onPreviewClick = (event: MouseEvent) => {
+    event.stopPropagation();
+    dispatch(seekToComment(comment, true));
   };
 
   const showReplyButton = !isCommentContentEmpty(comment.content);
@@ -33,7 +40,7 @@ export default function CommentCard({ comment }: { comment: Comment }) {
     >
       {isPaused && <div className={styles.PausedOverlay} />}
 
-      <CommentPreview comment={comment} />
+      <CommentPreview comment={comment} onClick={onPreviewClick} />
 
       <EditableRemark remark={comment} type="comment" />
 

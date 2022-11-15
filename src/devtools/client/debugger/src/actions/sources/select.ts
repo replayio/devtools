@@ -29,10 +29,8 @@ import { Context } from "../../reducers/pause";
 import { getTabExists } from "../../reducers/tabs";
 import { closeActiveSearch } from "../../reducers/ui";
 import { setShownSource } from "../../reducers/ui";
-import { getActiveSearch, getContext, getExecutionPoint, getThreadContext } from "../../selectors";
-import { getSelectedFrameAsync } from "../../selectors/pause";
+import { getActiveSearch, getContext, getThreadContext } from "../../selectors";
 import { createLocation } from "../../utils/location";
-import { paused } from "../pause/paused";
 
 export type PartialLocation = Parameters<typeof createLocation>[0];
 
@@ -129,8 +127,12 @@ export function selectLocation(
     const currentSource = getSelectedSource(getState());
     trackEvent("sources.select_location");
 
-    if (getViewMode(getState()) == "non-dev") {
-      dispatch(setViewMode("dev"));
+    if (openSourcesTab) {
+      // This action should only change view modes if it's also going to open the Sources tab.
+      // Otherwise it's not possible to change locations without also opening the DevTools tab.
+      if (getViewMode(getState()) == "non-dev") {
+        dispatch(setViewMode("dev"));
+      }
     }
 
     let source = getSourceDetails(getState(), location.sourceId);
