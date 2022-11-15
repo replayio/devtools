@@ -214,12 +214,12 @@ function BeforeAndAfterButton({
     <>
       <button
         title="Jump to Before"
-        className={`flex flex-row items-center hover:bg-menuHoverBgcolor ${
+        className={`flex rotate-180 transform flex-row items-center hover:bg-menuHoverBgcolor ${
           isPaused ? "visible" : "invisible"
         }`}
         onClick={onJumpToBefore}
       >
-        <MaterialIcon>arrow_backward</MaterialIcon>
+        <MaterialIcon>keyboard_tab</MaterialIcon>
       </button>
       <button
         title="Jump to After"
@@ -228,7 +228,7 @@ function BeforeAndAfterButton({
         }`}
         onClick={onJumpToAfter}
       >
-        <MaterialIcon>arrow_forward</MaterialIcon>
+        <MaterialIcon>keyboard_tab</MaterialIcon>
       </button>
     </>
   );
