@@ -26,7 +26,6 @@ export function TestCase({
 }) {
   const [expandSteps, setExpandSteps] = useState(false);
   const dispatch = useAppDispatch();
-  const cx = useAppSelector(getThreadContext);
   const expandable = test.steps || test.error;
 
   const duration = useAppSelector(getRecordingDuration);
@@ -53,14 +52,7 @@ export function TestCase({
       );
     }
   };
-
-  const onLocationClick = () => {
-    if (location) {
-      dispatch(selectLocation(cx, location));
-    }
-  };
   const toggleExpand = () => {
-    console.log({ test });
     const firstStep = test.steps?.[0];
     if (firstStep) {
       dispatch(seekToTime(firstStep.relativeStartTime + test.relativeStartTime));
@@ -79,19 +71,18 @@ export function TestCase({
   }, [isHighlighted]);
 
   return (
-    <div className="group flex flex-col">
-      <div className="group flex flex-row items-center justify-between gap-1 rounded-lg p-1 transition hover:cursor-pointer">
+    <div className="flex flex-col">
+      <div className="flex flex-row items-center justify-between gap-1 rounded-lg p-1 transition hover:cursor-pointer">
         <button
           onClick={toggleExpand}
           disabled={!expandable}
-          className="flex flex-grow flex-row gap-1 overflow-hidden"
+          className="flex flex-grow flex-row gap-1 overflow-hidden group"
         >
           <Status result={test.result} />
-          {test.steps ? (
-            <MaterialIcon>{expandSteps ? "expand_more" : "chevron_right"}</MaterialIcon>
-          ) : null}
           <div className="flex flex-col items-start text-bodyColor">
-            <div className="overflow-hidden overflow-ellipsis whitespace-pre">{test.title}</div>
+            <div className={`overflow-hidden overflow-ellipsis whitespace-pre ${!isHighlighted ? "group-hover:underline" : ""}`}>
+              {test.title}
+            </div>
             {test.error ? (
               <div className="mt-1 overflow-hidden rounded-lg bg-testsuitesErrorBgcolor px-2 py-1 text-left font-mono ">
                 {test.error.message}
@@ -99,23 +90,10 @@ export function TestCase({
             ) : null}
           </div>
         </button>
-        <div
-          className={`flex gap-1 self-start group-hover:visible ${
-            expandSteps ? "visible" : "invisible"
-          }`}
-        >
-          {location ? (
-            <button
-              onClick={onLocationClick}
-              title="Go To Source"
-              className="grid h-5 w-5 items-center justify-center hover:bg-menuHoverBgcolor"
-            >
-              <MaterialIcon>description</MaterialIcon>
-            </button>
-          ) : null}
-        </div>
       </div>
-      {expandSteps ? <TestSteps test={test} startTime={test.relativeStartTime} /> : null}
+      {expandSteps ? (
+        <TestSteps test={test} startTime={test.relativeStartTime} location={location} />
+      ) : null}
     </div>
   );
 }

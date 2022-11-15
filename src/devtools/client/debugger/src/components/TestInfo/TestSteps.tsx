@@ -1,3 +1,4 @@
+import { Location } from "@replayio/protocol";
 import React from "react";
 
 import { seekToTime, setTimelineToTime, startPlayback } from "ui/actions/timeline";
@@ -7,8 +8,19 @@ import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem } from "ui/types";
 
-export function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
-  const { steps } = test;
+import { selectLocation } from "../../actions/sources";
+import { getThreadContext } from "../../selectors";
+
+export function TestSteps({
+  test,
+  startTime,
+  location,
+}: {
+  test: TestItem;
+  startTime: number;
+  location?: Location;
+}) {
+  const cx = useAppSelector(getThreadContext);
   const dispatch = useAppDispatch();
   const testStart = test.steps[0].relativeStartTime + startTime;
   const testEnd =
@@ -22,10 +34,15 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
   const onPlayFromHere = (beginTime: number) => {
     dispatch(startPlayback({ beginTime: startTime, endTime: testEnd }));
   };
+  const onGoToLocation = () => {
+    if (location) {
+      dispatch(selectLocation(cx, location));
+    }
+  };
 
   return (
     <div className="flex flex-col rounded-lg py-2 pl-11">
-      {steps?.map((s, i) => (
+      {test.steps?.map((s, i) => (
         <TestStepItem
           testName={s.name}
           key={i}
@@ -35,9 +52,10 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
           argString={s.args?.toString()}
           parentId={s.parentId}
           error={!!s.error}
-          isLastStep={steps.length - 1 === i}
+          isLastStep={test.steps.length - 1 === i}
           onReplay={onReplay}
           onPlayFromHere={() => onPlayFromHere(startTime + s.relativeStartTime)}
+          onGoToLocation={onGoToLocation}
         />
       ))}
       {test.error ? (
@@ -63,9 +81,10 @@ function TestStepItem({
   index,
   parentId,
   error,
+  isLastStep,
   onReplay,
   onPlayFromHere,
-  isLastStep,
+  onGoToLocation,
 }: {
   testName: string;
   startTime: number;
@@ -74,14 +93,15 @@ function TestStepItem({
   index: number;
   parentId?: string;
   error: boolean;
+  isLastStep: boolean;
   onReplay: () => void;
   onPlayFromHere: () => void;
-  isLastStep: boolean;
+  onGoToLocation: () => void;
 }) {
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
-  // some chainers (`then`) don't have a duration, so let's bump it here so that it shows something in the UI
   const isPast = currentTime > startTime;
+  // some chainers (`then`) don't have a duration, so let's bump it here (+1) so that it shows something in the UI
   const isPaused = currentTime >= startTime && currentTime < startTime + (duration || 1);
 
   const onClick = () => dispatch(seekToTime(startTime));
@@ -109,7 +129,42 @@ function TestStepItem({
         </div>
         <div className="opacity-70">{argString}</div>
       </button>
-      <TestStepAction
+      <TestStepActions
+        onReplay={onReplay}
+        onPlayFromHere={onPlayFromHere}
+        isLastStep={isLastStep}
+        isPaused={isPaused}
+        onGoToLocation={onGoToLocation}
+      />
+    </div>
+  );
+}
+
+function TestStepActions({
+  onReplay,
+  onPlayFromHere,
+  isPaused,
+  isLastStep,
+  onGoToLocation,
+}: {
+  isLastStep: boolean;
+  isPaused: boolean;
+  onReplay: () => void;
+  onPlayFromHere: () => void;
+  onGoToLocation: () => void;
+}) {
+  return (
+    <div className="flex items-center gap-1">
+      <button
+        title="Show source in devtools"
+        className={`flex flex-row items-center hover:bg-menuHoverBgcolor ${
+          isPaused && location ? "visible" : "invisible"
+        }`}
+        onClick={(onGoToLocation)}
+      >
+        <MaterialIcon>code</MaterialIcon>
+      </button>
+      <PlayButton
         onReplay={onReplay}
         onPlayFromHere={onPlayFromHere}
         isLastStep={isLastStep}
@@ -118,8 +173,7 @@ function TestStepItem({
     </div>
   );
 }
-
-function TestStepAction({
+function PlayButton({
   onReplay,
   onPlayFromHere,
   isPaused,
@@ -135,14 +189,22 @@ function TestStepAction({
 
   if (isLastStep) {
     return (
-      <button className={classname} onClick={onReplay} title="Replay this test">
+      <button
+        className={`flex flex-row items-center hover:bg-menuHoverBgcolor ${classname}`}
+        onClick={onReplay}
+        title="Replay this test"
+      >
         <MaterialIcon>replay</MaterialIcon>
       </button>
     );
   }
 
   return (
-    <button className={classname} onClick={onPlayFromHere} title="Play test from here">
+    <button
+      className={`flex flex-row items-center hover:bg-menuHoverBgcolor ${classname}`}
+      onClick={onPlayFromHere}
+      title="Play test from here"
+    >
       <MaterialIcon>play_arrow</MaterialIcon>
     </button>
   );

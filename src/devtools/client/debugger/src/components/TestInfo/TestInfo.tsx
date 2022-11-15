@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 
 import { getRecordingDuration } from "ui/actions/app";
 import { setFocusRegion } from "ui/actions/timeline";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useFetchCypressSpec } from "ui/hooks/useFetchCypressSpec";
 import { Annotation, getReporterAnnotations } from "ui/reducers/reporter";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -47,7 +48,10 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
   return (
     <div className="flex flex-col space-y-1 px-4 py-2">
       {highlightedTest !== null && (
-        <button onClick={onReset}>Show all ({testCases.length}) tests</button>
+        <button onClick={onReset} className="flex flex-row items-center hover:underline">
+          <MaterialIcon>chevron_left</MaterialIcon>
+          <div>Back</div>
+        </button>
       )}
       {correctedTestCases.map(
         (t, i) =>
