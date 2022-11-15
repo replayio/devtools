@@ -501,6 +501,7 @@
   --testsuites-error-bgcolor: #770702;
   --testsuites-error-color: white;
   --testsuites-steps-bgcolor: var(--theme-base-100);
+  --testsuites-steps-bgcolor-hover: var(--theme-toggle-handle-bgcolor-hover);
 
   /* To organise (Dark) */
   --jellyfish-bgcolor: rgba(40, 40, 40, 0.8);

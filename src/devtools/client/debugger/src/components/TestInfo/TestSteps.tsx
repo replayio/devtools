@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 
-import { playback, seekToTime, setTimelineToTime, startPlayback } from "ui/actions/timeline";
+import { seekToTime, setTimelineToTime, startPlayback } from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getCurrentTime } from "ui/reducers/timeline";
@@ -9,8 +9,19 @@ import { TestItem } from "ui/types";
 
 export function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
   const { steps } = test;
+  const dispatch = useAppDispatch();
+  const testStart = test.steps[0].relativeStartTime + startTime;
+  const testEnd =
+    test.steps[test.steps.length - 1].relativeStartTime +
+    startTime +
+    test.steps[test.steps.length - 1].duration;
 
-  console.log({ steps });
+  const onReplay = () => {
+    dispatch(startPlayback({ beginTime: testStart, endTime: testEnd }));
+  };
+  const onPlayFromHere = (beginTime: number) => {
+    dispatch(startPlayback({ beginTime: startTime, endTime: testEnd }));
+  };
 
   return (
     <div className="flex flex-col rounded-lg py-2 pl-11">
@@ -24,9 +35,9 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
           argString={s.args?.toString()}
           parentId={s.parentId}
           error={!!s.error}
-          testEnd={test.steps[test.steps.length - 1].relativeStartTime + startTime}
-          testStart={test.steps[0].relativeStartTime + startTime}
-          isLast={steps.length - 1 === i}
+          isLastStep={steps.length - 1 === i}
+          onReplay={onReplay}
+          onPlayFromHere={() => onPlayFromHere(startTime + s.relativeStartTime)}
         />
       ))}
       {test.error ? (
@@ -52,9 +63,9 @@ function TestStepItem({
   index,
   parentId,
   error,
-  testStart,
-  testEnd,
-  isLast,
+  onReplay,
+  onPlayFromHere,
+  isLastStep,
 }: {
   testName: string;
   startTime: number;
@@ -62,10 +73,10 @@ function TestStepItem({
   argString: string;
   index: number;
   parentId?: string;
-  error?: boolean;
-  testEnd: number;
-  testStart: number;
-  isLast?: boolean;
+  error: boolean;
+  onReplay: () => void;
+  onPlayFromHere: () => void;
+  isLastStep: boolean;
 }) {
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
@@ -73,58 +84,66 @@ function TestStepItem({
   const isPast = currentTime > startTime;
   const isPaused = currentTime >= startTime && currentTime < startTime + (duration || 1);
 
-  const onClick = () => {
-    dispatch(seekToTime(startTime));
-  };
-  const onMouseEnter = () => {
-    dispatch(setTimelineToTime(startTime));
-  };
-  const onMouseLeave = () => {
-    dispatch(setTimelineToTime(currentTime));
-  };
-  const onPlayFromHere = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log({ startTime, testEnd });
-    dispatch(startPlayback(startTime, testEnd));
-  };
-  const onReplay = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    dispatch(startPlayback(testStart, testEnd));
-  };
+  const onClick = () => dispatch(seekToTime(startTime));
+  const onMouseEnter = () => dispatch(setTimelineToTime(startTime));
+  const onMouseLeave = () => dispatch(setTimelineToTime(currentTime));
 
   const pausedColor = error ? "border-l-red-500" : "border-l-green-500";
 
   return (
     <div
-      onClick={onClick}
       className={`group/step relative flex items-center overflow-hidden border-b border-l-4 border-themeBase-90 bg-testsuitesStepsBgcolor pl-1 pr-3 font-mono ${
         isPast || isPaused ? pausedColor : "border-l-transparent"
       }`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <div className="flex flex-grow items-center space-x-2 overflow-hidden py-2 text-start">
+      <button
+        onClick={onClick}
+        className="flex flex-grow items-center space-x-2 overflow-hidden py-2 text-start"
+      >
         <div className="opacity-70">{index + 1}</div>
         <div className={`whitespace-pre font-medium text-bodyColor ${isPaused ? "font-bold" : ""}`}>
           {parentId ? "- " : ""}
           {testName}
         </div>
         <div className="opacity-70">{argString}</div>
-      </div>
-
-      {isLast && isPaused ? (
-        <button className="" onClick={onReplay} title="Replay test">
-          <MaterialIcon>replay</MaterialIcon>
-        </button>
-      ) : !isLast ? (
-        <button
-          className="invisible group-hover/step:visible"
-          onClick={onPlayFromHere}
-          title="Play from here"
-        >
-          <MaterialIcon>play_arrow</MaterialIcon>
-        </button>
-      ) : null}
+      </button>
+      <TestStepAction
+        onReplay={onReplay}
+        onPlayFromHere={onPlayFromHere}
+        isLastStep={isLastStep}
+        isPaused={isPaused}
+      />
     </div>
+  );
+}
+
+function TestStepAction({
+  onReplay,
+  onPlayFromHere,
+  isPaused,
+  isLastStep,
+}: {
+  isLastStep: boolean;
+  isPaused: boolean;
+  onReplay: () => void;
+  onPlayFromHere: () => void;
+}) {
+  // Only show the action by default if we're paused there
+  const classname = `${isPaused ? "visible" : "invisible"} group-hover/step:visible`;
+
+  if (isLastStep) {
+    return (
+      <button className={classname} onClick={onReplay} title="Replay this test">
+        <MaterialIcon>replay</MaterialIcon>
+      </button>
+    );
+  }
+
+  return (
+    <button className={classname} onClick={onPlayFromHere} title="Play test from here">
+      <MaterialIcon>play_arrow</MaterialIcon>
+    </button>
   );
 }

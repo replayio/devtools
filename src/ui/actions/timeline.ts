@@ -299,7 +299,12 @@ export function togglePlayback(): UIThunkAction {
   };
 }
 
-export function startPlayback(optBeginTime?: number, optEndTime?: number): UIThunkAction {
+type PlaybackOptions = {
+  beginTime: number | null;
+  endTime: number | null;
+}
+
+export function startPlayback({ beginTime: optBeginTime, endTime: optEndTime }: PlaybackOptions  = { beginTime: null, endTime: null }): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
     const currentTime = getCurrentTime(state);
