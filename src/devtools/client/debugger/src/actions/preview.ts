@@ -94,6 +94,7 @@ export function setPreview(
     }
 
     const { returned } = await ThreadFront.evaluateNew({
+      replayClient,
       pauseId: selectedFrame.pauseId,
       frameId: selectedFrame.protocolId,
       text: expression,

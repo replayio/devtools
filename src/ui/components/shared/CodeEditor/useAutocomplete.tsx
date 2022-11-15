@@ -11,6 +11,7 @@ import {
 } from "devtools/client/debugger/src/reducers/pause";
 import { getEvaluatedProperties } from "devtools/client/webconsole/utils/autocomplete-eager";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { ReplayClientInterface } from "shared/client/types";
 import { getPreferredGeneratedSources } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
 import { PickedScopes, pickScopes } from "ui/suspense/scopeCache";
@@ -92,6 +93,7 @@ function useGetScopeMatches(expression: string) {
 }
 
 async function getEvalMatches(
+  replayClient: ReplayClientInterface,
   expression: string,
   pauseAndFrameId: PauseAndFrameId | null,
   fetchObject: ObjectFetcher
@@ -104,6 +106,7 @@ async function getEvalMatches(
     return null;
   }
   const evaluatedProperties = await getEvaluatedProperties(
+    replayClient,
     propertyExpression.left,
     pauseAndFrameId.pauseId,
     pauseAndFrameId.frameId,
@@ -128,7 +131,7 @@ function useGetEvalMatches(expression: string) {
       const fetchObject = async (objectId: string) => {
         return getObjectWithPreviewHelper(replayClient, selectedFrameId.pauseId, objectId);
       };
-      return getEvalMatches(expression, selectedFrameId, fetchObject);
+      return getEvalMatches(replayClient, expression, selectedFrameId, fetchObject);
     },
     [selectedFrameId, replayClient]
   );
