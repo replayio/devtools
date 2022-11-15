@@ -85,7 +85,12 @@ export function paused({
         currentLocation.column !== selectedFrame.location.column
       ) {
         const { selectLocation } = await import("../sources");
-        dispatch(selectLocation(cx, selectedFrame.location, true));
+        // This action creator is triggered whenever we seek to a new exception point.
+        // It's pretty far removed from the cause of the seek,
+        // so it shouldn't make the decision of whether to change UI tabs.
+        const openSourcesTab = false;
+
+        dispatch(selectLocation(cx, selectedFrame.location, openSourcesTab));
       }
 
       if (pause !== ThreadFront.currentPause) {
