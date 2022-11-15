@@ -48,7 +48,7 @@ async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
   await debugPrint(page, `Scrolling to source line ${chalk.bold(lineNumber)}`, "goToLine");
 
   await page.keyboard.down(getCommandKey());
-  await page.keyboard.type("g");
+  await page.keyboard.type("p");
   await page.keyboard.up(getCommandKey());
 
   const input = page.locator("[data-test-id=QuickOpenInput]");

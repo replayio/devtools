@@ -87,17 +87,19 @@ function NewSourceAdapter() {
         break;
       }
       case "g": {
-        // Unlike Enter / Shift+Enter, this event handler is external to the Search input
-        // so that we can mirror UIs like Chrome and Code and re-open the search UI if it's been closed
-        sourceSearchActions.enable();
-        if (event.shiftKey) {
-          sourceSearchActions.goToPrevious();
-        } else {
-          sourceSearchActions.goToNext();
-        }
+        if (event.ctrlKey || event.metaKey) {
+          // Unlike Enter / Shift+Enter, this event handler is external to the Search input
+          // so that we can mirror UIs like Chrome and Code and re-open the search UI if it's been closed
+          sourceSearchActions.enable();
+          if (event.shiftKey) {
+            sourceSearchActions.goToPrevious();
+          } else {
+            sourceSearchActions.goToNext();
+          }
 
-        event.preventDefault();
-        event.stopPropagation();
+          event.preventDefault();
+          event.stopPropagation();
+        }
         break;
       }
     }
