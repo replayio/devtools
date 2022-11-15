@@ -29,8 +29,8 @@ export function getCursorIndex(contentEditable: HTMLElement): number {
     if (selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
       if (range) {
-        const startOffset = range.startOffset;
         const startContainer = range.startContainer;
+        const startOffset = range.startOffset;
 
         let textIndex = 0;
         for (let nodeIndex = 0; nodeIndex < contentEditable.childNodes.length; nodeIndex++) {
@@ -38,7 +38,7 @@ export function getCursorIndex(contentEditable: HTMLElement): number {
           const textContentLength = childNode.textContent!.length;
 
           const textNode = childNode.nodeType === Node.TEXT_NODE ? childNode : childNode.firstChild;
-          if (textNode === startContainer) {
+          if (childNode === startContainer || textNode === startContainer) {
             return textIndex + startOffset;
           }
 
@@ -49,6 +49,13 @@ export function getCursorIndex(contentEditable: HTMLElement): number {
   }
 
   return contentEditable.textContent!.length;
+}
+
+export function getCursorIndexAfterPaste(
+  cursorIndexBeforePaste: number,
+  pastedText: string
+): number {
+  return cursorIndexBeforePaste + pastedText.length;
 }
 
 export function selectAllText(contentEditable: HTMLElement): void {
