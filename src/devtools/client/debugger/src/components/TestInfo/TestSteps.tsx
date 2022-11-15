@@ -1,9 +1,11 @@
 import { Location } from "@replayio/protocol";
 import React from "react";
 
+import { setViewMode } from "ui/actions/layout";
 import { seekToTime, setTimelineToTime, startPlayback } from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { getViewMode } from "ui/reducers/layout";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem } from "ui/types";
@@ -155,15 +157,7 @@ function TestStepActions({
 }) {
   return (
     <div className="flex items-center gap-1">
-      <button
-        title="Show source in devtools"
-        className={`flex flex-row items-center hover:bg-menuHoverBgcolor ${
-          isPaused && location ? "visible" : "invisible"
-        }`}
-        onClick={onGoToLocation}
-      >
-        <MaterialIcon>code</MaterialIcon>
-      </button>
+      <ToggleViewButton isPaused={isPaused} onGoToLocation={onGoToLocation} />
       <PlayButton
         onReplay={onReplay}
         onPlayFromHere={onPlayFromHere}
@@ -171,6 +165,36 @@ function TestStepActions({
         isPaused={isPaused}
       />
     </div>
+  );
+}
+function ToggleViewButton({
+  isPaused,
+  onGoToLocation,
+}: {
+  isPaused: boolean;
+  onGoToLocation: () => void;
+}) {
+  const dispatch = useAppDispatch();
+  const viewMode = useAppSelector(getViewMode);
+
+  const onClick = () => {
+    if (viewMode === "dev") {
+      dispatch(setViewMode("non-dev"));
+    } else {
+      onGoToLocation();
+    }
+  };
+
+  return (
+    <button
+      title="Show source in devtools"
+      className={`flex flex-row items-center hover:bg-menuHoverBgcolor ${
+        isPaused ? "visible" : "invisible"
+      }`}
+      onClick={onClick}
+    >
+      <MaterialIcon>{viewMode === "dev" ? "fullscreen" : "code"}</MaterialIcon>
+    </button>
   );
 }
 function PlayButton({
