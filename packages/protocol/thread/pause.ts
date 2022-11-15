@@ -145,20 +145,4 @@ export class Pause {
     assert(this.pauseId, "pauseId not set before sending a message");
     return await method(params, this.sessionId, this.pauseId);
   }
-
-  async evaluate(frameId: FrameId | undefined, expression: string, pure: boolean) {
-    assert(this.createWaiter, "no createWaiter");
-    await this.createWaiter;
-    const { result } = frameId
-      ? await this.sendMessage(client.Pause.evaluateInFrame, {
-          frameId,
-          expression,
-          useOriginalScopes: true,
-          pure,
-        })
-      : await this.sendMessage(client.Pause.evaluateInGlobal, { expression, pure });
-    const { returned, exception, failed, data } = result;
-    this.addData(data);
-    return { returned, exception, failed } as EvaluationResult;
-  }
 }

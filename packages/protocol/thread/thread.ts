@@ -16,12 +16,9 @@ import {
   loadedRegions as LoadedRegions,
   Location,
   MappedLocation,
-  Message,
-  ObjectId,
   PauseData,
   PauseDescription,
   PauseId,
-  PointRange,
   RecordingId,
   RequestEventInfo,
   RequestInfo,
@@ -35,12 +32,14 @@ import {
   Value,
   findAnnotationsResult,
   missingRegions,
-  newSource,
   requestBodyData,
   responseBodyData,
   unprocessedRegions,
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
+
+import { cachePauseData } from "bvaughn-architecture-demo/src/suspense/PauseCache";
+import { ReplayClientInterface } from "shared/client/types";
 
 import { MappedLocationCache } from "../mapped-location-cache";
 import ScopeMapCache from "../scope-map-cache";
@@ -509,11 +508,13 @@ class _ThreadFront {
   // Same as evaluate, but returns the result without wrapping a ValueFront around them.
   // TODO Replace usages of evaluate with this.
   async evaluateNew({
+    replayClient,
     pauseId,
     text,
     frameId,
     pure = false,
   }: {
+    replayClient: ReplayClientInterface;
     pauseId?: PauseId;
     text: string;
     frameId?: FrameId;
@@ -521,8 +522,28 @@ class _ThreadFront {
   }) {
     const pause = pauseId ? Pause.getById(pauseId) : this.currentPause;
     assert(pause, pauseId ? `no pause for pauseId ${pauseId}` : "no current pause");
+    await pause.ensureLoaded();
     const abilities = await this.recordingCapabilitiesWaiter.promise;
-    const rv = await pause.evaluate(frameId, text, abilities.supportsPureEvaluation && pure);
+    const { result } = frameId
+      ? await client.Pause.evaluateInFrame(
+          {
+            frameId,
+            expression: text,
+            useOriginalScopes: true,
+            pure: abilities.supportsPureEvaluation && pure,
+          },
+          this.sessionId!,
+          pause.pauseId!
+        )
+      : await client.Pause.evaluateInGlobal(
+          {
+            expression: text,
+            pure: abilities.supportsPureEvaluation && pure,
+          },
+          this.sessionId!,
+          pause.pauseId!
+        );
+    cachePauseData(replayClient, pause.pauseId!, result.data);
 
     if (repaintAfterEvaluationsExperimentalFlag) {
       const { repaint } = await import("protocol/graphics");
@@ -530,10 +551,10 @@ class _ThreadFront {
       repaint(true);
     }
 
-    if (rv.returned) {
-      return { exception: null, returned: rv.returned as unknown as Value };
-    } else if (rv.exception) {
-      return { exception: rv.exception as unknown as Value, returned: null };
+    if (result.returned) {
+      return { exception: null, returned: result.returned as unknown as Value };
+    } else if (result.exception) {
+      return { exception: result.exception as unknown as Value, returned: null };
     } else {
       return { exception: null, returned: null };
     }
