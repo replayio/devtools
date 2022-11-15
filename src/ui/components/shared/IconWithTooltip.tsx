@@ -31,6 +31,7 @@ export default function IconWithTooltip({
   return (
     <div className="icon-with-tooltip text-sm">
       <button
+        className="icon-with-tooltip-button"
         data-test-name={dataTestName}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
