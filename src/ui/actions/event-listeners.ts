@@ -97,10 +97,7 @@ export function getNodeEventListeners(
   nodeId: string
 ): UIThunkAction<Promise<EventListenerWithFunctionInfo[]>> {
   return async (dispatch, getState, { ThreadFront, protocolClient, replayClient, objectCache }) => {
-    if (!ThreadFront.currentPause) {
-      return [];
-    }
-    const pauseId = ThreadFront.currentPause.pauseId!;
+    const pauseId = await ThreadFront.getCurrentPauseId(replayClient);
 
     if (!eventListenersCacheByPause.has(pauseId)) {
       eventListenersCacheByPause.set(pauseId, new Map());
@@ -118,11 +115,10 @@ export function getNodeEventListeners(
     const sourcesById = getSourceDetailsEntities(state);
 
     // We need to fetch "basic" event listeners from the protocol API
-    const { listeners, data } = await ThreadFront.currentPause.sendMessage(
-      protocolClient.DOM.getEventListeners,
-      {
-        node: nodeId,
-      }
+    const { listeners, data } = await protocolClient.DOM.getEventListeners(
+      { node: nodeId },
+      ThreadFront.sessionId!,
+      pauseId
     );
 
     cachePauseData(replayClient, pauseId, data);

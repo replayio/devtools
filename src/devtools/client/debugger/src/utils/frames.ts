@@ -1,6 +1,7 @@
 import { PauseId } from "@replayio/protocol";
 
 import { getFrameStepsIfCached } from "bvaughn-architecture-demo/src/suspense/FrameStepsCache";
+import { getPauseIdForExecutionPointIfCached } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { ThreadFront } from "protocol/thread/thread";
 import { SourcesState } from "ui/reducers/sources";
 import { getPauseFramesIfCached } from "ui/suspense/frameCache";
@@ -33,11 +34,11 @@ export function getAllCachedPauseFrames(
     if (!steps?.value?.length) {
       break;
     }
-    const asyncParentPause = ThreadFront.ensurePause(steps.value[0].point, steps.value[0].time);
-    if (!asyncParentPause.pauseId || asyncParentPause.pauseId === pauseId) {
+    const asyncParentPauseId = getPauseIdForExecutionPointIfCached(steps.value[0].point)?.value;
+    if (!asyncParentPauseId || asyncParentPauseId === pauseId) {
       break;
     }
-    pauseId = asyncParentPause.pauseId;
+    pauseId = asyncParentPauseId;
     asyncIndex++;
   }
 

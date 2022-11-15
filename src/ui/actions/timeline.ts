@@ -18,7 +18,6 @@ import {
 } from "protocol/graphics";
 import { DownloadCancelledError } from "protocol/screenshot-cache";
 import { ThreadFront } from "protocol/thread";
-import { Pause } from "protocol/thread/pause";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { waitForTime } from "protocol/utils";
 import { getFirstComment } from "ui/hooks/comments/comments";
@@ -236,10 +235,9 @@ export function seek(
   pauseId?: PauseId
 ): UIThunkAction<boolean> {
   return (dispatch, getState, { ThreadFront }) => {
-    const pause = pauseId !== undefined ? Pause.getById(pauseId) : undefined;
     dispatch(framePositionsCleared());
-    if (pause) {
-      ThreadFront.timeWarpToPause(pause);
+    if (pauseId) {
+      ThreadFront.timeWarpToPause({ point, time, pauseId });
     } else {
       const regions = getLoadedRegions(getState());
       const focusRegion = getFocusRegion(getState());

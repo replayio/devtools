@@ -10,7 +10,7 @@ import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/Terminal
 import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 import useLoadedRegions from "bvaughn-architecture-demo/src/hooks/useRegions";
 import { getFramesSuspense } from "bvaughn-architecture-demo/src/suspense/FrameCache";
-import { getPauseIdForExecutionPointSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
+import { getPauseIdSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegions } from "shared/utils/time";
 
@@ -62,7 +62,7 @@ function ConsoleInputSuspends() {
     const isLoaded =
       loadedRegions !== null && isPointInRegions(executionPoint, loadedRegions.loaded);
     if (isLoaded) {
-      pauseId = getPauseIdForExecutionPointSuspense(replayClient, executionPoint);
+      pauseId = getPauseIdSuspense(replayClient, executionPoint, time);
       const frames = getFramesSuspense(replayClient, pauseId);
       frameId = frames?.[0]?.frameId ?? null;
     }

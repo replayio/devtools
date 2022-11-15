@@ -1,17 +1,9 @@
-import {
-  CallStack,
-  loadedRegions as LoadedRegions,
-  Location,
-  PauseData,
-  PauseId,
-} from "@replayio/protocol";
+import { loadedRegions as LoadedRegions, Location } from "@replayio/protocol";
 
-import { cachePauseData } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { preCacheExecutionPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
 import { EMPTY_TABS } from "devtools/client/debugger/src/reducers/tabs";
 import { ThreadFront } from "protocol/thread";
-import { addPauseDataListener } from "protocol/thread/pause";
 import { ReplayClient } from "shared/client/ReplayClient";
 import { replayClient } from "shared/client/ReplayClientContext";
 import { UIStore } from "ui/actions";
@@ -120,13 +112,6 @@ export async function bootstrapApp() {
   if (typeof window === "undefined") {
     return store;
   }
-
-  // Connect data in legacy Redux stores (like PauseData or points) to the newer Suspense caches.
-  // This avoids requiring the new components from requesting redundant data.
-  // In the case of PauseData, it's extra important– because the backend won't re-send the same data twice no matter how many times you ask for it.
-  addPauseDataListener((pauseId: PauseId, pauseData: PauseData, stack?: CallStack) => {
-    cachePauseData(replayClient, pauseId, pauseData, stack);
-  });
 
   // Listen for changes in loaded regions and pre-caches the points.
   ThreadFront.listenForLoadChanges((loadedRegions: LoadedRegions) => {

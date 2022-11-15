@@ -2,6 +2,7 @@ import { PauseId } from "@replayio/protocol";
 import { Suspense, useContext, useMemo } from "react";
 
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
+import { getPointAndTimeForPauseId } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import {
   Context,
   PauseFrame,
@@ -10,7 +11,6 @@ import {
   getSelectedFrameId,
   getThreadContext,
 } from "devtools/client/debugger/src/selectors";
-import { Pause } from "protocol/thread/pause";
 import { ThreadFront } from "protocol/thread/thread";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { enterFocusMode } from "ui/actions/timeline";
@@ -127,11 +127,15 @@ function PauseFrames({
 
   function selectFrame(cx: Context, frame: PauseFrame) {
     if (pauseId !== currentPauseId) {
-      const pause = Pause.getById(pauseId);
-      if (!pause?.point || !loadedRegions || !isPointInRegions(loadedRegions.loaded, pause.point)) {
+      const pointAndTime = getPointAndTimeForPauseId(pauseId);
+      if (
+        !pointAndTime ||
+        !loadedRegions ||
+        !isPointInRegions(loadedRegions.loaded, pointAndTime.point)
+      ) {
         return;
       }
-      ThreadFront.timeWarpToPause(pause);
+      ThreadFront.timeWarpToPause({ ...pointAndTime, pauseId });
     }
     dispatch(selectFrameAction(cx, frame));
   }
@@ -187,13 +191,13 @@ export default function Frames({
   const sourcesLoading = useAppSelector(getSourcesLoading);
   const loadedRegions = useAppSelector(getLoadedRegions);
   const dispatch = useAppDispatch();
-  const pause = Pause.getById(pauseId);
+  const pointAndTime = getPointAndTimeForPauseId(pauseId);
 
-  if (sourcesLoading || !loadedRegions || !pause?.point) {
+  if (sourcesLoading || !loadedRegions || !pointAndTime) {
     return null;
   }
 
-  if (!isPointInRegions(loadedRegions.loaded, pause.point)) {
+  if (!isPointInRegions(loadedRegions.loaded, pointAndTime.point)) {
     return (
       <div className="pane frames">
         <div className="pane-info empty">

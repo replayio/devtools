@@ -18,7 +18,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegions } from "shared/utils/time";
 
 import useLoadedRegions from "../hooks/useRegions";
-import { getPauseIdForExecutionPointAsync } from "../suspense/PauseCache";
+import { getPauseIdAsync } from "../suspense/PauseCache";
 import { TimelineContext } from "./TimelineContext";
 
 interface PauseAndFrameId {
@@ -74,7 +74,7 @@ export function SelectedFrameContextRoot({
 function DefaultSelectedFrameContextAdapter() {
   const client = useContext(ReplayClientContext);
   const loadedRegions = useLoadedRegions(client);
-  const { executionPoint } = useContext(TimelineContext);
+  const { executionPoint, time } = useContext(TimelineContext);
   const { setSelectedPauseAndFrameId } = useContext(SelectedFrameContext);
 
   const isLoaded = loadedRegions !== null && isPointInRegions(executionPoint, loadedRegions.loaded);
@@ -87,7 +87,7 @@ function DefaultSelectedFrameContextAdapter() {
     let cancelled = false;
 
     async function getData() {
-      const pauseId = await getPauseIdForExecutionPointAsync(client, executionPoint);
+      const pauseId = await getPauseIdAsync(client, executionPoint, time);
 
       // Edge case handle an update that rendered while we were awaiting data.
       // In the case we should skip any state update.
@@ -114,7 +114,7 @@ function DefaultSelectedFrameContextAdapter() {
     return () => {
       cancelled = true;
     };
-  }, [client, executionPoint, isLoaded, setSelectedPauseAndFrameId]);
+  }, [client, executionPoint, time, isLoaded, setSelectedPauseAndFrameId]);
 
   return null;
 }
