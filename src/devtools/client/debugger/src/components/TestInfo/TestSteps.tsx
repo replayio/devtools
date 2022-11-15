@@ -6,7 +6,7 @@ import { seekToTime, setTimelineToTime, startPlayback } from "ui/actions/timelin
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getViewMode } from "ui/reducers/layout";
-import { getCurrentTime } from "ui/reducers/timeline";
+import { getCurrentTime, getPlayback } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem } from "ui/types";
 
@@ -110,11 +110,12 @@ function TestStepItem({
   const onMouseEnter = () => dispatch(setTimelineToTime(startTime));
   const onMouseLeave = () => dispatch(setTimelineToTime(currentTime));
 
-  const pausedColor = error ? "border-l-red-500" : "border-l-green-500";
+  const pausedColor = error ? "border-l-red-500" : "border-l-primaryAccent";
 
   return (
     <div
       className={`group/step relative flex items-center overflow-hidden border-b border-l-4 border-themeBase-90 bg-testsuitesStepsBgcolor pl-1 pr-3 font-mono ${
+        // "border-l-transparent",
         isPast || isPaused ? pausedColor : "border-l-transparent"
       }`}
       onMouseEnter={onMouseEnter}
@@ -155,6 +156,13 @@ function TestStepActions({
   onPlayFromHere: () => void;
   onGoToLocation: () => void;
 }) {
+  const playback = useAppSelector(getPlayback);
+
+  // Don't show actions when playing actions back
+  if (playback) {
+    return null;
+  }
+
   return (
     <div className="flex items-center gap-1">
       <ToggleViewButton isPaused={isPaused} onGoToLocation={onGoToLocation} />
