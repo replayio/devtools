@@ -84,12 +84,12 @@ function TestStepItem({
   };
   const onPlayFromHere = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log("hi", { startTime, testEnd });
-    dispatch(startPlayback(testEnd));
+    console.log({ startTime, testEnd });
+    dispatch(startPlayback(startTime, testEnd));
   };
   const onReplay = (e: React.MouseEvent) => {
     e.stopPropagation();
-    dispatch(seekToTime(testStart, true));
+    dispatch(startPlayback(testStart, testEnd));
   };
 
   const pausedColor = error ? "border-l-red-500" : "border-l-green-500";
@@ -97,7 +97,7 @@ function TestStepItem({
   return (
     <div
       onClick={onClick}
-      className={`group relative flex items-center overflow-hidden border-b border-l-4 border-themeBase-90 bg-testsuitesStepsBgcolor pl-1 pr-3 font-mono ${
+      className={`group/step relative flex items-center overflow-hidden border-b border-l-4 border-themeBase-90 bg-testsuitesStepsBgcolor pl-1 pr-3 font-mono ${
         isPast || isPaused ? pausedColor : "border-l-transparent"
       }`}
       onMouseEnter={onMouseEnter}
@@ -113,13 +113,17 @@ function TestStepItem({
       </div>
 
       {isLast && isPaused ? (
-        <div className="" onClick={onReplay}>
+        <button className="" onClick={onReplay} title="Replay test">
           <MaterialIcon>replay</MaterialIcon>
-        </div>
+        </button>
       ) : !isLast ? (
-        <div className="invisible group-hover:visible" onClick={onPlayFromHere}>
-          PFH
-        </div>
+        <button
+          className="invisible group-hover/step:visible"
+          onClick={onPlayFromHere}
+          title="Play from here"
+        >
+          <MaterialIcon>play_arrow</MaterialIcon>
+        </button>
       ) : null}
     </div>
   );
