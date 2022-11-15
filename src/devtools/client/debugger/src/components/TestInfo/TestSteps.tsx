@@ -111,6 +111,10 @@ function TestStepItem({
   const onClick = () => dispatch(seekToTime(startTime));
   const onMouseEnter = () => dispatch(setTimelineToTime(startTime));
   const onMouseLeave = () => dispatch(setTimelineToTime(currentTime));
+  const onJumpToBefore = () => dispatch(seekToTime(startTime));
+  const onJumpToAfter = () => {
+    dispatch(seekToTime(startTime + adjustedDuration - 1));
+  };
 
   const pausedColor = error ? "border-l-red-500" : "border-l-primaryAccent";
 
@@ -132,7 +136,10 @@ function TestStepItem({
         className="flex flex-grow items-center space-x-2 overflow-hidden py-2 text-start"
       >
         <div className="opacity-70">{index + 1}</div>
-        <ProgressBar progress={progress} />
+        <div className="opacity-70">
+          {startTime},{adjustedDuration}
+        </div>
+        <ProgressBar progress={adjustedDuration === 1 && isPaused ? 100 : progress} />
         <div className={`whitespace-pre font-medium text-bodyColor ${isPaused ? "font-bold" : ""}`}>
           {parentId ? "- " : ""}
           {testName}
@@ -145,6 +152,9 @@ function TestStepItem({
         isLastStep={isLastStep}
         isPaused={isPaused}
         onGoToLocation={onGoToLocation}
+        onJumpToBefore={onJumpToBefore}
+        onJumpToAfter={onJumpToAfter}
+        duration={adjustedDuration}
       />
     </div>
   );
@@ -156,12 +166,18 @@ function TestStepActions({
   isPaused,
   isLastStep,
   onGoToLocation,
+  onJumpToBefore,
+  onJumpToAfter,
+  duration,
 }: {
   isLastStep: boolean;
   isPaused: boolean;
+  duration: number;
   onReplay: () => void;
   onPlayFromHere: () => void;
   onGoToLocation: () => void;
+  onJumpToBefore: () => void;
+  onJumpToAfter: () => void;
 }) {
   const playback = useAppSelector(getPlayback);
 
@@ -172,6 +188,13 @@ function TestStepActions({
 
   return (
     <div className="flex items-center gap-1">
+      {duration !== 1 ? (
+        <BeforeAndAfterButton
+          isPaused={isPaused}
+          onJumpToAfter={onJumpToAfter}
+          onJumpToBefore={onJumpToBefore}
+        />
+      ) : null}
       <ToggleViewButton isPaused={isPaused} onGoToLocation={onGoToLocation} />
       <PlayButton
         onReplay={onReplay}
@@ -180,6 +203,38 @@ function TestStepActions({
         isPaused={isPaused}
       />
     </div>
+  );
+}
+function BeforeAndAfterButton({
+  isPaused,
+  onJumpToBefore,
+  onJumpToAfter,
+}: {
+  isPaused: boolean;
+  onJumpToBefore: () => void;
+  onJumpToAfter: () => void;
+}) {
+  return (
+    <>
+      <button
+        title="Jump to Before"
+        className={`flex flex-row items-center hover:bg-menuHoverBgcolor ${
+          isPaused ? "visible" : "invisible"
+        }`}
+        onClick={onJumpToBefore}
+      >
+        <MaterialIcon>arrow_backward</MaterialIcon>
+      </button>
+      <button
+        title="Jump to After"
+        className={`flex flex-row items-center hover:bg-menuHoverBgcolor ${
+          isPaused ? "visible" : "invisible"
+        }`}
+        onClick={onJumpToAfter}
+      >
+        <MaterialIcon>arrow_forward</MaterialIcon>
+      </button>
+    </>
   );
 }
 function ToggleViewButton({
