@@ -56,7 +56,7 @@
   overflow: auto;
   height: 100%;
   flex: 1;
-  background-color: var(--point-panel-input-background-color);
+  background-color: var(--background-color-inputs);
   border: 2px solid transparent;
   padding: 0 0.5em;
   border-radius: 0.5em;
