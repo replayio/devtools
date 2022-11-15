@@ -117,30 +117,26 @@ function TestStepItem({
     dispatch(seekToTime(startTime + adjustedDuration - 1));
   };
 
-  const pausedColor = error ? "border-l-red-500" : "border-l-primaryAccent";
-
   // This math is bananas don't look here until this is cleaned up :)
   const bump = isPaused || isPast ? 10 : 0;
   const actualProgress = bump + 90 * ((currentTime - startTime) / adjustedDuration);
   const progress = actualProgress > 100 ? 100 : actualProgress;
+  const displayedProgress = adjustedDuration === 1 && isPaused ? 100 : progress;
 
   return (
     <div
-      className={`group/step relative flex items-center gap-1 overflow-hidden border-b border-l-4 border-themeBase-90 bg-testsuitesStepsBgcolor pl-1 pr-3 font-mono ${
-        isPast || isPaused ? pausedColor : "border-l-transparent"
-      }`}
+      className={`group/step relative flex items-start gap-1 overflow-hidden border-b border-themeBase-90 bg-testsuitesStepsBgcolor pl-1 pr-3 font-mono`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
       <button
         onClick={onClick}
-        className="flex flex-grow items-center space-x-2 overflow-hidden py-2 text-start"
+        className="flex flex-grow items-start space-x-2 overflow-hidden py-2 text-start"
       >
+        <div title={"" + displayedProgress}>
+          <ProgressBar progress={displayedProgress} />
+        </div>
         <div className="opacity-70">{index + 1}</div>
-        {/* <div className="opacity-70">
-          {startTime},{adjustedDuration}, {}
-        </div> */}
-        <ProgressBar progress={adjustedDuration === 1 && isPaused ? 100 : progress} />
         <div className={`whitespace-pre font-medium text-bodyColor ${isPaused ? "font-bold" : ""}`}>
           {parentId ? "- " : ""}
           {testName}
@@ -188,7 +184,7 @@ function TestStepActions({
   }
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1 py-2">
       {duration !== 1 ? (
         <BeforeAndAfterButton
           isPaused={isPaused}
