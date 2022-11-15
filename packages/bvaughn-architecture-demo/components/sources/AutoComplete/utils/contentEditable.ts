@@ -61,14 +61,18 @@ export function getCursorIndexAfterPaste(
 export function selectAllText(contentEditable: HTMLElement): void {
   contentEditable.focus();
 
-  const selection = window.getSelection();
-  if (selection) {
-    const range = document.createRange();
-    range.selectNodeContents(contentEditable);
+  // HACK
+  // Waiting until the end of the microtask queue works around a selection bug in Safari.
+  setTimeout(() => {
+    const selection = window.getSelection();
+    if (selection) {
+      const range = document.createRange();
+      range.selectNodeContents(contentEditable);
 
-    selection.removeAllRanges();
-    selection.addRange(range);
-  }
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+  }, 0);
 }
 
 export function selectText(
