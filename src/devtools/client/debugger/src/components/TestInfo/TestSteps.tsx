@@ -160,7 +160,7 @@ function TestStepActions({
         className={`flex flex-row items-center hover:bg-menuHoverBgcolor ${
           isPaused && location ? "visible" : "invisible"
         }`}
-        onClick={(onGoToLocation)}
+        onClick={onGoToLocation}
       >
         <MaterialIcon>code</MaterialIcon>
       </button>

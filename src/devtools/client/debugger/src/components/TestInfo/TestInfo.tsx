@@ -17,8 +17,7 @@ function maybeCorrectTestTimes(testCases: TestItem[], annotations: Annotation[])
   }));
 }
 
-export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
-  const [highlightedTest, setHighlightedTest] = useState<number | null>(null);
+export default function TestInfo({ testCases, highlightedTest, setHighlightedTest }: { testCases: TestItem[]; highlightedTest: number | null; setHighlightedTest: (test: number | null) => void }) {
   const dispatch = useAppDispatch();
   const annotations = useAppSelector(getReporterAnnotations);
   const cypressResults = useFetchCypressSpec();
