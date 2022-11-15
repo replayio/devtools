@@ -32,10 +32,11 @@ export function TestSteps({
     test.steps[test.steps.length - 1].duration;
 
   const onReplay = () => {
-    dispatch(startPlayback({ beginTime: testStart, endTime: testEnd }));
+    console.log("testEnd", { testEnd });
+    dispatch(startPlayback({ beginTime: testStart, endTime: testEnd - 1 }));
   };
   const onPlayFromHere = (beginTime: number) => {
-    dispatch(startPlayback({ beginTime: startTime, endTime: testEnd }));
+    dispatch(startPlayback({ beginTime: startTime, endTime: testEnd - 1 }));
   };
   const onGoToLocation = () => {
     if (location) {
@@ -119,8 +120,8 @@ function TestStepItem({
   const pausedColor = error ? "border-l-red-500" : "border-l-primaryAccent";
 
   // This math is bananas don't look here until this is cleaned up :)
-  const bump = isPaused || isPast ? 20 : 0;
-  const actualProgress = bump + 80 * ((currentTime - startTime) / adjustedDuration);
+  const bump = isPaused || isPast ? 10 : 0;
+  const actualProgress = bump + 90 * ((currentTime - startTime) / adjustedDuration);
   const progress = actualProgress > 100 ? 100 : actualProgress;
 
   return (
@@ -136,9 +137,9 @@ function TestStepItem({
         className="flex flex-grow items-center space-x-2 overflow-hidden py-2 text-start"
       >
         <div className="opacity-70">{index + 1}</div>
-        <div className="opacity-70">
-          {startTime},{adjustedDuration}
-        </div>
+        {/* <div className="opacity-70">
+          {startTime},{adjustedDuration}, {}
+        </div> */}
         <ProgressBar progress={adjustedDuration === 1 && isPaused ? 100 : progress} />
         <div className={`whitespace-pre font-medium text-bodyColor ${isPaused ? "font-bold" : ""}`}>
           {parentId ? "- " : ""}
