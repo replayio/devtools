@@ -1,15 +1,14 @@
 import { RecordingId } from "@replayio/protocol";
-import classNames from "classnames/bind";
-import React, { useLayoutEffect, useRef, useState } from "react";
+import { ClipboardEvent, KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
 
 import { RecordingTarget } from "protocol/thread/thread";
+import { getRecordingTarget } from "ui/actions/app";
 import Avatar from "ui/components/Avatar";
 import UserOptions from "ui/components/Header/UserOptions";
 import ViewToggle, { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import hooks from "ui/hooks";
 import { useGetActiveSessions } from "ui/hooks/sessions";
-import * as selectors from "ui/reducers/app";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
 import { Recording } from "ui/types";
@@ -20,9 +19,9 @@ import { RecordingTrialEnd } from "./RecordingTrialEnd";
 import ShareButton from "./ShareButton";
 import styles from "./Header.module.css";
 
-function pasteText(ev: React.ClipboardEvent) {
-  ev.preventDefault();
-  var text = ev.clipboardData.getData("text/plain");
+function pasteText(event: ClipboardEvent) {
+  event.preventDefault();
+  const text = event.clipboardData.getData("text/plain");
   document.execCommand("insertText", false, text);
 }
 
@@ -84,110 +83,76 @@ function HeaderTitle({
   recordingId: RecordingId;
 }) {
   const [editing, setEditing] = useState(EditState.Inactive);
-  const inputNode = useRef<HTMLInputElement>(null);
-  const [title, setTitle] = useState(recording?.title ?? "Untitled");
+  const contentEditableRef = useRef<HTMLSpanElement>(null);
   const updateRecordingTitle = hooks.useUpdateRecordingTitle();
   const canEditTitle = recording.userRole !== "none";
-  const isEditing = editing === EditState.Active;
 
-  const className =
-    "ml-2 text-lg p-0.5 whitespace-pre overflow-hidden overflow-ellipsis rounded-lg border-transparent hover:border-current focus:border-current";
+  const hasTitle = recording.title && recording.title.length > 0;
+  const displayTitle = hasTitle ? recording.title : "Untitled";
 
-  const onKeyPress: React.KeyboardEventHandler = (e: any) => {
-    if (e.code == "Enter" || e.code == "Escape") {
-      e.preventDefault();
-      saveOrReset(e.code === "Enter" ? EditState.Saving : EditState.Inactive);
+  useLayoutEffect(() => {
+    if (!contentEditableRef.current) {
+      return;
+    }
+
+    if (!editing) {
+      contentEditableRef.current.innerText = hasTitle ? recording.title! : "Untitled";
+    } else if (editing === EditState.Active && !hasTitle) {
+      contentEditableRef.current.innerText = "";
+    } else if (editing === EditState.Saving && !contentEditableRef.current.innerText) {
+      contentEditableRef.current.innerText = "Untitled";
+    }
+  }, [editing, hasTitle, recording.title]);
+
+  const testName = recording.metadata?.test?.title;
+  if (testName) {
+    return <span className={styles.ReadOnlyTitle}>{testName}</span>;
+  }
+
+  if (!canEditTitle) {
+    return <span className={styles.ReadOnlyTitle}>{displayTitle}</span>;
+  }
+
+  const onKeyDownOrKeyPress = (event: KeyboardEvent) => {
+    if (event.code == "Enter" || event.code == "Escape") {
+      event.preventDefault();
+      contentEditableRef.current!.blur();
     }
   };
   const onFocus = () => {
     trackEvent("header.edit_title");
     return editing === EditState.Inactive && setEditing(EditState.Active);
   };
-
-  const saveOrReset = (nextState = EditState.Saving) => {
-    if (!isEditing) {
+  const onBlur = () => {
+    if (editing !== EditState.Active) {
       return;
     }
+    const currentValue = contentEditableRef.current!.textContent || "";
 
-    if (nextState === EditState.Inactive) {
-      setTitle(recording.title!);
+    setEditing(EditState.Saving);
+    updateRecordingTitle(recordingId, currentValue).then(() => {
       setEditing(EditState.Inactive);
-    } else if (nextState === EditState.Saving) {
-      if (title !== recording.title) {
-        const finalTitle = title ?? "Untitled";
-        setTitle(finalTitle);
-        updateRecordingTitle(recordingId, finalTitle).then(() => {
-          setEditing(EditState.Inactive);
-        });
-        console.log("Saving new title: ", finalTitle);
-        setEditing(EditState.Saving);
-      } else {
-        setEditing(EditState.Inactive);
-      }
-    }
-
-    inputNode.current!.blur();
+    });
   };
 
-  const hasTitle = recording.title && recording.title.length > 0;
-  const displayTitle = isEditing ? title : hasTitle ? recording.title : "Untitled";
-
-  useLayoutEffect(() => {
-    if (!inputNode.current) {
-      return;
-    }
-
-    if (!editing) {
-      // inputNode.current.value = hasTitle ? recording.title! : "Untitled";
-      setTitle(hasTitle ? recording.title! : "Untitled");
-    } else if (editing === EditState.Active && !hasTitle) {
-      // inputNode.current.value = "";
-      setTitle("");
-    } else if (editing === EditState.Saving && !inputNode.current.value) {
-      // inputNode.current.value = "Untitled";
-      setTitle("Untitled");
-    }
-  }, [editing, hasTitle, recording.title]);
-
-  const testName = recording.metadata?.test?.title;
-  if (testName) {
-    return <span className={className}>{testName}</span>;
-  }
-
-  if (!canEditTitle) {
-    return <span className={className}>{displayTitle}</span>;
-  }
-
   return (
-    <input
-      style={{ outline: "none", background: "inherit", minWidth: 250 }}
-      className={classNames(className, "input m-5 focus:bg-blue-500", {
-        italic: !hasTitle && !editing,
-      })}
-      type="text"
+    <span
+      className={styles.EditableTitle}
+      contentEditable
+      onBlur={onBlur}
+      onFocus={onFocus}
+      onKeyDown={onKeyDownOrKeyPress}
+      onKeyPress={onKeyDownOrKeyPress}
+      onPaste={pasteText}
+      ref={contentEditableRef}
       role="textbox"
       spellCheck="false"
-      onBlur={() => saveOrReset()}
-      onKeyPress={onKeyPress}
-      onKeyDown={onKeyPress}
-      onFocus={onFocus}
-      onPaste={pasteText}
-      size={displayTitle?.length ?? 20}
-      ref={inputNode}
-      value={displayTitle ?? ""}
-      onChange={e => {
-        console.log("New value: ", e.target.value);
-        if (isEditing) {
-          setTitle(e.target.value);
-        }
-      }}
     />
   );
 }
 
 export default function Header() {
-  const recordingTarget = useAppSelector(selectors.getRecordingTarget);
-
+  const recordingTarget = useAppSelector(getRecordingTarget);
   const { isAuthenticated } = useAuth0();
   const recordingId = hooks.useGetRecordingId();
   const { recording, loading } = hooks.useGetRecording(recordingId);
@@ -207,7 +172,7 @@ export default function Header() {
 
   return (
     <div className={styles.Header}>
-      <div className="relative flex flex-grow flex-row items-center overflow-hidden" tabIndex={-1}>
+      <div className="relative flex flex-grow flex-row items-center overflow-hidden">
         {isAuthenticated && (
           <IconWithTooltip
             icon={backIcon}
@@ -218,7 +183,7 @@ export default function Header() {
         {recording && recordingId ? (
           <HeaderTitle recording={recording} recordingId={recordingId} />
         ) : (
-          <div className={styles.Title}>Recordings</div>
+          <div className={styles.ReadOnlyTitle}>Recordings</div>
         )}
       </div>
       <Links recordingTarget={recordingTarget} />

@@ -23,15 +23,27 @@
   flex-direction: row-reverse;
 }
 
-.Title {
-  max-width: 640px;
-  font-size: 20px;
+.EditableTitle,
+.ReadOnlyTitle {
+  flex: 0 1 auto;
+  margin: 0 0.5em;
+  padding: 0.25em;
+  border: 2px solid transparent;
+  border-radius: 0.25em;
+
+  font-family: Inter, sans-serif;
+  font-size: 18px;
+  line-height: 22px;
+
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.EditableTitle {
   cursor: pointer;
-  line-height: 22px;
-  margin-right: 0.5em;
-  margin-left: 8px;
-  font-weight: 600;
+}
+.EditableTitle:focus {
+  outline: none;
+  border-color: var(--color-brand);
 }
