@@ -1,4 +1,5 @@
 import { newSource as ProtocolSource } from "@replayio/protocol";
+import debounce from "lodash/debounce";
 import {
   CSSProperties,
   useCallback,
@@ -62,6 +63,7 @@ export default function SourceList({
     focusedSourceId,
     markPendingFocusUpdateProcessed,
     pendingFocusUpdate,
+    setHoveredLocation,
     setVisibleLines,
     visibleLines,
   } = useContext(SourcesContext);
@@ -151,6 +153,25 @@ export default function SourceList({
     prevPointsRef.current = points;
   }, [points]);
 
+  // React's rules-of-hooks doesn't like useCallback(debounce(...))
+  // It will error with a false positive: seCallback received a function whose dependencies are unknown
+  const onLineMouseLeaveDebounced = useMemo(
+    () =>
+      debounce(() => {
+        setHoveredLocation(null, null);
+      }, 50),
+    [setHoveredLocation]
+  );
+
+  const onLineMouseEnter = useCallback(
+    (lineIndex: number, lineNumberNode: HTMLElement) => {
+      onLineMouseLeaveDebounced.cancel();
+
+      setHoveredLocation(lineIndex, lineNumberNode);
+    },
+    [onLineMouseLeaveDebounced, setHoveredLocation]
+  );
+
   const itemData = useMemo<ItemData>(
     () => ({
       addPoint,
@@ -160,6 +181,8 @@ export default function SourceList({
       lineHeight,
       maxHitCount,
       minHitCount,
+      onLineMouseEnter,
+      onLineMouseLeave: onLineMouseLeaveDebounced,
       points,
       setShowHitCounts,
       showColumnBreakpoints,
@@ -175,6 +198,8 @@ export default function SourceList({
       lineHeight,
       maxHitCount,
       minHitCount,
+      onLineMouseEnter,
+      onLineMouseLeaveDebounced,
       points,
       showHitCounts,
       showColumnBreakpoints,

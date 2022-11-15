@@ -1,5 +1,5 @@
 import { newSource as ProtocolSource } from "@replayio/protocol";
-import { Suspense, memo, useMemo, useState, useSyncExternalStore } from "react";
+import { MouseEvent, Suspense, memo, useMemo, useState, useSyncExternalStore } from "react";
 import { areEqual } from "react-window";
 
 import Icon from "bvaughn-architecture-demo/components/Icon";
@@ -27,6 +27,8 @@ export type ItemData = {
   hitCounts: LineNumberToHitCountMap | null;
   maxHitCount: number | null;
   minHitCount: number | null;
+  onLineMouseEnter: (lineIndex: number, lineNumberNode: HTMLElement) => void;
+  onLineMouseLeave: (lineIndex: number, lineNumberNode: HTMLElement) => void;
   points: Point[];
   setShowHitCounts: (value: boolean) => void;
   showColumnBreakpoints: boolean;
@@ -50,6 +52,8 @@ const SourceListRow = memo(
       hitCounts,
       maxHitCount,
       minHitCount,
+      onLineMouseEnter,
+      onLineMouseLeave,
       points,
       setShowHitCounts,
       showColumnBreakpoints,
@@ -209,12 +213,23 @@ const SourceListRow = memo(
       }
     };
 
+    const onMouseEnter = (event: MouseEvent) => {
+      setIsHovered(true);
+      onLineMouseEnter(index, event.currentTarget as HTMLDivElement);
+    };
+
+    const onMouseLeave = (event: MouseEvent) => {
+      setIsHovered(false);
+      onLineMouseLeave(index, event.currentTarget as HTMLDivElement);
+    };
+
     return (
       <div
         className={styles.Row}
         data-test-id={`SourceLine-${lineNumber}`}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        data-test-name="SourceLine"
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
         style={{
           ...style,
 
