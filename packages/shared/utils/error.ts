@@ -20,18 +20,19 @@ export const commandError = (message: string, code: number): CommandError => {
 export const isCommandError = (error: unknown, code: number): boolean => {
   if (error instanceof Error) {
     return error.name === "CommandError" && (error as CommandError).code === code;
-  } else if (code === ProtocolError.TooManyPoints) {
-    if (typeof error === "string") {
-      console.error("Unexpected error type encountered (string):", error);
+  } else if (typeof error === "string") {
+    console.error("Unexpected error type encountered (string):\n", error);
 
-      // TODO [BAC-2330] The Analysis endpoint returns an error string instead of an error object.
-      return error === "There are too many points to complete this operation";
+    switch (code) {
+      case ProtocolError.TooManyPoints:
+        // TODO [BAC-2330] The Analysis endpoint returns an error string instead of an error object.
+        // TODO [FE-938] The error string may contain information about the analysis; it may not be an exact match.
+        return error.startsWith("There are too many points to complete this operation");
+      case ProtocolError.LinkerDoesNotSupportAction:
+        return (
+          error === "The linker version used to make this recording does not support this action"
+        );
     }
-  } else if (code === ProtocolError.LinkerDoesNotSupportAction) {
-    if (typeof error === "string") {
-      console.error("Unexpected error type encountered (string):", error);
-    }
-    return error === "The linker version used to make this recording does not support this action";
   }
 
   return false;
