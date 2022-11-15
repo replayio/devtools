@@ -1,6 +1,7 @@
 import { RecordingId } from "@replayio/protocol";
 import { ClipboardEvent, KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
 
+import { setCursor } from "bvaughn-architecture-demo/components/sources/AutoComplete/utils/contentEditable";
 import { RecordingTarget } from "protocol/thread/thread";
 import { getRecordingTarget } from "ui/actions/app";
 import Avatar from "ui/components/Avatar";
@@ -68,6 +69,7 @@ function Links({ recordingTarget }: { recordingTarget: RecordingTarget | null })
 
 enum EditState {
   Inactive,
+  Focused,
   Active,
   Saving,
 }
@@ -82,71 +84,153 @@ function HeaderTitle({
   recording: Recording;
   recordingId: RecordingId;
 }) {
-  const [editing, setEditing] = useState(EditState.Inactive);
+  const [editState, setEditState] = useState(EditState.Inactive);
   const contentEditableRef = useRef<HTMLSpanElement>(null);
   const updateRecordingTitle = hooks.useUpdateRecordingTitle();
-  const canEditTitle = recording.userRole !== "none";
 
-  const hasTitle = recording.title && recording.title.length > 0;
-  const displayTitle = hasTitle ? recording.title : "Untitled";
+  const { metadata, title, userRole } = recording;
+
+  const canEditTitle = userRole !== "none";
+
+  const hasTitle = title && title.length > 0;
+  const displayTitle = hasTitle ? title : "Untitled";
+
+  const isMouseDownRef = useRef<boolean>(false);
 
   useLayoutEffect(() => {
-    if (!contentEditableRef.current) {
-      return;
+    const contentEditable = contentEditableRef.current;
+    if (contentEditable) {
+      switch (editState) {
+        case EditState.Active: {
+          if (!hasTitle) {
+            contentEditable.innerText = "";
+          }
+          break;
+        }
+        case EditState.Saving: {
+          if (!contentEditable.innerText) {
+            contentEditable.innerText = "Untitled";
+          }
+          break;
+        }
+        default: {
+          contentEditable.innerText = hasTitle ? title! : "Untitled";
+          break;
+        }
+      }
     }
+  }, [editState, hasTitle, title]);
 
-    if (!editing) {
-      contentEditableRef.current.innerText = hasTitle ? recording.title! : "Untitled";
-    } else if (editing === EditState.Active && !hasTitle) {
-      contentEditableRef.current.innerText = "";
-    } else if (editing === EditState.Saving && !contentEditableRef.current.innerText) {
-      contentEditableRef.current.innerText = "Untitled";
-    }
-  }, [editing, hasTitle, recording.title]);
-
-  const testName = recording.metadata?.test?.title;
+  const testName = metadata?.test?.title;
   if (testName) {
     return <span className={styles.ReadOnlyTitle}>{testName}</span>;
-  }
-
-  if (!canEditTitle) {
+  } else if (!canEditTitle) {
     return <span className={styles.ReadOnlyTitle}>{displayTitle}</span>;
   }
 
-  const onKeyDownOrKeyPress = (event: KeyboardEvent) => {
-    if (event.code == "Enter" || event.code == "Escape") {
-      event.preventDefault();
-      contentEditableRef.current!.blur();
-    }
-  };
-  const onFocus = () => {
-    trackEvent("header.edit_title");
-    return editing === EditState.Inactive && setEditing(EditState.Active);
-  };
   const onBlur = () => {
-    if (editing !== EditState.Active) {
-      return;
-    }
-    const currentValue = contentEditableRef.current!.textContent || "";
+    switch (editState) {
+      case EditState.Active: {
+        const currentValue = contentEditableRef.current!.textContent || "";
 
-    setEditing(EditState.Saving);
-    updateRecordingTitle(recordingId, currentValue).then(() => {
-      setEditing(EditState.Inactive);
-    });
+        setEditState(EditState.Saving);
+        updateRecordingTitle(recordingId, currentValue).then(() => {
+          setEditState(EditState.Inactive);
+        });
+        break;
+      }
+      case EditState.Focused: {
+        setEditState(EditState.Inactive);
+        break;
+      }
+    }
+  };
+
+  const onClick = () => {
+    switch (editState) {
+      case EditState.Inactive: {
+        setEditState(EditState.Focused);
+        break;
+      }
+      case EditState.Focused: {
+        setEditState(EditState.Active);
+
+        trackEvent("header.edit_title");
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  };
+
+  const onFocus = () => {
+    switch (editState) {
+      case EditState.Inactive: {
+        if (!isMouseDownRef.current) {
+          // If we're focusing because of a "click" event
+          // Let the click handler update the focus state
+          // Otherwise we'll enter Active mode from a single click
+          setEditState(EditState.Focused);
+        }
+        return true;
+      }
+      default: {
+        break;
+      }
+    }
+
+    return false;
+  };
+
+  const onKeyDownOrKeyPress = (event: KeyboardEvent) => {
+    switch (editState) {
+      case EditState.Active: {
+        if (event.code == "Enter" || event.code == "Escape") {
+          event.preventDefault();
+
+          contentEditableRef.current!.blur();
+        }
+        break;
+      }
+      case EditState.Focused: {
+        if (event.code == "Enter") {
+          event.preventDefault();
+
+          setEditState(EditState.Active);
+          setCursor(contentEditableRef.current!, title ? title.length : 0);
+
+          trackEvent("header.edit_title");
+        }
+        break;
+      }
+    }
+  };
+
+  const onMouseDown = () => {
+    isMouseDownRef.current = true;
+  };
+
+  const onMouseUp = () => {
+    isMouseDownRef.current = false;
   };
 
   return (
     <span
       className={styles.EditableTitle}
-      contentEditable
+      contentEditable={editState === EditState.Active}
       onBlur={onBlur}
+      onClick={onClick}
       onFocus={onFocus}
       onKeyDown={onKeyDownOrKeyPress}
       onKeyPress={onKeyDownOrKeyPress}
+      onMouseDown={onMouseDown}
+      onMouseUp={onMouseUp}
       onPaste={pasteText}
       ref={contentEditableRef}
       role="textbox"
       spellCheck="false"
+      tabIndex={0}
     />
   );
 }

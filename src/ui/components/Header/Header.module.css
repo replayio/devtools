@@ -26,7 +26,7 @@
 .EditableTitle,
 .ReadOnlyTitle {
   flex: 0 1 auto;
-  margin: 0 0.5em;
+  margin: 0 0.25em;
   padding: 0.25em;
   border: 2px solid transparent;
   border-radius: 0.25em;
@@ -42,6 +42,9 @@
 
 .EditableTitle {
   cursor: pointer;
+}
+.EditableTitle:hover {
+  background-color: var(--theme-base-100);
 }
 .EditableTitle:focus {
   outline: none;
