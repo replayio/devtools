@@ -19,9 +19,7 @@ import useAuth0 from "ui/utils/useAuth0";
 
 import { RecordingTrialEnd } from "./RecordingTrialEnd";
 import ShareButton from "./ShareButton";
-import css from "./Header.module.css";
-
-const cx = classNames.bind(css);
+import styles from "./Header.module.css";
 
 function pasteText(ev: React.ClipboardEvent) {
   ev.preventDefault();
@@ -39,7 +37,7 @@ function Avatars({ recordingId }: { recordingId: RecordingId | null }) {
   }
 
   return (
-    <div className={css.avatars}>
+    <div className={styles.Avatars}>
       {users!.map((player, i) => (
         <Avatar player={player} isFirstPlayer={false} key={i} index={i} />
       ))}
@@ -60,7 +58,7 @@ function Links({ recordingTarget }: Pick<PropsFromRedux, "recordingTarget">) {
   const showShareButton = isAuthenticated && !showDevtoolsNag;
 
   return (
-    <div className={css.links}>
+    <div className={styles.Links}>
       <RecordingTrialEnd />
       {showShareButton ? <ShareButton /> : null}
       <Avatars recordingId={recordingId} />
@@ -131,18 +129,6 @@ function HeaderTitle({
 
     inputNode.current!.blur();
   };
-  const onBlur = () => {
-    if (editing !== EditState.Active) {
-      return;
-    }
-    const currentValue = inputNode.current!.value || "";
-
-    // setEditing(EditState.Saving);
-
-    // updateRecordingTitle(recordingId, currentValue).then(() => {
-    //   setEditing(EditState.Inactive);
-    // });
-  };
 
   const hasTitle = recording.title && recording.title.length > 0;
   const displayTitle = isEditing ? title : hasTitle ? recording.title : "Untitled";
@@ -176,7 +162,7 @@ function HeaderTitle({
   return (
     <input
       style={{ outline: "none", background: "inherit", minWidth: 250 }}
-      className={cx(className, "input m-5 focus:bg-blue-500", {
+      className={classNames(className, "input m-5 focus:bg-blue-500", {
         italic: !hasTitle && !editing,
       })}
       type="text"
@@ -187,7 +173,7 @@ function HeaderTitle({
       onKeyDown={onKeyPress}
       onFocus={onFocus}
       onPaste={pasteText}
-      size={Math.min(Math.max(displayTitle?.length ?? 0, 75), 100)}
+      size={displayTitle?.length ?? 20}
       ref={inputNode}
       value={displayTitle ?? ""}
       onChange={e => {
@@ -215,11 +201,11 @@ function Header({ recordingTarget }: PropsFromRedux) {
   };
 
   if (loading) {
-    return <div className={css.header}></div>;
+    return <div className={styles.Header}></div>;
   }
 
   return (
-    <div className={css.header}>
+    <div className={styles.Header}>
       <div className="relative flex flex-grow flex-row items-center overflow-hidden" tabIndex={-1}>
         {isAuthenticated && (
           <IconWithTooltip
@@ -231,7 +217,7 @@ function Header({ recordingTarget }: PropsFromRedux) {
         {recording && recordingId ? (
           <HeaderTitle recording={recording} recordingId={recordingId} />
         ) : (
-          <div className={css.title}>Recordings</div>
+          <div className={styles.Title}>Recordings</div>
         )}
       </div>
       <Links recordingTarget={recordingTarget} />
