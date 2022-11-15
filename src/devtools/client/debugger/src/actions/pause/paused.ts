@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import { PauseId } from "@replayio/protocol";
+
 import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
 import type { UIThunkAction } from "ui/actions";
 import { isPointInLoadingRegion } from "ui/reducers/app";
@@ -39,21 +41,18 @@ export function paused({
 
     trackEvent("paused");
 
-    const pause = ThreadFront.getCurrentPause();
-
-    await pause.createWaiter;
-
-    dispatch(pausedAction({ executionPoint, time, id: pause.pauseId!, frame }));
-
-    const cx = getThreadContext(getState());
-
+    let pauseId: PauseId;
     try {
-      await pause.createWaiter;
+      pauseId = await ThreadFront.getCurrentPauseId(replayClient);
     } catch (e) {
       console.error(e);
       dispatch(pauseCreationFailed(executionPoint));
       return;
     }
+
+    dispatch(pausedAction({ executionPoint, time, id: pauseId, frame }));
+
+    const cx = getThreadContext(getState());
 
     // `ThreadFront.timeWarp()` receives a `hasFrames` flag.
     // This is sometimes derived from an initial pause point or comment.
@@ -64,12 +63,12 @@ export function paused({
     // if there really _were_ frames at that specific point.
     // Now, we mimic that behavior by bailing out early if the passed-through `hasFrames` flag is false.
     // Yes, this means that `hasFrames` is a misleading name and we should fix that.
-    const frames = await getFramesAsync(replayClient, pause.pauseId!);
+    const frames = await getFramesAsync(replayClient, pauseId);
     if (!frames?.length) {
       return;
     }
 
-    dispatch(frameSelected({ cx, pauseId: pause.pauseId!, frameId: frames[0].frameId }));
+    dispatch(frameSelected({ cx, pauseId, frameId: frames[0].frameId }));
 
     if (hasFrames === false) {
       return;
@@ -91,10 +90,6 @@ export function paused({
         const openSourcesTab = false;
 
         dispatch(selectLocation(cx, selectedFrame.location, openSourcesTab));
-      }
-
-      if (pause !== ThreadFront.currentPause) {
-        return;
       }
     }
   };

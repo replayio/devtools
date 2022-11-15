@@ -2,18 +2,9 @@ import { PauseId, TimeStampedPointRange } from "@replayio/protocol";
 
 import { getFramesSuspense } from "bvaughn-architecture-demo/src/suspense/FrameCache";
 import { getFrameStepsSuspense } from "bvaughn-architecture-demo/src/suspense/FrameStepsCache";
-import { ThreadFront } from "protocol/thread";
+import { getPauseIdSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { isPointInRegions } from "ui/utils/timeline";
-
-export function getPauseIdForPointSuspense(point: string, time: number): PauseId {
-  const pause = ThreadFront.ensurePause(point, time);
-  if (pause.pauseId) {
-    return pause.pauseId;
-  } else {
-    throw pause.createWaiter;
-  }
-}
 
 // returns undefined if the async parent pause doesn't exist
 // or null if it is not in a loaded region
@@ -35,7 +26,7 @@ export function getAsyncParentPauseIdSuspense(
     if (!isPointInRegions(loadedRegions, steps[0].point)) {
       return null;
     }
-    const parentPauseId = getPauseIdForPointSuspense(steps[0].point, steps[0].time);
+    const parentPauseId = getPauseIdSuspense(replayClient, steps[0].point, steps[0].time);
     if (parentPauseId === pauseId) {
       return;
     }

@@ -17,7 +17,7 @@ import { cacheFrames } from "./FrameCache";
 import { preCacheObjects } from "./ObjectPreviews";
 import { cacheScope } from "./ScopeCache";
 
-export const {
+const {
   getValueSuspense: getPauseIdForExecutionPointSuspense,
   getValueAsync: getPauseIdForExecutionPointAsync,
   getValueIfCached: getPauseIdForExecutionPointIfCached,
@@ -35,6 +35,34 @@ export const {
   },
   executionPoint => executionPoint
 );
+
+export { getPauseIdForExecutionPointIfCached };
+
+const pointAndTimeByPauseId = new Map<PauseId, { point: ExecutionPoint; time: number }>();
+
+export function getPointAndTimeForPauseId(pauseId: PauseId) {
+  return pointAndTimeByPauseId.get(pauseId);
+}
+
+export function getPauseIdSuspense(
+  replayClient: ReplayClientInterface,
+  point: ExecutionPoint,
+  time: number
+) {
+  const pauseId = getPauseIdForExecutionPointSuspense(replayClient, point);
+  pointAndTimeByPauseId.set(pauseId, { point, time });
+  return pauseId;
+}
+
+export async function getPauseIdAsync(
+  replayClient: ReplayClientInterface,
+  point: ExecutionPoint,
+  time: number
+) {
+  const pauseId = await getPauseIdForExecutionPointAsync(replayClient, point);
+  pointAndTimeByPauseId.set(pauseId, { point, time });
+  return pauseId;
+}
 
 export const {
   getValueSuspense: evaluateSuspense,

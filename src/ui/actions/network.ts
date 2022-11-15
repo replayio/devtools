@@ -8,6 +8,7 @@ import {
 } from "@replayio/protocol";
 
 import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
+import { getPauseIdAsync } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { createFrame } from "devtools/client/debugger/src/client/create";
 import { Context } from "devtools/client/debugger/src/reducers/pause";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
@@ -109,13 +110,16 @@ export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
     });
 
     const timeStampedPoint = requestSummary.point;
-    const pause = ThreadFront.ensurePause(timeStampedPoint.point, timeStampedPoint.time);
-    await pause.ensureLoaded();
-    const frames = (await getFramesAsync(replayClient, pause.pauseId!)) || [];
+    const pauseId = await getPauseIdAsync(
+      replayClient,
+      timeStampedPoint.point,
+      timeStampedPoint.time
+    );
+    const frames = (await getFramesAsync(replayClient, pauseId)) || [];
     await ThreadFront.ensureAllSources();
     state = getState();
     const formattedFrames = frames?.map((frame, i) =>
-      createFrame(state.sources, frame, pause.pauseId!, i)
+      createFrame(state.sources, frame, pauseId, i)
     );
     dispatch({
       type: "SET_FRAMES",

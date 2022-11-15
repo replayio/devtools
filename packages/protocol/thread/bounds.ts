@@ -1,18 +1,15 @@
 import { ObjectId, Rect } from "@replayio/protocol";
 
 import { DisallowEverythingProxyHandler } from "../utils";
-import { Pause } from "./pause";
 
 // Used by the highlighter when showing the bounding client rect of a node
 // that might not be loaded yet, for the node picker.
 export class NodeBoundsFront {
-  private _pause: Pause;
   private _rects: Rect[];
   nodeId: ObjectId;
   then = undefined;
 
-  constructor(pause: Pause, nodeId: ObjectId, rects: Rect[]) {
-    this._pause = pause;
+  constructor(nodeId: ObjectId, rects: Rect[]) {
     this._rects = rects;
 
     this.nodeId = nodeId;

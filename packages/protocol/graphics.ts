@@ -264,9 +264,8 @@ export async function repaint(force = false) {
   }, 500);
 
   const { mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
-  const pause = ThreadFront.getCurrentPause();
-  await pause.ensureLoaded();
-  const rv = await repaintGraphics(replayClient, pause.pauseId!, force);
+  const pauseId = await ThreadFront.getCurrentPauseId(replayClient);
+  const rv = await repaintGraphics(replayClient, pauseId, force);
   graphicsFetched = true;
 
   if (didStall) {
@@ -275,7 +274,7 @@ export async function repaint(force = false) {
     }
   }
 
-  if (!rv || pause !== ThreadFront.currentPause) {
+  if (!rv || pauseId !== ThreadFront.currentPause.pauseId) {
     return;
   }
   let { description, screenShot } = rv;
