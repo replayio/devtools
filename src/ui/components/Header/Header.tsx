@@ -1,8 +1,8 @@
 import { RecordingId } from "@replayio/protocol";
 import classNames from "classnames/bind";
 import React, { useLayoutEffect, useRef, useState } from "react";
-import { ConnectedProps, connect } from "react-redux";
 
+import { RecordingTarget } from "protocol/thread/thread";
 import Avatar from "ui/components/Avatar";
 import UserOptions from "ui/components/Header/UserOptions";
 import ViewToggle, { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
@@ -12,7 +12,6 @@ import { useGetActiveSessions } from "ui/hooks/sessions";
 import * as selectors from "ui/reducers/app";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
-import { UIState } from "ui/state";
 import { Recording } from "ui/types";
 import { trackEvent } from "ui/utils/telemetry";
 import useAuth0 from "ui/utils/useAuth0";
@@ -45,7 +44,7 @@ function Avatars({ recordingId }: { recordingId: RecordingId | null }) {
   );
 }
 
-function Links({ recordingTarget }: Pick<PropsFromRedux, "recordingTarget">) {
+function Links({ recordingTarget }: { recordingTarget: RecordingTarget | null }) {
   const recordingId = hooks.useGetRecordingId();
   const { isAuthenticated } = useAuth0();
   const { nags } = hooks.useGetUserInfo();
@@ -186,7 +185,9 @@ function HeaderTitle({
   );
 }
 
-function Header({ recordingTarget }: PropsFromRedux) {
+export default function Header() {
+  const recordingTarget = useAppSelector(selectors.getRecordingTarget);
+
   const { isAuthenticated } = useAuth0();
   const recordingId = hooks.useGetRecordingId();
   const { recording, loading } = hooks.useGetRecording(recordingId);
@@ -224,11 +225,3 @@ function Header({ recordingTarget }: PropsFromRedux) {
     </div>
   );
 }
-
-const connector = connect((state: UIState) => ({
-  sessionId: selectors.getSessionId(state),
-  recordingTarget: selectors.getRecordingTarget(state),
-}));
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(Header);
