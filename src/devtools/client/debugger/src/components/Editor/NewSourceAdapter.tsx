@@ -71,9 +71,8 @@ function NewSourceAdapter() {
   }, [dispatch, visibleLines]);
 
   const onKeyDown = (event: KeyboardEvent) => {
-    switch (event.key) {
-      case "f":
-      case "F":
+    switch (event.key.toLowerCase()) {
+      case "f": {
         if (event.ctrlKey || event.metaKey) {
           sourceSearchActions.enable();
 
@@ -86,6 +85,21 @@ function NewSourceAdapter() {
           event.stopPropagation();
         }
         break;
+      }
+      case "g": {
+        // Unlike Enter / Shift+Enter, this event handler is external to the Search input
+        // so that we can mirror UIs like Chrome and Code and re-open the search UI if it's been closed
+        sourceSearchActions.enable();
+        if (event.shiftKey) {
+          sourceSearchActions.goToPrevious();
+        } else {
+          sourceSearchActions.goToNext();
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        break;
+      }
     }
   };
 
