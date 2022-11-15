@@ -236,6 +236,7 @@
   --toolbarbutton-focus-bgcolor: var(--theme-base-90);
   --toolbox-bgcolor: var(--theme-base-100);
   --unloaded-region-img: url("/images/dotted-mask-light.svg");
+  --title-hover-bgcolor: #e6e6e6;
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-20);
@@ -512,6 +513,7 @@
   --toolbarbutton-focus-bgcolor: var(--theme-base-90);
   --toolbox-bgcolor: var(--theme-base-100);
   --unloaded-region-img: url("/images/dotted-mask-dark.svg");
+  --title-hover-bgcolor: var(--theme-toggle-bgcolor);
 
   /* Toolbar */
   --theme-toolbar-panel-icon-color: var(--icon-color);
