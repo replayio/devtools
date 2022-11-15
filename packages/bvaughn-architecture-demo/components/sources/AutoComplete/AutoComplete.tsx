@@ -1,4 +1,12 @@
-import { KeyboardEvent, Suspense, useLayoutEffect, useRef, useState } from "react";
+import {
+  ClipboardEvent,
+  KeyboardEvent,
+  Suspense,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { parse } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
 
@@ -8,6 +16,7 @@ import AutoCompleteList from "./AutoCompleteList";
 import {
   getCursorClientX,
   getCursorIndex,
+  getCursorIndexAfterPaste,
   selectAllText,
   setCursor,
 } from "./utils/contentEditable";
@@ -56,11 +65,57 @@ export default function AutoComplete({
     }
   }, [cursorIndex]);
 
+  const beforeInputCursorIndexRef = useRef<number | null>(null);
+  const pasteTextRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const contentEditable = contentEditableRef.current;
+    if (contentEditable) {
+      const onBeforeInput = (event: InputEvent) => {
+        // Read the cursor position before a paste operation
+        // because we can't detect it reliably after the "input" event.
+        switch (event.inputType) {
+          case "deleteContent":
+          case "deleteContentBackward":
+          case "deleteContentForward":
+          case "deleteWordForward":
+          case "insertFromPaste":
+          case "insertFromPasteAsQuotation":
+          case "insertReplacementText":
+            beforeInputCursorIndexRef.current = getCursorIndex(contentEditable);
+            break;
+          default:
+            beforeInputCursorIndexRef.current = null;
+            break;
+        }
+      };
+
+      // React doesn't dispatch "beforeinput" events for content editable inputs.
+      contentEditable.addEventListener("beforeinput", onBeforeInput);
+      return () => {
+        contentEditable.removeEventListener("beforeinput", onBeforeInput);
+      };
+    }
+  }, []);
+
   const onInput = () => {
     const contentEditable = contentEditableRef.current;
     if (contentEditable) {
-      const cursorIndex = getCursorIndex(contentEditable);
       const newValue = contentEditable.textContent || "";
+
+      const cursorBeforeInput = beforeInputCursorIndexRef.current;
+      beforeInputCursorIndexRef.current = null;
+
+      const pastedText = pasteTextRef.current || "";
+      pasteTextRef.current = null;
+
+      let cursorIndex: number | null = null;
+      if (cursorBeforeInput !== null) {
+        cursorIndex = getCursorIndexAfterPaste(cursorBeforeInput, pastedText);
+      } else {
+        cursorIndex = getCursorIndex(contentEditable);
+      }
+
       if (newValue !== value) {
         onChangeProp(newValue);
         setCursorIndex(cursorIndex);
@@ -110,6 +165,10 @@ export default function AutoComplete({
     }
   };
 
+  const onPaste = (event: ClipboardEvent) => {
+    pasteTextRef.current = event.clipboardData?.getData("Text") || "";
+  };
+
   const onSubmit = (match: string) => {
     const contentEditable = contentEditableRef.current;
     if (contentEditable) {
@@ -139,6 +198,7 @@ export default function AutoComplete({
         data-test-name={dataTestName}
         onInput={onInput}
         onKeyDown={onKeyDown}
+        onPaste={onPaste}
         ref={contentEditableRef}
         tabIndex={0}
       />
