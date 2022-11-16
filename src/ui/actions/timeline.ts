@@ -102,8 +102,6 @@ export function jumpToInitialPausePoint(): UIThunkAction {
       setTimelineState({ currentTime: time, recordingDuration: time, zoomRegion: newZoomRegion })
     );
 
-    let hasFrames = false;
-
     const initialPausePoint = await getInitialPausePoint(ThreadFront.recordingId!);
 
     if (initialPausePoint) {
@@ -120,17 +118,15 @@ export function jumpToInitialPausePoint(): UIThunkAction {
         dispatch(syncFocusedRegion());
       }
       point = initialPausePoint.point;
-      hasFrames = initialPausePoint.hasFrames;
       time = initialPausePoint.time;
     }
     if (isPointInLoadingRegion(state, point)) {
-      ThreadFront.timeWarp(point, time, hasFrames);
+      ThreadFront.timeWarp(point, time, false);
     }
   };
 }
 
 async function getInitialPausePoint(recordingId: string) {
-  let hasFrames = false;
   if (getTest()) {
     return;
   }
@@ -143,23 +139,21 @@ async function getInitialPausePoint(recordingId: string) {
   const firstComment = await getFirstComment(recordingId);
   if (firstComment) {
     const { point, time } = firstComment;
-    hasFrames = firstComment.hasFrames;
-    return { point, time, hasFrames };
+    return { point, time };
   }
 
   const firstMeaningfulPaint = await getFirstMeaningfulPaint(10);
   if (firstMeaningfulPaint) {
     const { point, time } = firstMeaningfulPaint;
-    return { point, time, hasFrames: false };
+    return { point, time };
   }
 }
 
-function onPaused({ point, time, hasFrames }: PauseEventArgs): UIThunkAction {
+function onPaused({ point, time }: PauseEventArgs): UIThunkAction {
   return async (dispatch, getState) => {
     const focusRegion = getFocusRegion(getState());
-    const params: PauseEventArgs & { focusRegion: FocusRegion | null } = {
+    const params: Omit<PauseEventArgs, "openSourcesTab"> & { focusRegion: FocusRegion | null } = {
       focusRegion,
-      hasFrames,
       point,
       time,
     };
@@ -200,18 +194,15 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
 export function updatePausePointParams({
   point,
   time,
-  hasFrames,
   focusRegion,
 }: {
   point: ExecutionPoint;
   time: number;
-  hasFrames: boolean;
   focusRegion: FocusRegion | null;
 }) {
-  const params: { point: string; time: string; hasFrames: string; focusRegion?: string } = {
+  const params: { point: string; time: string; focusRegion?: string } = {
     point,
     time: `${time}`,
-    hasFrames: `${hasFrames}`,
     focusRegion: encodeFocusRegion(focusRegion),
   };
   updateUrlWithParams(params);
@@ -231,25 +222,25 @@ function encodeFocusRegion(focusRegion: FocusRegion | null) {
 export function seek(
   point: ExecutionPoint,
   time: number,
-  hasFrames: boolean,
+  openSourcesTab: boolean,
   pauseId?: PauseId
 ): UIThunkAction<boolean> {
   return (dispatch, getState, { ThreadFront }) => {
     dispatch(framePositionsCleared());
     if (pauseId) {
-      ThreadFront.timeWarpToPause({ point, time, pauseId });
+      ThreadFront.timeWarpToPause({ point, time, pauseId }, openSourcesTab);
     } else {
       const regions = getLoadedRegions(getState());
       const focusRegion = getFocusRegion(getState());
       const isTimeInLoadedRegion = regions !== null && isTimeInRegions(time, regions.loaded);
       if (isTimeInLoadedRegion) {
-        ThreadFront.timeWarp(point, time, hasFrames);
+        ThreadFront.timeWarp(point, time, openSourcesTab);
       } else {
         // We can't time-wrap in this case because trying to pause outside of a loaded region will throw.
         // In this case the best we can do is update the current time and the "video" frame.
         dispatch(setTimelineState({ currentTime: time }));
         dispatch(setTimelineToTime(time, true));
-        updatePausePointParams({ point, time, hasFrames, focusRegion });
+        updatePausePointParams({ point, time, focusRegion });
       }
     }
     return true;

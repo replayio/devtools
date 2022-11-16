@@ -24,5 +24,6 @@ const requests = [
 Loaded.args = {
   currentTime: 3,
   data: requests,
-  seek: (point: string, time: number, hasFrames: boolean, pauseId?: string | undefined) => false,
+  seek: (point: string, time: number, openSourcesTab: boolean, pauseId?: string | undefined) =>
+    false,
 };

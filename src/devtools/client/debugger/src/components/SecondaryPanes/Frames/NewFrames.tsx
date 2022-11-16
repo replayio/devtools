@@ -135,7 +135,7 @@ function PauseFrames({
       ) {
         return;
       }
-      ThreadFront.timeWarpToPause({ ...pointAndTime, pauseId });
+      ThreadFront.timeWarpToPause({ ...pointAndTime, pauseId }, true);
     }
     dispatch(selectFrameAction(cx, frame));
   }

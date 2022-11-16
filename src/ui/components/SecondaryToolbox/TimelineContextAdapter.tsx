@@ -37,7 +37,7 @@ export default function TimelineContextAdapter({ children }: PropsWithChildren) 
   const update = useCallback(
     async (time: number, executionPoint: ExecutionPoint) => {
       const pauseId = await getPauseIdAsync(client, executionPoint, time);
-      dispatch(seek(executionPoint, time, false /* hasFrames */, pauseId));
+      dispatch(seek(executionPoint, time, false /* openSourcesTab */, pauseId));
     },
     [client, dispatch]
   );

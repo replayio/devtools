@@ -15,7 +15,6 @@ export default function EventMarker({ event, isPrimaryHighlighted }: EventMarker
     <Marker
       point={event.point}
       time={event.time}
-      hasFrames={false}
       currentTime={currentTime}
       isPrimaryHighlighted={isPrimaryHighlighted}
       zoomRegion={zoomRegion}

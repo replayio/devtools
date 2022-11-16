@@ -68,7 +68,6 @@ function PreviewMarkers() {
             key={index}
             point={point.point}
             time={point.time}
-            hasFrames={!!point.frame}
             location={point.frame?.[0]}
             currentTime={currentTime}
             isPrimaryHighlighted={isPrimaryHighlighted}
