@@ -10,10 +10,8 @@ import { getSelectedSource } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import useWidthObserver from "ui/utils/useWidthObserver";
 
-import { waitForEditor } from "../../utils/editor/create-editor";
 import WelcomeBox from "../WelcomeBox";
 import EditorFooter from "./Footer";
-import Editor from "./index";
 import NewSourceAdapter from "./NewSourceAdapter";
 import EditorTabs from "./Tabs";
 
@@ -24,7 +22,6 @@ export const EditorPane = () => {
   const selectedSource = useAppSelector(getSelectedSource);
   const panelEl = useRef(null);
   const { value: enableLargeText } = useFeature("enableLargeText");
-  const { value: enableLegacySourceViewer } = useFeature("legacySourceViewer");
 
   const nodeWidth = useWidthObserver(panelEl);
 
@@ -40,7 +37,6 @@ export const EditorPane = () => {
   useEffect(() => {
     (async () => {
       try {
-        await waitForEditor();
         setLoadingEditor(false);
       } catch {
         dispatch(setUnexpectedError(ReplayUpdatedError));
@@ -64,7 +60,7 @@ export const EditorPane = () => {
         <EditorTabs />
         {selectedSource ? (
           <Redacted className="h-full">
-            {enableLegacySourceViewer ? <Editor /> : <NewSourceAdapter />}
+            <NewSourceAdapter />
           </Redacted>
         ) : (
           <WelcomeBox />

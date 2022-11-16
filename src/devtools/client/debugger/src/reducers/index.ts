@@ -11,7 +11,6 @@
 
 import ast from "./ast";
 import asyncRequests from "./async-requests";
-import fileSearch from "./file-search";
 import pause from "./pause";
 import preview from "./preview";
 import quickOpen from "./quick-open";
@@ -23,7 +22,6 @@ export default {
   asyncRequests,
   pause,
   ui,
-  fileSearch,
   ast,
   quickOpen,
   sourceTree,

@@ -7,7 +7,6 @@ import type { SourceTreeState } from "devtools/client/debugger/src/reducers/sour
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
 import type { ThreadsState } from "devtools/client/debugger/src/reducers/threads";
 import type { UISliceState } from "devtools/client/debugger/src/reducers/ui";
-import type { FileSearchState } from "devtools/client/debugger/src/selectors";
 import { BoxModelState } from "devtools/client/inspector/boxmodel/reducers/box-model";
 import { ComputedState } from "devtools/client/inspector/computed/state";
 import { MarkupState } from "devtools/client/inspector/markup/reducers/markup";
@@ -33,7 +32,6 @@ export interface UIState {
   computed: ComputedState;
   contextMenus: ContextMenusState;
   sources: NewSourcesState;
-  fileSearch: FileSearchState;
   inspector: InspectorState;
   layout: LayoutState;
   markup: MarkupState;

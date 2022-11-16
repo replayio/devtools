@@ -3,7 +3,6 @@ import classnames from "classnames";
 import React, { MouseEventHandler } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
-import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import { actions } from "ui/actions/index";
 import { timelineMarkerWidth as pointWidth } from "ui/constants";
 import { HoveredItem, ZoomRegion } from "ui/state/timeline";
@@ -58,12 +57,6 @@ class Marker extends React.Component<MarkerProps> {
     seek(point, time, hasFrames, pauseId);
   };
 
-  onMouseLeave: MouseEventHandler = (e: any) => {
-    if (!inBreakpointPanel(e)) {
-      this.props.clearHoveredItem();
-    }
-  };
-
   onMouseEnter = () => {
     const { point, time, location, setHoveredItem } = this.props;
     const hoveredItem: HoveredItem = {
@@ -95,7 +88,6 @@ class Marker extends React.Component<MarkerProps> {
           left: `calc(${offsetPercent}% - ${pointWidth / 2}px)`,
         }}
         onMouseEnter={this.onMouseEnter}
-        onMouseLeave={this.onMouseLeave}
         onClick={this.onClick}
       >
         <Circle />

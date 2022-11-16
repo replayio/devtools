@@ -2,6 +2,7 @@ import "image/image.css";
 import "image/icon.css";
 import "tailwindcss/tailwind.css";
 import "devtools/client/debugger/src/components/variables.css";
+import "bvaughn-architecture-demo/pages/variables.css";
 import "devtools/client/themes/variables.css";
 
 /////////////////// here be dragons ... ////////////////////
@@ -12,15 +13,11 @@ import "devtools/client/debugger/src/components/Editor/Breakpoints/Breakpoints.c
 import "devtools/client/debugger/src/components/Editor/Breakpoints/Panel/Panel.css";
 import "devtools/client/debugger/src/components/Editor/Editor.css";
 import "devtools/client/debugger/src/components/Editor/Footer.css";
-import "devtools/client/debugger/src/components/Editor/LineNumberTooltip.css";
-import "devtools/client/debugger/src/components/Editor/SearchBar.css";
 import "devtools/client/debugger/src/components/Editor/Tabs.css";
 import "devtools/client/debugger/src/components/SourceOutline/Outline.css";
 import "devtools/client/debugger/src/components/PrimaryPanes/Sources.css";
-import "devtools/client/debugger/src/components/FullTextSearch/FullTextSearch.css";
 import "devtools/client/debugger/src/components/QuickOpenModal.css";
 import "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/Breakpoint.css";
-import "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation.css";
 import "devtools/client/debugger/src/components/SecondaryPanes/CommandBar.css";
 import "devtools/client/debugger/src/components/SecondaryPanes/Frames/Frames.css";
 import "devtools/client/debugger/src/components/SecondaryPanes/Frames/Group.css";
@@ -43,7 +40,6 @@ import "devtools/client/debugger/src/components/shared/SearchInput.css";
 import "devtools/client/debugger/src/components/shared/SourceIcon.css";
 import "devtools/client/debugger/src/components/shared/tree.css";
 import "devtools/client/debugger/src/components/ShortcutsModal.css";
-import "devtools/client/debugger/src/utils/editor/source-editor.css";
 import "devtools/client/shared/components/Accordion.css";
 import "devtools/client/shared/components/splitter/SplitBox.css";
 import "devtools/client/shared/components/Tabs.css";

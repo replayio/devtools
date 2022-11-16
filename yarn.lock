@@ -9907,16 +9907,9 @@ __metadata:
   linkType: hard
 
 "codemirror@npm:^5.65.4":
-  version: 5.65.5
-  resolution: "codemirror@npm:5.65.5"
-  checksum: 7d9e50b0e9ca4504f262f4ffa368c28c7df2551ccea4dd91ad833b71f360c0c5864b6b182b605bfb053145a5f6ba55f56a61b6980739c24322be7f862994cfe5
-  languageName: node
-  linkType: hard
-
-"codemirror@npm:^5.65.7":
-  version: 5.65.7
-  resolution: "codemirror@npm:5.65.7"
-  checksum: 84e28000241fee3d605c1dd928d816f69e93b92621752d048f9273e18083ccaaa4e66783908060df13d0d566a20a1e007cd5bd0c0629cebd0e1c395d62f75795
+  version: 5.65.9
+  resolution: "codemirror@npm:5.65.9"
+  checksum: bbdb3991d4641d5c2a044c53907fb7b0d856f67e1190b7063e6a164e7b17f1390faf961d8264394b1ef8ca7e1f21acea2117bb4a0ed8394b3a92875f07beae3d
   languageName: node
   linkType: hard
 
@@ -20900,7 +20893,6 @@ __metadata:
     bvaughn-architecture-demo: "workspace:*"
     circular-dependency-plugin: ^5.2.2
     classnames: ^2.3.1
-    codemirror: ^5.65.7
     comlink: ^4.3.1
     cookie: ^0.4.2
     css-loader: ^6.7.1

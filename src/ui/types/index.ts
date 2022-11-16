@@ -20,7 +20,6 @@ export type LocalExperimentalUserSettings = {
   enableQueryCache: boolean;
   enableColumnBreakpoints: boolean;
   enableLargeText: boolean;
-  enableLegacySourceViewer: boolean;
   enableResolveRecording: boolean;
   hitCounts: boolean;
   profileWorkerThreads: boolean;

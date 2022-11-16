@@ -11,7 +11,6 @@ import { useGetUserSettings } from "ui/hooks/settings";
 import { getSelectedPanel } from "ui/reducers/layout";
 import type { UIState } from "ui/state";
 
-import actions from "../actions";
 import A11yIntention from "./A11yIntention";
 import { EditorPane } from "./Editor/EditorPane";
 import ShortcutsContext from "./Editor/ShortcutsContext";
@@ -21,7 +20,6 @@ const mapStateToProps = (state: UIState) => ({
 });
 
 const connector = connect(mapStateToProps, {
-  refreshCodeMirror: actions.refreshCodeMirror,
   setUnexpectedError,
 });
 
@@ -30,20 +28,6 @@ type DebuggerProps = PropsFromRedux & { wrapper: HTMLDivElement };
 
 class Debugger extends Component<DebuggerProps> {
   shortcuts = new KeyShortcuts({ window, target: this.props.wrapper });
-
-  componentDidMount() {
-    this.props.refreshCodeMirror();
-  }
-
-  componentDidUpdate(prevProps: DebuggerProps) {
-    const { selectedPanel, refreshCodeMirror } = this.props;
-
-    // Only refresh CodeMirror when moving from a non-debugger panel to the debugger panel. Otherwise,
-    // the gutter will keep errantly resizing between refreshes.
-    if (selectedPanel == "debugger" && prevProps.selectedPanel != selectedPanel) {
-      refreshCodeMirror();
-    }
-  }
 
   // Important so that the tabs chevron updates appropriately when
   // the user resizes the left or right columns

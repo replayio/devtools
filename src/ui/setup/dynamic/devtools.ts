@@ -22,7 +22,6 @@ import { setupMarkup } from "devtools/client/inspector/markup/actions/markup";
 import * as inspectorReducers from "devtools/client/inspector/reducers";
 import { setupRules } from "devtools/client/inspector/rules/actions/rules";
 import { setupNetwork } from "devtools/client/webconsole/actions/network";
-import { initOutputSyntaxHighlighting } from "devtools/client/webconsole/utils/syntax-highlighted";
 import { setPointsReceivedCallback as setAnalysisPointsReceivedCallback } from "protocol/analysisManager";
 import { Canvas, setAllPaintsReceivedCallback, setupGraphics } from "protocol/graphics";
 import {
@@ -226,7 +225,6 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   await setupApp(store, ThreadFront, replayClient);
   setupTimeline(store);
   setupGraphics();
-  initOutputSyntaxHighlighting();
   setupNetwork(store, ThreadFront);
   setupReactDevTools(store, ThreadFront);
   setupReporter(store, ThreadFront);
