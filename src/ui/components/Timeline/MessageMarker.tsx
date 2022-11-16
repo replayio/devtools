@@ -16,7 +16,6 @@ export default function MessageMarker({ message, isPrimaryHighlighted }: Message
     <Marker
       point={executionPoint}
       time={executionPointTime}
-      hasFrames={executionPointHasFrames}
       location={frame}
       pauseId={pauseId}
       currentTime={currentTime}

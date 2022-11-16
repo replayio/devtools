@@ -107,16 +107,13 @@ export function getPausePointParams() {
   const timeParam = url.searchParams.get("time");
   const time = timeParam ? +timeParam : 0;
 
-  const hasFramesParam = url.searchParams.get("hasFrames");
-  const hasFrames = hasFramesParam ? hasFramesParam == "true" : false;
-
   const focusRegionParam = url.searchParams.get("focusRegion");
   const focusRegion = focusRegionParam
     ? (decodeBase64FromURL(focusRegionParam) as TimeStampedPointRange)
     : null;
 
   if (pointParam && timeParam) {
-    return { point, time, hasFrames, focusRegion };
+    return { point, time, focusRegion };
   }
 
   return null;

@@ -23,12 +23,12 @@ type $FixTypeLater = any;
 
 export function paused({
   executionPoint,
-  hasFrames,
+  openSourcesTab,
   frame,
   time,
 }: {
   executionPoint: string;
-  hasFrames?: boolean;
+  openSourcesTab: boolean;
   frame?: $FixTypeLater;
   time?: number;
 }): UIThunkAction {
@@ -54,25 +54,12 @@ export function paused({
 
     const cx = getThreadContext(getState());
 
-    // `ThreadFront.timeWarp()` receives a `hasFrames` flag.
-    // This is sometimes derived from an initial pause point or comment.
-    // However, `seekToTime()` explicitly sets that flag to `false`.
-    // Previously, that resulted in fetch logic in `ThreadFront.getFrames()` bailing out early
-    // and returning an empty frames array, so no frame would be marked as selected,
-    // and thus user clicks on the timeline never resulted in a file being opened even
-    // if there really _were_ frames at that specific point.
-    // Now, we mimic that behavior by bailing out early if the passed-through `hasFrames` flag is false.
-    // Yes, this means that `hasFrames` is a misleading name and we should fix that.
     const frames = await getFramesAsync(replayClient, pauseId);
     if (!frames?.length) {
       return;
     }
 
     dispatch(frameSelected({ cx, pauseId, frameId: frames[0].frameId }));
-
-    if (hasFrames === false) {
-      return;
-    }
 
     const selectedFrame = frame || (await getSelectedFrameAsync(replayClient, getState()));
     if (selectedFrame) {
@@ -84,11 +71,6 @@ export function paused({
         currentLocation.column !== selectedFrame.location.column
       ) {
         const { selectLocation } = await import("../sources");
-        // This action creator is triggered whenever we seek to a new exception point.
-        // It's pretty far removed from the cause of the seek,
-        // so it shouldn't make the decision of whether to change UI tabs.
-        const openSourcesTab = false;
-
         dispatch(selectLocation(cx, selectedFrame.location, openSourcesTab));
       }
     }

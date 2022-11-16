@@ -72,7 +72,7 @@ export interface Source {
 export interface PauseEventArgs {
   point: ExecutionPoint;
   time: number;
-  hasFrames: boolean;
+  openSourcesTab: boolean;
 }
 
 interface FindTargetParameters {
@@ -388,20 +388,20 @@ class _ThreadFront {
     return this.recordingTargetWaiter.promise;
   }
 
-  timeWarp(point: ExecutionPoint, time: number, hasFrames?: boolean, frame?: Frame) {
+  timeWarp(point: ExecutionPoint, time: number, openSourcesTab: boolean, frame?: Frame) {
     this.currentPoint = point;
     this.currentTime = time;
     this.currentPauseId = null;
-    this.emit("paused", { point, hasFrames, time, frame });
+    this.emit("paused", { point, time, openSourcesTab, frame });
   }
 
-  timeWarpToPause(pause: Pause) {
+  timeWarpToPause(pause: Pause, openSourcesTab: boolean) {
     const { point, time, pauseId } = pause;
     assert(point && time, "point or time not set on pause");
     this.currentPoint = point;
     this.currentTime = time;
     this.currentPauseId = pauseId;
-    this.emit("paused", { point, hasFrames: true, time });
+    this.emit("paused", { point, time, openSourcesTab });
   }
 
   async ensureAllSources() {
@@ -623,8 +623,8 @@ class _ThreadFront {
     } catch {
       this.emit("paused", {
         point: this.currentPoint,
-        hasFrames: true,
         time: this.currentTime,
+        openSourcesTab: true,
       });
     }
 

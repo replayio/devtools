@@ -2,7 +2,7 @@ import { encodeObjectToURL, getPausePointParams } from "ui/utils/environment";
 
 describe("getPauseParams", () => {
   const urlWithFocusRegion = (focusRegion: string) => {
-    return `https://app.replay.io/recording/12345?point=23456&time=2&hasFrames=true&focusRegion=${focusRegion}`;
+    return `https://app.replay.io/recording/12345?point=23456&time=2&focusRegion=${focusRegion}`;
   };
 
   const focusRegionParams: string = encodeObjectToURL({
@@ -26,7 +26,6 @@ describe("getPauseParams", () => {
             "time": 2,
           },
         },
-        "hasFrames": true,
         "point": "23456",
         "time": 2,
       }
