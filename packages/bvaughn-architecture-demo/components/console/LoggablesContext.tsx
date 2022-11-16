@@ -94,6 +94,10 @@ export function LoggablesContextRoot({
 
   // Pre-filter in-focus messages by non text based search criteria.
   const preFilteredMessages = useMemo<ProtocolMessage[]>(() => {
+    if (messages === null) {
+      return EMPTY_ARRAY;
+    }
+
     return messages.filter((message: ProtocolMessage) => {
       switch (message.level) {
         case "warning": {

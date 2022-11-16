@@ -26,8 +26,10 @@ export type MessageData = {
   categoryCounts: CategoryCounts;
   countAfter: number;
   countBefore: number;
+  didError: boolean;
   didOverflow: boolean;
-  messages: ProtocolMessage[];
+  error: Error | null;
+  messages: ProtocolMessage[] | null;
 };
 
 const EMPTY_ARRAY: any[] = [];
@@ -36,7 +38,7 @@ const EMPTY_ARRAY: any[] = [];
 // It's tempting to think that I don't need to, because the recording session data is global,
 // but could this cause problems if React wants to render a high-priority update while a lower one is suspended?
 
-let inFlightWakeable: Wakeable<ProtocolMessage[]> | null = null;
+let inFlightWakeable: Wakeable<ProtocolMessage[] | null> | null = null;
 let inFlightFocusRange: TimeStampedPointRange | null = null;
 
 let lastFetchDidOverflow: boolean = false;
@@ -63,15 +65,17 @@ export function getMessagesSuspense(
     // The backend throws if both points in a range are the same.
     // Arguably it should handle this more gracefully by just returning an empty array but...
     return {
-      countAfter: -1,
-      countBefore: -1,
-      didOverflow: false,
-      messages: EMPTY_ARRAY,
       categoryCounts: {
         errors: 0,
         logs: 0,
         warnings: 0,
       },
+      countAfter: -1,
+      countBefore: -1,
+      didError: false,
+      didOverflow: false,
+      error: null,
+      messages: EMPTY_ARRAY,
     };
   }
 
@@ -122,7 +126,19 @@ export function getMessagesSuspense(
   }
 
   if (lastFetchError) {
-    throw lastFetchError;
+    return {
+      categoryCounts: {
+        errors: 0,
+        logs: 0,
+        warnings: 0,
+      },
+      countAfter: -1,
+      countBefore: -1,
+      didError: true,
+      didOverflow: false,
+      error: lastFetchError,
+      messages: null,
+    };
   }
 
   // TODO (FE-533) Filter Firefox internal browser exceptions (see isFirefoxInternalMessage)
@@ -204,6 +220,8 @@ export function getMessagesSuspense(
     countAfter: lastFetchedFocusRange === null ? lastFilteredCountAfter : -1,
     countBefore: lastFetchedFocusRange === null ? lastFilteredCountBefore : -1,
     didOverflow: lastFetchDidOverflow,
+    didError: false,
+    error: null,
     messages: lastFilteredMessages!,
   };
 }
@@ -211,7 +229,7 @@ export function getMessagesSuspense(
 async function fetchMessages(
   client: ReplayClientInterface,
   focusRange: TimeStampedPointRange | null,
-  wakeable: Wakeable<ProtocolMessage[]>
+  wakeable: Wakeable<ProtocolMessage[] | null>
 ) {
   try {
     const { messages, overflow } = await client.findMessages(focusRange);
@@ -253,7 +271,7 @@ async function fetchMessages(
     lastFetchedFocusRange = focusRange;
     lastFetchedMessages = null;
 
-    wakeable.reject(error);
+    wakeable.resolve(null);
   }
 }
 

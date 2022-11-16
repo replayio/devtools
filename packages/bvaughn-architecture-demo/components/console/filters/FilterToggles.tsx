@@ -149,21 +149,41 @@ function ToggleCategoryCount({ category }: { category: keyof CategoryCounts }) {
   const { range: focusRange } = useContext(FocusContext);
   const client = useContext(ReplayClientContext);
 
-  const { categoryCounts } = getMessagesSuspense(client, focusRange);
+  const { didError, categoryCounts } = getMessagesSuspense(client, focusRange);
   const count = categoryCounts[category];
 
-  return count === 0 ? null : <Badge label={count} />;
+  if (didError) {
+    return (
+      <span title="Something went wrong loading message counts.">
+        <Icon className={styles.ExceptionsErrorIcon} type="warning" />
+      </span>
+    );
+  } else if (count > 0) {
+    return <Badge label={count} />;
+  } else {
+    return null;
+  }
 }
 
 function NodeModulesCount() {
   const client = useContext(ReplayClientContext);
   const { range } = useContext(FocusContext);
 
-  const { messages } = getMessagesSuspense(client, range);
+  const { didError, messages } = getMessagesSuspense(client, range);
 
   const count = useMemo(() => {
-    return messages.filter(message => isInNodeModules(message)).length;
+    return messages ? messages.filter(message => isInNodeModules(message)).length : 0;
   }, [messages]);
 
-  return count === 0 ? null : <Badge label={count} />;
+  if (didError) {
+    return (
+      <span title="Something went wrong loading message counts.">
+        <Icon className={styles.ExceptionsErrorIcon} type="warning" />
+      </span>
+    );
+  } else if (count > 0) {
+    return <Badge label={count} />;
+  } else {
+    return null;
+  }
 }
