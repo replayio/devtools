@@ -65,13 +65,18 @@
   --border-color-error: #7a4242;
   --border-color-warning: #6f5920;
 
-  --color-hit-counts-bar-1: #2563be;
-  --color-hit-counts-bar-2: #6ba6ff;
-  --color-hit-counts-bar-3: #baecfa;
-  --color-hit-counts-label-background-1: #192436;
-  --color-hit-counts-label-background-2: #25364e;
-  --color-hit-counts-label-background-3: #30404e;
-  --color-hit-counts-label-color: #a4c6f8;
+  --color-hit-counts-bar-0: #465062;
+  --color-hit-counts-bar-1: #0284c3;
+  --color-hit-counts-bar-2: #0284c3;
+  --color-hit-counts-bar-3: #03a3f0;
+  --color-hit-counts-border-color: transparent;
+  --color-hit-counts-label-background-0: #1f2b43;
+  --color-hit-counts-label-background-1: #003e5b;
+  --color-hit-counts-label-background-2: #006290;
+  --color-hit-counts-label-background-3: #006290;
+  --color-hit-counts-label-color: #d7d7db;
+  --color-line-number-with-hits: #d7d7db;
+  --color-line-number-without-hits: var(--color-dimmer);
 
   --color-primary-background: var(--background-color-contrast-1);
   --color-secondary-background: var(--background-color-contrast-3);
@@ -195,13 +200,18 @@
   --color-disabled-button: #ffffff;
   --color-warning: #6c5914;
 
-  --color-hit-counts-bar-1: #bbeafa;
-  --color-hit-counts-bar-2: #69a6ff;
-  --color-hit-counts-bar-3: #2979ef;
-  --color-hit-counts-label-background-1: #fbfbfb;
-  --color-hit-counts-label-background-2: #eaf3ff;
-  --color-hit-counts-label-background-3: #e2ebfe;
+  --color-hit-counts-bar-0: #f3f4f6;
+  --color-hit-counts-bar-1: #c4e6f7;
+  --color-hit-counts-bar-2: #80d5fe;
+  --color-hit-counts-bar-3: #02acfd;
+  --color-hit-counts-border-color: #f3f4f6;
+  --color-hit-counts-label-background-0: #fbfbfb;
+  --color-hit-counts-label-background-1: #ebf7fc;
+  --color-hit-counts-label-background-2: #d5f1ff;
+  --color-hit-counts-label-background-3: #aae4fe;
   --color-hit-counts-label-color: #47628b;
+  --color-line-number-with-hits: var(--color-default);
+  --color-line-number-without-hits: var(--color-dimmer);
 
   --color-primary-background: #ffffff;
   --color-secondary-background: #eeeeee;
@@ -245,13 +255,10 @@
   --value-type-html-tag-bracket: #0c0c0d;
   --value-type-html-text: #0c0c0d;
 
-<<<<<<< HEAD
-=======
   --point-panel-background-color: #eef1f7;
   --point-panel-input-background-color: #e6e6e6;
   --point-panel-input-border-color: #dae5fd;
   --point-panel-input-edit-button-color: #82a7f9;
->>>>>>> 8a97cad0d (Polish print statement panel)
   --point-panel-timeline-background-color: #e6e6e6;
   --point-panel-button-background-color: #e6e6e6;
   --point-panel-button-background-color-disabled: #f0f0f0;

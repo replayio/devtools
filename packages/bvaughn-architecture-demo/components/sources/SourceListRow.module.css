@@ -14,7 +14,7 @@
 }
 
 .LineWithoutHits .LineNumber {
-  color: var(--color-dimmer);
+  color: var(--color-line-number-without-hits);
 }
 
 .Header {
@@ -84,7 +84,7 @@
   justify-content: flex-end;
   font-size: var(--font-size-small);
   padding: 0 1ch;
-  color: var(--color-dim);
+  color: var(--line-number-with-hits);
   user-select: none;
   position: relative;
   overflow: visible;
@@ -145,7 +145,7 @@
   height: var(--line-height);
 }
 .LineHitCountBar0 {
-  background-color: var(--point-panel-background-color);
+  background-color: var(--color-hit-counts-bar-0);
 }
 .LineHitCountBar1 {
   background-color: var(--color-hit-counts-bar-1);
@@ -165,9 +165,10 @@
   align-items: center;
   justify-content: center;
   color: var(--color-hit-counts-label-color);
+  border-right: 1px solid var(--color-hit-counts-border-color);
 }
 .LineHitCountLabel0 {
-  background-color: var(--color-hit-counts-label-background-1);
+  background-color: var(--color-hit-counts-label-background-0);
 }
 .LineHitCountLabel1 {
   background-color: var(--color-hit-counts-label-background-1);
@@ -200,7 +201,7 @@
   align-items: center;
   width: 100%;
   height: var(--line-height);
-  border-left: 1px solid var(--border-color-light);
+  padding-left: 1ch;
 }
 
 .CurrentLine {
