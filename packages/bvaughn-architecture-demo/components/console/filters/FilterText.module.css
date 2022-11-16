@@ -1,6 +1,6 @@
 .Input {
   height: 1.5em;
-  background-color: var(--background-color-default);
+  background-color: var(--background-color-inputs);
   color: var(--color-default);
   padding: 0 0.25em;
   margin: 0.25em 0.25em 0.25em 0;
@@ -9,6 +9,5 @@
   outline: none;
 }
 .Input:focus {
-  background-color: var(--background-color-contrast-1);
   border-color: var(--color-brand);
 }

@@ -28,11 +28,10 @@
   background: none;
   border: 2px solid transparent;
   outline: none;
-  background-color: var(--background-color-default);
+  background-color: var(--background-color-inputs);
   color: var(--color-default);
 }
 .Input:focus {
-  background-color: var(--background-color-contrast-1);
   border-color: var(--color-brand);
 }
 

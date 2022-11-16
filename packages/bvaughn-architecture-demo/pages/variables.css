@@ -45,6 +45,7 @@
   --background-color-current-execution-point: #25364e;
   --background-color-current-search-result: #42381f;
   --background-color-warning: #42381f;
+  --background-color-inputs: #0e1119;
   --color-brand: #09a6e9;
   --color-contrast: #081121;
   --color-current: #f02d5e;
@@ -115,7 +116,6 @@
   --value-type-html-tag-bracket: #e6e9ec;
   --value-type-html-text: #d7d7db;
 
-  --point-panel-input-background-color: #464648;
   --point-panel-timeline-background-color: #464648;
   --point-panel-button-background-color: #8a8f95;
   --point-panel-button-background-color-disabled: #464648;
@@ -172,6 +172,7 @@
   --background-color-current-execution-point: #eaf3ff;
   --background-color-current-search-result: #fffac8;
   --background-color-warning: #fffac8;
+  --background-color-inputs: #e6e6e6;
   --border-color: #081121;
   --border-color-current-execution-point: #69a6ff;
   --border-color-light: #f9f9fa;
@@ -243,7 +244,6 @@
   --value-type-html-tag-bracket: #0c0c0d;
   --value-type-html-text: #0c0c0d;
 
-  --point-panel-input-background-color: #e6e6e6;
   --point-panel-timeline-background-color: #e6e6e6;
   --point-panel-button-background-color: #e6e6e6;
   --point-panel-button-background-color-disabled: #f0f0f0;
