@@ -64,10 +64,10 @@ export function setViewMode(viewMode: ViewMode): UIThunkAction {
 
     // There's a possible race condition here so it's important to handle the nag logic first.
     // Otherwise, it's possible for the nag to not be properly dismissed.
-    // if (viewMode === "dev" && !localNags.includes(LocalNag.YANK_TO_SOURCE)) {
-    //   dispatch(dismissLocalNag(LocalNag.YANK_TO_SOURCE));
-    //   dispatch(setSelectedPrimaryPanel("explorer"));
-    // }
+    if (viewMode === "dev" && !localNags.includes(LocalNag.YANK_TO_SOURCE)) {
+      dispatch(dismissLocalNag(LocalNag.YANK_TO_SOURCE));
+      dispatch(setSelectedPrimaryPanel("explorer"));
+    }
 
     // If switching to non-dev mode, we check the selectedPrimaryPanel and update to comments
     // if selectedPrimaryPanel is one that should only be visible in dev mode.
