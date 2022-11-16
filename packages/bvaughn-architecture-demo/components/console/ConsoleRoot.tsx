@@ -44,26 +44,28 @@ export default function ConsoleRoot({
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <Suspense fallback={<IndeterminateLoader />}>
-      <ConsoleContextMenuContextRoot>
-        <ConsoleFiltersContextRoot>
-          <LoggablesContextRoot messageListRef={messageListRef}>
-            <ConsoleSearchContextRoot
-              messageListRef={messageListRef}
-              searchInputRef={searchInputRef}
-              showSearchInputByDefault={showSearchInputByDefault}
-            >
-              <Console
+    <ErrorBoundary>
+      <Suspense fallback={<IndeterminateLoader />}>
+        <ConsoleContextMenuContextRoot>
+          <ConsoleFiltersContextRoot>
+            <LoggablesContextRoot messageListRef={messageListRef}>
+              <ConsoleSearchContextRoot
                 messageListRef={messageListRef}
-                nagHeader={nagHeader}
                 searchInputRef={searchInputRef}
-                showFiltersByDefault={showFiltersByDefault}
-              />
-            </ConsoleSearchContextRoot>
-          </LoggablesContextRoot>
-        </ConsoleFiltersContextRoot>
-      </ConsoleContextMenuContextRoot>
-    </Suspense>
+                showSearchInputByDefault={showSearchInputByDefault}
+              >
+                <Console
+                  messageListRef={messageListRef}
+                  nagHeader={nagHeader}
+                  searchInputRef={searchInputRef}
+                  showFiltersByDefault={showFiltersByDefault}
+                />
+              </ConsoleSearchContextRoot>
+            </LoggablesContextRoot>
+          </ConsoleFiltersContextRoot>
+        </ConsoleContextMenuContextRoot>
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 
