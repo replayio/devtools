@@ -30,13 +30,10 @@ const connector = connect(mapStateToProps, {
 type PropsFromRedux = ConnectedProps<typeof connector>;
 interface PropsFromParent {
   breakpoint: Point;
-  editor: $FixTypeLater;
   onRemoveBreakpoint: (cx: Context, breakpoint: Point) => void;
   type: "logpoint" | "breakpoint";
 }
 type BreakpointProps = PropsFromRedux & PropsFromParent & { replayClient: ReplayClientInterface };
-
-type $FixTypeLater = any;
 
 class Breakpoint extends PureComponent<BreakpointProps> {
   get selectedLocation() {
@@ -78,7 +75,7 @@ class Breakpoint extends PureComponent<BreakpointProps> {
   }
 
   render() {
-    const { replayClient, breakpoint, editor, type, selectedFrameId, sourcesState } = this.props;
+    const { replayClient, breakpoint, type, selectedFrameId, sourcesState } = this.props;
     const frame = selectedFrameId
       ? getPauseFrameSuspense(replayClient, selectedFrameId, sourcesState)
       : undefined;
@@ -91,7 +88,7 @@ class Breakpoint extends PureComponent<BreakpointProps> {
         })}
         onClick={this.selectBreakpoint}
       >
-        <BreakpointOptions editor={editor} breakpoint={breakpoint} type={type} />
+        <BreakpointOptions breakpoint={breakpoint} type={type} />
         {this.renderSourceLocation()}
         <CloseButton
           buttonClass={null}

@@ -13,10 +13,8 @@ import { TestItem } from "ui/types";
 import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
 import ProtocolViewer from "./ProtocolViewer";
-import MaterialIcon from "./shared/MaterialIcon";
 import StatusDropdown from "./shared/StatusDropdown";
 
-const FullTextSearch = require("devtools/client/debugger/src/components/FullTextSearch").default;
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
 const Accordion = require("devtools/client/debugger/src/components/shared/Accordion").default;
 
@@ -100,7 +98,6 @@ export default function SidePanel() {
       {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}
       {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}
       {selectedPrimaryPanel === "comments" && <CommentCardsList />}
-      {selectedPrimaryPanel === "search" && <FullTextSearch />}
       {selectedPrimaryPanel === "events" && <Accordion items={items} />}
       {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
     </div>

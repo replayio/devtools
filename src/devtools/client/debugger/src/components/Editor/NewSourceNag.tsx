@@ -1,12 +1,6 @@
-import classNames from "classnames";
-import React, { useContext } from "react";
-
-import { LoggablesContext } from "bvaughn-architecture-demo/components/console/LoggablesContext";
 import { useNag } from "bvaughn-architecture-demo/src/hooks/useNag";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
-import { shouldShowNag } from "ui/utils/user";
 
 import styles from "./NewSourceNag.module.css";
 

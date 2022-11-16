@@ -11,7 +11,7 @@ const { getSourceDetailsEntities, getSourceIdsByUrl } = require("ui/reducers/sou
 const { getPreferredLocation } = require("ui/utils/preferredLocation");
 
 const Frames =
-  require("devtools/client/debugger/src/components/SecondaryPanes/Frames/index").Frames;
+  require("devtools/client/debugger/src/components/SecondaryPanes/Frames/NewFrames").default;
 const {
   annotateFrames,
 } = require("devtools/client/debugger/src/utils/pause/frames/annotateFrames");

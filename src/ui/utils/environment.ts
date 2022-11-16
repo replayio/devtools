@@ -1,6 +1,5 @@
 import { MockedResponse } from "@apollo/client/testing";
 import { TimeStampedPointRange } from "@replayio/protocol";
-import { Editor } from "codemirror";
 
 import { injectCustomSocketSendMessageForTesting } from "protocol/socket";
 
@@ -15,13 +14,6 @@ declare global {
   interface Window {
     // Injected by test runner during e2e tests.
     __mockEnvironmentForTesting?: MockEnvironment;
-
-    jsterm: {
-      editor: Editor;
-      setValue: (newValue: string) => void;
-      execute: () => void;
-      showAutocomplete?: (show: boolean) => void;
-    };
   }
 }
 

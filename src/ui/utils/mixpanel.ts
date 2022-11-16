@@ -1,7 +1,6 @@
 import { SessionId } from "@replayio/protocol";
 import mixpanel from "mixpanel-browser";
 
-import { Input } from "devtools/client/debugger/src/components/Editor/Breakpoints/Panel/PanelSummary";
 import { InspectorActiveTab } from "devtools/client/inspector/reducers";
 import { CanonicalRequestType } from "ui/components/NetworkMonitor/utils";
 import { WorkspaceId, WorkspaceUuid } from "ui/state/app";
@@ -20,7 +19,6 @@ type MixpanelEvent =
   | ["breakpoint.remove"]
   | ["breakpoint.set_condition"]
   | ["breakpoint.set_log"]
-  | ["breakpoint.start_edit", { input: Input; hitsCount: number | null }]
   | ["call_stack.select_frame"]
   | ["comments.create"]
   | ["comments.delete"]

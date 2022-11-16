@@ -20,7 +20,6 @@ import {
 
 import type { Context } from "../reducers/pause";
 import { getNewSelectedSourceId, getTabs } from "../selectors";
-import { removeDocument } from "../utils/editor";
 import { selectSource } from "./sources";
 
 export function updateTab(source: SourceDetails, framework: string) {
@@ -50,8 +49,6 @@ export function moveTabBySourceId(sourceId: string, tabIndex: number) {
  */
 export function closeTab(cx: Context, source: MiniSource): UIThunkAction {
   return (dispatch, getState) => {
-    removeDocument(source.id);
-
     const tabs = getTabs(getState());
     dispatch({ type: "CLOSE_TAB", source });
 
@@ -73,7 +70,6 @@ export function closeTabs(cx: Context, urls: string[]): UIThunkAction {
     const sources = urls.map(url => getSourceToDisplayForUrl(getState(), url)!).filter(Boolean);
 
     const tabs = getTabs(getState());
-    sources.forEach(source => removeDocument(source.id));
     dispatch({ type: "CLOSE_TABS", sources });
 
     const sourceId = getNewSelectedSourceId(getState(), tabs);

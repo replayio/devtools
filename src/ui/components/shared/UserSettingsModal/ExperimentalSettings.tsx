@@ -16,11 +16,6 @@ interface ExperimentalSetting {
 
 const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
   {
-    label: "Legacy source viewer",
-    description: "Enable legacy source viewer and log point UIs",
-    key: "enableLegacySourceViewer",
-  },
-  {
     label: "Column Breakpoints",
     description: "Add breakpoints within a line",
     key: "enableColumnBreakpoints",
@@ -95,9 +90,8 @@ export default function ExperimentalSettings({}) {
   // TODO: This is bad and should be updated with a better generalized hook
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
-  const { value: enableLegacySourceViewer, update: updateEnableNewSourceViewer } =
-    useFeature("legacySourceViewer");
   const { value: cacheScanData, update: updateCacheScanData } = useFeature("cacheScanData");
+
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
 
@@ -117,8 +111,6 @@ export default function ExperimentalSettings({}) {
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
-    } else if (key == "enableLegacySourceViewer") {
-      updateEnableNewSourceViewer(!enableLegacySourceViewer);
     } else if (key == "enableResolveRecording") {
       updateEnableResolveRecording(!enableResolveRecording);
     } else if (key === "hitCounts") {
@@ -141,7 +133,6 @@ export default function ExperimentalSettings({}) {
     cacheScanData,
     consoleFilterDrawerDefaultsToOpen,
     enableColumnBreakpoints,
-    enableLegacySourceViewer,
     enableQueryCache,
     enableResolveRecording,
     hitCounts,

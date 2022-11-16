@@ -1,9 +1,9 @@
 import { Action } from "@reduxjs/toolkit";
 import { RecordingId } from "@replayio/protocol";
-import escapeHtml from "escape-html";
 
 import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
 import { getStreamingSourceContentsHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { parse } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
 import {
   handleUnstableSourceIds,
   selectLocation,
@@ -11,10 +11,6 @@ import {
 import { fetchSymbolsForSource, getSymbols } from "devtools/client/debugger/src/reducers/ast";
 import { getExecutionPoint, getPauseId } from "devtools/client/debugger/src/reducers/pause";
 import { findClosestFunction } from "devtools/client/debugger/src/utils/ast";
-import {
-  getCodeMirror,
-  waitForEditor,
-} from "devtools/client/debugger/src/utils/editor/create-editor";
 import { getFilenameFromURL } from "devtools/client/debugger/src/utils/sources-tree/getURL";
 import type { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { waitForTime } from "protocol/utils";
@@ -205,16 +201,15 @@ export function createLabels(
       const lineText = contents!.split("\n")[line - 1];
       snippet = lineText?.slice(0, 100).trim();
     }
+
     let secondary = "";
     if (snippet) {
-      await waitForEditor();
-      const CodeMirror = getCodeMirror();
-      // @ts-expect-error runMode doesn't exist on CodeMirror
-      CodeMirror.runMode(snippet, "javascript", (text: string, className: string | null) => {
-        const openingTag = className ? `<span class="cm-${className}">` : "<span>";
-        secondary += `${openingTag}${escapeHtml(text)}</span>`;
-      });
+      const parsed = parse(snippet, ".js");
+      if (parsed !== null && parsed.length > 0) {
+        secondary = parsed[0];
+      }
     }
+
     return { primary, secondary };
   };
 }

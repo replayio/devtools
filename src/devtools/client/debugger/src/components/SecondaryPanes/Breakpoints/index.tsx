@@ -1,11 +1,7 @@
 import { SourceId } from "@replayio/protocol";
-import { ReactNode, useContext, useEffect, useMemo, useState } from "react";
+import { ReactNode, useContext, useMemo } from "react";
 
 import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import {
-  createHeadlessEditor,
-  waitForEditor,
-} from "devtools/client/debugger/src/utils/editor/create-editor";
 import { Point } from "shared/client/types";
 import { getSourceDetailsEntities } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
@@ -23,16 +19,8 @@ export default function Breakpoints({
   type: "breakpoint" | "logpoint";
 }) {
   const { deletePoints, points } = useContext(PointsContext);
-  const [headlessEditor, setHeadlessEditor] = useState<any>(null);
 
   const sourceDetailsEntities = useAppSelector(getSourceDetailsEntities);
-
-  useEffect(() => {
-    (async () => {
-      await waitForEditor();
-      setHeadlessEditor(createHeadlessEditor());
-    })();
-  }, []);
 
   const filteredAndSortedPoints = useMemo(
     () =>
@@ -62,10 +50,6 @@ export default function Breakpoints({
     }, {});
   }, [filteredAndSortedPoints]);
 
-  if (headlessEditor === null) {
-    return null;
-  }
-
   if (filteredAndSortedPoints.length === 0) {
     return (
       <div className="pane">
@@ -94,7 +78,6 @@ export default function Breakpoints({
                 <Breakpoint
                   key={point.id}
                   breakpoint={point}
-                  editor={headlessEditor}
                   onRemoveBreakpoint={() => deletePoints(point.id)}
                   type={type}
                 />

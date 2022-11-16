@@ -186,13 +186,6 @@ export function selectLocation(
     }
 
     dispatch(fetchSymbolsForSource(loadedSource.id));
-
-    // If a new source is selected update the file search results
-    const newSource = getSelectedSource(getState());
-    if (currentSource && currentSource !== newSource) {
-      const { updateActiveFileSearch } = await import("../ui");
-      dispatch(updateActiveFileSearch(cx));
-    }
   };
 }
 

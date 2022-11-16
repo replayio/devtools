@@ -37,9 +37,6 @@ pref("devtools.debugger.end-panel-size", 300);
 pref("devtools.debugger.ui.editor-wrapping", false);
 pref("devtools.debugger.ui.framework-grouping-on", true);
 pref("devtools.debugger.pending-selected-location", "{}");
-pref("devtools.debugger.file-search-case-sensitive", false);
-pref("devtools.debugger.file-search-whole-word", false);
-pref("devtools.debugger.file-search-regex-match", false);
 pref("devtools.debugger.project-directory-root", "");
 pref("devtools.debugger.map-scopes-enabled", false);
 pref("devtools.debugger.prefs-schema-version", prefsSchemaVersion);
@@ -97,9 +94,6 @@ export const prefs = new PrefsHelper("devtools", {
   endPanelSize: ["Int", "debugger.end-panel-size"],
   frameworkGroupingOn: ["Bool", "debugger.ui.framework-grouping-on"],
   pendingSelectedLocation: ["Json", "debugger.pending-selected-location", {}],
-  fileSearchCaseSensitive: ["Bool", "debugger.file-search-case-sensitive"],
-  fileSearchWholeWord: ["Bool", "debugger.file-search-whole-word"],
-  fileSearchRegexMatch: ["Bool", "debugger.file-search-regex-match"],
   debuggerPrefsSchemaVersion: ["Int", "debugger.prefs-schema-version"],
   logActions: ["Bool", "debugger.log-actions"],
   logEventBreakpoints: ["Bool", "debugger.log-event-breakpoints"],

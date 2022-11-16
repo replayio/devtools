@@ -16,9 +16,11 @@ import {
 } from "ui/reducers/sources";
 import { getPauseFrameSuspense } from "ui/suspense/frameCache";
 
-import { CursorPosition } from "../components/Editor/Footer";
 import { PauseAndFrameId } from "../reducers/pause";
 import { isBowerComponent, isNodeModule } from "./source";
+
+// TODO
+type CursorPosition = any;
 
 export function getSourceIDsToSearch(
   sourcesById: Record<string, SourceDetails>,

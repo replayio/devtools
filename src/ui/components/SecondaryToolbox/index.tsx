@@ -185,15 +185,9 @@ function SecondaryToolbox() {
         <Panel isActive={selectedPanel === "redux-devtools"}>
           <ReduxDevToolsPanel />
         </Panel>
-        {/* _
-          Don't_ render an `<Offscreen>` around the editor.
-          It appears that this causes React to unmount and remount
-          the class components, and we end up with a duplicate
-          CodeMirror instance or similar, and the entire editor freezes
-          and becomes non-interactive. If we skip that, toggling the "Sources" 
-          tab works just fine as expected.
-        */}
-        {toolboxLayout !== "ide" && selectedPanel === "debugger" && <EditorPane />}
+        <Panel isActive={selectedPanel === "debugger"}>
+          <EditorPane />
+        </Panel>
       </Redacted>
     </div>
   );
