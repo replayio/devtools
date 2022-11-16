@@ -40,7 +40,12 @@ const RequestTable = ({
   filteredAfterCount: number;
   filteredBeforeCount: number;
   onRowSelect: (request: RequestSummary) => void;
-  seek: (point: string, time: number, hasFrames: boolean, pauseId?: string | undefined) => boolean;
+  seek: (
+    point: string,
+    time: number,
+    openSourcesTab: boolean,
+    pauseId?: string | undefined
+  ) => boolean;
   selectedRequest?: RequestSummary;
   table: TableInstance<RequestSummary>;
 }) => {

@@ -222,7 +222,7 @@ export function createLabels(
 export function seekToComment(item: Comment | Reply, openSourcesTab: boolean): UIThunkAction {
   return (dispatch, getState) => {
     let context = selectors.getThreadContext(getState());
-    dispatch(seek(item.point, item.time, item.hasFrames));
+    dispatch(seek(item.point, item.time, false));
     dispatch(setSelectedPrimaryPanel("comments"));
 
     if (item.sourceLocation) {

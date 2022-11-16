@@ -38,14 +38,14 @@ export function bootstrap(
       point,
       time,
       frame,
-      hasFrames,
+      openSourcesTab,
     }: {
       point: string;
-      hasFrames: boolean;
+      openSourcesTab: boolean;
       time: number;
       frame: Frame;
     }) => {
-      store.dispatch(paused({ executionPoint: point, time, frame, hasFrames }));
+      store.dispatch(paused({ executionPoint: point, time, openSourcesTab, frame }));
     }
   );
   ThreadFront.on("resumed", () => store.dispatch(resumed()));

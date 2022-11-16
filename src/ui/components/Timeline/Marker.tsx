@@ -27,7 +27,6 @@ type MarkerProps = PropsFromRedux & {
   point: string;
   time: number;
   location?: Location;
-  hasFrames: boolean;
   currentTime: number;
   isPrimaryHighlighted: boolean;
   zoomRegion: ZoomRegion;
@@ -49,13 +48,13 @@ class Marker extends React.Component<MarkerProps> {
   }
 
   onClick: MouseEventHandler = e => {
-    const { seek, point, time, hasFrames, pauseId } = this.props;
+    const { seek, point, time, pauseId } = this.props;
     trackEvent("timeline.marker_select");
 
     e.preventDefault();
     e.stopPropagation();
 
-    seek(point, time, hasFrames, pauseId);
+    seek(point, time, true, pauseId);
   };
 
   onMouseLeave: MouseEventHandler = (e: any) => {
