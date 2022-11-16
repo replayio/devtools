@@ -1,9 +1,10 @@
 .Container {
-  flex-grow: 0;
-  flex-shrink: 0;
-  height: 2.5em;
-  width: 2.5em;
+  flex: 0 0 2em;
+  height: 2em;
+  width: 2em;
   position: relative;
+  font-family: var(--font-family-default);
+  font-size: var(--font-size-regular);
 }
 
 .Button {
@@ -17,11 +18,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 2.5em;
-  min-width: 2.5em;
-  border-radius: 2.5em;
-  font-weight: 600;
-  font-family: "Inter";
+  height: 2em;
+  min-width: 2em;
+  border-radius: 2em;
 }
 
 .PausedStyle {
@@ -52,7 +51,17 @@
   animation-fill-mode: forwards;
 }
 
+.ButtonIconWrapper {
+  height: 1em;
+  width: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
 .ButtonIcon {
+  flex: 0 0 1.25em;
   height: 1.25em;
   width: 1.25em;
   fill: currentColor;

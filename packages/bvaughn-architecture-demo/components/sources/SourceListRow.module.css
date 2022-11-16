@@ -1,5 +1,7 @@
 .Row {
   min-width: max(var(--longest-line-width), var(--list-width));
+
+  --line-hit-count-size: 6px;
 }
 
 .LineWithHits,
@@ -141,8 +143,9 @@
 }
 
 .LineHitCountBar {
-  flex: 0 0 0.5em;
+  flex: 0 0 var(--line-hit-count-size);
   height: var(--line-height);
+  font-size: var(--font-size-small);
 }
 .LineHitCountBar0 {
   background-color: var(--color-hit-counts-bar-0);
@@ -213,6 +216,6 @@
   top: var(--line-height);
   width: calc(var(--list-width) - var(--line-number-size) - 2ch);
   left: calc(var(--line-number-size) + 2ch);
-  border-left: 1px solid var(--border-color-light);
+  border-left: var(--line-hit-count-size) solid var(--color-hit-counts-bar-0);
   font-size: var(--font-size-small);
 }

@@ -43,7 +43,7 @@
 
 .FixedHeightRow {
   width: 100%;
-  flex: 0 0 0em;
+  flex: 0 0 3em;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -56,7 +56,7 @@
   overflow: auto;
   height: 100%;
   flex: 1;
-  background-color: var(--background-color-inputs);
+  background-color: var(--point-panel-input-background-color);
   border: 2px solid var(--point-panel-input-border-color);
   padding: 0 0.5em;
   border-radius: 0.5em;
@@ -79,8 +79,9 @@
 
 .Content {
   /* Allows height for horizontal scrollbar without shifting text */
-  height: 2.5em;
-  line-height: 2.5em;
+  height: 2em;
+  max-height: 2em;
+  line-height: 2em;
 
   flex: 1 1 auto;
   white-space: pre;
@@ -120,16 +121,15 @@
   padding: 0 2ch;
 }
 .SaveButton:disabled {
-  background-color: var(--primary-accent);
-  color: var(--color-tertiary-button);
-  opacity: 0.5;
+  background-color: var(--background-color-primary-button-disabled);
 }
 
 .AddConditionButton,
 .CancelButton {
   text-decoration: underline;
-  font-size: var(--font-size-small);
-  color: var(--primary-accent-text);
+  color: var(--color-link);
+  font-size: var(--font-family-default);
+  font-size: var(--font-size-regular);
 }
 
 .CancelButton {
@@ -141,9 +141,9 @@
   width: 100%;
 
   /* Allows height for horizontal scrollbar without shifting text */
-  height: 2.5em;
+  height: 2em;
   line-height: 1.5em;
-  padding: 0.5em 0;
+  padding: 0.25em 0;
 }
 .ContentInputWithNag::selection {
   background-color: var(--nag-background-color);
