@@ -4,13 +4,10 @@ import { useEffect, useState } from "react";
 import { getRecordingDuration } from "ui/actions/app";
 import { seekToTime, setFocusRegion } from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem, TestResult } from "ui/types";
 
-import { selectLocation } from "../../actions/sources";
-import { getThreadContext } from "../../selectors";
 import { TestSteps } from "./TestSteps";
 
 export function TestCase({
@@ -44,12 +41,15 @@ export function TestCase({
         })
       );
     } else {
-      dispatch(
-        setFocusRegion({
-          beginTime: testStartTime,
-          endTime: testEndTime,
-        })
-      );
+      // Note this check shouldn't be required but something seems to be broken (see SCS-289)
+      if (!Number.isNaN(testStartTime) && !Number.isNaN(testEndTime)) {
+        dispatch(
+          setFocusRegion({
+            beginTime: testStartTime,
+            endTime: testEndTime,
+          })
+        );
+      }
     }
   };
   const toggleExpand = () => {

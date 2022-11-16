@@ -1,6 +1,10 @@
 .Error {
-  padding: 0.5em;
-  text-align: center;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   background-color: var(--background-color-error);
   color: var(--color-default);
 }

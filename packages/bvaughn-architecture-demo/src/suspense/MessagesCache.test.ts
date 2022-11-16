@@ -92,7 +92,7 @@ describe("MessagesCache", () => {
     expect(data.categoryCounts).toEqual({ errors: 0, logs: 3, warnings: 0 });
     expect(data.countAfter).toBe(0);
     expect(data.countBefore).toBe(0);
-    expect(data.messages.map(({ point }) => point.time)).toEqual([0, 1, 2]);
+    expect(data.messages!.map(({ point }) => point.time)).toEqual([0, 1, 2]);
     expect(data.didOverflow).toBe(false);
     expect(client.findMessages).toHaveBeenCalledTimes(1);
 
@@ -108,7 +108,7 @@ describe("MessagesCache", () => {
     expect(data.categoryCounts).toEqual({ errors: 0, logs: 2, warnings: 0 });
     expect(data.countAfter).toBe(-1);
     expect(data.countBefore).toBe(-1);
-    expect(data.messages.map(({ point }) => point.time)).toEqual([1, 2]);
+    expect(data.messages!.map(({ point }) => point.time)).toEqual([1, 2]);
     expect(data.didOverflow).toBe(false);
     expect(client.findMessages).toHaveBeenCalledTimes(1);
 
@@ -121,7 +121,7 @@ describe("MessagesCache", () => {
     mockHelper([createM(1)], true);
 
     const data = await getMessagesHelper(null);
-    expect(data.messages.map(({ point }) => point.time)).toEqual([1]);
+    expect(data.messages!.map(({ point }) => point.time)).toEqual([1]);
     expect(data.didOverflow).toBe(true);
     expect(client.findMessages).toHaveBeenCalledTimes(1);
   });
@@ -130,7 +130,7 @@ describe("MessagesCache", () => {
     mockHelper([createM(0), createM(1), createM(2), createM(3)]);
 
     let data = await getMessagesHelper(null);
-    expect(data.messages.map(({ point }) => point.time)).toEqual([0, 1, 2, 3]);
+    expect(data.messages!.map(({ point }) => point.time)).toEqual([0, 1, 2, 3]);
     expect(data.categoryCounts).toEqual({ errors: 0, logs: 4, warnings: 0 });
     expect(data.countAfter).toBe(0);
     expect(data.countBefore).toBe(0);
@@ -140,7 +140,7 @@ describe("MessagesCache", () => {
     expect(data.categoryCounts).toEqual({ errors: 0, logs: 2, warnings: 0 });
     expect(data.countAfter).toBe(1);
     expect(data.countBefore).toBe(1);
-    expect(data.messages.map(({ point }) => point.time)).toEqual([1, 2]);
+    expect(data.messages!.map(({ point }) => point.time)).toEqual([1, 2]);
     expect(client.findMessages).toHaveBeenCalledTimes(1);
   });
 
@@ -148,14 +148,14 @@ describe("MessagesCache", () => {
     mockHelper([createM(0), createM(1), createM(2), createM(3)]);
 
     let data = await getMessagesHelper(toTSPR(0, 3));
-    expect(data.messages.map(({ point }) => point.time)).toEqual([0, 1, 2, 3]);
+    expect(data.messages!.map(({ point }) => point.time)).toEqual([0, 1, 2, 3]);
     expect(data.categoryCounts).toEqual({ errors: 0, logs: 4, warnings: 0 });
     expect(data.countAfter).toBe(-1);
     expect(data.countBefore).toBe(-1);
     expect(client.findMessages).toHaveBeenCalledTimes(1);
 
     data = await getMessagesHelper(toTSPR(1, 2));
-    expect(data.messages.map(({ point }) => point.time)).toEqual([1, 2]);
+    expect(data.messages!.map(({ point }) => point.time)).toEqual([1, 2]);
     expect(data.categoryCounts).toEqual({ errors: 0, logs: 2, warnings: 0 });
     expect(data.countAfter).toBe(-1);
     expect(data.countBefore).toBe(-1);
@@ -166,13 +166,13 @@ describe("MessagesCache", () => {
     mockHelper([createM(1), createM(2)]);
 
     let data = await getMessagesHelper(toTSPR(1, 2));
-    expect(data.messages.map(({ point }) => point.time)).toEqual([1, 2]);
+    expect(data.messages!.map(({ point }) => point.time)).toEqual([1, 2]);
     expect(client.findMessages).toHaveBeenCalledTimes(1);
 
     mockHelper([createM(0), createM(1), createM(2), createM(3)]);
 
     data = await getMessagesHelper(toTSPR(0, 3));
-    expect(data.messages.map(({ point }) => point.time)).toEqual([0, 1, 2, 3]);
+    expect(data.messages!.map(({ point }) => point.time)).toEqual([0, 1, 2, 3]);
     expect(client.findMessages).toHaveBeenCalledTimes(2);
   });
 
@@ -180,13 +180,13 @@ describe("MessagesCache", () => {
     mockHelper([createM(1), createM(2)]);
 
     let data = await getMessagesHelper(toTSPR(1, 2));
-    expect(data.messages.map(({ point }) => point.time)).toEqual([1, 2]);
+    expect(data.messages!.map(({ point }) => point.time)).toEqual([1, 2]);
     expect(client.findMessages).toHaveBeenCalledTimes(1);
 
     mockHelper([createM(0), createM(1), createM(2), createM(3)]);
 
     data = await getMessagesHelper(null);
-    expect(data.messages.map(({ point }) => point.time)).toEqual([0, 1, 2, 3]);
+    expect(data.messages!.map(({ point }) => point.time)).toEqual([0, 1, 2, 3]);
     expect(client.findMessages).toHaveBeenCalledTimes(2);
   });
 
@@ -194,17 +194,17 @@ describe("MessagesCache", () => {
     mockHelper([createM(1)], true);
 
     let data = await getMessagesHelper(toTSPR(0, 3));
-    expect(data.messages.map(({ point }) => point.time)).toEqual([1]);
+    expect(data.messages!.map(({ point }) => point.time)).toEqual([1]);
     expect(data.didOverflow).toBe(true);
     expect(client.findMessages).toHaveBeenCalledTimes(1);
 
     data = await getMessagesHelper(toTSPR(1, 3));
-    expect(data.messages.map(({ point }) => point.time)).toEqual([1]);
+    expect(data.messages!.map(({ point }) => point.time)).toEqual([1]);
     expect(data.didOverflow).toBe(true);
     expect(client.findMessages).toHaveBeenCalledTimes(2);
 
     data = await getMessagesHelper(toTSPR(1, 2));
-    expect(data.messages.map(({ point }) => point.time)).toEqual([1]);
+    expect(data.messages!.map(({ point }) => point.time)).toEqual([1]);
     expect(data.didOverflow).toBe(true);
     expect(client.findMessages).toHaveBeenCalledTimes(3);
   });
@@ -247,7 +247,7 @@ describe("MessagesCache", () => {
     await promise1;
 
     const data = await getMessagesHelper(toTSPR(2, 3));
-    expect(data.messages.map(({ point }) => point.time)).toEqual([2, 3]);
+    expect(data.messages!.map(({ point }) => point.time)).toEqual([2, 3]);
     expect(client.findMessages).toHaveBeenCalledTimes(2);
   });
 
@@ -266,6 +266,22 @@ describe("MessagesCache", () => {
     getMessagesHelper(null);
 
     expect(client.findMessages).toHaveBeenCalledTimes(2);
+  });
+
+  it("should catch errors and report them in the response data", async () => {
+    const error = new Error("Expected");
+
+    client.findMessages.mockImplementation(() => {
+      throw error;
+    });
+
+    console.error = jest.fn();
+
+    const response = await getMessagesHelper(toTSPR(0, 1));
+    expect(response.didError).toBe(true);
+    expect(response.error).toBe(error);
+    expect(response.messages).toBe(null);
+    expect(console.error).toHaveBeenCalledTimes(1);
   });
 
   it("should not continue to re-request the same messages after a failure", async () => {
