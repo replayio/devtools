@@ -53,3 +53,8 @@ export enum FocusOperation {
   resizeStart = "resizeStart",
   resizeEnd = "resizeEnd",
 }
+
+export type PlaybackOptions = {
+  beginTime: number | null;
+  endTime: number | null;
+};

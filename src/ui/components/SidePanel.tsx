@@ -45,19 +45,11 @@ export default function SidePanel() {
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
   const [cypressCollapsed, setCypressCollapsed] = useState(false);
+  const [highlightedTest, setHighlightedTest] = useState<number | null>(null);
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
 
-  const items: any[] = [
-    {
-      header: "Info",
-      buttons: resolveRecording ? <StatusDropdown /> : null,
-      className: "replay-info",
-      component: <ReplayInfo />,
-      opened: !replayInfoCollapsed,
-      onToggle: () => setReplayInfoCollapsed(!replayInfoCollapsed),
-    },
-  ];
+  const items: any[] = [];
 
   if (recording?.metadata?.test?.tests?.length) {
     items.push({
@@ -69,19 +61,35 @@ export default function SidePanel() {
       ),
       buttons: null,
       className: "cyress-info flex-1 border-t overflow-hidden border-themeBorder",
-      component: <TestInfo testCases={recording?.metadata?.test.tests} />,
+      component: (
+        <TestInfo
+          testCases={recording?.metadata?.test.tests}
+          highlightedTest={highlightedTest}
+          setHighlightedTest={setHighlightedTest}
+        />
+      ),
       opened: !cypressCollapsed,
       onToggle: () => setCypressCollapsed(!setCypressCollapsed),
     });
   } else {
-    items.push({
-      header: "Events",
-      buttons: null,
-      className: "events-info flex-1 border-t overflow-hidden border-themeBorder",
-      component: <Events />,
-      opened: !eventsCollapsed,
-      onToggle: () => setEventsCollapsed(!eventsCollapsed),
-    });
+    items.push(
+      {
+        header: "Info",
+        buttons: resolveRecording ? <StatusDropdown /> : null,
+        className: "replay-info",
+        component: <ReplayInfo />,
+        opened: !replayInfoCollapsed,
+        onToggle: () => setReplayInfoCollapsed(!replayInfoCollapsed),
+      },
+      {
+        header: "Events",
+        buttons: null,
+        className: "events-info flex-1 border-t overflow-hidden border-themeBorder",
+        component: <Events />,
+        opened: !eventsCollapsed,
+        onToggle: () => setEventsCollapsed(!eventsCollapsed),
+      }
+    );
   }
 
   return (
