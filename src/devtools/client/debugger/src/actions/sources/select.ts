@@ -74,13 +74,13 @@ export function selectSource(
   cx: Context,
   sourceId: string,
   options: PartialLocation = {} as PartialLocation,
-  openSourcesTab?: boolean
+  openSource = true
 ): UIThunkAction {
   return async dispatch => {
     // @ts-ignore Unknown Mixpanel event?
     trackEvent("sources.select");
     const location = createLocation({ ...options, sourceId });
-    return dispatch(selectSpecificLocation(cx, location, openSourcesTab));
+    return dispatch(selectLocation(cx, location, openSource));
   };
 }
 
@@ -121,13 +121,12 @@ export function handleUnstableSourceIds(sourceUrl: string, state: UIState): stri
 export function selectLocation(
   cx: Context,
   location: PartialLocation,
-  openSourcesTab = true
+  openSource = true
 ): UIThunkAction<Promise<unknown>> {
   return async (dispatch, getState, { ThreadFront }) => {
-    const currentSource = getSelectedSource(getState());
     trackEvent("sources.select_location");
 
-    if (openSourcesTab) {
+    if (openSource) {
       // This action should only change view modes if it's also going to open the Sources tab.
       // Otherwise it's not possible to change locations without also opening the DevTools tab.
       if (getViewMode(getState()) == "non-dev") {
@@ -156,16 +155,21 @@ export function selectLocation(
       dispatch(closeActiveSearch());
     }
 
+    dispatch(locationSelected({ location, source }));
+
+    if (!openSource) {
+      return;
+    }
+
     if (!getTabExists(getState(), source.id)) {
       dispatch(addTab(source));
     }
 
-    dispatch(locationSelected({ location, source }));
     const layout = getToolboxLayout(getState());
 
     // Yank the user to the editor tab in case the debugger/editor is tucked in
     // the toolbox.
-    if (layout !== "ide" && openSourcesTab) {
+    if (layout !== "ide") {
       dispatch(setSelectedPanel("debugger"));
     }
 
@@ -187,18 +191,6 @@ export function selectLocation(
 
     dispatch(fetchSymbolsForSource(loadedSource.id));
   };
-}
-
-/**
- * @memberof actions/sources
- * @static
- */
-export function selectSpecificLocation(
-  cx: Context,
-  location: PartialLocation,
-  openSourcesTab?: boolean
-) {
-  return selectLocation(cx, location, openSourcesTab);
 }
 
 // The RRP protocol values include both generated and original information about

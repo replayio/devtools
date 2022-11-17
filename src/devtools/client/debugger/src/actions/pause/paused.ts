@@ -23,12 +23,12 @@ type $FixTypeLater = any;
 
 export function paused({
   executionPoint,
-  openSourcesTab,
+  openSource,
   frame,
   time,
 }: {
   executionPoint: string;
-  openSourcesTab: boolean;
+  openSource: boolean;
   frame?: $FixTypeLater;
   time?: number;
 }): UIThunkAction {
@@ -71,7 +71,7 @@ export function paused({
         currentLocation.column !== selectedFrame.location.column
       ) {
         const { selectLocation } = await import("../sources");
-        dispatch(selectLocation(cx, selectedFrame.location, openSourcesTab));
+        dispatch(selectLocation(cx, selectedFrame.location, openSource));
       }
     }
   };

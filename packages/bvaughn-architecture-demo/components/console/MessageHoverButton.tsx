@@ -90,7 +90,7 @@ export default function MessageHoverButton({
       event.preventDefault();
       event.stopPropagation();
 
-      update(time, executionPoint);
+      update(time, executionPoint, true);
 
       if (inspectFunctionDefinition !== null && location !== null) {
         inspectFunctionDefinition([location]);

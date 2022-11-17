@@ -35,9 +35,9 @@ export default function TimelineContextAdapter({ children }: PropsWithChildren) 
   const executionPoint = useAppSelector(getCurrentPoint) || "0";
 
   const update = useCallback(
-    async (time: number, executionPoint: ExecutionPoint) => {
+    async (time: number, executionPoint: ExecutionPoint, openSource: boolean) => {
       const pauseId = await getPauseIdAsync(client, executionPoint, time);
-      dispatch(seek(executionPoint, time, false /* openSourcesTab */, pauseId));
+      dispatch(seek(executionPoint, time, openSource, pauseId));
     },
     [client, dispatch]
   );
