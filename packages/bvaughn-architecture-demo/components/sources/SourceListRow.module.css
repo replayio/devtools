@@ -183,6 +183,10 @@
   background-color: var(--color-hit-counts-label-background-3);
 }
 
+.LineHitCountLabelPending {
+  opacity: 0.75;
+}
+
 .LineSegment {
   margin: 0;
 }

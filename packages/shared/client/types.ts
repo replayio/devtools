@@ -185,5 +185,6 @@ export interface ReplayClientInterface {
     }) => void,
     onSourceContentsChunk: ({ chunk, sourceId }: { chunk: string; sourceId: SourceId }) => void
   ): Promise<void>;
+  waitForLoadedRegions(focusRange: PointRange | null): Promise<void>;
   waitForLoadedSources(): Promise<void>;
 }

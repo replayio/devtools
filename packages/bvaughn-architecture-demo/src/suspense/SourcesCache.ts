@@ -357,6 +357,7 @@ async function fetchSourceHitCounts(
 
     const key = sourceIdAndFocusRangeToKey(sourceId, focusRange);
 
+    let promiseCreators: (() => Promise<void>)[] = [];
     let map = cachedHitCountsMap.get(key);
     if (map == null) {
       map = new Map(map);
@@ -365,21 +366,19 @@ async function fetchSourceHitCounts(
 
       // This is the first time we've fetched lines for this source+focus range.
       // The fastest thing is to fetch all of them.
-      const hitCounts = await client.getSourceHitCounts(
-        sourceId,
-        locationRange,
-        locations,
-        focusRange
+      promiseCreators.push(() =>
+        client
+          .getSourceHitCounts(sourceId, locationRange, locations, focusRange)
+          .then(hitCounts => {
+            protocolRequests.push(hitCounts);
+          })
       );
-
-      protocolRequests.push(hitCounts);
     } else {
       // We may have fetched some of these lines already.
       // If so, we can skip fetching the ones we already have.
 
       let startLineNumber = null;
       let endLineNumber = null;
-      let promises: Promise<void>[] = [];
 
       for (
         let lineNumber = locationRange.start.line;
@@ -411,7 +410,7 @@ async function fetchSourceHitCounts(
             },
           };
 
-          promises.push(
+          promiseCreators.push(() =>
             client
               .getSourceHitCounts(sourceId, locationRange, locations, focusRange)
               .then(hitCounts => {
@@ -423,10 +422,17 @@ async function fetchSourceHitCounts(
           endLineNumber = null;
         }
       }
+    }
 
-      if (promises.length > 0) {
-        await Promise.all(promises);
-      }
+    if (promiseCreators.length > 0) {
+      // Don't try to load hit counts outside of the currently loaded region(s).
+      // This will result in incorrect values being cached.
+      // The best UX is probably to wait until the regions we're dealing with have been loaded, and then ask.
+      //
+      // Note that we only need to await if we don't have cached (in-memory) values.
+      await client.waitForLoadedRegions(focusRange);
+
+      await Promise.all(promiseCreators.map(promiseCreator => promiseCreator()));
     }
 
     protocolRequests.forEach(hitCounts => {

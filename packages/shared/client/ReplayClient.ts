@@ -53,6 +53,7 @@ import { RecordingCapabilities } from "protocol/thread/thread";
 import { binarySearch, compareNumericStrings, defer } from "protocol/utils";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { ProtocolError, isCommandError } from "shared/utils/error";
+import { isPointInRegions } from "shared/utils/time";
 
 import {
   HitPointStatus,
@@ -876,6 +877,35 @@ export class ReplayClient implements ReplayClientInterface {
       client.Debugger.removeSourceContentsChunkListener(onSourceContentsChunkWrapper);
       client.Debugger.removeSourceContentsInfoListener(onSourceContentsInfoWrapper);
     }
+  }
+
+  async waitForLoadedRegions(focusRange: PointRange | null): Promise<void> {
+    return new Promise(resolve => {
+      const checkLoaded = () => {
+        const loadedRegions = this.loadedRegions;
+        let isLoaded = false;
+
+        if (loadedRegions !== null) {
+          isLoaded =
+            focusRange !== null
+              ? isPointInRegions(focusRange.begin, loadedRegions.loaded) &&
+                isPointInRegions(focusRange.end, loadedRegions.loaded)
+              : loadedRegions.loading.length === 0;
+        }
+
+        if (isLoaded) {
+          resolve();
+
+          this.removeEventListener("loadedRegionsChange", checkLoaded);
+        }
+
+        return isLoaded;
+      };
+
+      this.addEventListener("loadedRegionsChange", checkLoaded);
+
+      checkLoaded();
+    });
   }
 
   async waitForLoadedSources(): Promise<void> {
