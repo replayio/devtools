@@ -53,7 +53,7 @@ import { RecordingCapabilities } from "protocol/thread/thread";
 import { binarySearch, compareNumericStrings, defer } from "protocol/utils";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { ProtocolError, isCommandError } from "shared/utils/error";
-import { isPointInRegions } from "shared/utils/time";
+import { isRangeInRegions, toPointRange } from "shared/utils/time";
 
 import {
   HitPointStatus,
@@ -612,6 +612,10 @@ export class ReplayClient implements ReplayClientInterface {
 
     const hitCounts: LineNumberToHitCountMap = new Map();
 
+    // Don't try to fetch hit counts in unloaded regions.
+    // The result might be invalid (and may get cached by a Suspense caller).
+    await this.waitForLoadedRegions(focusRange);
+
     await Promise.all(
       correspondingSourceIds.map(async sourceId => {
         const { hits: protocolHitCounts } = await client.Debugger.getHitCounts(
@@ -801,6 +805,10 @@ export class ReplayClient implements ReplayClientInterface {
         locations,
       };
 
+      // Don't try to run analysis in unloaded regions.
+      // The result might be invalid (and may get cached by a Suspense caller).
+      await this.waitForLoadedRegions(params.range || null);
+
       try {
         await analysisManager.runAnalysis(analysisParams, {
           onAnalysisError: (error: unknown) => {
@@ -879,18 +887,19 @@ export class ReplayClient implements ReplayClientInterface {
     }
   }
 
-  async waitForLoadedRegions(focusRange: PointRange | null): Promise<void> {
+  async waitForLoadedRegions(focusRange: TimeStampedPointRange | PointRange | null): Promise<void> {
     return new Promise(resolve => {
       const checkLoaded = () => {
         const loadedRegions = this.loadedRegions;
         let isLoaded = false;
-
         if (loadedRegions !== null) {
-          isLoaded =
-            focusRange !== null
-              ? isPointInRegions(focusRange.begin, loadedRegions.loaded) &&
-                isPointInRegions(focusRange.end, loadedRegions.loaded)
-              : loadedRegions.loading.length === 0;
+          if (focusRange !== null) {
+            const pointRange = toPointRange(focusRange);
+
+            isLoaded = isRangeInRegions(pointRange.begin, pointRange.end, loadedRegions.loaded);
+          } else {
+            isLoaded = loadedRegions.loaded.length > 0 && loadedRegions.loading.length === 0;
+          }
         }
 
         if (isLoaded) {

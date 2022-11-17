@@ -13,6 +13,7 @@ import {
   SourceLocationRange,
 } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
+import { isPointRange, toPointRange } from "shared/utils/time";
 
 import { createWakeable } from "../utils/suspense";
 import { createGenericCache } from "./createGenericCache";
@@ -357,7 +358,6 @@ async function fetchSourceHitCounts(
 
     const key = sourceIdAndFocusRangeToKey(sourceId, focusRange);
 
-    let promiseCreators: (() => Promise<void>)[] = [];
     let map = cachedHitCountsMap.get(key);
     if (map == null) {
       map = new Map(map);
@@ -366,19 +366,21 @@ async function fetchSourceHitCounts(
 
       // This is the first time we've fetched lines for this source+focus range.
       // The fastest thing is to fetch all of them.
-      promiseCreators.push(() =>
-        client
-          .getSourceHitCounts(sourceId, locationRange, locations, focusRange)
-          .then(hitCounts => {
-            protocolRequests.push(hitCounts);
-          })
+      const hitCounts = await client.getSourceHitCounts(
+        sourceId,
+        locationRange,
+        locations,
+        focusRange
       );
+
+      protocolRequests.push(hitCounts);
     } else {
       // We may have fetched some of these lines already.
       // If so, we can skip fetching the ones we already have.
 
       let startLineNumber = null;
       let endLineNumber = null;
+      let promises: Promise<void>[] = [];
 
       for (
         let lineNumber = locationRange.start.line;
@@ -410,7 +412,7 @@ async function fetchSourceHitCounts(
             },
           };
 
-          promiseCreators.push(() =>
+          promises.push(
             client
               .getSourceHitCounts(sourceId, locationRange, locations, focusRange)
               .then(hitCounts => {
@@ -422,17 +424,10 @@ async function fetchSourceHitCounts(
           endLineNumber = null;
         }
       }
-    }
 
-    if (promiseCreators.length > 0) {
-      // Don't try to load hit counts outside of the currently loaded region(s).
-      // This will result in incorrect values being cached.
-      // The best UX is probably to wait until the regions we're dealing with have been loaded, and then ask.
-      //
-      // Note that we only need to await if we don't have cached (in-memory) values.
-      await client.waitForLoadedRegions(focusRange);
-
-      await Promise.all(promiseCreators.map(promiseCreator => promiseCreator()));
+      if (promises.length > 0) {
+        await Promise.all(promises);
+      }
     }
 
     protocolRequests.forEach(hitCounts => {
@@ -490,10 +485,6 @@ export function getSourcesToDisplay(client: ReplayClientInterface): ProtocolSour
   return sources.filter(source => source.kind !== "inlineScript");
 }
 
-function isPointRange(range: TimeStampedPointRange | PointRange): range is PointRange {
-  return typeof range.begin === "string";
-}
-
 function toIndexedSources(protocolSources: ProtocolSource[]): IndexedSource[] {
   const urlToFirstSource: Map<SourceId, ProtocolSource> = new Map();
   const urlsThatChange: Set<SourceId> = new Set();
@@ -535,17 +526,6 @@ function toIndexedSources(protocolSources: ProtocolSource[]): IndexedSource[] {
       doesContentHashChange,
     };
   });
-}
-
-function toPointRange(range: TimeStampedPointRange | PointRange): PointRange {
-  if (isPointRange(range)) {
-    return range;
-  } else {
-    return {
-      begin: range.begin.point,
-      end: range.end.point,
-    };
-  }
 }
 
 function sourceIdAndFocusRangeToKey(

@@ -1,4 +1,19 @@
-import { ExecutionPoint, TimeStampedPointRange } from "@replayio/protocol";
+import { ExecutionPoint, PointRange, TimeStampedPointRange } from "@replayio/protocol";
+
+export function isRangeInRegions(
+  startPoint: ExecutionPoint,
+  endPoint: ExecutionPoint,
+  regions: TimeStampedPointRange[]
+): boolean {
+  const startPointNumber = BigInt(startPoint);
+  const endPointNumber = BigInt(endPoint);
+  return (
+    regions.find(
+      ({ begin, end }) =>
+        startPointNumber >= BigInt(begin.point) && endPointNumber <= BigInt(end.point)
+    ) != null
+  );
+}
 
 export function isPointInRegions(point: ExecutionPoint, regions: TimeStampedPointRange[]): boolean {
   const pointNumber = BigInt(point);
@@ -9,6 +24,21 @@ export function isPointInRegions(point: ExecutionPoint, regions: TimeStampedPoin
   );
 }
 
+export function isPointRange(range: TimeStampedPointRange | PointRange): range is PointRange {
+  return typeof range.begin === "string";
+}
+
 export function isTimeInRegions(time: number, regions: TimeStampedPointRange[]) {
   return regions.find(({ begin, end }) => time >= begin.time && time <= end.time);
+}
+
+export function toPointRange(range: TimeStampedPointRange | PointRange): PointRange {
+  if (isPointRange(range)) {
+    return range;
+  } else {
+    return {
+      begin: range.begin.point,
+      end: range.end.point,
+    };
+  }
 }
