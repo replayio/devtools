@@ -103,6 +103,14 @@ export const pricingDetailsForSubscription = (subscription: Subscription): PlanP
         discount: 0.1,
         trial: isTrial(subscription),
       };
+    case "org-annual-contract-v1":
+      return {
+        billingSchedule: "contract",
+        displayName: "Organization",
+        seatPrice: 0,
+        discount: 0,
+        trial: false,
+      };
     case "ent-v1":
       return {
         billingSchedule: "contract",
