@@ -13,6 +13,7 @@ import {
   SourceLocationRange,
 } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
+import { isPointRange, toPointRange } from "shared/utils/time";
 
 import { createWakeable } from "../utils/suspense";
 import { createGenericCache } from "./createGenericCache";
@@ -484,10 +485,6 @@ export function getSourcesToDisplay(client: ReplayClientInterface): ProtocolSour
   return sources.filter(source => source.kind !== "inlineScript");
 }
 
-function isPointRange(range: TimeStampedPointRange | PointRange): range is PointRange {
-  return typeof range.begin === "string";
-}
-
 function toIndexedSources(protocolSources: ProtocolSource[]): IndexedSource[] {
   const urlToFirstSource: Map<SourceId, ProtocolSource> = new Map();
   const urlsThatChange: Set<SourceId> = new Set();
@@ -529,17 +526,6 @@ function toIndexedSources(protocolSources: ProtocolSource[]): IndexedSource[] {
       doesContentHashChange,
     };
   });
-}
-
-function toPointRange(range: TimeStampedPointRange | PointRange): PointRange {
-  if (isPointRange(range)) {
-    return range;
-  } else {
-    return {
-      begin: range.begin.point,
-      end: range.end.point,
-    };
-  }
 }
 
 function sourceIdAndFocusRangeToKey(

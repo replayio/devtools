@@ -12,6 +12,17 @@ const collator = new Intl.Collator("en", {
   sensitivity: "base",
 });
 
+export function areRangesEqual(
+  prevRanges: Array<TimeStampedPointRange>,
+  nextRanges: Array<TimeStampedPointRange>
+): boolean {
+  return (
+    prevRanges.find((prevRange, index) => {
+      return !isRangeEqual(prevRange, nextRanges[index]);
+    }) == null
+  );
+}
+
 export function compareExecutionPoints(a: ExecutionPoint, b: ExecutionPoint): number {
   return collator.compare(a, b);
 }

@@ -43,7 +43,7 @@ import uniqueId from "lodash/uniqueId";
 
 import { initProtocolMessagesStore } from "bvaughn-architecture-demo/components/protocol/ProtocolMessagesStore";
 import { insert } from "bvaughn-architecture-demo/src/utils/array";
-import { compareExecutionPoints } from "bvaughn-architecture-demo/src/utils/time";
+import { areRangesEqual, compareExecutionPoints } from "bvaughn-architecture-demo/src/utils/time";
 import analysisManager from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
@@ -53,6 +53,7 @@ import { RecordingCapabilities } from "protocol/thread/thread";
 import { binarySearch, compareNumericStrings, defer } from "protocol/utils";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { ProtocolError, isCommandError } from "shared/utils/error";
+import { isRangeInRegions, toPointRange } from "shared/utils/time";
 
 import {
   HitPointStatus,
@@ -611,6 +612,10 @@ export class ReplayClient implements ReplayClientInterface {
 
     const hitCounts: LineNumberToHitCountMap = new Map();
 
+    // Don't try to fetch hit counts in unloaded regions.
+    // The result might be invalid (and may get cached by a Suspense caller).
+    await this.waitForLoadedRegions(focusRange);
+
     await Promise.all(
       correspondingSourceIds.map(async sourceId => {
         const { hits: protocolHitCounts } = await client.Debugger.getHitCounts(
@@ -800,6 +805,10 @@ export class ReplayClient implements ReplayClientInterface {
         locations,
       };
 
+      // Don't try to run analysis in unloaded regions.
+      // The result might be invalid (and may get cached by a Suspense caller).
+      await this.waitForLoadedRegions(params.range || null);
+
       try {
         await analysisManager.runAnalysis(analysisParams, {
           onAnalysisError: (error: unknown) => {
@@ -876,6 +885,38 @@ export class ReplayClient implements ReplayClientInterface {
       client.Debugger.removeSourceContentsChunkListener(onSourceContentsChunkWrapper);
       client.Debugger.removeSourceContentsInfoListener(onSourceContentsInfoWrapper);
     }
+  }
+
+  async waitForLoadedRegions(focusRange: TimeStampedPointRange | PointRange | null): Promise<void> {
+    return new Promise(resolve => {
+      const checkLoaded = () => {
+        const loadedRegions = this.loadedRegions;
+        let isLoaded = false;
+        if (loadedRegions !== null) {
+          if (focusRange !== null) {
+            const pointRange = toPointRange(focusRange);
+
+            isLoaded = isRangeInRegions(pointRange.begin, pointRange.end, loadedRegions.loaded);
+          } else {
+            isLoaded =
+              loadedRegions.loaded.length > 0 &&
+              areRangesEqual(loadedRegions.loaded, loadedRegions.loading);
+          }
+        }
+
+        if (isLoaded) {
+          resolve();
+
+          this.removeEventListener("loadedRegionsChange", checkLoaded);
+        }
+
+        return isLoaded;
+      };
+
+      this.addEventListener("loadedRegionsChange", checkLoaded);
+
+      checkLoaded();
+    });
   }
 
   async waitForLoadedSources(): Promise<void> {

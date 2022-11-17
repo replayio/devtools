@@ -1,8 +1,17 @@
 import { newSource as ProtocolSource } from "@replayio/protocol";
-import { MouseEvent, Suspense, memo, useMemo, useState, useSyncExternalStore } from "react";
+import {
+  MouseEvent,
+  Suspense,
+  memo,
+  useContext,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { areEqual } from "react-window";
 
 import Icon from "bvaughn-architecture-demo/components/Icon";
+import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import {
   AddPoint,
   DeletePoints,
@@ -39,6 +48,8 @@ export type ItemData = {
 
 const SourceListRow = memo(
   ({ data, index, style }: { data: ItemData; index: number; style: Object }) => {
+    const { isTransitionPending: isFocusRangePending } = useContext(FocusContext);
+
     const [isHovered, setIsHovered] = useState(false);
 
     const loadingPlaceholderWidth = useMemo(() => Math.round(5 + Math.random() * 30), []);
@@ -102,6 +113,10 @@ const SourceListRow = memo(
 
       hitCountBarClassName = styles[`LineHitCountBar${hitCountIndex + 1}`];
       hitCountLabelClassName = styles[`LineHitCountLabel${hitCountIndex + 1}`];
+    }
+
+    if (isFocusRangePending) {
+      hitCountLabelClassName = `${hitCountLabelClassName} ${styles.LineHitCountLabelPending}`;
     }
 
     let lineSegments = null;
