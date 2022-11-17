@@ -78,6 +78,7 @@ type PlanKey =
   | "ent-v1"
   | "team-annual-v1"
   | "org-annual-v1"
+  | "org-annual-contract-v1"
   | "team-oss-v1"
   | "team-internal-v1";
 
