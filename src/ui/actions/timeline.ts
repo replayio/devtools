@@ -152,7 +152,7 @@ async function getInitialPausePoint(recordingId: string) {
 function onPaused({ point, time }: PauseEventArgs): UIThunkAction {
   return async (dispatch, getState) => {
     const focusRegion = getFocusRegion(getState());
-    const params: Omit<PauseEventArgs, "openSourcesTab"> & { focusRegion: FocusRegion | null } = {
+    const params: Omit<PauseEventArgs, "openSource"> & { focusRegion: FocusRegion | null } = {
       focusRegion,
       point,
       time,
@@ -222,19 +222,19 @@ function encodeFocusRegion(focusRegion: FocusRegion | null) {
 export function seek(
   point: ExecutionPoint,
   time: number,
-  openSourcesTab: boolean,
+  openSource: boolean,
   pauseId?: PauseId
 ): UIThunkAction<boolean> {
   return (dispatch, getState, { ThreadFront }) => {
     dispatch(framePositionsCleared());
     if (pauseId) {
-      ThreadFront.timeWarpToPause({ point, time, pauseId }, openSourcesTab);
+      ThreadFront.timeWarpToPause({ point, time, pauseId }, openSource);
     } else {
       const regions = getLoadedRegions(getState());
       const focusRegion = getFocusRegion(getState());
       const isTimeInLoadedRegion = regions !== null && isTimeInRegions(time, regions.loaded);
       if (isTimeInLoadedRegion) {
-        ThreadFront.timeWarp(point, time, openSourcesTab);
+        ThreadFront.timeWarp(point, time, openSource);
       } else {
         // We can't time-wrap in this case because trying to pause outside of a loaded region will throw.
         // In this case the best we can do is update the current time and the "video" frame.

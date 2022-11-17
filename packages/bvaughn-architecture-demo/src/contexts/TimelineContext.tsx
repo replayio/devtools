@@ -12,7 +12,7 @@ export type TimelineContextType = {
   executionPoint: ExecutionPoint;
   isPending: boolean;
   time: number;
-  update: (time: number, executionPoint: ExecutionPoint) => void;
+  update: (time: number, executionPoint: ExecutionPoint, openSource: boolean) => void;
 };
 
 export const TimelineContext = createContext<TimelineContextType>(null as any);

@@ -288,12 +288,12 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
   };
 
   gotoLocation = (location?: { column?: number; line?: number; sourceId?: string }) => {
-    const { cx, selectSpecificLocation, selectedSource, viewMode, setViewMode } = this.props;
+    const { cx, selectLocation, selectedSource, viewMode, setViewMode } = this.props;
 
     if (location != null) {
       const selectedSourceId = selectedSource ? selectedSource.id : "";
       const sourceId = location.sourceId ? location.sourceId : selectedSourceId;
-      selectSpecificLocation(cx, {
+      selectLocation(cx, {
         column: location.column,
         line: location.line,
         sourceId,
@@ -512,7 +512,7 @@ function mapStateToProps(state: UIState) {
 const connector = connect(mapStateToProps, {
   closeQuickOpen: actions.closeQuickOpen,
   highlightLineRange: actions.highlightLineRange,
-  selectSpecificLocation: actions.selectSpecificLocation,
+  selectLocation: actions.selectLocation,
   setQuickOpenQuery: actions.setQuickOpenQuery,
   setViewMode,
 });

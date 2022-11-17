@@ -214,7 +214,7 @@ export function createLabels(
   };
 }
 
-export function seekToComment(item: Comment | Reply, openSourcesTab: boolean): UIThunkAction {
+export function seekToComment(item: Comment | Reply, openSource: boolean): UIThunkAction {
   return (dispatch, getState) => {
     let context = selectors.getThreadContext(getState());
     dispatch(seek(item.point, item.time, false));
@@ -222,7 +222,7 @@ export function seekToComment(item: Comment | Reply, openSourcesTab: boolean): U
 
     if (item.sourceLocation) {
       context = selectors.getThreadContext(getState());
-      dispatch(selectLocation(context, item.sourceLocation, openSourcesTab));
+      dispatch(selectLocation(context, item.sourceLocation, openSource));
     }
   };
 }

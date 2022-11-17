@@ -207,8 +207,8 @@ function FrameTimeline() {
     : undefined;
   const dispatch = useAppDispatch();
 
-  const seek = (point: string, time: number, openSourcesTab: boolean) =>
-    dispatch(actions.seek(point, time, openSourcesTab));
+  const seek = (point: string, time: number, openSource: boolean) =>
+    dispatch(actions.seek(point, time, openSource));
   const setPreviewPausedLocation = (location: Location) =>
     dispatch(actions.setPreviewPausedLocation(location));
 

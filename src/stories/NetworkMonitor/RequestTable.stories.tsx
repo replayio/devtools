@@ -24,6 +24,5 @@ const requests = [
 Loaded.args = {
   currentTime: 3,
   data: requests,
-  seek: (point: string, time: number, openSourcesTab: boolean, pauseId?: string | undefined) =>
-    false,
+  seek: (point: string, time: number, openSource: boolean, pauseId?: string | undefined) => false,
 };

@@ -25,7 +25,7 @@ const mapStateToProps = (state: UIState) => ({
 });
 
 const connector = connect(mapStateToProps, {
-  selectSpecificLocation: actions.selectSpecificLocation,
+  selectLocation: actions.selectLocation,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 interface PropsFromParent {
@@ -43,10 +43,10 @@ class Breakpoint extends PureComponent<BreakpointProps> {
   }
 
   selectBreakpoint = (event: React.MouseEvent) => {
-    const { cx, selectSpecificLocation } = this.props;
+    const { cx, selectLocation } = this.props;
     event.preventDefault();
 
-    selectSpecificLocation(cx, this.selectedLocation);
+    selectLocation(cx, this.selectedLocation);
   };
 
   removeBreakpoint = (event: React.MouseEvent) => {

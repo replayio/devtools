@@ -73,14 +73,14 @@ export default function PointPanelTimeline({
     const [prevHitPoint] = findHitPointBefore(hitPoints, currentExecutionPoint);
     if (prevHitPoint !== null) {
       setOptimisticTime(prevHitPoint.time);
-      update(prevHitPoint.time, prevHitPoint.point);
+      update(prevHitPoint.time, prevHitPoint.point, false);
     }
   };
   const goToNext = () => {
     const [nextHitPoint] = findHitPointAfter(hitPoints, currentExecutionPoint);
     if (nextHitPoint !== null) {
       setOptimisticTime(nextHitPoint.time);
-      update(nextHitPoint.time, nextHitPoint.point);
+      update(nextHitPoint.time, nextHitPoint.point, false);
     }
   };
 
@@ -112,7 +112,7 @@ export default function PointPanelTimeline({
     const point = await imperativelyGetClosestPointForTime(client, time);
 
     setOptimisticTime(hoverTime);
-    update(hoverTime, point);
+    update(hoverTime, point, false);
   };
 
   const onTimelineMouseLeave = () => {
@@ -211,7 +211,7 @@ export default function PointPanelTimeline({
               event.preventDefault();
 
               setOptimisticTime(hitPoint.time);
-              update(hitPoint.time, hitPoint.point);
+              update(hitPoint.time, hitPoint.point, false);
             }}
             style={{
               left: `${(100 * hitPoint.time) / duration}%`,

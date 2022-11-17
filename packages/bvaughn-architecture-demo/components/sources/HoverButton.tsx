@@ -90,7 +90,7 @@ export default function HoverButton({
 
     const onClick = () => {
       if (targetPoint != null) {
-        update(targetPoint.time, targetPoint.point);
+        update(targetPoint.time, targetPoint.point, false);
       }
     };
 
