@@ -43,7 +43,7 @@ import uniqueId from "lodash/uniqueId";
 
 import { initProtocolMessagesStore } from "bvaughn-architecture-demo/components/protocol/ProtocolMessagesStore";
 import { insert } from "bvaughn-architecture-demo/src/utils/array";
-import { compareExecutionPoints } from "bvaughn-architecture-demo/src/utils/time";
+import { areRangesEqual, compareExecutionPoints } from "bvaughn-architecture-demo/src/utils/time";
 import analysisManager from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
@@ -898,7 +898,9 @@ export class ReplayClient implements ReplayClientInterface {
 
             isLoaded = isRangeInRegions(pointRange.begin, pointRange.end, loadedRegions.loaded);
           } else {
-            isLoaded = loadedRegions.loaded.length > 0 && loadedRegions.loading.length === 0;
+            isLoaded =
+              loadedRegions.loaded.length > 0 &&
+              areRangesEqual(loadedRegions.loaded, loadedRegions.loading);
           }
         }
 
