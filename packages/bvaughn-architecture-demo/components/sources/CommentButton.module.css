@@ -1,9 +1,10 @@
 .Container {
-  flex-grow: 0;
-  flex-shrink: 0;
+  flex: 0 0 2em;
   height: 2em;
   width: 2em;
   position: relative;
+  font-family: var(--font-family-default);
+  font-size: var(--font-size-regular);
 }
 
 .Button {
@@ -50,9 +51,19 @@
   animation-fill-mode: forwards;
 }
 
-.ButtonIcon {
+.ButtonIconWrapper {
   height: 1em;
   width: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.ButtonIcon {
+  flex: 0 0 1.25em;
+  height: 1.25em;
+  width: 1.25em;
   fill: currentColor;
 }
 

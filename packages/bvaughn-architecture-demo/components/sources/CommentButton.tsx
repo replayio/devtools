@@ -42,7 +42,9 @@ export default function CommentButton({
         data-test-name="PointPanel-AddCommentButton"
         onClick={onClick}
       >
-        <Icon className={styles.ButtonIcon} type="comment" />
+        <div className={styles.ButtonIconWrapper}>
+          <Icon className={styles.ButtonIcon} type="comment" />
+        </div>
         <div className={styles.ButtonLabel}>Add comment</div>
       </button>
     </div>

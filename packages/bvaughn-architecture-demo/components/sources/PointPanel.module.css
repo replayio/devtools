@@ -1,14 +1,14 @@
 .Panel {
   display: flex;
   flex-direction: column;
-  background-color: var(--background-color-light);
+  background-color: var(--point-panel-background-color);
   padding: 1em;
   gap: 1em;
 }
 
 .Loader {
   height: var(--point-panel-height);
-  background-color: var(--background-color-light);
+  background-color: var(--point-panel-background-color);
   padding: 1em;
   display: flex;
   align-items: center;
@@ -56,8 +56,8 @@
   overflow: auto;
   height: 100%;
   flex: 1;
-  background-color: var(--background-color-inputs);
-  border: 2px solid transparent;
+  background-color: var(--point-panel-input-background-color);
+  border: 2px solid var(--point-panel-input-border-color);
   padding: 0 0.5em;
   border-radius: 0.5em;
   display: flex;
@@ -79,8 +79,9 @@
 
 .Content {
   /* Allows height for horizontal scrollbar without shifting text */
-  height: 2.5em;
-  line-height: 2.5em;
+  height: 2em;
+  max-height: 2em;
+  line-height: 2em;
 
   flex: 1 1 auto;
   white-space: pre;
@@ -102,12 +103,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: 2em;
 }
 
 .EditButtonIcon {
   height: 1.5em;
   width: 1.5em;
-  fill: var(--color-default);
+  fill: var(--point-panel-input-edit-button-color);
 }
 
 .SaveButton {
@@ -119,16 +121,15 @@
   padding: 0 2ch;
 }
 .SaveButton:disabled {
-  background-color: var(--background-color-tertiary-button);
-  color: var(--color-tertiary-button);
-  opacity: 0.5;
+  background-color: var(--background-color-primary-button-disabled);
 }
 
 .AddConditionButton,
 .CancelButton {
   text-decoration: underline;
-  font-size: var(--font-size-small);
-  color: var(--color-dim);
+  color: var(--color-link);
+  font-size: var(--font-family-default);
+  font-size: var(--font-size-regular);
 }
 
 .CancelButton {
@@ -140,9 +141,9 @@
   width: 100%;
 
   /* Allows height for horizontal scrollbar without shifting text */
-  height: 2.5em;
+  height: 2em;
   line-height: 1.5em;
-  padding: 0.5em 0;
+  padding: 0.25em 0;
 }
 .ContentInputWithNag::selection {
   background-color: var(--nag-background-color);
