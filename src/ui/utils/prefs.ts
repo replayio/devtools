@@ -23,10 +23,10 @@ pref("devtools.hitCounts", "hide-counts");
 
 // app features
 pref("devtools.features.basicProcessingLoadingBar", false);
-pref("devtools.features.cacheScanData", false);
 pref("devtools.features.columnBreakpoints", false);
 pref("devtools.features.commentAttachments", false);
 pref("devtools.features.consoleFilterDrawerDefaultsToOpen", false);
+pref("devtools.features.disableScanDataCache", false);
 pref("devtools.features.disableUnHitLines", false);
 pref("devtools.features.enableLargeText", false);
 pref("devtools.features.enableQueryCache", false);
@@ -61,10 +61,10 @@ export const prefs = new PrefsHelper("devtools", {
 
 export const features = new PrefsHelper("devtools.features", {
   basicProcessingLoadingBar: ["Bool", "basicProcessingLoadingBar"],
-  cacheScanData: ["Bool", "cacheScanData"],
   columnBreakpoints: ["Bool", "columnBreakpoints"],
   commentAttachments: ["Bool", "commentAttachments"],
   consoleFilterDrawerDefaultsToOpen: ["Bool", "consoleFilterDrawerDefaultsToOpen"],
+  disableScanDataCache: ["Bool", "disableScanDataCache"],
   enableQueryCache: ["Bool", "enableQueryCache"],
   disableUnHitLines: ["Bool", "disableUnHitLines"],
   enableLargeText: ["Bool", "enableLargeText"],

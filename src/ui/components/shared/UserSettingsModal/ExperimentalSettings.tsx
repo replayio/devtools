@@ -55,9 +55,9 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "consoleFilterDrawerDefaultsToOpen",
   },
   {
-    label: "Cache Scan Data",
-    description: "Cache the results of indexing the recording",
-    key: "cacheScanData",
+    label: "Disable Scan Data Cache",
+    description: "Do not cache the results of indexing the recording",
+    key: "disableScanDataCache",
   },
 ];
 
@@ -90,7 +90,8 @@ export default function ExperimentalSettings({}) {
   // TODO: This is bad and should be updated with a better generalized hook
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
-  const { value: cacheScanData, update: updateCacheScanData } = useFeature("cacheScanData");
+  const { value: disableScanDataCache, update: updateDisableScanDataCache } =
+    useFeature("disableScanDataCache");
 
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
@@ -123,15 +124,15 @@ export default function ExperimentalSettings({}) {
       updateBasicProcessingLoadingBar(!basicProcessingLoadingBar);
     } else if (key === "consoleFilterDrawerDefaultsToOpen") {
       updateConsoleFilterDrawerDefaultsToOpen(!consoleFilterDrawerDefaultsToOpen);
-    } else if (key === "cacheScanData") {
-      updateCacheScanData(!cacheScanData);
+    } else if (key === "disableScanDataCache") {
+      updateDisableScanDataCache(!disableScanDataCache);
     }
   };
 
   const localSettings = {
     basicProcessingLoadingBar,
-    cacheScanData,
     consoleFilterDrawerDefaultsToOpen,
+    disableScanDataCache,
     enableColumnBreakpoints,
     enableQueryCache,
     enableResolveRecording,

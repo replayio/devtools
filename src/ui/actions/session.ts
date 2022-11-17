@@ -196,7 +196,7 @@ export function createSocket(
       }
 
       const experimentalSettings: ExperimentalSettings = {
-        cacheScanData: !!features.cacheScanData,
+        disableScanDataCache: !!features.disableScanDataCache,
         disableCache: !!prefs.disableCache,
         disableQueryCache: !features.enableQueryCache,
         listenForMetrics: !!prefs.listenForMetrics,
