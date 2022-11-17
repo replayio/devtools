@@ -122,7 +122,7 @@ export default function Toolbar() {
         {viewMode == "dev" ? (
           <>
             <ToolbarButton icon="description" name="explorer" label="Source Explorer" />
-            <ToolbarButton icon="search" name="search" label="Search" />
+            {/* TODO [FE-976] <ToolbarButton icon="search" name="search" label="Search" />*/}
             <ToolbarButton
               icon="motion_photos_paused"
               name="debugger"
