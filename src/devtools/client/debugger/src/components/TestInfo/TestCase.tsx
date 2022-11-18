@@ -41,15 +41,12 @@ export function TestCase({
         })
       );
     } else {
-      // Note this check shouldn't be required but something seems to be broken (see SCS-289)
-      if (!Number.isNaN(testStartTime) && !Number.isNaN(testEndTime)) {
-        dispatch(
-          setFocusRegion({
-            beginTime: testStartTime,
-            endTime: testEndTime,
-          })
-        );
-      }
+      dispatch(
+        setFocusRegion({
+          beginTime: testStartTime,
+          endTime: testEndTime,
+        })
+      );
     }
   };
   const toggleExpand = () => {

@@ -506,12 +506,6 @@ export function setFocusRegion(
 
       let { endTime, beginTime } = focusRegion;
 
-      if (Number.isNaN(endTime) || Number.isNaN(beginTime)) {
-        // Guard against invalid focus regions; these break the app in a lot of bad ways.
-        console.error("Invalid focus region", focusRegion);
-        return;
-      }
-
       // Basic bounds check.
       if (beginTime < zoomRegion.beginTime) {
         beginTime = zoomRegion.beginTime;
