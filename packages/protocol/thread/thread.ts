@@ -246,7 +246,7 @@ class _ThreadFront {
           supportsEagerEvaluation: false,
           supportsEventTypes: false,
           supportsNetworkRequests: false,
-          supportsRepaintingGraphics: false,
+          supportsRepaintingGraphics: true,
           supportsPureEvaluation: false,
         };
 
