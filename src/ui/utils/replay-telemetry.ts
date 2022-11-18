@@ -1,4 +1,8 @@
 export async function pingTelemetry(event: string, tags: any = {}) {
+  if (process.env.NODE_ENV === "development" && !process.env.NEXT_PUBLIC_RECORD_REPLAY_TELEMETRY) {
+    return;
+  }
+
   try {
     const response = await fetch("https://telemetry.replay.io/", {
       method: "POST",
