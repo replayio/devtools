@@ -99,39 +99,39 @@ function SourceRenderer({
 
   const onMouseMove = (event: MouseEvent) => {
     const { clientX, clientY, defaultPrevented, target } = event;
-    if (defaultPrevented) {
-      // If something else (like the AutoComplete component) has prevented this event, ignore it.
-      return;
-    }
 
-    const source = sourceRef.current!;
-    if (!source.contains(target as Node)) {
-      // Don't react to mouse move events within e.g. the preview popup.
-      return;
-    }
-
-    const htmlElement = target as HTMLElement;
-    if (htmlElement.getAttribute("data-test-name") === "SourceListRow-LineSegment-PlainText") {
-      // Special case: plain text lines.
-      // These have no "tokens" that we can use for hit detection,
-      // So we fall back to browser selection APIs to determine what text the user is hovering over.
-      const textAndCursorIndex = getTextAndCursorIndex(clientX, clientY);
-      if (textAndCursorIndex) {
-        const [text, cursorIndex] = textAndCursorIndex;
-
-        setHoverStateDebounced(htmlElement, text, cursorIndex, clientX, setHoveredState);
+    // If something else (like the AutoComplete component) has prevented this event, don't show a hover preview.
+    // Clear any existing hover preview though, to avoid showing a stale popup.
+    if (!defaultPrevented) {
+      const source = sourceRef.current!;
+      if (!source.contains(target as Node)) {
+        // Don't react to mouse move events within e.g. the preview popup.
         return;
       }
-    } else {
-      // HACK
-      // This is kind of a janky way to differentiate tokens from non-tokens but it works for now.
-      const className = htmlElement.className;
-      const isToken = typeof className === "string" && className.startsWith("tok-");
 
-      if (isToken) {
-        // Debounce hover event to avoid showing the popup (or requesting data) in response to normal mouse movements.
-        setHoverStateDebounced(htmlElement, null, null, null, setHoveredState);
-        return;
+      const htmlElement = target as HTMLElement;
+      if (htmlElement.getAttribute("data-test-name") === "SourceListRow-LineSegment-PlainText") {
+        // Special case: plain text lines.
+        // These have no "tokens" that we can use for hit detection,
+        // So we fall back to browser selection APIs to determine what text the user is hovering over.
+        const textAndCursorIndex = getTextAndCursorIndex(clientX, clientY);
+        if (textAndCursorIndex) {
+          const [text, cursorIndex] = textAndCursorIndex;
+
+          setHoverStateDebounced(htmlElement, text, cursorIndex, clientX, setHoveredState);
+          return;
+        }
+      } else {
+        // HACK
+        // This is kind of a janky way to differentiate tokens from non-tokens but it works for now.
+        const className = htmlElement.className;
+        const isToken = typeof className === "string" && className.startsWith("tok-");
+
+        if (isToken) {
+          // Debounce hover event to avoid showing the popup (or requesting data) in response to normal mouse movements.
+          setHoverStateDebounced(htmlElement, null, null, null, setHoveredState);
+          return;
+        }
       }
     }
 
