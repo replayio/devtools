@@ -17,6 +17,7 @@ import MaterialIcon from "./shared/MaterialIcon";
 import ReplayLogo from "./shared/ReplayLogo";
 import Spinner from "./shared/Spinner";
 import Tooltip from "./shared/Tooltip";
+import { CypressToggler } from "devtools/client/debugger/src/components/TestInfo/CypressToggler";
 
 const HideVideoButton: FC = () => {
   const dispatch = useAppDispatch();
@@ -113,6 +114,7 @@ function Video({
         </CommentsOverlay>
       ) : null}
       {isNodePickerInitializing ? <Tooltip label="Loading…" targetID="video" /> : null}
+      <CypressToggler />
       <div id="highlighter-root">
         {highlightedNodeIds?.map(nodeId => (
           <PreviewNodeHighlighter key={nodeId} nodeId={nodeId} />
