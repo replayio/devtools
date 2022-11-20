@@ -1,6 +1,5 @@
 import {
   BreakpointId,
-  ContentType,
   Result as EvaluationResult,
   ExecutionPoint,
   FrameId,
@@ -708,6 +707,14 @@ export class ReplayClient implements ReplayClientInterface {
     await client.Session.loadRegion({ region: { begin: range.begin, end: range.end } }, sessionId);
   }
 
+  isOriginalSource(sourceId: SourceId): boolean {
+    return this._threadFront.isOriginalSource(sourceId);
+  }
+
+  isPrettyPrintedSource(sourceId: SourceId): boolean {
+    return this._threadFront.isPrettyPrintedSource(sourceId);
+  }
+
   removeEventListener(type: ReplayClientEvents, handler: Function): void {
     if (this._eventHandlers.has(type)) {
       const handlers = this._eventHandlers.get(type)!;
@@ -739,9 +746,21 @@ export class ReplayClient implements ReplayClientInterface {
     const sessionId = this.getSessionIdThrows();
     const thisSearchUniqueId = uniqueId("search-fns-");
 
+    let pendingMatches: FunctionMatch[] = [];
+
+    // It's important to buffer the chunks before passing them along to subscribers.
+    // The backend decides how big each streaming chunk should be,
+    // but if chunks are too small (and events are too close together)
+    // then we may schedule too many updates with React and causing a lot of memory pressure.
+    const onMatchesThrottled = throttle(() => {
+      onMatches(pendingMatches);
+      pendingMatches = [];
+    }, STREAMING_THROTTLE_DURATION);
+
     const matchesListener = ({ searchId, matches }: functionsMatches) => {
       if (searchId === thisSearchUniqueId) {
-        onMatches(matches);
+        pendingMatches = pendingMatches.concat(matches);
+        onMatchesThrottled();
       }
     };
 
@@ -772,18 +791,50 @@ export class ReplayClient implements ReplayClientInterface {
     const sessionId = this.getSessionIdThrows();
     const thisSearchUniqueId = uniqueId("search-sources-");
 
+    let pendingMatches: SearchSourceContentsMatch[] = [];
+    let pendingThrottlePromise: Promise<void> | null = null;
+    let resolvePendingThrottlePromise: Function | null = null;
+
+    // It's important to buffer the chunks before passing them along to subscribers.
+    // The backend decides how big each streaming chunk should be,
+    // but if chunks are too small (and events are too close together)
+    // then we may schedule too many updates with React and causing a lot of memory pressure.
+    const onMatchesThrottled = throttle(() => {
+      onMatches(pendingMatches);
+      pendingMatches = [];
+
+      if (resolvePendingThrottlePromise !== null) {
+        resolvePendingThrottlePromise();
+        pendingThrottlePromise = null;
+      }
+    }, STREAMING_THROTTLE_DURATION);
+
     const matchesListener = ({ searchId, matches }: searchSourceContentsMatches) => {
       if (searchId === thisSearchUniqueId) {
-        onMatches(matches);
+        pendingMatches = pendingMatches.concat(matches);
+
+        if (pendingThrottlePromise === null) {
+          pendingThrottlePromise = new Promise(resolve => {
+            resolvePendingThrottlePromise = resolve;
+          });
+        }
+
+        onMatchesThrottled();
       }
     };
 
     client.Debugger.addSearchSourceContentsMatchesListener(matchesListener);
     try {
+      // TODO [FE-967] Use new :limit param once it's been released.
       await client.Debugger.searchSourceContents(
         { searchId: thisSearchUniqueId, sourceIds, query },
         sessionId
       );
+
+      // Don't resolve the outer Promise until the last chunk has been processed.
+      if (pendingThrottlePromise !== null) {
+        await pendingThrottlePromise;
+      }
     } finally {
       client.Debugger.removeSearchSourceContentsMatchesListener(matchesListener);
     }
@@ -856,8 +907,8 @@ export class ReplayClient implements ReplayClientInterface {
         pendingChunk += params.chunk;
 
         if (pendingThrottlePromise === null) {
-          pendingThrottlePromise = new Promise(r => {
-            resolvePendingThrottlePromise = r;
+          pendingThrottlePromise = new Promise(resolve => {
+            resolvePendingThrottlePromise = resolve;
           });
         }
 

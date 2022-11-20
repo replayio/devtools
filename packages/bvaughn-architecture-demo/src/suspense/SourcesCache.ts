@@ -89,7 +89,7 @@ export function getSourcesSuspense(client: ReplayClientInterface) {
 
 // Wrapper method around getSources Suspense method.
 // This method can be used by non-React code to prefetch/prime the Suspense cache by loading object properties.
-export async function getSourcesHelper(client: ReplayClientInterface): Promise<ProtocolSource[]> {
+export async function getSourcesAsync(client: ReplayClientInterface): Promise<ProtocolSource[]> {
   try {
     return getSourcesSuspense(client);
   } catch (errorOrPromise) {

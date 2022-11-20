@@ -1,6 +1,7 @@
 import { SourceId } from "@replayio/protocol";
 import { Suspense, memo, useContext } from "react";
 
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { getFramesSuspense } from "bvaughn-architecture-demo/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -24,8 +25,8 @@ export default memo(function CurrentLineHighlight(props: Props) {
 function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
   const client = useContext(ReplayClientContext);
   const [sourceSearchState] = useContext(SourceSearchContext);
-
   const { selectedPauseAndFrameId, previewLocation } = useContext(SelectedFrameContext);
+  const { currentSearchResultLocation } = useContext(SourcesContext);
 
   if (previewLocation?.sourceId === sourceId) {
     if (previewLocation.line === lineNumber) {
@@ -73,12 +74,11 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
     }
   }
 
-  const searchLineIndex =
-    sourceSearchState.index < sourceSearchState.results.length
-      ? sourceSearchState.results[sourceSearchState.index]
-      : null;
-
-  if (sourceSearchState.currentScopeId === sourceId && searchLineIndex === lineNumber - 1) {
+  if (
+    currentSearchResultLocation != null &&
+    currentSearchResultLocation.sourceId === sourceSearchState.currentScopeId &&
+    currentSearchResultLocation.line === lineNumber
+  ) {
     return (
       <div className={styles.CurrentSearchResult} data-test-name="CurrentSearchResultHighlight" />
     );

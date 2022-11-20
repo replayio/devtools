@@ -25,6 +25,7 @@ import {
   searchSourceText,
   searchSourcesByName,
   toggleLogPointBadge,
+  verifyCurrentSearchResult,
   verifyHitPointButtonsEnabled,
   verifyLogPointStep,
 } from "./utils/source";
@@ -220,16 +221,19 @@ test("should support text search in the active source file", async ({ page }) =>
   const sourceSearchLocator = getSearchSourceLocator(page);
   await expect(sourceSearchLocator).not.toBeVisible();
   await searchSourceText(page, "function");
+  await verifyCurrentSearchResult(page, { fileName: "source-and-console.html", lineNumber: 17 });
   await takeScreenshot(page, sourceSearchLocator, "source-search-results");
   await page.keyboard.press("Shift+Enter");
+  await verifyCurrentSearchResult(page, { fileName: "source-and-console.html", lineNumber: 51 });
   await takeScreenshot(page, sourceSearchLocator, "source-search-last-result-active");
   await page.keyboard.press("Enter");
+  await verifyCurrentSearchResult(page, { fileName: "source-and-console.html", lineNumber: 17 });
   await takeScreenshot(page, sourceSearchLocator, "source-search-first-result-active");
   await page.keyboard.press("Escape");
   await expect(sourceSearchLocator).not.toBeVisible();
 });
 
-test("should remember search results and current index per source", async ({ page }) => {
+test("should remember search results count per source", async ({ page }) => {
   await openSourceFile(page, sourceId);
   const resultsLabel = getSourceSearchResultsLabelLocator(page);
   await searchSourceText(page, "function");
@@ -239,19 +243,19 @@ test("should remember search results and current index per source", async ({ pag
   await expect(await resultsLabel.textContent()).toBe("3 of 5 results");
 
   await openSourceFile(page, altSourceId);
-  await expect(await resultsLabel.textContent()).toBe("1 of 20 results");
+  await expect(await resultsLabel.textContent()).toBe("? of 20 results");
   await goToNextSourceSearchResult(page);
   await goToNextSourceSearchResult(page);
   await goToNextSourceSearchResult(page);
-  await expect(await resultsLabel.textContent()).toBe("4 of 20 results");
+  await expect(await resultsLabel.textContent()).toBe("3 of 20 results");
 
   await openSourceFile(page, sourceId);
-  await expect(await resultsLabel.textContent()).toBe("3 of 5 results");
+  await expect(await resultsLabel.textContent()).toBe("? of 5 results");
   await goToPreviousSourceSearchResult(page);
-  await expect(await resultsLabel.textContent()).toBe("2 of 5 results");
+  await expect(await resultsLabel.textContent()).toBe("5 of 5 results");
 
   await openSourceFile(page, altSourceId);
-  await expect(await resultsLabel.textContent()).toBe("4 of 20 results");
+  await expect(await resultsLabel.textContent()).toBe("? of 20 results");
 
   await clearSearchResult(page);
   await expect(await resultsLabel.isVisible()).toBe(false);
@@ -296,9 +300,9 @@ test("should support continue to next and previous functionality", async ({ page
   await expect(await isContinueToPreviousButtonEnabled(page, sourceId, 14)).toBe(false);
 
   // Go to line 14.
-  await expect(await isLineCurrentExecutionPoint(page, 14)).toBe(false);
+  await verifyCurrentExecutionPoint(page, 14, false);
   await continueTo(page, { lineNumber: 14, direction: "next", sourceId });
-  await expect(await isLineCurrentExecutionPoint(page, 14)).toBe(true);
+  await verifyCurrentExecutionPoint(page, 14);
 
   // Continue to next and previous buttons should both now be disabled for line 14.
   // Continue to previous should be enabled for line 13

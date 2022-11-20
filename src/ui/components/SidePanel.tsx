@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import SearchFiles from "bvaughn-architecture-demo/components/search-files/SearchFiles";
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import TestInfo from "devtools/client/debugger/src/components/TestInfo/TestInfo";
 import Events from "ui/components/Events";
@@ -100,6 +101,7 @@ export default function SidePanel() {
       {selectedPrimaryPanel === "comments" && <CommentCardsList />}
       {selectedPrimaryPanel === "events" && <Accordion items={items} />}
       {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
+      {selectedPrimaryPanel === "search" && <SearchFiles />}
     </div>
   );
 }

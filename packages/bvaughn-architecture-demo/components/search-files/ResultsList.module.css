@@ -1,0 +1,41 @@
+.Results,
+.ResultsPending {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  cursor: default;
+  user-select: none;
+}
+.ResultsPending {
+  opacity: 0.5;
+}
+
+.NoResults {
+  padding: 0 0.5em;
+  color: var(--color-dim);
+}
+
+.List {
+  overflow: hidden;
+  flex: 1 1 auto;
+}
+
+.OverflowHeader {
+  display: flex;
+  padding: 0 0.5em;
+  color: var(--color-dim);
+  font-size: var(--font-size-small);
+  background-color: var(--background-color-source-search);
+  border-top: 1px solid var(--border-color-source-search);
+  border-bottom: 1px solid var(--border-color-source-search);
+  padding: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.OverflowIcon {
+  flex: 0 0 2ch;
+  width: 2ch;
+  height: 2ch;
+  color: var(--color-warning);
+  margin-right: 1ch;
+}

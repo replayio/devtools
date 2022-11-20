@@ -58,6 +58,7 @@ describe("ExceptionsCache", () => {
     range: TimeStampedPointRange | null
   ) => Promise<UncaughtException[]>;
   let getStatus: () => Status;
+  let originalConsoleError: typeof console.error;
   let subscribeForStatus: (callback: () => {}) => () => {};
 
   beforeEach(() => {
@@ -68,10 +69,26 @@ describe("ExceptionsCache", () => {
     getExceptionsSuspense = module.getExceptionsSuspense;
     getStatus = module.getStatus;
     subscribeForStatus = module.subscribeForStatus;
+
+    // We expect to trigger this warning; avoid bloating the console output.
+    originalConsoleError = console.error.bind(console);
+    console.error = (...args) => {
+      if (
+        args.find(
+          arg =>
+            typeof arg === "string" &&
+            arg.includes("There are too many points to complete this operation")
+        ) == null
+      ) {
+        originalConsoleError(...args);
+      }
+    };
   });
 
   afterEach(() => {
     jest.resetModules();
+
+    console.error = originalConsoleError;
   });
 
   it("should handle empty range", async () => {

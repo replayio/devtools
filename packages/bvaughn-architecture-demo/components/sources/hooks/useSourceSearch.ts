@@ -1,11 +1,11 @@
 import { SourceId } from "@replayio/protocol";
 import escapeRegExp from "lodash/escapeRegExp";
 import isEqual from "lodash/isEqual";
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { NEW_LINE_REGEX } from "bvaughn-architecture-demo/src/utils/string";
 
-import useSearch from "./useSearch";
+import useSearch, { OnChangeDispatching } from "./useSearch";
 import type { Actions as SearchActions, State as SearchState } from "./useSearch";
 
 type Scope = {
@@ -64,7 +64,9 @@ export type State = SearchState<string, number, SearchModifiers> & {
   modifiers: SearchModifiers;
 };
 
-export default function useSourceSearch(): [State, Actions] {
+export default function useSourceSearch(
+  onChangeDispatching?: OnChangeDispatching<number>
+): [State, Actions] {
   const [scope, setScope] = useState<Scope>({
     code: "",
     sourceId: null,
@@ -81,7 +83,8 @@ export default function useSourceSearch(): [State, Actions] {
   const [state, dispatch] = useSearch<string, number, SearchModifiers>(
     lines,
     search,
-    scope.sourceId
+    scope.sourceId,
+    onChangeDispatching
   );
 
   const memoizedActions = useMemo<Actions>(

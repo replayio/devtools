@@ -152,6 +152,8 @@ export interface ReplayClientInterface {
     focusRange: PointRange | null
   ): Promise<LineNumberToHitCountMap>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
+  isOriginalSource(sourceId: SourceId): boolean;
+  isPrettyPrintedSource(sourceId: SourceId): boolean;
   loadRegion(range: TimeRange, duration: number): Promise<void>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;
   repaintGraphics(pauseId: PauseId): Promise<repaintGraphicsResult>;

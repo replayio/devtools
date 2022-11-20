@@ -1,4 +1,11 @@
-import React, { KeyboardEvent, MouseEvent, ReactNode, useState, useTransition } from "react";
+import React, {
+  CSSProperties,
+  KeyboardEvent,
+  MouseEvent,
+  ReactNode,
+  useState,
+  useTransition,
+} from "react";
 
 import Icon from "./Icon";
 import LazyOffscreen from "./LazyOffscreen";
@@ -16,6 +23,7 @@ export default function Expandable({
   header,
   headerClassName = "",
   onChange = noopOnChange,
+  style,
   useBlockLayoutWhenExpanded = true,
 }: {
   children: ReactNode;
@@ -25,6 +33,7 @@ export default function Expandable({
   header: ReactNode;
   headerClassName?: string;
   onChange?: (value: boolean) => void;
+  style?: CSSProperties;
   useBlockLayoutWhenExpanded?: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
@@ -67,6 +76,7 @@ export default function Expandable({
       } ${className}`}
       data-test-name="Expandable"
       data-test-state={isOpen ? "open" : "closed"}
+      style={style}
     >
       <span
         className={`${styles.ToggleButton} ${headerClassName}`}

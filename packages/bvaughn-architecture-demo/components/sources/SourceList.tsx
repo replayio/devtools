@@ -14,7 +14,10 @@ import { VariableSizeList as List, ListOnItemsRenderedProps } from "react-window
 
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import {
+  SourcesContext,
+  SourcesContextRoot,
+} from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
 import {
   StreamingSourceContents,
@@ -27,7 +30,6 @@ import { Point } from "shared/client/types";
 
 import useFontBasedListMeasurents from "./hooks/useFontBasedListMeasurents";
 import SourceListRow, { ItemData } from "./SourceListRow";
-import { SourceSearchContext } from "./SourceSearchContext";
 import { formatHitCount } from "./utils/formatHitCount";
 import getScrollbarWidth from "./utils/getScrollbarWidth";
 import { findPointForLocation } from "./utils/points";
@@ -59,7 +61,7 @@ export default function SourceList({
   const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
   const client = useContext(ReplayClientContext);
   const {
-    focusedLineNumber,
+    focusedLineIndex,
     focusedSourceId,
     markPendingFocusUpdateProcessed,
     pendingFocusUpdate,
@@ -83,14 +85,18 @@ export default function SourceList({
   );
 
   useEffect(() => {
-    if (pendingFocusUpdate === null || focusedLineNumber === null || focusedSourceId === null) {
+    if (pendingFocusUpdate === false || focusedLineIndex === null || focusedSourceId === null) {
+      return;
+    } else if (sourceId !== focusedSourceId) {
+      return;
+    } else if (lineCount == null || lineCount < focusedLineIndex) {
+      // Source content streams in; we may not have loaded this line yet.
       return;
     }
 
     const list = listRef.current;
     if (list) {
-      const lineIndex = focusedLineNumber - 1;
-      list.scrollToItem(lineIndex, "smart");
+      list.scrollToItem(focusedLineIndex, "smart");
 
       // Important!
       // Don't mark the update processed until we have actually scrolled to the line.
@@ -98,32 +104,13 @@ export default function SourceList({
       markPendingFocusUpdateProcessed();
     }
   }, [
-    focusedLineNumber,
+    focusedLineIndex,
     focusedSourceId,
+    lineCount,
     markPendingFocusUpdateProcessed,
     pendingFocusUpdate,
     sourceId,
   ]);
-
-  const [sourceSearchState, sourceSearchActions] = useContext(SourceSearchContext);
-  useLayoutEffect(() => {
-    const { pendingUpdateForScope, enabled, index, results } = sourceSearchState;
-    if (pendingUpdateForScope === null || pendingUpdateForScope !== sourceId) {
-      return;
-    }
-
-    if (enabled) {
-      if (results.length > 0) {
-        const lineIndex = results[index];
-        const list = listRef.current;
-        if (list) {
-          list.scrollToItem(lineIndex, "smart");
-        }
-      }
-
-      sourceSearchActions.markUpdateProcessed();
-    }
-  }, [sourceId, sourceSearchActions, sourceSearchState]);
 
   const togglesLocalStorageKey = `Replay:ShowHitCounts`;
   const [showHitCounts, setShowHitCounts] = useLocalStorage<boolean>(togglesLocalStorageKey, true);
@@ -164,10 +151,10 @@ export default function SourceList({
   );
 
   const onLineMouseEnter = useCallback(
-    (lineIndex: number, lineNumberNode: HTMLElement) => {
+    (lineIndex: number, lineNode: HTMLElement) => {
       onLineMouseLeaveDebounced.cancel();
 
-      setHoveredLocation(lineIndex, lineNumberNode);
+      setHoveredLocation(lineIndex, lineNode);
     },
     [onLineMouseLeaveDebounced, setHoveredLocation]
   );
@@ -250,7 +237,7 @@ export default function SourceList({
     [setVisibleLines]
   );
 
-  const maxLineNumberStringLength = `${lineCount}`.length;
+  const maxLineIndexStringLength = `${lineCount}`.length;
   const maxHitCountStringLength =
     showHitCounts && maxHitCount !== null ? `${formatHitCount(maxHitCount)}`.length : 0;
 
@@ -260,7 +247,7 @@ export default function SourceList({
     "--conditional-point-panel-height": `${conditionalPointPanelHeight}px`,
     "--hit-count-size": `${maxHitCountStringLength}ch`,
     "--line-height": `${lineHeight}px`,
-    "--line-number-size": `${maxLineNumberStringLength + 1}ch`,
+    "--line-number-size": `${maxLineIndexStringLength + 1}ch`,
     "--list-width": `${widthMinusScrollbar}px`,
     "--point-panel-height": `${pointPanelHeight}px`,
   };

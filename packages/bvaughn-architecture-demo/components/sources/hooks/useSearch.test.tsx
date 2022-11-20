@@ -67,12 +67,6 @@ describe("useSearch", () => {
     });
   }
 
-  function markUpdateProcessed() {
-    act(() => {
-      currentActions?.markUpdateProcessed();
-    });
-  }
-
   function search(query: string, queryData: QueryData = false) {
     act(() => {
       currentActions?.search(query, queryData);
@@ -127,25 +121,8 @@ describe("useSearch", () => {
     expect(currentState?.index).toBe(0);
   });
 
-  it("should reset pending update flag when results or indices change", async () => {
-    render(DEFAULT_ITEMS.concat("bat"));
-    search("b");
-    expect(currentState?.pendingUpdateForScope).toBe(DEFAULT_SCOPE);
-
-    markUpdateProcessed();
-    expect(currentState?.pendingUpdateForScope).toBe(null);
-
-    // Changes that impact the currently selected result should not re-set the flag
-    search("ba");
-    expect(currentState?.pendingUpdateForScope).toBe(DEFAULT_SCOPE);
-
-    // Changing scope should always clear the pending update flag
-    render(DEFAULT_ITEMS.concat("bat"), "new-scope");
-    expect(currentState?.pendingUpdateForScope).toBe(null);
-  });
-
   describe("scopes", () => {
-    it("should track results and indices separately per scope", async () => {
+    it("should track results separately per scope", async () => {
       const scopeAId = "scope-a";
       const scopeBId = "scope-b";
       const scopeAItems = ["bob", "charles", "greg", "stan"];
@@ -155,35 +132,29 @@ describe("useSearch", () => {
       search("a");
       goToNext();
       expect(currentState?.index).toBe(1);
-      expect(currentState?.pendingUpdateForScope).toBe(scopeAId);
       expect(currentState?.results).toHaveLength(2);
       expect(stableSearchMock).toHaveBeenCalledTimes(1);
 
       render(scopeBItems, scopeBId);
-      expect(currentState?.index).toBe(0);
-      expect(currentState?.pendingUpdateForScope).toBe(null);
+      expect(currentState?.index).toBe(-1);
       expect(currentState?.results).toHaveLength(3);
       expect(stableSearchMock).toHaveBeenCalledTimes(2);
       goToNext();
-      expect(currentState?.pendingUpdateForScope).toBe(scopeBId);
-      expect(currentState?.index).toBe(1);
+      expect(currentState?.index).toBe(0);
       expect(stableSearchMock).toHaveBeenCalledTimes(2);
 
       render(scopeAItems, scopeAId);
-      expect(currentState?.index).toBe(1);
-      expect(currentState?.pendingUpdateForScope).toBe(null);
+      expect(currentState?.index).toBe(-1);
       expect(currentState?.results).toHaveLength(2);
       expect(stableSearchMock).toHaveBeenCalledTimes(2);
 
-      goToPrevious();
+      goToNext();
       expect(currentState?.index).toBe(0);
-      expect(currentState?.pendingUpdateForScope).toBe(scopeAId);
       expect(currentState?.results).toHaveLength(2);
       expect(stableSearchMock).toHaveBeenCalledTimes(2);
 
       render(scopeBItems, scopeBId);
-      expect(currentState?.index).toBe(1);
-      expect(currentState?.pendingUpdateForScope).toBe(null);
+      expect(currentState?.index).toBe(-1);
       expect(currentState?.results).toHaveLength(3);
       expect(stableSearchMock).toHaveBeenCalledTimes(2);
     });

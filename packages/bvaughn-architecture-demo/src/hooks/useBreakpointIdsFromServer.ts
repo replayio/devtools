@@ -2,7 +2,7 @@ import { BreakpointId } from "@replayio/protocol";
 import { useContext, useEffect, useRef } from "react";
 
 import { getBreakpointPositionsAsync } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
-import { getSourcesHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { getSourcesAsync } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point, PointId } from "shared/client/types";
 import { ReplayClientInterface } from "shared/client/types";
@@ -33,7 +33,7 @@ export default function useBreakpointIdsFromServer(
           // There's no point (hah!) in restoring breakpoints until after
           // we have sources to work with, and it's also possible that
           // some persisted points have obsolete source IDs.
-          const allSources = await getSourcesHelper(replayClient);
+          const allSources = await getSourcesAsync(replayClient);
 
           const allSourceIds = new Set<string>();
           for (let source of allSources) {

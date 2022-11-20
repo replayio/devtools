@@ -1,5 +1,6 @@
 import { newSource as ProtocolSource } from "@replayio/protocol";
 import {
+  CSSProperties,
   MouseEvent,
   Suspense,
   memo,
@@ -47,7 +48,7 @@ export type ItemData = {
 };
 
 const SourceListRow = memo(
-  ({ data, index, style }: { data: ItemData; index: number; style: Object }) => {
+  ({ data, index, style }: { data: ItemData; index: number; style: CSSProperties }) => {
     const { isTransitionPending: isFocusRangePending } = useContext(FocusContext);
 
     const [isHovered, setIsHovered] = useState(false);
