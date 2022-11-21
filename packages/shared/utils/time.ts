@@ -27,10 +27,6 @@ export function isRangeInRegions(
         beginPointBigInt! >= BigInt(begin.point) && endPointBigInt! <= BigInt(end.point)
     ) == null
   ) {
-    console.log(
-      `Point range not loaded:\n  begin: ${beginPointBigInt}\n  end: ${endPointBigInt}\n  loaded:`,
-      JSON.stringify(regions, null, 2)
-    );
     // No loaded regions contain this range of points.
     return false;
   }
@@ -42,10 +38,6 @@ export function isRangeInRegions(
       ({ begin, end }) => beginTime! >= BigInt(begin.time) && endTime! <= BigInt(end.time)
     ) == null
   ) {
-    console.log(
-      `Time range not loaded:\n  begin: ${beginTime}\n  end: ${endTime}\n  loaded:`,
-      JSON.stringify(regions, null, 2)
-    );
     // No loaded regions contain this range of times.
     return false;
   }
