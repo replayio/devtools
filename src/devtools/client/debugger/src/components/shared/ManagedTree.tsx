@@ -5,10 +5,37 @@
 //
 import React, { Component } from "react";
 
-import { Tree } from "./tree";
+import { Tree, TreeProps } from "./tree";
 
-class ManagedTree extends Component {
-  constructor(props) {
+export interface ManagedTreeProps<T extends { name: string }>
+  extends Omit<TreeProps<T>, "renderItem" | "onExpand" | "onCollapse" | "isExpanded" | "getKey"> {
+  expanded?: Set<string>;
+  getPath: (item: T) => string;
+  listItems?: T[];
+  highlightItems?: T[];
+  focused?: T;
+  onFocus: (item: T | undefined) => void;
+  onExpand?: (item: T, expanded: Set<string>) => void;
+  onCollapse?: (item: T, expanded: Set<string>) => void;
+  renderItem: (
+    item: T,
+    depth: number,
+    isFocused: boolean,
+    arrow: React.ReactNode,
+    isExpanded: boolean,
+    { setExpanded }: { setExpanded: () => void }
+  ) => React.ReactNode;
+}
+
+interface ManagedTreeState {
+  expanded: Set<string>;
+}
+
+class ManagedTree<T extends { name: string }> extends Component<
+  ManagedTreeProps<T>,
+  ManagedTreeState
+> {
+  constructor(props: ManagedTreeProps<T>) {
     super(props);
 
     const expanded = props.expanded || new Set();
@@ -41,7 +68,7 @@ class ManagedTree extends Component {
     onFocus: () => {},
   };
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: ManagedTreeProps<T>) {
     const { listItems, highlightItems } = this.props;
     if (nextProps.listItems && nextProps.listItems != listItems) {
       this.expandListItems(nextProps.listItems);
@@ -56,9 +83,9 @@ class ManagedTree extends Component {
     }
   }
 
-  setExpanded = (item, isExpanded, shouldIncludeChildren) => {
-    const expandItem = i => {
-      const path = this.props.getPath(i);
+  setExpanded = (item: T, isExpanded: boolean) => {
+    const expandItem = (item: T) => {
+      const path = this.props.getPath(item);
       if (isExpanded) {
         expanded.add(path);
       } else {
@@ -68,21 +95,6 @@ class ManagedTree extends Component {
     const { expanded } = this.state;
     expandItem(item);
 
-    if (shouldIncludeChildren) {
-      let parents = [item];
-      while (parents.length) {
-        const children = [];
-        for (const parent of parents) {
-          if (parent.contents && parent.contents.length) {
-            for (const child of parent.contents) {
-              expandItem(child);
-              children.push(child);
-            }
-          }
-        }
-        parents = children;
-      }
-    }
     this.setState({ expanded });
 
     if (isExpanded && this.props.onExpand) {
@@ -92,14 +104,14 @@ class ManagedTree extends Component {
     }
   };
 
-  expandListItems(listItems) {
+  expandListItems(listItems: T[]) {
     const { expanded } = this.state;
     listItems.forEach(item => expanded.add(this.props.getPath(item)));
     this.props.onFocus(listItems[0]);
     this.setState({ expanded });
   }
 
-  highlightItem(highlightItems) {
+  highlightItem(highlightItems: T[]) {
     const { expanded } = this.state;
     // This file is visible, so we highlight it.
     if (expanded.has(this.props.getPath(highlightItems[0]))) {
@@ -121,19 +133,16 @@ class ManagedTree extends Component {
     const { expanded } = this.state;
     return (
       <div className="managed-tree">
-        <Tree
+        <Tree<any>
           {...this.props}
-          isExpanded={item => expanded.has(this.props.getPath(item))}
+          isExpanded={(item: T) => expanded.has(this.props.getPath(item))}
           focused={this.props.focused}
           getKey={this.props.getPath}
-          onExpand={(item, shouldIncludeChildren) =>
-            this.setExpanded(item, true, shouldIncludeChildren)
-          }
-          onCollapse={(item, shouldIncludeChildren) =>
-            this.setExpanded(item, false, shouldIncludeChildren)
-          }
+          onExpand={(item: T) => this.setExpanded(item, true)}
+          onCollapse={(item: T) => this.setExpanded(item, false)}
           onFocus={this.props.onFocus}
-          renderItem={(...args) =>
+          renderItem={(...args: any[]) =>
+            // @ts-expect-error some spread complaint
             this.props.renderItem(...args, {
               setExpanded: this.setExpanded,
             })

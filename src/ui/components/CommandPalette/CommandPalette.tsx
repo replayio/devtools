@@ -172,7 +172,7 @@ function CommandPalette({
   );
 }
 
-const connector = connect(() => ({}), {
+const connector = connect(null, {
   hideCommandPalette: actions.hideCommandPalette,
   executeCommand: actions.executeCommand,
 });

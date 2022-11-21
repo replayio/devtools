@@ -296,7 +296,7 @@ function WorkspaceMember({ member, hideModal, isAdmin, canLeave = false }: Works
   );
 }
 
-const connector = connect(() => ({}), {
+const connector = connect(null, {
   hideModal: actions.hideModal,
 });
 export type PropsFromRedux = ConnectedProps<typeof connector>;

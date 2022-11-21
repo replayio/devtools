@@ -20364,13 +20364,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom-factories@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "react-dom-factories@npm:1.0.2"
-  checksum: 2ef14d4bb1d33ebcc52a752f9d32820ce57d7ac4e0fe53b90f98adf5310f604b120ee7bb1ba2f1b36eb487b02e5cd4b1b52f138f49a82303672b971a3eb92b6a
-  languageName: node
-  linkType: hard
-
 "react-dom@npm:0.0.0-experimental-e7d0053e6-20220325":
   version: 0.0.0-experimental-e7d0053e6-20220325
   resolution: "react-dom@npm:0.0.0-experimental-e7d0053e6-20220325"
@@ -20958,7 +20951,6 @@ __metadata:
     react-devtools-inline: ^4.24.5
     react-devtools-inline_4_18_0: "npm:react-devtools-inline@4.18.0"
     react-dom: 0.0.0-experimental-1e5245df8-20220817
-    react-dom-factories: ^1.0.2
     react-is: ^18.2.0
     react-json-view: ^1.21.3
     react-lazyload: ^3.2.0

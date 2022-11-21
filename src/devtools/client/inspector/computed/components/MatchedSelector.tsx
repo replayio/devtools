@@ -2,9 +2,8 @@ import React from "react";
 
 import ExternalLink from "ui/components/shared/ExternalLink";
 
+import DeclarationValue from "../../rules/components/DeclarationValue";
 import { MatchedSelectorState } from "../state";
-
-const DeclarationValue = require("../../rules/components/DeclarationValue");
 
 interface MatchedSelectorProps {
   selector: MatchedSelectorState;

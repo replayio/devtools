@@ -1,46 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-"use strict";
-
-// This file is a chrome-API-dependent version of the file
-// packages/devtools-modules/src/unicode-url.js at
-// https://github.com/firefox-devtools/devtools-core, so that this
-// chrome-API-dependent version can take advantage of utilizing chrome APIs. But
-// because of this, it isn't intended to be used in Chrome-API-free
-// applications, such as the Launchpad.
-//
-// Please keep in mind that if the feature in this file has changed, don't
-// forget to also change that accordingly in the file
-// packages/devtools-modules/src/unicode-url.js at
-// https://github.com/firefox-devtools/devtools-core
-
-const idnService = {
-  convertToDisplayIDN(name) {
-    return name;
-  },
-};
-
-/**
- * Gets a readble Unicode hostname from a hostname.
- *
- * If the `hostname` is a readable ASCII hostname, such as example.org, then
- * this function will simply return the original `hostname`.
- *
- * If the `hostname` is a Punycode hostname representing a Unicode domain name,
- * such as xn--g6w.xn--8pv, then this function will return the readable Unicode
- * domain name by decoding the Punycode hostname.
- *
- * @param {string}  hostname
- *                  the hostname from which the Unicode hostname will be
- *                  parsed, such as example.org, xn--g6w.xn--8pv.
- * @return {string} The Unicode hostname. It may be the same as the `hostname`
- *                  passed to this function if the `hostname` itself is
- *                  a readable ASCII hostname or a Unicode hostname.
- */
-function getUnicodeHostname(hostname) {
-  return idnService.convertToDisplayIDN(hostname, {});
-}
 
 /**
  * Gets a readble Unicode URL pathname from a URL pathname.
@@ -61,7 +21,7 @@ function getUnicodeHostname(hostname) {
  *                  passed to this function if the `urlPath` itself is a readable
  *                  ASCII url or a Unicode url.
  */
-function getUnicodeUrlPath(urlPath) {
+export function getUnicodeUrlPath(urlPath: string) {
   try {
     return decodeURIComponent(urlPath);
   } catch (err) {}
@@ -93,22 +53,16 @@ function getUnicodeUrlPath(urlPath) {
  * @return {string} The readable URL. It may be the same as the `url` passed to
  *                  this function if the `url` itself is readable.
  */
-function getUnicodeUrl(url) {
+export function getUnicodeUrl(url: string) {
   try {
     const { protocol, hostname } = new URL(url);
     if (protocol === "data:") {
       // Never convert a data: URI.
       return url;
     }
-    const readableHostname = getUnicodeHostname(hostname);
+    const readableHostname = hostname;
     url = decodeURI(url);
     return url.replace(hostname, readableHostname);
   } catch (err) {}
   return url;
 }
-
-module.exports = {
-  getUnicodeHostname,
-  getUnicodeUrlPath,
-  getUnicodeUrl,
-};

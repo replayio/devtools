@@ -1,11 +1,10 @@
 import classNames from "classnames";
 import React, { FC } from "react";
 
-import { Declarations } from "devtools/client/inspector/rules/components/Declarations";
-import Selector from "devtools/client/inspector/rules/components/Selector";
-import { SourceLink } from "devtools/client/inspector/rules/components/SourceLink";
-
 import { RuleState } from "../reducers/rules";
+import { Declarations } from "./Declarations";
+import Selector from "./Selector";
+import { SourceLink } from "./SourceLink";
 
 type RuleProps = {
   query: string;

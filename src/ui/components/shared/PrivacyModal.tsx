@@ -19,6 +19,6 @@ function PrivacyModal({ hideModal }: PropsFromRedux) {
   );
 }
 
-const connector = connect(() => ({}), { hideModal: actions.hideModal });
+const connector = connect(null, { hideModal: actions.hideModal });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(PrivacyModal);
