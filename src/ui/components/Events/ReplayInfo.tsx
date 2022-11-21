@@ -185,7 +185,7 @@ function OperationsRow({
   );
 }
 
-const connector = connect(() => ({}), {
+const connector = connect(null, {
   setModal: actions.setModal,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;

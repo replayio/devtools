@@ -23,7 +23,7 @@ function QuickOpenButton({ openQuickOpen }: PropsFromRedux) {
   );
 }
 
-const connector = connect(() => ({}), {
+const connector = connect(null, {
   openQuickOpen,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;

@@ -93,7 +93,7 @@ function SingleInviteModal({ workspace }: SingleInviteModalProps) {
   );
 }
 
-const connector = connect(() => ({}), {
+const connector = connect(null, {
   hideModal: actions.hideModal,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;

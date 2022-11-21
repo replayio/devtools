@@ -88,7 +88,7 @@ function TeamBillingButtonBase({ setModal }: BillingPropsFromRedux) {
   );
 }
 
-const billingConnector = connect(() => ({}), { setModal });
+const billingConnector = connect(null, { setModal });
 type BillingPropsFromRedux = ConnectedProps<typeof billingConnector>;
 const TeamBillingButton = billingConnector(TeamBillingButtonBase);
 

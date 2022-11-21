@@ -38,7 +38,6 @@ import {
   updateTree,
 } from "../../utils/sources-tree";
 import { TreeDirectory, TreeNode, TreeSource } from "../../utils/sources-tree/types";
-import { parse } from "../../utils/url";
 import ManagedTree from "../shared/ManagedTree";
 // Components
 import SourcesTreeItem from "./SourcesTreeItem";
