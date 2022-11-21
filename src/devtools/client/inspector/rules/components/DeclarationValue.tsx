@@ -1,22 +1,19 @@
-const React = require("react");
-const PropTypes = require("prop-types");
+import React from "react";
+
+import Color from "./value/Color";
+import FontFamily from "./value/FontFamily";
+import Url from "./value/Url";
+
 const { COLOR, FONT_FAMILY, URI } = require("third-party/css/output-parser");
 
-const Color = require("devtools/client/inspector/rules/components/value/Color");
-const FontFamily = require("devtools/client/inspector/rules/components/value/FontFamily");
-const Url = require("devtools/client/inspector/rules/components/value/Url");
+interface DeclarationValueProps {
+  colorSpanClassName: string;
+  colorSwatchClassName: string;
+  fontFamilySpanClassName: string;
+  values: (string | Record<string, string>)[];
+}
 
-class DeclarationValue extends React.PureComponent {
-  static get propTypes() {
-    return {
-      colorSpanClassName: PropTypes.string,
-      colorSwatchClassName: PropTypes.string,
-      fontFamilySpanClassName: PropTypes.string,
-      values: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.object]))
-        .isRequired,
-    };
-  }
-
+class DeclarationValue extends React.PureComponent<DeclarationValueProps> {
   render() {
     return this.props.values.map(v => {
       if (typeof v === "string") {
@@ -52,4 +49,4 @@ class DeclarationValue extends React.PureComponent {
   }
 }
 
-module.exports = DeclarationValue;
+export default DeclarationValue;

@@ -2,11 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
+import classnames from "classnames";
+import React from "react";
 
-const { createRef, PureComponent } = require("react");
-const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
+import { ELEMENT_STYLE } from "shared/constants";
+
 const { PSEUDO_CLASSES } = require("third-party/css/constants");
 const {
   parsePseudoClassesAndAttributes,
@@ -15,25 +15,27 @@ const {
   SELECTOR_PSEUDO_CLASS,
 } = require("third-party/css/parsing-utils");
 
-import { ELEMENT_STYLE } from "shared/constants";
+export interface CSSSelector {
+  // Function that returns a Promise containing an unique CSS selector.
+  getUniqueSelector: () => Promise<string>;
+  // Array of the selectors that match the selected element.
+  matchedSelectors: string[];
+  // The CSS rule's selector text content.
+  selectorText: string;
+  // Array of the CSS rule's selectors.
+  selectors: string[];
+}
 
-const Types = require("devtools/client/inspector/rules/types");
+interface SelectorProps {
+  id: string;
+  isUserAgentStyle: boolean;
+  selector: CSSSelector;
+  type: number;
+  query: string;
+}
 
-export default class Selector extends PureComponent {
-  static get propTypes() {
-    return {
-      id: PropTypes.string.isRequired,
-      isUserAgentStyle: PropTypes.bool.isRequired,
-      selector: PropTypes.shape(Types.selector).isRequired,
-      type: PropTypes.number.isRequired,
-      query: PropTypes.string.isRequired,
-    };
-  }
-
-  constructor(props) {
-    super(props);
-    this.selectorRef = createRef();
-  }
+export default class Selector extends React.PureComponent<SelectorProps> {
+  selectorRef = React.createRef<HTMLDivElement>();
 
   componentDidMount() {
     if (
@@ -54,7 +56,7 @@ export default class Selector extends PureComponent {
     }
 
     const { matchedSelectors, selectors } = this.props.selector;
-    const output = [];
+    const output: React.ReactNode[] = [];
 
     // Go through the CSS rule's selectors and highlight the selectors that actually
     // matches.
@@ -64,44 +66,44 @@ export default class Selector extends PureComponent {
       // CSS classes for the parsed values.
       // NOTE: parsePseudoClassesAndAttributes is a good candidate for memoization.
       output.push(
-        dom.span(
-          {
-            className:
-              matchedSelectors.indexOf(selector) > -1
-                ? "ruleview-selector-matched"
-                : "ruleview-selector-unmatched",
-          },
-          parsePseudoClassesAndAttributes(selector).map(({ type, value }) => {
-            let selectorSpanClass = "";
+        <span
+          className={
+            matchedSelectors.indexOf(selector) > -1
+              ? "ruleview-selector-matched"
+              : "ruleview-selector-unmatched"
+          }
+        >
+          {parsePseudoClassesAndAttributes(selector).map(
+            ({ type, value }: { type: any; value: any }) => {
+              let selectorSpanClass = "";
 
-            switch (type) {
-              case SELECTOR_ATTRIBUTE:
-                selectorSpanClass += " ruleview-selector-attribute";
-                break;
-              case SELECTOR_ELEMENT:
-                selectorSpanClass += " ruleview-selector";
-                break;
-              case SELECTOR_PSEUDO_CLASS:
-                selectorSpanClass += PSEUDO_CLASSES.some(p => value === p)
-                  ? " ruleview-selector-pseudo-class-lock"
-                  : " ruleview-selector-pseudo-class";
-                break;
+              switch (type) {
+                case SELECTOR_ATTRIBUTE:
+                  selectorSpanClass += " ruleview-selector-attribute";
+                  break;
+                case SELECTOR_ELEMENT:
+                  selectorSpanClass += " ruleview-selector";
+                  break;
+                case SELECTOR_PSEUDO_CLASS:
+                  selectorSpanClass += PSEUDO_CLASSES.some((p: any) => value === p)
+                    ? " ruleview-selector-pseudo-class-lock"
+                    : " ruleview-selector-pseudo-class";
+                  break;
+              }
+
+              return (
+                <span key={value} className={selectorSpanClass}>
+                  {value}
+                </span>
+              );
             }
-
-            return dom.span(
-              {
-                key: value,
-                className: selectorSpanClass,
-              },
-              value
-            );
-          })
-        )
+          )}
+        </span>
       );
 
       // Append a comma separator unless this is the last selector.
       if (i < selectors.length - 1) {
-        output.push(dom.span({ className: "ruleview-selector-separator" }, ", "));
+        output.push(<span className="ruleview-selector-separator">{", "}</span>);
       }
     }
 
@@ -109,18 +111,14 @@ export default class Selector extends PureComponent {
   }
 
   render() {
-    return dom.span(
-      {
-        className:
-          "ruleview-selectorcontainer" +
-          (this.props.query && this.props.selector.selectorText.match(this.props.query)
-            ? " ruleview-selector-matched"
-            : ""),
-        ref: this.selectorRef,
-        tabIndex: 0,
-      },
-      // this.renderSelector()
-      this.props.selector.selectorText
+    const className = classnames("ruleview-selectorcontainer", {
+      "ruleview-selector-matched":
+        this.props.query && this.props.selector.selectorText.match(this.props.query),
+    });
+    return (
+      <span className={className} ref={this.selectorRef} tabIndex={0}>
+        {this.props.selector.selectorText}
+      </span>
     );
   }
 }

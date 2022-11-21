@@ -1,10 +1,9 @@
+import classnames from "classnames";
 import React from "react";
 
+import DeclarationValue from "../../rules/components/DeclarationValue";
 import { ComputedPropertyState } from "../state";
 import MatchedSelector from "./MatchedSelector";
-
-const DeclarationValue = require("../../rules/components/DeclarationValue");
-const classnames = require("classnames");
 
 interface ComputedPropertyProps {
   property: ComputedPropertyState;
