@@ -4,8 +4,7 @@
 
 //
 
-import { getUnicodeHostname, getUnicodeUrlPath } from "devtools/client/shared/unicode-url";
-import type { MiniSource } from "ui/reducers/sources";
+import { getUnicodeUrlPath } from "devtools/client/shared/unicode-url";
 
 import { parse } from "../url";
 
@@ -111,7 +110,7 @@ export function getURL(source: { url?: string }, defaultDomain = "") {
         ...def,
         path: pathname,
         filename,
-        group: getUnicodeHostname(host),
+        group: host,
       };
   }
 
