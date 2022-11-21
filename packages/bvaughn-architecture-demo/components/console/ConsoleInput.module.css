@@ -39,3 +39,15 @@
   height: 1em;
   color: var(--color-dim);
 }
+
+.FallbackState {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+  padding: 0 1ch;
+  min-height: 2em;
+
+  background-color: var(--background-color-error);
+  border-top: 1px solid var(--border-color-error);
+  color: var(--color-error);
+}

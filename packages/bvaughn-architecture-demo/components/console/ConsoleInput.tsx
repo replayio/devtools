@@ -1,6 +1,7 @@
 import { FrameId, PauseId } from "@replayio/protocol";
 import { Suspense, useContext, useEffect, useRef, useState } from "react";
 
+import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import Icon from "bvaughn-architecture-demo/components/Icon";
 import Loader from "bvaughn-architecture-demo/components/Loader";
 import AutoComplete from "bvaughn-architecture-demo/components/sources/AutoComplete/AutoComplete";
@@ -21,9 +22,11 @@ import styles from "./ConsoleInput.module.css";
 
 export default function ConsoleInput() {
   return (
-    <Suspense fallback={<Loader />}>
-      <ConsoleInputSuspends />
-    </Suspense>
+    <ErrorBoundary fallback={<ErrorFallback />}>
+      <Suspense fallback={<Loader />}>
+        <ConsoleInputSuspends />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 
@@ -153,3 +156,12 @@ function ConsoleInputSuspends() {
 }
 
 function noop() {}
+
+function ErrorFallback() {
+  return (
+    <div className={styles.FallbackState}>
+      <Icon className={styles.Icon} type="terminal-prompt" />
+      Input disabled for session because of an error
+    </div>
+  );
+}
