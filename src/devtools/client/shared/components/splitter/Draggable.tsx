@@ -67,4 +67,4 @@ class Draggable extends React.Component<DraggableProps> {
   }
 }
 
-module.exports = Draggable;
+export default Draggable;

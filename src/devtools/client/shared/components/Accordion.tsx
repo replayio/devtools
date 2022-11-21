@@ -4,12 +4,12 @@
 
 import React from "react";
 
-interface AccordionItem {
-  buttons: React.ReactNode[];
-  className: string;
+export interface AccordionItem {
+  buttons?: React.ReactNode[];
+  className?: string;
   component: React.ComponentType<any>;
   componentProps: Record<string, unknown>;
-  contentClassName: string;
+  contentClassName?: string;
   header: string;
   id: string;
   onToggle: (opened: boolean) => void;
@@ -17,7 +17,7 @@ interface AccordionItem {
 }
 
 interface AccordionProps {
-  style: React.CSSProperties;
+  style?: React.CSSProperties;
   items: AccordionItem[];
 }
 

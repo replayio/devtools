@@ -7,6 +7,8 @@ import React from "react";
 
 import { ELEMENT_STYLE } from "shared/constants";
 
+import { RuleSelector } from "../models/rule";
+
 const { PSEUDO_CLASSES } = require("third-party/css/constants");
 const {
   parsePseudoClassesAndAttributes,
@@ -15,21 +17,10 @@ const {
   SELECTOR_PSEUDO_CLASS,
 } = require("third-party/css/parsing-utils");
 
-export interface CSSSelector {
-  // Function that returns a Promise containing an unique CSS selector.
-  getUniqueSelector: () => Promise<string>;
-  // Array of the selectors that match the selected element.
-  matchedSelectors: string[];
-  // The CSS rule's selector text content.
-  selectorText: string;
-  // Array of the CSS rule's selectors.
-  selectors: string[];
-}
-
 interface SelectorProps {
   id: string;
-  isUserAgentStyle: boolean;
-  selector: CSSSelector;
+  isUserAgentStyle: boolean | null;
+  selector: RuleSelector;
   type: number;
   query: string;
 }
@@ -60,15 +51,15 @@ export default class Selector extends React.PureComponent<SelectorProps> {
 
     // Go through the CSS rule's selectors and highlight the selectors that actually
     // matches.
-    for (let i = 0; i < selectors.length; i++) {
-      const selector = selectors[i];
+    for (let i = 0; i < selectors!.length; i++) {
+      const selector = selectors![i];
       // Parse the selector for pseudo classes and attributes, and apply different
       // CSS classes for the parsed values.
       // NOTE: parsePseudoClassesAndAttributes is a good candidate for memoization.
       output.push(
         <span
           className={
-            matchedSelectors.indexOf(selector) > -1
+            matchedSelectors!.indexOf(selector) > -1
               ? "ruleview-selector-matched"
               : "ruleview-selector-unmatched"
           }
@@ -102,7 +93,7 @@ export default class Selector extends React.PureComponent<SelectorProps> {
       );
 
       // Append a comma separator unless this is the last selector.
-      if (i < selectors.length - 1) {
+      if (i < selectors!.length - 1) {
         output.push(<span className="ruleview-selector-separator">{", "}</span>);
       }
     }
