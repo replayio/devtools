@@ -52,7 +52,7 @@ import { RecordingCapabilities } from "protocol/thread/thread";
 import { binarySearch, compareNumericStrings, defer } from "protocol/utils";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { ProtocolError, isCommandError } from "shared/utils/error";
-import { isRangeInRegions, toPointRange } from "shared/utils/time";
+import { isPointInRegions, isRangeInRegions, toPointRange } from "shared/utils/time";
 
 import {
   HitPointStatus,
@@ -158,6 +158,9 @@ export class ReplayClient implements ReplayClientInterface {
 
   async createPause(executionPoint: ExecutionPoint): Promise<createPauseResult> {
     const sessionId = this.getSessionIdThrows();
+
+    await this._waitForPointToBeLoaded(executionPoint);
+
     const response = await client.Session.createPause({ point: executionPoint }, sessionId);
 
     return response;
@@ -237,6 +240,10 @@ export class ReplayClient implements ReplayClientInterface {
     overflow: boolean;
   }> {
     const sessionId = this.getSessionIdThrows();
+
+    // Don't try to fetch messages in unloaded regions.
+    // The result might be invalid (and may get cached by a Suspense caller).
+    await this._waitForRangeToBeLoaded(focusRange);
 
     if (focusRange !== null) {
       const response = await client.Console.findMessagesInRange(
@@ -354,6 +361,10 @@ export class ReplayClient implements ReplayClientInterface {
   ): Promise<HitPointsAndStatusTuple> {
     const collectedHitPoints: TimeStampedPoint[] = [];
     let status: HitPointStatus | null = null;
+
+    // Don't try to fetch hit points in unloaded regions.
+    // The result might be invalid (and may get cached by a Suspense caller).
+    await this._waitForRangeToBeLoaded(focusRange);
 
     const locations = this.getCorrespondingLocations(location).map(location => ({ location }));
 
@@ -583,6 +594,10 @@ export class ReplayClient implements ReplayClientInterface {
   ): Promise<LineNumberToHitCountMap> {
     const sessionId = this.getSessionIdThrows();
 
+    // Don't try to fetch hit counts in unloaded regions.
+    // The result might be invalid (and may get cached by a Suspense caller).
+    await this._waitForRangeToBeLoaded(focusRange);
+
     // The protocol returns possible breakpoints for the entire source,
     // but for large sources this can result in "too many locations" to run hit counts.
     // To avoid this, we limit the number of lines we request hit count information for.
@@ -610,10 +625,6 @@ export class ReplayClient implements ReplayClientInterface {
     const correspondingSourceIds = this.getCorrespondingSourceIds(sourceId);
 
     const hitCounts: LineNumberToHitCountMap = new Map();
-
-    // Don't try to fetch hit counts in unloaded regions.
-    // The result might be invalid (and may get cached by a Suspense caller).
-    await this.waitForLoadedRegions(focusRange);
 
     await Promise.all(
       correspondingSourceIds.map(async sourceId => {
@@ -841,6 +852,10 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async runAnalysis<Result>(params: RunAnalysisParams): Promise<Result[]> {
+    // Don't try to run analysis in unloaded regions.
+    // The result might be invalid (and may get cached by a Suspense caller).
+    await this._waitForRangeToBeLoaded(params.range || null);
+
     return new Promise<Result[]>(async (resolve, reject) => {
       const results: Result[] = [];
 
@@ -855,10 +870,6 @@ export class ReplayClient implements ReplayClientInterface {
         ...rest,
         locations,
       };
-
-      // Don't try to run analysis in unloaded regions.
-      // The result might be invalid (and may get cached by a Suspense caller).
-      await this.waitForLoadedRegions(params.range || null);
 
       try {
         await analysisManager.runAnalysis(analysisParams, {
@@ -938,16 +949,38 @@ export class ReplayClient implements ReplayClientInterface {
     }
   }
 
-  async waitForLoadedRegions(focusRange: TimeStampedPointRange | PointRange | null): Promise<void> {
+  async _waitForPointToBeLoaded(point: ExecutionPoint): Promise<void> {
+    return new Promise(resolve => {
+      const checkLoaded = () => {
+        const loadedRegions = this.loadedRegions;
+        let isLoaded = false;
+        if (loadedRegions !== null) {
+          isLoaded = isPointInRegions(point, loadedRegions.loaded);
+        }
+
+        if (isLoaded) {
+          resolve();
+
+          this.removeEventListener("loadedRegionsChange", checkLoaded);
+        }
+      };
+
+      this.addEventListener("loadedRegionsChange", checkLoaded);
+
+      checkLoaded();
+    });
+  }
+
+  async _waitForRangeToBeLoaded(
+    focusRange: TimeStampedPointRange | PointRange | null
+  ): Promise<void> {
     return new Promise(resolve => {
       const checkLoaded = () => {
         const loadedRegions = this.loadedRegions;
         let isLoaded = false;
         if (loadedRegions !== null) {
           if (focusRange !== null) {
-            const pointRange = toPointRange(focusRange);
-
-            isLoaded = isRangeInRegions(pointRange.begin, pointRange.end, loadedRegions.loaded);
+            isLoaded = isRangeInRegions(focusRange, loadedRegions.loaded);
           } else {
             isLoaded =
               loadedRegions.loaded.length > 0 &&
@@ -960,8 +993,6 @@ export class ReplayClient implements ReplayClientInterface {
 
           this.removeEventListener("loadedRegionsChange", checkLoaded);
         }
-
-        return isLoaded;
       };
 
       this.addEventListener("loadedRegionsChange", checkLoaded);

@@ -1,18 +1,56 @@
 import { ExecutionPoint, PointRange, TimeStampedPointRange } from "@replayio/protocol";
 
 export function isRangeInRegions(
-  startPoint: ExecutionPoint,
-  endPoint: ExecutionPoint,
+  range: TimeStampedPointRange | PointRange,
   regions: TimeStampedPointRange[]
 ): boolean {
-  const startPointNumber = BigInt(startPoint);
-  const endPointNumber = BigInt(endPoint);
-  return (
+  let beginPointBigInt: BigInt | null = null;
+  let beginTime: number | null = null;
+  let endPointBigInt: BigInt | null = null;
+  let endTime: number | null = null;
+
+  if (isTimeStampedPointRange(range)) {
+    beginPointBigInt = BigInt(range.begin.point);
+    beginTime = range.begin.time;
+    endPointBigInt = BigInt(range.end.point);
+    endTime = range.end.time;
+  } else {
+    beginPointBigInt = BigInt(range.begin);
+    endPointBigInt = BigInt(range.end);
+  }
+
+  if (
+    beginPointBigInt !== null &&
+    endPointBigInt !== null &&
     regions.find(
       ({ begin, end }) =>
-        startPointNumber >= BigInt(begin.point) && endPointNumber <= BigInt(end.point)
-    ) != null
-  );
+        beginPointBigInt! >= BigInt(begin.point) && endPointBigInt! <= BigInt(end.point)
+    ) == null
+  ) {
+    console.log(
+      `Point range not loaded:\n  begin: ${beginPointBigInt}\n  end: ${endPointBigInt}\n  loaded:`,
+      JSON.stringify(regions, null, 2)
+    );
+    // No loaded regions contain this range of points.
+    return false;
+  }
+
+  if (
+    beginTime !== null &&
+    endTime !== null &&
+    regions.find(
+      ({ begin, end }) => beginTime! >= BigInt(begin.time) && endTime! <= BigInt(end.time)
+    ) == null
+  ) {
+    console.log(
+      `Time range not loaded:\n  begin: ${beginTime}\n  end: ${endTime}\n  loaded:`,
+      JSON.stringify(regions, null, 2)
+    );
+    // No loaded regions contain this range of times.
+    return false;
+  }
+
+  return true;
 }
 
 export function isPointInRegions(point: ExecutionPoint, regions: TimeStampedPointRange[]): boolean {
@@ -26,6 +64,14 @@ export function isPointInRegions(point: ExecutionPoint, regions: TimeStampedPoin
 
 export function isPointRange(range: TimeStampedPointRange | PointRange): range is PointRange {
   return typeof range.begin === "string";
+}
+
+export function isTimeStampedPointRange(
+  range: TimeStampedPointRange | PointRange
+): range is TimeStampedPointRange {
+  return (
+    typeof range.begin === "object" && range.begin !== null && typeof range.begin.point === "string"
+  );
 }
 
 export function isTimeInRegions(time: number, regions: TimeStampedPointRange[]) {
