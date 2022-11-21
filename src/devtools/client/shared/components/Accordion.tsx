@@ -2,42 +2,36 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-"use strict";
+import React from "react";
 
-const { Component, createElement } = require("react");
-const PropTypes = require("prop-types");
-const { ul, li, h2, div, span } = require("react-dom-factories");
+interface AccordionItem {
+  buttons: React.ReactNode[];
+  className: string;
+  component: React.ComponentType<any>;
+  componentProps: Record<string, unknown>;
+  contentClassName: string;
+  header: string;
+  id: string;
+  onToggle: () => void;
+  opened: boolean;
+}
 
-class Accordion extends Component {
-  static get propTypes() {
-    return {
-      style: PropTypes.object,
-      // A list of all items to be rendered using an Accordion component.
-      items: PropTypes.arrayOf(
-        PropTypes.shape({
-          buttons: PropTypes.arrayOf(PropTypes.object),
-          className: PropTypes.string,
-          // Note: This used to only be PropTypes.object, but functions appear
-          // as well when the component is a factory, e.g. BoxModel in
-          // LayoutApp.js. So, this is relaxed, but maybe that's not the right
-          // thing to do. This react stuff is all rather mysterious.
-          component: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
-          componentProps: PropTypes.object,
-          contentClassName: PropTypes.string,
-          header: PropTypes.string.isRequired,
-          id: PropTypes.string.isRequired,
-          onToggle: PropTypes.func,
-          opened: PropTypes.bool.isRequired,
-        })
-      ).isRequired,
-    };
-  }
+interface AccordionProps {
+  style: React.CSSProperties;
+  items: AccordionItem[];
+}
 
+interface AccordionState {
+  opened: Record<string, boolean>;
+  everOpened: Record<string, boolean>;
+}
+
+class Accordion extends React.Component<AccordionProps, AccordionState> {
   /**
    * Add initial data to the state.opened map, and inject new data
    * when receiving updated props.
    */
-  static getDerivedStateFromProps(props, state) {
+  static getDerivedStateFromProps(props: AccordionProps, state: AccordionState) {
     const newItems = props.items.filter(({ id }) => typeof state.opened[id] !== "boolean");
 
     if (newItems.length) {
@@ -53,46 +47,40 @@ class Accordion extends Component {
     return null;
   }
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      opened: {},
-    };
-
-    this.onHeaderClick = this.onHeaderClick.bind(this);
-    this.onHeaderKeyDown = this.onHeaderKeyDown.bind(this);
-  }
+  state: AccordionState = {
+    opened: {},
+    everOpened: {},
+  };
 
   /**
    * @param {Event} event Click event.
    */
-  onHeaderClick(event) {
+  onHeaderClick = (event: React.MouseEvent) => {
     event.preventDefault();
     // In the Browser Toolbox's Inspector/Layout view, handleHeaderClick is
     // called twice unless we call stopPropagation, making the accordion item
     // open-and-close or close-and-open
     event.stopPropagation();
-    this.toggleItem(event.currentTarget.parentElement.id);
-  }
+    this.toggleItem(event.currentTarget.parentElement!.id);
+  };
 
   /**
    * @param {Event} event Keyboard event.
    * @param {Object} item The item to be collapsed/expanded.
    */
-  onHeaderKeyDown(event) {
+  onHeaderKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === " " || event.key === "Enter") {
       event.preventDefault();
-      this.toggleItem(event.currentTarget.parentElement.id);
+      this.toggleItem(event.currentTarget.parentElement!.id);
     }
-  }
+  };
 
   /**
    * Expand or collapse an accordion list item.
    * @param  {String} id Id of the item to be collapsed or expanded.
    */
-  toggleItem(id) {
-    const item = this.props.items.find(x => x.id === id);
+  toggleItem(id: string) {
+    const item = this.props.items.find((x: AccordionItem) => x.id === id);
     const opened = !this.state.opened[id];
     // We could have no item if props just changed
     if (!item) {
@@ -115,11 +103,11 @@ class Accordion extends Component {
     }
   }
 
-  renderItem(item) {
+  renderItem(item: AccordionItem) {
     const {
       buttons,
       className = "",
-      component,
+      component: ItemComponent,
       componentProps = {},
       contentClassName = "",
       header,
@@ -133,72 +121,57 @@ class Accordion extends Component {
     // before. This saves us rendering complex components when users are keeping
     // them closed (e.g. in Inspector/Layout) or may not open them at all.
     if (this.state.everOpened[id]) {
-      if (typeof component === "function") {
-        itemContent = createElement(component, componentProps);
-      } else if (typeof component === "object") {
-        itemContent = component;
+      if (typeof ItemComponent === "function") {
+        itemContent = <ItemComponent {...componentProps} />;
+      } else if (typeof ItemComponent === "object") {
+        itemContent = ItemComponent;
       }
     }
 
-    return li(
-      {
-        key: id,
-        id,
-        className: `accordion-item ${className}`.trim(),
-        "aria-labelledby": headerId,
-      },
-      h2(
-        {
-          id: headerId,
-          className: "accordion-header",
-          tabIndex: 0,
-          "aria-expanded": opened,
+    return (
+      <li
+        key={id}
+        id={id}
+        className={`accordion-item ${className}`.trim()}
+        aria-labelledby={headerId}
+      >
+        <h2
+          id={headerId}
+          className="accordion-header"
+          tabIndex={0}
+          aria-expanded={opened}
           // If the header contains buttons, make sure the heading name only
           // contains the "header" text and not the button text
-          "aria-label": header,
-          onKeyDown: this.onHeaderKeyDown,
-          onClick: this.onHeaderClick,
-        },
-        span({
-          className: `theme-twisty${opened ? " open" : ""}`,
-          role: "presentation",
-        }),
-        span(
-          {
-            className: "accordion-header-label",
-          },
-          header
-        ),
-        buttons &&
-          span(
-            {
-              className: "accordion-header-buttons",
-              role: "presentation",
-            },
-            buttons
-          )
-      ),
-      div(
-        {
-          className: `accordion-content ${contentClassName}`.trim(),
-          hidden: !opened,
-          role: "presentation",
-        },
-        itemContent
-      )
+          aria-label={header}
+          onKeyDown={this.onHeaderKeyDown}
+          onClick={this.onHeaderClick}
+        >
+          <span className={`theme-twisty${opened ? " open" : ""}`} role="presentation" />
+          <span className="accordion-header-label">{header}</span>
+          {buttons && (
+            <span className="accordion-header-buttons" role="presentation">
+              {buttons}
+            </span>
+          )}
+        </h2>
+        <div
+          className={`accordion-content ${contentClassName}`.trim()}
+          hidden={!opened}
+          role="presentation"
+        >
+          {itemContent}
+        </div>
+      </li>
     );
   }
 
   render() {
-    return ul(
-      {
-        className: "accordion",
-        style: this.props.style,
-        tabIndex: -1,
-      },
-      this.props.items.map(item => this.renderItem(item))
+    return (
+      <ul className="accordion" style={this.props.style} tabIndex={-1}>
+        {this.props.items.map((item: AccordionItem) => this.renderItem(item))}
+      </ul>
     );
   }
 }
 
-module.exports = Accordion;
+export default Accordion;
