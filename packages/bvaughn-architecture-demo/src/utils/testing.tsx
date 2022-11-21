@@ -222,7 +222,6 @@ export function createMockReplayClient() {
     searchFunctions: jest.fn().mockImplementation(async () => {}),
     searchSources: jest.fn().mockImplementation(async () => {}),
     streamSourceContents: jest.fn().mockImplementation(async () => {}),
-    waitForLoadedRegions: jest.fn().mockImplementation(async () => undefined),
     waitForLoadedSources: jest.fn().mockImplementation(async () => undefined),
   };
 }
