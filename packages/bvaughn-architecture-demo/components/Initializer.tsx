@@ -73,6 +73,7 @@ export default function Initializer({
           sessionId,
           refetchUser: () => {},
           trackEvent: () => {},
+          trackEventOnce: () => {},
         });
       };
 

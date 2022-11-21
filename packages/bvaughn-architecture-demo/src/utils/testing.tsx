@@ -41,6 +41,7 @@ export async function render(
     sessionId: "fakeSessionId",
     refetchUser: () => {},
     trackEvent: () => {},
+    trackEventOnce: () => {},
     ...options?.sessionContext,
   };
 

@@ -3,6 +3,7 @@ import debounce from "lodash/debounce";
 import { MouseEvent, Suspense, useContext, useLayoutEffect, useRef, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 
+import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
 import {
   StreamingSourceContents,
   getStreamingSourceContentsSuspense,
@@ -84,6 +85,7 @@ function SourceRenderer({
   streamingParser: StreamingParser;
   streamingSourceContents: StreamingSourceContents;
 }) {
+  const { trackEventOnce } = useContext(SessionContext);
   const [hoveredState, setHoveredState] = useState<HoveredState | null>(null);
 
   useLayoutEffect(
@@ -96,6 +98,11 @@ function SourceRenderer({
   );
 
   const sourceRef = useRef<HTMLDivElement>(null);
+
+  const trackMouseHover = () => {
+    // Analytics for onboarding
+    trackEventOnce("editor.mouse_over");
+  };
 
   const onMouseMove = (event: MouseEvent) => {
     const { clientX, clientY, defaultPrevented, target } = event;
@@ -146,6 +153,7 @@ function SourceRenderer({
       className={styles.Source}
       data-test-id={`Source-${source.sourceId}`}
       data-test-name="Source"
+      onMouseEnter={trackMouseHover}
     >
       <div className={styles.SourceList} onMouseMove={onMouseMove} ref={sourceRef}>
         <AutoSizer>
