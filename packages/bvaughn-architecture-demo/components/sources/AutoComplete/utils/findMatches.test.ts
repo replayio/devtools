@@ -77,4 +77,15 @@ describe("findMatches", () => {
       findMatches("foo", "bar", null, createPropertiesFromNames("bbaaarr", "abarr", "cbar"))
     ).toEqual(["cbar", "abarr", "bbaaarr"]);
   });
+
+  it("should escape special characters", () => {
+    expect(
+      findMatches(
+        null,
+        "fb(",
+        null,
+        createPropertiesFromNames("fooBar()", "fooBarBaz()", "barBaz()")
+      )
+    ).toEqual(["fooBar()", "fooBarBaz()"]);
+  });
 });

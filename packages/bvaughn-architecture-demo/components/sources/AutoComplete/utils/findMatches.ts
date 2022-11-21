@@ -77,11 +77,18 @@ function findMatches(
 ): Match[] {
   const matches: Match[] = [];
 
+  const needleRegExp = new RegExp(
+    needle.replace(/./g, char =>
+      /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/.test(char) ? `\\${char}.*` : `${char}.*`
+    ),
+    "i"
+  );
+
   if (scopes) {
     scopes.forEach(scope => {
       scope.bindings?.forEach(({ name }) => {
-        const weight = getMatchWeight(name, needle);
-        if (weight > 0) {
+        if (name.match(needleRegExp) !== null) {
+          const weight = getMatchWeight(name, needle);
           const match: Match = { text: name, weight };
           if (findIndexMatch(matches, match) < 0) {
             insertMatch(matches, match);
@@ -93,8 +100,8 @@ function findMatches(
 
   if (properties) {
     properties.forEach(({ name }) => {
-      const weight = getMatchWeight(name, needle);
-      if (weight > 0) {
+      if (name.match(needleRegExp) !== null) {
+        const weight = getMatchWeight(name, needle);
         const match: Match = { text: name, weight };
         if (findIndexMatch(matches, match) < 0) {
           insertMatch(matches, match);
@@ -107,13 +114,16 @@ function findMatches(
 }
 
 function getMatchWeight(text: string, needle: string): number {
+  needle = needle.toLowerCase();
+  text = text.toLowerCase();
+
   let needleIndex = 0;
   let prevMatchingTextIndex = -1;
   let weight = 0;
   for (let textIndex = 0; textIndex < text.length; textIndex++) {
     const textCharacter = text.charAt(textIndex);
     const needleCharacter = needle.charAt(needleIndex);
-    if (textCharacter.localeCompare(needleCharacter, undefined, { sensitivity: "accent" }) === 0) {
+    if (textCharacter === needleCharacter) {
       weight += calculateCharacterProximityWeight(textIndex - prevMatchingTextIndex);
       weight += calculateCharacterIndexWeight(textIndex);
 
@@ -122,9 +132,9 @@ function getMatchWeight(text: string, needle: string): number {
       if (needleIndex === needle.length) {
         return weight;
       }
-    }
 
-    prevMatchingTextIndex = textIndex;
+      prevMatchingTextIndex = textIndex;
+    }
   }
 
   return 0;

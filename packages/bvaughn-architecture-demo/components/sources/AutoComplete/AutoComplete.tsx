@@ -202,21 +202,19 @@ export default function AutoComplete({
         ref={contentEditableRef}
         tabIndex={0}
       />
-      {expression && (
-        <Suspense>
-          <AutoCompleteList
-            cursorClientX={cursorClientX}
-            dataTestId={dataTestId ? `${dataTestId}-List` : undefined}
-            dataTestName={dataTestName ? `${dataTestName}-List` : undefined}
-            expression={expression}
-            inputRef={contentEditableRef}
-            onCancel={() => {
-              /* no-op */
-            }}
-            onSubmit={onSubmit}
-          />
-        </Suspense>
-      )}
+      <Suspense>
+        <AutoCompleteList
+          cursorClientX={cursorClientX}
+          dataTestId={dataTestId ? `${dataTestId}-List` : undefined}
+          dataTestName={dataTestName ? `${dataTestName}-List` : undefined}
+          expression={expression}
+          inputRef={contentEditableRef}
+          onCancel={() => {
+            /* no-op */
+          }}
+          onSubmit={onSubmit}
+        />
+      </Suspense>
     </>
   );
 }

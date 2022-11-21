@@ -174,6 +174,10 @@ export default function AutoCompleteListOuter({
     selectedIndex,
   };
 
+  if (matches === null) {
+    return null;
+  }
+
   return (
     <Popup
       clientX={cursorClientX}
