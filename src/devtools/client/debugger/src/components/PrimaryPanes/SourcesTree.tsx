@@ -38,7 +38,7 @@ import {
   updateTree,
 } from "../../utils/sources-tree";
 import { TreeDirectory, TreeNode, TreeSource } from "../../utils/sources-tree/types";
-import ManagedTree from "../shared/ManagedTree";
+import ManagedTree, { ManagedTreeProps } from "../shared/ManagedTree";
 // Components
 import SourcesTreeItem from "./SourcesTreeItem";
 
@@ -150,18 +150,18 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
     }
   }
 
-  selectItem = (item: TreeNode) => {
-    if (item.type == "source" && !Array.isArray(item.contents)) {
+  selectItem = (item: TreeNode | undefined) => {
+    if (item && item.type == "source" && !Array.isArray(item.contents)) {
       trackEvent("source_explorer.select_source");
       this.props.selectSource(this.props.cx, item.contents.id);
     }
   };
 
-  onFocus = (item: TreeNode) => {
+  onFocus = (item: TreeNode | undefined) => {
     this.props.focusItem(item);
   };
 
-  onActivate = (item: TreeNode) => {
+  onActivate = (item: TreeNode | undefined) => {
     this.selectItem(item);
   };
 
@@ -207,11 +207,11 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
   }
 
   getRoots = (sourceTree: TreeNode) => {
-    return sourceTree.contents;
+    return sourceTree.contents as TreeNode[];
   };
 
   getChildren = (item: TreeNode) => {
-    return nodeHasChildren(item) ? item.contents : [];
+    return nodeHasChildren(item) ? (item.contents as TreeNode[]) : [];
   };
 
   renderItem = (
@@ -220,7 +220,7 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
     focused: boolean,
     _: any,
     expanded: boolean,
-    { setExpanded }: { setExpanded: () => void }
+    { setExpanded }: { setExpanded: (item: TreeNode) => void }
   ) => {
     return (
       <SourcesTreeItem
@@ -243,28 +243,27 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
 
     const { highlightItems, listItems, parentMap, sourceTree } = this.state;
 
-    const treeProps = {
-      autoExpandAll: false,
-      autoExpandDepth: 1,
-      expanded,
-      focused,
-      getChildren: this.getChildren,
-      getParent: (item: TreeNode) => parentMap.get(item),
-      getPath: this.getPath,
-      getRoots: () => this.getRoots(sourceTree),
-      highlightItems,
-      itemHeight: 21,
-      key: this.isEmpty() ? "empty" : "full",
-      listItems,
-      onCollapse: this.onCollapse,
-      onExpand: this.onExpand,
-      onFocus: this.onFocus,
-      onActivate: this.onActivate,
-      renderItem: this.renderItem,
-      preventBlur: true,
-    };
-
-    return <ManagedTree {...treeProps} />;
+    return (
+      <ManagedTree<TreeNode>
+        autoExpandAll={false}
+        autoExpandDepth={1}
+        expanded={expanded}
+        focused={focused as any}
+        getChildren={this.getChildren}
+        getParent={(item: TreeNode) => parentMap.get(item)}
+        getPath={this.getPath}
+        getRoots={() => this.getRoots(sourceTree)}
+        highlightItems={highlightItems}
+        key={this.isEmpty() ? "empty" : "full"}
+        listItems={listItems}
+        onCollapse={this.onCollapse}
+        onExpand={this.onExpand}
+        onFocus={this.onFocus}
+        onActivate={this.onActivate}
+        renderItem={this.renderItem}
+        preventBlur={true}
+      />
+    );
   }
 
   render() {
