@@ -12,7 +12,7 @@ interface AccordionItem {
   contentClassName: string;
   header: string;
   id: string;
-  onToggle: () => void;
+  onToggle: (opened: boolean) => void;
   opened: boolean;
 }
 
