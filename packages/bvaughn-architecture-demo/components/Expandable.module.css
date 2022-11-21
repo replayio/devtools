@@ -23,7 +23,7 @@
   width: 1em;
   height: 1em;
   margin-right: 0.5ch;
-  display: inline-block;
+  display: inline-flex;
 }
 .ArrowExpanded {
   transform: rotate(90deg);

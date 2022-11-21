@@ -100,7 +100,6 @@ function LocationRow({
     >
       <Expandable
         children={null}
-        className={styles.Expandable}
         defaultOpen={!isCollapsed}
         header={
           <>

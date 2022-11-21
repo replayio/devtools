@@ -61,7 +61,3 @@
   color: var(--color-dim);
   font-size: var(--font-size-small);
 }
-
-.Expandable {
-  display: block;
-}
