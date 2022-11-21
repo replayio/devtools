@@ -79,6 +79,7 @@ function NewSourceAdapter() {
           const input = sourceSearchInputRef.current;
           if (input) {
             input.focus();
+            input.select();
           }
 
           event.preventDefault();

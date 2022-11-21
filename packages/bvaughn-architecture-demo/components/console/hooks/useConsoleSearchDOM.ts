@@ -75,6 +75,7 @@ export default function useConsoleSearchDOM(
         const searchInput = searchInputRef.current;
         if (searchInput) {
           searchInput.focus();
+          searchInput.select();
         }
       },
     }),
