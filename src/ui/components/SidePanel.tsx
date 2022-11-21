@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import TestInfo from "devtools/client/debugger/src/components/TestInfo/TestInfo";
 import Events from "ui/components/Events";
+import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
 import Icon from "ui/components/shared/Icon";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
@@ -100,6 +101,7 @@ export default function SidePanel() {
       {selectedPrimaryPanel === "comments" && <CommentCardsList />}
       {selectedPrimaryPanel === "events" && <Accordion items={items} />}
       {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
+      {selectedPrimaryPanel === "search" && <SearchFilesReduxAdapter />}
     </div>
   );
 }

@@ -160,7 +160,12 @@ class _ThreadFront {
   private allSourcesWaiter = defer<void>();
   hasAllSources = false;
 
+  // The following group fo methods is injected by the legacy devtools client.
+  // By default, they are essentially no-ops (safe to call but useless).
+  // They require information from the application's Redux state to be useful.
   getCorrespondingSourceIds = (sourceId: SourceId) => [sourceId];
+  isOriginalSource = (_: SourceId) => false;
+  isPrettyPrintedSource = (_: SourceId) => false;
 
   // Map sourceId to breakpoint positions.
   breakpointPositions = new Map<string, Promise<SameLineSourceLocations[]>>();

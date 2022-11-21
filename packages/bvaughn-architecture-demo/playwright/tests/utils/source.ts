@@ -494,18 +494,6 @@ export async function isContinueToPreviousButtonEnabled(
   return isContinueToButtonEnabled(page, { direction: "previous", lineNumber, sourceId });
 }
 
-export async function isLineCurrentExecutionPoint(
-  page: Page,
-  lineNumber: number
-): Promise<boolean> {
-  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
-  const currentHighlight = lineLocator.locator(
-    '[data-test-name="CurrentExecutionPointLineHighlight"]'
-  );
-  const isVisible = await currentHighlight.isVisible();
-  return isVisible;
-}
-
 export async function isLineCurrentSearchResult(page: Page, lineNumber: number): Promise<boolean> {
   const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
   const currentHighlight = lineLocator.locator('[data-test-name="CurrentSearchResultHighlight"]');
@@ -662,6 +650,64 @@ export async function toggleLogPointBadge(
   }
 
   await stopHovering(page);
+}
+
+export async function verifyCurrentExecutionPoint(
+  page: Page,
+  fileName: string,
+  lineNumber: number,
+  expected: boolean = true
+) {
+  const selectedSourceTab = page.locator(
+    `[data-test-id^="SourceTab-"][data-test-state="selected"]`
+  );
+  await expect(await selectedSourceTab.textContent()).toBe(fileName);
+
+  await waitFor(async () => {
+    const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+    const currentHighlight = lineLocator.locator(
+      '[data-test-name="CurrentExecutionPointLineHighlight"]'
+    );
+    const isVisible = await currentHighlight.isVisible();
+    if (isVisible !== expected) {
+      throw new Error(`Expected line ${lineNumber} to be the current execution point`);
+    }
+  });
+}
+
+export async function verifyCurrentSearchResult(
+  page: Page,
+  options: {
+    fileName?: string;
+    lineNumber: number;
+    sourceId?: string;
+  },
+  expected: boolean = true
+) {
+  const { fileName, lineNumber, sourceId } = options;
+
+  if (fileName != null) {
+    const selectedSourceTab = page.locator(
+      `[data-test-id^="SourceTab-"][data-test-state="selected"]`
+    );
+    await expect(await selectedSourceTab.textContent()).toBe(fileName);
+  } else if (sourceId != null) {
+    const selectedSourceTab = page.locator(
+      `[data-test-id^="SourceTab-${sourceId}"][data-test-state="selected"]`
+    );
+    await expect(await selectedSourceTab.isVisible()).toBe(true);
+  } else {
+    throw `Must specify either a file name or source id`;
+  }
+
+  await waitFor(async () => {
+    const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+    const currentHighlight = lineLocator.locator('[data-test-name="CurrentSearchResultHighlight"]');
+    const isVisible = await currentHighlight.isVisible();
+    if (isVisible !== expected) {
+      throw new Error(`Expected line ${lineNumber} to be the current search result`);
+    }
+  });
 }
 
 export async function verifyHitPointButtonsEnabled(

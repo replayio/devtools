@@ -212,6 +212,8 @@ export function createMockReplayClient() {
     getSessionId: jest.fn().mockImplementation(async () => "fake-session-id"),
     getSourceHitCounts: jest.fn().mockImplementation(async () => new Map()),
     initialize: jest.fn().mockImplementation(async () => {}),
+    isOriginalSource: jest.fn().mockImplementation(async () => false),
+    isPrettyPrintedSource: jest.fn().mockImplementation(async () => false),
     loadRegion: jest.fn().mockImplementation(async () => {}),
     removeEventListener: jest.fn(),
     repaintGraphics: jest.fn().mockImplementation(async () => {}),

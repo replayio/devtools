@@ -1,0 +1,26 @@
+.ResultsCount,
+.ResultsCountPending {
+  flex: 0 0 auto;
+  color: var(--color-dim);
+  font-size: var(--font-size-small);
+  user-select: none;
+}
+.ResultsCountPending {
+  opacity: 0.5;
+}
+
+.SpinnerIcon {
+  color: var(--color-dim);
+  width: 1em;
+  height: 1em;
+  animation: 1s spin linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+}

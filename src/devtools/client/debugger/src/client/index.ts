@@ -4,7 +4,7 @@
 
 import { Frame } from "@replayio/protocol";
 
-import { getSourcesHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { getSourcesAsync } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import type { ThreadFront as TF } from "protocol/thread";
 import { ReplayClientInterface } from "shared/client/types";
 import type { UIStore } from "ui/actions";
@@ -16,7 +16,7 @@ import { verifyPrefSchema } from "../utils/prefs";
 let store: UIStore;
 
 async function setupDebugger(ThreadFront: typeof TF, replayClient: ReplayClientInterface) {
-  const sources = await getSourcesHelper(replayClient);
+  const sources = await getSourcesAsync(replayClient);
 
   store.dispatch(allSourcesReceived(sources));
 }

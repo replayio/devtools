@@ -1,4 +1,9 @@
-import { SourceId, sourceContentsChunk, sourceContentsInfo } from "@replayio/protocol";
+import {
+  SearchSourceContentsMatch,
+  SourceId,
+  sourceContentsChunk,
+  sourceContentsInfo,
+} from "@replayio/protocol";
 
 import createRecorder, { RecorderAPI } from "shared/proxy/createRecorder";
 import { Entry } from "shared/proxy/types";
@@ -56,6 +61,24 @@ export default function createReplayClientRecorder(
     return args;
   }
 
+  async function searchSources(
+    options: { query: string; sourceIds: SourceId[] },
+    onMatches: (matches: SearchSourceContentsMatch[]) => void
+  ) {
+    const recorderAPI = arguments[arguments.length - 1] as RecorderAPI;
+    const flushRecord = recorderAPI.holdUntil();
+
+    const onMatchesWrapper = (matches: SearchSourceContentsMatch[]) => {
+      recorderAPI.callParamWithArgs(1, matches);
+      onMatches(matches);
+    };
+
+    await replayClient.searchSources(options, onMatchesWrapper);
+
+    // Let the Proxy know that all events are complete and it's safe to write the entry.
+    flushRecord();
+  }
+
   async function streamSourceContents(
     sourceId: SourceId,
     onSourceContentsInfo: (params: sourceContentsInfo) => void,
@@ -67,12 +90,6 @@ export default function createReplayClientRecorder(
     const onSourceContentsChunkWrapper = (params: sourceContentsChunk) => {
       recorderAPI.callParamWithArgs(2, params);
       onSourceContentsChunk(params);
-
-      // Events may be emitted after the streamSourceContents Promise has resolved because of throttling,
-      // so this call is necessary to let the Proxy know that it's safe to write the entry.
-      //
-      // We are assuming only one chunk per file because our e2e tests all use small source files.
-      flushRecord();
     };
 
     const onSourceContentsInfoWrapper = (params: sourceContentsInfo) => {
@@ -80,11 +97,14 @@ export default function createReplayClientRecorder(
       onSourceContentsInfo(params);
     };
 
-    return replayClient.streamSourceContents(
+    await replayClient.streamSourceContents(
       sourceId,
       onSourceContentsInfoWrapper,
       onSourceContentsChunkWrapper
     );
+
+    // This call is necessary to let the Proxy know that it's safe to write the entry.
+    flushRecord();
   }
 
   const [proxyReplayClient] = createRecorder<ReplayClientInterface>(replayClient, {
@@ -92,7 +112,7 @@ export default function createReplayClientRecorder(
     onAsyncRequestResolved,
     onEntriesChanged,
     sanitizeArgs,
-    overrides: { streamSourceContents },
+    overrides: { searchSources, streamSourceContents },
   });
 
   return proxyReplayClient;

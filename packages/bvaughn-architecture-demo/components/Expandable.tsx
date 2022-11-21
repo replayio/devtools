@@ -1,4 +1,11 @@
-import React, { KeyboardEvent, MouseEvent, ReactNode, useState, useTransition } from "react";
+import React, {
+  CSSProperties,
+  KeyboardEvent,
+  MouseEvent,
+  ReactNode,
+  useState,
+  useTransition,
+} from "react";
 
 import Icon from "./Icon";
 import LazyOffscreen from "./LazyOffscreen";
@@ -9,6 +16,7 @@ export type RenderChildrenFunction = () => ReactNode;
 function noopOnChange(value: boolean) {}
 
 export default function Expandable({
+  arrowClassName = "",
   children,
   childrenClassName = "",
   className = "",
@@ -16,8 +24,10 @@ export default function Expandable({
   header,
   headerClassName = "",
   onChange = noopOnChange,
+  style,
   useBlockLayoutWhenExpanded = true,
 }: {
+  arrowClassName?: string;
   children: ReactNode;
   childrenClassName?: string;
   className?: string;
@@ -25,6 +35,7 @@ export default function Expandable({
   header: ReactNode;
   headerClassName?: string;
   onChange?: (value: boolean) => void;
+  style?: CSSProperties;
   useBlockLayoutWhenExpanded?: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
@@ -67,6 +78,7 @@ export default function Expandable({
       } ${className}`}
       data-test-name="Expandable"
       data-test-state={isOpen ? "open" : "closed"}
+      style={style}
     >
       <span
         className={`${styles.ToggleButton} ${headerClassName}`}
@@ -76,7 +88,9 @@ export default function Expandable({
         role="button"
         tabIndex={0}
       >
-        <span className={isOpen ? styles.ArrowExpanded : styles.ArrowCollapsed}>
+        <span
+          className={`${isOpen ? styles.ArrowExpanded : styles.ArrowCollapsed} ${arrowClassName}`}
+        >
           <Icon className={styles.ArrowIcon} type="arrow" />
         </span>
         {header}

@@ -16,6 +16,7 @@ import Initializer from "bvaughn-architecture-demo/components/Initializer";
 import LazyOffscreen from "bvaughn-architecture-demo/components/LazyOffscreen";
 import Loader from "bvaughn-architecture-demo/components/Loader";
 import ProtocolViewer from "bvaughn-architecture-demo/components/protocol/ProtocolViewer";
+import SearchFiles from "bvaughn-architecture-demo/components/search-files/SearchFiles";
 import SourceExplorer from "bvaughn-architecture-demo/components/sources/SourceExplorer";
 import Sources from "bvaughn-architecture-demo/components/sources/Sources";
 import { FocusContextRoot } from "bvaughn-architecture-demo/src/contexts/FocusContext";
@@ -39,7 +40,7 @@ import styles from "./index.module.css";
 
 const recordData = hasFlag("record");
 
-type Panel = "comments" | "protocol-viewer" | "sources";
+type Panel = "comments" | "protocol-viewer" | "search" | "sources";
 
 export default function HomePage() {
   // TODO As we finalize the client implementation to interface with Replay backend,
@@ -86,6 +87,7 @@ export default function HomePage() {
                         <div className={styles.ToolBar}>
                           <button
                             className={panel === "comments" ? styles.TabSelected : styles.Tab}
+                            data-test-id="TabButton-Comments"
                             disabled={isPending}
                             onClick={() => setPanelTransition("comments")}
                           >
@@ -93,15 +95,25 @@ export default function HomePage() {
                           </button>
                           <button
                             className={panel === "sources" ? styles.TabSelected : styles.Tab}
+                            data-test-id="TabButton-Sources"
                             disabled={isPending}
                             onClick={() => setPanelTransition("sources")}
                           >
                             <Icon className={styles.TabIcon} type="source-explorer" />
                           </button>
                           <button
+                            className={panel === "search" ? styles.TabSelected : styles.Tab}
+                            data-test-id="TabButton-Search"
+                            disabled={isPending}
+                            onClick={() => setPanelTransition("search")}
+                          >
+                            <Icon className={styles.TabIcon} type="search" />
+                          </button>
+                          <button
                             className={
                               panel === "protocol-viewer" ? styles.TabSelected : styles.Tab
                             }
+                            data-test-id="TabButton-ProtocolViewer"
                             disabled={isPending}
                             onClick={() => setPanelTransition("protocol-viewer")}
                           >
@@ -115,6 +127,9 @@ export default function HomePage() {
                             </LazyOffscreen>
                             <LazyOffscreen mode={panel == "protocol-viewer" ? "visible" : "hidden"}>
                               <ProtocolViewer />
+                            </LazyOffscreen>
+                            <LazyOffscreen mode={panel == "search" ? "visible" : "hidden"}>
+                              <SearchFiles />
                             </LazyOffscreen>
                             <LazyOffscreen mode={panel == "sources" ? "visible" : "hidden"}>
                               <SourceExplorer />

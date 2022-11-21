@@ -1,9 +1,8 @@
-import { useDeferredValue, useMemo, useReducer } from "react";
+import { Ref, useDeferredValue, useLayoutEffect, useMemo, useReducer, useRef } from "react";
 
 const EMPTY_ARRAY: any[] = [];
 
 export type CachedScope<Item, Result, QueryData> = {
-  index: number;
   items: Item[];
   results: Result[];
   query: string;
@@ -11,6 +10,8 @@ export type CachedScope<Item, Result, QueryData> = {
 };
 
 export type ScopeId = string;
+
+export type OnChangeDispatching<Result> = (currentResult: Result | null) => void;
 
 export type SearchFunction<Item, Result, QueryData = never> = (
   query: string,
@@ -23,10 +24,6 @@ export type State<Item, Result, QueryData = never> = {
     [id: ScopeId]: CachedScope<Item, Result, QueryData>;
   };
   currentScopeId: ScopeId | null;
-
-  // UI did react to change in source state
-  // This is an escape hatch since e.g. scrolling is often async and imperative
-  pendingUpdateForScope: ScopeId | null;
 
   // Global state (applies to all scopes)
   // If individual cached scope is out of sync (e.g. with query) then it needs to be re-searched
@@ -44,18 +41,20 @@ export type Action<Item, Result, QueryData = never> =
   | { type: "disable" }
   | { type: "enable" }
   | { type: "increment"; by: number }
-  | { type: "markUpdateProcessed" }
   | { type: "updateCurrentScopeId"; scopeId: ScopeId | null }
   | { type: "updateItems"; items: Item[] }
   | { type: "updateQuery"; query: string; queryData: QueryData | null }
-  | { type: "updateResults"; index: number; results: Result[] };
+  | {
+      type: "updateResults";
+      index: number;
+      results: Result[];
+    };
 
 export type Actions<QueryData = never> = {
   disable: () => void;
   enable: () => void;
   goToNext: () => void;
   goToPrevious: () => void;
-  markUpdateProcessed: () => void;
   search: (query: string, queryData?: QueryData) => void;
 };
 
@@ -78,7 +77,7 @@ function reducer<Item, Result, QueryData = never>(
     }
     case "increment": {
       const { by } = action;
-      const { currentScopeId, index, results } = state;
+      const { index, results } = state;
 
       let newIndex = index;
       if (by > 0) {
@@ -87,31 +86,9 @@ function reducer<Item, Result, QueryData = never>(
         newIndex = index + by >= 0 ? index + by : results.length - 1;
       }
 
-      const cachedScopes = state.cachedScopes;
-      if (currentScopeId !== null) {
-        const currentScope = cachedScopes[currentScopeId];
-        if (currentScope != null && currentScope.index !== newIndex) {
-          return {
-            ...state,
-            cachedScopes: {
-              ...cachedScopes,
-              [currentScopeId]: {
-                ...currentScope,
-                index: newIndex,
-              },
-            },
-            pendingUpdateForScope: currentScopeId,
-            index: newIndex,
-          };
-        }
-      }
-
-      return state;
-    }
-    case "markUpdateProcessed": {
       return {
         ...state,
-        pendingUpdateForScope: null,
+        index: newIndex,
       };
     }
     case "updateCurrentScopeId": {
@@ -134,7 +111,6 @@ function reducer<Item, Result, QueryData = never>(
       let cachedScope = cachedScopes[scopeId];
       if (cachedScope == null) {
         cachedScope = {
-          index: -1,
           items: EMPTY_ARRAY,
           query: "",
           queryData: null,
@@ -149,8 +125,7 @@ function reducer<Item, Result, QueryData = never>(
           [scopeId]: cachedScope,
         },
         currentScopeId: scopeId,
-        index: cachedScope.index,
-        pendingUpdateForScope: null,
+        index: -1,
         results: cachedScope.results,
       };
     }
@@ -207,14 +182,12 @@ function reducer<Item, Result, QueryData = never>(
               ...cachedScopes,
               [currentScopeId]: {
                 ...currentScope,
-                index,
                 query,
                 queryData,
                 results,
               },
             },
             index,
-            pendingUpdateForScope: currentScopeId,
             results,
           };
         }
@@ -228,7 +201,8 @@ function reducer<Item, Result, QueryData = never>(
 export default function useSearch<Item, Result, QueryData = never>(
   items: Item[],
   stableSearch: SearchFunction<Item, Result, QueryData>,
-  scopeId?: ScopeId | null
+  scopeId?: ScopeId | null,
+  onChangeDispatching?: OnChangeDispatching<Result>
 ): [State<Item, Result, QueryData>, Actions<QueryData>] {
   if (scopeId == null) {
     scopeId = "default";
@@ -241,13 +215,21 @@ export default function useSearch<Item, Result, QueryData = never>(
     currentScopeId: null,
     enabled: false,
     index: -1,
-    pendingUpdateForScope: null,
     query: "",
     queryData: null,
     results: [],
   });
 
-  const { cachedScopes, currentScopeId, query, queryData } = state;
+  const onChangeDispatchingRef = useRef<OnChangeDispatching<Result> | null>(
+    onChangeDispatching || null
+  );
+  const stateRef = useRef<State<Item, Result, QueryData>>(state);
+  useLayoutEffect(() => {
+    onChangeDispatchingRef.current = onChangeDispatching || null;
+    stateRef.current = state;
+  });
+
+  const { cachedScopes, currentScopeId, index: prevIndex, query, queryData } = state;
 
   // Let React update search text at high priority and results at lower priority;
   // this keeps the search text input updating quick and feeling responsive to user input.
@@ -282,37 +264,64 @@ export default function useSearch<Item, Result, QueryData = never>(
       ? stableSearch(deferredQuery, items, deferredQueryData)
       : EMPTY_ARRAY;
 
-    let prevIndex = currentScope?.index ?? -1;
     let index = -1;
+    if (!scopeIdChanged) {
+      // Update the selected index based on the new results.
+      if (results.length > 0) {
+        const prevItem =
+          prevIndex >= 0 && prevIndex < prevResults.length ? prevResults[prevIndex] : null;
+        if (prevItem) {
+          index = results.indexOf(prevItem);
+        }
 
-    // Update the selected index based on the new results.
-    if (results.length > 0) {
-      const prevItem =
-        prevIndex >= 0 && prevIndex < prevResults.length ? prevResults[prevIndex] : null;
-      if (prevItem) {
-        index = results.indexOf(prevItem);
-      }
-
-      if (index < 0) {
-        index = 0;
+        if (index < 0) {
+          index = 0;
+        }
       }
     }
 
     dispatch({ type: "updateResults", index, results });
 
-    if (scopeIdChanged) {
-      // Don't schedule a pending update if results were updated as the result of a scope change.
-      dispatch({ type: "markUpdateProcessed" });
+    if (!scopeIdChanged) {
+      // Refine the selected result (within the current search) as a user types.
+      const onChangeDispatching = onChangeDispatchingRef.current;
+      if (onChangeDispatching) {
+        onChangeDispatching(results[index]);
+      }
     }
   }
 
   const actions = useMemo<Actions<QueryData>>(
     () => ({
-      disable: () => dispatch({ type: "disable" }),
+      disable: () => {
+        const onChangeDispatching = onChangeDispatchingRef.current;
+        if (onChangeDispatching) {
+          onChangeDispatching(null);
+        }
+
+        dispatch({ type: "disable" });
+      },
       enable: () => dispatch({ type: "enable" }),
-      markUpdateProcessed: () => dispatch({ type: "markUpdateProcessed" }),
-      goToNext: () => dispatch({ type: "increment", by: 1 }),
-      goToPrevious: () => dispatch({ type: "increment", by: -1 }),
+      goToNext: () => {
+        const onChangeDispatching = onChangeDispatchingRef.current;
+        if (onChangeDispatching) {
+          const { index, results } = stateRef.current;
+          const newIndex = index + 1 < results.length ? index + 1 : 0;
+          onChangeDispatching(results[newIndex] || null);
+        }
+
+        dispatch({ type: "increment", by: 1 });
+      },
+      goToPrevious: () => {
+        const onChangeDispatching = onChangeDispatchingRef.current;
+        if (onChangeDispatching) {
+          const { index, results } = stateRef.current;
+          const newIndex = index > 0 ? index - 1 : results.length - 1;
+          onChangeDispatching(results[newIndex] || null);
+        }
+
+        dispatch({ type: "increment", by: -1 });
+      },
       search: (query: string, queryData?: QueryData) =>
         dispatch({ type: "updateQuery", query, queryData: queryData || null }),
     }),

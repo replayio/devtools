@@ -3,7 +3,11 @@ import * as React from "react";
 
 import styles from "./Checkbox.module.css";
 
-export type CheckboxProps = { label?: React.ReactNode; addon?: React.ReactNode } & Pick<
+export type CheckboxProps = {
+  addon?: React.ReactNode;
+  dataTestId?: string;
+  label?: React.ReactNode;
+} & Pick<
   React.HTMLProps<HTMLInputElement>,
   "id" | "checked" | "className" | "disabled" | "onChange" | "title"
 >;
@@ -12,6 +16,7 @@ export function Checkbox({
   id,
   checked,
   className,
+  dataTestId,
   disabled,
   label,
   addon,
@@ -21,7 +26,12 @@ export function Checkbox({
 }: CheckboxProps) {
   const generatedId = React.useId();
   const parsedId = id || generatedId;
+
+  const checkboxDataTestId = dataTestId ? `${dataTestId}-Checkbox` : undefined;
+  const labelDataTestId = dataTestId ? `${dataTestId}-Label` : undefined;
+
   const checkboxProps = {
+    "data-test-id": checkboxDataTestId,
     disabled,
     id,
     checked,
@@ -32,7 +42,7 @@ export function Checkbox({
   return label ? (
     <div className={classNames(styles.Container, className)} {...props}>
       <input {...checkboxProps} id={parsedId} className={styles.Input} />
-      <label htmlFor={parsedId} className={styles.Label}>
+      <label data-test-id={labelDataTestId} htmlFor={parsedId} className={styles.Label}>
         {label}
       </label>
       {addon}

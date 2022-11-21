@@ -1,0 +1,58 @@
+.SearchFiles {
+  height: 100%;
+  border-radius: 0.5em;
+  background-color: var(--background-color-contrast-2);
+  padding: 0.5em 0;
+}
+
+.Checkbox {
+  flex: 0 0 auto;
+  margin: 0.5em;
+}
+
+.Content {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  overflow-x: hidden;
+}
+
+.InputWrapper {
+  height: 2em;
+  display: flex;
+  align-items: center;
+  padding: 0.5em;
+  margin: 0 0.5em;
+  background-color: var(--background-color-inputs);
+  border: 2px solid transparent;
+  border-radius: 0.5em;
+}
+.InputWrapper:focus-within {
+  border-color: var(--color-brand);
+}
+
+.Icon {
+  flex: 0 0 2em;
+  width: 2em;
+  height: 2em;
+  padding: 0.25em;
+  display: inline-block;
+  color: var(--color-dim);
+}
+
+.Input {
+  min-width: 0;
+  flex: 1 1 auto;
+  background: none;
+  color: var(--color-default);
+  font-size: var(--font-size-regular);
+
+  /* Override overly-specific style from legacy app */
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+  margin: 0;
+  padding: 0;
+}

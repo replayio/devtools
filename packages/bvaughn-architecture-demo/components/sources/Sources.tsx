@@ -122,6 +122,7 @@ function Sources() {
                 key={sourceId}
                 className={sourceId === focusedSourceId ? styles.SelectedTab : styles.Tab}
                 data-test-id={`SourceTab-${sourceId}`}
+                data-test-state={sourceId === focusedSourceId ? "selected" : "unselected"}
                 onClick={onOpenButtonClick}
               >
                 <button className={styles.OpenButton} onClick={onOpenButtonClick}>

@@ -1,4 +1,4 @@
-import { loadedRegions as LoadedRegions, Location } from "@replayio/protocol";
+import { loadedRegions as LoadedRegions, Location, SourceId } from "@replayio/protocol";
 
 import { preCacheExecutionPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
@@ -12,7 +12,12 @@ import { getUserSettings } from "ui/hooks/settings";
 import { getUserInfo } from "ui/hooks/users";
 import { getTheme, initialAppState } from "ui/reducers/app";
 import { syncInitialLayoutState } from "ui/reducers/layout";
-import { getCorrespondingSourceIds } from "ui/reducers/sources";
+import {
+  getCorrespondingSourceIds,
+  getSourceDetails,
+  isOriginalSource,
+  isPrettyPrintedSource,
+} from "ui/reducers/sources";
 import { ReplaySession, getReplaySession } from "ui/setup/prefs";
 import type { LayoutState } from "ui/state/layout";
 import { Recording } from "ui/types";
@@ -134,8 +139,16 @@ export async function bootstrapApp() {
     (locations: Location[]) => getPreferredLocation(locations) || null
   );
 
-  ThreadFront.getCorrespondingSourceIds = (sourceId: string) => {
+  ThreadFront.getCorrespondingSourceIds = (sourceId: SourceId) => {
     return getCorrespondingSourceIds(store.getState(), sourceId);
+  };
+  ThreadFront.isOriginalSource = (sourceId: SourceId) => {
+    const sourceDetails = getSourceDetails(store.getState(), sourceId);
+    return sourceDetails != null && isOriginalSource(sourceDetails);
+  };
+  ThreadFront.isPrettyPrintedSource = (sourceId: SourceId) => {
+    const sourceDetails = getSourceDetails(store.getState(), sourceId);
+    return sourceDetails != null && isPrettyPrintedSource(sourceDetails);
   };
 
   setupTelemetry();

@@ -2,7 +2,6 @@ import camelCase from "lodash/camelCase";
 import React, { ReactNode, Suspense, useContext, useMemo, useSyncExternalStore } from "react";
 
 import Icon from "bvaughn-architecture-demo/components/Icon";
-import Loader from "bvaughn-architecture-demo/components/Loader";
 import { ConsoleFiltersContext } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import {

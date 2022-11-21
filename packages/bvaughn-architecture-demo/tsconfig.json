@@ -14,11 +14,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "baseUrl": ".",
+    "baseUrl": "../",
     "paths": {
       "design/*": ["../design/*"],
       "protocol/*": ["../protocol/*"],
-      "shared/*": ["../shared/*"]
+      "shared/*": ["../shared/*"],
     }
   },
   "include": [

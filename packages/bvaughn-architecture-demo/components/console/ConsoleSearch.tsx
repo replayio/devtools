@@ -42,9 +42,10 @@ export default function ConsoleSearch({
 
   let results = null;
   if (searchState.results.length > 0) {
+    const currentLabel = searchState.index < 0 ? "?" : searchState.index + 1;
     results = (
       <div className={styles.Results} data-test-id="SearchResultsLabel">
-        {searchState.index + 1} of {searchState.results.length} results
+        {currentLabel} of {searchState.results.length} results
         <button
           className={styles.ResultsIconButton}
           data-test-id="ConsoleSearchGoToPreviousButton"
