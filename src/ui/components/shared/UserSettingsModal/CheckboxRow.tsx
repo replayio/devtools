@@ -18,7 +18,7 @@ export function CheckboxRow({ id, checked, onChange, label, description }: Check
       <Checkbox id={id} checked={checked} onChange={onChange} />
       <div>{label}</div>
       {description ? (
-        <div className="mb-1 text-xs text-gray-500" style={{ gridColumnStart: "2" }}>
+        <div className="mb-1 text-xs text-bodySubColor" style={{ gridColumnStart: "2" }}>
           {description}
         </div>
       ) : null}
