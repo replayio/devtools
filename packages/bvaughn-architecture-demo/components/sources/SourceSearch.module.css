@@ -1,11 +1,19 @@
-.Container {
+.Outer {
+  width: 100%;
+  padding: 0.25em 0;
+  background-color: var(--color-contrast);
+}
+
+.Container,
+.ContainerFocused {
   width: 100%;
   height: 2.5em;
-  border: 2px solid transparent;
-  border-top-color: var(--color-contrast);
+  border: 2px solid var(--background-color-contrast-2);
+  overflow: hidden;
+  border-radius: 0.5em;
   display: flex;
 }
-.Container:focus-within {
+.ContainerFocused {
   border-color: var(--color-brand);
 }
 
@@ -67,9 +75,14 @@
   border: none;
   color: var(--color-dim);
   padding: 0;
-  width: 1.5em;
-  height: 1.5em;
-  border-radius: 0.25em;
+  width: 2em;
+  height: 2em;
+  border-radius: 0.5em;
+  border: 2px solid transparent;
+  outline: none;
+}
+.ResultsIconButton:focus {
+  border-color: var(--color-brand);
 }
 .ResultsIconButton:hover:not(.ResultsIconButton:disabled):not(.ResultsIconButtonActive) {
   color: var(--color-default);

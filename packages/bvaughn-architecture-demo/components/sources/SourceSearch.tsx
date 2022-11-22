@@ -1,4 +1,4 @@
-import { ChangeEvent, KeyboardEvent, RefObject, useContext } from "react";
+import { ChangeEvent, KeyboardEvent, RefObject, useContext, useState } from "react";
 
 import Icon from "../Icon";
 import { SourceSearchContext } from "./SourceSearchContext";
@@ -14,6 +14,8 @@ export default function SourceSearch({
   const [searchState, searchActions] = useContext(SourceSearchContext);
 
   const { caseSensitive, regex, wholeWord } = searchState.modifiers;
+
+  const [inputFocused, setInputFocused] = useState(false);
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     searchActions.search(event.currentTarget.value);
@@ -60,79 +62,91 @@ export default function SourceSearch({
   }
 
   return (
-    <div className={styles.Container} data-test-id="SourceSearch">
-      <div className={styles.InputAndResults}>
-        <Icon className={styles.SearchIcon} type="search" />
-        <input
-          autoFocus
-          className={styles.Input}
-          data-test-id="SourceSearchInput"
-          onChange={onChange}
-          onKeyDown={onKeyDown}
-          placeholder="Find"
-          ref={inputRef}
-          type="text"
-          value={searchState.query}
-        />
-        {results}
-        <button
-          className={styles.ResultsIconButton}
-          data-test-id="SourceSearchGoToPreviousButton"
-          disabled={searchState.results.length === 0}
-          onClick={searchActions.goToPrevious}
-        >
-          <Icon className={styles.ResultsIcon} type="up" />
-        </button>
-        <button
-          className={styles.ResultsIconButton}
-          data-test-id="SourceSearchGoToNextButton"
-          disabled={searchState.results.length === 0}
-          onClick={searchActions.goToNext}
-        >
-          <Icon className={styles.ResultsIcon} type="down" />
-        </button>
-      </div>
-      <div className={styles.Modifiers}>
-        Modifiers:
-        <button
-          className={[styles.ResultsIconButton, regex && styles.ResultsIconButtonActive].join(" ")}
-          data-test-id="SearchRegExButton"
-          onClick={() => searchActions.setModifiers({ ...searchState.modifiers, regex: !regex })}
-        >
-          .*
-        </button>
-        <button
-          className={[
-            styles.ResultsIconButton,
-            caseSensitive && styles.ResultsIconButtonActive,
-          ].join(" ")}
-          data-test-id="SearchCaseSensitivityButton"
-          onClick={() =>
-            searchActions.setModifiers({ ...searchState.modifiers, caseSensitive: !caseSensitive })
-          }
-        >
-          Aa
-        </button>
-        <button
-          className={[styles.ResultsIconButton, wholeWord && styles.ResultsIconButtonActive].join(
-            " "
-          )}
-          data-test-id="SearchWholeWordButtonButton"
-          onClick={() =>
-            searchActions.setModifiers({ ...searchState.modifiers, wholeWord: !wholeWord })
-          }
-        >
-          <span className={styles.WholeWordText}>ab</span>
-        </button>
-      </div>
-      <div className={styles.Modifiers}>
-        <button
-          className={styles.ResultsIconButton}
-          data-test-id="SourceSearchClearButton"
-          onClick={searchActions.disable}
-        >
-          <Icon className={styles.ResultsIcon} type="cancel" />
-        </button>
+    <div className={styles.Outer}>
+      <div
+        className={inputFocused ? styles.ContainerFocused : styles.Container}
+        data-test-id="SourceSearch"
+      >
+        <div className={styles.InputAndResults}>
+          <Icon className={styles.SearchIcon} type="search" />
+          <input
+            autoFocus
+            className={styles.Input}
+            data-test-id="SourceSearchInput"
+            onBlur={() => setInputFocused(false)}
+            onChange={onChange}
+            onFocus={() => setInputFocused(true)}
+            onKeyDown={onKeyDown}
+            placeholder="Find"
+            ref={inputRef}
+            type="text"
+            value={searchState.query}
+          />
+          {results}
+          <button
+            className={styles.ResultsIconButton}
+            data-test-id="SourceSearchGoToPreviousButton"
+            disabled={searchState.results.length === 0}
+            onClick={searchActions.goToPrevious}
+          >
+            <Icon className={styles.ResultsIcon} type="up" />
+          </button>
+          <button
+            className={styles.ResultsIconButton}
+            data-test-id="SourceSearchGoToNextButton"
+            disabled={searchState.results.length === 0}
+            onClick={searchActions.goToNext}
+          >
+            <Icon className={styles.ResultsIcon} type="down" />
+          </button>
+        </div>
+        <div className={styles.Modifiers}>
+          Modifiers:
+          <button
+            className={[styles.ResultsIconButton, regex && styles.ResultsIconButtonActive].join(
+              " "
+            )}
+            data-test-id="SearchRegExButton"
+            onClick={() => searchActions.setModifiers({ ...searchState.modifiers, regex: !regex })}
+          >
+            .*
+          </button>
+          <button
+            className={[
+              styles.ResultsIconButton,
+              caseSensitive && styles.ResultsIconButtonActive,
+            ].join(" ")}
+            data-test-id="SearchCaseSensitivityButton"
+            onClick={() =>
+              searchActions.setModifiers({
+                ...searchState.modifiers,
+                caseSensitive: !caseSensitive,
+              })
+            }
+          >
+            Aa
+          </button>
+          <button
+            className={[styles.ResultsIconButton, wholeWord && styles.ResultsIconButtonActive].join(
+              " "
+            )}
+            data-test-id="SearchWholeWordButtonButton"
+            onClick={() =>
+              searchActions.setModifiers({ ...searchState.modifiers, wholeWord: !wholeWord })
+            }
+          >
+            <span className={styles.WholeWordText}>ab</span>
+          </button>
+        </div>
+        <div className={styles.Modifiers}>
+          <button
+            className={styles.ResultsIconButton}
+            data-test-id="SourceSearchClearButton"
+            onClick={searchActions.disable}
+          >
+            <Icon className={styles.ResultsIcon} type="cancel" />
+          </button>
+        </div>
       </div>
     </div>
   );

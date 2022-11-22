@@ -1,15 +1,17 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
-.source-footer {
-  background: var(--body-bgcolor);
-  border-top: 1px solid var(--theme-splitter-color);
+.source-footer-wrapper {
+  width: 100%;
+  padding-top: 0.25em;
+  background-color: var(--background-color-default);
   position: absolute;
-  display: flex;
   bottom: 0;
   left: 0;
   right: 0;
+}
+
+.source-footer {
+  background: var(--body-bgcolor);
+  border-radius: 0.5em;
+  display: flex;
   opacity: 1;
   width: 100%;
   user-select: none;
