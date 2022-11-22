@@ -55,13 +55,14 @@ export default function SearchFiles({ limit }: { limit?: number }) {
           </Suspense>
         </div>
 
-        <Checkbox
-          className={styles.Checkbox}
-          dataTestId="SearchFiles-IncludeNodeModules"
-          label="Include node modules"
-          checked={includeNodeModules}
-          onChange={() => setIncludeNodeModules(!includeNodeModules)}
-        />
+        <div className={styles.CheckboxWrapper}>
+          <Checkbox
+            dataTestId="SearchFiles-IncludeNodeModules"
+            label="Include node modules"
+            checked={includeNodeModules}
+            onChange={() => setIncludeNodeModules(!includeNodeModules)}
+          />
+        </div>
 
         <Suspense>
           <ResultsList
