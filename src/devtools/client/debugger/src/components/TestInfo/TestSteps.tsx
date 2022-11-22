@@ -1,5 +1,5 @@
 import { Location } from "@replayio/protocol";
-import React from "react";
+import React, { useState } from "react";
 
 import { setViewMode } from "ui/actions/layout";
 import { seekToTime, setTimelineToTime, startPlayback } from "ui/actions/timeline";
@@ -122,9 +122,13 @@ function TestStepItem({
   const progress = actualProgress > 100 ? 100 : actualProgress;
   const displayedProgress = adjustedDuration === 1 && isPaused ? 100 : progress;
 
+  const color = error ? "border-red-500" : "border-l-primaryAccent";
+
   return (
     <div
-      className={`group/step relative flex items-start gap-1 overflow-hidden border-b border-themeBase-90 bg-testsuitesStepsBgcolor pl-1 pr-3 font-mono`}
+      className={`group/step relative flex items-start gap-1 overflow-hidden border-b border-l-2 border-themeBase-90 pl-1 pr-3 font-mono hover:bg-gray-100 ${
+        isPaused || isPast ? color : "border-l-transparent"
+      } ${isPaused ? "bg-gray-100" : "bg-testsuitesStepsBgcolor"}`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
@@ -132,8 +136,8 @@ function TestStepItem({
         onClick={onClick}
         className="flex flex-grow items-start space-x-2 overflow-hidden py-2 text-start"
       >
-        <div title={"" + displayedProgress}>
-          <ProgressBar progress={displayedProgress} />
+        <div title={"" + displayedProgress} className="flex h-4 items-center">
+          <ProgressBar progress={displayedProgress} error={error} />
         </div>
         <div className="opacity-70">{index + 1}</div>
         <div className={`whitespace-pre font-medium text-bodyColor ${isPaused ? "font-bold" : ""}`}>
