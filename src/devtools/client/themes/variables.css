@@ -144,6 +144,7 @@
   /* Core classes (Light) */
   --chrome: var(--theme-base-95); /* bg app */
   --body-color: #38383d;
+  --body-sub-color: #a9a9b1;
   --buttontext-color: #f4f8fa;
   --checkbox-border: var(--theme-base-80);
   --checkbox: #fff;
@@ -425,6 +426,7 @@
   /* Core classes (Dark) */
   --chrome: #081120; /* bg app */
   --body-color: var(--grey-30);
+  --body-sub-color: var(--grey-40);
   --buttontext-color: #f4f8fa;
   --checkbox-border: var(--theme-base-90);
   --checkbox: var(--theme-base-80);

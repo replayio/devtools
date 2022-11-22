@@ -21,11 +21,6 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableColumnBreakpoints",
   },
   {
-    label: "Resolve recording",
-    description: "Mark a replay as resolved",
-    key: "enableResolveRecording",
-  },
-  {
     label: "Inline hit counts",
     description: "Show line hit counts in the source view",
     key: "hitCounts",
@@ -93,9 +88,6 @@ export default function ExperimentalSettings({}) {
   const { value: disableScanDataCache, update: updateDisableScanDataCache } =
     useFeature("disableScanDataCache");
 
-  const { value: enableResolveRecording, update: updateEnableResolveRecording } =
-    useFeature("resolveRecording");
-
   const {
     value: consoleFilterDrawerDefaultsToOpen,
     update: updateConsoleFilterDrawerDefaultsToOpen,
@@ -112,8 +104,6 @@ export default function ExperimentalSettings({}) {
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
-    } else if (key == "enableResolveRecording") {
-      updateEnableResolveRecording(!enableResolveRecording);
     } else if (key === "hitCounts") {
       updateHitCounts(!hitCounts);
     } else if (key === "profileWorkerThreads") {
@@ -135,7 +125,6 @@ export default function ExperimentalSettings({}) {
     disableScanDataCache,
     enableColumnBreakpoints,
     enableQueryCache,
-    enableResolveRecording,
     hitCounts,
     profileWorkerThreads,
   };

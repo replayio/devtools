@@ -36,7 +36,7 @@ function Title({ recording }: { recording: Recording }) {
     <div className="flex flex-grow flex-row items-center space-x-2 overflow-hidden hover:cursor-pointer">
       <div className="flex flex-grow flex-col overflow-hidden py-2">
         {recording.metadata?.test?.title}
-        <div className="text-xs text-gray-500">{recording.metadata?.test?.file}</div>
+        <div className="text-xs text-bodySubColor">{recording.metadata?.test?.file}</div>
       </div>
     </div>
   );
