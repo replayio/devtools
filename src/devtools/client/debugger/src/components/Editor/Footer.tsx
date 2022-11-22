@@ -132,14 +132,16 @@ function SourceFooter() {
   }
 
   return (
-    <div className="source-footer">
-      <ErrorBoundary>
-        <Suspense>
-          <SourcemapToggleSuspends cursorPosition={cursorPosition} />
-          <SourcemapVisualizerLinkSuspends cursorPosition={cursorPosition} />
-        </Suspense>
-      </ErrorBoundary>
-      <div className="source-footer-end">{cursorPositionUI}</div>
+    <div className="source-footer-wrapper">
+      <div className="source-footer">
+        <ErrorBoundary>
+          <Suspense>
+            <SourcemapToggleSuspends cursorPosition={cursorPosition} />
+            <SourcemapVisualizerLinkSuspends cursorPosition={cursorPosition} />
+          </Suspense>
+        </ErrorBoundary>
+        <div className="source-footer-end">{cursorPositionUI}</div>
+      </div>
     </div>
   );
 }

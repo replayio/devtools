@@ -1,12 +1,4 @@
-import {
-  ForwardedRef,
-  KeyboardEvent,
-  MutableRefObject,
-  ReactNode,
-  forwardRef,
-  useContext,
-  useMemo,
-} from "react";
+import { ForwardedRef, MutableRefObject, ReactNode, forwardRef, useContext, useMemo } from "react";
 
 import Icon from "bvaughn-architecture-demo/components/Icon";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
@@ -21,10 +13,7 @@ import {
   isTerminalExpression,
   isUncaughtException,
 } from "bvaughn-architecture-demo/src/utils/loggables";
-import {
-  isExecutionPointsLessThan,
-  isExecutionPointsWithinRange,
-} from "bvaughn-architecture-demo/src/utils/time";
+import { isExecutionPointsLessThan } from "bvaughn-architecture-demo/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegions } from "shared/utils/time";
 
