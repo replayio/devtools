@@ -659,8 +659,8 @@ export function syncFocusedRegion(): UIThunkAction {
 
     replayClient.loadRegion(
       {
-        begin: displayedBeginForFocusRegion(focusRegion),
-        end: displayedEndForFocusRegion(focusRegion),
+        begin: focusRegion.begin.time,
+        end: focusRegion.end.time,
       },
       zoomTime.endTime
     );
