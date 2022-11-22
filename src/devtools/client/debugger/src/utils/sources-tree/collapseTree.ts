@@ -8,7 +8,41 @@ import type { ParentMap, TreeDirectory, TreeNode, TreeSource } from "./types";
 import { createDirectoryNode } from "./utils";
 
 /**
- * Take an existing source tree, and return a new one with collapsed nodes.
+ * Take an existing source tree, find directories where
+ * there is a sequence of singly-nested folders with no
+ * additional files, and replace them with a single directory
+ * entry whose name is those folders combined, like "/c/d/e/".
+ * This mimics the common convention in IDEs and Github tree
+ * displays where folder entries are collapsed together.
+ *
+ * Example: for a URL like `https://something.com/src/app/3/3a/3aa/g.ts`, with no other files in that path, the resulting tree
+ * structure would look like:
+ * ```ts
+ * {
+ *   type: "directory",
+ *   name: "root",
+ *   path: "",
+ *   contents: {
+ *     type: "directory",
+ *     path: "/something.com",
+ *     name: "something.com",
+ *     contents: [
+ *       type: "directory",
+ *       path: "/something.com/src",
+ *       name: "src",
+ *       contents: [
+ *         {
+ *           type: "directory",
+ *           path: "/something.com/rsc/app/3/3a/3aa",
+ *           // Collapsed folder name here
+ *           name: "app/3/3a/3aa",
+ *           contents: [theSourceFile]
+ *         }
+ *       ]
+ *     ]
+ *   }
+ * }
+ * ```
  */
 function _collapseTree(node: TreeNode, depth: number): TreeNode {
   // Node is a folder.

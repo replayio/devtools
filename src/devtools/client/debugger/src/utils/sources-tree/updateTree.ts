@@ -40,10 +40,15 @@ export function createTree({ sources }: { sources: SourcesMap }) {
 }
 
 interface UpdateTreeArgs {
+  /**The new sources to show, in a record keyed by source URL */
   newSources: SourcesMap;
+  /**The previous sources to show, in a record keyed by source URL */
   prevSources: SourcesMap;
+  /** The previously constructed full tree, with no folder entries "collapsed" together */
   uncollapsedTree: TreeDirectory;
+  /** @deprecated Now-unused string to compare hostnames */
   debuggeeUrl: string;
+  /** The final display copy of the tree, with any sets of singly-nested folders "collapsed" together */
   sourceTree?: TreeNode;
 }
 
