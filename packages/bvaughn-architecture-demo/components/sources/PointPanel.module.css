@@ -3,7 +3,7 @@
   flex-direction: column;
   background-color: var(--point-panel-background-color);
   padding: 1em;
-  gap: 1em;
+  gap: 0.4em;
 }
 
 .Loader {
@@ -43,11 +43,10 @@
 
 .FixedHeightRow {
   width: 100%;
-  flex: 0 0 3em;
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 1em;
+  gap: 0.5em;
 }
 
 .ContentWrapper,
