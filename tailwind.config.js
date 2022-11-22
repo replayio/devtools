@@ -7,7 +7,7 @@ module.exports = {
 			},
 			colors: {
 				themeBase: {
-					100: 'var(--theme-base-100)',
+					101: 'var(--theme-base-100)',
 					95: 'var(--theme-base-95)',
 					90: 'var(--theme-base-90)',
 					85: 'var(--theme-base-85)',
