@@ -227,7 +227,10 @@ class TreeNode<T> extends React.Component<TreeNodeProps<T>> {
       return treeIndent;
     });
 
-    const items = indents.concat(renderItem(item, depth, focused, arrow, expanded));
+    // Handle "needs keys" warnings for the indentation
+    const items = indents
+      .concat(renderItem(item, depth, focused, arrow, expanded))
+      .map((element, i) => React.cloneElement(element as JSX.Element, { key: i }));
 
     return (
       <div
