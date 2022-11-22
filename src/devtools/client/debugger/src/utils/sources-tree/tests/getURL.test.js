@@ -4,7 +4,7 @@
 
 import { makeMockSource } from "devtools/client/debugger/src/utils/test-mockup";
 
-import { getURL } from "./getURL";
+import { getURL } from "../getURL";
 
 function createMockSource(props) {
   const rv = {
