@@ -7,7 +7,7 @@ import type { ParentMap, TreeDirectory, TreeNode, TreeSource } from "./types";
 export function formatTree(tree: TreeNode, depth = 0, str = "") {
   const whitespace = new Array(depth * 2).join(" ");
 
-  if (tree.type === "directory") {
+  if (tree.type !== "source") {
     str += `${whitespace} - ${tree.name} path=${tree.path} \n`;
     tree.contents.forEach(t => {
       str = formatTree(t, depth + 1, str);

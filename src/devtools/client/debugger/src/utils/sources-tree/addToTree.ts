@@ -138,7 +138,16 @@ function addSourceToNode(node: TreeNode, url: ParsedUrl, source: SourceDetails) 
         return source;
       }
       case "source": {
-        // Convert the "single-source" tree node with a `SourceDetails` as its
+        // We've found a potentially duplicated file with multiple versions.
+        // _If_ the contents are identical, do nothing - no reason to show them separately.
+
+        if (node.contents.contentHash === source.contentHash) {
+          // The return value gets assigned as the _new_ `node.contents`,
+          // so return the existing source entry to leave things unchanged.
+          return node.contents;
+        }
+
+        // Otherwise, convert the "single-source" tree node with a `SourceDetails` as its
         // contents, into a "multiSource" node with an array of 2 "source" nodes
         // as its contents. We can hardcode the numeric prefixes for multi-versions.
         const newContents = [
@@ -151,6 +160,14 @@ function addSourceToNode(node: TreeNode, url: ParsedUrl, source: SourceDetails) 
         return newContents;
       }
       case "multiSource": {
+        // We might also have an existing entry for this content hash here.
+        // Similar to the single case, skip adding the new one if there's a collision.
+        if (
+          node.contents.find(childNode => childNode.contents.contentHash === source.contentHash)
+        ) {
+          return node.contents;
+        }
+
         const newContents = node.contents.concat(createSourceNode(filename, source.url!, source));
 
         // Recalculate the numeric prefixes for each version of the file.
