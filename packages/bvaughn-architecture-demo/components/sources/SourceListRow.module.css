@@ -220,6 +220,6 @@
   top: var(--line-height);
   width: calc(var(--list-width) - var(--line-number-size) - 2ch);
   left: calc(var(--line-number-size) + 2ch);
-  border-left: var(--line-hit-count-size) solid var(--color-hit-counts-bar-0);
+  border-left: var(--line-hit-count-size) solid var(--color-hit-counts-bar-print-panel);
   font-size: var(--font-size-small);
 }

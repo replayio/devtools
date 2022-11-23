@@ -72,6 +72,7 @@
   --color-warning: #fce2a1;
   --color-search-results: #d7d7db;
 
+  --color-hit-counts-bar-print-panel: #465062;
   --color-hit-counts-bar-0: #465062;
   --color-hit-counts-bar-1: #0284c3;
   --color-hit-counts-bar-2: #0284c3;
@@ -220,6 +221,7 @@
   --color-warning: #6c5914;
   --color-search-results: #47628b;
 
+  --color-hit-counts-bar-print-panel: #d5d5d5;
   --color-hit-counts-bar-0: #f3f4f6;
   --color-hit-counts-bar-1: #c4e6f7;
   --color-hit-counts-bar-2: #80d5fe;
