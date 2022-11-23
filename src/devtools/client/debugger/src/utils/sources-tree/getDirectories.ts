@@ -34,7 +34,7 @@ export function findSourceTreeNodes(sourceTree: TreeDirectory, path: string) {
       return subtree;
     }
 
-    if (subtree.type === "directory") {
+    if (subtree.type !== "source") {
       const matches = subtree.contents.map(child => _traverse(child));
       return matches && (matches.filter(Boolean) as TreeNode[]);
     }

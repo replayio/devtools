@@ -2,343 +2,7 @@
 
 exports[`updateTree Generates a correctly sorted nested tree of sources and folders 1`] = `
 Object {
-  "contents": Array [
-    Object {
-      "contents": Array [
-        Object {
-          "contents": Array [
-            Object {
-              "contents": Array [
-                Object {
-                  "contents": Object {
-                    "id": "https://codesandbox.io/static/js/sandbox.js",
-                    "url": "https://codesandbox.io/static/js/sandbox.js",
-                  },
-                  "name": "sandbox.js",
-                  "path": "/codesandbox.io/static/js/sandbox.js",
-                  "type": "source",
-                },
-                Object {
-                  "contents": Object {
-                    "id": "https://codesandbox.io/static/js/vendors.js",
-                    "url": "https://codesandbox.io/static/js/vendors.js",
-                  },
-                  "name": "vendors.js",
-                  "path": "/codesandbox.io/static/js/vendors.js",
-                  "type": "source",
-                },
-              ],
-              "name": "js",
-              "path": "/codesandbox.io/static/js",
-              "type": "directory",
-            },
-          ],
-          "name": "static",
-          "path": "/codesandbox.io/static",
-          "type": "directory",
-        },
-      ],
-      "name": "codesandbox.io",
-      "path": "/codesandbox.io",
-      "type": "directory",
-    },
-    Object {
-      "contents": Array [
-        Object {
-          "contents": Object {
-            "id": "replay-content:///react-devtools-hook-script",
-            "url": "replay-content:///react-devtools-hook-script",
-          },
-          "name": "react-devtools-hook-script",
-          "path": "/replay-content:///react-devtools-hook-script",
-          "type": "source",
-        },
-      ],
-      "name": "replay-content://",
-      "path": "/replay-content://",
-      "type": "directory",
-    },
-    Object {
-      "contents": Array [
-        Object {
-          "contents": Object {
-            "id": "(index)",
-            "url": "https://something.com/(index)",
-          },
-          "name": "(index)",
-          "path": "/something.com/(index)",
-          "type": "source",
-        },
-        Object {
-          "contents": Array [
-            Object {
-              "contents": Array [
-                Object {
-                  "contents": Array [
-                    Object {
-                      "contents": Object {
-                        "id": "node_modules/react-redux/es/index.js",
-                        "url": "https://something.com/node_modules/react-redux/es/index.js",
-                      },
-                      "name": "index.js",
-                      "path": "/something.com/node_modules/react-redux/es/index.js",
-                      "type": "source",
-                    },
-                    Object {
-                      "contents": Object {
-                        "id": "node_modules/react-redux/es/types.js",
-                        "url": "https://something.com/node_modules/react-redux/es/types.js",
-                      },
-                      "name": "types.js",
-                      "path": "/something.com/node_modules/react-redux/es/types.js",
-                      "type": "source",
-                    },
-                  ],
-                  "name": "es",
-                  "path": "/something.com/node_modules/react-redux/es",
-                  "type": "directory",
-                },
-              ],
-              "name": "react-redux",
-              "path": "/something.com/node_modules/react-redux",
-              "type": "directory",
-            },
-            Object {
-              "contents": Array [
-                Object {
-                  "contents": Array [
-                    Object {
-                      "contents": Object {
-                        "id": "node_modules/redux/es/redux.js",
-                        "url": "https://something.com/node_modules/redux/es/redux.js",
-                      },
-                      "name": "redux.js",
-                      "path": "/something.com/node_modules/redux/es/redux.js",
-                      "type": "source",
-                    },
-                  ],
-                  "name": "es",
-                  "path": "/something.com/node_modules/redux/es",
-                  "type": "directory",
-                },
-              ],
-              "name": "redux",
-              "path": "/something.com/node_modules/redux",
-              "type": "directory",
-            },
-          ],
-          "name": "node_modules",
-          "path": "/something.com/node_modules",
-          "type": "directory",
-        },
-        Object {
-          "contents": Array [
-            Object {
-              "contents": Array [
-                Object {
-                  "contents": Object {
-                    "id": "src/app/hooks.ts",
-                    "url": "https://something.com/src/app/hooks.ts",
-                  },
-                  "name": "hooks.ts",
-                  "path": "/something.com/src/app/hooks.ts",
-                  "type": "source",
-                },
-                Object {
-                  "contents": Object {
-                    "id": "src/app/store.ts",
-                    "url": "https://something.com/src/app/store.ts",
-                  },
-                  "name": "store.ts",
-                  "path": "/something.com/src/app/store.ts",
-                  "type": "source",
-                },
-              ],
-              "name": "app",
-              "path": "/something.com/src/app",
-              "type": "directory",
-            },
-            Object {
-              "contents": Array [
-                Object {
-                  "contents": Array [
-                    Object {
-                      "contents": Object {
-                        "id": "src/features/counter/Counter.tsx",
-                        "url": "https://something.com/src/features/counter/Counter.tsx",
-                      },
-                      "name": "Counter.tsx",
-                      "path": "/something.com/src/features/counter/Counter.tsx",
-                      "type": "source",
-                    },
-                    Object {
-                      "contents": Object {
-                        "id": "src/features/counter/counterAPI.ts",
-                        "url": "https://something.com/src/features/counter/counterAPI.ts",
-                      },
-                      "name": "counterAPI.ts",
-                      "path": "/something.com/src/features/counter/counterAPI.ts",
-                      "type": "source",
-                    },
-                    Object {
-                      "contents": Object {
-                        "id": "src/features/counter/counterSlice.ts",
-                        "url": "https://something.com/src/features/counter/counterSlice.ts",
-                      },
-                      "name": "counterSlice.ts",
-                      "path": "/something.com/src/features/counter/counterSlice.ts",
-                      "type": "source",
-                    },
-                  ],
-                  "name": "counter",
-                  "path": "/something.com/src/features/counter",
-                  "type": "directory",
-                },
-              ],
-              "name": "features",
-              "path": "/something.com/src/features",
-              "type": "directory",
-            },
-            Object {
-              "contents": Array [
-                Object {
-                  "contents": Array [
-                    Object {
-                      "contents": Object {
-                        "id": "src/features2/todos/todos.ts?2",
-                        "url": "https://something.com/src/features2/todos/todos.ts?2",
-                      },
-                      "name": "todos.ts",
-                      "path": "/something.com/src/features2/todos/todos.ts",
-                      "type": "source",
-                    },
-                  ],
-                  "name": "todos",
-                  "path": "/something.com/src/features2/todos",
-                  "type": "directory",
-                },
-              ],
-              "name": "features2",
-              "path": "/something.com/src/features2",
-              "type": "directory",
-            },
-            Object {
-              "contents": Object {
-                "id": "src/App.tsx",
-                "url": "https://something.com/src/App.tsx",
-              },
-              "name": "App.tsx",
-              "path": "/something.com/src/App.tsx",
-              "type": "source",
-            },
-            Object {
-              "contents": Object {
-                "id": "src/index.tsx",
-                "url": "https://something.com/src/index.tsx",
-              },
-              "name": "index.tsx",
-              "path": "/something.com/src/index.tsx",
-              "type": "source",
-            },
-          ],
-          "name": "src",
-          "path": "/something.com/src",
-          "type": "directory",
-        },
-      ],
-      "name": "something.com",
-      "path": "/something.com",
-      "type": "directory",
-    },
-    Object {
-      "contents": Array [
-        Object {
-          "contents": Array [
-            Object {
-              "contents": Array [
-                Object {
-                  "contents": Array [
-                    Object {
-                      "contents": Array [
-                        Object {
-                          "contents": Array [
-                            Object {
-                              "contents": Array [
-                                Object {
-                                  "contents": Array [
-                                    Object {
-                                      "contents": Array [
-                                        Object {
-                                          "contents": Object {
-                                            "id": "webpack:////home/circleci/codesandbox-client/node_modules/core-js/fn/array/includes.js",
-                                            "url": "webpack:////home/circleci/codesandbox-client/node_modules/core-js/fn/array/includes.js",
-                                          },
-                                          "name": "includes.js",
-                                          "path": "/webpack:////home/circleci/codesandbox-client/node_modules/core-js/fn/array/includes.js",
-                                          "type": "source",
-                                        },
-                                      ],
-                                      "name": "array",
-                                      "path": "/webpack:////home/circleci/codesandbox-client/node_modules/core-js/fn/array",
-                                      "type": "directory",
-                                    },
-                                  ],
-                                  "name": "fn",
-                                  "path": "/webpack:////home/circleci/codesandbox-client/node_modules/core-js/fn",
-                                  "type": "directory",
-                                },
-                              ],
-                              "name": "core-js",
-                              "path": "/webpack:////home/circleci/codesandbox-client/node_modules/core-js",
-                              "type": "directory",
-                            },
-                          ],
-                          "name": "node_modules",
-                          "path": "/webpack:////home/circleci/codesandbox-client/node_modules",
-                          "type": "directory",
-                        },
-                      ],
-                      "name": "codesandbox-client",
-                      "path": "/webpack:////home/circleci/codesandbox-client",
-                      "type": "directory",
-                    },
-                  ],
-                  "name": "circleci",
-                  "path": "/webpack:////home/circleci",
-                  "type": "directory",
-                },
-              ],
-              "name": "home",
-              "path": "/webpack:////home",
-              "type": "directory",
-            },
-          ],
-          "name": "",
-          "path": "/webpack:///",
-          "type": "directory",
-        },
-        Object {
-          "contents": Array [
-            Object {
-              "contents": Object {
-                "id": "webpack://BrowserFS/webpack/bootstrap",
-                "url": "webpack://BrowserFS/webpack/bootstrap",
-              },
-              "name": "bootstrap",
-              "path": "/webpack:///webpack/bootstrap",
-              "type": "source",
-            },
-          ],
-          "name": "webpack",
-          "path": "/webpack:///webpack",
-          "type": "directory",
-        },
-      ],
-      "name": "webpack://",
-      "path": "/webpack://",
-      "type": "directory",
-    },
-  ],
+  "contents": Array [],
   "name": "root",
   "path": "",
   "type": "directory",
@@ -526,13 +190,29 @@ Object {
             Object {
               "contents": Array [
                 Object {
-                  "contents": Object {
-                    "id": "src/features2/todos/todos.ts?2",
-                    "url": "https://something.com/src/features2/todos/todos.ts?2",
-                  },
+                  "contents": Array [
+                    Object {
+                      "contents": Object {
+                        "id": "src/features2/todos/todos.ts?1",
+                        "url": "https://something.com/src/features2/todos/todos.ts?1",
+                      },
+                      "name": "(1) todos.ts",
+                      "path": "https://something.com/src/features2/todos/todos.ts?1",
+                      "type": "source",
+                    },
+                    Object {
+                      "contents": Object {
+                        "id": "src/features2/todos/todos.ts?2",
+                        "url": "https://something.com/src/features2/todos/todos.ts?2",
+                      },
+                      "name": "(2) todos.ts",
+                      "path": "https://something.com/src/features2/todos/todos.ts?2",
+                      "type": "source",
+                    },
+                  ],
                   "name": "todos.ts",
                   "path": "/something.com/src/features2/todos/todos.ts",
-                  "type": "source",
+                  "type": "multiSource",
                 },
               ],
               "name": "features2/todos",

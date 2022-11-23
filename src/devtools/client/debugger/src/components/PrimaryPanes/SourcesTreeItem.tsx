@@ -126,7 +126,8 @@ class SourceTreeItem extends Component<FinalSTIProps> {
 
   renderItemArrow() {
     const { item, expanded } = this.props;
-    return isDirectory(item) ? (
+    const shouldShowArrow = isDirectory(item) || item.type === "multiSource";
+    return shouldShowArrow ? (
       <AccessibleImage className={classnames("arrow", { expanded })} />
     ) : (
       <span className="img no-arrow" />
