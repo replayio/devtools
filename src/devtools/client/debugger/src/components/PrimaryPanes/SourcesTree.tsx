@@ -52,13 +52,9 @@ function shouldAutoExpand(depth: number, item: TreeNode) {
   return item.name === "";
 }
 
-function findSource(
-  sources: Record<string, SourceDetails>,
-  itemPath: string,
-  source: SourceDetails
-) {
+function findSource(sourcesByUrl: Record<string, SourceDetails>, source: SourceDetails) {
   if (source) {
-    return sources[source.id];
+    return sourcesByUrl[source.url!];
   }
   return source;
 }
@@ -168,7 +164,7 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
   // NOTE: we get the source from sources because item.contents is cached
   getSource(item: TreeNode) {
     const source = getSourceFromNode(item);
-    return findSource(this.props.sources, item.path, source!);
+    return findSource(this.props.sources, source!);
   }
 
   getPath = (item: TreeNode) => {
