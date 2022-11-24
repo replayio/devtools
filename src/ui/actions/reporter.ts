@@ -35,7 +35,7 @@ export async function setupReporter(store: UIStore, ThreadFront: typeof TF) {
         filtered.map(({ point, time, contents }) => ({
           point,
           time,
-          message: parseContents(contents),
+          message: JSON.parse(parseContents(contents)),
         }))
       )
     );

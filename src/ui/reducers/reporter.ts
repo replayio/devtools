@@ -4,9 +4,13 @@ import { ExecutionPoint } from "@replayio/protocol";
 import { compareNumericStrings } from "protocol/utils";
 import { UIState } from "ui/state";
 
+type TestEvents = "test:start" | "step:end" | "step:enqueue" | "step:start";
+
 type CypressAnnotationMessage = {
-  event: "test:start";
+  event: TestEvents;
   titlePath: string[];
+  commandVariable?: "cmd" | "log";
+  id?: string;
 };
 export interface Annotation {
   point: ExecutionPoint;
@@ -38,3 +42,10 @@ const reporterSlice = createSlice({
 export default reporterSlice.reducer;
 export const { addReporterAnnotations } = reporterSlice.actions;
 export const getReporterAnnotations = (state: UIState) => state.reporter.annotations;
+export const getReporterAnnotationsForTests = (state: UIState) =>  state.reporter.annotations.filter(a => a.message.event === "test:start");
+export const getReporterAnnotationsForTitle = (title: string) => (state: UIState) =>
+  state.reporter.annotations.filter(
+    a =>
+      a.message.titlePath[a.message.titlePath.length - 1] === title &&
+      a.message.event === "step:enqueue"
+  );

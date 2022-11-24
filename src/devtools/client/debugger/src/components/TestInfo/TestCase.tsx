@@ -12,12 +12,10 @@ import { TestSteps } from "./TestSteps";
 
 export function TestCase({
   test,
-  location,
   setHighlightedTest,
   isHighlighted,
 }: {
   test: TestItem;
-  location?: Location;
   setHighlightedTest: () => void;
   isHighlighted: boolean;
 }) {
@@ -95,9 +93,7 @@ export function TestCase({
           </div>
         </button>
       </div>
-      {expandSteps ? (
-        <TestSteps test={test} startTime={test.relativeStartTime} location={location} />
-      ) : null}
+      {expandSteps ? <TestSteps test={test} startTime={test.relativeStartTime} /> : null}
     </div>
   );
 }
