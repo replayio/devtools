@@ -22,6 +22,7 @@ export interface GetUserSettings_viewer_settings {
   disableLogRocket: boolean;
   enableRepaint: boolean;
   enableTeams: boolean;
+  role: string;
 }
 
 export interface GetUserSettings_viewer_defaultWorkspace {

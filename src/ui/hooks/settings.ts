@@ -33,6 +33,7 @@ const emptySettings: ExperimentalUserSettings = {
   disableLogRocket: false,
   enableTeams: true,
   enableLargeText: false,
+  role: "developer",
 };
 
 const testSettings: ExperimentalUserSettings = {
@@ -41,6 +42,7 @@ const testSettings: ExperimentalUserSettings = {
   disableLogRocket: false,
   enableTeams: true,
   enableLargeText: false,
+  role: "developer",
 };
 
 export async function getUserSettings(): Promise<ExperimentalUserSettings> {
@@ -160,19 +162,28 @@ function convertUserSettings(data: GetUserSettings | undefined): ExperimentalUse
     disableLogRocket: settings.disableLogRocket,
     enableTeams: settings.enableTeams,
     enableLargeText: false,
+    role: settings.role || "developer",
   };
 }
 
-type MutableSettings = Extract<SettingItemKey, "disableLogRocket">;
+type MutableSettings = Extract<SettingItemKey, "disableLogRocket" | "role">;
 
 type GqlPair = {
   disableLogRocket: [UpdateUserSettingsLogRocket, UpdateUserSettingsLogRocketVariables];
+  role: [UpdateUserSettingsLogRocket, { role: string }];
 };
 
 const SETTINGS_MUTATIONS: Record<MutableSettings, DocumentNode> = {
   disableLogRocket: gql`
     mutation UpdateUserSettingsLogRocket($newValue: Boolean) {
       updateUserSettings(input: { disableLogRocket: $newValue }) {
+        success
+      }
+    }
+  `,
+  role: gql`
+    mutation UpdateUserSettingsLogRocket($role: String) {
+      updateUserSettings(input: { role: $role }) {
         success
       }
     }
