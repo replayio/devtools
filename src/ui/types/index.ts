@@ -190,6 +190,7 @@ export type TestStep = {
   relativeStartTime: number;
   parentId?: string;
   error?: TestItemError;
+  hook?: "beforeEach" | "afterEach";
 };
 
 // https://github.com/Replayio/replay-cli/blob/main/packages/replay/metadata/source.ts
