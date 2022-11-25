@@ -1,10 +1,9 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import { getRecordingDuration } from "ui/actions/app";
 import { setFocusRegion } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { useFetchCypressSpec } from "ui/hooks/useFetchCypressSpec";
-import { Annotation, getReporterAnnotations } from "ui/reducers/reporter";
+import { Annotation, getReporterAnnotationsForTests } from "ui/reducers/reporter";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem } from "ui/types";
 
@@ -27,8 +26,7 @@ export default function TestInfo({
   setHighlightedTest: (test: number | null) => void;
 }) {
   const dispatch = useAppDispatch();
-  const annotations = useAppSelector(getReporterAnnotations);
-  const cypressResults = useFetchCypressSpec();
+  const annotations = useAppSelector(getReporterAnnotationsForTests);
   const duration = useAppSelector(getRecordingDuration);
 
   // The test start times in metadata may be incorrect. If we have the reporter annotations,
@@ -66,7 +64,6 @@ export default function TestInfo({
             <TestCase
               test={t}
               key={i}
-              location={cypressResults?.[i]?.location}
               setHighlightedTest={() => setHighlightedTest(i)}
               isHighlighted={i === highlightedTest}
             />

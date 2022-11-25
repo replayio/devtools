@@ -188,6 +188,7 @@ export type TestStep = {
   name: string;
   duration: number;
   relativeStartTime: number;
+  point?: string;
   parentId?: string;
   error?: TestItemError;
   hook?: "beforeEach" | "afterEach";

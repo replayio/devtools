@@ -1,16 +1,17 @@
-import { Location } from "@replayio/protocol";
-import React, { useState } from "react";
+import React, { useContext } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { setViewMode } from "ui/actions/layout";
 import { seekToTime, setTimelineToTime, startPlayback } from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getViewMode } from "ui/reducers/layout";
+import { getReporterAnnotationsForTitle } from "ui/reducers/reporter";
 import { getCurrentTime, getPlayback } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem, TestStep } from "ui/types";
 
-import { selectLocation } from "../../actions/sources";
+import { selectLocation, selectSource } from "../../actions/sources";
 import { getThreadContext } from "../../selectors";
 import { ProgressBar } from "./ProgressBar";
 
@@ -18,15 +19,15 @@ function TestSection({
   steps,
   startTime,
   header,
-  onGoToLocation,
+  testTitle,
   onPlayFromHere,
   onReplay,
 }: {
-  onGoToLocation: () => void;
   onPlayFromHere: (time: number) => void;
   onReplay: () => void;
   startTime: number;
   steps: TestStep[];
+  testTitle: string;
   header?: string;
 }) {
   if (steps.length === 0) {
@@ -38,7 +39,9 @@ function TestSection({
       {header ? <div className="py-2">{header}</div> : null}
       {steps.map((s, i) => (
         <TestStepItem
-          testName={s.name}
+          stepName={s.name}
+          point={s.point}
+          testTitle={testTitle}
           key={i}
           index={i}
           startTime={startTime + s.relativeStartTime}
@@ -49,24 +52,15 @@ function TestSection({
           isLastStep={steps.length - 1 === i}
           onReplay={onReplay}
           onPlayFromHere={() => onPlayFromHere(startTime + s.relativeStartTime)}
-          onGoToLocation={onGoToLocation}
         />
       ))}
     </>
   );
 }
 
-export function TestSteps({
-  test,
-  startTime,
-  location,
-}: {
-  test: TestItem;
-  startTime: number;
-  location?: Location;
-}) {
-  const cx = useAppSelector(getThreadContext);
+export function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
   const dispatch = useAppDispatch();
+  const annotations = useAppSelector(getReporterAnnotationsForTitle(test.title));
   const testStart = test.steps[0].relativeStartTime + startTime;
   const testEnd =
     test.steps[test.steps.length - 1].relativeStartTime +
@@ -77,25 +71,20 @@ export function TestSteps({
     dispatch(startPlayback({ beginTime: testStart, endTime: testEnd - 1 }));
   };
   const onPlayFromHere = (beginTime: number) => {
-    dispatch(startPlayback({ beginTime: startTime, endTime: testEnd - 1 }));
-  };
-  const onGoToLocation = () => {
-    if (location) {
-      dispatch(selectLocation(cx, location));
-    }
+    dispatch(startPlayback({ beginTime, endTime: testEnd - 1 }));
   };
 
   const [beforeEachSteps, testBodySteps, afterEachSteps] = (test.steps || []).reduce<TestStep[][]>(
-    (acc, step) => {
+    (acc, step, i) => {
       switch (step.hook) {
         case "beforeEach":
-          acc[0].push(step);
+          acc[0].push({ ...step, point: annotations[i].point });
           break;
         case "afterEach":
-          acc[2].push(step);
+          acc[2].push({ ...step, point: annotations[i].point });
           break;
         default:
-          acc[1].push(step);
+          acc[1].push({ ...step, point: annotations[i].point });
           break;
       }
 
@@ -107,24 +96,24 @@ export function TestSteps({
   return (
     <div className="flex flex-col rounded-lg py-2 pl-11">
       <TestSection
+        testTitle={test.title}
         onReplay={onReplay}
-        onGoToLocation={onGoToLocation}
         onPlayFromHere={onPlayFromHere}
         steps={beforeEachSteps}
         startTime={startTime}
         header="Before Each"
       />
       <TestSection
+        testTitle={test.title}
         onReplay={onReplay}
-        onGoToLocation={onGoToLocation}
         onPlayFromHere={onPlayFromHere}
         steps={testBodySteps}
         startTime={startTime}
         header={beforeEachSteps.length + afterEachSteps.length > 0 ? "Test Body" : undefined}
       />
       <TestSection
+        testTitle={test.title}
         onReplay={onReplay}
-        onGoToLocation={onGoToLocation}
         onPlayFromHere={onPlayFromHere}
         steps={afterEachSteps}
         startTime={startTime}
@@ -146,7 +135,9 @@ export function TestSteps({
 }
 
 function TestStepItem({
-  testName,
+  testTitle,
+  point,
+  stepName,
   startTime,
   duration,
   argString,
@@ -156,9 +147,10 @@ function TestStepItem({
   isLastStep,
   onReplay,
   onPlayFromHere,
-  onGoToLocation,
 }: {
-  testName: string;
+  testTitle: string;
+  point?: string;
+  stepName: string;
   startTime: number;
   duration: number;
   argString: string;
@@ -168,11 +160,12 @@ function TestStepItem({
   isLastStep: boolean;
   onReplay: () => void;
   onPlayFromHere: () => void;
-  onGoToLocation: () => void;
 }) {
+  const cx = useAppSelector(getThreadContext);
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
   const isPast = currentTime > startTime;
+  const client = useContext(ReplayClientContext);
   // some chainers (`then`) don't have a duration, so let's bump it here (+1) so that it shows something in the UI
   const adjustedDuration = duration || 1;
   const isPaused = currentTime >= startTime && currentTime < startTime + adjustedDuration;
@@ -183,6 +176,30 @@ function TestStepItem({
   const onJumpToBefore = () => dispatch(seekToTime(startTime));
   const onJumpToAfter = () => {
     dispatch(seekToTime(startTime + adjustedDuration - 1));
+  };
+  const onGoToLocation = async () => {
+    if (!point) {
+      return;
+    }
+    
+    const frame = await (async point => {
+      const {
+        data: { frames },
+      } = await client.createPause(point);
+      
+      const returnFirst = (list: any, fn: any) =>
+        list.reduce((acc: any, v: any, i: any) => acc ?? fn(v, i, list), null);
+
+      return returnFirst(frames, (f: any, i: any, l: any) =>
+        l[i + 1]?.functionName === "__stackReplacementMarker" ? f : null
+      );
+    })(point);
+
+    const location = frame.location[frame.location.length - 1];
+
+    if (location) {
+      dispatch(selectLocation(cx, location));
+    }
   };
 
   // This math is bananas don't look here until this is cleaned up :)
@@ -211,7 +228,7 @@ function TestStepItem({
         <div className="opacity-70">{index + 1}</div>
         <div className={`whitespace-pre font-medium text-bodyColor ${isPaused ? "font-bold" : ""}`}>
           {parentId ? "- " : ""}
-          {testName}
+          {stepName}
         </div>
         <div className="opacity-70">{argString}</div>
       </button>
