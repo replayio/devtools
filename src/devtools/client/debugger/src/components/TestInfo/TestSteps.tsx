@@ -77,7 +77,7 @@ export function TestSteps({
     dispatch(startPlayback({ beginTime: testStart, endTime: testEnd - 1 }));
   };
   const onPlayFromHere = (beginTime: number) => {
-    dispatch(startPlayback({ beginTime: startTime, endTime: testEnd - 1 }));
+    dispatch(startPlayback({ beginTime, endTime: testEnd - 1 }));
   };
 
   const [beforeEachSteps, testBodySteps, afterEachSteps] = (test.steps || []).reduce<TestStep[][]>(
