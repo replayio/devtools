@@ -172,7 +172,7 @@ export function TestStepItem({
   const progress = actualProgress > 100 ? 100 : actualProgress;
   const displayedProgress = adjustedDuration === 1 && isPaused ? 100 : progress;
 
-  const color = error ? "border-red-500" : "border-l-primaryAccent";
+  const color = error ? "border-l-red-500" : "border-l-primaryAccent";
 
   return (
     <>
