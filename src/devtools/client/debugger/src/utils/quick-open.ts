@@ -63,9 +63,9 @@ export function parseLineColumn(query: string) {
 
 function formatSourceForList(source: SourceDetails, tabUrls: Set<string>) {
   const title = getTruncatedFileName(source);
-  const relativeUrlWithQuery = `${source.url}${getSourceQueryString(source) || ""}`;
-  const subtitle = endTruncateStr(relativeUrlWithQuery, 100);
-  const value = relativeUrlWithQuery;
+  // `source.url` now includes query strings already
+  const subtitle = endTruncateStr(source.url!, 100);
+  const value = source.url!;
   return {
     value,
     title,
@@ -153,6 +153,8 @@ export function formatSources(
 ) {
   const formattedSources = [];
 
+  const seenContentHashes = new Set<string>();
+
   for (const url in sourcesToDisplayByUrl) {
     if (onlySourcesInTabs && !tabUrls.has(url)) {
       continue;
@@ -161,6 +163,11 @@ export function formatSources(
       continue;
     }
     const sourceToDisplay = sourcesToDisplayByUrl[url]!;
+
+    if (seenContentHashes.has(sourceToDisplay.contentHash!)) {
+      continue;
+    }
+    seenContentHashes.add(sourceToDisplay.contentHash!);
     formattedSources.push(formatSourceForList(sourceToDisplay, tabUrls));
   }
 
