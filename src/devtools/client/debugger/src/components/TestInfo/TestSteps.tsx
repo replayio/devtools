@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useContext } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { setViewMode } from "ui/actions/layout";
 import { seekToTime, setTimelineToTime, startPlayback } from "ui/actions/timeline";
@@ -164,6 +165,7 @@ function TestStepItem({
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
   const isPast = currentTime > startTime;
+  const client = useContext(ReplayClientContext);
   // some chainers (`then`) don't have a duration, so let's bump it here (+1) so that it shows something in the UI
   const adjustedDuration = duration || 1;
   const isPaused = currentTime >= startTime && currentTime < startTime + adjustedDuration;
@@ -183,9 +185,8 @@ function TestStepItem({
     const frame = await (async point => {
       const {
         data: { frames },
-      } = await window.app.sendMessage("Session.createPause", {
-        point,
-      });
+      } = await client.createPause(point);
+      
       const returnFirst = (list: any, fn: any) =>
         list.reduce((acc: any, v: any, i: any) => acc ?? fn(v, i, list), null);
 
