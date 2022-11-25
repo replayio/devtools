@@ -8,11 +8,53 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getViewMode } from "ui/reducers/layout";
 import { getCurrentTime, getPlayback } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { TestItem } from "ui/types";
+import { TestItem, TestStep } from "ui/types";
 
 import { selectLocation } from "../../actions/sources";
 import { getThreadContext } from "../../selectors";
 import { ProgressBar } from "./ProgressBar";
+
+function TestSection({
+  steps,
+  startTime,
+  header,
+  onGoToLocation,
+  onPlayFromHere,
+  onReplay,
+}: {
+  onGoToLocation: () => void;
+  onPlayFromHere: (time: number) => void;
+  onReplay: () => void;
+  startTime: number;
+  steps: TestStep[];
+  header?: string;
+}) {
+  if (steps.length === 0) {
+    return null;
+  }
+
+  return (
+    <>
+      {header ? <div className="py-2">{header}</div> : null}
+      {steps.map((s, i) => (
+        <TestStepItem
+          testName={s.name}
+          key={i}
+          index={i}
+          startTime={startTime + s.relativeStartTime}
+          duration={s.duration}
+          argString={s.args?.toString()}
+          parentId={s.parentId}
+          error={!!s.error}
+          isLastStep={steps.length - 1 === i}
+          onReplay={onReplay}
+          onPlayFromHere={() => onPlayFromHere(startTime + s.relativeStartTime)}
+          onGoToLocation={onGoToLocation}
+        />
+      ))}
+    </>
+  );
+}
 
 export function TestSteps({
   test,
@@ -43,24 +85,51 @@ export function TestSteps({
     }
   };
 
+  const [beforeEachSteps, testBodySteps, afterEachSteps] = (test.steps || []).reduce<TestStep[][]>(
+    (acc, step) => {
+      switch (step.hook) {
+        case "beforeEach":
+          acc[0].push(step);
+          break;
+        case "afterEach":
+          acc[2].push(step);
+          break;
+        default:
+          acc[1].push(step);
+          break;
+      }
+
+      return acc;
+    },
+    [[], [], []]
+  );
+
   return (
     <div className="flex flex-col rounded-lg py-2 pl-11">
-      {test.steps?.map((s, i) => (
-        <TestStepItem
-          testName={s.name}
-          key={i}
-          index={i}
-          startTime={startTime + s.relativeStartTime}
-          duration={s.duration}
-          argString={s.args?.toString()}
-          parentId={s.parentId}
-          error={!!s.error}
-          isLastStep={test.steps.length - 1 === i}
-          onReplay={onReplay}
-          onPlayFromHere={() => onPlayFromHere(startTime + s.relativeStartTime)}
-          onGoToLocation={onGoToLocation}
-        />
-      ))}
+      <TestSection
+        onReplay={onReplay}
+        onGoToLocation={onGoToLocation}
+        onPlayFromHere={onPlayFromHere}
+        steps={beforeEachSteps}
+        startTime={startTime}
+        header="Before Each"
+      />
+      <TestSection
+        onReplay={onReplay}
+        onGoToLocation={onGoToLocation}
+        onPlayFromHere={onPlayFromHere}
+        steps={testBodySteps}
+        startTime={startTime}
+        header={beforeEachSteps.length + afterEachSteps.length > 0 ? "Test Body" : undefined}
+      />
+      <TestSection
+        onReplay={onReplay}
+        onGoToLocation={onGoToLocation}
+        onPlayFromHere={onPlayFromHere}
+        steps={afterEachSteps}
+        startTime={startTime}
+        header="After Each"
+      />
       {test.error ? (
         <div className="border-l-2 border-red-500 bg-testsuitesErrorBgcolor text-testsuitesErrorColor">
           <div className="flex flex-row items-center space-x-1 p-2">
