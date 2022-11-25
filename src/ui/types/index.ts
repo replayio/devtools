@@ -1,3 +1,5 @@
+import { CypressAnnotationMessage } from "ui/reducers/reporter";
+
 export interface User {
   name?: string | null;
   picture?: string | null;
@@ -189,6 +191,9 @@ export type TestStep = {
   duration: number;
   relativeStartTime: number;
   point?: string;
+  pointEnd?: string;
+  messageEnqueue?: CypressAnnotationMessage;
+  messageEnd?: CypressAnnotationMessage;
   parentId?: string;
   error?: TestItemError;
   hook?: "beforeEach" | "afterEach";
