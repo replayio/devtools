@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { selectLocation } from "../../actions/sources";
 import { getThreadContext } from "../../selectors";
 import { ProgressBar } from "./ProgressBar";
-import { TestStepActions } from "./TestSteps";
+import { TestStepActions } from "./TestStepActions";
 
 export function TestStepItem({
   messageEnqueue,
@@ -26,6 +26,9 @@ export function TestStepItem({
   isLastStep,
   onReplay,
   onPlayFromHere,
+  id,
+  selectedIndex,
+  setSelectedIndex,
 }: {
   messageEnqueue?: CypressAnnotationMessage;
   messageEnd?: CypressAnnotationMessage;
@@ -41,8 +44,10 @@ export function TestStepItem({
   isLastStep: boolean;
   onReplay: () => void;
   onPlayFromHere: () => void;
+  selectedIndex: string | null;
+  id: string | null;
+  setSelectedIndex: (index: string) => void;
 }) {
-  const [selected, setSelected] = useState(false);
   const [consoleProps, setConsoleProps] = useState<any>(null);
   const cx = useAppSelector(getThreadContext);
   const currentTime = useAppSelector(getCurrentTime);
@@ -52,6 +57,7 @@ export function TestStepItem({
   // some chainers (`then`) don't have a duration, so let's bump it here (+1) so that it shows something in the UI
   const adjustedDuration = duration || 1;
   const isPaused = currentTime >= startTime && currentTime < startTime + adjustedDuration;
+  const selected = selectedIndex === id;
 
   const getConsoleProps = async () => {
     if (!pointEnd) {
@@ -64,13 +70,10 @@ export function TestStepItem({
     } = await window.app.sendMessage("Session.createPause", {
       point: pointEnd,
     });
-    console.log(2, pointEnd);
 
     if (!frames) {
       return null;
     }
-
-    console.log(3);
 
     const callerFrame = frames[1];
 
@@ -86,19 +89,16 @@ export function TestStepItem({
         pauseId
       );
 
-      console.log(cmdSubject);
       if (cmdSubject) {
         setConsoleProps(cmdSubject.result.data.objects?.[0].preview?.properties);
       }
     }
 
-    console.log(4);
     return null;
   };
   const onClick = () => {
-    console.log({ messageEnd, startTime });
     dispatch(seekToTime(startTime));
-    setSelected(!selected);
+    setSelectedIndex(id);
 
     getConsoleProps();
   };
@@ -181,14 +181,14 @@ export function TestStepItem({
     </>
   );
 }
-function ConsoleProps({ consoleProps }: { consoleProps: any }) {
+function ConsoleProps({ consoleProps }: { consoleProps: Record<string, string>[] }) {
   return (
     <div className="flex flex-col">
-      <div>Console Props here</div>
+      <div>Console Props</div>
       <div className="flex flex-col">
         {consoleProps?.map((p, i) => (
           <div key={i}>
-            {p.name}, {p.value}
+            {p.name}: {p.value || p.object}
           </div>
         ))}
       </div>

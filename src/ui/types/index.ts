@@ -1,4 +1,4 @@
-import { CypressAnnotationMessage } from "ui/reducers/reporter";
+import { Annotation, CypressAnnotationMessage } from "ui/reducers/reporter";
 
 export interface User {
   name?: string | null;
@@ -190,13 +190,19 @@ export type TestStep = {
   name: string;
   duration: number;
   relativeStartTime: number;
-  point?: string;
-  pointEnd?: string;
-  messageEnqueue?: CypressAnnotationMessage;
-  messageEnd?: CypressAnnotationMessage;
+  id: string;
   parentId?: string;
   error?: TestItemError;
   hook?: "beforeEach" | "afterEach";
+};
+
+export type AnnotatedTestStep = TestStep & {
+  annotations: Annotations;
+};
+
+type Annotations = {
+  end: Annotation;
+  enqueue: Annotation;
 };
 
 // https://github.com/Replayio/replay-cli/blob/main/packages/replay/metadata/source.ts
