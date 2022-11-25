@@ -52,13 +52,9 @@ function shouldAutoExpand(depth: number, item: TreeNode) {
   return item.name === "";
 }
 
-function findSource(
-  sources: Record<string, SourceDetails>,
-  itemPath: string,
-  source: SourceDetails
-) {
+function findSource(sourcesByUrl: Record<string, SourceDetails>, source: SourceDetails) {
   if (source) {
-    return sources[source.id];
+    return sourcesByUrl[source.url!];
   }
   return source;
 }
@@ -92,8 +88,8 @@ interface STState {
   uncollapsedTree: TreeDirectory;
   sourceTree: TreeNode;
   parentMap: WeakMap<object, any>;
-  listItems?: (TreeDirectory | TreeSource)[];
-  highlightItems?: (TreeDirectory | TreeSource)[];
+  listItems?: TreeNode[];
+  highlightItems?: TreeNode[];
 }
 
 class SourcesTree extends Component<PropsFromRedux, STState> {
@@ -168,7 +164,7 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
   // NOTE: we get the source from sources because item.contents is cached
   getSource(item: TreeNode) {
     const source = getSourceFromNode(item);
-    return findSource(this.props.sources, item.path, source!);
+    return findSource(this.props.sources, source!);
   }
 
   getPath = (item: TreeNode) => {
@@ -180,6 +176,18 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
     }
 
     return `${path}/${source.id}/`;
+  };
+
+  getKey = (item: TreeNode) => {
+    const { path } = item;
+    const source = this.getSource(item);
+
+    if (item.type === "source" && source) {
+      // Probably overkill
+      return `${source.url!}${source.contentHash || ""}${source.id}`;
+    }
+
+    return path;
   };
 
   onExpand = (item: TreeNode, expandedState: $FixTypeLater) => {
@@ -252,6 +260,7 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
         getChildren={this.getChildren}
         getParent={(item: TreeNode) => parentMap.get(item)}
         getPath={this.getPath}
+        getKey={this.getKey}
         getRoots={() => this.getRoots(sourceTree)}
         highlightItems={highlightItems}
         key={this.isEmpty() ? "empty" : "full"}

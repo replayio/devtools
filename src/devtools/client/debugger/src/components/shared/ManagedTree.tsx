@@ -11,6 +11,7 @@ export interface ManagedTreeProps<T extends { name: string }>
   extends Omit<TreeProps<T>, "renderItem" | "onExpand" | "onCollapse" | "isExpanded" | "getKey"> {
   expanded?: Set<string>;
   getPath: (item: T) => string;
+  getKey?: (item: T) => string;
   listItems?: T[];
   highlightItems?: T[];
   focused?: T;
@@ -137,7 +138,7 @@ class ManagedTree<T extends { name: string }> extends Component<
           {...this.props}
           isExpanded={(item: T) => expanded.has(this.props.getPath(item))}
           focused={this.props.focused}
-          getKey={this.props.getPath}
+          getKey={this.props.getKey ?? this.props.getPath}
           onExpand={(item: T) => this.setExpanded(item, true)}
           onCollapse={(item: T) => this.setExpanded(item, false)}
           onFocus={this.props.onFocus}

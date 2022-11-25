@@ -31,11 +31,11 @@
 }
 
 html:not([dir="rtl"]) .managed-tree .tree .node > div {
-  margin-left: 10px;
+  margin-left: 3px;
 }
 
 html[dir="rtl"] .managed-tree .tree .node > div {
-  margin-right: 10px;
+  margin-right: 3px;
 }
 
 .managed-tree .tree-node button {

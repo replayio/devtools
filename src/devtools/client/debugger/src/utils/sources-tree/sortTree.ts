@@ -5,7 +5,7 @@
 //
 
 import type { ParentMap, TreeDirectory, TreeNode, TreeSource } from "./types";
-import { isExactUrlMatch, nodeHasChildren } from "./utils";
+import { isDirectory, isExactUrlMatch, nodeHasChildren } from "./utils";
 
 /**
  * Look at the nodes in the source tree, and determine the index of where to
@@ -15,8 +15,8 @@ import { isExactUrlMatch, nodeHasChildren } from "./utils";
  */
 export function sortTree(tree: TreeDirectory, debuggeeUrl = "") {
   return tree.contents.sort((previousNode, currentNode) => {
-    const currentNodeIsDir = nodeHasChildren(currentNode);
-    const previousNodeIsDir = nodeHasChildren(previousNode);
+    const currentNodeIsDir = isDirectory(currentNode);
+    const previousNodeIsDir = isDirectory(previousNode);
     if (currentNode.name === "(index)") {
       return 1;
     } else if (previousNode.name === "(index)") {

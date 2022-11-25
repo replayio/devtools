@@ -8,7 +8,7 @@ import { SourceDetails } from "ui/reducers/sources";
 
 import { parse } from "../url";
 import type { ParentMap, TreeDirectory, TreeNode, TreeSource } from "./types";
-import { nodeHasChildren } from "./utils";
+import { isDirectory, nodeHasChildren } from "./utils";
 
 /*
  * Gets domain from url (without www prefix)
@@ -124,7 +124,7 @@ export function createTreeNodeMatcher(
       }
     }
     // Sort directories before files
-    const nodeIsDir = nodeHasChildren(node);
+    const nodeIsDir = isDirectory(node);
     if (nodeIsDir && !isDir) {
       return -1;
     } else if (!nodeIsDir && isDir) {
