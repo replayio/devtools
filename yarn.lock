@@ -3920,6 +3920,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@replayio/protocol@npm:^0.34.0":
+  version: 0.34.0
+  resolution: "@replayio/protocol@npm:0.34.0"
+  checksum: d9456980e1ae42ccad87e3064cd80bbb919d0cae98ee29d84adc0a78f92ffc864cd24fb28a67f4d63abd1540db9925ada32225405a32a64eebc5dca7855f4148
+  languageName: node
+  linkType: hard
+
 "@replayio/replay@npm:^0.10.0":
   version: 0.10.0
   resolution: "@replayio/replay@npm:0.10.0"
@@ -20829,7 +20836,7 @@ __metadata:
     "@redux-devtools/app": ^2.1.4
     "@redux-devtools/extension": ^3.2.2
     "@reduxjs/toolkit": ^1.8.4
-    "@replayio/protocol": ^0.32.3
+    "@replayio/protocol": ^0.34.0
     "@replayio/replay": ^0.9.6
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0

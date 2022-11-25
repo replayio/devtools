@@ -259,12 +259,10 @@ export function seekToTime(targetTime: number, autoPlay?: boolean): UIThunkActio
 
     const nearestEvent = mostRecentPaintOrMouseEvent(targetTime) || { point: "", time: Infinity };
     let bestPoint = nearestEvent;
-    try {
-      const pointNearTime = await replayClient.getPointNearTime(targetTime);
-      if (Math.abs(pointNearTime.time - targetTime) < Math.abs(nearestEvent.time - targetTime)) {
-        bestPoint = pointNearTime;
-      }
-    } catch (e) {}
+    const pointNearTime = await replayClient.getPointNearTime(targetTime);
+    if (Math.abs(pointNearTime.time - targetTime) < Math.abs(nearestEvent.time - targetTime)) {
+      bestPoint = pointNearTime;
+    }
 
     dispatch(seek(bestPoint.point, targetTime, false));
 
