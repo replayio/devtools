@@ -39,6 +39,7 @@ function TestSection({
       {steps.map((s, i) => (
         <TestStepItem
           stepName={s.name}
+          point={s.point}
           testTitle={testTitle}
           key={i}
           index={i}
@@ -56,17 +57,9 @@ function TestSection({
   );
 }
 
-export function TestSteps({
-  test,
-  startTime,
-  location,
-}: {
-  test: TestItem;
-  startTime: number;
-  location?: Location;
-}) {
-  const cx = useAppSelector(getThreadContext);
+export function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
   const dispatch = useAppDispatch();
+  const annotations = useAppSelector(getReporterAnnotationsForTitle(test.title));
   const testStart = test.steps[0].relativeStartTime + startTime;
   const testEnd =
     test.steps[test.steps.length - 1].relativeStartTime +
@@ -81,16 +74,16 @@ export function TestSteps({
   };
 
   const [beforeEachSteps, testBodySteps, afterEachSteps] = (test.steps || []).reduce<TestStep[][]>(
-    (acc, step) => {
+    (acc, step, i) => {
       switch (step.hook) {
         case "beforeEach":
-          acc[0].push(step);
+          acc[0].push({ ...step, point: annotations[i].point });
           break;
         case "afterEach":
-          acc[2].push(step);
+          acc[2].push({ ...step, point: annotations[i].point });
           break;
         default:
-          acc[1].push(step);
+          acc[1].push({ ...step, point: annotations[i].point });
           break;
       }
 
@@ -142,6 +135,7 @@ export function TestSteps({
 
 function TestStepItem({
   testTitle,
+  point,
   stepName,
   startTime,
   duration,
@@ -154,6 +148,7 @@ function TestStepItem({
   onPlayFromHere,
 }: {
   testTitle: string;
+  point?: string;
   stepName: string;
   startTime: number;
   duration: number;
@@ -166,7 +161,6 @@ function TestStepItem({
   onPlayFromHere: () => void;
 }) {
   const cx = useAppSelector(getThreadContext);
-  const annotations = useAppSelector(getReporterAnnotationsForTitle(testTitle));
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
   const isPast = currentTime > startTime;
@@ -182,8 +176,10 @@ function TestStepItem({
     dispatch(seekToTime(startTime + adjustedDuration - 1));
   };
   const onGoToLocation = async () => {
-    const { point } = annotations[index];
-
+    if (!point) {
+      return;
+    }
+    
     const frame = await (async point => {
       const {
         data: { frames },
