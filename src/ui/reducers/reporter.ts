@@ -42,7 +42,8 @@ const reporterSlice = createSlice({
 export default reporterSlice.reducer;
 export const { addReporterAnnotations } = reporterSlice.actions;
 export const getReporterAnnotations = (state: UIState) => state.reporter.annotations;
-export const getReporterAnnotationsForTests = (state: UIState) =>  state.reporter.annotations.filter(a => a.message.event === "test:start");
+export const getReporterAnnotationsForTests = (state: UIState) =>
+  state.reporter.annotations.filter(a => a.message.event === "test:start");
 export const getReporterAnnotationsForTitle = (title: string) => (state: UIState) =>
   state.reporter.annotations.filter(
     a =>

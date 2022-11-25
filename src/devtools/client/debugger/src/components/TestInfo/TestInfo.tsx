@@ -10,7 +10,6 @@ import { TestItem } from "ui/types";
 import { TestCase } from "./TestCase";
 
 function maybeCorrectTestTimes(testCases: TestItem[], annotations: Annotation[]) {
-  console.log({ testCases, annotations });
   return testCases.map((t, i) => ({
     ...t,
     relativeStartTime: annotations?.[i]?.time ? annotations?.[i]?.time : t.relativeStartTime,
