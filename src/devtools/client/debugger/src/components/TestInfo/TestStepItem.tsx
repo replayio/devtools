@@ -177,16 +177,19 @@ export function TestStepItem({
           duration={adjustedDuration}
         />
       </div>
-      {selected && <ConsoleProps consoleProps={consoleProps} />}
+      {selected && consoleProps && <ConsoleProps consoleProps={consoleProps} />}
     </>
   );
 }
 function ConsoleProps({ consoleProps }: { consoleProps: Record<string, string>[] }) {
+  // Don't show snapshot props
+  const displayedProps = consoleProps.filter(p => p.name !== "Snapshot");
+  
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col p-2 pl-8 gap-1">
       <div>Console Props</div>
-      <div className="flex flex-col">
-        {consoleProps?.map((p, i) => (
+      <div className="flex flex-col gap-1">
+        {displayedProps?.map((p, i) => (
           <div key={i}>
             {p.name}: {p.value || p.object}
           </div>

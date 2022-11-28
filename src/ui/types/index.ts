@@ -201,8 +201,8 @@ export type AnnotatedTestStep = TestStep & {
 };
 
 type Annotations = {
-  end: Annotation;
-  enqueue: Annotation;
+  end?: Annotation;
+  enqueue?: Annotation;
 };
 
 // https://github.com/Replayio/replay-cli/blob/main/packages/replay/metadata/source.ts

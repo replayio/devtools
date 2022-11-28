@@ -137,7 +137,7 @@ function TestSection({
   startTime: number;
   steps: AnnotatedTestStep[];
   selectedIndex: string | null;
-  setSelectedIndex: (index: string) => void;
+  setSelectedIndex: (index: string | null) => void;
   header?: string;
 }) {
   if (steps.length === 0) {
@@ -150,10 +150,10 @@ function TestSection({
       {steps.map((s, i) => (
         <TestStepItem
           stepName={s.name}
-          messageEnqueue={s.annotations.enqueue.message}
-          messageEnd={s.annotations.end.message}
-          point={s.annotations.enqueue.point}
-          pointEnd={s.annotations.end.point}
+          messageEnqueue={s.annotations.enqueue?.message}
+          messageEnd={s.annotations.end?.message}
+          point={s.annotations.enqueue?.point}
+          pointEnd={s.annotations.end?.point}
           key={i}
           index={i}
           startTime={startTime + s.relativeStartTime}
