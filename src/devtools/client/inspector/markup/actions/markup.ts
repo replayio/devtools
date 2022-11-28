@@ -20,9 +20,9 @@ import {
   getSelectedDomNodeId,
   newRootAdded,
   nodeBoxModelLoaded,
-  nodeHighlighted,
   nodeHighlightingCleared,
   nodeSelected,
+  nodesHighlighted,
   resetMarkup,
   updateChildrenLoading,
   updateNodeExpanded,
@@ -575,24 +575,32 @@ export function onPageDownKey(): UIThunkAction {
 
 let unhighlightTimer: ReturnType<typeof window.setTimeout> | null = null;
 
-export function highlightNode(nodeId: string, duration?: number): UIThunkAction {
+export function highlightNodes(
+  nodeIds: string[],
+  pauseId?: string,
+  duration?: number
+): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, protocolClient }) => {
     if (!ThreadFront.currentPause) {
       return;
     }
 
-    const { highlightedNode, nodeBoxModels } = getState().markup;
-    if (highlightedNode !== nodeId) {
-      dispatch(nodeHighlighted(nodeId));
+    const { highlightedNodes, nodeBoxModels } = getState().markup;
+    if (!highlightedNodes || !nodeIds.every(id => highlightedNodes.includes(id))) {
+      dispatch(nodesHighlighted(nodeIds));
 
-      if (!(nodeId in nodeBoxModels.entities)) {
-        const { model: nodeBoxModel } = await protocolClient.DOM.getBoxModel(
-          { node: nodeId },
-          ThreadFront.sessionId!,
-          ThreadFront.currentPause.pauseId!
-        );
-        dispatch(nodeBoxModelLoaded(nodeBoxModel));
-      }
+      await Promise.all(
+        nodeIds.map(async nodeId => {
+          if (!(nodeId in nodeBoxModels.entities)) {
+            const { model: nodeBoxModel } = await protocolClient.DOM.getBoxModel(
+              { node: nodeId },
+              ThreadFront.sessionId!,
+              pauseId || ThreadFront.currentPause.pauseId!
+            );
+            dispatch(nodeBoxModelLoaded(nodeBoxModel));
+          }
+        })
+      );
 
       if (unhighlightTimer) {
         clearTimeout(unhighlightTimer);
@@ -605,6 +613,10 @@ export function highlightNode(nodeId: string, duration?: number): UIThunkAction 
       }
     }
   };
+}
+
+export function highlightNode(nodeId: string, duration?: number): UIThunkAction {
+  return highlightNodes([nodeId], undefined, duration);
 }
 
 export function unhighlightNode(): UIThunkAction {

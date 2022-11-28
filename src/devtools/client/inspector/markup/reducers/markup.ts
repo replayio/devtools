@@ -75,7 +75,7 @@ export interface MarkupState {
   selectionReason: SelectionReason | null;
   // A node that should be scrolled into view.
   scrollIntoViewNode: string | null;
-  highlightedNode: string | null;
+  highlightedNodes: string[] | null;
   nodeBoxModels: EntityState<BoxModel>;
   // An object representing the markup tree. The key to the object represents the object
   // ID of a NodeFront of a given node. The value of each item in the object contains
@@ -103,7 +103,7 @@ const initialState: MarkupState = {
   selectedNode: null,
   selectionReason: null,
   scrollIntoViewNode: null,
-  highlightedNode: null,
+  highlightedNodes: null,
   nodeBoxModels: boxModelAdapter.getInitialState(),
   tree: nodeAdapter.getInitialState(),
 };
@@ -161,14 +161,14 @@ const markupSlice = createSlice({
     updateScrollIntoViewNode(state, action: PayloadAction<string | null>) {
       state.scrollIntoViewNode = action.payload;
     },
-    nodeHighlighted(state, action: PayloadAction<string>) {
-      state.highlightedNode = action.payload;
+    nodesHighlighted(state, action: PayloadAction<string[]>) {
+      state.highlightedNodes = action.payload;
     },
     nodeBoxModelLoaded(state, action: PayloadAction<BoxModel>) {
       boxModelAdapter.addOne(state.nodeBoxModels, action);
     },
     nodeHighlightingCleared(state) {
-      state.highlightedNode = null;
+      state.highlightedNodes = null;
     },
   },
   extraReducers: builder => {
@@ -188,7 +188,7 @@ export const {
   updateChildrenLoading,
   nodeSelected,
   updateScrollIntoViewNode,
-  nodeHighlighted,
+  nodesHighlighted,
   nodeBoxModelLoaded,
   nodeHighlightingCleared,
 } = markupSlice.actions;
