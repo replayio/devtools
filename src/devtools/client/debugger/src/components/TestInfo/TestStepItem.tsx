@@ -46,7 +46,7 @@ export function TestStepItem({
   onPlayFromHere: () => void;
   selectedIndex: string | null;
   id: string | null;
-  setSelectedIndex: (index: string) => void;
+  setSelectedIndex: (index: string | null) => void;
 }) {
   const [consoleProps, setConsoleProps] = useState<any>(null);
   const cx = useAppSelector(getThreadContext);
