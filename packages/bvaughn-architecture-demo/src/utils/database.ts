@@ -2,11 +2,13 @@ type Record<T> = {
   value: T | undefined;
 };
 
-function getOrCreateObjectStore(database: IDBDatabase, storeName: string): IDBObjectStore {
+export function createObjectStore(database: IDBDatabase, storeName: string) {
   if (!database.objectStoreNames.contains(storeName)) {
     database.createObjectStore(storeName, { keyPath: "key" });
   }
+}
 
+function getObjectStore(database: IDBDatabase, storeName: string): IDBObjectStore {
   const transaction = database.transaction([storeName]);
   return transaction.objectStore(storeName);
 }
@@ -35,7 +37,7 @@ async function getRecord<T>(
         record: Record<T | undefined>;
       }
   >(resolve => {
-    const objectStore = getOrCreateObjectStore(database, storeName);
+    const objectStore = getObjectStore(database, storeName);
     const readRequest = objectStore.get(recordName);
     readRequest.onerror = () => {
       console.error("IndexedDB read error:", readRequest.error);
@@ -95,7 +97,7 @@ export async function setValue<T>(
   record!.value = value;
 
   await new Promise<void>((resolve, reject) => {
-    const objectStore = getOrCreateObjectStore(database, storeName);
+    const objectStore = getObjectStore(database, storeName);
     const writeRequest = objectStore.put(record);
     writeRequest.onerror = () => {
       console.error("IndexedDB write error:", writeRequest.error);

@@ -1,9 +1,10 @@
 import { SetStateAction, useCallback, useEffect, useRef, useState, useTransition } from "react";
 
 import {
+  createObjectStore,
   getValue as getValueFromIndexedDb,
   setValue as setValueInIndexedDB,
-} from "src/utils/database";
+} from "../utils/database";
 
 const STATUS_INITIALIZATION_COMPLETE = "initialization-complete";
 const STATUS_INITIALIZATION_ERRORED = "initialization-errored";
@@ -76,14 +77,21 @@ export default function useIndexedDB<T>(options: {
     let cancelled = false;
 
     const openRequest = indexedDB.open(databaseName, databaseVersion);
+
+    openRequest.onupgradeneeded = () => {
+      const database = openRequest.result;
+      console.log("onupgradeneeded");
+      // TODO Handle upgrades
+      createObjectStore(database, storeName);
+    };
+
     openRequest.onerror = () => {
       console.error("IndexedDB open error:", openRequest.error);
       setStatus(STATUS_INITIALIZATION_ERRORED);
     };
     openRequest.onsuccess = () => {
+      const database = openRequest.result;
       if (!cancelled) {
-        const database = openRequest.result;
-
         databaseRef.current = database;
 
         getValueFromIndexedDb<T>(database, storeName, recordName).then(({ error, value }) => {
@@ -93,16 +101,12 @@ export default function useIndexedDB<T>(options: {
               setStatus(STATUS_INITIALIZATION_ERRORED);
             } else {
               const initialValue = initialValueRef.current;
-              setValue(value === undefined ? initialValue : value);
+              setValue(value === undefined ? initialValue : value!);
               setStatus(STATUS_INITIALIZATION_COMPLETE);
             }
           }
         });
       }
-    };
-    openRequest.onupgradeneeded = () => {
-      console.log("onupgradeneeded");
-      // TODO Handle upgrades
     };
 
     return () => {

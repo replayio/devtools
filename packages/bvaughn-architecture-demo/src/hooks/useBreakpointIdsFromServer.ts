@@ -20,11 +20,11 @@ export default function useBreakpointIdsFromServer(
   const pointIdToBreakpointIdMapRef = useRef<Map<PointId, BreakpointId[]>>(new Map());
 
   useEffect(() => {
-    if (points === undefined) {
-      return;
-    }
-
     async function setUpBreakpoints() {
+      if (points === undefined) {
+        return;
+      }
+
       const pointIdToBreakpointIdMap = pointIdToBreakpointIdMapRef.current;
       const prevPoints = prevPointsRef.current;
       if (prevPoints !== points) {

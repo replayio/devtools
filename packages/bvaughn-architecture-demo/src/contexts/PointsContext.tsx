@@ -169,7 +169,16 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       pointsForAnalysis:
         pointsForAnalysisStatus === "initialization-complete" ? pointsForAnalysis! : EMPTY_ARRAY,
     }),
-    [addPoint, deletePoints, editPoint, isPending, points, pointsForAnalysis]
+    [
+      addPoint,
+      deletePoints,
+      editPoint,
+      isPending,
+      points,
+      pointsForAnalysis,
+      pointsForAnalysisStatus,
+      pointsStatus,
+    ]
   );
 
   return <PointsContext.Provider value={context}>{children}</PointsContext.Provider>;
