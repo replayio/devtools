@@ -1,15 +1,22 @@
+import { Object as ProtocolObject } from "@replayio/protocol";
+import cloneDeep from "lodash/cloneDeep";
 import React, { useContext, useState } from "react";
 
+import PropertiesRenderer from "bvaughn-architecture-demo/components/inspector/PropertiesRenderer";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
-import { CypressAnnotationMessage } from "ui/reducers/reporter";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { CypressAnnotationMessage } from "ui/types";
 
 import { selectLocation } from "../../actions/sources";
 import { getThreadContext } from "../../selectors";
 import { ProgressBar } from "./ProgressBar";
 import { TestStepActions } from "./TestStepActions";
+
+function returnFirst<T, R>(list: T[] | undefined, fn: (v: T) => R | null) {
+  return list ? list.reduce<R | null>((acc, v) => acc ?? fn(v), null) : null;
+}
 
 export function TestStepItem({
   messageEnqueue,
@@ -48,7 +55,8 @@ export function TestStepItem({
   id: string | null;
   setSelectedIndex: (index: string | null) => void;
 }) {
-  const [consoleProps, setConsoleProps] = useState<any>(null);
+  const [consoleProps, setConsoleProps] = useState<ProtocolObject>();
+  const [pauseId, setPauseId] = useState<string | null>(null);
   const cx = useAppSelector(getThreadContext);
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
@@ -64,34 +72,59 @@ export function TestStepItem({
       return null;
     }
 
-    const {
-      pauseId,
-      data: { frames },
-    } = await window.app.sendMessage("Session.createPause", {
-      point: pointEnd,
-    });
+    try {
+      const pauseResult = await client.createPause(pointEnd);
+      const frames = pauseResult.data.frames;
 
-    if (!frames) {
-      return null;
-    }
-
-    const callerFrame = frames[1];
-
-    if (messageEnd?.logVariable) {
-      const cmdSubject = await window.app.sendMessage(
-        "Pause.evaluateInFrame",
-        {
-          frameId: callerFrame.frameId,
-          expression: `(${messageEnd.logVariable}.consoleProps)`,
-          pure: false,
-          useOriginalScopes: true,
-        },
-        pauseId
-      );
-
-      if (cmdSubject) {
-        setConsoleProps(cmdSubject.result.data.objects?.[0].preview?.properties);
+      if (!frames) {
+        return null;
       }
+
+      const callerFrame = frames[1];
+
+      if (messageEnd?.logVariable) {
+        const logResult = await client.evaluateExpression(
+          pauseResult.pauseId,
+          messageEnd.logVariable,
+          callerFrame.frameId
+        );
+
+        const consolePropsProperty = returnFirst(logResult.data.objects, o => {
+          return logResult.returned && o.objectId === logResult.returned.object
+            ? returnFirst(o.preview?.properties, p => (p.name === "consoleProps" ? p : null))
+            : null;
+        });
+
+        if (consolePropsProperty?.object) {
+          const consolePropsPauseData = await client.getObjectWithPreview(
+            consolePropsProperty.object,
+            pauseResult.pauseId
+          );
+          const consoleProps = consolePropsPauseData.objects?.find(
+            o => o.objectId === consolePropsProperty.object
+          );
+
+          const consolePropsCopy = cloneDeep(consoleProps);
+
+          if (consolePropsCopy?.preview) {
+            // suppress the prototype entry in the properties output
+            consolePropsCopy.preview.prototypeId = undefined;
+          }
+
+          if (consolePropsCopy?.preview?.properties) {
+            // Remove snapshot value
+            consolePropsCopy.preview.properties = consolePropsCopy.preview.properties.filter(
+              p => p.name !== "Snapshot"
+            );
+          }
+
+          setPauseId(pauseResult.pauseId);
+          setConsoleProps(consolePropsCopy);
+        }
+      }
+    } catch {
+      setPauseId(null);
+      setConsoleProps(undefined);
     }
 
     return null;
@@ -177,24 +210,25 @@ export function TestStepItem({
           duration={adjustedDuration}
         />
       </div>
-      {selected && consoleProps && <ConsoleProps consoleProps={consoleProps} />}
+      {selected && pauseId && <ConsoleProps pauseId={pauseId} consoleProps={consoleProps} />}
     </>
   );
 }
-function ConsoleProps({ consoleProps }: { consoleProps: Record<string, string>[] }) {
-  // Don't show snapshot props
-  const displayedProps = consoleProps.filter(p => p.name !== "Snapshot");
+function ConsoleProps({
+  pauseId,
+  consoleProps,
+}: {
+  pauseId?: string;
+  consoleProps?: ProtocolObject;
+}) {
+  if (!pauseId || !consoleProps) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col gap-1 p-2 pl-8">
       <div>Console Props</div>
-      <div className="flex flex-col gap-1">
-        {displayedProps?.map((p, i) => (
-          <div key={i}>
-            {p.name}: {p.value || p.object}
-          </div>
-        ))}
-      </div>
+      <PropertiesRenderer pauseId={pauseId} object={consoleProps} />
     </div>
   );
 }

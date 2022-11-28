@@ -1,4 +1,4 @@
-import { Annotation, CypressAnnotationMessage } from "ui/reducers/reporter";
+import { ExecutionPoint } from "@replayio/protocol";
 
 export interface User {
   name?: string | null;
@@ -184,6 +184,22 @@ type TestItemError = {
   line?: number;
   column?: number;
 };
+
+type TestEvents = "test:start" | "step:end" | "step:enqueue" | "step:start";
+
+export type CypressAnnotationMessage = {
+  event: TestEvents;
+  titlePath: string[];
+  commandVariable?: "cmd" | "log";
+  logVariable?: "cmd" | "log";
+  id?: string;
+};
+
+export interface Annotation {
+  point: ExecutionPoint;
+  time: number;
+  message: CypressAnnotationMessage;
+}
 
 export type TestStep = {
   args: string[];

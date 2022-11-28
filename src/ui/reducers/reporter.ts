@@ -1,23 +1,8 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { ExecutionPoint } from "@replayio/protocol";
+import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 
 import { compareNumericStrings } from "protocol/utils";
 import { UIState } from "ui/state";
-
-type TestEvents = "test:start" | "step:end" | "step:enqueue" | "step:start";
-
-export type CypressAnnotationMessage = {
-  event: TestEvents;
-  titlePath: string[];
-  commandVariable?: "cmd" | "log";
-  logVariable?: "cmd" | "log";
-  id?: string;
-};
-export interface Annotation {
-  point: ExecutionPoint;
-  time: number;
-  message: CypressAnnotationMessage;
-}
+import { Annotation } from "ui/types";
 
 export interface ReporterState {
   annotations: Annotation[];
@@ -43,17 +28,23 @@ const reporterSlice = createSlice({
 export default reporterSlice.reducer;
 export const { addReporterAnnotations } = reporterSlice.actions;
 export const getReporterAnnotations = (state: UIState) => state.reporter.annotations;
-export const getReporterAnnotationsForTests = (state: UIState) =>
-  state.reporter.annotations.filter(a => a.message.event === "test:start");
-export const getReporterAnnotationsForTitle = (title: string) => (state: UIState) =>
-  state.reporter.annotations.filter(
-    a =>
-      a.message.titlePath[a.message.titlePath.length - 1] === title &&
-      a.message.event === "step:enqueue"
+export const getReporterAnnotationsForTests = createSelector(
+  getReporterAnnotations,
+  (annotations: Annotation[]) => annotations.filter(a => a.message.event === "test:start")
+);
+export const getReporterAnnotationsForTitle = (title: string) =>
+  createSelector(getReporterAnnotations, (annotations: Annotation[]) =>
+    annotations.filter(
+      a =>
+        a.message.titlePath[a.message.titlePath.length - 1] === title &&
+        a.message.event === "step:enqueue"
+    )
   );
-export const getReporterAnnotationsForTitleEnd = (title: string) => (state: UIState) =>
-  state.reporter.annotations.filter(
-    a =>
-      a.message.titlePath[a.message.titlePath.length - 1] === title &&
-      a.message.event === "step:end"
+export const getReporterAnnotationsForTitleEnd = (title: string) =>
+  createSelector(getReporterAnnotations, (annotations: Annotation[]) =>
+    annotations.filter(
+      a =>
+        a.message.titlePath[a.message.titlePath.length - 1] === title &&
+        a.message.event === "step:end"
+    )
   );
