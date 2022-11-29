@@ -164,8 +164,8 @@ const markupSlice = createSlice({
     nodesHighlighted(state, action: PayloadAction<string[]>) {
       state.highlightedNodes = action.payload;
     },
-    nodeBoxModelLoaded(state, action: PayloadAction<BoxModel>) {
-      boxModelAdapter.addOne(state.nodeBoxModels, action);
+    nodeBoxModelsLoaded(state, action: PayloadAction<BoxModel[]>) {
+      boxModelAdapter.setAll(state.nodeBoxModels, action);
     },
     nodeHighlightingCleared(state) {
       state.highlightedNodes = null;
@@ -174,8 +174,15 @@ const markupSlice = createSlice({
   extraReducers: builder => {
     // dispatched by actions/timeline.ts, in `playback()`
     builder.addCase("pause/resumed", (state, action) => {
-      // Clear out the DOM nodes data whenever the user hits "Play" in the timeline
-      return initialState;
+      // Clear out the DOM nodes data whenever the user hits "Play" in the timeline.
+      // However, preserve whatever nodes may be highlighted at the time,
+      // since these can now be independent of the current pause (such as
+      // highlighting from a test step)
+      return {
+        ...initialState,
+        highlightedNodes: state.highlightedNodes,
+        nodeBoxModels: state.nodeBoxModels,
+      };
     });
   },
 });
@@ -189,7 +196,7 @@ export const {
   nodeSelected,
   updateScrollIntoViewNode,
   nodesHighlighted,
-  nodeBoxModelLoaded,
+  nodeBoxModelsLoaded,
   nodeHighlightingCleared,
 } = markupSlice.actions;
 

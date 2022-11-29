@@ -10,7 +10,11 @@ import type { UIStore, UIThunkAction } from "ui/actions";
 import { isInspectorSelected } from "ui/reducers/app";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
 import { UIState } from "ui/state";
-import { getNodeDataAsync, getNodeEventListenersAsync } from "ui/suspense/nodeCaches";
+import {
+  getBoxModelAsync,
+  getNodeDataAsync,
+  getNodeEventListenersAsync,
+} from "ui/suspense/nodeCaches";
 import { getBoundingRectAsync, getComputedStyleAsync } from "ui/suspense/styleCaches";
 
 import {
@@ -19,7 +23,7 @@ import {
   childrenAdded,
   getSelectedDomNodeId,
   newRootAdded,
-  nodeBoxModelLoaded,
+  nodeBoxModelsLoaded,
   nodeHighlightingCleared,
   nodeSelected,
   nodesHighlighted,
@@ -581,26 +585,35 @@ export function highlightNodes(
   duration?: number
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, protocolClient }) => {
-    if (!ThreadFront.currentPause) {
+    if (nodeIds.length === 0) {
       return;
     }
 
-    const { highlightedNodes, nodeBoxModels } = getState().markup;
+    if (!pauseId) {
+      // We're trying to highlight nodes from the current pause.
+      // Bail out if we're not paused
+      if (!ThreadFront.currentPause) {
+        return;
+      }
+      pauseId = ThreadFront.currentPause.pauseId!;
+    }
+
+    const { highlightedNodes } = getState().markup;
     if (!highlightedNodes || !nodeIds.every(id => highlightedNodes.includes(id))) {
       dispatch(nodesHighlighted(nodeIds));
 
-      await Promise.all(
+      const boxModels = await Promise.all(
         nodeIds.map(async nodeId => {
-          if (!(nodeId in nodeBoxModels.entities)) {
-            const { model: nodeBoxModel } = await protocolClient.DOM.getBoxModel(
-              { node: nodeId },
-              ThreadFront.sessionId!,
-              pauseId || ThreadFront.currentPause.pauseId!
-            );
-            dispatch(nodeBoxModelLoaded(nodeBoxModel));
-          }
+          const boxModel = await getBoxModelAsync(
+            protocolClient,
+            ThreadFront.sessionId!,
+            pauseId!,
+            nodeId
+          );
+          return boxModel;
         })
       );
+      dispatch(nodeBoxModelsLoaded(boxModels));
 
       if (unhighlightTimer) {
         clearTimeout(unhighlightTimer);
