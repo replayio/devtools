@@ -184,9 +184,9 @@ export function TestStepItem({
 function ConsoleProps({ consoleProps }: { consoleProps: Record<string, string>[] }) {
   // Don't show snapshot props
   const displayedProps = consoleProps.filter(p => p.name !== "Snapshot");
-  
+
   return (
-    <div className="flex flex-col p-2 pl-8 gap-1">
+    <div className="flex flex-col gap-1 p-2 pl-8">
       <div>Console Props</div>
       <div className="flex flex-col gap-1">
         {displayedProps?.map((p, i) => (
