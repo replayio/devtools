@@ -29,8 +29,8 @@ function useGetTestSections(
           acc[0].push({
             ...step,
             annotations: {
-              end: annotationsEnd[i],
-              enqueue: annotationsEnqueue[i],
+              end: annotationsEnd.find(a => a.message.id === step.id),
+              enqueue: annotationsEnqueue.find(a => a.message.id === step.id),
             },
           });
           break;
@@ -38,8 +38,8 @@ function useGetTestSections(
           acc[2].push({
             ...step,
             annotations: {
-              end: annotationsEnd[i],
-              enqueue: annotationsEnqueue[i],
+              end: annotationsEnd.find(a => a.message.id === step.id),
+              enqueue: annotationsEnqueue.find(a => a.message.id === step.id),
             },
           });
           break;
@@ -47,8 +47,8 @@ function useGetTestSections(
           acc[1].push({
             ...step,
             annotations: {
-              end: annotationsEnd[i],
-              enqueue: annotationsEnqueue[i],
+              end: annotationsEnd.find(a => a.message.id === step.id),
+              enqueue: annotationsEnqueue.find(a => a.message.id === step.id),
             },
           });
           break;

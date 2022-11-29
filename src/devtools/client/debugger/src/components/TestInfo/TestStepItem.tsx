@@ -226,7 +226,7 @@ function ConsoleProps({
   }
 
   return (
-    <div className="flex flex-col gap-1 p-2 pl-8">
+    <div className="flex flex-col gap-1 p-2 pl-8 font-mono">
       <div>Console Props</div>
       <PropertiesRenderer pauseId={pauseId} object={consoleProps} />
     </div>
