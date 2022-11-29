@@ -12,8 +12,8 @@ import { CypressAnnotationMessage } from "ui/types";
 import { selectLocation } from "../../actions/sources";
 import { getThreadContext } from "../../selectors";
 import { ProgressBar } from "./ProgressBar";
-import { TestStepActions } from "./TestStepActions";
 import { TestInfoContext } from "./TestInfo";
+import { TestStepActions } from "./TestStepActions";
 
 function returnFirst<T, R>(list: T[] | undefined, fn: (v: T) => R | null) {
   return list ? list.reduce<R | null>((acc, v) => acc ?? fn(v), null) : null;
