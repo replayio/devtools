@@ -1,5 +1,7 @@
-import { useMemo } from "react";
+import { Object as ProtocolObject } from "@replayio/protocol";
+import { createContext, useContext, useMemo, useState } from "react";
 
+import PropertiesRenderer from "bvaughn-architecture-demo/components/inspector/PropertiesRenderer";
 import { getRecordingDuration } from "ui/actions/app";
 import { setFocusRegion } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -8,6 +10,17 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Annotation, TestItem } from "ui/types";
 
 import { TestCase } from "./TestCase";
+
+type TestInfoContextType = {
+  selectedId: string | null;
+  setSelectedId: (id: string | null) => void;
+  consoleProps?: ProtocolObject;
+  setConsoleProps: (obj?: ProtocolObject) => void;
+  pauseId: string | null;
+  setPauseId: (id: string | null) => void;
+};
+
+export const TestInfoContext = createContext<TestInfoContextType>(null as any);
 
 function maybeCorrectTestTimes(testCases: TestItem[], annotations: Annotation[]) {
   return testCases.map((t, i) => ({
@@ -25,6 +38,9 @@ export default function TestInfo({
   highlightedTest: number | null;
   setHighlightedTest: (test: number | null) => void;
 }) {
+  const [consoleProps, setConsoleProps] = useState<ProtocolObject>();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [pauseId, setPauseId] = useState<string | null>(null);
   const dispatch = useAppDispatch();
   const annotations = useAppSelector(getReporterAnnotationsForTests);
   const duration = useAppSelector(getRecordingDuration);
@@ -48,27 +64,50 @@ export default function TestInfo({
         endTime: duration,
       })
     );
+    setPauseId(null);
+    setConsoleProps(undefined);
   };
 
   return (
-    <div className="flex flex-col space-y-1 px-4 py-2">
-      {highlightedTest !== null && (
-        <button onClick={onReset} className="flex flex-row items-center hover:underline">
-          <MaterialIcon>chevron_left</MaterialIcon>
-          <div>Back</div>
-        </button>
-      )}
-      {correctedTestCases.map(
-        (t, i) =>
-          showTest(i) && (
-            <TestCase
-              test={t}
-              key={i}
-              setHighlightedTest={() => setHighlightedTest(i)}
-              isHighlighted={i === highlightedTest}
-            />
-          )
-      )}
+    <TestInfoContext.Provider
+      value={{ selectedId, setSelectedId, consoleProps, setConsoleProps, pauseId, setPauseId }}
+    >
+      <div className="flex flex-grow flex-col overflow-hidden">
+        <div className="flex flex-grow flex-col space-y-1 overflow-scroll px-4 py-2">
+          {highlightedTest !== null && (
+            <button onClick={onReset} className="flex flex-row items-center hover:underline">
+              <MaterialIcon>chevron_left</MaterialIcon>
+              <div>Back</div>
+            </button>
+          )}
+          {correctedTestCases.map(
+            (t, i) =>
+              showTest(i) && (
+                <TestCase
+                  test={t}
+                  key={i}
+                  setHighlightedTest={() => setHighlightedTest(i)}
+                  isHighlighted={i === highlightedTest}
+                />
+              )
+          )}
+        </div>
+        <Console />
+      </div>
+    </TestInfoContext.Provider>
+  );
+}
+
+function Console() {
+  const { pauseId, consoleProps } = useContext(TestInfoContext);
+  const hideProps = !pauseId || !consoleProps;
+
+  return (
+    <div className="h-100 h-64 flex-shrink-0 overflow-auto p-2">
+      <div>Console Props</div>
+      <div className="flex flex-col gap-1 p-2 pl-8 font-mono">
+        {!hideProps && <PropertiesRenderer pauseId={pauseId} object={consoleProps} />}
+      </div>
     </div>
   );
 }

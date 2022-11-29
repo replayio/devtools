@@ -12,6 +12,7 @@ import { CypressAnnotationMessage } from "ui/types";
 import { selectLocation } from "../../actions/sources";
 import { getThreadContext } from "../../selectors";
 import { ProgressBar } from "./ProgressBar";
+import { TestInfoContext } from "./TestInfo";
 import { TestStepActions } from "./TestStepActions";
 
 function returnFirst<T, R>(list: T[] | undefined, fn: (v: T) => R | null) {
@@ -55,8 +56,7 @@ export function TestStepItem({
   id: string | null;
   setSelectedIndex: (index: string | null) => void;
 }) {
-  const [consoleProps, setConsoleProps] = useState<ProtocolObject>();
-  const [pauseId, setPauseId] = useState<string | null>(null);
+  const { setConsoleProps, setPauseId } = useContext(TestInfoContext);
   const cx = useAppSelector(getThreadContext);
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
@@ -210,25 +210,6 @@ export function TestStepItem({
           duration={adjustedDuration}
         />
       </div>
-      {selected && pauseId && <ConsoleProps pauseId={pauseId} consoleProps={consoleProps} />}
     </>
-  );
-}
-function ConsoleProps({
-  pauseId,
-  consoleProps,
-}: {
-  pauseId?: string;
-  consoleProps?: ProtocolObject;
-}) {
-  if (!pauseId || !consoleProps) {
-    return null;
-  }
-
-  return (
-    <div className="flex flex-col gap-1 p-2 pl-8 font-mono">
-      <div>Console Props</div>
-      <PropertiesRenderer pauseId={pauseId} object={consoleProps} />
-    </div>
   );
 }

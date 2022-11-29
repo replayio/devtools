@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 
 import { startPlayback } from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
@@ -9,6 +9,7 @@ import {
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AnnotatedTestStep, Annotation, TestItem, TestStep } from "ui/types";
 
+import { TestInfoContext } from "./TestInfo";
 import { TestStepItem } from "./TestStepItem";
 
 function useGetTestSections(
@@ -69,7 +70,7 @@ function useGetTestSections(
 }
 
 export function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
-  const [selectedIndex, setSelectedIndex] = useState<null | string>(null);
+  const { selectedId, setSelectedId } = useContext(TestInfoContext);
   const dispatch = useAppDispatch();
   const { beforeEach, testBody, afterEach } = useGetTestSections(test.steps, test.title);
   const testStart = test.steps[0].relativeStartTime + startTime;
@@ -92,8 +93,8 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
         onPlayFromHere={onPlayFromHere}
         steps={beforeEach}
         startTime={startTime}
-        selectedIndex={selectedIndex}
-        setSelectedIndex={setSelectedIndex}
+        selectedIndex={selectedId}
+        setSelectedIndex={setSelectedId}
         header="Before Each"
       />
       <TestSection
@@ -101,8 +102,8 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
         onPlayFromHere={onPlayFromHere}
         steps={testBody}
         startTime={startTime}
-        selectedIndex={selectedIndex}
-        setSelectedIndex={setSelectedIndex}
+        selectedIndex={selectedId}
+        setSelectedIndex={setSelectedId}
         header={beforeEach.length + afterEach.length > 0 ? "Test Body" : undefined}
       />
       <TestSection
@@ -110,8 +111,8 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
         onPlayFromHere={onPlayFromHere}
         steps={afterEach}
         startTime={startTime}
-        selectedIndex={selectedIndex}
-        setSelectedIndex={setSelectedIndex}
+        selectedIndex={selectedId}
+        setSelectedIndex={setSelectedId}
         header="After Each"
       />
       {test.error ? (
