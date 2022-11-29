@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import { startPlayback } from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
@@ -7,7 +7,7 @@ import {
   getReporterAnnotationsForTitleEnd,
 } from "ui/reducers/reporter";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { AnnotatedTestStep, TestItem, TestStep } from "ui/types";
+import { AnnotatedTestStep, Annotation, TestItem, TestStep } from "ui/types";
 
 import { TestStepItem } from "./TestStepItem";
 
@@ -22,44 +22,50 @@ function useGetTestSections(
   const annotationsEnqueue = useAppSelector(getReporterAnnotationsForTitle(testTitle));
   const annotationsEnd = useAppSelector(getReporterAnnotationsForTitleEnd(testTitle));
 
-  const [beforeEach, testBody, afterEach] = steps.reduce<AnnotatedTestStep[][]>(
-    (acc, step, i) => {
-      switch (step.hook) {
-        case "beforeEach":
-          acc[0].push({
-            ...step,
-            annotations: {
-              end: annotationsEnd.find(a => a.message.id === step.id),
-              enqueue: annotationsEnqueue.find(a => a.message.id === step.id),
-            },
-          });
-          break;
-        case "afterEach":
-          acc[2].push({
-            ...step,
-            annotations: {
-              end: annotationsEnd.find(a => a.message.id === step.id),
-              enqueue: annotationsEnqueue.find(a => a.message.id === step.id),
-            },
-          });
-          break;
-        default:
-          acc[1].push({
-            ...step,
-            annotations: {
-              end: annotationsEnd.find(a => a.message.id === step.id),
-              enqueue: annotationsEnqueue.find(a => a.message.id === step.id),
-            },
-          });
-          break;
-      }
+  return useMemo(
+    () =>
+      steps.reduce<{
+        beforeEach: AnnotatedTestStep[];
+        testBody: AnnotatedTestStep[];
+        afterEach: AnnotatedTestStep[];
+      }>(
+        (acc, step, i) => {
+          switch (step.hook) {
+            case "beforeEach":
+              acc.beforeEach.push({
+                ...step,
+                annotations: {
+                  end: annotationsEnd.find(a => a.message.id === step.id),
+                  enqueue: annotationsEnqueue.find(a => a.message.id === step.id),
+                },
+              });
+              break;
+            case "afterEach":
+              acc.afterEach.push({
+                ...step,
+                annotations: {
+                  end: annotationsEnd.find(a => a.message.id === step.id),
+                  enqueue: annotationsEnqueue.find(a => a.message.id === step.id),
+                },
+              });
+              break;
+            default:
+              acc.testBody.push({
+                ...step,
+                annotations: {
+                  end: annotationsEnd.find(a => a.message.id === step.id),
+                  enqueue: annotationsEnqueue.find(a => a.message.id === step.id),
+                },
+              });
+              break;
+          }
 
-      return acc;
-    },
-    [[], [], []]
+          return acc;
+        },
+        { beforeEach: [], testBody: [], afterEach: [] }
+      ),
+    [steps, annotationsEnd, annotationsEnqueue]
   );
-
-  return { beforeEach, testBody, afterEach };
 }
 
 export function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
