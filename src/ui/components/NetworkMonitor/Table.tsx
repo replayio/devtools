@@ -70,8 +70,6 @@ export default function Table({
     [events, requests, types]
   );
 
-  console.log({ data });
-
   const defaultColumn = useMemo(
     () => ({
       minWidth: 60,
