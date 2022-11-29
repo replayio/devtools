@@ -18,6 +18,7 @@ import StatusDropdown from "./shared/StatusDropdown";
 
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
 const Accordion = require("devtools/client/debugger/src/components/shared/Accordion").default;
+import styles from "./SidePanel.module.css";
 
 function TestResultsSummary({ testCases }: { testCases: TestItem[] }) {
   const failed = testCases.filter(c => c.result === "failed").length;
@@ -43,53 +44,29 @@ export default function SidePanel() {
 
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
-  const [cypressCollapsed, setCypressCollapsed] = useState(false);
   const [highlightedTest, setHighlightedTest] = useState<number | null>(null);
-  const recordingId = useGetRecordingId();
-  const { recording } = useGetRecording(recordingId);
 
   const items: any[] = [];
 
-  if (recording?.metadata?.test?.tests?.length) {
-    items.push({
-      header: (
-        <div className="flex flex-row items-center">
-          <span className="flex-grow truncate">{recording?.metadata?.test?.file}</span>
-          <TestResultsSummary testCases={recording?.metadata?.test?.tests} />
-        </div>
-      ),
+  // if (recording?.metadata?.test?.tests?.length) {
+  items.push(
+    {
+      header: "Info",
+      buttons: resolveRecording ? <StatusDropdown /> : null,
+      className: "replay-info",
+      component: <ReplayInfo />,
+      opened: !replayInfoCollapsed,
+      onToggle: () => setReplayInfoCollapsed(!replayInfoCollapsed),
+    },
+    {
+      header: "Events",
       buttons: null,
-      className: "cyress-info flex-1 border-t overflow-hidden border-themeBorder",
-      component: (
-        <TestInfo
-          testCases={recording?.metadata?.test.tests}
-          highlightedTest={highlightedTest}
-          setHighlightedTest={setHighlightedTest}
-        />
-      ),
-      opened: !cypressCollapsed,
-      onToggle: () => setCypressCollapsed(!setCypressCollapsed),
-    });
-  } else {
-    items.push(
-      {
-        header: "Info",
-        buttons: resolveRecording ? <StatusDropdown /> : null,
-        className: "replay-info",
-        component: <ReplayInfo />,
-        opened: !replayInfoCollapsed,
-        onToggle: () => setReplayInfoCollapsed(!replayInfoCollapsed),
-      },
-      {
-        header: "Events",
-        buttons: null,
-        className: "events-info flex-1 border-t overflow-hidden border-themeBorder",
-        component: <Events />,
-        opened: !eventsCollapsed,
-        onToggle: () => setEventsCollapsed(!eventsCollapsed),
-      }
-    );
-  }
+      className: "events-info flex-1 border-t overflow-hidden border-themeBorder",
+      component: <Events />,
+      opened: !eventsCollapsed,
+      onToggle: () => setEventsCollapsed(!eventsCollapsed),
+    }
+  );
 
   return (
     <div
@@ -99,9 +76,46 @@ export default function SidePanel() {
       {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}
       {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}
       {selectedPrimaryPanel === "comments" && <CommentCardsList />}
-      {selectedPrimaryPanel === "events" && <Accordion items={items} />}
+      {selectedPrimaryPanel === "events" && (
+        <EventsPane
+          items={items}
+          highlightedTest={highlightedTest}
+          setHighlightedTest={setHighlightedTest}
+        />
+      )}
       {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
       {selectedPrimaryPanel === "search" && <SearchFilesReduxAdapter />}
     </div>
   );
+}
+
+function EventsPane({
+  items,
+  highlightedTest,
+  setHighlightedTest,
+}: {
+  items: any[];
+  highlightedTest: number | null;
+  setHighlightedTest: (test: number | null) => void;
+}) {
+  const recordingId = useGetRecordingId();
+  const { recording } = useGetRecording(recordingId);
+
+  if (recording?.metadata?.test?.tests?.length) {
+    return (
+      <div className="h-full flex-1 flex flex-col overflow-hidden">
+        <div className={styles.ToolbarHeader}>
+          <span className="flex-grow truncate">{recording?.metadata?.test?.file}</span>
+          <TestResultsSummary testCases={recording?.metadata?.test?.tests} />
+        </div>
+        <TestInfo
+          testCases={recording?.metadata?.test.tests}
+          highlightedTest={highlightedTest}
+          setHighlightedTest={setHighlightedTest}
+        />
+      </div>
+    )
+  }
+
+  return <Accordion items={items} />;
 }
