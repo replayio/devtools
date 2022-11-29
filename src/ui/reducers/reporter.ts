@@ -48,9 +48,3 @@ export const getReporterAnnotationsForTitleEnd = (title: string) =>
         a.message.event === "step:end"
     )
   );
-export const getReporterAnnotationsForTitleStart = (title: string) => (state: UIState) =>
-  state.reporter.annotations.filter(
-    a =>
-      a.message.titlePath[a.message.titlePath.length - 1] === title &&
-      a.message.event === "step:start"
-  );

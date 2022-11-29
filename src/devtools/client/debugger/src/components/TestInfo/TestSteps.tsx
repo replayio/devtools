@@ -155,14 +155,15 @@ function TestSection({
 }) {
   const requests = useAppSelector(getRequests);
   const events = useAppSelector(getEvents);
+
+  const data = useMemo(
+    () => partialRequestsToCompleteSummaries(requests, events, new Set()),
+    [requests, events]
+  );
+
   if (steps.length === 0) {
     return null;
   }
-
-  const endTime =
-    startTime + steps[steps.length - 1].relativeStartTime + steps[steps.length - 1].duration;
-
-  const data = partialRequestsToCompleteSummaries(requests, events, new Set());
 
   return (
     <>
