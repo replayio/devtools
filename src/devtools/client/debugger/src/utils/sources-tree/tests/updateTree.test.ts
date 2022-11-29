@@ -40,19 +40,64 @@ describe("updateTree", () => {
     "node_modules/react-redux/es/types.js",
   ];
 
+  // Case where two duplicated sources with the same content hash result in
+  // a single "source" treenode
+  const duplicatedSourcePaths1 = [
+    "src/features3/todos/todos.ts?3",
+    "src/features3/todos/todos.ts?4",
+  ];
+
+  // Case where there are multiple different source versions, but at least one
+  // duplicate content hash, resulting in a "multiSource" node with <N items
+  const duplicatedSourcePaths2 = [
+    "src/features4/todos/todos.ts?number=5&duplicate=true",
+    "src/features4/todos/todos.ts?number=6&duplicate=false",
+    "src/features4/todos/todos.ts?number=7&duplicate=true",
+  ];
+
   // Anything that starts with "webpack", "https", or "replay-content" is a full URL
   const reIsFullURL = /^(webpack|https|replay-content)/;
 
   // Fake a set of SourceDetails objects based on these URLs
-  const sources: SourceDetails[] = partialPaths.map(path => {
+  const mainSources: SourceDetails[] = partialPaths.map(path => {
     // We don't care about most of the SourceDetails object
     // fields, but TS wants us to fill them in anyway.
     // Cast to skip them.
     return {
       id: path,
       url: reIsFullURL.test(path) ? path : `https://something.com/${path}`,
+      contentHash: path,
     } as SourceDetails;
   });
+
+  const duplicatedSources1: SourceDetails[] = duplicatedSourcePaths1.map(path => {
+    const url = `https://something.com/${path}`;
+    const urlObj = new URL(url);
+    urlObj.search = "";
+    return {
+      id: path,
+      url,
+      // Fake a content hash by using the URL minus the query params,
+      // which will fake a content hash collision
+      contentHash: urlObj.href,
+    } as SourceDetails;
+  });
+
+  const duplicatedSources2: SourceDetails[] = duplicatedSourcePaths2.map(path => {
+    const url = `https://something.com/${path}`;
+    const urlObj = new URL(url);
+    urlObj.search = "";
+    return {
+      id: path,
+      url,
+      // Fake a content hash by using the URL minus the query params,
+      // which will fake a content hash collision
+      contentHash: path.includes("duplicate=true") ? urlObj.href : path,
+    } as SourceDetails;
+  });
+
+  const sources = mainSources.concat(duplicatedSources1, duplicatedSources2);
+
   // Turn them into a record keyed by URLs, as used in the real app
   const sourcesRecord = Object.fromEntries(sources.map(source => [source.url, source] as const));
 

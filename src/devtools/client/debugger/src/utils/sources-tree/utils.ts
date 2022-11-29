@@ -14,7 +14,7 @@ import type { ParentMap, TreeDirectory, TreeNode, TreeSource } from "./types";
 export type SourcesMap = Record<string, SourceDetails>;
 
 export function nodeHasChildren(item: TreeNode) {
-  return item.type == "directory" && Array.isArray(item.contents);
+  return Array.isArray(item.contents);
 }
 
 export function isExactUrlMatch(pathPart: string, debuggeeUrl: string) {
@@ -63,14 +63,17 @@ export function isDirectory(item: TreeNode) {
 }
 
 export function getSourceFromNode(item: TreeNode) {
-  const { contents } = item;
-  if (!isDirectory(item) && !Array.isArray(contents)) {
-    return contents;
+  if (item.type === "source") {
+    return item.contents;
+  } else if (item.type === "multiSource") {
+    // All items should have the same filename, so use the first one.
+    // That way we get an icon.
+    return item.contents[0]?.contents;
   }
 }
 
 export function isSource(item: TreeNode) {
-  return item.type === "source";
+  return !isDirectory(item);
 }
 
 export function partIsFile(index: number, parts: string[], url: TreeNode) {
@@ -104,7 +107,7 @@ export function createParentMap(tree: TreeNode) {
   const map = new WeakMap();
 
   function _traverse(subtree: TreeNode) {
-    if (subtree.type === "directory") {
+    if (subtree.type !== "source") {
       for (const child of subtree.contents) {
         map.set(child, subtree);
         _traverse(child);

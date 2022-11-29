@@ -1,0 +1,16 @@
+.ToolbarHeader {
+  display: flex;
+  border-bottom: 1px;
+  flex-shrink: 0;
+  font-size: 15px;
+  line-height: 19px;
+  font-weight: 400;
+  color: var(--body-color);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 8px;
+  border-bottom: 1px;
+  border-color: var(--theme-border);
+  align-items: center;
+}

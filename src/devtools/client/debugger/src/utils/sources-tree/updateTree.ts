@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import { createNextState } from "@reduxjs/toolkit";
 
 import { SourceDetails } from "ui/reducers/sources";
 
@@ -58,11 +58,15 @@ export function updateTree({ newSources, prevSources, uncollapsedTree }: UpdateT
   // @ts-expect-error This used to be nested records - somehow it still works?
   const sourcesToAdd = getSourcesToAdd(Object.values(newSources), Object.values(prevSources));
 
-  for (const source of sourcesToAdd) {
-    addToTree(uncollapsedTree, source, debuggeeHost!);
-  }
+  // Since the logic here is mutative, wrap the updates with Immer to
+  // produce a fully immutable update.
+  const newUncollapsedTree = createNextState(uncollapsedTree, draft => {
+    for (const source of sourcesToAdd) {
+      addToTree(draft, source, debuggeeHost!);
+    }
+  });
 
-  const newSourceTree = collapseTree(uncollapsedTree);
+  const newSourceTree = collapseTree(newUncollapsedTree);
 
   return {
     uncollapsedTree,

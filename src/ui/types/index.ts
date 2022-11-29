@@ -1,3 +1,5 @@
+import { ExecutionPoint } from "@replayio/protocol";
+
 export interface User {
   name?: string | null;
   picture?: string | null;
@@ -184,13 +186,40 @@ type TestItemError = {
   column?: number;
 };
 
+type TestEvents = "test:start" | "step:end" | "step:enqueue" | "step:start";
+
+export type CypressAnnotationMessage = {
+  event: TestEvents;
+  titlePath: string[];
+  commandVariable?: "cmd" | "log";
+  logVariable?: "cmd" | "log";
+  id?: string;
+};
+
+export interface Annotation {
+  point: ExecutionPoint;
+  time: number;
+  message: CypressAnnotationMessage;
+}
+
 export type TestStep = {
   args: string[];
   name: string;
   duration: number;
   relativeStartTime: number;
+  id: string;
   parentId?: string;
   error?: TestItemError;
+  hook?: "beforeEach" | "afterEach";
+};
+
+export type AnnotatedTestStep = TestStep & {
+  annotations: Annotations;
+};
+
+type Annotations = {
+  end?: Annotation;
+  enqueue?: Annotation;
 };
 
 // https://github.com/Replayio/replay-cli/blob/main/packages/replay/metadata/source.ts

@@ -19,22 +19,21 @@ import { getContext } from "../../selectors";
 import { copyToTheClipboard } from "../../utils/clipboard";
 import { getSourceQueryString } from "../../utils/source";
 import { getPathWithoutThread, isDirectory } from "../../utils/sources-tree";
+import { TreeNode } from "../../utils/sources-tree/types";
 import AccessibleImage from "../shared/AccessibleImage";
 import SourceIcon from "../shared/SourceIcon";
 
-type $FixTypeLater = any;
-
 interface STIProps {
-  item: $FixTypeLater;
+  item: TreeNode;
   depth: number;
   focused: boolean;
   autoExpand: boolean;
   expanded: boolean;
-  focusItem: (item: $FixTypeLater) => void;
-  selectItem: (item: $FixTypeLater) => void;
+  focusItem: (item: TreeNode) => void;
+  selectItem: (item: TreeNode) => void;
   source: SourceDetails;
   debuggeeUrl: string;
-  setExpanded: (item: $FixTypeLater, a: boolean, b: boolean) => void;
+  setExpanded: (item: TreeNode, a: boolean, b: boolean) => void;
 }
 
 const mapStateToProps = (state: UIState, props: STIProps) => {
@@ -68,7 +67,7 @@ class SourceTreeItem extends Component<FinalSTIProps> {
     }
   };
 
-  onContextMenu = (event: React.MouseEvent, item: $FixTypeLater) => {
+  onContextMenu = (event: React.MouseEvent, item: TreeNode) => {
     // TODO [FE-926] Review source editor context menu for re-adding later
     // This includes actual implementation (legacy FF menu vs something new),
     // as well as what menu items it should contain.
@@ -107,7 +106,7 @@ class SourceTreeItem extends Component<FinalSTIProps> {
     showMenu(event, menuOptions);
   };
 
-  addCollapseExpandAllOptions = (menuOptions: ContextMenuItem[], item: $FixTypeLater) => {
+  addCollapseExpandAllOptions = (menuOptions: ContextMenuItem[], item: TreeNode) => {
     const { setExpanded } = this.props;
 
     menuOptions.push({
@@ -127,14 +126,15 @@ class SourceTreeItem extends Component<FinalSTIProps> {
 
   renderItemArrow() {
     const { item, expanded } = this.props;
-    return isDirectory(item) ? (
+    const shouldShowArrow = isDirectory(item) || item.type === "multiSource";
+    return shouldShowArrow ? (
       <AccessibleImage className={classnames("arrow", { expanded })} />
     ) : (
       <span className="img no-arrow" />
     );
   }
 
-  renderIcon(item: $FixTypeLater, depth: number) {
+  renderIcon(item: TreeNode, depth: number) {
     const { source } = this.props;
 
     if (item.name === "webpack://") {
@@ -174,7 +174,7 @@ class SourceTreeItem extends Component<FinalSTIProps> {
   renderItemTooltip() {
     const { item, depth } = this.props;
 
-    return item.type === "source" ? unescape(item.contents.url) : getPathWithoutThread(item.path);
+    return item.type === "source" ? unescape(item.contents.url!) : getPathWithoutThread(item.path);
   }
 
   render() {

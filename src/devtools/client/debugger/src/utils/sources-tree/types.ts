@@ -8,8 +8,9 @@
 // import type { Source } from "devtools/client/debugger/src/reducers/sources";
 import { SourceDetails } from "ui/reducers/sources";
 
-export type TreeNode = TreeSource | TreeDirectory;
+export type TreeNode = TreeSource | TreeDirectory | TreeMultiSource;
 
+/** A single source file node */
 export type TreeSource = {
   type: "source";
   name: string;
@@ -17,6 +18,15 @@ export type TreeSource = {
   contents: SourceDetails;
 };
 
+/** Parent node when there are multiple versions of the same file URL */
+export type TreeMultiSource = {
+  type: "multiSource";
+  name: string;
+  path: string;
+  contents: TreeSource[];
+};
+
+/** A directory in the source tree */
 export type TreeDirectory = {
   type: "directory";
   name: string;
