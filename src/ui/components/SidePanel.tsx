@@ -15,10 +15,10 @@ import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
 import ProtocolViewer from "./ProtocolViewer";
 import StatusDropdown from "./shared/StatusDropdown";
+import styles from "./SidePanel.module.css";
 
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
 const Accordion = require("devtools/client/debugger/src/components/shared/Accordion").default;
-import styles from "./SidePanel.module.css";
 
 function TestResultsSummary({ testCases }: { testCases: TestItem[] }) {
   const failed = testCases.filter(c => c.result === "failed").length;
@@ -103,7 +103,7 @@ function EventsPane({
 
   if (recording?.metadata?.test?.tests?.length) {
     return (
-      <div className="h-full flex-1 flex flex-col overflow-hidden">
+      <div className="flex h-full flex-1 flex-col overflow-hidden">
         <div className={styles.ToolbarHeader}>
           <span className="flex-grow truncate">{recording?.metadata?.test?.file}</span>
           <TestResultsSummary testCases={recording?.metadata?.test?.tests} />
@@ -114,7 +114,7 @@ function EventsPane({
           setHighlightedTest={setHighlightedTest}
         />
       </div>
-    )
+    );
   }
 
   return <Accordion items={items} />;
