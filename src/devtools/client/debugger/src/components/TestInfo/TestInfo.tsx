@@ -3,9 +3,9 @@ import { useMemo } from "react";
 import { getRecordingDuration } from "ui/actions/app";
 import { setFocusRegion } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { Annotation, getReporterAnnotationsForTests } from "ui/reducers/reporter";
+import { getReporterAnnotationsForTests } from "ui/reducers/reporter";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { TestItem } from "ui/types";
+import { Annotation, TestItem } from "ui/types";
 
 import { TestCase } from "./TestCase";
 
