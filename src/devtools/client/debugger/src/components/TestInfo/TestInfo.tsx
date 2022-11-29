@@ -1,6 +1,7 @@
 import { Object as ProtocolObject } from "@replayio/protocol";
-import { createContext, useContext, useMemo, useState } from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 
+import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import PropertiesRenderer from "bvaughn-architecture-demo/components/inspector/PropertiesRenderer";
 import { getRecordingDuration } from "ui/actions/app";
 import { setFocusRegion } from "ui/actions/timeline";
@@ -92,7 +93,7 @@ export default function TestInfo({
               )
           )}
         </div>
-        <Console />
+        {highlightedTest ? <Console /> : null}
       </div>
     </TestInfoContext.Provider>
   );
@@ -103,11 +104,13 @@ function Console() {
   const hideProps = !pauseId || !consoleProps;
 
   return (
-    <div className="h-100 h-64 flex-shrink-0 overflow-auto p-2">
+    <div className="h-100 flex h-64 flex-shrink-0 flex-col overflow-auto p-2">
       <div>Console Props</div>
-      <div className="flex flex-col gap-1 p-2 pl-8 font-mono">
-        {!hideProps && <PropertiesRenderer pauseId={pauseId} object={consoleProps} />}
-      </div>
+      <ErrorBoundary>
+        <div className="flex flex-grow flex-col gap-1 p-2 pl-8 font-mono">
+          {!hideProps && <PropertiesRenderer pauseId={pauseId} object={consoleProps} />}
+        </div>
+      </ErrorBoundary>
     </div>
   );
 }

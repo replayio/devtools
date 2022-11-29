@@ -54,8 +54,11 @@ export function TestStepItem({
   id: string | null;
   setSelectedIndex: (index: string | null) => void;
 }) {
-  const { setConsoleProps, setPauseId, pauseId } = useContext(TestInfoContext);
-  const [subjectNodeIds, setSubjectNodeIds] = useState<string[]>();
+  const { setConsoleProps, setPauseId } = useContext(TestInfoContext);
+  const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
+    pauseId: string;
+    nodeIds: string[];
+  }>();
   const cx = useAppSelector(getThreadContext);
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
@@ -64,7 +67,6 @@ export function TestStepItem({
   // some chainers (`then`) don't have a duration, so let's bump it here (+1) so that it shows something in the UI
   const adjustedDuration = duration || 1;
   const isPaused = currentTime >= startTime && currentTime < startTime + adjustedDuration;
-  const selected = selectedIndex === id;
 
   useEffect(() => {
     (async () => {
@@ -106,7 +108,7 @@ export function TestStepItem({
           );
 
           const nodeIds = subjects.filter(s => s?.preview?.node).map(s => s?.objectId!);
-          setSubjectNodeIds(nodeIds);
+          setSubjectNodePauseData({ pauseId: pauseResult.pauseId, nodeIds });
         }
 
         if (messageEnd?.logVariable) {
@@ -156,8 +158,8 @@ export function TestStepItem({
   };
   const onMouseEnter = () => {
     dispatch(setTimelineToTime(startTime));
-    if (subjectNodeIds && pauseId) {
-      dispatch(highlightNodes(subjectNodeIds, pauseId));
+    if (subjectNodePauseData) {
+      dispatch(highlightNodes(subjectNodePauseData.nodeIds, subjectNodePauseData.pauseId));
     }
   };
   const onMouseLeave = () => {
