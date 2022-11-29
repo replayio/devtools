@@ -6,10 +6,11 @@ import { UIState } from "ui/state";
 
 type TestEvents = "test:start" | "step:end" | "step:enqueue" | "step:start";
 
-type CypressAnnotationMessage = {
+export type CypressAnnotationMessage = {
   event: TestEvents;
   titlePath: string[];
   commandVariable?: "cmd" | "log";
+  logVariable?: "cmd" | "log";
   id?: string;
 };
 export interface Annotation {
@@ -49,4 +50,10 @@ export const getReporterAnnotationsForTitle = (title: string) => (state: UIState
     a =>
       a.message.titlePath[a.message.titlePath.length - 1] === title &&
       a.message.event === "step:enqueue"
+  );
+export const getReporterAnnotationsForTitleEnd = (title: string) => (state: UIState) =>
+  state.reporter.annotations.filter(
+    a =>
+      a.message.titlePath[a.message.titlePath.length - 1] === title &&
+      a.message.event === "step:end"
   );
