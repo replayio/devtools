@@ -1,16 +1,22 @@
 import React, { useContext, useMemo, useState } from "react";
 
 import { startPlayback } from "ui/actions/timeline";
+import { partialRequestsToCompleteSummaries } from "ui/components/NetworkMonitor/utils";
 import Icon from "ui/components/shared/Icon";
+import { getEvents, getRequests } from "ui/reducers/network";
 import {
   getReporterAnnotationsForTitle,
   getReporterAnnotationsForTitleEnd,
 } from "ui/reducers/reporter";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { AnnotatedTestStep, Annotation, TestItem, TestStep } from "ui/types";
+import { AnnotatedTestStep, TestItem, TestStep } from "ui/types";
 
+import { NetworkEvent, getDisplayedEvents } from "./NetworkEvent";
 import { TestInfoContext } from "./TestInfo";
 import { TestStepItem } from "./TestStepItem";
+
+// const XHR_TYPE = "xhr";
+export const XHR_TYPE = "text/jsx";
 
 function useGetTestSections(
   steps: TestStep[],
@@ -147,6 +153,14 @@ function TestSection({
   setSelectedIndex: (index: string | null) => void;
   header?: string;
 }) {
+  const requests = useAppSelector(getRequests);
+  const events = useAppSelector(getEvents);
+
+  const data = useMemo(
+    () => partialRequestsToCompleteSummaries(requests, events, new Set()),
+    [requests, events]
+  );
+
   if (steps.length === 0) {
     return null;
   }
@@ -155,26 +169,33 @@ function TestSection({
     <>
       {header ? <div className="py-2">{header}</div> : null}
       {steps.map((s, i) => (
-        <TestStepItem
-          stepName={s.name}
-          messageEnqueue={s.annotations.enqueue?.message}
-          messageEnd={s.annotations.end?.message}
-          point={s.annotations.enqueue?.point}
-          pointEnd={s.annotations.end?.point}
-          key={i}
-          index={i}
-          startTime={startTime + s.relativeStartTime}
-          duration={s.duration}
-          argString={s.args?.toString()}
-          parentId={s.parentId}
-          error={!!s.error}
-          isLastStep={steps.length - 1 === i}
-          onReplay={onReplay}
-          onPlayFromHere={() => onPlayFromHere(startTime + s.relativeStartTime)}
-          selectedIndex={selectedIndex}
-          setSelectedIndex={setSelectedIndex}
-          id={s.id}
-        />
+        <>
+          <TestStepItem
+            stepName={s.name}
+            messageEnqueue={s.annotations.enqueue?.message}
+            messageEnd={s.annotations.end?.message}
+            point={s.annotations.enqueue?.point}
+            pointEnd={s.annotations.end?.point}
+            key={i}
+            index={i}
+            startTime={startTime + s.relativeStartTime}
+            duration={s.duration}
+            argString={s.args?.toString()}
+            parentId={s.parentId}
+            error={!!s.error}
+            isLastStep={steps.length - 1 === i}
+            onReplay={onReplay}
+            onPlayFromHere={() => onPlayFromHere(startTime + s.relativeStartTime)}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            id={s.id}
+          />
+          <div className="flex flex-col">
+            {getDisplayedEvents(s, steps, data, startTime).map(r => (
+              <NetworkEvent key={r.id} method={r.method} status={r.status} url={r.url} id={r.id} />
+            ))}
+          </div>
+        </>
       ))}
     </>
   );
