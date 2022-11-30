@@ -139,7 +139,9 @@ export function initializeMixpanel() {
   mixpanel.register({ recordingId: getRecordingId() });
 }
 
-export function maybeSetMixpanelContext(userInfo: TelemetryUser & { workspaceId: string | null }) {
+export function maybeSetMixpanelContext(
+  userInfo: TelemetryUser & { workspaceId: string | null; role: string | null }
+) {
   const { internal: isInternal } = userInfo;
   const forceEnableMixpanel = prefs.logTelemetryEvent;
   const shouldEnableMixpanel = (!isInternal && !skipTelemetry()) || forceEnableMixpanel;
@@ -213,7 +215,7 @@ export function setMixpanelContext({
   email,
   workspaceId,
   role,
-}: TelemetryUser & { workspaceId: string | null }) {
+}: TelemetryUser & { workspaceId: string | null; role: string | null }) {
   mixpanel.register({ isReplayBrowser: isReplayBrowser() });
 
   if (id) {
