@@ -15,6 +15,7 @@ export const GET_USER_SETTINGS = gql`
         disableLogRocket
         enableRepaint
         enableTeams
+        role
       }
       defaultWorkspace {
         id
