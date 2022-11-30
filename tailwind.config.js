@@ -51,6 +51,7 @@ module.exports = {
         textFieldBorder: "var(--text-field-border)",
         bodyBgcolor: "var(--body-bgcolor)",
         testsuitesErrorBgcolor: "var(--testsuites-error-bgcolor)",
+        testsuitesErrorBgcolorHover: "var(--testsuites-error-bgcolor-hover)",
         testsuitesErrorColor: "var(--testsuites-error-color)",
         testsuitesStepsBgcolor: "var(--testsuites-steps-bgcolor)",
         themeBorder: "var(--theme-border)",

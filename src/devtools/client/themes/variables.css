@@ -220,6 +220,7 @@
 
   /* Testsuites (Light) */
   --testsuites-error-bgcolor: #ffe9e9;
+  --testsuites-error-bgcolor-hover: #fce2e2;
   --testsuites-error-color: red;
   --testsuites-steps-bgcolor: #fafafa;
 

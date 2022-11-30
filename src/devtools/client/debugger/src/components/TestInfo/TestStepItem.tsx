@@ -199,34 +199,35 @@ export function TestStepItem({
   const bump = isPaused || isPast ? 10 : 0;
   const actualProgress = bump + 90 * ((currentTime - startTime) / adjustedDuration);
   const progress = actualProgress > 100 ? 100 : actualProgress;
-  const displayedProgress = adjustedDuration === 1 && isPaused ? 100 : progress;
+  const displayedProgress =
+    adjustedDuration === 1 && isPaused ? 100 : progress == 100 ? 0 : progress;
 
   const color = error ? "border-l-red-500" : "border-l-primaryAccent";
 
   return (
     <>
       <div
-        className={`group/step relative flex items-start gap-1 overflow-hidden border-b border-l-2 border-themeBase-90 pl-1 pr-3 font-mono hover:bg-gray-100 ${
+        className={`group/step relative flex items-start gap-1 border-b border-l-2 border-themeBase-90 pl-1 pr-3 font-mono hover:bg-gray-100 ${
           isPaused || isPast ? color : "border-l-transparent"
-        } ${isPaused ? "bg-gray-100" : "bg-testsuitesStepsBgcolor"}`}
+        } ${
+          progress > 0 && error
+            ? "bg-testsuitesErrorBgcolor text-testsuitesErrorColor hover:bg-testsuitesErrorBgcolorHover"
+            : isPaused
+            ? "bg-gray-100"
+            : "bg-testsuitesStepsBgcolor"
+        }`}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
-        <button
-          onClick={onClick}
-          className="flex flex-grow items-start space-x-2 overflow-hidden py-2 text-start"
-        >
+        <button onClick={onClick} className="flex flex-grow items-start space-x-2  py-2 text-start">
           <div title={"" + displayedProgress} className="flex h-4 items-center">
             <ProgressBar progress={displayedProgress} error={error} />
           </div>
           <div className="opacity-70">{index + 1}</div>
-          <div
-            className={`whitespace-pre font-medium text-bodyColor ${isPaused ? "font-bold" : ""}`}
-          >
+          <div className={` font-medium ${isPaused ? "font-bold" : ""}`}>
             {parentId ? "- " : ""}
-            {stepName}
+            {stepName} <span className="opacity-70">{argString}</span>
           </div>
-          <div className="opacity-70">{argString}</div>
         </button>
         <TestStepActions
           onReplay={onReplay}
