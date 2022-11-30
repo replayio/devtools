@@ -11,9 +11,7 @@ export type PrefsTypeToTSType<T extends PrefsType> = T extends "Bool"
   ? number
   : T extends "Json"
   ? Record<string, unknown>
-  : 42;
-
-type t1 = PrefsTypeToTSType<"Char">;
+  : never;
 
 export declare type Prefs<BP extends PrefsBlueprint<K>> = {
   [key in keyof BP]: PrefsTypeToTSType<BP[key][0]>;
