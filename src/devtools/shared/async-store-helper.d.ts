@@ -1,12 +1,8 @@
-export type PrefsType = "Bool" | "Char" | "String" | "Int" | "Float" | "Json";
+import { Prefs, PrefsBlueprint } from "devtools/client/shared/prefs";
 
-declare type Prefs<K extends string> = Record<K, boolean | number | string | object>;
-
-export type PrefsBlueprint<K extends string> = Record<K, [PrefsType, string]>;
-
-export function asyncStoreHelper<K extends string>(
+export function asyncStoreHelper<BP extends PrefsBlueprint>(
   prefsRoot?: string,
-  prefsBlueprint?: PrefsBlueprint<K>
-): Prefs<K> & {
-  toJSON(): Record<K, boolean | number | string | object>;
+  prefsBlueprint?: BP
+): Prefs<BP> & {
+  toJSON(): Prefs<BP>;
 };
