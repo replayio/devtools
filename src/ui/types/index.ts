@@ -194,7 +194,6 @@ export type CypressAnnotationMessage = {
   logVariable?: "cmd" | "log";
   id?: string;
 };
-
 export interface Annotation {
   point: ExecutionPoint;
   time: number;

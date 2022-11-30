@@ -1,3 +1,4 @@
+import {} from "devtools/client/inspector/markup/reducers/markup";
 import React, { FC, useEffect, useRef } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
@@ -56,6 +57,7 @@ function Video({
 }: PropsFromRedux) {
   const recordingId = hooks.useGetRecordingId();
   const viewMode = useAppSelector(getViewMode);
+  const highlightedNodeIds = useAppSelector(state => state.markup.highlightedNodes);
   const isPaused = !playback;
   const isNodeTarget = recordingTarget == "node";
 
@@ -112,7 +114,9 @@ function Video({
       ) : null}
       {isNodePickerInitializing ? <Tooltip label="Loading…" targetID="video" /> : null}
       <div id="highlighter-root">
-        <PreviewNodeHighlighter />
+        {highlightedNodeIds?.map(nodeId => (
+          <PreviewNodeHighlighter key={nodeId} nodeId={nodeId} />
+        ))}
       </div>
       {viewMode === "dev" ? <HideVideoButton /> : null}
     </div>

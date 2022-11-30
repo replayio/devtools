@@ -140,11 +140,8 @@ const getAttribute = (node: NodeInfo, name: string) => {
   return attr?.value;
 };
 
-export function PreviewNodeHighlighter() {
-  const highlightedNodeId = useAppSelector(state => state.markup.highlightedNode);
-  const highlightedNodeBoxModel = useAppSelector(state =>
-    highlightedNodeId ? getNodeBoxModelById(state, highlightedNodeId) : undefined
-  );
+export function PreviewNodeHighlighter({ nodeId }: { nodeId: string }) {
+  const highlightedNodeBoxModel = useAppSelector(state => getNodeBoxModelById(state, nodeId));
   const canvas = useAppSelector(state => state.app.canvas);
 
   if (!highlightedNodeBoxModel || !canvas) {

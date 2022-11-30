@@ -1,4 +1,5 @@
 import {
+  BoxModel,
   EventListener,
   NodeBounds,
   PauseData,
@@ -205,6 +206,28 @@ export const {
     return elements;
   },
   (client, sessionId, pauseId) => `${pauseId}`
+);
+
+export const {
+  getValueSuspense: getBoxModelSuspense,
+  getValueAsync: getBoxModelAsync,
+  getValueIfCached: getBoxModelIfCached,
+} = createGenericCache<
+  [client: ProtocolClient, sessionId: string, pauseId: PauseId, nodeId: string],
+  BoxModel
+>(
+  async (client, sessionId, pauseId, nodeId) => {
+    const { model: nodeBoxModel } = await client.DOM.getBoxModel(
+      {
+        node: nodeId,
+      },
+      sessionId,
+      pauseId
+    );
+
+    return nodeBoxModel;
+  },
+  (client, sessionId, pauseId, nodeId) => `${pauseId}|${nodeId}`
 );
 
 export function getMouseTarget(

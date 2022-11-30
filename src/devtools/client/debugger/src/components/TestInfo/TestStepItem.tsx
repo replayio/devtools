@@ -1,8 +1,6 @@
-import { Object as ProtocolObject } from "@replayio/protocol";
-import cloneDeep from "lodash/cloneDeep";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
-import PropertiesRenderer from "bvaughn-architecture-demo/components/inspector/PropertiesRenderer";
+import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
 import { getCurrentTime } from "ui/reducers/timeline";
@@ -57,6 +55,10 @@ export function TestStepItem({
   setSelectedIndex: (index: string | null) => void;
 }) {
   const { setConsoleProps, setPauseId } = useContext(TestInfoContext);
+  const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
+    pauseId: string;
+    nodeIds: string[];
+  }>();
   const cx = useAppSelector(getThreadContext);
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
@@ -65,78 +67,105 @@ export function TestStepItem({
   // some chainers (`then`) don't have a duration, so let's bump it here (+1) so that it shows something in the UI
   const adjustedDuration = duration || 1;
   const isPaused = currentTime >= startTime && currentTime < startTime + adjustedDuration;
-  const selected = selectedIndex === id;
 
-  const getConsoleProps = async () => {
-    if (!pointEnd) {
-      return null;
-    }
-
-    try {
-      const pauseResult = await client.createPause(pointEnd);
-      const frames = pauseResult.data.frames;
-
-      if (!frames) {
+  useEffect(() => {
+    (async () => {
+      if (!pointEnd) {
         return null;
       }
 
-      const callerFrame = frames[1];
+      try {
+        const pauseResult = await client.createPause(pointEnd);
+        const frames = pauseResult.data.frames;
 
-      if (messageEnd?.logVariable) {
-        const logResult = await client.evaluateExpression(
-          pauseResult.pauseId,
-          messageEnd.logVariable,
-          callerFrame.frameId
-        );
-
-        const consolePropsProperty = returnFirst(logResult.data.objects, o => {
-          return logResult.returned && o.objectId === logResult.returned.object
-            ? returnFirst(o.preview?.properties, p => (p.name === "consoleProps" ? p : null))
-            : null;
-        });
-
-        if (consolePropsProperty?.object) {
-          const consolePropsPauseData = await client.getObjectWithPreview(
-            consolePropsProperty.object,
-            pauseResult.pauseId
-          );
-          const consoleProps = consolePropsPauseData.objects?.find(
-            o => o.objectId === consolePropsProperty.object
-          );
-
-          const consolePropsCopy = cloneDeep(consoleProps);
-
-          if (consolePropsCopy?.preview) {
-            // suppress the prototype entry in the properties output
-            consolePropsCopy.preview.prototypeId = undefined;
-          }
-
-          if (consolePropsCopy?.preview?.properties) {
-            // Remove snapshot value
-            consolePropsCopy.preview.properties = consolePropsCopy.preview.properties.filter(
-              p => p.name !== "Snapshot"
-            );
-          }
-
-          setPauseId(pauseResult.pauseId);
-          setConsoleProps(consolePropsCopy);
+        if (!frames) {
+          return null;
         }
+
+        setPauseId(pauseResult.pauseId);
+
+        const callerFrame = frames[1];
+
+        if (messageEnd?.commandVariable) {
+          const cmdResult = await client.evaluateExpression(
+            pauseResult.pauseId,
+            `${messageEnd.commandVariable}.get("subject")`,
+            callerFrame.frameId
+          );
+
+          const cmdObject = cmdResult.data.objects?.find(
+            o => o.objectId === cmdResult.returned?.object
+          );
+          const length: number | undefined = cmdObject?.preview?.properties?.find(
+            o => o.name === "length"
+          )?.value;
+          const subjects = Array.from({ length: length || 0 }, (_, i) =>
+            cmdResult.data.objects?.find(
+              obj =>
+                obj.objectId ===
+                cmdObject?.preview?.properties?.find(p => p.name === String(i))?.object
+            )
+          );
+
+          const nodeIds = subjects.filter(s => s?.preview?.node).map(s => s?.objectId!);
+          setSubjectNodePauseData({ pauseId: pauseResult.pauseId, nodeIds });
+        }
+
+        if (messageEnd?.logVariable) {
+          const logResult = await client.evaluateExpression(
+            pauseResult.pauseId,
+            messageEnd.logVariable,
+            callerFrame.frameId
+          );
+
+          const consolePropsProperty = returnFirst(logResult.data.objects, o => {
+            return logResult.returned && o.objectId === logResult.returned.object
+              ? returnFirst(o.preview?.properties, p => (p.name === "consoleProps" ? p : null))
+              : null;
+          });
+
+          if (consolePropsProperty?.object) {
+            const consolePropsPauseData = await client.getObjectWithPreview(
+              consolePropsProperty.object,
+              pauseResult.pauseId
+            );
+            const consoleProps = consolePropsPauseData.objects?.find(
+              o => o.objectId === consolePropsProperty.object
+            );
+
+            if (consoleProps?.preview) {
+              // suppress the prototype entry in the properties output
+              consoleProps.preview.prototypeId = undefined;
+            }
+
+            setConsoleProps(consoleProps);
+          }
+        }
+      } catch {
+        setPauseId(null);
+        setConsoleProps(undefined);
       }
-    } catch {
-      setPauseId(null);
-      setConsoleProps(undefined);
-    }
 
-    return null;
-  };
+      return null;
+    })();
+  }, [client, messageEnd, pointEnd, setConsoleProps, setPauseId]);
+
   const onClick = () => {
-    dispatch(seekToTime(startTime));
-    setSelectedIndex(id);
-
-    getConsoleProps();
+    if (id) {
+      dispatch(seekToTime(startTime));
+      setSelectedIndex(id);
+    }
   };
-  const onMouseEnter = () => dispatch(setTimelineToTime(startTime));
-  const onMouseLeave = () => dispatch(setTimelineToTime(currentTime));
+  const onMouseEnter = () => {
+    dispatch(setTimelineToTime(startTime));
+    if (subjectNodePauseData) {
+      dispatch(highlightNodes(subjectNodePauseData.nodeIds, subjectNodePauseData.pauseId));
+    }
+  };
+  const onMouseLeave = () => {
+    dispatch(setTimelineToTime(currentTime));
+    dispatch(unhighlightNode());
+  };
   const onJumpToBefore = () => dispatch(seekToTime(startTime));
   const onJumpToAfter = () => {
     dispatch(seekToTime(startTime + adjustedDuration - 1));
