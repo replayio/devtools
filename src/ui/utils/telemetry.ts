@@ -85,7 +85,6 @@ export type TelemetryUser = {
   id: string | undefined;
   email: string | undefined;
   internal: boolean;
-  role?: string;
 };
 
 let telemetryUser: TelemetryUser | undefined;

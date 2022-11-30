@@ -174,9 +174,10 @@ export async function bootstrapApp() {
     if (userInfo) {
       const userSettings = await getUserSettings();
       const workspaceId = userSettings.defaultWorkspaceId;
+      const role = userSettings.role;
 
       setTelemetryContext(userInfo);
-      maybeSetMixpanelContext({ ...userInfo, workspaceId });
+      maybeSetMixpanelContext({ ...userInfo, workspaceId, role });
     }
 
     initLaunchDarkly();
