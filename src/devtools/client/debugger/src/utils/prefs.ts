@@ -101,8 +101,6 @@ export const prefs = new PrefsHelper("devtools", {
   indentSize: ["Int", "editor.tabsize"],
 });
 
-type DebuggerPrefs = typeof prefs;
-
 export const useDebuggerPrefs = (prefKey: string) => {
   const fullKey = `devtools.debugger.${prefKey}`;
   const [preference, setPreference] = useState(prefsService.getBoolPref(fullKey));
@@ -123,10 +121,6 @@ export const useDebuggerPrefs = (prefKey: string) => {
     },
   };
 };
-
-export const javascriptPrefs = new PrefsHelper("javascript", {
-  enableJavaScript: ["Bool", "enabled"],
-});
 
 export const features = new PrefsHelper("devtools.debugger.features", {
   asyncStepping: ["Bool", "async-stepping"],

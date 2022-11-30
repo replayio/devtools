@@ -58,3 +58,10 @@ export function truncateMiddleText(sourceText: string, maxLength: number) {
   }
   return truncatedText;
 }
+
+export function endTruncateStr(str: string, size: number) {
+  if (str.length > size) {
+    return `…${str.slice(str.length - size)}`;
+  }
+  return str;
+}

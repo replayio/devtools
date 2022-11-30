@@ -12,7 +12,7 @@ import { FunctionDeclaration, SymbolEntry } from "../reducers/ast";
 import { SearchTypes } from "../reducers/quick-open";
 import { memoizeLast } from "./memoizeLast";
 import { getSourceClassnames, getSourceQueryString, getTruncatedFileName } from "./source";
-import { endTruncateStr } from "./utils";
+import { endTruncateStr } from "./text";
 
 export const MODIFIERS: Record<string, SearchTypes> = {
   "@": "functions",
