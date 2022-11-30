@@ -93,7 +93,7 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
   };
 
   return (
-    <div className="flex flex-col rounded-lg py-2 pl-11">
+    <div className="flex flex-col rounded-lg py-2 px-2">
       <TestSection
         onReplay={onReplay}
         onPlayFromHere={onPlayFromHere}
@@ -127,9 +127,7 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
             <Icon filename="warning" size="small" className="bg-testsuitesErrorColor" />
             <div className="font-bold">Error</div>
           </div>
-          <div className="wrap space-y-1 overflow-hidden bg-testsuitesErrorBgcolor p-2 font-mono">
-            {test.error.message}
-          </div>
+          <div className="wrap space-y-1 overflow-hidden p-2 font-mono">{test.error.message}</div>
         </div>
       ) : null}
     </div>
@@ -167,36 +165,52 @@ function TestSection({
 
   return (
     <>
-      {header ? <div className="py-2">{header}</div> : null}
-      {steps.map((s, i) => (
-        <>
-          <TestStepItem
-            stepName={s.name}
-            messageEnqueue={s.annotations.enqueue?.message}
-            messageEnd={s.annotations.end?.message}
-            point={s.annotations.enqueue?.point}
-            pointEnd={s.annotations.end?.point}
-            key={i}
-            index={i}
-            startTime={startTime + s.relativeStartTime}
-            duration={s.duration}
-            argString={s.args?.toString()}
-            parentId={s.parentId}
-            error={!!s.error}
-            isLastStep={steps.length - 1 === i}
-            onReplay={onReplay}
-            onPlayFromHere={() => onPlayFromHere(startTime + s.relativeStartTime)}
-            selectedIndex={selectedIndex}
-            setSelectedIndex={setSelectedIndex}
-            id={s.id}
-          />
-          <div className="flex flex-col">
-            {getDisplayedEvents(s, steps, data, startTime).map(r => (
-              <NetworkEvent key={r.id} method={r.method} status={r.status} url={r.url} id={r.id} />
-            ))}
-          </div>
-        </>
-      ))}
+      {header ? (
+        <div
+          className="pt-6 pb-2 pl-2  font-semibold uppercase opacity-50"
+          style={{ fontSize: "10px" }}
+        >
+          {header}
+        </div>
+      ) : null}
+      {steps
+
+        .filter((step, i) => !steps.slice(0, i).some(s => !!s.error))
+        .map((s, i) => (
+          <>
+            <TestStepItem
+              stepName={s.name}
+              messageEnqueue={s.annotations.enqueue?.message}
+              messageEnd={s.annotations.end?.message}
+              point={s.annotations.enqueue?.point}
+              pointEnd={s.annotations.end?.point}
+              key={i}
+              index={i}
+              startTime={startTime + s.relativeStartTime}
+              duration={s.duration}
+              argString={s.args?.toString()}
+              parentId={s.parentId}
+              error={!!s.error}
+              isLastStep={steps.length - 1 === i}
+              onReplay={onReplay}
+              onPlayFromHere={() => onPlayFromHere(startTime + s.relativeStartTime)}
+              selectedIndex={selectedIndex}
+              setSelectedIndex={setSelectedIndex}
+              id={s.id}
+            />
+            <div className="flex flex-col">
+              {getDisplayedEvents(s, steps, data, startTime).map(r => (
+                <NetworkEvent
+                  key={r.id}
+                  method={r.method}
+                  status={r.status}
+                  url={r.url}
+                  id={r.id}
+                />
+              ))}
+            </div>
+          </>
+        ))}
     </>
   );
 }

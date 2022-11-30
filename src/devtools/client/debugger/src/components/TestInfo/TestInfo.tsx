@@ -74,11 +74,15 @@ export default function TestInfo({
       value={{ selectedId, setSelectedId, consoleProps, setConsoleProps, pauseId, setPauseId }}
     >
       <div className="flex flex-grow flex-col overflow-hidden">
-        <div className="flex flex-grow flex-col space-y-1 overflow-scroll px-4 py-2">
+        <div className="flex flex-grow flex-col space-y-1 overflow-auto px-2 py-2">
           {highlightedTest !== null && (
-            <button onClick={onReset} className="flex flex-row items-center hover:underline">
+            <button
+              onClick={onReset}
+              className="flex flex-row items-center hover:underline"
+              style={{ fontSize: "15px" }}
+            >
               <MaterialIcon>chevron_left</MaterialIcon>
-              <div>Back</div>
+              <div>{correctedTestCases[highlightedTest].title}</div>
             </button>
           )}
           {correctedTestCases.map(
@@ -104,11 +108,23 @@ function Console() {
   const hideProps = !pauseId || !consoleProps;
 
   return (
-    <div className="h-100 flex h-64 flex-shrink-0 flex-col overflow-auto p-2">
-      <div>Console Props</div>
+    <div
+      className="h-100 flex h-64 flex-shrink-0 flex-col overflow-auto p-4"
+      style={{
+        borderTop: "2px solid var(--chrome)",
+        fontSize: "15px",
+      }}
+    >
+      <div className="text-md">Console Props</div>
       <ErrorBoundary>
         <div className="flex flex-grow flex-col gap-1 p-2 pl-8 font-mono">
-          {!hideProps && <PropertiesRenderer pauseId={pauseId} object={consoleProps} />}
+          {hideProps ? (
+            <div className="flex flex-grow items-center justify-center align-middle text-xs opacity-50">
+              Nothing Selected...
+            </div>
+          ) : (
+            <PropertiesRenderer pauseId={pauseId} object={consoleProps} />
+          )}
         </div>
       </ErrorBoundary>
     </div>
