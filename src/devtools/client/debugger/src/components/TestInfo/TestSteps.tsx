@@ -191,8 +191,8 @@ function TestSection({
             id={s.id}
           />
           <div className="flex flex-col">
-            {getDisplayedEvents(s, steps, data, startTime).map((r, i) => (
-              <NetworkEvent key={i} method={r.method} status={r.status} url={r.url} id={r.id} />
+            {getDisplayedEvents(s, steps, data, startTime).map((r) => (
+              <NetworkEvent key={r.id} method={r.method} status={r.status} url={r.url} id={r.id} />
             ))}
           </div>
         </>
