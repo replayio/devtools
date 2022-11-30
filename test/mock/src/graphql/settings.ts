@@ -25,6 +25,7 @@ export function createUserSettingsMock(): MockedResponse[] {
         disableLogRocket: false,
         enableRepaint: false,
         enableTeams: true,
+        role: "developer",
       },
     },
   };

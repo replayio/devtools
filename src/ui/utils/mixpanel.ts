@@ -212,6 +212,7 @@ export function setMixpanelContext({
   id,
   email,
   workspaceId,
+  role,
 }: TelemetryUser & { workspaceId: string | null }) {
   mixpanel.register({ isReplayBrowser: isReplayBrowser() });
 
@@ -225,6 +226,10 @@ export function setMixpanelContext({
 
   if (workspaceId) {
     mixpanel.people.set({ workspaceId });
+  }
+
+  if (role) {
+    mixpanel.people.set({ role });
   }
 
   if (prefs.logTelemetryEvent) {

@@ -22,10 +22,8 @@ export default function WelcomeToReplay() {
           <OnboardingBody>{`Nice to meet you! I'm going to save you and your team a whole lot of time.`}</OnboardingBody>
         </OnboardingContent>
         <OnboardingActions>
-          <Link href="./import-settings">
-            <a type="button" className={classes}>
-              Get Started
-            </a>
+          <Link href="/login?returnTo=/browser/choose-role">
+            <a className={classes}>Get Started</a>
           </Link>
         </OnboardingActions>
       </OnboardingContentWrapper>

@@ -13,6 +13,7 @@ export type ExperimentalUserSettings = {
   disableLogRocket: boolean;
   enableTeams: boolean;
   enableLargeText: boolean;
+  role: string;
 };
 
 export type LocalExperimentalUserSettings = {
