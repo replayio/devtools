@@ -6,12 +6,11 @@ import { useEffect, useState } from "react";
 
 import { PrefsHelper } from "devtools/client/shared/prefs";
 import { asyncStoreHelper } from "devtools/shared/async-store-helper";
-import Services, { prefs as prefsService } from "devtools/shared/services";
+import { pref, prefs as prefsService } from "devtools/shared/services";
 
 // Schema version to bump when the async store format has changed incompatibly
 // and old stores should be cleared.
 const prefsSchemaVersion = 11;
-const { pref } = Services;
 
 // Debugger prefs.
 pref("devtools.browsertoolbox.fission", false);
@@ -86,26 +85,28 @@ export const prefs = new PrefsHelper("devtools", {
   componentVisible: ["Bool", "debugger.component-visible"],
   workersVisible: ["Bool", "debugger.workers-visible"],
   breakpointsVisible: ["Bool", "debugger.breakpoints-visible"],
-  breakpointsVisible: ["Bool", "debugger.logpoints-visible"],
+  logpointsVisible: ["Bool", "debugger.logpoints-visible"],
   eventListenersVisible: ["Bool", "debugger.event-listeners-visible"],
   startPanelCollapsed: ["Bool", "debugger.start-panel-collapsed"],
   endPanelCollapsed: ["Bool", "debugger.end-panel-collapsed"],
   startPanelSize: ["Int", "debugger.start-panel-size"],
   endPanelSize: ["Int", "debugger.end-panel-size"],
   frameworkGroupingOn: ["Bool", "debugger.ui.framework-grouping-on"],
-  pendingSelectedLocation: ["Json", "debugger.pending-selected-location", {}],
+  pendingSelectedLocation: ["Json", "debugger.pending-selected-location"],
   debuggerPrefsSchemaVersion: ["Int", "debugger.prefs-schema-version"],
   logActions: ["Bool", "debugger.log-actions"],
   logEventBreakpoints: ["Bool", "debugger.log-event-breakpoints"],
   indentSize: ["Int", "editor.tabsize"],
 });
 
-export const useDebuggerPrefs = prefKey => {
+type DebuggerPrefs = typeof prefs;
+
+export const useDebuggerPrefs = (prefKey: keyof DebuggerPrefs) => {
   const fullKey = `devtools.debugger.${prefKey}`;
   const [preference, setPreference] = useState(prefsService.getBoolPref(fullKey));
 
   useEffect(() => {
-    const onUpdate = prefs => {
+    const onUpdate = (prefs: typeof prefsService) => {
       setPreference(prefs.getBoolPref(fullKey));
     };
 
@@ -115,7 +116,7 @@ export const useDebuggerPrefs = prefKey => {
 
   return {
     value: preference,
-    update: newValue => {
+    update: (newValue: boolean) => {
       prefsService.setBoolPref(fullKey, newValue);
     },
   };
@@ -124,11 +125,6 @@ export const useDebuggerPrefs = prefKey => {
 export const javascriptPrefs = new PrefsHelper("javascript", {
   enableJavaScript: ["Bool", "enabled"],
 });
-
-// The pref may not be defined. Defaulting to null isn't viable (cursor never blinks).
-// Can't use CodeMirror.defaults here because it's loaded later.
-// Hardcode the fallback value to that of CodeMirror.defaults.cursorBlinkRate.
-prefs.cursorBlinkRate = Services.prefs.getIntPref("ui.caretBlinkTime", 530);
 
 export const features = new PrefsHelper("devtools.debugger.features", {
   asyncStepping: ["Bool", "async-stepping"],
