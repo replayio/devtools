@@ -7,11 +7,11 @@ import { Point } from "shared/client/types";
 import { Redacted } from "ui/components/Redacted";
 import { MiniSource, getHasSiblingOfSameName, getSourceDetails } from "ui/reducers/sources";
 import type { UIState } from "ui/state";
+import { features } from "ui/utils/prefs";
 
 import actions from "../../../actions";
 import { getExecutionPoint } from "../../../reducers/pause";
 import { getContext } from "../../../selectors";
-import { features } from "../../../utils/prefs";
 import { getFileURL, getSourceQueryString, getTruncatedFileName } from "../../../utils/source";
 import { CloseButton } from "../../shared/Button";
 

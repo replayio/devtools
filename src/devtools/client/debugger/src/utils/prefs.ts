@@ -54,7 +54,3 @@ export const useDebuggerPrefs = (prefKey: string) => {
     },
   };
 };
-
-export const features = new PrefsHelper("devtools.debugger.features", {
-  columnBreakpoints: ["Bool", "column-breakpoints"],
-});

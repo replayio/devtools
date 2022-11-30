@@ -10,7 +10,6 @@ pref("devtools.disableLogRocket", false);
 pref("devtools.event-listeners-breakpoints", true);
 pref("devtools.listenForMetrics", false);
 pref("devtools.logTelemetryEvent", false);
-pref("devtools.showPanelAbove", false);
 pref("devtools.showRedactions", false);
 pref("devtools.sidePanelSize", "240px");
 pref("devtools.theme", "system");
@@ -43,11 +42,9 @@ export const prefs = new PrefsHelper("devtools", {
   defaultMode: ["String", "defaultMode"],
   disableCache: ["Bool", "disableCache"],
   disableLogRocket: ["Bool", "disableLogRocket"],
-  eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
   listenForMetrics: ["Bool", "listenForMetrics"],
   logTelemetryEvent: ["Bool", "logTelemetryEvent"],
   secondaryPanelHeight: ["String", "dev-secondary-panel-height"],
-  showPanelAbove: ["Bool", "showPanelAbove"],
   showRedactions: ["Bool", "showRedactions"],
   sidePanelSize: ["String", "sidePanelSize"],
   theme: ["String", "theme"],
