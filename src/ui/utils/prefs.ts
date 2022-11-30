@@ -1,9 +1,6 @@
 import { PrefsHelper } from "devtools/client/shared/prefs";
+import { asyncStoreHelper } from "devtools/shared/async-store-helper";
 import { pref } from "devtools/shared/services";
-
-import { isTest } from "./environment";
-
-const { asyncStoreHelper } = require("devtools/shared/async-store-helper");
 
 // app prefs.
 pref("devtools.defaultMode", "non-dev");
@@ -81,5 +78,5 @@ export const features = new PrefsHelper("devtools.features", {
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {
-  replaySessions: ["replay-sessions", {}],
+  replaySessions: ["Json", "replay-sessions"],
 });
