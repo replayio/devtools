@@ -5,7 +5,7 @@
 // Side-effectful import, needed to initialize prefs before read
 require("devtools/client/inspector/prefs");
 
-const Services = require("devtools/shared/services");
+import Services from "devtools/shared/services";
 
 export type EventId = string;
 

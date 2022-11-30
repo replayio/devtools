@@ -1,7 +1,7 @@
 import { DocumentNode, gql, useMutation, useQuery } from "@apollo/client";
 import { useEffect, useMemo, useState } from "react";
 
-import { prefs as prefsService } from "devtools/shared/services";
+import Services from "devtools/shared/services";
 import { CreateUserAPIKey, CreateUserAPIKeyVariables } from "graphql/CreateUserAPIKey";
 import { DeleteUserAPIKey, DeleteUserAPIKeyVariables } from "graphql/DeleteUserAPIKey";
 import { GetUserSettings } from "graphql/GetUserSettings";
@@ -26,6 +26,8 @@ import { features, prefs } from "ui/utils/prefs";
 import useAuth0 from "ui/utils/useAuth0";
 
 import type { ApiKey, ExperimentalUserSettings } from "../types";
+
+const { prefs: prefsService } = Services;
 
 const emptySettings: ExperimentalUserSettings = {
   apiKeys: [],

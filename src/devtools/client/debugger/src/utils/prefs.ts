@@ -6,7 +6,9 @@ import { useEffect, useState } from "react";
 
 import { PrefsHelper } from "devtools/client/shared/prefs";
 import { asyncStoreHelper } from "devtools/shared/async-store-helper";
-import { pref, prefs as prefsService } from "devtools/shared/services";
+import Services, { pref } from "devtools/shared/services";
+
+const { prefs: prefsService } = Services;
 
 // Schema version to bump when the async store format has changed incompatibly
 // and old stores should be cleared.
@@ -101,7 +103,7 @@ export const prefs = new PrefsHelper("devtools", {
 
 type DebuggerPrefs = typeof prefs;
 
-export const useDebuggerPrefs = (prefKey: keyof DebuggerPrefs) => {
+export const useDebuggerPrefs = (prefKey: string) => {
   const fullKey = `devtools.debugger.${prefKey}`;
   const [preference, setPreference] = useState(prefsService.getBoolPref(fullKey));
 

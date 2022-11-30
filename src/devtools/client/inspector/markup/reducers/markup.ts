@@ -4,9 +4,8 @@ import { EntityState, PayloadAction, createEntityAdapter, createSlice } from "@r
 import { BoxModel, PseudoType } from "@replayio/protocol";
 import { Attr } from "@replayio/protocol";
 
+import Services from "devtools/shared/services";
 import { UIState } from "ui/state";
-
-const Services = require("devtools/shared/services");
 
 const ATTR_COLLAPSE_ENABLED_PREF = "devtools.markup.collapseAttributes";
 const ATTR_COLLAPSE_LENGTH_PREF = "devtools.markup.collapseAttributeLength";

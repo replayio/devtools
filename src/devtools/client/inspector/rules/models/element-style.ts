@@ -6,6 +6,7 @@ import { ProtocolClient } from "@replayio/protocol";
 
 import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import RuleModel, { NodeWithId } from "devtools/client/inspector/rules/models/rule";
+import Services from "devtools/shared/services";
 import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
 import { getAppliedRulesAsync } from "ui/suspense/styleCaches";
@@ -13,8 +14,6 @@ import { getAppliedRulesAsync } from "ui/suspense/styleCaches";
 import { RuleFront } from "./fronts/rule";
 import { StyleFront } from "./fronts/style";
 import TextProperty, { ComputedProperty } from "./text-property";
-
-const Services = require("devtools/shared/services");
 
 var NON_ASCII = "[^\\x00-\\x7F]";
 var ESCAPE = "\\\\[^\n\r]";

@@ -1,7 +1,5 @@
 import { PrefsHelper } from "devtools/client/shared/prefs";
-import Services from "devtools/shared/services";
-
-const { pref } = Services;
+import Services, { pref } from "devtools/shared/services";
 
 pref("devtools.inspector.is-three-pane-mode-enabled", false);
 pref("devtools.inspector.sidebar-size", 700);

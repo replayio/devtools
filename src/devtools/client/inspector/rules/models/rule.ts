@@ -5,6 +5,7 @@
 import { Node } from "@replayio/protocol";
 
 import TextProperty from "devtools/client/inspector/rules/models/text-property";
+import Services from "devtools/shared/services";
 import { assert } from "protocol/utils";
 import CSSProperties from "third-party/css/css-properties";
 
@@ -14,7 +15,6 @@ import { StyleFront } from "./fronts/style";
 
 const CssLogic = require("third-party/css-logic/shared-inspector-css-logic");
 const { parseNamedDeclarations } = require("third-party/css/parsing-utils");
-const Services = require("devtools/shared/services");
 
 export interface NodeWithId {
   nodeId: string;
