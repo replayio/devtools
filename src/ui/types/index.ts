@@ -186,7 +186,7 @@ type TestItemError = {
   column?: number;
 };
 
-type TestEvents = "test:start" | "step:end" | "step:enqueue" | "step:start";
+type TestEvents = "test:start" | "step:end" | "step:enqueue" | "step:start" | "event:navigation";
 
 export type CypressAnnotationMessage = {
   event: TestEvents;
@@ -194,6 +194,7 @@ export type CypressAnnotationMessage = {
   commandVariable?: "cmd" | "log";
   logVariable?: "cmd" | "log";
   id?: string;
+  url?: string;
 };
 export interface Annotation {
   point: ExecutionPoint;
