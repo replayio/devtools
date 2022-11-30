@@ -69,7 +69,6 @@ export default function Table({
     () => partialRequestsToCompleteSummaries(requests, events, types),
     [events, requests, types]
   );
-
   const defaultColumn = useMemo(
     () => ({
       minWidth: 60,

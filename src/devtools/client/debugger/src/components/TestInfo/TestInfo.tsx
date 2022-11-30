@@ -112,10 +112,16 @@ function Console() {
       className="h-100 flex h-64 flex-shrink-0 flex-col overflow-auto p-4"
       style={{
         borderTop: "2px solid var(--chrome)",
-        fontSize: "15px",
       }}
     >
-      <div className="text-md">Console Props</div>
+      <div
+        className="text-md"
+        style={{
+          fontSize: "15px",
+        }}
+      >
+        Console Props
+      </div>
       <ErrorBoundary>
         <div className="flex flex-grow flex-col gap-1 p-2 pl-8 font-mono">
           {hideProps ? (
