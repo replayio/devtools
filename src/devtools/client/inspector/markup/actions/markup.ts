@@ -2,7 +2,6 @@ import { ProtocolClient, Object as ProtocolObject } from "@replayio/protocol";
 
 import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { getPauseId, paused } from "devtools/client/debugger/src/reducers/pause";
-import { features } from "devtools/client/inspector/prefs";
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { Deferred, assert, defer } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
@@ -211,15 +210,14 @@ export function addChildren(
   return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
     let childrenToAdd = childNodes;
 
-    if (!features.showWhitespaceNodes) {
-      childrenToAdd = childNodes.filter(nodeObject => {
-        const node = nodeObject?.preview?.node;
-        if (!node) {
-          return false;
-        }
-        return node.nodeType !== NodeConstants.TEXT_NODE || /[^\s]/.exec(node.nodeValue!);
-      });
-    }
+    // Filter out whitespace nodes (formerly a pref option)
+    childrenToAdd = childNodes.filter(nodeObject => {
+      const node = nodeObject?.preview?.node;
+      if (!node) {
+        return false;
+      }
+      return node.nodeType !== NodeConstants.TEXT_NODE || /[^\s]/.exec(node.nodeValue!);
+    });
 
     const originalPauseId = getPauseId(getState());
 
