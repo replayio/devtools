@@ -19434,17 +19434,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-loader@npm:^6.2.1":
-  version: 6.2.1
-  resolution: "postcss-loader@npm:6.2.1"
+"postcss-loader@npm:^7.0.2":
+  version: 7.0.2
+  resolution: "postcss-loader@npm:7.0.2"
   dependencies:
     cosmiconfig: ^7.0.0
     klona: ^2.0.5
-    semver: ^7.3.5
+    semver: ^7.3.8
   peerDependencies:
     postcss: ^7.0.0 || ^8.0.1
     webpack: ^5.0.0
-  checksum: e40ae79c3e39df37014677a817b001bd115d8b10dedf53a07b97513d93b1533cd702d7a48831bdd77b9a9484b1ec84a5d4a723f80e83fb28682c75b5e65e8a90
+  checksum: 2d251537d482eb751f812c96c8b515f46d7c9905cad7afab33f0f34872670619b7440cefc9e2babbf89fb11b4708850d522d79fa5ff788227587645e78f16638
   languageName: node
   linkType: hard
 
@@ -20936,7 +20936,7 @@ __metadata:
     node-fetch: 2.x
     parse-script-tags: ^0.1.7
     postcss: ^8.4.12
-    postcss-loader: ^6.2.1
+    postcss-loader: ^7.0.2
     prettier: ^2.6.2
     prettier-plugin-import-sort: ^0.0.7
     prettier-plugin-tailwindcss: ^0.1.7
@@ -21766,6 +21766,17 @@ __metadata:
   bin:
     semver: bin/semver.js
   checksum: 2fa3e877568cd6ce769c75c211beaed1f9fce80b28338cadd9d0b6c40f2e2862bafd62c19a6cff42f3d54292b7c623277bcab8816a2b5521cf15210d43e75232
+  languageName: node
+  linkType: hard
+
+"semver@npm:^7.3.8":
+  version: 7.3.8
+  resolution: "semver@npm:7.3.8"
+  dependencies:
+    lru-cache: ^6.0.0
+  bin:
+    semver: bin/semver.js
+  checksum: ba9c7cbbf2b7884696523450a61fee1a09930d888b7a8d7579025ad93d459b2d1949ee5bbfeb188b2be5f4ac163544c5e98491ad6152df34154feebc2cc337c1
   languageName: node
   linkType: hard
 
