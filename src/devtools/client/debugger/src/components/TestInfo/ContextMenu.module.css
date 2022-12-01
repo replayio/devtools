@@ -5,10 +5,9 @@
   border-radius: 0.5em;
   overflow: hidden;
   white-space: nowrap;
-  transform: translateX(-100%);
 
   /* Ensure the context menu is always above console rows and the current time indicator */
-  z-index: 4;
+  z-index: 11;
 }
 
 .ContextMenuItem {
