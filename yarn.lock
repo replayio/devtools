@@ -20973,7 +20973,7 @@ __metadata:
     ts-node: ^10.7.0
     tsconfig-paths: ^3.14.1
     typescript: 4.7.4
-    utf-8-validate: ^5.0.8
+    utf-8-validate: ^5.0.10
     v8-to-istanbul: ^9.0.1
     webpack: ^5.71.0
     webpack-cli: ^4.9.2
@@ -24219,13 +24219,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"utf-8-validate@npm:^5.0.8":
-  version: 5.0.9
-  resolution: "utf-8-validate@npm:5.0.9"
+"utf-8-validate@npm:^5.0.10":
+  version: 5.0.10
+  resolution: "utf-8-validate@npm:5.0.10"
   dependencies:
     node-gyp: latest
     node-gyp-build: ^4.3.0
-  checksum: 90117f1b65e0a1256c83dfad529983617263b622f2379745311d0438c7ea31db0d134ebd0dca84c3f5847a3560a3d249644e478a9109c616f63c7ea19cac53dc
+  checksum: 5579350a023c66a2326752b6c8804cc7b39dcd251bb088241da38db994b8d78352e388dcc24ad398ab98385ba3c5ffcadb6b5b14b2637e43f767869055e46ba6
   languageName: node
   linkType: hard
 
