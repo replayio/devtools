@@ -533,19 +533,15 @@ export class ReplayClient implements ReplayClientInterface {
     return result.data;
   }
 
-  async getPointNearTime(time: number): Promise<TimeStampedPoint> {
+  async getPointNearTime(time: number): Promise<{ point: TimeStampedPoint; precise: boolean }> {
     const sessionId = this.getSessionIdThrows();
 
-    await this._waitForTimeToBeLoaded(time);
-
-    const { point } = await client.Session.getPointNearTime({ time }, sessionId);
-    return point;
+    const { point, precise } = await client.Session.getPointNearTime({ time }, sessionId);
+    return { point, precise };
   }
 
   async getPointsBoundingTime(time: number): Promise<PointsBoundingTime> {
     const sessionId = this.getSessionIdThrows();
-
-    await this._waitForTimeToBeLoaded(time);
 
     const result = await client.Session.getPointsBoundingTime({ time }, sessionId);
     return result;
@@ -1007,7 +1003,7 @@ export class ReplayClient implements ReplayClientInterface {
     });
   }
 
-  async _waitForTimeToBeLoaded(time: number): Promise<void> {
+  async waitForTimeToBeLoaded(time: number): Promise<void> {
     return new Promise(resolve => {
       const checkLoaded = () => {
         const loadedRegions = this.loadedRegions;
