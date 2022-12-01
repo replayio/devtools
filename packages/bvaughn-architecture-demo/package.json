@@ -16,7 +16,7 @@
     "js-tokens": "^8.0.0",
     "lodash": "^4.17.21",
     "next": "^12.1.6",
-    "pretty-ms": "^7.0.1",
+    "pretty-ms": "^8.0.0",
     "protocol": "workspace:*",
     "react": "0.0.0-experimental-e7d0053e6-20220325",
     "react-dom": "0.0.0-experimental-e7d0053e6-20220325",
