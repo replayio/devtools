@@ -17,13 +17,9 @@ import styles from "./styles.module.css";
 export default function CodeCompletionPlugin({
   dataTestId,
   dataTestName = "CodeTypeAhead",
-  onActivate,
-  onDeactivate,
 }: {
   dataTestId?: string;
   dataTestName?: string;
-  onActivate: () => void;
-  onDeactivate: () => void;
 }): JSX.Element {
   const [editor] = useLexicalComposerContext();
 
@@ -61,8 +57,6 @@ export default function CodeCompletionPlugin({
       isExactMatch={isExactMatch}
       itemClassName={styles.Item}
       listClassName={styles.List}
-      onActivate={onActivate}
-      onDeactivate={onDeactivate}
     />
   );
 }

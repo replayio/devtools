@@ -1,20 +1,14 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
-import { COMMAND_PRIORITY_CRITICAL, KEY_ENTER_COMMAND, KEY_TAB_COMMAND, TextNode } from "lexical";
+import { COMMAND_PRIORITY_LOW, KEY_ENTER_COMMAND, KEY_TAB_COMMAND, TextNode } from "lexical";
 import { useEffect, useRef } from "react";
 
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_STRIKETHROUGH, IS_UNDERLINE } from "./constants";
 
 const SUPPORTED_STYLES = IS_CODE | IS_STRIKETHROUGH | IS_BOLD | IS_ITALIC | IS_UNDERLINE;
 
-export default function CommentPlugin({ enabled }: { enabled: boolean }): null {
+export default function CommentPlugin(): null {
   const [editor] = useLexicalComposerContext();
-
-  // Shares most recently committed component state with imperative Lexical API (which only runs on mount)
-  const committedStateRef = useRef({ enabled });
-  useEffect(() => {
-    committedStateRef.current.enabled = enabled;
-  });
 
   useEffect(() => {
     function onTextNodeTransform(node: TextNode) {
@@ -39,8 +33,6 @@ export default function CommentPlugin({ enabled }: { enabled: boolean }): null {
     function onEnterCommand(event: KeyboardEvent) {
       if (!editor.isEditable()) {
         return false;
-      } else if (!committedStateRef.current.enabled) {
-        return false;
       }
 
       if (event?.shiftKey) {
@@ -59,8 +51,8 @@ export default function CommentPlugin({ enabled }: { enabled: boolean }): null {
 
     return mergeRegister(
       editor.registerNodeTransform(TextNode, onTextNodeTransform),
-      editor.registerCommand(KEY_ENTER_COMMAND, onEnterCommand, COMMAND_PRIORITY_CRITICAL),
-      editor.registerCommand(KEY_TAB_COMMAND, onTabCommand, COMMAND_PRIORITY_CRITICAL)
+      editor.registerCommand(KEY_ENTER_COMMAND, onEnterCommand, COMMAND_PRIORITY_LOW),
+      editor.registerCommand(KEY_TAB_COMMAND, onTabCommand, COMMAND_PRIORITY_LOW)
     );
   }, [editor]);
 

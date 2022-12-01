@@ -1,10 +1,9 @@
-import { AnyAaaaRecord } from "dns";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
 import {
   $createTextNode,
   $getSelection,
-  COMMAND_PRIORITY_CRITICAL,
+  COMMAND_PRIORITY_NORMAL,
   LexicalNode,
   TextNode,
 } from "lexical";
@@ -26,8 +25,6 @@ export default function TypeAheadPlugin<Item extends Object>({
   itemClassName = "",
   itemRenderer = (item: Item) => item as any,
   listClassName = "",
-  onActivate,
-  onDeactivate,
 }: {
   anchorElem?: HTMLElement;
   createItemNode?: (item: Item) => LexicalNode;
@@ -39,8 +36,6 @@ export default function TypeAheadPlugin<Item extends Object>({
   itemClassName?: string;
   itemRenderer?: (item: Item) => ReactNode;
   listClassName?: string;
-  onActivate: () => void;
-  onDeactivate: () => void;
 }): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
 
@@ -48,26 +43,14 @@ export default function TypeAheadPlugin<Item extends Object>({
 
   const ignoreNextUpdateRef = useRef(false);
 
-  const setQueryDataWrapper = useCallback((newQueryData: QueryData | null) => {
-    setQueryData(newQueryData);
-
-    if (newQueryData === null) {
-      committedStateRef.current.onDeactivate();
-    } else {
-      committedStateRef.current.onActivate();
-    }
-  }, []);
-
   // Shares most recently committed component state with imperative Lexical API (which only runs on mount)
-  const committedStateRef = useRef({ onActivate, onDeactivate, queryData });
+  const committedStateRef = useRef({ queryData });
   useEffect(() => {
-    committedStateRef.current.onActivate = onActivate;
-    committedStateRef.current.onDeactivate = onDeactivate;
     committedStateRef.current.queryData = queryData;
   });
 
   useEffect(() => {
-    const handleUpdate = () => {
+    const onUpdate = () => {
       if (!editor.isEditable()) {
         return;
       }
@@ -82,7 +65,7 @@ export default function TypeAheadPlugin<Item extends Object>({
         const selection = $getSelection();
         const newQueryData = getQueryData(selection);
 
-        setQueryDataWrapper(newQueryData);
+        setQueryData(newQueryData);
       });
     };
 
@@ -150,17 +133,24 @@ export default function TypeAheadPlugin<Item extends Object>({
         // Don't re-show the popup if the user just selected an item.
         ignoreNextUpdateRef.current = true;
 
-        setQueryDataWrapper(null);
+        setQueryData(null);
       });
 
       return true;
     };
 
+    function onEditable() {
+      if (!editor.isEditable()) {
+        setQueryData(null);
+      }
+    }
+
     return mergeRegister(
-      editor.registerUpdateListener(handleUpdate),
-      editor.registerCommand(INSERT_ITEM_COMMAND, onInsertItem, COMMAND_PRIORITY_CRITICAL)
+      editor.registerEditableListener(onEditable),
+      editor.registerUpdateListener(onUpdate),
+      editor.registerCommand(INSERT_ITEM_COMMAND, onInsertItem, COMMAND_PRIORITY_NORMAL)
     );
-  }, [createItemNode, editor, findMatches, getQueryData, setQueryDataWrapper]);
+  }, [createItemNode, editor, findMatches, getQueryData]);
 
   return queryData === null
     ? null
@@ -177,7 +167,7 @@ export default function TypeAheadPlugin<Item extends Object>({
             itemRenderer={itemRenderer}
             listClassName={listClassName}
             queryData={queryData}
-            updateQueryData={setQueryDataWrapper}
+            updateQueryData={setQueryData}
           />
         </Suspense>,
         anchorElem

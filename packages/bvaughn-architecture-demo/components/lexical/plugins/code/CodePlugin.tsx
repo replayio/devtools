@@ -7,8 +7,9 @@ import {
   $isParagraphNode,
   $isRangeSelection,
   $isTextNode,
-  COMMAND_PRIORITY_CRITICAL,
+  COMMAND_PRIORITY_EDITOR,
   COMMAND_PRIORITY_LOW,
+  COMMAND_PRIORITY_NORMAL,
   KEY_ARROW_DOWN_COMMAND,
   KEY_ARROW_UP_COMMAND,
   KEY_TAB_COMMAND,
@@ -53,7 +54,7 @@ export default function CodePlugin(): null {
 
     return mergeRegister(
       editor.registerNodeTransform(TextNode, onTextNodeTransform),
-      editor.registerCommand(KEY_TAB_COMMAND, onTabCommand, COMMAND_PRIORITY_CRITICAL),
+      editor.registerCommand(KEY_TAB_COMMAND, onTabCommand, COMMAND_PRIORITY_NORMAL),
       editor.registerCommand(
         KEY_ARROW_UP_COMMAND,
         (payload): boolean => handleShiftLines(KEY_ARROW_UP_COMMAND, payload),

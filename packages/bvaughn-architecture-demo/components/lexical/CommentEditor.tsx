@@ -93,20 +93,16 @@ export default function CommentEditor({
 }): JSX.Element {
   const historyState = createEmptyHistoryState();
 
-  const [formPluginEnabled, setFormPluginEnabled] = useState(true);
-
   const editorRef = useRef<LexicalEditor>(null);
   const backupEditorStateRef = useRef<EditorState | null>(null);
 
   // Shares most recently committed component state with imperative Lexical API (which only runs on mount)
   const committedStateRef = useRef({
-    formPluginEnabled,
     onCancel,
     onDelete,
     onSave,
   });
   useEffect(() => {
-    committedStateRef.current.formPluginEnabled = formPluginEnabled;
     committedStateRef.current.onCancel = onCancel;
     committedStateRef.current.onDelete = onDelete;
     committedStateRef.current.onSave = onSave;
@@ -174,25 +170,20 @@ export default function CommentEditor({
     }
   }, [editorRef]);
 
-  const onFormCancel = useCallback((editorState: EditorState) => {
-    const { onCancel, onDelete } = committedStateRef.current;
+  const onFormCancel = useCallback((_: EditorState) => {
+    const { onCancel } = committedStateRef.current;
 
-    const textContent = serialize(editorState);
-    if (textContent.trim() === "") {
-      onDelete();
-    } else {
-      onCancel();
+    onCancel();
 
-      const editor = editorRef.current;
-      if (editor) {
-        editor.update(() => {
-          const editorState = backupEditorStateRef.current;
-          if (editorState) {
-            editor.setEditorState(editorState);
-          }
-        });
-        editor.setEditable(false);
-      }
+    const editor = editorRef.current;
+    if (editor) {
+      editor.update(() => {
+        const editorState = backupEditorStateRef.current;
+        if (editorState) {
+          editor.setEditorState(editorState);
+        }
+      });
+      editor.setEditable(false);
     }
   }, []);
 
@@ -214,21 +205,18 @@ export default function CommentEditor({
     }
   }, []);
 
-  // Discard pending changes on-blur
+  // Discard pending changes on-blur;
   useEffect(() => {
     const editor = editorRef.current;
     if (editor) {
       const onBlurCommand = (event: FocusEvent) => {
-        const { formPluginEnabled } = committedStateRef.current;
         if (event.defaultPrevented) {
-          return false;
-        } else if (!formPluginEnabled) {
           return false;
         }
 
         if (editor.isEditable()) {
           event.preventDefault();
-          onFormCancel(editor.getEditorState());
+          onFormSubmit(editor.getEditorState());
           return true;
         }
 
@@ -237,7 +225,7 @@ export default function CommentEditor({
 
       return editor.registerCommand(BLUR_COMMAND, onBlurCommand, COMMAND_PRIORITY_NORMAL);
     }
-  }, [onFormCancel]);
+  }, [onFormSubmit]);
 
   return (
     <div className={styles.Editor}>
@@ -252,22 +240,15 @@ export default function CommentEditor({
             ErrorBoundary={LexicalErrorBoundary}
           />
           <MarkdownShortcutPlugin transformers={MARKDOWN_TRANSFORMERS} />
-          <FormPlugin
-            enableCancel={formPluginEnabled}
-            enableSubmit={formPluginEnabled}
-            onCancel={onFormCancel}
-            onSubmit={onFormSubmit}
-          />
-          <CommentPlugin enabled={formPluginEnabled} />
+          <FormPlugin onCancel={onFormCancel} onSubmit={onFormSubmit} />
+          <CommentPlugin />
           <LoomLinkPlugin />
           <ReplayLinkPlugin />
           {collaboratorNames !== null ? (
             <MentionsPlugin
               collaboratorNames={collaboratorNames}
               dataTestId={dataTestId ? `${dataTestId}-CodeTypeAhead` : undefined}
-              dataTestName={dataTestName ? `${dataTestName}-CodeTypeAhead` : undefined}
-              onActivate={() => setFormPluginEnabled(false)}
-              onDeactivate={() => setFormPluginEnabled(true)}
+              dataTestName={dataTestName ? `${dataTestName}-CodeTypeAhead` : "CodeTypeAhead"}
             />
           ) : null}
         </>

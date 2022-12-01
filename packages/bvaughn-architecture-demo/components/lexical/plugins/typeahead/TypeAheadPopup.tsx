@@ -1,11 +1,12 @@
 import { mergeRegister } from "@lexical/utils";
 import {
   BLUR_COMMAND,
-  COMMAND_PRIORITY_CRITICAL,
+  COMMAND_PRIORITY_HIGH,
   KEY_ARROW_DOWN_COMMAND,
   KEY_ARROW_UP_COMMAND,
   KEY_ENTER_COMMAND,
   KEY_ESCAPE_COMMAND,
+  KEY_TAB_COMMAND,
   LexicalEditor,
 } from "lexical";
 import { ReactNode, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -141,11 +142,13 @@ function TypeAheadPopUp<Item>({
     items,
     queryData,
     selectedIndex,
+    updateQueryData,
   });
   useLayoutEffect(() => {
     committedStateRef.current.items = items;
     committedStateRef.current.queryData = queryData;
     committedStateRef.current.selectedIndex = selectedIndex;
+    committedStateRef.current.updateQueryData = updateQueryData;
   });
 
   const selectedItem = items[selectedIndex] || null;
@@ -288,7 +291,8 @@ function TypeAheadPopUp<Item>({
 
           return true;
         }
-        case "Enter": {
+        case "Enter":
+        case "Tab": {
           const { selectedIndex, items } = committedStateRef.current;
           const selectedItem = items[selectedIndex];
           if (selectedItem == null) {
@@ -304,6 +308,7 @@ function TypeAheadPopUp<Item>({
         case "Escape": {
           event.preventDefault();
 
+          const { updateQueryData } = committedStateRef.current;
           updateQueryData(null);
 
           return true;
@@ -313,28 +318,31 @@ function TypeAheadPopUp<Item>({
       return false;
     }
 
+    // Dismiss the type-ahead popup on blur.
     function onBlur(event: FocusEvent) {
-      const { selectedIndex, items } = committedStateRef.current;
-      const selectedItem = items[selectedIndex];
-      if (selectedItem == null) {
-        return false;
+      // The only exception to this should be if the "blur" was caused by a click in the type-ahead menu.
+      const popup = popupRef.current;
+      if (popup) {
+        const relatedTarget = event.relatedTarget as Node;
+        if (popup !== relatedTarget && !popup.contains(relatedTarget)) {
+          const { updateQueryData } = committedStateRef.current;
+          updateQueryData(null);
+          return false;
+        }
       }
-
-      event.preventDefault();
-
-      editor.dispatchCommand(INSERT_ITEM_COMMAND, { item: selectedItem as Item });
 
       return true;
     }
 
     return mergeRegister(
-      editor.registerCommand(BLUR_COMMAND, onBlur, COMMAND_PRIORITY_CRITICAL),
-      editor.registerCommand(KEY_ARROW_DOWN_COMMAND, onKeyPress, COMMAND_PRIORITY_CRITICAL),
-      editor.registerCommand(KEY_ARROW_UP_COMMAND, onKeyPress, COMMAND_PRIORITY_CRITICAL),
-      editor.registerCommand(KEY_ENTER_COMMAND, onKeyPress, COMMAND_PRIORITY_CRITICAL),
-      editor.registerCommand(KEY_ESCAPE_COMMAND, onKeyPress, COMMAND_PRIORITY_CRITICAL)
+      editor.registerCommand(BLUR_COMMAND, onBlur, COMMAND_PRIORITY_HIGH),
+      editor.registerCommand(KEY_ARROW_DOWN_COMMAND, onKeyPress, COMMAND_PRIORITY_HIGH),
+      editor.registerCommand(KEY_ARROW_UP_COMMAND, onKeyPress, COMMAND_PRIORITY_HIGH),
+      editor.registerCommand(KEY_ENTER_COMMAND, onKeyPress, COMMAND_PRIORITY_HIGH),
+      editor.registerCommand(KEY_ESCAPE_COMMAND, onKeyPress, COMMAND_PRIORITY_HIGH),
+      editor.registerCommand(KEY_TAB_COMMAND, onKeyPress, COMMAND_PRIORITY_HIGH)
     );
-  }, [editor, updateQueryData]);
+  }, [editor]);
 
   return (
     <TypeAheadListRenderer

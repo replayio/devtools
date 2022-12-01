@@ -16,7 +16,7 @@ import {
   SerializedEditorState,
   TextNode,
 } from "lexical";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import LexicalEditorRefSetter from "./LexicalEditorRefSetter";
 import CodeCompletionPlugin from "./plugins/code-completion/CodeCompletionPlugin";
@@ -52,8 +52,6 @@ export default function CodeEditor({
   placeholder?: string;
 }): JSX.Element {
   const historyState = createEmptyHistoryState();
-
-  const [formPluginEnabled, setFormPluginEnabled] = useState(true);
 
   const editorRef = useRef<LexicalEditor>(null);
   const backupEditorStateRef = useRef<EditorState | null>(null);
@@ -132,19 +130,11 @@ export default function CodeEditor({
           placeholder={<div className={styles.Placeholder}>{placeholder}</div>}
           ErrorBoundary={LexicalErrorBoundary}
         />
-        <FormPlugin
-          enableCancel={formPluginEnabled}
-          enableSubmit={formPluginEnabled}
-          onCancel={onFormCancel}
-          onChange={onFormChange}
-          onSubmit={onFormSubmit}
-        />
+        <FormPlugin onCancel={onFormCancel} onChange={onFormChange} onSubmit={onFormSubmit} />
         <CodePlugin />
         <CodeCompletionPlugin
           dataTestId={dataTestId ? `${dataTestId}-CodeTypeAhead` : undefined}
           dataTestName={dataTestName ? `${dataTestName}-CodeTypeAhead` : undefined}
-          onActivate={() => setFormPluginEnabled(false)}
-          onDeactivate={() => setFormPluginEnabled(true)}
         />
       </>
     </LexicalComposer>

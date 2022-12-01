@@ -14,14 +14,10 @@ export default function MentionsPlugin({
   collaboratorNames,
   dataTestId,
   dataTestName = "MentionsTypeAhead",
-  onActivate,
-  onDeactivate,
 }: {
   collaboratorNames: string[];
   dataTestId?: string;
   dataTestName?: string;
-  onActivate: () => void;
-  onDeactivate: () => void;
 }): JSX.Element {
   const [editor] = useLexicalComposerContext();
 
@@ -55,8 +51,6 @@ export default function MentionsPlugin({
       isExactMatch={isExactMatch}
       itemClassName={styles.Item}
       listClassName={styles.List}
-      onActivate={onActivate}
-      onDeactivate={onDeactivate}
     />
   );
 }
