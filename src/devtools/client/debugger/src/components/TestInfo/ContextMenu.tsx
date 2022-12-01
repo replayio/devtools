@@ -4,6 +4,7 @@ import useModalDismissSignal from "bvaughn-architecture-demo/src/hooks/useModalD
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { seekToTime, startPlayback } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { selectLocation } from "../../actions/sources";
@@ -15,7 +16,6 @@ import {
   TestStepType,
 } from "./TestInfoContextMenuContext";
 import styles from "./ContextMenu.module.css";
-import { getCurrentTime } from "ui/reducers/timeline";
 
 function ContextMenu({
   hide,
@@ -87,11 +87,21 @@ function ContextMenu({
         <MaterialIcon>play_circle</MaterialIcon>
         Play from here
       </div>
-      <div className={`${styles.ContextMenuItem} ${testStep.startTime === currentTime ? styles.disabled : ""}`} onClick={onJumpToBefore}>
+      <div
+        className={`${styles.ContextMenuItem} ${
+          testStep.startTime === currentTime ? styles.disabled : ""
+        }`}
+        onClick={onJumpToBefore}
+      >
         <MaterialIcon>arrow_back</MaterialIcon>
         Show before
       </div>
-      <div className={`${styles.ContextMenuItem} ${testStep.endTime - 1 === currentTime ? styles.disabled : ""}`} onClick={onJumpToAfter}>
+      <div
+        className={`${styles.ContextMenuItem} ${
+          testStep.endTime - 1 === currentTime ? styles.disabled : ""
+        }`}
+        onClick={onJumpToAfter}
+      >
         <MaterialIcon>arrow_forward</MaterialIcon>
         Show after
       </div>
