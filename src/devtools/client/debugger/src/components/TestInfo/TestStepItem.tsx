@@ -147,7 +147,7 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
   const bump = isPaused || isPast ? 10 : 0;
   const actualProgress = bump + 90 * ((currentTime - startTime) / duration);
   const progress = actualProgress > 100 ? 100 : actualProgress;
-  const displayedProgress = duration === 1 && isPaused ? 100 : progress;
+  const displayedProgress = duration === 1 && isPaused ? 100 : progress == 100 ? 0 : progress;
 
   const color = error ? "border-l-red-500" : "border-l-primaryAccent";
 
