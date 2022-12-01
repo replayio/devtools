@@ -41,7 +41,7 @@
     "@reduxjs/toolkit": "^1.8.4",
     "@replayio/protocol": "^0.32.3",
     "@sentry/react": "^7.9.0",
-    "@sentry/tracing": "^7.9.0",
+    "@sentry/tracing": "^7.22.0",
     "@stripe/react-stripe-js": "^1.7.0",
     "@stripe/stripe-js": "^1.26.0",
     "@svgr/webpack": "^6.2.1",
