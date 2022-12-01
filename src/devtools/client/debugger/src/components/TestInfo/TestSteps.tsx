@@ -15,7 +15,7 @@ import { useAppSelector } from "ui/setup/hooks";
 import { AnnotatedTestStep, CypressAnnotationMessage, TestItem, TestStep } from "ui/types";
 
 import { NetworkEvent } from "./NetworkEvent";
-import { TestCase, TestCaseContext } from "./TestCase";
+import { TestCaseContext } from "./TestCase";
 import { TestStepRoot } from "./TestStepRoot";
 
 type StepEvent = {

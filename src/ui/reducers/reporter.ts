@@ -6,10 +6,18 @@ import { Annotation } from "ui/types";
 
 export interface ReporterState {
   annotations: Annotation[];
+  selectedStep: SelectedStep | null
+}
+
+type SelectedStep = {
+    id: string;
+    startTime: number;
+    endTime: number;
 }
 
 const initialState: ReporterState = {
   annotations: [],
+  selectedStep: null
 };
 
 const reporterSlice = createSlice({
@@ -22,12 +30,19 @@ const reporterSlice = createSlice({
 
       state.annotations = annotations;
     },
+    setSelectedStep(state, action: PayloadAction<SelectedStep | null>) {
+      // This is not ideal since we're duplicating data that's being composed elsewhere.
+      // Ideally we would have a selectedStepId, and a list of steps to query to get that
+      // data instead.
+      state.selectedStep = action.payload
+    },
   },
 });
 
 export default reporterSlice.reducer;
-export const { addReporterAnnotations } = reporterSlice.actions;
+export const { addReporterAnnotations, setSelectedStep } = reporterSlice.actions;
 export const getReporterAnnotations = (state: UIState) => state.reporter.annotations;
+export const getSelectedStep = (state: UIState) => state.reporter.selectedStep;
 export const getReporterAnnotationsForTests = createSelector(
   getReporterAnnotations,
   (annotations: Annotation[]) => annotations.filter(a => a.message.event === "test:start")

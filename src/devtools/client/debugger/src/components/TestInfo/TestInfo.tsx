@@ -6,7 +6,7 @@ import PropertiesRenderer from "bvaughn-architecture-demo/components/inspector/P
 import { getRecordingDuration } from "ui/actions/app";
 import { setFocusRegion } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { getReporterAnnotationsForTests } from "ui/reducers/reporter";
+import { getReporterAnnotationsForTests, setSelectedStep } from "ui/reducers/reporter";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Annotation, TestItem } from "ui/types";
 
@@ -15,8 +15,6 @@ import { TestCase } from "./TestCase";
 import { TestInfoContextMenuContextRoot } from "./TestInfoContextMenuContext";
 
 type TestInfoContextType = {
-  selectedId: string | null;
-  setSelectedId: (id: string | null) => void;
   consoleProps?: ProtocolObject;
   setConsoleProps: (obj?: ProtocolObject) => void;
   pauseId: string | null;
@@ -42,7 +40,6 @@ export default function TestInfo({
   setHighlightedTest: (test: number | null) => void;
 }) {
   const [consoleProps, setConsoleProps] = useState<ProtocolObject>();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [pauseId, setPauseId] = useState<string | null>(null);
   const dispatch = useAppDispatch();
   const annotations = useAppSelector(getReporterAnnotationsForTests);
@@ -61,6 +58,7 @@ export default function TestInfo({
 
   const onReset = () => {
     setHighlightedTest(null);
+    dispatch(setSelectedStep(null));
     dispatch(
       setFocusRegion({
         beginTime: 0,
@@ -73,7 +71,7 @@ export default function TestInfo({
 
   return (
     <TestInfoContext.Provider
-      value={{ selectedId, setSelectedId, consoleProps, setConsoleProps, pauseId, setPauseId }}
+      value={{ consoleProps, setConsoleProps, pauseId, setPauseId }}
     >
       <TestInfoContextMenuContextRoot>
         <div className="flex flex-grow flex-col overflow-hidden">
