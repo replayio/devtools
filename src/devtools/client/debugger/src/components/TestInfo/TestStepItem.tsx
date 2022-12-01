@@ -8,10 +8,10 @@ import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { ProgressBar } from "./ProgressBar";
+import { TestCaseContext } from "./TestCase";
 import { TestInfoContext } from "./TestInfo";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { TestStepContext } from "./TestStepRoot";
-import { TestCaseContext } from "./TestCase";
 
 function returnFirst<T, R>(list: T[] | undefined, fn: (v: T) => R | null) {
   return list ? list.reduce<R | null>((acc, v) => acc ?? fn(v), null) : null;
@@ -23,12 +23,12 @@ export interface TestStepItemProps {
   id: string | null;
 }
 
-export function TestStepItem({
-  argString,
-  index,
-  id,
-}: TestStepItemProps) {
-  const { setConsoleProps, setPauseId, setSelectedId: setSelectedIndex } = useContext(TestInfoContext);
+export function TestStepItem({ argString, index, id }: TestStepItemProps) {
+  const {
+    setConsoleProps,
+    setPauseId,
+    setSelectedId: setSelectedIndex,
+  } = useContext(TestInfoContext);
   const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
     pauseId: string;
     nodeIds: string[];
@@ -179,33 +179,21 @@ export function TestStepItem({
 
 function Actions() {
   const { startTime: stepStartTime, duration, point } = useContext(TestStepContext);
-  const { startTime: caseStartTime, endTime: caseEndTime} = useContext(TestCaseContext);
+  const { startTime: caseStartTime, endTime: caseEndTime } = useContext(TestCaseContext);
   const { show } = useContext(TestInfoContextMenuContext);
-
 
   const onClick = (e: React.MouseEvent) => {
     const testStep = {
       startTime: stepStartTime,
       endTime: stepStartTime + duration,
-      enqueuePoint: point
-    }
+      enqueuePoint: point,
+    };
     const testCase = {
       startTime: caseStartTime,
       endTime: caseEndTime,
-    }
+    };
     show({ x: e.pageX, y: e.pageY }, testCase, testStep);
   };
-
-  {/* <TestStepActions
-    onReplay={onReplay}
-    onPlayFromHere={onPlayFromHere}
-    isLastStep={isLastStep}
-    isPaused={isPaused}
-    onGoToLocation={onGoToLocation}
-    onJumpToBefore={onJumpToBefore}
-    onJumpToAfter={onJumpToAfter}
-    duration={adjustedDuration}
-  /> */}
 
   return (
     <button onClick={onClick} className="py-2">

@@ -10,8 +10,8 @@ import { getReporterAnnotationsForTests } from "ui/reducers/reporter";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Annotation, TestItem } from "ui/types";
 
-import { TestCase } from "./TestCase";
 import ContextMenuWrapper from "./ContextMenu";
+import { TestCase } from "./TestCase";
 import { TestInfoContextMenuContextRoot } from "./TestInfoContextMenuContext";
 
 type TestInfoContextType = {

@@ -37,7 +37,6 @@ function ContextMenu({
   const onPlayFromHere = () => {
     hide();
     dispatch(startPlayback({ beginTime: testStep.startTime, endTime: testCase.endTime }));
-    console.log("on play from here", { testStep, testCase });
   };
   const onJumpToBefore = () => {
     hide();

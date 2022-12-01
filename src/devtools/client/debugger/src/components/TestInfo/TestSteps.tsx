@@ -146,18 +146,12 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
 
   return (
     <div className="flex flex-col rounded-lg py-2 px-2">
-      <TestSection
-        events={beforeEach}
-        header="Before Each"
-      />
+      <TestSection events={beforeEach} header="Before Each" />
       <TestSection
         events={testBody}
         header={beforeEach.length + afterEach.length > 0 ? "Test Body" : undefined}
       />
-      <TestSection
-        events={afterEach}
-        header="After Each"
-      />
+      <TestSection events={afterEach} header="After Each" />
       {test.error ? (
         <div className="border-l-2 border-red-500 bg-testsuitesErrorBgcolor text-testsuitesErrorColor">
           <div className="flex flex-row items-center space-x-1 p-2">
@@ -171,13 +165,7 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
   );
 }
 
-function TestSection({
-  events,
-  header,
-}: {
-  events: CompositeTestEvent[];
-  header?: string;
-}) {
+function TestSection({ events, header }: { events: CompositeTestEvent[]; header?: string }) {
   if (events.length === 0) {
     return null;
   }
@@ -194,13 +182,7 @@ function TestSection({
       ) : null}
       {events.map(({ event: s, type }, i) =>
         type === "step" ? (
-          <TestStepRoot
-            step={s}
-            key={i}
-            index={i}
-            argString={s.args?.toString()}
-            id={s.id}
-          />
+          <TestStepRoot step={s} key={i} index={i} argString={s.args?.toString()} id={s.id} />
         ) : type === "network" ? (
           <NetworkEvent key={s.id} method={s.method} status={s.status} url={s.url} id={s.id} />
         ) : (
