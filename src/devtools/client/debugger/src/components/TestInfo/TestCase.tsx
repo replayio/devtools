@@ -111,7 +111,7 @@ export function TestCase({
             </button>
           </div>
         )}
-        {expandSteps ? <TestSteps test={test} startTime={test.relativeStartTime} /> : null}
+        {expandSteps ? <TestSteps test={test} /> : null}
       </div>
     </TestCaseContext.Provider>
   );

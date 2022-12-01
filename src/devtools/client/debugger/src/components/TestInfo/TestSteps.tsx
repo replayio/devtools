@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useContext, useMemo } from "react";
 
 import {
   RequestSummary,
@@ -15,6 +15,7 @@ import { useAppSelector } from "ui/setup/hooks";
 import { AnnotatedTestStep, CypressAnnotationMessage, TestItem, TestStep } from "ui/types";
 
 import { NetworkEvent } from "./NetworkEvent";
+import { TestCase, TestCaseContext } from "./TestCase";
 import { TestStepRoot } from "./TestStepRoot";
 
 type StepEvent = {
@@ -73,7 +74,7 @@ function useGetTestSections(
       .map<NetworkEvent>(n => ({ time: n.end!, type: "network", event: n }));
 
     const stepsByTime = steps.map<StepEvent>(s => ({
-      time: startTime + s.relativeStartTime + s.duration,
+      time: startTime + s.relativeStartTime,
       type: "step",
       event: {
         ...s,
@@ -141,8 +142,13 @@ function useGetTestSections(
   }, [steps, annotationsEnd, annotationsEnqueue, requests, events, startTime, navigationEvents]);
 }
 
-export function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
-  const { beforeEach, testBody, afterEach } = useGetTestSections(startTime, test.steps, test.title);
+export function TestSteps({ test }: { test: TestItem }) {
+  const { startTime: testCaseStartTime } = useContext(TestCaseContext);
+  const { beforeEach, testBody, afterEach } = useGetTestSections(
+    testCaseStartTime,
+    test.steps,
+    test.title
+  );
 
   return (
     <div className="flex flex-col rounded-lg py-2 px-2">

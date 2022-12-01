@@ -36,7 +36,7 @@ export function TestStepRoot({ step, ...props }: TestStepRootProps) {
     messageEnd: step.annotations.end?.message,
     point: step.annotations.enqueue?.point,
     pointEnd: step.annotations.end?.point,
-    duration: adjustedDuration,
+    duration: step.name === "assert" ? 1 : adjustedDuration,
     parentId: step.parentId,
     error: !!step.error,
   };
