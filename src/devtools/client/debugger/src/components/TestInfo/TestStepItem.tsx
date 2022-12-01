@@ -207,7 +207,7 @@ export function TestStepItem({
   return (
     <>
       <div
-        className={`group/step relative flex items-start gap-1 border-b border-l-2 border-themeBase-90 pl-1 pr-3 font-mono hover:bg-gray-100 ${
+        className={`group/step relative flex items-start gap-1 border-b border-l-2 border-themeBase-90 pl-1 pr-3 font-mono hover:bg-toolbarBackground ${
           isPaused || isPast ? color : "border-l-transparent"
         } ${
           progress > 0 && error
