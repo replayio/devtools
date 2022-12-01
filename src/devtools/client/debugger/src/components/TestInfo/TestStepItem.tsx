@@ -196,7 +196,7 @@ function Actions() {
   };
 
   return (
-    <button onClick={onClick} className={`group-hover/step:visible py-2 invisible`}>
+    <button onClick={onClick} className={`invisible py-2 group-hover/step:visible`}>
       <div className="flex items-center">
         <MaterialIcon>more_vert</MaterialIcon>
       </div>
