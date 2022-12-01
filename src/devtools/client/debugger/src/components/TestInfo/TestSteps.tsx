@@ -48,6 +48,7 @@ function useGetTestSections(
   const navigationEvents = useAppSelector(getReporterAnnotationsForTitleNavigation(testTitle));
   const annotationsEnqueue = useAppSelector(getReporterAnnotationsForTitle(testTitle));
   const annotationsEnd = useAppSelector(getReporterAnnotationsForTitleEnd(testTitle));
+  const annotationsStart = useAppSelector(getReporterAnnotationsForTitleEnd(testTitle));
   const requests = useAppSelector(getRequests);
   const events = useAppSelector(getEvents);
 
@@ -81,6 +82,7 @@ function useGetTestSections(
         annotations: {
           end: annotationsEnd.find(a => a.message.id === s.id),
           enqueue: annotationsEnqueue.find(a => a.message.id === s.id),
+          start: annotationsStart.find(a => a.message.id === s.id),
         },
       },
     }));
@@ -139,7 +141,16 @@ function useGetTestSections(
     }
 
     return { beforeEach, testBody, afterEach };
-  }, [steps, annotationsEnd, annotationsEnqueue, requests, events, startTime, navigationEvents]);
+  }, [
+    steps,
+    annotationsEnd,
+    annotationsEnqueue,
+    requests,
+    events,
+    startTime,
+    navigationEvents,
+    annotationsStart,
+  ]);
 }
 
 export function TestSteps({ test }: { test: TestItem }) {

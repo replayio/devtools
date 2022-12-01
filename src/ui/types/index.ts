@@ -218,6 +218,7 @@ export type AnnotatedTestStep = TestStep & {
 };
 
 type Annotations = {
+  start?: Annotation;
   end?: Annotation;
   enqueue?: Annotation;
 };

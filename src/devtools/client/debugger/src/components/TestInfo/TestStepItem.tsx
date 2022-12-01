@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
+import { seek, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
 import { getCurrentTime } from "ui/reducers/timeline";
@@ -35,7 +35,7 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
   const selectedStep = useAppSelector(getSelectedStep);
   const dispatch = useAppDispatch();
   const client = useContext(ReplayClientContext);
-  const { startTime, duration, messageEnd, pointEnd, error, stepName, parentId } =
+  const { startTime, duration, messageEnd, pointEnd, error, stepName, parentId, pointStart } =
     useContext(TestStepContext);
   const isPast = currentTime > startTime;
   const isPaused = currentTime >= startTime && currentTime < startTime + duration;
@@ -120,12 +120,12 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
   }, [client, messageEnd, pointEnd, setConsoleProps, setPauseId]);
 
   const onClick = () => {
-    if (id) {
+    if (id && pointStart) {
       if (localPauseData) {
         setConsoleProps(localPauseData.consoleProps);
         setPauseId(localPauseData.pauseId);
       }
-      dispatch(seekToTime(startTime));
+      dispatch(seek(pointStart!, startTime, false));
       dispatch(setSelectedStep({ id, startTime, endTime: startTime + duration - 1 }));
     }
   };

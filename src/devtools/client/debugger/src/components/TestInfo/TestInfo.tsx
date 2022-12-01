@@ -70,6 +70,14 @@ export default function TestInfo({
     setConsoleProps(undefined);
   };
 
+  if (!annotations) {
+    return (
+      <div className="flex flex-grow flex-col overflow-hidden">
+        <div className="flex flex-grow flex-col space-y-1 overflow-auto px-2 py-2">Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <TestInfoContext.Provider value={{ consoleProps, setConsoleProps, pauseId, setPauseId }}>
       <TestInfoContextMenuContextRoot>
