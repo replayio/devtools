@@ -88,7 +88,6 @@ async function fetchPointsBoundingTime(
             currentPointsBoundingTime.after.point === afterPoint
           ) {
             // Session.getPointsBoundingTime should never return overlapping ranges that are not exact matches.
-            // And we can skip adding add duplicate ranges.
             // These shouldn't be common, but if two times within the same range are requested in parallel, we might see this.
             indexMiddle = -1;
             break;
@@ -122,6 +121,12 @@ async function fetchPointsBoundingTime(
 
         // Eagerly request a precise value (while we're within a loaded region).
         // This value will be cached should the client request it again.
+        //
+        // We don't need to do this; we could just clear the cached values and only ask again lazily,
+        // but the region might not still be loaded later.
+        // Regardless, this request will not cause an update to React components,
+        // unless they were to update again for some other reason and re-ask
+        // in which case, they would re-Suspend anyway.
         try {
           getClosestPointForTimeSuspense(client, time);
         } catch (error) {
