@@ -25,10 +25,7 @@ export interface TestStepItemProps {
 }
 
 export function TestStepItem({ argString, index, id }: TestStepItemProps) {
-  const {
-    setConsoleProps,
-    setPauseId,
-  } = useContext(TestInfoContext);
+  const { setConsoleProps, setPauseId } = useContext(TestInfoContext);
   const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
     pauseId: string;
     nodeIds: string[];
