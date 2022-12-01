@@ -84,7 +84,9 @@ export function TestCase({
   };
 
   return (
-    <TestCaseContext.Provider value={{startTime: testStartTime, endTime: testEndTime, onReplay, onPlayFromHere}}>
+    <TestCaseContext.Provider
+      value={{ startTime: testStartTime, endTime: testEndTime, onReplay, onPlayFromHere }}
+    >
       <div className="flex flex-col">
         {!isHighlighted && (
           <div className="flex flex-row items-center justify-between gap-1 rounded-lg p-1 transition hover:cursor-pointer">

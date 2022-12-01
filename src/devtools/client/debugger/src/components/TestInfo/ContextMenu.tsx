@@ -1,8 +1,13 @@
 import { useContext, useRef } from "react";
 
 import useModalDismissSignal from "bvaughn-architecture-demo/src/hooks/useModalDismissSignal";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { seekToTime, startPlayback } from "ui/actions/timeline";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
+import { selectLocation } from "../../actions/sources";
+import { getContext } from "../../selectors";
 import {
   Coordinates,
   TestCaseType,
@@ -10,9 +15,6 @@ import {
   TestStepType,
 } from "./TestInfoContextMenuContext";
 import styles from "./ContextMenu.module.css";
-import { selectLocation } from "../../actions/sources";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { getContext } from "../../selectors";
 
 function ContextMenu({
   hide,
@@ -28,6 +30,7 @@ function ContextMenu({
   const dispatch = useAppDispatch();
   const ref = useRef<HTMLDivElement>(null);
   const cx = useAppSelector(getContext);
+  const client = useContext(ReplayClientContext);
 
   useModalDismissSignal(ref, hide, true);
 
@@ -45,6 +48,7 @@ function ContextMenu({
     dispatch(seekToTime(testStep.endTime - 1));
   };
   const onGoToLocation = async () => {
+    hide();
     if (!testStep.enqueuePoint) {
       return;
     }
@@ -72,41 +76,28 @@ function ContextMenu({
   return (
     <div
       className={styles.ContextMenu}
-      data-test-id="ConsoleContextMenu"
       ref={ref}
       style={{
         left: mouseCoordinates.x,
         top: mouseCoordinates.y,
       }}
     >
-      <div
-        className={styles.ContextMenuItem}
-        data-test-id="ConsoleContextMenu-SetFocusStartButton"
-        onClick={onPlayFromHere}
-      >
+      <div className={styles.ContextMenuItem} onClick={onPlayFromHere}>
+        <MaterialIcon>play_circle</MaterialIcon>
         Play from here
       </div>
-      <div
-        className={styles.ContextMenuItem}
-        data-test-id="ConsoleContextMenu-SetFocusStartButton"
-        onClick={onJumpToBefore}
-      >
+      <div className={styles.ContextMenuItem} onClick={onJumpToBefore}>
+        <MaterialIcon>arrow_back</MaterialIcon>
         Show before
       </div>
-      <div
-        className={styles.ContextMenuItem}
-        data-test-id="ConsoleContextMenu-SetFocusStartButton"
-        onClick={onJumpToAfter}
-      >
+      <div className={styles.ContextMenuItem} onClick={onJumpToAfter}>
+        <MaterialIcon>arrow_forward</MaterialIcon>
         Show after
       </div>
-      {/* <div
-        className={styles.ContextMenuItem}
-        data-test-id="ConsoleContextMenu-SetFocusStartButton"
-        onClick={onClick}
-      >
-        Jump to source code
-      </div> */}
+      <div className={styles.ContextMenuItem} onClick={onGoToLocation}>
+        <MaterialIcon>code</MaterialIcon>
+        Show source code
+      </div>
     </div>
   );
 }
