@@ -1,6 +1,5 @@
-import React, { useCallback, useContext, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 
-import { startPlayback } from "ui/actions/timeline";
 import {
   RequestSummary,
   partialRequestsToCompleteSummaries,
@@ -12,13 +11,11 @@ import {
   getReporterAnnotationsForTitleEnd,
   getReporterAnnotationsForTitleNavigation,
 } from "ui/reducers/reporter";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useAppSelector } from "ui/setup/hooks";
 import { AnnotatedTestStep, CypressAnnotationMessage, TestItem, TestStep } from "ui/types";
 
 import { NetworkEvent } from "./NetworkEvent";
-import { TestInfoContext } from "./TestInfo";
-import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
-import { TestStepItem } from "./TestStepItem";
+import { TestStepRoot } from "./TestStepRoot";
 
 type StepEvent = {
   time: number;
@@ -145,49 +142,20 @@ function useGetTestSections(
 }
 
 export function TestSteps({ test, startTime }: { test: TestItem; startTime: number }) {
-  const { selectedId, setSelectedId } = useContext(TestInfoContext);
-  const dispatch = useAppDispatch();
   const { beforeEach, testBody, afterEach } = useGetTestSections(startTime, test.steps, test.title);
-  const testStart = test.steps[0].relativeStartTime + startTime;
-  const testEnd =
-    test.steps[test.steps.length - 1].relativeStartTime +
-    startTime +
-    test.steps[test.steps.length - 1].duration;
-
-  const onReplay = () => {
-    dispatch(startPlayback({ beginTime: testStart, endTime: testEnd - 1 }));
-  };
-  const onPlayFromHere = (beginTime: number) => {
-    dispatch(startPlayback({ beginTime, endTime: testEnd - 1 }));
-  };
 
   return (
     <div className="flex flex-col rounded-lg py-2 px-2">
       <TestSection
-        onReplay={onReplay}
-        onPlayFromHere={onPlayFromHere}
         events={beforeEach}
-        startTime={startTime}
-        selectedIndex={selectedId}
-        setSelectedIndex={setSelectedId}
         header="Before Each"
       />
       <TestSection
-        onReplay={onReplay}
-        onPlayFromHere={onPlayFromHere}
         events={testBody}
-        startTime={startTime}
-        selectedIndex={selectedId}
-        setSelectedIndex={setSelectedId}
         header={beforeEach.length + afterEach.length > 0 ? "Test Body" : undefined}
       />
       <TestSection
-        onReplay={onReplay}
-        onPlayFromHere={onPlayFromHere}
         events={afterEach}
-        startTime={startTime}
-        selectedIndex={selectedId}
-        setSelectedIndex={setSelectedId}
         header="After Each"
       />
       {test.error ? (
@@ -205,19 +173,9 @@ export function TestSteps({ test, startTime }: { test: TestItem; startTime: numb
 
 function TestSection({
   events,
-  startTime,
   header,
-  onPlayFromHere,
-  onReplay,
-  selectedIndex,
-  setSelectedIndex,
 }: {
-  onPlayFromHere: (time: number) => void;
-  onReplay: () => void;
-  startTime: number;
   events: CompositeTestEvent[];
-  selectedIndex: string | null;
-  setSelectedIndex: (index: string | null) => void;
   header?: string;
 }) {
   if (events.length === 0) {
@@ -236,24 +194,11 @@ function TestSection({
       ) : null}
       {events.map(({ event: s, type }, i) =>
         type === "step" ? (
-          <TestStepItem
-            stepName={s.name}
-            messageEnqueue={s.annotations.enqueue?.message}
-            messageEnd={s.annotations.end?.message}
-            point={s.annotations.enqueue?.point}
-            pointEnd={s.annotations.end?.point}
+          <TestStepRoot
+            step={s}
             key={i}
             index={i}
-            startTime={startTime + s.relativeStartTime}
-            duration={s.duration}
             argString={s.args?.toString()}
-            parentId={s.parentId}
-            error={!!s.error}
-            isLastStep={events.length - 1 === i}
-            onReplay={onReplay}
-            onPlayFromHere={() => onPlayFromHere(startTime + s.relativeStartTime)}
-            selectedIndex={selectedIndex}
-            setSelectedIndex={setSelectedIndex}
             id={s.id}
           />
         ) : type === "network" ? (

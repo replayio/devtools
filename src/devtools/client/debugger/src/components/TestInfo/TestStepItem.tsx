@@ -1,74 +1,44 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { CypressAnnotationMessage } from "ui/types";
 
-import { selectLocation } from "../../actions/sources";
-import { getThreadContext } from "../../selectors";
 import { ProgressBar } from "./ProgressBar";
 import { TestInfoContext } from "./TestInfo";
-import { TestStepActions } from "./TestStepActions";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { TestStepContext } from "./TestStepRoot";
 
 function returnFirst<T, R>(list: T[] | undefined, fn: (v: T) => R | null) {
   return list ? list.reduce<R | null>((acc, v) => acc ?? fn(v), null) : null;
 }
 
-export function TestStepItem({
-  messageEnqueue,
-  messageEnd,
-  point,
-  pointEnd,
-  stepName,
-  startTime,
-  duration,
-  argString,
-  index,
-  parentId,
-  error,
-  isLastStep,
-  onReplay,
-  onPlayFromHere,
-  id,
-  selectedIndex,
-  setSelectedIndex,
-}: {
-  messageEnqueue?: CypressAnnotationMessage;
-  messageEnd?: CypressAnnotationMessage;
-  point?: string;
-  pointEnd?: string;
-  stepName: string;
-  startTime: number;
-  duration: number;
+export interface TestStepItemProps {
   argString: string;
   index: number;
-  parentId?: string;
-  error: boolean;
-  isLastStep: boolean;
-  onReplay: () => void;
-  onPlayFromHere: () => void;
-  selectedIndex: string | null;
   id: string | null;
-  setSelectedIndex: (index: string | null) => void;
-}) {
-  const { setConsoleProps, setPauseId } = useContext(TestInfoContext);
+}
+
+export function TestStepItem({
+  argString,
+  index,
+  id,
+}: TestStepItemProps) {
+  const { setConsoleProps, setPauseId, setSelectedId: setSelectedIndex } = useContext(TestInfoContext);
   const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
     pauseId: string;
     nodeIds: string[];
   }>();
-  const cx = useAppSelector(getThreadContext);
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
-  const isPast = currentTime > startTime;
   const client = useContext(ReplayClientContext);
-  // some chainers (`then`) don't have a duration, so let's bump it here (+1) so that it shows something in the UI
-  const adjustedDuration = duration || 1;
-  const isPaused = currentTime >= startTime && currentTime < startTime + adjustedDuration;
+  const { startTime, duration, messageEnd, pointEnd, error, stepName, parentId } =
+    useContext(TestStepContext);
+  const isPast = currentTime > startTime;
+  const isPaused = currentTime >= startTime && currentTime < startTime + duration;
 
   useEffect(() => {
     (async () => {
@@ -168,46 +138,45 @@ export function TestStepItem({
     dispatch(setTimelineToTime(currentTime));
     dispatch(unhighlightNode());
   };
-  const onJumpToBefore = () => dispatch(seekToTime(startTime));
-  const onJumpToAfter = () => {
-    dispatch(seekToTime(startTime + adjustedDuration - 1));
-  };
-  const onGoToLocation = async () => {
-    if (!point) {
-      return;
-    }
+  // const onJumpToBefore = () => dispatch(seekToTime(startTime));
+  // const onJumpToAfter = () => {
+  //   dispatch(seekToTime(startTime + adjustedDuration - 1));
+  // };
+  // // const onPlayFromHere = () => onPlayFromHere(startTime);
+  // const onGoToLocation = async () => {
+  //   if (!point) {
+  //     return;
+  //   }
 
-    const frame = await (async point => {
-      const {
-        data: { frames },
-      } = await client.createPause(point);
+  //   const frame = await (async point => {
+  //     const {
+  //       data: { frames },
+  //     } = await client.createPause(point);
 
-      const returnFirst = (list: any, fn: any) =>
-        list.reduce((acc: any, v: any, i: any) => acc ?? fn(v, i, list), null);
+  //     const returnFirst = (list: any, fn: any) =>
+  //       list.reduce((acc: any, v: any, i: any) => acc ?? fn(v, i, list), null);
 
-      return returnFirst(frames, (f: any, i: any, l: any) =>
-        l[i + 1]?.functionName === "__stackReplacementMarker" ? f : null
-      );
-    })(point);
+  //     return returnFirst(frames, (f: any, i: any, l: any) =>
+  //       l[i + 1]?.functionName === "__stackReplacementMarker" ? f : null
+  //     );
+  //   })(point);
 
-    const location = frame.location[frame.location.length - 1];
+  //   const location = frame.location[frame.location.length - 1];
 
-    if (location) {
-      dispatch(selectLocation(cx, location));
-    }
-  };
+  //   if (location) {
+  //     dispatch(selectLocation(cx, location));
+  //   }
+  // };
 
   // This math is bananas don't look here until this is cleaned up :)
   const bump = isPaused || isPast ? 10 : 0;
-  const actualProgress = bump + 90 * ((currentTime - startTime) / adjustedDuration);
+  const actualProgress = bump + 90 * ((currentTime - startTime) / duration);
   const progress = actualProgress > 100 ? 100 : actualProgress;
-  const displayedProgress =
-    adjustedDuration === 1 && isPaused ? 100 : progress == 100 ? 0 : progress;
+  const displayedProgress = duration === 1 && isPaused ? 100 : progress == 100 ? 0 : progress;
 
   const color = error ? "border-l-red-500" : "border-l-primaryAccent";
 
   return (
-    <>
       <div
         className={`group/step relative flex items-start gap-1 border-b border-l-2 border-themeBase-90 pl-1 pr-3 font-mono hover:bg-toolbarBackground ${
           isPaused || isPast ? color : "border-l-transparent"
@@ -231,23 +200,12 @@ export function TestStepItem({
             {stepName} <span className="opacity-70">{argString}</span>
           </div>
         </button>
-        {/* <TestStepActions
-          onReplay={onReplay}
-          onPlayFromHere={onPlayFromHere}
-          isLastStep={isLastStep}
-          isPaused={isPaused}
-          onGoToLocation={onGoToLocation}
-          onJumpToBefore={onJumpToBefore}
-          onJumpToAfter={onJumpToAfter}
-          duration={adjustedDuration}
-        /> */}
-        <ContextMenuIcon />
-      </div>
-    </>
+      <Actions />
+    </div>
   );
 }
 
-function ContextMenuIcon() {
+function Actions() {
   const { show } = useContext(TestInfoContextMenuContext);
   const onClick = (e: React.MouseEvent) => {
     console.log("click1");
@@ -259,5 +217,5 @@ function ContextMenuIcon() {
         <MaterialIcon>more_vert</MaterialIcon>
       </div>
     </button>
-  )
+  );
 }
