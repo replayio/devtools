@@ -38,3 +38,8 @@
 .ColorBadgeClear {
   border: 0.25rem solid var(--background-color-contrast-5);
 }
+
+.disabled {
+  color: var(--theme-text-color-inactive);
+  pointer-events: none;
+}
