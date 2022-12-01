@@ -1,3 +1,4 @@
+import classNames from "classnames/bind";
 import { useContext, useRef } from "react";
 
 import useModalDismissSignal from "bvaughn-architecture-demo/src/hooks/useModalDismissSignal";
@@ -33,6 +34,7 @@ function ContextMenu({
   const ref = useRef<HTMLDivElement>(null);
   const cx = useAppSelector(getContext);
   const client = useContext(ReplayClientContext);
+  const classnames = classNames.bind(styles);
 
   useModalDismissSignal(ref, hide, true);
 
@@ -88,19 +90,17 @@ function ContextMenu({
         Play from here
       </div>
       <div
-        className={`${styles.ContextMenuItem} ${
-          testStep.startTime === currentTime ? styles.disabled : ""
-        }`}
-        onClick={onJumpToBefore}
+        className={classnames("ContextMenuItem", { disabled: testStep.startTime === currentTime })}
+        onClick={testStep.startTime === currentTime ? undefined : onJumpToBefore}
       >
         <MaterialIcon>arrow_back</MaterialIcon>
         Show before
       </div>
       <div
-        className={`${styles.ContextMenuItem} ${
-          testStep.endTime - 1 === currentTime ? styles.disabled : ""
-        }`}
-        onClick={onJumpToAfter}
+        className={classnames("ContextMenuItem", {
+          disabled: testStep.endTime - 1 === currentTime,
+        })}
+        onClick={testStep.endTime - 1 === currentTime ? undefined : onJumpToAfter}
       >
         <MaterialIcon>arrow_forward</MaterialIcon>
         Show after
