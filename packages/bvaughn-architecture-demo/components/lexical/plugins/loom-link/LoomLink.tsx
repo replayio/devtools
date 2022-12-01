@@ -35,6 +35,5 @@ function LazyImage({ loomId }: { loomId: string }): JSX.Element {
 
   useSuspenseImage(url);
 
-  // TODO Style
   return <img className={styles.Image} data-loom-id={loomId} src={url} />;
 }
