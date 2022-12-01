@@ -31,8 +31,16 @@
   border-radius: 1.5em;
 }
 
-.Content {
+.ContentWrapper {
   padding: 0.5em;
+  border: 2px solid transparent;
+  border-radius: 0.5em;
+}
+.ContentWrapper:focus-within {
+  border-color: var(--color-brand);
+}
+.ContentWrapper p {
+  margin: 0;
 }
 
 .PublishedReply,

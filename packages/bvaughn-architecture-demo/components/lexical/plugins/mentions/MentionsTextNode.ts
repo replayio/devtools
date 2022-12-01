@@ -10,6 +10,7 @@ import {
 import { SerializedMentionsTextNode } from "./types";
 import $convertMentionsElement from "./utils/$convertMentionsElement";
 import $createMentionsTextNode from "./utils/$createMentionsTextNode";
+import styles from "./styles.module.css";
 
 export default class MentionsTextNode extends TextNode {
   static getType(): string {
@@ -44,7 +45,7 @@ export default class MentionsTextNode extends TextNode {
 
   createDOM(config: EditorConfig): HTMLElement {
     const dom = super.createDOM(config);
-    dom.className = "mentions-node";
+    dom.className = styles.Node;
     return dom;
   }
 

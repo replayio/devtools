@@ -1,6 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
+import { type as typeLexical } from "./lexical";
 import { openPauseInformationPanel } from "./pause-information-panel";
 import { openSource, openSourceExplorerPanel } from "./source-explorer-panel";
 import { clearTextArea, debugPrint, delay, getCommandKey, mapLocators, waitFor } from "./utils";
@@ -140,21 +141,27 @@ export async function addLogpoint(
         "addLogpoint"
       );
 
+      const conditionInputSelector = '[data-test-name="PointPanel-ConditionInput"]';
+
       await line.locator('[data-test-name="PointPanel-AddConditionButton"]').click();
 
-      const conditionInput = line.locator('[data-test-name="PointPanel-ConditionInput"]');
-      await conditionInput.focus();
-      await clearTextArea(page, conditionInput);
-      await page.keyboard.type(condition);
+      await typeLexical(
+        page,
+        `${getSourceLineSelector(lineNumber)} [data-test-name="PointPanel-ConditionInput"]`,
+        condition,
+        false
+      );
     }
 
     if (content) {
       await debugPrint(page, `Setting log-point content "${chalk.bold(content)}"`, "addLogpoint");
 
-      const contentInput = line.locator('[data-test-name="PointPanel-ContentInput"]');
-      await contentInput.focus();
-      await clearTextArea(page, contentInput);
-      await page.keyboard.type(content);
+      await typeLexical(
+        page,
+        `${getSourceLineSelector(lineNumber)} [data-test-name="PointPanel-ContentInput"]`,
+        content,
+        false
+      );
     }
 
     const saveButton = line.locator('[data-test-name="PointPanel-SaveButton"]');
@@ -203,6 +210,10 @@ export async function getSelectedLineNumber(page: Page): Promise<number | null> 
 export async function getSourceLine(page: Page, lineNumber: number): Promise<Locator> {
   const source = await getCurrentSource(page);
   return source!.locator(`[data-test-id=SourceLine-${lineNumber}]`);
+}
+
+export function getSourceLineSelector(lineNumber: number): string {
+  return `[data-test-id=SourceLine-${lineNumber}]`;
 }
 
 export function getSourceTab(page: Page, url: string): Locator {

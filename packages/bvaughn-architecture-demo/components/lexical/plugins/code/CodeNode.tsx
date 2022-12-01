@@ -2,7 +2,6 @@ import { EditorConfig, ElementNode } from "lexical";
 
 import { SerializedCodeNode } from "./types";
 import $createCodeNode from "./utils/$createCodeNode";
-import "./styles.css";
 
 export default class CodeNode extends ElementNode {
   static getType(): string {

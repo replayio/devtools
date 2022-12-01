@@ -1,0 +1,5 @@
+.Link {
+  color: var(--color-link);
+  font-weight: bold;
+  text-decoration: underline;
+}

@@ -1,5 +1,4 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $rootTextContent } from "@lexical/text";
 import { mergeRegister } from "@lexical/utils";
 import {
   $getNodeByKey,
@@ -12,7 +11,7 @@ import {
   COMMAND_PRIORITY_LOW,
   KEY_ARROW_DOWN_COMMAND,
   KEY_ARROW_UP_COMMAND,
-  KEY_ENTER_COMMAND,
+  KEY_TAB_COMMAND,
   LexicalCommand,
   LexicalEditor,
   LexicalNode,
@@ -21,7 +20,7 @@ import {
   NodeKey,
   TextNode,
 } from "lexical";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 import CodeNode from "./CodeNode";
 import $createCodeNode from "./utils/$createCodeNode";
@@ -29,40 +28,10 @@ import $isCodeNode from "./utils/$isCodeNode";
 import parsedTokensToCodeTextNode from "./utils/parsedTokensToCodeTextNode";
 import parseTokens from "./utils/parseTokens";
 
-export default function CodePlugin({
-  onChange,
-  onSubmit,
-}: {
-  onChange: (text: string) => void;
-  onSubmit: () => void;
-}): null {
+export default function CodePlugin(): null {
   const [editor] = useLexicalComposerContext();
 
-  const onChangeRef = useRef(onChange);
   useEffect(() => {
-    onChangeRef.current = onChange;
-  }, [onChange]);
-
-  const onSubmitRef = useRef(onSubmit);
-  useEffect(() => {
-    onSubmitRef.current = onSubmit;
-  }, [onSubmit]);
-
-  useEffect(() => {
-    function onEnterCommand(event: KeyboardEvent) {
-      if (event?.shiftKey) {
-        return false;
-      } else {
-        event.preventDefault();
-
-        // Enter key is used to submit the terminal entry
-        // const textContent = editor.getEditorState().read($rootTextContent);
-        onSubmitRef.current();
-
-        return true;
-      }
-    }
-
     function onTextNodeTransform(node: TextNode) {
       // Since CodeNode has flat children structure we only need to check if node's parent is a code node and run highlighting.
       const parentNode = node.getParent();
@@ -76,15 +45,15 @@ export default function CodePlugin({
       }
     }
 
-    function onUpdate() {
-      const textContent = editor.getEditorState().read($rootTextContent);
-
-      onChangeRef.current(textContent);
-    }
+    const onTabCommand = (_: KeyboardEvent) => {
+      // Tab characters should not indent code blocks.
+      // Tabbing should change focus.
+      return true;
+    };
 
     return mergeRegister(
       editor.registerNodeTransform(TextNode, onTextNodeTransform),
-      editor.registerCommand(KEY_ENTER_COMMAND, onEnterCommand, COMMAND_PRIORITY_CRITICAL),
+      editor.registerCommand(KEY_TAB_COMMAND, onTabCommand, COMMAND_PRIORITY_CRITICAL),
       editor.registerCommand(
         KEY_ARROW_UP_COMMAND,
         (payload): boolean => handleShiftLines(KEY_ARROW_UP_COMMAND, payload),
@@ -104,8 +73,7 @@ export default function CodePlugin({
         MOVE_TO_START,
         (payload): boolean => handleMoveTo(MOVE_TO_START, payload),
         COMMAND_PRIORITY_LOW
-      ),
-      editor.registerUpdateListener(onUpdate)
+      )
     );
   }, [editor]);
 

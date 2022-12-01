@@ -1,29 +1,154 @@
-import { LexicalEditor } from "lexical";
-import * as React from "react";
-import { FunctionComponent, useLayoutEffect, useRef } from "react";
+import { mergeRegister } from "@lexical/utils";
+import {
+  BLUR_COMMAND,
+  COMMAND_PRIORITY_CRITICAL,
+  KEY_ARROW_DOWN_COMMAND,
+  KEY_ARROW_UP_COMMAND,
+  KEY_ENTER_COMMAND,
+  KEY_ESCAPE_COMMAND,
+  LexicalEditor,
+} from "lexical";
+import { ReactNode, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import DefaultTypeAheadItemListRenderer from "./DefaultTypeAheadItemListRenderer";
-import { ItemListRendererProps } from "./types";
-import useTypeAheadPlugin from "./useTypeAheadPlugin";
+import { INSERT_ITEM_COMMAND } from "./commands";
+import TypeAheadListRenderer from "./TypeAheadListRenderer";
+import { QueryData } from "./types";
 import getDOMRangeRect from "./utils/getDOMRangeRect";
 import getLexicalEditorForDomNode from "./utils/getLexicalEditorForDomNode";
 import setFloatingElemPosition from "./utils/setFloatingElemPosition";
 
-export default function TypeAheadPopUp<Item>({
+const EMPTY_ARRAY: any[] = [];
+
+export default function TypeAheadPopUpSuspends<Item>({
   anchorElem,
+  dataTestId,
+  dataTestName,
   editor,
-  insertItem,
-  ItemListRenderer = DefaultTypeAheadItemListRenderer,
+  findMatches,
+  isExactMatch,
+  itemClassName,
+  itemRenderer,
+  listClassName,
+  queryData,
+  updateQueryData,
 }: {
   anchorElem: HTMLElement;
+  dataTestId?: string;
+  dataTestName?: string;
   editor: LexicalEditor;
-  insertItem: (item: Item) => void;
-  ItemListRenderer: FunctionComponent<ItemListRendererProps<Item>>;
+  findMatches: (query: string, queryAdditionalData: string | null) => Item[];
+  isExactMatch: (query: string, item: Item) => boolean;
+  itemClassName: string;
+  itemRenderer: (item: Item) => ReactNode;
+  listClassName: string;
+  queryData: QueryData;
+  updateQueryData: (queryData: QueryData | null) => void;
+}) {
+  const items = findMatches(queryData.query, queryData.queryAdditionalData);
+
+  return (
+    <Suspense>
+      <TypeAheadPopUp
+        anchorElem={anchorElem}
+        dataTestId={dataTestId}
+        dataTestName={dataTestName}
+        editor={editor}
+        isExactMatch={isExactMatch}
+        itemClassName={itemClassName}
+        itemRenderer={itemRenderer}
+        items={items}
+        listClassName={listClassName}
+        queryData={queryData}
+        updateQueryData={updateQueryData}
+      />
+    </Suspense>
+  );
+}
+
+function TypeAheadPopUp<Item>({
+  anchorElem,
+  dataTestId,
+  dataTestName,
+  editor,
+  isExactMatch,
+  itemClassName,
+  itemRenderer,
+  items,
+  listClassName,
+  queryData,
+  updateQueryData,
+}: {
+  anchorElem: HTMLElement;
+  dataTestId?: string;
+  dataTestName?: string;
+  editor: LexicalEditor;
+  isExactMatch: (query: string, item: Item) => boolean;
+  itemClassName: string;
+  itemRenderer: (item: Item) => ReactNode;
+  items: Item[];
+  listClassName: string;
+  queryData: QueryData;
+  updateQueryData: (queryData: QueryData | null) => void;
 }) {
   const popupRef = useRef<HTMLDivElement>(null);
   const selectedItemRef = useRef<HTMLDivElement>(null);
 
-  const { dismiss, items, query, selectedItem } = useTypeAheadPlugin<Item>();
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  // Refines selected item when items change.
+  const [prevState, setPrevState] = useState({
+    items: EMPTY_ARRAY,
+    selectedIndex: 0,
+  });
+  if (prevState.items !== items) {
+    const { items: prevItems, selectedIndex: prevSelectedIndex } = prevState;
+
+    const previousItem = prevSelectedIndex < prevItems.length ? prevItems[prevSelectedIndex] : null;
+
+    let newSelectionIndex = 0;
+    if (previousItem !== null) {
+      newSelectionIndex = items.indexOf(previousItem);
+      newSelectionIndex = newSelectionIndex >= 0 ? newSelectionIndex : 0;
+    }
+
+    setSelectedIndex(newSelectionIndex);
+
+    setPrevState({
+      items,
+      selectedIndex: newSelectionIndex,
+    });
+  } else if (prevState.selectedIndex !== selectedIndex) {
+    setPrevState({
+      items,
+      selectedIndex,
+    });
+  }
+
+  // Notify the parent plug-in that it should deactivate the type-ahead when there are no suggestions.
+  // This includes the case where there's only one suggestion and it's an exact match.
+  useEffect(() => {
+    if (queryData !== null) {
+      if (items.length === 0) {
+        updateQueryData(null);
+      } else if (items.length === 1 && isExactMatch(queryData.query, items[0])) {
+        updateQueryData(null);
+      }
+    }
+  }, [isExactMatch, items, queryData, updateQueryData]);
+
+  // Shares most recently committed component state with imperative Lexical API (which only runs on mount)
+  const committedStateRef = useRef({
+    items,
+    queryData,
+    selectedIndex,
+  });
+  useLayoutEffect(() => {
+    committedStateRef.current.items = items;
+    committedStateRef.current.queryData = queryData;
+    committedStateRef.current.selectedIndex = selectedIndex;
+  });
+
+  const selectedItem = items[selectedIndex] || null;
 
   // Position popup
   useLayoutEffect(() => {
@@ -50,7 +175,7 @@ export default function TypeAheadPopUp<Item>({
     let positionRect: DOMRect | null = null;
 
     // Position the popup at the start of the query.
-    let queryLength = query.length;
+    let queryLength = queryData.query.length;
     let currentNode: Node | null = anchorNode;
     let currentOffset = anchorOffset;
     loop: while (currentNode != null) {
@@ -99,13 +224,128 @@ export default function TypeAheadPopUp<Item>({
     }
   });
 
+  // Clicks inside of the popup shouldn't dismiss the plugin
+  // until after they have been handled.
+  useLayoutEffect(() => {
+    const popup = popupRef.current;
+    if (popup) {
+      const onMouseDown = (event: MouseEvent) => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      };
+
+      popup.addEventListener("mousedown", onMouseDown);
+      return () => {
+        popup.removeEventListener("mousedown", onMouseDown);
+      };
+    }
+  }, []);
+
+  // Register Lexical command listeners for mouse and keyboard interactions
+  useLayoutEffect(() => {
+    function onKeyPress(event: KeyboardEvent) {
+      if (!editor.isEditable()) {
+        return false;
+      }
+
+      const { queryData } = committedStateRef.current;
+      if (queryData === null) {
+        return false;
+      }
+
+      switch (event.key) {
+        case "ArrowDown": {
+          const { items, selectedIndex } = committedStateRef.current;
+          if (items.length === 0) {
+            return false;
+          }
+
+          event.preventDefault();
+
+          let newIndex = selectedIndex + 1;
+          if (newIndex >= items.length) {
+            newIndex = 0;
+          }
+
+          setSelectedIndex(newIndex);
+
+          return true;
+        }
+        case "ArrowUp": {
+          const { items, selectedIndex } = committedStateRef.current;
+          if (items.length === 0) {
+            return false;
+          }
+
+          event.preventDefault();
+
+          let newIndex = selectedIndex - 1;
+          if (newIndex < 0) {
+            newIndex = items.length - 1;
+          }
+
+          setSelectedIndex(newIndex);
+
+          return true;
+        }
+        case "Enter": {
+          const { selectedIndex, items } = committedStateRef.current;
+          const selectedItem = items[selectedIndex];
+          if (selectedItem == null) {
+            return false;
+          }
+
+          event.preventDefault();
+
+          editor.dispatchCommand(INSERT_ITEM_COMMAND, { item: selectedItem as Item });
+
+          return true;
+        }
+        case "Escape": {
+          event.preventDefault();
+
+          updateQueryData(null);
+
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    function onBlur(event: FocusEvent) {
+      const { selectedIndex, items } = committedStateRef.current;
+      const selectedItem = items[selectedIndex];
+      if (selectedItem == null) {
+        return false;
+      }
+
+      event.preventDefault();
+
+      editor.dispatchCommand(INSERT_ITEM_COMMAND, { item: selectedItem as Item });
+
+      return true;
+    }
+
+    return mergeRegister(
+      editor.registerCommand(BLUR_COMMAND, onBlur, COMMAND_PRIORITY_CRITICAL),
+      editor.registerCommand(KEY_ARROW_DOWN_COMMAND, onKeyPress, COMMAND_PRIORITY_CRITICAL),
+      editor.registerCommand(KEY_ARROW_UP_COMMAND, onKeyPress, COMMAND_PRIORITY_CRITICAL),
+      editor.registerCommand(KEY_ENTER_COMMAND, onKeyPress, COMMAND_PRIORITY_CRITICAL),
+      editor.registerCommand(KEY_ESCAPE_COMMAND, onKeyPress, COMMAND_PRIORITY_CRITICAL)
+    );
+  }, [editor, updateQueryData]);
+
   return (
-    <ItemListRenderer
+    <TypeAheadListRenderer
+      dataTestId={dataTestId}
+      dataTestName={dataTestName}
+      editor={editor}
+      itemClassName={itemClassName}
+      itemRenderer={itemRenderer}
+      listClassName={listClassName}
       items={items}
       popupRef={popupRef}
-      selectItem={item => {
-        insertItem(item);
-      }}
       selectedItem={selectedItem}
     />
   );

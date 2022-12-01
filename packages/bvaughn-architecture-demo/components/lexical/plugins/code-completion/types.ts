@@ -10,7 +10,4 @@ export type SerializedCodeCompletionTextNode = Spread<
   SerializedTextNode
 >;
 
-export type Match = {
-  text: string;
-  weight: number;
-};
+export type Match = string;

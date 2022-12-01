@@ -1,0 +1,10 @@
+.Popup {
+}
+
+.Item {
+}
+
+.Node {
+  color: var(--color-brand);
+  font-weight: bold;
+}

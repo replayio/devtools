@@ -1,0 +1,54 @@
+.Editor {
+  position: relative;
+}
+
+.ContentEditable {
+  outline: 0;
+  border: 0;
+}
+
+.Placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--color-dim);
+}
+
+/* Theme */
+
+.LexicalBold,
+.LexicalCode,
+.LexicalItalic,
+.LexicalStrikethrough,
+.LexicalUnderline,
+.LexicalUnderlineStrikethrough {
+  font-size: inherit;
+}
+
+.LexicalBold {
+  font-weight: bold;
+}
+
+.LexicalCode {
+  padding: 2px;
+  border-radius: 3px;
+  background-color: var(--background-color-default);
+  color: var(--color-brand);
+  font-family: var(--font-family-monospace);
+}
+
+.LexicalItalic {
+  font-style: italic;
+}
+
+.LexicalStrikethrough {
+  text-decoration: line-through;
+}
+
+.LexicalUnderline {
+  text-decoration: underline;
+}
+
+.LexicalUnderlineStrikethrough {
+  text-decoration: underline line-through;
+}

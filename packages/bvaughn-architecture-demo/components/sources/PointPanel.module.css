@@ -150,6 +150,11 @@
   color: var(--nag-color);
 }
 
+.ContentInput p,
+.ContentInputWithNag p {
+  margin: 0;
+}
+
 .ContentPrefixLabel {
   width: 3ch;
   display: flex;

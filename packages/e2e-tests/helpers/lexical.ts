@@ -1,0 +1,51 @@
+import { Page } from "@playwright/test";
+
+import { delay, getCommandKey } from "./utils";
+
+export async function clearText(page: Page, selector: string) {
+  await focus(page, selector);
+
+  await page.keyboard.press(`${getCommandKey()}+A`);
+  await page.keyboard.press("Backspace");
+}
+
+export async function focus(page: Page, selector: string) {
+  // For some reason, locator.focus() does not work as expected;
+  // Lexical's own Playwright tests use page.focus(selector) though and it works.
+  await page.focus(selector);
+}
+
+export async function hideTypeAheadSuggestions(page: Page, selector: string) {
+  const list = page.locator('[data-test-name="TypeAheadList"]');
+
+  if (await list.isVisible()) {
+    const input = page.locator(selector);
+    await input.type("Escape");
+  }
+}
+export async function type(page: Page, selector: string, text: string, shouldSubmit: boolean) {
+  await clearText(page, selector);
+
+  const input = page.locator(selector);
+  await input.type(text);
+
+  if (shouldSubmit) {
+    await hideTypeAheadSuggestions(page, selector);
+
+    let loopCounter = 0;
+
+    // Timing awkwardness;
+    // Sometimes the typeahead misses an "Enter" command and doesn't submit the form.
+    while ((await input.textContent()) === text) {
+      await delay(100);
+
+      await input.press("Enter");
+
+      if (loopCounter++ > 5) {
+        // Give up after a few tries;
+        // This likely indicates something unexpected.
+        break;
+      }
+    }
+  }
+}

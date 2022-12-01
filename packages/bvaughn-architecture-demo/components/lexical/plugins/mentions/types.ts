@@ -9,8 +9,3 @@ export type SerializedMentionsTextNode = Spread<
   },
   SerializedTextNode
 >;
-
-export type TeamMember = {
-  name: string;
-  username: string;
-};

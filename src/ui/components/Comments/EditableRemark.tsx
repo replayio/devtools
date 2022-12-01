@@ -1,20 +1,16 @@
-import { ReactNode, useMemo, useState } from "react";
+import { SerializedEditorState } from "lexical";
+import { useMemo, useState } from "react";
 
+import CommentEditor from "bvaughn-architecture-demo/components/lexical/CommentEditor";
 import { useUpdateComment, useUpdateCommentReply } from "ui/hooks/comments/comments";
 import useDeleteComment from "ui/hooks/comments/useDeleteComment";
 import useDeleteCommentReply from "ui/hooks/comments/useDeleteCommentReply";
 import { useGetOwnersAndCollaborators, useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserId } from "ui/hooks/users";
-import { setModal } from "ui/reducers/app";
-import { useAppDispatch } from "ui/setup/hooks";
 import type { Comment, Remark } from "ui/state/comments";
-import { User } from "ui/types";
 import { formatRelativeTime } from "ui/utils/comments";
 
 import { AvatarImage } from "../Avatar";
-import TipTapEditor from "./CommentEditor/TipTapEditor";
-import { FocusContext } from "./FocusContext";
-import LoomComment from "./LoomComment";
 import RemarkDropDown from "./RemarkDropDown";
 import styles from "./EditableRemark.module.css";
 
@@ -36,7 +32,19 @@ export default function EditableRemark({
   const updateComment = useUpdateComment();
   const updateCommentReply = useUpdateCommentReply();
 
-  const users = useCollaborators();
+  const recordingId = useGetRecordingId();
+  const ownersAndCollaborators = useGetOwnersAndCollaborators(recordingId);
+  const collaboratorNames = useMemo(() => {
+    const names: string[] = [];
+    if (ownersAndCollaborators.collaborators) {
+      ownersAndCollaborators.collaborators.forEach(collaborator => {
+        if (collaborator?.user?.name) {
+          names.push(collaborator.user.name);
+        }
+      });
+    }
+    return names;
+  }, [ownersAndCollaborators]);
 
   // This should be replaced with useTransition() once we're using Suspense for comment data.
   const [isPending, setIsPending] = useState(false);
@@ -59,21 +67,23 @@ export default function EditableRemark({
   };
 
   const publishRemark = () => {
-    saveChanges(content);
+    saveChanges(JSON.parse(content));
   };
 
   const discardPendingChanges = () => {
     setIsEditing(false);
   };
 
-  const saveChanges = async (newContent: string) => {
+  const saveChanges = async (editorState: SerializedEditorState) => {
     setIsPending(true);
     setIsEditing(false);
 
+    const string = JSON.stringify(editorState);
+
     if (type === "comment") {
-      await updateComment(remarkId, newContent, true, (remark as Comment).position);
+      await updateComment(remarkId, string, true, (remark as Comment).position);
     } else {
-      await updateCommentReply(remarkId, newContent, true);
+      await updateCommentReply(remarkId, string, true);
     }
 
     setIsPending(false);
@@ -84,8 +94,6 @@ export default function EditableRemark({
       startEditing();
     }
   };
-
-  const loomUrl = content.match(/loom\.com\/share\/(\S*?)(\"|\?)/)?.[1];
 
   return (
     <>
@@ -110,43 +118,17 @@ export default function EditableRemark({
         className={remark.isPublished ? styles.PublishedContent : styles.UnpublishedContent}
         onDoubleClick={onDoubleClick}
       >
-        {loomUrl && !isEditing ? (
-          <LoomComment loomUrl={loomUrl} />
-        ) : (
-          <FocusContext.Consumer>
-            {({ autofocus, blur, close, isFocused }) => (
-              <TipTapEditor
-                autofocus={autofocus}
-                blur={blur}
-                close={close}
-                content={content}
-                editable={isEditing && !isPending}
-                handleCancel={discardPendingChanges}
-                handleDelete={deleteRemark}
-                handleSubmit={saveChanges}
-                possibleMentions={users || []}
-                placeholder={type === "reply" ? "Write a reply..." : "Type a comment"}
-                takeFocus={isFocused}
-              />
-            )}
-          </FocusContext.Consumer>
-        )}
+        <CommentEditor
+          autoFocus={isEditing}
+          collaboratorNames={collaboratorNames}
+          editable={isEditing && !isPending}
+          initialValue={content}
+          onCancel={discardPendingChanges}
+          onDelete={deleteRemark}
+          onSave={saveChanges}
+          placeholder={type === "reply" ? "Write a reply..." : "Type a comment"}
+        />
       </div>
     </>
   );
-}
-
-function useCollaborators() {
-  const recordingId = useGetRecordingId();
-  const { collaborators, owner } = useGetOwnersAndCollaborators(recordingId!);
-
-  const users = useMemo(
-    () =>
-      collaborators && owner
-        ? ([...collaborators.map(c => c.user), owner].filter(Boolean) as User[])
-        : undefined,
-    [collaborators, owner]
-  );
-
-  return users;
 }

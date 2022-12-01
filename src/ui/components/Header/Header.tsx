@@ -1,7 +1,6 @@
 import { RecordingId } from "@replayio/protocol";
 import { ClipboardEvent, KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
 
-import { selectAllText } from "bvaughn-architecture-demo/components/sources/AutoComplete/utils/contentEditable";
 import { RecordingTarget } from "protocol/thread/thread";
 import { getRecordingTarget } from "ui/actions/app";
 import Avatar from "ui/components/Avatar";
@@ -123,7 +122,24 @@ function HeaderTitle({
   const onFocus = () => {
     trackEvent("header.edit_title");
     setEditState(EditState.Active);
-    selectAllText(contentEditableRef.current!);
+
+    const contentEditable = contentEditableRef.current;
+    if (contentEditable) {
+      contentEditable.focus();
+
+      // HACK
+      // Waiting until the end of the microtask queue works around a selection bug in Safari.
+      setTimeout(() => {
+        const selection = window.getSelection();
+        if (selection) {
+          const range = document.createRange();
+          range.selectNodeContents(contentEditable);
+
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+      }, 0);
+    }
   };
   const onBlur = () => {
     if (editState !== EditState.Active) {

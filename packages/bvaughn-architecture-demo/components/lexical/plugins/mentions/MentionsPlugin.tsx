@@ -1,17 +1,28 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
-import * as React from "react";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 import TypeAheadPlugin from "../typeahead/TypeAheadPlugin";
-import findMatchingMentions from "./findMatchingMentions";
-import getMentionsQueryData from "./getMentionsQueryData";
-import MentionsItemListRenderer from "./MentionsItemListRenderer";
+import findMatches from "./findMatches";
+import getQueryData from "./getQueryData";
+import isExactMatch from "./isExactMatch";
 import MentionsTextNode from "./MentionsTextNode";
-import { TeamMember } from "./types";
 import $createMentionsTextNode from "./utils/$createMentionsTextNode";
+import styles from "./styles.module.css";
 
-export default function MentionsPlugin(): JSX.Element {
+export default function MentionsPlugin({
+  collaboratorNames,
+  dataTestId,
+  dataTestName = "MentionsTypeAhead",
+  onActivate,
+  onDeactivate,
+}: {
+  collaboratorNames: string[];
+  dataTestId?: string;
+  dataTestName?: string;
+  onActivate: () => void;
+  onDeactivate: () => void;
+}): JSX.Element {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
@@ -27,16 +38,29 @@ export default function MentionsPlugin(): JSX.Element {
     );
   }, [editor]);
 
+  const findMatchesWithCollaborators = useCallback(
+    (query: string) => {
+      return findMatches(collaboratorNames, query, null);
+    },
+    [collaboratorNames]
+  );
+
   return (
-    <TypeAheadPlugin<TeamMember>
+    <TypeAheadPlugin<string>
       createItemNode={createItemNode}
-      getQueryData={getMentionsQueryData}
-      findMatches={findMatchingMentions}
-      ItemListRenderer={MentionsItemListRenderer}
+      dataTestId={dataTestId}
+      dataTestName={dataTestName}
+      getQueryData={getQueryData}
+      findMatches={findMatchesWithCollaborators}
+      isExactMatch={isExactMatch}
+      itemClassName={styles.Item}
+      listClassName={styles.List}
+      onActivate={onActivate}
+      onDeactivate={onDeactivate}
     />
   );
 }
 
-function createItemNode(teamMember: TeamMember) {
-  return $createMentionsTextNode(`@${teamMember.username}`);
+function createItemNode(collaboratorNames: string) {
+  return $createMentionsTextNode(`@${collaboratorNames}`);
 }

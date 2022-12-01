@@ -1,7 +1,6 @@
 import { $getRoot, $isLineBreakNode, $isParagraphNode, $isTextNode, EditorState } from "lexical";
 
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_STRIKETHROUGH } from "../constants";
-import { $isLoomThumbnailNode } from "../LoomThumbnailNode";
 
 // Note that this parser currently only supports a couple of formats,
 // and does not support multiple formats per TextNode.
@@ -36,7 +35,7 @@ export default function serialize(editorState: EditorState): string {
             }
 
             text += nodeText;
-          } else if ($isLoomThumbnailNode(child)) {
+          } else if (typeof child.getTextContent === "function") {
             text += child.getTextContent();
           }
         });

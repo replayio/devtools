@@ -1,17 +1,44 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
+import { FrameId, PauseId } from "@replayio/protocol";
 import { $createTextNode, TextNode } from "lexical";
-import * as React from "react";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
+
+import { SelectedFrameContext } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import TypeAheadPlugin from "../typeahead/TypeAheadPlugin";
-import CodeCompletionItemListRenderer from "./CodeCompletionItemListRenderer";
-import findMatchingCodeCompletions from "./findMatchingCodeCompletions";
-import getCodeCompletionQueryData from "./getCodeCompletionQueryData";
+import findMatches from "./findMatches";
+import getQueryData from "./getQueryData";
+import isExactMatch from "./isExactMatch";
 import { Match } from "./types";
+import styles from "./styles.module.css";
 
-export default function CodeCompletionPlugin(): JSX.Element {
+export default function CodeCompletionPlugin({
+  dataTestId,
+  dataTestName = "CodeTypeAhead",
+  onActivate,
+  onDeactivate,
+}: {
+  dataTestId?: string;
+  dataTestName?: string;
+  onActivate: () => void;
+  onDeactivate: () => void;
+}): JSX.Element {
   const [editor] = useLexicalComposerContext();
+
+  const replayClient = useContext(ReplayClientContext);
+  const { selectedPauseAndFrameId } = useContext(SelectedFrameContext);
+  let pauseId: PauseId | null = null;
+  let frameId: FrameId | null = null;
+  if (selectedPauseAndFrameId) {
+    pauseId = selectedPauseAndFrameId.pauseId;
+    frameId = selectedPauseAndFrameId.frameId;
+  }
+
+  const findMatchesWrapper = (query: string, queryScope: string | null) => {
+    return findMatches(query, queryScope, replayClient, frameId, pauseId);
+  };
 
   useEffect(() => {
     function onCodeCompletionTextNodeTransform(node: TextNode) {
@@ -27,13 +54,19 @@ export default function CodeCompletionPlugin(): JSX.Element {
   return (
     <TypeAheadPlugin<Match>
       createItemNode={createItemNode}
-      getQueryData={getCodeCompletionQueryData}
-      findMatches={findMatchingCodeCompletions}
-      ItemListRenderer={CodeCompletionItemListRenderer}
+      dataTestId={dataTestId}
+      dataTestName={dataTestName}
+      getQueryData={getQueryData}
+      findMatches={findMatchesWrapper}
+      isExactMatch={isExactMatch}
+      itemClassName={styles.Item}
+      listClassName={styles.List}
+      onActivate={onActivate}
+      onDeactivate={onDeactivate}
     />
   );
 }
 
 function createItemNode(match: Match) {
-  return $createTextNode(match.text);
+  return $createTextNode(match);
 }

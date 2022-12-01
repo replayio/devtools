@@ -1,0 +1,32 @@
+.List {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-height: 9em;
+  width: 30ch;
+  overflow-x: hidden;
+  overflow-y: overlay;
+  user-select: none;
+  border-radius: 0.25em;
+  border: 1px solid var(--border-color);
+
+  /* HACK For some reason a z-index of 10+ is required to sit above the Editor */
+  z-index: 10;
+}
+
+.Item,
+.SelectedItem {
+  background-color: var(--context-menu-background-color);
+  color: var(--color-default);
+  font-size: var(--font-size-regular);
+  line-height: 2em;
+  cursor: pointer;
+}
+.SelectedItem {
+  background-color: var(--background-color-primary-button);
+  color: var(--color-primary-button);
+}
+
+.Item:hover {
+  background-color: var(--context-menu-background-color-hover);
+}

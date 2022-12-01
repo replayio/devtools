@@ -32,20 +32,6 @@ export type HookState<Item> = {
   selectedIndex: number;
   items: Item[];
 };
-
-export type ItemListRendererProps<Item> = {
-  items: Item[];
-  popupRef: RefObject<HTMLDivElement>;
-  selectedItem: Item | null;
-  selectItem: (item: Item) => void;
-};
-
-export type ItemRendererProps<Item> = {
-  isSelected: boolean;
-  item: Item;
-  selectItem: (item: Item) => void;
-};
-
 export type TextRange = {
   beginOffset: number;
   beginTextNode: LexicalNode;
@@ -58,11 +44,6 @@ export type QueryData = {
   positionTextRange: TextRange;
   query: string;
   queryAdditionalData: string | null;
-};
-
-export type SearchPromise<Item> = {
-  cancel: () => void;
-  promise: Promise<Item[]>;
 };
 
 export type TypeAheadSelection = RangeSelection | NodeSelection | GridSelection;
