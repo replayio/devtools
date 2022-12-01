@@ -193,10 +193,14 @@ export function createMockReplayClient() {
     getMappedLocation: jest.fn().mockImplementation(async () => []),
     getObjectWithPreview: jest.fn().mockImplementation(async () => ({})),
     getObjectProperty: jest.fn().mockImplementation(async () => ({})),
-    getPointNearTime: jest.fn().mockImplementation(async () => ({ point: "0", time: 0 })),
+    getPointNearTime: jest.fn().mockImplementation(async () => ({
+      precise: true,
+      point: { point: "0", time: 0 },
+    })),
     getPointsBoundingTime: jest.fn().mockImplementation(async () => ({
       before: { point: "0", time: 0 },
       after: { point: "0", time: 0 },
+      precise: true,
     })),
     getPreferredLocation: jest.fn().mockImplementation(async () => ({})),
     getRecordingCapabilities: jest.fn().mockImplementation(async () => ({
