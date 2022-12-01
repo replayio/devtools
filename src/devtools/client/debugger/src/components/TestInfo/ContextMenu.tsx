@@ -52,20 +52,20 @@ function ContextMenu({
       return;
     }
 
-    const frame = await (async point => {
-      const {
-        data: { frames },
-      } = await client.createPause(point);
+    const point = testStep.enqueuePoint;
 
-      const returnFirst = (list: any, fn: any) =>
-        list.reduce((acc: any, v: any, i: any) => acc ?? fn(v, i, list), null);
+    const {
+      data: { frames },
+    } = await client.createPause(point);
 
-      return returnFirst(frames, (f: any, i: any, l: any) =>
-        l[i + 1]?.functionName === "__stackReplacementMarker" ? f : null
-      );
-    })(testStep.enqueuePoint);
+    const returnFirst = (list: any, fn: any) =>
+      list.reduce((acc: any, v: any, i: any) => acc ?? fn(v, i, list), null);
 
-    const location = frame.location[frame.location.length - 1];
+    const firstFrame = returnFirst(frames, (f: any, i: any, l: any) =>
+      l[i + 1]?.functionName === "__stackReplacementMarker" ? f : null
+    );
+
+    const location = firstFrame.location[firstFrame.location.length - 1];
 
     if (location) {
       dispatch(selectLocation(cx, location));
