@@ -14,6 +14,7 @@ import {
   TestInfoContextMenuContext,
   TestStepType,
 } from "./TestInfoContextMenuContext";
+import { returnFirst } from "./TestStepItem";
 import styles from "./ContextMenu.module.css";
 
 function ContextMenu({
@@ -58,17 +59,31 @@ function ContextMenu({
       data: { frames },
     } = await client.createPause(point);
 
-    const returnFirst = (list: any, fn: any) =>
-      list.reduce((acc: any, v: any, i: any) => acc ?? fn(v, i, list), null);
+    if (frames) {
+      // find the cypress marker frame
+      const markerFrameIndex = returnFirst(frames, (f: any, i: any, l: any) =>
+        f.functionName === "__stackReplacementMarker" ? i : null
+      );
 
-    const firstFrame = returnFirst(frames, (f: any, i: any, l: any) =>
-      l[i + 1]?.functionName === "__stackReplacementMarker" ? f : null
-    );
+      // and extract its sourceId
+      const markerSourceId = frames[markerFrameIndex]?.functionLocation?.[0].sourceId;
+      if (markerSourceId) {
+        // slice the frames from the current to the marker frame and reverse
+        // it so the user frames are on top
+        const userFrames = frames?.slice(0, markerFrameIndex).reverse();
 
-    const location = firstFrame.location[firstFrame.location.length - 1];
+        // then search from the top for the first frame from the same source
+        // as the marker (which should be cypress_runner.js) and return it
+        const frame = returnFirst(userFrames, (f, i, l) => {
+          return l[i + 1]?.functionLocation?.some(fl => fl.sourceId === markerSourceId) ? f : null;
+        });
 
-    if (location) {
-      dispatch(selectLocation(cx, location));
+        const location = frame?.location[frame.location.length - 1];
+
+        if (location) {
+          dispatch(selectLocation(cx, location));
+        }
+      }
     }
   };
 

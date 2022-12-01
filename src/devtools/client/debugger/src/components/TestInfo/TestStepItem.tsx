@@ -13,8 +13,11 @@ import { TestInfoContext } from "./TestInfo";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { TestStepContext } from "./TestStepRoot";
 
-function returnFirst<T, R>(list: T[] | undefined, fn: (v: T) => R | null) {
-  return list ? list.reduce<R | null>((acc, v) => acc ?? fn(v), null) : null;
+export function returnFirst<T, R>(
+  list: T[] | undefined,
+  fn: (value: T, index: number, list: T[]) => R | null
+) {
+  return list ? list.reduce<R | null>((acc, v, i, l) => acc ?? fn(v, i, l), null) : null;
 }
 
 export interface TestStepItemProps {
