@@ -1,14 +1,15 @@
+import { SerializedEditorState } from "lexical";
 import React, {
   ReactNode,
   unstable_useCacheRefresh as useCacheRefresh,
   useContext,
-  useRef,
   useState,
   useTransition,
 } from "react";
 
 import AvatarImage from "bvaughn-architecture-demo/components/AvatarImage";
 import Icon from "bvaughn-architecture-demo/components/Icon";
+import CommentEditor from "bvaughn-architecture-demo/components/lexical/CommentEditor";
 import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
 import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
 import {
@@ -18,7 +19,7 @@ import {
   updateComment as updateCommentGraphQL,
   updateCommentReply as updateCommentReplyGraphQL,
 } from "bvaughn-architecture-demo/src/graphql/Comments";
-import { Comment, User, UserInfo } from "bvaughn-architecture-demo/src/graphql/types";
+import { Comment, User } from "bvaughn-architecture-demo/src/graphql/types";
 import { formatRelativeTime } from "bvaughn-architecture-demo/src/utils/time";
 
 import styles from "./Comment.module.css";
@@ -124,16 +125,10 @@ function EditableRemark({
   const { currentUserInfo } = useContext(SessionContext);
   const invalidateCache = useCacheRefresh();
 
+  const [isEditing, setIsEditing] = useState(content === "");
+
   // Editing or deleting this content is a self-contained transition.
   const [isPending, startTransition] = useTransition();
-
-  // New comments should default to showing edit mode.
-  const [isEditing, setIsEditing] = useState(owner.id === currentUserInfo?.id && content === "");
-  const [pendingContent, setPendingContent] = useState(content);
-
-  // Both the Enter key and "blur" trigger saving behavior,
-  // so make sure only the first event to occur gets handled.
-  const saveOnBlurRef = useRef(true);
 
   const deleteTransition = () => {
     startTransition(async () => {
@@ -144,57 +139,29 @@ function EditableRemark({
   };
 
   const startEditing = () => {
-    saveOnBlurRef.current = true;
-    setPendingContent(content);
     setIsEditing(true);
   };
 
   const save = (newContent: string, newIsPublished: boolean = isPublished) => {
-    startTransition(async () => {
-      setPendingContent("");
-      setIsEditing(false);
+    setIsEditing(false);
 
+    startTransition(async () => {
       await editCallback(newContent, newIsPublished === true);
 
       invalidateCache();
     });
   };
 
-  const onBlur = () => {
-    if (saveOnBlurRef.current) {
-      if (pendingContent.trim() === "") {
-        deleteTransition();
-      } else {
-        save(pendingContent);
-      }
-    }
+  const onCancel = () => {
+    setIsEditing(false);
   };
 
-  const onChange = (event: React.ChangeEvent) => {
-    setPendingContent((event.currentTarget as HTMLTextAreaElement).value);
+  const onDelete = () => {
+    deleteTransition();
   };
 
-  const onKeyDown = (event: React.KeyboardEvent) => {
-    switch (event.key) {
-      case "Enter": {
-        event.preventDefault();
-        saveOnBlurRef.current = false;
-        save(pendingContent, true);
-        break;
-      }
-      case "Escape": {
-        event.preventDefault();
-        saveOnBlurRef.current = false;
-
-        if (content.trim() === "") {
-          deleteTransition();
-        }
-
-        setPendingContent("");
-        setIsEditing(false);
-        break;
-      }
-    }
+  const onSave = (editorState: SerializedEditorState) => {
+    save(JSON.stringify(editorState), false);
   };
 
   return (
@@ -209,7 +176,7 @@ function EditableRemark({
           <>
             <button
               className={styles.Button}
-              disabled={isEditing}
+              disabled={isEditing || isPending}
               onClick={startEditing}
               title="Edit"
             >
@@ -230,20 +197,17 @@ function EditableRemark({
         )}
       </div>
 
-      {isEditing && (
-        <textarea
-          autoFocus
-          className={styles.Input}
-          disabled={isPending}
-          onBlur={onBlur}
-          onChange={onChange}
-          onKeyDown={onKeyDown}
+      <div className={styles.ContentWrapper} onDoubleClick={startEditing}>
+        <CommentEditor
+          autoFocus={isEditing}
+          editable={isEditing && !isPending}
+          initialValue={content}
+          onCancel={onCancel}
+          onDelete={onDelete}
+          onSave={onSave}
           placeholder="Leave a comment"
-          value={pendingContent}
         />
-      )}
-
-      {!isEditing && <div className={styles.Content}>{content}</div>}
+      </div>
 
       {children}
     </div>

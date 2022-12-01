@@ -233,14 +233,14 @@ export function getPointPanelConditionAutoCompleteListLocator(
   page: Page,
   lineNumber: number
 ): Locator {
-  return page.locator(`[data-test-id="PointPanel-ConditionInput-${lineNumber}-List"]`);
+  return page.locator(`[data-test-id="PointPanel-ConditionInput-${lineNumber}-CodeTypeAhead"]`);
 }
 
 export function getPointPanelContentAutoCompleteListLocator(
   page: Page,
   lineNumber: number
 ): Locator {
-  return page.locator(`[data-test-id="PointPanel-ContentInput-${lineNumber}-List"]`);
+  return page.locator(`[data-test-id="PointPanel-ContentInput-${lineNumber}-CodeTypeAhead"]`);
 }
 
 export function getSourceSearchResultsLabelLocator(page: Page): Locator {

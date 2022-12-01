@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import Icon from "bvaughn-architecture-demo/components/Icon";
+import CodeEditor from "bvaughn-architecture-demo/components/lexical/CodeEditor";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
 import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
@@ -24,7 +25,6 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 
 import Loader from "../Loader";
-import AutoComplete from "./AutoComplete/AutoComplete";
 import BadgePicker from "./BadgePicker";
 import CommentButton from "./CommentButton";
 import PointPanelTimeline from "./PointPanelTimeline";
@@ -140,18 +140,22 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                   }
                 >
                   <div className={styles.Content}>
-                    <AutoComplete
-                      autoFocus={editReason === "condition"}
+                    <div
                       className={
                         showEditBreakpointNag ? styles.ContentInputWithNag : styles.ContentInput
                       }
-                      dataTestId={`PointPanel-ConditionInput-${lineNumber}`}
-                      dataTestName="PointPanel-ConditionInput"
-                      onCancel={onCancel}
-                      onChange={onEditableConditionChange}
-                      onSubmit={onSubmit}
-                      value={editableCondition}
-                    />
+                    >
+                      <CodeEditor
+                        autoFocus={editReason === "condition"}
+                        dataTestId={`PointPanel-ConditionInput-${lineNumber}`}
+                        dataTestName="PointPanel-ConditionInput"
+                        editable={true}
+                        initialValue={editableCondition}
+                        onCancel={onCancel}
+                        onChange={onEditableConditionChange}
+                        onSave={onSubmit}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -163,18 +167,22 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
               >
                 <BadgePicker point={point} />
                 <div className={styles.Content}>
-                  <AutoComplete
-                    autoFocus={showEditBreakpointNag || editReason === "content"}
+                  <div
                     className={
                       showEditBreakpointNag ? styles.ContentInputWithNag : styles.ContentInput
                     }
-                    dataTestId={`PointPanel-ContentInput-${lineNumber}`}
-                    dataTestName="PointPanel-ContentInput"
-                    onCancel={onCancel}
-                    onChange={onEditableContentChange}
-                    onSubmit={onSubmit}
-                    value={editableContent}
-                  />
+                  >
+                    <CodeEditor
+                      autoFocus={showEditBreakpointNag || editReason === "content"}
+                      dataTestId={`PointPanel-ContentInput-${lineNumber}`}
+                      dataTestName="PointPanel-ContentInput"
+                      editable={true}
+                      initialValue={editableContent}
+                      onCancel={onCancel}
+                      onChange={onEditableContentChange}
+                      onSave={onSubmit}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

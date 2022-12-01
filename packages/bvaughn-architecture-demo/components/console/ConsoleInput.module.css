@@ -32,6 +32,9 @@
   font-family: var(--font-family-monospace);
   font-size: var(--font-size-regular);
 }
+.Input p {
+  margin: 0;
+}
 
 .Icon {
   flex: 0 0 1em;

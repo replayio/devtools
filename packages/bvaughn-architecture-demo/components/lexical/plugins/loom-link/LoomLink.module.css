@@ -1,0 +1,5 @@
+.Image {
+  max-width: 400px !important;
+  width: 100%;
+  cursor: pointer !important;
+}

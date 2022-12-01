@@ -3,6 +3,7 @@
   flex-direction: row;
   align-items: center;
   margin: 0 0.75rem 0.5rem;
+  line-height: 2em;
 }
 
 .Avatar {
@@ -45,8 +46,20 @@
 
 .PublishedContent,
 .UnpublishedContent {
-  margin: 0 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 0.5em;
+  padding: 0.25em;
+  margin: 0 0.5em;
 }
 .UnpublishedContent {
   color: var(--theme-comment);
+}
+.PublishedContent:focus-within,
+.UnpublishedContent:focus-within {
+  background-color: var(--background-color-inputs);
+  border-color: var(--border-color);
+}
+.PublishedContent p,
+.UnpublishedContent p {
+  margin: 0;
 }

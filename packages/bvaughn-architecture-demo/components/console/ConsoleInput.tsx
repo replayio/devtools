@@ -3,8 +3,8 @@ import { Suspense, useContext, useEffect, useRef, useState } from "react";
 
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import Icon from "bvaughn-architecture-demo/components/Icon";
+import CodeEditor from "bvaughn-architecture-demo/components/lexical/CodeEditor";
 import Loader from "bvaughn-architecture-demo/components/Loader";
-import AutoComplete from "bvaughn-architecture-demo/components/sources/AutoComplete/AutoComplete";
 import { SelectedFrameContext } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
 import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
 import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
@@ -41,6 +41,7 @@ function ConsoleInputSuspends() {
 
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
   const [expressionHistory, addExpression] = useTerminalHistory(recordingId);
+  const [incrementedKey, setIncrementedKey] = useState(1);
 
   const ref = useRef<HTMLInputElement>(null);
   const searchStateVisibleRef = useRef(false);
@@ -117,7 +118,7 @@ function ConsoleInputSuspends() {
     setExpression(newExpression);
   };
 
-  const onSubmit = () => {
+  const onSubmit = (expression: string) => {
     if (expression.trim() !== "") {
       addMessage({
         expression,
@@ -131,6 +132,7 @@ function ConsoleInputSuspends() {
       addExpression(expression);
 
       setExpression("");
+      setIncrementedKey(incrementedKey + 1);
     }
   };
 
@@ -138,14 +140,16 @@ function ConsoleInputSuspends() {
     <div className={styles.Container}>
       <div className={styles.PromptRow} onKeyDown={onKeyDown}>
         <Icon className={styles.Icon} type="terminal-prompt" />
-        <AutoComplete
-          className={styles.Input}
-          dataTestId="ConsoleTerminalInput"
-          onCancel={noop}
-          onChange={onChange}
-          onSubmit={onSubmit}
-          value={expression}
-        />
+        <div className={styles.Input}>
+          <CodeEditor
+            dataTestId="ConsoleTerminalInput"
+            editable={true}
+            initialValue={expression}
+            key={incrementedKey}
+            onChange={onChange}
+            onSave={onSubmit}
+          />
+        </div>
       </div>
       <div className={styles.ResultRow}>
         {expression !== "" && <Icon className={styles.Icon} type="terminal-result" />}

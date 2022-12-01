@@ -195,16 +195,15 @@ export async function getComments(
 
   const comments = response?.recording?.comments ?? [];
 
-  // TODO Re-think these type differences; it would be nice for the client and GraphQL to use the same types.
   // @ts-ignore
   return comments.map(comment => {
     return {
       ...comment,
-      content: contentToString(comment.content),
+      content: comment.content,
       replies: comment.replies.map(reply => {
         return {
           ...reply,
-          content: contentToString(reply.content),
+          content: reply.content,
           hasFrames: comment.hasFrames,
           sourceLocation: comment.sourceLocation,
           time: comment.time,
@@ -250,16 +249,4 @@ export async function updateCommentReply(
     },
     accessToken
   );
-}
-
-// HACK: This is the inverse of parseCommentContent() in utils/comments
-// For the purposes of this demo, comment contents are plain text.
-function contentToString(content: string): string {
-  try {
-    content = JSON.parse(content)
-      .content.map((paragraph: any) => paragraph.content.map((block: any) => block.text).join(""))
-      .join("");
-  } catch (error) {}
-
-  return content;
 }

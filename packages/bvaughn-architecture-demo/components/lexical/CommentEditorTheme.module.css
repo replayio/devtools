@@ -1,0 +1,37 @@
+.LexicalBold,
+.LexicalCode,
+.LexicalItalic,
+.LexicalStrikethrough,
+.LexicalUnderline,
+.LexicalUnderlineStrikethrough {
+  font-size: inherit;
+}
+
+.LexicalBold {
+  font-weight: bold;
+}
+
+.LexicalCode {
+  font-family: var(--font-family-monospace);
+
+  padding: 2px;
+  border-radius: 3px;
+  background-color: var(--chrome);
+  color: var(--cm-variable);
+}
+
+.LexicalItalic {
+  font-style: italic;
+}
+
+.LexicalStrikethrough {
+  text-decoration: line-through;
+}
+
+.LexicalUnderline {
+  text-decoration: underline;
+}
+
+.LexicalUnderlineStrikethrough {
+  text-decoration: underline line-through;
+}

@@ -1,9 +1,10 @@
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
+import { type as typeLexical } from "./lexical";
 import { waitForPaused } from "./pause-information-panel";
 import { Expected, MessageType } from "./types";
-import { debugPrint, find, waitFor } from "./utils";
+import { debugPrint, waitFor } from "./utils";
 
 const categoryNames = {
   keyboard: "Keyboard",
@@ -67,11 +68,7 @@ export async function executeTerminalExpression(page: Page, text: string): Promi
   // Wait for the Console to stop loading
   await consoleRoot.locator("text=Unavailable...").waitFor({ state: "hidden" });
 
-  const input = page.locator('[data-test-id="ConsoleTerminalInput"]');
-  await input.focus();
-  await input.type(text);
-  await input.press("Escape"); // Close auto-complete dialog if open
-  await input.press("Enter");
+  await typeLexical(page, '[data-test-id="ConsoleTerminalInput"]', text, true);
 }
 
 export async function executeAndVerifyTerminalExpression(
