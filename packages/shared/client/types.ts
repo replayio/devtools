@@ -188,4 +188,5 @@ export interface ReplayClientInterface {
     onSourceContentsChunk: ({ chunk, sourceId }: { chunk: string; sourceId: SourceId }) => void
   ): Promise<void>;
   waitForLoadedSources(): Promise<void>;
+  waitForTimeToBeLoaded(time: number): Promise<void>;
 }
