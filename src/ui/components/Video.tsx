@@ -2,13 +2,14 @@ import {} from "devtools/client/inspector/markup/reducers/markup";
 import React, { FC, useEffect, useRef } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { CypressToggler } from "devtools/client/debugger/src/components/TestInfo/CypressToggler";
 import { PreviewNodeHighlighter } from "devtools/client/inspector/markup/components/PreviewNodeHighlighter";
 import { installObserver, refreshGraphics } from "protocol/graphics";
 import { setShowVideoPanel } from "ui/actions/layout";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
 import CommentTool from "ui/components/shared/CommentTool";
 import hooks from "ui/hooks";
-import { getViewMode } from "ui/reducers/layout";
+import { getSelectedPanel, getSelectedPrimaryPanel, getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 
@@ -57,6 +58,7 @@ function Video({
 }: PropsFromRedux) {
   const recordingId = hooks.useGetRecordingId();
   const viewMode = useAppSelector(getViewMode);
+  const panel = useAppSelector(getSelectedPrimaryPanel);
   const highlightedNodeIds = useAppSelector(state => state.markup.highlightedNodes);
   const isPaused = !playback;
   const isNodeTarget = recordingTarget == "node";
@@ -113,6 +115,7 @@ function Video({
         </CommentsOverlay>
       ) : null}
       {isNodePickerInitializing ? <Tooltip label="Loading…" targetID="video" /> : null}
+      {panel === "events" && <CypressToggler />}
       <div id="highlighter-root">
         {highlightedNodeIds?.map(nodeId => (
           <PreviewNodeHighlighter key={nodeId} nodeId={nodeId} />

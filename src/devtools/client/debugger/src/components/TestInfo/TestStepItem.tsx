@@ -4,6 +4,7 @@ import { highlightNodes, unhighlightNode } from "devtools/client/inspector/marku
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { setSelectedStep } from "ui/reducers/reporter";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -24,11 +25,7 @@ export interface TestStepItemProps {
 }
 
 export function TestStepItem({ argString, index, id }: TestStepItemProps) {
-  const {
-    setConsoleProps,
-    setPauseId,
-    setSelectedId: setSelectedIndex,
-  } = useContext(TestInfoContext);
+  const { setConsoleProps, setPauseId } = useContext(TestInfoContext);
   const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
     pauseId: string;
     nodeIds: string[];
@@ -126,7 +123,7 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
   const onClick = () => {
     if (id) {
       dispatch(seekToTime(startTime));
-      setSelectedIndex(id);
+      dispatch(setSelectedStep({ id, startTime, endTime: startTime + duration - 1 }));
     }
   };
   const onMouseEnter = () => {
