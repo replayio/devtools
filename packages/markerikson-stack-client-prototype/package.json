@@ -8,7 +8,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@codemirror/lang-javascript": "^6.0.2",
+    "@codemirror/lang-javascript": "^6.1.1",
     "@replayio/protocol": "^0.32.2",
     "@uiw/react-codemirror": "^4.11.4",
     "bvaughn-architecture-demo": "workspace:*",
