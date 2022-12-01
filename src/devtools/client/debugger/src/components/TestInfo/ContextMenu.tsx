@@ -15,6 +15,7 @@ import {
   TestStepType,
 } from "./TestInfoContextMenuContext";
 import styles from "./ContextMenu.module.css";
+import { getCurrentTime } from "ui/reducers/timeline";
 
 function ContextMenu({
   hide,
@@ -28,6 +29,7 @@ function ContextMenu({
   testCase: TestCaseType;
 }) {
   const dispatch = useAppDispatch();
+  const currentTime = useAppSelector(getCurrentTime);
   const ref = useRef<HTMLDivElement>(null);
   const cx = useAppSelector(getContext);
   const client = useContext(ReplayClientContext);
@@ -85,11 +87,11 @@ function ContextMenu({
         <MaterialIcon>play_circle</MaterialIcon>
         Play from here
       </div>
-      <div className={styles.ContextMenuItem} onClick={onJumpToBefore}>
+      <div className={`${styles.ContextMenuItem} ${testStep.startTime === currentTime ? styles.disabled : ""}`} onClick={onJumpToBefore}>
         <MaterialIcon>arrow_back</MaterialIcon>
         Show before
       </div>
-      <div className={styles.ContextMenuItem} onClick={onJumpToAfter}>
+      <div className={`${styles.ContextMenuItem} ${testStep.endTime - 1 === currentTime ? styles.disabled : ""}`} onClick={onJumpToAfter}>
         <MaterialIcon>arrow_forward</MaterialIcon>
         Show after
       </div>
