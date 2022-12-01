@@ -15,6 +15,7 @@ export type TestStepContextType = {
   duration: number;
   parentId?: string;
   error: boolean;
+  pointStart?: string;
 };
 
 export const TestStepContext = createContext<TestStepContextType>(null as any);
@@ -36,6 +37,7 @@ export function TestStepRoot({ step, ...props }: TestStepRootProps) {
     messageEnd: step.annotations.end?.message,
     point: step.annotations.enqueue?.point,
     pointEnd: step.annotations.end?.point,
+    pointStart: step.annotations.start?.point,
     duration: step.name === "assert" ? 1 : adjustedDuration,
     parentId: step.parentId,
     error: !!step.error,

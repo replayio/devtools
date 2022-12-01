@@ -63,6 +63,14 @@ export const getReporterAnnotationsForTitleEnd = (title: string) =>
         a.message.event === "step:end"
     )
   );
+export const getReporterAnnotationsForTitleStart = (title: string) =>
+  createSelector(getReporterAnnotations, (annotations: Annotation[]) =>
+    annotations.filter(
+      a =>
+        a.message.titlePath[a.message.titlePath.length - 1] === title &&
+        a.message.event === "step:start"
+    )
+  );
 export const getReporterAnnotationsForTitleNavigation = (title: string) =>
   createSelector(getReporterAnnotations, (annotations: Annotation[]) =>
     annotations.filter(

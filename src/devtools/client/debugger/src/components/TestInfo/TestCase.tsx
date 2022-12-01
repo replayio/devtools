@@ -1,8 +1,9 @@
 import { createContext, useEffect, useState } from "react";
 
 import { getRecordingDuration } from "ui/actions/app";
-import { seekToTime, setFocusRegion, startPlayback } from "ui/actions/timeline";
+import { seek, setFocusRegion, startPlayback } from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
+import { getReporterAnnotationsForTitleEnd } from "ui/reducers/reporter";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem, TestResult } from "ui/types";
@@ -30,6 +31,7 @@ export function TestCase({
   const [expandSteps, setExpandSteps] = useState(false);
   const dispatch = useAppDispatch();
   const expandable = test.steps || test.error;
+  const annotationsStart = useAppSelector(getReporterAnnotationsForTitleEnd(test.title));
 
   const duration = useAppSelector(getRecordingDuration);
   const testStartTime = test.relativeStartTime;
@@ -57,8 +59,11 @@ export function TestCase({
   };
   const toggleExpand = () => {
     const firstStep = test.steps?.[0];
-    if (firstStep) {
-      dispatch(seekToTime(firstStep.relativeStartTime + test.relativeStartTime));
+    const time = firstStep.relativeStartTime + test.relativeStartTime;
+    const pointStart = annotationsStart.find(a => a.message.id === firstStep.id)?.point;
+
+    if (firstStep && time && pointStart) {
+      dispatch(seek(pointStart, time, false));
     }
 
     setHighlightedTest();
