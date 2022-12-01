@@ -1,10 +1,10 @@
 import React from "react";
 
+import { COLOR, FONT_FAMILY, URI } from "third-party/css/output-parser";
+
 import Color from "./value/Color";
 import FontFamily from "./value/FontFamily";
 import Url from "./value/Url";
-
-const { COLOR, FONT_FAMILY, URI } = require("third-party/css/output-parser");
 
 interface DeclarationValueProps {
   colorSpanClassName: string;

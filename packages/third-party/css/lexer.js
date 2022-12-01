@@ -1456,8 +1456,6 @@ Scanner.prototype = {
  * @param {String} input the CSS text to lex
  * @return {CSSLexer} the new lexer
  */
-function getCSSLexer(input) {
+export function getCSSLexer(input) {
   return new Scanner(input);
 }
-
-exports.getCSSLexer = getCSSLexer;

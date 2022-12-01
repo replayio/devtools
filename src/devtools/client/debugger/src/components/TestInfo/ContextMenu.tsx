@@ -1,9 +1,11 @@
+import classNames from "classnames/bind";
 import { useContext, useRef } from "react";
 
 import useModalDismissSignal from "bvaughn-architecture-demo/src/hooks/useModalDismissSignal";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { seekToTime, startPlayback } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { selectLocation } from "../../actions/sources";
@@ -28,9 +30,11 @@ function ContextMenu({
   testCase: TestCaseType;
 }) {
   const dispatch = useAppDispatch();
+  const currentTime = useAppSelector(getCurrentTime);
   const ref = useRef<HTMLDivElement>(null);
   const cx = useAppSelector(getContext);
   const client = useContext(ReplayClientContext);
+  const classnames = classNames.bind(styles);
 
   useModalDismissSignal(ref, hide, true);
 
@@ -85,11 +89,19 @@ function ContextMenu({
         <MaterialIcon>play_circle</MaterialIcon>
         Play from here
       </div>
-      <div className={styles.ContextMenuItem} onClick={onJumpToBefore}>
+      <div
+        className={classnames("ContextMenuItem", { disabled: testStep.startTime === currentTime })}
+        onClick={testStep.startTime === currentTime ? undefined : onJumpToBefore}
+      >
         <MaterialIcon>arrow_back</MaterialIcon>
         Show before
       </div>
-      <div className={styles.ContextMenuItem} onClick={onJumpToAfter}>
+      <div
+        className={classnames("ContextMenuItem", {
+          disabled: testStep.endTime - 1 === currentTime,
+        })}
+        onClick={testStep.endTime - 1 === currentTime ? undefined : onJumpToAfter}
+      >
         <MaterialIcon>arrow_forward</MaterialIcon>
         Show after
       </div>

@@ -258,7 +258,7 @@ export function copyBreakpointsToClipboard(): UIThunkAction {
 }
 
 export function executeCommand(key: CommandKey): UIThunkAction {
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     const recordingId = getRecordingId();
 
     if (key === "open_console") {
@@ -291,7 +291,7 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPrimaryPanel("explorer"));
       // Someday we'll fix circular dependencies. Today is not that day.
-      const { expandSourcesPane } = require("devtools/client/debugger/src/actions/ui");
+      const { expandSourcesPane } = await import("devtools/client/debugger/src/actions/ui");
       dispatch(expandSourcesPane());
     } else if (key === "open_outline") {
       dispatch(setViewMode("dev"));

@@ -137,7 +137,7 @@ export interface ReplayClientInterface {
     level?: ObjectPreviewLevel
   ): Promise<PauseData>;
   getObjectProperty(objectId: ObjectId, pauseId: PauseId, propertyName: string): Promise<Result>;
-  getPointNearTime(time: number): Promise<TimeStampedPoint>;
+  getPointNearTime(time: number): Promise<{ point: TimeStampedPoint; precise: boolean }>;
   getPointsBoundingTime(time: number): Promise<PointsBoundingTime>;
   getPreferredLocation(locations: Location[]): Location | null;
   getRecordingCapabilities(): Promise<RecordingCapabilities>;
@@ -188,4 +188,5 @@ export interface ReplayClientInterface {
     onSourceContentsChunk: ({ chunk, sourceId }: { chunk: string; sourceId: SourceId }) => void
   ): Promise<void>;
   waitForLoadedSources(): Promise<void>;
+  waitForTimeToBeLoaded(time: number): Promise<void>;
 }

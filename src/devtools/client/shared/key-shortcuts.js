@@ -4,8 +4,8 @@
 
 "use strict";
 
-const EventEmitter = require("devtools/shared/event-emitter");
-const { KeyCodes } = require("devtools/client/shared/keycodes");
+import EventEmitter from "devtools/shared/event-emitter";
+import { KeyCodes } from "devtools/client/shared/keycodes";
 
 // List of electron keys mapped to DOM API (DOM_VK_*) key code
 const ElectronKeysMapping = {

@@ -8,7 +8,7 @@
 // This should be kept in sync with that list.
 // test_cssColorDatabase.js tries to enforce this.
 
-const cssColors = {
+export const cssColors = {
   aliceblue: [240, 248, 255, 1],
   antiquewhite: [250, 235, 215, 1],
   aqua: [0, 255, 255, 1],
@@ -162,7 +162,7 @@ const cssColors = {
 // Lab values generated using formula from http://www.easyrgb.com/en/math.php.
 // X_10, Y_10, Z_10 (CIE 1964) reference values for D65 illuminant
 // (Daylight, sRGB, Adobe-RGB) were used.
-const labColors = {
+export const labColors = {
   aliceblue: [97.17890760827636, -0.9397756746095665, -5.246475627032843],
   antiquewhite: [93.73077088204487, 2.236373679139203, 10.649604819299775],
   aqua: [91.11652110946342, -47.73670577664391, -15.108617112376965],
@@ -312,6 +312,3 @@ const labColors = {
   yellow: [97.13824698129729, -21.169488449187533, 93.99151723968109],
   yellowgreen: [76.5351984302265, -37.69097531845872, 66.13250570541341],
 };
-
-exports.cssColors = cssColors;
-exports.labColors = labColors;

@@ -1,4 +1,5 @@
 import { Object as ProtocolObject } from "@replayio/protocol";
+import cloneDeep from "lodash/cloneDeep";
 import React, { createContext, useContext, useMemo, useState } from "react";
 
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
@@ -114,7 +115,19 @@ export default function TestInfo({
 
 function Console() {
   const { pauseId, consoleProps } = useContext(TestInfoContext);
-  const hideProps = !pauseId || !consoleProps;
+
+  const sanitizedConsoleProps = useMemo(() => {
+    const sanitized = cloneDeep(consoleProps);
+    if (sanitized?.preview?.properties) {
+      sanitized.preview.properties = sanitized.preview.properties.filter(
+        p => p.name !== "Snapshot"
+      );
+    }
+
+    return sanitized;
+  }, [consoleProps]);
+
+  const hideProps = !pauseId || !sanitizedConsoleProps;
 
   return (
     <div
@@ -122,6 +135,7 @@ function Console() {
       style={{
         borderTop: "2px solid var(--chrome)",
       }}
+      key={pauseId}
     >
       <div
         className="text-md"
@@ -138,7 +152,7 @@ function Console() {
               Nothing Selected...
             </div>
           ) : (
-            <PropertiesRenderer pauseId={pauseId} object={consoleProps} />
+            <PropertiesRenderer pauseId={pauseId} object={sanitizedConsoleProps} />
           )}
         </div>
       </ErrorBoundary>

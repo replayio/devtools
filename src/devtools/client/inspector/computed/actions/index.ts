@@ -1,14 +1,13 @@
 import { Action, ThunkAction } from "@reduxjs/toolkit";
 
 import CSSProperties from "third-party/css/css-properties";
+import { OutputParser } from "third-party/css/output-parser";
 import { getComputedStyleAsync } from "ui/suspense/styleCaches";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 
 import ElementStyle from "../../rules/models/element-style";
 import { ComputedPropertyState, MatchedSelectorState } from "../state";
 import { InspectorState } from "../state";
-
-const { OutputParser } = require("third-party/css/output-parser");
 
 type SetComputedPropertiesAction = Action<"set_computed_properties"> & {
   properties: ComputedPropertyState[];

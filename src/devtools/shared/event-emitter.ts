@@ -12,7 +12,20 @@ const eventListeners = Symbol("EventEmitter/listeners");
 const onceOriginalListener = Symbol("EventEmitter/once-original-listener");
 const handler = Symbol("EventEmitter/event-handler");
 
-class EventEmitter {
+interface EmitterTarget {
+  [eventListeners]: Map<string, Set<Listener>>;
+}
+
+type Callback = (...args: any[]) => undefined | Promise<any>;
+
+interface ListenerObject {
+  [handler]: Callback;
+}
+
+type Listener = ListenerObject | Callback;
+
+export class EventEmitter implements EmitterTarget {
+  [eventListeners]: Map<string, any>;
   constructor() {
     this[eventListeners] = new Map();
   }
@@ -30,7 +43,7 @@ class EventEmitter {
    * @returns {Function}
    *    A function that removes the listener when called.
    */
-  static on(target, type, listener) {
+  static on(target: EmitterTarget, type: string, listener: Listener): Function {
     if (typeof listener !== "function" && !isEventHandler(listener)) {
       throw new Error(BAD_LISTENER);
     }
@@ -42,7 +55,7 @@ class EventEmitter {
     const events = target[eventListeners];
 
     if (events.has(type)) {
-      events.get(type).add(listener);
+      events.get(type)!.add(listener);
     } else {
       events.set(type, new Set([listener]));
     }
@@ -62,7 +75,7 @@ class EventEmitter {
    * @param {Function|Object} [listener]
    *    The listener that processes the event.
    */
-  static off(target, type, listener) {
+  static off(target: EmitterTarget, type: string, listener: Listener) {
     const length = arguments.length;
     const events = target[eventListeners];
 
@@ -90,6 +103,7 @@ class EventEmitter {
         // So we iterate all the listeners to check if any of them is a wrapper to
         // the `listener` given.
         for (const value of listenersForType.values()) {
+          // @ts-expect-error who knows
           if (onceOriginalListener in value && value[onceOriginalListener] === listener) {
             listenersForType.delete(value);
             break;
@@ -108,7 +122,7 @@ class EventEmitter {
     }
   }
 
-  static clearEvents(target) {
+  static clearEvents(target: EmitterTarget) {
     const events = target[eventListeners];
     if (!events) {
       return;
@@ -130,11 +144,11 @@ class EventEmitter {
    * @return {Promise}
    *    The promise resolved once the event `type` is emitted.
    */
-  static once(target, type, listener) {
+  static once(target: EmitterTarget, type: string, listener: Listener): Promise<any> {
     return new Promise(resolve => {
       // This is the actual listener that will be added to the target's listener, it wraps
       // the call to the original `listener` given.
-      const newListener = (first, ...rest) => {
+      const newListener = (first: any, ...rest: any[]) => {
         // To prevent side effects we're removing the listener upfront.
         EventEmitter.off(target, type, newListener);
 
@@ -159,16 +173,17 @@ class EventEmitter {
         return rv;
       };
 
+      // @ts-expect-error who knows
       newListener[onceOriginalListener] = listener;
       EventEmitter.on(target, type, newListener);
     });
   }
 
-  static emit(target, type, ...rest) {
+  static emit(target: EmitterTarget, type: string, ...rest: any[]) {
     EventEmitter._emit(target, type, false, ...rest);
   }
 
-  static emitAsync(target, type, ...rest) {
+  static emitAsync(target: EmitterTarget, type: string, ...rest: any[]) {
     return EventEmitter._emit(target, type, true, ...rest);
   }
 
@@ -188,14 +203,17 @@ class EventEmitter {
    *    If `async` argument is true, returns the promise resolved once all listeners have resolved.
    *    Otherwise, this function returns undefined;
    */
-  static _emit(target, type, async, ...rest) {
-    logEvent(type, rest);
-
+  static _emit(
+    target: EmitterTarget,
+    type: string,
+    async: boolean,
+    ...rest: any[]
+  ): Promise<any> | undefined {
     if (!(eventListeners in target)) {
       return undefined;
     }
 
-    const promises = async ? [] : null;
+    const promises: Promise<any>[] | null = async ? [] : null;
 
     if (target[eventListeners].has(type)) {
       // Creating a temporary Set with the original listeners, to avoiding side effects
@@ -215,7 +233,7 @@ class EventEmitter {
         // event handler we're going to fire wasn't removed.
         if (listeners && listeners.has(listener)) {
           try {
-            let promise;
+            let promise: Promise<any> | undefined;
             if (isEventHandler(listener)) {
               promise = listener[handler](type, ...rest);
             } else {
@@ -227,7 +245,7 @@ class EventEmitter {
               if (!promise || promise.constructor.name != "Promise") {
                 console.warn(`Listener for event '${type}' did not return a promise.`);
               } else {
-                promises.push(promise);
+                promises!.push(promise!);
               }
             }
           } catch (ex) {
@@ -248,7 +266,7 @@ class EventEmitter {
     }
 
     if (async) {
-      return Promise.all(promises);
+      return Promise.all(promises!);
     }
 
     return undefined;
@@ -265,7 +283,7 @@ class EventEmitter {
    * @return {Number}
    *    The number of event listeners.
    */
-  static count(target, type) {
+  static count(target: EmitterTarget, type: string): number {
     if (eventListeners in target) {
       const listenersForType = target[eventListeners].get(type);
 
@@ -286,8 +304,9 @@ class EventEmitter {
    * @return Object
    *    The object given, mixed.
    */
-  static decorate(target) {
+  static decorate(target: any) {
     const descriptors = Object.getOwnPropertyDescriptors(this.prototype);
+    // @ts-expect-error who knows
     delete descriptors.constructor;
     return Object.defineProperties(target, descriptors);
   }
@@ -296,11 +315,13 @@ class EventEmitter {
     return handler;
   }
 
-  on(...args) {
+  on(...args: any[]) {
+    // @ts-expect-error who knows
     return EventEmitter.on(this, ...args);
   }
 
-  off(...args) {
+  off(...args: any[]) {
+    // @ts-expect-error who knows
     EventEmitter.off(this, ...args);
   }
 
@@ -308,24 +329,25 @@ class EventEmitter {
     EventEmitter.clearEvents(this);
   }
 
-  once(...args) {
+  once(...args: any[]) {
+    // @ts-expect-error who knows
     return EventEmitter.once(this, ...args);
   }
 
-  emit(...args) {
+  emit(...args: any[]) {
+    // @ts-expect-error who knows
     EventEmitter.emit(this, ...args);
   }
 
-  emitAsync(...args) {
+  emitAsync(...args: any[]) {
+    // @ts-expect-error who knows
     return EventEmitter.emitAsync(this, ...args);
   }
 
-  emitForTests(...args) {}
+  emitForTests(...args: any[]) {}
 }
 
-module.exports = EventEmitter;
-
-const isEventHandler = listener =>
+const isEventHandler = (listener: any): listener is ListenerObject =>
   listener && handler in listener && typeof listener[handler] === "function";
 
-function logEvent() {}
+export default EventEmitter;

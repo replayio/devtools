@@ -270,7 +270,7 @@ var parsers = {
  *   {type: "uri", value: "uri1"}
  * ]
  */
-function parseAttribute(namespaceURI, tagName, attributes, attributeName, attributeValue) {
+export function parseAttribute(namespaceURI, tagName, attributes, attributeName, attributeValue) {
   const type = getType(namespaceURI, tagName, attributes, attributeName);
   if (!type) {
     return [
@@ -338,7 +338,7 @@ function getAttribute(attributes, attributeName) {
  * @param {String} splitChar A 1 length split character.
  * @return {Array}
  */
-function splitBy(value, splitChar) {
+export function splitBy(value, splitChar) {
   const data = [];
 
   let buffer = "",
@@ -364,7 +364,3 @@ function splitBy(value, splitChar) {
   }
   return data;
 }
-
-exports.parseAttribute = parseAttribute;
-// Exported for testing only.
-exports.splitBy = splitBy;

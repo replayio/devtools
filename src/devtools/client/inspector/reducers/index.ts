@@ -7,11 +7,10 @@
 import boxModel from "devtools/client/inspector/boxmodel/reducers/box-model";
 import computed from "devtools/client/inspector/computed/reducers";
 import markup from "devtools/client/inspector/markup/reducers/markup";
+import { prefs } from "devtools/client/inspector/prefs";
 import rules from "devtools/client/inspector/rules/reducers/rules";
 
 import { InspectorAction } from "../actions";
-
-const { prefs } = require("devtools/client/inspector/prefs");
 
 export { markup, rules, computed, boxModel };
 
@@ -23,7 +22,7 @@ export interface InspectorState {
 
 export function initialInspectorState(): InspectorState {
   return {
-    activeTab: prefs.activeTab,
+    activeTab: prefs.activeTab as InspectorActiveTab,
   };
 }
 

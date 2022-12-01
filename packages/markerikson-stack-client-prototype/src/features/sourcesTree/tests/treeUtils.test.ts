@@ -1491,6 +1491,5 @@ describe("parse sources tree", () => {
     const initialItems = urls.map(url => ({ url } as SourceDetails));
 
     const tree = parseSourcesTree(initialItems);
-    console.log("Tree: ", util.inspect(tree, { depth: Infinity }));
   });
 });

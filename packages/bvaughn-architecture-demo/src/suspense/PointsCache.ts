@@ -60,49 +60,79 @@ async function fetchPointsBoundingTime(
     const pointsBoundingTime = await client.getPointsBoundingTime(time);
     const point = getClosestPointInPointsBoundingTime(time, pointsBoundingTime);
 
-    // Pre-cache time-to-point match and insert into sorted ExecutionPoints array.
-    preCacheExecutionPointForTime({ point, time });
+    if (pointsBoundingTime.precise) {
+      // [FE-978] Don't cache any derived values from imprecise points.
+      // It would be difficult/impossible to efficiently undo all of the changes that could result from this.
 
-    // Also insert bounding points into sorted array; ignore duplicates!
-    if (sortedPointsBoundingTimes.length === 0) {
-      sortedPointsBoundingTimes.push(pointsBoundingTime);
+      // Pre-cache time-to-point match and insert into sorted ExecutionPoints array.
+      preCacheExecutionPointForTime({ point, time });
+
+      // Also insert bounding points into sorted array; ignore duplicates!
+      if (sortedPointsBoundingTimes.length === 0) {
+        sortedPointsBoundingTimes.push(pointsBoundingTime);
+      } else {
+        const beforePoint = pointsBoundingTime.before.point;
+        const afterPoint = pointsBoundingTime.after.point;
+
+        let indexBegin = 0;
+        let indexEnd = sortedPointsBoundingTimes.length - 1;
+        let indexMiddle = 0;
+
+        while (indexBegin <= indexEnd) {
+          indexMiddle = Math.floor((indexBegin + indexEnd) / 2);
+
+          const currentPointsBoundingTime = sortedPointsBoundingTimes[indexMiddle];
+
+          if (
+            currentPointsBoundingTime.before.point === beforePoint &&
+            currentPointsBoundingTime.after.point === afterPoint
+          ) {
+            // Session.getPointsBoundingTime should never return overlapping ranges that are not exact matches.
+            // These shouldn't be common, but if two times within the same range are requested in parallel, we might see this.
+            indexMiddle = -1;
+            break;
+          } else if (currentPointsBoundingTime.after.point < beforePoint) {
+            indexBegin = indexMiddle + 1;
+          } else {
+            indexEnd = indexMiddle - 1;
+          }
+        }
+
+        if (indexMiddle >= 0) {
+          const closestPointsBoundingTime = sortedPointsBoundingTimes[indexMiddle];
+          if (pointsBoundingTime.before.point < closestPointsBoundingTime.after.point) {
+            sortedPointsBoundingTimes.splice(indexMiddle, 0, pointsBoundingTime);
+          } else {
+            sortedPointsBoundingTimes.splice(indexMiddle + 1, 0, pointsBoundingTime);
+          }
+        }
+      }
     } else {
-      const beforePoint = pointsBoundingTime.before.point;
-      const afterPoint = pointsBoundingTime.after.point;
+      cachedPointsForTime.set(time, point);
 
-      let indexBegin = 0;
-      let indexEnd = sortedPointsBoundingTimes.length - 1;
-      let indexMiddle = 0;
+      // [FE-978] Don't permanently cache imprecise values.
+      // If we've asked about a time that's not currently in a loaded region, the backend will send a coarse-grained guess.
+      // We can proceed with the guess, but once the backend has loaded the region we should ask again
+      // and refine the value we have cached locally.
+      client.waitForTimeToBeLoaded(time).then(() => {
+        // Clear the previously-cached, imprecise value.
+        cachedPointsForTime.delete(time);
+        timeToInFlightRequestMap.delete(time);
 
-      while (indexBegin <= indexEnd) {
-        indexMiddle = Math.floor((indexBegin + indexEnd) / 2);
-
-        const currentPointsBoundingTime = sortedPointsBoundingTimes[indexMiddle];
-
-        if (
-          currentPointsBoundingTime.before.point === beforePoint &&
-          currentPointsBoundingTime.after.point === afterPoint
-        ) {
-          // Session.getPointsBoundingTime should never return overlapping ranges that are not exact matches.
-          // And we can skip adding add duplicate ranges.
-          // These shouldn't be common, but if two times within the same range are requested in parallel, we might see this.
-          indexMiddle = -1;
-          break;
-        } else if (currentPointsBoundingTime.after.point < beforePoint) {
-          indexBegin = indexMiddle + 1;
-        } else {
-          indexEnd = indexMiddle - 1;
+        // Eagerly request a precise value (while we're within a loaded region).
+        // This value will be cached should the client request it again.
+        //
+        // We don't need to do this; we could just clear the cached values and only ask again lazily,
+        // but the region might not still be loaded later.
+        // Regardless, this request will not cause an update to React components,
+        // unless they were to update again for some other reason and re-ask
+        // in which case, they would re-Suspend anyway.
+        try {
+          getClosestPointForTimeSuspense(client, time);
+        } catch (error) {
+          // Fire and forget.
         }
-      }
-
-      if (indexMiddle >= 0) {
-        const closestPointsBoundingTime = sortedPointsBoundingTimes[indexMiddle];
-        if (pointsBoundingTime.before.point < closestPointsBoundingTime.after.point) {
-          sortedPointsBoundingTimes.splice(indexMiddle, 0, pointsBoundingTime);
-        } else {
-          sortedPointsBoundingTimes.splice(indexMiddle + 1, 0, pointsBoundingTime);
-        }
-      }
+      });
     }
 
     wakeable.resolve(point);
