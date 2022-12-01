@@ -4,7 +4,7 @@ import { highlightNodes, unhighlightNode } from "devtools/client/inspector/marku
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { setSelectedStep } from "ui/reducers/reporter";
+import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -31,6 +31,7 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
     nodeIds: string[];
   }>();
   const currentTime = useAppSelector(getCurrentTime);
+  const selectedStep = useAppSelector(getSelectedStep);
   const dispatch = useAppDispatch();
   const client = useContext(ReplayClientContext);
   const { startTime, duration, messageEnd, pointEnd, error, stepName, parentId } =
@@ -153,7 +154,7 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
         progress > 0 && error
           ? "bg-testsuitesErrorBgcolor text-testsuitesErrorColor hover:bg-testsuitesErrorBgcolorHover"
           : isPaused
-          ? "bg-gray-100"
+          ? "bg-toolbarBackground"
           : "bg-testsuitesStepsBgcolor"
       }`}
       onMouseEnter={onMouseEnter}
@@ -169,12 +170,12 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
           {stepName} <span className="opacity-70">{argString}</span>
         </div>
       </button>
-      <Actions />
+      <Actions isSelected={selectedStep?.id === id} />
     </div>
   );
 }
 
-function Actions() {
+function Actions({ isSelected }: { isSelected: boolean }) {
   const { startTime: stepStartTime, duration, point } = useContext(TestStepContext);
   const { startTime: caseStartTime, endTime: caseEndTime } = useContext(TestCaseContext);
   const { show } = useContext(TestInfoContextMenuContext);
@@ -193,7 +194,10 @@ function Actions() {
   };
 
   return (
-    <button onClick={onClick} className={`invisible py-2 group-hover/step:visible`}>
+    <button
+      onClick={onClick}
+      className={`${isSelected ? "" : "invisible"} py-2 group-hover/step:visible`}
+    >
       <div className="flex items-center">
         <MaterialIcon>more_vert</MaterialIcon>
       </div>
