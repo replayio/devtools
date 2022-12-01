@@ -109,17 +109,24 @@ async function fetchPointsBoundingTime(
         }
       }
     } else {
+      cachedPointsForTime.set(time, point);
+
       // [FE-978] Don't permanently cache imprecise values.
       // If we've asked about a time that's not currently in a loaded region, the backend will send a coarse-grained guess.
       // We can proceed with the guess, but once the backend has loaded the region we should ask again
       // and refine the value we have cached locally.
       client.waitForTimeToBeLoaded(time).then(() => {
         // Clear the previously-cached, imprecise value.
+        cachedPointsForTime.delete(time);
         timeToInFlightRequestMap.delete(time);
 
         // Eagerly request a precise value (while we're within a loaded region).
         // This value will be cached should the client request it again.
-        getClosestPointForTimeSuspense(client, time);
+        try {
+          getClosestPointForTimeSuspense(client, time);
+        } catch (error) {
+          // Fire and forget.
+        }
       });
     }
 

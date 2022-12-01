@@ -69,6 +69,7 @@ describe("PointsCache", () => {
       mockClient.getPointsBoundingTime.mockReturnValue({
         before: { time: 25, point: "25" },
         after: { time: 100, point: "100" },
+        precise: true,
       });
 
       let point = await getClosestPointForTimeHelper(25);
@@ -83,6 +84,7 @@ describe("PointsCache", () => {
       mockClient.getPointsBoundingTime.mockReturnValue({
         before: { time: 20, point: "20" },
         after: { time: 30, point: "30" },
+        precise: true,
       });
       expect(await getClosestPointForTimeHelper(22)).toBe("20");
       expect(mockClient.getPointsBoundingTime).toHaveBeenCalledTimes(1);
@@ -90,6 +92,7 @@ describe("PointsCache", () => {
       mockClient.getPointsBoundingTime.mockReturnValue({
         before: { time: 31, point: "31" },
         after: { time: 34, point: "34" },
+        precise: true,
       });
       expect(await getClosestPointForTimeHelper(32)).toBe("31");
       expect(mockClient.getPointsBoundingTime).toHaveBeenCalledTimes(2);
@@ -97,6 +100,7 @@ describe("PointsCache", () => {
       mockClient.getPointsBoundingTime.mockReturnValue({
         before: { time: 70, point: "70" },
         after: { time: 80, point: "80" },
+        precise: true,
       });
       expect(await getClosestPointForTimeHelper(78)).toBe("80");
       expect(mockClient.getPointsBoundingTime).toHaveBeenCalledTimes(3);
@@ -104,6 +108,7 @@ describe("PointsCache", () => {
       mockClient.getPointsBoundingTime.mockReturnValue({
         before: { time: 50, point: "50" },
         after: { time: 60, point: "60" },
+        precise: true,
       });
       expect(await getClosestPointForTimeHelper(50)).toBe("50");
       expect(mockClient.getPointsBoundingTime).toHaveBeenCalledTimes(4);
@@ -122,6 +127,89 @@ describe("PointsCache", () => {
       expect(await getClosestPointForTimeHelper(72)).toBe("70");
       expect(await getClosestPointForTimeHelper(80)).toBe("80");
       expect(mockClient.getPointsBoundingTime).toHaveBeenCalledTimes(4);
+    });
+
+    it("should only pre-cache derived data for precise times", async () => {
+      mockClient.waitForTimeToBeLoaded.mockImplementation(() => {
+        return new Promise(() => {});
+      });
+
+      // Imprecise values mean that no derived values for times/points between this should be cached.
+      mockClient.getPointsBoundingTime.mockReturnValue({
+        before: { time: 20, point: "20" },
+        after: { time: 24, point: "24" },
+        precise: false,
+      });
+      expect(await getClosestPointForTimeHelper(21)).toBe("20");
+
+      // Precise values are safe to cache derived values for.
+      mockClient.getPointsBoundingTime.mockReturnValue({
+        before: { time: 26, point: "26" },
+        after: { time: 29, point: "29" },
+        precise: true,
+      });
+      expect(await getClosestPointForTimeHelper(29)).toBe("29");
+
+      expect(mockClient.getPointsBoundingTime).toHaveBeenCalledTimes(2);
+
+      // Asking for values between the precise range should not trigger any new requests.
+      expect(await getClosestPointForTimeHelper(26)).toBe("26");
+      expect(await getClosestPointForTimeHelper(28)).toBe("29");
+      expect(mockClient.getPointsBoundingTime).toHaveBeenCalledTimes(2);
+
+      // Asking for values between the imprecise range should result in new backend requests.
+      getClosestPointForTimeHelper(20);
+      getClosestPointForTimeHelper(24);
+      expect(mockClient.getPointsBoundingTime).toHaveBeenCalledTimes(4);
+    });
+
+    it("should refine imprecise values once regions have been loaded", async () => {
+      let resolveAndRefine: Function | null = null;
+      let waitForTimeToBeLoadedPromise;
+      mockClient.waitForTimeToBeLoaded.mockImplementation(() => {
+        waitForTimeToBeLoadedPromise = new Promise(resolve => {
+          resolveAndRefine = resolve;
+        });
+        return waitForTimeToBeLoadedPromise;
+      });
+
+      // First the backend returns an imprecise value for time 21.
+      mockClient.getPointsBoundingTime.mockReturnValue({
+        before: { time: 20, point: "20" },
+        after: { time: 24, point: "24" },
+        precise: false,
+      });
+      expect(await getClosestPointForTimeHelper(21)).toBe("20");
+
+      // And a precise value for time 29.
+      mockClient.getPointsBoundingTime.mockReturnValue({
+        before: { time: 26, point: "26" },
+        after: { time: 29, point: "29" },
+        precise: true,
+      });
+      expect(await getClosestPointForTimeHelper(29)).toBe("29");
+
+      // Two backend calls have been made.
+      expect(mockClient.getPointsBoundingTime).toHaveBeenCalledTimes(2);
+
+      // If we ask again, we should get the (still cached) imprecise value
+      expect(await getClosestPointForTimeHelper(21)).toBe("20");
+      expect(mockClient.getPointsBoundingTime).toHaveBeenCalledTimes(2);
+
+      // But once the unloaded regions have been loaded, the imprecise value should be discarded.
+      mockClient.getPointsBoundingTime.mockReturnValue({
+        before: { time: 21, point: "21" },
+        after: { time: 22, point: "22" },
+        precise: true,
+      });
+      resolveAndRefine!();
+      await waitForTimeToBeLoadedPromise;
+      expect(await getClosestPointForTimeHelper(21)).toBe("21");
+      expect(mockClient.getPointsBoundingTime).toHaveBeenCalledTimes(3);
+
+      // The precise value should stay cached
+      expect(await getClosestPointForTimeHelper(29)).toBe("29");
+      expect(mockClient.getPointsBoundingTime).toHaveBeenCalledTimes(3);
     });
   });
 
@@ -216,12 +304,14 @@ describe("PointsCache", () => {
       mockClient.getPointsBoundingTime.mockReturnValue({
         before: { time: 30, point: "30" },
         after: { time: 40, point: "40" },
+        precise: true,
       });
       await imperativelyGetClosestPointForTime(replayClient, 38);
 
       mockClient.getPointsBoundingTime.mockReturnValue({
         before: { time: 10, point: "10" },
         after: { time: 20, point: "20" },
+        precise: true,
       });
       await imperativelyGetClosestPointForTime(replayClient, 12);
 
@@ -240,9 +330,18 @@ describe("PointsCache", () => {
       mockClient.getPointsBoundingTime.mockReturnValue({
         before: { time: 10, point: "10" },
         after: { time: 20, point: "20" },
+        precise: true,
       });
       expect(await imperativelyGetClosestPointForTime(replayClient, 12)).toBe("10");
       expect(mockClient.getPointsBoundingTime).toHaveBeenCalledTimes(1);
+
+      mockClient.getPointsBoundingTime.mockReturnValue({
+        before: { time: 21, point: "21" },
+        after: { time: 24, point: "24" },
+        precise: true,
+      });
+      expect(await imperativelyGetClosestPointForTime(replayClient, 21)).toBe("21");
+      expect(mockClient.getPointsBoundingTime).toHaveBeenCalledTimes(2);
     });
 
     it("should fall back to the best guess nearest point if the backend throws", async () => {
