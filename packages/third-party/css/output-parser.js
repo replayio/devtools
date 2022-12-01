@@ -4,9 +4,9 @@
 
 "use strict";
 
-const { angleUtils } = require("./css-angle");
-const { colorUtils } = require("./color");
-const { getCSSLexer } = require("./lexer");
+import * as angleUtils  from "./css-angle";
+import * as colorUtils from "./color";
+import { getCSSLexer } from "./lexer";
 
 // Functions that accept an angle argument.
 const ANGLE_TAKING_FUNCTIONS = [
@@ -39,15 +39,15 @@ const COLOR_TAKING_FUNCTIONS = [
   "drop-shadow",
 ];
 
-const ANGLE = (exports.ANGLE = "angle");
-const COLOR = (exports.COLOR = "color");
-const CUSTOM_PROPERTY = (exports.CUSTOM_PROPERTY = "custom-property");
-const FLEX = (exports.FLEX = "flex");
-const FONT_FAMILY = (exports.FONT_FAMILY = "font-family");
-const GRID = (exports.GRID = "grid");
-const TIMING_FUNCTION = (exports.TIMING_FUNCTION = "timing-function");
-const URI = (exports.URI = "url");
-const VARIABLE_FUNCTION = (exports.VARIABLE_FUNCTION = "variable-function");
+export const ANGLE = "angle";
+export const COLOR = "color";
+export const CUSTOM_PROPERTY = "custom-property";
+export const FLEX = "flex";
+export const FONT_FAMILY = "font-family";
+export const GRID = "grid";
+export const TIMING_FUNCTION = "timing-function";
+export const URI = "url";
+export const VARIABLE_FUNCTION = "variable-function";
 
 /**
  * This module is used to process CSS text declarations and output DOM fragments (to be
@@ -61,7 +61,7 @@ const VARIABLE_FUNCTION = (exports.VARIABLE_FUNCTION = "variable-function");
  * - converting between color types on Shift+click on their swatches.
  *
  * Usage:
- *   const OutputParser = require("devtools/client/shared/output-parser");
+ *   import { OutputParser }  from "devtools/client/shared/output-parser";
  *   const parser = new OutputParser(document, cssProperties);
  *   parser.parseCssProperty("color", "red"); // Returns document fragment.
  *
@@ -77,7 +77,7 @@ const VARIABLE_FUNCTION = (exports.VARIABLE_FUNCTION = "variable-function");
  *        - supportsCssColor4ColorFunction - A function for checking
  *          the supporting of css-color-4 color function.
  */
-function OutputParser(document, { supportsType, supportsCssColor4ColorFunction }) {
+export function OutputParser(document, { supportsType, supportsCssColor4ColorFunction }) {
   this.parsed = [];
   this.doc = document;
   this.supportsType = supportsType;
@@ -736,4 +736,3 @@ OutputParser.prototype = {
   },
 };
 
-exports.OutputParser = OutputParser;

@@ -6,16 +6,15 @@ import classnames from "classnames";
 import React from "react";
 
 import { ELEMENT_STYLE } from "shared/constants";
-
-import { RuleSelector } from "../models/rule";
-
-const { PSEUDO_CLASSES } = require("third-party/css/constants");
-const {
-  parsePseudoClassesAndAttributes,
+import { PSEUDO_CLASSES } from "third-party/css/constants";
+import {
   SELECTOR_ATTRIBUTE,
   SELECTOR_ELEMENT,
   SELECTOR_PSEUDO_CLASS,
-} = require("third-party/css/parsing-utils");
+  parsePseudoClassesAndAttributes,
+} from "third-party/css/parsing-utils";
+
+import { RuleSelector } from "../models/rule";
 
 interface SelectorProps {
   id: string;

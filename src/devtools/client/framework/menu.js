@@ -4,7 +4,7 @@
 
 "use strict";
 
-const EventEmitter = require("devtools/shared/event-emitter");
+import EventEmitter from "devtools/shared/event-emitter";
 
 /**
  * A partial implementation of the Menu API provided by electron:
@@ -16,7 +16,7 @@ const EventEmitter = require("devtools/shared/event-emitter");
  * @param String id (non standard)
  *        Needed so tests can confirm the XUL implementation is working
  */
-function Menu({ id = null } = {}) {
+export function Menu({ id = null } = {}) {
   this.menuitems = [];
   this.id = id;
 
@@ -221,4 +221,4 @@ function applyItemAttributesToNode(item, node) {
   }
 }
 
-module.exports = Menu;
+export default Menu;

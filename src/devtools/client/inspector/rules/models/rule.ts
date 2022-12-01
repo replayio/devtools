@@ -7,14 +7,13 @@ import { Node } from "@replayio/protocol";
 import TextProperty from "devtools/client/inspector/rules/models/text-property";
 import Services from "devtools/shared/services";
 import { assert } from "protocol/utils";
+import { shortSource } from "third-party/css-logic/shared-inspector-css-logic";
 import CSSProperties from "third-party/css/css-properties";
+import { parseNamedDeclarations } from "third-party/css/parsing-utils";
 
 import ElementStyle from "./element-style";
 import { RuleFront } from "./fronts/rule";
 import { StyleFront } from "./fronts/style";
-
-const CssLogic = require("third-party/css-logic/shared-inspector-css-logic");
-const { parseNamedDeclarations } = require("third-party/css/parsing-utils");
 
 export interface NodeWithId {
   nodeId: string;
@@ -158,7 +157,7 @@ export default class RuleModel {
 
   get sourceLink(): SourceLink {
     return {
-      label: this.getSourceText(CssLogic.shortSource({ href: this.sourceLocation.url })),
+      label: this.getSourceText(shortSource({ href: this.sourceLocation.url })),
       title: this.sourceLocation.url,
     };
   }
@@ -180,7 +179,7 @@ export default class RuleModel {
   }
 
   get title() {
-    let title = CssLogic.shortSource(this.sheet);
+    let title = shortSource(this.sheet);
     if (this.domRule.isRule() && this.ruleLine !== undefined && this.ruleLine > 0) {
       title += ":" + this.ruleLine;
     }

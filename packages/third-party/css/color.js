@@ -5,11 +5,11 @@
 
 "use strict";
 
-const Services = require("devtools/shared/services").default;
-const { getCSSLexer } = require("./lexer");
-const { cssColors } = require("./color-db");
+import Services from "devtools/shared/services";
+import { getCSSLexer } from "./lexer";
+import { cssColors } from "./color-db";
 
-const { CSS_ANGLEUNIT } = require("./constants");
+import { CSS_ANGLEUNIT }from "./constants";
 
 const COLOR_UNIT_PREF = "devtools.defaultColorUnit";
 
@@ -19,7 +19,7 @@ const SPECIALVALUES = new Set(["currentcolor", "initial", "inherit", "transparen
  * This module is used to convert between various color types.
  *
  * Usage:
- *   let {colorUtils} = require("devtools/shared/css/color");
+ *   import * as colorUtils from "devtools/shared/css/color";
  *   let color = new colorUtils.CssColor("red");
  *   // In order to support css-color-4 color function, pass true to the
  *   // second argument.
@@ -55,25 +55,11 @@ const SPECIALVALUES = new Set(["currentcolor", "initial", "inherit", "transparen
  *   Valid values for COLOR_UNIT_PREF are contained in CssColor.COLORUNIT.
  */
 
-function CssColor(colorValue, supportsCssColor4ColorFunction = false) {
+export function CssColor(colorValue, supportsCssColor4ColorFunction = false) {
   this.newColor(colorValue);
   this.cssColor4 = supportsCssColor4ColorFunction;
 }
 
-module.exports.colorUtils = {
-  CssColor: CssColor,
-  rgbToHsl: rgbToHsl,
-  rgbToLab: rgbToLab,
-  setAlpha: setAlpha,
-  classifyColor: classifyColor,
-  rgbToColorName: rgbToColorName,
-  colorToRGBA: colorToRGBA,
-  isValidCSSColor: isValidCSSColor,
-  calculateContrastRatio: calculateContrastRatio,
-  calculateDeltaE: calculateDeltaE,
-  calculateLuminance: calculateLuminance,
-  blendColors: blendColors,
-};
 
 /**
  * Values used in COLOR_UNIT_PREF
@@ -482,7 +468,7 @@ CssColor.prototype = {
  * @return {array}
  *         Array of hsl values.
  */
-function rgbToHsl([r, g, b]) {
+ export function rgbToHsl([r, g, b]) {
   r = r / 255;
   g = g / 255;
   b = b / 255;
@@ -528,7 +514,7 @@ function rgbToHsl([r, g, b]) {
  * @return {array}
  *         Array of lab values.
  */
-function rgbToLab([r, g, b]) {
+ export function rgbToLab([r, g, b]) {
   // Convert rgb values to xyz coordinates.
   r = r / 255;
   g = g / 255;
@@ -573,11 +559,11 @@ function rgbToLab([r, g, b]) {
  * @return {Number}
  *         DeltaE value between the two colors
  */
-function calculateDeltaE([l1, a1, b1], [l2, a2, b2]) {
+export function calculateDeltaE([l1, a1, b1], [l2, a2, b2]) {
   return Math.sqrt(Math.pow(l1 - l2, 2) + Math.pow(a1 - a2, 2) + Math.pow(b1 - b2, 2));
 }
 
-function roundTo(number, digits) {
+export function roundTo(number, digits) {
   const multiplier = Math.pow(10, digits);
   return Math.round(number * multiplier) / multiplier;
 }
@@ -596,7 +582,7 @@ function roundTo(number, digits) {
  * @return {String}
  *         Converted color with `alpha` value in rgba form.
  */
-function setAlpha(colorValue, alpha, useCssColor4ColorFunction = false) {
+ export function setAlpha(colorValue, alpha, useCssColor4ColorFunction = false) {
   const color = new CssColor(colorValue, useCssColor4ColorFunction);
 
   // Throw if the color supplied is not valid.
@@ -622,7 +608,7 @@ function setAlpha(colorValue, alpha, useCssColor4ColorFunction = false) {
  * @return {String}
  *         The color classification, one of "rgb", "hsl", "hex", or "name".
  */
-function classifyColor(value) {
+ export function classifyColor(value) {
   value = value.toLowerCase();
   if (value.startsWith("rgb(") || value.startsWith("rgba(")) {
     return CssColor.COLORUNIT.rgb;
@@ -645,7 +631,7 @@ var cssRGBMap;
  * @param {Number} r, g, b  The color components.
  * @return {String} the name of the color or an empty string
  */
-function rgbToColorName(r, g, b) {
+ export function rgbToColorName(r, g, b) {
   if (!cssRGBMap) {
     cssRGBMap = {};
     for (const name in cssColors) {
@@ -1191,7 +1177,7 @@ function parseOldStyleRgb(lexer, hasAlpha) {
  *         otherwise an array of the form [r, g, b, a]; or null if the
  *         name was not a valid color
  */
-function colorToRGBA(name, useCssColor4ColorFunction = false, toArray = false) {
+ export function colorToRGBA(name, useCssColor4ColorFunction = false, toArray = false) {
   name = name.trim().toLowerCase();
 
   if (name in cssColors) {
@@ -1249,7 +1235,7 @@ function colorToRGBA(name, useCssColor4ColorFunction = false, toArray = false) {
  * @param {Boolean} useCssColor4ColorFunction use css-color-4 color function or not.
  * @return {Boolean} True if the string is a CSS color name.
  */
-function isValidCSSColor(name, useCssColor4ColorFunction = false) {
+ export function isValidCSSColor(name, useCssColor4ColorFunction = false) {
   return colorToRGBA(name, useCssColor4ColorFunction) !== null;
 }
 
@@ -1260,7 +1246,7 @@ function isValidCSSColor(name, useCssColor4ColorFunction = false) {
  * @param {Array} rgba An array with [r,g,b,a] values.
  * @return {Number} The calculated luminance.
  */
-function calculateLuminance(rgba) {
+ export function calculateLuminance(rgba) {
   for (let i = 0; i < 3; i++) {
     rgba[i] /= 255;
     rgba[i] = rgba[i] < 0.03928 ? rgba[i] / 12.92 : Math.pow((rgba[i] + 0.055) / 1.055, 2.4);
@@ -1278,7 +1264,7 @@ function calculateLuminance(rgba) {
  * @return {Array}
  *         An array with combined [r,g,b,a] colors.
  */
-function blendColors(foregroundColor, backgroundColor = [255, 255, 255, 1]) {
+ export function blendColors(foregroundColor, backgroundColor = [255, 255, 255, 1]) {
   const [fgR, fgG, fgB, fgA] = foregroundColor;
   const [bgR, bgG, bgB, bgA] = backgroundColor;
   if (fgA === 1) {
@@ -1303,7 +1289,7 @@ function blendColors(foregroundColor, backgroundColor = [255, 255, 255, 1]) {
  * the text color.
  * @return {Number} The calculated luminance.
  */
-function calculateContrastRatio(backgroundColor, textColor) {
+ export function calculateContrastRatio(backgroundColor, textColor) {
   // Do not modify given colors.
   backgroundColor = Array.from(backgroundColor);
   textColor = Array.from(textColor);

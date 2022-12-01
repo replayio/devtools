@@ -4,7 +4,9 @@
 
 //  "use strict";
 
-export const asyncStorage = require("./async-storage");
+import * as asyncStorage from "./async-storage";
+
+export * as asyncStorage from "./async-storage";
 
 /*
  * asyncStoreHelper wraps asyncStorage so that it is easy to define project

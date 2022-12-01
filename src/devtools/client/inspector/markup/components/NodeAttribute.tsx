@@ -2,12 +2,11 @@ import { Attr } from "@replayio/protocol";
 import React, { PureComponent } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { truncateString } from "devtools/shared/inspector/utils";
+import { parseAttribute } from "third-party/node-attribute-parser";
 import { UIState } from "ui/state";
 
 import { NodeInfo } from "../reducers/markup";
-
-const { truncateString } = require("devtools/shared/inspector/utils");
-const { parseAttribute } = require("third-party/node-attribute-parser");
 
 const COLLAPSE_DATA_URL_REGEX = /^data.+base64/;
 const COLLAPSE_DATA_URL_LENGTH = 60;
@@ -41,7 +40,7 @@ class NodeAttribute extends PureComponent<NodeAttributeProps & PropsFromRedux> {
     // Parse the attribute value to detect whether there are linkable parts in it
     const parsedLinksData = parseAttribute(
       node.namespaceURI,
-      node.tagName,
+      node.tagName!,
       attributes,
       attribute.name,
       attribute.value

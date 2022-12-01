@@ -6,15 +6,15 @@
 
 const SPECIALVALUES = new Set(["initial", "inherit", "unset"]);
 
-const { getCSSLexer } = require("./lexer");
+import { getCSSLexer } from "./lexer";
 
-const { CSS_ANGLEUNIT } = require("./constants");
+import { CSS_ANGLEUNIT } from "./constants";
 
 /**
  * This module is used to convert between various angle units.
  *
  * Usage:
- *   let {angleUtils} = require("devtools/client/shared/css-angle");
+ *   import * as angleUtils from "devtools/client/shared/css-angle";
  *   let angle = new angleUtils.CssAngle("180deg");
  *
  *   angle.authored === "180deg"
@@ -28,14 +28,10 @@ const { CSS_ANGLEUNIT } = require("./constants");
  *   angle.newAngle("-1TURN") === "-1TURN"; // true
  */
 
-function CssAngle(angleValue) {
+export function CssAngle(angleValue) {
   this.newAngle(angleValue);
 }
 
-module.exports.angleUtils = {
-  CssAngle: CssAngle,
-  classifyAngle: classifyAngle,
-};
 
 CssAngle.prototype = {
   // Still keep trying to lazy load properties-db by lazily getting ANGLEUNIT
@@ -320,7 +316,7 @@ CssAngle.prototype = {
  * @return {String}
  *         The angle classification, one of "deg", "rad", "grad", or "turn".
  */
-function classifyAngle(value) {
+export function classifyAngle(value) {
   value = value.toLowerCase();
   if (value.endsWith("deg")) {
     return CSS_ANGLEUNIT.deg;

@@ -12,7 +12,7 @@ const eventListeners = Symbol("EventEmitter/listeners");
 const onceOriginalListener = Symbol("EventEmitter/once-original-listener");
 const handler = Symbol("EventEmitter/event-handler");
 
-class EventEmitter {
+export class EventEmitter {
   constructor() {
     this[eventListeners] = new Map();
   }
@@ -323,9 +323,9 @@ class EventEmitter {
   emitForTests(...args) {}
 }
 
-module.exports = EventEmitter;
-
 const isEventHandler = listener =>
   listener && handler in listener && typeof listener[handler] === "function";
 
 function logEvent() {}
+
+export default EventEmitter;

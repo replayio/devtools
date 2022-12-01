@@ -17,7 +17,7 @@
  * https://bugzilla.mozilla.org/show_bug.cgi?id=664991
  */
 
-exports.KeyCodes = {
+export const KeyCodes = {
   DOM_VK_CANCEL: 3,
   DOM_VK_HELP: 6,
   DOM_VK_BACK_SPACE: 8,

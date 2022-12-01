@@ -4,7 +4,7 @@
 
 "use strict";
 
-const {
+import {
   VIEW_NODE_FONT_TYPE,
   VIEW_NODE_IMAGE_URL_TYPE,
   VIEW_NODE_INACTIVE_CSS,
@@ -15,7 +15,7 @@ const {
   VIEW_NODE_SHAPE_SWATCH,
   VIEW_NODE_VALUE_TYPE,
   VIEW_NODE_VARIABLE_TYPE,
-} = require("devtools/client/inspector/shared/node-types");
+} from "devtools/client/inspector/shared/node-types";
 const INSET_POINT_TYPES = ["top", "right", "bottom", "left"];
 
 /**
@@ -27,7 +27,7 @@ const INSET_POINT_TYPES = ["top", "right", "bottom", "left"];
  *        The [ElementStyle] associated with the selected element
  * @return {Rule|null} associated with the given node
  */
-function getRuleFromNode(node, elementStyle) {
+export function getRuleFromNode(node, elementStyle) {
   const ruleEl = node.closest(".ruleview-rule[data-rule-id]");
   const ruleId = ruleEl ? ruleEl.dataset.ruleId : null;
   return ruleId ? elementStyle.getRule(ruleId) : null;
@@ -68,7 +68,7 @@ function getDeclarationFromNode(node, rule) {
  * Otherwise, returns null if the node isn't anything we care about.
  */
 // eslint-disable-next-line complexity
-function getNodeInfo(node, elementStyle) {
+export function getNodeInfo(node, elementStyle) {
   if (!node) {
     return null;
   }
@@ -283,13 +283,7 @@ function getShapePoint(node) {
  *        CSS variable name (e.g. "--color")
  * @return {Boolean}
  */
-function hasCSSVariable(propertyValue, variableName) {
+export function hasCSSVariable(propertyValue, variableName) {
   const regex = new RegExp(`(^|\\W)var\\(${variableName}\\s*[,)]`);
   return regex.test(propertyValue);
 }
-
-module.exports = {
-  getNodeInfo,
-  getRuleFromNode,
-  hasCSSVariable,
-};
