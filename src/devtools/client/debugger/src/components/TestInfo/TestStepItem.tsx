@@ -11,6 +11,7 @@ import { ProgressBar } from "./ProgressBar";
 import { TestInfoContext } from "./TestInfo";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { TestStepContext } from "./TestStepRoot";
+import { TestCaseContext } from "./TestCase";
 
 function returnFirst<T, R>(list: T[] | undefined, fn: (v: T) => R | null) {
   return list ? list.reduce<R | null>((acc, v) => acc ?? fn(v), null) : null;
@@ -138,35 +139,6 @@ export function TestStepItem({
     dispatch(setTimelineToTime(currentTime));
     dispatch(unhighlightNode());
   };
-  // const onJumpToBefore = () => dispatch(seekToTime(startTime));
-  // const onJumpToAfter = () => {
-  //   dispatch(seekToTime(startTime + adjustedDuration - 1));
-  // };
-  // // const onPlayFromHere = () => onPlayFromHere(startTime);
-  // const onGoToLocation = async () => {
-  //   if (!point) {
-  //     return;
-  //   }
-
-  //   const frame = await (async point => {
-  //     const {
-  //       data: { frames },
-  //     } = await client.createPause(point);
-
-  //     const returnFirst = (list: any, fn: any) =>
-  //       list.reduce((acc: any, v: any, i: any) => acc ?? fn(v, i, list), null);
-
-  //     return returnFirst(frames, (f: any, i: any, l: any) =>
-  //       l[i + 1]?.functionName === "__stackReplacementMarker" ? f : null
-  //     );
-  //   })(point);
-
-  //   const location = frame.location[frame.location.length - 1];
-
-  //   if (location) {
-  //     dispatch(selectLocation(cx, location));
-  //   }
-  // };
 
   // This math is bananas don't look here until this is cleaned up :)
   const bump = isPaused || isPast ? 10 : 0;
@@ -177,40 +149,64 @@ export function TestStepItem({
   const color = error ? "border-l-red-500" : "border-l-primaryAccent";
 
   return (
-      <div
-        className={`group/step relative flex items-start gap-1 border-b border-l-2 border-themeBase-90 pl-1 pr-3 font-mono hover:bg-toolbarBackground ${
-          isPaused || isPast ? color : "border-l-transparent"
-        } ${
-          progress > 0 && error
-            ? "bg-testsuitesErrorBgcolor text-testsuitesErrorColor hover:bg-testsuitesErrorBgcolorHover"
-            : isPaused
-            ? "bg-gray-100"
-            : "bg-testsuitesStepsBgcolor"
-        }`}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-      >
-        <button onClick={onClick} className="flex flex-grow items-start space-x-2  py-2 text-start">
-          <div title={"" + displayedProgress} className="flex h-4 items-center">
-            <ProgressBar progress={displayedProgress} error={error} />
-          </div>
-          <div className="opacity-70">{index + 1}</div>
-          <div className={` font-medium ${isPaused ? "font-bold" : ""}`}>
-            {parentId ? "- " : ""}
-            {stepName} <span className="opacity-70">{argString}</span>
-          </div>
-        </button>
+    <div
+      className={`group/step relative flex items-start gap-1 border-b border-l-2 border-themeBase-90 pl-1 pr-3 font-mono hover:bg-toolbarBackground ${
+        isPaused || isPast ? color : "border-l-transparent"
+      } ${
+        progress > 0 && error
+          ? "bg-testsuitesErrorBgcolor text-testsuitesErrorColor hover:bg-testsuitesErrorBgcolorHover"
+          : isPaused
+          ? "bg-gray-100"
+          : "bg-testsuitesStepsBgcolor"
+      }`}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
+      <button onClick={onClick} className="flex flex-grow items-start space-x-2  py-2 text-start">
+        <div title={"" + displayedProgress} className="flex h-4 items-center">
+          <ProgressBar progress={displayedProgress} error={error} />
+        </div>
+        <div className="opacity-70">{index + 1}</div>
+        <div className={` font-medium ${isPaused ? "font-bold" : ""}`}>
+          {parentId ? "- " : ""}
+          {stepName} <span className="opacity-70">{argString}</span>
+        </div>
+      </button>
       <Actions />
     </div>
   );
 }
 
 function Actions() {
+  const { startTime: stepStartTime, duration, point } = useContext(TestStepContext);
+  const { startTime: caseStartTime, endTime: caseEndTime} = useContext(TestCaseContext);
   const { show } = useContext(TestInfoContextMenuContext);
+
+
   const onClick = (e: React.MouseEvent) => {
-    console.log("click1");
-    show({ x: e.pageX, y: e.pageY });
+    const testStep = {
+      startTime: stepStartTime,
+      endTime: stepStartTime + duration,
+      enqueuePoint: point
+    }
+    const testCase = {
+      startTime: caseStartTime,
+      endTime: caseEndTime,
+    }
+    show({ x: e.pageX, y: e.pageY }, testCase, testStep);
   };
+
+  {/* <TestStepActions
+    onReplay={onReplay}
+    onPlayFromHere={onPlayFromHere}
+    isLastStep={isLastStep}
+    isPaused={isPaused}
+    onGoToLocation={onGoToLocation}
+    onJumpToBefore={onJumpToBefore}
+    onJumpToAfter={onJumpToAfter}
+    duration={adjustedDuration}
+  /> */}
+
   return (
     <button onClick={onClick} className="py-2">
       <div className="flex items-center">
