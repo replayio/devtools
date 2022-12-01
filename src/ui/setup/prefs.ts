@@ -99,14 +99,14 @@ async function getReplaySessions() {
   if (replaySessions) {
     return replaySessions;
   }
-  replaySessions = await asyncStore.replaySessions;
+  replaySessions = (await asyncStore.replaySessions) as ReplaySessions;
   return replaySessions;
 }
 
 export async function getReplaySession(
   recordingId: RecordingId
 ): Promise<ReplaySession | undefined> {
-  return (await asyncStore.replaySessions)[recordingId];
+  return ((await asyncStore.replaySessions) as ReplaySessions)[recordingId];
 }
 
 export enum LocalNag {

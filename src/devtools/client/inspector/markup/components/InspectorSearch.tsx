@@ -1,14 +1,12 @@
 import { Object as ProtocolObject } from "@replayio/protocol";
 import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 
+import Services from "devtools/shared/services";
 import type { UIThunkAction } from "ui/actions";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { getNodeDataAsync } from "ui/suspense/nodeCaches";
 
 import { searchDOM } from "../actions/markup";
 import { getSelectedDomNodeId, nodeSelected } from "../reducers/markup";
-
-const Services = require("devtools/shared/services");
 
 const doFullTextSearch = (
   queryBefore: string,

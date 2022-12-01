@@ -5,7 +5,7 @@
 
 "use strict";
 
-const Services = require("devtools/shared/services");
+const Services = require("devtools/shared/services").default;
 const { getCSSLexer } = require("./lexer");
 const { cssColors } = require("./color-db");
 

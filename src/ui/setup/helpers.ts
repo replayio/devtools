@@ -1,4 +1,3 @@
-import { asyncStore as debuggerAsyncStore } from "devtools/client/debugger/src/utils/prefs";
 // eslint-disable-next-line no-restricted-imports
 import { client, sendMessage, triggerEvent } from "protocol/socket";
 import { UIStore } from "ui/actions";
@@ -16,7 +15,6 @@ declare global {
     prefs: typeof prefs;
     features: typeof features;
     asyncStore: typeof asyncStore;
-    debuggerAsyncStore: typeof debuggerAsyncStore;
     dumpPrefs: () => string;
     dumpBasicProcessing: () => void;
     local: () => void;
@@ -57,7 +55,6 @@ export async function setupAppHelper(store: UIStore) {
     prefs,
     features,
     asyncStore,
-    debuggerAsyncStore,
     triggerEvent,
     replaySession,
     client,

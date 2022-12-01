@@ -92,7 +92,6 @@ export const STANDARD_EVENT_CATEGORIES: EventCategory[] = [
   {
     category: "Keyboard",
     events: [
-      // TODO Check Services.prefs.getBoolPref("dom.input_events.beforeinput.enabled")
       { type: "event.keyboard.beforeinput", label: "beforeinput" },
       { type: "event.keyboard.input", label: "input" },
       { type: "event.keyboard.keydown", label: "keydown" },

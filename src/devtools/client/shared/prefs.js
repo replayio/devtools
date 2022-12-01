@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const Services = require("devtools/shared/services");
+import Services from "devtools/shared/services";
 const EventEmitter = require("devtools/shared/event-emitter");
 
 /**
@@ -32,7 +32,7 @@ const EventEmitter = require("devtools/shared/event-emitter");
  * @param object prefsBlueprint
  *        An object containing { accessorName: [prefType, prefName] } keys.
  */
-function PrefsHelper(prefsRoot = "", prefsBlueprint = {}) {
+export function PrefsHelper(prefsRoot = "", prefsBlueprint = {}) {
   EventEmitter.decorate(this);
 
   const cache = new Map();
@@ -183,21 +183,17 @@ function makeObserver(self, cache, prefsRoot, prefsBlueprint) {
   };
 }
 
-exports.PrefsHelper = PrefsHelper;
-
 /**
  * A PreferenceObserver observes a pref branch for pref changes.
  * It emits an event for each preference change.
  */
-function PrefObserver(branchName) {
+export function PrefObserver(branchName) {
   this.branchName = branchName;
   this.branch = Services.prefs.getBranch(branchName);
   this.branch.addObserver("", this);
 
   EventEmitter.decorate(this);
 }
-
-exports.PrefObserver = PrefObserver;
 
 PrefObserver.prototype = {
   observe: function (subject, topic, data) {

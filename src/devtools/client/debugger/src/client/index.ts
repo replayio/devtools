@@ -11,7 +11,6 @@ import type { UIStore } from "ui/actions";
 import { allSourcesReceived } from "ui/reducers/sources";
 
 import { paused, resumed } from "../actions/pause";
-import { verifyPrefSchema } from "../utils/prefs";
 
 let store: UIStore;
 
@@ -29,8 +28,6 @@ export function bootstrap(
   store = _store;
 
   setupDebugger(ThreadFront, replayClient);
-
-  verifyPrefSchema();
 
   ThreadFront.on(
     "paused",

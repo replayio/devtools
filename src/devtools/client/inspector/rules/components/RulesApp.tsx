@@ -1,11 +1,10 @@
-const Services = require("devtools/shared/services");
-
 import React, { FC, useCallback, useMemo, useState } from "react";
 
 import { Rule } from "devtools/client/inspector/rules/components/Rule";
 import { Rules } from "devtools/client/inspector/rules/components/Rules";
 import { Toolbar } from "devtools/client/inspector/rules/components/Toolbar";
 import Accordion, { AccordionItem } from "devtools/client/shared/components/Accordion";
+import Services from "devtools/shared/services";
 import { useAppSelector } from "ui/setup/hooks";
 
 import { RuleInheritance } from "../models/rule";

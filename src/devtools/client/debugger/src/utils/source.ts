@@ -11,8 +11,8 @@ import { LoadingStatus } from "ui/utils/LoadingStatus";
 import type { SymbolDeclarations } from "../reducers/ast";
 import { getURL } from "./sources-tree/getURL";
 import { truncateMiddleText } from "./text";
+import { endTruncateStr } from "./text";
 import { parse as parseURL } from "./url";
-import { endTruncateStr } from "./utils";
 
 export { isMinified } from "./isMinified";
 

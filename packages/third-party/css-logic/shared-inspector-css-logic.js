@@ -15,7 +15,7 @@ const MAX_DATA_URL_LENGTH = 40;
  * @constructor
  */
 
-const Services = require("devtools/shared/services");
+const Services = require("devtools/shared/services").default;
 
 /**
  * Special values for filter, in addition to an href these values can be used

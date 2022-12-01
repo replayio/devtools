@@ -16,6 +16,18 @@ const NS_PREFBRANCH_PREFCHANGE_TOPIC_ID = "nsPref:changed";
 // We prefix all our local storage items with this.
 const PREFIX = "Services.prefs:";
 
+type PREF_VALUES = number | string | boolean;
+
+type $FixTypeLater = any;
+
+type ObserverFunction = (prefBranch: PrefBranch, topic: string, relativeName: string) => void;
+
+type TempObserver =
+  | {
+      observe: ObserverFunction;
+    }
+  | ObserverFunction;
+
 /**
  * Create a new preference branch.  This object conforms largely to
  * nsIPrefBranch and nsIPrefService, though it only implements the
@@ -27,54 +39,55 @@ const PREFIX = "Services.prefs:";
  * @param {String} name the base name of this branch
  * @param {String} fullName the fully-qualified name of this branch
  */
-function PrefBranch(parent, name, fullName) {
-  this._parent = parent;
-  this._name = name;
-  this._fullName = fullName;
-  this._observers = {};
-  this._children = {};
+class PrefBranch {
+  private _parent: PrefBranch | null;
+  private _name: string;
+  private _fullName: string;
+  private _observers: Record<string, TempObserver[]> = {};
+  private _children: Record<string, PrefBranch> = {};
 
-  // Properties used when this branch has a value as well.
-  this._defaultValue = null;
-  this._hasUserValue = false;
-  this._userValue = null;
-  this._type = PREF_INVALID;
-}
-
-PrefBranch.prototype = {
-  PREF_INVALID: PREF_INVALID,
-  PREF_STRING: PREF_STRING,
-  PREF_INT: PREF_INT,
-  PREF_BOOL: PREF_BOOL,
+  private _defaultValue: PREF_VALUES | null = null;
+  private _hasUserValue = false;
+  private _userValue: PREF_VALUES | null = null;
+  private _type: number = PREF_INVALID;
+  constructor(parent: PrefBranch | null, name: string, fullName: string) {
+    this._parent = parent;
+    this._name = name;
+    this._fullName = fullName;
+  }
+  PREF_INVALID = PREF_INVALID;
+  PREF_STRING = PREF_STRING;
+  PREF_INT = PREF_INT;
+  PREF_BOOL = PREF_BOOL;
 
   /** @see nsIPrefBranch.root.  */
   get root() {
     return this._fullName;
-  },
+  }
 
   /** @see nsIPrefBranch.getPrefType.  */
-  getPrefType: function (prefName) {
+  getPrefType = (prefName: string) => {
     return this._findPref(prefName)._type;
-  },
+  };
 
   /** @see nsIPrefBranch.getBoolPref.  */
-  getBoolPref: function (prefName, defaultValue) {
+  getBoolPref = (prefName: string, defaultValue?: PREF_VALUES): boolean => {
     try {
       let thePref = this._findPref(prefName);
       if (thePref._type !== PREF_BOOL) {
         throw new Error(`${prefName} does not have bool type`);
       }
-      return thePref._get();
+      return thePref._get() as boolean;
     } catch (e) {
       if (typeof defaultValue !== "undefined") {
-        return defaultValue;
+        return defaultValue as boolean;
       }
       throw e;
     }
-  },
+  };
 
   /** @see nsIPrefBranch.setBoolPref.  */
-  setBoolPref: function (prefName, value) {
+  setBoolPref = (prefName: string, value: boolean) => {
     if (typeof value !== "boolean") {
       throw new Error("non-bool passed to setBoolPref");
     }
@@ -83,31 +96,31 @@ PrefBranch.prototype = {
       throw new Error(`${prefName} does not have bool type`);
     }
     thePref._set(value);
-  },
+  };
 
   /** @see nsIPrefBranch.getCharPref.  */
-  getCharPref: function (prefName, defaultValue) {
+  getCharPref = (prefName: string, defaultValue?: PREF_VALUES): string => {
     try {
       let thePref = this._findPref(prefName);
       if (thePref._type !== PREF_STRING) {
         throw new Error(`${prefName} does not have string type`);
       }
-      return thePref._get();
+      return thePref._get() as string;
     } catch (e) {
       if (typeof defaultValue !== "undefined") {
-        return defaultValue;
+        return defaultValue as string;
       }
       throw e;
     }
-  },
+  };
 
   /** @see nsIPrefBranch.getStringPref.  */
-  getStringPref: function () {
-    return this.getCharPref.apply(this, arguments);
-  },
+  getStringPref = (prefName: string, defaultValue?: string) => {
+    return this.getCharPref(prefName, defaultValue);
+  };
 
   /** @see nsIPrefBranch.setCharPref.  */
-  setCharPref: function (prefName, value) {
+  setCharPref = (prefName: string, value: string) => {
     if (typeof value !== "string") {
       throw new Error("non-string passed to setCharPref");
     }
@@ -116,31 +129,31 @@ PrefBranch.prototype = {
       throw new Error(`${prefName} does not have string type`);
     }
     thePref._set(value);
-  },
+  };
 
   /** @see nsIPrefBranch.setStringPref.  */
-  setStringPref: function () {
-    return this.setCharPref.apply(this, arguments);
-  },
+  setStringPref = (prefName: string, value: string) => {
+    return this.setCharPref(prefName, value);
+  };
 
   /** @see nsIPrefBranch.getIntPref.  */
-  getIntPref: function (prefName, defaultValue) {
+  getIntPref = (prefName: string, defaultValue?: number): number => {
     try {
       let thePref = this._findPref(prefName);
       if (thePref._type !== PREF_INT) {
         throw new Error(`${prefName} does not have int type`);
       }
-      return thePref._get();
+      return thePref._get() as number;
     } catch (e) {
       if (typeof defaultValue !== "undefined") {
         return defaultValue;
       }
       throw e;
     }
-  },
+  };
 
   /** @see nsIPrefBranch.setIntPref.  */
-  setIntPref: function (prefName, value) {
+  setIntPref = (prefName: string, value: number) => {
     if (typeof value !== "number") {
       throw new Error("non-number passed to setIntPref");
     }
@@ -149,22 +162,22 @@ PrefBranch.prototype = {
       throw new Error(`${prefName} does not have int type`);
     }
     thePref._set(value);
-  },
+  };
 
   /** @see nsIPrefBranch.clearUserPref */
-  clearUserPref: function (prefName) {
+  clearUserPref = (prefName: string) => {
     let thePref = this._findPref(prefName);
     thePref._clearUserValue();
-  },
+  };
 
   /** @see nsIPrefBranch.prefHasUserValue */
-  prefHasUserValue: function (prefName) {
+  prefHasUserValue = (prefName: string) => {
     let thePref = this._findPref(prefName);
     return thePref._hasUserValue;
-  },
+  };
 
   /** @see nsIPrefBranch.addObserver */
-  addObserver: function (domain, observer, holdWeak) {
+  addObserver = (domain: string, observer: $FixTypeLater, holdWeak: boolean) => {
     if (holdWeak) {
       throw new Error("shim prefs only supports strong observers");
     }
@@ -173,10 +186,10 @@ PrefBranch.prototype = {
       this._observers[domain] = [];
     }
     this._observers[domain].push(observer);
-  },
+  };
 
   /** @see nsIPrefBranch.removeObserver */
-  removeObserver: function (domain, observer) {
+  removeObserver = (domain: string, observer: $FixTypeLater) => {
     if (!(domain in this._observers)) {
       return;
     }
@@ -184,18 +197,10 @@ PrefBranch.prototype = {
     if (index >= 0) {
       this._observers[domain].splice(index, 1);
     }
-  },
-
-  /** @see nsIPrefService.savePrefFile */
-  savePrefFile: function (file) {
-    if (file) {
-      throw new Error("shim prefs only supports null file in savePrefFile");
-    }
-    // Nothing to do - this implementation always writes back.
-  },
+  };
 
   /** @see nsIPrefService.getBranch */
-  getBranch: function (prefRoot) {
+  getBranch = (prefRoot: string) => {
     if (!prefRoot) {
       return this;
     }
@@ -205,7 +210,7 @@ PrefBranch.prototype = {
     // This is a bit weird since it could erroneously return a pref,
     // not a pref branch.
     return this._findPref(prefRoot);
-  },
+  };
 
   /**
    * Return this preference's current value.
@@ -214,12 +219,12 @@ PrefBranch.prototype = {
    *         return a string, a number, or a boolean depending on the
    *         preference's type.
    */
-  _get: function () {
+  _get = () => {
     if (this._hasUserValue) {
       return this._userValue;
     }
     return this._defaultValue;
-  },
+  };
 
   /**
    * Set the preference's value.  The new value is assumed to be a
@@ -228,13 +233,13 @@ PrefBranch.prototype = {
    *
    * @param {Any} value the new value
    */
-  _set: function (value) {
+  _set = (value: PREF_VALUES) => {
     if (!this._hasUserValue || value !== this._userValue) {
       this._userValue = value;
       this._hasUserValue = true;
       this._saveAndNotify();
     }
-  },
+  };
 
   /**
    * Set the default value for this preference, and emit a
@@ -242,32 +247,32 @@ PrefBranch.prototype = {
    *
    * @param {Any} value the new default value
    */
-  _setDefault: function (value) {
+  _setDefault = (value: PREF_VALUES) => {
     if (this._defaultValue !== value) {
       this._defaultValue = value;
       if (!this._hasUserValue) {
         this._saveAndNotify();
       }
     }
-  },
+  };
 
   /**
    * If this preference has a user value, clear it.  If a change was
    * made, emit a change notification.
    */
-  _clearUserValue: function () {
+  _clearUserValue = () => {
     if (this._hasUserValue) {
       this._userValue = null;
       this._hasUserValue = false;
       this._saveAndNotify();
     }
-  },
+  };
 
   /**
    * Helper function to write the preference's value to local storage
    * and then emit a change notification.
    */
-  _saveAndNotify: function () {
+  _saveAndNotify = () => {
     let store = {
       type: this._type,
       defaultValue: this._defaultValue,
@@ -276,8 +281,8 @@ PrefBranch.prototype = {
     };
 
     localStorage.setItem(PREFIX + this._fullName, JSON.stringify(store));
-    this._parent._notify(this._name);
-  },
+    this._parent?._notify(this._name);
+  };
 
   /**
    * Change this preference's value without writing it back to local
@@ -297,15 +302,20 @@ PrefBranch.prototype = {
    *        and |hasUserValue| is a boolean indicating whether the user value
    *        is valid
    */
-  _storageUpdated: function (type, userValue, hasUserValue, defaultValue) {
+  _storageUpdated = (
+    type: number,
+    userValue: PREF_VALUES,
+    hasUserValue: boolean,
+    defaultValue: PREF_VALUES
+  ) => {
     this._type = type;
     this._defaultValue = defaultValue;
     this._hasUserValue = hasUserValue;
     this._userValue = userValue;
     // There's no need to write this back to local storage, since it
     // came from there; and this avoids infinite event loops.
-    this._parent._notify(this._name);
-  },
+    this._parent?._notify(this._name);
+  };
 
   /**
    * Helper function to find either a Preference or PrefBranch object
@@ -314,9 +324,9 @@ PrefBranch.prototype = {
    * @param {String} prefName the fully-qualified preference name
    * @return {Object} Either a Preference or PrefBranch object
    */
-  _findPref: function (prefName) {
+  _findPref = (prefName: string) => {
     let branchNames = prefName.split(".");
-    let branch = this;
+    let branch: PrefBranch = this;
 
     for (let branchName of branchNames) {
       branch = branch._children[branchName];
@@ -326,7 +336,7 @@ PrefBranch.prototype = {
     }
 
     return branch;
-  },
+  };
 
   /**
    * Helper function to notify any observers when a preference has
@@ -336,7 +346,7 @@ PrefBranch.prototype = {
    * @param {String} relativeName the name of the updated pref,
    *        relative to this branch
    */
-  _notify: function (relativeName) {
+  _notify = (relativeName: string) => {
     for (let domain in this._observers) {
       if (
         relativeName === domain ||
@@ -364,7 +374,7 @@ PrefBranch.prototype = {
     if (this._parent) {
       this._parent._notify(`${this._name}.${relativeName}`);
     }
-  },
+  };
 
   /**
    * Helper function to create a branch given an array of branch names
@@ -374,8 +384,8 @@ PrefBranch.prototype = {
    *        of the branch to be created
    * @return {PrefBranch} the new branch
    */
-  _createBranch: function (branchList) {
-    let parent = this;
+  _createBranch = (branchList: string[]) => {
+    let parent: PrefBranch = this;
     for (let branch of branchList) {
       if (!parent._children[branch]) {
         let isParentRoot = !parent._parent;
@@ -385,7 +395,7 @@ PrefBranch.prototype = {
       parent = parent._children[branch];
     }
     return parent;
-  },
+  };
 
   /**
    * Create a new preference.  The new preference is assumed to be in
@@ -401,7 +411,13 @@ PrefBranch.prototype = {
    * @param {Boolean} init if true, then this call is initialization
    *        from local storage and should override the default prefs
    */
-  _findOrCreatePref: function (keyName, userValue, hasUserValue, defaultValue, init = false) {
+  _findOrCreatePref = (
+    keyName: string,
+    userValue: PREF_VALUES,
+    hasUserValue: boolean,
+    defaultValue: PREF_VALUES,
+    init = false
+  ) => {
     let branch = this._createBranch(keyName.split("."));
     if (hasUserValue && typeof userValue !== typeof defaultValue) {
       throw new Error(`inconsistent values when creating ${keyName}`);
@@ -429,15 +445,15 @@ PrefBranch.prototype = {
     }
 
     return branch;
-  },
+  };
 
-  getKeyName: function (keyName) {
+  getKeyName = (keyName: string) => {
     if (keyName.startsWith(PREFIX)) {
       return keyName.slice(PREFIX.length);
     }
 
     return keyName;
-  },
+  };
 
   /**
    * Helper function that is called when local storage changes.  This
@@ -446,7 +462,7 @@ PrefBranch.prototype = {
    * @param {StorageEvent} event the event representing the local
    *        storage change
    */
-  _onStorageChange: function (event) {
+  _onStorageChange = (event: StorageEvent) => {
     if (event.storageArea !== localStorage || !event.key) {
       return;
     }
@@ -469,31 +485,22 @@ PrefBranch.prototype = {
       let thePref = this._findPref(key);
       thePref._storageUpdated(type, userValue, hasUserValue, defaultValue);
     }
-  },
+  };
 
   /**
    * Helper function to initialize the root PrefBranch.
    */
-  _initializeRoot: function () {
+  _initializeRoot = () => {
     if (typeof window === "undefined") {
       return;
-    }
-
-    if (Services._defaultPrefsEnabled) {
-      /* eslint-disable no-eval */
-      // let devtools = require("raw!prefs!devtools/client/preferences/devtools");
-      // eval(devtools);
-      // let all = require("raw!prefs!modules/libpref/init/all");
-      // eval(all);
-      /* eslint-enable no-eval */
     }
 
     // Read the prefs from local storage and create the local
     // representations.
     for (let i = 0; i < localStorage.length; ++i) {
       let keyName = localStorage.key(i);
-      if (keyName.startsWith(PREFIX)) {
-        let { userValue, hasUserValue, defaultValue } = JSON.parse(localStorage.getItem(keyName));
+      if (keyName?.startsWith(PREFIX)) {
+        let { userValue, hasUserValue, defaultValue } = JSON.parse(localStorage.getItem(keyName)!);
         this._findOrCreatePref(
           keyName.slice(PREFIX.length),
           userValue,
@@ -506,42 +513,22 @@ PrefBranch.prototype = {
 
     this._onStorageChange = this._onStorageChange.bind(this);
     window.addEventListener("storage", this._onStorageChange);
-  },
-};
-
-class ObserverService {
-  constructor() {
-    this._observers = new Map();
-  }
-
-  addObserver(observer, topic) {
-    const topicObservers = this._observers.get(topic) || [];
-    this._observers.set(topic, topicObservers.concat(observer));
-  }
-
-  removeObserver(observer, topic) {
-    let topicObservers = this._observers.get(topic) || [];
-    topicObservers = topicObservers.filter(obs => obs != observer);
-    if (topicObservers.length === 0) {
-      this._observers.delete(topic);
-    } else {
-      this._observers.set(topic, topicObservers.concat(observer));
-    }
-  }
-
-  notifyObservers(topic, data) {
-    for (const observer of this._observers.get(topic) || []) {
-      observer(data);
-    }
-  }
+  };
 }
 
-const Services = {
-  _prefs: null,
+interface ServicesObj {
+  _prefs: PrefBranch | null;
+  prefs: PrefBranch;
+  appinfo: {
+    OS: "Linux" | "WINNT" | "Darwin" | "Unknown";
+    name: string;
+    version: string;
+    is64Bit: boolean;
+  };
+}
 
-  // For use by tests.  If set to false before Services.prefs is used,
-  // this will disable the reading of the default prefs.
-  _defaultPrefsEnabled: true,
+const Services: ServicesObj = {
+  _prefs: null,
 
   /**
    * An implementation of nsIPrefService that is based on local
@@ -557,11 +544,6 @@ const Services = {
     }
     return this._prefs;
   },
-
-  /**
-   * An implementation of nsIObserverService.
-   */
-  obs: new ObserverService(),
 
   /**
    * An implementation of Services.appinfo that holds just the
@@ -600,80 +582,6 @@ const Services = {
       return true;
     },
   },
-
-  /**
-   * An implementation of Services.focus that holds just the
-   * properties and methods needed by devtools.
-   * @see nsIFocusManager.idl for details.
-   */
-  focus: {
-    // These values match nsIFocusManager in order to make testing a
-    // bit simpler.
-    MOVEFOCUS_FORWARD: 1,
-    MOVEFOCUS_BACKWARD: 2,
-
-    get focusedElement() {
-      if (!document.hasFocus()) {
-        return null;
-      }
-      return document.activeElement;
-    },
-
-    moveFocus: function (window, startElement, type, flags) {
-      if (flags !== 0) {
-        throw new Error("shim Services.focus.moveFocus only accepts flags===0");
-      }
-      if (type !== Services.focus.MOVEFOCUS_FORWARD && type !== Services.focus.MOVEFOCUS_BACKWARD) {
-        throw new Error(
-          "shim Services.focus.moveFocus only supports " +
-            " MOVEFOCUS_FORWARD and MOVEFOCUS_BACKWARD"
-        );
-      }
-
-      if (!startElement) {
-        startElement = document.activeElement || document;
-      }
-
-      let iter = document.createTreeWalker(document, NodeFilter.SHOW_ELEMENT, {
-        acceptNode: function (node) {
-          let tabIndex = node.getAttribute("tabindex");
-          if (tabIndex === "-1") {
-            return NodeFilter.FILTER_SKIP;
-          }
-          node.focus();
-          if (document.activeElement == node) {
-            return NodeFilter.FILTER_ACCEPT;
-          }
-          return NodeFilter.FILTER_SKIP;
-        },
-      });
-
-      iter.currentNode = startElement;
-
-      // Sets the focus via side effect in the filter.
-      if (type === Services.focus.MOVEFOCUS_FORWARD) {
-        iter.nextNode();
-      } else {
-        iter.previousNode();
-      }
-    },
-  },
-
-  /**
-   * An implementation of Services.wm that provides a shim for
-   * getMostRecentWindow.
-   */
-  wm: {
-    getMostRecentWindow: function () {
-      // Having the returned object implement openUILinkIn is
-      // sufficient for our purposes.
-      return {
-        openUILinkIn: function (url) {
-          window.open(url, "_blank");
-        },
-      };
-    },
-  },
 };
 
 /**
@@ -684,10 +592,9 @@ const Services = {
  * @param {String} name the name of the preference
  * @param {Any} value the default value of the preference
  */
-function pref(name, value) {
+export function pref(name: string, value: PREF_VALUES) {
   let thePref = Services.prefs._findOrCreatePref(name, value, true, value);
   thePref._setDefault(value);
 }
 
-module.exports = Services;
-Services.pref = pref;
+export default Services;
