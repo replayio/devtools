@@ -4,7 +4,7 @@
 
 //
 
-function WorkerDispatcher() {
+export function WorkerDispatcher() {
   this.msgId = 1;
   this.worker = null;
 }
@@ -92,7 +92,7 @@ WorkerDispatcher.prototype = {
   },
 };
 
-function workerHandler(publicInterface) {
+export function workerHandler(publicInterface) {
   return function (msg) {
     const { id, method, calls } = msg.data;
 
@@ -134,8 +134,3 @@ function asErrorMessage(error) {
     metadata: undefined,
   };
 }
-
-module.exports = {
-  WorkerDispatcher,
-  workerHandler,
-};

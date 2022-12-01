@@ -1,5 +1,5 @@
-const Menu = require("devtools/client/framework/menu");
-const MenuItem = require("devtools/client/framework/menu-item");
+import Menu from "devtools/client/framework/menu";
+import MenuItem from "devtools/client/framework/menu-item";
 
 function inToolbox() {
   try {
@@ -25,7 +25,7 @@ function onShown(menu, popup) {
   });
 }
 
-function showMenu(evt, items) {
+export function showMenu(evt, items) {
   if (items.length === 0) {
     return;
   }
@@ -83,7 +83,7 @@ function showSubMenu(subMenu, menuItemNode, popup) {
   }
 }
 
-function buildMenu(items) {
+export function buildMenu(items) {
   return items
     .map(itm => {
       const hide = typeof itm.hidden === "function" ? itm.hidden() : itm.hidden;
@@ -91,8 +91,3 @@ function buildMenu(items) {
     })
     .filter(itm => itm !== null);
 }
-
-module.exports = {
-  showMenu,
-  buildMenu,
-};

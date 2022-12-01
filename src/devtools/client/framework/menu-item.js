@@ -74,4 +74,4 @@ function MenuItem({
   this.visible = visible;
 }
 
-module.exports = MenuItem;
+export default MenuItem;

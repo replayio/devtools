@@ -2,16 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { generateUUID } = require("devtools/shared/generate-uuid");
-const { hasCSSVariable } = require("devtools/client/inspector/rules/utils/utils");
-const { escapeCSSComment } = require("third-party/css/parsing-utils");
-
+import { hasCSSVariable } from "devtools/client/inspector/rules/utils/utils";
+import { generateUUID } from "devtools/shared/generate-uuid";
 import CSSProperties from "third-party/css/css-properties";
+import { OutputParser } from "third-party/css/output-parser";
+import { escapeCSSComment } from "third-party/css/parsing-utils";
 
 import ElementStyle from "./element-style";
 import RuleModel from "./rule";
-
-const { OutputParser } = require("third-party/css/output-parser");
 
 export type Priority = "" | "important" | undefined;
 
@@ -39,17 +37,7 @@ function getDummyElement() {
   return dummyElement;
 }
 
-interface OutputParserClass {
-  parseCssProperty: (
-    name: string,
-    value: string,
-    options: {
-      baseURI?: string | null;
-    }
-  ) => (string | { type: string; value: string })[];
-}
-
-let outputParser: OutputParserClass;
+let outputParser: OutputParser;
 
 function getOutputParser() {
   if (!outputParser) {
@@ -159,7 +147,7 @@ export default class TextProperty {
 
     return getOutputParser().parseCssProperty(this.name, value, {
       baseURI: this.rule.ruleHref,
-    });
+    }) as (string | { type: string; value: string })[];
   }
 
   /**

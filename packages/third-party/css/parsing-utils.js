@@ -11,18 +11,41 @@
 
 "use strict";
 
-const { getCSSLexer } = require("./lexer");
+/*
+  TODO Convert this file to TS
 
-const SELECTOR_ATTRIBUTE = (module.exports.SELECTOR_ATTRIBUTE = 1);
-const SELECTOR_ELEMENT = (module.exports.SELECTOR_ELEMENT = 2);
-const SELECTOR_PSEUDO_CLASS = (module.exports.SELECTOR_PSEUDO_CLASS = 3);
-const CSS_BLOCKS = { "(": ")", "[": "]", "{": "}" };
+  This TS typedef was in a .d.ts file, but the one function declaration 
+  wasn't providing much value and it's easier to delete the .d.ts file than
+  to convert this all to TS right now
+
+  export interface ParsedCSSDeclaration {
+    name;
+    value;
+    priority: "" | "important";
+    terminator;
+    offsets: [start, end];
+    colonOffsets: [start, end];
+    commentOffsets?: [start, end];
+  }
+
+  export function parseNamedDeclarations(
+    isCssPropertyKnown: (cssProperty) => boolean,
+    inputString,
+    parseComments?
+  ): ParsedCSSDeclaration[];
+*/
+
+import { getCSSLexer } from "./lexer";
+
+export const SELECTOR_ATTRIBUTE = 1;
+export const SELECTOR_ELEMENT = 2;
+export const SELECTOR_PSEUDO_CLASS = 3;
+export const CSS_BLOCKS = { "(": ")", "[": "]", "{": "}" };
 
 // When commenting out a declaration, we put this character into the
 // comment opener so that future parses of the commented text know to
 // bypass the property name validity heuristic.
-const COMMENT_PARSING_HEURISTIC_BYPASS_CHAR =
-  (module.exports.COMMENT_PARSING_HEURISTIC_BYPASS_CHAR = "!");
+export const COMMENT_PARSING_HEURISTIC_BYPASS_CHAR = "!";
 
 /**
  * A generator function that lexes a CSS source string, yielding the
@@ -32,7 +55,7 @@ const COMMENT_PARSING_HEURISTIC_BYPASS_CHAR =
  * @yield {CSSToken} The next CSSToken that is lexed
  * @see CSSToken for details about the returned tokens
  */
-function* cssTokenizer(string) {
+export function* cssTokenizer(string) {
   const lexer = getCSSLexer(string);
   while (true) {
     const token = lexer.nextToken();
@@ -65,7 +88,7 @@ function* cssTokenizer(string) {
  * @return {Array} An array of tokens (@see CSSToken) that have
  *        line and column information.
  */
-function cssTokenizerWithLineColumn(string) {
+export function cssTokenizerWithLineColumn(string) {
   const lexer = getCSSLexer(string);
   const result = [];
   let prevToken = undefined;
@@ -112,7 +135,7 @@ function cssTokenizerWithLineColumn(string) {
  *                 input string
  * @return {String} the escaped result
  */
-function escapeCSSComment(inputString) {
+export function escapeCSSComment(inputString) {
   const result = inputString.replace(/\/(\\*)\*/g, "/\\$1*");
   return result.replace(/\*(\\*)\//g, "*\\$1/");
 }
@@ -126,7 +149,7 @@ function escapeCSSComment(inputString) {
  *                 input string
  * @return {String} the un-escaped result
  */
-function unescapeCSSComment(inputString) {
+export function unescapeCSSComment(inputString) {
   const result = inputString.replace(/\/\\(\\*)\*/g, "/$1*");
   return result.replace(/\*\\(\\*)\//g, "*$1/");
 }
@@ -149,7 +172,7 @@ function unescapeCSSComment(inputString) {
  * @return {array} Array of declarations of the same form as returned
  *                 by parseDeclarations.
  */
-function parseCommentDeclarations(isCssPropertyKnown, commentText, startOffset, endOffset) {
+export function parseCommentDeclarations(isCssPropertyKnown, commentText, startOffset, endOffset) {
   let commentOverride = false;
   if (commentText === "") {
     return [];
@@ -229,7 +252,7 @@ function parseCommentDeclarations(isCssPropertyKnown, commentText, startOffset, 
  * @return {object} an empty declaration of the form returned by
  *                  parseDeclarations
  */
-function getEmptyDeclaration() {
+export function getEmptyDeclaration() {
   return {
     name: "",
     value: "",
@@ -243,7 +266,7 @@ function getEmptyDeclaration() {
 /**
  * Like trim, but only trims CSS-allowed whitespace.
  */
-function cssTrim(str) {
+export function cssTrim(str) {
   const match = /^[ \t\r\n\f]*(.*?)[ \t\r\n\f]*$/.exec(str);
   if (match) {
     return match[1];
@@ -517,7 +540,7 @@ function parseDeclarationsInternal(
  *         on the object, which will hold the offsets of the start
  *         and end of the enclosing comment.
  */
-function parseDeclarations(isCssPropertyKnown, inputString, parseComments = false) {
+export function parseDeclarations(isCssPropertyKnown, inputString, parseComments = false) {
   return parseDeclarationsInternal(isCssPropertyKnown, inputString, parseComments, false, false);
 }
 
@@ -525,7 +548,7 @@ function parseDeclarations(isCssPropertyKnown, inputString, parseComments = fals
  * Like @see parseDeclarations, but removes properties that do not
  * have a name.
  */
-function parseNamedDeclarations(isCssPropertyKnown, inputString, parseComments = false) {
+export function parseNamedDeclarations(isCssPropertyKnown, inputString, parseComments = false) {
   return parseDeclarations(isCssPropertyKnown, inputString, parseComments).filter(
     item => !!item.name
   );
@@ -547,10 +570,10 @@ function parseNamedDeclarations(isCssPropertyKnown, inputString, parseComments =
  * @param {String} value
  *        The CSS selector text.
  * @return {Array} an array of objects with the following signature:
- *         [{ "value": string, "type": integer }, ...]
+ *         [{ "value", "type": integer }, ...]
  */
 // eslint-disable-next-line complexity
-function parsePseudoClassesAndAttributes(value) {
+export function parsePseudoClassesAndAttributes(value) {
   if (!value) {
     throw new Error("empty input string");
   }
@@ -648,7 +671,7 @@ function parsePseudoClassesAndAttributes(value) {
  *        The value from the text editor.
  * @return {Object} an object with 'value' and 'priority' properties.
  */
-function parseSingleValue(isCssPropertyKnown, value) {
+export function parseSingleValue(isCssPropertyKnown, value) {
   const declaration = parseDeclarations(isCssPropertyKnown, "a: " + value + ";")[0];
   return {
     value: declaration ? declaration.value : "",
@@ -663,7 +686,7 @@ function parseSingleValue(isCssPropertyKnown, value) {
  * @param {CSS_ANGLEUNIT} angleUnit The angleValue's angle unit.
  * @return {Number} An angle value in degree.
  */
-function getAngleValueInDegrees(angleValue, angleUnit) {
+ export function getAngleValueInDegrees(angleValue, angleUnit) {
   switch (angleUnit) {
     case CSS_ANGLEUNIT.deg:
       return angleValue;
@@ -678,14 +701,3 @@ function getAngleValueInDegrees(angleValue, angleUnit) {
   }
 }
 
-module.exports.cssTokenizer = cssTokenizer;
-module.exports.cssTokenizerWithLineColumn = cssTokenizerWithLineColumn;
-module.exports.escapeCSSComment = escapeCSSComment;
-module.exports.unescapeCSSComment = unescapeCSSComment;
-module.exports.parseDeclarations = parseDeclarations;
-module.exports.parseNamedDeclarations = parseNamedDeclarations;
-// parseCommentDeclarations is exported for testing.
-module.exports._parseCommentDeclarations = parseCommentDeclarations;
-module.exports.parsePseudoClassesAndAttributes = parsePseudoClassesAndAttributes;
-module.exports.parseSingleValue = parseSingleValue;
-module.exports.getAngleValueInDegrees = getAngleValueInDegrees;

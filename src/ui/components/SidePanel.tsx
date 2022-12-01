@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
+import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPanes";
+import Accordion from "devtools/client/debugger/src/components/shared/Accordion";
 import TestInfo from "devtools/client/debugger/src/components/TestInfo/TestInfo";
 import Events from "ui/components/Events";
 import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
@@ -16,9 +18,6 @@ import ReplayInfo from "./Events/ReplayInfo";
 import ProtocolViewer from "./ProtocolViewer";
 import StatusDropdown from "./shared/StatusDropdown";
 import styles from "./SidePanel.module.css";
-
-const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
-const Accordion = require("devtools/client/debugger/src/components/shared/Accordion").default;
 
 function TestResultsSummary({ testCases }: { testCases: TestItem[] }) {
   const failed = testCases.filter(c => c.result === "failed").length;

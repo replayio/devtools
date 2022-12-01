@@ -8,13 +8,13 @@
  * Types of nodes used in the rule and computed view.
  */
 
-exports.VIEW_NODE_FONT_TYPE = "font-type";
-exports.VIEW_NODE_IMAGE_URL_TYPE = "image-url-type";
-exports.VIEW_NODE_INACTIVE_CSS = "inactive-css";
-exports.VIEW_NODE_LOCATION_TYPE = "location-type";
-exports.VIEW_NODE_PROPERTY_TYPE = "property-type";
-exports.VIEW_NODE_SELECTOR_TYPE = "selector-type";
-exports.VIEW_NODE_SHAPE_POINT_TYPE = "shape-point-type";
-exports.VIEW_NODE_SHAPE_SWATCH = "shape-swatch";
-exports.VIEW_NODE_VALUE_TYPE = "value-type";
-exports.VIEW_NODE_VARIABLE_TYPE = "variable-type";
+export const VIEW_NODE_FONT_TYPE = "font-type";
+export const VIEW_NODE_IMAGE_URL_TYPE = "image-url-type";
+export const VIEW_NODE_INACTIVE_CSS = "inactive-css";
+export const VIEW_NODE_LOCATION_TYPE = "location-type";
+export const VIEW_NODE_PROPERTY_TYPE = "property-type";
+export const VIEW_NODE_SELECTOR_TYPE = "selector-type";
+export const VIEW_NODE_SHAPE_POINT_TYPE = "shape-point-type";
+export const VIEW_NODE_SHAPE_SWATCH = "shape-swatch";
+export const VIEW_NODE_VALUE_TYPE = "value-type";
+export const VIEW_NODE_VARIABLE_TYPE = "variable-type";

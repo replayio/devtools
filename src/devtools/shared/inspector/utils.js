@@ -7,7 +7,7 @@
 /**
  * Truncate the string and add ellipsis to the middle of the string.
  */
-function truncateString(str, maxLength) {
+export function truncateString(str, maxLength) {
   if (!str || str.length <= maxLength) {
     return str;
   }
@@ -18,5 +18,3 @@ function truncateString(str, maxLength) {
     str.substring(str.length - Math.floor(maxLength / 2))
   );
 }
-
-exports.truncateString = truncateString;

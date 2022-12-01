@@ -15,12 +15,12 @@ const MAX_DATA_URL_LENGTH = 40;
  * @constructor
  */
 
-const Services = require("devtools/shared/services").default;
+import Services from "devtools/shared/services";
 
 /**
  * Special values for filter, in addition to an href these values can be used
  */
-exports.FILTER = {
+export const FILTER = {
   // show properties for all user style sheets.
   USER: "user",
   // USER, plus user-agent (i.e. browser) style sheets
@@ -35,7 +35,7 @@ exports.FILTER = {
  * string bundle.
  * @see csshtmltree.js RuleView._cacheStatusNames()
  */
-exports.STATUS = {
+export const STATUS = {
   BEST: 3,
   MATCHED: 2,
   PARENT_MATCH: 1,
@@ -47,7 +47,7 @@ exports.STATUS = {
  * Mapping of CSSRule type value to CSSRule type name.
  * @see https://developer.mozilla.org/en-US/docs/Web/API/CSSRule
  */
-exports.CSSRuleTypeName = {
+export const CSSRuleTypeName = {
   1: "", // Regular CSS style rule has no name
   3: "@import",
   4: "@media",
@@ -70,7 +70,7 @@ exports.CSSRuleTypeName = {
  * @return {boolean} true if the given stylesheet is an author stylesheet,
  * false otherwise.
  */
-exports.isAuthorStylesheet = function (sheet) {
+export const isAuthorStylesheet = function (sheet) {
   return sheet.parsingMode === "author";
 };
 
@@ -81,7 +81,7 @@ exports.isAuthorStylesheet = function (sheet) {
  * @return {boolean} true if the given stylesheet is a user stylesheet,
  * false otherwise.
  */
-exports.isUserStylesheet = function (sheet) {
+export const isUserStylesheet = function (sheet) {
   return sheet.parsingMode === "user";
 };
 
@@ -92,7 +92,7 @@ exports.isUserStylesheet = function (sheet) {
  * @return {boolean} true if the given stylesheet is a agent stylesheet,
  * false otherwise.
  */
-exports.isAgentStylesheet = function (sheet) {
+export const isAgentStylesheet = function (sheet) {
   return sheet.parsingMode === "agent";
 };
 
@@ -102,7 +102,7 @@ exports.isAgentStylesheet = function (sheet) {
  * @param {CSSStyleSheet} sheet the DOM object for the style sheet.
  */
 const shortSourceCache = new Map();
-exports.shortSource = function (sheet) {
+export const shortSource = function (sheet) {
   // Use a string like "inline" if there is no source href
   if (!sheet || !sheet.href) {
     return "inline";
@@ -190,7 +190,7 @@ function getLineCountInComments(text) {
  *          }
  */
 // eslint-disable-next-line complexity
-function prettifyCSS(text, ruleCount) {
+export function prettifyCSS(text, ruleCount) {
   if (prettifyCSS.LINE_SEPARATOR == null) {
     const os = Services.appinfo.OS;
     prettifyCSS.LINE_SEPARATOR = os === "WINNT" ? "\r\n" : "\n";
@@ -455,7 +455,6 @@ function prettifyCSS(text, ruleCount) {
   return { result, mappings };
 }
 
-exports.prettifyCSS = prettifyCSS;
 
 /**
  * Given a node, check to see if it is a ::marker, ::before, or ::after element.
@@ -467,7 +466,7 @@ exports.prettifyCSS = prettifyCSS;
  *            - {DOMNode} node The non-anonymous node
  *            - {string} pseudo One of ':marker', ':before', ':after', or null.
  */
-function getBindingElementAndPseudo(node) {
+export function getBindingElementAndPseudo(node) {
   let bindingElement = node;
   let pseudo = null;
   if (node.nodeName == "_moz_generated_content_marker") {
@@ -485,24 +484,22 @@ function getBindingElementAndPseudo(node) {
     pseudo: pseudo,
   };
 }
-exports.getBindingElementAndPseudo = getBindingElementAndPseudo;
 
 /**
  * Returns css style rules for a given a node.
  * This function can handle ::before or ::after pseudo element as well as
  * normal element.
  */
-function getCSSStyleRules(node) {
+export function getCSSStyleRules(node) {
   const { bindingElement, pseudo } = getBindingElementAndPseudo(node);
   const rules = InspectorUtils.getCSSStyleRules(bindingElement, pseudo);
   return rules;
 }
-exports.getCSSStyleRules = getCSSStyleRules;
 
 /**
  * Returns true if the given node has visited state.
  */
-function hasVisitedState(node) {
+export function hasVisitedState(node) {
   if (!node) {
     return false;
   }
@@ -514,7 +511,6 @@ function hasVisitedState(node) {
     InspectorUtils.hasPseudoClassLock(node, ":visited")
   );
 }
-exports.hasVisitedState = hasVisitedState;
 
 /**
  * Find the position of [element] in [nodeList].
@@ -563,7 +559,7 @@ function findNodeAndContainer(node) {
  *   - ele.containingDocOrShadow.querySelector(reply) === ele
  *   - ele.containingDocOrShadow.querySelectorAll(reply).length === 1
  */
-const findCssSelector = function (ele) {
+export const findCssSelector = function (ele) {
   const { node, containingDocOrShadow } = findNodeAndContainer(ele);
   ele = node;
 
@@ -623,7 +619,6 @@ const findCssSelector = function (ele) {
   }
   return selector;
 };
-exports.findCssSelector = findCssSelector;
 
 /**
  * If the element is in a frame or under a shadowRoot, return the corresponding
@@ -659,7 +654,7 @@ function getSelectorParent(node) {
  *         document. The selectors are ordered starting with the root document and
  *         ending with the deepest nested frame or shadow root.
  */
-const findAllCssSelectors = function (node) {
+export const findAllCssSelectors = function (node) {
   const selectors = [];
   while (node) {
     selectors.unshift(findCssSelector(node));
@@ -668,7 +663,6 @@ const findAllCssSelectors = function (node) {
 
   return selectors;
 };
-exports.findAllCssSelectors = findAllCssSelectors;
 
 /**
  * Get the full CSS path for a given element.
@@ -677,7 +671,7 @@ exports.findAllCssSelectors = findAllCssSelectors;
  * match the element uniquely. It does however, represent the full path from the root
  * node to the element.
  */
-function getCssPath(ele) {
+export function getCssPath(ele) {
   const { node, containingDocOrShadow } = findNodeAndContainer(ele);
   ele = node;
   if (!containingDocOrShadow || !containingDocOrShadow.contains(ele)) {
@@ -723,7 +717,6 @@ function getCssPath(ele) {
 
   return paths.length ? paths.join(" ") : "";
 }
-exports.getCssPath = getCssPath;
 
 /**
  * Get the xpath for a given element.
@@ -731,7 +724,7 @@ exports.getCssPath = getCssPath;
  * @param {DomNode} ele
  * @returns a string that can be used as an XPath to find the element uniquely.
  */
-function getXPath(ele) {
+export function getXPath(ele) {
   const { node, containingDocOrShadow } = findNodeAndContainer(ele);
   ele = node;
   if (!containingDocOrShadow || !containingDocOrShadow.contains(ele)) {
@@ -784,4 +777,3 @@ function getXPath(ele) {
 
   return parts.length ? "/" + parts.reverse().join("/") : "";
 }
-exports.getXPath = getXPath;

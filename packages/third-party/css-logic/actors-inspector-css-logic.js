@@ -27,8 +27,8 @@
 
 "use strict";
 
-const nodeConstants = require("devtools/shared/dom-node-constants").default;
-const {
+import nodeConstants from "devtools/shared/dom-node-constants";
+import {
   getBindingElementAndPseudo,
   getCSSStyleRules,
   hasVisitedState,
@@ -38,18 +38,17 @@ const {
   shortSource,
   FILTER,
   STATUS,
-} = require("./shared-inspector-css-logic");
+} from "./shared-inspector-css-logic";
 
 const COMPAREMODE = {
   BOOLEAN: "bool",
   INTEGER: "int",
 };
 
-function CssLogic() {
+export function CssLogic() {
   this._propertyInfos = {};
 }
 
-exports.CssLogic = CssLogic;
 
 CssLogic.prototype = {
   // Both setup by highlight().
@@ -1061,7 +1060,7 @@ CssRule.prototype = {
  * @param {string} selector The selector that we wish to investigate.
  * @param {Number} index The index of the selector within it's rule.
  */
-function CssSelector(cssRule, selector, index) {
+export function CssSelector(cssRule, selector, index) {
   this.cssRule = cssRule;
   this.text = selector;
   this.inlineStyle = this.text == "@element.style";
@@ -1069,7 +1068,6 @@ function CssSelector(cssRule, selector, index) {
   this.selectorIndex = index;
 }
 
-exports.CssSelector = CssSelector;
 
 CssSelector.prototype = {
   _matchId: null,

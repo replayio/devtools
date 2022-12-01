@@ -1,10 +1,9 @@
 import React from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { trackEvent } from "ui/utils/telemetry";
-
-const { openQuickOpen } = require("devtools/client/debugger/src/actions/quick-open");
 
 function QuickOpenButton({ openQuickOpen }: PropsFromRedux) {
   const onClick = (e: React.MouseEvent) => {

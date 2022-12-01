@@ -4,7 +4,7 @@
 "use strict";
 
 import Services from "devtools/shared/services";
-const EventEmitter = require("devtools/shared/event-emitter");
+import EventEmitter from "devtools/shared/event-emitter";
 
 /**
  * Shortcuts for lazily accessing and setting various preferences.
