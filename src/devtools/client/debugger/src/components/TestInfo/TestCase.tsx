@@ -1,14 +1,22 @@
-import { Location } from "@replayio/protocol";
-import { useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 import { getRecordingDuration } from "ui/actions/app";
-import { seekToTime, setFocusRegion } from "ui/actions/timeline";
+import { seekToTime, setFocusRegion, startPlayback } from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem, TestResult } from "ui/types";
 
 import { TestSteps } from "./TestSteps";
+
+export type TestCaseContextType = {
+  startTime: number;
+  endTime: number;
+  onReplay: () => void;
+  onPlayFromHere: (startTime: number) => void;
+};
+
+export const TestCaseContext = createContext<TestCaseContextType>(null as any);
 
 export function TestCase({
   test,
@@ -68,33 +76,44 @@ export function TestCase({
     }
   }, [isHighlighted]);
 
+  const onReplay = () => {
+    dispatch(startPlayback({ beginTime: testStartTime, endTime: testEndTime - 1 }));
+  };
+  const onPlayFromHere = (beginTime: number) => {
+    dispatch(startPlayback({ beginTime, endTime: testEndTime - 1 }));
+  };
+
   return (
-    <div className="flex flex-col">
-      {!isHighlighted && (
-        <div className="flex flex-row items-center justify-between gap-1 rounded-lg p-1 transition hover:cursor-pointer">
-          <button
-            onClick={toggleExpand}
-            disabled={!expandable}
-            className="group flex flex-grow flex-row gap-1 overflow-hidden"
-          >
-            <Status result={test.result} />
-            <div className="flex flex-col items-start text-bodyColor">
-              <div
-                className={`overflow-hidden overflow-ellipsis whitespace-pre ${"group-hover:underline"}`}
-              >
-                {test.title}
-              </div>
-              {test.error ? (
-                <div className="mt-1 overflow-hidden rounded-lg bg-testsuitesErrorBgcolor px-2 py-1 text-left font-mono ">
-                  {test.error.message}
+    <TestCaseContext.Provider
+      value={{ startTime: testStartTime, endTime: testEndTime, onReplay, onPlayFromHere }}
+    >
+      <div className="flex flex-col">
+        {!isHighlighted && (
+          <div className="flex flex-row items-center justify-between gap-1 rounded-lg p-1 transition hover:cursor-pointer">
+            <button
+              onClick={toggleExpand}
+              disabled={!expandable}
+              className="group flex flex-grow flex-row gap-1 overflow-hidden"
+            >
+              <Status result={test.result} />
+              <div className="flex flex-col items-start text-bodyColor">
+                <div
+                  className={`overflow-hidden overflow-ellipsis whitespace-pre ${"group-hover:underline"}`}
+                >
+                  {test.title}
                 </div>
-              ) : null}
-            </div>
-          </button>
-        </div>
-      )}
-      {expandSteps ? <TestSteps test={test} startTime={test.relativeStartTime} /> : null}
-    </div>
+                {test.error ? (
+                  <div className="mt-1 overflow-hidden rounded-lg bg-testsuitesErrorBgcolor px-2 py-1 text-left font-mono ">
+                    {test.error.message}
+                  </div>
+                ) : null}
+              </div>
+            </button>
+          </div>
+        )}
+        {expandSteps ? <TestSteps test={test} /> : null}
+      </div>
+    </TestCaseContext.Provider>
   );
 }
 

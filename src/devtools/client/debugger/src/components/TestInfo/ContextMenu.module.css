@@ -1,0 +1,40 @@
+.ContextMenu {
+  position: absolute;
+  flex-direction: column;
+  display: flex;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  white-space: nowrap;
+
+  /* Ensure the context menu is always above console rows and the current time indicator */
+  z-index: 11;
+}
+
+.ContextMenuItem {
+  background-color: var(--context-menu-background-color);
+  color: var(--color-default);
+  padding: 0.5rem 1rem;
+  user-select: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+}
+.ContextMenuItem:hover {
+  background-color: var(--context-menu-background-color-hover);
+}
+
+.ColorBadge,
+.ColorBadgeClear,
+.UnicornBadge {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 1rem;
+}
+.ColorBadge {
+  background-color: var(--badge-color);
+}
+.ColorBadgeClear {
+  border: 0.25rem solid var(--background-color-contrast-5);
+}

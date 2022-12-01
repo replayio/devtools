@@ -10,7 +10,9 @@ import { getReporterAnnotationsForTests } from "ui/reducers/reporter";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Annotation, TestItem } from "ui/types";
 
+import ContextMenuWrapper from "./ContextMenu";
 import { TestCase } from "./TestCase";
+import { TestInfoContextMenuContextRoot } from "./TestInfoContextMenuContext";
 
 type TestInfoContextType = {
   selectedId: string | null;
@@ -73,32 +75,35 @@ export default function TestInfo({
     <TestInfoContext.Provider
       value={{ selectedId, setSelectedId, consoleProps, setConsoleProps, pauseId, setPauseId }}
     >
-      <div className="flex flex-grow flex-col overflow-hidden">
-        <div className="flex flex-grow flex-col space-y-1 overflow-auto px-2 py-2">
-          {highlightedTest !== null && (
-            <button
-              onClick={onReset}
-              className="flex flex-row items-center hover:underline"
-              style={{ fontSize: "15px" }}
-            >
-              <MaterialIcon>chevron_left</MaterialIcon>
-              <div>{correctedTestCases[highlightedTest].title}</div>
-            </button>
-          )}
-          {correctedTestCases.map(
-            (t, i) =>
-              showTest(i) && (
-                <TestCase
-                  test={t}
-                  key={i}
-                  setHighlightedTest={() => setHighlightedTest(i)}
-                  isHighlighted={i === highlightedTest}
-                />
-              )
-          )}
+      <TestInfoContextMenuContextRoot>
+        <div className="flex flex-grow flex-col overflow-hidden">
+          <div className="flex flex-grow flex-col space-y-1 overflow-auto px-2 py-2">
+            {highlightedTest !== null && (
+              <button
+                onClick={onReset}
+                className="flex flex-row items-center hover:underline"
+                style={{ fontSize: "15px" }}
+              >
+                <MaterialIcon>chevron_left</MaterialIcon>
+                <div>{correctedTestCases[highlightedTest].title}</div>
+              </button>
+            )}
+            {correctedTestCases.map(
+              (t, i) =>
+                showTest(i) && (
+                  <TestCase
+                    test={t}
+                    key={i}
+                    setHighlightedTest={() => setHighlightedTest(i)}
+                    isHighlighted={i === highlightedTest}
+                  />
+                )
+            )}
+          </div>
+          {highlightedTest ? <Console /> : null}
+          <ContextMenuWrapper />
         </div>
-        {highlightedTest ? <Console /> : null}
-      </div>
+      </TestInfoContextMenuContextRoot>
     </TestInfoContext.Provider>
   );
 }
