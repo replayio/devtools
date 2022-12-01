@@ -25,6 +25,7 @@ export interface TestStepItemProps {
 }
 
 export function TestStepItem({ argString, index, id }: TestStepItemProps) {
+  const [localPauseData, setLocalPauseData] = useState<{ pauseId: string; consoleProps: any }>();
   const { setConsoleProps, setPauseId } = useContext(TestInfoContext);
   const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
     pauseId: string;
@@ -52,8 +53,6 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
         if (!frames) {
           return null;
         }
-
-        setPauseId(pauseResult.pauseId);
 
         const callerFrame = frames[1];
 
@@ -109,12 +108,11 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
               consoleProps.preview.prototypeId = undefined;
             }
 
-            setConsoleProps(consoleProps);
+            setLocalPauseData({ pauseId: pauseResult.pauseId, consoleProps });
           }
         }
       } catch {
-        setPauseId(null);
-        setConsoleProps(undefined);
+        setLocalPauseData(undefined);
       }
 
       return null;
@@ -123,6 +121,10 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
 
   const onClick = () => {
     if (id) {
+      if (localPauseData) {
+        setConsoleProps(localPauseData.consoleProps);
+        setPauseId(localPauseData.pauseId);
+      }
       dispatch(seekToTime(startTime));
       dispatch(setSelectedStep({ id, startTime, endTime: startTime + duration - 1 }));
     }
