@@ -1,30 +1,31 @@
-import { useAppDispatch } from "packages/markerikson-stack-client-prototype/src/app/hooks";
-import React, { useState } from "react";
-import { seekToTime } from "ui/actions/timeline";
+import React from "react";
 
+import { seekToTime } from "ui/actions/timeline";
 import { getSelectedStep } from "ui/reducers/reporter";
 import { getCurrentTime } from "ui/reducers/timeline";
-import { useAppSelector } from "ui/setup/hooks";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+
+import styles from "./CypressToggler.module.css";
 
 export function CypressToggler() {
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
   const selectedStep = useAppSelector(getSelectedStep);
 
-  if (!selectedStep || selectedStep.startTime === selectedStep.endTime ) {
+  if (!selectedStep || selectedStep.startTime === selectedStep.endTime) {
     return null;
   }
 
   const onBefore = () => {
     dispatch(seekToTime(selectedStep.startTime));
-  }
+  };
   const onAfter = () => {
     dispatch(seekToTime(selectedStep.endTime));
-  }
+  };
 
   return (
-    <div className="absolute flex h-full w-full items-end justify-center pb-4">
-      <div className="flex rounded-md bg-themeToggleBgcolor p-1">
+    <div className={styles.ToggleWrapper}>
+      <div className={styles.ToggleContainer}>
         <Button onClick={onBefore} active={currentTime === selectedStep.startTime}>
           Before
         </Button>
@@ -46,7 +47,7 @@ function Button({
   active?: boolean;
 }) {
   return (
-    <button className={`rounded-md px-2 py-1 ${active ? "font-bold" : ""}`} onClick={onClick}>
+    <button className={`${styles.ToggleButton} ${active ? styles.Active : ""}`} onClick={onClick}>
       {children}
     </button>
   );

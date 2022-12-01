@@ -6,18 +6,18 @@ import { Annotation } from "ui/types";
 
 export interface ReporterState {
   annotations: Annotation[];
-  selectedStep: SelectedStep | null
+  selectedStep: SelectedStep | null;
 }
 
 type SelectedStep = {
-    id: string;
-    startTime: number;
-    endTime: number;
-}
+  id: string;
+  startTime: number;
+  endTime: number;
+};
 
 const initialState: ReporterState = {
   annotations: [],
-  selectedStep: null
+  selectedStep: null,
 };
 
 const reporterSlice = createSlice({
@@ -34,7 +34,7 @@ const reporterSlice = createSlice({
       // This is not ideal since we're duplicating data that's being composed elsewhere.
       // Ideally we would have a selectedStepId, and a list of steps to query to get that
       // data instead.
-      state.selectedStep = action.payload
+      state.selectedStep = action.payload;
     },
   },
 });

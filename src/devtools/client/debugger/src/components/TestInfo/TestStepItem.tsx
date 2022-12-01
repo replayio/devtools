@@ -28,7 +28,6 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
   const {
     setConsoleProps,
     setPauseId,
-    setSelectedId: setSelectedIndex,
   } = useContext(TestInfoContext);
   const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
     pauseId: string;
@@ -127,7 +126,7 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
   const onClick = () => {
     if (id) {
       dispatch(seekToTime(startTime));
-      dispatch(setSelectedStep({id, startTime, endTime: startTime + duration - 1}));
+      dispatch(setSelectedStep({ id, startTime, endTime: startTime + duration - 1 }));
     }
   };
   const onMouseEnter = () => {

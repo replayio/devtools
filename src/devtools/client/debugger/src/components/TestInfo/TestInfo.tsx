@@ -70,9 +70,7 @@ export default function TestInfo({
   };
 
   return (
-    <TestInfoContext.Provider
-      value={{ consoleProps, setConsoleProps, pauseId, setPauseId }}
-    >
+    <TestInfoContext.Provider value={{ consoleProps, setConsoleProps, pauseId, setPauseId }}>
       <TestInfoContextMenuContextRoot>
         <div className="flex flex-grow flex-col overflow-hidden">
           <div className="flex flex-grow flex-col space-y-1 overflow-auto px-2 py-2">
