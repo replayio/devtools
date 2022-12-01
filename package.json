@@ -34,7 +34,7 @@
   "dependencies": {
     "@apollo/client": "^3.5.10",
     "@auth0/auth0-react": "1.2.0",
-    "@headlessui/react": "^1.4.3",
+    "@headlessui/react": "^1.7.4",
     "@heroicons/react": "^1.0.6",
     "@redux-devtools/app": "^2.1.4",
     "@redux-devtools/extension": "^3.2.2",
