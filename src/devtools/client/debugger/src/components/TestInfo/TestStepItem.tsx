@@ -12,6 +12,8 @@ import { getThreadContext } from "../../selectors";
 import { ProgressBar } from "./ProgressBar";
 import { TestInfoContext } from "./TestInfo";
 import { TestStepActions } from "./TestStepActions";
+import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 function returnFirst<T, R>(list: T[] | undefined, fn: (v: T) => R | null) {
   return list ? list.reduce<R | null>((acc, v) => acc ?? fn(v), null) : null;
@@ -229,7 +231,7 @@ export function TestStepItem({
             {stepName} <span className="opacity-70">{argString}</span>
           </div>
         </button>
-        <TestStepActions
+        {/* <TestStepActions
           onReplay={onReplay}
           onPlayFromHere={onPlayFromHere}
           isLastStep={isLastStep}
@@ -238,8 +240,24 @@ export function TestStepItem({
           onJumpToBefore={onJumpToBefore}
           onJumpToAfter={onJumpToAfter}
           duration={adjustedDuration}
-        />
+        /> */}
+        <ContextMenuIcon />
       </div>
     </>
   );
+}
+
+function ContextMenuIcon() {
+  const { show } = useContext(TestInfoContextMenuContext);
+  const onClick = (e: React.MouseEvent) => {
+    console.log("click1");
+    show({ x: e.pageX, y: e.pageY });
+  };
+  return (
+    <button onClick={onClick} className="py-2">
+      <div className="flex items-center">
+        <MaterialIcon>more_vert</MaterialIcon>
+      </div>
+    </button>
+  )
 }

@@ -17,6 +17,7 @@ import { AnnotatedTestStep, CypressAnnotationMessage, TestItem, TestStep } from 
 
 import { NetworkEvent } from "./NetworkEvent";
 import { TestInfoContext } from "./TestInfo";
+import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { TestStepItem } from "./TestStepItem";
 
 type StepEvent = {
