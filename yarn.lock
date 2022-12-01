@@ -5906,12 +5906,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@trunkio/launcher@npm:^1.0.5":
-  version: 1.1.1
-  resolution: "@trunkio/launcher@npm:1.1.1"
+"@trunkio/launcher@npm:^1.2.3":
+  version: 1.2.3
+  resolution: "@trunkio/launcher@npm:1.2.3"
   bin:
     trunk: trunk
-  checksum: 5f7f98aeb2b82cc202497e33635265cc1566a74895cf5199c8e8e97b8409221b51983a49a4ba20508563fc1b93f5e03fac6bcb05fac4444780cb9ec85989371a
+  checksum: cd54e54d3ae292e55fd2979ccac3f77d652ae2696963886a3f47558b04e42272a24201d665cdd8f27ca46ee788e596ced522fea9c9fced3d6deda0486dfd313f
   languageName: node
   linkType: hard
 
@@ -20852,7 +20852,7 @@ __metadata:
     "@tiptap/extension-placeholder": ^2.0.0-beta.48
     "@tiptap/react": ^2.0.0-beta.108
     "@tiptap/starter-kit": ^2.0.0-beta.183
-    "@trunkio/launcher": ^1.0.5
+    "@trunkio/launcher": ^1.2.3
     "@types/classnames": ^2.2.11
     "@types/codemirror": ^5.60.5
     "@types/cookie": ^0.4.1
