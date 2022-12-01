@@ -34,16 +34,8 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
   const selectedStep = useAppSelector(getSelectedStep);
   const dispatch = useAppDispatch();
   const client = useContext(ReplayClientContext);
-  const {
-    startTime,
-    duration,
-    messageEnd,
-    pointEnd,
-    error,
-    stepName,
-    parentId,
-    pointStart,
-  } = useContext(TestStepContext);
+  const { startTime, duration, messageEnd, pointEnd, error, stepName, parentId, pointStart } =
+    useContext(TestStepContext);
   const isPast = currentTime > startTime;
   const isPaused = currentTime >= startTime && currentTime < startTime + duration;
 

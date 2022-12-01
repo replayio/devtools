@@ -141,7 +141,16 @@ function useGetTestSections(
     }
 
     return { beforeEach, testBody, afterEach };
-  }, [steps, annotationsEnd, annotationsEnqueue, requests, events, startTime, navigationEvents, annotationsStart]);
+  }, [
+    steps,
+    annotationsEnd,
+    annotationsEnqueue,
+    requests,
+    events,
+    startTime,
+    navigationEvents,
+    annotationsStart,
+  ]);
 }
 
 export function TestSteps({ test }: { test: TestItem }) {
