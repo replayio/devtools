@@ -5,8 +5,16 @@ import { delay, getCommandKey } from "./utils";
 export async function clearText(page: Page, selector: string) {
   await focus(page, selector);
 
-  await page.keyboard.press(`${getCommandKey()}+A`);
-  await page.keyboard.press("Backspace");
+  const input = page.locator(selector);
+
+  // Timing awkwardness;
+  // Make sure we clear all of the text (and not just most of it)
+  while (((await input.textContent()) || "").trim() !== "") {
+    await delay(100);
+
+    await page.keyboard.press(`${getCommandKey()}+A`);
+    await page.keyboard.press("Backspace");
+  }
 }
 
 export async function focus(page: Page, selector: string) {
