@@ -79,7 +79,13 @@ function ToolbarButton({
         />
       </div>
       {showBadge ? (
-        <div className="absolute top-1 left-3 mr-2 mb-1 h-2 w-2 rounded-full bg-secondaryAccent" />
+        <div
+          className="absolute h-2 w-2 rounded-full bg-secondaryAccent"
+          style={{
+            left: "1em",
+            top: "0.5em",
+          }}
+        />
       ) : null}
     </div>
   );
