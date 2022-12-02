@@ -69,29 +69,34 @@ export default function useIndexedDB<T>(options: {
     let cancelled = false;
 
     async function setupDatabaseForHook() {
-      const dbInstance = await openDB(databaseName, databaseVersion, {
-        upgrade(db) {
-          // The "upgrade" callback runs both on initial creation (when a DB does not exist),
-          // and on version number change.
-          for (let storeName of storeNames) {
-            if (!db.objectStoreNames.contains(storeName)) {
-              db.createObjectStore(storeName);
+      if (typeof window !== "undefined" && typeof window.indexedDB !== "undefined") {
+        const dbInstance = await openDB(databaseName, databaseVersion, {
+          upgrade(db) {
+            // The "upgrade" callback runs both on initial creation (when a DB does not exist),
+            // and on version number change.
+            for (let storeName of storeNames) {
+              if (!db.objectStoreNames.contains(storeName)) {
+                db.createObjectStore(storeName);
+              }
             }
+          },
+        });
+        databaseRef.current = dbInstance;
+        try {
+          const savedData = await dbInstance.get(storeName, recordName);
+          if (!cancelled) {
+            if (savedData !== undefined) {
+              // We may not have a saved value. Don't overwrite with `undefined`.
+              setValue(savedData);
+            }
+            setStatus(STATUS_INITIALIZATION_COMPLETE);
           }
-        },
-      });
-      databaseRef.current = dbInstance;
-      try {
-        const savedData = await dbInstance.get(storeName, recordName);
-        if (!cancelled) {
-          if (savedData !== undefined) {
-            // We may not have a saved value. Don't overwrite with `undefined`.
-            setValue(savedData);
-          }
-          setStatus(STATUS_INITIALIZATION_COMPLETE);
+        } catch {
+          setStatus(STATUS_INITIALIZATION_ERRORED);
         }
-      } catch {
-        setStatus(STATUS_INITIALIZATION_ERRORED);
+      } else {
+        // No IndexedDB available - this might be a local unit test
+        setStatus(STATUS_INITIALIZATION_COMPLETE);
       }
     }
 

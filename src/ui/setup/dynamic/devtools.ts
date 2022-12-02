@@ -336,7 +336,11 @@ const keysToDelete: RegExp[] = [
 ];
 
 export async function migratePerRecordingPersistedSettings() {
-  if (typeof window !== "undefined" && typeof window.localStorage !== "undefined") {
+  if (
+    typeof window !== "undefined" &&
+    typeof window.localStorage !== "undefined" &&
+    typeof window.indexedDB !== "undefined"
+  ) {
     const allLocalStorageKeys = Object.keys(localStorage);
 
     for (let migration of settingsToMigrate) {
