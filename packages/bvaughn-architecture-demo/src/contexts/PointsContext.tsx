@@ -21,7 +21,7 @@ const EMPTY_ARRAY: Point[] = [];
 
 // NOTE: If any change is made like adding a store name, bump the version number
 // to ensure that the database is recreated properly.
-const POINTS_DATABASE: IDBOptions = {
+export const POINTS_DATABASE: IDBOptions = {
   databaseName: "Points",
   databaseVersion: 1,
   storeNames: ["high-priority", "transition"],
