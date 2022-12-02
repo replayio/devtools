@@ -344,6 +344,11 @@ function TypeAheadPopUp<Item>({
     );
   }, [editor]);
 
+  if (items.length === 0) {
+    // Don't render an empty popup.
+    return null;
+  }
+
   return (
     <TypeAheadListRenderer
       dataTestId={dataTestId}
