@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { SHOW_GLOBAL_SEARCH_EVENT_TYPE } from "bvaughn-architecture-demo/components/search-files/SearchFiles";
 import { closeQuickOpen, toggleQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import * as dbgActions from "devtools/client/debugger/src/actions/ui";
 import { getActiveSearch, getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
@@ -65,6 +66,8 @@ function KeyboardShortcuts({
       trackEvent("key_shortcut.full_text_search");
       setSelectedPrimaryPanel("search");
       focusFullTextInput(true);
+
+      window.dispatchEvent(new CustomEvent(SHOW_GLOBAL_SEARCH_EVENT_TYPE));
     };
 
     const toggleEditFocusMode = (e: KeyboardEvent) => {

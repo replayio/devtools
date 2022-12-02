@@ -1,4 +1,12 @@
-import { ChangeEvent, KeyboardEvent, Suspense, useState, useTransition } from "react";
+import {
+  ChangeEvent,
+  KeyboardEvent,
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 
 import { Checkbox } from "design";
 
@@ -7,11 +15,15 @@ import InlineResultsCount from "./InlineResultsCount";
 import ResultsList from "./ResultsList";
 import styles from "./SearchFiles.module.css";
 
+export const SHOW_GLOBAL_SEARCH_EVENT_TYPE = "show-global-search";
+
 export default function SearchFiles({ limit }: { limit?: number }) {
   const [includeNodeModules, setIncludeNodeModules] = useState(false);
   const [queryForDisplay, setQueryForDisplay] = useState("");
   const [queryForSuspense, setQueryForSuspense] = useState("");
   const [isPending, startTransition] = useTransition();
+
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     setQueryForDisplay(event.target.value);
@@ -30,6 +42,17 @@ export default function SearchFiles({ limit }: { limit?: number }) {
     }
   };
 
+  useEffect(() => {
+    const onShowGlobalSearch = () => {
+      inputRef.current?.focus();
+    };
+
+    window.addEventListener(SHOW_GLOBAL_SEARCH_EVENT_TYPE, onShowGlobalSearch);
+    return () => {
+      window.removeEventListener(SHOW_GLOBAL_SEARCH_EVENT_TYPE, onShowGlobalSearch);
+    };
+  }, []);
+
   return (
     <div className={styles.SearchFiles}>
       <div className={styles.Content}>
@@ -42,6 +65,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
             onChange={onChange}
             onKeyDown={onKeyDown}
             placeholder="Find in files..."
+            ref={inputRef}
             type="text"
             value={queryForDisplay}
           />
