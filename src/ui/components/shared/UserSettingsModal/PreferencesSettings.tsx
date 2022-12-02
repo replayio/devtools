@@ -113,8 +113,9 @@ function UiPreferences() {
   const dispatch = useAppDispatch();
   const theme = useAppSelector(getThemePreference);
   const { value: defaultMode, update: updateDefaultMode } = useStringPref("defaultMode");
-  const { value: hitCountsMode, update: updateHitCounts } = useStringPref("hitCounts");
-  const hitCountsEnabled = useFeature("hitCounts");
+  // TODO [FE-1011] Hit count settings is broken and disabled for now
+  // const { value: hitCountsMode, update: updateHitCounts } = useStringPref("hitCounts");
+  // const hitCountsEnabled = useFeature("hitCounts");
   const { value: enableLargeText, update: updateEnableLargeText } = useFeature("enableLargeText");
 
   const setSelected = (value: AppTheme) => {
@@ -151,7 +152,7 @@ function UiPreferences() {
           />
         </div>
       </div>
-      {hitCountsEnabled && (
+      {/* {hitCountsEnabled && (
         <div className="flex flex-row justify-between">
           <div>Heat Maps</div>
           <div className="w-1/2">
@@ -166,7 +167,7 @@ function UiPreferences() {
             />
           </div>
         </div>
-      )}
+      )} */}
       <label
         className="flex cursor-pointer items-center space-x-2 p-1"
         data-private
