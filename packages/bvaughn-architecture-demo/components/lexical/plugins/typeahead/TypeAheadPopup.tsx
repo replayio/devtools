@@ -127,7 +127,10 @@ function TypeAheadPopUp<Item>({
 
   // Notify the parent plug-in that it should deactivate the type-ahead when there are no suggestions.
   // This includes the case where there's only one suggestion and it's an exact match.
-  useEffect(() => {
+  //
+  // It's best to do this with a layout effect because of the exact-match check;
+  // Otherwise the popup will appear to flicker before being hidden.
+  useLayoutEffect(() => {
     if (queryData !== null) {
       if (items.length === 0) {
         updateQueryData(null);
@@ -343,6 +346,11 @@ function TypeAheadPopUp<Item>({
       editor.registerCommand(KEY_TAB_COMMAND, onKeyPress, COMMAND_PRIORITY_HIGH)
     );
   }, [editor]);
+
+  if (items.length === 0) {
+    // Don't render an empty popup.
+    return null;
+  }
 
   return (
     <TypeAheadListRenderer

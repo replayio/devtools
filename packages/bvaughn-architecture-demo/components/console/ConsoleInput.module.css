@@ -17,7 +17,8 @@
   flex-direction: Row;
   align-items: center;
   gap: 1ch;
-  min-height: 1.5em;
+  min-height: 2em;
+  line-height: 2em;
   padding: 0 1ch;
 }
 
