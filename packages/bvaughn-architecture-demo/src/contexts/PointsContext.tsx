@@ -61,7 +61,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   const { recordingId, trackEvent } = useContext(SessionContext);
   const replayClient = useContext(ReplayClientContext);
 
-  // Both high-pri state and transition state should be managed by useLocalStorage,
+  // Both high-pri state and transition state should be managed by useIndexedDB,
   // Else values from other tabs will only be synced to the high-pri state.
   const {
     setValue: setPoints,

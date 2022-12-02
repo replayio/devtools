@@ -15,7 +15,6 @@ import Icon from "bvaughn-architecture-demo/components/Icon";
 import IndeterminateLoader from "bvaughn-architecture-demo/components/IndeterminateLoader";
 import Loader from "bvaughn-architecture-demo/components/Loader";
 import { ConsoleFiltersContextRoot } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
-import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
 import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
 import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
 
@@ -85,9 +84,8 @@ function Console({
   const { clearMessages: clearConsoleEvaluations, messages: consoleEvaluations } =
     useContext(TerminalContext);
 
-  const { recordingId } = useContext(SessionContext);
   const [isMenuOpen, setIsMenuOpen] = useLocalStorage<boolean>(
-    `Replay:Console:MenuOpen:${recordingId}`,
+    `Replay:Console:MenuOpen`,
     showFiltersByDefault
   );
   const [menuValueHasBeenToggled, setMenuValueHasBeenToggled] = useState(false);
