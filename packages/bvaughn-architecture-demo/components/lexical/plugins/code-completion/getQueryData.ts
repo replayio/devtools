@@ -189,14 +189,6 @@ export default function getQueryData(selection: TypeAheadSelection | null): Quer
     insertionEndTextNode = node;
     insertionEndOffset = offset;
   }
-  if (positionBeginTextNode === null) {
-    positionBeginTextNode = node;
-    positionBeginOffset = offset;
-  }
-  if (positionEndTextNode === null) {
-    positionEndTextNode = node;
-    positionEndOffset = offset;
-  }
 
   return {
     query,
