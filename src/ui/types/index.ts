@@ -196,6 +196,7 @@ export type CypressAnnotationMessage = {
   id?: string;
   url?: string;
 };
+
 export interface Annotation {
   point: ExecutionPoint;
   time: number;

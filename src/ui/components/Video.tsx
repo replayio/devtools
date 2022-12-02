@@ -1,4 +1,3 @@
-import {} from "devtools/client/inspector/markup/reducers/markup";
 import React, { FC, useEffect, useRef } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
@@ -59,7 +58,7 @@ function Video({
   const recordingId = hooks.useGetRecordingId();
   const viewMode = useAppSelector(getViewMode);
   const panel = useAppSelector(getSelectedPrimaryPanel);
-  const highlightedNodeIds = useAppSelector(state => state.markup.highlightedNodes);
+  const highlightedNodeIds = useAppSelector(state => state.markup.highlightedNode);
   const isPaused = !playback;
   const isNodeTarget = recordingTarget == "node";
 
@@ -117,9 +116,7 @@ function Video({
       {isNodePickerInitializing ? <Tooltip label="Loading…" targetID="video" /> : null}
       {panel === "events" && <CypressToggler />}
       <div id="highlighter-root">
-        {highlightedNodeIds?.map(nodeId => (
-          <PreviewNodeHighlighter key={nodeId} nodeId={nodeId} />
-        ))}
+        <PreviewNodeHighlighter />
       </div>
       {viewMode === "dev" ? <HideVideoButton /> : null}
     </div>

@@ -9,11 +9,7 @@ import type { UIStore, UIThunkAction } from "ui/actions";
 import { isInspectorSelected } from "ui/reducers/app";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
 import { UIState } from "ui/state";
-import {
-  getBoxModelAsync,
-  getNodeDataAsync,
-  getNodeEventListenersAsync,
-} from "ui/suspense/nodeCaches";
+import { getNodeDataAsync, getNodeEventListenersAsync } from "ui/suspense/nodeCaches";
 import { getBoundingRectAsync, getComputedStyleAsync } from "ui/suspense/styleCaches";
 
 import {
@@ -22,10 +18,10 @@ import {
   childrenAdded,
   getSelectedDomNodeId,
   newRootAdded,
-  nodeBoxModelsLoaded,
+  nodeBoxModelLoaded,
+  nodeHighlighted,
   nodeHighlightingCleared,
   nodeSelected,
-  nodesHighlighted,
   resetMarkup,
   updateChildrenLoading,
   updateNodeExpanded,
@@ -577,41 +573,24 @@ export function onPageDownKey(): UIThunkAction {
 
 let unhighlightTimer: ReturnType<typeof window.setTimeout> | null = null;
 
-export function highlightNodes(
-  nodeIds: string[],
-  pauseId?: string,
-  duration?: number
-): UIThunkAction {
+export function highlightNode(nodeId: string, duration?: number): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, protocolClient }) => {
-    if (nodeIds.length === 0) {
+    if (!ThreadFront.currentPause) {
       return;
     }
 
-    if (!pauseId) {
-      // We're trying to highlight nodes from the current pause.
-      // Bail out if we're not paused
-      if (!ThreadFront.currentPause) {
-        return;
+    const { highlightedNode, nodeBoxModels } = getState().markup;
+    if (highlightedNode !== nodeId) {
+      dispatch(nodeHighlighted(nodeId));
+
+      if (!(nodeId in nodeBoxModels.entities)) {
+        const { model: nodeBoxModel } = await protocolClient.DOM.getBoxModel(
+          { node: nodeId },
+          ThreadFront.sessionId!,
+          ThreadFront.currentPause.pauseId!
+        );
+        dispatch(nodeBoxModelLoaded(nodeBoxModel));
       }
-      pauseId = ThreadFront.currentPause.pauseId!;
-    }
-
-    const { highlightedNodes } = getState().markup;
-    if (!highlightedNodes || !nodeIds.every(id => highlightedNodes.includes(id))) {
-      dispatch(nodesHighlighted(nodeIds));
-
-      const boxModels = await Promise.all(
-        nodeIds.map(async nodeId => {
-          const boxModel = await getBoxModelAsync(
-            protocolClient,
-            ThreadFront.sessionId!,
-            pauseId!,
-            nodeId
-          );
-          return boxModel;
-        })
-      );
-      dispatch(nodeBoxModelsLoaded(boxModels));
 
       if (unhighlightTimer) {
         clearTimeout(unhighlightTimer);
@@ -624,10 +603,6 @@ export function highlightNodes(
       }
     }
   };
-}
-
-export function highlightNode(nodeId: string, duration?: number): UIThunkAction {
-  return highlightNodes([nodeId], undefined, duration);
 }
 
 export function unhighlightNode(): UIThunkAction {
