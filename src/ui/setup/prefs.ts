@@ -1,6 +1,7 @@
 import { RecordingId } from "@replayio/protocol";
 import debounce from "lodash/debounce";
 
+import type { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import { Tab, getTabs } from "devtools/client/debugger/src/reducers/tabs";
 import { prefs as debuggerPrefs } from "devtools/client/debugger/src/utils/prefs";
 import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
@@ -30,6 +31,7 @@ export interface ReplaySession {
   selectedPanel: SecondaryPanelName;
   localNags: LocalNag[];
   tabs: Tab[];
+  persistedSelectedLocation: PartialLocation | null;
 }
 
 export function registerStoreObserver(
@@ -156,6 +158,7 @@ async function maybeUpdateReplaySessions(state: UIState) {
     selectedPanel: getSelectedPanel(state),
     localNags: getLocalNags(state),
     tabs: persistTabs(getTabs(state)) || [],
+    persistedSelectedLocation: state.sources?.persistedSelectedLocation || null,
   };
 
   const newState = { ...previousReplaySessions, [recordingId]: currentReplaySession };

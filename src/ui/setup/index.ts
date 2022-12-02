@@ -13,8 +13,10 @@ import { getUserInfo } from "ui/hooks/users";
 import { getTheme, initialAppState } from "ui/reducers/app";
 import { syncInitialLayoutState } from "ui/reducers/layout";
 import {
+  SourcesState,
   getCorrespondingSourceIds,
   getSourceDetails,
+  initialState as initialSourcesState,
   isOriginalSource,
   isPrettyPrintedSource,
 } from "ui/reducers/sources";
@@ -105,11 +107,26 @@ export const getInitialTabsState = async (): Promise<TabsState> => {
   return { tabs: session?.tabs ?? EMPTY_TABS };
 };
 
+export const getInitialSourcesState = async (): Promise<SourcesState> => {
+  const session = await getReplaySession(getRecordingId()!);
+
+  if (!session) {
+    return initialSourcesState;
+  }
+
+  return {
+    ...initialSourcesState,
+    persistedSelectedLocation:
+      "persistedSelectedLocation" in session ? session.persistedSelectedLocation : null,
+  };
+};
+
 export async function bootstrapApp() {
   const initialState = {
     app: initialAppState,
     layout: await getInitialLayoutState(),
     tabs: await getInitialTabsState(),
+    sources: await getInitialSourcesState(),
   };
 
   const store = bootstrapStore(initialState);
