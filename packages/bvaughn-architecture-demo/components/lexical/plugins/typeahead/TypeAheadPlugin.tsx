@@ -78,7 +78,7 @@ export default function TypeAheadPlugin<Item extends Object>({
 
         const itemNode = createItemNode(item);
 
-        const { beginTextNode, beginOffset, endTextNode, endOffset } = queryData.insertionTextRange;
+        const { beginTextNode, beginOffset, endTextNode, endOffset } = queryData.textRange;
 
         let currentTextNode: LexicalNode | null = beginTextNode;
         nodes: while (currentTextNode !== null) {

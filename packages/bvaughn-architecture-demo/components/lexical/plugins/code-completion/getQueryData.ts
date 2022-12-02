@@ -199,20 +199,14 @@ export default function getQueryData(selection: TypeAheadSelection | null): Quer
   }
 
   return {
-    insertionTextRange: {
+    query,
+    queryAdditionalData,
+    textRange: {
       beginOffset: insertionBeginOffset,
       beginTextNode: insertionBeginTextNode,
       endOffset: insertionEndOffset,
       endTextNode: insertionEndTextNode,
     },
-    positionTextRange: {
-      beginOffset: positionBeginOffset,
-      beginTextNode: positionBeginTextNode,
-      endOffset: positionEndOffset,
-      endTextNode: positionEndTextNode,
-    },
-    query,
-    queryAdditionalData,
   };
 }
 
