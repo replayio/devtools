@@ -73,6 +73,10 @@ function ConsoleInputSuspends() {
   }
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+
     switch (event.key) {
       case "ArrowDown": {
         event.preventDefault();

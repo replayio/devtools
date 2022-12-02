@@ -40,10 +40,9 @@ export type TextRange = {
 };
 
 export type QueryData = {
-  insertionTextRange: TextRange;
-  positionTextRange: TextRange;
   query: string;
   queryAdditionalData: string | null;
+  textRange: TextRange;
 };
 
 export type TypeAheadSelection = RangeSelection | NodeSelection | GridSelection;

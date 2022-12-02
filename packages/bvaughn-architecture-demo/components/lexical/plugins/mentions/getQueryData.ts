@@ -129,32 +129,27 @@ export default function getQueryData(selection: TypeAheadSelection | null): Quer
   }
 
   if (beginTextNode === null || endTextNode === null) {
-    const textRange = {
-      beginOffset: offset,
-      beginTextNode: node,
-      endOffset: offset,
-      endTextNode: node,
-    };
     return {
-      insertionTextRange: textRange,
-      positionTextRange: textRange,
       query,
       queryAdditionalData: null,
+      textRange: {
+        beginOffset: offset,
+        beginTextNode: node,
+        endOffset: offset,
+        endTextNode: node,
+      },
     };
   }
 
-  const textRange = {
-    beginOffset,
-    beginTextNode: beginTextNode,
-    endOffset,
-    endTextNode: endTextNode,
-  };
-
   return {
-    insertionTextRange: textRange,
-    positionTextRange: textRange,
     query,
     queryAdditionalData: null,
+    textRange: {
+      beginOffset,
+      beginTextNode: beginTextNode,
+      endOffset,
+      endTextNode: endTextNode,
+    },
   };
 }
 
