@@ -179,28 +179,32 @@ function TypeAheadPopUp<Item>({
     const { beginOffset, beginTextNode, endOffset, endTextNode } = queryData.textRange;
 
     try {
-      const beginHTMLElement = editor._keyToDOMMap.get(beginTextNode.getKey());
-      const endHTMLElement = editor._keyToDOMMap.get(endTextNode.getKey());
+      const beginHTMLElement = editor.getElementByKey(beginTextNode.getKey());
+      const endHTMLElement = editor.getElementByKey(endTextNode.getKey());
 
       if (beginHTMLElement && endHTMLElement) {
+        const beginTextNode =
+          beginHTMLElement.nodeType === Node.TEXT_NODE
+            ? beginHTMLElement
+            : beginHTMLElement.firstChild!;
+        const endTextNode =
+          endHTMLElement.nodeType === Node.TEXT_NODE ? endHTMLElement : endHTMLElement.firstChild!;
+
         const endTextNodeOffset = Math.min(
-          endOffset - 1,
-          endTextNode.textContent ? endTextNode.textContent.length - 1 : 0
+          endOffset,
+          endTextNode.textContent ? endTextNode.textContent.length : 0
         );
 
         // Position the popup at the start of the query.
         // Temporarily change selection so we can measure the text we care about
         nativeSelection.setBaseAndExtent(
-          beginHTMLElement.nodeType === Node.TEXT_NODE
-            ? beginHTMLElement
-            : beginHTMLElement.firstChild!,
+          beginTextNode,
           beginOffset,
-          endHTMLElement.nodeType === Node.TEXT_NODE ? endHTMLElement : endHTMLElement.firstChild!,
+          endTextNode,
           endTextNodeOffset
         );
 
         const positionRect = getDOMRangeRect(nativeSelection, rootElement);
-        console.log("positionRect:", positionRect);
 
         // const positionRect = positionRange?.getBoundingClientRect() ?? null;
         if (positionRect !== null) {
