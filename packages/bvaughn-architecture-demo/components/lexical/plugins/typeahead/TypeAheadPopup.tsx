@@ -11,7 +11,6 @@ import {
 } from "lexical";
 import { ReactNode, Suspense, useLayoutEffect, useRef, useState } from "react";
 
-import findDOMNode from "../../utils/findDOMNode";
 import { INSERT_ITEM_COMMAND } from "./commands";
 import TypeAheadListRenderer from "./TypeAheadListRenderer";
 import { QueryData } from "./types";
@@ -179,30 +178,29 @@ function TypeAheadPopUp<Item>({
 
     const { beginOffset, beginTextNode, endOffset, endTextNode } = queryData.textRange;
 
-    const beginHTMLElement = findDOMNode(beginTextNode);
-    const endHTMLElement = findDOMNode(endTextNode);
+    try {
+      const beginHTMLElement = editor._keyToDOMMap.get(beginTextNode.getKey());
+      const endHTMLElement = editor._keyToDOMMap.get(endTextNode.getKey());
 
-    if (beginHTMLElement && endHTMLElement) {
-      const beginTextNode =
-        beginHTMLElement.nodeType === Node.TEXT_NODE
-          ? beginHTMLElement
-          : beginHTMLElement.firstChild!;
-      const endTextNode =
-        endHTMLElement.nodeType === Node.TEXT_NODE ? endHTMLElement : endHTMLElement.firstChild!;
+      if (beginHTMLElement && endHTMLElement) {
+        const endTextNodeOffset = Math.min(
+          endOffset - 1,
+          endTextNode.textContent ? endTextNode.textContent.length - 1 : 0
+        );
 
-      const endTextNodeOffset = endTextNode.textContent ? endTextNode.textContent.length - 1 : 0;
-
-      try {
         // Position the popup at the start of the query.
         // Temporarily change selection so we can measure the text we care about
         nativeSelection.setBaseAndExtent(
-          beginTextNode,
+          beginHTMLElement.nodeType === Node.TEXT_NODE
+            ? beginHTMLElement
+            : beginHTMLElement.firstChild!,
           beginOffset,
-          endTextNode,
+          endHTMLElement.nodeType === Node.TEXT_NODE ? endHTMLElement : endHTMLElement.firstChild!,
           endTextNodeOffset
         );
 
         const positionRect = getDOMRangeRect(nativeSelection, rootElement);
+        console.log("positionRect:", positionRect);
 
         // const positionRect = positionRange?.getBoundingClientRect() ?? null;
         if (positionRect !== null) {
@@ -212,11 +210,13 @@ function TypeAheadPopUp<Item>({
 
           setFloatingElemPosition(positionRect, popup, anchorElem, 0, 0);
         }
-      } catch (error) {}
-
-      // Restore selection
-      nativeSelection.setBaseAndExtent(anchorNode, anchorOffset, focusNode, focusOffset);
+      }
+    } catch (error) {
+      console.error(error);
     }
+
+    // Restore selection
+    nativeSelection.setBaseAndExtent(anchorNode, anchorOffset, focusNode, focusOffset);
   });
 
   // Scroll selected item into view
