@@ -1,6 +1,7 @@
 import classNames from "classnames/bind";
 import { useContext, useRef } from "react";
 
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import useModalDismissSignal from "bvaughn-architecture-demo/src/hooks/useModalDismissSignal";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { seekToTime, startPlayback } from "ui/actions/timeline";
@@ -9,6 +10,7 @@ import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { selectLocation } from "../../actions/sources";
+import { showSource } from "../../actions/ui";
 import { getContext } from "../../selectors";
 import {
   Coordinates,
@@ -38,6 +40,7 @@ function ContextMenu({
   const classnames = classNames.bind(styles);
 
   useModalDismissSignal(ref, hide, true);
+  const { setCurrentSearchResultLocation } = useContext(SourcesContext);
 
   const onPlayFromHere = () => {
     hide();
@@ -86,6 +89,7 @@ function ContextMenu({
 
         if (location) {
           dispatch(selectLocation(cx, location));
+          setCurrentSearchResultLocation(location);
         }
       }
     }
