@@ -1,8 +1,9 @@
+import { Object, createPauseResult } from "@replayio/protocol";
 import React, { useContext, useEffect, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { seek, setTimelineToTime } from "ui/actions/timeline";
+import { seek, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
 import { getCurrentTime } from "ui/reducers/timeline";
@@ -28,7 +29,11 @@ export interface TestStepItemProps {
 }
 
 export function TestStepItem({ argString, index, id }: TestStepItemProps) {
-  const [localPauseData, setLocalPauseData] = useState<{ pauseId: string; consoleProps: any }>();
+  const [localPauseData, setLocalPauseData] = useState<{
+    startPauseId?: string;
+    endPauseId?: string;
+    consoleProps?: Object;
+  }>();
   const { setConsoleProps, setPauseId } = useContext(TestInfoContext);
   const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
     pauseId: string;
@@ -44,75 +49,79 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
   const isPaused = currentTime >= startTime && currentTime < startTime + duration;
 
   useEffect(() => {
+    let endPauseResult: createPauseResult | undefined;
+    let startPauseResult: createPauseResult | undefined;
+
     (async () => {
-      if (!pointEnd) {
-        return null;
-      }
-
       try {
-        const pauseResult = await client.createPause(pointEnd);
-        const frames = pauseResult.data.frames;
+        let consoleProps: Object | undefined;
 
-        if (!frames) {
-          return null;
-        }
+        endPauseResult = pointEnd ? await client.createPause(pointEnd) : undefined;
+        startPauseResult = pointStart ? await client.createPause(pointStart) : undefined;
+        const frames = endPauseResult?.data.frames;
 
-        const callerFrame = frames[1];
+        if (endPauseResult && frames) {
+          const callerFrame = frames[1];
 
-        if (messageEnd?.commandVariable) {
-          const cmdResult = await client.evaluateExpression(
-            pauseResult.pauseId,
-            `${messageEnd.commandVariable}.get("subject")`,
-            callerFrame.frameId
-          );
-
-          const cmdObject = cmdResult.data.objects?.find(
-            o => o.objectId === cmdResult.returned?.object
-          );
-          const length: number | undefined = cmdObject?.preview?.properties?.find(
-            o => o.name === "length"
-          )?.value;
-          const subjects = Array.from({ length: length || 0 }, (_, i) =>
-            cmdResult.data.objects?.find(
-              obj =>
-                obj.objectId ===
-                cmdObject?.preview?.properties?.find(p => p.name === String(i))?.object
-            )
-          );
-
-          const nodeIds = subjects.filter(s => s?.preview?.node).map(s => s?.objectId!);
-          setSubjectNodePauseData({ pauseId: pauseResult.pauseId, nodeIds });
-        }
-
-        if (messageEnd?.logVariable) {
-          const logResult = await client.evaluateExpression(
-            pauseResult.pauseId,
-            messageEnd.logVariable,
-            callerFrame.frameId
-          );
-
-          const consolePropsProperty = returnFirst(logResult.data.objects, o => {
-            return logResult.returned && o.objectId === logResult.returned.object
-              ? returnFirst(o.preview?.properties, p => (p.name === "consoleProps" ? p : null))
-              : null;
-          });
-
-          if (consolePropsProperty?.object) {
-            const consolePropsPauseData = await client.getObjectWithPreview(
-              consolePropsProperty.object,
-              pauseResult.pauseId
-            );
-            const consoleProps = consolePropsPauseData.objects?.find(
-              o => o.objectId === consolePropsProperty.object
+          if (messageEnd?.commandVariable) {
+            const cmdResult = await client.evaluateExpression(
+              endPauseResult.pauseId,
+              `${messageEnd.commandVariable}.get("subject")`,
+              callerFrame.frameId
             );
 
-            if (consoleProps?.preview) {
-              // suppress the prototype entry in the properties output
-              consoleProps.preview.prototypeId = undefined;
-            }
+            const cmdObject = cmdResult.data.objects?.find(
+              o => o.objectId === cmdResult.returned?.object
+            );
+            const length: number | undefined = cmdObject?.preview?.properties?.find(
+              o => o.name === "length"
+            )?.value;
+            const subjects = Array.from({ length: length || 0 }, (_, i) =>
+              cmdResult.data.objects?.find(
+                obj =>
+                  obj.objectId ===
+                  cmdObject?.preview?.properties?.find(p => p.name === String(i))?.object
+              )
+            );
 
-            setLocalPauseData({ pauseId: pauseResult.pauseId, consoleProps });
+            const nodeIds = subjects.filter(s => s?.preview?.node).map(s => s?.objectId!);
+            setSubjectNodePauseData({ pauseId: endPauseResult.pauseId, nodeIds });
           }
+
+          if (messageEnd?.logVariable) {
+            const logResult = await client.evaluateExpression(
+              endPauseResult.pauseId,
+              messageEnd.logVariable,
+              callerFrame.frameId
+            );
+
+            const consolePropsProperty = returnFirst(logResult.data.objects, o => {
+              return logResult.returned && o.objectId === logResult.returned.object
+                ? returnFirst(o.preview?.properties, p => (p.name === "consoleProps" ? p : null))
+                : null;
+            });
+
+            if (consolePropsProperty?.object) {
+              const consolePropsPauseData = await client.getObjectWithPreview(
+                consolePropsProperty.object,
+                endPauseResult.pauseId
+              );
+              const consoleProps = consolePropsPauseData.objects?.find(
+                o => o.objectId === consolePropsProperty.object
+              );
+
+              if (consoleProps?.preview) {
+                // suppress the prototype entry in the properties output
+                consoleProps.preview.prototypeId = undefined;
+              }
+            }
+          }
+
+          setLocalPauseData({
+            startPauseId: startPauseResult?.pauseId,
+            endPauseId: endPauseResult.pauseId,
+            consoleProps,
+          });
         }
       } catch {
         setLocalPauseData(undefined);
@@ -120,13 +129,22 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
 
       return null;
     })();
-  }, [client, messageEnd, pointEnd, setConsoleProps, setPauseId]);
+
+    // return async () => {
+    //   if (endPauseResult) {
+    //     await client.releasePause(endPauseResult.pauseId);
+    //   }
+    //   if (startPauseResult) {
+    //     await client.releasePause(startPauseResult.pauseId);
+    //   }
+    // }
+  }, [client, messageEnd, pointEnd, pointStart]);
 
   const onClick = () => {
     if (id && pointStart) {
-      if (localPauseData) {
+      if (localPauseData?.endPauseId && localPauseData.consoleProps) {
         setConsoleProps(localPauseData.consoleProps);
-        setPauseId(localPauseData.pauseId);
+        setPauseId(localPauseData.endPauseId);
       }
       dispatch(seek(pointStart!, startTime, false));
       dispatch(setSelectedStep({ id, startTime, endTime: startTime + duration - 1 }));
@@ -134,6 +152,9 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
   };
   const onMouseEnter = () => {
     dispatch(setTimelineToTime(startTime));
+    if (localPauseData?.startPauseId) {
+      dispatch(setTimelineToPauseTime(localPauseData.startPauseId, startTime));
+    }
     if (subjectNodePauseData) {
       dispatch(highlightNodes(subjectNodePauseData.nodeIds, subjectNodePauseData.pauseId));
     }

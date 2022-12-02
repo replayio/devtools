@@ -250,6 +250,17 @@ export async function repaint(force = false) {
     return;
   }
 
+  const pauseId = await ThreadFront.getCurrentPauseId(replayClient);
+
+  return repaintAtPause(ThreadFront.currentTime, pauseId, force);
+}
+
+export async function repaintAtPause(time: number, pauseId: string, force = false) {
+  const recordingCapabilities = await ThreadFront.getRecordingCapabilities();
+  if (!recordingCapabilities.supportsRepaintingGraphics) {
+    return;
+  }
+
   let graphicsFetched = false;
 
   let didStall = false;
@@ -263,8 +274,6 @@ export async function repaint(force = false) {
     }
   }, 500);
 
-  const { mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
-  const pauseId = await ThreadFront.getCurrentPauseId(replayClient);
   const rv = await repaintGraphics(replayClient, pauseId, force);
   graphicsFetched = true;
 
@@ -274,7 +283,8 @@ export async function repaint(force = false) {
     }
   }
 
-  if (!rv || pauseId !== ThreadFront.currentPause.pauseId) {
+  // if (!rv || pauseId !== ThreadFront.currentPause.pauseId) {
+  if (!rv) {
     return;
   }
   let { description, screenShot } = rv;
@@ -287,6 +297,8 @@ export async function repaint(force = false) {
       return;
     }
   }
+
+  const { mouse } = await getGraphicsAtTime(time);
   paintGraphics(screenShot, mouse);
 }
 
