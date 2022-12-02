@@ -1032,7 +1032,9 @@ export class ReplayClient implements ReplayClientInterface {
   _dispatchEvent(type: ReplayClientEvents, ...args: any[]): void {
     const handlers = this._eventHandlers.get(type);
     if (handlers) {
-      handlers.forEach(handler => handler(...args));
+      // we iterate over a copy of the handlers array because the array
+      // may be modified during the iteration by one of the handlers
+      [...handlers].forEach(handler => handler(...args));
     }
   }
 
