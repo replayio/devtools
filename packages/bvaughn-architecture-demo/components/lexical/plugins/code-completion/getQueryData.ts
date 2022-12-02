@@ -104,12 +104,17 @@ export default function getQueryData(selection: TypeAheadSelection | null): Quer
     let currentText = positionBeginTextNode?.getTextContent() ?? "";
 
     if (currentTextNode !== null) {
+      let prevOffset: number = -1;
+      let prevTextNode: LexicalNode | null = null;
+
       forward: while (true) {
         for (currentOffset; currentOffset < currentText.length; currentOffset++) {
           const char = currentText.charAt(currentOffset);
           if (isBoundaryChar(char)) {
-            insertionEndTextNode = currentTextNode;
-            insertionEndOffset = currentOffset;
+            if (insertionEndTextNode === null) {
+              insertionEndTextNode = currentTextNode;
+              insertionEndOffset = currentOffset;
+            }
 
             if (positionEndTextNode === null) {
               positionEndTextNode = currentTextNode;
@@ -119,12 +124,13 @@ export default function getQueryData(selection: TypeAheadSelection | null): Quer
             break forward;
           } else if (char === ".") {
             if (dotCount === 0) {
-              // If the cursor is within an expression (e.g. "window.loca|tion.href")
-              // then break once we reach the next "."
+              // If the cursor is within an expression (e.g. "window.loca|tion.href") then break once we reach the next "."
               positionEndOffset = currentOffset;
               positionEndTextNode = currentTextNode;
 
-              // Don't break; find the expression to can replace the whole thing (e.g. "window.loc|ation.href" => "window.location")
+              // To match Chrome's behavior we should also only replace things between the dots (e.g. "wd|w.location" => "window.location")
+              insertionEndTextNode = prevTextNode;
+              insertionEndOffset = prevOffset;
             }
 
             dotCount--;
@@ -150,6 +156,9 @@ export default function getQueryData(selection: TypeAheadSelection | null): Quer
             break forward;
           }
         }
+
+        prevOffset = currentOffset;
+        prevTextNode = currentTextNode;
 
         currentTextNode = nextTextNode;
         currentText = nextTextNode.getTextContent();
