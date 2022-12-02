@@ -1,10 +1,11 @@
+import { IDBPDatabase, openDB } from "idb";
 import { SetStateAction, useCallback, useEffect, useRef, useState, useTransition } from "react";
 
-import {
-  createObjectStore,
-  getValue as getValueFromIndexedDb,
-  setValue as setValueInIndexedDB,
-} from "../utils/database";
+export interface IDBOptions {
+  databaseName: string;
+  databaseVersion: number;
+  storeNames: string[];
+}
 
 const STATUS_INITIALIZATION_COMPLETE = "initialization-complete";
 const STATUS_INITIALIZATION_ERRORED = "initialization-errored";
@@ -24,95 +25,83 @@ type Status =
 // * IndexedDB storage limits is typically much larger than local storage because it is based on free disk space (and not a hard limit).
 //   See: https://tinyurl.com/index-db-storage-limits
 export default function useIndexedDB<T>(options: {
-  databaseName: string;
-  databaseVersion?: number;
+  database: IDBOptions;
   initialValue: T;
   recordName: string;
   scheduleUpdatesAsTransitions?: boolean;
   storeName: string;
 }): {
-  setValue: (value: T) => void;
+  setValue: (value: T | ((prevValue: T) => T)) => void;
   status: Status;
-  value: T | undefined;
+  value: T;
 } {
-  const {
-    databaseName,
-    databaseVersion = 1,
-    initialValue,
-    recordName,
-    scheduleUpdatesAsTransitions = false,
-    storeName,
-  } = options;
+  const { databaseName, databaseVersion, storeNames } = options.database;
+  const { initialValue, recordName, scheduleUpdatesAsTransitions = false, storeName } = options;
 
   const [isPending, startTransition] = useTransition();
-  const [value, setValue] = useState<T | undefined>(undefined);
+  const [value, setValue] = useState<T>(initialValue);
   const [status, setStatus] = useState<Status>(STATUS_INITIALIZATION_PENDING);
 
-  const databaseRef = useRef<IDBDatabase | null>(null);
-  const initialValueRef = useRef<T>(initialValue);
+  const databaseRef = useRef<IDBPDatabase | null>(null);
 
   const setValueWrapper = useCallback(
-    (value: T) => {
+    (newValue: T | ((prevValue: T) => T)) => {
       if (scheduleUpdatesAsTransitions) {
         startTransition(() => {
-          setValue(value);
+          setValue(newValue);
         });
       } else {
-        setValue(value);
-      }
-
-      const database = databaseRef.current;
-      if (database !== null) {
-        setValueInIndexedDB(database, recordName, storeName, value);
+        setValue(newValue);
       }
     },
-    [recordName, scheduleUpdatesAsTransitions, storeName]
+    [scheduleUpdatesAsTransitions]
   );
 
   useEffect(() => {
-    initialValueRef.current = initialValue;
-  }, [initialValue]);
+    if (status === "initialization-complete") {
+      // Only sync data to IDB after we've finished reading it,
+      // to avoid accidentally overwriting with the initial value
+      databaseRef.current?.put(storeName, value, recordName);
+    }
+  }, [value, recordName, storeName, status]);
 
   useEffect(() => {
     let cancelled = false;
 
-    const openRequest = indexedDB.open(databaseName, databaseVersion);
-
-    openRequest.onupgradeneeded = () => {
-      const database = openRequest.result;
-      console.log("onupgradeneeded");
-      // TODO Handle upgrades
-      createObjectStore(database, storeName);
-    };
-
-    openRequest.onerror = () => {
-      console.error("IndexedDB open error:", openRequest.error);
-      setStatus(STATUS_INITIALIZATION_ERRORED);
-    };
-    openRequest.onsuccess = () => {
-      const database = openRequest.result;
-      if (!cancelled) {
-        databaseRef.current = database;
-
-        getValueFromIndexedDb<T>(database, storeName, recordName).then(({ error, value }) => {
-          if (!cancelled) {
-            if (error) {
-              console.error("IndexedDB read error:", error);
-              setStatus(STATUS_INITIALIZATION_ERRORED);
-            } else {
-              const initialValue = initialValueRef.current;
-              setValue(value === undefined ? initialValue : value!);
-              setStatus(STATUS_INITIALIZATION_COMPLETE);
+    async function setupDatabaseForHook() {
+      const dbInstance = await openDB(databaseName, databaseVersion, {
+        upgrade(db) {
+          // The "upgrade" callback runs both on initial creation (when a DB does not exist),
+          // and on version number change.
+          for (let storeName of storeNames) {
+            if (!db.objectStoreNames.contains(storeName)) {
+              db.createObjectStore(storeName);
             }
           }
-        });
+        },
+      });
+      databaseRef.current = dbInstance;
+      try {
+        const savedData = await dbInstance.get(storeName, recordName);
+        if (!cancelled) {
+          if (savedData !== undefined) {
+            // We may not have a saved value. Don't overwrite with `undefined`.
+            setValue(savedData);
+          }
+          setStatus(STATUS_INITIALIZATION_COMPLETE);
+        }
+      } catch {
+        setStatus(STATUS_INITIALIZATION_ERRORED);
       }
-    };
+    }
+
+    setupDatabaseForHook();
 
     return () => {
       cancelled = true;
+      databaseRef.current?.close();
     };
-  }, [databaseName, databaseVersion, recordName, storeName]);
+  }, [databaseName, databaseVersion, recordName, storeName, storeNames]);
 
   return {
     setValue: setValueWrapper,

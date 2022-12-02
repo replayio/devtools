@@ -14,10 +14,18 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point, PointId } from "shared/client/types";
 
 import useBreakpointIdsFromServer from "../hooks/useBreakpointIdsFromServer";
-import useIndexedDB from "../hooks/useIndexedDB";
+import useIndexedDB, { IDBOptions } from "../hooks/useIndexedDB";
 import { SessionContext } from "./SessionContext";
 
 const EMPTY_ARRAY: Point[] = [];
+
+// NOTE: If any change is made like adding a store name, bump the version number
+// to ensure that the database is recreated properly.
+const POINTS_DATABASE: IDBOptions = {
+  databaseName: "Points",
+  databaseVersion: 1,
+  storeNames: ["high-priority", "transition"],
+};
 
 export type PointInstance = {
   point: Point;
@@ -60,7 +68,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     status: pointsStatus,
     value: points,
   } = useIndexedDB<Point[]>({
-    databaseName: "Points",
+    database: POINTS_DATABASE,
     initialValue: [],
     recordName: recordingId,
     storeName: "high-priority",
@@ -70,7 +78,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     status: pointsForAnalysisStatus,
     value: pointsForAnalysis,
   } = useIndexedDB<Point[]>({
-    databaseName: "Points",
+    database: POINTS_DATABASE,
     initialValue: [],
     recordName: recordingId,
     scheduleUpdatesAsTransitions: true,
@@ -97,7 +105,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
 
   const addPoint = useCallback(
     (partialPoint: Partial<Point> | null, location: Location) => {
-      // Points (and their ids) are shared between tabs (via LocalStorage),
+      // Points (and their ids) are shared between tabs (via IndexedDB),
       // so the id numbers should be deterministic;
       // a single incrementing counter wouldn't work well unless it was also synced.
       const id = `${location.sourceId}:${location.line}:${location.column}`;
