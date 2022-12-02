@@ -214,6 +214,7 @@ export type TestStep = {
 };
 
 export type AnnotatedTestStep = TestStep & {
+  index: number;
   annotations: Annotations;
 };
 

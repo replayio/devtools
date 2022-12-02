@@ -74,11 +74,12 @@ function useGetTestSections(
       })
       .map<NetworkEvent>(n => ({ time: n.end!, type: "network", event: n }));
 
-    const stepsByTime = steps.map<StepEvent>(s => ({
+    const stepsByTime = steps.map<StepEvent>((s, i) => ({
       time: startTime + s.relativeStartTime,
       type: "step",
       event: {
         ...s,
+        index: i,
         annotations: {
           end: annotationsEnd.find(a => a.message.id === s.id),
           enqueue: annotationsEnqueue.find(a => a.message.id === s.id),
@@ -199,7 +200,7 @@ function TestSection({ events, header }: { events: CompositeTestEvent[]; header?
       ) : null}
       {events.map(({ event: s, type }, i) =>
         type === "step" ? (
-          <TestStepRoot step={s} key={i} index={i} argString={s.args?.toString()} id={s.id} />
+          <TestStepRoot step={s} key={i} index={s.index} argString={s.args?.toString()} id={s.id} />
         ) : type === "network" ? (
           <NetworkEvent key={s.id} method={s.method} status={s.status} url={s.url} id={s.id} />
         ) : (
