@@ -57,7 +57,13 @@ function EagerEvaluationResultSuspends({
         return null;
       }
 
-      children = <ClientValueValueRenderer clientValue={clientValue} context="console" />;
+      children = (
+        <ClientValueValueRenderer
+          clientValue={clientValue}
+          context="console"
+          disableExpandStringToggle={true}
+        />
+      );
     }
   }
 
