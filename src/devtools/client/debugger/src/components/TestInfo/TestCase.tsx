@@ -11,6 +11,7 @@ import { TestItem, TestResult } from "ui/types";
 import { TestSteps } from "./TestSteps";
 
 export type TestCaseContextType = {
+  test: TestItem;
   startTime: number;
   endTime: number;
   onReplay: () => void;
@@ -87,7 +88,7 @@ export function TestCase({
 
   return (
     <TestCaseContext.Provider
-      value={{ startTime: testStartTime, endTime: testEndTime, onReplay, onPlayFromHere }}
+      value={{ startTime: testStartTime, endTime: testEndTime, onReplay, onPlayFromHere, test }}
     >
       <div className="flex flex-col">
         {!isHighlighted && (
