@@ -100,6 +100,10 @@ function ContextMenu({
         top: mouseCoordinates.y,
       }}
     >
+      <div className={styles.ContextMenuItem} onClick={onGoToLocation}>
+        <MaterialIcon>code</MaterialIcon>
+        Jump to source
+      </div>
       <div className={styles.ContextMenuItem} onClick={onPlayFromHere}>
         <MaterialIcon>play_circle</MaterialIcon>
         Play from here
@@ -119,10 +123,6 @@ function ContextMenu({
       >
         <MaterialIcon>arrow_forward</MaterialIcon>
         Show after
-      </div>
-      <div className={styles.ContextMenuItem} onClick={onGoToLocation}>
-        <MaterialIcon>code</MaterialIcon>
-        Show source code
       </div>
     </div>
   );

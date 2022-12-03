@@ -203,7 +203,7 @@ function TestSection({ events, header }: { events: CompositeTestEvent[]; header?
         ) : type === "network" ? (
           <NetworkEvent key={s.id} method={s.method} status={s.status} url={s.url} id={s.id} />
         ) : (
-          <span className="font-italic flex border-b border-themeBase-90 p-1 px-2">
+          <span className="flex border-b border-themeBase-90 p-1 px-2 italic opacity-70">
             new url {s.url}
           </span>
         )
