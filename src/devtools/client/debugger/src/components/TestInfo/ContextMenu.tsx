@@ -105,6 +105,8 @@ function ContextMenu({
     }
   };
 
+  const canJumpToBefore = adjustedAbsoluteEndTime === currentTime || testStep.name === "assert";
+
   return (
     <div
       className={styles.ContextMenu}
@@ -123,9 +125,9 @@ function ContextMenu({
       </div>
       <div
         className={classnames("ContextMenuItem", {
-          disabled: testStep.absoluteStartTime === currentTime,
+          disabled: canJumpToBefore,
         })}
-        onClick={testStep.absoluteStartTime === currentTime ? undefined : onJumpToBefore}
+        onClick={canJumpToBefore ? undefined : onJumpToBefore}
       >
         <MaterialIcon>arrow_back</MaterialIcon>
         Show before
