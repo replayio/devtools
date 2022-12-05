@@ -4,8 +4,12 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from "
 
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import PropertiesRenderer from "bvaughn-architecture-demo/components/inspector/PropertiesRenderer";
-import { getReporterAnnotationsForTests, getSelectedTest } from "ui/reducers/reporter";
-import { useAppSelector } from "ui/setup/hooks";
+import {
+  getReporterAnnotationsForTests,
+  getSelectedTest,
+  setSelectedTest,
+} from "ui/reducers/reporter";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem } from "ui/types";
 
 import ContextMenuWrapper from "./ContextMenu";
@@ -22,6 +26,7 @@ type TestInfoContextType = {
 export const TestInfoContext = createContext<TestInfoContextType>(null as any);
 
 export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
+  const dispatch = useAppDispatch();
   const selectedTest = useAppSelector(getSelectedTest);
   const [consoleProps, setConsoleProps] = useState<ProtocolObject>();
   const [pauseId, setPauseId] = useState<string | null>(null);
@@ -30,6 +35,13 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
   const showTest = (index: number) => {
     return selectedTest === null || selectedTest === index;
   };
+
+  useEffect(() => {
+    if (testCases.length === 1) {
+      dispatch(setSelectedTest(0));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!annotations) {
     return (
