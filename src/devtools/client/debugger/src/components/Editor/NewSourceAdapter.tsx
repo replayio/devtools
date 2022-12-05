@@ -47,17 +47,10 @@ function NewSourceAdapter() {
   const dispatch = useAppDispatch();
   const location = useAppSelector(getSelectedLocation);
 
-  const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
-
   // Sync the selected location that's in Redux to the new SourcesContext.
   // This makes the CMD+O and CMD+G menus work.
   // This also makes clicking on Console log locations work.
   useLayoutEffect(() => {
-    const timeoutId = timeoutIdRef.current;
-    if (timeoutId !== null) {
-      clearTimeout(timeoutId);
-    }
-
     if (location == null) {
       return;
     }
@@ -69,18 +62,12 @@ function NewSourceAdapter() {
     const lineNumber = location?.line ?? 0;
     const lineIndex = lineNumber > 0 ? lineNumber - 1 : undefined;
 
-    // TRICKY
     // Sync focused state from Redux to React context,
-    // but do it after a small delay to avoid overriding values the are set as part of a transition.
     if (
       focusedSource?.sourceId !== location.sourceId ||
       focusedSource?.startLineIndex !== lineIndex
     ) {
-      timeoutIdRef.current = setTimeout(() => {
-        timeoutIdRef.current = null;
-
-        openSource("view-source", location.sourceId, lineIndex, lineIndex);
-      }, 100);
+      openSource("view-source", location.sourceId, lineIndex, lineIndex);
     }
   }, [focusedSource, location, openSource]);
 
