@@ -138,7 +138,8 @@ function MatchRow({
       data-test-name="SearchFiles-ResultRow"
       data-test-type="Match"
       onClick={() => {
-        openSource("search-result", match.location.sourceId, match.location.line - 1);
+        const lineIndex = match.location.line - 1;
+        openSource("search-result", match.location.sourceId, lineIndex, lineIndex);
       }}
       style={style}
     >

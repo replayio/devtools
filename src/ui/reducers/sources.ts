@@ -159,7 +159,7 @@ const sourcesSlice = createSlice({
     },
     locationSelected: (
       state,
-      action: PayloadAction<{ location: PartialLocation; source: SourceDetails }>
+      action: PayloadAction<{ location: PartialLocation; source?: SourceDetails }>
     ) => {
       // Source is used by the tabs reducer
       const { location } = action.payload;

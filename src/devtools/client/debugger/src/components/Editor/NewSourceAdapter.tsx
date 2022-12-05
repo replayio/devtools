@@ -10,7 +10,6 @@ import {
 } from "bvaughn-architecture-demo/components/sources/SourceSearchContext";
 import { KeyboardModifiersContextRoot } from "bvaughn-architecture-demo/src/contexts/KeyboardModifiersContext";
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import useDebouncedCallback from "bvaughn-architecture-demo/src/hooks/useDebouncedCallback";
 import { getSource } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useFeature } from "ui/hooks/settings";
@@ -80,7 +79,7 @@ function NewSourceAdapter() {
       timeoutIdRef.current = setTimeout(() => {
         timeoutIdRef.current = null;
 
-        openSource("view-source", location.sourceId, lineIndex);
+        openSource("view-source", location.sourceId, lineIndex, lineIndex);
       }, 100);
     }
   }, [focusedSource, location, openSource]);

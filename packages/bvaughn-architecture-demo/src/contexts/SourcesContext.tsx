@@ -1,10 +1,12 @@
-import { Location, SourceId, SourceLocation } from "@replayio/protocol";
+import { SourceId, SourceLocation } from "@replayio/protocol";
 import {
   PropsWithChildren,
   createContext,
   useCallback,
+  useLayoutEffect,
   useMemo,
   useReducer,
+  useRef,
   useTransition,
 } from "react";
 
@@ -30,7 +32,12 @@ type SourcesContextType = {
   hoveredLineNode: HTMLElement | null;
   isPending: boolean;
   markPendingFocusUpdateProcessed: () => void;
-  openSource: (mode: FocusedSourceMode, sourceId: SourceId, lineIndex?: number) => void;
+  openSource: (
+    mode: FocusedSourceMode,
+    sourceId: SourceId,
+    startLineIndex?: number,
+    endLineIndex?: number
+  ) => void;
   openSourceIds: SourceId[];
   pendingFocusUpdate: boolean;
   setHoveredLocation: (lineIndex: number | null, lineNode: HTMLElement | null) => void;
@@ -144,7 +151,6 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
       }
     }
     case "open_source": {
-      // TODO [FE-1009] Support focused line range
       const { focusedSource } = action;
 
       const {
@@ -265,19 +271,44 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
 
 export const SourcesContext = createContext<SourcesContextType>(null as any);
 
+type PartialLocation = {
+  column?: number | undefined;
+  line?: number | undefined;
+  sourceId: SourceId;
+  sourceUrl?: string | undefined;
+};
+type SelectLocationFunction = (location: PartialLocation | null) => void;
+
 const defaultFindClosestFunctionByName = () => null;
+const defaultSelectLocation = () => {};
 
 export type SourcesContextRootProps = PropsWithChildren<{
   findClosestFunctionName?: FindClosestFunctionName;
+  selectLocation?: SelectLocationFunction;
 }>;
 
 export function SourcesContextRoot({
   children,
   findClosestFunctionName = defaultFindClosestFunctionByName,
+  selectLocation = defaultSelectLocation,
 }: SourcesContextRootProps) {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
   const [isPending, startTransition] = useTransition();
+
+  const selectLocationRef = useRef<SelectLocationFunction>(selectLocation);
+  useLayoutEffect(() => {
+    selectLocationRef.current = selectLocation;
+  });
+
+  useLayoutEffect(() => {
+    if (state.focusedSource === null) {
+      const selectLocation = selectLocationRef.current;
+      if (selectLocation) {
+        selectLocation(null);
+      }
+    }
+  }, [state.focusedSource]);
 
   const closeSource = useCallback((sourceId: SourceId) => {
     startTransition(() => {
@@ -292,17 +323,30 @@ export function SourcesContextRoot({
   }, []);
 
   const openSource = useCallback(
-    (mode: FocusedSourceMode, sourceId: SourceId, lineIndex: number | undefined) => {
+    (
+      mode: FocusedSourceMode,
+      sourceId: SourceId,
+      startLineIndex: number | null = null,
+      endLineIndex: number | null = null
+    ) => {
       startTransition(() => {
         dispatch({
           type: "open_source",
           focusedSource: {
-            endLineIndex: lineIndex ?? null,
+            endLineIndex,
             mode,
             sourceId,
-            startLineIndex: lineIndex ?? null,
+            startLineIndex,
           },
         });
+
+        const selectLocation = selectLocationRef.current;
+        if (selectLocation) {
+          selectLocation({
+            line: startLineIndex !== null ? startLineIndex + 1 : undefined,
+            sourceId,
+          });
+        }
       });
     },
     []

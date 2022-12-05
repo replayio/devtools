@@ -2,7 +2,9 @@ import { SourceLocation } from "@replayio/protocol";
 import { PropsWithChildren, useCallback } from "react";
 
 import { SourcesContextRoot } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import { findClosestFunctionNameThunk } from "devtools/client/debugger/src/utils/ast";
+import { clearSelectedLocation, locationSelected } from "ui/reducers/sources";
 import { useAppDispatch } from "ui/setup/hooks";
 
 // Relays information about the active source from Redux to the newer SourcesContext.
@@ -19,8 +21,22 @@ export default function SourcesContextWrapper({ children }: PropsWithChildren) {
     [dispatch]
   );
 
+  const selectLocation = useCallback(
+    (location: PartialLocation | null) => {
+      if (location === null) {
+        dispatch(clearSelectedLocation);
+      } else {
+        dispatch(locationSelected({ location }));
+      }
+    },
+    [dispatch]
+  );
+
   return (
-    <SourcesContextRoot findClosestFunctionName={findClosestFunctionName}>
+    <SourcesContextRoot
+      findClosestFunctionName={findClosestFunctionName}
+      selectLocation={selectLocation}
+    >
       {children}
     </SourcesContextRoot>
   );

@@ -98,7 +98,6 @@ export default function SourceList({
 
     const list = listRef.current;
     if (list) {
-      // TODO [FE-1009] Handle line range
       list.scrollToItem(startLineIndex, "smart");
 
       // Important!

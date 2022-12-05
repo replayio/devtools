@@ -13,7 +13,6 @@ import { getToolboxLayout, getViewMode } from "ui/reducers/layout";
 import {
   SourceDetails,
   clearSelectedLocation,
-  getSelectedSource,
   getSourceDetails,
   getSourceIdToDisplayForUrl,
   getSourceToDisplayForUrl,

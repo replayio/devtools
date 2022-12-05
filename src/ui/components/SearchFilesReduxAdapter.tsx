@@ -13,8 +13,6 @@ export default function SearchFilesReduxAdapter() {
   const sourcesById = useAppSelector(getSourceDetailsEntities);
   const dispatch = useAppDispatch();
 
-  // TODO [FE-1009] This "search-result" specific adapter can probably go away in favor of a single, more general-purpose adapter.
-
   // When a user clicks on a search in the file-search panel, open it in Redux as well.
   useLayoutEffect(() => {
     if (focusedSource != null) {

@@ -120,7 +120,8 @@ export default function useSourceFileNameSearch(): [State, Actions] {
         if (goToLineNumber !== null) {
           const sourceId = focusedSourceIdRef.current;
           if (sourceId != null) {
-            openSource("view-source", sourceId, goToLineNumber - 1);
+            const lineIndex = goToLineNumber - 1;
+            openSource("view-source", sourceId, lineIndex, lineIndex);
           }
         }
       },
