@@ -1,12 +1,12 @@
 export default function parseTipTapJson(json: any): string {
   let markdownString = "";
 
-  json.content.forEach((paragraph: any) => {
+  json.content.forEach(({ content }: any) => {
     if (markdownString !== "") {
       markdownString += "\n\n";
     }
 
-    paragraph.content.forEach(({ marks = [], text, type }: any) => {
+    content?.forEach(({ marks = [], text, type }: any) => {
       switch (type) {
         case "hardBreak": {
           markdownString += "\n";
@@ -15,7 +15,7 @@ export default function parseTipTapJson(json: any): string {
         case "text": {
           let formattedText = text;
 
-          marks.forEach(({ type }: any) => {
+          marks?.forEach(({ type }: any) => {
             switch (type) {
               case "bold": {
                 formattedText = `**${formattedText}**`;
@@ -27,6 +27,7 @@ export default function parseTipTapJson(json: any): string {
               }
             }
           });
+
           markdownString += formattedText;
           break;
         }

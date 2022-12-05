@@ -1,11 +1,11 @@
 import { SerializedEditorState } from "lexical";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import CommentEditor from "bvaughn-architecture-demo/components/lexical/CommentEditor";
 import { useUpdateComment, useUpdateCommentReply } from "ui/hooks/comments/comments";
 import useDeleteComment from "ui/hooks/comments/useDeleteComment";
 import useDeleteCommentReply from "ui/hooks/comments/useDeleteCommentReply";
-import { useGetOwnersAndCollaborators, useGetRecordingId } from "ui/hooks/recordings";
+import useRecordingUsers from "ui/hooks/useGetCollaboratorNames";
 import { useGetUserId } from "ui/hooks/users";
 import type { Comment, Remark } from "ui/state/comments";
 import { formatRelativeTime } from "ui/utils/comments";
@@ -32,19 +32,7 @@ export default function EditableRemark({
   const updateComment = useUpdateComment();
   const updateCommentReply = useUpdateCommentReply();
 
-  const recordingId = useGetRecordingId();
-  const ownersAndCollaborators = useGetOwnersAndCollaborators(recordingId);
-  const collaboratorNames = useMemo(() => {
-    const names: string[] = [];
-    if (ownersAndCollaborators.collaborators) {
-      ownersAndCollaborators.collaborators.forEach(collaborator => {
-        if (collaborator?.user?.name) {
-          names.push(collaborator.user.name);
-        }
-      });
-    }
-    return names;
-  }, [ownersAndCollaborators]);
+  const collaborators = useRecordingUsers(true);
 
   // This should be replaced with useTransition() once we're using Suspense for comment data.
   const [isPending, setIsPending] = useState(false);
@@ -120,7 +108,7 @@ export default function EditableRemark({
       >
         <CommentEditor
           autoFocus={isEditing}
-          collaboratorNames={collaboratorNames}
+          collaborators={collaborators}
           editable={isEditing && !isPending}
           initialValue={content}
           onCancel={discardPendingChanges}

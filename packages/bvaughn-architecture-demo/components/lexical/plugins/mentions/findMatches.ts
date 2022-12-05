@@ -1,17 +1,21 @@
+import { Collaborator } from "./types";
+
 export default function findMatches(
-  collaboratorNames: string[],
+  collaborators: Collaborator[],
   query: string,
   _: string | null
-): string[] {
+): Collaborator[] {
   // Strip the "@" prefix off of the query before searching.
   query = query.slice(1);
 
   if (query === "") {
     // If there's nothing left in the query, just show everything.
-    return collaboratorNames;
+    return collaborators;
   }
 
   const caseInsensitiveQuery = query.toLowerCase();
 
-  return collaboratorNames.filter(name => name.toLowerCase().includes(caseInsensitiveQuery));
+  return collaborators.filter(collaborator =>
+    collaborator.name.toLowerCase().includes(caseInsensitiveQuery)
+  );
 }

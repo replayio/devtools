@@ -7,15 +7,16 @@ import findMatches from "./findMatches";
 import getQueryData from "./getQueryData";
 import isExactMatch from "./isExactMatch";
 import MentionsTextNode from "./MentionsTextNode";
+import { Collaborator } from "./types";
 import $createMentionsTextNode from "./utils/$createMentionsTextNode";
 import styles from "./styles.module.css";
 
 export default function MentionsPlugin({
-  collaboratorNames,
+  collaborators,
   dataTestId,
   dataTestName = "MentionsTypeAhead",
 }: {
-  collaboratorNames: string[];
+  collaborators: Collaborator[];
   dataTestId?: string;
   dataTestName?: string;
 }): JSX.Element {
@@ -36,13 +37,13 @@ export default function MentionsPlugin({
 
   const findMatchesWithCollaborators = useCallback(
     (query: string) => {
-      return findMatches(collaboratorNames, query, null);
+      return findMatches(collaborators, query, null);
     },
-    [collaboratorNames]
+    [collaborators]
   );
 
   return (
-    <TypeAheadPlugin<string>
+    <TypeAheadPlugin<Collaborator>
       createItemNode={createItemNode}
       dataTestId={dataTestId}
       dataTestName={dataTestName}
@@ -50,11 +51,16 @@ export default function MentionsPlugin({
       findMatches={findMatchesWithCollaborators}
       isExactMatch={isExactMatch}
       itemClassName={styles.Item}
+      itemRenderer={itemRenderer}
       listClassName={styles.List}
     />
   );
 }
 
-function createItemNode(collaboratorNames: string) {
-  return $createMentionsTextNode(`@${collaboratorNames}`);
+function createItemNode(collaborator: Collaborator) {
+  return $createMentionsTextNode(collaborator.id, collaborator.name);
+}
+
+function itemRenderer(collaborator: Collaborator) {
+  return collaborator.name;
 }
