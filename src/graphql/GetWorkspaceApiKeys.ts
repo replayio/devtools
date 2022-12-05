@@ -26,9 +26,7 @@ export interface GetWorkspaceApiKeys_node_Workspace {
   apiKeys: GetWorkspaceApiKeys_node_Workspace_apiKeys[] | null;
 }
 
-export type GetWorkspaceApiKeys_node =
-  | GetWorkspaceApiKeys_node_Recording
-  | GetWorkspaceApiKeys_node_Workspace;
+export type GetWorkspaceApiKeys_node = GetWorkspaceApiKeys_node_Recording | GetWorkspaceApiKeys_node_Workspace;
 
 export interface GetWorkspaceApiKeys {
   node: GetWorkspaceApiKeys_node | null;
