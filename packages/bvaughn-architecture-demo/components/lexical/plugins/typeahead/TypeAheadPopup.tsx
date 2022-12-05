@@ -9,7 +9,7 @@ import {
   KEY_TAB_COMMAND,
   LexicalEditor,
 } from "lexical";
-import { ReactNode, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ReactNode, Suspense, useLayoutEffect, useRef, useState } from "react";
 
 import { INSERT_ITEM_COMMAND } from "./commands";
 import TypeAheadListRenderer from "./TypeAheadListRenderer";
@@ -127,7 +127,10 @@ function TypeAheadPopUp<Item>({
 
   // Notify the parent plug-in that it should deactivate the type-ahead when there are no suggestions.
   // This includes the case where there's only one suggestion and it's an exact match.
-  useEffect(() => {
+  //
+  // It's best to do this with a layout effect because of the exact-match check;
+  // Otherwise the popup will appear to flicker before being hidden.
+  useLayoutEffect(() => {
     if (queryData !== null) {
       if (items.length === 0) {
         updateQueryData(null);
@@ -169,54 +172,55 @@ function TypeAheadPopUp<Item>({
     const { anchorNode, anchorOffset, focusNode, focusOffset } = nativeSelection;
     if (anchorNode === null || focusNode === null) {
       return;
-    }
-
-    if (getLexicalEditorForDomNode(anchorNode) !== editor) {
+    } else if (getLexicalEditorForDomNode(anchorNode) !== editor) {
       return;
     }
 
-    let positionRect: DOMRect | null = null;
+    const { beginOffset, beginTextNode, endOffset, endTextNode } = queryData.textRange;
 
-    // Position the popup at the start of the query.
-    let queryLength = queryData.query.length;
-    let currentNode: Node | null = anchorNode;
-    let currentOffset = anchorOffset;
-    loop: while (currentNode != null) {
-      for (let offset = currentOffset; offset >= 0; offset--) {
-        queryLength--;
+    try {
+      const beginHTMLElement = editor.getElementByKey(beginTextNode.getKey());
+      const endHTMLElement = editor.getElementByKey(endTextNode.getKey());
 
-        if (queryLength === 0) {
-          // Temporarily change selection so we can measure the text we care about
-          nativeSelection.setBaseAndExtent(currentNode, offset, currentNode, offset);
+      if (beginHTMLElement && endHTMLElement) {
+        const beginTextNode =
+          beginHTMLElement.nodeType === Node.TEXT_NODE
+            ? beginHTMLElement
+            : beginHTMLElement.firstChild!;
+        const endTextNode =
+          endHTMLElement.nodeType === Node.TEXT_NODE ? endHTMLElement : endHTMLElement.firstChild!;
 
-          positionRect = getDOMRangeRect(nativeSelection, rootElement);
+        const endTextNodeOffset = Math.min(
+          endOffset,
+          endTextNode.textContent ? endTextNode.textContent.length : 0
+        );
 
-          // Restore selection
-          nativeSelection.setBaseAndExtent(anchorNode, anchorOffset, focusNode, focusOffset);
+        // Position the popup at the start of the query.
+        // Temporarily change selection so we can measure the text we care about
+        nativeSelection.setBaseAndExtent(
+          beginTextNode,
+          beginOffset,
+          endTextNode,
+          endTextNodeOffset
+        );
 
-          break loop;
+        const positionRect = getDOMRangeRect(nativeSelection, rootElement);
+
+        // const positionRect = positionRange?.getBoundingClientRect() ?? null;
+        if (positionRect !== null) {
+          popup.style.position = "absolute";
+          popup.style.left = "0px";
+          popup.style.top = "0px";
+
+          setFloatingElemPosition(positionRect, popup, anchorElem, 0, 0);
         }
       }
-
-      if (currentNode.previousSibling != null) {
-        currentNode = currentNode.previousSibling;
-        currentOffset = currentNode.textContent?.length ?? 0;
-      } else if (currentNode.parentNode?.previousSibling?.firstChild != null) {
-        currentNode = currentNode.parentNode.previousSibling.firstChild;
-        currentOffset = currentNode.textContent?.length ?? 0;
-      } else {
-        currentNode = null;
-      }
+    } catch (error) {
+      console.error(error);
     }
 
-    // const positionRect = positionRange?.getBoundingClientRect() ?? null;
-    if (positionRect !== null) {
-      popup.style.position = "absolute";
-      popup.style.left = "0px";
-      popup.style.top = "0px";
-
-      setFloatingElemPosition(positionRect, popup, anchorElem, 0, 0);
-    }
+    // Restore selection
+    nativeSelection.setBaseAndExtent(anchorNode, anchorOffset, focusNode, focusOffset);
   });
 
   // Scroll selected item into view
@@ -343,6 +347,11 @@ function TypeAheadPopUp<Item>({
       editor.registerCommand(KEY_TAB_COMMAND, onKeyPress, COMMAND_PRIORITY_HIGH)
     );
   }, [editor]);
+
+  if (items.length === 0) {
+    // Don't render an empty popup.
+    return null;
+  }
 
   return (
     <TypeAheadListRenderer

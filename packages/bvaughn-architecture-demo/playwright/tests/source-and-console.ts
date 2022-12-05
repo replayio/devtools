@@ -67,12 +67,36 @@ test("should run local analysis for log points", async ({ page }) => {
   await takeScreenshot(page, message, "log-point-local-analysis");
 });
 
+test("should overflow long log point text (without wrapping)", async ({ page }) => {
+  await toggleProtocolMessages(page, false);
+  await addLogPoint(page, {
+    sourceId,
+    lineNumber: 13,
+    content: '"This is a long string with a lot of text so that it overflows the log point panel"',
+    saveAfterEdit: false,
+  });
+  const logPointPanel = getPointPanelLocator(page, 13);
+  await takeScreenshot(page, logPointPanel, "log-point-panel-with-long-text-in-edit-mode");
+
+  const saveButton = logPointPanel.locator('[data-test-name="PointPanel-SaveButton"]');
+  await saveButton.click({ force: true });
+
+  await takeScreenshot(page, logPointPanel, "log-point-panel-with-long-text-in-read-only-mode");
+});
+
 test("should support new lines in log points", async ({ page }) => {
   await toggleProtocolMessages(page, false);
-  await addLogPoint(page, { sourceId, lineNumber: 13, content: '"one\\ntwo"' });
-  await verifyConsoleMessage(page, "two", "log-point", 1);
-  const message = page.locator("[data-test-name=Message]").first();
-  await takeScreenshot(page, message, "log-point-with-new-lines");
+
+  await addLogPoint(page, { sourceId, lineNumber: 13, content: "initial" });
+
+  const strings = ['"one\\ntwo"', "'one\\ntwo'", "`one\\ntwo`"];
+  for (let index = 0; index < strings.length; index++) {
+    const string = strings[index];
+    await editLogPoint(page, { sourceId, lineNumber: 13, content: string });
+    await verifyConsoleMessage(page, "two", "log-point", 1);
+    const message = page.locator("[data-test-name=Message]").first();
+    await takeScreenshot(page, message, "log-point-with-new-lines");
+  }
 });
 
 test("should run remote analysis for log points", async ({ page }) => {

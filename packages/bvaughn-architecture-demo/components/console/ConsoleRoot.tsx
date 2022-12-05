@@ -102,6 +102,11 @@ function Console({
   const onKeyDown = (event: KeyboardEvent) => {
     switch (event.key.toLowerCase()) {
       case "f": {
+        if (event.shiftKey) {
+          // Cmd+Shift+F is reserved global search.
+          return;
+        }
+
         if (event.ctrlKey || event.metaKey) {
           searchActions.show();
 

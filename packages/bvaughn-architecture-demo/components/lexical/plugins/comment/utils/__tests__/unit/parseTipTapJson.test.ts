@@ -10,7 +10,7 @@ function assert(json: any, expectedHtml: string) {
 }
 
 describe("parseTipTapJson", () => {
-  test.only("imports styled text", async () => {
+  test("imports styled text", async () => {
     const json = {
       type: "doc",
       content: [

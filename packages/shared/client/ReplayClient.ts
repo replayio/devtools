@@ -241,11 +241,25 @@ export class ReplayClient implements ReplayClientInterface {
   }> {
     const sessionId = this.getSessionIdThrows();
 
-    // Don't try to fetch messages in unloaded regions.
-    // The result might be invalid (and may get cached by a Suspense caller).
-    await this._waitForRangeToBeLoaded(focusRange);
-
     if (focusRange !== null) {
+      // We *only* care about loaded regions when calling `findMessagesInRange`.
+      // Calling `findMessages` is always safe and always returns the console
+      // messages for all parts of the recording, regardless of what is
+      // currently loading or loaded. The reason we sometimes use
+      // `findMessagesInRange` is because `findMessages` can overflow (if the
+      // replay contains more than 1,000 console messages). In that case, we
+      // might be able to fetch all of the console messages for a particular
+      // section by using `findMessagesInRange`, but it requires sending
+      // manifests to a running process, so it will only work in loaded regions.
+
+      // It would be better if `findMessagesInRange` either errored when the
+      // requested range could not be returned, or returned the boundaries of
+      // what it *did* successfully load (see BAC-2536), but right now it will
+      // just silently return a subset of messages. Given that we are extra
+      // careful here not to to fetch messages in unloaded regions because the
+      // result might be invalid (and may get cached by a Suspense caller).
+      await this._waitForRangeToBeLoaded(focusRange);
+
       const response = await client.Console.findMessagesInRange(
         { range: { begin: focusRange.begin.point, end: focusRange.end.point } },
         sessionId
@@ -980,13 +994,11 @@ export class ReplayClient implements ReplayClientInterface {
       const checkLoaded = () => {
         const loadedRegions = this.loadedRegions;
         let isLoaded = false;
-        if (loadedRegions !== null) {
+        if (loadedRegions !== null && loadedRegions.loading.length > 0) {
           if (focusRange !== null) {
-            isLoaded = isRangeInRegions(focusRange, loadedRegions.loaded);
+            isLoaded = isRangeInRegions(focusRange, loadedRegions.indexed);
           } else {
-            isLoaded =
-              loadedRegions.loaded.length > 0 &&
-              areRangesEqual(loadedRegions.loaded, loadedRegions.loading);
+            isLoaded = areRangesEqual(loadedRegions.indexed, loadedRegions.loading);
           }
         }
 
@@ -1032,7 +1044,9 @@ export class ReplayClient implements ReplayClientInterface {
   _dispatchEvent(type: ReplayClientEvents, ...args: any[]): void {
     const handlers = this._eventHandlers.get(type);
     if (handlers) {
-      handlers.forEach(handler => handler(...args));
+      // we iterate over a copy of the handlers array because the array
+      // may be modified during the iteration by one of the handlers
+      [...handlers].forEach(handler => handler(...args));
     }
   }
 

@@ -437,8 +437,7 @@ test("should show a button to clear terminal expressions", async ({ page }) => {
 
   // Add some expressions
   await page.fill("[data-test-id=ConsoleTerminalInput]", "location.href");
-  await page.keyboard.press("Enter"); // Accept auto-complete suggestion
-  await page.keyboard.press("Enter"); // Submit expression
+  await page.keyboard.press("Enter");
   await page.fill("[data-test-id=ConsoleTerminalInput]", "+/local");
   await page.keyboard.press("Enter");
 

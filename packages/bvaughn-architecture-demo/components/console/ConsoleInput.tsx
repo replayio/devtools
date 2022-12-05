@@ -41,7 +41,7 @@ function ConsoleInputSuspends() {
 
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
   const [expressionHistory, addExpression] = useTerminalHistory(recordingId);
-  const [incrementedKey, setIncrementedKey] = useState(1);
+  const [incrementedKey, setIncrementedKey] = useState(0);
 
   const ref = useRef<HTMLInputElement>(null);
   const searchStateVisibleRef = useRef(false);
@@ -73,6 +73,10 @@ function ConsoleInputSuspends() {
   }
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+
     switch (event.key) {
       case "ArrowDown": {
         event.preventDefault();
@@ -88,6 +92,8 @@ function ConsoleInputSuspends() {
             setHistoryIndex(null);
             setExpression("");
           }
+
+          setIncrementedKey(incrementedKey + 1);
         }
         break;
       }
@@ -108,6 +114,7 @@ function ConsoleInputSuspends() {
         if (newIndex >= 0 && newExpression != null) {
           setHistoryIndex(newIndex);
           setExpression(newExpression);
+          setIncrementedKey(incrementedKey + 1);
         }
         break;
       }
@@ -136,12 +143,18 @@ function ConsoleInputSuspends() {
     }
   };
 
+  // Don't auto-focus the Console input on the initial render.
+  // But if we recreate it (after the user types Enter or up/down arrow)
+  // then we want focus to "stay" in the input.
+  const autoFocus = incrementedKey > 0;
+
   return (
     <div className={styles.Container}>
       <div className={styles.PromptRow} onKeyDown={onKeyDown}>
         <Icon className={styles.Icon} type="terminal-prompt" />
         <div className={styles.Input}>
           <CodeEditor
+            autoFocus={autoFocus}
             dataTestId="ConsoleTerminalInput"
             editable={true}
             initialValue={expression}

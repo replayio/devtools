@@ -30,7 +30,7 @@ import {
   SerializedEditorState,
   TextNode,
 } from "lexical";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import LexicalEditorRefSetter from "./LexicalEditorRefSetter";
 import CommentPlugin from "./plugins/comment/CommentPlugin";
@@ -43,6 +43,7 @@ import { LoomLinkNode } from "./plugins/loom-link/LoomLinkNode";
 import LoomLinkPlugin from "./plugins/loom-link/LoomLinkPlugin";
 import MentionsPlugin from "./plugins/mentions/MentionsPlugin";
 import MentionsTextNode from "./plugins/mentions/MentionsTextNode";
+import { Collaborator } from "./plugins/mentions/types";
 import { ReplayLinkNode } from "./plugins/replay-link/ReplayLinkNode";
 import ReplayLinkPlugin from "./plugins/replay-link/ReplayLinkPlugin";
 import styles from "./styles.module.css";
@@ -70,7 +71,7 @@ const NODES: Array<Klass<LexicalNode>> = [
 
 export default function CommentEditor({
   autoFocus,
-  collaboratorNames = null,
+  collaborators = null,
   dataTestId,
   dataTestName,
   editable,
@@ -81,7 +82,7 @@ export default function CommentEditor({
   placeholder = "",
 }: {
   autoFocus?: boolean;
-  collaboratorNames?: string[] | null;
+  collaborators?: Collaborator[] | null;
   dataTestId?: string;
   dataTestName?: string;
   editable: boolean;
@@ -110,6 +111,10 @@ export default function CommentEditor({
 
   const [markdown, serializedEditorState] = useMemo(() => {
     try {
+      if (initialValue === "") {
+        return [initialValue, null];
+      }
+
       const json = JSON.parse(initialValue);
       if (json.type === "doc") {
         // Legacy (TipTap) JSON content format.
@@ -120,8 +125,10 @@ export default function CommentEditor({
         return [null, json];
       }
     } catch (error) {
+      console.error(`Error parsing saved comment state: "${initialValue}"`, error);
+
       // Assume markdown string as fallback.
-      return [null, initialValue];
+      return [initialValue, null];
     }
   }, [initialValue]);
 
@@ -244,9 +251,9 @@ export default function CommentEditor({
           <CommentPlugin />
           <LoomLinkPlugin />
           <ReplayLinkPlugin />
-          {collaboratorNames !== null ? (
+          {collaborators !== null ? (
             <MentionsPlugin
-              collaboratorNames={collaboratorNames}
+              collaborators={collaborators}
               dataTestId={dataTestId ? `${dataTestId}-CodeTypeAhead` : undefined}
               dataTestName={dataTestName ? `${dataTestName}-CodeTypeAhead` : "CodeTypeAhead"}
             />

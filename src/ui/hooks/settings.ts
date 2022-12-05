@@ -184,7 +184,7 @@ const SETTINGS_MUTATIONS: Record<MutableSettings, DocumentNode> = {
     }
   `,
   role: gql`
-    mutation UpdateUserSettingsLogRocket($role: String) {
+    mutation UpdateUserSettingsRole($role: String) {
       updateUserSettings(input: { role: $role }) {
         success
       }

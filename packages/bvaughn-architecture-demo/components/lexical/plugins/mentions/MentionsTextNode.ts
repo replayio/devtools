@@ -7,22 +7,25 @@ import {
   TextNode,
 } from "lexical";
 
-import { SerializedMentionsTextNode } from "./types";
+import { Collaborator, SerializedMentionsTextNode } from "./types";
 import $convertMentionsElement from "./utils/$convertMentionsElement";
 import $createMentionsTextNode from "./utils/$createMentionsTextNode";
 import styles from "./styles.module.css";
 
 export default class MentionsTextNode extends TextNode {
+  __id: string;
+  __name: string;
+
   static getType(): string {
     return "mentions-item";
   }
 
   static clone(node: MentionsTextNode): MentionsTextNode {
-    return new MentionsTextNode(node.__text, node.__key);
+    return new MentionsTextNode(node.__id, node.__name, node.__key);
   }
 
   static importJSON(serializedNode: SerializedMentionsTextNode): MentionsTextNode {
-    const node = $createMentionsTextNode(serializedNode.text);
+    const node = $createMentionsTextNode(serializedNode.id, serializedNode.name);
     node.setTextContent(serializedNode.text);
     node.setFormat(serializedNode.format);
     node.setDetail(serializedNode.detail);
@@ -31,13 +34,18 @@ export default class MentionsTextNode extends TextNode {
     return node;
   }
 
-  constructor(text: string, key?: NodeKey) {
-    super(text, key);
+  constructor(id: string, name: string, key?: NodeKey) {
+    super(`@${name}`, key);
+
+    this.__id = id;
+    this.__name = name;
   }
 
   exportJSON(): SerializedMentionsTextNode {
     return {
       ...super.exportJSON(),
+      id: this.__id,
+      name: this.__name,
       type: "mentions-item",
       version: 1,
     };
@@ -52,7 +60,10 @@ export default class MentionsTextNode extends TextNode {
   exportDOM(): DOMExportOutput {
     const element = document.createElement("span");
     element.setAttribute("data-lexical-mentions-item", "true");
-    element.textContent = this.__text;
+    element.setAttribute("data-lexical-mentions-id", this.__id);
+    element.setAttribute("data-lexical-mentions-name", this.__name);
+
+    element.textContent = `@${this.__name}`;
     return { element };
   }
 

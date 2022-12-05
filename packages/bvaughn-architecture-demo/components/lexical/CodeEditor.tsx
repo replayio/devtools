@@ -113,8 +113,6 @@ export default function CodeEditor({
       const textContent = $rootTextContent();
       onSave(textContent, editorState.toJSON());
 
-      editor.setEditable(false);
-
       backupEditorStateRef.current = editorState;
     }
   };

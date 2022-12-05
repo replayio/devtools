@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 
-import Expandable from "bvaughn-architecture-demo/components/Expandable";
 import { Value as ClientValue } from "bvaughn-architecture-demo/src/utils/protocol";
 
 import styles from "./shared.module.css";
@@ -30,9 +29,11 @@ export const NEW_LINE_REGEX = /\r\n?|\n|\u2028|\u2029/g;
 export default function ClientValueValueRenderer({
   clientValue,
   context,
+  disableExpandStringToggle = false,
 }: {
   clientValue: ClientValue;
   context: "console" | "default" | "nested";
+  disableExpandStringToggle?: boolean;
 }) {
   //We'll let the child `<Expandable>` tell us when it's expanded
   const [isStringExpanded, setIsStringExpanded] = useState(false);
@@ -76,7 +77,7 @@ export default function ClientValueValueRenderer({
   const finalFormattedValue = formattedValue || " ";
   let contents: React.ReactNode = finalFormattedValue;
 
-  if (needsExpandStringToggle) {
+  if (needsExpandStringToggle && !disableExpandStringToggle) {
     contents = (
       <>
         {finalFormattedValue}
