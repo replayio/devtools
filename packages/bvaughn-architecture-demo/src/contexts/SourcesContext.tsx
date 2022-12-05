@@ -14,11 +14,17 @@ const VISIBLE_LINES_BUCKET_SIZE = 100;
 
 export type FindClosestFunctionName = (sourceId: string, location: SourceLocation) => string | null;
 
+export type FocusedSource = {
+  endLineIndex: number | null;
+  sourceId: SourceId;
+  startLineIndex: number | null;
+  type: "search-result" | "view-source";
+};
+
 type SourcesContextType = {
   closeSource: (sourceId: SourceId) => void;
   currentSearchResultLocation: Location | null;
-  focusedLineIndex: number | null;
-  focusedSourceId: SourceId | null;
+  focusedSource: FocusedSource | null;
   hoveredLineIndex: number | null;
   hoveredLineNode: HTMLElement | null;
   isPending: boolean;
@@ -40,8 +46,7 @@ type SourcesContextType = {
 
 export type OpenSourcesState = {
   currentSearchResultLocation: Location | null;
-  focusedLineIndex: number | null;
-  focusedSourceId: SourceId | null;
+  focusedSource: FocusedSource | null;
   hoveredLineIndex: number | null;
   hoveredLineNode: HTMLElement | null;
   openSourceIds: SourceId[];
@@ -51,8 +56,7 @@ export type OpenSourcesState = {
 
 const INITIAL_STATE: OpenSourcesState = {
   currentSearchResultLocation: null,
-  focusedLineIndex: null,
-  focusedSourceId: null,
+  focusedSource: null,
   hoveredLineIndex: null,
   hoveredLineNode: null,
   openSourceIds: [],
@@ -93,8 +97,7 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
     case "close_source": {
       const { sourceId } = action;
       const {
-        focusedLineIndex: prevFocusedLineIndex,
-        focusedSourceId: prevFocusedSourceId,
+        focusedSource: prevFocusedSource,
         hoveredLineIndex: prevHoveredLine,
         hoveredLineNode: prevHoveredLineNode,
         openSourceIds,
@@ -103,21 +106,28 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
 
       const index = openSourceIds.indexOf(sourceId);
       if (index > -1) {
-        let focusedLineIndex = prevFocusedLineIndex;
-        let focusedSourceId = prevFocusedSourceId;
+        let focusedSource = prevFocusedSource;
         let hoveredLineIndex = prevHoveredLine;
         let hoveredLineNode = prevHoveredLineNode;
-        if (prevFocusedSourceId === sourceId) {
-          focusedLineIndex = null;
+        if (prevFocusedSource?.sourceId === sourceId) {
+          focusedSource = null;
           hoveredLineIndex = null;
           hoveredLineNode = null;
 
           if (index > 0) {
-            focusedSourceId = openSourceIds[index - 1];
+            focusedSource = {
+              endLineIndex: null,
+              sourceId: openSourceIds[index - 1],
+              startLineIndex: null,
+              type: "view-source",
+            };
           } else if (index < openSourceIds.length - 1) {
-            focusedSourceId = openSourceIds[index + 1];
-          } else {
-            focusedSourceId = null;
+            focusedSource = {
+              endLineIndex: null,
+              sourceId: openSourceIds[index + 1],
+              startLineIndex: null,
+              type: "view-source",
+            };
           }
         }
 
@@ -126,8 +136,7 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
 
         return {
           ...state,
-          focusedLineIndex,
-          focusedSourceId,
+          focusedSource,
           hoveredLineIndex,
           hoveredLineNode,
           openSourceIds: [...openSourceIds.slice(0, index), ...openSourceIds.slice(index + 1)],
@@ -144,18 +153,26 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
       };
     }
     case "open_source": {
+      // TODO [FE-1009] Support focused line range and type
       const { lineIndex, sourceId } = action;
+      const startLineIndex = lineIndex ?? null;
+      const endLineIndex = lineIndex ?? null;
+      const type = "view-source";
+
       const {
-        focusedSourceId: prevFocusedSourceId,
-        focusedLineIndex: prevFocusedLineIndex,
+        focusedSource: prevFocusedSource,
         openSourceIds: prevOpenSourceIds,
         pendingFocusUpdate: prevPendingFocusUpdate,
         visibleLinesBySourceId: prevVisibleLinesBySourceId,
       } = state;
 
-      if (sourceId === prevFocusedSourceId) {
+      if (sourceId === prevFocusedSource?.sourceId) {
         // If sources are equal we may be able to bail out.
-        if (lineIndex === null || lineIndex === prevFocusedLineIndex) {
+        if (
+          lineIndex === null ||
+          (startLineIndex === prevFocusedSource?.startLineIndex &&
+            endLineIndex === prevFocusedSource?.endLineIndex)
+        ) {
           // If the same line was specified (or no line) we may be able to bail out.
           if (prevPendingFocusUpdate) {
             // Only bail out if pendingFocusUpdate is also true;
@@ -172,8 +189,12 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
 
       return {
         ...state,
-        focusedLineIndex: lineIndex,
-        focusedSourceId: sourceId,
+        focusedSource: {
+          endLineIndex,
+          sourceId,
+          startLineIndex,
+          type,
+        },
         hoveredLineIndex: null,
         hoveredLineNode: null,
         openSourceIds,
@@ -182,6 +203,7 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
       };
     }
     case "set_current_search_result_location": {
+      // TODO [FE-1009] Replace with focusedSource
       const { location } = action;
       const { currentSearchResultLocation: prevCurrentSearchResultLocation } = state;
       if (prevCurrentSearchResultLocation === location) {
@@ -211,15 +233,15 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
     }
     case "set_visible_lines": {
       const { startIndex, stopIndex } = action;
-      const { focusedSourceId, visibleLinesBySourceId: prevVisibleLinesBySourceId } = state;
+      const { focusedSource, visibleLinesBySourceId: prevVisibleLinesBySourceId } = state;
 
-      if (focusedSourceId === null) {
+      if (focusedSource === null) {
         return state;
       }
 
       let prevStartIndex = null;
       let prevStopIndex = null;
-      const prevVisibleLines = prevVisibleLinesBySourceId[focusedSourceId];
+      const prevVisibleLines = prevVisibleLinesBySourceId[focusedSource.sourceId];
       if (prevVisibleLines != null) {
         prevStartIndex = prevVisibleLines.start.line;
         prevStopIndex = prevVisibleLines.start.line;
@@ -246,7 +268,7 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
             ...state,
             visibleLinesBySourceId: {
               ...prevVisibleLinesBySourceId,
-              [focusedSourceId]: {
+              [focusedSource.sourceId]: {
                 start: {
                   line: bucketedStartIndex,
                   column: 0,
@@ -333,14 +355,13 @@ export function SourcesContextRoot({
   const context = useMemo<SourcesContextType>(
     () => ({
       currentSearchResultLocation: state.currentSearchResultLocation,
-      focusedLineIndex: state.focusedLineIndex,
-      focusedSourceId: state.focusedSourceId,
+      focusedSource: state.focusedSource,
       hoveredLineIndex: state.hoveredLineIndex,
       hoveredLineNode: state.hoveredLineNode,
       openSourceIds: state.openSourceIds,
       pendingFocusUpdate: state.pendingFocusUpdate,
-      visibleLines: state.focusedSourceId
-        ? state.visibleLinesBySourceId[state.focusedSourceId] || null
+      visibleLines: state.focusedSource?.sourceId
+        ? state.visibleLinesBySourceId[state.focusedSource?.sourceId] || null
         : null,
 
       closeSource,

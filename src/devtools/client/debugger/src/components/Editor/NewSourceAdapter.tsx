@@ -34,8 +34,10 @@ export default function NewSourceAdapterRoot() {
 
 function NewSourceAdapter() {
   const replayClient = useContext(ReplayClientContext);
-  const { focusedSourceId, openSource, openSourceIds, visibleLines } = useContext(SourcesContext);
+  const { focusedSource, openSource, openSourceIds, visibleLines } = useContext(SourcesContext);
   const [sourceSearchState, sourceSearchActions] = useContext(SourceSearchContext);
+
+  const focusedSourceId = focusedSource?.sourceId ?? null;
 
   const sourceSearchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);

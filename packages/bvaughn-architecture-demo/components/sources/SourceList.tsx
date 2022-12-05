@@ -61,8 +61,7 @@ export default function SourceList({
   const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
   const client = useContext(ReplayClientContext);
   const {
-    focusedLineIndex,
-    focusedSourceId,
+    focusedSource,
     markPendingFocusUpdateProcessed,
     pendingFocusUpdate,
     setHoveredLocation,
@@ -85,32 +84,29 @@ export default function SourceList({
   );
 
   useEffect(() => {
-    if (pendingFocusUpdate === false || focusedLineIndex === null || focusedSourceId === null) {
+    const focusedSourceId = focusedSource?.sourceId ?? null;
+    const startLineIndex = focusedSource?.startLineIndex ?? null;
+
+    if (pendingFocusUpdate === false || startLineIndex === null || focusedSourceId === null) {
       return;
     } else if (sourceId !== focusedSourceId) {
       return;
-    } else if (lineCount == null || lineCount < focusedLineIndex) {
+    } else if (lineCount == null || lineCount < startLineIndex) {
       // Source content streams in; we may not have loaded this line yet.
       return;
     }
 
     const list = listRef.current;
     if (list) {
-      list.scrollToItem(focusedLineIndex, "smart");
+      // TODO [FE-1009] Handle line range
+      list.scrollToItem(startLineIndex, "smart");
 
       // Important!
       // Don't mark the update processed until we have actually scrolled to the line.
       // The Source viewer might be suspended, loading data, and we don't want to drop the scroll action.
       markPendingFocusUpdateProcessed();
     }
-  }, [
-    focusedLineIndex,
-    focusedSourceId,
-    lineCount,
-    markPendingFocusUpdateProcessed,
-    pendingFocusUpdate,
-    sourceId,
-  ]);
+  }, [focusedSource, lineCount, markPendingFocusUpdateProcessed, pendingFocusUpdate, sourceId]);
 
   const togglesLocalStorageKey = `Replay:ShowHitCounts`;
   const [showHitCounts, setShowHitCounts] = useLocalStorage<boolean>(togglesLocalStorageKey, true);

@@ -80,7 +80,8 @@ export type GoToLineState = {
 export type State = SearchState<Item, Result> & GoToLineState;
 
 export default function useSourceFileNameSearch(): [State, Actions] {
-  const { focusedSourceId, openSource } = useContext(SourcesContext);
+  const { focusedSource, openSource } = useContext(SourcesContext);
+  const focusedSourceId = focusedSource?.sourceId ?? null;
 
   const focusedSourceIdRef = useRef<SourceId | null>(null);
 

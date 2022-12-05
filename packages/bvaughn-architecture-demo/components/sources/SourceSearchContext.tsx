@@ -18,8 +18,9 @@ export const SourceSearchContext = createContext<SearchContextType>(null as any)
 
 export function SourceSearchContextRoot({ children }: { children: ReactNode }) {
   const client = useContext(ReplayClientContext);
-  const { focusedSourceId, openSource, setCurrentSearchResultLocation } =
-    useContext(SourcesContext);
+  const { focusedSource, openSource, setCurrentSearchResultLocation } = useContext(SourcesContext);
+
+  const focusedSourceId = focusedSource?.sourceId ?? null;
 
   const [state, dispatch] = useSourceSearch(lineIndex => {
     if (focusedSourceId === null || lineIndex === null) {
