@@ -4,8 +4,12 @@ import "devtools/client/inspector/prefs";
 import { ActionCreatorWithoutPayload } from "@reduxjs/toolkit";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { MouseEvent, TimeStampedPoint, sessionError, uploadedData } from "@replayio/protocol";
+import { IDBPDatabase, openDB } from "idb";
 import debounce from "lodash/debounce";
 
+import { CONSOLE_SETTINGS_DATABASE } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
+import { POINTS_DATABASE } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { IDBOptions } from "bvaughn-architecture-demo/src/hooks/useIndexedDB";
 import {
   getCachedObject,
   getObjectPropertyHelper,
@@ -286,6 +290,110 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   setVideoUrlCallback((url: string) => {
     store.dispatch(setVideoUrl(url));
   });
+}
+
+interface MigrationSetting {
+  regexp: RegExp;
+  database: IDBOptions;
+  storeName: string;
+}
+
+// The new console and points logic was storing per-recording values in `localStorage`,
+// with unique keys per recording ID. That was cluttering up `localStorage`.
+// We've switched to storing per-recording values in IndexedDB.
+// Migrate existing settings from `localStorage` to IDB.
+const settingsToMigrate: MigrationSetting[] = [
+  {
+    regexp: /^(?<recordingId>.+)::points$/,
+    database: POINTS_DATABASE,
+    storeName: "high-priority",
+  },
+  {
+    regexp: /^(?<recordingId>.+)::points::transition$/,
+    database: POINTS_DATABASE,
+    storeName: "transition",
+  },
+  {
+    regexp: /^(?<recordingId>.+)::terminalExpressionHistory$/,
+    database: CONSOLE_SETTINGS_DATABASE,
+    storeName: "terminalHistory",
+  },
+  {
+    regexp: /^Replay:showExceptions:(?<recordingId>.+)$/,
+    database: CONSOLE_SETTINGS_DATABASE,
+    storeName: "showExceptions",
+  },
+  {
+    regexp: /^Replay:Toggles:(?<recordingId>.+)$/,
+    database: CONSOLE_SETTINGS_DATABASE,
+    storeName: "filterToggles",
+  },
+];
+
+const keysToDelete: RegExp[] = [
+  /^Replay:Console:MenuOpen:(?<recordingId>.+)$/,
+  /^(?<recordingId>.+)::expressionHistory$/,
+];
+
+export async function migratePerRecordingPersistedSettings() {
+  if (
+    typeof window !== "undefined" &&
+    typeof window.localStorage !== "undefined" &&
+    typeof window.indexedDB !== "undefined"
+  ) {
+    const allLocalStorageKeys = Object.keys(localStorage);
+
+    for (let migration of settingsToMigrate) {
+      let dbInstance: IDBPDatabase | null = null;
+      try {
+        const { databaseName, databaseVersion, storeNames } = migration.database;
+        dbInstance = await openDB(databaseName, databaseVersion, {
+          upgrade(db) {
+            // The "upgrade" callback runs both on initial creation (when a DB does not exist),
+            // and on version number change.
+            for (let storeName of storeNames) {
+              if (!db.objectStoreNames.contains(storeName)) {
+                db.createObjectStore(storeName);
+              }
+            }
+          },
+        });
+
+        const matchingEntries = allLocalStorageKeys.filter(key => migration.regexp.test(key));
+
+        for (let key of matchingEntries) {
+          const storedValue = localStorage.getItem(key);
+          const match = key.match(migration.regexp)!;
+          const { recordingId } = match!.groups!;
+          if (storedValue) {
+            const actualValue = JSON.parse(storedValue);
+            if (Array.isArray(actualValue) && actualValue.length === 0) {
+              // Remove empty array items - they're a leftover default
+              localStorage.removeItem(key);
+              continue;
+            }
+
+            await dbInstance.put(migration.storeName, actualValue, recordingId);
+            localStorage.removeItem(key);
+          }
+        }
+      } catch (err) {
+        continue;
+      } finally {
+        if (dbInstance) {
+          dbInstance.close();
+        }
+      }
+    }
+
+    for (let regexp of keysToDelete) {
+      const matchingKeys = allLocalStorageKeys.filter(key => regexp.test(key));
+
+      for (let key of matchingKeys) {
+        localStorage.removeItem(key);
+      }
+    }
+  }
 }
 
 // The original Big Ball O' Exports containing selectors + other fields

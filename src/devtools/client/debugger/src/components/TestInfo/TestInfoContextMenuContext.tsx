@@ -1,24 +1,18 @@
 import { PropsWithChildren, createContext, useCallback, useMemo, useState } from "react";
 
+import { AnnotatedTestStep, TestItem } from "ui/types";
+
 export type Coordinates = {
   x: number;
   y: number;
 };
 
-export type TestCaseType = {
-  startTime: number;
-  endTime: number;
-};
-export type TestStepType = TestCaseType & {
-  enqueuePoint?: string;
-};
-
 export type TestInfoContextMenuContextType = {
   hide: () => void;
-  show: (mouseCoordinates: Coordinates, testCase: TestCaseType, testStep: TestStepType) => void;
+  show: (mouseCoordinates: Coordinates, testCase: TestItem, testStep: AnnotatedTestStep) => void;
   mouseCoordinates: Coordinates | null;
-  testStep: TestStepType | null;
-  testCase: TestCaseType | null;
+  testStep: AnnotatedTestStep | null;
+  testCase: TestItem | null;
 };
 
 export const TestInfoContextMenuContext = createContext<TestInfoContextMenuContextType>(
@@ -27,8 +21,8 @@ export const TestInfoContextMenuContext = createContext<TestInfoContextMenuConte
 
 export function TestInfoContextMenuContextRoot({ children }: PropsWithChildren) {
   const [mouseCoordinates, setMouseCoordinates] = useState<Coordinates | null>(null);
-  const [testStep, setTestStep] = useState<TestStepType | null>(null);
-  const [testCase, setTestCase] = useState<TestCaseType | null>(null);
+  const [testStep, setTestStep] = useState<AnnotatedTestStep | null>(null);
+  const [testCase, setTestCase] = useState<TestItem | null>(null);
 
   const hide = useCallback(() => {
     setMouseCoordinates(null);
@@ -37,7 +31,7 @@ export function TestInfoContextMenuContextRoot({ children }: PropsWithChildren) 
   }, []);
 
   const show = useCallback(
-    (mouseCoordinates: Coordinates, testCase: TestCaseType, testStep: TestStepType) => {
+    (mouseCoordinates: Coordinates, testCase: TestItem, testStep: AnnotatedTestStep) => {
       setMouseCoordinates(mouseCoordinates);
       setTestStep(testStep);
       setTestCase(testCase);

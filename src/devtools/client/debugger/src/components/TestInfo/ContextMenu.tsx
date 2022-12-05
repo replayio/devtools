@@ -7,15 +7,11 @@ import { seekToTime, startPlayback } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { AnnotatedTestStep, TestItem } from "ui/types";
 
 import { selectLocation } from "../../actions/sources";
 import { getContext } from "../../selectors";
-import {
-  Coordinates,
-  TestCaseType,
-  TestInfoContextMenuContext,
-  TestStepType,
-} from "./TestInfoContextMenuContext";
+import { Coordinates, TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { returnFirst } from "./TestStepItem";
 import styles from "./ContextMenu.module.css";
 
@@ -23,12 +19,12 @@ function ContextMenu({
   hide,
   mouseCoordinates,
   testStep,
-  testCase,
+  test,
 }: {
   hide: () => void;
   mouseCoordinates: Coordinates;
-  testStep: TestStepType;
-  testCase: TestCaseType;
+  testStep: AnnotatedTestStep;
+  test: TestItem;
 }) {
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(getCurrentTime);
@@ -37,27 +33,35 @@ function ContextMenu({
   const client = useContext(ReplayClientContext);
   const classnames = classNames.bind(styles);
 
+  const isLastStep = test.steps[test.steps.length - 1].id === testStep.id;
+  const adjustedAbsoluteEndTime = testStep.absoluteEndTime - 1;
+
   useModalDismissSignal(ref, hide, true);
 
   const onPlayFromHere = () => {
     hide();
-    dispatch(startPlayback({ beginTime: testStep.startTime, endTime: testCase.endTime }));
+    dispatch(
+      startPlayback({
+        beginTime: testStep.absoluteStartTime,
+        endTime: test.relativeStartTime + test.duration,
+      })
+    );
   };
   const onJumpToBefore = () => {
     hide();
-    dispatch(seekToTime(testStep.startTime));
+    dispatch(seekToTime(testStep.absoluteStartTime));
   };
   const onJumpToAfter = () => {
     hide();
-    dispatch(seekToTime(testStep.endTime - 1));
+    dispatch(seekToTime(adjustedAbsoluteEndTime));
   };
   const onGoToLocation = async () => {
     hide();
-    if (!testStep.enqueuePoint) {
+    if (!testStep.annotations.enqueue) {
       return;
     }
 
-    const point = testStep.enqueuePoint;
+    const point = testStep.annotations.enqueue.point;
 
     const {
       data: { frames },
@@ -104,22 +108,27 @@ function ContextMenu({
         <MaterialIcon>code</MaterialIcon>
         Jump to source
       </div>
-      <div className={styles.ContextMenuItem} onClick={onPlayFromHere}>
+      <div
+        className={classnames("ContextMenuItem", { disabled: isLastStep })}
+        onClick={onPlayFromHere}
+      >
         <MaterialIcon>play_circle</MaterialIcon>
         Play from here
       </div>
       <div
-        className={classnames("ContextMenuItem", { disabled: testStep.startTime === currentTime })}
-        onClick={testStep.startTime === currentTime ? undefined : onJumpToBefore}
+        className={classnames("ContextMenuItem", {
+          disabled: testStep.absoluteStartTime === currentTime,
+        })}
+        onClick={testStep.absoluteStartTime === currentTime ? undefined : onJumpToBefore}
       >
         <MaterialIcon>arrow_back</MaterialIcon>
         Show before
       </div>
       <div
         className={classnames("ContextMenuItem", {
-          disabled: testStep.endTime - 1 === currentTime,
+          disabled: adjustedAbsoluteEndTime === currentTime,
         })}
-        onClick={testStep.endTime - 1 === currentTime ? undefined : onJumpToAfter}
+        onClick={adjustedAbsoluteEndTime === currentTime ? undefined : onJumpToAfter}
       >
         <MaterialIcon>arrow_forward</MaterialIcon>
         Show after
@@ -139,7 +148,7 @@ export default function ContextMenuWrapper() {
         hide={hide}
         mouseCoordinates={mouseCoordinates}
         testStep={testStep}
-        testCase={testCase}
+        test={testCase}
       />
     );
   }
