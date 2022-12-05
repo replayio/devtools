@@ -2,12 +2,13 @@ import classnames from "classnames";
 import classNames from "classnames";
 import React, { useContext, useEffect, useState } from "react";
 
+import AccessibleImage from "devtools/client/debugger/src/components/shared/AccessibleImage";
 import { getPauseId } from "devtools/client/debugger/src/selectors";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
-import { useGetRecordingId } from "ui/hooks/recordings";
+import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -55,7 +56,17 @@ function ToolbarButton({
       dispatch(actions.setSelectedPrimaryPanel(panelName));
     }
   };
-
+  const imageIcon =
+    icon == "cypress" ? (
+      <AccessibleImage className="cypress" />
+    ) : (
+      <MaterialIcon
+        className={classNames("toolbar-panel-icon text-themeToolbarPanelIconColor", name)}
+        iconSize="2xl"
+      >
+        {icon}
+      </MaterialIcon>
+    );
   return (
     <div className="relative px-2">
       <ToolbarButtonTab active={selectedPrimaryPanel == name} />
@@ -65,14 +76,7 @@ function ToolbarButton({
         })}
       >
         <IconWithTooltip
-          icon={
-            <MaterialIcon
-              className={classNames("toolbar-panel-icon text-themeToolbarPanelIconColor", name)}
-              iconSize="2xl"
-            >
-              {icon}
-            </MaterialIcon>
-          }
+          icon={imageIcon}
           content={label}
           dataTestName={`ToolbarButton-${label.replace(/ /g, "")}`}
           handleClick={() => handleClick(name)}
@@ -100,6 +104,7 @@ export default function Toolbar() {
   const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
   const [showCommentsBadge, setShowCommentsBadge] = useState(false);
   const recordingId = useGetRecordingId();
+  const { recording } = useGetRecording(recordingId);
   const { comments, loading } = hooks.useGetComments(recordingId);
   const { value: logProtocol } = useFeature("logProtocol");
 
@@ -118,7 +123,11 @@ export default function Toolbar() {
   return (
     <div className="toolbox-toolbar-container flex flex-col items-center justify-between py-1">
       <div id="toolbox-toolbar space-y-1">
-        <ToolbarButton icon="info" label="Replay Info" name="events" />
+        {recording?.metadata?.test?.runner?.name == "cypress" ? (
+          <ToolbarButton icon="cypress" label="Cypress Panel" name="events" />
+        ) : (
+          <ToolbarButton icon="info" label="Replay Info" name="events" />
+        )}
         <ToolbarButton
           icon="forum"
           label="Comments"

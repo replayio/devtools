@@ -90,7 +90,7 @@ export default function TestInfo({
                 style={{ fontSize: "15px" }}
               >
                 <MaterialIcon>chevron_left</MaterialIcon>
-                <div>{correctedTestCases[highlightedTest].title}</div>
+                <div className="pl-1 text-left">{correctedTestCases[highlightedTest].title}</div>
               </button>
             )}
             {correctedTestCases.map(
@@ -143,7 +143,7 @@ function Console() {
           fontSize: "15px",
         }}
       >
-        Console Props
+        Step Details
       </div>
       <ErrorBoundary>
         <div className="flex flex-grow flex-col gap-1 p-2 font-mono">

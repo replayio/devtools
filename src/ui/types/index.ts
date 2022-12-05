@@ -162,6 +162,7 @@ export type TestMetadata = {
   version: number;
   tests?: TestItem[];
   run?: { id: string; title?: string };
+  runner?: { name: string; version: string };
   path?: string[];
   file?: string;
 };

@@ -23,7 +23,10 @@ export function NetworkEvent({
   };
 
   return (
-    <button className="font-italic flex border-b border-themeBase-90 p-1 px-2" onClick={onClick}>
+    <button
+      className="flex border-b border-themeBase-90 p-1 px-2 italic opacity-70 "
+      onClick={onClick}
+    >
       {method} {status} {new URL(url).pathname}
     </button>
   );
