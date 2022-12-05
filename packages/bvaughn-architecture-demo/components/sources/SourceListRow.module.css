@@ -105,7 +105,7 @@
   text-align: right;
   align-items: center;
   justify-content: flex-end;
-  padding-right: 2ch;
+  padding-right: 1ch;
 }
 .BreakpointToggleOff:after,
 .BreakpointToggleOn:after {
