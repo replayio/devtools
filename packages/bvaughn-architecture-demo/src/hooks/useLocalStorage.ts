@@ -2,7 +2,13 @@ import { SetStateAction, useCallback, useLayoutEffect, useState, useTransition }
 
 import { localStorageGetItem, localStorageSetItem } from "../utils/storage";
 
-// Forked from https://usehooks.com/useLocalStorage/
+// Stores value in localStorage and synchronizes it between sessions and tabs.
+// The API mirrors useState.
+// It can optionally be configured to wrap React updates in a transition.
+//
+// Consider the following benefits and trade-offs of using this hook vs useIndexedDB:
+// * Local storage is synchronous which can simplify things when stored values are used during app initialization
+// * Local storage has a hard limit of ~5MB so it should not be used for values that grow over time (e.g. arrays, per-recording values)
 export default function useLocalStorage<T>(
   key: string,
   initialValue: T | (() => T),

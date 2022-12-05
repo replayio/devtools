@@ -9,8 +9,7 @@ import {
   useTransition,
 } from "react";
 
-import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
-
+import useIndexedDB, { IDBOptions } from "../hooks/useIndexedDB";
 import { SessionContext } from "./SessionContext";
 
 // Various boolean flags to types of console messages or attributes to show/hide.
@@ -59,18 +58,30 @@ export type ConsoleFiltersContextType = Toggles & {
   ) => void;
 };
 
+// NOTE: If any change is made like adding a store name, bump the version number
+// to ensure that the database is recreated properly.
+export const CONSOLE_SETTINGS_DATABASE: IDBOptions = {
+  databaseName: "ConsoleSettings",
+  databaseVersion: 1,
+  storeNames: ["filterToggles", "showExceptions", "terminalHistory"],
+};
+
 export const ConsoleFiltersContext = createContext<ConsoleFiltersContextType>(null as any);
 
 export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
   const { recordingId } = useContext(SessionContext);
 
-  const togglesLocalStorageKey = `Replay:Toggles:${recordingId}`;
-  const [toggles, setToggles] = useLocalStorage<Toggles>(togglesLocalStorageKey, {
-    showErrors: true,
-    showLogs: true,
-    showNodeModules: false,
-    showTimestamps: false,
-    showWarnings: false,
+  const { value: toggles, setValue: setToggles } = useIndexedDB<Toggles>({
+    database: CONSOLE_SETTINGS_DATABASE,
+    initialValue: {
+      showErrors: true,
+      showLogs: true,
+      showNodeModules: false,
+      showTimestamps: false,
+      showWarnings: false,
+    },
+    recordName: recordingId,
+    storeName: "filterToggles",
   });
 
   // Filter input changes quickly while a user types, but re-filtering can be slow.
@@ -82,11 +93,13 @@ export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
   const [eventTypes, setEventTypes] = useState<EventTypes>({});
   const [deferredEventTypes, setDeferredEventTypes] = useState<EventTypes>({});
 
-  const showExceptionsLocalStorageKey = `Replay:showExceptions:${recordingId}`;
-  const [showExceptions, setShowExceptions] = useLocalStorage<boolean>(
-    showExceptionsLocalStorageKey,
-    false
-  );
+  const { value: showExceptions, setValue: setShowExceptions } = useIndexedDB<boolean>({
+    database: CONSOLE_SETTINGS_DATABASE,
+    initialValue: false,
+    recordName: recordingId,
+    storeName: "showExceptions",
+  });
+
   const [deferredShowExceptions, setDeferredShowExceptions] = useState<boolean>(showExceptions);
 
   const update = useCallback(
