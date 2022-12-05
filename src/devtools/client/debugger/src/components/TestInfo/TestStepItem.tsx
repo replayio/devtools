@@ -2,7 +2,9 @@ import { Object, createPauseResult } from "@replayio/protocol";
 import React, { useContext, useEffect, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
+import { ThreadFront } from "protocol/thread";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { getCurrentPoint } from "ui/actions/app";
 import { seek, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
@@ -40,14 +42,25 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     pauseId: string;
     nodeIds: string[];
   }>();
+  const currentPoint = useAppSelector(getCurrentPoint);
   const currentTime = useAppSelector(getCurrentTime);
   const selectedStep = useAppSelector(getSelectedStep);
   const dispatch = useAppDispatch();
   const client = useContext(ReplayClientContext);
-  const isPast = currentTime > step.absoluteStartTime;
-  const isPaused = currentTime >= step.absoluteStartTime && currentTime < step.absoluteEndTime;
   const { point: pointEnd, message: messageEnd } = step.annotations.end || {};
   const { point: pointStart } = step.annotations.start || {};
+
+  // compare points if possible and fall back to timestamps
+  const currentPointBigInt = currentPoint ? BigInt(currentPoint) : null;
+  const pointEndBigInt = pointEnd ? BigInt(pointEnd) : null;
+  const isPast =
+    currentPointBigInt && pointEndBigInt
+      ? currentPointBigInt > pointEndBigInt
+      : currentTime > step.absoluteStartTime;
+  const isPaused =
+    currentPointBigInt && pointEndBigInt && pointStart
+      ? currentPointBigInt >= BigInt(pointStart) && currentPointBigInt <= pointEndBigInt
+      : currentTime >= step.absoluteStartTime && currentTime < step.absoluteEndTime;
 
   useEffect(() => {
     let endPauseResult: createPauseResult | undefined;
@@ -160,14 +173,20 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const onMouseEnter = () => {
     dispatch(setTimelineToTime(step.absoluteStartTime));
     if (localPauseData?.startPauseId) {
-      dispatch(setTimelineToPauseTime(localPauseData.startPauseId, step.absoluteStartTime));
+      dispatch(
+        setTimelineToPauseTime(
+          step.absoluteStartTime,
+          localPauseData.startPauseId,
+          step.annotations.start?.point
+        )
+      );
     }
     if (subjectNodePauseData) {
       dispatch(highlightNodes(subjectNodePauseData.nodeIds, subjectNodePauseData.pauseId));
     }
   };
   const onMouseLeave = () => {
-    dispatch(setTimelineToTime(currentTime));
+    dispatch(setTimelineToTime(null));
     dispatch(unhighlightNode());
   };
 

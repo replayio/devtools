@@ -193,15 +193,16 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
 }
 
 export function setTimelineToPauseTime(
+  time: number,
   pauseId: string,
-  time: number | null,
-  updateGraphics = true
+  point?: string,
+  force = false
 ): UIThunkAction {
   return async (dispatch, getState) => {
-    dispatch(setTimelineToTime(time, updateGraphics));
+    dispatch(setTimelineToTime(time));
 
     if (time) {
-      repaintAtPause(time, pauseId, time => getHoverTime(getState()) !== time);
+      repaintAtPause(time, pauseId, time => getHoverTime(getState()) !== time, force, point);
     }
   };
 }

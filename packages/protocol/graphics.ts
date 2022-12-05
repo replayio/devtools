@@ -299,18 +299,27 @@ export async function repaintAtPause(
   time: number,
   pauseId: string,
   shouldCancelRepaint: (time: number, pauseId: string) => boolean,
-  force = false
+  force = false,
+  point?: string
 ) {
   const recordingCapabilities = await ThreadFront.getRecordingCapabilities();
   if (!recordingCapabilities.supportsRepaintingGraphics) {
     return;
   }
 
-  const screenshot = await fetchScreenshotForPause(pauseId);
+  const screenshot = await fetchScreenshotForPause(pauseId, force);
 
   if (screenshot && !shouldCancelRepaint(time, pauseId)) {
     const { mouse } = await getGraphicsAtTime(time);
     paintGraphics(screenshot, mouse);
+
+    if (point) {
+      insertEntrySorted(gPaintPoints, {
+        time,
+        point,
+        paintHash: screenshot.hash,
+      });
+    }
   }
 }
 

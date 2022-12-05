@@ -10,6 +10,7 @@ import {
   getReporterAnnotationsForTitle,
   getReporterAnnotationsForTitleEnd,
   getReporterAnnotationsForTitleNavigation,
+  getReporterAnnotationsForTitleStart,
 } from "ui/reducers/reporter";
 import { useAppSelector } from "ui/setup/hooks";
 import { AnnotatedTestStep, CypressAnnotationMessage, TestItem, TestStep } from "ui/types";
@@ -48,19 +49,43 @@ function useGetTestSections(
   const navigationEvents = useAppSelector(getReporterAnnotationsForTitleNavigation(testTitle));
   const annotationsEnqueue = useAppSelector(getReporterAnnotationsForTitle(testTitle));
   const annotationsEnd = useAppSelector(getReporterAnnotationsForTitleEnd(testTitle));
-  const annotationsStart = useAppSelector(getReporterAnnotationsForTitleEnd(testTitle));
+  const annotationsStart = useAppSelector(getReporterAnnotationsForTitleStart(testTitle));
   const requests = useAppSelector(getRequests);
   const events = useAppSelector(getEvents);
 
   return useMemo(() => {
-    const times = steps.reduce(
-      (acc, s) =>
-        typeof s.relativeStartTime === "number" && typeof s.duration === "number"
-          ? {
-              min: Math.min(acc.min, startTime + s.relativeStartTime),
-              max: Math.max(acc.max, startTime + s.relativeStartTime + s.duration),
-            }
-          : acc,
+    const stepsByTime = steps.map<StepEvent>((s, i) => {
+      const annotations = {
+        end: annotationsEnd.find(a => a.message.id === s.id),
+        enqueue: annotationsEnqueue.find(a => a.message.id === s.id),
+        start: annotationsStart.find(a => a.message.id === s.id),
+      };
+
+      const duration = s.name === "assert" ? 1 : s.duration || 1;
+      const absoluteStartTime = annotations.start?.time ?? startTime + s.relativeStartTime;
+      const absoluteEndTime = annotations.end?.time ?? absoluteStartTime + duration;
+
+      return {
+        time: absoluteStartTime,
+        type: "step",
+        event: {
+          ...s,
+          absoluteStartTime,
+          absoluteEndTime: absoluteEndTime - 1,
+          duration,
+          index: i,
+          annotations,
+        },
+      };
+    });
+
+    console.log(stepsByTime);
+
+    const times = stepsByTime.reduce(
+      (acc, s) => ({
+        min: Math.min(acc.min, s.event.absoluteStartTime),
+        max: Math.max(acc.max, s.event.absoluteEndTime),
+      }),
       { min: Infinity, max: 0 }
     );
 
@@ -73,26 +98,6 @@ function useGetTestSections(
         return (n.cause === "xhr" || n.cause === "fetch") && n.end != null && isDuringSteps(n.end);
       })
       .map<NetworkEvent>(n => ({ time: n.end!, type: "network", event: n }));
-
-    const stepsByTime = steps.map<StepEvent>((s, i) => {
-      const duration = s.name === "assert" ? 1 : s.duration || 1;
-      return {
-        time: startTime + s.relativeStartTime,
-        type: "step",
-        event: {
-          ...s,
-          absoluteStartTime: startTime + s.relativeStartTime,
-          absoluteEndTime: startTime + s.relativeStartTime + duration,
-          duration,
-          index: i,
-          annotations: {
-            end: annotationsEnd.find(a => a.message.id === s.id),
-            enqueue: annotationsEnqueue.find(a => a.message.id === s.id),
-            start: annotationsStart.find(a => a.message.id === s.id),
-          },
-        },
-      };
-    });
 
     const navigationEventsByTime = navigationEvents
       .filter(e => isDuringSteps(e.time))
