@@ -12,8 +12,6 @@ import { preCacheSources } from "bvaughn-architecture-demo/src/suspense/SourcesC
 import { getStreamingSourceContentsHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import type { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
-// TODO Move prefs out of reducers and load this separately
-import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { getTextAtPosition } from "devtools/client/debugger/src/utils/source";
 import { assert } from "protocol/utils";
 import { UIThunkAction } from "ui/actions";
@@ -83,15 +81,15 @@ export interface SourcesState {
   preferredGeneratedSources: string[];
 }
 
-const initialState: SourcesState = {
+export const initialState: SourcesState = {
   allSourcesReceived: false,
   sourceDetails: sourceDetailsAdapter.getInitialState(),
   contents: contentsAdapter.getInitialState(),
   selectedLocation: null,
   selectedLocationHistory: [],
   selectedLocationHasScrolled: false,
-  // TODO Move prefs out of reducers and load this separately
-  persistedSelectedLocation: (prefs.pendingSelectedLocation as PartialLocation) || null,
+  // Persisted value will be applied in ui/setup/index.ts as part of store setup
+  persistedSelectedLocation: null,
   sourcesByUrl: {},
   preferredGeneratedSources: [],
 };

@@ -8,12 +8,12 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { AnnotatedTestStep } from "ui/types";
 
 import { ProgressBar } from "./ProgressBar";
 import { TestCaseContext } from "./TestCase";
 import { TestInfoContext } from "./TestInfo";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
-import { TestStepContext } from "./TestStepRoot";
 
 export function returnFirst<T, R>(
   list: T[] | undefined,
@@ -23,12 +23,13 @@ export function returnFirst<T, R>(
 }
 
 export interface TestStepItemProps {
+  step: AnnotatedTestStep;
   argString: string;
   index: number;
   id: string | null;
 }
 
-export function TestStepItem({ argString, index, id }: TestStepItemProps) {
+export function TestStepItem({ step, argString, index, id }: TestStepItemProps) {
   const [localPauseData, setLocalPauseData] = useState<{
     startPauseId?: string;
     endPauseId?: string;
@@ -43,10 +44,10 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
   const selectedStep = useAppSelector(getSelectedStep);
   const dispatch = useAppDispatch();
   const client = useContext(ReplayClientContext);
-  const { startTime, duration, messageEnd, pointEnd, error, stepName, parentId, pointStart } =
-    useContext(TestStepContext);
-  const isPast = currentTime > startTime;
-  const isPaused = currentTime >= startTime && currentTime < startTime + duration;
+  const isPast = currentTime > step.absoluteStartTime;
+  const isPaused = currentTime >= step.absoluteStartTime && currentTime < step.absoluteEndTime;
+  const { point: pointEnd, message: messageEnd } = step.annotations.end || {};
+  const { point: pointStart } = step.annotations.start || {};
 
   useEffect(() => {
     let endPauseResult: createPauseResult | undefined;
@@ -146,14 +147,20 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
         setConsoleProps(localPauseData.consoleProps);
         setPauseId(localPauseData.endPauseId);
       }
-      dispatch(seek(pointStart!, startTime, false, localPauseData?.startPauseId));
-      dispatch(setSelectedStep({ id, startTime, endTime: startTime + duration - 1 }));
+      dispatch(seek(pointStart!, step.absoluteStartTime, false, localPauseData?.startPauseId));
+      dispatch(
+        setSelectedStep({
+          id,
+          startTime: step.absoluteStartTime,
+          endTime: step.absoluteEndTime - 1,
+        })
+      );
     }
   };
   const onMouseEnter = () => {
-    dispatch(setTimelineToTime(startTime));
+    dispatch(setTimelineToTime(step.absoluteStartTime));
     if (localPauseData?.startPauseId) {
-      dispatch(setTimelineToPauseTime(localPauseData.startPauseId, startTime));
+      dispatch(setTimelineToPauseTime(localPauseData.startPauseId, step.absoluteStartTime));
     }
     if (subjectNodePauseData) {
       dispatch(highlightNodes(subjectNodePauseData.nodeIds, subjectNodePauseData.pauseId));
@@ -166,18 +173,18 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
 
   // This math is bananas don't look here until this is cleaned up :)
   const bump = isPaused || isPast ? 10 : 0;
-  const actualProgress = bump + 90 * ((currentTime - startTime) / duration);
+  const actualProgress = bump + 90 * ((currentTime - step.absoluteStartTime) / step.duration);
   const progress = actualProgress > 100 ? 100 : actualProgress;
-  const displayedProgress = duration === 1 && isPaused ? 100 : progress == 100 ? 0 : progress;
+  const displayedProgress = step.duration === 1 && isPaused ? 100 : progress == 100 ? 0 : progress;
 
-  const color = error ? "border-l-red-500" : "border-l-primaryAccent";
+  const color = step.error ? "border-l-red-500" : "border-l-primaryAccent";
 
   return (
     <div
       className={`group/step relative flex items-start gap-1 border-b border-l-2 border-themeBase-90 pl-1 pr-3 font-mono hover:bg-toolbarBackground ${
         isPaused || isPast ? color : "border-l-transparent"
       } ${
-        progress > 0 && error
+        progress > 0 && step.error
           ? "bg-testsuitesErrorBgcolor text-testsuitesErrorColor hover:bg-testsuitesErrorBgcolorHover"
           : isPaused
           ? "bg-toolbarBackground"
@@ -188,35 +195,25 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
     >
       <button onClick={onClick} className="flex flex-grow items-start space-x-2  py-2 text-start">
         <div title={"" + displayedProgress} className="flex h-4 items-center">
-          <ProgressBar progress={displayedProgress} error={error} />
+          <ProgressBar progress={displayedProgress} error={!!step.error} />
         </div>
         <div className="opacity-70">{index + 1}</div>
         <div className={` font-medium ${isPaused ? "font-bold" : ""}`}>
-          {parentId ? "- " : ""}
-          {stepName} <span className="opacity-70">{argString}</span>
+          {step.parentId ? "- " : ""}
+          {step.name} <span className="opacity-70">{argString}</span>
         </div>
       </button>
-      <Actions isSelected={selectedStep?.id === id} />
+      <Actions step={step} isSelected={selectedStep?.id === id} />
     </div>
   );
 }
 
-function Actions({ isSelected }: { isSelected: boolean }) {
-  const { startTime: stepStartTime, duration, point } = useContext(TestStepContext);
-  const { startTime: caseStartTime, endTime: caseEndTime } = useContext(TestCaseContext);
+function Actions({ step, isSelected }: { step: AnnotatedTestStep; isSelected: boolean }) {
+  const { test } = useContext(TestCaseContext);
   const { show } = useContext(TestInfoContextMenuContext);
 
   const onClick = (e: React.MouseEvent) => {
-    const testStep = {
-      startTime: stepStartTime,
-      endTime: stepStartTime + duration,
-      enqueuePoint: point,
-    };
-    const testCase = {
-      startTime: caseStartTime,
-      endTime: caseEndTime,
-    };
-    show({ x: e.pageX, y: e.pageY }, testCase, testStep);
+    show({ x: e.pageX, y: e.pageY }, test, step);
   };
 
   return (

@@ -34,7 +34,6 @@ const emptySettings: ExperimentalUserSettings = {
   defaultWorkspaceId: null,
   disableLogRocket: false,
   enableTeams: true,
-  enableLargeText: false,
   role: "developer",
 };
 
@@ -43,7 +42,6 @@ const testSettings: ExperimentalUserSettings = {
   defaultWorkspaceId: null,
   disableLogRocket: false,
   enableTeams: true,
-  enableLargeText: false,
   role: "developer",
 };
 
@@ -163,7 +161,6 @@ function convertUserSettings(data: GetUserSettings | undefined): ExperimentalUse
     defaultWorkspaceId: data.viewer.defaultWorkspace?.id || null,
     disableLogRocket: settings.disableLogRocket,
     enableTeams: settings.enableTeams,
-    enableLargeText: false,
     role: settings.role || "developer",
   };
 }

@@ -1,16 +1,19 @@
 import { RecordingId } from "@replayio/protocol";
 import { useCallback } from "react";
 
-import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
+import { CONSOLE_SETTINGS_DATABASE } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
+import useIndexedDB from "bvaughn-architecture-demo/src/hooks/useIndexedDB";
 
 export default function useTerminalHistory(
   recordingId: RecordingId,
   maxHistoryLength: number = 20
 ): [expressionHistory: string[], addExpression: (value: string) => void] {
-  const [expressionHistory, setExpressionHistory] = useLocalStorage<string[]>(
-    `${recordingId}::expressionHistory`,
-    []
-  );
+  const { value: expressionHistory, setValue: setExpressionHistory } = useIndexedDB<string[]>({
+    database: CONSOLE_SETTINGS_DATABASE,
+    initialValue: [],
+    recordName: recordingId,
+    storeName: "terminalHistory",
+  });
 
   const addExpression = useCallback<(value: string) => void>(
     (command: string) => {

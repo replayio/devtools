@@ -209,6 +209,8 @@ export function loadMouseTargets(): UIThunkAction {
 
 export function setBreakpointsFromClipboard(): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
+    // TODO [FE-998] Figure out a new implementation that works with IndexedDB instead
+    /*
     const currentFocusedElement = document.activeElement;
     let text = "";
     try {
@@ -244,16 +246,20 @@ export function setBreakpointsFromClipboard(): UIThunkAction {
         (currentFocusedElement as HTMLElement).focus();
       }
     }
+    */
   };
 }
 
 export function copyBreakpointsToClipboard(): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
+    // TODO [FE-998] Figure out a new implementation that works with IndexedDB instead
+    /*
     const storageKey = `${ThreadFront.recordingId!}::points`;
     const currentPointsValue = localStorage.getItem(storageKey);
     if (currentPointsValue) {
       await navigator.clipboard.writeText(currentPointsValue);
     }
+    */
   };
 }
 
@@ -323,11 +329,12 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       dispatch(setToolboxLayout("left"));
     } else if (key === "pin_to_bottom_right") {
       dispatch(setToolboxLayout("ide"));
-    } else if (key === "copy_points") {
-      dispatch(copyBreakpointsToClipboard());
-    } else if (key === "set_points") {
-      dispatch(setBreakpointsFromClipboard());
     }
+    // else if (key === "copy_points") {
+    //   dispatch(copyBreakpointsToClipboard());
+    // } else if (key === "set_points") {
+    //   dispatch(setBreakpointsFromClipboard());
+    // }
 
     dispatch(hideCommandPalette());
   };
