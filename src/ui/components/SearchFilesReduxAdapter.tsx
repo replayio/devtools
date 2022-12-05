@@ -8,27 +8,30 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 // Adapter that connects file search to Redux state.
 export default function SearchFilesReduxAdapter() {
-  const { currentSearchResultLocation } = useContext(SourcesContext);
+  const { focusedSource } = useContext(SourcesContext);
 
   const sourcesById = useAppSelector(getSourceDetailsEntities);
   const dispatch = useAppDispatch();
 
   // When a user clicks on a search in the file-search panel, open it in Redux as well.
   useLayoutEffect(() => {
-    if (currentSearchResultLocation != null) {
-      const url = sourcesById[currentSearchResultLocation.sourceId]?.url;
-      if (url) {
-        dispatch(
-          onViewSourceInDebugger({
-            url,
-            sourceId: currentSearchResultLocation.sourceId,
-            line: currentSearchResultLocation.line,
-            column: currentSearchResultLocation.column,
-          })
-        );
+    if (focusedSource != null) {
+      const { mode, startLineIndex, sourceId } = focusedSource;
+      if (mode === "search-result") {
+        const url = sourcesById[sourceId]?.url;
+        if (url) {
+          dispatch(
+            onViewSourceInDebugger({
+              url,
+              sourceId,
+              line: startLineIndex !== null ? startLineIndex + 1 : undefined,
+              column: 0,
+            })
+          );
+        }
       }
     }
-  }, [currentSearchResultLocation, dispatch, sourcesById]);
+  }, [dispatch, focusedSource, sourcesById]);
 
   return <SearchFiles />;
 }

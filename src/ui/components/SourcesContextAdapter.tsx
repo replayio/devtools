@@ -2,13 +2,18 @@ import { SourceLocation } from "@replayio/protocol";
 import { PropsWithChildren, useCallback } from "react";
 
 import { SourcesContextRoot } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { PartialLocation, selectLocation } from "devtools/client/debugger/src/actions/sources";
+import { getContext } from "devtools/client/debugger/src/selectors";
 import { findClosestFunctionNameThunk } from "devtools/client/debugger/src/utils/ast";
-import { useAppDispatch } from "ui/setup/hooks";
+import { clearSelectedLocation, getSelectedLocation } from "ui/reducers/sources";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 // Relays information about the active source from Redux to the newer SourcesContext.
 // This information is consumed, along with other state (like the hovered line number) by the PointsContext.
 export default function SourcesContextWrapper({ children }: PropsWithChildren) {
   const dispatch = useAppDispatch();
+  const selectedLocation = useAppSelector(getSelectedLocation);
+  const cx = useAppSelector(getContext);
 
   const findClosestFunctionName = useCallback(
     (sourceId: string, location: SourceLocation) => {
@@ -19,8 +24,29 @@ export default function SourcesContextWrapper({ children }: PropsWithChildren) {
     [dispatch]
   );
 
+  const selectLocationWrapper = useCallback(
+    (location: PartialLocation | null) => {
+      if (location === null) {
+        if (selectedLocation !== null) {
+          dispatch(clearSelectedLocation);
+        }
+      } else {
+        if (
+          selectedLocation?.sourceId !== location.sourceId ||
+          selectedLocation.line !== location.line
+        ) {
+          dispatch(selectLocation(cx, location));
+        }
+      }
+    },
+    [cx, dispatch, selectedLocation]
+  );
+
   return (
-    <SourcesContextRoot findClosestFunctionName={findClosestFunctionName}>
+    <SourcesContextRoot
+      findClosestFunctionName={findClosestFunctionName}
+      selectLocation={selectLocationWrapper}
+    >
       {children}
     </SourcesContextRoot>
   );

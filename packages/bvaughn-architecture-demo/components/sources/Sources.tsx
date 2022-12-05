@@ -28,8 +28,9 @@ export default function SourcesRoot() {
 }
 
 function Sources() {
-  const { closeSource, focusedSourceId, openSource, openSourceIds } = useContext(SourcesContext);
   const client = useContext(ReplayClientContext);
+  const { closeSource, focusedSource, openSource, openSourceIds } = useContext(SourcesContext);
+  const focusedSourceId = focusedSource?.sourceId ?? null;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const sourceFileNameSearchInputRef = useRef<HTMLInputElement>(null);
@@ -113,7 +114,7 @@ function Sources() {
               event.preventDefault();
               event.stopPropagation();
 
-              openSource(sourceId);
+              openSource("view-source", sourceId);
             };
 
             const onCloseButtonClick = (event: MouseEvent) => {

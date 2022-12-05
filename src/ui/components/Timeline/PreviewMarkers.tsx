@@ -19,8 +19,10 @@ function PreviewMarkers() {
 
   const replayClient = useContext(ReplayClientContext);
 
-  const { focusedSourceId, hoveredLineIndex, visibleLines } = useContext(SourcesContext);
+  const { focusedSource, hoveredLineIndex, visibleLines } = useContext(SourcesContext);
   const { range: focusRange } = useContext(FocusContext);
+
+  const focusedSourceId = focusedSource?.sourceId ?? null;
 
   let firstColumnWithHitCounts = null;
   if (focusedSourceId !== null && hoveredLineIndex !== null && visibleLines !== null) {

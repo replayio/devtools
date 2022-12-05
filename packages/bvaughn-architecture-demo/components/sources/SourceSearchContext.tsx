@@ -18,18 +18,15 @@ export const SourceSearchContext = createContext<SearchContextType>(null as any)
 
 export function SourceSearchContextRoot({ children }: { children: ReactNode }) {
   const client = useContext(ReplayClientContext);
-  const { focusedSourceId, openSource, setCurrentSearchResultLocation } =
-    useContext(SourcesContext);
+  const { focusedSource, openSource } = useContext(SourcesContext);
+
+  const focusedSourceId = focusedSource?.sourceId ?? null;
 
   const [state, dispatch] = useSourceSearch(lineIndex => {
-    if (focusedSourceId === null || lineIndex === null) {
-      setCurrentSearchResultLocation(null);
-      return;
+    if (focusedSourceId !== null && lineIndex !== null) {
+      // Update the highlighted line when the current search result changes.
+      openSource("search-result", focusedSourceId, lineIndex, lineIndex);
     }
-
-    // Update the highlighted line when the current search result changes.
-    setCurrentSearchResultLocation({ sourceId: focusedSourceId, line: lineIndex + 1, column: 0 });
-    openSource(focusedSourceId, lineIndex);
   });
 
   const context = useMemo<SearchContextType>(() => [state, dispatch], [dispatch, state]);

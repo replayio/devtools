@@ -1,10 +1,12 @@
-import { Location, SourceId, SourceLocation } from "@replayio/protocol";
+import { SourceId, SourceLocation } from "@replayio/protocol";
 import {
   PropsWithChildren,
   createContext,
   useCallback,
+  useLayoutEffect,
   useMemo,
   useReducer,
+  useRef,
   useTransition,
 } from "react";
 
@@ -14,19 +16,30 @@ const VISIBLE_LINES_BUCKET_SIZE = 100;
 
 export type FindClosestFunctionName = (sourceId: string, location: SourceLocation) => string | null;
 
+export type FocusedSourceMode = "search-result" | "view-source";
+
+export type FocusedSource = {
+  endLineIndex: number | null;
+  mode: FocusedSourceMode;
+  sourceId: SourceId;
+  startLineIndex: number | null;
+};
+
 type SourcesContextType = {
   closeSource: (sourceId: SourceId) => void;
-  currentSearchResultLocation: Location | null;
-  focusedLineIndex: number | null;
-  focusedSourceId: SourceId | null;
+  focusedSource: FocusedSource | null;
   hoveredLineIndex: number | null;
   hoveredLineNode: HTMLElement | null;
   isPending: boolean;
   markPendingFocusUpdateProcessed: () => void;
-  openSource: (sourceId: SourceId, lineIndex?: number) => void;
+  openSource: (
+    mode: FocusedSourceMode,
+    sourceId: SourceId,
+    startLineIndex?: number,
+    endLineIndex?: number
+  ) => void;
   openSourceIds: SourceId[];
   pendingFocusUpdate: boolean;
-  setCurrentSearchResultLocation: (location: Location | null) => void;
   setHoveredLocation: (lineIndex: number | null, lineNode: HTMLElement | null) => void;
   setVisibleLines: (startIndex: number | null, stopIndex: number | null) => void;
   findClosestFunctionName: FindClosestFunctionName;
@@ -39,9 +52,7 @@ type SourcesContextType = {
 };
 
 export type OpenSourcesState = {
-  currentSearchResultLocation: Location | null;
-  focusedLineIndex: number | null;
-  focusedSourceId: SourceId | null;
+  focusedSource: FocusedSource | null;
   hoveredLineIndex: number | null;
   hoveredLineNode: HTMLElement | null;
   openSourceIds: SourceId[];
@@ -50,9 +61,7 @@ export type OpenSourcesState = {
 };
 
 const INITIAL_STATE: OpenSourcesState = {
-  currentSearchResultLocation: null,
-  focusedLineIndex: null,
-  focusedSourceId: null,
+  focusedSource: null,
   hoveredLineIndex: null,
   hoveredLineNode: null,
   openSourceIds: [],
@@ -63,10 +72,10 @@ const INITIAL_STATE: OpenSourcesState = {
 type CloseSourceAction = { type: "close_source"; sourceId: SourceId };
 type MarkFocusUpdateProcessedActions = { type: "mark_focus_update_processed" };
 type MarkSearchResultUpdateProcessedActions = { type: "mark_search_result_update_processed" };
-type OpenSourceAction = { type: "open_source"; sourceId: SourceId; lineIndex: number | null };
-type SetCurrentSearchResultLocationAction = {
-  type: "set_current_search_result_location";
-  location: Location | null;
+
+type OpenSourceAction = {
+  type: "open_source";
+  focusedSource: FocusedSource;
 };
 type SetHoveredLineAction = {
   type: "set_hovered_location";
@@ -84,7 +93,6 @@ type OpenSourcesAction =
   | MarkFocusUpdateProcessedActions
   | MarkSearchResultUpdateProcessedActions
   | OpenSourceAction
-  | SetCurrentSearchResultLocationAction
   | SetHoveredLineAction
   | SetVisibleLines;
 
@@ -93,8 +101,7 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
     case "close_source": {
       const { sourceId } = action;
       const {
-        focusedLineIndex: prevFocusedLineIndex,
-        focusedSourceId: prevFocusedSourceId,
+        focusedSource: prevFocusedSource,
         hoveredLineIndex: prevHoveredLine,
         hoveredLineNode: prevHoveredLineNode,
         openSourceIds,
@@ -103,21 +110,28 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
 
       const index = openSourceIds.indexOf(sourceId);
       if (index > -1) {
-        let focusedLineIndex = prevFocusedLineIndex;
-        let focusedSourceId = prevFocusedSourceId;
+        let focusedSource = prevFocusedSource;
         let hoveredLineIndex = prevHoveredLine;
         let hoveredLineNode = prevHoveredLineNode;
-        if (prevFocusedSourceId === sourceId) {
-          focusedLineIndex = null;
+        if (prevFocusedSource?.sourceId === sourceId) {
+          focusedSource = null;
           hoveredLineIndex = null;
           hoveredLineNode = null;
 
           if (index > 0) {
-            focusedSourceId = openSourceIds[index - 1];
+            focusedSource = {
+              endLineIndex: null,
+              mode: "view-source",
+              sourceId: openSourceIds[index - 1],
+              startLineIndex: null,
+            };
           } else if (index < openSourceIds.length - 1) {
-            focusedSourceId = openSourceIds[index + 1];
-          } else {
-            focusedSourceId = null;
+            focusedSource = {
+              endLineIndex: null,
+              mode: "view-source",
+              sourceId: openSourceIds[index + 1],
+              startLineIndex: null,
+            };
           }
         }
 
@@ -126,8 +140,7 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
 
         return {
           ...state,
-          focusedLineIndex,
-          focusedSourceId,
+          focusedSource,
           hoveredLineIndex,
           hoveredLineNode,
           openSourceIds: [...openSourceIds.slice(0, index), ...openSourceIds.slice(index + 1)],
@@ -137,25 +150,22 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
         return state;
       }
     }
-    case "mark_focus_update_processed": {
-      return {
-        ...state,
-        pendingFocusUpdate: false,
-      };
-    }
     case "open_source": {
-      const { lineIndex, sourceId } = action;
+      const { focusedSource } = action;
+
       const {
-        focusedSourceId: prevFocusedSourceId,
-        focusedLineIndex: prevFocusedLineIndex,
+        focusedSource: prevFocusedSource,
         openSourceIds: prevOpenSourceIds,
         pendingFocusUpdate: prevPendingFocusUpdate,
         visibleLinesBySourceId: prevVisibleLinesBySourceId,
       } = state;
 
-      if (sourceId === prevFocusedSourceId) {
+      if (focusedSource?.sourceId === prevFocusedSource?.sourceId) {
         // If sources are equal we may be able to bail out.
-        if (lineIndex === null || lineIndex === prevFocusedLineIndex) {
+        if (
+          focusedSource.startLineIndex === prevFocusedSource?.startLineIndex &&
+          focusedSource.endLineIndex === prevFocusedSource?.endLineIndex
+        ) {
           // If the same line was specified (or no line) we may be able to bail out.
           if (prevPendingFocusUpdate) {
             // Only bail out if pendingFocusUpdate is also true;
@@ -166,14 +176,13 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
       }
 
       let openSourceIds = prevOpenSourceIds;
-      if (prevOpenSourceIds.indexOf(sourceId) === -1) {
-        openSourceIds = [...prevOpenSourceIds, sourceId];
+      if (prevOpenSourceIds.indexOf(focusedSource.sourceId) === -1) {
+        openSourceIds = [...prevOpenSourceIds, focusedSource.sourceId];
       }
 
       return {
         ...state,
-        focusedLineIndex: lineIndex,
-        focusedSourceId: sourceId,
+        focusedSource,
         hoveredLineIndex: null,
         hoveredLineNode: null,
         openSourceIds,
@@ -181,18 +190,11 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
         visibleLinesBySourceId: prevVisibleLinesBySourceId,
       };
     }
-    case "set_current_search_result_location": {
-      const { location } = action;
-      const { currentSearchResultLocation: prevCurrentSearchResultLocation } = state;
-      if (prevCurrentSearchResultLocation === location) {
-        return state;
-      } else {
-        return {
-          ...state,
-          currentSearchResultLocation: location,
-        };
-      }
-      break;
+    case "mark_focus_update_processed": {
+      return {
+        ...state,
+        pendingFocusUpdate: false,
+      };
     }
     case "set_hovered_location": {
       const { lineIndex, lineNode } = action;
@@ -211,15 +213,15 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
     }
     case "set_visible_lines": {
       const { startIndex, stopIndex } = action;
-      const { focusedSourceId, visibleLinesBySourceId: prevVisibleLinesBySourceId } = state;
+      const { focusedSource, visibleLinesBySourceId: prevVisibleLinesBySourceId } = state;
 
-      if (focusedSourceId === null) {
+      if (focusedSource === null) {
         return state;
       }
 
       let prevStartIndex = null;
       let prevStopIndex = null;
-      const prevVisibleLines = prevVisibleLinesBySourceId[focusedSourceId];
+      const prevVisibleLines = prevVisibleLinesBySourceId[focusedSource.sourceId];
       if (prevVisibleLines != null) {
         prevStartIndex = prevVisibleLines.start.line;
         prevStopIndex = prevVisibleLines.start.line;
@@ -246,7 +248,7 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
             ...state,
             visibleLinesBySourceId: {
               ...prevVisibleLinesBySourceId,
-              [focusedSourceId]: {
+              [focusedSource.sourceId]: {
                 start: {
                   line: bucketedStartIndex,
                   column: 0,
@@ -269,19 +271,44 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
 
 export const SourcesContext = createContext<SourcesContextType>(null as any);
 
+type PartialLocation = {
+  column?: number | undefined;
+  line?: number | undefined;
+  sourceId: SourceId;
+  sourceUrl?: string | undefined;
+};
+type SelectLocationFunction = (location: PartialLocation | null) => void;
+
 const defaultFindClosestFunctionByName = () => null;
+const defaultSelectLocation = () => {};
 
 export type SourcesContextRootProps = PropsWithChildren<{
   findClosestFunctionName?: FindClosestFunctionName;
+  selectLocation?: SelectLocationFunction;
 }>;
 
 export function SourcesContextRoot({
   children,
   findClosestFunctionName = defaultFindClosestFunctionByName,
+  selectLocation = defaultSelectLocation,
 }: SourcesContextRootProps) {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
   const [isPending, startTransition] = useTransition();
+
+  const selectLocationRef = useRef<SelectLocationFunction>(selectLocation);
+  useLayoutEffect(() => {
+    selectLocationRef.current = selectLocation;
+  });
+
+  useLayoutEffect(() => {
+    if (state.focusedSource === null) {
+      const selectLocation = selectLocationRef.current;
+      if (selectLocation) {
+        selectLocation(null);
+      }
+    }
+  }, [state.focusedSource]);
 
   const closeSource = useCallback((sourceId: SourceId) => {
     startTransition(() => {
@@ -295,21 +322,35 @@ export function SourcesContextRoot({
     });
   }, []);
 
-  const openSource = useCallback((sourceId: SourceId, lineIndex: number | undefined) => {
-    startTransition(() => {
-      dispatch({
-        type: "open_source",
-        lineIndex: lineIndex === undefined ? null : lineIndex,
-        sourceId,
-      });
-    });
-  }, []);
+  const openSource = useCallback(
+    (
+      mode: FocusedSourceMode,
+      sourceId: SourceId,
+      startLineIndex: number | null = null,
+      endLineIndex: number | null = null
+    ) => {
+      startTransition(() => {
+        dispatch({
+          type: "open_source",
+          focusedSource: {
+            endLineIndex,
+            mode,
+            sourceId,
+            startLineIndex,
+          },
+        });
 
-  const setCurrentSearchResultLocation = useCallback((location: Location | null) => {
-    startTransition(() => {
-      dispatch({ type: "set_current_search_result_location", location });
-    });
-  }, []);
+        const selectLocation = selectLocationRef.current;
+        if (selectLocation) {
+          selectLocation({
+            line: startLineIndex !== null ? startLineIndex + 1 : undefined,
+            sourceId,
+          });
+        }
+      });
+    },
+    []
+  );
 
   const setHoveredLocation = useCallback(
     (lineIndex: number | null, lineNode: HTMLElement | null) => {
@@ -332,22 +373,19 @@ export function SourcesContextRoot({
 
   const context = useMemo<SourcesContextType>(
     () => ({
-      currentSearchResultLocation: state.currentSearchResultLocation,
-      focusedLineIndex: state.focusedLineIndex,
-      focusedSourceId: state.focusedSourceId,
+      focusedSource: state.focusedSource,
       hoveredLineIndex: state.hoveredLineIndex,
       hoveredLineNode: state.hoveredLineNode,
       openSourceIds: state.openSourceIds,
       pendingFocusUpdate: state.pendingFocusUpdate,
-      visibleLines: state.focusedSourceId
-        ? state.visibleLinesBySourceId[state.focusedSourceId] || null
+      visibleLines: state.focusedSource?.sourceId
+        ? state.visibleLinesBySourceId[state.focusedSource?.sourceId] || null
         : null,
 
       closeSource,
       isPending,
       markPendingFocusUpdateProcessed,
       openSource,
-      setCurrentSearchResultLocation,
       setHoveredLocation,
       setVisibleLines,
       findClosestFunctionName,
@@ -357,7 +395,6 @@ export function SourcesContextRoot({
       isPending,
       markPendingFocusUpdateProcessed,
       openSource,
-      setCurrentSearchResultLocation,
       setHoveredLocation,
       setVisibleLines,
       state,

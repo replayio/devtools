@@ -34,8 +34,10 @@ export default function NewSourceAdapterRoot() {
 
 function NewSourceAdapter() {
   const replayClient = useContext(ReplayClientContext);
-  const { focusedSourceId, openSource, openSourceIds, visibleLines } = useContext(SourcesContext);
+  const { focusedSource, openSource, openSourceIds, visibleLines } = useContext(SourcesContext);
   const [sourceSearchState, sourceSearchActions] = useContext(SourceSearchContext);
+
+  const focusedSourceId = focusedSource?.sourceId ?? null;
 
   const sourceSearchInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -58,9 +60,16 @@ function NewSourceAdapter() {
     // Except when a filed is opened (e.g. by clicking on the file tab) in which cases it passes 0.
     // We ignore the 0 because it breaks scroll state preservation between tabs.
     const lineNumber = location?.line ?? 0;
+    const lineIndex = lineNumber > 0 ? lineNumber - 1 : undefined;
 
-    openSource(location.sourceId, lineNumber > 0 ? lineNumber : undefined);
-  }, [location, openSource]);
+    // Sync focused state from Redux to React context,
+    if (
+      focusedSource?.sourceId !== location.sourceId ||
+      focusedSource?.startLineIndex !== lineIndex
+    ) {
+      openSource("view-source", location.sourceId, lineIndex, lineIndex);
+    }
+  }, [focusedSource, location, openSource]);
 
   // Sync the lines currently rendered by the new Source list to Redux.
   // This updates Redux state to mark certain actions as "processed".
