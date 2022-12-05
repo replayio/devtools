@@ -2,9 +2,10 @@ import { SourceLocation } from "@replayio/protocol";
 import { PropsWithChildren, useCallback } from "react";
 
 import { SourcesContextRoot } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import { PartialLocation } from "devtools/client/debugger/src/actions/sources";
+import { PartialLocation, selectLocation } from "devtools/client/debugger/src/actions/sources";
+import { getContext } from "devtools/client/debugger/src/selectors";
 import { findClosestFunctionNameThunk } from "devtools/client/debugger/src/utils/ast";
-import { clearSelectedLocation, getSelectedLocation, locationSelected } from "ui/reducers/sources";
+import { clearSelectedLocation, getSelectedLocation } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 // Relays information about the active source from Redux to the newer SourcesContext.
@@ -12,6 +13,7 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 export default function SourcesContextWrapper({ children }: PropsWithChildren) {
   const dispatch = useAppDispatch();
   const selectedLocation = useAppSelector(getSelectedLocation);
+  const cx = useAppSelector(getContext);
 
   const findClosestFunctionName = useCallback(
     (sourceId: string, location: SourceLocation) => {
@@ -22,7 +24,7 @@ export default function SourcesContextWrapper({ children }: PropsWithChildren) {
     [dispatch]
   );
 
-  const selectLocation = useCallback(
+  const selectLocationWrapper = useCallback(
     (location: PartialLocation | null) => {
       if (location === null) {
         if (selectedLocation !== null) {
@@ -33,17 +35,17 @@ export default function SourcesContextWrapper({ children }: PropsWithChildren) {
           selectedLocation?.sourceId !== location.sourceId ||
           selectedLocation.line !== location.line
         ) {
-          dispatch(locationSelected({ location }));
+          dispatch(selectLocation(cx, location));
         }
       }
     },
-    [dispatch, selectedLocation]
+    [cx, dispatch, selectedLocation]
   );
 
   return (
     <SourcesContextRoot
       findClosestFunctionName={findClosestFunctionName}
-      selectLocation={selectLocation}
+      selectLocation={selectLocationWrapper}
     >
       {children}
     </SourcesContextRoot>

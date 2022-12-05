@@ -55,12 +55,7 @@ function update(state: TabsState = initialTabState(), action: AnyAction) {
       return updateSourceIds(state, action.payload);
 
     case locationSelected.type: {
-      const source = action.payload.source;
-      if (source) {
-        return addSelectedSource(state, source);
-      } else {
-        return state;
-      }
+      return addSelectedSource(state, action.payload.source);
     }
 
     default:
