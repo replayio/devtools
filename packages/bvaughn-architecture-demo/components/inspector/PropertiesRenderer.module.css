@@ -2,7 +2,7 @@
 .Prototype {
   color: var(--object-inspector-prototype-color);
   display: inline;
-  min-height: 1em;
+  min-height: 1rem;
 }
 
 .BucketLabel {
@@ -20,8 +20,8 @@
 .NoEntries {
   color: var(--object-inspector-prototype-color);
   font-style: italic;
-  min-height: 1em;
-  padding-left: calc(0.5em + 0.5ch);
+  min-height: 1rem;
+  padding-left: calc(0.5rem + 0.5ch);
 }
 
 .Separator {

@@ -2,12 +2,12 @@
 .ConsoleMessageHoverButton {
   font-family: var(--font-family-default);
   font-weight: 600;
-  padding: 0 0.125em;
+  padding: 0 0.125rem;
   position: absolute;
   left: 0;
   top: 0;
-  height: 1.5em;
-  border-radius: 0 3em 3em 0;
+  height: 1.5rem;
+  border-radius: 0 3rem 3rem 0;
   outline: none;
   border: none;
   display: flex;
@@ -29,15 +29,15 @@
 
 .AddCommentButtonIcon,
 .ConsoleMessageHoverButtonIcon {
-  width: 1.25em;
-  height: 1.25em;
-  padding: 0.125em 0.25em 0.125em 0.125em;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0.125rem 0.25rem 0.125rem 0.125rem;
   display: inline-block;
 }
 
 .Label,
 .LabelHovered {
-  line-height: 1em;
+  line-height: 1rem;
   transition: padding 100ms ease-in-out;
   transition: all 140ms ease-in-out;
   overflow: hidden;
@@ -49,6 +49,6 @@
 }
 .LabelHovered {
   max-width: 13ch;
-  padding: 0 0.5em 0 0.125em;
+  padding: 0 0.5rem 0 0.125rem;
   opacity: 1;
 }

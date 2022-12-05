@@ -4,10 +4,10 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding: 0.25em 0;
-  gap: 0.25em;
+  padding: 0.25rem 0;
+  gap: 0.25rem;
   color: var(--color-default);
-  border-bottom-right-radius: 0.5em;
+  border-bottom-right-radius: 0.5rem;
   border-top: 1px solid var(--background-color-default);
 }
 
@@ -17,8 +17,8 @@
   flex-direction: Row;
   align-items: center;
   gap: 1ch;
-  min-height: 2em;
-  line-height: 2em;
+  min-height: 2rem;
+  line-height: 2rem;
   padding: 0 1ch;
 }
 
@@ -26,7 +26,7 @@
   min-width: 100%;
   outline: none;
 
-  line-height: 1.5em;
+  line-height: 1.5rem;
   white-space: pre-wrap;
   word-break: break-word;
 
@@ -38,9 +38,9 @@
 }
 
 .Icon {
-  flex: 0 0 1em;
-  width: 1em;
-  height: 1em;
+  flex: 0 0 1rem;
+  width: 1rem;
+  height: 1rem;
   color: var(--color-dim);
 }
 
@@ -49,7 +49,7 @@
   align-items: center;
   gap: 1ch;
   padding: 0 1ch;
-  min-height: 2em;
+  min-height: 2rem;
 
   background-color: var(--background-color-error);
   border-top: 1px solid var(--border-color-error);

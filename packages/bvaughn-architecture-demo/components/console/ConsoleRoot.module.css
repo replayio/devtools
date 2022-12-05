@@ -4,8 +4,8 @@
   grid-template-rows: auto 1fr;
   flex: 1 1 auto;
   overflow: hidden;
-  border-bottom-left-radius: 0.5em;
-  border-bottom-right-radius: 0.5em;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
   background-color: var(--background-color-contrast-2);
   word-break: break-all;
   font-size: var(--font-size-regular);
@@ -22,8 +22,8 @@
 
 .MenuToggleButton,
 .DeleteTerminalExpressionButton {
-  width: 2em;
-  height: 2em;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
   background: none;
   outline: none;
@@ -40,9 +40,9 @@
 
 .MenuToggleButtonIcon,
 .DeleteTerminalExpressionIcon {
-  width: 3em;
-  height: 2em;
-  padding: 0.25em;
+  width: 3rem;
+  height: 2rem;
+  padding: 0.25rem;
   fill: var(--color-default);
   display: inline-block;
 }
@@ -51,7 +51,7 @@
   grid-column: 1;
   overflow: auto;
   height: 100%;
-  max-width: 12em;
+  max-width: 12rem;
   border-top: 1px solid var(--background-color-default);
   border-right: 1px solid var(--background-color-default);
 }
@@ -72,13 +72,13 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  min-height: 2em;
+  min-height: 2rem;
   flex: 0 0 auto;
 }
 
 .Loader {
   flex: 1;
-  padding: 0.5em;
+  padding: 0.5rem;
 }
 
 .ErrorBoundaryFallback {

@@ -1,16 +1,16 @@
 .Outer {
   width: 100%;
-  padding: 0.25em 0;
+  padding: 0.25rem 0;
   background-color: var(--color-contrast);
 }
 
 .Container,
 .ContainerFocused {
   width: 100%;
-  height: 2.5em;
+  height: 2.5rem;
   border: 2px solid var(--background-color-contrast-2);
   overflow: hidden;
-  border-radius: 0.5em;
+  border-radius: 0.5rem;
   display: flex;
 }
 .ContainerFocused {
@@ -19,24 +19,24 @@
 
 .InputAndResults {
   flex: 1 1 auto;
-  padding: 0 0.5em;
+  padding: 0 0.5rem;
   display: flex;
   align-items: center;
   background-color: var(--background-color-contrast-2);
 }
 
 .SearchIcon {
-  width: 2em;
-  height: 2em;
-  padding: 0.25em;
-  flex: 0 0 2em;
+  width: 2rem;
+  height: 2rem;
+  padding: 0.25rem;
+  flex: 0 0 2rem;
   display: inline-block;
   color: var(--color-dim);
 }
 
 .Input {
   width: 100%;
-  height: 2em;
+  height: 2rem;
   padding: 0 0.5ch;
   background: none;
   border: none;
@@ -75,9 +75,9 @@
   border: none;
   color: var(--color-dim);
   padding: 0;
-  width: 2em;
-  height: 2em;
-  border-radius: 0.5em;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
   border: 2px solid transparent;
   outline: none;
 }
@@ -95,8 +95,8 @@
 }
 
 .ResultsIcon {
-  width: 1.5em;
-  height: 1.5em;
+  width: 1.5rem;
+  height: 1.5rem;
   display: inline-block;
   color: currentColor;
 }

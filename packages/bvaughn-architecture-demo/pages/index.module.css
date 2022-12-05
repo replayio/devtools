@@ -6,8 +6,8 @@
 .VerticalContainer {
   display: flex;
   flex-direction: column;
-  padding: 0.5em 0.5em 0.5em 0;
-  gap: 0.5em;
+  padding: 0.5rem 0.5rem 0.5rem 0;
+  gap: 0.5rem;
   width: 100vw;
   height: 100vh;
   overflow: auto;
@@ -17,7 +17,7 @@
   display: flex;
   flex-direction: row;
   flex: 1 1 auto;
-  gap: 0.5em;
+  gap: 0.5rem;
   overflow: auto;
 }
 
@@ -47,7 +47,7 @@
 }
 
 .Row {
-  flex: 0 0 2em;
+  flex: 0 0 2rem;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -58,7 +58,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5em;
+  gap: 0.5rem;
 }
 
 .Tab,
@@ -67,9 +67,9 @@
   background: transparent;
   border: none;
   padding: 0;
-  height: 2em;
-  width: 2em;
-  flex: 0 0 2em;
+  height: 2rem;
+  width: 2rem;
+  flex: 0 0 2rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -87,14 +87,14 @@
   position: absolute;
   left: 0;
   content: " ";
-  border-right: 0.25em solid var(--color-brand);
-  border-top-right-radius: 0.25em;
-  border-bottom-right-radius: 0.25em;
-  height: 2em;
+  border-right: 0.25rem solid var(--color-brand);
+  border-top-right-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+  height: 2rem;
 }
 
 .TabIcon {
-  height: 1.5em;
-  width: 1.5em;
+  height: 1.5rem;
+  width: 1.5rem;
   display: inline-block;
 }

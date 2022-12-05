@@ -2,12 +2,12 @@
   position: absolute;
   top: 0;
   left: 0;
-  max-height: 9em;
+  max-height: 9rem;
   width: 30ch;
   overflow-x: hidden;
   overflow-y: overlay;
   user-select: none;
-  border-radius: 0.25em;
+  border-radius: 0.25rem;
   border: 1px solid var(--border-color);
 
   /* HACK For some reason a z-index of 10+ is required to sit above the Editor */
@@ -19,7 +19,7 @@
   background-color: var(--context-menu-background-color);
   color: var(--color-default);
   font-size: var(--font-size-regular);
-  line-height: 2em;
+  line-height: 2rem;
   cursor: pointer;
 }
 .SelectedItem {

@@ -25,22 +25,22 @@
 
 .CountRow {
   background-color: var(--background-color-contrast-2);
-  padding: 0.5em 1em;
+  padding: 0.5rem 1rem;
 }
 
 .OverflowRow {
   display: flex;
   align-items: center;
-  gap: 1em;
-  padding: 0.5em 1em;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
   background-color: var(--background-color-error);
   color: var(--color-error);
 }
 
 .OverflowRowIcon {
-  width: 1.5em;
-  height: 1.5em;
-  flex: 0 0 1.5em;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: 0 0 1.5rem;
   display: inline-block;
 }
 

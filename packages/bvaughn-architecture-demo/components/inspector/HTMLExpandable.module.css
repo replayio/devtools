@@ -10,21 +10,21 @@
 .PreviewRow {
   color: var(--value-type-object);
   display: inline;
-  min-height: 1em;
+  min-height: 1rem;
 }
 
 .ArrowContainer {
-  width: 0.75em;
-  height: 1em;
+  width: 0.75rem;
+  height: 1rem;
   position: relative;
 }
 
 .ArrowCollapsed,
 .ArrowExpanded {
-  width: 1em;
-  height: 1em;
+  width: 1rem;
+  height: 1rem;
   margin-right: 0.5ch;
-  transform-origin: 0.5em 0.5em;
+  transform-origin: 0.5rem 0.5rem;
   transition: transform 200ms;
   display: inline-block;
   vertical-align: top;
@@ -35,14 +35,14 @@
 
 .ArrowIcon {
   fill: var(--collapsible-toggle-color);
-  width: 1em;
-  height: 1em;
+  width: 1rem;
+  height: 1rem;
   display: inline-block;
 }
 
 .Children {
-  margin-left: 0.5em;
-  padding-left: 0.5em;
+  margin-left: 0.5rem;
+  padding-left: 0.5rem;
   display: flex;
   flex-direction: column;
 }
@@ -50,5 +50,5 @@
 .FooterCollapsed {
 }
 .FooterExpanded {
-  margin-left: 1em;
+  margin-left: 1rem;
 }

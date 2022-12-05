@@ -46,8 +46,8 @@
 }
 
 .IconButton {
-  height: 1em;
-  width: 1em;
+  height: 1rem;
+  width: 1rem;
   outline: none;
   background: none;
   padding: 0;
@@ -57,8 +57,8 @@
 }
 
 .Icon {
-  height: 1em;
-  width: 1em;
+  height: 1rem;
+  width: 1rem;
   color: var(--object-inspector-go-to-definition-icon-color);
   display: inline-block;
 }
@@ -95,7 +95,7 @@
 .HTMLClosingTag,
 .HTMLOpeningTag {
   color: var(--value-type-html-tag);
-  line-height: 1em;
+  line-height: 1rem;
 }
 
 .Bracket {

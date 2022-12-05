@@ -22,8 +22,8 @@ button {
 }
 
 ::-webkit-scrollbar {
-  width: 0.75em;
-  height: 0.75em;
+  width: 0.75rem;
+  height: 0.75rem;
   background: transparent;
 }
 
@@ -32,11 +32,11 @@ button {
 }
 
 ::-webkit-scrollbar-track {
-  border-radius: 0.75em;
+  border-radius: 0.75rem;
   background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  border-radius: 0.75em;
+  border-radius: 0.75rem;
   background: var(--scroll-thumb-color);
 }

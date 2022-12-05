@@ -1,6 +1,6 @@
 .BadgePicker {
-  --badge-picker-button-size: 1.5em;
-  --badge-picker-icon-size: 1em;
+  --badge-picker-button-size: 1.5rem;
+  --badge-picker-icon-size: 1rem;
 
   width: var(--badge-picker-button-size);
   height: var(--badge-picker-button-size);
@@ -31,9 +31,9 @@
 .BadgePickerButtonIcon,
 .BadgePickerButtonToggleIcon {
   position: relative;
-  flex: 0 0 0.5em;
-  height: 0.5em;
-  border-radius: 0.5em;
+  flex: 0 0 0.5rem;
+  height: 0.5rem;
+  border-radius: 0.5rem;
 
   /*
    * This variable maps to a dynamic value set by JavaScript based on the badge type.
@@ -45,8 +45,8 @@
 .BadgePickerButtonIcon:after {
   content: "";
   position: absolute;
-  top: -0.25em;
-  left: -0.25em;
+  top: -0.25rem;
+  left: -0.25rem;
   height: var(--badge-picker-icon-size);
   width: var(--badge-picker-icon-size);
   border-radius: var(--badge-picker-icon-size);
@@ -61,8 +61,8 @@
 
 .BadgePickerButtonToggleIcon {
   fill: var(--badge-default-color);
-  flex: 0 0 0.75em;
-  height: 0.75em;
+  flex: 0 0 0.75rem;
+  height: 0.75rem;
 }
 
 .BadgePickerOpen,
@@ -102,8 +102,8 @@
 }
 
 .UnicornBadge {
-  height: 0.5em;
-  width: 0.5em;
+  height: 0.5rem;
+  width: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;

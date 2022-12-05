@@ -10,16 +10,16 @@
 }
 
 .Logo {
-  height: 3em;
+  height: 3rem;
   color: var(--color-error);
-  margin-bottom: 1em;
+  margin-bottom: 1rem;
   display: inline-block;
 }
 
 .Header {
   font-family: var(--font-family-default);
   font-size: var(--font-size-large);
-  margin-bottom: 0.5em;
+  margin-bottom: 0.5rem;
 }
 
 .Message {

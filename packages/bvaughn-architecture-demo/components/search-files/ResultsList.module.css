@@ -11,7 +11,7 @@
 }
 
 .NoResults {
-  padding: 0 0.5em;
+  padding: 0 0.5rem;
   color: var(--color-dim);
 }
 
@@ -22,14 +22,14 @@
 
 .OverflowHeader {
   display: flex;
-  padding: 0 0.5em;
+  padding: 0 0.5rem;
   color: var(--color-dim);
   font-size: var(--font-size-small);
   background-color: var(--background-color-source-search);
   border-top: 1px solid var(--border-color-source-search);
   border-bottom: 1px solid var(--border-color-source-search);
-  padding: 0.5em;
-  margin-bottom: 0.5em;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .OverflowIcon {

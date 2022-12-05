@@ -14,11 +14,11 @@
   color: var(--color-dimmer);
   font-size: var(--font-size-small);
   text-align: right;
-  margin: 0.5em;
+  margin: 0.5rem;
 }
 
 .Pre {
-  margin: 0.5em;
+  margin: 0.5rem;
   font-family: var(--font-family-monospace);
   font-size: var(--font-size-small);
   overflow: auto;

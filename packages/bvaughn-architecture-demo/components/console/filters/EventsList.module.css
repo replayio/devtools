@@ -2,8 +2,8 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 0 0.75em;
-  gap: 0.5em;
+  padding: 0 0.75rem;
+  gap: 0.5rem;
 }
 
 .Header {
@@ -14,9 +14,9 @@
 
 .FilterInput {
   width: 100%;
-  height: 1.5em;
-  padding: 0 0.25em;
-  border-radius: 0.25em;
+  height: 1.5rem;
+  padding: 0 0.25rem;
+  border-radius: 0.25rem;
   background: none;
   border: 2px solid transparent;
   outline: none;

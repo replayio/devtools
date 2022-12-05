@@ -5,8 +5,8 @@
   display: grid;
   width: 100vw;
   height: 100vh;
-  padding: 1em;
-  gap: 1em;
+  padding: 1rem;
+  gap: 1rem;
 }
 .Grid2Columns {
   grid-template-columns: 1fr 2fr;
@@ -19,7 +19,7 @@
 .VerticalContainer {
   display: flex;
   flex: 1 1 auto;
-  gap: 0.5em;
+  gap: 0.5rem;
   overflow: auto;
   font-size: var(--font-size-regular);
 }
@@ -37,16 +37,16 @@
 .ScopesPanel {
   display: flex;
   flex-direction: column;
-  gap: 0.5em;
+  gap: 0.5rem;
   overflow-x: hidden;
   background-color: var(--background-color-contrast-2);
   width: 300px;
-  padding: 0.5em;
-  border-radius: 0.5em;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
 }
 
 .Box {
   border: 1px solid var(--border-color);
   display: inline-block;
-  margin: 0.5em;
+  margin: 0.5rem;
 }

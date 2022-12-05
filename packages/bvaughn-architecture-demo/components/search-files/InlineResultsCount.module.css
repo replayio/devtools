@@ -11,8 +11,8 @@
 
 .SpinnerIcon {
   color: var(--color-dim);
-  width: 1em;
-  height: 1em;
+  width: 1rem;
+  height: 1rem;
   animation: 1s spin linear infinite;
 }
 

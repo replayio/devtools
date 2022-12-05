@@ -1,10 +1,10 @@
 .Filters {
   height: 100%;
-  padding: 0.5em 0;
+  padding: 0.5rem 0;
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 0.5em;
+  gap: 0.5rem;
   word-break: initial;
 }
 
@@ -12,7 +12,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 0 0.75em;
+  padding: 0 0.75rem;
 }
 
 .Divider {
@@ -24,14 +24,14 @@
 
 .ExceptionsErrorIcon {
   color: var(--color-error);
-  height: 1em;
-  width: 1em;
+  height: 1rem;
+  width: 1rem;
 }
 
 .SpinnerIcon {
   color: var(--color-dim);
-  width: 1em;
-  height: 1em;
+  width: 1rem;
+  height: 1rem;
   animation: 1s spin linear infinite;
 }
 

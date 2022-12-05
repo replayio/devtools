@@ -1,8 +1,8 @@
 .Shimmer {
   display: inline-block;
-  height: 1em;
+  height: 1rem;
   background-color: var(--background-color-contrast-3);
-  border-radius: 0.25em;
+  border-radius: 0.25rem;
 
   animation-name: shimmer;
   animation-duration: 1s;
