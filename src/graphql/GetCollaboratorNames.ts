@@ -69,11 +69,13 @@ export interface GetCollaboratorNames_recording_workspace_members {
 
 export interface GetCollaboratorNames_recording_workspace {
   __typename: "Workspace";
+  id: string;
   members: GetCollaboratorNames_recording_workspace_members | null;
 }
 
 export interface GetCollaboratorNames_recording {
   __typename: "Recording";
+  id: string;
   uuid: any;
   owner: GetCollaboratorNames_recording_owner | null;
   collaborators: GetCollaboratorNames_recording_collaborators | null;
