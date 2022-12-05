@@ -41,11 +41,15 @@ const reporterSlice = createSlice({
     setSelectedTest(state, action: PayloadAction<number | null>) {
       state.selectedTest = action.payload;
     },
+    selectedStepCleared(state) {
+      state.selectedStep = null;
+    },
   },
 });
 
 export default reporterSlice.reducer;
-export const { addReporterAnnotations, setSelectedStep, setSelectedTest } = reporterSlice.actions;
+export const { addReporterAnnotations, setSelectedStep, setSelectedTest, selectedStepCleared } =
+  reporterSlice.actions;
 export const getReporterAnnotations = (state: UIState) => state.reporter.annotations;
 export const getSelectedStep = (state: UIState) => state.reporter.selectedStep;
 export const getSelectedTest = (state: UIState) => state.reporter.selectedTest;
