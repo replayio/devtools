@@ -244,23 +244,7 @@ export function setupGraphics() {
   });
 }
 
-export async function repaint(force = false) {
-  const recordingCapabilities = await ThreadFront.getRecordingCapabilities();
-  if (!recordingCapabilities.supportsRepaintingGraphics) {
-    return;
-  }
-
-  const pauseId = await ThreadFront.getCurrentPauseId(replayClient);
-
-  return repaintAtPause(ThreadFront.currentTime, pauseId, force);
-}
-
-export async function repaintAtPause(time: number, pauseId: string, force = false) {
-  const recordingCapabilities = await ThreadFront.getRecordingCapabilities();
-  if (!recordingCapabilities.supportsRepaintingGraphics) {
-    return;
-  }
-
+async function fetchScreenshotForPause(pauseId: string, force = false) {
   let graphicsFetched = false;
 
   let didStall = false;
@@ -283,10 +267,10 @@ export async function repaintAtPause(time: number, pauseId: string, force = fals
     }
   }
 
-  // if (!rv || pauseId !== ThreadFront.currentPause.pauseId) {
   if (!rv) {
     return;
   }
+
   let { description, screenShot } = rv;
   if (screenShot) {
     repaintedScreenshots.set(description.hash, screenShot);
@@ -294,12 +278,40 @@ export async function repaintAtPause(time: number, pauseId: string, force = fals
     screenShot = repaintedScreenshots.get(description.hash);
     if (!screenShot) {
       console.error("Missing repainted screenshot", description);
-      return;
     }
   }
 
-  const { mouse } = await getGraphicsAtTime(time);
-  paintGraphics(screenShot, mouse);
+  return screenShot;
+}
+
+export async function repaint(force = false) {
+  repaintAtPause(
+    ThreadFront.currentTime,
+    ThreadFront.currentPause.pauseId!,
+    (_time, pauseId) => {
+      return pauseId !== ThreadFront.currentPause.pauseId;
+    },
+    force
+  );
+}
+
+export async function repaintAtPause(
+  time: number,
+  pauseId: string,
+  shouldCancelRepaint: (time: number, pauseId: string) => boolean,
+  force = false
+) {
+  const recordingCapabilities = await ThreadFront.getRecordingCapabilities();
+  if (!recordingCapabilities.supportsRepaintingGraphics) {
+    return;
+  }
+
+  const screenshot = await fetchScreenshotForPause(pauseId);
+
+  if (screenshot && !shouldCancelRepaint(time, pauseId)) {
+    const { mouse } = await getGraphicsAtTime(time);
+    paintGraphics(screenshot, mouse);
+  }
 }
 
 export function addLastScreen(screen: ScreenShot | null, point: string, time: number) {

@@ -197,11 +197,11 @@ export function setTimelineToPauseTime(
   time: number | null,
   updateGraphics = true
 ): UIThunkAction {
-  return async dispatch => {
+  return async (dispatch, getState) => {
     dispatch(setTimelineToTime(time, updateGraphics));
 
     if (time) {
-      dispatch(() => repaintAtPause(time, pauseId));
+      repaintAtPause(time, pauseId, time => getHoverTime(getState()) !== time);
     }
   };
 }

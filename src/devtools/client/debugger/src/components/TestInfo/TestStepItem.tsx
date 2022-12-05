@@ -146,7 +146,7 @@ export function TestStepItem({ argString, index, id }: TestStepItemProps) {
         setConsoleProps(localPauseData.consoleProps);
         setPauseId(localPauseData.endPauseId);
       }
-      dispatch(seek(pointStart!, startTime, false));
+      dispatch(seek(pointStart!, startTime, false, localPauseData?.startPauseId));
       dispatch(setSelectedStep({ id, startTime, endTime: startTime + duration - 1 }));
     }
   };
