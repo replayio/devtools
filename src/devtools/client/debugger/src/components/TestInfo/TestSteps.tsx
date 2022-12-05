@@ -79,8 +79,6 @@ function useGetTestSections(
       };
     });
 
-    console.log(stepsByTime);
-
     const times = stepsByTime.reduce(
       (acc, s) => ({
         min: Math.min(acc.min, s.event.absoluteStartTime),
