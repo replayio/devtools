@@ -212,6 +212,8 @@ export type TestStep = {
 };
 
 export type AnnotatedTestStep = TestStep & {
+  absoluteStartTime: number;
+  absoluteEndTime: number;
   index: number;
   annotations: Annotations;
 };

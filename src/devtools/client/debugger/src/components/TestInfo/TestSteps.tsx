@@ -16,7 +16,7 @@ import { AnnotatedTestStep, CypressAnnotationMessage, TestItem, TestStep } from 
 
 import { NetworkEvent } from "./NetworkEvent";
 import { TestCaseContext } from "./TestCase";
-import { TestStepRoot } from "./TestStepRoot";
+import { TestStepItem } from "./TestStepItem";
 
 type StepEvent = {
   time: number;
@@ -74,19 +74,25 @@ function useGetTestSections(
       })
       .map<NetworkEvent>(n => ({ time: n.end!, type: "network", event: n }));
 
-    const stepsByTime = steps.map<StepEvent>((s, i) => ({
-      time: startTime + s.relativeStartTime,
-      type: "step",
-      event: {
-        ...s,
-        index: i,
-        annotations: {
-          end: annotationsEnd.find(a => a.message.id === s.id),
-          enqueue: annotationsEnqueue.find(a => a.message.id === s.id),
-          start: annotationsStart.find(a => a.message.id === s.id),
+    const stepsByTime = steps.map<StepEvent>((s, i) => {
+      const duration = s.name === "assert" ? 1 : s.duration || 1;
+      return {
+        time: startTime + s.relativeStartTime,
+        type: "step",
+        event: {
+          ...s,
+          absoluteStartTime: startTime + s.relativeStartTime,
+          absoluteEndTime: startTime + s.relativeStartTime + duration,
+          duration,
+          index: i,
+          annotations: {
+            end: annotationsEnd.find(a => a.message.id === s.id),
+            enqueue: annotationsEnqueue.find(a => a.message.id === s.id),
+            start: annotationsStart.find(a => a.message.id === s.id),
+          },
         },
-      },
-    }));
+      };
+    });
 
     const navigationEventsByTime = navigationEvents
       .filter(e => isDuringSteps(e.time))
@@ -200,7 +206,7 @@ function TestSection({ events, header }: { events: CompositeTestEvent[]; header?
       ) : null}
       {events.map(({ event: s, type }, i) =>
         type === "step" ? (
-          <TestStepRoot step={s} key={i} index={s.index} argString={s.args?.toString()} id={s.id} />
+          <TestStepItem step={s} key={i} index={s.index} argString={s.args?.toString()} id={s.id} />
         ) : type === "network" ? (
           <NetworkEvent key={s.id} method={s.method} status={s.status} url={s.url} id={s.id} />
         ) : (
