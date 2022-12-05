@@ -10,6 +10,7 @@ import {
 } from "bvaughn-architecture-demo/components/sources/SourceSearchContext";
 import { KeyboardModifiersContextRoot } from "bvaughn-architecture-demo/src/contexts/KeyboardModifiersContext";
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import useDebouncedCallback from "bvaughn-architecture-demo/src/hooks/useDebouncedCallback";
 import { getSource } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useFeature } from "ui/hooks/settings";
@@ -47,10 +48,17 @@ function NewSourceAdapter() {
   const dispatch = useAppDispatch();
   const location = useAppSelector(getSelectedLocation);
 
+  const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
+
   // Sync the selected location that's in Redux to the new SourcesContext.
   // This makes the CMD+O and CMD+G menus work.
   // This also makes clicking on Console log locations work.
   useLayoutEffect(() => {
+    const timeoutId = timeoutIdRef.current;
+    if (timeoutId !== null) {
+      clearTimeout(timeoutId);
+    }
+
     if (location == null) {
       return;
     }
@@ -60,9 +68,22 @@ function NewSourceAdapter() {
     // Except when a filed is opened (e.g. by clicking on the file tab) in which cases it passes 0.
     // We ignore the 0 because it breaks scroll state preservation between tabs.
     const lineNumber = location?.line ?? 0;
+    const lineIndex = lineNumber > 0 ? lineNumber - 1 : undefined;
 
-    openSource(location.sourceId, lineNumber > 0 ? lineNumber : undefined);
-  }, [location, openSource]);
+    // TRICKY
+    // Sync focused state from Redux to React context,
+    // but do it after a small delay to avoid overriding values the are set as part of a transition.
+    if (
+      focusedSource?.sourceId !== location.sourceId ||
+      focusedSource?.startLineIndex !== lineIndex
+    ) {
+      timeoutIdRef.current = setTimeout(() => {
+        timeoutIdRef.current = null;
+
+        openSource("view-source", location.sourceId, lineIndex);
+      }, 100);
+    }
+  }, [focusedSource, location, openSource]);
 
   // Sync the lines currently rendered by the new Source list to Redux.
   // This updates Redux state to mark certain actions as "processed".

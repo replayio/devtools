@@ -57,7 +57,7 @@ export function InspectorContextRoot({
     (mappedLocation: MappedLocation) => {
       const location = mappedLocation.length > 0 ? mappedLocation[mappedLocation.length - 1] : null;
       if (location) {
-        openSource(location.sourceId, location.line);
+        openSource("view-source", location.sourceId, location.line - 1);
         showSourcesPanel();
       }
     },

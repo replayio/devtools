@@ -114,7 +114,7 @@ function Sources() {
               event.preventDefault();
               event.stopPropagation();
 
-              openSource(sourceId);
+              openSource("view-source", sourceId);
             };
 
             const onCloseButtonClick = (event: MouseEvent) => {

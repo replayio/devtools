@@ -130,7 +130,7 @@ function MatchRow({
 }) {
   const { match } = result;
 
-  const { openSource, setCurrentSearchResultLocation } = useContext(SourcesContext);
+  const { openSource } = useContext(SourcesContext);
 
   return (
     <div
@@ -138,8 +138,7 @@ function MatchRow({
       data-test-name="SearchFiles-ResultRow"
       data-test-type="Match"
       onClick={() => {
-        openSource(match.location.sourceId, match.location.line);
-        setCurrentSearchResultLocation(match.location);
+        openSource("search-result", match.location.sourceId, match.location.line - 1);
       }}
       style={style}
     >

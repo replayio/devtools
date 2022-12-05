@@ -71,7 +71,7 @@ export default function SourceFileNameSearch({
         if (searchState.goToLineNumber === null) {
           const result = searchState.results[searchState.index];
           if (result) {
-            openSource(result.source.sourceId);
+            openSource("view-source", result.source.sourceId);
           }
         }
 

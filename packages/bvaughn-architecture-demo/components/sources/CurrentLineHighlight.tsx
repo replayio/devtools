@@ -26,7 +26,7 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
   const client = useContext(ReplayClientContext);
   const [sourceSearchState] = useContext(SourceSearchContext);
   const { selectedPauseAndFrameId, previewLocation } = useContext(SelectedFrameContext);
-  const { currentSearchResultLocation } = useContext(SourcesContext);
+  const { focusedSource } = useContext(SourcesContext);
 
   if (previewLocation?.sourceId === sourceId) {
     if (previewLocation.line === lineNumber) {
@@ -74,14 +74,34 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
     }
   }
 
-  if (
-    currentSearchResultLocation != null &&
-    currentSearchResultLocation.sourceId === sourceSearchState.currentScopeId &&
-    currentSearchResultLocation.line === lineNumber
-  ) {
-    return (
-      <div className={styles.CurrentSearchResult} data-test-name="CurrentSearchResultHighlight" />
-    );
+  if (focusedSource !== null) {
+    const { endLineIndex, mode, startLineIndex, sourceId } = focusedSource;
+
+    if (endLineIndex !== null && startLineIndex !== null) {
+      const lineIndex = lineNumber - 1;
+
+      if (
+        sourceId === sourceSearchState.currentScopeId &&
+        lineIndex <= endLineIndex &&
+        lineIndex >= startLineIndex
+      ) {
+        switch (mode) {
+          case "search-result": {
+            return (
+              <div
+                className={styles.CurrentSearchResult}
+                data-test-name="CurrentSearchResultHighlight"
+              />
+            );
+          }
+          case "view-source": {
+            return (
+              <div className={styles.ViewSourceHighlight} data-test-name="ViewSourceHighlight" />
+            );
+          }
+        }
+      }
+    }
   }
 
   return null;

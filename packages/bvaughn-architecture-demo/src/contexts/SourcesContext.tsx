@@ -14,25 +14,25 @@ const VISIBLE_LINES_BUCKET_SIZE = 100;
 
 export type FindClosestFunctionName = (sourceId: string, location: SourceLocation) => string | null;
 
+export type FocusedSourceMode = "search-result" | "view-source";
+
 export type FocusedSource = {
   endLineIndex: number | null;
+  mode: FocusedSourceMode;
   sourceId: SourceId;
   startLineIndex: number | null;
-  type: "search-result" | "view-source";
 };
 
 type SourcesContextType = {
   closeSource: (sourceId: SourceId) => void;
-  currentSearchResultLocation: Location | null;
   focusedSource: FocusedSource | null;
   hoveredLineIndex: number | null;
   hoveredLineNode: HTMLElement | null;
   isPending: boolean;
   markPendingFocusUpdateProcessed: () => void;
-  openSource: (sourceId: SourceId, lineIndex?: number) => void;
+  openSource: (mode: FocusedSourceMode, sourceId: SourceId, lineIndex?: number) => void;
   openSourceIds: SourceId[];
   pendingFocusUpdate: boolean;
-  setCurrentSearchResultLocation: (location: Location | null) => void;
   setHoveredLocation: (lineIndex: number | null, lineNode: HTMLElement | null) => void;
   setVisibleLines: (startIndex: number | null, stopIndex: number | null) => void;
   findClosestFunctionName: FindClosestFunctionName;
@@ -45,7 +45,6 @@ type SourcesContextType = {
 };
 
 export type OpenSourcesState = {
-  currentSearchResultLocation: Location | null;
   focusedSource: FocusedSource | null;
   hoveredLineIndex: number | null;
   hoveredLineNode: HTMLElement | null;
@@ -55,7 +54,6 @@ export type OpenSourcesState = {
 };
 
 const INITIAL_STATE: OpenSourcesState = {
-  currentSearchResultLocation: null,
   focusedSource: null,
   hoveredLineIndex: null,
   hoveredLineNode: null,
@@ -67,10 +65,10 @@ const INITIAL_STATE: OpenSourcesState = {
 type CloseSourceAction = { type: "close_source"; sourceId: SourceId };
 type MarkFocusUpdateProcessedActions = { type: "mark_focus_update_processed" };
 type MarkSearchResultUpdateProcessedActions = { type: "mark_search_result_update_processed" };
-type OpenSourceAction = { type: "open_source"; sourceId: SourceId; lineIndex: number | null };
-type SetCurrentSearchResultLocationAction = {
-  type: "set_current_search_result_location";
-  location: Location | null;
+
+type OpenSourceAction = {
+  type: "open_source";
+  focusedSource: FocusedSource;
 };
 type SetHoveredLineAction = {
   type: "set_hovered_location";
@@ -88,7 +86,6 @@ type OpenSourcesAction =
   | MarkFocusUpdateProcessedActions
   | MarkSearchResultUpdateProcessedActions
   | OpenSourceAction
-  | SetCurrentSearchResultLocationAction
   | SetHoveredLineAction
   | SetVisibleLines;
 
@@ -117,16 +114,16 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
           if (index > 0) {
             focusedSource = {
               endLineIndex: null,
+              mode: "view-source",
               sourceId: openSourceIds[index - 1],
               startLineIndex: null,
-              type: "view-source",
             };
           } else if (index < openSourceIds.length - 1) {
             focusedSource = {
               endLineIndex: null,
+              mode: "view-source",
               sourceId: openSourceIds[index + 1],
               startLineIndex: null,
-              type: "view-source",
             };
           }
         }
@@ -146,18 +143,9 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
         return state;
       }
     }
-    case "mark_focus_update_processed": {
-      return {
-        ...state,
-        pendingFocusUpdate: false,
-      };
-    }
     case "open_source": {
-      // TODO [FE-1009] Support focused line range and type
-      const { lineIndex, sourceId } = action;
-      const startLineIndex = lineIndex ?? null;
-      const endLineIndex = lineIndex ?? null;
-      const type = "view-source";
+      // TODO [FE-1009] Support focused line range
+      const { focusedSource } = action;
 
       const {
         focusedSource: prevFocusedSource,
@@ -166,12 +154,11 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
         visibleLinesBySourceId: prevVisibleLinesBySourceId,
       } = state;
 
-      if (sourceId === prevFocusedSource?.sourceId) {
+      if (focusedSource?.sourceId === prevFocusedSource?.sourceId) {
         // If sources are equal we may be able to bail out.
         if (
-          lineIndex === null ||
-          (startLineIndex === prevFocusedSource?.startLineIndex &&
-            endLineIndex === prevFocusedSource?.endLineIndex)
+          focusedSource.startLineIndex === prevFocusedSource?.startLineIndex &&
+          focusedSource.endLineIndex === prevFocusedSource?.endLineIndex
         ) {
           // If the same line was specified (or no line) we may be able to bail out.
           if (prevPendingFocusUpdate) {
@@ -183,18 +170,13 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
       }
 
       let openSourceIds = prevOpenSourceIds;
-      if (prevOpenSourceIds.indexOf(sourceId) === -1) {
-        openSourceIds = [...prevOpenSourceIds, sourceId];
+      if (prevOpenSourceIds.indexOf(focusedSource.sourceId) === -1) {
+        openSourceIds = [...prevOpenSourceIds, focusedSource.sourceId];
       }
 
       return {
         ...state,
-        focusedSource: {
-          endLineIndex,
-          sourceId,
-          startLineIndex,
-          type,
-        },
+        focusedSource,
         hoveredLineIndex: null,
         hoveredLineNode: null,
         openSourceIds,
@@ -202,19 +184,11 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
         visibleLinesBySourceId: prevVisibleLinesBySourceId,
       };
     }
-    case "set_current_search_result_location": {
-      // TODO [FE-1009] Replace with focusedSource
-      const { location } = action;
-      const { currentSearchResultLocation: prevCurrentSearchResultLocation } = state;
-      if (prevCurrentSearchResultLocation === location) {
-        return state;
-      } else {
-        return {
-          ...state,
-          currentSearchResultLocation: location,
-        };
-      }
-      break;
+    case "mark_focus_update_processed": {
+      return {
+        ...state,
+        pendingFocusUpdate: false,
+      };
     }
     case "set_hovered_location": {
       const { lineIndex, lineNode } = action;
@@ -317,21 +291,22 @@ export function SourcesContextRoot({
     });
   }, []);
 
-  const openSource = useCallback((sourceId: SourceId, lineIndex: number | undefined) => {
-    startTransition(() => {
-      dispatch({
-        type: "open_source",
-        lineIndex: lineIndex === undefined ? null : lineIndex,
-        sourceId,
+  const openSource = useCallback(
+    (mode: FocusedSourceMode, sourceId: SourceId, lineIndex: number | undefined) => {
+      startTransition(() => {
+        dispatch({
+          type: "open_source",
+          focusedSource: {
+            endLineIndex: lineIndex ?? null,
+            mode,
+            sourceId,
+            startLineIndex: lineIndex ?? null,
+          },
+        });
       });
-    });
-  }, []);
-
-  const setCurrentSearchResultLocation = useCallback((location: Location | null) => {
-    startTransition(() => {
-      dispatch({ type: "set_current_search_result_location", location });
-    });
-  }, []);
+    },
+    []
+  );
 
   const setHoveredLocation = useCallback(
     (lineIndex: number | null, lineNode: HTMLElement | null) => {
@@ -354,7 +329,6 @@ export function SourcesContextRoot({
 
   const context = useMemo<SourcesContextType>(
     () => ({
-      currentSearchResultLocation: state.currentSearchResultLocation,
       focusedSource: state.focusedSource,
       hoveredLineIndex: state.hoveredLineIndex,
       hoveredLineNode: state.hoveredLineNode,
@@ -368,7 +342,6 @@ export function SourcesContextRoot({
       isPending,
       markPendingFocusUpdateProcessed,
       openSource,
-      setCurrentSearchResultLocation,
       setHoveredLocation,
       setVisibleLines,
       findClosestFunctionName,
@@ -378,7 +351,6 @@ export function SourcesContextRoot({
       isPending,
       markPendingFocusUpdateProcessed,
       openSource,
-      setCurrentSearchResultLocation,
       setHoveredLocation,
       setVisibleLines,
       state,
