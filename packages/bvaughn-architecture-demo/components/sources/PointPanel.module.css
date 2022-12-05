@@ -88,6 +88,16 @@
   overflow-y: hidden;
   overflow-x: auto;
   font-size: var(--font-size-regular);
+
+  /* Firefox fixes */
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb-color) transparent;
+}
+.Content::-webkit-scrollbar {
+  height: 0.5em;
+}
+.Content [data-test-name="PointPanel-ContentInput"] {
+  white-space: nowrap !important;
 }
 
 .AddConditionButton,

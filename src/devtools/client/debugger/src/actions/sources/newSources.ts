@@ -2,7 +2,6 @@ import { getTabs, tabsRestored } from "devtools/client/debugger/src/reducers/tab
 import {
   SourceDetails,
   allSourcesReceived,
-  getAllSourceDetails,
   getSourceToDisplayById,
   getSourceToDisplayForUrl,
 } from "ui/reducers/sources";
@@ -26,7 +25,6 @@ export const setupSourcesListeners = (startAppListening: AppStartListening) => {
       const tabs = getTabs(state);
       const persistedLocation = getPreviousPersistedLocation(state);
 
-      const sources = getAllSourceDetails(state);
       const cx = getContext(state);
 
       // Tabs are persisted with just a URL, but no `sourceId` because

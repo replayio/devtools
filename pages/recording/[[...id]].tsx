@@ -18,7 +18,7 @@ import {
   useSubscribeRecording,
 } from "ui/hooks/recordings";
 import useConfigureReplayClientInterop from "ui/hooks/useReplayClient";
-import setupDevtools from "ui/setup/dynamic/devtools";
+import setupDevtools, { migratePerRecordingPersistedSettings } from "ui/setup/dynamic/devtools";
 import { useAppDispatch, useAppStore } from "ui/setup/hooks";
 import { Recording as RecordingInfo } from "ui/types";
 import { isTest } from "ui/utils/environment";
@@ -29,6 +29,8 @@ import { trackEvent } from "ui/utils/telemetry";
 import useToken from "ui/utils/useToken";
 
 import Upload from "./upload";
+
+migratePerRecordingPersistedSettings();
 
 interface MetadataProps {
   metadata?: {

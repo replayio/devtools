@@ -7,16 +7,24 @@ import {
   useCallback,
   useContext,
   useMemo,
-  useState,
-  useTransition,
 } from "react";
 
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point, PointId } from "shared/client/types";
 
 import useBreakpointIdsFromServer from "../hooks/useBreakpointIdsFromServer";
-import useLocalStorage from "../hooks/useLocalStorage";
+import useIndexedDB, { IDBOptions } from "../hooks/useIndexedDB";
 import { SessionContext } from "./SessionContext";
+
+const EMPTY_ARRAY: Point[] = [];
+
+// NOTE: If any change is made like adding a store name, bump the version number
+// to ensure that the database is recreated properly.
+export const POINTS_DATABASE: IDBOptions = {
+  databaseName: "Points",
+  databaseVersion: 1,
+  storeNames: ["high-priority", "transition"],
+};
 
 export type PointInstance = {
   point: Point;
@@ -52,14 +60,31 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   const { recordingId, trackEvent } = useContext(SessionContext);
   const replayClient = useContext(ReplayClientContext);
 
-  // Both high-pri state and transition state should be managed by useLocalStorage,
+  // Both high-pri state and transition state should be managed by useIndexedDB,
   // Else values from other tabs will only be synced to the high-pri state.
-  const [points, setPoints] = useLocalStorage<Point[]>(`${recordingId}::points`, []);
-  const [pointsForAnalysis, setPointsForAnalysis, isPending] = useLocalStorage<Point[]>(
-    `${recordingId}::points::transition`,
-    [],
-    true
-  );
+  const {
+    setValue: setPoints,
+    status: pointsStatus,
+    value: points,
+  } = useIndexedDB<Point[]>({
+    database: POINTS_DATABASE,
+    initialValue: [],
+    recordName: recordingId,
+    storeName: "high-priority",
+  });
+  const {
+    setValue: setPointsForAnalysis,
+    status: pointsForAnalysisStatus,
+    value: pointsForAnalysis,
+  } = useIndexedDB<Point[]>({
+    database: POINTS_DATABASE,
+    initialValue: [],
+    recordName: recordingId,
+    scheduleUpdatesAsTransitions: true,
+    storeName: "transition",
+  });
+
+  const isPending = pointsForAnalysisStatus === "update-pending";
 
   const setPointsHelper = useCallback(
     (action: SetStateAction<Point[]>) => {
@@ -71,7 +96,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
 
   const addPoint = useCallback(
     (partialPoint: Partial<Point> | null, location: Location) => {
-      // Points (and their ids) are shared between tabs (via LocalStorage),
+      // Points (and their ids) are shared between tabs (via IndexedDB),
       // so the id numbers should be deterministic;
       // a single incrementing counter wouldn't work well unless it was also synced.
       const id = `${location.sourceId}:${location.line}:${location.column}`;
@@ -93,7 +118,6 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
 
       setPointsHelper((prevPoints: Point[]) => {
         const index = sortedIndexBy(prevPoints, point, ({ location }) => location.line);
-
         return prevPoints.slice(0, index).concat([point], prevPoints.slice(index));
       });
     },
@@ -120,12 +144,10 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
             ...prevPoint,
             ...partialPoint,
           };
-
           const points = prevPoints.slice();
           points.splice(index, 1, newPoint);
           return points;
         }
-
         throw Error(`Could not find point with id "${id}"`);
       });
     },
@@ -135,8 +157,25 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   useBreakpointIdsFromServer(points, editPoint, deletePoints, replayClient);
 
   const context = useMemo(
-    () => ({ addPoint, deletePoints, editPoint, isPending, points, pointsForAnalysis }),
-    [addPoint, deletePoints, editPoint, isPending, points, pointsForAnalysis]
+    () => ({
+      addPoint,
+      deletePoints,
+      editPoint,
+      isPending,
+      points: pointsStatus === "initialization-complete" ? points! : EMPTY_ARRAY,
+      pointsForAnalysis:
+        pointsForAnalysisStatus === "initialization-complete" ? pointsForAnalysis! : EMPTY_ARRAY,
+    }),
+    [
+      addPoint,
+      deletePoints,
+      editPoint,
+      isPending,
+      points,
+      pointsForAnalysis,
+      pointsForAnalysisStatus,
+      pointsStatus,
+    ]
   );
 
   return <PointsContext.Provider value={context}>{children}</PointsContext.Provider>;

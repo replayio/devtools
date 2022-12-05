@@ -48,9 +48,7 @@ export interface GetWorkspaceSubscription_node_Workspace {
   subscription: GetWorkspaceSubscription_node_Workspace_subscription | null;
 }
 
-export type GetWorkspaceSubscription_node =
-  | GetWorkspaceSubscription_node_Recording
-  | GetWorkspaceSubscription_node_Workspace;
+export type GetWorkspaceSubscription_node = GetWorkspaceSubscription_node_Recording | GetWorkspaceSubscription_node_Workspace;
 
 export interface GetWorkspaceSubscription {
   node: GetWorkspaceSubscription_node | null;

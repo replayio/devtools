@@ -12,7 +12,6 @@ export type ExperimentalUserSettings = {
   defaultWorkspaceId: null | string;
   disableLogRocket: boolean;
   enableTeams: boolean;
-  enableLargeText: boolean;
   role: string;
 };
 
@@ -22,7 +21,6 @@ export type LocalExperimentalUserSettings = {
   consoleFilterDrawerDefaultsToOpen: boolean;
   enableQueryCache: boolean;
   enableColumnBreakpoints: boolean;
-  enableLargeText: boolean;
   hitCounts: boolean;
   profileWorkerThreads: boolean;
 };
@@ -216,6 +214,7 @@ export type TestStep = {
 export type AnnotatedTestStep = TestStep & {
   absoluteStartTime: number;
   absoluteEndTime: number;
+  index: number;
   annotations: Annotations;
 };
 
