@@ -2,12 +2,11 @@ import { Location, TimeStampedPoint } from "@replayio/protocol";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import {
   PropsWithChildren,
+  SetStateAction,
   createContext,
   useCallback,
   useContext,
-  useLayoutEffect,
   useMemo,
-  useRef,
 } from "react";
 
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -87,21 +86,13 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
 
   const isPending = pointsForAnalysisStatus === "update-pending";
 
-  const prevPointsRef = useRef<Point[]>([]);
-
   const setPointsHelper = useCallback(
-    (newPoints: Point[]) => {
-      setPoints(newPoints);
-      setPointsForAnalysis(newPoints);
+    (action: SetStateAction<Point[]>) => {
+      setPoints(action);
+      setPointsForAnalysis(action);
     },
     [setPoints, setPointsForAnalysis]
   );
-
-  useLayoutEffect(() => {
-    if (pointsStatus === "initialization-complete") {
-      prevPointsRef.current = points!;
-    }
-  }, [points, pointsStatus]);
 
   const addPoint = useCallback(
     (partialPoint: Partial<Point> | null, location: Location) => {
@@ -125,9 +116,10 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       trackEvent("breakpoint.add");
       // TODO Determine if we should track "breakpoint.add_column" here
 
-      const prevPoints = prevPointsRef.current;
-      const index = sortedIndexBy(prevPoints, point, ({ location }) => location.line);
-      setPointsHelper(prevPoints.slice(0, index).concat([point], prevPoints.slice(index)));
+      setPointsHelper((prevPoints: Point[]) => {
+        const index = sortedIndexBy(prevPoints, point, ({ location }) => location.line);
+        return prevPoints.slice(0, index).concat([point], prevPoints.slice(index));
+      });
     },
     [setPointsHelper, trackEvent]
   );
@@ -135,8 +127,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   const deletePoints = useCallback(
     (...ids: PointId[]) => {
       trackEvent("breakpoint.remove");
-      const prevPoints = prevPointsRef.current;
-      setPointsHelper(prevPoints.filter(point => !ids.includes(point.id)));
+      setPointsHelper((prevPoints: Point[]) => prevPoints.filter(point => !ids.includes(point.id)));
     },
 
     [setPointsHelper, trackEvent]
@@ -145,22 +136,20 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   const editPoint = useCallback(
     (id: PointId, partialPoint: Partial<Point>) => {
       trackEvent("breakpoint.edit");
-      const prevPoints = prevPointsRef.current;
-      const index = prevPoints.findIndex(point => point.id === id);
-      if (index >= 0) {
-        const prevPoint = prevPoints[index];
-        const newPoint: Point = {
-          ...prevPoint,
-          ...partialPoint,
-        };
-
-        const newPoints = prevPoints.slice();
-        newPoints.splice(index, 1, newPoint);
-
-        setPointsHelper(newPoints);
-      } else {
+      setPointsHelper((prevPoints: Point[]) => {
+        const index = prevPoints.findIndex(point => point.id === id);
+        if (index >= 0) {
+          const prevPoint = prevPoints[index];
+          const newPoint: Point = {
+            ...prevPoint,
+            ...partialPoint,
+          };
+          const points = prevPoints.slice();
+          points.splice(index, 1, newPoint);
+          return points;
+        }
         throw Error(`Could not find point with id "${id}"`);
-      }
+      });
     },
     [setPointsHelper, trackEvent]
   );
