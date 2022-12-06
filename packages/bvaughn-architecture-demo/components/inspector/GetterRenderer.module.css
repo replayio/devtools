@@ -9,7 +9,7 @@
 }
 
 .ToggleAlignmentPadding {
-  margin-left: 1.25em;
+  margin-left: 1.25rem;
 }
 
 .Separator {
@@ -17,8 +17,8 @@
 }
 
 .InvokeGetterButton {
-  height: 1em;
-  width: 1em;
+  height: 1rem;
+  width: 1rem;
   outline: none;
   background: none;
   padding: 0;
@@ -28,8 +28,8 @@
 }
 
 .InvokeGetterIcon {
-  height: 1em;
-  width: 1em;
+  height: 1rem;
+  width: 1rem;
   color: var(--object-inspector-invoke-getter-icon-color);
   display: inline-block;
 }

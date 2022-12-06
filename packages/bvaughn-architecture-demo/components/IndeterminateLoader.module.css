@@ -7,7 +7,7 @@
 }
 
 .ProgressBarOuter {
-  flex: 0 0 0.25em;
+  flex: 0 0 0.25rem;
   width: 100%;
   background-color: var(--background-color-contrast-3);
   overflow: hidden;

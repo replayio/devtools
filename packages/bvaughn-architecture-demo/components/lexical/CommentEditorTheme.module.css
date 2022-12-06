@@ -15,7 +15,7 @@
   font-family: var(--font-family-monospace);
 
   padding: 2px;
-  border-radius: 3px;
+  border-radius: 0.25rem;
   background-color: var(--chrome);
   color: var(--cm-variable);
 }

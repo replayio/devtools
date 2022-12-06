@@ -1,0 +1,7 @@
+{
+  "configBasedir": "packages/bvaughn-architecture-demo/",
+  "extends": ["stylelint-config-prettier"],
+  "rules": {
+    "unit-disallowed-list": ["em"]
+  }
+}

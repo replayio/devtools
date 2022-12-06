@@ -43,6 +43,7 @@
   --background-color-secondary-button: #f02d5e;
   --background-color-tertiary-button: #929292;
   --background-color-disabled-button: #454950;
+  --background-color-high-contrast-button: #081120;
   --background-color-current-execution-point: #25364e;
   --background-color-current-search-result: #42381f;
   --background-color-warning: #42381f;
@@ -69,6 +70,7 @@
   --color-secondary-button: #ffffff;
   --color-tertiary-button: #000000;
   --color-disabled-button: #ffffff;
+  --color-high-contrast-button: #ffffff;
   --color-warning: #fce2a1;
   --color-search-results: #d7d7db;
 
@@ -191,6 +193,7 @@
   --background-color-secondary-button: #f02d5e;
   --background-color-tertiary-button: #929292;
   --background-color-disabled-button: #666666;
+  --background-color-high-contrast-button: #f2f2f2;
   --background-color-current-execution-point: #eaf3ff;
   --background-color-current-search-result: #fffac8;
   --background-color-warning: #fffac8;
@@ -217,6 +220,7 @@
   --color-secondary-button: #ffffff;
   --color-tertiary-button: #ffffff;
   --color-disabled-button: #ffffff;
+  --color-high-contrast-button: #000000;
   --color-warning: #6c5914;
   --color-search-results: #47628b;
 

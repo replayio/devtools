@@ -1,11 +1,13 @@
 .FocusRegionRowOff,
 .FocusRegionRowOn {
-  padding: 1ch;
+  padding: 0.25rem;
   display: flex;
   flex-direction: row;
   flex: 1;
-  gap: 1ch;
+  gap: 0.25rem;
   align-items: center;
+  border-radius: 0.5rem;
+  margin-left: 0.5rem;
 }
 .FocusRegionRowOn {
   background-color: var(--focus-mode-active-background-color);
@@ -14,9 +16,9 @@
 .FocusToggleButton {
   width: 10ch;
   cursor: pointer;
-  border-radius: 0.25em;
+  border-radius: 0.25rem;
   border: none;
-  padding: 0.25em;
+  padding: 0.25rem;
 }
 
 .RangeSlider {
@@ -31,8 +33,8 @@
 .RangeTrackUnfocused {
   position: absolute;
   top: 50%;
-  height: 0.25em;
-  margin-top: -0.125em;
+  height: 2px;
+  margin-top: -0.125rem;
 }
 .RangeTrackFocused {
   background-color: var(--region-focused-color);
@@ -51,19 +53,19 @@
 }
 .RangeStartThumb {
   background-color: var(--focus-mode-thumb-color);
-  border-radius: 0.25em 0px 0px 0.25em;
+  border-radius: 0.25rem 0px 0px 0.25rem;
 }
 .RangeEndThumb {
   background-color: var(--focus-mode-thumb-color);
-  border-radius: 0px 0.25em 0.25em 0px;
+  border-radius: 0px 0.25rem 0.25rem 0px;
 }
 
 .FocusTimeStamps {
   white-space: nowrap;
   font-size: var(--font-size-regular);
   background-color: rgba(255, 255, 255, 0.5);
-  border-radius: 0.25em;
-  padding: 0.125em 0.25em;
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.25rem;
 }
 
 .Timeline {
@@ -85,20 +87,20 @@
 }
 
 .RegionRanges {
-  flex: 0 0 0.25em;
+  flex: 0 0 2px;
   position: relative;
 }
 
 .LoadedRegions,
 .LoadingRegions {
-  height: 0.25em;
+  height: 2px;
   position: absolute;
 }
 .LoadingRegions {
   background-color: var(--region-loading-color);
-  bottom: calc(0.5em + 1px);
+  bottom: calc(2px + 1px);
 }
 .LoadedRegions {
   background-color: var(--region-loaded-color);
-  bottom: 0.5em;
+  bottom: 8px;
 }

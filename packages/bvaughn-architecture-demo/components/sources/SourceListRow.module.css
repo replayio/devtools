@@ -28,11 +28,11 @@
 .HoverButton {
   position: absolute;
   top: 0;
-  left: 0.25em;
+  left: 0.25rem;
   z-index: 5;
 
-  width: 1.5em;
-  height: 1.5em;
+  width: 1rem;
+  height: 1rem;
 
   cursor: pointer;
   transition: all 100ms;
@@ -42,26 +42,24 @@
   color: var(--color-disabled-button);
   cursor: default;
 }
-
 .HoverButton:hover:not(.HoverButton:disabled) {
-  top: -0.25em;
+  top: -0.25rem;
   left: 0;
-  width: 2em;
-  height: 2em;
+  width: 1.5rem;
+  height: 1.5rem;
   transition: all 100ms;
 }
-
 .HoverButton:hover:not(.HoverButton:disabled) .HoverButtonIcon {
-  width: 1.5em;
-  height: 1.5em;
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .BreakpointIcon,
 .DisabledBreakpointIcon,
 .HoverButtonIcon,
 .Icon {
-  width: 1em;
-  height: 1em;
+  width: 1rem;
+  height: 1rem;
   display: inline-block;
 }
 .BreakpointIcon,
@@ -100,8 +98,8 @@
   top: 50%;
   height: 2.5ch;
   margin-top: -1.25ch;
-  left: -1ch;
-  right: -1ch;
+  left: 0;
+  right: 0;
   text-align: right;
   align-items: center;
   justify-content: flex-end;
@@ -200,7 +198,7 @@
   padding: 0;
   margin: 0 0.5ch;
   cursor: pointer;
-  height: 1em;
+  height: 1rem;
 }
 
 .LineSegmentsAndPointPanel {

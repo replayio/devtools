@@ -1,6 +1,5 @@
 import { Suspense, useContext } from "react";
 
-import AvatarImage from "bvaughn-architecture-demo/components/AvatarImage";
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import Loader from "bvaughn-architecture-demo/components/Loader";
 import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
