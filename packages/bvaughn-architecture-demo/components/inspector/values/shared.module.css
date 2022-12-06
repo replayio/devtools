@@ -122,7 +122,7 @@
 
 .FunctionKeyword {
   color: var(--object-inspector-function-keyword);
-  margin-right: 0.5ch;
+  margin-right: 1ch;
 }
 .FunctionName {
   color: var(--object-inspector-function-name);
@@ -134,7 +134,16 @@
 
 .StringToggleButton {
   padding: 0.25rem 0.5rem;
-  background-color: var(--chrome);
-  border-radius: 0.375rem;
+  outline: 0;
+  border: 0;
+  cursor: pointer;
+  border-radius: 0.25rem;
   display: inline;
+  margin-left: 1ch;
+
+  background-color: var(--background-color-high-contrast-button);
+  color: var(--color-high-contrast-button);
+
+  font-size: var(--font-size-small);
+  font-family: var(--font-family-default);
 }

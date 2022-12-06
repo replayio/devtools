@@ -19,8 +19,9 @@
   background-color: var(--context-menu-background-color);
   color: var(--color-default);
   font-size: var(--font-size-regular);
-  line-height: 2rem;
+  line-height: 1.5rem;
   cursor: pointer;
+  padding: 0 1ch;
 }
 .SelectedItem {
   background-color: var(--background-color-primary-button);

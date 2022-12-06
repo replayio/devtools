@@ -20,10 +20,10 @@
 }
 
 .InputWrapper {
-  height: 2rem;
+  height: 1.75rem;
   display: flex;
   align-items: center;
-  padding: 0.5rem;
+  padding: 0 0.5rem 0 0;
   margin: 0 0.5rem;
   background-color: var(--background-color-inputs);
   border: 2px solid transparent;
@@ -34,9 +34,9 @@
 }
 
 .Icon {
-  flex: 0 0 2rem;
-  width: 2rem;
-  height: 2rem;
+  flex: 0 0 1.75rem;
+  width: 1.75rem;
+  height: 1.75rem;
   padding: 0.25rem;
   display: inline-block;
   color: var(--color-dim);

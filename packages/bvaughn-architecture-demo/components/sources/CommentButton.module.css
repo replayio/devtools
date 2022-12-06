@@ -1,7 +1,7 @@
 .Container {
-  flex: 0 0 2rem;
-  height: 2rem;
-  width: 2rem;
+  flex: 0 0 1.5rem;
+  height: 1.5rem;
+  width: 1.5rem;
   position: relative;
   font-family: var(--font-family-default);
   font-size: var(--font-size-regular);
@@ -13,14 +13,14 @@
   background: none;
   border: none;
   margin: 0;
-  padding: 0.5rem;
+  padding: 0.25rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 2rem;
-  min-width: 2rem;
-  border-radius: 2rem;
+  height: 1.5rem;
+  min-width: 1.5rem;
+  border-radius: 1.5rem;
 }
 
 .PausedStyle {
@@ -61,9 +61,9 @@
 }
 
 .ButtonIcon {
-  flex: 0 0 1.25rem;
-  height: 1.25rem;
-  width: 1.25rem;
+  flex: 0 0 1rem;
+  height: 1rem;
+  width: 1rem;
   fill: currentColor;
 }
 

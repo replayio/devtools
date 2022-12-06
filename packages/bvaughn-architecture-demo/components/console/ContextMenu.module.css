@@ -13,7 +13,7 @@
 .ContextMenuItem {
   background-color: var(--context-menu-background-color);
   color: var(--color-default);
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.75rem;
   user-select: none;
   cursor: pointer;
   display: flex;
@@ -28,9 +28,9 @@
 .ColorBadgeClear,
 .UnicornBadge {
   display: inline-block;
-  width: 1rem;
-  height: 1rem;
-  border-radius: 1rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 0.75rem;
 }
 .ColorBadge {
   background-color: var(--badge-color);

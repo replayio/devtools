@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   gap: 1ch;
-  padding: 0.5rem;
+  padding: 0.25rem;
   user-select: none;
 }
 
@@ -32,9 +32,9 @@
 }
 
 .ContentWrapper {
-  padding: 0.5rem;
+  padding: 0.25rem;
   border: 2px solid transparent;
-  border-radius: 0.5rem;
+  border-radius: 0.25rem;
 }
 .ContentWrapper:focus-within {
   border-color: var(--color-brand);
@@ -58,7 +58,7 @@
   background: var(--background-color-contrast-1);
   color: var(--color-default);
   border: 2px solid var(--background-color-contrast-2);
-  padding: 0.5rem;
+  padding: 0.25rem;
   display: flex;
   border-radius: 0.25rem;
   cursor: pointer;
@@ -83,7 +83,7 @@
   color: var(--color-brand);
   outline: none;
   border: none;
-  padding: 0.5rem;
+  padding: 0.25rem;
   background-color: var(--background-color-contrast-1);
   color: var(--color-default);
   border: 2px solid var(--background-color-contrast-2);
@@ -98,7 +98,7 @@
   width: 100%;
   outline: none;
   border: none;
-  padding: 0.5rem;
+  padding: 0.25rem;
   background-color: var(--background-color-contrast-1);
   border: 2px solid var(--background-color-contrast-2);
   color: var(--color-default);

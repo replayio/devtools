@@ -2,9 +2,13 @@
 .ErrorRow,
 .TraceRow,
 .WarningRow {
+  min-height: calc(1.5rem + 1px);
   margin-top: -1px;
-  padding: 0.25rem 0.1rem;
+
+  padding: 0.25rem;
+  padding-top: calc(0.25rem + 1px);
   padding-left: 1.5rem;
+  
   border-bottom: 1px solid var(--background-color-contrast-1);
   position: relative;
 }
@@ -89,7 +93,6 @@
 .LogContentsEmpty {
   flex: 1 1 100%;
   display: inline;
-  vertical-align: top;
 }
 
 .LogContentsEmpty {
@@ -142,7 +145,7 @@
   width: 0.5rem;
   height: 0.5rem;
   position: absolute;
-  top: 0.75rem;
+  top: 0.5rem;
   left: 0.5rem;
 }
 

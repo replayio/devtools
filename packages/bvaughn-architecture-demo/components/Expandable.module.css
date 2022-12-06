@@ -3,7 +3,6 @@
 }
 .Inline {
   display: inline;
-  vertical-align: top;
 }
 
 .ToggleButton {
@@ -24,6 +23,7 @@
   height: 1rem;
   margin-right: 0.5ch;
   display: inline-flex;
+  vertical-align: top;
 }
 .ArrowExpanded {
   transform: rotate(90deg);

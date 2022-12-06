@@ -1,34 +1,37 @@
-.Container {
+.Container,
+.ContainerFocused {
   display: flex;
   width: 100%;
   align-items: center;
-  border-top: 1px solid var(--background-color-contrast-2);
+  border: 2px solid transparent;
+  border-bottom-right-radius: 0.5rem;
+  overflow: hidden;
+}
+.ContainerFocused {
+  border-color: var(--color-brand);
 }
 
 .Icon {
-  width: 2rem;
-  height: 2rem;
+  width: 1.75rem;
+  height: 1.75rem;
   padding: 0.25rem;
-  flex: 0 0 2rem;
-  border-top: 1px solid var(--background-color-default);
+  flex: 0 0 1.75rem;
   display: inline-block;
 }
 
 .Input {
   width: 100%;
-  height: 2rem;
-  padding: 0 0.5ch;
+  height: 1.75rem;
+  padding: 0 0.25rem;
   background: none;
-  border: 2px solid transparent;
-  outline: none;
   background-color: var(--background-color-inputs);
   color: var(--color-default);
 
   font-family: var(--font-family-monospace);
   font-size: var(--font-size-regular);
-}
-.Input:focus {
-  border-color: var(--color-brand);
+
+  outline: none;
+  border: none;
 }
 
 .Results {
@@ -42,12 +45,32 @@
 }
 
 .ResultsIconButton {
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-regular);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: none;
-  color: var(--color-default);
+  color: var(--color-dim);
   padding: 0;
-  width: 1rem;
-  height: 1rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.5rem;
+  border: 2px solid transparent;
+  outline: none;
+}
+.ResultsIconButton:focus {
+  border-color: var(--color-brand);
+}
+.ResultsIconButton:hover:not(.ResultsIconButton:disabled):not(.ResultsIconButtonActive) {
+  color: var(--color-default);
+}
+.ResultsIconButton:disabled {
+  color: var(--color-dimmer);
+}
+.ResultsIconButtonActive {
+  color: var(--background-color-primary-button);
 }
 
 .ResultsIcon {

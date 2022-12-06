@@ -4,7 +4,7 @@
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
   word-break: initial;
 }
 
@@ -12,7 +12,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 0 0.75rem;
+  padding: 0 0.5rem;
 }
 
 .Divider {

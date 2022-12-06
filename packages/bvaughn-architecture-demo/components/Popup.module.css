@@ -3,7 +3,7 @@
   z-index: 20;
   display: flex;
   flex-direction: column;
-  padding: 0.125rem 0;
+  padding: 0;
 }
 
 .UpArrow,

@@ -1,11 +1,13 @@
 .FocusRegionRowOff,
 .FocusRegionRowOn {
-  padding: 1ch;
+  padding: 0.25rem;
   display: flex;
   flex-direction: row;
   flex: 1;
-  gap: 1ch;
+  gap: 0.25rem;
   align-items: center;
+  border-radius: 0.5rem;
+  margin-left: 0.5rem;
 }
 .FocusRegionRowOn {
   background-color: var(--focus-mode-active-background-color);
@@ -31,7 +33,7 @@
 .RangeTrackUnfocused {
   position: absolute;
   top: 50%;
-  height: 0.25rem;
+  height: 2px;
   margin-top: -0.125rem;
 }
 .RangeTrackFocused {
@@ -85,20 +87,20 @@
 }
 
 .RegionRanges {
-  flex: 0 0 0.25rem;
+  flex: 0 0 2px;
   position: relative;
 }
 
 .LoadedRegions,
 .LoadingRegions {
-  height: 0.25rem;
+  height: 2px;
   position: absolute;
 }
 .LoadingRegions {
   background-color: var(--region-loading-color);
-  bottom: calc(0.5rem + 1px);
+  bottom: calc(2px + 1px);
 }
 .LoadedRegions {
   background-color: var(--region-loaded-color);
-  bottom: 0.5rem;
+  bottom: 8px;
 }

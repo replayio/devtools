@@ -23,7 +23,7 @@
 .ArrowExpanded {
   width: 1rem;
   height: 1rem;
-  margin-right: 0.5ch;
+  margin-right: 0.25rem;
   transform-origin: 0.5rem 0.5rem;
   transition: transform 200ms;
   display: inline-block;
@@ -45,10 +45,4 @@
   padding-left: 0.5rem;
   display: flex;
   flex-direction: column;
-}
-
-.FooterCollapsed {
-}
-.FooterExpanded {
-  margin-left: 1rem;
 }

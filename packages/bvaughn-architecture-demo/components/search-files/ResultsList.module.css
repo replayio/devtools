@@ -33,9 +33,9 @@
 }
 
 .OverflowIcon {
-  flex: 0 0 2ch;
-  width: 2ch;
-  height: 2ch;
+  flex: 0 0 0.75rem;
+  width: 0.75rem;
+  height: 0.75rem;
   color: var(--color-warning);
   margin-right: 1ch;
 }

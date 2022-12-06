@@ -1,6 +1,6 @@
 .Button,
 .ButtonWithNag {
-  border-radius: 0.5rem;
+  border-radius: 0.25rem;
 
   display: none;
   align-items: center;

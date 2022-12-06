@@ -1,5 +1,5 @@
 .BadgePicker {
-  --badge-picker-button-size: 1.5rem;
+  --badge-picker-button-size: 1.25rem;
   --badge-picker-icon-size: 1rem;
 
   width: var(--badge-picker-button-size);

@@ -1,4 +1,4 @@
-import { MutableRefObject, useContext } from "react";
+import { MutableRefObject, useContext, useState } from "react";
 
 import Icon from "../Icon";
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
@@ -12,6 +12,8 @@ export default function ConsoleSearch({
   searchInputRef: MutableRefObject<HTMLInputElement | null>;
 }) {
   const [searchState, searchActions] = useContext(ConsoleSearchContext);
+
+  const [inputFocused, setInputFocused] = useState(false);
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     searchActions.search(event.currentTarget.value);
@@ -81,13 +83,18 @@ export default function ConsoleSearch({
   }
 
   return (
-    <div className={`${styles.Container} ${className}`} data-test-id="ConsoleSearch">
+    <div
+      className={`${inputFocused ? styles.ContainerFocused : styles.Container} ${className}`}
+      data-test-id="ConsoleSearch"
+    >
       <Icon className={styles.Icon} type="search" />
       <input
         autoFocus
         className={styles.Input}
         data-test-id="ConsoleSearchInput"
+        onBlur={() => setInputFocused(false)}
         onChange={onChange}
+        onFocus={() => setInputFocused(true)}
         onKeyDown={onKeyDown}
         placeholder="Find in logs"
         ref={searchInputRef}
