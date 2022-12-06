@@ -1,6 +1,20 @@
-import { SetStateAction, useCallback, useLayoutEffect, useState, useTransition } from "react";
+import {
+  SetStateAction,
+  useCallback,
+  useLayoutEffect,
+  useReducer,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 
 import { localStorageGetItem, localStorageSetItem } from "../utils/storage";
+
+function manuallyTriggerStorageEvent() {
+  // Apparently the "storage" event only fires across tabs, and setting a value
+  // in the _same_ tab won't trigger it. Do that manually:
+  window.dispatchEvent(new Event("storage"));
+}
 
 // Stores value in localStorage and synchronizes it between sessions and tabs.
 // The API mirrors useState.
@@ -15,6 +29,7 @@ export default function useLocalStorage<T>(
   scheduleUpdatesAsTransitions: boolean = false
 ): [value: T, setValue: (value: T | ((prevValue: T) => T)) => void, isPending: boolean] {
   const [isPending, startTransition] = useTransition();
+  const [updateCounter, dispatchUpdate] = useReducer(c => c + 1, 0);
 
   const [value, setValue] = useState<T>(() => {
     const storedValue = localStorageGetItem(key);
@@ -30,9 +45,11 @@ export default function useLocalStorage<T>(
       if (scheduleUpdatesAsTransitions) {
         startTransition(() => {
           setValue(action);
+          dispatchUpdate();
         });
       } else {
         setValue(action);
+        dispatchUpdate();
       }
     },
     [scheduleUpdatesAsTransitions]
@@ -62,6 +79,15 @@ export default function useLocalStorage<T>(
 
     localStorageSetItem(key, string);
   }, [key, value]);
+
+  // Order of effects matters here. Don't trigger this until _after_ we've updated `localStorage`.
+  useLayoutEffect(() => {
+    // Only notify if this hook has had its setter run
+    if (updateCounter > 0) {
+      // Notify any other components subscribed to this value that it has changed
+      manuallyTriggerStorageEvent();
+    }
+  }, [updateCounter]);
 
   return [value, setValueWrapper, isPending];
 }

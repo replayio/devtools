@@ -2,6 +2,9 @@ import { PrefsHelper } from "devtools/client/shared/prefs";
 import { asyncStoreHelper } from "devtools/shared/async-store-helper";
 import { pref } from "devtools/shared/services";
 
+// Note: additional preferences are defined in other files,
+// including uses of `pref()`, `useLocalStorage`, and `useIndexedDB`.
+
 // app prefs.
 pref("devtools.defaultMode", "non-dev");
 pref("devtools.dev-secondary-panel-height", "375px");
@@ -15,7 +18,6 @@ pref("devtools.sidePanelSize", "240px");
 pref("devtools.theme", "system");
 pref("devtools.toolbox-size", "50%");
 pref("devtools.consoleFilterDrawerExpanded", true);
-pref("devtools.hitCounts", "hide-counts");
 
 // app features
 pref("devtools.features.basicProcessingLoadingBar", false);
@@ -50,7 +52,6 @@ export const prefs = new PrefsHelper("devtools", {
   theme: ["String", "theme"],
   toolboxSize: ["String", "toolbox-size"],
   consoleFilterDrawerExpanded: ["Bool", "consoleFilterDrawerExpanded"],
-  hitCounts: ["String", "hitCounts"],
 });
 
 export const features = new PrefsHelper("devtools.features", {
@@ -62,7 +63,6 @@ export const features = new PrefsHelper("devtools.features", {
   enableQueryCache: ["Bool", "enableQueryCache"],
   disableUnHitLines: ["Bool", "disableUnHitLines"],
   enableLargeText: ["Bool", "enableLargeText"],
-  hitCounts: ["Bool", "hitCounts"],
   logProtocol: ["Bool", "logProtocol"],
   logProtocolEvents: ["Bool", "logProtocolEvents"],
   newControllerOnRefresh: ["Bool", "newControllerOnRefresh"],

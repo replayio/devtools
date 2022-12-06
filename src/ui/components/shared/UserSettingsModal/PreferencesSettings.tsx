@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
 import hooks from "ui/hooks";
 import { useFeature, useStringPref } from "ui/hooks/settings";
 import { EmailSubscription } from "ui/hooks/users";
@@ -107,15 +108,12 @@ function PrivacyPreferences() {
     </div>
   );
 }
-type HitCountMode = "hide-counts" | "show-counts" | "disabled";
 
 function UiPreferences() {
   const dispatch = useAppDispatch();
   const theme = useAppSelector(getThemePreference);
   const { value: defaultMode, update: updateDefaultMode } = useStringPref("defaultMode");
-  // TODO [FE-1011] Hit count settings is broken and disabled for now
-  // const { value: hitCountsMode, update: updateHitCounts } = useStringPref("hitCounts");
-  // const hitCountsEnabled = useFeature("hitCounts");
+  const [showHitCounts, setShowHitCounts] = useLocalStorage<boolean>(`Replay:ShowHitCounts`, true);
   const { value: enableLargeText, update: updateEnableLargeText } = useFeature("enableLargeText");
 
   const setSelected = (value: AppTheme) => {
@@ -152,22 +150,18 @@ function UiPreferences() {
           />
         </div>
       </div>
-      {/* {hitCountsEnabled && (
-        <div className="flex flex-row justify-between">
-          <div>Heat Maps</div>
-          <div className="w-1/2">
-            <SelectMenu
-              options={[
-                { name: "Hide Counts", id: "hide-counts" },
-                { name: "Show Counts", id: "show-counts" },
-                { name: "Hidden", id: "disabled" },
-              ]}
-              selected={hitCountsMode}
-              setSelected={mode => updateHitCounts(mode as HitCountMode)}
-            />
-          </div>
-        </div>
-      )} */}
+      <label
+        className="flex cursor-pointer items-center space-x-2 p-1"
+        data-private
+        htmlFor="show-hit-counts"
+      >
+        <Checkbox
+          id="show-hit-counts"
+          checked={showHitCounts}
+          onChange={() => setShowHitCounts(!showHitCounts)}
+        />
+        <div>Show hit count numbers for each source line</div>
+      </label>
       <label
         className="flex cursor-pointer items-center space-x-2 p-1"
         data-private
