@@ -1,7 +1,5 @@
 import Link from "next/link";
-import { useContext } from "react";
 
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { TestRun } from "ui/hooks/tests";
 
 import {
@@ -11,7 +9,6 @@ import {
 import { AttributeContainer } from "../AttributeContainer";
 import { RunStats } from "../RunStats";
 import { getDuration } from "../utils";
-import { TestRunOverviewContext } from "./TestRunOverviewContainerContextType";
 
 function Title({ testRun }: { testRun: TestRun }) {
   const title = testRun?.commitTitle;
@@ -25,7 +22,7 @@ function Title({ testRun }: { testRun: TestRun }) {
   );
 }
 
-function Attributes({ testRun }: { testRun: TestRun }) {
+export function Attributes({ testRun }: { testRun: TestRun }) {
   const duration = getDuration(testRun.recordings!);
   const durationString = getDurationString(duration);
   const { user, date, mergeId, mergeTitle, branch } = testRun;
@@ -62,9 +59,7 @@ function RunnerLink({ testRun }: { testRun: TestRun }) {
   );
 }
 
-export function RunSummary() {
-  const testRun = useContext(TestRunOverviewContext).testRun!;
-
+export function RunSummary({ testRun }: { testRun: TestRun }) {
   return (
     <div className="mb-2 flex flex-col space-y-2 border-b border-themeBorder p-4">
       <div className="flex flex-row justify-between">

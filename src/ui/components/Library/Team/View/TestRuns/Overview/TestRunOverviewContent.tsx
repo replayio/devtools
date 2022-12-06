@@ -17,7 +17,7 @@ export function TestRunOverviewContent() {
     >
       {testRun ? (
         <>
-          <RunSummary />
+          <RunSummary testRun={testRun} />
           <RunResults />
         </>
       ) : (

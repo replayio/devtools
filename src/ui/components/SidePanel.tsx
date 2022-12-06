@@ -12,6 +12,7 @@ import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
+import { useGetTestRunForWorkspace } from "ui/hooks/tests";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import {
   getReporterAnnotationsForTests,
@@ -24,6 +25,7 @@ import { Annotation, Recording, TestItem } from "ui/types";
 
 import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
+import { Attributes } from "./Library/Team/View/TestRuns/Overview/RunSummary";
 import ProtocolViewer from "./ProtocolViewer";
 import StatusDropdown from "./shared/StatusDropdown";
 import styles from "./SidePanel.module.css";
@@ -131,6 +133,9 @@ function EventsPane({ items }: { items: any[] }) {
     );
   };
 
+  const workspaceId = recording?.workspace?.id;
+  const testRunId = recording?.metadata?.test?.run?.id;
+
   if (recording?.metadata?.test?.tests?.length) {
     return (
       <div className="flex h-full flex-1 flex-col overflow-hidden">
@@ -149,10 +154,28 @@ function EventsPane({ items }: { items: any[] }) {
             </>
           )}
         </div>
+        {workspaceId && testRunId ? (
+          <TestRunAttributes workspaceId={workspaceId} testRunId={testRunId} />
+        ) : null}
         <TestInfo testCases={recording?.metadata?.test.tests} />
       </div>
     );
   }
 
   return <Accordion items={items} />;
+}
+
+function TestRunAttributes({ workspaceId, testRunId }: { workspaceId: string; testRunId: string }) {
+  const { testRun } = useGetTestRunForWorkspace(workspaceId, testRunId);
+  const selectedTest = useAppSelector(getSelectedTest);
+
+  if (!testRun || selectedTest !== null) {
+    return null;
+  }
+
+  return (
+    <div className="border-b p-2">
+      <Attributes testRun={testRun} />
+    </div>
+  );
 }
