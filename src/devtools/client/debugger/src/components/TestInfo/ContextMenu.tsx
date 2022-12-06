@@ -35,6 +35,7 @@ function ContextMenu({
   const client = useContext(ReplayClientContext);
   const classnames = classNames.bind(styles);
 
+  const isFirstStep = test.steps[0].id === testStep.id;
   const isLastStep = test.steps[test.steps.length - 1].id === testStep.id;
   const canJumpToBefore =
     currentPoint && testStep.annotations.start
@@ -54,6 +55,15 @@ function ContextMenu({
       startPlayback({
         beginTime: testStep.absoluteStartTime,
         endTime: test.relativeStartTime + test.duration,
+      })
+    );
+  };
+  const onPlayToHere = () => {
+    hide();
+    dispatch(
+      startPlayback({
+        beginTime: test.relativeStartTime,
+        endTime: testStep.absoluteStartTime,
       })
     );
   };
@@ -135,6 +145,13 @@ function ContextMenu({
       <div className={styles.ContextMenuItem} onClick={onGoToLocation}>
         <MaterialIcon>code</MaterialIcon>
         Jump to source
+      </div>
+      <div
+        className={classnames("ContextMenuItem", { disabled: isFirstStep })}
+        onClick={onPlayToHere}
+      >
+        <MaterialIcon>play_circle</MaterialIcon>
+        Play to here
       </div>
       <div
         className={classnames("ContextMenuItem", { disabled: isLastStep })}
