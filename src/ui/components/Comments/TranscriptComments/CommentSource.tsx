@@ -8,6 +8,8 @@ import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 
+import LoadingLabelPlaceholder from "./LoadingLabelPlaceholder";
+
 type PropsFromParent = {
   comment: any;
 };
@@ -45,21 +47,6 @@ function CommentSource({
     return null;
   }
 
-  let sourceContent: React.ReactNode = null;
-  // We may not have sources yet, and once we have sources we still have to calculate
-  // the "labels" from the source texts.  Show loading indicators until ready.
-  if (labels) {
-    sourceContent = (
-      <div
-        className="cm-s-mozilla overflow-hidden whitespace-pre font-mono text-xs"
-        style={{ fontSize: "11px" }}
-        dangerouslySetInnerHTML={{ __html: labels?.secondary || "" }}
-      />
-    );
-  } else {
-    sourceContent = <div className="whitespace-pre font-mono text-xs italic">Loading...</div>;
-  }
-
   return (
     <div
       onClick={onSelectSource}
@@ -67,7 +54,16 @@ function CommentSource({
     >
       <div className="mono flex flex-col font-medium">
         <div className="flex w-full flex-row justify-between space-x-1">
-          {sourceContent}
+          <div
+            className="cm-s-mozilla overflow-hidden whitespace-pre font-mono text-xs"
+            style={{ fontSize: "11px" }}
+          >
+            {labels ? (
+              <span dangerouslySetInnerHTML={{ __html: labels?.secondary || "" }} />
+            ) : (
+              <LoadingLabelPlaceholder />
+            )}
+          </div>
           <div
             className="flex flex-shrink-0 opacity-0 transition group-hover:opacity-100"
             title="Show in the Editor"
