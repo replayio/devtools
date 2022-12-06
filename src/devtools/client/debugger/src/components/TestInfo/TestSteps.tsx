@@ -150,6 +150,16 @@ function useGetTestSections(
       }
     }
 
+    if (nonStepStack.length) {
+      if (afterEach.length) {
+        afterEach.push(...nonStepStack);
+      } else if (testBody.length) {
+        testBody.push(...nonStepStack);
+      } else if (beforeEach.length) {
+        beforeEach.push(...nonStepStack);
+      }
+    }
+
     return { beforeEach, testBody, afterEach };
   }, [
     steps,
