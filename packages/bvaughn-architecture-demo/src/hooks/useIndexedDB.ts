@@ -1,6 +1,8 @@
 import { IDBPDatabase, openDB } from "idb";
 import { SetStateAction, useCallback, useEffect, useRef, useState, useTransition } from "react";
 
+import { createGenericCache } from "../suspense/createGenericCache";
+
 export interface IDBOptions {
   databaseName: string;
   databaseVersion: number;
@@ -18,6 +20,44 @@ type Status =
   | typeof STATUS_INITIALIZATION_ERRORED
   | typeof STATUS_UPDATE_PENDING;
 
+export const {
+  getValueSuspense: getIDBInstanceSuspense,
+  getValueAsync: getIDBInstanceAsync,
+  getValueIfCached: getIDBInstanceIfCached,
+} = createGenericCache<[dbOptions: IDBOptions], IDBPDatabase>(
+  async dbOptions => {
+    const { databaseName, databaseVersion, storeNames } = dbOptions;
+    // Create a single shared IDB instance for this DB definition
+    const dbInstance = await openDB(databaseName, databaseVersion, {
+      upgrade(db) {
+        // The "upgrade" callback runs both on initial creation (when a DB does not exist),
+        // and on version number change.
+        for (let storeName of storeNames) {
+          if (!db.objectStoreNames.contains(storeName)) {
+            db.createObjectStore(storeName);
+          }
+        }
+      },
+    });
+    return dbInstance;
+  },
+  dbOptions => dbOptions.databaseName + dbOptions.databaseVersion
+);
+
+export const {
+  getValueSuspense: getInitialIDBValueSuspense,
+  getValueAsync: getInitialIDBValueAsync,
+  getValueIfCached: getInitialIDBValueIfCached,
+} = createGenericCache<[dbOptions: IDBOptions, storeName: string, recordName: string], any>(
+  async (dbOptions, storeName, recordName) => {
+    // Only look up this initial stored value once
+    const dbInstance = await getIDBInstanceAsync(dbOptions);
+    return dbInstance.get(storeName, recordName);
+  },
+  (dbOptions, storeName, recordName) =>
+    dbOptions.databaseName + dbOptions.databaseVersion + storeName + recordName
+);
+
 // Stores value in IndexedDB and synchronizes it between sessions.
 //
 // Consider the following benefits and trade-offs of using this hook vs useLocalStorage:
@@ -30,20 +70,28 @@ export default function useIndexedDB<T>(options: {
   recordName: string;
   scheduleUpdatesAsTransitions?: boolean;
   storeName: string;
+  suspend?: boolean;
 }): {
   setValue: (value: T | ((prevValue: T) => T)) => void;
   status: Status;
   value: T;
 } {
+  const waitForValueLoadedSuspense = () => {
+    return getInitialIDBValueSuspense(options.database, storeName, recordName);
+  };
+
   const { databaseName, databaseVersion, storeNames } = options.database;
   const { initialValue, recordName, scheduleUpdatesAsTransitions = false, storeName } = options;
 
   const [isPending, startTransition] = useTransition();
-  const [value, setValue] = useState<T>(initialValue);
+  // If requested, suspend entirely until we've read the initial value
+  //  and can use that to seed the `useState`
+  const [value, setValue] = useState<T>(
+    options.suspend === true ? waitForValueLoadedSuspense() : initialValue
+  );
   const [status, setStatus] = useState<Status>(STATUS_INITIALIZATION_PENDING);
 
   const databaseRef = useRef<IDBPDatabase | null>(null);
-
   const setValueWrapper = useCallback(
     (newValue: T | ((prevValue: T) => T)) => {
       if (scheduleUpdatesAsTransitions) {
@@ -70,20 +118,10 @@ export default function useIndexedDB<T>(options: {
 
     async function setupDatabaseForHook() {
       if (typeof window !== "undefined" && typeof window.indexedDB !== "undefined") {
-        const dbInstance = await openDB(databaseName, databaseVersion, {
-          upgrade(db) {
-            // The "upgrade" callback runs both on initial creation (when a DB does not exist),
-            // and on version number change.
-            for (let storeName of storeNames) {
-              if (!db.objectStoreNames.contains(storeName)) {
-                db.createObjectStore(storeName);
-              }
-            }
-          },
-        });
+        const dbInstance = await getIDBInstanceAsync(options.database);
         databaseRef.current = dbInstance;
         try {
-          const savedData = await dbInstance.get(storeName, recordName);
+          const savedData = await getInitialIDBValueAsync(options.database, storeName, recordName);
           if (!cancelled) {
             if (savedData !== undefined) {
               // We may not have a saved value. Don't overwrite with `undefined`.
@@ -104,9 +142,8 @@ export default function useIndexedDB<T>(options: {
 
     return () => {
       cancelled = true;
-      databaseRef.current?.close();
     };
-  }, [databaseName, databaseVersion, recordName, storeName, storeNames]);
+  }, [options.database, databaseName, databaseVersion, recordName, storeName, storeNames]);
 
   return {
     setValue: setValueWrapper,
