@@ -3,6 +3,7 @@ import { useContext, useRef } from "react";
 
 import useModalDismissSignal from "bvaughn-architecture-demo/src/hooks/useModalDismissSignal";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { getCurrentPoint } from "ui/actions/app";
 import { seek, seekToTime, startPlayback } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getCurrentTime } from "ui/reducers/timeline";
@@ -28,13 +29,22 @@ function ContextMenu({
 }) {
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(getCurrentTime);
+  const currentPoint = useAppSelector(getCurrentPoint);
   const ref = useRef<HTMLDivElement>(null);
   const cx = useAppSelector(getContext);
   const client = useContext(ReplayClientContext);
   const classnames = classNames.bind(styles);
 
   const isLastStep = test.steps[test.steps.length - 1].id === testStep.id;
-  const adjustedAbsoluteEndTime = testStep.absoluteEndTime - 1;
+  const canJumpToBefore =
+    currentPoint && testStep.annotations.start
+      ? BigInt(currentPoint) !== BigInt(testStep.annotations.start.point)
+      : currentTime !== testStep.absoluteStartTime;
+  const canJumpToAfter =
+    !isLastStep &&
+    (currentPoint && testStep.annotations.end
+      ? BigInt(currentPoint) !== BigInt(testStep.annotations.end.point)
+      : currentTime !== testStep.absoluteEndTime);
 
   useModalDismissSignal(ref, hide, true);
 
@@ -48,6 +58,10 @@ function ContextMenu({
     );
   };
   const onJumpToBefore = () => {
+    if (!canJumpToBefore) {
+      return;
+    }
+
     hide();
     const start = testStep.annotations.start;
     if (start) {
@@ -57,12 +71,16 @@ function ContextMenu({
     }
   };
   const onJumpToAfter = () => {
+    if (!canJumpToAfter) {
+      return;
+    }
+
     hide();
     const end = testStep.annotations.end;
     if (end) {
       dispatch(seek(end.point, end.time, false));
     } else {
-      dispatch(seekToTime(adjustedAbsoluteEndTime));
+      dispatch(seekToTime(testStep.absoluteEndTime - 1));
     }
   };
   const onGoToLocation = async () => {
@@ -105,8 +123,6 @@ function ContextMenu({
     }
   };
 
-  const canJumpToBefore = adjustedAbsoluteEndTime === currentTime || testStep.name === "assert";
-
   return (
     <div
       className={styles.ContextMenu}
@@ -129,18 +145,18 @@ function ContextMenu({
       </div>
       <div
         className={classnames("ContextMenuItem", {
-          disabled: canJumpToBefore,
+          disabled: !canJumpToBefore,
         })}
-        onClick={canJumpToBefore ? undefined : onJumpToBefore}
+        onClick={onJumpToBefore}
       >
         <MaterialIcon>arrow_back</MaterialIcon>
         Show before
       </div>
       <div
         className={classnames("ContextMenuItem", {
-          disabled: adjustedAbsoluteEndTime === currentTime,
+          disabled: !canJumpToAfter,
         })}
-        onClick={adjustedAbsoluteEndTime === currentTime ? undefined : onJumpToAfter}
+        onClick={onJumpToAfter}
       >
         <MaterialIcon>arrow_forward</MaterialIcon>
         Show after
