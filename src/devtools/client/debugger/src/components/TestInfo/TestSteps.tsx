@@ -169,7 +169,7 @@ export function TestSteps({ test }: { test: TestItem }) {
   );
 
   return (
-    <div className="flex flex-col rounded-lg py-2 px-2">
+    <div className="flex flex-col rounded-lg px-2">
       <TestSection events={beforeEach} header="Before Each" />
       <TestSection
         events={testBody}
@@ -210,7 +210,7 @@ function TestSection({ events, header }: { events: CompositeTestEvent[]; header?
         ) : type === "network" ? (
           <NetworkEvent key={s.id} method={s.method} status={s.status} url={s.url} id={s.id} />
         ) : (
-          <span className="flex border-b border-themeBase-90 p-1 px-2 italic opacity-70">
+          <span className="flex border-b border-themeBase-90 bg-toolbarBackground py-2 px-2 italic opacity-70">
             new url {s.url}
           </span>
         )

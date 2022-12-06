@@ -24,7 +24,7 @@ export function NetworkEvent({
 
   return (
     <button
-      className="flex border-b border-themeBase-90 p-1 px-2 italic opacity-70 "
+      className="flex border-b border-themeBase-90 bg-toolbarBackground py-2 px-2 italic opacity-70 "
       onClick={onClick}
     >
       {method} {status} {new URL(url).pathname}

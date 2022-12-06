@@ -1,23 +1,44 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPanes";
 import Accordion from "devtools/client/debugger/src/components/shared/Accordion";
 import TestInfo from "devtools/client/debugger/src/components/TestInfo/TestInfo";
+import { getRecordingDuration } from "ui/actions/app";
+import { setFocusRegion } from "ui/actions/timeline";
 import Events from "ui/components/Events";
 import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
 import Icon from "ui/components/shared/Icon";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
-import { useAppSelector } from "ui/setup/hooks";
-import { TestItem } from "ui/types";
+import { getReporterAnnotationsForTests, setSelectedStep } from "ui/reducers/reporter";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { Annotation, Recording, TestItem } from "ui/types";
 
 import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
 import ProtocolViewer from "./ProtocolViewer";
 import StatusDropdown from "./shared/StatusDropdown";
 import styles from "./SidePanel.module.css";
+
+// The test start times in metadata may be incorrect. If we have the reporter annotations,
+// we can use those instead
+function maybeCorrectTestTimes(recording: Recording | void, annotations: Annotation[]) {
+  const testCases = recording?.metadata?.test?.tests;
+  return (
+    testCases?.map((t, i) => ({
+      ...t,
+      relativeStartTime: annotations?.[i]?.time ? annotations?.[i]?.time : t.relativeStartTime,
+    })) || []
+  );
+}
+
+function getSpecFilename(recording: Recording | void) {
+  const file = recording?.metadata?.test?.file || "";
+  return file.includes("/") ? file.split("/").pop() : file;
+}
 
 function TestResultsSummary({ testCases }: { testCases: TestItem[] }) {
   const failed = testCases.filter(c => c.result === "failed").length;
@@ -99,16 +120,46 @@ function EventsPane({
 }) {
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
+  const annotations = useAppSelector(getReporterAnnotationsForTests);
+  const dispatch = useAppDispatch();
+  const duration = useAppSelector(getRecordingDuration);
+
+  const testCases = useMemo(
+    () => maybeCorrectTestTimes(recording, annotations),
+    [recording, annotations]
+  );
+
+  const onReset = () => {
+    setHighlightedTest(null);
+    dispatch(setSelectedStep(null));
+    dispatch(
+      setFocusRegion({
+        beginTime: 0,
+        endTime: duration,
+      })
+    );
+  };
 
   if (recording?.metadata?.test?.tests?.length) {
     return (
       <div className="flex h-full flex-1 flex-col overflow-hidden">
         <div className={styles.ToolbarHeader}>
-          <span className="flex-grow truncate">{recording?.metadata?.test?.file}</span>
-          <TestResultsSummary testCases={recording?.metadata?.test?.tests} />
+          {highlightedTest !== null ? (
+            <button onClick={onReset} className="flex flex-grow items-center truncate ">
+              <MaterialIcon>chevron_left</MaterialIcon>
+              <span className="flex-grow  text-left"> {testCases[highlightedTest].title}</span>
+            </button>
+          ) : (
+            <>
+              <div className="flex flex-grow items-center ">
+                <span className="flex-grow truncate pl-1">{getSpecFilename(recording)}</span>
+              </div>
+              <TestResultsSummary testCases={recording?.metadata?.test?.tests} />
+            </>
+          )}
         </div>
         <TestInfo
-          testCases={recording?.metadata?.test.tests}
+          testCases={testCases}
           highlightedTest={highlightedTest}
           setHighlightedTest={setHighlightedTest}
         />
