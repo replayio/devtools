@@ -3,6 +3,7 @@ import { createContext, useEffect, useState } from "react";
 import { getRecordingDuration } from "ui/actions/app";
 import { seek, setFocusRegion, startPlayback } from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import {
   getReporterAnnotationsForTitleEnd,
   getSelectedTest,
@@ -90,12 +91,12 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
     >
       <div className="flex flex-col">
         {!isSelected && (
-          <div className="flex flex-row items-center justify-between gap-1 rounded-lg p-1 transition hover:cursor-pointer">
-            <button
-              onClick={toggleExpand}
-              disabled={!expandable}
-              className="group flex flex-grow flex-row gap-1 overflow-hidden"
-            >
+          <button
+            className="group flex flex-row items-center justify-between gap-1 rounded-lg p-1 transition hover:cursor-pointer"
+            onClick={toggleExpand}
+            disabled={!expandable}
+          >
+            <div className="flex flex-grow flex-row gap-1 overflow-hidden">
               <Status result={test.result} />
               <div className="flex flex-col items-start text-bodyColor">
                 <div
@@ -109,8 +110,11 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
                   </div>
                 ) : null}
               </div>
-            </button>
-          </div>
+            </div>
+            <div className="invisible flex self-start group-hover:visible">
+              <MaterialIcon>chevron_right</MaterialIcon>
+            </div>
+          </button>
         )}
         {expandSteps ? <TestSteps test={test} /> : null}
       </div>
