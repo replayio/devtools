@@ -1,10 +1,10 @@
 import { Object as ProtocolObject } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import PropertiesRenderer from "bvaughn-architecture-demo/components/inspector/PropertiesRenderer";
-import { getReporterAnnotationsForTests, getSelectedTest } from "ui/reducers/reporter";
+import { getSelectedTest } from "ui/reducers/reporter";
 import { useAppSelector } from "ui/setup/hooks";
 import { TestItem } from "ui/types";
 
@@ -25,19 +25,10 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
   const selectedTest = useAppSelector(getSelectedTest);
   const [consoleProps, setConsoleProps] = useState<ProtocolObject>();
   const [pauseId, setPauseId] = useState<string | null>(null);
-  const annotations = useAppSelector(getReporterAnnotationsForTests);
 
   const showTest = (index: number) => {
     return selectedTest === null || selectedTest === index;
   };
-
-  if (!annotations) {
-    return (
-      <div className="flex flex-grow flex-col overflow-hidden">
-        <div className="flex flex-grow flex-col space-y-1 overflow-auto px-2">Loading...</div>
-      </div>
-    );
-  }
 
   return (
     <TestInfoContext.Provider value={{ consoleProps, setConsoleProps, pauseId, setPauseId }}>
