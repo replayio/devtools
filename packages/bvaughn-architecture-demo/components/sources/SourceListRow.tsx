@@ -40,7 +40,6 @@ export type ItemData = {
   onLineMouseEnter: (lineIndex: number, lineNumberNode: HTMLElement) => void;
   onLineMouseLeave: (lineIndex: number, lineNumberNode: HTMLElement) => void;
   points: Point[];
-  setShowHitCounts: (value: boolean) => void;
   showColumnBreakpoints: boolean;
   showHitCounts: boolean;
   source: ProtocolSource;
@@ -67,7 +66,6 @@ const SourceListRow = memo(
       onLineMouseEnter,
       onLineMouseLeave,
       points,
-      setShowHitCounts,
       showColumnBreakpoints,
       showHitCounts,
       source,
@@ -270,15 +268,9 @@ const SourceListRow = memo(
             </div>
           </div>
 
-          <div
-            className={`${styles.LineHitCountBar} ${hitCountBarClassName}`}
-            onClick={() => setShowHitCounts(!showHitCounts)}
-          />
+          <div className={`${styles.LineHitCountBar} ${hitCountBarClassName}`} />
           {showHitCounts && (
-            <div
-              className={`${styles.LineHitCountLabel} ${hitCountLabelClassName}`}
-              onClick={() => setShowHitCounts(!showHitCounts)}
-            >
+            <div className={`${styles.LineHitCountLabel} ${hitCountLabelClassName}`}>
               {hitCount !== null ? formatHitCount(hitCount) : ""}
             </div>
           )}

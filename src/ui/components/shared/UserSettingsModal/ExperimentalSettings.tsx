@@ -21,11 +21,6 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableColumnBreakpoints",
   },
   {
-    label: "Inline hit counts",
-    description: "Show line hit counts in the source view",
-    key: "hitCounts",
-  },
-  {
     label: "Profile Source Worker",
     description:
       "Record a performance profile of the source worker and send it to Replay to help diagnose performance issues",
@@ -92,7 +87,6 @@ export default function ExperimentalSettings({}) {
     value: consoleFilterDrawerDefaultsToOpen,
     update: updateConsoleFilterDrawerDefaultsToOpen,
   } = useFeature("consoleFilterDrawerDefaultsToOpen");
-  const { value: hitCounts, update: updateHitCounts } = useFeature("hitCounts");
   const { value: profileWorkerThreads, update: updateProfileWorkerThreads } =
     useFeature("profileWorkerThreads");
   const { value: enableQueryCache, update: updateEnableQueryCache } =
@@ -104,8 +98,6 @@ export default function ExperimentalSettings({}) {
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
-    } else if (key === "hitCounts") {
-      updateHitCounts(!hitCounts);
     } else if (key === "profileWorkerThreads") {
       updateProfileWorkerThreads(!profileWorkerThreads);
     } else if (key === "enableQueryCache") {
@@ -125,7 +117,6 @@ export default function ExperimentalSettings({}) {
     disableScanDataCache,
     enableColumnBreakpoints,
     enableQueryCache,
-    hitCounts,
     profileWorkerThreads,
   };
 

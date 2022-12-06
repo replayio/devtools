@@ -108,7 +108,7 @@ export default function SourceList({
   }, [focusedSource, lineCount, markPendingFocusUpdateProcessed, pendingFocusUpdate, sourceId]);
 
   const togglesLocalStorageKey = `Replay:ShowHitCounts`;
-  const [showHitCounts, setShowHitCounts] = useLocalStorage<boolean>(togglesLocalStorageKey, true);
+  const [showHitCounts] = useLocalStorage<boolean>(togglesLocalStorageKey, true);
 
   const hitCounts = visibleLines
     ? getSourceHitCountsSuspense(client, sourceId, visibleLines, focusRange)
@@ -166,7 +166,6 @@ export default function SourceList({
       onLineMouseEnter,
       onLineMouseLeave: onLineMouseLeaveDebounced,
       points,
-      setShowHitCounts,
       showColumnBreakpoints,
       showHitCounts,
       source,
@@ -185,7 +184,6 @@ export default function SourceList({
       points,
       showHitCounts,
       showColumnBreakpoints,
-      setShowHitCounts,
       source,
       streamingParser,
     ]

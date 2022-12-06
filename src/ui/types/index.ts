@@ -21,7 +21,6 @@ export type LocalExperimentalUserSettings = {
   consoleFilterDrawerDefaultsToOpen: boolean;
   enableQueryCache: boolean;
   enableColumnBreakpoints: boolean;
-  hitCounts: boolean;
   profileWorkerThreads: boolean;
 };
 
