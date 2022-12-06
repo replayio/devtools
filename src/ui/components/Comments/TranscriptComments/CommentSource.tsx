@@ -8,6 +8,8 @@ import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 
+import LoadingLabelPlaceholder from "./LoadingLabelPlaceholder";
+
 type PropsFromParent = {
   comment: any;
 };
@@ -41,6 +43,10 @@ function CommentSource({
     selectLocation(context, sourceLocation);
   };
 
+  if (!sourceLocation) {
+    return null;
+  }
+
   return (
     <div
       onClick={onSelectSource}
@@ -51,11 +57,15 @@ function CommentSource({
           <div
             className="cm-s-mozilla overflow-hidden whitespace-pre font-mono text-xs"
             style={{ fontSize: "11px" }}
-            dangerouslySetInnerHTML={{ __html: labels?.secondary || "" }}
-          />
+          >
+            {labels ? (
+              <span dangerouslySetInnerHTML={{ __html: labels?.secondary || "" }} />
+            ) : (
+              <LoadingLabelPlaceholder />
+            )}
+          </div>
           <div
             className="flex flex-shrink-0 opacity-0 transition group-hover:opacity-100"
-            // className="flex-shrink-0 p-px w-4 h-4 opacity-0 group-hover:opacity-100"
             title="Show in the Editor"
           >
             <MaterialIcon iconSize="sm">keyboard_arrow_right</MaterialIcon>
