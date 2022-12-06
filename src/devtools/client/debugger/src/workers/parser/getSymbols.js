@@ -17,6 +17,14 @@ let symbolDeclarations = new Map();
 // eslint-disable-next-line complexity
 function extractSymbol(path, symbols, state) {
   if (isFunction(path)) {
+    const start = path.node.body?.loc?.start;
+    if (start) {
+      symbols.functionBodyLocations.push({
+        line: start.line,
+        column: start.column,
+      });
+    }
+
     const name = getFunctionName(path.node, path.parent);
 
     if (!state.fnCounts[name]) {
@@ -80,6 +88,7 @@ function extractSymbols(sourceId) {
   const symbols = {
     functions: [],
     classes: [],
+    functionBodyLocations: [],
     hasJsx: false,
     hasTypes: false,
     loading: false,
