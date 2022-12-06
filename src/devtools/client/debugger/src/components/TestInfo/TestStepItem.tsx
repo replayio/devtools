@@ -140,18 +140,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
       } catch {
         setLocalPauseData(undefined);
       }
-
-      return null;
     })();
-
-    // return async () => {
-    //   if (endPauseResult) {
-    //     await client.releasePause(endPauseResult.pauseId);
-    //   }
-    //   if (startPauseResult) {
-    //     await client.releasePause(startPauseResult.pauseId);
-    //   }
-    // }
   }, [client, messageEnd, pointEnd, pointStart]);
 
   const onClick = () => {
