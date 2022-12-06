@@ -61,9 +61,22 @@ function useGetTestSections(
         start: annotationsStart.find(a => a.message.id === s.id),
       };
 
-      const duration = s.name === "assert" ? 1 : s.duration || 1;
-      const absoluteStartTime = annotations.start?.time ?? startTime + s.relativeStartTime;
-      const absoluteEndTime = annotations.end?.time ?? absoluteStartTime + duration;
+      let duration = s.duration || 1;
+      let absoluteStartTime = annotations.start?.time ?? startTime + s.relativeStartTime;
+      let absoluteEndTime = annotations.end?.time ?? absoluteStartTime + duration;
+
+      if (s.name === "assert") {
+        // start failed asserts at their end time so they line up with the end
+        // of the failed command but successful asserts with their start time
+        if (s.error) {
+          absoluteStartTime = absoluteEndTime - 1;
+          annotations.start = annotations.end;
+        } else {
+          absoluteEndTime = absoluteStartTime + 1;
+          annotations.end = annotations.start;
+        }
+        duration = 1;
+      }
 
       return {
         time: absoluteStartTime,
