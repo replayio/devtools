@@ -12,13 +12,20 @@ import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
+import { useGetTestRunForWorkspace } from "ui/hooks/tests";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
-import { getReporterAnnotationsForTests, setSelectedStep } from "ui/reducers/reporter";
+import {
+  getReporterAnnotationsForTests,
+  getSelectedTest,
+  setSelectedStep,
+  setSelectedTest,
+} from "ui/reducers/reporter";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Annotation, Recording, TestItem } from "ui/types";
 
 import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
+import { Attributes } from "./Library/Team/View/TestRuns/Overview/RunSummary";
 import ProtocolViewer from "./ProtocolViewer";
 import StatusDropdown from "./shared/StatusDropdown";
 import styles from "./SidePanel.module.css";
@@ -64,7 +71,6 @@ export default function SidePanel() {
 
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
-  const [highlightedTest, setHighlightedTest] = useState<number | null>(null);
 
   const items: any[] = [];
 
@@ -96,31 +102,18 @@ export default function SidePanel() {
       {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}
       {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}
       {selectedPrimaryPanel === "comments" && <CommentCardsList />}
-      {selectedPrimaryPanel === "events" && (
-        <EventsPane
-          items={items}
-          highlightedTest={highlightedTest}
-          setHighlightedTest={setHighlightedTest}
-        />
-      )}
+      {selectedPrimaryPanel === "events" && <EventsPane items={items} />}
       {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
       {selectedPrimaryPanel === "search" && <SearchFilesReduxAdapter />}
     </div>
   );
 }
 
-function EventsPane({
-  items,
-  highlightedTest,
-  setHighlightedTest,
-}: {
-  items: any[];
-  highlightedTest: number | null;
-  setHighlightedTest: (test: number | null) => void;
-}) {
+function EventsPane({ items }: { items: any[] }) {
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   const annotations = useAppSelector(getReporterAnnotationsForTests);
+  const selectedTest = useAppSelector(getSelectedTest);
   const dispatch = useAppDispatch();
   const duration = useAppSelector(getRecordingDuration);
 
@@ -130,7 +123,7 @@ function EventsPane({
   );
 
   const onReset = () => {
-    setHighlightedTest(null);
+    dispatch(setSelectedTest(null));
     dispatch(setSelectedStep(null));
     dispatch(
       setFocusRegion({
@@ -140,14 +133,17 @@ function EventsPane({
     );
   };
 
+  const workspaceId = recording?.workspace?.id;
+  const testRunId = recording?.metadata?.test?.run?.id;
+
   if (recording?.metadata?.test?.tests?.length) {
     return (
       <div className="flex h-full flex-1 flex-col overflow-hidden">
         <div className={styles.ToolbarHeader}>
-          {highlightedTest !== null ? (
+          {selectedTest !== null ? (
             <button onClick={onReset} className="flex flex-grow items-center truncate ">
               <MaterialIcon>chevron_left</MaterialIcon>
-              <span className="flex-grow  text-left"> {testCases[highlightedTest].title}</span>
+              <span className="flex-grow  text-left"> {testCases[selectedTest].title}</span>
             </button>
           ) : (
             <>
@@ -158,14 +154,28 @@ function EventsPane({
             </>
           )}
         </div>
-        <TestInfo
-          testCases={testCases}
-          highlightedTest={highlightedTest}
-          setHighlightedTest={setHighlightedTest}
-        />
+        {workspaceId && testRunId ? (
+          <TestRunAttributes workspaceId={workspaceId} testRunId={testRunId} />
+        ) : null}
+        <TestInfo testCases={recording?.metadata?.test.tests} />
       </div>
     );
   }
 
   return <Accordion items={items} />;
+}
+
+function TestRunAttributes({ workspaceId, testRunId }: { workspaceId: string; testRunId: string }) {
+  const { testRun } = useGetTestRunForWorkspace(workspaceId, testRunId);
+  const selectedTest = useAppSelector(getSelectedTest);
+
+  if (!testRun || selectedTest !== null) {
+    return null;
+  }
+
+  return (
+    <div className="border-b p-2">
+      <Attributes testRun={testRun} />
+    </div>
+  );
 }

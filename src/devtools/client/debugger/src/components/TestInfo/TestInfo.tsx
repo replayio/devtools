@@ -1,13 +1,11 @@
 import { Object as ProtocolObject } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import PropertiesRenderer from "bvaughn-architecture-demo/components/inspector/PropertiesRenderer";
-import { getRecordingDuration } from "ui/actions/app";
-import { setFocusRegion } from "ui/actions/timeline";
-import { getReporterAnnotationsForTests, setSelectedStep } from "ui/reducers/reporter";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { getReporterAnnotationsForTests, getSelectedTest } from "ui/reducers/reporter";
+import { useAppSelector } from "ui/setup/hooks";
 import { TestItem } from "ui/types";
 
 import ContextMenuWrapper from "./ContextMenu";
@@ -23,23 +21,14 @@ type TestInfoContextType = {
 
 export const TestInfoContext = createContext<TestInfoContextType>(null as any);
 
-export default function TestInfo({
-  testCases,
-  highlightedTest,
-  setHighlightedTest,
-}: {
-  testCases: TestItem[];
-  highlightedTest: number | null;
-  setHighlightedTest: (test: number | null) => void;
-}) {
+export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
+  const selectedTest = useAppSelector(getSelectedTest);
   const [consoleProps, setConsoleProps] = useState<ProtocolObject>();
   const [pauseId, setPauseId] = useState<string | null>(null);
-  const dispatch = useAppDispatch();
   const annotations = useAppSelector(getReporterAnnotationsForTests);
-  const duration = useAppSelector(getRecordingDuration);
 
   const showTest = (index: number) => {
-    return highlightedTest === null || highlightedTest === index;
+    return selectedTest === null || selectedTest === index;
   };
 
   if (!annotations) {
@@ -55,19 +44,9 @@ export default function TestInfo({
       <TestInfoContextMenuContextRoot>
         <div className="flex flex-grow flex-col overflow-hidden">
           <div className="flex flex-grow flex-col space-y-1 overflow-auto px-2 ">
-            {testCases.map(
-              (t, i) =>
-                showTest(i) && (
-                  <TestCase
-                    test={t}
-                    key={i}
-                    setHighlightedTest={() => setHighlightedTest(i)}
-                    isHighlighted={i === highlightedTest}
-                  />
-                )
-            )}
+            {testCases.map((t, i) => showTest(i) && <TestCase test={t} key={i} index={i} />)}
           </div>
-          {highlightedTest ? <Console /> : null}
+          {selectedTest ? <Console /> : null}
           <ContextMenuWrapper />
         </div>
       </TestInfoContextMenuContextRoot>

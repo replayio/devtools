@@ -3,7 +3,11 @@ import { createContext, useEffect, useState } from "react";
 import { getRecordingDuration } from "ui/actions/app";
 import { seek, setFocusRegion, startPlayback } from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
-import { getReporterAnnotationsForTitleEnd } from "ui/reducers/reporter";
+import {
+  getReporterAnnotationsForTitleEnd,
+  getSelectedTest,
+  setSelectedTest,
+} from "ui/reducers/reporter";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem, TestResult } from "ui/types";
@@ -20,18 +24,12 @@ export type TestCaseContextType = {
 
 export const TestCaseContext = createContext<TestCaseContextType>(null as any);
 
-export function TestCase({
-  test,
-  setHighlightedTest,
-  isHighlighted,
-}: {
-  test: TestItem;
-  setHighlightedTest: () => void;
-  isHighlighted: boolean;
-}) {
+export function TestCase({ test, index }: { test: TestItem; index: number }) {
   const [expandSteps, setExpandSteps] = useState(false);
   const dispatch = useAppDispatch();
   const expandable = test.steps || test.error;
+  const selectedTest = useAppSelector(getSelectedTest);
+  const isSelected = selectedTest === index;
   const annotationsStart = useAppSelector(getReporterAnnotationsForTitleEnd(test.title));
 
   const duration = useAppSelector(getRecordingDuration);
@@ -67,17 +65,17 @@ export function TestCase({
       dispatch(seek(pointStart, time, false));
     }
 
-    setHighlightedTest();
+    dispatch(setSelectedTest(index));
     onFocus();
   };
 
   useEffect(() => {
-    if (isHighlighted) {
+    if (isSelected) {
       setExpandSteps(true);
     } else {
       setExpandSteps(false);
     }
-  }, [isHighlighted]);
+  }, [isSelected]);
 
   const onReplay = () => {
     dispatch(startPlayback({ beginTime: testStartTime, endTime: testEndTime - 1 }));
@@ -91,7 +89,7 @@ export function TestCase({
       value={{ startTime: testStartTime, endTime: testEndTime, onReplay, onPlayFromHere, test }}
     >
       <div className="flex flex-col">
-        {!isHighlighted && (
+        {!isSelected && (
           <div className="flex flex-row items-center justify-between gap-1 rounded-lg p-1 transition hover:cursor-pointer">
             <button
               onClick={toggleExpand}
