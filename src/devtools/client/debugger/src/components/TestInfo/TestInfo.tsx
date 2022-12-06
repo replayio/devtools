@@ -63,6 +63,9 @@ function Console() {
       sanitized.preview.properties = sanitized.preview.properties.filter(
         p => p.name !== "Snapshot"
       );
+
+      // suppress the prototype entry in the properties output
+      sanitized.preview.prototypeId = undefined;
     }
 
     return sanitized;
