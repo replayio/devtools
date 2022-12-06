@@ -78,16 +78,13 @@ export default function useLocalStorage<T>(
     const string = JSON.stringify(value);
 
     localStorageSetItem(key, string);
-  }, [key, value]);
 
-  // Order of effects matters here. Don't trigger this until _after_ we've updated `localStorage`.
-  useLayoutEffect(() => {
     // Only notify if this hook has had its setter run
     if (updateCounter > 0) {
       // Notify any other components subscribed to this value that it has changed
       manuallyTriggerStorageEvent();
     }
-  }, [updateCounter]);
+  }, [key, value, updateCounter]);
 
   return [value, setValueWrapper, isPending];
 }
