@@ -6,6 +6,7 @@ import {
   getSelectedPrimaryPanel,
   getShowCommandPalette,
 } from "ui/reducers/layout";
+import { getSelectedTest } from "ui/reducers/reporter";
 import { LocalNag } from "ui/setup/prefs";
 import {
   PrimaryPanelName,
@@ -61,10 +62,15 @@ export function dismissLocalNag(nag: LocalNag): DismissLocalNagAction {
 export function setViewMode(viewMode: ViewMode): UIThunkAction {
   return async (dispatch, getState) => {
     const localNags = getLocalNags(getState());
+    const selectedTest = getSelectedTest(getState());
 
     // There's a possible race condition here so it's important to handle the nag logic first.
     // Otherwise, it's possible for the nag to not be properly dismissed.
-    if (viewMode === "dev" && !localNags.includes(LocalNag.YANK_TO_SOURCE)) {
+    if (
+      viewMode === "dev" &&
+      selectedTest === null &&
+      !localNags.includes(LocalNag.YANK_TO_SOURCE)
+    ) {
       dispatch(dismissLocalNag(LocalNag.YANK_TO_SOURCE));
       dispatch(setSelectedPrimaryPanel("explorer"));
     }
