@@ -142,24 +142,6 @@
   display: flex;
 }
 
-.LineHitCountBar {
-  flex: 0 0 var(--line-hit-count-size);
-  height: var(--line-height);
-  font-size: var(--font-size-small);
-}
-.LineHitCountBar0 {
-  background-color: var(--color-hit-counts-bar-0);
-}
-.LineHitCountBar1 {
-  background-color: var(--color-hit-counts-bar-1);
-}
-.LineHitCountBar2 {
-  background-color: var(--color-hit-counts-bar-2);
-}
-.LineHitCountBar3 {
-  background-color: var(--color-hit-counts-bar-3);
-}
-
 .LineHitCountLabel {
   height: var(--line-height);
   font-size: var(--font-size-tiny);

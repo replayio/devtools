@@ -107,9 +107,6 @@ export default function SourceList({
     }
   }, [focusedSource, lineCount, markPendingFocusUpdateProcessed, pendingFocusUpdate, sourceId]);
 
-  const togglesLocalStorageKey = `Replay:ShowHitCounts`;
-  const [showHitCounts, setShowHitCounts] = useLocalStorage<boolean>(togglesLocalStorageKey, true);
-
   const hitCounts = visibleLines
     ? getSourceHitCountsSuspense(client, sourceId, visibleLines, focusRange)
     : null;
@@ -166,9 +163,7 @@ export default function SourceList({
       onLineMouseEnter,
       onLineMouseLeave: onLineMouseLeaveDebounced,
       points,
-      setShowHitCounts,
       showColumnBreakpoints,
-      showHitCounts,
       source,
       streamingParser,
     }),
@@ -183,9 +178,7 @@ export default function SourceList({
       onLineMouseEnter,
       onLineMouseLeaveDebounced,
       points,
-      showHitCounts,
       showColumnBreakpoints,
-      setShowHitCounts,
       source,
       streamingParser,
     ]
@@ -234,7 +227,7 @@ export default function SourceList({
 
   const maxLineIndexStringLength = `${lineCount}`.length;
   const maxHitCountStringLength =
-    showHitCounts && maxHitCount !== null ? `${formatHitCount(maxHitCount)}`.length : 0;
+    maxHitCount !== null ? `${formatHitCount(maxHitCount)}`.length : 0;
 
   const widthMinusScrollbar = width - scrollbarWidth;
 
