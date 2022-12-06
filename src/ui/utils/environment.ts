@@ -112,8 +112,11 @@ export function getPausePointParams() {
     ? (decodeBase64FromURL(focusRegionParam) as TimeStampedPointRange)
     : null;
 
+  const testIndexParam = url.searchParams.get("testIndex");
+  const testIndex = JSON.parse(`${testIndexParam}`);
+
   if (pointParam && timeParam) {
-    return { point, time, focusRegion };
+    return { point, time, focusRegion, testIndex };
   }
 
   return null;

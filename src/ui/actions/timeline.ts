@@ -22,6 +22,7 @@ import { ThreadFront } from "protocol/thread";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { waitForTime } from "protocol/utils";
 import { getFirstComment } from "ui/hooks/comments/comments";
+import { setSelectedTest } from "ui/reducers/reporter";
 import {
   getCurrentTime,
   getFocusRegion,
@@ -118,6 +119,12 @@ export function jumpToInitialPausePoint(): UIThunkAction {
         );
         dispatch(syncFocusedRegion());
       }
+
+      const testIndex = "testIndex" in initialPausePoint ? initialPausePoint.testIndex : undefined;
+      if (testIndex) {
+        dispatch(setSelectedTest(testIndex));
+      }
+
       point = initialPausePoint.point;
       time = initialPausePoint.time;
     }

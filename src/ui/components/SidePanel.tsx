@@ -5,7 +5,7 @@ import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPan
 import Accordion from "devtools/client/debugger/src/components/shared/Accordion";
 import TestInfo from "devtools/client/debugger/src/components/TestInfo/TestInfo";
 import { getRecordingDuration } from "ui/actions/app";
-import { setFocusRegion } from "ui/actions/timeline";
+import { setFocusRegion, updateFocusRegionParam } from "ui/actions/timeline";
 import Events from "ui/components/Events";
 import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
 import Icon from "ui/components/shared/Icon";
@@ -129,6 +129,7 @@ function EventsPane({ items }: { items: any[] }) {
         endTime: duration,
       })
     );
+    dispatch(updateFocusRegionParam());
   };
 
   if (recording?.metadata?.test?.tests?.length) {

@@ -3,6 +3,7 @@ import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 import { compareNumericStrings } from "protocol/utils";
 import { UIState } from "ui/state";
 import { Annotation } from "ui/types";
+import { updateUrlWithParams } from "ui/utils/environment";
 
 export interface ReporterState {
   annotations: Annotation[];
@@ -39,6 +40,7 @@ const reporterSlice = createSlice({
       state.selectedStep = action.payload;
     },
     setSelectedTest(state, action: PayloadAction<number | null>) {
+      updateUrlWithParams({ testIndex: JSON.stringify(action.payload) });
       state.selectedTest = action.payload;
     },
   },
