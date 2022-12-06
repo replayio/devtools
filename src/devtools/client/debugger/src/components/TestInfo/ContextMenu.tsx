@@ -3,7 +3,7 @@ import { useContext, useRef } from "react";
 
 import useModalDismissSignal from "bvaughn-architecture-demo/src/hooks/useModalDismissSignal";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { seekToTime, startPlayback } from "ui/actions/timeline";
+import { seek, seekToTime, startPlayback } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -49,11 +49,21 @@ function ContextMenu({
   };
   const onJumpToBefore = () => {
     hide();
-    dispatch(seekToTime(testStep.absoluteStartTime));
+    const start = testStep.annotations.start;
+    if (start) {
+      dispatch(seek(start.point, start.time, false));
+    } else {
+      dispatch(seekToTime(testStep.absoluteStartTime));
+    }
   };
   const onJumpToAfter = () => {
     hide();
-    dispatch(seekToTime(adjustedAbsoluteEndTime));
+    const end = testStep.annotations.end;
+    if (end) {
+      dispatch(seek(end.point, end.time, false));
+    } else {
+      dispatch(seekToTime(adjustedAbsoluteEndTime));
+    }
   };
   const onGoToLocation = async () => {
     hide();
@@ -95,6 +105,8 @@ function ContextMenu({
     }
   };
 
+  const canJumpToBefore = adjustedAbsoluteEndTime === currentTime || testStep.name === "assert";
+
   return (
     <div
       className={styles.ContextMenu}
@@ -117,9 +129,9 @@ function ContextMenu({
       </div>
       <div
         className={classnames("ContextMenuItem", {
-          disabled: testStep.absoluteStartTime === currentTime,
+          disabled: canJumpToBefore,
         })}
-        onClick={testStep.absoluteStartTime === currentTime ? undefined : onJumpToBefore}
+        onClick={canJumpToBefore ? undefined : onJumpToBefore}
       >
         <MaterialIcon>arrow_back</MaterialIcon>
         Show before

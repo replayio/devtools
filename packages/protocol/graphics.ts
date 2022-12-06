@@ -244,12 +244,7 @@ export function setupGraphics() {
   });
 }
 
-export async function repaint(force = false) {
-  const recordingCapabilities = await ThreadFront.getRecordingCapabilities();
-  if (!recordingCapabilities.supportsRepaintingGraphics) {
-    return;
-  }
-
+async function fetchScreenshotForPause(pauseId: string, force = false) {
   let graphicsFetched = false;
 
   let didStall = false;
@@ -263,8 +258,6 @@ export async function repaint(force = false) {
     }
   }, 500);
 
-  const { mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
-  const pauseId = await ThreadFront.getCurrentPauseId(replayClient);
   const rv = await repaintGraphics(replayClient, pauseId, force);
   graphicsFetched = true;
 
@@ -274,9 +267,10 @@ export async function repaint(force = false) {
     }
   }
 
-  if (!rv || pauseId !== ThreadFront.currentPause.pauseId) {
+  if (!rv) {
     return;
   }
+
   let { description, screenShot } = rv;
   if (screenShot) {
     repaintedScreenshots.set(description.hash, screenShot);
@@ -284,10 +278,49 @@ export async function repaint(force = false) {
     screenShot = repaintedScreenshots.get(description.hash);
     if (!screenShot) {
       console.error("Missing repainted screenshot", description);
-      return;
     }
   }
-  paintGraphics(screenShot, mouse);
+
+  return screenShot;
+}
+
+export async function repaint(force = false) {
+  repaintAtPause(
+    ThreadFront.currentTime,
+    ThreadFront.currentPause.pauseId!,
+    (_time, pauseId) => {
+      return pauseId !== ThreadFront.currentPause.pauseId;
+    },
+    force
+  );
+}
+
+export async function repaintAtPause(
+  time: number,
+  pauseId: string,
+  shouldCancelRepaint: (time: number, pauseId: string) => boolean,
+  force = false,
+  point?: string
+) {
+  const recordingCapabilities = await ThreadFront.getRecordingCapabilities();
+  if (!recordingCapabilities.supportsRepaintingGraphics) {
+    return;
+  }
+
+  const screenshot = await fetchScreenshotForPause(pauseId, force);
+
+  if (screenshot && !shouldCancelRepaint(time, pauseId)) {
+    const { mouse } = await getGraphicsAtTime(time);
+    paintGraphics(screenshot, mouse);
+
+    if (point) {
+      insertEntrySorted(gPaintPoints, {
+        time,
+        point,
+        paintHash: screenshot.hash,
+      });
+    }
+  }
 }
 
 export function addLastScreen(screen: ScreenShot | null, point: string, time: number) {

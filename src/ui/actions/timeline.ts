@@ -13,6 +13,7 @@ import {
   nextPaintOrMouseEvent,
   paintGraphics,
   previousPaintEvent,
+  repaintAtPause,
   screenshotCache,
   timeIsBeyondKnownPaints,
 } from "protocol/graphics";
@@ -187,6 +188,21 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
       if (!(error instanceof DownloadCancelledError)) {
         console.error(error);
       }
+    }
+  };
+}
+
+export function setTimelineToPauseTime(
+  time: number,
+  pauseId: string,
+  point?: string,
+  force = false
+): UIThunkAction {
+  return async (dispatch, getState) => {
+    dispatch(setTimelineToTime(time));
+
+    if (time) {
+      repaintAtPause(time, pauseId, time => getHoverTime(getState()) !== time, force, point);
     }
   };
 }
