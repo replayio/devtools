@@ -287,7 +287,7 @@ async function fetchScreenshotForPause(pauseId: string, force = false) {
 export async function repaint(force = false) {
   repaintAtPause(
     ThreadFront.currentTime,
-    ThreadFront.currentPause.pauseId!,
+    await ThreadFront.getCurrentPauseId(replayClient),
     (_time, pauseId) => {
       return pauseId !== ThreadFront.currentPause.pauseId;
     },
