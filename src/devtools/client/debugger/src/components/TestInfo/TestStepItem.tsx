@@ -171,6 +171,10 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     }
   };
   const onMouseEnter = () => {
+    if (isPaused) {
+      return;
+    }
+
     dispatch(setTimelineToTime(step.absoluteStartTime));
     if (localPauseData?.startPauseId) {
       dispatch(
@@ -186,6 +190,10 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     }
   };
   const onMouseLeave = () => {
+    if (isPaused) {
+      return;
+    }
+
     dispatch(setTimelineToTime(null));
     dispatch(unhighlightNode());
   };
