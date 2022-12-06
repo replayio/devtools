@@ -154,11 +154,11 @@ export function selectLocation(
       dispatch(closeActiveSearch());
     }
 
-    dispatch(locationSelected({ location, source }));
-
     if (!openSource) {
       return;
     }
+
+    dispatch(locationSelected({ location, source }));
 
     if (!getTabExists(getState(), source.id)) {
       dispatch(addTab(source));
