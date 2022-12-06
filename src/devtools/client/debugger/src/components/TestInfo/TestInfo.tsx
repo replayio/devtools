@@ -6,10 +6,9 @@ import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import PropertiesRenderer from "bvaughn-architecture-demo/components/inspector/PropertiesRenderer";
 import { getRecordingDuration } from "ui/actions/app";
 import { setFocusRegion } from "ui/actions/timeline";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getReporterAnnotationsForTests, setSelectedStep } from "ui/reducers/reporter";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { Annotation, TestItem } from "ui/types";
+import { TestItem } from "ui/types";
 
 import ContextMenuWrapper from "./ContextMenu";
 import { TestCase } from "./TestCase";
@@ -23,13 +22,6 @@ type TestInfoContextType = {
 };
 
 export const TestInfoContext = createContext<TestInfoContextType>(null as any);
-
-function maybeCorrectTestTimes(testCases: TestItem[], annotations: Annotation[]) {
-  return testCases.map((t, i) => ({
-    ...t,
-    relativeStartTime: annotations?.[i]?.time ? annotations?.[i]?.time : t.relativeStartTime,
-  }));
-}
 
 export default function TestInfo({
   testCases,
@@ -46,34 +38,14 @@ export default function TestInfo({
   const annotations = useAppSelector(getReporterAnnotationsForTests);
   const duration = useAppSelector(getRecordingDuration);
 
-  // The test start times in metadata may be incorrect. If we have the reporter annotations,
-  // we can use those instead
-  const correctedTestCases = useMemo(
-    () => maybeCorrectTestTimes(testCases, annotations),
-    [testCases, annotations]
-  );
-
   const showTest = (index: number) => {
     return highlightedTest === null || highlightedTest === index;
-  };
-
-  const onReset = () => {
-    setHighlightedTest(null);
-    dispatch(setSelectedStep(null));
-    dispatch(
-      setFocusRegion({
-        beginTime: 0,
-        endTime: duration,
-      })
-    );
-    setPauseId(null);
-    setConsoleProps(undefined);
   };
 
   if (!annotations) {
     return (
       <div className="flex flex-grow flex-col overflow-hidden">
-        <div className="flex flex-grow flex-col space-y-1 overflow-auto px-2 py-2">Loading...</div>
+        <div className="flex flex-grow flex-col space-y-1 overflow-auto px-2">Loading...</div>
       </div>
     );
   }
@@ -82,18 +54,8 @@ export default function TestInfo({
     <TestInfoContext.Provider value={{ consoleProps, setConsoleProps, pauseId, setPauseId }}>
       <TestInfoContextMenuContextRoot>
         <div className="flex flex-grow flex-col overflow-hidden">
-          <div className="flex flex-grow flex-col space-y-1 overflow-auto px-2 py-2">
-            {highlightedTest !== null && (
-              <button
-                onClick={onReset}
-                className="flex flex-row items-center hover:underline"
-                style={{ fontSize: "15px" }}
-              >
-                <MaterialIcon>chevron_left</MaterialIcon>
-                <div className="pl-1 text-left">{correctedTestCases[highlightedTest].title}</div>
-              </button>
-            )}
-            {correctedTestCases.map(
+          <div className="flex flex-grow flex-col space-y-1 overflow-auto px-2 ">
+            {testCases.map(
               (t, i) =>
                 showTest(i) && (
                   <TestCase
@@ -131,14 +93,14 @@ function Console() {
 
   return (
     <div
-      className="h-100 flex h-64 flex-shrink-0 flex-col overflow-auto p-4"
+      className="h-100 flex h-64 flex-shrink-0 flex-col overflow-auto py-2"
       style={{
         borderTop: "2px solid var(--chrome)",
       }}
       key={pauseId}
     >
       <div
-        className="text-md"
+        className="text-md p-2 px-4"
         style={{
           fontSize: "15px",
         }}
@@ -146,7 +108,7 @@ function Console() {
         Step Details
       </div>
       <ErrorBoundary>
-        <div className="flex flex-grow flex-col gap-1 p-2 font-mono">
+        <div className="flex flex-grow flex-col gap-1 py-2 font-mono">
           {hideProps ? (
             <div className="flex flex-grow items-center justify-center align-middle text-xs opacity-50">
               Nothing Selected...
