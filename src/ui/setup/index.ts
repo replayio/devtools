@@ -1,5 +1,8 @@
 import { loadedRegions as LoadedRegions, Location, SourceId } from "@replayio/protocol";
 
+import { CONSOLE_SETTINGS_DATABASE } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
+import { POINTS_DATABASE } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { getInitialIDBValueAsync } from "bvaughn-architecture-demo/src/hooks/useIndexedDB";
 import { preCacheExecutionPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
 import { EMPTY_TABS } from "devtools/client/debugger/src/reducers/tabs";
@@ -121,12 +124,35 @@ export const getInitialSourcesState = async (): Promise<SourcesState> => {
   };
 };
 
+const IDB_PREFS_DATABASES = [CONSOLE_SETTINGS_DATABASE, POINTS_DATABASE];
+
 export async function bootstrapApp() {
+  const recordingId = getRecordingId();
+  const idbPrefsPromises: Promise<any>[] = [];
+
+  if (recordingId) {
+    for (let dbOptions of IDB_PREFS_DATABASES) {
+      for (let storeName of dbOptions.storeNames) {
+        idbPrefsPromises.push(getInitialIDBValueAsync(dbOptions, storeName, recordingId));
+      }
+    }
+  }
+
+  // Load all async/IDB prefs in parallel before we continue.
+  // We don't actively use the `idbPrefsPromises` data here,
+  // as that is used in the `useIndexedDB` hook in components.
+  const [initialLayoutState, initialTabsState, initialSourcesState] = await Promise.all([
+    getInitialLayoutState(),
+    getInitialTabsState(),
+    getInitialSourcesState(),
+    ...idbPrefsPromises,
+  ] as const);
+
   const initialState = {
     app: initialAppState,
-    layout: await getInitialLayoutState(),
-    tabs: await getInitialTabsState(),
-    sources: await getInitialSourcesState(),
+    layout: initialLayoutState,
+    tabs: initialTabsState,
+    sources: initialSourcesState,
   };
 
   const store = bootstrapStore(initialState);

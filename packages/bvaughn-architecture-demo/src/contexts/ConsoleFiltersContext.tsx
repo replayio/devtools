@@ -82,7 +82,6 @@ export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
     },
     recordName: recordingId,
     storeName: "filterToggles",
-    suspend: true,
   });
 
   // Filter input changes quickly while a user types, but re-filtering can be slow.

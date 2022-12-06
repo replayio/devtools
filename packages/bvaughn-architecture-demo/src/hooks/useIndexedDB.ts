@@ -58,37 +58,44 @@ export const {
     dbOptions.databaseName + dbOptions.databaseVersion + storeName + recordName
 );
 
-// Stores value in IndexedDB and synchronizes it between sessions.
-//
-// Consider the following benefits and trade-offs of using this hook vs useLocalStorage:
-// * IndexedDB is asynchronous which can complicate things when stored values are used during app initialization
-// * IndexedDB storage limits is typically much larger than local storage because it is based on free disk space (and not a hard limit).
-//   See: https://tinyurl.com/index-db-storage-limits
+/**
+Stores value in IndexedDB and synchronizes it between sessions.
+
+Consider the following benefits and trade-offs of using this hook vs useLocalStorage:
+- IndexedDB is asynchronous which can complicate things when stored values are used during app initialization
+- IndexedDB storage limits is typically much larger than local storage because it is based on free disk space (and not a hard limit).
+  See: https://tinyurl.com/index-db-storage-limits
+
+***NOTE**: All IDBOptions database definitions used with this hook _must_ be listed in the `IDB_PREFS_DATABASES`
+array in both `src/ui/setup/index.ts` and `bvaughn/components/Initializer.tsx`,
+so that the initial values can be read async during app bootstrapping.
+That way the initial values are available synchronously when this hook first runs and we
+can avoid any unnecessary flashes during initial rendering.
+ */
 export default function useIndexedDB<T>(options: {
   database: IDBOptions;
   initialValue: T;
   recordName: string;
   scheduleUpdatesAsTransitions?: boolean;
   storeName: string;
-  suspend?: boolean;
 }): {
   setValue: (value: T | ((prevValue: T) => T)) => void;
   status: Status;
   value: T;
 } {
-  const waitForValueLoadedSuspense = () => {
-    return getInitialIDBValueSuspense(options.database, storeName, recordName);
-  };
-
   const { databaseName, databaseVersion, storeNames } = options.database;
   const { initialValue, recordName, scheduleUpdatesAsTransitions = false, storeName } = options;
 
   const [isPending, startTransition] = useTransition();
   // If requested, suspend entirely until we've read the initial value
   //  and can use that to seed the `useState`
-  const [value, setValue] = useState<T>(
-    options.suspend === true ? waitForValueLoadedSuspense() : initialValue
-  );
+  const [value, setValue] = useState<T>(() => {
+    // In order for persistence to work properly, `getInitialIDBValueAsync` _must_ have been
+    // called in the main app, in `src/ui/setup/index.ts::bootstrapApp()`.
+    return (
+      getInitialIDBValueIfCached(options.database, storeName, recordName)?.value ?? initialValue
+    );
+  });
   const [status, setStatus] = useState<Status>(STATUS_INITIALIZATION_PENDING);
 
   const databaseRef = useRef<IDBPDatabase | null>(null);
@@ -118,20 +125,10 @@ export default function useIndexedDB<T>(options: {
 
     async function setupDatabaseForHook() {
       if (typeof window !== "undefined" && typeof window.indexedDB !== "undefined") {
+        // Save the DB instance so we can sync updates later
         const dbInstance = await getIDBInstanceAsync(options.database);
         databaseRef.current = dbInstance;
-        try {
-          const savedData = await getInitialIDBValueAsync(options.database, storeName, recordName);
-          if (!cancelled) {
-            if (savedData !== undefined) {
-              // We may not have a saved value. Don't overwrite with `undefined`.
-              setValue(savedData);
-            }
-            setStatus(STATUS_INITIALIZATION_COMPLETE);
-          }
-        } catch {
-          setStatus(STATUS_INITIALIZATION_ERRORED);
-        }
+        setStatus(STATUS_INITIALIZATION_COMPLETE);
       } else {
         // No IndexedDB available - this might be a local unit test
         setStatus(STATUS_INITIALIZATION_COMPLETE);

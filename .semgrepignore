@@ -5,3 +5,4 @@ node_modules
 src/devtools/client/shared/vendor/
 src/devtools/client/shared/sourceeditor/codemirror
 src/test/harness.js
+packages/bvaughn-architecture-demo/src/hooks/useIndexedDB.ts
