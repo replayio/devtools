@@ -23,7 +23,7 @@ describe("asycStoreHelper", () => {
 
   it("supports default values", async () => {
     mockAsyncStorage();
-    const asyncStore = asyncStoreHelper("root", { a: ["_a", {}] });
+    const asyncStore = asyncStoreHelper("root", { a: ["Json", "_a", {}] });
     expect(await asyncStore.a).toEqual({});
   });
 
