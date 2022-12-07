@@ -150,14 +150,18 @@ function EventsPane({ items }: { items: any[] }) {
               <div className="flex flex-grow items-center ">
                 <span className="flex-grow truncate pl-1">{getSpecFilename(recording)}</span>
               </div>
-              <TestResultsSummary testCases={recording?.metadata?.test?.tests} />
+              <TestResultsSummary testCases={testCases} />
             </>
           )}
         </div>
         {workspaceId && testRunId ? (
           <TestRunAttributes workspaceId={workspaceId} testRunId={testRunId} />
         ) : null}
-        <TestInfo testCases={recording?.metadata?.test.tests} />
+        {annotations ? <TestInfo testCases={testCases} /> :
+            <div className="flex flex-grow flex-col overflow-hidden">
+              <div className="flex flex-grow flex-col space-y-1 overflow-auto px-2">Loading...</div>
+            </div>
+        }
       </div>
     );
   }
