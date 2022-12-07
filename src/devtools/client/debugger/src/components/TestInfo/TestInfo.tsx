@@ -37,7 +37,7 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
           <div className="flex flex-grow flex-col space-y-1 overflow-auto px-2 ">
             {testCases.map((t, i) => showTest(i) && <TestCase test={t} key={i} index={i} />)}
           </div>
-          {selectedTest ? <Console /> : null}
+          {selectedTest !== null ? <Console /> : null}
           <ContextMenuWrapper />
         </div>
       </TestInfoContextMenuContextRoot>
