@@ -1,7 +1,13 @@
 import { createContext, useEffect, useState } from "react";
 
 import { getRecordingDuration } from "ui/actions/app";
-import { seek, setFocusRegion, startPlayback } from "ui/actions/timeline";
+import {
+  seek,
+  setFocusRegion,
+  startPlayback,
+  syncFocusedRegion,
+  updateFocusRegionParam,
+} from "ui/actions/timeline";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import {
@@ -56,6 +62,8 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
         })
       );
     }
+    dispatch(syncFocusedRegion());
+    dispatch(updateFocusRegionParam());
   };
   const toggleExpand = () => {
     const firstStep = test.steps?.[0];
