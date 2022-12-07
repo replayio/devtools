@@ -2,20 +2,17 @@ import React from "react";
 
 import { setSelectedPanel, setViewMode } from "ui/actions/layout";
 import { selectAndFetchRequest } from "ui/actions/network";
-import { useAppDispatch } from "ui/setup/hooks";
+import { RequestSummary } from "ui/components/NetworkMonitor/utils";
+import { getCurrentTime } from "ui/reducers/timeline";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
-export function NetworkEvent({
-  method,
-  status,
-  url,
-  id,
-}: {
-  method: string;
-  status?: number;
-  url: string;
-  id: string;
-}) {
+import { TestStepRow } from "./TestStepRow";
+
+export function NetworkEvent({ request }: { request: RequestSummary }) {
+  const { method, status, url, id, end } = request;
+
   const dispatch = useAppDispatch();
+  const currentTime = useAppSelector(getCurrentTime);
   const onClick = () => {
     dispatch(setViewMode("dev"));
     dispatch(setSelectedPanel("network"));
@@ -23,11 +20,10 @@ export function NetworkEvent({
   };
 
   return (
-    <button
-      className="flex border-b border-themeBase-90 bg-toolbarBackground py-2 px-2 italic opacity-70 "
-      onClick={onClick}
-    >
-      {method} {status} {new URL(url).pathname}
-    </button>
+    <TestStepRow pending={!!end && end > currentTime} error={!!status && status >= 400}>
+      <button className="flex items-center italic opacity-70" onClick={onClick}>
+        {method} {status} {new URL(url).pathname}
+      </button>
+    </TestStepRow>
   );
 }

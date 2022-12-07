@@ -16,6 +16,7 @@ import { ProgressBar } from "./ProgressBar";
 import { TestCaseContext } from "./TestCase";
 import { TestInfoContext } from "./TestInfo";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
+import { TestStepRow } from "./TestStepRow";
 
 export function returnFirst<T, R>(
   list: T[] | undefined,
@@ -204,34 +205,25 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const progress = actualProgress > 100 ? 100 : actualProgress;
   const displayedProgress = (step.duration === 1 && isPaused) || progress == 100 ? 0 : progress;
 
-  const color = step.error ? "border-l-red-500" : "border-l-primaryAccent";
-
   return (
-    <div
-      className={`group/step relative flex items-start gap-1 border-b border-l-2 border-themeBase-90 pl-1 pr-3 font-mono hover:bg-toolbarBackground ${
-        isPaused || isPast ? color : "border-l-transparent"
-      } ${
-        progress > 0 && step.error
-          ? "bg-testsuitesErrorBgcolor text-testsuitesErrorColor hover:bg-testsuitesErrorBgcolorHover"
-          : isPaused
-          ? "bg-toolbarBackground"
-          : "bg-testsuitesStepsBgcolor"
-      }`}
+    <TestStepRow
+      pending={!isPast && !isPaused}
+      error={!!step.error}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <button onClick={onClick} className="flex flex-grow items-start space-x-2  py-2 text-start">
+      <button onClick={onClick} className="flex flex-grow items-start space-x-2 text-start">
         <div title={"" + displayedProgress} className="flex h-4 items-center">
           <ProgressBar progress={displayedProgress} error={!!step.error} />
         </div>
-        <div className="opacity-70">{index + 1}</div>
-        <div className={` font-medium ${isPaused ? "font-bold" : ""}`}>
+        <div className="opacity-70 ">{index + 1}</div>
+        <div className={`font-medium ${isPaused ? "font-bold" : ""}`}>
           {step.parentId ? "- " : ""}
           {step.name} <span className="opacity-70">{argString}</span>
         </div>
       </button>
       <Actions step={step} isSelected={selectedStep?.id === id} />
-    </div>
+    </TestStepRow>
   );
 }
 
@@ -246,7 +238,7 @@ function Actions({ step, isSelected }: { step: AnnotatedTestStep; isSelected: bo
   return (
     <button
       onClick={onClick}
-      className={`${isSelected ? "" : "invisible"} py-2 group-hover/step:visible`}
+      className={`${isSelected ? "" : "invisible"} group-hover/step:visible`}
     >
       <div className="flex items-center">
         <MaterialIcon>more_vert</MaterialIcon>

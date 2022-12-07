@@ -12,12 +12,14 @@ import {
   getReporterAnnotationsForTitleNavigation,
   getReporterAnnotationsForTitleStart,
 } from "ui/reducers/reporter";
+import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import { AnnotatedTestStep, CypressAnnotationMessage, TestItem, TestStep } from "ui/types";
 
 import { NetworkEvent } from "./NetworkEvent";
 import { TestCaseContext } from "./TestCase";
 import { TestStepItem } from "./TestStepItem";
+import { TestStepRow } from "./TestStepRow";
 
 type StepEvent = {
   time: number;
@@ -216,6 +218,7 @@ export function TestSteps({ test }: { test: TestItem }) {
 }
 
 function TestSection({ events, header }: { events: CompositeTestEvent[]; header?: string }) {
+  const currentTime = useAppSelector(getCurrentTime);
   if (events.length === 0) {
     return null;
   }
@@ -230,15 +233,13 @@ function TestSection({ events, header }: { events: CompositeTestEvent[]; header?
           {header}
         </div>
       ) : null}
-      {events.map(({ event: s, type }, i) =>
+      {events.map(({ event: s, type, time }, i) =>
         type === "step" ? (
           <TestStepItem step={s} key={i} index={s.index} argString={s.args?.toString()} id={s.id} />
         ) : type === "network" ? (
-          <NetworkEvent key={s.id} method={s.method} status={s.status} url={s.url} id={s.id} />
+          <NetworkEvent key={s.id} request={s} />
         ) : (
-          <span className="flex border-b border-themeBase-90 bg-toolbarBackground py-2 px-2 italic opacity-70">
-            new url {s.url}
-          </span>
+          <TestStepRow pending={time > currentTime}>new url {s.url}</TestStepRow>
         )
       )}
     </>
