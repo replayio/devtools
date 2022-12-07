@@ -143,9 +143,14 @@ function EventsPane({ items }: { items: any[] }) {
       <div className="flex h-full flex-1 flex-col overflow-hidden">
         <div className={styles.ToolbarHeader}>
           {selectedTest !== null ? (
-            <button onClick={onReset} className="flex flex-grow items-center truncate ">
+            <button onClick={onReset} className="flex flex-grow items-center gap-1 truncate">
               <MaterialIcon>chevron_left</MaterialIcon>
-              <span className="flex-grow  text-left"> {testCases[selectedTest].title}</span>
+              {testCases[selectedTest].error ? (
+                <Icon filename="testsuites-fail" size="small" className="bg-red-500" />
+              ) : (
+                <Icon filename="testsuites-success" size="small" className="bg-green-700" />
+              )}
+              <span className="flex-grow text-left"> {testCases[selectedTest].title}</span>
             </button>
           ) : (
             <>
