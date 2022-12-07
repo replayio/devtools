@@ -62,15 +62,15 @@ export default function createReplayClientRecorder(
   }
 
   async function searchSources(
-    options: { query: string; sourceIds: SourceId[] },
-    onMatches: (matches: SearchSourceContentsMatch[]) => void
+    options: { limit: number; query: string; sourceIds: SourceId[] },
+    onMatches: (matches: SearchSourceContentsMatch[], didOverflow: boolean) => void
   ) {
     const recorderAPI = arguments[arguments.length - 1] as RecorderAPI;
     const flushRecord = recorderAPI.holdUntil();
 
-    const onMatchesWrapper = (matches: SearchSourceContentsMatch[]) => {
-      recorderAPI.callParamWithArgs(1, matches);
-      onMatches(matches);
+    const onMatchesWrapper = (matches: SearchSourceContentsMatch[], didOverflow: boolean) => {
+      recorderAPI.callParamWithArgs(1, matches, didOverflow);
+      onMatches(matches, didOverflow);
     };
 
     await replayClient.searchSources(options, onMatchesWrapper);

@@ -167,10 +167,11 @@ export interface ReplayClientInterface {
   ): Promise<void>;
   searchSources(
     opts: {
+      limit?: number;
       query: string;
       sourceIds?: string[];
     },
-    onMatches: (matches: SearchSourceContentsMatch[]) => void
+    onMatches: (matches: SearchSourceContentsMatch[], didOverflow: boolean) => void
   ): Promise<void>;
   streamSourceContents(
     sourceId: SourceId,

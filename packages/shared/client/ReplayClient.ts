@@ -807,17 +807,20 @@ export class ReplayClient implements ReplayClientInterface {
    */
   async searchSources(
     {
+      limit,
       query,
       sourceIds,
     }: {
+      limit?: number;
       query: string;
       sourceIds?: string[];
     },
-    onMatches: (matches: SearchSourceContentsMatch[]) => void
+    onMatches: (matches: SearchSourceContentsMatch[], didOverflow: boolean) => void
   ): Promise<void> {
     const sessionId = this.getSessionIdThrows();
     const thisSearchUniqueId = uniqueId("search-sources-");
 
+    let didOverflow = false;
     let pendingMatches: SearchSourceContentsMatch[] = [];
     let pendingThrottlePromise: Promise<void> | null = null;
     let resolvePendingThrottlePromise: Function | null = null;
@@ -827,7 +830,7 @@ export class ReplayClient implements ReplayClientInterface {
     // but if chunks are too small (and events are too close together)
     // then we may schedule too many updates with React and causing a lot of memory pressure.
     const onMatchesThrottled = throttle(() => {
-      onMatches(pendingMatches);
+      onMatches(pendingMatches, didOverflow);
       pendingMatches = [];
 
       if (resolvePendingThrottlePromise !== null) {
@@ -836,8 +839,9 @@ export class ReplayClient implements ReplayClientInterface {
       }
     }, STREAMING_THROTTLE_DURATION);
 
-    const matchesListener = ({ searchId, matches }: searchSourceContentsMatches) => {
+    const matchesListener = ({ matches, overflow, searchId }: searchSourceContentsMatches) => {
       if (searchId === thisSearchUniqueId) {
+        didOverflow ||= overflow;
         pendingMatches = pendingMatches.concat(matches);
 
         if (pendingThrottlePromise === null) {
@@ -852,9 +856,8 @@ export class ReplayClient implements ReplayClientInterface {
 
     client.Debugger.addSearchSourceContentsMatchesListener(matchesListener);
     try {
-      // TODO [FE-967] Use new :limit param once it's been released.
       await client.Debugger.searchSourceContents(
-        { searchId: thisSearchUniqueId, sourceIds, query },
+        { limit, searchId: thisSearchUniqueId, sourceIds, query },
         sessionId
       );
 
