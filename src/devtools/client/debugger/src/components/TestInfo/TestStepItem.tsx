@@ -35,7 +35,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const [localPauseData, setLocalPauseData] = useState<{
     startPauseId?: string;
     endPauseId?: string;
-    consoleProps?: Object;
+    consoleProps?: ProtocolObject;
   }>();
   const { setConsoleProps, setPauseId } = useContext(TestInfoContext);
   const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
