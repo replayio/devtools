@@ -1,6 +1,8 @@
 import { IDBPDatabase, openDB } from "idb";
 import { SetStateAction, useCallback, useEffect, useRef, useState, useTransition } from "react";
 
+import { createGenericCache } from "../suspense/createGenericCache";
+
 export interface IDBOptions {
   databaseName: string;
   databaseVersion: number;
@@ -18,12 +20,79 @@ type Status =
   | typeof STATUS_INITIALIZATION_ERRORED
   | typeof STATUS_UPDATE_PENDING;
 
-// Stores value in IndexedDB and synchronizes it between sessions.
-//
-// Consider the following benefits and trade-offs of using this hook vs useLocalStorage:
-// * IndexedDB is asynchronous which can complicate things when stored values are used during app initialization
-// * IndexedDB storage limits is typically much larger than local storage because it is based on free disk space (and not a hard limit).
-//   See: https://tinyurl.com/index-db-storage-limits
+export async function preloadIDBInitialValues(
+  idbPrefsDatabase: IDBOptions[],
+  recordingId?: string
+) {
+  const idbPrefsPromises: Promise<any>[] = [];
+  if (!recordingId) {
+    // We don't have a recording ID if it's the library
+    return;
+  }
+
+  if (recordingId) {
+    for (let dbOptions of idbPrefsDatabase) {
+      for (let storeName of dbOptions.storeNames) {
+        idbPrefsPromises.push(getInitialIDBValueAsync(dbOptions, storeName, recordingId));
+      }
+    }
+  }
+
+  return Promise.all(idbPrefsPromises);
+}
+
+export const {
+  getValueSuspense: getIDBInstanceSuspense,
+  getValueAsync: getIDBInstanceAsync,
+  getValueIfCached: getIDBInstanceIfCached,
+} = createGenericCache<[dbOptions: IDBOptions], IDBPDatabase>(
+  async dbOptions => {
+    const { databaseName, databaseVersion, storeNames } = dbOptions;
+    // Create a single shared IDB instance for this DB definition
+    const dbInstance = await openDB(databaseName, databaseVersion, {
+      upgrade(db) {
+        // The "upgrade" callback runs both on initial creation (when a DB does not exist),
+        // and on version number change.
+        for (let storeName of storeNames) {
+          if (!db.objectStoreNames.contains(storeName)) {
+            db.createObjectStore(storeName);
+          }
+        }
+      },
+    });
+    return dbInstance;
+  },
+  dbOptions => dbOptions.databaseName + dbOptions.databaseVersion
+);
+
+export const {
+  getValueSuspense: getInitialIDBValueSuspense,
+  getValueAsync: getInitialIDBValueAsync,
+  getValueIfCached: getInitialIDBValueIfCached,
+} = createGenericCache<[dbOptions: IDBOptions, storeName: string, recordName: string], any>(
+  async (dbOptions, storeName, recordName) => {
+    // Only look up this initial stored value once
+    const dbInstance = await getIDBInstanceAsync(dbOptions);
+    return dbInstance.get(storeName, recordName);
+  },
+  (dbOptions, storeName, recordName) =>
+    dbOptions.databaseName + dbOptions.databaseVersion + storeName + recordName
+);
+
+/**
+Stores value in IndexedDB and synchronizes it between sessions.
+
+Consider the following benefits and trade-offs of using this hook vs useLocalStorage:
+- IndexedDB is asynchronous which can complicate things when stored values are used during app initialization
+- IndexedDB storage limits is typically much larger than local storage because it is based on free disk space (and not a hard limit).
+  See: https://tinyurl.com/index-db-storage-limits
+
+***NOTE**: All IDBOptions database definitions used with this hook _must_ be listed in the `IDB_PREFS_DATABASES`
+array in both `src/ui/setup/index.ts` and `bvaughn/components/Initializer.tsx`,
+so that the initial values can be read async during app bootstrapping.
+That way the initial values are available synchronously when this hook first runs and we
+can avoid any unnecessary flashes during initial rendering.
+ */
 export default function useIndexedDB<T>(options: {
   database: IDBOptions;
   initialValue: T;
@@ -39,11 +108,16 @@ export default function useIndexedDB<T>(options: {
   const { initialValue, recordName, scheduleUpdatesAsTransitions = false, storeName } = options;
 
   const [isPending, startTransition] = useTransition();
-  const [value, setValue] = useState<T>(initialValue);
+  const [value, setValue] = useState<T>(() => {
+    // In order for persistence to work properly, `getInitialIDBValueAsync` _must_ have been
+    // called in an early app entry point (such as `src/ui/setup/index.ts::bootstrapApp()`, or `components/Initializer.tsx`).
+    return (
+      getInitialIDBValueIfCached(options.database, storeName, recordName)?.value ?? initialValue
+    );
+  });
   const [status, setStatus] = useState<Status>(STATUS_INITIALIZATION_PENDING);
 
   const databaseRef = useRef<IDBPDatabase | null>(null);
-
   const setValueWrapper = useCallback(
     (newValue: T | ((prevValue: T) => T)) => {
       if (scheduleUpdatesAsTransitions) {
@@ -66,34 +140,12 @@ export default function useIndexedDB<T>(options: {
   }, [value, recordName, storeName, status]);
 
   useEffect(() => {
-    let cancelled = false;
-
     async function setupDatabaseForHook() {
       if (typeof window !== "undefined" && typeof window.indexedDB !== "undefined") {
-        const dbInstance = await openDB(databaseName, databaseVersion, {
-          upgrade(db) {
-            // The "upgrade" callback runs both on initial creation (when a DB does not exist),
-            // and on version number change.
-            for (let storeName of storeNames) {
-              if (!db.objectStoreNames.contains(storeName)) {
-                db.createObjectStore(storeName);
-              }
-            }
-          },
-        });
+        // Save the DB instance so we can sync updates later
+        const dbInstance = await getIDBInstanceAsync(options.database);
         databaseRef.current = dbInstance;
-        try {
-          const savedData = await dbInstance.get(storeName, recordName);
-          if (!cancelled) {
-            if (savedData !== undefined) {
-              // We may not have a saved value. Don't overwrite with `undefined`.
-              setValue(savedData);
-            }
-            setStatus(STATUS_INITIALIZATION_COMPLETE);
-          }
-        } catch {
-          setStatus(STATUS_INITIALIZATION_ERRORED);
-        }
+        setStatus(STATUS_INITIALIZATION_COMPLETE);
       } else {
         // No IndexedDB available - this might be a local unit test
         setStatus(STATUS_INITIALIZATION_COMPLETE);
@@ -101,12 +153,7 @@ export default function useIndexedDB<T>(options: {
     }
 
     setupDatabaseForHook();
-
-    return () => {
-      cancelled = true;
-      databaseRef.current?.close();
-    };
-  }, [databaseName, databaseVersion, recordName, storeName, storeNames]);
+  }, [options.database, databaseName, databaseVersion, recordName, storeName, storeNames]);
 
   return {
     setValue: setValueWrapper,
