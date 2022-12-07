@@ -278,6 +278,9 @@ const SourceListRow = memo(
           <div className={styles.LineSegmentsAndPointPanel}>
             {lineSegments}
 
+            {/* Workaround for FE-1025 */}
+            <div className={styles.HoverButtonCompanion}></div>
+
             {isHovered && (
               <Suspense>
                 <HoverButton
