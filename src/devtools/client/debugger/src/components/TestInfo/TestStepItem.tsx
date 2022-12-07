@@ -203,13 +203,13 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
 
   return (
     <div
-      className={`group/step relative flex items-start gap-1 border-b border-l-2 border-themeBase-90 pl-1 pr-3 font-mono hover:bg-toolbarBackground ${
+      className={`group/step relative flex items-start gap-1 border-b border-l-2 border-themeBase-90 pl-1 pr-3 font-mono hover:bg-toolbarBackgroundHover ${
         isPaused || isPast ? color : "border-l-transparent"
       } ${
         progress > 0 && step.error
           ? "bg-testsuitesErrorBgcolor text-testsuitesErrorColor hover:bg-testsuitesErrorBgcolorHover"
           : isPaused
-          ? "bg-toolbarBackground"
+          ? "bg-toolbarBackgroundHover"
           : "bg-testsuitesStepsBgcolor"
       }`}
       onMouseEnter={onMouseEnter}
