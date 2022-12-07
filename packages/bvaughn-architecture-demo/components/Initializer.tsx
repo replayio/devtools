@@ -6,7 +6,7 @@ import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 
 import { CONSOLE_SETTINGS_DATABASE } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
 import { POINTS_DATABASE } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import { getInitialIDBValueAsync } from "bvaughn-architecture-demo/src/hooks/useIndexedDB";
+import { preloadIDBInitialValues } from "bvaughn-architecture-demo/src/hooks/useIndexedDB";
 import { preCacheExecutionPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -58,18 +58,7 @@ export default function Initializer({
           }
         }
 
-        const idbPrefsPromises: Promise<any>[] = [];
-
-        if (recordingId) {
-          // Preload
-          for (let dbOptions of IDB_PREFS_DATABASES) {
-            for (let storeName of dbOptions.storeNames) {
-              idbPrefsPromises.push(getInitialIDBValueAsync(dbOptions, storeName, recordingId));
-            }
-          }
-
-          await Promise.all(idbPrefsPromises);
-        }
+        await preloadIDBInitialValues(IDB_PREFS_DATABASES, recordingId!);
 
         const sessionId = await client.initialize(activeRecordingId, activeAccessToken);
         const endpoint = await client.getSessionEndpoint(sessionId);

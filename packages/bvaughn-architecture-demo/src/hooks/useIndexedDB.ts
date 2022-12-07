@@ -20,6 +20,27 @@ type Status =
   | typeof STATUS_INITIALIZATION_ERRORED
   | typeof STATUS_UPDATE_PENDING;
 
+export async function preloadIDBInitialValues(
+  idbPrefsDatabase: IDBOptions[],
+  recordingId?: string
+) {
+  const idbPrefsPromises: Promise<any>[] = [];
+  if (!recordingId) {
+    // We don't have a recording ID if it's the library
+    return;
+  }
+
+  if (recordingId) {
+    for (let dbOptions of idbPrefsDatabase) {
+      for (let storeName of dbOptions.storeNames) {
+        idbPrefsPromises.push(getInitialIDBValueAsync(dbOptions, storeName, recordingId));
+      }
+    }
+  }
+
+  return Promise.all(idbPrefsPromises);
+}
+
 export const {
   getValueSuspense: getIDBInstanceSuspense,
   getValueAsync: getIDBInstanceAsync,
@@ -87,11 +108,9 @@ export default function useIndexedDB<T>(options: {
   const { initialValue, recordName, scheduleUpdatesAsTransitions = false, storeName } = options;
 
   const [isPending, startTransition] = useTransition();
-  // If requested, suspend entirely until we've read the initial value
-  //  and can use that to seed the `useState`
   const [value, setValue] = useState<T>(() => {
     // In order for persistence to work properly, `getInitialIDBValueAsync` _must_ have been
-    // called in the main app, in `src/ui/setup/index.ts::bootstrapApp()`.
+    // called in an early app entry point (such as `src/ui/setup/index.ts::bootstrapApp()`, or `components/Initializer.tsx`).
     return (
       getInitialIDBValueIfCached(options.database, storeName, recordName)?.value ?? initialValue
     );
@@ -121,8 +140,6 @@ export default function useIndexedDB<T>(options: {
   }, [value, recordName, storeName, status]);
 
   useEffect(() => {
-    let cancelled = false;
-
     async function setupDatabaseForHook() {
       if (typeof window !== "undefined" && typeof window.indexedDB !== "undefined") {
         // Save the DB instance so we can sync updates later
@@ -136,10 +153,6 @@ export default function useIndexedDB<T>(options: {
     }
 
     setupDatabaseForHook();
-
-    return () => {
-      cancelled = true;
-    };
   }, [options.database, databaseName, databaseVersion, recordName, storeName, storeNames]);
 
   return {
