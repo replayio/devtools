@@ -27,10 +27,15 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "profileWorkerThreads",
   },
   {
-    label: "Enable query-level caching",
+    label: "Enable query-level caching for unstable request types",
     description:
       "Allow the backend to return previously generated responses without re-running the request",
-    key: "enableQueryCache",
+    key: "enableUnstableQueryCache",
+  },
+  {
+    label: "Disable query-level caching for stable request types",
+    description: "Disable caching of previously generated responses",
+    key: "disableStableQueryCache",
   },
   {
     label: "Detailed loading bar",
@@ -89,8 +94,11 @@ export default function ExperimentalSettings({}) {
   } = useFeature("consoleFilterDrawerDefaultsToOpen");
   const { value: profileWorkerThreads, update: updateProfileWorkerThreads } =
     useFeature("profileWorkerThreads");
-  const { value: enableQueryCache, update: updateEnableQueryCache } =
-    useFeature("enableQueryCache");
+  const { value: enableUnstableQueryCache, update: updateEnableUnstableQueryCache } = useFeature(
+    "enableUnstableQueryCache"
+  );
+  const { value: disableStableQueryCache, update: updateDisableStableQueryCache } =
+    useFeature("disableStableQueryCache");
   const { value: basicProcessingLoadingBar, update: updateBasicProcessingLoadingBar } = useFeature(
     "basicProcessingLoadingBar"
   );
@@ -100,8 +108,10 @@ export default function ExperimentalSettings({}) {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
     } else if (key === "profileWorkerThreads") {
       updateProfileWorkerThreads(!profileWorkerThreads);
-    } else if (key === "enableQueryCache") {
-      updateEnableQueryCache(!enableQueryCache);
+    } else if (key === "enableUnstableQueryCache") {
+      updateEnableUnstableQueryCache(!enableUnstableQueryCache);
+    } else if (key === "disableStableQueryCache") {
+      updateDisableStableQueryCache(!disableStableQueryCache);
     } else if (key === "basicProcessingLoadingBar") {
       updateBasicProcessingLoadingBar(!basicProcessingLoadingBar);
     } else if (key === "consoleFilterDrawerDefaultsToOpen") {
@@ -115,8 +125,9 @@ export default function ExperimentalSettings({}) {
     basicProcessingLoadingBar,
     consoleFilterDrawerDefaultsToOpen,
     disableScanDataCache,
+    disableStableQueryCache,
     enableColumnBreakpoints,
-    enableQueryCache,
+    enableUnstableQueryCache,
     profileWorkerThreads,
   };
 
