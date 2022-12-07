@@ -1,7 +1,7 @@
 import { SourceId } from "@replayio/protocol";
 import escapeRegExp from "lodash/escapeRegExp";
 import isEqual from "lodash/isEqual";
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { NEW_LINE_REGEX } from "bvaughn-architecture-demo/src/utils/string";
 
@@ -11,6 +11,12 @@ import type { Actions as SearchActions, State as SearchState } from "./useSearch
 type Scope = {
   code: string;
   sourceId: SourceId | null;
+};
+
+export type SourceSearchResult = {
+  columnIndex: number;
+  lineIndex: number;
+  text: string;
 };
 
 type SearchModifiers = {
@@ -27,14 +33,14 @@ function search(
   query: string,
   lines: string[],
   modifiers: SearchModifiers | null = null
-): number[] {
+): SourceSearchResult[] {
   const { caseSensitive = false, regex = false, wholeWord = false } = modifiers || {};
 
-  const results: number[] = [];
+  const results: SourceSearchResult[] = [];
 
-  let flags;
+  let flags = "g";
   if (!caseSensitive) {
-    flags = "i";
+    flags += "i";
   }
 
   if (!regex) {
@@ -47,9 +53,17 @@ function search(
   const regExp = new RegExp(query, flags);
 
   lines.forEach((line, index) => {
-    if (line.match(regExp)) {
-      results.push(index);
-    }
+    let match: RegExpExecArray | null = null;
+    do {
+      match = regExp.exec(line);
+      if (match !== null) {
+        results.push({
+          columnIndex: match.index,
+          lineIndex: index,
+          text: match[0],
+        });
+      }
+    } while (match !== null);
   });
 
   return results;
@@ -60,12 +74,12 @@ export type Actions = SearchActions<SearchModifiers> & {
   setScope: SetScope;
 };
 
-export type State = SearchState<string, number, SearchModifiers> & {
+export type State = SearchState<string, SourceSearchResult, SearchModifiers> & {
   modifiers: SearchModifiers;
 };
 
 export default function useSourceSearch(
-  onChangeDispatching?: OnChangeDispatching<number>
+  onChangeDispatching?: OnChangeDispatching<SourceSearchResult>
 ): [State, Actions] {
   const [scope, setScope] = useState<Scope>({
     code: "",
@@ -80,7 +94,7 @@ export default function useSourceSearch(
 
   const lines = useMemo(() => scope.code.split(NEW_LINE_REGEX), [scope.code]);
 
-  const [state, dispatch] = useSearch<string, number, SearchModifiers>(
+  const [state, dispatch] = useSearch<string, SourceSearchResult, SearchModifiers>(
     lines,
     search,
     scope.sourceId,

@@ -45,7 +45,7 @@
   --background-color-disabled-button: #454950;
   --background-color-high-contrast-button: #081120;
   --background-color-current-execution-point: #25364e;
-  --background-color-current-search-result: #42381f;
+  --background-color-current-search-result: #25364e;
   --background-color-warning: #42381f;
   --background-color-inputs: #0e1119;
   --background-color-source-search: #25364e;
@@ -169,6 +169,11 @@
   --region-unfocused-color: var(--background-color-contrast-3);
   --region-loaded-color: #939395;
   --region-loading-color: #69e261;
+
+  --search-result-active-background-color: #fffd03;
+  --search-result-active-color: #000000;
+  --search-result-inactive-background-color: #ff9632;
+  --search-result-inactive-color: #000000;
 }
 
 :root.theme-light {
@@ -196,7 +201,7 @@
   --background-color-disabled-button: #666666;
   --background-color-high-contrast-button: #f2f2f2;
   --background-color-current-execution-point: #eaf3ff;
-  --background-color-current-search-result: #fffac8;
+  --background-color-current-search-result: #eaf3ff;
   --background-color-warning: #fffac8;
   --background-color-inputs: #e6e6e6;
   --background-color-source-search: #eaf3ff;
@@ -320,4 +325,9 @@
   --region-unfocused-color: var(--background-color-contrast-1);
   --region-loaded-color: #ff0000;
   --region-loading-color: #73cc6d;
+
+  --search-result-active-background-color: #fffd03;
+  --search-result-active-color: #000000;
+  --search-result-inactive-background-color: #ff9632;
+  --search-result-inactive-color: #000000;
 }
