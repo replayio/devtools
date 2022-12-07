@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import { SourceId } from "@replayio/protocol";
 import React, { PureComponent } from "react";
 import ReactDOM from "react-dom";
 import { ConnectedProps, connect } from "react-redux";
@@ -9,7 +10,6 @@ import { ConnectedProps, connect } from "react-redux";
 import { getToolboxLayout } from "ui/reducers/layout";
 import { SourceDetails, getSelectedSource } from "ui/reducers/sources";
 import type { UIState } from "ui/state";
-import { trackEvent } from "ui/utils/telemetry";
 
 import actions from "../../actions";
 import { openQuickOpen as openQuickOpenAction } from "../../actions/quick-open";
@@ -92,6 +92,15 @@ class Tabs extends PureComponent<PropsFromRedux> {
     this._draggedSourceIndex = index;
   }
 
+  _tabRefs: { [key: SourceId]: HTMLElement } = {};
+  _setTabRef = (sourceId: SourceId, elementRef: HTMLDivElement | null) => {
+    if (elementRef !== null) {
+      this._tabRefs[sourceId] = elementRef;
+    } else {
+      delete this._tabRefs[sourceId];
+    }
+  };
+
   getIconClass(source: SourceDetails) {
     if (isPretty(source)) {
       return "prettyPrint";
@@ -116,7 +125,10 @@ class Tabs extends PureComponent<PropsFromRedux> {
       return;
     }
 
-    const tabDOM = ReactDOM.findDOMNode(this.refs[`tab_${source.id}`])! as HTMLElement;
+    const tabDOM = this._tabRefs[source.id];
+    if (tabDOM == null) {
+      return;
+    }
 
     /* $FlowIgnore: tabDOM.nodeType will always be of Node.ELEMENT_NODE since it comes from a ref;
       however; the return type of findDOMNode is null | Element | Text */
@@ -163,7 +175,7 @@ class Tabs extends PureComponent<PropsFromRedux> {
                 onDragEnd={this.onTabDragEnd}
                 key={index}
                 source={source}
-                ref={`tab_${source.id}`}
+                setTabRef={this._setTabRef}
               />
             );
           })}

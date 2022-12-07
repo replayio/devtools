@@ -12,6 +12,7 @@ import {
 import { areEqual } from "react-window";
 
 import Icon from "bvaughn-architecture-demo/components/Icon";
+import useSourceContextMenu from "bvaughn-architecture-demo/components/sources/useSourceContextMenu";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import {
   AddPoint,
@@ -237,6 +238,13 @@ const SourceListRow = memo(
       onLineMouseLeave(index, event.currentTarget as HTMLDivElement);
     };
 
+    const { contextMenu, onContextMenu } = useSourceContextMenu({
+      firstBreakableColumnIndex: lineHitCounts?.firstBreakableColumnIndex ?? null,
+      lineNumber,
+      sourceId: source.sourceId,
+      sourceUrl: source.url ?? null,
+    });
+
     return (
       <div
         className={styles.Row}
@@ -253,7 +261,10 @@ const SourceListRow = memo(
           width: undefined,
         }}
       >
-        <div className={lineHasHits ? styles.LineWithHits : styles.LineWithoutHits}>
+        <div
+          className={lineHasHits ? styles.LineWithHits : styles.LineWithoutHits}
+          onContextMenu={onContextMenu}
+        >
           <div className={styles.LineNumber} data-test-id={`SourceLine-LineNumber-${lineNumber}`}>
             {lineNumber}
             <div
@@ -302,6 +313,8 @@ const SourceListRow = memo(
         </div>
 
         <CurrentLineHighlight lineNumber={lineNumber} sourceId={sourceId} />
+
+        {contextMenu}
       </div>
     );
   },

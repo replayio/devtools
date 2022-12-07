@@ -2,6 +2,7 @@ import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { Suspense, memo, useContext } from "react";
 
+import useConsoleContextMenu from "bvaughn-architecture-demo/components/console/useConsoleContextMenu";
 import Inspector from "bvaughn-architecture-demo/components/inspector";
 import Loader from "bvaughn-architecture-demo/components/Loader";
 import { ConsoleFiltersContext } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
@@ -10,7 +11,6 @@ import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/Timeline
 import { EventLog } from "bvaughn-architecture-demo/src/suspense/EventsCache";
 import { formatTimestamp } from "bvaughn-architecture-demo/src/utils/time";
 
-import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
 import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 import styles from "./shared.module.css";
@@ -24,7 +24,6 @@ function EventLogRenderer({
   index: number;
   isFocused: boolean;
 }) {
-  const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
@@ -63,10 +62,7 @@ function EventLogRenderer({
         ))
       : null;
 
-  const showContextMenu = (event: MouseEvent) => {
-    event.preventDefault();
-    show(eventLog, { x: event.pageX, y: event.pageY });
-  };
+  const { contextMenu, onContextMenu } = useConsoleContextMenu(eventLog);
 
   const primaryContent = (
     <>
@@ -86,35 +82,38 @@ function EventLogRenderer({
   );
 
   return (
-    <InspectableTimestampedPointContext.Provider value={context}>
-      <div
-        ref={ref}
-        className={className}
-        data-search-index={index}
-        data-test-message-type="event"
-        data-test-paused-here={eventLog.point === currentExecutionPoint}
-        data-test-name="Message"
-        role="listitem"
-        onContextMenu={showContextMenu}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <span className={styles.Source}>
-          <Suspense fallback={<Loader />}>
-            <Source locations={eventLog.location} />
-          </Suspense>
-        </span>
-        {primaryContent}
-        {isHovered && (
-          <MessageHoverButton
-            executionPoint={eventLog.point}
-            locations={eventLog.location}
-            showAddCommentButton={true}
-            time={eventLog.time}
-          />
-        )}
-      </div>
-    </InspectableTimestampedPointContext.Provider>
+    <>
+      <InspectableTimestampedPointContext.Provider value={context}>
+        <div
+          ref={ref}
+          className={className}
+          data-search-index={index}
+          data-test-message-type="event"
+          data-test-paused-here={eventLog.point === currentExecutionPoint}
+          data-test-name="Message"
+          role="listitem"
+          onContextMenu={onContextMenu}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          <span className={styles.Source}>
+            <Suspense fallback={<Loader />}>
+              <Source locations={eventLog.location} />
+            </Suspense>
+          </span>
+          {primaryContent}
+          {isHovered && (
+            <MessageHoverButton
+              executionPoint={eventLog.point}
+              locations={eventLog.location}
+              showAddCommentButton={true}
+              time={eventLog.time}
+            />
+          )}
+        </div>
+      </InspectableTimestampedPointContext.Provider>
+      {contextMenu}
+    </>
   );
 }
 

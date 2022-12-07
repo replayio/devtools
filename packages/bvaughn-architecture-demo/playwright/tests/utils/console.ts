@@ -74,9 +74,11 @@ export async function locateMessage<T>(
 
     if (count === 0) {
       if (loop++ > 25) {
-        throw new Error(
-          `Could not locate message type "${messageType}" with text "${partialText}"`
-        );
+        let message = `Could not locate message type "${messageType}"`;
+        if (partialText) {
+          message += ` with text "${partialText}`;
+        }
+        throw new Error(message);
       }
 
       await new Promise(resolve => setTimeout(resolve, 50));

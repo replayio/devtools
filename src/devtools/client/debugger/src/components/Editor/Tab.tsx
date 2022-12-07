@@ -1,208 +1,78 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
-//
-
+import { SourceId } from "@replayio/protocol";
 import classnames from "classnames";
-import React, { PureComponent } from "react";
-import { ConnectedProps, connect } from "react-redux";
+import { DragEventHandler, MouseEvent } from "react";
 
-import { buildMenu, showMenu } from "devtools/shared/contextmenu";
-import { actions } from "ui/actions";
+import { selectSource } from "devtools/client/debugger/src/actions/sources";
+import { closeTab } from "devtools/client/debugger/src/actions/tabs";
+import useTabContextMenu from "devtools/client/debugger/src/components/Editor/useTabContextMenu";
 import { Redacted } from "ui/components/Redacted";
 import { SourceDetails, getHasSiblingOfSameName, getSelectedSource } from "ui/reducers/sources";
-import { UIState } from "ui/state";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { getActiveSearch, getContext, getSourcesForTabs } from "../../selectors";
-import { copyToTheClipboard } from "../../utils/clipboard";
 import {
   getFileURL,
-  getRawSourceURL,
   getSourceQueryString,
   getTruncatedFileName,
   isPretty,
 } from "../../utils/source";
-import { getTabMenuItems } from "../../utils/tabs";
 import { CloseButton } from "../shared/Button";
 import SourceIcon from "../shared/SourceIcon";
 
-interface TabProps {
+export default function Tab({
+  onDragEnd,
+  onDragOver,
+  onDragStart,
+  setTabRef,
+  source,
+}: {
+  onDragEnd: DragEventHandler<HTMLDivElement>;
+  onDragOver: DragEventHandler<HTMLDivElement>;
+  onDragStart: DragEventHandler<HTMLDivElement>;
+  setTabRef: (sourceId: SourceId, ref: HTMLDivElement | null) => void;
   source: SourceDetails;
-  onDragOver: React.DragEventHandler<HTMLDivElement>;
-  onDragStart: React.DragEventHandler<HTMLDivElement>;
-  onDragEnd: React.DragEventHandler<HTMLDivElement>;
-}
+}) {
+  const dispatch = useAppDispatch();
 
-const mapStateToProps = (state: UIState, { source }: TabProps) => {
-  const selectedSource = getSelectedSource(state);
+  const cx = useAppSelector(getContext);
+  const selectedSource = useAppSelector(getSelectedSource);
+  const activeSearch = useAppSelector(getActiveSearch);
+  const hasSiblingOfSameName = useAppSelector(state => getHasSiblingOfSameName(state, source));
 
-  return {
-    cx: getContext(state),
-    tabSources: getSourcesForTabs(state),
-    selectedSource,
-    activeSearch: getActiveSearch(state),
-    hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
-  };
-};
+  // @ts-expect-error activeSearch possible values mismatch
+  const isSourceSearchEnabled = activeSearch === "source";
+  const sourceId = source.id;
+  const active = selectedSource && sourceId == selectedSource.id && !isSourceSearchEnabled;
+  const isPrettyCode = isPretty(source);
 
-const connector = connect(
-  mapStateToProps,
-  {
-    selectSource: actions.selectSource,
-    copyToClipboard: actions.copyToClipboard,
-    closeTab: actions.closeTab,
-    closeTabs: actions.closeTabs,
-    showSource: actions.showSource,
-    ensureSourcesIsVisible: actions.ensureSourcesIsVisible,
-  },
-  null,
-  {
-    forwardRef: true,
+  function onClickClose(event: MouseEvent) {
+    event.stopPropagation();
+    trackEvent("tabs.close");
+    dispatch(closeTab(cx, source));
   }
-);
 
-type PropsFromRedux = ConnectedProps<typeof connector>;
-type FinalTabProps = PropsFromRedux & TabProps;
-
-class Tab extends PureComponent<FinalTabProps> {
-  onTabContextMenu = (event: React.MouseEvent, tab: string) => {
+  function handleTabClick(event: MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
-    this.showContextMenu(event, tab);
-  };
+    trackEvent("tabs.select");
 
-  showContextMenu(e: React.MouseEvent, tab: string) {
-    const {
-      cx,
-      closeTab,
-      closeTabs,
-      copyToClipboard,
-      tabSources,
-      showSource,
-      selectedSource,
-      source,
-      ensureSourcesIsVisible,
-    } = this.props;
-
-    const tabCount = tabSources.length;
-    const otherTabs = tabSources.filter(t => t.id !== tab);
-    const sourceTab = tabSources.find(t => t.id == tab);
-    const tabURLs = tabSources.map(t => t.url!);
-    const otherTabURLs = otherTabs.map(t => t.url!);
-
-    if (!sourceTab || !selectedSource) {
-      return;
-    }
-
-    const tabMenuItems = getTabMenuItems();
-    const items = [
-      {
-        item: {
-          ...tabMenuItems.closeTab,
-          click: () => closeTab(cx, sourceTab),
-        },
-      },
-      {
-        item: {
-          ...tabMenuItems.closeOtherTabs,
-          click: () => closeTabs(cx, otherTabURLs),
-          disabled: otherTabURLs.length === 0,
-        },
-      },
-      {
-        item: {
-          ...tabMenuItems.closeTabsToEnd,
-          click: () => {
-            const tabIndex = tabSources.findIndex(t => t.id == tab);
-            closeTabs(
-              cx,
-              tabURLs.filter((t, i) => i > tabIndex)
-            );
-          },
-          disabled: tabCount === 1 || tabSources.some((t, i) => t.id === tab && tabCount - 1 === i),
-        },
-      },
-      {
-        item: {
-          ...tabMenuItems.closeAllTabs,
-          click: () => closeTabs(cx, tabURLs),
-        },
-      },
-      { item: { type: "separator" } },
-      {
-        item: {
-          ...tabMenuItems.copyToClipboard,
-          disabled: selectedSource.id !== tab,
-          click: () => copyToClipboard(sourceTab),
-        },
-      },
-      {
-        item: {
-          ...tabMenuItems.copySourceUri2,
-          disabled: !selectedSource.url,
-          click: () => copyToTheClipboard(getRawSourceURL(sourceTab.url)),
-        },
-      },
-      {
-        item: {
-          ...tabMenuItems.showSource,
-          disabled: !selectedSource.url,
-          click: () => {
-            ensureSourcesIsVisible();
-            showSource(cx, tab);
-          },
-        },
-      },
-    ];
-
-    showMenu(e, buildMenu(items));
+    dispatch(selectSource(cx, sourceId));
   }
 
-  isSourceSearchEnabled() {
-    // @ts-expect-error activeSearch possible values mismatch
-    return this.props.activeSearch === "source";
-  }
+  const className = classnames("source-tab", {
+    active,
+    pretty: isPrettyCode,
+  });
 
-  render() {
-    const {
-      cx,
-      selectedSource,
-      selectSource,
-      closeTab,
-      source,
-      tabSources,
-      hasSiblingOfSameName,
-      onDragOver,
-      onDragStart,
-      onDragEnd,
-    } = this.props;
-    const sourceId = source.id;
-    const active = selectedSource && sourceId == selectedSource.id && !this.isSourceSearchEnabled();
-    const isPrettyCode = isPretty(source);
+  const query = hasSiblingOfSameName ? getSourceQueryString(source) : "";
 
-    function onClickClose(e: React.MouseEvent) {
-      e.stopPropagation();
-      trackEvent("tabs.close");
-      closeTab(cx, source);
-    }
+  const { contextMenu, onContextMenu } = useTabContextMenu({
+    source,
+  });
 
-    function handleTabClick(e: React.MouseEvent) {
-      e.preventDefault();
-      e.stopPropagation();
-      trackEvent("tabs.select");
-      return selectSource(cx, sourceId);
-    }
-
-    const className = classnames("source-tab", {
-      active,
-      pretty: isPrettyCode,
-    });
-
-    const query = hasSiblingOfSameName ? getSourceQueryString(source) : "";
-
-    return (
+  return (
+    <>
       <Redacted
         draggable
         onDragOver={onDragOver}
@@ -213,9 +83,10 @@ class Tab extends PureComponent<FinalTabProps> {
         data-test-name={`Source-${getTruncatedFileName(source, query)}`}
         key={sourceId}
         onClick={handleTabClick}
+        onContextMenu={onContextMenu}
         // Accommodate middle click to close tab
         onMouseUp={e => e.button === 1 && closeTab(cx, source)}
-        onContextMenu={e => this.onTabContextMenu(e, sourceId)}
+        refToForward={elementRef => setTabRef(sourceId, elementRef as HTMLDivElement | null)}
         title={getFileURL(source, false)}
       >
         <SourceIcon
@@ -225,8 +96,7 @@ class Tab extends PureComponent<FinalTabProps> {
         <div className="filename">{getTruncatedFileName(source, query)}</div>
         <CloseButton buttonClass="" handleClick={onClickClose} tooltip={"Close tab"} />
       </Redacted>
-    );
-  }
+      {contextMenu}
+    </>
+  );
 }
-
-export default connector(Tab);

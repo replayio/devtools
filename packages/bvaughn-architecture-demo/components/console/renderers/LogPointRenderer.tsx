@@ -3,6 +3,7 @@ import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { Suspense, memo, useContext } from "react";
 
+import useConsoleContextMenu from "bvaughn-architecture-demo/components/console/useConsoleContextMenu";
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import Inspector from "bvaughn-architecture-demo/components/inspector";
 import ClientValueValueRenderer from "bvaughn-architecture-demo/components/inspector/values/ClientValueValueRenderer";
@@ -18,7 +19,6 @@ import { formatTimestamp } from "bvaughn-architecture-demo/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Badge } from "shared/client/types";
 
-import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
 import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 import styles from "./shared.module.css";
@@ -35,9 +35,10 @@ function LogPointRenderer({
   isFocused: boolean;
   logPointInstance: PointInstance;
 }) {
-  const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
+
+  const { contextMenu, onContextMenu } = useConsoleContextMenu(logPointInstance);
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -53,11 +54,6 @@ function LogPointRenderer({
   if (isFocused) {
     className = `${className} ${styles.Focused}`;
   }
-
-  const showContextMenu = (event: MouseEvent) => {
-    event.preventDefault();
-    show(logPointInstance, { x: event.pageX, y: event.pageY });
-  };
 
   const locations = useMemo(
     () => [logPointInstance.point.location],
@@ -91,33 +87,36 @@ function LogPointRenderer({
   );
 
   return (
-    <div
-      ref={ref}
-      className={className}
-      data-search-index={index}
-      data-test-message-type="log-point"
-      data-test-paused-here={logPointInstance.timeStampedHitPoint.point === currentExecutionPoint}
-      data-test-name="Message"
-      onContextMenu={showContextMenu}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      role="listitem"
-    >
-      <span className={styles.Source}>
-        <Suspense fallback={<Loader />}>
-          {locations.length > 0 && <Source locations={locations} />}
-        </Suspense>
-      </span>
-      {primaryContent}
-      {isHovered && (
-        <MessageHoverButton
-          executionPoint={logPointInstance.timeStampedHitPoint.point}
-          locations={locations}
-          showAddCommentButton={true}
-          time={logPointInstance.timeStampedHitPoint.time}
-        />
-      )}
-    </div>
+    <>
+      <div
+        ref={ref}
+        className={className}
+        data-search-index={index}
+        data-test-message-type="log-point"
+        data-test-paused-here={logPointInstance.timeStampedHitPoint.point === currentExecutionPoint}
+        data-test-name="Message"
+        onContextMenu={onContextMenu}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        role="listitem"
+      >
+        <span className={styles.Source}>
+          <Suspense fallback={<Loader />}>
+            {locations.length > 0 && <Source locations={locations} />}
+          </Suspense>
+        </span>
+        {primaryContent}
+        {isHovered && (
+          <MessageHoverButton
+            executionPoint={logPointInstance.timeStampedHitPoint.point}
+            locations={locations}
+            showAddCommentButton={true}
+            time={logPointInstance.timeStampedHitPoint.time}
+          />
+        )}
+      </div>
+      {contextMenu}
+    </>
   );
 }
 
