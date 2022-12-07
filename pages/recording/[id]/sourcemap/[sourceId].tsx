@@ -1,3 +1,4 @@
+import { newSource } from "@replayio/protocol";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
@@ -60,29 +61,24 @@ async function loadSourceMap(
       store.dispatch(onUnprocessedRegions(regions))
     );
 
-    // find the requested source
-    const result = await Promise.race([
-      client.Debugger.findSources({}, sessionId),
-      new Promise<{ id: string; url?: string }>(resolve => {
-        client.Debugger.addNewSourceListener(newSource => {
-          if (newSource.sourceId === sourceId) {
-            if (newSource.generatedSourceIds?.length) {
-              const url = newSource.url ? decodeURI(newSource.url) : undefined;
-              resolve({ id: newSource.generatedSourceIds[0], url });
-            } else {
-              resolve({ id: sourceId });
-            }
-          }
-        });
-      }),
-    ]);
-    if (!("id" in result)) {
+    const sources: Map<string, newSource> = new Map();
+    client.Debugger.addNewSourceListener(newSource => {
+      sources.set(newSource.sourceId, newSource);
+    });
+    await client.Debugger.findSources({}, sessionId);
+    let source = sources.get(sourceId);
+    let generatedSourceId = sourceId;
+    while (source?.generatedSourceIds?.length) {
+      generatedSourceId = source.generatedSourceIds[0];
+      source = sources.get(generatedSourceId);
+    }
+    if (!source) {
       return { error: "Source not found" };
     }
 
     // load the requested source's contents and sourcemap
-    const { id: generatedSourceId, url } = result;
-    const { contents: source } = await client.Debugger.getSourceContents(
+    const { url } = source;
+    const { contents } = await client.Debugger.getSourceContents(
       { sourceId: generatedSourceId },
       sessionId
     );
@@ -90,7 +86,7 @@ async function loadSourceMap(
       { sourceId: generatedSourceId },
       sessionId
     );
-    return { source, map, url };
+    return { source: contents, map, url };
   } catch (error: any) {
     return { error: error.message || "Failed to load sourcemap" };
   }
