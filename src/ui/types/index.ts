@@ -19,8 +19,9 @@ export type LocalExperimentalUserSettings = {
   basicProcessingLoadingBar: boolean;
   disableScanDataCache: boolean;
   consoleFilterDrawerDefaultsToOpen: boolean;
-  enableQueryCache: boolean;
+  disableStableQueryCache: boolean;
   enableColumnBreakpoints: boolean;
+  enableUnstableQueryCache: boolean;
   profileWorkerThreads: boolean;
 };
 

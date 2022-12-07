@@ -198,7 +198,8 @@ export function createSocket(
       const experimentalSettings: ExperimentalSettings = {
         disableScanDataCache: !!features.disableScanDataCache,
         disableCache: !!prefs.disableCache,
-        disableQueryCache: !features.enableQueryCache,
+        disableStableQueryCache: !!features.disableStableQueryCache,
+        disableUnstableQueryCache: !features.enableUnstableQueryCache,
         listenForMetrics: !!prefs.listenForMetrics,
         profileWorkerThreads: !!features.profileWorkerThreads,
       };

@@ -27,8 +27,9 @@ pref("devtools.features.commentAttachments", false);
 pref("devtools.features.consoleFilterDrawerDefaultsToOpen", false);
 pref("devtools.features.disableScanDataCache", false);
 pref("devtools.features.disableUnHitLines", false);
+pref("devtools.features.disableStableQueryCache", false);
+pref("devtools.features.enableUnstableQueryCache", false);
 pref("devtools.features.enableLargeText", false);
-pref("devtools.features.enableQueryCache", false);
 pref("devtools.features.hitCounts", true);
 pref("devtools.features.logProtocol", false);
 pref("devtools.features.logProtocolEvents", false);
@@ -61,9 +62,10 @@ export const features = new PrefsHelper("devtools.features", {
   commentAttachments: ["Bool", "commentAttachments"],
   consoleFilterDrawerDefaultsToOpen: ["Bool", "consoleFilterDrawerDefaultsToOpen"],
   disableScanDataCache: ["Bool", "disableScanDataCache"],
-  enableQueryCache: ["Bool", "enableQueryCache"],
+  disableStableQueryCache: ["Bool", "disableStableQueryCache"],
   disableUnHitLines: ["Bool", "disableUnHitLines"],
   enableLargeText: ["Bool", "enableLargeText"],
+  enableUnstableQueryCache: ["Bool", "enableUnstableQueryCache"],
   logProtocol: ["Bool", "logProtocol"],
   logProtocolEvents: ["Bool", "logProtocolEvents"],
   newControllerOnRefresh: ["Bool", "newControllerOnRefresh"],
