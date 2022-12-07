@@ -5,7 +5,7 @@ import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPan
 import Accordion from "devtools/client/debugger/src/components/shared/Accordion";
 import TestInfo from "devtools/client/debugger/src/components/TestInfo/TestInfo";
 import { getRecordingDuration } from "ui/actions/app";
-import { setFocusRegion } from "ui/actions/timeline";
+import { setFocusRegion, syncFocusedRegion, updateFocusRegionParam } from "ui/actions/timeline";
 import Events from "ui/components/Events";
 import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
 import Icon from "ui/components/shared/Icon";
@@ -131,6 +131,8 @@ function EventsPane({ items }: { items: any[] }) {
         endTime: duration,
       })
     );
+    dispatch(syncFocusedRegion());
+    dispatch(updateFocusRegionParam());
   };
 
   const workspaceId = recording?.workspace?.id;
@@ -150,14 +152,20 @@ function EventsPane({ items }: { items: any[] }) {
               <div className="flex flex-grow items-center ">
                 <span className="flex-grow truncate pl-1">{getSpecFilename(recording)}</span>
               </div>
-              <TestResultsSummary testCases={recording?.metadata?.test?.tests} />
+              <TestResultsSummary testCases={testCases} />
             </>
           )}
         </div>
         {workspaceId && testRunId ? (
           <TestRunAttributes workspaceId={workspaceId} testRunId={testRunId} />
         ) : null}
-        <TestInfo testCases={recording?.metadata?.test.tests} />
+        {annotations ? (
+          <TestInfo testCases={testCases} />
+        ) : (
+          <div className="flex flex-grow flex-col overflow-hidden">
+            <div className="flex flex-grow flex-col space-y-1 overflow-auto px-2">Loading...</div>
+          </div>
+        )}
       </div>
     );
   }

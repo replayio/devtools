@@ -1,4 +1,4 @@
-import { Object, createPauseResult } from "@replayio/protocol";
+import { Object as ProtocolObject, createPauseResult } from "@replayio/protocol";
 import React, { useContext, useEffect, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
@@ -36,7 +36,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const [localPauseData, setLocalPauseData] = useState<{
     startPauseId?: string;
     endPauseId?: string;
-    consoleProps?: Object;
+    consoleProps?: ProtocolObject;
   }>();
   const { setConsoleProps, setPauseId } = useContext(TestInfoContext);
   const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
@@ -69,7 +69,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
 
     (async () => {
       try {
-        let consoleProps: Object | undefined;
+        let consoleProps: ProtocolObject | undefined;
 
         endPauseResult = pointEnd ? await client.createPause(pointEnd) : undefined;
         startPauseResult = pointStart ? await client.createPause(pointStart) : undefined;
@@ -121,14 +121,9 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
                 consolePropsProperty.object,
                 endPauseResult.pauseId
               );
-              const consoleProps = consolePropsPauseData.objects?.find(
+              consoleProps = consolePropsPauseData.objects?.find(
                 o => o.objectId === consolePropsProperty.object
               );
-
-              if (consoleProps?.preview) {
-                // suppress the prototype entry in the properties output
-                consoleProps.preview.prototypeId = undefined;
-              }
             }
           }
 
