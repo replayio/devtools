@@ -3,6 +3,7 @@ import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { Suspense, memo, useContext } from "react";
 
+import useConsoleContextMenu from "bvaughn-architecture-demo/components/console/useConsoleContextMenu";
 import Expandable from "bvaughn-architecture-demo/components/Expandable";
 import Icon from "bvaughn-architecture-demo/components/Icon";
 import Inspector from "bvaughn-architecture-demo/components/inspector";
@@ -12,7 +13,6 @@ import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/Timeline
 import { UncaughtException } from "bvaughn-architecture-demo/src/suspense/ExceptionsCache";
 import { formatTimestamp } from "bvaughn-architecture-demo/src/utils/time";
 
-import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
 import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 import StackRenderer from "../StackRenderer";
@@ -29,9 +29,10 @@ function UncaughtExceptionRenderer({
   isFocused: boolean;
   uncaughtException: UncaughtException;
 }) {
-  const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
+
+  const { contextMenu, onContextMenu } = useConsoleContextMenu(uncaughtException);
 
   const locations = useMemo(() => {
     return Array.isArray(uncaughtException.location)
@@ -53,11 +54,6 @@ function UncaughtExceptionRenderer({
   if (isFocused) {
     className = `${className} ${styles.Focused}`;
   }
-
-  const showContextMenu = (event: MouseEvent) => {
-    event.preventDefault();
-    show(uncaughtException, { x: event.pageX, y: event.pageY });
-  };
 
   const frames = uncaughtException.data.frames || EMPTY_ARRAY;
   const showExpandable = frames.length > 0;
@@ -84,46 +80,51 @@ function UncaughtExceptionRenderer({
     );
 
   return (
-    <div
-      ref={ref}
-      className={className}
-      data-search-index={index}
-      data-test-message-type="exception"
-      data-test-paused-here={uncaughtException.point === currentExecutionPoint}
-      data-test-name="Message"
-      onContextMenu={showContextMenu}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      role="listitem"
-    >
-      {showTimestamps && (
-        <span className={styles.TimeStamp}>{formatTimestamp(uncaughtException.time, true)} </span>
-      )}
-      <Icon className={styles.ErrorIcon} type="error" />
-      <span className={styles.Source}>
-        <Suspense fallback={<Loader />}>
-          {locations.length > 0 && <Source locations={locations} />}
-        </Suspense>
-      </span>
-      {showExpandable ? (
-        <Expandable
-          children={<StackRenderer frames={frames} stack={frames.map(({ frameId }) => frameId)} />}
-          className={styles.Expandable}
-          header={primaryContent}
-          useBlockLayoutWhenExpanded={false}
-        />
-      ) : (
-        primaryContent
-      )}
-      {isHovered && (
-        <MessageHoverButton
-          executionPoint={uncaughtException.point}
-          locations={locations}
-          showAddCommentButton={true}
-          time={uncaughtException.time}
-        />
-      )}
-    </div>
+    <>
+      <div
+        ref={ref}
+        className={className}
+        data-search-index={index}
+        data-test-message-type="exception"
+        data-test-paused-here={uncaughtException.point === currentExecutionPoint}
+        data-test-name="Message"
+        onContextMenu={onContextMenu}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        role="listitem"
+      >
+        {showTimestamps && (
+          <span className={styles.TimeStamp}>{formatTimestamp(uncaughtException.time, true)} </span>
+        )}
+        <Icon className={styles.ErrorIcon} type="error" />
+        <span className={styles.Source}>
+          <Suspense fallback={<Loader />}>
+            {locations.length > 0 && <Source locations={locations} />}
+          </Suspense>
+        </span>
+        {showExpandable ? (
+          <Expandable
+            children={
+              <StackRenderer frames={frames} stack={frames.map(({ frameId }) => frameId)} />
+            }
+            className={styles.Expandable}
+            header={primaryContent}
+            useBlockLayoutWhenExpanded={false}
+          />
+        ) : (
+          primaryContent
+        )}
+        {isHovered && (
+          <MessageHoverButton
+            executionPoint={uncaughtException.point}
+            locations={locations}
+            showAddCommentButton={true}
+            time={uncaughtException.time}
+          />
+        )}
+      </div>
+      {contextMenu}
+    </>
   );
 }
 

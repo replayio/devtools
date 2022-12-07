@@ -12,17 +12,14 @@ export default function useModalDismissSignal(
       return;
     }
 
-    const handleDocumentKeyDown = (event: KeyboardEvent) => {
+    const handleKeyboardEvent = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         dismissCallback();
       }
     };
 
-    const handleDocumentClick = (event: MouseEvent) => {
+    const handleMouseEvent = (event: MouseEvent) => {
       if (!element.contains(event.target as Node)) {
-        event.stopPropagation();
-        event.preventDefault();
-
         dismissCallback();
       }
     };
@@ -38,11 +35,10 @@ export default function useModalDismissSignal(
       // It's important to listen to the ownerDocument to support browser extensions.
       // The root document might belong to a different window.
       ownerDocument = element.ownerDocument;
-      ownerDocument.addEventListener("keydown", handleDocumentKeyDown);
+      ownerDocument.addEventListener("keydown", handleKeyboardEvent);
       if (dismissOnClickOutside) {
-        ownerDocument.addEventListener("click", handleDocumentClick, true);
-      }
-      if (dismissOnClickOutside) {
+        ownerDocument.addEventListener("click", handleMouseEvent, true);
+        ownerDocument.addEventListener("contextmenu", handleMouseEvent, true);
         ownerDocument.addEventListener("scroll", dismissCallback, true);
       }
     }, 0);
@@ -53,8 +49,10 @@ export default function useModalDismissSignal(
       }
 
       if (ownerDocument !== null) {
-        ownerDocument.removeEventListener("keydown", handleDocumentKeyDown);
-        ownerDocument.removeEventListener("click", handleDocumentClick, true);
+        ownerDocument.removeEventListener("keydown", handleKeyboardEvent);
+        ownerDocument.removeEventListener("click", handleMouseEvent, true);
+        ownerDocument.removeEventListener("contextmenu", handleMouseEvent, true);
+        ownerDocument.removeEventListener("scroll", dismissCallback, true);
       }
     };
   }, [modalRef, dismissCallback, dismissOnClickOutside]);

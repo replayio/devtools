@@ -17,7 +17,6 @@ import { ProtocolMessagesState } from "ui/reducers/protocolMessages";
 import { ReporterState } from "ui/reducers/reporter";
 import type { SourcesState as NewSourcesState } from "ui/reducers/sources";
 
-import { ContextMenusState } from "../reducers/contextMenus";
 import { AppState } from "./app";
 import { LayoutState } from "./layout";
 import { ReactDevToolsState } from "./reactDevTools";
@@ -30,7 +29,6 @@ export interface UIState {
   asyncRequests: AsyncRequestsState;
   boxModel: BoxModelState;
   computed: ComputedState;
-  contextMenus: ContextMenusState;
   sources: NewSourcesState;
   inspector: InspectorState;
   layout: LayoutState;

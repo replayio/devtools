@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 
+import useConsoleContextMenu from "bvaughn-architecture-demo/components/console/useConsoleContextMenu";
 import Icon from "bvaughn-architecture-demo/components/Icon";
 import Inspector from "bvaughn-architecture-demo/components/inspector";
 import ClientValueValueRenderer from "bvaughn-architecture-demo/components/inspector/values/ClientValueValueRenderer";
@@ -24,7 +25,6 @@ import { primitiveToClientValue } from "bvaughn-architecture-demo/src/utils/prot
 import { formatTimestamp } from "bvaughn-architecture-demo/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
 import MessageHoverButton from "../MessageHoverButton";
 import styles from "./shared.module.css";
 
@@ -37,9 +37,10 @@ function TerminalExpressionRenderer({
   isFocused: boolean;
   terminalExpression: TerminalExpression;
 }) {
-  const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
+
+  const { contextMenu, onContextMenu } = useConsoleContextMenu(terminalExpression);
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -63,59 +64,57 @@ function TerminalExpressionRenderer({
     className = `${className} ${styles.Focused}`;
   }
 
-  const showContextMenu = (event: MouseEvent) => {
-    event.preventDefault();
-    show(terminalExpression, { x: event.pageX, y: event.pageY });
-  };
-
   return (
-    <div
-      className={className}
-      data-search-index={index}
-      data-test-message-type="terminal-expression"
-      data-test-paused-here={terminalExpression.point === currentExecutionPoint}
-      data-test-name="Message"
-      onContextMenu={showContextMenu}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      ref={ref}
-      role="listitem"
-    >
-      <span
-        className={
-          showTimestamps
-            ? styles.TerminalPrimaryRowWithTimestamps
-            : styles.TerminalPrimaryRowWithoutTimestamps
-        }
+    <>
+      <div
+        className={className}
+        data-search-index={index}
+        data-test-message-type="terminal-expression"
+        data-test-paused-here={terminalExpression.point === currentExecutionPoint}
+        data-test-name="Message"
+        onContextMenu={onContextMenu}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        ref={ref}
+        role="listitem"
       >
-        {showTimestamps && (
-          <span className={styles.TimeStamp}>
-            {formatTimestamp(terminalExpression.time, true)}{" "}
-          </span>
-        )}
-        <span className={styles.TerminalLogContents} data-test-name="LogContents">
-          <span className={styles.LogContents} data-test-name="TerminalExpression-Expression">
-            <Icon className={styles.PromptIcon} type="prompt" />
-            <SyntaxHighlightedExpression expression={terminalExpression.expression} />
-          </span>
-          <span className={styles.LogContents} data-test-name="TerminalExpression-Result">
-            <Icon className={styles.EagerEvaluationIcon} type="eager-evaluation" />
-            <Suspense fallback={<Loader />}>
-              <EvaluatedContent terminalExpression={terminalExpression} />
-            </Suspense>
+        <span
+          className={
+            showTimestamps
+              ? styles.TerminalPrimaryRowWithTimestamps
+              : styles.TerminalPrimaryRowWithoutTimestamps
+          }
+        >
+          {showTimestamps && (
+            <span className={styles.TimeStamp}>
+              {formatTimestamp(terminalExpression.time, true)}{" "}
+            </span>
+          )}
+          <span className={styles.TerminalLogContents} data-test-name="LogContents">
+            <span className={styles.LogContents} data-test-name="TerminalExpression-Expression">
+              <Icon className={styles.PromptIcon} type="prompt" />
+              <SyntaxHighlightedExpression expression={terminalExpression.expression} />
+            </span>
+            <span className={styles.LogContents} data-test-name="TerminalExpression-Result">
+              <Icon className={styles.EagerEvaluationIcon} type="eager-evaluation" />
+              <Suspense fallback={<Loader />}>
+                <EvaluatedContent terminalExpression={terminalExpression} />
+              </Suspense>
+            </span>
           </span>
         </span>
-      </span>
 
-      {isHovered && (
-        <MessageHoverButton
-          executionPoint={terminalExpression.point}
-          locations={null}
-          showAddCommentButton={false}
-          time={terminalExpression.time}
-        />
-      )}
-    </div>
+        {isHovered && (
+          <MessageHoverButton
+            executionPoint={terminalExpression.point}
+            locations={null}
+            showAddCommentButton={false}
+            time={terminalExpression.time}
+          />
+        )}
+      </div>
+      {contextMenu}
+    </>
   );
 }
 

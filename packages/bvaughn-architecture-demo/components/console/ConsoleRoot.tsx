@@ -18,11 +18,9 @@ import { ConsoleFiltersContextRoot } from "bvaughn-architecture-demo/src/context
 import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
 import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
 
-import { ConsoleContextMenuContextRoot } from "./ConsoleContextMenuContext";
 import ConsoleInput from "./ConsoleInput";
 import ConsoleSearch from "./ConsoleSearch";
 import { ConsoleSearchContext, ConsoleSearchContextRoot } from "./ConsoleSearchContext";
-import ContextMenu from "./ContextMenu";
 import FilterText from "./filters/FilterText";
 import FilterToggles from "./filters/FilterToggles";
 import { LoggablesContextRoot } from "./LoggablesContext";
@@ -45,24 +43,22 @@ export default function ConsoleRoot({
   return (
     <ErrorBoundary>
       <Suspense fallback={<IndeterminateLoader />}>
-        <ConsoleContextMenuContextRoot>
-          <ConsoleFiltersContextRoot>
-            <LoggablesContextRoot messageListRef={messageListRef}>
-              <ConsoleSearchContextRoot
+        <ConsoleFiltersContextRoot>
+          <LoggablesContextRoot messageListRef={messageListRef}>
+            <ConsoleSearchContextRoot
+              messageListRef={messageListRef}
+              searchInputRef={searchInputRef}
+              showSearchInputByDefault={showSearchInputByDefault}
+            >
+              <Console
                 messageListRef={messageListRef}
+                nagHeader={nagHeader}
                 searchInputRef={searchInputRef}
-                showSearchInputByDefault={showSearchInputByDefault}
-              >
-                <Console
-                  messageListRef={messageListRef}
-                  nagHeader={nagHeader}
-                  searchInputRef={searchInputRef}
-                  showFiltersByDefault={showFiltersByDefault}
-                />
-              </ConsoleSearchContextRoot>
-            </LoggablesContextRoot>
-          </ConsoleFiltersContextRoot>
-        </ConsoleContextMenuContextRoot>
+                showFiltersByDefault={showFiltersByDefault}
+              />
+            </ConsoleSearchContextRoot>
+          </LoggablesContextRoot>
+        </ConsoleFiltersContextRoot>
       </Suspense>
     </ErrorBoundary>
   );
@@ -195,8 +191,6 @@ function Console({
           </div>
         </ErrorBoundary>
       </Suspense>
-
-      <ContextMenu />
     </div>
   );
 }

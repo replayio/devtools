@@ -4,6 +4,7 @@
 
 //
 
+import { copyToClipboard as copyTextToClipboard } from "bvaughn-architecture-demo/components/sources/utils/clipboard";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import type { UIThunkAction } from "ui/actions";
 import { SourceDetails, getSourceContent, getSourceDetails } from "ui/reducers/sources";
@@ -23,7 +24,6 @@ import {
   toggleStartPanel,
 } from "../reducers/ui";
 import { getActiveSearch, getContext, getQuickOpenEnabled } from "../selectors";
-import { copyToTheClipboard } from "../utils/clipboard";
 import { selectSource } from "./sources/select";
 
 export {
@@ -102,7 +102,7 @@ export function copyToClipboard(source: SourceDetails): UIThunkAction {
   return (dispatch, getState) => {
     const content = getSourceContent(getState(), source.id);
     if (content?.value?.type === "text") {
-      copyToTheClipboard(content.value.value);
+      copyTextToClipboard(content.value.value);
     }
   };
 }

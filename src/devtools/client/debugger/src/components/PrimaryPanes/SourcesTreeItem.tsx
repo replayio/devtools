@@ -8,6 +8,7 @@ import classnames from "classnames";
 import React, { Component } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { copyToClipboard } from "bvaughn-architecture-demo/components/sources/utils/clipboard";
 import { showMenu } from "devtools/shared/contextmenu";
 import { Redacted } from "ui/components/Redacted";
 import type { SourceDetails } from "ui/reducers/sources";
@@ -16,7 +17,6 @@ import type { UIState } from "ui/state";
 
 import type { ContextMenuItem } from "../../reducers/types";
 import { getContext } from "../../selectors";
-import { copyToTheClipboard } from "../../utils/clipboard";
 import { getSourceQueryString } from "../../utils/source";
 import { getPathWithoutThread, isDirectory } from "../../utils/sources-tree";
 import { TreeNode } from "../../utils/sources-tree/types";
@@ -89,7 +89,7 @@ class SourceTreeItem extends Component<FinalSTIProps> {
           label: copySourceUri2Label,
           accesskey: copySourceUri2Key,
           disabled: false,
-          click: () => copyToTheClipboard(contents.url),
+          click: () => copyToClipboard(contents.url || ""),
         };
 
         const { source } = this.props;

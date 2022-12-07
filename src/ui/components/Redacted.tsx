@@ -1,18 +1,40 @@
 import classnames from "classnames";
-import React from "react";
+import { HTMLProps, Ref } from "react";
 
 import { prefs } from "ui/utils/prefs";
 
-export function Redacted({ className, ...rest }: React.HTMLProps<HTMLDivElement>) {
+type RefProp = {
+  refToForward?: Ref<HTMLElement>;
+};
+
+export function Redacted({
+  className,
+  refToForward,
+  ...rest
+}: HTMLProps<HTMLDivElement> & RefProp) {
   const showRedactions = prefs.showRedactions;
   return (
-    <div {...rest} data-private={true} className={classnames(className, { showRedactions })} />
+    <div
+      {...rest}
+      data-private={true}
+      className={classnames(className, { showRedactions })}
+      ref={refToForward as Ref<HTMLDivElement>}
+    />
   );
 }
 
-export function RedactedSpan({ className, ...rest }: React.HTMLProps<HTMLSpanElement>) {
+export function RedactedSpan({
+  className,
+  refToForward,
+  ...rest
+}: HTMLProps<HTMLSpanElement> & RefProp) {
   const showRedactions = prefs.showRedactions;
   return (
-    <span {...rest} data-private={true} className={classnames(className, { showRedactions })} />
+    <span
+      {...rest}
+      data-private={true}
+      className={classnames(className, { showRedactions })}
+      ref={refToForward}
+    />
   );
 }

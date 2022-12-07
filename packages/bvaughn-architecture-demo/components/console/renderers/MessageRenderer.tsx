@@ -3,6 +3,7 @@ import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { Suspense, memo, useContext } from "react";
 
+import useConsoleContextMenu from "bvaughn-architecture-demo/components/console/useConsoleContextMenu";
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import Expandable from "bvaughn-architecture-demo/components/Expandable";
 import Icon from "bvaughn-architecture-demo/components/Icon";
@@ -14,7 +15,6 @@ import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/Timeline
 import { ProtocolMessage } from "bvaughn-architecture-demo/src/suspense/MessagesCache";
 import { formatTimestamp } from "bvaughn-architecture-demo/src/utils/time";
 
-import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
 import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 import StackRenderer from "../StackRenderer";
@@ -37,9 +37,10 @@ function MessageRenderer({
 
   const [isHovered, setIsHovered] = useState(false);
 
-  const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
+
+  const { contextMenu, onContextMenu } = useConsoleContextMenu(message);
 
   const context = useMemo(
     () => ({
@@ -92,11 +93,6 @@ function MessageRenderer({
     className = `${className} ${styles.Focused}`;
   }
 
-  const showContextMenu = (event: MouseEvent) => {
-    event.preventDefault();
-    show(message, { x: event.pageX, y: event.pageY });
-  };
-
   const argumentValues = message.argumentValues || EMPTY_ARRAY;
   const primaryContent =
     argumentValues.length > 0 ? (
@@ -124,49 +120,52 @@ function MessageRenderer({
   );
 
   return (
-    <InspectableTimestampedPointContext.Provider value={context}>
-      <div
-        ref={ref}
-        className={className}
-        data-search-index={index}
-        data-test-message-type={testMessageType}
-        data-test-paused-here={message.point.point === currentExecutionPoint}
-        data-test-name="Message"
-        onContextMenu={showContextMenu}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        role="listitem"
-      >
-        {showTimestamps && (
-          <span className={styles.TimeStamp}>{formatTimestamp(message.point.time, true)} </span>
-        )}
-        {icon}
-        <span className={styles.Source}>
-          <Suspense fallback={<Loader />}>
-            {frame?.location?.length > 0 && <Source locations={frame.location} />}
-          </Suspense>
-        </span>
-        {frame != null && message.stack != null && showExpandable ? (
-          <Expandable
-            children={<StackRenderer frames={frames} stack={message.stack} />}
-            className={styles.Expandable}
-            header={logContents}
-            useBlockLayoutWhenExpanded={false}
-          />
-        ) : (
-          logContents
-        )}
+    <>
+      <InspectableTimestampedPointContext.Provider value={context}>
+        <div
+          ref={ref}
+          className={className}
+          data-search-index={index}
+          data-test-message-type={testMessageType}
+          data-test-paused-here={message.point.point === currentExecutionPoint}
+          data-test-name="Message"
+          onContextMenu={onContextMenu}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          role="listitem"
+        >
+          {showTimestamps && (
+            <span className={styles.TimeStamp}>{formatTimestamp(message.point.time, true)} </span>
+          )}
+          {icon}
+          <span className={styles.Source}>
+            <Suspense fallback={<Loader />}>
+              {frame?.location?.length > 0 && <Source locations={frame.location} />}
+            </Suspense>
+          </span>
+          {frame != null && message.stack != null && showExpandable ? (
+            <Expandable
+              children={<StackRenderer frames={frames} stack={message.stack} />}
+              className={styles.Expandable}
+              header={logContents}
+              useBlockLayoutWhenExpanded={false}
+            />
+          ) : (
+            logContents
+          )}
 
-        {isHovered && (
-          <MessageHoverButton
-            executionPoint={message.point.point}
-            locations={frame?.location || null}
-            showAddCommentButton={true}
-            time={message.point.time}
-          />
-        )}
-      </div>
-    </InspectableTimestampedPointContext.Provider>
+          {isHovered && (
+            <MessageHoverButton
+              executionPoint={message.point.point}
+              locations={frame?.location || null}
+              showAddCommentButton={true}
+              time={message.point.time}
+            />
+          )}
+        </div>
+      </InspectableTimestampedPointContext.Provider>
+      {contextMenu}
+    </>
   );
 }
 
