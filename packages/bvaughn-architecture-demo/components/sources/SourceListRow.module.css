@@ -53,6 +53,13 @@
   width: 1.5rem;
   height: 1.5rem;
 }
+.HoverButtonCompanion {
+  position: absolute;
+  width: 1px;
+  height: 1rem;
+  background-color: white;
+  opacity: 0.0001;
+}
 
 .BreakpointIcon,
 .DisabledBreakpointIcon,
