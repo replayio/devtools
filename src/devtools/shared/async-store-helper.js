@@ -21,11 +21,11 @@ export function asyncStoreHelper(root, mappings) {
   let store = {};
 
   function getMappingKey(key) {
-    return Array.isArray(mappings[key]) ? mappings[key][0] : mappings[key];
+    return Array.isArray(mappings[key]) ? mappings[key][1] : mappings[key];
   }
 
   function getMappingDefaultValue(key) {
-    return Array.isArray(mappings[key]) ? mappings[key][1] : null;
+    return Array.isArray(mappings[key]) ? mappings[key][2] : null;
   }
 
   Object.keys(mappings).map(key =>

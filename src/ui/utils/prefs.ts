@@ -1,6 +1,7 @@
 import { PrefsHelper } from "devtools/client/shared/prefs";
 import { asyncStoreHelper } from "devtools/shared/async-store-helper";
 import { pref } from "devtools/shared/services";
+import { ReplaySession } from "ui/setup/prefs";
 
 // Note: additional preferences are defined in other files,
 // including uses of `pref()`, `useLocalStorage`, and `useIndexedDB`.
@@ -75,5 +76,5 @@ export const features = new PrefsHelper("devtools.features", {
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {
-  replaySessions: ["Json", "replay-sessions"],
+  replaySessions: ["Json", "replay-sessions", {} as Record<string, ReplaySession>],
 });
