@@ -67,6 +67,7 @@ module.exports = {
         themeToolbarPanelIconColor: "var(--theme-toolbar-panel-icon-color)",
         timejumpText: "var(--timejump-text)",
         toolbarBackground: "var(--theme-toolbar-background)",
+        toolbarBackgroundHover: "var(--theme-toolbar-background-hover)",
         toolbarBackgroundAlt: "var(--theme-toolbar-background-alt)",
         tooltipBgcolor: "var(--tooltip-bgcolor)",
         tooltipColor: "var(--tooltip-color)",
