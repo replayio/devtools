@@ -2,19 +2,13 @@ import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 
 import { compareNumericStrings } from "protocol/utils";
 import { UIState } from "ui/state";
-import { Annotation } from "ui/types";
+import { AnnotatedTestStep, Annotation } from "ui/types";
 
 export interface ReporterState {
   annotations: Annotation[];
-  selectedStep: SelectedStep | null;
+  selectedStep: AnnotatedTestStep | null;
   selectedTest: number | null;
 }
-
-type SelectedStep = {
-  id: string;
-  startTime: number;
-  endTime: number;
-};
 
 const initialState: ReporterState = {
   annotations: [],
@@ -32,7 +26,7 @@ const reporterSlice = createSlice({
 
       state.annotations = annotations;
     },
-    setSelectedStep(state, action: PayloadAction<SelectedStep | null>) {
+    setSelectedStep(state, action: PayloadAction<AnnotatedTestStep | null>) {
       // This is not ideal since we're duplicating data that's being composed elsewhere.
       // Ideally we would have a selectedStepId, and a list of steps to query to get that
       // data instead.
@@ -41,14 +35,29 @@ const reporterSlice = createSlice({
     setSelectedTest(state, action: PayloadAction<number | null>) {
       state.selectedTest = action.payload;
     },
-    selectedStepCleared(state) {
+    mayClearSelectedStep(state, action: PayloadAction<{ point?: string; time?: number }>) {
+      const { point, time } = action.payload;
+
+      if ((point || time) && state.selectedStep) {
+        const points = [
+          state.selectedStep.annotations.start?.point,
+          state.selectedStep.annotations.end?.point,
+        ];
+
+        const times = [state.selectedStep.absoluteStartTime, state.selectedStep.absoluteEndTime];
+
+        if ((point && points.includes(point)) || (time && times.includes(time))) {
+          return;
+        }
+      }
+
       state.selectedStep = null;
     },
   },
 });
 
 export default reporterSlice.reducer;
-export const { addReporterAnnotations, setSelectedStep, setSelectedTest, selectedStepCleared } =
+export const { addReporterAnnotations, setSelectedStep, setSelectedTest, mayClearSelectedStep } =
   reporterSlice.actions;
 export const getReporterAnnotations = (state: UIState) => state.reporter.annotations;
 export const getSelectedStep = (state: UIState) => state.reporter.selectedStep;

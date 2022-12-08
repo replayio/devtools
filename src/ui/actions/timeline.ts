@@ -22,7 +22,7 @@ import { ThreadFront } from "protocol/thread";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { waitForTime } from "protocol/utils";
 import { getFirstComment } from "ui/hooks/comments/comments";
-import { selectedStepCleared } from "ui/reducers/reporter";
+import { mayClearSelectedStep } from "ui/reducers/reporter";
 import {
   getCurrentTime,
   getFocusRegion,
@@ -243,7 +243,7 @@ export function seek(
   pauseId?: PauseId
 ): UIThunkAction<boolean> {
   return (dispatch, getState, { ThreadFront }) => {
-    dispatch(selectedStepCleared());
+    dispatch(mayClearSelectedStep({ point, time }));
     dispatch(framePositionsCleared());
     if (pauseId) {
       ThreadFront.timeWarpToPause({ point, time, pauseId }, openSource);

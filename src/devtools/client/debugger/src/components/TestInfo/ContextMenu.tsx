@@ -2,18 +2,11 @@ import classNames from "classnames/bind";
 import { useContext, useRef } from "react";
 
 import useModalDismissSignal from "bvaughn-architecture-demo/src/hooks/useModalDismissSignal";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { getCurrentPoint } from "ui/actions/app";
-import { seek, seekToTime, startPlayback } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { getCurrentTime } from "ui/reducers/timeline";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useTestStepActions } from "ui/hooks/useTestStepActions";
 import { AnnotatedTestStep, TestItem } from "ui/types";
 
-import { selectLocation } from "../../actions/sources";
-import { getContext } from "../../selectors";
 import { Coordinates, TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
-import { returnFirst } from "./TestStepItem";
 import styles from "./ContextMenu.module.css";
 
 function ContextMenu({
@@ -27,110 +20,42 @@ function ContextMenu({
   testStep: AnnotatedTestStep;
   test: TestItem;
 }) {
-  const dispatch = useAppDispatch();
-  const currentTime = useAppSelector(getCurrentTime);
-  const currentPoint = useAppSelector(getCurrentPoint);
   const ref = useRef<HTMLDivElement>(null);
-  const cx = useAppSelector(getContext);
-  const client = useContext(ReplayClientContext);
   const classnames = classNames.bind(styles);
+  const actions = useTestStepActions(testStep);
 
   const isFirstStep = test.steps[0].id === testStep.id;
   const isLastStep = test.steps[test.steps.length - 1].id === testStep.id;
-  const canJumpToBefore =
-    currentPoint && testStep.annotations.start
-      ? BigInt(currentPoint) !== BigInt(testStep.annotations.start.point)
-      : currentTime !== testStep.absoluteStartTime;
-  const canJumpToAfter =
-    !isLastStep &&
-    (currentPoint && testStep.annotations.end
-      ? BigInt(currentPoint) !== BigInt(testStep.annotations.end.point)
-      : currentTime !== testStep.absoluteEndTime);
 
   useModalDismissSignal(ref, hide, true);
 
   const onPlayFromHere = () => {
     hide();
-    dispatch(
-      startPlayback({
-        beginTime: testStep.absoluteStartTime,
-        endTime: test.relativeStartTime + test.duration,
-      })
-    );
+    actions.playFromStep(test);
   };
   const onPlayToHere = () => {
     hide();
-    dispatch(
-      startPlayback({
-        beginTime: test.relativeStartTime,
-        endTime: testStep.absoluteStartTime,
-      })
-    );
+    actions.playToStep(test);
   };
   const onJumpToBefore = () => {
-    if (!canJumpToBefore) {
+    if (actions.isAtStepStart) {
       return;
     }
 
     hide();
-    const start = testStep.annotations.start;
-    if (start) {
-      dispatch(seek(start.point, start.time, false));
-    } else {
-      dispatch(seekToTime(testStep.absoluteStartTime));
-    }
+    actions.seekToStepStart();
   };
   const onJumpToAfter = () => {
-    if (!canJumpToAfter) {
+    if (actions.isAtStepEnd) {
       return;
     }
 
     hide();
-    const end = testStep.annotations.end;
-    if (end) {
-      dispatch(seek(end.point, end.time, false));
-    } else {
-      dispatch(seekToTime(testStep.absoluteEndTime - 1));
-    }
+    actions.seekToStepEnd();
   };
   const onGoToLocation = async () => {
     hide();
-    if (!testStep.annotations.enqueue) {
-      return;
-    }
-
-    const point = testStep.annotations.enqueue.point;
-
-    const {
-      data: { frames },
-    } = await client.createPause(point);
-
-    if (frames) {
-      // find the cypress marker frame
-      const markerFrameIndex = returnFirst(frames, (f: any, i: any, l: any) =>
-        f.functionName === "__stackReplacementMarker" ? i : null
-      );
-
-      // and extract its sourceId
-      const markerSourceId = frames[markerFrameIndex]?.functionLocation?.[0].sourceId;
-      if (markerSourceId) {
-        // slice the frames from the current to the marker frame and reverse
-        // it so the user frames are on top
-        const userFrames = frames?.slice(0, markerFrameIndex).reverse();
-
-        // then search from the top for the first frame from the same source
-        // as the marker (which should be cypress_runner.js) and return it
-        const frame = returnFirst(userFrames, (f, i, l) => {
-          return l[i + 1]?.functionLocation?.some(fl => fl.sourceId === markerSourceId) ? f : null;
-        });
-
-        const location = frame?.location[frame.location.length - 1];
-
-        if (location) {
-          dispatch(selectLocation(cx, location));
-        }
-      }
-    }
+    actions.showStepSource();
   };
 
   return (
@@ -162,7 +87,7 @@ function ContextMenu({
       </div>
       <div
         className={classnames("ContextMenuItem", {
-          disabled: !canJumpToBefore,
+          disabled: actions.isAtStepStart,
         })}
         onClick={onJumpToBefore}
       >
@@ -171,7 +96,7 @@ function ContextMenu({
       </div>
       <div
         className={classnames("ContextMenuItem", {
-          disabled: !canJumpToAfter,
+          disabled: actions.isAtStepEnd,
         })}
         onClick={onJumpToAfter}
       >
