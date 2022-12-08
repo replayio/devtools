@@ -220,8 +220,8 @@
 
   /* Testsuites (Light) */
   --testsuites-error-bgcolor: #ffe9e9;
-  --testsuites-error-bgcolor-hover: #fce2e2;
-  --testsuites-error-color: red;
+  --testsuites-error-bgcolor-hover: #ffe0e0;
+  --testsuites-error-color: #EB5757;
   --testsuites-steps-bgcolor: #fafafa;
 
   /* To organise (Light) */
@@ -502,6 +502,7 @@
 
   /* Testsuites (Dark) */
   --testsuites-error-bgcolor: #770702;
+  --testsuites-error-bgcolor-hover: #7a1712;
   --testsuites-error-color: white;
   --testsuites-steps-bgcolor: var(--theme-base-100);
 

@@ -202,6 +202,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
 
   return (
     <TestStepRow
+      active={isPaused}
       pending={!isPast && !isPaused}
       error={!!step.error}
       onMouseEnter={onMouseEnter}

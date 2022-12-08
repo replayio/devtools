@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestStepRow } from "./TestStepRow";
 
 export function NetworkEvent({ request }: { request: RequestSummary }) {
-  const { method, status, url, id, end } = request;
+  const { method, status, url, id, start, end } = request;
 
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(getCurrentTime);
@@ -22,7 +22,11 @@ export function NetworkEvent({ request }: { request: RequestSummary }) {
   const pathname = new URL(url).pathname;
 
   return (
-    <TestStepRow pending={!!end && end > currentTime} error={!!status && status >= 400}>
+    <TestStepRow
+      pending={!!end && start > currentTime}
+      active={start <= currentTime && !!end && end >= currentTime}
+      error={!!status && status >= 400}
+    >
       <button
         className="flex items-center truncate italic opacity-70"
         onClick={onClick}

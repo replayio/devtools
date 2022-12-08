@@ -3,11 +3,13 @@ import React from "react";
 
 interface TestStepRowProps {
   error?: boolean;
+  active?: boolean;
   pending?: boolean;
 }
 
 export function TestStepRow({
   className,
+  active,
   pending,
   error,
   ...rest
@@ -21,15 +23,16 @@ export function TestStepRow({
         {
           // border
           "border-l-transparent": pending,
-          "border-l-red-500": !pending && error,
-          "border-l-primaryAccent": !pending && !error,
+          "border-l-red-500": (!pending || active) && error,
+          "border-l-primaryAccent": (!pending || active) && !error,
 
           // background / foreground
-          "hover:bg-toolbarBackgroundHover": !error,
-          "bg-testsuitesErrorBgcolor text-testsuitesErrorColor hover:bg-testsuitesErrorBgcolorHover":
-            !pending && error,
-          "bg-toolbarBackgroundHover": !pending && !error,
-          "bg-testsuitesStepsBgcolor": pending,
+          "text-testsuitesErrorColor": error,
+          "bg-testsuitesErrorBgcolor hover:bg-testsuitesErrorBgcolorHover": error && pending,
+          "bg-testsuitesErrorBgcolorHover": error && active,
+          "bg-toolbarBackgroundHover": active && !error,
+          "bg-testsuitesStepsBgcolor hover:bg-toolbarBackgroundHover": pending && !error,
+          "hover:bg-toolbarBackgroundHover": !pending && !active && !error,
         }
       )}
     />
