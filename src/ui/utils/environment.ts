@@ -179,9 +179,13 @@ export function getDisplayedUrl(url: string | undefined) {
     return "";
   }
 
-  const urlObj = new URL(url);
-  const { hostname, pathname } = urlObj;
-  return `${hostname}${pathname}`;
+  try {
+    const urlObj = new URL(url);
+    const { hostname, pathname } = urlObj;
+    return `${hostname}${pathname}`;
+  } catch (e) {
+    return "";
+  }
 }
 
 export function getSystemColorSchemePreference() {
