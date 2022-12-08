@@ -500,7 +500,7 @@ export function clearHoveredItem(): UIThunkAction {
 export function setFocusRegion(
   focusRegion: { beginTime: number; endTime: number } | null
 ): UIThunkAction {
-  return (dispatch, getState) => {
+  return async (dispatch, getState, { replayClient }) => {
     const state = getState();
     const currentTime = getCurrentTime(state);
 
@@ -582,18 +582,27 @@ export function setFocusRegion(
         { time: beginTime, point: "" },
         p => p.time
       );
-      const begin =
-        beginIndex > 0 ? state.timeline.points[beginIndex - 1] : { point: "0", time: 0 };
+      let begin = beginIndex > 0 ? state.timeline.points[beginIndex - 1] : { point: "0", time: 0 };
 
       const endIndex = sortedIndexBy(
         state.timeline.points,
         { time: endTime, point: "" },
         p => p.time
       );
-      const end =
+      let end =
         endIndex > 0 && endIndex < state.timeline.points.length
           ? state.timeline.points[endIndex]
           : { point: "", time: endTime };
+
+      const serverBegin = await replayClient.getPointsBoundingTime(beginTime);
+      const serverEnd = await replayClient.getPointsBoundingTime(endTime);
+
+      if (beginTime - serverBegin.before.time < beginTime - begin.time) {
+        begin = serverBegin.before;
+      }
+      if (serverEnd.after.time - endTime < endTime - end.time) {
+        end = serverEnd.after;
+      }
 
       dispatch(
         newFocusRegion({
