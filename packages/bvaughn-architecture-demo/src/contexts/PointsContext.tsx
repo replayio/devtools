@@ -62,13 +62,9 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
 
   // Both high-pri state and transition state should be managed by useIndexedDB,
   // Else values from other tabs will only be synced to the high-pri state.
-  const {
-    setValue: setPoints,
-    status: pointsStatus,
-    value: points,
-  } = useIndexedDB<Point[]>({
+  const { setValue: setPoints, value: points } = useIndexedDB<Point[]>({
     database: POINTS_DATABASE,
-    initialValue: [],
+    initialValue: EMPTY_ARRAY,
     recordName: recordingId,
     storeName: "high-priority",
   });
@@ -78,7 +74,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     value: pointsForAnalysis,
   } = useIndexedDB<Point[]>({
     database: POINTS_DATABASE,
-    initialValue: [],
+    initialValue: EMPTY_ARRAY,
     recordName: recordingId,
     scheduleUpdatesAsTransitions: true,
     storeName: "transition",
@@ -162,20 +158,10 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       deletePoints,
       editPoint,
       isPending,
-      points: pointsStatus === "initialization-complete" ? points! : EMPTY_ARRAY,
-      pointsForAnalysis:
-        pointsForAnalysisStatus === "initialization-complete" ? pointsForAnalysis! : EMPTY_ARRAY,
+      points: points,
+      pointsForAnalysis: pointsForAnalysis,
     }),
-    [
-      addPoint,
-      deletePoints,
-      editPoint,
-      isPending,
-      points,
-      pointsForAnalysis,
-      pointsForAnalysisStatus,
-      pointsStatus,
-    ]
+    [addPoint, deletePoints, editPoint, isPending, points, pointsForAnalysis]
   );
 
   return <PointsContext.Provider value={context}>{children}</PointsContext.Provider>;
