@@ -2,7 +2,11 @@ import { MouseEvent, useLayoutEffect, useRef, useState } from "react";
 
 import { seekToTime, setTimelineToTime, stopPlayback } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
-import { isPlaying as isPlayingSelector, setTimelineState } from "ui/reducers/timeline";
+import {
+  isPlaying as isPlayingSelector,
+  setDragging,
+  setTimelineState,
+} from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getTimeFromPosition } from "ui/utils/timeline";
 
@@ -86,6 +90,8 @@ export default function Timeline() {
     );
     const isDragging = event.buttons === 1;
 
+    dispatch(setDragging(isDragging));
+
     if (hoverTime != mouseTime) {
       dispatch(setTimelineToTime(mouseTime, isDragging));
     }
@@ -102,6 +108,7 @@ export default function Timeline() {
       zoomRegion
     );
 
+    dispatch(setDragging(false));
     dispatch(seekToTime(mouseTime, resumePlaybackOnMouseUp));
 
     if (resumePlaybackOnMouseUp) {
