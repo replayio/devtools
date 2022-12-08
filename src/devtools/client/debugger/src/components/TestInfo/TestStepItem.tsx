@@ -157,13 +157,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
         setPauseId(localPauseData.endPauseId);
       }
       dispatch(seek(pointStart!, step.absoluteStartTime, false, localPauseData?.startPauseId));
-      dispatch(
-        setSelectedStep({
-          id,
-          startTime: step.absoluteStartTime,
-          endTime: step.absoluteEndTime - 1,
-        })
-      );
+      dispatch(setSelectedStep(step));
     }
   };
   const onMouseEnter = () => {
