@@ -35,6 +35,7 @@ export interface TimelineState {
   timelineDimensions: { width: number; left: number; top: number };
   unprocessedRegions: TimeRange[];
   zoomRegion: ZoomRegion;
+  dragging: boolean;
 }
 
 export interface HoveredItem {

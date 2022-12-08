@@ -2,13 +2,16 @@ import { Object as ProtocolObject, createPauseResult } from "@replayio/protocol"
 import React, { useContext, useEffect, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
-import { ThreadFront } from "protocol/thread";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { getCurrentPoint } from "ui/actions/app";
 import { seek, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
-import { getCurrentTime } from "ui/reducers/timeline";
+import {
+  getCurrentTime,
+  isDragging as isDraggingSelector,
+  isPlaying as isPlayingSelector,
+} from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AnnotatedTestStep } from "ui/types";
 
@@ -50,16 +53,20 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const client = useContext(ReplayClientContext);
   const { point: pointEnd, message: messageEnd } = step.annotations.end || {};
   const { point: pointStart } = step.annotations.start || {};
+  const isPlaying = useAppSelector(isPlayingSelector);
+  const isDragging = useAppSelector(isDraggingSelector);
+
+  const shouldUseTimes = isPlaying || isDragging;
 
   // compare points if possible and fall back to timestamps
   const currentPointBigInt = currentPoint ? BigInt(currentPoint) : null;
   const pointEndBigInt = pointEnd ? BigInt(pointEnd) : null;
   const isPast =
-    currentPointBigInt && pointEndBigInt
+    !shouldUseTimes && currentPointBigInt && pointEndBigInt
       ? currentPointBigInt > pointEndBigInt
       : currentTime > step.absoluteStartTime;
   const isPaused =
-    currentPointBigInt && pointEndBigInt && pointStart
+    !shouldUseTimes && currentPointBigInt && pointEndBigInt && pointStart
       ? currentPointBigInt >= BigInt(pointStart) && currentPointBigInt <= pointEndBigInt
       : currentTime >= step.absoluteStartTime && currentTime < step.absoluteEndTime;
 

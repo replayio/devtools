@@ -32,6 +32,7 @@ function initialTimelineState(): TimelineState {
     unprocessedRegions: [],
     /** @deprecated This appears to be obsolete for now? */
     zoomRegion: { beginTime: 0, endTime: 0, scale: 1 },
+    dragging: false,
   };
 }
 
@@ -39,6 +40,9 @@ const timelineSlice = createSlice({
   name: "timeline",
   initialState: initialTimelineState,
   reducers: {
+    setDragging(state, action: PayloadAction<boolean>) {
+      state.dragging = action.payload;
+    },
     setTimelineState(state, action: PayloadAction<Partial<TimelineState>>) {
       // This is poor action design and we should avoid this :(
       Object.assign(state, action.payload);
@@ -83,6 +87,7 @@ const lessThan = (a: number, b: number) => b - a > EPSILON;
 
 export const {
   allPaintsReceived,
+  setDragging,
   setHoveredItem,
   setPlaybackPrecachedTime,
   setPlaybackStalled,
@@ -134,6 +139,7 @@ export const getCurrentTime = (state: UIState) => state.timeline.currentTime;
 export const getHoverTime = (state: UIState) => state.timeline.hoverTime;
 export const getPlayback = (state: UIState) => state.timeline.playback;
 export const getShowFocusModeControls = (state: UIState) => state.timeline.showFocusModeControls;
+export const isDragging = (state: UIState) => state.timeline.dragging;
 export const isPlaying = (state: UIState) => state.timeline.playback !== null;
 export const isPlaybackStalled = (state: UIState) => state.timeline.stalled;
 export const getUnprocessedRegions = (state: UIState) => state.timeline.unprocessedRegions;
