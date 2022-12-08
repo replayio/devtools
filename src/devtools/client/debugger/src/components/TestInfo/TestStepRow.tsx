@@ -17,7 +17,7 @@ export function TestStepRow({
       {...rest}
       className={classnames(
         className,
-        "group/step relative flex items-start gap-1 border-b border-l-2 border-themeBase-90 px-3 py-2 font-mono hover:bg-toolbarBackground",
+        "group/step relative flex items-start gap-1 border-b border-l-2 border-themeBase-90 px-3 py-2 font-mono",
         {
           // border
           "border-l-transparent": pending,
@@ -25,6 +25,7 @@ export function TestStepRow({
           "border-l-primaryAccent": !pending && !error,
 
           // background / foreground
+          "hover:bg-toolbarBackground": !error,
           "bg-testsuitesErrorBgcolor text-testsuitesErrorColor hover:bg-testsuitesErrorBgcolorHover":
             !pending && error,
           "bg-toolbarBackground": !pending && !error,

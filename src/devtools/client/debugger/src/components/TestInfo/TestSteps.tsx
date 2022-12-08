@@ -205,13 +205,15 @@ export function TestSteps({ test }: { test: TestItem }) {
       />
       <TestSection events={afterEach} header="After Each" />
       {test.error ? (
-        <div className="border-l-2 border-red-500 bg-testsuitesErrorBgcolor text-testsuitesErrorColor">
-          <div className="flex flex-row items-center space-x-1 p-2">
-            <Icon filename="warning" size="small" className="bg-testsuitesErrorColor" />
-            <div className="font-bold">Error</div>
+        <TestStepRow error>
+          <div>
+            <div className="flex flex-row items-center space-x-1 p-2">
+              <Icon filename="warning" size="small" className="bg-testsuitesErrorColor" />
+              <div className="font-bold">Error</div>
+            </div>
+            <div className="wrap space-y-1 overflow-hidden p-2 font-mono">{test.error.message}</div>
           </div>
-          <div className="wrap space-y-1 overflow-hidden p-2 font-mono">{test.error.message}</div>
-        </div>
+        </TestStepRow>
       ) : null}
     </div>
   );
@@ -239,7 +241,11 @@ function TestSection({ events, header }: { events: CompositeTestEvent[]; header?
         ) : type === "network" ? (
           <NetworkEvent key={s.id} request={s} />
         ) : (
-          <TestStepRow pending={time > currentTime}>new url {s.url}</TestStepRow>
+          <TestStepRow pending={time > currentTime}>
+            <div className="truncate italic opacity-70" title={s.url}>
+              new url {s.url}
+            </div>
+          </TestStepRow>
         )
       )}
     </>

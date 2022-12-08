@@ -19,10 +19,16 @@ export function NetworkEvent({ request }: { request: RequestSummary }) {
     dispatch(selectAndFetchRequest(id));
   };
 
+  const pathname = new URL(url).pathname;
+
   return (
     <TestStepRow pending={!!end && end > currentTime} error={!!status && status >= 400}>
-      <button className="flex items-center italic opacity-70" onClick={onClick}>
-        {method} {status} {new URL(url).pathname}
+      <button
+        className="flex items-center truncate italic opacity-70"
+        onClick={onClick}
+        title={pathname}
+      >
+        {method} {status} {pathname}
       </button>
     </TestStepRow>
   );
