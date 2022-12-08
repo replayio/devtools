@@ -44,22 +44,22 @@
   width: 100%;
 }
 
-.PublishedContent,
-.UnpublishedContent {
+.Content {
   border: 1px solid transparent;
   border-radius: 0.5em;
   padding: 0.25em;
   margin: 0 0.5em;
 }
-.UnpublishedContent {
+
+.Unpublished {
   color: var(--theme-comment);
 }
-.PublishedContent:focus-within,
-.UnpublishedContent:focus-within {
+
+.Editing {
   background-color: var(--background-color-inputs);
   border-color: var(--border-color);
 }
-.PublishedContent p,
-.UnpublishedContent p {
+
+.Content p {
   margin: 0;
 }

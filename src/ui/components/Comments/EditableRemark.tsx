@@ -83,6 +83,14 @@ export default function EditableRemark({
     }
   };
 
+  const classNames = [styles.Content];
+  if (!remark.isPublished) {
+    classNames.push(styles.Unpublished);
+  }
+  if (isEditing) {
+    classNames.push(styles.Editing);
+  }
+
   return (
     <>
       <div className={styles.HeaderRow}>
@@ -102,10 +110,7 @@ export default function EditableRemark({
         )}
       </div>
 
-      <div
-        className={remark.isPublished ? styles.PublishedContent : styles.UnpublishedContent}
-        onDoubleClick={onDoubleClick}
-      >
+      <div className={classNames.join(" ")} onDoubleClick={onDoubleClick}>
         <CommentEditor
           autoFocus={isEditing}
           collaborators={collaborators}
