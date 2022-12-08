@@ -1,0 +1,13 @@
+.Link {
+  font-weight: bold;
+  text-decoration: underline;
+  color: var(--color-link);
+}
+
+[data-lexical-editor="true"][contenteditable="false"] .Editable {
+  display: none;
+}
+
+[data-lexical-editor="true"][contenteditable="true"] .ReadOnly {
+  display: none;
+}
