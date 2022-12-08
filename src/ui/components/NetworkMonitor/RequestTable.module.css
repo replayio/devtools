@@ -53,8 +53,6 @@ table.requests {
   background: var(--secondary-accent);
   height: 2px;
   width: 100%;
-  position: absolute;
-  bottom: 0;
 }
 
 .resizer {

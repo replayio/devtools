@@ -1,0 +1,16 @@
+.Highlight {
+  position: absolute;
+  left: 0;
+  z-index: 2;
+
+  display: flex;
+}
+
+.ActiveMark {
+  background-color: var(--search-result-active-background-color);
+  color: var(--search-result-active-color);
+}
+.InactiveMark {
+  background-color: var(--search-result-inactive-background-color);
+  color: var(--search-result-inactive-color);
+}

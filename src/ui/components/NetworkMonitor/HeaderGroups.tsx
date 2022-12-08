@@ -2,8 +2,6 @@ import classNames from "classnames";
 import React, { useState } from "react";
 import { Column, HeaderGroup } from "react-table";
 
-import { ContextMenu } from "../ContextMenu";
-import ColumnsDropdown from "./ColumnsDropdown";
 import { RequestSummary } from "./utils";
 import styles from "./RequestTable.module.css";
 
@@ -21,20 +19,7 @@ export function HeaderGroups({
 }) {
   const [menuLocation, setMenuLocation] = useState<MenuLocation>();
   return (
-    <div
-      className="border-b border-splitter bg-toolbarBackground"
-      onContextMenu={ev => {
-        ev.preventDefault();
-        setMenuLocation({ x: ev.pageX, y: ev.pageY });
-      }}
-    >
-      {menuLocation ? (
-        <ContextMenu x={menuLocation.x} y={menuLocation.y} close={() => setMenuLocation(undefined)}>
-          <ColumnsDropdown columns={columns} />
-        </ContextMenu>
-      ) : (
-        ""
-      )}
+    <div className="border-b border-splitter bg-toolbarBackground">
       {headerGroups.map((headerGroup: HeaderGroup<RequestSummary>) => {
         const { key, ...headerProps } = headerGroup.getHeaderGroupProps();
         return (

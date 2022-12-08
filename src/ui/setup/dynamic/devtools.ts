@@ -48,7 +48,6 @@ import { setupReporter } from "ui/actions/reporter";
 import { precacheScreenshots } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import app, { loadReceivedEvents, setVideoUrl } from "ui/reducers/app";
-import contextMenus from "ui/reducers/contextMenus";
 import network from "ui/reducers/network";
 import protocolMessages from "ui/reducers/protocolMessages";
 import reactDevTools from "ui/reducers/reactDevTools";
@@ -167,7 +166,6 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
 
   const reducers = {
     app,
-    contextMenus,
     network,
     reactDevTools,
     reporter,

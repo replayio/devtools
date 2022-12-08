@@ -87,7 +87,7 @@ const libraryMap = [
     contextPattern: /zone\.js/,
   },
   {
-    label: "@reduxjs/toolkit",
+    label: "Redux",
     pattern: /redux/i,
   },
   {

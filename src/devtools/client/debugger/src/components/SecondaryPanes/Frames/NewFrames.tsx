@@ -2,6 +2,7 @@ import { PauseId } from "@replayio/protocol";
 import { Suspense, useContext, useMemo } from "react";
 
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
+import { copyToClipboard } from "bvaughn-architecture-demo/components/sources/utils/clipboard";
 import { getPointAndTimeForPauseId } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import {
   Context,
@@ -23,7 +24,6 @@ import { isPointInRegions } from "ui/utils/timeline";
 
 import { selectFrame as selectFrameAction } from "../../../actions/pause/selectFrame";
 import { toggleFrameworkGrouping as setFrameworkGroupingAction } from "../../../reducers/ui";
-import { copyToTheClipboard } from "../../../utils/clipboard";
 import { getAllCachedPauseFrames } from "../../../utils/frames";
 import { collapseFrames, formatCopyName } from "../../../utils/pause/frames";
 import Frame from "./Frame";
@@ -148,7 +148,7 @@ function PauseFrames({
     const framesToCopy = getAllCachedPauseFrames(pauseId, sourcesState)
       ?.map(f => formatCopyName(f))
       .join("\n");
-    copyToTheClipboard(framesToCopy);
+    copyToClipboard(framesToCopy || "");
   }
 
   const commonProps: CommonFrameComponentProps = {

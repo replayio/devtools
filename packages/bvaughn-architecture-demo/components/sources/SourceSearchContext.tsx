@@ -22,10 +22,10 @@ export function SourceSearchContextRoot({ children }: { children: ReactNode }) {
 
   const focusedSourceId = focusedSource?.sourceId ?? null;
 
-  const [state, dispatch] = useSourceSearch(lineIndex => {
-    if (focusedSourceId !== null && lineIndex !== null) {
+  const [state, dispatch] = useSourceSearch(result => {
+    if (focusedSourceId != null && result != null) {
       // Update the highlighted line when the current search result changes.
-      openSource("search-result", focusedSourceId, lineIndex, lineIndex);
+      openSource("search-result", focusedSourceId, result.lineIndex, result.lineIndex);
     }
   });
 

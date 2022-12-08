@@ -4,11 +4,9 @@
 
 import kebabCase from "lodash/kebabCase";
 
+import { copyToClipboard } from "bvaughn-architecture-demo/components/sources/utils/clipboard";
 import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
-//
 import { showMenu } from "devtools/shared/contextmenu";
-
-import { copyToTheClipboard } from "../../../utils/clipboard";
 
 function formatMenuElement(label: string, accesskey: string, click: () => void, disabled = false) {
   const id = `node-menu-${kebabCase(label)}`;
@@ -22,7 +20,7 @@ function formatMenuElement(label: string, accesskey: string, click: () => void, 
 }
 
 function copySourceElement(url: string) {
-  return formatMenuElement("Copy source URI", "u", () => copyToTheClipboard(url));
+  return formatMenuElement("Copy source URI", "u", () => copyToClipboard(url));
 }
 
 function copyStackTraceElement(copyStackTrace: () => void) {

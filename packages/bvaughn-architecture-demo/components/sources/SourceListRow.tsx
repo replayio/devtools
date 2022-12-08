@@ -12,6 +12,9 @@ import {
 import { areEqual } from "react-window";
 
 import Icon from "bvaughn-architecture-demo/components/Icon";
+import SearchResultHighlight from "bvaughn-architecture-demo/components/sources/SearchResultHighlight";
+import { SourceSearchContext } from "bvaughn-architecture-demo/components/sources/SourceSearchContext";
+import useSourceContextMenu from "bvaughn-architecture-demo/components/sources/useSourceContextMenu";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import {
   AddPoint,
@@ -49,6 +52,7 @@ export type ItemData = {
 const SourceListRow = memo(
   ({ data, index, style }: { data: ItemData; index: number; style: CSSProperties }) => {
     const { isTransitionPending: isFocusRangePending } = useContext(FocusContext);
+    const [searchState] = useContext(SourceSearchContext);
 
     const [isHovered, setIsHovered] = useState(false);
 
@@ -237,6 +241,19 @@ const SourceListRow = memo(
       onLineMouseLeave(index, event.currentTarget as HTMLDivElement);
     };
 
+    const { contextMenu, onContextMenu } = useSourceContextMenu({
+      firstBreakableColumnIndex: lineHitCounts?.firstBreakableColumnIndex ?? null,
+      lineNumber,
+      sourceId: source.sourceId,
+      sourceUrl: source.url ?? null,
+    });
+
+    const currentSearchResult = searchState.results[searchState.index] || null;
+    const searchResultsForLine = useMemo(
+      () => searchState.results.filter(result => result.lineIndex === index),
+      [index, searchState.results]
+    );
+
     return (
       <div
         className={styles.Row}
@@ -253,7 +270,10 @@ const SourceListRow = memo(
           width: undefined,
         }}
       >
-        <div className={lineHasHits ? styles.LineWithHits : styles.LineWithoutHits}>
+        <div
+          className={lineHasHits ? styles.LineWithHits : styles.LineWithoutHits}
+          onContextMenu={onContextMenu}
+        >
           <div className={styles.LineNumber} data-test-id={`SourceLine-LineNumber-${lineNumber}`}>
             {lineNumber}
             <div
@@ -276,7 +296,19 @@ const SourceListRow = memo(
           )}
 
           <div className={styles.LineSegmentsAndPointPanel}>
+            {searchResultsForLine.map((result, resultIndex) => (
+              <SearchResultHighlight
+                key={resultIndex}
+                columnIndex={result.columnIndex}
+                isActive={result === currentSearchResult}
+                text={result.text}
+              />
+            ))}
+
             {lineSegments}
+
+            {/* Workaround for FE-1025 */}
+            <div className={styles.HoverButtonCompanion}></div>
 
             {isHovered && (
               <Suspense>
@@ -299,6 +331,8 @@ const SourceListRow = memo(
         </div>
 
         <CurrentLineHighlight lineNumber={lineNumber} sourceId={sourceId} />
+
+        {contextMenu}
       </div>
     );
   },

@@ -25,10 +25,10 @@ export function TestStepRow({
           "border-l-primaryAccent": !pending && !error,
 
           // background / foreground
-          "hover:bg-toolbarBackground": !error,
+          "hover:bg-toolbarBackgroundHover": !error,
           "bg-testsuitesErrorBgcolor text-testsuitesErrorColor hover:bg-testsuitesErrorBgcolorHover":
             !pending && error,
-          "bg-toolbarBackground": !pending && !error,
+          "bg-toolbarBackgroundHover": !pending && !error,
           "bg-testsuitesStepsBgcolor": pending,
         }
       )}
