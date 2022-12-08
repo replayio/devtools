@@ -86,7 +86,7 @@ function HeaderTitle({
   const contentEditableRef = useRef<HTMLSpanElement>(null);
   const updateRecordingTitle = hooks.useUpdateRecordingTitle();
 
-  const { metadata, title, userRole } = recording;
+  const { title, userRole } = recording;
 
   const canEditTitle = userRole !== "none";
   const hasTitle = title && title.length > 0;
@@ -106,10 +106,7 @@ function HeaderTitle({
     }
   }, [editState, hasTitle, title]);
 
-  const testName = metadata?.test?.title;
-  if (testName) {
-    return <span className={styles.ReadOnlyTitle}>{testName}</span>;
-  } else if (!canEditTitle) {
+  if (!canEditTitle) {
     return <span className={styles.ReadOnlyTitle}>{displayTitle}</span>;
   }
 
