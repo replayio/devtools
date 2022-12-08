@@ -122,10 +122,10 @@ function StreamingResults({
     () => streamingResults.fetchedCount
   );
 
-  const totalCount = useSyncExternalStore<number>(
+  const didOverflow = useSyncExternalStore<boolean>(
     streamingResults.subscribe,
-    () => streamingResults.totalCount,
-    () => streamingResults.totalCount
+    () => streamingResults.didOverflow,
+    () => streamingResults.didOverflow
   );
 
   const getResultIndexFromRowIndex = useCallback(
@@ -236,8 +236,6 @@ function StreamingResults({
     [getResultAtIndex, isLocationCollapsed, query, sources, toggleLocation]
   );
 
-  const showOverflowHeader = totalCount > fetchedCount;
-
   if (isComplete && orderedResults.length === 0) {
     return (
       <div className={styles.Results}>
@@ -257,7 +255,7 @@ function StreamingResults({
       className={isPending ? styles.ResultsPending : styles.Results}
       data-test-id="SourceSearch-Results"
     >
-      {showOverflowHeader && (
+      {didOverflow && (
         <div className={styles.OverflowHeader} data-test-id="SourceSearch-OverflowMessage">
           <Icon className={styles.OverflowIcon} type="warning" />
           The result set only contains a subset of all matches. Be more specific in your search to

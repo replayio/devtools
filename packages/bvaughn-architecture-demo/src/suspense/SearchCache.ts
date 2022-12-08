@@ -28,10 +28,10 @@ export type SourceSearchResult = SourceSearchResultLocation | SourceSearchResult
 
 export type StreamingSourceSearchResults = {
   complete: boolean;
+  didOverflow: boolean;
   fetchedCount: number;
   orderedResults: SourceSearchResult[];
   subscribe(subscriber: Subscriber): UnsubscribeFunction;
-  totalCount: number;
 };
 
 const MAX_SEARCH_RESULTS_TO_DISPLAY = 1_000;
@@ -72,6 +72,7 @@ export const {
 
     const result: StreamingSourceSearchResults = {
       complete: false,
+      didOverflow: false,
       fetchedCount: 0,
       orderedResults,
       subscribe: (subscriber: Subscriber) => {
@@ -80,7 +81,6 @@ export const {
           subscribers.delete(subscriber);
         };
       },
-      totalCount: 0,
     };
 
     if (sourceIdsWithNodeModules === null) {
@@ -96,34 +96,32 @@ export const {
     let currentResultLocation: SourceSearchResultLocation | null = null;
 
     client
-      .searchSources({ query, sourceIds }, (matches: SearchSourceContentsMatch[]) => {
-        result.totalCount += matches.length;
+      .searchSources(
+        { limit, query, sourceIds },
+        (matches: SearchSourceContentsMatch[], didOverflow: boolean) => {
+          result.didOverflow ||= didOverflow;
+          result.fetchedCount += matches.length;
 
-        for (let index = 0; index < matches.length; index++) {
-          if (result.fetchedCount >= limit) {
-            break;
+          for (let index = 0; index < matches.length; index++) {
+            const match = matches[index];
+
+            if (
+              currentResultLocation === null ||
+              currentResultLocation.location.sourceId !== match.location.sourceId
+            ) {
+              currentResultLocation = { location: match.location, matchCount: 0, type: "location" };
+
+              orderedResults.push(currentResultLocation);
+            }
+
+            currentResultLocation.matchCount++;
+
+            orderedResults.push({ match, type: "match" });
           }
 
-          result.fetchedCount++;
-
-          const match = matches[index];
-
-          if (
-            currentResultLocation === null ||
-            currentResultLocation.location.sourceId !== match.location.sourceId
-          ) {
-            currentResultLocation = { location: match.location, matchCount: 0, type: "location" };
-
-            orderedResults.push(currentResultLocation);
-          }
-
-          currentResultLocation.matchCount++;
-
-          orderedResults.push({ match, type: "match" });
+          notifySubscribers();
         }
-
-        notifySubscribers();
-      })
+      )
       .then(() => {
         result.complete = true;
 

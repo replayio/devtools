@@ -50,10 +50,10 @@ function StreamingInlineResultsCount({
     () => streamingResults.fetchedCount
   );
 
-  const totalCount = useSyncExternalStore(
+  const didOverflow = useSyncExternalStore(
     streamingResults.subscribe,
-    () => streamingResults.totalCount,
-    () => streamingResults.totalCount
+    () => streamingResults.didOverflow,
+    () => streamingResults.didOverflow
   );
 
   if (!isComplete) {
@@ -61,7 +61,7 @@ function StreamingInlineResultsCount({
   }
 
   let label = "";
-  switch (totalCount) {
+  switch (fetchedCount) {
     case 0:
       label = "No matches";
       break;
@@ -69,10 +69,10 @@ function StreamingInlineResultsCount({
       label = "1 result";
       break;
     default:
-      if (fetchedCount !== totalCount) {
+      if (didOverflow) {
         label = `first ${fetchedCount} results`;
       } else {
-        label = `${totalCount} results`;
+        label = `${fetchedCount} results`;
       }
       break;
   }
