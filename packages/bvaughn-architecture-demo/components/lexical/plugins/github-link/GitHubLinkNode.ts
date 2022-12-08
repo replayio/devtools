@@ -38,18 +38,17 @@ export class GitHubLinkNode extends TextNode {
     };
   }
 
-  createDOM(config: EditorConfig): HTMLElement {
-    const editableSpan = super.createDOM(config);
+  createDOM(_: EditorConfig): HTMLElement {
+    // const editableSpan = super.createDOM(config);
+    const editableSpan = document.createElement("span");
     editableSpan.className = styles.Editable;
-
-    const textContent = editableSpan.textContent ?? "";
 
     const readOnlyLink = document.createElement("a");
     readOnlyLink.className = styles.ReadOnly;
-    readOnlyLink.href = textContent;
     readOnlyLink.rel = "noreferrer";
     readOnlyLink.target = "_blank";
-    readOnlyLink.textContent = getFormattedText(textContent);
+
+    this._updateDOMText(editableSpan, readOnlyLink);
 
     const dom = document.createElement("span");
     dom.className = styles.Link;
@@ -57,6 +56,28 @@ export class GitHubLinkNode extends TextNode {
     dom.appendChild(readOnlyLink);
 
     return dom;
+  }
+
+  updateDOM(_: TextNode, dom: HTMLElement, __: EditorConfig): boolean {
+    // if (super.updateDOM(prevNode, dom, config)) {
+    //   return true;
+    // }
+    const editableSpan = dom.children[0] as HTMLSpanElement;
+    const readOnlyLink = dom.children[1] as HTMLAnchorElement;
+
+    this._updateDOMText(editableSpan, readOnlyLink);
+
+    return false;
+  }
+
+  _updateDOMText(editableSpan: HTMLSpanElement, readOnlyLink: HTMLAnchorElement) {
+    const text = this.__text;
+    console.log(`_updateDOMText: "${text}"`);
+
+    editableSpan.textContent = text;
+
+    readOnlyLink.href = text;
+    readOnlyLink.textContent = getFormattedText(text);
   }
 
   canInsertTextBefore(): boolean {
