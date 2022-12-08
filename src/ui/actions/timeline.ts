@@ -4,6 +4,7 @@ import sortedLastIndexBy from "lodash/sortedLastIndexBy";
 
 import { framePositionsCleared, resumed } from "devtools/client/debugger/src/reducers/pause";
 import {
+  addLastScreen,
   gPaintPoints,
   getFirstMeaningfulPaint,
   getGraphicsAtTime,
@@ -203,7 +204,16 @@ export function setTimelineToPauseTime(
     dispatch(setTimelineToTime(time));
 
     if (time) {
-      repaintAtPause(time, pauseId, time => getHoverTime(getState()) !== time, force, point);
+      const screenshot = await repaintAtPause(
+        time,
+        pauseId,
+        time => getHoverTime(getState()) !== time,
+        force
+      );
+
+      if (screenshot && point) {
+        addLastScreen(screenshot, point, time);
+      }
     }
   };
 }

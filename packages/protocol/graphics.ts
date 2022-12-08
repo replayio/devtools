@@ -299,8 +299,7 @@ export async function repaintAtPause(
   time: number,
   pauseId: string,
   shouldCancelRepaint: (time: number, pauseId: string) => boolean,
-  force = false,
-  point?: string
+  force = false
 ) {
   const recordingCapabilities = await ThreadFront.getRecordingCapabilities();
   if (!recordingCapabilities.supportsRepaintingGraphics) {
@@ -313,13 +312,7 @@ export async function repaintAtPause(
     const { mouse } = await getGraphicsAtTime(time);
     paintGraphics(screenshot, mouse);
 
-    if (point) {
-      insertEntrySorted(gPaintPoints, {
-        time,
-        point,
-        paintHash: screenshot.hash,
-      });
-    }
+    return screenshot;
   }
 }
 
