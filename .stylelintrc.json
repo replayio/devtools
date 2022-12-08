@@ -1,6 +1,10 @@
 {
-  "configBasedir": "packages/bvaughn-architecture-demo/",
+  "configBasedir": ".",
   "extends": ["stylelint-config-prettier"],
+  "ignoreFiles": [
+    "pages/**/*.css",
+    "src/**/*.css"
+  ],
   "rules": {
     "unit-disallowed-list": ["em"]
   }
