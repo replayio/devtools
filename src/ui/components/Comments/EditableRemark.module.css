@@ -45,8 +45,7 @@
 }
 
 .Content {
-  border: 1px solid transparent;
-  border-radius: 0.5em;
+  border-radius: 0.25em;
   padding: 0.25em;
   margin: 0 0.5em;
 }
@@ -57,7 +56,6 @@
 
 .Editing {
   background-color: var(--background-color-inputs);
-  border-color: var(--border-color);
 }
 
 .Content p {
