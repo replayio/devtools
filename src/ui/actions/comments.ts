@@ -42,7 +42,7 @@ export function setHoveredComment(comment: any): SetHoveredComment {
 
 export function createComment(
   time: number,
-  point: string | null,
+  point: string,
   recordingId: RecordingId,
   options: CommentOptions
 ): UIThunkAction {
@@ -85,7 +85,14 @@ export function createFrameComment(
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const state = getState();
     const currentTime = getCurrentTime(state);
-    const executionPoint = getExecutionPoint(state);
+
+    // Comments require execution points;
+    // but if the current time is within an unloaded region, the client might not know the execution point.
+    // In this case we should ask the server for a nearby point.
+    let executionPoint = getExecutionPoint(state);
+    if (executionPoint === null) {
+      executionPoint = (await replayClient.getPointNearTime(currentTime)).point.point;
+    }
 
     // Only try to generate a sourceLocation if there's a corresponding breakpoint for this frame comment.
     const sourceLocation = breakpoint
@@ -118,10 +125,17 @@ export function createFloatingCodeComment(
   recordingId: RecordingId,
   breakpoint: any
 ): UIThunkAction {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { replayClient }) => {
     const state = getState();
     const currentTime = getCurrentTime(state);
-    const executionPoint = getExecutionPoint(state);
+
+    // Comments require execution points;
+    // but if the current time is within an unloaded region, the client might not know the execution point.
+    // In this case we should ask the server for a nearby point.
+    let executionPoint = getExecutionPoint(state);
+    if (executionPoint === null) {
+      executionPoint = (await replayClient.getPointNearTime(currentTime)).point.point;
+    }
 
     dispatch(
       createComment(currentTime, executionPoint, recordingId, {
@@ -137,10 +151,17 @@ export function createNetworkRequestComment(
   request: RequestSummary,
   recordingId: RecordingId
 ): UIThunkAction {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { replayClient }) => {
     const state = getState();
     const time = request.triggerPoint?.time ?? getCurrentTime(state);
-    const executionPoint = request.triggerPoint?.point || getExecutionPoint(state);
+
+    // Comments require execution points;
+    // but if the current time is within an unloaded region, the client might not know the execution point.
+    // In this case we should ask the server for a nearby point.
+    let executionPoint = request.triggerPoint?.point || getExecutionPoint(state);
+    if (executionPoint === null) {
+      executionPoint = (await replayClient.getPointNearTime(time)).point.point;
+    }
 
     dispatch(
       createComment(time, executionPoint, recordingId, {
