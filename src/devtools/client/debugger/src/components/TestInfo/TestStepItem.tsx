@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { getCurrentPoint } from "ui/actions/app";
-import { seek, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
+import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
 import {
@@ -147,12 +147,17 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   }, [client, messageEnd, pointEnd, pointStart]);
 
   const onClick = () => {
-    if (id && pointStart) {
-      if (localPauseData?.endPauseId && localPauseData.consoleProps) {
-        setConsoleProps(localPauseData.consoleProps);
-        setPauseId(localPauseData.endPauseId);
+    if (id) {
+      if (pointStart) {
+        if (localPauseData?.endPauseId && localPauseData.consoleProps) {
+          setConsoleProps(localPauseData.consoleProps);
+          setPauseId(localPauseData.endPauseId);
+        }
+        dispatch(seek(pointStart!, step.absoluteStartTime, false, localPauseData?.startPauseId));
+      } else {
+        dispatch(seekToTime(step.absoluteStartTime, false));
       }
-      dispatch(seek(pointStart!, step.absoluteStartTime, false, localPauseData?.startPauseId));
+
       dispatch(setSelectedStep(step));
     }
   };
