@@ -56,6 +56,8 @@ export enum FocusOperation {
 }
 
 export type PlaybackOptions = {
+  beginPoint?: string;
+  endPoint?: string;
   beginTime: number | null;
   endTime: number | null;
 };

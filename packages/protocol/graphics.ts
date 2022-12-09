@@ -244,7 +244,12 @@ export function setupGraphics() {
   });
 }
 
-async function fetchScreenshotForPause(pauseId: string, force = false) {
+export async function fetchScreenshotForPause(pauseId: string, force = false) {
+  const recordingCapabilities = await ThreadFront.getRecordingCapabilities();
+  if (!recordingCapabilities.supportsRepaintingGraphics) {
+    return;
+  }
+
   let graphicsFetched = false;
 
   let didStall = false;
@@ -301,16 +306,22 @@ export async function repaintAtPause(
   shouldCancelRepaint: (time: number, pauseId: string) => boolean,
   force = false
 ) {
-  const recordingCapabilities = await ThreadFront.getRecordingCapabilities();
-  if (!recordingCapabilities.supportsRepaintingGraphics) {
-    return;
-  }
-
   const screenshot = await fetchScreenshotForPause(pauseId, force);
 
   if (screenshot && !shouldCancelRepaint(time, pauseId)) {
     const { mouse } = await getGraphicsAtTime(time);
     paintGraphics(screenshot, mouse);
+
+    return screenshot;
+  }
+}
+
+export async function addScreenForPoint(point: string, time: number) {
+  const pauseResult = await replayClient.createPause(point);
+  const screenshot = await fetchScreenshotForPause(pauseResult.pauseId);
+
+  if (screenshot) {
+    addLastScreen(screenshot, point, time);
 
     return screenshot;
   }

@@ -1,10 +1,11 @@
-import { ExecutionPoint, PauseId } from "@replayio/protocol";
+import { ExecutionPoint, PauseId, ScreenShot } from "@replayio/protocol";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import sortedLastIndexBy from "lodash/sortedLastIndexBy";
 
 import { framePositionsCleared, resumed } from "devtools/client/debugger/src/reducers/pause";
 import {
   addLastScreen,
+  addScreenForPoint,
   gPaintPoints,
   getFirstMeaningfulPaint,
   getGraphicsAtTime,
@@ -315,7 +316,7 @@ export function togglePlayback(): UIThunkAction {
 }
 
 export function startPlayback(
-  { beginTime: optBeginTime, endTime: optEndTime }: PlaybackOptions = {
+  { beginTime: optBeginTime, endTime: optEndTime, beginPoint, endPoint }: PlaybackOptions = {
     beginTime: null,
     endTime: null,
   }
@@ -340,7 +341,9 @@ export function startPlayback(
       })
     );
 
-    dispatch(playback(beginTime, endTime));
+    dispatch(
+      playbackPoints({ time: beginTime, point: beginPoint }, { time: endTime, point: endPoint })
+    );
   };
 }
 
@@ -368,15 +371,33 @@ export function replayPlayback(): UIThunkAction {
 }
 
 export function playback(beginTime: number, endTime: number): UIThunkAction {
-  return async (dispatch, getState) => {
+  return async dispatch => {
+    dispatch(playbackPoints({ time: beginTime }, { time: endTime }));
+  };
+}
+
+export function playbackPoints(
+  begin: { time: number; point?: string },
+  end: { time: number; point?: string }
+): UIThunkAction {
+  return async (dispatch, getState, { replayClient }) => {
     let beginDate = Date.now();
     let currentDate = beginDate;
-    let currentTime = beginTime;
+    let currentTime = begin.time;
     let nextGraphicsTime!: number;
     let nextGraphicsPromise!: ReturnType<typeof getGraphicsAtTime>;
+    let endPointScreenPromise: Promise<ScreenShot | undefined> = Promise.resolve(undefined);
+
+    if (begin.point) {
+      await addScreenForPoint(begin.point, begin.time);
+    }
+
+    if (end.point) {
+      endPointScreenPromise = addScreenForPoint(end.point, end.time);
+    }
 
     const prepareNextGraphics = () => {
-      nextGraphicsTime = snapTimeForPlayback(nextPaintOrMouseEvent(currentTime)?.time || endTime);
+      nextGraphicsTime = snapTimeForPlayback(nextPaintOrMouseEvent(currentTime)?.time || end.time);
       nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime, true);
       dispatch(precacheScreenshots(nextGraphicsTime));
     };
@@ -390,18 +411,23 @@ export function playback(beginTime: number, endTime: number): UIThunkAction {
       }
 
       currentDate = Date.now();
-      currentTime = beginTime + (currentDate - beginDate);
+      currentTime = begin.time + (currentDate - beginDate);
 
-      if (currentTime > endTime) {
-        dispatch(seekToTime(endTime));
-        return dispatch(setTimelineState({ currentTime: endTime, playback: null }));
+      if (currentTime > end.time) {
+        if (end.point) {
+          await endPointScreenPromise;
+          dispatch(seek(end.point, end.time, false));
+        } else {
+          dispatch(seekToTime(end.time));
+        }
+        return dispatch(setTimelineState({ currentTime: end.time, playback: null }));
       }
 
       dispatch(resumed());
       dispatch(
         setTimelineState({
           currentTime,
-          playback: { beginTime, beginDate, time: currentTime },
+          playback: { beginTime: begin.time, beginDate, time: currentTime },
         })
       );
 
@@ -424,12 +450,12 @@ export function playback(beginTime: number, endTime: number): UIThunkAction {
           // 100 milliseconds, we reset `beginTime` and `beginDate` as if playback had
           // begun right now.
           if (Date.now() - currentDate > 100) {
-            beginTime = currentTime;
+            begin.time = currentTime;
             beginDate = Date.now();
             dispatch(
               setTimelineState({
                 currentTime,
-                playback: { beginTime, beginDate, time: currentTime },
+                playback: { beginTime: begin.time, beginDate, time: currentTime },
               })
             );
           }
