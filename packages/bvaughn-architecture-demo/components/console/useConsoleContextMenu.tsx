@@ -3,6 +3,7 @@ import { useContext } from "react";
 import ContextMenuDivider from "bvaughn-architecture-demo/components/context-menu/ContextMenuDivider";
 import ContextMenuItem from "bvaughn-architecture-demo/components/context-menu/ContextMenuItem";
 import useContextMenu from "bvaughn-architecture-demo/components/context-menu/useContextMenu";
+import Icon from "bvaughn-architecture-demo/components/Icon";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
@@ -42,10 +43,16 @@ export default function useConsoleContextMenu(loggable: Loggable) {
   return useContextMenu(
     <>
       <ContextMenuItem dataTestId="ConsoleContextMenu-SetFocusStartButton" onClick={setFocusBegin}>
-        Set focus start
+        <>
+          <Icon type="set-focus-start" />
+          Set focus start
+        </>
       </ContextMenuItem>
       <ContextMenuItem dataTestId="ConsoleContextMenu-SetFocusEndButton" onClick={setFocusEnd}>
-        Set focus end
+        <>
+          <Icon type="set-focus-end" />
+          Set focus end
+        </>
       </ContextMenuItem>
       {isPointInstance(loggable) && (
         <>

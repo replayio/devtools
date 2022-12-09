@@ -1,7 +1,9 @@
 import { ReactNode } from "react";
 
+import styles from "./Icon.module.css";
+
 export default function Icon({
-  className,
+  className = styles.DefaultIcon,
   type,
 }: {
   className?: string;
@@ -40,6 +42,8 @@ export default function Icon({
     | "rewind"
     | "save"
     | "search"
+    | "set-focus-end"
+    | "set-focus-start"
     | "share"
     | "source-explorer"
     | "spinner"
@@ -186,6 +190,38 @@ export default function Icon({
     case "search":
       path =
         "M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z";
+      break;
+    case "set-focus-end":
+      path = (
+        <>
+          <path
+            fill="currentColor"
+            d="M20.0885 12.1788C19.9705 12.0987 19.9705 11.9013 20.0885 11.8212L22.7303 10.0288C22.8497 9.94777 23 10.0474 23 10.2076L23 13.7924C23 13.9526 22.8497 14.0522 22.7303 13.9712L20.0885 12.1788Z"
+          />
+          <path
+            fill="currentColor"
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M8 7C6.89543 7 6 7.89543 6 9V15C6 16.1046 6.89543 17 8 17H16C17.1046 17 18 16.1046 18 15V9C18 7.89543 17.1046 7 16 7H8ZM15 7.71429H9V16.2857H15V7.71429Z"
+          />
+        </>
+      );
+      break;
+    case "set-focus-start":
+      path = (
+        <>
+          <path
+            fill="curentColor"
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M8 7C6.89543 7 6 7.89543 6 9V15C6 16.1046 6.89543 17 8 17H16C17.1046 17 18 16.1046 18 15V9C18 7.89543 17.1046 7 16 7H8ZM15 7.71429H9V16.2857H15V7.71429Z"
+          />
+          <path
+            fill="curentColor"
+            d="M3.91147 11.8212C4.02951 11.9013 4.02951 12.0987 3.91147 12.1788L1.26968 13.9712C1.15029 14.0522 1 13.9526 1 13.7924V10.2076C1 10.0474 1.15029 9.94777 1.26968 10.0288L3.91147 11.8212Z"
+          />
+        </>
+      );
       break;
     case "share":
       path = "M2.01 21L23 12 2.01 3 2 10l15 2-15 2z";
