@@ -33,7 +33,7 @@ export async function preloadIDBInitialValues(
   if (recordingId) {
     for (let dbOptions of idbPrefsDatabase) {
       for (let storeName of dbOptions.storeNames) {
-        idbPrefsPromises.push(getInitialIDBValueAsync(dbOptions, storeName, recordingId));
+        idbPrefsPromises.push(getLatestIDBValueAsync(dbOptions, storeName, recordingId));
       }
     }
   }
@@ -66,9 +66,10 @@ export const {
 );
 
 export const {
-  getValueSuspense: getInitialIDBValueSuspense,
-  getValueAsync: getInitialIDBValueAsync,
-  getValueIfCached: getInitialIDBValueIfCached,
+  getValueSuspense: getLatestIDBValueSuspense,
+  getValueAsync: getLatestIDBValueAsync,
+  getValueIfCached: getLatestIDBValueIfCached,
+  addValue: setLatestIDBValue,
 } = createGenericCache<[dbOptions: IDBOptions, storeName: string, recordName: string], any>(
   async (dbOptions, storeName, recordName) => {
     // Only look up this initial stored value once
@@ -112,7 +113,7 @@ export default function useIndexedDB<T>(options: {
     // In order for persistence to work properly, `getInitialIDBValueAsync` _must_ have been
     // called in an early app entry point (such as `src/ui/setup/index.ts::bootstrapApp()`, or `components/Initializer.tsx`).
     return (
-      getInitialIDBValueIfCached(options.database, storeName, recordName)?.value ?? initialValue
+      getLatestIDBValueIfCached(options.database, storeName, recordName)?.value ?? initialValue
     );
   });
   const [status, setStatus] = useState<Status>(STATUS_INITIALIZATION_PENDING);
@@ -136,8 +137,11 @@ export default function useIndexedDB<T>(options: {
       // Only sync data to IDB after we've finished reading it,
       // to avoid accidentally overwriting with the initial value
       databaseRef.current?.put(storeName, value, recordName);
+      // Also overwrite the cached value so that we can synchronously read
+      // this if the hook unmounts and remounts in the same session.
+      setLatestIDBValue(value, options.database, storeName, recordName);
     }
-  }, [value, recordName, storeName, status]);
+  }, [value, options.database, recordName, storeName, status]);
 
   useEffect(() => {
     async function setupDatabaseForHook() {
