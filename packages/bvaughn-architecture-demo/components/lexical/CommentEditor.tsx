@@ -46,8 +46,6 @@ import LoomLinkPlugin from "./plugins/loom-link/LoomLinkPlugin";
 import MentionsPlugin from "./plugins/mentions/MentionsPlugin";
 import MentionsTextNode from "./plugins/mentions/MentionsTextNode";
 import { Collaborator } from "./plugins/mentions/types";
-import { ReplayLinkNode } from "./plugins/replay-link/ReplayLinkNode";
-import ReplayLinkPlugin from "./plugins/replay-link/ReplayLinkPlugin";
 import styles from "./styles.module.css";
 
 // The comment editor only supports a subset of markdown formatting.
@@ -68,7 +66,6 @@ const NODES: Array<Klass<LexicalNode>> = [
   MarkNode,
   MentionsTextNode,
   ParagraphNode,
-  ReplayLinkNode,
   TextNode,
 ];
 
@@ -255,7 +252,6 @@ export default function CommentEditor({
           <FormPlugin onCancel={onFormCancel} onSubmit={onFormSubmit} />
           <CommentPlugin />
           <LoomLinkPlugin />
-          <ReplayLinkPlugin />
           <AutoLinkPlugin />
           {collaborators !== null ? (
             <MentionsPlugin

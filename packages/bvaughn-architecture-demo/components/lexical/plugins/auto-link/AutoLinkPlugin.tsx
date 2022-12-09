@@ -4,11 +4,12 @@ import type { ElementNode, LexicalNode } from "lexical";
 import { $createTextNode, $isElementNode, $isLineBreakNode, $isTextNode, TextNode } from "lexical";
 import { useEffect } from "react";
 
+import MATCHERS from "./AutoLinkMatchers";
 import { $createAutoLinkNode, $isAutoLinkNode, $isLinkNode, AutoLinkNode } from "./AutoLinkNode";
 
 // Forked with modifications from packages/lexical-react/src/LexicalAutoLinkPlugin
 
-type LinkMatcherResult = {
+export type LinkMatch = {
   formattedText: string | null;
   index: number;
   length: number;
@@ -39,10 +40,9 @@ export default function AutoLinkPlugin(): null {
   return null;
 }
 
-function findFirstMatch(text: string): LinkMatcherResult | null {
-  for (let i = 0; i < LINK_MATCHERS.length; i++) {
-    const match = LINK_MATCHERS[i](text);
-
+function findFirstMatch(text: string): LinkMatch | null {
+  for (let i = 0; i < MATCHERS.length; i++) {
+    const match = MATCHERS[i](text);
     if (match) {
       return match;
     }
@@ -51,7 +51,7 @@ function findFirstMatch(text: string): LinkMatcherResult | null {
   return null;
 }
 
-const PUNCTUATION_OR_SPACE = /[.,;\s]/;
+const PUNCTUATION_OR_SPACE = /[.,;!\s]/;
 
 function isSeparator(char: string): boolean {
   return PUNCTUATION_OR_SPACE.test(char);
@@ -136,7 +136,6 @@ function handleLinkCreation(node: TextNode): void {
           invalidMatchEnd + matchStart + matchLength
         );
       }
-      console.log("match:", match);
       const linkNode = $createAutoLinkNode(match.url, match.formattedText);
       const textNode = $createTextNode(match.text);
       textNode.setFormat(linkTextNode.getFormat());
@@ -212,69 +211,3 @@ function replaceWithChildren(node: ElementNode): Array<LexicalNode> {
   node.remove();
   return children.map(child => child.getLatest());
 }
-
-// TODO Add Replay matcher here
-
-const GITHUB_URL_MATCHER =
-  /((https?:\/\/(www\.)?)|(www\.))github\.com\/([^\/]+)\/([^\/]+)\/(issues|pull)\/([0-9]+)/;
-
-const URL_MATCHER =
-  /((https?:\/\/(www\.)?)|(www\.))[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
-
-const EMAIL_MATCHER =
-  /(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
-
-const LINK_MATCHERS = [
-  (text: string) => {
-    const match = GITHUB_URL_MATCHER.exec(text);
-    if (match === null) {
-      return null;
-    }
-
-    const fullMatch = match[0];
-
-    const organization = match[5]; // e.g. github.com/[replayio]/devtools/issues/123
-    const project = match[6]; // e.g. github.com/replayio/[devtools]/issues/123
-    const number = match[8]; // e.g. github.com/replayio/devtools/issues/[123]
-
-    const formattedText = `#${number} (${organization}/${project})`;
-
-    return {
-      formattedText,
-      index: match.index,
-      length: fullMatch.length,
-      text: fullMatch,
-      url: fullMatch.startsWith("http") ? fullMatch : `https://${fullMatch}`,
-    };
-  },
-  (text: string) => {
-    const match = URL_MATCHER.exec(text);
-    if (match === null) {
-      return null;
-    }
-
-    const fullMatch = match[0];
-    return {
-      formattedText: null,
-      index: match.index,
-      length: fullMatch.length,
-      text: fullMatch,
-      url: fullMatch.startsWith("http") ? fullMatch : `https://${fullMatch}`,
-    };
-  },
-  (text: string) => {
-    const match = EMAIL_MATCHER.exec(text);
-    if (match === null) {
-      return null;
-    }
-
-    const fullMatch = match[0];
-    return {
-      formattedText: null,
-      index: match.index,
-      length: fullMatch.length,
-      text: fullMatch,
-      url: `mailto:${fullMatch}`,
-    };
-  },
-];
