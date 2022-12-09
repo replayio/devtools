@@ -49,7 +49,7 @@ import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { RecordingCapabilities } from "protocol/thread/thread";
-import { binarySearch, compareNumericStrings, defer } from "protocol/utils";
+import { binarySearch, compareNumericStrings, defer, waitForTime } from "protocol/utils";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import { isPointInRegions, isRangeInRegions, isTimeInRegions } from "shared/utils/time";
@@ -799,6 +799,14 @@ export class ReplayClient implements ReplayClientInterface {
       );
     } finally {
       client.Debugger.removeFunctionsMatchesListener(matchesListener);
+    }
+
+    // Because the matches callback is throttled, we may still have a bit of
+    // leftover data that hasn't been handled yet, even though the server API
+    // promise has resolved. Delay-loop until that's done, so that the logic
+    // that called this method knows when it's safe to continue.
+    while (pendingMatches.length > 0) {
+      await waitForTime(10);
     }
   }
 
