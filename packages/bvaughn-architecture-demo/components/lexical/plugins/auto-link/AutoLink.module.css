@@ -1,0 +1,12 @@
+.Link {
+  font-weight: bold;
+  text-decoration: underline;
+  color: var(--color-link);
+}
+
+[data-lexical-editor="true"][contenteditable="false"] .Link[data-lexical-formatted-link] span {
+  display: none;
+}
+[data-lexical-editor="true"][contenteditable="false"] .Link[data-lexical-formatted-link]::after {
+  content: attr(data-lexical-formatted-link);
+}

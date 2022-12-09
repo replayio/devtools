@@ -33,6 +33,8 @@ import {
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import LexicalEditorRefSetter from "./LexicalEditorRefSetter";
+import { AutoLinkNode } from "./plugins/auto-link/AutoLinkNode";
+import AutoLinkPlugin from "./plugins/auto-link/AutoLinkPlugin";
 import CommentPlugin from "./plugins/comment/CommentPlugin";
 import parseMarkdownString from "./plugins/comment/utils/parseMarkdownString";
 import parseTipTapJson from "./plugins/comment/utils/parseTipTapJson";
@@ -44,8 +46,6 @@ import LoomLinkPlugin from "./plugins/loom-link/LoomLinkPlugin";
 import MentionsPlugin from "./plugins/mentions/MentionsPlugin";
 import MentionsTextNode from "./plugins/mentions/MentionsTextNode";
 import { Collaborator } from "./plugins/mentions/types";
-import { ReplayLinkNode } from "./plugins/replay-link/ReplayLinkNode";
-import ReplayLinkPlugin from "./plugins/replay-link/ReplayLinkPlugin";
 import styles from "./styles.module.css";
 
 // The comment editor only supports a subset of markdown formatting.
@@ -60,12 +60,12 @@ const MARKDOWN_TRANSFORMERS = [
 ];
 
 const NODES: Array<Klass<LexicalNode>> = [
+  AutoLinkNode,
   LineBreakNode,
   LoomLinkNode,
   MarkNode,
   MentionsTextNode,
   ParagraphNode,
-  ReplayLinkNode,
   TextNode,
 ];
 
@@ -173,9 +173,11 @@ export default function CommentEditor({
   useEffect(() => {
     const editor = editorRef.current;
     if (editor) {
-      backupEditorStateRef.current = editor.getEditorState();
+      if (editable) {
+        backupEditorStateRef.current = editor.getEditorState();
+      }
     }
-  }, [editorRef]);
+  }, [editable, editorRef]);
 
   const onFormCancel = useCallback((_: EditorState) => {
     const { onCancel } = committedStateRef.current;
@@ -250,7 +252,7 @@ export default function CommentEditor({
           <FormPlugin onCancel={onFormCancel} onSubmit={onFormSubmit} />
           <CommentPlugin />
           <LoomLinkPlugin />
-          <ReplayLinkPlugin />
+          <AutoLinkPlugin />
           {collaborators !== null ? (
             <MentionsPlugin
               collaborators={collaborators}
