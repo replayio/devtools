@@ -12,12 +12,13 @@ export default class CodeNode extends ElementNode {
     return new CodeNode(node.__key);
   }
 
-  createDOM(config: EditorConfig): HTMLElement {
+  createDOM(_: EditorConfig): HTMLElement {
     const dom = document.createElement("div");
+    dom.setAttribute("spellcheck", "false");
     return dom;
   }
 
-  updateDOM(prevNode: CodeNode, dom: HTMLElement): boolean {
+  updateDOM(_: CodeNode, __: HTMLElement): boolean {
     return false;
   }
 
@@ -29,7 +30,7 @@ export default class CodeNode extends ElementNode {
     };
   }
 
-  static importJSON(serializedNode: SerializedCodeNode): CodeNode {
+  static importJSON(_: SerializedCodeNode): CodeNode {
     const node = $createCodeNode();
     return node;
   }
