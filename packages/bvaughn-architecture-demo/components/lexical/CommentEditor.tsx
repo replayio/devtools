@@ -177,9 +177,11 @@ export default function CommentEditor({
   useEffect(() => {
     const editor = editorRef.current;
     if (editor) {
-      backupEditorStateRef.current = editor.getEditorState();
+      if (editable) {
+        backupEditorStateRef.current = editor.getEditorState();
+      }
     }
-  }, [editorRef]);
+  }, [editable, editorRef]);
 
   const onFormCancel = useCallback((_: EditorState) => {
     const { onCancel } = committedStateRef.current;
