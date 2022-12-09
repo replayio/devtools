@@ -14,10 +14,7 @@ import { VariableSizeList as List, ListOnItemsRenderedProps } from "react-window
 
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import {
-  SourcesContext,
-  SourcesContextRoot,
-} from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
 import {
   StreamingSourceContents,

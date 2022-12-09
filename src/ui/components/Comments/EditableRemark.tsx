@@ -2,6 +2,8 @@ import { SerializedEditorState } from "lexical";
 import { useState } from "react";
 
 import CommentEditor from "bvaughn-architecture-demo/components/lexical/CommentEditor";
+import useCommentContextMenu from "ui/components/Comments/useCommentContextMenu";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useUpdateComment, useUpdateCommentReply } from "ui/hooks/comments/comments";
 import useDeleteComment from "ui/hooks/comments/useDeleteComment";
 import useDeleteCommentReply from "ui/hooks/comments/useDeleteCommentReply";
@@ -11,7 +13,6 @@ import type { Comment, Remark } from "ui/state/comments";
 import { formatRelativeTime } from "ui/utils/comments";
 
 import { AvatarImage } from "../Avatar";
-import RemarkDropDown from "./RemarkDropDown";
 import styles from "./EditableRemark.module.css";
 
 export default function EditableRemark({
@@ -46,18 +47,6 @@ export default function EditableRemark({
     setIsEditing(true);
   };
 
-  const deleteRemark = async () => {
-    if (type === "comment") {
-      await deleteComment(remarkId);
-    } else {
-      await deleteCommentReply(remarkId);
-    }
-  };
-
-  const publishRemark = () => {
-    saveChanges(JSON.parse(content));
-  };
-
   const discardPendingChanges = () => {
     setIsEditing(false);
   };
@@ -77,6 +66,18 @@ export default function EditableRemark({
     setIsPending(false);
   };
 
+  const deleteRemark = async () => {
+    setIsPending(true);
+
+    if (type === "comment") {
+      await deleteComment(remark.id);
+    } else {
+      await deleteCommentReply(remark.id);
+    }
+
+    setIsPending(false);
+  };
+
   const onDoubleClick = () => {
     if (canEdit) {
       startEditing();
@@ -91,6 +92,14 @@ export default function EditableRemark({
     classNames.push(styles.Editing);
   }
 
+  const { contextMenu, onContextMenu } = useCommentContextMenu({
+    deleteRemark: deleteRemark,
+    editRemark: startEditing,
+    remark: remark,
+    saveRemark: saveChanges,
+    type: type,
+  });
+
   return (
     <>
       <div className={styles.HeaderRow}>
@@ -99,15 +108,10 @@ export default function EditableRemark({
           {user?.name}
         </div>
         <div className={styles.Time}>{formatRelativeTime(new Date(remark.createdAt))}</div>
-        {showOptionsMenu && (
-          <RemarkDropDown
-            deleteRemark={deleteRemark}
-            isPublished={!!remark.isPublished}
-            publishRemark={publishRemark}
-            startEditing={startEditing}
-            type={type}
-          />
-        )}
+
+        <MaterialIcon className={styles.Icon} disabled={isPending} outlined onClick={onContextMenu}>
+          more_vert
+        </MaterialIcon>
       </div>
 
       <div className={classNames.join(" ")} onDoubleClick={onDoubleClick}>
@@ -122,6 +126,8 @@ export default function EditableRemark({
           placeholder={type === "reply" ? "Write a reply..." : "Type a comment"}
         />
       </div>
+
+      {contextMenu}
     </>
   );
 }
