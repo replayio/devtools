@@ -10,7 +10,13 @@ import {
   toggleProtocolMessages,
   toggleSideMenu,
 } from "./utils/console";
-import { getCommandKey, getElementCount, getTestUrl, takeScreenshot } from "./utils/general";
+import {
+  getCommandKey,
+  getElementCount,
+  getTestUrl,
+  stopHovering,
+  takeScreenshot,
+} from "./utils/general";
 import testSetup from "./utils/testSetup";
 
 testSetup("0d0b52a9-96bc-4bd9-b5d8-66275c6cce96");
@@ -501,6 +507,7 @@ test("should support setting focus range via the context menu", async ({ page })
 
   listItem = await locateMessage(page, "console-warning", "This is a warning");
   await listItem.click({ button: "right" });
+  await stopHovering(page);
   await page.click("[data-test-id=ConsoleContextMenu-SetFocusStartButton]");
   // Give the UI time to settle.
   await expect(messageLocator(page, "console-log", "This is a log")).toBeHidden();
@@ -508,6 +515,7 @@ test("should support setting focus range via the context menu", async ({ page })
 
   listItem = await locateMessage(page, "console-error", "This is an error");
   await listItem.click({ button: "right" });
+  await stopHovering(page);
   await page.click("[data-test-id=ConsoleContextMenu-SetFocusEndButton]");
   // Give the UI time to settle.
   await expect(messageLocator(page, "console-log", "This is a trace")).toBeHidden();
