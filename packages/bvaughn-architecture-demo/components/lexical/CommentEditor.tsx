@@ -32,10 +32,9 @@ import {
 } from "lexical";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
-import { GitHubLinkNode } from "bvaughn-architecture-demo/components/lexical/plugins/github-link/GitHubLinkNode";
-import GitHubLinkPlugin from "bvaughn-architecture-demo/components/lexical/plugins/github-link/GitHubLinkPlugin";
-
 import LexicalEditorRefSetter from "./LexicalEditorRefSetter";
+import { AutoLinkNode } from "./plugins/auto-link/AutoLinkNode";
+import AutoLinkPlugin from "./plugins/auto-link/AutoLinkPlugin";
 import CommentPlugin from "./plugins/comment/CommentPlugin";
 import parseMarkdownString from "./plugins/comment/utils/parseMarkdownString";
 import parseTipTapJson from "./plugins/comment/utils/parseTipTapJson";
@@ -63,7 +62,7 @@ const MARKDOWN_TRANSFORMERS = [
 ];
 
 const NODES: Array<Klass<LexicalNode>> = [
-  GitHubLinkNode,
+  AutoLinkNode,
   LineBreakNode,
   LoomLinkNode,
   MarkNode,
@@ -257,7 +256,7 @@ export default function CommentEditor({
           <CommentPlugin />
           <LoomLinkPlugin />
           <ReplayLinkPlugin />
-          <GitHubLinkPlugin />
+          <AutoLinkPlugin />
           {collaborators !== null ? (
             <MentionsPlugin
               collaborators={collaborators}
