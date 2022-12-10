@@ -8,7 +8,9 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { $rootTextContent } from "@lexical/text";
 import {
   $getRoot,
+  COMMAND_PRIORITY_CRITICAL,
   EditorState,
+  KEY_ENTER_COMMAND,
   Klass,
   LexicalEditor,
   LexicalNode,
@@ -31,6 +33,7 @@ import styles from "./styles.module.css";
 const NODES: Array<Klass<LexicalNode>> = [LineBreakNode, CodeNode, TextNode];
 
 export default function CodeEditor({
+  allowWrapping = true,
   autoFocus = false,
   dataTestId,
   dataTestName,
@@ -41,6 +44,7 @@ export default function CodeEditor({
   onSave,
   placeholder = "",
 }: {
+  allowWrapping?: boolean;
   autoFocus?: boolean;
   dataTestId?: string;
   dataTestName?: string;
@@ -106,6 +110,24 @@ export default function CodeEditor({
       }
     }
   };
+
+  useEffect(() => {
+    if (!allowWrapping) {
+      const editor = editorRef.current;
+      if (editor) {
+        const onEnter = (event: KeyboardEvent) => {
+          if (event.shiftKey) {
+            event.preventDefault();
+            return true;
+          }
+
+          return false;
+        };
+
+        return editor.registerCommand(KEY_ENTER_COMMAND, onEnter, COMMAND_PRIORITY_CRITICAL);
+      }
+    }
+  }, [allowWrapping, editorRef]);
 
   const onFormSubmit = (editorState: EditorState) => {
     const editor = editorRef.current;
