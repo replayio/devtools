@@ -1,7 +1,8 @@
 import MATCHERS_ARRAY, {
   EmailUrlMatcher,
   GenericUrlMatcher,
-  GitHubUrlMatcher,
+  GitHubCodeLinkUrlMatcher,
+  GitHubIssueOrPrUrlMatcher,
   ReplayUrlMatcher,
 } from "./AutoLinkMatchers";
 import { LinkMatch } from "./AutoLinkPlugin";
@@ -50,7 +51,7 @@ describe("AutoLinkMatchers", () => {
     const matcher = MATCHERS_ARRAY.find(matchFunction =>
       matchFunction("before https://www.github.com/foo/bar/issues/123 after")
     );
-    expect(matcher).toBe(GitHubUrlMatcher);
+    expect(matcher).toBe(GitHubIssueOrPrUrlMatcher);
   });
 
   describe("EmailUrlMatcher", () => {
@@ -117,7 +118,57 @@ describe("AutoLinkMatchers", () => {
     });
   });
 
-  describe("GitHubUrlMatcher", () => {
+  describe("GitHubCodeLinkUrlMatcher", () => {
+    it("should match links to GitHub code", () => {
+      testAll(
+        [
+          "https://github.com/replayio/devtools/blob/main/src/ui/components/SourcesContext.tsx",
+          "www.github.com/replayio/devtools/blob/main/src/ui/components/SourcesContext.tsx",
+          "github.com/replayio/devtools/blob/main/src/ui/components/SourcesContext.tsx",
+          "https://github.com/replayio/devtools/blob/cc1097afe4151a6664608c7eacbafbb21e8527c4/packages/bvaughn-architecture-demo/src/contexts/SourcesContext.tsx",
+          "www.github.com/replayio/devtools/blob/cc1097afe4151a6664608c7eacbafbb21e8527c4/packages/bvaughn-architecture-demo/src/contexts/SourcesContext.tsx",
+          "github.com/replayio/devtools/blob/cc1097afe4151a6664608c7eacbafbb21e8527c4/packages/bvaughn-architecture-demo/src/contexts/SourcesContext.tsx",
+        ],
+        GitHubCodeLinkUrlMatcher,
+        (match, text) => {
+          expect(match).not.toBeNull();
+          expect(match!.formattedText).toBe("SourcesContext.tsx (replayio/devtools)");
+          expect(match!.url).toBe(text.startsWith("http") ? text : `https://${text}`);
+        }
+      );
+    });
+
+    it("should match links to GitHub code with line numbers", () => {
+      testAll(
+        [
+          "https://github.com/replayio/devtools/blob/main/src/ui/components/SourcesContext.tsx#L153-L176",
+          "https://github.com/replayio/devtools/blob/cc1097afe4151a6664608c7eacbafbb21e8527c4/packages/bvaughn-architecture-demo/src/contexts/SourcesContext.tsx#L153-L176",
+        ],
+        GitHubCodeLinkUrlMatcher,
+        (match, text) => {
+          expect(match).not.toBeNull();
+          expect(match!.formattedText).toBe("SourcesContext.tsx:153-176 (replayio/devtools)");
+          expect(match!.url).toBe(text.startsWith("http") ? text : `https://${text}`);
+        }
+      );
+    });
+
+    it("should not match links to things other than GitHub code", () => {
+      testAll(
+        [
+          "https://github.com/foo/bar/issues/123",
+          "www.github.com/foo/bar/issues/123",
+          "http://www.google.com",
+        ],
+        GitHubCodeLinkUrlMatcher,
+        (match, text) => {
+          expect(match).toBeNull();
+        }
+      );
+    });
+  });
+
+  describe("GitHubIssueOrPrUrlMatcher", () => {
     it("should match GitHub issue link", () => {
       testAll(
         [
@@ -127,7 +178,7 @@ describe("AutoLinkMatchers", () => {
           "github.com/foo/bar/issues/123",
           "github.com/foo/bar/issues/123?foo=bar",
         ],
-        GitHubUrlMatcher,
+        GitHubIssueOrPrUrlMatcher,
         (match, text) => {
           expect(match).not.toBeNull();
           expect(match!.formattedText).toBe("#123 (foo/bar)");
@@ -146,7 +197,7 @@ describe("AutoLinkMatchers", () => {
           "github.com/foo/bar/pull/123/files",
           "github.com/foo/bar/pull/123/files?w=1",
         ],
-        GitHubUrlMatcher,
+        GitHubIssueOrPrUrlMatcher,
         (match, text) => {
           expect(match).not.toBeNull();
           expect(match!.formattedText).toBe("#123 (foo/bar)");
@@ -158,7 +209,7 @@ describe("AutoLinkMatchers", () => {
     it("should not match other GitHub link", () => {
       testAll(
         ["https://www.github.com", "https://www.github.com/foo", "https://www.github.com/foo/bar"],
-        GitHubUrlMatcher,
+        GitHubIssueOrPrUrlMatcher,
         match => {
           expect(match).toBeNull();
         }
