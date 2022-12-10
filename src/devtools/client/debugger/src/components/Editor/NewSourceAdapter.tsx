@@ -13,7 +13,7 @@ import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesCo
 import { getSource } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useFeature } from "ui/hooks/settings";
-import { getSelectedLocation } from "ui/reducers/sources";
+import { getSelectedLocation, getSelectedLocationHasScrolled } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { setViewport } from "../../selectors";
@@ -46,6 +46,7 @@ function NewSourceAdapter() {
 
   const dispatch = useAppDispatch();
   const location = useAppSelector(getSelectedLocation);
+  const locationHasScrolled = useAppSelector(getSelectedLocationHasScrolled);
 
   // Sync the selected location that's in Redux to the new SourcesContext.
   // This makes the CMD+O and CMD+G menus work.
@@ -65,11 +66,12 @@ function NewSourceAdapter() {
     // Sync focused state from Redux to React context,
     if (
       focusedSource?.sourceId !== location.sourceId ||
-      focusedSource?.startLineIndex !== lineIndex
+      focusedSource?.startLineIndex !== lineIndex ||
+      !locationHasScrolled
     ) {
       openSource("view-source", location.sourceId, lineIndex, lineIndex);
     }
-  }, [focusedSource, location, openSource]);
+  }, [focusedSource, location, locationHasScrolled, openSource]);
 
   // Sync the lines currently rendered by the new Source list to Redux.
   // This updates Redux state to mark certain actions as "processed".
