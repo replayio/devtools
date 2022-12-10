@@ -6,8 +6,11 @@ const EMAIL_MATCHER =
 const GENERIC_URL_MATCHER =
   /((https?:\/\/(www\.)?)|(www\.))[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
 
-const GITHUB_URL_MATCHER =
+const GITHUB_ISSUE_OR_PR_URL_MATCHER =
   /(https?:\/\/)?(www\.)?github\.com\/([^\/]+)\/([^\/]+)\/(issues|pull)\/([0-9]+)([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
+
+const GITHUB_CODE_LINK_URL_MATCHER =
+  /(https?:\/\/)?(www\.)?github\.com\/([^\/]+)\/([^\/]+)\/blob\/([-a-zA-Z0-9()@:%_+.~?&//=]*)(#L([0-9]+)\-L([0-9]+))?/;
 
 const REPLAY_URL_REGEX =
   /((https?:\/\/(app\.))|(app\.))replay\.io\/recording\/([-a-zA-Z0-9]+)(\?[-a-zA-Z0-9()@:%_+.~#?&//=]*)?/;
@@ -44,8 +47,40 @@ export function GenericUrlMatcher(text: string): LinkMatch | null {
   };
 }
 
-export function GitHubUrlMatcher(text: string): LinkMatch | null {
-  const match = GITHUB_URL_MATCHER.exec(text);
+export function GitHubCodeLinkUrlMatcher(text: string): LinkMatch | null {
+  const match = GITHUB_CODE_LINK_URL_MATCHER.exec(text);
+  if (match === null) {
+    return null;
+  }
+
+  const fullMatch = match[0];
+
+  const organization = match[3]; // e.g. github.com/[replayio]/devtools/blob/path/to/file.ts
+  const project = match[4]; // e.g. github.com/replayio/[devtools]/blob/path/to/file.ts
+  const filePath = match[5]; // e.g. github.com/replayio/devtools/blob/[path/to/file.ts]
+  const fileName = filePath.split("/").pop();
+
+  const lineNumberStart = match[7]; // e.g. github.com/replayio/devtools/blob/path/to/file.ts#L[12]-L34
+  const lineNumberEnd = match[8]; // e.g. github.com/replayio/devtools/blob/[path/to/file.ts#L12-L[34]
+
+  let formattedText;
+  if (lineNumberStart != null && lineNumberEnd != null) {
+    formattedText = `${fileName}:${lineNumberStart}-${lineNumberEnd} (${organization}/${project})`;
+  } else {
+    formattedText = `${fileName} (${organization}/${project})`;
+  }
+
+  return {
+    formattedText,
+    index: match.index,
+    length: fullMatch.length,
+    text: fullMatch,
+    url: fullMatch.startsWith("http") ? fullMatch : `https://${fullMatch}`,
+  };
+}
+
+export function GitHubIssueOrPrUrlMatcher(text: string): LinkMatch | null {
+  const match = GITHUB_ISSUE_OR_PR_URL_MATCHER.exec(text);
   if (match === null) {
     return null;
   }
@@ -92,4 +127,10 @@ export function ReplayUrlMatcher(text: string): LinkMatch | null {
 
 // Order is significant because it determines priority;
 // More specific matchers should come first.
-export default [ReplayUrlMatcher, GitHubUrlMatcher, EmailUrlMatcher, GenericUrlMatcher];
+export default [
+  ReplayUrlMatcher,
+  GitHubCodeLinkUrlMatcher,
+  GitHubIssueOrPrUrlMatcher,
+  EmailUrlMatcher,
+  GenericUrlMatcher,
+];
