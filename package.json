@@ -48,6 +48,7 @@
     "@stripe/react-stripe-js": "^1.7.0",
     "@stripe/stripe-js": "^1.26.0",
     "@svgr/webpack": "^6.2.1",
+    "big-integer": "^1.6.51",
     "bvaughn-architecture-demo": "workspace:*",
     "classnames": "^2.3.1",
     "cookie": "^0.4.2",
