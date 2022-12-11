@@ -146,6 +146,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                       }
                     >
                       <CodeEditor
+                        allowWrapping={false}
                         autoFocus={editReason === "condition"}
                         dataTestId={`PointPanel-ConditionInput-${lineNumber}`}
                         dataTestName="PointPanel-ConditionInput"
@@ -173,6 +174,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                     }
                   >
                     <CodeEditor
+                      allowWrapping={false}
                       autoFocus={showEditBreakpointNag || editReason === "content"}
                       dataTestId={`PointPanel-ContentInput-${lineNumber}`}
                       dataTestName="PointPanel-ContentInput"

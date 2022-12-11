@@ -97,7 +97,7 @@
   height: 0.5rem;
 }
 .Content [data-test-name="PointPanel-ContentInput"] {
-  white-space: nowrap !important;
+  white-space: pre !important;
 }
 
 .AddConditionButton,
