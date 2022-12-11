@@ -1,3 +1,4 @@
+import { TimeStampedPoint } from "@replayio/protocol";
 import {
   MouseEvent,
   Suspense,
@@ -14,15 +15,19 @@ import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContex
 import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
 import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
 import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { PauseAndFrameId } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
 import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
 import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 import { addComment as addCommentGraphQL } from "bvaughn-architecture-demo/src/graphql/Comments";
 import { Nag } from "bvaughn-architecture-demo/src/graphql/types";
 import { useNag } from "bvaughn-architecture-demo/src/hooks/useNag";
+import { getFramesSuspense } from "bvaughn-architecture-demo/src/suspense/FrameCache";
+import { getPauseIdSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
+import { findIndexBigInt } from "bvaughn-architecture-demo/src/utils/array";
 import { validate } from "bvaughn-architecture-demo/src/utils/points";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { Point } from "shared/client/types";
+import { HitPointStatus, Point } from "shared/client/types";
 
 import Loader from "../Loader";
 import BadgePicker from "./BadgePicker";
@@ -49,14 +54,7 @@ export default function SourcePanelWrapper({
 
 function PointPanel({ className, point }: { className: string; point: Point }) {
   const { range: focusRange } = useContext(FocusContext);
-  const graphQLClient = useContext(GraphQLClientContext);
-  const { showCommentsPanel } = useContext(InspectorContext);
-  const { editPoint } = useContext(PointsContext);
   const client = useContext(ReplayClientContext);
-  const { accessToken, recordingId, trackEvent } = useContext(SessionContext);
-  const { executionPoint: currentExecutionPoint, time: curentTime } = useContext(TimelineContext);
-
-  const [showEditBreakpointNag, dismissEditBreakpointNag] = useNag(Nag.FIRST_BREAKPOINT_EDIT);
 
   const [hitPoints, hitPointStatus] = getHitPointsForLocationSuspense(
     client,
@@ -64,6 +62,36 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
     null,
     focusRange
   );
+
+  return (
+    <PointPanelWithHistPoints
+      className={className}
+      hitPoints={hitPoints}
+      hitPointStatus={hitPointStatus}
+      point={point}
+    />
+  );
+}
+
+function PointPanelWithHistPoints({
+  className,
+  hitPoints,
+  hitPointStatus,
+  point,
+}: {
+  className: string;
+  hitPoints: TimeStampedPoint[];
+  hitPointStatus: HitPointStatus;
+  point: Point;
+}) {
+  const graphQLClient = useContext(GraphQLClientContext);
+  const { showCommentsPanel } = useContext(InspectorContext);
+  const { editPoint } = useContext(PointsContext);
+  const client = useContext(ReplayClientContext);
+  const { accessToken, recordingId, trackEvent } = useContext(SessionContext);
+  const { executionPoint: currentExecutionPoint, time: currentTime } = useContext(TimelineContext);
+
+  const [showEditBreakpointNag, dismissEditBreakpointNag] = useNag(Nag.FIRST_BREAKPOINT_EDIT);
 
   const invalidateCache = useCacheRefresh();
 
@@ -86,6 +114,42 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
   const hasChanged = editableCondition !== point.condition || editableContent !== point.content;
 
   const lineNumber = point.location.line;
+
+  // Log point code suggestions should always be relative to location of the the point panel.
+  // This is a more intuitive experience than using the current execution point,
+  // which may be paused at a different location.
+  const closestHitPoint = useMemo(() => {
+    const executionPoints = hitPoints.map(hitPoint => hitPoint.point);
+    const index = findIndexBigInt(executionPoints, currentExecutionPoint, false);
+    return hitPoints[index] || null;
+  }, [hitPoints, currentExecutionPoint]);
+
+  // If we've found a hit point match, use data from its scope.
+  // Otherwise fall back to using the global execution point.
+  let pauseAndFrameId: PauseAndFrameId | null = null;
+  if (closestHitPoint) {
+    const pauseId = getPauseIdSuspense(client, closestHitPoint.point, closestHitPoint.time);
+    const frames = getFramesSuspense(client, pauseId);
+    const frameId = frames?.[0]?.frameId ?? null;
+    if (frameId !== null) {
+      pauseAndFrameId = {
+        frameId,
+        pauseId,
+      };
+    }
+    // console.log("pauseId:", pauseId, "and", frameId);
+  } else {
+    const pauseId = getPauseIdSuspense(client, currentExecutionPoint, currentTime);
+    const frames = getFramesSuspense(client, pauseId);
+    const frameId = frames?.[0]?.frameId ?? null;
+    if (frameId !== null) {
+      pauseAndFrameId = {
+        frameId,
+        pauseId,
+      };
+      // console.log("pauseId:", pauseId, "and", frameId);
+    }
+  }
 
   // Prevent hovers over syntax highlighted tokens from showing preview popups.
   const onMouseMove = (event: MouseEvent) => {
@@ -155,6 +219,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                         onCancel={onCancel}
                         onChange={onEditableConditionChange}
                         onSave={onSubmit}
+                        pauseAndFrameId={pauseAndFrameId}
                       />
                     </div>
                   </div>
@@ -183,6 +248,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
                       onCancel={onCancel}
                       onChange={onEditableContentChange}
                       onSave={onSubmit}
+                      pauseAndFrameId={pauseAndFrameId}
                     />
                   </div>
                 </div>
@@ -263,7 +329,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
           isPublished: false,
           point: currentExecutionPoint,
           sourceLocation: point.location,
-          time: curentTime,
+          time: currentTime,
         });
 
         invalidateCache();

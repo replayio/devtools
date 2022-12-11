@@ -21,7 +21,7 @@ import useLoadedRegions from "../hooks/useRegions";
 import { getPauseIdAsync } from "../suspense/PauseCache";
 import { TimelineContext } from "./TimelineContext";
 
-interface PauseAndFrameId {
+export interface PauseAndFrameId {
   pauseId: PauseId;
   frameId: FrameId;
 }
