@@ -1,4 +1,16 @@
+import BigInteger from "big-integer";
+
 type ComparisonFunction<T> = (a: T, b: T) => number;
+
+function compareBigInt(a: string, b: string): number {
+  return BigInteger(a.replace(/_/g, ""))
+    .subtract(BigInteger(b.replace(/_/g, "")))
+    .toJSNumber();
+}
+
+function compareStrings(a: string, b: string): number {
+  return a.localeCompare(b);
+}
 
 // Note that for non-exact matches to work
 // the comparison function should return more fine-grained delta values than the typical -1, 0, or 1.
@@ -36,14 +48,14 @@ export function findIndex<T>(
         return 0;
     }
 
-    const delta = comparisonFunction(targetItem, sortedItems[middleIndex]);
-    if (delta === 0) {
+    const value = comparisonFunction(targetItem, sortedItems[middleIndex]);
+    if (value === 0) {
       return middleIndex;
     } else {
       let lowIndex = middleIndex;
       let highIndex = middleIndex;
 
-      if (delta > 0) {
+      if (value > 0) {
         highIndex = Math.min(middleIndex + 1, sortedItems.length - 1);
       } else {
         lowIndex = Math.max(0, middleIndex - 1);
@@ -57,8 +69,16 @@ export function findIndex<T>(
   }
 }
 
+export function findIndexBigInt(
+  sortedItems: string[],
+  targetItem: string,
+  exactMatch = true
+): number {
+  return findIndex<string>(sortedItems, targetItem, compareBigInt, exactMatch);
+}
+
 export function findIndexString(sortedItems: string[], targetItem: string): number {
-  return findIndex<string>(sortedItems, targetItem, (a, b) => a.localeCompare(b));
+  return findIndex<string>(sortedItems, targetItem, compareStrings);
 }
 
 export function insert<T>(

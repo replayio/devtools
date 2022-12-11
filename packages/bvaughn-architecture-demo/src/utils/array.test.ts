@@ -1,4 +1,4 @@
-import { findIndex, findIndexString, insert, insertString } from "./array";
+import { findIndex, findIndexBigInt, findIndexString, insert, insertString } from "./array";
 
 describe("array utils", () => {
   describe("findIndex", () => {
@@ -59,6 +59,31 @@ describe("array utils", () => {
         // Ambiguous case!
         expect(findIndex([1, 3], 2, compare, false)).toEqual(1);
       });
+    });
+  });
+
+  describe("findIndexBigInt", () => {
+    const bigints = [
+      "1000000000000000000000000000000000",
+      "2000000000000000000000000000000000",
+      "10000000000000000000000000000000000",
+      "15000000000000000000000000000000000",
+    ];
+
+    it("should find the matching index of bit integers", () => {
+      expect(findIndexBigInt(bigints, "1000000000000000000000000000000000")).toBe(0);
+      expect(findIndexBigInt(bigints, "2000000000000000000000000000000000")).toBe(1);
+      expect(findIndexBigInt(bigints, "10000000000000000000000000000000000")).toBe(2);
+      expect(findIndexBigInt(bigints, "15000000000000000000000000000000000")).toBe(3);
+    });
+
+    it("should find the closest index of bit integers", () => {
+      expect(findIndexBigInt(bigints, "500000000000000000000000000000000", false)).toBe(0);
+      expect(findIndexBigInt(bigints, "1100000000000000000000000000000000", false)).toBe(0);
+      expect(findIndexBigInt(bigints, "1600000000000000000000000000000000", false)).toBe(1);
+      expect(findIndexBigInt(bigints, "5000000000000000000000000000000000", false)).toBe(1);
+      expect(findIndexBigInt(bigints, "13000000000000000000000000000000000", false)).toBe(3);
+      expect(findIndexBigInt(bigints, "25000000000000000000000000000000000", false)).toBe(3);
     });
   });
 
