@@ -64,7 +64,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
   );
 
   return (
-    <PointPanelWithHistPoints
+    <PointPanelWithHitPoints
       className={className}
       hitPoints={hitPoints}
       hitPointStatus={hitPointStatus}
@@ -73,7 +73,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
   );
 }
 
-function PointPanelWithHistPoints({
+function PointPanelWithHitPoints({
   className,
   hitPoints,
   hitPointStatus,
