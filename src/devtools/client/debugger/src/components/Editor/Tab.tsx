@@ -10,7 +10,7 @@ import { SourceDetails, getHasSiblingOfSameName, getSelectedSource } from "ui/re
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
-import { getActiveSearch, getContext, getSourcesForTabs } from "../../selectors";
+import { getActiveSearch, getContext } from "../../selectors";
 import {
   getFileURL,
   getSourceQueryString,
@@ -71,6 +71,9 @@ export default function Tab({
     source,
   });
 
+  const url = getFileURL(source, false);
+  const fileName = url.split("/").pop();
+
   return (
     <>
       <Redacted
@@ -80,7 +83,7 @@ export default function Tab({
         onDragEnd={onDragEnd}
         className={className}
         data-status={active ? "active" : undefined}
-        data-test-name={`Source-${getTruncatedFileName(source, query)}`}
+        data-test-name={`Source-${fileName}`}
         key={sourceId}
         onClick={handleTabClick}
         onContextMenu={onContextMenu}
