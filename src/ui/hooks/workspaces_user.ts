@@ -129,7 +129,10 @@ export function useInviteNewWorkspaceMember(onCompleted: () => void) {
   return inviteNewWorkspaceMember;
 }
 
-export function useClaimTeamInvitationCode(onCompleted: () => void, onError: () => void) {
+export function useClaimTeamInvitationCode(
+  onCompleted: (workspaceId: string | null) => void,
+  onError: () => void
+) {
   const [inviteNewWorkspaceMember] = useMutation<
     ClaimTeamInvitationCode,
     ClaimTeamInvitationCodeVariables
@@ -138,10 +141,11 @@ export function useClaimTeamInvitationCode(onCompleted: () => void, onError: () 
       mutation ClaimTeamInvitationCode($code: ID!) {
         claimTeamInvitationCode(input: { code: $code }) {
           success
+          workspaceId
         }
       }
     `,
-    { onCompleted, onError }
+    { onCompleted: data => onCompleted(data.claimTeamInvitationCode.workspaceId), onError }
   );
 
   return inviteNewWorkspaceMember;
