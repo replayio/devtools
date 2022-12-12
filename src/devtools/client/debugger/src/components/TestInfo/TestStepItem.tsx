@@ -1,5 +1,5 @@
 import { Object as ProtocolObject, createPauseResult } from "@replayio/protocol";
-import React, { useContext, useEffect, useState } from "react";
+import React, { createRef, useCallback, useContext, useEffect, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -36,6 +36,7 @@ export interface TestStepItemProps {
 }
 
 export function TestStepItem({ step, argString, index, id }: TestStepItemProps) {
+  const ref = createRef<HTMLDivElement>();
   const [localPauseData, setLocalPauseData] = useState<{
     startPauseId?: string;
     endPauseId?: string;
@@ -146,7 +147,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     })();
   }, [client, messageEnd, pointEnd, pointStart]);
 
-  const onClick = () => {
+  const onClick = useCallback(() => {
     if (id) {
       if (pointStart) {
         if (localPauseData?.endPauseId && localPauseData.consoleProps) {
@@ -160,7 +161,8 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
 
       dispatch(setSelectedStep(step));
     }
-  };
+  }, [step, pointStart, localPauseData, dispatch, setConsoleProps, id, setPauseId]);
+
   const onMouseEnter = () => {
     if (isPaused) {
       return;
@@ -189,6 +191,13 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     dispatch(unhighlightNode());
   };
 
+  useEffect(() => {
+    if (step.error && ref.current) {
+      ref.current.scrollIntoView();
+      onClick();
+    }
+  }, [step, ref, onClick]);
+
   // This math is bananas don't look here until this is cleaned up :)
   const bump = isPaused || isPast ? 10 : 0;
   const actualProgress = bump + 90 * ((currentTime - step.absoluteStartTime) / step.duration);
@@ -202,6 +211,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
       error={!!step.error}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      ref={ref}
     >
       <button onClick={onClick} className="flex flex-grow items-start space-x-2 text-start">
         <div title={"" + displayedProgress} className="flex h-4 items-center">
