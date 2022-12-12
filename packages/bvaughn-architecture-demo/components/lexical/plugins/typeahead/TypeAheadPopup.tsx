@@ -40,7 +40,7 @@ export default function TypeAheadPopUpSuspends<Item>({
   findMatches: (query: string, queryAdditionalData: string | null) => Item[];
   isExactMatch: (query: string, item: Item) => boolean;
   itemClassName: string;
-  itemRenderer: (item: Item) => ReactNode;
+  itemRenderer: (item: Item, query: string) => ReactNode;
   listClassName: string;
   queryData: QueryData;
   updateQueryData: (queryData: QueryData | null) => void;
@@ -85,7 +85,7 @@ function TypeAheadPopUp<Item>({
   editor: LexicalEditor;
   isExactMatch: (query: string, item: Item) => boolean;
   itemClassName: string;
-  itemRenderer: (item: Item) => ReactNode;
+  itemRenderer: (item: Item, query: string) => ReactNode;
   items: Item[];
   listClassName: string;
   queryData: QueryData;
@@ -225,9 +225,9 @@ function TypeAheadPopUp<Item>({
 
   // Scroll selected item into view
   useLayoutEffect(() => {
-    const itemRenderer = selectedItemRef.current;
-    if (itemRenderer) {
-      itemRenderer.scrollIntoView({ block: "nearest" });
+    const selectedItem = selectedItemRef.current;
+    if (selectedItem) {
+      selectedItem.scrollIntoView({ block: "nearest" });
     }
   });
 
@@ -363,6 +363,7 @@ function TypeAheadPopUp<Item>({
       listClassName={listClassName}
       items={items}
       popupRef={popupRef}
+      query={queryData.query}
       selectedItem={selectedItem}
     />
   );
