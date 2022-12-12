@@ -49,7 +49,8 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
     dispatch(
       startPlayback({
         beginTime: test.relativeStartTime,
-        endTime: testStep.absoluteStartTime,
+        endTime: testStep.annotations.end?.time || testStep.absoluteEndTime,
+        endPoint: testStep.annotations.end?.point,
       })
     );
   };
