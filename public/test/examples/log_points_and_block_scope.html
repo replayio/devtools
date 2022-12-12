@@ -5,13 +5,17 @@
   arrayGlobal.push(3);
 
   {
-    const arrayBlockOne = ["a", "b"];
-    arrayBlockOne.push("c");
-  }
+    const arrayBlockOuter = [];
 
-  {
-    const arrayBlockTwo = [true];
-    arrayBlockTwo.push(false);
+    {
+      const arrayBlockOne = ["a", "b"];
+      arrayBlockOne.push("c");
+    }
+
+    {
+      const arrayBlockTwo = [true];
+      arrayBlockTwo.push(false);
+    }
   }
 
   // e2e test recorder waits for this log.
