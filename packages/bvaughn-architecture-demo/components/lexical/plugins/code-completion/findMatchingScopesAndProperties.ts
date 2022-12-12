@@ -89,7 +89,7 @@ function findMatches(
   );
 
   if (scopes) {
-    scopes.forEach((scope, index) => {
+    scopes.forEach(scope => {
       scope.bindings?.forEach(({ name }) => {
         if (name.match(needleRegExp) !== null) {
           const weight = getMatchWeight(name, needle);
