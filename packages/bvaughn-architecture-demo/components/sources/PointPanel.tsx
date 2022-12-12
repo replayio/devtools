@@ -126,29 +126,17 @@ function PointPanelWithHistPoints({
 
   // If we've found a hit point match, use data from its scope.
   // Otherwise fall back to using the global execution point.
+  const executionPoint = closestHitPoint ? closestHitPoint.point : currentExecutionPoint;
+  const time = closestHitPoint ? closestHitPoint.time : currentTime;
+  const pauseId = getPauseIdSuspense(client, executionPoint, time);
+  const frames = getFramesSuspense(client, pauseId);
+  const frameId = frames?.[0]?.frameId ?? null;
   let pauseAndFrameId: PauseAndFrameId | null = null;
-  if (closestHitPoint) {
-    const pauseId = getPauseIdSuspense(client, closestHitPoint.point, closestHitPoint.time);
-    const frames = getFramesSuspense(client, pauseId);
-    const frameId = frames?.[0]?.frameId ?? null;
-    if (frameId !== null) {
-      pauseAndFrameId = {
-        frameId,
-        pauseId,
-      };
-    }
-    // console.log("pauseId:", pauseId, "and", frameId);
-  } else {
-    const pauseId = getPauseIdSuspense(client, currentExecutionPoint, currentTime);
-    const frames = getFramesSuspense(client, pauseId);
-    const frameId = frames?.[0]?.frameId ?? null;
-    if (frameId !== null) {
-      pauseAndFrameId = {
-        frameId,
-        pauseId,
-      };
-      // console.log("pauseId:", pauseId, "and", frameId);
-    }
+  if (frameId !== null) {
+    pauseAndFrameId = {
+      frameId,
+      pauseId,
+    };
   }
 
   // Prevent hovers over syntax highlighted tokens from showing preview popups.
