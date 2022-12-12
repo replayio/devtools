@@ -20,6 +20,8 @@ import {
 } from "lexical";
 import { useEffect, useRef } from "react";
 
+import { PauseAndFrameId } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
+
 import LexicalEditorRefSetter from "./LexicalEditorRefSetter";
 import CodeCompletionPlugin from "./plugins/code-completion/CodeCompletionPlugin";
 import CodeNode from "./plugins/code/CodeNode";
@@ -42,6 +44,7 @@ export default function CodeEditor({
   onCancel,
   onChange,
   onSave,
+  pauseAndFrameId,
   placeholder = "",
 }: {
   allowWrapping?: boolean;
@@ -53,6 +56,7 @@ export default function CodeEditor({
   onCancel?: () => void;
   onChange?: (markdown: string, editorState: SerializedEditorState) => void;
   onSave: (markdown: string, editorState: SerializedEditorState) => void;
+  pauseAndFrameId: PauseAndFrameId | null;
   placeholder?: string;
 }): JSX.Element {
   const historyState = createEmptyHistoryState();
@@ -155,6 +159,7 @@ export default function CodeEditor({
         <CodeCompletionPlugin
           dataTestId={dataTestId ? `${dataTestId}-CodeTypeAhead` : undefined}
           dataTestName={dataTestName ? `${dataTestName}-CodeTypeAhead` : undefined}
+          pauseAndFrameId={pauseAndFrameId}
         />
       </>
     </LexicalComposer>

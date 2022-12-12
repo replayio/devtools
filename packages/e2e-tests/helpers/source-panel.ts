@@ -98,14 +98,14 @@ async function getVisibleLineNumbers(page: Page): Promise<number[]> {
 export async function addLogpoint(
   page: Page,
   options: {
-    columnIndex?: number;
     lineNumber: number;
     condition?: string;
     content?: string;
     url: string;
+    saveAfterEdit?: boolean;
   }
 ): Promise<void> {
-  const { condition, content, lineNumber, url } = options;
+  const { lineNumber, url } = options;
 
   await debugPrint(
     page,
@@ -129,46 +129,7 @@ export async function addLogpoint(
   await toggle.click({ force: true });
 
   await waitForLogpoint(page, options);
-
-  if (condition || content) {
-    const line = await getSourceLine(page, lineNumber);
-    await line.locator('[data-test-name="PointPanel-EditButton"]').click();
-
-    if (condition) {
-      await debugPrint(
-        page,
-        `Setting log-point condition "${chalk.bold(condition)}"`,
-        "addLogpoint"
-      );
-
-      const conditionInputSelector = '[data-test-name="PointPanel-ConditionInput"]';
-
-      await line.locator('[data-test-name="PointPanel-AddConditionButton"]').click();
-
-      await typeLexical(
-        page,
-        `${getSourceLineSelector(lineNumber)} [data-test-name="PointPanel-ConditionInput"]`,
-        condition,
-        false
-      );
-    }
-
-    if (content) {
-      await debugPrint(page, `Setting log-point content "${chalk.bold(content)}"`, "addLogpoint");
-
-      await typeLexical(
-        page,
-        `${getSourceLineSelector(lineNumber)} [data-test-name="PointPanel-ContentInput"]`,
-        content,
-        false
-      );
-    }
-
-    const saveButton = line.locator('[data-test-name="PointPanel-SaveButton"]');
-    await expect(saveButton).toBeEnabled();
-    await saveButton.click();
-    await saveButton.waitFor({ state: "detached" });
-  }
+  await editLogPoint(page, options);
 }
 
 export async function closeSource(page: Page, url: string): Promise<void> {
@@ -181,6 +142,69 @@ export async function closeSource(page: Page, url: string): Promise<void> {
   }
 
   await sourceTab.waitFor({ state: "detached" });
+}
+
+export async function editLogPoint(
+  page: Page,
+  options: {
+    content?: string;
+    condition?: string;
+    lineNumber: number;
+    saveAfterEdit?: boolean;
+    url: string;
+  }
+) {
+  const { condition, content, lineNumber, saveAfterEdit = true, url } = options;
+
+  await debugPrint(
+    page,
+    `Editing log-point at ${chalk.bold(`${url}:${lineNumber}`)}`,
+    "editLogPoint"
+  );
+
+  if (condition != null || content != null) {
+    const line = await getSourceLine(page, lineNumber);
+    await line.locator('[data-test-name="PointPanel-EditButton"]').click();
+
+    if (condition != null) {
+      await debugPrint(
+        page,
+        `Setting log-point condition "${chalk.bold(condition)}"`,
+        "addLogpoint"
+      );
+
+      await line.locator('[data-test-name="PointPanel-AddConditionButton"]').click();
+
+      await typeLexical(
+        page,
+        `${getSourceLineSelector(lineNumber)} [data-test-name="PointPanel-ConditionInput"]`,
+        condition,
+        false
+      );
+    }
+
+    if (content != null) {
+      await debugPrint(page, `Setting log-point content "${chalk.bold(content)}"`, "addLogpoint");
+
+      await typeLexical(
+        page,
+        `${getSourceLineSelector(lineNumber)} [data-test-name="PointPanel-ContentInput"]`,
+        content,
+        false
+      );
+    }
+
+    if (saveAfterEdit) {
+      const saveButton = line.locator('[data-test-name="PointPanel-SaveButton"]');
+      await expect(saveButton).toBeEnabled();
+      await saveButton.click();
+      await saveButton.waitFor({ state: "detached" });
+    }
+  }
+}
+
+export function getCurrentLogPointPanelTypeAhead(page: Page): Locator {
+  return page.locator('[data-test-name="PointPanel-ContentInput-CodeTypeAhead"]');
 }
 
 export async function getSelectedLineNumber(page: Page): Promise<number | null> {

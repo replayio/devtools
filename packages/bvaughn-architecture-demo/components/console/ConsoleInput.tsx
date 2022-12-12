@@ -161,6 +161,7 @@ function ConsoleInputSuspends() {
             key={incrementedKey}
             onChange={onChange}
             onSave={onSubmit}
+            pauseAndFrameId={selectedPauseAndFrameId}
           />
         </div>
       </div>

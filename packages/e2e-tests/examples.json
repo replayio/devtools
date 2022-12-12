@@ -31,5 +31,6 @@
   "node/exceptions.js": "12da3cda-262b-4477-9f35-e9e17111f51b",
   "node/objects.js": "6ea2837c-386e-483a-8ec9-94c7a51a07e4",
   "node/run_worker.js": "b41107df-8d0e-488f-bad3-a7d26c183043",
-  "node/spawn.js": "c9d0539d-fde0-4949-a9f7-acdb5b56d4a6"
+  "node/spawn.js": "c9d0539d-fde0-4949-a9f7-acdb5b56d4a6",
+  "log_points_and_block_scope.html": "4074e685-5374-4f02-b4f1-35b713d07c06"
 }

@@ -159,6 +159,6 @@ function findIndexMatch(sortedMatches: Match[], match: Match): number {
   return findIndex<Match>(sortedMatches, match, compareMatch);
 }
 
-function insertMatch(sortedMatches: Match[], match: Match): void {
+function insertMatch(sortedMatches: Match[], match: Match): Match[] {
   return insert<Match>(sortedMatches, match, compareMatch);
 }

@@ -4,7 +4,7 @@ import { FrameId, PauseId } from "@replayio/protocol";
 import { $createTextNode, TextNode } from "lexical";
 import { useContext, useEffect } from "react";
 
-import { SelectedFrameContext } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
+import { PauseAndFrameId } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import TypeAheadPlugin from "../typeahead/TypeAheadPlugin";
@@ -17,19 +17,21 @@ import styles from "./styles.module.css";
 export default function CodeCompletionPlugin({
   dataTestId,
   dataTestName = "CodeTypeAhead",
+  pauseAndFrameId = null,
 }: {
   dataTestId?: string;
   dataTestName?: string;
+  pauseAndFrameId: PauseAndFrameId | null;
 }): JSX.Element {
   const [editor] = useLexicalComposerContext();
 
   const replayClient = useContext(ReplayClientContext);
-  const { selectedPauseAndFrameId } = useContext(SelectedFrameContext);
+
   let pauseId: PauseId | null = null;
   let frameId: FrameId | null = null;
-  if (selectedPauseAndFrameId) {
-    pauseId = selectedPauseAndFrameId.pauseId;
-    frameId = selectedPauseAndFrameId.frameId;
+  if (pauseAndFrameId != null) {
+    pauseId = pauseAndFrameId.pauseId;
+    frameId = pauseAndFrameId.frameId;
   }
 
   const findMatchesWrapper = (query: string, queryScope: string | null) => {
