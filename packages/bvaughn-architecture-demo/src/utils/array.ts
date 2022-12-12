@@ -1,11 +1,8 @@
-import BigInteger from "big-integer";
-
 type ComparisonFunction<T> = (a: T, b: T) => number;
 
 function compareBigInt(a: string, b: string): number {
-  return BigInteger(a.replace(/_/g, ""))
-    .subtract(BigInteger(b.replace(/_/g, "")))
-    .toJSNumber();
+  const difference = BigInt(a) - BigInt(b);
+  return parseInt("" + difference);
 }
 
 function compareStrings(a: string, b: string): number {

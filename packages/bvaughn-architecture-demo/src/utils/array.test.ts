@@ -64,6 +64,7 @@ describe("array utils", () => {
 
   describe("findIndexBigInt", () => {
     const bigints = [
+      "0",
       "1000000000000000000000000000000000",
       "2000000000000000000000000000000000",
       "10000000000000000000000000000000000",
@@ -71,19 +72,21 @@ describe("array utils", () => {
     ];
 
     it("should find the matching index of bit integers", () => {
-      expect(findIndexBigInt(bigints, "1000000000000000000000000000000000")).toBe(0);
-      expect(findIndexBigInt(bigints, "2000000000000000000000000000000000")).toBe(1);
-      expect(findIndexBigInt(bigints, "10000000000000000000000000000000000")).toBe(2);
-      expect(findIndexBigInt(bigints, "15000000000000000000000000000000000")).toBe(3);
+      expect(findIndexBigInt(bigints, "0")).toBe(0);
+      expect(findIndexBigInt(bigints, "1000000000000000000000000000000000")).toBe(1);
+      expect(findIndexBigInt(bigints, "2000000000000000000000000000000000")).toBe(2);
+      expect(findIndexBigInt(bigints, "10000000000000000000000000000000000")).toBe(3);
+      expect(findIndexBigInt(bigints, "15000000000000000000000000000000000")).toBe(4);
     });
 
     it("should find the closest index of bit integers", () => {
-      expect(findIndexBigInt(bigints, "500000000000000000000000000000000", false)).toBe(0);
-      expect(findIndexBigInt(bigints, "1100000000000000000000000000000000", false)).toBe(0);
-      expect(findIndexBigInt(bigints, "1600000000000000000000000000000000", false)).toBe(1);
-      expect(findIndexBigInt(bigints, "5000000000000000000000000000000000", false)).toBe(1);
-      expect(findIndexBigInt(bigints, "13000000000000000000000000000000000", false)).toBe(3);
-      expect(findIndexBigInt(bigints, "25000000000000000000000000000000000", false)).toBe(3);
+      expect(findIndexBigInt(bigints, "50000000000000000000000000000000", false)).toBe(0);
+      expect(findIndexBigInt(bigints, "800000000000000000000000000000000", false)).toBe(1);
+      expect(findIndexBigInt(bigints, "1100000000000000000000000000000000", false)).toBe(1);
+      expect(findIndexBigInt(bigints, "1600000000000000000000000000000000", false)).toBe(2);
+      expect(findIndexBigInt(bigints, "5000000000000000000000000000000000", false)).toBe(2);
+      expect(findIndexBigInt(bigints, "13000000000000000000000000000000000", false)).toBe(4);
+      expect(findIndexBigInt(bigints, "25000000000000000000000000000000000", false)).toBe(4);
     });
   });
 

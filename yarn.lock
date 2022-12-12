@@ -8589,7 +8589,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"big-integer@npm:^1.6.51, big-integer@npm:^1.6.7":
+"big-integer@npm:^1.6.7":
   version: 1.6.51
   resolution: "big-integer@npm:1.6.51"
   checksum: 3d444173d1b2e20747e2c175568bedeebd8315b0637ea95d75fd27830d3b8e8ba36c6af40374f36bdaea7b5de376dcada1b07587cb2a79a928fccdb6e6e3c518
@@ -20865,7 +20865,6 @@ __metadata:
     babel-loader: ^8.2.4
     babel-plugin-add-react-displayname: ^0.0.5
     babel-plugin-transform-import-meta: ^2.1.1
-    big-integer: ^1.6.51
     bufferutil: ^4.0.6
     bvaughn-architecture-demo: "workspace:*"
     circular-dependency-plugin: ^5.2.2
