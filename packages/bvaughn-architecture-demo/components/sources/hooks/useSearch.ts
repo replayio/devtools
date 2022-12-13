@@ -175,21 +175,27 @@ function reducer<Item, Result, QueryData = never>(
       const cachedScopes = state.cachedScopes;
       if (currentScopeId !== null) {
         const currentScope = cachedScopes[currentScopeId];
-        if (currentScope != null && currentScope.results !== results) {
-          return {
-            ...state,
-            cachedScopes: {
-              ...cachedScopes,
-              [currentScopeId]: {
-                ...currentScope,
-                query,
-                queryData,
-                results,
+        if (currentScope != null) {
+          if (
+            currentScope.query !== query ||
+            currentScope.queryData !== queryData ||
+            currentScope.results !== results
+          ) {
+            return {
+              ...state,
+              cachedScopes: {
+                ...cachedScopes,
+                [currentScopeId]: {
+                  ...currentScope,
+                  query,
+                  queryData,
+                  results,
+                },
               },
-            },
-            index,
-            results,
-          };
+              index,
+              results,
+            };
+          }
         }
       }
 
