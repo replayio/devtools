@@ -1,8 +1,10 @@
+import classnames from "classnames";
 import { createContext, useEffect, useState } from "react";
 
 import { getRecordingDuration } from "ui/actions/app";
 import {
   seek,
+  seekToTime,
   setFocusRegion,
   startPlayback,
   syncFocusedRegion,
@@ -34,7 +36,7 @@ export const TestCaseContext = createContext<TestCaseContextType>(null as any);
 export function TestCase({ test, index }: { test: TestItem; index: number }) {
   const [expandSteps, setExpandSteps] = useState(false);
   const dispatch = useAppDispatch();
-  const expandable = test.steps || test.error;
+  const expandable = typeof test.relativeStartTime === "number" && (test.steps || test.error);
   const selectedTest = useAppSelector(getSelectedTest);
   const isSelected = selectedTest === index;
   const annotationsStart = useAppSelector(getReporterAnnotationsForTitleEnd(test.title));
@@ -67,14 +69,19 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
   };
   const toggleExpand = () => {
     const firstStep = test.steps?.[0];
-    const time = firstStep.relativeStartTime + test.relativeStartTime;
-    const pointStart = annotationsStart.find(a => a.message.id === firstStep.id)?.point;
+    if (firstStep) {
+      const time = firstStep.relativeStartTime + test.relativeStartTime;
+      const pointStart = annotationsStart.find(a => a.message.id === firstStep.id)?.point;
 
-    if (firstStep && time && pointStart) {
-      dispatch(seek(pointStart, time, false));
+      if (time && pointStart) {
+        dispatch(seek(pointStart, time, false));
+      }
+
+      dispatch(setSelectedTest(index));
+    } else if (typeof test.relativeStartTime === "number") {
+      dispatch(seekToTime(test.relativeStartTime, false));
     }
 
-    dispatch(setSelectedTest(index));
     onFocus();
   };
 
@@ -100,7 +107,12 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
       <div className="flex flex-col">
         {!isSelected && (
           <button
-            className="group flex flex-row items-center justify-between gap-1 rounded-lg p-1 transition hover:cursor-pointer"
+            className={classnames(
+              "flex flex-row items-center justify-between gap-1 rounded-lg p-1 transition",
+              {
+                "group hover:cursor-pointer": expandable,
+              }
+            )}
             onClick={toggleExpand}
             disabled={!expandable}
           >
