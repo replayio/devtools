@@ -732,12 +732,8 @@ export class ReplayClient implements ReplayClientInterface {
     return mappedLocation;
   }
 
-  async loadRegion(range: TimeRange, duration: number): Promise<void> {
+  async loadRegion(range: TimeRange): Promise<void> {
     const sessionId = this.getSessionIdThrows();
-
-    client.Session.unloadRegion({ region: { begin: 0, end: range.begin } }, sessionId);
-    client.Session.unloadRegion({ region: { begin: range.end, end: duration } }, sessionId);
-
     await client.Session.loadRegion({ region: { begin: range.begin, end: range.end } }, sessionId);
   }
 
