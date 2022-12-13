@@ -1,17 +1,10 @@
 import { Action } from "@reduxjs/toolkit";
 import { RecordingId } from "@replayio/protocol";
 
+import { createSourceLocationLabels } from "bvaughn-architecture-demo/components/sources/utils/createCommentLabels";
 import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
-import { getStreamingSourceContentsHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
-import { parse } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
-import {
-  handleUnstableSourceIds,
-  selectLocation,
-} from "devtools/client/debugger/src/actions/sources/select";
-import { fetchSymbolsForSource, getSymbols } from "devtools/client/debugger/src/reducers/ast";
+import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getExecutionPoint, getPauseId } from "devtools/client/debugger/src/reducers/pause";
-import { findClosestFunction } from "devtools/client/debugger/src/utils/ast";
-import { getFilenameFromURL } from "devtools/client/debugger/src/utils/sources-tree/getURL";
 import type { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { waitForTime } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
@@ -22,7 +15,6 @@ import {
   getPreferredGeneratedSources,
   getPreferredSourceId,
   getSourceDetailsEntities,
-  getTextAtLocation,
 } from "ui/reducers/sources";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
@@ -46,11 +38,19 @@ export function createComment(
   recordingId: RecordingId,
   options: CommentOptions
 ): UIThunkAction {
-  return async dispatch => {
+  return async (dispatch, getState, { replayClient }) => {
     const { sourceLocation, hasFrames, position, networkRequestId } = options;
-    const labels = sourceLocation ? await dispatch(createLabels(sourceLocation)) : undefined;
-    const primaryLabel = labels?.primary;
-    const secondaryLabel = labels?.secondary;
+
+    let primaryLabel: string | null = null;
+    let secondaryLabel: string | null = null;
+    if (sourceLocation) {
+      ({ primaryLabel, secondaryLabel } = await createSourceLocationLabels(
+        replayClient,
+        sourceLocation.sourceId,
+        sourceLocation.line,
+        sourceLocation.column
+      ));
+    }
 
     trackEvent("comments.create");
 
@@ -171,67 +171,6 @@ export function createNetworkRequestComment(
         networkRequestId: request.id,
       })
     );
-  };
-}
-
-export function createLabels(
-  sourceLocation: SourceLocation
-): UIThunkAction<Promise<{ primary: string; secondary: string }>> {
-  return async (dispatch, getState, { ThreadFront, replayClient }) => {
-    await ThreadFront.ensureAllSources();
-    const state = getState();
-
-    const { line, sourceUrl } = sourceLocation;
-
-    let sourceId: string | null = sourceLocation.sourceId || null;
-
-    // If there's a source URL, we should use it to find the source ID.
-    // Otherwise fall back to the source ID we already have.
-    if (sourceUrl) {
-      const alternateSourceId = handleUnstableSourceIds(sourceLocation.sourceUrl, state);
-      if (alternateSourceId) {
-        sourceId = alternateSourceId;
-        sourceLocation = {
-          ...sourceLocation,
-          sourceId: alternateSourceId,
-        };
-      }
-    }
-
-    const filename = sourceUrl ? getFilenameFromURL(sourceUrl) : "unknown source";
-
-    if (!sourceId) {
-      return { primary: `${filename}:${line}`, secondary: "" };
-    }
-
-    let symbols = getSymbols(state, { id: sourceId });
-    if (!symbols) {
-      await dispatch(fetchSymbolsForSource(sourceId));
-      // TODO Technically a small race condition here if the symbols were already loading,
-      // but given where `createLabels` is called I'm not going to worry about it
-      symbols = getSymbols(state, { id: sourceId });
-    }
-    const closestFunction = findClosestFunction(symbols!, sourceLocation);
-    const primary = closestFunction?.name || `${filename}:${line}`;
-
-    let snippet = getTextAtLocation(state, sourceLocation) || "";
-    if (!snippet) {
-      const { resolver } = await getStreamingSourceContentsHelper(replayClient, sourceId);
-      const { contents } = await resolver;
-
-      const lineText = contents!.split("\n")[line - 1];
-      snippet = lineText?.slice(0, 100).trim();
-    }
-
-    let secondary = "";
-    if (snippet) {
-      const parsed = parse(snippet, ".js");
-      if (parsed !== null && parsed.length > 0) {
-        secondary = parsed[0];
-      }
-    }
-
-    return { primary, secondary };
   };
 }
 

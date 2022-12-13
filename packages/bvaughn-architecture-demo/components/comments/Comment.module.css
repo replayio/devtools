@@ -114,3 +114,27 @@
   color: var(--color-contrast);
   border-color: var(--color-error);
 }
+
+.Labels {
+  margin: 0.25rem;
+  background-color: var(--comment-card-source-preview-background-color);
+  border-radius: 0.25rem;
+  font-family: var(--font-family-monospace);
+  cursor: pointer;
+}
+.Labels:hover {
+  background-color: var(--comment-card-source-preview-background-color-hover);
+}
+
+.PrimaryLabel {
+  font-size: var(--font-size-small);
+  padding: 0.25rem 0.5rem;
+}
+
+.SecondaryLabel {
+  font-size: var(--font-size-regular);
+  padding: 0.25rem 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

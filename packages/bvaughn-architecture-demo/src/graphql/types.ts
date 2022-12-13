@@ -1,5 +1,3 @@
-import { SourceLocation } from "@replayio/protocol";
-
 export enum Nag {
   FIRST_LOG_IN = "first_log_in",
   FIRST_REPLAY_2 = "first_replay_2",
@@ -37,6 +35,13 @@ export type UserInfo = {
   features: { library: boolean };
 };
 
+export interface CommentSourceLocation {
+  sourceUrl: string;
+  line: number;
+  column: number;
+  sourceId: string;
+}
+
 interface Remark {
   content: string;
   createdAt: string;
@@ -44,7 +49,7 @@ interface Remark {
   id: string;
   isPublished: boolean;
   point: string;
-  sourceLocation: SourceLocation | null;
+  sourceLocation: CommentSourceLocation | null;
   time: number;
   updatedAt: string;
   user: User;

@@ -102,6 +102,14 @@ export async function getSourcesAsync(client: ReplayClientInterface): Promise<Pr
   }
 }
 
+export async function getSourceAsync(
+  client: ReplayClientInterface,
+  sourceId: ProtocolSourceId
+): Promise<ProtocolSource | null> {
+  await getSourcesAsync(client);
+  return getSource(client, sourceId);
+}
+
 export function getSource(
   client: ReplayClientInterface,
   sourceId: ProtocolSourceId
@@ -123,6 +131,25 @@ export function getCachedSourceContents(
 ): StreamingSourceContents | null {
   const record = sourceIdToStreamingSourceContentsMap.get(sourceId);
   return record?.status === STATUS_RESOLVED ? record.value : null;
+}
+
+export async function getStreamingSourceContentsAsync(
+  client: ReplayClientInterface,
+  sourceId: ProtocolSourceId
+): Promise<StreamingSourceContents | null> {
+  try {
+    return getStreamingSourceContentsSuspense(client, sourceId);
+  } catch (errorOrPromise) {
+    if (
+      errorOrPromise != null &&
+      typeof errorOrPromise === "object" &&
+      errorOrPromise.hasOwnProperty("then")
+    ) {
+      return errorOrPromise as Promise<StreamingSourceContents>;
+    } else {
+      throw errorOrPromise;
+    }
+  }
 }
 
 export function getStreamingSourceContentsSuspense(
