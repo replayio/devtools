@@ -11,6 +11,7 @@ import { ProtocolError, isCommandError } from "shared/utils/error";
 
 import { createWakeable } from "../utils/suspense";
 import { isExecutionPointsLessThan } from "../utils/time";
+import { createGenericCache2 } from "./createGenericCache";
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 export type CachedPointsForTime = Map<number, ExecutionPoint>;
@@ -57,7 +58,7 @@ async function fetchPointsBoundingTime(
   rethrowError: boolean
 ) {
   try {
-    const pointsBoundingTime = await client.getPointsBoundingTime(time);
+    const pointsBoundingTime = await getPointsBoundingTimeAsync(client, time);
     const point = getClosestPointInPointsBoundingTime(time, pointsBoundingTime);
 
     // Pre-cache time-to-point match and insert into sorted ExecutionPoints array.
@@ -378,3 +379,12 @@ export function preCacheExecutionPointForTime(timeStampedPoint: TimeStampedPoint
     }
   }
 }
+
+export const {
+  getValueSuspense: getPointsBoundingTimeSuspense,
+  getValueAsync: getPointsBoundingTimeAsync,
+  getValueIfCached: getPointsBoundingTimeIfCached,
+} = createGenericCache2<ReplayClientInterface, [time: number], PointsBoundingTime>(
+  async (client, time) => client.getPointsBoundingTime(time),
+  time => `${time}`
+);

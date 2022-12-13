@@ -1,11 +1,10 @@
 import classnames from "classnames";
 import { createContext, useEffect, useState } from "react";
 
-import { getRecordingDuration } from "ui/actions/app";
 import {
   seek,
   seekToTime,
-  setFocusRegion,
+  setFocusRegionFromTimeRange,
   startPlayback,
   syncFocusedRegion,
   updateFocusRegionParam,
@@ -17,7 +16,6 @@ import {
   getSelectedTest,
   setSelectedTest,
 } from "ui/reducers/reporter";
-import { getFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem, TestResult, TestStep } from "ui/types";
 
@@ -54,26 +52,15 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
   const isSelected = selectedTest === index;
   const annotationsStart = useAppSelector(getReporterAnnotationsForTitleEnd);
 
-  const duration = useAppSelector(getRecordingDuration);
   const testStartTime = test.relativeStartTime || 0;
   const testEndTime = testStartTime + (test.duration || 0);
-  const focusRegion = useAppSelector(getFocusRegion);
-  const isFocused =
-    focusRegion?.beginTime === testStartTime && focusRegion?.endTime === testEndTime;
 
   const onFocus = () => {
-    if (isFocused) {
+    if (testEndTime > testStartTime) {
       dispatch(
-        setFocusRegion({
-          beginTime: 0,
-          endTime: duration,
-        })
-      );
-    } else if (testEndTime > testStartTime) {
-      dispatch(
-        setFocusRegion({
-          beginTime: testStartTime,
-          endTime: testEndTime,
+        setFocusRegionFromTimeRange({
+          begin: testStartTime,
+          end: testEndTime,
         })
       );
     }

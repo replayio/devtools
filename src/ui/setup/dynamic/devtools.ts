@@ -55,7 +55,7 @@ import reporter from "ui/reducers/reporter";
 import timeline, {
   allPaintsReceived,
   paintsReceived,
-  pointsReceivedThunk,
+  pointsReceived,
   setPlaybackStalled,
 } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
@@ -262,7 +262,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   let points: TimeStampedPoint[] = [];
 
   const onPointsReceived = debounce(() => {
-    store.dispatch(pointsReceivedThunk(points.map(({ point, time }) => ({ point, time }))));
+    store.dispatch(pointsReceived(points.map(({ point, time }) => ({ point, time }))));
     store.dispatch(paintsReceived(points.filter(p => "screenShots" in p)));
     points = [];
   }, 1_000);

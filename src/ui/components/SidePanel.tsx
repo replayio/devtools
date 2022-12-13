@@ -4,8 +4,11 @@ import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPanes";
 import Accordion from "devtools/client/debugger/src/components/shared/Accordion";
 import TestInfo from "devtools/client/debugger/src/components/TestInfo/TestInfo";
-import { getRecordingDuration } from "ui/actions/app";
-import { setFocusRegion, syncFocusedRegion, updateFocusRegionParam } from "ui/actions/timeline";
+import {
+  setFocusRegionFromTimeRange,
+  syncFocusedRegion,
+  updateFocusRegionParam,
+} from "ui/actions/timeline";
 import Events from "ui/components/Events";
 import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
 import Icon from "ui/components/shared/Icon";
@@ -115,7 +118,6 @@ function EventsPane({ items }: { items: any[] }) {
   const annotations = useAppSelector(getReporterAnnotationsForTests);
   const selectedTest = useAppSelector(getSelectedTest);
   const dispatch = useAppDispatch();
-  const duration = useAppSelector(getRecordingDuration);
 
   const testCases = useMemo(
     () => maybeCorrectTestTimes(recording, annotations),
@@ -125,12 +127,7 @@ function EventsPane({ items }: { items: any[] }) {
   const onReset = () => {
     dispatch(setSelectedTest(null));
     dispatch(setSelectedStep(null));
-    dispatch(
-      setFocusRegion({
-        beginTime: 0,
-        endTime: duration,
-      })
-    );
+    dispatch(setFocusRegionFromTimeRange(null));
     dispatch(syncFocusedRegion());
     dispatch(updateFocusRegionParam());
   };
