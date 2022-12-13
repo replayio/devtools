@@ -13,6 +13,7 @@ export default function TypeAheadItemRenderer<Item>({
   isSelected,
   item,
   itemRenderer,
+  query,
 }: {
   className: string;
   dataTestId?: string;
@@ -20,7 +21,8 @@ export default function TypeAheadItemRenderer<Item>({
   editor: LexicalEditor;
   isSelected: boolean;
   item: Item;
-  itemRenderer: (item: Item) => ReactNode;
+  itemRenderer: (item: Item, query: string) => ReactNode;
+  query: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -46,7 +48,7 @@ export default function TypeAheadItemRenderer<Item>({
       onClick={onClick}
       ref={ref}
     >
-      {itemRenderer(item)}
+      {itemRenderer(item, query)}
     </div>
   );
 }

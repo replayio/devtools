@@ -98,6 +98,9 @@
   --context-menu-background-color-divider: var(--background-color-contrast-2);
   --context-menu-background-color-hover: var(--background-color-contrast-2);
 
+  --comment-card-source-preview-background-color: #081221;
+  --comment-card-source-preview-background-color-hover: #3e434a;
+
   --object-inspector-go-to-definition-icon-color: #dddddd;
   --object-inspector-go-to-definition-icon-color-hover: #ffffff;
   --object-inspector-invoke-getter-icon-color: #dddddd;
@@ -253,6 +256,9 @@
   --context-menu-background-color: var(--background-color-default);
   --context-menu-background-color-divider: var(--background-color-contrast-1);
   --context-menu-background-color-hover: var(--background-color-contrast-1);
+
+  --comment-card-source-preview-background-color: #f2f3f2;
+  --comment-card-source-preview-background-color-hover: #e6e6e6;
 
   --object-inspector-go-to-definition-icon-color: #222222;
   --object-inspector-go-to-definition-icon-color-hover: #000000;

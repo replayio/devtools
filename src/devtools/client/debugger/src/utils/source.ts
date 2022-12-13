@@ -4,14 +4,13 @@
 
 //
 
+import { truncate as truncateText } from "bvaughn-architecture-demo/src/utils/text";
 import { getUnicodeUrl } from "devtools/client/shared/unicode-url";
 import { MiniSource, SourceContent } from "ui/reducers/sources";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 
 import type { SymbolDeclarations } from "../reducers/ast";
 import { getURL } from "./sources-tree/getURL";
-import { truncateMiddleText } from "./text";
-import { endTruncateStr } from "./text";
 import { parse as parseURL } from "./url";
 
 export { isMinified } from "./isMinified";
@@ -134,7 +133,7 @@ function resolveFileURL(
   if (!truncate) {
     return name;
   }
-  return endTruncateStr(name, 50);
+  return truncateText(name, { maxLength: 50, position: "start" });
 }
 
 export function getFormattedSourceId(id: string) {
@@ -162,7 +161,10 @@ export function getFilename(
  * Provides a middle-trunated filename
  */
 export function getTruncatedFileName(source: MiniSource, querystring = "", length = 30) {
-  return truncateMiddleText(`${getFilename(source)}${querystring}`, length);
+  return truncateText(`${getFilename(source)}${querystring}`, {
+    maxLength: length,
+    position: "middle",
+  });
 }
 
 /* Gets path for files with same filename for editor tabs, breakpoints, etc.

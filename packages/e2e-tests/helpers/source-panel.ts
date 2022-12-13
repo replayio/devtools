@@ -164,7 +164,11 @@ export async function editLogPoint(
 
   if (condition != null || content != null) {
     const line = await getSourceLine(page, lineNumber);
-    await line.locator('[data-test-name="PointPanel-EditButton"]').click();
+
+    const isEditing = await line.locator('[data-lexical-editor="true"]').isVisible();
+    if (!isEditing) {
+      await line.locator('[data-test-name="PointPanel-EditButton"]').click();
+    }
 
     if (condition != null) {
       await debugPrint(

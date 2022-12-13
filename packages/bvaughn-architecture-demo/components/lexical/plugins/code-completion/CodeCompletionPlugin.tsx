@@ -58,6 +58,7 @@ export default function CodeCompletionPlugin({
       findMatches={findMatchesWrapper}
       isExactMatch={isExactMatch}
       itemClassName={styles.Item}
+      itemRenderer={itemRenderer}
       listClassName={styles.List}
     />
   );
@@ -65,4 +66,40 @@ export default function CodeCompletionPlugin({
 
 function createItemNode(match: Match) {
   return $createTextNode(match);
+}
+
+function itemRenderer(code: string, query: string) {
+  // Remove leading "."
+  query = query.slice(1);
+
+  let children = [];
+  let inProgress = "";
+  let codeIndex = 0;
+  let queryIndex = 0;
+
+  while (codeIndex < code.length) {
+    const queryChar = query.charAt(queryIndex) || "";
+    const codeChar = code.charAt(codeIndex);
+
+    if (codeChar.toLowerCase() === queryChar.toLowerCase()) {
+      if (inProgress !== "") {
+        children.push(<span key={children.length}>{inProgress}</span>);
+      }
+
+      children.push(<strong key={children.length}>{codeChar}</strong>);
+
+      inProgress = "";
+      queryIndex++;
+    } else {
+      inProgress += codeChar;
+    }
+
+    codeIndex++;
+  }
+
+  if (inProgress !== "") {
+    children.push(<span key={children.length}>{inProgress}</span>);
+  }
+
+  return children;
 }

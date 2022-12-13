@@ -1,8 +1,10 @@
+import classnames from "classnames";
 import { createContext, useEffect, useState } from "react";
 
 import { getRecordingDuration } from "ui/actions/app";
 import {
   seek,
+  seekToTime,
   setFocusRegion,
   startPlayback,
   syncFocusedRegion,
@@ -17,7 +19,7 @@ import {
 } from "ui/reducers/reporter";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { TestItem, TestResult } from "ui/types";
+import { TestItem, TestResult, TestStep } from "ui/types";
 
 import { TestSteps } from "./TestSteps";
 
@@ -29,12 +31,25 @@ export type TestCaseContextType = {
   onPlayFromHere: (startTime: number) => void;
 };
 
+function formatStepError(step?: TestStep) {
+  if (!step || !step.error) {
+    return null;
+  }
+
+  return (
+    <>
+      <strong className="bold">Error:</strong>&nbsp;
+      {step.args.map((e, i) => (typeof e === "string" ? <span key={i}>{e}&nbsp;</span> : null))}
+    </>
+  );
+}
+
 export const TestCaseContext = createContext<TestCaseContextType>(null as any);
 
 export function TestCase({ test, index }: { test: TestItem; index: number }) {
   const [expandSteps, setExpandSteps] = useState(false);
   const dispatch = useAppDispatch();
-  const expandable = test.steps || test.error;
+  const expandable = typeof test.relativeStartTime === "number" && (test.steps || test.error);
   const selectedTest = useAppSelector(getSelectedTest);
   const isSelected = selectedTest === index;
   const annotationsStart = useAppSelector(getReporterAnnotationsForTitleEnd(test.title));
@@ -67,14 +82,19 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
   };
   const toggleExpand = () => {
     const firstStep = test.steps?.[0];
-    const time = firstStep.relativeStartTime + test.relativeStartTime;
-    const pointStart = annotationsStart.find(a => a.message.id === firstStep.id)?.point;
+    if (firstStep) {
+      const time = firstStep.relativeStartTime + test.relativeStartTime;
+      const pointStart = annotationsStart.find(a => a.message.id === firstStep.id)?.point;
 
-    if (firstStep && time && pointStart) {
-      dispatch(seek(pointStart, time, false));
+      if (time && pointStart) {
+        dispatch(seek(pointStart, time, false));
+      }
+
+      dispatch(setSelectedTest(index));
+    } else if (typeof test.relativeStartTime === "number") {
+      dispatch(seekToTime(test.relativeStartTime, false));
     }
 
-    dispatch(setSelectedTest(index));
     onFocus();
   };
 
@@ -100,7 +120,12 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
       <div className="flex flex-col">
         {!isSelected && (
           <button
-            className="group flex flex-row items-center justify-between gap-1 rounded-lg p-1 transition hover:cursor-pointer"
+            className={classnames(
+              "flex flex-row items-center justify-between gap-1 rounded-lg p-1 transition",
+              {
+                "group hover:cursor-pointer": expandable,
+              }
+            )}
             onClick={toggleExpand}
             disabled={!expandable}
           >
@@ -113,8 +138,8 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
                   {test.title}
                 </div>
                 {test.error ? (
-                  <div className="mt-1 overflow-hidden rounded-lg bg-testsuitesErrorBgcolor px-2 py-1 text-left font-mono ">
-                    {test.error.message}
+                  <div className="mt-2 overflow-hidden rounded-lg bg-testsuitesErrorBgcolor px-3 py-2 text-left font-mono ">
+                    {formatStepError(test.steps?.find(s => s.error)) || test.error.message}
                   </div>
                 ) : null}
               </div>

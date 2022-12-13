@@ -14,16 +14,18 @@ export default function TypeAheadListRenderer<Item>({
   itemRenderer,
   listClassName,
   popupRef,
+  query,
   selectedItem,
 }: {
   dataTestId?: string;
   dataTestName?: string;
   editor: LexicalEditor;
   itemClassName: string;
-  itemRenderer: (item: Item) => ReactNode;
+  itemRenderer: (item: Item, query: string) => ReactNode;
   items: Item[];
   listClassName: string;
   popupRef: RefObject<HTMLDivElement>;
+  query: string;
   selectedItem: Item | null;
 }) {
   return (
@@ -43,6 +45,7 @@ export default function TypeAheadListRenderer<Item>({
           isSelected={selectedItem === items[index]}
           item={item as Item}
           itemRenderer={itemRenderer}
+          query={query}
         />
       ))}
     </div>

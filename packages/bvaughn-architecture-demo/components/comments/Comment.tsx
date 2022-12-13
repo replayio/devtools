@@ -12,6 +12,7 @@ import Icon from "bvaughn-architecture-demo/components/Icon";
 import CommentEditor from "bvaughn-architecture-demo/components/lexical/CommentEditor";
 import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
 import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import {
   addCommentReply as addCommentReplyGraphQL,
   deleteComment as deleteCommentGraphQL,
@@ -19,7 +20,7 @@ import {
   updateComment as updateCommentGraphQL,
   updateCommentReply as updateCommentReplyGraphQL,
 } from "bvaughn-architecture-demo/src/graphql/Comments";
-import { Comment, User } from "bvaughn-architecture-demo/src/graphql/types";
+import { Comment, CommentSourceLocation, User } from "bvaughn-architecture-demo/src/graphql/types";
 import { formatRelativeTime } from "bvaughn-architecture-demo/src/utils/time";
 
 import styles from "./Comment.module.css";
@@ -64,6 +65,9 @@ export default function CommentRenderer({ comment }: { comment: Comment }) {
       editCallback={editCommentCallback}
       isPublished={comment.isPublished}
       owner={comment.user}
+      primaryLabel={comment.primaryLabel || null}
+      secondaryLabel={comment.secondaryLabel || null}
+      sourceLocation={comment.sourceLocation}
     >
       {comment.replies.map(reply => {
         const deleteCommentReplyCallback = async () => {
@@ -90,6 +94,9 @@ export default function CommentRenderer({ comment }: { comment: Comment }) {
             editCallback={editCommentReplyCallback}
             isPublished={reply.isPublished}
             owner={reply.user}
+            primaryLabel={null}
+            secondaryLabel={null}
+            sourceLocation={null}
           />
         );
       })}
@@ -112,6 +119,9 @@ function EditableRemark({
   editCallback,
   isPublished,
   owner,
+  primaryLabel,
+  secondaryLabel,
+  sourceLocation,
 }: {
   children?: ReactNode;
   className: string;
@@ -121,8 +131,12 @@ function EditableRemark({
   editCallback: (newContent: string, newIsPublished: boolean) => Promise<void>;
   isPublished: boolean;
   owner: User;
+  primaryLabel: string | null;
+  secondaryLabel: string | null;
+  sourceLocation: CommentSourceLocation | null;
 }) {
   const { currentUserInfo } = useContext(SessionContext);
+  const { openSource } = useContext(SourcesContext);
   const invalidateCache = useCacheRefresh();
 
   const [isEditing, setIsEditing] = useState(content === "");
@@ -164,6 +178,16 @@ function EditableRemark({
     save(JSON.stringify(editorState), false);
   };
 
+  const openLocation = () => {
+    if (sourceLocation) {
+      const { line: lineNumber, sourceId } = sourceLocation;
+
+      const lineIndex = lineNumber - 1;
+
+      openSource("view-source", sourceId, lineIndex, lineIndex);
+    }
+  };
+
   return (
     <div className={className}>
       <div className={styles.HeaderRow}>
@@ -196,6 +220,18 @@ function EditableRemark({
           </>
         )}
       </div>
+
+      {(primaryLabel || secondaryLabel) && (
+        <div className={styles.Labels} onClick={openLocation}>
+          {primaryLabel && <div className={styles.PrimaryLabel}>{primaryLabel}</div>}
+          {secondaryLabel && (
+            <div
+              className={styles.SecondaryLabel}
+              dangerouslySetInnerHTML={{ __html: secondaryLabel }}
+            />
+          )}
+        </div>
+      )}
 
       <div className={styles.ContentWrapper} onDoubleClick={startEditing}>
         <CommentEditor
