@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import React from "react";
+import React, { forwardRef } from "react";
 
 interface TestStepRowProps {
   error?: boolean;
@@ -7,16 +7,18 @@ interface TestStepRowProps {
   pending?: boolean;
 }
 
-export function TestStepRow({
+export function TestStepRowBase({
+  clientRef,
   className,
   active,
   pending,
   error,
   ...rest
-}: TestStepRowProps & React.HTMLProps<HTMLDivElement>) {
+}: TestStepRowProps & React.HTMLProps<HTMLDivElement> & { clientRef?: React.Ref<HTMLDivElement> }) {
   return (
     <div
       {...rest}
+      ref={clientRef}
       className={classnames(
         className,
         "group/step relative flex items-start gap-1 border-b border-l-2 border-themeBase-90 px-3 py-2 font-mono",
@@ -38,3 +40,10 @@ export function TestStepRow({
     />
   );
 }
+
+export const TestStepRow = forwardRef<
+  HTMLDivElement,
+  TestStepRowProps & React.HTMLProps<HTMLDivElement>
+>(function TestStepRow(props, ref) {
+  return <TestStepRowBase {...props} clientRef={ref} />;
+});
