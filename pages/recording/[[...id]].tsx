@@ -121,10 +121,11 @@ function useRecordingSlug(recordingId: string) {
 }
 
 function RecordingPage({
+  apiKey,
   getAccessibleRecording,
   setExpectedError,
   head,
-}: PropsFromRedux & { head?: React.ReactNode }) {
+}: PropsFromRedux & { apiKey?: string; head?: React.ReactNode }) {
   const token = useToken();
   const store = useAppStore();
   const { query } = useRouter();
@@ -200,7 +201,7 @@ function RecordingPage({
     return (
       <>
         {head}
-        <DevTools uploadComplete={uploadComplete} />
+        <DevTools apiKey={apiKey} uploadComplete={uploadComplete} />
       </>
     );
   }
@@ -220,14 +221,14 @@ export const getServerSideProps: GetServerSideProps = async function ({ params }
   };
 };
 
-type SSRProps = MetadataProps & { headOnly?: boolean };
+type SSRProps = MetadataProps & { apiKey?: string; headOnly?: boolean };
 
-export default function SSRRecordingPage({ headOnly, metadata }: SSRProps) {
+export default function SSRRecordingPage({ apiKey, headOnly, metadata }: SSRProps) {
   let head: React.ReactNode = <RecordingHead metadata={metadata} />;
 
   if (headOnly) {
     return head;
   }
 
-  return <ConnectedRecordingPage head={head} />;
+  return <ConnectedRecordingPage apiKey={apiKey} head={head} />;
 }

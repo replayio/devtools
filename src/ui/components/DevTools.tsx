@@ -47,7 +47,7 @@ import Video from "./Video";
 
 const Viewer = React.lazy(() => import("./Viewer"));
 
-type DevToolsProps = PropsFromRedux & { uploadComplete: boolean };
+type DevToolsProps = PropsFromRedux & { apiKey?: string; uploadComplete: boolean };
 
 function ViewLoader() {
   const [showLoader, setShowLoader] = useState(false);
@@ -107,6 +107,7 @@ function Body() {
 }
 
 function _DevTools({
+  apiKey,
   clearTrialExpired,
   createSocket,
   loadedRegions,
@@ -203,7 +204,7 @@ function _DevTools({
   }
 
   return (
-    <SessionContextAdapter>
+    <SessionContextAdapter apiKey={apiKey ?? null}>
       <SourcesContextAdapter>
         <FocusContextReduxAdapter>
           <PointsContextRoot>

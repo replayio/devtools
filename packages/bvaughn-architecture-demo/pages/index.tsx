@@ -42,7 +42,7 @@ const recordData = hasFlag("record");
 
 type Panel = "comments" | "protocol-viewer" | "search" | "sources";
 
-export default function HomePage() {
+export default function HomePage({ apiKey }: { apiKey?: string }) {
   // TODO As we finalize the client implementation to interface with Replay backend,
   // we can inject a wrapper here that also reports cache hits and misses to this UI in a debug panel.
 
@@ -71,7 +71,7 @@ export default function HomePage() {
   usePreferredColorScheme();
 
   const content = (
-    <Initializer>
+    <Initializer accessToken={apiKey || null}>
       <KeyboardModifiersContextRoot>
         <SourcesContextRoot>
           <InspectorContextRoot
