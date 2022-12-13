@@ -1,15 +1,16 @@
-import classNames from "classnames";
 import React from "react";
 
+import Icon from "bvaughn-architecture-demo/components/Icon";
 import { setSelectedPanel } from "ui/actions/layout";
 import { selectAndFetchRequest } from "ui/actions/network";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getSummaryById } from "ui/reducers/network";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 import { isInFocusSpan } from "ui/utils/timeline";
+
+import styles from "./styles.module.css";
 
 export default function NetworkRequestPreview({ networkRequestId }: { networkRequestId: string }) {
   const dispatch = useAppDispatch();
@@ -32,32 +33,16 @@ export default function NetworkRequestPreview({ networkRequestId }: { networkReq
 
   return (
     <div
+      className={isSeekEnabled ? styles.LabelGroup : styles.LabelGroupDisabled}
       onClick={isSeekEnabled ? onClick : undefined}
-      className={classNames(
-        "group rounded-md border-gray-200 bg-chrome px-2 py-0.5",
-        isSeekEnabled && "cursor-pointer hover:bg-themeTextFieldBgcolor"
-      )}
+      title={isSeekEnabled ? "Show in the Network Monitor" : undefined}
     >
-      <div className="mono flex flex-col font-medium">
-        <div className="flex w-full flex-row justify-between space-x-1">
-          <div
-            className="cm-s-mozilla space-x-2 overflow-hidden whitespace-pre font-mono text-xs"
-            style={{ fontSize: "11px" }}
-          >
-            <span className="font-bold">{`[${method}]`}</span>
-            <span>{name}</span>
-          </div>
-          <div
-            className={classNames(
-              "flex flex-shrink-0 opacity-0 transition",
-              isSeekEnabled && "group-hover:opacity-100"
-            )}
-            title="Show in the Network Monitor"
-          >
-            <MaterialIcon iconSize="sm">keyboard_arrow_right</MaterialIcon>
-          </div>
+      <div className={styles.Labels}>
+        <div className={styles.PrimaryLabel}>
+          <span className={styles.NetworkRequestMethod}>{`[${method}]`}</span> {name}
         </div>
       </div>
+      <Icon className={styles.Icon} type="chevron-right" />
     </div>
   );
 }

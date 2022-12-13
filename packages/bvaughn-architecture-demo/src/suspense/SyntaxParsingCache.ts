@@ -44,11 +44,14 @@ export const { getValueSuspense: parse } = createGenericCache<
   string[] | null
 >(highlighter, identity);
 
-export const { getValueSuspense: parseStreaming, getValueAsync: parseStreamingAsync } =
-  createGenericCache<[source: StreamingSourceContents, maxTime?: number], StreamingParser | null>(
-    streamingSourceContentsToStreamingParser,
-    identity
-  );
+export const {
+  getValueAsync: parseStreamingAsync,
+  getValueSuspense: parseStreaming,
+  getValueIfCached: getParsedValueIfCached,
+} = createGenericCache<[source: StreamingSourceContents, maxTime?: number], StreamingParser | null>(
+  streamingSourceContentsToStreamingParser,
+  identity
+);
 
 let cachedElement: HTMLElement | null = null;
 

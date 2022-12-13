@@ -1,41 +1,79 @@
 import React, { useEffect, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import Icon from "bvaughn-architecture-demo/components/Icon";
+import { createSourceLocationLabels } from "bvaughn-architecture-demo/components/sources/utils/createCommentLabels";
+import { replayClient } from "shared/client/ReplayClientContext";
 import { actions } from "ui/actions";
-import { createLabels } from "ui/actions/comments";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
+import { Comment } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
 
 import LoadingLabelPlaceholder from "./LoadingLabelPlaceholder";
+import styles from "./styles.module.css";
 
 type PropsFromParent = {
-  comment: any;
+  comment: Comment;
 };
 type CommentSourceProps = PropsFromRedux & PropsFromParent;
 
-type Labels = {
-  primary: string | null;
-  secondary: string | null;
+type State = {
+  initialized: boolean;
+  primaryLabel: string | null;
+  secondaryLabel: string | null;
 };
 
-function CommentSource({
-  comment,
-  createLabels,
-  context,
-  selectLocation,
-  setViewMode,
-}: CommentSourceProps) {
-  const [labels, setLabels] = useState<Labels | null>(null);
+function CommentSource({ comment, context, selectLocation, setViewMode }: CommentSourceProps) {
+  const { primaryLabel, secondaryLabel, sourceLocation } = comment;
 
-  const sourceLocation = comment?.sourceLocation;
+  // If the comment has no labels, lazily create them.
+  const [state, setState] = useState<State>({
+    initialized: secondaryLabel !== null || primaryLabel !== null,
+    primaryLabel: primaryLabel ?? null,
+    secondaryLabel: secondaryLabel ?? null,
+  });
 
   useEffect(() => {
-    if (sourceLocation && labels === null) {
-      createLabels(sourceLocation).then(setLabels);
+    if (state.initialized) {
+      return;
+    } else if (primaryLabel !== null || secondaryLabel !== null) {
+      return;
+    } else if (sourceLocation === null) {
+      return;
     }
-  }, [createLabels, labels, sourceLocation]);
+
+    const loadLabels = async () => {
+      try {
+        const { primaryLabel, secondaryLabel } = await createSourceLocationLabels(
+          replayClient,
+          sourceLocation.sourceId,
+          sourceLocation.line,
+          sourceLocation.column
+        );
+
+        setState({
+          initialized: true,
+          primaryLabel,
+          secondaryLabel,
+        });
+      } catch (error) {
+        console.error(error);
+
+        setState({
+          initialized: true,
+          primaryLabel: null,
+          secondaryLabel: null,
+        });
+      }
+    };
+
+    loadLabels();
+  }, [primaryLabel, secondaryLabel, sourceLocation, state]);
+
+  if (!sourceLocation) {
+    return null;
+  }
 
   const onSelectSource = () => {
     setViewMode("dev");
@@ -43,35 +81,24 @@ function CommentSource({
     selectLocation(context, sourceLocation);
   };
 
-  if (!sourceLocation) {
-    return null;
-  }
-
   return (
-    <div
-      onClick={onSelectSource}
-      className="group cursor-pointer rounded-md border-gray-200 bg-chrome px-2 py-0.5 hover:bg-themeTextFieldBgcolor"
-    >
-      <div className="mono flex flex-col font-medium">
-        <div className="flex w-full flex-row justify-between space-x-1">
-          <div
-            className="cm-s-mozilla overflow-hidden whitespace-pre font-mono text-xs"
-            style={{ fontSize: "11px" }}
-          >
-            {labels ? (
-              <span dangerouslySetInnerHTML={{ __html: labels?.secondary || "" }} />
-            ) : (
-              <LoadingLabelPlaceholder />
+    <div className={styles.LabelGroup} onClick={onSelectSource} title="Show in the Editor">
+      <div className={styles.Labels}>
+        {state.initialized ? (
+          <>
+            {state.primaryLabel && <div className={styles.PrimaryLabel}>{state.primaryLabel}</div>}
+            {state.secondaryLabel && (
+              <pre
+                className={styles.SecondaryLabel}
+                dangerouslySetInnerHTML={{ __html: state.secondaryLabel }}
+              />
             )}
-          </div>
-          <div
-            className="flex flex-shrink-0 opacity-0 transition group-hover:opacity-100"
-            title="Show in the Editor"
-          >
-            <MaterialIcon iconSize="sm">keyboard_arrow_right</MaterialIcon>
-          </div>
-        </div>
+          </>
+        ) : (
+          <LoadingLabelPlaceholder />
+        )}
       </div>
+      <Icon className={styles.Icon} type="chevron-right" />
     </div>
   );
 }
@@ -81,7 +108,6 @@ const connector = connect(
     context: selectors.getThreadContext(state),
   }),
   {
-    createLabels,
     selectLocation: actions.selectLocation,
     setViewMode: actions.setViewMode,
   }

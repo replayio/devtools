@@ -5,12 +5,14 @@ import ContextMenuDivider from "bvaughn-architecture-demo/components/context-men
 import ContextMenuItem from "bvaughn-architecture-demo/components/context-menu/ContextMenuItem";
 import useContextMenu from "bvaughn-architecture-demo/components/context-menu/useContextMenu";
 import { copyToClipboard } from "bvaughn-architecture-demo/components/sources/utils/clipboard";
+import { createSourceLocationLabels } from "bvaughn-architecture-demo/components/sources/utils/createCommentLabels";
 import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
 import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
 import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
 import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 import { addComment as addCommentGraphQL } from "bvaughn-architecture-demo/src/graphql/Comments";
 import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 export default function useSourceContextMenu({
   firstBreakableColumnIndex,
@@ -23,6 +25,7 @@ export default function useSourceContextMenu({
   sourceId: SourceId;
   sourceUrl: string | null;
 }) {
+  const client = useContext(ReplayClientContext);
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
   const { accessToken, recordingId, trackEvent } = useContext(SessionContext);
@@ -45,19 +48,25 @@ export default function useSourceContextMenu({
       }
       trackEvent("breakpoint.add_comment");
 
+      const { primaryLabel, secondaryLabel } = await createSourceLocationLabels(
+        client,
+        sourceId,
+        lineNumber,
+        firstBreakableColumnIndex
+      );
+
       await addCommentGraphQL(graphQLClient, accessToken, recordingId, {
         content: "",
         hasFrames: true,
         isPublished: false,
         point: currentExecutionPoint,
-        sourceLocation:
-          firstBreakableColumnIndex != null
-            ? {
-                column: firstBreakableColumnIndex,
-                line: lineNumber,
-                sourceId,
-              }
-            : null,
+        primaryLabel,
+        secondaryLabel,
+        sourceLocation: {
+          column: firstBreakableColumnIndex != null ? firstBreakableColumnIndex : 0,
+          line: lineNumber,
+          sourceId,
+        },
         time: curentTime,
       });
 
@@ -70,11 +79,10 @@ export default function useSourceContextMenu({
   };
 
   const disableCopySourceUri = sourceUrl == null;
-  const disableAddComment = isPending || firstBreakableColumnIndex == null;
 
   return useContextMenu(
     <>
-      <ContextMenuItem disabled={disableAddComment} onClick={addComment}>
+      <ContextMenuItem disabled={isPending} onClick={addComment}>
         Add comment to line {lineNumber}
       </ContextMenuItem>
       <ContextMenuDivider />

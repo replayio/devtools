@@ -59,10 +59,7 @@ const cachedHitCountsMap: Map<string, LineNumberToHitCountMap> = new Map();
 // Source id and focus range to the a tuple of min and max hit counts;
 // this value is updated as we fetch new hit counts for the source (and focus range)
 const minMaxHitCountsMap: Map<SourceIdAndFocusRange, MinMaxHitCountTuple> = new Map();
-const sourceIdToSourceContentsMap: Map<
-  ProtocolSourceId,
-  Record<ProtocolSourceContents>
-> = new Map();
+
 const sourceIdToStreamingSourceContentsMap: Map<
   ProtocolSourceId,
   Record<StreamingSourceContents>
@@ -105,6 +102,14 @@ export async function getSourcesAsync(client: ReplayClientInterface): Promise<Pr
   }
 }
 
+export async function getSourceAsync(
+  client: ReplayClientInterface,
+  sourceId: ProtocolSourceId
+): Promise<ProtocolSource | null> {
+  await getSourcesAsync(client);
+  return getSource(client, sourceId);
+}
+
 export function getSource(
   client: ReplayClientInterface,
   sourceId: ProtocolSourceId
@@ -121,9 +126,30 @@ export function getSourceIfAlreadyLoaded(sourceId: ProtocolSourceId): ProtocolSo
   return null;
 }
 
-export function getCachedSourceContents(sourceId: ProtocolSourceId): ProtocolSourceContents | null {
-  const record = sourceIdToSourceContentsMap.get(sourceId);
+export function getCachedSourceContents(
+  sourceId: ProtocolSourceId
+): StreamingSourceContents | null {
+  const record = sourceIdToStreamingSourceContentsMap.get(sourceId);
   return record?.status === STATUS_RESOLVED ? record.value : null;
+}
+
+export async function getStreamingSourceContentsAsync(
+  client: ReplayClientInterface,
+  sourceId: ProtocolSourceId
+): Promise<StreamingSourceContents | null> {
+  try {
+    return getStreamingSourceContentsSuspense(client, sourceId);
+  } catch (errorOrPromise) {
+    if (
+      errorOrPromise != null &&
+      typeof errorOrPromise === "object" &&
+      errorOrPromise.hasOwnProperty("then")
+    ) {
+      return errorOrPromise as Promise<StreamingSourceContents>;
+    } else {
+      throw errorOrPromise;
+    }
+  }
 }
 
 export function getStreamingSourceContentsSuspense(
