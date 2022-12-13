@@ -48,9 +48,6 @@ import { ThreadFront } from "protocol/thread";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { RecordingCapabilities } from "protocol/thread/thread";
 import { binarySearch, compareNumericStrings, defer, waitForTime } from "protocol/utils";
-import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
-import { insert } from "replay-next/src/utils/array";
-import { areRangesEqual, compareExecutionPoints } from "replay-next/src/utils/time";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import { isPointInRegions, isRangeInRegions, isTimeInRegions } from "shared/utils/time";
@@ -64,6 +61,10 @@ import {
   RunAnalysisParams,
   SourceLocationRange,
 } from "./types";
+
+import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
+import { insert } from "replay-next/src/utils/array";
+import { areRangesEqual, compareExecutionPoints } from "replay-next/src/utils/time";
 
 const STREAMING_THROTTLE_DURATION = 100;
 
