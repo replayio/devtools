@@ -191,23 +191,24 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     dispatch(unhighlightNode());
   };
 
-  useEffect(() => {
-    if (
-      !isPlaying &&
-      ref.current &&
-      currentTime >= step.absoluteStartTime &&
-      currentTime <= step.absoluteEndTime
-    ) {
-      ref.current.scrollIntoView();
-    }
-  }, [isPlaying, ref, currentTime, step]);
+  // TODO [ryanjduffy]: Reverting
+  // useEffect(() => {
+  //   if (
+  //     !isPlaying &&
+  //     ref.current &&
+  //     currentTime >= step.absoluteStartTime &&
+  //     currentTime <= step.absoluteEndTime
+  //   ) {
+  //     ref.current.scrollIntoView();
+  //   }
+  // }, [isPlaying, ref, currentTime, step]);
 
-  useEffect(() => {
-    if (step.error && ref.current) {
-      ref.current.scrollIntoView();
-      onClick();
-    }
-  }, [step, ref, onClick]);
+  // useEffect(() => {
+  //   if (step.error && ref.current) {
+  //     ref.current.scrollIntoView();
+  //     onClick();
+  //   }
+  // }, [step, ref, onClick]);
 
   // This math is bananas don't look here until this is cleaned up :)
   const bump = isPaused || isPast ? 10 : 0;
