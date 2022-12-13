@@ -50,14 +50,11 @@ export default function useSourceContextMenu({
         hasFrames: true,
         isPublished: false,
         point: currentExecutionPoint,
-        sourceLocation:
-          firstBreakableColumnIndex != null
-            ? {
-                column: firstBreakableColumnIndex,
-                line: lineNumber,
-                sourceId,
-              }
-            : null,
+        sourceLocation: {
+          column: firstBreakableColumnIndex != null ? firstBreakableColumnIndex : 0,
+          line: lineNumber,
+          sourceId,
+        },
         time: curentTime,
       });
 
@@ -70,11 +67,10 @@ export default function useSourceContextMenu({
   };
 
   const disableCopySourceUri = sourceUrl == null;
-  const disableAddComment = isPending || firstBreakableColumnIndex == null;
 
   return useContextMenu(
     <>
-      <ContextMenuItem disabled={disableAddComment} onClick={addComment}>
+      <ContextMenuItem disabled={isPending} onClick={addComment}>
         Add comment to line {lineNumber}
       </ContextMenuItem>
       <ContextMenuDivider />
