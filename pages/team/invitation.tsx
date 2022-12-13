@@ -15,8 +15,12 @@ export default function InvitationHandler() {
   const invitationCode = query.code as string;
   const claimTeamInvitationCode = hooks.useClaimTeamInvitationCode(onCompleted, onError);
 
-  function onCompleted() {
-    push("/");
+  function onCompleted(workspaceId: string | null) {
+    if (workspaceId) {
+      push("/team/" + workspaceId);
+    } else {
+      push("/");
+    }
   }
   function onError() {
     dispatch(

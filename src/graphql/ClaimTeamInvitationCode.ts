@@ -10,6 +10,7 @@
 export interface ClaimTeamInvitationCode_claimTeamInvitationCode {
   __typename: "ClaimTeamInvitationCode";
   success: boolean | null;
+  workspaceId: string | null;
 }
 
 export interface ClaimTeamInvitationCode {
