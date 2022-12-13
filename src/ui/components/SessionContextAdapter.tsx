@@ -13,7 +13,13 @@ import { useAppSelector } from "ui/setup/hooks";
 import { trackEventOnce } from "ui/utils/mixpanel";
 import { trackEvent } from "ui/utils/telemetry";
 
-export default function SessionContextAdapter({ children }: { children: ReactNode }) {
+export default function SessionContextAdapter({
+  apiKey,
+  children,
+}: {
+  apiKey: string | null;
+  children: ReactNode;
+}) {
   const recordingId = useGetRecordingId();
   const currentUserInfo = useGetUserInfo();
   const apolloClient = useApolloClient();
@@ -28,7 +34,7 @@ export default function SessionContextAdapter({ children }: { children: ReactNod
 
   const sessionContext = useMemo<SessionContextType>(
     () => ({
-      accessToken: ThreadFront.getAccessToken(),
+      accessToken: apiKey || ThreadFront.getAccessToken(),
       currentUserInfo,
       duration,
       recordingId,
@@ -39,7 +45,7 @@ export default function SessionContextAdapter({ children }: { children: ReactNod
       trackEvent: trackEvent as SessionContextType["trackEvent"],
       trackEventOnce: trackEventOnce as SessionContextType["trackEventOnce"],
     }),
-    [currentUserInfo, duration, recordingId, refetchUser]
+    [apiKey, currentUserInfo, duration, recordingId, refetchUser]
   );
 
   return <SessionContext.Provider value={sessionContext}>{children}</SessionContext.Provider>;
