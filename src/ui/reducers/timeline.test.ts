@@ -5,6 +5,7 @@ import { UIStore } from "ui/actions";
 import * as actions from "../actions/timeline";
 import {
   getCurrentTime,
+  getDisplayedFocusRegion,
   getFocusRegion,
   getHoverTime,
   getPlayback,
@@ -36,292 +37,220 @@ describe("Redux timeline state", () => {
     it("should assign a default focusRegion around the current time when toggled on", () => {
       expect(getFocusRegion(store.getState())).toBeNull();
       dispatch(actions.toggleFocusMode());
-      expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+      expect(getDisplayedFocusRegion(store.getState())).toMatchInlineSnapshot(`
         Object {
-          "begin": Object {
-            "point": "0",
-            "time": 0,
-          },
-          "beginTime": 70,
-          "end": Object {
-            "point": "",
-            "time": 80,
-          },
-          "endTime": 80,
+          "begin": 70,
+          "end": 80,
         }
       `);
     });
 
-    it("should not force the currentTime to be within the focusRegion as it moves around", () => {
-      dispatch(
-        actions.setFocusRegion({
-          beginTime: 50,
-          endTime: 60,
+    it("should not force the currentTime to be within the focusRegion as it moves around", async () => {
+      await dispatch(
+        actions.updateDisplayedFocusRegion({
+          begin: 50,
+          end: 60,
         })
       );
       expect(getCurrentTime(store.getState())).toBe(75);
 
-      dispatch(
-        actions.setFocusRegion({
-          beginTime: 75,
-          endTime: 85,
+      await dispatch(
+        actions.updateDisplayedFocusRegion({
+          begin: 75,
+          end: 85,
         })
       );
       expect(getCurrentTime(store.getState())).toBe(75);
 
-      dispatch(
-        actions.setFocusRegion({
-          beginTime: 25,
-          endTime: 30,
+      await dispatch(
+        actions.updateDisplayedFocusRegion({
+          begin: 25,
+          end: 30,
         })
       );
       expect(getCurrentTime(store.getState())).toBe(75);
     });
 
-    it("should update the hoverTime (and the time displayed in the video player) to match the handle being dragged", () => {
+    it("should update the hoverTime (and the time displayed in the video player) to match the handle being dragged", async () => {
       // If we are moving the whole focus region, seek to the current time.
-      dispatch(
-        actions.setFocusRegion({
-          beginTime: 60,
-          endTime: 80,
+      await dispatch(
+        actions.updateDisplayedFocusRegion({
+          begin: 60,
+          end: 80,
         })
       );
       expect(getHoverTime(store.getState())).toBe(75);
 
       // If we are moving the beginTime, seek to that point
-      dispatch(
-        actions.setFocusRegion({
-          beginTime: 65,
-          endTime: 80,
+      await dispatch(
+        actions.updateDisplayedFocusRegion({
+          begin: 65,
+          end: 80,
         })
       );
       expect(getHoverTime(store.getState())).toBe(65);
 
       // If we are moving the endTime, seek to that point
-      dispatch(
-        actions.setFocusRegion({
-          beginTime: 65,
-          endTime: 75,
+      await dispatch(
+        actions.updateDisplayedFocusRegion({
+          begin: 65,
+          end: 75,
         })
       );
       expect(getHoverTime(store.getState())).toBe(75);
 
       // Moving the entire range should not move the hover time,
       // unless the time would otherwise be out of the new focused region.
-      dispatch(
-        actions.setFocusRegion({
-          beginTime: 68,
-          endTime: 78,
+      await dispatch(
+        actions.updateDisplayedFocusRegion({
+          begin: 68,
+          end: 78,
         })
       );
       expect(getHoverTime(store.getState())).toBe(75);
-      dispatch(
-        actions.setFocusRegion({
-          beginTime: 80,
-          endTime: 90,
+      await dispatch(
+        actions.updateDisplayedFocusRegion({
+          begin: 80,
+          end: 90,
         })
       );
       expect(getHoverTime(store.getState())).toBe(80);
     });
 
-    it("should not allow an invalid focusRegion to be set", () => {
-      // Before the start of the focus window
-      dispatch(
-        actions.setFocusRegion({
-          beginTime: 30,
-          endTime: 40,
+    it("should not allow an invalid focusRegion to be set", async () => {
+      // Before the start of the zoom region
+      await dispatch(
+        actions.updateDisplayedFocusRegion({
+          begin: 30,
+          end: 40,
         })
       );
-      expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+      expect(getDisplayedFocusRegion(store.getState())).toMatchInlineSnapshot(`
         Object {
-          "begin": Object {
-            "point": "0",
-            "time": 0,
-          },
-          "beginTime": 50,
-          "end": Object {
-            "point": "",
-            "time": 50,
-          },
-          "endTime": 50,
+          "begin": 50,
+          "end": 50,
         }
       `);
 
-      // After the end of the focus window
-      dispatch(
-        actions.setFocusRegion({
-          beginTime: 110,
-          endTime: 125,
+      // After the end of the zoom region
+      await dispatch(
+        actions.updateDisplayedFocusRegion({
+          begin: 110,
+          end: 125,
         })
       );
-      expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+      expect(getDisplayedFocusRegion(store.getState())).toMatchInlineSnapshot(`
         Object {
-          "begin": Object {
-            "point": "0",
-            "time": 0,
-          },
-          "beginTime": 110,
-          "end": Object {
-            "point": "",
-            "time": 110,
-          },
-          "endTime": 110,
+          "begin": 100,
+          "end": 100,
         }
       `);
 
       // Overlapping
-      dispatch(
-        actions.setFocusRegion({
-          beginTime: 60,
-          endTime: 80,
+      await dispatch(
+        actions.updateDisplayedFocusRegion({
+          begin: 60,
+          end: 80,
         })
       );
-      dispatch(
-        actions.setFocusRegion({
-          beginTime: 90,
-          endTime: 80,
+      await dispatch(
+        actions.updateDisplayedFocusRegion({
+          begin: 90,
+          end: 80,
         })
       );
-      expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+      expect(getDisplayedFocusRegion(store.getState())).toMatchInlineSnapshot(`
         Object {
-          "begin": Object {
-            "point": "0",
-            "time": 0,
-          },
-          "beginTime": 80,
-          "end": Object {
-            "point": "",
-            "time": 80,
-          },
-          "endTime": 80,
+          "begin": 80,
+          "end": 80,
         }
       `);
 
       // Overlapping alternate
-      dispatch(
-        actions.setFocusRegion({
-          beginTime: 60,
-          endTime: 80,
+      await dispatch(
+        actions.updateDisplayedFocusRegion({
+          begin: 60,
+          end: 80,
         })
       );
-      dispatch(
-        actions.setFocusRegion({
-          beginTime: 60,
-          endTime: 50,
+      await dispatch(
+        actions.updateDisplayedFocusRegion({
+          begin: 60,
+          end: 50,
         })
       );
-      expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+      expect(getDisplayedFocusRegion(store.getState())).toMatchInlineSnapshot(`
         Object {
-          "begin": Object {
-            "point": "0",
-            "time": 0,
-          },
-          "beginTime": 60,
-          "end": Object {
-            "point": "",
-            "time": 60,
-          },
-          "endTime": 60,
+          "begin": 60,
+          "end": 60,
         }
       `);
     });
 
-    it("should stop playback before resizing focusRegion", () => {
+    it("should stop playback before resizing focusRegion", async () => {
       dispatch(actions.startPlayback());
       expect(getPlayback(store.getState())).not.toBeNull();
 
-      dispatch(
-        actions.setFocusRegion({
-          beginTime: 50,
-          endTime: 60,
+      await dispatch(
+        actions.updateDisplayedFocusRegion({
+          begin: 50,
+          end: 60,
         })
       );
       expect(getPlayback(store.getState())).toBeNull();
     });
 
     describe("set start time", () => {
-      it("should focus from the start time to the end of the zoom region if no focus region has been set", () => {
-        dispatch(actions.setFocusRegionBeginTime(65, false));
-        expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+      it("should focus from the start time to the end of the zoom region if no focus region has been set", async () => {
+        await dispatch(actions.setFocusRegionBeginTime(65, false));
+        expect(getDisplayedFocusRegion(store.getState())).toMatchInlineSnapshot(`
           Object {
-            "begin": Object {
-              "point": "0",
-              "time": 0,
-            },
-            "beginTime": 65,
-            "end": Object {
-              "point": "",
-              "time": 100,
-            },
-            "endTime": 100,
+            "begin": 65,
+            "end": 100,
           }
         `);
       });
 
-      it("should only update the start time when a region is set", () => {
-        dispatch(
-          actions.setFocusRegion({
-            beginTime: 50,
-            endTime: 70,
+      it("should only update the start time when a region is set", async () => {
+        await dispatch(
+          actions.updateDisplayedFocusRegion({
+            begin: 50,
+            end: 70,
           })
         );
-        dispatch(actions.setFocusRegionBeginTime(65, false));
-        expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+        await dispatch(actions.setFocusRegionBeginTime(65, false));
+        expect(getDisplayedFocusRegion(store.getState())).toMatchInlineSnapshot(`
           Object {
-            "begin": Object {
-              "point": "0",
-              "time": 0,
-            },
-            "beginTime": 65,
-            "end": Object {
-              "point": "",
-              "time": 70,
-            },
-            "endTime": 70,
+            "begin": 65,
+            "end": 70,
           }
         `);
       });
     });
 
     describe("set end time", () => {
-      it("should focus from the beginning of the zoom region to the specified end time if no focus region has been set", () => {
-        dispatch(actions.setFocusRegionEndTime(65, false));
-        expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+      it("should focus from the beginning of the zoom region to the specified end time if no focus region has been set", async () => {
+        await dispatch(actions.setFocusRegionEndTime(65, false));
+        expect(getDisplayedFocusRegion(store.getState())).toMatchInlineSnapshot(`
           Object {
-            "begin": Object {
-              "point": "0",
-              "time": 0,
-            },
-            "beginTime": 50,
-            "end": Object {
-              "point": "",
-              "time": 65,
-            },
-            "endTime": 65,
+            "begin": 50,
+            "end": 65,
           }
         `);
       });
 
-      it("should only update the end time when a region is set", () => {
-        dispatch(
-          actions.setFocusRegion({
-            beginTime: 50,
-            endTime: 70,
+      it("should only update the end time when a region is set", async () => {
+        await dispatch(
+          actions.updateDisplayedFocusRegion({
+            begin: 50,
+            end: 70,
           })
         );
-        dispatch(actions.setFocusRegionEndTime(65, false));
-        expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+        await dispatch(actions.setFocusRegionEndTime(65, false));
+        expect(getDisplayedFocusRegion(store.getState())).toMatchInlineSnapshot(`
           Object {
-            "begin": Object {
-              "point": "0",
-              "time": 0,
-            },
-            "beginTime": 50,
-            "end": Object {
-              "point": "",
-              "time": 65,
-            },
-            "endTime": 65,
+            "begin": 50,
+            "end": 65,
           }
         `);
       });

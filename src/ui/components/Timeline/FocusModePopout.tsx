@@ -1,15 +1,11 @@
 import React, { useEffect } from "react";
 
-import {
-  exitFocusMode,
-  setFocusRegion,
-  syncFocusedRegion,
-  updateFocusRegionParam,
-} from "ui/actions/timeline";
+import { exitFocusMode, syncFocusedRegion, updateFocusRegionParam } from "ui/actions/timeline";
 import {
   getFocusRegionBackup,
   getShowFocusModeControls,
   isMaximumFocusRegion,
+  setFocusRegion,
 } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";

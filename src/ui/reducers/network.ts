@@ -8,15 +8,10 @@ import sortBy from "lodash/sortBy";
 import sortedUniqBy from "lodash/sortedUniqBy";
 import { createSelector } from "reselect";
 
-import { isPointInRegions } from "shared/utils/time";
 import { NetworkAction } from "ui/actions/network";
 import { partialRequestsToCompleteSummaries } from "ui/components/NetworkMonitor/utils";
 import { UIState } from "ui/state";
-import {
-  displayedBeginForFocusRegion,
-  displayedEndForFocusRegion,
-  filterToFocusRegion,
-} from "ui/utils/timeline";
+import { filterToFocusRegion } from "ui/utils/timeline";
 
 import { getFocusRegion } from "./timeline";
 
@@ -102,9 +97,7 @@ export const getFocusedEvents = createSelector(getEvents, getFocusRegion, (event
   if (!focusRegion) {
     return events;
   }
-  const beginTime = displayedBeginForFocusRegion(focusRegion);
-  const endTime = displayedEndForFocusRegion(focusRegion);
-  return events.filter(e => e.time > beginTime && e.time <= endTime);
+  return events.filter(e => e.time > focusRegion.begin.time && e.time <= focusRegion.end.time);
 });
 
 type GetFocusedRequestsReturn = [

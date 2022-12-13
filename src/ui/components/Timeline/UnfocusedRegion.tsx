@@ -2,23 +2,19 @@ import clamp from "lodash/clamp";
 
 import { selectors } from "ui/reducers";
 import { useAppSelector } from "ui/setup/hooks";
-import { trackEvent } from "ui/utils/telemetry";
-import {
-  displayedBeginForFocusRegion,
-  displayedEndForFocusRegion,
-  getVisiblePosition,
-} from "ui/utils/timeline";
+import { getVisiblePosition } from "ui/utils/timeline";
 
 export default function UnfocusedRegion() {
+  const displayedFocusRegion = useAppSelector(selectors.getDisplayedFocusRegion);
   const focusRegion = useAppSelector(selectors.getFocusRegion);
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
 
-  if (!focusRegion) {
+  if (!displayedFocusRegion && !focusRegion) {
     return null;
   }
 
-  const beginTime = displayedBeginForFocusRegion(focusRegion);
-  const endTime = displayedEndForFocusRegion(focusRegion);
+  const beginTime = displayedFocusRegion?.begin ?? focusRegion!.begin.time;
+  const endTime = displayedFocusRegion?.end ?? focusRegion!.end.time;
   const duration = zoomRegion.endTime - zoomRegion.beginTime;
 
   const start = getVisiblePosition({ time: beginTime, zoom: zoomRegion }) * 100;

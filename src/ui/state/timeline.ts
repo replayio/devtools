@@ -8,9 +8,7 @@ export interface ZoomRegion {
 
 export interface FocusRegion {
   end: TimeStampedPoint;
-  endTime: number;
   begin: TimeStampedPoint;
-  beginTime: number;
 }
 
 export interface TimelineState {
@@ -20,6 +18,7 @@ export interface TimelineState {
   hoverTime: number | null;
   focusRegion: FocusRegion | null;
   focusRegionBackup: FocusRegion | null;
+  displayedFocusRegion: TimeRange | null;
   playback: {
     beginTime: number;
     beginDate: number;

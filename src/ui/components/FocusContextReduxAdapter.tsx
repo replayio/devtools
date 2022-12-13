@@ -2,7 +2,7 @@ import { PropsWithChildren, useCallback, useEffect, useMemo, useState, useTransi
 
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import { Range } from "bvaughn-architecture-demo/src/types";
-import { setFocusRegion } from "ui/actions/timeline";
+import { setFocusRegionFromTimeRange } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -27,11 +27,11 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
   const update = useCallback(
     (value: Range | null, _: boolean) => {
       dispatch(
-        setFocusRegion(
+        setFocusRegionFromTimeRange(
           value !== null
             ? {
-                beginTime: value[0],
-                endTime: value[1],
+                begin: value[0],
+                end: value[1],
               }
             : null
         )

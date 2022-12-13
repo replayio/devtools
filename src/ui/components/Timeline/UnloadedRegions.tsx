@@ -27,20 +27,7 @@ export const UnloadedRegions: FC = () => {
   let beginTime = begin.time;
   let endTime = end.time;
   if (focusRegion) {
-    // Even though we technically focus on the nearest points,
-    // We should only show the user a range defining their specified times.
-    const userVisibleTimeStampedPointRange: TimeStampedPointRange = {
-      begin: {
-        point: focusRegion.begin.point,
-        time: focusRegion.beginTime,
-      },
-      end: {
-        point: focusRegion.end.point,
-        time: focusRegion.endTime,
-      },
-    };
-
-    const overlappingRegions = overlap([userVisibleTimeStampedPointRange], loadedRegions.loading);
+    const overlappingRegions = overlap([focusRegion], loadedRegions.loading);
     if (overlappingRegions.length > 0) {
       const focusedAndLoaded = overlappingRegions[0];
       beginTime = focusedAndLoaded.begin.time;

@@ -14,9 +14,7 @@ import {
 const point = (time: number) => ({ time, point: `${time}` });
 const focusRegion = (from: number, to: number): FocusRegion => ({
   begin: point(from),
-  beginTime: from,
   end: point(to),
-  endTime: to,
 });
 
 describe("getFormattedTime", () => {

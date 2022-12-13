@@ -26,14 +26,6 @@ export function getPixelDistance({
   return Math.abs((toPos - fromPos) * overlayWidth);
 }
 
-export function displayedBeginForFocusRegion(focusRegion: FocusRegion) {
-  return focusRegion.beginTime;
-}
-
-export function displayedEndForFocusRegion(focusRegion: FocusRegion) {
-  return focusRegion.endTime;
-}
-
 // Get the position of a time on the visible part of the timeline,
 // in the range [0, 1] if the timeline is fully zommed out.
 export function getVisiblePosition({ time, zoom }: { time: number | null; zoom: ZoomRegion }) {
@@ -219,10 +211,7 @@ export function isSameTimeStampedPointRange(
 }
 
 export function isInFocusSpan(time: number, focusRegion: FocusRegion) {
-  const beginTime = displayedBeginForFocusRegion(focusRegion);
-  const endTime = displayedEndForFocusRegion(focusRegion);
-
-  return time >= beginTime && time <= endTime;
+  return time >= focusRegion.begin.time && time <= focusRegion.end.time;
 }
 
 export function isPointInRegions(regions: TimeStampedPointRange[], point: string) {
@@ -286,9 +275,8 @@ export function isFocusRegionSubset(
     return false;
   } else {
     return (
-      displayedBeginForFocusRegion(nextFocusRegion) >=
-        displayedBeginForFocusRegion(prevFocusRegion) &&
-      displayedEndForFocusRegion(nextFocusRegion) <= displayedEndForFocusRegion(prevFocusRegion)
+      nextFocusRegion.begin.time >= prevFocusRegion.begin.time &&
+      nextFocusRegion.end.time <= prevFocusRegion.end.time
     );
   }
 }
