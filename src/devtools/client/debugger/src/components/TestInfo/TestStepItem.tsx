@@ -192,6 +192,17 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   };
 
   useEffect(() => {
+    if (
+      !isPlaying &&
+      ref.current &&
+      currentTime >= step.absoluteStartTime &&
+      currentTime <= step.absoluteEndTime
+    ) {
+      ref.current.scrollIntoView();
+    }
+  }, [isPlaying, ref, currentTime, step]);
+
+  useEffect(() => {
     if (step.error && ref.current) {
       ref.current.scrollIntoView();
       onClick();
