@@ -136,7 +136,7 @@ test("should auto-suggestion text based on the current expression", async ({ pag
   await editLogPoint(page, {
     sourceId,
     lineNumber: 28,
-    content: "window.loc",
+    content: "window.locat",
     saveAfterEdit: false,
   });
   await waitFor(async () => expect(await autoCompleteList.isVisible()).toBe(true));

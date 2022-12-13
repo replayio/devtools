@@ -23,7 +23,7 @@ export default function TypeAheadPlugin<Item extends Object>({
   findMatches,
   isExactMatch,
   itemClassName = "",
-  itemRenderer = (item: Item) => item as any,
+  itemRenderer = (item: Item, query: string) => item as any,
   listClassName = "",
 }: {
   anchorElem?: HTMLElement;
@@ -34,7 +34,7 @@ export default function TypeAheadPlugin<Item extends Object>({
   findMatches: (query: string, queryAdditionalData: string | null) => Item[];
   isExactMatch: (query: string, item: Item) => boolean;
   itemClassName?: string;
-  itemRenderer?: (item: Item) => ReactNode;
+  itemRenderer?: (item: Item, query: string) => ReactNode;
   listClassName?: string;
 }): JSX.Element | null {
   const [editor] = useLexicalComposerContext();

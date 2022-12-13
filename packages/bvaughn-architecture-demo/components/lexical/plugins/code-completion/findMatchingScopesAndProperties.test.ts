@@ -75,7 +75,16 @@ describe("findMatches", () => {
   it("should sort matches to emphasize properties with more consecutive matching substring characters", () => {
     expect(
       findMatches("foo", "bar", null, createPropertiesFromNames("bbaaarr", "abarr", "cbar"))
-    ).toEqual(["cbar", "abarr", "bbaaarr"]);
+    ).toEqual(["abarr", "cbar", "bbaaarr"]);
+  });
+
+  it("should sort properties with casing matches earlier", () => {
+    expect(
+      findMatches("", "array", null, createPropertiesFromNames("Array", "array", "UintArray"))
+    ).toEqual(["array", "Array", "UintArray"]);
+    expect(
+      findMatches("", "Array", null, createPropertiesFromNames("Array", "array", "UintArray"))
+    ).toEqual(["Array", "array", "UintArray"]);
   });
 
   it("should escape special characters", () => {
