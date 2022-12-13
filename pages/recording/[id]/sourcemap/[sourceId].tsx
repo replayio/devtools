@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
+import { assert } from "protocol/utils";
 import renderSourcemap from "third-party/sourcemap-visualizer/sourcemapVisualizer";
 import { UIStore } from "ui/actions";
 import { onUnprocessedRegions, setAppMode } from "ui/actions/app";
@@ -66,18 +67,31 @@ async function loadSourceMap(
       sources.set(newSource.sourceId, newSource);
     });
     await client.Debugger.findSources({}, sessionId);
-    let source = sources.get(sourceId);
-    let generatedSourceId = sourceId;
-    while (source?.generatedSourceIds?.length) {
-      generatedSourceId = source.generatedSourceIds[0];
-      source = sources.get(generatedSourceId);
-    }
-    if (!source) {
+    let originalSource = sources.get(sourceId);
+    let generatedSourceId = originalSource?.generatedSourceIds?.[0];
+
+    if (!originalSource || !generatedSourceId) {
       return { error: "Source not found" };
     }
 
+    let generatedSource = sources.get(generatedSourceId)!;
+    assert(generatedSource, "referenced source should exist");
+
+    // Traverse the source chain until we find the original source whose
+    // generated source is *truly* a generated source. We know this because *it*
+    // does not have any generated sources. So if the chain was:
+    // pp1 -> o1 -> 1
+    // We would stop when `originalSource` is `o1` and `generatedSource` is `1`.
+    while (generatedSource.generatedSourceIds?.length) {
+      originalSource = generatedSource;
+      generatedSourceId = originalSource.generatedSourceIds![0];
+      const newGeneratedSource = sources.get(generatedSourceId)!;
+      assert(newGeneratedSource, "referenced source should exist");
+      generatedSource = newGeneratedSource;
+    }
+
     // load the requested source's contents and sourcemap
-    const { url } = source;
+    const { url } = originalSource;
     const { contents } = await client.Debugger.getSourceContents(
       { sourceId: generatedSourceId },
       sessionId
