@@ -19,7 +19,7 @@ import {
 } from "ui/reducers/reporter";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { TestItem, TestResult } from "ui/types";
+import { TestItem, TestResult, TestStep } from "ui/types";
 
 import { TestSteps } from "./TestSteps";
 
@@ -30,6 +30,19 @@ export type TestCaseContextType = {
   onReplay: () => void;
   onPlayFromHere: (startTime: number) => void;
 };
+
+function formatStepError(step?: TestStep) {
+  if (!step || !step.error) {
+    return null;
+  }
+
+  return (
+    <>
+      <strong className="bold">Error:</strong>&nbsp;
+      {step.args.map((e, i) => (typeof e === "string" ? <span key={i}>{e}&nbsp;</span> : null))}
+    </>
+  );
+}
 
 export const TestCaseContext = createContext<TestCaseContextType>(null as any);
 
@@ -125,8 +138,8 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
                   {test.title}
                 </div>
                 {test.error ? (
-                  <div className="mt-1 overflow-hidden rounded-lg bg-testsuitesErrorBgcolor px-2 py-1 text-left font-mono ">
-                    {test.error.message}
+                  <div className="mt-2 overflow-hidden rounded-lg bg-testsuitesErrorBgcolor px-3 py-2 text-left font-mono ">
+                    {formatStepError(test.steps?.find(s => s.error)) || test.error.message}
                   </div>
                 ) : null}
               </div>
