@@ -38,10 +38,6 @@ export default function useSourceContextMenu({
   const invalidateCache = useCacheRefresh();
 
   const addComment = () => {
-    if (accessToken === null) {
-      return;
-    }
-
     startTransition(async () => {
       if (showCommentsPanel !== null) {
         showCommentsPanel();
@@ -55,7 +51,7 @@ export default function useSourceContextMenu({
         firstBreakableColumnIndex
       );
 
-      await addCommentGraphQL(graphQLClient, accessToken, recordingId, {
+      await addCommentGraphQL(graphQLClient, accessToken!, recordingId, {
         content: "",
         hasFrames: true,
         isPublished: false,
@@ -82,10 +78,14 @@ export default function useSourceContextMenu({
 
   return useContextMenu(
     <>
-      <ContextMenuItem disabled={isPending} onClick={addComment}>
-        Add comment to line {lineNumber}
-      </ContextMenuItem>
-      <ContextMenuDivider />
+      {accessToken !== null && (
+        <>
+          <ContextMenuItem disabled={isPending} onClick={addComment}>
+            Add comment to line {lineNumber}
+          </ContextMenuItem>
+          <ContextMenuDivider />
+        </>
+      )}
       <ContextMenuItem disabled={disableCopySourceUri} onClick={copySourceUri}>
         Copy source URI
       </ContextMenuItem>
