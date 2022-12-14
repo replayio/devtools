@@ -2,8 +2,6 @@ import { ChatAltIcon } from "@heroicons/react/solid";
 import { useState } from "react";
 
 import Icon from "bvaughn-architecture-demo/components/Icon";
-import { setViewMode } from "ui/actions/layout";
-import { useAppDispatch } from "ui/setup/hooks";
 
 import styles from "./styles.module.css";
 
@@ -14,8 +12,6 @@ export default function CommentThumbnail({
   primaryLabel: string | null;
   secondaryLabel: string;
 }) {
-  const dispatch = useAppDispatch();
-
   const [showPreview, setShowPreview] = useState(false);
 
   let indicatorLeft: string | null = null;
@@ -28,16 +24,14 @@ export default function CommentThumbnail({
     } catch (error) {}
   }
 
-  const onClick = () => {
-    if (showPreview) {
-      dispatch(setViewMode("non-dev"));
-    } else {
-      setShowPreview(true);
-    }
-  };
+  const onClick = () => setShowPreview(!showPreview);
 
   return (
-    <div className={styles.OuterImageContainer} onClick={onClick}>
+    <div
+      className={styles.OuterImageContainer}
+      onClick={onClick}
+      title={showPreview ? "Hide preview" : "Show preview"}
+    >
       {showPreview ? (
         <div className={styles.InnerImageContainer}>
           <img className={styles.Image} src={secondaryLabel} />
