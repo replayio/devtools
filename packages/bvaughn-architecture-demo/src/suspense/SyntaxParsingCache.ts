@@ -143,7 +143,11 @@ function incrementalParser(fileName?: string, contentType?: ContentType): Increm
   let complete: boolean = false;
   const parsedLines: string[] = [];
 
-  let inProgressHTMLString = "";
+  const inProgressState = {
+    htmlString: "",
+    rawString: "",
+  };
+
   let parsedCharacterIndex = 0;
 
   function parseChunk(
@@ -193,20 +197,10 @@ function incrementalParser(fileName?: string, contentType?: ContentType): Increm
       if (from > characterIndex) {
         // No style applied to the token between position and from.
         // This typically indicates white space or newline characters.
-        inProgressHTMLString = processSection(
-          inProgressHTMLString,
-          parsedLines,
-          codeToParse.slice(characterIndex, from),
-          ""
-        );
+        processSection(inProgressState, parsedLines, codeToParse.slice(characterIndex, from), "");
       }
 
-      inProgressHTMLString = processSection(
-        inProgressHTMLString,
-        parsedLines,
-        codeToParse.slice(from, to),
-        classes
-      );
+      processSection(inProgressState, parsedLines, codeToParse.slice(from, to), classes);
 
       characterIndex = to;
     });
@@ -215,16 +209,16 @@ function incrementalParser(fileName?: string, contentType?: ContentType): Increm
     if (characterIndex < maxPosition) {
       // No style applied on the trailing text.
       // This typically indicates white space or newline characters.
-      inProgressHTMLString = processSection(
-        inProgressHTMLString,
+      processSection(
+        inProgressState,
         parsedLines,
         codeToParse.slice(characterIndex, maxPosition),
         ""
       );
     }
 
-    if (inProgressHTMLString !== "") {
-      parsedLines.push(inProgressHTMLString);
+    if (inProgressState.htmlString !== "") {
+      parsedLines.push(inProgressState.htmlString);
     }
 
     parsedCharacterIndex += characterIndex + 1;
@@ -239,7 +233,7 @@ function incrementalParser(fileName?: string, contentType?: ContentType): Increm
         if (nextIndex === -1) {
           const line = codeToParse.substring(parsedCharacterIndex);
 
-          inProgressHTMLString += line;
+          inProgressState.htmlString += line;
 
           break;
         } else if (nextIndex !== parsedCharacterIndex) {
@@ -248,25 +242,25 @@ function incrementalParser(fileName?: string, contentType?: ContentType): Increm
               ? codeToParse.substring(parsedCharacterIndex, nextIndex)
               : codeToParse.substring(parsedCharacterIndex);
 
-          inProgressHTMLString += line;
+          inProgressState.htmlString += line;
         }
 
         if (nextIndex >= 0) {
-          parsedLines.push(inProgressHTMLString);
+          parsedLines.push(inProgressState.htmlString);
 
-          inProgressHTMLString = "";
+          inProgressState.htmlString = "";
         }
 
         parsedCharacterIndex = nextIndex + 1;
         nextIndex = codeToParse.indexOf("\n", parsedCharacterIndex);
       }
 
-      if (inProgressHTMLString !== "") {
-        parsedLines.push(inProgressHTMLString);
+      if (inProgressState.htmlString !== "") {
+        parsedLines.push(inProgressState.htmlString);
       }
     }
 
-    inProgressHTMLString = "";
+    inProgressState.htmlString = "";
   }
 
   return {
@@ -325,11 +319,14 @@ function urlToLanguage(fileName: string): LRLanguage {
 }
 
 function processSection(
-  inProgressHTMLString: string,
+  htmlString: {
+    htmlString: string;
+    rawString: string;
+  },
   parsedLines: string[],
   section: string,
   className: string
-): string {
+) {
   if (cachedElement === null) {
     cachedElement = document.createElement("span");
   } else {
@@ -345,8 +342,10 @@ function processSection(
 
       cachedElement.className = className;
       cachedElement.textContent = subsection;
+      cachedElement.setAttribute("data-column-index", "" + htmlString.rawString.length);
 
-      inProgressHTMLString += cachedElement.outerHTML;
+      htmlString.htmlString += cachedElement.outerHTML;
+      htmlString.rawString += subsection;
 
       break;
     } else if (nextIndex !== index) {
@@ -355,20 +354,22 @@ function processSection(
 
       cachedElement.className = className;
       cachedElement.textContent = subsection;
+      cachedElement.setAttribute("data-column-index", "" + htmlString.rawString.length);
 
-      inProgressHTMLString += cachedElement.outerHTML;
+      htmlString.htmlString += cachedElement.outerHTML;
+      htmlString.rawString += subsection;
     }
 
     if (nextIndex >= 0) {
-      parsedLines.push(inProgressHTMLString);
+      parsedLines.push(htmlString.htmlString);
 
-      inProgressHTMLString = "";
+      htmlString.htmlString = "";
+      htmlString.rawString = "";
+
       cachedElement.innerHTML = "";
     }
 
     index = nextIndex + 1;
     nextIndex = section.indexOf("\n", index);
   }
-
-  return inProgressHTMLString;
 }
