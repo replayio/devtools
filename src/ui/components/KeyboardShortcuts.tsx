@@ -125,8 +125,8 @@ function KeyboardShortcuts({
         const canvas = document.querySelector("canvas#graphics");
         if (canvas) {
           base64PNG = await getBase64Png(canvas as HTMLCanvasElement, {
-            maxWidth: 200,
-            maxHeight: 200,
+            maxWidth: 300,
+            maxHeight: 300,
           });
         }
 
