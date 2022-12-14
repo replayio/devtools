@@ -30,7 +30,7 @@ export function returnFirst<T, R>(
 
 export interface TestStepItemProps {
   step: AnnotatedTestStep;
-  argString: string;
+  argString?: string;
   index: number;
   id: string | null;
 }
