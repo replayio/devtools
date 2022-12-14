@@ -52,7 +52,7 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
   const expandable = typeof test.relativeStartTime === "number" && (test.steps || test.error);
   const selectedTest = useAppSelector(getSelectedTest);
   const isSelected = selectedTest === index;
-  const annotationsStart = useAppSelector(getReporterAnnotationsForTitleEnd(test.title));
+  const annotationsStart = useAppSelector(getReporterAnnotationsForTitleEnd);
 
   const duration = useAppSelector(getRecordingDuration);
   const testStartTime = test.relativeStartTime;
@@ -90,7 +90,7 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
         dispatch(seek(pointStart, time, false));
       }
 
-      dispatch(setSelectedTest(index));
+      dispatch(setSelectedTest({ index, title: test.title }));
     } else if (typeof test.relativeStartTime === "number") {
       dispatch(seekToTime(test.relativeStartTime, false));
     }

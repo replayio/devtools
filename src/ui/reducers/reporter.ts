@@ -8,12 +8,14 @@ export interface ReporterState {
   annotations: Annotation[];
   selectedStep: AnnotatedTestStep | null;
   selectedTest: number | null;
+  selectedTestTitle: string | null;
 }
 
 const initialState: ReporterState = {
   annotations: [],
   selectedStep: null,
   selectedTest: null,
+  selectedTestTitle: null,
 };
 
 const reporterSlice = createSlice({
@@ -32,8 +34,9 @@ const reporterSlice = createSlice({
       // data instead.
       state.selectedStep = action.payload;
     },
-    setSelectedTest(state, action: PayloadAction<number | null>) {
-      state.selectedTest = action.payload;
+    setSelectedTest(state, action: PayloadAction<{ index: number; title: string } | null>) {
+      state.selectedTest = action.payload?.index || null;
+      state.selectedTestTitle = action.payload?.title || null;
     },
     mayClearSelectedStep(state, action: PayloadAction<{ point?: string; time?: number }>) {
       const { point, time } = action.payload;
@@ -62,39 +65,56 @@ export const { addReporterAnnotations, setSelectedStep, setSelectedTest, mayClea
 export const getReporterAnnotations = (state: UIState) => state.reporter.annotations;
 export const getSelectedStep = (state: UIState) => state.reporter.selectedStep;
 export const getSelectedTest = (state: UIState) => state.reporter.selectedTest;
+export const getSelectedTestTitle = (state: UIState) => state.reporter.selectedTestTitle;
 export const getReporterAnnotationsForTests = createSelector(
   getReporterAnnotations,
   (annotations: Annotation[]) => annotations.filter(a => a.message.event === "test:start")
 );
-export const getReporterAnnotationsForTitle = (title: string) =>
-  createSelector(getReporterAnnotations, (annotations: Annotation[]) =>
-    annotations.filter(
-      a =>
-        a.message.titlePath[a.message.titlePath.length - 1] === title &&
-        a.message.event === "step:enqueue"
-    )
-  );
-export const getReporterAnnotationsForTitleEnd = (title: string) =>
-  createSelector(getReporterAnnotations, (annotations: Annotation[]) =>
-    annotations.filter(
-      a =>
-        a.message.titlePath[a.message.titlePath.length - 1] === title &&
-        a.message.event === "step:end"
-    )
-  );
-export const getReporterAnnotationsForTitleStart = (title: string) =>
-  createSelector(getReporterAnnotations, (annotations: Annotation[]) =>
-    annotations.filter(
-      a =>
-        a.message.titlePath[a.message.titlePath.length - 1] === title &&
-        a.message.event === "step:start"
-    )
-  );
-export const getReporterAnnotationsForTitleNavigation = (title: string) =>
-  createSelector(getReporterAnnotations, (annotations: Annotation[]) =>
-    annotations.filter(
-      a =>
-        a.message.titlePath[a.message.titlePath.length - 1] === title &&
-        a.message.event === "event:navigation"
-    )
-  );
+export const getReporterAnnotationsForTitle = createSelector(
+  getSelectedTestTitle,
+  getReporterAnnotations,
+  (title, annotations) =>
+    title
+      ? annotations.filter(
+          a =>
+            a.message.titlePath[a.message.titlePath.length - 1] === title &&
+            a.message.event === "step:enqueue"
+        )
+      : []
+);
+export const getReporterAnnotationsForTitleEnd = createSelector(
+  getSelectedTestTitle,
+  getReporterAnnotations,
+  (title, annotations) =>
+    title
+      ? annotations.filter(
+          a =>
+            a.message.titlePath[a.message.titlePath.length - 1] === title &&
+            a.message.event === "step:end"
+        )
+      : []
+);
+export const getReporterAnnotationsForTitleStart = createSelector(
+  getSelectedTestTitle,
+  getReporterAnnotations,
+  (title, annotations) =>
+    title
+      ? annotations.filter(
+          a =>
+            a.message.titlePath[a.message.titlePath.length - 1] === title &&
+            a.message.event === "step:start"
+        )
+      : []
+);
+export const getReporterAnnotationsForTitleNavigation = createSelector(
+  getSelectedTestTitle,
+  getReporterAnnotations,
+  (title, annotations) =>
+    title
+      ? annotations.filter(
+          a =>
+            a.message.titlePath[a.message.titlePath.length - 1] === title &&
+            a.message.event === "event:navigation"
+        )
+      : []
+);
