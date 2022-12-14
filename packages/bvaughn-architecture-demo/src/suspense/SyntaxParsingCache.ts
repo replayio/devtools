@@ -342,6 +342,7 @@ function processSection(
 
       cachedElement.className = className;
       cachedElement.textContent = subsection;
+      cachedElement.setAttribute("data-parsed-token", "");
       cachedElement.setAttribute("data-column-index", "" + htmlString.rawString.length);
 
       htmlString.htmlString += cachedElement.outerHTML;
@@ -354,6 +355,7 @@ function processSection(
 
       cachedElement.className = className;
       cachedElement.textContent = subsection;
+      cachedElement.setAttribute("data-parsed-token", "");
       cachedElement.setAttribute("data-column-index", "" + htmlString.rawString.length);
 
       htmlString.htmlString += cachedElement.outerHTML;

@@ -129,11 +129,7 @@ function SourceRenderer({
           return;
         }
       } else {
-        // HACK
-        // This is kind of a janky way to differentiate tokens from non-tokens but it works for now.
-        const className = htmlElement.className;
-        const isToken = typeof className === "string" && className.startsWith("tok-");
-
+        const isToken = htmlElement.hasAttribute("data-parsed-token");
         if (isToken) {
           // Debounce hover event to avoid showing the popup (or requesting data) in response to normal mouse movements.
           setHoverStateDebounced(htmlElement, null, null, null, setHoveredState);
