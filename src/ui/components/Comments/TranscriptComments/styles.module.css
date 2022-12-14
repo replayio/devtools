@@ -102,3 +102,14 @@
   width: 1rem;
   height: 1rem;
 }
+
+.ShowPreviewPrompt {
+  display: flex;
+  gap: 1ch;
+}
+
+.PreviewIcon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-dimmer);
+}
