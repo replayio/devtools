@@ -2,6 +2,7 @@ import { useEffect, useMemo } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { SHOW_GLOBAL_SEARCH_EVENT_TYPE } from "bvaughn-architecture-demo/components/search-files/SearchFiles";
+import { getBase64Png } from "bvaughn-architecture-demo/src/utils/canvas";
 import { closeQuickOpen, toggleQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import * as dbgActions from "devtools/client/debugger/src/actions/ui";
 import { getActiveSearch, getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
@@ -111,7 +112,7 @@ function KeyboardShortcuts({
       toggleQuickOpen(query, project);
     };
 
-    const addComment = (e: KeyboardEvent) => {
+    const addComment = async (e: KeyboardEvent) => {
       // Un-authenticated users can't comment on Replays.
       if (!isAuthenticated) {
         return;
@@ -119,7 +120,17 @@ function KeyboardShortcuts({
 
       if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
-        createFrameComment(null, recordingId);
+
+        let base64PNG: string | null = null;
+        const canvas = document.querySelector("canvas#graphics");
+        if (canvas) {
+          base64PNG = await getBase64Png(canvas as HTMLCanvasElement, {
+            maxWidth: 300,
+            maxHeight: 300,
+          });
+        }
+
+        createFrameComment(null, recordingId, base64PNG ?? null, null);
       }
     };
 

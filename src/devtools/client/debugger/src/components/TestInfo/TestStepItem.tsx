@@ -1,5 +1,5 @@
 import { Object as ProtocolObject, createPauseResult } from "@replayio/protocol";
-import React, { createRef, useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -60,6 +60,22 @@ function useStepState(step: AnnotatedTestStep) {
   } else if (isPast) {
     return "past";
   }
+
+  return "pending";
+}
+
+// relies on the scrolling parent to be the nearest positioning context
+function scrollIntoView(node: HTMLDivElement) {
+  if (!node.offsetParent) {
+    return;
+  }
+
+  const parentBounds = node.offsetParent.getBoundingClientRect();
+  const nodeBounds = node.getBoundingClientRect();
+
+  if (nodeBounds.top < parentBounds.top || nodeBounds.bottom > parentBounds.bottom) {
+    node.scrollIntoView();
+  }
 }
 
 export interface TestStepItemProps {
@@ -70,7 +86,7 @@ export interface TestStepItemProps {
 }
 
 export function TestStepItem({ step, argString, index, id }: TestStepItemProps) {
-  const ref = createRef<HTMLDivElement>();
+  const ref = useRef<HTMLDivElement>(null);
   const [localPauseData, setLocalPauseData] = useState<{
     startPauseId?: string;
     endPauseId?: string;
@@ -81,6 +97,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     pauseId: string;
     nodeIds: string[];
   }>();
+  const isPlaying = useAppSelector(isPlayingSelector);
   const currentTime = useAppSelector(getCurrentTime);
   const selectedStep = useAppSelector(getSelectedStep);
   const dispatch = useAppDispatch();
@@ -210,24 +227,23 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     dispatch(unhighlightNode());
   };
 
-  // TODO [ryanjduffy]: Reverting
-  // useEffect(() => {
-  //   if (
-  //     !isPlaying &&
-  //     ref.current &&
-  //     currentTime >= step.absoluteStartTime &&
-  //     currentTime <= step.absoluteEndTime
-  //   ) {
-  //     ref.current.scrollIntoView();
-  //   }
-  // }, [isPlaying, ref, currentTime, step]);
+  useEffect(() => {
+    if (
+      !isPlaying &&
+      ref.current &&
+      currentTime >= step.absoluteStartTime &&
+      currentTime <= step.absoluteEndTime
+    ) {
+      scrollIntoView(ref.current);
+    }
+  }, [isPlaying, ref, currentTime, step]);
 
-  // useEffect(() => {
-  //   if (step.error && ref.current) {
-  //     ref.current.scrollIntoView();
-  //     onClick();
-  //   }
-  // }, [step, ref, onClick]);
+  useEffect(() => {
+    if (step.error && ref.current) {
+      scrollIntoView(ref.current);
+      onClick();
+    }
+  }, [step, ref, onClick]);
 
   // This math is bananas don't look here until this is cleaned up :)
   const bump = state !== "pending" ? 10 : 0;

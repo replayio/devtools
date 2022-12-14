@@ -52,7 +52,7 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
   const expandable = test.steps || test.error;
   const selectedTest = useAppSelector(getSelectedTest);
   const isSelected = selectedTest === index;
-  const annotationsStart = useAppSelector(getReporterAnnotationsForTitleEnd(test.title));
+  const annotationsStart = useAppSelector(getReporterAnnotationsForTitleEnd);
 
   const duration = useAppSelector(getRecordingDuration);
   const testStartTime = test.relativeStartTime || 0;
@@ -95,7 +95,7 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
       }
     }
 
-    dispatch(setSelectedTest(index));
+    dispatch(setSelectedTest({ index, title: test.title }));
 
     onFocus();
   };

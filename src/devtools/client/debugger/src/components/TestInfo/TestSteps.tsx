@@ -41,17 +41,16 @@ type CompositeTestEvent = StepEvent | NetworkEvent | NavigationEvent;
 
 function useGetTestSections(
   startTime: number,
-  steps: TestStep[],
-  testTitle: string
+  steps: TestStep[]
 ): {
   beforeEach: CompositeTestEvent[];
   testBody: CompositeTestEvent[];
   afterEach: CompositeTestEvent[];
 } {
-  const navigationEvents = useAppSelector(getReporterAnnotationsForTitleNavigation(testTitle));
-  const annotationsEnqueue = useAppSelector(getReporterAnnotationsForTitle(testTitle));
-  const annotationsEnd = useAppSelector(getReporterAnnotationsForTitleEnd(testTitle));
-  const annotationsStart = useAppSelector(getReporterAnnotationsForTitleStart(testTitle));
+  const navigationEvents = useAppSelector(getReporterAnnotationsForTitleNavigation);
+  const annotationsEnqueue = useAppSelector(getReporterAnnotationsForTitle);
+  const annotationsEnd = useAppSelector(getReporterAnnotationsForTitleEnd);
+  const annotationsStart = useAppSelector(getReporterAnnotationsForTitleStart);
   const requests = useAppSelector(getRequests);
   const events = useAppSelector(getEvents);
 
@@ -191,11 +190,7 @@ function useGetTestSections(
 
 export function TestSteps({ test }: { test: TestItem }) {
   const { startTime: testCaseStartTime } = useContext(TestCaseContext);
-  const { beforeEach, testBody, afterEach } = useGetTestSections(
-    testCaseStartTime,
-    test.steps,
-    test.title
-  );
+  const { beforeEach, testBody, afterEach } = useGetTestSections(testCaseStartTime, test.steps);
 
   return (
     <div className="flex flex-col rounded-lg px-2">
@@ -220,8 +215,19 @@ export function TestSteps({ test }: { test: TestItem }) {
   );
 }
 
-function TestSection({ events, header }: { events: CompositeTestEvent[]; header?: string }) {
+function NewUrlRow({ time, message }: { time: number; message: CypressAnnotationMessage }) {
   const currentTime = useAppSelector(getCurrentTime);
+
+  return (
+    <TestStepRow pending={time > currentTime} key={(message.url || "url") + time}>
+      <div className="truncate italic opacity-70" title={message.url}>
+        new url {message.url}
+      </div>
+    </TestStepRow>
+  );
+}
+
+function TestSection({ events, header }: { events: CompositeTestEvent[]; header?: string }) {
   if (events.length === 0) {
     return null;
   }
@@ -238,15 +244,17 @@ function TestSection({ events, header }: { events: CompositeTestEvent[]; header?
       ) : null}
       {events.map(({ event: s, type, time }, i) =>
         type === "step" ? (
-          <TestStepItem step={s} key={i} index={s.index} argString={s.args?.toString()} id={s.id} />
+          <TestStepItem
+            step={s}
+            key={s.id}
+            index={s.index}
+            argString={s.args?.toString()}
+            id={s.id}
+          />
         ) : type === "network" ? (
           <NetworkEvent key={s.id} request={s} />
         ) : (
-          <TestStepRow pending={time > currentTime}>
-            <div className="truncate italic opacity-70" title={s.url}>
-              new url {s.url}
-            </div>
-          </TestStepRow>
+          <NewUrlRow message={s} time={time} key={s.id} />
         )
       )}
     </>

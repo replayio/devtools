@@ -34,7 +34,7 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
     <TestInfoContext.Provider value={{ consoleProps, setConsoleProps, pauseId, setPauseId }}>
       <TestInfoContextMenuContextRoot>
         <div className="flex flex-grow flex-col overflow-hidden">
-          <div className="flex flex-grow flex-col space-y-1 overflow-auto px-2 ">
+          <div className="relative flex flex-grow flex-col space-y-1 overflow-auto px-2">
             {testCases.map((t, i) => showTest(i) && <TestCase test={t} key={i} index={i} />)}
           </div>
           {selectedTest !== null ? <Console /> : null}

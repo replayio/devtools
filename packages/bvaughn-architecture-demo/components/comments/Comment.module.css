@@ -127,14 +127,42 @@
 }
 
 .PrimaryLabel {
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-tiny);
   padding: 0.25rem 0.5rem;
 }
 
 .SecondaryLabel {
-  font-size: var(--font-size-regular);
+  font-size: var(--font-size-small);
   padding: 0.25rem 0.5rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.OuterImageContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  background-color: var(--comment-card-source-preview-background-color);
+}
+
+.InnerImageContainer {
+  position: relative;
+}
+
+.PositionIndicator {
+  position: absolute;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-left: -0.75rem;
+  margin-top: -0.75rem;
+  fill: var(--color-current);
+}
+
+.Image {
+  max-width: 100%;
+  height: auto;
 }

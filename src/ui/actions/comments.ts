@@ -39,17 +39,24 @@ export function createComment(
   options: CommentOptions
 ): UIThunkAction {
   return async (dispatch, getState, { replayClient }) => {
-    const { sourceLocation, hasFrames, position, networkRequestId } = options;
+    let {
+      sourceLocation,
+      hasFrames,
+      position,
+      networkRequestId,
+      primaryLabel = null,
+      secondaryLabel = null,
+    } = options;
 
-    let primaryLabel: string | null = null;
-    let secondaryLabel: string | null = null;
-    if (sourceLocation) {
-      ({ primaryLabel, secondaryLabel } = await createSourceLocationLabels(
-        replayClient,
-        sourceLocation.sourceId,
-        sourceLocation.line,
-        sourceLocation.column
-      ));
+    if (primaryLabel === null && secondaryLabel === null) {
+      if (sourceLocation) {
+        ({ primaryLabel, secondaryLabel } = await createSourceLocationLabels(
+          replayClient,
+          sourceLocation.sourceId,
+          sourceLocation.line,
+          sourceLocation.column
+        ));
+      }
     }
 
     trackEvent("comments.create");
@@ -80,7 +87,8 @@ export function createComment(
 export function createFrameComment(
   position: { x: number; y: number } | null,
   recordingId: RecordingId,
-  breakpoint?: any
+  base64PNG: string | null,
+  relativePosition: { x: number; y: number } | null
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const state = getState();
@@ -94,17 +102,13 @@ export function createFrameComment(
       executionPoint = (await replayClient.getPointNearTime(currentTime)).point.point;
     }
 
-    // Only try to generate a sourceLocation if there's a corresponding breakpoint for this frame comment.
-    const sourceLocation = breakpoint
-      ? breakpoint.location ||
-        (await getCurrentPauseSourceLocationWithTimeout(ThreadFront, replayClient, getState))
-      : null;
-
     dispatch(
       createComment(currentTime, executionPoint, recordingId, {
         position,
         hasFrames: true,
-        sourceLocation: sourceLocation || null,
+        sourceLocation: null,
+        primaryLabel: JSON.stringify(relativePosition),
+        secondaryLabel: base64PNG,
       })
     );
   };
@@ -169,6 +173,8 @@ export function createNetworkRequestComment(
         hasFrames: false,
         sourceLocation: null,
         networkRequestId: request.id,
+        primaryLabel: `${request.method} request`,
+        secondaryLabel: request.name,
       })
     );
   };
