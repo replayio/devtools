@@ -38,7 +38,7 @@ export default function NetworkRequestPreview({ networkRequestId }: { networkReq
       title={isSeekEnabled ? "Show in the Network Monitor" : undefined}
     >
       <div className={styles.Labels}>
-        <div className={styles.PrimaryLabel}>
+        <div className={styles.NetworkRequestLabel}>
           <span className={styles.NetworkRequestMethod}>{`[${method}]`}</span> {name}
         </div>
       </div>

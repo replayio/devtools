@@ -127,12 +127,12 @@
 }
 
 .PrimaryLabel {
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-tiny);
   padding: 0.25rem 0.5rem;
 }
 
 .SecondaryLabel {
-  font-size: var(--font-size-regular);
+  font-size: var(--font-size-small);
   padding: 0.25rem 0.5rem;
   overflow: hidden;
   text-overflow: ellipsis;

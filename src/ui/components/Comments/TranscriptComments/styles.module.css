@@ -26,8 +26,8 @@
   flex-direction: column;
   flex: 1 1 auto;
   overflow: hidden;
-  padding: 0.25rem 0.5rem;
-  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  gap: 0.125rem;
 }
 
 .PrimaryLabel,
@@ -42,8 +42,12 @@
 }
 .SecondaryLabel {
   margin: 0;
-  font-size: var(--font-size-regular);
+  font-size: var(--font-size-small);
   color: var(--color-dim);
+}
+
+.NetworkRequestLabel {
+  font-size: var(--font-size-small);
 }
 
 .Icon {
