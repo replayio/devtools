@@ -64,7 +64,7 @@ function useGetTestSections(
       };
 
       let duration = s.duration || 1;
-      let absoluteStartTime = annotations.start?.time ?? startTime + s.relativeStartTime;
+      let absoluteStartTime = annotations.start?.time ?? startTime + (s.relativeStartTime || 0);
       let absoluteEndTime = annotations.end?.time ?? absoluteStartTime + duration;
 
       if (s.name === "assert") {
@@ -85,8 +85,9 @@ function useGetTestSections(
         type: "step",
         event: {
           ...s,
+          relativeStartTime: s.relativeStartTime,
           absoluteStartTime,
-          absoluteEndTime: absoluteEndTime - 1,
+          absoluteEndTime: Math.max(0, absoluteEndTime - 1),
           duration,
           index: i,
           annotations,
