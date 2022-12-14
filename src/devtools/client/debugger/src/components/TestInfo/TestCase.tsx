@@ -32,7 +32,7 @@ export type TestCaseContextType = {
 };
 
 function formatStepError(step?: TestStep) {
-  if (!step || !step.error) {
+  if (!step || !step.error || !step.args) {
     return null;
   }
 
