@@ -1,11 +1,7 @@
-import { MouseEvent, ReactNode, useState } from "react";
+import { MouseEvent, ReactNode, useMemo, useState } from "react";
 
 import ContextMenu from "./ContextMenu";
-
-type Coordinates = {
-  pageX: number;
-  pageY: number;
-};
+import { ContextMenuContext, ContextMenuContextType } from "./ContextMenuContext";
 
 export default function useContextMenu(
   contextMenuItems: ReactNode,
@@ -19,28 +15,31 @@ export default function useContextMenu(
 } {
   const { dataTestId, dataTestName } = options;
 
-  const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
+  const [contextMenuEvent, setContextMenuEvent] = useState<MouseEvent | null>(null);
+  const context = useMemo<ContextMenuContextType>(() => ({ contextMenuEvent }), [contextMenuEvent]);
 
   const onContextMenu = (event: MouseEvent) => {
     event.preventDefault();
 
-    setCoordinates({ pageX: event.pageX, pageY: event.pageY });
+    setContextMenuEvent(event);
   };
 
-  const hideContextMenu = () => setCoordinates(null);
+  const hideContextMenu = () => setContextMenuEvent(null);
 
   let contextMenu = null;
-  if (coordinates) {
+  if (contextMenuEvent) {
     contextMenu = (
-      <ContextMenu
-        dataTestId={dataTestId}
-        dataTestName={dataTestName}
-        hide={hideContextMenu}
-        pageX={coordinates.pageX}
-        pageY={coordinates.pageY}
-      >
-        {contextMenuItems}
-      </ContextMenu>
+      <ContextMenuContext.Provider value={context}>
+        <ContextMenu
+          dataTestId={dataTestId}
+          dataTestName={dataTestName}
+          hide={hideContextMenu}
+          pageX={contextMenuEvent.pageX}
+          pageY={contextMenuEvent.pageY}
+        >
+          {contextMenuItems}
+        </ContextMenu>
+      </ContextMenuContext.Provider>
     );
   }
 
