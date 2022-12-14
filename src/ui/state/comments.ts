@@ -19,6 +19,8 @@ export type CommentOptions = {
   hasFrames: boolean;
   sourceLocation: SourceLocation | null;
   networkRequestId?: string;
+  primaryLabel?: string | null;
+  secondaryLabel?: string | null;
 };
 
 export interface Remark {

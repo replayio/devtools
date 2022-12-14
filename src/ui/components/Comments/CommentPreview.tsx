@@ -3,6 +3,7 @@ import { MouseEvent } from "react";
 import { Comment } from "ui/state/comments";
 
 import CommentSource from "./TranscriptComments/CommentSource";
+import CommentThumbnail from "./TranscriptComments/CommentThumbnail";
 import NetworkRequestPreview from "./TranscriptComments/NetworkRequestPreview";
 import styles from "./CommentPreview.module.css";
 
@@ -26,6 +27,15 @@ export default function CommentPreview({
       </div>
     );
   } else {
+    const { primaryLabel, secondaryLabel } = comment;
+    if (typeof secondaryLabel === "string" && secondaryLabel.startsWith("data:image")) {
+      return (
+        <div className={styles.Preview}>
+          <CommentThumbnail primaryLabel={primaryLabel ?? null} secondaryLabel={secondaryLabel} />
+        </div>
+      );
+    }
+
     return null;
   }
 }
