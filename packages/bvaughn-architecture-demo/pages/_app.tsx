@@ -27,10 +27,11 @@ function Routing({ Component, pageProps }: AppProps) {
   );
 }
 
-const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
+const App = (props: AppProps & AuthProps) => {
   return <Routing {...props} />;
 };
 
+// Forked verbatim from /pages/_app.tsx
 App.getInitialProps = (appContext: AppContext) => {
   const props = NextApp.getInitialProps(appContext);
   const authHeader = appContext.ctx.req?.headers.authorization;
