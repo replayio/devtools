@@ -35,8 +35,8 @@ const reporterSlice = createSlice({
       state.selectedStep = action.payload;
     },
     setSelectedTest(state, action: PayloadAction<{ index: number; title: string } | null>) {
-      state.selectedTest = action.payload?.index || null;
-      state.selectedTestTitle = action.payload?.title || null;
+      state.selectedTest = action.payload?.index ?? null;
+      state.selectedTestTitle = action.payload?.title ?? null;
     },
     mayClearSelectedStep(state, action: PayloadAction<{ point?: string; time?: number }>) {
       const { point, time } = action.payload;
