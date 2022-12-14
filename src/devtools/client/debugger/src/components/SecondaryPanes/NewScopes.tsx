@@ -73,6 +73,7 @@ function Scope({ pauseId, scope }: { pauseId: PauseId; scope: ConvertedScope }) 
 }
 
 export default function Scopes() {
+  const selectedFrameId = useAppSelector(getSelectedFrameId);
   const showUnloadedRegionError = !useAppSelector(isCurrentTimeInLoadedRegion);
   const dispatch = useAppDispatch();
 
@@ -93,7 +94,10 @@ export default function Scopes() {
   return (
     <div className="scopes-content">
       <Redacted className="pane scopes-list" data-test-name="ScopesList">
-        <ErrorBoundary fallback={<div className="pane-info">Error loading scopes</div>}>
+        <ErrorBoundary
+          key={`${selectedFrameId?.pauseId}:${selectedFrameId?.frameId}`}
+          fallback={<div className="pane-info">Error loading scopes</div>}
+        >
           <Suspense fallback={<div className="pane-info">Loading…</div>}>
             <ScopesRenderer />
           </Suspense>
