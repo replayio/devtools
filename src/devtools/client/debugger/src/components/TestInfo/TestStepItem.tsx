@@ -6,6 +6,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { getCurrentPoint } from "ui/actions/app";
 import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { useTestStepActions } from "ui/hooks/useTestStepActions";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
 import {
   getCurrentTime,
@@ -26,6 +27,41 @@ export function returnFirst<T, R>(
   fn: (value: T, index: number, list: T[]) => R | null
 ) {
   return list ? list.reduce<R | null>((acc, v, i, l) => acc ?? fn(v, i, l), null) : null;
+}
+
+function useStepState(step: AnnotatedTestStep) {
+  const currentTime = useAppSelector(getCurrentTime);
+  const currentPoint = useAppSelector(getCurrentPoint);
+  const isPlaying = useAppSelector(isPlayingSelector);
+  const isDragging = useAppSelector(isDraggingSelector);
+
+  const { point: pointEnd } = step.annotations.end || {};
+  const { point: pointStart } = step.annotations.start || {};
+
+  const shouldUseTimes = isPlaying || isDragging;
+
+  if (step.relativeStartTime == null) {
+    return "pending";
+  }
+
+  const currentPointBigInt = currentPoint ? BigInt(currentPoint) : null;
+  const pointEndBigInt = pointEnd ? BigInt(pointEnd) : null;
+  const isPast =
+    !shouldUseTimes && currentPointBigInt && pointEndBigInt
+      ? currentPointBigInt > pointEndBigInt
+      : currentTime > step.absoluteStartTime;
+  const isPaused =
+    !shouldUseTimes && currentPointBigInt && pointEndBigInt && pointStart
+      ? currentPointBigInt >= BigInt(pointStart) && currentPointBigInt <= pointEndBigInt
+      : currentTime >= step.absoluteStartTime && currentTime < step.absoluteEndTime;
+
+  if (isPaused) {
+    return "paused";
+  } else if (isPast) {
+    return "past";
+  }
+
+  return "pending";
 }
 
 // relies on the scrolling parent to be the nearest positioning context
@@ -61,30 +97,16 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     pauseId: string;
     nodeIds: string[];
   }>();
-  const currentPoint = useAppSelector(getCurrentPoint);
+  const isPlaying = useAppSelector(isPlayingSelector);
   const currentTime = useAppSelector(getCurrentTime);
   const selectedStep = useAppSelector(getSelectedStep);
   const dispatch = useAppDispatch();
   const client = useContext(ReplayClientContext);
   const { point: pointEnd, message: messageEnd } = step.annotations.end || {};
   const { point: pointStart } = step.annotations.start || {};
-  const isPlaying = useAppSelector(isPlayingSelector);
-  const isDragging = useAppSelector(isDraggingSelector);
+  const state = useStepState(step);
 
-  const shouldUseTimes = isPlaying || isDragging;
-
-  // compare points if possible and fall back to timestamps
-  const currentPointBigInt = currentPoint ? BigInt(currentPoint) : null;
-  const pointEndBigInt = pointEnd ? BigInt(pointEnd) : null;
-  const isPast =
-    !shouldUseTimes && currentPointBigInt && pointEndBigInt
-      ? currentPointBigInt > pointEndBigInt
-      : currentTime > step.absoluteStartTime;
-  const isPaused =
-    !shouldUseTimes && currentPointBigInt && pointEndBigInt && pointStart
-      ? currentPointBigInt >= BigInt(pointStart) && currentPointBigInt <= pointEndBigInt
-      : currentTime >= step.absoluteStartTime && currentTime < step.absoluteEndTime;
-
+  // compare points if possible and
   useEffect(() => {
     let endPauseResult: createPauseResult | undefined;
     let startPauseResult: createPauseResult | undefined;
@@ -178,7 +200,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   }, [step, pointStart, localPauseData, dispatch, setConsoleProps, id, setPauseId]);
 
   const onMouseEnter = () => {
-    if (isPaused) {
+    if (state === "paused") {
       return;
     }
 
@@ -197,7 +219,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     }
   };
   const onMouseLeave = () => {
-    if (isPaused) {
+    if (state === "paused") {
       return;
     }
 
@@ -224,15 +246,16 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   }, [step, ref, onClick]);
 
   // This math is bananas don't look here until this is cleaned up :)
-  const bump = isPaused || isPast ? 10 : 0;
+  const bump = state !== "pending" ? 10 : 0;
   const actualProgress = bump + 90 * ((currentTime - step.absoluteStartTime) / step.duration);
   const progress = actualProgress > 100 ? 100 : actualProgress;
-  const displayedProgress = (step.duration === 1 && isPaused) || progress == 100 ? 0 : progress;
+  const displayedProgress =
+    (step.duration === 1 && state === "paused") || progress == 100 ? 0 : progress;
 
   return (
     <TestStepRow
-      active={isPaused}
-      pending={!isPast && !isPaused}
+      active={state === "paused"}
+      pending={state === "pending"}
       error={!!step.error}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
@@ -243,7 +266,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
           <ProgressBar progress={displayedProgress} error={!!step.error} />
         </div>
         <div className="opacity-70 ">{index + 1}</div>
-        <div className={`font-medium ${isPaused ? "font-bold" : ""}`}>
+        <div className={`font-medium ${state === "paused" ? "font-bold" : ""}`}>
           {step.parentId ? "- " : ""}
           {step.name} <span className="opacity-70">{argString}</span>
         </div>
@@ -256,6 +279,11 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
 function Actions({ step, isSelected }: { step: AnnotatedTestStep; isSelected: boolean }) {
   const { test } = useContext(TestCaseContext);
   const { show } = useContext(TestInfoContextMenuContext);
+  const stepActions = useTestStepActions(step);
+
+  if (!stepActions.canPlayback(test)) {
+    return null;
+  }
 
   const onClick = (e: React.MouseEvent) => {
     show({ x: e.pageX, y: e.pageY }, test, step);

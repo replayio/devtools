@@ -49,14 +49,14 @@ export const TestCaseContext = createContext<TestCaseContextType>(null as any);
 export function TestCase({ test, index }: { test: TestItem; index: number }) {
   const [expandSteps, setExpandSteps] = useState(false);
   const dispatch = useAppDispatch();
-  const expandable = typeof test.relativeStartTime === "number" && (test.steps || test.error);
+  const expandable = test.steps || test.error;
   const selectedTest = useAppSelector(getSelectedTest);
   const isSelected = selectedTest === index;
   const annotationsStart = useAppSelector(getReporterAnnotationsForTitleEnd);
 
   const duration = useAppSelector(getRecordingDuration);
-  const testStartTime = test.relativeStartTime;
-  const testEndTime = test.relativeStartTime + test.duration;
+  const testStartTime = test.relativeStartTime || 0;
+  const testEndTime = testStartTime + (test.duration || 0);
   const focusRegion = useAppSelector(getFocusRegion);
   const isFocused =
     focusRegion?.beginTime === testStartTime && focusRegion?.endTime === testEndTime;
@@ -69,7 +69,7 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
           endTime: duration,
         })
       );
-    } else {
+    } else if (testEndTime > testStartTime) {
       dispatch(
         setFocusRegion({
           beginTime: testStartTime,
@@ -82,18 +82,20 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
   };
   const toggleExpand = () => {
     const firstStep = test.steps?.[0];
-    if (firstStep) {
-      const time = firstStep.relativeStartTime + test.relativeStartTime;
-      const pointStart = annotationsStart.find(a => a.message.id === firstStep.id)?.point;
+    if (test.relativeStartTime != null) {
+      if (firstStep?.relativeStartTime != null) {
+        const time = firstStep.relativeStartTime + test.relativeStartTime;
+        const pointStart = annotationsStart.find(a => a.message.id === firstStep.id)?.point;
 
-      if (time && pointStart) {
-        dispatch(seek(pointStart, time, false));
+        if (time && pointStart) {
+          dispatch(seek(pointStart, time, false));
+        }
+      } else {
+        dispatch(seekToTime(test.relativeStartTime, false));
       }
-
-      dispatch(setSelectedTest({ index, title: test.title }));
-    } else if (typeof test.relativeStartTime === "number") {
-      dispatch(seekToTime(test.relativeStartTime, false));
     }
+
+    dispatch(setSelectedTest({ index, title: test.title }));
 
     onFocus();
   };

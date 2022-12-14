@@ -170,8 +170,8 @@ export type TestItem = {
   title: string;
   relativePath?: string;
   result: TestResult;
-  relativeStartTime: number;
-  duration: number;
+  relativeStartTime?: number;
+  duration?: number;
   steps: TestStep[];
   id?: string;
   path?: string[];
@@ -204,7 +204,7 @@ export type TestStep = {
   args?: string[];
   name: string;
   duration: number;
-  relativeStartTime: number;
+  relativeStartTime?: number;
   id: string;
   parentId?: string;
   error?: TestItemError;
