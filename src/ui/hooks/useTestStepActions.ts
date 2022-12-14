@@ -29,8 +29,14 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
       : !!testStep && currentTime === testStep.absoluteEndTime;
   const canJumpToAfter = !isAtStepEnd;
 
+  const canPlayback = (
+    test: TestItem
+  ): test is TestItem & { relativeStartTime: number; duration: number } => {
+    return test.relativeStartTime != null && test.duration != null;
+  };
+
   const playFromStep = (test: TestItem) => {
-    if (!testStep) {
+    if (!testStep || !canPlayback(test)) {
       return;
     }
 
@@ -43,12 +49,12 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
   };
 
   const playToStep = (test: TestItem) => {
-    if (!testStep) {
+    if (!testStep || !canPlayback(test)) {
       return;
     }
     dispatch(
       startPlayback({
-        beginTime: test.relativeStartTime,
+        beginTime: test.relativeStartTime || 0,
         endTime: testStep.annotations.end?.time || testStep.absoluteEndTime,
         endPoint: testStep.annotations.end?.point,
       })
@@ -121,6 +127,7 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
   };
 
   return {
+    canPlayback,
     isAtStepEnd,
     isAtStepStart,
     playFromStep,

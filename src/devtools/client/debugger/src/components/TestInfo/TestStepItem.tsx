@@ -6,6 +6,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { getCurrentPoint } from "ui/actions/app";
 import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { useTestStepActions } from "ui/hooks/useTestStepActions";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
 import {
   getCurrentTime,
@@ -262,6 +263,11 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
 function Actions({ step, isSelected }: { step: AnnotatedTestStep; isSelected: boolean }) {
   const { test } = useContext(TestCaseContext);
   const { show } = useContext(TestInfoContextMenuContext);
+  const stepActions = useTestStepActions(step);
+
+  if (!stepActions.canPlayback(test)) {
+    return null;
+  }
 
   const onClick = (e: React.MouseEvent) => {
     show({ x: e.pageX, y: e.pageY }, test, step);

@@ -56,31 +56,29 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
 
   const duration = useAppSelector(getRecordingDuration);
   const testStartTime = test.relativeStartTime || 0;
-  const testEndTime = testStartTime + test.duration;
+  const testEndTime = testStartTime + (test.duration || 0);
   const focusRegion = useAppSelector(getFocusRegion);
   const isFocused =
     focusRegion?.beginTime === testStartTime && focusRegion?.endTime === testEndTime;
 
   const onFocus = () => {
-    if (duration > 0) {
-      if (isFocused) {
-        dispatch(
-          setFocusRegion({
-            beginTime: 0,
-            endTime: duration,
-          })
-        );
-      } else {
-        dispatch(
-          setFocusRegion({
-            beginTime: testStartTime,
-            endTime: testEndTime,
-          })
-        );
-      }
-      dispatch(syncFocusedRegion());
-      dispatch(updateFocusRegionParam());
+    if (isFocused) {
+      dispatch(
+        setFocusRegion({
+          beginTime: 0,
+          endTime: duration,
+        })
+      );
+    } else if (testEndTime > testStartTime) {
+      dispatch(
+        setFocusRegion({
+          beginTime: testStartTime,
+          endTime: testEndTime,
+        })
+      );
     }
+    dispatch(syncFocusedRegion());
+    dispatch(updateFocusRegionParam());
   };
   const toggleExpand = () => {
     const firstStep = test.steps?.[0];
