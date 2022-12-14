@@ -1,9 +1,10 @@
-import { ReactNode } from "react";
+import { CSSProperties, ReactNode } from "react";
 
 import styles from "./Icon.module.css";
 
 export default function Icon({
   className = styles.DefaultIcon,
+  style,
   type,
 }: {
   className?: string;
@@ -55,6 +56,7 @@ export default function Icon({
     | "view-html-element"
     | "visible"
     | "warning";
+  style?: CSSProperties;
 }) {
   let path: ReactNode = null;
   switch (type) {
@@ -273,7 +275,7 @@ export default function Icon({
   }
 
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <svg className={className} style={style} viewBox="0 0 24 24" fill="currentColor">
       <path d="M0 0h24v24H0z" fill="none" />
       {path}
     </svg>

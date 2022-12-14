@@ -64,6 +64,7 @@ export default function CommentRenderer({ comment }: { comment: Comment }) {
       deleteCallback={deleteCommentCallback}
       editCallback={editCommentCallback}
       isPublished={comment.isPublished}
+      networkRequestId={comment.networkRequestId}
       owner={comment.user}
       primaryLabel={comment.primaryLabel || null}
       secondaryLabel={comment.secondaryLabel || null}
@@ -93,6 +94,7 @@ export default function CommentRenderer({ comment }: { comment: Comment }) {
             deleteCallback={deleteCommentReplyCallback}
             editCallback={editCommentReplyCallback}
             isPublished={reply.isPublished}
+            networkRequestId={null}
             owner={reply.user}
             primaryLabel={null}
             secondaryLabel={null}
@@ -118,6 +120,7 @@ function EditableRemark({
   deleteCallback,
   editCallback,
   isPublished,
+  networkRequestId,
   owner,
   primaryLabel,
   secondaryLabel,
@@ -130,13 +133,13 @@ function EditableRemark({
   deleteCallback: () => Promise<void>;
   editCallback: (newContent: string, newIsPublished: boolean) => Promise<void>;
   isPublished: boolean;
+  networkRequestId: string | null;
   owner: User;
   primaryLabel: string | null;
   secondaryLabel: string | null;
   sourceLocation: CommentSourceLocation | null;
 }) {
   const { currentUserInfo } = useContext(SessionContext);
-  const { openSource } = useContext(SourcesContext);
   const invalidateCache = useCacheRefresh();
 
   const [isEditing, setIsEditing] = useState(content === "");
@@ -178,16 +181,6 @@ function EditableRemark({
     save(JSON.stringify(editorState), false);
   };
 
-  const openLocation = () => {
-    if (sourceLocation) {
-      const { line: lineNumber, sourceId } = sourceLocation;
-
-      const lineIndex = lineNumber - 1;
-
-      openSource("view-source", sourceId, lineIndex, lineIndex);
-    }
-  };
-
   return (
     <div className={className}>
       <div className={styles.HeaderRow}>
@@ -221,17 +214,12 @@ function EditableRemark({
         )}
       </div>
 
-      {(primaryLabel || secondaryLabel) && (
-        <div className={styles.Labels} onClick={openLocation}>
-          {primaryLabel && <div className={styles.PrimaryLabel}>{primaryLabel}</div>}
-          {secondaryLabel && (
-            <div
-              className={styles.SecondaryLabel}
-              dangerouslySetInnerHTML={{ __html: secondaryLabel }}
-            />
-          )}
-        </div>
-      )}
+      <CommentPreview
+        networkRequestId={networkRequestId}
+        primaryLabel={primaryLabel}
+        secondaryLabel={secondaryLabel}
+        sourceLocation={sourceLocation}
+      />
 
       <div className={styles.ContentWrapper} onDoubleClick={startEditing}>
         <CommentEditor
@@ -293,4 +281,74 @@ function DeleteWithConfirmationButton({
       </button>
     );
   }
+}
+
+function CommentPreview({
+  networkRequestId,
+  primaryLabel,
+  secondaryLabel,
+  sourceLocation,
+}: {
+  networkRequestId: string | null;
+  primaryLabel: string | null;
+  secondaryLabel: string | null;
+  sourceLocation: CommentSourceLocation | null;
+}) {
+  const { openSource } = useContext(SourcesContext);
+
+  if (primaryLabel === null && secondaryLabel === null) {
+    return null;
+  }
+
+  if (sourceLocation !== null || networkRequestId !== null) {
+    const onClick = () => {
+      if (sourceLocation) {
+        const { line: lineNumber, sourceId } = sourceLocation;
+
+        const lineIndex = lineNumber - 1;
+
+        openSource("view-source", sourceId, lineIndex, lineIndex);
+      }
+    };
+
+    return (
+      <div className={styles.Labels} onClick={onClick}>
+        {primaryLabel && <div className={styles.PrimaryLabel}>{primaryLabel}</div>}
+        {secondaryLabel && (
+          <div
+            className={styles.SecondaryLabel}
+            dangerouslySetInnerHTML={{ __html: secondaryLabel }}
+          />
+        )}
+      </div>
+    );
+  } else if (typeof secondaryLabel === "string" && secondaryLabel.startsWith("data:image")) {
+    let indicatorLeft: string | null = null;
+    let indicatorTop: string | null = null;
+    if (typeof primaryLabel === "string") {
+      try {
+        const coordinates = JSON.parse(primaryLabel);
+        indicatorLeft = `${coordinates.x * 100}%`;
+        indicatorTop = `${coordinates.y * 100}%`;
+      } catch (error) {}
+    }
+
+    return (
+      <div className={styles.OuterImageContainer}>
+        <div className={styles.InnerImageContainer}>
+          <img className={styles.Image} src={secondaryLabel} />
+
+          {indicatorLeft !== null && indicatorTop !== null && (
+            <Icon
+              className={styles.PositionIndicator}
+              style={{ left: indicatorLeft, top: indicatorTop }}
+              type="comment"
+            />
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return null;
 }
