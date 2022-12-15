@@ -260,6 +260,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       ref={ref}
+      data-test-id="TestSuites-TestCase-TestStepRow"
     >
       <button onClick={onClick} className="flex flex-grow items-start space-x-2 text-start">
         <div title={"" + displayedProgress} className="flex h-4 items-center">

@@ -119,7 +119,7 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
     <TestCaseContext.Provider
       value={{ startTime: testStartTime, endTime: testEndTime, onReplay, onPlayFromHere, test }}
     >
-      <div className="flex flex-col">
+      <div className="flex flex-col" data-test-id="TestSuite-TestCaseRow">
         {!isSelected && (
           <button
             className={classnames(
@@ -140,7 +140,10 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
                   {test.title}
                 </div>
                 {test.error ? (
-                  <div className="mt-2 overflow-hidden rounded-lg bg-testsuitesErrorBgcolor px-3 py-2 text-left font-mono ">
+                  <div
+                    className="mt-2 overflow-hidden rounded-lg bg-testsuitesErrorBgcolor px-3 py-2 text-left font-mono"
+                    data-test-id="TestSuite-TestCaseRow-Error"
+                  >
                     {formatStepError(test.steps?.find(s => s.error)) || test.error.message}
                   </div>
                 ) : null}
