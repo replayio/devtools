@@ -99,7 +99,7 @@ export function createFrameComment(
     // In this case we should ask the server for a nearby point.
     let executionPoint = getExecutionPoint(state);
     if (executionPoint === null) {
-      executionPoint = (await replayClient.getPointNearTime(currentTime)).point.point;
+      executionPoint = (await replayClient.getPointNearTime(currentTime)).point;
     }
 
     dispatch(
@@ -138,7 +138,7 @@ export function createFloatingCodeComment(
     // In this case we should ask the server for a nearby point.
     let executionPoint = getExecutionPoint(state);
     if (executionPoint === null) {
-      executionPoint = (await replayClient.getPointNearTime(currentTime)).point.point;
+      executionPoint = (await replayClient.getPointNearTime(currentTime)).point;
     }
 
     dispatch(
@@ -164,7 +164,7 @@ export function createNetworkRequestComment(
     // In this case we should ask the server for a nearby point.
     let executionPoint = request.triggerPoint?.point || getExecutionPoint(state);
     if (executionPoint === null) {
-      executionPoint = (await replayClient.getPointNearTime(time)).point.point;
+      executionPoint = (await replayClient.getPointNearTime(time)).point;
     }
 
     dispatch(

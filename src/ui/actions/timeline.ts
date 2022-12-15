@@ -288,7 +288,7 @@ export function seekToTime(targetTime: number, autoPlay?: boolean): UIThunkActio
 
     const nearestEvent = mostRecentPaintOrMouseEvent(targetTime) || { point: "", time: Infinity };
     let bestPoint = nearestEvent;
-    const { point } = await replayClient.getPointNearTime(targetTime);
+    const point = await replayClient.getPointNearTime(targetTime);
     if (Math.abs(point.time - targetTime) < Math.abs(nearestEvent.time - targetTime)) {
       bestPoint = point;
     }
