@@ -1,4 +1,4 @@
-import { ReactNode, useLayoutEffect, useRef, useState } from "react";
+import { ReactNode } from "react";
 
 import styles from "./SearchResultHighlight.module.css";
 
@@ -15,29 +15,12 @@ export default function SearchResultHighlight({
 }) {
   const searchResultColumnEndIndex = searchResultColumnStartIndex + searchText.length;
 
-  const breakpointMarkerIsBeforeHighlight =
-    columnBreakpointIndex !== null && columnBreakpointIndex <= searchResultColumnStartIndex;
   const breakpointMarkerIsWithinHighlight =
     columnBreakpointIndex !== null &&
     columnBreakpointIndex < searchResultColumnEndIndex &&
     columnBreakpointIndex > searchResultColumnStartIndex;
 
-  const ref = useRef<HTMLPreElement>(null);
-
-  const [breakpointMarkerOffset, setBreakpointMarkerOffset] = useState(0);
-
-  useLayoutEffect(() => {
-    if (breakpointMarkerIsBeforeHighlight || breakpointMarkerIsWithinHighlight) {
-      const pre = ref.current;
-      if (pre) {
-        const style = getComputedStyle(pre);
-        const offset = style.getPropertyValue("--column-breakpoint-width");
-        setBreakpointMarkerOffset(parseInt(offset));
-      }
-    }
-  }, [breakpointMarkerIsBeforeHighlight, breakpointMarkerIsWithinHighlight]);
-
-  let markers: ReactNode | ReactNode[] = null;
+  let markers: ReactNode = null;
 
   if (breakpointMarkerIsWithinHighlight) {
     // A column breakpoint is in the middle of this search result highlight.
@@ -47,59 +30,42 @@ export default function SearchResultHighlight({
     const textStart = searchText.substring(0, index);
     const textEnd = searchText.substring(index);
 
-    markers = [
-      <Marker
-        breakpointMarkerOffset={0}
-        columnOffset={searchResultColumnStartIndex + 1}
-        isActive={isActive}
-        key="start"
-        text={textStart}
-      />,
-      <Marker
-        breakpointMarkerOffset={breakpointMarkerOffset}
-        columnOffset={0}
-        isActive={isActive}
-        key="end"
-        text={textEnd}
-      />,
-    ];
-  } else {
     markers = (
-      <Marker
-        breakpointMarkerOffset={breakpointMarkerIsBeforeHighlight ? breakpointMarkerOffset : 0}
-        columnOffset={searchResultColumnStartIndex + 1}
-        isActive={isActive}
-        text={searchText}
-      />
+      <>
+        <span
+          className={isActive ? styles.ActiveMark : styles.InactiveMark}
+          style={{ marginLeft: `${searchResultColumnStartIndex + 1}ch` }}
+        >
+          {textStart}
+        </span>
+        <div className={styles.ColumnBreakpointSpacer} />
+        <span className={isActive ? styles.ActiveMark : styles.InactiveMark}>{textEnd}</span>
+      </>
+    );
+  } else {
+    const breakpointMarkerIsBeforeHighlight =
+      columnBreakpointIndex !== null && columnBreakpointIndex <= searchResultColumnStartIndex;
+
+    markers = (
+      <>
+        {breakpointMarkerIsBeforeHighlight && <div className={styles.ColumnBreakpointSpacer} />}
+        <span
+          className={isActive ? styles.ActiveMark : styles.InactiveMark}
+          style={{ marginLeft: `${searchResultColumnStartIndex + 1}ch` }}
+        >
+          {searchText}
+        </span>
+      </>
     );
   }
 
   return (
-    <pre className={styles.Highlight} ref={ref}>
+    <pre
+      className={styles.Highlight}
+      data-test-name="SourceSearchResultHighlight"
+      data-test-search-state={isActive ? "active" : "inactive"}
+    >
       {markers}
     </pre>
-  );
-}
-
-function Marker({
-  breakpointMarkerOffset,
-  columnOffset,
-  isActive,
-  text,
-}: {
-  breakpointMarkerOffset: number;
-  columnOffset: number;
-  isActive: boolean;
-  text: string;
-}) {
-  const marginLeft =
-    breakpointMarkerOffset > 0
-      ? `calc(${columnOffset}ch + ${breakpointMarkerOffset}px)`
-      : `${columnOffset}ch`;
-
-  return (
-    <span className={isActive ? styles.ActiveMark : styles.InactiveMark} style={{ marginLeft }}>
-      {text}
-    </span>
   );
 }

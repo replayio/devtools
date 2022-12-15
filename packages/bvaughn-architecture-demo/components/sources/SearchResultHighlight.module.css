@@ -14,3 +14,8 @@
   background-color: var(--search-result-inactive-background-color);
   color: var(--search-result-inactive-color);
 }
+
+.ColumnBreakpointSpacer {
+  display: inline-block;
+  width: var(--column-breakpoint-width);
+}
