@@ -46,10 +46,13 @@ export async function createSourceLocationLabels(
   if (streamingSource != null) {
     const parsedSource = await parseStreamingAsync(streamingSource);
     if (parsedSource != null) {
-      if (parsedSource.parsedLines.length < lineNumber) {
+      if (parsedSource.rawLines.length < lineNumber) {
+        // If the streaming source hasn't finished loading yet, wait for it to load;
+        // Note that it's important to check raw lines as parsed lines may be clipped
+        // if the source is larger than the parser has been configured to handle.
         await new Promise<void>(resolve => {
           parsedSource.subscribe(() => {
-            if (parsedSource.parsedLines.length >= lineNumber) {
+            if (parsedSource.rawLines.length >= lineNumber) {
               resolve();
             }
           });
@@ -57,10 +60,15 @@ export async function createSourceLocationLabels(
       }
 
       const rawLine = parsedSource.rawLines[lineNumber - 1];
-      if (rawLine.length > MAX_LABEL_CHARS) {
-        secondaryLabel = truncate(rawLine, { maxLength: MAX_LABEL_CHARS, position: "middle" });
-      } else {
+      if (parsedSource.parsedLines.length >= lineNumber && rawLine.length <= MAX_LABEL_CHARS) {
         secondaryLabel = parsedSource.parsedLines[lineNumber - 1] || null;
+      } else {
+        // Secondary label is expected to be HTML for source code.
+        // That's true even if we don't have any actual syntax highlighted markup to show.
+        const element = document.createElement("span");
+        element.textContent = truncate(rawLine, { maxLength: MAX_LABEL_CHARS, position: "middle" });
+
+        secondaryLabel = element.outerHTML;
       }
     }
   }
