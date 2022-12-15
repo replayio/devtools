@@ -74,7 +74,7 @@ export async function getElementCount(page: Page, queryString: string): Promise<
   return count;
 }
 
-export function getTestUrl(testRoute: string): string {
+export function getTestUrl(testRoute: string, additionalQueryParams: string[] = []): string {
   const { debug, fixtureDataPath, record, recordingId } = global as any;
 
   const host = HOST || "localhost";
@@ -92,6 +92,8 @@ export function getTestUrl(testRoute: string): string {
   if (recordingId) {
     queryParams.push(`recordingId=${recordingId}`);
   }
+
+  queryParams.push(...additionalQueryParams);
 
   return `http://${host}:3000/tests/${testRoute}?${queryParams.join("&")}`;
 }

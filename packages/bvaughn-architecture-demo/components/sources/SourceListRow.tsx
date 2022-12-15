@@ -9,7 +9,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { areEqual, shouldComponentUpdate } from "react-window";
+import { areEqual } from "react-window";
 
 import Icon from "bvaughn-architecture-demo/components/Icon";
 import SearchResultHighlight from "bvaughn-architecture-demo/components/sources/SearchResultHighlight";
@@ -32,6 +32,12 @@ import SourceLineLoadingPlaceholder from "./SourceLineLoadingPlaceholder";
 import { formatHitCount } from "./utils/formatHitCount";
 import { findPointForLocation } from "./utils/points";
 import styles from "./SourceListRow.module.css";
+
+// Primarily exists as a way for e2e tests to disable syntax highlighting
+// to simulate large files that aren't fully parsed.
+const syntaxHighlightingEnabled =
+  typeof window !== "undefined" &&
+  new URL(window?.location?.href).searchParams.get("disableSyntaxHighlighting") == null;
 
 export type ItemData = {
   addPoint: AddPoint;
@@ -92,7 +98,11 @@ const SourceListRow = memo(
 
     const lineHitCounts = hitCounts?.get(lineNumber) || null;
 
-    const html = index < parsedLines.length ? parsedLines[index] : null;
+    let html: string | null = null;
+    if (syntaxHighlightingEnabled && index < parsedLines.length) {
+      html = parsedLines[index] ?? null;
+    }
+
     const plainText = index < rawLines.length ? rawLines[index] : null;
 
     const point = findPointForLocation(points, sourceId, lineNumber);
