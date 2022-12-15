@@ -180,7 +180,7 @@ export function setupGraphics() {
     const maybePaintGraphics = async () => {
       if (!paintedGraphics) {
         const { screen, mouse } = await getGraphicsAtTime(ThreadFront.currentTime, false, true);
-        if (screen && mouse) {
+        if (screen) {
           paintedGraphics = true;
           paintGraphics(screen, mouse);
         }
