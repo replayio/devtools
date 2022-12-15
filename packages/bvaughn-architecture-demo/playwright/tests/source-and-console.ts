@@ -435,7 +435,7 @@ test("should update the current time when the next/previous log point buttons ar
   });
 });
 
-test("should account for column breakppoints", async ({ page }) => {
+test("should account for column breakpoints", async ({ page }) => {
   await searchSourceText(page, "if (--");
 
   const lineLocator = getSourceLineLocator(page, sourceId, 20);
@@ -444,4 +444,22 @@ test("should account for column breakppoints", async ({ page }) => {
   // Add log point panel (which will insert a column breakpoint)
   await addLogPoint(page, { sourceId, lineNumber: 20 });
   await takeScreenshot(page, lineLocator, "search-result-highlight-with-column-breakpoint");
+});
+
+test("should account for column breakpoints with plain text", async ({ page }) => {
+  await page.goto(getTestUrl("source-and-console", ["disableSyntaxHighlighting"]));
+  await openSourceFile(page, sourceId);
+
+  await searchSourceText(page, "if (--");
+
+  const lineLocator = getSourceLineLocator(page, sourceId, 20);
+  await takeScreenshot(page, lineLocator, "search-result-highlight-plaintext");
+
+  // Add log point panel (which will insert a column breakpoint)
+  await addLogPoint(page, { sourceId, lineNumber: 20 });
+  await takeScreenshot(
+    page,
+    lineLocator,
+    "search-result-highlight-plaintext-with-column-breakpoint"
+  );
 });
