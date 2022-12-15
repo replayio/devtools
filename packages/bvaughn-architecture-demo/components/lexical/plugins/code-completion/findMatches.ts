@@ -61,6 +61,20 @@ function fetchQueryData(
           !PREVIEW_CAN_OVERFLOW
         );
         properties = preview?.properties || null;
+
+        // Auto-complete should not just include own properties.
+        // If there's a prototype chain, fetch those properties also.
+        let currentPrototypeId = preview?.prototypeId;
+        while (currentPrototypeId) {
+          const { preview: prototypePreview } = getObjectWithPreviewSuspense(
+            replayClient,
+            pauseId,
+            currentPrototypeId,
+            !PREVIEW_CAN_OVERFLOW
+          );
+          properties = properties ? properties.concat(prototypePreview?.properties || []) : [];
+          currentPrototypeId = prototypePreview?.prototypeId;
+        }
       }
     } else {
       // Evaluate the properties of the global/window object
