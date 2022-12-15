@@ -69,7 +69,7 @@ function InvationDomainCheck({ workspace }: { workspace: Workspace }) {
   const workspaceLink = (
     <span>
       Restrict this invite link to users with a{" "}
-      <span className="font-medium ">{workspace.domain}</span> email address
+      <span className="font-medium ">{workspace.domain}</span> (including subdomains) email address
     </span>
   );
 
