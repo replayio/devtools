@@ -403,6 +403,26 @@ test("should evaluate terminal expressions at an execution point", async ({ page
   await takeScreenshot(page, newListItem, "terminal-expression-at-execution-point");
 });
 
+test("should suggest type-ahead options from prototype objects as well", async ({ page }) => {
+  await setup(page);
+  await toggleProtocolMessage(page, "logs", true);
+
+  const listItem = await locateMessage(page, "console-log", "This is a log");
+  await seekToMessage(page, listItem);
+
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "window.location.propertyIs");
+  await delay(500); // HACK Give the type-ahead data time to load
+  await page.keyboard.press("Enter"); // Accept suggestion
+  await page.keyboard.press("Enter"); // Submit expression
+
+  const newListItem = await locateMessage(page, "terminal-expression");
+  await takeScreenshot(
+    page,
+    newListItem,
+    "terminal-expression-at-execution-point-with-parent-property"
+  );
+});
+
 test("should evaluate terminal expressions without an execution point", async ({ page }) => {
   await setup(page);
 
