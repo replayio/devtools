@@ -547,11 +547,11 @@ export class ReplayClient implements ReplayClientInterface {
     return result.data;
   }
 
-  async getPointNearTime(time: number): Promise<{ point: TimeStampedPoint; precise: boolean }> {
+  async getPointNearTime(time: number): Promise<TimeStampedPoint> {
     const sessionId = this.getSessionIdThrows();
 
-    const { point, precise } = await client.Session.getPointNearTime({ time }, sessionId);
-    return { point, precise };
+    const { point } = await client.Session.getPointNearTime({ time }, sessionId);
+    return point;
   }
 
   async getPointsBoundingTime(time: number): Promise<PointsBoundingTime> {
