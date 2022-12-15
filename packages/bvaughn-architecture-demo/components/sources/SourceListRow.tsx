@@ -9,7 +9,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { areEqual } from "react-window";
+import { areEqual, shouldComponentUpdate } from "react-window";
 
 import Icon from "bvaughn-architecture-demo/components/Icon";
 import SearchResultHighlight from "bvaughn-architecture-demo/components/sources/SearchResultHighlight";
@@ -123,24 +123,31 @@ const SourceListRow = memo(
       hitCountLabelClassName = `${hitCountLabelClassName} ${styles.LineHitCountLabelPending}`;
     }
 
+    const showColumnBreakpointMarker = showColumnBreakpoints && point?.shouldLog;
+
+    let columnBreakpointMarker = null;
+    if (showColumnBreakpointMarker) {
+      columnBreakpointMarker = (
+        <button
+          className={styles.BreakpointButton}
+          onClick={() => editPoint(point.id, { shouldBreak: !point.shouldBreak })}
+        >
+          <Icon
+            className={point.shouldBreak ? styles.BreakpointIcon : styles.DisabledBreakpointIcon}
+            type="breakpoint"
+          />
+        </button>
+      );
+    }
+
     let lineSegments = null;
     if (html !== null) {
-      if (showColumnBreakpoints && point?.shouldLog) {
-        const { id, location, shouldBreak } = point;
-
-        if (location.column === 0) {
+      if (showColumnBreakpointMarker) {
+        if (point.location.column === 0) {
           // Special case; much simpler.
           lineSegments = (
             <>
-              <button
-                className={styles.BreakpointButton}
-                onClick={() => editPoint(id, { shouldBreak: !shouldBreak })}
-              >
-                <Icon
-                  className={shouldBreak ? styles.BreakpointIcon : styles.DisabledBreakpointIcon}
-                  type="breakpoint"
-                />
-              </button>
+              {columnBreakpointMarker}
               <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: html }} />
             </>
           );
@@ -161,7 +168,7 @@ const SourceListRow = memo(
             child.remove();
 
             columnIndex += child.textContent?.length || 0;
-            if (columnIndex >= location.column) {
+            if (columnIndex >= point.location.column) {
               htmlAfter = div.innerHTML;
               break;
             }
@@ -173,15 +180,7 @@ const SourceListRow = memo(
                 className={styles.LineSegment}
                 dangerouslySetInnerHTML={{ __html: htmlBefore }}
               />
-              <button
-                className={styles.BreakpointButton}
-                onClick={() => editPoint(id, { shouldBreak: !shouldBreak })}
-              >
-                <Icon
-                  className={shouldBreak ? styles.BreakpointIcon : styles.DisabledBreakpointIcon}
-                  type="breakpoint"
-                />
-              </button>
+              {columnBreakpointMarker}
               <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: htmlAfter }} />
             </>
           );
@@ -191,16 +190,41 @@ const SourceListRow = memo(
           <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: html }} />
         );
       }
-    } else {
-      if (plainText !== null) {
+    } else if (plainText !== null) {
+      if (showColumnBreakpointMarker) {
+        const textStart = plainText.substring(0, point.location.column);
+        const textEnd = plainText.substring(point.location.column);
+
+        lineSegments = (
+          <>
+            {textStart && (
+              <pre
+                className={styles.LineSegment}
+                data-test-name="SourceListRow-LineSegment-PlainText"
+              >
+                {textStart}
+              </pre>
+            )}
+            {columnBreakpointMarker}
+            {textEnd && (
+              <pre
+                className={styles.LineSegment}
+                data-test-name="SourceListRow-LineSegment-PlainText"
+              >
+                {textEnd}
+              </pre>
+            )}
+          </>
+        );
+      } else {
         lineSegments = (
           <pre className={styles.LineSegment} data-test-name="SourceListRow-LineSegment-PlainText">
             {plainText}
           </pre>
         );
-      } else {
-        lineSegments = <SourceLineLoadingPlaceholder width={loadingPlaceholderWidth} />;
       }
+    } else {
+      lineSegments = <SourceLineLoadingPlaceholder width={loadingPlaceholderWidth} />;
     }
 
     const toggleBreakpoint = () => {
@@ -298,9 +322,7 @@ const SourceListRow = memo(
             {searchResultsForLine.map((result, resultIndex) => (
               <SearchResultHighlight
                 key={resultIndex}
-                columnBreakpointIndex={
-                  showColumnBreakpoints && point?.shouldLog ? point.location.column : null
-                }
+                columnBreakpointIndex={showColumnBreakpointMarker ? point.location.column : null}
                 isActive={result === currentSearchResult}
                 searchResultColumnIndex={result.columnIndex}
                 searchText={result.text}
