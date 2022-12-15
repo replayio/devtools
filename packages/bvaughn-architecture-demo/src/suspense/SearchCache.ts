@@ -153,10 +153,17 @@ async function initializeSourceIds(client: ReplayClientInterface) {
     }
   };
 
+  const minifiedSources = new Set<SourceId>();
+  sources.forEach(source => {
+    if (source.kind === "prettyPrinted" && source.generatedSourceIds?.length) {
+      minifiedSources.add(source.generatedSourceIds[0]);
+    }
+  });
+
   sources.forEach(source => {
     const sourceId = source.sourceId;
 
-    if (client.isPrettyPrintedSource(sourceId)) {
+    if (minifiedSources.has(sourceId)) {
       return;
     }
 
