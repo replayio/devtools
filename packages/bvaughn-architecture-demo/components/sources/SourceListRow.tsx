@@ -93,6 +93,7 @@ const SourceListRow = memo(
     const lineHitCounts = hitCounts?.get(lineNumber) || null;
 
     const html = index < parsedLines.length ? parsedLines[index] : null;
+    const plainText = index < rawLines.length ? rawLines[index] : null;
 
     const point = findPointForLocation(points, sourceId, lineNumber);
 
@@ -191,8 +192,6 @@ const SourceListRow = memo(
         );
       }
     } else {
-      const plainText = index < rawLines.length ? rawLines[index] : null;
-
       if (plainText !== null) {
         lineSegments = (
           <pre className={styles.LineSegment} data-test-name="SourceListRow-LineSegment-PlainText">
@@ -299,9 +298,12 @@ const SourceListRow = memo(
             {searchResultsForLine.map((result, resultIndex) => (
               <SearchResultHighlight
                 key={resultIndex}
-                columnIndex={result.columnIndex}
+                columnBreakpointIndex={
+                  showColumnBreakpoints && point?.shouldLog ? point.location.column : null
+                }
                 isActive={result === currentSearchResult}
-                text={result.text}
+                searchResultColumnIndex={result.columnIndex}
+                searchText={result.text}
               />
             ))}
 
