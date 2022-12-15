@@ -2,8 +2,8 @@
   position: absolute;
   left: 0;
   z-index: 2;
-  display: flex;
   pointer-events: none;
+  white-space: pre;
 }
 
 .ActiveMark {
@@ -13,4 +13,9 @@
 .InactiveMark {
   background-color: var(--search-result-inactive-background-color);
   color: var(--search-result-inactive-color);
+}
+
+.ColumnBreakpointSpacer {
+  display: inline-block;
+  width: var(--column-breakpoint-width);
 }
