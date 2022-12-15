@@ -434,3 +434,14 @@ test("should update the current time when the next/previous log point buttons ar
     nextEnabled: true,
   });
 });
+
+test("should account for column breakppoints", async ({ page }) => {
+  await searchSourceText(page, "if (--");
+
+  const lineLocator = getSourceLineLocator(page, sourceId, 20);
+  await takeScreenshot(page, lineLocator, "search-result-highlight");
+
+  // Add log point panel (which will insert a column breakpoint)
+  await addLogPoint(page, { sourceId, lineNumber: 20 });
+  await takeScreenshot(page, lineLocator, "search-result-highlight-with-column-breakpoint");
+});
