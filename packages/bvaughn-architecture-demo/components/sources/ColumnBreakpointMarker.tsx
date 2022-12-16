@@ -52,8 +52,9 @@ export default function ColumnBreakpointMarker({
     <button
       className={styles.Button}
       onClick={onClick}
-      data-test-name="ColumnBreakpointMarker"
       data-test-id={`ColumnBreakpointMarker-${sourceId}:${lineNumber}:${columnIndex}`}
+      data-test-name="ColumnBreakpointMarker"
+      data-test-state={point?.shouldBreak ? "enabled" : "disabled"}
     >
       <Icon
         className={point?.shouldBreak ? styles.EnabledIcon : styles.DisabledIcon}

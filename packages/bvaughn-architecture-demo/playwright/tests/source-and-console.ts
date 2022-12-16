@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { toggleProtocolMessages, verifyConsoleMessage } from "./utils/console";
-import { delay, getTestUrl, takeScreenshot, waitFor } from "./utils/general";
+import { delay, getTestUrl, stopHovering, takeScreenshot, waitFor } from "./utils/general";
 import {
   addBreakPoint,
   addLogPoint,
@@ -24,6 +24,7 @@ import {
   removeLogPoint,
   searchSourceText,
   searchSourcesByName,
+  toggleColumnBreakpoint,
   toggleLogPointBadge,
   verifyCurrentSearchResult,
   verifyHitPointButtonsEnabled,
@@ -462,4 +463,98 @@ test("should account for column breakpoints with plain text", async ({ page }) =
     lineLocator,
     "search-result-highlight-plaintext-with-column-breakpoint"
   );
+});
+
+// da3ece0f-f987-4a9b-a188-85ed5a097674
+test("should support multiple breakable column positions on a line", async ({ page }) => {
+  const lineNumber = 4;
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
+
+  await takeScreenshot(page, lineLocator, "line-4-no-breakpoints-enabled");
+
+  await addBreakPoint(page, { lineNumber, sourceId });
+  await stopHovering(page);
+  await takeScreenshot(page, lineLocator, "line-4-break-on-column-19");
+
+  await toggleColumnBreakpoint(page, true, { columnIndex: 22, lineNumber, sourceId });
+  await stopHovering(page);
+  await takeScreenshot(page, lineLocator, "line-4-break-on-columns-19-and-22");
+
+  await toggleColumnBreakpoint(page, false, { columnIndex: 22, lineNumber, sourceId });
+  await stopHovering(page);
+  await takeScreenshot(page, lineLocator, "line-4-break-on-column-19");
+
+  await toggleColumnBreakpoint(page, true, { columnIndex: 30, lineNumber, sourceId });
+  await stopHovering(page);
+  await takeScreenshot(page, lineLocator, "line-4-break-on-columns-19-and-30");
+
+  await removeBreakPoint(page, { lineNumber, sourceId });
+  await stopHovering(page);
+  await takeScreenshot(page, lineLocator, "line-4-no-breakpoints-enabled");
+});
+
+// da3ece0f-f987-4a9b-a188-85ed5a097674
+test("should render search results properly for lines with multiple breakable column positions", async ({
+  page,
+}) => {
+  const lineNumber = 4;
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
+
+  // Search result includes a breakpoint marker
+  await searchSourceText(page, "i = 0");
+  await takeScreenshot(page, lineLocator, "line-4-search-result-one-no-breakpoints");
+  await addBreakPoint(page, { lineNumber, sourceId });
+  await stopHovering(page);
+  await takeScreenshot(page, lineLocator, "line-4-search-result-one-with-breakpoints");
+
+  // Search result includes multiple breakpoint markers
+  await searchSourceText(page, "= 0; i");
+  await takeScreenshot(page, lineLocator, "line-4-search-result-two-with-breakpoints");
+
+  // Multiple search results per line
+  await searchSourceText(page, "0;");
+  await takeScreenshot(page, lineLocator, "line-4-search-result-three-with-breakpoints");
+  await removeBreakPoint(page, { lineNumber, sourceId });
+  await stopHovering(page);
+  await takeScreenshot(page, lineLocator, "line-4-search-result-three-no-breakpoints");
+});
+
+// da3ece0f-f987-4a9b-a188-85ed5a097674
+test("should properly toggle breakable and loggable behaviors when there are multiple breakable positions on a line", async ({
+  page,
+}) => {
+  const lineNumber = 4;
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
+
+  await addLogPoint(page, { lineNumber, sourceId });
+  await stopHovering(page);
+  await takeScreenshot(page, lineLocator, "line-4-column-19-should-log");
+
+  await addBreakPoint(page, { lineNumber, sourceId });
+  await stopHovering(page);
+  await takeScreenshot(page, lineLocator, "line-4-column-19-should-log-and-break");
+
+  await removeBreakPoint(page, { lineNumber, sourceId });
+  await stopHovering(page);
+  await takeScreenshot(page, lineLocator, "line-4-column-19-should-log");
+
+  await toggleColumnBreakpoint(page, true, { columnIndex: 22, lineNumber, sourceId });
+  await stopHovering(page);
+  await takeScreenshot(page, lineLocator, "line-4-column-19-should-log-and-22-should-break");
+
+  await addBreakPoint(page, { lineNumber, sourceId });
+  await stopHovering(page);
+  await takeScreenshot(
+    page,
+    lineLocator,
+    "line-4-column-19-should-log-and-break-and-22-should-break"
+  );
+
+  await removeBreakPoint(page, { lineNumber, sourceId });
+  await stopHovering(page);
+  await takeScreenshot(page, lineLocator, "line-4-column-19-should-log-and-22-should-break");
+
+  await removeLogPoint(page, { lineNumber, sourceId });
+  await stopHovering(page);
+  await takeScreenshot(page, lineLocator, "line-4-column-22-should-break");
 });
