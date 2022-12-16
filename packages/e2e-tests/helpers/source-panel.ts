@@ -34,7 +34,7 @@ export async function addBreakpoint(
 
   const line = await getSourceLine(page, lineNumber);
   await line.locator('[data-test-id^="SourceLine-LineNumber"]').hover();
-  await line.locator('[data-test-id^="SourceLine-LineNumber"]').click();
+  await line.locator('[data-test-name="BreakpointToggle"]').click();
 
   await waitForBreakpoint(page, options);
 }
