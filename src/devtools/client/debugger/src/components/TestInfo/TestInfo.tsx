@@ -81,7 +81,7 @@ function Console() {
         Step Details
       </div>
       <ErrorBoundary>
-        <div className="flex flex-grow flex-col gap-1 py-2 font-mono">
+        <div className="flex flex-grow flex-col gap-1 p-2 font-mono">
           {hideProps ? (
             <div className="flex flex-grow items-center justify-center align-middle text-xs opacity-50">
               Nothing Selected...
