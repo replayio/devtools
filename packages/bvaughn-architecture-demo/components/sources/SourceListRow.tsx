@@ -1,7 +1,8 @@
-import { newSource as ProtocolSource } from "@replayio/protocol";
+import { newSource as ProtocolSource, SameLineSourceLocations } from "@replayio/protocol";
 import {
   CSSProperties,
   MouseEvent,
+  ReactNode,
   Suspense,
   memo,
   useContext,
@@ -25,12 +26,13 @@ import { StreamingParser } from "bvaughn-architecture-demo/src/suspense/SyntaxPa
 import { LineNumberToHitCountMap } from "shared/client/types";
 import { Point } from "shared/client/types";
 
+import ColumnBreakpointMarker from "./ColumnBreakpointMarker";
 import CurrentLineHighlight from "./CurrentLineHighlight";
 import HoverButton from "./HoverButton";
 import PointPanel from "./PointPanel";
 import SourceLineLoadingPlaceholder from "./SourceLineLoadingPlaceholder";
 import { formatHitCount } from "./utils/formatHitCount";
-import { findPointForLocation } from "./utils/points";
+import { findPointsForLocation } from "./utils/points";
 import styles from "./SourceListRow.module.css";
 
 // Primarily exists as a way for e2e tests to disable syntax highlighting
@@ -41,6 +43,7 @@ const syntaxHighlightingEnabled =
 
 export type ItemData = {
   addPoint: AddPoint;
+  breakablePositionsByLine: Map<number, SameLineSourceLocations>;
   deletePoints: DeletePoints;
   editPoint: EditPoint;
   hitCounts: LineNumberToHitCountMap | null;
@@ -68,6 +71,7 @@ const SourceListRow = memo(
 
     const {
       addPoint,
+      breakablePositionsByLine,
       deletePoints,
       editPoint,
       hitCounts,
@@ -105,7 +109,8 @@ const SourceListRow = memo(
 
     const plainText = index < rawLines.length ? rawLines[index] : null;
 
-    const point = findPointForLocation(points, sourceId, lineNumber);
+    const pointsForLine = findPointsForLocation(points, sourceId, lineNumber);
+    const point = pointsForLine[0] ?? null;
 
     const hitCount = lineHitCounts?.count || null;
     const lineHasHits = hitCount !== null && hitCount > 0;
@@ -133,105 +138,99 @@ const SourceListRow = memo(
       hitCountLabelClassName = `${hitCountLabelClassName} ${styles.LineHitCountLabelPending}`;
     }
 
-    const showColumnBreakpointMarker = showColumnBreakpoints && point?.shouldLog;
+    const showBreakpointMarkers = showColumnBreakpoints && point != null;
+    const breakableColumnIndices = breakablePositionsByLine.get(lineNumber)?.columns ?? [];
 
-    let columnBreakpointMarker = null;
-    if (showColumnBreakpointMarker) {
-      columnBreakpointMarker = (
-        <button
-          className={styles.BreakpointButton}
-          onClick={() => editPoint(point.id, { shouldBreak: !point.shouldBreak })}
-        >
-          <Icon
-            className={point.shouldBreak ? styles.BreakpointIcon : styles.DisabledBreakpointIcon}
-            type="breakpoint"
-          />
-        </button>
-      );
-    }
+    // TODO [bvaughn]
+    // Update the SyntaxParsingCache to return this structure to begin with.
+    // Then create a token renderer component that knows how to convert to markup.
+    const tokens = useMemo<Token[] | null>(() => (html ? htmlStringToTokens(html) : null), [html]);
 
-    let lineSegments = null;
-    if (html !== null) {
-      if (showColumnBreakpointMarker) {
-        if (point.location.column === 0) {
-          // Special case; much simpler.
-          lineSegments = (
-            <>
-              {columnBreakpointMarker}
-              <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: html }} />
-            </>
-          );
-        } else {
-          // HACK
-          // This could possibly be done in a smarter way?
-          const div = document.createElement("div");
-          div.innerHTML = html;
-
-          let htmlAfter = "";
-          let htmlBefore = "";
-          let columnIndex = 0;
-          while (div.childNodes.length > 0) {
-            const child = div.childNodes[0];
-
-            htmlBefore += (child as HTMLElement).outerHTML || child.textContent;
-
-            child.remove();
-
-            columnIndex += child.textContent?.length || 0;
-            if (columnIndex >= point.location.column) {
-              htmlAfter = div.innerHTML;
-              break;
-            }
+    const renderBetween = (
+      rendered: ReactNode[],
+      columnIndexStart: number,
+      columnIndexEnd: number
+    ) => {
+      if (tokens) {
+        for (let index = 0; index < tokens.length; index++) {
+          const token = tokens[index];
+          if (token.columnIndex + token.value.length > columnIndexEnd) {
+            break;
+          } else if (token.columnIndex >= columnIndexStart) {
+            rendered.push(
+              <pre className={styles.LineSegment} key={rendered.length}>
+                <span
+                  className={token.type ? `tok-${token.type}` : undefined}
+                  data-column-index={token.columnIndex}
+                  data-parsed-token
+                >
+                  {token.value}
+                </span>
+              </pre>
+            );
           }
-
-          lineSegments = (
-            <>
-              <pre
-                className={styles.LineSegment}
-                dangerouslySetInnerHTML={{ __html: htmlBefore }}
-              />
-              {columnBreakpointMarker}
-              <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: htmlAfter }} />
-            </>
-          );
         }
-      } else {
-        lineSegments = (
-          <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: html }} />
-        );
-      }
-    } else if (plainText !== null) {
-      if (showColumnBreakpointMarker) {
-        const textStart = plainText.substring(0, point.location.column);
-        const textEnd = plainText.substring(point.location.column);
-
-        lineSegments = (
-          <>
-            {textStart && (
-              <pre
-                className={styles.LineSegment}
-                data-test-name="SourceListRow-LineSegment-PlainText"
-              >
-                {textStart}
-              </pre>
-            )}
-            {columnBreakpointMarker}
-            {textEnd && (
-              <pre
-                className={styles.LineSegment}
-                data-test-name="SourceListRow-LineSegment-PlainText"
-              >
-                {textEnd}
-              </pre>
-            )}
-          </>
-        );
-      } else {
-        lineSegments = (
-          <pre className={styles.LineSegment} data-test-name="SourceListRow-LineSegment-PlainText">
-            {plainText}
+      } else if (plainText) {
+        rendered.push(
+          <pre
+            className={styles.LineSegment}
+            data-test-name="SourceListRow-LineSegment-PlainText"
+            key={rendered.length}
+          >
+            {plainText.substring(columnIndexStart, columnIndexEnd)}
           </pre>
         );
+      }
+    };
+
+    let lineSegments = null;
+    if (plainText !== null) {
+      if (showBreakpointMarkers) {
+        lineSegments = [];
+
+        let lastColumnIndex = 0;
+
+        for (let i = 0; i < breakableColumnIndices.length; i++) {
+          const columnIndex = breakableColumnIndices[i];
+
+          if (columnIndex > lastColumnIndex) {
+            renderBetween(lineSegments, lastColumnIndex, columnIndex);
+          }
+
+          lineSegments.push(
+            <ColumnBreakpointMarker
+              addPoint={addPoint}
+              columnIndex={columnIndex}
+              deletePoints={deletePoints}
+              editPoint={editPoint}
+              key={lineSegments.length}
+              lineNumber={lineNumber}
+              point={pointsForLine.find(point => point.location.column === columnIndex) ?? null}
+              sourceId={sourceId}
+            />
+          );
+
+          lastColumnIndex = columnIndex;
+        }
+
+        if (lastColumnIndex < plainText.length - 1) {
+          renderBetween(lineSegments, lastColumnIndex, plainText.length - 1);
+        }
+      } else {
+        if (html !== null) {
+          lineSegments = (
+            <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: html }} />
+          );
+        } else {
+          lineSegments = (
+            <pre
+              className={styles.LineSegment}
+              data-test-name="SourceListRow-LineSegment-PlainText"
+            >
+              {plainText}
+            </pre>
+          );
+        }
       }
     } else {
       lineSegments = <SourceLineLoadingPlaceholder width={loadingPlaceholderWidth} />;
@@ -332,7 +331,7 @@ const SourceListRow = memo(
             {searchResultsForLine.map((result, resultIndex) => (
               <SearchResultHighlight
                 key={resultIndex}
-                columnBreakpointIndex={showColumnBreakpointMarker ? point.location.column : null}
+                columnBreakpointIndex={showBreakpointMarkers ? point.location.column : null}
                 isActive={result === currentSearchResult}
                 searchResultColumnIndex={result.columnIndex}
                 searchText={result.text}
@@ -376,3 +375,28 @@ const SourceListRow = memo(
 SourceListRow.displayName = "SourceListRow";
 
 export default SourceListRow;
+
+type Token = {
+  columnIndex: number;
+  type: string | null;
+  value: string;
+};
+
+function htmlStringToTokens(html: string): Token[] {
+  const tokens: Array<Token> = [];
+
+  const element = document.createElement("div");
+  element.innerHTML = html;
+
+  for (let index = 0; index < element.childNodes.length; index++) {
+    const child = element.childNodes[index] as HTMLElement;
+
+    tokens.push({
+      columnIndex: parseInt(child.getAttribute("data-column-index")!),
+      type: child.className ? child.className.substring(4) : null, // Strip "tok-" prefix
+      value: child.textContent!,
+    });
+  }
+
+  return tokens;
+}
