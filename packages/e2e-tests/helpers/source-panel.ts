@@ -39,7 +39,7 @@ export async function addBreakpoint(
   await waitForBreakpoint(page, options);
 }
 
-async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
+export async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
   const lineLocator = await getSourceLine(page, lineNumber);
   const lineIsVisible = await lineLocator.isVisible();
   if (lineIsVisible) {
@@ -214,7 +214,7 @@ export function getCurrentLogPointPanelTypeAhead(page: Page): Locator {
 export async function getSelectedLineNumber(page: Page): Promise<number | null> {
   let currentLineLocator = null;
 
-  const lineLocator = page.locator(`[data-test-id^=SourceLine`);
+  const lineLocator = page.locator(`[data-test-id^=SourceLine]`);
   for (let index = 0; index < (await lineLocator.count()); index++) {
     const line = lineLocator.nth(index);
     const currentHighlight = lineLocator.locator(
@@ -230,9 +230,15 @@ export async function getSelectedLineNumber(page: Page): Promise<number | null> 
     return null;
   }
 
-  const lineNumber = await currentLineLocator.locator(`[data-test-id^="SourceLine-LineNumber"`);
+  const lineNumber = currentLineLocator.locator(`[data-test-id^="SourceLine-LineNumber"`);
   const textContent = await lineNumber.textContent();
   return textContent !== null ? parseInt(textContent, 10) : null;
+}
+
+export function getLineNumberHitCount(lineNumber: number, page: Page): Locator {
+  return page
+    .locator(`[data-test-id=SourceLine-${lineNumber}]`)
+    .locator("[class*=SourceListRow_LineHitCountLabel]");
 }
 
 export async function getSourceLine(page: Page, lineNumber: number): Promise<Locator> {

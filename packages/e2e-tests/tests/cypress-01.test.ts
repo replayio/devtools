@@ -1,9 +1,6 @@
 import test, { expect } from "@playwright/test";
 
-import { openDevToolsTab, startTest } from "../helpers";
-import { executeAndVerifyTerminalExpression } from "../helpers/console-panel";
-import { resumeToLine, rewindToLine } from "../helpers/pause-information-panel";
-import { addBreakpoint } from "../helpers/source-panel";
+import { startTest } from "../helpers";
 import {
   getCypressLogo,
   getTestCaseSections,
