@@ -1,18 +1,18 @@
-import { parse } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
+import { ParsedToken, parse } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
 
 export default function getExpressionFromString(
   string: string,
   cursorIndex: number
 ): string | null {
-  const parsedString = parse(string, ".js");
-  if (parsedString == null || parsedString.length === 0) {
+  let parsedTokensByLine = parse(string, ".js");
+  if (parsedTokensByLine == null || parsedTokensByLine.length === 0) {
     return null;
   }
 
-  const line = parsedString[parsedString.length - 1];
+  const parsedTokens = parsedTokensByLine[parsedTokensByLine.length - 1];
 
   const element = document.createElement("div");
-  element.innerHTML = line;
+  element.innerHTML = parsedTokensToHtml(parsedTokens);
 
   let childIndex = 0;
   let textIndex = 0;
@@ -78,11 +78,11 @@ export default function getExpressionFromString(
     currentIndex++;
   }
 
-  const parsedExpression = parse(expression, ".js");
-  if (parsedExpression == null || parsedExpression.length === 0) {
+  parsedTokensByLine = parse(expression, ".js");
+  if (parsedTokensByLine == null || parsedTokensByLine.length === 0) {
     return null;
   } else {
-    element.innerHTML = parsedExpression[0];
+    element.innerHTML = parsedTokensToHtml(parsedTokensByLine[0]);
     if (element.children.length === 1) {
       const child = element.children[0];
       switch (child.className) {
@@ -106,4 +106,13 @@ export default function getExpressionFromString(
   }
 
   return expression || null;
+}
+
+function parsedTokensToHtml(tokens: ParsedToken[]): string {
+  return tokens
+    .map(token => {
+      const className = token.type ? `tok-${token.type}` : "";
+      return `<span class="${className}">${token.value}</span>`;
+    })
+    .join("");
 }

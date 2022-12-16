@@ -19,3 +19,7 @@
   display: inline-block;
   width: var(--column-breakpoint-width);
 }
+
+.LeadingSpacer {
+  display: inline-block;
+}

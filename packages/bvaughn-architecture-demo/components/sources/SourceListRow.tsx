@@ -22,7 +22,10 @@ import {
   DeletePoints,
   EditPoint,
 } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import { StreamingParser } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
+import {
+  ParsedToken,
+  StreamingParser,
+} from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
 import { LineNumberToHitCountMap } from "shared/client/types";
 import { Point } from "shared/client/types";
 
@@ -88,26 +91,26 @@ const SourceListRow = memo(
 
     const { sourceId } = source;
 
-    const parsedLines = useSyncExternalStore(
+    const parsedTokensByLine = useSyncExternalStore(
       streamingParser.subscribe,
-      () => streamingParser.parsedLines,
-      () => streamingParser.parsedLines
+      () => streamingParser.parsedTokensByLine,
+      () => streamingParser.parsedTokensByLine
     );
 
-    const rawLines = useSyncExternalStore(
+    const rawTextByLine = useSyncExternalStore(
       streamingParser.subscribe,
-      () => streamingParser.rawLines,
-      () => streamingParser.rawLines
+      () => streamingParser.rawTextByLine,
+      () => streamingParser.rawTextByLine
     );
 
     const lineHitCounts = hitCounts?.get(lineNumber) || null;
 
-    let html: string | null = null;
-    if (syntaxHighlightingEnabled && index < parsedLines.length) {
-      html = parsedLines[index] ?? null;
+    let tokens: ParsedToken[] | null = null;
+    if (syntaxHighlightingEnabled && index < parsedTokensByLine.length) {
+      tokens = parsedTokensByLine[index] ?? null;
     }
 
-    const plainText = index < rawLines.length ? rawLines[index] : null;
+    const plainText = index < rawTextByLine.length ? rawTextByLine[index] : null;
 
     const pointsForLine = findPointsForLocation(points, sourceId, lineNumber);
     const point = pointsForLine[0] ?? null;
@@ -140,11 +143,6 @@ const SourceListRow = memo(
 
     const showBreakpointMarkers = showColumnBreakpoints && point != null;
     const breakableColumnIndices = breakablePositionsByLine.get(lineNumber)?.columns ?? [];
-
-    // TODO [bvaughn]
-    // Update the SyntaxParsingCache to return this structure to begin with.
-    // Then create a token renderer component that knows how to convert to markup.
-    const tokens = useMemo<Token[] | null>(() => (html ? htmlStringToTokens(html) : null), [html]);
 
     const renderBetween = (
       rendered: ReactNode[],
@@ -217,9 +215,20 @@ const SourceListRow = memo(
           renderBetween(lineSegments, lastColumnIndex, plainText.length - 1);
         }
       } else {
-        if (html !== null) {
+        if (tokens !== null) {
           lineSegments = (
-            <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: html }} />
+            <pre className={styles.LineSegment}>
+              {tokens.map((token, index) => (
+                <span
+                  className={token.type ? `tok-${token.type}` : undefined}
+                  data-column-index={token.columnIndex}
+                  data-parsed-token
+                  key={index}
+                >
+                  {token.value}
+                </span>
+              ))}
+            </pre>
           );
         } else {
           lineSegments = (
@@ -330,11 +339,12 @@ const SourceListRow = memo(
           <div className={styles.LineSegmentsAndPointPanel}>
             {searchResultsForLine.map((result, resultIndex) => (
               <SearchResultHighlight
+                breakableColumnIndices={breakableColumnIndices}
                 key={resultIndex}
-                columnBreakpointIndex={showBreakpointMarkers ? point.location.column : null}
                 isActive={result === currentSearchResult}
                 searchResultColumnIndex={result.columnIndex}
                 searchText={result.text}
+                showColumnBreakpoints={showColumnBreakpoints && pointsForLine.length > 0}
               />
             ))}
 
@@ -375,28 +385,3 @@ const SourceListRow = memo(
 SourceListRow.displayName = "SourceListRow";
 
 export default SourceListRow;
-
-type Token = {
-  columnIndex: number;
-  type: string | null;
-  value: string;
-};
-
-function htmlStringToTokens(html: string): Token[] {
-  const tokens: Array<Token> = [];
-
-  const element = document.createElement("div");
-  element.innerHTML = html;
-
-  for (let index = 0; index < element.childNodes.length; index++) {
-    const child = element.childNodes[index] as HTMLElement;
-
-    tokens.push({
-      columnIndex: parseInt(child.getAttribute("data-column-index")!),
-      type: child.className ? child.className.substring(4) : null, // Strip "tok-" prefix
-      value: child.textContent!,
-    });
-  }
-
-  return tokens;
-}
