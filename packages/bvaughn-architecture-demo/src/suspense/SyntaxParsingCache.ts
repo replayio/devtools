@@ -365,3 +365,12 @@ function processSection(
     nextIndex = section.indexOf("\n", index);
   }
 }
+
+export function parsedTokensToHtml(tokens: ParsedToken[]): string {
+  return tokens
+    .map(token => {
+      const className = token.type ? `tok-${token.type}` : "";
+      return `<span class="${className}">${token.value}</span>`;
+    })
+    .join("");
+}

@@ -5,8 +5,8 @@ import {
   getStreamingSourceContentsAsync,
 } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import {
-  ParsedToken,
   parseStreamingAsync,
+  parsedTokensToHtml,
 } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
 import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
 import { truncate } from "bvaughn-architecture-demo/src/utils/text";
@@ -82,13 +82,4 @@ export async function createSourceLocationLabels(
   }
 
   return { primaryLabel, secondaryLabel };
-}
-
-function parsedTokensToHtml(tokens: ParsedToken[]): string {
-  return tokens
-    .map(token => {
-      const className = token.type ? `tok-${token.type}` : "";
-      return `<span class="${className}">${token.value}</span>`;
-    })
-    .join("");
 }

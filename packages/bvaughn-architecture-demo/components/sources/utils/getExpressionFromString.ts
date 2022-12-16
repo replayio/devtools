@@ -1,4 +1,7 @@
-import { ParsedToken, parse } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
+import {
+  parse,
+  parsedTokensToHtml,
+} from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
 
 export default function getExpressionFromString(
   string: string,
@@ -106,13 +109,4 @@ export default function getExpressionFromString(
   }
 
   return expression || null;
-}
-
-function parsedTokensToHtml(tokens: ParsedToken[]): string {
-  return tokens
-    .map(token => {
-      const className = token.type ? `tok-${token.type}` : "";
-      return `<span class="${className}">${token.value}</span>`;
-    })
-    .join("");
 }
