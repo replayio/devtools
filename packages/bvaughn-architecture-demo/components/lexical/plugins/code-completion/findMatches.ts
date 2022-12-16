@@ -13,6 +13,8 @@ import { Match } from "./types";
 // Let's try not allowing overflow and we can disable it if it's too slow.
 const PREVIEW_CAN_OVERFLOW = false;
 
+const MAX_PROTOTYPE_DEPTH = 10;
+
 export default function findMatches(
   query: string,
   queryScope: string | null,
@@ -61,6 +63,22 @@ function fetchQueryData(
           !PREVIEW_CAN_OVERFLOW
         );
         properties = preview?.properties || null;
+
+        // Auto-complete should not just include own properties.
+        // If there's a prototype chain, fetch those properties also.
+        let currentPrototypeId = preview?.prototypeId;
+        let depth = 0;
+        while (currentPrototypeId && depth < MAX_PROTOTYPE_DEPTH) {
+          const { preview: prototypePreview } = getObjectWithPreviewSuspense(
+            replayClient,
+            pauseId,
+            currentPrototypeId,
+            !PREVIEW_CAN_OVERFLOW
+          );
+          properties = properties ? properties.concat(prototypePreview?.properties || []) : [];
+          currentPrototypeId = prototypePreview?.prototypeId;
+          depth++;
+        }
       }
     } else {
       // Evaluate the properties of the global/window object
