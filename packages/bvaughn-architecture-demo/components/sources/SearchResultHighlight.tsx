@@ -3,59 +3,63 @@ import { ReactNode } from "react";
 import styles from "./SearchResultHighlight.module.css";
 
 export default function SearchResultHighlight({
-  columnBreakpointIndex,
+  breakableColumnIndices,
   isActive,
   searchResultColumnIndex: searchResultColumnStartIndex,
   searchText,
+  showColumnBreakpoints,
 }: {
-  columnBreakpointIndex: number | null;
+  breakableColumnIndices: number[];
   isActive: boolean;
   searchResultColumnIndex: number;
   searchText: string;
+  showColumnBreakpoints: boolean;
 }) {
   const searchResultColumnEndIndex = searchResultColumnStartIndex + searchText.length;
+  const className = isActive ? styles.ActiveMark : styles.InactiveMark;
 
-  const breakpointMarkerIsWithinHighlight =
-    columnBreakpointIndex !== null &&
-    columnBreakpointIndex < searchResultColumnEndIndex &&
-    columnBreakpointIndex > searchResultColumnStartIndex;
+  let children: ReactNode[] = [
+    <div
+      className={styles.LeadingSpacer}
+      key={0}
+      style={{
+        marginLeft: `${searchResultColumnStartIndex + 1}ch`,
+      }}
+    />,
+  ];
 
-  let markers: ReactNode = null;
+  let columnIndex = searchResultColumnStartIndex;
 
-  if (breakpointMarkerIsWithinHighlight) {
-    // A column breakpoint is in the middle of this search result highlight.
-    // The highlight needs to be split into parts around the breakpoint marker.
+  if (showColumnBreakpoints) {
+    for (let index = 0; index < breakableColumnIndices.length; index++) {
+      const breakableColumnIndex = breakableColumnIndices[index];
 
-    const index = columnBreakpointIndex - searchResultColumnStartIndex;
-    const textStart = searchText.substring(0, index);
-    const textEnd = searchText.substring(index);
+      if (columnIndex < breakableColumnIndex) {
+        const charIndexStart = columnIndex - searchResultColumnStartIndex;
+        if (charIndexStart < searchText.length) {
+          const charIndexEnd = breakableColumnIndex - searchResultColumnStartIndex;
+          const text = searchText.substring(charIndexStart, charIndexEnd);
+          children.push(
+            <span className={className} key={children.length}>
+              {text}
+            </span>
+          );
+        }
 
-    markers = (
-      <>
-        <span
-          className={isActive ? styles.ActiveMark : styles.InactiveMark}
-          style={{ marginLeft: `${searchResultColumnStartIndex + 1}ch` }}
-        >
-          {textStart}
-        </span>
-        <div className={styles.ColumnBreakpointSpacer} />
-        <span className={isActive ? styles.ActiveMark : styles.InactiveMark}>{textEnd}</span>
-      </>
-    );
-  } else {
-    const breakpointMarkerIsBeforeHighlight =
-      columnBreakpointIndex !== null && columnBreakpointIndex <= searchResultColumnStartIndex;
+        columnIndex = breakableColumnIndex;
+      }
 
-    markers = (
-      <>
-        {breakpointMarkerIsBeforeHighlight && <div className={styles.ColumnBreakpointSpacer} />}
-        <span
-          className={isActive ? styles.ActiveMark : styles.InactiveMark}
-          style={{ marginLeft: `${searchResultColumnStartIndex + 1}ch` }}
-        >
-          {searchText}
-        </span>
-      </>
+      children.push(<div className={styles.ColumnBreakpointSpacer} key={children.length} />);
+    }
+  }
+
+  if (columnIndex < searchResultColumnEndIndex) {
+    const charIndexStart = columnIndex - searchResultColumnStartIndex;
+    const text = searchText.substring(charIndexStart);
+    children.push(
+      <span className={className} key={children.length}>
+        {text}
+      </span>
     );
   }
 
@@ -65,7 +69,7 @@ export default function SearchResultHighlight({
       data-test-name="SourceSearchResultHighlight"
       data-test-search-state={isActive ? "active" : "inactive"}
     >
-      {markers}
+      {children}
     </pre>
   );
 }

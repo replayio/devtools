@@ -18,6 +18,7 @@ import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesCo
 import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
 import {
   StreamingSourceContents,
+  getBreakpointPositionsSuspense,
   getCachedMinMaxSourceHitCounts,
   getSourceHitCountsSuspense,
 } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
@@ -107,6 +108,9 @@ export default function SourceList({
   const togglesLocalStorageKey = `Replay:ShowHitCounts`;
   const [showHitCounts] = useLocalStorage<boolean>(togglesLocalStorageKey, true);
 
+  // Note that getSourceHitCountsSuspense also suspends on getBreakpointPositions*
+  const [_, breakablePositionsByLine] = getBreakpointPositionsSuspense(client, sourceId);
+
   const hitCounts = visibleLines
     ? getSourceHitCountsSuspense(client, sourceId, visibleLines, focusRange)
     : null;
@@ -154,6 +158,7 @@ export default function SourceList({
   const itemData = useMemo<ItemData>(
     () => ({
       addPoint,
+      breakablePositionsByLine,
       deletePoints,
       editPoint,
       hitCounts,
@@ -170,6 +175,7 @@ export default function SourceList({
     }),
     [
       addPoint,
+      breakablePositionsByLine,
       deletePoints,
       editPoint,
       hitCounts,

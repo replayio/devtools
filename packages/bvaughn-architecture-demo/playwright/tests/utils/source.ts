@@ -609,6 +609,36 @@ export async function searchSourcesByName(page: Page, text: string) {
   await page.keyboard.type(text);
 }
 
+export async function toggleColumnBreakpoint(
+  page: Page,
+  enabled: boolean,
+  options: {
+    columnIndex: number;
+    lineNumber: number;
+    sourceId: string;
+  }
+) {
+  const { columnIndex, lineNumber, sourceId } = options;
+
+  await debugPrint(
+    page,
+    `Toggling breakpoint ${
+      enabled ? "on" : "off"
+    } for line ${lineNumber} and column index ${columnIndex}`,
+    "toggleColumnBreakpoint"
+  );
+
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
+  const toggle = lineLocator.locator(
+    `[data-test-id="ColumnBreakpointMarker-${sourceId}:${lineNumber}:${columnIndex}"]`
+  );
+  const targetState = enabled ? "enabled" : "disabled";
+  const currentState = await toggle.getAttribute("data-test-state");
+  if (currentState !== targetState) {
+    await toggle.click();
+  }
+}
+
 export async function toggleLogPointBadge(
   page: Page,
   options: {

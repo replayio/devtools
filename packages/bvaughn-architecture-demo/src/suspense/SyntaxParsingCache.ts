@@ -14,6 +14,12 @@ import { ContentType } from "@replayio/protocol";
 import { createGenericCache } from "./createGenericCache";
 import { StreamingSourceContents } from "./SourcesCache";
 
+export type ParsedToken = {
+  columnIndex: number;
+  type: string | null;
+  value: string;
+};
+
 export type IncrementalParser = {
   isComplete: () => boolean;
   parseChunk: (
@@ -22,17 +28,17 @@ export type IncrementalParser = {
     chunkSize?: number,
     maxParseTime?: number
   ) => void;
-  parsedLines: string[];
+  parsedTokensByLine: Array<ParsedToken[]>;
 };
 
 export type StreamSubscriber = () => void;
 export type UnsubscribeFromStream = () => void;
 
 export type StreamingParser = {
-  parsedLines: string[];
-  parsedProgress: number;
-  rawLines: string[];
-  rawProgress: number;
+  parsedTokensByLine: Array<ParsedToken[]>;
+  parsedTokensPercentage: number;
+  rawTextByLine: string[];
+  rawTextPercentage: number;
   subscribe(subscriber: StreamSubscriber): UnsubscribeFromStream;
 };
 
@@ -41,7 +47,7 @@ export const DEFAULT_MAX_TIME = 5_000;
 
 export const { getValueSuspense: parse } = createGenericCache<
   [code: string, fileName: string],
-  string[] | null
+  Array<ParsedToken[]> | null
 >(highlighter, identity);
 
 export const {
@@ -52,8 +58,6 @@ export const {
   streamingSourceContentsToStreamingParser,
   identity
 );
-
-let cachedElement: HTMLElement | null = null;
 
 async function streamingSourceContentsToStreamingParser(
   source: StreamingSourceContents,
@@ -67,10 +71,10 @@ async function streamingSourceContentsToStreamingParser(
   let didParse = false;
 
   const streamingParser: StreamingParser = {
-    parsedLines: [],
-    parsedProgress: 0,
-    rawLines: [],
-    rawProgress: 0,
+    parsedTokensByLine: [],
+    parsedTokensPercentage: 0,
+    rawTextByLine: [],
+    rawTextPercentage: 0,
     subscribe(subscriber: StreamSubscriber) {
       subscribers.add(subscriber);
       return () => {
@@ -83,22 +87,24 @@ async function streamingSourceContentsToStreamingParser(
 
   const processChunk = () => {
     if (source.contents !== null) {
-      if (streamingParser.rawLines.length === 0) {
-        streamingParser.rawLines = streamingParser.rawLines.concat(source.contents.split("\n"));
+      if (streamingParser.rawTextByLine.length === 0) {
+        streamingParser.rawTextByLine = streamingParser.rawTextByLine.concat(
+          source.contents.split("\n")
+        );
       } else {
-        const lastLine = streamingParser.rawLines[streamingParser.rawLines.length - 1];
+        const lastLine = streamingParser.rawTextByLine[streamingParser.rawTextByLine.length - 1];
 
         const newLines = source.contents.substring(sourceIndex).split("\n");
         newLines[0] = lastLine + newLines[0];
 
-        streamingParser.rawLines = streamingParser.rawLines
-          .slice(0, streamingParser.rawLines.length - 1)
+        streamingParser.rawTextByLine = streamingParser.rawTextByLine
+          .slice(0, streamingParser.rawTextByLine.length - 1)
           .concat(newLines);
       }
 
       sourceIndex = source.contents.length;
 
-      streamingParser.rawProgress = source.contents.length / source.codeUnitCount!;
+      streamingParser.rawTextPercentage = source.contents.length / source.codeUnitCount!;
 
       // HACK [FE-925]
       // Unprettified sources without source maps can have a lot of text on a single line.
@@ -110,7 +116,7 @@ async function streamingSourceContentsToStreamingParser(
         source.codeUnitCount / source.lineCount > 2_500;
 
       if (!didParse && !badFormat) {
-        if (streamingParser.rawProgress === 1 || source.contents.length >= maxCharacters) {
+        if (streamingParser.rawTextPercentage === 1 || source.contents.length >= maxCharacters) {
           didParse = true;
 
           const parser = incrementalParser(undefined, source.contentType!)!;
@@ -119,10 +125,10 @@ async function streamingSourceContentsToStreamingParser(
           // TODO [FE-853]
           // Handle the case where the last line wasn't fully processed.
           // We could do a partial line, but that might be slow for long lines.
-          streamingParser.parsedLines = parser.isComplete()
-            ? parser.parsedLines
-            : parser.parsedLines.slice(0, parser.parsedLines.length - 1);
-          streamingParser.parsedProgress = streamingParser.rawProgress;
+          streamingParser.parsedTokensByLine = parser.isComplete()
+            ? parser.parsedTokensByLine
+            : parser.parsedTokensByLine.slice(0, parser.parsedTokensByLine.length - 1);
+          streamingParser.parsedTokensPercentage = streamingParser.rawTextPercentage;
         }
       }
 
@@ -141,10 +147,11 @@ async function streamingSourceContentsToStreamingParser(
 
 function incrementalParser(fileName?: string, contentType?: ContentType): IncrementalParser | null {
   let complete: boolean = false;
-  const parsedLines: string[] = [];
 
-  const inProgressState = {
-    htmlString: "",
+  const parsedTokens: Array<ParsedToken[]> = [];
+
+  const currentLineState = {
+    parsedTokens: [],
     rawString: "",
   };
 
@@ -197,10 +204,10 @@ function incrementalParser(fileName?: string, contentType?: ContentType): Increm
       if (from > characterIndex) {
         // No style applied to the token between position and from.
         // This typically indicates white space or newline characters.
-        processSection(inProgressState, parsedLines, codeToParse.slice(characterIndex, from), "");
+        processSection(currentLineState, parsedTokens, codeToParse.slice(characterIndex, from), "");
       }
 
-      processSection(inProgressState, parsedLines, codeToParse.slice(from, to), classes);
+      processSection(currentLineState, parsedTokens, codeToParse.slice(from, to), classes);
 
       characterIndex = to;
     });
@@ -210,15 +217,15 @@ function incrementalParser(fileName?: string, contentType?: ContentType): Increm
       // No style applied on the trailing text.
       // This typically indicates white space or newline characters.
       processSection(
-        inProgressState,
-        parsedLines,
+        currentLineState,
+        parsedTokens,
         codeToParse.slice(characterIndex, maxPosition),
         ""
       );
     }
 
-    if (inProgressState.htmlString !== "") {
-      parsedLines.push(inProgressState.htmlString);
+    if (currentLineState.parsedTokens.length) {
+      parsedTokens.push(currentLineState.parsedTokens);
     }
 
     parsedCharacterIndex += characterIndex + 1;
@@ -229,48 +236,46 @@ function incrementalParser(fileName?: string, contentType?: ContentType): Increm
     if (parsedCharacterIndex < codeToParse.length) {
       let nextIndex = codeToParse.indexOf("\n", parsedCharacterIndex);
 
+      let parsedLineTokens: ParsedToken[] = [];
+
       while (true) {
-        if (nextIndex === -1) {
-          const line = codeToParse.substring(parsedCharacterIndex);
+        const line =
+          nextIndex >= 0
+            ? codeToParse.substring(parsedCharacterIndex, nextIndex)
+            : codeToParse.substring(parsedCharacterIndex);
 
-          inProgressState.htmlString += line;
-
-          break;
-        } else if (nextIndex !== parsedCharacterIndex) {
-          const line =
-            nextIndex >= 0
-              ? codeToParse.substring(parsedCharacterIndex, nextIndex)
-              : codeToParse.substring(parsedCharacterIndex);
-
-          inProgressState.htmlString += line;
-        }
+        parsedLineTokens.push({
+          columnIndex: 0,
+          type: null,
+          value: line,
+        });
 
         if (nextIndex >= 0) {
-          parsedLines.push(inProgressState.htmlString);
+          parsedTokens.push(parsedLineTokens);
 
-          inProgressState.htmlString = "";
+          parsedLineTokens = [];
+        } else if (nextIndex === -1) {
+          break;
         }
 
         parsedCharacterIndex = nextIndex + 1;
         nextIndex = codeToParse.indexOf("\n", parsedCharacterIndex);
       }
 
-      if (inProgressState.htmlString !== "") {
-        parsedLines.push(inProgressState.htmlString);
+      if (parsedLineTokens.length) {
+        parsedTokens.push(parsedLineTokens);
       }
     }
-
-    inProgressState.htmlString = "";
   }
 
   return {
     isComplete: () => complete,
-    parsedLines,
+    parsedTokensByLine: parsedTokens,
     parseChunk,
   };
 }
 
-function highlighter(code: string, fileName: string): string[] | null {
+function highlighter(code: string, fileName: string): Array<ParsedToken[]> | null {
   const parser = incrementalParser(fileName);
   if (parser === null) {
     return null;
@@ -278,7 +283,7 @@ function highlighter(code: string, fileName: string): string[] | null {
 
   parser.parseChunk(code, true);
 
-  return parser.parsedLines;
+  return parser.parsedTokensByLine;
 }
 
 function identity(any: any) {
@@ -319,59 +324,53 @@ function urlToLanguage(fileName: string): LRLanguage {
 }
 
 function processSection(
-  htmlString: {
-    htmlString: string;
+  currentLineState: {
+    parsedTokens: ParsedToken[];
     rawString: string;
   },
-  parsedLines: string[],
+  parsedTokens: Array<ParsedToken[]>,
   section: string,
   className: string
 ) {
-  if (cachedElement === null) {
-    cachedElement = document.createElement("span");
-  } else {
-    cachedElement.innerHTML = "";
-  }
+  const tokenType = className?.substring(4) ?? null; // Remove "tok-" prefix;
 
   let index = 0;
   let nextIndex = section.indexOf("\n");
 
   while (true) {
+    const substring =
+      nextIndex >= 0 ? section.substring(index, nextIndex) : section.substring(index);
+
+    const token: ParsedToken = {
+      columnIndex: currentLineState.rawString.length,
+      type: tokenType,
+      value: substring,
+    };
+
+    currentLineState.parsedTokens.push(token);
+    currentLineState.rawString += substring;
+
     if (nextIndex === -1) {
-      const subsection = section.substring(index);
-
-      cachedElement.className = className;
-      cachedElement.textContent = subsection;
-      cachedElement.setAttribute("data-parsed-token", "");
-      cachedElement.setAttribute("data-column-index", "" + htmlString.rawString.length);
-
-      htmlString.htmlString += cachedElement.outerHTML;
-      htmlString.rawString += subsection;
-
       break;
-    } else if (nextIndex !== index) {
-      const subsection =
-        nextIndex >= 0 ? section.substring(index, nextIndex) : section.substring(index);
-
-      cachedElement.className = className;
-      cachedElement.textContent = subsection;
-      cachedElement.setAttribute("data-parsed-token", "");
-      cachedElement.setAttribute("data-column-index", "" + htmlString.rawString.length);
-
-      htmlString.htmlString += cachedElement.outerHTML;
-      htmlString.rawString += subsection;
     }
 
     if (nextIndex >= 0) {
-      parsedLines.push(htmlString.htmlString);
+      parsedTokens.push(currentLineState.parsedTokens);
 
-      htmlString.htmlString = "";
-      htmlString.rawString = "";
-
-      cachedElement.innerHTML = "";
+      currentLineState.parsedTokens = [];
+      currentLineState.rawString = "";
     }
 
     index = nextIndex + 1;
     nextIndex = section.indexOf("\n", index);
   }
+}
+
+export function parsedTokensToHtml(tokens: ParsedToken[]): string {
+  return tokens
+    .map(token => {
+      const className = token.type ? `tok-${token.type}` : "";
+      return `<span class="${className}">${token.value}</span>`;
+    })
+    .join("");
 }

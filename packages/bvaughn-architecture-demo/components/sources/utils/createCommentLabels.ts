@@ -4,7 +4,10 @@ import {
   getSourceAsync,
   getStreamingSourceContentsAsync,
 } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
-import { parseStreamingAsync } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
+import {
+  parseStreamingAsync,
+  parsedTokensToHtml,
+} from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
 import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
 import { truncate } from "bvaughn-architecture-demo/src/utils/text";
 import { ReplayClientInterface } from "shared/client/types";
@@ -46,22 +49,27 @@ export async function createSourceLocationLabels(
   if (streamingSource != null) {
     const parsedSource = await parseStreamingAsync(streamingSource);
     if (parsedSource != null) {
-      if (parsedSource.rawLines.length < lineNumber) {
+      if (parsedSource.rawTextByLine.length < lineNumber) {
         // If the streaming source hasn't finished loading yet, wait for it to load;
         // Note that it's important to check raw lines as parsed lines may be clipped
         // if the source is larger than the parser has been configured to handle.
         await new Promise<void>(resolve => {
           parsedSource.subscribe(() => {
-            if (parsedSource.rawLines.length >= lineNumber) {
+            if (parsedSource.rawTextByLine.length >= lineNumber) {
               resolve();
             }
           });
         });
       }
 
-      const rawLine = parsedSource.rawLines[lineNumber - 1];
-      if (parsedSource.parsedLines.length >= lineNumber && rawLine.length <= MAX_LABEL_CHARS) {
-        secondaryLabel = parsedSource.parsedLines[lineNumber - 1] || null;
+      const rawLine = parsedSource.rawTextByLine[lineNumber - 1];
+      if (
+        parsedSource.parsedTokensByLine.length >= lineNumber &&
+        rawLine.length <= MAX_LABEL_CHARS
+      ) {
+        secondaryLabel = parsedTokensToHtml(
+          parsedSource.parsedTokensByLine[lineNumber - 1] ?? null
+        );
       } else {
         // Secondary label is expected to be HTML for source code.
         // That's true even if we don't have any actual syntax highlighted markup to show.

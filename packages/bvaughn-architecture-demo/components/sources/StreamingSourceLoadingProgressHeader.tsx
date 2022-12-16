@@ -9,27 +9,27 @@ export default function StreamingSourceLoadingProgressHeader({
 }: {
   streamingParser: StreamingParser;
 }) {
-  const rawProgress = useSyncExternalStore(
+  const rawTextPercentage = useSyncExternalStore(
     streamingParser.subscribe,
-    () => streamingParser.rawProgress,
-    () => streamingParser.rawProgress
+    () => streamingParser.rawTextPercentage,
+    () => streamingParser.rawTextPercentage
   );
 
-  const parsedProgress = useSyncExternalStore(
+  const parsedTokensPercentage = useSyncExternalStore(
     streamingParser.subscribe,
-    () => streamingParser.parsedProgress,
-    () => streamingParser.parsedProgress
+    () => streamingParser.parsedTokensPercentage,
+    () => streamingParser.parsedTokensPercentage
   );
 
-  const loadedProgressBarWidth = Math.round(rawProgress * 100);
-  const parsedProgressBarWidth = Math.round(parsedProgress * 100);
+  const loadedProgressBarWidth = Math.round(rawTextPercentage * 100);
+  const parsedTokensPercentageBarWidth = Math.round(parsedTokensPercentage * 100);
 
   return (
     <div
       className={styles.Container}
       style={{
         // Collapse progress bar once loading has finished
-        height: rawProgress === 1 ? 0 : undefined,
+        height: rawTextPercentage === 1 ? 0 : undefined,
       }}
     >
       <div className={styles.RawProgressBar} style={{ width: `${loadedProgressBarWidth}%` }} />
@@ -37,8 +37,8 @@ export default function StreamingSourceLoadingProgressHeader({
         className={styles.ParsedProgressBar}
         style={{
           // Show parsed progress bar once parsing has started
-          opacity: parsedProgress > 0 ? 1 : 0,
-          width: parsedProgress > 0 ? `${parsedProgressBarWidth}%` : 0,
+          opacity: parsedTokensPercentage > 0 ? 1 : 0,
+          width: parsedTokensPercentage > 0 ? `${parsedTokensPercentageBarWidth}%` : 0,
         }}
       />
     </div>

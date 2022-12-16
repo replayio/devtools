@@ -79,9 +79,15 @@ export function findPointForLocation(
   sourceId: SourceId,
   lineNumber: number
 ): Point | null {
-  return (
-    points.find(
-      point => point.location.sourceId === sourceId && point.location.line === lineNumber
-    ) || null
-  );
+  return findPointsForLocation(points, sourceId, lineNumber)[0] ?? null;
+}
+
+export function findPointsForLocation(
+  points: Point[],
+  sourceId: SourceId,
+  lineNumber: number
+): Point[] {
+  return points
+    .filter(point => point.location.sourceId === sourceId && point.location.line === lineNumber)
+    .sort((a, b) => a.location.column - b.location.column);
 }
