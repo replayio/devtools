@@ -113,7 +113,7 @@ const SourceListRow = memo(
     const plainText = index < rawTextByLine.length ? rawTextByLine[index] : null;
 
     const pointsForLine = findPointsForLocation(points, sourceId, lineNumber);
-    const point = pointsForLine[0] ?? null;
+    const firstPoint = pointsForLine[0] ?? null;
 
     const hitCount = lineHitCounts?.count || null;
     const lineHasHits = hitCount !== null && hitCount > 0;
@@ -141,7 +141,7 @@ const SourceListRow = memo(
       hitCountLabelClassName = `${hitCountLabelClassName} ${styles.LineHitCountLabelPending}`;
     }
 
-    const showBreakpointMarkers = showColumnBreakpoints && point != null;
+    const showBreakpointMarkers = showColumnBreakpoints && firstPoint != null;
     const breakableColumnIndices = breakablePositionsByLine.get(lineNumber)?.columns ?? [];
 
     const renderBetween = (
@@ -250,15 +250,9 @@ const SourceListRow = memo(
         return;
       }
 
-      if (point) {
-        if (!point.shouldBreak || point.shouldLog) {
-          editPoint(point.id, { shouldBreak: !point.shouldBreak });
-        } else {
-          deletePoints(point.id);
-        }
-      } else {
-        // TODO The legacy app uses the closest function name for the content (if there is one).
-        // This app doesn't yet have logic for parsing source contents though.
+      // If there are no breakpoints on this line,
+      // Clicking the breakpoint toggle should add one at the first breakable column.
+      if (pointsForLine.length === 0) {
         addPoint(
           {
             shouldBreak: true,
@@ -269,6 +263,18 @@ const SourceListRow = memo(
             sourceId,
           }
         );
+      } else {
+        // If there are breakpoints on this line,
+        // The breakable gutter marker reflects the state of the first breakpoint on the line.
+        // Toggling the breakpoint on should enable breaking behavior for that point.
+        // Toggling it off depends on whether the point also logs.
+        // 1. If it logs and breaks, then we should disable breaking
+        // 2. If it only breaks then we should delete that point (and all others on the line)
+        if (firstPoint.shouldLog) {
+          editPoint(firstPoint.id, { shouldBreak: !firstPoint.shouldBreak });
+        } else {
+          deletePoints(...pointsForLine.map(point => point.id));
+        }
       }
     };
 
@@ -319,10 +325,10 @@ const SourceListRow = memo(
             {lineNumber}
             <div
               className={
-                point?.shouldBreak ? styles.BreakpointToggleOn : styles.BreakpointToggleOff
+                firstPoint?.shouldBreak ? styles.BreakpointToggleOn : styles.BreakpointToggleOff
               }
               data-test-name="BreakpointToggle"
-              data-test-state={point?.shouldBreak ? "on" : "off"}
+              data-test-state={firstPoint?.shouldBreak ? "on" : "off"}
               onClick={toggleBreakpoint}
             >
               {lineNumber}
@@ -363,14 +369,14 @@ const SourceListRow = memo(
                   iconClassName={styles.HoverButtonIcon}
                   lineHitCounts={lineHitCounts}
                   lineNumber={lineNumber}
-                  point={point}
+                  point={firstPoint}
                   source={source}
                 />
               </Suspense>
             )}
           </div>
 
-          {point?.shouldLog && <PointPanel className={styles.PointPanel} point={point} />}
+          {firstPoint?.shouldLog && <PointPanel className={styles.PointPanel} point={firstPoint} />}
         </div>
 
         <CurrentLineHighlight lineNumber={lineNumber} sourceId={sourceId} />
