@@ -294,13 +294,6 @@ export function createSocket(
         scope.setExtra("sessionId", sessionId);
       });
 
-      if (prefs.listenForMetrics) {
-        window.sessionMetrics = [];
-        addEventListener("Session.newMetric", ({ data }) => {
-          window.sessionMetrics?.push(data);
-        });
-      }
-
       window.sessionId = sessionId;
       ThreadFront.setSessionId(sessionId);
       const recordingTarget = await ThreadFront.recordingTargetWaiter.promise;
