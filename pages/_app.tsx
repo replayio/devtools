@@ -26,6 +26,7 @@ import { InstallRouteListener } from "ui/utils/routeListener";
 import tokenManager from "ui/utils/tokenManager";
 
 import "../src/base.css";
+import useAuthTelemetry from "ui/hooks/useAuthTelemetry";
 
 if (isMock()) {
   // If this is an end to end test, bootstrap the mock environment.
@@ -118,6 +119,7 @@ function Routing({ Component, pageProps }: AppProps) {
 }
 
 const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
+  useAuthTelemetry();
   const router = useRouter();
   let head: React.ReactNode;
 
