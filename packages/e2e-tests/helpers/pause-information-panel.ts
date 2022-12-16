@@ -34,10 +34,9 @@ export async function expandAllScopesBlocks(page: Page): Promise<void> {
   const scopesPanel = getScopesPanel(page);
   const blocks = scopesPanel.locator('[data-test-name="ScopesInspector"]');
 
-  const count = await blocks.count();
-  if (count === 0) {
-    throw Error(`No Scope blocks found`);
-  }
+  await waitFor(async () => {
+    expect(await blocks.count()).toBeGreaterThan(0);
+  });
 
   await forEach(blocks, async (block: Locator) => {
     await toggleExpandable(page, { scope: block });
