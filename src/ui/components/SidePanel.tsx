@@ -25,6 +25,7 @@ import {
 } from "ui/reducers/reporter";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Annotation, Recording, TestItem } from "ui/types";
+import { getRecordingId } from "ui/utils/recording";
 
 import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
@@ -178,14 +179,20 @@ function EventsPane({ items }: { items: any[] }) {
 function TestRunAttributes({ workspaceId, testRunId }: { workspaceId: string; testRunId: string }) {
   const { testRun } = useGetTestRunForWorkspace(workspaceId, testRunId);
   const selectedTest = useAppSelector(getSelectedTest);
+  const recordingId = getRecordingId();
 
   if (!testRun || selectedTest !== null) {
     return null;
   }
 
+  const thisSpecRun = {
+    ...testRun,
+    recordings: testRun.recordings?.filter(r => r.id === recordingId),
+  };
+
   return (
     <div className="border-b p-2">
-      <Attributes testRun={testRun} />
+      <Attributes testRun={thisSpecRun} />
     </div>
   );
 }
