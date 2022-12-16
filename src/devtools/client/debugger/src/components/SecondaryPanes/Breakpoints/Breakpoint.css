@@ -54,6 +54,7 @@
   position: relative;
   padding: 4px 8px;
   line-height: 16px;
+  white-space: nowrap;
 }
 
 .breakpoints-list .breakpoint:hover {
