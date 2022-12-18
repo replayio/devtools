@@ -1,6 +1,6 @@
 import { Wakeable } from "../suspense/types";
 
-let SYNCHRONOUS_CIRCULAR_THENABLE_CHECK_MAX_COUNT = 1_000;
+let CIRCULAR_THENABLE_CHECK_MAX_COUNT = 1_000;
 
 // A "thennable" is a subset of the Promise API.
 // We could use a Promise as thennable, but Promises have a downside: they use the microtask queue.
@@ -14,24 +14,15 @@ export function createWakeable<T>(): Wakeable<T> {
   let status: "unresolved" | "resolved" | "rejected" = "unresolved";
   let data: T | Error | null = null;
 
-  let callbacksRegisteredDuringCurrentFrame = 0;
-  let resetCounterTimer: NodeJS.Timeout | null = null;
+  let callbacksRegisteredAfterResolutionCount = 0;
 
   // Guard against a case where promise resolution results in a new wakeable listener being added.
   // That cause would result in an infinite loop.
   // Note that our guard counter should be somewhat high to avoid false positives.
   // It is a legitimate use-case to register handlers after a wakeable has been resolved or rejected.
   const checkCircularThenableChain = () => {
-    if (++callbacksRegisteredDuringCurrentFrame > SYNCHRONOUS_CIRCULAR_THENABLE_CHECK_MAX_COUNT) {
+    if (++callbacksRegisteredAfterResolutionCount > CIRCULAR_THENABLE_CHECK_MAX_COUNT) {
       throw Error("Circular thenable chain detected (infinite loop?)");
-    }
-
-    if (resetCounterTimer === null) {
-      resetCounterTimer = setTimeout(() => {
-        resetCounterTimer = null;
-
-        callbacksRegisteredDuringCurrentFrame = 0;
-      }, 0);
     }
   };
 
@@ -133,6 +124,6 @@ export function suspendInParallel<T extends AnyFunction[]>(
 }
 
 // Expose max circular check count for testing purposes.
-export function __setSynchronousCircularThenableCheckMaxCount(value: number) {
-  SYNCHRONOUS_CIRCULAR_THENABLE_CHECK_MAX_COUNT = value;
+export function __setCircularThenableCheckMaxCount(value: number) {
+  CIRCULAR_THENABLE_CHECK_MAX_COUNT = value;
 }

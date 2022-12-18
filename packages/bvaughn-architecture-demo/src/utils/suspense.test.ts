@@ -1,10 +1,6 @@
 import { Wakeable } from "bvaughn-architecture-demo/src/suspense/types";
 
-import {
-  __setSynchronousCircularThenableCheckMaxCount,
-  createWakeable,
-  suspendInParallel,
-} from "./suspense";
+import { __setCircularThenableCheckMaxCount, createWakeable, suspendInParallel } from "./suspense";
 
 describe("Suspense util", () => {
   describe("createWakeable", () => {
@@ -143,20 +139,12 @@ describe("Suspense util", () => {
     };
 
     beforeEach(() => {
-      __setSynchronousCircularThenableCheckMaxCount(5);
+      __setCircularThenableCheckMaxCount(5);
     });
 
     it("should not throw if count is not exceeded", () => {
       const wakeable = createWakeable<number>();
       wakeable.resolve(123);
-      registerSyncListeners(wakeable, 5);
-    });
-
-    it("should reset counter between frames to avoid throwing unnecessarily", async () => {
-      const wakeable = createWakeable<number>();
-      wakeable.resolve(123);
-      registerSyncListeners(wakeable, 5);
-      await new Promise(resolve => setTimeout(resolve, 0));
       registerSyncListeners(wakeable, 5);
     });
 
@@ -166,19 +154,39 @@ describe("Suspense util", () => {
       verifyThrows(wakeable, 6);
     });
 
-    it("should re-throw if count is exceeded within the same frame", () => {
+    it("should re-throw if count is exceeded multiple times", () => {
       const wakeable = createWakeable<number>();
       wakeable.resolve(123);
       verifyThrows(wakeable, 6);
-      verifyThrows(wakeable, 6);
+      verifyThrows(wakeable, 1);
     });
 
-    it("should re-throw if count is exceeded in the next frame", async () => {
+    it("should detect loops that span ticks", async () => {
       const wakeable = createWakeable<number>();
       wakeable.resolve(123);
-      verifyThrows(wakeable, 6);
+      registerSyncListeners(wakeable, 3);
       await new Promise(resolve => setTimeout(resolve, 0));
-      verifyThrows(wakeable, 6);
+      verifyThrows(wakeable, 3);
+    });
+
+    it("should detect loops that span ticks variant", async () => {
+      const wakeable = createWakeable<number>();
+      wakeable.resolve(123);
+
+      let caught = null;
+      try {
+        for (let i = 0; i <= 5; i++) {
+          wakeable.then(
+            () => {},
+            () => {}
+          );
+          await new Promise(resolve => setTimeout(resolve, 0));
+        }
+      } catch (error) {
+        caught = error;
+      }
+
+      expect(caught).not.toBeNull();
     });
   });
 
