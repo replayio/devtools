@@ -1,4 +1,10 @@
-import { createWakeable, suspendInParallel } from "./suspense";
+import { Wakeable } from "bvaughn-architecture-demo/src/suspense/types";
+
+import {
+  __setSynchronousCircularThenableCheckMaxCount,
+  createWakeable,
+  suspendInParallel,
+} from "./suspense";
 
 describe("Suspense util", () => {
   describe("createWakeable", () => {
@@ -117,6 +123,62 @@ describe("Suspense util", () => {
       expect(() => {
         alreadyResolved.reject(error);
       }).toThrowError("Wakeable has already been resolved");
+    });
+  });
+
+  describe("circular thenable chains", () => {
+    const registerSyncListeners = (wakeable: Wakeable<number>, iterations: number) => {
+      for (let i = 0; i < iterations; i++) {
+        wakeable.then(
+          () => {},
+          () => {}
+        );
+      }
+    };
+
+    const verifyThrows = (wakeable: Wakeable<number>, iterations: number) => {
+      expect(() => registerSyncListeners(wakeable, iterations)).toThrowError(
+        "Circular thenable chain detected"
+      );
+    };
+
+    beforeEach(() => {
+      __setSynchronousCircularThenableCheckMaxCount(5);
+    });
+
+    it("should not throw if count is not exceeded", () => {
+      const wakeable = createWakeable<number>();
+      wakeable.resolve(123);
+      registerSyncListeners(wakeable, 5);
+    });
+
+    it("should reset counter between frames to avoid throwing unnecessarily", async () => {
+      const wakeable = createWakeable<number>();
+      wakeable.resolve(123);
+      registerSyncListeners(wakeable, 5);
+      await new Promise(resolve => setTimeout(resolve, 0));
+      registerSyncListeners(wakeable, 5);
+    });
+
+    it("should throw if count is exceeded", () => {
+      const wakeable = createWakeable<number>();
+      wakeable.resolve(123);
+      verifyThrows(wakeable, 6);
+    });
+
+    it("should re-throw if count is exceeded within the same frame", () => {
+      const wakeable = createWakeable<number>();
+      wakeable.resolve(123);
+      verifyThrows(wakeable, 6);
+      verifyThrows(wakeable, 6);
+    });
+
+    it("should re-throw if count is exceeded in the next frame", async () => {
+      const wakeable = createWakeable<number>();
+      wakeable.resolve(123);
+      verifyThrows(wakeable, 6);
+      await new Promise(resolve => setTimeout(resolve, 0));
+      verifyThrows(wakeable, 6);
     });
   });
 
