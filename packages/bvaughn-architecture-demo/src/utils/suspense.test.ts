@@ -188,6 +188,24 @@ describe("Suspense util", () => {
 
       expect(caught).not.toBeNull();
     });
+
+    it("should track loops separately per wakeable", async () => {
+      const wakeableA = createWakeable<number>();
+      wakeableA.resolve(123);
+
+      const wakeableB = createWakeable<number>();
+      wakeableB.resolve(456);
+
+      // Total count exceeds loop but not individually
+      registerSyncListeners(wakeableA, 5);
+      registerSyncListeners(wakeableB, 3);
+
+      // Wakeable A should now throw
+      verifyThrows(wakeableA, 1);
+
+      // But Wakeable B should not
+      registerSyncListeners(wakeableB, 2);
+    });
   });
 
   describe("suspendInParallel", () => {
