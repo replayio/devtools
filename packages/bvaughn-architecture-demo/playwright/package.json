@@ -8,7 +8,7 @@
   },
   "scripts": {
     "playwright:install": "playwright install chromium",
-    "test": "playwright test --workers 4 tests",
+    "test": "playwright test --workers 8 tests",
     "test:update-fixture-data": "RECORD_PROTOCOL_DATA=true yarn test",
     "test:visual": "PWDEBUG=console VISUAL_DEBUG=true yarn test"
   }
