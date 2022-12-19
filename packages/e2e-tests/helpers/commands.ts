@@ -15,4 +15,5 @@ export async function quickOpen(page: Page, url: string): Promise<void> {
   await debugPrint(page, `Opening file "${chalk.bold(url)}"`, "quickOpen");
   await page.keyboard.press("Enter");
   await page.waitForSelector(`[data-test-name="Source-${url}"]`);
+  await page.waitForSelector(`[data-test-name="Source"]`);
 }
