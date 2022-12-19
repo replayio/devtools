@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import {
   Locator,
   LocatorScreenshotOptions,
@@ -128,11 +130,19 @@ export async function takeScreenshot(
 
   await page.emulateMedia({ colorScheme: "dark" });
   const screenshotDark = await takeScreenshotHelper(page, locator, margin);
-  expect(screenshotDark).toMatchSnapshot(["dark", name]);
+
+  const darkDir = path.join(__dirname, `../../visuals/`, "dark");
+  fs.mkdirSync(darkDir, { recursive: true });
+  fs.writeFileSync(path.join(darkDir, name), screenshotDark);
+  expect(screenshotDark).not.toBeNull();
 
   await page.emulateMedia({ colorScheme: "light" });
   const screenshotLight = await takeScreenshotHelper(page, locator, margin);
-  expect(screenshotLight).toMatchSnapshot(["light", name]);
+
+  const lightDir = path.join(__dirname, `../../visuals/`, "light");
+  fs.mkdirSync(lightDir, { recursive: true });
+  fs.writeFileSync(path.join(lightDir, name), screenshotLight);
+  expect(screenshotLight).not.toBeNull();
 }
 
 async function takeScreenshotHelper(
@@ -182,7 +192,6 @@ export async function waitFor(
       return;
     } catch (error) {
       if (typeof error === "string") {
-        console.log(error);
       }
 
       if (performance.now() - startTime > timeout) {
