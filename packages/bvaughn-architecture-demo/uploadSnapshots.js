@@ -28,10 +28,28 @@ function getFiles(dir) {
   return allFiles;
 }
 
-async function createAction({ projectId, branch, metadata }) {
+async function createAction({ projectId }) {
   let res;
 
   try {
+    const {
+      payload: { pull_request: pullRequest, action },
+      runId,
+      actor,
+    } = github.context;
+
+    const branch = pullRequest?.head?.ref || "main";
+
+    const metadata = {
+      pr_url: pullRequest?.html_url,
+      pr_number: pullRequest?.number,
+      pr_title: pullRequest?.title,
+      pr_branch: branch,
+      run_id: runId,
+      actor,
+      commit_sha: github.context?.sha,
+    };
+
     res = await fetch(`${visualsUrl}/api/createAction`, {
       method: "POST",
       headers: {
@@ -88,30 +106,9 @@ async function uploadImage(file, actionId) {
   }
 }
 
-async function run() {
-  const {
-    payload: { pull_request: pullRequest, action },
-    runId,
-    actor,
-  } = github.context;
-
-  const branch = pullRequest?.head?.ref || "main";
-
-  const metadata = {
-    pr_url: pullRequest.html_url,
-    pr_number: pullRequest.number,
-    pr_title: pullRequest.title,
-    pr_branch: branch,
-    run_id: runId,
-    actor,
-    commit_sha: github.context?.sha,
-  };
-
-  return createAction({ projectId, branch, metadata });
-}
-
 (async () => {
-  const response = await run();
+  const response = await createAction({ projectId });
+
   console.log("response", response);
   if (response.error) {
     console.log("error", response.error);
