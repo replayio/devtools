@@ -143,6 +143,7 @@ export function createNetworkRequestComment(
           request.method,
           request.name,
           request.status ?? null,
+          request.point.time,
           request.type
         ),
       })

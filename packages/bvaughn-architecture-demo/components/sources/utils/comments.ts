@@ -32,6 +32,7 @@ export interface NetworkRequestCommentTypeData {
   method: string;
   name: string;
   status: number | null;
+  time: number;
   type: CanonicalRequestType;
 }
 
@@ -57,6 +58,7 @@ export function createTypeDataForNetworkRequestComment(
   requestMethod: string,
   requestName: string,
   requestStatus: number | null,
+  requestTime: number,
   requestType: CanonicalRequestType
 ): NetworkRequestCommentTypeData {
   return {
@@ -64,6 +66,7 @@ export function createTypeDataForNetworkRequestComment(
     method: requestMethod,
     name: requestName,
     status: requestStatus,
+    time: requestTime,
     type: requestType,
   };
 }
