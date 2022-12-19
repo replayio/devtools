@@ -11,7 +11,10 @@ import {
 
 import Icon from "bvaughn-architecture-demo/components/Icon";
 import CodeEditor from "bvaughn-architecture-demo/components/lexical/CodeEditor";
-import { createSourceLocationLabels } from "bvaughn-architecture-demo/components/sources/utils/createCommentLabels";
+import {
+  COMMENT_TYPE_SOURCE_CODE,
+  createTypeDataForSourceCodeComment,
+} from "bvaughn-architecture-demo/components/sources/utils/comments";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
 import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
@@ -312,7 +315,7 @@ function PointPanelWithHitPoints({
         }
         trackEvent("breakpoint.add_comment");
 
-        const { primaryLabel, secondaryLabel } = await createSourceLocationLabels(
+        const typeData = await createTypeDataForSourceCodeComment(
           client,
           point.location.sourceId,
           point.location.line,
@@ -324,10 +327,9 @@ function PointPanelWithHitPoints({
           hasFrames: true,
           isPublished: false,
           point: currentExecutionPoint,
-          primaryLabel,
-          secondaryLabel,
-          sourceLocation: point.location,
           time: currentTime,
+          type: COMMENT_TYPE_SOURCE_CODE,
+          typeData,
         });
 
         invalidateCache();

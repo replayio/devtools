@@ -61,6 +61,8 @@ const GetCommentsQuery = `
         point
         position
         networkRequestId
+        type
+        typeData
         user {
           id
           internal
@@ -109,7 +111,12 @@ export async function addComment(
   graphQLClient: GraphQLClientInterface,
   accessToken: string,
   recordingId: RecordingId,
-  config: Partial<AddCommentInput>
+  config: Partial<
+    Omit<
+      AddCommentInput,
+      "networkRequestId" | "position" | "primaryLabel" | "secondaryLabel" | "sourceLocation"
+    >
+  >
 ) {
   await graphQLClient.send(
     {

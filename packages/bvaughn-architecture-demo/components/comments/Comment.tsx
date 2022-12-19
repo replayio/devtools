@@ -20,7 +20,12 @@ import {
   updateComment as updateCommentGraphQL,
   updateCommentReply as updateCommentReplyGraphQL,
 } from "bvaughn-architecture-demo/src/graphql/Comments";
-import { Comment, CommentSourceLocation, User } from "bvaughn-architecture-demo/src/graphql/types";
+import {
+  Comment,
+  CommentSourceLocation,
+  CommentType,
+  User,
+} from "bvaughn-architecture-demo/src/graphql/types";
 import { formatRelativeTime } from "bvaughn-architecture-demo/src/utils/time";
 
 import styles from "./Comment.module.css";
@@ -69,6 +74,8 @@ export default function CommentRenderer({ comment }: { comment: Comment }) {
       primaryLabel={comment.primaryLabel || null}
       secondaryLabel={comment.secondaryLabel || null}
       sourceLocation={comment.sourceLocation}
+      type={comment.type}
+      typeData={comment.typeData}
     >
       {comment.replies.map(reply => {
         const deleteCommentReplyCallback = async () => {
@@ -99,6 +106,8 @@ export default function CommentRenderer({ comment }: { comment: Comment }) {
             primaryLabel={null}
             secondaryLabel={null}
             sourceLocation={null}
+            type={null}
+            typeData={null}
           />
         );
       })}
@@ -125,6 +134,8 @@ function EditableRemark({
   primaryLabel,
   secondaryLabel,
   sourceLocation,
+  type,
+  typeData,
 }: {
   children?: ReactNode;
   className: string;
@@ -138,6 +149,8 @@ function EditableRemark({
   primaryLabel: string | null;
   secondaryLabel: string | null;
   sourceLocation: CommentSourceLocation | null;
+  type: string | null;
+  typeData: any | null;
 }) {
   const { currentUserInfo } = useContext(SessionContext);
   const invalidateCache = useCacheRefresh();

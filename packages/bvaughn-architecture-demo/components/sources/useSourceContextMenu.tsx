@@ -5,7 +5,10 @@ import ContextMenuDivider from "bvaughn-architecture-demo/components/context-men
 import ContextMenuItem from "bvaughn-architecture-demo/components/context-menu/ContextMenuItem";
 import useContextMenu from "bvaughn-architecture-demo/components/context-menu/useContextMenu";
 import { copyToClipboard } from "bvaughn-architecture-demo/components/sources/utils/clipboard";
-import { createSourceLocationLabels } from "bvaughn-architecture-demo/components/sources/utils/createCommentLabels";
+import {
+  COMMENT_TYPE_SOURCE_CODE,
+  createTypeDataForSourceCodeComment,
+} from "bvaughn-architecture-demo/components/sources/utils/comments";
 import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
 import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
 import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
@@ -29,7 +32,7 @@ export default function useSourceContextMenu({
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
   const { accessToken, recordingId, trackEvent } = useContext(SessionContext);
-  const { executionPoint: currentExecutionPoint, time: curentTime } = useContext(TimelineContext);
+  const { executionPoint: currentExecutionPoint, time: currentTime } = useContext(TimelineContext);
 
   const togglesLocalStorageKey = `Replay:ShowHitCounts`;
   const [showHitCounts, setShowHitCounts] = useLocalStorage<boolean>(togglesLocalStorageKey, true);
@@ -44,26 +47,16 @@ export default function useSourceContextMenu({
       }
       trackEvent("breakpoint.add_comment");
 
-      const { primaryLabel, secondaryLabel } = await createSourceLocationLabels(
-        client,
-        sourceId,
-        lineNumber,
-        firstBreakableColumnIndex
-      );
+      const typeData = await createTypeDataForSourceCodeComment(client, sourceId, lineNumber, 0);
 
       await addCommentGraphQL(graphQLClient, accessToken!, recordingId, {
         content: "",
         hasFrames: true,
         isPublished: false,
         point: currentExecutionPoint,
-        primaryLabel,
-        secondaryLabel,
-        sourceLocation: {
-          column: firstBreakableColumnIndex != null ? firstBreakableColumnIndex : 0,
-          line: lineNumber,
-          sourceId,
-        },
-        time: curentTime,
+        time: currentTime,
+        type: COMMENT_TYPE_SOURCE_CODE,
+        typeData,
       });
 
       invalidateCache();
