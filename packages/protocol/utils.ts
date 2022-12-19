@@ -1,3 +1,5 @@
+import { SourceLocation } from "@replayio/protocol";
+
 type ErrorHandler = (error: Error) => void;
 
 let errorHandler: ErrorHandler = (error: Error) => {
@@ -205,4 +207,10 @@ export class ArrayMap<K, V> {
  */
 export function compareNumericStrings(a: string, b: string) {
   return a.length < b.length ? -1 : a.length > b.length ? 1 : a < b ? -1 : a > b ? 1 : 0;
+}
+
+export function locationsInclude(haystack: SourceLocation[], needle: SourceLocation) {
+  return haystack.some(
+    location => location.line === needle.line && location.column === needle.column
+  );
 }
