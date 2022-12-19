@@ -116,7 +116,9 @@ async function uploadImage(file, actionId) {
   }
 
   const actionId = response.data.id;
-  const files = getFiles("./playwright/snapshots/tests");
+
+  const files = getFiles("./playwright/visuals");
+  console.log(files);
   const res = await Promise.all(files.map(file => uploadImage(file, actionId)));
   console.log(JSON.stringify(res, null, 2));
 })();
