@@ -18,6 +18,8 @@ const config: FullConfig = {
   reporter: CI ? "github" : "list",
   retries: RECORD_VIDEO || VISUAL_DEBUG ? 0 : 2,
   snapshotDir: "./snapshots",
+  fullyParallel: true,
+
   use: {
     browserName: "chromium",
     launchOptions: {
