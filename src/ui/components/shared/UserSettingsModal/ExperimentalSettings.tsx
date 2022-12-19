@@ -54,6 +54,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     description: "Do not cache the results of indexing the recording",
     key: "disableScanDataCache",
   },
+  {
+    label: "Enable workaround for broken sourcemaps",
+    description: "Skip locations that are mapped to the beginning of a function body",
+    key: "brokenSourcemapWorkaround",
+  },
 ];
 
 const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [];
@@ -102,6 +107,9 @@ export default function ExperimentalSettings({}) {
   const { value: basicProcessingLoadingBar, update: updateBasicProcessingLoadingBar } = useFeature(
     "basicProcessingLoadingBar"
   );
+  const { value: brokenSourcemapWorkaround, update: updateBrokenSourcemapWorkaround } = useFeature(
+    "brokenSourcemapWorkaround"
+  );
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
@@ -118,11 +126,14 @@ export default function ExperimentalSettings({}) {
       updateConsoleFilterDrawerDefaultsToOpen(!consoleFilterDrawerDefaultsToOpen);
     } else if (key === "disableScanDataCache") {
       updateDisableScanDataCache(!disableScanDataCache);
+    } else if (key === "brokenSourcemapWorkaround") {
+      updateBrokenSourcemapWorkaround(!brokenSourcemapWorkaround);
     }
   };
 
   const localSettings = {
     basicProcessingLoadingBar,
+    brokenSourcemapWorkaround,
     consoleFilterDrawerDefaultsToOpen,
     disableScanDataCache,
     disableStableQueryCache,

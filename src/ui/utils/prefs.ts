@@ -40,6 +40,7 @@ pref("devtools.features.protocolTimeline", false);
 pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.resolveRecording", false);
 pref("devtools.features.chromiumNetMonitor", true);
+pref("devtools.features.brokenSourcemapWorkaround", false);
 
 export const prefs = new PrefsHelper("devtools", {
   colorScheme: ["String", "colorScheme"],
@@ -75,6 +76,7 @@ export const features = new PrefsHelper("devtools.features", {
   repaintEvaluations: ["Bool", "repaintEvaluations"],
   resolveRecording: ["Bool", "resolveRecording"],
   chromiumNetMonitor: ["Bool", "chromiumNetMonitor"],
+  brokenSourcemapWorkaround: ["Bool", "brokenSourcemapWorkaround"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {
