@@ -95,7 +95,7 @@ async function run() {
     actor,
   } = github.context;
 
-  const branch = pullRequest.head?.ref;
+  const branch = pullRequest?.head?.ref || "main";
 
   const metadata = {
     pr_url: pullRequest.html_url,
