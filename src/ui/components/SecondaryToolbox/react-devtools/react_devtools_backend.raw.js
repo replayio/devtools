@@ -12155,6 +12155,22 @@
       bridge.send('isSynchronousXHRSupported', Object(utils["i" /* isSynchronousXHRSupported */])());
       setupHighlighter(bridge, this);
       TraceUpdates_initialize(this);
+      window.__RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__ = (inEvent, inData) => {
+        let rv;
+        window.logMessage(`Bridge message started: ${inEvent}`);
+        this._bridge = {
+          send(event, data) {
+            rv = { event, data };
+          }
+        };
+        try {
+
+          this[inEvent](inData);
+        } catch (err) {
+          window.logMessage(`Error executing bridge message '${inEvent}': ${err}, ${err.stack}`)
+        }
+        window.logMessage(`Bridge message complete: ${inEvent}`);
+        return rv;
       
     }
   
