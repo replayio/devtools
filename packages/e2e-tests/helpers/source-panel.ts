@@ -413,10 +413,17 @@ export async function verifyLogpointStep(
 
 // TODO [FE-626] Rewrite this helper to reduce complexity.
 export async function waitForSelectedSource(page: Page, url: string) {
-  return waitFor(async () => {
+  await waitFor(async () => {
     const editorPanel = page.locator("#toolbox-content-debugger");
     const sourceHeader = editorPanel.locator(`[data-test-name="Source-${url}"]`);
-    const isTabActive = (await sourceHeader.getAttribute("data-status")) === "active";
+
+    expect(await sourceHeader.getAttribute("data-status")).toBe("active");
+
+    // Make sure the visible source is the same source as the selected tab.
+    const headerSourceId = await sourceHeader.getAttribute("data-test-sourceid");
+    expect(
+      await page.locator('[data-test-name="Source"]:visible').getAttribute("data-test-sourceid")
+    ).toBe(headerSourceId);
 
     // HACK Assume that the source file has loaded when the combined text of the first
     // 10 lines is no longer an empty string
@@ -432,6 +439,7 @@ export async function waitForSelectedSource(page: Page, url: string) {
       // Remove zero-width spaces, which would be considered non-empty
       .replace(/[\u200B-\u200D\uFEFF]/g, "");
 
-    expect(isTabActive && numLines > 0 && combinedLineText !== "").toBe(true);
+    expect(numLines).toBeGreaterThan(0);
+    expect(combinedLineText).not.toBe("");
   });
 }

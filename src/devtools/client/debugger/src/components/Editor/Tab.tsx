@@ -84,6 +84,7 @@ export default function Tab({
         className={className}
         data-status={active ? "active" : undefined}
         data-test-name={`Source-${fileName}`}
+        data-test-sourceid={source.id}
         key={sourceId}
         onClick={handleTabClick}
         onContextMenu={onContextMenu}
