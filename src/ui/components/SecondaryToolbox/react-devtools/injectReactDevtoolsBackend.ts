@@ -6,7 +6,6 @@ import { ReplayClientInterface } from "shared/client/types";
 // a given Pause, and we want to retain the info even if the RDT component unmounts.
 const pausesWithDevtoolsInjected = new Set<string>();
 
-type Renderer = any;
 declare global {
   interface Window {
     __REACT_DEVTOOLS_GLOBAL_HOOK__: any;
@@ -22,17 +21,15 @@ declare global {
   }
 }
 
-function onRendererInject(renderer: Renderer, rendererID: number) {
-  const rv = { rendererID, version: renderer.version || "unknown" };
-  return JSON.stringify(rv);
-}
-
 function mutateWindowForSetup() {
+  // Create placeholders for our poor man's debug logging and the saved React tree operations
   window.evaluationLogs = [];
   window.savedOperations = [];
   window.logMessage = function (message) {
     window.evaluationLogs.push(message);
   };
+
+  // Erase the stub global hook from Chromium
   delete window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 }
 
@@ -45,33 +42,17 @@ function readRenderers() {
 }
 
 function getMessages() {
+  // Get the log messages for debugging
   return JSON.stringify({ messages: window.evaluationLogs });
 }
 
-function getOperations() {
-  return JSON.stringify({ operations: window.savedOperations });
-}
-
-function logRendererVersion() {
-  // const result = window.__RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__(
-  //   "getBridgeProtocol",
-  //   undefined
-  // );
-  const result = window.__RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("inspectElement", {
-    forceFullData: true,
-    id: 173,
-    path: null,
-    rendererID: 1,
-    requestID: 1,
-  });
-  window.logMessage("Renderer version result: " + JSON.stringify(result));
-}
-
 function copyMountedRoots() {
+  // The only time we have access to the React root objects is when `onCommitFiberRoot` gets called.
+  // Our Chromium fork specifically captures all those and saves them.
+  // As part of the setup process, we have to copy those root references over to the real RDT
+  // global hook object, so it has them available when it tries to walk the component tree.
   const savedRoots = window.__REACT_DEVTOOLS_STUB_FIBER_ROOTS;
-  window.logMessage("Saved roots keys: " + Object.keys(savedRoots));
   for (let [rendererID, rendererRoots] of Object.entries(savedRoots)) {
-    window.logMessage(`Saved roots: renderer = ${rendererID}, numRoots: ${rendererRoots.size}`);
     const numericRendererID = Number(rendererID);
     const hookRoots = window.__REACT_DEVTOOLS_GLOBAL_HOOK__.getFiberRoots(numericRendererID);
     for (let root of rendererRoots) {
@@ -83,6 +64,8 @@ function copyMountedRoots() {
 function injectExistingRenderers() {
   window.__REACT_DEVTOOLS_SAVED_RENDERERS__.forEach(renderer => {
     window.logMessage("Injecting renderer");
+    // Similarly, we need to take the real renderer references, and attach them
+    // to the real RDT global hook now that it's in the page.
     window.__REACT_DEVTOOLS_GLOBAL_HOOK__.inject(renderer);
   });
 
@@ -90,22 +73,11 @@ function injectExistingRenderers() {
     rendererID,
     renderer,
   ] of window.__REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.entries()) {
-    // const savedRoots = window.__REACT_DEVTOOLS_STUB_GET_FIBER_ROOTS(rendererID);
-    //
-    // for (let root of savedRoots) {
-    //   hookRoots.add(root);
     const hookRoots = window.__REACT_DEVTOOLS_GLOBAL_HOOK__.getFiberRoots(rendererID);
     for (let root of hookRoots) {
+      // Force the extension to crawl the current DOM contents so it knows what nodes exist
       window.__REACT_DEVTOOLS_GLOBAL_HOOK__.onCommitFiberRoot(rendererID, root, 1);
     }
-
-    // }
-    // renderer.flushInitialOperations();
-    window.logMessage(
-      `Renderer: ${rendererID}, size: ${
-        window.__REACT_DEVTOOLS_GLOBAL_HOOK__.getFiberRoots(rendererID).size
-      }`
-    );
   }
 }
 
@@ -125,7 +97,7 @@ export async function logWindowMessages(
   replayClient: ReplayClientInterface
 ) {
   const messages = await evaluateNoArgsFunction(ThreadFront, replayClient, getMessages);
-  console.log("Evaluation messages: ", JSON.parse(messages?.returned?.value ?? "null").messages);
+  // console.log("Evaluation messages: ", JSON.parse(messages?.returned?.value ?? "null").messages);
 }
 
 export async function injectReactDevtoolsBackend(
@@ -149,7 +121,6 @@ export async function injectReactDevtoolsBackend(
     text: injectGlobalHookSource,
   });
 
-  console.log("Copying mounted roots");
   await evaluateNoArgsFunction(ThreadFront, replayClient, copyMountedRoots);
 
   await ThreadFront.evaluateNew({
@@ -159,13 +130,5 @@ export async function injectReactDevtoolsBackend(
 
   await evaluateNoArgsFunction(ThreadFront, replayClient, injectExistingRenderers);
 
-  try {
-    // await evaluateNoArgsFunction(ThreadFront, replayClient, logRendererVersion);
-  } catch (err) {
-    console.error(err);
-  }
-
   await logWindowMessages(ThreadFront, replayClient);
-  // const hook = await evaluateNoArgsFunction(ThreadFront, replayClient, readWindow);
-  // console.log("Global hook: ", JSON.parse(hook?.returned?.value ?? "null"));
 }
