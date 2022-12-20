@@ -173,6 +173,13 @@ export class ReplayClient implements ReplayClientInterface {
   ): Promise<EvaluationResult> {
     const sessionId = this.getSessionIdThrows();
 
+    // Edge case handling:
+    // User is logging a plan object (e.g. "{...}")
+    // This expression will not evaluate correctly unless we wrap parens around it
+    if (expression.startsWith("{") && expression.endsWith("}")) {
+      expression = `(${expression})`;
+    }
+
     if (frameId === null) {
       const response = await client.Pause.evaluateInGlobal(
         {
