@@ -28,6 +28,7 @@ import {
   nodesHighlighted,
   resetMarkup,
   updateChildrenLoading,
+  updateLoadingFailed,
   updateNodeExpanded,
   updateScrollIntoViewNode,
 } from "../reducers/markup";
@@ -133,15 +134,21 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
         }
       }
 
-      // If the "Elements" panel is already selected, go ahead and fetch markup data now.
-      // Otherwise, wait until the next time it _is_ selected.
-      if (isInspectorSelected(getState())) {
-        await loadNewDocument();
-      } else {
+      if (!isInspectorSelected(getState())) {
         await condition((action, currState) => {
           return isInspectorSelected(currState);
         });
+      }
+
+      try {
         await loadNewDocument();
+      } catch (error) {
+        console.error(error);
+
+        // This error may indicate that the document is not available at the current execution point.
+        // In that case, we should inform the user (rather than remaining in a visual loading state).
+        // When the execution point changes we will try again.
+        dispatch(updateLoadingFailed(true));
       }
     },
   });
