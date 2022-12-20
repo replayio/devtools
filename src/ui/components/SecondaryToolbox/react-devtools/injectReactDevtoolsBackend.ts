@@ -139,7 +139,7 @@ export async function injectReactDevtoolsBackend(
 
   pausesWithDevtoolsInjected.add(pauseId);
 
-  const injectGlobalHookSource = require("./injectGlobalHook.raw.js").default;
+  const injectGlobalHookSource = require("./installHook.raw.js").default;
   const reactDevtoolsBackendSource = require("./react_devtools_backend.raw.js").default;
 
   await evaluateNoArgsFunction(ThreadFront, replayClient, mutateWindowForSetup);
