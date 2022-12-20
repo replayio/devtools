@@ -15,6 +15,7 @@ export const {
   [pauseId: PauseId, frameId: FrameId],
   PointDescription[] | undefined
 >(
+  "FrameStepsCache: getFrameSteps",
   async (client, pauseId, frameId) => {
     try {
       const frameSteps = await client.getFrameSteps(pauseId, frameId);

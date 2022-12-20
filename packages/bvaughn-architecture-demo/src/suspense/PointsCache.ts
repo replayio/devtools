@@ -254,7 +254,7 @@ export function getClosestPointForTimeSuspense(
   // Otherwise let's fetch the closest points for this time.
   let wakeable = timeToInFlightRequestMap.get(time);
   if (wakeable == null) {
-    wakeable = createWakeable<ExecutionPoint>();
+    wakeable = createWakeable<ExecutionPoint>(`getClosestPointForTimeSuspense time: ${time}`);
 
     timeToInFlightRequestMap.set(time, wakeable);
 
@@ -287,7 +287,9 @@ export function getHitPointsForLocationSuspense(
   const key = getKey(location, condition, focusRange);
   let record = locationToHitPointsMap.get(key);
   if (record == null) {
-    const wakeable = createWakeable<HitPointsAndStatusTuple>();
+    const wakeable = createWakeable<HitPointsAndStatusTuple>(
+      `getHitPointsForLocationSuspense: ${key}`
+    );
 
     record = {
       status: STATUS_PENDING,
@@ -341,7 +343,12 @@ export async function imperativelyGetClosestPointForTime(
   // Next try asking the backend for a match and cache it.
   // Note that the backend may throw an error if this time isn't within a loaded region.
   try {
-    await fetchPointsBoundingTime(client, time, createWakeable<ExecutionPoint>(), true);
+    await fetchPointsBoundingTime(
+      client,
+      time,
+      createWakeable<ExecutionPoint>(`imperativelyGetClosestPointForTime time: ${time}`),
+      true
+    );
     return cachedPointsForTime.get(time)!;
   } catch (error) {
     if (!isCommandError(error, ProtocolError.RecordingUnloaded)) {
@@ -385,6 +392,7 @@ export const {
   getValueAsync: getPointsBoundingTimeAsync,
   getValueIfCached: getPointsBoundingTimeIfCached,
 } = createGenericCache2<ReplayClientInterface, [time: number], PointsBoundingTime>(
+  "PointsCache: getPointsBoundingTime",
   async (client, time) => client.getPointsBoundingTime(time),
   time => `${time}`
 );

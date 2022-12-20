@@ -91,7 +91,11 @@ export function getExceptionsSuspense(
 
   if (shouldFetch) {
     inFlightFocusRange = focusRange;
-    inFlightWakeable = createWakeable();
+    inFlightWakeable = createWakeable(
+      `getExceptionsSuspense: ${
+        focusRange ? `${focusRange.begin.point}-${focusRange.end.point}` : "-"
+      }`
+    );
 
     fetchExceptions(client);
 

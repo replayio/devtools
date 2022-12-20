@@ -24,7 +24,7 @@ export function getCommentListSuspense(
 ): Comment[] {
   const commentRecord = getCacheForType(createCommentRecord);
   if (commentRecord.record === null) {
-    const wakeable = createWakeable<Comment[]>();
+    const wakeable = createWakeable<Comment[]>("getCommentListSuspense");
 
     commentRecord.record = {
       status: STATUS_PENDING,

@@ -48,7 +48,9 @@ export function getEventCategoryCountsSuspense(client: ReplayClientInterface): E
   }
 
   if (inProgressEventCategoryCountsWakeable === null) {
-    inProgressEventCategoryCountsWakeable = createWakeable<EventCategory[]>();
+    inProgressEventCategoryCountsWakeable = createWakeable<EventCategory[]>(
+      "getEventCategoryCountsSuspense"
+    );
 
     fetchEventCategoryCounts(client);
   }
@@ -64,7 +66,7 @@ export function getEventTypeEntryPointsSuspense(
   if (record == null) {
     record = {
       status: STATUS_PENDING,
-      value: createWakeable<EventLog[]>(),
+      value: createWakeable<EventLog[]>("getEventTypeEntryPointsSuspense"),
     };
 
     eventTypeToEntryPointMap.set(eventType, record);

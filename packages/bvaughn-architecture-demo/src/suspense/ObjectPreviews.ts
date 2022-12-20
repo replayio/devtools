@@ -123,7 +123,9 @@ export function getObjectWithPreviewSuspense(
 
   let record = recordMap.get(objectId);
   if (record == null) {
-    const wakeable = createWakeable<Object>();
+    const wakeable = createWakeable<Object>(
+      `getObjectWithPreviewSuspense objectId: ${objectId} and pauseId: ${pauseId}`
+    );
 
     record = {
       status: STATUS_PENDING,
@@ -178,7 +180,9 @@ export function getObjectPropertySuspense(
 
   let record = recordMap.get(key);
   if (record == null) {
-    const wakeable = createWakeable<ProtocolValue>();
+    const wakeable = createWakeable<ProtocolValue>(
+      `getObjectProperty objectId: ${objectId} and pauseId: ${pauseId} and propertyName: ${propertyName}`
+    );
 
     record = {
       status: STATUS_PENDING,
