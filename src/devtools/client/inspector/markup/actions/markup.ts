@@ -5,6 +5,7 @@ import { getPauseId, paused } from "devtools/client/debugger/src/reducers/pause"
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { Deferred, assert, defer } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
+import { ProtocolError, isCommandError } from "shared/utils/error";
 import type { UIStore, UIThunkAction } from "ui/actions";
 import { isInspectorSelected } from "ui/reducers/app";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
@@ -143,12 +144,14 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
       try {
         await loadNewDocument();
       } catch (error) {
-        console.error(error);
-
-        // This error may indicate that the document is not available at the current execution point.
-        // In that case, we should inform the user (rather than remaining in a visual loading state).
-        // When the execution point changes we will try again.
-        dispatch(updateLoadingFailed(true));
+        if (isCommandError(error, ProtocolError.DocumentIsUnavailable)) {
+          // The document is not available at the current execution point.
+          // We should inform the user (rather than remaining in a visual loading state).
+          // When the execution point changes we will try again.
+          dispatch(updateLoadingFailed(true));
+        } else {
+          throw error;
+        }
       }
     },
   });
