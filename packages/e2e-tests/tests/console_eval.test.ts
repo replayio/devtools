@@ -6,7 +6,6 @@ import {
   openConsolePanel,
   warpToMessage,
 } from "../helpers/console-panel";
-import { seekToPreviousScreenshot } from "../helpers/timeline";
 
 const url = "doc_rr_basic.html";
 
