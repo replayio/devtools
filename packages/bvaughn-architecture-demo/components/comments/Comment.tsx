@@ -12,7 +12,6 @@ import Icon from "bvaughn-architecture-demo/components/Icon";
 import CommentEditor from "bvaughn-architecture-demo/components/lexical/CommentEditor";
 import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
 import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
-import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import {
   addCommentReply as addCommentReplyGraphQL,
   deleteComment as deleteCommentGraphQL,
@@ -23,6 +22,7 @@ import {
 import { Comment, CommentSourceLocation, User } from "bvaughn-architecture-demo/src/graphql/types";
 import { formatRelativeTime } from "bvaughn-architecture-demo/src/utils/time";
 
+import CommentPreview from "./CommentPreview";
 import styles from "./Comment.module.css";
 
 export default function CommentRenderer({ comment }: { comment: Comment }) {
@@ -69,6 +69,8 @@ export default function CommentRenderer({ comment }: { comment: Comment }) {
       primaryLabel={comment.primaryLabel || null}
       secondaryLabel={comment.secondaryLabel || null}
       sourceLocation={comment.sourceLocation}
+      type={comment.type}
+      typeData={comment.typeData}
     >
       {comment.replies.map(reply => {
         const deleteCommentReplyCallback = async () => {
@@ -99,6 +101,8 @@ export default function CommentRenderer({ comment }: { comment: Comment }) {
             primaryLabel={null}
             secondaryLabel={null}
             sourceLocation={null}
+            type={null}
+            typeData={null}
           />
         );
       })}
@@ -125,6 +129,8 @@ function EditableRemark({
   primaryLabel,
   secondaryLabel,
   sourceLocation,
+  type,
+  typeData,
 }: {
   children?: ReactNode;
   className: string;
@@ -138,6 +144,8 @@ function EditableRemark({
   primaryLabel: string | null;
   secondaryLabel: string | null;
   sourceLocation: CommentSourceLocation | null;
+  type: string | null;
+  typeData: any | null;
 }) {
   const { currentUserInfo } = useContext(SessionContext);
   const invalidateCache = useCacheRefresh();
@@ -214,12 +222,7 @@ function EditableRemark({
         )}
       </div>
 
-      <CommentPreview
-        networkRequestId={networkRequestId}
-        primaryLabel={primaryLabel}
-        secondaryLabel={secondaryLabel}
-        sourceLocation={sourceLocation}
-      />
+      <CommentPreview type={type} typeData={typeData} />
 
       <div className={styles.ContentWrapper} onDoubleClick={startEditing}>
         <CommentEditor
@@ -281,74 +284,4 @@ function DeleteWithConfirmationButton({
       </button>
     );
   }
-}
-
-function CommentPreview({
-  networkRequestId,
-  primaryLabel,
-  secondaryLabel,
-  sourceLocation,
-}: {
-  networkRequestId: string | null;
-  primaryLabel: string | null;
-  secondaryLabel: string | null;
-  sourceLocation: CommentSourceLocation | null;
-}) {
-  const { openSource } = useContext(SourcesContext);
-
-  if (primaryLabel === null && secondaryLabel === null) {
-    return null;
-  }
-
-  if (sourceLocation !== null || networkRequestId !== null) {
-    const onClick = () => {
-      if (sourceLocation) {
-        const { line: lineNumber, sourceId } = sourceLocation;
-
-        const lineIndex = lineNumber - 1;
-
-        openSource("view-source", sourceId, lineIndex, lineIndex);
-      }
-    };
-
-    return (
-      <div className={styles.Labels} onClick={onClick}>
-        {primaryLabel && <div className={styles.PrimaryLabel}>{primaryLabel}</div>}
-        {secondaryLabel && (
-          <div
-            className={styles.SecondaryLabel}
-            dangerouslySetInnerHTML={{ __html: secondaryLabel }}
-          />
-        )}
-      </div>
-    );
-  } else if (typeof secondaryLabel === "string" && secondaryLabel.startsWith("data:image")) {
-    let indicatorLeft: string | null = null;
-    let indicatorTop: string | null = null;
-    if (typeof primaryLabel === "string") {
-      try {
-        const coordinates = JSON.parse(primaryLabel);
-        indicatorLeft = `${coordinates.x * 100}%`;
-        indicatorTop = `${coordinates.y * 100}%`;
-      } catch (error) {}
-    }
-
-    return (
-      <div className={styles.OuterImageContainer}>
-        <div className={styles.InnerImageContainer}>
-          <img className={styles.Image} src={secondaryLabel} />
-
-          {indicatorLeft !== null && indicatorTop !== null && (
-            <Icon
-              className={styles.PositionIndicator}
-              style={{ left: indicatorLeft, top: indicatorTop }}
-              type="comment"
-            />
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  return null;
 }

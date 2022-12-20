@@ -25,7 +25,7 @@ export function getSourceFileName(
   return fileName;
 }
 
-function getSourceFileNameFromUrl(url: string): string | null {
+export function getSourceFileNameFromUrl(url: string): string | null {
   let fileName = url.split("/")?.pop();
   if (fileName == "") {
     fileName = "(index)";

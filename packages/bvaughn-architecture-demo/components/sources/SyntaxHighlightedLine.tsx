@@ -11,7 +11,6 @@ import styles from "./SyntaxHighlightedLine.module.css";
 type Props = { code: string; className?: string; fileExtension?: string };
 
 export default function SyntaxHighlightedLine({ className = "", code, fileExtension }: Props) {
-  console.log('SyntaxHighlightedLine: "' + code + '"');
   return (
     <Suspense fallback={<Loader />}>
       <SyntaxHighlightedLineSuspends

@@ -48,6 +48,8 @@ export interface GetComments_recording_comments {
   networkRequestId: string | null;
   user: GetComments_recording_comments_user | null;
   replies: GetComments_recording_comments_replies[];
+  type: string | null;
+  typeData: any | null;
 }
 
 export interface GetComments_recording {

@@ -19,6 +19,8 @@ export interface AddCommentInput {
   secondaryLabel?: string | null;
   sourceLocation?: any | null;
   time: number;
+  type?: string | null;
+  typeData?: any | null;
 }
 
 export interface AddCommentReplyInput {

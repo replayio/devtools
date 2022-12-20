@@ -41,7 +41,7 @@ class CommentMarker extends React.Component<CommentMarkerProps> {
     e.stopPropagation();
     const { comment, seekToComment } = this.props;
     trackEvent("timeline.comment_select");
-    seekToComment(comment, false);
+    seekToComment(comment, comment.sourceLocation, false);
   };
 
   render() {

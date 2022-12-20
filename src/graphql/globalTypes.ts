@@ -10,7 +10,7 @@
 export interface AddCommentInput {
   content: string;
   hasFrames: boolean;
-  isPublished?: boolean | null;
+  isPublished: boolean;
   networkRequestId?: string | null;
   point: string;
   position?: any | null;
@@ -19,12 +19,14 @@ export interface AddCommentInput {
   secondaryLabel?: string | null;
   sourceLocation?: any | null;
   time: number;
+  type?: string | null;
+  typeData?: any | null;
 }
 
 export interface AddCommentReplyInput {
   commentId: string;
   content: string;
-  isPublished?: boolean | null;
+  isPublished: boolean;
 }
 
 //==============================================================

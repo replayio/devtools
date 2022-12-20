@@ -42,6 +42,8 @@ export interface CommentSourceLocation {
   sourceId: string;
 }
 
+export type CommentType = "source-code" | "network-request" | "visual";
+
 interface Remark {
   content: string;
   createdAt: string;
@@ -66,6 +68,8 @@ export interface Comment extends Remark {
   primaryLabel?: string;
   replies: Reply[];
   secondaryLabel?: string;
+  type: string | null;
+  typeData: any | null;
 }
 
 export interface Reply extends Remark {
