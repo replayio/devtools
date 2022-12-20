@@ -11680,7 +11680,16 @@
         if (renderer == null) {
           console.warn(`Invalid renderer id "${rendererID}" for element "${id}"`);
         } else {
-          this._bridge.send('inspectedElement', renderer.inspectElement(requestID, id, path, forceFullData)); // When user selects an element, stop trying to restore the selection,
+          // window.logMessage("Sending inspectElement: ");
+          let result;
+          try {
+            result = renderer.inspectElement(requestID, id, path, forceFullData);
+            // window.logMessage("inspectElement result: " + JSON.stringify(result))
+          } catch (err) {
+            window.logMessage("inspectElement error: " + err);
+          }
+          
+          this._bridge.send('inspectedElement', result); // When user selects an element, stop trying to restore the selection,
           // and instead remember the current selection for the next reload.
   
   
@@ -11689,7 +11698,7 @@
             this._persistedSelectionMatch = null;
             renderer.setTrackedPath(null);
   
-            this._throttledPersistSelection(rendererID, id);
+            // this._throttledPersistSelection(rendererID, id);
           } // TODO: If there was a way to change the selected DOM element
           // in native Elements tab without forcing a switch to it, we'd do it here.
           // For now, it doesn't seem like there is a way to do that:

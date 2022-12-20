@@ -122,7 +122,6 @@ class ReplayWall implements Wall {
         }
 
         case "highlightNativeElement": {
-          return;
           const { rendererID, id } = payload;
 
           if (this.highlightedElementId) {
@@ -145,14 +144,12 @@ class ReplayWall implements Wall {
         }
 
         case "clearNativeElementHighlight": {
-          return;
           this.unhighlightNode();
           this.highlightedElementId = undefined;
           break;
         }
 
         case "startInspectingNative": {
-          return;
           this.initializePicker();
 
           const boundingRects = await this.fetchMouseTargetsForPause();
