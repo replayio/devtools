@@ -1979,7 +1979,6 @@
     }
   
     function onCommitFiberRoot(rendererID, root, priorityLevel) {
-      // window.logMessage("hook onCommitFiberRoot");
       const mountedRoots = hook.getFiberRoots(rendererID);
       const current = root.current;
       const isKnownRoot = mountedRoots.has(root);
@@ -2093,7 +2092,7 @@
       // which in turn enables the profiler to dim or filter internal frames.
       getInternalModuleRanges,
       registerInternalModuleStart,
-      registerInternalModuleStop,
+      registerInternalModuleStop
     };
   
     if (false) {}
@@ -8588,14 +8587,12 @@
     }
   
     function flushPendingEvents(root) {
-      window.logMessage("Hook flushPendingEvents()");
       // Add any pending errors and warnings to the operations array.
       // We do this just before flushing, so we can ignore errors for no-longer-mounted Fibers.
       recordPendingErrorsAndWarnings();
   
   
       if (shouldBailoutWithPendingOperations()) {
-        window.logMessage("Hook bailing out");
         // If we aren't profiling, we can just bail out here.
         // No use sending an empty update over the bridge.
         //
@@ -9281,7 +9278,6 @@
     }
   
     function flushInitialOperations() {
-      // window.logMessage("flushInitialOperations()")
       const localPendingOperationsQueue = pendingOperationsQueue;
       pendingOperationsQueue = null;
   
@@ -9300,7 +9296,6 @@
   
   
         hook.getFiberRoots(rendererID).forEach(root => {
-          // window.logMessage("fIO(): fiberRoot")
           currentRootID = getOrGenerateFiberID(root.current);
           setRootPseudoKey(currentRootID, root.current); // Handle multi-renderer edge-case where only some v16 renderers support profiling.
   
@@ -9391,8 +9386,6 @@
           passiveEffectDuration: null
         };
       }
-  
-      // window.logMessage("handleCommitFiberRoot");
   
       if (alternate) {
         // TODO: relying on this seems a bit fishy.

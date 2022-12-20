@@ -6939,7 +6939,6 @@
     // Once this method has been called for a Fiber, untrackFiberID() should always be called later to avoid leaking.
   
     function getPersistentID(obj) {
-      // @ts-ignore
       const id = __RECORD_REPLAY_ARGUMENTS__.getPersistentId(obj);
       if (!id) {
         throw new Error(`Missing persistent ID for fiber ${obj} ${obj.constructor}`);
@@ -6961,7 +6960,6 @@
   
     function getOrGenerateFiberID(fiber) {
       let id = null;
-      // window.logMessage("getOrGenerateFiberID(): " + fiber.key)
   
       if (fiberToIDMap.has(fiber)) {
         id = fiberToIDMap.get(fiber);
@@ -6980,11 +6978,7 @@
       if (id === null) {
         didGenerateID = true;
         id = getFiberID(fiber);
-        // if (id == null) {
-        //   id = Object(utils["p" /* getUID */])();
-        // }
       } // This refinement is for Flow purposes only.
-  
   
       const refinedID = id; // Make sure we're tracking this Fiber
       // e.g. if it just mounted or an error was logged during initial render.
@@ -7029,10 +7023,6 @@
   
   
     function getFiberIDUnsafe(fiber) {
-      // const persistentFiberID = getFiberID(fiber);
-      // return persistentFiberID;
-  
-      // window.logMessage("getFiberIDUnsafe: " + fiberToIDMap.size)
       if (fiberToIDMap.has(fiber)) {
         return fiberToIDMap.get(fiber);
       } else {
@@ -7447,13 +7437,10 @@
         }
       }
   
-      // window.logMessage("shouldBailout: " + JSON.stringify({pendingOps: pendingOperations.length, pendingUnmounts: pendingRealUnmountedIDs.length, pendingSims: pendingSimulatedUnmountedIDs.length, pendingID: pendingUnmountedRootID}))
-  
       return pendingOperations.length === 0 && pendingRealUnmountedIDs.length === 0 && pendingSimulatedUnmountedIDs.length === 0 && pendingUnmountedRootID === null;
     }
   
     function flushOrQueueOperations(operations) {
-      // window.logMessage("flushOrQueueOperations(): " + operations.length)
       if (shouldBailoutWithPendingOperations()) {
         return;
       }
@@ -7582,7 +7569,6 @@
     }
   
     function flushPendingEvents(root) {
-      // window.logMessage("RDT flushPendingEvents()")
       // Add any pending errors and warnings to the operations array.
       // We do this just before flushing, so we can ignore errors for no-longer-mounted Fibers.
       recordPendingErrorsAndWarnings();
@@ -7590,7 +7576,6 @@
   
       if (shouldBailoutWithPendingOperations()) {
         // If we aren't profiling, we can just bail out here.
-        // window.logMessage("Bailing out of pending operations");
         // No use sending an empty update over the bridge.
         //
         // The Profiler stores metadata for each commit and reconstructs the app tree per commit using:
@@ -7785,7 +7770,6 @@
     }
   
     function recordUnmount(fiber, isSimulated) {
-      // ("RDT recordUnmount()");
       if (constants["s" /* __DEBUG__ */]) {
         debug('recordUnmount()', fiber, null, isSimulated ? 'unmount is simulated' : '');
       }
@@ -7799,10 +7783,8 @@
         }
       }
   
-      // const unsafeID = getFiberIDUnsafe(fiber);
       const persistentID =  getFiberID(fiber);
       const unsafeID = persistentID;
-      // window.logMessage(`recordUnmount: fiber = ${getDisplayNameForFiber(fiber)}, fiber ID = ${unsafeID}, persistent ID = ${persistentID}`);
   
       if (unsafeID === null) {
         // If we've never seen this Fiber, it might be inside of a legacy render Suspense fragment (so the store is not even aware of it).
@@ -7830,14 +7812,10 @@
         if (isSimulated) {
           pendingSimulatedUnmountedIDs.push(id);
         } else {
-          // window.logMessage("Pushing pending unmounted: " + id);
           pendingRealUnmountedIDs.push(id);
         }
-      } else {
-        // window.logMessage("Not tracking unmounted fiber: " + id);
       }
   
-      // window.logMessage("fiber needs remount: " + fiber._debugNeedsRemount)
       if (!fiber._debugNeedsRemount) {
         untrackFiberID(fiber);
         const isProfilingSupported = fiber.hasOwnProperty('treeBaseDuration');
@@ -7850,8 +7828,6 @@
     }
   
     function mountFiberRecursively(firstChild, parentFiber, traverseSiblings, traceNearestHostComponentUpdate) {
-      // window.logMessage("RDT mountFiberRecursively()");
-  
       // Iterate over siblings rather than recursing.
       // This reduces the chance of stack overflow for wide trees (e.g. lists with many items).
       let fiber = firstChild;
@@ -7859,12 +7835,7 @@
       while (fiber !== null) {
         // Generate an ID even for filtered Fibers, in case it's needed later (e.g. for Profiling).
         getOrGenerateFiberID(fiber);
-  
-        
-      const type = getDisplayNameForFiber(fiber);
-  
-      // window.logMessage(`mountFiberRecursively(): ${type}, ${type === "button" ? JSON.stringify(fiber.memoizedProps.children) : ''}`)
-  
+
         if (constants["s" /* __DEBUG__ */]) {
           debug('mountFiberRecursively()', fiber, parentFiber);
         } // If we have the tree selection from previous reload, try to match this Fiber.
@@ -7937,7 +7908,6 @@
   
   
     function unmountFiberChildrenRecursively(fiber) {
-      // window.logMessage("RDT unmountFiberChildrenRecursively()");
       if (constants["s" /* __DEBUG__ */]) {
         debug('unmountFiberChildrenRecursively()', fiber);
       } // We might meet a nested Suspense on our way.
@@ -8089,46 +8059,10 @@
         }
       }
     } // Returns whether closest unfiltered fiber parent needs to reset its child list.
-  
-    // function stringify(obj, replacer, spaces, cycleReplacer) {
-    //   return JSON.stringify(obj, serializer(replacer, cycleReplacer), spaces)
-    // }
-  
-    function stringify(val, depth, replacer, space) {
-      depth = isNaN(+depth) ? 1 : depth;
-      function _build(key, val, depth, o, a) { // (JSON.stringify() has it's own rules, which we respect here by using it for property iteration)
-          return !val || typeof val != 'object' ? val : (a=Array.isArray(val), JSON.stringify(val, function(k,v){ if (a || depth > 0) { if (replacer) v=replacer(k,v); if (!k) return (a=Array.isArray(v),val=v); !o && (o=a?[]:{}); o[k] = _build(k, v, a?depth:depth-1); } }), o||(a?[]:{}));
-      }
-      return JSON.stringify(_build('', val, depth), serializer(), space);
-  }
-    
-    function serializer(replacer, cycleReplacer) {
-      var stack = [], keys = []
-    
-      if (cycleReplacer == null) cycleReplacer = function(key, value) {
-        if (stack[0] === value) return "[Circular ~]"
-        return "[Circular ~." + keys.slice(0, stack.indexOf(value)).join(".") + "]"
-      }
-    
-      return function(key, value) {
-        if (stack.length > 0) {
-          var thisPos = stack.indexOf(this)
-          ~thisPos ? stack.splice(thisPos + 1) : stack.push(this)
-          ~thisPos ? keys.splice(thisPos, Infinity, key) : keys.push(key)
-          if (~stack.indexOf(value)) value = cycleReplacer.call(this, key, value)
-        }
-        else stack.push(value)
-    
-        return replacer == null ? value : replacer.call(this, key, value)
-      }
-    }
+
   
     function updateFiberRecursively(nextFiber, prevFiber, parentFiber, traceNearestHostComponentUpdate) {
       const id = getOrGenerateFiberID(nextFiber);
-  
-      const type = nextFiber.type?.name ?? nextFiber?.type?.toString()
-  
-      // window.logMessage(`updateFiberRecursively(): ${type}, ${type === "button" ? JSON.stringify(nextFiber.memoizedProps.children) : ''}`)
   
       if (constants["s" /* __DEBUG__ */]) {
         debug('updateFiberRecursively()', nextFiber, parentFiber);
@@ -8327,7 +8261,6 @@
     }
   
     function flushInitialOperations() {
-      // window.logMessage("RDT flushInitialOperations()")
       const localPendingOperationsQueue = pendingOperationsQueue;
       pendingOperationsQueue = null;
   
@@ -8335,7 +8268,6 @@
         // We may have already queued up some operations before the frontend connected
         // If so, let the frontend know about them.
         localPendingOperationsQueue.forEach(operations => {
-          // window.logMessage("RDT flushing pending operations");
           hook.emit('operations', operations);
         });
       } else {
@@ -8346,7 +8278,6 @@
         } // If we have not been profiling, then we can just walk the tree and build up its current state as-is.
   
         hook.getFiberRoots(rendererID).forEach(root => {
-          // window.logMessage("RDT fiberRoot");
           currentRootID = getOrGenerateFiberID(root.current);
           setRootPseudoKey(currentRootID, root.current); // Handle multi-renderer edge-case where only some v16 renderers support profiling.
   
@@ -8402,7 +8333,6 @@
     }
   
     function handleCommitFiberRoot(root, priorityLevel) {
-      // window.logMessage("RDT handleCommitFiberRoot")
       const current = root.current;
       const alternate = current.alternate; // Flush any pending Fibers that we are untracking before processing the new commit.
       // If we don't do this, we might end up double-deleting Fibers in some cases (like Legacy Suspense).
@@ -8446,7 +8376,6 @@
         const isMounted = current.memoizedState != null && current.memoizedState.element != null && // A dehydrated root is not considered mounted
         current.memoizedState.isDehydrated !== true;
   
-        // window.logMessage("alternate: " + JSON.stringify({isMounted, wasMounted}))
         if (!wasMounted && isMounted) {
           // Mount a new root.
           setRootPseudoKey(currentRootID, current);
@@ -8460,7 +8389,6 @@
           recordUnmount(current, false);
         }
       } else {
-        // window.logMessage("Mounting new root");
         // Mount a new root.
         setRootPseudoKey(currentRootID, current);
         mountFiberRecursively(current, null, false, false);
@@ -8957,6 +8885,7 @@
       const typeSymbol = getTypeSymbol(type);
       let canViewSource = false;
       let context = null;
+
   
       if (tag === ClassComponent || tag === FunctionComponent || tag === IncompleteClassComponent || tag === IndeterminateComponent || tag === MemoComponent || tag === ForwardRef || tag === SimpleMemoComponent) {
         canViewSource = true;
@@ -8999,6 +8928,7 @@
         }
       }
   
+      
       let hasLegacyContext = false;
   
       if (context !== null) {
@@ -9049,6 +8979,8 @@
           }
         }
       }
+
+      
   
       let rootType = null;
       let current = fiber;
@@ -9130,7 +9062,9 @@
         rendererVersion: renderer.version,
         plugins
       };
-    }
+  }
+
+    
   
     let mostRecentlyInspectedElement = null;
     let hasElementUpdatedSinceLastInspected = false;
@@ -9284,7 +9218,7 @@
       if (path !== null) {
         mergeInspectedPaths(path);
       }
-  
+
       if (isMostRecentlyInspectedElement(id) && !forceFullData) {
         if (!hasElementUpdatedSinceLastInspected) {
           if (path !== null) {
@@ -9318,6 +9252,8 @@
       }
   
       hasElementUpdatedSinceLastInspected = false;
+
+
   
       try {
         mostRecentlyInspectedElement = inspectElementRaw(id);
@@ -11680,18 +11616,8 @@
         if (renderer == null) {
           console.warn(`Invalid renderer id "${rendererID}" for element "${id}"`);
         } else {
-          // window.logMessage("Sending inspectElement: ");
-          let result;
-          try {
-            result = renderer.inspectElement(requestID, id, path, forceFullData);
-            // window.logMessage("inspectElement result: " + JSON.stringify(result))
-          } catch (err) {
-            window.logMessage("inspectElement error: " + err);
-          }
-          
-          this._bridge.send('inspectedElement', result); // When user selects an element, stop trying to restore the selection,
+          this._bridge.send('inspectedElement', renderer.inspectElement(requestID, id, path, forceFullData)); // When user selects an element, stop trying to restore the selection,
           // and instead remember the current selection for the next reload.
-  
   
           if (this._persistedSelectionMatch === null || this._persistedSelectionMatch.id !== id) {
             this._persistedSelection = null;
@@ -11704,7 +11630,6 @@
           // For now, it doesn't seem like there is a way to do that:
           // https://github.com/bvaughn/react-devtools-experimental/issues/102
           // (Setting $0 doesn't work, and calling inspect() switches the tab.)
-  
         }
       });
   
@@ -12164,22 +12089,21 @@
       bridge.send('isSynchronousXHRSupported', Object(utils["i" /* isSynchronousXHRSupported */])());
       setupHighlighter(bridge, this);
       TraceUpdates_initialize(this);
+
       window.__RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__ = (inEvent, inData) => {
         let rv;
-        window.logMessage(`Bridge message started: ${inEvent}`);
         this._bridge = {
           send(event, data) {
             rv = { event, data };
           }
         };
         try {
-
           this[inEvent](inData);
         } catch (err) {
           window.logMessage(`Error executing bridge message '${inEvent}': ${err}, ${err.stack}`)
         }
-        window.logMessage(`Bridge message complete: ${inEvent}`);
         return rv;
+      };
       
     }
   
@@ -13268,10 +13192,10 @@
   
   window.addEventListener('message', welcome);
   
-  // window.logMessage("RDT initializing");
+  window.logMessage("RDT initializing");
   
   setup(window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
-  // window.logMessage("RDT setup complete");
+  window.logMessage("RDT setup complete");
   
   function setup(hook) {
     if (hook == null) {
@@ -15966,6 +15890,7 @@
       }
   
       const inspectedElement = inspectElementRaw(id);
+
   
       if (inspectedElement === null) {
         return {
@@ -16390,10 +16315,9 @@
       renderer,
       rendererInterface
     }) => {
+      window.logMessage(`RDT renderer-attached: ${id}`)
       agent.setRendererInterface(id, rendererInterface); // Now that the Store and the renderer interface are connected,
       // it's time to flush the pending operation codes to the frontend.
-  
-      // window.logMessage("sub renderer-attached: flushing operations")
       rendererInterface.flushInitialOperations();
     }), hook.sub('unsupported-renderer-version', id => {
       agent.onUnsupportedRenderer(id);
@@ -16403,8 +16327,6 @@
     const attachRenderer = (id, renderer) => {
       let rendererInterface = hook.rendererInterfaces.get(id); // Inject any not-yet-injected renderers (if we didn't reload-and-profile)
   
-      
-    // window.logMessage("attachRenderer");
       if (rendererInterface == null) {
         if (typeof renderer.findFiberByHostInstance === 'function') {
           // react-reconciler v16+
@@ -16462,7 +16384,6 @@
       agent.removeListener('shutdown', onAgentShutdown);
     });
   
-    // window.logMessage("attach complete");
     return () => {
       subs.forEach(fn => fn());
     };
