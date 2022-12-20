@@ -35,6 +35,7 @@ describe("Generic suspense cache", () => {
 
 function createTestCache() {
   return createGenericCache<[number], number>(
+    "test",
     n => (n % 2 === 0 ? n : Promise.resolve(n)),
     n => `${n}`
   );

@@ -26,6 +26,7 @@ export const {
   ],
   WiredAppliedRule[]
 >(
+  "styleCaches: getAppliedRules",
   async (client, replayClient, sessionId, pauseId, nodeId) => {
     const { rules, data } = await client.CSS.getAppliedRules({ node: nodeId }, sessionId, pauseId);
 
@@ -82,6 +83,7 @@ export const {
   [client: ProtocolClient, sessionId: string, pauseId: PauseId, nodeId: string],
   Map<string, string> | undefined
 >(
+  "styleCaches: getComputedStyle",
   async (client, sessionId, pauseId, nodeId) => {
     try {
       const { computedStyle } = await client.CSS.getComputedStyle(
@@ -113,6 +115,8 @@ export const {
   [client: ProtocolClient, sessionId: string, pauseId: PauseId, nodeId: string],
   DOMRect | undefined
 >(
+  "styleCaches: getBoundingRect",
+
   async (client, sessionId, pauseId, nodeId) => {
     try {
       const { rect } = await client.DOM.getBoundingClientRect(

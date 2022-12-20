@@ -56,6 +56,7 @@ export const {
   ],
   ProtocolObject[]
 >(
+  "nodeCaches: getNodeData",
   async (client, replayClient, sessionId, pauseId, options) => {
     let nodeIds: string[] = [];
     let pauseData = null as PauseData | null;
@@ -181,6 +182,7 @@ export const {
   ],
   EventListener[] | undefined
 >(
+  "nodeCaches: getNodeEventListeners",
   async (client, replayClient, sessionId, pauseId, nodeId) => {
     const { listeners, data } = await client.DOM.getEventListeners(
       {
@@ -201,6 +203,7 @@ export const {
   getValueAsync: getBoundingRectsAsync,
   getValueIfCached: getBoundingRectsIfCached,
 } = createGenericCache<[client: ProtocolClient, sessionId: string, pauseId: PauseId], NodeBounds[]>(
+  "nodeCaches: getBoundingRects",
   async (client, sessionId, pauseId) => {
     const { elements } = await client.DOM.getAllBoundingClientRects({}, sessionId, pauseId);
     return elements;
@@ -216,6 +219,7 @@ export const {
   [client: ProtocolClient, sessionId: string, pauseId: PauseId, nodeId: string],
   BoxModel
 >(
+  "nodeCaches: getBoxModel",
   async (client, sessionId, pauseId, nodeId) => {
     const { model: nodeBoxModel } = await client.DOM.getBoxModel(
       {

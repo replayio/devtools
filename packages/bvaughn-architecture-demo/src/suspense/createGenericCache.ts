@@ -34,10 +34,12 @@ interface HookState<TValue> {
 }
 
 export function createGenericCache<TParams extends Array<any>, TValue>(
+  debugLabel: string,
   fetchValue: (...args: TParams) => Thennable<TValue> | TValue,
   getCacheKey: (...args: TParams) => string
 ): GenericCache<TParams, TValue> {
   const cache = createGenericCache2<undefined, TParams, TValue>(
+    debugLabel,
     (_, ...args) => fetchValue(...args),
     (...args) => getCacheKey(...args)
   );
@@ -50,6 +52,7 @@ export function createGenericCache<TParams extends Array<any>, TValue>(
 }
 
 export function createGenericCache2<TExtra, TParams extends Array<any>, TValue>(
+  debugLabel: string,
   fetchValue: (extra: TExtra, ...args: TParams) => Thennable<TValue> | TValue,
   getCacheKey: (...args: TParams) => string
 ): GenericCache2<TExtra, TParams, TValue> {
@@ -60,7 +63,7 @@ export function createGenericCache2<TExtra, TParams extends Array<any>, TValue>(
 
     let record = recordMap.get(cacheKey);
     if (!record) {
-      const wakeable = createWakeable<TValue>();
+      const wakeable = createWakeable<TValue>(`${debugLabel} ${cacheKey}}`);
       record = {
         status: STATUS_PENDING,
         value: wakeable,

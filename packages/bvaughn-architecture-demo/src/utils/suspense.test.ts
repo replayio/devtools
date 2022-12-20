@@ -12,7 +12,7 @@ describe("Suspense util", () => {
       const onRejectA = jest.fn();
       const onRejectB = jest.fn();
 
-      const wakeable = createWakeable();
+      const wakeable = createWakeable("test");
       wakeable.then(onFulfillA, onRejectA);
       wakeable.then(onFulfillB, onRejectB);
 
@@ -35,7 +35,7 @@ describe("Suspense util", () => {
       const onRejectA = jest.fn();
       const onRejectB = jest.fn();
 
-      const wakeable = createWakeable();
+      const wakeable = createWakeable("test");
       wakeable.then(onFulfillA, onRejectA);
       wakeable.then(onFulfillB, onRejectB);
 
@@ -60,7 +60,7 @@ describe("Suspense util", () => {
         throw Error("Should not be called");
       };
 
-      const wakeable = createWakeable();
+      const wakeable = createWakeable("test");
       wakeable.then(throwsIfCalled, rejectedInitially);
       wakeable.reject(error);
       expect(rejectedInitially).toHaveBeenCalledWith(error);
@@ -80,7 +80,7 @@ describe("Suspense util", () => {
         throw Error("Should not be called");
       };
 
-      const wakeable = createWakeable();
+      const wakeable = createWakeable("test");
       wakeable.then(resolvedInitially, throwsIfCalled);
 
       wakeable.resolve(123);
@@ -98,10 +98,10 @@ describe("Suspense util", () => {
     it("should not allow rejecting or resolving the same wakeable more than once", () => {
       const error = new Error("This is an error");
 
-      const alreadyRejected = createWakeable();
+      const alreadyRejected = createWakeable("test");
       alreadyRejected.reject(error);
 
-      const alreadyResolved = createWakeable();
+      const alreadyResolved = createWakeable("test");
       alreadyResolved.resolve(123);
 
       expect(() => {
@@ -143,26 +143,26 @@ describe("Suspense util", () => {
     });
 
     it("should not throw if count is not exceeded", () => {
-      const wakeable = createWakeable<number>();
+      const wakeable = createWakeable<number>("test");
       wakeable.resolve(123);
       registerSyncListeners(wakeable, 5);
     });
 
     it("should throw if count is exceeded", () => {
-      const wakeable = createWakeable<number>();
+      const wakeable = createWakeable<number>("test");
       wakeable.resolve(123);
       verifyThrows(wakeable, 6);
     });
 
     it("should re-throw if count is exceeded multiple times", () => {
-      const wakeable = createWakeable<number>();
+      const wakeable = createWakeable<number>("test");
       wakeable.resolve(123);
       verifyThrows(wakeable, 6);
       verifyThrows(wakeable, 1);
     });
 
     it("should detect loops that span ticks", async () => {
-      const wakeable = createWakeable<number>();
+      const wakeable = createWakeable<number>("test");
       wakeable.resolve(123);
       registerSyncListeners(wakeable, 3);
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -170,7 +170,7 @@ describe("Suspense util", () => {
     });
 
     it("should detect loops that span ticks variant", async () => {
-      const wakeable = createWakeable<number>();
+      const wakeable = createWakeable<number>("test");
       wakeable.resolve(123);
 
       let caught = null;
@@ -190,10 +190,10 @@ describe("Suspense util", () => {
     });
 
     it("should track loops separately per wakeable", async () => {
-      const wakeableA = createWakeable<number>();
+      const wakeableA = createWakeable<number>("test");
       wakeableA.resolve(123);
 
-      const wakeableB = createWakeable<number>();
+      const wakeableB = createWakeable<number>("test");
       wakeableB.resolve(456);
 
       // Total count exceeds loop but not individually

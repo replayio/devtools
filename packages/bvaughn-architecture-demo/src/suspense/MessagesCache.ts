@@ -118,7 +118,11 @@ export function getMessagesSuspense(
   if (shouldFetch) {
     inFlightFocusRange = focusRange;
 
-    const wakeable = (inFlightWakeable = createWakeable());
+    const wakeable = (inFlightWakeable = createWakeable(
+      `getMessagesSuspense: ${
+        focusRange ? `${focusRange.begin.point}-${focusRange.end.point}` : "-"
+      }`
+    ));
 
     fetchMessages(client, focusRange, wakeable);
 

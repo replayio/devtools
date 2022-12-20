@@ -75,7 +75,7 @@ export function getSourcesSuspense(client: ReplayClientInterface) {
   }
 
   if (inProgressSourcesWakeable === null) {
-    inProgressSourcesWakeable = createWakeable();
+    inProgressSourcesWakeable = createWakeable("getSourcesSuspense");
 
     // Suspense caches fire and forget; errors will be handled within the fetch function.
     fetchSources(client);
@@ -160,7 +160,9 @@ export function getStreamingSourceContentsSuspense(
   if (record == null) {
     record = {
       status: STATUS_PENDING,
-      value: createWakeable<StreamingSourceContents>(),
+      value: createWakeable<StreamingSourceContents>(
+        `getStreamingSourceContentsSuspense sourceId: ${sourceId}`
+      ),
     };
 
     sourceIdToStreamingSourceContentsMap.set(sourceId, record);
@@ -227,7 +229,7 @@ export function getSourceHitCountsSuspense(
   if (record == null) {
     record = {
       status: STATUS_PENDING,
-      value: createWakeable<LineNumberToHitCountMap>(),
+      value: createWakeable<LineNumberToHitCountMap>(`getSourceHitCountsSuspense ${key}`),
     };
 
     hitCountRecordsMap.set(key, record);
@@ -254,6 +256,7 @@ export const {
     breakablePositionsByLine: Map<number, ProtocolSameLineSourceLocations>
   ]
 >(
+  "SourcesCache: getBreakpointPositions",
   async (client, sourceId) => {
     const breakablePositions = await client.getBreakpointPositions(sourceId, null);
 

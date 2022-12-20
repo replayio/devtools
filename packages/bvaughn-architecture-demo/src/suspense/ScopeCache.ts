@@ -19,6 +19,7 @@ export const {
   getValueIfCached: getScopeIfCached,
   addValue: cacheScope,
 } = createGenericCache2<ReplayClientInterface, [pauseId: PauseId, scopeId: ScopeId], Scope>(
+  "ScopeCache: getScope",
   async (client, pauseId, scopeId) => {
     const result = await client.getScope(pauseId, scopeId);
     await client.waitForLoadedSources();
@@ -35,6 +36,7 @@ export const {
   getValueAsync: getFrameScopesAsync,
   getValueIfCached: getFrameScopesIfCached,
 } = createGenericCache2<ReplayClientInterface, [pauseId: PauseId, frameId: FrameId], FrameScopes>(
+  "ScopeCache: getFrameScopes",
   async (client, pauseId, frameId) => {
     const frame = (await getFramesAsync(client, pauseId))?.find(
       frame => frame.frameId === frameId

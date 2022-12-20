@@ -15,6 +15,7 @@ export const {
   [replayClient: ReplayClientInterface, location: ProtocolLocation],
   ProtocolMappedLocation
 >(
+  "MappedLocationCache: getMappedLocation",
   (client, location) => client.getMappedLocation(location),
   (client, location) => `${location.sourceId}:${location.line}:${location.column}`
 );
