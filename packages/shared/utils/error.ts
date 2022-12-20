@@ -4,10 +4,11 @@ export interface CommandError extends Error {
 }
 
 export enum ProtocolError {
+  DocumentIsUnavailable = 45,
+  LinkerDoesNotSupportAction = 48,
   RecordingUnloaded = 38,
   TooManyLocationsToPerformAnalysis = 67,
   TooManyPoints = 55,
-  LinkerDoesNotSupportAction = 48,
 }
 
 export const commandError = (message: string, code: number): CommandError => {
