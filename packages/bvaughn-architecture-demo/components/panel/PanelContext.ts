@@ -1,11 +1,11 @@
-import { CSSProperties, DragEventHandler, createContext } from "react";
+import { CSSProperties, createContext } from "react";
 
-import { Panel, PanelId } from "./types";
+import { Panel, PanelId, ResizeHandler } from "./types";
 
 export type PanelContextType = {
   direction: "horizontal" | "vertical";
   getPanelStyle: (id: PanelId) => CSSProperties;
-  registerResizeHandle: (idBefore: PanelId, idAfter: PanelId) => DragEventHandler<HTMLDivElement>;
+  registerResizeHandle: (idBefore: PanelId, idAfter: PanelId) => ResizeHandler;
   registerPanel: (id: PanelId, panel: Panel) => void;
 };
 

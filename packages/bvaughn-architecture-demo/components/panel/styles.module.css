@@ -19,8 +19,8 @@
 }
 
 .HorizontalPanelGroup .HandleEnabled {
-  cursor: col-resize;
+  cursor: ew-resize;
 }
 .VerticalPanelGroup .HandleEnabled {
-  cursor: row-resize;
+  cursor: ns-resize;
 }

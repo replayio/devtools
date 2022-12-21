@@ -7,7 +7,4 @@ export type Panel = {
   minWeight: number;
 };
 
-export type ResizeHandler = {
-  idAfter: PanelId;
-  idBefore: PanelId;
-};
+export type ResizeHandler = (event: MouseEvent) => void;

@@ -1,6 +1,5 @@
 import {
   CSSProperties,
-  DragEvent,
   ReactNode,
   useCallback,
   useLayoutEffect,
@@ -27,7 +26,7 @@ type State = {
   direction: "horizontal" | "vertical";
   panels: Panel[];
   // 0-1 values representing the relative size of each panel.
-  positions: number[];
+  sizes: number[];
 };
 
 function PanelGroup({ children, className = "", direction, height, width }: Props) {
@@ -39,7 +38,7 @@ function PanelGroup({ children, className = "", direction, height, width }: Prop
   const [state, setState] = useState<State>({
     direction,
     panels: [],
-    positions: [],
+    sizes: [],
   });
 
   // Share the latest (committed) state with callbacks to avoid unnecessarily re-creating them.
@@ -48,8 +47,14 @@ function PanelGroup({ children, className = "", direction, height, width }: Prop
     stateRef.current = state;
   }, [state]);
 
+  const sizeRef = useRef({ height, width });
+  useLayoutEffect(() => {
+    sizeRef.current.height = height;
+    sizeRef.current.width = width;
+  }, [height, width]);
+
   // Once all panels have registered themselves,
-  // Compute the initial positions based on default weights.
+  // Compute the initial sizes based on default weights.
   // This assumes that panels register during initial mount (no conditional rendering)!
   useLayoutEffect(() => {
     const panels = panelsRef.current;
@@ -58,60 +63,37 @@ function PanelGroup({ children, className = "", direction, height, width }: Prop
       return weight + panel.defaultWeight;
     }, 0);
 
-    const positions = panels.map(panel => panel.defaultWeight / totalWeight);
+    const sizes = panels.map(panel => panel.defaultWeight / totalWeight);
 
     setState(prevState => ({
       ...prevState,
       panels,
-      positions,
+      sizes,
     }));
   }, []);
 
   const getPanelStyle = useCallback(
-    (id: PanelId) => {
-      const index = state.panels.findIndex(panel => panel.id === id);
-      const position = state.positions[index];
-      if (position == null) {
-        return {};
+    (id: PanelId): CSSProperties => {
+      const offset = getOffset(id, state, height, width);
+      const size = getSize(id, state, height, width);
+
+      if (state.direction === "horizontal") {
+        return {
+          height: "100%",
+          position: "absolute",
+          left: offset,
+          top: 0,
+          width: size,
+        };
+      } else {
+        return {
+          height: size,
+          position: "absolute",
+          left: 0,
+          top: offset,
+          width: "100%",
+        };
       }
-
-      const isHorizontal = state.direction === "horizontal";
-
-      let left = 0;
-      let top = 0;
-      const style: CSSProperties = {
-        height,
-        position: "absolute",
-        width,
-      };
-
-      for (let index = 0; index < state.positions.length; index++) {
-        const panel = state.panels[index];
-        const position = state.positions[index];
-        const size = isHorizontal ? position * width : position * height;
-
-        if (panel.id === id) {
-          if (isHorizontal) {
-            style.width = size;
-          } else {
-            style.height = size;
-          }
-
-          break;
-        } else {
-          if (isHorizontal) {
-            left += size;
-          } else {
-            top += size;
-          }
-        }
-      }
-
-      return {
-        ...style,
-        left,
-        top,
-      };
     },
     [height, state, width]
   );
@@ -126,10 +108,10 @@ function PanelGroup({ children, className = "", direction, height, width }: Prop
   }, []);
 
   const registerResizeHandle = useCallback((idBefore: PanelId, idAfter: PanelId) => {
-    return (event: DragEvent<HTMLDivElement>) => {
-      console.log(`onDrag() ${idBefore}-${idAfter} ~ ${event.clientX}x${event.clientY}`);
-
-      const { panels, positions } = stateRef.current;
+    return (event: MouseEvent) => {
+      const { height, width } = sizeRef.current;
+      const state = stateRef.current;
+      const { direction, panels, sizes } = state;
 
       // A resizing panel should only affect panels before it.
       //
@@ -140,11 +122,32 @@ function PanelGroup({ children, className = "", direction, height, width }: Prop
       // In the case of an expanding panel:
       // Only the panel immediately before it will be affected.
 
-      // TODO [panels]
-      // Resize the current panel and resize panel(s) before to make space.
+      const beforeIndex = panels.findIndex(panel => panel.id === idBefore);
+      const afterIndex = panels.findIndex(panel => panel.id === idAfter);
+
+      const prevOffset =
+        getOffset(idAfter, state, height, width) / (direction === "horizontal" ? width : height);
+      const nextOffset =
+        direction === "horizontal" ? event.clientX / width : event.clientY / height;
+
+      const delta = prevOffset - nextOffset;
 
       // TODO [panels]
       // Observe min/max weight values.
+
+      // TODO [panels]
+      // Resize the current panel and resize panel(s) before to make space.
+
+      setState(prevState => {
+        const sizes = prevState.sizes.concat();
+        sizes[beforeIndex] -= delta;
+        sizes[afterIndex] += delta;
+
+        return {
+          ...prevState,
+          sizes,
+        };
+      });
     };
   }, []);
 
@@ -173,3 +176,41 @@ function PanelGroup({ children, className = "", direction, height, width }: Prop
 }
 
 export default withAutoSizer<Props>(PanelGroup);
+
+function getOffset(id: PanelId, state: State, height: number, width: number): number {
+  let index = state.panels.findIndex(panel => panel.id === id);
+  if (index < 0) {
+    return 0;
+  }
+
+  let scaledOffset = 0;
+
+  for (index = index - 1; index >= 0; index--) {
+    const panel = state.panels[index];
+    scaledOffset += getSize(panel.id, state, height, width);
+  }
+
+  return Math.round(scaledOffset);
+}
+
+function getSize(id: PanelId, state: State, height: number, width: number): number {
+  const { direction, panels, sizes } = state;
+
+  const index = panels.findIndex(panel => panel.id === id);
+  const size = sizes[index];
+  if (size == null) {
+    return 0;
+  }
+
+  const totalSize = direction === "horizontal" ? width : height;
+
+  if (panels.length === 1) {
+    return totalSize;
+  } else if (index === panels.length - 1) {
+    // Ensure the last panel always fills the remaining space (no overflow or gap)
+    const offset = getOffset(id, state, height, width);
+    return totalSize - offset;
+  } else {
+    return Math.round(size * totalSize);
+  }
+}
