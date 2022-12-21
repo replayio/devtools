@@ -11,7 +11,7 @@ import {
 import AutoSizer from "react-virtualized-auto-sizer";
 
 import { PanelContext } from "./PanelContext";
-import { Panel, PanelId, ResizeHandler } from "./types";
+import { Panel, PanelId } from "./types";
 import styles from "./styles.module.css";
 
 type Props = {
@@ -40,7 +40,6 @@ function PanelGroup({
   width: number;
 }) {
   const [panels, setPanels] = useState<Panel[]>([]);
-  const [resizeHandlers, setResizeHandlers] = useState<ResizeHandler[]>([]);
   const [weights, setWeights] = useState<Map<string, number>>(new Map());
 
   const weightsRef = useRef<Map<string, number>>(weights);
@@ -132,23 +131,10 @@ function PanelGroup({
   }, []);
 
   const registerResizeHandle = useCallback((idBefore: PanelId, idAfter: PanelId) => {
-    setResizeHandlers(prevResizeHandlers => {
-      const newResizeHandlers = prevResizeHandlers.concat();
-      const index = newResizeHandlers.findIndex(
-        resizeHandler => resizeHandler.idBefore === idBefore && resizeHandler.idAfter === idAfter
-      );
-      if (index >= 0) {
-        newResizeHandlers.splice(index, 1);
-      }
-      newResizeHandlers.push({
-        idAfter,
-        idBefore,
-      });
-      return newResizeHandlers;
-    });
-
     return (event: DragEvent<HTMLDivElement>) => {
       console.log(`onDrag() ${idBefore}-${idAfter} ~ ${event.clientX}x${event.clientY}`);
+
+      const weights = weightsRef.current;
 
       // TODO [panels]
       // Resize the current panel and resize panel(s) before to make space.
@@ -159,16 +145,7 @@ function PanelGroup({
   }, []);
 
   const unregisterResizeHandle = useCallback((idBefore: PanelId, idAfter: PanelId) => {
-    setResizeHandlers(prevResizeHandlers => {
-      const newResizeHandlers = prevResizeHandlers.concat();
-      const index = newResizeHandlers.findIndex(
-        resizeHandler => resizeHandler.idBefore === idBefore && resizeHandler.idAfter === idAfter
-      );
-      if (index >= 0) {
-        newResizeHandlers.splice(index, 1);
-      }
-      return newResizeHandlers;
-    });
+    // No-op for now
   }, []);
 
   const context = useMemo(
