@@ -7,8 +7,6 @@ export type PanelContextType = {
   getPanelStyle: (id: PanelId) => CSSProperties;
   registerResizeHandle: (idBefore: PanelId, idAfter: PanelId) => DragEventHandler<HTMLDivElement>;
   registerPanel: (id: PanelId, panel: Panel) => void;
-  unregisterPanel: (id: PanelId) => void;
-  unregisterResizeHandle: (idBefore: PanelId, idAfter: PanelId) => void;
 };
 
 export const PanelContext = createContext<PanelContextType | null>(null);

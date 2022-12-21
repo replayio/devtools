@@ -22,23 +22,17 @@ export default function PanelResizeHandle({
     throw Error(`PanelResizeHandle components must be rendered within a PanelGroup container`);
   }
 
-  const { registerResizeHandle, unregisterResizeHandle } = context;
+  const { registerResizeHandle } = context;
 
   const [onDrag, setOnDrag] = useState<DragEventHandler<HTMLDivElement> | null>(null);
 
   useEffect(() => {
     if (disabled) {
       setOnDrag(null);
-
-      unregisterResizeHandle(panelBefore, panelAfter);
     } else {
       setOnDrag(() => registerResizeHandle(panelBefore, panelAfter));
-
-      return () => {
-        unregisterResizeHandle(panelBefore, panelAfter);
-      };
     }
-  }, [disabled, panelAfter, panelBefore, registerResizeHandle, unregisterResizeHandle]);
+  }, [disabled, panelAfter, panelBefore, registerResizeHandle]);
 
   return (
     <div

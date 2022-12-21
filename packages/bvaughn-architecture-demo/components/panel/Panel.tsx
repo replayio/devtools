@@ -24,7 +24,7 @@ export default function Panel({
     throw Error(`Panel components must be rendered within a PanelGroup container`);
   }
 
-  const { getPanelStyle, registerPanel, unregisterPanel } = context;
+  const { getPanelStyle, registerPanel } = context;
 
   useLayoutEffect(() => {
     const panel = {
@@ -35,11 +35,7 @@ export default function Panel({
     };
 
     registerPanel(id, panel);
-
-    return () => {
-      unregisterPanel(id);
-    };
-  }, [defaultWeight, maxWeight, minWeight, registerPanel, id, unregisterPanel]);
+  }, [defaultWeight, maxWeight, minWeight, registerPanel, id]);
 
   const style = getPanelStyle(id);
 

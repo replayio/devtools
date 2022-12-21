@@ -20,6 +20,13 @@ type Props = {
   direction: "horizontal" | "vertical";
 };
 
+type State = {
+  direction: "horizontal" | "vertical";
+  panels: Panel[];
+  // 0-1 values representing the relative size of each panel.
+  positions: number[];
+};
+
 export default function AutoSizedPanelGroup(props: Props) {
   return (
     <AutoSizer>
@@ -28,7 +35,6 @@ export default function AutoSizedPanelGroup(props: Props) {
   );
 }
 
-// TODO Persist weights using localStorage
 function PanelGroup({
   children,
   className = "",
@@ -39,31 +45,51 @@ function PanelGroup({
   height: number;
   width: number;
 }) {
-  const [panels, setPanels] = useState<Panel[]>([]);
-  const [weights, setWeights] = useState<Map<string, number>>(new Map());
+  const panelsRef = useRef<Panel[]>([]);
 
-  const weightsRef = useRef<Map<string, number>>(weights);
+  // TODO [panels]
+  // Serialize state to local storage between sessions.
+  // State should include registered panel ids; if those change we should reset persisted state.
+  const [state, setState] = useState<State>({
+    direction,
+    panels: [],
+    positions: [],
+  });
 
+  // Share the latest (committed) state with callbacks to avoid unnecessarily re-creating them.
+  const stateRef = useRef<State>(state);
   useLayoutEffect(() => {
-    // This assumes that all panels register at the same time (during initial mount)
-    // Otherwise it will erase/reset panel weights
-    let totalWeight = 0;
-    panels.forEach(panel => {
-      totalWeight += panel.defaultWeight;
-    });
-    const weights = new Map();
-    panels.forEach(panel => {
-      weights.set(panel.id, panel.defaultWeight / totalWeight);
-    });
-    setWeights(weights);
-  }, [panels]);
+    stateRef.current = state;
+  }, [state]);
+
+  // Once all panels have registered themselves,
+  // Compute the initial positions based on default weights.
+  // This assumes that panels register during initial mount (no conditional rendering)!
+  useLayoutEffect(() => {
+    const panels = panelsRef.current;
+
+    const totalWeight = panels.reduce((weight, panel) => {
+      return weight + panel.defaultWeight;
+    }, 0);
+
+    const positions = panels.map(panel => panel.defaultWeight / totalWeight);
+
+    setState(prevState => ({
+      ...prevState,
+      panels,
+      positions,
+    }));
+  }, []);
 
   const getPanelStyle = useCallback(
     (id: PanelId) => {
-      const weight = weights.get(id);
-      if (weight == null) {
+      const index = state.panels.findIndex(panel => panel.id === id);
+      const position = state.positions[index];
+      if (position == null) {
         return {};
       }
+
+      const isHorizontal = state.direction === "horizontal";
 
       let left = 0;
       let top = 0;
@@ -73,30 +99,27 @@ function PanelGroup({
         width,
       };
 
-      let didBreak = false;
+      for (let index = 0; index < state.positions.length; index++) {
+        const panel = state.panels[index];
+        const position = state.positions[index];
+        const size = isHorizontal ? position * width : position * height;
 
-      weights.forEach((weight, currentUid) => {
-        if (didBreak) {
-          return;
-        }
-
-        const size = direction === "horizontal" ? weight * width : weight * height;
-
-        if (currentUid === id) {
-          if (direction === "horizontal") {
+        if (panel.id === id) {
+          if (isHorizontal) {
             style.width = size;
           } else {
             style.height = size;
           }
-          didBreak = true;
+
+          break;
         } else {
-          if (direction === "horizontal") {
+          if (isHorizontal) {
             left += size;
           } else {
             top += size;
           }
         }
-      });
+      }
 
       return {
         ...style,
@@ -104,48 +127,39 @@ function PanelGroup({
         top,
       };
     },
-    [direction, height, weights, width]
+    [height, state, width]
   );
 
   const registerPanel = useCallback((id: PanelId, panel: Panel) => {
-    setPanels(prevPanels => {
-      const newPanels = prevPanels.concat();
-      const index = newPanels.findIndex(panel => panel.id === id);
-      if (index >= 0) {
-        newPanels.splice(index, 1);
-      }
-      newPanels.push(panel);
-      return newPanels;
-    });
-  }, []);
-
-  const unregisterPanel = useCallback((id: PanelId) => {
-    setPanels(prevPanels => {
-      const newPanels = prevPanels.concat();
-      const index = newPanels.findIndex(panel => panel.id === id);
-      if (index >= 0) {
-        newPanels.splice(index, 1);
-      }
-      return newPanels;
-    });
+    const panels = panelsRef.current;
+    const index = panels.findIndex(panel => panel.id === id);
+    if (index >= 0) {
+      panels.splice(index, 1);
+    }
+    panels.push(panel);
   }, []);
 
   const registerResizeHandle = useCallback((idBefore: PanelId, idAfter: PanelId) => {
     return (event: DragEvent<HTMLDivElement>) => {
       console.log(`onDrag() ${idBefore}-${idAfter} ~ ${event.clientX}x${event.clientY}`);
 
-      const weights = weightsRef.current;
+      const { panels, positions } = stateRef.current;
+
+      // A resizing panel should only affect panels before it.
+      //
+      // In the case of a contracting panel:
+      // It may only affect the panel immediately before it, provided that panel has adequate room to grow.
+      // Otherwise it will affect prior panels as well.
+      //
+      // In the case of an expanding panel:
+      // Only the panel immediately before it will be affected.
 
       // TODO [panels]
       // Resize the current panel and resize panel(s) before to make space.
 
       // TODO [panels]
-      // Account for min/max weight values.
+      // Observe min/max weight values.
     };
-  }, []);
-
-  const unregisterResizeHandle = useCallback((idBefore: PanelId, idAfter: PanelId) => {
-    // No-op for now
   }, []);
 
   const context = useMemo(
@@ -154,17 +168,8 @@ function PanelGroup({
       getPanelStyle,
       registerPanel,
       registerResizeHandle,
-      unregisterPanel,
-      unregisterResizeHandle,
     }),
-    [
-      direction,
-      getPanelStyle,
-      registerPanel,
-      registerResizeHandle,
-      unregisterPanel,
-      unregisterResizeHandle,
-    ]
+    [direction, getPanelStyle, registerPanel, registerResizeHandle]
   );
 
   return (
