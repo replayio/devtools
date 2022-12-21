@@ -8,7 +8,8 @@ import {
   useRef,
   useState,
 } from "react";
-import AutoSizer from "react-virtualized-auto-sizer";
+
+import withAutoSizer from "bvaughn-architecture-demo/src/utils/withAutoSizer";
 
 import { PanelContext } from "./PanelContext";
 import { Panel, PanelId } from "./types";
@@ -18,6 +19,8 @@ type Props = {
   children: ReactNode[];
   className?: string;
   direction: "horizontal" | "vertical";
+  height: number;
+  width: number;
 };
 
 type State = {
@@ -27,24 +30,7 @@ type State = {
   positions: number[];
 };
 
-export default function AutoSizedPanelGroup(props: Props) {
-  return (
-    <AutoSizer>
-      {({ height, width }) => <PanelGroup {...props} height={height} width={width} />}
-    </AutoSizer>
-  );
-}
-
-function PanelGroup({
-  children,
-  className = "",
-  direction,
-  height,
-  width,
-}: Props & {
-  height: number;
-  width: number;
-}) {
+function PanelGroup({ children, className = "", direction, height, width }: Props) {
   const panelsRef = useRef<Panel[]>([]);
 
   // TODO [panels]
@@ -185,3 +171,5 @@ function PanelGroup({
     </PanelContext.Provider>
   );
 }
+
+export default withAutoSizer<Props>(PanelGroup);
