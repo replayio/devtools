@@ -1,11 +1,7 @@
 import {
   CSSProperties,
-  Children,
   DragEvent,
-  DragEventHandler,
-  ReactElement,
   ReactNode,
-  cloneElement,
   useCallback,
   useLayoutEffect,
   useMemo,
@@ -15,14 +11,13 @@ import {
 import AutoSizer from "react-virtualized-auto-sizer";
 
 import { PanelContext } from "./PanelContext";
-import { Panel } from "./types";
+import { Panel, PanelId, ResizeHandler } from "./types";
 import styles from "./styles.module.css";
 
 type Props = {
   children: ReactNode[];
   className?: string;
   direction: "horizontal" | "vertical";
-  handleSize?: number;
 };
 
 export default function AutoSizedPanelGroup(props: Props) {
@@ -38,7 +33,6 @@ function PanelGroup({
   children,
   className = "",
   direction,
-  handleSize = 5,
   height,
   width,
 }: Props & {
@@ -46,6 +40,7 @@ function PanelGroup({
   width: number;
 }) {
   const [panels, setPanels] = useState<Panel[]>([]);
+  const [resizeHandlers, setResizeHandlers] = useState<ResizeHandler[]>([]);
   const [weights, setWeights] = useState<Map<string, number>>(new Map());
 
   const weightsRef = useRef<Map<string, number>>(weights);
@@ -65,7 +60,7 @@ function PanelGroup({
   }, [panels]);
 
   const getPanelStyle = useCallback(
-    (id: string) => {
+    (id: PanelId) => {
       const weight = weights.get(id);
       if (weight == null) {
         return {};
@@ -113,7 +108,7 @@ function PanelGroup({
     [direction, height, weights, width]
   );
 
-  const registerPanel = useCallback((id: string, panel: Panel) => {
+  const registerPanel = useCallback((id: PanelId, panel: Panel) => {
     setPanels(prevPanels => {
       const newPanels = prevPanels.concat();
       const index = newPanels.findIndex(panel => panel.id === id);
@@ -125,7 +120,7 @@ function PanelGroup({
     });
   }, []);
 
-  const unregisterPanel = useCallback((id: string) => {
+  const unregisterPanel = useCallback((id: PanelId) => {
     setPanels(prevPanels => {
       const newPanels = prevPanels.concat();
       const index = newPanels.findIndex(panel => panel.id === id);
@@ -136,50 +131,75 @@ function PanelGroup({
     });
   }, []);
 
+  const registerResizeHandle = useCallback((idBefore: PanelId, idAfter: PanelId) => {
+    setResizeHandlers(prevResizeHandlers => {
+      const newResizeHandlers = prevResizeHandlers.concat();
+      const index = newResizeHandlers.findIndex(
+        resizeHandler => resizeHandler.idBefore === idBefore && resizeHandler.idAfter === idAfter
+      );
+      if (index >= 0) {
+        newResizeHandlers.splice(index, 1);
+      }
+      newResizeHandlers.push({
+        idAfter,
+        idBefore,
+      });
+      return newResizeHandlers;
+    });
+
+    return (event: DragEvent<HTMLDivElement>) => {
+      console.log(`onDrag() ${idBefore}-${idAfter} ~ ${event.clientX}x${event.clientY}`);
+
+      // TODO [panels]
+      // Resize the current panel and resize panel(s) before to make space.
+
+      // TODO [panels]
+      // Account for min/max weight values.
+    };
+  }, []);
+
+  const unregisterResizeHandle = useCallback((idBefore: PanelId, idAfter: PanelId) => {
+    setResizeHandlers(prevResizeHandlers => {
+      const newResizeHandlers = prevResizeHandlers.concat();
+      const index = newResizeHandlers.findIndex(
+        resizeHandler => resizeHandler.idBefore === idBefore && resizeHandler.idAfter === idAfter
+      );
+      if (index >= 0) {
+        newResizeHandlers.splice(index, 1);
+      }
+      return newResizeHandlers;
+    });
+  }, []);
+
   const context = useMemo(
     () => ({
       direction,
       getPanelStyle,
       registerPanel,
+      registerResizeHandle,
       unregisterPanel,
+      unregisterResizeHandle,
     }),
-    [direction, getPanelStyle, registerPanel, unregisterPanel]
+    [
+      direction,
+      getPanelStyle,
+      registerPanel,
+      registerResizeHandle,
+      unregisterPanel,
+      unregisterResizeHandle,
+    ]
   );
-
-  const classNames = [
-    className,
-    direction === "horizontal" ? styles.HorizontalPanelGroup : styles.VerticalPanelGroup,
-  ];
-
-  // TODO [panels]
-  // Maybe auto-inserting these resizers isn't the right way to do this.
-  // Maybe those should be user-provided, e.g.
-  // <PanelResizeHandle className="..." panelBefore="..." panelAfter="..." />
-  //
-  // This would also allow for more complex interactions, e.g.
-  // <PanelMoveHandle panel="..." />
-  const renderedChildren = useMemo(() => {
-    const childrenArray = Children.toArray(children);
-    return childrenArray.map((child, index) => {
-      const element = child as unknown as ReactElement;
-
-      let onDrag: DragEventHandler<HTMLDivElement> | null = null;
-      if (index > 0) {
-        onDrag = (event: DragEvent<HTMLDivElement>) => {
-          console.log("onDrag()", element.props.id, event.clientX, "x", event.clientY);
-
-          // TODO Resize the current panel
-          // TODO Resize panel(s) before to make space
-        };
-      }
-
-      return cloneElement(element, { key: element.props.key || index, onDrag });
-    });
-  }, [children]);
 
   return (
     <PanelContext.Provider value={context}>
-      <div className={classNames.join(" ")}>{renderedChildren}</div>
+      <div
+        className={[
+          className,
+          direction === "horizontal" ? styles.HorizontalPanelGroup : styles.VerticalPanelGroup,
+        ].join(" ")}
+      >
+        {children}
+      </div>
     </PanelContext.Provider>
   );
 }
