@@ -21,10 +21,10 @@ export default function SourceAndConsole() {
           <PanelResizeHandle
             className={styles.HorizontalResizeHandle}
             panelBefore="middle"
-            panelAfter="three"
+            panelAfter="stacked"
           />
         </Panel>
-        <Panel className={styles.Panel} defaultSize={0.3} id="three">
+        <Panel className={styles.Panel} defaultSize={0.3} id="stacked">
           <div className={styles.Grower}>
             <PanelGroup direction="vertical">
               <Panel className={styles.Panel} defaultSize={0.4} id="top">
@@ -34,18 +34,30 @@ export default function SourceAndConsole() {
                 <PanelResizeHandle panelBefore="top" panelAfter="bottom">
                   <div className={styles.VerticalResizeBar} />
                 </PanelResizeHandle>
-                <div className={styles.VerticalFillerBottom}>bottom [2, 2]</div>
+                <div className={styles.VerticalFillerBottom}>
+                  <PanelGroup direction="horizontal">
+                    <Panel className={styles.Panel} defaultSize={0.5} id="bottom-left">
+                      <div className={styles.HorizontalFillerLeft}>bottom-left [2, 2, 1]</div>
+                    </Panel>
+                    <Panel className={styles.Panel} defaultSize={0.5} id="bottom-right">
+                      <PanelResizeHandle panelBefore="bottom-left" panelAfter="bottom-right">
+                        <div className={styles.HorizontalResizeBar} />
+                      </PanelResizeHandle>
+                      <div className={styles.HorizontalFillerRight}>bottom-right [2, 2, 1]</div>
+                    </Panel>
+                  </PanelGroup>
+                </div>
               </Panel>
             </PanelGroup>
           </div>
         </Panel>
-        <Panel className={styles.Panel} defaultSize={0.2} id="four">
+        <Panel className={styles.Panel} defaultSize={0.2} id="right">
           <PanelResizeHandle
             className={styles.HorizontalResizeHandle}
-            panelBefore="three"
-            panelAfter="four"
+            panelBefore="stacked"
+            panelAfter="right"
           />
-          <div className={styles.HorizontalFiller}>four [1]</div>
+          <div className={styles.HorizontalFiller}>right [1]</div>
         </Panel>
       </PanelGroup>
     </div>

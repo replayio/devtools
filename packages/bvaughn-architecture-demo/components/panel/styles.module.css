@@ -1,10 +1,10 @@
 .Panel {
   display: flex;
 }
-.HorizontalPanelGroup .Panel {
+.HorizontalPanelGroup > .Panel {
   flex-direction: row;
 }
-.VerticalPanelGroup .Panel {
+.VerticalPanelGroup > .Panel {
   flex-direction: column;
 }
 
@@ -12,9 +12,9 @@
   flex: 0 0 auto;
 }
 
-.HorizontalPanelGroup .HandleEnabled {
+.HorizontalPanelGroup > .Panel > .HandleEnabled {
   cursor: ew-resize;
 }
-.VerticalPanelGroup .HandleEnabled {
+.VerticalPanelGroup > .Panel > .HandleEnabled {
   cursor: ns-resize;
 }

@@ -10,6 +10,8 @@
 }
 
 .HorizontalFiller,
+.HorizontalFillerLeft,
+.HorizontalFillerRight,
 .VerticalFillerBottom,
 .VerticalFillerTop {
   height: 100%;
@@ -18,9 +20,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 .HorizontalFiller {
   border-radius: 0.5rem;
@@ -48,4 +48,12 @@
   background-color: var(--background-color-contrast-3);
   border-bottom: 1px solid var(--background-color-contrast-4);
   border-top: 1px solid var(--background-color-contrast-4);
+}
+
+.HorizontalResizeBar {
+  height: 100%;
+  width: 4px;
+  background-color: var(--background-color-contrast-3);
+  border-left: 1px solid var(--background-color-contrast-4);
+  border-right: 1px solid var(--background-color-contrast-4);
 }

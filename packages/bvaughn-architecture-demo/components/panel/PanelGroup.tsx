@@ -50,6 +50,13 @@ function PanelGroup({ children, className = "", direction, height, width }: Prop
   useLayoutEffect(() => {
     stateRef.current = state;
   }, [state]);
+  ///////////////////////////////////////
+  if (direction === "horizontal") {
+    console.log(
+      `${state.sizes.reduce((sum, size) => sum + size, 0)}\t|\t${state.sizes.join("\t")}`
+    );
+  }
+  ///////////////////////////////////////
 
   const sizeRef = useRef({ height, width });
   useLayoutEffect(() => {
@@ -122,10 +129,19 @@ function PanelGroup({ children, className = "", direction, height, width }: Prop
       const delta = isHorizontal ? movement / width : movement / height;
 
       const prevState = stateRef.current;
+      ///////////////////////////////////////
+      console.groupCollapsed(`-> Update for delta: ${delta}`);
+      ///////////////////////////////////////
       const nextState = adjustByDelta(idBefore, idAfter, delta, prevState);
       if (prevState !== nextState) {
+        ///////////////////////////////////////
+        console.log(`-> Update`);
+        ///////////////////////////////////////
         setState(nextState);
       }
+      ///////////////////////////////////////
+      console.groupEnd();
+      ///////////////////////////////////////
     };
   }, []);
 
@@ -165,9 +181,9 @@ function adjustByDelta(
     return prevState;
   }
 
-  const { panels, sizes } = prevState;
+  const { panels, sizes: prevSizes } = prevState;
 
-  const nextSizes = sizes.concat();
+  const nextSizes = prevSizes.concat();
 
   let didChange = false;
 
@@ -183,7 +199,7 @@ function adjustByDelta(
     const indexBefore = panels.findIndex(panel => panel.id === idBefore);
     for (let index = indexBefore; index >= 0; index--) {
       const panel = panels[index];
-      const prevSize = sizes[index];
+      const prevSize = prevSizes[index];
 
       const nextSize = nextSizes[index] + delta;
       const nextSizeSafe = Math.max(nextSize, panel.minSize);
@@ -192,8 +208,8 @@ function adjustByDelta(
 
         didChange = true;
         nextSizes[index] = nextSizeSafe;
-        delta -= nextSizeSafe - nextSize;
-        delta -= prevSize - nextSizeSafe;
+        delta -= nextSizeSafe - nextSize; // TODO WUT
+        delta -= prevSize - nextSizeSafe; // TODO WUT
         if (delta <= 0) {
           break;
         }
@@ -202,7 +218,7 @@ function adjustByDelta(
 
     if (deltaApplied > 0) {
       const indexAfter = panels.findIndex(panel => panel.id === idAfter);
-      const prevSizeAfter = sizes[indexAfter];
+      const prevSizeAfter = prevSizes[indexAfter];
       const nextSizeAfter = prevSizeAfter + deltaApplied;
       nextSizes[indexAfter] = nextSizeAfter;
     }
@@ -210,25 +226,19 @@ function adjustByDelta(
     // A positive delta means the panel before the resizer should "expand" and the panel after should "contract".
     // Subsequent panels should not be impacted.
     const indexBefore = panels.findIndex(panel => panel.id === idBefore);
-    const prevSizeBefore = sizes[indexBefore];
-    const nextSizeBefore = nextSizes[indexBefore] + delta;
-    console.log(`before "${idBefore}"\t${prevSizeBefore}\t${nextSizeBefore}}`);
+    const indexAfter = panels.findIndex(panel => panel.id === idAfter);
 
-    if (prevSizeBefore !== nextSizeBefore) {
-      const maxDelta = nextSizeBefore - prevSizeBefore;
+    const panelAfter = panels[indexAfter];
+    const prevSize = prevSizes[indexAfter];
+    const nextSize = Math.max(prevSize - delta, panelAfter.minSize);
+    if (prevSize !== nextSize) {
+      didChange = true;
 
-      const indexAfter = panels.findIndex(panel => panel.id === idAfter);
-      const panelAfter = panels[indexAfter];
-      const prevSizeAfter = sizes[indexAfter];
-      const nextSizeAfter = nextSizes[indexAfter] - maxDelta;
-      const nextSizeAfterSafe = Math.max(nextSizeAfter, panelAfter.minSize);
-      console.log(`after "${idAfter}"\t${prevSizeAfter}\t${nextSizeAfterSafe}}`);
-
-      if (prevSizeAfter !== nextSizeAfterSafe) {
-        didChange = true;
-        nextSizes[indexBefore] = nextSizeBefore;
-        nextSizes[indexAfter] = nextSizeAfterSafe;
-      }
+      // If the panel after can contract more, expand the panel before,
+      // but only by the amount that the panel after has expanded.
+      // This might be less than the overall delta.
+      nextSizes[indexBefore] = prevSizes[indexBefore] + (prevSize - nextSize);
+      nextSizes[indexAfter] = nextSize;
     }
   }
 
