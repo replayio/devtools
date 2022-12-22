@@ -64,10 +64,10 @@ function PanelGroup({ children, className = "", direction, height, width }: Prop
     const panels = panelsRef.current;
 
     const totalWeight = panels.reduce((weight, panel) => {
-      return weight + panel.defaultWeight;
+      return weight + panel.defaultSize;
     }, 0);
 
-    const sizes = panels.map(panel => panel.defaultWeight / totalWeight);
+    const sizes = panels.map(panel => panel.defaultSize / totalWeight);
 
     setState(prevState => ({
       ...prevState,
@@ -186,7 +186,7 @@ function adjustByDelta(
       const prevSize = sizes[index];
 
       const nextSize = nextSizes[index] + delta;
-      const nextSizeSafe = Math.min(Math.max(nextSize, panel.minWeight), panel.maxWeight);
+      const nextSizeSafe = Math.max(nextSize, panel.minSize);
       if (nextSizeSafe !== prevSize) {
         deltaApplied += prevSize - nextSizeSafe;
 
@@ -205,31 +205,28 @@ function adjustByDelta(
       const prevSizeAfter = sizes[indexAfter];
       const nextSizeAfter = prevSizeAfter + deltaApplied;
       nextSizes[indexAfter] = nextSizeAfter;
-      // TODO [panels] maxWeight
     }
   } else {
     // A positive delta means the panel before the resizer should "expand" and the panel after should "contract".
     // Subsequent panels should not be impacted.
     const indexBefore = panels.findIndex(panel => panel.id === idBefore);
-    const panelBefore = panels[indexBefore];
     const prevSizeBefore = sizes[indexBefore];
     const nextSizeBefore = nextSizes[indexBefore] + delta;
-    const nextSizeBeforeSafe = Math.min(nextSizeBefore, panelBefore.maxWeight);
-    console.log(`before "${idBefore}"\t${prevSizeBefore}\t${nextSizeBeforeSafe}}`);
+    console.log(`before "${idBefore}"\t${prevSizeBefore}\t${nextSizeBefore}}`);
 
-    if (prevSizeBefore !== nextSizeBeforeSafe) {
-      const maxDelta = nextSizeBeforeSafe - prevSizeBefore;
+    if (prevSizeBefore !== nextSizeBefore) {
+      const maxDelta = nextSizeBefore - prevSizeBefore;
 
       const indexAfter = panels.findIndex(panel => panel.id === idAfter);
       const panelAfter = panels[indexAfter];
       const prevSizeAfter = sizes[indexAfter];
       const nextSizeAfter = nextSizes[indexAfter] - maxDelta;
-      const nextSizeAfterSafe = Math.max(nextSizeAfter, panelAfter.minWeight);
+      const nextSizeAfterSafe = Math.max(nextSizeAfter, panelAfter.minSize);
       console.log(`after "${idAfter}"\t${prevSizeAfter}\t${nextSizeAfterSafe}}`);
 
       if (prevSizeAfter !== nextSizeAfterSafe) {
         didChange = true;
-        nextSizes[indexBefore] = nextSizeBeforeSafe;
+        nextSizes[indexBefore] = nextSizeBefore;
         nextSizes[indexAfter] = nextSizeAfterSafe;
       }
     }

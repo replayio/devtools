@@ -8,10 +8,10 @@ export default function SourceAndConsole() {
   return (
     <div className={styles.FullHeightAndWidth}>
       <PanelGroup direction="horizontal">
-        <Panel className={styles.Panel} defaultWeight={1} id="left">
+        <Panel className={styles.Panel} defaultSize={0.2} id="left">
           <div className={styles.HorizontalFiller}>left [1]</div>
         </Panel>
-        <Panel className={styles.Panel} defaultWeight={3} id="middle">
+        <Panel className={styles.Panel} defaultSize={0.4} id="middle">
           <PanelResizeHandle
             className={styles.HorizontalResizeHandle}
             panelBefore="left"
@@ -24,13 +24,13 @@ export default function SourceAndConsole() {
             panelAfter="three"
           />
         </Panel>
-        <Panel className={styles.Panel} defaultWeight={2} id="three">
+        <Panel className={styles.Panel} defaultSize={0.3} id="three">
           <div className={styles.Grower}>
             <PanelGroup direction="vertical">
-              <Panel className={styles.Panel} defaultWeight={1} id="top">
+              <Panel className={styles.Panel} defaultSize={0.4} id="top">
                 <div className={styles.VerticalFillerTop}>top [2, 1]</div>
               </Panel>
-              <Panel className={styles.Panel} defaultWeight={2} id="bottom">
+              <Panel className={styles.Panel} defaultSize={0.6} id="bottom">
                 <PanelResizeHandle panelBefore="top" panelAfter="bottom">
                   <div className={styles.VerticalResizeBar} />
                 </PanelResizeHandle>
@@ -39,7 +39,7 @@ export default function SourceAndConsole() {
             </PanelGroup>
           </div>
         </Panel>
-        <Panel className={styles.Panel} defaultWeight={1} id="four">
+        <Panel className={styles.Panel} defaultSize={0.2} id="four">
           <PanelResizeHandle
             className={styles.HorizontalResizeHandle}
             panelBefore="three"

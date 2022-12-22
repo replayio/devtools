@@ -1,10 +1,9 @@
 export type PanelId = string;
 
 export type Panel = {
-  defaultWeight: number;
+  defaultSize: number;
   id: PanelId;
-  maxWeight: number;
-  minWeight: number;
+  minSize: number;
 };
 
 export type ResizeHandler = (event: MouseEvent) => void;

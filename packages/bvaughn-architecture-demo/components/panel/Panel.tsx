@@ -10,17 +10,15 @@ import styles from "./styles.module.css";
 export default function Panel({
   children,
   className = "",
-  defaultWeight = 1,
+  defaultSize = 0.1,
   id,
-  maxWeight = 0.9,
-  minWeight = 0.1,
+  minSize = 0.1,
 }: {
   children: ReactNode;
   className?: string;
-  defaultWeight?: number;
+  defaultSize?: number;
   id: PanelId;
-  maxWeight?: number;
-  minWeight?: number;
+  minSize?: number;
 }) {
   const context = useContext(PanelContext);
   if (context === null) {
@@ -31,14 +29,13 @@ export default function Panel({
 
   useLayoutEffect(() => {
     const panel = {
-      defaultWeight,
+      defaultSize,
       id,
-      maxWeight,
-      minWeight,
+      minSize,
     };
 
     registerPanel(id, panel);
-  }, [defaultWeight, maxWeight, minWeight, registerPanel, id]);
+  }, [defaultSize, minSize, registerPanel, id]);
 
   const style = getPanelStyle(id);
 
