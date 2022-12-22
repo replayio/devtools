@@ -50,13 +50,6 @@ function PanelGroup({ children, className = "", direction, height, width }: Prop
   useLayoutEffect(() => {
     stateRef.current = state;
   }, [state]);
-  ///////////////////////////////////////
-  if (direction === "horizontal") {
-    console.log(
-      `${state.sizes.reduce((sum, size) => sum + size, 0)}\t|\t${state.sizes.join("\t")}`
-    );
-  }
-  ///////////////////////////////////////
 
   const sizeRef = useRef({ height, width });
   useLayoutEffect(() => {
@@ -129,19 +122,10 @@ function PanelGroup({ children, className = "", direction, height, width }: Prop
       const delta = isHorizontal ? movement / width : movement / height;
 
       const prevState = stateRef.current;
-      ///////////////////////////////////////
-      console.groupCollapsed(`-> Update for delta: ${delta}`);
-      ///////////////////////////////////////
       const nextState = adjustByDelta(idBefore, idAfter, delta, prevState);
       if (prevState !== nextState) {
-        ///////////////////////////////////////
-        console.log(`-> Update`);
-        ///////////////////////////////////////
         setState(nextState);
       }
-      ///////////////////////////////////////
-      console.groupEnd();
-      ///////////////////////////////////////
     };
   }, []);
 
@@ -196,31 +180,31 @@ function adjustByDelta(
 
     // A negative delta means the panel after the resizer should "expand" by decreasing its offset.
     // Other panels may also need to shift (to "contract") to make room, depending on the min weights.
-    const indexBefore = panels.findIndex(panel => panel.id === idBefore);
-    for (let index = indexBefore; index >= 0; index--) {
+    let index = panels.findIndex(panel => panel.id === idBefore);
+    for (; index >= 0; index--) {
       const panel = panels[index];
       const prevSize = prevSizes[index];
-
-      const nextSize = nextSizes[index] + delta;
-      const nextSizeSafe = Math.max(nextSize, panel.minSize);
-      if (nextSizeSafe !== prevSize) {
-        deltaApplied += prevSize - nextSizeSafe;
+      const nextSize = Math.max(nextSizes[index] + delta, panel.minSize);
+      if (prevSize !== nextSize) {
+        delta -= prevSize - nextSize;
+        deltaApplied += prevSize - nextSize;
 
         didChange = true;
-        nextSizes[index] = nextSizeSafe;
-        delta -= nextSizeSafe - nextSize; // TODO WUT
-        delta -= prevSize - nextSizeSafe; // TODO WUT
+
+        nextSizes[index] = nextSize;
+
         if (delta <= 0) {
           break;
         }
       }
     }
 
+    // Grow/expand the panel after, but only by the amount that previous panels were able to shrink/contract.
     if (deltaApplied > 0) {
-      const indexAfter = panels.findIndex(panel => panel.id === idAfter);
-      const prevSizeAfter = prevSizes[indexAfter];
-      const nextSizeAfter = prevSizeAfter + deltaApplied;
-      nextSizes[indexAfter] = nextSizeAfter;
+      const index = panels.findIndex(panel => panel.id === idAfter);
+      const prevSize = prevSizes[index];
+      const nextSize = prevSize + deltaApplied;
+      nextSizes[index] = nextSize;
     }
   } else {
     // A positive delta means the panel before the resizer should "expand" and the panel after should "contract".
