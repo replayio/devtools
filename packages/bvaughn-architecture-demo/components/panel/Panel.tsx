@@ -4,6 +4,9 @@ import { PanelContext } from "./PanelContext";
 import { PanelId } from "./types";
 import styles from "./styles.module.css";
 
+// TODO [panels]
+// Support min pixel size too.
+// PanelGroup should warn if total width is less min pixel widths.
 export default function Panel({
   children,
   className = "",

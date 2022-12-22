@@ -29,6 +29,10 @@ type State = {
   sizes: number[];
 };
 
+// TODO [panels]
+// Within a drag, remember original positions to refine more easily on expand.
+// Look at what the Chrome devtools Sources does
+
 function PanelGroup({ children, className = "", direction, height, width }: Props) {
   const panelsRef = useRef<Panel[]>([]);
 
@@ -109,45 +113,19 @@ function PanelGroup({ children, className = "", direction, height, width }: Prop
 
   const registerResizeHandle = useCallback((idBefore: PanelId, idAfter: PanelId) => {
     return (event: MouseEvent) => {
+      event.preventDefault();
+
       const { height, width } = sizeRef.current;
-      const state = stateRef.current;
-      const { direction, panels, sizes } = state;
 
-      // A resizing panel should only affect panels before it.
-      //
-      // In the case of a contracting panel:
-      // It may only affect the panel immediately before it, provided that panel has adequate room to grow.
-      // Otherwise it will affect prior panels as well.
-      //
-      // In the case of an expanding panel:
-      // Only the panel immediately before it will be affected.
+      const isHorizontal = stateRef.current.direction === "horizontal";
+      const movement = isHorizontal ? event.movementX : event.movementY;
+      const delta = isHorizontal ? movement / width : movement / height;
 
-      const beforeIndex = panels.findIndex(panel => panel.id === idBefore);
-      const afterIndex = panels.findIndex(panel => panel.id === idAfter);
-
-      const prevOffset =
-        getOffset(idAfter, state, height, width) / (direction === "horizontal" ? width : height);
-      const nextOffset =
-        direction === "horizontal" ? event.clientX / width : event.clientY / height;
-
-      const delta = prevOffset - nextOffset;
-
-      // TODO [panels]
-      // Observe min/max weight values.
-
-      // TODO [panels]
-      // Resize the current panel and resize panel(s) before to make space.
-
-      setState(prevState => {
-        const sizes = prevState.sizes.concat();
-        sizes[beforeIndex] -= delta;
-        sizes[afterIndex] += delta;
-
-        return {
-          ...prevState,
-          sizes,
-        };
-      });
+      const prevState = stateRef.current;
+      const nextState = adjustByDelta(idBefore, idAfter, delta, prevState);
+      if (prevState !== nextState) {
+        setState(nextState);
+      }
     };
   }, []);
 
@@ -176,6 +154,98 @@ function PanelGroup({ children, className = "", direction, height, width }: Prop
 }
 
 export default withAutoSizer<Props>(PanelGroup);
+
+function adjustByDelta(
+  idBefore: PanelId,
+  idAfter: PanelId,
+  delta: number,
+  prevState: State
+): State {
+  if (delta === 0) {
+    return prevState;
+  }
+
+  const { panels, sizes } = prevState;
+
+  const nextSizes = sizes.concat();
+
+  let didChange = false;
+
+  // A resizing panel affects the panels before or after it.
+  //
+  // In the case of a contracting panel, it may affect one or more of the panels before it.
+  // In the case of an expanding panel, it may affect one or more of the panels after it.
+  if (delta < 0) {
+    let deltaApplied = 0;
+
+    // A negative delta means the panel after the resizer should "expand" by decreasing its offset.
+    // Other panels may also need to shift (to "contract") to make room, depending on the min weights.
+    const indexBefore = panels.findIndex(panel => panel.id === idBefore);
+    for (let index = indexBefore; index >= 0; index--) {
+      const panel = panels[index];
+      const prevSize = sizes[index];
+
+      const nextSize = nextSizes[index] + delta;
+      const nextSizeSafe = Math.min(Math.max(nextSize, panel.minWeight), panel.maxWeight);
+      if (nextSizeSafe !== prevSize) {
+        deltaApplied += prevSize - nextSizeSafe;
+
+        didChange = true;
+        nextSizes[index] = nextSizeSafe;
+        delta -= nextSizeSafe - nextSize;
+        delta -= prevSize - nextSizeSafe;
+        if (delta <= 0) {
+          break;
+        }
+      }
+    }
+
+    if (deltaApplied > 0) {
+      const indexAfter = panels.findIndex(panel => panel.id === idAfter);
+      const prevSizeAfter = sizes[indexAfter];
+      const nextSizeAfter = prevSizeAfter + deltaApplied;
+      nextSizes[indexAfter] = nextSizeAfter;
+      // TODO [panels] maxWeight
+    }
+  } else {
+    // A positive delta means the panel before the resizer should "expand" and the panel after should "contract".
+    // Subsequent panels should not be impacted.
+    const indexBefore = panels.findIndex(panel => panel.id === idBefore);
+    const panelBefore = panels[indexBefore];
+    const prevSizeBefore = sizes[indexBefore];
+    const nextSizeBefore = nextSizes[indexBefore] + delta;
+    const nextSizeBeforeSafe = Math.min(nextSizeBefore, panelBefore.maxWeight);
+    console.log(`before "${idBefore}"\t${prevSizeBefore}\t${nextSizeBeforeSafe}}`);
+
+    if (prevSizeBefore !== nextSizeBeforeSafe) {
+      const maxDelta = nextSizeBeforeSafe - prevSizeBefore;
+
+      const indexAfter = panels.findIndex(panel => panel.id === idAfter);
+      const panelAfter = panels[indexAfter];
+      const prevSizeAfter = sizes[indexAfter];
+      const nextSizeAfter = nextSizes[indexAfter] - maxDelta;
+      const nextSizeAfterSafe = Math.max(nextSizeAfter, panelAfter.minWeight);
+      console.log(`after "${idAfter}"\t${prevSizeAfter}\t${nextSizeAfterSafe}}`);
+
+      if (prevSizeAfter !== nextSizeAfterSafe) {
+        didChange = true;
+        nextSizes[indexBefore] = nextSizeBeforeSafe;
+        nextSizes[indexAfter] = nextSizeAfterSafe;
+      }
+    }
+  }
+
+  // If we were unable to resize any of the panels panels, return the previous state.
+  // This will essentially bailout and ignore the "mousemove" event.
+  if (!didChange) {
+    return prevState;
+  }
+
+  return {
+    ...prevState,
+    sizes: nextSizes,
+  };
+}
 
 function getOffset(id: PanelId, state: State, height: number, width: number): number {
   let index = state.panels.findIndex(panel => panel.id === id);
@@ -206,10 +276,10 @@ function getSize(id: PanelId, state: State, height: number, width: number): numb
 
   if (panels.length === 1) {
     return totalSize;
-  } else if (index === panels.length - 1) {
+    // } else if (index === panels.length - 1) {
     // Ensure the last panel always fills the remaining space (no overflow or gap)
-    const offset = getOffset(id, state, height, width);
-    return totalSize - offset;
+    // const offset = getOffset(id, state, height, width);
+    // return totalSize - offset;
   } else {
     return Math.round(size * totalSize);
   }

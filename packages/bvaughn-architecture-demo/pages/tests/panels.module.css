@@ -1,0 +1,51 @@
+.FullHeightAndWidth {
+  width: calc(100vw - 1rem);
+  height: calc(100vh - 1rem);
+  margin: 0.5rem;
+}
+
+.Grower {
+  width: 100%;
+  height: 100%;
+}
+
+.HorizontalFiller,
+.VerticalFillerBottom,
+.VerticalFillerTop {
+  height: 100%;
+  width: 100%;
+  background-color: var(--background-color-contrast-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.HorizontalFiller {
+  border-radius: 0.5rem;
+}
+.VerticalFillerTop {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+.VerticalFillerBottom {
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+}
+
+.Panel {
+  display: flex;
+}
+
+.HorizontalResizeHandle {
+  padding: 0 0.25rem;
+}
+
+.VerticalResizeBar {
+  height: 4px;
+  width: 100%;
+  background-color: var(--background-color-contrast-3);
+  border-bottom: 1px solid var(--background-color-contrast-4);
+  border-top: 1px solid var(--background-color-contrast-4);
+}

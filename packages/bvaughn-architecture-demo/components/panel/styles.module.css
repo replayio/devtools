@@ -11,12 +11,6 @@
 .Handle {
   flex: 0 0 auto;
 }
-.HorizontalPanelGroup .Handle {
-  padding: 0 0.25rem;
-}
-.VerticalPanelGroup .Handle {
-  padding: 0.25rem 0;
-}
 
 .HorizontalPanelGroup .HandleEnabled {
   cursor: ew-resize;
