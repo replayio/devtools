@@ -1,6 +1,6 @@
 import { ReactNode, useContext, useEffect, useState } from "react";
 
-import { PanelContext } from "./PanelContext";
+import { PanelGroupContext } from "./PanelContexts";
 import { PanelId, ResizeHandler } from "./types";
 import styles from "./styles.module.css";
 
@@ -17,7 +17,7 @@ export default function PanelResizeHandle({
   panelAfter: PanelId;
   panelBefore: PanelId;
 }) {
-  const context = useContext(PanelContext);
+  const context = useContext(PanelGroupContext);
   if (context === null) {
     throw Error(`PanelResizeHandle components must be rendered within a PanelGroup container`);
   }

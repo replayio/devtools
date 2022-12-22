@@ -4,10 +4,23 @@ import PanelResizeHandle from "bvaughn-architecture-demo/components/panel/PanelR
 
 import styles from "./panels.module.css";
 
+function onOuterPanelGroupSizesChanged(sizes: number[]) {
+  localStorage.setItem("PanelGroup:outer:sizes", JSON.stringify(sizes));
+}
+
+let defaultSizes: number[] | undefined = undefined;
+try {
+  defaultSizes = JSON.parse(localStorage.getItem("PanelGroup:outer:sizes") || "[]");
+} catch (error) {}
+
 export default function SourceAndConsole() {
   return (
     <div className={styles.FullHeightAndWidth}>
-      <PanelGroup direction="horizontal">
+      <PanelGroup
+        defaultSizes={defaultSizes}
+        direction="horizontal"
+        onSizesChanged={onOuterPanelGroupSizesChanged}
+      >
         <Panel className={styles.Panel} defaultSize={0.2} id="left">
           <div className={styles.HorizontalFiller}>left [1]</div>
         </Panel>

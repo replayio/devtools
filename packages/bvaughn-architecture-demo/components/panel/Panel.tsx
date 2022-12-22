@@ -1,6 +1,6 @@
 import { ReactNode, useContext, useLayoutEffect } from "react";
 
-import { PanelContext } from "./PanelContext";
+import { PanelGroupContext } from "./PanelContexts";
 import { PanelId } from "./types";
 import styles from "./styles.module.css";
 
@@ -20,7 +20,7 @@ export default function Panel({
   id: PanelId;
   minSize?: number;
 }) {
-  const context = useContext(PanelContext);
+  const context = useContext(PanelGroupContext);
   if (context === null) {
     throw Error(`Panel components must be rendered within a PanelGroup container`);
   }

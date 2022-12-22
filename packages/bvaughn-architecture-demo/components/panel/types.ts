@@ -1,3 +1,5 @@
+export type Direction = "horizontal" | "vertical";
+
 export type PanelId = string;
 
 export type Panel = {
