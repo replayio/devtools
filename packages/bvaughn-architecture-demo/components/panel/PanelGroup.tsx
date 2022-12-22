@@ -29,6 +29,8 @@ type State = {
   sizes: number[];
 };
 
+const PRECISION = 5;
+
 // TODO [panels]
 // Within a drag, remember original positions to refine more easily on expand.
 // Look at what the Chrome devtools Sources does
@@ -169,68 +171,52 @@ function adjustByDelta(
 
   const nextSizes = prevSizes.concat();
 
-  let didChange = false;
+  let deltaApplied = 0;
 
   // A resizing panel affects the panels before or after it.
   //
-  // In the case of a contracting panel, it may affect one or more of the panels before it.
-  // In the case of an expanding panel, it may affect one or more of the panels after it.
-  if (delta < 0) {
-    let deltaApplied = 0;
+  // A negative delta means the panel immediately after the resizer should grow/expand by decreasing its offset.
+  // Other panels may also need to shrink/contract (and shift) to make room, depending on the min weights.
+  //
+  // A positive delta means the panel immediately before the resizer should "expand".
+  // This is accomplished by shrinking/contracting (and shifting) one or more of the panels after the resizer.
+  let pivotId = delta < 0 ? idBefore : idAfter;
+  let index = panels.findIndex(panel => panel.id === pivotId);
+  while (true) {
+    const panel = panels[index];
+    const prevSize = prevSizes[index];
+    const nextSize = Math.max(prevSize - Math.abs(delta), panel.minSize);
+    if (prevSize !== nextSize) {
+      deltaApplied += prevSize - nextSize;
 
-    // A negative delta means the panel after the resizer should "expand" by decreasing its offset.
-    // Other panels may also need to shift (to "contract") to make room, depending on the min weights.
-    let index = panels.findIndex(panel => panel.id === idBefore);
-    for (; index >= 0; index--) {
-      const panel = panels[index];
-      const prevSize = prevSizes[index];
-      const nextSize = Math.max(nextSizes[index] + delta, panel.minSize);
-      if (prevSize !== nextSize) {
-        delta -= prevSize - nextSize;
-        deltaApplied += prevSize - nextSize;
+      nextSizes[index] = nextSize;
 
-        didChange = true;
-
-        nextSizes[index] = nextSize;
-
-        if (delta <= 0) {
-          break;
-        }
+      if (deltaApplied.toPrecision(PRECISION) >= delta.toPrecision(PRECISION)) {
+        break;
       }
     }
 
-    // Grow/expand the panel after, but only by the amount that previous panels were able to shrink/contract.
-    if (deltaApplied > 0) {
-      const index = panels.findIndex(panel => panel.id === idAfter);
-      const prevSize = prevSizes[index];
-      const nextSize = prevSize + deltaApplied;
-      nextSizes[index] = nextSize;
-    }
-  } else {
-    // A positive delta means the panel before the resizer should "expand" and the panel after should "contract".
-    // Subsequent panels should not be impacted.
-    const indexBefore = panels.findIndex(panel => panel.id === idBefore);
-    const indexAfter = panels.findIndex(panel => panel.id === idAfter);
-
-    const panelAfter = panels[indexAfter];
-    const prevSize = prevSizes[indexAfter];
-    const nextSize = Math.max(prevSize - delta, panelAfter.minSize);
-    if (prevSize !== nextSize) {
-      didChange = true;
-
-      // If the panel after can contract more, expand the panel before,
-      // but only by the amount that the panel after has expanded.
-      // This might be less than the overall delta.
-      nextSizes[indexBefore] = prevSizes[indexBefore] + (prevSize - nextSize);
-      nextSizes[indexAfter] = nextSize;
+    if (delta < 0) {
+      if (--index < 0) {
+        break;
+      }
+    } else {
+      if (++index >= panels.length) {
+        break;
+      }
     }
   }
 
   // If we were unable to resize any of the panels panels, return the previous state.
   // This will essentially bailout and ignore the "mousemove" event.
-  if (!didChange) {
+  if (deltaApplied === 0) {
     return prevState;
   }
+
+  // Adjust the pivot panel before, but only by the amount that surrounding panels were able to shrink/contract.
+  pivotId = delta < 0 ? idAfter : idBefore;
+  index = panels.findIndex(panel => panel.id === pivotId);
+  nextSizes[index] = prevSizes[index] + deltaApplied;
 
   return {
     ...prevState,
