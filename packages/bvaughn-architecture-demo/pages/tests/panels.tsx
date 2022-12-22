@@ -4,25 +4,27 @@ import PanelResizeHandle from "bvaughn-architecture-demo/components/panel/PanelR
 
 import styles from "./panels.module.css";
 
-function onOuterPanelGroupSizesChanged(sizes: number[]) {
-  localStorage.setItem("PanelGroup:outer:sizes", JSON.stringify(sizes));
-}
+function clearSavedSizes() {
+  localStorage.removeItem("PanelGroup:sizes:inner-horizontal");
+  localStorage.removeItem("PanelGroup:sizes:outer-horizontal");
+  localStorage.removeItem("PanelGroup:sizes:vertical");
 
-let defaultSizes: number[] | undefined = undefined;
-try {
-  defaultSizes = JSON.parse(localStorage.getItem("PanelGroup:outer:sizes") || "[]");
-} catch (error) {}
+  window.location.reload();
+}
 
 export default function SourceAndConsole() {
   return (
     <div className={styles.FullHeightAndWidth}>
-      <PanelGroup
-        defaultSizes={defaultSizes}
-        direction="horizontal"
-        onSizesChanged={onOuterPanelGroupSizesChanged}
-      >
+      <PanelGroup autoSaveId="outer-horizontal" direction="horizontal">
         <Panel className={styles.Panel} defaultSize={0.2} id="left">
-          <div className={styles.HorizontalFiller}>left [1]</div>
+          <div className={styles.HorizontalFiller}>
+            left [1]
+            <br />
+            <br />
+            <button className={styles.ResetButton} onClick={clearSavedSizes}>
+              reset sizes
+            </button>
+          </div>
         </Panel>
         <Panel className={styles.Panel} defaultSize={0.4} id="middle">
           <PanelResizeHandle
@@ -39,7 +41,7 @@ export default function SourceAndConsole() {
         </Panel>
         <Panel className={styles.Panel} defaultSize={0.3} id="stacked">
           <div className={styles.Grower}>
-            <PanelGroup direction="vertical">
+            <PanelGroup autoSaveId="vertical" direction="vertical">
               <Panel className={styles.Panel} defaultSize={0.4} id="top">
                 <div className={styles.VerticalFillerTop}>top [2, 1]</div>
               </Panel>
@@ -48,7 +50,7 @@ export default function SourceAndConsole() {
                   <div className={styles.VerticalResizeBar} />
                 </PanelResizeHandle>
                 <div className={styles.VerticalFillerBottom}>
-                  <PanelGroup direction="horizontal">
+                  <PanelGroup autoSaveId="inner-horizontal" direction="horizontal">
                     <Panel className={styles.Panel} defaultSize={0.5} id="bottom-left">
                       <div className={styles.HorizontalFillerLeft}>bottom-left [2, 2, 1]</div>
                     </Panel>

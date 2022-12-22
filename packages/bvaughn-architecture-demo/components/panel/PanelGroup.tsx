@@ -16,12 +16,11 @@ import { Direction, Panel, PanelId } from "./types";
 import styles from "./styles.module.css";
 
 type Props = {
+  autoSaveId?: string;
   children: ReactNode[];
   className?: string;
-  defaultSizes?: number[];
   direction: Direction;
   height: number;
-  onSizesChanged?: (sizes: number[]) => void;
   width: number;
 };
 
@@ -31,15 +30,7 @@ const PRECISION = 5;
 // Within an active drag, remember original positions to refine more easily on expand.
 // Look at what the Chrome devtools Sources does.
 
-function PanelGroup({
-  children,
-  className = "",
-  defaultSizes = [],
-  direction,
-  height,
-  onSizesChanged,
-  width,
-}: Props) {
+function PanelGroup({ autoSaveId, children, className = "", direction, height, width }: Props) {
   const panelsRef = useRef<Panel[]>([]);
 
   // 0-1 values representing the relative size of each panel.
@@ -49,20 +40,17 @@ function PanelGroup({
   const committedValuesRef = useRef<{
     direction: Direction;
     height: number;
-    onSizesChanged?: (sizes: number[]) => void;
     sizes: number[];
     width: number;
   }>({
     direction,
     height,
-    onSizesChanged,
     sizes,
     width,
   });
   useLayoutEffect(() => {
     committedValuesRef.current.direction = direction;
     committedValuesRef.current.height = height;
-    committedValuesRef.current.onSizesChanged = onSizesChanged;
     committedValuesRef.current.sizes = sizes;
     committedValuesRef.current.width = width;
   });
@@ -77,6 +65,18 @@ function PanelGroup({
       return;
     }
 
+    // If this panel has been configured to persist sizing information,
+    // default size should be restored from local storage if possible.
+    let defaultSizes: number[] | undefined = undefined;
+    if (autoSaveId) {
+      try {
+        const value = localStorage.getItem(`PanelGroup:sizes:${autoSaveId}`);
+        if (value) {
+          defaultSizes = JSON.parse(value);
+        }
+      } catch (error) {}
+    }
+
     if (sizes.length === 0 && defaultSizes != null && defaultSizes.length === panels.length) {
       setSizes(defaultSizes);
     } else {
@@ -86,14 +86,14 @@ function PanelGroup({
 
       setSizes(panels.map(panel => panel.defaultSize / totalWeight));
     }
-  }, [defaultSizes]);
+  }, [autoSaveId]);
 
   useEffect(() => {
-    const { onSizesChanged } = committedValuesRef.current;
-    if (typeof onSizesChanged === "function") {
-      onSizesChanged(sizes);
+    if (autoSaveId && sizes.length > 0) {
+      // If this panel has been configured to persist sizing information, save sizes to local storage.
+      localStorage.setItem(`PanelGroup:sizes:${autoSaveId}`, JSON.stringify(sizes));
     }
-  }, [defaultSizes, sizes]);
+  }, [autoSaveId, sizes]);
 
   const getPanelStyle = useCallback(
     (id: PanelId): CSSProperties => {
