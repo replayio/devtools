@@ -1,7 +1,4 @@
-import { ApolloError } from "@apollo/client";
 import { Action } from "@reduxjs/toolkit";
-import { uploadedData } from "@replayio/protocol";
-import * as Sentry from "@sentry/react";
 
 import {
   CommandRequest,
@@ -45,6 +42,10 @@ import { subscriptionExpired } from "ui/utils/workspace";
 import { setExpectedError, setUnexpectedError } from "./errors";
 import { setViewMode } from "./layout";
 import { jumpToInitialPausePoint } from "./timeline";
+
+import { ApolloError } from "@apollo/client";
+import { uploadedData } from "@replayio/protocol";
+import * as Sentry from "@sentry/react";
 
 export { setUnexpectedError, setExpectedError };
 
