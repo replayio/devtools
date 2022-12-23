@@ -33,6 +33,7 @@ import {
   keyboardEvents,
   navigationEvents,
   repaintGraphicsResult,
+  requestFocusRangeResult,
   searchSourceContentsMatches,
   sourceContentsChunk,
   sourceContentsInfo,
@@ -732,9 +733,11 @@ export class ReplayClient implements ReplayClientInterface {
     return mappedLocation;
   }
 
-  async loadRegion(range: TimeRange): Promise<void> {
+  async requestFocusRange(range: TimeRange): Promise<requestFocusRangeResult> {
     const sessionId = this.getSessionIdThrows();
-    await client.Session.loadRegion({ region: { begin: range.begin, end: range.end } }, sessionId);
+    const result = await client.Session.requestFocusRange({ range }, sessionId);
+
+    return result;
   }
 
   isOriginalSource(sourceId: SourceId): boolean {
