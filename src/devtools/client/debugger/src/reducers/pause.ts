@@ -304,7 +304,7 @@ async function getResumePoint(replayClient: ReplayClientInterface, state: UIStat
     selectedFrameId.pauseId,
     selectedFrameId.frameId
   );
-  if (!frameSteps) {
+  if (!frameSteps?.length) {
     return;
   }
 
@@ -312,8 +312,12 @@ async function getResumePoint(replayClient: ReplayClientInterface, state: UIStat
     return findLast(frameSteps, p => compareNumericStrings(p.point, executionPoint) < 0)?.point;
   }
 
-  if (type == "stepOver" || type == "resume" || type == "stepIn" || type == "stepUp") {
-    return frameSteps.find(p => compareNumericStrings(p.point, executionPoint) > 0)?.point;
+  if (type == "stepOver" || type == "resume" || type == "stepIn" || type == "stepOut") {
+    let index = frameSteps.findIndex(p => compareNumericStrings(p.point, executionPoint) > 0);
+    if (index < 0) {
+      index = frameSteps.length - 1;
+    }
+    return frameSteps[index].point;
   }
 }
 
