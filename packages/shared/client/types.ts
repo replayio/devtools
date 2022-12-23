@@ -155,6 +155,7 @@ export interface ReplayClientInterface {
   isOriginalSource(sourceId: SourceId): boolean;
   isPrettyPrintedSource(sourceId: SourceId): boolean;
   loadRegion(range: TimeRange): Promise<void>;
+  requestFocusRange(range: TimeRange): Promise<PointRange>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;
   repaintGraphics(pauseId: PauseId): Promise<repaintGraphicsResult>;
   runAnalysis<Result>(analysisParams: RunAnalysisParams): Promise<Result[]>;
