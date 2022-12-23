@@ -88,11 +88,13 @@ export interface TestStepItemProps {
 export function TestStepItem({ step, argString, index, id }: TestStepItemProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [localPauseData, setLocalPauseData] = useState<{
+    startPauseFailed?: boolean;
     startPauseId?: string;
+    endPauseFailed?: boolean;
     endPauseId?: string;
     consoleProps?: ProtocolObject;
   }>();
-  const { setConsoleProps, setPauseId } = useContext(TestInfoContext);
+  const { loading, setLoading, setConsoleProps, setPauseId } = useContext(TestInfoContext);
   const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
     pauseId: string;
     nodeIds: string[];
@@ -108,15 +110,13 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
 
   // compare points if possible and
   useEffect(() => {
-    let endPauseResult: createPauseResult | undefined;
-    let startPauseResult: createPauseResult | undefined;
+    setLoading(true);
 
     (async () => {
       try {
         let consoleProps: ProtocolObject | undefined;
 
-        endPauseResult = pointEnd ? await client.createPause(pointEnd) : undefined;
-        startPauseResult = pointStart ? await client.createPause(pointStart) : undefined;
+        const endPauseResult = pointEnd ? await client.createPause(pointEnd) : undefined;
         const frames = endPauseResult?.data.frames;
 
         if (endPauseResult && frames) {
@@ -171,17 +171,51 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
             }
           }
 
-          setLocalPauseData({
-            startPauseId: startPauseResult?.pauseId,
-            endPauseId: endPauseResult.pauseId,
+          const endPauseId = endPauseResult.pauseId;
+          setLocalPauseData(v => ({
+            ...v,
+            endPauseFailed: false,
+            endPauseId,
             consoleProps,
-          });
+          }));
         }
       } catch {
-        setLocalPauseData(undefined);
+        setLocalPauseData(v => ({
+          ...v,
+          endPauseFailed: true,
+        }));
       }
     })();
-  }, [client, messageEnd, pointEnd, pointStart]);
+
+    (async () => {
+      try {
+        const startPauseResult = pointStart ? await client.createPause(pointStart) : undefined;
+
+        if (startPauseResult) {
+          const startPauseId = startPauseResult.pauseId;
+          setLocalPauseData(v => ({
+            ...v,
+            loading: false,
+            startPauseId,
+          }));
+        }
+      } catch {
+        setLocalPauseData(v => ({
+          ...v,
+          startPauseFailed: true,
+        }));
+      }
+    })();
+  }, [client, messageEnd, pointEnd, pointStart, setLoading]);
+
+  useEffect(() => {
+    const { endPauseFailed, endPauseId } = localPauseData || {};
+    // Loading is used by step details which only relies on the end pause
+    // completing
+    if (loading && (endPauseFailed || endPauseId)) {
+      setLoading(false);
+    }
+  }, [localPauseData, loading, setLoading]);
 
   const onClick = useCallback(() => {
     if (id) {

@@ -15,6 +15,8 @@ import { TestInfoContextMenuContextRoot } from "./TestInfoContextMenuContext";
 type TestInfoContextType = {
   consoleProps?: ProtocolObject;
   setConsoleProps: (obj?: ProtocolObject) => void;
+  loading: boolean;
+  setLoading: (loading: boolean) => void;
   pauseId: string | null;
   setPauseId: (id: string | null) => void;
 };
@@ -24,6 +26,7 @@ export const TestInfoContext = createContext<TestInfoContextType>(null as any);
 export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
   const selectedTest = useAppSelector(getSelectedTest);
   const [consoleProps, setConsoleProps] = useState<ProtocolObject>();
+  const [loading, setLoading] = useState<boolean>(true);
   const [pauseId, setPauseId] = useState<string | null>(null);
 
   const showTest = (index: number) => {
@@ -31,7 +34,9 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
   };
 
   return (
-    <TestInfoContext.Provider value={{ consoleProps, setConsoleProps, pauseId, setPauseId }}>
+    <TestInfoContext.Provider
+      value={{ loading, setLoading, consoleProps, setConsoleProps, pauseId, setPauseId }}
+    >
       <TestInfoContextMenuContextRoot>
         <div className="flex flex-grow flex-col overflow-hidden">
           <div className="relative flex flex-grow flex-col space-y-1 overflow-auto px-2">
@@ -46,7 +51,7 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
 }
 
 function Console() {
-  const { pauseId, consoleProps } = useContext(TestInfoContext);
+  const { loading, pauseId, consoleProps } = useContext(TestInfoContext);
 
   const sanitizedConsoleProps = useMemo(() => {
     const sanitized = cloneDeep(consoleProps);
@@ -82,9 +87,13 @@ function Console() {
       </div>
       <ErrorBoundary>
         <div className="flex flex-grow flex-col gap-1 p-2 font-mono">
-          {hideProps ? (
+          {loading ? (
             <div className="flex flex-grow items-center justify-center align-middle text-xs opacity-50">
-              Nothing Selected...
+              Loading ...
+            </div>
+          ) : hideProps ? (
+            <div className="flex flex-grow items-center justify-center align-middle text-xs opacity-50">
+              Failed to load step info
             </div>
           ) : (
             <PropertiesRenderer pauseId={pauseId} object={sanitizedConsoleProps} />
