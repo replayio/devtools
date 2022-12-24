@@ -39,7 +39,6 @@
     "@lexical/link": "^0.6.5",
     "@lexical/mark": "^0.6.5",
     "@lexical/react": "^0.6.5",
-    "@octokit/rest": "^19.0.5",
     "@redux-devtools/app": "^2.1.4",
     "@redux-devtools/extension": "^3.2.2",
     "@reduxjs/toolkit": "^1.8.4",

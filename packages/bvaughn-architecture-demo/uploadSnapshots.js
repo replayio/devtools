@@ -28,59 +28,15 @@ function getFiles(dir) {
   return allFiles;
 }
 
-async function createAction({ projectId }) {
-  let res;
-
-  try {
-    const {
-      payload: { pull_request: pullRequest, action },
-      runId,
-      actor,
-    } = github.context;
-
-    const branch = pullRequest?.head?.ref || "main";
-
-    const metadata = {
-      pr_url: pullRequest?.html_url,
-      pr_number: pullRequest?.number,
-      pr_title: pullRequest?.title,
-      pr_branch: branch,
-      run_id: runId,
-      actor,
-      commit_sha: github.context?.sha,
-    };
-
-    res = await fetch(`${visualsUrl}/api/createAction`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ projectId, branch, metadata }),
-    });
-
-    if (res.status !== 200) {
-      const body = await res.text();
-      console.log(res.status, body);
-      return body;
-    }
-    const body = await res.json();
-    return body;
-  } catch (e) {
-    console.error("error", e);
-  }
-}
-
-async function uploadImage(file, actionId) {
+async function uploadImage(file, branch) {
   const content = fs.readFileSync(file, { encoding: "base64" });
   const image = { content, file };
 
   console.log(`Uploading ${file}`, {
     url: `${visualsUrl}/api/uploadSnapshot`,
-    actionId,
-    image: {
-      file,
-      content: content.slice(0, 100),
-    },
+    branch,
+    projectId,
+    image: { file, content: content.slice(0, 100) },
   });
 
   let res;
@@ -91,34 +47,25 @@ async function uploadImage(file, actionId) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ image, actionId }),
+      body: JSON.stringify({ image, runId, projectId }),
     });
 
     if (res.status !== 200) {
-      const body = await res.text();
-      return body;
+      return { status: res.status, error: await res.text() };
     }
-    const body = await res.json();
-    return body;
+    return res.json();
   } catch (e) {
     console.error("error", e);
-    return e;
+    return { status: 500, error: e };
   }
 }
 
 (async () => {
-  const response = await createAction({ projectId });
-
-  console.log("response", response);
-  if (response.error) {
-    console.log("error", response.error);
-    return;
-  }
-
-  const actionId = response.data.id;
+  const { runId, sha, ref } = github.context;
+  console.log(sha, ref, github.context);
 
   const files = getFiles("./playwright/visuals");
   console.log(files);
-  const res = await Promise.all(files.map(file => uploadImage(file, actionId)));
+  const res = await Promise.all(files.map(file => uploadImage(file, ref)));
   console.log(JSON.stringify(res, null, 2));
 })();

@@ -12,16 +12,19 @@ if (SLOW_MO) {
 }
 
 const config: FullConfig = {
-  workers: 1,
   forbidOnly: !!CI,
+  globalSetup: require.resolve("./playwright.globalSetup"),
   // @ts-ignore
   reporter: CI ? "github" : "list",
-  retries: 2,
+  retries: RECORD_VIDEO || VISUAL_DEBUG ? 0 : 2,
+  snapshotDir: "./snapshots",
   use: {
     browserName: "chromium",
     launchOptions: {
       slowMo,
     },
+    trace: "on-first-retry",
+    video: RECORD_VIDEO ? "on" : "off",
     viewport: {
       width: 1024,
       height: 600,
@@ -31,5 +34,9 @@ const config: FullConfig = {
   testMatch: ["tests/**/*.ts"],
   timeout: 30_000,
 };
+
+if (VISUAL_DEBUG || RECORD_PROTOCOL_DATA) {
+  config.workers = 1;
+}
 
 export default config;
