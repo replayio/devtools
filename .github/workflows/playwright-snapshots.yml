@@ -1,4 +1,4 @@
-name: "Tests: Playwright"
+name: "Playwright Snapshots"
 
 on:
   push:
@@ -43,19 +43,17 @@ jobs:
         run: yarn install
         shell: bash
         working-directory: packages/bvaughn-architecture-demo
-      - uses: supplypike/setup-bin@v1
-        with:
-          uri: 'https://github.com/earthly/earthly/releases/download/v0.6.14/earthly-linux-amd64'
-          name: 'earthly'
-          version: '0.6.14'
-      - name: Earthly version
-        run: earthly --version
-      - name: Run dev server and Playwright tests
-        run: ./playwright.js
+      - name: Install Playwright packages
+        run: yarn install
+        shell: bash
+        working-directory: packages/bvaughn-architecture-demo/playwright
+      - name: Run dev server
+        run: yarn dev &
         working-directory: packages/bvaughn-architecture-demo
-      - name: Archive trace artifacts
+      - name: Run playwright tests
+        run: yarn test
+        working-directory: packages/bvaughn-architecture-demo/playwright  
+      - name: Upload results
         if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: Playwright test results
-          path: packages/bvaughn-architecture-demo/playwright/test-results
+        run: ./uploadSnapshots.js
+        working-directory: packages/bvaughn-architecture-demo
