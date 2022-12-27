@@ -47,7 +47,7 @@ async function uploadImage(file, branch) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ image, runId, projectId }),
+      body: JSON.stringify({ image, branch, projectId }),
     });
 
     if (res.status !== 200) {
