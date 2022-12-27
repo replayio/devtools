@@ -168,7 +168,7 @@ class TokenManager {
   }
 
   private async update(refresh: boolean) {
-    if (!this.auth0Client || this.auth0Client.isLoading) {
+    if (!this.auth0Client || this.auth0Client.isLoading || typeof window === "undefined") {
       return;
     }
 
