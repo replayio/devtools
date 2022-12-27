@@ -62,10 +62,11 @@ async function uploadImage(file, branch) {
 
 (async () => {
   const { runId, sha, ref } = github.context;
-  console.log(sha, ref, github.context);
+  console.log(">> head", github.context.payload.pull_request.head);
 
+  const branch = github.context.payload.pull_request.head.ref;
   const files = getFiles("./playwright/visuals");
   console.log(files);
-  const res = await Promise.all(files.map(file => uploadImage(file, ref)));
+  const res = await Promise.all(files.map(file => uploadImage(file, branch)));
   console.log(JSON.stringify(res, null, 2));
 })();
