@@ -51,7 +51,7 @@ jobs:
         run: yarn dev &
         working-directory: packages/bvaughn-architecture-demo
       - name: Run playwright tests
-        run: yarn test
+        run: yarn visuals
         working-directory: packages/bvaughn-architecture-demo/playwright  
       - name: Upload results
         if: always()
