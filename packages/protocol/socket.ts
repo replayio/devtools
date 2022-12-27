@@ -9,6 +9,7 @@ import {
   PointDescription,
   ProtocolClient,
   SessionId,
+  TimeRange,
   analysisPoints,
   analysisResult,
 } from "@replayio/protocol";
@@ -132,12 +133,14 @@ export async function createSession(
   recordingId: string,
   loadPoint: string | undefined,
   experimentalSettings: ExperimentalSettings,
+  focusWindow: TimeRange | undefined,
   sessionCallbacks: SessionCallbacks
 ) {
   const { sessionId } = await sendMessage("Recording.createSession", {
     recordingId,
     loadPoint: loadPoint || undefined,
     experimentalSettings,
+    focusWindow,
   });
 
   setSessionCallbacks(sessionCallbacks);

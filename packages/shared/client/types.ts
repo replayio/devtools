@@ -38,6 +38,7 @@ import {
   keyboardEvents,
   navigationEvents,
   repaintGraphicsResult,
+  requestFocusRangeResult,
 } from "@replayio/protocol";
 
 import { AnalysisParams } from "protocol/analysisManager";
@@ -154,8 +155,7 @@ export interface ReplayClientInterface {
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   isOriginalSource(sourceId: SourceId): boolean;
   isPrettyPrintedSource(sourceId: SourceId): boolean;
-  loadRegion(range: TimeRange): Promise<void>;
-  requestFocusRange(range: TimeRange): Promise<PointRange>;
+  requestFocusRange(range: TimeRange): Promise<requestFocusRangeResult>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;
   repaintGraphics(pauseId: PauseId): Promise<repaintGraphicsResult>;
   runAnalysis<Result>(analysisParams: RunAnalysisParams): Promise<Result[]>;

@@ -4,7 +4,6 @@ import {
   CommandRequest,
   CommandResponse,
   ExperimentalSettings,
-  addEventListener,
   createSession,
 } from "protocol/socket";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
@@ -39,9 +38,10 @@ import { registerRecording, trackEvent } from "ui/utils/telemetry";
 import tokenManager from "ui/utils/tokenManager";
 import { subscriptionExpired } from "ui/utils/workspace";
 
+import { getZoomRegion, setFocusRegion } from "../reducers/timeline";
 import { setExpectedError, setUnexpectedError } from "./errors";
 import { setViewMode } from "./layout";
-import { jumpToInitialPausePoint } from "./timeline";
+import { getInitialPausePoint, jumpToInitialPausePoint } from "./timeline";
 
 import { ApolloError } from "@apollo/client";
 import { uploadedData } from "@replayio/protocol";
@@ -230,67 +230,87 @@ export function createSocket(
         }
       }
 
-      const sessionId = await createSession(recordingId, loadPoint, experimentalSettings, {
-        onEvent: (event: ProtocolEvent) => {
-          if (features.logProtocolEvents) {
-            queueAction(eventReceived({ ...event, recordedAt: window.performance.now() }));
-          }
-        },
-        onRequest: (request: CommandRequest) => {
-          if (features.logProtocol) {
-            queueAction(requestSent({ ...request, recordedAt: window.performance.now() }));
-          }
-        },
-        onResponse: (response: CommandResponse) => {
-          if (features.logProtocol) {
-            const clonedResponse = { ...response, recordedAt: window.performance.now() };
+      const initialPausePoint = await getInitialPausePoint(ThreadFront.recordingId!);
+      const focusRegion =
+        initialPausePoint && "focusRegion" in initialPausePoint
+          ? initialPausePoint.focusRegion
+          : undefined;
 
-            if (isSourceContentsCommandResponse(clonedResponse)) {
-              // Must be a source contents entry. Shrink the source text just to minimize store size.
-              // It's rare that we would want to look at the source text in the Protocol Viewer,
-              // and at most we might want to see if the initial lines match or something.
-              clonedResponse.result = {
-                ...clonedResponse.result,
-                contents: clonedResponse.result.contents.slice(0, 1000),
-              };
+      const state = getState();
+      const zoomTime = getZoomRegion(state);
+
+      const focusRange = {
+        begin: focusRegion ? focusRegion.begin.time : zoomTime.beginTime,
+        end: focusRegion ? focusRegion.end.time : zoomTime.endTime,
+      };
+
+      const sessionId = await createSession(
+        recordingId,
+        loadPoint,
+        experimentalSettings,
+        focusRange,
+        {
+          onEvent: (event: ProtocolEvent) => {
+            if (features.logProtocolEvents) {
+              queueAction(eventReceived({ ...event, recordedAt: window.performance.now() }));
             }
-            queueAction(responseReceived(clonedResponse));
-          }
-        },
-        onResponseError: (error: CommandResponse) => {
-          if (features.logProtocol) {
-            queueAction(errorReceived({ ...error, recordedAt: window.performance.now() }));
-          }
-        },
-        onSocketError: (evt: Event, initial: boolean) => {
-          console.error("Socket Error", evt);
-          if (initial) {
-            queueAction(
-              setUnexpectedError({
-                action: "refresh",
-                content:
-                  "A connection to our server could not be established. Please check your connection.",
-                message: "Unable to establish socket connection",
-                ...evt,
-              })
-            );
-          } else {
-            queueAction(
-              setUnexpectedError({
-                action: "refresh",
-                content: "The socket has closed due to an error. Please refresh the page.",
-                message: "Unexpected socket error",
-                ...evt,
-              })
-            );
-          }
-        },
-        onSocketClose: (willClose: boolean) => {
-          if (!willClose) {
-            queueAction(setUnexpectedError(getDisconnectionError(), true));
-          }
-        },
-      });
+          },
+          onRequest: (request: CommandRequest) => {
+            if (features.logProtocol) {
+              queueAction(requestSent({ ...request, recordedAt: window.performance.now() }));
+            }
+          },
+          onResponse: (response: CommandResponse) => {
+            if (features.logProtocol) {
+              const clonedResponse = { ...response, recordedAt: window.performance.now() };
+
+              if (isSourceContentsCommandResponse(clonedResponse)) {
+                // Must be a source contents entry. Shrink the source text just to minimize store size.
+                // It's rare that we would want to look at the source text in the Protocol Viewer,
+                // and at most we might want to see if the initial lines match or something.
+                clonedResponse.result = {
+                  ...clonedResponse.result,
+                  contents: clonedResponse.result.contents.slice(0, 1000),
+                };
+              }
+              queueAction(responseReceived(clonedResponse));
+            }
+          },
+          onResponseError: (error: CommandResponse) => {
+            if (features.logProtocol) {
+              queueAction(errorReceived({ ...error, recordedAt: window.performance.now() }));
+            }
+          },
+          onSocketError: (evt: Event, initial: boolean) => {
+            console.error("Socket Error", evt);
+            if (initial) {
+              queueAction(
+                setUnexpectedError({
+                  action: "refresh",
+                  content:
+                    "A connection to our server could not be established. Please check your connection.",
+                  message: "Unable to establish socket connection",
+                  ...evt,
+                })
+              );
+            } else {
+              queueAction(
+                setUnexpectedError({
+                  action: "refresh",
+                  content: "The socket has closed due to an error. Please refresh the page.",
+                  message: "Unexpected socket error",
+                  ...evt,
+                })
+              );
+            }
+          },
+          onSocketClose: (willClose: boolean) => {
+            if (!willClose) {
+              queueAction(setUnexpectedError(getDisconnectionError(), true));
+            }
+          },
+        }
+      );
 
       Sentry.configureScope(scope => {
         scope.setExtra("sessionId", sessionId);
@@ -315,6 +335,9 @@ export function createSocket(
 
       await ThreadFront.waitForSession();
       dispatch(jumpToInitialPausePoint());
+      if (focusRegion) {
+        dispatch(setFocusRegion(focusRegion));
+      }
     } catch (e: any) {
       const currentError = selectors.getUnexpectedError(getState());
 

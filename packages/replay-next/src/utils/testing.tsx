@@ -216,6 +216,7 @@ export function createMockReplayClient() {
     isOriginalSource: jest.fn().mockImplementation(async () => false),
     isPrettyPrintedSource: jest.fn().mockImplementation(async () => false),
     loadRegion: jest.fn().mockImplementation(async () => {}),
+    requestFocusRange: jest.fn().mockImplementation(async () => {}),
     removeEventListener: jest.fn(),
     repaintGraphics: jest.fn().mockImplementation(async () => {}),
     runAnalysis: jest.fn().mockImplementation(async () => []),
