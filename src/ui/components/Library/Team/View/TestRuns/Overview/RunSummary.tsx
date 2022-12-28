@@ -28,7 +28,7 @@ export function Attributes({ testRun }: { testRun: TestRun }) {
   const { user, date, mergeId, mergeTitle, branch } = testRun;
 
   return (
-    <div className="flex flex-row flex-wrap items-center pl-1">
+    <div className="flex flex-row flex-wrap items-center">
       <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
       <AttributeContainer icon="person">{user!}</AttributeContainer>
       {mergeId && (
