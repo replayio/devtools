@@ -185,31 +185,31 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
 
   const onClick = useCallback(() => {
     if (id) {
-      if (pointStart) {
+      if (pointEnd) {
         if (localPauseData?.endPauseId && localPauseData.consoleProps) {
           setConsoleProps(localPauseData.consoleProps);
           setPauseId(localPauseData.endPauseId);
         }
-        dispatch(seek(pointStart!, step.absoluteStartTime, false, localPauseData?.startPauseId));
+        dispatch(seek(pointEnd!, step.absoluteEndTime, false, localPauseData?.endPauseId));
       } else {
-        dispatch(seekToTime(step.absoluteStartTime, false));
+        dispatch(seekToTime(step.absoluteEndTime, false));
       }
 
       dispatch(setSelectedStep(step));
     }
-  }, [step, pointStart, localPauseData, dispatch, setConsoleProps, id, setPauseId]);
+  }, [step, pointEnd, localPauseData, dispatch, setConsoleProps, id, setPauseId]);
 
   const onMouseEnter = () => {
     if (state === "paused") {
       return;
     }
 
-    dispatch(setTimelineToTime(step.absoluteStartTime));
-    if (localPauseData?.startPauseId) {
+    dispatch(setTimelineToTime(step.absoluteEndTime));
+    if (localPauseData?.endPauseId) {
       dispatch(
         setTimelineToPauseTime(
-          step.absoluteStartTime,
-          localPauseData.startPauseId,
+          step.absoluteEndTime,
+          localPauseData.endPauseId,
           step.annotations.start?.point
         )
       );

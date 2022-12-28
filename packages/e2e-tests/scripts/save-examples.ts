@@ -202,7 +202,7 @@ async function makeReplayPublic(apiKey: string, recordingId: string) {
   };
 
   return axios({
-    url: "https://api.replay.io/v1/graphql",
+    url: config.graphqlUrl,
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,

@@ -7,13 +7,11 @@ const {
   // much slower than production, so when this is set, tests should use
   // much longer timeouts.
   BACKEND_CI,
-  DEBUG,
   SLOW_MO,
 } = process.env;
 
 const config: PlaywrightTestConfig = {
   use: {
-    headless: !DEBUG,
     launchOptions: {
       slowMo: SLOW_MO ? parseInt(SLOW_MO, 10) : 0,
     },
@@ -59,9 +57,5 @@ const config: PlaywrightTestConfig = {
         },
       ],
 };
-
-if (DEBUG) {
-  config.workers = 1;
-}
 
 export default config;

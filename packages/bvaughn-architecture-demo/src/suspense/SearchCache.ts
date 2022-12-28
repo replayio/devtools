@@ -60,6 +60,7 @@ export const {
   [query: string, includeNodeModules: boolean, limit?: number],
   StreamingSourceSearchResults
 >(
+  "SearchCache: searchSources",
   async (
     client: ReplayClientInterface,
     query: string,

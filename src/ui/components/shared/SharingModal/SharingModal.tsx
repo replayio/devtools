@@ -91,7 +91,7 @@ function CollaboratorsSection({ recording }: { recording: Recording }) {
   }
 
   return (
-    <section className="space-y-4 bg-menuBgcolor p-8">
+    <section className="space-y-4 bg-themeBase-100 p-8">
       <div className="flex w-full flex-col justify-between space-y-3">
         <div className="w-full space-y-4">
           <div className="space-y-1.5">

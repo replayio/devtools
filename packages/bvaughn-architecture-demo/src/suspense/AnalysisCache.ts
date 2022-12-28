@@ -65,7 +65,7 @@ export function runAnalysisSuspense(
 
   let record = locationAndTimeToValueMap.get(key);
   if (record == null) {
-    const wakeable = createWakeable<AnalysisResults>();
+    const wakeable = createWakeable<AnalysisResults>(`runAnalysisSuspense: ${key}`);
 
     record = {
       status: STATUS_PENDING,

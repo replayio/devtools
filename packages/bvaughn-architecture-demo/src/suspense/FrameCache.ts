@@ -12,6 +12,7 @@ export const {
   getValueIfCached: getFramesIfCached,
   addValue: cacheFrames,
 } = createGenericCache2<ReplayClientInterface, [pauseId: PauseId], Frame[] | undefined>(
+  "FrameCache: getFrames",
   async (client, pauseId) => {
     const framesResult = await client.getAllFrames(pauseId);
     await client.waitForLoadedSources();

@@ -10,6 +10,7 @@
     "playwright:install": "playwright install chromium",
     "test": "playwright test tests",
     "test:update-fixture-data": "RECORD_PROTOCOL_DATA=true yarn test",
-    "test:visual": "PWDEBUG=console VISUAL_DEBUG=true yarn test"
+    "test:visual": "PWDEBUG=console VISUAL_DEBUG=true yarn test",
+    "visuals": "VISUALS=true yarn test"
   }
 }

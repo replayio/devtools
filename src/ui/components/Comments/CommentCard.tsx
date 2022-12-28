@@ -26,12 +26,12 @@ export default function CommentCard({ comment }: { comment: Comment }) {
   const onClick = (event: MouseEvent) => {
     event.stopPropagation();
     const openSource = viewMode === "dev";
-    dispatch(seekToComment(comment, openSource));
+    dispatch(seekToComment(comment, comment.sourceLocation, openSource));
   };
 
   const onPreviewClick = (event: MouseEvent) => {
     event.stopPropagation();
-    dispatch(seekToComment(comment, true));
+    dispatch(seekToComment(comment, comment.sourceLocation, true));
   };
 
   const showReplyButton = !isCommentContentEmpty(comment.content);

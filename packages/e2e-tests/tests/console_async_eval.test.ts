@@ -12,7 +12,7 @@ import { addLogpoint } from "../helpers/source-panel";
 
 const url = "doc_async.html";
 
-test("console_async: support global console evaluations in async frames", async ({ page }) => {
+test("console_async: support console evaluations in async frames", async ({ page }) => {
   await startTest(page, url);
   await openDevToolsTab(page);
   await openConsolePanel(page);

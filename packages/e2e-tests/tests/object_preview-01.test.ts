@@ -43,7 +43,7 @@ test(`object_preview-01: expressions in the console after time warping`, async (
   await executeTerminalExpression(page, "Error('helo')");
   await verifyConsoleMessage(page, "Error: helo");
 
-  await executeTerminalExpression(page, 'function f() { throw Error("there"); }()');
+  await executeTerminalExpression(page, '(function f() { throw Error("there"); })()');
   await verifyConsoleMessage(page, "Error: there");
 
   await executeTerminalExpression(page, "Array(1, 2, 3)");

@@ -3,6 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { EntityState, createAsyncThunk, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import { SourceLocation } from "@replayio/protocol";
 
 import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/sourceVisualizations";
 import { MiniSource, SourceDetails, getSourceDetailsEntities } from "ui/reducers/sources";
@@ -69,6 +70,7 @@ export type SymbolDeclarations = {
   hasJsx: boolean;
   hasTypes: boolean;
   framework?: string;
+  functionBodyLocations: SourceLocation[];
 };
 
 export interface SymbolEntry {

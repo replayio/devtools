@@ -46,6 +46,7 @@ export const {
   getValueAsync: getIDBInstanceAsync,
   getValueIfCached: getIDBInstanceIfCached,
 } = createGenericCache<[dbOptions: IDBOptions], IDBPDatabase>(
+  "useIndexedDB: getIDBInstance",
   async dbOptions => {
     const { databaseName, databaseVersion, storeNames } = dbOptions;
     // Create a single shared IDB instance for this DB definition
@@ -71,6 +72,7 @@ export const {
   getValueIfCached: getLatestIDBValueIfCached,
   addValue: setLatestIDBValue,
 } = createGenericCache<[dbOptions: IDBOptions, storeName: string, recordName: string], any>(
+  "MappedLocationCache: getLatestIDBValue",
   async (dbOptions, storeName, recordName) => {
     // Only look up this initial stored value once
     const dbInstance = await getIDBInstanceAsync(dbOptions);

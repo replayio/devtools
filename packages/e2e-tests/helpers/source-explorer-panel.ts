@@ -23,6 +23,8 @@ export async function openSource(page: Page, url: string): Promise<void> {
   const sourceTab = getSourceTab(page, url);
   if (await sourceTab.isVisible()) {
     await debugPrint(page, `Source "${chalk.bold(url)}" already open`, "openSource");
+    // Even if the tab is selected, make sure the editor itself has loaded.
+    await waitForSelectedSource(page, url);
     return;
   }
 

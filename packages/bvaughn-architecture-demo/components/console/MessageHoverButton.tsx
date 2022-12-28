@@ -9,6 +9,10 @@ import {
 } from "react";
 
 import Icon from "bvaughn-architecture-demo/components/Icon";
+import {
+  COMMENT_TYPE_SOURCE_CODE,
+  createTypeDataForSourceCodeComment,
+} from "bvaughn-architecture-demo/components/sources/utils/comments";
 import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
 import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
 import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
@@ -51,19 +55,32 @@ export default function MessageHoverButton({
 
   let button = null;
   if (isCurrentlyPausedAt) {
-    if (showAddCommentButton && accessToken) {
+    if (showAddCommentButton && accessToken && location !== null) {
       const addCommentTransition = () => {
+        if (location === null) {
+          return;
+        }
+
         startTransition(async () => {
           if (showCommentsPanel !== null) {
             showCommentsPanel();
           }
+
+          const typeData = await createTypeDataForSourceCodeComment(
+            client,
+            location.sourceId,
+            location.line,
+            location.column
+          );
+
           await addCommentGraphQL(graphQLClient, accessToken, recordingId, {
             content: "",
             hasFrames: true,
             isPublished: false,
             point: executionPoint,
-            sourceLocation: location,
             time,
+            type: COMMENT_TYPE_SOURCE_CODE,
+            typeData,
           });
 
           invalidateCache();

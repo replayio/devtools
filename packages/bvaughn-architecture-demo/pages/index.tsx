@@ -1,12 +1,4 @@
-import React, {
-  Suspense,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  useSyncExternalStore,
-  useTransition,
-} from "react";
+import React, { Suspense, useCallback, useContext, useMemo, useSyncExternalStore } from "react";
 
 import CommentList from "bvaughn-architecture-demo/components/comments/CommentList";
 import ConsoleRoot from "bvaughn-architecture-demo/components/console";
@@ -27,6 +19,7 @@ import { SelectedFrameContextRoot } from "bvaughn-architecture-demo/src/contexts
 import { SourcesContextRoot } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { TerminalContextRoot } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
 import { TimelineContextRoot } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
+import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
 import usePreferredColorScheme from "bvaughn-architecture-demo/src/hooks/usePreferredColorScheme";
 import createReplayClientRecorder from "shared/client/createReplayClientRecorder";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -58,15 +51,10 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
   const replayClientRecorder = useMemo(() => {
     return recordFlag ? createReplayClientRecorder(client) : client;
   }, [client, recordFlag]);
-  const [panel, setPanel] = useState<Panel>("sources");
-  const [isPending, startTransition] = useTransition();
+  const [panel, setPanel, isPending] = useLocalStorage<Panel>("bvaughn:panel", "sources", true);
 
-  const setPanelTransition = (panel: Panel) => {
-    startTransition(() => setPanel(panel));
-  };
-
-  const showCommentsPanel = useCallback(() => setPanel("comments"), []);
-  const showSourcesPanel = useCallback(() => setPanel("sources"), []);
+  const showCommentsPanel = useCallback(() => setPanel("comments"), [setPanel]);
+  const showSourcesPanel = useCallback(() => setPanel("sources"), [setPanel]);
 
   usePreferredColorScheme();
 
@@ -89,7 +77,7 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
                             className={panel === "comments" ? styles.TabSelected : styles.Tab}
                             data-test-id="TabButton-Comments"
                             disabled={isPending}
-                            onClick={() => setPanelTransition("comments")}
+                            onClick={() => setPanel("comments")}
                           >
                             <Icon className={styles.TabIcon} type="comments" />
                           </button>
@@ -97,7 +85,7 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
                             className={panel === "sources" ? styles.TabSelected : styles.Tab}
                             data-test-id="TabButton-Sources"
                             disabled={isPending}
-                            onClick={() => setPanelTransition("sources")}
+                            onClick={() => setPanel("sources")}
                           >
                             <Icon className={styles.TabIcon} type="source-explorer" />
                           </button>
@@ -105,7 +93,7 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
                             className={panel === "search" ? styles.TabSelected : styles.Tab}
                             data-test-id="TabButton-Search"
                             disabled={isPending}
-                            onClick={() => setPanelTransition("search")}
+                            onClick={() => setPanel("search")}
                           >
                             <Icon className={styles.TabIcon} type="search" />
                           </button>
@@ -115,7 +103,7 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
                             }
                             data-test-id="TabButton-ProtocolViewer"
                             disabled={isPending}
-                            onClick={() => setPanelTransition("protocol-viewer")}
+                            onClick={() => setPanel("protocol-viewer")}
                           >
                             <Icon className={styles.TabIcon} type="protocol-viewer" />
                           </button>

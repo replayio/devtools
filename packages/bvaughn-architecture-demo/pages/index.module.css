@@ -82,6 +82,9 @@
   color: var(--color-brand);
   position: relative;
 }
+.Tab:disabled {
+  color: var(--color-dim);
+}
 
 .TabSelected::before {
   position: absolute;

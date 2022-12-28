@@ -51,7 +51,7 @@ function getEncodedSuspense(host: string, fixtureDataPath: string): string {
     if (caughtError !== null) {
       throw caughtError;
     } else if (wakeable === null) {
-      wakeable = createWakeable<string>();
+      wakeable = createWakeable<string>(`getEncodedSuspense`);
       fetch(`http://${host}:3000/api/data?fixtureDataPath=${fixtureDataPath}`)
         .then(async response => {
           encoded = await response.text();

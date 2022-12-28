@@ -46,6 +46,8 @@ export interface GetComments_recording_comments {
   point: string;
   position: any | null;
   networkRequestId: string | null;
+  type: string | null;
+  typeData: any | null;
   user: GetComments_recording_comments_user | null;
   replies: GetComments_recording_comments_replies[];
 }

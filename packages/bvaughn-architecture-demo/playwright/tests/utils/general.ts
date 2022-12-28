@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import {
   Locator,
   LocatorScreenshotOptions,
@@ -7,7 +9,7 @@ import {
 } from "@playwright/test";
 import chalk from "chalk";
 
-const { HOST, RECORD_PROTOCOL_DATA, VISUAL_DEBUG } = process.env;
+const { HOST, RECORD_PROTOCOL_DATA, VISUAL_DEBUG, VISUALS } = process.env;
 
 const SCREENSHOT_OPTIONS: LocatorScreenshotOptions & PageScreenshotOptions = {
   animations: "disabled",
@@ -128,11 +130,26 @@ export async function takeScreenshot(
 
   await page.emulateMedia({ colorScheme: "dark" });
   const screenshotDark = await takeScreenshotHelper(page, locator, margin);
-  expect(screenshotDark).toMatchSnapshot(["dark", name]);
+
+  if (VISUALS) {
+    const darkDir = path.join(__dirname, `../../visuals/`, "dark");
+    fs.mkdirSync(darkDir, { recursive: true });
+    fs.writeFileSync(path.join(darkDir, name), screenshotDark);
+    expect(screenshotDark).not.toBeNull();
+  } else {
+    expect(screenshotDark).toMatchSnapshot(["dark", name]);
+  }
 
   await page.emulateMedia({ colorScheme: "light" });
   const screenshotLight = await takeScreenshotHelper(page, locator, margin);
-  expect(screenshotLight).toMatchSnapshot(["light", name]);
+  if (VISUALS) {
+    const lightDir = path.join(__dirname, `../../visuals/`, "light");
+    fs.mkdirSync(lightDir, { recursive: true });
+    fs.writeFileSync(path.join(lightDir, name), screenshotLight);
+    expect(screenshotLight).not.toBeNull();
+  } else {
+    expect(screenshotLight).toMatchSnapshot(["dark", name]);
+  }
 }
 
 async function takeScreenshotHelper(

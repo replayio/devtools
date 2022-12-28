@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { SHOW_GLOBAL_SEARCH_EVENT_TYPE } from "bvaughn-architecture-demo/components/search-files/SearchFiles";
-import { getBase64Png } from "bvaughn-architecture-demo/src/utils/canvas";
+import { createTypeDataForVisualComment } from "bvaughn-architecture-demo/components/sources/utils/comments";
 import { closeQuickOpen, toggleQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import * as dbgActions from "devtools/client/debugger/src/actions/ui";
 import { getActiveSearch, getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
@@ -121,16 +121,12 @@ function KeyboardShortcuts({
       if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
 
-        let base64PNG: string | null = null;
         const canvas = document.querySelector("canvas#graphics");
-        if (canvas) {
-          base64PNG = await getBase64Png(canvas as HTMLCanvasElement, {
-            maxWidth: 300,
-            maxHeight: 300,
-          });
-        }
+        const typeData = canvas
+          ? await createTypeDataForVisualComment(canvas as HTMLCanvasElement, null, null)
+          : null;
 
-        createFrameComment(null, recordingId, base64PNG ?? null, null);
+        createFrameComment(null, recordingId, typeData);
       }
     };
 
