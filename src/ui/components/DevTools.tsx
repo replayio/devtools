@@ -1,12 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import { PointsContextRoot } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import { SelectedFrameContextRoot } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
 import usePreferredFontSize from "bvaughn-architecture-demo/src/hooks/usePreferredFontSize";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
-import { getPaneCollapse } from "devtools/client/debugger/src/selectors";
-import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import { ThreadFront } from "protocol/thread";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
@@ -23,7 +22,6 @@ import {
   maybeSetGuestMixpanelContext,
   trackEventOnce,
 } from "ui/utils/mixpanel";
-import { prefs } from "ui/utils/prefs";
 import tokenManager, { TokenState } from "ui/utils/tokenManager";
 import useAuth0 from "ui/utils/useAuth0";
 
@@ -72,7 +70,6 @@ function ViewLoader() {
 }
 
 function Body() {
-  const sidePanelCollapsed = useAppSelector(getPaneCollapse);
   const viewMode = useAppSelector(getViewMode);
 
   return (
@@ -80,25 +77,21 @@ function Body() {
       <div className="flex h-full flex-row overflow-hidden bg-chrome">
         <Toolbar />
         <ReduxAnnotationsProvider>
-          <SplitBox
-            startPanel={<SidePanel />}
-            endPanel={
-              viewMode === "dev" ? (
+          <PanelGroup autoSaveId="DevTools-horizontal" className="split-box" direction="horizontal">
+            <Panel className="flex=1 flex h-full overflow-hidden" defaultSize={20} minSize={15}>
+              <SidePanel />
+            </Panel>
+            <PanelResizeHandle className="h-full w-2" />
+            <Panel className="flex h-full overflow-hidden" minSize={50}>
+              {viewMode === "dev" ? (
                 <React.Suspense fallback={<ViewLoader />}>
                   <Viewer />
                 </React.Suspense>
               ) : (
                 <Video />
-              )
-            }
-            initialSize={prefs.sidePanelSize as `${number}px`}
-            maxSize={sidePanelCollapsed ? "0" : "80%"}
-            minSize={sidePanelCollapsed ? "0" : "240px"}
-            onControlledPanelResized={(num: number) => (prefs.sidePanelSize = `${num}px`)}
-            splitterSize={8}
-            style={{ width: "100%", overflow: "hidden" }}
-            vert={true}
-          />
+              )}
+            </Panel>
+          </PanelGroup>
         </ReduxAnnotationsProvider>
       </div>
       <Timeline />
