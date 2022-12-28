@@ -33,7 +33,7 @@ export function TestStepRowBase({
           "bg-testsuitesErrorBgcolor hover:bg-testsuitesErrorBgcolorHover": error && pending,
           "bg-testsuitesErrorBgcolorHover": error && active,
           "bg-toolbarBackgroundHover": active && !error,
-          "bg-testsuitesStepsBgcolor hover:bg-toolbarBackgroundHover": pending && !error,
+          "bg-testsuitesStepsBgcolor hover:bg-testsuitesStepsBgcolorHover": pending && !error,
           "hover:bg-toolbarBackgroundHover": !pending && !active && !error,
         }
       )}
