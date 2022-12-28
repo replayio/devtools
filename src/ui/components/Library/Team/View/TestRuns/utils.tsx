@@ -1,8 +1,9 @@
 import { Recording } from "ui/types";
 
 export function getDuration(recordings: Recording[]) {
-  const sortedRecordings = recordings.map(r => new Date(r.date).getTime()).sort((a, b) => a - b);
-  return sortedRecordings[sortedRecordings.length - 1] - sortedRecordings[0];
+  return recordings
+    .flatMap(r => r.metadata?.test?.tests?.map(t => t.duration))
+    .reduce<number>((acc, v) => acc + (v || 0), 0);
 }
 export const getDurationString = (duration: number) => {
   const date = new Date(duration);
