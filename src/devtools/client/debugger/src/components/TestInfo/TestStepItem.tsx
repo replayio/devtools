@@ -295,7 +295,7 @@ function Actions({ step, isSelected }: { step: AnnotatedTestStep; isSelected: bo
       onClick={onClick}
       className={`${isSelected ? "" : "invisible"} group-hover/step:visible`}
     >
-      <div className="flex items-center">
+      <div className="flex items-center text-themeBase-85">
         <MaterialIcon>more_vert</MaterialIcon>
       </div>
     </button>

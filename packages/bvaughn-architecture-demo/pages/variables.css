@@ -94,9 +94,9 @@
 
   --collapsible-toggle-color: #9ba0a5;
 
-  --context-menu-background-color: var(--background-color-contrast-3);
+  --context-menu-background-color: var(--theme-base-95);
   --context-menu-background-color-divider: var(--background-color-contrast-2);
-  --context-menu-background-color-hover: var(--background-color-contrast-2);
+  --context-menu-background-color-hover: var(--theme-base-90);
 
   --comment-card-source-preview-background-color: #081221;
   --comment-card-source-preview-background-color-hover: #3e434a;
@@ -253,9 +253,9 @@
 
   --collapsible-toggle-color: #868688;
 
-  --context-menu-background-color: var(--background-color-default);
+  --context-menu-background-color: var(--theme-base-100);
   --context-menu-background-color-divider: var(--background-color-contrast-1);
-  --context-menu-background-color-hover: var(--background-color-contrast-1);
+  --context-menu-background-color-hover: var(--theme-base-95);
 
   --comment-card-source-preview-background-color: #f2f3f2;
   --comment-card-source-preview-background-color-hover: #e6e6e6;
