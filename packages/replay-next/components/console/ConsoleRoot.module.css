@@ -6,6 +6,7 @@
   background-color: var(--background-color-contrast-2);
   word-break: break-all;
   font-size: var(--font-size-regular);
+  font-weight: bolder;
 }
 .ConsoleRoot:focus {
   outline: none;
@@ -78,6 +79,7 @@
   align-items: center;
   min-height: 1.75rem;
   flex: 0 0 auto;
+  background-color: rebeccapurple;
 }
 
 .Loader {
