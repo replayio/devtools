@@ -94,7 +94,6 @@ export async function setupTimeline(store: UIStore) {
   shortcuts.attach(window.document);
 }
 
-// MIRIAM - here
 export function jumpToInitialPausePoint(): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const endpoint = await replayClient.getSessionEndpoint(replayClient.getSessionId()!);
@@ -119,10 +118,7 @@ export function jumpToInitialPausePoint(): UIThunkAction {
       const focusRegion =
         "focusRegion" in initialPausePoint ? initialPausePoint.focusRegion : undefined;
       if (focusRegion) {
-        // MIRIAM: this sets redux state.
         dispatch(newFocusRegion(focusRegion));
-        // MIRIAM: this sends a protocol request to backend.
-        // dispatch(syncFocusedRegion());
       }
       point = initialPausePoint.point;
       time = initialPausePoint.time;

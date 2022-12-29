@@ -335,9 +335,6 @@ export function createSocket(
 
       await ThreadFront.waitForSession();
       dispatch(jumpToInitialPausePoint());
-      if (focusRegion) {
-        dispatch(setFocusRegion(focusRegion));
-      }
     } catch (e: any) {
       const currentError = selectors.getUnexpectedError(getState());
 
