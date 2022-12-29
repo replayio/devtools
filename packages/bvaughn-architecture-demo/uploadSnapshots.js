@@ -32,13 +32,6 @@ async function uploadImage(file, branch) {
   const content = fs.readFileSync(file, { encoding: "base64" });
   const image = { content, file };
 
-  console.log(`Uploading ${file}`, {
-    url: `${visualsUrl}/api/uploadSnapshot`,
-    branch,
-    projectId,
-    image: { file, content: content.slice(0, 100) },
-  });
-
   let res;
 
   try {
@@ -55,18 +48,28 @@ async function uploadImage(file, branch) {
     }
     return res.json();
   } catch (e) {
-    console.error("error", e);
-    return { status: 500, error: e };
+    return { file, status: 500, error: e };
   }
 }
 
 (async () => {
-  const { runId, sha, ref } = github.context;
-  console.log(">> head", github.context.payload.pull_request.head);
-
   const branch = github.context.payload.pull_request.head.ref;
   const files = getFiles("./playwright/visuals");
-  console.log(files);
+
   const res = await Promise.all(files.map(file => uploadImage(file, branch)));
-  console.log(JSON.stringify(res, null, 2));
+
+  const passed = res.filter(r => r.status == 201);
+  const failed = res.filter(r => r.status !== 201);
+
+  console.log(
+    "passed",
+    passed
+      .map(r => `${r.data?.file}\t${r.data?.status}\tprimary_changed:${r.data?.primary_changed}`)
+      .join("\n")
+  );
+
+  console.log(
+    "failed",
+    failed.map(r => r.error)
+  );
 })();
