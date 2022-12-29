@@ -1,4 +1,5 @@
 import React, { Suspense, useCallback, useContext, useMemo, useSyncExternalStore } from "react";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import CommentList from "bvaughn-architecture-demo/components/comments/CommentList";
 import ConsoleRoot from "bvaughn-architecture-demo/components/console";
@@ -108,31 +109,55 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
                             <Icon className={styles.TabIcon} type="protocol-viewer" />
                           </button>
                         </div>
-                        <div className={styles.CommentsContainer}>
-                          <Suspense fallback={<Loader />}>
-                            <LazyOffscreen mode={panel == "comments" ? "visible" : "hidden"}>
-                              <CommentList />
-                            </LazyOffscreen>
-                            <LazyOffscreen mode={panel == "protocol-viewer" ? "visible" : "hidden"}>
-                              <ProtocolViewer />
-                            </LazyOffscreen>
-                            <LazyOffscreen mode={panel == "search" ? "visible" : "hidden"}>
-                              <SearchFiles />
-                            </LazyOffscreen>
-                            <LazyOffscreen mode={panel == "sources" ? "visible" : "hidden"}>
-                              <SourceExplorer />
-                            </LazyOffscreen>
-                          </Suspense>
-                        </div>
-                        <div className={styles.SourcesContainer}>
-                          <Suspense fallback={<Loader />}>
-                            <Sources />
-                          </Suspense>
-                        </div>
-                        <div className={styles.ConsoleContainer}>
-                          <TerminalContextRoot>
-                            <ConsoleRoot showSearchInputByDefault={false} />
-                          </TerminalContextRoot>
+                        <div className={styles.PanelGroup}>
+                          <PanelGroup autoSaveId="bvaughn-layout-main" direction="horizontal">
+                            <Panel className={styles.Panel} defaultSize={15} id="left" minSize={10}>
+                              <div className={styles.CommentsContainer}>
+                                <Suspense fallback={<Loader />}>
+                                  <LazyOffscreen mode={panel == "comments" ? "visible" : "hidden"}>
+                                    <CommentList />
+                                  </LazyOffscreen>
+                                  <LazyOffscreen
+                                    mode={panel == "protocol-viewer" ? "visible" : "hidden"}
+                                  >
+                                    <ProtocolViewer />
+                                  </LazyOffscreen>
+                                  <LazyOffscreen mode={panel == "search" ? "visible" : "hidden"}>
+                                    <SearchFiles />
+                                  </LazyOffscreen>
+                                  <LazyOffscreen mode={panel == "sources" ? "visible" : "hidden"}>
+                                    <SourceExplorer />
+                                  </LazyOffscreen>
+                                </Suspense>
+                              </div>
+                              <PanelResizeHandle className={styles.PanelResizeHandle} />
+                            </Panel>
+                            <Panel
+                              className={styles.Panel}
+                              defaultSize={50}
+                              id="middle"
+                              minSize={35}
+                            >
+                              <div className={styles.SourcesContainer}>
+                                <Suspense fallback={<Loader />}>
+                                  <Sources />
+                                </Suspense>
+                              </div>
+                            </Panel>
+                            <Panel
+                              className={styles.Panel}
+                              defaultSize={35}
+                              id="right"
+                              minSize={25}
+                            >
+                              <PanelResizeHandle className={styles.PanelResizeHandle} />
+                              <div className={styles.ConsoleContainer}>
+                                <TerminalContextRoot>
+                                  <ConsoleRoot showSearchInputByDefault={false} />
+                                </TerminalContextRoot>
+                              </div>
+                            </Panel>
+                          </PanelGroup>
                         </div>
                       </div>
                       <div className={styles.Row}>

@@ -24,25 +24,24 @@
 .CommentsContainer {
   display: flex;
   flex-direction: column;
-  flex: 1 1 20%;
   height: 100%;
-  max-width: 20%;
+  width: 100%;
   overflow: auto;
 }
 
 .SourcesContainer {
   display: flex;
   flex-direction: column;
-  flex: 1 1 40%;
   height: 100%;
+  width: 100%;
   overflow: auto;
 }
 
 .ConsoleContainer {
   display: flex;
   flex-direction: column;
-  flex: 1 1 40%;
   height: 100%;
+  width: 100%;
   overflow: auto;
 }
 
@@ -100,4 +99,18 @@
   height: 1.5rem;
   width: 1.5rem;
   display: inline-block;
+}
+
+.Panel {
+  display: flex;
+  flex-direction: row;
+}
+
+.PanelGroup {
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.PanelResizeHandle {
+  width: 0.5rem;
 }

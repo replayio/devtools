@@ -1,4 +1,5 @@
 .Input {
+  flex: 1;
   height: 1.25rem;
   background-color: var(--background-color-inputs);
   color: var(--color-default);

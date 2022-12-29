@@ -9,15 +9,16 @@ import {
   useRef,
   useState,
 } from "react";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
-import Icon from "bvaughn-architecture-demo/components/Icon";
 import IndeterminateLoader from "bvaughn-architecture-demo/components/IndeterminateLoader";
 import Loader from "bvaughn-architecture-demo/components/Loader";
 import { ConsoleFiltersContextRoot } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
 import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
 import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
 
+import ConsoleActionsRow from "./ConsoleActionsRow";
 import ConsoleInput from "./ConsoleInput";
 import ConsoleSearch from "./ConsoleSearch";
 import { ConsoleSearchContext, ConsoleSearchContextRoot } from "./ConsoleSearchContext";
@@ -135,62 +136,79 @@ function Console({
       onKeyDown={onKeyDown}
       tabIndex={0}
     >
-      <div className={styles.ConsoleActions}>
-        <button
-          className={styles.MenuToggleButton}
-          data-test-id="ConsoleMenuToggleButton"
-          data-test-state={isMenuOpen ? "open" : "closed"}
-          onClick={() => {
-            setIsMenuOpen(!isMenuOpen);
-            setMenuValueHasBeenToggled(true);
-          }}
-          title={isMenuOpen ? "Close filter menu" : "Open filter menu"}
-        >
-          <Icon
-            className={styles.MenuToggleButtonIcon}
-            type={isMenuOpen ? "menu-open" : "menu-closed"}
-          />
-        </button>
+      <PanelGroup autoSaveId="ConsoleRoot" direction="horizontal">
+        <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
+          <>
+            <Panel
+              className={styles.LeftPanel}
+              defaultSize={25}
+              id="filters"
+              minSize={20}
+              order={1}
+            >
+              {
+                /* Avoid rendering two of these (even display:none) because it confuses Playwright */
+                isMenuOpen && (
+                  <ConsoleActionsRow
+                    clearConsoleEvaluations={clearConsoleEvaluations}
+                    consoleEvaluationsCount={consoleEvaluations.length}
+                    isMenuOpen={isMenuOpen}
+                    setIsMenuOpen={setIsMenuOpen}
+                    setMenuValueHasBeenToggled={setMenuValueHasBeenToggled}
+                  />
+                )
+              }
 
-        {consoleEvaluations.length > 0 && (
-          <button
-            className={styles.DeleteTerminalExpressionButton}
-            data-test-id="ClearConsoleEvaluationsButton"
-            onClick={clearConsoleEvaluations}
-            title="Clear console evaluations"
+              <div className={styles.FilterPanel}>
+                <div className={styles.FilterColumn}>
+                  <Suspense fallback={<Loader />}>{renderFilters && <FilterToggles />}</Suspense>
+                </div>
+              </div>
+            </Panel>
+            <div className={styles.PanelResizeHandleContainer}>
+              <PanelResizeHandle className={styles.PanelResizeHandle} />
+            </div>
+          </>
+        </Offscreen>
+
+        <Panel className={styles.RightPanel} defaultSize={75} id="console" minSize={50} order={2}>
+          <div className={styles.RightColumnActionsRow}>
+            {!isMenuOpen && (
+              <ConsoleActionsRow
+                clearConsoleEvaluations={clearConsoleEvaluations}
+                consoleEvaluationsCount={consoleEvaluations.length}
+                isMenuOpen={isMenuOpen}
+                setIsMenuOpen={setIsMenuOpen}
+                setMenuValueHasBeenToggled={setMenuValueHasBeenToggled}
+              />
+            )}
+            <FilterText />
+          </div>
+
+          <Suspense
+            fallback={
+              <div className={styles.Loader}>
+                <Loader />
+              </div>
+            }
           >
-            <Icon className={styles.DeleteTerminalExpressionIcon} type="delete" />
-          </button>
-        )}
-      </div>
+            <ErrorBoundary fallbackClassName={styles.ErrorBoundaryFallback}>
+              <div className={styles.MessageColumn}>
+                {nagHeader}
 
-      <FilterText />
+                <MessagesList ref={messageListRef} />
 
-      <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
-        <div className={styles.FilterColumn}>
-          <Suspense fallback={<Loader />}>{renderFilters && <FilterToggles />}</Suspense>
-        </div>
-      </Offscreen>
+                <ConsoleInput />
 
-      <Suspense
-        fallback={
-          <div className={styles.Loader}>
-            <Loader />
-          </div>
-        }
-      >
-        <ErrorBoundary fallbackClassName={styles.ErrorBoundaryFallback}>
-          <div className={styles.MessageColumn}>
-            {nagHeader}
-
-            <MessagesList ref={messageListRef} />
-
-            <ConsoleInput />
-
-            <ConsoleSearch className={styles.Row} searchInputRef={searchInputRef} />
-          </div>
-        </ErrorBoundary>
-      </Suspense>
+                <ConsoleSearch
+                  className={styles.ConsoleSearchRow}
+                  searchInputRef={searchInputRef}
+                />
+              </div>
+            </ErrorBoundary>
+          </Suspense>
+        </Panel>
+      </PanelGroup>
     </div>
   );
 }

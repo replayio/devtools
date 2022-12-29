@@ -1,7 +1,4 @@
 .ConsoleRoot {
-  display: grid;
-  grid-template-columns: auto 2fr;
-  grid-template-rows: auto 1fr;
   flex: 1 1 auto;
   overflow: hidden;
   border-bottom-left-radius: 0.5rem;
@@ -14,61 +11,68 @@
   outline: none;
 }
 
-.ConsoleActions {
-  grid-column: 1;
+.LeftPanel,
+.RightPanel {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
 }
 
-.MenuToggleButton,
-.DeleteTerminalExpressionButton {
-  width: 1.75rem;
-  height: 1.75rem;
-  padding: 0;
-  background: none;
-  outline: none;
-  border: 2px solid transparent;
-  cursor: pointer;
+.FilterPanel {
+  flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.MenuToggleButton:focus,
-.DeleteTerminalExpressionButton:focus {
-  border-color: var(--color-brand);
-}
-
-.MenuToggleButtonIcon,
-.DeleteTerminalExpressionIcon {
-  width: 1.5rem;
-  height: 1.5rem;
-  padding: 0.25rem;
-  fill: var(--color-default);
-  display: inline-block;
+  flex-direction: row;
 }
 
 .FilterColumn {
-  grid-column: 1;
+  flex: 1 1 auto;
   overflow: auto;
   height: 100%;
-  max-width: 12rem;
   border-top: 1px solid var(--background-color-default);
-  border-right: 1px solid var(--background-color-default);
+}
+
+.PanelResizeHandleContainer {
+  height: 100%;
+  width: 1px;
+  overflow: visible;
+  position: relative;
+}
+
+/**
+ * The resize target for this component is too small!
+ * This CSS overflows to give it a larger hit area than the visible 1px wide border.
+ */
+.PanelResizeHandle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -0.125rem;
+  right: -0.125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.PanelResizeHandle::after {
+  content: " ";
+  display: block;
+  height: 100%;
+  width: 1px;
+  background-color: var(--background-color-default);
+}
+
+.RightColumnActionsRow {
+  display: flex;
 }
 
 .MessageColumn {
-  grid-column: 1 / -1;
+  flex: 1 1 auto;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   border-top: 1px solid var(--background-color-default);
 }
 
-.ConsoleRootOpen .MessageColumn {
-  grid-column: 2;
-}
-
-.Row {
+.ConsoleSearchRow {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -82,5 +86,4 @@
 }
 
 .ErrorBoundaryFallback {
-  grid-column: 2;
 }
