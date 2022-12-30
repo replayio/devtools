@@ -11,6 +11,6 @@
     "test": "playwright test tests",
     "test:update-fixture-data": "RECORD_PROTOCOL_DATA=true yarn test",
     "test:visual": "PWDEBUG=console VISUAL_DEBUG=true yarn test",
-    "visuals": "VISUALS=true playwright test tests --workers=2"
+    "visuals": "VISUALS=true playwright test tests"
   }
 }

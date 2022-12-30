@@ -50,6 +50,8 @@ jobs:
       - name: Run dev server
         run: yarn dev &
         working-directory: packages/bvaughn-architecture-demo
+      - name: Wait until server is up
+        run: npx wait-on http-get://localhost:3000
       - name: Run playwright tests
         run: yarn visuals
         working-directory: packages/bvaughn-architecture-demo/playwright  
