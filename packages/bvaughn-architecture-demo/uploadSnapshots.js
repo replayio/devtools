@@ -28,7 +28,7 @@ function getFiles(dir) {
   return allFiles;
 }
 
-async function uploadImage(file, branch) {
+async function uploadImage(file, branch, runId) {
   const content = fs.readFileSync(file, { encoding: "base64" });
   const image = { content, file };
 
@@ -40,7 +40,7 @@ async function uploadImage(file, branch) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ image, branch, projectId }),
+      body: JSON.stringify({ image, branch, projectId, runId }),
     });
 
     if (res.status !== 200) {
@@ -59,13 +59,14 @@ async function uploadImage(file, branch) {
   const branch =
     github.context.payload.pull_request?.head?.ref ||
     github.context.payload.repository?.default_branch;
+  const runId = github.context.runId;
 
   if (!branch) {
     console.log(`Skipping: No branch found`);
     return;
   }
   console.log(`Uploading to branch ${branch}`);
-  const res = await Promise.all(files.map(file => uploadImage(file, branch)));
+  const res = await Promise.all(files.map(file => uploadImage(file, branch, runId)));
 
   const passed = res.filter(r => r.status == 201);
   const failed = res.filter(r => r.status !== 201);
@@ -79,4 +80,8 @@ async function uploadImage(file, branch) {
 
   console.log(`${failed.length} failed snapshots`);
   console.log(failed.map(r => r.error));
+
+  if (failed.length > 0) {
+    process.exit(1);
+  }
 })();
