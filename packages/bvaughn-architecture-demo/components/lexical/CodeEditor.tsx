@@ -18,7 +18,7 @@ import {
   SerializedEditorState,
   TextNode,
 } from "lexical";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { PauseAndFrameId } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
 
@@ -59,7 +59,7 @@ export default function CodeEditor({
   pauseAndFrameId: PauseAndFrameId | null;
   placeholder?: string;
 }): JSX.Element {
-  const historyState = createEmptyHistoryState();
+  const historyState = useMemo(() => createEmptyHistoryState(), []);
 
   const editorRef = useRef<LexicalEditor>(null);
   const backupEditorStateRef = useRef<EditorState | null>(null);

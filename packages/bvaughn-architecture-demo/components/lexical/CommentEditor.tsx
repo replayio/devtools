@@ -92,7 +92,7 @@ export default function CommentEditor({
   onSave: (editorState: SerializedEditorState) => void;
   placeholder: string;
 }): JSX.Element {
-  const historyState = createEmptyHistoryState();
+  const historyState = useMemo(() => createEmptyHistoryState(), []);
 
   const editorRef = useRef<LexicalEditor>(null);
   const backupEditorStateRef = useRef<EditorState | null>(null);
