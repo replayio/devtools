@@ -4,6 +4,7 @@
 const github = require("@actions/github");
 const fs = require("fs");
 const fetch = require("node-fetch");
+const chunk = require("lodash/chunk");
 
 const projectId = "dcb5df26-b418-4fe2-9bdf-5a838e604ec4";
 const visualsUrl = "https://replay-visuals.vercel.app";
@@ -53,8 +54,8 @@ async function uploadImage(file, branch, runId) {
 }
 
 (async () => {
-  const files = getFiles("./playwright/visuals");
-  console.log(`Found ${files.length} files`);
+  const allFiles = getFiles("./playwright/visuals");
+  console.log(`Found ${allFiles.length} files`);
 
   const branch =
     github.context.payload.pull_request?.head?.ref ||
@@ -66,10 +67,16 @@ async function uploadImage(file, branch, runId) {
     return;
   }
   console.log(`Uploading to branch ${branch}`);
-  const res = await Promise.all(files.map(file => uploadImage(file, branch, runId)));
 
-  const passed = res.filter(r => r.status == 201);
-  const failed = res.filter(r => r.status !== 201);
+  let results = [];
+
+  for (const files of chunk(allFiles, 20)) {
+    const res = await Promise.all(files.map(file => uploadImage(file, branch, runId)));
+    results.push(...res);
+  }
+
+  const passed = results.filter(r => r.status == 201);
+  const failed = results.filter(r => r.status !== 201);
 
   console.log(`${passed.length} passed snapshots`);
   console.log(
