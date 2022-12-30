@@ -51,6 +51,7 @@ export default function CodeCompletionPlugin({
 
   return (
     <TypeAheadPlugin<Match>
+      arrowKeysShouldDismiss={true}
       createItemNode={createItemNode}
       dataTestId={dataTestId}
       dataTestName={dataTestName}
