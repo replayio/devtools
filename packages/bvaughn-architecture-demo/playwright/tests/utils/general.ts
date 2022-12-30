@@ -148,7 +148,7 @@ export async function takeScreenshot(
     fs.writeFileSync(path.join(lightDir, name), screenshotLight);
     expect(screenshotLight).not.toBeNull();
   } else {
-    expect(screenshotLight).toMatchSnapshot(["dark", name]);
+    expect(screenshotLight).toMatchSnapshot(["light", name]);
   }
 }
 
