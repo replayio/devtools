@@ -54,28 +54,29 @@ async function uploadImage(file, branch) {
 
 (async () => {
   const files = getFiles("./playwright/visuals");
-  console.log("payload", github.context.payload);
-  console.log("context", github.context);
-  const branch = github.context.payload.pull_request?.head?.ref || "main";
+  console.log(`Found ${files.length} files`);
 
   const branch =
     github.context.payload.pull_request?.head?.ref ||
     github.context.payload.repository?.default_branch;
 
+  if (!branch) {
+    console.log(`Skipping: No branch found`);
+    return;
+  }
+  console.log(`Uploading to branch ${branch}`);
   const res = await Promise.all(files.map(file => uploadImage(file, branch)));
 
   const passed = res.filter(r => r.status == 201);
   const failed = res.filter(r => r.status !== 201);
 
+  console.log(`${passed.length} passed snapshots`);
   console.log(
-    "passed",
     passed
       .map(r => `${r.data?.file}\t${r.data?.status}\tprimary_changed:${r.data?.primary_changed}`)
       .join("\n")
   );
 
-  console.log(
-    "failed",
-    failed.map(r => r.error)
-  );
+  console.log(`${failed.length} failed snapshots`);
+  console.log(failed.map(r => r.error));
 })();
