@@ -254,8 +254,8 @@
   --collapsible-toggle-color: #868688;
 
   --context-menu-background-color: #f0f0f0;
-  --context-menu-background-color-divider: var(--background-color-contrast-1);
-  --context-menu-background-color-hover: var(--background-color-contrast-1);
+  --context-menu-background-color-divider: #d0d0d0;
+  --context-menu-background-color-hover: #d0d0d0;
 
   --comment-card-source-preview-background-color: #f2f3f2;
   --comment-card-source-preview-background-color-hover: #e6e6e6;
