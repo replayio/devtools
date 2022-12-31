@@ -57,19 +57,19 @@ async function uploadImage(file, branch, runId) {
   const allFiles = getFiles("./playwright/visuals");
   console.log(`Found ${allFiles.length} files`);
 
+  const runId = github.context.runId;
   const branch =
     github.context.payload.pull_request?.head?.ref ||
     github.context.payload.repository?.default_branch;
-  const runId = github.context.runId;
 
   if (!branch) {
     console.log(`Skipping: No branch found`);
     return;
   }
+
   console.log(`Uploading to branch ${branch}`);
 
   let results = [];
-
   for (const files of chunk(allFiles, 20)) {
     const res = await Promise.all(files.map(file => uploadImage(file, branch, runId)));
     results.push(...res);
