@@ -253,7 +253,7 @@
 
   --collapsible-toggle-color: #868688;
 
-  --context-menu-background-color: var(--background-color-default);
+  --context-menu-background-color: #f0f0f0;
   --context-menu-background-color-divider: var(--background-color-contrast-1);
   --context-menu-background-color-hover: var(--background-color-contrast-1);
 
