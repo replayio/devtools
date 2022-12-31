@@ -529,8 +529,8 @@ test("should support setting focus range via the context menu", async ({ page })
 
   listItem = await locateMessage(page, "console-warning", "This is a warning");
   await listItem.click({ button: "right" });
-  await stopHovering(page);
   await page.click("[data-test-id=ConsoleContextMenu-SetFocusStartButton]");
+  await stopHovering(page);
   // Give the UI time to settle.
   await expect(messageLocator(page, "console-log", "This is a log")).toBeHidden();
   await takeScreenshot(page, list, "context-menu-focus-after-start");
