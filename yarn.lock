@@ -5983,12 +5983,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@testing-library/user-event@npm:^14.1.0":
-  version: 14.2.0
-  resolution: "@testing-library/user-event@npm:14.2.0"
+"@testing-library/user-event@npm:^14.4.3":
+  version: 14.4.3
+  resolution: "@testing-library/user-event@npm:14.4.3"
   peerDependencies:
     "@testing-library/dom": ">=7.21.4"
-  checksum: b34f19bbfe938d03778831b9c083d451c53f983f6f6c0db05a572b71ba5323c4125097bb4b8c97595bc9b946610d2c2f65cf1e113f047eed7a3078f28a1027e2
+  checksum: 852c48ea6db1c9471b18276617c84fec4320771e466cd58339a732ca3fd73ad35e5a43ae14f51af51a8d0a150dcf60fcaab049ef367871207bea8f92c4b8195e
   languageName: node
   linkType: hard
 
@@ -20999,7 +20999,7 @@ __metadata:
     "@tailwindcss/forms": ^0.5.0
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.3.0
-    "@testing-library/user-event": ^14.1.0
+    "@testing-library/user-event": ^14.4.3
     "@trunkio/launcher": ^1.0.5
     "@types/classnames": ^2.2.11
     "@types/cookie": ^0.4.1
