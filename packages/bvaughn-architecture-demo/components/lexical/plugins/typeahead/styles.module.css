@@ -16,7 +16,7 @@
 
 .Item,
 .SelectedItem {
-  background-color: var(--context-menu-background-color);
+  background-color: var(--context-menu-bgcolor);
   color: var(--color-default);
   font-size: var(--font-size-regular);
   line-height: 1.5rem;
@@ -29,5 +29,5 @@
 }
 
 .Item:hover {
-  background-color: var(--context-menu-background-color-hover);
+  background-color: var(--context-menu-bgcolor-hover);
 }

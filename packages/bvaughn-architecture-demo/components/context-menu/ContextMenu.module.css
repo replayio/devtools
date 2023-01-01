@@ -8,5 +8,5 @@
   z-index: 15;
   filter: drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.5));
   padding: 0.25rem 0;
-  background-color: var(--context-menu-background-color);
+  background-color: var(--context-menu-bgcolor);
 }
