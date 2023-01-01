@@ -1844,13 +1844,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/lang-json@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@codemirror/lang-json@npm:6.0.0"
+"@codemirror/lang-json@npm:^6.0.1":
+  version: 6.0.1
+  resolution: "@codemirror/lang-json@npm:6.0.1"
   dependencies:
     "@codemirror/language": ^6.0.0
     "@lezer/json": ^1.0.0
-  checksum: 9eb7b1842e407f87683420ac74c06af224142719daf4d8dad254bffc34e826deaee2a318481b3e875e87051acaac8a56e85b4cc2ed7de53bd0297fc630e8452f
+  checksum: e9e87d50ff7b81bd56a6ab50740b1dd54e9a93f1be585e1d59d0642e2148842ea1528ac7b7221eb4ddc7fe84bbc28065144cc3ab86f6e06c6aeb2d4b4e62acf1
   languageName: node
   linkType: hard
 
@@ -9152,7 +9152,7 @@ __metadata:
     "@actions/github": ^5.1.1
     "@codemirror/lang-html": ^6.1.2
     "@codemirror/lang-javascript_bvaughn": "npm:@codemirror/lang-javascript@6.1.0"
-    "@codemirror/lang-json": ^6.0.0
+    "@codemirror/lang-json": ^6.0.1
     "@codemirror/language_bvaughn": "npm:@codemirror/language@6.2.1"
     "@codemirror/state_bvaughn": "npm:@codemirror/state@6.1.2"
     "@lezer/common_bvaughn": "npm:@lezer/common@1.0.1"
