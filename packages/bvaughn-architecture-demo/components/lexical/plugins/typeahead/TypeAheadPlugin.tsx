@@ -4,10 +4,14 @@ import {
   $createTextNode,
   $getSelection,
   COMMAND_PRIORITY_NORMAL,
+  KEY_ARROW_DOWN_COMMAND,
+  KEY_ARROW_LEFT_COMMAND,
+  KEY_ARROW_RIGHT_COMMAND,
+  KEY_ARROW_UP_COMMAND,
   LexicalNode,
   TextNode,
 } from "lexical";
-import { ReactNode, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { ReactNode, Suspense, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { INSERT_ITEM_COMMAND } from "./commands";
@@ -16,6 +20,7 @@ import { QueryData, TypeAheadSelection } from "./types";
 
 export default function TypeAheadPlugin<Item extends Object>({
   anchorElem = document.body,
+  arrowKeysShouldDismiss = false,
   createItemNode = $createTextNode as any,
   dataTestId,
   dataTestName,
@@ -27,6 +32,7 @@ export default function TypeAheadPlugin<Item extends Object>({
   listClassName = "",
 }: {
   anchorElem?: HTMLElement;
+  arrowKeysShouldDismiss?: boolean;
   createItemNode?: (item: Item) => LexicalNode;
   dataTestId?: string;
   dataTestName?: string;
@@ -41,7 +47,9 @@ export default function TypeAheadPlugin<Item extends Object>({
 
   const [queryData, setQueryData] = useState<QueryData | null>(null);
 
-  const ignoreNextUpdateRef = useRef(false);
+  // Ignore the first update.
+  // We shouldn't show a type-ahead completion for an editor editor that just mounted and happens to contain content.
+  const ignoreNextUpdateRef = useRef(true);
 
   // Shares most recently committed component state with imperative Lexical API (which only runs on mount)
   const committedStateRef = useRef({ queryData });
@@ -145,12 +153,49 @@ export default function TypeAheadPlugin<Item extends Object>({
       }
     }
 
+    // Up/down arrow keys should not show a type-ahead suggestion,
+    // and should dismiss a type-ahead suggestion if one is active.
+    function onUpDownArrowKeyCommand() {
+      if (arrowKeysShouldDismiss) {
+        ignoreNextUpdateRef.current = true;
+      }
+
+      return arrowKeysShouldDismiss;
+    }
+
+    // Left/right arrow keys should dismiss a type-ahead suggestion.
+    function onLeftRightArrowKeyCommand() {
+      if (arrowKeysShouldDismiss) {
+        ignoreNextUpdateRef.current = true;
+
+        setQueryData(null);
+      }
+
+      return arrowKeysShouldDismiss;
+    }
+
     return mergeRegister(
       editor.registerEditableListener(onEditable),
       editor.registerUpdateListener(onUpdate),
-      editor.registerCommand(INSERT_ITEM_COMMAND, onInsertItem, COMMAND_PRIORITY_NORMAL)
+      editor.registerCommand(INSERT_ITEM_COMMAND, onInsertItem, COMMAND_PRIORITY_NORMAL),
+      editor.registerCommand(
+        KEY_ARROW_DOWN_COMMAND,
+        onUpDownArrowKeyCommand,
+        COMMAND_PRIORITY_NORMAL
+      ),
+      editor.registerCommand(
+        KEY_ARROW_LEFT_COMMAND,
+        onLeftRightArrowKeyCommand,
+        COMMAND_PRIORITY_NORMAL
+      ),
+      editor.registerCommand(
+        KEY_ARROW_RIGHT_COMMAND,
+        onLeftRightArrowKeyCommand,
+        COMMAND_PRIORITY_NORMAL
+      ),
+      editor.registerCommand(KEY_ARROW_UP_COMMAND, onUpDownArrowKeyCommand, COMMAND_PRIORITY_NORMAL)
     );
-  }, [createItemNode, editor, findMatches, getQueryData]);
+  }, [arrowKeysShouldDismiss, createItemNode, editor, findMatches, getQueryData]);
 
   return queryData === null
     ? null

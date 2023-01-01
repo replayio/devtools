@@ -18,6 +18,8 @@ export default function findMatchingScopesAndProperties(
   scopes: Scope[] | null,
   properties: Property[] | null
 ): string[] | null {
+  matchComparator = query ? createComparatorForNeedle(query) : null;
+
   if (queryScope) {
     // We're searching the properties of an object.
     // Ignore scope values because they aren't part of that object.
@@ -36,18 +38,6 @@ export default function findMatchingScopesAndProperties(
   } else {
     return null;
   }
-}
-
-function calculateCharacterCasingWeight(sameCase: boolean): number {
-  return sameCase ? 1 : 0;
-}
-
-function calculateCharacterProximityWeight(delta: number): number {
-  return Math.max(0, 10 - delta);
-}
-
-function calculateCharacterIndexWeight(characterIndex: number): number {
-  return Math.max(0, 10 - characterIndex);
 }
 
 function flatten(scopes: Scope[] | null, properties: Property[] | null): string[] {
@@ -81,6 +71,7 @@ function findMatches(
 ): Match[] {
   const matches: Match[] = [];
 
+  // Filter out non-matching items quickly (before doing the heavier work of computing a score)
   const needleRegExp = new RegExp(
     needle.replace(/./g, char =>
       /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/.test(char) ? `\\${char}.*` : `${char}.*`
@@ -118,45 +109,80 @@ function findMatches(
 }
 
 function getMatchWeight(text: string, needle: string): number {
+  let matchingSubstringLength = 0;
   let needleIndex = 0;
-  let prevMatchingTextIndex = -1;
+  let textIndex = 0;
   let weight = 0;
-  for (let textIndex = 0; textIndex < text.length; textIndex++) {
+
+  while (needleIndex < needle.length && textIndex < text.length) {
     const textCharacter = text.charAt(textIndex);
     const needleCharacter = needle.charAt(needleIndex);
 
     if (textCharacter.toLowerCase() === needleCharacter.toLowerCase()) {
-      weight += calculateCharacterCasingWeight(textCharacter === needleCharacter);
-      weight += calculateCharacterProximityWeight(textIndex - prevMatchingTextIndex);
-      weight += calculateCharacterIndexWeight(textIndex);
+      matchingSubstringLength++;
 
       needleIndex++;
+      textIndex++;
+    } else {
+      if (matchingSubstringLength > 0) {
+        weight += matchingSubstringLength * matchingSubstringLength;
 
-      if (needleIndex === needle.length) {
-        return weight;
+        matchingSubstringLength = 0;
       }
 
-      prevMatchingTextIndex = textIndex;
+      textIndex++;
     }
   }
 
-  return 0;
+  // No match (or incomplete match)
+  if (needleIndex < needle.length - 1) {
+    return 0;
+  }
+
+  if (matchingSubstringLength > 0) {
+    weight += matchingSubstringLength * matchingSubstringLength;
+  }
+
+  return weight;
 }
 
-function compareMatch(a: Match, b: Match): number {
-  if (a.weight !== b.weight) {
-    // Higher weight should come first.
-    return b.weight - a.weight;
-  } else {
-    // For equal weights, fall back to sorting alphabetically.
+type MatchComparator = (a: Match, b: Match) => number;
+
+let matchComparator: MatchComparator | null = null;
+
+// Match ranking is as follows:
+// 1. Matches that begin with the needle (case-sensitive comparison) should come first.
+// 2. Matches that begin with the needle (case-insensitive comparison) should come second.
+// 3. Matches with the longest matching substring group(s) should come third.
+// 4. All else being equal, fall back to locale comparison.
+function createComparatorForNeedle(needle: string): MatchComparator {
+  const lowerCaseNeedle = needle.toLowerCase();
+
+  return (a: Match, b: Match) => {
+    const aStart = a.text.startsWith(needle);
+    const bStart = b.text.startsWith(needle);
+    if (aStart != bStart) {
+      return aStart ? -1 : 1;
+    }
+
+    const aStartLowerCase = a.text.toLowerCase().startsWith(lowerCaseNeedle);
+    const bStartLowerCase = b.text.toLowerCase().startsWith(lowerCaseNeedle);
+    if (aStartLowerCase != bStartLowerCase) {
+      return aStartLowerCase ? -1 : 1;
+    }
+
+    if (a.weight !== b.weight) {
+      return b.weight - a.weight;
+    }
+
     return a.text.localeCompare(b.text);
-  }
+  };
 }
 
 function findIndexMatch(sortedMatches: Match[], match: Match): number {
-  return findIndex<Match>(sortedMatches, match, compareMatch);
+  return findIndex<Match>(sortedMatches, match, matchComparator!);
 }
 
 function insertMatch(sortedMatches: Match[], match: Match): Match[] {
-  return insert<Match>(sortedMatches, match, compareMatch);
+  return insert<Match>(sortedMatches, match, matchComparator!);
 }

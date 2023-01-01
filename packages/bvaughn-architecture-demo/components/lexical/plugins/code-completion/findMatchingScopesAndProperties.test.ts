@@ -61,7 +61,7 @@ describe("findMatches", () => {
     ).toEqual(["fb", "fobar", "foobar"]);
   });
 
-  it("should sort matches to emphasize properties that match earlier in the substring", () => {
+  it("should sort matches to emphasize properties that begin with the substring", () => {
     expect(
       findMatches(
         "foo",
@@ -69,7 +69,7 @@ describe("findMatches", () => {
         null,
         createPropertiesFromNames("zbar", "aaaaabar", "bar", "baraaa")
       )
-    ).toEqual(["bar", "baraaa", "zbar", "aaaaabar"]);
+    ).toEqual(["bar", "baraaa", "aaaaabar", "zbar"]);
   });
 
   it("should sort matches to emphasize properties with more consecutive matching substring characters", () => {

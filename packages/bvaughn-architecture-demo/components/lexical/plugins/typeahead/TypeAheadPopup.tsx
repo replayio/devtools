@@ -106,8 +106,10 @@ function TypeAheadPopUp<Item>({
 
     const previousItem = prevSelectedIndex < prevItems.length ? prevItems[prevSelectedIndex] : null;
 
+    // Only maintain selection if the selected index is greater than 0.
+    // This avoids awkward scroll jumps while the user is typing.
     let newSelectionIndex = 0;
-    if (previousItem !== null) {
+    if (previousItem !== null && prevSelectedIndex > 0) {
       newSelectionIndex = items.indexOf(previousItem);
       newSelectionIndex = newSelectionIndex >= 0 ? newSelectionIndex : 0;
     }

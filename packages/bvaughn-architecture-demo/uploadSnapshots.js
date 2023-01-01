@@ -4,6 +4,7 @@
 const github = require("@actions/github");
 const fs = require("fs");
 const fetch = require("node-fetch");
+const chunk = require("lodash/chunk");
 
 const projectId = "dcb5df26-b418-4fe2-9bdf-5a838e604ec4";
 const visualsUrl = "https://replay-visuals.vercel.app";
@@ -28,16 +29,9 @@ function getFiles(dir) {
   return allFiles;
 }
 
-async function uploadImage(file, branch) {
+async function uploadImage(file, branch, runId) {
   const content = fs.readFileSync(file, { encoding: "base64" });
   const image = { content, file };
-
-  console.log(`Uploading ${file}`, {
-    url: `${visualsUrl}/api/uploadSnapshot`,
-    branch,
-    projectId,
-    image: { file, content: content.slice(0, 100) },
-  });
 
   let res;
 
@@ -47,7 +41,7 @@ async function uploadImage(file, branch) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ image, branch, projectId }),
+      body: JSON.stringify({ image, branch, projectId, runId }),
     });
 
     if (res.status !== 200) {
@@ -55,18 +49,46 @@ async function uploadImage(file, branch) {
     }
     return res.json();
   } catch (e) {
-    console.error("error", e);
-    return { status: 500, error: e };
+    return { file, status: 500, error: e };
   }
 }
 
 (async () => {
-  const { runId, sha, ref } = github.context;
-  console.log(">> head", github.context.payload.pull_request.head);
+  const allFiles = getFiles("./playwright/visuals");
+  console.log(`Found ${allFiles.length} files`);
 
-  const branch = github.context.payload.pull_request.head.ref;
-  const files = getFiles("./playwright/visuals");
-  console.log(files);
-  const res = await Promise.all(files.map(file => uploadImage(file, branch)));
-  console.log(JSON.stringify(res, null, 2));
+  const branch =
+    github.context.payload.pull_request?.head?.ref ||
+    github.context.payload.repository?.default_branch;
+  const runId = github.context.runId;
+
+  if (!branch) {
+    console.log(`Skipping: No branch found`);
+    return;
+  }
+  console.log(`Uploading to branch ${branch}`);
+
+  let results = [];
+
+  for (const files of chunk(allFiles, 20)) {
+    const res = await Promise.all(files.map(file => uploadImage(file, branch, runId)));
+    results.push(...res);
+  }
+
+  const passed = results.filter(r => r.status == 201);
+  const failed = results.filter(r => r.status !== 201);
+
+  console.log(`${passed.length} passed snapshots`);
+  console.log(
+    passed
+      .map(r => `${r.data?.file}\t${r.data?.status}\tprimary_changed:${r.data?.primary_changed}`)
+      .join("\n")
+  );
+
+  console.log(`${failed.length} failed snapshots`);
+  console.log(failed.map(r => r.error));
+
+  if (failed.length > 0) {
+    process.exit(1);
+  }
 })();
