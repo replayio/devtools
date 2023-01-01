@@ -11,7 +11,7 @@
 }
 
 .ContextMenuItem {
-  background-color: var(--context-menu-background-color);
+  background-color: var(--context-menu-bgcolor);
   color: var(--color-default);
   padding: 0.5rem 1rem;
   user-select: none;
@@ -21,7 +21,7 @@
   gap: 1ch;
 }
 .ContextMenuItem:hover {
-  background-color: var(--context-menu-background-color-hover);
+  background-color: var(--context-menu-bgcolor-hover);
 }
 
 .ColorBadge,

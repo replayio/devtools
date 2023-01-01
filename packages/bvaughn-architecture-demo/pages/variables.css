@@ -94,9 +94,9 @@
 
   --collapsible-toggle-color: #9ba0a5;
 
-  --context-menu-background-color: #3d4552;
-  --context-menu-background-color-divider: var(--background-color-contrast-3);
-  --context-menu-background-color-hover: var(--background-color-contrast-3);
+  --context-menu-bgcolor: #3d4552;
+  --context-menu-bgcolor-divider: var(--background-color-contrast-3);
+  --context-menu-bgcolor-hover: var(--background-color-contrast-3);
 
   --comment-card-source-preview-background-color: #081221;
   --comment-card-source-preview-background-color-hover: #3e434a;
@@ -253,9 +253,9 @@
 
   --collapsible-toggle-color: #868688;
 
-  --context-menu-background-color: #f8f8f9;
-  --context-menu-background-color-divider: #e0e0e0;
-  --context-menu-background-color-hover: #e0e0e0;
+  --context-menu-bgcolor: #f8f8f9;
+  --context-menu-bgcolor-divider: #e0e0e0;
+  --context-menu-bgcolor-hover: #e0e0e0;
 
   --comment-card-source-preview-background-color: #f2f3f2;
   --comment-card-source-preview-background-color-hover: #e6e6e6;

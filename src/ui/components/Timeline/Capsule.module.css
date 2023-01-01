@@ -16,11 +16,11 @@
   border-bottom-left-radius: 2rem;
   border-top-left-radius: 2rem;
   padding: 0 0.5rem;
-  background-color: var(--focus-mode-capsule-background-color);
+  background-color: var(--focus-mode-capsule-bgcolor);
   color: var(--theme-icon-color);
 }
 .LeftSideLoading:hover {
-  background-color: var(--focus-mode-capsule-background-color-hover);
+  background-color: var(--focus-mode-capsule-bgcolor-hover);
 }
 
 .LoadingState {
