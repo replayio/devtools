@@ -19900,12 +19900,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier-plugin-tailwindcss@npm:^0.1.7":
-  version: 0.1.13
-  resolution: "prettier-plugin-tailwindcss@npm:0.1.13"
+"prettier-plugin-tailwindcss@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "prettier-plugin-tailwindcss@npm:0.2.1"
   peerDependencies:
     prettier: ">=2.2.0"
-  checksum: 1b9000686e661be81de7d36d514c5ee34a98b11639b538bce8dd3a482c073c0148feb9d54b526babaede681d1c5ecb318ad97f38e8d71dd5cc26c33dfcaf8344
+  checksum: 5a04b26f50baea552aaff938b6413bf66d0050c3ca5a0d5bc432a7efc8f8e4ba194a23b1aabd4d39d36228afaf368ba2bce24ebb87f4972459a3679eff6942e8
   languageName: node
   linkType: hard
 
@@ -21087,7 +21087,7 @@ __metadata:
     postcss-loader: ^6.2.1
     prettier: ^2.6.2
     prettier-plugin-import-sort: ^0.0.7
-    prettier-plugin-tailwindcss: ^0.1.7
+    prettier-plugin-tailwindcss: ^0.2.1
     pretty-ms: ^7.0.1
     prop-types: ^15.8.1
     protocol: "workspace:*"
