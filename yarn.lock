@@ -17775,14 +17775,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mini-css-extract-plugin@npm:^2.6.0":
-  version: 2.6.0
-  resolution: "mini-css-extract-plugin@npm:2.6.0"
+"mini-css-extract-plugin@npm:^2.7.2":
+  version: 2.7.2
+  resolution: "mini-css-extract-plugin@npm:2.7.2"
   dependencies:
     schema-utils: ^4.0.0
   peerDependencies:
     webpack: ^5.0.0
-  checksum: ea73bd66558de7a37db094fe68fa130e7a725ab15f880ff8467a75d9c4c2f1576d20720088ea22af9922a94b8600bbfef0c6acaf10d12a32a9bd20a90ba3c35f
+  checksum: cd65611d6dc452f230c6ebba8a47bc5f5146b813b13b0b402c6f4a69f6451242eeea781152bebd31cad8ca7c7e95dac91e7e464087f18fb65b2d1097b58cf4ae
   languageName: node
   linkType: hard
 
@@ -21076,7 +21076,7 @@ __metadata:
     lodash: ^4.17.21
     logrocket: ^2.2.1
     logrocket-react: ^5.0.1
-    mini-css-extract-plugin: ^2.6.0
+    mini-css-extract-plugin: ^2.7.2
     mixpanel-browser: ^2.43.0
     next: ^12.2
     next-compose-plugins: ^2.2.1
