@@ -40,7 +40,7 @@ pref("devtools.features.protocolTimeline", false);
 pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.resolveRecording", false);
 pref("devtools.features.chromiumNetMonitor", true);
-pref("devtools.features.brokenSourcemapWorkaround", false);
+pref("devtools.features.brokenSourcemapWorkaround", true);
 
 export const prefs = new PrefsHelper("devtools", {
   colorScheme: ["String", "colorScheme"],
