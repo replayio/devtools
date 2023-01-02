@@ -6,6 +6,7 @@ import {
   InspectableTimestampedPointContext,
   InspectorContext,
 } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
+import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
 import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import {
   Value as ClientValue,
@@ -41,6 +42,7 @@ export default function HTMLElementRenderer({
   const { inspectHTMLElement } = useContext(InspectorContext);
   const client = useContext(ReplayClientContext);
   const timestampedPointContext = useContext(InspectableTimestampedPointContext);
+  const timelineContext = useContext(TimelineContext);
 
   const tagName = (object.preview?.node?.nodeName || "unknown").toLowerCase();
 
@@ -77,14 +79,11 @@ export default function HTMLElementRenderer({
     event.stopPropagation();
 
     if (inspectHTMLElement !== null) {
-      if (timestampedPointContext !== null) {
-        inspectHTMLElement(
-          protocolValue,
-          pauseId,
-          timestampedPointContext.executionPoint,
-          timestampedPointContext.time
-        );
-      }
+      // we use the current point/time unless this component is wrapped in an
+      // InspectableTimestampedPointContext (e.g. if the HTML element to render is
+      // from a console message)
+      const { executionPoint, time } = timestampedPointContext || timelineContext;
+      inspectHTMLElement(protocolValue, pauseId, executionPoint, time);
     }
   };
 
