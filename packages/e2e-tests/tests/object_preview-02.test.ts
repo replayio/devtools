@@ -1,7 +1,7 @@
 import test, { expect } from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
-import { warpToMessage } from "../helpers/console-panel";
+import { waitForTerminal, warpToMessage } from "../helpers/console-panel";
 import {
   closeBreakpointsAccordionPane,
   closeCallStackAccordionPane,
@@ -18,6 +18,7 @@ const url = "doc_rr_objects.html";
 test(`object_preview-02: should allow objects in scope to be inspected`, async ({ page }) => {
   await startTest(page, url);
   await openDevToolsTab(page);
+  await waitForTerminal(page);
 
   await warpToMessage(page, "Done");
 

@@ -46,7 +46,7 @@ import { FocusRegion, HoveredItem, PlaybackOptions } from "ui/state/timeline";
 import {
   encodeObjectToURL,
   getPausePointParams,
-  getTest,
+  isTest,
   updateUrlWithParams,
 } from "ui/utils/environment";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
@@ -106,6 +106,11 @@ export function jumpToInitialPausePoint(): UIThunkAction {
       setTimelineState({ currentTime: time, recordingDuration: time, zoomRegion: newZoomRegion })
     );
 
+    if (isTest()) {
+      ThreadFront.timeWarp(point, time, false);
+      return;
+    }
+
     const initialPausePoint = await getInitialPausePoint(ThreadFront.recordingId!);
 
     if (initialPausePoint) {
@@ -125,10 +130,6 @@ export function jumpToInitialPausePoint(): UIThunkAction {
 }
 
 async function getInitialPausePoint(recordingId: string) {
-  if (getTest()) {
-    return;
-  }
-
   const pausePointParams = getPausePointParams();
   if (pausePointParams) {
     return pausePointParams;
