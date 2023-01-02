@@ -374,3 +374,7 @@ export async function setConsoleMessageAsFocusEnd(page: Page, message: Locator) 
   await message.click({ button: "right" });
   await page.locator('[data-test-id="ConsoleContextMenu-SetFocusEndButton"]').click();
 }
+
+export async function waitForTerminal(page: Page) {
+  await page.locator('[data-test-id="ConsoleTerminalInput"]').waitFor();
+}
