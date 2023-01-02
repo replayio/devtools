@@ -120,8 +120,6 @@ const markupSlice = createSlice({
     newRootAdded(state, action: PayloadAction<NodeInfo>) {
       nodeAdapter.setAll(state.tree, [action.payload]);
       state.rootNode = action.payload.id;
-      state.selectedNode = null;
-      state.scrollIntoViewNode = null;
     },
     childrenAdded(state, action: PayloadAction<{ parent: NodeInfo; children: NodeInfo[] }>) {
       const { parent, children } = action.payload;
