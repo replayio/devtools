@@ -160,9 +160,6 @@ class _ThreadFront {
   // Waiter which resolves when the debugger has loaded and we've warped to the endpoint.
   initializedWaiter = defer<void>();
 
-  // Waiter which resolves when there is at least one loading region
-  loadingHasBegun = defer<void>();
-
   // Waiter which resolves when all sources have been loaded.
   private allSourcesWaiter = defer<void>();
   hasAllSources = false;
@@ -336,8 +333,6 @@ class _ThreadFront {
 
       client.Session.addLoadedRegionsListener((loadedRegions: LoadedRegions) => {
         this._mostRecentLoadedRegions = loadedRegions;
-
-        this.loadingHasBegun.resolve();
 
         this._loadedRegionsListeners.forEach(callback => callback(loadedRegions));
       });
