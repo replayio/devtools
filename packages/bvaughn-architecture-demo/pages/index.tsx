@@ -111,7 +111,13 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
                         </div>
                         <div className={styles.PanelGroup}>
                           <PanelGroup autoSaveId="bvaughn-layout-main" direction="horizontal">
-                            <Panel className={styles.Panel} defaultSize={15} id="left" minSize={10}>
+                            <Panel
+                              className={styles.Panel}
+                              collapsible={true}
+                              defaultSize={15}
+                              minSize={10}
+                              maxSize={20}
+                            >
                               <div className={styles.CommentsContainer}>
                                 <Suspense fallback={<Loader />}>
                                   <LazyOffscreen mode={panel == "comments" ? "visible" : "hidden"}>
@@ -130,27 +136,21 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
                                   </LazyOffscreen>
                                 </Suspense>
                               </div>
-                              <PanelResizeHandle className={styles.PanelResizeHandle} />
                             </Panel>
-                            <Panel
-                              className={styles.Panel}
-                              defaultSize={50}
-                              id="middle"
-                              minSize={35}
-                            >
+                            <PanelResizeHandle className={styles.PanelResizeHandle}>
+                              <div className={styles.PanelResizeHandleInner} />
+                            </PanelResizeHandle>
+                            <Panel className={styles.Panel} defaultSize={50} minSize={35}>
                               <div className={styles.SourcesContainer}>
                                 <Suspense fallback={<Loader />}>
                                   <Sources />
                                 </Suspense>
                               </div>
                             </Panel>
-                            <Panel
-                              className={styles.Panel}
-                              defaultSize={35}
-                              id="right"
-                              minSize={25}
-                            >
-                              <PanelResizeHandle className={styles.PanelResizeHandle} />
+                            <PanelResizeHandle className={styles.PanelResizeHandle}>
+                              <div className={styles.PanelResizeHandleInner} />
+                            </PanelResizeHandle>
+                            <Panel className={styles.Panel} defaultSize={35} minSize={25}>
                               <div className={styles.ConsoleContainer}>
                                 <TerminalContextRoot>
                                   <ConsoleRoot showSearchInputByDefault={false} />

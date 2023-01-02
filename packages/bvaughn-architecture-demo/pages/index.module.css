@@ -113,4 +113,20 @@
 
 .PanelResizeHandle {
   width: 0.5rem;
+  padding: 0.125rem;
+}
+.PanelResizeHandle:focus {
+  outline: none;
+}
+
+.PanelResizeHandleInner {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.25rem;
+  transition: 250ms linear background-color;
+}
+
+.PanelResizeHandle[aria-valuenow="0"] .PanelResizeHandleInner,
+.PanelResizeHandle[data-resize-handle-active] .PanelResizeHandleInner {
+  background-color: var(--background-color-resize-handle);
 }
