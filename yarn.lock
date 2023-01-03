@@ -1814,7 +1814,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/lang-javascript@npm:^6.0.0, @codemirror/lang-javascript_bvaughn@npm:@codemirror/lang-javascript@6.1.0":
+"@codemirror/lang-javascript@npm:^6.0.0, @codemirror/lang-javascript_replay_next@npm:@codemirror/lang-javascript@6.1.0":
   version: 6.1.0
   resolution: "@codemirror/lang-javascript@npm:6.1.0"
   dependencies:
@@ -1868,7 +1868,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/language_bvaughn@npm:@codemirror/language@6.2.1":
+"@codemirror/language_replay_next@npm:@codemirror/language@6.2.1":
   version: 6.2.1
   resolution: "@codemirror/language@npm:6.2.1"
   dependencies:
@@ -1911,7 +1911,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/state_bvaughn@npm:@codemirror/state@6.1.2":
+"@codemirror/state_replay_next@npm:@codemirror/state@6.1.2":
   version: 6.1.2
   resolution: "@codemirror/state@npm:6.1.2"
   checksum: 7eda4b3eb6a777fecaa5a62e95a162aa163ccff01913d21a88d1157247390d9b57e6bcf54738be0b98aff8ba3a6ec3cb7aeb3b9714b019cb6c05242da9d9fdfe
@@ -3001,7 +3001,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lezer/common_bvaughn@npm:@lezer/common@1.0.1":
+"@lezer/common_replay_next@npm:@lezer/common@1.0.1":
   version: 1.0.1
   resolution: "@lezer/common@npm:1.0.1"
   checksum: 05bda2b0b90713a511502e1e0c67842996cb86415cd701c46eb49f8fa117552229a4bc7244f1e8e0025e3563294a52911eebd70d06a4bc987280fca5d148c34b
@@ -3027,7 +3027,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lezer/highlight_bvaughn@npm:@lezer/highlight@1.1.1":
+"@lezer/highlight_replay_next@npm:@lezer/highlight@1.1.1":
   version: 1.1.1
   resolution: "@lezer/highlight@npm:1.1.1"
   dependencies:
@@ -9151,12 +9151,12 @@ __metadata:
   dependencies:
     "@actions/github": ^5.1.1
     "@codemirror/lang-html": ^6.1.2
-    "@codemirror/lang-javascript_bvaughn": "npm:@codemirror/lang-javascript@6.1.0"
+    "@codemirror/lang-javascript_replay_next": "npm:@codemirror/lang-javascript@6.1.0"
     "@codemirror/lang-json": ^6.0.0
-    "@codemirror/language_bvaughn": "npm:@codemirror/language@6.2.1"
-    "@codemirror/state_bvaughn": "npm:@codemirror/state@6.1.2"
-    "@lezer/common_bvaughn": "npm:@lezer/common@1.0.1"
-    "@lezer/highlight_bvaughn": "npm:@lezer/highlight@1.1.1"
+    "@codemirror/language_replay_next": "npm:@codemirror/language@6.2.1"
+    "@codemirror/state_replay_next": "npm:@codemirror/state@6.1.2"
+    "@lezer/common_replay_next": "npm:@lezer/common@1.0.1"
+    "@lezer/highlight_replay_next": "npm:@lezer/highlight@1.1.1"
     "@playwright/test": ^1.23.1
     "@replayio/protocol": ^0.32.3
     "@testing-library/jest-dom": ^5.16.3

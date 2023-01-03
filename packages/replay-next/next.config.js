@@ -10,11 +10,11 @@ module.exports = withTM(["design"])({
 
   compilerOptions: {
     paths: {
-      "@codemirror/lang-javascript": "@codemirror/lang-javascript_bvaughn",
-      "@codemirror/language": "@codemirror/language_bvaughn",
-      "@codemirror/state": "@codemirror/state_bvaughn",
-      "@lezer/common": "@lezer/common_bvaughn",
-      "@lezer/highlight": "@lezer/highlight_bvaughn",
+      "@codemirror/lang-javascript": "@codemirror/lang-javascript_replay_next",
+      "@codemirror/language": "@codemirror/language_replay_next",
+      "@codemirror/state": "@codemirror/state_replay_next",
+      "@lezer/common": "@lezer/common_replay_next",
+      "@lezer/highlight": "@lezer/highlight_replay_next",
     },
   },
 });
