@@ -680,18 +680,15 @@ export function setFocusRegionBeginTime(
 }
 
 export function syncFocusedRegion(): UIThunkAction {
-  return async (dispatch, getState, { replayClient }) => {
+  return async (_dispatch, getState, { replayClient }) => {
     const state = getState();
-    const focusRegion = getFocusRegion(state);
+    const focusRegion = getFocusRegion(state) as FocusRegion;
     const zoomTime = getZoomRegion(state);
 
-    replayClient.loadRegion(
-      {
-        begin: focusRegion ? focusRegion.begin.time : zoomTime.beginTime,
-        end: focusRegion ? focusRegion.end.time : zoomTime.endTime,
-      },
-      zoomTime.endTime
-    );
+    replayClient.requestFocusRange({
+      begin: focusRegion ? focusRegion.begin.time : zoomTime.beginTime,
+      end: focusRegion ? focusRegion.end.time : zoomTime.endTime,
+    });
   };
 }
 
