@@ -1,11 +1,13 @@
 .ConsoleRoot {
   flex: 1 1 auto;
   overflow: hidden;
-  border-bottom-left-radius: 0.5rem;
-  border-bottom-right-radius: 0.5rem;
+  border-bottom-left-radius: 3.5rem;
+  border-bottom-right-radius: 3.5rem;
   background-color: var(--background-color-contrast-2);
   word-break: break-all;
   font-size: var(--font-size-regular);
+  font-weight: bold;
+  border: 2px solid red;
 }
 .ConsoleRoot:focus {
   outline: none;
