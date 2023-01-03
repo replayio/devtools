@@ -9145,43 +9145,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"replay-next@workspace:*, replay-next@workspace:packages/replay-next":
-  version: 0.0.0-use.local
-  resolution: "replay-next@workspace:packages/replay-next"
-  dependencies:
-    "@actions/github": ^5.1.1
-    "@codemirror/lang-html": ^6.1.2
-    "@codemirror/lang-javascript_replay_next": "npm:@codemirror/lang-javascript@6.1.0"
-    "@codemirror/lang-json": ^6.0.0
-    "@codemirror/language_replay_next": "npm:@codemirror/language@6.2.1"
-    "@codemirror/state_replay_next": "npm:@codemirror/state@6.1.2"
-    "@lezer/common_replay_next": "npm:@lezer/common@1.0.1"
-    "@lezer/highlight_replay_next": "npm:@lezer/highlight@1.1.1"
-    "@playwright/test": ^1.23.1
-    "@replayio/protocol": ^0.32.3
-    "@testing-library/jest-dom": ^5.16.3
-    "@testing-library/react": ^13.2.0
-    date-fns: ^2.28.0
-    design: "workspace:*"
-    idb: ^7.1.1
-    jest: ^28.0.2
-    jest-environment-jsdom: ^28.0.2
-    js-tokens: ^8.0.0
-    lodash: ^4.17.21
-    next: ^12.1.6
-    next-transpile-modules: ^9.0.0
-    node-fetch: ^2.0.0
-    playwright-chromium: ^1.23.1
-    pretty-ms: ^7.0.1
-    protocol: "workspace:*"
-    react: 0.0.0-experimental-e7d0053e6-20220325
-    react-dom: 0.0.0-experimental-e7d0053e6-20220325
-    react-virtualized-auto-sizer: ^1.0.7
-    shared: "workspace:*"
-    typescript: ^4.6.3
-  languageName: unknown
-  linkType: soft
-
 "byline@npm:5.0.0":
   version: 5.0.0
   resolution: "byline@npm:5.0.0"
@@ -17402,7 +17365,6 @@ __metadata:
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
     "@uiw/react-codemirror": ^4.11.4
-    replay-next: "workspace:*"
     jest: ^28.0.2
     jest-environment-jsdom: ^28.0.2
     lodash: ^4.17.21
@@ -17411,6 +17373,7 @@ __metadata:
     protocol: "workspace:*"
     react: 0.0.0-experimental-e7d0053e6-20220325
     react-dom: 0.0.0-experimental-e7d0053e6-20220325
+    replay-next: "workspace:*"
     shared: "*"
     typescript: ^4.6.3
   languageName: unknown
@@ -21030,7 +20993,6 @@ __metadata:
     babel-plugin-add-react-displayname: ^0.0.5
     babel-plugin-transform-import-meta: ^2.1.1
     bufferutil: ^4.0.6
-    replay-next: "workspace:*"
     circular-dependency-plugin: ^5.2.2
     classnames: ^2.3.1
     comlink: ^4.3.1
@@ -21110,6 +21072,7 @@ __metadata:
     react-virtualized-auto-sizer: ^1.0.6
     react-window: ^1.8.8
     reactjs-popup: ^2.0.5
+    replay-next: "workspace:*"
     reselect: ^4.1.5
     shared: "workspace:*"
     sharp: ^0.30.3
@@ -21448,6 +21411,43 @@ __metadata:
   checksum: d2db0b69c5cb0c14dd750036e0abcd6b3c3f7b2da3ee179786b755cf737ca15fa0fff417ca72de33d6966056f4695440e680a352401fc02c95ade59899afbdd0
   languageName: node
   linkType: hard
+
+"replay-next@workspace:*, replay-next@workspace:packages/replay-next":
+  version: 0.0.0-use.local
+  resolution: "replay-next@workspace:packages/replay-next"
+  dependencies:
+    "@actions/github": ^5.1.1
+    "@codemirror/lang-html": ^6.1.2
+    "@codemirror/lang-javascript_replay_next": "npm:@codemirror/lang-javascript@6.1.0"
+    "@codemirror/lang-json": ^6.0.0
+    "@codemirror/language_replay_next": "npm:@codemirror/language@6.2.1"
+    "@codemirror/state_replay_next": "npm:@codemirror/state@6.1.2"
+    "@lezer/common_replay_next": "npm:@lezer/common@1.0.1"
+    "@lezer/highlight_replay_next": "npm:@lezer/highlight@1.1.1"
+    "@playwright/test": ^1.23.1
+    "@replayio/protocol": ^0.32.3
+    "@testing-library/jest-dom": ^5.16.3
+    "@testing-library/react": ^13.2.0
+    date-fns: ^2.28.0
+    design: "workspace:*"
+    idb: ^7.1.1
+    jest: ^28.0.2
+    jest-environment-jsdom: ^28.0.2
+    js-tokens: ^8.0.0
+    lodash: ^4.17.21
+    next: ^12.1.6
+    next-transpile-modules: ^9.0.0
+    node-fetch: ^2.0.0
+    playwright-chromium: ^1.23.1
+    pretty-ms: ^7.0.1
+    protocol: "workspace:*"
+    react: 0.0.0-experimental-e7d0053e6-20220325
+    react-dom: 0.0.0-experimental-e7d0053e6-20220325
+    react-virtualized-auto-sizer: ^1.0.7
+    shared: "workspace:*"
+    typescript: ^4.6.3
+  languageName: unknown
+  linkType: soft
 
 "require-directory@npm:^2.1.1":
   version: 2.1.1
