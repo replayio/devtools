@@ -7,14 +7,13 @@ import { ProtocolClient } from "@replayio/protocol";
 import RuleModel, { NodeWithId } from "devtools/client/inspector/rules/models/rule";
 import Services from "devtools/shared/services";
 import { assert } from "protocol/utils";
+import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 import { getAppliedRulesAsync } from "ui/suspense/styleCaches";
 
 import { RuleFront } from "./fronts/rule";
 import { StyleFront } from "./fronts/style";
 import TextProperty, { ComputedProperty } from "./text-property";
-
-import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
 
 var NON_ASCII = "[^\\x00-\\x7F]";
 var ESCAPE = "\\\\[^\n\r]";

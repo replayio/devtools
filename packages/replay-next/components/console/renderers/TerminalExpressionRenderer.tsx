@@ -10,11 +10,6 @@ import {
   useState,
 } from "react";
 
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
-import MessageHoverButton from "../MessageHoverButton";
-import styles from "./shared.module.css";
-
 import useConsoleContextMenu from "replay-next/components/console/useConsoleContextMenu";
 import Icon from "replay-next/components/Icon";
 import Inspector from "replay-next/components/inspector";
@@ -28,6 +23,10 @@ import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { evaluateSuspense } from "replay-next/src/suspense/PauseCache";
 import { primitiveToClientValue } from "replay-next/src/utils/protocol";
 import { formatTimestamp } from "replay-next/src/utils/time";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+
+import MessageHoverButton from "../MessageHoverButton";
+import styles from "./shared.module.css";
 
 function TerminalExpressionRenderer({
   index,

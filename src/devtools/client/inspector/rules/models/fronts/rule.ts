@@ -1,11 +1,10 @@
 import { Object as ProtocolObject, Rule } from "@replayio/protocol";
 
 import { assert } from "protocol/utils";
+import { getCachedObject } from "replay-next/src/suspense/ObjectPreviews";
 
 import { StyleFront } from "./style";
 import { StyleSheetFront } from "./styleSheet";
-
-import { getCachedObject } from "replay-next/src/suspense/ObjectPreviews";
 
 // Manages interaction with a CSSRule.
 export class RuleFront {

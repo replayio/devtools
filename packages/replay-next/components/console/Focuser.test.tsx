@@ -1,8 +1,8 @@
 import { fireEvent, screen } from "@testing-library/react";
 
-import Focuser from "./Focuser";
-
 import { renderFocused } from "replay-next/src/utils/testing";
+
+import Focuser from "./Focuser";
 
 describe("Focuser", () => {
   it("should render the with no focus region", async () => {

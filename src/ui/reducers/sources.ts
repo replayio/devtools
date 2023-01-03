@@ -12,14 +12,13 @@ import type { PartialLocation } from "devtools/client/debugger/src/actions/sourc
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import { getTextAtPosition } from "devtools/client/debugger/src/utils/source";
 import { assert } from "protocol/utils";
+import { preCacheSources } from "replay-next/src/suspense/SourcesCache";
+import { getStreamingSourceContentsHelper } from "replay-next/src/suspense/SourcesCache";
 import { UIThunkAction } from "ui/actions";
 import { listenForCondition } from "ui/setup/listenerMiddleware";
 import { UIState } from "ui/state";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 import { newSourcesToCompleteSourceDetails } from "ui/utils/sources";
-
-import { preCacheSources } from "replay-next/src/suspense/SourcesCache";
-import { getStreamingSourceContentsHelper } from "replay-next/src/suspense/SourcesCache";
 
 export interface SourceDetails {
   isSourceMapped: boolean;

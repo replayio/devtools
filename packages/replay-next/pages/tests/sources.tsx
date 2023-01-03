@@ -1,6 +1,3 @@
-import createTest from "./utils/createTest";
-import styles from "./styles.module.css";
-
 import SourceExplorer from "replay-next/components/sources/SourceExplorer";
 import Sources from "replay-next/components/sources/Sources";
 import { FocusContextRoot } from "replay-next/src/contexts/FocusContext";
@@ -8,6 +5,9 @@ import { KeyboardModifiersContextRoot } from "replay-next/src/contexts/KeyboardM
 import { PointsContextRoot } from "replay-next/src/contexts/PointsContext";
 import { SourcesContextRoot } from "replay-next/src/contexts/SourcesContext";
 import { TimelineContextRoot } from "replay-next/src/contexts/TimelineContext";
+
+import createTest from "./utils/createTest";
+import styles from "./styles.module.css";
 
 const DEFAULT_RECORDING_ID = "aeaf1d96-c47a-4584-87cf-4f9bd9f65d85";
 

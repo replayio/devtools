@@ -3,6 +3,10 @@ import { loadedRegions as LoadedRegions, Location, SourceId } from "@replayio/pr
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
 import { EMPTY_TABS } from "devtools/client/debugger/src/reducers/tabs";
 import { ThreadFront } from "protocol/thread";
+import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
+import { POINTS_DATABASE } from "replay-next/src/contexts/PointsContext";
+import { preloadIDBInitialValues } from "replay-next/src/hooks/useIndexedDB";
+import { preCacheExecutionPointForTime } from "replay-next/src/suspense/PointsCache";
 import { ReplayClient } from "shared/client/ReplayClient";
 import { replayClient } from "shared/client/ReplayClientContext";
 import { UIStore } from "ui/actions";
@@ -35,11 +39,6 @@ import { setupDOMHelpers } from "./dom";
 import { setupAppHelper } from "./helpers";
 import { registerStoreObserver, updatePrefs } from "./prefs";
 import { bootstrapStore } from "./store";
-
-import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
-import { POINTS_DATABASE } from "replay-next/src/contexts/PointsContext";
-import { preloadIDBInitialValues } from "replay-next/src/hooks/useIndexedDB";
-import { preCacheExecutionPointForTime } from "replay-next/src/suspense/PointsCache";
 
 declare global {
   interface Window {

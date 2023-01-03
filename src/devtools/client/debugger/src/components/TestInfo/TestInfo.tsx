@@ -2,6 +2,8 @@ import { Object as ProtocolObject } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
 import React, { createContext, useContext, useMemo, useState } from "react";
 
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
 import { getSelectedTest } from "ui/reducers/reporter";
 import { useAppSelector } from "ui/setup/hooks";
 import { TestItem } from "ui/types";
@@ -9,9 +11,6 @@ import { TestItem } from "ui/types";
 import ContextMenuWrapper from "./ContextMenu";
 import { TestCase } from "./TestCase";
 import { TestInfoContextMenuContextRoot } from "./TestInfoContextMenuContext";
-
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
-import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
 
 type TestInfoContextType = {
   consoleProps?: ProtocolObject;

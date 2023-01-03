@@ -1,9 +1,9 @@
 import { LexicalEditor } from "lexical";
 import { ReactNode, useLayoutEffect, useRef } from "react";
 
-import styles from "./styles.module.css";
-
 import { INSERT_ITEM_COMMAND } from "replay-next/components/lexical/plugins/typeahead/commands";
+
+import styles from "./styles.module.css";
 
 export default function TypeAheadItemRenderer<Item>({
   className,

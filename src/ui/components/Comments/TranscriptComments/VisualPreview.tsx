@@ -1,12 +1,11 @@
 import { ChatAltIcon } from "@heroicons/react/solid";
 import { useState } from "react";
 
+import Icon from "replay-next/components/Icon";
+import { isVisualCommentTypeData } from "replay-next/components/sources/utils/comments";
 import { Comment } from "ui/state/comments";
 
 import styles from "./styles.module.css";
-
-import Icon from "replay-next/components/Icon";
-import { isVisualCommentTypeData } from "replay-next/components/sources/utils/comments";
 
 // Adapter component that can handle rendering legacy or modern visual comments.
 export default function VisualPreview({ comment }: { comment: Comment }) {

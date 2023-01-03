@@ -1,10 +1,10 @@
 import { ReactNode } from "react";
 
+import { filterNonEnumerableProperties } from "replay-next/src/utils/protocol";
+
 import ValueRenderer from "../ValueRenderer";
 import { ObjectPreviewRendererProps } from "./types";
 import styles from "./shared.module.css";
-
-import { filterNonEnumerableProperties } from "replay-next/src/utils/protocol";
 
 const MAX_PROPERTIES_TO_PREVIEW = 5;
 

@@ -2,11 +2,10 @@ import { PauseId, ProtocolClient, Object as ProtocolObject } from "@replayio/pro
 import uniqBy from "lodash/uniqBy";
 
 import { RuleFront } from "devtools/client/inspector/rules/models/fronts/rule";
-import { ReplayClientInterface } from "shared/client/types";
-
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
+import { ReplayClientInterface } from "shared/client/types";
 
 export interface WiredAppliedRule {
   rule: RuleFront;

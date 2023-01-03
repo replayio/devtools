@@ -3,6 +3,12 @@ import debounce from "lodash/debounce";
 import { MouseEvent, Suspense, useContext, useLayoutEffect, useRef, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import {
+  StreamingSourceContents,
+  getStreamingSourceContentsSuspense,
+} from "replay-next/src/suspense/SourcesCache";
+import { StreamingParser, parseStreaming } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Loader from "../Loader";
@@ -13,13 +19,6 @@ import getExpressionForTokenElement from "./utils/getExpressionForTokenElement";
 import getExpressionFromString from "./utils/getExpressionFromString";
 import getTextAndCursorIndex from "./utils/getTextAndCursorIndex";
 import styles from "./Source.module.css";
-
-import { SessionContext } from "replay-next/src/contexts/SessionContext";
-import {
-  StreamingSourceContents,
-  getStreamingSourceContentsSuspense,
-} from "replay-next/src/suspense/SourcesCache";
-import { StreamingParser, parseStreaming } from "replay-next/src/suspense/SyntaxParsingCache";
 
 const MOUSE_MOVE_DEBOUNCE_DURATION = 250;
 

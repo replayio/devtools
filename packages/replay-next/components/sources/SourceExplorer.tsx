@@ -1,14 +1,13 @@
 import { useContext, useMemo, useState } from "react";
 
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
-import styles from "./SourceExplorer.module.css";
-
 import Icon from "replay-next/components/Icon";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { getSourcesToDisplay, isIndexedSource } from "replay-next/src/suspense/SourcesCache";
 import { protocolSourcesToSourceTree } from "replay-next/src/utils/protocol";
 import { getSourceFileName } from "replay-next/src/utils/source";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+
+import styles from "./SourceExplorer.module.css";
 
 export default function SourceExplorer() {
   const client = useContext(ReplayClientContext);

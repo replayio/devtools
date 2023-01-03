@@ -9,15 +9,14 @@ import {
 
 import { createFrame } from "devtools/client/debugger/src/client/create";
 import { Context } from "devtools/client/debugger/src/reducers/pause";
+import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
+import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getRequestById, getSummaryById } from "ui/reducers/network";
 import { isPointInRegions } from "ui/utils/timeline";
 
 import { UIThunkAction } from ".";
-
-import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
-import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 
 type NewNetworkRequestsAction = {
   type: "NEW_NETWORK_REQUESTS";

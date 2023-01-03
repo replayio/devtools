@@ -2,15 +2,6 @@ import { ReactNode, useEffect, useState } from "react";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
-import { replayClient } from "shared/client/ReplayClientContext";
-import { setViewMode } from "ui/actions/layout";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { Comment } from "ui/state/comments";
-import { trackEvent } from "ui/utils/telemetry";
-
-import LoadingLabelPlaceholder from "./LoadingLabelPlaceholder";
-import styles from "./styles.module.css";
-
 import Icon from "replay-next/components/Icon";
 import {
   SourceCodeCommentTypeData,
@@ -20,6 +11,14 @@ import { isSourceCodeCommentTypeData } from "replay-next/components/sources/util
 import { CommentSourceLocation } from "replay-next/src/graphql/types";
 import { ParsedToken, parsedTokensToHtml } from "replay-next/src/suspense/SyntaxParsingCache";
 import { getSourceFileNameFromUrl } from "replay-next/src/utils/source";
+import { replayClient } from "shared/client/ReplayClientContext";
+import { setViewMode } from "ui/actions/layout";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { Comment } from "ui/state/comments";
+import { trackEvent } from "ui/utils/telemetry";
+
+import LoadingLabelPlaceholder from "./LoadingLabelPlaceholder";
+import styles from "./styles.module.css";
 
 // Adapter component that can handle rendering legacy or modern source-code comments.
 export default function SourceCodePreview({ comment }: { comment: Comment }) {

@@ -1,11 +1,10 @@
 import React, { Suspense, useContext } from "react";
 
 import Frames from "devtools/client/debugger/src/components/SecondaryPanes/Frames/NewFrames";
+import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { RequestSummary } from "./utils";
-
-import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
 
 function StackTrace({ request }: { request: RequestSummary }) {
   const client = useContext(ReplayClientContext);

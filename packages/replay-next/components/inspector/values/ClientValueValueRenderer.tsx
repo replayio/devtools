@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 
-import styles from "./shared.module.css";
-
 import { Value as ClientValue } from "replay-next/src/utils/protocol";
+
+import styles from "./shared.module.css";
 
 type ValueType = ClientValue["type"];
 

@@ -1,17 +1,16 @@
 import { MouseEvent } from "react";
 
+import {
+  isNetworkRequestCommentTypeData,
+  isSourceCodeCommentTypeData,
+  isVisualCommentTypeData,
+} from "replay-next/components/sources/utils/comments";
 import { Comment } from "ui/state/comments";
 
 import NetworkRequestPreview from "./TranscriptComments/NetworkRequestPreview";
 import SourceCodePreview from "./TranscriptComments/SourceCodePreview";
 import VisualPreview from "./TranscriptComments/VisualPreview";
 import styles from "./CommentPreview.module.css";
-
-import {
-  isNetworkRequestCommentTypeData,
-  isSourceCodeCommentTypeData,
-  isVisualCommentTypeData,
-} from "replay-next/components/sources/utils/comments";
 
 export default function CommentPreview({
   comment,

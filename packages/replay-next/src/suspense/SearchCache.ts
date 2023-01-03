@@ -1,12 +1,11 @@
 import { Location, SearchSourceContentsMatch, SourceId } from "@replayio/protocol";
 
+import { insert } from "replay-next/src/utils/array";
+import { isBowerComponent, isModuleFromCdn, isNodeModule } from "replay-next/src/utils/source";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createGenericCache2 } from "./createGenericCache";
 import { getSourcesAsync } from "./SourcesCache";
-
-import { insert } from "replay-next/src/utils/array";
-import { isBowerComponent, isModuleFromCdn, isNodeModule } from "replay-next/src/utils/source";
 
 // TODO Create a generic cache variant that
 // (1) supports streaming data and

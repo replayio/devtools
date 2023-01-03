@@ -1,6 +1,6 @@
-import { __setCircularThenableCheckMaxCount, createWakeable, suspendInParallel } from "./suspense";
-
 import { Wakeable } from "replay-next/src/suspense/types";
+
+import { __setCircularThenableCheckMaxCount, createWakeable, suspendInParallel } from "./suspense";
 
 describe("Suspense util", () => {
   describe("createWakeable", () => {

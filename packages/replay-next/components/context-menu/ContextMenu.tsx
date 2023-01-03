@@ -1,10 +1,10 @@
 import { ComponentPropsWithoutRef, ReactElement, ReactNode, useRef } from "react";
 import { createPortal } from "react-dom";
 
+import useModalDismissSignal from "replay-next/src/hooks/useModalDismissSignal";
+
 import ContextMenuItem from "./ContextMenuItem";
 import styles from "./ContextMenu.module.css";
-
-import useModalDismissSignal from "replay-next/src/hooks/useModalDismissSignal";
 
 export default function ContextMenu({
   children,

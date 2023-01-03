@@ -1,13 +1,12 @@
 import React, { Suspense, memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { getSelectedSource } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
 import { localStorageGetItem, localStorageSetItem } from "ui/utils/storage";
 
 import SourcemapToggleSuspends from "./SourcemapToggle";
 import SourcemapVisualizerLinkSuspends from "./SourcemapVisualizerLink";
-
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
 
 export type CursorPosition = {
   readonly column: number;

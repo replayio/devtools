@@ -9,16 +9,6 @@ import {
   useTransition,
 } from "react";
 
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { HitPointStatus, Point } from "shared/client/types";
-
-import Loader from "../Loader";
-import BadgePicker from "./BadgePicker";
-import CommentButton from "./CommentButton";
-import PointPanelTimeline from "./PointPanelTimeline";
-import SyntaxHighlightedLine from "./SyntaxHighlightedLine";
-import styles from "./PointPanel.module.css";
-
 import Icon from "replay-next/components/Icon";
 import CodeEditor from "replay-next/components/lexical/CodeEditor";
 import {
@@ -40,6 +30,15 @@ import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
 import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/PointsCache";
 import { findIndexBigInt } from "replay-next/src/utils/array";
 import { validate } from "replay-next/src/utils/points";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { HitPointStatus, Point } from "shared/client/types";
+
+import Loader from "../Loader";
+import BadgePicker from "./BadgePicker";
+import CommentButton from "./CommentButton";
+import PointPanelTimeline from "./PointPanelTimeline";
+import SyntaxHighlightedLine from "./SyntaxHighlightedLine";
+import styles from "./PointPanel.module.css";
 
 type EditReason = "condition" | "content";
 

@@ -1,14 +1,13 @@
 import { SourceId } from "@replayio/protocol";
 import { Suspense, memo, useContext } from "react";
 
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { SelectedFrameContext } from "../../src/contexts/SelectedFrameContext";
 import { SourceSearchContext } from "./SourceSearchContext";
 import styles from "./CurrentLineHighlight.module.css";
-
-import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
 
 type Props = {
   lineNumber: number;

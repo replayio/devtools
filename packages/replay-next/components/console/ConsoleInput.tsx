@@ -1,14 +1,6 @@
 import { FrameId, PauseId } from "@replayio/protocol";
 import { Suspense, useContext, useEffect, useRef, useState } from "react";
 
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { isPointInRegions } from "shared/utils/time";
-
-import { ConsoleSearchContext } from "./ConsoleSearchContext";
-import EagerEvaluationResult from "./EagerEvaluationResult";
-import useTerminalHistory from "./hooks/useTerminalHistory";
-import styles from "./ConsoleInput.module.css";
-
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import Icon from "replay-next/components/Icon";
 import CodeEditor from "replay-next/components/lexical/CodeEditor";
@@ -20,6 +12,13 @@ import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import useLoadedRegions from "replay-next/src/hooks/useRegions";
 import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
 import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { isPointInRegions } from "shared/utils/time";
+
+import { ConsoleSearchContext } from "./ConsoleSearchContext";
+import EagerEvaluationResult from "./EagerEvaluationResult";
+import useTerminalHistory from "./hooks/useTerminalHistory";
+import styles from "./ConsoleInput.module.css";
 
 export default function ConsoleInput() {
   return (

@@ -1,13 +1,12 @@
 import { FrameId, PauseId, Property, Scope } from "@replayio/protocol";
 
+import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
+import { evaluateSuspense } from "replay-next/src/suspense/PauseCache";
+import { getFrameScopesSuspense } from "replay-next/src/suspense/ScopeCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 import findMatchingScopesAndProperties from "./findMatchingScopesAndProperties";
 import { Match } from "./types";
-
-import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
-import { evaluateSuspense } from "replay-next/src/suspense/PauseCache";
-import { getFrameScopesSuspense } from "replay-next/src/suspense/ScopeCache";
 
 // The legacy auto-complete allowed property previews to overflow.
 // This meant we only got a couple of them, which was only of limited use.

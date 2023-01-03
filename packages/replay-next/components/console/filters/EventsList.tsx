@@ -1,13 +1,12 @@
 import { ChangeEvent, Suspense, useContext, useMemo, useState, useTransition } from "react";
 
+import Loader from "replay-next/components/Loader";
+import { getEventCategoryCountsSuspense } from "replay-next/src/suspense/EventsCache";
+import type { EventCategory as EventCategoryType } from "replay-next/src/suspense/EventsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import EventCategory from "./EventCategory";
 import styles from "./EventsList.module.css";
-
-import Loader from "replay-next/components/Loader";
-import { getEventCategoryCountsSuspense } from "replay-next/src/suspense/EventsCache";
-import type { EventCategory as EventCategoryType } from "replay-next/src/suspense/EventsCache";
 
 export default function EventsList() {
   const [filterByDisplayText, setFilterByDisplayText] = useState("");

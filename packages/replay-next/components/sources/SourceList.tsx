@@ -12,16 +12,6 @@ import {
 } from "react";
 import { VariableSizeList as List, ListOnItemsRenderedProps } from "react-window";
 
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { Point } from "shared/client/types";
-
-import useFontBasedListMeasurents from "./hooks/useFontBasedListMeasurents";
-import SourceListRow, { ItemData } from "./SourceListRow";
-import { formatHitCount } from "./utils/formatHitCount";
-import getScrollbarWidth from "./utils/getScrollbarWidth";
-import { findPointForLocation } from "./utils/points";
-import styles from "./SourceList.module.css";
-
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { PointsContext } from "replay-next/src/contexts/PointsContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
@@ -33,6 +23,15 @@ import {
   getSourceHitCountsSuspense,
 } from "replay-next/src/suspense/SourcesCache";
 import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { Point } from "shared/client/types";
+
+import useFontBasedListMeasurents from "./hooks/useFontBasedListMeasurents";
+import SourceListRow, { ItemData } from "./SourceListRow";
+import { formatHitCount } from "./utils/formatHitCount";
+import getScrollbarWidth from "./utils/getScrollbarWidth";
+import { findPointForLocation } from "./utils/points";
+import styles from "./SourceList.module.css";
 
 export default function SourceList({
   height,

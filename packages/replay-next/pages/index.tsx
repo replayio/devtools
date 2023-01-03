@@ -1,12 +1,6 @@
 import React, { Suspense, useCallback, useContext, useMemo, useSyncExternalStore } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
-import createReplayClientRecorder from "shared/client/createReplayClientRecorder";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { hasFlag } from "shared/utils/url";
-
-import styles from "./index.module.css";
-
 import CommentList from "replay-next/components/comments/CommentList";
 import ConsoleRoot from "replay-next/components/console";
 import Focuser from "replay-next/components/console/Focuser";
@@ -28,6 +22,11 @@ import { TerminalContextRoot } from "replay-next/src/contexts/TerminalContext";
 import { TimelineContextRoot } from "replay-next/src/contexts/TimelineContext";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import usePreferredColorScheme from "replay-next/src/hooks/usePreferredColorScheme";
+import createReplayClientRecorder from "shared/client/createReplayClientRecorder";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { hasFlag } from "shared/utils/url";
+
+import styles from "./index.module.css";
 
 // TODO There's a potential hot loop in this code when an error happens (e.g. Linker too old to support Console.findMessagesInRange)
 // where React keeps quickly retrying after an error is thrown, rather than rendering an error boundary.

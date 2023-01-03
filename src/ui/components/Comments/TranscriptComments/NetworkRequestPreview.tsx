@@ -1,3 +1,5 @@
+import Icon from "replay-next/components/Icon";
+import { isNetworkRequestCommentTypeData } from "replay-next/components/sources/utils/comments";
 import { setSelectedPanel } from "ui/actions/layout";
 import { selectAndFetchRequest } from "ui/actions/network";
 import { getSummaryById } from "ui/reducers/network";
@@ -9,9 +11,6 @@ import { trackEvent } from "ui/utils/telemetry";
 import { isInFocusSpan } from "ui/utils/timeline";
 
 import styles from "./styles.module.css";
-
-import Icon from "replay-next/components/Icon";
-import { isNetworkRequestCommentTypeData } from "replay-next/components/sources/utils/comments";
 
 // Adapter component that can handle rendering legacy or modern network-request comments.
 export default function NetworkRequestPreview({ comment }: { comment: Comment }) {

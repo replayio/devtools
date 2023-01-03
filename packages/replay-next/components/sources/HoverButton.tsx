@@ -2,13 +2,6 @@ import { ExecutionPoint, newSource as ProtocolSource, TimeStampedPoint } from "@
 import findLast from "lodash/findLast";
 import { useContext } from "react";
 
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { Point } from "shared/client/types";
-import { LineHitCounts } from "shared/client/types";
-import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
-
-import styles from "./HoverButton.module.css";
-
 import Icon from "replay-next/components/Icon";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { KeyboardModifiersContext } from "replay-next/src/contexts/KeyboardModifiersContext";
@@ -24,6 +17,12 @@ import {
   isExecutionPointsGreaterThan,
   isExecutionPointsLessThan,
 } from "replay-next/src/utils/time";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { Point } from "shared/client/types";
+import { LineHitCounts } from "shared/client/types";
+import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
+
+import styles from "./HoverButton.module.css";
 
 export default function HoverButton({
   addPoint,

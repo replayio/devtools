@@ -1,18 +1,5 @@
 import { ForwardedRef, MutableRefObject, ReactNode, forwardRef, useContext, useMemo } from "react";
 
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { isPointInRegions } from "shared/utils/time";
-
-import { ConsoleSearchContext } from "./ConsoleSearchContext";
-import CurrentTimeIndicator from "./CurrentTimeIndicator";
-import { Loggable, LoggablesContext } from "./LoggablesContext";
-import EventLogRenderer from "./renderers/EventLogRenderer";
-import LogPointRenderer from "./renderers/LogPointRenderer";
-import MessageRenderer from "./renderers/MessageRenderer";
-import TerminalExpressionRenderer from "./renderers/TerminalExpressionRenderer";
-import UncaughtExceptionRenderer from "./renderers/UncaughtExceptionRenderer";
-import styles from "./MessagesList.module.css";
-
 import Icon from "replay-next/components/Icon";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
@@ -27,6 +14,18 @@ import {
   isUncaughtException,
 } from "replay-next/src/utils/loggables";
 import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { isPointInRegions } from "shared/utils/time";
+
+import { ConsoleSearchContext } from "./ConsoleSearchContext";
+import CurrentTimeIndicator from "./CurrentTimeIndicator";
+import { Loggable, LoggablesContext } from "./LoggablesContext";
+import EventLogRenderer from "./renderers/EventLogRenderer";
+import LogPointRenderer from "./renderers/LogPointRenderer";
+import MessageRenderer from "./renderers/MessageRenderer";
+import TerminalExpressionRenderer from "./renderers/TerminalExpressionRenderer";
+import UncaughtExceptionRenderer from "./renderers/UncaughtExceptionRenderer";
+import styles from "./MessagesList.module.css";
 
 type CurrentTimeIndicatorPlacement = Loggable | "begin" | "end";
 

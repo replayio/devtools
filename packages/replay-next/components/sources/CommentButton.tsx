@@ -1,10 +1,10 @@
 import { TimeStampedPoint } from "@replayio/protocol";
 import { useContext, useMemo, useState } from "react";
 
+import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+
 import Icon from "../Icon";
 import styles from "./CommentButton.module.css";
-
-import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 
 // Three states prevents close animation from being shown on mount.
 type State = "initial" | "open" | "closed";

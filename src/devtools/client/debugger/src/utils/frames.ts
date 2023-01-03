@@ -1,13 +1,12 @@
 import { PauseId } from "@replayio/protocol";
 
 import { ThreadFront } from "protocol/thread/thread";
+import { getFrameStepsIfCached } from "replay-next/src/suspense/FrameStepsCache";
+import { getPauseIdForExecutionPointIfCached } from "replay-next/src/suspense/PauseCache";
 import { SourcesState } from "ui/reducers/sources";
 import { getPauseFramesIfCached } from "ui/suspense/frameCache";
 
 import { PauseFrame } from "../selectors";
-
-import { getFrameStepsIfCached } from "replay-next/src/suspense/FrameStepsCache";
-import { getPauseIdForExecutionPointIfCached } from "replay-next/src/suspense/PauseCache";
 
 // returns all cached frames from the given pauseId and its async parent pauseIds
 // and converts them to PauseFrames

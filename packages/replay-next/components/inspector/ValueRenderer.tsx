@@ -1,6 +1,10 @@
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import { FC, memo, useContext } from "react";
 
+import {
+  getCachedObject,
+  getObjectWithPreviewSuspense,
+} from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useClientValue from "./useClientValue";
@@ -15,11 +19,6 @@ import ObjectRenderer from "./values/ObjectRenderer";
 import RegExpRenderer from "./values/RegExpRenderer";
 import SetRenderer from "./values/SetRenderer";
 import { ObjectPreviewRendererProps } from "./values/types";
-
-import {
-  getCachedObject,
-  getObjectWithPreviewSuspense,
-} from "replay-next/src/suspense/ObjectPreviews";
 
 // TODO Add custom Date renderer (and ClientValue type)
 

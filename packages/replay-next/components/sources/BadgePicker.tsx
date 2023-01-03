@@ -1,12 +1,11 @@
 import { useContext, useState } from "react";
 
+import { PointsContext } from "replay-next/src/contexts/PointsContext";
 import { Badge, Point } from "shared/client/types";
 
 import Icon from "../Icon";
 import { getBadgeStyleVars } from "./utils/getBadgeStyleVars";
 import styles from "./BadgePicker.module.css";
-
-import { PointsContext } from "replay-next/src/contexts/PointsContext";
 
 // Three states prevents close animation from being shown on mount.
 type State = "initial" | "open" | "closed";

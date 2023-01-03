@@ -4,6 +4,7 @@
 
 import { PauseId } from "@replayio/protocol";
 
+import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
 import type { UIThunkAction } from "ui/actions";
 import { isPointInLoadingRegion } from "ui/reducers/app";
 import { getSelectedLocation } from "ui/reducers/sources";
@@ -17,8 +18,6 @@ import {
 } from "../../reducers/pause";
 import { getThreadContext } from "../../selectors";
 import { getSelectedFrameAsync } from "../../selectors/pause";
-
-import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
 
 type $FixTypeLater = any;
 

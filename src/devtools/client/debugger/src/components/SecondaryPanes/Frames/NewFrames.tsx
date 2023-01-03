@@ -10,6 +10,9 @@ import {
   getThreadContext,
 } from "devtools/client/debugger/src/selectors";
 import { ThreadFront } from "protocol/thread/thread";
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
+import { getPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { enterFocusMode } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
@@ -26,10 +29,6 @@ import { collapseFrames, formatCopyName } from "../../../utils/pause/frames";
 import Frame from "./Frame";
 import Group from "./Group";
 import { CommonFrameComponentProps } from ".";
-
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
-import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
-import { getPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";
 
 function FramesRenderer({
   panel,

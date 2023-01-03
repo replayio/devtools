@@ -1,10 +1,10 @@
 import { MouseEvent, useContext } from "react";
 
-import { ObjectPreviewRendererProps } from "./types";
-import styles from "./shared.module.css";
-
 import Icon from "replay-next/components/Icon";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
+
+import { ObjectPreviewRendererProps } from "./types";
+import styles from "./shared.module.css";
 
 const MAX_PROPERTIES_TO_PREVIEW = 5;
 

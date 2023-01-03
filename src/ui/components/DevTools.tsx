@@ -4,6 +4,9 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import { ThreadFront } from "protocol/thread";
+import { PointsContextRoot } from "replay-next/src/contexts/PointsContext";
+import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
+import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
@@ -39,10 +42,6 @@ import SourcesContextAdapter from "./SourcesContextAdapter";
 import Timeline from "./Timeline";
 import Toolbar from "./Toolbar";
 import Video from "./Video";
-
-import { PointsContextRoot } from "replay-next/src/contexts/PointsContext";
-import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
-import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
 
 const Viewer = React.lazy(() => import("./Viewer"));
 

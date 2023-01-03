@@ -3,12 +3,11 @@
 import { Dictionary } from "@reduxjs/toolkit";
 import type { Location, ObjectPreview, Object as ProtocolObject } from "@replayio/protocol";
 
+import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { SourceDetails, getPreferredLocation, getSourceDetailsEntities } from "ui/reducers/sources";
 import { UIState } from "ui/state";
 
 import { UIThunkAction } from "./index";
-
-import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 
 export type FunctionPreview = Required<
   Pick<ObjectPreview, "functionName" | "functionLocation" | "functionParameterNames">

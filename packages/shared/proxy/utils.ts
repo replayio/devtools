@@ -1,6 +1,6 @@
-import { Entry } from "./types";
-
 import { Thennable } from "replay-next/src/suspense/types";
+
+import { Entry } from "./types";
 
 export function findMatch(entries: Entry[], prop: string, args: any[] | null): Entry | null {
   return (

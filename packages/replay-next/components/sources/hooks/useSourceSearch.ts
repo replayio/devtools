@@ -3,10 +3,10 @@ import escapeRegExp from "lodash/escapeRegExp";
 import isEqual from "lodash/isEqual";
 import { useMemo, useState } from "react";
 
+import { NEW_LINE_REGEX } from "replay-next/src/utils/string";
+
 import useSearch, { OnChangeDispatching } from "./useSearch";
 import type { Actions as SearchActions, State as SearchState } from "./useSearch";
-
-import { NEW_LINE_REGEX } from "replay-next/src/utils/string";
 
 type Scope = {
   code: string;

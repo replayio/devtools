@@ -8,10 +8,6 @@ import {
   useTransition,
 } from "react";
 
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
-import styles from "./MessageHoverButton.module.css";
-
 import Icon from "replay-next/components/Icon";
 import {
   COMMENT_TYPE_SOURCE_CODE,
@@ -25,6 +21,9 @@ import { addComment as addCommentGraphQL } from "replay-next/src/graphql/Comment
 import { Nag } from "replay-next/src/graphql/types";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+
+import styles from "./MessageHoverButton.module.css";
 
 export default function MessageHoverButton({
   executionPoint,

@@ -20,6 +20,8 @@ import {
 } from "lexical";
 import { useEffect, useMemo, useRef } from "react";
 
+import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
+
 import LexicalEditorRefSetter from "./LexicalEditorRefSetter";
 import CodeCompletionPlugin from "./plugins/code-completion/CodeCompletionPlugin";
 import CodeNode from "./plugins/code/CodeNode";
@@ -28,8 +30,6 @@ import parsedTokensToCodeTextNode from "./plugins/code/utils/parsedTokensToCodeT
 import parseTokens from "./plugins/code/utils/parseTokens";
 import FormPlugin from "./plugins/form/FormPlugin";
 import styles from "./styles.module.css";
-
-import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
 
 // Diffing is simplest when the Code plug-in has a flat structure.
 const NODES: Array<Klass<LexicalNode>> = [LineBreakNode, CodeNode, TextNode];

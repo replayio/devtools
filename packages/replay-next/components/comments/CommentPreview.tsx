@@ -1,7 +1,5 @@
 import { ReactNode, useContext, useState } from "react";
 
-import styles from "./CommentPreview.module.css";
-
 import Icon from "replay-next/components/Icon";
 import {
   isNetworkRequestCommentTypeData,
@@ -11,6 +9,8 @@ import {
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { ParsedToken, parsedTokensToHtml } from "replay-next/src/suspense/SyntaxParsingCache";
 import { getSourceFileNameFromUrl } from "replay-next/src/utils/source";
+
+import styles from "./CommentPreview.module.css";
 
 export default function CommentPreview({
   type,

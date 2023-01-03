@@ -9,14 +9,13 @@ import React, {
   useTransition,
 } from "react";
 
+import { TimelineContext, TimelineContextType } from "replay-next/src/contexts/TimelineContext";
+import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { seek } from "ui/actions/timeline";
 import { getCurrentPoint } from "ui/reducers/app";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-
-import { TimelineContext, TimelineContextType } from "replay-next/src/contexts/TimelineContext";
-import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 
 // Adapter that reads the current execution point and time (from Redux) and passes them to the TimelineContext.
 export default function TimelineContextAdapter({ children }: PropsWithChildren) {

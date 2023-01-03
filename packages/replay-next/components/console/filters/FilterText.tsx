@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 
-import styles from "./FilterText.module.css";
-
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
+
+import styles from "./FilterText.module.css";
 
 export default function FilterText() {
   const { filterByDisplayText, update } = useContext(ConsoleFiltersContext);

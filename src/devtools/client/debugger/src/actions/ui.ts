@@ -5,6 +5,7 @@
 //
 
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
+import { copyToClipboard as copyTextToClipboard } from "replay-next/components/sources/utils/clipboard";
 import type { UIThunkAction } from "ui/actions";
 import { SourceDetails, getSourceContent, getSourceDetails } from "ui/reducers/sources";
 
@@ -24,8 +25,6 @@ import {
 } from "../reducers/ui";
 import { getActiveSearch, getContext, getQuickOpenEnabled } from "../selectors";
 import { selectSource } from "./sources/select";
-
-import { copyToClipboard as copyTextToClipboard } from "replay-next/components/sources/utils/clipboard";
 
 export {
   closeActiveSearch,

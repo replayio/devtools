@@ -7,9 +7,6 @@ import React, {
   useTransition,
 } from "react";
 
-import CommentPreview from "./CommentPreview";
-import styles from "./Comment.module.css";
-
 import AvatarImage from "replay-next/components/AvatarImage";
 import Icon from "replay-next/components/Icon";
 import CommentEditor from "replay-next/components/lexical/CommentEditor";
@@ -24,6 +21,9 @@ import {
 } from "replay-next/src/graphql/Comments";
 import { Comment, CommentSourceLocation, User } from "replay-next/src/graphql/types";
 import { formatRelativeTime } from "replay-next/src/utils/time";
+
+import CommentPreview from "./CommentPreview";
+import styles from "./Comment.module.css";
 
 export default function CommentRenderer({ comment }: { comment: Comment }) {
   const { accessToken } = useContext(SessionContext);

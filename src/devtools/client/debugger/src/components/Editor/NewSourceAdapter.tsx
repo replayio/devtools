@@ -1,14 +1,5 @@
 import { KeyboardEvent, useContext, useEffect, useLayoutEffect, useRef } from "react";
 
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { useFeature } from "ui/hooks/settings";
-import { getSelectedLocation, getSelectedLocationHasScrolled } from "ui/reducers/sources";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-
-import { setViewport } from "../../selectors";
-import NewSourceNag from "./NewSourceNag";
-import "replay-next/components/sources/CodeMirror.css";
-
 import LazyOffscreen from "replay-next/components/LazyOffscreen";
 import Source from "replay-next/components/sources/Source";
 import { SourceFileNameSearchContextRoot } from "replay-next/components/sources/SourceFileNameSearchContext";
@@ -20,6 +11,14 @@ import {
 import { KeyboardModifiersContextRoot } from "replay-next/src/contexts/KeyboardModifiersContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { getSource } from "replay-next/src/suspense/SourcesCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { useFeature } from "ui/hooks/settings";
+import { getSelectedLocation, getSelectedLocationHasScrolled } from "ui/reducers/sources";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+
+import { setViewport } from "../../selectors";
+import NewSourceNag from "./NewSourceNag";
+import "replay-next/components/sources/CodeMirror.css";
 
 export default function NewSourceAdapterRoot() {
   return (

@@ -1,15 +1,14 @@
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import { ForwardedRef, Suspense, forwardRef, useContext } from "react";
 
+import Inspector from "replay-next/components/inspector";
+import Loader from "replay-next/components/Loader";
+import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import PropertiesRenderer from "./PropertiesRenderer";
 import useClientValue from "./useClientValue";
 import styles from "./SourcePreviewInspector.module.css";
-
-import Inspector from "replay-next/components/inspector";
-import Loader from "replay-next/components/Loader";
-import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
 
 type Props = {
   className?: string;

@@ -2,10 +2,6 @@ import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { Suspense, memo, useContext } from "react";
 
-import MessageHoverButton from "../MessageHoverButton";
-import Source from "../Source";
-import styles from "./shared.module.css";
-
 import useConsoleContextMenu from "replay-next/components/console/useConsoleContextMenu";
 import Inspector from "replay-next/components/inspector";
 import Loader from "replay-next/components/Loader";
@@ -14,6 +10,10 @@ import { InspectableTimestampedPointContext } from "replay-next/src/contexts/Ins
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { EventLog } from "replay-next/src/suspense/EventsCache";
 import { formatTimestamp } from "replay-next/src/utils/time";
+
+import MessageHoverButton from "../MessageHoverButton";
+import Source from "../Source";
+import styles from "./shared.module.css";
 
 function EventLogRenderer({
   eventLog,

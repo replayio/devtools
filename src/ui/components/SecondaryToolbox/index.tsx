@@ -4,6 +4,7 @@ import React, { FC, ReactNode, Suspense, useContext } from "react";
 
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
 import { RecordingCapabilities } from "protocol/thread/thread";
+import LazyOffscreen from "replay-next/components/LazyOffscreen";
 import { setSelectedPanel } from "ui/actions/layout";
 import { useFeature } from "ui/hooks/settings";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
@@ -26,8 +27,6 @@ import { ReduxDevToolsPanel } from "./ReduxDevTools";
 import SourcesTabLabel from "./SourcesTabLabel";
 import { ShowVideoButton } from "./ToolboxButton";
 import ToolboxOptions from "./ToolboxOptions";
-
-import LazyOffscreen from "replay-next/components/LazyOffscreen";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 

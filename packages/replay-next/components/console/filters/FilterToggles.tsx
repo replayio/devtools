@@ -2,11 +2,6 @@ import camelCase from "lodash/camelCase";
 import React, { ReactNode, Suspense, useContext, useMemo, useSyncExternalStore } from "react";
 
 import { Badge, Checkbox } from "design";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
-import EventsList from "./EventsList";
-import styles from "./FilterToggles.module.css";
-
 import Icon from "replay-next/components/Icon";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
@@ -14,6 +9,10 @@ import { getStatus, subscribeForStatus } from "replay-next/src/suspense/Exceptio
 import { CategoryCounts, getMessagesSuspense } from "replay-next/src/suspense/MessagesCache";
 import { getRecordingCapabilitiesSuspense } from "replay-next/src/suspense/RecordingCache";
 import { isInNodeModules } from "replay-next/src/utils/messages";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+
+import EventsList from "./EventsList";
+import styles from "./FilterToggles.module.css";
 
 export default function FilterToggles() {
   const {

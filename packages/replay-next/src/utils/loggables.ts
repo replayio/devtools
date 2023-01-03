@@ -1,13 +1,13 @@
 import { ExecutionPoint } from "@replayio/protocol";
 
-import { compareExecutionPoints } from "./time";
-
 import { Loggable } from "replay-next/components/console/LoggablesContext";
 import { PointInstance } from "replay-next/src/contexts/PointsContext";
 import { TerminalExpression } from "replay-next/src/contexts/TerminalContext";
 import { EventLog } from "replay-next/src/suspense/EventsCache";
 import { UncaughtException } from "replay-next/src/suspense/ExceptionsCache";
 import { ProtocolMessage } from "replay-next/src/suspense/MessagesCache";
+
+import { compareExecutionPoints } from "./time";
 
 export function isEventLog(loggable: Loggable): loggable is EventLog {
   return loggable.type === "EventLog";

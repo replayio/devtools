@@ -12,6 +12,10 @@ import React, {
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
 
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { getSourceHitCountsSuspense } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import Spinner from "ui/components/shared/Spinner";
 import { SourceDetails, getSelectedSource } from "ui/reducers/sources";
@@ -27,11 +31,6 @@ import { getOutlineSymbols } from "./getOutlineSymbols";
 import { isFunctionDeclaration } from "./isFunctionSymbol";
 import { SourceOutlineClass } from "./SourceOutlineClass";
 import { SourceOutlineFunction } from "./SourceOutlineFunction";
-
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
-import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { getSourceHitCountsSuspense } from "replay-next/src/suspense/SourcesCache";
 
 export function SourceOutline({
   cursorPosition,

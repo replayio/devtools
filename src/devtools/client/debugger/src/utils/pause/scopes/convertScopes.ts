@@ -1,10 +1,9 @@
 import { Frame, NamedValue, ObjectId, PauseId, Scope } from "@replayio/protocol";
 
 import { assert } from "protocol/utils";
+import { getCachedObject } from "replay-next/src/suspense/ObjectPreviews";
 
 import { simplifyDisplayName } from "../frames";
-
-import { getCachedObject } from "replay-next/src/suspense/ObjectPreviews";
 
 export interface ConvertedBindingsScope {
   type: "bindings";

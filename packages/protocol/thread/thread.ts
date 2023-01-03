@@ -37,18 +37,17 @@ import {
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
+import {
+  cachePauseData,
+  getPauseIdForExecutionPointIfCached,
+} from "replay-next/src/suspense/PauseCache";
+import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { MappedLocationCache } from "../mapped-location-cache";
 import ScopeMapCache from "../scope-map-cache";
 import { client } from "../socket";
 import { EventEmitter, assert, defer, locationsInclude } from "../utils";
-
-import {
-  cachePauseData,
-  getPauseIdForExecutionPointIfCached,
-} from "replay-next/src/suspense/PauseCache";
-import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 
 export interface RecordingDescription {
   duration: TimeStamp;

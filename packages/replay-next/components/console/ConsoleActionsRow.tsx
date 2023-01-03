@@ -1,6 +1,6 @@
-import styles from "./ConsoleActionsRow.module.css";
-
 import Icon from "replay-next/components/Icon";
+
+import styles from "./ConsoleActionsRow.module.css";
 
 export default function ConsoleActionsRow({
   clearConsoleEvaluations,

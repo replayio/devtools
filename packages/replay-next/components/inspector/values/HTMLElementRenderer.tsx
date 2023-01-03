@@ -1,13 +1,6 @@
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import { MouseEvent, useContext } from "react";
 
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
-import useClientValue from "../useClientValue";
-import ClientValueValueRenderer from "./ClientValueValueRenderer";
-import { ObjectPreviewRendererProps } from "./types";
-import styles from "./shared.module.css";
-
 import Icon from "replay-next/components/Icon";
 import {
   InspectableTimestampedPointContext,
@@ -19,6 +12,12 @@ import {
   Value as ClientValue,
   filterNonEnumerableProperties,
 } from "replay-next/src/utils/protocol";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+
+import useClientValue from "../useClientValue";
+import ClientValueValueRenderer from "./ClientValueValueRenderer";
+import { ObjectPreviewRendererProps } from "./types";
+import styles from "./shared.module.css";
 
 type Props = ObjectPreviewRendererProps & {
   showClosingTag?: boolean;

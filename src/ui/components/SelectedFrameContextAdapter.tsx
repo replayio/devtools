@@ -5,9 +5,8 @@ import {
   getPausePreviewLocation,
   getSelectedFrameId,
 } from "devtools/client/debugger/src/selectors";
-import { useAppSelector } from "ui/setup/hooks";
-
 import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
+import { useAppSelector } from "ui/setup/hooks";
 
 export default function SelectedFrameContextAdapter() {
   const selectedPauseAndFrameIdRedux = useAppSelector(getSelectedFrameId);

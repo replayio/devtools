@@ -1,13 +1,12 @@
 import { ExecutionPoint, SourceId, TimeStampedPoint } from "@replayio/protocol";
 
 import { binarySearch } from "protocol/utils";
-import { Point } from "shared/client/types";
-
 import {
   compareExecutionPoints,
   isExecutionPointsGreaterThan,
   isExecutionPointsLessThan,
 } from "replay-next/src/utils/time";
+import { Point } from "shared/client/types";
 
 type HitPointAndIndexTuple = [hitPoint: TimeStampedPoint, index: number];
 type NullTuple = [null, null];

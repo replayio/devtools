@@ -4,6 +4,8 @@ import { ConnectedProps, connect } from "react-redux";
 import { closeQuickOpen, toggleQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import * as dbgActions from "devtools/client/debugger/src/actions/ui";
 import { getActiveSearch, getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
+import { SHOW_GLOBAL_SEARCH_EVENT_TYPE } from "replay-next/components/search-files/SearchFiles";
+import { createTypeDataForVisualComment } from "replay-next/components/sources/utils/comments";
 import { UIThunkAction } from "ui/actions";
 import { actions } from "ui/actions";
 import { useGetRecordingId } from "ui/hooks/recordings";
@@ -15,9 +17,6 @@ import { trackEvent } from "ui/utils/telemetry";
 import useAuth0 from "ui/utils/useAuth0";
 
 import { getCommandPaletteInput } from "./CommandPalette/SearchInput";
-
-import { SHOW_GLOBAL_SEARCH_EVENT_TYPE } from "replay-next/components/search-files/SearchFiles";
-import { createTypeDataForVisualComment } from "replay-next/components/sources/utils/comments";
 
 const closeOpenModalsOnEscape = (e: KeyboardEvent): UIThunkAction => {
   return (dispatch, getState) => {

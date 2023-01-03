@@ -7,6 +7,8 @@ import type { FrameId, Location, PauseId, TimeStampedPoint, Value } from "@repla
 import findLast from "lodash/findLast";
 
 import { compareNumericStrings } from "protocol/utils";
+import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
+import { getFrameStepsAsync } from "replay-next/src/suspense/FrameStepsCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { getPreferredLocation, getSelectedSourceId } from "ui/reducers/sources";
 import { SourceDetails } from "ui/reducers/sources";
@@ -16,9 +18,6 @@ import { features } from "ui/utils/prefs";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 
 import { getSymbolEntryForSource } from "./ast";
-
-import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
-import { getFrameStepsAsync } from "replay-next/src/suspense/FrameStepsCache";
 
 export interface Context {
   navigateCounter: number;

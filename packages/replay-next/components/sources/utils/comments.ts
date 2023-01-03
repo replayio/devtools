@@ -1,7 +1,5 @@
 import { SourceId } from "@replayio/protocol";
 
-import { ReplayClientInterface } from "shared/client/types";
-
 import {
   getSourceAsync,
   getStreamingSourceContentsAsync,
@@ -9,6 +7,7 @@ import {
 import { parseStreamingAsync } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ParsedToken } from "replay-next/src/suspense/SyntaxParsingCache";
 import { getBase64Png } from "replay-next/src/utils/canvas";
+import { ReplayClientInterface } from "shared/client/types";
 
 export enum CanonicalRequestType {
   CSS,

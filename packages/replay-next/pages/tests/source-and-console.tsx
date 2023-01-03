@@ -1,6 +1,3 @@
-import createTest from "./utils/createTest";
-import styles from "./styles.module.css";
-
 import ConsoleRoot from "replay-next/components/console";
 import SourceExplorer from "replay-next/components/sources/SourceExplorer";
 import Sources from "replay-next/components/sources/Sources";
@@ -11,6 +8,9 @@ import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrame
 import { SourcesContextRoot } from "replay-next/src/contexts/SourcesContext";
 import { TerminalContextRoot } from "replay-next/src/contexts/TerminalContext";
 import { TimelineContextRoot } from "replay-next/src/contexts/TimelineContext";
+
+import createTest from "./utils/createTest";
+import styles from "./styles.module.css";
 
 const DEFAULT_RECORDING_ID = "dbd4da74-cf42-41fb-851d-69bed67debcf";
 

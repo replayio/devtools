@@ -6,13 +6,12 @@ import {
 } from "devtools/client/debugger/src/actions/ui";
 import { Tab, getContext, getTabs } from "devtools/client/debugger/src/selectors";
 import { getRawSourceURL } from "devtools/client/debugger/src/utils/source";
-import { MiniSource, getSelectedSource } from "ui/reducers/sources";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-
 import ContextMenuDivider from "replay-next/components/context-menu/ContextMenuDivider";
 import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
 import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import { copyToClipboard as copyTextToClipboard } from "replay-next/components/sources/utils/clipboard";
+import { MiniSource, getSelectedSource } from "ui/reducers/sources";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 export default function useTabContextMenu({ source }: { source: MiniSource }) {
   const dispatch = useAppDispatch();

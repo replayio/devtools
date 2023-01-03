@@ -3,13 +3,6 @@ import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { Suspense, memo, useContext } from "react";
 
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { Badge } from "shared/client/types";
-
-import MessageHoverButton from "../MessageHoverButton";
-import Source from "../Source";
-import styles from "./shared.module.css";
-
 import useConsoleContextMenu from "replay-next/components/console/useConsoleContextMenu";
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import Inspector from "replay-next/components/inspector";
@@ -23,6 +16,12 @@ import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { runAnalysisSuspense } from "replay-next/src/suspense/AnalysisCache";
 import { primitiveToClientValue } from "replay-next/src/utils/protocol";
 import { formatTimestamp } from "replay-next/src/utils/time";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { Badge } from "shared/client/types";
+
+import MessageHoverButton from "../MessageHoverButton";
+import Source from "../Source";
+import styles from "./shared.module.css";
 
 const NEW_BADGE_THRESHOLD = 5_000;
 

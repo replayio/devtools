@@ -3,11 +3,6 @@ import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { Suspense, memo, useContext } from "react";
 
-import MessageHoverButton from "../MessageHoverButton";
-import Source from "../Source";
-import StackRenderer from "../StackRenderer";
-import styles from "./shared.module.css";
-
 import useConsoleContextMenu from "replay-next/components/console/useConsoleContextMenu";
 import Expandable from "replay-next/components/Expandable";
 import Icon from "replay-next/components/Icon";
@@ -17,6 +12,11 @@ import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersCo
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { UncaughtException } from "replay-next/src/suspense/ExceptionsCache";
 import { formatTimestamp } from "replay-next/src/utils/time";
+
+import MessageHoverButton from "../MessageHoverButton";
+import Source from "../Source";
+import StackRenderer from "../StackRenderer";
+import styles from "./shared.module.css";
 
 const EMPTY_ARRAY: any[] = [];
 

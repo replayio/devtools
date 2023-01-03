@@ -15,14 +15,6 @@ import {
   useTransition,
 } from "react";
 
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
-import HTMLExpandable from "./HTMLExpandable";
-import PropertiesRenderer from "./PropertiesRenderer";
-import useClientValue from "./useClientValue";
-import ValueRenderer from "./ValueRenderer";
-import styles from "./GetterRenderer.module.css";
-
 import Expandable from "replay-next/components/Expandable";
 import Icon from "replay-next/components/Icon";
 import Loader from "replay-next/components/Loader";
@@ -31,6 +23,13 @@ import {
   getObjectWithPreviewSuspense,
 } from "replay-next/src/suspense/ObjectPreviews";
 import { Value as ClientValue, protocolValueToClientValue } from "replay-next/src/utils/protocol";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+
+import HTMLExpandable from "./HTMLExpandable";
+import PropertiesRenderer from "./PropertiesRenderer";
+import useClientValue from "./useClientValue";
+import ValueRenderer from "./ValueRenderer";
+import styles from "./GetterRenderer.module.css";
 
 export default function GetterRenderer({
   parentObjectId,

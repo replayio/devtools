@@ -1,5 +1,8 @@
 import { KeyboardEvent, MouseEvent, useContext, useRef } from "react";
 
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { getSource } from "replay-next/src/suspense/SourcesCache";
+import { getSourceFileName } from "replay-next/src/utils/source";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Icon from "../Icon";
@@ -13,10 +16,6 @@ import {
 import SourceSearch from "./SourceSearch";
 import { SourceSearchContext, SourceSearchContextRoot } from "./SourceSearchContext";
 import styles from "./Sources.module.css";
-
-import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { getSource } from "replay-next/src/suspense/SourcesCache";
-import { getSourceFileName } from "replay-next/src/utils/source";
 
 export default function SourcesRoot() {
   return (

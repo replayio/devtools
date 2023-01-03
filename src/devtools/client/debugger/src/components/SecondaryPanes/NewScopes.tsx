@@ -1,6 +1,10 @@
 import { PauseId, Value } from "@replayio/protocol";
 import { Suspense, useContext } from "react";
 
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import Inspector from "replay-next/components/inspector/Inspector";
+import ScopesInspector from "replay-next/components/inspector/ScopesInspector";
+import { getFrameScopesSuspense } from "replay-next/src/suspense/ScopeCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { enterFocusMode } from "ui/actions/timeline";
 import { Redacted } from "ui/components/Redacted";
@@ -13,11 +17,6 @@ import { pickScopes } from "ui/suspense/scopeCache";
 import { getSelectedFrameId } from "../../selectors";
 import { ConvertedScope, convertScopes } from "../../utils/pause/scopes/convertScopes";
 import styles from "./NewObjectInspector.module.css";
-
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
-import Inspector from "replay-next/components/inspector/Inspector";
-import ScopesInspector from "replay-next/components/inspector/ScopesInspector";
-import { getFrameScopesSuspense } from "replay-next/src/suspense/ScopeCache";
 
 function ScopesRenderer() {
   const replayClient = useContext(ReplayClientContext);

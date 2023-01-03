@@ -2,6 +2,9 @@ import { PauseId, Object as ProtocolObject, Value as ProtocolValue } from "@repl
 import classNames from "classnames";
 import { ReactNode, Suspense, useContext, useState } from "react";
 
+import Expandable from "replay-next/components/Expandable";
+import Loader from "replay-next/components/Loader";
+import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import HTMLExpandable from "./HTMLExpandable";
@@ -9,10 +12,6 @@ import PropertiesRenderer from "./PropertiesRenderer";
 import useClientValue from "./useClientValue";
 import ValueRenderer from "./ValueRenderer";
 import styles from "./KeyValueRenderer.module.css";
-
-import Expandable from "replay-next/components/Expandable";
-import Loader from "replay-next/components/Loader";
-import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
 
 // Renders a protocol Object/ObjectPreview as a key+value pair.
 //

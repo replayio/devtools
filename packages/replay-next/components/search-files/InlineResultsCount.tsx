@@ -1,14 +1,13 @@
 import { useContext, useSyncExternalStore } from "react";
 
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
-import styles from "./InlineResultsCount.module.css";
-
 import Icon from "replay-next/components/Icon";
 import {
   StreamingSourceSearchResults,
   searchSourcesSuspense,
 } from "replay-next/src/suspense/SearchCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+
+import styles from "./InlineResultsCount.module.css";
 
 export default function InlineResultsCount({
   includeNodeModules,

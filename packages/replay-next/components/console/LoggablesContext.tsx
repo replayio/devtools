@@ -8,8 +8,6 @@ import {
   useMemo,
 } from "react";
 
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { PointInstance, PointsContext } from "replay-next/src/contexts/PointsContext";
@@ -22,6 +20,7 @@ import { loggableSort } from "replay-next/src/utils/loggables";
 import { isInNodeModules } from "replay-next/src/utils/messages";
 import { suspendInParallel } from "replay-next/src/utils/suspense";
 import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 export type Loggable =
   | EventLog

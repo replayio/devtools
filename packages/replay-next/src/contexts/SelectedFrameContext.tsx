@@ -13,14 +13,13 @@ import {
   useState,
 } from "react";
 
+import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegions } from "shared/utils/time";
 
 import useLoadedRegions from "../hooks/useRegions";
 import { getPauseIdAsync } from "../suspense/PauseCache";
 import { TimelineContext } from "./TimelineContext";
-
-import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
 
 export interface PauseAndFrameId {
   pauseId: PauseId;

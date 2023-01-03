@@ -1,12 +1,11 @@
 import { Location as ProtocolLocation } from "@replayio/protocol";
 import { MouseEvent, useContext } from "react";
 
+import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
+import { getSource } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import styles from "./Source.module.css";
-
-import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
-import { getSource } from "replay-next/src/suspense/SourcesCache";
 
 export default function Source({
   className = "",

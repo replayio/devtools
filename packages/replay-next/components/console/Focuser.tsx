@@ -1,14 +1,13 @@
 import { TimeStampedPointRange } from "@replayio/protocol";
 import React, { MutableRefObject, useContext, useEffect, useRef, useState } from "react";
 
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
-import styles from "./Focuser.module.css";
-
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import useLoadedRegions from "replay-next/src/hooks/useRegions";
 import { formatTimestamp } from "replay-next/src/utils/time";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+
+import styles from "./Focuser.module.css";
 
 export default function Focuser() {
   const { duration } = useContext(SessionContext);

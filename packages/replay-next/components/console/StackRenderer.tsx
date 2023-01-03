@@ -1,13 +1,12 @@
 import { CallStack, Frame, FrameId } from "@replayio/protocol";
 import React, { Suspense, memo, useContext } from "react";
 
+import Loader from "replay-next/components/Loader";
+import { getSource } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Source from "./Source";
 import styles from "./StackRenderer.module.css";
-
-import Loader from "replay-next/components/Loader";
-import { getSource } from "replay-next/src/suspense/SourcesCache";
 
 // This is a crappy approximation of the console; the UI isn't meant to be the focus of this branch.
 // It would be nice to re-implement the whole Console UI though and re-write all of the legacy object inspector code.

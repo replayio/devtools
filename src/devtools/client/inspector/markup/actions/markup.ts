@@ -3,6 +3,7 @@ import { ProtocolClient, Object as ProtocolObject } from "@replayio/protocol";
 import { getPauseId, paused } from "devtools/client/debugger/src/reducers/pause";
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { Deferred, assert, defer } from "protocol/utils";
+import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import type { UIStore, UIThunkAction } from "ui/actions";
@@ -38,8 +39,6 @@ import {
   getSelectedNodeId,
   isNodeExpanded,
 } from "../selectors/markup";
-
-import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
 
 let rootNodeWaiter: Deferred<void> | undefined;
 

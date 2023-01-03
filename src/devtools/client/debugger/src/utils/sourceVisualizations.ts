@@ -4,6 +4,8 @@ import sortBy from "lodash/sortBy";
 
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
+import { getMappedLocationSuspense } from "replay-next/src/suspense/MappedLocationCache";
+import { getBreakpointPositionsSuspense } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 import {
   SourceDetails,
@@ -16,9 +18,6 @@ import { getPauseFrameSuspense } from "ui/suspense/frameCache";
 
 import { PauseAndFrameId } from "../reducers/pause";
 import { isBowerComponent, isNodeModule } from "./source";
-
-import { getMappedLocationSuspense } from "replay-next/src/suspense/MappedLocationCache";
-import { getBreakpointPositionsSuspense } from "replay-next/src/suspense/SourcesCache";
 
 // TODO
 type CursorPosition = any;

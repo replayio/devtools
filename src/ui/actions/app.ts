@@ -5,6 +5,7 @@ import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { shallowEqual } from "devtools/client/debugger/src/utils/compare";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
+import { isValidPoint } from "replay-next/src/contexts/PointsContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 import * as selectors from "ui/reducers/app";
@@ -39,8 +40,6 @@ import {
 } from "./layout";
 import { toggleFocusMode } from "./timeline";
 import { UIStore, UIThunkAction } from ".";
-
-import { isValidPoint } from "replay-next/src/contexts/PointsContext";
 
 export * from "../reducers/app";
 

@@ -3,6 +3,7 @@ import { ConnectedProps, connect } from "react-redux";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
+import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { actions } from "ui/actions";
 import { hideRequestDetails, selectAndFetchRequest } from "ui/actions/network";
 import { getFocusedEvents, getFocusedRequests, getSelectedRequestId } from "ui/reducers/network";
@@ -17,8 +18,6 @@ import RequestDetails from "./RequestDetails";
 import RequestTable from "./RequestTable";
 import Table from "./Table";
 import { CanonicalRequestType, RequestSummary } from "./utils";
-
-import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 
 export const NetworkMonitor = ({
   currentTime,

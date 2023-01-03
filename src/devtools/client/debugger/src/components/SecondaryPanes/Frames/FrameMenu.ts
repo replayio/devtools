@@ -6,7 +6,6 @@ import kebabCase from "lodash/kebabCase";
 
 import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
 import { showMenu } from "devtools/shared/contextmenu";
-
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 
 function formatMenuElement(label: string, accesskey: string, click: () => void, disabled = false) {

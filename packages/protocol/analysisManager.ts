@@ -15,12 +15,11 @@ import {
 
 import { addEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
+import { preCacheExecutionPointForTime } from "replay-next/src/suspense/PointsCache";
 
 import { client } from "./socket";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "./thread/analysis";
 import { assert } from "./utils";
-
-import { preCacheExecutionPointForTime } from "replay-next/src/suspense/PointsCache";
 
 // For more information about these params, see:
 // https://static.replay.io/protocol/tot/Analysis

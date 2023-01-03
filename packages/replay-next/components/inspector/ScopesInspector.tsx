@@ -1,11 +1,11 @@
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import { Suspense } from "react";
 
-import Inspector from "./Inspector";
-import styles from "./ScopesInspector.module.css";
-
 import Expandable from "replay-next/components/Expandable";
 import Loader from "replay-next/components/Loader";
+
+import Inspector from "./Inspector";
+import styles from "./ScopesInspector.module.css";
 
 export default function ScopesInspector({
   name,

@@ -10,12 +10,11 @@ import { getSelectedFrameId, getThreadContext } from "devtools/client/debugger/s
 import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import Services from "devtools/shared/services";
+import { useGetFrameSteps } from "replay-next/src/suspense/FrameStepsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { useGetFrames } from "ui/suspense/frameCache";
 import { trackEvent } from "ui/utils/telemetry";
-
-import { useGetFrameSteps } from "replay-next/src/suspense/FrameStepsCache";
 
 const { appinfo } = Services;
 

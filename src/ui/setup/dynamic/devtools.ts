@@ -31,6 +31,15 @@ import {
 import { addEventListener, initSocket, client as protocolClient } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
+import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
+import { POINTS_DATABASE } from "replay-next/src/contexts/PointsContext";
+import { IDBOptions } from "replay-next/src/hooks/useIndexedDB";
+import {
+  getCachedObject,
+  getObjectPropertyHelper,
+  getObjectThrows,
+  getObjectWithPreviewHelper,
+} from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 import { UIStore, actions } from "ui/actions";
 import { setCanvas } from "ui/actions/app";
@@ -56,16 +65,6 @@ import type { ThunkExtraArgs } from "ui/utils/thunk";
 
 import { startAppListening } from "../listenerMiddleware";
 import { AppStore, extendStore } from "../store";
-
-import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
-import { POINTS_DATABASE } from "replay-next/src/contexts/PointsContext";
-import { IDBOptions } from "replay-next/src/hooks/useIndexedDB";
-import {
-  getCachedObject,
-  getObjectPropertyHelper,
-  getObjectThrows,
-  getObjectWithPreviewHelper,
-} from "replay-next/src/suspense/ObjectPreviews";
 
 const { setupApp, setupTimeline } = actions;
 

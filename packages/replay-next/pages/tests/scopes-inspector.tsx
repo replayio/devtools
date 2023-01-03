@@ -1,16 +1,15 @@
 import { Suspense, useContext } from "react";
 
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
-import createTest from "./utils/createTest";
-import styles from "./styles.module.css";
-
 import Inspector from "replay-next/components/inspector";
 import ScopesInspector from "replay-next/components/inspector/ScopesInspector";
 import Loader from "replay-next/components/Loader";
 import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
 import { evaluateSuspense, getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
 import { getClosestPointForTimeSuspense } from "replay-next/src/suspense/PointsCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+
+import createTest from "./utils/createTest";
+import styles from "./styles.module.css";
 
 const DEFAULT_RECORDING_ID = "9fd8381f-05e6-40c2-8b4f-59e40c2c3886";
 

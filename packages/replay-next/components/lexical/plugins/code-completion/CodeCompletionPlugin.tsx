@@ -4,6 +4,7 @@ import { FrameId, PauseId } from "@replayio/protocol";
 import { $createTextNode, TextNode } from "lexical";
 import { useContext, useEffect } from "react";
 
+import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import TypeAheadPlugin from "../typeahead/TypeAheadPlugin";
@@ -12,8 +13,6 @@ import getQueryData from "./getQueryData";
 import isExactMatch from "./isExactMatch";
 import { Match } from "./types";
 import styles from "./styles.module.css";
-
-import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
 
 export default function CodeCompletionPlugin({
   dataTestId,

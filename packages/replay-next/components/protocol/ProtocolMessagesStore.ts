@@ -2,7 +2,6 @@ import { CommandMethods } from "@replayio/protocol";
 
 import { CommandResponse } from "protocol/socket";
 import { Request } from "protocol/socket";
-
 import { setSessionCallbacks } from "replay-next/../protocol/socket";
 
 export type Event = {
