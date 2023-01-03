@@ -35,7 +35,7 @@ export default function useLocalStorage<T>(
     if (storedValue != null) {
       return JSON.parse(storedValue);
     } else {
-      return initialValue;
+      return initialValue; // nosemgrep typescript.react.best-practice.react-props-in-state.react-props-in-state
     }
   });
 
