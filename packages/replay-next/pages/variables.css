@@ -23,12 +23,14 @@
 :root.theme-dark {
   --color-transparent: rgba(0, 0, 0, 0);
 
-  --scroll-thumb-color: #454950;
-
-  --nag-background-color: #ff005b;
-  --nag-gradient-color-begin: #ff2f86;
-  --nag-gradient-color-end: #eb265e;
-  --nag-color: #ffffff;
+  /* Color ramp: this is copy/pasted to align to src/devtools/client/themes/variables.css */
+  --theme-base-100: #000; /* background chrome */
+  --theme-base-95: #192230; /* tab bars */
+  --theme-base-90: #3d4552; /* editor and selected tab */
+  --theme-base-85: #3e434b; /* textfields */
+  --theme-base-80: #797d81;
+  --theme-base-70: #a2a6a8;
+  --theme-base-60: #c3c6c8;
 
   --background-color-contrast-1: #0e1119;
   --background-color-contrast-2: #192230;
@@ -92,6 +94,13 @@
   --color-secondary-background: var(--background-color-contrast-3);
   --color-control-background: var(--background-color-contrast-4);
   --color-control-background-active: var(--background-color-primary-button);
+
+  --scroll-thumb-color: #454950;
+
+  --nag-background-color: #ff005b;
+  --nag-gradient-color-begin: #ff2f86;
+  --nag-gradient-color-end: #eb265e;
+  --nag-color: #ffffff;
 
   --collapsible-toggle-color: #9ba0a5;
 
@@ -199,12 +208,14 @@
 :root.theme-light {
   --color-transparent: rgba(255, 255, 255, 0);
 
-  --scroll-thumb-color: #aaaaaa;
-
-  --nag-background-color: #f02d5e;
-  --nag-gradient-color-begin: #ff3087;
-  --nag-gradient-color-end: #ed265c;
-  --nag-color: #ffffff;
+  /* Color ramp: this is copy/pasted to align to src/devtools/client/themes/variables.css */
+  --theme-base-100: hsl(0, 0%, 100%);
+  --theme-base-95: hsl(0, 0%, 95%);
+  --theme-base-90: hsl(0, 0%, 90%);
+  --theme-base-85: hsl(0, 0%, 85%);
+  --theme-base-80: hsl(0, 0%, 80%);
+  --theme-base-70: hsl(0, 0%, 70%);
+  --theme-base-60: hsl(0, 0%, 60%);
 
   --background-color-contrast-1: #e6e6e6;
   --background-color-contrast-2: #ffffff;
@@ -268,6 +279,13 @@
   --color-secondary-background: #eeeeee;
   --color-control-background: var(--background-color-contrast-1);
   --color-control-background-active: var(--background-color-primary-button);
+
+  --scroll-thumb-color: #aaaaaa;
+
+  --nag-background-color: #f02d5e;
+  --nag-gradient-color-begin: #ff3087;
+  --nag-gradient-color-end: #ed265c;
+  --nag-color: #ffffff;
 
   --collapsible-toggle-color: #868688;
 
