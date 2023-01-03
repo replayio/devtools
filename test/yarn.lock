@@ -1287,13 +1287,13 @@ __metadata:
   linkType: hard
 
 "json5@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "json5@npm:1.0.1"
+  version: 1.0.2
+  resolution: "json5@npm:1.0.2"
   dependencies:
     minimist: ^1.2.0
   bin:
     json5: lib/cli.js
-  checksum: e76ea23dbb8fc1348c143da628134a98adf4c5a4e8ea2adaa74a80c455fc2cdf0e2e13e6398ef819bfe92306b610ebb2002668ed9fc1af386d593691ef346fc3
+  checksum: 866458a8c58a95a49bef3adba929c625e82532bcff1fe93f01d29cb02cac7c3fe1f4b79951b7792c2da9de0b32871a8401a6e3c5b36778ad852bf5b8a61165d7
   languageName: node
   linkType: hard
 
@@ -1589,23 +1589,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.22.2":
-  version: 1.22.2
-  resolution: "playwright-core@npm:1.22.2"
+"playwright-core@npm:1.29.1":
+  version: 1.29.1
+  resolution: "playwright-core@npm:1.29.1"
   bin:
     playwright: cli.js
-  checksum: 7381c35359b4338282f73dc902c1c1311e8e7cbf852f445dd6b430ebcb7eafc842b8e512d238fdc0b70d1da2b14046f297b19dac027c6a0a62ff217e70f6a07c
+  checksum: e1c8423db4d28f44e5365a353f321b04a07709c8bf26d0c908f06d2c2669f715315170f84ca98a532951c2ac6324f5f48f651dca1abe43092c7637bdb4703303
   languageName: node
   linkType: hard
 
-"playwright@npm:^1.22.2":
-  version: 1.22.2
-  resolution: "playwright@npm:1.22.2"
+"playwright@npm:^1.25.1":
+  version: 1.29.1
+  resolution: "playwright@npm:1.29.1"
   dependencies:
-    playwright-core: 1.22.2
+    playwright-core: 1.29.1
   bin:
     playwright: cli.js
-  checksum: e9e9c4a959d27b6bea3144a0cb19b15124226fb0017e65978fe781fc79129793028ec68dbe9252674120b9a0079bd0e4d17bd2e1258e66032d5ec5427f35cb6f
+  checksum: ef20f71b20420d9e0eaf45ac5f936422dc6961a863eb71192abe911d3f951722b3c464a36ea04cac8484368c876b5513db04171375f970831fb2bccb9fbb1b7b
   languageName: node
   linkType: hard
 
@@ -1707,7 +1707,7 @@ __metadata:
     eslint-plugin-react: ^7.20.6
     eslint-plugin-react-hooks: ^4.3.0
     lodash: ^4.17.20
-    playwright: ^1.22.2
+    playwright: ^1.25.1
   dependenciesMeta:
     "@recordreplay/playwright":
       optional: true
