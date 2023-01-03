@@ -95,7 +95,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
           {recording.metadata && (
             <>
               <Row>
-                <MaterialIcon>schedule</MaterialIcon>
+                <MaterialIcon className="text-xl">schedule</MaterialIcon>
                 <div
                   className="overflow-hidden overflow-ellipsis whitespace-pre"
                   title={recording.metadata.source?.branch}

@@ -50,7 +50,7 @@ export default function PortalDropdown(props: PortalDropdownProps) {
     <div className="portal-dropdown-wrapper">
       <button
         type="button"
-        className={`expand-dropdown mr-1 flex w-full px-2 py-1 ${buttonStyle}`}
+        className={`expand-dropdown mr-1 flex w-full py-1 ${buttonStyle}`}
         disabled={props.disabled}
         id="portal-dropdown-button"
         data-test-id="consoleDockButton"
