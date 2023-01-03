@@ -75,8 +75,8 @@ async function uploadImage(file, branch, runId) {
     results.push(...res);
   }
 
-  const passed = results.filter(r => r.status == 201);
-  const failed = results.filter(r => r.status !== 201);
+  const passed = results.filter(r => r.data);
+  const failed = results.filter(r => r.error);
 
   console.log(`${passed.length} passed snapshots`);
   console.log(
