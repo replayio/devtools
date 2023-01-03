@@ -1,8 +1,6 @@
 import classnames from "classnames";
 import { useMemo } from "react";
 
-import Expandable from "bvaughn-architecture-demo/components/Expandable";
-
 import { useAppDispatch, useAppSelector, useAppStore } from "../../app/hooks";
 import { sourceEntrySelected } from "../sources/selectedSourcesSlice";
 import { getSourceDetails } from "../sources/sourcesCache";
@@ -17,6 +15,8 @@ import styles from "./SourcesTree.module.css";
 import fileIcon from "./images/file-small.svg";
 import folderIcon from "./images/folder.svg";
 import globeIcon from "./images/globe-small.svg";
+
+import Expandable from "replay-next/components/Expandable";
 
 interface STIProps {
   node: SourceTreeNode;

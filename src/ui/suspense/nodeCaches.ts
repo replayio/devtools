@@ -8,10 +8,11 @@ import {
   Object as ProtocolObject,
 } from "@replayio/protocol";
 
-import { createGenericCache } from "bvaughn-architecture-demo/src/suspense/createGenericCache";
-import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
-import { cachePauseData } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
+
+import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
+import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
+import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 
 type NodeFetchOptions =
   | {

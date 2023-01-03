@@ -5,7 +5,6 @@
 import { Dictionary } from "@reduxjs/toolkit";
 import type { FunctionMatch, Location } from "@replayio/protocol";
 
-import { truncate as truncateText } from "bvaughn-architecture-demo/src/utils/text";
 import { SourceDetails } from "ui/reducers/sources";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 
@@ -13,6 +12,8 @@ import { FunctionDeclaration, SymbolEntry } from "../reducers/ast";
 import { SearchTypes } from "../reducers/quick-open";
 import { memoizeLast } from "./memoizeLast";
 import { getSourceClassnames, getTruncatedFileName } from "./source";
+
+import { truncate as truncateText } from "replay-next/src/utils/text";
 
 export const MODIFIERS: Record<string, SearchTypes> = {
   "@": "functions",

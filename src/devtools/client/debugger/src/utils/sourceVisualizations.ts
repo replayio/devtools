@@ -2,8 +2,6 @@ import { Dictionary } from "@reduxjs/toolkit";
 import type { SourceId } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 
-import { getMappedLocationSuspense } from "bvaughn-architecture-demo/src/suspense/MappedLocationCache";
-import { getBreakpointPositionsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
@@ -18,6 +16,9 @@ import { getPauseFrameSuspense } from "ui/suspense/frameCache";
 
 import { PauseAndFrameId } from "../reducers/pause";
 import { isBowerComponent, isNodeModule } from "./source";
+
+import { getMappedLocationSuspense } from "replay-next/src/suspense/MappedLocationCache";
+import { getBreakpointPositionsSuspense } from "replay-next/src/suspense/SourcesCache";
 
 // TODO
 type CursorPosition = any;

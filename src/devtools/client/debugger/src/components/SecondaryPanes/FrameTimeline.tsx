@@ -9,7 +9,6 @@ import classnames from "classnames";
 import React, { Component, Suspense, useContext } from "react";
 import ReactTooltip from "react-tooltip";
 
-import { getFrameStepsSuspense } from "bvaughn-architecture-demo/src/suspense/FrameStepsCache";
 import { locationsInclude } from "protocol/utils";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { actions } from "ui/actions";
@@ -27,6 +26,8 @@ import { PartialLocation } from "../../actions/sources/select";
 import { PauseFrame, getExecutionPoint } from "../../reducers/pause";
 import { SymbolEntry, getSymbols } from "../../selectors";
 import { getSelectedFrameSuspense } from "../../selectors/pause";
+
+import { getFrameStepsSuspense } from "replay-next/src/suspense/FrameStepsCache";
 
 function getBoundingClientRect(element?: HTMLElement) {
   if (!element) {

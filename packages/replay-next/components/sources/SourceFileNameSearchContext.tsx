@@ -1,10 +1,11 @@
 import { newSource as ProtocolSource } from "@replayio/protocol";
 import { ReactNode, createContext, useContext, useEffect, useMemo } from "react";
 
-import { getSourcesAsync } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useSourceFileNameSearch, { Actions, State } from "./hooks/useSourceFileNameSearch";
+
+import { getSourcesAsync } from "replay-next/src/suspense/SourcesCache";
 
 export const SourceFileNameSearchContext = createContext<[State, Actions]>(null as any);
 

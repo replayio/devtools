@@ -1,11 +1,12 @@
 import { BreakpointId } from "@replayio/protocol";
 import { useContext, useEffect, useRef } from "react";
 
-import { getBreakpointPositionsAsync } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
-import { getSourcesAsync } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point, PointId } from "shared/client/types";
 import { ReplayClientInterface } from "shared/client/types";
+
+import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
+import { getSourcesAsync } from "replay-next/src/suspense/SourcesCache";
 
 // Breakpoints must be synced with the server so the stepping controls will work.
 export default function useBreakpointIdsFromServer(

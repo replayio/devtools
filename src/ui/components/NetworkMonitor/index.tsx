@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
-import IndeterminateLoader from "bvaughn-architecture-demo/components/IndeterminateLoader";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import { actions } from "ui/actions";
 import { hideRequestDetails, selectAndFetchRequest } from "ui/actions/network";
@@ -18,6 +17,8 @@ import RequestDetails from "./RequestDetails";
 import RequestTable from "./RequestTable";
 import Table from "./Table";
 import { CanonicalRequestType, RequestSummary } from "./utils";
+
+import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 
 export const NetworkMonitor = ({
   currentTime,

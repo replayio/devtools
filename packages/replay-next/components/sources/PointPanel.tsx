@@ -9,27 +9,6 @@ import {
   useTransition,
 } from "react";
 
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import CodeEditor from "bvaughn-architecture-demo/components/lexical/CodeEditor";
-import {
-  COMMENT_TYPE_SOURCE_CODE,
-  createTypeDataForSourceCodeComment,
-} from "bvaughn-architecture-demo/components/sources/utils/comments";
-import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
-import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
-import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
-import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import { PauseAndFrameId } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
-import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
-import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
-import { addComment as addCommentGraphQL } from "bvaughn-architecture-demo/src/graphql/Comments";
-import { Nag } from "bvaughn-architecture-demo/src/graphql/types";
-import { useNag } from "bvaughn-architecture-demo/src/hooks/useNag";
-import { getFramesSuspense } from "bvaughn-architecture-demo/src/suspense/FrameCache";
-import { getPauseIdSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
-import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
-import { findIndexBigInt } from "bvaughn-architecture-demo/src/utils/array";
-import { validate } from "bvaughn-architecture-demo/src/utils/points";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { HitPointStatus, Point } from "shared/client/types";
 
@@ -39,6 +18,28 @@ import CommentButton from "./CommentButton";
 import PointPanelTimeline from "./PointPanelTimeline";
 import SyntaxHighlightedLine from "./SyntaxHighlightedLine";
 import styles from "./PointPanel.module.css";
+
+import Icon from "replay-next/components/Icon";
+import CodeEditor from "replay-next/components/lexical/CodeEditor";
+import {
+  COMMENT_TYPE_SOURCE_CODE,
+  createTypeDataForSourceCodeComment,
+} from "replay-next/components/sources/utils/comments";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
+import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
+import { PointsContext } from "replay-next/src/contexts/PointsContext";
+import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import { addComment as addCommentGraphQL } from "replay-next/src/graphql/Comments";
+import { Nag } from "replay-next/src/graphql/types";
+import { useNag } from "replay-next/src/hooks/useNag";
+import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
+import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
+import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/PointsCache";
+import { findIndexBigInt } from "replay-next/src/utils/array";
+import { validate } from "replay-next/src/utils/points";
 
 type EditReason = "condition" | "content";
 

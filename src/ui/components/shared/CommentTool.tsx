@@ -1,10 +1,6 @@
 import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 
-import {
-  VisualCommentTypeData,
-  createTypeDataForVisualComment,
-} from "bvaughn-architecture-demo/components/sources/utils/comments";
 import { getAreMouseTargetsLoading, getCanvas } from "ui/actions/app";
 import { createFrameComment } from "ui/actions/comments";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
@@ -13,6 +9,11 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Canvas } from "ui/state/app";
 import { Comment, Reply } from "ui/state/comments";
 import useAuth0 from "ui/utils/useAuth0";
+
+import {
+  VisualCommentTypeData,
+  createTypeDataForVisualComment,
+} from "replay-next/components/sources/utils/comments";
 
 const mouseEventCanvasPosition = (e: MouseEvent) => {
   const canvas = document.getElementById("graphics");

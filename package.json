@@ -48,7 +48,7 @@
     "@stripe/react-stripe-js": "^1.7.0",
     "@stripe/stripe-js": "^1.26.0",
     "@svgr/webpack": "^6.2.1",
-    "bvaughn-architecture-demo": "workspace:*",
+    "replay-next": "workspace:*",
     "classnames": "^2.3.1",
     "cookie": "^0.4.2",
     "date-fns": "^2.28.0",

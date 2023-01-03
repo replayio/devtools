@@ -1,21 +1,22 @@
 import { SourceId } from "@replayio/protocol";
 import { unstable_useCacheRefresh as useCacheRefresh, useContext, useTransition } from "react";
 
-import ContextMenuDivider from "bvaughn-architecture-demo/components/context-menu/ContextMenuDivider";
-import ContextMenuItem from "bvaughn-architecture-demo/components/context-menu/ContextMenuItem";
-import useContextMenu from "bvaughn-architecture-demo/components/context-menu/useContextMenu";
-import { copyToClipboard } from "bvaughn-architecture-demo/components/sources/utils/clipboard";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+
+import ContextMenuDivider from "replay-next/components/context-menu/ContextMenuDivider";
+import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
+import useContextMenu from "replay-next/components/context-menu/useContextMenu";
+import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 import {
   COMMENT_TYPE_SOURCE_CODE,
   createTypeDataForSourceCodeComment,
-} from "bvaughn-architecture-demo/components/sources/utils/comments";
-import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
-import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
-import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
-import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
-import { addComment as addCommentGraphQL } from "bvaughn-architecture-demo/src/graphql/Comments";
-import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
+} from "replay-next/components/sources/utils/comments";
+import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
+import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import { addComment as addCommentGraphQL } from "replay-next/src/graphql/Comments";
+import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 
 export default function useSourceContextMenu({
   firstBreakableColumnIndex,

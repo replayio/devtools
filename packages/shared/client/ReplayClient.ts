@@ -40,9 +40,6 @@ import {
 import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
 
-import { initProtocolMessagesStore } from "bvaughn-architecture-demo/components/protocol/ProtocolMessagesStore";
-import { insert } from "bvaughn-architecture-demo/src/utils/array";
-import { areRangesEqual, compareExecutionPoints } from "bvaughn-architecture-demo/src/utils/time";
 import analysisManager from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
@@ -63,6 +60,10 @@ import {
   RunAnalysisParams,
   SourceLocationRange,
 } from "./types";
+
+import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
+import { insert } from "replay-next/src/utils/array";
+import { areRangesEqual, compareExecutionPoints } from "replay-next/src/utils/time";
 
 const STREAMING_THROTTLE_DURATION = 100;
 

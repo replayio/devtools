@@ -1,15 +1,16 @@
 import { SerializedEditorState } from "lexical";
 
-import ContextMenuDivider from "bvaughn-architecture-demo/components/context-menu/ContextMenuDivider";
-import ContextMenuItem from "bvaughn-architecture-demo/components/context-menu/ContextMenuItem";
-import useContextMenu from "bvaughn-architecture-demo/components/context-menu/useContextMenu";
-import Icon from "bvaughn-architecture-demo/components/Icon";
 import { setFocusRegionBeginTime, setFocusRegionEndTime } from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
 import type { Remark } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { useConfirm } from "../shared/Confirm";
+
+import ContextMenuDivider from "replay-next/components/context-menu/ContextMenuDivider";
+import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
+import useContextMenu from "replay-next/components/context-menu/useContextMenu";
+import Icon from "replay-next/components/Icon";
 
 export default function useCommentContextMenu({
   deleteRemark,

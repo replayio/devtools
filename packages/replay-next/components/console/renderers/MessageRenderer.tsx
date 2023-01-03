@@ -3,22 +3,22 @@ import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { Suspense, memo, useContext } from "react";
 
-import useConsoleContextMenu from "bvaughn-architecture-demo/components/console/useConsoleContextMenu";
-import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
-import Expandable from "bvaughn-architecture-demo/components/Expandable";
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import Inspector from "bvaughn-architecture-demo/components/inspector";
-import Loader from "bvaughn-architecture-demo/components/Loader";
-import { ConsoleFiltersContext } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
-import { InspectableTimestampedPointContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
-import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
-import { ProtocolMessage } from "bvaughn-architecture-demo/src/suspense/MessagesCache";
-import { formatTimestamp } from "bvaughn-architecture-demo/src/utils/time";
-
 import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 import StackRenderer from "../StackRenderer";
 import styles from "./shared.module.css";
+
+import useConsoleContextMenu from "replay-next/components/console/useConsoleContextMenu";
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import Expandable from "replay-next/components/Expandable";
+import Icon from "replay-next/components/Icon";
+import Inspector from "replay-next/components/inspector";
+import Loader from "replay-next/components/Loader";
+import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
+import { InspectableTimestampedPointContext } from "replay-next/src/contexts/InspectorContext";
+import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import { ProtocolMessage } from "replay-next/src/suspense/MessagesCache";
+import { formatTimestamp } from "replay-next/src/utils/time";
 
 const EMPTY_ARRAY: any[] = [];
 

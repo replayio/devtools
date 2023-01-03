@@ -1,6 +1,6 @@
-import Icon from "bvaughn-architecture-demo/components/Icon";
-
 import styles from "./ConsoleActionsRow.module.css";
+
+import Icon from "replay-next/components/Icon";
 
 export default function ConsoleActionsRow({
   clearConsoleEvaluations,

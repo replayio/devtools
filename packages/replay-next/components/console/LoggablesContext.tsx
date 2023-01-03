@@ -8,31 +8,20 @@ import {
   useMemo,
 } from "react";
 
-import { ConsoleFiltersContext } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
-import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
-import { PointInstance, PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import {
-  TerminalContext,
-  TerminalExpression,
-} from "bvaughn-architecture-demo/src/contexts/TerminalContext";
-import {
-  EventLog,
-  getEventTypeEntryPointsSuspense,
-} from "bvaughn-architecture-demo/src/suspense/EventsCache";
-import {
-  UncaughtException,
-  getExceptionsSuspense,
-} from "bvaughn-architecture-demo/src/suspense/ExceptionsCache";
-import {
-  ProtocolMessage,
-  getMessagesSuspense,
-} from "bvaughn-architecture-demo/src/suspense/MessagesCache";
-import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
-import { loggableSort } from "bvaughn-architecture-demo/src/utils/loggables";
-import { isInNodeModules } from "bvaughn-architecture-demo/src/utils/messages";
-import { suspendInParallel } from "bvaughn-architecture-demo/src/utils/suspense";
-import { isExecutionPointsWithinRange } from "bvaughn-architecture-demo/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+
+import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { PointInstance, PointsContext } from "replay-next/src/contexts/PointsContext";
+import { TerminalContext, TerminalExpression } from "replay-next/src/contexts/TerminalContext";
+import { EventLog, getEventTypeEntryPointsSuspense } from "replay-next/src/suspense/EventsCache";
+import { UncaughtException, getExceptionsSuspense } from "replay-next/src/suspense/ExceptionsCache";
+import { ProtocolMessage, getMessagesSuspense } from "replay-next/src/suspense/MessagesCache";
+import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/PointsCache";
+import { loggableSort } from "replay-next/src/utils/loggables";
+import { isInNodeModules } from "replay-next/src/utils/messages";
+import { suspendInParallel } from "replay-next/src/utils/suspense";
+import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 
 export type Loggable =
   | EventLog

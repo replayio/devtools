@@ -1,14 +1,6 @@
 import { Action } from "@reduxjs/toolkit";
 import { RecordingId } from "@replayio/protocol";
 
-import {
-  COMMENT_TYPE_NETWORK_REQUEST,
-  COMMENT_TYPE_VISUAL,
-  VisualCommentTypeData,
-  createTypeDataForNetworkRequestComment,
-} from "bvaughn-architecture-demo/components/sources/utils/comments";
-import { CommentSourceLocation } from "bvaughn-architecture-demo/src/graphql/types";
-import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getExecutionPoint, getPauseId } from "devtools/client/debugger/src/reducers/pause";
 import type { ThreadFront as ThreadFrontType } from "protocol/thread";
@@ -30,6 +22,15 @@ import { trackEvent } from "ui/utils/telemetry";
 import type { UIThunkAction } from "./index";
 import { setSelectedPrimaryPanel } from "./layout";
 import { seek } from "./timeline";
+
+import {
+  COMMENT_TYPE_NETWORK_REQUEST,
+  COMMENT_TYPE_VISUAL,
+  VisualCommentTypeData,
+  createTypeDataForNetworkRequestComment,
+} from "replay-next/components/sources/utils/comments";
+import { CommentSourceLocation } from "replay-next/src/graphql/types";
+import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
 
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
 

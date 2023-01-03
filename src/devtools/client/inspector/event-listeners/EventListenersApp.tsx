@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 
-import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { getPauseId } from "devtools/client/debugger/src/reducers/pause";
 import { getSelectedDomNodeId } from "devtools/client/inspector/markup/reducers/markup";
 import { onViewSourceInDebugger } from "devtools/client/webconsole/actions/toolbox";
@@ -15,6 +14,8 @@ import { useAppSelector } from "ui/setup/hooks";
 
 import { ExpandableItem } from "./ExpandableItem";
 import { XHTMLNode } from "./XHTMLNode";
+
+import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
 
 export const EventListenersApp = () => {
   const [listeners, setListeners] = useState<EventListenerWithFunctionInfo[]>([]);

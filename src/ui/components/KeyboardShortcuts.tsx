@@ -1,8 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
-import { SHOW_GLOBAL_SEARCH_EVENT_TYPE } from "bvaughn-architecture-demo/components/search-files/SearchFiles";
-import { createTypeDataForVisualComment } from "bvaughn-architecture-demo/components/sources/utils/comments";
 import { closeQuickOpen, toggleQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import * as dbgActions from "devtools/client/debugger/src/actions/ui";
 import { getActiveSearch, getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
@@ -17,6 +15,9 @@ import { trackEvent } from "ui/utils/telemetry";
 import useAuth0 from "ui/utils/useAuth0";
 
 import { getCommandPaletteInput } from "./CommandPalette/SearchInput";
+
+import { SHOW_GLOBAL_SEARCH_EVENT_TYPE } from "replay-next/components/search-files/SearchFiles";
+import { createTypeDataForVisualComment } from "replay-next/components/sources/utils/comments";
 
 const closeOpenModalsOnEscape = (e: KeyboardEvent): UIThunkAction => {
   return (dispatch, getState) => {

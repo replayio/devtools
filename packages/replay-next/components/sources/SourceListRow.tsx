@@ -12,20 +12,6 @@ import {
 } from "react";
 import { areEqual } from "react-window";
 
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import SearchResultHighlight from "bvaughn-architecture-demo/components/sources/SearchResultHighlight";
-import { SourceSearchContext } from "bvaughn-architecture-demo/components/sources/SourceSearchContext";
-import useSourceContextMenu from "bvaughn-architecture-demo/components/sources/useSourceContextMenu";
-import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
-import {
-  AddPoint,
-  DeletePoints,
-  EditPoint,
-} from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import {
-  ParsedToken,
-  StreamingParser,
-} from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
 import { LineNumberToHitCountMap } from "shared/client/types";
 import { Point } from "shared/client/types";
 
@@ -37,6 +23,14 @@ import SourceLineLoadingPlaceholder from "./SourceLineLoadingPlaceholder";
 import { formatHitCount } from "./utils/formatHitCount";
 import { findPointsForLocation } from "./utils/points";
 import styles from "./SourceListRow.module.css";
+
+import Icon from "replay-next/components/Icon";
+import SearchResultHighlight from "replay-next/components/sources/SearchResultHighlight";
+import { SourceSearchContext } from "replay-next/components/sources/SourceSearchContext";
+import useSourceContextMenu from "replay-next/components/sources/useSourceContextMenu";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { AddPoint, DeletePoints, EditPoint } from "replay-next/src/contexts/PointsContext";
+import { ParsedToken, StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 
 // Primarily exists as a way for e2e tests to disable syntax highlighting
 // to simulate large files that aren't fully parsed.

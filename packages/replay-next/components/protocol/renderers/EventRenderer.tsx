@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 
-import SyntaxHighlightedLine from "bvaughn-architecture-demo/components/sources/SyntaxHighlightedLine";
-
 import { Event } from "../ProtocolMessagesStore";
 import styles from "./shared.module.css";
+
+import SyntaxHighlightedLine from "replay-next/components/sources/SyntaxHighlightedLine";
 
 export function EventHeaderRenderer({ message }: { message: Event }) {
   return (

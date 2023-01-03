@@ -81,7 +81,7 @@ function sortImports(styleApi) {
           isGlobalReduxStoreConfig,
           // import { ThreadFront } from "protocol/thread"
           isProtocolModule,
-          // import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+          // import { PointsContext } from "replay-next/src/contexts/PointsContext";
           isNewPrototypeModule,
           // import { Icon } from "design/Icon"
           isOtherInternalPackageModule,

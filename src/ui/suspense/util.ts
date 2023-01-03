@@ -1,10 +1,11 @@
 import { PauseId, TimeStampedPointRange } from "@replayio/protocol";
 
-import { getFramesSuspense } from "bvaughn-architecture-demo/src/suspense/FrameCache";
-import { getFrameStepsSuspense } from "bvaughn-architecture-demo/src/suspense/FrameStepsCache";
-import { getPauseIdSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { isPointInRegions } from "ui/utils/timeline";
+
+import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
+import { getFrameStepsSuspense } from "replay-next/src/suspense/FrameStepsCache";
+import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
 
 // returns undefined if the async parent pause doesn't exist
 // or null if it is not in a loaded region

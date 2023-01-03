@@ -9145,9 +9145,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bvaughn-architecture-demo@workspace:*, bvaughn-architecture-demo@workspace:packages/bvaughn-architecture-demo":
+"replay-next@workspace:*, replay-next@workspace:packages/replay-next":
   version: 0.0.0-use.local
-  resolution: "bvaughn-architecture-demo@workspace:packages/bvaughn-architecture-demo"
+  resolution: "replay-next@workspace:packages/replay-next"
   dependencies:
     "@actions/github": ^5.1.1
     "@codemirror/lang-html": ^6.1.2
@@ -17402,7 +17402,7 @@ __metadata:
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
     "@uiw/react-codemirror": ^4.11.4
-    bvaughn-architecture-demo: "workspace:*"
+    replay-next: "workspace:*"
     jest: ^28.0.2
     jest-environment-jsdom: ^28.0.2
     lodash: ^4.17.21
@@ -21030,7 +21030,7 @@ __metadata:
     babel-plugin-add-react-displayname: ^0.0.5
     babel-plugin-transform-import-meta: ^2.1.1
     bufferutil: ^4.0.6
-    bvaughn-architecture-demo: "workspace:*"
+    replay-next: "workspace:*"
     circular-dependency-plugin: ^5.2.2
     classnames: ^2.3.1
     comlink: ^4.3.1

@@ -1,11 +1,12 @@
 import { MouseEvent, useContext } from "react";
 
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import { ConsoleFiltersContext } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
-import { Event } from "bvaughn-architecture-demo/src/suspense/EventsCache";
 import { Badge, Checkbox } from "design";
 
 import styles from "./EventType.module.css";
+
+import Icon from "replay-next/components/Icon";
+import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
+import { Event } from "replay-next/src/suspense/EventsCache";
 
 export default function EventType({
   categoryLabel,

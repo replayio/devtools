@@ -1,9 +1,6 @@
 import { PauseId } from "@replayio/protocol";
 import { Suspense, useContext, useMemo } from "react";
 
-import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
-import { copyToClipboard } from "bvaughn-architecture-demo/components/sources/utils/clipboard";
-import { getPointAndTimeForPauseId } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import {
   Context,
   PauseFrame,
@@ -29,6 +26,10 @@ import { collapseFrames, formatCopyName } from "../../../utils/pause/frames";
 import Frame from "./Frame";
 import Group from "./Group";
 import { CommonFrameComponentProps } from ".";
+
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
+import { getPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";
 
 function FramesRenderer({
   panel,

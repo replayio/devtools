@@ -7,23 +7,23 @@ import React, {
   useTransition,
 } from "react";
 
-import AvatarImage from "bvaughn-architecture-demo/components/AvatarImage";
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import CommentEditor from "bvaughn-architecture-demo/components/lexical/CommentEditor";
-import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
-import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
+import CommentPreview from "./CommentPreview";
+import styles from "./Comment.module.css";
+
+import AvatarImage from "replay-next/components/AvatarImage";
+import Icon from "replay-next/components/Icon";
+import CommentEditor from "replay-next/components/lexical/CommentEditor";
+import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import {
   addCommentReply as addCommentReplyGraphQL,
   deleteComment as deleteCommentGraphQL,
   deleteCommentReply as deleteCommentReplyGraphQL,
   updateComment as updateCommentGraphQL,
   updateCommentReply as updateCommentReplyGraphQL,
-} from "bvaughn-architecture-demo/src/graphql/Comments";
-import { Comment, CommentSourceLocation, User } from "bvaughn-architecture-demo/src/graphql/types";
-import { formatRelativeTime } from "bvaughn-architecture-demo/src/utils/time";
-
-import CommentPreview from "./CommentPreview";
-import styles from "./Comment.module.css";
+} from "replay-next/src/graphql/Comments";
+import { Comment, CommentSourceLocation, User } from "replay-next/src/graphql/types";
+import { formatRelativeTime } from "replay-next/src/utils/time";
 
 export default function CommentRenderer({ comment }: { comment: Comment }) {
   const { accessToken } = useContext(SessionContext);

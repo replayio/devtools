@@ -1,8 +1,8 @@
 import { useSyncExternalStore } from "react";
 
-import { StreamingParser } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
-
 import styles from "./StreamingSourceLoadingProgressHeader.module.css";
+
+import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 
 export default function StreamingSourceLoadingProgressHeader({
   streamingParser,

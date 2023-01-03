@@ -1,12 +1,9 @@
 import { Suspense } from "react";
 
-import {
-  parse,
-  parsedTokensToHtml,
-} from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
-
 import Loader from "../Loader";
 import styles from "./SyntaxHighlightedLine.module.css";
+
+import { parse, parsedTokensToHtml } from "replay-next/src/suspense/SyntaxParsingCache";
 
 type Props = { code: string; className?: string; fileExtension?: string };
 

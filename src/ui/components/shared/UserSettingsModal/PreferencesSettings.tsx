@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
 import hooks from "ui/hooks";
 import { useFeature, useStringPref } from "ui/hooks/settings";
 import { EmailSubscription } from "ui/hooks/users";
@@ -12,6 +11,8 @@ import { AppTheme } from "ui/state/app";
 import { SelectMenu } from "../Forms";
 import Checkbox from "../Forms/Checkbox";
 import { CheckboxRow } from "./CheckboxRow";
+
+import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 
 const EMAIL_NOTIFICATIONS = {
   [EmailSubscription.COLLABORATOR_REQUEST]: "When somebody invites you to collaborate on a replay",

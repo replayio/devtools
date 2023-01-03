@@ -1,10 +1,11 @@
 import { ReactNode, createContext, useContext, useEffect, useMemo } from "react";
 
-import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import { getStreamingSourceContentsHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useSourceSearch, { Actions, SetScope, State } from "./hooks/useSourceSearch";
+
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { getStreamingSourceContentsHelper } from "replay-next/src/suspense/SourcesCache";
 
 export type SearchModifiers = {
   caseSensitive: boolean;

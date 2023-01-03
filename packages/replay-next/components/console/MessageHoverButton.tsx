@@ -8,22 +8,23 @@ import {
   useTransition,
 } from "react";
 
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import {
-  COMMENT_TYPE_SOURCE_CODE,
-  createTypeDataForSourceCodeComment,
-} from "bvaughn-architecture-demo/components/sources/utils/comments";
-import { GraphQLClientContext } from "bvaughn-architecture-demo/src/contexts/GraphQLClientContext";
-import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
-import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
-import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
-import { addComment as addCommentGraphQL } from "bvaughn-architecture-demo/src/graphql/Comments";
-import { Nag } from "bvaughn-architecture-demo/src/graphql/types";
-import { useNag } from "bvaughn-architecture-demo/src/hooks/useNag";
-import { isExecutionPointsGreaterThan } from "bvaughn-architecture-demo/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import styles from "./MessageHoverButton.module.css";
+
+import Icon from "replay-next/components/Icon";
+import {
+  COMMENT_TYPE_SOURCE_CODE,
+  createTypeDataForSourceCodeComment,
+} from "replay-next/components/sources/utils/comments";
+import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
+import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import { addComment as addCommentGraphQL } from "replay-next/src/graphql/Comments";
+import { Nag } from "replay-next/src/graphql/types";
+import { useNag } from "replay-next/src/hooks/useNag";
+import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 
 export default function MessageHoverButton({
   executionPoint,

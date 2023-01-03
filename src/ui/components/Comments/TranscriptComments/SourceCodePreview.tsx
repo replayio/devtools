@@ -1,17 +1,5 @@
 import { ReactNode, useEffect, useState } from "react";
 
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import {
-  SourceCodeCommentTypeData,
-  createTypeDataForSourceCodeComment,
-} from "bvaughn-architecture-demo/components/sources/utils/comments";
-import { isSourceCodeCommentTypeData } from "bvaughn-architecture-demo/components/sources/utils/comments";
-import { CommentSourceLocation } from "bvaughn-architecture-demo/src/graphql/types";
-import {
-  ParsedToken,
-  parsedTokensToHtml,
-} from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
-import { getSourceFileNameFromUrl } from "bvaughn-architecture-demo/src/utils/source";
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import { replayClient } from "shared/client/ReplayClientContext";
@@ -22,6 +10,16 @@ import { trackEvent } from "ui/utils/telemetry";
 
 import LoadingLabelPlaceholder from "./LoadingLabelPlaceholder";
 import styles from "./styles.module.css";
+
+import Icon from "replay-next/components/Icon";
+import {
+  SourceCodeCommentTypeData,
+  createTypeDataForSourceCodeComment,
+} from "replay-next/components/sources/utils/comments";
+import { isSourceCodeCommentTypeData } from "replay-next/components/sources/utils/comments";
+import { CommentSourceLocation } from "replay-next/src/graphql/types";
+import { ParsedToken, parsedTokensToHtml } from "replay-next/src/suspense/SyntaxParsingCache";
+import { getSourceFileNameFromUrl } from "replay-next/src/utils/source";
 
 // Adapter component that can handle rendering legacy or modern source-code comments.
 export default function SourceCodePreview({ comment }: { comment: Comment }) {

@@ -1,13 +1,14 @@
 import { useContext, useSyncExternalStore } from "react";
 
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import {
-  StreamingSourceSearchResults,
-  searchSourcesSuspense,
-} from "bvaughn-architecture-demo/src/suspense/SearchCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import styles from "./InlineResultsCount.module.css";
+
+import Icon from "replay-next/components/Icon";
+import {
+  StreamingSourceSearchResults,
+  searchSourcesSuspense,
+} from "replay-next/src/suspense/SearchCache";
 
 export default function InlineResultsCount({
   includeNodeModules,

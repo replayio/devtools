@@ -125,9 +125,9 @@ describe("AutoLinkMatchers", () => {
           "https://github.com/replayio/devtools/blob/main/src/ui/components/SourcesContext.tsx",
           "www.github.com/replayio/devtools/blob/main/src/ui/components/SourcesContext.tsx",
           "github.com/replayio/devtools/blob/main/src/ui/components/SourcesContext.tsx",
-          "https://github.com/replayio/devtools/blob/cc1097afe4151a6664608c7eacbafbb21e8527c4/packages/bvaughn-architecture-demo/src/contexts/SourcesContext.tsx",
-          "www.github.com/replayio/devtools/blob/cc1097afe4151a6664608c7eacbafbb21e8527c4/packages/bvaughn-architecture-demo/src/contexts/SourcesContext.tsx",
-          "github.com/replayio/devtools/blob/cc1097afe4151a6664608c7eacbafbb21e8527c4/packages/bvaughn-architecture-demo/src/contexts/SourcesContext.tsx",
+          "https://github.com/replayio/devtools/blob/cc1097afe4151a6664608c7eacbafbb21e8527c4/packages/replay-next/src/contexts/SourcesContext.tsx",
+          "www.github.com/replayio/devtools/blob/cc1097afe4151a6664608c7eacbafbb21e8527c4/packages/replay-next/src/contexts/SourcesContext.tsx",
+          "github.com/replayio/devtools/blob/cc1097afe4151a6664608c7eacbafbb21e8527c4/packages/replay-next/src/contexts/SourcesContext.tsx",
         ],
         GitHubCodeLinkUrlMatcher,
         (match, text) => {
@@ -142,7 +142,7 @@ describe("AutoLinkMatchers", () => {
       testAll(
         [
           "https://github.com/replayio/devtools/blob/main/src/ui/components/SourcesContext.tsx#L153-L176",
-          "https://github.com/replayio/devtools/blob/cc1097afe4151a6664608c7eacbafbb21e8527c4/packages/bvaughn-architecture-demo/src/contexts/SourcesContext.tsx#L153-L176",
+          "https://github.com/replayio/devtools/blob/cc1097afe4151a6664608c7eacbafbb21e8527c4/packages/replay-next/src/contexts/SourcesContext.tsx#L153-L176",
         ],
         GitHubCodeLinkUrlMatcher,
         (match, text) => {

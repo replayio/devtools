@@ -1,10 +1,10 @@
 import { MouseEvent, useContext } from "react";
 
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
-
 import { ObjectPreviewRendererProps } from "./types";
 import styles from "./shared.module.css";
+
+import Icon from "replay-next/components/Icon";
+import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 
 const MAX_PROPERTIES_TO_PREVIEW = 5;
 

@@ -8,7 +8,6 @@ import classnames from "classnames";
 import React, { Component } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
-import { copyToClipboard } from "bvaughn-architecture-demo/components/sources/utils/clipboard";
 import { showMenu } from "devtools/shared/contextmenu";
 import { Redacted } from "ui/components/Redacted";
 import type { SourceDetails } from "ui/reducers/sources";
@@ -22,6 +21,8 @@ import { getPathWithoutThread, isDirectory } from "../../utils/sources-tree";
 import { TreeNode } from "../../utils/sources-tree/types";
 import AccessibleImage from "../shared/AccessibleImage";
 import SourceIcon from "../shared/SourceIcon";
+
+import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 
 interface STIProps {
   item: TreeNode;

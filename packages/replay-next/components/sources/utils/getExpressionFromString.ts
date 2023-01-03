@@ -1,7 +1,4 @@
-import {
-  parse,
-  parsedTokensToHtml,
-} from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
+import { parse, parsedTokensToHtml } from "replay-next/src/suspense/SyntaxParsingCache";
 
 export default function getExpressionFromString(
   string: string,

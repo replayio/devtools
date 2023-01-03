@@ -1,7 +1,6 @@
 import { KeyboardEvent, NodeBounds, unprocessedRegions } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
-import { isValidPoint } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { shallowEqual } from "devtools/client/debugger/src/utils/compare";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
@@ -40,6 +39,8 @@ import {
 } from "./layout";
 import { toggleFocusMode } from "./timeline";
 import { UIStore, UIThunkAction } from ".";
+
+import { isValidPoint } from "replay-next/src/contexts/PointsContext";
 
 export * from "../reducers/app";
 

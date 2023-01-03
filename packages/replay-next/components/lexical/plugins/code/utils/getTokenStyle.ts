@@ -1,4 +1,4 @@
-import { TokenType } from "bvaughn-architecture-demo/components/lexical/plugins/code/types";
+import { TokenType } from "replay-next/components/lexical/plugins/code/types";
 
 export default function getTokenStyle(tokenType: TokenType): string {
   const color = TOKEN_TYPE_TO_COLOR_MAP[tokenType];

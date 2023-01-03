@@ -1,10 +1,6 @@
 import { useApolloClient } from "@apollo/client";
 import { ReactNode, useCallback, useMemo } from "react";
 
-import {
-  SessionContext,
-  SessionContextType,
-} from "bvaughn-architecture-demo/src/contexts/SessionContext";
 import { ThreadFront } from "protocol/thread";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserInfo } from "ui/hooks/users";
@@ -12,6 +8,8 @@ import { getRecordingDuration } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import { trackEventOnce } from "ui/utils/mixpanel";
 import { trackEvent } from "ui/utils/telemetry";
+
+import { SessionContext, SessionContextType } from "replay-next/src/contexts/SessionContext";
 
 export default function SessionContextAdapter({
   apiKey,

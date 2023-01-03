@@ -1,6 +1,5 @@
 import { ProtocolClient, Object as ProtocolObject } from "@replayio/protocol";
 
-import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { getPauseId, paused } from "devtools/client/debugger/src/reducers/pause";
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { Deferred, assert, defer } from "protocol/utils";
@@ -39,6 +38,8 @@ import {
   getSelectedNodeId,
   isNodeExpanded,
 } from "../selectors/markup";
+
+import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
 
 let rootNodeWaiter: Deferred<void> | undefined;
 

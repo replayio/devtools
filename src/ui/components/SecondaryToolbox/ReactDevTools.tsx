@@ -3,10 +3,6 @@ import React, { useContext } from "react";
 import { useEffect, useState } from "react";
 import type { Store, Wall } from "react-devtools-inline/frontend";
 
-import {
-  getObjectPropertyHelper,
-  getObjectWithPreviewHelper,
-} from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
@@ -31,6 +27,11 @@ import { getMouseTarget } from "ui/suspense/nodeCaches";
 import { NodePicker as NodePickerClass, NodePickerOpts } from "ui/utils/nodePicker";
 import { getJSON } from "ui/utils/objectFetching";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
+
+import {
+  getObjectPropertyHelper,
+  getObjectWithPreviewHelper,
+} from "replay-next/src/suspense/ObjectPreviews";
 
 type ReactDevToolsInlineModule = typeof import("react-devtools-inline/frontend");
 

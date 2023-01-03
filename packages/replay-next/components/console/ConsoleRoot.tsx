@@ -11,13 +11,6 @@ import {
 } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
-import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
-import IndeterminateLoader from "bvaughn-architecture-demo/components/IndeterminateLoader";
-import Loader from "bvaughn-architecture-demo/components/Loader";
-import { ConsoleFiltersContextRoot } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
-import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
-import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
-
 import ConsoleActionsRow from "./ConsoleActionsRow";
 import ConsoleInput from "./ConsoleInput";
 import ConsoleSearch from "./ConsoleSearch";
@@ -27,6 +20,13 @@ import FilterToggles from "./filters/FilterToggles";
 import { LoggablesContextRoot } from "./LoggablesContext";
 import MessagesList from "./MessagesList";
 import styles from "./ConsoleRoot.module.css";
+
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
+import Loader from "replay-next/components/Loader";
+import { ConsoleFiltersContextRoot } from "replay-next/src/contexts/ConsoleFiltersContext";
+import { TerminalContext } from "replay-next/src/contexts/TerminalContext";
+import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 
 export default function ConsoleRoot({
   nagHeader = null,

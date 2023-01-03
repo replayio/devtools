@@ -4,7 +4,6 @@
 
 //
 
-import { truncate as truncateText } from "bvaughn-architecture-demo/src/utils/text";
 import { getUnicodeUrl } from "devtools/client/shared/unicode-url";
 import { MiniSource, SourceContent } from "ui/reducers/sources";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
@@ -12,6 +11,8 @@ import { LoadingStatus } from "ui/utils/LoadingStatus";
 import type { SymbolDeclarations } from "../reducers/ast";
 import { getURL } from "./sources-tree/getURL";
 import { parse as parseURL } from "./url";
+
+import { truncate as truncateText } from "replay-next/src/utils/text";
 
 export { isMinified } from "./isMinified";
 

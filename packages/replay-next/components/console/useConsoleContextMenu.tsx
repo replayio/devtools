@@ -1,17 +1,18 @@
 import { useContext } from "react";
 
-import ContextMenuDivider from "bvaughn-architecture-demo/components/context-menu/ContextMenuDivider";
-import ContextMenuItem from "bvaughn-architecture-demo/components/context-menu/ContextMenuItem";
-import useContextMenu from "bvaughn-architecture-demo/components/context-menu/useContextMenu";
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
-import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
-import { getLoggableTime, isPointInstance } from "bvaughn-architecture-demo/src/utils/loggables";
 import { Badge } from "shared/client/types";
 
 import { Loggable } from "./LoggablesContext";
 import styles from "./ContextMenu.module.css";
+
+import ContextMenuDivider from "replay-next/components/context-menu/ContextMenuDivider";
+import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
+import useContextMenu from "replay-next/components/context-menu/useContextMenu";
+import Icon from "replay-next/components/Icon";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { PointsContext } from "replay-next/src/contexts/PointsContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { getLoggableTime, isPointInstance } from "replay-next/src/utils/loggables";
 
 const BADGES: Badge[] = ["green", "yellow", "orange", "purple"];
 

@@ -1,13 +1,14 @@
 import { Value as ProtocolValue } from "@replayio/protocol";
 import { RefObject, Suspense, useContext, useEffect, useRef } from "react";
 
-import { SelectedFrameContext } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
-import { evaluateSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import SourcePreviewInspector from "../inspector/SourcePreviewInspector";
 import Popup from "../Popup";
 import styles from "./PreviewPopup.module.css";
+
+import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
+import { evaluateSuspense } from "replay-next/src/suspense/PauseCache";
 
 type Props = {
   clientX?: number | null;

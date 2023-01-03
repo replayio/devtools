@@ -7,15 +7,6 @@ import { MouseEvent, TimeStampedPoint, sessionError, uploadedData } from "@repla
 import { IDBPDatabase, openDB } from "idb";
 import debounce from "lodash/debounce";
 
-import { CONSOLE_SETTINGS_DATABASE } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
-import { POINTS_DATABASE } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import { IDBOptions } from "bvaughn-architecture-demo/src/hooks/useIndexedDB";
-import {
-  getCachedObject,
-  getObjectPropertyHelper,
-  getObjectThrows,
-  getObjectWithPreviewHelper,
-} from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { setupSourcesListeners } from "devtools/client/debugger/src/actions/sources";
 import * as dbgClient from "devtools/client/debugger/src/client";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
@@ -65,6 +56,16 @@ import type { ThunkExtraArgs } from "ui/utils/thunk";
 
 import { startAppListening } from "../listenerMiddleware";
 import { AppStore, extendStore } from "../store";
+
+import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
+import { POINTS_DATABASE } from "replay-next/src/contexts/PointsContext";
+import { IDBOptions } from "replay-next/src/hooks/useIndexedDB";
+import {
+  getCachedObject,
+  getObjectPropertyHelper,
+  getObjectThrows,
+  getObjectWithPreviewHelper,
+} from "replay-next/src/suspense/ObjectPreviews";
 
 const { setupApp, setupTimeline } = actions;
 

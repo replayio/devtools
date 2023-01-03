@@ -12,17 +12,6 @@ import {
 } from "react";
 import { VariableSizeList as List, ListOnItemsRenderedProps } from "react-window";
 
-import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
-import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
-import {
-  StreamingSourceContents,
-  getBreakpointPositionsSuspense,
-  getCachedMinMaxSourceHitCounts,
-  getSourceHitCountsSuspense,
-} from "bvaughn-architecture-demo/src/suspense/SourcesCache";
-import { StreamingParser } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 
@@ -32,6 +21,18 @@ import { formatHitCount } from "./utils/formatHitCount";
 import getScrollbarWidth from "./utils/getScrollbarWidth";
 import { findPointForLocation } from "./utils/points";
 import styles from "./SourceList.module.css";
+
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { PointsContext } from "replay-next/src/contexts/PointsContext";
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
+import {
+  StreamingSourceContents,
+  getBreakpointPositionsSuspense,
+  getCachedMinMaxSourceHitCounts,
+  getSourceHitCountsSuspense,
+} from "replay-next/src/suspense/SourcesCache";
+import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 
 export default function SourceList({
   height,

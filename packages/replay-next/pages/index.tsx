@@ -1,32 +1,33 @@
 import React, { Suspense, useCallback, useContext, useMemo, useSyncExternalStore } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
-import CommentList from "bvaughn-architecture-demo/components/comments/CommentList";
-import ConsoleRoot from "bvaughn-architecture-demo/components/console";
-import Focuser from "bvaughn-architecture-demo/components/console/Focuser";
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import Initializer from "bvaughn-architecture-demo/components/Initializer";
-import LazyOffscreen from "bvaughn-architecture-demo/components/LazyOffscreen";
-import Loader from "bvaughn-architecture-demo/components/Loader";
-import ProtocolViewer from "bvaughn-architecture-demo/components/protocol/ProtocolViewer";
-import SearchFiles from "bvaughn-architecture-demo/components/search-files/SearchFiles";
-import SourceExplorer from "bvaughn-architecture-demo/components/sources/SourceExplorer";
-import Sources from "bvaughn-architecture-demo/components/sources/Sources";
-import { FocusContextRoot } from "bvaughn-architecture-demo/src/contexts/FocusContext";
-import { InspectorContextRoot } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
-import { KeyboardModifiersContextRoot } from "bvaughn-architecture-demo/src/contexts/KeyboardModifiersContext";
-import { PointsContextRoot } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import { SelectedFrameContextRoot } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
-import { SourcesContextRoot } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import { TerminalContextRoot } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
-import { TimelineContextRoot } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
-import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
-import usePreferredColorScheme from "bvaughn-architecture-demo/src/hooks/usePreferredColorScheme";
 import createReplayClientRecorder from "shared/client/createReplayClientRecorder";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { hasFlag } from "shared/utils/url";
 
 import styles from "./index.module.css";
+
+import CommentList from "replay-next/components/comments/CommentList";
+import ConsoleRoot from "replay-next/components/console";
+import Focuser from "replay-next/components/console/Focuser";
+import Icon from "replay-next/components/Icon";
+import Initializer from "replay-next/components/Initializer";
+import LazyOffscreen from "replay-next/components/LazyOffscreen";
+import Loader from "replay-next/components/Loader";
+import ProtocolViewer from "replay-next/components/protocol/ProtocolViewer";
+import SearchFiles from "replay-next/components/search-files/SearchFiles";
+import SourceExplorer from "replay-next/components/sources/SourceExplorer";
+import Sources from "replay-next/components/sources/Sources";
+import { FocusContextRoot } from "replay-next/src/contexts/FocusContext";
+import { InspectorContextRoot } from "replay-next/src/contexts/InspectorContext";
+import { KeyboardModifiersContextRoot } from "replay-next/src/contexts/KeyboardModifiersContext";
+import { PointsContextRoot } from "replay-next/src/contexts/PointsContext";
+import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
+import { SourcesContextRoot } from "replay-next/src/contexts/SourcesContext";
+import { TerminalContextRoot } from "replay-next/src/contexts/TerminalContext";
+import { TimelineContextRoot } from "replay-next/src/contexts/TimelineContext";
+import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
+import usePreferredColorScheme from "replay-next/src/hooks/usePreferredColorScheme";
 
 // TODO There's a potential hot loop in this code when an error happens (e.g. Linker too old to support Console.findMessagesInRange)
 // where React keeps quickly retrying after an error is thrown, rather than rendering an error boundary.

@@ -1,19 +1,5 @@
 import { ForwardedRef, MutableRefObject, ReactNode, forwardRef, useContext, useMemo } from "react";
 
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
-import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
-import useLoadedRegions from "bvaughn-architecture-demo/src/hooks/useRegions";
-import { getMessagesSuspense } from "bvaughn-architecture-demo/src/suspense/MessagesCache";
-import {
-  getLoggableExecutionPoint,
-  isEventLog,
-  isPointInstance,
-  isProtocolMessage,
-  isTerminalExpression,
-  isUncaughtException,
-} from "bvaughn-architecture-demo/src/utils/loggables";
-import { isExecutionPointsLessThan } from "bvaughn-architecture-demo/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegions } from "shared/utils/time";
 
@@ -26,6 +12,21 @@ import MessageRenderer from "./renderers/MessageRenderer";
 import TerminalExpressionRenderer from "./renderers/TerminalExpressionRenderer";
 import UncaughtExceptionRenderer from "./renderers/UncaughtExceptionRenderer";
 import styles from "./MessagesList.module.css";
+
+import Icon from "replay-next/components/Icon";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import useLoadedRegions from "replay-next/src/hooks/useRegions";
+import { getMessagesSuspense } from "replay-next/src/suspense/MessagesCache";
+import {
+  getLoggableExecutionPoint,
+  isEventLog,
+  isPointInstance,
+  isProtocolMessage,
+  isTerminalExpression,
+  isUncaughtException,
+} from "replay-next/src/utils/loggables";
+import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
 
 type CurrentTimeIndicatorPlacement = Loggable | "begin" | "end";
 

@@ -4,10 +4,6 @@
 import { loadedRegions as LoadedRegions } from "@replayio/protocol";
 import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 
-import { CONSOLE_SETTINGS_DATABASE } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
-import { POINTS_DATABASE } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import { preloadIDBInitialValues } from "bvaughn-architecture-demo/src/hooks/useIndexedDB";
-import { preCacheExecutionPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { SessionContext, SessionContextType } from "../src/contexts/SessionContext";
@@ -16,6 +12,11 @@ import { getCurrentUserInfo } from "../src/graphql/User";
 import { preCacheSources } from "../src/suspense/SourcesCache";
 import Loader from "./Loader";
 import styles from "./Initializer.module.css";
+
+import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
+import { POINTS_DATABASE } from "replay-next/src/contexts/PointsContext";
+import { preloadIDBInitialValues } from "replay-next/src/hooks/useIndexedDB";
+import { preCacheExecutionPointForTime } from "replay-next/src/suspense/PointsCache";
 
 // HACK Hack around the fact that the initSocket() function is side effectful
 // and writes to an "app" global on the window object.

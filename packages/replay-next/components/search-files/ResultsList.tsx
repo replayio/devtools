@@ -13,19 +13,20 @@ import {
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
 
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import {
-  SourceSearchResult,
-  StreamingSourceSearchResults,
-  isSourceSearchResultLocation,
-  searchSourcesSuspense,
-} from "bvaughn-architecture-demo/src/suspense/SearchCache";
-import { getSourcesSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import ResultsListRow from "./ResultsListRow";
 import type { ItemData } from "./ResultsListRow";
 import styles from "./ResultsList.module.css";
+
+import Icon from "replay-next/components/Icon";
+import {
+  SourceSearchResult,
+  StreamingSourceSearchResults,
+  isSourceSearchResultLocation,
+  searchSourcesSuspense,
+} from "replay-next/src/suspense/SearchCache";
+import { getSourcesSuspense } from "replay-next/src/suspense/SourcesCache";
 
 const ROW_HEIGHT = 18;
 

@@ -5,10 +5,11 @@ import {
 } from "@replayio/protocol";
 import { useContext } from "react";
 
-import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import KeyValueRenderer from "./KeyValueRenderer";
+
+import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
 
 // HTML entries are a special case.
 // Unlike the other property lists, HTML entries only display child nodes:

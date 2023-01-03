@@ -1,14 +1,15 @@
 import { FrameId, PauseId } from "@replayio/protocol";
 import { ReactNode, Suspense, useContext } from "react";
 
-import Inspector from "bvaughn-architecture-demo/components/inspector";
-import ClientValueValueRenderer from "bvaughn-architecture-demo/components/inspector/values/ClientValueValueRenderer";
-import { SelectedFrameContext } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
-import { evaluateSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
-import { primitiveToClientValue } from "bvaughn-architecture-demo/src/utils/protocol";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import styles from "./EagerEvaluationResult.module.css";
+
+import Inspector from "replay-next/components/inspector";
+import ClientValueValueRenderer from "replay-next/components/inspector/values/ClientValueValueRenderer";
+import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
+import { evaluateSuspense } from "replay-next/src/suspense/PauseCache";
+import { primitiveToClientValue } from "replay-next/src/utils/protocol";
 
 export default function EagerEvaluationResult({ expression }: { expression: string }) {
   const { selectedPauseAndFrameId } = useContext(SelectedFrameContext);

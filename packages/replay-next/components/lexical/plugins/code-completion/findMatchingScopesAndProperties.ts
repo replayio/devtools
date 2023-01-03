@@ -1,11 +1,6 @@
 import { Property, Scope } from "@replayio/protocol";
 
-import {
-  findIndex,
-  findIndexString,
-  insert,
-  insertString,
-} from "bvaughn-architecture-demo/src/utils/array";
+import { findIndex, findIndexString, insert, insertString } from "replay-next/src/utils/array";
 
 type Match = {
   text: string;

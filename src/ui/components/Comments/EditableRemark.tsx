@@ -1,7 +1,6 @@
 import { SerializedEditorState } from "lexical";
 import { useState } from "react";
 
-import CommentEditor from "bvaughn-architecture-demo/components/lexical/CommentEditor";
 import useCommentContextMenu from "ui/components/Comments/useCommentContextMenu";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useUpdateComment, useUpdateCommentReply } from "ui/hooks/comments/comments";
@@ -14,6 +13,8 @@ import { formatRelativeTime } from "ui/utils/comments";
 
 import { AvatarImage } from "../Avatar";
 import styles from "./EditableRemark.module.css";
+
+import CommentEditor from "replay-next/components/lexical/CommentEditor";
 
 export default function EditableRemark({
   remark,

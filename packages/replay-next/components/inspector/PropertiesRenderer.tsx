@@ -9,16 +9,17 @@ import {
 import sortBy from "lodash/sortBy";
 import { FC, Fragment, Suspense, useContext, useMemo } from "react";
 
-import Expandable from "bvaughn-architecture-demo/components/Expandable";
-import Loader from "bvaughn-architecture-demo/components/Loader";
-import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
-import { mergePropertiesAndGetterValues } from "bvaughn-architecture-demo/src/utils/protocol";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import GetterRenderer from "./GetterRenderer";
 import KeyValueRenderer from "./KeyValueRenderer";
 import ValueRenderer from "./ValueRenderer";
 import styles from "./PropertiesRenderer.module.css";
+
+import Expandable from "replay-next/components/Expandable";
+import Loader from "replay-next/components/Loader";
+import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
+import { mergePropertiesAndGetterValues } from "replay-next/src/utils/protocol";
 
 const PROPERTY_BUCKET_SIZE = 100;
 

@@ -1,12 +1,13 @@
 import isEqual from "lodash/isEqual";
 import { useContext, useEffect } from "react";
 
-import { SelectedFrameContext } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
 import {
   getPausePreviewLocation,
   getSelectedFrameId,
 } from "devtools/client/debugger/src/selectors";
 import { useAppSelector } from "ui/setup/hooks";
+
+import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
 
 export default function SelectedFrameContextAdapter() {
   const selectedPauseAndFrameIdRedux = useAppSelector(getSelectedFrameId);

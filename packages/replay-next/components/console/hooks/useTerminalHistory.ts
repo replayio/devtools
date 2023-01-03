@@ -1,8 +1,8 @@
 import { RecordingId } from "@replayio/protocol";
 import { useCallback } from "react";
 
-import { CONSOLE_SETTINGS_DATABASE } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
-import useIndexedDB from "bvaughn-architecture-demo/src/hooks/useIndexedDB";
+import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
+import useIndexedDB from "replay-next/src/hooks/useIndexedDB";
 
 export default function useTerminalHistory(
   recordingId: RecordingId,

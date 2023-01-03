@@ -1,11 +1,12 @@
-import ContextMenuDivider from "bvaughn-architecture-demo/components/context-menu/ContextMenuDivider";
-import ContextMenuItem from "bvaughn-architecture-demo/components/context-menu/ContextMenuItem";
-import useContextMenu from "bvaughn-architecture-demo/components/context-menu/useContextMenu";
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import { copyToClipboard as copyTextToClipboard } from "bvaughn-architecture-demo/components/sources/utils/clipboard";
 import { setFocusRegionBeginTime, setFocusRegionEndTime } from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
 import { ReplayEvent } from "ui/state/app";
+
+import ContextMenuDivider from "replay-next/components/context-menu/ContextMenuDivider";
+import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
+import useContextMenu from "replay-next/components/context-menu/useContextMenu";
+import Icon from "replay-next/components/Icon";
+import { copyToClipboard as copyTextToClipboard } from "replay-next/components/sources/utils/clipboard";
 
 export default function useEventContextMenu(event: ReplayEvent) {
   const dispatch = useAppDispatch();

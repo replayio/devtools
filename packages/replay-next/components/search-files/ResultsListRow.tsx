@@ -2,21 +2,21 @@ import { newSource as Source } from "@replayio/protocol";
 import { CSSProperties, memo, useContext, useMemo } from "react";
 import { areEqual } from "react-window";
 
-import Expandable from "bvaughn-architecture-demo/components/Expandable";
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import HighlightMatch from "bvaughn-architecture-demo/components/search-files/HighlightMatch";
-import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import styles from "./ResultsListRow.module.css";
+
+import Expandable from "replay-next/components/Expandable";
+import Icon from "replay-next/components/Icon";
+import HighlightMatch from "replay-next/components/search-files/HighlightMatch";
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import {
   SourceSearchResult,
   SourceSearchResultLocation,
   SourceSearchResultMatch,
   isSourceSearchResultLocation,
   isSourceSearchResultMatch,
-} from "bvaughn-architecture-demo/src/suspense/SearchCache";
-import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
-import { getRelativePathWithoutFile } from "bvaughn-architecture-demo/src/utils/url";
-
-import styles from "./ResultsListRow.module.css";
+} from "replay-next/src/suspense/SearchCache";
+import { getSourceFileName } from "replay-next/src/utils/source";
+import { getRelativePathWithoutFile } from "replay-next/src/utils/url";
 
 export type ItemData = {
   getResultAtIndex(index: number): SourceSearchResult | null;

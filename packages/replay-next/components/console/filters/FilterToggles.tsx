@@ -1,24 +1,19 @@
 import camelCase from "lodash/camelCase";
 import React, { ReactNode, Suspense, useContext, useMemo, useSyncExternalStore } from "react";
 
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import { ConsoleFiltersContext } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
-import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
-import {
-  getStatus,
-  subscribeForStatus,
-} from "bvaughn-architecture-demo/src/suspense/ExceptionsCache";
-import {
-  CategoryCounts,
-  getMessagesSuspense,
-} from "bvaughn-architecture-demo/src/suspense/MessagesCache";
-import { getRecordingCapabilitiesSuspense } from "bvaughn-architecture-demo/src/suspense/RecordingCache";
-import { isInNodeModules } from "bvaughn-architecture-demo/src/utils/messages";
 import { Badge, Checkbox } from "design";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import EventsList from "./EventsList";
 import styles from "./FilterToggles.module.css";
+
+import Icon from "replay-next/components/Icon";
+import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { getStatus, subscribeForStatus } from "replay-next/src/suspense/ExceptionsCache";
+import { CategoryCounts, getMessagesSuspense } from "replay-next/src/suspense/MessagesCache";
+import { getRecordingCapabilitiesSuspense } from "replay-next/src/suspense/RecordingCache";
+import { isInNodeModules } from "replay-next/src/utils/messages";
 
 export default function FilterToggles() {
   const {

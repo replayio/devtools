@@ -1,12 +1,12 @@
 import { ChangeEvent, KeyboardEvent, RefObject, useContext, useEffect, useRef } from "react";
 
-import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
-
 import Icon from "../Icon";
 import { Result as SearchResult } from "./hooks/useSourceFileNameSearch";
 import { SourceFileNameSearchContext } from "./SourceFileNameSearchContext";
 import styles from "./SourceFileNameSearch.module.css";
+
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { getSourceFileName } from "replay-next/src/utils/source";
 
 export default function SourceFileNameSearch({
   containerRef,

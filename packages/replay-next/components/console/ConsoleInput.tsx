@@ -1,17 +1,6 @@
 import { FrameId, PauseId } from "@replayio/protocol";
 import { Suspense, useContext, useEffect, useRef, useState } from "react";
 
-import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import CodeEditor from "bvaughn-architecture-demo/components/lexical/CodeEditor";
-import Loader from "bvaughn-architecture-demo/components/Loader";
-import { SelectedFrameContext } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
-import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
-import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
-import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
-import useLoadedRegions from "bvaughn-architecture-demo/src/hooks/useRegions";
-import { getFramesSuspense } from "bvaughn-architecture-demo/src/suspense/FrameCache";
-import { getPauseIdSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegions } from "shared/utils/time";
 
@@ -19,6 +8,18 @@ import { ConsoleSearchContext } from "./ConsoleSearchContext";
 import EagerEvaluationResult from "./EagerEvaluationResult";
 import useTerminalHistory from "./hooks/useTerminalHistory";
 import styles from "./ConsoleInput.module.css";
+
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import Icon from "replay-next/components/Icon";
+import CodeEditor from "replay-next/components/lexical/CodeEditor";
+import Loader from "replay-next/components/Loader";
+import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { TerminalContext } from "replay-next/src/contexts/TerminalContext";
+import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import useLoadedRegions from "replay-next/src/hooks/useRegions";
+import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
+import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
 
 export default function ConsoleInput() {
   return (

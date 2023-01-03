@@ -1,8 +1,9 @@
-import { useNag } from "bvaughn-architecture-demo/src/hooks/useNag";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { Nag } from "ui/hooks/users";
 
 import styles from "./NewSourceNag.module.css";
+
+import { useNag } from "replay-next/src/hooks/useNag";
 
 export default function NewSourceNag() {
   const [showAddBreakpointNag] = useNag(Nag.FIRST_BREAKPOINT_ADD);

@@ -1,23 +1,24 @@
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import { MouseEvent, useContext } from "react";
 
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import {
-  InspectableTimestampedPointContext,
-  InspectorContext,
-} from "bvaughn-architecture-demo/src/contexts/InspectorContext";
-import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
-import { getObjectWithPreviewSuspense } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
-import {
-  Value as ClientValue,
-  filterNonEnumerableProperties,
-} from "bvaughn-architecture-demo/src/utils/protocol";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useClientValue from "../useClientValue";
 import ClientValueValueRenderer from "./ClientValueValueRenderer";
 import { ObjectPreviewRendererProps } from "./types";
 import styles from "./shared.module.css";
+
+import Icon from "replay-next/components/Icon";
+import {
+  InspectableTimestampedPointContext,
+  InspectorContext,
+} from "replay-next/src/contexts/InspectorContext";
+import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
+import {
+  Value as ClientValue,
+  filterNonEnumerableProperties,
+} from "replay-next/src/utils/protocol";
 
 type Props = ObjectPreviewRendererProps & {
   showClosingTag?: boolean;

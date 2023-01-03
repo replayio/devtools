@@ -7,8 +7,6 @@ import {
   responseBodyData,
 } from "@replayio/protocol";
 
-import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
-import { getPauseIdAsync } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { createFrame } from "devtools/client/debugger/src/client/create";
 import { Context } from "devtools/client/debugger/src/reducers/pause";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
@@ -17,6 +15,9 @@ import { getRequestById, getSummaryById } from "ui/reducers/network";
 import { isPointInRegions } from "ui/utils/timeline";
 
 import { UIThunkAction } from ".";
+
+import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
+import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 
 type NewNetworkRequestsAction = {
   type: "NEW_NETWORK_REQUESTS";

@@ -1,13 +1,14 @@
 import { SourceId } from "@replayio/protocol";
 
+import { ReplayClientInterface } from "shared/client/types";
+
 import {
   getSourceAsync,
   getStreamingSourceContentsAsync,
-} from "bvaughn-architecture-demo/src/suspense/SourcesCache";
-import { parseStreamingAsync } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
-import { ParsedToken } from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
-import { getBase64Png } from "bvaughn-architecture-demo/src/utils/canvas";
-import { ReplayClientInterface } from "shared/client/types";
+} from "replay-next/src/suspense/SourcesCache";
+import { parseStreamingAsync } from "replay-next/src/suspense/SyntaxParsingCache";
+import { ParsedToken } from "replay-next/src/suspense/SyntaxParsingCache";
+import { getBase64Png } from "replay-next/src/utils/canvas";
 
 export enum CanonicalRequestType {
   CSS,

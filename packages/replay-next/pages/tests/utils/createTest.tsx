@@ -1,11 +1,12 @@
 import { FunctionComponent, Suspense, useEffect, useState } from "react";
 
-import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
-import Initializer from "bvaughn-architecture-demo/components/Initializer";
-import usePreferredColorScheme from "bvaughn-architecture-demo/src/hooks/usePreferredColorScheme";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useReplayClientForTesting } from "shared/utils/client";
 import { getFlag } from "shared/utils/url";
+
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import Initializer from "replay-next/components/Initializer";
+import usePreferredColorScheme from "replay-next/src/hooks/usePreferredColorScheme";
 
 export default function createTest(Component: FunctionComponent<any>, defaultRecordingId: string) {
   function Test() {

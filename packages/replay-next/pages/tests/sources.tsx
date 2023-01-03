@@ -1,13 +1,13 @@
-import SourceExplorer from "bvaughn-architecture-demo/components/sources/SourceExplorer";
-import Sources from "bvaughn-architecture-demo/components/sources/Sources";
-import { FocusContextRoot } from "bvaughn-architecture-demo/src/contexts/FocusContext";
-import { KeyboardModifiersContextRoot } from "bvaughn-architecture-demo/src/contexts/KeyboardModifiersContext";
-import { PointsContextRoot } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import { SourcesContextRoot } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import { TimelineContextRoot } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
-
 import createTest from "./utils/createTest";
 import styles from "./styles.module.css";
+
+import SourceExplorer from "replay-next/components/sources/SourceExplorer";
+import Sources from "replay-next/components/sources/Sources";
+import { FocusContextRoot } from "replay-next/src/contexts/FocusContext";
+import { KeyboardModifiersContextRoot } from "replay-next/src/contexts/KeyboardModifiersContext";
+import { PointsContextRoot } from "replay-next/src/contexts/PointsContext";
+import { SourcesContextRoot } from "replay-next/src/contexts/SourcesContext";
+import { TimelineContextRoot } from "replay-next/src/contexts/TimelineContext";
 
 const DEFAULT_RECORDING_ID = "aeaf1d96-c47a-4584-87cf-4f9bd9f65d85";
 

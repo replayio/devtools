@@ -1,10 +1,10 @@
 import { ReactNode, useMemo } from "react";
 
-import SyntaxHighlightedLine from "bvaughn-architecture-demo/components/sources/SyntaxHighlightedLine";
-import { formatDuration } from "bvaughn-architecture-demo/src/utils/time";
-
 import { RequestResponse } from "../ProtocolMessagesStore";
 import styles from "./shared.module.css";
+
+import SyntaxHighlightedLine from "replay-next/components/sources/SyntaxHighlightedLine";
+import { formatDuration } from "replay-next/src/utils/time";
 
 export function RequestResponseHeaderRenderer({ message }: { message: RequestResponse }) {
   let status = null;

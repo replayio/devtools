@@ -1,4 +1,4 @@
-import { truncate } from "bvaughn-architecture-demo/src/utils/text";
+import { truncate } from "replay-next/src/utils/text";
 
 describe("text utils", () => {
   describe("truncate", () => {

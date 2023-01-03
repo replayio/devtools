@@ -1,5 +1,5 @@
-import { ProtocolMessage } from "bvaughn-architecture-demo/src/suspense/MessagesCache";
-import { getSourceIfAlreadyLoaded } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { ProtocolMessage } from "replay-next/src/suspense/MessagesCache";
+import { getSourceIfAlreadyLoaded } from "replay-next/src/suspense/SourcesCache";
 
 // Messages with pages that match this expression are internal Firefox errors and we should not display them.
 const FIREFOX_INTERNAL_REGEX = /resource:\/\/\/modules\/\S+\.jsm/;

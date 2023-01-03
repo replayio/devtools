@@ -10,23 +10,24 @@ import {
   useState,
 } from "react";
 
-import useConsoleContextMenu from "bvaughn-architecture-demo/components/console/useConsoleContextMenu";
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import Inspector from "bvaughn-architecture-demo/components/inspector";
-import ClientValueValueRenderer from "bvaughn-architecture-demo/components/inspector/values/ClientValueValueRenderer";
-import Loader from "bvaughn-architecture-demo/components/Loader";
-import SyntaxHighlightedExpression from "bvaughn-architecture-demo/components/SyntaxHighlightedExpression";
-import { ConsoleFiltersContext } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
-import { InspectableTimestampedPointContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
-import { TerminalExpression } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
-import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
-import { evaluateSuspense } from "bvaughn-architecture-demo/src/suspense/PauseCache";
-import { primitiveToClientValue } from "bvaughn-architecture-demo/src/utils/protocol";
-import { formatTimestamp } from "bvaughn-architecture-demo/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import MessageHoverButton from "../MessageHoverButton";
 import styles from "./shared.module.css";
+
+import useConsoleContextMenu from "replay-next/components/console/useConsoleContextMenu";
+import Icon from "replay-next/components/Icon";
+import Inspector from "replay-next/components/inspector";
+import ClientValueValueRenderer from "replay-next/components/inspector/values/ClientValueValueRenderer";
+import Loader from "replay-next/components/Loader";
+import SyntaxHighlightedExpression from "replay-next/components/SyntaxHighlightedExpression";
+import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
+import { InspectableTimestampedPointContext } from "replay-next/src/contexts/InspectorContext";
+import { TerminalExpression } from "replay-next/src/contexts/TerminalContext";
+import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import { evaluateSuspense } from "replay-next/src/suspense/PauseCache";
+import { primitiveToClientValue } from "replay-next/src/utils/protocol";
+import { formatTimestamp } from "replay-next/src/utils/time";
 
 function TerminalExpressionRenderer({
   index,

@@ -4,7 +4,6 @@
 
 import React, { useContext, useEffect } from "react";
 
-import { useGetFrameSteps } from "bvaughn-architecture-demo/src/suspense/FrameStepsCache";
 import actions from "devtools/client/debugger/src/actions/index";
 import CommandBarButton from "devtools/client/debugger/src/components/shared/Button/CommandBarButton";
 import { getSelectedFrameId, getThreadContext } from "devtools/client/debugger/src/reducers/pause";
@@ -15,6 +14,8 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { useGetFrames } from "ui/suspense/frameCache";
 import { trackEvent } from "ui/utils/telemetry";
+
+import { useGetFrameSteps } from "replay-next/src/suspense/FrameStepsCache";
 
 const { appinfo } = Services;
 

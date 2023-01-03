@@ -1,13 +1,14 @@
 import classNames from "classnames/bind";
 import { useContext, useRef } from "react";
 
-import useModalDismissSignal from "bvaughn-architecture-demo/src/hooks/useModalDismissSignal";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useTestStepActions } from "ui/hooks/useTestStepActions";
 import { AnnotatedTestStep, TestItem } from "ui/types";
 
 import { Coordinates, TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import styles from "./ContextMenu.module.css";
+
+import useModalDismissSignal from "replay-next/src/hooks/useModalDismissSignal";
 
 function ContextMenu({
   hide,

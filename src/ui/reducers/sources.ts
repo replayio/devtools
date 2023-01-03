@@ -8,8 +8,6 @@ import {
 } from "@reduxjs/toolkit";
 import { Location, MappedLocation, SourceKind, newSource } from "@replayio/protocol";
 
-import { preCacheSources } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
-import { getStreamingSourceContentsHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import type { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import { getTextAtPosition } from "devtools/client/debugger/src/utils/source";
@@ -19,6 +17,9 @@ import { listenForCondition } from "ui/setup/listenerMiddleware";
 import { UIState } from "ui/state";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 import { newSourcesToCompleteSourceDetails } from "ui/utils/sources";
+
+import { preCacheSources } from "replay-next/src/suspense/SourcesCache";
+import { getStreamingSourceContentsHelper } from "replay-next/src/suspense/SourcesCache";
 
 export interface SourceDetails {
   isSourceMapped: boolean;

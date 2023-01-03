@@ -1,19 +1,16 @@
 import { ReactNode, useContext, useState } from "react";
 
-import Icon from "bvaughn-architecture-demo/components/Icon";
+import styles from "./CommentPreview.module.css";
+
+import Icon from "replay-next/components/Icon";
 import {
   isNetworkRequestCommentTypeData,
   isSourceCodeCommentTypeData,
   isVisualCommentTypeData,
-} from "bvaughn-architecture-demo/components/sources/utils/comments";
-import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import {
-  ParsedToken,
-  parsedTokensToHtml,
-} from "bvaughn-architecture-demo/src/suspense/SyntaxParsingCache";
-import { getSourceFileNameFromUrl } from "bvaughn-architecture-demo/src/utils/source";
-
-import styles from "./CommentPreview.module.css";
+} from "replay-next/components/sources/utils/comments";
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { ParsedToken, parsedTokensToHtml } from "replay-next/src/suspense/SyntaxParsingCache";
+import { getSourceFileNameFromUrl } from "replay-next/src/utils/source";
 
 export default function CommentPreview({
   type,

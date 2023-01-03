@@ -1,16 +1,14 @@
 import { useContext, useMemo, useState } from "react";
 
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import {
-  getSourcesToDisplay,
-  isIndexedSource,
-} from "bvaughn-architecture-demo/src/suspense/SourcesCache";
-import { protocolSourcesToSourceTree } from "bvaughn-architecture-demo/src/utils/protocol";
-import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import styles from "./SourceExplorer.module.css";
+
+import Icon from "replay-next/components/Icon";
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { getSourcesToDisplay, isIndexedSource } from "replay-next/src/suspense/SourcesCache";
+import { protocolSourcesToSourceTree } from "replay-next/src/utils/protocol";
+import { getSourceFileName } from "replay-next/src/utils/source";
 
 export default function SourceExplorer() {
   const client = useContext(ReplayClientContext);

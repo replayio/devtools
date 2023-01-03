@@ -1,14 +1,11 @@
 import { SourceId } from "@replayio/protocol";
 
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import {
-  AddPoint,
-  DeletePoints,
-  EditPoint,
-} from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import { Point } from "shared/client/types";
 
 import styles from "./ColumnBreakpointMarker.module.css";
+
+import Icon from "replay-next/components/Icon";
+import { AddPoint, DeletePoints, EditPoint } from "replay-next/src/contexts/PointsContext";
 
 export default function ColumnBreakpointMarker({
   addPoint,

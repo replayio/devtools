@@ -6,7 +6,6 @@ import { act } from "react-dom/test-utils";
 import { Provider } from "react-redux";
 import { v4 as uuid } from "uuid";
 
-import { createMockReplayClient } from "bvaughn-architecture-demo/src/utils/testing";
 import type { UIStore } from "ui/actions";
 import setupDevtools from "ui/setup/dynamic/devtools";
 import { bootstrapStore } from "ui/setup/store";
@@ -18,6 +17,8 @@ import {
   createRecordingOwnerUserIdMock,
   createUserSettingsMock,
 } from "../../test/mock/src/graphql";
+
+import { createMockReplayClient } from "replay-next/src/utils/testing";
 
 const recordingId = uuid();
 const userId = uuid();

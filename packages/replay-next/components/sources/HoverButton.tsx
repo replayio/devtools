@@ -2,31 +2,28 @@ import { ExecutionPoint, newSource as ProtocolSource, TimeStampedPoint } from "@
 import findLast from "lodash/findLast";
 import { useContext } from "react";
 
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
-import { KeyboardModifiersContext } from "bvaughn-architecture-demo/src/contexts/KeyboardModifiersContext";
-import {
-  AddPoint,
-  DeletePoints,
-  EditPoint,
-} from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import { SessionContext } from "bvaughn-architecture-demo/src/contexts/SessionContext";
-import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import { TimelineContext } from "bvaughn-architecture-demo/src/contexts/TimelineContext";
-import { Nag } from "bvaughn-architecture-demo/src/graphql/types";
-import { useNag } from "bvaughn-architecture-demo/src/hooks/useNag";
-import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
-import {
-  compareExecutionPoints,
-  isExecutionPointsGreaterThan,
-  isExecutionPointsLessThan,
-} from "bvaughn-architecture-demo/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 import { LineHitCounts } from "shared/client/types";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 
 import styles from "./HoverButton.module.css";
+
+import Icon from "replay-next/components/Icon";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { KeyboardModifiersContext } from "replay-next/src/contexts/KeyboardModifiersContext";
+import { AddPoint, DeletePoints, EditPoint } from "replay-next/src/contexts/PointsContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import { Nag } from "replay-next/src/graphql/types";
+import { useNag } from "replay-next/src/hooks/useNag";
+import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/PointsCache";
+import {
+  compareExecutionPoints,
+  isExecutionPointsGreaterThan,
+  isExecutionPointsLessThan,
+} from "replay-next/src/utils/time";
 
 export default function HoverButton({
   addPoint,
