@@ -24,10 +24,10 @@
   --color-transparent: rgba(0, 0, 0, 0);
 
   /* Color ramp: this is copy/pasted to align to src/devtools/client/themes/variables.css */
-  --theme-base-100: #000; /* background chrome */
-  --theme-base-95: #192230; /* tab bars */
-  --theme-base-90: #3d4552; /* editor and selected tab */
-  --theme-base-85: #3e434b; /* textfields */
+  --theme-base-100: #000;
+  --theme-base-95: #192230;
+  --theme-base-90: #3d4552;
+  --theme-base-85: #3e434b;
   --theme-base-80: #797d81;
   --theme-base-70: #a2a6a8;
   --theme-base-60: #c3c6c8;
