@@ -36,6 +36,7 @@ pref("devtools.features.logProtocolEvents", false);
 pref("devtools.features.newControllerOnRefresh", false);
 pref("devtools.features.originalClassNames", false);
 pref("devtools.features.profileWorkerThreads", false);
+pref("devtools.features.enableRoutines", false);
 pref("devtools.features.protocolTimeline", false);
 pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.resolveRecording", false);
@@ -66,6 +67,7 @@ export const features = new PrefsHelper("devtools.features", {
   disableStableQueryCache: ["Bool", "disableStableQueryCache"],
   disableUnHitLines: ["Bool", "disableUnHitLines"],
   enableLargeText: ["Bool", "enableLargeText"],
+  enableRoutines: ["Bool", "enableRoutines"],
   enableUnstableQueryCache: ["Bool", "enableUnstableQueryCache"],
   logProtocol: ["Bool", "logProtocol"],
   logProtocolEvents: ["Bool", "logProtocolEvents"],
