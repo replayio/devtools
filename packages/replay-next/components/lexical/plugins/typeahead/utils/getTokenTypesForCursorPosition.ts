@@ -3,10 +3,10 @@ import { LexicalNode } from "lexical";
 import parseTokens from "../../code/utils/parseTokens";
 import getLineTextAndCursorPosition from "./getLineTextAndCursorPosition";
 
-export default function getTokenTypeForCursorPosition(
+export default function getTokenTypesForCursorPosition(
   initialNode: LexicalNode,
   initialOffset: number
-): string | null {
+): string[] | null {
   const [text, cursorIndex] = getLineTextAndCursorPosition(initialNode, initialOffset);
   if (text === null) {
     return null;
@@ -24,7 +24,7 @@ export default function getTokenTypeForCursorPosition(
     currentIndex += token.text.length;
 
     if (currentIndex >= cursorIndex) {
-      return token.type;
+      return token.types;
     }
   }
 

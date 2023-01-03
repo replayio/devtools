@@ -3,8 +3,9 @@ import { ensureSyntaxTree } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
 import { classHighlighter, highlightTree } from "@lezer/highlight";
 
+import classNameToTokenTypes from "replay-next/components/sources/utils/classNameToTokenTypes";
+
 import { Token } from "../types";
-import classNameToTokenType from "./classNameToTokenType";
 
 export default function parseTokens(textToParse: string): Token[] | null {
   const codeMirrorState = EditorState.create({
@@ -27,13 +28,13 @@ export default function parseTokens(textToParse: string): Token[] | null {
       // This typically indicates white space or newline characters.
       tokens.push({
         text: textToParse.slice(characterIndex, from),
-        type: null,
+        types: null,
       });
     }
 
     tokens.push({
       text: textToParse.slice(from, to),
-      type: classNameToTokenType(className),
+      types: classNameToTokenTypes(className),
     });
 
     characterIndex = to;
@@ -43,7 +44,7 @@ export default function parseTokens(textToParse: string): Token[] | null {
     // Anything left is plain text
     tokens.push({
       text: textToParse.slice(characterIndex),
-      type: null,
+      types: null,
     });
   }
 

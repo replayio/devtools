@@ -9,7 +9,7 @@ export default function parsedTokensToCodeTextNode(tokens: Token[]): CodeNode {
   const nodes: LexicalNode[] = [];
 
   tokens.forEach(token => {
-    const type = token.type ? getTokenStyle(token.type) : "";
+    const type = token.types ? getTokenStyle(token.types) || "" : "";
     const lines = token.text.split(/[\r\n]/);
     return lines.forEach((line, lineIndex) => {
       if (lineIndex > 0) {

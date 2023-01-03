@@ -1,7 +1,15 @@
 import { TokenType } from "replay-next/components/lexical/plugins/code/types";
 
-export default function getTokenStyle(tokenType: TokenType): string {
-  const color = TOKEN_TYPE_TO_COLOR_MAP[tokenType];
+export default function getTokenStyle(tokenTypes: TokenType[]): string | null {
+  if (tokenTypes.length === 0) {
+    return null;
+  }
+
+  const color = TOKEN_TYPE_TO_COLOR_MAP[tokenTypes[0]];
+  if (color == null) {
+    return null;
+  }
+
   return `color: ${color};`;
 }
 

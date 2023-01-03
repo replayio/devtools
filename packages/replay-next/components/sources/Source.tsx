@@ -126,7 +126,7 @@ function SourceRenderer({
           return;
         }
       } else {
-        const isToken = htmlElement.hasAttribute("data-parsed-token");
+        const isToken = htmlElement.hasAttribute("data-inspectable-token");
         if (isToken) {
           // Debounce hover event to avoid showing the popup (or requesting data) in response to normal mouse movements.
           setHoverStateDebounced(htmlElement, null, null, null, setHoveredState);
