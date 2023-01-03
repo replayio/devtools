@@ -49,6 +49,7 @@
   --background-color-warning: #42381f;
   --background-color-inputs: #0e1119;
   --background-color-source-search: #25364e;
+  --background-color-resize-handle: #242e3d;
 
   --border-color: #e1e6ed;
   --border-color-current-execution-point: #2563be;
@@ -208,6 +209,7 @@
   --background-color-warning: #fffac8;
   --background-color-inputs: #e6e6e6;
   --background-color-source-search: #eaf3ff;
+  --background-color-resize-handle: #cfcfcf;
 
   --border-color: #081121;
   --border-color-current-execution-point: #69a6ff;
