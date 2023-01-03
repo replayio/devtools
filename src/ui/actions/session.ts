@@ -1,4 +1,7 @@
+import { ApolloError } from "@apollo/client";
 import { Action } from "@reduxjs/toolkit";
+import { uploadedData } from "@replayio/protocol";
+import * as Sentry from "@sentry/react";
 
 import {
   CommandRequest,
@@ -42,10 +45,6 @@ import { getZoomRegion, setFocusRegion } from "../reducers/timeline";
 import { setExpectedError, setUnexpectedError } from "./errors";
 import { setViewMode } from "./layout";
 import { getInitialPausePoint, jumpToInitialPausePoint } from "./timeline";
-
-import { ApolloError } from "@apollo/client";
-import { uploadedData } from "@replayio/protocol";
-import * as Sentry from "@sentry/react";
 
 export { setUnexpectedError, setExpectedError };
 

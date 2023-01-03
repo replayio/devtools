@@ -1,4 +1,6 @@
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
+import { ExecutionPoint, PauseId, ScreenShot, TimeRange } from "@replayio/protocol";
+import throttle from "lodash/throttle";
 
 import { framePositionsCleared, resumed } from "devtools/client/debugger/src/reducers/pause";
 import {
@@ -21,6 +23,7 @@ import { DownloadCancelledError } from "protocol/screenshot-cache";
 import { ThreadFront } from "protocol/thread";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { waitForTime } from "protocol/utils";
+import { getPointsBoundingTimeAsync } from "replay-next/src/suspense/PointsCache";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import { mayClearSelectedStep } from "ui/reducers/reporter";
 import {
@@ -60,10 +63,6 @@ import {
 } from "../reducers/timeline";
 import { getLoadedRegions, isPointInLoadingRegion } from "./app";
 import type { UIStore, UIThunkAction } from "./index";
-
-import { ExecutionPoint, PauseId, ScreenShot, TimeRange } from "@replayio/protocol";
-import throttle from "lodash/throttle";
-import { getPointsBoundingTimeAsync } from "replay-next/src/suspense/PointsCache";
 
 const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
 const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;

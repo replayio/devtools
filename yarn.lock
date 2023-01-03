@@ -4282,10 +4282,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/protocol@file:.yalc/@replayio/protocol::locator=recordreplay-devtools%40workspace%3A.":
+"@replayio/protocol@npm:0.36.0":
   version: 0.36.0
-  resolution: "@replayio/protocol@file:.yalc/@replayio/protocol#.yalc/@replayio/protocol::hash=8c3834&locator=recordreplay-devtools%40workspace%3A."
-  checksum: fdfeb7b320916b21e5ca62f6d1a402ae0934784045ada5d6f9e2eb51010cbb397e26e77908bf3d906bf80afc25c63ff6eea4ac184bceff60ecae8f7d3ab917e3
+  resolution: "@replayio/protocol@npm:0.36.0"
+  checksum: 5f999cc83ebac8b982f3aec6bdaf06a7ad35645962cd8471372f7429fb115eb029053724ccd9584a01ecdf19dd2add18eefdcb91a3a75615380bb1ea095320db
   languageName: node
   linkType: hard
 
@@ -20945,7 +20945,7 @@ __metadata:
     "@redux-devtools/app": ^2.1.4
     "@redux-devtools/extension": ^3.2.2
     "@reduxjs/toolkit": ^1.8.4
-    "@replayio/protocol": "file:.yalc/@replayio/protocol"
+    "@replayio/protocol": 0.36.0
     "@replayio/replay": ^0.9.6
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0
