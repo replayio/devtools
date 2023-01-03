@@ -2,7 +2,7 @@ import { $isRangeSelection, LexicalNode, TextNode } from "lexical";
 
 import { QueryData, TypeAheadSelection } from "../typeahead/types";
 import $isSimpleText from "../typeahead/utils/$isSimpleText";
-import getTokenTypeForCursorPosition from "../typeahead/utils/getTokenTypeForCursorPosition";
+import getTokenTypesForCursorPosition from "../typeahead/utils/getTokenTypesForCursorPosition";
 
 export default function getQueryData(selection: TypeAheadSelection | null): QueryData | null {
   if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
@@ -17,14 +17,18 @@ export default function getQueryData(selection: TypeAheadSelection | null): Quer
   const anchor = selection.anchor;
   const offset = anchor.offset;
 
-  const tokenType = getTokenTypeForCursorPosition(node, offset);
-  switch (tokenType) {
-    case "comment":
-    case "number":
-    case "punctuation":
-    case "string":
-    case "string2":
-      return null;
+  const tokenTypes = getTokenTypesForCursorPosition(node, offset);
+  if (tokenTypes == null || tokenTypes.length === 0) {
+    return null;
+  } else {
+    switch (tokenTypes[0]) {
+      case "comment":
+      case "number":
+      case "punctuation":
+      case "string":
+      case "string2":
+        return null;
+    }
   }
 
   let insertionBeginOffset = -1;

@@ -11,12 +11,14 @@ import { EditorState } from "@codemirror/state";
 import { classHighlighter, highlightTree } from "@lezer/highlight";
 import { ContentType } from "@replayio/protocol";
 
+import classNameToTokenTypes from "replay-next/components/sources/utils/classNameToTokenTypes";
+
 import { createGenericCache } from "./createGenericCache";
 import { StreamingSourceContents } from "./SourcesCache";
 
 export type ParsedToken = {
   columnIndex: number;
-  type: string | null;
+  types: string[] | null;
   value: string;
 };
 
@@ -247,7 +249,7 @@ function incrementalParser(fileName?: string, contentType?: ContentType): Increm
 
         parsedLineTokens.push({
           columnIndex: 0,
-          type: null,
+          types: null,
           value: line,
         });
 
@@ -333,7 +335,7 @@ function processSection(
   section: string,
   className: string
 ) {
-  const tokenType = className?.substring(4) ?? null; // Remove "tok-" prefix;
+  const tokenTypes = className ? classNameToTokenTypes(className) : null; // Remove "tok-" prefix;
 
   let index = 0;
   let nextIndex = section.indexOf("\n");
@@ -344,7 +346,7 @@ function processSection(
 
     const token: ParsedToken = {
       columnIndex: currentLineState.rawString.length,
-      type: tokenType,
+      types: tokenTypes,
       value: substring,
     };
 
@@ -370,7 +372,11 @@ function processSection(
 export function parsedTokensToHtml(tokens: ParsedToken[]): string {
   return tokens
     .map(token => {
-      const className = token.type ? `tok-${token.type}` : "";
+      let className = undefined;
+      if (token.types) {
+        className = token.types.map(type => `tok-${type}`).join(" ");
+      }
+
       return `<span class="${className}">${token.value}</span>`;
     })
     .join("");

@@ -2,6 +2,7 @@ import { newSource as ProtocolSource, SameLineSourceLocations } from "@replayio/
 import {
   CSSProperties,
   MouseEvent,
+  ReactElement,
   ReactNode,
   Suspense,
   memo,
@@ -150,13 +151,7 @@ const SourceListRow = memo(
           } else if (token.columnIndex >= columnIndexStart) {
             rendered.push(
               <pre className={styles.LineSegment} key={rendered.length}>
-                <span
-                  className={token.type ? `tok-${token.type}` : undefined}
-                  data-column-index={token.columnIndex}
-                  data-parsed-token
-                >
-                  {token.value}
-                </span>
+                {renderToken(token)}
               </pre>
             );
           }
@@ -211,16 +206,7 @@ const SourceListRow = memo(
         if (tokens !== null) {
           lineSegments = (
             <pre className={styles.LineSegment}>
-              {tokens.map((token, index) => (
-                <span
-                  className={token.type ? `tok-${token.type}` : undefined}
-                  data-column-index={token.columnIndex}
-                  data-parsed-token
-                  key={index}
-                >
-                  {token.value}
-                </span>
-              ))}
+              {tokens.map((token, index) => renderToken(token, index))}
             </pre>
           );
         } else {
@@ -384,3 +370,37 @@ const SourceListRow = memo(
 SourceListRow.displayName = "SourceListRow";
 
 export default SourceListRow;
+
+function renderToken(token: ParsedToken, key?: any): ReactElement {
+  let inspectable = token.types
+    ? token.types.some(type => {
+        switch (type) {
+          case "definition":
+          case "local":
+          case "propertyName":
+          case "typeName":
+          case "variableName":
+          case "variableName2":
+            return true;
+            break;
+        }
+        return false;
+      })
+    : false;
+
+  let className = undefined;
+  if (token.types) {
+    className = token.types.map(type => `tok-${type}`).join(" ");
+  }
+
+  return (
+    <span
+      className={className}
+      data-column-index={token.columnIndex}
+      data-inspectable-token={inspectable || undefined}
+      key={key}
+    >
+      {token.value}
+    </span>
+  );
+}

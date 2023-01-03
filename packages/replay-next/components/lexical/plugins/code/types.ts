@@ -26,5 +26,5 @@ export type TokenType =
 
 export type Token = {
   text: string;
-  type: TokenType | null;
+  types: TokenType[] | null;
 };
