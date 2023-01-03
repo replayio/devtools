@@ -30,7 +30,7 @@ export default function useLocalStorage<T>(
   const [isPending, startTransition] = useTransition();
   const [updateCounter, dispatchUpdate] = useReducer(c => c + 1, 0);
 
-// nosemgrep typescript.react.best-practice.react-props-in-state.react-props-in-state
+  // nosemgrep typescript.react.best-practice.react-props-in-state.react-props-in-state
   const [value, setValue] = useState<T>(() => {
     const storedValue = localStorageGetItem(key);
     if (storedValue != null) {
