@@ -40,9 +40,6 @@ import {
 import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
 
-import { initProtocolMessagesStore } from "bvaughn-architecture-demo/components/protocol/ProtocolMessagesStore";
-import { insert } from "bvaughn-architecture-demo/src/utils/array";
-import { areRangesEqual, compareExecutionPoints } from "bvaughn-architecture-demo/src/utils/time";
 import analysisManager from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
@@ -50,6 +47,9 @@ import { ThreadFront } from "protocol/thread";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { RecordingCapabilities } from "protocol/thread/thread";
 import { binarySearch, compareNumericStrings, defer, waitForTime } from "protocol/utils";
+import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
+import { insert } from "replay-next/src/utils/array";
+import { areRangesEqual, compareExecutionPoints } from "replay-next/src/utils/time";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import { isPointInRegions, isRangeInRegions, isTimeInRegions } from "shared/utils/time";

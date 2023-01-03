@@ -40,8 +40,8 @@ import groupBy from "lodash/groupBy";
 import {
   cachePauseData,
   getPauseIdForExecutionPointIfCached,
-} from "bvaughn-architecture-demo/src/suspense/PauseCache";
-import { getPauseIdAsync } from "bvaughn-architecture-demo/src/suspense/PauseCache";
+} from "replay-next/src/suspense/PauseCache";
+import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { MappedLocationCache } from "../mapped-location-cache";

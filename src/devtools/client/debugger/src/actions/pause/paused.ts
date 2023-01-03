@@ -4,7 +4,7 @@
 
 import { PauseId } from "@replayio/protocol";
 
-import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
+import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
 import type { UIThunkAction } from "ui/actions";
 import { isPointInLoadingRegion } from "ui/reducers/app";
 import { getSelectedLocation } from "ui/reducers/sources";

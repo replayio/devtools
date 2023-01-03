@@ -1,14 +1,14 @@
 import { Frame, PauseId } from "@replayio/protocol";
 
-import { createUseGetValue } from "bvaughn-architecture-demo/src/suspense/createGenericCache";
+import { createFrame } from "devtools/client/debugger/src/client/create";
+import { PauseAndFrameId } from "devtools/client/debugger/src/reducers/pause";
+import { formatCallStackFrames } from "devtools/client/debugger/src/selectors/getCallStackFrames";
+import { createUseGetValue } from "replay-next/src/suspense/createGenericCache";
 import {
   getFramesAsync,
   getFramesIfCached,
   getFramesSuspense,
-} from "bvaughn-architecture-demo/src/suspense/FrameCache";
-import { createFrame } from "devtools/client/debugger/src/client/create";
-import { PauseAndFrameId } from "devtools/client/debugger/src/reducers/pause";
-import { formatCallStackFrames } from "devtools/client/debugger/src/selectors/getCallStackFrames";
+} from "replay-next/src/suspense/FrameCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { SourcesState } from "ui/reducers/sources";
 

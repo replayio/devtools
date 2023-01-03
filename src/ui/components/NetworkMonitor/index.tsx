@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
-import IndeterminateLoader from "bvaughn-architecture-demo/components/IndeterminateLoader";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
+import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { actions } from "ui/actions";
 import { hideRequestDetails, selectAndFetchRequest } from "ui/actions/network";
 import { getFocusedEvents, getFocusedRequests, getSelectedRequestId } from "ui/reducers/network";

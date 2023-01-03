@@ -2,8 +2,8 @@ import { Object as ProtocolObject } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
 import React, { createContext, useContext, useMemo, useState } from "react";
 
-import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
-import PropertiesRenderer from "bvaughn-architecture-demo/components/inspector/PropertiesRenderer";
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
 import { getSelectedTest } from "ui/reducers/reporter";
 import { useAppSelector } from "ui/setup/hooks";
 import { TestItem } from "ui/types";

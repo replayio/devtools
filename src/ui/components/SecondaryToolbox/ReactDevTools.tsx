@@ -3,13 +3,13 @@ import React, { useContext } from "react";
 import { useEffect, useState } from "react";
 import type { Store, Wall } from "react-devtools-inline/frontend";
 
-import {
-  getObjectPropertyHelper,
-  getObjectWithPreviewHelper,
-} from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
+import {
+  getObjectPropertyHelper,
+  getObjectWithPreviewHelper,
+} from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { fetchMouseTargetsForPause } from "ui/actions/app";

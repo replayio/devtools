@@ -34,7 +34,7 @@ module.exports = {
     // Handle module aliases
     "^@/components/(.*)$": "<rootDir>/components/$1",
 
-    "^bvaughn-architecture-demo/(.*)": "<rootDir>/packages/bvaughn-architecture-demo/$1",
+    "^replay-next/(.*)": "<rootDir>/packages/replay-next/$1",
   },
   testEnvironment: "jsdom",
   testMatch: [

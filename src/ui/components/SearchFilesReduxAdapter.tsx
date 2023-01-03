@@ -1,8 +1,8 @@
 import { useContext, useLayoutEffect } from "react";
 
-import SearchFiles from "bvaughn-architecture-demo/components/search-files/SearchFiles";
-import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { onViewSourceInDebugger } from "devtools/client/webconsole/actions";
+import SearchFiles from "replay-next/components/search-files/SearchFiles";
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { getSourceDetailsEntities } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 

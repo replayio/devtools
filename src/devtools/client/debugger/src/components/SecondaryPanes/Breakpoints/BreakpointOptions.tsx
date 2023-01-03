@@ -1,6 +1,6 @@
 import React from "react";
 
-import SyntaxHighlightedLine from "bvaughn-architecture-demo/components/sources/SyntaxHighlightedLine";
+import SyntaxHighlightedLine from "replay-next/components/sources/SyntaxHighlightedLine";
 import { Point } from "shared/client/types";
 import { getSelectedSource, getSourceContent } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";

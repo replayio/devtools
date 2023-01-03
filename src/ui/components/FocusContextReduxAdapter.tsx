@@ -1,7 +1,7 @@
 import { PropsWithChildren, useCallback, useEffect, useMemo, useState, useTransition } from "react";
 
-import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
-import { Range } from "bvaughn-architecture-demo/src/types";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { Range } from "replay-next/src/types";
 import { setFocusRegionFromTimeRange } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getFocusRegion } from "ui/reducers/timeline";

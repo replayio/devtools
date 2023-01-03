@@ -1,11 +1,11 @@
 import { useEffect, useMemo } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
-import { SHOW_GLOBAL_SEARCH_EVENT_TYPE } from "bvaughn-architecture-demo/components/search-files/SearchFiles";
-import { createTypeDataForVisualComment } from "bvaughn-architecture-demo/components/sources/utils/comments";
 import { closeQuickOpen, toggleQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import * as dbgActions from "devtools/client/debugger/src/actions/ui";
 import { getActiveSearch, getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
+import { SHOW_GLOBAL_SEARCH_EVENT_TYPE } from "replay-next/components/search-files/SearchFiles";
+import { createTypeDataForVisualComment } from "replay-next/components/sources/utils/comments";
 import { UIThunkAction } from "ui/actions";
 import { actions } from "ui/actions";
 import { useGetRecordingId } from "ui/hooks/recordings";

@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   VisualCommentTypeData,
   createTypeDataForVisualComment,
-} from "bvaughn-architecture-demo/components/sources/utils/comments";
+} from "replay-next/components/sources/utils/comments";
 import { getAreMouseTargetsLoading, getCanvas } from "ui/actions/app";
 import { createFrameComment } from "ui/actions/comments";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";

@@ -1,7 +1,7 @@
 import { SourceId } from "@replayio/protocol";
 import { ReactNode, useContext, useMemo } from "react";
 
-import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { PointsContext } from "replay-next/src/contexts/PointsContext";
 import { Point } from "shared/client/types";
 import { getSourceDetailsEntities } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";

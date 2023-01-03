@@ -2,9 +2,9 @@ import "ui/setup/dynamic/inspector";
 import classnames from "classnames";
 import React, { FC, ReactNode, Suspense, useContext } from "react";
 
-import LazyOffscreen from "bvaughn-architecture-demo/components/LazyOffscreen";
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
 import { RecordingCapabilities } from "protocol/thread/thread";
+import LazyOffscreen from "replay-next/components/LazyOffscreen";
 import { setSelectedPanel } from "ui/actions/layout";
 import { useFeature } from "ui/hooks/settings";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";

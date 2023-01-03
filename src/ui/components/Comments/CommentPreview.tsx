@@ -4,7 +4,7 @@ import {
   isNetworkRequestCommentTypeData,
   isSourceCodeCommentTypeData,
   isVisualCommentTypeData,
-} from "bvaughn-architecture-demo/components/sources/utils/comments";
+} from "replay-next/components/sources/utils/comments";
 import { Comment } from "ui/state/comments";
 
 import NetworkRequestPreview from "./TranscriptComments/NetworkRequestPreview";

@@ -1,11 +1,11 @@
 import { KeyboardEvent, NodeBounds, unprocessedRegions } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
-import { isValidPoint } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { shallowEqual } from "devtools/client/debugger/src/utils/compare";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
+import { isValidPoint } from "replay-next/src/contexts/PointsContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 import * as selectors from "ui/reducers/app";

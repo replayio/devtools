@@ -1,17 +1,17 @@
 import { Action } from "@reduxjs/toolkit";
 import { RecordingId } from "@replayio/protocol";
 
+import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
+import { getExecutionPoint, getPauseId } from "devtools/client/debugger/src/reducers/pause";
+import type { ThreadFront as ThreadFrontType } from "protocol/thread";
 import {
   COMMENT_TYPE_NETWORK_REQUEST,
   COMMENT_TYPE_VISUAL,
   VisualCommentTypeData,
   createTypeDataForNetworkRequestComment,
-} from "bvaughn-architecture-demo/components/sources/utils/comments";
-import { CommentSourceLocation } from "bvaughn-architecture-demo/src/graphql/types";
-import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
-import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
-import { getExecutionPoint, getPauseId } from "devtools/client/debugger/src/reducers/pause";
-import type { ThreadFront as ThreadFrontType } from "protocol/thread";
+} from "replay-next/components/sources/utils/comments";
+import { CommentSourceLocation } from "replay-next/src/graphql/types";
+import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { ADD_COMMENT_MUTATION, AddCommentMutation } from "ui/hooks/comments/useAddComment";

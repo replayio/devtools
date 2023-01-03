@@ -6,9 +6,9 @@ import { AnyAction, PayloadAction, createAsyncThunk, createSlice } from "@reduxj
 import type { FrameId, Location, PauseId, TimeStampedPoint, Value } from "@replayio/protocol";
 import findLast from "lodash/findLast";
 
-import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
-import { getFrameStepsAsync } from "bvaughn-architecture-demo/src/suspense/FrameStepsCache";
 import { compareNumericStrings } from "protocol/utils";
+import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
+import { getFrameStepsAsync } from "replay-next/src/suspense/FrameStepsCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { getPreferredLocation, getSelectedSourceId } from "ui/reducers/sources";
 import { SourceDetails } from "ui/reducers/sources";

@@ -1,10 +1,10 @@
 import { SourceLocation } from "@replayio/protocol";
 import { PropsWithChildren, useCallback } from "react";
 
-import { SourcesContextRoot } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { PartialLocation, selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getContext } from "devtools/client/debugger/src/selectors";
 import { findClosestFunctionNameThunk } from "devtools/client/debugger/src/utils/ast";
+import { SourcesContextRoot } from "replay-next/src/contexts/SourcesContext";
 import { clearSelectedLocation, getSelectedLocation } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 

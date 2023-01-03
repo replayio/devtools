@@ -3,7 +3,7 @@
 import { Dictionary } from "@reduxjs/toolkit";
 import type { Location, ObjectPreview, Object as ProtocolObject } from "@replayio/protocol";
 
-import { cachePauseData } from "bvaughn-architecture-demo/src/suspense/PauseCache";
+import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { SourceDetails, getPreferredLocation, getSourceDetailsEntities } from "ui/reducers/sources";
 import { UIState } from "ui/state";
 

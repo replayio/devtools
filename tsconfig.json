@@ -51,7 +51,7 @@
         "src/devtools/client/shared/vendor/*",
         "node_modules/*"
       ],
-      "bvaughn-architecture-demo": ["packages/bvaughn-architecture-demo/*"],
+      "replay-next": ["packages/replay-next/*"],
       "@recordreplay/accordion": ["packages/accordion/index.tsx"],
       "components": ["packages/design/index.ts"],
       "components/*": ["packages/design/*"],

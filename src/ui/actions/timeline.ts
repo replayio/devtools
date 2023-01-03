@@ -2,7 +2,6 @@ import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
 import { ExecutionPoint, PauseId, ScreenShot, TimeRange } from "@replayio/protocol";
 import throttle from "lodash/throttle";
 
-import { getPointsBoundingTimeAsync } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import { framePositionsCleared, resumed } from "devtools/client/debugger/src/reducers/pause";
 import {
   addLastScreen,
@@ -24,6 +23,7 @@ import { DownloadCancelledError } from "protocol/screenshot-cache";
 import { ThreadFront } from "protocol/thread";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { waitForTime } from "protocol/utils";
+import { getPointsBoundingTimeAsync } from "replay-next/src/suspense/PointsCache";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import { mayClearSelectedStep } from "ui/reducers/reporter";
 import {

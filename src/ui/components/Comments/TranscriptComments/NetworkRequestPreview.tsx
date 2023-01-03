@@ -1,5 +1,5 @@
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import { isNetworkRequestCommentTypeData } from "bvaughn-architecture-demo/components/sources/utils/comments";
+import Icon from "replay-next/components/Icon";
+import { isNetworkRequestCommentTypeData } from "replay-next/components/sources/utils/comments";
 import { setSelectedPanel } from "ui/actions/layout";
 import { selectAndFetchRequest } from "ui/actions/network";
 import { getSummaryById } from "ui/reducers/network";

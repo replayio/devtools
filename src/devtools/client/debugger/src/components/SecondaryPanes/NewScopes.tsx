@@ -1,10 +1,10 @@
 import { PauseId, Value } from "@replayio/protocol";
 import { Suspense, useContext } from "react";
 
-import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
-import Inspector from "bvaughn-architecture-demo/components/inspector/Inspector";
-import ScopesInspector from "bvaughn-architecture-demo/components/inspector/ScopesInspector";
-import { getFrameScopesSuspense } from "bvaughn-architecture-demo/src/suspense/ScopeCache";
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import Inspector from "replay-next/components/inspector/Inspector";
+import ScopesInspector from "replay-next/components/inspector/ScopesInspector";
+import { getFrameScopesSuspense } from "replay-next/src/suspense/ScopeCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { enterFocusMode } from "ui/actions/timeline";
 import { Redacted } from "ui/components/Redacted";

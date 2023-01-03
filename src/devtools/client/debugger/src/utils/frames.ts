@@ -1,8 +1,8 @@
 import { PauseId } from "@replayio/protocol";
 
-import { getFrameStepsIfCached } from "bvaughn-architecture-demo/src/suspense/FrameStepsCache";
-import { getPauseIdForExecutionPointIfCached } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import { ThreadFront } from "protocol/thread/thread";
+import { getFrameStepsIfCached } from "replay-next/src/suspense/FrameStepsCache";
+import { getPauseIdForExecutionPointIfCached } from "replay-next/src/suspense/PauseCache";
 import { SourcesState } from "ui/reducers/sources";
 import { getPauseFramesIfCached } from "ui/suspense/frameCache";
 

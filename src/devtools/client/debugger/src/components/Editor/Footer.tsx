@@ -1,6 +1,6 @@
 import React, { Suspense, memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { getSelectedSource } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
 import { localStorageGetItem, localStorageSetItem } from "ui/utils/storage";

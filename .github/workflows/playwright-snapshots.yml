@@ -42,20 +42,20 @@ jobs:
       - name: Install packages
         run: yarn install
         shell: bash
-        working-directory: packages/bvaughn-architecture-demo
+        working-directory: packages/replay-next
       - name: Install Playwright packages
         run: yarn install
         shell: bash
-        working-directory: packages/bvaughn-architecture-demo/playwright
+        working-directory: packages/replay-next/playwright
       - name: Run dev server
         run: yarn dev &
-        working-directory: packages/bvaughn-architecture-demo
+        working-directory: packages/replay-next
       - name: Wait until server is up
         run: npx wait-on --timeout=60000 http-get://localhost:3000
       - name: Run playwright tests
         run: yarn visuals
-        working-directory: packages/bvaughn-architecture-demo/playwright  
+        working-directory: packages/replay-next/playwright  
       - name: Upload results
         if: always()
         run: ./uploadSnapshots.js
-        working-directory: packages/bvaughn-architecture-demo
+        working-directory: packages/replay-next

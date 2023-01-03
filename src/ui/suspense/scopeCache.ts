@@ -1,6 +1,6 @@
 import { Scope, SourceId } from "@replayio/protocol";
 
-import { FrameScopes } from "bvaughn-architecture-demo/src/suspense/ScopeCache";
+import { FrameScopes } from "replay-next/src/suspense/ScopeCache";
 
 export interface PickedScopes {
   scopes: Scope[];

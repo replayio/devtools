@@ -2,11 +2,11 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
-import { PointsContextRoot } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import { SelectedFrameContextRoot } from "bvaughn-architecture-demo/src/contexts/SelectedFrameContext";
-import usePreferredFontSize from "bvaughn-architecture-demo/src/hooks/usePreferredFontSize";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import { ThreadFront } from "protocol/thread";
+import { PointsContextRoot } from "replay-next/src/contexts/PointsContext";
+import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
+import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";

@@ -1,8 +1,8 @@
 import { ChatAltIcon } from "@heroicons/react/solid";
 import { useState } from "react";
 
-import Icon from "bvaughn-architecture-demo/components/Icon";
-import { isVisualCommentTypeData } from "bvaughn-architecture-demo/components/sources/utils/comments";
+import Icon from "replay-next/components/Icon";
+import { isVisualCommentTypeData } from "replay-next/components/sources/utils/comments";
 import { Comment } from "ui/state/comments";
 
 import styles from "./styles.module.css";
