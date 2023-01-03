@@ -326,37 +326,45 @@ async function loadReactDevToolsInlineModuleFromProtocol(
     return;
   }
 
-  stateUpdaterCallback(await import("react-devtools-inline/frontend"));
+  // Default assume that it's a recent recording
+  let backendBridgeProtocolVersion = 2;
 
-  // const response = await ThreadFront.evaluateNew({
-  //   replayClient,
-  //   text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("getBridgeProtocol", undefined)`,
-  // });
-  // if (response.returned?.object) {
-  //   // Unwrap the nested eval objects by asking the backend for contents
-  //   // of the nested fields: `{data: {version: 123}}`
-  //   const responseDataObject = await getObjectPropertyHelper(
-  //     replayClient,
-  //     pauseId,
-  //     response.returned.object,
-  //     "data"
-  //   );
-  //   const versionData = (await getObjectPropertyHelper(
-  //     replayClient,
-  //     pauseId,
-  //     responseDataObject.object!,
-  //     "version"
-  //   )) as { value: number };
-  //   const { value: version } = versionData;
+  const recordingTarget = await ThreadFront.getRecordingTarget();
 
-  //   // We should only load the DevTools module once we know which protocol version it requires.
-  //   // If we don't have a version yet, it probably means we're too early in the Replay session.
-  //   if (version >= 2) {
-  //     stateUpdaterCallback(await import("react-devtools-inline/frontend"));
-  //   } else if (version === 1) {
-  //     stateUpdaterCallback(await import("react-devtools-inline_4_18_0/frontend"));
-  //   }
-  // }
+  if (recordingTarget === "gecko") {
+    // For Gecko recordings, introspect the page to determine what RDT version was used
+    const response = await ThreadFront.evaluateNew({
+      replayClient,
+      text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("getBridgeProtocol", undefined)`,
+    });
+    if (response.returned?.object) {
+      // Unwrap the nested eval objects by asking the backend for contents
+      // of the nested fields: `{data: {version: 123}}`
+      const responseDataObject = await getObjectPropertyHelper(
+        replayClient,
+        pauseId,
+        response.returned.object,
+        "data"
+      );
+      const versionData = (await getObjectPropertyHelper(
+        replayClient,
+        pauseId,
+        responseDataObject.object!,
+        "version"
+      )) as { value: number };
+      if (versionData.value) {
+        backendBridgeProtocolVersion = versionData.value;
+      }
+    }
+  }
+
+  // We should only load the DevTools module once we know which protocol version it requires.
+  // If we don't have a version yet, it probably means we're too early in the Replay session.
+  if (backendBridgeProtocolVersion >= 2) {
+    stateUpdaterCallback(await import("react-devtools-inline/frontend"));
+  } else if (backendBridgeProtocolVersion === 1) {
+    stateUpdaterCallback(await import("react-devtools-inline_4_18_0/frontend"));
+  }
 }
 
 const nodePickerInstance = new NodePickerClass();
