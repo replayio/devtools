@@ -10,23 +10,27 @@ const projectId = "dcb5df26-b418-4fe2-9bdf-5a838e604ec4";
 const visualsUrl = "https://replay-visuals.vercel.app";
 
 function getFiles(dir) {
-  const files = fs.readdirSync(dir);
+  try {
+    const files = fs.readdirSync(dir);
 
-  const allFiles = [];
+    const allFiles = [];
 
-  files.forEach(file => {
-    const stats = fs.statSync(`${dir}/${file}`);
+    files.forEach(file => {
+      const stats = fs.statSync(`${dir}/${file}`);
 
-    if (stats.isDirectory()) {
-      allFiles.push(...getFiles(`${dir}/${file}`));
-    } else {
-      if (file !== ".DS_Store") {
-        allFiles.push(`${dir}/${file}`);
+      if (stats.isDirectory()) {
+        allFiles.push(...getFiles(`${dir}/${file}`));
+      } else {
+        if (file !== ".DS_Store") {
+          allFiles.push(`${dir}/${file}`);
+        }
       }
-    }
-  });
+    });
 
-  return allFiles;
+    return allFiles;
+  } catch (e) {
+    return [];
+  }
 }
 
 async function uploadImage(file, branch, runId) {
@@ -54,8 +58,15 @@ async function uploadImage(file, branch, runId) {
 }
 
 (async () => {
-  const allFiles = getFiles("./playwright/visuals");
-  console.log(`Found ${allFiles.length} files`);
+  const dir = "./playwright/visuals";
+  const allFiles = getFiles(dir);
+
+  if (allFiles.length == 0) {
+    console.log(`Skipping: No files found in ${dir}`);
+    process.exit(1);
+  } else {
+    console.log(`Found ${allFiles.length} files`);
+  }
 
   const branch =
     github.context.payload.pull_request?.head?.ref ||
