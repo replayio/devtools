@@ -48,7 +48,11 @@ function SuspendingPreviewPopup({
   }
 
   useEffect(() => {
-    const onClick = ({ target }: MouseEvent) => {
+    const onClick = ({ defaultPrevented, target }: MouseEvent) => {
+      if (defaultPrevented) {
+        return;
+      }
+
       const popupElement = popupRef.current;
       if (popupElement && target) {
         if (popupElement !== target && !popupElement.contains(target as any)) {
