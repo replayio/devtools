@@ -268,7 +268,6 @@ const SourceListRow = memo(
     };
 
     const { contextMenu, onContextMenu } = useSourceContextMenu({
-      firstBreakableColumnIndex: lineHitCounts?.firstBreakableColumnIndex ?? null,
       lineNumber,
       sourceId: source.sourceId,
       sourceUrl: source.url ?? null,

@@ -42,6 +42,10 @@ export default function Expandable({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   const onClick = (event: MouseEvent) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+
     event.stopPropagation();
 
     if (isPending) {

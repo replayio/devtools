@@ -1,4 +1,4 @@
-import { MouseEvent, ReactNode, useMemo, useState } from "react";
+import { MouseEvent, ReactNode, useCallback, useMemo, useState } from "react";
 
 import ContextMenu from "./ContextMenu";
 import { ContextMenuContext, ContextMenuContextType } from "./ContextMenuContext";
@@ -16,15 +16,21 @@ export default function useContextMenu(
   const { dataTestId, dataTestName } = options;
 
   const [contextMenuEvent, setContextMenuEvent] = useState<MouseEvent | null>(null);
+
   const context = useMemo<ContextMenuContextType>(() => ({ contextMenuEvent }), [contextMenuEvent]);
 
   const onContextMenu = (event: MouseEvent) => {
+    if (event.defaultPrevented) {
+      // Support nested context menus
+      return;
+    }
+
     event.preventDefault();
 
     setContextMenuEvent(event);
   };
 
-  const hideContextMenu = () => setContextMenuEvent(null);
+  const hideContextMenu = useCallback(() => setContextMenuEvent(null), []);
 
   let contextMenu = null;
   if (contextMenuEvent) {

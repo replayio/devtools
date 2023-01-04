@@ -41,8 +41,7 @@ export default function useModalDismissSignal(
       ownerDocument.addEventListener("keydown", handleDocumentKeyDown);
       if (dismissOnClickOutside) {
         ownerDocument.addEventListener("click", handleDocumentClick, true);
-      }
-      if (dismissOnClickOutside) {
+        ownerDocument.addEventListener("contextmenu", handleDocumentClick, true);
         ownerDocument.addEventListener("scroll", dismissCallback, true);
       }
     }, 0);
@@ -53,8 +52,10 @@ export default function useModalDismissSignal(
       }
 
       if (ownerDocument !== null) {
-        ownerDocument.removeEventListener("keydown", handleDocumentKeyDown);
         ownerDocument.removeEventListener("click", handleDocumentClick, true);
+        ownerDocument.removeEventListener("contextmenu", handleDocumentClick, true);
+        ownerDocument.removeEventListener("scroll", dismissCallback, true);
+        ownerDocument.removeEventListener("keydown", handleDocumentKeyDown);
       }
     };
   }, [modalRef, dismissCallback, dismissOnClickOutside]);

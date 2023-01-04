@@ -1,4 +1,6 @@
-import { ReactNode } from "react";
+import { MouseEvent, ReactNode, useContext } from "react";
+
+import { ContextMenuContext } from "replay-next/components/context-menu/ContextMenuContext";
 
 import styles from "./ContextMenuItem.module.css";
 
@@ -15,9 +17,17 @@ export default function ContextMenuItem({
   disabled?: boolean;
   onClick?: () => void;
 }) {
-  const onClick = () => {
-    if (!disabled && onClickProp) {
-      onClickProp();
+  const onClick = (event: MouseEvent) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (!disabled) {
+      if (onClickProp) {
+        onClickProp();
+      }
     }
   };
 

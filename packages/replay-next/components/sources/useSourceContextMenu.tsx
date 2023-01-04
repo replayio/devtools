@@ -18,12 +18,10 @@ import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 export default function useSourceContextMenu({
-  firstBreakableColumnIndex,
   lineNumber,
   sourceId,
   sourceUrl,
 }: {
-  firstBreakableColumnIndex: number | null;
   lineNumber: number;
   sourceId: SourceId;
   sourceUrl: string | null;
