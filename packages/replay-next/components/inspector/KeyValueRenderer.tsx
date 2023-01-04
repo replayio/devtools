@@ -13,6 +13,16 @@ import useClientValue from "./useClientValue";
 import ValueRenderer from "./ValueRenderer";
 import styles from "./KeyValueRenderer.module.css";
 
+export type Props = {
+  before?: ReactNode;
+  context: "console" | "default" | "nested";
+  enableInspection?: boolean;
+  expandByDefault?: boolean;
+  layout: "horizontal" | "vertical";
+  pauseId: PauseId;
+  protocolValue: ProtocolValue;
+};
+
 // Renders a protocol Object/ObjectPreview as a key+value pair.
 //
 // This renderer supports two layouts: "horizontal" and "vertical".
@@ -30,15 +40,7 @@ export default function KeyValueRenderer({
   layout = "horizontal",
   pauseId,
   protocolValue,
-}: {
-  before?: ReactNode;
-  context: "console" | "default" | "nested";
-  enableInspection?: boolean;
-  expandByDefault?: boolean;
-  layout: "horizontal" | "vertical";
-  pauseId: PauseId;
-  protocolValue: ProtocolValue;
-}) {
+}: Props) {
   const client = useContext(ReplayClientContext);
   const clientValue = useClientValue(protocolValue, pauseId);
 

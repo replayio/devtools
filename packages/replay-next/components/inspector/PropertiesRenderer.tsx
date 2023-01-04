@@ -16,7 +16,7 @@ import { mergePropertiesAndGetterValues } from "replay-next/src/utils/protocol";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import GetterRenderer from "./GetterRenderer";
-import KeyValueRenderer from "./KeyValueRenderer";
+import KeyValueRenderer from "./KeyValueRendererWithContextMenu";
 import ValueRenderer from "./ValueRenderer";
 import styles from "./PropertiesRenderer.module.css";
 
