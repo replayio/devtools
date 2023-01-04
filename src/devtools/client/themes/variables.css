@@ -133,6 +133,7 @@
   --badge-yellow-contrast-color: rgb(99, 79, 5);
 
   /* Color ramp (Light) */
+  /* Migration note: copy/pasted with packages/replay-next/pages/variables.css */
   --theme-base-100: hsl(0, 0%, 100%);
   --theme-base-95: hsl(0, 0%, 95%);
   --theme-base-90: hsl(0, 0%, 90%);
@@ -166,15 +167,7 @@
   --tooltip-bgcolor: #38383d;
 
   /* Tabs (Light) */
-  --tab-bgcolor: var(--theme-base-90);
-  --tab-color: var(--theme-base-40);
-  --tab-hover-bgcolor: var(--theme-base-85);
-  --tab-hover-color: var(--tab-selected-color);
-  --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
-  --tab-selected-color: var(--body-color);
-  --tab-standard-color: rgba(0, 0, 0, 0.5);
-  --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
-  --tab-bgcolor: var(--theme-base-90); /* bg tabs */
+  /* Migration note: removed from this document; added to packages/replay-next/pages/variables.css */
 
   /* Timeline (Light) */
   --progressbar-preview-max: var(--theme-base-85);
@@ -448,13 +441,8 @@
   --tooltip-color: #fff;
   --tooltip-bgcolor: var(--theme-base-85);
 
-  /* Tabs (Dark) */
-  --tab-bgcolor: var(--theme-base-100);
-  --tab-color: var(--theme-base-40);
-  --tab-hover-bgcolor: var(--theme-base-85);
-  --tab-hover-color: var(--tab-selected-color);
-  --tab-selected-bgcolor: var(--theme-base-95);
-  --tab-selected-color: #fff;
+  /* Tabs (Light) */
+  /* Migration note: removed from this document; added to packages/replay-next/pages/variables.css */
 
   /* Timeline (Dark) */
   --progressbar-preview-max: var(--theme-base-70);
