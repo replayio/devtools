@@ -23,12 +23,17 @@
 :root.theme-dark {
   --color-transparent: rgba(0, 0, 0, 0);
 
-  --scroll-thumb-color: #454950;
+  /* Color ramp: this is copy/pasted to align to src/devtools/client/themes/variables.css */
+  --theme-base-100: #000; /* background chrome */
+  --theme-base-95: #192230; /* tab bars */
+  --theme-base-90: #3d4552; /* editor and selected tab */
+  --theme-base-85: #3e434b; /* textfields */
+  --theme-base-80: #797d81;
+  --theme-base-70: #a2a6a8;
+  --theme-base-60: #c3c6c8;
 
-  --nag-background-color: #ff005b;
-  --nag-gradient-color-begin: #ff2f86;
-  --nag-gradient-color-end: #eb265e;
-  --nag-color: #ffffff;
+  --scroll-thumb-color: #454950;
+  --dropshadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 
   --background-color-contrast-1: #0e1119;
   --background-color-contrast-2: #192230;
@@ -93,11 +98,17 @@
   --color-control-background: var(--background-color-contrast-4);
   --color-control-background-active: var(--background-color-primary-button);
 
+  --nag-background-color: #ff005b;
+  --nag-gradient-color-begin: #ff2f86;
+  --nag-gradient-color-end: #eb265e;
+  --nag-color: #ffffff;
+
   --collapsible-toggle-color: #9ba0a5;
 
   --context-menu-bgcolor: #3d4552;
   --context-menu-bgcolor-divider: var(--background-color-contrast-3);
-  --context-menu-bgcolor-hover: var(--background-color-contrast-3);
+  --context-menu-bgcolor-hover: var(--theme-base-95);
+  --context-menu-dropshadow: var(--dropshadow);
 
   --comment-card-source-preview-background-color: #081221;
   --comment-card-source-preview-background-color-hover: #3e434a;
@@ -199,12 +210,17 @@
 :root.theme-light {
   --color-transparent: rgba(255, 255, 255, 0);
 
-  --scroll-thumb-color: #aaaaaa;
+  /* Color ramp: this is copy/pasted to align to src/devtools/client/themes/variables.css */
+  --theme-base-100: hsl(0, 0%, 100%);
+  --theme-base-95: hsl(0, 0%, 95%);
+  --theme-base-90: hsl(0, 0%, 90%);
+  --theme-base-85: hsl(0, 0%, 85%);
+  --theme-base-80: hsl(0, 0%, 80%);
+  --theme-base-70: hsl(0, 0%, 70%);
+  --theme-base-60: hsl(0, 0%, 60%);
 
-  --nag-background-color: #f02d5e;
-  --nag-gradient-color-begin: #ff3087;
-  --nag-gradient-color-end: #ed265c;
-  --nag-color: #ffffff;
+  --scroll-thumb-color: #aaaaaa;
+  --dropshadow: 0 4px 6px -1px rgb(100 100 255 / 0.7), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 
   --background-color-contrast-1: #e6e6e6;
   --background-color-contrast-2: #ffffff;
@@ -269,11 +285,17 @@
   --color-control-background: var(--background-color-contrast-1);
   --color-control-background-active: var(--background-color-primary-button);
 
+  --nag-background-color: #f02d5e;
+  --nag-gradient-color-begin: #ff3087;
+  --nag-gradient-color-end: #ed265c;
+  --nag-color: #ffffff;
+
   --collapsible-toggle-color: #868688;
 
   --context-menu-bgcolor: #f8f8f9;
   --context-menu-bgcolor-divider: #e0e0e0;
-  --context-menu-bgcolor-hover: #e0e0e0;
+  --context-menu-bgcolor-hover: var(--theme-base-95);
+  --context-menu-dropshadow: var(--dropshadow);
 
   --comment-card-source-preview-background-color: #f2f3f2;
   --comment-card-source-preview-background-color-hover: #e6e6e6;

@@ -5,6 +5,7 @@
   border-radius: 0.5rem;
   overflow: hidden;
   white-space: nowrap;
+  box-shadow: var(--dropshadow-md);
 
   /* Ensure the context menu is always above console rows and the current time indicator */
   z-index: 11;
