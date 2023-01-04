@@ -13,6 +13,8 @@ import { getDuration } from "../utils";
 function Title({ testRun }: { testRun: TestRun }) {
   const title = testRun?.commitTitle;
 
+  boop;
+
   return (
     <div className="flex flex-row items-center space-x-2 overflow-hidden">
       <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-medium">
