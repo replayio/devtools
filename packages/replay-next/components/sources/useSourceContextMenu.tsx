@@ -1,6 +1,8 @@
 import { SourceId } from "@replayio/protocol";
 import { unstable_useCacheRefresh as useCacheRefresh, useContext, useTransition } from "react";
 
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+
 import ContextMenuDivider from "replay-next/components/context-menu/ContextMenuDivider";
 import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
 import useContextMenu from "replay-next/components/context-menu/useContextMenu";
@@ -15,15 +17,12 @@ import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { addComment as addCommentGraphQL } from "replay-next/src/graphql/Comments";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 export default function useSourceContextMenu({
-  firstBreakableColumnIndex,
   lineNumber,
   sourceId,
   sourceUrl,
 }: {
-  firstBreakableColumnIndex: number | null;
   lineNumber: number;
   sourceId: SourceId;
   sourceUrl: string | null;
