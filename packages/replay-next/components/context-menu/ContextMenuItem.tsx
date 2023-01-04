@@ -1,8 +1,8 @@
 import { MouseEvent, ReactNode, useContext } from "react";
 
-import styles from "./ContextMenuItem.module.css";
-
 import { ContextMenuContext } from "replay-next/components/context-menu/ContextMenuContext";
+
+import styles from "./ContextMenuItem.module.css";
 
 export default function ContextMenuItem({
   children,

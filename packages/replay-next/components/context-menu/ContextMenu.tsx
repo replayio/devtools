@@ -1,9 +1,9 @@
 import { ReactNode, useRef } from "react";
 import { createPortal } from "react-dom";
 
-import styles from "./ContextMenu.module.css";
-
 import useModalDismissSignal from "replay-next/src/hooks/useModalDismissSignal";
+
+import styles from "./ContextMenu.module.css";
 
 export default function ContextMenu({
   children,
