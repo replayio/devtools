@@ -34,9 +34,10 @@
 
   --scroll-thumb-color: #454950;
   --dropshadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --body-bgcolor: var(--theme-base-95);
 
   --background-color-contrast-1: #0e1119;
-  --background-color-contrast-2: #192230;
+  --background-color-contrast-2: fuchsia;
   --background-color-contrast-3: #2a3343;
   --background-color-contrast-4: #454950;
   --background-color-contrast-5: #e1e6ed;
@@ -221,9 +222,10 @@
 
   --scroll-thumb-color: #aaaaaa;
   --dropshadow: 0 4px 6px -1px rgb(100 100 255 / 0.7), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --body-bgcolor: var(--theme-base-100); /* bg text */
 
   --background-color-contrast-1: #e6e6e6;
-  --background-color-contrast-2: #ffffff;
+  --background-color-contrast-2: fuchsia;
   --background-color-contrast-3: #82888c;
   --background-color-contrast-4: #223344;
   --background-color-contrast-5: #081121;
