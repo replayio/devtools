@@ -2,8 +2,6 @@ import { Object as ProtocolObject } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
 import React, { createContext, useContext, useMemo, useState } from "react";
 
-import ErrorBoundary from "replay-next/components/ErrorBoundary";
-import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
 import { getSelectedTest } from "ui/reducers/reporter";
 import { useAppSelector } from "ui/setup/hooks";
 import { TestItem } from "ui/types";
@@ -11,6 +9,9 @@ import { TestItem } from "ui/types";
 import ContextMenuWrapper from "./ContextMenu";
 import { TestCase } from "./TestCase";
 import { TestInfoContextMenuContextRoot } from "./TestInfoContextMenuContext";
+
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
 
 type TestInfoContextType = {
   consoleProps?: ProtocolObject;
@@ -39,7 +40,7 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
     >
       <TestInfoContextMenuContextRoot>
         <div className="flex flex-grow flex-col overflow-hidden">
-          <div className="relative flex flex-grow flex-col space-y-1 overflow-auto px-2">
+          <div className="relative flex flex-grow flex-col space-y-1 overflow-auto px-2 pt-3">
             {testCases.map((t, i) => showTest(i) && <TestCase test={t} key={i} index={i} />)}
           </div>
           {selectedTest !== null ? <Console /> : null}
