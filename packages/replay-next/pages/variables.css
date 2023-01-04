@@ -32,6 +32,9 @@
   --theme-base-70: #a2a6a8;
   --theme-base-60: #c3c6c8;
 
+  --scroll-thumb-color: #454950;
+  --dropshadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+
   --background-color-contrast-1: #0e1119;
   --background-color-contrast-2: #192230;
   --background-color-contrast-3: #2a3343;
@@ -95,8 +98,6 @@
   --color-control-background: var(--background-color-contrast-4);
   --color-control-background-active: var(--background-color-primary-button);
 
-  --scroll-thumb-color: #454950;
-
   --nag-background-color: #ff005b;
   --nag-gradient-color-begin: #ff2f86;
   --nag-gradient-color-end: #eb265e;
@@ -108,7 +109,6 @@
   --context-menu-bgcolor-divider: var(--background-color-contrast-3);
   --context-menu-bgcolor-hover: var(--theme-base-95);
   --context-menu-dropshadow: var(--dropshadow-md);
-  --dropshadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 
   --comment-card-source-preview-background-color: #081221;
   --comment-card-source-preview-background-color-hover: #3e434a;
@@ -219,6 +219,9 @@
   --theme-base-70: hsl(0, 0%, 70%);
   --theme-base-60: hsl(0, 0%, 60%);
 
+  --scroll-thumb-color: #aaaaaa;
+  --dropshadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+
   --background-color-contrast-1: #e6e6e6;
   --background-color-contrast-2: #ffffff;
   --background-color-contrast-3: #82888c;
@@ -281,8 +284,6 @@
   --color-secondary-background: #eeeeee;
   --color-control-background: var(--background-color-contrast-1);
   --color-control-background-active: var(--background-color-primary-button);
-
-  --scroll-thumb-color: #aaaaaa;
 
   --nag-background-color: #f02d5e;
   --nag-gradient-color-begin: #ff3087;
