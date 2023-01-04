@@ -23,6 +23,15 @@
 :root.theme-dark {
   --color-transparent: rgba(0, 0, 0, 0);
 
+  /* Color ramp: this is copy/pasted to align to src/devtools/client/themes/variables.css */
+  --theme-base-100: #000; /* background chrome */
+  --theme-base-95: #192230; /* tab bars */
+  --theme-base-90: #3d4552; /* editor and selected tab */
+  --theme-base-85: #3e434b; /* textfields */
+  --theme-base-80: #797d81;
+  --theme-base-70: #a2a6a8;
+  --theme-base-60: #c3c6c8;
+
   --background-color-contrast-1: #0e1119;
   --background-color-contrast-2: #192230;
   --background-color-contrast-3: #2a3343;
@@ -97,7 +106,9 @@
 
   --context-menu-bgcolor: #3d4552;
   --context-menu-bgcolor-divider: var(--background-color-contrast-3);
-  --context-menu-bgcolor-hover: #f2f2f2; /* this is theme-base-95 */
+  --context-menu-bgcolor-hover: var(--theme-base-95);
+  --context-menu-dropshadow: var(--dropshadow-md);
+  --dropshadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 
   --comment-card-source-preview-background-color: #081221;
   --comment-card-source-preview-background-color-hover: #3e434a;
@@ -199,6 +210,15 @@
 :root.theme-light {
   --color-transparent: rgba(255, 255, 255, 0);
 
+  /* Color ramp: this is copy/pasted to align to src/devtools/client/themes/variables.css */
+  --theme-base-100: hsl(0, 0%, 100%);
+  --theme-base-95: hsl(0, 0%, 95%);
+  --theme-base-90: hsl(0, 0%, 90%);
+  --theme-base-85: hsl(0, 0%, 85%);
+  --theme-base-80: hsl(0, 0%, 80%);
+  --theme-base-70: hsl(0, 0%, 70%);
+  --theme-base-60: hsl(0, 0%, 60%);
+
   --background-color-contrast-1: #e6e6e6;
   --background-color-contrast-2: #ffffff;
   --background-color-contrast-3: #82888c;
@@ -273,7 +293,8 @@
 
   --context-menu-bgcolor: #f8f8f9;
   --context-menu-bgcolor-divider: #e0e0e0;
-  --context-menu-bgcolor-hover: #192230; /* this is theme-base-95 */
+  --context-menu-bgcolor-hover: var(--theme-base-95);
+  --context-menu-dropshadow: var(--dropshadow-md);
 
   --comment-card-source-preview-background-color: #f2f3f2;
   --comment-card-source-preview-background-color-hover: #e6e6e6;
