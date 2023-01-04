@@ -33,14 +33,6 @@ function mutateWindowForSetup() {
   delete window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 }
 
-function readWindow() {
-  return JSON.stringify(window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
-}
-
-function readRenderers() {
-  return JSON.stringify({ renderers: window.__REACT_DEVTOOLS_SAVED_RENDERERS__ });
-}
-
 function getMessages() {
   // Get the log messages for debugging
   return JSON.stringify({ messages: window.evaluationLogs });
@@ -129,6 +121,4 @@ export async function injectReactDevtoolsBackend(
   });
 
   await evaluateNoArgsFunction(ThreadFront, replayClient, injectExistingRenderers);
-
-  await logWindowMessages(ThreadFront, replayClient);
 }
