@@ -12,6 +12,7 @@ import {
   analysisPoints,
   analysisResult,
 } from "@replayio/protocol";
+import { captureException } from "@sentry/react";
 
 import { commandError } from "shared/utils/error";
 
@@ -196,6 +197,7 @@ export async function sendMessage<M extends CommandMethods>(
 ): Promise<CommandResult<M>> {
   const id = gNextMessageId++;
   const msg: CommandRequest = { id, method, params, pauseId, sessionId };
+  const callerStackTrace = new Error(`Caller stacktrace for ${method}`);
 
   if (gSocketOpen) {
     doSend(msg);
@@ -224,6 +226,7 @@ export async function sendMessage<M extends CommandMethods>(
       // _just_ "Internal Error" or similar
       finalMessage = `${message} (request: ${method}, ${JSON.stringify(params)})`;
     }
+    captureException(callerStackTrace, { extra: { code, message, params } });
     throw commandError(finalMessage, code);
   }
 
