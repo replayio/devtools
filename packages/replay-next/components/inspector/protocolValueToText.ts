@@ -10,7 +10,10 @@ import { errorProtocolObjectToString } from "replay-next/components/inspector/va
 import { functionProtocolObjectToString } from "replay-next/components/inspector/values/FunctionRenderer";
 import { regExpProtocolObjectToString } from "replay-next/components/inspector/values/RegExpRenderer";
 import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
-import { protocolValueToClientValue } from "replay-next/src/utils/protocol";
+import {
+  filterNonEnumerableProperties,
+  protocolValueToClientValue,
+} from "replay-next/src/utils/protocol";
 import { ReplayClientInterface } from "shared/client/types";
 
 const MAX_DEPTH_TO_COPY = 5;
@@ -95,12 +98,53 @@ async function protocolValueToTextHelper(
                 break;
               }
               case "html-element": {
-                // TODO [FE-989]
-                console.log("TODO [FE-989]", object);
+                const {
+                  attributes,
+                  childNodes = [],
+                  nodeName = "unknown",
+                } = object.preview?.node ?? {};
+
+                const tagName = nodeName.toLowerCase();
+                const properties = filterNonEnumerableProperties(attributes ?? []);
+
+                const mappedChildren = [];
+                for (let i = 0; i < childNodes.length; i++) {
+                  const childNodeId = childNodes[i];
+                  const protocolValue = { object: childNodeId };
+                  mappedChildren.push(
+                    await protocolValueToTextHelper(
+                      client,
+                      protocolValue,
+                      pauseId,
+                      objectIdSet,
+                      depth + 1,
+                      false
+                    )
+                  );
+                }
+
+                const mappedAttributes = [];
+                if (properties.length > 0) {
+                  for (const property of properties) {
+                    const clientValue = protocolValueToClientValue(pauseId, property);
+
+                    mappedAttributes.push(`${clientValue.name}="${clientValue.preview ?? ""}"`);
+                  }
+                }
+
+                const openTag =
+                  mappedAttributes.length > 0
+                    ? `<${tagName} ${mappedAttributes.join(" ")}`
+                    : `<${tagName}`;
+
+                valueToCopy =
+                  mappedChildren.length > 0
+                    ? `${openTag}>${mappedChildren.join(" ")}</${tagName}>`
+                    : `${openTag} />`;
                 break;
               }
               case "html-text": {
-                valueToCopy = JSON.stringify(object.preview.node?.nodeValue);
+                valueToCopy = object.preview.node?.nodeValue ?? "";
                 break;
               }
               case "map": {
