@@ -219,6 +219,40 @@
 
   /*
   Migration notes:
+    * things below this point were removed from other files
+  */
+
+  /* src/devtools/client/debugger/src/components/SecondaryPanes/FrameTimeline.css */
+  --progress-playing-background: #2d4a65;
+  --progressbar-background: var(--theme-base-90);
+  --replay-head-background: var(--theme-highlight-purple);
+  --progressbar-unfocused-background: #8fa7be;
+
+  /* src/devtools/client/debugger/src/components/Editor/Breakpoints/Breakpoints.css */
+  --gutter-hover-background-color: #414141;
+
+  /* src/devtools/client/themes/tooltips.css */
+  --bezier-diagonal-color: #eee;
+  --bezier-grid-color: rgba(0, 0, 0, 0.2);
+
+  --theme-tooltip-color: var(--theme-text-color-strong);
+  --theme-tooltip-background: var(--theme-popup-background);
+  --theme-tooltip-shadow: rgba(25, 25, 25, 0.76);
+
+  --theme-arrowpanel-background: var(--theme-popup-background);
+  --theme-arrowpanel-color: var(--theme-popup-color);
+  --theme-arrowpanel-border-color: var(--theme-popup-border-color);
+  --theme-arrowpanel-separator: rgba(249, 249, 250, 0.1);
+  --theme-arrowpanel-dimmed: var(--theme-popup-dimmed);
+  --theme-arrowpanel-dimmed-further: rgba(249, 249, 250, 0.15);
+  --theme-arrowpanel-disabled-color: rgba(249, 249, 250, 0.5);
+
+  /* src/devtools/client/themes/splitview.css */
+  --sidemenu-selected-arrow: url(images/item-arrow-dark-ltr.svg);
+  --sidemenu-selected-arrow-rtl: url(images/item-arrow-dark-rtl.svg);
+
+  /*
+  Migration notes:
     * removed from src/devtools/client/themes/variables.css
     * things below this point are not organized yet
   */
@@ -531,6 +565,40 @@
   --token-variableName-color: #8d1bdc;
   --token-variableName2-color: #8d1bdc;
   --inspectable-token-hover-background-color: #ffffaa;
+
+  /*
+  Migration notes:
+    * things below this point were removed from other files
+  */
+
+  /* src/devtools/client/debugger/src/components/SecondaryPanes/FrameTimeline.css */
+  --progress-playing-background: red;
+  --progressbar-background: var(--theme-base-100);
+  --replay-head-background: var(--purple-50);
+  --progressbar-unfocused-background: var(--theme-base-70);
+
+  /* src/devtools/client/debugger/src/components/Editor/Breakpoints/Breakpoints.css */
+  --gutter-hover-background-color: #dde1e4;
+
+  /* src/devtools/client/themes/tooltips.css */
+  --bezier-diagonal-color: #eee;
+  --bezier-grid-color: rgba(0, 0, 0, 0.2);
+
+  --theme-tooltip-color: var(--theme-text-color-strong);
+  --theme-tooltip-background: var(--theme-popup-background);
+  --theme-tooltip-shadow: rgba(25, 25, 25, 0.76);
+
+  --theme-arrowpanel-background: var(--theme-popup-background);
+  --theme-arrowpanel-color: var(--theme-popup-color);
+  --theme-arrowpanel-border-color: var(--theme-popup-border-color);
+  --theme-arrowpanel-separator: rgba(249, 249, 250, 0.1);
+  --theme-arrowpanel-dimmed: var(--theme-popup-dimmed);
+  --theme-arrowpanel-dimmed-further: rgba(249, 249, 250, 0.15);
+  --theme-arrowpanel-disabled-color: rgba(249, 249, 250, 0.5);
+
+  /* src/devtools/client/themes/splitview.css */
+  --sidemenu-selected-arrow: url(images/item-arrow-ltr.svg);
+  --sidemenu-selected-arrow-rtl: url(images/item-arrow-rtl.svg);
 
   /*
   Migration notes:
