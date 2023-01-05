@@ -23,7 +23,8 @@
 :root.theme-dark {
   --color-transparent: rgba(0, 0, 0, 0);
 
-  /* Color ramp: this is copy/pasted to align to src/devtools/client/themes/variables.css */
+  /* Color ramp (Dark) */
+  /* Migration note: copy/pasted with src/devtools/client/themes/variables.css */
   --theme-base-100: #000; /* background chrome */
   --theme-base-95: #192230; /* tab bars */
   --theme-base-90: #3d4552; /* editor and selected tab */
@@ -31,6 +32,15 @@
   --theme-base-80: #797d81;
   --theme-base-70: #a2a6a8;
   --theme-base-60: #c3c6c8;
+
+  /* Tabs (Dark) */
+  /* Migration note: removed from src/devtools/client/themes/variables.css */
+  --tab-bgcolor: var(--theme-base-100);
+  --tab-color: var(--theme-base-40);
+  --tab-hover-bgcolor: var(--theme-base-85);
+  --tab-hover-color: var(--tab-selected-color);
+  --tab-selected-bgcolor: var(--theme-base-95);
+  --tab-selected-color: #fff;
 
   --scroll-thumb-color: #454950;
   --dropshadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -210,7 +220,8 @@
 :root.theme-light {
   --color-transparent: rgba(255, 255, 255, 0);
 
-  /* Color ramp: this is copy/pasted to align to src/devtools/client/themes/variables.css */
+  /* Tabs (Light) */
+  /* Migration note: removed from src/devtools/client/themes/variables.css */
   --theme-base-100: hsl(0, 0%, 100%);
   --theme-base-95: hsl(0, 0%, 95%);
   --theme-base-90: hsl(0, 0%, 90%);
@@ -218,6 +229,18 @@
   --theme-base-80: hsl(0, 0%, 80%);
   --theme-base-70: hsl(0, 0%, 70%);
   --theme-base-60: hsl(0, 0%, 60%);
+
+  /* Tabs (Light) */
+  /* Migration note: removed from src/devtools/client/themes/variables.css */
+  --tab-bgcolor: var(--theme-base-90);
+  --tab-color: var(--theme-base-40);
+  --tab-hover-bgcolor: var(--theme-base-85);
+  --tab-hover-color: var(--tab-selected-color);
+  --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
+  --tab-selected-color: var(--body-color);
+  --tab-standard-color: rgba(0, 0, 0, 0.5);
+  --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
+  --tab-bgcolor: var(--theme-base-90); /* bg tabs */
 
   --scroll-thumb-color: #aaaaaa;
   --dropshadow: 0 4px 6px -1px rgb(100 100 255 / 0.7), 0 2px 4px -2px rgb(0 0 0 / 0.1);
