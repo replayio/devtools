@@ -1,4 +1,5 @@
 import { Locator, Page, test } from "@playwright/test";
+import { readSync, writeSync } from "clipboardy";
 
 import {
   findContextMenuItem,
@@ -18,8 +19,6 @@ import {
 } from "./utils/console";
 import { getTestUrl, waitFor } from "./utils/general";
 import testSetup from "./utils/testSetup";
-
-import { readSync, writeSync } from "clipboardy";
 
 testSetup("ee4da15f-5d86-4629-8356-c673b5e711b0");
 
