@@ -216,6 +216,120 @@
   --token-variableName-color: #58e0ff;
   --token-variableName2-color: #58e0ff;
   --inspectable-token-hover-background-color: #484731;
+
+  /*
+  Migration notes:
+    * removed from src/devtools/client/themes/variables.css
+    * things below this point are not organized yet
+  */
+
+  /* Timeline (Dark) */
+  --progressbar-preview-max: var(--theme-base-70);
+  --progressbar-preview-min: var(--primary-accent);
+
+  /* Menus (Dark) */
+  --menu-bgcolor: var(--theme-base-90);
+  --menu-color: var(--body-color);
+  --menu-hover-bgcolor: var(--theme-base-95);
+  --menu-hover-color: white;
+  --theme-menu-highlight: var(--theme-text-field-bgcolor);
+
+  /* Code Mirror (Dark) */
+  --cm-linenumber: var(--grey-40);
+  --cm-keyword: #ff42a8;
+  --cm-def: #fff;
+  --cm-string: #01acfd;
+  --cm-variable: #58e0ff;
+  --cm-number: yellow;
+  --cm-property: #ff98eb;
+  --cm-atom: #fff;
+  --caret-color: #fff;
+  --debug-line-border: var(--theme-base-85);
+  --debug-line-background: var(--theme-base-100);
+  --gutter-hit-count-background: #081121;
+  --gutter-hit-count-foreground: #6a717e;
+  --line-hit-background-color-1: #2563be25;
+  --line-hit-background-color-2: #6ba6ff25;
+  --line-hit-background-color-3: #baecfa25;
+  --line-hit-border-color-0: #445064;
+  --line-hit-border-color-1: #2563be;
+  --line-hit-border-color-2: #6ba6ff;
+  --line-hit-border-color-3: #baecfa;
+  --line-hit-color: #a4c6f8;
+
+  /* Breakpoints (Dark) */
+  --breakpoint-arrow-disabled: var(--theme-base-80);
+  --breakpoint-arrow: var(--theme-base-60);
+  --breakpoint-editfield-active: var(--console-message-background);
+  --breakpoint-editfield-hover: var(--console-message-background);
+  --breakpoint-status-bg: var(--theme-base-90);
+  --breakpoint-status: var(--body-color);
+  --breakpoint-tip: #fff;
+  --breakpoint-label: var(--cm-string);
+
+  /* Testsuites (Dark) */
+  --testsuites-error-bgcolor: #770702;
+  --testsuites-error-bgcolor-hover: #7a1712;
+  --testsuites-error-color: white;
+  --testsuites-steps-bgcolor: var(--theme-base-100);
+
+  /* To organise (Dark) */
+  --jellyfish-bgcolor: rgba(40, 40, 40, 0.8);
+  --timejump-text: var(--buttontext-color);
+  --theme-console-input-bgcolor: var(--theme-base-95);
+  --theme-toggle-handle-bgcolor: var(--theme-base-100);
+  --theme-toggle-handle-bgcolor-hover: #005f92;
+  --theme-toggle-bgcolor: var(--theme-base-85);
+  --theme-toggle-color: white;
+  --toolbarbutton-focus-bgcolor: var(--theme-toggle-bgcolor);
+  --toolbox-bgcolor: var(--theme-base-100);
+  --unloaded-region-img: url("/images/dotted-mask-dark.svg");
+  --title-hover-bgcolor: var(--theme-toggle-bgcolor);
+
+  /* Toolbar */
+  --theme-toolbar-panel-icon-color: var(--icon-color);
+  --theme-tab-toolbar-background: var(--grey-90);
+  --theme-toolbar-background: #18181a;
+  --theme-toolbar-color: var(--body-color);
+  --theme-toolbar-selected-color: white;
+  --theme-toolbar-highlighted-color: var(--green-50);
+  --theme-toolbar-background-hover: #232327;
+  --theme-toolbar-background-alt: var(--grey-85);
+  --theme-toolbar-hover: #232327;
+  --theme-toolbar-hover-active: #252526;
+  --theme-toolbar-separator: var(--grey-10-a20);
+
+  /* Toolbar buttons */
+  --toolbarbutton-background: var(--grey-70);
+  --toolbarbutton-hover-background: var(--grey-70);
+
+  /* Buttons */
+  --theme-button-background: rgba(249, 249, 250, 0.1);
+  --theme-button-active-background: rgba(249, 249, 250, 0.15);
+
+  /* Accordion headers */
+  --theme-accordion-header-background: #232327;
+  --theme-accordion-header-hover: #2a2a2e;
+
+  /* Selection */
+  --theme-selection-background: var(--primary-accent);
+  --theme-selection-background-hover: #353b48;
+  --theme-selection-focus-background: var(--grey-60);
+  --theme-selection-focus-color: var(--grey-30);
+  --theme-selection-color: #ffffff;
+
+  /* Border color that splits the toolbars/panels/headers. */
+  --theme-splitter-color: black;
+  --theme-emphasized-splitter-color: var(--grey-60);
+  --theme-emphasized-splitter-color-hover: var(--grey-50);
+
+  /* Icon colors */
+  --theme-icon-color: rgba(249, 249, 250, 0.7);
+  --theme-icon-hover-color: #fff;
+  --theme-icon-dimmed-color: rgba(147, 147, 149, 0.9);
+  --theme-icon-checked-color: var(--blue-30);
+  --theme-icon-error-color: var(--red-40);
+  --theme-icon-warning-color: var(--yellow-60);
 }
 
 :root.theme-light {
@@ -417,4 +531,103 @@
   --token-variableName-color: #8d1bdc;
   --token-variableName2-color: #8d1bdc;
   --inspectable-token-hover-background-color: #ffffaa;
+
+  /*
+  Migration notes:
+    * removed from src/devtools/client/themes/variables.css
+    * things below this point are not organized yet
+  */
+
+  /* Timeline (Light) */
+  --progressbar-preview-max: var(--theme-base-85);
+  --progressbar-preview-min: var(--primary-accent);
+
+  /* Menus (Light) */
+  --menu-bgcolor: var(--theme-toolbar-background);
+  --menu-color: var(--body-color);
+  --menu-hover-bgcolor: var(--theme-base-95);
+  --menu-hover-color: #000;
+  --theme-menu-highlight: #f3f4f6;
+
+  /* Code Mirror (Light) */
+  --cm-linenumber: var(--grey-80);
+  --cm-keyword: #dd00a9;
+  --cm-variable: #8000d7;
+  --cm-def: #3172e0;
+  --cm-string: #0842a4;
+  --cm-number: #18181a;
+  --caret-color: #18181a;
+  --debug-line-border: var(--primary-accent);
+  --debug-line-background: #e8f5fb;
+  --gutter-hit-count-background: #f3f4f6;
+  --gutter-hit-count-foreground: #aeaeae;
+  --line-hit-background-color-1: #bbeafa25;
+  --line-hit-background-color-2: #69a6ff25;
+  --line-hit-background-color-3: #2979ef25;
+  --line-hit-border-color-0: #d9dad9;
+  --line-hit-border-color-1: #bbeafa;
+  --line-hit-border-color-2: #69a6ff;
+  --line-hit-border-color-3: #2979ef;
+  --line-hit-color: #47628b;
+
+  /* Breakpoints (Light) */
+  --breakpoint-arrow-disabled: var(--theme-base-90);
+  --breakpoint-arrow: var(--theme-base-60);
+  --breakpoint-editfield-active: var(--theme-base-100);
+  --breakpoint-editfield-hover: var(--theme-base-100);
+  --breakpoint-status-bg: var(--theme-base-90);
+  --breakpoint-status: var(--body-color);
+  --breakpoint-tip: var(--theme-highlight-purple);
+  --breakpoint-label: var(--cm-string);
+
+  /* Testsuites (Light) */
+  --testsuites-error-bgcolor: #ffe9e9;
+  --testsuites-error-bgcolor-hover: #ffe0e0;
+  --testsuites-error-color: #eb5757;
+  --testsuites-steps-bgcolor: #fafafa;
+
+  /* Toolbar */
+  --theme-tab-toolbar-background: var(--grey-20);
+  --theme-toolbar-background: var(--grey-10);
+  --theme-toolbar-color: var(--body-color);
+  --theme-toolbar-selected-color: var(--body-color);
+  --theme-toolbar-panel-icon-color: #bcbcbc;
+  --theme-toolbar-highlighted-color: var(--green-60);
+  --theme-toolbar-background-hover: rgba(221, 225, 228, 0.66);
+  --theme-toolbar-background-alt: #f5f5f5;
+
+  --theme-toolbar-hover-active: var(--grey-20);
+  --theme-toolbar-separator: var(--grey-90-a10);
+
+  /* Toolbar buttons */
+  --toolbarbutton-background: var(--theme-toolbar-background);
+  --toolbarbutton-hover-background: var(--theme-toolbar-hover);
+
+  /* Buttons */
+  --theme-button-background: rgba(12, 12, 13, 0.05);
+  --theme-button-active-background: rgba(12, 12, 13, 0.1);
+
+  /* Accordion headers */
+  --theme-accordion-header-background: var(--theme-toolbar-background);
+  --theme-accordion-header-hover: var(--theme-toolbar-hover);
+
+  /* Selection */
+  --theme-selection-background: var(--primary-accent);
+  --theme-selection-background-hover: #f0f9fe;
+  --theme-selection-focus-background: var(--toolbarbutton-hover-background);
+  --theme-selection-focus-color: var(--grey-70);
+  --theme-selection-color: #ffffff;
+
+  /* Border color that splits the toolbars/panels/headers. */
+  --theme-splitter-color: var(--grey-25);
+  --theme-emphasized-splitter-color: var(--grey-30);
+  --theme-emphasized-splitter-color-hover: var(--grey-40);
+
+  /* Icon colors */
+  --theme-icon-color: rgba(12, 12, 13, 0.8);
+  --theme-icon-hover-color: #000;
+  --theme-icon-dimmed-color: rgba(135, 135, 137, 0.9);
+  --theme-icon-checked-color: var(--blue-60);
+  --theme-icon-error-color: var(--red-60);
+  --theme-icon-warning-color: var(--yellow-65);
 }
