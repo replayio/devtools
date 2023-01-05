@@ -4,7 +4,7 @@ import { LaunchBrowser } from "ui/components/shared/LaunchBrowserModal";
 import { BubbleViewportWrapper } from "ui/components/shared/Viewport";
 
 const BrowserAuth = () => {
-  const library = "replay:library";
+  const library = "replay:open";
 
   return (
     <BubbleViewportWrapper>
