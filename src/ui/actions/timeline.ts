@@ -68,6 +68,8 @@ const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
 const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
 export const MAX_FOCUS_REGION_DURATION = 60_000;
 
+console.log("random string");
+
 export async function setupTimeline(store: UIStore) {
   const dispatch = store.dispatch;
 
