@@ -74,7 +74,7 @@
 }
 
 .LineNumber {
-  background-color: var(--background-color-contrast-2);
+  background-color: var(--body-bgcolor);
   height: var(--line-height);
   width: calc(var(--line-number-size) + 2ch);
   display: flex;
