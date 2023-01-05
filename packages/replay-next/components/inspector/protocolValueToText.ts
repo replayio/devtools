@@ -4,61 +4,93 @@ import {
   Value as ProtocolValue,
 } from "@replayio/protocol";
 
+import { ReplayClientInterface } from "shared/client/types";
+
 import { dateProtocolObjectToString } from "replay-next/components/inspector/values/DateRenderer";
 import { errorProtocolObjectToString } from "replay-next/components/inspector/values/ErrorRenderer";
 import { regExpProtocolObjectToString } from "replay-next/components/inspector/values/RegExpRenderer";
 import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
 import { protocolValueToClientValue } from "replay-next/src/utils/protocol";
-import { ReplayClientInterface } from "shared/client/types";
+import { functionProtocolObjectToString } from "replay-next/components/inspector/values/FunctionRenderer";
 
 export default async function protocolValueToText(
   client: ReplayClientInterface,
   protocolValue: ProtocolValue | ProtocolNamedValue,
-  pauseId: PauseId
+  pauseId: PauseId,
+  depth: number = 0
 ): Promise<string | null> {
   const clientValue = protocolValueToClientValue(pauseId, protocolValue);
 
-  if (clientValue.objectId) {
-    let valueToCopy: string | null = null;
+  let nameToCopy: string | null = null;
+  let valueToCopy: string | null = null;
 
+  if (depth > 0) {
+    if (isProtocolNamedValue(protocolValue)) {
+      nameToCopy = protocolValue.name;
+    }
+  }
+
+  if (clientValue.objectId) {
     const object = await getObjectWithPreviewHelper(client, pauseId, clientValue.objectId);
-    if (object) {
+    if (object && object.preview) {
       switch (clientValue.type) {
-        case "array":
-          console.log("TODO [FE-989]", object);
-          break;
-        case "date":
+        case "date": {
           valueToCopy = dateProtocolObjectToString(object);
           break;
-        case "error":
+        }
+        case "error": {
           valueToCopy = errorProtocolObjectToString(object);
           break;
-        case "function":
-          // Nothing meaningful to copy
+        }
+        case "function": {
+          valueToCopy = functionProtocolObjectToString(object);
           break;
-        case "html-element":
-        case "html-text":
-          console.log("TODO [FE-989]", object);
-          break;
-        case "map":
-          console.log("TODO [FE-989]", object);
-          break;
-        case "regexp":
+        }
+        case "regexp": {
           valueToCopy = regExpProtocolObjectToString(object);
           break;
-        case "set":
-          console.log("TODO [FE-989]", object);
+        }
+        default: {
+          const properties = object.preview.properties ?? [];
+          const mappedValues = await Promise.all(
+            properties.map(property => protocolValueToText(client, property, pauseId, depth + 1))
+          );
+
+          switch (clientValue.type) {
+            case "array":
+              valueToCopy = `[${mappedValues.join(", ")}]`;
+              break;
+            case "html-element":
+            case "html-text":
+              console.log("TODO [FE-989]", object);
+              break;
+            case "map":
+              valueToCopy = `Map([${mappedValues.join(", ")}])`;
+              break;
+            case "object":
+              valueToCopy = `{${mappedValues.join(", ")}}`;
+              break;
+            case "set":
+              valueToCopy = `Set(${mappedValues.join(", ")})`;
+              break;
+          }
           break;
-        case "object":
-          console.log("TODO [FE-989]", object);
-          break;
+        }
       }
     }
-
-    return valueToCopy;
   } else if (clientValue.preview) {
-    return clientValue.preview;
-  } else {
-    return null;
+    valueToCopy = clientValue.preview;
   }
+
+  if (nameToCopy) {
+    return `"${nameToCopy}": ${JSON.stringify(valueToCopy) ?? "undefined"}`;
+  } else {
+    return valueToCopy;
+  }
+}
+
+function isProtocolNamedValue(
+  value: ProtocolNamedValue | ProtocolValue
+): value is ProtocolNamedValue {
+  return value.hasOwnProperty("name");
 }

@@ -1,10 +1,11 @@
+import { Object as ProtocolObject } from "@replayio/protocol";
 import { MouseEvent, useContext } from "react";
-
-import Icon from "replay-next/components/Icon";
-import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 
 import { ObjectPreviewRendererProps } from "./types";
 import styles from "./shared.module.css";
+
+import Icon from "replay-next/components/Icon";
+import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 
 const MAX_PROPERTIES_TO_PREVIEW = 5;
 
@@ -63,4 +64,12 @@ export default function FunctionRenderer({ object }: ObjectPreviewRendererProps)
       )}
     </>
   );
+}
+
+export function functionProtocolObjectToString(protocolObject: ProtocolObject) {
+  const { preview } = protocolObject;
+
+  const { functionName, functionParameterNames = [] } = preview ?? {};
+
+  return `${functionName}(${functionParameterNames.join(", ")}) {}`;
 }
