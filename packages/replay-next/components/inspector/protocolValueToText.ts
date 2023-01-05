@@ -83,16 +83,18 @@ async function protocolValueToTextHelper(
               case "array": {
                 const properties = object.preview.properties ?? [];
                 const mappedValues = await Promise.all(
-                  properties.map(property =>
-                    protocolValueToTextHelper(
-                      client,
-                      property,
-                      pauseId,
-                      objectIdSet,
-                      depth + 1,
-                      false
+                  properties
+                    .filter(property => property.name !== "length")
+                    .map(property =>
+                      protocolValueToTextHelper(
+                        client,
+                        property,
+                        pauseId,
+                        objectIdSet,
+                        depth + 1,
+                        false
+                      )
                     )
-                  )
                 );
                 valueToCopy = `[${mappedValues.join(", ")}]`;
                 break;

@@ -10,6 +10,12 @@ export default function protocolValueToCopyLabel(
   protocolValue: ProtocolValue | ProtocolNamedValue,
   pauseId: PauseId
 ): string | null {
-  const clientValue = protocolValueToClientValue(pauseId, protocolValue);
-  return clientValue.type || null;
+  const { type } = protocolValueToClientValue(pauseId, protocolValue);
+
+  switch (type) {
+    case "nan":
+      return "number";
+    default:
+      return type || null;
+  }
 }

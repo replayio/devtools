@@ -215,3 +215,7 @@ export async function verifyConsoleMessage(
     await message.waitFor();
   }
 }
+
+export async function filterByText(page: Page, text: string) {
+  await page.fill("[data-test-id=ConsoleFilterInput]", text);
+}
