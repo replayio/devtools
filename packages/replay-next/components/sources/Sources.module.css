@@ -31,7 +31,7 @@
   color: var(--color-default);
 }
 .SelectedTab {
-  background-color: var(--background-color-contrast-2);
+  background-color: var(--body-bgcolor);
 }
 .SelectedTab:hover,
 .Tab:hover {
@@ -40,7 +40,7 @@
 }
 
 .Content {
-  background-color: var(--background-color-contrast-2);
+  background-color: var(--body-bgcolor);
   border-bottom-right-radius: 0.5rem;
   padding: 0;
   flex: 1 1 auto;
