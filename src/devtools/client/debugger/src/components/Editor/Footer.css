@@ -10,7 +10,6 @@
 
 .source-footer {
   background: var(--body-bgcolor);
-  border-radius: 0.5em;
   display: flex;
   opacity: 1;
   width: 100%;
