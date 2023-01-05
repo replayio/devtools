@@ -153,7 +153,6 @@
   --modal-border: none;
   --tab-bgcolor-alt-subtle: var(--theme-base-100); /* info, events */
   --tab-bgcolor: var(--theme-base-90); /* bg tabs */
-  --body-bgcolor: var(--theme-base-100); /* bg text */
   --theme-border: #d2d5da;
   --icon-color: var(--body-color);
   --theme-focuser-bgcolor: var(--primary-accent);
@@ -166,10 +165,9 @@
   --tooltip-color: white;
   --tooltip-bgcolor: #38383d;
 
-  /*
-  Migration notes
-  * All of these sections were removed from this document; added to packages/replay-next/pages/variables.css
-  */
+
+  /* Tabs (Light) */
+  /* Migration note: removed from this document; added to packages/replay-next/pages/variables.css */
 
   /* Tabs (Light) */
   /* Timeline (Light) */
@@ -365,10 +363,8 @@
   --tooltip-color: #fff;
   --tooltip-bgcolor: var(--theme-base-85);
 
-  /*
-  Migration notes
-  * All of these sections were removed from this document; added to packages/replay-next/pages/variables.css
-  */
+  /* Tabs (Dark) */
+  /* Migration note: removed from this document; added to packages/replay-next/pages/variables.css */
 
   /* Tabs (Dark) */
   /* Timeline (Dark) */

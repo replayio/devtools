@@ -14,7 +14,7 @@ import {
 } from "@replayio/protocol";
 import { captureException } from "@sentry/react";
 
-import { commandError } from "shared/utils/error";
+import { ProtocolError, commandError } from "shared/utils/error";
 
 import { makeInfallible } from "./utils";
 
@@ -91,6 +91,14 @@ if (typeof window !== "undefined") {
   });
 }
 
+const noCallerStackTracesForErrorCodes = new Set([
+  ProtocolError.GraphicsUnavailableAtPoint,
+  ProtocolError.InternalError,
+  ProtocolError.SessionDestroyed,
+  ProtocolError.TooManyPoints,
+  ProtocolError.UnsupportedRecording,
+]);
+
 export type ExperimentalSettings = {
   listenForMetrics: boolean;
   controllerKey?: string;
@@ -99,6 +107,7 @@ export type ExperimentalSettings = {
   disableQueryCache?: boolean;
   disableStableQueryCache?: boolean;
   disableUnstableQueryCache?: boolean;
+  enableRoutines?: boolean;
   profileWorkerThreads?: boolean;
 };
 
@@ -226,7 +235,9 @@ export async function sendMessage<M extends CommandMethods>(
       // _just_ "Internal Error" or similar
       finalMessage = `${message} (request: ${method}, ${JSON.stringify(params)})`;
     }
-    captureException(callerStackTrace, { extra: { code, message, params } });
+    if (!noCallerStackTracesForErrorCodes.has(code)) {
+      captureException(callerStackTrace, { extra: { code, message, method, params } });
+    }
     throw commandError(finalMessage, code);
   }
 
