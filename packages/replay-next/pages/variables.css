@@ -289,7 +289,7 @@
   --theme-toolbar-panel-icon-color: var(--icon-color);
   --theme-tab-toolbar-background: var(--grey-90);
   --theme-toolbar-background: #18181a;
-  --theme-toolbar-color: var(--grey-20);
+  --theme-toolbar-color: var(--body-color);
   --theme-toolbar-selected-color: white;
   --theme-toolbar-highlighted-color: var(--green-50);
   --theme-toolbar-background-hover: #232327;
@@ -587,6 +587,7 @@
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-20);
   --theme-toolbar-background: var(--grey-10);
+  --theme-toolbar-color: var(--body-color);
   --theme-toolbar-selected-color: var(--body-color);
   --theme-toolbar-panel-icon-color: #bcbcbc;
   --theme-toolbar-highlighted-color: var(--green-60);
