@@ -96,7 +96,7 @@ export async function injectReactDevtoolsBackend(
   ThreadFront: typeof TF,
   replayClient: ReplayClientInterface
 ) {
-  const pauseId = ThreadFront.currentPause?.pauseId;
+  const pauseId = await ThreadFront.getCurrentPauseId(replayClient);
   if (!pauseId || pausesWithDevtoolsInjected.has(pauseId)) {
     return;
   }
