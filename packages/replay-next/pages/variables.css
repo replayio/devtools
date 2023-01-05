@@ -248,8 +248,8 @@
   --theme-arrowpanel-disabled-color: rgba(249, 249, 250, 0.5);
 
   /* src/devtools/client/themes/splitview.css */
-  --sidemenu-selected-arrow: url(images/item-arrow-dark-ltr.svg);
-  --sidemenu-selected-arrow-rtl: url(images/item-arrow-dark-rtl.svg);
+  --sidemenu-selected-arrow: url("/images/item-arrow-dark-ltr.svg");
+  --sidemenu-selected-arrow-rtl: url("/images/item-arrow-dark-rtl.svg");
 
   /*
   Migration notes:
@@ -597,8 +597,8 @@
   --theme-arrowpanel-disabled-color: rgba(249, 249, 250, 0.5);
 
   /* src/devtools/client/themes/splitview.css */
-  --sidemenu-selected-arrow: url(images/item-arrow-ltr.svg);
-  --sidemenu-selected-arrow-rtl: url(images/item-arrow-rtl.svg);
+  --sidemenu-selected-arrow: url("/images/item-arrow-ltr.svg");
+  --sidemenu-selected-arrow-rtl: url("/images/item-arrow-rtl.svg");
 
   /*
   Migration notes:
