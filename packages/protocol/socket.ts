@@ -99,6 +99,7 @@ export type ExperimentalSettings = {
   disableQueryCache?: boolean;
   disableStableQueryCache?: boolean;
   disableUnstableQueryCache?: boolean;
+  enableRoutines?: boolean;
   profileWorkerThreads?: boolean;
 };
 
