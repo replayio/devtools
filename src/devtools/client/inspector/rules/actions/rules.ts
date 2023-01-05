@@ -1,4 +1,5 @@
-import type { UIStore, UIThunkAction } from "ui/actions";
+import { assert } from "protocol/utils";
+import type { UIStore } from "ui/actions";
 import { isInspectorSelected } from "ui/reducers/app";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
 
@@ -21,9 +22,10 @@ export function setupRules(store: UIStore, startAppListening: AppStartListening)
       const { ThreadFront, protocolClient, replayClient } = extra;
       const state = getState();
 
+      const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
       const selectedNode = getSelectedDomNodeId(state);
 
-      if (!isInspectorSelected(state) || !selectedNode || !ThreadFront.currentPause?.pauseId) {
+      if (!isInspectorSelected(state) || !selectedNode) {
         console.log("Bailing out of rule fetching", selectedNode);
         dispatch(rulesUpdated([]));
         return;
@@ -38,6 +40,10 @@ export function setupRules(store: UIStore, startAppListening: AppStartListening)
         nodeInfo = getMarkupNodeById(getState(), selectedNode);
       }
 
+      if (ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
+        return;
+      }
+
       if (!nodeInfo?.isConnected || !nodeInfo?.isElement) {
         console.log("No node info for rules", nodeInfo);
         dispatch(rulesUpdated([]));
@@ -46,7 +52,7 @@ export function setupRules(store: UIStore, startAppListening: AppStartListening)
 
       const elementStyle = new ElementStyle(
         selectedNode,
-        ThreadFront.currentPause.pauseId,
+        originalPauseId,
         ThreadFront.sessionId!,
         replayClient,
         protocolClient

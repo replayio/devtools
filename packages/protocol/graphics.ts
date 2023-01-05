@@ -294,7 +294,7 @@ export async function repaint(force = false) {
     ThreadFront.currentTime,
     await ThreadFront.getCurrentPauseId(replayClient),
     (_time, pauseId) => {
-      return pauseId !== ThreadFront.currentPause.pauseId;
+      return pauseId !== ThreadFront.currentPauseIdUnsafe;
     },
     force
   );

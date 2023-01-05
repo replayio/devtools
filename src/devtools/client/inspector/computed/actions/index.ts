@@ -32,14 +32,12 @@ export type InspectorThunkAction<TReturn = void> = ThunkAction<
 >;
 
 export function setComputedProperties(elementStyle: ElementStyle): InspectorThunkAction {
-  return async (dispatch, getState, { protocolClient, ThreadFront }) => {
-    if (!ThreadFront.currentPause?.pauseId) {
-      return;
-    }
+  return async (dispatch, getState, { protocolClient, ThreadFront, replayClient }) => {
+    const pauseId = await ThreadFront.getCurrentPauseId(replayClient);
     const computed = await getComputedStyleAsync(
       protocolClient,
       ThreadFront.sessionId!,
-      ThreadFront.currentPause.pauseId,
+      pauseId,
       elementStyle.nodeId
     );
     const properties = await createComputedProperties(elementStyle, computed);

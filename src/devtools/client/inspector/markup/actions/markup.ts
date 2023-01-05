@@ -1,6 +1,6 @@
 import { ProtocolClient, Object as ProtocolObject } from "@replayio/protocol";
 
-import { getPauseId, paused } from "devtools/client/debugger/src/reducers/pause";
+import { paused } from "devtools/client/debugger/src/reducers/pause";
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { Deferred, assert, defer } from "protocol/utils";
 import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
@@ -50,19 +50,20 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
   startAppListening({
     actionCreator: nodeSelected,
     effect: async (action, listenerApi) => {
-      const { extra, getState, dispatch } = listenerApi;
-      const { ThreadFront, protocolClient, replayClient } = extra;
+      const { getState, dispatch } = listenerApi;
       const state = getState();
       const { selectedNode, selectionReason } = state.markup;
 
-      if (!isInspectorSelected(state) || !selectedNode || !ThreadFront.currentPause?.pauseId) {
+      if (!isInspectorSelected(state) || !selectedNode) {
         return;
       }
 
       // Ignore any `nodeSelected` actions dispatched during `selectionChanged` (could cause an infinite loop)
       listenerApi.unsubscribe();
 
-      dispatch(selectionChanged(selectionReason === "navigateaway", selectionReason !== "markup"));
+      await dispatch(
+        selectionChanged(selectionReason === "navigateaway", selectionReason !== "markup")
+      );
 
       // Restore listening to `nodeSelected`
       listenerApi.subscribe();
@@ -79,7 +80,7 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
 
       cancelActiveListeners();
 
-      const originalPauseId = getPauseId(getState());
+      const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
 
       // every time we pause, clear the existing DOM node info
       dispatch(reset());
@@ -88,17 +89,16 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
         await ThreadFront.ensureAllSources();
 
         // Clear selection if pauses have differed
-        let currentPauseId = getPauseId(getState());
         const selectedNodeId = getSelectedDomNodeId(getState());
 
-        if (selectedNodeId && currentPauseId && currentPauseId !== originalPauseId) {
+        if (selectedNodeId && ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
           dispatch(nodeSelected(null));
+          return;
         }
 
         // Clear out and reset all the node tree data
         await dispatch(newRoot());
-        currentPauseId = getPauseId(getState());
-        if (currentPauseId !== originalPauseId) {
+        if (ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
           return;
         }
 
@@ -111,11 +111,11 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
             protocolClient,
             replayClient,
             ThreadFront.sessionId!,
-            ThreadFront.currentPause!.pauseId!,
+            originalPauseId!,
             { type: "document" }
           );
 
-          if (!rootNode) {
+          if (!rootNode || ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
             return;
           }
 
@@ -124,12 +124,15 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
             protocolClient,
             replayClient,
             ThreadFront.sessionId!,
-            ThreadFront.currentPause!.pauseId!,
+            originalPauseId!,
             { type: "querySelector", nodeId: rootNode.objectId, selector: "body" }
           );
 
-          currentPauseId = getPauseId(getState());
-          if (defaultNode && !selectedNodeId && currentPauseId === originalPauseId) {
+          if (
+            defaultNode &&
+            !selectedNodeId &&
+            ThreadFront.currentPauseIdUnsafe === originalPauseId
+          ) {
             dispatch(nodeSelected(defaultNode.objectId, "navigateaway"));
           }
         }
@@ -173,20 +176,17 @@ export function reset() {
  */
 export function newRoot(): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
-    const pause = ThreadFront.currentPause;
-    assert(pause, "no current pause");
-    const originalPauseId = getPauseId(getState());
+    const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
 
     const [rootNodeData] = await getNodeDataAsync(
       protocolClient,
       replayClient,
       ThreadFront.sessionId!,
-      ThreadFront.currentPause!.pauseId!,
+      originalPauseId,
       { type: "document" }
     );
 
-    let currentPauseId = getPauseId(getState());
-    if (!rootNodeData || currentPauseId !== originalPauseId) {
+    if (!rootNodeData || ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
       return;
     }
     const rootNode = await convertNode(
@@ -194,11 +194,10 @@ export function newRoot(): UIThunkAction<Promise<void>> {
       replayClient,
       protocolClient,
       ThreadFront.sessionId!,
-      currentPauseId!
+      originalPauseId
     );
 
-    currentPauseId = getPauseId(getState());
-    if (currentPauseId !== originalPauseId) {
+    if (ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
       return;
     }
 
@@ -229,7 +228,7 @@ export function addChildren(
       return node.nodeType !== NodeConstants.TEXT_NODE || /[^\s]/.exec(node.nodeValue!);
     });
 
-    const originalPauseId = getPauseId(getState());
+    const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
 
     // Always ensure we have a parent
     const parent = await convertNode(
@@ -252,8 +251,7 @@ export function addChildren(
       )
     );
 
-    let currentPauseId = getPauseId(getState());
-    if (currentPauseId !== originalPauseId) {
+    if (ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
       return;
     }
 
@@ -267,8 +265,6 @@ export function collapseNode(nodeId: string) {
 
 export function toggleNodeExpanded(nodeId: string, isExpanded: boolean): UIThunkAction {
   return (dispatch, getState, { ThreadFront }) => {
-    assert(ThreadFront.currentPause, "no current pause");
-
     if (isExpanded) {
       dispatch(collapseNode(nodeId));
     } else {
@@ -303,26 +299,22 @@ export function expandNode(
         dispatch(updateScrollIntoViewNode(node.id));
       }
 
-      const originalPauseId = getPauseId(getState());
-
-      assert(originalPauseId, "no current pause");
+      const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
 
       const childNodes = await getNodeDataAsync(
         protocolClient,
         replayClient,
         ThreadFront.sessionId!,
-        ThreadFront.currentPause!.pauseId!,
+        originalPauseId,
         { type: "childNodes", nodeId }
       );
 
-      let currentPauseId = getPauseId(getState());
-      if (currentPauseId !== originalPauseId) {
+      if (ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
         return;
       }
       await dispatch(addChildren(nodeId, childNodes));
 
-      currentPauseId = getPauseId(getState());
-      if (currentPauseId !== originalPauseId) {
+      if (ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
         return;
       }
       dispatch(updateChildrenLoading({ nodeId, isLoadingChildren: false }));
@@ -339,8 +331,8 @@ export function expandNode(
 export function selectionChanged(
   expandSelectedNode: boolean,
   shouldScrollIntoView = false
-): UIThunkAction {
-  return async (dispatch, getState, { replayClient }) => {
+): UIThunkAction<Promise<void>> {
+  return async (dispatch, getState, { replayClient, ThreadFront }) => {
     const selectedNodeId = getSelectedDomNodeId(getState());
 
     if (!selectedNodeId) {
@@ -357,7 +349,7 @@ export function selectionChanged(
       return;
     }
 
-    const pauseId = getPauseId(getState())!;
+    const pauseId = await ThreadFront.getCurrentPauseId(replayClient);
 
     dispatch(nodeSelected(latestSelectedNodeId));
 
@@ -398,15 +390,16 @@ export function selectionChanged(
 export function selectNode(nodeId: string, reason?: SelectionReason): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
     // Ensure we have the data loaded
+    const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
     const nodes = await getNodeDataAsync(
       protocolClient,
       replayClient,
       ThreadFront.sessionId!,
-      ThreadFront.currentPause!.pauseId!,
+      originalPauseId,
       { type: "parentNodes", nodeId }
     );
 
-    if (nodes.length) {
+    if (nodes.length && ThreadFront.currentPauseIdUnsafe === originalPauseId) {
       dispatch(highlightNode(nodeId, 1000));
 
       dispatch(nodeSelected(nodeId, reason));
@@ -592,18 +585,14 @@ export function highlightNodes(
   pauseId?: string,
   duration?: number
 ): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront, protocolClient }) => {
+  return async (dispatch, getState, { ThreadFront, protocolClient, replayClient }) => {
     if (nodeIds.length === 0) {
       return;
     }
 
     if (!pauseId) {
       // We're trying to highlight nodes from the current pause.
-      // Bail out if we're not paused
-      if (!ThreadFront.currentPause) {
-        return;
-      }
-      pauseId = ThreadFront.currentPause.pauseId!;
+      pauseId = await ThreadFront.getCurrentPauseId(replayClient);
     }
 
     const { highlightedNodes } = getState().markup;
