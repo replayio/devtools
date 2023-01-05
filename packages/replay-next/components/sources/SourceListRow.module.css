@@ -9,7 +9,7 @@
 .LineWithoutHits {
   white-space: pre-wrap;
   font-family: var(--font-family-monospace);
-  font-size: var(--font-size-regular);
+  font-size: 20px;
   display: flex;
   flex-direction: row;
   align-items: center;
