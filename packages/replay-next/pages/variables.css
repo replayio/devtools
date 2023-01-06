@@ -2,6 +2,108 @@
   --font-family-default: Inter, sans-serif;
   --font-family-monospace: Menlo, ui-monospace, SFMono-Regular, Monaco, Consolas, Liberation Mono,
     Courier New, monospace;
+
+  /* Migration note: everyone below this was removed from src/devtools/client/themes/variables.css */
+
+  --theme-focus-border-color-textbox: #0675d3;
+  --theme-textbox-box-shadow: rgba(97, 181, 255, 0.75);
+
+  /* Text sizes */
+  --root-font-size: 16px;
+  --devtools-base-font-size: 12px;
+  --theme-body-font-size: 12px;
+  --theme-code-font-size: 11px;
+  --theme-tab-font-size: 15px;
+  --theme-code-line-height: calc(15 / 11);
+
+  /* Toolbar size (excluding borders) */
+  --theme-toolbar-height: 24px;
+
+  /* For accessibility purposes we want to enhance the focus styling. This
+     * should improve keyboard navigation usability. */
+  --theme-focus-outline: 1px dotted var(--theme-focus-outline-color);
+  --theme-focus-box-shadow-textbox: 0 0 0 1px var(--theme-textbox-box-shadow);
+  --toolbarbutton-focus-bgcolor: var(--theme-selection-focus-background);
+  --toolbarbutton-focus-color: var(--theme-selection-focus-color);
+  --toolbarbutton-checked-background: var(--theme-selection-background);
+  --toolbarbutton-checked-color: var(--theme-selection-color);
+  --toolbarbutton-checked-focus-background: var(--blue-60);
+
+  /* The photon animation curve */
+  --animation-curve: cubic-bezier(0.07, 0.95, 0, 1);
+
+  /*
+     * Photon Colors CSS Variables v3.3.2
+     * - Colors are taken from https://github.com/FirefoxUX/photon-colors/blob/master/photon-colors.css
+     * - We only add Photon color variables that we are actually using; unused
+     *   variables will fail browser/base/content/test/static/browser_parsable_css.js
+     * - We added a few unofficial colors: a few intermediary values (e.g. Blue 45),
+     *   and lighter variants for the dark theme (e.g. Red 20, Red 40).
+     */
+
+  --primary-accent-text: #007aff;
+  --primary-accent: #01acfd;
+  --primary-accent-hover: #0194ff;
+  --primary-accent-light: #85bfff;
+
+  --primary-accent-legacy: #007aff;
+  --primary-accent-legacy-hover: #0067d7;
+
+  --secondary-accent: #f02d5e;
+  --secondary-accent-hover: #d72451;
+  --secondary-accent-stroke: #f02d5e;
+
+  /* used in our codebase, to be refactored */
+  --new-blue-900: #215487;
+  --cool-gray-200: #e5e7eb;
+  --cool-gray-300: #d1d5db;
+  --cool-gray-400: #9ca3af;
+  --cool-gray-500: #6b7280;
+  --magenta-65: #dd00a9;
+  --purple-50: #9400ff;
+  --purple-60: #8000d7;
+  --blue-30: #75baff;
+  --blue-40: #45a1ff;
+  --blue-50: #0a84ff;
+  --blue-55: #0074e8;
+  --blue-60: #0060df;
+  --blue-70: #003eaa;
+  --blue-80: #002275;
+  --green-50: #30e60b;
+  --green-60: #12bc00;
+  --green-70: #058b00;
+  --yellow-50: #ffe900;
+  --yellow-60: #d7b600;
+  --yellow-65: #be9b00;
+  --yellow-70: #a47f00;
+  --yellow-80: #715100;
+  --yellow-90: #3e2800;
+  --red-20: #ffb3d2;
+  --red-40: #ff3b6b;
+  --red-50: #ff0039;
+  --red-60: #d70022;
+  --red-70: #a4000f;
+  --grey-10: #f9f9fa;
+  --grey-10-a15: rgba(249, 249, 250, 0.15);
+  --grey-10-a20: rgba(249, 249, 250, 0.2);
+  --grey-10-a25: rgba(249, 249, 250, 0.25);
+  --grey-10-a30: rgba(249, 249, 250, 0.3);
+  --grey-10-a40: rgba(249, 249, 250, 0.4);
+  --grey-20: #ededf0;
+  --grey-25: #e0e0e2;
+  --grey-30: #d7d7db;
+  --grey-35: #c3c3c6;
+  --grey-40: #b1b1b3;
+  --grey-43: #a4a4a4;
+  --grey-45: #939395;
+  --grey-50: #737373;
+  --grey-55: #5c5c5f;
+  --grey-60: #4a4a4f;
+  --grey-70: #38383d;
+  --grey-80: #2a2a2e;
+  --grey-90: #0c0c0d;
+  --grey-90-a10: rgba(12, 12, 13, 0.1);
+  --grey-90-a30: rgba(12, 12, 13, 0.3);
 }
 
 :root,
@@ -23,8 +125,9 @@
 :root.theme-dark {
   --color-transparent: rgba(0, 0, 0, 0);
 
+  /* Migration note: removed from src/devtools/client/themes/variables.css */
+
   /* Color ramp (Dark) */
-  /* Migration note: copy/pasted with src/devtools/client/themes/variables.css */
   --theme-base-100: #000; /* background chrome */
   --theme-base-95: #192230; /* tab bars */
   --theme-base-90: #3d4552; /* editor and selected tab */
