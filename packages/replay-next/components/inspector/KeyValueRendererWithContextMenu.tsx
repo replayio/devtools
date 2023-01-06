@@ -9,9 +9,9 @@ export default function KeyValueRendererWithContextMenu(props: Props) {
   const { contextMenu, onContextMenu } = useInspectorContextMenu({ pauseId, protocolValue });
 
   return (
-    <span onContextMenu={onContextMenu}>
-      <KeyValueRenderer {...props} />
+    <>
+      <KeyValueRenderer {...props} onContextMenu={onContextMenu} />
       {contextMenu}
-    </span>
+    </>
   );
 }

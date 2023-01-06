@@ -9,6 +9,7 @@ import {
   findClientValues,
   findExpandables,
   findKeyValues,
+  toggleExpandable,
 } from "replay-next/playwright/tests/utils/inspector";
 
 import {
@@ -20,7 +21,7 @@ import {
 import { getTestUrl, waitFor } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
-testSetup("ee4da15f-5d86-4629-8356-c673b5e711b0");
+testSetup("88eab88a-380f-4eda-837c-0cdd49fa18bc");
 
 type LocatorFunction = (
   page: Page,
@@ -119,9 +120,9 @@ test("should copy dates", async ({ page }) => {
     page,
     findKeyValues,
     "date",
-    "Mon Aug 29 2022",
+    "2023",
     "Copy date",
-    '"Mon Aug 29 2022 14:42:16 GMT-0400 (Eastern Daylight Time)"'
+    '"Thu Jan 05 2023 19:09:26 GMT-0500 (Eastern Standard Time)"'
   );
 });
 
@@ -189,6 +190,43 @@ test("should copy arrays", async ({ page }) => {
   );
 });
 
+test("should copy deep arrays and their nested properties", async ({ page }) => {
+  // Verify a deep object that gets truncated
+  await verifyContextMenuCopy(
+    page,
+    findKeyValues,
+    "deepArray",
+    "(2) [",
+    "Copy array",
+    '["level-1", ["level-2", ["level-3", ["level-4", ["level-5", ["[[ Truncated ]]", "[[ Truncated ]]"]]]]]]'
+  );
+
+  // Expand properties and copy the nested value
+  const listItems = await locateMessage(page, "console-log", "level-1");
+  const listItem = listItems.first();
+  for (let i = 1; i <= 5; i++) {
+    await toggleExpandable(page, { expanded: true, partialText: `level-${i}` });
+  }
+
+  const clientValues = await findClientValues(page, `level-6`);
+  const clientValue = clientValues.last();
+
+  await showContextMenu(page, clientValue);
+
+  writeSync(""); // clear clipboard
+
+  const contextMenuItem = await findContextMenuItem(page, "Copy array");
+  await contextMenuItem.click();
+
+  const expectedValue = '["level-6", ["level-7", ["level-8", ["level-9", ["level-10", []]]]]]';
+  await waitFor(async () => {
+    const actualValue = readSync();
+    if (actualValue !== expectedValue) {
+      throw `Expected clipboard to contain "${expectedValue}" but found "${actualValue}"`;
+    }
+  });
+});
+
 test("should copy objects", async ({ page }) => {
   await verifyContextMenuCopy(page, findKeyValues, "filter_objectEmpty", "{}", "Copy object", "{}");
 
@@ -200,6 +238,43 @@ test("should copy objects", async ({ page }) => {
     "Copy object",
     '{"foo": 123, "bar": "abc", "baz": true}'
   );
+});
+
+test("should copy deep objects and their nested properties", async ({ page }) => {
+  // Verify a deep object that gets truncated
+  await verifyContextMenuCopy(
+    page,
+    findKeyValues,
+    "filter_objectDeep",
+    "level-1",
+    "Copy object",
+    '{"level-1": {"level-2": {"level-3": {"level-4": {"level-5": {"[[ Truncated ]]"}}}}}}'
+  );
+
+  // Expand properties and copy the nested value
+  const listItems = await locateMessage(page, "console-log", "level-1");
+  const listItem = listItems.first();
+  for (let i = 1; i <= 5; i++) {
+    await toggleExpandable(page, { expanded: true, partialText: `level-${i}: {…}` });
+  }
+
+  const keyValues = await findKeyValues(page, `level-5`, listItem);
+  const keyValue = keyValues.last();
+
+  await showContextMenu(page, keyValue);
+
+  writeSync(""); // clear clipboard
+
+  const contextMenuItem = await findContextMenuItem(page, "Copy object");
+  await contextMenuItem.click();
+
+  const expectedValue = '{"level-6": {"level-7": {"level-8": {"level-9": {"level-10": {}}}}}}';
+  await waitFor(async () => {
+    const actualValue = readSync();
+    if (actualValue !== expectedValue) {
+      throw `Expected clipboard to contain "${expectedValue}" but found "${actualValue}"`;
+    }
+  });
 });
 
 test("should copy maps", async ({ page }) => {

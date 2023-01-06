@@ -37,7 +37,7 @@ async function protocolValueToTextHelper(
   includeName: boolean
 ): Promise<string | null> {
   if (depth > MAX_DEPTH_TO_COPY) {
-    return null;
+    return '"[[ Truncated ]]"';
   }
 
   const clientValue = protocolValueToClientValue(pauseId, protocolValue);

@@ -1,6 +1,6 @@
 import { PauseId, Object as ProtocolObject, Value as ProtocolValue } from "@replayio/protocol";
 import classNames from "classnames";
-import { ReactNode, Suspense, useContext, useState } from "react";
+import { MouseEvent, ReactNode, Suspense, useContext, useState } from "react";
 
 import Expandable from "replay-next/components/Expandable";
 import Loader from "replay-next/components/Loader";
@@ -19,6 +19,7 @@ export type Props = {
   enableInspection?: boolean;
   expandByDefault?: boolean;
   layout: "horizontal" | "vertical";
+  onContextMenu?: (event: MouseEvent) => void;
   pauseId: PauseId;
   protocolValue: ProtocolValue;
 };
@@ -38,6 +39,7 @@ export default function KeyValueRenderer({
   enableInspection = true,
   expandByDefault = false,
   layout = "horizontal",
+  onContextMenu,
   pauseId,
   protocolValue,
 }: Props) {
@@ -83,7 +85,7 @@ export default function KeyValueRenderer({
           // Children that are text nodes will be rendered inline, as part of the value/preview.
           if (htmlElementChildren.length > 0) {
             return (
-              <span className={classNames(styles.KeyValue)}>
+              <span className={classNames(styles.KeyValue)} onContextMenu={onContextMenu}>
                 <HTMLExpandable
                   before={
                     <>
@@ -150,6 +152,7 @@ export default function KeyValueRenderer({
         !showExpandableView && layout === "vertical" ? styles.ToggleAlignmentPadding : null
       )}
       data-test-name="KeyValue"
+      onContextMenu={onContextMenu}
     >
       {before}
       {name != null ? (
