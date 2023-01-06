@@ -41,7 +41,6 @@ import { registerRecording, trackEvent } from "ui/utils/telemetry";
 import tokenManager from "ui/utils/tokenManager";
 import { subscriptionExpired } from "ui/utils/workspace";
 
-import { getZoomRegion, setFocusRegion } from "../reducers/timeline";
 import { setExpectedError, setUnexpectedError } from "./errors";
 import { setViewMode } from "./layout";
 import { getInitialPausePoint, jumpToInitialPausePoint } from "./timeline";
@@ -236,13 +235,12 @@ export function createSocket(
           ? initialPausePoint.focusRegion
           : undefined;
 
-      const state = getState();
-      const zoomTime = getZoomRegion(state);
-
-      const focusRange = {
-        begin: focusRegion ? focusRegion.begin.time : zoomTime.beginTime,
-        end: focusRegion ? focusRegion.end.time : zoomTime.endTime,
-      };
+      const focusRange = focusRegion
+        ? {
+            begin: focusRegion.begin.time,
+            end: focusRegion.end.time,
+          }
+        : undefined;
 
       const sessionId = await createSession(
         recordingId,
