@@ -7,7 +7,6 @@ import {
   CommandRequest,
   CommandResponse,
   ExperimentalSettings,
-  addEventListener,
   createSession,
 } from "protocol/socket";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
@@ -251,7 +250,7 @@ export function createSocket(
         recordingId,
         loadPoint,
         experimentalSettings,
-        undefined,
+        focusRange,
         {
           onEvent: (event: ProtocolEvent) => {
             if (features.logProtocolEvents) {
