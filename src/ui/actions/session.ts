@@ -31,6 +31,7 @@ import {
   requestSent,
   responseReceived,
 } from "ui/reducers/protocolMessages";
+import { getZoomRegion } from "ui/reducers/timeline";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import { Recording } from "ui/types";
 import { extractGraphQLError } from "ui/utils/apolloClient";
@@ -44,7 +45,7 @@ import { subscriptionExpired } from "ui/utils/workspace";
 
 import { setExpectedError, setUnexpectedError } from "./errors";
 import { setViewMode } from "./layout";
-import { jumpToInitialPausePoint } from "./timeline";
+import { getInitialPausePoint, jumpToInitialPausePoint } from "./timeline";
 
 export { setUnexpectedError, setExpectedError };
 
@@ -229,6 +230,22 @@ export function createSocket(
           flushTimeoutId = setTimeout(flushQueuedActions, 0);
         }
       }
+
+      const initialPausePoint = await getInitialPausePoint(ThreadFront.recordingId!);
+      const focusRegion =
+        initialPausePoint && "focusRegion" in initialPausePoint
+          ? initialPausePoint.focusRegion
+          : undefined;
+
+      const state = getState();
+      const zoomTime = getZoomRegion(state);
+
+      const focusRange = {
+        begin: focusRegion ? focusRegion.begin.time : zoomTime.beginTime,
+        end: focusRegion ? focusRegion.end.time : zoomTime.endTime,
+      };
+
+      console.log("miriam focus range", focusRange);
 
       const sessionId = await createSession(
         recordingId,

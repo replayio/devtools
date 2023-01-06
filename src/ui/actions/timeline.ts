@@ -129,7 +129,7 @@ export function jumpToInitialPausePoint(): UIThunkAction {
   };
 }
 
-async function getInitialPausePoint(recordingId: string) {
+export async function getInitialPausePoint(recordingId: string) {
   const pausePointParams = getPausePointParams();
   if (pausePointParams) {
     return pausePointParams;
