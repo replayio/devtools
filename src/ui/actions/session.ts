@@ -244,11 +244,14 @@ export function createSocket(
         end: focusRegion ? focusRegion.end.time : zoomTime.endTime,
       };
 
+      // miriam
+      console.log(focusRange);
+
       const sessionId = await createSession(
         recordingId,
         loadPoint,
         experimentalSettings,
-        focusRange,
+        undefined,
         {
           onEvent: (event: ProtocolEvent) => {
             if (features.logProtocolEvents) {
