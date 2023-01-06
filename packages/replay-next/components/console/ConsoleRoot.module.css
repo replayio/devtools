@@ -3,7 +3,7 @@
   overflow: hidden;
   border-bottom-left-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
-  background-color: var(--background-color-contrast-2);
+  background-color: var(--body-bgcolor);
   word-break: break-all;
   font-size: var(--font-size-regular);
 }

@@ -202,6 +202,7 @@ export function createSocket(
         disableUnstableQueryCache: !features.enableUnstableQueryCache,
         listenForMetrics: !!prefs.listenForMetrics,
         profileWorkerThreads: !!features.profileWorkerThreads,
+        enableRoutines: !!features.enableRoutines,
       };
       if (features.newControllerOnRefresh) {
         experimentalSettings.controllerKey = String(Date.now());
