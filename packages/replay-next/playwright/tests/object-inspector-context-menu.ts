@@ -61,8 +61,10 @@ async function verifyContextMenuCopy(
   await verifyClipboardText(page, expectedValue);
 }
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ context, page }) => {
   page.setDefaultTimeout(5000);
+
+  context.grantPermissions(["clipboard-read"]);
 
   await page.goto(getTestUrl("console"));
 
