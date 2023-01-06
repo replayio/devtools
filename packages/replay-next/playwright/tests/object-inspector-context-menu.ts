@@ -1,5 +1,4 @@
 import { Locator, Page, test } from "@playwright/test";
-import { readSync, writeSync } from "clipboardy";
 
 import {
   findContextMenuItem,
@@ -29,6 +28,15 @@ type LocatorFunction = (
   locator: Locator | null
 ) => Promise<Locator>;
 
+async function verifyClipboardText(page: Page, expectedValue: string): Promise<void> {
+  await waitFor(async () => {
+    const actualText = await page.evaluate(() => navigator.clipboard.readText());
+    if (actualText !== expectedValue) {
+      throw `Expected clipboard to contain "${expectedValue}" but found "${actualText}"`;
+    }
+  });
+}
+
 async function verifyContextMenuCopy(
   page: Page,
   locatorFunction: LocatorFunction,
@@ -47,17 +55,10 @@ async function verifyContextMenuCopy(
 
   await showContextMenu(page, inspectorItem);
 
-  writeSync(""); // clear clipboard
-
   const contextMenuItem = await findContextMenuItem(page, copyLabel);
   await contextMenuItem.click();
 
-  await waitFor(async () => {
-    const actualValue = readSync();
-    if (actualValue !== expectedValue) {
-      throw `Expected clipboard to contain "${expectedValue}" but found "${actualValue}"`;
-    }
-  });
+  await verifyClipboardText(page, expectedValue);
 }
 
 test.beforeEach(async ({ page }) => {
@@ -213,18 +214,11 @@ test("should copy deep arrays and their nested properties", async ({ page }) => 
 
   await showContextMenu(page, clientValue);
 
-  writeSync(""); // clear clipboard
-
   const contextMenuItem = await findContextMenuItem(page, "Copy array");
   await contextMenuItem.click();
 
   const expectedValue = '["level-6", ["level-7", ["level-8", ["level-9", ["level-10", []]]]]]';
-  await waitFor(async () => {
-    const actualValue = readSync();
-    if (actualValue !== expectedValue) {
-      throw `Expected clipboard to contain "${expectedValue}" but found "${actualValue}"`;
-    }
-  });
+  await verifyClipboardText(page, expectedValue);
 });
 
 test("should copy objects", async ({ page }) => {
@@ -263,18 +257,11 @@ test("should copy deep objects and their nested properties", async ({ page }) =>
 
   await showContextMenu(page, keyValue);
 
-  writeSync(""); // clear clipboard
-
   const contextMenuItem = await findContextMenuItem(page, "Copy object");
   await contextMenuItem.click();
 
   const expectedValue = '{"level-6": {"level-7": {"level-8": {"level-9": {"level-10": {}}}}}}';
-  await waitFor(async () => {
-    const actualValue = readSync();
-    if (actualValue !== expectedValue) {
-      throw `Expected clipboard to contain "${expectedValue}" but found "${actualValue}"`;
-    }
-  });
+  await verifyClipboardText(page, expectedValue);
 });
 
 test("should copy maps", async ({ page }) => {
