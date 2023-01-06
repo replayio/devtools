@@ -117,6 +117,7 @@ export function jumpToInitialPausePoint(): UIThunkAction {
       const focusRegion =
         "focusRegion" in initialPausePoint ? initialPausePoint.focusRegion : undefined;
       if (focusRegion) {
+        dispatch(syncFocusedRegion());
         dispatch(newFocusRegion(focusRegion));
       }
       point = initialPausePoint.point;
