@@ -223,6 +223,10 @@
     * things below this point are not organized yet
   */
 
+  /* Core classes (Dark) partial */
+  --checkbox-border: var(--theme-base-90);
+  --checkbox: var(--theme-base-80);
+
   /* Timeline (Dark) */
   --progressbar-preview-max: var(--theme-base-70);
   --progressbar-preview-min: var(--primary-accent);
@@ -334,6 +338,7 @@
 
 :root.theme-light {
   --color-transparent: rgba(255, 255, 255, 0);
+
 
   /* Tabs (Light) */
   /* Migration note: removed from src/devtools/client/themes/variables.css */
@@ -537,6 +542,10 @@
     * removed from src/devtools/client/themes/variables.css
     * things below this point are not organized yet
   */
+
+  /* Core classes (Light) partial */
+  --checkbox-border: var(--theme-base-80);
+  --checkbox: #fff;
 
   /* Timeline (Light) */
   --progressbar-preview-max: var(--theme-base-85);

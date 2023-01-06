@@ -175,13 +175,26 @@
   font-size: var(--font-size-small);
 }
 
+/* This is an approximation of the Replay checkbox style; not all CSS variables have been migrated yet */
 .Toggle {
-  /* trunk-ignore-begin(stylelint/unit-disallowed-list) */
-  width: 1em;
-  height: 1em;
+  width: 1rem;
+  height: 1rem;
   position: absolute;
-  left: calc(-1em - var(--line-hit-count-size) - 1ch);
-  top: calc(50% - 0.5em);
+  left: calc(-1rem - var(--line-hit-count-size) - 1ch);
+  top: calc(50% - 0.5rem);
   margin: 0;
-  /* trunk-ignore-end(stylelint/unit-disallowed-list) */
+  padding: 0;
+  appearance: none;
+  color: var(--color-brand);
+  background-color: var(--checkbox);
+  border-color: var(--checkbox-border);
+  border-radius: 0.25rem;
+}
+.Toggle:checked {
+  border-color: transparent;
+  background-color: currentColor;
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
 }
