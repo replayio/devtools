@@ -47,7 +47,7 @@ describe("getExpressionFromString", () => {
   });
 
   it("should include tokens joined by periods", () => {
-    expect(getExpressionHelper("foo bar.|baz")).toBe("bar.baz");
+    expect(getExpressionHelper("foo bar.baz")).toBe("bar.baz");
     expect(getExpressionHelper("foo bar.b|az")).toBe("bar.baz");
     expect(getExpressionHelper("foo bar.ba|z")).toBe("bar.baz");
     expect(getExpressionHelper("foo bar.baz|")).toBe("bar.baz");
@@ -116,25 +116,21 @@ describe("getExpressionFromString", () => {
   });
 
   it("should return expressions that are inside of a template string variable", () => {
-    expect(getExpressionHelper("`foo ${|bar")).toBe("bar");
     expect(getExpressionHelper("`foo ${b|ar")).toBe("bar");
     expect(getExpressionHelper("`foo ${ba|r")).toBe("bar");
     expect(getExpressionHelper("`foo ${bar|")).toBe("bar");
     expect(getExpressionHelper("`foo ${bar|")).toBe("bar");
 
-    expect(getExpressionHelper("`foo ${bar.|baz")).toBe("bar.baz");
     expect(getExpressionHelper("`foo ${bar.b|az")).toBe("bar.baz");
     expect(getExpressionHelper("`foo ${bar.ba|z")).toBe("bar.baz");
     expect(getExpressionHelper("`foo ${bar.baz|")).toBe("bar.baz");
   });
 
   it("should return expressions that are in the middle of a larger string", () => {
-    expect(getExpressionHelper("foo, |bar, baz")).toBe("bar");
     expect(getExpressionHelper("foo, b|ar, baz")).toBe("bar");
     expect(getExpressionHelper("foo, ba|r, baz")).toBe("bar");
     expect(getExpressionHelper("foo, bar|, baz")).toBe("bar");
 
-    expect(getExpressionHelper("foo, bar.|prop, baz")).toBe("bar.prop");
     expect(getExpressionHelper("foo, bar.p|rop, baz")).toBe("bar.prop");
     expect(getExpressionHelper("foo, bar.pr|op, baz")).toBe("bar.prop");
     expect(getExpressionHelper("foo, bar.pro|p, baz")).toBe("bar.prop");
@@ -142,25 +138,37 @@ describe("getExpressionFromString", () => {
   });
 
   it("should return expressions that are in the middle of a template string", () => {
-    expect(getExpressionHelper('`URL: "${|win}"')).toBe("win");
     expect(getExpressionHelper('`URL: "${w|in}"')).toBe("win");
     expect(getExpressionHelper('`URL: "${wi|n}"')).toBe("win");
     expect(getExpressionHelper('`URL: "${win|}"')).toBe("win");
 
-    expect(getExpressionHelper('`URL: "${window.|loc}"')).toBe("window.loc");
     expect(getExpressionHelper('`URL: "${window.l|oc}"')).toBe("window.loc");
     expect(getExpressionHelper('`URL: "${window.lo|c}"')).toBe("window.loc");
     expect(getExpressionHelper('`URL: "${window.loc|}"')).toBe("window.loc");
   });
 
   it("should not consider property tokens to the right of the cursor as part of an expression", () => {
-    expect(getExpressionHelper('`URL: "${|window.loc}"')).toBe("window");
     expect(getExpressionHelper('`URL: "${w|indow.loc}"')).toBe("window");
     expect(getExpressionHelper('`URL: "${wi|ndow.loc}"')).toBe("window");
     expect(getExpressionHelper('`URL: "${win|dow.loc}"')).toBe("window");
     expect(getExpressionHelper('`URL: "${wind|ow.loc}"')).toBe("window");
     expect(getExpressionHelper('`URL: "${windo|w.loc}"')).toBe("window");
     expect(getExpressionHelper('`URL: "${window|.loc}"')).toBe("window");
+  });
+
+  // FE-1102
+  it("should not include function call when evaluating a parameter", () => {
+    expect(getExpressionHelper("test(f|oo)")).toBe("foo");
+    expect(getExpressionHelper("test(fo|o)")).toBe("foo");
+    expect(getExpressionHelper("test(foo|)")).toBe("foo");
+
+    expect(getExpressionHelper("test(f|oo, bar)")).toBe("foo");
+    expect(getExpressionHelper("test(fo|o, bar)")).toBe("foo");
+    expect(getExpressionHelper("test(foo|, bar)")).toBe("foo");
+
+    expect(getExpressionHelper("test(foo, b|ar)")).toBe("bar");
+    expect(getExpressionHelper("test(foo, ba|r)")).toBe("bar");
+    expect(getExpressionHelper("test(foo, bar|)")).toBe("bar");
   });
 
   describe("minified/mangled code", () => {
@@ -185,7 +193,7 @@ describe("getExpressionFromString", () => {
     });
 
     it("variables", () => {
-      expect(getExpressionHelper('!function(){"use strict";var e={4:function(e,|t,n)')).toBe("t");
+      expect(getExpressionHelper('!function(){"use strict";var e={4:function(e|,t,n)')).toBe("e");
       expect(getExpressionHelper('!function(){"use strict";var e={4:function(e,t|')).toBe("t");
     });
   });

@@ -32,9 +32,11 @@ export default function getExpressionFromString(
   const child = element.children[Math.min(childIndex, element.children.length - 1)];
   switch (child.className) {
     case "tok-comment":
+    case "tok-number":
+    case "tok-operator":
+    case "tok-punctuation":
     case "tok-string":
     case "tok-string2":
-      // Don't try to auto-complete strings.
       return null;
   }
 
@@ -48,6 +50,7 @@ export default function getExpressionFromString(
       case ";":
       case "+":
       case "{":
+      case "(":
       case ")":
       case "!":
       case ",":
@@ -69,6 +72,7 @@ export default function getExpressionFromString(
       case "+":
       case "}":
       case "(":
+      case ")":
       case ",":
       case ".":
         break nextLoop;
