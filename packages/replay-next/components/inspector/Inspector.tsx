@@ -4,7 +4,7 @@ import {
   Value as ProtocolValue,
 } from "@replayio/protocol";
 
-import KeyValueRenderer from "./KeyValueRenderer";
+import KeyValueRenderer from "./KeyValueRendererWithContextMenu";
 import styles from "./Inspector.module.css";
 
 export default function Inspector({

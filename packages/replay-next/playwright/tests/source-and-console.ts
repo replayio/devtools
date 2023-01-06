@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { toggleProtocolMessages, verifyConsoleMessage } from "./utils/console";
+import { openContextMenu, toggleProtocolMessages, verifyConsoleMessage } from "./utils/console";
 import { delay, getTestUrl, stopHovering, takeScreenshot, waitFor } from "./utils/general";
 import {
   addBreakPoint,
@@ -196,11 +196,11 @@ test("should support custom badge styles for log points", async ({ page }) => {
 
   const message = page.locator("[data-test-name=Message]");
 
-  await message.click({ button: "right" });
+  await openContextMenu(message);
   await page.click("[data-test-id=ConsoleContextMenu-Badge-yellow]");
   await takeScreenshot(page, message, "log-point-message-with-yellow-badge");
 
-  await message.click({ button: "right" });
+  await openContextMenu(message);
   await page.click("[data-test-id=ConsoleContextMenu-Badge-unicorn]");
   await takeScreenshot(page, message, "log-point-message-with-unicorn-badge");
 });

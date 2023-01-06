@@ -88,6 +88,12 @@ export async function locateMessage<T>(
   }
 }
 
+export async function openContextMenu(listItem: Locator) {
+  // Click to the left of the list item to avoid accidentally clicking on an Inspector instance
+  // Inspector has its own context menu with "copy object"
+  await listItem.click({ button: "right", position: { x: 10, y: 10 } });
+}
+
 export function messageLocator(
   page: Page,
   messageType: MessageType,
@@ -208,4 +214,8 @@ export async function verifyConsoleMessage(
     const message = messages.first();
     await message.waitFor();
   }
+}
+
+export async function filterByText(page: Page, text: string) {
+  await page.fill("[data-test-id=ConsoleFilterInput]", text);
 }

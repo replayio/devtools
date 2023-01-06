@@ -364,17 +364,23 @@ export async function warpToMessage(page: Page, text: string, line?: number) {
 export async function setConsoleMessageAsFocusStart(page: Page, message: Locator) {
   await debugPrint(page, `Setting focus range start`, "setConsoleMessageAsFocusStart");
 
-  await message.click({ button: "right" });
+  await openContextMenu(message);
   await page.locator('[data-test-id="ConsoleContextMenu-SetFocusStartButton"]').click();
 }
 
 export async function setConsoleMessageAsFocusEnd(page: Page, message: Locator) {
   await debugPrint(page, `Setting focus range end`, "setConsoleMessageAsFocusEnd");
 
-  await message.click({ button: "right" });
+  await openContextMenu(message);
   await page.locator('[data-test-id="ConsoleContextMenu-SetFocusEndButton"]').click();
 }
 
 export async function waitForTerminal(page: Page) {
   await page.locator('[data-test-id="ConsoleTerminalInput"]').waitFor();
+}
+
+export async function openContextMenu(listItem: Locator) {
+  // Click to the left of the list item to avoid accidentally clicking on an Inspector instance
+  // Inspector has its own context menu with "copy object"
+  await listItem.click({ button: "right", position: { x: 10, y: 10 } });
 }
