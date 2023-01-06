@@ -106,14 +106,14 @@ function Routing({ Component, pageProps }: AppProps) {
         <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
         <title>Replay</title>
       </Head>
-      <_App>
-        <InstallRouteListener />
-        <ErrorBoundary>
+      <ErrorBoundary>
+        <_App>
+          <InstallRouteListener />
           <React.Suspense fallback={<LoadingScreen fallbackMessage="Fetching data..." />}>
             <Component {...pageProps} />
           </React.Suspense>
-        </ErrorBoundary>
-      </_App>
+        </_App>
+      </ErrorBoundary>
     </Provider>
   );
 }

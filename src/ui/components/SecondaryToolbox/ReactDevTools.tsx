@@ -5,11 +5,13 @@ import type { Store, Wall } from "react-devtools-inline/frontend";
 
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ThreadFront } from "protocol/thread";
+import { RecordingCapabilities, RecordingTarget } from "protocol/thread/thread";
 import { compareNumericStrings } from "protocol/utils";
 import {
   getObjectPropertyHelper,
   getObjectWithPreviewHelper,
 } from "replay-next/src/suspense/ObjectPreviews";
+import { getRecordingCapabilitiesSuspense } from "replay-next/src/suspense/RecordingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { fetchMouseTargetsForPause } from "ui/actions/app";
@@ -32,6 +34,11 @@ import { NodePicker as NodePickerClass, NodePickerOpts } from "ui/utils/nodePick
 import { getJSON } from "ui/utils/objectFetching";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 
+import {
+  injectReactDevtoolsBackend,
+  logWindowMessages,
+} from "./react-devtools/injectReactDevtoolsBackend";
+
 type ReactDevToolsInlineModule = typeof import("react-devtools-inline/frontend");
 
 type NodeOptsWithoutBounds = Omit<NodePickerOpts, "onCheckNodeBounds">;
@@ -43,6 +50,7 @@ class ReplayWall implements Wall {
   private _listener?: (msg: any) => void;
   private inspectedElements = new Set();
   private highlightedElementId?: number;
+  private recordingTarget: RecordingTarget | null = null;
   store?: Store;
 
   constructor(
@@ -78,6 +86,8 @@ class ReplayWall implements Wall {
 
   // called by the frontend to send a request to the backend
   async send(event: string, payload: any) {
+    await this.ensureReactDevtoolsBackendLoaded();
+
     try {
       switch (event) {
         case "inspectElement": {
@@ -179,26 +189,42 @@ class ReplayWall implements Wall {
     }
   }
 
+  private async ensureReactDevtoolsBackendLoaded() {
+    if (this.recordingTarget === null) {
+      this.recordingTarget = await ThreadFront.getRecordingTarget();
+    }
+
+    if (this.recordingTarget === "chromium") {
+      await injectReactDevtoolsBackend(ThreadFront, this.replayClient);
+    }
+  }
+
   // send a request to the backend in the recording and the reply to the frontend
   private async sendRequest(event: string, payload: any) {
-    const response = await ThreadFront.evaluateNew({
-      replayClient: this.replayClient,
-      text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("${event}", ${JSON.stringify(
-        payload
-      )})`,
-    });
+    try {
+      const response = await ThreadFront.evaluateNew({
+        replayClient: this.replayClient,
+        text: ` window.__RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("${event}", ${JSON.stringify(
+          payload
+        )})`,
+      });
 
-    if (response.returned) {
-      const result: any = await getJSON(this.replayClient, this.pauseId!, response.returned);
+      if (response.returned) {
+        const result: any = await getJSON(this.replayClient, this.pauseId!, response.returned);
 
-      if (result) {
-        this._listener?.({ event: result.event, payload: result.data });
+        if (result) {
+          this._listener?.({ event: result.event, payload: result.data });
+        }
+        return result;
       }
-      return result;
+    } finally {
+      await logWindowMessages(ThreadFront, this.replayClient);
     }
   }
 
   private async mapNodesToElements() {
+    await this.ensureReactDevtoolsBackendLoaded();
+
     const nodeToElementId = new Map<ObjectId, number>();
     for (const rootID of this.store!._roots) {
       const rendererID = this.store!._rootIDToRendererID.get(rootID)!;
@@ -300,34 +326,44 @@ async function loadReactDevToolsInlineModuleFromProtocol(
     return;
   }
 
-  const response = await ThreadFront.evaluateNew({
-    replayClient,
-    text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("getBridgeProtocol", undefined)`,
-  });
-  if (response.returned?.object) {
-    // Unwrap the nested eval objects by asking the backend for contents
-    // of the nested fields: `{data: {version: 123}}`
-    const responseDataObject = await getObjectPropertyHelper(
-      replayClient,
-      pauseId,
-      response.returned.object,
-      "data"
-    );
-    const versionData = (await getObjectPropertyHelper(
-      replayClient,
-      pauseId,
-      responseDataObject.object!,
-      "version"
-    )) as { value: number };
-    const { value: version } = versionData;
+  // Default assume that it's a recent recording
+  let backendBridgeProtocolVersion = 2;
 
-    // We should only load the DevTools module once we know which protocol version it requires.
-    // If we don't have a version yet, it probably means we're too early in the Replay session.
-    if (version >= 2) {
-      stateUpdaterCallback(await import("react-devtools-inline/frontend"));
-    } else if (version === 1) {
-      stateUpdaterCallback(await import("react-devtools-inline_4_18_0/frontend"));
+  const recordingTarget = await ThreadFront.getRecordingTarget();
+
+  if (recordingTarget === "gecko") {
+    // For Gecko recordings, introspect the page to determine what RDT version was used
+    const response = await ThreadFront.evaluateNew({
+      replayClient,
+      text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("getBridgeProtocol", undefined)`,
+    });
+    if (response.returned?.object) {
+      // Unwrap the nested eval objects by asking the backend for contents
+      // of the nested fields: `{data: {version: 123}}`
+      const responseDataObject = await getObjectPropertyHelper(
+        replayClient,
+        pauseId,
+        response.returned.object,
+        "data"
+      );
+      const versionData = (await getObjectPropertyHelper(
+        replayClient,
+        pauseId,
+        responseDataObject.object!,
+        "version"
+      )) as { value: number };
+      if (versionData.value) {
+        backendBridgeProtocolVersion = versionData.value;
+      }
     }
+  }
+
+  // We should only load the DevTools module once we know which protocol version it requires.
+  // If we don't have a version yet, it probably means we're too early in the Replay session.
+  if (backendBridgeProtocolVersion >= 2) {
+    stateUpdaterCallback(await import("react-devtools-inline/frontend"));
+  } else if (backendBridgeProtocolVersion === 1) {
+    stateUpdaterCallback(await import("react-devtools-inline_4_18_0/frontend"));
   }
 }
 

@@ -24,7 +24,7 @@
 }
 
 .CountRow {
-  background-color: var(--background-color-contrast-2);
+  background-color: var(--body-bgcolor);
   padding: 0.5rem 1rem;
 }
 
