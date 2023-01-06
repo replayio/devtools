@@ -251,6 +251,65 @@
   --sidemenu-selected-arrow: url("/images/item-arrow-dark-ltr.svg");
   --sidemenu-selected-arrow-rtl: url("/images/item-arrow-dark-rtl.svg");
 
+  /* src/devtools/client/themes/boxmodel.css */
+  --marginbox-color: #73764a;
+  --borderbox-color: var(--grey-70);
+  --paddingbox-color: #6657a6;
+  --contentbox-color: #407aa4;
+  --marginbox-border-color: #bdca00;
+  --contentbox-border-color: #00b8ff;
+  --position-border-color: var(--grey-40);
+
+  /* src/devtools/client/themes/rules.css */
+  --rule-highlight-background-color: #521c76;
+  --rule-header-background-color: #222225;
+  --rule-pseudo-class-text-color: var(--yellow-50);
+  --rule-unused-name-text-color: var(--grey-45);
+  --rule-unused-value-text-color: #787878;
+  --rule-overridden-name-text-color: var(--grey-45);
+  --rule-overridden-value-text-color: #787878;
+
+  /* src/devtools/client/themes/changes.css */
+  --diff-add-background-color: rgba(18, 188, 0, 0.15);
+  --diff-add-text-color: #12bc00;
+  --diff-remove-background-color: rgba(255, 0, 57, 0.15);
+  --diff-remove-text-color: #ff0039;
+  --diff-source-background: #222225;
+  --diff-level: 0;
+  --diff-level-offset: 10px;
+  /*
+    Minimum padding so content on the first level (zero) isn't touching the edge. Added
+    and removed lines will re-declare this to add extra padding to clear the +/- icons.
+  */
+  --diff-level-min-offset: 5px;
+
+  /* src/devtools/client/themes/computed.css */
+  --row-striped-background: rgba(255, 255, 255, 0.05);
+
+  /* src/devtools/client/themes/memory.css */
+  --cell-border-color: rgba(255, 255, 255, 0.15);
+  --cell-border-color-light: rgba(255, 255, 255, 0.1);
+  --focus-cell-border-color: rgba(255, 255, 255, 0.5);
+  --row-alt-background-color: rgba(86, 117, 185, 0.15);
+  --row-hover-background-color: rgba(86, 117, 185, 0.25);
+  --link-color: var(--blue-40);
+  --link-color-active: var(--blue-30);
+
+  /* src/devtools/client/themes/components-frame.css */
+  --frame-link-line-color: hsl(210, 40%, 60%);
+  --frame-link-source: var(--blue-40);
+
+  /* src/devtools/client/themes/widgets.css */
+  --table-splitter-color: rgba(255, 255, 255, 0.15);
+  --table-zebra-background: rgba(255, 255, 255, 0.05);
+  --sidemenu-selected-arrow: url("/images/item-arrow-dark-ltr.svg");
+  --sidemenu-selected-arrow-rtl: url("/images/item-arrow-dark-rtl.svg");
+
+  /* src/devtools/client/themes/perf.css */
+  --highlight-color: var(--blue-55);
+  --slider-thumb-color: var(--grey-40);
+  --slider-track-color: var(--grey-60);
+
   /* src/devtools/client/themes/variables.css */
   /* items below this point haven't been organised yet */
 
@@ -596,6 +655,64 @@
   /* src/devtools/client/themes/splitview.css */
   --sidemenu-selected-arrow: url("/images/item-arrow-ltr.svg");
   --sidemenu-selected-arrow-rtl: url("/images/item-arrow-rtl.svg");
+
+  /* src/devtools/client/themes/boxmodel.css */
+  --marginbox-color: #fdffdf;
+  --borderbox-color: var(--grey-50);
+  --paddingbox-color: #e3dcff;
+  --contentbox-color: #cff0fb;
+  --marginbox-border-color: #d8e60a;
+  --contentbox-border-color: #54a9ff;
+  --position-border-color: var(--grey-50);
+
+  /* src/devtools/client/themes/rules.css */
+  --rule-highlight-background-color: var(--theme-highlight-yellow);
+  --rule-header-background-color: var(--theme-toolbar-background);
+  --rule-pseudo-class-text-color: var(--yellow-70);
+  --rule-unused-name-text-color: var(--grey-50);
+  --rule-unused-value-text-color: var(--grey-45);
+  --rule-overridden-name-text-color: var(--grey-50);
+  --rule-overridden-value-text-color: var(--grey-45);
+
+  /* src/devtools/client/themes/changes.css */
+  --diff-add-background-color: #f1feec;
+  --diff-add-text-color: #54983f;
+  --diff-remove-background-color: #fbf2f5;
+  --diff-remove-text-color: #bf7173;
+  --diff-source-background: var(--theme-toolbar-background);
+  --diff-level: 0;
+  --diff-level-offset: 10px;
+  /*
+    Minimum padding so content on the first level (zero) isn't touching the edge Added and removed lines will re-declare this to add extra padding to clear the +/- icons.
+  */
+  --diff-level-min-offset: 5px;
+
+  /* src/devtools/client/themes/computed.css */
+  --row-striped-background: rgba(247, 247, 247, 0.8);
+
+  /* src/devtools/client/themes/memory.css */
+  --cell-border-color: rgba(0, 0, 0, 0.15);
+  --cell-border-color-light: rgba(0, 0, 0, 0.1);
+  --focus-cell-border-color: rgba(0, 0, 0, 0.3);
+  --row-alt-background-color: rgba(76, 158, 217, 0.1);
+  --row-hover-background-color: rgba(76, 158, 217, 0.2);
+  --link-color: var(--blue-60);
+  --link-color-active: var(--blue-70);
+
+  /* src/devtools/client/themes/components-frame.css */
+  --frame-link-line-color: var(--theme-highlight-blue);
+  --frame-link-source: var(--theme-highlight-purple);
+
+  /* src/devtools/client/themes/widgets.css */
+  --table-splitter-color: rgba(0, 0, 0, 0.15);
+  --table-zebra-background: rgba(0, 0, 0, 0.05);
+  --sidemenu-selected-arrow: url("/images/item-arrow-ltr.svg");
+  --sidemenu-selected-arrow-rtl: url("/images/item-arrow-rtl.svg");
+
+  /* src/devtools/client/themes/perf.css */
+  --highlight-color: var(--blue-55);
+  --slider-thumb-color: var(--grey-50);
+  --slider-track-color: var(--grey-30);
 
   /*
   Migration notes:

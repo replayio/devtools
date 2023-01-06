@@ -1,21 +1,7 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
-
 /**
  * Frame Component
  * Styles for React component at `devtools/client/shared/components/Frame.js`
  */
-
-.theme-light {
-  --frame-link-line-color: var(--theme-highlight-blue);
-  --frame-link-source: var(--theme-highlight-purple);
-}
-
-.theme-dark {
-  --frame-link-line-color: hsl(210, 40%, 60%);
-  --frame-link-source: var(--blue-40);
-}
 
 .stack-trace {
   display: grid;

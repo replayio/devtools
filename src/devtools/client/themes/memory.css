@@ -1,28 +1,3 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-/* CSS Variables specific to this panel that aren't defined by the themes */
-.theme-dark {
-  --cell-border-color: rgba(255, 255, 255, 0.15);
-  --cell-border-color-light: rgba(255, 255, 255, 0.1);
-  --focus-cell-border-color: rgba(255, 255, 255, 0.5);
-  --row-alt-background-color: rgba(86, 117, 185, 0.15);
-  --row-hover-background-color: rgba(86, 117, 185, 0.25);
-  --link-color: var(--blue-40);
-  --link-color-active: var(--blue-30);
-}
-
-.theme-light {
-  --cell-border-color: rgba(0, 0, 0, 0.15);
-  --cell-border-color-light: rgba(0, 0, 0, 0.1);
-  --focus-cell-border-color: rgba(0, 0, 0, 0.3);
-  --row-alt-background-color: rgba(76, 158, 217, 0.1);
-  --row-hover-background-color: rgba(76, 158, 217, 0.2);
-  --link-color: var(--blue-60);
-  --link-color-active: var(--blue-70);
-}
-
 html,
 body,
 #memory-tool {

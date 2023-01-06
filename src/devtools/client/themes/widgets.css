@@ -1,22 +1,4 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
 @import url(chrome://devtools/skin/breadcrumbs.css);
-
-.theme-dark {
-  --table-splitter-color: rgba(255, 255, 255, 0.15);
-  --table-zebra-background: rgba(255, 255, 255, 0.05);
-  --sidemenu-selected-arrow: url(images/item-arrow-dark-ltr.svg);
-  --sidemenu-selected-arrow-rtl: url(images/item-arrow-dark-rtl.svg);
-}
-
-.theme-light {
-  --table-splitter-color: rgba(0, 0, 0, 0.15);
-  --table-zebra-background: rgba(0, 0, 0, 0.05);
-  --sidemenu-selected-arrow: url(images/item-arrow-ltr.svg);
-  --sidemenu-selected-arrow-rtl: url(images/item-arrow-rtl.svg);
-}
 
 /* Generic pane helpers */
 
