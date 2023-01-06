@@ -63,7 +63,9 @@ async function protocolValueToTextHelper(
       if (object && object.preview) {
         switch (type) {
           case "date": {
-            valueToCopy = JSON.stringify(dateProtocolObjectToString(object));
+            const dateTime = object?.preview?.dateTime;
+            const string = dateTime ? new Date(dateTime).toISOString() : "Date";
+            valueToCopy = JSON.stringify(string);
             break;
           }
           case "error": {

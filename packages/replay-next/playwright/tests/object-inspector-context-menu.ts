@@ -125,7 +125,7 @@ test("should copy dates", async ({ page }) => {
     "date",
     "2023",
     "Copy date",
-    '"Thu Jan 05 2023 19:09:26 GMT-0500 (Eastern Standard Time)"'
+    '"2023-01-06T00:09:26.752Z"'
   );
 });
 
