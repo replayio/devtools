@@ -79,6 +79,7 @@ export type Point = {
   location: Location;
   shouldBreak: boolean;
   shouldLog: boolean;
+  shouldShowPointPanel?: boolean;
 };
 
 export type RunAnalysisParams = Omit<AnalysisParams, "locations"> & { location?: Location };

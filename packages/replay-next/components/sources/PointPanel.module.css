@@ -1,9 +1,12 @@
-.Panel {
+.PanelEnabled,
+.PanelDisabled {
   display: flex;
   flex-direction: column;
-  background-color: var(--point-panel-background-color);
   padding: 0.5rem;
   gap: 0.5rem;
+}
+.PanelEnabled {
+  background-color: var(--point-panel-background-color);
 }
 
 .Loader {
@@ -170,4 +173,15 @@
   align-items: center;
   justify-content: center;
   font-size: var(--font-size-small);
+}
+
+.Toggle {
+  /* trunk-ignore-begin(stylelint/unit-disallowed-list) */
+  width: 1em;
+  height: 1em;
+  position: absolute;
+  left: calc(-1em - var(--line-hit-count-size) - 1ch);
+  top: calc(50% - 0.5em);
+  margin: 0;
+  /* trunk-ignore-end(stylelint/unit-disallowed-list) */
 }

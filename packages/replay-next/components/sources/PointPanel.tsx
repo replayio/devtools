@@ -1,5 +1,6 @@
 import { TimeStampedPoint } from "@replayio/protocol";
 import {
+  ChangeEvent,
   MouseEvent,
   Suspense,
   unstable_useCacheRefresh as useCacheRefresh,
@@ -181,7 +182,7 @@ function PointPanelWithHitPoints({
 
     return (
       <div
-        className={`${styles.Panel} ${className}`}
+        className={`${point.shouldLog ? styles.PanelEnabled : styles.PanelDisabled} ${className}`}
         data-test-id={`PointPanel-${lineNumber}`}
         onMouseMove={onMouseMove}
       >
@@ -338,7 +339,7 @@ function PointPanelWithHitPoints({
 
     return (
       <div
-        className={`${styles.Panel} ${className}`}
+        className={`${point.shouldLog ? styles.PanelEnabled : styles.PanelDisabled} ${className}`}
         data-test-id={`PointPanel-${lineNumber}`}
         onMouseMove={onMouseMove}
       >
@@ -401,7 +402,29 @@ function PointPanelWithHitPoints({
         <div className={styles.FixedHeightRow}>
           <PointPanelTimeline hitPoints={hitPoints} hitPointStatus={hitPointStatus} point={point} />
         </div>
+
+        <Toggle point={point} />
       </div>
     );
   }
+}
+
+function Toggle({ point }: { point: Point }) {
+  const { editPoint } = useContext(PointsContext);
+
+  const onChange = (event: ChangeEvent<HTMLInputElement>) => {
+    editPoint(point.id, {
+      shouldLog: event.target.checked,
+      shouldShowPointPanel: true,
+    });
+  };
+
+  return (
+    <input
+      checked={point.shouldLog}
+      className={styles.Toggle}
+      onChange={onChange}
+      type="checkbox"
+    />
+  );
 }

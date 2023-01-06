@@ -196,7 +196,7 @@ export default function SourceList({
     (index: number) => {
       const lineNumber = index + 1;
       const point = findPointForLocation(points, sourceId, lineNumber);
-      if (point === null || !point.shouldLog) {
+      if (point === null || (!point.shouldLog && !point.shouldShowPointPanel)) {
         return lineHeight;
       } else if (point.condition !== null) {
         return lineHeightWithConditionalPoint;

@@ -6,7 +6,6 @@ import Icon from "replay-next/components/Icon";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { KeyboardModifiersContext } from "replay-next/src/contexts/KeyboardModifiersContext";
 import { AddPoint, DeletePoints, EditPoint } from "replay-next/src/contexts/PointsContext";
-import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { Nag } from "replay-next/src/graphql/types";
@@ -50,7 +49,6 @@ export default function HoverButton({
   const client = useContext(ReplayClientContext);
   const { executionPoint, update } = useContext(TimelineContext);
   const { findClosestFunctionName } = useContext(SourcesContext);
-  const { trackEvent } = useContext(SessionContext);
 
   const [showNag, dismissNag] = useNag(Nag.FIRST_BREAKPOINT_ADD);
 
@@ -139,10 +137,12 @@ export default function HoverButton({
       }
     };
 
+    const shouldLog = !!(point?.shouldLog || point?.shouldShowPointPanel);
+
     const togglePoint = () => {
       if (point) {
-        if (!point.shouldLog || point.shouldBreak) {
-          editPoint(point.id, { shouldLog: !point.shouldLog });
+        if (!shouldLog || point.shouldBreak) {
+          editPoint(point.id, { shouldLog: !shouldLog });
         } else {
           deletePoints(point.id);
         }
@@ -153,10 +153,10 @@ export default function HoverButton({
       <button
         className={`${buttonClassName} ${showNag ? styles.ButtonWithNag : styles.Button}`}
         data-test-name="LogPointToggle"
-        data-test-state={point?.shouldLog ? "on" : "off"}
-        onClick={point?.shouldLog ? togglePoint : addLogPoint}
+        data-test-state={shouldLog ? "on" : "off"}
+        onClick={shouldLog ? togglePoint : addLogPoint}
       >
-        <Icon className={iconClassName} type={point?.shouldLog ? "remove" : "add"} />
+        <Icon className={iconClassName} type={shouldLog ? "remove" : "add"} />
       </button>
     );
   }

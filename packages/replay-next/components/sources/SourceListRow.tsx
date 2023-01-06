@@ -249,7 +249,7 @@ const SourceListRow = memo(
         // Toggling it off depends on whether the point also logs.
         // 1. If it logs and breaks, then we should disable breaking
         // 2. If it only breaks then we should delete that point (and all others on the line)
-        if (firstPoint.shouldLog) {
+        if (firstPoint.shouldLog || firstPoint.shouldShowPointPanel) {
           editPoint(firstPoint.id, { shouldBreak: !firstPoint.shouldBreak });
         } else {
           deletePoints(...pointsForLine.map(point => point.id));
@@ -354,7 +354,9 @@ const SourceListRow = memo(
             )}
           </div>
 
-          {firstPoint?.shouldLog && <PointPanel className={styles.PointPanel} point={firstPoint} />}
+          {(firstPoint?.shouldLog || firstPoint?.shouldShowPointPanel) && (
+            <PointPanel className={styles.PointPanel} point={firstPoint} />
+          )}
         </div>
 
         <CurrentLineHighlight lineNumber={lineNumber} sourceId={sourceId} />
