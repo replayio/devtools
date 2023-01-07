@@ -5,7 +5,6 @@
 :root.theme-light {
   /*
   TABLE OF CONTENTS
-  - Color ramp
   - Core classes
   - Tabs
   - Timeline
@@ -17,7 +16,6 @@
   - (Previous styles; to organise)
   */
 
-  /* Color ramp (Light) */
   /* Migration note: copy/pasted with packages/replay-next/pages/variables.css */
   --theme-base-100: hsl(0, 0%, 100%);
   --theme-base-95: hsl(0, 0%, 95%);
@@ -53,6 +51,7 @@
   /* Tabs (Light) */
   /* Migration note: removed from this document; added to packages/replay-next/pages/variables.css */
 
+  /* Color ramp (Light) */
   /* Tabs (Light) */
   /* Timeline (Light) */
   /* Menus (Light) */
@@ -189,7 +188,6 @@
 :root.theme-dark {
   /*
   TABLE OF CONTENTS
-  - Color ramp
   - Core classes
   - Tabs
   - Timeline
@@ -200,15 +198,6 @@
   - To Organise
   - (Previous styles; to organise)
   */
-
-  /* Color ramp (Dark) */
-  --theme-base-100: #000; /* background chrome */
-  --theme-base-95: #192230; /* tab bars */
-  --theme-base-90: #3d4552; /* editor and selected tab */
-  --theme-base-85: #3e434b; /* textfields */
-  --theme-base-80: #797d81;
-  --theme-base-70: #a2a6a8;
-  --theme-base-60: #c3c6c8;
 
   /* Core classes (Dark) */
   --chrome: #081120; /* bg app */
@@ -237,6 +226,7 @@
   /* Tabs (Dark) */
   /* Migration note: removed from this document; added to packages/replay-next/pages/variables.css */
 
+  /* Color ramp (Dark) */
   /* Tabs (Dark) */
   /* Timeline (Dark) */
   /* Menus (Dark) */
