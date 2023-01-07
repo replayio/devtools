@@ -16,15 +16,6 @@
   - (Previous styles; to organise)
   */
 
-  /* Migration note: copy/pasted with packages/replay-next/pages/variables.css */
-  --theme-base-100: hsl(0, 0%, 100%);
-  --theme-base-95: hsl(0, 0%, 95%);
-  --theme-base-90: hsl(0, 0%, 90%);
-  --theme-base-85: hsl(0, 0%, 85%);
-  --theme-base-80: hsl(0, 0%, 80%);
-  --theme-base-70: hsl(0, 0%, 70%);
-  --theme-base-60: hsl(0, 0%, 60%);
-
   /* Core classes (Light) */
   --chrome: var(--theme-base-95); /* bg app */
   --body-color: #38383d;
