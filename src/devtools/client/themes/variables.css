@@ -5,7 +5,6 @@
 :root.theme-light {
   /*
   TABLE OF CONTENTS
-  - Badge colors
   - Color ramp
   - Core classes
   - Tabs
@@ -17,18 +16,6 @@
   - To Organise
   - (Previous styles; to organise)
   */
-
-  /* Badge colors */
-  --badge-green-color: #73cc6d;
-  --badge-green-contrast-color: #fff;
-  --badge-orange-color: #da7c04;
-  --badge-orange-contrast-color: #fff;
-  --badge-purple-color: #a973cd;
-  --badge-purple-contrast-color: #fff;
-  --badge-unicorn-color: #ff6ddf;
-  --badge-unicorn-contrast-color: #fff;
-  --badge-yellow-color: #e4cd00;
-  --badge-yellow-contrast-color: rgb(99, 79, 5);
 
   /* Color ramp (Light) */
   /* Migration note: copy/pasted with packages/replay-next/pages/variables.css */
@@ -202,7 +189,6 @@
 :root.theme-dark {
   /*
   TABLE OF CONTENTS
-  - Badge colors
   - Color ramp
   - Core classes
   - Tabs
@@ -214,18 +200,6 @@
   - To Organise
   - (Previous styles; to organise)
   */
-
-  /* Badge colors */
-  --badge-green-color: #69e261;
-  --badge-green-contrast-color: #050;
-  --badge-orange-color: #ff9a19;
-  --badge-orange-contrast-color: #fff;
-  --badge-purple-color: #cc81ff;
-  --badge-purple-contrast-color: #fff;
-  --badge-unicorn-color: #e110b3;
-  --badge-unicorn-contrast-color: #fff;
-  --badge-yellow-color: #fee608;
-  --badge-yellow-contrast-color: rgb(99, 79, 5);
 
   /* Color ramp (Dark) */
   --theme-base-100: #000; /* background chrome */
