@@ -416,7 +416,6 @@
   /* src/devtools/client/themes/variables.css */
   /* items below this point haven't been organised yet */
 
-
   /* Timeline (Dark) */
   --progressbar-preview-max: var(--theme-base-70);
   --progressbar-preview-min: var(--primary-accent);
