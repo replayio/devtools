@@ -6,12 +6,6 @@
   /*
   TABLE OF CONTENTS
   - Core classes
-  - Tabs
-  - Timeline
-  - Menus
-  - Code Mirror (Editor)
-  - Breakpoints
-  - Testsuites
   - To Organise
   - (Previous styles; to organise)
   */
@@ -39,9 +33,9 @@
   --tooltip-color: white;
   --tooltip-bgcolor: #38383d;
 
-  /* Tabs (Light) */
   /* Migration note: removed from this document; added to packages/replay-next/pages/variables.css */
 
+  /* Tabs (Light) */
   /* Color ramp (Light) */
   /* Tabs (Light) */
   /* Timeline (Light) */
@@ -180,12 +174,6 @@
   /*
   TABLE OF CONTENTS
   - Core classes
-  - Tabs
-  - Timeline
-  - Menus
-  - Code Mirror (Editor)
-  - Breakpoints
-  - Testsuites
   - To Organise
   - (Previous styles; to organise)
   */
@@ -214,9 +202,9 @@
   --tooltip-color: #fff;
   --tooltip-bgcolor: var(--theme-base-85);
 
-  /* Tabs (Dark) */
   /* Migration note: removed from this document; added to packages/replay-next/pages/variables.css */
 
+  /* Tabs (Dark) */
   /* Color ramp (Dark) */
   /* Tabs (Dark) */
   /* Timeline (Dark) */
