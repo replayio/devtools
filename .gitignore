@@ -28,3 +28,5 @@ storybook-static/
 .pnp.*
 *.tgz
 test/.yarn/cache/
+*.mp4
+videos/
