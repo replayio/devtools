@@ -145,9 +145,33 @@
   --tab-selected-bgcolor: var(--theme-base-95);
   --tab-selected-color: #fff;
 
+  /* Core classes (Dark) */
+  /* Migration note: removed from src/devtools/client/themes/variables.css */
   --scroll-thumb-color: #454950;
   --dropshadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --body-bgcolor: var(--theme-base-95);
+  --chrome: #081120; /* bg app */
+  --body-color: var(--grey-30);
+  --body-sub-color: var(--grey-40);
+  --buttontext-color: #f4f8fa;
+  --checkbox-border: var(--theme-base-90);
+  --checkbox: var(--theme-base-80);
+  --modal-bgcolor: var(--theme-base-95);
+  --modal-border: #222;
+  --tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
+  --tab-bgcolor: var(--theme-base-100); /* bg tabs */
+
+  --theme-border: var(--theme-base-100);
+  --icon-color: var(--body-color);
+  --theme-focuser-bgcolor: var(--primary-accent);
+  --theme-sidebar-background: var(--body-bgcolor);
+  --theme-text-field-color: #fff;
+  --theme-text-field-bgcolor: var(--theme-base-85);
+  --theme-text-field-bgcolor-hover: var(--theme-base-90);
+  --text-field-border: var(--theme-base-85);
+  --tab-selected-bgcolor: var(--theme-base-95);
+  --tooltip-color: #fff;
+  --tooltip-bgcolor: var(--theme-base-85);
 
   --background-color-contrast-1: #0e1119;
   --background-color-contrast-2: #192230;
@@ -523,6 +547,91 @@
   --theme-icon-checked-color: var(--blue-30);
   --theme-icon-error-color: var(--red-40);
   --theme-icon-warning-color: var(--yellow-60);
+
+  /* Text color */
+  --theme-comment: var(--grey-45);
+  --theme-text-color-alt: var(--grey-45);
+  --theme-text-color-inactive: var(--grey-50);
+  --theme-text-color-strong: var(--grey-30);
+
+  --theme-highlight-green: #86de74;
+  --theme-highlight-blue: #75bfff;
+  --theme-highlight-purple: #b98eff;
+  --theme-highlight-red: #ff7de9;
+  --theme-highlight-yellow: #fff89e;
+
+  /* These theme-highlight color variables have not been photonized. */
+  --theme-highlight-bluegrey: #5e88b0;
+  --theme-highlight-lightorange: #d99b28;
+  --theme-highlight-orange: #d96629;
+  --theme-highlight-pink: #df80ff;
+  --theme-highlight-gray: #e9f4fe;
+
+  /* For accessibility purposes we want to enhance the focus styling. This
+   * should improve keyboard navigation usability. */
+  --theme-focus-outline-color: #ced3d9;
+
+  /* Colors used in Graphs, like performance tools. Mostly similar to some "highlight-*" colors. */
+  --theme-graphs-green: #70bf53;
+  --theme-graphs-blue: #46afe3;
+  --theme-graphs-bluegrey: #5e88b0;
+  --theme-graphs-purple: #df80ff;
+  --theme-graphs-yellow: #d99b28;
+  --theme-graphs-orange: #d96629;
+  --theme-graphs-red: #eb5368;
+  --theme-graphs-grey: #757873;
+  --theme-graphs-full-red: #f00;
+  --theme-graphs-full-blue: #00f;
+
+  /* Common popup styles(used by HTMLTooltip and autocomplete) */
+  --theme-popup-background: var(--grey-60);
+  --theme-popup-color: rgb(249, 249, 250);
+  --theme-popup-border-color: #27272b;
+  --theme-popup-dimmed: rgba(249, 249, 250, 0.1);
+
+  /* Styling for devtool buttons */
+  --theme-toolbarbutton-background: none;
+  --theme-toolbarbutton-color: var(--grey-40);
+  --theme-toolbarbutton-hover-background: var(--grey-10-a15);
+  --theme-toolbarbutton-checked-background: var(--grey-10-a20);
+  --theme-toolbarbutton-checked-color: var(--grey-30);
+  --theme-toolbarbutton-checked-hover-background: var(--grey-10-a25);
+  --theme-toolbarbutton-checked-hover-color: var(--grey-30);
+  --theme-toolbarbutton-active-background: var(--grey-10-a30);
+  --theme-toolbarbutton-active-color: var(--grey-30);
+
+  /* Warning colors */
+  --theme-warning-background: hsl(42, 37%, 19%);
+  --theme-warning-border: hsl(60, 30%, 26%);
+  --theme-warning-color: hsl(43, 94%, 81%);
+
+  /* Flashing colors used to highlight updates */
+  --theme-contrast-background: #1a4380;
+  --theme-contrast-background-alpha: rgba(255, 233, 0, 0.15); /* Yellow 50-a15 */
+  --theme-contrast-color: white;
+  --theme-contrast-border: var(--yellow-65);
+
+  /* Timeline Navigation */
+  --replaying-marker-fill: var(--primary-accent);
+  --replaying-marker-stroke: var(--primary-accent);
+  --replaying-marker-future-fill: var(--primary-accent);
+  --replaying-marker-future-stroke: var(--primary-accent);
+  --replaying-paused-marker-fill: var(--secondary-accent);
+  --replaying-paused-marker-stroke: var(--secondary-accent-stroke);
+  --replay-head-background: var(--purple-50);
+
+  /* Loading screen */
+  --loading-boxes: var(--chrome);
+  --loading-background: var(--theme-base-100);
+
+  /* Focus mode editor (dark) */
+  --focus-mode-capsule-bgcolor: var(--theme-base-90);
+  --focus-mode-capsule-bgcolor-hover: #232938;
+  --focus-mode-loading-color: #00567f;
+  --focus-mode-loaded-indexed-color: var(--primary-accent);
+  --focus-mode-popout-icon-background-color: var(--primary-accent);
+  --focus-mode-popout-icon-color: white;
+  --focus-mode-popout-text-input-background-color: #33373d;
 }
 
 :root.theme-light {
@@ -550,9 +659,32 @@
   --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
   --tab-bgcolor: var(--theme-base-90); /* bg tabs */
 
+  /* Core classes (Light) */
+  /* Migration note: removed from src/devtools/client/themes/variables.css */
   --scroll-thumb-color: #aaaaaa;
   --dropshadow: 0 4px 6px -1px rgb(100 100 255 / 0.7), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --body-bgcolor: var(--theme-base-100); /* bg text */
+  --chrome: var(--theme-base-95); /* bg app */
+  --body-color: #38383d;
+  --body-sub-color: #a9a9b1;
+  --buttontext-color: #f4f8fa;
+  --checkbox-border: var(--theme-base-80);
+  --checkbox: #fff;
+  --modal-bgcolor: rgba(255, 255, 255, 0.98);
+  --modal-border: none;
+  --tab-bgcolor-alt-subtle: var(--theme-base-100); /* info, events */
+  --tab-bgcolor: var(--theme-base-90); /* bg tabs */
+  --theme-border: #d2d5da;
+  --icon-color: var(--body-color);
+  --theme-focuser-bgcolor: var(--primary-accent);
+  --theme-sidebar-background: var(--theme-base-100);
+  --theme-text-field-color: var(--theme-body-color);
+  --theme-text-field-bgcolor: var(--theme-base-90);
+  --theme-text-field-bgcolor-hover: var(--theme-base-85);
+  --text-field-border: var(--cool-gray-300);
+  --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
+  --tooltip-color: white;
+  --tooltip-bgcolor: #38383d;
 
   --background-color-contrast-1: #e6e6e6;
   --background-color-contrast-2: #ffffff;
@@ -871,6 +1003,22 @@
   --testsuites-error-color: #eb5757;
   --testsuites-steps-bgcolor: #fafafa;
 
+  /* To organise (Light) */
+  --jellyfish-bgcolor: rgba(255, 255, 255, 0.8);
+  --timejump-text: var(--buttontext-color);
+  --theme-console-input-bgcolor: var(--body-bgcolor);
+  --theme-toggle-handle-bgcolor: var(--theme-base-100);
+  --theme-toggle-handle-bgcolor-hover: #b5eaff;
+  --theme-toggle-inner: var(--cool-gray-200);
+  --theme-toggle-selected: white;
+  --theme-toggle-bgcolor: var(--theme-base-85);
+  --theme-toggle-color: var(--grey-70);
+  --theme-toolbar-hover: #fff;
+  --toolbarbutton-focus-bgcolor: var(--theme-base-90);
+  --toolbox-bgcolor: var(--theme-base-100);
+  --unloaded-region-img: url("/images/dotted-mask-light.svg");
+  --title-hover-bgcolor: #e6e6e6;
+
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-20);
   --theme-toolbar-background: var(--grey-10);
@@ -915,4 +1063,90 @@
   --theme-icon-checked-color: var(--blue-60);
   --theme-icon-error-color: var(--red-60);
   --theme-icon-warning-color: var(--yellow-65);
+
+  /* Text color */
+  --theme-comment: var(--grey-50);
+  --theme-text-color-alt: var(--grey-50);
+  --theme-text-color-inactive: var(--grey-40);
+  --theme-text-color-strong: var(--grey-90);
+
+  --theme-highlight-green: var(--green-70);
+  --theme-highlight-blue: var(--blue-55);
+  --theme-highlight-purple: var(--blue-70);
+  --theme-highlight-red: var(--magenta-65);
+  --theme-highlight-yellow: #fff89e;
+
+  /* These theme-highlight color variables have not been photonized. */
+  --theme-highlight-bluegrey: #0072ab;
+  --theme-highlight-lightorange: #d97e00;
+  --theme-highlight-orange: #f13c00;
+  --theme-highlight-pink: #b82ee5;
+  --theme-highlight-gray: #dde1e4;
+
+  /* For accessibility purposes we want to enhance the focus styling. This
+   * should improve keyboard navigation usability. */
+  --theme-focus-outline-color: #000000;
+
+  /* Colors used in Graphs, like performance tools. Similar colors to Chrome's timeline. */
+  --theme-graphs-green: #85d175;
+  --theme-graphs-blue: #83b7f6;
+  --theme-graphs-bluegrey: #0072ab;
+  --theme-graphs-purple: #b693eb;
+  --theme-graphs-yellow: #efc052;
+  --theme-graphs-orange: #d97e00;
+  --theme-graphs-red: #e57180;
+  --theme-graphs-grey: #cccccc;
+  --theme-graphs-full-red: #f00;
+  --theme-graphs-full-blue: #00f;
+
+  /* Common popup styles(used by HTMLTooltip and autocomplete) */
+  --theme-popup-background: white;
+  --theme-popup-color: var(--grey-70);
+  --theme-errant-popup-color: #991b1b;
+  --theme-popup-border-color: ThreeDShadow;
+  --theme-popup-dimmed: hsla(0, 0%, 80%, 0.3);
+
+  /* Styling for devtool buttons */
+  --theme-toolbarbutton-background: none;
+  --theme-toolbarbutton-color: var(--grey-70);
+  --theme-toolbarbutton-hover-background: var(--grey-90-a05);
+  --theme-toolbarbutton-checked-background: var(--grey-90-a10);
+  --theme-toolbarbutton-checked-color: var(--grey-90);
+  --theme-toolbarbutton-checked-hover-background: var(--grey-90-a15);
+  --theme-toolbarbutton-checked-hover-color: var(--grey-90);
+  --theme-toolbarbutton-active-background: var(--grey-90-a20);
+  --theme-toolbarbutton-active-color: var(--grey-90);
+
+  /* Warning colors */
+  --theme-warning-background: hsl(54, 100%, 92%);
+  --theme-warning-border: rgba(215, 182, 0, 0.28); /* Yellow 60 + opacity */
+  --theme-warning-color: var(--yellow-80);
+
+  /* Flashing colors used to highlight updates */
+  --theme-contrast-background: #fff9bb;
+  --theme-contrast-background-alpha: rgb(255, 241, 90);
+  --theme-contrast-color: black;
+  --theme-contrast-border: var(--yellow-60);
+
+  /* Timeline Navigation */
+  --replaying-marker-fill: var(--primary-accent);
+  --replaying-marker-stroke: var(--primary-accent);
+  --replaying-marker-future-fill: var(--primary-accent);
+  --replaying-marker-future-stroke: var(--primary-accent);
+  --replaying-paused-marker-fill: var(--secondary-accent);
+  --replaying-paused-marker-stroke: var(--secondary-accent-stroke);
+  --replay-head-background: var(--purple-50);
+
+  /* Loading screen */
+  --loading-boxes: white;
+  --loading-background: var(--chrome);
+
+  /* Focus mode editor (light) */
+  --focus-mode-capsule-bgcolor: #e6e6e6;
+  --focus-mode-capsule-bgcolor-hover: #d8d8d8;
+  --focus-mode-loading-color: white;
+  --focus-mode-loaded-indexed-color: var(--primary-accent);
+  --focus-mode-popout-icon-background-color: white;
+  --focus-mode-popout-icon-color: black;
+  --focus-mode-popout-text-input-background-color: var(--theme-base-85);
 }
