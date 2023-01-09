@@ -168,12 +168,7 @@ class TokenManager {
   }
 
   private async update(refresh: boolean) {
-    if (
-      !this.auth0Client ||
-      this.auth0Client.isLoading ||
-      typeof window === "undefined" ||
-      window.__IS_RECORD_REPLAY_RUNTIME__
-    ) {
+    if (!this.auth0Client || this.auth0Client.isLoading || typeof window === "undefined") {
       return;
     }
 
