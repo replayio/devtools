@@ -91,12 +91,17 @@ if (typeof window !== "undefined") {
   });
 }
 
-const noCallerStackTracesForErrorCodes = new Set([
+const noCallerStackTracesForErrorCodes = new Set<ProtocolError>([
   ProtocolError.GraphicsUnavailableAtPoint,
   ProtocolError.InternalError,
   ProtocolError.SessionDestroyed,
   ProtocolError.TooManyPoints,
+  ProtocolError.UnknownSession,
   ProtocolError.UnsupportedRecording,
+]);
+const noCallerStackTracesForFailedCommands = new Set<CommandMethods>([
+  "DOM.repaintGraphics",
+  "Session.createPause",
 ]);
 
 export type ExperimentalSettings = {
@@ -235,7 +240,10 @@ export async function sendMessage<M extends CommandMethods>(
       // _just_ "Internal Error" or similar
       finalMessage = `${message} (request: ${method}, ${JSON.stringify(params)})`;
     }
-    if (!noCallerStackTracesForErrorCodes.has(code)) {
+    if (
+      !noCallerStackTracesForErrorCodes.has(code) &&
+      !(code === ProtocolError.CommandFailed && noCallerStackTracesForFailedCommands.has(method))
+    ) {
       captureException(callerStackTrace, { extra: { code, message, method, params } });
     }
     throw commandError(finalMessage, code);
