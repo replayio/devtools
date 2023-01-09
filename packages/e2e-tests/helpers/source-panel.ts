@@ -126,7 +126,10 @@ export async function addLogpoint(
   await numberLocator.hover({ force: true });
   const toggle = line.locator('[data-test-name="LogPointToggle"]');
   await toggle.waitFor();
-  await toggle.click({ force: true });
+  const state = await toggle.getAttribute("data-test-state");
+  if (state !== "on") {
+    await toggle.click({ force: true });
+  }
 
   await waitForLogpoint(page, options);
   await editLogPoint(page, options);
@@ -312,6 +315,40 @@ export async function removeBreakpoint(
   // important for cases where we remove a breakpoint and then immediately
   // attempt to step across the breakpoint location.
   await delay(500);
+}
+
+export async function removeLogPoint(
+  page: Page,
+  options: {
+    lineNumber: number;
+    url: string;
+  }
+): Promise<void> {
+  const { lineNumber, url } = options;
+
+  await debugPrint(
+    page,
+    `Removing log-point at ${chalk.bold(`${url}:${lineNumber}`)}`,
+    "removeLogpoint"
+  );
+
+  await openDevToolsTab(page);
+
+  if (url) {
+    await openSourceExplorerPanel(page);
+    await openSource(page, url);
+  }
+
+  const line = await getSourceLine(page, lineNumber);
+  const numberLocator = line.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
+  await numberLocator.waitFor();
+  await numberLocator.hover({ force: true });
+  const toggle = line.locator('[data-test-name="LogPointToggle"]');
+  await toggle.waitFor();
+  const state = await toggle.getAttribute("data-test-state");
+  if (state !== "off") {
+    await toggle.click({ force: true });
+  }
 }
 
 export async function toggleMappedSources(page: Page, targetState: "on" | "off"): Promise<void> {

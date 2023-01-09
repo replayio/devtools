@@ -68,6 +68,15 @@ export type Events = {
   navigationEvents: NavigationEvent[];
 };
 
+export const POINT_BEHAVIOR_ENABLED = "enabled";
+export const POINT_BEHAVIOR_DISABLED = "disabled";
+export const POINT_BEHAVIOR_DISABLED_TEMPORARILY = "disabled-temporarily";
+
+type PointBehavior =
+  | typeof POINT_BEHAVIOR_ENABLED
+  | typeof POINT_BEHAVIOR_DISABLED
+  | typeof POINT_BEHAVIOR_DISABLED_TEMPORARILY;
+
 export type PointId = string;
 export type Badge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow";
 export type Point = {
@@ -77,8 +86,8 @@ export type Point = {
   createdAtTime: number;
   id: PointId;
   location: Location;
-  shouldBreak: boolean;
-  shouldLog: boolean;
+  shouldBreak: PointBehavior;
+  shouldLog: PointBehavior;
 };
 
 export type RunAnalysisParams = Omit<AnalysisParams, "locations"> & { location?: Location };
