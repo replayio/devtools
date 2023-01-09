@@ -401,7 +401,7 @@ test("should update the current time when the log point timeline is clicked", as
 test("should update the current time when the next/previous log point buttons are clicked", async ({
   page,
 }) => {
-  const lineNumber = 30;
+  const lineNumber = 18;
 
   await addLogPoint(page, { lineNumber, sourceId });
   await verifyLogPointStep(page, "2", { lineNumber, sourceId });
