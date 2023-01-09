@@ -59,6 +59,7 @@ module.exports = {
         themeMenuHighlight: "var(--theme-menu-highlight)",
         tabBgcolor: "var(--tab-bgcolor)",
         tabBgcolorAltSubtle: "var(--tab-bgcolor-alt-subtle)",
+        themeTableSelectionBackgroundHover: "var(--theme-table-selection-background-hover)",
         themeTextFieldBgcolor: "var(--theme-text-field-bgcolor)",
         themeTextFieldColor: "var(--theme-text-field-color)",
         themeToggleBgcolor: "var(--theme-toggle-bgcolor)",
