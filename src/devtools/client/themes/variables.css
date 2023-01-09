@@ -1,145 +1,14 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
 :root {
-  --theme-focus-border-color-textbox: #0675d3;
-  --theme-textbox-box-shadow: rgba(97, 181, 255, 0.75);
-
-  /* Text sizes */
-  --root-font-size: 16px;
-  --devtools-base-font-size: 12px;
-  --theme-body-font-size: 12px;
-  --theme-code-font-size: 11px;
-  --theme-tab-font-size: 15px;
-  --theme-code-line-height: calc(15 / 11);
-
-  /* Toolbar size (excluding borders) */
-  --theme-toolbar-height: 24px;
-
-  /* For accessibility purposes we want to enhance the focus styling. This
-   * should improve keyboard navigation usability. */
-  --theme-focus-outline: 1px dotted var(--theme-focus-outline-color);
-  --theme-focus-box-shadow-textbox: 0 0 0 1px var(--theme-textbox-box-shadow);
-  --toolbarbutton-focus-bgcolor: var(--theme-selection-focus-background);
-  --toolbarbutton-focus-color: var(--theme-selection-focus-color);
-  --toolbarbutton-checked-background: var(--theme-selection-background);
-  --toolbarbutton-checked-color: var(--theme-selection-color);
-  --toolbarbutton-checked-focus-background: var(--blue-60);
-
-  /* The photon animation curve */
-  --animation-curve: cubic-bezier(0.07, 0.95, 0, 1);
-
-  /*
-   * Photon Colors CSS Variables v3.3.2
-   * - Colors are taken from https://github.com/FirefoxUX/photon-colors/blob/master/photon-colors.css
-   * - We only add Photon color variables that we are actually using; unused
-   *   variables will fail browser/base/content/test/static/browser_parsable_css.js
-   * - We added a few unofficial colors: a few intermediary values (e.g. Blue 45),
-   *   and lighter variants for the dark theme (e.g. Red 20, Red 40).
-   */
-
-  --primary-accent-text: #007aff;
-  --primary-accent: #01acfd;
-  --primary-accent-hover: #0194ff;
-  --primary-accent-light: #85bfff;
-
-  --primary-accent-legacy: #007aff;
-  --primary-accent-legacy-hover: #0067d7;
-
-  --secondary-accent: #f02d5e;
-  --secondary-accent-hover: #d72451;
-  --secondary-accent-stroke: #f02d5e;
-
-  /* used in our codebase, to be refactored */
-  --new-blue-900: #215487;
-  --cool-gray-200: #e5e7eb;
-  --cool-gray-300: #d1d5db;
-  --cool-gray-400: #9ca3af;
-  --cool-gray-500: #6b7280;
-  --magenta-65: #dd00a9;
-  --purple-50: #9400ff;
-  --purple-60: #8000d7;
-  --blue-30: #75baff;
-  --blue-40: #45a1ff;
-  --blue-50: #0a84ff;
-  --blue-55: #0074e8;
-  --blue-60: #0060df;
-  --blue-70: #003eaa;
-  --blue-80: #002275;
-  --green-50: #30e60b;
-  --green-60: #12bc00;
-  --green-70: #058b00;
-  --yellow-50: #ffe900;
-  --yellow-60: #d7b600;
-  --yellow-65: #be9b00;
-  --yellow-70: #a47f00;
-  --yellow-80: #715100;
-  --yellow-90: #3e2800;
-  --red-20: #ffb3d2;
-  --red-40: #ff3b6b;
-  --red-50: #ff0039;
-  --red-60: #d70022;
-  --red-70: #a4000f;
-  --grey-10: #f9f9fa;
-  --grey-10-a15: rgba(249, 249, 250, 0.15);
-  --grey-10-a20: rgba(249, 249, 250, 0.2);
-  --grey-10-a25: rgba(249, 249, 250, 0.25);
-  --grey-10-a30: rgba(249, 249, 250, 0.3);
-  --grey-10-a40: rgba(249, 249, 250, 0.4);
-  --grey-20: #ededf0;
-  --grey-25: #e0e0e2;
-  --grey-30: #d7d7db;
-  --grey-35: #c3c3c6;
-  --grey-40: #b1b1b3;
-  --grey-43: #a4a4a4;
-  --grey-45: #939395;
-  --grey-50: #737373;
-  --grey-55: #5c5c5f;
-  --grey-60: #4a4a4f;
-  --grey-70: #38383d;
-  --grey-80: #2a2a2e;
-  --grey-90: #0c0c0d;
-  --grey-90-a10: rgba(12, 12, 13, 0.1);
-  --grey-90-a30: rgba(12, 12, 13, 0.3);
+  /* Migration note: this was all moved to packages/replay-next/pages/variables.css in preparation for removing this file entirely  */
 }
 
 :root.theme-light {
   /*
   TABLE OF CONTENTS
-  - Badge colors
-  - Color ramp
   - Core classes
-  - Tabs
-  - Timeline
-  - Menus
-  - Code Mirror (Editor)
-  - Breakpoints
-  - Testsuites
   - To Organise
   - (Previous styles; to organise)
   */
-
-  /* Badge colors */
-  --badge-green-color: #73cc6d;
-  --badge-green-contrast-color: #fff;
-  --badge-orange-color: #da7c04;
-  --badge-orange-contrast-color: #fff;
-  --badge-purple-color: #a973cd;
-  --badge-purple-contrast-color: #fff;
-  --badge-unicorn-color: #ff6ddf;
-  --badge-unicorn-contrast-color: #fff;
-  --badge-yellow-color: #e4cd00;
-  --badge-yellow-contrast-color: rgb(99, 79, 5);
-
-  /* Color ramp (Light) */
-  --theme-base-100: hsl(0, 0%, 100%);
-  --theme-base-95: hsl(0, 0%, 95%);
-  --theme-base-90: hsl(0, 0%, 90%);
-  --theme-base-85: hsl(0, 0%, 85%);
-  --theme-base-80: hsl(0, 0%, 80%);
-  --theme-base-70: hsl(0, 0%, 70%);
-  --theme-base-60: hsl(0, 0%, 60%);
 
   /* Core classes (Light) */
   --chrome: var(--theme-base-95); /* bg app */
@@ -152,7 +21,6 @@
   --modal-border: none;
   --tab-bgcolor-alt-subtle: var(--theme-base-100); /* info, events */
   --tab-bgcolor: var(--theme-base-90); /* bg tabs */
-  --body-bgcolor: var(--theme-base-100); /* bg text */
   --theme-border: #d2d5da;
   --icon-color: var(--body-color);
   --theme-focuser-bgcolor: var(--primary-accent);
@@ -165,64 +33,23 @@
   --tooltip-color: white;
   --tooltip-bgcolor: #38383d;
 
+  /* Migration note: removed from this document; added to packages/replay-next/pages/variables.css */
+
   /* Tabs (Light) */
-  --tab-bgcolor: var(--theme-base-90);
-  --tab-color: var(--theme-base-40);
-  --tab-hover-bgcolor: var(--theme-base-85);
-  --tab-hover-color: var(--tab-selected-color);
-  --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
-  --tab-selected-color: var(--body-color);
-  --tab-standard-color: rgba(0, 0, 0, 0.5);
-  --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
-  --tab-bgcolor: var(--theme-base-90); /* bg tabs */
-
+  /* Color ramp (Light) */
+  /* Tabs (Light) */
   /* Timeline (Light) */
-  --progressbar-preview-max: var(--theme-base-85);
-  --progressbar-preview-min: var(--primary-accent);
-
   /* Menus (Light) */
-  --menu-bgcolor: var(--theme-toolbar-background);
-  --menu-color: var(--body-color);
-  --menu-hover-bgcolor: var(--theme-base-95);
-  --menu-hover-color: #000;
-  --theme-menu-highlight: #f3f4f6;
-
   /* Code Mirror (Light) */
-  --cm-linenumber: var(--grey-80);
-  --cm-keyword: #dd00a9;
-  --cm-variable: #8000d7;
-  --cm-def: #3172e0;
-  --cm-string: #0842a4;
-  --cm-number: #18181a;
-  --caret-color: #18181a;
-  --debug-line-border: var(--primary-accent);
-  --debug-line-background: #e8f5fb;
-  --gutter-hit-count-background: #f3f4f6;
-  --gutter-hit-count-foreground: #aeaeae;
-  --line-hit-background-color-1: #bbeafa25;
-  --line-hit-background-color-2: #69a6ff25;
-  --line-hit-background-color-3: #2979ef25;
-  --line-hit-border-color-0: #d9dad9;
-  --line-hit-border-color-1: #bbeafa;
-  --line-hit-border-color-2: #69a6ff;
-  --line-hit-border-color-3: #2979ef;
-  --line-hit-color: #47628b;
-
   /* Breakpoints (Light) */
-  --breakpoint-arrow-disabled: var(--theme-base-90);
-  --breakpoint-arrow: var(--theme-base-60);
-  --breakpoint-editfield-active: var(--theme-base-100);
-  --breakpoint-editfield-hover: var(--theme-base-100);
-  --breakpoint-status-bg: var(--theme-base-90);
-  --breakpoint-status: var(--body-color);
-  --breakpoint-tip: var(--theme-highlight-purple);
-  --breakpoint-label: var(--cm-string);
-
   /* Testsuites (Light) */
-  --testsuites-error-bgcolor: #ffe9e9;
-  --testsuites-error-bgcolor-hover: #ffe0e0;
-  --testsuites-error-color: #eb5757;
-  --testsuites-steps-bgcolor: #fafafa;
+  /* Toolbar (Light) */
+  /* Toolbar buttons (Light) */
+  /* Buttons (Light) */
+  /* Accordion headers (Light) */
+  /* Selection (Light) */
+  /* Border color that splits the toolbars/panels/headers. (Light) */
+  /* Icon colors (Light) */
 
   /* To organise (Light) */
   --jellyfish-bgcolor: rgba(255, 255, 255, 0.8);
@@ -239,50 +66,6 @@
   --toolbox-bgcolor: var(--theme-base-100);
   --unloaded-region-img: url("/images/dotted-mask-light.svg");
   --title-hover-bgcolor: #e6e6e6;
-
-  /* Toolbar */
-  --theme-tab-toolbar-background: var(--grey-20);
-  --theme-toolbar-background: var(--grey-10);
-  --theme-toolbar-selected-color: var(--body-color);
-  --theme-toolbar-panel-icon-color: #bcbcbc;
-  --theme-toolbar-highlighted-color: var(--green-60);
-  --theme-toolbar-background-hover: rgba(221, 225, 228, 0.66);
-  --theme-toolbar-background-alt: #f5f5f5;
-
-  --theme-toolbar-hover-active: var(--grey-20);
-  --theme-toolbar-separator: var(--grey-90-a10);
-
-  /* Toolbar buttons */
-  --toolbarbutton-background: var(--theme-toolbar-background);
-  --toolbarbutton-hover-background: var(--theme-toolbar-hover);
-
-  /* Buttons */
-  --theme-button-background: rgba(12, 12, 13, 0.05);
-  --theme-button-active-background: rgba(12, 12, 13, 0.1);
-
-  /* Accordion headers */
-  --theme-accordion-header-background: var(--theme-toolbar-background);
-  --theme-accordion-header-hover: var(--theme-toolbar-hover);
-
-  /* Selection */
-  --theme-selection-background: var(--primary-accent);
-  --theme-selection-background-hover: #f0f9fe;
-  --theme-selection-focus-background: var(--toolbarbutton-hover-background);
-  --theme-selection-focus-color: var(--grey-70);
-  --theme-selection-color: #ffffff;
-
-  /* Border color that splits the toolbars/panels/headers. */
-  --theme-splitter-color: var(--grey-25);
-  --theme-emphasized-splitter-color: var(--grey-30);
-  --theme-emphasized-splitter-color-hover: var(--grey-40);
-
-  /* Icon colors */
-  --theme-icon-color: rgba(12, 12, 13, 0.8);
-  --theme-icon-hover-color: #000;
-  --theme-icon-dimmed-color: rgba(135, 135, 137, 0.9);
-  --theme-icon-checked-color: var(--blue-60);
-  --theme-icon-error-color: var(--red-60);
-  --theme-icon-warning-color: var(--yellow-65);
 
   /* Text color */
   --theme-comment: var(--grey-50);
@@ -390,39 +173,10 @@
 :root.theme-dark {
   /*
   TABLE OF CONTENTS
-  - Badge colors
-  - Color ramp
   - Core classes
-  - Tabs
-  - Timeline
-  - Menus
-  - Code Mirror (Editor)
-  - Breakpoints
-  - Testsuites
   - To Organise
   - (Previous styles; to organise)
   */
-
-  /* Badge colors */
-  --badge-green-color: #69e261;
-  --badge-green-contrast-color: #050;
-  --badge-orange-color: #ff9a19;
-  --badge-orange-contrast-color: #fff;
-  --badge-purple-color: #cc81ff;
-  --badge-purple-contrast-color: #fff;
-  --badge-unicorn-color: #e110b3;
-  --badge-unicorn-contrast-color: #fff;
-  --badge-yellow-color: #fee608;
-  --badge-yellow-contrast-color: rgb(99, 79, 5);
-
-  /* Color ramp (Dark) */
-  --theme-base-100: #000; /* background chrome */
-  --theme-base-95: #192230; /* tab bars */
-  --theme-base-90: #3d4552; /* editor and selected tab */
-  --theme-base-85: #3e434b; /* textfields */
-  --theme-base-80: #797d81;
-  --theme-base-70: #a2a6a8;
-  --theme-base-60: #c3c6c8;
 
   /* Core classes (Dark) */
   --chrome: #081120; /* bg app */
@@ -448,63 +202,23 @@
   --tooltip-color: #fff;
   --tooltip-bgcolor: var(--theme-base-85);
 
+  /* Migration note: removed from this document; added to packages/replay-next/pages/variables.css */
+
   /* Tabs (Dark) */
-  --tab-bgcolor: var(--theme-base-100);
-  --tab-color: var(--theme-base-40);
-  --tab-hover-bgcolor: var(--theme-base-85);
-  --tab-hover-color: var(--tab-selected-color);
-  --tab-selected-bgcolor: var(--theme-base-95);
-  --tab-selected-color: #fff;
-
+  /* Color ramp (Dark) */
+  /* Tabs (Dark) */
   /* Timeline (Dark) */
-  --progressbar-preview-max: var(--theme-base-70);
-  --progressbar-preview-min: var(--primary-accent);
-
   /* Menus (Dark) */
-  --menu-bgcolor: var(--theme-base-90);
-  --menu-color: var(--body-color);
-  --menu-hover-bgcolor: var(--theme-base-95);
-  --menu-hover-color: white;
-  --theme-menu-highlight: var(--theme-text-field-bgcolor);
-
   /* Code Mirror (Dark) */
-  --cm-linenumber: var(--grey-40);
-  --cm-keyword: #ff42a8;
-  --cm-def: #fff;
-  --cm-string: #01acfd;
-  --cm-variable: #58e0ff;
-  --cm-number: yellow;
-  --cm-property: #ff98eb;
-  --cm-atom: #fff;
-  --caret-color: #fff;
-  --debug-line-border: var(--theme-base-85);
-  --debug-line-background: var(--theme-base-100);
-  --gutter-hit-count-background: #081121;
-  --gutter-hit-count-foreground: #6a717e;
-  --line-hit-background-color-1: #2563be25;
-  --line-hit-background-color-2: #6ba6ff25;
-  --line-hit-background-color-3: #baecfa25;
-  --line-hit-border-color-0: #445064;
-  --line-hit-border-color-1: #2563be;
-  --line-hit-border-color-2: #6ba6ff;
-  --line-hit-border-color-3: #baecfa;
-  --line-hit-color: #a4c6f8;
-
   /* Breakpoints (Dark) */
-  --breakpoint-arrow-disabled: var(--theme-base-80);
-  --breakpoint-arrow: var(--theme-base-60);
-  --breakpoint-editfield-active: var(--console-message-background);
-  --breakpoint-editfield-hover: var(--console-message-background);
-  --breakpoint-status-bg: var(--theme-base-90);
-  --breakpoint-status: var(--body-color);
-  --breakpoint-tip: #fff;
-  --breakpoint-label: var(--cm-string);
-
   /* Testsuites (Dark) */
-  --testsuites-error-bgcolor: #770702;
-  --testsuites-error-bgcolor-hover: #7a1712;
-  --testsuites-error-color: white;
-  --testsuites-steps-bgcolor: var(--theme-base-100);
+  /* Toolbar (Dark) */
+  /* Toolbar buttons (Dark) */
+  /* Buttons (Dark) */
+  /* Accordion headers (Dark) */
+  /* Selection (Dark) */
+  /* Border color that splits the toolbars/panels/headers. (Dark) */
+  /* Icon colors (Dark) */
 
   /* To organise (Dark) */
   --jellyfish-bgcolor: rgba(40, 40, 40, 0.8);
