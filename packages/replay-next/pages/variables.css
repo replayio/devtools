@@ -314,6 +314,7 @@
   /* Selection */
   --theme-selection-background: var(--primary-accent);
   --theme-selection-background-hover: #353b48;
+  --theme-table-selection-background-hover: var(--theme-toolbar-background);
   --theme-selection-focus-background: var(--grey-60);
   --theme-selection-focus-color: var(--grey-30);
   --theme-selection-color: #ffffff;
@@ -614,6 +615,7 @@
   /* Selection */
   --theme-selection-background: var(--primary-accent);
   --theme-selection-background-hover: #f0f9fe;
+  --theme-table-selection-background-hover: var(--theme-toolbar-background);
   --theme-selection-focus-background: var(--toolbarbutton-hover-background);
   --theme-selection-focus-color: var(--grey-70);
   --theme-selection-color: #ffffff;

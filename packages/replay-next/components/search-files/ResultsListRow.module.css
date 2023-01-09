@@ -23,7 +23,6 @@
 .MatchRow:hover {
   background-color: var(--theme-selection-background-hover);
 }
-
 .MatchRow {
   white-space: pre;
   overflow: hidden;
