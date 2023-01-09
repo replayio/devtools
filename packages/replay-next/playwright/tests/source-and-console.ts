@@ -154,17 +154,21 @@ test("should support conditional log points", async ({ page }) => {
 
   const messages = page.locator("[data-test-name=Messages]");
 
-  // TODO await fillLogPointText(page, 28, `"logsToPrint", logsToPrint`);
+  await editLogPoint(page, { sourceId, lineNumber: 28, content: `"logsToPrint", logsToPrint` });
   await takeScreenshot(page, messages, "log-point-multi-hits-console");
 
-  // TODO await fillLogPointText(page, 28, `"logsToPrint", logsToPrint`, "logsToPrint <= 3");
+  await editLogPoint(page, {
+    sourceId,
+    lineNumber: 28,
+    content: `"logsToPrint", logsToPrint`,
+    condition: "logsToPrint <= 5",
+  });
   await takeScreenshot(page, messages, "log-point-multi-hits-with-conditional-console");
 });
 
 test("should gracefully handle invalid remote analysis", async ({ page }) => {
   await toggleProtocolMessages(page, false);
-  await addLogPoint(page, { sourceId, lineNumber: 13 });
-  // TODO await fillLogPointText(page, 13, "z");
+  await addLogPoint(page, { content: "z", sourceId, lineNumber: 13 });
 
   const message = page.locator("[data-test-name=Message]").first();
   await takeScreenshot(page, message, "log-point-invalid-remote-analysis-console");
