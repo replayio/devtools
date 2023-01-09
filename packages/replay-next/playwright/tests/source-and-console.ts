@@ -32,7 +32,7 @@ import {
 } from "./utils/source";
 import testSetup from "./utils/testSetup";
 
-testSetup("dbd4da74-cf42-41fb-851d-69bed67debcf");
+testSetup("c9fffa00-ac71-48bc-adb2-52ae81588e85");
 
 const sourceId = "h1";
 const altSourceId = "1";
@@ -154,17 +154,21 @@ test("should support conditional log points", async ({ page }) => {
 
   const messages = page.locator("[data-test-name=Messages]");
 
-  // TODO await fillLogPointText(page, 28, `"logsToPrint", logsToPrint`);
+  await editLogPoint(page, { sourceId, lineNumber: 28, content: `"logsToPrint", logsToPrint` });
   await takeScreenshot(page, messages, "log-point-multi-hits-console");
 
-  // TODO await fillLogPointText(page, 28, `"logsToPrint", logsToPrint`, "logsToPrint <= 3");
+  await editLogPoint(page, {
+    sourceId,
+    lineNumber: 28,
+    content: `"logsToPrint", logsToPrint`,
+    condition: "logsToPrint <= 5",
+  });
   await takeScreenshot(page, messages, "log-point-multi-hits-with-conditional-console");
 });
 
 test("should gracefully handle invalid remote analysis", async ({ page }) => {
   await toggleProtocolMessages(page, false);
-  await addLogPoint(page, { sourceId, lineNumber: 13 });
-  // TODO await fillLogPointText(page, 13, "z");
+  await addLogPoint(page, { content: "z", sourceId, lineNumber: 13 });
 
   const message = page.locator("[data-test-name=Message]").first();
   await takeScreenshot(page, message, "log-point-invalid-remote-analysis-console");
@@ -401,7 +405,7 @@ test("should update the current time when the log point timeline is clicked", as
 test("should update the current time when the next/previous log point buttons are clicked", async ({
   page,
 }) => {
-  const lineNumber = 30;
+  const lineNumber = 18;
 
   await addLogPoint(page, { lineNumber, sourceId });
   await verifyLogPointStep(page, "2", { lineNumber, sourceId });

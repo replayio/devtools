@@ -11,7 +11,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import createTest from "./utils/createTest";
 import styles from "./styles.module.css";
 
-const DEFAULT_RECORDING_ID = "9fd8381f-05e6-40c2-8b4f-59e40c2c3886";
+const DEFAULT_RECORDING_ID = "b1849642-40a3-445c-96f8-4bcd2c35586e";
 
 function Scopes() {
   return (
