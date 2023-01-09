@@ -27,7 +27,7 @@
   flex: 1 1 auto;
   overflow: auto;
   height: 100%;
-  border-top: 1px solid var(--background-color-default);
+  border-top: 1px solid var(--theme-splitter-color);
 }
 
 .PanelResizeHandleContainer {
@@ -57,7 +57,7 @@
   display: block;
   height: 100%;
   width: 1px;
-  background-color: var(--background-color-default);
+  background-color: var(--theme-splitter-color);
 }
 
 .RightColumnActionsRow {
@@ -69,7 +69,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  border-top: 1px solid var(--background-color-default);
+  border-top: 1px solid var(--theme-splitter-color);
 }
 
 .ConsoleSearchRow {
