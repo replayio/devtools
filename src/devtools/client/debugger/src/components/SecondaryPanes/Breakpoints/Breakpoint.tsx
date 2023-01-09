@@ -1,5 +1,6 @@
 import classnames from "classnames";
-import React, { PureComponent, Suspense, useContext } from "react";
+import { ChangeEvent, PureComponent, Suspense, useContext } from "react";
+import { MouseEvent } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import {
@@ -7,8 +8,16 @@ import {
   PauseFrame,
   getSelectedFrameId,
 } from "devtools/client/debugger/src/reducers/pause";
+import { EditPoint } from "replay-next/src/contexts/PointsContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { Point, ReplayClientInterface } from "shared/client/types";
+import {
+  POINT_BEHAVIOR_DISABLED,
+  POINT_BEHAVIOR_DISABLED_TEMPORARILY,
+  POINT_BEHAVIOR_ENABLED,
+  Point,
+  ReplayClientInterface,
+} from "shared/client/types";
+import Checkbox from "ui/components/shared/Forms/Checkbox";
 import type { UIState } from "ui/state";
 import { getPauseFrameSuspense } from "ui/suspense/frameCache";
 
@@ -30,6 +39,7 @@ const connector = connect(mapStateToProps, {
 type PropsFromRedux = ConnectedProps<typeof connector>;
 interface PropsFromParent {
   breakpoint: Point;
+  onEditPoint: EditPoint;
   onRemoveBreakpoint: (cx: Context, breakpoint: Point) => void;
   type: "logpoint" | "breakpoint";
 }
@@ -42,18 +52,15 @@ class Breakpoint extends PureComponent<BreakpointProps> {
     return breakpoint.location;
   }
 
-  selectBreakpoint = (event: React.MouseEvent) => {
+  selectBreakpoint = (event: MouseEvent) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+
     const { cx, selectLocation } = this.props;
     event.preventDefault();
 
     selectLocation(cx, this.selectedLocation);
-  };
-
-  removeBreakpoint = (event: React.MouseEvent) => {
-    const { cx, onRemoveBreakpoint, breakpoint } = this.props;
-    event.stopPropagation();
-
-    onRemoveBreakpoint(cx, breakpoint);
   };
 
   isCurrentlyPausedAtBreakpoint(frame: PauseFrame | undefined) {
@@ -75,10 +82,67 @@ class Breakpoint extends PureComponent<BreakpointProps> {
   }
 
   render() {
-    const { replayClient, breakpoint, type, selectedFrameId, sourcesState } = this.props;
+    const {
+      cx,
+      replayClient,
+      breakpoint,
+      onEditPoint,
+      onRemoveBreakpoint,
+      type,
+      selectedFrameId,
+      sourcesState,
+    } = this.props;
     const frame = selectedFrameId
       ? getPauseFrameSuspense(replayClient, selectedFrameId, sourcesState)
       : undefined;
+
+    const behavior = type === "breakpoint" ? breakpoint.shouldBreak : breakpoint.shouldLog;
+    const isChecked = behavior === POINT_BEHAVIOR_ENABLED;
+
+    // Prevent clicks on the <input> from selecting the location.
+    const onCheckboxClick = (event: MouseEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+    };
+
+    const onCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
+      const behavior = event.target.checked
+        ? POINT_BEHAVIOR_ENABLED
+        : POINT_BEHAVIOR_DISABLED_TEMPORARILY;
+
+      if (type === "breakpoint") {
+        onEditPoint(breakpoint.id, {
+          shouldBreak: behavior,
+        });
+      } else {
+        onEditPoint(breakpoint.id, {
+          shouldLog: behavior,
+        });
+      }
+    };
+
+    const onCloseButtonClick = (event: MouseEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (type === "breakpoint") {
+        if (breakpoint.shouldLog === POINT_BEHAVIOR_ENABLED) {
+          onEditPoint(breakpoint.id, {
+            shouldBreak: POINT_BEHAVIOR_DISABLED,
+          });
+        } else {
+          onRemoveBreakpoint(cx, breakpoint);
+        }
+      } else {
+        if (breakpoint.shouldBreak === POINT_BEHAVIOR_ENABLED) {
+          onEditPoint(breakpoint.id, {
+            shouldLog: POINT_BEHAVIOR_DISABLED,
+          });
+        } else {
+          onRemoveBreakpoint(cx, breakpoint);
+        }
+      }
+    };
 
     return (
       <div
@@ -86,13 +150,25 @@ class Breakpoint extends PureComponent<BreakpointProps> {
           breakpoint,
           paused: this.isCurrentlyPausedAtBreakpoint(frame),
         })}
+        data-test-name="Breakpoint"
+        data-test-type={type}
+        data-test-column-index={breakpoint.location.column}
+        data-test-line-number={breakpoint.location.line}
+        data-test-source-id={breakpoint.location.sourceId}
         onClick={this.selectBreakpoint}
       >
+        <label
+          data-test-name="BreakpointToggle"
+          data-test-state={isChecked ? POINT_BEHAVIOR_ENABLED : POINT_BEHAVIOR_DISABLED_TEMPORARILY}
+          onClick={onCheckboxClick}
+        >
+          <Checkbox checked={isChecked} onChange={onCheckboxChange} />
+        </label>
         <BreakpointOptions breakpoint={breakpoint} type={type} />
         {this.renderSourceLocation()}
         <CloseButton
           buttonClass={null}
-          handleClick={this.removeBreakpoint}
+          handleClick={onCloseButtonClick}
           tooltip={"Remove this breakpoint"}
         />
       </div>

@@ -4,7 +4,7 @@ import { useContext, useEffect, useRef } from "react";
 import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
 import { getSourcesAsync } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { Point, PointId } from "shared/client/types";
+import { POINT_BEHAVIOR_ENABLED, Point, PointId } from "shared/client/types";
 import { ReplayClientInterface } from "shared/client/types";
 
 // Breakpoints must be synced with the server so the stepping controls will work.
@@ -77,13 +77,13 @@ export default function useBreakpointIdsFromServer(
           points.forEach(point => {
             const prevPoint = prevPoints.find(({ id }) => id === point.id);
             if (prevPoint == null) {
-              if (point.shouldBreak) {
+              if (point.shouldBreak === POINT_BEHAVIOR_ENABLED) {
                 client.breakpointAdded(point.location, point.condition).then(serverIds => {
                   pointIdToBreakpointIdMap.set(point.id, serverIds);
                 });
               }
             } else if (prevPoint.shouldBreak !== point.shouldBreak) {
-              if (point.shouldBreak) {
+              if (point.shouldBreak === POINT_BEHAVIOR_ENABLED) {
                 client.breakpointAdded(point.location, point.condition).then(serverIds => {
                   pointIdToBreakpointIdMap.set(point.id, serverIds);
                 });

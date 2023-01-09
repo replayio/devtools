@@ -31,7 +31,7 @@ import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/Points
 import { findIndexBigInt } from "replay-next/src/utils/array";
 import { validate } from "replay-next/src/utils/points";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { HitPointStatus, Point } from "shared/client/types";
+import { HitPointStatus, POINT_BEHAVIOR_ENABLED, Point } from "shared/client/types";
 
 import Loader from "../Loader";
 import BadgePicker from "./BadgePicker";
@@ -148,6 +148,8 @@ function PointPanelWithHitPoints({
     event.preventDefault();
   };
 
+  const shouldLog = point.shouldLog === POINT_BEHAVIOR_ENABLED;
+
   if (isEditing) {
     const hasCondition = editableCondition !== null;
 
@@ -181,7 +183,7 @@ function PointPanelWithHitPoints({
 
     return (
       <div
-        className={`${styles.Panel} ${className}`}
+        className={`${shouldLog ? styles.PanelEnabled : styles.PanelDisabled} ${className}`}
         data-test-id={`PointPanel-${lineNumber}`}
         onMouseMove={onMouseMove}
       >
@@ -338,7 +340,7 @@ function PointPanelWithHitPoints({
 
     return (
       <div
-        className={`${styles.Panel} ${className}`}
+        className={`${shouldLog ? styles.PanelEnabled : styles.PanelDisabled} ${className}`}
         data-test-id={`PointPanel-${lineNumber}`}
         onMouseMove={onMouseMove}
       >

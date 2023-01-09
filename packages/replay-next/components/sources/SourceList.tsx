@@ -24,7 +24,7 @@ import {
 } from "replay-next/src/suspense/SourcesCache";
 import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { Point } from "shared/client/types";
+import { POINT_BEHAVIOR_DISABLED, Point } from "shared/client/types";
 
 import useFontBasedListMeasurents from "./hooks/useFontBasedListMeasurents";
 import SourceListRow, { ItemData } from "./SourceListRow";
@@ -196,7 +196,7 @@ export default function SourceList({
     (index: number) => {
       const lineNumber = index + 1;
       const point = findPointForLocation(points, sourceId, lineNumber);
-      if (point === null || !point.shouldLog) {
+      if (point === null || point.shouldLog === POINT_BEHAVIOR_DISABLED) {
         return lineHeight;
       } else if (point.condition !== null) {
         return lineHeightWithConditionalPoint;

@@ -13,14 +13,18 @@ import {
 } from "react";
 import { areEqual } from "react-window";
 
-import Icon from "replay-next/components/Icon";
 import SearchResultHighlight from "replay-next/components/sources/SearchResultHighlight";
 import { SourceSearchContext } from "replay-next/components/sources/SourceSearchContext";
 import useSourceContextMenu from "replay-next/components/sources/useSourceContextMenu";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { AddPoint, DeletePoints, EditPoint } from "replay-next/src/contexts/PointsContext";
 import { ParsedToken, StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
-import { LineNumberToHitCountMap } from "shared/client/types";
+import {
+  LineNumberToHitCountMap,
+  POINT_BEHAVIOR_DISABLED,
+  POINT_BEHAVIOR_DISABLED_TEMPORARILY,
+  POINT_BEHAVIOR_ENABLED,
+} from "shared/client/types";
 import { Point } from "shared/client/types";
 
 import ColumnBreakpointMarker from "./ColumnBreakpointMarker";
@@ -108,6 +112,7 @@ const SourceListRow = memo(
 
     const pointsForLine = findPointsForLocation(points, sourceId, lineNumber);
     const firstPoint = pointsForLine[0] ?? null;
+    const showPointPanel = firstPoint !== null && firstPoint.shouldLog !== POINT_BEHAVIOR_DISABLED;
 
     const hitCount = lineHitCounts?.count || null;
     const lineHasHits = hitCount !== null && hitCount > 0;
@@ -224,6 +229,8 @@ const SourceListRow = memo(
       lineSegments = <SourceLineLoadingPlaceholder width={loadingPlaceholderWidth} />;
     }
 
+    const shouldBreak = firstPoint?.shouldBreak === POINT_BEHAVIOR_ENABLED;
+
     const toggleBreakpoint = () => {
       if (lineHitCounts === null) {
         return;
@@ -234,7 +241,7 @@ const SourceListRow = memo(
       if (pointsForLine.length === 0) {
         addPoint(
           {
-            shouldBreak: true,
+            shouldBreak: POINT_BEHAVIOR_ENABLED,
           },
           {
             column: lineHitCounts.firstBreakableColumnIndex,
@@ -249,8 +256,10 @@ const SourceListRow = memo(
         // Toggling it off depends on whether the point also logs.
         // 1. If it logs and breaks, then we should disable breaking
         // 2. If it only breaks then we should delete that point (and all others on the line)
-        if (firstPoint.shouldLog) {
-          editPoint(firstPoint.id, { shouldBreak: !firstPoint.shouldBreak });
+        if (showPointPanel) {
+          editPoint(firstPoint.id, {
+            shouldBreak: shouldBreak ? POINT_BEHAVIOR_DISABLED : POINT_BEHAVIOR_ENABLED,
+          });
         } else {
           deletePoints(...pointsForLine.map(point => point.id));
         }
@@ -279,6 +288,21 @@ const SourceListRow = memo(
       [index, searchState.results]
     );
 
+    let breakPointTestState = "off";
+    if (firstPoint !== null) {
+      switch (firstPoint.shouldBreak) {
+        case POINT_BEHAVIOR_ENABLED:
+          breakPointTestState = "on";
+          break;
+        case POINT_BEHAVIOR_DISABLED:
+          breakPointTestState = "off";
+          break;
+        case POINT_BEHAVIOR_DISABLED_TEMPORARILY:
+          breakPointTestState = "off-temporarily";
+          break;
+      }
+    }
+
     return (
       <div
         className={styles.Row}
@@ -302,11 +326,9 @@ const SourceListRow = memo(
           <div className={styles.LineNumber} data-test-id={`SourceLine-LineNumber-${lineNumber}`}>
             {lineNumber}
             <div
-              className={
-                firstPoint?.shouldBreak ? styles.BreakpointToggleOn : styles.BreakpointToggleOff
-              }
+              className={styles.BreakpointToggle}
               data-test-name="BreakpointToggle"
-              data-test-state={firstPoint?.shouldBreak ? "on" : "off"}
+              data-test-state={breakPointTestState}
               onClick={toggleBreakpoint}
             >
               {lineNumber}
@@ -354,7 +376,7 @@ const SourceListRow = memo(
             )}
           </div>
 
-          {firstPoint?.shouldLog && <PointPanel className={styles.PointPanel} point={firstPoint} />}
+          {showPointPanel && <PointPanel className={styles.PointPanel} point={firstPoint} />}
         </div>
 
         <CurrentLineHighlight lineNumber={lineNumber} sourceId={sourceId} />
