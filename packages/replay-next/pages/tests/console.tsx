@@ -10,7 +10,7 @@ import { TimelineContextRoot } from "replay-next/src/contexts/TimelineContext";
 import createTest from "./utils/createTest";
 import styles from "./styles.module.css";
 
-const DEFAULT_RECORDING_ID = "0d0b52a9-96bc-4bd9-b5d8-66275c6cce96";
+const DEFAULT_RECORDING_ID = "4ccc9f9f-f0d3-4418-ac21-1b316e462a44";
 
 function Console() {
   return (

@@ -21,7 +21,7 @@ import {
 } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
-testSetup("0d0b52a9-96bc-4bd9-b5d8-66275c6cce96");
+testSetup("4ccc9f9f-f0d3-4418-ac21-1b316e462a44");
 
 async function setup(page: Page, toggleState: boolean | null = null) {
   await page.goto(getTestUrl("console"));

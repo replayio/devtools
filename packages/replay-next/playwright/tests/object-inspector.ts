@@ -4,7 +4,7 @@ import { filterByText, toggleProtocolMessage, toggleProtocolMessages } from "./u
 import { getTestUrl, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
-testSetup("ee4da15f-5d86-4629-8356-c673b5e711b0");
+testSetup("f619b607-8161-45b3-b882-bc74e1fc416d");
 
 async function inspectAndTakeScreenshotOf(page: Page, partialText: string, screenshotName: string) {
   const messageItem = await page
