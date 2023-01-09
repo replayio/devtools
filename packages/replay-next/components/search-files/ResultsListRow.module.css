@@ -21,9 +21,8 @@
 }
 .LocationRow:hover,
 .MatchRow:hover {
-  background-color: var(--background-color-contrast-3);
+  background-color: var(--theme-selection-background-hover);
 }
-
 .MatchRow {
   white-space: pre;
   overflow: hidden;

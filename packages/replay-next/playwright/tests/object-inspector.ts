@@ -1,14 +1,10 @@
 import { Page, test } from "@playwright/test";
 
-import { toggleProtocolMessage, toggleProtocolMessages } from "./utils/console";
+import { filterByText, toggleProtocolMessage, toggleProtocolMessages } from "./utils/console";
 import { getTestUrl, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
 testSetup("ee4da15f-5d86-4629-8356-c673b5e711b0");
-
-async function filterByText(page: Page, text: string) {
-  await page.fill("[data-test-id=ConsoleFilterInput]", text);
-}
 
 async function inspectAndTakeScreenshotOf(page: Page, partialText: string, screenshotName: string) {
   const messageItem = await page

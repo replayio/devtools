@@ -1,3 +1,5 @@
+import { Object as ProtocolObject } from "@replayio/protocol";
+
 import { ObjectPreviewRendererProps } from "./types";
 import styles from "./shared.module.css";
 
@@ -10,10 +12,15 @@ export default function ErrorRenderer({ object }: ObjectPreviewRendererProps) {
     property => property.name === "message"
   );
 
-  return (
-    <span className={styles.Error}>
-      {object.className}
-      {messageProperty ? `: ${messageProperty.value}` : ""}
-    </span>
+  return <span className={styles.Error}>{errorProtocolObjectToString(object)}</span>;
+}
+
+export function errorProtocolObjectToString(protocolObject: ProtocolObject) {
+  const { className } = protocolObject;
+
+  const messageProperty = protocolObject?.preview?.properties?.find(
+    property => property.name === "message"
   );
+
+  return messageProperty ? `${className}: ${messageProperty.value}` : className;
 }

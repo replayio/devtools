@@ -204,6 +204,19 @@
         htmlElementWithProps,
       ];
 
+      const deepArray = [];
+      const deepObject = {};
+      let currentArray = deepArray;
+      let currentObject = deepObject;
+      for (let i = 1; i <= 10; i++) {
+        const key = `level-${i}`;
+        currentObject[key] = {};
+        currentObject = currentObject[key];
+
+        currentArray.push(key, []);
+        currentArray = currentArray[1];
+      }
+
       // Note that the naming and ordering of properties in the object below is significant.
       // The corresponding Playwright tests may operate on the first match for a given locator/selector.
       const complexObject = {
@@ -232,6 +245,7 @@
         filter_objectSimple: object,
         filter_objectWithNullPrototype: objectWithNullPrototype,
         filter_objectWithGettersAndSetters: objectWithGettersAndSetters,
+        filter_objectDeep: deepObject,
 
         // HTML elements
         filter_htmlElement: htmlElement,
@@ -246,6 +260,7 @@
         arrayLength4: array4,
         arrayLength5: array5,
         arrayLength6: array6,
+        deepArray,
         arrayWithObjects,
         overflowingArray,
         arrayOfHtmlElements,

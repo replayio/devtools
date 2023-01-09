@@ -1,3 +1,5 @@
+import { Object as ProtocolObject } from "@replayio/protocol";
+
 import { ObjectPreviewRendererProps } from "./types";
 import styles from "./shared.module.css";
 
@@ -6,5 +8,11 @@ import styles from "./shared.module.css";
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
 export default function RegExpRenderer({ object }: ObjectPreviewRendererProps) {
-  return <span className={styles.RegExp}>{object?.preview?.regexpString ?? object.className}</span>;
+  return <span className={styles.RegExp}>{regExpProtocolObjectToString(object)}</span>;
+}
+
+export function regExpProtocolObjectToString(protocolObject: ProtocolObject) {
+  const { className, preview } = protocolObject;
+
+  return preview?.regexpString ?? className;
 }
