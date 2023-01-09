@@ -98,6 +98,12 @@ export function hasLoadingParam() {
   return getURL().searchParams.get("loading") != null;
 }
 
+export function getFocusRegion() {
+  const url = getURL();
+  const focusRegionParam = url.searchParams.get("focusRegion");
+  return focusRegionParam ? (decodeBase64FromURL(focusRegionParam) as TimeStampedPointRange) : null;
+}
+
 export function getPausePointParams() {
   const url = getURL();
 
@@ -107,10 +113,7 @@ export function getPausePointParams() {
   const timeParam = url.searchParams.get("time");
   const time = timeParam ? +timeParam : 0;
 
-  const focusRegionParam = url.searchParams.get("focusRegion");
-  const focusRegion = focusRegionParam
-    ? (decodeBase64FromURL(focusRegionParam) as TimeStampedPointRange)
-    : null;
+  const focusRegion = getFocusRegion();
 
   if (pointParam && timeParam) {
     return { point, time, focusRegion };

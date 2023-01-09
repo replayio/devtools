@@ -42,7 +42,7 @@
     "@redux-devtools/app": "^2.1.4",
     "@redux-devtools/extension": "^3.2.2",
     "@reduxjs/toolkit": "^1.8.4",
-    "@replayio/protocol": "0.36.0",
+    "@replayio/protocol": "0.37.0",
     "@sentry/react": "^7.9.0",
     "@sentry/tracing": "^7.9.0",
     "@stripe/react-stripe-js": "^1.7.0",
