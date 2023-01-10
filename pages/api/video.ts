@@ -39,24 +39,25 @@ async function fetchGraphics(
   { client, sessionId }: { client: ProtocolClient; sessionId: string }
 ) {
   let prevTime = 0;
-  let input = "";
   const numPaints = paintPoints.length;
-  await Promise.all(
-    paintPoints.map(async (point, index) => {
-      const duration = (point.time - prevTime) / 1000;
-      const filename = path.join(tmpDir, `/${index}-${point.point}-${point.time}.jpeg`);
-      input += `file '${filename}'\nduration ${duration}\n`;
+  const input = (
+    await Promise.all(
+      paintPoints.map(async (point, index) => {
+        const duration = (point.time - prevTime) / 1000;
+        const filename = path.join(tmpDir, `/${index}-${point.point}-${point.time}.jpeg`);
 
-      prevTime = point.time;
+        prevTime = point.time;
 
-      const { screen } = await client.Graphics.getPaintContents(
-        { point: point.point, mimeType: point.screenShots[0].mimeType },
-        sessionId
-      );
-      console.log(`${index}/${numPaints} - ${filename}`);
-      fs.writeFileSync(filename, Buffer.from(screen.data, "base64"));
-    })
-  );
+        const { screen } = await client.Graphics.getPaintContents(
+          { point: point.point, mimeType: point.screenShots[0].mimeType },
+          sessionId
+        );
+        console.log(`${index}/${numPaints} - ${filename}`);
+        fs.writeFileSync(filename, Buffer.from(screen.data, "base64"));
+        return `file '${filename}'\nduration ${duration}\n`;
+      })
+    )
+  ).join("");
 
   const inputFilename = path.join(tmpDir, "/input.txt");
   console.log(inputFilename);
@@ -81,7 +82,7 @@ async function createVideo(tmpDir: string, input: string, recordingId: string): 
       console.log("Error:", err);
       reject(err);
     })
-    .outputOptions(["-c:v libx264", "-r 30", "-pix_fmt yuv420p"])
+    .outputOptions(["-c:v libx264", "-r 30", "-pix_fmt yuv420p", `-vf "scale=100:-2,setdar=16/9"`])
     .save(filename);
 
   return promise;
