@@ -95,12 +95,26 @@ if (typeof window !== "undefined") {
 const noCallerStackTracesForErrorCodes = new Set<ProtocolError>([
   ProtocolError.GraphicsUnavailableAtPoint,
   ProtocolError.InternalError,
+  ProtocolError.InvalidRecording,
+  ProtocolError.SessionCreationFailure,
   ProtocolError.SessionDestroyed,
+  ProtocolError.ServiceUnavailable,
   ProtocolError.TooManyPoints,
+  ProtocolError.UnknownBuild,
   ProtocolError.UnknownSession,
   ProtocolError.UnsupportedRecording,
 ]);
 const noCallerStackTracesForFailedCommands = new Set<CommandMethods>([
+  "CSS.getAppliedRules",
+  "CSS.getComputedStyle",
+  "DOM.getAllBoundingClientRects",
+  "DOM.getBoundingClientRect",
+  "DOM.getBoxModel",
+  "DOM.getDocument",
+  "DOM.getEventListeners",
+  "DOM.getParentNodes",
+  "DOM.performSearch",
+  "DOM.querySelector",
   "DOM.repaintGraphics",
   "Session.createPause",
 ]);
