@@ -12,6 +12,7 @@
 #toolbox-toolbar {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
   border-top: 0px;
 }
 
