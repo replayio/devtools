@@ -621,7 +621,7 @@
   --theme-selection-color: #ffffff;
 
   /* Border color that splits the toolbars/panels/headers. */
-  --theme-splitter-color: var(--grey-25);
+  --theme-splitter-color: #e0e0e2; /* TODO @jonbell var(--grey-25) is undefined */
   --theme-emphasized-splitter-color: var(--grey-30);
   --theme-emphasized-splitter-color-hover: var(--grey-40);
 

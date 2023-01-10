@@ -107,12 +107,12 @@ test("should expand and inspect arrays", async ({ page }) => {
   await toggleProtocolMessage(page, "warnings", true);
 
   const listItem = await locateMessage(page, "console-warning", "This is a warning");
-  await takeScreenshot(page, listItem, "array-collapsed", 1);
+  await takeScreenshot(page, listItem, "array-collapsed");
 
   const outer = listItem.locator("[data-test-name=Expandable]", { hasText: "This is a warning" });
   const keyValue = outer.locator("[data-test-name=Expandable]", { hasText: "(3) [" });
   await keyValue.click();
-  await takeScreenshot(page, listItem, "array-expanded", 1);
+  await takeScreenshot(page, listItem, "array-expanded");
 });
 
 test("should expand and inspect objects", async ({ page }) => {
