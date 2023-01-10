@@ -172,6 +172,11 @@ class TokenManager {
       return;
     }
 
+    if (window.__IS_RECORD_REPLAY_RUNTIME__) {
+      this.setState({}, this.deferredState);
+      return;
+    }
+
     const wasAuthenticated = this.auth0Client.isAuthenticated;
 
     if (this.isTokenRequested) {
