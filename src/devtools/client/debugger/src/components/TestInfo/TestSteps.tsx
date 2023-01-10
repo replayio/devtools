@@ -237,7 +237,7 @@ function TestSection({ events, header }: { events: CompositeTestEvent[]; header?
       {header ? (
         <div
           data-test-id="TestSuites-TestCase-SectionHeader"
-          className="pt-6 pb-2 pl-2  font-semibold uppercase opacity-50"
+          className="pt-6 pb-2  font-semibold uppercase opacity-50 first:pt-0"
           style={{ fontSize: "10px" }}
         >
           {header}

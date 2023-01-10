@@ -272,6 +272,7 @@
   --testsuites-error-bgcolor-hover: #7a1712;
   --testsuites-error-color: white;
   --testsuites-steps-bgcolor: var(--theme-base-100);
+  --testsuites-steps-bgcolor-hover: var(--theme-base-90);
 
   /* To organise (Dark) */
   --jellyfish-bgcolor: rgba(40, 40, 40, 0.8);
@@ -583,9 +584,11 @@
 
   /* Testsuites (Light) */
   --testsuites-error-bgcolor: #ffe9e9;
+  --testsuites-error-bgcolor: #ffe9e9;
   --testsuites-error-bgcolor-hover: #ffe0e0;
   --testsuites-error-color: #eb5757;
-  --testsuites-steps-bgcolor: #fafafa;
+  --testsuites-steps-bgcolor: #f7f7f7;
+  --testsuites-steps-bgcolor-hover: #f4f4f4;
 
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-20);

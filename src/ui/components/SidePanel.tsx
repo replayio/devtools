@@ -191,7 +191,7 @@ function TestRunAttributes({ workspaceId, testRunId }: { workspaceId: string; te
   };
 
   return (
-    <div className="border-b p-2">
+    <div className="p-2">
       <Attributes testRun={thisSpecRun} />
     </div>
   );
