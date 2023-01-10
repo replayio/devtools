@@ -10,7 +10,13 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import styles from "./EagerEvaluationResult.module.css";
 
-export default function EagerEvaluationResult({ expression }: { expression: string }) {
+export default function EagerEvaluationResult({
+  cacheKey,
+  expression,
+}: {
+  cacheKey: string;
+  expression: string;
+}) {
   const { selectedPauseAndFrameId } = useContext(SelectedFrameContext);
 
   let pauseId: PauseId | null = null;
@@ -26,23 +32,30 @@ export default function EagerEvaluationResult({ expression }: { expression: stri
 
   return (
     <Suspense>
-      <EagerEvaluationResultSuspends expression={expression} pauseId={pauseId} frameId={frameId} />
+      <EagerEvaluationResultSuspends
+        cacheKey={cacheKey}
+        expression={expression}
+        pauseId={pauseId}
+        frameId={frameId}
+      />
     </Suspense>
   );
 }
 
 function EagerEvaluationResultSuspends({
+  cacheKey,
   expression,
   frameId,
   pauseId,
 }: {
+  cacheKey: string;
   expression: string;
   frameId: FrameId | null;
   pauseId: PauseId;
 }) {
   const client = useContext(ReplayClientContext);
 
-  const result = evaluateSuspense(client, pauseId, frameId, expression);
+  const result = evaluateSuspense(client, pauseId, frameId, expression, cacheKey);
   const { exception, returned } = result;
 
   let children: ReactNode | null = null;
@@ -67,5 +80,9 @@ function EagerEvaluationResultSuspends({
     }
   }
 
-  return <div className={styles.Wrapper}>{children}</div>;
+  return (
+    <div className={styles.Wrapper} data-test-id="ConsoleTerminalInputEagerEvaluationResult">
+      {children}
+    </div>
+  );
 }

@@ -291,8 +291,8 @@ export async function verifyFramesCount(page: Page, expectedCount: number) {
   const framesPanel = getFramesPanel(page);
   return waitFor(async () => {
     const frameListItems = framesPanel.locator(".frame");
-    const numFrames = await frameListItems.count();
-    expect(numFrames === expectedCount).toBe(true);
+    const actualCount = await frameListItems.count();
+    expect(actualCount).toBe(expectedCount);
   });
 }
 

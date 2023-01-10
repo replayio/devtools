@@ -71,7 +71,7 @@ export const {
   getValueIfCached: getEvaluationResultIfCached,
 } = createGenericCache2<
   ReplayClientInterface,
-  [pauseId: PauseId, frameId: FrameId | null, expression: string],
+  [pauseId: PauseId, frameId: FrameId | null, expression: string, uid?: string],
   Omit<Result, "data">
 >(
   "PauseCache: evaluate",
@@ -81,7 +81,7 @@ export const {
     cachePauseData(client, pauseId, result.data);
     return { exception: result.exception, failed: result.failed, returned: result.returned };
   },
-  (pauseId, frameId, expression) => `${pauseId}:${frameId}:${expression}`
+  (pauseId, frameId, expression, uid = "") => `${pauseId}:${frameId}:${expression}:${uid}`
 );
 
 export function cachePauseData(
