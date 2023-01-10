@@ -587,7 +587,6 @@
   /* Common popup styles(used by HTMLTooltip and autocomplete) */
   --theme-popup-background: var(--grey-60);
   --theme-popup-color: rgb(249, 249, 250);
-  --theme-errant-popup-color: #991b1b; /* make this work for dark */
   --theme-popup-border-color: #27272b;
   --theme-popup-dimmed: rgba(249, 249, 250, 0.1);
 
@@ -1102,7 +1101,6 @@
   /* Common popup styles(used by HTMLTooltip and autocomplete) */
   --theme-popup-background: white;
   --theme-popup-color: var(--grey-70);
-  --theme-errant-popup-color: #991b1b;
   --theme-popup-border-color: ThreeDShadow;
   --theme-popup-dimmed: hsla(0, 0%, 80%, 0.3);
 
