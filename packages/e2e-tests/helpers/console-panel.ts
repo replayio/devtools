@@ -1,7 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
-import { type as typeLexical } from "./lexical";
+import { submitCurrentText as submitCurrentTextLexical, type as typeLexical } from "./lexical";
 import { waitForPaused } from "./pause-information-panel";
 import { Expected, MessageType } from "./types";
 import { debugPrint, waitFor } from "./utils";
@@ -54,7 +54,11 @@ export async function enableConsoleMessageType(
   await checkbox.check();
 }
 
-export async function executeTerminalExpression(page: Page, text: string): Promise<void> {
+export async function executeTerminalExpression(
+  page: Page,
+  text: string,
+  shouldSubmit: boolean = true
+): Promise<void> {
   await debugPrint(
     page,
     `Executing terminal expression "${chalk.bold(text)}"`,
@@ -68,7 +72,7 @@ export async function executeTerminalExpression(page: Page, text: string): Promi
   // Wait for the Console to stop loading
   await consoleRoot.locator("text=Unavailable...").waitFor({ state: "hidden" });
 
-  await typeLexical(page, '[data-test-id="ConsoleTerminalInput"]', text, true);
+  await typeLexical(page, '[data-test-id="ConsoleTerminalInput"]', text, shouldSubmit);
 }
 
 export async function executeAndVerifyTerminalExpression(
@@ -185,6 +189,10 @@ export async function seekToConsoleMessage(
   await waitForPaused(page, line);
 }
 
+export async function submitCurrentText(page: Page) {
+  await submitCurrentTextLexical(page, '[data-test-id="ConsoleTerminalInput"]');
+}
+
 export async function toggleSideFilters(page: Page, open: boolean): Promise<void> {
   const button = page.locator('[data-test-id="ConsoleMenuToggleButton"]');
   const state = await button.getAttribute("data-test-state");
@@ -216,6 +224,13 @@ export async function verifyConsoleMessage(
 
   const messages = await findConsoleMessage(page, expected, messageType);
   await verifyExpectedCount(messages, expectedCount);
+}
+
+export async function verifyEagerEvaluationResult(page: Page, expected: Expected) {
+  const result = page.locator(
+    `[data-test-id="ConsoleTerminalInputEagerEvaluationResult"]:has-text('${expected}')`
+  );
+  await verifyExpectedCount(result, 1);
 }
 
 export async function verifyEvaluationResult(

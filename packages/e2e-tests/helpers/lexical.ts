@@ -31,6 +31,7 @@ export async function hideTypeAheadSuggestions(page: Page, selector: string) {
     await input.type("Escape");
   }
 }
+
 export async function type(page: Page, selector: string, text: string, shouldSubmit: boolean) {
   await clearText(page, selector);
 
@@ -38,22 +39,29 @@ export async function type(page: Page, selector: string, text: string, shouldSub
   await input.type(text);
 
   if (shouldSubmit) {
-    await hideTypeAheadSuggestions(page, selector);
+    await submitCurrentText(page, selector);
+  }
+}
 
-    let loopCounter = 0;
+export async function submitCurrentText(page: Page, selector: string) {
+  const input = page.locator(selector);
+  const initialText = await input.textContent();
 
-    // Timing awkwardness;
-    // Sometimes the typeahead misses an "Enter" command and doesn't submit the form.
-    while ((await input.textContent()) === text) {
-      await delay(100);
+  await hideTypeAheadSuggestions(page, selector);
 
-      await input.press("Enter");
+  let loopCounter = 0;
 
-      if (loopCounter++ > 5) {
-        // Give up after a few tries;
-        // This likely indicates something unexpected.
-        break;
-      }
+  // Timing awkwardness;
+  // Sometimes the typeahead misses an "Enter" command and doesn't submit the form.
+  while ((await input.textContent()) === initialText) {
+    await delay(100);
+
+    await input.press("Enter");
+
+    if (loopCounter++ > 5) {
+      // Give up after a few tries;
+      // This likely indicates something unexpected.
+      break;
     }
   }
 }

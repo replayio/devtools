@@ -80,5 +80,9 @@ function EagerEvaluationResultSuspends({
     }
   }
 
-  return <div className={styles.Wrapper}>{children}</div>;
+  return (
+    <div className={styles.Wrapper} data-test-id="ConsoleTerminalInputEagerEvaluationResult">
+      {children}
+    </div>
+  );
 }
