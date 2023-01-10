@@ -1,6 +1,6 @@
 import classnames from "classnames";
 import classNames from "classnames";
-import React, { useContext, useEffect, useState } from "react";
+import React, { ReactNode, useContext, useEffect, useState } from "react";
 
 import AccessibleImage from "devtools/client/debugger/src/components/shared/AccessibleImage";
 import { getPauseId } from "devtools/client/debugger/src/selectors";
@@ -95,7 +95,7 @@ function ToolbarButton({
   );
 }
 
-export default function Toolbar() {
+export default function Toolbar({ sidePanelToggle }: { sidePanelToggle: ReactNode }) {
   const replayClient = useContext(ReplayClientContext);
   const pauseId = useAppSelector(getPauseId);
   const frames = useGetFrames(replayClient, pauseId);
@@ -122,7 +122,7 @@ export default function Toolbar() {
 
   return (
     <div className="toolbox-toolbar-container flex flex-col items-center justify-between py-1">
-      <div id="toolbox-toolbar space-y-1">
+      <div id="toolbox-toolbar">
         {recording?.metadata?.test?.runner?.name == "cypress" ? (
           <ToolbarButton icon="cypress" label="Cypress Panel" name="events" />
         ) : (
@@ -147,6 +147,13 @@ export default function Toolbar() {
           </>
         ) : null}
         {logProtocol ? <ToolbarButton icon="code" label="Protocol" name="protocol" /> : null}
+
+        {sidePanelToggle !== null && (
+          <>
+            <div className="grow"></div>
+            <div className="relative px-2">{sidePanelToggle}</div>
+          </>
+        )}
       </div>
     </div>
   );
