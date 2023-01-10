@@ -167,13 +167,11 @@ function ConsoleInputSuspends() {
       </div>
       <div className={styles.ResultRow}>
         {expression !== "" && <Icon className={styles.Icon} type="terminal-result" />}
-        <EagerEvaluationResult expression={expression} />
+        <EagerEvaluationResult cacheKey={"" + incrementedKey} expression={expression} />
       </div>
     </div>
   );
 }
-
-function noop() {}
 
 function ErrorFallback() {
   return (
