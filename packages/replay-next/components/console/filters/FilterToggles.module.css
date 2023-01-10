@@ -19,7 +19,7 @@
   width: 100%;
   flex: 0 0 1px;
   border: none;
-  background-color: var(--background-color-default);
+  background-color: var(--theme-splitter-color);
 }
 
 .ExceptionsErrorIcon {

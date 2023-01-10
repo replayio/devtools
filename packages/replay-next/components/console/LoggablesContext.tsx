@@ -21,6 +21,7 @@ import { isInNodeModules } from "replay-next/src/utils/messages";
 import { suspendInParallel } from "replay-next/src/utils/suspense";
 import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { POINT_BEHAVIOR_ENABLED } from "shared/client/types";
 
 export type Loggable =
   | EventLog
@@ -141,7 +142,7 @@ export function LoggablesContextRoot({
     const pointInstances: PointInstance[] = [];
 
     points.forEach(point => {
-      if (point.shouldLog) {
+      if (point.shouldLog === POINT_BEHAVIOR_ENABLED) {
         const [hitPoints, status] = getHitPointsForLocationSuspense(
           client,
           point.location,

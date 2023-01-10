@@ -59,6 +59,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     description: "Skip locations that are mapped to the beginning of a function body",
     key: "brokenSourcemapWorkaround",
   },
+  {
+    label: "Enable Backend Processing Routines",
+    description: "Enable backend support for running processing routines (like React DevTools)",
+    key: "enableRoutines",
+  },
 ];
 
 const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [];
@@ -111,6 +116,8 @@ export default function ExperimentalSettings({}) {
     "brokenSourcemapWorkaround"
   );
 
+  const { value: enableRoutines, update: updateEnableRoutines } = useFeature("enableRoutines");
+
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
@@ -128,6 +135,8 @@ export default function ExperimentalSettings({}) {
       updateDisableScanDataCache(!disableScanDataCache);
     } else if (key === "brokenSourcemapWorkaround") {
       updateBrokenSourcemapWorkaround(!brokenSourcemapWorkaround);
+    } else if (key === "enableRoutines") {
+      updateEnableRoutines(!enableRoutines);
     }
   };
 
@@ -139,6 +148,7 @@ export default function ExperimentalSettings({}) {
     disableStableQueryCache,
     enableColumnBreakpoints,
     enableUnstableQueryCache,
+    enableRoutines,
     profileWorkerThreads,
   };
 

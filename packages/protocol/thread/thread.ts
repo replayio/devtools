@@ -219,15 +219,14 @@ class _ThreadFront {
     });
   }
 
-  get currentPause(): Pause {
-    return {
-      point: this.currentPoint,
-      time: this.currentTime,
-      pauseId:
-        this.currentPauseId ??
-        getPauseIdForExecutionPointIfCached(this.currentPoint)?.value ??
-        null,
-    };
+  /**
+   * This may be null if the pauseId for the current execution point hasn't been
+   * received from the backend yet. Use `await getCurrentPauseId()` instead if possible.
+   */
+  get currentPauseIdUnsafe() {
+    return (
+      this.currentPauseId ?? getPauseIdForExecutionPointIfCached(this.currentPoint)?.value ?? null
+    );
   }
 
   async getCurrentPauseId(replayClient: ReplayClientInterface): Promise<PauseId> {

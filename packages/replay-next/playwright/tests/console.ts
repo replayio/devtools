@@ -4,6 +4,7 @@ import {
   hideSearchInput,
   locateMessage,
   messageLocator,
+  openContextMenu,
   seekToMessage,
   showSearchInput,
   toggleProtocolMessage,
@@ -20,7 +21,7 @@ import {
 } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
-testSetup("0d0b52a9-96bc-4bd9-b5d8-66275c6cce96");
+testSetup("4ccc9f9f-f0d3-4418-ac21-1b316e462a44");
 
 async function setup(page: Page, toggleState: boolean | null = null) {
   await page.goto(getTestUrl("console"));
@@ -106,12 +107,12 @@ test("should expand and inspect arrays", async ({ page }) => {
   await toggleProtocolMessage(page, "warnings", true);
 
   const listItem = await locateMessage(page, "console-warning", "This is a warning");
-  await takeScreenshot(page, listItem, "array-collapsed", 1);
+  await takeScreenshot(page, listItem, "array-collapsed");
 
   const outer = listItem.locator("[data-test-name=Expandable]", { hasText: "This is a warning" });
   const keyValue = outer.locator("[data-test-name=Expandable]", { hasText: "(3) [" });
   await keyValue.click();
-  await takeScreenshot(page, listItem, "array-expanded", 1);
+  await takeScreenshot(page, listItem, "array-expanded");
 });
 
 test("should expand and inspect objects", async ({ page }) => {
@@ -511,13 +512,13 @@ test("should show the context menu on top of other messages and the current time
   await seekToMessage(page, listItem);
 
   listItem = await locateMessage(page, "console-log", "This is a log");
-  await listItem.click({ button: "right" });
+  await openContextMenu(listItem);
   await takeScreenshot(page, list, "context-menu-position-one");
 
   await page.keyboard.press("Escape");
 
   listItem = await locateMessage(page, "console-error", "This is an error");
-  await listItem.click({ button: "right" });
+  await openContextMenu(listItem);
   await takeScreenshot(page, list, "context-menu-position-two");
 });
 
@@ -528,7 +529,7 @@ test("should support setting focus range via the context menu", async ({ page })
   let listItem;
 
   listItem = await locateMessage(page, "console-warning", "This is a warning");
-  await listItem.click({ button: "right" });
+  await openContextMenu(listItem);
   await page.click("[data-test-id=ConsoleContextMenu-SetFocusStartButton]");
   await stopHovering(page);
   // Give the UI time to settle.
@@ -536,7 +537,7 @@ test("should support setting focus range via the context menu", async ({ page })
   await takeScreenshot(page, list, "context-menu-focus-after-start");
 
   listItem = await locateMessage(page, "console-error", "This is an error");
-  await listItem.click({ button: "right" });
+  await openContextMenu(listItem);
   await stopHovering(page);
   await page.click("[data-test-id=ConsoleContextMenu-SetFocusEndButton]");
   // Give the UI time to settle.

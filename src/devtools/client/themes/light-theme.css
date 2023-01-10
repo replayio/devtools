@@ -239,5 +239,5 @@ div.CodeMirror span.eval-text {
 }
 
 .theme-light .editor-container {
-  background-color: #fff;
+  background-color: var(--body-bgcolor);
 }

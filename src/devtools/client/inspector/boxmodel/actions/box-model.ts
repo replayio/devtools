@@ -1,4 +1,4 @@
-import type { UIStore, UIThunkAction } from "ui/actions";
+import type { UIStore } from "ui/actions";
 import { isInspectorSelected } from "ui/reducers/app";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
 import { getBoundingRectAsync, getComputedStyleAsync } from "ui/suspense/styleCaches";
@@ -17,7 +17,7 @@ export function setupBoxModel(store: UIStore, startAppListening: AppStartListeni
       const state = getState();
       const { selectedNode, tree } = state.markup;
 
-      if (!isInspectorSelected(state) || !selectedNode || !ThreadFront.currentPause?.pauseId) {
+      if (!isInspectorSelected(state) || !selectedNode) {
         return;
       }
 
@@ -27,19 +27,11 @@ export function setupBoxModel(store: UIStore, startAppListening: AppStartListeni
         return;
       }
 
+      const pauseId = await ThreadFront.getCurrentPauseId(replayClient);
+
       const [bounds, style] = await Promise.all([
-        getBoundingRectAsync(
-          protocolClient,
-          ThreadFront.sessionId!,
-          ThreadFront.currentPause.pauseId,
-          selectedNode
-        ),
-        getComputedStyleAsync(
-          protocolClient,
-          ThreadFront.sessionId!,
-          ThreadFront.currentPause.pauseId,
-          selectedNode
-        ),
+        getBoundingRectAsync(protocolClient, ThreadFront.sessionId!, pauseId, selectedNode),
+        getComputedStyleAsync(protocolClient, ThreadFront.sessionId!, pauseId, selectedNode),
       ]);
 
       if (!bounds || !style) {

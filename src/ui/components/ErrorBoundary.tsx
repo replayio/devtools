@@ -38,7 +38,7 @@ export default function ErrorBoundary({ children }: { children: ReactNode }) {
   };
 
   return (
-    <Sentry.ErrorBoundary onError={onError}>
+    <Sentry.ErrorBoundary onError={onError} fallback={<Error />}>
       {unexpectedError ? <Error /> : children}
     </Sentry.ErrorBoundary>
   );

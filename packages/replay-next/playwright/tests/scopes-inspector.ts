@@ -4,7 +4,7 @@ import { getTestUrl, takeScreenshot } from "./utils/general";
 import { toggleExpandable } from "./utils/inspector";
 import testSetup from "./utils/testSetup";
 
-testSetup("9fd8381f-05e6-40c2-8b4f-59e40c2c3886");
+testSetup("b1849642-40a3-445c-96f8-4bcd2c35586e");
 
 test.beforeEach(async ({ page }) => {
   page.setDefaultTimeout(5000);

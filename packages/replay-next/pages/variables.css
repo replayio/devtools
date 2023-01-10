@@ -125,9 +125,8 @@
 :root.theme-dark {
   --color-transparent: rgba(0, 0, 0, 0);
 
-  /* Migration note: removed from src/devtools/client/themes/variables.css */
-
   /* Color ramp (Dark) */
+  /* Migration note: copy/pasted with src/devtools/client/themes/variables.css */
   --theme-base-100: #000; /* background chrome */
   --theme-base-95: #192230; /* tab bars */
   --theme-base-90: #3d4552; /* editor and selected tab */
@@ -172,6 +171,7 @@
   --tab-selected-bgcolor: var(--theme-base-95);
   --tooltip-color: #fff;
   --tooltip-bgcolor: var(--theme-base-85);
+
 
   --background-color-contrast-1: #0e1119;
   --background-color-contrast-2: #192230;
@@ -531,6 +531,7 @@
   /* Selection */
   --theme-selection-background: var(--primary-accent);
   --theme-selection-background-hover: #353b48;
+  --theme-table-selection-background-hover: var(--theme-toolbar-background);
   --theme-selection-focus-background: var(--grey-60);
   --theme-selection-focus-color: var(--grey-30);
   --theme-selection-color: #ffffff;
@@ -1047,12 +1048,13 @@
   /* Selection */
   --theme-selection-background: var(--primary-accent);
   --theme-selection-background-hover: #f0f9fe;
+  --theme-table-selection-background-hover: var(--theme-toolbar-background);
   --theme-selection-focus-background: var(--toolbarbutton-hover-background);
   --theme-selection-focus-color: var(--grey-70);
   --theme-selection-color: #ffffff;
 
   /* Border color that splits the toolbars/panels/headers. */
-  --theme-splitter-color: var(--grey-25);
+  --theme-splitter-color: #e0e0e2; /* TODO @jonbell var(--grey-25) is undefined */
   --theme-emphasized-splitter-color: var(--grey-30);
   --theme-emphasized-splitter-color-hover: var(--grey-40);
 
