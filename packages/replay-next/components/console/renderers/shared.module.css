@@ -9,7 +9,7 @@
   padding-top: calc(0.25rem + 1px);
   padding-left: 1.5rem;
 
-  border-bottom: 1px solid var(--background-color-contrast-1);
+  border-bottom: 1px solid var(--theme-splitter-color);
   position: relative;
 }
 .ErrorRow {

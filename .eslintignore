@@ -9,3 +9,4 @@ packages/accordion/website/
 **/*.config.js
 **/.eslintrc*
 **/*.d.ts
+src/ui/components/SecondaryToolbox/**/*.raw.js

@@ -4,7 +4,7 @@ import { toggleProtocolMessages } from "./utils/console";
 import { getTestUrl, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
-testSetup("30a6dd11-bd3e-45db-b6cc-5749c04fb885");
+testSetup("4f76b342-c7a8-467f-ad08-9fa885f10477");
 
 async function inspect(page: Page, partialText: string) {
   const messageItem = await page

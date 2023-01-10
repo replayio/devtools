@@ -3,7 +3,7 @@
   overflow: hidden;
   border-bottom-left-radius: 0.5rem;
   border-bottom-right-radius: 0.5rem;
-  background-color: var(--background-color-contrast-2);
+  background-color: var(--body-bgcolor);
   word-break: break-all;
   font-size: var(--font-size-regular);
 }
@@ -27,7 +27,7 @@
   flex: 1 1 auto;
   overflow: auto;
   height: 100%;
-  border-top: 1px solid var(--background-color-default);
+  border-top: 1px solid var(--theme-splitter-color);
 }
 
 .PanelResizeHandleContainer {
@@ -57,7 +57,7 @@
   display: block;
   height: 100%;
   width: 1px;
-  background-color: var(--background-color-default);
+  background-color: var(--theme-splitter-color);
 }
 
 .RightColumnActionsRow {
@@ -69,7 +69,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  border-top: 1px solid var(--background-color-default);
+  border-top: 1px solid var(--theme-splitter-color);
 }
 
 .ConsoleSearchRow {

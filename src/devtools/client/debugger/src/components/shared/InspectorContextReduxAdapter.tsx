@@ -45,7 +45,7 @@ export default function InspectorContextReduxAdapter({ children }: { children: R
 
   const inspectHTMLElement = useCallback(
     (protocolValue: ProtocolValue, pauseId: PauseId, point: ExecutionPoint, time: number) => {
-      if (pauseId !== ThreadFront.currentPause.pauseId) {
+      if (pauseId !== ThreadFront.currentPauseIdUnsafe) {
         ThreadFront.timeWarpToPause({ point, time, pauseId }, false);
       }
       dispatch(selectNode(protocolValue.object!));

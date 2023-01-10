@@ -172,8 +172,10 @@ const baseNextConfig = {
       fs: false,
     };
 
+    // JS files that need to be imported as strings,
+    // such as the React DevTools backend to be injected into pauses
     config.module.rules.push({
-      test: /\.properties$/,
+      test: /\.raw\.*/,
       loader: "raw-loader",
     });
 

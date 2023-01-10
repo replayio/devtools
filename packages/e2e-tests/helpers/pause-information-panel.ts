@@ -1,5 +1,8 @@
 import { Locator, Page, expect } from "@playwright/test";
+import { SourceId } from "@replayio/protocol";
 import chalk from "chalk";
+
+import { POINT_BEHAVIOR_DISABLED_TEMPORARILY, POINT_BEHAVIOR_ENABLED } from "shared/client/types";
 
 import { openSource } from "./source-explorer-panel";
 import { Expected } from "./types";
@@ -370,4 +373,38 @@ export async function waitForScopeValue(page: Page, name: string, expectedValue:
     )
     .first();
   await scopeValue.waitFor();
+}
+
+export function findPoints(
+  page: Page,
+  type: "logpoint" | "breakpoint",
+  options: {
+    sourceId?: SourceId;
+    lineNumber?: number;
+    columnIndex?: number;
+  } = {}
+) {
+  const { columnIndex, lineNumber, sourceId } = options;
+
+  const selectorCriteria = [
+    '[data-test-name="Breakpoint"]',
+    `[data-test-type="${type}"]`,
+    columnIndex != null ? `[data-test-column-index="${columnIndex}"]` : "",
+    lineNumber != null ? `[data-test-line-number="${lineNumber}"]` : "",
+    sourceId != null ? `[data-test-source-id="${sourceId}"]` : "",
+  ];
+
+  return page.locator(selectorCriteria.join(""));
+}
+
+export async function togglePoint(page: Page, pointLocator: Locator, enabled: boolean) {
+  const targetState = enabled ? POINT_BEHAVIOR_ENABLED : POINT_BEHAVIOR_DISABLED_TEMPORARILY;
+  const toggle = pointLocator.locator('[data-test-name="BreakpointToggle"]');
+  const currentState = await toggle.getAttribute("date-test-state");
+  if (targetState !== currentState) {
+    await debugPrint(page, `Toggling point to ${targetState}`, "togglePoint");
+    await toggle.click();
+  } else {
+    await debugPrint(page, `Point already ${targetState}`, "togglePoint");
+  }
 }

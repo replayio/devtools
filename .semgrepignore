@@ -6,3 +6,4 @@ src/devtools/client/shared/vendor/
 src/devtools/client/shared/sourceeditor/codemirror
 src/test/harness.js
 packages/replay-next/src/hooks/useIndexedDB.ts
+src/ui/components/SecondaryToolbox/**/*.raw.js

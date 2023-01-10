@@ -13,12 +13,20 @@ export default function useModalDismissSignal(
     }
 
     const handleDocumentKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) {
+        return;
+      }
+
       if (event.key === "Escape") {
         dismissCallback();
       }
     };
 
     const handleDocumentClick = (event: MouseEvent) => {
+      if (event.defaultPrevented) {
+        return;
+      }
+
       if (!element.contains(event.target as Node)) {
         event.stopPropagation();
         event.preventDefault();

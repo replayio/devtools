@@ -25,7 +25,7 @@ import styles from "./shared.module.css";
 
 const NEW_BADGE_THRESHOLD = 5_000;
 
-// Renders PointInstances with shouldLog=true.
+// Renders PointInstances with logging enabled.
 function LogPointRenderer({
   index,
   isFocused,

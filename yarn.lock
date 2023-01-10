@@ -4282,10 +4282,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/protocol@npm:0.36.0":
-  version: 0.36.0
-  resolution: "@replayio/protocol@npm:0.36.0"
-  checksum: 5f999cc83ebac8b982f3aec6bdaf06a7ad35645962cd8471372f7429fb115eb029053724ccd9584a01ecdf19dd2add18eefdcb91a3a75615380bb1ea095320db
+"@replayio/protocol@npm:0.37.0":
+  version: 0.37.0
+  resolution: "@replayio/protocol@npm:0.37.0"
+  checksum: 5f8599c93146e8a98ba7b6d022090012fb762b8bd9a9de0e0dac9306675ad88e878fadb5b4fe26d4a674e2e8021978d67331c6076368e5ac30f8115513a6aa95
   languageName: node
   linkType: hard
 
@@ -20626,13 +20626,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-resizable-panels@npm:^0.0.27":
-  version: 0.0.27
-  resolution: "react-resizable-panels@npm:0.0.27"
+"react-resizable-panels@npm:^0.0.30":
+  version: 0.0.30
+  resolution: "react-resizable-panels@npm:0.0.30"
   peerDependencies:
     react: ^16.14.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0
-  checksum: d644e65c7df2010931fdaf69db0b33b380d4b2734bba5d851926e512455a66f9b91c4c889600103e516b7446ddd4c22c6875c1670ca24bda49ef7bfc04ad8494
+  checksum: 7c7bb657a71559f01ff5fff021d5c5843ea3db9fb2059fe2d282f8f32692959979f60470d3d065f927a2cebc030cbced470f01a1a52ece2afb6ed5c0c5cea934
   languageName: node
   linkType: hard
 
@@ -20945,7 +20945,7 @@ __metadata:
     "@redux-devtools/app": ^2.1.4
     "@redux-devtools/extension": ^3.2.2
     "@reduxjs/toolkit": ^1.8.4
-    "@replayio/protocol": 0.36.0
+    "@replayio/protocol": 0.37.0
     "@replayio/replay": ^0.9.6
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0
@@ -21065,7 +21065,7 @@ __metadata:
     react-lazyload: ^3.2.0
     react-merge-refs: ^1.1.0
     react-redux: ^8.0.2
-    react-resizable-panels: ^0.0.27
+    react-resizable-panels: ^0.0.30
     react-table: ^7.7.0
     react-tooltip: ^4.2.21
     react-transition-group: ^4.4.2

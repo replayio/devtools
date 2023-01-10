@@ -1,6 +1,6 @@
 import { PauseId, Object as ProtocolObject, Value as ProtocolValue } from "@replayio/protocol";
 import classNames from "classnames";
-import { ReactNode, Suspense, useContext, useState } from "react";
+import { MouseEvent, ReactNode, Suspense, useContext, useState } from "react";
 
 import Expandable from "replay-next/components/Expandable";
 import Loader from "replay-next/components/Loader";
@@ -12,6 +12,17 @@ import PropertiesRenderer from "./PropertiesRenderer";
 import useClientValue from "./useClientValue";
 import ValueRenderer from "./ValueRenderer";
 import styles from "./KeyValueRenderer.module.css";
+
+export type Props = {
+  before?: ReactNode;
+  context: "console" | "default" | "nested";
+  enableInspection?: boolean;
+  expandByDefault?: boolean;
+  layout: "horizontal" | "vertical";
+  onContextMenu?: (event: MouseEvent) => void;
+  pauseId: PauseId;
+  protocolValue: ProtocolValue;
+};
 
 // Renders a protocol Object/ObjectPreview as a key+value pair.
 //
@@ -28,17 +39,10 @@ export default function KeyValueRenderer({
   enableInspection = true,
   expandByDefault = false,
   layout = "horizontal",
+  onContextMenu,
   pauseId,
   protocolValue,
-}: {
-  before?: ReactNode;
-  context: "console" | "default" | "nested";
-  enableInspection?: boolean;
-  expandByDefault?: boolean;
-  layout: "horizontal" | "vertical";
-  pauseId: PauseId;
-  protocolValue: ProtocolValue;
-}) {
+}: Props) {
   const client = useContext(ReplayClientContext);
   const clientValue = useClientValue(protocolValue, pauseId);
 
@@ -81,7 +85,7 @@ export default function KeyValueRenderer({
           // Children that are text nodes will be rendered inline, as part of the value/preview.
           if (htmlElementChildren.length > 0) {
             return (
-              <span className={classNames(styles.KeyValue)}>
+              <span className={classNames(styles.KeyValue)} onContextMenu={onContextMenu}>
                 <HTMLExpandable
                   before={
                     <>
@@ -148,6 +152,7 @@ export default function KeyValueRenderer({
         !showExpandableView && layout === "vertical" ? styles.ToggleAlignmentPadding : null
       )}
       data-test-name="KeyValue"
+      onContextMenu={onContextMenu}
     >
       {before}
       {name != null ? (

@@ -18,7 +18,12 @@ import {
   isExecutionPointsLessThan,
 } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { Point } from "shared/client/types";
+import {
+  POINT_BEHAVIOR_DISABLED,
+  POINT_BEHAVIOR_DISABLED_TEMPORARILY,
+  POINT_BEHAVIOR_ENABLED,
+  Point,
+} from "shared/client/types";
 import { LineHitCounts } from "shared/client/types";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 
@@ -127,22 +132,31 @@ export default function HoverButton({
       }
 
       if (point) {
-        editPoint(point.id, { content, shouldLog: true });
+        editPoint(point.id, { content, shouldLog: POINT_BEHAVIOR_ENABLED });
       } else {
         addPoint(
           {
             content,
-            shouldLog: true,
+            shouldLog: POINT_BEHAVIOR_ENABLED,
           },
           location
         );
       }
     };
 
+    const { shouldBreak = POINT_BEHAVIOR_DISABLED, shouldLog = POINT_BEHAVIOR_DISABLED } =
+      point || {};
+
+    // If a point's behavior has been temporarily disabled, the hover button should take that into account.
+    const hasOrDidBreak = shouldBreak !== POINT_BEHAVIOR_DISABLED;
+    const hasOrDidLog = shouldLog !== POINT_BEHAVIOR_DISABLED;
+
     const togglePoint = () => {
       if (point) {
-        if (!point.shouldLog || point.shouldBreak) {
-          editPoint(point.id, { shouldLog: !point.shouldLog });
+        if (!hasOrDidLog || hasOrDidBreak) {
+          editPoint(point.id, {
+            shouldLog: hasOrDidLog ? POINT_BEHAVIOR_DISABLED : POINT_BEHAVIOR_ENABLED,
+          });
         } else {
           deletePoints(point.id);
         }
@@ -153,10 +167,10 @@ export default function HoverButton({
       <button
         className={`${buttonClassName} ${showNag ? styles.ButtonWithNag : styles.Button}`}
         data-test-name="LogPointToggle"
-        data-test-state={point?.shouldLog ? "on" : "off"}
-        onClick={point?.shouldLog ? togglePoint : addLogPoint}
+        data-test-state={hasOrDidLog ? "on" : "off"}
+        onClick={hasOrDidLog ? togglePoint : addLogPoint}
       >
-        <Icon className={iconClassName} type={point?.shouldLog ? "remove" : "add"} />
+        <Icon className={iconClassName} type={hasOrDidLog ? "remove" : "add"} />
       </button>
     );
   }

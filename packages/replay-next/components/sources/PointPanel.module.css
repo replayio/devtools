@@ -1,9 +1,12 @@
-.Panel {
+.PanelEnabled,
+.PanelDisabled {
   display: flex;
   flex-direction: column;
-  background-color: var(--point-panel-background-color);
   padding: 0.5rem;
   gap: 0.5rem;
+}
+.PanelEnabled {
+  background-color: var(--point-panel-background-color);
 }
 
 .Loader {

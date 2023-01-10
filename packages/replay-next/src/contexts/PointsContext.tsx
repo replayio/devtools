@@ -10,7 +10,7 @@ import {
 } from "react";
 
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { Point, PointId } from "shared/client/types";
+import { POINT_BEHAVIOR_DISABLED, Point, PointId } from "shared/client/types";
 
 import useBreakpointIdsFromServer from "../hooks/useBreakpointIdsFromServer";
 import useIndexedDB, { IDBOptions } from "../hooks/useIndexedDB";
@@ -102,8 +102,8 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
         content: "",
         condition: null,
         createdAtTime: Date.now(),
-        shouldBreak: false,
-        shouldLog: false,
+        shouldBreak: POINT_BEHAVIOR_DISABLED,
+        shouldLog: POINT_BEHAVIOR_DISABLED,
         ...partialPoint,
         id,
         location,

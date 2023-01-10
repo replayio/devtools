@@ -9,12 +9,13 @@ import {
   PointDescription,
   ProtocolClient,
   SessionId,
+  TimeRange,
   analysisPoints,
   analysisResult,
 } from "@replayio/protocol";
 import { captureException } from "@sentry/react";
 
-import { commandError } from "shared/utils/error";
+import { ProtocolError, commandError } from "shared/utils/error";
 
 import { makeInfallible } from "./utils";
 
@@ -91,6 +92,19 @@ if (typeof window !== "undefined") {
   });
 }
 
+const noCallerStackTracesForErrorCodes = new Set<ProtocolError>([
+  ProtocolError.GraphicsUnavailableAtPoint,
+  ProtocolError.InternalError,
+  ProtocolError.SessionDestroyed,
+  ProtocolError.TooManyPoints,
+  ProtocolError.UnknownSession,
+  ProtocolError.UnsupportedRecording,
+]);
+const noCallerStackTracesForFailedCommands = new Set<CommandMethods>([
+  "DOM.repaintGraphics",
+  "Session.createPause",
+]);
+
 export type ExperimentalSettings = {
   listenForMetrics: boolean;
   controllerKey?: string;
@@ -99,6 +113,7 @@ export type ExperimentalSettings = {
   disableQueryCache?: boolean;
   disableStableQueryCache?: boolean;
   disableUnstableQueryCache?: boolean;
+  enableRoutines?: boolean;
   profileWorkerThreads?: boolean;
 };
 
@@ -133,12 +148,14 @@ export async function createSession(
   recordingId: string,
   loadPoint: string | undefined,
   experimentalSettings: ExperimentalSettings,
+  focusWindow: TimeRange | undefined,
   sessionCallbacks: SessionCallbacks
 ) {
   const { sessionId } = await sendMessage("Recording.createSession", {
     recordingId,
     loadPoint: loadPoint || undefined,
     experimentalSettings,
+    focusWindow,
   });
 
   setSessionCallbacks(sessionCallbacks);
@@ -226,7 +243,12 @@ export async function sendMessage<M extends CommandMethods>(
       // _just_ "Internal Error" or similar
       finalMessage = `${message} (request: ${method}, ${JSON.stringify(params)})`;
     }
-    captureException(callerStackTrace, { extra: { code, message, params } });
+    if (
+      !noCallerStackTracesForErrorCodes.has(code) &&
+      !(code === ProtocolError.CommandFailed && noCallerStackTracesForFailedCommands.has(method))
+    ) {
+      captureException(callerStackTrace, { extra: { code, message, method, params } });
+    }
     throw commandError(finalMessage, code);
   }
 

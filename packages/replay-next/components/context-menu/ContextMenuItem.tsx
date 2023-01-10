@@ -1,6 +1,4 @@
-import { MouseEvent, ReactNode, useContext } from "react";
-
-import { ContextMenuContext } from "replay-next/components/context-menu/ContextMenuContext";
+import { MouseEvent, ReactNode } from "react";
 
 import styles from "./ContextMenuItem.module.css";
 
