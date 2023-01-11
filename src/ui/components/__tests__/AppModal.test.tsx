@@ -53,6 +53,6 @@ describe("AppModal", () => {
     await userEvent.type(document.body, "{Escape}");
 
     // Verify the modal is hidden
-    expect(await screen.queryByText("Privacy")).not.toBeInTheDocument();
+    await expect(await screen.queryByText("Privacy")).not.toBeInTheDocument();
   });
 });

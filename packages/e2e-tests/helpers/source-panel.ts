@@ -454,7 +454,7 @@ export async function waitForSelectedSource(page: Page, url: string) {
     const editorPanel = page.locator("#toolbox-content-debugger");
     const sourceHeader = editorPanel.locator(`[data-test-name="Source-${url}"]`);
 
-    expect(await sourceHeader.getAttribute("data-status")).toBe("active");
+    await expect(await sourceHeader.getAttribute("data-status")).toBe("active");
 
     // Make sure the visible source is the same source as the selected tab.
     const headerSourceId = await sourceHeader.getAttribute("data-test-sourceid");

@@ -1,6 +1,7 @@
 import { Page, expect, test } from "@playwright/test";
 
 import {
+  addTerminalExpression,
   hideSearchInput,
   locateMessage,
   messageLocator,
@@ -465,20 +466,18 @@ test("should show a button to clear terminal expressions", async ({ page }) => {
   await toggleProtocolMessages(page, false);
 
   // Add some expressions
-  await page.fill("[data-test-id=ConsoleTerminalInput]", "location.href");
-  await page.keyboard.press("Enter");
-  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/local");
-  await page.keyboard.press("Enter");
+  await addTerminalExpression(page, "location.href");
+  await addTerminalExpression(page, "+/local");
 
-  expect(await getElementCount(page, "[data-test-name=Message]")).toBe(2);
-  expect(await getElementCount(page, "[data-test-id=ClearConsoleEvaluationsButton]")).toBe(1);
+  await expect(await getElementCount(page, "[data-test-name=Message]")).toBe(2);
+  await expect(await getElementCount(page, "[data-test-id=ClearConsoleEvaluationsButton]")).toBe(1);
 
   // Click the button to clear them
   await page.click("[data-test-id=ClearConsoleEvaluationsButton]");
 
   // Verify an empty terminal
-  expect(await getElementCount(page, "[data-test-name=Message]")).toBe(0);
-  expect(await getElementCount(page, "[data-test-id=ClearConsoleEvaluationsButton]")).toBe(0);
+  await expect(await getElementCount(page, "[data-test-name=Message]")).toBe(0);
+  await expect(await getElementCount(page, "[data-test-id=ClearConsoleEvaluationsButton]")).toBe(0);
 });
 
 test("should escape object expressions in terminal expressions", async ({ page }) => {

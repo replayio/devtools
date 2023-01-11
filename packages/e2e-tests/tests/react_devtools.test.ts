@@ -45,7 +45,7 @@ test("react_devtools: Test React DevTools.", async ({ page }) => {
   await enableComponentPicker(page);
   await waitFor(async () => {
     await hoverScreenshot(page, x, y);
-    expect(await page.locator("[class^=InactiveSelectedElement]").count()).toBeGreaterThan(0);
+    await expect(await page.locator("[class^=InactiveSelectedElement]").count()).toBeGreaterThan(0);
   });
   await waitForAndCheckInspectedItem(getInspectedItem(page, "Props", "text"), '"Foo"');
 
@@ -59,7 +59,7 @@ test("react_devtools: Test React DevTools.", async ({ page }) => {
   const highlighter = page.locator("#box-model-content");
   await highlighter.waitFor();
   const expectedHighlighterShape = `M${left},${top} L${right},${top} L${right},${bottom} L${left},${bottom}`;
-  expect(await highlighter.getAttribute("d")).toEqual(expectedHighlighterShape);
+  await expect(await highlighter.getAttribute("d")).toEqual(expectedHighlighterShape);
 
   component = getReactComponents(page).nth(0);
   await component.click();

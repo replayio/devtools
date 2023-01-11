@@ -6,6 +6,17 @@ import { Expected, MessageType } from "./types";
 
 type ToggleName = "errors" | "exceptions" | "logs" | "nodeModules" | "timestamps" | "warnings";
 
+export async function addTerminalExpression(page: Page, text: string): Promise<void> {
+  await debugPrint(page, `Adding terminal expression "${chalk.bold(text)}"`, "addTerminalMessage");
+
+  const input = page.locator("[data-test-id=ConsoleTerminalInput]");
+  await input.waitFor();
+  await input.focus();
+  await input.fill(text);
+  await page.keyboard.press("Enter");
+  await verifyConsoleMessage(page, text, "terminal-expression", 1);
+}
+
 export async function findConsoleMessage(
   page: Page,
   expected?: Expected,

@@ -16,8 +16,8 @@ describe("Focuser", () => {
       },
     });
 
-    expect(await screen.queryByText("Focus off")).toBeInTheDocument();
-    expect(await screen.queryByText("0:00 – 1:00")).toBeInTheDocument();
+    await expect(await screen.queryByText("Focus off")).toBeInTheDocument();
+    await expect(await screen.queryByText("0:00 – 1:00")).toBeInTheDocument();
   });
 
   it("should render the current focus region", async () => {
@@ -49,8 +49,8 @@ describe("Focuser", () => {
       },
     });
 
-    expect(await screen.queryByText("Focus on")).toBeInTheDocument();
-    expect(await screen.queryByText("0:00 – 0:30")).toBeInTheDocument();
+    await expect(await screen.queryByText("Focus on")).toBeInTheDocument();
+    await expect(await screen.queryByText("0:00 – 0:30")).toBeInTheDocument();
   });
 
   it("should allow the focus region to be toggled on and off", async () => {

@@ -61,14 +61,14 @@ describe("proxy", () => {
     }
 
     const [recorder, entries] = createRecorder(new Target());
-    expect(await recorder.multiplyByTwo(2)).toBe(4);
-    expect(await recorder.multiplyByTwo(3)).toBe(6);
+    await expect(await recorder.multiplyByTwo(2)).toBe(4);
+    await expect(await recorder.multiplyByTwo(3)).toBe(6);
 
     expect(entries).toHaveLength(2);
 
     const player = createPlayer<Target>(serialize(entries));
-    expect(await player.multiplyByTwo(2)).toBe(4);
-    expect(await player.multiplyByTwo(3)).toBe(6);
+    await expect(await player.multiplyByTwo(2)).toBe(4);
+    await expect(await player.multiplyByTwo(3)).toBe(6);
   });
 
   test("should resolve async responses correctly regardless of order", async () => {
@@ -97,13 +97,13 @@ describe("proxy", () => {
     resolvers[1]("second");
     await waitForPromisesToFlush();
 
-    expect(await a).toBe("first");
-    expect(await b).toBe("second");
-    expect(await c).toBe("third");
+    await expect(await a).toBe("first");
+    await expect(await b).toBe("second");
+    await expect(await c).toBe("third");
 
     const player = createPlayer<Target>(serialize(entries));
     // Only the most recent value should be returned.
-    expect(await player.asyncMethod()).toBe("third");
+    await expect(await player.asyncMethod()).toBe("third");
   });
 
   test("should return the latest value for a method with multiple matching calls", async () => {
@@ -114,14 +114,14 @@ describe("proxy", () => {
     }
 
     const [recorder, entries] = createRecorder(new Target());
-    expect(await recorder.multiplyByTwo(2)).toBe(4);
-    expect(await recorder.multiplyByTwo(3)).toBe(6);
+    await expect(await recorder.multiplyByTwo(2)).toBe(4);
+    await expect(await recorder.multiplyByTwo(3)).toBe(6);
 
     expect(entries).toHaveLength(2);
 
     const player = createPlayer<Target>(serialize(entries));
-    expect(await player.multiplyByTwo(2)).toBe(4);
-    expect(await player.multiplyByTwo(3)).toBe(6);
+    await expect(await player.multiplyByTwo(2)).toBe(4);
+    await expect(await player.multiplyByTwo(3)).toBe(6);
   });
 
   test("should support getters", () => {
@@ -366,7 +366,7 @@ describe("proxy", () => {
     const [recorder, entries] = createRecorder(new Target(), {
       sanitizeResult,
     });
-    expect(await recorder.asyncMethod(object)).toEqual(objectSanitizedResult);
+    await expect(await recorder.asyncMethod(object)).toEqual(objectSanitizedResult);
 
     expect(entries).toHaveLength(1);
     expect(entries).toMatchInlineSnapshot(`
@@ -393,7 +393,7 @@ describe("proxy", () => {
     `);
 
     const player = createPlayer<Target>(serialize(entries));
-    expect(await player.asyncMethod(object)).toEqual(objectSanitizedResult);
+    await expect(await player.asyncMethod(object)).toEqual(objectSanitizedResult);
   });
 
   test("should notify of pending async requests", async () => {
