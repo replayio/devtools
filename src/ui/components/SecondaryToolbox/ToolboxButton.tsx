@@ -1,8 +1,7 @@
-import { setShowVideoPanel } from "ui/actions/layout";
-import { getShowVideoPanel } from "ui/reducers/layout";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { RefObject } from "react";
+import { ImperativePanelHandle } from "react-resizable-panels";
 
-import Icon from "../shared/Icon";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 interface ToolboxButtonProps {
   title?: string;
@@ -22,21 +21,27 @@ export const ToolboxButton = ({ children, title, onClick = () => {} }: ToolboxBu
   );
 };
 
-export const ShowVideoButton = () => {
-  const dispatch = useAppDispatch();
-  const showVideoPanel = useAppSelector(getShowVideoPanel);
-
+export const ShowVideoButton = ({
+  videoPanelCollapsed,
+  videoPanelRef,
+}: {
+  videoPanelCollapsed: Boolean;
+  videoPanelRef: RefObject<ImperativePanelHandle>;
+}) => {
   const onClick = () => {
-    dispatch(setShowVideoPanel(true));
+    const panel = videoPanelRef.current;
+    if (panel) {
+      if (videoPanelCollapsed) {
+        panel.expand();
+      } else {
+        panel.collapse();
+      }
+    }
   };
 
-  if (showVideoPanel) {
-    return null;
-  }
-
   return (
-    <ToolboxButton title="Show Video" onClick={onClick}>
-      <Icon filename="video" className="bg-iconColor" size="small" />
+    <ToolboxButton title={videoPanelCollapsed ? "Show Video" : "Hide Video"} onClick={onClick}>
+      <MaterialIcon>{videoPanelCollapsed ? "videocam_on" : "videocam_off"}</MaterialIcon>
     </ToolboxButton>
   );
 };

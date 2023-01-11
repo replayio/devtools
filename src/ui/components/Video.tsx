@@ -1,41 +1,21 @@
 import {} from "devtools/client/inspector/markup/reducers/markup";
-import React, { FC, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { CypressToggler } from "devtools/client/debugger/src/components/TestInfo/CypressToggler";
 import { PreviewNodeHighlighter } from "devtools/client/inspector/markup/components/PreviewNodeHighlighter";
 import { installObserver, refreshGraphics } from "protocol/graphics";
-import { setShowVideoPanel } from "ui/actions/layout";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
 import CommentTool from "ui/components/shared/CommentTool";
 import hooks from "ui/hooks";
-import { getSelectedPanel, getSelectedPrimaryPanel, getViewMode } from "ui/reducers/layout";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { getSelectedPrimaryPanel, getViewMode } from "ui/reducers/layout";
+import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 
 import { selectors } from "../reducers";
-import MaterialIcon from "./shared/MaterialIcon";
 import ReplayLogo from "./shared/ReplayLogo";
 import Spinner from "./shared/Spinner";
 import Tooltip from "./shared/Tooltip";
-
-const HideVideoButton: FC = () => {
-  const dispatch = useAppDispatch();
-
-  const onClick = () => {
-    dispatch(setShowVideoPanel(false));
-  };
-
-  return (
-    <button
-      className="video-picker-button absolute top-0 right-0 flex rounded-full bg-tabBgcolor p-1"
-      title="Hide Video"
-      onClick={onClick}
-    >
-      <MaterialIcon>videocam_off</MaterialIcon>
-    </button>
-  );
-};
 
 function CommentLoader({ recordingId }: { recordingId: string }) {
   const { comments, loading } = hooks.useGetComments(recordingId);
@@ -121,7 +101,6 @@ function Video({
           <PreviewNodeHighlighter key={nodeId} nodeId={nodeId} />
         ))}
       </div>
-      {viewMode === "dev" ? <HideVideoButton /> : null}
     </div>
   );
 }

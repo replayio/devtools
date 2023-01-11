@@ -2,7 +2,6 @@ import { LocalNag } from "ui/setup/prefs";
 
 export type LayoutState = {
   showCommandPalette: boolean;
-  showVideoPanel: boolean;
   selectedPrimaryPanel: PrimaryPanelName;
   selectedPanel: SecondaryPanelName;
   viewMode: ViewMode;

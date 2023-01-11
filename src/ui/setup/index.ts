@@ -89,7 +89,7 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
     };
   }
 
-  const { viewMode, showVideoPanel, toolboxLayout, selectedPanel } = syncInitialLayoutState;
+  const { viewMode, toolboxLayout, selectedPanel } = syncInitialLayoutState;
   const initialViewMode = session.viewMode || viewMode;
   trackEvent(initialViewMode == "dev" ? "layout.default_devtools" : "layout.default_viewer");
 
@@ -98,7 +98,6 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
     viewMode: initialViewMode,
     selectedPanel: "selectedPanel" in session ? session.selectedPanel : selectedPanel,
     selectedPrimaryPanel: getDefaultSelectedPrimaryPanel(session, recording),
-    showVideoPanel: "showVideoPanel" in session ? session.showVideoPanel : showVideoPanel,
     toolboxLayout: "toolboxLayout" in session ? session.toolboxLayout : toolboxLayout,
     localNags: "localNags" in session ? session.localNags : [],
   };
