@@ -80,10 +80,18 @@ function getMessages() {
 }
 
 function getActionObjectId() {
+  const { actionSanitizer } = extractedConfig;
+  if (actionSanitizer) {
+    return actionSanitizer(action);
+  }
   return action;
 }
 
 function getStateObjectId() {
+  const { stateSanitizer } = extractedConfig;
+  if (stateSanitizer) {
+    return stateSanitizer(state);
+  }
   return state;
 }
 
