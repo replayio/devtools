@@ -61,10 +61,13 @@ export default function useBreakpointIdsFromServer(
               // We haven't fetched breakable positions for this yet. Get them.
               await getBreakpointPositionsAsync(client, point.location.sourceId);
             }
+
             // _Now_ we can tell the backend about this breakpoint.
-            client.breakpointAdded(point.location, point.condition).then(serverIds => {
-              pointIdToBreakpointIdMap.set(point.id, serverIds);
-            });
+            if (point.shouldBreak === POINT_BEHAVIOR_ENABLED) {
+              client.breakpointAdded(point.location, point.condition).then(serverIds => {
+                pointIdToBreakpointIdMap.set(point.id, serverIds);
+              });
+            }
           }
 
           if (pointsToRemove.length > 0) {
