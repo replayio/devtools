@@ -1,4 +1,4 @@
-import { ExecutionPoint } from "@replayio/protocol";
+import { ExecutionPoint, Value } from "@replayio/protocol";
 
 import type { ThreadFront as TF } from "protocol/thread";
 import { ThreadFront } from "protocol/thread";
@@ -6,10 +6,12 @@ import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 
+export type ReduxActionStateValues = readonly [pauseId: string, action: Value, state: Value];
+
 // Cache this at the module level, because the backend records all evaluations
 // applied to a given pause in a session. So, we only need to do this once for
 // a given Pause, and we want to retain the info even if the RDT component unmounts.
-export const pausesWithDevtoolsInjected = new Set<string>();
+export const pausesWithDevtoolsInjected = new Map<string, ReduxActionStateValues>();
 
 // types borrowed from the Redux DevTools source
 
@@ -106,9 +108,14 @@ export async function fetchReduxValuesAtPoint(
   time: number
 ) {
   const pauseId = await getPauseIdAsync(replayClient, point, time);
-  if (!pauseId || pausesWithDevtoolsInjected.has(pauseId)) {
+  if (!pauseId) {
     return;
   }
+
+  if (pausesWithDevtoolsInjected.has(point)) {
+    return pausesWithDevtoolsInjected.get(point)!;
+  }
+
   const frames = await getFramesAsync(replayClient, pauseId);
   if (!frames) {
     return;
@@ -130,5 +137,9 @@ export async function fetchReduxValuesAtPoint(
     frames[0].frameId
   );
 
-  return [pauseId, actionRes, stateRes] as const;
+  if (actionRes.returned && stateRes.returned) {
+    const result = [pauseId, actionRes.returned!, stateRes.returned!] as const;
+    pausesWithDevtoolsInjected.set(point, result);
+    return result;
+  }
 }

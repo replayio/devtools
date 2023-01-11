@@ -6,7 +6,10 @@ import Inspector from "replay-next/components/inspector/Inspector";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { getRecordingId } from "ui/utils/recording";
 
-import { fetchReduxValuesAtPoint } from "./redux-devtools/injectReduxDevtoolsProcessing";
+import {
+  ReduxActionStateValues,
+  fetchReduxValuesAtPoint,
+} from "./redux-devtools/injectReduxDevtoolsProcessing";
 import type { ReduxActionAnnotation } from "./redux-devtools/redux-annotations";
 import {
   exampleReduxAnnotations,
@@ -21,26 +24,18 @@ interface RACProps {
 
 function ReduxActionContents({ point, time }: RACProps) {
   const replayClient = useContext(ReplayClientContext);
-  const [actionValue, setActionValue] = useState<Value | null>(null);
-  const [stateValue, setStateValue] = useState<Value | null>(null);
-
-  const [pauseId, setPauseId] = useState<string | null>(null);
+  const [reduxValues, setReduxValues] = useState<ReduxActionStateValues | null>(null);
 
   useLayoutEffect(() => {
     async function fetchAction() {
       const res = await fetchReduxValuesAtPoint(replayClient, point, time);
 
-      if (res) {
-        const [pauseId, actionValue, stateValue] = res;
-        if ("returned" in actionValue && actionValue?.returned) {
-          setActionValue(actionValue.returned);
-          setStateValue(stateValue?.returned);
-          setPauseId(pauseId);
-        }
-      }
+      setReduxValues(res ?? null);
     }
     fetchAction();
   }, [replayClient, point, time]);
+
+  const [pauseId, actionValue, stateValue] = reduxValues ?? [];
   return (
     <div>
       <h4 className="text-base font-bold">Action</h4>
