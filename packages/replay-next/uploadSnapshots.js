@@ -49,12 +49,12 @@ async function uploadImage(file, branch, runId) {
     });
 
     if (res.status !== 200) {
-      return { status: res.status, error: await res.text(), file };
+      return { status: res.status, error: await res.text(), serverError: true, file, content };
     }
 
     return res.json();
   } catch (e) {
-    return { file, status: res.status, error: e, fetchThrew: true, content };
+    return { status: res.status, error: e, serverError: false, file, content };
   }
 }
 
@@ -98,7 +98,7 @@ async function uploadImage(file, branch, runId) {
   );
 
   console.log(`${failed.length} failed snapshots`);
-  console.log(failed.map(r => `${r.file} - ${r.fetchThrew ? "fetch-failed" : "server-failed"} - ${JSON.stringify(r.error)} -- ${r.content}`));
+  console.log(failed.map(r => `${r.file} - ${r.serverError ? "server-error" : "client-error"} - ${JSON.stringify(r.error)} -- ${r.content}`));
 
   if (failed.length > 0) {
     process.exit(1);
