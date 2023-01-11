@@ -24,7 +24,7 @@ describe("Generic suspense cache", () => {
     const cache = createTestCache();
     const thennable = cache.getValueAsync(1);
     expect(isThennable(thennable)).toBe(true);
-    expect(await thennable).toBe(1);
+    await expect(await thennable).toBe(1);
   });
 
   it("should return sync values", () => {

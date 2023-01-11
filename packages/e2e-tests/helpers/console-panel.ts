@@ -183,8 +183,9 @@ export async function seekToConsoleMessage(
   await consoleMessage.hover();
   await consoleMessage.locator('[data-test-id="ConsoleMessageHoverButton"]').click();
 
-  await waitFor(async () =>
-    expect(await consoleMessage.getAttribute("data-test-paused-here")).toBe("true")
+  await waitFor(
+    async () =>
+      await expect(await consoleMessage.getAttribute("data-test-paused-here")).toBe("true")
   );
   await waitForPaused(page, line);
 }
