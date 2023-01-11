@@ -86,8 +86,9 @@ function ToolbarButton({
         <div
           className="absolute h-2 w-2 rounded-full bg-secondaryAccent"
           style={{
-            left: "1em",
-            top: "0.5em",
+            // FE-1096 Aiming for pixel perfect badge alignment over icons with inconsistent shapes
+            right: name === "comments" ? ".9rem" : "1em",
+            top: name === "debugger" ? ".6em" : "0.5em",
           }}
         />
       ) : null}
