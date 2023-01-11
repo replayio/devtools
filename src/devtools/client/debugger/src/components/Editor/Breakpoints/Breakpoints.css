@@ -1,24 +1,10 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
-.theme-light {
-  --gutter-hover-background-color: #dde1e4;
-  --breakpoint-fill: var(--primary-accent);
-  --breakpoint-stroke: var(--primary-accent-hover);
-}
-
-.theme-dark {
-  --gutter-hover-background-color: #414141;
-  --breakpoint-fill: var(--primary-accent);
-  --breakpoint-stroke: var(--primary-accent-hover);
-}
-
 .theme-light,
 .theme-dark {
   --breakpoint-skipped-opacity: 0.15;
   --breakpoint-inactive-opacity: 0.3;
   --breakpoint-disabled-opacity: 0.6;
+  --breakpoint-fill: var(--primary-accent);
+  --breakpoint-stroke: var(--primary-accent-hover);
 }
 
 /* Standard gutter breakpoints */
