@@ -1,34 +1,17 @@
+import { ExecutionPoint } from "@replayio/protocol";
 // import { Root, UPDATE_STATE } from "@redux-devtools/app";
-import type { Root } from "@redux-devtools/app";
+import classnames from "classnames";
 import React, { useContext, useLayoutEffect, useRef, useState } from "react";
-import { batch } from "react-redux";
 
 import { useAppSelector } from "ui/setup/hooks";
 import type { UIState } from "ui/state";
 
 import { ReduxAnnotationsContext } from "./redux-devtools/redux-annotations";
-
-type RDTAppStore = NonNullable<Root["store"]>;
-
-type RDTThemes = "light" | "dark" | "auto";
-
-const replayThemesToRDTThemes = {
-  light: "light",
-  dark: "dark",
-  system: "auto",
-} as const;
+import styles from "./ReduxDevTools.module.css";
 
 export const ReduxDevToolsPanel = () => {
-  const [ReduxDevToolsAppRoot, setRoot] = useState<typeof Root | null>(null);
-  const rootRef = useRef<Root | null>(null);
   const reduxAnnotations = useContext(ReduxAnnotationsContext);
-
-  // Collect the current Replay app theme so we can apply it to the Redux DevTools
-  const appTheme = useAppSelector((state: UIState) => state.app.theme);
-  // Also save the current RDT theme in state, so we can do stupid syncing tricks
-  const [currentRDTTheme, setCurrentRDTTheme] = useState<RDTThemes>(
-    replayThemesToRDTThemes[appTheme]
-  );
+  const [selectedPoint, setSelectedPoint] = useState<ExecutionPoint | null>(null);
 
   useLayoutEffect(() => {
     // Code-split and lazy-import the main Redux DevTools `<Root>` component.
@@ -71,7 +54,7 @@ export const ReduxDevToolsPanel = () => {
       }
     });
     */
-  }, [ReduxDevToolsAppRoot, appTheme, currentRDTTheme]);
+  }, []);
 
   useLayoutEffect(() => {
     // TODO Re-enable Redux DevTools annotations handling
@@ -148,12 +131,32 @@ export const ReduxDevToolsPanel = () => {
       });
     });
     */
-  }, [ReduxDevToolsAppRoot, reduxAnnotations]);
+  }, []);
 
-  if (!ReduxDevToolsAppRoot) {
-    return null;
-  }
+  const renderedActions = reduxAnnotations.map(annotation => {
+    return (
+      <div
+        key={annotation.point}
+        className={classnames("font-mono text-base", {
+          [styles.selected]: annotation.point === selectedPoint,
+        })}
+        role="listitem"
+        onClick={() => setSelectedPoint(annotation.point)}
+      >
+        {annotation.payload.actionType}
+      </div>
+    );
+  });
 
-  // @ts-ignore Weird ref type error
-  return <ReduxDevToolsAppRoot ref={rootRef} />;
+  return (
+    <div className={classnames("flex min-h-full bg-bodyBgcolor", styles.frames)}>
+      <div className="border-right-black max-w-s flex flex-col">
+        <h3 className="text-lg font-bold">Actions</h3>
+        <div role="list">{renderedActions}</div>
+      </div>
+      <div className="ml-1 grow">
+        <h3 className="text-lg font-bold">Contents</h3>
+      </div>
+    </div>
+  );
 };
