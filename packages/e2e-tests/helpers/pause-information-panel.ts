@@ -38,7 +38,7 @@ export async function expandAllScopesBlocks(page: Page): Promise<void> {
   const blocks = scopesPanel.locator('[data-test-name="ScopesInspector"]');
 
   await waitFor(async () => {
-    await expect(await blocks.count()).toBeGreaterThan(0);
+    expect(await blocks.count()).toBeGreaterThan(0);
   });
 
   await forEach(blocks, async (block: Locator) => {
