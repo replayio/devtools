@@ -82,7 +82,7 @@ async function createVideo(tmpDir: string, input: string, recordingId: string): 
       console.log("Error:", err);
       reject(err);
     })
-    .outputOptions(["-c:v libx264", "-r 30", "-pix_fmt yuv420p", `-vf "scale=100:-2,setdar=16/9"`])
+    .outputOptions(["-c:v libx264", "-r 30", "-pix_fmt yuv420p"])
     .save(filename);
 
   return promise;
