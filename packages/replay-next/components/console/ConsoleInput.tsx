@@ -13,6 +13,7 @@ import useLoadedRegions from "replay-next/src/hooks/useRegions";
 import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
 import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { isThennable } from "shared/proxy/utils";
 import { isPointInRegions } from "shared/utils/time";
 
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
@@ -67,8 +68,14 @@ function ConsoleInputSuspends() {
       loadedRegions !== null && isPointInRegions(executionPoint, loadedRegions.loaded);
     if (isLoaded) {
       pauseId = getPauseIdSuspense(replayClient, executionPoint, time);
-      const frames = getFramesSuspense(replayClient, pauseId);
-      frameId = frames?.[0]?.frameId ?? null;
+      try {
+        const frames = getFramesSuspense(replayClient, pauseId);
+        frameId = frames?.[0]?.frameId ?? null;
+      } catch (errorOrPromise) {
+        if (isThennable(errorOrPromise)) {
+          throw errorOrPromise;
+        }
+      }
     }
   }
 
