@@ -5,12 +5,10 @@ import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { shallowEqual } from "devtools/client/debugger/src/utils/compare";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
-import { isValidPoint } from "replay-next/src/contexts/PointsContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 import * as selectors from "ui/reducers/app";
 import { getTheme } from "ui/reducers/app";
-import { getShowVideoPanel } from "ui/reducers/layout";
 import { Canvas, EventKind, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
 import { getBoundingRectsAsync } from "ui/suspense/nodeCaches";
 import { compareBigInt } from "ui/utils/helpers";
@@ -34,7 +32,6 @@ import {
   hideCommandPalette,
   setSelectedPanel,
   setSelectedPrimaryPanel,
-  setShowVideoPanel,
   setToolboxLayout,
   setViewMode,
 } from "./layout";
@@ -318,9 +315,6 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       dispatch(setModal("sharing", { recordingId }));
     } else if (key === "toggle_edit_focus") {
       dispatch(toggleFocusMode());
-    } else if (key === "toggle_video") {
-      const showVideoPanel = getShowVideoPanel(getState());
-      dispatch(setShowVideoPanel(!showVideoPanel));
     } else if (key === "toggle_dark_mode") {
       dispatch(toggleTheme());
     } else if (key === "pin_to_bottom") {

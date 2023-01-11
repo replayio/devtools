@@ -113,7 +113,7 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
                           <PanelGroup autoSaveId="bvaughn-layout-main" direction="horizontal">
                             <Panel
                               className={styles.Panel}
-                              collapsible={true}
+                              collapsible
                               defaultSize={15}
                               minSize={10}
                               maxSize={20}

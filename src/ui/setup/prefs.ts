@@ -11,7 +11,6 @@ import {
   getLocalNags,
   getSelectedPanel,
   getSelectedPrimaryPanel,
-  getShowVideoPanel,
   getToolboxLayout,
   getViewMode,
 } from "ui/reducers/layout";
@@ -25,7 +24,6 @@ export interface ReplaySessions {
 }
 export interface ReplaySession {
   viewMode: ViewMode;
-  showVideoPanel: boolean;
   toolboxLayout: ToolboxLayout;
   selectedPrimaryPanel: PrimaryPanelName;
   selectedPanel: SecondaryPanelName;
@@ -153,7 +151,6 @@ async function maybeUpdateReplaySessions(state: UIState) {
   const currentReplaySession = {
     viewMode: getViewMode(state),
     toolboxLayout: getToolboxLayout(state),
-    showVideoPanel: getShowVideoPanel(state),
     selectedPrimaryPanel: getSelectedPrimaryPanel(state),
     selectedPanel: getSelectedPanel(state),
     localNags: getLocalNags(state),

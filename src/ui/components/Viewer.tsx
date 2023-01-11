@@ -1,24 +1,21 @@
-import React from "react";
-import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { useRef, useState } from "react";
+import {
+  ImperativePanelHandle,
+  Panel,
+  PanelGroup,
+  PanelResizeHandle,
+} from "react-resizable-panels";
 
 import Video from "ui/components/Video";
-import { getRecordingTarget } from "ui/reducers/app";
-import { getShowVideoPanel, getToolboxLayout } from "ui/reducers/layout";
+import { getToolboxLayout } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
-import { ToolboxLayout } from "ui/state/layout";
-import { prefs } from "ui/utils/prefs";
 
 import SecondaryToolbox from "./SecondaryToolbox";
 import Toolbox from "./Toolbox";
 
-const useGetShowVideo = () => {
-  const recordingTarget = useAppSelector(getRecordingTarget);
-  const showVideoPanel = useAppSelector(getShowVideoPanel);
-  return showVideoPanel && recordingTarget !== "node";
-};
-
 const Vertical = () => {
-  const showVideo = useGetShowVideo();
+  const videoPanelRef = useRef<ImperativePanelHandle>(null);
+  const [videoPanelCollapsed, setVideoPanelCollapsed] = useState(false);
 
   return (
     <PanelGroup
@@ -26,37 +23,40 @@ const Vertical = () => {
       className="w-full overflow-hidden"
       direction="vertical"
     >
-      {showVideo && (
-        <>
-          <Panel
-            className="flex-column flex flex-1"
-            defaultSize={50}
-            id="video"
-            minSize={10}
-            order={1}
-          >
-            <div className="flex-column flex flex-1">
-              <Video />
-            </div>
-          </Panel>
-          <PanelResizeHandle className="h-2 w-full" />
-        </>
-      )}
+      <Panel
+        className="flex-column flex flex-1"
+        collapsible
+        defaultSize={50}
+        id="Panel-Video"
+        minSize={10}
+        onCollapse={setVideoPanelCollapsed}
+        order={1}
+        ref={videoPanelRef}
+      >
+        <div className="flex-column flex flex-1">
+          <Video />
+        </div>
+      </Panel>
+      <PanelResizeHandle
+        className={videoPanelCollapsed ? "" : "h-2 w-full"}
+        id="PanelResizeHandle-Video"
+      />
       <Panel
         className="flex-column flex flex-1"
         defaultSize={50}
-        id="secondary-toolbox"
+        id="Panel-SecondaryToolbox"
         minSize={30}
         order={2}
       >
-        <SecondaryToolbox />
+        <SecondaryToolbox videoPanelCollapsed={videoPanelCollapsed} videoPanelRef={videoPanelRef} />
       </Panel>
     </PanelGroup>
   );
 };
 
 const Horizontal = () => {
-  const showVideo = useGetShowVideo();
+  const videoPanelRef = useRef<ImperativePanelHandle>(null);
+  const [videoPanelCollapsed, setVideoPanelCollapsed] = useState(false);
 
   return (
     <PanelGroup
@@ -67,50 +67,36 @@ const Horizontal = () => {
       <Panel
         className="flex flex-1 flex-row"
         defaultSize={50}
-        id="secondary-toolbox"
+        id="Panel-SecondaryToolbox"
         minSize={30}
         order={1}
       >
         <div className="flex flex-1 flex-row">
-          <SecondaryToolbox />
-          <PanelResizeHandle className="w-2" />
+          <SecondaryToolbox
+            videoPanelCollapsed={videoPanelCollapsed}
+            videoPanelRef={videoPanelRef}
+          />
+          <PanelResizeHandle
+            className={videoPanelCollapsed ? "" : "w-2"}
+            id="PanelResizeHandle-Video"
+          />
         </div>
       </Panel>
-      {showVideo && (
-        <Panel className="flex flex-1 flex-row" defaultSize={50} id="video" minSize={10} order={2}>
-          <Video />
-        </Panel>
-      )}
+      <Panel
+        className="flex flex-1 flex-row"
+        collapsible
+        defaultSize={50}
+        id="Panel-Video"
+        minSize={10}
+        onCollapse={setVideoPanelCollapsed}
+        order={2}
+        ref={videoPanelRef}
+      >
+        <Video />
+      </Panel>
     </PanelGroup>
   );
 };
-
-function minSize(sidePanelCollapsed: boolean, toolboxLayout: ToolboxLayout): `${number}px` {
-  if (!sidePanelCollapsed && toolboxLayout === "ide") {
-    return "300px";
-  }
-
-  if (!sidePanelCollapsed || toolboxLayout === "ide") {
-    return "200px";
-  }
-
-  return "0px";
-}
-
-function maxSize(
-  sidePanelCollapsed: boolean,
-  toolboxLayout: ToolboxLayout
-): `${number}` | `${number}%` | `${number}px` {
-  if (toolboxLayout === "ide") {
-    return "80%";
-  }
-
-  if (sidePanelCollapsed) {
-    return "0";
-  }
-
-  return String(prefs.sidePanelSize) as `${number}px`;
-}
 
 export default function Viewer() {
   const toolboxLayout = useAppSelector(getToolboxLayout);

@@ -43,8 +43,7 @@ export type CommandKey =
   | "show_replay_info"
   | "show_sharing"
   | "toggle_dark_mode"
-  | "toggle_edit_focus"
-  | "toggle_video";
+  | "toggle_edit_focus";
 
 const COMMANDS: readonly Command[] = [
   { key: "open_console", label: "Open Console" },
@@ -70,7 +69,6 @@ const COMMANDS: readonly Command[] = [
   { key: "show_sharing", label: "Show Sharing Options" },
   { key: "toggle_dark_mode", label: "Toggle Dark Mode", shortcut: "Alt+Shift+T" },
   { key: "toggle_edit_focus", label: "Toggle Edit Focus Mode", shortcut: "Shift+F" },
-  { key: "toggle_video", label: "Toggle Video" },
   { key: "pin_to_bottom", label: "Pin Toolbox To Bottom" },
   { key: "pin_to_left", label: "Pin Toolbox To Left" },
   { key: "pin_to_bottom_right", label: "Pin Toolbox To Bottom Right" },

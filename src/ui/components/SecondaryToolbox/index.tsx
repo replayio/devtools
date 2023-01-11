@@ -1,6 +1,7 @@
 import "ui/setup/dynamic/inspector";
 import classnames from "classnames";
-import React, { FC, ReactNode, Suspense, useContext } from "react";
+import React, { FC, ReactNode, RefObject, Suspense, useContext } from "react";
+import { ImperativePanelHandle } from "react-resizable-panels";
 
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
 import { RecordingCapabilities } from "protocol/thread/thread";
@@ -128,15 +129,27 @@ function PanelButtonsScrollOverflowGradient() {
   return <div className="secondary-toolbox-scroll-overflow-gradient"></div>;
 }
 
-export default function SecondaryToolboxSuspenseWrapper() {
+export default function SecondaryToolboxSuspenseWrapper({
+  videoPanelCollapsed,
+  videoPanelRef,
+}: {
+  videoPanelCollapsed: Boolean;
+  videoPanelRef: RefObject<ImperativePanelHandle>;
+}) {
   return (
     <Suspense fallback={<Loader />}>
-      <SecondaryToolbox />
+      <SecondaryToolbox videoPanelCollapsed={videoPanelCollapsed} videoPanelRef={videoPanelRef} />
     </Suspense>
   );
 }
 
-function SecondaryToolbox() {
+function SecondaryToolbox({
+  videoPanelCollapsed,
+  videoPanelRef,
+}: {
+  videoPanelCollapsed: Boolean;
+  videoPanelRef: RefObject<ImperativePanelHandle>;
+}) {
   const selectedPanel = useAppSelector(getSelectedPanel);
   const hasReactComponents = useAppSelector(selectors.hasReactComponents);
   const toolboxLayout = useAppSelector(getToolboxLayout);
@@ -163,7 +176,10 @@ function SecondaryToolbox() {
         />
         <div className="secondary-toolbox-right-buttons-container flex">
           <PanelButtonsScrollOverflowGradient />
-          <ShowVideoButton />
+          <ShowVideoButton
+            videoPanelCollapsed={videoPanelCollapsed}
+            videoPanelRef={videoPanelRef}
+          />
           <ToolboxOptions />
         </div>
       </header>

@@ -147,13 +147,8 @@ export default function Toolbar({ sidePanelToggle }: { sidePanelToggle: ReactNod
           </>
         ) : null}
         {logProtocol ? <ToolbarButton icon="code" label="Protocol" name="protocol" /> : null}
-
-        {sidePanelToggle !== null && (
-          <>
-            <div className="grow"></div>
-            <div className="relative px-2">{sidePanelToggle}</div>
-          </>
-        )}
+        <div className="grow"></div>
+        <div className="relative px-2">{sidePanelToggle}</div>
       </div>
     </div>
   );

@@ -26,9 +26,6 @@ type SetShowCommandPaletteAction = Action<"set_show_command_palette"> & { value:
 type SetToolboxLayoutAction = Action<"set_toolbox_layout"> & {
   layout: ToolboxLayout;
 };
-type SetShowVideoPanelAction = Action<"set_show_video_panel"> & {
-  showVideoPanel: boolean;
-};
 type SetViewModeAction = Action<"set_view_mode"> & { viewMode: ViewMode };
 type DismissLocalNagAction = Action<"dismiss_local_nag"> & { nag: LocalNag };
 export type SetSelectedPanelAction = Action<"set_selected_panel"> & { panel: SecondaryPanelName };
@@ -37,7 +34,6 @@ export type LayoutAction =
   | SetSelectedPrimaryPanelAction
   | SetShowCommandPaletteAction
   | SetToolboxLayoutAction
-  | SetShowVideoPanelAction
   | SetViewModeAction
   | DismissLocalNagAction;
 
@@ -79,11 +75,6 @@ export function setViewMode(viewMode: ViewMode): UIThunkAction {
     dispatch({ type: "set_view_mode", viewMode });
     trackEvent(viewMode == "dev" ? "layout.devtools" : "layout.viewer");
   };
-}
-export function setShowVideoPanel(showVideoPanel: boolean): SetShowVideoPanelAction {
-  trackEvent("toolbox.secondary.video_toggle");
-
-  return { type: "set_show_video_panel", showVideoPanel };
 }
 
 export function setToolboxLayout(layout: ToolboxLayout): UIThunkAction {
