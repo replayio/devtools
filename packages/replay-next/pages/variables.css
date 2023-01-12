@@ -104,6 +104,33 @@
   --grey-90: #0c0c0d;
   --grey-90-a10: rgba(12, 12, 13, 0.1);
   --grey-90-a30: rgba(12, 12, 13, 0.3);
+
+  --z-index-1: 10;
+  --z-index-2: 20;
+  --z-index-3: 30;
+  --z-index-4: 40;
+  --z-index-5: 50;
+  --z-index-6: 60;
+  --z-index-7: 70;
+  --z-index-8: 80;
+  --z-index-9: 90;
+  --z-index-10: 100;
+  --z-index-1--timeline-comment: var(--z-index-1);
+  --z-index-1--paused-comment: var(--z-index-1);
+  --z-index-1--paused-message: var(--z-index-1);
+  --z-index-1--comment-container: var(--z-index-1);
+  --z-index-1--icon-tooltip: var(--z-index-1);
+  --z-index-1--timeline-tooltip: var(--z-index-1);
+  --z-index-2--hovered-point-secondary: var(--z-index-2);
+  --z-index-3--hovered-point-primary: var(--z-index-3);
+  --z-index-3--hovered-comment-primary: var(--z-index-3);
+  --z-index-4--name: var(--z-index-4);
+  --z-index-5--name: var(--z-index-5);
+  --z-index-6--name: var(--z-index-6);
+  --z-index-7--name: var(--z-index-7);
+  --z-index-7--mask: var(--z-index-7);
+  --z-index-8--modal: var(--z-index-8);
+  --z-index-8--dropdown: var(--z-index-8);
 }
 
 :root,
@@ -125,8 +152,6 @@
 :root.theme-dark {
   --color-transparent: rgba(0, 0, 0, 0);
 
-  /* Migration note: removed from src/devtools/client/themes/variables.css */
-
   /* Color ramp (Dark) */
   --theme-base-100: #000; /* background chrome */
   --theme-base-95: #192230; /* tab bars */
@@ -137,16 +162,17 @@
   --theme-base-60: #c3c6c8;
 
   /* Tabs (Dark) */
-  /* Migration note: removed from src/devtools/client/themes/variables.css */
   --tab-bgcolor: var(--theme-base-100);
   --tab-color: var(--theme-base-40);
   --tab-hover-bgcolor: var(--theme-base-85);
   --tab-hover-color: var(--tab-selected-color);
   --tab-selected-bgcolor: var(--theme-base-95);
   --tab-selected-color: #fff;
+  /* --tab-standard-color: ; to add */
+  /* --tab-standard-hover-bgcolor: ; to add */
+  /* --tab-bgcolor: ; */
 
   /* Core classes (Dark) */
-  /* Migration note: removed from src/devtools/client/themes/variables.css */
   --scroll-thumb-color: #454950;
   --dropshadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --body-bgcolor: var(--theme-base-95);
@@ -160,7 +186,6 @@
   --modal-border: #222;
   --tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
   --tab-bgcolor: var(--theme-base-100); /* bg tabs */
-
   --theme-border: var(--theme-base-100);
   --icon-color: var(--body-color);
   --theme-focuser-bgcolor: var(--primary-accent);
@@ -331,8 +356,8 @@
   --token-comment-color: #8f8f92;
   --token-definition-color: #fefefe;
   --token-local-color: #fefefe;
-  --token-keyword-color: #ff42a9;
   --token-meta-color: #8f8f92;
+  --token-keyword-color: #ff42a9;
   --token-number-color: #ffff00;
   --token-operator-color: #fefefe;
   --token-propertyName-color: #ff98eb;
@@ -437,8 +462,11 @@
   --slider-thumb-color: var(--grey-40);
   --slider-track-color: var(--grey-60);
 
-  /* src/devtools/client/themes/variables.css */
-  /* items below this point haven't been organised yet */
+  /*
+  Migration notes:
+    * removed from src/devtools/client/themes/variables.css
+    * things below this point are not organized yet
+  */
 
   /* Timeline (Dark) */
   --progressbar-preview-max: var(--theme-base-70);
@@ -454,9 +482,9 @@
   /* Code Mirror (Dark) */
   --cm-linenumber: var(--grey-40);
   --cm-keyword: #ff42a8;
+  --cm-variable: #58e0ff;
   --cm-def: #fff;
   --cm-string: #01acfd;
-  --cm-variable: #58e0ff;
   --cm-number: yellow;
   --cm-property: #ff98eb;
   --cm-atom: #fff;
@@ -573,7 +601,7 @@
    * should improve keyboard navigation usability. */
   --theme-focus-outline-color: #ced3d9;
 
-  /* Colors used in Graphs, like performance tools. Mostly similar to some "highlight-*" colors. */
+  /* Colors used in Graphs, like performance tools. */
   --theme-graphs-green: #70bf53;
   --theme-graphs-blue: #46afe3;
   --theme-graphs-bluegrey: #5e88b0;
@@ -639,8 +667,7 @@
 :root.theme-light {
   --color-transparent: rgba(255, 255, 255, 0);
 
-  /* Tabs (Light) */
-  /* Migration note: removed from src/devtools/client/themes/variables.css */
+  /* Color ramp (Light) */
   --theme-base-100: hsl(0, 0%, 100%);
   --theme-base-95: hsl(0, 0%, 95%);
   --theme-base-90: hsl(0, 0%, 90%);
@@ -650,7 +677,6 @@
   --theme-base-60: hsl(0, 0%, 60%);
 
   /* Tabs (Light) */
-  /* Migration note: removed from src/devtools/client/themes/variables.css */
   --tab-bgcolor: var(--theme-base-90);
   --tab-color: var(--theme-base-40);
   --tab-hover-bgcolor: var(--theme-base-85);
@@ -662,7 +688,6 @@
   --tab-bgcolor: var(--theme-base-90); /* bg tabs */
 
   /* Core classes (Light) */
-  /* Migration note: removed from src/devtools/client/themes/variables.css */
   --scroll-thumb-color: #aaaaaa;
   --dropshadow: 0 4px 6px -1px rgb(100 100 255 / 0.7), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --body-bgcolor: var(--theme-base-100); /* bg text */
@@ -920,7 +945,8 @@
   --diff-level: 0;
   --diff-level-offset: 10px;
   /*
-    Minimum padding so content on the first level (zero) isn't touching the edge Added and removed lines will re-declare this to add extra padding to clear the +/- icons.
+    Minimum padding so content on the first level (zero) isn't touching the edge. Added 
+    and removed lines will re-declare this to add extra padding to clear the +/- icons.
   */
   --diff-level-min-offset: 5px;
 
@@ -975,6 +1001,8 @@
   --cm-def: #3172e0;
   --cm-string: #0842a4;
   --cm-number: #18181a;
+  /* --cm-property: ; to add */
+  /* --cm-atom: #fff; to add */
   --caret-color: #18181a;
   --debug-line-border: var(--primary-accent);
   --debug-line-background: #e8f5fb;
@@ -1000,7 +1028,6 @@
   --breakpoint-label: var(--cm-string);
 
   /* Testsuites (Light) */
-  --testsuites-error-bgcolor: #ffe9e9;
   --testsuites-error-bgcolor: #ffe9e9;
   --testsuites-error-bgcolor-hover: #ffe0e0;
   --testsuites-error-color: #eb5757;
@@ -1041,11 +1068,11 @@
   --theme-button-background: rgba(12, 12, 13, 0.05);
   --theme-button-active-background: rgba(12, 12, 13, 0.1);
 
-  /* Accordion headers */
+  /* Accordion headers (Light) */
   --theme-accordion-header-background: var(--theme-toolbar-background);
   --theme-accordion-header-hover: var(--theme-toolbar-hover);
 
-  /* Selection */
+  /* Selection (Light) */
   --theme-selection-background: var(--primary-accent);
   --theme-selection-background-hover: #f0f9fe;
   --theme-table-selection-background-hover: var(--theme-toolbar-background);
@@ -1058,7 +1085,7 @@
   --theme-emphasized-splitter-color: var(--grey-30);
   --theme-emphasized-splitter-color-hover: var(--grey-40);
 
-  /* Icon colors */
+  /* Icon colors (Light) */
   --theme-icon-color: rgba(12, 12, 13, 0.8);
   --theme-icon-hover-color: #000;
   --theme-icon-dimmed-color: rgba(135, 135, 137, 0.9);
@@ -1066,7 +1093,7 @@
   --theme-icon-error-color: var(--red-60);
   --theme-icon-warning-color: var(--yellow-65);
 
-  /* Text color */
+  /* Text color (Light) */
   --theme-comment: var(--grey-50);
   --theme-text-color-alt: var(--grey-50);
   --theme-text-color-inactive: var(--grey-40);
@@ -1089,7 +1116,7 @@
    * should improve keyboard navigation usability. */
   --theme-focus-outline-color: #000000;
 
-  /* Colors used in Graphs, like performance tools. Similar colors to Chrome's timeline. */
+  /* Colors used in Graphs, like performance tools. */
   --theme-graphs-green: #85d175;
   --theme-graphs-blue: #83b7f6;
   --theme-graphs-bluegrey: #0072ab;
@@ -1150,4 +1177,44 @@
   --focus-mode-popout-icon-background-color: white;
   --focus-mode-popout-icon-color: black;
   --focus-mode-popout-text-input-background-color: var(--theme-base-85);
+}
+
+/*
+Migration notes:
+  * removed from src/devtools/client/themes/variables.css
+  * things below this point are not organized yet
+*/
+
+/*
+ * For doorhangers elsewhere in Firefox, Mac uses fixed colors rather than
+ * system colors.
+ */
+:root[platform="mac"].theme-light {
+  --theme-popup-color: hsl(0, 0%, 10%);
+  --theme-popup-border-color: var(--grey-90-a20);
+}
+
+/* browser specific tweaks */
+@-moz-document url-prefix() {
+  :root.theme-dark {
+    --modal-bgcolor: rgba(0, 0, 0, 0.98);
+  }
+}
+
+/* Z-index scale */
+
+/* Z-index values should always be defined in #app. This allows us to at a glance determine
+relative layers of our application and prevents bugs arising from arbitrary z-index values. */
+
+/* Whenever possible, we should rely on the element stack order instead of z-index. If you're
+certain that you **have** to use a z-index (e.g. element with position: absolute/fixed), define a
+custom variable for it below so we can keep track of everything in one place. */
+
+@keyframes linearFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
