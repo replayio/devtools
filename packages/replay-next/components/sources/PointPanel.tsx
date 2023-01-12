@@ -1,6 +1,5 @@
 import { TimeStampedPoint } from "@replayio/protocol";
 import {
-  MouseEvent,
   Suspense,
   unstable_useCacheRefresh as useCacheRefresh,
   useContext,
@@ -143,11 +142,6 @@ function PointPanelWithHitPoints({
     };
   }
 
-  // Prevent hovers over syntax highlighted tokens from showing preview popups.
-  const onMouseMove = (event: MouseEvent) => {
-    event.preventDefault();
-  };
-
   const shouldLog = point.shouldLog === POINT_BEHAVIOR_ENABLED;
 
   if (isEditing) {
@@ -185,7 +179,6 @@ function PointPanelWithHitPoints({
       <div
         className={`${shouldLog ? styles.PanelEnabled : styles.PanelDisabled} ${className}`}
         data-test-id={`PointPanel-${lineNumber}`}
-        onMouseMove={onMouseMove}
       >
         <div className={styles.LayoutRow}>
           <div className={styles.MainColumn}>
@@ -342,7 +335,6 @@ function PointPanelWithHitPoints({
       <div
         className={`${shouldLog ? styles.PanelEnabled : styles.PanelDisabled} ${className}`}
         data-test-id={`PointPanel-${lineNumber}`}
-        onMouseMove={onMouseMove}
       >
         <div className={styles.LayoutRow}>
           <div className={styles.MainColumn}>
