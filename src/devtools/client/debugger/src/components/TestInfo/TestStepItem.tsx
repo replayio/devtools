@@ -2,6 +2,7 @@ import { Object as ProtocolObject, createPauseResult } from "@replayio/protocol"
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
+import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { getCurrentPoint } from "ui/actions/app";
 import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
@@ -161,12 +162,11 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
             });
 
             if (consolePropsProperty?.object) {
-              const consolePropsPauseData = await client.getObjectWithPreview(
+              consoleProps = await getObjectWithPreviewHelper(
+                client,
+                endPauseResult.pauseId,
                 consolePropsProperty.object,
-                endPauseResult.pauseId
-              );
-              consoleProps = consolePropsPauseData.objects?.find(
-                o => o.objectId === consolePropsProperty.object
+                true
               );
             }
           }
