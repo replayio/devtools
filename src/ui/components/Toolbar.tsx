@@ -1,8 +1,8 @@
 import classnames from "classnames";
 import classNames from "classnames";
-import React, { ReactNode, useContext, useEffect, useState } from "react";
+import React, { ReactNode, RefObject, useContext, useEffect, useState } from "react";
+import { ImperativePanelHandle } from "react-resizable-panels";
 
-import AccessibleImage from "devtools/client/debugger/src/components/shared/AccessibleImage";
 import { getPauseId } from "devtools/client/debugger/src/selectors";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
@@ -58,11 +58,13 @@ function ToolbarButton({
   icon,
   label,
   name,
+  sidePanelRef,
   showBadge,
 }: {
   icon: string;
   label: string;
   name: PrimaryPanelName;
+  sidePanelRef: RefObject<ImperativePanelHandle>;
   showBadge?: boolean;
 }) {
   const selectedPrimaryPanel = useAppSelector(selectors.getSelectedPrimaryPanel);
@@ -78,6 +80,15 @@ function ToolbarButton({
     if (selectedPrimaryPanel != panelName) {
       trackEvent(`toolbox.primary.${panelName}_select`);
       dispatch(actions.setSelectedPrimaryPanel(panelName));
+    } else {
+      const panel = sidePanelRef.current;
+      if (panel) {
+        if (panel.getCollapsed()) {
+          panel.expand();
+        } else {
+          panel.collapse();
+        }
+      }
     }
   };
   const imageIcon = (
@@ -117,7 +128,13 @@ function ToolbarButton({
   );
 }
 
-export default function Toolbar({ sidePanelToggle }: { sidePanelToggle: ReactNode }) {
+export default function Toolbar({
+  sidePanelCollapsed,
+  sidePanelRef,
+}: {
+  sidePanelCollapsed: boolean;
+  sidePanelRef: RefObject<ImperativePanelHandle>;
+}) {
   const replayClient = useContext(ReplayClientContext);
   const pauseId = useAppSelector(getPauseId);
   const frames = useGetFrames(replayClient, pauseId);
@@ -146,31 +163,77 @@ export default function Toolbar({ sidePanelToggle }: { sidePanelToggle: ReactNod
     <div className="toolbox-toolbar-container flex flex-col items-center justify-between py-1">
       <div id="toolbox-toolbar">
         {recording?.metadata?.test?.runner?.name == "cypress" ? (
-          <ToolbarButton icon="cypress" label="Cypress Panel" name="events" />
+          <ToolbarButton
+            icon="cypress"
+            label="Cypress Panel"
+            name="events"
+            sidePanelRef={sidePanelRef}
+          />
         ) : (
-          <ToolbarButton icon="info" label="Replay Info" name="events" />
+          <ToolbarButton
+            icon="info"
+            label="Replay Info"
+            name="events"
+            sidePanelRef={sidePanelRef}
+          />
         )}
         <ToolbarButton
           icon="forum"
           label="Comments"
           name="comments"
           showBadge={showCommentsBadge}
+          sidePanelRef={sidePanelRef}
         />
         {viewMode == "dev" ? (
           <>
-            <ToolbarButton icon="description" name="explorer" label="Source Explorer" />
-            <ToolbarButton icon="search" name="search" label="Search" />
+            <ToolbarButton
+              icon="description"
+              name="explorer"
+              label="Source Explorer"
+              sidePanelRef={sidePanelRef}
+            />
+            <ToolbarButton icon="search" name="search" label="Search" sidePanelRef={sidePanelRef} />
             <ToolbarButton
               icon="motion_photos_paused"
               name="debugger"
               label="Pause Information"
               showBadge={hasFrames}
+              sidePanelRef={sidePanelRef}
             />
           </>
         ) : null}
-        {logProtocol ? <ToolbarButton icon="code" label="Protocol" name="protocol" /> : null}
+        {logProtocol ? (
+          <ToolbarButton icon="code" label="Protocol" name="protocol" sidePanelRef={sidePanelRef} />
+        ) : null}
         <div className="grow"></div>
-        <div className="relative px-2">{sidePanelToggle}</div>
+        <div className="relative px-2">
+          <div className="toolbar-panel-button">
+            <IconWithTooltip
+              icon={
+                <MaterialIcon
+                  className="toolbar-panel-icon text-themeToolbarPanelIconColor"
+                  iconSize="2xl"
+                >
+                  {sidePanelCollapsed
+                    ? "keyboard_double_arrow_right"
+                    : "keyboard_double_arrow_left"}
+                </MaterialIcon>
+              }
+              content={sidePanelCollapsed ? "Expand side panel" : "Collapse side panel"}
+              dataTestName={`ToolbarButton-ExpandSidePanel`}
+              handleClick={() => {
+                const panel = sidePanelRef.current;
+                if (panel) {
+                  if (sidePanelCollapsed) {
+                    panel.expand();
+                  } else {
+                    panel.collapse();
+                  }
+                }
+              }}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

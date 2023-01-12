@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 import {
   ImperativePanelHandle,
@@ -14,8 +14,6 @@ import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrame
 import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
-import IconWithTooltip from "ui/components/shared/IconWithTooltip";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
@@ -87,37 +85,10 @@ function Body() {
     setSidePanelCollapsed(isCollapsed);
   };
 
-  const sidePanelToggle = (
-    <div className="toolbar-panel-button">
-      <IconWithTooltip
-        icon={
-          <MaterialIcon
-            className="toolbar-panel-icon text-themeToolbarPanelIconColor"
-            iconSize="2xl"
-          >
-            {sidePanelCollapsed ? "keyboard_double_arrow_right" : "keyboard_double_arrow_left"}
-          </MaterialIcon>
-        }
-        content={sidePanelCollapsed ? "Expand side panel" : "Collapse side panel"}
-        dataTestName={`ToolbarButton-ExpandSidePanel`}
-        handleClick={() => {
-          const panel = sidePanelRef.current;
-          if (panel) {
-            if (sidePanelCollapsed) {
-              panel.expand();
-            } else {
-              panel.collapse();
-            }
-          }
-        }}
-      />
-    </div>
-  );
-
   return (
     <div className="vertical-panels pr-2">
       <div className="flex h-full flex-row overflow-hidden bg-chrome">
-        <Toolbar sidePanelToggle={sidePanelToggle} />
+        <Toolbar sidePanelCollapsed={sidePanelCollapsed} sidePanelRef={sidePanelRef} />
         <ReduxAnnotationsProvider>
           <PanelGroup autoSaveId="DevTools-horizontal" className="split-box" direction="horizontal">
             <Panel
