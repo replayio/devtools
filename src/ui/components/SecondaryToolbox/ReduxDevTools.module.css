@@ -101,108 +101,25 @@
   color: white;
 }
 
-.frames .show-more-container {
-  display: flex;
-  min-height: 24px;
-  padding: 4px 0;
-}
-
-.frames .show-more {
-  text-align: center;
-  padding: 8px 0px;
-  margin: 7px 10px 7px 7px;
-  border: 1px solid var(--theme-splitter-color);
-  background-color: var(--theme-tab-toolbar-background);
-  width: 100%;
-  font-size: inherit;
-  color: inherit;
-}
-
-.frames .show-more:hover {
-  background-color: var(--theme-toolbar-background-hover);
-}
-
-.frames .img.annotation-logo {
-  margin-inline-end: 4px;
-  background-color: var(--theme-tab-toolbar-background);
-}
-
-/* Frameworks */
-:root.theme-dark .frames .img.annotation-logo:not(.angular) {
-  background-color: var(--blue-30);
-}
-:root.theme-light .frames .img.annotation-logo:not(.angular) {
-  background-color: var(--blue-50);
-}
-:root.theme-dark .frames .selected .img.annotation-logo:not(.angular),
-:root.theme-light .frames .selected .img.annotation-logo:not(.angular) {
-  background-color: var(--theme-selection-color);
-}
-
-/*
- * We also show the library icon in locations, which are forced to RTL.
- */
-.frames .location .img.annotation-logo {
-  margin-inline-start: 4px;
-}
-
-/* Some elements are added to the DOM only to be printed into the clipboard
-   when the user copy some elements. We don't want those elements to mess with
-   the layout so we put them outside of the screen
-*/
-.frames .clipboard-only {
-  position: absolute;
-  left: -9999px;
-}
-
-.call-stack-pane [role="listitem"] .location-async-cause {
-  height: 20px;
-  line-height: 20px;
-  color: var(--theme-icon-dimmed-color);
-  display: block;
-  z-index: 4;
+.diffWrap {
   position: relative;
-  padding-left: 17px;
-  width: 100%;
-  pointer-events: none;
-}
-
-.call-stack-pane [role="listitem"] .location-async-cause::after {
-  content: " ";
-  position: absolute;
-  left: 0;
-  z-index: -1;
-  height: 30px;
-  top: 50%;
-  width: 100%;
-  border-top: 1px solid var(--theme-tab-toolbar-background);
-}
-
-.call-stack-pane .async-label {
   z-index: 1;
-  background-color: var(--body-bgcolor);
-  padding: 0 3px;
-  display: inline-block;
 }
 
-.accordion .call-stack-pane ._content,
-.accordion .breakpoints-pane ._content {
-  border-radius: 0 0 0 0;
+.diffAdd,
+.diffUpdateTo {
+  background-color: var(--diff-add-background-color);
+  color: var(--diff-add-text-color);
 }
 
-.accordion .call-stack-pane ._header,
-.accordion .scopes-pane ._header {
-  border-top: 1px solid var(--tab-bgcolor);
+.diffRemove,
+.diffUpdateFrom {
+  text-decoration: line-through;
+  background-color: var(--diff-remove-background-color);
+  color: var(--diff-remove-text-color);
 }
 
-.frame:hover {
-  cursor: pointer;
-}
-
-.webconsole-app .frame:hover {
-  background: var(--console-error-hover-background);
-}
-
-.network-monitor .frame:hover {
-  background-color: var(--theme-toolbar-background);
+.stateDiffEmpty {
+  padding: "10px";
+  color: var(--body-sub-color);
 }

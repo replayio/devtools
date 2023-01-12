@@ -98,7 +98,6 @@ function getStateObjectId() {
 
 function diffStates() {
   const { instanceId } = extractedConfig;
-  const diffExists = !!window.jsondiffpatch;
 
   let previousState = {};
 
@@ -190,12 +189,16 @@ export async function calculateStateDiff(
     text: jsondiffpatchSource,
   });
 
-  const diffExists = await evaluateNoArgsFunction(
+  const diffResult = await evaluateNoArgsFunction(
     ThreadFront,
     replayClient,
     diffStates,
     pauseId,
     frames[0].frameId
   );
-  console.log("Diff exists: ", diffExists);
+  if (diffResult.returned?.value) {
+    const diff = JSON.parse(diffResult.returned.value);
+    console.log("Diff: ", diff);
+    return diff;
+  }
 }
