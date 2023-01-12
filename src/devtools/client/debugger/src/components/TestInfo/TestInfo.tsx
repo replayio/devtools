@@ -67,7 +67,13 @@ function Console() {
     return sanitized;
   }, [consoleProps]);
 
-  const hideProps = !pauseId || !sanitizedConsoleProps;
+  const hideProps = !sanitizedConsoleProps;
+
+  const errorFallback = (
+    <div className="flex flex-grow items-center justify-center align-middle font-mono text-xs opacity-50">
+      Failed to load step info
+    </div>
+  );
 
   return (
     <div
@@ -75,7 +81,7 @@ function Console() {
       style={{
         borderTop: "2px solid var(--chrome)",
       }}
-      key={pauseId}
+      key={pauseId || "no-pause-id"}
     >
       <div
         className="text-md p-2 px-4"
@@ -85,18 +91,16 @@ function Console() {
       >
         Step Details
       </div>
-      <ErrorBoundary>
+      <ErrorBoundary fallback={errorFallback}>
         <div className="flex flex-grow flex-col gap-1 p-2 font-mono">
           {loading ? (
             <div className="flex flex-grow items-center justify-center align-middle text-xs opacity-50">
               Loading ...
             </div>
           ) : hideProps ? (
-            <div className="flex flex-grow items-center justify-center align-middle text-xs opacity-50">
-              Failed to load step info
-            </div>
+            errorFallback
           ) : (
-            <PropertiesRenderer pauseId={pauseId} object={sanitizedConsoleProps} />
+            <PropertiesRenderer pauseId={pauseId!} object={sanitizedConsoleProps} />
           )}
         </div>
       </ErrorBoundary>
