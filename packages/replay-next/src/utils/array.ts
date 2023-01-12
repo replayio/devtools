@@ -78,11 +78,11 @@ export function findIndexString(sortedItems: string[], targetItem: string): numb
   return findIndex<string>(sortedItems, targetItem, compareStrings);
 }
 
-export function insert<T>(
+export function findInsertIndex<T>(
   sortedItems: T[],
   item: T,
   comparisonFunction: ComparisonFunction<T>
-): T[] {
+): number {
   let lowIndex = 0;
   let highIndex = sortedItems.length;
   while (lowIndex < highIndex) {
@@ -95,7 +95,15 @@ export function insert<T>(
     }
   }
 
-  const insertAtIndex = lowIndex;
+  return lowIndex;
+}
+
+export function insert<T>(
+  sortedItems: T[],
+  item: T,
+  comparisonFunction: ComparisonFunction<T>
+): T[] {
+  const insertAtIndex = findInsertIndex(sortedItems, item, comparisonFunction);
 
   sortedItems.splice(insertAtIndex, 0, item);
 

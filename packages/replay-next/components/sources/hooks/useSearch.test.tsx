@@ -1,7 +1,13 @@
 import { RenderResult, act, render as rtlRender } from "@testing-library/react";
 import { useEffect } from "react";
 
-import useSearch, { Actions, ScopeId, SearchFunction, State } from "./useSearch";
+import useSearch, {
+  Actions,
+  FindInitialIndexFunction,
+  ScopeId,
+  SearchFunction,
+  State,
+} from "./useSearch";
 
 type Item = string;
 type Result = string;
@@ -9,6 +15,10 @@ type QueryData = boolean;
 
 const DEFAULT_ITEMS: Item[] = ["foo", "bar", "baz"];
 const DEFAULT_SCOPE = "default";
+
+function stableFindInitialIndex(): number {
+  return 0;
+}
 
 function stableSearch(query: string, items: Item[], caseSensitive: QueryData | null = false) {
   const needle = caseSensitive ? query : query.toLowerCase();
@@ -24,9 +34,12 @@ describe("useSearch", () => {
   let currentActions: Actions<QueryData> | null = null;
   let currentState: State<Item, Result, QueryData> | null = null;
   let renderResult: RenderResult | null = null;
+  let stableFindInitialIndexMock: jest.MockedFunction<FindInitialIndexFunction<Result>> =
+    null as any;
   let stableSearchMock: jest.MockedFunction<SearchFunction<Item, Result, QueryData>> = null as any;
 
   beforeEach(() => {
+    stableFindInitialIndexMock = jest.fn().mockImplementation(stableFindInitialIndex);
     stableSearchMock = jest.fn().mockImplementation(stableSearch);
   });
 
@@ -35,7 +48,12 @@ describe("useSearch", () => {
   });
 
   function Component({ items, scopeId }: { items: Item[]; scopeId: ScopeId }) {
-    const [state, actions] = useSearch<Item, Result, QueryData>(items, stableSearchMock, scopeId);
+    const [state, actions] = useSearch<Item, Result, QueryData>(
+      items,
+      stableSearchMock,
+      stableFindInitialIndexMock,
+      scopeId
+    );
 
     useEffect(() => {
       currentActions = actions;
@@ -118,6 +136,32 @@ describe("useSearch", () => {
     goToPrevious();
     expect(currentState?.index).toBe(1);
     goToPrevious();
+    expect(currentState?.index).toBe(0);
+  });
+
+  it("should select the findInitialIndex function prop", async () => {
+    stableFindInitialIndexMock.mockImplementation(items => items.indexOf("bat"));
+
+    // Injected findIndex function should be used to select the initial match.
+    render(DEFAULT_ITEMS.concat("bat"));
+    search("b");
+    expect(stableFindInitialIndexMock).toHaveBeenCalledTimes(1);
+    expect(currentState?.index).toBe(2); // bat
+    expect(currentState?.results).toHaveLength(3);
+
+    goToPrevious();
+    expect(currentState?.index).toBe(1); // baz
+
+    // Injected findIndex function should not be used for refinement.
+    search("baz");
+    expect(currentState?.index).toBe(0);
+
+    stableFindInitialIndexMock.mockReset();
+    stableFindInitialIndexMock.mockImplementation(items => items.indexOf("bat"));
+
+    // Injected findIndex function should be used again if results reset.
+    search("at");
+    expect(stableFindInitialIndexMock).toHaveBeenCalledTimes(1);
     expect(currentState?.index).toBe(0);
   });
 

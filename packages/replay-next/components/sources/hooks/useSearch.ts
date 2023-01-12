@@ -1,4 +1,5 @@
-import { Ref, useDeferredValue, useLayoutEffect, useMemo, useReducer, useRef } from "react";
+import isEqual from "lodash/isEqual";
+import { useDeferredValue, useLayoutEffect, useMemo, useReducer, useRef } from "react";
 
 const EMPTY_ARRAY: any[] = [];
 
@@ -11,6 +12,8 @@ export type CachedScope<Item, Result, QueryData> = {
 
 export type ScopeId = string;
 
+export type FindInitialIndexFunction<Result> = (results: Result[]) => number;
+
 export type OnChangeDispatching<Result> = (currentResult: Result | null) => void;
 
 export type SearchFunction<Item, Result, QueryData = never> = (
@@ -18,6 +21,10 @@ export type SearchFunction<Item, Result, QueryData = never> = (
   items: Item[],
   queryData?: QueryData | null
 ) => Result[];
+
+function defaultFindInitialIndex<Result>(results: Result[]): number {
+  return results.length > 0 ? 0 : -1;
+}
 
 export type State<Item, Result, QueryData = never> = {
   cachedScopes: {
@@ -158,7 +165,7 @@ function reducer<Item, Result, QueryData = never>(
       // This should only update the global query;
       // per-scope query should only be updated along with results
 
-      if (query !== state.query || queryData !== state.queryData) {
+      if (query !== state.query || !isEqual(queryData, state.queryData)) {
         return {
           ...state,
           query,
@@ -207,6 +214,7 @@ function reducer<Item, Result, QueryData = never>(
 export default function useSearch<Item, Result, QueryData = never>(
   items: Item[],
   stableSearch: SearchFunction<Item, Result, QueryData>,
+  findInitialIndex: FindInitialIndexFunction<Result> = defaultFindInitialIndex,
   scopeId?: ScopeId | null,
   onChangeDispatching?: OnChangeDispatching<Result>
 ): [State<Item, Result, QueryData>, Actions<QueryData>] {
@@ -246,7 +254,8 @@ export default function useSearch<Item, Result, QueryData = never>(
   const prevResults = currentScope != null ? currentScope.results : EMPTY_ARRAY;
   const itemsChanged = currentScope == null || currentScope.items !== items;
   const queryChanged = currentScope == null || currentScope.query !== deferredQuery;
-  const queryDataChanged = currentScope == null || currentScope.queryData !== deferredQueryData;
+  const queryDataChanged =
+    currentScope == null || !isEqual(currentScope.queryData, deferredQueryData);
   const scopeIdChanged = currentScopeId !== scopeId;
 
   // State will not update within the scope of the rest of this function,
@@ -281,7 +290,7 @@ export default function useSearch<Item, Result, QueryData = never>(
         }
 
         if (index < 0) {
-          index = 0;
+          index = findInitialIndex(results);
         }
       }
     }
