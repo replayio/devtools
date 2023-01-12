@@ -1,4 +1,5 @@
 import { ExecutionPoint, Value } from "@replayio/protocol";
+import classnames from "classnames";
 import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import Inspector from "replay-next/components/inspector/Inspector";
@@ -10,8 +11,12 @@ import {
   fetchReduxValuesAtPoint,
 } from "./injectReduxDevtoolsProcessing";
 import { JSONDiff, labelRenderer } from "./JSONDiff";
-import styles from "./ReduxDevTools.module.css";
+import styles from "../ReduxDevTools.module.css";
 
+// TODO Get the rest of these replaced with intentional colors
+// `react-json-tree` uses specific field names to look up its colors.
+// For now I've just inserted our background and text colors in the
+// right fields, so it sorta follows our theming.
 const replayBase16Theme = {
   base00: "var(--body-bgcolor)",
   base01: "red",
@@ -31,15 +36,38 @@ const replayBase16Theme = {
   base0F: "#c98344",
 };
 
+interface PanelButtonProps {
+  selected: boolean;
+  children: React.ReactNode;
+  name: string;
+  onClick: (name: string) => void;
+}
+
+const PanelButton = ({ selected, children, name, onClick }: PanelButtonProps) => {
+  return (
+    <button
+      className={classnames(styles.contentsTab, {
+        [styles.selectedTab]: selected,
+      })}
+      onClick={() => onClick(name)}
+    >
+      <div>{children}</div>
+    </button>
+  );
+};
+
 interface RDTCProps {
   point: ExecutionPoint;
   time: number;
 }
 
+type SelectedContentsTab = "action" | "state" | "diff";
+
 export function ReduxDevToolsContents({ point, time }: RDTCProps) {
   const replayClient = useContext(ReplayClientContext);
   const [reduxValues, setReduxValues] = useState<ReduxActionStateValues | null>(null);
   const [diff, setDiff] = useState<Record<string, unknown> | null>(null);
+  const [selectedTab, setSelectedTab] = useState<SelectedContentsTab>("action");
 
   useLayoutEffect(() => {
     async function fetchAction() {
@@ -56,48 +84,83 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
   }, [replayClient, point, time]);
 
   const [pauseId, actionValue, stateValue] = reduxValues ?? [];
+
+  let contents: React.ReactNode;
+
+  switch (selectedTab) {
+    case "action": {
+      contents = actionValue && (
+        <Inspector
+          key={point + "action"}
+          pauseId={pauseId!}
+          protocolValue={actionValue}
+          context="console"
+          expandByDefault={true}
+        ></Inspector>
+      );
+      break;
+    }
+    case "state": {
+      contents = stateValue && (
+        <Inspector
+          key={point + "state"}
+          pauseId={pauseId!}
+          protocolValue={stateValue}
+          context="console"
+          expandByDefault={true}
+        ></Inspector>
+      );
+      break;
+    }
+    case "diff": {
+      contents = diff && (
+        <JSONDiff
+          delta={diff}
+          base16Theme={replayBase16Theme}
+          styling={() => ({})}
+          invertTheme={false}
+          isWideLayout={false}
+          dataTypeKey=""
+          labelRenderer={labelRenderer}
+        />
+      );
+      break;
+    }
+  }
+
   return (
-    <div>
-      <h4 className="text-base font-bold">Action</h4>
-      {actionValue && (
-        <div className="font-mono text-sm">
-          <Inspector
-            key={point + "action"}
-            pauseId={pauseId!}
-            protocolValue={actionValue}
-            context="console"
-            expandByDefault={true}
-          ></Inspector>
-        </div>
-      )}
+    <>
+      <div className="p3 flex">
+        <PanelButton
+          selected={selectedTab === "action"}
+          name="action"
+          onClick={() => {
+            setSelectedTab("action");
+          }}
+        >
+          Action
+        </PanelButton>
+        <PanelButton
+          selected={selectedTab === "state"}
+          name="state"
+          onClick={() => {
+            setSelectedTab("state");
+          }}
+        >
+          State
+        </PanelButton>
+        <PanelButton
+          selected={selectedTab === "diff"}
+          name="diff"
+          onClick={() => {
+            setSelectedTab("diff");
+          }}
+        >
+          Diff
+        </PanelButton>
+      </div>
 
-      <h4 className="text-base font-bold">State</h4>
-      {stateValue && (
-        <div className="font-mono text-sm">
-          <Inspector
-            key={point + "state"}
-            pauseId={pauseId!}
-            protocolValue={stateValue}
-            context="console"
-            expandByDefault={true}
-          ></Inspector>
-        </div>
-      )}
-
-      <h4 className="text-base font-bold">Diff</h4>
-      {diff && (
-        <div className="font-mono text-sm">
-          <JSONDiff
-            delta={diff}
-            base16Theme={replayBase16Theme}
-            styling={() => ({})}
-            invertTheme={false}
-            isWideLayout={false}
-            dataTypeKey=""
-            labelRenderer={labelRenderer}
-          />
-        </div>
-      )}
-    </div>
+      <div className="font-mono text-sm">{contents}</div>
+    </>
   );
 }

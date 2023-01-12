@@ -86,3 +86,19 @@
   padding: "10px";
   color: var(--body-sub-color);
 }
+
+.contentsTab {
+  background-color: var(--tab-bgcolor);
+  color: var(--tab-color);
+  padding: 0.5rem;
+}
+
+.contentsTab.selectedTab {
+  background-color: var(--tab-selected-bgcolor);
+  color: var(--tab-selected-color);
+}
+
+.contentsTab:hover {
+  background-color: var(--tab-hover-bgcolor);
+  color: var(--tab-hover-color);
+}

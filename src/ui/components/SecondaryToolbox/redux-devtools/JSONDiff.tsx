@@ -1,3 +1,5 @@
+// NOTE: This file has a ton of logic copied from the Redux DevTools packages
+
 import classnames from "classnames";
 import React, { Component } from "react";
 import { JSONTree } from "react-json-tree";

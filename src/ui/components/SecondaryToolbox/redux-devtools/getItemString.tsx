@@ -1,3 +1,5 @@
+// NOTE: This file has a ton of logic copied from the Redux DevTools packages
+
 import React from "react";
 
 import type { StylingFunction } from "./JSONDiff";
@@ -9,6 +11,10 @@ function isIterable(obj: any) {
     !Array.isArray(obj) &&
     typeof obj[window.Symbol.iterator] === "function"
   );
+}
+
+function isImmutable(value: any) {
+  return false;
 }
 
 function getShortTypeString(val: any, diff: boolean | undefined) {

@@ -52,6 +52,11 @@ export const ReduxDevToolsPanel = () => {
     }
   }, []);
 
+  // TODO Right now we're going to show _all_ actions in the list.
+  // This could be a very long list, and the user may have intended
+  // to have some of them filtered out via RDT options, which we
+  // now have as `annotation.payload.shouldIgnoreAction`.
+  // We could start filtering those out if appropriate.
   const renderedActions = reduxAnnotations.map(annotation => {
     return (
       <div
@@ -80,10 +85,7 @@ export const ReduxDevToolsPanel = () => {
         <h3 className="text-lg font-bold">Actions</h3>
         <div role="list">{renderedActions}</div>
       </div>
-      <div className="ml-1 grow">
-        <h3 className="text-lg font-bold">Contents</h3>
-        {contents}
-      </div>
+      <div className="ml-1 grow">{contents}</div>
     </div>
   );
 };
