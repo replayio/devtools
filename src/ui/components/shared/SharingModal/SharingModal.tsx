@@ -141,30 +141,32 @@ function SharingSection({
   return (
     <>
       <CollaboratorsSection recording={recording} />
-      <section className="flex flex-grow flex-row items-center justify-between space-x-2 bg-menuHoverBgcolor px-8 pt-8">
-        <div className="flex flex-row items-start space-x-3 overflow-hidden">
-          <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-200 font-bold">
-            <MaterialIcon className="text-blue-600" iconSize="xl">
-              people
-            </MaterialIcon>
+      <section className="flex flex-col bg-menuHoverBgcolor px-8 py-8">
+        <div className="flex flex-grow flex-row items-center justify-between space-x-2 ">
+          <div className="flex flex-row items-start space-x-3 overflow-hidden">
+            <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-200 font-bold">
+              <MaterialIcon className="text-blue-600" iconSize="xl">
+                people
+              </MaterialIcon>
+            </div>
+            <div className="flex flex-col space-y-1 overflow-hidden">
+              <div className="font-bold">Privacy Settings</div>
+              <PrivacyDropdown {...{ recording }} />
+              {showEnvironmentVariables ? <EnvironmentVariablesRow /> : null}
+            </div>
           </div>
-          <div className="flex flex-col space-y-1 overflow-hidden">
-            <div className="font-bold">Privacy Settings</div>
-            <PrivacyDropdown {...{ recording }} />
-            {showEnvironmentVariables ? <EnvironmentVariablesRow /> : null}
-          </div>
+          <CopyButton recording={recording} />
         </div>
-        <CopyButton recording={recording} />
+        <div>
+          {!recording.private && recording.operations && (
+            <ToggleShowPrivacyButton
+              showPrivacy={showPrivacy}
+              operations={recording.operations}
+              setShowPrivacy={setShowPrivacy}
+            />
+          )}
+        </div>
       </section>
-      {recording.operations && (
-        <section className="bg-menuHoverBgcolor px-8 pb-6">
-          <ToggleShowPrivacyButton
-            showPrivacy={showPrivacy}
-            operations={recording.operations}
-            setShowPrivacy={setShowPrivacy}
-          />
-        </section>
-      )}
     </>
   );
 }
