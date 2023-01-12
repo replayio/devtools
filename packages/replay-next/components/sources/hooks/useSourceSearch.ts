@@ -1,8 +1,10 @@
 import { SourceId } from "@replayio/protocol";
 import escapeRegExp from "lodash/escapeRegExp";
 import isEqual from "lodash/isEqual";
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { findInsertIndex } from "replay-next/src/utils/array";
 import { NEW_LINE_REGEX } from "replay-next/src/utils/string";
 
 import useSearch, { OnChangeDispatching } from "./useSearch";
@@ -26,7 +28,6 @@ type SearchModifiers = {
 };
 
 type SetModifiers = (modifiers: SearchModifiers) => void;
-
 export type SetScope = (sourceId: SourceId | null, code: string) => void;
 
 function search(
@@ -81,6 +82,8 @@ export type State = SearchState<string, SourceSearchResult, SearchModifiers> & {
 export default function useSourceSearch(
   onChangeDispatching?: OnChangeDispatching<SourceSearchResult>
 ): [State, Actions] {
+  const { cursorColumnIndex, cursorLineIndex } = useContext(SourcesContext);
+
   const [scope, setScope] = useState<Scope>({
     code: "",
     sourceId: null,
@@ -94,9 +97,30 @@ export default function useSourceSearch(
 
   const lines = useMemo(() => scope.code.split(NEW_LINE_REGEX), [scope.code]);
 
+  const findInitialIndex = (results: SourceSearchResult[]) => {
+    if (cursorLineIndex === null) {
+      return 0;
+    }
+
+    // Results are sorted by line, then column.
+    // We can use the binary search helper function to find the first result.
+    const resultsIndex = findInsertIndex(results, null as any, (_, result) => {
+      if (cursorLineIndex !== result.lineIndex) {
+        return cursorLineIndex - result.lineIndex;
+      } else if (cursorColumnIndex !== null) {
+        return cursorColumnIndex - result.columnIndex;
+      } else {
+        return 0;
+      }
+    });
+
+    return resultsIndex;
+  };
+
   const [state, dispatch] = useSearch<string, SourceSearchResult, SearchModifiers>(
     lines,
     search,
+    findInitialIndex,
     scope.sourceId,
     onChangeDispatching
   );
@@ -113,7 +137,9 @@ export default function useSourceSearch(
         setModifiers(newModifiers);
         dispatch.search(state.query, newModifiers);
       },
-      setScope: (sourceId: SourceId | null, code: string) => setScope({ code, sourceId }),
+      setScope: (sourceId: SourceId | null, code: string) => {
+        setScope({ code, sourceId });
+      },
     }),
     [dispatch, modifiers, state.query]
   );

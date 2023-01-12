@@ -27,6 +27,8 @@ export type FocusedSource = {
 
 type SourcesContextType = {
   closeSource: (sourceId: SourceId) => void;
+  cursorColumnIndex: number | null;
+  cursorLineIndex: number | null;
   focusedSource: FocusedSource | null;
   hoveredLineIndex: number | null;
   hoveredLineNode: HTMLElement | null;
@@ -40,6 +42,7 @@ type SourcesContextType = {
   ) => void;
   openSourceIds: SourceId[];
   pendingFocusUpdate: boolean;
+  setCursorLocation: (lineIndex: number | null, columnIndex: number | null) => void;
   setHoveredLocation: (lineIndex: number | null, lineNode: HTMLElement | null) => void;
   setVisibleLines: (startIndex: number | null, stopIndex: number | null) => void;
   findClosestFunctionName: FindClosestFunctionName;
@@ -52,6 +55,8 @@ type SourcesContextType = {
 };
 
 export type OpenSourcesState = {
+  cursorColumnIndex: number | null;
+  cursorLineIndex: number | null;
   focusedSource: FocusedSource | null;
   hoveredLineIndex: number | null;
   hoveredLineNode: HTMLElement | null;
@@ -61,6 +66,8 @@ export type OpenSourcesState = {
 };
 
 const INITIAL_STATE: OpenSourcesState = {
+  cursorColumnIndex: null,
+  cursorLineIndex: null,
   focusedSource: null,
   hoveredLineIndex: null,
   hoveredLineNode: null,
@@ -76,6 +83,11 @@ type MarkSearchResultUpdateProcessedActions = { type: "mark_search_result_update
 type OpenSourceAction = {
   type: "open_source";
   focusedSource: FocusedSource;
+};
+type SetCursorLocationAction = {
+  type: "set_cursor_location";
+  columnIndex: number | null;
+  lineIndex: number | null;
 };
 type SetHoveredLineAction = {
   type: "set_hovered_location";
@@ -93,6 +105,7 @@ type OpenSourcesAction =
   | MarkFocusUpdateProcessedActions
   | MarkSearchResultUpdateProcessedActions
   | OpenSourceAction
+  | SetCursorLocationAction
   | SetHoveredLineAction
   | SetVisibleLines;
 
@@ -101,6 +114,8 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
     case "close_source": {
       const { sourceId } = action;
       const {
+        cursorColumnIndex: prevCursorColumnIndex,
+        cursorLineIndex: prevCursorLineIndex,
         focusedSource: prevFocusedSource,
         hoveredLineIndex: prevHoveredLine,
         hoveredLineNode: prevHoveredLineNode,
@@ -110,10 +125,14 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
 
       const index = openSourceIds.indexOf(sourceId);
       if (index > -1) {
+        let cursorColumnIndex = prevCursorColumnIndex;
+        let cursorLineIndex = prevCursorLineIndex;
         let focusedSource = prevFocusedSource;
         let hoveredLineIndex = prevHoveredLine;
         let hoveredLineNode = prevHoveredLineNode;
         if (prevFocusedSource?.sourceId === sourceId) {
+          cursorColumnIndex = null;
+          cursorLineIndex = null;
           focusedSource = null;
           hoveredLineIndex = null;
           hoveredLineNode = null;
@@ -140,6 +159,8 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
 
         return {
           ...state,
+          cursorColumnIndex,
+          cursorLineIndex,
           focusedSource,
           hoveredLineIndex,
           hoveredLineNode,
@@ -154,11 +175,20 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
       const { focusedSource } = action;
 
       const {
+        cursorColumnIndex: prevCursorColumnIndex,
+        cursorLineIndex: prevCursorLineIndex,
         focusedSource: prevFocusedSource,
         openSourceIds: prevOpenSourceIds,
         pendingFocusUpdate: prevPendingFocusUpdate,
         visibleLinesBySourceId: prevVisibleLinesBySourceId,
       } = state;
+
+      let cursorColumnIndex = prevCursorColumnIndex;
+      let cursorLineIndex = prevCursorLineIndex;
+      if (focusedSource?.sourceId !== prevFocusedSource?.sourceId) {
+        cursorColumnIndex = null;
+        cursorLineIndex = null;
+      }
 
       if (focusedSource?.sourceId === prevFocusedSource?.sourceId) {
         // If sources are equal we may be able to bail out.
@@ -182,6 +212,8 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
 
       return {
         ...state,
+        cursorColumnIndex,
+        cursorLineIndex,
         focusedSource,
         hoveredLineIndex: null,
         hoveredLineNode: null,
@@ -195,6 +227,21 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
         ...state,
         pendingFocusUpdate: false,
       };
+    }
+    case "set_cursor_location": {
+      const { columnIndex, lineIndex } = action;
+      const { cursorColumnIndex: prevCursorColumnIndex, cursorLineIndex: prevCursorLineIndex } =
+        state;
+
+      if (columnIndex === prevCursorColumnIndex && lineIndex === prevCursorLineIndex) {
+        return state;
+      } else {
+        return {
+          ...state,
+          cursorColumnIndex: columnIndex,
+          cursorLineIndex: lineIndex,
+        };
+      }
     }
     case "set_hovered_location": {
       const { lineIndex, lineNode } = action;
@@ -352,6 +399,12 @@ export function SourcesContextRoot({
     []
   );
 
+  const setCursorLocation = useCallback((lineIndex: number | null, columnIndex: number | null) => {
+    startTransition(() => {
+      dispatch({ type: "set_cursor_location", columnIndex, lineIndex });
+    });
+  }, []);
+
   const setHoveredLocation = useCallback(
     (lineIndex: number | null, lineNode: HTMLElement | null) => {
       startTransition(() => {
@@ -373,6 +426,8 @@ export function SourcesContextRoot({
 
   const context = useMemo<SourcesContextType>(
     () => ({
+      cursorColumnIndex: state.cursorColumnIndex,
+      cursorLineIndex: state.cursorLineIndex,
       focusedSource: state.focusedSource,
       hoveredLineIndex: state.hoveredLineIndex,
       hoveredLineNode: state.hoveredLineNode,
@@ -386,6 +441,7 @@ export function SourcesContextRoot({
       isPending,
       markPendingFocusUpdateProcessed,
       openSource,
+      setCursorLocation,
       setHoveredLocation,
       setVisibleLines,
       findClosestFunctionName,
@@ -395,6 +451,7 @@ export function SourcesContextRoot({
       isPending,
       markPendingFocusUpdateProcessed,
       openSource,
+      setCursorLocation,
       setHoveredLocation,
       setVisibleLines,
       state,

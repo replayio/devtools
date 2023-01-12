@@ -18,6 +18,7 @@ import { SourceSearchContext } from "replay-next/components/sources/SourceSearch
 import useSourceContextMenu from "replay-next/components/sources/useSourceContextMenu";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { AddPoint, DeletePoints, EditPoint } from "replay-next/src/contexts/PointsContext";
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { ParsedToken, StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import {
   LineNumberToHitCountMap,
@@ -61,8 +62,17 @@ export type ItemData = {
 
 const SourceListRow = memo(
   ({ data, index, style }: { data: ItemData; index: number; style: CSSProperties }) => {
+    const { cursorColumnIndex, cursorLineIndex, setCursorLocation } = useContext(SourcesContext);
     const { isTransitionPending: isFocusRangePending } = useContext(FocusContext);
     const [searchState] = useContext(SourceSearchContext);
+
+    const setCursorLocationFromMouseEvent = (event: MouseEvent) => {
+      const { target } = event;
+      const htmlElement = target as HTMLElement;
+      const columnIndexAttribute = htmlElement.getAttribute("data-column-index");
+      const columnIndex = columnIndexAttribute ? parseInt(columnIndexAttribute) : 0;
+      setCursorLocation(index, columnIndex);
+    };
 
     const [isHovered, setIsHovered] = useState(false);
 
@@ -282,6 +292,15 @@ const SourceListRow = memo(
       sourceUrl: source.url ?? null,
     });
 
+    const onContextMenuWrapper = (event: MouseEvent) => {
+      onContextMenu(event);
+      setCursorLocationFromMouseEvent(event);
+    };
+
+    const onClick = (event: MouseEvent) => {
+      setCursorLocationFromMouseEvent(event);
+    };
+
     const currentSearchResult = searchState.results[searchState.index] || null;
     const searchResultsForLine = useMemo(
       () => searchState.results.filter(result => result.lineIndex === index),
@@ -321,7 +340,8 @@ const SourceListRow = memo(
       >
         <div
           className={lineHasHits ? styles.LineWithHits : styles.LineWithoutHits}
-          onContextMenu={onContextMenu}
+          onContextMenu={onContextMenuWrapper}
+          onClick={onClick}
         >
           <div className={styles.LineNumber} data-test-id={`SourceLine-LineNumber-${lineNumber}`}>
             {lineNumber}
@@ -403,7 +423,6 @@ function renderToken(token: ParsedToken, key?: any): ReactElement {
           case "variableName":
           case "variableName2":
             return true;
-            break;
         }
         return false;
       })
