@@ -198,7 +198,6 @@ export async function calculateStateDiff(
   );
   if (diffResult.returned?.value) {
     const diff = JSON.parse(diffResult.returned.value);
-    console.log("Diff: ", diff);
     return diff;
   }
 }

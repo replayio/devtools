@@ -3,14 +3,8 @@ import React, { Component } from "react";
 import { JSONTree } from "react-json-tree";
 import type { LabelRenderer, ShouldExpandNodeInitially } from "react-json-tree";
 
-// import { stringify } from 'javascript-stringify';
-// import { Delta } from 'jsondiffpatch';
-// import { StylingFunction } from 'react-base16-styling';
-// import { Base16Theme } from 'redux-devtools-themes';
 import getItemString from "./getItemString";
 import styles from "../ReduxDevTools.module.css";
-
-// import getJsonTreeTheme from './getJsonTreeTheme';
 
 interface Delta {
   [key: string]: any;
@@ -121,15 +115,6 @@ export const labelRenderer: LabelRenderer = ([key, ...rest], nodeType, expanded)
   return (
     <span>
       <span {...styling("treeItemKey")}>{key}</span>
-      <span
-        {...styling("treeItemPin")}
-        // onClick={() =>
-        //   onInspectPath([
-        //     ...inspectedPath.slice(0, inspectedPath.length - 1),
-        //     ...[key, ...rest].reverse(),
-        //   ])
-        // }
-      ></span>
       {!expanded && ": "}
     </span>
   );
@@ -204,8 +189,6 @@ export class JSONDiff extends Component<Props, State> {
 
   valueRenderer = (raw: any, value: any) => {
     const { styling, isWideLayout } = this.props;
-
-    console.log("Styles: ", styles);
 
     function renderSpan(name: string, body: string) {
       return (

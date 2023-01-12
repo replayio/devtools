@@ -2,13 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-.frames [role="list"] {
+.actions [role="list"] {
   list-style: none;
   margin: 0;
   padding: 4px 0;
 }
 
-.frames [role="list"] [role="listitem"] {
+.actions [role="list"] [role="listitem"] {
   overflow: hidden;
   display: flex;
   justify-content: space-between;
@@ -21,16 +21,16 @@
   line-height: 1.5rem;
 }
 
-.frames [role="list"] [role="listitem"] * {
+.actions [role="list"] [role="listitem"] * {
   user-select: none;
 }
 
-.frames .badge {
+.actions .badge {
   flex-shrink: 0;
   margin-right: 4px;
 }
 
-.frames .location {
+.actions .location {
   font-weight: normal;
   margin: 0;
   flex-grow: 1;
@@ -43,61 +43,24 @@
   text-align: right;
 }
 
-.call-stack-pane .location-async-cause {
-  color: var(--theme-comment);
-}
-
-.theme-light .call-stack-pane .frames .location {
-  color: var(--theme-comment);
-  padding-right: 10px;
-}
-
-:root.theme-dark .frames .location {
-  color: var(--body-color);
-}
-
-.frames .title {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  padding-left: 10px;
-}
-
-.frames [role="list"] [role="listitem"]:hover,
-.frames [role="list"] [role="listitem"]:focus {
+.actions [role="list"] [role="listitem"]:hover,
+.actions [role="list"] [role="listitem"]:focus {
   background-color: var(--theme-toolbar-background-alt);
 }
 
-.frames [role="list"] [role="listitem"]:hover .location-async-cause,
-.frames [role="list"] [role="listitem"]:focus .location-async-cause {
+.actions [role="list"] [role="listitem"]:hover .location-async-cause,
+.actions [role="list"] [role="listitem"]:focus .location-async-cause {
   background-color: var(--body-bgcolor);
 }
 
-:global(.theme-dark) .frames [role="list"] [role="listitem"]:focus,
-:global(.theme-dark) .frames [role="list"] [role="listitem"]:focus .async-label,
-:global(.theme-dark) .frames [role="list"] [role="listitem"]:focus .async-label {
+:global(.theme-dark) .actions [role="list"] [role="listitem"]:focus,
+:global(.theme-dark) .actions [role="list"] [role="listitem"]:focus .async-label,
+:global(.theme-dark) .actions [role="list"] [role="listitem"]:focus .async-label {
   background-color: var(--theme-tab-toolbar-background);
 }
 
-.frame-description {
-  width: 100%;
-  display: flex;
-}
-.frames [role="list"] [role="listitem"].selected {
+.actions [role="list"] [role="listitem"].selected {
   background-color: var(--theme-selection-background);
-  color: white;
-}
-
-.frames [role="list"] [role="listitem"] .frame-description .title,
-.frames [role="list"] [role="listitem"] .frame-description .frame-link-source {
-  flex-basis: 50%;
-}
-
-.frames [role="list"] [role="listitem"].selected i.annotation-logo svg path {
-  fill: white;
-}
-
-:root.theme-light .frames [role="list"] [role="listitem"].selected .location,
-:root.theme-dark .frames [role="list"] [role="listitem"].selected .location {
   color: white;
 }
 

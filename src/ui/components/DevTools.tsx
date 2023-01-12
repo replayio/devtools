@@ -36,7 +36,6 @@ import FocusContextReduxAdapter from "./FocusContextReduxAdapter";
 import Header from "./Header/index";
 import KeyboardShortcuts from "./KeyboardShortcuts";
 import { KeyModifiers } from "./KeyModifiers";
-import { ReduxAnnotationsProvider } from "./SecondaryToolbox/redux-devtools/ReduxAnnotationsProvider";
 import TimelineContextAdapter from "./SecondaryToolbox/TimelineContextAdapter";
 import SelectedFrameContextAdapter from "./SelectedFrameContextAdapter";
 import SessionContextAdapter from "./SessionContextAdapter";
@@ -89,7 +88,6 @@ function Body() {
     <div className="vertical-panels pr-2">
       <div className="flex h-full flex-row overflow-hidden bg-chrome">
         <Toolbar sidePanelCollapsed={sidePanelCollapsed} sidePanelRef={sidePanelRef} />
-        <ReduxAnnotationsProvider>
           <PanelGroup autoSaveId="DevTools-horizontal" className="split-box" direction="horizontal">
             <Panel
               className="flex=1 flex h-full overflow-hidden"
@@ -116,7 +114,6 @@ function Body() {
               )}
             </Panel>
           </PanelGroup>
-        </ReduxAnnotationsProvider>
       </div>
       <Timeline />
     </div>

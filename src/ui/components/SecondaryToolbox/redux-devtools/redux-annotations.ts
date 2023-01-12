@@ -1,7 +1,4 @@
-import type { UPDATE_STATE } from "@redux-devtools/app";
-import type { Action } from "@reduxjs/toolkit";
 import { Annotation, TimeStampedPoint } from "@replayio/protocol";
-import { createContext } from "react";
 
 interface ReduxActionFields {
   actionType: string;
@@ -18,8 +15,6 @@ interface ReduxAnnotationContents {
 export interface ReduxActionAnnotation extends TimeStampedPoint, ReduxAnnotationContents {
   kind: string;
 }
-
-export const ReduxAnnotationsContext = createContext<ReduxActionAnnotation[]>([]);
 
 export const processReduxAnnotations = (annotations: Annotation[]): ReduxActionAnnotation[] => {
   return annotations.map(annotation => {

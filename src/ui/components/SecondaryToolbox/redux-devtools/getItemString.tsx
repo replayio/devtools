@@ -1,7 +1,5 @@
 import React from "react";
 
-// import { isCollection, isIndexed, isKeyed } from 'immutable';
-// import { StylingFunction } from 'react-base16-styling';
 import type { StylingFunction } from "./JSONDiff";
 
 function isIterable(obj: any) {
@@ -13,19 +11,12 @@ function isIterable(obj: any) {
   );
 }
 
-const IS_IMMUTABLE_KEY = "@@__IS_IMMUTABLE__@@";
-
-function isImmutable(value: any) {
-  return false;
-  // return isKeyed(value) || isIndexed(value) || isCollection(value);
-}
-
 function getShortTypeString(val: any, diff: boolean | undefined) {
   if (diff && Array.isArray(val)) {
     val = val[val.length === 2 ? 1 : 0];
   }
 
-  if (isIterable(val) && !isImmutable(val)) {
+  if (isIterable(val)) {
     return "(…)";
   } else if (Array.isArray(val)) {
     return val.length > 0 ? "[…]" : "[]";
