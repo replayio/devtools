@@ -20,6 +20,30 @@ import { trackEvent } from "ui/utils/telemetry";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 
+function CypressIcon() {
+  return (
+    <svg
+      width="256"
+      height="256"
+      viewBox="0 0 256 256"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-full w-full"
+    >
+      <path
+        d="M128 2C197.645 2 254 58.3555 254 128C254 197.645 197.645 254 128 254C58.3555 254 2 197.645 2 128C2 58.3555 58.3555 2 128 2Z"
+        fill="currentColor"
+        stroke="white"
+        strokeWidth="4"
+      />
+      <path
+        d="M188.702 177.211C184.316 190.807 177.737 200.895 168.526 208.351C159.316 215.807 147.035 219.754 131.684 221.07L128.614 200.895C138.702 199.579 146.158 197.386 150.982 193.877C152.737 192.561 156.246 188.614 156.246 188.614L119.842 71.9474H150.105L171.158 159.228L193.526 71.9474H222.912L188.702 177.211ZM83 68C90.0175 68 96.5965 68.8772 101.86 71.0702C107.561 73.2632 112.825 76.3333 118.088 80.7193L105.807 97.386C102.298 94.7544 98.7895 93 95.7193 91.6842C92.6491 90.3684 88.7018 89.9298 85.193 89.9298C70.2807 89.9298 62.8246 101.333 62.8246 124.579C62.8246 136.421 64.5789 144.754 68.5263 149.579C72.4737 154.842 77.7368 157.035 85.193 157.035C88.7018 157.035 92.2105 156.596 95.2807 155.281C98.3509 153.965 101.86 152.211 106.246 149.579L118.526 167.123C108.439 175.456 97.0351 179.404 83.8772 179.404C73.3509 179.404 64.5789 177.211 56.6842 172.825C49.2281 168.439 43.0877 161.86 39.1404 153.526C35.193 145.193 33 135.544 33 124.14C33 113.175 35.193 103.088 39.1404 94.7544C43.0877 85.9825 49.2281 79.4035 56.6842 74.5789C64.1404 70.6316 72.9123 68 83 68Z"
+        fill="white"
+      />
+    </svg>
+  );
+}
+
 function ToolbarButtonTab({ active }: { active: boolean }) {
   return (
     <div
@@ -56,17 +80,14 @@ function ToolbarButton({
       dispatch(actions.setSelectedPrimaryPanel(panelName));
     }
   };
-  const imageIcon =
-    icon == "cypress" ? (
-      <AccessibleImage className="cypress" />
-    ) : (
-      <MaterialIcon
-        className={classNames("toolbar-panel-icon text-themeToolbarPanelIconColor", name)}
-        iconSize="2xl"
-      >
-        {icon}
-      </MaterialIcon>
-    );
+  const imageIcon = (
+    <MaterialIcon
+      className={classNames("toolbar-panel-icon text-themeToolbarPanelIconColor", name)}
+      iconSize="2xl"
+    >
+      {icon === "cypress" ? <CypressIcon /> : icon}
+    </MaterialIcon>
+  );
   return (
     <div className="relative px-2">
       <ToolbarButtonTab active={selectedPrimaryPanel == name} />
