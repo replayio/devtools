@@ -1,13 +1,10 @@
 const { patchWebpackConfig } = require("next-global-css");
-const transpileModules = require("next-transpile-modules");
 const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
 const withPlugins = require("next-compose-plugins");
 
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 });
-
-const withTM = transpileModules(["replay-next", "design"]);
 
 /**
  * @type {Pick<
@@ -202,4 +199,4 @@ const baseNextConfig = {
   },
 };
 
-module.exports = withPlugins([withTM, withBundleAnalyzer], baseNextConfig);
+module.exports = withPlugins([withBundleAnalyzer], baseNextConfig);
