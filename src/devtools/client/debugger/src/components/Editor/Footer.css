@@ -18,12 +18,6 @@
   box-sizing: border-box;
 }
 
-.source-footer-end {
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-}
-
 .source-footer .commands * {
   user-select: none;
 }

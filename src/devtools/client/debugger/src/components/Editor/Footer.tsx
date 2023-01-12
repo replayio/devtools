@@ -28,12 +28,6 @@ function SourceFooter() {
             <SourcemapVisualizerLinkSuspends cursorPosition={cursorPosition} />
           </Suspense>
         </ErrorBoundary>
-
-        <div className="source-footer-end">
-          <div className="cursor-position">
-            Line {(cursorLineIndex || 0) + 1}, Column {(cursorColumnIndex || 0) + 1}
-          </div>
-        </div>
       </div>
     </div>
   );
