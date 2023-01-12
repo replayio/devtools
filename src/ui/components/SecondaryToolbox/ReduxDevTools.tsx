@@ -8,6 +8,7 @@ import { getRecordingId } from "ui/utils/recording";
 
 import {
   ReduxActionStateValues,
+  calculateStateDiff,
   fetchReduxValuesAtPoint,
 } from "./redux-devtools/injectReduxDevtoolsProcessing";
 import type { ReduxActionAnnotation } from "./redux-devtools/redux-annotations";
@@ -31,6 +32,8 @@ function ReduxActionContents({ point, time }: RACProps) {
       const res = await fetchReduxValuesAtPoint(replayClient, point, time);
 
       setReduxValues(res ?? null);
+
+      calculateStateDiff(replayClient, point, time);
     }
     fetchAction();
   }, [replayClient, point, time]);

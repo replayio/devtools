@@ -55,6 +55,7 @@ declare global {
   interface Window {
     evaluationLogs: string[];
     logMessage: (message: string) => void;
+    jsondiffpatch: any;
   }
 
   // These types aren't actually attached to `window`, but _should_ be in
@@ -93,6 +94,20 @@ function getStateObjectId() {
     return stateSanitizer(state);
   }
   return state;
+}
+
+function diffStates() {
+  const { instanceId } = extractedConfig;
+  const diffExists = !!window.jsondiffpatch;
+
+  let previousState = {};
+
+  if (instanceId in latestDispatchedActions) {
+    previousState = latestDispatchedActions[instanceId].state;
+  }
+
+  const diff = window.jsondiffpatch.diff(previousState, state);
+  return JSON.stringify(diff);
 }
 
 async function evaluateNoArgsFunction(
@@ -150,4 +165,37 @@ export async function fetchReduxValuesAtPoint(
     pausesWithDevtoolsInjected.set(point, result);
     return result;
   }
+}
+
+export async function calculateStateDiff(
+  replayClient: ReplayClientInterface,
+  point: ExecutionPoint,
+  time: number
+) {
+  const pauseId = await getPauseIdAsync(replayClient, point, time);
+  if (!pauseId) {
+    return;
+  }
+
+  const frames = await getFramesAsync(replayClient, pauseId);
+  if (!frames) {
+    return;
+  }
+
+  const jsondiffpatchSource = require("./jsondiffpatch.umd.slim.raw.js").default;
+
+  await ThreadFront.evaluateNew({
+    replayClient,
+    pauseId,
+    text: jsondiffpatchSource,
+  });
+
+  const diffExists = await evaluateNoArgsFunction(
+    ThreadFront,
+    replayClient,
+    diffStates,
+    pauseId,
+    frames[0].frameId
+  );
+  console.log("Diff exists: ", diffExists);
 }
