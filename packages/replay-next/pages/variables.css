@@ -86,6 +86,15 @@
   --grey-90-a10: rgba(12, 12, 13, 0.1);
   --grey-90-a30: rgba(12, 12, 13, 0.3);
 
+  /* Z-index scale */
+
+  /* Z-index values should always be defined in #app. This allows us to at a glance determine
+  relative layers of our application and prevents bugs arising from arbitrary z-index values. */
+
+  /* Whenever possible, we should rely on the element stack order instead of z-index. If you're
+  certain that you **have** to use a z-index (e.g. element with position: absolute/fixed), define a
+  custom variable for it below so we can keep track of everything in one place. */
+
   --z-index-1: 10;
   --z-index-2: 20;
   --z-index-3: 30;
@@ -1069,15 +1078,6 @@ Migration notes:
     --modal-bgcolor: rgba(0, 0, 0, 0.98);
   }
 }
-
-/* Z-index scale */
-
-/* Z-index values should always be defined in #app. This allows us to at a glance determine
-relative layers of our application and prevents bugs arising from arbitrary z-index values. */
-
-/* Whenever possible, we should rely on the element stack order instead of z-index. If you're
-certain that you **have** to use a z-index (e.g. element with position: absolute/fixed), define a
-custom variable for it below so we can keep track of everything in one place. */
 
 @keyframes linearFadeIn {
   0% {
