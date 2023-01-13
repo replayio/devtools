@@ -87,6 +87,7 @@ export interface TestStepItemProps {
 }
 
 export function TestStepItem({ step, argString, index, id }: TestStepItemProps) {
+  const hasScrolled = useRef(false);
   const ref = useRef<HTMLDivElement>(null);
   const [localPauseData, setLocalPauseData] = useState<{
     startPauseFailed?: boolean;
@@ -217,21 +218,22 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     }
   }, [localPauseData, loading, setLoading]);
 
+  const { endPauseId, consoleProps } = localPauseData || {};
   const onClick = useCallback(() => {
     if (id) {
       if (pointEnd) {
-        if (localPauseData?.endPauseId && localPauseData.consoleProps) {
-          setConsoleProps(localPauseData.consoleProps);
-          setPauseId(localPauseData.endPauseId);
+        if (endPauseId && consoleProps) {
+          setConsoleProps(consoleProps);
+          setPauseId(endPauseId);
         }
-        dispatch(seek(pointEnd!, step.absoluteEndTime, false, localPauseData?.endPauseId));
+        dispatch(seek(pointEnd!, step.absoluteEndTime, false, endPauseId));
       } else {
         dispatch(seekToTime(step.absoluteEndTime, false));
       }
 
       dispatch(setSelectedStep(step));
     }
-  }, [step, pointEnd, localPauseData, dispatch, setConsoleProps, id, setPauseId]);
+  }, [step, pointEnd, endPauseId, consoleProps, dispatch, setConsoleProps, id, setPauseId]);
 
   const onMouseEnter = () => {
     if (state === "paused") {
@@ -273,7 +275,8 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   }, [isPlaying, ref, currentTime, step]);
 
   useEffect(() => {
-    if (step.error && ref.current) {
+    if (step.error && ref.current && !hasScrolled.current) {
+      hasScrolled.current = true;
       scrollIntoView(ref.current);
       onClick();
     }

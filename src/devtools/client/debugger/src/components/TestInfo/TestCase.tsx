@@ -55,7 +55,7 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
   const testStartTime = test.relativeStartTime || 0;
   const testEndTime = testStartTime + (test.duration || 0);
 
-  const onFocus = () => {
+  const onFocus = useCallback(() => {
     if (testEndTime > testStartTime) {
       dispatch(
         setFocusRegionFromTimeRange({
@@ -66,11 +66,10 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
     }
     dispatch(syncFocusedRegion());
     dispatch(updateFocusRegionParam());
-  };
+  }, [testStartTime, testEndTime, dispatch]);
+
   const toggleExpand = () => {
     dispatch(setSelectedTest({ index, title: test.title }));
-
-    onFocus();
   };
 
   const seekToFirstStep = useCallback(() => {
@@ -93,10 +92,11 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
     if (isSelected) {
       setExpandSteps(true);
       seekToFirstStep();
+      onFocus();
     } else {
       setExpandSteps(false);
     }
-  }, [isSelected, seekToFirstStep]);
+  }, [isSelected, seekToFirstStep, onFocus]);
 
   const onReplay = () => {
     dispatch(startPlayback({ beginTime: testStartTime, endTime: testEndTime - 1 }));
