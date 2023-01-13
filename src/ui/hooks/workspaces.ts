@@ -169,8 +169,8 @@ export function useGetWorkspace(workspaceId: string | null): {
 export function useUpdateWorkspaceLogo() {
   const [updateWorkspaceLogo] = useMutation<UpdateWorkspaceLogo, UpdateWorkspaceLogoVariables>(
     gql`
-      mutation UpdateWorkspaceLogo($workspaceId: ID!, $logo: String) {
-        updateWorkspaceLogo(input: { workspaceId: $workspaceId, logo: $logo }) {
+      mutation UpdateWorkspaceLogo($workspaceId: ID!, $format: String, $logo: String) {
+        updateWorkspaceLogo(input: { workspaceId: $workspaceId, format: $format, logo: $logo }) {
           success
         }
       }
@@ -221,6 +221,7 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
                 id
                 name
                 logo
+                logoFormat
                 invitationCode
                 domain
                 isDomainLimitedCode

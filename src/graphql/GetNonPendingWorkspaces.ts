@@ -42,7 +42,9 @@ export interface GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_ed
   user: GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node_WorkspaceUserMember_user;
 }
 
-export type GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node = GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node_WorkspacePendingEmailMember | GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node_WorkspaceUserMember;
+export type GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node =
+  | GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node_WorkspacePendingEmailMember
+  | GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges_node_WorkspaceUserMember;
 
 export interface GetNonPendingWorkspaces_viewer_workspaces_edges_node_members_edges {
   __typename: "WorkspaceMemberEdge";
@@ -59,6 +61,7 @@ export interface GetNonPendingWorkspaces_viewer_workspaces_edges_node {
   id: string;
   name: string;
   logo: string | null;
+  logoFormat: string | null;
   invitationCode: string | null;
   domain: string | null;
   isDomainLimitedCode: boolean | null;
