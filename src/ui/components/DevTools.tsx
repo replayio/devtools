@@ -88,32 +88,32 @@ function Body() {
     <div className="vertical-panels pr-2">
       <div className="flex h-full flex-row overflow-hidden bg-chrome">
         <Toolbar sidePanelCollapsed={sidePanelCollapsed} sidePanelRef={sidePanelRef} />
-          <PanelGroup autoSaveId="DevTools-horizontal" className="split-box" direction="horizontal">
-            <Panel
-              className="flex=1 flex h-full overflow-hidden"
-              collapsible
-              defaultSize={20}
-              id="Panel-SidePanel"
-              minSize={15}
-              onCollapse={onSidePanelCollapse}
-              ref={sidePanelRef}
-            >
-              <SidePanel />
-            </Panel>
-            <PanelResizeHandle
-              className={`h-full ${sidePanelCollapsed ? "w-0" : "w-2"}`}
-              id="PanelResizeHandle-SidePanel"
-            />
-            <Panel className="flex h-full overflow-hidden" minSize={50}>
-              {viewMode === "dev" ? (
-                <React.Suspense fallback={<ViewLoader />}>
-                  <Viewer />
-                </React.Suspense>
-              ) : (
-                <Video />
-              )}
-            </Panel>
-          </PanelGroup>
+        <PanelGroup autoSaveId="DevTools-horizontal" className="split-box" direction="horizontal">
+          <Panel
+            className="flex=1 flex h-full overflow-hidden"
+            collapsible
+            defaultSize={20}
+            id="Panel-SidePanel"
+            minSize={15}
+            onCollapse={onSidePanelCollapse}
+            ref={sidePanelRef}
+          >
+            <SidePanel />
+          </Panel>
+          <PanelResizeHandle
+            className={`h-full ${sidePanelCollapsed ? "w-0" : "w-2"}`}
+            id="PanelResizeHandle-SidePanel"
+          />
+          <Panel className="flex h-full overflow-hidden" minSize={50}>
+            {viewMode === "dev" ? (
+              <React.Suspense fallback={<ViewLoader />}>
+                <Viewer />
+              </React.Suspense>
+            ) : (
+              <Video />
+            )}
+          </Panel>
+        </PanelGroup>
       </div>
       <Timeline />
     </div>
