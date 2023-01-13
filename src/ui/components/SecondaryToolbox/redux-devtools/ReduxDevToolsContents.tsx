@@ -141,7 +141,7 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
 
   return (
     <>
-      <div className="p3 flex">
+      <div className={classnames("p3 flex w-full", styles.tabsContainer)}>
         <PanelButton
           selected={selectedTab === "action"}
           name="action"

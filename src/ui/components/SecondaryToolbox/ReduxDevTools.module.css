@@ -64,6 +64,10 @@
   color: white;
 }
 
+.tabsContainer {
+  background-color: var(--tab-bgcolor);
+}
+
 .diffWrap {
   position: relative;
   z-index: 1;
