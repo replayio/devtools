@@ -149,9 +149,7 @@
   --tab-hover-color: var(--tab-selected-color);
   --tab-selected-bgcolor: var(--theme-base-95);
   --tab-selected-color: #fff;
-  /* --tab-standard-color: ; to add */
-  /* --tab-standard-hover-bgcolor: ; to add */
-  /* --tab-bgcolor: ; */
+  --tab-standard-color: rgba(255, 255, 255, 0.5);
 
   /* Core classes (Dark) */
   --scroll-thumb-color: #454950;
@@ -166,7 +164,6 @@
   --modal-bgcolor: var(--theme-base-95);
   --modal-border: #222;
   --tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
-  --tab-bgcolor: var(--theme-base-100); /* bg tabs */
   --theme-border: var(--theme-base-100);
   --icon-color: var(--body-color);
   --theme-focuser-bgcolor: var(--primary-accent);
@@ -445,14 +442,8 @@
   --theme-menu-highlight: var(--theme-text-field-bgcolor);
 
   /* Code Mirror (Dark) */
-  --cm-linenumber: var(--grey-40);
-  --cm-keyword: #ff42a8;
   --cm-variable: #58e0ff;
-  --cm-def: #fff;
   --cm-string: #01acfd;
-  --cm-number: yellow;
-  --cm-property: #ff98eb;
-  --cm-atom: #fff;
   --caret-color: #fff;
   --debug-line-border: var(--theme-base-85);
   --debug-line-background: var(--theme-base-100);
@@ -619,7 +610,6 @@
   --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
   --tab-selected-color: var(--body-color);
   --tab-standard-color: rgba(0, 0, 0, 0.5);
-  --tab-bgcolor: var(--theme-base-90); /* bg tabs */
 
   /* Core classes (Light) */
   --scroll-thumb-color: #aaaaaa;
@@ -634,7 +624,6 @@
   --modal-bgcolor: rgba(255, 255, 255, 0.98);
   --modal-border: none;
   --tab-bgcolor-alt-subtle: var(--theme-base-100); /* info, events */
-  --tab-bgcolor: var(--theme-base-90); /* bg tabs */
   --theme-border: #d2d5da;
   --icon-color: var(--body-color);
   --theme-focuser-bgcolor: var(--primary-accent);
@@ -913,14 +902,8 @@
   --theme-menu-highlight: #f3f4f6;
 
   /* Code Mirror (Light) */
-  --cm-linenumber: var(--grey-80);
-  --cm-keyword: #dd00a9;
   --cm-variable: #8000d7;
-  --cm-def: #3172e0;
   --cm-string: #0842a4;
-  --cm-number: #18181a;
-  /* --cm-property: ; to add */
-  /* --cm-atom: #fff; to add */
   --caret-color: #18181a;
   --debug-line-border: var(--primary-accent);
   --debug-line-background: #e8f5fb;
@@ -984,7 +967,7 @@
   --theme-selection-color: #ffffff;
 
   /* Border color that splits the toolbars/panels/headers. */
-  --theme-splitter-color: #e0e0e2; /* TODO @jonbell var(--grey-25) is undefined */
+  --theme-splitter-color: #e0e0e2;
   --theme-emphasized-splitter-color: var(--grey-30);
   --theme-emphasized-splitter-color-hover: var(--grey-40);
 
