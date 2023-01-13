@@ -265,7 +265,24 @@
   --object-inspector-inline-key: #36d1c4;
   --object-inspector-bucket-color: #939395;
 
+  --value-type-bigint: #86de74;
+  --value-type-boolean: #86de74;
+  --value-type-date: #34d3c6;
+  --value-type-error: #ffb3d2;
+  --value-type-nan: #86de74;
+  --value-type-null: #939395;
+  --value-type-number: #86de74;
+  --value-type-object: #e6e9ec;
+  --value-type-regexp: #34d3c6;
+  --value-type-string: #e7eaed;
+  --value-type-symbol: #34d3c6;
   --value-type-undefined: #939395;
+  --value-type-html-attribute-name: #ff7de9;
+  --value-type-html-attribute-separator: #9ba0a5;
+  --value-type-html-attribute-value: #ae87f2;
+  --value-type-html-tag: #75bffe;
+  --value-type-html-tag-bracket: #e6e9ec;
+  --value-type-html-text: #d7d7db;
 
   --point-panel-background-color: #1f2b43;
   --point-panel-input-background-color: #000000;
@@ -716,7 +733,24 @@
   --object-inspector-inline-key: #0074e8;
   --object-inspector-bucket-color: #737373;
 
+  --value-type-bigint: #058b00;
+  --value-type-boolean: #058b00;
+  --value-type-date: #34d3c6;
+  --value-type-error: #ff0000;
+  --value-type-nan: #86de74;
+  --value-type-null: #737373;
+  --value-type-number: #058b00;
+  --value-type-object: #0c0c0d;
+  --value-type-regexp: #0074e8;
+  --value-type-string: #0c0c0d;
+  --value-type-symbol: #dd00a9;
   --value-type-undefined: #737373;
+  --value-type-html-attribute-name: #dd00a9;
+  --value-type-html-attribute-separator: #737373;
+  --value-type-html-attribute-value: #003eaa;
+  --value-type-html-tag: #0074e8;
+  --value-type-html-tag-bracket: #0c0c0d;
+  --value-type-html-text: #0c0c0d;
 
   --point-panel-background-color: #f0f1f4;
   --point-panel-input-background-color: #ffffff;
