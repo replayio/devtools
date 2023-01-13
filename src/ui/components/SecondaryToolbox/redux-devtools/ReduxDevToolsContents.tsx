@@ -63,6 +63,12 @@ interface RDTCProps {
 
 type SelectedContentsTab = "action" | "state" | "diff";
 
+// TODO This UI layout doesn't distinguish between multiple "instances" in a page.
+// The backend data _ought_ to be set up so that each unique instance has its own
+// current/previous state at all times, so clicking on any given action _should_
+// result in a correct diff, but the list of actions will be all intermingled.
+// Figure out a way to present that info in this UI - a dropdown next to the buttons?
+
 export function ReduxDevToolsContents({ point, time }: RDTCProps) {
   const replayClient = useContext(ReplayClientContext);
   const [reduxValues, setReduxValues] = useState<ReduxActionStateValues | null>(null);

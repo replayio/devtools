@@ -83,7 +83,9 @@ export const ReduxDevToolsPanel = () => {
     <div className={classnames("flex min-h-full bg-bodyBgcolor p-1", styles.actions)}>
       <div className="border-right-black max-w-s flex flex-col pr-2">
         <h3 className="text-lg font-bold">Actions</h3>
-        <div role="list">{renderedActions}</div>
+        <div role="list" className="overflow-auto">
+          {renderedActions}
+        </div>
       </div>
       <div className="ml-1 grow">{contents}</div>
     </div>
