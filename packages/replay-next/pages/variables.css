@@ -150,6 +150,7 @@
   --tab-selected-bgcolor: var(--theme-base-95);
   --tab-selected-color: #fff;
   /* --tab-standard-color: ; to add */
+  /* --tab-standard-hover-bgcolor: ; to add */
   /* --tab-bgcolor: ; */
 
   /* Core classes (Dark) */
