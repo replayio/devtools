@@ -792,11 +792,19 @@
   --search-result-inactive-background-color: #ff9632;
   --search-result-inactive-color: #000000;
 
+  --token-comment-color: #737373;
+  --token-definition-color: #3172e0;
+  --token-local-color: #4e4e52;
   --token-meta-color: #737373;
   --token-keyword-color: #de00aa;
+  --token-number-color: #18181a;
+  --token-operator-color: #4e4e52;
   --token-propertyName-color: #dd00a9;
+  --token-punctuation-color: #0074e8;
   --token-string-color: #0842a4;
+  --token-string2-color: #0842a4;
   --token-typeName-color: #0074e8;
+  --token-variableName-color: #8d1bdc;
   --token-variableName2-color: #8d1bdc;
   --inspectable-token-hover-background-color: #ffffaa;
 
