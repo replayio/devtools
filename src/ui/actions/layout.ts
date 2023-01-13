@@ -62,7 +62,10 @@ export function setViewMode(viewMode: ViewMode): UIThunkAction {
     // Otherwise, it's possible for the nag to not be properly dismissed.
     if (viewMode === "dev" && !localNags.includes(LocalNag.YANK_TO_SOURCE)) {
       dispatch(dismissLocalNag(LocalNag.YANK_TO_SOURCE));
-      dispatch(setSelectedPrimaryPanel("explorer"));
+      const currentPrimaryPanel = getSelectedPrimaryPanel(getState());
+      if (currentPrimaryPanel !== "cypress") {
+        dispatch(setSelectedPrimaryPanel("explorer"));
+      }
     }
 
     // If switching to non-dev mode, we check the selectedPrimaryPanel and update to comments
