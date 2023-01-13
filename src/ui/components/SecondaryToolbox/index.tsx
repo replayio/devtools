@@ -163,7 +163,7 @@ function SecondaryToolbox({
 
   const kindsSet = new Set(annotationKinds);
   const hasReactComponents = kindsSet.has("react-devtools-hook");
-  const hasReduxAnnotations = kindsSet.has("redux-devtools-setup");
+  const hasReduxAnnotations = kindsSet.has("redux-devtools-data");
 
   if (selectedPanel === "react-components" && !hasReactComponents) {
     dispatch(setSelectedPanel("console"));

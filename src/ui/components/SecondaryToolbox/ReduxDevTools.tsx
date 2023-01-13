@@ -2,13 +2,10 @@ import { ExecutionPoint } from "@replayio/protocol";
 import classnames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 
-import { getRecordingId } from "ui/utils/recording";
+import { ThreadFront } from "protocol/thread";
 
 import type { ReduxActionAnnotation } from "./redux-devtools/redux-annotations";
-import {
-  exampleReduxAnnotations,
-  processReduxAnnotations,
-} from "./redux-devtools/redux-annotations";
+import { processReduxAnnotations } from "./redux-devtools/redux-annotations";
 import { ReduxDevToolsContents } from "./redux-devtools/ReduxDevToolsContents";
 import styles from "./ReduxDevTools.module.css";
 
@@ -18,13 +15,6 @@ export const ReduxDevToolsPanel = () => {
   const isStrictEffectsSecondRenderRef = useRef(false);
 
   useEffect(() => {
-    // TODO Re-enable Redux DevTools annotations handling
-    const recordingId = getRecordingId();
-
-    if (recordingId !== "1ff386de-f3b4-4ff1-a5a3-8c137387b620") {
-      return;
-    }
-
     // React will double-run effects in dev. Avoid trying to subscribe twice,
     // as `socket.ts` throws errors if you call `getAnnotations()` more than once.
     if (isStrictEffectsSecondRenderRef.current) {
@@ -33,23 +23,16 @@ export const ReduxDevToolsPanel = () => {
 
     isStrictEffectsSecondRenderRef.current = true;
 
-    // ThreadFront.getAnnotations(annotations => {
-    //   if (annotations.length) {
-    //     // Pre-process Redux annotations by parsing the string messages,
-    //     // then add them to the state array and pass down via context.
-    //     setReduxAnnotations(prevAnnotations =>
-    //       prevAnnotations.concat(processReduxAnnotations(annotations))
-    //     );
-    //   }
-    // }, "redux-devtools-data");
-
-    if (exampleReduxAnnotations.length) {
-      // Pre-process Redux annotations by parsing the string messages,
-      // then add them to the state array and pass down via context.
-      setReduxAnnotations(prevAnnotations =>
-        prevAnnotations.concat(processReduxAnnotations(exampleReduxAnnotations))
-      );
-    }
+    // We only show this panel if we know that Redux annotations exist already
+    ThreadFront.getAnnotations(annotations => {
+      if (annotations.length) {
+        // Pre-process Redux annotations by parsing the string messages,
+        // then add them to the state array and pass down via context.
+        setReduxAnnotations(prevAnnotations =>
+          prevAnnotations.concat(processReduxAnnotations(annotations))
+        );
+      }
+    }, "redux-devtools-data");
   }, []);
 
   // TODO Right now we're going to show _all_ actions in the list.
