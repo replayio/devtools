@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 
 import {
   seek,
@@ -50,7 +50,7 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
   const expandable = test.steps || test.error;
   const selectedTest = useAppSelector(getSelectedTest);
   const isSelected = selectedTest === index;
-  const annotationsStart = useAppSelector(getReporterAnnotationsForTitleEnd);
+  const annotationsEnd = useAppSelector(getReporterAnnotationsForTitleEnd);
 
   const testStartTime = test.relativeStartTime || 0;
   const testEndTime = testStartTime + (test.duration || 0);
@@ -68,11 +68,17 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
     dispatch(updateFocusRegionParam());
   };
   const toggleExpand = () => {
+    dispatch(setSelectedTest({ index, title: test.title }));
+
+    onFocus();
+  };
+
+  const seekToFirstStep = useCallback(() => {
     const firstStep = test.steps?.[0];
     if (test.relativeStartTime != null) {
       if (firstStep?.relativeStartTime != null) {
         const time = firstStep.relativeStartTime + test.relativeStartTime;
-        const pointStart = annotationsStart.find(a => a.message.id === firstStep.id)?.point;
+        const pointStart = annotationsEnd.find(a => a.message.id === firstStep.id)?.point;
 
         if (time && pointStart) {
           dispatch(seek(pointStart, time, false));
@@ -81,19 +87,16 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
         dispatch(seekToTime(test.relativeStartTime, false));
       }
     }
-
-    dispatch(setSelectedTest({ index, title: test.title }));
-
-    onFocus();
-  };
+  }, [test, annotationsEnd, dispatch]);
 
   useEffect(() => {
     if (isSelected) {
       setExpandSteps(true);
+      seekToFirstStep();
     } else {
       setExpandSteps(false);
     }
-  }, [isSelected]);
+  }, [isSelected, seekToFirstStep]);
 
   const onReplay = () => {
     dispatch(startPlayback({ beginTime: testStartTime, endTime: testEndTime - 1 }));
