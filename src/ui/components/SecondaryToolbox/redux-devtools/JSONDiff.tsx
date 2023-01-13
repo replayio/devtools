@@ -8,7 +8,7 @@ import type { LabelRenderer, ShouldExpandNodeInitially } from "react-json-tree";
 import getItemString from "./getItemString";
 import styles from "../ReduxDevTools.module.css";
 
-interface Delta {
+export interface Delta {
   [key: string]: any;
   [key: number]: any;
 }
@@ -76,6 +76,7 @@ function stringifyAndShrink(val: any, isWideLayout?: boolean) {
     return "null";
   }
 
+  // TODO The original code used `javascript-stringify` for better output here
   const str = JSON.stringify(val);
   if (typeof str === "undefined") {
     return "undefined";
@@ -110,8 +111,7 @@ function prepareDelta(value: any) {
 }
 
 export const labelRenderer: LabelRenderer = ([key, ...rest], nodeType, expanded) => {
-  // const { styling, onInspectPath, inspectedPath } = this.props;
-
+  // TODO Use the original styling behavior here?
   const styling = (key: string) => ({});
 
   return (

@@ -2,16 +2,14 @@ import { ExecutionPoint, Value } from "@replayio/protocol";
 
 import type { ThreadFront as TF } from "protocol/thread";
 import { ThreadFront } from "protocol/thread";
+import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 
-export type ReduxActionStateValues = readonly [pauseId: string, action: Value, state: Value];
+import type { Delta } from "./JSONDiff";
 
-// Cache this at the module level, because the backend records all evaluations
-// applied to a given pause in a session. So, we only need to do this once for
-// a given Pause, and we want to retain the info even if the RDT component unmounts.
-export const pausesWithDevtoolsInjected = new Map<string, ReduxActionStateValues>();
+export type ReduxActionStateValues = readonly [pauseId: string, action: Value, state: Value];
 
 // types borrowed from the Redux DevTools source
 
@@ -124,80 +122,85 @@ async function evaluateNoArgsFunction(
   });
 }
 
-export async function fetchReduxValuesAtPoint(
-  replayClient: ReplayClientInterface,
-  point: ExecutionPoint,
-  time: number
-) {
-  const pauseId = await getPauseIdAsync(replayClient, point, time);
-  if (!pauseId) {
-    return;
-  }
+// Cache this at the module level, because the backend records all evaluations
+// applied to a given pause in a session. So, we only need to do this once for
+// a given Pause, and we want to retain the info even if the RDT component unmounts.
+export const { getValueAsync: getActionStateValuesAsync } = createGenericCache<
+  [point: ExecutionPoint, time: number, replayClient: ReplayClientInterface],
+  ReduxActionStateValues | undefined
+>(
+  "reduxDevtools: getActionStateValues",
+  async (point, time, replayClient) => {
+    const pauseId = await getPauseIdAsync(replayClient, point, time);
+    if (!pauseId) {
+      return;
+    }
 
-  if (pausesWithDevtoolsInjected.has(point)) {
-    return pausesWithDevtoolsInjected.get(point)!;
-  }
+    const frames = await getFramesAsync(replayClient, pauseId);
+    if (!frames) {
+      return;
+    }
 
-  const frames = await getFramesAsync(replayClient, pauseId);
-  if (!frames) {
-    return;
-  }
+    const actionRes = await evaluateNoArgsFunction(
+      ThreadFront,
+      replayClient,
+      getActionObjectId,
+      pauseId,
+      frames[0].frameId
+    );
 
-  const actionRes = await evaluateNoArgsFunction(
-    ThreadFront,
-    replayClient,
-    getActionObjectId,
-    pauseId,
-    frames[0].frameId
-  );
+    const stateRes = await evaluateNoArgsFunction(
+      ThreadFront,
+      replayClient,
+      getStateObjectId,
+      pauseId,
+      frames[0].frameId
+    );
 
-  const stateRes = await evaluateNoArgsFunction(
-    ThreadFront,
-    replayClient,
-    getStateObjectId,
-    pauseId,
-    frames[0].frameId
-  );
+    if (actionRes.returned && stateRes.returned) {
+      const result = [pauseId, actionRes.returned!, stateRes.returned!] as const;
+      return result;
+    }
+  },
+  point => point
+);
 
-  if (actionRes.returned && stateRes.returned) {
-    const result = [pauseId, actionRes.returned!, stateRes.returned!] as const;
-    pausesWithDevtoolsInjected.set(point, result);
-    return result;
-  }
-}
+export const { getValueAsync: getDiffAsync } = createGenericCache<
+  [point: ExecutionPoint, time: number, replayClient: ReplayClientInterface],
+  Delta | undefined
+>(
+  "reduxDevtools: getDiff",
+  async (point, time, replayClient) => {
+    const pauseId = await getPauseIdAsync(replayClient, point, time);
+    if (!pauseId) {
+      return;
+    }
 
-export async function calculateStateDiff(
-  replayClient: ReplayClientInterface,
-  point: ExecutionPoint,
-  time: number
-) {
-  const pauseId = await getPauseIdAsync(replayClient, point, time);
-  if (!pauseId) {
-    return;
-  }
+    const frames = await getFramesAsync(replayClient, pauseId);
+    if (!frames) {
+      return;
+    }
 
-  const frames = await getFramesAsync(replayClient, pauseId);
-  if (!frames) {
-    return;
-  }
+    const jsondiffpatchSource = require("./jsondiffpatch.umd.slim.raw.js").default;
 
-  const jsondiffpatchSource = require("./jsondiffpatch.umd.slim.raw.js").default;
+    await ThreadFront.evaluateNew({
+      replayClient,
+      pauseId,
+      text: jsondiffpatchSource,
+    });
 
-  await ThreadFront.evaluateNew({
-    replayClient,
-    pauseId,
-    text: jsondiffpatchSource,
-  });
+    const diffResult = await evaluateNoArgsFunction(
+      ThreadFront,
+      replayClient,
+      diffStates,
+      pauseId,
+      frames[0].frameId
+    );
 
-  const diffResult = await evaluateNoArgsFunction(
-    ThreadFront,
-    replayClient,
-    diffStates,
-    pauseId,
-    frames[0].frameId
-  );
-  if (diffResult.returned?.value) {
-    const diff = JSON.parse(diffResult.returned.value);
-    return diff;
-  }
-}
+    if (diffResult.returned?.value) {
+      const diff = JSON.parse(diffResult.returned.value);
+      return diff;
+    }
+  },
+  point => point
+);

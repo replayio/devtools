@@ -7,8 +7,8 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import {
   ReduxActionStateValues,
-  calculateStateDiff,
-  fetchReduxValuesAtPoint,
+  getActionStateValuesAsync,
+  getDiffAsync,
 } from "./injectReduxDevtoolsProcessing";
 import { JSONDiff, labelRenderer } from "./JSONDiff";
 import styles from "../ReduxDevTools.module.css";
@@ -71,17 +71,22 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
 
   useLayoutEffect(() => {
     async function fetchAction() {
-      const res = await fetchReduxValuesAtPoint(replayClient, point, time);
-
-      setReduxValues(res ?? null);
-
-      const diffRes = await calculateStateDiff(replayClient, point, time);
-      if (diffRes) {
-        setDiff(diffRes);
+      switch (selectedTab) {
+        case "action":
+        case "state": {
+          const res = await getActionStateValuesAsync(point, time, replayClient);
+          setReduxValues(res ?? null);
+          break;
+        }
+        case "diff": {
+          const diffRes = await getDiffAsync(point, time, replayClient);
+          setDiff(diffRes ?? null);
+          break;
+        }
       }
     }
     fetchAction();
-  }, [replayClient, point, time]);
+  }, [replayClient, point, time, selectedTab]);
 
   const [pauseId, actionValue, stateValue] = reduxValues ?? [];
 
