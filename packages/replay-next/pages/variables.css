@@ -15,12 +15,11 @@
   --theme-code-font-size: 11px;
   --theme-tab-font-size: 15px;
   --theme-code-line-height: calc(15 / 11);
-
   /* Toolbar size (excluding borders) */
   --theme-toolbar-height: 24px;
 
-  /* For accessibility purposes we want to enhance the focus styling. This
-     * should improve keyboard navigation usability. */
+  /* For accessibility purposes we want to enhance the focus styling. 
+  This should improve keyboard navigation usability. */
   --theme-focus-outline: 1px dotted var(--theme-focus-outline-color);
   --theme-focus-box-shadow-textbox: 0 0 0 1px var(--theme-textbox-box-shadow);
   --toolbarbutton-focus-bgcolor: var(--theme-selection-focus-background);
@@ -31,15 +30,6 @@
 
   /* The photon animation curve */
   --animation-curve: cubic-bezier(0.07, 0.95, 0, 1);
-
-  /*
-     * Photon Colors CSS Variables v3.3.2
-     * - Colors are taken from https://github.com/FirefoxUX/photon-colors/blob/master/photon-colors.css
-     * - We only add Photon color variables that we are actually using; unused
-     *   variables will fail browser/base/content/test/static/browser_parsable_css.js
-     * - We added a few unofficial colors: a few intermediary values (e.g. Blue 45),
-     *   and lighter variants for the dark theme (e.g. Red 20, Red 40).
-     */
 
   --primary-accent: #01acfd;
   --primary-accent-hover: #0194ff;
