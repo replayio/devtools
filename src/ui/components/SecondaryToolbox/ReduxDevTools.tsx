@@ -89,3 +89,5 @@ export const ReduxDevToolsPanel = () => {
     </div>
   );
 };
+
+export default ReduxDevToolsPanel;

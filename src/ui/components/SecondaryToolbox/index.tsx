@@ -7,7 +7,6 @@ import { EditorPane } from "devtools/client/debugger/src/components/Editor/Edito
 import { RecordingCapabilities } from "protocol/thread/thread";
 import LazyOffscreen from "replay-next/components/LazyOffscreen";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import type { UIThunkAction } from "ui/actions";
 import { setSelectedPanel } from "ui/actions/layout";
 import { useFeature } from "ui/hooks/settings";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
@@ -24,13 +23,15 @@ import ReplayLogo from "../shared/ReplayLogo";
 import WaitForReduxSlice from "../WaitForReduxSlice";
 import { getRecordingCapabilitiesSuspense } from "./getRecordingCapabilities";
 import NewConsoleRoot from "./NewConsole";
-import ReactDevtoolsPanel from "./ReactDevTools";
-import { ReduxDevToolsPanel } from "./ReduxDevTools";
 import SourcesTabLabel from "./SourcesTabLabel";
 import { ShowVideoButton } from "./ToolboxButton";
 import ToolboxOptions from "./ToolboxOptions";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
+
+const ReactDevToolsPanel = React.lazy(() => import("./ReactDevTools"));
+
+const ReduxDevToolsPanel = React.lazy(() => import("./ReduxDevTools"));
 
 interface PanelButtonsProps {
   hasReactComponents: boolean;
@@ -207,7 +208,7 @@ function SecondaryToolbox({
           <InspectorPanel />
         </Panel>
         <Panel isActive={selectedPanel === "react-components"}>
-          <ReactDevtoolsPanel />
+          <ReactDevToolsPanel />
         </Panel>
         <Panel isActive={selectedPanel === "redux-devtools"}>
           <ReduxDevToolsPanel />
