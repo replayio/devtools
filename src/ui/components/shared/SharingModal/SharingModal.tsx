@@ -95,11 +95,15 @@ function CollaboratorsSection({ recording }: { recording: Recording }) {
   }
 
   return (
-    <section className="space-y-4 bg-themeBase-100 p-8">
+    <section className="space-y-4 bg-themeBase-100 p-4">
       <div className="flex w-full flex-col justify-between space-y-3">
         <div className="w-full space-y-4">
-          <div className="space-y-1.5">
-            <div className="font-bold">Add People</div>
+          <div>
+            <div className="font-bold">Team</div>
+
+            <PrivacyDropdown {...{ recording }} />
+
+            <div className="mt-4 font-bold">Add People</div>
             <Collaborators recordingId={recording.id} />
           </div>
           <CollaboratorRequests recording={recording} />
@@ -142,21 +146,8 @@ function SharingSection({
     <>
       <CollaboratorsSection recording={recording} />
       <section className="flex flex-col bg-menuHoverBgcolor px-8 py-8">
-        <div className="flex flex-grow flex-row items-center justify-between space-x-2 ">
-          <div className="flex flex-row items-start space-x-3 overflow-hidden">
-            <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-200 font-bold">
-              <MaterialIcon className="text-blue-600" iconSize="xl">
-                people
-              </MaterialIcon>
-            </div>
-            <div className="flex flex-col space-y-1 overflow-hidden">
-              <div className="font-bold">Privacy Settings</div>
-              <PrivacyDropdown {...{ recording }} />
-              {showEnvironmentVariables ? <EnvironmentVariablesRow /> : null}
-            </div>
-          </div>
-          <CopyButton recording={recording} />
-        </div>
+        <CopyButton recording={recording} />
+        <DownloadSection recording={recording} />
         <div>
           {!recording.private && recording.operations && (
             <ToggleShowPrivacyButton
@@ -203,20 +194,7 @@ function Header({
     </div>
   );
 
-  return (
-    <section className="justify-left flex flex-row items-center space-x-2  px-8 py-4">
-      <Tab
-        label="Sharing"
-        onClick={() => setModalMode("sharing")}
-        active={modalMode == "sharing"}
-      />
-      <Tab
-        label="Downloads"
-        onClick={() => setModalMode("download")}
-        active={modalMode == "download"}
-      />
-    </section>
-  );
+  return <section></section>;
 }
 
 function DownloadSection({ recording }: { recording: Recording }) {
@@ -277,9 +255,8 @@ function DownloadSection({ recording }: { recording: Recording }) {
   };
 
   return (
-    <div className="flex flex-col">
-      {screen && <img className="mx-10" src={`data:image/jpeg;base64,${screen.data}`} />}
-      <div className="my-4 mt-4 flex flex-col items-center">
+    <div>
+      <div>
         <button
           className="mr-0 flex items-center space-x-1.5 rounded-lg bg-primaryAccent py-1 px-2 text-sm text-buttontextColor hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
           onClick={onDownload}
@@ -310,15 +287,15 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
         <div className="flex flex-col space-y-0" style={{ width: 460 }}>
           <Header modalMode={modalMode} setModalMode={setModalMode} />
           {modalMode == "sharing" ? (
-            <SharingSection
-              recording={recording}
-              showEnvironmentVariables={showEnvironmentVariables}
-              showPrivacy={showPrivacy}
-              setShowPrivacy={setShowPrivacy}
-            />
-          ) : (
-            <DownloadSection recording={recording} />
-          )}
+            <>
+              <SharingSection
+                recording={recording}
+                showEnvironmentVariables={showEnvironmentVariables}
+                showPrivacy={showPrivacy}
+                setShowPrivacy={setShowPrivacy}
+              />
+            </>
+          ) : null}
         </div>
         {showPrivacy ? (
           <div className="relative flex overflow-auto bg-menuHoverBgcolor">
