@@ -146,9 +146,11 @@ function SharingSection({
   return (
     <>
       <CollaboratorsSection recording={recording} />
-      <section className="flex flex-col bg-menuHoverBgcolor px-6 py-6">
-        <div className="flex justify-center">
-          <div className="mr-4">
+      <section className="flex flex-col bg-menuHoverBgcolor px-4 pb-4 pt-3">
+        <div className="mb-2 font-bold">Sharing</div>
+
+        <div className="flex">
+          <div className="mr-2">
             <CopyButton recording={recording} />
           </div>
           <div>
@@ -219,7 +221,7 @@ function DownloadSection({ recording }: { recording: Recording }) {
 
   const buttonStates = {
     "not-started": {
-      label: "Download video",
+      label: "Download as video",
       icon: "download",
     },
     downloading: {
