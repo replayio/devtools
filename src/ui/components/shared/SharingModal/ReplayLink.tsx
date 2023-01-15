@@ -24,7 +24,7 @@ export function CopyButton({ recording }: { recording: Recording }) {
   return (
     <div className="copy-link relative flex flex-shrink-0 flex-col items-center">
       <button
-        className="rounded-lg border border-gray-400 p-2 py-1 transition hover:border-primaryAccent hover:bg-primaryAccent hover:text-white"
+        className="rounded-lg bg-primaryAccent p-2 py-1 text-white transition hover:border-primaryAccent hover:bg-primaryAccent hover:text-white"
         {...{ onClick }}
       >
         Copy Link

@@ -47,10 +47,10 @@ export default function PortalDropdown(props: PortalDropdownProps) {
   const toolboxLayout = useAppSelector(getToolboxLayout);
 
   return (
-    <div className="portal-dropdown-wrapper">
+    <div className="portal-dropdown-wrapper rounded-md border bg-gray-100 py-1 px-2 hover:bg-gray-200">
       <button
         type="button"
-        className={`expand-dropdown mr-1 flex w-full py-1 ${buttonStyle}`}
+        className={`expand-dropdown mr-1 flex w-full p-1 ${buttonStyle}`}
         disabled={props.disabled}
         id="portal-dropdown-button"
         data-test-id="consoleDockButton"

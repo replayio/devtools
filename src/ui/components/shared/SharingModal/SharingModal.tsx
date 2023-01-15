@@ -27,6 +27,7 @@ import MaterialIcon from "../MaterialIcon";
 import Collaborators from "./Collaborators";
 import PrivacyDropdown from "./PrivacyDropdown";
 import { CopyButton } from "./ReplayLink";
+import Sharing from "./Sharing";
 
 function SharingModalWrapper(props: PropsFromRedux) {
   const opts = props.modalOptions;
@@ -145,9 +146,15 @@ function SharingSection({
   return (
     <>
       <CollaboratorsSection recording={recording} />
-      <section className="flex flex-col bg-menuHoverBgcolor px-8 py-8">
-        <CopyButton recording={recording} />
-        <DownloadSection recording={recording} />
+      <section className="flex flex-col bg-menuHoverBgcolor px-6 py-6">
+        <div className="flex justify-center">
+          <div className="mr-4">
+            <CopyButton recording={recording} />
+          </div>
+          <div>
+            <DownloadSection recording={recording} />
+          </div>
+        </div>
         <div>
           {!recording.private && recording.operations && (
             <ToggleShowPrivacyButton
@@ -282,9 +289,9 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
       <div
         className="sharing-modal relative flex flex-row overflow-hidden rounded-lg text-sm shadow-xl"
-        style={{ width: showPrivacy ? 720 : 460 }}
+        style={{ width: showPrivacy ? 720 : 390 }}
       >
-        <div className="flex flex-col space-y-0" style={{ width: 460 }}>
+        <div className="flex flex-col space-y-0" style={{ width: 390 }}>
           <Header modalMode={modalMode} setModalMode={setModalMode} />
           {modalMode == "sharing" ? (
             <>
