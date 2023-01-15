@@ -102,8 +102,9 @@ function CollaboratorsSection({ recording }: { recording: Recording }) {
           <div>
             <div className="font-bold">Team</div>
 
-            <PrivacyDropdown {...{ recording }} />
-
+            <div className="rounded-md border border border-transparent bg-[#F8F8F8] p-2 hover:bg-menuHoverBgcolor">
+              <PrivacyDropdown {...{ recording }} />
+            </div>
             <div className="mt-4 font-bold">Add People</div>
             <Collaborators recordingId={recording.id} />
           </div>
@@ -146,8 +147,8 @@ function SharingSection({
   return (
     <>
       <CollaboratorsSection recording={recording} />
-      <section className="flex flex-col bg-menuHoverBgcolor px-4 pb-4 pt-3">
-        <div className="mb-2 font-bold">Sharing</div>
+      <section className="flex flex-col bg-menuHoverBgcolor px-4 pb-5 pt-3">
+        <div className="mb-2 font-bold">Sharing Options</div>
 
         <div className="flex">
           <div className="mr-2">
@@ -229,7 +230,7 @@ function DownloadSection({ recording }: { recording: Recording }) {
       icon: "loop",
     },
     success: {
-      label: "Downloaded video",
+      label: "Video downloaded",
       icon: "check",
     },
     error: {
@@ -267,7 +268,7 @@ function DownloadSection({ recording }: { recording: Recording }) {
     <div>
       <div>
         <button
-          className="mr-0 flex items-center space-x-1.5 rounded-lg bg-primaryAccent py-1 px-2 text-sm text-buttontextColor hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
+          className="mr-0 flex items-center space-x-1.5 rounded-lg bg-white p-2 px-3 text-sm text-bodyColor hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
           onClick={onDownload}
         >
           <MaterialIcon className="mr-2">{buttonStates[downloadState].icon}</MaterialIcon>
