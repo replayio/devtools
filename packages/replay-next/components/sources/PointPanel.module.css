@@ -119,6 +119,13 @@
   line-height: 1.5rem;
 }
 
+.Check {
+  flex: 0 0 1rem;
+  height: 1rem;
+  width: 1rem;
+  fill: currentColor;
+}
+
 .EditButtonIcon {
   height: 1rem;
   width: 1rem;
