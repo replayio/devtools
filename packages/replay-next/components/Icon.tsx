@@ -97,9 +97,9 @@ export default function Icon({
           <path
             d="M13 8.95508L7.90909 13.9551L6 12.0801"
             stroke="white"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
         </>
       );
