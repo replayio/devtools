@@ -69,6 +69,10 @@
   gap: 1ch;
 }
 
+.ContentWrapper:hover {
+  border: 2px solid var(--point-panel-input-border-color-hover);
+}
+
 .ContentWrapperInvalid {
   background-color: var(--background-color-error);
   border-color: var(--border-color-error);
