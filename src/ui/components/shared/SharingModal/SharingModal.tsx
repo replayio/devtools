@@ -28,6 +28,7 @@ import Collaborators from "./Collaborators";
 import PrivacyDropdown from "./PrivacyDropdown";
 import { CopyButton } from "./ReplayLink";
 import Sharing from "./Sharing";
+import styles from "./SharingModal.module.css";
 
 function SharingModalWrapper(props: PropsFromRedux) {
   const opts = props.modalOptions;
@@ -227,7 +228,7 @@ function DownloadSection({ recording }: { recording: Recording }) {
       icon: "download",
     },
     downloading: {
-      label: "Downloading video",
+      label: "Downloading video ...",
       icon: "loop",
     },
     success: {
@@ -267,18 +268,12 @@ function DownloadSection({ recording }: { recording: Recording }) {
 
   return (
     <div>
-      <div>
-        <button
-          className="mr-0 flex items-center space-x-1.5 rounded-lg bg-white p-2 px-3 text-sm text-bodyColor hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
-          onClick={onDownload}
-        >
-          <MaterialIcon className="mr-2">{buttonStates[downloadState].icon}</MaterialIcon>
-          {buttonStates[downloadState].label}
-        </button>
-        {downloadState == "downloading" && (
-          <div className="mt-2 italic text-slate-400">Takes approximately 30 seconds...</div>
-        )}
-      </div>
+      <button className={styles.downloadVideo} onClick={onDownload}>
+        <MaterialIcon className={`mr-2 ${downloadState === "downloading" ? "animate-spin" : ""}`}>
+          {buttonStates[downloadState].icon}
+        </MaterialIcon>
+        {buttonStates[downloadState].label}
+      </button>
     </div>
   );
 }

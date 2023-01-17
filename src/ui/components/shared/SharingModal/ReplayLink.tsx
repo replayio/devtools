@@ -5,6 +5,7 @@ import { getRecordingURL } from "ui/utils/recording";
 import { trackEvent } from "ui/utils/telemetry";
 
 import Icon from "../../shared/Icon";
+import styles from "./SharingModal.module.css";
 
 export function CopyButton({ recording }: { recording: Recording }) {
   const [showCopied, setShowCopied] = useState(false);
@@ -25,12 +26,9 @@ export function CopyButton({ recording }: { recording: Recording }) {
 
   return (
     <div className="copy-link relative flex flex-shrink-0 flex-col items-center">
-      <button
-        className="hover:bg-whiteHover rounded-lg bg-white p-2 px-3 text-bodyColor transition hover:border-primaryAccent hover:text-white"
-        {...{ onClick }}
-      >
+      <button className={styles.copyURL} {...{ onClick }}>
         <div className="flex">
-          <Icon filename="doc" size="medium" className="mr-1 bg-bodyColor" />
+          <Icon filename="doc" size="medium" className={styles.copyIcon} />
           <div>Copy URL</div>
         </div>
       </button>
