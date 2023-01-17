@@ -175,7 +175,7 @@ export type TestItem = {
   result: TestResult;
   relativeStartTime?: number;
   duration?: number;
-  steps: TestStep[];
+  steps?: TestStep[];
   id?: string;
   path?: string[];
   error?: TestItemError;

@@ -24,8 +24,8 @@ function ContextMenu({
   const classnames = classNames.bind(styles);
   const actions = useTestStepActions(testStep);
 
-  const isFirstStep = test.steps[0].id === testStep.id;
-  const isLastStep = test.steps[test.steps.length - 1].id === testStep.id;
+  const isFirstStep = test.steps?.[0].id === testStep.id;
+  const isLastStep = test.steps?.[test.steps.length - 1].id === testStep.id;
 
   useModalDismissSignal(ref, hide, true);
 
