@@ -18,7 +18,7 @@ export default React.forwardRef<
       className={classNames(
         `text-${textSize ? textSize : "sm"}`,
         center ? "text-center" : "",
-        "block w-full rounded-md border border-themeBase-100 bg-[#F8F8F8] p-2 text-themeTextFieldColor hover:bg-[#F2F2F2] focus:border-primaryAccent focus:ring-primaryAccent"
+        "block w-full rounded-md border border-transparent bg-themeTextFieldBgcolor p-2 text-themeTextFieldColor hover:bg-themeTextFieldBgcolorHover focus:border-primaryAccent focus:ring-primaryAccent"
       )}
     />
   );

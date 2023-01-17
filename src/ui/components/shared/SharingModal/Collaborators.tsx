@@ -19,7 +19,9 @@ export default function Collaborators({ recordingId }: CollaboratorsProps) {
 
   return (
     <section className="flex w-full flex-col space-y-4">
-      <EmailForm recordingId={recordingId} />
+      <div className="border border-transparent">
+        <EmailForm recordingId={recordingId} />
+      </div>
       <CollaboratorsList {...{ owner, collaborators }} />
     </section>
   );

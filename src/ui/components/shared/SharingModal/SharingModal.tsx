@@ -96,16 +96,17 @@ function CollaboratorsSection({ recording }: { recording: Recording }) {
   }
 
   return (
-    <section className="space-y-4 bg-themeBase-100 p-4">
+    <section className="space-y-4 bg-modalBgcolor p-4">
       <div className="flex w-full flex-col justify-between space-y-3">
         <div className="w-full space-y-4">
           <div>
             <div className="font-bold">Team</div>
 
-            <div className="rounded-md border border border-transparent bg-[#F8F8F8] p-2 hover:bg-menuHoverBgcolor">
+            <div className="rounded-md border border border-transparent bg-themeTextFieldBgcolor p-2 hover:bg-themeTextFieldBgcolorHover">
               <PrivacyDropdown {...{ recording }} />
             </div>
             <div className="mt-4 font-bold">Add People</div>
+
             <Collaborators recordingId={recording.id} />
           </div>
           <CollaboratorRequests recording={recording} />
