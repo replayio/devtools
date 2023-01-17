@@ -47,7 +47,7 @@ export const TestCaseContext = createContext<TestCaseContextType>(null as any);
 export function TestCase({ test, index }: { test: TestItem; index: number }) {
   const [expandSteps, setExpandSteps] = useState(false);
   const dispatch = useAppDispatch();
-  const expandable = test.steps || test.error;
+  const expandable = !!test.steps;
   const selectedTest = useAppSelector(getSelectedTest);
   const isSelected = selectedTest === index;
   const annotationsEnd = useAppSelector(getReporterAnnotationsForTitleEnd);
