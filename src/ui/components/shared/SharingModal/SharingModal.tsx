@@ -27,7 +27,6 @@ import MaterialIcon from "../MaterialIcon";
 import Collaborators from "./Collaborators";
 import PrivacyDropdown from "./PrivacyDropdown";
 import { CopyButton } from "./ReplayLink";
-import Sharing from "./Sharing";
 import styles from "./SharingModal.module.css";
 
 function SharingModalWrapper(props: PropsFromRedux) {
