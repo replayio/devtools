@@ -95,11 +95,10 @@ export default function Icon({
       path = (
         <>
           <path
-            d="M13 8.95508L7.90909 13.9551L6 12.0801"
-            stroke="white"
+            d="M9 16.2l-3.5-3.5c-.39-.39-1.01-.39-1.4 0-.39.39-.39 1.01 0 1.4l4.19 4.19c.39.39 1.02.39 1.41 0L20.3 7.7c.39-.39.39-1.01 0-1.4-.39-.39-1.01-.39-1.4 0L9 16.2z"
+            fill="currentColor"
+            stroke="currentColor"
             strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
           />
         </>
       );
