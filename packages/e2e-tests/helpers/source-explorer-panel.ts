@@ -79,7 +79,7 @@ export async function openSource(page: Page, url: string): Promise<void> {
 
 export async function openSourceExplorerPanel(page: Page): Promise<void> {
   const pane = getSourcesPane(page);
-  let isVisible = await pane.isVisible(); // await isSidePaneVisible(pane);
+  let isVisible = await pane.isVisible();
 
   if (!isVisible) {
     return page.locator('[data-test-name="ToolbarButton-SourceExplorer"]').click();
