@@ -270,7 +270,7 @@ export default function WorkspaceSettingsModal() {
       size="lg"
       title={
         workspace.logo ? (
-          <Base64Image src={workspace.logo} className="max-h-12" />
+          <Base64Image src={workspace.logo} format={workspace.logoFormat} className="max-h-12" />
         ) : (
           workspace.name || "Team Settings"
         )

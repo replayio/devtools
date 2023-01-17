@@ -276,6 +276,7 @@ export interface PendingWorkspaceInvitation extends Workspace {
 export interface Workspace {
   apiKeys?: ApiKey[];
   logo?: string | null;
+  logoFormat?: string | null;
   domain?: string | null;
   hasPaymentMethod?: boolean;
   id: string;
