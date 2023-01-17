@@ -7,7 +7,7 @@
 }
 
 .sharing-modal .permissions-list {
-  animation: slideInFromLeft 0.75s ease-in-out;
+  animation: fadeIn 0.4s ease-in-out;
 }
 
 @keyframes fadeIn {
