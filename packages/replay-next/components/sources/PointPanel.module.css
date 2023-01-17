@@ -70,7 +70,7 @@
 }
 
 .ContentWrapper:hover {
-  border: 2px solid var(--point-panel-input-border-color-hover);
+  border-color: var(--point-panel-input-border-color-hover);
 }
 
 .ContentWrapperInvalid {
