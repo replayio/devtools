@@ -1,0 +1,108 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
+
+.actions [role="list"] {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+}
+
+.actions [role="list"] [role="listitem"] {
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  column-gap: 0.5em;
+  flex-direction: row;
+  align-items: center;
+  margin: 0;
+  max-width: 100%;
+  flex-wrap: wrap;
+  line-height: 1.5rem;
+}
+
+.actions [role="list"] [role="listitem"] * {
+  user-select: none;
+}
+
+.actions .badge {
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.actions .location {
+  font-weight: normal;
+  margin: 0;
+  flex-grow: 1;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  /* Trick to get the ellipsis at the start of the string */
+  text-overflow: ellipsis;
+  direction: rtl;
+  text-align: right;
+}
+
+.actions [role="list"] [role="listitem"]:hover,
+.actions [role="list"] [role="listitem"]:focus {
+  background-color: var(--theme-toolbar-background-alt);
+}
+
+.actions [role="list"] [role="listitem"]:hover .location-async-cause,
+.actions [role="list"] [role="listitem"]:focus .location-async-cause {
+  background-color: var(--body-bgcolor);
+}
+
+:global(.theme-dark) .actions [role="list"] [role="listitem"]:focus,
+:global(.theme-dark) .actions [role="list"] [role="listitem"]:focus .async-label,
+:global(.theme-dark) .actions [role="list"] [role="listitem"]:focus .async-label {
+  background-color: var(--theme-tab-toolbar-background);
+}
+
+.actions [role="list"] [role="listitem"].selected {
+  background-color: var(--theme-selection-background);
+  color: white;
+}
+
+.tabsContainer {
+  background-color: var(--tab-bgcolor);
+}
+
+.diffWrap {
+  position: relative;
+  z-index: 1;
+}
+
+.diffAdd,
+.diffUpdateTo {
+  background-color: var(--diff-add-background-color);
+  color: var(--diff-add-text-color);
+}
+
+.diffRemove,
+.diffUpdateFrom {
+  text-decoration: line-through;
+  background-color: var(--diff-remove-background-color);
+  color: var(--diff-remove-text-color);
+}
+
+.stateDiffEmpty {
+  padding: "10px";
+  color: var(--body-sub-color);
+}
+
+.contentsTab {
+  background-color: var(--tab-bgcolor);
+  color: var(--tab-color);
+  padding: 0.5rem;
+}
+
+.contentsTab.selectedTab {
+  background-color: var(--tab-selected-bgcolor);
+  color: var(--tab-selected-color);
+}
+
+.contentsTab:hover {
+  background-color: var(--tab-hover-bgcolor);
+  color: var(--tab-hover-color);
+}
