@@ -6,6 +6,19 @@
   max-height: 240px;
 }
 
+.sharing-modal .permissions-list {
+  animation: slideInFromLeft 0.75s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .sharing-modal .permission {
   display: flex;
   align-items: center;
