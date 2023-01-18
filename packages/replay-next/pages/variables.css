@@ -481,6 +481,7 @@
   --toolbarbutton-focus-bgcolor: var(--theme-toggle-bgcolor);
   --unloaded-region-img: url("/images/dotted-mask-dark.svg");
   --title-hover-bgcolor: var(--theme-toggle-bgcolor);
+  --jellyfish-bgcolor: rgba(40, 40, 40, 0.8);
 
   /* Toolbar (Dark) */
   --theme-toolbar-panel-icon-color: var(--icon-color);
@@ -941,6 +942,7 @@
   --toolbarbutton-focus-bgcolor: var(--theme-base-90);
   --unloaded-region-img: url("/images/dotted-mask-light.svg");
   --title-hover-bgcolor: #e6e6e6;
+  --jellyfish-bgcolor: rgba(255, 255, 255, 0.8);
 
   /* Toolbar */
   --theme-toolbar-panel-icon-color: #bcbcbc;
