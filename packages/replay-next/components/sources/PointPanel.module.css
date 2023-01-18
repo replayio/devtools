@@ -69,6 +69,10 @@
   gap: 1ch;
 }
 
+.ContentWrapper:hover {
+  border-color: var(--point-panel-input-border-color-hover);
+}
+
 .ContentWrapperInvalid {
   background-color: var(--background-color-error);
   border-color: var(--border-color-error);
@@ -117,6 +121,13 @@
   align-items: center;
   justify-content: center;
   line-height: 1.5rem;
+}
+
+.Check {
+  flex: 0 0 1rem;
+  height: 1rem;
+  width: 1rem;
+  fill: currentColor;
 }
 
 .EditButtonIcon {
