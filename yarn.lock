@@ -11008,7 +11008,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"enhanced-resolve@npm:^5.7.0, enhanced-resolve@npm:^5.9.3":
+"enhanced-resolve@npm:^5.9.3":
   version: 5.9.3
   resolution: "enhanced-resolve@npm:5.9.3"
   dependencies:
@@ -16506,7 +16506,6 @@ __metadata:
     jest-environment-jsdom: ^28.0.2
     lodash: ^4.17.21
     next: ^12.1.6
-    next-transpile-modules: ^9.0.0
     protocol: "workspace:*"
     react: 0.0.0-experimental-e7d0053e6-20220325
     react-dom: 0.0.0-experimental-e7d0053e6-20220325
@@ -17270,16 +17269,6 @@ __metadata:
   version: 1.3.1
   resolution: "next-global-css@npm:1.3.1"
   checksum: fdb85e2ea614e17dc2d6f3f5064644346de9458774844f50a398c2b71d3d320717713d6f915fa8b91039956440900e6166a8b1bc19d3091c31aed582495f8a0f
-  languageName: node
-  linkType: hard
-
-"next-transpile-modules@npm:^9.0.0":
-  version: 9.0.0
-  resolution: "next-transpile-modules@npm:9.0.0"
-  dependencies:
-    enhanced-resolve: ^5.7.0
-    escalade: ^3.1.1
-  checksum: 9a5d86d80cedc2404b2b1d5bd4994f2f7bf60e5e20f24e8cc5cfec34da1418b4a439916f37a95ca336bcf6d81094c3647354ac6a0c6737b3df59e62b6380507d
   languageName: node
   linkType: hard
 
