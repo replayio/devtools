@@ -55,7 +55,7 @@ function Console() {
   const { loading, pauseId, consoleProps } = useContext(TestInfoContext);
 
   const [showStepDetails, setShowStepDetails] = useLocalStorage<boolean>(
-    `Replay:ShowStepDetails`,
+    `Replay:TestInfo:StepDetails`,
     true
   );
 
