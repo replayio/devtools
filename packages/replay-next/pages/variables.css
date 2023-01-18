@@ -201,7 +201,7 @@
   --background-color-current-execution-point: #25364e;
   --background-color-current-search-result: #25364e;
   --background-color-warning: #42381f;
-  --background-color-inputs: var(--theme-text-field-bg);
+  --background-color-inputs: var(--theme-text-field-bgcolor);
   --background-color-source-search: #25364e;
   --background-color-resize-handle: #242e3d;
 
