@@ -4,6 +4,7 @@ import React, { createContext, useContext, useMemo, useState } from "react";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
+import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { getSelectedTest } from "ui/reducers/reporter";
 import { useAppSelector } from "ui/setup/hooks";
 import { TestItem } from "ui/types";
@@ -52,7 +53,12 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
 
 function Console() {
   const { loading, pauseId, consoleProps } = useContext(TestInfoContext);
-  const [showStepDetails, setShowStepDetails] = useState(true);
+  // const [showStepDetails, setShowStepDetails] = useState(true);
+
+  const [showStepDetails, setShowStepDetails] = useLocalStorage<boolean>(
+    `Replay:ShowStepDetails`,
+    true
+  );
 
   const sanitizedConsoleProps = useMemo(() => {
     const sanitized = cloneDeep(consoleProps);
