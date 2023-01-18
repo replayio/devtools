@@ -283,6 +283,7 @@ function DownloadSection({ recording }: { recording: Recording }) {
         <button
           className="mr-0 flex items-center space-x-1.5 rounded-lg bg-primaryAccent py-1 px-2 text-sm text-buttontextColor hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
           onClick={onDownload}
+          disabled={downloadState !== "not-started"}
         >
           <MaterialIcon className="mr-2">{buttonStates[downloadState].icon}</MaterialIcon>
           {buttonStates[downloadState].label}
