@@ -80,7 +80,7 @@ function Console() {
     <>
       <div onClick={() => setShowStepDetails(!showStepDetails)}>Do it</div>
       <div
-        className={`flex-shrink-1 flex h-64 flex-col overflow-auto py-2 ${
+        className={`flex h-64 flex-shrink-0 flex-col overflow-auto py-2 ${
           showStepDetails ? "visible" : "hidden"
         }`}
         style={{
@@ -88,19 +88,32 @@ function Console() {
         }}
         key={pauseId || "no-pause-id"}
       >
-        <div className={`flex-shrink-1 flex flex-col gap-1 p-2 font-mono`}>Step Details</div>
+        <div
+          className="text-md p-2 px-4"
+          style={{
+            fontSize: "15px",
+          }}
+        >
+          Step Details
+        </div>
 
         <ErrorBoundary fallback={errorFallback}>
-          <div className={`flex flex-grow flex-col gap-1 p-2 font-mono`}>
-            {loading ? (
-              <div className="flex flex-grow items-center justify-center align-middle text-xs opacity-50">
-                Loading ...
-              </div>
-            ) : hideProps ? (
-              errorFallback
-            ) : (
-              <PropertiesRenderer pauseId={pauseId!} object={sanitizedConsoleProps} />
-            )}
+          <div
+            className={`flex flex-grow flex-col gap-1 bg-green-500 p-2 font-mono ${
+              showStepDetails ? "visible" : "hidden"
+            }`}
+          >
+            <div className={`flex flex-grow flex-col gap-1 bg-red-500 p-2 font-mono`}>
+              {loading ? (
+                <div className="flex flex-grow items-center justify-center align-middle text-xs opacity-50">
+                  Loading ...
+                </div>
+              ) : hideProps ? (
+                errorFallback
+              ) : (
+                <PropertiesRenderer pauseId={pauseId!} object={sanitizedConsoleProps} />
+              )}
+            </div>
           </div>
         </ErrorBoundary>
       </div>
