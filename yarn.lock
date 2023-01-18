@@ -19781,16 +19781,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-tooltip@npm:^4.2.21":
-  version: 4.2.21
-  resolution: "react-tooltip@npm:4.2.21"
+"react-tooltip@npm:^4.5.1":
+  version: 4.5.1
+  resolution: "react-tooltip@npm:4.5.1"
   dependencies:
-    prop-types: ^15.7.2
+    prop-types: ^15.8.1
     uuid: ^7.0.3
   peerDependencies:
     react: ">=16.0.0"
     react-dom: ">=16.0.0"
-  checksum: dd145ae90768a8af5518672bfd91b985a57ff021b50a60044caedd872b457ea5134793cf8d5426bd45587fa6f722320936009f5c6533a4f94d665c0a23589222
+  checksum: bb2065b6aec5d860627e1459cd193889a236093c484f32a021b7b3c8c36c2144d1077932b5d74bc0262f1e24a3e0fd8251df2107c348a913a9b236467ed2185d
   languageName: node
   linkType: hard
 
@@ -20160,7 +20160,7 @@ __metadata:
     react-redux: ^8.0.2
     react-resizable-panels: ^0.0.34
     react-table: ^7.7.0
-    react-tooltip: ^4.2.21
+    react-tooltip: ^4.5.1
     react-transition-group: ^4.4.2
     react-virtualized-auto-sizer: ^1.0.6
     react-window: ^1.8.8
