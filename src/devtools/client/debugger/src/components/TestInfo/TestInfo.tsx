@@ -53,7 +53,6 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
 
 function Console() {
   const { loading, pauseId, consoleProps } = useContext(TestInfoContext);
-  // const [showStepDetails, setShowStepDetails] = useState(true);
 
   const [showStepDetails, setShowStepDetails] = useLocalStorage<boolean>(
     `Replay:ShowStepDetails`,
