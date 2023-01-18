@@ -77,29 +77,21 @@ function Console() {
   );
 
   return (
-    
-  
-
+    <>
+      <div onClick={() => setShowStepDetails(!showStepDetails)}>Do it</div>
       <div
         className={`flex-shrink-1 flex h-64 flex-col overflow-auto py-2 ${
-            showStepDetails ? "visible" : "hidden"
-          }}
+          showStepDetails ? "visible" : "hidden"
+        }`}
         style={{
           borderTop: "2px solid var(--chrome)",
         }}
         key={pauseId || "no-pause-id"}
       >
-        <div
-          className="text-md p-2 px-4"
-          style={{
-            fontSize: "15px",
-          }}
-        >
-          Step Details
-        </div>
+        <div className={`flex-shrink-1 flex flex-col gap-1 p-2 font-mono`}>Step Details</div>
 
         <ErrorBoundary fallback={errorFallback}>
-          
+          <div className={`flex flex-grow flex-col gap-1 p-2 font-mono`}>
             {loading ? (
               <div className="flex flex-grow items-center justify-center align-middle text-xs opacity-50">
                 Loading ...
@@ -110,7 +102,8 @@ function Console() {
               <PropertiesRenderer pauseId={pauseId!} object={sanitizedConsoleProps} />
             )}
           </div>
-        </ErrorBoundary>      
-    </div>
+        </ErrorBoundary>
+      </div>
+    </>
   );
 }
