@@ -78,32 +78,35 @@ function Console() {
 
   return (
     <>
-      <div onClick={() => setShowStepDetails(!showStepDetails)}>Do it</div>
       <div
-        className={`flex h-64 flex-shrink-0 flex-col overflow-auto py-2 ${
-          showStepDetails ? "visible" : "hidden"
-        }`}
+        className={`overflow-none flex flex-shrink-0 flex-col py-2 ${
+          showStepDetails ? "h-64" : "h-12"
+        } delay-0 duration-300 ease-in-out`}
         style={{
-          borderTop: "2px solid var(--chrome)",
+          borderTop: "1px solid var(--chrome)",
         }}
         key={pauseId || "no-pause-id"}
       >
         <div
-          className="text-md p-2 px-4"
+          className="text-md var(--theme-tab-font-size) p-2  px-4 hover:cursor-pointer"
+          onClick={() => setShowStepDetails(!showStepDetails)}
           style={{
             fontSize: "15px",
           }}
         >
-          Step Details
+          <div className="flex select-none items-center space-x-2">
+            <div className={`img arrow ${showStepDetails ? "expanded" : null}`}></div>
+            <span className="overflow-hidden overflow-ellipsis whitespace-pre">Step Details</span>
+          </div>
         </div>
 
         <ErrorBoundary fallback={errorFallback}>
           <div
-            className={`flex flex-grow flex-col gap-1 bg-green-500 p-2 font-mono ${
+            className={`flex flex-grow flex-col gap-1 p-2 font-mono transition-all ${
               showStepDetails ? "visible" : "hidden"
             }`}
           >
-            <div className={`flex flex-grow flex-col gap-1 bg-red-500 p-2 font-mono`}>
+            <div className={`flex flex-grow flex-col gap-1 p-2 font-mono`}>
               {loading ? (
                 <div className="flex flex-grow items-center justify-center align-middle text-xs opacity-50">
                   Loading ...
