@@ -39,6 +39,29 @@ export async function addBreakpoint(
   await waitForBreakpoint(page, options);
 }
 
+export async function addConditional(page: Page, lineNumber: number) {
+  const contextMenu = page.locator(`[data-test-id="LogPointContextMenu-Line-${lineNumber}"]`);
+  const isVisible = await contextMenu.isVisible();
+  if (!isVisible) {
+    const pointPanelLocator = getPointPanelLocator(page, lineNumber);
+    const capsule = pointPanelLocator.locator('[data-test-name="LogPointCapsule"]');
+    await capsule.click();
+
+    await contextMenu.waitFor();
+  }
+
+  const contextMenuItem = contextMenu.locator(
+    '[data-test-name="ContextMenuItem-ToggleConditional"]'
+  );
+  await contextMenuItem.waitFor();
+  const state = await contextMenuItem.getAttribute("data-test-state");
+  if (state === "false") {
+    await debugPrint(page, `Adding conditional to line ${lineNumber}`, "addConditional");
+
+    await contextMenuItem.click();
+  }
+}
+
 async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
   const lineLocator = await getSourceLine(page, lineNumber);
   const lineIsVisible = await lineLocator.isVisible();
@@ -180,7 +203,7 @@ export async function editLogPoint(
         "addLogpoint"
       );
 
-      await line.locator('[data-test-name="PointPanel-AddConditionButton"]').click();
+      await addConditional(page, lineNumber);
 
       await typeLexical(
         page,
@@ -445,7 +468,7 @@ export async function verifyLogpointStep(
 
   const line = await getSourceLine(page, lineNumber);
   const status = line.locator(`[data-test-name="LogPointStatus"]:has-text("${expectedStatus}")`);
-  await status.waitFor({ state: "visible" });
+  await status.waitFor();
 }
 
 // TODO [FE-626] Rewrite this helper to reduce complexity.

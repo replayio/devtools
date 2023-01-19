@@ -1,0 +1,29 @@
+.Capsule {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  padding: 0 2ch;
+  height: 1rem;
+  border-radius: 1rem;
+
+  background-color: var(--point-panel-timeline-label-background-color);
+  color: var(--point-panel-timeline-label-color);
+
+  font-size: var(--font-size-tiny);
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+}
+
+.Label {
+  flex: 1 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.CaretIcon {
+  flex: 0 0 0.5rem;
+  height: 0.5rem;
+  width: 0.5rem;
+}

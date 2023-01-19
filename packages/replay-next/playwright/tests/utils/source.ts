@@ -194,7 +194,7 @@ export async function editLogPoint(
     );
 
     if (!isConditionInputVisible) {
-      await pointPanelLocator.locator(`[data-test-name=PointPanel-AddConditionButton]`).click();
+      await addConditional(page, lineNumber);
     }
     await clearTextArea(page, conditionLocator);
     await conditionLocator.fill(condition);
@@ -203,6 +203,29 @@ export async function editLogPoint(
   if (saveAfterEdit) {
     const saveButton = pointPanelLocator.locator('[data-test-name="PointPanel-SaveButton"]');
     await saveButton.click({ force: true });
+  }
+}
+
+export async function addConditional(page: Page, lineNumber: number) {
+  const contextMenu = page.locator(`[data-test-id="LogPointContextMenu-Line-${lineNumber}"]`);
+  const isVisible = await contextMenu.isVisible();
+  if (!isVisible) {
+    const pointPanelLocator = getPointPanelLocator(page, lineNumber);
+    const capsule = pointPanelLocator.locator('[data-test-name="LogPointCapsule"]');
+    await capsule.click();
+
+    await contextMenu.waitFor();
+  }
+
+  const contextMenuItem = contextMenu.locator(
+    '[data-test-name="ContextMenuItem-ToggleConditional"]'
+  );
+  await contextMenuItem.waitFor();
+  const state = await contextMenuItem.getAttribute("data-test-state");
+  if (state === "false") {
+    await debugPrint(page, `Adding conditional to line ${lineNumber}`, "addConditional");
+
+    await contextMenuItem.click();
   }
 }
 

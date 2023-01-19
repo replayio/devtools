@@ -3,14 +3,14 @@ import { useContext, useState } from "react";
 import { PointsContext } from "replay-next/src/contexts/PointsContext";
 import { Badge, Point } from "shared/client/types";
 
-import Icon from "../Icon";
-import { getBadgeStyleVars } from "./utils/getBadgeStyleVars";
+import Icon from "../../Icon";
+import { getBadgeStyleVars } from "../utils/getBadgeStyleVars";
 import styles from "./BadgePicker.module.css";
 
 // Three states prevents close animation from being shown on mount.
 type State = "initial" | "open" | "closed";
 
-export default function BadgePicker({ point }: { point: Point }) {
+export default function BadgePicker({ invalid, point }: { invalid: boolean; point: Point }) {
   const { editPoint } = useContext(PointsContext);
 
   const [state, setState] = useState<State>("initial");
@@ -24,9 +24,9 @@ export default function BadgePicker({ point }: { point: Point }) {
   const isOpen = state === "open";
 
   return (
-    <div className={styles.BadgePicker}>
+    <div className={styles.BadgePicker} data-invalid={invalid || undefined}>
       <button
-        className={`${styles.BadgePickerButton} ${styles.BadgePickerButtonToggle}`}
+        className={styles.BadgePickerButton}
         data-test-name={isOpen ? "BadgeButtonButton-default" : "BadgePickerButton"}
         data-test-state={point.badge || "default"}
         onClick={() => (isOpen ? toggle(null) : setState("open"))}

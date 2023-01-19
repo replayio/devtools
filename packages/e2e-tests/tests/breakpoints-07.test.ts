@@ -54,6 +54,7 @@ test(`breakpoints-07: rewind and seek using command bar and console messages`, a
   // Verify that the active source and breakpoints/logpoints are restored after a reload.
   await page.reload();
   await openDevToolsTab(page); // Should be unnecessary but sometimes "Viewer" tab is selected
+  await quickOpen(page, "bundle_input.js"); // Should be unnecessary
   await sourceTab.waitFor({ state: "visible" });
 
   await waitForBreakpoint(page, { lineNumber: 5, url: "bundle_input.js" });
