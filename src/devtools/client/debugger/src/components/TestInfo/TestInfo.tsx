@@ -4,6 +4,7 @@ import React, { createContext, useContext, useMemo, useState } from "react";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
+import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { getSelectedTest } from "ui/reducers/reporter";
 import { useAppSelector } from "ui/setup/hooks";
 import { TestItem } from "ui/types";
@@ -53,6 +54,11 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
 function Console() {
   const { loading, pauseId, consoleProps } = useContext(TestInfoContext);
 
+  const [showStepDetails, setShowStepDetails] = useLocalStorage<boolean>(
+    `Replay:TestInfo:StepDetails`,
+    true
+  );
+
   const sanitizedConsoleProps = useMemo(() => {
     const sanitized = cloneDeep(consoleProps);
     if (sanitized?.preview?.properties) {
@@ -76,34 +82,49 @@ function Console() {
   );
 
   return (
-    <div
-      className="h-100 flex h-64 flex-shrink-0 flex-col overflow-auto py-2"
-      style={{
-        borderTop: "2px solid var(--chrome)",
-      }}
-      key={pauseId || "no-pause-id"}
-    >
+    <>
       <div
-        className="text-md p-2 px-4"
+        className={`overflow-none flex flex-shrink-0 flex-col py-2 ${
+          showStepDetails ? "h-64" : "h-12"
+        } delay-0 duration-300 ease-in-out`}
         style={{
-          fontSize: "15px",
+          borderTop: "1px solid var(--chrome)",
         }}
+        key={pauseId || "no-pause-id"}
       >
-        Step Details
-      </div>
-      <ErrorBoundary fallback={errorFallback}>
-        <div className="flex flex-grow flex-col gap-1 p-2 font-mono">
-          {loading ? (
-            <div className="flex flex-grow items-center justify-center align-middle text-xs opacity-50">
-              Loading ...
-            </div>
-          ) : hideProps ? (
-            errorFallback
-          ) : (
-            <PropertiesRenderer pauseId={pauseId!} object={sanitizedConsoleProps} />
-          )}
+        <div
+          className="text-md var(--theme-tab-font-size) p-2  px-4 hover:cursor-pointer"
+          onClick={() => setShowStepDetails(!showStepDetails)}
+          style={{
+            fontSize: "15px",
+          }}
+        >
+          <div className="flex select-none items-center space-x-2">
+            <div className={`img arrow ${showStepDetails ? "expanded" : null}`}></div>
+            <span className="overflow-hidden overflow-ellipsis whitespace-pre">Step Details</span>
+          </div>
         </div>
-      </ErrorBoundary>
-    </div>
+
+        <ErrorBoundary fallback={errorFallback}>
+          <div
+            className={`flex flex-grow flex-col gap-1 p-2 font-mono transition-all ${
+              showStepDetails ? "visible" : "hidden"
+            }`}
+          >
+            <div className={`flex flex-grow flex-col gap-1 p-2 font-mono`}>
+              {loading ? (
+                <div className="flex flex-grow items-center justify-center align-middle text-xs opacity-50">
+                  Loading ...
+                </div>
+              ) : hideProps ? (
+                errorFallback
+              ) : (
+                <PropertiesRenderer pauseId={pauseId!} object={sanitizedConsoleProps} />
+              )}
+            </div>
+          </div>
+        </ErrorBoundary>
+      </div>
+    </>
   );
 }
