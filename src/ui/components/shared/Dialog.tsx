@@ -3,17 +3,9 @@ import React, { HTMLProps } from "react";
 
 import ReplayLogo from "./ReplayLogo";
 
-export type DialogPropTypes = HTMLProps<HTMLDivElement> & { showFooterLinks?: boolean } & {
-  showIllustration?: boolean;
-};
+export type DialogPropTypes = HTMLProps<HTMLDivElement> & { showFooterLinks?: boolean };
 
-export function Dialog({
-  children,
-  className,
-  showFooterLinks,
-  showIllustration,
-  ...props
-}: DialogPropTypes) {
+export function Dialog({ children, className, showFooterLinks, ...props }: DialogPropTypes) {
   return (
     <>
       <div
@@ -22,7 +14,6 @@ export function Dialog({
         role="dialog"
         style={{ animation: "linearFadeIn ease 200ms", width: 400 }}
       >
-        {showIllustration ? <DialogIllustration /> : null}
         {children}
       </div>
 
@@ -59,18 +50,6 @@ export const DialogLogo = ({ className, ...props }: HTMLProps<HTMLDivElement>) =
   return (
     <div {...props} className={classNames("mb-5 flex justify-center", className)}>
       <ReplayLogo size="md" />
-    </div>
-  );
-};
-
-export const DialogIllustration = ({
-  children,
-  className,
-  ...props
-}: HTMLProps<HTMLHeadingElement>) => {
-  return (
-    <div>
-      <img src="/images/illustrations/ready1.png" className="w-fill mb-8 rounded-lg" />
     </div>
   );
 };
