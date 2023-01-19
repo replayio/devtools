@@ -1,8 +1,9 @@
-import { Object as ProtocolObject, createPauseResult } from "@replayio/protocol";
+import { Object as ProtocolObject } from "@replayio/protocol";
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
+import { evaluateAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { getCurrentPoint } from "ui/actions/app";
 import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
@@ -125,50 +126,66 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
           const callerFrame = frames[1];
 
           if (messageEnd?.commandVariable) {
-            const cmdResult = await client.evaluateExpression(
+            const cmdResult = await evaluateAsync(
+              client,
               endPauseResult.pauseId,
-              `${messageEnd.commandVariable}.get("subject")`,
-              callerFrame.frameId
+              callerFrame.frameId,
+              `${messageEnd.commandVariable}.get("subject")`
             );
 
-            const cmdObject = cmdResult.data.objects?.find(
-              o => o.objectId === cmdResult.returned?.object
-            );
-            const length: number | undefined = cmdObject?.preview?.properties?.find(
-              o => o.name === "length"
-            )?.value;
-            const subjects = Array.from({ length: length || 0 }, (_, i) =>
-              cmdResult.data.objects?.find(
-                obj =>
-                  obj.objectId ===
-                  cmdObject?.preview?.properties?.find(p => p.name === String(i))?.object
-              )
-            );
+            const cmdObjectId = cmdResult.returned?.object;
 
-            const nodeIds = subjects.filter(s => s?.preview?.node).map(s => s?.objectId!);
-            setSubjectNodePauseData({ pauseId: endPauseResult.pauseId, nodeIds });
+            if (cmdObjectId) {
+              const cmdObject = await getObjectWithPreviewHelper(
+                client,
+                endPauseResult.pauseId,
+                cmdObjectId,
+                true
+              );
+
+              const length: number | undefined = cmdObject?.preview?.properties?.find(
+                o => o.name === "length"
+              )?.value;
+              const nodeIds = Array.from(
+                { length: length || 0 },
+                (_, i) =>
+                  cmdObject.preview?.properties?.find(
+                    obj =>
+                      obj.object ===
+                      cmdObject?.preview?.properties?.find(p => p.name === String(i))?.object
+                  )?.object
+              ).filter((s): s is string => typeof s === "string");
+
+              setSubjectNodePauseData({ pauseId: endPauseResult.pauseId, nodeIds });
+            }
           }
 
           if (messageEnd?.logVariable) {
-            const logResult = await client.evaluateExpression(
+            const logResult = await evaluateAsync(
+              client,
               endPauseResult.pauseId,
-              messageEnd.logVariable,
-              callerFrame.frameId
+              callerFrame.frameId,
+              messageEnd.logVariable
             );
 
-            const consolePropsProperty = returnFirst(logResult.data.objects, o => {
-              return logResult.returned && o.objectId === logResult.returned.object
-                ? returnFirst(o.preview?.properties, p => (p.name === "consoleProps" ? p : null))
-                : null;
-            });
-
-            if (consolePropsProperty?.object) {
-              consoleProps = await getObjectWithPreviewHelper(
+            if (logResult.returned?.object) {
+              const logObject = await getObjectWithPreviewHelper(
                 client,
                 endPauseResult.pauseId,
-                consolePropsProperty.object,
-                true
+                logResult.returned.object
               );
+              const consolePropsProperty = returnFirst(logObject.preview?.properties, p =>
+                p.name === "consoleProps" ? p : null
+              );
+
+              if (consolePropsProperty?.object) {
+                consoleProps = await getObjectWithPreviewHelper(
+                  client,
+                  endPauseResult.pauseId,
+                  consolePropsProperty.object,
+                  true
+                );
+              }
             }
           }
 
