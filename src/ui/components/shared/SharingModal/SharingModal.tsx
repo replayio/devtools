@@ -88,7 +88,15 @@ function CollaboratorRequests({ recording }: { recording: Recording }) {
   );
 }
 
-function CollaboratorsSection({ recording }: { recording: Recording }) {
+function CollaboratorsSection({
+  recording,
+  showPrivacy,
+  setShowPrivacy,
+}: {
+  recording: Recording;
+  showPrivacy: boolean;
+  setShowPrivacy: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const { hasNoRole, loading } = useHasNoRole();
 
   if (hasNoRole || loading) {
@@ -100,12 +108,23 @@ function CollaboratorsSection({ recording }: { recording: Recording }) {
       <div className="flex w-full flex-col justify-between space-y-3">
         <div className="w-full space-y-4">
           <div>
-            <div className="font-bold">Team</div>
+            <div className="mb-2 font-bold">Team</div>
 
             <div className="rounded-md border border border-transparent bg-themeTextFieldBgcolor p-2 hover:bg-themeTextFieldBgcolorHover">
               <PrivacyDropdown {...{ recording }} />
             </div>
-            <div className="mt-4 font-bold">Add People</div>
+
+            <div>
+              {!recording.private && recording.operations && (
+                <ToggleShowPrivacyButton
+                  showPrivacy={showPrivacy}
+                  operations={recording.operations}
+                  setShowPrivacy={setShowPrivacy}
+                />
+              )}
+            </div>
+
+            <div className="mt-4 mb-2 font-bold">Add People</div>
 
             <Collaborators recordingId={recording.id} />
           </div>
@@ -147,7 +166,11 @@ function SharingSection({
 }) {
   return (
     <>
-      <CollaboratorsSection recording={recording} />
+      <CollaboratorsSection
+        recording={recording}
+        showPrivacy={showPrivacy}
+        setShowPrivacy={setShowPrivacy}
+      />
       <section className="flex flex-col bg-menuHoverBgcolor px-4 pb-5 pt-3">
         <div className="mb-2 font-bold">Sharing Options</div>
 
@@ -158,15 +181,6 @@ function SharingSection({
           <div>
             <DownloadSection recording={recording} />
           </div>
-        </div>
-        <div>
-          {!recording.private && recording.operations && (
-            <ToggleShowPrivacyButton
-              showPrivacy={showPrivacy}
-              operations={recording.operations}
-              setShowPrivacy={setShowPrivacy}
-            />
-          )}
         </div>
       </section>
     </>
@@ -303,7 +317,7 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
           ) : null}
         </div>
         {showPrivacy ? (
-          <div className="relative flex overflow-auto bg-menuHoverBgcolor">
+          <div className="relative flex overflow-auto bg-themeBase-90">
             <Privacy />
           </div>
         ) : null}
