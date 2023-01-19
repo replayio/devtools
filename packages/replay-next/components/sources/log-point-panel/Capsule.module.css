@@ -14,6 +14,10 @@
   font-variant-numeric: tabular-nums;
 }
 
+.Capsule:hover {
+  cursor: pointer;
+}
+
 .Label {
   flex: 1 0 auto;
   display: flex;
