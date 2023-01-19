@@ -88,6 +88,8 @@
   flex-direction: row;
   align-items: center;
 
+  cursor: text;
+
   /* Firefox fixes */
   scrollbar-width: thin;
   scrollbar-color: var(--scroll-thumb-color) transparent;
@@ -108,12 +110,20 @@
   background: none;
   border: none;
   margin: 0;
+  cursor: pointer;
+}
+.EditButton[data-invalid],
+.EditButton:disabled,
+.RemoveConditionalButton[data-invalid],
+.RemoveConditionalButton:disabled,
+.SaveButton[data-invalid],
+.SaveButton:disabled {
+  cursor: default;
 }
 
 .EditButton {
   flex-grow: 0;
   flex-shrink: 0;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -204,7 +214,6 @@
 }
 .SaveButton[data-invalid] {
   background-color: var(--background-color-primary-button-disabled);
-  cursor: default;
 }
 .SaveButton:disabled {
   background-color: var(--background-color-primary-button-disabled);
