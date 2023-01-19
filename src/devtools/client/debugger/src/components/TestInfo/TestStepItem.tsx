@@ -24,13 +24,6 @@ import { TestInfoContext } from "./TestInfo";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { TestStepRow } from "./TestStepRow";
 
-export function returnFirst<T, R>(
-  list: T[] | undefined,
-  fn: (value: T, index: number, list: T[]) => R | null
-) {
-  return list ? list.reduce<R | null>((acc, v, i, l) => acc ?? fn(v, i, l), null) : null;
-}
-
 function useStepState(step: AnnotatedTestStep) {
   const currentTime = useAppSelector(getCurrentTime);
   const currentPoint = useAppSelector(getCurrentPoint);
@@ -174,8 +167,8 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
                 endPauseResult.pauseId,
                 logResult.returned.object
               );
-              const consolePropsProperty = returnFirst(logObject.preview?.properties, p =>
-                p.name === "consoleProps" ? p : null
+              const consolePropsProperty = logObject.preview?.properties?.find(
+                p => p.name === "consoleProps"
               );
 
               if (consolePropsProperty?.object) {
