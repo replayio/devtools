@@ -4,6 +4,7 @@ import { openContextMenu, toggleProtocolMessages, verifyConsoleMessage } from ".
 import { delay, getTestUrl, stopHovering, takeScreenshot, waitFor } from "./utils/general";
 import {
   addBreakPoint,
+  addConditional,
   addLogPoint,
   clearSearchResult,
   editLogPoint,
@@ -21,6 +22,7 @@ import {
   goToPreviousSourceSearchResult,
   openSourceFile,
   removeBreakPoint,
+  removeConditional,
   removeLogPoint,
   searchSourceText,
   searchSourcesByName,
@@ -347,7 +349,7 @@ test("should support continue to next and previous functionality", async ({ page
 
 test("should allow log point badge colors to be toggled", async ({ page }) => {
   const pointPanelLocator = getPointPanelLocator(page, 13);
-  await addLogPoint(page, { sourceId, lineNumber: 13 });
+  await addLogPoint(page, { sourceId, lineNumber: 13, saveAfterEdit: true });
   await takeScreenshot(page, pointPanelLocator, "point-panel-default-badge");
   await toggleLogPointBadge(page, { sourceId, lineNumber: 13, badge: "green" });
   await takeScreenshot(page, pointPanelLocator, "point-panel-green-badge");
@@ -561,4 +563,19 @@ test("should properly toggle breakable and loggable behaviors when there are mul
   await removeLogPoint(page, { lineNumber, sourceId });
   await stopHovering(page);
   await takeScreenshot(page, lineLocator, "line-4-column-22-should-break");
+});
+
+test("should expand and contract line height when log points are added and removed", async ({
+  page,
+}) => {
+  const lineLocator = getSourceLineLocator(page, sourceId, 13);
+  await takeScreenshot(page, lineLocator, "line-without-log-point");
+  await addLogPoint(page, { sourceId, lineNumber: 13 });
+  await takeScreenshot(page, lineLocator, "line-with-log-point");
+  await addConditional(page, { condition: "true", lineNumber: 13, sourceId });
+  await takeScreenshot(page, lineLocator, "line-with-conditional-log-point");
+  await removeConditional(page, { lineNumber: 13, sourceId });
+  await takeScreenshot(page, lineLocator, "line-with-log-point");
+  await removeLogPoint(page, { sourceId, lineNumber: 13 });
+  await takeScreenshot(page, lineLocator, "line-without-log-point");
 });

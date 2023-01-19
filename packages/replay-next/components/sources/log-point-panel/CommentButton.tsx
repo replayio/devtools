@@ -3,7 +3,7 @@ import { useContext, useMemo, useState } from "react";
 
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 
-import Icon from "../Icon";
+import Icon from "../../Icon";
 import styles from "./CommentButton.module.css";
 
 // Three states prevents close animation from being shown on mount.

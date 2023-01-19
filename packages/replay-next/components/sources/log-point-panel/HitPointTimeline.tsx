@@ -1,13 +1,5 @@
 import { TimeStampedPoint } from "@replayio/protocol";
-import {
-  CSSProperties,
-  MouseEvent,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { MouseEvent, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import Icon from "replay-next/components/Icon";
@@ -15,28 +7,33 @@ import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { imperativelyGetClosestPointForTime } from "replay-next/src/suspense/PointsCache";
 import {
-  formatTimestamp,
   isExecutionPointsGreaterThan,
   isExecutionPointsLessThan,
 } from "replay-next/src/utils/time";
+import { formatTimestamp } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { HitPointStatus, Point } from "shared/client/types";
 
-import { getBadgeStyleVars } from "./utils/getBadgeStyleVars";
-import { findHitPoint, findHitPointAfter, findHitPointBefore } from "./utils/points";
-import styles from "./PointPanelTimeline.module.css";
+import { findHitPointAfter, findHitPointBefore } from "../utils/points";
+import { findHitPoint } from "../utils/points";
+import Capsule from "./Capsule";
+import styles from "./HitPointTimeline.module.css";
 
-export default function PointPanelTimeline({
+export default function HitPointTimeline({
+  hasConditional,
   hitPoints,
   hitPointStatus,
   point,
+  toggleConditional,
 }: {
+  hasConditional: boolean;
   hitPoints: TimeStampedPoint[];
   hitPointStatus: HitPointStatus;
   point: Point;
+  toggleConditional: () => void;
 }) {
   const client = useContext(ReplayClientContext);
-  const { duration, trackEvent } = useContext(SessionContext);
+  const { duration } = useContext(SessionContext);
   const {
     executionPoint: currentExecutionPoint,
     isPending,
@@ -61,43 +58,6 @@ export default function PointPanelTimeline({
   }, [currentTime]);
 
   const [currentHitPoint, currentHitPointIndex] = findHitPoint(hitPoints, currentExecutionPoint);
-
-  const firstHitPoint = hitPoints.length > 0 ? hitPoints[0] : null;
-  const lastHitPoint = hitPoints.length > 0 ? hitPoints[hitPoints.length - 1] : null;
-  const previousButtonEnabled =
-    firstHitPoint != null && isExecutionPointsLessThan(firstHitPoint.point, currentExecutionPoint);
-  const nextButtonEnabled =
-    lastHitPoint != null && isExecutionPointsGreaterThan(lastHitPoint.point, currentExecutionPoint);
-
-  const goToPrevious = () => {
-    const [prevHitPoint] = findHitPointBefore(hitPoints, currentExecutionPoint);
-    if (prevHitPoint !== null) {
-      setOptimisticTime(prevHitPoint.time);
-      update(prevHitPoint.time, prevHitPoint.point, false);
-    }
-  };
-  const goToNext = () => {
-    const [nextHitPoint] = findHitPointAfter(hitPoints, currentExecutionPoint);
-    if (nextHitPoint !== null) {
-      setOptimisticTime(nextHitPoint.time);
-      update(nextHitPoint.time, nextHitPoint.point, false);
-    }
-  };
-
-  const label =
-    currentHitPointIndex !== null
-      ? `${currentHitPointIndex + 1}/${hitPoints.length}`
-      : hitPoints.length;
-
-  let tooManyPointsToFind = false;
-  switch (hitPointStatus) {
-    case "too-many-points-to-find":
-    case "unknown-error":
-      tooManyPointsToFind = true;
-      break;
-  }
-
-  const badgeStyle = getBadgeStyleVars(point.badge);
 
   const onTimelineClick = async (event: MouseEvent) => {
     if (isPending) {
@@ -131,43 +91,58 @@ export default function PointPanelTimeline({
     setHoverCoordinates({ clientX: event.clientX, clientY: event.clientY });
   };
 
+  const firstHitPoint = hitPoints.length > 0 ? hitPoints[0] : null;
+  const lastHitPoint = hitPoints.length > 0 ? hitPoints[hitPoints.length - 1] : null;
+  const previousButtonEnabled =
+    firstHitPoint != null && isExecutionPointsLessThan(firstHitPoint.point, currentExecutionPoint);
+  const nextButtonEnabled =
+    lastHitPoint != null && isExecutionPointsGreaterThan(lastHitPoint.point, currentExecutionPoint);
+
+  const goToPrevious = () => {
+    const [prevHitPoint] = findHitPointBefore(hitPoints, currentExecutionPoint);
+    if (prevHitPoint !== null) {
+      setOptimisticTime(prevHitPoint.time);
+      update(prevHitPoint.time, prevHitPoint.point, false);
+    }
+  };
+  const goToNext = () => {
+    const [nextHitPoint] = findHitPointAfter(hitPoints, currentExecutionPoint);
+    if (nextHitPoint !== null) {
+      setOptimisticTime(nextHitPoint.time);
+      update(nextHitPoint.time, nextHitPoint.point, false);
+    }
+  };
+
   const disableButtons = isPending && optimisticTime === null;
 
   return (
-    <>
+    <div className={styles.PointPanelTimeline}>
       <button
-        className={styles.PreviousHitPointButton}
+        className={styles.PreviousButton}
         data-test-name="PreviousHitPointButton"
         disabled={disableButtons || !previousButtonEnabled}
         onClick={goToPrevious}
       >
-        <Icon className={styles.PreviousHitPointButtonIcon} type="arrow-left" />
+        <Icon className={styles.PreviousButtonIcon} type="arrow-left" />
       </button>
-      {tooManyPointsToFind ? (
-        <div
-          className={styles.HitPointsLabelTooMany}
-          data-test-name="LogPointStatus"
-          style={badgeStyle as CSSProperties}
-        >
-          -
-        </div>
-      ) : (
-        <div
-          className={styles.HitPointsLabel}
-          data-test-name="LogPointStatus"
-          style={badgeStyle as CSSProperties}
-        >
-          {label}
-        </div>
-      )}
+      <Capsule
+        currentHitPoint={currentHitPoint}
+        currentHitPointIndex={currentHitPointIndex}
+        hasConditional={hasConditional}
+        hitPoints={hitPoints}
+        hitPointStatus={hitPointStatus}
+        point={point}
+        toggleConditional={toggleConditional}
+      />
       <button
-        className={styles.NextHitPointButton}
+        className={styles.NextButton}
         data-test-name="NextHitPointButton"
         disabled={disableButtons || !nextButtonEnabled}
         onClick={goToNext}
       >
-        <Icon className={styles.NextHitPointButtonIcon} type="arrow-right" />
+        <Icon className={styles.NextButtonIcon} type="arrow-right" />
       </button>
+      <span /> {/* Spacer */}
       <div
         className={isPending ? styles.HitPointTimelineDisabled : styles.HitPointTimeline}
         data-test-name="PointPanelTimeline"
@@ -226,7 +201,7 @@ export default function PointPanelTimeline({
           />
         )}
       </div>
-    </>
+    </div>
   );
 }
 

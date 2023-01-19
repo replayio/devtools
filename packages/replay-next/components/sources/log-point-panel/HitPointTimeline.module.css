@@ -1,52 +1,8 @@
-.NextHitPointButton,
-.PreviousHitPointButton {
-  flex: 0 0 1rem;
-  height: 1rem;
-  width: 1rem;
+.PointPanelTimeline {
+  flex: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 1rem;
-  background-color: var(--point-panel-timeline-button-background-color);
-  color: var(--point-panel-timeline-button-color);
-  box-shadow: var(--point-panel-timeline-button-shadow);
-  transition: opacity 250ms;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  cursor: pointer;
-}
-
-.NextHitPointButton:disabled,
-.PreviousHitPointButton:disabled {
-  color: var(--point-panel-timeline-button-color-disabled);
-  cursor: default;
-}
-
-.NextHitPointButtonIcon,
-.PreviousHitPointButtonIcon {
-  height: 0.75rem;
-  width: 0.75rem;
-}
-
-.HitPointsLabel,
-.HitPointsLabelTooMany {
-  font-size: var(--font-size-medium);
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 1rem;
-  min-width: 7ch;
-  padding: 0 1ch;
-  border-radius: 1rem;
-
-  background-color: var(--point-panel-timeline-label-background-color);
-  color: var(--point-panel-timeline-label-color);
-}
-.HitPointsLabelTooMany {
+  gap: 0.25rem;
 }
 
 .HitPointTimeline,
@@ -119,4 +75,37 @@
   margin-top: -0.25rem;
   background-color: var(--background-color-default);
   color: var(--color-default);
+}
+
+.NextButton,
+.PreviousButton {
+  flex: 0 0 1rem;
+  height: 1rem;
+  width: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 1rem;
+  background-color: var(--point-panel-timeline-button-background-color);
+  color: var(--point-panel-timeline-button-color);
+  box-shadow: var(--point-panel-timeline-button-shadow);
+  transition: opacity 250ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+}
+
+.NextButton:disabled,
+.PreviousButton:disabled {
+  color: var(--point-panel-timeline-button-color-disabled);
+  cursor: default;
+}
+
+.NextButtonIcon,
+.PreviousButtonIcon {
+  height: 0.75rem;
+  width: 0.75rem;
 }

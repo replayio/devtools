@@ -31,7 +31,7 @@ import { Point } from "shared/client/types";
 import ColumnBreakpointMarker from "./ColumnBreakpointMarker";
 import CurrentLineHighlight from "./CurrentLineHighlight";
 import HoverButton from "./HoverButton";
-import PointPanel from "./PointPanel";
+import LogPointPanel from "./log-point-panel/LogPointPanel";
 import SourceLineLoadingPlaceholder from "./SourceLineLoadingPlaceholder";
 import { formatHitCount } from "./utils/formatHitCount";
 import { findPointsForLocation } from "./utils/points";
@@ -43,6 +43,9 @@ const syntaxHighlightingEnabled =
   typeof window !== "undefined" &&
   new URL(window?.location?.href).searchParams.get("disableSyntaxHighlighting") == null;
 
+export type PointStateEnum = "point" | "point-with-conditional";
+export type SetLinePointState = (lineIndex: number, state: PointStateEnum | null) => void;
+
 export type ItemData = {
   addPoint: AddPoint;
   breakablePositionsByLine: Map<number, SameLineSourceLocations>;
@@ -53,7 +56,10 @@ export type ItemData = {
   minHitCount: number | null;
   onLineMouseEnter: (lineIndex: number, lineNumberNode: HTMLElement) => void;
   onLineMouseLeave: (lineIndex: number, lineNumberNode: HTMLElement) => void;
+  pointPanelHeight: number;
+  pointPanelWithConditionalHeight: number;
   points: Point[];
+  setLinePointState: SetLinePointState;
   showColumnBreakpoints: boolean;
   showHitCounts: boolean;
   source: ProtocolSource;
@@ -62,7 +68,7 @@ export type ItemData = {
 
 const SourceListRow = memo(
   ({ data, index, style }: { data: ItemData; index: number; style: CSSProperties }) => {
-    const { cursorColumnIndex, cursorLineIndex, setCursorLocation } = useContext(SourcesContext);
+    const { setCursorLocation } = useContext(SourcesContext);
     const { isTransitionPending: isFocusRangePending } = useContext(FocusContext);
     const [searchState] = useContext(SourceSearchContext);
 
@@ -91,6 +97,7 @@ const SourceListRow = memo(
       onLineMouseEnter,
       onLineMouseLeave,
       points,
+      setLinePointState,
       showColumnBreakpoints,
       showHitCounts,
       source,
@@ -390,13 +397,20 @@ const SourceListRow = memo(
                   lineHitCounts={lineHitCounts}
                   lineNumber={lineNumber}
                   point={firstPoint}
+                  setLinePointState={setLinePointState}
                   source={source}
                 />
               </Suspense>
             )}
           </div>
 
-          {showPointPanel && <PointPanel className={styles.PointPanel} point={firstPoint} />}
+          {showPointPanel && (
+            <LogPointPanel
+              className={styles.PointPanel}
+              point={firstPoint}
+              setLinePointState={setLinePointState}
+            />
+          )}
         </div>
 
         <CurrentLineHighlight lineNumber={lineNumber} sourceId={sourceId} />

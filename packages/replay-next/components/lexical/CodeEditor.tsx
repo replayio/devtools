@@ -5,6 +5,7 @@ import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { createEmptyHistoryState } from "@lexical/react/LexicalHistoryPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { $selectAll } from "@lexical/selection";
 import { $rootTextContent } from "@lexical/text";
 import {
   $getRoot,
@@ -18,7 +19,7 @@ import {
   SerializedEditorState,
   TextNode,
 } from "lexical";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 
 import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
 
@@ -37,6 +38,7 @@ const NODES: Array<Klass<LexicalNode>> = [LineBreakNode, CodeNode, TextNode];
 export default function CodeEditor({
   allowWrapping = true,
   autoFocus = false,
+  autoSelect = false,
   dataTestId,
   dataTestName,
   editable,
@@ -49,6 +51,7 @@ export default function CodeEditor({
 }: {
   allowWrapping?: boolean;
   autoFocus?: boolean;
+  autoSelect?: boolean;
   dataTestId?: string;
   dataTestName?: string;
   editable: boolean;
@@ -63,6 +66,27 @@ export default function CodeEditor({
 
   const editorRef = useRef<LexicalEditor>(null);
   const backupEditorStateRef = useRef<EditorState | null>(null);
+
+  const didMountRef = useRef(false);
+  useLayoutEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+
+      if (autoSelect) {
+        const editor = editorRef.current;
+        if (editor) {
+          editor.update(() => {
+            const root = $getRoot();
+            const firstChild = root.getFirstChild();
+            if (firstChild) {
+              const selection = firstChild.select(0, 0);
+              $selectAll(selection);
+            }
+          });
+        }
+      }
+    }
+  }, [autoSelect]);
 
   useEffect(() => {
     const editor = editorRef.current;

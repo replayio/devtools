@@ -3,6 +3,7 @@ import findLast from "lodash/findLast";
 import { useContext } from "react";
 
 import Icon from "replay-next/components/Icon";
+import { SetLinePointState } from "replay-next/components/sources/SourceListRow";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { KeyboardModifiersContext } from "replay-next/src/contexts/KeyboardModifiersContext";
 import { AddPoint, DeletePoints, EditPoint } from "replay-next/src/contexts/PointsContext";
@@ -18,12 +19,7 @@ import {
   isExecutionPointsLessThan,
 } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import {
-  POINT_BEHAVIOR_DISABLED,
-  POINT_BEHAVIOR_DISABLED_TEMPORARILY,
-  POINT_BEHAVIOR_ENABLED,
-  Point,
-} from "shared/client/types";
+import { POINT_BEHAVIOR_DISABLED, POINT_BEHAVIOR_ENABLED, Point } from "shared/client/types";
 import { LineHitCounts } from "shared/client/types";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 
@@ -38,6 +34,7 @@ export default function HoverButton({
   lineHitCounts,
   lineNumber,
   point,
+  setLinePointState,
   source,
 }: {
   addPoint: AddPoint;
@@ -48,6 +45,7 @@ export default function HoverButton({
   lineHitCounts: LineHitCounts | null;
   lineNumber: number;
   point: Point | null;
+  setLinePointState: SetLinePointState;
   source: ProtocolSource;
 }) {
   const { range: focusRange } = useContext(FocusContext);
@@ -141,6 +139,8 @@ export default function HoverButton({
           },
           location
         );
+
+        setLinePointState(lineNumber - 1, "point");
       }
     };
 
@@ -159,6 +159,8 @@ export default function HoverButton({
           });
         } else {
           deletePoints(point.id);
+
+          setLinePointState(lineNumber - 1, null);
         }
       }
     };

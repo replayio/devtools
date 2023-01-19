@@ -17,16 +17,24 @@ export async function getRecordingTarget(page: Page): Promise<RecordingTarget> {
 }
 
 export async function openDevToolsTab(page: Page) {
-  const tab = page.locator('[data-test-id="ViewToggle-DevTools"]');
+  // Wait for the page to load enough that it's safe to continue.
+  const header = page.locator('[data-test-name="Header"]');
+  await header.waitFor();
 
-  // The DevTools tab won't exist if it's a Node recording
+  // The DevTools tab won't exist if it's a Node recording.
+  const tab = page.locator('[data-test-id="ViewToggle-DevTools"]');
   if (await tab.isVisible()) {
     await tab.click();
   }
 }
 
 export async function openViewerTab(page: Page) {
-  return page.locator('[data-test-id="ViewToggle-Viewer"]').click();
+  // Wait for the page to load enough that it's safe to continue.
+  const header = page.locator('[data-test-name="Header"]');
+  await header.waitFor();
+
+  const tab = page.locator('[data-test-id="ViewToggle-Viewer"]');
+  await tab.click();
 }
 
 export async function startTest(page: Page, example: string) {

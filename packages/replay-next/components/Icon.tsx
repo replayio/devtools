@@ -15,11 +15,13 @@ export default function Icon({
     | "arrow-right"
     | "breakpoint"
     | "cancel"
+    | "chevron-down"
     | "chevron-right"
     | "check"
     | "close"
     | "comment"
     | "comments"
+    | "conditional"
     | "confirm"
     | "continue-to-next"
     | "continue-to-previous"
@@ -43,6 +45,7 @@ export default function Icon({
     | "protocol"
     | "protocol-viewer"
     | "remove"
+    | "remove-alternate"
     | "rewind"
     | "save"
     | "search"
@@ -84,6 +87,9 @@ export default function Icon({
       path =
         "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z";
       break;
+    case "chevron-down":
+      path = "M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z";
+      break;
     case "chevron-right":
       path = "M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z";
       break;
@@ -110,6 +116,34 @@ export default function Icon({
     case "comments":
       path =
         "M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z";
+      break;
+    case "conditional":
+      path = (
+        <>
+          <g opacity={0.5}>
+            <path
+              clipRule="evenodd"
+              d="M1.5 5.69013C1.5 6.33298 2.02113 6.85411 2.66398 6.85411L16.6317 6.85411C17.2746 6.85411 17.7957 6.33298 17.7957 5.69013C17.7957 5.04728 17.2746 4.52615 16.6317 4.52615L2.66398 4.52615C2.02113 4.52615 1.5 5.04728 1.5 5.69013Z"
+              fill="currentColor"
+              fillRule="evenodd"
+            ></path>
+            <path
+              d="M21.8705 6.69786C22.6464 6.24984 22.6464 5.1298 21.8705 4.68179L16.6326 1.65769C15.8566 1.20967 14.8866 1.76969 14.8866 2.66572L14.8866 8.71392C14.8866 9.60996 15.8566 10.17 16.6326 9.72196L21.8705 6.69786Z"
+              fill="currentColor"
+            ></path>
+          </g>
+          <path
+            clipRule="evenodd"
+            d="M1.5 5.69015C1.5 6.333 2.02113 6.85413 2.66398 6.85413C4.155 6.85413 6.16581 6.87659 7.81772 7.85549C9.34116 8.75827 10.8118 10.6448 10.8118 15.002C10.8118 15.6448 11.333 16.166 11.9758 16.166C12.6186 16.166 13.1398 15.6448 13.1398 15.002C13.1398 10.0474 11.4095 7.27795 9.00451 5.85277C6.76418 4.52516 4.16689 4.52581 2.73256 4.52617C2.70939 4.52617 2.68653 4.52618 2.66398 4.52618C2.02113 4.52618 1.5 5.04731 1.5 5.69015Z"
+            fill="currentColor"
+            fillRule="evenodd"
+          ></path>
+          <path
+            d="M11.4944 22.316C11.7083 22.6863 12.2428 22.6863 12.4566 22.316L16.5346 15.2527C16.7484 14.8823 16.4812 14.4194 16.0535 14.4194L7.89751 14.4194C7.46989 14.4194 7.20262 14.8823 7.41644 15.2527L11.4944 22.316Z"
+            fill="currentColor"
+          ></path>
+        </>
+      );
       break;
     case "confirm":
       path = "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z";
@@ -202,6 +236,10 @@ export default function Icon({
       break;
     case "remove":
       path = "M19 13H5v-2h14v2z";
+      break;
+    case "remove-alternate":
+      path =
+        "M14.59 8L12 10.59 9.41 8 8 9.41 10.59 12 8 14.59 9.41 16 12 13.41 14.59 16 16 14.59 13.41 12 16 9.41 14.59 8zM12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z";
       break;
     case "rewind":
       path =

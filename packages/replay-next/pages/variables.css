@@ -291,9 +291,11 @@
   --value-type-html-text: #d7d7db;
 
   --point-panel-background-color: #1f2b43;
+  --point-panel-conditional-icon: var(--blue-40);
   --point-panel-input-background-color: #000000;
   --point-panel-input-border-color: transparent;
   --point-panel-input-border-color-hover: #273149;
+  --point-panel-input-border-color-focus: var(--theme-selection-background);
   --point-panel-input-edit-button-color: #747476;
   --point-panel-input-edit-button-color-hover: var(--primary-accent);
   --point-panel-input-cancel-button-color: #484445;
@@ -309,7 +311,8 @@
   --point-panel-timeline-label-color: var(--color-brand);
 
   --badge-picker-background-color: #28282a;
-  --badge-default-color: #747476;
+  --badge-picker-invalid-background-color: #724543;
+  --badge-default-color: rgba(255, 255, 255, 0.2);
   --badge-green-color: #69e261;
   --badge-green-contrast-color: #050;
   --badge-orange-color: #ff9a19;
@@ -758,10 +761,12 @@
   --value-type-html-text: #0c0c0d;
 
   --point-panel-background-color: #f0f1f4;
+  --point-panel-conditional-icon: var(--blue-60);
   --point-panel-input-background-color: #ffffff;
   --point-panel-input-border-color: transparent;
   --point-panel-input-border-color-hover: #e9ebef;
-  --point-panel-input-edit-button-color: var(--color-brand);
+  --point-panel-input-border-color-focus: var(--theme-selection-background);
+  --point-panel-input-edit-button-color: var(--color-dimmer);
   --point-panel-input-edit-button-color-hover: var(--primary-accent);
   --point-panel-input-cancel-button-color: #e2e2e2;
   --point-panel-input-cancel-button-color-hover: #afafb5;
@@ -776,7 +781,8 @@
   --point-panel-timeline-label-color: var(--color-brand);
 
   --badge-picker-background-color: #f9f9fa;
-  --badge-default-color: #e6e6e6;
+  --badge-picker-invalid-background-color: #f4d8d8;
+  --badge-default-color: rgba(0, 0, 0, 0.08);
   --badge-green-color: #73cc6d;
   --badge-green-contrast-color: #fff;
   --badge-orange-color: #da7c04;

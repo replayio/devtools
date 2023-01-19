@@ -8,10 +8,12 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
+  useState,
   useSyncExternalStore,
 } from "react";
 import { VariableSizeList as List, ListOnItemsRenderedProps } from "react-window";
 
+import { findPointForLocation } from "replay-next/components/sources/utils/points";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { PointsContext } from "replay-next/src/contexts/PointsContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
@@ -26,11 +28,10 @@ import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_DISABLED, Point } from "shared/client/types";
 
-import useFontBasedListMeasurents from "./hooks/useFontBasedListMeasurents";
-import SourceListRow, { ItemData } from "./SourceListRow";
+import useFontBasedListMeasurements from "./hooks/useFontBasedListMeasurements";
+import SourceListRow, { ItemData, PointStateEnum, SetLinePointState } from "./SourceListRow";
 import { formatHitCount } from "./utils/formatHitCount";
 import getScrollbarWidth from "./utils/getScrollbarWidth";
-import { findPointForLocation } from "./utils/points";
 import styles from "./SourceList.module.css";
 
 export default function SourceList({
@@ -67,13 +68,8 @@ export default function SourceList({
     visibleLines,
   } = useContext(SourcesContext);
 
-  const {
-    conditionalPointPanelHeight,
-    pointPanelHeight,
-    lineHeight,
-    lineHeightWithConditionalPoint,
-    lineHeightWithPoint,
-  } = useFontBasedListMeasurents(listRef);
+  const { lineHeight, pointPanelHeight, pointPanelWithConditionalHeight } =
+    useFontBasedListMeasurements(listRef);
 
   const lineCount = useSyncExternalStore(
     streamingSourceContents.subscribe,
@@ -155,6 +151,30 @@ export default function SourceList({
     [onLineMouseLeaveDebounced, setHoveredLocation]
   );
 
+  const [lineIndexToPointStateMap, setLineIndexToPointStateMap] = useState<
+    Map<number, PointStateEnum>
+  >(new Map());
+
+  const setLinePointState = useCallback<SetLinePointState>(
+    (lineIndex: number, state: PointStateEnum | null) => {
+      setLineIndexToPointStateMap(prev => {
+        const cloned = new Map(prev.entries());
+        if (state === null) {
+          cloned.delete(lineIndex);
+        } else {
+          cloned.set(lineIndex, state);
+        }
+        return cloned;
+      });
+
+      const list = listRef.current;
+      if (list) {
+        list.resetAfterIndex(lineIndex);
+      }
+    },
+    []
+  );
+
   const itemData = useMemo<ItemData>(
     () => ({
       addPoint,
@@ -167,7 +187,10 @@ export default function SourceList({
       minHitCount,
       onLineMouseEnter,
       onLineMouseLeave: onLineMouseLeaveDebounced,
+      pointPanelHeight,
+      pointPanelWithConditionalHeight,
       points,
+      setLinePointState,
       showColumnBreakpoints,
       showHitCounts,
       source,
@@ -184,7 +207,10 @@ export default function SourceList({
       minHitCount,
       onLineMouseEnter,
       onLineMouseLeaveDebounced,
+      pointPanelHeight,
+      pointPanelWithConditionalHeight,
       points,
+      setLinePointState,
       showHitCounts,
       showColumnBreakpoints,
       source,
@@ -196,15 +222,41 @@ export default function SourceList({
     (index: number) => {
       const lineNumber = index + 1;
       const point = findPointForLocation(points, sourceId, lineNumber);
-      if (point === null || point.shouldLog === POINT_BEHAVIOR_DISABLED) {
+      if (!point) {
+        // If the Point has been removed by some external action,
+        // e.g. the Pause Information side panel,
+        // Then ignore any cached Point state.
         return lineHeight;
-      } else if (point.condition !== null) {
-        return lineHeightWithConditionalPoint;
-      } else {
-        return lineHeightWithPoint;
+      }
+
+      const lineState = lineIndexToPointStateMap.get(index) ?? "no-point";
+      switch (lineState) {
+        case "point":
+          return lineHeight + pointPanelHeight;
+        case "point-with-conditional":
+          return lineHeight + pointPanelWithConditionalHeight;
+        default:
+          if (point && point.shouldLog !== POINT_BEHAVIOR_DISABLED) {
+            // This Point might have been restored by a previous session.
+            // In this case we should use its persisted values.
+            if (point.condition !== null) {
+              return lineHeight + pointPanelWithConditionalHeight;
+            } else {
+              return lineHeight + pointPanelHeight;
+            }
+          }
+
+          return lineHeight;
       }
     },
-    [lineHeight, lineHeightWithConditionalPoint, lineHeightWithPoint, points, sourceId]
+    [
+      lineHeight,
+      lineIndexToPointStateMap,
+      points,
+      pointPanelHeight,
+      pointPanelWithConditionalHeight,
+      sourceId,
+    ]
   );
 
   const longestLineWidthRef = useRef<number>(0);
@@ -240,12 +292,12 @@ export default function SourceList({
   const widthMinusScrollbar = width - scrollbarWidth;
 
   const style = {
-    "--conditional-point-panel-height": `${conditionalPointPanelHeight}px`,
     "--hit-count-size": `${maxHitCountStringLength}ch`,
     "--line-height": `${lineHeight}px`,
     "--line-number-size": `${maxLineIndexStringLength + 1}ch`,
     "--list-width": `${widthMinusScrollbar}px`,
     "--point-panel-height": `${pointPanelHeight}px`,
+    "--point-panel-with-conditional-height": `${pointPanelWithConditionalHeight}px`,
   };
 
   return (
