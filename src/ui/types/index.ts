@@ -175,7 +175,7 @@ export type TestItem = {
   result: TestResult;
   relativeStartTime?: number;
   duration?: number;
-  steps: TestStep[];
+  steps?: TestStep[];
   id?: string;
   path?: string[];
   error?: TestItemError;
@@ -276,6 +276,7 @@ export interface PendingWorkspaceInvitation extends Workspace {
 export interface Workspace {
   apiKeys?: ApiKey[];
   logo?: string | null;
+  logoFormat?: string | null;
   domain?: string | null;
   hasPaymentMethod?: boolean;
   id: string;

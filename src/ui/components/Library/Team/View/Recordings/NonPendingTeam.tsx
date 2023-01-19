@@ -25,7 +25,13 @@ export function NonPendingTeamScreen({ team }: { team: Workspace }) {
   return (
     <RecordingsPageViewer
       recordings={recordings}
-      workspaceName={team?.logo ? <Base64Image src={team.logo} className="max-h-12" /> : team.name}
+      workspaceName={
+        team?.logo ? (
+          <Base64Image src={team.logo} format={team.logoFormat} className="max-h-12" />
+        ) : (
+          team.name
+        )
+      }
     />
   );
 }

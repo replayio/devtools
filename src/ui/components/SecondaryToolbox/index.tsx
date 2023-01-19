@@ -1,11 +1,12 @@
 import "ui/setup/dynamic/inspector";
 import classnames from "classnames";
-import React, { FC, ReactNode, RefObject, Suspense, useContext } from "react";
+import React, { FC, ReactNode, RefObject, Suspense, useContext, useEffect, useState } from "react";
 import { ImperativePanelHandle } from "react-resizable-panels";
 
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
 import { RecordingCapabilities } from "protocol/thread/thread";
 import LazyOffscreen from "replay-next/components/LazyOffscreen";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { setSelectedPanel } from "ui/actions/layout";
 import { useFeature } from "ui/hooks/settings";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
@@ -22,14 +23,15 @@ import ReplayLogo from "../shared/ReplayLogo";
 import WaitForReduxSlice from "../WaitForReduxSlice";
 import { getRecordingCapabilitiesSuspense } from "./getRecordingCapabilities";
 import NewConsoleRoot from "./NewConsole";
-import ReactDevtoolsPanel from "./ReactDevTools";
-import { ReduxAnnotationsContext } from "./redux-devtools/redux-annotations";
-import { ReduxDevToolsPanel } from "./ReduxDevTools";
 import SourcesTabLabel from "./SourcesTabLabel";
 import { ShowVideoButton } from "./ToolboxButton";
 import ToolboxOptions from "./ToolboxOptions";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
+
+const ReactDevToolsPanel = React.lazy(() => import("./ReactDevTools"));
+
+const ReduxDevToolsPanel = React.lazy(() => import("./ReduxDevTools"));
 
 interface PanelButtonsProps {
   hasReactComponents: boolean;
@@ -151,19 +153,29 @@ function SecondaryToolbox({
   videoPanelRef: RefObject<ImperativePanelHandle>;
 }) {
   const selectedPanel = useAppSelector(getSelectedPanel);
-  const hasReactComponents = useAppSelector(selectors.hasReactComponents);
   const toolboxLayout = useAppSelector(getToolboxLayout);
-  const reduxAnnotations = useContext(ReduxAnnotationsContext);
+  const [annotationKinds, setAnnotationKinds] = useState<string[]>([]);
   const dispatch = useAppDispatch();
+  const replayClient = useContext(ReplayClientContext);
 
   const recordingCapabilities = getRecordingCapabilitiesSuspense();
   const { value: chromiumNetMonitorEnabled } = useFeature("chromiumNetMonitor");
+
+  const kindsSet = new Set(annotationKinds);
+  const hasReactComponents = kindsSet.has("react-devtools-hook");
+  const hasReduxAnnotations = kindsSet.has("redux-devtools-data");
 
   if (selectedPanel === "react-components" && !hasReactComponents) {
     dispatch(setSelectedPanel("console"));
   }
 
-  const hasReduxAnnotations = reduxAnnotations.length > 0;
+  useEffect(() => {
+    async function fetchKinds() {
+      const kinds = await replayClient.getAnnotationKinds();
+      setAnnotationKinds(kinds);
+    }
+    fetchKinds();
+  }, [replayClient]);
 
   return (
     <div className={classnames(`secondary-toolbox rounded-lg`)}>
@@ -196,7 +208,7 @@ function SecondaryToolbox({
           <InspectorPanel />
         </Panel>
         <Panel isActive={selectedPanel === "react-components"}>
-          <ReactDevtoolsPanel />
+          <ReactDevToolsPanel />
         </Panel>
         <Panel isActive={selectedPanel === "redux-devtools"}>
           <ReduxDevToolsPanel />

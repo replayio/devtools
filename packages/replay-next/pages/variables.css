@@ -293,7 +293,13 @@
   --point-panel-background-color: #1f2b43;
   --point-panel-input-background-color: #000000;
   --point-panel-input-border-color: transparent;
+  --point-panel-input-border-color-hover: #273149;
   --point-panel-input-edit-button-color: #747476;
+  --point-panel-input-edit-button-color-hover: var(--primary-accent);
+  --point-panel-input-cancel-button-color: #484445;
+  --point-panel-input-cancel-button-color-hover: #747476;
+  --point-panel-input-disabled-cancel-button-color: #a65858;
+  --point-panel-input-disabled-cancel-button-color-hover: #d3aaaa;
   --point-panel-timeline-background-color: #000000;
   --point-panel-timeline-button-background-color: #000000;
   --point-panel-timeline-button-color: var(--color-brand);
@@ -481,6 +487,7 @@
   --toolbarbutton-focus-bgcolor: var(--theme-toggle-bgcolor);
   --unloaded-region-img: url("/images/dotted-mask-dark.svg");
   --title-hover-bgcolor: var(--theme-toggle-bgcolor);
+  --jellyfish-bgcolor: rgba(40, 40, 40, 0.8);
 
   /* Toolbar (Dark) */
   --theme-toolbar-panel-icon-color: var(--icon-color);
@@ -654,7 +661,7 @@
   --background-color-error: #fcefee;
   --background-color-light: #f9f9fa;
   --background-color-primary-button: #05acfd;
-  --background-color-primary-button-disabled: #7acff9;
+  --background-color-primary-button-disabled: #d2d2d2;
   --background-color-secondary-button: #f02d5e;
   --background-color-disabled-button: #666666;
   --background-color-high-contrast-button: #f2f2f2;
@@ -754,7 +761,13 @@
   --point-panel-background-color: #f0f1f4;
   --point-panel-input-background-color: #ffffff;
   --point-panel-input-border-color: transparent;
+  --point-panel-input-border-color-hover: #e9ebef;
   --point-panel-input-edit-button-color: var(--color-brand);
+  --point-panel-input-edit-button-color-hover: var(--primary-accent);
+  --point-panel-input-cancel-button-color: #e2e2e2;
+  --point-panel-input-cancel-button-color-hover: #afafb5;
+  --point-panel-input-disabled-cancel-button-color: #d3aaaa;
+  --point-panel-input-disabled-cancel-button-color-hover: #c07171;
   --point-panel-timeline-background-color: #ffffff;
   --point-panel-timeline-button-background-color: #ffffff;
   --point-panel-timeline-button-color: var(--color-brand);
@@ -942,6 +955,7 @@
   --toolbarbutton-focus-bgcolor: var(--theme-base-90);
   --unloaded-region-img: url("/images/dotted-mask-light.svg");
   --title-hover-bgcolor: #e6e6e6;
+  --jellyfish-bgcolor: rgba(255, 255, 255, 0.8);
 
   /* Toolbar */
   --theme-toolbar-panel-icon-color: #bcbcbc;

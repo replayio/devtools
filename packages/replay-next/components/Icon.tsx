@@ -16,6 +16,7 @@ export default function Icon({
     | "breakpoint"
     | "cancel"
     | "chevron-right"
+    | "check"
     | "close"
     | "comment"
     | "comments"
@@ -89,6 +90,18 @@ export default function Icon({
     case "close":
       path =
         "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z";
+      break;
+    case "check":
+      path = (
+        <>
+          <path
+            d="M9 16.2l-3.5-3.5c-.39-.39-1.01-.39-1.4 0-.39.39-.39 1.01 0 1.4l4.19 4.19c.39.39 1.02.39 1.41 0L20.3 7.7c.39-.39.39-1.01 0-1.4-.39-.39-1.01-.39-1.4 0L9 16.2z"
+            fill="currentColor"
+            stroke="currentColor"
+            strokeWidth="2"
+          />
+        </>
+      );
       break;
     case "comment":
       path =

@@ -287,6 +287,7 @@ function DownloadSection({ recording }: { recording: Recording }) {
         </MaterialIcon>
         {buttonStates[downloadState].label}
       </button>
+
     </div>
   );
 }
