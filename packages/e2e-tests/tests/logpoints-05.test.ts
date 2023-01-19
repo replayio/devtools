@@ -4,13 +4,13 @@ import { openDevToolsTab, startTest } from "../helpers";
 import {
   addLogpoint,
   editLogPoint,
-  getCurrentLogPointPanelTypeAhead,
+  getLogPointPanelContentTypeAhead,
 } from "../helpers/source-panel";
 
 const url = "log_points_and_block_scope.html";
 
 async function verifyLogPointTypeAheadSuggestions(page: Page, expectedPartialList: string[]) {
-  const actualTextContent = (await getCurrentLogPointPanelTypeAhead(page).textContent()) || "";
+  const actualTextContent = (await getLogPointPanelContentTypeAhead(page).textContent()) || "";
   const expectedTextContent = expectedPartialList.join("");
   expect(actualTextContent.startsWith(expectedTextContent)).toBe(true);
 }

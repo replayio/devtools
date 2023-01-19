@@ -39,26 +39,32 @@ export async function addBreakpoint(
   await waitForBreakpoint(page, options);
 }
 
-export async function addConditional(page: Page, lineNumber: number) {
-  const contextMenu = page.locator(`[data-test-id="LogPointContextMenu-Line-${lineNumber}"]`);
-  const isVisible = await contextMenu.isVisible();
-  if (!isVisible) {
-    const pointPanelLocator = getPointPanelLocator(page, lineNumber);
-    const capsule = pointPanelLocator.locator('[data-test-name="LogPointCapsule"]');
-    await capsule.click();
-
-    await contextMenu.waitFor();
+export async function addConditional(
+  page: Page,
+  options: {
+    condition?: string;
+    lineNumber: number;
   }
+) {
+  await toggleConditional(page, {
+    lineNumber: options.lineNumber,
+    state: "on",
+  });
 
-  const contextMenuItem = contextMenu.locator(
-    '[data-test-name="ContextMenuItem-ToggleConditional"]'
-  );
-  await contextMenuItem.waitFor();
-  const state = await contextMenuItem.getAttribute("data-test-state");
-  if (state === "false") {
-    await debugPrint(page, `Adding conditional to line ${lineNumber}`, "addConditional");
+  const { condition, lineNumber } = options;
+  if (condition != null) {
+    await debugPrint(
+      page,
+      `Setting log point condition to "${chalk.bold(condition)}"`,
+      "addConditional"
+    );
 
-    await contextMenuItem.click();
+    await typeLexical(
+      page,
+      `${getSourceLineSelector(lineNumber)} [data-test-name="PointPanel-ConditionInput"]`,
+      condition,
+      false
+    );
   }
 }
 
@@ -96,7 +102,11 @@ async function getCurrentSource(page: Page): Promise<Locator | null> {
   return null;
 }
 
-async function getVisibleLineNumbers(page: Page): Promise<number[]> {
+export function getPointPanelLocator(page: Page, lineNumber: number): Locator {
+  return page.locator(`[data-test-id=PointPanel-${lineNumber}]`);
+}
+
+export async function getVisibleLineNumbers(page: Page): Promise<number[]> {
   const source = await getCurrentSource(page);
   if (source === null) {
     return [];
@@ -197,20 +207,7 @@ export async function editLogPoint(
     }
 
     if (condition != null) {
-      await debugPrint(
-        page,
-        `Setting log-point condition "${chalk.bold(condition)}"`,
-        "addLogpoint"
-      );
-
-      await addConditional(page, lineNumber);
-
-      await typeLexical(
-        page,
-        `${getSourceLineSelector(lineNumber)} [data-test-name="PointPanel-ConditionInput"]`,
-        condition,
-        false
-      );
+      await addConditional(page, { condition, lineNumber });
     }
 
     if (content != null) {
@@ -233,7 +230,11 @@ export async function editLogPoint(
   }
 }
 
-export function getCurrentLogPointPanelTypeAhead(page: Page): Locator {
+export function getLogPointPanelConditionTypeAhead(page: Page): Locator {
+  return page.locator('[data-test-name="PointPanel-ConditionInput-CodeTypeAhead"]');
+}
+
+export function getLogPointPanelContentTypeAhead(page: Page): Locator {
   return page.locator('[data-test-name="PointPanel-ContentInput-CodeTypeAhead"]');
 }
 
@@ -340,6 +341,18 @@ export async function removeBreakpoint(
   await delay(500);
 }
 
+export async function removeConditional(
+  page: Page,
+  options: {
+    lineNumber: number;
+  }
+) {
+  await toggleConditional(page, {
+    lineNumber: options.lineNumber,
+    state: "off",
+  });
+}
+
 export async function removeLogPoint(
   page: Page,
   options: {
@@ -371,6 +384,43 @@ export async function removeLogPoint(
   const state = await toggle.getAttribute("data-test-state");
   if (state !== "off") {
     await toggle.click({ force: true });
+  }
+}
+
+export async function toggleConditional(
+  page: Page,
+  options: {
+    lineNumber: number;
+    state: "on" | "off";
+  }
+) {
+  const { lineNumber, state: targetState } = options;
+
+  const contextMenu = page.locator(`[data-test-id="LogPointContextMenu-Line-${lineNumber}"]`);
+  const isVisible = await contextMenu.isVisible();
+  if (!isVisible) {
+    const pointPanelLocator = getPointPanelLocator(page, lineNumber);
+    const capsule = pointPanelLocator.locator('[data-test-name="LogPointCapsule"]');
+    await capsule.click();
+
+    await contextMenu.waitFor();
+  }
+
+  const contextMenuItem = contextMenu.locator(
+    '[data-test-name="ContextMenuItem-ToggleConditional"]'
+  );
+  await contextMenuItem.waitFor();
+  const actualState = await contextMenuItem.getAttribute("data-test-state");
+  if (actualState !== targetState) {
+    await debugPrint(
+      page,
+      targetState === "on"
+        ? `Adding conditional to line ${lineNumber}`
+        : `Removing conditional from line ${lineNumber}`,
+      "toggleConditional"
+    );
+
+    await contextMenuItem.click();
   }
 }
 
@@ -409,10 +459,6 @@ export async function waitForBreakpoint(
   } else {
     await breakpointGroup.waitForSelector(`.breakpoint-line:has-text("${lineNumber}")`);
   }
-}
-
-export function getPointPanelLocator(page: Page, lineNumber: number): Locator {
-  return page.locator(`[data-test-id=PointPanel-${lineNumber}]`);
 }
 
 export async function waitForLogpoint(

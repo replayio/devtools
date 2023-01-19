@@ -186,6 +186,10 @@ function PointPanelWithHitPoints({
   }
 
   const startEditing = (editReason: EditReason | null = null) => {
+    if (isEditing) {
+      return;
+    }
+
     trackEvent("breakpoint.start_edit");
     setEditableCondition(point.condition || null);
     setEditableContent(point.content);
@@ -269,12 +273,14 @@ function PointPanelWithHitPoints({
     <div
       className={`${shouldLog ? styles.PanelEnabled : styles.PanelDisabled} ${className}`}
       data-test-id={`PointPanel-${lineNumber}`}
+      data-test-state={isEditing ? "edit" : "view"}
     >
       {
         hasCondition && (
           <div className={styles.EditableContentWrapperRow}>
             <div
               className={isConditionValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}
+              onClick={showTooManyPointsMessage ? undefined : () => startEditing("condition")}
             >
               <div
                 className={styles.ConditionalIconWrapper}
@@ -313,10 +319,7 @@ function PointPanelWithHitPoints({
                 </div>
               ) : (
                 <>
-                  <div
-                    className={styles.Content}
-                    onClick={showTooManyPointsMessage ? undefined : () => startEditing("condition")}
-                  >
+                  <div className={styles.Content}>
                     <SyntaxHighlightedLine code={point.condition!} />
                   </div>
 
@@ -340,7 +343,10 @@ function PointPanelWithHitPoints({
             Use Focus Mode to reduce the number of hits.
           </div>
         ) : (
-          <div className={isContentValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}>
+          <div
+            className={isContentValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}
+            onClick={showTooManyPointsMessage ? undefined : () => startEditing("content")}
+          >
             <BadgePicker invalid={!isContentValid} point={point} />
 
             {isEditing ? (
@@ -367,16 +373,12 @@ function PointPanelWithHitPoints({
               </div>
             ) : (
               <>
-                <div
-                  className={styles.Content}
-                  onClick={showTooManyPointsMessage ? undefined : () => startEditing("content")}
-                >
+                <div className={styles.Content}>
                   <SyntaxHighlightedLine code={point.content} />
                 </div>
                 <button
                   className={styles.EditButton}
                   disabled={isPending}
-                  onClick={showTooManyPointsMessage ? undefined : () => startEditing("content")}
                   data-test-name="PointPanel-EditButton"
                 >
                   <Icon className={styles.EditButtonIcon} type="edit" />

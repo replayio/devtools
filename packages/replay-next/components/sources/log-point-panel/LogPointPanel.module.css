@@ -54,8 +54,8 @@
 .ContentWrapper:hover {
   border-color: var(--point-panel-input-border-color-hover);
 }
-.ContentWrapper:focus,
-.ContentWrapper:focus-within {
+.PanelEnabled[data-test-state="edit"] .ContentWrapper:focus,
+.PanelEnabled[data-test-state="edit"] .ContentWrapper:focus-within {
   border-color: var(--point-panel-input-border-color-focus);
 }
 
@@ -120,7 +120,7 @@
   line-height: 1.5rem;
   color: var(--point-panel-input-edit-button-color);
 }
-.EditButton:hover {
+.ContentWrapper:hover .EditButton {
   color: var(--point-panel-input-edit-button-color-hover);
 }
 

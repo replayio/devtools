@@ -10,7 +10,6 @@
   background-color: var(--point-panel-timeline-label-background-color);
   color: var(--point-panel-timeline-label-color);
 
-  font-size: var(--font-size-tiny);
   font-weight: bold;
   font-variant-numeric: tabular-nums;
 }
@@ -20,6 +19,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
+  /* Visually center the font within the capsule */
+  padding-top: 1px;
 }
 
 .CaretIcon {
