@@ -2,11 +2,8 @@
   background-color: var(--theme-base-100);
 }
 
-.sharing-modal .permissions-list {
-  max-height: 240px;
-}
-
 .permissions-list {
+  max-height: 240px;
   animation: fadeIn 0.4s ease-in-out;
 }
 
