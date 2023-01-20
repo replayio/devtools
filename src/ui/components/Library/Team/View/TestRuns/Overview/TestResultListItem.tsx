@@ -10,23 +10,22 @@ import styles from "../../../../Library.module.css";
 
 function ViewReplay({ passed, recordingId }: { passed: boolean; recordingId: RecordingId }) {
   return (
-    <Link href={`/recording/${recordingId}`}>
-      <a
-        className="group flex cursor-pointer items-center justify-center p-2 transition"
-        onClick={e => e.stopPropagation()}
+    <Link
+      href={`/recording/${recordingId}`}
+      className="group flex cursor-pointer items-center justify-center p-2 transition"
+      onClick={e => e.stopPropagation()}
+    >
+      <MaterialIcon
+        iconSize="2xl"
+        outlined
+        className={
+          passed
+            ? "text-[#219653] group-hover:text-[green-500]"
+            : "text-[#EB5757] group-hover:text-red-500"
+        }
       >
-        <MaterialIcon
-          iconSize="2xl"
-          outlined
-          className={
-            passed
-              ? "text-[#219653] group-hover:text-[green-500]"
-              : "text-[#EB5757] group-hover:text-red-500"
-          }
-        >
-          {passed ? "play_circle" : "play_circle_filled"}
-        </MaterialIcon>
-      </a>
+        {passed ? "play_circle" : "play_circle_filled"}
+      </MaterialIcon>
     </Link>
   );
 }
@@ -60,10 +59,11 @@ function FilterByTestButton({ recording }: { recording: Recording }) {
   const path = JSON.stringify(recording.metadata?.test?.path || []);
 
   return (
-    <Link href={`/team/${teamId}/results?q=test-path:${path}`}>
-      <a className="max-w-min overflow-hidden overflow-ellipsis whitespace-pre p-2 text-left opacity-0 hover:bg-gray-200 hover:underline group-hover:opacity-100">
-        <MaterialIcon>filter_alt</MaterialIcon>
-      </a>
+    <Link
+      href={`/team/${teamId}/results?q=test-path:${path}`}
+      className="max-w-min overflow-hidden overflow-ellipsis whitespace-pre p-2 text-left opacity-0 hover:bg-gray-200 hover:underline group-hover:opacity-100"
+    >
+      <MaterialIcon>filter_alt</MaterialIcon>
     </Link>
   );
 }
@@ -77,15 +77,14 @@ export function TestResultListItem({ recording }: { recording: Recording }) {
     <div
       className={`group flex grow flex-row items-center px-2 transition duration-150 ${styles.libraryRow}`}
     >
-      <Link href={`/recording/${recordingId}`}>
-        <a
-          className="group flex flex-grow cursor-pointer items-center justify-center space-x-2 p-2 transition"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <ViewReplay passed={passed} recordingId={recordingId} />
-          <Title recording={recording} />
-        </a>
+      <Link
+        href={`/recording/${recordingId}`}
+        className="group flex flex-grow cursor-pointer items-center justify-center space-x-2 p-2 transition"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <ViewReplay passed={passed} recordingId={recordingId} />
+        <Title recording={recording} />
       </Link>
       <Comments recording={recording} />
       <FilterByTestButton recording={recording} />

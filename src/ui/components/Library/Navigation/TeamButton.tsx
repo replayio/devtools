@@ -43,25 +43,24 @@ export function TeamButton({
   };
 
   return (
-    <Link href={url}>
-      <a
-        className={classNames(
-          `${styles.teamRow} group flex flex-row justify-between space-x-2 px-4 py-2 text-left transition duration-200 hover:text-white focus:outline-none`,
-          isSelected ? `${styles.teamRowActive} cursor-auto font-bold` : "cursor-pointer"
-        )}
-        onClick={onClick}
-      >
-        <span className="overflow-hidden overflow-ellipsis whitespace-pre">
-          <div className="flex">
-            <LibraryIcon teamType={isTest ? "tests" : "team"} />
-            {label}
-          </div>
-        </span>
-        {isNew ? (
-          <div className={"rounded-md bg-primaryAccent px-3 py-0.5 text-xs text-white"}>New</div>
-        ) : null}
-        {showSettingsButton ? <SettingsButton /> : null}
-      </a>
+    <Link
+      href={url}
+      className={classNames(
+        `${styles.teamRow} group flex flex-row justify-between space-x-2 px-4 py-2 text-left transition duration-200 hover:text-white focus:outline-none`,
+        isSelected ? `${styles.teamRowActive} cursor-auto font-bold` : "cursor-pointer"
+      )}
+      onClick={onClick}
+    >
+      <span className="overflow-hidden overflow-ellipsis whitespace-pre">
+        <div className="flex">
+          <LibraryIcon teamType={isTest ? "tests" : "team"} />
+          {label}
+        </div>
+      </span>
+      {isNew ? (
+        <div className={"rounded-md bg-primaryAccent px-3 py-0.5 text-xs text-white"}>New</div>
+      ) : null}
+      {showSettingsButton ? <SettingsButton /> : null}
     </Link>
   );
 }
