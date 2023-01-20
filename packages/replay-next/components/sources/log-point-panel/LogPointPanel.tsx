@@ -352,10 +352,6 @@ function PointPanelWithHitPoints({
             <span style={{ textDecoration: "underline" }} onClick={enterFocusMode}>
               Focus Mode
             </span>{" "}
-            or{""}
-            <span style={{ textDecoration: "underline" }} onClick={toggleCondition}>
-              conditionals
-            </span>{" "}
             to reduce the number of hits.
           </div>
         ) : (

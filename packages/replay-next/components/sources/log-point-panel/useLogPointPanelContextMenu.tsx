@@ -49,6 +49,7 @@ export default function useLogPointPanelContextMenu({
   return useContextMenu(
     <>
       <ContextMenuItem
+        disabled={currentHitPoint == null}
         dataTestName="ContextMenuItem-ToggleConditional"
         dataTestState={hasConditional ? "true" : "false"}
         onClick={toggleConditional}
