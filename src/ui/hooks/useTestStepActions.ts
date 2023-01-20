@@ -1,7 +1,6 @@
 import { useContext } from "react";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
-import { returnFirst } from "devtools/client/debugger/src/components/TestInfo/TestStepItem";
 import { getContext } from "devtools/client/debugger/src/selectors";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { getCurrentPoint } from "ui/actions/app";
@@ -100,8 +99,8 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
 
     if (frames) {
       // find the cypress marker frame
-      const markerFrameIndex = returnFirst(frames, (f: any, i: any, l: any) =>
-        f.functionName === "__stackReplacementMarker" ? i : null
+      const markerFrameIndex = frames.findIndex(
+        (f: any, i: any, l: any) => f.functionName === "__stackReplacementMarker"
       );
 
       // and extract its sourceId
@@ -113,9 +112,9 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
 
         // then search from the top for the first frame from the same source
         // as the marker (which should be cypress_runner.js) and return it
-        const frame = returnFirst(userFrames, (f, i, l) => {
-          return l[i + 1]?.functionLocation?.some(fl => fl.sourceId === markerSourceId) ? f : null;
-        });
+        const frame = userFrames.find((f, i, l) =>
+          l[i + 1]?.functionLocation?.some(fl => fl.sourceId === markerSourceId)
+        );
 
         const location = frame?.location[frame.location.length - 1];
 
