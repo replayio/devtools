@@ -1,8 +1,8 @@
 import { PropsWithChildren, useCallback, useEffect, useMemo, useState, useTransition } from "react";
 
-import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { FocusContext, FocusContextType } from "replay-next/src/contexts/FocusContext";
 import { Range } from "replay-next/src/types";
-import { setFocusRegionFromTimeRange } from "ui/actions/timeline";
+import { enterFocusMode, setFocusRegionFromTimeRange } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -45,9 +45,12 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
       isTransitionPending: isPending,
       range: deferredFocusRegion ? rangeForFocusRegion(deferredFocusRegion) : null,
       rangeForDisplay: focusRegion ? rangeForFocusRegion(focusRegion) : null,
+      enterFocusMode: () => {
+        dispatch(enterFocusMode());
+      },
       update,
     };
-  }, [deferredFocusRegion, isPending, focusRegion, update]);
+  }, [deferredFocusRegion, isPending, focusRegion, update, dispatch]);
 
   return <FocusContext.Provider value={context}>{children}</FocusContext.Provider>;
 }

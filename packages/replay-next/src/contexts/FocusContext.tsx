@@ -30,6 +30,7 @@ export type FocusContextType = {
   range: TimeStampedPointRange | null;
   rangeForDisplay: TimeStampedPointRange | null;
   update: (value: Range | null, debounce: boolean) => void;
+  enterFocusMode: () => void;
 };
 
 export const FocusContext = createContext<FocusContextType>(null as any);
@@ -122,6 +123,7 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
       rangeForDisplay: range,
       range: deferredRange,
       update: updateFocusRange,
+      enterFocusMode: () => {},
     }),
     [deferredRange, isTransitionPending, range, updateFocusRange]
   );
