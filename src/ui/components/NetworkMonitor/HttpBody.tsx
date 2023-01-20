@@ -1,7 +1,7 @@
 import { BodyData } from "@replayio/protocol";
 import classNames from "classnames";
+import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
-import ReactJson from "react-json-view";
 
 import { getTheme } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
@@ -19,6 +19,10 @@ import {
   URLEncodedToPlaintext,
 } from "./content";
 import styles from "./HttpBody.module.css";
+
+const ReactJson = dynamic(() => import("react-json-view"), {
+  ssr: false,
+});
 
 const TextBodyComponent = ({ raw, text }: { raw: RawBody; text: string }) => {
   const [copied, setCopied] = useState(false);

@@ -1,7 +1,4 @@
-const transpileModules = require("next-transpile-modules");
 const { patchWebpackConfig } = require("next-global-css");
-
-const withTM = transpileModules(["protocol"]);
 
 /**
  * @type {Pick<
@@ -11,6 +8,7 @@ const withTM = transpileModules(["protocol"]);
  */
 const baseNextConfig = {
   reactStrictMode: true,
+  transpilePackages: ["protocol"],
 
   // This setting allows the Next app to import code from e.g. "packages/protocol"
   experimental: {
