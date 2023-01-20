@@ -62,29 +62,26 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
   const isSelected = focusId === testRun.id;
 
   return (
-    <Link href={`/team/${teamId}/runs/${testRun.id}`}>
-      <a
-        className={`flex cursor-pointer flex-row space-x-3 rounded-sm border-b border-chrome bg-themeBase-100 px-3 py-3 ${
-          styles.libraryRow
-        }     
+    <Link
+      href={`/team/${teamId}/runs/${testRun.id}`}
+      className={`flex cursor-pointer flex-row space-x-3 rounded-sm border-b border-chrome bg-themeBase-100 px-3 py-3 ${
+        styles.libraryRow
+      }     
       ${isSelected ? styles.libraryRowSelected : ""}
       `}
-        onClick={onClick}
-      >
-        <Status failCount={failCount} />
-        <div className="flex flex-grow flex-col space-y-1 overflow-hidden">
-          <div className="flex flex-row justify-between space-x-3">
-            <Title testRun={testRun} />
-            <RunStats testRun={testRun} />
-          </div>
-          <Attributes testRun={testRun} />
-          {testRun.title ? (
-            <div className="flex flex-row items-center justify-between text-xs">
-              {testRun.title}
-            </div>
-          ) : null}
+      onClick={onClick}
+    >
+      <Status failCount={failCount} />
+      <div className="flex flex-grow flex-col space-y-1 overflow-hidden">
+        <div className="flex flex-row justify-between space-x-3">
+          <Title testRun={testRun} />
+          <RunStats testRun={testRun} />
         </div>
-      </a>
+        <Attributes testRun={testRun} />
+        {testRun.title ? (
+          <div className="flex flex-row items-center justify-between text-xs">{testRun.title}</div>
+        ) : null}
+      </div>
     </Link>
   );
 }
