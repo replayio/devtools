@@ -136,18 +136,15 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
                 true
               );
 
-              const length: number | undefined = cmdObject?.preview?.properties?.find(
-                o => o.name === "length"
-              )?.value;
-              const nodeIds = Array.from(
-                { length: length || 0 },
-                (_, i) =>
-                  cmdObject.preview?.properties?.find(
-                    obj =>
-                      obj.object ===
-                      cmdObject?.preview?.properties?.find(p => p.name === String(i))?.object
-                  )?.object
-              ).filter((s): s is string => typeof s === "string");
+              const props = cmdObject?.preview?.properties;
+              const length: number = props?.find(o => o.name === "length")?.value || 0;
+              const nodeIds = [];
+              for (let i = 0; i < length; i++) {
+                const v = props?.find(p => p.name === String(i));
+                if (v?.object) {
+                  nodeIds.push(v.object);
+                }
+              }
 
               setSubjectNodePauseData({ pauseId: endPauseResult.pauseId, nodeIds });
             }
