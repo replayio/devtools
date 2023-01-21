@@ -7,7 +7,7 @@ import {
   Object as RecordReplayObject,
 } from "@replayio/protocol";
 import isEmpty from 'lodash/isEmpty';
-import sum from 'lodash/sum';
+import without from 'lodash/without';
 import { ThreadFront } from 'protocol/thread';
 import { RecordingTarget } from 'protocol/thread/thread';
 
@@ -15,9 +15,7 @@ import { ReplayClientInterface } from "shared/client/types";
 
 import {
   STANDARD_EVENT_CATEGORIES,
-  EventCategory,
-  ChromiumEventCategoriesByEventDefault,
-  ChromiumEventCategoriesByEventAndTarget
+  EventCategory
 } from "../constants";
 import { createWakeable } from "../utils/suspense";
 import { cachePauseData } from "./PauseCache";
@@ -167,13 +165,13 @@ const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
   },
   chromium(eventCountsRaw: Record<string, number>) {
     const eventTable = STANDARD_EVENT_CATEGORIES.chromium!;
-    eventCountsRaw = ChromiumConvertEventCounts(eventCountsRaw);
+    const eventCountsConverted = convertChromiumEventCounts(eventCountsRaw);
     return eventTable.map(category => {
       return {
         ...category,
         events: category.events.map(eventType => ({
           ...eventType,
-          count: eventCountsRaw[eventType.type],
+          count: eventCountsConverted[eventType.type],
         })),
       };
     });
@@ -181,15 +179,20 @@ const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
 };
 
 /**
- * Take the non-sensical event information emitted by chromium and convert to a
- * normalized format.
+ * Convert event count entries to unique name and merge all which map to the same name.
  */
-function ChromiumConvertEventCounts(eventCountsRaw: Record<string, number>) {
+function convertChromiumEventCounts(eventCountsRaw: Record<string, number>) {
   const converted: { [key: string]: number } = {};
+  const chromiumEventCategoriesByEventDefault = makeChromiumEventCategoriesByEventDefault();
+  const chromiumEventCategoriesByEventAndTarget = makeChromiumEventCategoriesByEventAndTarget();
   Object.entries(eventCountsRaw)
     .map(
       ([eventInputRaw, count]) => {
-        const uniqueEventName = MakeChromiumUniqueEventName(eventInputRaw);
+        const uniqueEventName = makeChromiumUniqueEventName(
+          eventInputRaw,
+          chromiumEventCategoriesByEventDefault,
+          chromiumEventCategoriesByEventAndTarget
+        );
         if (uniqueEventName) {
           converted[uniqueEventName] = (converted[uniqueEventName] || 0) + count;
         }
@@ -198,26 +201,33 @@ function ChromiumConvertEventCounts(eventCountsRaw: Record<string, number>) {
   return converted;
 }
 
+
 /**
- * Chromium is more involved than gecko, because its event names 
+ * Convert event strings produced by chromium to unique event names.
+ * 
+ * NOTE: Chromium event names are more involved than gecko, because its event names 
  * are not unique. Instead, it uses both: event name + event target name
  * to look up the "breakpoint".
  *
  * NOTE: Event names are produced in ReplayMakeEventName() in chromium in
  *   third_party/blink/renderer/core/inspector/inspector_dom_debugger_agent.cc.
  */
-function MakeChromiumUniqueEventName(eventInputRaw: string) {
+function makeChromiumUniqueEventName(
+  eventInputRaw: string,
+  chromiumEventCategoriesByEventDefault: EventCategoriesByEvent,
+  chromiumEventCategoriesByEventAndTarget: EventCategoriesByEventAndTarget
+) {
   const [eventNameRaw, eventTargetName] = eventInputRaw.split(',', 2);
 
   // look up category
   let category: string = '';
   if (eventTargetName) {
     // first try to look up by targetName
-    category = ChromiumEventCategoriesByEventAndTarget[eventNameRaw]?.[eventTargetName];
+    category = chromiumEventCategoriesByEventAndTarget[eventNameRaw]?.[eventTargetName];
   }
   if (!category) {
     // try to look up default
-    category = ChromiumEventCategoriesByEventDefault[eventNameRaw];
+    category = chromiumEventCategoriesByEventDefault[eventNameRaw];
   }
   return MakeChromiumEventName(category, eventNameRaw);
 };
@@ -225,6 +235,72 @@ function MakeChromiumUniqueEventName(eventInputRaw: string) {
 function MakeChromiumEventName(category: string, eventNameRaw: string) {
   return `${category}.${eventNameRaw}`;
 }
+
+
+type EventCategoriesByEvent = Record<string, string>;
+type EventCategoriesByEventAndTarget = Record<string, Record<string, string>>;
+
+/**
+ * This allows looking up category by non-unique event name
+ * for all events that have a '*' target (or no target at all).
+ * 
+ * @example
+ * ({
+ *   load: 'load',
+ *   click: 'mouse',
+ *   // ... 100+ more entries ...
+ * })
+ * 
+ */
+function makeChromiumEventCategoriesByEventDefault(): EventCategoriesByEvent {
+  return Object.fromEntries(
+    STANDARD_EVENT_CATEGORIES.chromium!
+      .flatMap(category => {
+        if (!category.eventTargets || category.eventTargets.includes('*')) {
+          return category.events.map(evt => [
+            evt.type, category.category
+          ]);
+        }
+        return null;
+      })
+      .filter(Boolean) as [[string, string]]
+  );
+}
+
+/**
+ * This allows looking up category by (1) non-unique event name -> (2) EventTarget name.
+ * 
+ * @example 
+ * ({
+ *   load: {
+ *     xmlhttprequest: 'XHR',
+ *     xmlhttprequestupload: 'XHR',
+ *   },
+ *   click: { // or maybe `click: 'mouse'` for short, since it only has a default
+ *   }
+ *   // ... 100+ more entries ...
+ * })
+ */
+function makeChromiumEventCategoriesByEventAndTarget(): EventCategoriesByEventAndTarget {
+  return Object.fromEntries(
+    STANDARD_EVENT_CATEGORIES.chromium!
+      .flatMap(category => {
+        const eventTargets = category.eventTargets && without(category.eventTargets, '*');
+        if (!eventTargets?.length) {
+          return null;
+        }
+        return category.events.map(evt =>
+          [
+            evt.type,
+            Object.fromEntries(eventTargets.map(target => [target, category.category]))
+          ]
+        ) as [[string, Record<string, string>]];
+      })
+      .filter(Boolean) as [[string, Record<string, string>]]
+  );
+}
+
+
 
 
 /**
