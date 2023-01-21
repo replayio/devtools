@@ -3,7 +3,7 @@ import { MouseEvent, useContext } from "react";
 import { Badge, Checkbox } from "design";
 import Icon from "replay-next/components/Icon";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
-import { Event } from "replay-next/src/suspense/EventsCache";
+import { EventCounter } from "replay-next/src/suspense/EventsCache";
 
 import styles from "./EventType.module.css";
 
@@ -14,7 +14,7 @@ export default function EventType({
 }: {
   categoryLabel: string | null;
   disabled: boolean;
-  event: Event;
+  event: EventCounter;
 }) {
   const { eventTypesForDisplay: eventTypes, update } = useContext(ConsoleFiltersContext);
 

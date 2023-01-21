@@ -2,7 +2,7 @@ import { ChangeEvent, Suspense, useContext, useMemo, useState, useTransition } f
 
 import Loader from "replay-next/components/Loader";
 import { getEventCategoryCountsSuspense } from "replay-next/src/suspense/EventsCache";
-import type { EventCategory as EventCategoryType } from "replay-next/src/suspense/EventsCache";
+import type { EventCategoryWithCount as EventCategoryType } from "replay-next/src/suspense/EventsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import EventCategory from "./EventCategory";

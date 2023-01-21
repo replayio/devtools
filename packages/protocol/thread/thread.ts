@@ -252,7 +252,7 @@ class _ThreadFront {
       case "chromium": {
         recordingCapabilities = {
           supportsEagerEvaluation: false,
-          supportsEventTypes: false,
+          supportsEventTypes: true,
           supportsNetworkRequests: false,
           supportsRepaintingGraphics: true,
           supportsPureEvaluation: false,

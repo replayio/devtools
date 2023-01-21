@@ -6,23 +6,32 @@ import {
   PauseId,
   Object as RecordReplayObject,
 } from "@replayio/protocol";
+import isEmpty from 'lodash/isEmpty';
+import sum from 'lodash/sum';
+import { ThreadFront } from 'protocol/thread';
+import { RecordingTarget } from 'protocol/thread/thread';
 
 import { ReplayClientInterface } from "shared/client/types";
 
-import { STANDARD_EVENT_CATEGORIES } from "../constants";
+import {
+  STANDARD_EVENT_CATEGORIES,
+  EventCategory,
+  ChromiumEventCategoriesByEventDefault,
+  ChromiumEventCategoriesByEventAndTarget
+} from "../constants";
 import { createWakeable } from "../utils/suspense";
 import { cachePauseData } from "./PauseCache";
-import { Record, STATUS_PENDING, STATUS_RESOLVED, Wakeable } from "./types";
+import { Record as WakeableRecord, STATUS_PENDING, STATUS_RESOLVED, Wakeable } from "./types";
 
-export type Event = {
+export type EventCounter = {
   count: number;
   label: string;
   type: EventHandlerType;
 };
 
-export type EventCategory = {
+export type EventCategoryWithCount = {
   category: string;
-  events: Event[];
+  events: EventCounter[];
 };
 
 export type EventLog = {
@@ -38,17 +47,18 @@ export type EventLog = {
   values: any[];
 };
 
-let eventTypeToEntryPointMap = new Map<EventHandlerType, Record<EventLog[]>>();
-let eventCategoryCounts: EventCategory[] | null = null;
-let inProgressEventCategoryCountsWakeable: Wakeable<EventCategory[]> | null = null;
+let recordingTarget: RecordingTarget | null = null;
+let eventTypeToEntryPointMap = new Map<EventHandlerType, WakeableRecord<EventLog[]>>();
+let eventCategoryCounts: EventCategoryWithCount[] | null = null;
+let inProgressEventCategoryCountsWakeable: Wakeable<EventCategoryWithCount[]> | null = null;
 
-export function getEventCategoryCountsSuspense(client: ReplayClientInterface): EventCategory[] {
+export function getEventCategoryCountsSuspense(client: ReplayClientInterface): EventCategoryWithCount[] {
   if (eventCategoryCounts !== null) {
     return eventCategoryCounts;
   }
 
   if (inProgressEventCategoryCountsWakeable === null) {
-    inProgressEventCategoryCountsWakeable = createWakeable<EventCategory[]>(
+    inProgressEventCategoryCountsWakeable = createWakeable<EventCategoryWithCount[]>(
       "getEventCategoryCountsSuspense"
     );
 
@@ -82,22 +92,10 @@ export function getEventTypeEntryPointsSuspense(
 }
 
 async function fetchEventCategoryCounts(client: ReplayClientInterface) {
-  const pendingEventCategoryCounts: EventCategory[] = [];
+  const pendingEventCategoryCounts: EventCategoryWithCount[] = [];
 
-  const allEvents = await client.getEventCountForTypes(
-    Object.values(STANDARD_EVENT_CATEGORIES)
-      .map(c => c.events.map(e => e.type))
-      .flat()
-  );
-  eventCategoryCounts = Object.values(STANDARD_EVENT_CATEGORIES).map(category => {
-    return {
-      ...category,
-      events: category.events.map(eventType => ({
-        ...eventType,
-        count: allEvents[eventType.type],
-      })),
-    };
-  });
+  const eventCountsRaw = await client.getAllEventHandlerCounts();
+  eventCategoryCounts = await countEvents(eventCountsRaw);
 
   inProgressEventCategoryCountsWakeable!.resolve(pendingEventCategoryCounts);
   inProgressEventCategoryCountsWakeable = null;
@@ -106,7 +104,7 @@ async function fetchEventCategoryCounts(client: ReplayClientInterface) {
 async function fetchEventTypeEntryPoints(
   client: ReplayClientInterface,
   eventType: EventHandlerType,
-  record: Record<EventLog[]>
+  record: WakeableRecord<EventLog[]>
 ) {
   const entryPoints = await client.runAnalysis<EventLog>({
     effectful: false,
@@ -131,6 +129,108 @@ async function fetchEventTypeEntryPoints(
   wakeable.resolve(eventLogs);
 }
 
+async function getRecordingTarget() {
+  if (recordingTarget === null) {
+    recordingTarget = await ThreadFront.getRecordingTarget();
+  }
+  return recordingTarget;
+}
+
+async function countEvents(eventCountsRaw: Record<string, number>) {
+  const recordingTarget = await getRecordingTarget();
+  const targetCountEvents = CountEvents[recordingTarget];
+  if (!targetCountEvents) {
+    if (!isEmpty(eventCountsRaw)) {
+      console.error(`recordingTarget "${recordingTarget}" has events but is missing CountEvents function`);
+    }
+    return [];
+  }
+  return targetCountEvents(eventCountsRaw);
+}
+
+type CountEventsFunction = (
+  eventCountsRaw: Record<string, number>
+) => EventCategoryWithCount[];
+
+const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
+  gecko(eventCountsRaw: Record<string, number>) {
+    const eventTable = STANDARD_EVENT_CATEGORIES.gecko!;
+    return eventTable.map(category => {
+      return {
+        ...category,
+        events: category.events.map(eventType => ({
+          ...eventType,
+          count: eventCountsRaw[eventType.type],
+        })),
+      };
+    });
+  },
+  chromium(eventCountsRaw: Record<string, number>) {
+    const eventTable = STANDARD_EVENT_CATEGORIES.chromium!;
+    eventCountsRaw = ChromiumConvertEventCounts(eventCountsRaw);
+    return eventTable.map(category => {
+      return {
+        ...category,
+        events: category.events.map(eventType => ({
+          ...eventType,
+          count: eventCountsRaw[eventType.type],
+        })),
+      };
+    });
+  }
+};
+
+/**
+ * Take the non-sensical event information emitted by chromium and convert to a
+ * normalized format.
+ */
+function ChromiumConvertEventCounts(eventCountsRaw: Record<string, number>) {
+  const converted: { [key: string]: number } = {};
+  Object.entries(eventCountsRaw)
+    .map(
+      ([eventInputRaw, count]) => {
+        const uniqueEventName = MakeChromiumUniqueEventName(eventInputRaw);
+        if (uniqueEventName) {
+          converted[uniqueEventName] = (converted[uniqueEventName] || 0) + count;
+        }
+      }
+    );
+  return converted;
+}
+
+/**
+ * Chromium is more involved than gecko, because its event names 
+ * are not unique. Instead, it uses both: event name + event target name
+ * to look up the "breakpoint".
+ *
+ * NOTE: Event names are produced in ReplayMakeEventName() in chromium in
+ *   third_party/blink/renderer/core/inspector/inspector_dom_debugger_agent.cc.
+ */
+function MakeChromiumUniqueEventName(eventInputRaw: string) {
+  const [eventNameRaw, eventTargetName] = eventInputRaw.split(',', 2);
+
+  // look up category
+  let category: string = '';
+  if (eventTargetName) {
+    // first try to look up by targetName
+    category = ChromiumEventCategoriesByEventAndTarget[eventNameRaw]?.[eventTargetName];
+  }
+  if (!category) {
+    // try to look up default
+    category = ChromiumEventCategoriesByEventDefault[eventNameRaw];
+  }
+  return MakeChromiumEventName(category, eventNameRaw);
+};
+
+function MakeChromiumEventName(category: string, eventNameRaw: string) {
+  return `${category}.${eventNameRaw}`;
+}
+
+
+/**
+ * Mapper JS string that will be executed inside a VM on the backend
+ * on inidividual analysis results.
+ */
 const MAPPER = `
   const finalData = { frames: [], scopes: [], objects: [] };
   function addPauseData({ frames, scopes, objects }) {
@@ -197,3 +297,6 @@ const MAPPER = `
     },
   ];
 `;
+
+
+
