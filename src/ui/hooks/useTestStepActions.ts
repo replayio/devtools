@@ -87,11 +87,14 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
   };
 
   const showStepSource = async () => {
-    if (!testStep?.annotations.enqueue) {
+    const isChaiAssertion = testStep?.name === "assert" && !testStep.annotations.enqueue;
+    const annotation = isChaiAssertion ? testStep.annotations.start : testStep?.annotations.enqueue;
+
+    if (!annotation) {
       return;
     }
 
-    const point = testStep.annotations.enqueue.point;
+    const point = annotation.point;
 
     const {
       data: { frames },
@@ -110,11 +113,19 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
         // it so the user frames are on top
         const userFrames = frames?.slice(0, markerFrameIndex).reverse();
 
-        // then search from the top for the first frame from the same source
-        // as the marker (which should be cypress_runner.js) and return it
-        const frame = userFrames.find((f, i, l) =>
-          l[i + 1]?.functionLocation?.some(fl => fl.sourceId === markerSourceId)
-        );
+        const frame = userFrames.find((f, i, l) => {
+          if (isChaiAssertion) {
+            // if this is a chai assertion, the invocation was synchronous in this
+            // call stack so we're looking from the top for the first frame that
+            // isn't from the same source as the marker to identify the user frame
+            // that invoke it
+            return f.functionLocation?.every(fl => fl.sourceId !== markerSourceId);
+          } else {
+            // for enqueued assertions, search from the top for the first frame from the same source
+            // as the marker (which should be cypress_runner.js) and return it
+            return l[i + 1]?.functionLocation?.some(fl => fl.sourceId === markerSourceId);
+          }
+        });
 
         const location = frame?.location[frame.location.length - 1];
 

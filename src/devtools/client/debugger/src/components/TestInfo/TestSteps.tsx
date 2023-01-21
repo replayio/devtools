@@ -72,10 +72,8 @@ function useGetTestSections(
           // of the failed command but successful asserts with their start time
           if (s.error) {
             absoluteStartTime = absoluteEndTime - 1;
-            annotations.start = annotations.end;
           } else {
             absoluteEndTime = absoluteStartTime + 1;
-            annotations.end = annotations.start;
           }
           duration = 1;
         }
