@@ -242,6 +242,12 @@ export function createSocket(
           }
         : undefined;
 
+      const requestTimings: {
+        timings: { [method: string]: number };
+        requests: { [id: number]: { time: number; method: string } };
+      } = { timings: {}, requests: {} };
+      window.requestTimings = requestTimings;
+
       const sessionId = await createSession(
         recordingId,
         loadPoint,
@@ -257,8 +263,20 @@ export function createSocket(
             if (features.logProtocol) {
               queueAction(requestSent({ ...request, recordedAt: window.performance.now() }));
             }
+            console.log(request.id, request.method);
+            requestTimings.requests[request.id] = {
+              method: request.method,
+              time: window.performance.now(),
+            };
           },
           onResponse: (response: CommandResponse) => {
+            console.log(response.id);
+            const request = requestTimings.requests[response.id];
+            requestTimings.timings[request.method] = Math.max(
+              window.performance.now() - request.time,
+              0
+            );
+
             if (features.logProtocol) {
               const clonedResponse = { ...response, recordedAt: window.performance.now() };
 
