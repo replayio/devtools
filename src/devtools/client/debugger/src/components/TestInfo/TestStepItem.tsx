@@ -309,7 +309,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
       <button
         onClick={onClick}
         className="flex w-0 flex-grow items-start space-x-2 text-start"
-        title={`Step ${index + 1}: ${step.name} ${argString}`}
+        title={`Step ${index + 1}: ${step.name} ${argString || ""}`}
       >
         <div title={"" + displayedProgress} className="flex h-4 items-center">
           <ProgressBar progress={displayedProgress} error={!!step.error} />

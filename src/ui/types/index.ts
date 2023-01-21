@@ -204,7 +204,7 @@ export interface Annotation {
 }
 
 export type TestStep = {
-  args?: string[];
+  args?: any[];
   name: string;
   duration: number;
   relativeStartTime?: number;
