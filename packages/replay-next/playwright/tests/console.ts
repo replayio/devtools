@@ -510,15 +510,20 @@ test("should show the context menu on top of other messages and the current time
   let listItem = await locateMessage(page, "console-log", "This is a trace");
   await seekToMessage(page, listItem);
 
-  listItem = await locateMessage(page, "console-log", "This is a log");
+  listItem = await locateMessage(page, "console-log", "This is a trace");
   await openContextMenu(listItem);
-  await takeScreenshot(page, list, "context-menu-position-one");
+  // Change
+  await takeScreenshot(page, listItem, "context-menu-position-one");
 
   await page.keyboard.press("Escape");
 
   listItem = await locateMessage(page, "console-error", "This is an error");
   await openContextMenu(listItem);
-  await takeScreenshot(page, list, "context-menu-position-two");
+  // Delete
+  // await takeScreenshot(page, list, "context-menu-position-two");
+
+  // Add
+  await takeScreenshot(page, listItem, "context-menu-position-two-new-image");
 });
 
 test("should support setting focus range via the context menu", async ({ page }) => {
