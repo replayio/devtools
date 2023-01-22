@@ -54,6 +54,16 @@
   border-top: 1px solid var(--theme-splitter-color);
 }
 
+.disabled {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--theme-base-95),
+    var(--theme-base-95) 5px,
+    var(--theme-base-100) 5px,
+    var(--theme-base-100) 10px
+  );
+}
+
 .breakpoints-list .breakpoint:hover {
   background: var(--theme-toolbar-background-alt);
 }

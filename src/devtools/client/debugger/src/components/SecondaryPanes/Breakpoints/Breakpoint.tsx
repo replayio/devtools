@@ -149,6 +149,7 @@ class Breakpoint extends PureComponent<BreakpointProps> {
         className={classnames({
           breakpoint,
           paused: this.isCurrentlyPausedAtBreakpoint(frame),
+          disabled: !isChecked,
         })}
         data-test-name="Breakpoint"
         data-test-type={type}

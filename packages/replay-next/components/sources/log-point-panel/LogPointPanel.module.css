@@ -4,12 +4,21 @@
   flex-direction: column;
   padding: 0.5rem;
   gap: 0.25rem;
-
   --badge-picker-button-size: 1.25rem;
   --badge-picker-icon-size: 1rem;
 }
 .PanelEnabled {
   background-color: var(--point-panel-background-color);
+}
+
+.PanelDisabled {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--theme-base-100),
+    var(--theme-base-100) 5px,
+    var(--point-panel-background-color) 5px,
+    var(--point-panel-background-color) 10px
+  );
 }
 
 .Loader {
