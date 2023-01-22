@@ -35,7 +35,7 @@ export function getPrivacySummaryAndIcon(recording: Recording) {
 
 function DropdownButton({ disabled, children }: { disabled?: boolean; children: ReactNode }) {
   return (
-    <div className="flex flex-row space-x-1">
+    <div className="align-items-center flex flex-row space-x-1">
       <span className="whitespace-pre">{children}</span>
       {!disabled ? (
         <div style={{ lineHeight: "0px" }}>
