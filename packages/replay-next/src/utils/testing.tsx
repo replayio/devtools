@@ -110,6 +110,7 @@ export async function renderFocused(
     range: null,
     rangeForDisplay: null,
     update: jest.fn(),
+    enterFocusMode: () => {},
     ...options?.focusContext,
   };
 
