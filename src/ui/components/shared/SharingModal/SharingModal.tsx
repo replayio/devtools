@@ -27,6 +27,7 @@ import MaterialIcon from "../MaterialIcon";
 import Collaborators from "./Collaborators";
 import PrivacyDropdown from "./PrivacyDropdown";
 import { CopyButton } from "./ReplayLink";
+import styles from "./SharingModal.module.css";
 
 function SharingModalWrapper(props: PropsFromRedux) {
   const opts = props.modalOptions;
@@ -87,7 +88,15 @@ function CollaboratorRequests({ recording }: { recording: Recording }) {
   );
 }
 
-function CollaboratorsSection({ recording }: { recording: Recording }) {
+function CollaboratorsSection({
+  recording,
+  showPrivacy,
+  setShowPrivacy,
+}: {
+  recording: Recording;
+  showPrivacy: boolean;
+  setShowPrivacy: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const { hasNoRole, loading } = useHasNoRole();
 
   if (hasNoRole || loading) {
@@ -95,11 +104,28 @@ function CollaboratorsSection({ recording }: { recording: Recording }) {
   }
 
   return (
-    <section className="space-y-4 bg-themeBase-100 p-8">
+    <section className="space-y-4 bg-modalBgcolor p-4">
       <div className="flex w-full flex-col justify-between space-y-3">
         <div className="w-full space-y-4">
-          <div className="space-y-1.5">
-            <div className="font-bold">Add People</div>
+          <div>
+            <div className="mb-2 font-bold">Team</div>
+
+            <div className="rounded-md border border border-transparent bg-themeTextFieldBgcolor p-2 hover:bg-themeTextFieldBgcolorHover">
+              <PrivacyDropdown recording={recording} />
+            </div>
+
+            <div>
+              {!recording.private && recording.operations && (
+                <ToggleShowPrivacyButton
+                  showPrivacy={showPrivacy}
+                  operations={recording.operations}
+                  setShowPrivacy={setShowPrivacy}
+                />
+              )}
+            </div>
+
+            <div className="mt-4 mb-2 font-bold">Add People</div>
+
             <Collaborators recordingId={recording.id} />
           </div>
           <CollaboratorRequests recording={recording} />
@@ -140,31 +166,21 @@ function SharingSection({
 }) {
   return (
     <>
-      <CollaboratorsSection recording={recording} />
-      <section className="flex flex-col bg-menuHoverBgcolor px-8 py-8">
-        <div className="flex flex-grow flex-row items-center justify-between space-x-2 ">
-          <div className="flex flex-row items-start space-x-3 overflow-hidden">
-            <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-200 font-bold">
-              <MaterialIcon className="text-blue-600" iconSize="xl">
-                people
-              </MaterialIcon>
-            </div>
-            <div className="flex flex-col space-y-1 overflow-hidden">
-              <div className="font-bold">Privacy Settings</div>
-              <PrivacyDropdown {...{ recording }} />
-              {showEnvironmentVariables ? <EnvironmentVariablesRow /> : null}
-            </div>
+      <CollaboratorsSection
+        recording={recording}
+        showPrivacy={showPrivacy}
+        setShowPrivacy={setShowPrivacy}
+      />
+      <section className="flex flex-col bg-menuHoverBgcolor px-4 pb-5 pt-3">
+        <div className="mb-2 font-bold">Sharing Options</div>
+
+        <div className="flex">
+          <div className="mr-2">
+            <CopyButton recording={recording} />
           </div>
-          <CopyButton recording={recording} />
-        </div>
-        <div>
-          {!recording.private && recording.operations && (
-            <ToggleShowPrivacyButton
-              showPrivacy={showPrivacy}
-              operations={recording.operations}
-              setShowPrivacy={setShowPrivacy}
-            />
-          )}
+          <div>
+            <DownloadSection recording={recording} />
+          </div>
         </div>
       </section>
     </>
@@ -203,20 +219,7 @@ function Header({
     </div>
   );
 
-  return (
-    <section className="justify-left flex flex-row items-center space-x-2  px-8 py-4">
-      <Tab
-        label="Sharing"
-        onClick={() => setModalMode("sharing")}
-        active={modalMode == "sharing"}
-      />
-      <Tab
-        label="Downloads"
-        onClick={() => setModalMode("download")}
-        active={modalMode == "download"}
-      />
-    </section>
-  );
+  return <section></section>;
 }
 
 function DownloadSection({ recording }: { recording: Recording }) {
@@ -234,15 +237,15 @@ function DownloadSection({ recording }: { recording: Recording }) {
 
   const buttonStates = {
     "not-started": {
-      label: "Download video",
+      label: "Download as video",
       icon: "download",
     },
     downloading: {
-      label: "Downloading video",
+      label: "Downloading video ...",
       icon: "loop",
     },
     success: {
-      label: "Downloaded video",
+      label: "Video downloaded",
       icon: "check",
     },
     error: {
@@ -277,21 +280,14 @@ function DownloadSection({ recording }: { recording: Recording }) {
   };
 
   return (
-    <div className="flex flex-col">
-      {screen && <img className="mx-10" src={`data:image/jpeg;base64,${screen.data}`} />}
-      <div className="my-4 mt-4 flex flex-col items-center">
-        <button
-          className="mr-0 flex items-center space-x-1.5 rounded-lg bg-primaryAccent py-1 px-2 text-sm text-buttontextColor hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
-          onClick={onDownload}
-          disabled={downloadState !== "not-started"}
-        >
-          <MaterialIcon className="mr-2">{buttonStates[downloadState].icon}</MaterialIcon>
-          {buttonStates[downloadState].label}
-        </button>
-        {downloadState == "downloading" && (
-          <div className="mt-2 italic text-slate-400">Takes approximately 30 seconds...</div>
-        )}
-      </div>
+    <div>
+      <button className={styles.downloadVideo} onClick={onDownload}>
+        <MaterialIcon className={`mr-2 ${downloadState === "downloading" ? "animate-spin" : ""}`}>
+          {buttonStates[downloadState].icon}
+        </MaterialIcon>
+        {buttonStates[downloadState].label}
+      </button>
+
     </div>
   );
 }
@@ -306,23 +302,23 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
       <div
         className="sharing-modal relative flex flex-row overflow-hidden rounded-lg text-sm shadow-xl"
-        style={{ width: showPrivacy ? 720 : 460 }}
+        style={{ width: showPrivacy ? 720 : 390 }}
       >
-        <div className="flex flex-col space-y-0" style={{ width: 460 }}>
+        <div className="flex flex-col space-y-0" style={{ width: 390 }}>
           <Header modalMode={modalMode} setModalMode={setModalMode} />
           {modalMode == "sharing" ? (
-            <SharingSection
-              recording={recording}
-              showEnvironmentVariables={showEnvironmentVariables}
-              showPrivacy={showPrivacy}
-              setShowPrivacy={setShowPrivacy}
-            />
-          ) : (
-            <DownloadSection recording={recording} />
-          )}
+            <>
+              <SharingSection
+                recording={recording}
+                showEnvironmentVariables={showEnvironmentVariables}
+                showPrivacy={showPrivacy}
+                setShowPrivacy={setShowPrivacy}
+              />
+            </>
+          ) : null}
         </div>
         {showPrivacy ? (
-          <div className="relative flex overflow-auto bg-menuHoverBgcolor">
+          <div className="relative flex overflow-auto bg-themeBase-90">
             <Privacy />
           </div>
         ) : null}

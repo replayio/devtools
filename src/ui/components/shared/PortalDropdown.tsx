@@ -47,10 +47,10 @@ export default function PortalDropdown(props: PortalDropdownProps) {
   const toolboxLayout = useAppSelector(getToolboxLayout);
 
   return (
-    <div className="portal-dropdown-wrapper">
+    <>
       <button
         type="button"
-        className={`expand-dropdown mr-1 flex w-full py-1 ${buttonStyle}`}
+        className={`expand-dropdown mr-1 flex w-full ${buttonStyle}`}
         disabled={props.disabled}
         id="portal-dropdown-button"
         data-test-id="consoleDockButton"
@@ -75,7 +75,7 @@ export default function PortalDropdown(props: PortalDropdownProps) {
             document.body
           )
         : null}
-    </div>
+    </>
   );
 }
 
