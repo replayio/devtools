@@ -45,7 +45,6 @@ import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { MappedLocationCache } from "../mapped-location-cache";
-import ScopeMapCache from "../scope-map-cache";
 import { client } from "../socket";
 import { EventEmitter, assert, defer, locationsInclude } from "../utils";
 
@@ -178,8 +177,6 @@ class _ThreadFront {
   breakpointPositions = new Map<string, Promise<SameLineSourceLocations[]>>();
 
   mappedLocations = new MappedLocationCache();
-
-  scopeMaps = new ScopeMapCache();
 
   // Points which will be reached when stepping in various directions from a point.
   resumeTargets = new Map<string, PauseDescription>();
@@ -485,10 +482,6 @@ class _ThreadFront {
         });
       }
     }
-  }
-
-  getScopeMap(location: Location): Promise<Record<string, string>> {
-    return this.scopeMaps.getScopeMap(location);
   }
 
   // Same as evaluate, but returns the result without wrapping a ValueFront around them.
