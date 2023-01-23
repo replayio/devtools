@@ -89,6 +89,7 @@ Consider the following benefits and trade-offs of using this hook vs useLocalSto
 - IndexedDB is asynchronous which can complicate things when stored values are used during app initialization
 - IndexedDB storage limits is typically much larger than local storage because it is based on free disk space (and not a hard limit).
   See: https://tinyurl.com/index-db-storage-limits
+- IndexedDB does not have a built-in method for listening to changes, whereas `localStorage` has a `"storage"` event.
 
 ***NOTE**: All IDBOptions database definitions used with this hook _must_ be listed in the `IDB_PREFS_DATABASES`
 array in both `src/ui/setup/index.ts` and `bvaughn/components/Initializer.tsx`,
