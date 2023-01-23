@@ -106,11 +106,11 @@ export async function renderFocused(
   };
 
   const focusContext: FocusContextType = {
+    enterFocusMode: () => {},
     isTransitionPending: false,
     range: null,
     rangeForDisplay: null,
     update: jest.fn(),
-    enterFocusMode: () => {},
     ...options?.focusContext,
   };
 

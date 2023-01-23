@@ -91,9 +91,9 @@ function PointPanel(props: ExternalProps) {
   return (
     <PointPanelWithHitPoints
       {...props}
+      enterFocusMode={enterFocusMode}
       hitPoints={hitPoints}
       hitPointStatus={hitPointStatus}
-      enterFocusMode={enterFocusMode}
     />
   );
 }
@@ -349,7 +349,7 @@ function PointPanelWithHitPoints({
         {showTooManyPointsMessage ? (
           <div className={styles.ContentWrapperTooManyPoints}>
             Use{""}
-            <span style={{ textDecoration: "underline" }} onClick={enterFocusMode}>
+            <span className={styles.FocusModeLink} onClick={enterFocusMode}>
               Focus Mode
             </span>{" "}
             to reduce the number of hits.

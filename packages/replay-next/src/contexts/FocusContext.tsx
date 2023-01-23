@@ -26,11 +26,11 @@ const FOCUS_DEBOUNCE_DURATION = 250;
 export type FocusContextType = {
   // Focus is about to be updated as part of a transition;
   // UI that consumes the focus for Suspense purposes may wish want reflect the temporary pending state.
+  enterFocusMode: () => void;
   isTransitionPending: boolean;
   range: TimeStampedPointRange | null;
   rangeForDisplay: TimeStampedPointRange | null;
   update: (value: Range | null, debounce: boolean) => void;
-  enterFocusMode: () => void;
 };
 
 export const FocusContext = createContext<FocusContextType>(null as any);
@@ -119,11 +119,11 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
 
   const focusContext = useMemo<FocusContextType>(
     () => ({
+      enterFocusMode: () => {},
       isTransitionPending,
       rangeForDisplay: range,
       range: deferredRange,
       update: updateFocusRange,
-      enterFocusMode: () => {},
     }),
     [deferredRange, isTransitionPending, range, updateFocusRange]
   );

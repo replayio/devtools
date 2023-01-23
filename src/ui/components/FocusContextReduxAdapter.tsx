@@ -50,7 +50,7 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
       },
       update,
     };
-  }, [deferredFocusRegion, isPending, focusRegion, update, dispatch]);
+  }, [deferredFocusRegion, dispatch, isPending, focusRegion, update]);
 
   return <FocusContext.Provider value={context}>{children}</FocusContext.Provider>;
 }
