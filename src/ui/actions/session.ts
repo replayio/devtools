@@ -331,7 +331,7 @@ export function createSocket(
 
       ThreadFront.on("paused", ({ point }) => dispatch(setCurrentPoint(point)));
 
-      await ThreadFront.waitForSession();
+      await ThreadFront.loadingHasBegun.promise;
       dispatch(jumpToInitialPausePoint());
     } catch (e: any) {
       const currentError = selectors.getUnexpectedError(getState());

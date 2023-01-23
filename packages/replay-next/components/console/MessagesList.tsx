@@ -17,6 +17,7 @@ import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegions } from "shared/utils/time";
 
+import ErrorBoundary from "../ErrorBoundary";
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
 import CurrentTimeIndicator from "./CurrentTimeIndicator";
 import { Loggable, LoggablesContext } from "./LoggablesContext";
@@ -26,6 +27,7 @@ import MessageRenderer from "./renderers/MessageRenderer";
 import TerminalExpressionRenderer from "./renderers/TerminalExpressionRenderer";
 import UncaughtExceptionRenderer from "./renderers/UncaughtExceptionRenderer";
 import styles from "./MessagesList.module.css";
+import rendererStyles from "./renderers/shared.module.css";
 
 type CurrentTimeIndicatorPlacement = Loggable | "begin" | "end";
 
@@ -177,7 +179,18 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
         role="list"
         tabIndex={0}
       >
-        {listItems}
+        {listItems.map((item, index) => (
+          <ErrorBoundary
+            key={index}
+            fallback={
+              <div className={rendererStyles.Row}>
+                <div className={rendererStyles.ErrorBoundaryFallback}>Something went wrong.</div>
+              </div>
+            }
+          >
+            {item}
+          </ErrorBoundary>
+        ))}
       </div>
       {countAfter > 0 && (
         <div className={styles.CountRow}>

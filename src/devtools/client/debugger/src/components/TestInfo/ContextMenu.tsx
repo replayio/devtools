@@ -67,10 +67,12 @@ function ContextMenu({
         top: mouseCoordinates.y,
       }}
     >
-      <div className={styles.ContextMenuItem} onClick={onGoToLocation}>
-        <MaterialIcon>code</MaterialIcon>
-        Jump to source
-      </div>
+      {actions.canShowStepSource ? (
+        <div className={styles.ContextMenuItem} onClick={onGoToLocation}>
+          <MaterialIcon>code</MaterialIcon>
+          Jump to source
+        </div>
+      ) : null}
       <div
         className={classnames("ContextMenuItem", { disabled: isFirstStep })}
         onClick={onPlayToHere}

@@ -35,7 +35,7 @@ export function ToggleShowPrivacyButton({
     >
       <div className="flex flex-row items-center space-x-2">
         <MaterialIcon iconSize="xl">storage</MaterialIcon>
-        <span>Contains potentially sensitive data from {uniqueDomains.length} domains</span>
+        <span>Potentially sensitive data from {uniqueDomains.length} domains</span>
       </div>
       <MaterialIcon className="opacity-0 group-hover:opacity-100" iconSize="xl">
         {showPrivacy ? "chevron_left" : "chevron_right"}
@@ -88,9 +88,9 @@ export function Privacy() {
   const { operations } = recording ?? {};
 
   return (
-    <div className="m-5 flex flex-col space-y-7 overflow-hidden">
+    <div className="m-4 flex w-96 flex-col space-y-4 overflow-hidden">
       <div className="flex flex-col space-y-1">
-        <div className="text-lg font-bold">Privacy</div>
+        <div className="font-bold">Privacy</div>
         <div className="">
           {`Replays include all of the data needed to replay the browser. `}
           <ExternalLink
