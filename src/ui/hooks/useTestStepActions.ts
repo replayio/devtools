@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AnnotatedTestStep, TestItem } from "ui/types";
 
 import { useGetRecording, useGetRecordingId } from "./recordings";
+import { isStepEnd, isStepStart } from "./useStepState";
 
 function findSourceLocationCypress8Plus(
   frames: Frame[],
@@ -73,17 +74,11 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
       ? recording.metadata.test.runner.version
       : undefined;
 
-  const isAtStepStart =
-    currentPoint && testStep?.annotations.start
-      ? BigInt(currentPoint) === BigInt(testStep.annotations.start.point)
-      : !!testStep && currentTime === testStep.absoluteStartTime;
-  const canJumpToBefore = !isAtStepStart;
+  const stepStart = testStep ? isStepStart(testStep, currentTime, currentPoint) : false;
+  const canJumpToBefore = testStep && !stepStart && testStep.name !== "assert";
 
-  const isAtStepEnd =
-    currentPoint && testStep?.annotations.end
-      ? BigInt(currentPoint) === BigInt(testStep.annotations.end.point)
-      : !!testStep && currentTime === testStep.absoluteEndTime;
-  const canJumpToAfter = !isAtStepEnd;
+  const stepEnd = testStep ? isStepEnd(testStep, currentTime, currentPoint) : false;
+  const canJumpToAfter = testStep && !stepEnd && testStep.name !== "assert";
 
   const canPlayback = (
     test: TestItem
@@ -175,8 +170,10 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
 
   return {
     canPlayback,
-    isAtStepEnd,
-    isAtStepStart,
+    canJumpToAfter,
+    canJumpToBefore,
+    isAtStepEnd: stepEnd,
+    isAtStepStart: stepStart,
     playFromStep,
     playToStep,
     seekToStepEnd,

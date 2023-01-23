@@ -89,7 +89,7 @@ function ContextMenu({
       </div>
       <div
         className={classnames("ContextMenuItem", {
-          disabled: actions.isAtStepStart,
+          disabled: !actions.canJumpToBefore,
         })}
         onClick={onJumpToBefore}
       >
@@ -98,7 +98,7 @@ function ContextMenu({
       </div>
       <div
         className={classnames("ContextMenuItem", {
-          disabled: actions.isAtStepEnd,
+          disabled: !actions.canJumpToAfter,
         })}
         onClick={onJumpToAfter}
       >
