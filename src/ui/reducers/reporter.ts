@@ -85,14 +85,26 @@ export const getReporterAnnotationsForTitle = createSelector(
 export const getReporterAnnotationsForTitleEnd = createSelector(
   getSelectedTestTitle,
   getReporterAnnotations,
-  (title, annotations) =>
-    title
-      ? annotations.filter(
-          a =>
-            a.message.titlePath[a.message.titlePath.length - 1] === title &&
-            a.message.event === "step:end"
-        )
-      : []
+  (title, annotations) => {
+    if (!title) {
+      return [];
+    }
+
+    const acc = new Map<string, Annotation>();
+    annotations.forEach(a => {
+      const id = a.message.id;
+      if (
+        id &&
+        a.message.titlePath[a.message.titlePath.length - 1] === title &&
+        a.message.event === "step:end" &&
+        (!acc.has(id) || compareNumericStrings(acc.get(id)!.point, a.point))
+      ) {
+        acc.set(id, a);
+      }
+    });
+
+    return Array.from(acc.values());
+  }
 );
 export const getReporterAnnotationsForTitleStart = createSelector(
   getSelectedTestTitle,
