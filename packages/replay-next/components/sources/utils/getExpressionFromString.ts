@@ -75,6 +75,7 @@ export default function getExpressionFromString(
       case ")":
       case ",":
       case ".":
+      case "[":
         break nextLoop;
     }
 

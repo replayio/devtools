@@ -171,6 +171,17 @@ describe("getExpressionFromString", () => {
     expect(getExpressionHelper("test(foo, bar|)")).toBe("bar");
   });
 
+  // FE-1136
+  it("should properly handle bracket notation", () => {
+    expect(getExpressionHelper("const foo = b|ar[baz];")).toBe("bar");
+    expect(getExpressionHelper("const foo = ba|r[baz];")).toBe("bar");
+    expect(getExpressionHelper("const foo = bar|[baz];")).toBe("bar");
+
+    expect(getExpressionHelper("const foo = bar[b|az];")).toBe("bar[baz]");
+    expect(getExpressionHelper("const foo = bar[ba|z];")).toBe("bar[baz]");
+    expect(getExpressionHelper("const foo = bar[baz|];")).toBe("bar[baz]");
+  });
+
   describe("minified/mangled code", () => {
     it("keywords", () => {
       expect(getExpressionHelper('!fu|nction(){"use strict";var e={4:function(e,t,n)')).toBe(
