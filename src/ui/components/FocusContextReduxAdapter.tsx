@@ -42,12 +42,12 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
 
   const context = useMemo(() => {
     return {
-      isTransitionPending: isPending,
-      range: deferredFocusRegion ? rangeForFocusRegion(deferredFocusRegion) : null,
-      rangeForDisplay: focusRegion ? rangeForFocusRegion(focusRegion) : null,
       enterFocusMode: () => {
         dispatch(enterFocusMode());
       },
+      isTransitionPending: isPending,
+      range: deferredFocusRegion ? rangeForFocusRegion(deferredFocusRegion) : null,
+      rangeForDisplay: focusRegion ? rangeForFocusRegion(focusRegion) : null,
       update,
     };
   }, [deferredFocusRegion, dispatch, isPending, focusRegion, update]);

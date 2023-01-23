@@ -100,11 +100,11 @@ function PointPanel(props: ExternalProps) {
 
 function PointPanelWithHitPoints({
   className,
+  enterFocusMode,
   hitPoints,
   hitPointStatus,
   point,
   setLinePointState,
-  enterFocusMode,
 }: InternalProps) {
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
