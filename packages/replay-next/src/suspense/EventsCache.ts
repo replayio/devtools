@@ -17,8 +17,7 @@ import { RecordingTarget } from 'protocol/thread/thread';
 import { ReplayClientInterface } from "shared/client/types";
 
 import {
-  STANDARD_EVENT_CATEGORIES,
-  EventCategory
+  STANDARD_EVENT_CATEGORIES
 } from "../constants";
 import { groupEntries } from '../utils/group';
 import { createWakeable } from "../utils/suspense";
@@ -29,6 +28,10 @@ export type EventCounter = {
   count: number;
   label: string;
   type: EventHandlerType;
+  /**
+   * Set of event types sent from the runtime that map to this normalized event entry.
+   */
+  rawEventTypes: string[];
 };
 
 export type EventCategoryWithCount = {
@@ -185,6 +188,7 @@ const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
         events: category.events.map(event => ({
           ...event,
           count: eventCountsRaw[event.type],
+          rawEventTypes: [event.type]
         })),
       };
     });
@@ -203,7 +207,12 @@ const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
     // const normalizedEventCounts = convertChromiumEventCounts(eventCountsRaw);
     const chromiumEventCategoriesByEventDefault = makeChromiumEventCategoriesByEventDefault();
     const chromiumEventCategoriesByEventAndTarget = makeChromiumEventCategoriesByEventAndTarget();
-    const normalizedEventCounts: { [key: string]: number } = {};
+    const normalizedEventCounts: { 
+      [key: string]: {
+        count: number,
+        rawEventTypes: string[];
+      }
+    } = {};
     Object.entries(eventCountsRaw).forEach(
       ([eventInputRaw, count]) => {
         const [eventTypeRaw, eventTargetName] = eventInputRaw.split(',', 2);
@@ -212,9 +221,18 @@ const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
           chromiumEventCategoriesByEventDefault,
           chromiumEventCategoriesByEventAndTarget
         );
+
         const uniqueEventType = makeChromiumEventType(category, eventTypeRaw);
         if (uniqueEventType) {
-          normalizedEventCounts[uniqueEventType] = (normalizedEventCounts[uniqueEventType] || 0) + count;
+          let entry = normalizedEventCounts[uniqueEventType];
+          if (!entry) {
+            normalizedEventCounts[uniqueEventType] = entry = {
+              count: 0,
+              rawEventTypes: []
+            };
+          }
+          entry.count += count;
+          entry.rawEventTypes.push(eventInputRaw);
         }
       }
     );
@@ -224,10 +242,12 @@ const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
       return {
         ...category,
         events: category.events.map(event => {
-          const count = normalizedEventCounts[makeChromiumEventType(category.category, event.type)];
+          const countEntry = normalizedEventCounts[
+            makeChromiumEventType(category.category, event.type)
+          ];
           return {
             ...event,
-            count,
+            ...countEntry
           };
         }),
       };
