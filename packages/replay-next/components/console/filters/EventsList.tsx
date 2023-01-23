@@ -73,8 +73,7 @@ function EventsListCategories({
 
   return (
     <>
-      <div className={styles.Header}>Common Events</div>
-      {commonEventCategories.map(eventCategory => (
+      {commonEventCategories.map((eventCategory) => (
         <EventCategory
           key={eventCategory.category}
           disabled={isPending}
@@ -82,7 +81,6 @@ function EventsListCategories({
           filterByText={filterByText}
         />
       ))}
-      <div className={styles.Header}>Other Events</div>
       {otherEventCategories.map(eventCategory => (
         <EventCategory
           key={eventCategory.category}

@@ -6,8 +6,11 @@ import {
   PauseId,
   Object as RecordReplayObject,
 } from "@replayio/protocol";
+import sumBy from 'lodash/sumBy';
 import isEmpty from 'lodash/isEmpty';
 import without from 'lodash/without';
+
+import { assert } from "protocol/utils";
 import { ThreadFront } from 'protocol/thread';
 import { RecordingTarget } from 'protocol/thread/thread';
 
@@ -17,6 +20,7 @@ import {
   STANDARD_EVENT_CATEGORIES,
   EventCategory
 } from "../constants";
+import { groupEntries } from '../utils/group';
 import { createWakeable } from "../utils/suspense";
 import { cachePauseData } from "./PauseCache";
 import { Record as WakeableRecord, STATUS_PENDING, STATUS_RESOLVED, Wakeable } from "./types";
@@ -45,10 +49,21 @@ export type EventLog = {
   values: any[];
 };
 
+type EventCategoriesByEvent = Record<string, string>;
+type EventCategoriesByEventAndTarget = Record<string, Record<string, string>>;
+
 let recordingTarget: RecordingTarget | null = null;
 let eventTypeToEntryPointMap = new Map<EventHandlerType, WakeableRecord<EventLog[]>>();
 let eventCategoryCounts: EventCategoryWithCount[] | null = null;
 let inProgressEventCategoryCountsWakeable: Wakeable<EventCategoryWithCount[]> | null = null;
+
+/**
+ * Encode a Chromium event type, based on its category and non-unique event type.
+ */
+function makeChromiumEventType(category: string, eventTypeRaw?: string) {
+  return `${category}.${eventTypeRaw}`;
+}
+
 
 export function getEventCategoryCountsSuspense(client: ReplayClientInterface): EventCategoryWithCount[] {
   if (eventCategoryCounts !== null) {
@@ -143,12 +158,23 @@ async function countEvents(eventCountsRaw: Record<string, number>) {
     }
     return [];
   }
-  return targetCountEvents(eventCountsRaw);
+
+  const result = targetCountEvents(eventCountsRaw);
+
+  if (process.env.NODE_ENV !== "production") {
+    // make sure that target counts add up to raw counts
+    const targetCount = sumBy(result.flatMap(category => sumBy(category.events, event => event.count || 0)));
+    const rawCount = sumBy(Object.values(eventCountsRaw));
+    assert(targetCount === rawCount, `Event count: ${targetCount} != ${rawCount}`);
+  }
+
+  return result;
 }
 
 type CountEventsFunction = (
   eventCountsRaw: Record<string, number>
 ) => EventCategoryWithCount[];
+
 
 const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
   gecko(eventCountsRaw: Record<string, number>) {
@@ -156,89 +182,92 @@ const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
     return eventTable.map(category => {
       return {
         ...category,
-        events: category.events.map(eventType => ({
-          ...eventType,
-          count: eventCountsRaw[eventType.type],
+        events: category.events.map(event => ({
+          ...event,
+          count: eventCountsRaw[event.type],
         })),
       };
     });
   },
   chromium(eventCountsRaw: Record<string, number>) {
     const eventTable = STANDARD_EVENT_CATEGORIES.chromium!;
-    const eventCountsConverted = convertChromiumEventCounts(eventCountsRaw);
-    return eventTable.map(category => {
+
+    // Merge non-unique CDT category names.
+    // NOTE: at this point, we don't care about eventTargets.
+    const normalizedEventTable = groupEntries(
+      eventTable.map(({ category, events }) => [category, events])
+    )
+      .map(([ category, events ]) => ({ category, events }));
+
+    // convert, map and merge event types
+    // const normalizedEventCounts = convertChromiumEventCounts(eventCountsRaw);
+    const chromiumEventCategoriesByEventDefault = makeChromiumEventCategoriesByEventDefault();
+    const chromiumEventCategoriesByEventAndTarget = makeChromiumEventCategoriesByEventAndTarget();
+    const normalizedEventCounts: { [key: string]: number } = {};
+    Object.entries(eventCountsRaw).forEach(
+      ([eventInputRaw, count]) => {
+        const [eventTypeRaw, eventTargetName] = eventInputRaw.split(',', 2);
+        const category = lookupChromiumEventCategory(
+          eventTypeRaw, eventTargetName,
+          chromiumEventCategoriesByEventDefault,
+          chromiumEventCategoriesByEventAndTarget
+        );
+        const uniqueEventType = makeChromiumEventType(category, eventTypeRaw);
+        if (uniqueEventType) {
+          normalizedEventCounts[uniqueEventType] = (normalizedEventCounts[uniqueEventType] || 0) + count;
+        }
+      }
+    );
+    
+    // produce eventTable with counts
+    return normalizedEventTable.map(category => {
       return {
         ...category,
-        events: category.events.map(eventType => ({
-          ...eventType,
-          count: eventCountsConverted[eventType.type],
-        })),
+        events: category.events.map(event => {
+          const count = normalizedEventCounts[makeChromiumEventType(category.category, event.type)];
+          return {
+            ...event,
+            count,
+          };
+        }),
       };
     });
   }
 };
 
 /**
- * Convert event count entries to unique name and merge all which map to the same name.
+ * Convert event count EntryTypes to unique EntryType and merge all which map to the same type.
  */
-function convertChromiumEventCounts(eventCountsRaw: Record<string, number>) {
-  const converted: { [key: string]: number } = {};
-  const chromiumEventCategoriesByEventDefault = makeChromiumEventCategoriesByEventDefault();
-  const chromiumEventCategoriesByEventAndTarget = makeChromiumEventCategoriesByEventAndTarget();
-  Object.entries(eventCountsRaw)
-    .map(
-      ([eventInputRaw, count]) => {
-        const uniqueEventName = makeChromiumUniqueEventName(
-          eventInputRaw,
-          chromiumEventCategoriesByEventDefault,
-          chromiumEventCategoriesByEventAndTarget
-        );
-        if (uniqueEventName) {
-          converted[uniqueEventName] = (converted[uniqueEventName] || 0) + count;
-        }
-      }
-    );
-  return converted;
-}
 
 
 /**
- * Convert event strings produced by chromium to unique event names.
+ * Find category for raw chromium event input string.
  * 
  * NOTE: Chromium event names are more involved than gecko, because its event names 
  * are not unique. Instead, it uses both: event name + event target name
  * to look up the "breakpoint".
  *
- * NOTE: Event names are produced in ReplayMakeEventName() in chromium in
+ * NOTE: Event names are produced in ReplayMakeEventType() in chromium in
  *   third_party/blink/renderer/core/inspector/inspector_dom_debugger_agent.cc.
  */
-function makeChromiumUniqueEventName(
-  eventInputRaw: string,
+function lookupChromiumEventCategory(
+  eventTypeRaw: string, eventTargetName: string,
   chromiumEventCategoriesByEventDefault: EventCategoriesByEvent,
   chromiumEventCategoriesByEventAndTarget: EventCategoriesByEventAndTarget
 ) {
-  const [eventNameRaw, eventTargetName] = eventInputRaw.split(',', 2);
-
   // look up category
   let category: string = '';
   if (eventTargetName) {
-    // first try to look up by targetName
-    category = chromiumEventCategoriesByEventAndTarget[eventNameRaw]?.[eventTargetName];
+    // 1. try to look up by targetName
+    category = chromiumEventCategoriesByEventAndTarget[eventTypeRaw]?.[eventTargetName];
   }
   if (!category) {
-    // try to look up default
-    category = chromiumEventCategoriesByEventDefault[eventNameRaw];
+    // 2. try to look up default
+    category = chromiumEventCategoriesByEventDefault[eventTypeRaw];
   }
-  return MakeChromiumEventName(category, eventNameRaw);
+  return category;
 };
 
-function MakeChromiumEventName(category: string, eventNameRaw: string) {
-  return `${category}.${eventNameRaw}`;
-}
-
-
-type EventCategoriesByEvent = Record<string, string>;
-type EventCategoriesByEventAndTarget = Record<string, Record<string, string>>;
 
 /**
  * This allows looking up category by non-unique event name
@@ -253,6 +282,7 @@ type EventCategoriesByEventAndTarget = Record<string, Record<string, string>>;
  * 
  */
 function makeChromiumEventCategoriesByEventDefault(): EventCategoriesByEvent {
+  // TODO: add checks to make sure that each type only has one "default category"
   return Object.fromEntries(
     STANDARD_EVENT_CATEGORIES.chromium!
       .flatMap(category => {
@@ -276,27 +306,33 @@ function makeChromiumEventCategoriesByEventDefault(): EventCategoriesByEvent {
  *     xmlhttprequest: 'XHR',
  *     xmlhttprequestupload: 'XHR',
  *   },
- *   click: { // or maybe `click: 'mouse'` for short, since it only has a default
+ *   click: {
+ *     pointerevent: 'mouse'
  *   }
  *   // ... 100+ more entries ...
  * })
  */
 function makeChromiumEventCategoriesByEventAndTarget(): EventCategoriesByEventAndTarget {
+  const nonUniqueEntries = STANDARD_EVENT_CATEGORIES.chromium!
+    .flatMap(category => {
+      const eventTargets = category.eventTargets && without(category.eventTargets, '*');
+      if (!eventTargets?.length) {
+        return null;
+      }
+      return category.events.map(evt =>
+        [
+          evt.type,
+          eventTargets.map(target => [target.toLowerCase(), category.category])
+        ] as [string, [string, string][]]
+      );
+    })
+    .filter(Boolean) as [string, [string, string][]][];
+
+  const uniqueEntries = groupEntries(nonUniqueEntries);
   return Object.fromEntries(
-    STANDARD_EVENT_CATEGORIES.chromium!
-      .flatMap(category => {
-        const eventTargets = category.eventTargets && without(category.eventTargets, '*');
-        if (!eventTargets?.length) {
-          return null;
-        }
-        return category.events.map(evt =>
-          [
-            evt.type,
-            Object.fromEntries(eventTargets.map(target => [target, category.category]))
-          ]
-        ) as [[string, Record<string, string>]];
-      })
-      .filter(Boolean) as [[string, Record<string, string>]]
+    uniqueEntries.map(([eventType, targetCategoryEntries]) => {
+      return [eventType, Object.fromEntries(targetCategoryEntries)] as [string, Record<string, string>];
+    })
   );
 }
 

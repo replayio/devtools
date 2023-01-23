@@ -532,7 +532,7 @@ export const STANDARD_EVENT_CATEGORIES: Partial<Record<RecordingTarget, EventCat
       {
         "category": "Pictureinpicture",
         "eventTargets": [
-          "PictureInPictureWindow"
+          "pictureinpicturewindow"
         ],
         "events": [
           {

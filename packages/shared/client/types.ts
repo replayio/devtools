@@ -134,6 +134,7 @@ export interface ReplayClientInterface {
   getCorrespondingLocations(location: Location): Location[];
   getCorrespondingSourceIds(sourceId: SourceId): SourceId[];
   getEventCountForTypes(eventTypes: EventHandlerType[]): Promise<Record<string, number>>;
+  getAllEventHandlerCounts(): Promise<Record<string, number>>;
   getFrameSteps(pauseId: PauseId, frameId: FrameId): Promise<PointDescription[]>;
   getHitPointsForLocation(
     focusRange: TimeStampedPointRange | null,
