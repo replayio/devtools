@@ -300,6 +300,7 @@
   --point-panel-input-edit-button-color-hover: var(--primary-accent);
   --point-panel-input-cancel-button-color: #484445;
   --point-panel-input-cancel-button-color-hover: #747476;
+  --point-panel-input-disabled-link-color-hover: #fff;
   --point-panel-input-disabled-cancel-button-color: #a65858;
   --point-panel-input-disabled-cancel-button-color-hover: #d3aaaa;
   --point-panel-timeline-background-color: #000000;
@@ -771,6 +772,7 @@
   --point-panel-input-edit-button-color-hover: var(--primary-accent);
   --point-panel-input-cancel-button-color: #e2e2e2;
   --point-panel-input-cancel-button-color-hover: #afafb5;
+  --point-panel-input-disabled-link-color-hover: #b9000d;
   --point-panel-input-disabled-cancel-button-color: #d3aaaa;
   --point-panel-input-disabled-cancel-button-color-hover: #c07171;
   --point-panel-timeline-background-color: #ffffff;

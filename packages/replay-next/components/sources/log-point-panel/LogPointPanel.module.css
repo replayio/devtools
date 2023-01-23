@@ -4,12 +4,20 @@
   flex-direction: column;
   padding: 0.5rem;
   gap: 0.25rem;
-
   --badge-picker-button-size: 1.25rem;
   --badge-picker-icon-size: 1rem;
 }
 .PanelEnabled {
   background-color: var(--point-panel-background-color);
+}
+
+.FocusModeLink {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.FocusModeLink:hover {
+  color: var(--point-panel-input-disabled-link-color-hover);
 }
 
 .Loader {

@@ -49,6 +49,7 @@ type ExternalProps = {
 };
 
 type InternalProps = ExternalProps & {
+  enterFocusMode: () => void;
   hitPoints: TimeStampedPoint[];
   hitPointStatus: HitPointStatus;
 };
@@ -76,7 +77,8 @@ export default function PointPanelWrapper(props: ExternalProps) {
 function PointPanel(props: ExternalProps) {
   const { point } = props;
 
-  const { range: focusRange } = useContext(FocusContext);
+  const { enterFocusMode, range: focusRange } = useContext(FocusContext);
+
   const client = useContext(ReplayClientContext);
 
   const [hitPoints, hitPointStatus] = getHitPointsForLocationSuspense(
@@ -87,12 +89,18 @@ function PointPanel(props: ExternalProps) {
   );
 
   return (
-    <PointPanelWithHitPoints {...props} hitPoints={hitPoints} hitPointStatus={hitPointStatus} />
+    <PointPanelWithHitPoints
+      {...props}
+      enterFocusMode={enterFocusMode}
+      hitPoints={hitPoints}
+      hitPointStatus={hitPointStatus}
+    />
   );
 }
 
 function PointPanelWithHitPoints({
   className,
+  enterFocusMode,
   hitPoints,
   hitPointStatus,
   point,
@@ -340,7 +348,11 @@ function PointPanelWithHitPoints({
       <div className={styles.EditableContentWrapperRow}>
         {showTooManyPointsMessage ? (
           <div className={styles.ContentWrapperTooManyPoints}>
-            Use Focus Mode to reduce the number of hits.
+            Use{""}
+            <span className={styles.FocusModeLink} onClick={enterFocusMode}>
+              Focus Mode
+            </span>{" "}
+            to reduce the number of hits.
           </div>
         ) : (
           <div
