@@ -49,9 +49,9 @@ type ExternalProps = {
 };
 
 type InternalProps = ExternalProps & {
+  enterFocusMode: () => void;
   hitPoints: TimeStampedPoint[];
   hitPointStatus: HitPointStatus;
-  enterFocusMode: () => void;
 };
 
 export default function PointPanelWrapper(props: ExternalProps) {
@@ -77,7 +77,7 @@ export default function PointPanelWrapper(props: ExternalProps) {
 function PointPanel(props: ExternalProps) {
   const { point } = props;
 
-  const { range: focusRange, enterFocusMode } = useContext(FocusContext);
+  const { enterFocusMode, range: focusRange } = useContext(FocusContext);
 
   const client = useContext(ReplayClientContext);
 
