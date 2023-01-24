@@ -1,3 +1,12 @@
+export function isNumeric(text: string): boolean {
+  return (
+    typeof text === "string" &&
+    text.match(/\s/) === null &&
+    !isNaN(text as any) &&
+    !isNaN(parseFloat(text))
+  );
+}
+
 export function truncate(
   text: string,
   options: {

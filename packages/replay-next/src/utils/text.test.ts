@@ -1,6 +1,24 @@
-import { truncate } from "replay-next/src/utils/text";
+import { isNumeric, truncate } from "replay-next/src/utils/text";
 
 describe("text utils", () => {
+  describe("isNumeric", () => {
+    it("should reject non-numeric values", () => {
+      expect(isNumeric("")).toBe(false);
+      expect(isNumeric("a")).toBe(false);
+      expect(isNumeric("true")).toBe(false);
+      expect(isNumeric(" 1")).toBe(false);
+      expect(isNumeric("1 ")).toBe(false);
+    });
+
+    it("should accept numeric values", () => {
+      expect(isNumeric("1")).toBe(true);
+      expect(isNumeric("123")).toBe(true);
+      expect(isNumeric("1.2")).toBe(true);
+      expect(isNumeric(".1")).toBe(true);
+      expect(isNumeric("0.234")).toBe(true);
+    });
+  });
+
   describe("truncate", () => {
     it("should not truncate strings shorter than the max length", () => {
       expect(truncate("12345", { maxLength: 10 })).toEqual("12345");
