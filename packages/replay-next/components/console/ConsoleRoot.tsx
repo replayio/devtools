@@ -145,6 +145,7 @@ function Console({
               id="filters"
               minSize={20}
               order={1}
+              style={{ overflowY: "auto" }}
             >
               {
                 /* Avoid rendering two of these (even display:none) because it confuses Playwright */
