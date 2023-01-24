@@ -72,6 +72,11 @@ function makeChromiumEventType(nonUniqueEventType: string, category?: string) {
   return nonUniqueEventType;
 }
 
+/**
+ * NOTE: The `rawEventType` is produced in MakeReplayMakeEventType in chromium's
+ *   `InspectorDOMDebuggerAgent`.
+ * @see https://github.com/replayio/chromium/blob/509fb5f3c3a587ebef668a631a53eed83acc2f85/third_party/blink/renderer/core/inspector/inspector_dom_debugger_agent.cc#L940
+ */
 function decodeChromiumEventType(rawEventType: string) {
   const [nonUniqueEventType, eventTargetName] = rawEventType.split(',', 2);
   return [nonUniqueEventType, eventTargetName];
@@ -277,10 +282,6 @@ const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
   }
 };
 
-/**
- * Convert event count EntryTypes to unique EntryType and merge all which map to the same type.
- */
-
 
 /**
  * Find category for raw chromium event input string.
@@ -288,9 +289,6 @@ const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
  * NOTE: Chromium event names are more involved than gecko, because its event names 
  * are not unique. Instead, it uses both: event name + event target name
  * to look up the "breakpoint".
- *
- * NOTE: Event names are produced in MakeReplayMakeEventType() in chromium in
- *   third_party/blink/renderer/core/inspector/inspector_dom_debugger_agent.cc.
  */
 function lookupChromiumEventCategory(
   eventTypeRaw: string, eventTargetName: string,
