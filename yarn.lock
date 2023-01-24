@@ -6258,6 +6258,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/semver@npm:^7.3.13":
+  version: 7.3.13
+  resolution: "@types/semver@npm:7.3.13"
+  checksum: 00c0724d54757c2f4bc60b5032fe91cda6410e48689633d5f35ece8a0a66445e3e57fa1d6e07eb780f792e82ac542948ec4d0b76eb3484297b79bd18b8cf1cb0
+  languageName: node
+  linkType: hard
+
 "@types/source-list-map@npm:*":
   version: 0.1.2
   resolution: "@types/source-list-map@npm:0.1.2"
@@ -20083,6 +20090,7 @@ __metadata:
     "@types/react-transition-group": ^4.4.5
     "@types/react-virtualized-auto-sizer": ^1.0.1
     "@types/react-window": ^1.8.5
+    "@types/semver": ^7.3.13
     "@types/styled-components": ^5.1.25
     "@types/uuid": ^8.3.1
     "@typescript-eslint/parser": ^5.38.1
@@ -20177,6 +20185,7 @@ __metadata:
     reactjs-popup: ^2.0.5
     replay-next: "workspace:*"
     reselect: ^4.1.5
+    semver: ^7.3.8
     shared: "workspace:*"
     sharp: ^0.30.3
     slugify: ^1.6.5
@@ -20977,6 +20986,17 @@ __metadata:
   bin:
     semver: bin/semver.js
   checksum: 2fa3e877568cd6ce769c75c211beaed1f9fce80b28338cadd9d0b6c40f2e2862bafd62c19a6cff42f3d54292b7c623277bcab8816a2b5521cf15210d43e75232
+  languageName: node
+  linkType: hard
+
+"semver@npm:^7.3.8":
+  version: 7.3.8
+  resolution: "semver@npm:7.3.8"
+  dependencies:
+    lru-cache: ^6.0.0
+  bin:
+    semver: bin/semver.js
+  checksum: ba9c7cbbf2b7884696523450a61fee1a09930d888b7a8d7579025ad93d459b2d1949ee5bbfeb188b2be5f4ac163544c5e98491ad6152df34154feebc2cc337c1
   languageName: node
   linkType: hard
 

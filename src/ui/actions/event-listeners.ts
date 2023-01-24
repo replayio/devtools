@@ -4,7 +4,14 @@ import { Dictionary } from "@reduxjs/toolkit";
 import type { Location, ObjectPreview, Object as ProtocolObject } from "@replayio/protocol";
 
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
-import { SourceDetails, getPreferredLocation, getSourceDetailsEntities } from "ui/reducers/sources";
+import { getScopeMapAsync } from "replay-next/src/suspense/ScopeMapCache";
+import { ReplayClientInterface } from "shared/client/types";
+import {
+  SourceDetails,
+  getGeneratedLocation,
+  getPreferredLocation,
+  getSourceDetailsEntities,
+} from "ui/reducers/sources";
 import { UIState } from "ui/state";
 
 import { UIThunkAction } from "./index";
@@ -64,7 +71,8 @@ const isFunctionWithPreview = (obj: ProtocolObject): obj is FunctionWithPreview 
 const REACT_16_EVENT_LISTENER_PROP_KEY = "__reactEventHandlers$";
 const REACT_17_18_EVENT_LISTENER_PROP_KEY = "__reactProps$";
 
-const formatEventListener = (
+const formatEventListener = async (
+  replayClient: ReplayClientInterface,
   listener: { type: string; capture: boolean },
   fnPreview: FunctionWithPreview,
   state: UIState,
@@ -81,11 +89,17 @@ const formatEventListener = (
     locationUrl = functionLocation?.length > 0 ? sourcesById[location.sourceId]?.url : undefined;
   }
 
+  const scopeMap = await getScopeMapAsync(
+    replayClient,
+    getGeneratedLocation(sourcesById, functionLocation)
+  );
+  const originalFunctionName = scopeMap?.find(mapping => mapping[0] === functionName)?.[1];
+
   return {
     ...listener,
     location,
     locationUrl,
-    functionName,
+    functionName: originalFunctionName || functionName,
     functionParameterNames,
     framework,
   };
@@ -124,15 +138,17 @@ export function getNodeEventListeners(
     cachePauseData(replayClient, pauseId, data);
 
     // Reformat those entries to add location/name/params data
-    const formattedListenerEntries = listeners.map(listener => {
-      // TODO These entries exist in current testing, but what's fetching them earlier?
-      const listenerHandler = objectCache.getObjectThrows(
-        pauseId,
-        listener.handler
-      ) as FunctionWithPreview;
+    const formattedListenerEntries = await Promise.all(
+      listeners.map(listener => {
+        // TODO These entries exist in current testing, but what's fetching them earlier?
+        const listenerHandler = objectCache.getObjectThrows(
+          pauseId,
+          listener.handler
+        ) as FunctionWithPreview;
 
-      return formatEventListener(listener, listenerHandler, state, sourcesById);
-    });
+        return formatEventListener(replayClient, listener, listenerHandler, state, sourcesById);
+      })
+    );
 
     // Next, we want to find "framework listeners". As currently implemented,
     // this is really just finding React `onThing` events.
@@ -189,19 +205,22 @@ export function getNodeEventListeners(
         // Finally, we can filter that down to "objects" that are actually functions.
         // We can assume that any function this far down is a React event handler,
         // defined in actual user code.
-        const formattedFrameworkListeners = allPropertyPreviews
-          .filter(obj => obj.value.className === "Function")
-          .map(obj => {
-            // Add an entry like `{name: "onClick", location, locationUrl}
-            return formatEventListener(
-              { type: obj.name, capture: false },
-              obj.value,
-              state,
-              sourcesById,
-              // We're only finding React-specific event handlers atm
-              "react"
-            );
-          });
+        const formattedFrameworkListeners = await Promise.all(
+          allPropertyPreviews
+            .filter(obj => obj.value.className === "Function")
+            .map(obj => {
+              // Add an entry like `{name: "onClick", location, locationUrl}
+              return formatEventListener(
+                replayClient,
+                { type: obj.name, capture: false },
+                obj.value,
+                state,
+                sourcesById,
+                // We're only finding React-specific event handlers atm
+                "react"
+              );
+            })
+        );
 
         // Merge the React event entries into the list of all event listeners
         formattedListenerEntries.push(...formattedFrameworkListeners);

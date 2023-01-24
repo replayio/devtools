@@ -56,7 +56,7 @@ export default function Capsule({
 
   const badgeStyle = getBadgeStyleVars(point.badge);
 
-  let label: ReactNode = "–";
+  let label: ReactNode = "10k+";
   if (!tooManyPointsToFind) {
     if (currentHitPointIndex != null) {
       label = `${currentHitPointIndex + 1}/${hitPoints.length}`;

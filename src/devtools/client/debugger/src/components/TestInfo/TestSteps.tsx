@@ -250,7 +250,9 @@ function TestSection({ events, header }: { events: CompositeTestEvent[]; header?
             step={s}
             key={s.id}
             index={s.index}
-            argString={s.args?.toString()}
+            argString={
+              s.args ? s.args.filter((s): s is string => s && typeof s === "string").join(", ") : ""
+            }
             id={s.id}
           />
         ) : type === "network" ? (

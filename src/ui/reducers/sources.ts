@@ -420,6 +420,18 @@ export function getAlternateLocation(sources: SourcesState, locations: MappedLoc
   return null;
 }
 
+export function getGeneratedLocation(
+  sourcesById: Dictionary<SourceDetails>,
+  locations: MappedLocation
+): Location {
+  const location = locations.find(location => {
+    const source = sourcesById[location.sourceId];
+    return source?.generated.length === 0;
+  });
+  assert(location, "no generated location found");
+  return location || locations[0];
+}
+
 export function getHasSiblingOfSameName(state: UIState, source: MiniSource) {
   if (!source || !source.url) {
     return false;

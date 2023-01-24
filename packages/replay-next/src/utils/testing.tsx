@@ -106,6 +106,7 @@ export async function renderFocused(
   };
 
   const focusContext: FocusContextType = {
+    enterFocusMode: () => {},
     isTransitionPending: false,
     range: null,
     rangeForDisplay: null,
@@ -207,6 +208,7 @@ export function createMockReplayClient() {
     })),
     getRecordingId: jest.fn().mockImplementation(async () => "fake-recording-id"),
     getScope: jest.fn().mockImplementation(async () => {}),
+    getScopeMap: jest.fn().mockImplementation(async () => {}),
     getSessionEndpoint: jest.fn().mockImplementation(async () => ({
       point: "1000",
       time: 1000,

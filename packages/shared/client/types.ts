@@ -32,6 +32,7 @@ import {
   TimeRange,
   TimeStampedPoint,
   TimeStampedPointRange,
+  VariableMapping,
   createPauseResult,
   getAllFramesResult,
   getScopeResult,
@@ -154,6 +155,7 @@ export interface ReplayClientInterface {
   getRecordingCapabilities(): Promise<RecordingCapabilities>;
   getRecordingId(): RecordingId | null;
   getScope(pauseId: PauseId, scopeId: ScopeId): Promise<getScopeResult>;
+  getScopeMap(location: Location): Promise<VariableMapping[] | undefined>;
   getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
   getSessionId(): SessionId | null;
   getSourceHitCounts(

@@ -45,7 +45,6 @@ import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { MappedLocationCache } from "../mapped-location-cache";
-import ScopeMapCache from "../scope-map-cache";
 import { client } from "../socket";
 import { EventEmitter, assert, defer, locationsInclude } from "../utils";
 
@@ -160,6 +159,9 @@ class _ThreadFront {
   // Waiter which resolves when the debugger has loaded and we've warped to the endpoint.
   initializedWaiter = defer<void>();
 
+  // Waiter which resolves when there is at least one loading region
+  loadingHasBegun = defer<void>();
+
   // Waiter which resolves when all sources have been loaded.
   private allSourcesWaiter = defer<void>();
   hasAllSources = false;
@@ -175,8 +177,6 @@ class _ThreadFront {
   breakpointPositions = new Map<string, Promise<SameLineSourceLocations[]>>();
 
   mappedLocations = new MappedLocationCache();
-
-  scopeMaps = new ScopeMapCache();
 
   // Points which will be reached when stepping in various directions from a point.
   resumeTargets = new Map<string, PauseDescription>();
@@ -333,6 +333,8 @@ class _ThreadFront {
       client.Session.addLoadedRegionsListener((loadedRegions: LoadedRegions) => {
         this._mostRecentLoadedRegions = loadedRegions;
 
+        this.loadingHasBegun.resolve();
+
         this._loadedRegionsListeners.forEach(callback => callback(loadedRegions));
       });
 
@@ -480,10 +482,6 @@ class _ThreadFront {
         });
       }
     }
-  }
-
-  getScopeMap(location: Location): Promise<Record<string, string>> {
-    return this.scopeMaps.getScopeMap(location);
   }
 
   // Same as evaluate, but returns the result without wrapping a ValueFront around them.

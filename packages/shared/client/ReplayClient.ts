@@ -26,6 +26,7 @@ import {
   TimeRange,
   TimeStampedPoint,
   TimeStampedPointRange,
+  VariableMapping,
   createPauseResult,
   functionsMatches,
   getAllFramesResult,
@@ -607,6 +608,12 @@ export class ReplayClient implements ReplayClientInterface {
     const sessionId = this.getSessionIdThrows();
     const result = await client.Pause.getScope({ scope: scopeId }, sessionId, pauseId);
     return result;
+  }
+
+  async getScopeMap(location: Location): Promise<VariableMapping[] | undefined> {
+    const sessionId = this.getSessionIdThrows();
+    const { map } = await client.Debugger.getScopeMap({ location }, sessionId);
+    return map;
   }
 
   async getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint> {

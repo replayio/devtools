@@ -170,7 +170,7 @@
   --buttontext-color: #f4f8fa;
   --checkbox-border: var(--theme-base-90);
   --checkbox: var(--theme-base-80);
-  --modal-bgcolor: var(--theme-base-95);
+  --modal-bgcolor: var(--theme-base-100);
   --modal-border: #222;
   --tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
   --theme-border: var(--theme-base-100);
@@ -179,7 +179,7 @@
   --theme-sidebar-background: var(--body-bgcolor);
   --theme-text-field-color: #fff;
   --theme-text-field-bgcolor: var(--theme-base-85);
-  --theme-text-field-bgcolor-hover: var(--theme-base-90);
+  --theme-text-field-bgcolor-hover: var(--theme-base-95);
   --text-field-border: var(--theme-base-85);
   --tab-selected-bgcolor: var(--theme-base-95);
   --tooltip-color: #fff;
@@ -201,7 +201,7 @@
   --background-color-current-execution-point: #25364e;
   --background-color-current-search-result: #25364e;
   --background-color-warning: #42381f;
-  --background-color-inputs: #0e1119;
+  --background-color-inputs: var(--theme-text-field-bgcolor);
   --background-color-source-search: #25364e;
   --background-color-resize-handle: #242e3d;
 
@@ -300,6 +300,7 @@
   --point-panel-input-edit-button-color-hover: var(--primary-accent);
   --point-panel-input-cancel-button-color: #484445;
   --point-panel-input-cancel-button-color-hover: #747476;
+  --point-panel-input-disabled-link-color-hover: #fff;
   --point-panel-input-disabled-cancel-button-color: #a65858;
   --point-panel-input-disabled-cancel-button-color-hover: #d3aaaa;
   --point-panel-timeline-background-color: #000000;
@@ -648,8 +649,8 @@
   --theme-focuser-bgcolor: var(--primary-accent);
   --theme-sidebar-background: var(--theme-base-100);
   --theme-text-field-color: var(--theme-body-color);
-  --theme-text-field-bgcolor: var(--theme-base-90);
-  --theme-text-field-bgcolor-hover: var(--theme-base-85);
+  --theme-text-field-bgcolor: #f8f8f8;
+  --theme-text-field-bgcolor-hover: var(--theme-base-95);
   --text-field-border: var(--cool-gray-300);
   --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
   --tooltip-color: white;
@@ -668,10 +669,11 @@
   --background-color-secondary-button: #f02d5e;
   --background-color-disabled-button: #666666;
   --background-color-high-contrast-button: #f2f2f2;
+
   --background-color-current-execution-point: #eaf3ff;
   --background-color-current-search-result: #eaf3ff;
   --background-color-warning: #fffac8;
-  --background-color-inputs: #e6e6e6;
+  --background-color-inputs: var(--theme-text-field-bgcolor);
   --background-color-source-search: #eaf3ff;
   --background-color-resize-handle: #cfcfcf;
 
@@ -770,6 +772,7 @@
   --point-panel-input-edit-button-color-hover: var(--primary-accent);
   --point-panel-input-cancel-button-color: #e2e2e2;
   --point-panel-input-cancel-button-color-hover: #afafb5;
+  --point-panel-input-disabled-link-color-hover: #b9000d;
   --point-panel-input-disabled-cancel-button-color: #d3aaaa;
   --point-panel-input-disabled-cancel-button-color-hover: #c07171;
   --point-panel-timeline-background-color: #ffffff;
