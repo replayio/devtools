@@ -87,14 +87,15 @@ describe("findMatches", () => {
     ).toEqual(["Array", "array", "UintArray"]);
   });
 
-  it("should escape special characters", () => {
+  // FE-1133
+  it("should not suggest array indices or any other names that require bracket notations", () => {
     expect(
       findMatches(
+        "array",
         null,
-        "fb(",
-        null,
-        createPropertiesFromNames("fooBar()", "fooBarBaz()", "barBaz()")
+        createScopesFromNames(),
+        createPropertiesFromNames("0", "1", "foo", "foo-bar", "foo_bar", "qux2")
       )
-    ).toEqual(["fooBar()", "fooBarBaz()"]);
+    ).toEqual(["foo", "foo_bar", "qux2"]);
   });
 });

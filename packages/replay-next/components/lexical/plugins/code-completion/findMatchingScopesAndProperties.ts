@@ -7,6 +7,8 @@ type Match = {
   weight: number;
 };
 
+const IdentifierRegex = /^[a-zA-Z_$][0-9a-zA-Z_$]*$/;
+
 export default function findMatchingScopesAndProperties(
   queryScope: string | null,
   query: string | null,
@@ -15,24 +17,31 @@ export default function findMatchingScopesAndProperties(
 ): string[] | null {
   matchComparator = query ? createComparatorForNeedle(query) : null;
 
+  let names: string[] | null = null;
   if (queryScope) {
     // We're searching the properties of an object.
     // Ignore scope values because they aren't part of that object.
     if (query) {
       const matches = findMatches(query, null, properties);
-      return matches.map(match => match.text);
+      names = matches.map(match => match.text);
     } else {
       // Show all properties until a user has started narrowing things down.
-      return flatten(null, properties);
+      names = flatten(null, properties);
     }
   } else if (query) {
     // If there's no expression head, we might be searching values in scope,
     // or we might be searching global/window properties.
     const matches = findMatches(query, scopes, properties);
-    return matches.map(match => match.text);
-  } else {
-    return null;
+    names = matches.map(match => match.text);
   }
+
+  // Type-ahead should not suggest numeric values (e.g. array indices)
+  // or any other name that would require bracket notation.
+  if (names) {
+    names = names.filter(name => name.match(IdentifierRegex));
+  }
+
+  return names;
 }
 
 function flatten(scopes: Scope[] | null, properties: Property[] | null): string[] {
