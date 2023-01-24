@@ -33,20 +33,23 @@ function getFiles(dir) {
   }
 }
 
-async function uploadImage(file, branch, runId) {
+async function uploadImage(file, branchName, runId) {
   const content = fs.readFileSync(file, { encoding: "base64" });
   const image = { content, file };
 
   let res;
 
   try {
-    res = await fetch(`${visualsUrl}/api/uploadSnapshot`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ image, branch, projectId, runId }),
-    });
+    res = await fetch(
+      `${visualsUrl}/api/uploadSnapshot?branchName=${branchName}&projectId=${projectId}&runId=${runId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ image }),
+      }
+    );
 
     if (res.status !== 200) {
       return { status: res.status, error: await res.text(), serverError: true, file, content };
@@ -69,21 +72,21 @@ async function uploadImage(file, branch, runId) {
     console.log(`Found ${allFiles.length} files`);
   }
 
-  const branch =
+  const branchName =
     github.context.payload.pull_request?.head?.ref ||
     github.context.payload.repository?.default_branch;
   const runId = github.context.runId;
 
-  if (!branch) {
+  if (!branchName) {
     console.log(`Skipping: No branch found`);
     return;
   }
-  console.log(`Uploading to branch ${branch}`);
+  console.log(`Uploading to branch "${branchName}"`);
 
   let results = [];
 
   for (const files of chunk(allFiles, 20)) {
-    const res = await Promise.all(files.map(file => uploadImage(file, branch, runId)));
+    const res = await Promise.all(files.map(file => uploadImage(file, branchName, runId)));
     results.push(...res);
   }
 
@@ -98,7 +101,14 @@ async function uploadImage(file, branch, runId) {
   );
 
   console.log(`${failed.length} failed snapshots`);
-  console.log(failed.map(r => `${r.file} - ${r.serverError ? "server-error" : "client-error"} - ${JSON.stringify(r.error)} -- ${r.content}`));
+  console.log(
+    failed.map(
+      r =>
+        `${r.file} - ${r.serverError ? "server-error" : "client-error"} - ${JSON.stringify(
+          r.error
+        )} -- ${r.content}`
+    )
+  );
 
   if (failed.length > 0) {
     process.exit(1);
