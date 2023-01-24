@@ -8,16 +8,16 @@ import useLogPointPanelContextMenu from "./useLogPointPanelContextMenu";
 import styles from "./Capsule.module.css";
 
 export default function Capsule({
+  closestHitPointIndex,
   currentHitPoint,
-  currentHitPointIndex,
   hasConditional,
   hitPoints,
   hitPointStatus,
   point,
   toggleConditional,
 }: {
+  closestHitPointIndex: number;
   currentHitPoint: TimeStampedPoint | null;
-  currentHitPointIndex: number | null;
   hasConditional: boolean;
   hitPoints: TimeStampedPoint[];
   hitPointStatus: HitPointStatus;
@@ -58,10 +58,15 @@ export default function Capsule({
 
   let label: ReactNode = "10k+";
   if (!tooManyPointsToFind) {
-    if (currentHitPointIndex != null) {
-      label = `${currentHitPointIndex + 1}/${hitPoints.length}`;
+    if (currentHitPoint != null) {
+      label = `${closestHitPointIndex + 1}/${hitPoints.length}`;
     } else {
-      label = `${hitPoints.length}`;
+      label = (
+        <>
+          <span className={styles.NearestIndex}>{closestHitPointIndex + 1}/</span>
+          {hitPoints.length}
+        </>
+      );
     }
   }
 

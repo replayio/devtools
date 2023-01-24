@@ -33,3 +33,7 @@
   height: 0.5rem;
   width: 0.5rem;
 }
+
+.NearestIndex {
+  color: var(--color-dimmer);
+}
