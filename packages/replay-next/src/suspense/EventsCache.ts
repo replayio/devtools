@@ -10,7 +10,6 @@ import sumBy from 'lodash/sumBy';
 import isEmpty from 'lodash/isEmpty';
 import without from 'lodash/without';
 
-import { assert } from "protocol/utils";
 import { ThreadFront } from 'protocol/thread';
 import { RecordingTarget } from 'protocol/thread/thread';
 
@@ -23,6 +22,7 @@ import { groupEntries } from '../utils/group';
 import { createWakeable } from "../utils/suspense";
 import { cachePauseData } from "./PauseCache";
 import { Record as WakeableRecord, STATUS_PENDING, STATUS_RESOLVED, Wakeable } from "./types";
+import size from 'lodash/size';
 
 export type EventCounter = {
   count: number;
@@ -63,8 +63,18 @@ let inProgressEventCategoryCountsWakeable: Wakeable<EventCategoryWithCount[]> | 
 /**
  * Encode a Chromium event type, based on its category and non-unique event type.
  */
-function makeChromiumEventType(category: string, eventTypeRaw?: string) {
-  return `${category}.${eventTypeRaw}`;
+function makeChromiumEventType(nonUniqueEventType: string, category?: string) {
+  if (category) {
+    return `${category}.${nonUniqueEventType}`;
+  }
+
+  // we were not able to match this event type to a pre-defined category
+  return nonUniqueEventType;
+}
+
+function decodeChromiumEventType(rawEventType: string) {
+  const [nonUniqueEventType, eventTargetName] = rawEventType.split(',', 2);
+  return [nonUniqueEventType, eventTargetName];
 }
 
 
@@ -161,16 +171,7 @@ async function countEvents(eventCountsRaw: Record<string, number>) {
     }
     return [];
   }
-
   const result = targetCountEvents(eventCountsRaw);
-
-  if (process.env.NODE_ENV !== "production") {
-    // make sure that target counts add up to raw counts
-    const targetCount = sumBy(result.flatMap(category => sumBy(category.events, event => event.count || 0)));
-    const rawCount = sumBy(Object.values(eventCountsRaw));
-    assert(targetCount === rawCount, `Event count: ${targetCount} != ${rawCount}`);
-  }
-
   return result;
 }
 
@@ -215,36 +216,34 @@ const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
     } = {};
     Object.entries(eventCountsRaw).forEach(
       ([eventInputRaw, count]) => {
-        const [eventTypeRaw, eventTargetName] = eventInputRaw.split(',', 2);
+        const [eventTypeRaw, eventTargetName] = decodeChromiumEventType(eventInputRaw);
         const category = lookupChromiumEventCategory(
           eventTypeRaw, eventTargetName,
           chromiumEventCategoriesByEventDefault,
           chromiumEventCategoriesByEventAndTarget
         );
 
-        const uniqueEventType = makeChromiumEventType(category, eventTypeRaw);
-        if (uniqueEventType) {
-          let entry = normalizedEventCounts[uniqueEventType];
-          if (!entry) {
-            normalizedEventCounts[uniqueEventType] = entry = {
-              count: 0,
-              rawEventTypes: []
-            };
-          }
-          entry.count += count;
-          entry.rawEventTypes.push(eventInputRaw);
+        const uniqueEventType = makeChromiumEventType(eventTypeRaw, category);
+        let entry = normalizedEventCounts[uniqueEventType];
+        if (!entry) {
+          normalizedEventCounts[uniqueEventType] = entry = {
+            count: 0,
+            rawEventTypes: []
+          };
         }
+        entry.count += count;
+        entry.rawEventTypes.push(eventInputRaw);
       }
     );
     
     // produce eventTable with counts
-    return normalizedEventTable.map(category => {
+    const result = normalizedEventTable.map(category => {
       return {
         ...category,
         events: category.events.map(event => {
-          const countEntry = normalizedEventCounts[
-            makeChromiumEventType(category.category, event.type)
-          ];
+          const type = makeChromiumEventType(event.type, category.category);
+          const countEntry = normalizedEventCounts[type];
+          delete normalizedEventCounts[type];
           return {
             ...event,
             ...countEntry
@@ -252,6 +251,29 @@ const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
         }),
       };
     });
+
+
+    if (size(normalizedEventCounts)) {
+      // add "unknown" category
+      result.push({
+        category: 'unknown',
+        events: Object.entries(normalizedEventCounts).map(
+          ([type, countEntry]) => ({
+            type,
+            label: `${type} (${countEntry.rawEventTypes
+              .map(eventInputRaw => {
+                const [, eventTargetName] = decodeChromiumEventType(eventInputRaw);
+                return eventTargetName;
+              })
+              .join(', ')})`,
+            ...countEntry
+          })
+        )
+      });
+    }
+
+
+    return result;
   }
 };
 
@@ -326,8 +348,9 @@ function makeChromiumEventCategoriesByEventDefault(): EventCategoriesByEvent {
  *     xmlhttprequest: 'XHR',
  *     xmlhttprequestupload: 'XHR',
  *   },
- *   click: {
- *     pointerevent: 'mouse'
+ *   play: {
+ *     video: 'Media',
+ *     audio: 'Media'
  *   }
  *   // ... 100+ more entries ...
  * })
