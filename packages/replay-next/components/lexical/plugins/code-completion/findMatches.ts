@@ -3,6 +3,7 @@ import { FrameId, PauseId, Property, Scope } from "@replayio/protocol";
 import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
 import { evaluateSuspense } from "replay-next/src/suspense/PauseCache";
 import { getFrameScopesSuspense } from "replay-next/src/suspense/ScopeCache";
+import { isNumeric } from "replay-next/src/utils/text";
 import { ReplayClientInterface } from "shared/client/types";
 
 import findMatchingScopesAndProperties from "./findMatchingScopesAndProperties";
@@ -95,6 +96,11 @@ function fetchQueryData(
         }
       }
     }
+  }
+
+  // Type-ahead should not suggest numeric values (e.g. array indices).
+  if (properties) {
+    properties = properties.filter(({ name }) => !isNumeric(name));
   }
 
   return { properties, scopes };
