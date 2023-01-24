@@ -20,11 +20,12 @@ export default function EventType({
 
   const checked = eventTypes[event.rawEventTypes[0]] === true;
   const newChecked = !checked;
-  const toggle = () => update({ 
-    eventTypes: Object.fromEntries(
-      event.rawEventTypes.map(rawEventType => [rawEventType, newChecked])
-    )
-  });
+  const toggle = () =>
+    update({
+      eventTypes: Object.fromEntries(
+        event.rawEventTypes.map(rawEventType => [rawEventType, newChecked])
+      ),
+    });
 
   const stopPropagation = (event: MouseEvent) => {
     event.stopPropagation();

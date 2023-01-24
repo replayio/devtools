@@ -1,5 +1,6 @@
 import { EventHandlerType } from "@replayio/protocol";
-import { RecordingTarget } from 'protocol/thread/thread';
+
+import { RecordingTarget } from "protocol/thread/thread";
 
 export type EventCategory = {
   category: string;
@@ -25,987 +26,935 @@ export type EventCategory = {
  */
 export const STANDARD_EVENT_CATEGORIES: Partial<Record<RecordingTarget, EventCategory[]>> = {
   // Copied from src/devtools/server/actors/utils/event-breakpoints.js
-  gecko:
-    [
-      {
-        category: "Animation",
-        events: [
-          { type: "animationframe.request", label: "requestAnimationFrame" },
-          { type: "animationframe.cancel", label: "cancelAnimationFrame" },
-          { type: "animationframe.fire", label: "requestAnimationFrameCallback" },
-        ],
-      },
-      {
-        category: "Clipboard",
-        events: [
-          { type: "event.clipboard.copy", label: "copy" },
-          { type: "event.clipboard.cut", label: "cut" },
-          { type: "event.clipboard.paste", label: "paste" },
-          { type: "event.clipboard.beforecopy", label: "beforecopy" },
-          { type: "event.clipboard.beforecut", label: "beforecut" },
-          { type: "event.clipboard.beforepaste", label: "beforepaste" },
-        ],
-      },
-      {
-        category: "Control",
-        events: [
-          { type: "event.control.resize", label: "resize" },
-          { type: "event.control.scroll", label: "scroll" },
-          { type: "event.control.zoom", label: "zoom" },
-          { type: "event.control.focus", label: "focus" },
-          { type: "event.control.blur", label: "blur" },
-          { type: "event.control.select", label: "select" },
-          { type: "event.control.change", label: "change" },
-          { type: "event.control.submit", label: "submit" },
-          { type: "event.control.reset", label: "reset" },
-        ],
-      },
-      {
-        category: "DOM Mutation",
-        events: [
-          // Deprecated DOM events.
-          { type: "event.dom-mutation.DOMActivate", label: "DOMActivate" },
-          { type: "event.dom-mutation.DOMFocusIn", label: "DOMFocusIn" },
-          { type: "event.dom-mutation.DOMFocusOut", label: "DOMFocusOut" },
+  gecko: [
+    {
+      category: "Animation",
+      events: [
+        { type: "animationframe.request", label: "requestAnimationFrame" },
+        { type: "animationframe.cancel", label: "cancelAnimationFrame" },
+        { type: "animationframe.fire", label: "requestAnimationFrameCallback" },
+      ],
+    },
+    {
+      category: "Clipboard",
+      events: [
+        { type: "event.clipboard.copy", label: "copy" },
+        { type: "event.clipboard.cut", label: "cut" },
+        { type: "event.clipboard.paste", label: "paste" },
+        { type: "event.clipboard.beforecopy", label: "beforecopy" },
+        { type: "event.clipboard.beforecut", label: "beforecut" },
+        { type: "event.clipboard.beforepaste", label: "beforepaste" },
+      ],
+    },
+    {
+      category: "Control",
+      events: [
+        { type: "event.control.resize", label: "resize" },
+        { type: "event.control.scroll", label: "scroll" },
+        { type: "event.control.zoom", label: "zoom" },
+        { type: "event.control.focus", label: "focus" },
+        { type: "event.control.blur", label: "blur" },
+        { type: "event.control.select", label: "select" },
+        { type: "event.control.change", label: "change" },
+        { type: "event.control.submit", label: "submit" },
+        { type: "event.control.reset", label: "reset" },
+      ],
+    },
+    {
+      category: "DOM Mutation",
+      events: [
+        // Deprecated DOM events.
+        { type: "event.dom-mutation.DOMActivate", label: "DOMActivate" },
+        { type: "event.dom-mutation.DOMFocusIn", label: "DOMFocusIn" },
+        { type: "event.dom-mutation.DOMFocusOut", label: "DOMFocusOut" },
 
-          // Standard DOM mutation events.
-          { type: "event.dom-mutation.DOMAttrModified", label: "DOMAttrModified" },
-          { type: "event.dom-mutation.DOMCharacterDataModified", label: "DOMCharacterDataModified" },
-          { type: "event.dom-mutation.DOMNodeInserted", label: "DOMNodeInserted" },
-          {
-            type: "event.dom-mutation.DOMNodeInsertedIntoDocument",
-            label: "DOMNodeInsertedIntoDocument",
-          },
-          { type: "event.dom-mutation.DOMNodeRemoved", label: "DOMNodeRemoved" },
-          {
-            type: "event.dom-mutation.DOMNodeRemovedIntoDocument",
-            label: "DOMNodeRemovedIntoDocument",
-          },
-          { type: "event.dom-mutation.DOMSubtreeModified", label: "DOMSubtreeModified" },
+        // Standard DOM mutation events.
+        { type: "event.dom-mutation.DOMAttrModified", label: "DOMAttrModified" },
+        { type: "event.dom-mutation.DOMCharacterDataModified", label: "DOMCharacterDataModified" },
+        { type: "event.dom-mutation.DOMNodeInserted", label: "DOMNodeInserted" },
+        {
+          type: "event.dom-mutation.DOMNodeInsertedIntoDocument",
+          label: "DOMNodeInsertedIntoDocument",
+        },
+        { type: "event.dom-mutation.DOMNodeRemoved", label: "DOMNodeRemoved" },
+        {
+          type: "event.dom-mutation.DOMNodeRemovedIntoDocument",
+          label: "DOMNodeRemovedIntoDocument",
+        },
+        { type: "event.dom-mutation.DOMSubtreeModified", label: "DOMSubtreeModified" },
 
-          // DOM load events.
-          { type: "event.dom-mutation.DOMContentLoaded", label: "DOMContentLoaded" },
-        ],
-      },
-      {
-        category: "Device",
-        events: [
-          { type: "event.device.deviceorientation", label: "deviceorientation" },
-          { type: "event.device.devicemotio", label: "devicemotion" },
-        ],
-      },
-      {
-        category: "Drag and Drop",
-        events: [
-          { type: "event.drag-and-drop.drag", label: "drag" },
-          { type: "event.drag-and-drop.dragstart", label: "dragstart" },
-          { type: "event.drag-and-drop.dragend", label: "dragend" },
-          { type: "event.drag-and-drop.dragenter", label: "dragenter" },
-          { type: "event.drag-and-drop.dragover", label: "dragover" },
-          { type: "event.drag-and-drop.dragleave", label: "dragleave" },
-          { type: "event.drag-and-drop.drop", label: "drop" },
-        ],
-      },
-      {
-        category: "Keyboard",
-        events: [
-          { type: "event.keyboard.beforeinput", label: "beforeinput" },
-          { type: "event.keyboard.input", label: "input" },
-          { type: "event.keyboard.keydown", label: "keydown" },
-          { type: "event.keyboard.keyup", label: "keyup" },
-          { type: "event.keyboard.keypress", label: "keypress" },
-        ],
-      },
-      {
-        category: "Load",
-        events: [
-          { type: "event.load.load", label: "load" },
-          // TODO: Disabled pending fixes for bug 1569775.
-          // globalEvent("load", "beforeunload"),
-          // globalEvent("load", "unload"),
-          { type: "event.load.abort", label: "abort" },
-          { type: "event.load.error", label: "error" },
-          { type: "event.load.hashchange", label: "hashchange" },
-          { type: "event.load.popstate", label: "popstate" },
-        ],
-      },
-      {
-        category: "Media",
-        events: [
-          { type: "event.media.play", label: "play" },
-          { type: "event.media.pause", label: "pause" },
-          { type: "event.media.playing", label: "playing" },
-          { type: "event.media.canplay", label: "canplay" },
-          { type: "event.media.canplaythrough", label: "canplaythrough" },
-          { type: "event.media.seeking", label: "seeking" },
-          { type: "event.media.seeked", label: "seeked" },
-          { type: "event.media.timeupdate", label: "timeupdate" },
-          { type: "event.media.ended", label: "ended" },
-          { type: "event.media.ratechange", label: "ratechange" },
-          { type: "event.media.durationchange", label: "durationchange" },
-          { type: "event.media.volumechange", label: "volumechange" },
-          { type: "event.media.loadstart", label: "loadstart" },
-          { type: "event.media.progress", label: "progress" },
-          { type: "event.media.suspend", label: "suspend" },
-          { type: "event.media.abort", label: "abort" },
-          { type: "event.media.error", label: "error" },
-          { type: "event.media.emptied", label: "emptied" },
-          { type: "event.media.stalled", label: "stalled" },
-          { type: "event.media.loadedmetadata", label: "loadedmetadata" },
-          { type: "event.media.loadeddata", label: "loadeddata" },
-          { type: "event.media.waiting", label: "waiting" },
-        ],
-      },
-      {
-        category: "Mouse",
-        events: [
-          { type: "event.mouse.auxclick", label: "auxclick" },
-          { type: "event.mouse.click", label: "click" },
-          { type: "event.mouse.dblclick", label: "dblclick" },
-          { type: "event.mouse.mousedown", label: "mousedown" },
-          { type: "event.mouse.mouseup", label: "mouseup" },
-          { type: "event.mouse.mouseover", label: "mouseover" },
-          { type: "event.mouse.mousemove", label: "mousemove" },
-          { type: "event.mouse.mouseout", label: "mouseout" },
-          { type: "event.mouse.mouseenter", label: "mouseenter" },
-          { type: "event.mouse.mouseleave", label: "mouseleave" },
-          { type: "event.mouse.mousewheel", label: "mousewheel" },
-          { type: "event.mouse.wheel", label: "wheel" },
-          { type: "event.mouse.contextmenu", label: "contextmenu" },
-        ],
-      },
-      {
-        category: "Pointer",
-        events: [
-          { type: "event.pointer.pointerover", label: "pointerover" },
-          { type: "event.pointer.pointerout", label: "pointerout" },
-          { type: "event.pointer.pointerenter", label: "pointerenter" },
-          { type: "event.pointer.pointerleave", label: "pointerleave" },
-          { type: "event.pointer.pointerdown", label: "pointerdown" },
-          { type: "event.pointer.pointerup", label: "pointerup" },
-          { type: "event.pointer.pointermove", label: "pointermove" },
-          { type: "event.pointer.pointercancel", label: "pointercancel" },
-          { type: "event.pointer.gotpointercapture", label: "gotpointercapture" },
-          { type: "event.pointer.lostpointercapture", label: "lostpointercapture" },
-        ],
-      },
-      {
-        category: "Timer",
-        events: [
-          { type: "timer.timeout.set", label: "setTimeout" },
-          { type: "timer.timeout.clear", label: "clearTimeout" },
-          { type: "timer.timeout.fire", label: "setTimeoutCallback" },
-          { type: "timer.interval.set", label: "setInterval" },
-          { type: "timer.interval.clear", label: "clearInterval" },
-          { type: "timer.interval.fire", label: "setIntervalCallback" },
-        ],
-      },
-      {
-        category: "Touch",
-        events: [
-          { type: "event.touch.touchstart", label: "touchstart" },
-          { type: "event.touch.touchmove", label: "touchmove" },
-          { type: "event.touch.touchend", label: "touchend" },
-          { type: "event.touch.touchcancel", label: "touchcancel" },
-        ],
-      },
-      {
-        category: "WebSocket",
-        events: [
-          { type: "event.websocket.open", label: "open" },
-          { type: "event.websocket.message", label: "message" },
-          { type: "event.websocket.error", label: "error" },
-          { type: "event.websocket.close", label: "close" },
-        ],
-      },
-      {
-        category: "Worker",
-        events: [
-          { type: "event.message", label: "message" },
-          { type: "event.messageerror", label: "messageerror" },
+        // DOM load events.
+        { type: "event.dom-mutation.DOMContentLoaded", label: "DOMContentLoaded" },
+      ],
+    },
+    {
+      category: "Device",
+      events: [
+        { type: "event.device.deviceorientation", label: "deviceorientation" },
+        { type: "event.device.devicemotio", label: "devicemotion" },
+      ],
+    },
+    {
+      category: "Drag and Drop",
+      events: [
+        { type: "event.drag-and-drop.drag", label: "drag" },
+        { type: "event.drag-and-drop.dragstart", label: "dragstart" },
+        { type: "event.drag-and-drop.dragend", label: "dragend" },
+        { type: "event.drag-and-drop.dragenter", label: "dragenter" },
+        { type: "event.drag-and-drop.dragover", label: "dragover" },
+        { type: "event.drag-and-drop.dragleave", label: "dragleave" },
+        { type: "event.drag-and-drop.drop", label: "drop" },
+      ],
+    },
+    {
+      category: "Keyboard",
+      events: [
+        { type: "event.keyboard.beforeinput", label: "beforeinput" },
+        { type: "event.keyboard.input", label: "input" },
+        { type: "event.keyboard.keydown", label: "keydown" },
+        { type: "event.keyboard.keyup", label: "keyup" },
+        { type: "event.keyboard.keypress", label: "keypress" },
+      ],
+    },
+    {
+      category: "Load",
+      events: [
+        { type: "event.load.load", label: "load" },
+        // TODO: Disabled pending fixes for bug 1569775.
+        // globalEvent("load", "beforeunload"),
+        // globalEvent("load", "unload"),
+        { type: "event.load.abort", label: "abort" },
+        { type: "event.load.error", label: "error" },
+        { type: "event.load.hashchange", label: "hashchange" },
+        { type: "event.load.popstate", label: "popstate" },
+      ],
+    },
+    {
+      category: "Media",
+      events: [
+        { type: "event.media.play", label: "play" },
+        { type: "event.media.pause", label: "pause" },
+        { type: "event.media.playing", label: "playing" },
+        { type: "event.media.canplay", label: "canplay" },
+        { type: "event.media.canplaythrough", label: "canplaythrough" },
+        { type: "event.media.seeking", label: "seeking" },
+        { type: "event.media.seeked", label: "seeked" },
+        { type: "event.media.timeupdate", label: "timeupdate" },
+        { type: "event.media.ended", label: "ended" },
+        { type: "event.media.ratechange", label: "ratechange" },
+        { type: "event.media.durationchange", label: "durationchange" },
+        { type: "event.media.volumechange", label: "volumechange" },
+        { type: "event.media.loadstart", label: "loadstart" },
+        { type: "event.media.progress", label: "progress" },
+        { type: "event.media.suspend", label: "suspend" },
+        { type: "event.media.abort", label: "abort" },
+        { type: "event.media.error", label: "error" },
+        { type: "event.media.emptied", label: "emptied" },
+        { type: "event.media.stalled", label: "stalled" },
+        { type: "event.media.loadedmetadata", label: "loadedmetadata" },
+        { type: "event.media.loadeddata", label: "loadeddata" },
+        { type: "event.media.waiting", label: "waiting" },
+      ],
+    },
+    {
+      category: "Mouse",
+      events: [
+        { type: "event.mouse.auxclick", label: "auxclick" },
+        { type: "event.mouse.click", label: "click" },
+        { type: "event.mouse.dblclick", label: "dblclick" },
+        { type: "event.mouse.mousedown", label: "mousedown" },
+        { type: "event.mouse.mouseup", label: "mouseup" },
+        { type: "event.mouse.mouseover", label: "mouseover" },
+        { type: "event.mouse.mousemove", label: "mousemove" },
+        { type: "event.mouse.mouseout", label: "mouseout" },
+        { type: "event.mouse.mouseenter", label: "mouseenter" },
+        { type: "event.mouse.mouseleave", label: "mouseleave" },
+        { type: "event.mouse.mousewheel", label: "mousewheel" },
+        { type: "event.mouse.wheel", label: "wheel" },
+        { type: "event.mouse.contextmenu", label: "contextmenu" },
+      ],
+    },
+    {
+      category: "Pointer",
+      events: [
+        { type: "event.pointer.pointerover", label: "pointerover" },
+        { type: "event.pointer.pointerout", label: "pointerout" },
+        { type: "event.pointer.pointerenter", label: "pointerenter" },
+        { type: "event.pointer.pointerleave", label: "pointerleave" },
+        { type: "event.pointer.pointerdown", label: "pointerdown" },
+        { type: "event.pointer.pointerup", label: "pointerup" },
+        { type: "event.pointer.pointermove", label: "pointermove" },
+        { type: "event.pointer.pointercancel", label: "pointercancel" },
+        { type: "event.pointer.gotpointercapture", label: "gotpointercapture" },
+        { type: "event.pointer.lostpointercapture", label: "lostpointercapture" },
+      ],
+    },
+    {
+      category: "Timer",
+      events: [
+        { type: "timer.timeout.set", label: "setTimeout" },
+        { type: "timer.timeout.clear", label: "clearTimeout" },
+        { type: "timer.timeout.fire", label: "setTimeoutCallback" },
+        { type: "timer.interval.set", label: "setInterval" },
+        { type: "timer.interval.clear", label: "clearInterval" },
+        { type: "timer.interval.fire", label: "setIntervalCallback" },
+      ],
+    },
+    {
+      category: "Touch",
+      events: [
+        { type: "event.touch.touchstart", label: "touchstart" },
+        { type: "event.touch.touchmove", label: "touchmove" },
+        { type: "event.touch.touchend", label: "touchend" },
+        { type: "event.touch.touchcancel", label: "touchcancel" },
+      ],
+    },
+    {
+      category: "WebSocket",
+      events: [
+        { type: "event.websocket.open", label: "open" },
+        { type: "event.websocket.message", label: "message" },
+        { type: "event.websocket.error", label: "error" },
+        { type: "event.websocket.close", label: "close" },
+      ],
+    },
+    {
+      category: "Worker",
+      events: [
+        { type: "event.message", label: "message" },
+        { type: "event.messageerror", label: "messageerror" },
 
-          // Service Worker events.
-          { type: "event.serviceworker.fetch", label: "fetch" },
-        ],
-      },
-      {
-        category: "XHR",
-        events: [
-          { type: "event.xhr.readystatechange", label: "readystatechange" },
-          { type: "event.xhr.load", label: "load" },
-          { type: "event.xhr.loadstart", label: "loadstart" },
-          { type: "event.xhr.loadend", label: "loadend" },
-          { type: "event.xhr.abort", label: "abort" },
-          { type: "event.xhr.error", label: "error" },
-          { type: "event.xhr.progress", label: "progress" },
-          { type: "event.xhr.timeout", label: "timeout" },
-        ],
-      },
-    ],
+        // Service Worker events.
+        { type: "event.serviceworker.fetch", label: "fetch" },
+      ],
+    },
+    {
+      category: "XHR",
+      events: [
+        { type: "event.xhr.readystatechange", label: "readystatechange" },
+        { type: "event.xhr.load", label: "load" },
+        { type: "event.xhr.loadstart", label: "loadstart" },
+        { type: "event.xhr.loadend", label: "loadend" },
+        { type: "event.xhr.abort", label: "abort" },
+        { type: "event.xhr.error", label: "error" },
+        { type: "event.xhr.progress", label: "progress" },
+        { type: "event.xhr.timeout", label: "timeout" },
+      ],
+    },
+  ],
 
   chromium:
-
     // <GENERATED CODE. DO NOT EDIT.>
     // NOTE: This table is generated via `ts-node $CHROMIUM_DIR/src/replay-scripts/gen-event-names.ts`
     [
       {
-        "category": "Animation",
-        "eventTargets": [
-          "*"
+        category: "Animation",
+        eventTargets: ["*"],
+        events: [
+          {
+            type: "requestAnimationFrame",
+            label: "requestAnimationFrame",
+          },
+          {
+            type: "cancelAnimationFrame",
+            label: "cancelAnimationFrame",
+          },
+          {
+            type: "requestAnimationFrame.callback",
+            label: "requestAnimationFrame.callback",
+          },
         ],
-        "events": [
-          {
-            "type": "requestAnimationFrame",
-            "label": "requestAnimationFrame"
-          },
-          {
-            "type": "cancelAnimationFrame",
-            "label": "cancelAnimationFrame"
-          },
-          {
-            "type": "requestAnimationFrame.callback",
-            "label": "requestAnimationFrame.callback"
-          }
-        ]
       },
       {
-        "category": "Canvas",
-        "eventTargets": [
-          "*"
+        category: "Canvas",
+        eventTargets: ["*"],
+        events: [
+          {
+            type: "canvasContextCreated",
+            label: "canvasContextCreated",
+          },
+          {
+            type: "webglErrorFired",
+            label: "webglErrorFired",
+          },
+          {
+            type: "webglWarningFired",
+            label: "webglWarningFired",
+          },
         ],
-        "events": [
-          {
-            "type": "canvasContextCreated",
-            "label": "canvasContextCreated"
-          },
-          {
-            "type": "webglErrorFired",
-            "label": "webglErrorFired"
-          },
-          {
-            "type": "webglWarningFired",
-            "label": "webglWarningFired"
-          }
-        ]
       },
       {
-        "category": "Geolocation",
-        "eventTargets": [
-          "*"
-        ],
-        "events": [
+        category: "Geolocation",
+        eventTargets: ["*"],
+        events: [
           {
-            "type": "Geolocation.getCurrentPosition",
-            "label": "Geolocation.getCurrentPosition"
+            type: "Geolocation.getCurrentPosition",
+            label: "Geolocation.getCurrentPosition",
           },
           {
-            "type": "Geolocation.watchPosition",
-            "label": "Geolocation.watchPosition"
-          }
-        ]
+            type: "Geolocation.watchPosition",
+            label: "Geolocation.watchPosition",
+          },
+        ],
       },
       {
-        "category": "Notification",
-        "eventTargets": [
-          "*"
-        ],
-        "events": [
+        category: "Notification",
+        eventTargets: ["*"],
+        events: [
           {
-            "type": "Notification.requestPermission",
-            "label": "Notification.requestPermission"
-          }
-        ]
+            type: "Notification.requestPermission",
+            label: "Notification.requestPermission",
+          },
+        ],
       },
       {
-        "category": "Parse",
-        "eventTargets": [
-          "*"
-        ],
-        "events": [
+        category: "Parse",
+        eventTargets: ["*"],
+        events: [
           {
-            "type": "Element.setInnerHTML",
-            "label": "Element.setInnerHTML"
+            type: "Element.setInnerHTML",
+            label: "Element.setInnerHTML",
           },
           {
-            "type": "Document.write",
-            "label": "Document.write"
-          }
-        ]
+            type: "Document.write",
+            label: "Document.write",
+          },
+        ],
       },
       {
-        "category": "Script",
-        "eventTargets": [
-          "*"
-        ],
-        "events": [
+        category: "Script",
+        eventTargets: ["*"],
+        events: [
           {
-            "type": "scriptFirstStatement",
-            "label": "scriptFirstStatement"
+            type: "scriptFirstStatement",
+            label: "scriptFirstStatement",
           },
           {
-            "type": "scriptBlockedByCSP",
-            "label": "scriptBlockedByCSP"
-          }
-        ]
+            type: "scriptBlockedByCSP",
+            label: "scriptBlockedByCSP",
+          },
+        ],
       },
       {
-        "category": "Timer",
-        "eventTargets": [
-          "*"
+        category: "Timer",
+        eventTargets: ["*"],
+        events: [
+          {
+            type: "setTimeout",
+            label: "setTimeout",
+          },
+          {
+            type: "clearTimeout",
+            label: "clearTimeout",
+          },
+          {
+            type: "setInterval",
+            label: "setInterval",
+          },
+          {
+            type: "clearInterval",
+            label: "clearInterval",
+          },
+          {
+            type: "setTimeout.callback",
+            label: "setTimeout.callback",
+          },
+          {
+            type: "setInterval.callback",
+            label: "setInterval.callback",
+          },
         ],
-        "events": [
-          {
-            "type": "setTimeout",
-            "label": "setTimeout"
-          },
-          {
-            "type": "clearTimeout",
-            "label": "clearTimeout"
-          },
-          {
-            "type": "setInterval",
-            "label": "setInterval"
-          },
-          {
-            "type": "clearInterval",
-            "label": "clearInterval"
-          },
-          {
-            "type": "setTimeout.callback",
-            "label": "setTimeout.callback"
-          },
-          {
-            "type": "setInterval.callback",
-            "label": "setInterval.callback"
-          }
-        ]
       },
       {
-        "category": "Window",
-        "eventTargets": [
-          "*"
-        ],
-        "events": [
+        category: "Window",
+        eventTargets: ["*"],
+        events: [
           {
-            "type": "DOMWindow.close",
-            "label": "DOMWindow.close"
-          }
-        ]
+            type: "DOMWindow.close",
+            label: "DOMWindow.close",
+          },
+        ],
       },
       {
-        "category": "Webaudio",
-        "eventTargets": [
-          "*"
+        category: "Webaudio",
+        eventTargets: ["*"],
+        events: [
+          {
+            type: "audioContextCreated",
+            label: "audioContextCreated",
+          },
+          {
+            type: "audioContextClosed",
+            label: "audioContextClosed",
+          },
+          {
+            type: "audioContextResumed",
+            label: "audioContextResumed",
+          },
+          {
+            type: "audioContextSuspended",
+            label: "audioContextSuspended",
+          },
         ],
-        "events": [
-          {
-            "type": "audioContextCreated",
-            "label": "audioContextCreated"
-          },
-          {
-            "type": "audioContextClosed",
-            "label": "audioContextClosed"
-          },
-          {
-            "type": "audioContextResumed",
-            "label": "audioContextResumed"
-          },
-          {
-            "type": "audioContextSuspended",
-            "label": "audioContextSuspended"
-          }
-        ]
       },
       {
-        "category": "Media",
-        "eventTargets": [
-          "audio",
-          "video"
+        category: "Media",
+        eventTargets: ["audio", "video"],
+        events: [
+          {
+            type: "play",
+            label: "play",
+          },
+          {
+            type: "pause",
+            label: "pause",
+          },
+          {
+            type: "playing",
+            label: "playing",
+          },
+          {
+            type: "canplay",
+            label: "canplay",
+          },
+          {
+            type: "canplaythrough",
+            label: "canplaythrough",
+          },
+          {
+            type: "seeking",
+            label: "seeking",
+          },
+          {
+            type: "seeked",
+            label: "seeked",
+          },
+          {
+            type: "timeupdate",
+            label: "timeupdate",
+          },
+          {
+            type: "ended",
+            label: "ended",
+          },
+          {
+            type: "ratechange",
+            label: "ratechange",
+          },
+          {
+            type: "durationchange",
+            label: "durationchange",
+          },
+          {
+            type: "volumechange",
+            label: "volumechange",
+          },
+          {
+            type: "loadstart",
+            label: "loadstart",
+          },
+          {
+            type: "progress",
+            label: "progress",
+          },
+          {
+            type: "suspend",
+            label: "suspend",
+          },
+          {
+            type: "abort",
+            label: "abort",
+          },
+          {
+            type: "error",
+            label: "error",
+          },
+          {
+            type: "emptied",
+            label: "emptied",
+          },
+          {
+            type: "stalled",
+            label: "stalled",
+          },
+          {
+            type: "loadedmetadata",
+            label: "loadedmetadata",
+          },
+          {
+            type: "loadeddata",
+            label: "loadeddata",
+          },
+          {
+            type: "waiting",
+            label: "waiting",
+          },
         ],
-        "events": [
-          {
-            "type": "play",
-            "label": "play"
-          },
-          {
-            "type": "pause",
-            "label": "pause"
-          },
-          {
-            "type": "playing",
-            "label": "playing"
-          },
-          {
-            "type": "canplay",
-            "label": "canplay"
-          },
-          {
-            "type": "canplaythrough",
-            "label": "canplaythrough"
-          },
-          {
-            "type": "seeking",
-            "label": "seeking"
-          },
-          {
-            "type": "seeked",
-            "label": "seeked"
-          },
-          {
-            "type": "timeupdate",
-            "label": "timeupdate"
-          },
-          {
-            "type": "ended",
-            "label": "ended"
-          },
-          {
-            "type": "ratechange",
-            "label": "ratechange"
-          },
-          {
-            "type": "durationchange",
-            "label": "durationchange"
-          },
-          {
-            "type": "volumechange",
-            "label": "volumechange"
-          },
-          {
-            "type": "loadstart",
-            "label": "loadstart"
-          },
-          {
-            "type": "progress",
-            "label": "progress"
-          },
-          {
-            "type": "suspend",
-            "label": "suspend"
-          },
-          {
-            "type": "abort",
-            "label": "abort"
-          },
-          {
-            "type": "error",
-            "label": "error"
-          },
-          {
-            "type": "emptied",
-            "label": "emptied"
-          },
-          {
-            "type": "stalled",
-            "label": "stalled"
-          },
-          {
-            "type": "loadedmetadata",
-            "label": "loadedmetadata"
-          },
-          {
-            "type": "loadeddata",
-            "label": "loadeddata"
-          },
-          {
-            "type": "waiting",
-            "label": "waiting"
-          }
-        ]
       },
       {
-        "category": "Pictureinpicture",
-        "eventTargets": [
-          "video"
-        ],
-        "events": [
+        category: "Pictureinpicture",
+        eventTargets: ["video"],
+        events: [
           {
-            "type": "enterpictureinpicture",
-            "label": "enterpictureinpicture"
+            type: "enterpictureinpicture",
+            label: "enterpictureinpicture",
           },
           {
-            "type": "leavepictureinpicture",
-            "label": "leavepictureinpicture"
-          }
-        ]
+            type: "leavepictureinpicture",
+            label: "leavepictureinpicture",
+          },
+        ],
       },
       {
-        "category": "Pictureinpicture",
-        "eventTargets": [
-          "pictureinpicturewindow"
-        ],
-        "events": [
+        category: "Pictureinpicture",
+        eventTargets: ["pictureinpicturewindow"],
+        events: [
           {
-            "type": "resize",
-            "label": "resize"
-          }
-        ]
+            type: "resize",
+            label: "resize",
+          },
+        ],
       },
       {
-        "category": "Clipboard",
-        "eventTargets": [
-          "*"
+        category: "Clipboard",
+        eventTargets: ["*"],
+        events: [
+          {
+            type: "copy",
+            label: "copy",
+          },
+          {
+            type: "cut",
+            label: "cut",
+          },
+          {
+            type: "paste",
+            label: "paste",
+          },
+          {
+            type: "beforecopy",
+            label: "beforecopy",
+          },
+          {
+            type: "beforecut",
+            label: "beforecut",
+          },
+          {
+            type: "beforepaste",
+            label: "beforepaste",
+          },
         ],
-        "events": [
-          {
-            "type": "copy",
-            "label": "copy"
-          },
-          {
-            "type": "cut",
-            "label": "cut"
-          },
-          {
-            "type": "paste",
-            "label": "paste"
-          },
-          {
-            "type": "beforecopy",
-            "label": "beforecopy"
-          },
-          {
-            "type": "beforecut",
-            "label": "beforecut"
-          },
-          {
-            "type": "beforepaste",
-            "label": "beforepaste"
-          }
-        ]
       },
       {
-        "category": "Control",
-        "eventTargets": [
-          "*"
+        category: "Control",
+        eventTargets: ["*"],
+        events: [
+          {
+            type: "resize",
+            label: "resize",
+          },
+          {
+            type: "scroll",
+            label: "scroll",
+          },
+          {
+            type: "zoom",
+            label: "zoom",
+          },
+          {
+            type: "focus",
+            label: "focus",
+          },
+          {
+            type: "blur",
+            label: "blur",
+          },
+          {
+            type: "select",
+            label: "select",
+          },
+          {
+            type: "change",
+            label: "change",
+          },
+          {
+            type: "submit",
+            label: "submit",
+          },
+          {
+            type: "reset",
+            label: "reset",
+          },
         ],
-        "events": [
-          {
-            "type": "resize",
-            "label": "resize"
-          },
-          {
-            "type": "scroll",
-            "label": "scroll"
-          },
-          {
-            "type": "zoom",
-            "label": "zoom"
-          },
-          {
-            "type": "focus",
-            "label": "focus"
-          },
-          {
-            "type": "blur",
-            "label": "blur"
-          },
-          {
-            "type": "select",
-            "label": "select"
-          },
-          {
-            "type": "change",
-            "label": "change"
-          },
-          {
-            "type": "submit",
-            "label": "submit"
-          },
-          {
-            "type": "reset",
-            "label": "reset"
-          }
-        ]
       },
       {
-        "category": "Device",
-        "eventTargets": [
-          "*"
-        ],
-        "events": [
+        category: "Device",
+        eventTargets: ["*"],
+        events: [
           {
-            "type": "deviceorientation",
-            "label": "deviceorientation"
+            type: "deviceorientation",
+            label: "deviceorientation",
           },
           {
-            "type": "devicemotion",
-            "label": "devicemotion"
-          }
-        ]
+            type: "devicemotion",
+            label: "devicemotion",
+          },
+        ],
       },
       {
-        "category": "DOM Mutation",
-        "eventTargets": [
-          "*"
+        category: "DOM Mutation",
+        eventTargets: ["*"],
+        events: [
+          {
+            type: "DOMActivate",
+            label: "DOMActivate",
+          },
+          {
+            type: "DOMFocusIn",
+            label: "DOMFocusIn",
+          },
+          {
+            type: "DOMFocusOut",
+            label: "DOMFocusOut",
+          },
+          {
+            type: "DOMAttrModified",
+            label: "DOMAttrModified",
+          },
+          {
+            type: "DOMCharacterDataModified",
+            label: "DOMCharacterDataModified",
+          },
+          {
+            type: "DOMNodeInserted",
+            label: "DOMNodeInserted",
+          },
+          {
+            type: "DOMNodeInsertedIntoDocument",
+            label: "DOMNodeInsertedIntoDocument",
+          },
+          {
+            type: "DOMNodeRemoved",
+            label: "DOMNodeRemoved",
+          },
+          {
+            type: "DOMNodeRemovedFromDocument",
+            label: "DOMNodeRemovedFromDocument",
+          },
+          {
+            type: "DOMSubtreeModified",
+            label: "DOMSubtreeModified",
+          },
+          {
+            type: "DOMContentLoaded",
+            label: "DOMContentLoaded",
+          },
         ],
-        "events": [
-          {
-            "type": "DOMActivate",
-            "label": "DOMActivate"
-          },
-          {
-            "type": "DOMFocusIn",
-            "label": "DOMFocusIn"
-          },
-          {
-            "type": "DOMFocusOut",
-            "label": "DOMFocusOut"
-          },
-          {
-            "type": "DOMAttrModified",
-            "label": "DOMAttrModified"
-          },
-          {
-            "type": "DOMCharacterDataModified",
-            "label": "DOMCharacterDataModified"
-          },
-          {
-            "type": "DOMNodeInserted",
-            "label": "DOMNodeInserted"
-          },
-          {
-            "type": "DOMNodeInsertedIntoDocument",
-            "label": "DOMNodeInsertedIntoDocument"
-          },
-          {
-            "type": "DOMNodeRemoved",
-            "label": "DOMNodeRemoved"
-          },
-          {
-            "type": "DOMNodeRemovedFromDocument",
-            "label": "DOMNodeRemovedFromDocument"
-          },
-          {
-            "type": "DOMSubtreeModified",
-            "label": "DOMSubtreeModified"
-          },
-          {
-            "type": "DOMContentLoaded",
-            "label": "DOMContentLoaded"
-          }
-        ]
       },
       {
-        "category": "Drag and Drop",
-        "eventTargets": [
-          "*"
+        category: "Drag and Drop",
+        eventTargets: ["*"],
+        events: [
+          {
+            type: "drag",
+            label: "drag",
+          },
+          {
+            type: "dragstart",
+            label: "dragstart",
+          },
+          {
+            type: "dragend",
+            label: "dragend",
+          },
+          {
+            type: "dragenter",
+            label: "dragenter",
+          },
+          {
+            type: "dragover",
+            label: "dragover",
+          },
+          {
+            type: "dragleave",
+            label: "dragleave",
+          },
+          {
+            type: "drop",
+            label: "drop",
+          },
         ],
-        "events": [
-          {
-            "type": "drag",
-            "label": "drag"
-          },
-          {
-            "type": "dragstart",
-            "label": "dragstart"
-          },
-          {
-            "type": "dragend",
-            "label": "dragend"
-          },
-          {
-            "type": "dragenter",
-            "label": "dragenter"
-          },
-          {
-            "type": "dragover",
-            "label": "dragover"
-          },
-          {
-            "type": "dragleave",
-            "label": "dragleave"
-          },
-          {
-            "type": "drop",
-            "label": "drop"
-          }
-        ]
       },
       {
-        "category": "Keyboard",
-        "eventTargets": [
-          "*"
+        category: "Keyboard",
+        eventTargets: ["*"],
+        events: [
+          {
+            type: "keydown",
+            label: "keydown",
+          },
+          {
+            type: "keyup",
+            label: "keyup",
+          },
+          {
+            type: "keypress",
+            label: "keypress",
+          },
+          {
+            type: "input",
+            label: "input",
+          },
         ],
-        "events": [
-          {
-            "type": "keydown",
-            "label": "keydown"
-          },
-          {
-            "type": "keyup",
-            "label": "keyup"
-          },
-          {
-            "type": "keypress",
-            "label": "keypress"
-          },
-          {
-            "type": "input",
-            "label": "input"
-          }
-        ]
       },
       {
-        "category": "Load",
-        "eventTargets": [
-          "*"
+        category: "Load",
+        eventTargets: ["*"],
+        events: [
+          {
+            type: "load",
+            label: "load",
+          },
+          {
+            type: "beforeunload",
+            label: "beforeunload",
+          },
+          {
+            type: "unload",
+            label: "unload",
+          },
+          {
+            type: "abort",
+            label: "abort",
+          },
+          {
+            type: "error",
+            label: "error",
+          },
+          {
+            type: "hashchange",
+            label: "hashchange",
+          },
+          {
+            type: "popstate",
+            label: "popstate",
+          },
+          {
+            type: "navigate",
+            label: "navigate",
+          },
+          {
+            type: "navigatesuccess",
+            label: "navigatesuccess",
+          },
+          {
+            type: "navigateerror",
+            label: "navigateerror",
+          },
+          {
+            type: "currentchange",
+            label: "currentchange",
+          },
+          {
+            type: "navigateto",
+            label: "navigateto",
+          },
+          {
+            type: "navigatefrom",
+            label: "navigatefrom",
+          },
+          {
+            type: "finish",
+            label: "finish",
+          },
+          {
+            type: "dispose",
+            label: "dispose",
+          },
         ],
-        "events": [
-          {
-            "type": "load",
-            "label": "load"
-          },
-          {
-            "type": "beforeunload",
-            "label": "beforeunload"
-          },
-          {
-            "type": "unload",
-            "label": "unload"
-          },
-          {
-            "type": "abort",
-            "label": "abort"
-          },
-          {
-            "type": "error",
-            "label": "error"
-          },
-          {
-            "type": "hashchange",
-            "label": "hashchange"
-          },
-          {
-            "type": "popstate",
-            "label": "popstate"
-          },
-          {
-            "type": "navigate",
-            "label": "navigate"
-          },
-          {
-            "type": "navigatesuccess",
-            "label": "navigatesuccess"
-          },
-          {
-            "type": "navigateerror",
-            "label": "navigateerror"
-          },
-          {
-            "type": "currentchange",
-            "label": "currentchange"
-          },
-          {
-            "type": "navigateto",
-            "label": "navigateto"
-          },
-          {
-            "type": "navigatefrom",
-            "label": "navigatefrom"
-          },
-          {
-            "type": "finish",
-            "label": "finish"
-          },
-          {
-            "type": "dispose",
-            "label": "dispose"
-          }
-        ]
       },
       {
-        "category": "Mouse",
-        "eventTargets": [
-          "*"
+        category: "Mouse",
+        eventTargets: ["*"],
+        events: [
+          {
+            type: "auxclick",
+            label: "auxclick",
+          },
+          {
+            type: "click",
+            label: "click",
+          },
+          {
+            type: "dblclick",
+            label: "dblclick",
+          },
+          {
+            type: "mousedown",
+            label: "mousedown",
+          },
+          {
+            type: "mouseup",
+            label: "mouseup",
+          },
+          {
+            type: "mouseover",
+            label: "mouseover",
+          },
+          {
+            type: "mousemove",
+            label: "mousemove",
+          },
+          {
+            type: "mouseout",
+            label: "mouseout",
+          },
+          {
+            type: "mouseenter",
+            label: "mouseenter",
+          },
+          {
+            type: "mouseleave",
+            label: "mouseleave",
+          },
+          {
+            type: "mousewheel",
+            label: "mousewheel",
+          },
+          {
+            type: "wheel",
+            label: "wheel",
+          },
+          {
+            type: "contextmenu",
+            label: "contextmenu",
+          },
         ],
-        "events": [
-          {
-            "type": "auxclick",
-            "label": "auxclick"
-          },
-          {
-            "type": "click",
-            "label": "click"
-          },
-          {
-            "type": "dblclick",
-            "label": "dblclick"
-          },
-          {
-            "type": "mousedown",
-            "label": "mousedown"
-          },
-          {
-            "type": "mouseup",
-            "label": "mouseup"
-          },
-          {
-            "type": "mouseover",
-            "label": "mouseover"
-          },
-          {
-            "type": "mousemove",
-            "label": "mousemove"
-          },
-          {
-            "type": "mouseout",
-            "label": "mouseout"
-          },
-          {
-            "type": "mouseenter",
-            "label": "mouseenter"
-          },
-          {
-            "type": "mouseleave",
-            "label": "mouseleave"
-          },
-          {
-            "type": "mousewheel",
-            "label": "mousewheel"
-          },
-          {
-            "type": "wheel",
-            "label": "wheel"
-          },
-          {
-            "type": "contextmenu",
-            "label": "contextmenu"
-          }
-        ]
       },
       {
-        "category": "Pointer",
-        "eventTargets": [
-          "*"
+        category: "Pointer",
+        eventTargets: ["*"],
+        events: [
+          {
+            type: "pointerover",
+            label: "pointerover",
+          },
+          {
+            type: "pointerout",
+            label: "pointerout",
+          },
+          {
+            type: "pointerenter",
+            label: "pointerenter",
+          },
+          {
+            type: "pointerleave",
+            label: "pointerleave",
+          },
+          {
+            type: "pointerdown",
+            label: "pointerdown",
+          },
+          {
+            type: "pointerup",
+            label: "pointerup",
+          },
+          {
+            type: "pointermove",
+            label: "pointermove",
+          },
+          {
+            type: "pointercancel",
+            label: "pointercancel",
+          },
+          {
+            type: "gotpointercapture",
+            label: "gotpointercapture",
+          },
+          {
+            type: "lostpointercapture",
+            label: "lostpointercapture",
+          },
+          {
+            type: "pointerrawupdate",
+            label: "pointerrawupdate",
+          },
         ],
-        "events": [
-          {
-            "type": "pointerover",
-            "label": "pointerover"
-          },
-          {
-            "type": "pointerout",
-            "label": "pointerout"
-          },
-          {
-            "type": "pointerenter",
-            "label": "pointerenter"
-          },
-          {
-            "type": "pointerleave",
-            "label": "pointerleave"
-          },
-          {
-            "type": "pointerdown",
-            "label": "pointerdown"
-          },
-          {
-            "type": "pointerup",
-            "label": "pointerup"
-          },
-          {
-            "type": "pointermove",
-            "label": "pointermove"
-          },
-          {
-            "type": "pointercancel",
-            "label": "pointercancel"
-          },
-          {
-            "type": "gotpointercapture",
-            "label": "gotpointercapture"
-          },
-          {
-            "type": "lostpointercapture",
-            "label": "lostpointercapture"
-          },
-          {
-            "type": "pointerrawupdate",
-            "label": "pointerrawupdate"
-          }
-        ]
       },
       {
-        "category": "Touch",
-        "eventTargets": [
-          "*"
+        category: "Touch",
+        eventTargets: ["*"],
+        events: [
+          {
+            type: "touchstart",
+            label: "touchstart",
+          },
+          {
+            type: "touchmove",
+            label: "touchmove",
+          },
+          {
+            type: "touchend",
+            label: "touchend",
+          },
+          {
+            type: "touchcancel",
+            label: "touchcancel",
+          },
         ],
-        "events": [
-          {
-            "type": "touchstart",
-            "label": "touchstart"
-          },
-          {
-            "type": "touchmove",
-            "label": "touchmove"
-          },
-          {
-            "type": "touchend",
-            "label": "touchend"
-          },
-          {
-            "type": "touchcancel",
-            "label": "touchcancel"
-          }
-        ]
       },
       {
-        "category": "Worker",
-        "eventTargets": [
-          "*"
-        ],
-        "events": [
+        category: "Worker",
+        eventTargets: ["*"],
+        events: [
           {
-            "type": "message",
-            "label": "message"
+            type: "message",
+            label: "message",
           },
           {
-            "type": "messageerror",
-            "label": "messageerror"
-          }
-        ]
+            type: "messageerror",
+            label: "messageerror",
+          },
+        ],
       },
       {
-        "category": "XHR",
-        "eventTargets": [
-          "xmlhttprequest",
-          "xmlhttprequestupload"
+        category: "XHR",
+        eventTargets: ["xmlhttprequest", "xmlhttprequestupload"],
+        events: [
+          {
+            type: "readystatechange",
+            label: "readystatechange",
+          },
+          {
+            type: "load",
+            label: "load",
+          },
+          {
+            type: "loadstart",
+            label: "loadstart",
+          },
+          {
+            type: "loadend",
+            label: "loadend",
+          },
+          {
+            type: "abort",
+            label: "abort",
+          },
+          {
+            type: "error",
+            label: "error",
+          },
+          {
+            type: "progress",
+            label: "progress",
+          },
+          {
+            type: "timeout",
+            label: "timeout",
+          },
         ],
-        "events": [
-          {
-            "type": "readystatechange",
-            "label": "readystatechange"
-          },
-          {
-            "type": "load",
-            "label": "load"
-          },
-          {
-            "type": "loadstart",
-            "label": "loadstart"
-          },
-          {
-            "type": "loadend",
-            "label": "loadend"
-          },
-          {
-            "type": "abort",
-            "label": "abort"
-          },
-          {
-            "type": "error",
-            "label": "error"
-          },
-          {
-            "type": "progress",
-            "label": "progress"
-          },
-          {
-            "type": "timeout",
-            "label": "timeout"
-          }
-        ]
-      }
-    ]
-    // </GENERATED CODE. DO NOT EDIT.>
+      },
+    ],
+  // </GENERATED CODE. DO NOT EDIT.>
 };

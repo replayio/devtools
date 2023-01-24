@@ -73,7 +73,7 @@ function EventsListCategories({
 
   return (
     <>
-      {commonEventCategories.map((eventCategory) => (
+      {commonEventCategories.map(eventCategory => (
         <EventCategory
           key={eventCategory.category}
           disabled={isPending}
