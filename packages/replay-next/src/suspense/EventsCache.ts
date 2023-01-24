@@ -289,7 +289,7 @@ const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
  * are not unique. Instead, it uses both: event name + event target name
  * to look up the "breakpoint".
  *
- * NOTE: Event names are produced in ReplayMakeEventType() in chromium in
+ * NOTE: Event names are produced in MakeReplayMakeEventType() in chromium in
  *   third_party/blink/renderer/core/inspector/inspector_dom_debugger_agent.cc.
  */
 function lookupChromiumEventCategory(

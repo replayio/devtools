@@ -246,7 +246,7 @@ export const STANDARD_EVENT_CATEGORIES: Partial<Record<RecordingTarget, EventCat
   chromium:
 
     // <GENERATED CODE. DO NOT EDIT.>
-    // NOTE: This code is generated via `ts-node scripts/gen-event-names.ts`
+    // NOTE: This table is generated via `ts-node $CHROMIUM_DIR/src/replay-scripts/gen-event-names.ts`
     [
       {
         "category": "Animation",
