@@ -138,17 +138,37 @@ function EventsPane({ items }: { items: any[] }) {
 
   if (recording?.metadata?.test?.tests?.length) {
     return (
-      <div className="flex h-full flex-1 flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col overflow-hidden" style={{ flexWrap: "wrap" }}>
         <div className={styles.ToolbarHeader}>
           {selectedTest !== null ? (
-            <button onClick={onReset} className="flex flex-grow items-center gap-1 truncate">
-              <MaterialIcon>chevron_left</MaterialIcon>
+            <button
+              onClick={onReset}
+              className="flex flex-grow gap-1 truncate"
+              style={{ minHeight: "64px", alignSelf: "flex-start" }}
+            >
+              <div
+                className="img arrowhead-right h-32 w-32"
+                style={{ transform: "rotate(180deg)" }}
+              />
+              <span className="flex-grow text-left" style={{ whiteSpace: "normal" }}>
+                {" "}
+                {testCases[selectedTest].title}
+              </span>
               {testCases[selectedTest].error ? (
-                <Icon filename="testsuites-fail" size="small" className="bg-red-500" />
+                <Icon
+                  filename="testsuites-fail"
+                  size="small"
+                  className="bg-red-500"
+                  style={{ alignSelf: "flex-start" }}
+                />
               ) : (
-                <Icon filename="testsuites-success" size="small" className="bg-green-700" />
+                <Icon
+                  filename="testsuites-success"
+                  size="medium"
+                  className="bg-green-700"
+                  style={{ alignSelf: "flex-start" }}
+                />
               )}
-              <span className="flex-grow text-left"> {testCases[selectedTest].title}</span>
             </button>
           ) : (
             <>
