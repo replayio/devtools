@@ -138,7 +138,7 @@ function EventsPane({ items }: { items: any[] }) {
 
   if (recording?.metadata?.test?.tests?.length) {
     return (
-      <div className="flex flex-1 flex-col overflow-hidden" style={{ flexWrap: "wrap" }}>
+      <div className="flex h-full flex-1 flex-col overflow-hidden">
         <div className={styles.ToolbarHeader}>
           {selectedTest !== null ? (
             <button
