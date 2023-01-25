@@ -466,6 +466,19 @@ export async function toggleShouldLog(
   }
 }
 
+export async function seekToPreviousLogPointHit(page: Page, lineNumber: number) {
+  await debugPrint(
+    page,
+    `Seeking to previous log-point hit at line ${chalk.bold(`${lineNumber}`)}`,
+    "removeLogpoint"
+  );
+
+  const line = await getSourceLine(page, lineNumber);
+  const previousButton = line.locator('[data-test-name="PreviousHitPointButton"]');
+  await previousButton.waitFor();
+  await previousButton.click();
+}
+
 export async function toggleMappedSources(page: Page, targetState: "on" | "off"): Promise<void> {
   const toggle = page.locator('[data-test-id="SourceMapToggle"]');
   const currentState = await toggle.getAttribute("data-test-state");

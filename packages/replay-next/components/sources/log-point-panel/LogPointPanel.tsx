@@ -89,7 +89,7 @@ function PointPanel(props: ExternalProps) {
   const [hitPoints, hitPointStatus] = getHitPointsForLocationSuspense(
     client,
     point.location,
-    null,
+    point.condition,
     focusRange
   );
 
