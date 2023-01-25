@@ -58,12 +58,12 @@ function TestResultsSummary({ testCases }: { testCases: TestItem[] }) {
   return (
     <div className="ml-4 flex gap-2 px-1 py-1">
       <div className="flex items-center gap-1">
-        <Icon filename="testsuites-success" size="small" className="bg-green-700" />
-        <div className="text-sm text-green-700">{passed}</div>
+        <Icon filename="testsuites-success" size="small" className={styles.SuccessIcon} />
+        <div className={`text-sm ${styles.SuccessText}`}>{passed}</div>
       </div>
       <div className="mr-1 flex items-center gap-1">
-        <Icon filename="testsuites-fail" size="small" className="bg-red-500" />
-        <div className="text-sm text-red-500">{failed}</div>
+        <Icon filename="testsuites-fail" size="small" className={styles.ErrorIcon} />
+        <div className={`text-sm ${styles.ErrorTextLighter}`}>{failed}</div>
       </div>
     </div>
   );
@@ -141,14 +141,29 @@ function EventsPane({ items }: { items: any[] }) {
       <div className="flex h-full flex-1 flex-col overflow-hidden">
         <div className={styles.ToolbarHeader}>
           {selectedTest !== null ? (
-            <button onClick={onReset} className="flex flex-grow items-center gap-1 truncate">
-              <MaterialIcon>chevron_left</MaterialIcon>
+            <button onClick={onReset} className="my-1 flex flex-grow gap-1 self-start truncate">
+              <div
+                className="img arrowhead-right mt-1 h-32 w-32"
+                style={{ transform: "rotate(180deg)", marginTop: "2px" }}
+              />
+              <span className="flex-grow whitespace-normal text-left">
+                {" "}
+                {testCases[selectedTest].title}
+              </span>
               {testCases[selectedTest].error ? (
-                <Icon filename="testsuites-fail" size="small" className="bg-red-500" />
+                <Icon
+                  filename="testsuites-fail"
+                  size="small"
+                  className={`self-start ${styles.ErrorIcon}`}
+                />
               ) : (
-                <Icon filename="testsuites-success" size="small" className="bg-green-700" />
+                <Icon
+                  filename="testsuites-success"
+                  size="medium"
+                  className={styles.SuccessIcon}
+                  style={{ alignSelf: "flex-start" }}
+                />
               )}
-              <span className="flex-grow text-left"> {testCases[selectedTest].title}</span>
             </button>
           ) : (
             <>
@@ -191,7 +206,7 @@ function TestRunAttributes({ workspaceId, testRunId }: { workspaceId: string; te
   };
 
   return (
-    <div className="p-2">
+    <div className="p-2 pt-0">
       <Attributes testRun={thisSpecRun} />
     </div>
   );

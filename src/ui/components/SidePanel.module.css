@@ -14,3 +14,23 @@
   border-color: var(--theme-border);
   align-items: center;
 }
+
+.SuccessIcon {
+  background-color: var(--testsuites-success-color);
+}
+
+.SuccessText {
+  color: var(--testsuites-success-color);
+}
+
+.ErrorIcon {
+  background-color: var(--testsuites-error-icon-bgcolor);
+}
+
+.ErrorText {
+  color: var(--testsuites-error-color);
+}
+
+.ErrorTextLighter {
+  color: var(--testsuites-error-icon-bgcolor);
+}

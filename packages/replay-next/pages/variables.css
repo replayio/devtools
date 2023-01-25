@@ -476,11 +476,13 @@
   --breakpoint-label: var(--cm-string);
 
   /* Testsuites (Dark) */
-  --testsuites-error-bgcolor: #770702;
+  --testsuites-error-bgcolor: var(--background-color-error);
   --testsuites-error-bgcolor-hover: #7a1712;
-  --testsuites-error-color: white;
+  --testsuites-error-icon-bgcolor: rgb(255, 115, 115);
+  --testsuites-error-color: rgb(255, 197, 197);
   --testsuites-steps-bgcolor: var(--theme-base-100);
   --testsuites-steps-bgcolor-hover: var(--theme-base-90);
+  --testsuites-success-color: #30e60b;
 
   /* To organise (Dark) */
   --timejump-text: var(--buttontext-color);
@@ -950,9 +952,11 @@
   /* Testsuites (Light) */
   --testsuites-error-bgcolor: #ffe9e9;
   --testsuites-error-bgcolor-hover: #ffe0e0;
+  --testsuites-error-icon-bgcolor: #eb5757;
   --testsuites-error-color: #eb5757;
   --testsuites-steps-bgcolor: #f7f7f7;
   --testsuites-steps-bgcolor-hover: #f4f4f4;
+  --testsuites-success-color: #058b00;
 
   /* To organise (Light) */
   --timejump-text: var(--buttontext-color);
