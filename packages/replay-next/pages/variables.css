@@ -479,7 +479,7 @@
   --testsuites-error-bgcolor: var(--background-color-error);
   --testsuites-error-bgcolor-hover: #7a1712;
   --testsuites-error-icon-bgcolor: rgb(255, 115, 115);
-  --testsuites-error-color: rgb(255, 115, 115);
+  --testsuites-error-color: rgb(255, 197, 197);
   --testsuites-steps-bgcolor: var(--theme-base-100);
   --testsuites-steps-bgcolor-hover: var(--theme-base-90);
   --testsuites-success-color: #30e60b;

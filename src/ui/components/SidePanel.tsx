@@ -63,7 +63,7 @@ function TestResultsSummary({ testCases }: { testCases: TestItem[] }) {
       </div>
       <div className="mr-1 flex items-center gap-1">
         <Icon filename="testsuites-fail" size="small" className={styles.ErrorIcon} />
-        <div className={`text-sm ${styles.ErrorText}`}>{failed}</div>
+        <div className={`text-sm ${styles.ErrorTextLighter}`}>{failed}</div>
       </div>
     </div>
   );
@@ -141,16 +141,12 @@ function EventsPane({ items }: { items: any[] }) {
       <div className="flex h-full flex-1 flex-col overflow-hidden">
         <div className={styles.ToolbarHeader}>
           {selectedTest !== null ? (
-            <button
-              onClick={onReset}
-              className="flex flex-grow gap-1 truncate"
-              style={{ alignSelf: "flex-start" }}
-            >
+            <button onClick={onReset} className="my-1 flex flex-grow gap-1 self-start truncate">
               <div
-                className="img arrowhead-right h-32 w-32"
-                style={{ transform: "rotate(180deg)" }}
+                className="img arrowhead-right mt-1 h-32 w-32"
+                style={{ transform: "rotate(180deg)", marginTop: "2px" }}
               />
-              <span className="flex-grow text-left" style={{ whiteSpace: "normal" }}>
+              <span className="flex-grow whitespace-normal text-left">
                 {" "}
                 {testCases[selectedTest].title}
               </span>
@@ -158,8 +154,7 @@ function EventsPane({ items }: { items: any[] }) {
                 <Icon
                   filename="testsuites-fail"
                   size="small"
-                  className="bg-red-500"
-                  style={{ alignSelf: "flex-start" }}
+                  className={`self-start ${styles.ErrorIcon}`}
                 />
               ) : (
                 <Icon

@@ -30,3 +30,7 @@
 .ErrorText {
   color: var(--testsuites-error-color);
 }
+
+.ErrorTextLighter {
+  color: var(--testsuites-error-icon-bgcolor);
+}
