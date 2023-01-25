@@ -1,0 +1,89 @@
+.ConsoleRoot {
+  flex: 1 1 auto;
+  overflow: hidden;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  background-color: var(--body-bgcolor);
+  word-break: break-all;
+  font-size: var(--font-size-regular);
+}
+.ConsoleRoot:focus {
+  outline: none;
+}
+
+.LeftPanel,
+.RightPanel {
+  display: flex;
+  flex-direction: column;
+}
+
+.FilterPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+}
+
+.FilterColumn {
+  flex: 1 1 auto;
+  overflow: auto;
+  height: 100%;
+  border-top: 1px solid var(--theme-splitter-color);
+}
+
+.PanelResizeHandleContainer {
+  height: 100%;
+  width: 1px;
+  overflow: visible;
+  position: relative;
+}
+
+/**
+ * The resize target for this component is too small!
+ * This CSS overflows to give it a larger hit area than the visible 1px wide border.
+ */
+.PanelResizeHandle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -0.125rem;
+  right: -0.125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.PanelResizeHandle::after {
+  content: " ";
+  display: block;
+  height: 100%;
+  width: 1px;
+  background-color: var(--theme-splitter-color);
+}
+
+.RightColumnActionsRow {
+  display: flex;
+}
+
+.MessageColumn {
+  flex: 1 1 auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--theme-splitter-color);
+}
+
+.ConsoleSearchRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-height: 1.75rem;
+  flex: 0 0 auto;
+}
+
+.Loader {
+  flex: 1;
+  padding: 0.5rem;
+}
+
+.ErrorBoundaryFallback {
+}

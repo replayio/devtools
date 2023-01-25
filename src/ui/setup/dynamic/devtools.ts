@@ -7,15 +7,6 @@ import { MouseEvent, TimeStampedPoint, sessionError, uploadedData } from "@repla
 import { IDBPDatabase, openDB } from "idb";
 import debounce from "lodash/debounce";
 
-import { CONSOLE_SETTINGS_DATABASE } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
-import { POINTS_DATABASE } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import { IDBOptions } from "bvaughn-architecture-demo/src/hooks/useIndexedDB";
-import {
-  getCachedObject,
-  getObjectPropertyHelper,
-  getObjectThrows,
-  getObjectWithPreviewHelper,
-} from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { setupSourcesListeners } from "devtools/client/debugger/src/actions/sources";
 import * as dbgClient from "devtools/client/debugger/src/client";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
@@ -40,6 +31,15 @@ import {
 import { addEventListener, initSocket, client as protocolClient } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
+import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
+import { POINTS_DATABASE } from "replay-next/src/contexts/PointsContext";
+import { IDBOptions } from "replay-next/src/hooks/useIndexedDB";
+import {
+  getCachedObject,
+  getObjectPropertyHelper,
+  getObjectThrows,
+  getObjectWithPreviewHelper,
+} from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 import { UIStore, actions } from "ui/actions";
 import { setCanvas } from "ui/actions/app";
@@ -55,7 +55,7 @@ import reporter from "ui/reducers/reporter";
 import timeline, {
   allPaintsReceived,
   paintsReceived,
-  pointsReceivedThunk,
+  pointsReceived,
   setPlaybackStalled,
 } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
@@ -117,8 +117,7 @@ const SessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
       "This error has been fixed in an updated version of Replay. Please try upgrading Replay and trying a new recording.",
   },
   [SessionError.OldBuild]: {
-    content:
-      "This recording is no longer available because we have updated Replay. Please try recording a new replay.",
+    content: "This recording is no longer available. Please try recording a new replay.",
   },
   [SessionError.LongRecording]: {
     content: "You’ve hit an error that happens with long recordings. Can you try a shorter one?",
@@ -262,7 +261,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   let points: TimeStampedPoint[] = [];
 
   const onPointsReceived = debounce(() => {
-    store.dispatch(pointsReceivedThunk(points.map(({ point, time }) => ({ point, time }))));
+    store.dispatch(pointsReceived(points.map(({ point, time }) => ({ point, time }))));
     store.dispatch(paintsReceived(points.filter(p => "screenShots" in p)));
     points = [];
   }, 1_000);

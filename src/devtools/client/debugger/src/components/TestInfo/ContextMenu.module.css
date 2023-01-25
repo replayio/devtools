@@ -5,15 +5,17 @@
   border-radius: 0.5rem;
   overflow: hidden;
   white-space: nowrap;
+  box-shadow: var(--dropshadow-md);
 
   /* Ensure the context menu is always above console rows and the current time indicator */
   z-index: 11;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
 .ContextMenuItem {
-  background-color: var(--context-menu-background-color);
+  background-color: var(--context-menu-bgcolor);
   color: var(--color-default);
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1rem 0.5rem 0.5rem;
   user-select: none;
   cursor: pointer;
   display: flex;
@@ -21,7 +23,7 @@
   gap: 1ch;
 }
 .ContextMenuItem:hover {
-  background-color: var(--context-menu-background-color-hover);
+  background-color: var(--context-menu-bgcolor-hover);
 }
 
 .ColorBadge,

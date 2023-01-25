@@ -8,7 +8,6 @@ export const syncInitialLayoutState: LayoutState = {
   showCommandPalette: false,
   selectedPrimaryPanel: "events",
   viewMode: prefs.defaultMode as ViewMode,
-  showVideoPanel: true,
   toolboxLayout: "ide",
   selectedPanel: "console",
   localNags: [],
@@ -39,10 +38,6 @@ export default function update(state = syncInitialLayoutState, action: LayoutAct
       return { ...state, viewMode: action.viewMode };
     }
 
-    case "set_show_video_panel": {
-      return { ...state, showVideoPanel: action.showVideoPanel };
-    }
-
     case "set_toolbox_layout": {
       return { ...state, toolboxLayout: action.layout };
     }
@@ -68,6 +63,5 @@ export const getShowCommandPalette = (state: UIState) => state.layout.showComman
 export const getSelectedPrimaryPanel = (state: UIState) => state.layout.selectedPrimaryPanel;
 export const getSelectedPanel = (state: UIState) => state.layout.selectedPanel;
 export const getViewMode = (state: UIState) => state.layout.viewMode;
-export const getShowVideoPanel = (state: UIState) => state.layout.showVideoPanel;
 export const getToolboxLayout = (state: UIState) => state.layout.toolboxLayout;
 export const getLocalNags = (state: UIState) => state.layout.localNags;

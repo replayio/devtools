@@ -1,8 +1,8 @@
 import { SourceId } from "@replayio/protocol";
 import { ReactNode, useContext, useMemo } from "react";
 
-import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import { Point } from "shared/client/types";
+import { PointsContext } from "replay-next/src/contexts/PointsContext";
+import { POINT_BEHAVIOR_DISABLED, Point } from "shared/client/types";
 import { getSourceDetailsEntities } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
 
@@ -18,7 +18,7 @@ export default function Breakpoints({
   emptyContent: ReactNode;
   type: "breakpoint" | "logpoint";
 }) {
-  const { deletePoints, points } = useContext(PointsContext);
+  const { deletePoints, editPoint, points } = useContext(PointsContext);
 
   const sourceDetailsEntities = useAppSelector(getSourceDetailsEntities);
 
@@ -31,7 +31,10 @@ export default function Breakpoints({
           // or there could be obsolete persisted source IDs for points.
           // Ensure we only show points that have valid sources available.
           const sourceExists = !!sourceDetailsEntities[point.location.sourceId];
-          const matchesType = type === "breakpoint" ? point.shouldBreak : point.shouldLog;
+
+          // Show both enabled and temporarily disabled points.
+          const behavior = type === "breakpoint" ? point.shouldBreak : point.shouldLog;
+          const matchesType = behavior !== POINT_BEHAVIOR_DISABLED;
 
           return sourceExists && matchesType;
         })
@@ -78,6 +81,7 @@ export default function Breakpoints({
                 <Breakpoint
                   key={point.id}
                   breakpoint={point}
+                  onEditPoint={editPoint}
                   onRemoveBreakpoint={() => deletePoints(point.id)}
                   type={type}
                 />

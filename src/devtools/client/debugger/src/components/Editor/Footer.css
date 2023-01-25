@@ -10,19 +10,12 @@
 
 .source-footer {
   background: var(--body-bgcolor);
-  border-radius: 0.5em;
   display: flex;
   opacity: 1;
   width: 100%;
   user-select: none;
   height: var(--editor-footer-height);
   box-sizing: border-box;
-}
-
-.source-footer-end {
-  display: flex;
-  align-items: center;
-  margin-left: auto;
 }
 
 .source-footer .commands * {

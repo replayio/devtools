@@ -26,6 +26,7 @@ import { InstallRouteListener } from "ui/utils/routeListener";
 import tokenManager from "ui/utils/tokenManager";
 
 import "../src/base.css";
+import useAuthTelemetry from "ui/hooks/useAuthTelemetry";
 
 if (isMock()) {
   // If this is an end to end test, bootstrap the mock environment.
@@ -105,19 +106,20 @@ function Routing({ Component, pageProps }: AppProps) {
         <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
         <title>Replay</title>
       </Head>
-      <_App>
-        <InstallRouteListener />
-        <ErrorBoundary>
+      <ErrorBoundary>
+        <_App>
+          <InstallRouteListener />
           <React.Suspense fallback={<LoadingScreen fallbackMessage="Fetching data..." />}>
             <Component {...pageProps} />
           </React.Suspense>
-        </ErrorBoundary>
-      </_App>
+        </_App>
+      </ErrorBoundary>
     </Provider>
   );
 }
 
 const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
+  useAuthTelemetry();
   const router = useRouter();
   let head: React.ReactNode;
 

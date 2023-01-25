@@ -1,10 +1,15 @@
 import { MouseEvent } from "react";
 
+import {
+  isNetworkRequestCommentTypeData,
+  isSourceCodeCommentTypeData,
+  isVisualCommentTypeData,
+} from "replay-next/components/sources/utils/comments";
 import { Comment } from "ui/state/comments";
 
-import CommentSource from "./TranscriptComments/CommentSource";
-import CommentThumbnail from "./TranscriptComments/CommentThumbnail";
 import NetworkRequestPreview from "./TranscriptComments/NetworkRequestPreview";
+import SourceCodePreview from "./TranscriptComments/SourceCodePreview";
+import VisualPreview from "./TranscriptComments/VisualPreview";
 import styles from "./CommentPreview.module.css";
 
 export default function CommentPreview({
@@ -14,28 +19,32 @@ export default function CommentPreview({
   comment: Comment;
   onClick: (event: MouseEvent) => void;
 }) {
-  if (comment.sourceLocation) {
+  if (comment.sourceLocation || isSourceCodeCommentTypeData(comment.type, comment.typeData)) {
     return (
       <div className={styles.Preview} onClick={onClick}>
-        <CommentSource comment={comment} />
+        <SourceCodePreview comment={comment} />
       </div>
     );
-  } else if (comment.networkRequestId) {
+  } else if (
+    comment.networkRequestId ||
+    isNetworkRequestCommentTypeData(comment.type, comment.typeData)
+  ) {
     return (
       <div className={styles.Preview} onClick={onClick}>
-        <NetworkRequestPreview networkRequestId={comment.networkRequestId} />
+        <NetworkRequestPreview comment={comment} />
       </div>
     );
-  } else {
-    const { primaryLabel, secondaryLabel } = comment;
-    if (typeof secondaryLabel === "string" && secondaryLabel.startsWith("data:image")) {
-      return (
-        <div className={styles.Preview}>
-          <CommentThumbnail primaryLabel={primaryLabel ?? null} secondaryLabel={secondaryLabel} />
-        </div>
-      );
-    }
-
-    return null;
+  } else if (
+    (typeof comment.secondaryLabel === "string" &&
+      comment.secondaryLabel.startsWith("data:image")) ||
+    isVisualCommentTypeData(comment.type, comment.typeData)
+  ) {
+    return (
+      <div className={styles.Preview}>
+        <VisualPreview comment={comment} />
+      </div>
+    );
   }
+
+  return null;
 }

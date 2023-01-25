@@ -18,19 +18,19 @@ describe("asycStoreHelper", () => {
     mockAsyncStorage();
     const asyncStore = asyncStoreHelper("root", { a: "_a" });
     asyncStore.a = 3;
-    expect(await asyncStore.a).toEqual(3);
+    await expect(await asyncStore.a).toEqual(3);
   });
 
   it("supports default values", async () => {
     mockAsyncStorage();
     const asyncStore = asyncStoreHelper("root", { a: ["Json", "_a", {}] });
-    expect(await asyncStore.a).toEqual({});
+    await expect(await asyncStore.a).toEqual({});
   });
 
   it("undefined default value", async () => {
     mockAsyncStorage();
     const asyncStore = asyncStoreHelper("root", { a: "_a" });
-    expect(await asyncStore.a).toEqual(null);
+    await expect(await asyncStore.a).toEqual(null);
   });
 
   it("setting an undefined mapping", async () => {

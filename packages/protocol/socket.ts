@@ -9,11 +9,13 @@ import {
   PointDescription,
   ProtocolClient,
   SessionId,
+  TimeRange,
   analysisPoints,
   analysisResult,
 } from "@replayio/protocol";
+import { captureException } from "@sentry/react";
 
-import { commandError } from "shared/utils/error";
+import { ProtocolError, commandError } from "shared/utils/error";
 
 import { makeInfallible } from "./utils";
 
@@ -90,12 +92,42 @@ if (typeof window !== "undefined") {
   });
 }
 
+const noCallerStackTracesForErrorCodes = new Set<ProtocolError>([
+  ProtocolError.GraphicsUnavailableAtPoint,
+  ProtocolError.InternalError,
+  ProtocolError.InvalidRecording,
+  ProtocolError.SessionCreationFailure,
+  ProtocolError.SessionDestroyed,
+  ProtocolError.ServiceUnavailable,
+  ProtocolError.TooManyPoints,
+  ProtocolError.UnknownBuild,
+  ProtocolError.UnknownSession,
+  ProtocolError.UnsupportedRecording,
+]);
+const noCallerStackTracesForFailedCommands = new Set<CommandMethods>([
+  "CSS.getAppliedRules",
+  "CSS.getComputedStyle",
+  "DOM.getAllBoundingClientRects",
+  "DOM.getBoundingClientRect",
+  "DOM.getBoxModel",
+  "DOM.getDocument",
+  "DOM.getEventListeners",
+  "DOM.getParentNodes",
+  "DOM.performSearch",
+  "DOM.querySelector",
+  "DOM.repaintGraphics",
+  "Session.createPause",
+]);
+
 export type ExperimentalSettings = {
   listenForMetrics: boolean;
   controllerKey?: string;
   disableCache?: boolean;
   disableScanDataCache?: boolean;
   disableQueryCache?: boolean;
+  disableStableQueryCache?: boolean;
+  disableUnstableQueryCache?: boolean;
+  enableRoutines?: boolean;
   profileWorkerThreads?: boolean;
 };
 
@@ -130,12 +162,14 @@ export async function createSession(
   recordingId: string,
   loadPoint: string | undefined,
   experimentalSettings: ExperimentalSettings,
+  focusWindow: TimeRange | undefined,
   sessionCallbacks: SessionCallbacks
 ) {
   const { sessionId } = await sendMessage("Recording.createSession", {
     recordingId,
     loadPoint: loadPoint || undefined,
     experimentalSettings,
+    focusWindow,
   });
 
   setSessionCallbacks(sessionCallbacks);
@@ -194,6 +228,7 @@ export async function sendMessage<M extends CommandMethods>(
 ): Promise<CommandResult<M>> {
   const id = gNextMessageId++;
   const msg: CommandRequest = { id, method, params, pauseId, sessionId };
+  const callerStackTrace = new Error(`Caller stacktrace for ${method}`);
 
   if (gSocketOpen) {
     doSend(msg);
@@ -221,6 +256,12 @@ export async function sendMessage<M extends CommandMethods>(
       // Include details on the method and params in the error string so that we get more than
       // _just_ "Internal Error" or similar
       finalMessage = `${message} (request: ${method}, ${JSON.stringify(params)})`;
+    }
+    if (
+      !noCallerStackTracesForErrorCodes.has(code) &&
+      !(code === ProtocolError.CommandFailed && noCallerStackTracesForFailedCommands.has(method))
+    ) {
+      captureException(callerStackTrace, { extra: { code, message, method, params } });
     }
     throw commandError(finalMessage, code);
   }

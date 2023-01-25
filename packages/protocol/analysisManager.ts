@@ -13,9 +13,9 @@ import {
   analysisResult,
 } from "@replayio/protocol";
 
-import { preCacheExecutionPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import { addEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
+import { preCacheExecutionPointForTime } from "replay-next/src/suspense/PointsCache";
 
 import { client } from "./socket";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "./thread/analysis";

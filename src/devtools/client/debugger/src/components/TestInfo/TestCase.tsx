@@ -1,11 +1,10 @@
 import classnames from "classnames";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 
-import { getRecordingDuration } from "ui/actions/app";
 import {
   seek,
   seekToTime,
-  setFocusRegion,
+  setFocusRegionFromTimeRange,
   startPlayback,
   syncFocusedRegion,
   updateFocusRegionParam,
@@ -17,11 +16,11 @@ import {
   getSelectedTest,
   setSelectedTest,
 } from "ui/reducers/reporter";
-import { getFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem, TestResult, TestStep } from "ui/types";
 
 import { TestSteps } from "./TestSteps";
+import styles from "src/ui/components/SidePanel.module.css";
 
 export type TestCaseContextType = {
   test: TestItem;
@@ -49,43 +48,37 @@ export const TestCaseContext = createContext<TestCaseContextType>(null as any);
 export function TestCase({ test, index }: { test: TestItem; index: number }) {
   const [expandSteps, setExpandSteps] = useState(false);
   const dispatch = useAppDispatch();
-  const expandable = test.steps || test.error;
+  const expandable = !!test.steps;
   const selectedTest = useAppSelector(getSelectedTest);
   const isSelected = selectedTest === index;
-  const annotationsStart = useAppSelector(getReporterAnnotationsForTitleEnd);
+  const annotationsEnd = useAppSelector(getReporterAnnotationsForTitleEnd);
 
-  const duration = useAppSelector(getRecordingDuration);
   const testStartTime = test.relativeStartTime || 0;
   const testEndTime = testStartTime + (test.duration || 0);
-  const focusRegion = useAppSelector(getFocusRegion);
-  const isFocused =
-    focusRegion?.beginTime === testStartTime && focusRegion?.endTime === testEndTime;
 
-  const onFocus = () => {
-    if (isFocused) {
+  const onFocus = useCallback(() => {
+    if (testEndTime > testStartTime) {
       dispatch(
-        setFocusRegion({
-          beginTime: 0,
-          endTime: duration,
-        })
-      );
-    } else if (testEndTime > testStartTime) {
-      dispatch(
-        setFocusRegion({
-          beginTime: testStartTime,
-          endTime: testEndTime,
+        setFocusRegionFromTimeRange({
+          begin: testStartTime,
+          end: testEndTime,
         })
       );
     }
     dispatch(syncFocusedRegion());
     dispatch(updateFocusRegionParam());
-  };
+  }, [testStartTime, testEndTime, dispatch]);
+
   const toggleExpand = () => {
+    dispatch(setSelectedTest({ index, title: test.title }));
+  };
+
+  const seekToFirstStep = useCallback(() => {
     const firstStep = test.steps?.[0];
     if (test.relativeStartTime != null) {
       if (firstStep?.relativeStartTime != null) {
         const time = firstStep.relativeStartTime + test.relativeStartTime;
-        const pointStart = annotationsStart.find(a => a.message.id === firstStep.id)?.point;
+        const pointStart = annotationsEnd.find(a => a.message.id === firstStep.id)?.point;
 
         if (time && pointStart) {
           dispatch(seek(pointStart, time, false));
@@ -94,19 +87,17 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
         dispatch(seekToTime(test.relativeStartTime, false));
       }
     }
-
-    dispatch(setSelectedTest({ index, title: test.title }));
-
-    onFocus();
-  };
+  }, [test, annotationsEnd, dispatch]);
 
   useEffect(() => {
     if (isSelected) {
       setExpandSteps(true);
+      seekToFirstStep();
+      onFocus();
     } else {
       setExpandSteps(false);
     }
-  }, [isSelected]);
+  }, [isSelected, seekToFirstStep, onFocus]);
 
   const onReplay = () => {
     dispatch(startPlayback({ beginTime: testStartTime, endTime: testEndTime - 1 }));
@@ -165,7 +156,7 @@ export function Status({ result }: { result: TestResult }) {
     <Icon
       filename={result === "passed" ? "testsuites-success" : "testsuites-fail"}
       size="small"
-      className={result === "passed" ? "bg-[#219653]" : "bg-[#EB5757]"}
+      className={result === "passed" ? styles.SuccessIcon : styles.ErrorIcon}
     />
   );
 }

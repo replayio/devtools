@@ -348,8 +348,8 @@
   --loading-background: var(--chrome);
 
   /* Focus mode editor (light) */
-  --focus-mode-capsule-background-color: #e6e6e6;
-  --focus-mode-capsule-background-color-hover: #d8d8d8;
+  --focus-mode-capsule-bgcolor: #e6e6e6;
+  --focus-mode-capsule-bgcolor-hover: #d8d8d8;
   --focus-mode-loading-color: white;
   --focus-mode-loaded-indexed-color: var(--primary-accent);
   --focus-mode-popout-icon-background-color: white;
@@ -612,8 +612,8 @@
   --loading-background: var(--theme-base-100);
 
   /* Focus mode editor (dark) */
-  --focus-mode-capsule-background-color: var(--theme-base-90);
-  --focus-mode-capsule-background-color-hover: #232938;
+  --focus-mode-capsule-bgcolor: var(--theme-base-90);
+  --focus-mode-capsule-bgcolor-hover: #232938;
   --focus-mode-loading-color: #00567f;
   --focus-mode-loaded-indexed-color: var(--primary-accent);
   --focus-mode-popout-icon-background-color: var(--primary-accent);

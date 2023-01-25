@@ -23,13 +23,7 @@ import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
 import { getSystemColorSchemePreference } from "ui/utils/environment";
 import { compareBigInt } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
-import {
-  displayedBeginForFocusRegion,
-  displayedEndForFocusRegion,
-  isPointInRegions,
-  isTimeInRegions,
-  overlap,
-} from "ui/utils/timeline";
+import { isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
 
 export const initialAppState: AppState = {
   // analysisPoints: {},
@@ -309,9 +303,7 @@ export const getFlatEvents = (state: UIState) => {
   // Only show the events in the current focused region
   return focusRegion
     ? filteredEvents.filter(
-        e =>
-          e.time > displayedBeginForFocusRegion(focusRegion) &&
-          e.time < displayedEndForFocusRegion(focusRegion)
+        e => e.point >= focusRegion.begin.point && e.point < focusRegion.end.point
       )
     : filteredEvents;
 };

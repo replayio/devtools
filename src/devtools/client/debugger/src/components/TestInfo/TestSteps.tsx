@@ -41,7 +41,7 @@ type CompositeTestEvent = StepEvent | NetworkEvent | NavigationEvent;
 
 function useGetTestSections(
   startTime: number,
-  steps: TestStep[]
+  steps?: TestStep[]
 ): {
   beforeEach: CompositeTestEvent[];
   testBody: CompositeTestEvent[];
@@ -55,44 +55,43 @@ function useGetTestSections(
   const events = useAppSelector(getEvents);
 
   return useMemo(() => {
-    const stepsByTime = steps.map<StepEvent>((s, i) => {
-      const annotations = {
-        end: annotationsEnd.find(a => a.message.id === s.id),
-        enqueue: annotationsEnqueue.find(a => a.message.id === s.id),
-        start: annotationsStart.find(a => a.message.id === s.id),
-      };
+    const stepsByTime =
+      steps?.map<StepEvent>((s, i) => {
+        const annotations = {
+          end: annotationsEnd.find(a => a.message.id === s.id),
+          enqueue: annotationsEnqueue.find(a => a.message.id === s.id),
+          start: annotationsStart.find(a => a.message.id === s.id),
+        };
 
-      let duration = s.duration || 1;
-      let absoluteStartTime = annotations.start?.time ?? startTime + (s.relativeStartTime || 0);
-      let absoluteEndTime = annotations.end?.time ?? absoluteStartTime + duration;
+        let duration = s.duration || 1;
+        let absoluteStartTime = annotations.start?.time ?? startTime + (s.relativeStartTime || 0);
+        let absoluteEndTime = annotations.end?.time ?? absoluteStartTime + duration;
 
-      if (s.name === "assert") {
-        // start failed asserts at their end time so they line up with the end
-        // of the failed command but successful asserts with their start time
-        if (s.error) {
-          absoluteStartTime = absoluteEndTime - 1;
-          annotations.start = annotations.end;
-        } else {
-          absoluteEndTime = absoluteStartTime + 1;
-          annotations.end = annotations.start;
+        if (s.name === "assert") {
+          // start failed asserts at their end time so they line up with the end
+          // of the failed command but successful asserts with their start time
+          if (s.error) {
+            absoluteStartTime = absoluteEndTime - 1;
+          } else {
+            absoluteEndTime = absoluteStartTime + 1;
+          }
+          duration = 1;
         }
-        duration = 1;
-      }
 
-      return {
-        time: absoluteStartTime,
-        type: "step",
-        event: {
-          ...s,
-          relativeStartTime: s.relativeStartTime,
-          absoluteStartTime,
-          absoluteEndTime: Math.max(0, absoluteEndTime - 1),
-          duration,
-          index: i,
-          annotations,
-        },
-      };
-    });
+        return {
+          time: absoluteStartTime,
+          type: "step",
+          event: {
+            ...s,
+            relativeStartTime: s.relativeStartTime,
+            absoluteStartTime,
+            absoluteEndTime: Math.max(0, absoluteEndTime - 1),
+            duration,
+            index: i,
+            annotations,
+          },
+        };
+      }) || [];
 
     const times = stepsByTime.reduce(
       (acc, s) => ({
@@ -237,7 +236,7 @@ function TestSection({ events, header }: { events: CompositeTestEvent[]; header?
       {header ? (
         <div
           data-test-id="TestSuites-TestCase-SectionHeader"
-          className="pt-6 pb-2 pl-2  font-semibold uppercase opacity-50"
+          className="pt-6 pb-2  font-semibold uppercase opacity-50 first:pt-0"
           style={{ fontSize: "10px" }}
         >
           {header}
@@ -249,7 +248,9 @@ function TestSection({ events, header }: { events: CompositeTestEvent[]; header?
             step={s}
             key={s.id}
             index={s.index}
-            argString={s.args?.toString()}
+            argString={
+              s.args ? s.args.filter((s): s is string => s && typeof s === "string").join(", ") : ""
+            }
             id={s.id}
           />
         ) : type === "network" ? (

@@ -1,15 +1,10 @@
 import classNames from "classnames";
 import React, { useEffect, useRef } from "react";
 
-import { setFocusRegion, setTimelineToTime } from "ui/actions/timeline";
+import { setTimelineToTime, updateDisplayedFocusRegion } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import {
-  displayedBeginForFocusRegion,
-  displayedEndForFocusRegion,
-  getPositionFromTime,
-  getTimeFromPosition,
-} from "ui/utils/timeline";
+import { getPositionFromTime, getTimeFromPosition } from "ui/utils/timeline";
 
 import { EditMode } from ".";
 
@@ -24,10 +19,10 @@ type Props = {
 };
 
 export default function ConditionalFocuser({ editMode, setEditMode }: Props) {
-  const focusRegion = useAppSelector(selectors.getFocusRegion);
+  const displayedFocusRegion = useAppSelector(selectors.getDisplayedFocusRegion);
   const showFocusModeControls = useAppSelector(selectors.getShowFocusModeControls);
 
-  if (!focusRegion || !showFocusModeControls) {
+  if (!displayedFocusRegion || !showFocusModeControls) {
     return null;
   }
 
@@ -37,7 +32,7 @@ export default function ConditionalFocuser({ editMode, setEditMode }: Props) {
 function Focuser({ editMode, setEditMode }: Props) {
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(selectors.getCurrentTime);
-  const focusRegion = useAppSelector(selectors.getFocusRegion);
+  const displayedFocusRegion = useAppSelector(selectors.getDisplayedFocusRegion);
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -46,7 +41,7 @@ function Focuser({ editMode, setEditMode }: Props) {
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || !focusRegion || !editMode) {
+    if (!container || !displayedFocusRegion || !editMode) {
       return;
     }
 
@@ -87,13 +82,8 @@ function Focuser({ editMode, setEditMode }: Props) {
           container.getBoundingClientRect(),
           zoomRegion
         );
-        // This is a little bit of a weird one, but we actually *want* to use
-        // the focus based on the actual time position of the handles, not on
-        // the points we end up going to. Otherwise, because the window always
-        // grows when the point is not exact, we end up with an ever-expanding
-        // window while dragging it around the timeline.
-        const beginTime = displayedBeginForFocusRegion(focusRegion);
-        const endTime = displayedEndForFocusRegion(focusRegion);
+        const beginTime = displayedFocusRegion.begin;
+        const endTime = displayedFocusRegion.end;
 
         switch (editMode.type) {
           case "drag": {
@@ -112,28 +102,37 @@ function Focuser({ editMode, setEditMode }: Props) {
             }
 
             dispatch(
-              setFocusRegion({
-                beginTime: newBeginTime,
-                endTime: newEndTime,
-              })
+              updateDisplayedFocusRegion(
+                {
+                  begin: newBeginTime,
+                  end: newEndTime,
+                },
+                true
+              )
             );
             break;
           }
           case "resize-end": {
             dispatch(
-              setFocusRegion({
-                beginTime,
-                endTime: mouseTime,
-              })
+              updateDisplayedFocusRegion(
+                {
+                  begin: beginTime,
+                  end: mouseTime,
+                },
+                true
+              )
             );
             break;
           }
           case "resize-start": {
             dispatch(
-              setFocusRegion({
-                beginTime: mouseTime,
-                endTime,
-              })
+              updateDisplayedFocusRegion(
+                {
+                  begin: mouseTime,
+                  end: endTime,
+                },
+                true
+              )
             );
             break;
           }
@@ -195,7 +194,7 @@ function Focuser({ editMode, setEditMode }: Props) {
     };
   });
 
-  if (!focusRegion) {
+  if (!displayedFocusRegion) {
     return null;
   }
 
@@ -209,8 +208,8 @@ function Focuser({ editMode, setEditMode }: Props) {
   const setEditModeToResizeEnd = () => setEditMode({ type: "resize-end" });
   const setEditModeToResizeStart = () => setEditMode({ type: "resize-start" });
 
-  const left = getPositionFromTime(displayedBeginForFocusRegion(focusRegion), zoomRegion);
-  const right = getPositionFromTime(displayedEndForFocusRegion(focusRegion), zoomRegion);
+  const left = getPositionFromTime(displayedFocusRegion.begin, zoomRegion);
+  const right = getPositionFromTime(displayedFocusRegion.end, zoomRegion);
 
   return (
     <div className="relative top-0 left-0 h-full w-full" ref={containerRef}>

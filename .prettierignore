@@ -6,7 +6,7 @@ src/global-css.ts
 
 test/examples
 src/devtools/client/debugger/src/workers/parser/tests/fixtures
-packages/bvaughn-architecture-demo/playwright/protocol-fixtures/
+packages/replay-next/playwright/protocol-fixtures/
 src/ui/utils/intercom.ts
 index.html
 packages/third-party/
@@ -14,3 +14,4 @@ pages/_app.tsx
 *.tsbuildinfo
 *.json
 *.yaml
+src/**/*.raw.js

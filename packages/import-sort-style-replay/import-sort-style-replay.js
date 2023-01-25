@@ -22,7 +22,8 @@ function sortImports(styleApi) {
   const isReactEcosystemModule = imported =>
     Boolean(imported.moduleName.match(/^(react|react-dom|prop-types|redux|\@reduxjs|next)/));
 
-  const isNewPrototypeModule = imported => Boolean(imported.moduleName.match(/^(bvaughn|shared)/));
+  const isNewPrototypeModule = imported =>
+    Boolean(imported.moduleName.match(/^(replay-next|shared)/));
   const isProtocolModule = imported => Boolean(imported.moduleName.match(/^protocol/));
   const isOtherInternalPackageModule = imported =>
     Boolean(imported.moduleName.match(/^(accordion|design|third-party)/));
@@ -81,7 +82,7 @@ function sortImports(styleApi) {
           isGlobalReduxStoreConfig,
           // import { ThreadFront } from "protocol/thread"
           isProtocolModule,
-          // import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+          // import { PointsContext } from "replay-next/src/contexts/PointsContext";
           isNewPrototypeModule,
           // import { Icon } from "design/Icon"
           isOtherInternalPackageModule,

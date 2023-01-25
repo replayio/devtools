@@ -1,7 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
-import { type as typeLexical } from "./lexical";
+import { submitCurrentText as submitCurrentTextLexical, type as typeLexical } from "./lexical";
 import { waitForPaused } from "./pause-information-panel";
 import { Expected, MessageType } from "./types";
 import { debugPrint, waitFor } from "./utils";
@@ -54,7 +54,11 @@ export async function enableConsoleMessageType(
   await checkbox.check();
 }
 
-export async function executeTerminalExpression(page: Page, text: string): Promise<void> {
+export async function executeTerminalExpression(
+  page: Page,
+  text: string,
+  shouldSubmit: boolean = true
+): Promise<void> {
   await debugPrint(
     page,
     `Executing terminal expression "${chalk.bold(text)}"`,
@@ -68,7 +72,7 @@ export async function executeTerminalExpression(page: Page, text: string): Promi
   // Wait for the Console to stop loading
   await consoleRoot.locator("text=Unavailable...").waitFor({ state: "hidden" });
 
-  await typeLexical(page, '[data-test-id="ConsoleTerminalInput"]', text, true);
+  await typeLexical(page, '[data-test-id="ConsoleTerminalInput"]', text, shouldSubmit);
 }
 
 export async function executeAndVerifyTerminalExpression(
@@ -179,10 +183,15 @@ export async function seekToConsoleMessage(
   await consoleMessage.hover();
   await consoleMessage.locator('[data-test-id="ConsoleMessageHoverButton"]').click();
 
-  await waitFor(async () =>
-    expect(await consoleMessage.getAttribute("data-test-paused-here")).toBe("true")
+  await waitFor(
+    async () =>
+      await expect(await consoleMessage.getAttribute("data-test-paused-here")).toBe("true")
   );
   await waitForPaused(page, line);
+}
+
+export async function submitCurrentText(page: Page) {
+  await submitCurrentTextLexical(page, '[data-test-id="ConsoleTerminalInput"]');
 }
 
 export async function toggleSideFilters(page: Page, open: boolean): Promise<void> {
@@ -216,6 +225,13 @@ export async function verifyConsoleMessage(
 
   const messages = await findConsoleMessage(page, expected, messageType);
   await verifyExpectedCount(messages, expectedCount);
+}
+
+export async function verifyEagerEvaluationResult(page: Page, expected: Expected) {
+  const result = page.locator(
+    `[data-test-id="ConsoleTerminalInputEagerEvaluationResult"]:has-text('${expected}')`
+  );
+  await verifyExpectedCount(result, 1);
 }
 
 export async function verifyEvaluationResult(
@@ -355,6 +371,7 @@ export async function verifyTrimmedConsoleMessages(
 }
 
 export async function warpToMessage(page: Page, text: string, line?: number) {
+  await openConsolePanel(page);
   const messages = await findConsoleMessage(page, text);
   const message = messages.first();
   await seekToConsoleMessage(page, message, line);
@@ -363,13 +380,23 @@ export async function warpToMessage(page: Page, text: string, line?: number) {
 export async function setConsoleMessageAsFocusStart(page: Page, message: Locator) {
   await debugPrint(page, `Setting focus range start`, "setConsoleMessageAsFocusStart");
 
-  await message.click({ button: "right" });
+  await openContextMenu(message);
   await page.locator('[data-test-id="ConsoleContextMenu-SetFocusStartButton"]').click();
 }
 
 export async function setConsoleMessageAsFocusEnd(page: Page, message: Locator) {
   await debugPrint(page, `Setting focus range end`, "setConsoleMessageAsFocusEnd");
 
-  await message.click({ button: "right" });
+  await openContextMenu(message);
   await page.locator('[data-test-id="ConsoleContextMenu-SetFocusEndButton"]').click();
+}
+
+export async function waitForTerminal(page: Page) {
+  await page.locator('[data-test-id="ConsoleTerminalInput"]').waitFor();
+}
+
+export async function openContextMenu(listItem: Locator) {
+  // Click to the left of the list item to avoid accidentally clicking on an Inspector instance
+  // Inspector has its own context menu with "copy object"
+  await listItem.click({ button: "right", position: { x: 10, y: 10 } });
 }

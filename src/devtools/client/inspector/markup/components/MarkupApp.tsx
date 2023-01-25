@@ -14,7 +14,7 @@ export interface MarkupProps {}
 
 type PropsFromParent = {};
 
-function MarkupApp({ markupRootNode }: PropsFromRedux & PropsFromParent) {
+function MarkupApp({ loadingFailed, markupRootNode }: PropsFromRedux & PropsFromParent) {
   const isMarkupEmpty = (markupRootNode?.children?.length || 0) == 0;
 
   const contentRef = useRef<HTMLDivElement>(null);
@@ -42,6 +42,9 @@ function MarkupApp({ markupRootNode }: PropsFromRedux & PropsFromParent) {
     };
   }, []);
 
+  const showLoadingProgressBar = isMarkupEmpty && !loadingFailed;
+  const showLoadingFailedMessage = loadingFailed;
+
   return (
     <div className="devtools-inspector-tab-panel">
       <div id="inspector-main-content" className="devtools-main-content" ref={contentRef}>
@@ -66,7 +69,10 @@ function MarkupApp({ markupRootNode }: PropsFromRedux & PropsFromParent) {
               {<Nodes />}
             </div>
           </div>
-          {isMarkupEmpty ? <LoadingProgressBar /> : null}
+          {showLoadingProgressBar && <LoadingProgressBar />}
+          {showLoadingFailedMessage && (
+            <div className="devtools-sidepanel-no-result">Elements are not available</div>
+          )}
         </div>
         <HTMLBreadcrumbs />
       </div>
@@ -75,6 +81,7 @@ function MarkupApp({ markupRootNode }: PropsFromRedux & PropsFromParent) {
 }
 
 const connector = connect((state: UIState) => ({
+  loadingFailed: state.markup.loadingFailed,
   markupRootNode: getNodeInfo(state, state.markup.rootNode!),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;

@@ -1,7 +1,3 @@
-import ContextMenuDivider from "bvaughn-architecture-demo/components/context-menu/ContextMenuDivider";
-import ContextMenuItem from "bvaughn-architecture-demo/components/context-menu/ContextMenuItem";
-import useContextMenu from "bvaughn-architecture-demo/components/context-menu/useContextMenu";
-import { copyToClipboard as copyTextToClipboard } from "bvaughn-architecture-demo/components/sources/utils/clipboard";
 import { closeTab, closeTabs } from "devtools/client/debugger/src/actions/tabs";
 import {
   copyToClipboard as copySourceToClipboard,
@@ -10,6 +6,10 @@ import {
 } from "devtools/client/debugger/src/actions/ui";
 import { Tab, getContext, getTabs } from "devtools/client/debugger/src/selectors";
 import { getRawSourceURL } from "devtools/client/debugger/src/utils/source";
+import ContextMenuDivider from "replay-next/components/context-menu/ContextMenuDivider";
+import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
+import useContextMenu from "replay-next/components/context-menu/useContextMenu";
+import { copyToClipboard as copyTextToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { MiniSource, getSelectedSource } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 

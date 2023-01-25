@@ -1,12 +1,12 @@
 import { loadedRegions as LoadedRegions, Location, SourceId } from "@replayio/protocol";
 
-import { CONSOLE_SETTINGS_DATABASE } from "bvaughn-architecture-demo/src/contexts/ConsoleFiltersContext";
-import { POINTS_DATABASE } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import { preloadIDBInitialValues } from "bvaughn-architecture-demo/src/hooks/useIndexedDB";
-import { preCacheExecutionPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
 import { EMPTY_TABS } from "devtools/client/debugger/src/reducers/tabs";
 import { ThreadFront } from "protocol/thread";
+import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
+import { POINTS_DATABASE } from "replay-next/src/contexts/PointsContext";
+import { preloadIDBInitialValues } from "replay-next/src/hooks/useIndexedDB";
+import { preCacheExecutionPointForTime } from "replay-next/src/suspense/PointsCache";
 import { ReplayClient } from "shared/client/ReplayClient";
 import { replayClient } from "shared/client/ReplayClientContext";
 import { UIStore } from "ui/actions";
@@ -89,7 +89,7 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
     };
   }
 
-  const { viewMode, showVideoPanel, toolboxLayout, selectedPanel } = syncInitialLayoutState;
+  const { viewMode, toolboxLayout, selectedPanel } = syncInitialLayoutState;
   const initialViewMode = session.viewMode || viewMode;
   trackEvent(initialViewMode == "dev" ? "layout.default_devtools" : "layout.default_viewer");
 
@@ -98,7 +98,6 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
     viewMode: initialViewMode,
     selectedPanel: "selectedPanel" in session ? session.selectedPanel : selectedPanel,
     selectedPrimaryPanel: getDefaultSelectedPrimaryPanel(session, recording),
-    showVideoPanel: "showVideoPanel" in session ? session.showVideoPanel : showVideoPanel,
     toolboxLayout: "toolboxLayout" in session ? session.toolboxLayout : toolboxLayout,
     localNags: "localNags" in session ? session.localNags : [],
   };

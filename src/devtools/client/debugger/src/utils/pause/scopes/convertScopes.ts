@@ -1,7 +1,7 @@
 import { Frame, NamedValue, ObjectId, PauseId, Scope } from "@replayio/protocol";
 
-import { getCachedObject } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { assert } from "protocol/utils";
+import { getCachedObject } from "replay-next/src/suspense/ObjectPreviews";
 
 import { simplifyDisplayName } from "../frames";
 

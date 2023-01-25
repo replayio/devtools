@@ -1,4 +1,4 @@
-import NewConsole from "bvaughn-architecture-demo/components/console";
+import NewConsole from "replay-next/components/console";
 import { useFeature } from "ui/hooks/settings";
 
 import { ConsoleNag } from "../shared/Nags/Nags";

@@ -35,8 +35,8 @@ export function getPrivacySummaryAndIcon(recording: Recording) {
 
 function DropdownButton({ disabled, children }: { disabled?: boolean; children: ReactNode }) {
   return (
-    <div className="flex flex-row space-x-1">
-      <span className="whitespace-pre text-xs">{children}</span>
+    <div className="flex flex-row items-center space-x-1">
+      <span className="whitespace-pre">{children}</span>
       {!disabled ? (
         <div style={{ lineHeight: "0px" }}>
           <MaterialIcon>expand_more</MaterialIcon>
@@ -91,9 +91,7 @@ function useGetPrivacyOptions(
     options.push(
       <DropdownItem onClick={setPublic} key="option-public">
         <DropdownItemContent icon="globe" selected={!isPrivate}>
-          <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
-            Anyone with the link
-          </span>
+          <span className="text-xs">Anyone with the link</span>
         </DropdownItemContent>
       </DropdownItem>
     );
@@ -115,7 +113,7 @@ function useGetPrivacyOptions(
           <DropdownItem onClick={() => handleMoveToTeam(id)} key={id}>
             <DropdownItemContent icon="group" selected={!!isPrivate && id === workspaceId}>
               <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
-                Members of {name}
+                {name}
               </span>
             </DropdownItemContent>
           </DropdownItem>
@@ -169,9 +167,7 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
         distance={0}
         position="bottom-right"
       >
-        <Dropdown menuItemsClassName="z-50 overflow-auto max-h-48" widthClass="w-80">
-          {privacyOptions}
-        </Dropdown>
+        <Dropdown menuItemsClassName="z-50 overflow-auto max-h-48">{privacyOptions}</Dropdown>
       </PortalDropdown>
     </>
   );

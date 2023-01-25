@@ -80,6 +80,8 @@ export interface MarkupState {
   // ID of a NodeFront of a given node. The value of each item in the object contains
   // an object representing the properties of the given node.
   tree: EntityState<NodeInfo>;
+  // The document could not be loaded at the current execution point.
+  loadingFailed: boolean;
 }
 
 const nodeAdapter = createEntityAdapter<NodeInfo>();
@@ -103,6 +105,7 @@ const initialState: MarkupState = {
   selectionReason: null,
   scrollIntoViewNode: null,
   highlightedNodes: null,
+  loadingFailed: false,
   nodeBoxModels: boxModelAdapter.getInitialState(),
   tree: nodeAdapter.getInitialState(),
 };
@@ -117,8 +120,6 @@ const markupSlice = createSlice({
     newRootAdded(state, action: PayloadAction<NodeInfo>) {
       nodeAdapter.setAll(state.tree, [action.payload]);
       state.rootNode = action.payload.id;
-      state.selectedNode = null;
-      state.scrollIntoViewNode = null;
     },
     childrenAdded(state, action: PayloadAction<{ parent: NodeInfo; children: NodeInfo[] }>) {
       const { parent, children } = action.payload;
@@ -169,6 +170,10 @@ const markupSlice = createSlice({
     nodeHighlightingCleared(state) {
       state.highlightedNodes = null;
     },
+    // The document could not be loaded at the current execution point.
+    updateLoadingFailed(state, action: PayloadAction<boolean>) {
+      state.loadingFailed = action.payload;
+    },
   },
   extraReducers: builder => {
     // dispatched by actions/timeline.ts, in `playback()`
@@ -197,6 +202,7 @@ export const {
   nodesHighlighted,
   nodeBoxModelsLoaded,
   nodeHighlightingCleared,
+  updateLoadingFailed,
 } = markupSlice.actions;
 
 export default markupSlice.reducer;

@@ -11,7 +11,7 @@ import {
   NewTerminalExpression,
   TerminalContext,
   TerminalExpression,
-} from "bvaughn-architecture-demo/src/contexts/TerminalContext";
+} from "replay-next/src/contexts/TerminalContext";
 
 export default function TerminalContextController({ children }: PropsWithChildren) {
   const [isPending, startTransition] = useTransition();

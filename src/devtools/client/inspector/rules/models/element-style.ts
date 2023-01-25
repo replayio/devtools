@@ -4,10 +4,10 @@
 
 import { ProtocolClient } from "@replayio/protocol";
 
-import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import RuleModel, { NodeWithId } from "devtools/client/inspector/rules/models/rule";
 import Services from "devtools/shared/services";
 import { assert } from "protocol/utils";
+import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 import { getAppliedRulesAsync } from "ui/suspense/styleCaches";
 

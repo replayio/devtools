@@ -9,15 +9,23 @@ import classnames from "classnames";
 import React, { Component, Suspense, useContext } from "react";
 import ReactTooltip from "react-tooltip";
 
-import { getFrameStepsSuspense } from "bvaughn-architecture-demo/src/suspense/FrameStepsCache";
+import { locationsInclude } from "protocol/utils";
+import { getFrameStepsSuspense } from "replay-next/src/suspense/FrameStepsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { actions } from "ui/actions";
-import { SourcesState, getPreferredLocation, getSelectedLocation } from "ui/reducers/sources";
+import {
+  SourcesState,
+  getPreferredLocation,
+  getSelectedLocation,
+  getSelectedSource,
+} from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { PartialLocation } from "../../actions/sources/select";
 import { PauseFrame, getExecutionPoint } from "../../reducers/pause";
+import { SymbolEntry, getSymbols } from "../../selectors";
 import { getSelectedFrameSuspense } from "../../selectors/pause";
 
 function getBoundingClientRect(element?: HTMLElement) {
@@ -38,6 +46,7 @@ interface FrameTimelineProps {
   selectedLocation: PartialLocation | null;
   selectedFrame: PauseFrame | null;
   frameSteps: PointDescription[] | undefined;
+  symbols: SymbolEntry | null;
   seek: (point: string, time: number, hasFrames: boolean) => void;
   setPreviewPausedLocation: (location: Location) => void;
   sourcesState: SourcesState;
@@ -81,7 +90,7 @@ class FrameTimelineRenderer extends Component<FrameTimelineProps, FrameTimelineS
   }
 
   getPosition(progress: number) {
-    const { frameSteps } = this.props;
+    const { frameSteps, symbols, selectedLocation } = this.props;
     if (!frameSteps) {
       return;
     }
@@ -92,7 +101,23 @@ class FrameTimelineRenderer extends Component<FrameTimelineProps, FrameTimelineS
     // We cap the index to the actual existing indices in framePositions.
     // This way, we don't let the index reference an element that doesn't exist.
     // e.g. displayIndex = 3, framePositions.length = 3 => framePositions[3] is undefined
-    const adjustedDisplayIndex = Math.min(displayIndex, numberOfPositions - 1);
+    let adjustedDisplayIndex = Math.min(displayIndex, numberOfPositions - 1);
+
+    // skip over steps that are mapped to the beginning of a function body
+    // see SCS-172
+    const bodyLocations = symbols?.symbols?.functionBodyLocations;
+    if (features.brokenSourcemapWorkaround && bodyLocations) {
+      while (adjustedDisplayIndex < numberOfPositions - 2) {
+        const location = frameSteps[adjustedDisplayIndex].frame?.find(
+          location => location.sourceId === selectedLocation?.sourceId
+        );
+        if (location && locationsInclude(bodyLocations, location)) {
+          adjustedDisplayIndex++;
+        } else {
+          break;
+        }
+      }
+    }
 
     this.setState({ lastDisplayIndex: adjustedDisplayIndex });
 
@@ -202,6 +227,8 @@ function FrameTimeline() {
   const executionPoint = useAppSelector(getExecutionPoint);
   const selectedLocation = useAppSelector(getSelectedLocation);
   const selectedFrame = useAppSelector(state => getSelectedFrameSuspense(replayClient, state));
+  const source = useAppSelector(getSelectedSource);
+  const symbols = useAppSelector(state => (source ? getSymbols(state, source) : null));
   const frameSteps = selectedFrame
     ? getFrameStepsSuspense(replayClient, selectedFrame.pauseId, selectedFrame.protocolId)
     : undefined;
@@ -219,6 +246,7 @@ function FrameTimeline() {
       selectedFrame={selectedFrame}
       frameSteps={frameSteps}
       sourcesState={sourcesState}
+      symbols={symbols}
       seek={seek}
       setPreviewPausedLocation={setPreviewPausedLocation}
     />

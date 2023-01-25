@@ -4,13 +4,13 @@
 
 import React, { useContext, useEffect } from "react";
 
-import { useGetFrameSteps } from "bvaughn-architecture-demo/src/suspense/FrameStepsCache";
 import actions from "devtools/client/debugger/src/actions/index";
 import CommandBarButton from "devtools/client/debugger/src/components/shared/Button/CommandBarButton";
 import { getSelectedFrameId, getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import Services from "devtools/shared/services";
+import { useGetFrameSteps } from "replay-next/src/suspense/FrameStepsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { useGetFrames } from "ui/suspense/frameCache";

@@ -1,5 +1,0 @@
-.editorconfig
-.yarn
-cache_buster
-playwright-report*
-test-results

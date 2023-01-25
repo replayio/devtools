@@ -1,10 +1,10 @@
 import type { PointDescription } from "@replayio/protocol";
 import { Suspense, useContext } from "react";
 
-import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
-import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import { getHitPointsForLocationSuspense } from "bvaughn-architecture-demo/src/suspense/PointsCache";
-import { getSourceHitCountsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/PointsCache";
+import { getSourceHitCountsSuspense } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { selectors } from "ui/reducers";
 import { useAppSelector } from "ui/setup/hooks";

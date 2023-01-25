@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React, { useContext } from "react";
 
-import { LoggablesContext } from "bvaughn-architecture-demo/components/console/LoggablesContext";
+import { LoggablesContext } from "replay-next/components/console/LoggablesContext";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { shouldShowNag } from "ui/utils/user";

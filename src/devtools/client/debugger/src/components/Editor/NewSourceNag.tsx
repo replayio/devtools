@@ -1,4 +1,4 @@
-import { useNag } from "bvaughn-architecture-demo/src/hooks/useNag";
+import { useNag } from "replay-next/src/hooks/useNag";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { Nag } from "ui/hooks/users";
 

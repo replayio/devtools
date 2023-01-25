@@ -1,0 +1,53 @@
+.Container,
+.ContainerPending {
+  flex: 1 1 auto;
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-regular);
+
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+
+  /* Account for -1px margin-top offset of rows (to align top/bottom borders) */
+  padding-top: 1px;
+}
+.ContainerPending {
+  opacity: 0.5;
+}
+
+.Container:focus,
+.ContainerPending:focus {
+  outline: none;
+}
+
+.CountRow {
+  background-color: var(--body-bgcolor);
+  padding: 0.5rem 1rem;
+}
+
+.OverflowRow {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+  padding: 0.25rem 0.5rem;
+  background-color: var(--background-color-error);
+  color: var(--color-error);
+}
+
+.OverflowRowIcon {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 1rem;
+  display: inline-block;
+}
+
+.OverflowLink {
+  color: var(--color-error);
+  text-decoration: underline;
+}
+.OverflowLink:hover {
+  text-decoration: none;
+}

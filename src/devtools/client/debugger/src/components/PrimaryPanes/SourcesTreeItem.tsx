@@ -8,8 +8,8 @@ import classnames from "classnames";
 import React, { Component } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
-import { copyToClipboard } from "bvaughn-architecture-demo/components/sources/utils/clipboard";
 import { showMenu } from "devtools/shared/contextmenu";
+import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { Redacted } from "ui/components/Redacted";
 import type { SourceDetails } from "ui/reducers/sources";
 import { getHasSiblingOfSameName, getSourceContent, isFulfilled } from "ui/reducers/sources";

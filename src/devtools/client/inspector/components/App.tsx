@@ -1,14 +1,11 @@
 import "ui/setup/dynamic/inspector";
 import classnames from "classnames";
-import React, { FC, ReactNode, useMemo } from "react";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import ComputedApp from "devtools/client/inspector/computed/components/ComputedApp";
 import LayoutApp from "devtools/client/inspector/layout/components/LayoutApp";
 import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
-import { prefs } from "devtools/client/inspector/prefs";
 import { RulesApp } from "devtools/client/inspector/rules/components/RulesApp";
-import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import { assert } from "protocol/utils";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { ResponsiveTabs } from "../../shared/components/ResponsiveTabs";
@@ -30,52 +27,19 @@ const availableTabs: readonly InspectorActiveTab[] = [
   "eventsview",
 ] as const;
 
-const InspectorApp: FC = () => {
+export default function InspectorApp() {
   const dispatch = useAppDispatch();
   const activeTab = useAppSelector(state => state.inspector.activeTab);
-
-  const onSplitboxResize = (width: number) => {
-    prefs.splitSidebarSize = width;
-  };
-
-  const markupView: JSX.Element | undefined = useMemo(() => {
-    return <MarkupApp />;
-  }, []);
-
-  const activePanel: ReactNode = useMemo(() => {
-    switch (activeTab) {
-      case "ruleview": {
-        return <RulesApp />;
-      }
-      case "computedview": {
-        return <ComputedApp />;
-      }
-      case "layoutview": {
-        return <LayoutApp showBoxModelProperties={true} />;
-      }
-      case "eventsview": {
-        return <EventListenersApp />;
-      }
-    }
-    assert(
-      false,
-      "This code should be unreachable (handle all cases within the switch statement)."
-    );
-  }, [activeTab]);
 
   return (
     <div className="inspector-responsive-container theme-body inspector">
       <div id="inspector-splitter-box">
-        <SplitBox
-          className="inspector-sidebar-splitter"
-          initialSize={`${prefs.splitSidebarSize}px`}
-          minSize="20%"
-          maxSize="80%"
-          onMove={onSplitboxResize}
-          splitterSize={4}
-          endPanelControl={true}
-          startPanel={markupView}
-          endPanel={
+        <PanelGroup autoSaveId="App" className="inspector-sidebar-splitter" direction="horizontal">
+          <Panel minSize={20}>
+            <MarkupApp />
+          </Panel>
+          <PanelResizeHandle className="h-full w-1" />
+          <Panel defaultSize={40} minSize={20}>
             <div className="devtools-inspector-tab-panel">
               <div id="inspector-sidebar-container">
                 <div id="inspector-sidebar">
@@ -113,7 +77,12 @@ const InspectorApp: FC = () => {
                       </nav>
                       <div className="panels">
                         <div className="tab-panel-box" role="tabpanel">
-                          {activePanel}
+                          {activeTab === "computedview" && <ComputedApp />}
+                          {activeTab === "eventsview" && <EventListenersApp />}
+                          {activeTab === "layoutview" && (
+                            <LayoutApp showBoxModelProperties={true} />
+                          )}
+                          {activeTab === "ruleview" && <RulesApp />}
                         </div>
                       </div>
                     </div>
@@ -121,11 +90,9 @@ const InspectorApp: FC = () => {
                 </div>
               </div>
             </div>
-          }
-        />
+          </Panel>
+        </PanelGroup>
       </div>
     </div>
   );
-};
-
-export default InspectorApp;
+}

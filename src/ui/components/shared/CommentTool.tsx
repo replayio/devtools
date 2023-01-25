@@ -1,7 +1,10 @@
 import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 
-import { getBase64Png } from "bvaughn-architecture-demo/src/utils/canvas";
+import {
+  VisualCommentTypeData,
+  createTypeDataForVisualComment,
+} from "replay-next/components/sources/utils/comments";
 import { getAreMouseTargetsLoading, getCanvas } from "ui/actions/app";
 import { createFrameComment } from "ui/actions/comments";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
@@ -85,25 +88,18 @@ export default function CommentTool({ comments }: { comments: (Comment | Reply)[
         if (isAuthenticated) {
           const position = mouseEventCanvasPosition(event);
 
-          let base64PNG: string | null = null;
-          let relativePositions: { x: number; y: number } | null = null;
+          let typeData: VisualCommentTypeData | null = null;
 
           const canvas = document.querySelector("canvas#graphics");
           if (canvas) {
-            base64PNG = await getBase64Png(canvas as HTMLCanvasElement, {
-              maxWidth: 300,
-              maxHeight: 300,
-            });
-
-            const rect = canvas.getBoundingClientRect();
-
-            relativePositions = {
-              x: (event.clientX - rect.left) / rect.width,
-              y: (event.clientY - rect.top) / rect.height,
-            };
+            typeData = await createTypeDataForVisualComment(
+              canvas as HTMLCanvasElement,
+              event.pageX,
+              event.pageY
+            );
           }
 
-          dispatch(createFrameComment(position, recordingId, base64PNG, relativePositions));
+          dispatch(createFrameComment(position, recordingId, typeData));
         }
 
         dispatch(setSelectedPrimaryPanel("comments"));

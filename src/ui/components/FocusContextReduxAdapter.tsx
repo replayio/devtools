@@ -1,8 +1,8 @@
 import { PropsWithChildren, useCallback, useEffect, useMemo, useState, useTransition } from "react";
 
-import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
-import { Range } from "bvaughn-architecture-demo/src/types";
-import { setFocusRegion } from "ui/actions/timeline";
+import { FocusContext, FocusContextType } from "replay-next/src/contexts/FocusContext";
+import { Range } from "replay-next/src/types";
+import { enterFocusMode, setFocusRegionFromTimeRange } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -27,11 +27,11 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
   const update = useCallback(
     (value: Range | null, _: boolean) => {
       dispatch(
-        setFocusRegion(
+        setFocusRegionFromTimeRange(
           value !== null
             ? {
-                beginTime: value[0],
-                endTime: value[1],
+                begin: value[0],
+                end: value[1],
               }
             : null
         )
@@ -42,12 +42,15 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
 
   const context = useMemo(() => {
     return {
+      enterFocusMode: () => {
+        dispatch(enterFocusMode());
+      },
       isTransitionPending: isPending,
       range: deferredFocusRegion ? rangeForFocusRegion(deferredFocusRegion) : null,
       rangeForDisplay: focusRegion ? rangeForFocusRegion(focusRegion) : null,
       update,
     };
-  }, [deferredFocusRegion, isPending, focusRegion, update]);
+  }, [deferredFocusRegion, dispatch, isPending, focusRegion, update]);
 
   return <FocusContext.Provider value={context}>{children}</FocusContext.Provider>;
 }

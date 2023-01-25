@@ -4,8 +4,8 @@
 
 import { Frame } from "@replayio/protocol";
 
-import { getSourcesAsync } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import type { ThreadFront as TF } from "protocol/thread";
+import { getSourcesAsync } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 import type { UIStore } from "ui/actions";
 import { allSourcesReceived } from "ui/reducers/sources";

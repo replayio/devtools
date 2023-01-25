@@ -1,7 +1,7 @@
 import classnames from "classnames";
 import { useMemo } from "react";
 
-import Expandable from "bvaughn-architecture-demo/components/Expandable";
+import Expandable from "replay-next/components/Expandable";
 
 import { useAppDispatch, useAppSelector, useAppStore } from "../../app/hooks";
 import { sourceEntrySelected } from "../sources/selectedSourcesSlice";

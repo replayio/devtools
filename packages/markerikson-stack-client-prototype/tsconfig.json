@@ -17,9 +17,9 @@
     "downlevelIteration": true,
     "baseUrl": ".",
     "paths": {
-      "bvaughn-architecture-demo/*": ["../bvaughn-architecture-demo/*"]
+      "replay-next/*": ["../replay-next/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "../bvaughn-architecture-demo/**/*.ts*"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "../replay-next/**/*.ts*"],
   "exclude": ["node_modules"]
 }

@@ -6,15 +6,18 @@ import { AnyAction, PayloadAction, createAsyncThunk, createSlice } from "@reduxj
 import type { FrameId, Location, PauseId, TimeStampedPoint, Value } from "@replayio/protocol";
 import findLast from "lodash/findLast";
 
-import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
-import { getFrameStepsAsync } from "bvaughn-architecture-demo/src/suspense/FrameStepsCache";
 import { compareNumericStrings } from "protocol/utils";
+import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
+import { getFrameStepsAsync } from "replay-next/src/suspense/FrameStepsCache";
 import { ReplayClientInterface } from "shared/client/types";
-import { getPreferredLocation } from "ui/reducers/sources";
+import { getPreferredLocation, getSelectedSourceId } from "ui/reducers/sources";
 import { SourceDetails } from "ui/reducers/sources";
 import { getContextFromAction } from "ui/setup/redux/middleware/context";
 import type { UIState } from "ui/state";
+import { features } from "ui/utils/prefs";
 import { ThunkExtraArgs } from "ui/utils/thunk";
+
+import { getSymbolEntryForSource } from "./ast";
 
 export interface Context {
   navigateCounter: number;
@@ -105,9 +108,22 @@ export const executeCommandOperation = createAsyncThunk<
   const { ThreadFront, replayClient } = extra;
   const state = getState();
   const loadedRegions = getLoadedRegions(state)!;
+  const sourceId = getSelectedSourceId(state);
+  const symbols = sourceId ? getSymbolEntryForSource(state, sourceId) : undefined;
   const nextPoint = await getResumePoint(replayClient, state, command);
 
-  const resp = await ThreadFront[command](nextPoint, loadedRegions);
+  const resp = await ThreadFront[command]({
+    point: nextPoint,
+    sourceId,
+    loadedRegions,
+    locationsToSkip:
+      // skip over points that are mapped to the beginning of a function body
+      // see SCS-172
+      features.brokenSourcemapWorkaround &&
+      (command === "stepOver" || command === "reverseStepOver")
+        ? symbols?.symbols?.functionBodyLocations
+        : undefined,
+  });
   if (!resp?.frame) {
     return { location: null };
   }
@@ -288,7 +304,7 @@ async function getResumePoint(replayClient: ReplayClientInterface, state: UIStat
     selectedFrameId.pauseId,
     selectedFrameId.frameId
   );
-  if (!frameSteps) {
+  if (!frameSteps?.length) {
     return;
   }
 
@@ -296,8 +312,12 @@ async function getResumePoint(replayClient: ReplayClientInterface, state: UIStat
     return findLast(frameSteps, p => compareNumericStrings(p.point, executionPoint) < 0)?.point;
   }
 
-  if (type == "stepOver" || type == "resume" || type == "stepIn" || type == "stepUp") {
-    return frameSteps.find(p => compareNumericStrings(p.point, executionPoint) > 0)?.point;
+  if (type == "stepOver" || type == "resume" || type == "stepIn" || type == "stepOut") {
+    let index = frameSteps.findIndex(p => compareNumericStrings(p.point, executionPoint) > 0);
+    if (index < 0) {
+      index = frameSteps.length - 1;
+    }
+    return frameSteps[index].point;
   }
 }
 

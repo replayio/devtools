@@ -1,0 +1,16 @@
+{
+  "name": "tests",
+  "packageManager": "yarn@3.2.1",
+  "devDependencies": {
+    "@playwright/test": "^1.25.1",
+    "chalk": "^4",
+    "playwright": "^1.25.1"
+  },
+  "scripts": {
+    "playwright:install": "playwright install chromium",
+    "test": "playwright test tests",
+    "test:update-fixture-data": "RECORD_PROTOCOL_DATA=true yarn test",
+    "test:visual": "PWDEBUG=console VISUAL_DEBUG=true yarn test",
+    "visuals": "VISUALS=true playwright test tests"
+  }
+}

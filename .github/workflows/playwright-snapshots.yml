@@ -1,0 +1,61 @@
+name: "Playwright Snapshots"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  # Force terminal colors. @see https://www.npmjs.com/package/colors
+  FORCE_COLOR: 1
+  FLAKINESS_CONNECTION_STRING: ${{ secrets.FLAKINESS_CONNECTION_STRING }}
+
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print job info
+        run: |
+          echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+          echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+          echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+          node --version
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      # Get the yarn cache path.
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+      - name: Restore yarn cache
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            **/node_modules
+          key: yarn-cache-folder-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: "yarn-cache-folder-"
+      # Actually install packages with Yarn
+      - name: Install packages
+        run: yarn install
+        shell: bash
+        working-directory: packages/replay-next
+      - name: Install Playwright packages
+        run: yarn install
+        shell: bash
+        working-directory: packages/replay-next/playwright
+      - name: Run dev server
+        run: yarn dev &
+        working-directory: packages/replay-next
+      - name: Wait until server is up
+        run: npx wait-on --timeout=60000 http-get://localhost:3000
+      - name: Run playwright tests
+        run: yarn visuals
+        working-directory: packages/replay-next/playwright  
+      - name: Upload results
+        if: always()
+        run: ./uploadSnapshots.js
+        working-directory: packages/replay-next

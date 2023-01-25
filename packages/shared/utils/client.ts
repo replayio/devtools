@@ -1,11 +1,11 @@
 import { TimeStampedPoint } from "@replayio/protocol";
 import { useContext, useLayoutEffect, useMemo } from "react";
 
-import { preCacheExecutionPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
-import { addCachedPointsForTimeListener } from "bvaughn-architecture-demo/src/suspense/PointsCache";
-import { Wakeable } from "bvaughn-architecture-demo/src/suspense/types";
-import { createWakeable } from "bvaughn-architecture-demo/src/utils/suspense";
 import { ThreadFront } from "protocol/thread";
+import { preCacheExecutionPointForTime } from "replay-next/src/suspense/PointsCache";
+import { addCachedPointsForTimeListener } from "replay-next/src/suspense/PointsCache";
+import { Wakeable } from "replay-next/src/suspense/types";
+import { createWakeable } from "replay-next/src/utils/suspense";
 import createReplayClientPlayer from "shared/client/createReplayClientPlayer";
 import createReplayClientRecorder from "shared/client/createReplayClientRecorder";
 import { decode } from "shared/client/encoder";
@@ -51,7 +51,7 @@ function getEncodedSuspense(host: string, fixtureDataPath: string): string {
     if (caughtError !== null) {
       throw caughtError;
     } else if (wakeable === null) {
-      wakeable = createWakeable<string>();
+      wakeable = createWakeable<string>(`getEncodedSuspense`);
       fetch(`http://${host}:3000/api/data?fixtureDataPath=${fixtureDataPath}`)
         .then(async response => {
           encoded = await response.text();

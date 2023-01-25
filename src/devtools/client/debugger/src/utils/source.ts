@@ -4,8 +4,8 @@
 
 //
 
-import { truncate as truncateText } from "bvaughn-architecture-demo/src/utils/text";
 import { getUnicodeUrl } from "devtools/client/shared/unicode-url";
+import { truncate as truncateText } from "replay-next/src/utils/text";
 import { MiniSource, SourceContent } from "ui/reducers/sources";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 

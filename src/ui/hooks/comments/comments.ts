@@ -37,6 +37,8 @@ export function useGetComments(recordingId: RecordingId): {
       time: comment.time,
       point: comment.point,
       position: comment.position,
+      type: null,
+      typeData: null,
     })),
   }));
   return { comments, loading, error };

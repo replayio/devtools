@@ -1,0 +1,6 @@
+.Divider {
+  height: 1px;
+  width: 100%;
+  background-color: var(--context-menu-bgcolor-divider);
+  margin: 0.25rem 0;
+}

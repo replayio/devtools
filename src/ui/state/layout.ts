@@ -2,7 +2,6 @@ import { LocalNag } from "ui/setup/prefs";
 
 export type LayoutState = {
   showCommandPalette: boolean;
-  showVideoPanel: boolean;
   selectedPrimaryPanel: PrimaryPanelName;
   selectedPanel: SecondaryPanelName;
   viewMode: ViewMode;
@@ -11,7 +10,7 @@ export type LayoutState = {
 };
 
 export type ViewMode = "dev" | "non-dev";
-export const VIEWER_PANELS = ["events", "comments"] as const;
+export const VIEWER_PANELS = ["cypress", "events", "comments"] as const;
 type ViewerPrimaryPanelName = typeof VIEWER_PANELS[number];
 export type PrimaryPanelName =
   | "explorer"

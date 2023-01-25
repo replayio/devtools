@@ -35,7 +35,7 @@ jobs:
     - name: Install packages
       run: yarn install
       shell: bash
-      working-directory: packages/bvaughn-architecture-demo
+      working-directory: packages/replay-next
     - name: Run tests
       run: yarn test
-      working-directory: packages/bvaughn-architecture-demo
+      working-directory: packages/replay-next

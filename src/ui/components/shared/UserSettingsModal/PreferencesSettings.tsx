@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
+import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import hooks from "ui/hooks";
 import { useFeature, useStringPref } from "ui/hooks/settings";
 import { EmailSubscription } from "ui/hooks/users";

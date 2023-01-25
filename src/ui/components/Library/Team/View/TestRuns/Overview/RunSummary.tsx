@@ -28,7 +28,7 @@ export function Attributes({ testRun }: { testRun: TestRun }) {
   const { user, date, mergeId, mergeTitle, branch } = testRun;
 
   return (
-    <div className="flex flex-row flex-wrap items-center">
+    <div className="flex flex-row flex-wrap items-center pl-1">
       <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
       <AttributeContainer icon="person">{user!}</AttributeContainer>
       {mergeId && (
@@ -51,10 +51,8 @@ function RunnerLink({ testRun }: { testRun: TestRun }) {
   }
 
   return (
-    <Link href={triggerUrl}>
-      <a target="_blank" rel="noreferrer noopener" className="hover:underline">
-        <span>View run in GitHub</span>
-      </a>
+    <Link href={triggerUrl} target="_blank" rel="noreferrer noopener" className="hover:underline">
+      <span>View run in GitHub</span>
     </Link>
   );
 }

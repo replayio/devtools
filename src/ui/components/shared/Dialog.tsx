@@ -70,7 +70,7 @@ export const DialogDescription = ({
   return (
     <p
       {...props}
-      className="mb-2 whitespace-pre-wrap break-all text-center text-sm text-themeBase-70"
+      className="break-word mb-2 whitespace-pre-wrap text-center text-sm text-themeBase-70"
     >
       {children}
     </p>

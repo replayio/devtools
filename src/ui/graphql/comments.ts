@@ -18,6 +18,8 @@ export const GET_COMMENTS = gql`
         point
         position
         networkRequestId
+        type
+        typeData
         user {
           id
           name

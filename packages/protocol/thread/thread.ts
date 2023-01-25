@@ -40,14 +40,13 @@ import groupBy from "lodash/groupBy";
 import {
   cachePauseData,
   getPauseIdForExecutionPointIfCached,
-} from "bvaughn-architecture-demo/src/suspense/PauseCache";
-import { getPauseIdAsync } from "bvaughn-architecture-demo/src/suspense/PauseCache";
+} from "replay-next/src/suspense/PauseCache";
+import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { MappedLocationCache } from "../mapped-location-cache";
-import ScopeMapCache from "../scope-map-cache";
 import { client } from "../socket";
-import { EventEmitter, assert, defer } from "../utils";
+import { EventEmitter, assert, defer, locationsInclude } from "../utils";
 
 export interface RecordingDescription {
   duration: TimeStamp;
@@ -73,6 +72,13 @@ export interface PauseEventArgs {
   point: ExecutionPoint;
   time: number;
   openSource: boolean;
+}
+
+export interface ResumeOperationParams {
+  point?: ExecutionPoint;
+  loadedRegions: LoadedRegions;
+  sourceId?: SourceId;
+  locationsToSkip?: SourceLocation[];
 }
 
 interface FindTargetParameters {
@@ -172,8 +178,6 @@ class _ThreadFront {
 
   mappedLocations = new MappedLocationCache();
 
-  scopeMaps = new ScopeMapCache();
-
   // Points which will be reached when stepping in various directions from a point.
   resumeTargets = new Map<string, PauseDescription>();
 
@@ -215,15 +219,14 @@ class _ThreadFront {
     });
   }
 
-  get currentPause(): Pause {
-    return {
-      point: this.currentPoint,
-      time: this.currentTime,
-      pauseId:
-        this.currentPauseId ??
-        getPauseIdForExecutionPointIfCached(this.currentPoint)?.value ??
-        null,
-    };
+  /**
+   * This may be null if the pauseId for the current execution point hasn't been
+   * received from the backend yet. Use `await getCurrentPauseId()` instead if possible.
+   */
+  get currentPauseIdUnsafe() {
+    return (
+      this.currentPauseId ?? getPauseIdForExecutionPointIfCached(this.currentPoint)?.value ?? null
+    );
   }
 
   async getCurrentPauseId(replayClient: ReplayClientInterface): Promise<PauseId> {
@@ -481,10 +484,6 @@ class _ThreadFront {
     }
   }
 
-  getScopeMap(location: Location): Promise<Record<string, string>> {
-    return this.scopeMaps.getScopeMap(location);
-  }
-
   // Same as evaluate, but returns the result without wrapping a ValueFront around them.
   // TODO Replace usages of evaluate with this.
   async evaluateNew({
@@ -571,61 +570,86 @@ class _ThreadFront {
     return promise;
   }
 
-  findStepInTarget(point: ExecutionPoint) {
-    return client.Debugger.findStepInTarget({ point }, this.sessionId!);
-  }
-
-  private async _findResumeTarget(point: ExecutionPoint, command: FindTargetCommand) {
+  private async _findResumeTarget(
+    findTargetCommand: FindTargetCommand,
+    {
+      point,
+      loadedRegions,
+      sourceId,
+      locationsToSkip,
+    }: ResumeOperationParams & { point: ExecutionPoint }
+  ) {
     assert(this.sessionId, "no sessionId");
     await this.ensureAllSources();
 
-    // Check already-known resume targets.
-    const key = `${point}:${command.name}`;
-    const knownTarget = this.resumeTargets.get(key);
-    if (knownTarget) {
-      return knownTarget;
-    }
+    while (true) {
+      // Check already-known resume targets.
+      const key = `${point}:${findTargetCommand.name}`;
+      let target = this.resumeTargets.get(key);
 
-    const epoch = this.resumeTargetEpoch;
-    const resp = await command({ point }, this.sessionId);
-    const { target } = resp;
-    if (epoch == this.resumeTargetEpoch) {
-      this.updateMappedLocation(target.frame);
-      this.resumeTargets.set(key, target);
-    }
+      if (!target) {
+        const epoch = this.resumeTargetEpoch;
+        try {
+          const resp = await findTargetCommand({ point }, this.sessionId);
+          target = resp.target;
+          if (epoch == this.resumeTargetEpoch) {
+            this.updateMappedLocation(target.frame);
+            this.resumeTargets.set(key, target);
+          }
+        } catch {
+          return null;
+        }
+      }
 
-    return target;
+      if (
+        loadedRegions.loaded.every(
+          region =>
+            BigInt(target!.point) < BigInt(region.begin.point) ||
+            BigInt(target!.point) > BigInt(region.end.point)
+        )
+      ) {
+        return null;
+      }
+
+      if (locationsToSkip) {
+        const location = target.frame?.find(location => location.sourceId === sourceId);
+        if (location && locationsInclude(locationsToSkip, location)) {
+          point = target.point;
+          continue;
+        }
+      }
+
+      return target;
+    }
   }
 
   private async _resumeOperation(
     command: FindTargetCommand,
-    selectedPoint: ExecutionPoint | undefined,
-    loadedRegions: LoadedRegions
+    {
+      point: selectedPoint,
+      sourceId: selectedSourceId,
+      loadedRegions,
+      locationsToSkip,
+    }: ResumeOperationParams
   ) {
     // Don't allow resumes until we've finished loading and did the initial
     // warp to the endpoint.
     await this.initializedWaiter.promise;
 
-    let resumeEmitted = false;
-    let resumeTarget: PauseDescription | null = null;
-
-    const warpToTarget = () => {
-      const { point, time, frame } = resumeTarget!;
-      this.timeWarp(point, time, !!frame);
-    };
-
-    setTimeout(() => {
-      resumeEmitted = true;
-      this.emit("resumed");
-      if (resumeTarget) {
-        setTimeout(warpToTarget, 0);
-      }
-    }, 0);
+    this.emit("resumed");
 
     const point = selectedPoint || this.currentPoint;
-    try {
-      resumeTarget = await this._findResumeTarget(point, command);
-    } catch {
+    const resumeTarget = await this._findResumeTarget(command, {
+      point,
+      loadedRegions,
+      sourceId: selectedSourceId,
+      locationsToSkip,
+    });
+
+    if (resumeTarget) {
+      const { point, time, frame } = resumeTarget!;
+      this.timeWarp(point, time, !!frame);
+    } else {
       this.emit("paused", {
         point: this.currentPoint,
         time: this.currentTime,
@@ -633,42 +657,26 @@ class _ThreadFront {
       });
     }
 
-    if (
-      resumeTarget &&
-      loadedRegions.loaded.every(
-        region => resumeTarget!.time < region.begin.time || resumeTarget!.time > region.end.time
-      )
-    ) {
-      resumeTarget = null;
-    }
-    if (resumeTarget && resumeEmitted) {
-      warpToTarget();
-    }
     return resumeTarget;
   }
 
-  rewind(point: ExecutionPoint | undefined, loadedRegions: LoadedRegions) {
-    return this._resumeOperation(client.Debugger.findRewindTarget, point, loadedRegions);
+  rewind(params: ResumeOperationParams) {
+    return this._resumeOperation(client.Debugger.findRewindTarget, params);
   }
-  resume(point: ExecutionPoint | undefined, loadedRegions: LoadedRegions) {
-    return this._resumeOperation(client.Debugger.findResumeTarget, point, loadedRegions);
+  resume(params: ResumeOperationParams) {
+    return this._resumeOperation(client.Debugger.findResumeTarget, params);
   }
-  reverseStepOver(point: ExecutionPoint | undefined, loadedRegions: LoadedRegions) {
-    return this._resumeOperation(client.Debugger.findReverseStepOverTarget, point, loadedRegions);
+  reverseStepOver(params: ResumeOperationParams) {
+    return this._resumeOperation(client.Debugger.findReverseStepOverTarget, params);
   }
-  stepOver(point: ExecutionPoint | undefined, loadedRegions: LoadedRegions) {
-    return this._resumeOperation(client.Debugger.findStepOverTarget, point, loadedRegions);
+  stepOver(params: ResumeOperationParams) {
+    return this._resumeOperation(client.Debugger.findStepOverTarget, params);
   }
-  stepIn(point: ExecutionPoint | undefined, loadedRegions: LoadedRegions) {
-    return this._resumeOperation(client.Debugger.findStepInTarget, point, loadedRegions);
+  stepIn(params: ResumeOperationParams) {
+    return this._resumeOperation(client.Debugger.findStepInTarget, params);
   }
-  stepOut(point: ExecutionPoint | undefined, loadedRegions: LoadedRegions) {
-    return this._resumeOperation(client.Debugger.findStepOutTarget, point, loadedRegions);
-  }
-
-  async resumeTarget(point: ExecutionPoint) {
-    await this.initializedWaiter.promise;
-    return this._findResumeTarget(point, client.Debugger.findResumeTarget);
+  stepOut(params: ResumeOperationParams) {
+    return this._resumeOperation(client.Debugger.findStepOutTarget, params);
   }
 
   async findNetworkRequests(

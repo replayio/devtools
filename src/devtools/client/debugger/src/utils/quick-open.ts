@@ -5,7 +5,7 @@
 import { Dictionary } from "@reduxjs/toolkit";
 import type { FunctionMatch, Location } from "@replayio/protocol";
 
-import { truncate as truncateText } from "bvaughn-architecture-demo/src/utils/text";
+import { truncate as truncateText } from "replay-next/src/utils/text";
 import { SourceDetails } from "ui/reducers/sources";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 

@@ -11,12 +11,12 @@
     "@codemirror/lang-javascript": "^6.0.2",
     "@replayio/protocol": "^0.32.2",
     "@uiw/react-codemirror": "^4.11.4",
-    "bvaughn-architecture-demo": "workspace:*",
     "lodash": "^4.17.21",
     "next": "^12.1.6",
     "protocol": "workspace:*",
     "react": "0.0.0-experimental-e7d0053e6-20220325",
     "react-dom": "0.0.0-experimental-e7d0053e6-20220325",
+    "replay-next": "workspace:*",
     "shared": "*"
   },
   "devDependencies": {
@@ -24,7 +24,6 @@
     "@testing-library/react": "^13.2.0",
     "jest": "^28.0.2",
     "jest-environment-jsdom": "^28.0.2",
-    "next-transpile-modules": "^9.0.0",
     "typescript": "^4.6.3"
   },
   "overrides": {}

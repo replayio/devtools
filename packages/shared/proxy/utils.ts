@@ -1,4 +1,4 @@
-import { Thennable } from "bvaughn-architecture-demo/src/suspense/types";
+import { Thennable } from "replay-next/src/suspense/types";
 
 import { Entry } from "./types";
 

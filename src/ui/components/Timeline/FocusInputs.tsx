@@ -1,14 +1,14 @@
 import React from "react";
 
-import { setFocusRegion } from "ui/actions/timeline";
+import {
+  exitFocusMode,
+  syncFocusedRegion,
+  updateDisplayedFocusRegion,
+  updateFocusRegionParam,
+} from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import {
-  displayedBeginForFocusRegion,
-  displayedEndForFocusRegion,
-  getFormattedTime,
-  getSecondsFromFormattedTime,
-} from "ui/utils/timeline";
+import { getFormattedTime, getSecondsFromFormattedTime } from "ui/utils/timeline";
 
 import EditableTimeInput from "./EditableTimeInput";
 import styles from "./FocusInputs.module.css";
@@ -16,7 +16,7 @@ import styles from "./FocusInputs.module.css";
 export default function FocusInputs() {
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(selectors.getCurrentTime);
-  const focusRegion = useAppSelector(selectors.getFocusRegion);
+  const displayedFocusRegion = useAppSelector(selectors.getDisplayedFocusRegion);
   const showFocusModeControls = useAppSelector(selectors.getShowFocusModeControls);
   const recordingDuration = useAppSelector(selectors.getRecordingDuration);
 
@@ -26,25 +26,23 @@ export default function FocusInputs() {
   // Avoid layout shift; keep input size consistent when focus mode toggles.
   const inputSize = formattedDuration.length;
 
-  if (showFocusModeControls && focusRegion !== null) {
-    const formattedEndTime = getFormattedTime(displayedEndForFocusRegion(focusRegion));
-    const formattedBeginTime = getFormattedTime(displayedBeginForFocusRegion(focusRegion));
+  if (showFocusModeControls && displayedFocusRegion !== null) {
+    const formattedEndTime = getFormattedTime(displayedFocusRegion.end);
+    const formattedBeginTime = getFormattedTime(displayedFocusRegion.begin);
 
-    const validateAndSaveBeginTime = (pending: string) => {
+    const validateAndSaveBeginTime = async (pending: string) => {
       try {
         const newBeginTime = getSecondsFromFormattedTime(pending);
         if (!isNaN(newBeginTime)) {
           // If the new end time is less than the current start time, the user is probably trying to move the whole range.
           // We can simplify this operation by resetting both the start and end time to the same value.
           const newEndTime =
-            newBeginTime <= displayedEndForFocusRegion(focusRegion!)
-              ? displayedEndForFocusRegion(focusRegion!)
-              : newBeginTime;
+            newBeginTime <= displayedFocusRegion.end ? displayedFocusRegion.end : newBeginTime;
 
-          dispatch(
-            setFocusRegion({
-              endTime: newEndTime,
-              beginTime: newBeginTime,
+          await dispatch(
+            updateDisplayedFocusRegion({
+              begin: newBeginTime,
+              end: newEndTime,
             })
           );
         }
@@ -52,21 +50,19 @@ export default function FocusInputs() {
         // Ignore
       }
     };
-    const validateAndSaveEndTime = (pending: string) => {
+    const validateAndSaveEndTime = async (pending: string) => {
       try {
         const newEndTime = getSecondsFromFormattedTime(pending);
         if (!isNaN(newEndTime)) {
           // If the new start time is greater than the current end time, the user is probably trying to move the whole range.
           // We can simplify this operation by resetting both the start and end time to the same value.
           const newBeginTime =
-            newEndTime >= displayedBeginForFocusRegion(focusRegion!)
-              ? displayedBeginForFocusRegion(focusRegion!)
-              : newEndTime;
+            newEndTime >= displayedFocusRegion.begin ? displayedFocusRegion.begin : newEndTime;
 
-          dispatch(
-            setFocusRegion({
-              beginTime: newBeginTime,
-              endTime: newEndTime,
+          await dispatch(
+            updateDisplayedFocusRegion({
+              begin: newBeginTime,
+              end: newEndTime,
             })
           );
         }

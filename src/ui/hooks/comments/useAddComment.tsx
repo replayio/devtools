@@ -27,7 +27,22 @@ export default function useAddComment(): AddCommentMutation {
     return addComment({
       variables: {
         input: {
-          ...omit(comment, ["id", "createdAt", "updatedAt", "replies", "user"]),
+          ...omit(comment, [
+            "createdAt",
+            "id",
+            "isPublished",
+            "replies",
+            "updatedAt",
+            "user",
+
+            // TODO [FE-1058] Legacy fields
+            "networkRequestId",
+            "position",
+            "primaryLabel",
+            "secondaryLabel",
+            "sourceLocation",
+          ]),
+          isPublished: comment.isPublished === true,
           recordingId: comment.recordingId,
         },
       },

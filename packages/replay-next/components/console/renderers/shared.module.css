@@ -1,0 +1,213 @@
+.Row,
+.ErrorRow,
+.TraceRow,
+.WarningRow {
+  min-height: calc(1.5rem + 1px);
+  margin-top: -1px;
+
+  padding: 0.25rem;
+  padding-top: calc(0.25rem + 1px);
+  padding-left: 1.5rem;
+
+  border-bottom: 1px solid var(--theme-splitter-color);
+  position: relative;
+}
+.ErrorRow {
+  background-color: var(--background-color-error);
+  color: var(--color-error);
+
+  border-top: 1px solid var(--border-color-error);
+  border-color: var(--border-color-error);
+
+  /* Ensure error borders are visible above non-error rows */
+  z-index: 2;
+
+  --color-default: var(--color-error);
+  --value-type-string: var(--color-error);
+}
+.WarningRow {
+  background-color: var(--background-color-warning);
+  color: var(--color-warning);
+  border-top: 1px solid var(--border-color-warning);
+  border-color: var(--border-color-warning);
+
+  /* Ensure warning borders are visible above regular rows */
+  z-index: 1;
+
+  --color-default: var(--color-warning);
+  --value-type-string: var(--color-warning);
+}
+
+.Row:last-child {
+  border-bottom: 0;
+}
+
+.EagerEvaluationIcon,
+.ErrorIcon,
+.PromptIcon,
+.WarningIcon {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 1rem;
+  display: inline-block;
+  vertical-align: top;
+  position: absolute;
+  left: 0.25rem;
+}
+.EagerEvaluationIcon {
+  color: var(--color-dim);
+}
+.ErrorIcon {
+  color: var(--color-error);
+}
+.WarningIcon {
+  color: var(--color-warning);
+}
+
+.Focused {
+  background-color: var(--background-color-contrast-1);
+}
+
+.PrimaryRowWithTimestamps,
+.PrimaryRowWithoutTimestamps,
+.TerminalPrimaryRowWithTimestamps,
+.TerminalPrimaryRowWithoutTimestamps {
+  width: 100%;
+  display: grid;
+  grid-column-gap: 1ch;
+}
+.PrimaryRowWithTimestamps {
+  grid-template-columns: min-content 1fr minmax(auto, max-content);
+}
+.PrimaryRowWithoutTimestamps {
+  grid-template-columns: 1fr minmax(auto, max-content);
+}
+.TerminalPrimaryRowWithTimestamps {
+  grid-template-columns: min-content auto;
+}
+.TerminalPrimaryRowWithoutTimestamps {
+  grid-template-columns: auto;
+}
+
+.LogContents,
+.LogContentsEmpty {
+  flex: 1 1 100%;
+  display: inline;
+}
+
+.LogContentsEmpty {
+  color: var(--color-dim);
+}
+
+.Source {
+  float: right;
+  max-width: 50%;
+  opacity: 0.75;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: pre;
+  direction: rtl;
+  text-align: right;
+  margin-left: 1ch;
+}
+.Source:hover {
+  opacity: 1;
+}
+
+.TimeStamp {
+  color: var(--color-dim);
+  font-size: var(--font-size-small);
+  word-break: initial;
+  float: left;
+}
+
+.MessageText {
+  min-height: 1rem;
+}
+
+.TerminalLogContents {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5ch;
+}
+
+.Exception {
+  display: flex;
+  align-content: center;
+  gap: 0.5ch;
+  color: var(--color-error);
+}
+
+.BadgeContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.5rem;
+  height: 0.5rem;
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+}
+
+.ColorBadge,
+.UnicornBadge {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+.ColorBadge {
+  border-radius: 0.5rem;
+  background-color: var(--badge-color);
+}
+.DefaultColorBadge {
+  width: 0.25rem;
+  height: 0.25rem;
+  border-radius: 0.25rem;
+  background-color: var(--badge-default-color);
+}
+
+.PulsingBadge {
+  box-shadow: 0 0 0 0 var(--pulse-color-off);
+  animation: pulse 1.2s 5;
+}
+
+.UnicornBadge {
+  position: absolute;
+  left: 1.5rem;
+  top: 0.5rem;
+  overflow: visible;
+  display: inline-block;
+  margin: 0 0.5rem 0 -1rem;
+}
+.Unicorn {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  margin-top: -0.25rem;
+  margin-left: -0.25rem;
+  background-image: url(../../../public/unicorn.svg) !important;
+  background-size: auto 100%;
+}
+
+.Expandable {
+  width: 100%;
+}
+
+.AnalysisError {
+  color: var(--color-error);
+}
+
+.ErrorBoundaryFallback {
+  color: var(--color-error);
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--pulse-color-off);
+  }
+  70% {
+    box-shadow: 0 0 0 0.25rem var(--pulse-color-on);
+  }
+  100% {
+    box-shadow: 0 0 0 0 var(--pulse-color-off);
+  }
+}

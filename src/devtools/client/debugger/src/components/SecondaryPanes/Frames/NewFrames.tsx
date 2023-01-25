@@ -1,9 +1,6 @@
 import { PauseId } from "@replayio/protocol";
 import { Suspense, useContext, useMemo } from "react";
 
-import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
-import { copyToClipboard } from "bvaughn-architecture-demo/components/sources/utils/clipboard";
-import { getPointAndTimeForPauseId } from "bvaughn-architecture-demo/src/suspense/PauseCache";
 import {
   Context,
   PauseFrame,
@@ -13,6 +10,9 @@ import {
   getThreadContext,
 } from "devtools/client/debugger/src/selectors";
 import { ThreadFront } from "protocol/thread/thread";
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
+import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
+import { getPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { enterFocusMode } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";

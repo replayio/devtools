@@ -168,41 +168,58 @@ class TokenManager {
   }
 
   private async update(refresh: boolean) {
-    if (!this.auth0Client || this.auth0Client.isLoading) {
+    if (!this.auth0Client || this.auth0Client.isLoading || typeof window === "undefined") {
       return;
     }
 
-    if (this.auth0Client.isAuthenticated) {
-      if (this.isTokenRequested) {
-        if (refresh) {
-          this.reset();
-        } else {
-          return;
-        }
-      }
+    if (window.__IS_RECORD_REPLAY_RUNTIME__) {
+      this.setState({}, this.deferredState);
+      return;
+    }
 
-      this.isTokenRequested = true;
-      const deferredState = this.deferredState;
+    const wasAuthenticated = this.auth0Client.isAuthenticated;
 
-      const item = window.localStorage.getItem("__cypress");
-      if (item) {
-        const token = JSON.parse(item).body.access_token;
-        this.setState({ token }, deferredState);
+    if (this.isTokenRequested) {
+      if (refresh) {
+        this.reset();
+      } else {
         return;
       }
+    }
 
-      try {
-        const token = await this.fetchToken(refresh);
+    this.isTokenRequested = true;
+    const deferredState = this.deferredState;
 
-        this.setState({ token }, deferredState);
-        if (deferredState === this.deferredState) {
-          this.setupTokenRefresh(token);
-        }
-      } catch (e) {
-        this.setState({ error: e }, deferredState);
+    const item = window.localStorage.getItem("__cypress");
+    if (item) {
+      const token = JSON.parse(item).body.access_token;
+      this.setState({ token }, deferredState);
+      return;
+    }
+
+    try {
+      const token = await this.fetchToken(refresh);
+
+      this.setState({ token }, deferredState);
+      if (deferredState === this.deferredState) {
+        this.setupTokenRefresh(token);
       }
-    } else {
-      this.setState({}, this.deferredState);
+    } catch (e) {
+      // If we fail to fetch the token and the user was authenticated, we need
+      // to report the error because the user will have expected to still be
+      // authenticated but isn't.
+      //
+      // If the user had not logged in yet, we were trying to refresh their
+      // access token via a refresh token. This could fail for either valid
+      // reasons (an expired refresh token) or an error state (reused refresh
+      // token, auth0 error, etc) but since the user was not in the middle of a
+      // session, we can silently land them on the login page and let them try
+      // to login fresh.
+      if (wasAuthenticated) {
+        this.setState({ error: e }, deferredState);
+      } else {
+        this.setState({}, this.deferredState);
+      }
     }
   }
 
@@ -212,7 +229,7 @@ class TokenManager {
     try {
       return await this.auth0Client.getAccessTokenSilently({ audience, ignoreCache: refresh });
     } catch (e: any) {
-      if (e.error !== "login_required" && e.error !== "consent_required") {
+      if (e.error !== "consent_required") {
         throw e;
       }
       console.error("Failed to fetch the access token silently - this shouldn't happen!", e);

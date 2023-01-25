@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
-import IndeterminateLoader from "bvaughn-architecture-demo/components/IndeterminateLoader";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
-import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
+import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { actions } from "ui/actions";
 import { hideRequestDetails, selectAndFetchRequest } from "ui/actions/network";
 import { getFocusedEvents, getFocusedRequests, getSelectedRequestId } from "ui/reducers/network";
@@ -13,7 +13,6 @@ import { UIState } from "ui/state";
 import { timeMixpanelEvent } from "ui/utils/mixpanel";
 import { trackEvent } from "ui/utils/telemetry";
 
-import LoadingProgressBar from "../shared/LoadingProgressBar";
 import { FilterLayout } from "./FilterLayout";
 import RequestDetails from "./RequestDetails";
 import RequestTable from "./RequestTable";
@@ -100,13 +99,14 @@ export const NetworkMonitor = ({
               toggleType={toggleType}
               types={types}
               table={
-                <SplitBox
-                  className="min-h-0 border-t border-splitter"
-                  initialSize="350px"
-                  minSize={selectedRequest ? "30%" : "100%"}
-                  maxSize={selectedRequest ? "70%" : "100%"}
-                  startPanel={
+                <PanelGroup
+                  autoSaveId="NetworkMonitor"
+                  className="h-full w-full"
+                  direction="vertical"
+                >
+                  <Panel>
                     <RequestTable
+                      className="h-full w-full"
                       table={table}
                       currentTime={currentTime}
                       data={data}
@@ -119,24 +119,25 @@ export const NetworkMonitor = ({
                       seek={seek}
                       selectedRequest={selectedRequest}
                     />
-                  }
-                  endPanel={
-                    selectedRequestId ? (
-                      selectedRequest ? (
-                        <RequestDetails
-                          cx={cx}
-                          request={selectedRequest}
-                          previousRequestId={previousRequestId}
-                          nextRequestId={nextRequestId}
-                        />
-                      ) : (
-                        <div>Loading…</div>
-                      )
-                    ) : null
-                  }
-                  splitterSize={2}
-                  vert={vert}
-                />
+                  </Panel>
+                  {selectedRequestId && (
+                    <>
+                      <PanelResizeHandle className="h-2 w-full" />
+                      <Panel defaultSize={50}>
+                        {selectedRequest ? (
+                          <RequestDetails
+                            cx={cx}
+                            request={selectedRequest}
+                            previousRequestId={previousRequestId}
+                            nextRequestId={nextRequestId}
+                          />
+                        ) : (
+                          <div>Loading…</div>
+                        )}
+                      </Panel>
+                    </>
+                  )}
+                </PanelGroup>
               }
             />
           </div>

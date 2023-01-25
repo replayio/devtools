@@ -1,16 +1,12 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { TimeStampedPoint } from "@replayio/protocol";
+import { TimeRange, TimeStampedPoint } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 
 import { UIThunkAction } from "ui/actions";
 import { MAX_FOCUS_REGION_DURATION } from "ui/actions/timeline";
 import { UIState } from "ui/state";
 import { FocusRegion, HoveredItem, TimelineState } from "ui/state/timeline";
-import {
-  displayedBeginForFocusRegion,
-  displayedEndForFocusRegion,
-  mergeSortedPointLists,
-} from "ui/utils/timeline";
+import { mergeSortedPointLists } from "ui/utils/timeline";
 
 function initialTimelineState(): TimelineState {
   return {
@@ -18,6 +14,7 @@ function initialTimelineState(): TimelineState {
     currentTime: 0,
     focusRegion: null,
     focusRegionBackup: null,
+    displayedFocusRegion: null,
     hoverTime: null,
     hoveredItem: null,
     playback: null,
@@ -59,6 +56,9 @@ const timelineSlice = createSlice({
     setFocusRegion(state, action: PayloadAction<FocusRegion | null>) {
       state.focusRegion = action.payload;
     },
+    setDisplayedFocusRegion(state, action: PayloadAction<TimeRange | null>) {
+      state.displayedFocusRegion = action.payload;
+    },
     pointsReceived(state, action: PayloadAction<TimeStampedPoint[]>) {
       const mutablePoints = [...state.points];
       state.points = mergeSortedPointLists(
@@ -92,45 +92,11 @@ export const {
   setPlaybackPrecachedTime,
   setPlaybackStalled,
   setFocusRegion,
+  setDisplayedFocusRegion,
   setTimelineState,
   pointsReceived,
   paintsReceived,
 } = timelineSlice.actions;
-
-export const pointsReceivedThunk = (points: TimeStampedPoint[]): UIThunkAction => {
-  return (dispatch, getState) => {
-    const state = getState() as UIState;
-    dispatch(pointsReceived(points));
-    const focusRegion = getFocusRegion(state);
-    if (!focusRegion) {
-      return;
-    }
-    // If we have just received points that we did not know about, those points
-    // might represent a better fit for the user-requested focus window than
-    // whatever points we were using before. If so, we will narrow the focus
-    // region down farther to the best-found points. However, in the case that
-    // we might be mucking about with time beyond the precision of floating
-    // point numbers, we should just chill, we are close enough to the user
-    // specified boundary (hence the epsilon check).
-    // See https://github.com/replayio/devtools/pull/7666 for more info.
-    const betterFocusStart = points.find(
-      p =>
-        BigInt(focusRegion.begin.point) < BigInt(p.point) && lessThan(p.time, focusRegion.beginTime)
-    );
-    const betterFocusEnd = points.find(
-      p => BigInt(p.point) < BigInt(focusRegion.end.point) && lessThan(focusRegion.endTime, p.time)
-    );
-    if (betterFocusStart || betterFocusEnd) {
-      dispatch(
-        setFocusRegion({
-          ...focusRegion,
-          begin: betterFocusStart || focusRegion.begin,
-          end: betterFocusEnd || focusRegion.end,
-        })
-      );
-    }
-  };
-};
 
 export default timelineSlice.reducer;
 
@@ -161,10 +127,11 @@ export const getBasicProcessingProgress = (state: UIState) => {
 };
 export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
 export const getFocusRegion = (state: UIState) => state.timeline.focusRegion;
+export const getDisplayedFocusRegion = (state: UIState) => state.timeline.displayedFocusRegion;
 export const isMaximumFocusRegion = (state: UIState) => {
-  const focusRegion = state.timeline.focusRegion;
+  const focusRegion = state.timeline.displayedFocusRegion;
   if (focusRegion) {
-    const duration = focusRegion.endTime - focusRegion.beginTime;
+    const duration = focusRegion.end - focusRegion.begin;
     // JavaScript floating point numbers are not precise enough,
     // so in order to avoid occasional flickers from rounding errors, fuzz it a bit.
     return duration + 0.1 >= MAX_FOCUS_REGION_DURATION;
@@ -173,7 +140,3 @@ export const isMaximumFocusRegion = (state: UIState) => {
   }
 };
 export const getFocusRegionBackup = (state: UIState) => state.timeline.focusRegionBackup;
-export const getIsInFocusMode = (state: UIState) =>
-  state.timeline.focusRegion &&
-  (displayedBeginForFocusRegion(state.timeline.focusRegion) !== 0 ||
-    displayedEndForFocusRegion(state.timeline.focusRegion) !== state.timeline.zoomRegion.endTime);

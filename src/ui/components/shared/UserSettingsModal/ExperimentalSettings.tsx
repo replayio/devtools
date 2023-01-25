@@ -27,10 +27,15 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "profileWorkerThreads",
   },
   {
-    label: "Enable query-level caching",
+    label: "Enable query-level caching for unstable request types",
     description:
       "Allow the backend to return previously generated responses without re-running the request",
-    key: "enableQueryCache",
+    key: "enableUnstableQueryCache",
+  },
+  {
+    label: "Disable query-level caching for stable request types",
+    description: "Disable caching of previously generated responses",
+    key: "disableStableQueryCache",
   },
   {
     label: "Detailed loading bar",
@@ -48,6 +53,16 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     label: "Disable Scan Data Cache",
     description: "Do not cache the results of indexing the recording",
     key: "disableScanDataCache",
+  },
+  {
+    label: "Enable workaround for broken sourcemaps",
+    description: "Skip locations that are mapped to the beginning of a function body",
+    key: "brokenSourcemapWorkaround",
+  },
+  {
+    label: "Enable Backend Processing Routines",
+    description: "Enable backend support for running processing routines (like React DevTools)",
+    key: "enableRoutines",
   },
 ];
 
@@ -89,34 +104,51 @@ export default function ExperimentalSettings({}) {
   } = useFeature("consoleFilterDrawerDefaultsToOpen");
   const { value: profileWorkerThreads, update: updateProfileWorkerThreads } =
     useFeature("profileWorkerThreads");
-  const { value: enableQueryCache, update: updateEnableQueryCache } =
-    useFeature("enableQueryCache");
+  const { value: enableUnstableQueryCache, update: updateEnableUnstableQueryCache } = useFeature(
+    "enableUnstableQueryCache"
+  );
+  const { value: disableStableQueryCache, update: updateDisableStableQueryCache } =
+    useFeature("disableStableQueryCache");
   const { value: basicProcessingLoadingBar, update: updateBasicProcessingLoadingBar } = useFeature(
     "basicProcessingLoadingBar"
   );
+  const { value: brokenSourcemapWorkaround, update: updateBrokenSourcemapWorkaround } = useFeature(
+    "brokenSourcemapWorkaround"
+  );
+
+  const { value: enableRoutines, update: updateEnableRoutines } = useFeature("enableRoutines");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
     } else if (key === "profileWorkerThreads") {
       updateProfileWorkerThreads(!profileWorkerThreads);
-    } else if (key === "enableQueryCache") {
-      updateEnableQueryCache(!enableQueryCache);
+    } else if (key === "enableUnstableQueryCache") {
+      updateEnableUnstableQueryCache(!enableUnstableQueryCache);
+    } else if (key === "disableStableQueryCache") {
+      updateDisableStableQueryCache(!disableStableQueryCache);
     } else if (key === "basicProcessingLoadingBar") {
       updateBasicProcessingLoadingBar(!basicProcessingLoadingBar);
     } else if (key === "consoleFilterDrawerDefaultsToOpen") {
       updateConsoleFilterDrawerDefaultsToOpen(!consoleFilterDrawerDefaultsToOpen);
     } else if (key === "disableScanDataCache") {
       updateDisableScanDataCache(!disableScanDataCache);
+    } else if (key === "brokenSourcemapWorkaround") {
+      updateBrokenSourcemapWorkaround(!brokenSourcemapWorkaround);
+    } else if (key === "enableRoutines") {
+      updateEnableRoutines(!enableRoutines);
     }
   };
 
   const localSettings = {
     basicProcessingLoadingBar,
+    brokenSourcemapWorkaround,
     consoleFilterDrawerDefaultsToOpen,
     disableScanDataCache,
+    disableStableQueryCache,
     enableColumnBreakpoints,
-    enableQueryCache,
+    enableUnstableQueryCache,
+    enableRoutines,
     profileWorkerThreads,
   };
 

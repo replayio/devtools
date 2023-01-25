@@ -19,9 +19,12 @@ export type LocalExperimentalUserSettings = {
   basicProcessingLoadingBar: boolean;
   disableScanDataCache: boolean;
   consoleFilterDrawerDefaultsToOpen: boolean;
-  enableQueryCache: boolean;
+  disableStableQueryCache: boolean;
   enableColumnBreakpoints: boolean;
+  enableUnstableQueryCache: boolean;
+  enableRoutines: boolean;
   profileWorkerThreads: boolean;
+  brokenSourcemapWorkaround: boolean;
 };
 
 export type LocalUserSettings = LocalExperimentalUserSettings & {
@@ -172,7 +175,7 @@ export type TestItem = {
   result: TestResult;
   relativeStartTime?: number;
   duration?: number;
-  steps: TestStep[];
+  steps?: TestStep[];
   id?: string;
   path?: string[];
   error?: TestItemError;
@@ -201,7 +204,7 @@ export interface Annotation {
 }
 
 export type TestStep = {
-  args?: string[];
+  args?: any[];
   name: string;
   duration: number;
   relativeStartTime?: number;
@@ -273,6 +276,7 @@ export interface PendingWorkspaceInvitation extends Workspace {
 export interface Workspace {
   apiKeys?: ApiKey[];
   logo?: string | null;
+  logoFormat?: string | null;
   domain?: string | null;
   hasPaymentMethod?: boolean;
   id: string;

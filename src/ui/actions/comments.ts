@@ -1,12 +1,17 @@
 import { Action } from "@reduxjs/toolkit";
 import { RecordingId } from "@replayio/protocol";
 
-import { createSourceLocationLabels } from "bvaughn-architecture-demo/components/sources/utils/createCommentLabels";
-import { getFramesAsync } from "bvaughn-architecture-demo/src/suspense/FrameCache";
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getExecutionPoint, getPauseId } from "devtools/client/debugger/src/reducers/pause";
 import type { ThreadFront as ThreadFrontType } from "protocol/thread";
-import { waitForTime } from "protocol/utils";
+import {
+  COMMENT_TYPE_NETWORK_REQUEST,
+  COMMENT_TYPE_VISUAL,
+  VisualCommentTypeData,
+  createTypeDataForNetworkRequestComment,
+} from "replay-next/components/sources/utils/comments";
+import { CommentSourceLocation } from "replay-next/src/graphql/types";
+import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { ADD_COMMENT_MUTATION, AddCommentMutation } from "ui/hooks/comments/useAddComment";
@@ -18,7 +23,7 @@ import {
 } from "ui/reducers/sources";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
-import { Comment, CommentOptions, Reply, SourceLocation } from "ui/state/comments";
+import { Comment, CommentOptions, Reply } from "ui/state/comments";
 import { mutate } from "ui/utils/apolloClient";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -38,26 +43,19 @@ export function createComment(
   recordingId: RecordingId,
   options: CommentOptions
 ): UIThunkAction {
-  return async (dispatch, getState, { replayClient }) => {
+  return async dispatch => {
     let {
-      sourceLocation,
       hasFrames,
-      position,
+      type,
+      typeData,
+
+      // TODO [FE-1058] Delete legacy fields in favor of type/typeData
       networkRequestId,
+      position,
       primaryLabel = null,
       secondaryLabel = null,
+      sourceLocation,
     } = options;
-
-    if (primaryLabel === null && secondaryLabel === null) {
-      if (sourceLocation) {
-        ({ primaryLabel, secondaryLabel } = await createSourceLocationLabels(
-          replayClient,
-          sourceLocation.sourceId,
-          sourceLocation.line,
-          sourceLocation.column
-        ));
-      }
-    }
 
     trackEvent("comments.create");
 
@@ -68,14 +66,18 @@ export function createComment(
           content: "",
           hasFrames,
           isPublished: false,
-          networkRequestId: networkRequestId || null,
           point,
+          recordingId,
+          time,
+          type,
+          typeData,
+
+          // TODO [FE-1058] Delete legacy fields in favor of type/typeData
+          networkRequestId: networkRequestId || null,
           position,
           primaryLabel,
-          recordingId,
           secondaryLabel,
           sourceLocation,
-          time,
         },
       },
     });
@@ -87,47 +89,7 @@ export function createComment(
 export function createFrameComment(
   position: { x: number; y: number } | null,
   recordingId: RecordingId,
-  base64PNG: string | null,
-  relativePosition: { x: number; y: number } | null
-): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront, replayClient }) => {
-    const state = getState();
-    const currentTime = getCurrentTime(state);
-
-    // Comments require execution points;
-    // but if the current time is within an unloaded region, the client might not know the execution point.
-    // In this case we should ask the server for a nearby point.
-    let executionPoint = getExecutionPoint(state);
-    if (executionPoint === null) {
-      executionPoint = (await replayClient.getPointNearTime(currentTime)).point.point;
-    }
-
-    dispatch(
-      createComment(currentTime, executionPoint, recordingId, {
-        position,
-        hasFrames: true,
-        sourceLocation: null,
-        primaryLabel: JSON.stringify(relativePosition),
-        secondaryLabel: base64PNG,
-      })
-    );
-  };
-}
-
-function getCurrentPauseSourceLocationWithTimeout(
-  ThreadFront: typeof ThreadFrontType,
-  replayClient: ReplayClientInterface,
-  getState: () => UIState
-) {
-  return Promise.race([
-    getCurrentPauseSourceLocation(ThreadFront, replayClient, getState),
-    waitForTime(1000),
-  ]);
-}
-
-export function createFloatingCodeComment(
-  recordingId: RecordingId,
-  breakpoint: any
+  typeData: VisualCommentTypeData | null
 ): UIThunkAction {
   return async (dispatch, getState, { replayClient }) => {
     const state = getState();
@@ -138,14 +100,16 @@ export function createFloatingCodeComment(
     // In this case we should ask the server for a nearby point.
     let executionPoint = getExecutionPoint(state);
     if (executionPoint === null) {
-      executionPoint = (await replayClient.getPointNearTime(currentTime)).point.point;
+      executionPoint = (await replayClient.getPointNearTime(currentTime)).point;
     }
 
     dispatch(
       createComment(currentTime, executionPoint, recordingId, {
-        position: null,
-        hasFrames: false,
-        sourceLocation: breakpoint.location || null,
+        position,
+        hasFrames: true,
+        sourceLocation: null,
+        type: COMMENT_TYPE_VISUAL,
+        typeData,
       })
     );
   };
@@ -164,7 +128,7 @@ export function createNetworkRequestComment(
     // In this case we should ask the server for a nearby point.
     let executionPoint = request.triggerPoint?.point || getExecutionPoint(state);
     if (executionPoint === null) {
-      executionPoint = (await replayClient.getPointNearTime(time)).point.point;
+      executionPoint = (await replayClient.getPointNearTime(time)).point;
     }
 
     dispatch(
@@ -173,22 +137,33 @@ export function createNetworkRequestComment(
         hasFrames: false,
         sourceLocation: null,
         networkRequestId: request.id,
-        primaryLabel: `${request.method} request`,
-        secondaryLabel: request.name,
+        type: COMMENT_TYPE_NETWORK_REQUEST,
+        typeData: createTypeDataForNetworkRequestComment(
+          request.id,
+          request.method,
+          request.name,
+          request.status ?? null,
+          request.point.time,
+          request.type
+        ),
       })
     );
   };
 }
 
-export function seekToComment(item: Comment | Reply, openSource: boolean): UIThunkAction {
+export function seekToComment(
+  comment: Comment,
+  sourceLocation: CommentSourceLocation | null,
+  openSource: boolean
+): UIThunkAction {
   return (dispatch, getState) => {
     let context = selectors.getThreadContext(getState());
-    dispatch(seek(item.point, item.time, false));
+    dispatch(seek(comment.point, comment.time, false));
     dispatch(setSelectedPrimaryPanel("comments"));
 
-    if (item.sourceLocation) {
+    if (sourceLocation) {
       context = selectors.getThreadContext(getState());
-      dispatch(selectLocation(context, item.sourceLocation, openSource));
+      dispatch(selectLocation(context, sourceLocation, openSource));
     }
   };
 }

@@ -27,18 +27,21 @@ pref("devtools.features.commentAttachments", false);
 pref("devtools.features.consoleFilterDrawerDefaultsToOpen", false);
 pref("devtools.features.disableScanDataCache", false);
 pref("devtools.features.disableUnHitLines", false);
+pref("devtools.features.disableStableQueryCache", false);
+pref("devtools.features.enableUnstableQueryCache", false);
 pref("devtools.features.enableLargeText", false);
-pref("devtools.features.enableQueryCache", false);
 pref("devtools.features.hitCounts", true);
 pref("devtools.features.logProtocol", false);
 pref("devtools.features.logProtocolEvents", false);
 pref("devtools.features.newControllerOnRefresh", false);
 pref("devtools.features.originalClassNames", false);
 pref("devtools.features.profileWorkerThreads", false);
+pref("devtools.features.enableRoutines", false);
 pref("devtools.features.protocolTimeline", false);
 pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.resolveRecording", false);
 pref("devtools.features.chromiumNetMonitor", true);
+pref("devtools.features.brokenSourcemapWorkaround", true);
 
 export const prefs = new PrefsHelper("devtools", {
   colorScheme: ["String", "colorScheme"],
@@ -61,9 +64,11 @@ export const features = new PrefsHelper("devtools.features", {
   commentAttachments: ["Bool", "commentAttachments"],
   consoleFilterDrawerDefaultsToOpen: ["Bool", "consoleFilterDrawerDefaultsToOpen"],
   disableScanDataCache: ["Bool", "disableScanDataCache"],
-  enableQueryCache: ["Bool", "enableQueryCache"],
+  disableStableQueryCache: ["Bool", "disableStableQueryCache"],
   disableUnHitLines: ["Bool", "disableUnHitLines"],
   enableLargeText: ["Bool", "enableLargeText"],
+  enableRoutines: ["Bool", "enableRoutines"],
+  enableUnstableQueryCache: ["Bool", "enableUnstableQueryCache"],
   logProtocol: ["Bool", "logProtocol"],
   logProtocolEvents: ["Bool", "logProtocolEvents"],
   newControllerOnRefresh: ["Bool", "newControllerOnRefresh"],
@@ -73,6 +78,7 @@ export const features = new PrefsHelper("devtools.features", {
   repaintEvaluations: ["Bool", "repaintEvaluations"],
   resolveRecording: ["Bool", "resolveRecording"],
   chromiumNetMonitor: ["Bool", "chromiumNetMonitor"],
+  brokenSourcemapWorkaround: ["Bool", "brokenSourcemapWorkaround"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

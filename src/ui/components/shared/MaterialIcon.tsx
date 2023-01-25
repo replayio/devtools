@@ -12,7 +12,7 @@ const SIZE_STYLES = {
 } as const;
 
 type MaterialIconProps = React.HTMLProps<HTMLDivElement> & {
-  children: string;
+  children: string | React.ReactElement;
   outlined?: boolean;
   iconSize?: keyof typeof SIZE_STYLES;
   title?: string;
@@ -27,13 +27,18 @@ export default function MaterialIcon({
   title,
   ...rest
 }: MaterialIconProps) {
+  const isIconFont = typeof children === "string";
+
   return (
     <div
       {...rest}
       className={classnames(
         "flex-shrink-0 select-none leading-none",
         className,
-        outlined ? "material-icons-outlined" : "material-icons",
+        {
+          "material-icons-outlined": outlined && isIconFont,
+          "material-icons": !outlined && isIconFont,
+        },
         SIZE_STYLES[iconSize]
       )}
       title={title}

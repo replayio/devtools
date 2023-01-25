@@ -1,27 +1,3 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/ */
-
-:root {
-  --marginbox-color: #fdffdf;
-  --borderbox-color: var(--grey-50);
-  --paddingbox-color: #e3dcff;
-  --contentbox-color: #cff0fb;
-  --marginbox-border-color: #d8e60a;
-  --contentbox-border-color: #54a9ff;
-  --position-border-color: var(--grey-50);
-}
-
-:root.theme-dark {
-  --marginbox-color: #73764a;
-  --borderbox-color: var(--grey-70);
-  --paddingbox-color: #6657a6;
-  --contentbox-color: #407aa4;
-  --marginbox-border-color: #bdca00;
-  --contentbox-border-color: #00b8ff;
-  --position-border-color: var(--grey-40);
-}
-
 .boxmodel-container {
   overflow: auto;
   padding-bottom: 4px;

@@ -1,16 +1,16 @@
 import { KeyboardEvent, useContext, useEffect, useLayoutEffect, useRef } from "react";
 
-import LazyOffscreen from "bvaughn-architecture-demo/components/LazyOffscreen";
-import Source from "bvaughn-architecture-demo/components/sources/Source";
-import { SourceFileNameSearchContextRoot } from "bvaughn-architecture-demo/components/sources/SourceFileNameSearchContext";
-import SourceSearch from "bvaughn-architecture-demo/components/sources/SourceSearch";
+import LazyOffscreen from "replay-next/components/LazyOffscreen";
+import Source from "replay-next/components/sources/Source";
+import { SourceFileNameSearchContextRoot } from "replay-next/components/sources/SourceFileNameSearchContext";
+import SourceSearch from "replay-next/components/sources/SourceSearch";
 import {
   SourceSearchContext,
   SourceSearchContextRoot,
-} from "bvaughn-architecture-demo/components/sources/SourceSearchContext";
-import { KeyboardModifiersContextRoot } from "bvaughn-architecture-demo/src/contexts/KeyboardModifiersContext";
-import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import { getSource } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+} from "replay-next/components/sources/SourceSearchContext";
+import { KeyboardModifiersContextRoot } from "replay-next/src/contexts/KeyboardModifiersContext";
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { getSource } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useFeature } from "ui/hooks/settings";
 import { getSelectedLocation, getSelectedLocationHasScrolled } from "ui/reducers/sources";
@@ -18,7 +18,7 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { setViewport } from "../../selectors";
 import NewSourceNag from "./NewSourceNag";
-import "bvaughn-architecture-demo/components/sources/CodeMirror.css";
+import "replay-next/components/sources/CodeMirror.css";
 
 export default function NewSourceAdapterRoot() {
   return (

@@ -4,8 +4,11 @@ import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPanes";
 import Accordion from "devtools/client/debugger/src/components/shared/Accordion";
 import TestInfo from "devtools/client/debugger/src/components/TestInfo/TestInfo";
-import { getRecordingDuration } from "ui/actions/app";
-import { setFocusRegion, syncFocusedRegion, updateFocusRegionParam } from "ui/actions/timeline";
+import {
+  setFocusRegionFromTimeRange,
+  syncFocusedRegion,
+  updateFocusRegionParam,
+} from "ui/actions/timeline";
 import Events from "ui/components/Events";
 import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
 import Icon from "ui/components/shared/Icon";
@@ -22,6 +25,7 @@ import {
 } from "ui/reducers/reporter";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Annotation, Recording, TestItem } from "ui/types";
+import { getRecordingId } from "ui/utils/recording";
 
 import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
@@ -54,12 +58,12 @@ function TestResultsSummary({ testCases }: { testCases: TestItem[] }) {
   return (
     <div className="ml-4 flex gap-2 px-1 py-1">
       <div className="flex items-center gap-1">
-        <Icon filename="testsuites-success" size="small" className="bg-green-700" />
-        <div className="text-sm text-green-700">{passed}</div>
+        <Icon filename="testsuites-success" size="small" className={styles.SuccessIcon} />
+        <div className={`text-sm ${styles.SuccessText}`}>{passed}</div>
       </div>
       <div className="mr-1 flex items-center gap-1">
-        <Icon filename="testsuites-fail" size="small" className="bg-red-500" />
-        <div className="text-sm text-red-500">{failed}</div>
+        <Icon filename="testsuites-fail" size="small" className={styles.ErrorIcon} />
+        <div className={`text-sm ${styles.ErrorTextLighter}`}>{failed}</div>
       </div>
     </div>
   );
@@ -115,7 +119,6 @@ function EventsPane({ items }: { items: any[] }) {
   const annotations = useAppSelector(getReporterAnnotationsForTests);
   const selectedTest = useAppSelector(getSelectedTest);
   const dispatch = useAppDispatch();
-  const duration = useAppSelector(getRecordingDuration);
 
   const testCases = useMemo(
     () => maybeCorrectTestTimes(recording, annotations),
@@ -125,12 +128,7 @@ function EventsPane({ items }: { items: any[] }) {
   const onReset = () => {
     dispatch(setSelectedTest(null));
     dispatch(setSelectedStep(null));
-    dispatch(
-      setFocusRegion({
-        beginTime: 0,
-        endTime: duration,
-      })
-    );
+    dispatch(setFocusRegionFromTimeRange(null));
     dispatch(syncFocusedRegion());
     dispatch(updateFocusRegionParam());
   };
@@ -143,14 +141,29 @@ function EventsPane({ items }: { items: any[] }) {
       <div className="flex h-full flex-1 flex-col overflow-hidden">
         <div className={styles.ToolbarHeader}>
           {selectedTest !== null ? (
-            <button onClick={onReset} className="flex flex-grow items-center gap-1 truncate">
-              <MaterialIcon>chevron_left</MaterialIcon>
+            <button onClick={onReset} className="my-1 flex flex-grow gap-1 self-start truncate">
+              <div
+                className="img arrowhead-right mt-1 h-32 w-32"
+                style={{ transform: "rotate(180deg)", marginTop: "2px" }}
+              />
+              <span className="flex-grow whitespace-normal text-left">
+                {" "}
+                {testCases[selectedTest].title}
+              </span>
               {testCases[selectedTest].error ? (
-                <Icon filename="testsuites-fail" size="small" className="bg-red-500" />
+                <Icon
+                  filename="testsuites-fail"
+                  size="small"
+                  className={`self-start ${styles.ErrorIcon}`}
+                />
               ) : (
-                <Icon filename="testsuites-success" size="small" className="bg-green-700" />
+                <Icon
+                  filename="testsuites-success"
+                  size="medium"
+                  className={styles.SuccessIcon}
+                  style={{ alignSelf: "flex-start" }}
+                />
               )}
-              <span className="flex-grow text-left"> {testCases[selectedTest].title}</span>
             </button>
           ) : (
             <>
@@ -181,14 +194,20 @@ function EventsPane({ items }: { items: any[] }) {
 function TestRunAttributes({ workspaceId, testRunId }: { workspaceId: string; testRunId: string }) {
   const { testRun } = useGetTestRunForWorkspace(workspaceId, testRunId);
   const selectedTest = useAppSelector(getSelectedTest);
+  const recordingId = getRecordingId();
 
   if (!testRun || selectedTest !== null) {
     return null;
   }
 
+  const thisSpecRun = {
+    ...testRun,
+    recordings: testRun.recordings?.filter(r => r.id === recordingId),
+  };
+
   return (
-    <div className="border-b p-2">
-      <Attributes testRun={testRun} />
+    <div className="p-2 pt-0">
+      <Attributes testRun={thisSpecRun} />
     </div>
   );
 }

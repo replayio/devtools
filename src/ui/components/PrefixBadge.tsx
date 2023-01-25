@@ -1,7 +1,7 @@
 import React, { useCallback, useContext } from "react";
 
-import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import { PrefixBadgePicker } from "design";
+import { PointsContext } from "replay-next/src/contexts/PointsContext";
 import { Badge, Point } from "shared/client/types";
 
 import styles from "./PrefixBadge.module.css";

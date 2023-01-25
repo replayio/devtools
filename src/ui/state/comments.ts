@@ -1,5 +1,6 @@
 import { RecordingId } from "@replayio/protocol";
 
+import { CommentType } from "replay-next/src/graphql/types";
 import { User } from "ui/types";
 
 export interface SourceLocation {
@@ -15,12 +16,17 @@ export interface CommentPosition {
 }
 
 export type CommentOptions = {
-  position: CommentPosition | null;
   hasFrames: boolean;
-  sourceLocation: SourceLocation | null;
+  type: CommentType;
+  typeData: any | null;
+
+  // TODO [FE-1058]
+  // Legacy attributes that should eventually be deleted in favor of type/typeData
   networkRequestId?: string;
+  position: CommentPosition | null;
   primaryLabel?: string | null;
   secondaryLabel?: string | null;
+  sourceLocation: SourceLocation | null;
 };
 
 export interface Remark {
@@ -33,18 +39,23 @@ export interface Remark {
   isPublished: boolean | null;
   point: string;
   recordingId: RecordingId;
-  sourceLocation: SourceLocation | null;
   time: number;
   updatedAt: string;
   user: User | null;
 }
 
 export interface Comment extends Remark {
+  replies: Reply[];
+  type: string | null;
+  typeData: any | null;
+
+  // TODO [FE-1058]
+  // Legacy attributes that should eventually be deleted in favor of type/typeData
   position: CommentPosition | null;
   networkRequestId: string | null;
   primaryLabel?: string | null;
-  replies: Reply[];
   secondaryLabel?: string | null;
+  sourceLocation: SourceLocation | null;
 }
 
 export interface Reply extends Remark {

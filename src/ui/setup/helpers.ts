@@ -16,7 +16,6 @@ declare global {
     features: typeof features;
     asyncStore: typeof asyncStore;
     dumpPrefs: () => string;
-    dumpBasicProcessing: () => void;
     local: () => void;
     prod: () => void;
     clearIndexedDB: () => void;
@@ -26,24 +25,6 @@ declare global {
     releaseSession: () => void;
     client: typeof client;
   }
-}
-
-function dumpBasicProcessing() {
-  const processing = window.sessionMetrics?.filter(
-    (data: any) => data.event === "RegionBasicProcessing"
-  );
-
-  if (!processing) {
-    return;
-  }
-
-  const firstBeginTime = processing[0]?.params.timings.creationTimestamp;
-  const stats = processing.map((region: any) => ({
-    id: region.params.regionIdx,
-    beginTime: region.params.timings.creationTimestamp - firstBeginTime,
-    duration: region.params.timings.processingDuration,
-  }));
-  console.table(stats);
 }
 
 export async function setupAppHelper(store: UIStore) {
@@ -61,7 +42,6 @@ export async function setupAppHelper(store: UIStore) {
     sendMessage: (cmd, args = {}, pauseId) =>
       sendMessage(cmd, args, window.sessionId, pauseId as any),
     releaseSession: () => client.Recording.releaseSession({ sessionId: window.sessionId }),
-    dumpBasicProcessing,
     dumpPrefs: () =>
       JSON.stringify({ features: features.toJSON(), prefs: prefs.toJSON() }, null, 2),
     local: () => {

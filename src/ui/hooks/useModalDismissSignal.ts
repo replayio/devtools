@@ -13,12 +13,20 @@ export default function useModalDismissSignal(
     }
 
     const handleDocumentKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) {
+        return;
+      }
+
       if (event.key === "Escape") {
         dismissCallback();
       }
     };
 
     const handleDocumentClick = (event: MouseEvent) => {
+      if (event.defaultPrevented) {
+        return;
+      }
+
       if (!element.contains(event.target as Node)) {
         event.stopPropagation();
         event.preventDefault();
@@ -41,8 +49,7 @@ export default function useModalDismissSignal(
       ownerDocument.addEventListener("keydown", handleDocumentKeyDown);
       if (dismissOnClickOutside) {
         ownerDocument.addEventListener("click", handleDocumentClick, true);
-      }
-      if (dismissOnClickOutside) {
+        ownerDocument.addEventListener("contextmenu", handleDocumentClick, true);
         ownerDocument.addEventListener("scroll", dismissCallback, true);
       }
     }, 0);
@@ -53,8 +60,10 @@ export default function useModalDismissSignal(
       }
 
       if (ownerDocument !== null) {
-        ownerDocument.removeEventListener("keydown", handleDocumentKeyDown);
         ownerDocument.removeEventListener("click", handleDocumentClick, true);
+        ownerDocument.removeEventListener("contextmenu", handleDocumentClick, true);
+        ownerDocument.removeEventListener("scroll", dismissCallback, true);
+        ownerDocument.removeEventListener("keydown", handleDocumentKeyDown);
       }
     };
   }, [modalRef, dismissCallback, dismissOnClickOutside]);

@@ -12,10 +12,10 @@
   background-color: var(--primary-accent);
 }
 .ToggleOff {
-  background-color: var(--focus-mode-capsule-background-color);
+  background-color: var(--focus-mode-capsule-bgcolor);
 }
 .ToggleOff:hover {
-  background-color: var(--focus-mode-capsule-background-color-hover);
+  background-color: var(--focus-mode-capsule-bgcolor-hover);
 }
 
 .ToggleOffIcon,

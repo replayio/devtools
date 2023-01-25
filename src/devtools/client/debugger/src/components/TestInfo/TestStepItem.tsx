@@ -1,18 +1,16 @@
-import { Object as ProtocolObject, createPauseResult } from "@replayio/protocol";
+import { Object as ProtocolObject } from "@replayio/protocol";
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
+import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
+import { evaluateAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { getCurrentPoint } from "ui/actions/app";
 import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { getStepRanges, useStepState } from "ui/hooks/useStepState";
 import { useTestStepActions } from "ui/hooks/useTestStepActions";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
-import {
-  getCurrentTime,
-  isDragging as isDraggingSelector,
-  isPlaying as isPlayingSelector,
-} from "ui/reducers/timeline";
+import { getCurrentTime, isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AnnotatedTestStep } from "ui/types";
 
@@ -21,48 +19,6 @@ import { TestCaseContext } from "./TestCase";
 import { TestInfoContext } from "./TestInfo";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { TestStepRow } from "./TestStepRow";
-
-export function returnFirst<T, R>(
-  list: T[] | undefined,
-  fn: (value: T, index: number, list: T[]) => R | null
-) {
-  return list ? list.reduce<R | null>((acc, v, i, l) => acc ?? fn(v, i, l), null) : null;
-}
-
-function useStepState(step: AnnotatedTestStep) {
-  const currentTime = useAppSelector(getCurrentTime);
-  const currentPoint = useAppSelector(getCurrentPoint);
-  const isPlaying = useAppSelector(isPlayingSelector);
-  const isDragging = useAppSelector(isDraggingSelector);
-
-  const { point: pointEnd } = step.annotations.end || {};
-  const { point: pointStart } = step.annotations.start || {};
-
-  const shouldUseTimes = isPlaying || isDragging;
-
-  if (step.relativeStartTime == null) {
-    return "pending";
-  }
-
-  const currentPointBigInt = currentPoint ? BigInt(currentPoint) : null;
-  const pointEndBigInt = pointEnd ? BigInt(pointEnd) : null;
-  const isPast =
-    !shouldUseTimes && currentPointBigInt && pointEndBigInt
-      ? currentPointBigInt > pointEndBigInt
-      : currentTime > step.absoluteStartTime;
-  const isPaused =
-    !shouldUseTimes && currentPointBigInt && pointEndBigInt && pointStart
-      ? currentPointBigInt >= BigInt(pointStart) && currentPointBigInt <= pointEndBigInt
-      : currentTime >= step.absoluteStartTime && currentTime < step.absoluteEndTime;
-
-  if (isPaused) {
-    return "paused";
-  } else if (isPast) {
-    return "past";
-  }
-
-  return "pending";
-}
 
 // relies on the scrolling parent to be the nearest positioning context
 function scrollIntoView(node: HTMLDivElement) {
@@ -86,13 +42,16 @@ export interface TestStepItemProps {
 }
 
 export function TestStepItem({ step, argString, index, id }: TestStepItemProps) {
+  const hasScrolled = useRef(false);
   const ref = useRef<HTMLDivElement>(null);
   const [localPauseData, setLocalPauseData] = useState<{
+    startPauseFailed?: boolean;
     startPauseId?: string;
+    endPauseFailed?: boolean;
     endPauseId?: string;
     consoleProps?: ProtocolObject;
   }>();
-  const { setConsoleProps, setPauseId } = useContext(TestInfoContext);
+  const { loading, setLoading, setConsoleProps, setPauseId } = useContext(TestInfoContext);
   const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
     pauseId: string;
     nodeIds: string[];
@@ -108,108 +67,154 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
 
   // compare points if possible and
   useEffect(() => {
-    let endPauseResult: createPauseResult | undefined;
-    let startPauseResult: createPauseResult | undefined;
+    setLoading(true);
 
     (async () => {
       try {
         let consoleProps: ProtocolObject | undefined;
 
-        endPauseResult = pointEnd ? await client.createPause(pointEnd) : undefined;
-        startPauseResult = pointStart ? await client.createPause(pointStart) : undefined;
+        const endPauseResult = pointEnd ? await client.createPause(pointEnd) : undefined;
         const frames = endPauseResult?.data.frames;
 
         if (endPauseResult && frames) {
           const callerFrame = frames[1];
 
           if (messageEnd?.commandVariable) {
-            const cmdResult = await client.evaluateExpression(
+            const cmdResult = await evaluateAsync(
+              client,
               endPauseResult.pauseId,
-              `${messageEnd.commandVariable}.get("subject")`,
-              callerFrame.frameId
+              callerFrame.frameId,
+              `${messageEnd.commandVariable}.get("subject")`
             );
 
-            const cmdObject = cmdResult.data.objects?.find(
-              o => o.objectId === cmdResult.returned?.object
-            );
-            const length: number | undefined = cmdObject?.preview?.properties?.find(
-              o => o.name === "length"
-            )?.value;
-            const subjects = Array.from({ length: length || 0 }, (_, i) =>
-              cmdResult.data.objects?.find(
-                obj =>
-                  obj.objectId ===
-                  cmdObject?.preview?.properties?.find(p => p.name === String(i))?.object
-              )
-            );
+            const cmdObjectId = cmdResult.returned?.object;
 
-            const nodeIds = subjects.filter(s => s?.preview?.node).map(s => s?.objectId!);
-            setSubjectNodePauseData({ pauseId: endPauseResult.pauseId, nodeIds });
-          }
-
-          if (messageEnd?.logVariable) {
-            const logResult = await client.evaluateExpression(
-              endPauseResult.pauseId,
-              messageEnd.logVariable,
-              callerFrame.frameId
-            );
-
-            const consolePropsProperty = returnFirst(logResult.data.objects, o => {
-              return logResult.returned && o.objectId === logResult.returned.object
-                ? returnFirst(o.preview?.properties, p => (p.name === "consoleProps" ? p : null))
-                : null;
-            });
-
-            if (consolePropsProperty?.object) {
-              const consolePropsPauseData = await client.getObjectWithPreview(
-                consolePropsProperty.object,
-                endPauseResult.pauseId
+            if (cmdObjectId) {
+              const cmdObject = await getObjectWithPreviewHelper(
+                client,
+                endPauseResult.pauseId,
+                cmdObjectId,
+                true
               );
-              consoleProps = consolePropsPauseData.objects?.find(
-                o => o.objectId === consolePropsProperty.object
-              );
+
+              const props = cmdObject?.preview?.properties;
+              const length: number = props?.find(o => o.name === "length")?.value || 0;
+              const nodeIds = [];
+              for (let i = 0; i < length; i++) {
+                const v = props?.find(p => p.name === String(i));
+                if (v?.object) {
+                  nodeIds.push(v.object);
+                }
+              }
+
+              setSubjectNodePauseData({ pauseId: endPauseResult.pauseId, nodeIds });
             }
           }
 
-          setLocalPauseData({
-            startPauseId: startPauseResult?.pauseId,
-            endPauseId: endPauseResult.pauseId,
+          if (messageEnd?.logVariable) {
+            const logResult = await evaluateAsync(
+              client,
+              endPauseResult.pauseId,
+              callerFrame.frameId,
+              messageEnd.logVariable
+            );
+
+            if (logResult.returned?.object) {
+              const logObject = await getObjectWithPreviewHelper(
+                client,
+                endPauseResult.pauseId,
+                logResult.returned.object
+              );
+              const consolePropsProperty = logObject.preview?.properties?.find(
+                p => p.name === "consoleProps"
+              );
+
+              if (consolePropsProperty?.object) {
+                consoleProps = await getObjectWithPreviewHelper(
+                  client,
+                  endPauseResult.pauseId,
+                  consolePropsProperty.object,
+                  true
+                );
+              }
+            }
+          }
+
+          const endPauseId = endPauseResult.pauseId;
+          setLocalPauseData(v => ({
+            ...v,
+            endPauseFailed: false,
+            endPauseId,
             consoleProps,
-          });
+          }));
         }
       } catch {
-        setLocalPauseData(undefined);
+        setLocalPauseData(v => ({
+          ...v,
+          endPauseFailed: true,
+        }));
       }
     })();
-  }, [client, messageEnd, pointEnd, pointStart]);
 
-  const onClick = useCallback(() => {
-    if (id) {
-      if (pointStart) {
-        if (localPauseData?.endPauseId && localPauseData.consoleProps) {
-          setConsoleProps(localPauseData.consoleProps);
-          setPauseId(localPauseData.endPauseId);
+    (async () => {
+      try {
+        const startPauseResult = pointStart ? await client.createPause(pointStart) : undefined;
+
+        if (startPauseResult) {
+          const startPauseId = startPauseResult.pauseId;
+          setLocalPauseData(v => ({
+            ...v,
+            loading: false,
+            startPauseId,
+          }));
         }
-        dispatch(seek(pointStart!, step.absoluteStartTime, false, localPauseData?.startPauseId));
+      } catch {
+        setLocalPauseData(v => ({
+          ...v,
+          startPauseFailed: true,
+        }));
+      }
+    })();
+  }, [client, messageEnd, pointEnd, pointStart, setLoading]);
+
+  useEffect(() => {
+    const { endPauseFailed, endPauseId } = localPauseData || {};
+    // Loading is used by step details which only relies on the end pause
+    // completing
+    if (loading && (endPauseFailed || endPauseId)) {
+      setLoading(false);
+    }
+  }, [localPauseData, loading, setLoading]);
+
+  const { endPauseId, consoleProps } = localPauseData || {};
+  const onClick = useCallback(() => {
+    const { timeRange, pointRange } = getStepRanges(step);
+    if (id && timeRange) {
+      if (pointRange) {
+        if (endPauseId && consoleProps) {
+          setConsoleProps(consoleProps);
+          setPauseId(endPauseId);
+        }
+        dispatch(seek(pointRange[1], timeRange[1], false, endPauseId));
       } else {
-        dispatch(seekToTime(step.absoluteStartTime, false));
+        dispatch(seekToTime(timeRange[1], false));
       }
 
       dispatch(setSelectedStep(step));
     }
-  }, [step, pointStart, localPauseData, dispatch, setConsoleProps, id, setPauseId]);
+  }, [step, endPauseId, consoleProps, dispatch, setConsoleProps, id, setPauseId]);
 
   const onMouseEnter = () => {
     if (state === "paused") {
       return;
     }
 
-    dispatch(setTimelineToTime(step.absoluteStartTime));
-    if (localPauseData?.startPauseId) {
+    dispatch(setTimelineToTime(step.absoluteEndTime));
+    if (localPauseData?.endPauseId) {
       dispatch(
         setTimelineToPauseTime(
-          step.absoluteStartTime,
-          localPauseData.startPauseId,
+          step.absoluteEndTime,
+          localPauseData.endPauseId,
           step.annotations.start?.point
         )
       );
@@ -239,7 +244,8 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   }, [isPlaying, ref, currentTime, step]);
 
   useEffect(() => {
-    if (step.error && ref.current) {
+    if (step.error && ref.current && !hasScrolled.current) {
+      hasScrolled.current = true;
       scrollIntoView(ref.current);
       onClick();
     }
@@ -262,12 +268,16 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
       ref={ref}
       data-test-id="TestSuites-TestCase-TestStepRow"
     >
-      <button onClick={onClick} className="flex flex-grow items-start space-x-2 text-start">
+      <button
+        onClick={onClick}
+        className="flex w-0 flex-grow items-start space-x-2 text-start"
+        title={`Step ${index + 1}: ${step.name} ${argString || ""}`}
+      >
         <div title={"" + displayedProgress} className="flex h-4 items-center">
           <ProgressBar progress={displayedProgress} error={!!step.error} />
         </div>
         <div className="opacity-70 ">{index + 1}</div>
-        <div className={`font-medium ${state === "paused" ? "font-bold" : ""}`}>
+        <div className={`truncate font-medium ${state === "paused" ? "font-bold" : ""}`}>
           {step.parentId ? "- " : ""}
           {step.name} <span className="opacity-70">{argString}</span>
         </div>
@@ -294,6 +304,7 @@ function Actions({ step, isSelected }: { step: AnnotatedTestStep; isSelected: bo
     <button
       onClick={onClick}
       className={`${isSelected ? "" : "invisible"} group-hover/step:visible`}
+      data-test-id="TestSuites-TestCase-TestStepRow-Actions"
     >
       <div className="flex items-center">
         <MaterialIcon>more_vert</MaterialIcon>

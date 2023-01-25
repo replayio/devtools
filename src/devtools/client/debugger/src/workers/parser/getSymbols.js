@@ -35,6 +35,14 @@ function extractSymbol(path, symbols, state) {
       // in the file
       index,
     });
+
+    const start = path.node.body?.loc?.start;
+    if (start) {
+      symbols.functionBodyLocations.push({
+        line: start.line,
+        column: start.column,
+      });
+    }
   }
 
   if (t.isCallExpression(path)) {
@@ -79,6 +87,7 @@ function extractSymbol(path, symbols, state) {
 function extractSymbols(sourceId) {
   const symbols = {
     functions: [],
+    functionBodyLocations: [],
     classes: [],
     hasJsx: false,
     hasTypes: false,

@@ -44,6 +44,7 @@ test(`object_preview-03: Test previews when switching between frames and steppin
 
   await verifyFramesCount(page, 2);
   await selectFrame(page, 1);
+  await expandAllScopesBlocks(page);
   await toggleExpandable(page, { scope: blockScope, text: "fooobj" });
   await waitForScopeValue(page, "fooprop1", 0);
   await waitForScopeValue(page, "fooprop2", 1);

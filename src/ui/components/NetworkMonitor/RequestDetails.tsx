@@ -80,7 +80,12 @@ const DetailTable = ({ className, details }: { className?: string; details: Deta
   if (details.length === 0) {
     return (
       <div className={classNames(className, "flex flex-col")}>
-        <div className={classNames(styles.row, "cursor-pointer py-1 hover:bg-toolbarBackground")}>
+        <div
+          className={classNames(
+            styles.row,
+            "cursor-pointer py-1 hover:bg-themeTableSelectionBackgroundHover"
+          )}
+        >
           No entries
         </div>
       </div>
@@ -91,7 +96,10 @@ const DetailTable = ({ className, details }: { className?: string; details: Deta
     <div className={classNames(className, "flex flex-col")}>
       {details.map((h, i) => (
         <div
-          className={classNames(styles.row, "cursor-pointer py-1 hover:bg-toolbarBackground")}
+          className={classNames(
+            styles.row,
+            "cursor-pointer py-1 hover:bg-themeTableSelectionBackgroundHover"
+          )}
           key={`${h.name}-${i}`}
         >
           <span className="font-bold ">{h.name}:</span> {h.value}
@@ -327,7 +335,7 @@ const RequestDetails = ({
   }
 
   return (
-    <div className="no-scrollbar w-full overflow-y-scroll border-l border-themeBorder bg-bodyBgcolor">
+    <div className="no-scrollbar h-full w-full overflow-y-scroll border-l border-themeBorder bg-bodyBgcolor">
       <RequestDetailsTabs>
         <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
         <CloseButton buttonClass="mr-2" handleClick={closePanel} tooltip={"Close tab"} />

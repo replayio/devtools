@@ -26,6 +26,7 @@ import {
   TimeRange,
   TimeStampedPoint,
   TimeStampedPointRange,
+  VariableMapping,
   createPauseResult,
   functionsMatches,
   getAllFramesResult,
@@ -33,6 +34,7 @@ import {
   keyboardEvents,
   navigationEvents,
   repaintGraphicsResult,
+  requestFocusRangeResult,
   searchSourceContentsMatches,
   sourceContentsChunk,
   sourceContentsInfo,
@@ -40,9 +42,6 @@ import {
 import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
 
-import { initProtocolMessagesStore } from "bvaughn-architecture-demo/components/protocol/ProtocolMessagesStore";
-import { insert } from "bvaughn-architecture-demo/src/utils/array";
-import { areRangesEqual, compareExecutionPoints } from "bvaughn-architecture-demo/src/utils/time";
 import analysisManager from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
@@ -50,6 +49,9 @@ import { ThreadFront } from "protocol/thread";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { RecordingCapabilities } from "protocol/thread/thread";
 import { binarySearch, compareNumericStrings, defer, waitForTime } from "protocol/utils";
+import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
+import { insert } from "replay-next/src/utils/array";
+import { areRangesEqual, compareExecutionPoints } from "replay-next/src/utils/time";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import { isPointInRegions, isRangeInRegions, isTimeInRegions } from "shared/utils/time";
@@ -173,10 +175,17 @@ export class ReplayClient implements ReplayClientInterface {
   ): Promise<EvaluationResult> {
     const sessionId = this.getSessionIdThrows();
 
+    // Edge case handling:
+    // User is logging a plan object (e.g. "{...}")
+    // This expression will not evaluate correctly unless we wrap parens around it
+    if (expression.startsWith("{") && expression.endsWith("}")) {
+      expression = `(${expression})`;
+    }
+
     if (frameId === null) {
       const response = await client.Pause.evaluateInGlobal(
         {
-          expression: `(${expression})`,
+          expression,
           pure: false,
         },
         sessionId,
@@ -187,7 +196,7 @@ export class ReplayClient implements ReplayClientInterface {
       const response = await client.Pause.evaluateInFrame(
         {
           frameId,
-          expression: `(${expression})`,
+          expression,
           pure: false,
           useOriginalScopes: true,
         },
@@ -547,11 +556,11 @@ export class ReplayClient implements ReplayClientInterface {
     return result.data;
   }
 
-  async getPointNearTime(time: number): Promise<{ point: TimeStampedPoint; precise: boolean }> {
+  async getPointNearTime(time: number): Promise<TimeStampedPoint> {
     const sessionId = this.getSessionIdThrows();
 
-    const { point, precise } = await client.Session.getPointNearTime({ time }, sessionId);
-    return { point, precise };
+    const { point } = await client.Session.getPointNearTime({ time }, sessionId);
+    return point;
   }
 
   async getPointsBoundingTime(time: number): Promise<PointsBoundingTime> {
@@ -591,6 +600,12 @@ export class ReplayClient implements ReplayClientInterface {
     const sessionId = this.getSessionIdThrows();
     const result = await client.Pause.getScope({ scope: scopeId }, sessionId, pauseId);
     return result;
+  }
+
+  async getScopeMap(location: Location): Promise<VariableMapping[] | undefined> {
+    const sessionId = this.getSessionIdThrows();
+    const { map } = await client.Debugger.getScopeMap({ location }, sessionId);
+    return map;
   }
 
   async getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint> {
@@ -725,13 +740,11 @@ export class ReplayClient implements ReplayClientInterface {
     return mappedLocation;
   }
 
-  async loadRegion(range: TimeRange, duration: number): Promise<void> {
+  async requestFocusRange(range: TimeRange): Promise<requestFocusRangeResult> {
     const sessionId = this.getSessionIdThrows();
+    const result = await client.Session.requestFocusRange({ range }, sessionId);
 
-    client.Session.unloadRegion({ region: { begin: 0, end: range.begin } }, sessionId);
-    client.Session.unloadRegion({ region: { begin: range.end, end: duration } }, sessionId);
-
-    await client.Session.loadRegion({ region: { begin: range.begin, end: range.end } }, sessionId);
+    return result;
   }
 
   isOriginalSource(sourceId: SourceId): boolean {

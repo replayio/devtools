@@ -2,10 +2,10 @@ import { Dictionary } from "@reduxjs/toolkit";
 import type { SourceId } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 
-import { getMappedLocationSuspense } from "bvaughn-architecture-demo/src/suspense/MappedLocationCache";
-import { getBreakpointPositionsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
+import { getMappedLocationSuspense } from "replay-next/src/suspense/MappedLocationCache";
+import { getBreakpointPositionsSuspense } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 import {
   SourceDetails,

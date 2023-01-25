@@ -1,0 +1,12 @@
+.ContextMenu {
+  position: absolute;
+  flex-direction: column;
+  display: flex;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  white-space: nowrap;
+  z-index: 25; /* Higher than preview popup */
+  filter: drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.5));
+  padding: 0.25rem 0;
+  background-color: var(--context-menu-bgcolor);
+}

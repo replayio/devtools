@@ -32,7 +32,7 @@ module.exports = {
       "@recordreplay/accordion": path.resolve(__dirname, "../packages/accordion/index.tsx"),
       "third-party": path.resolve(__dirname, "../packages/third-party"),
       "packages/third-party": path.resolve(__dirname, "../packages/third-party"),
-      "bvaughn-architecture-demo": path.resolve(__dirname, "../packages/bvaughn-architecture-demo"),
+      "replay-next": path.resolve(__dirname, "../packages/replay-next"),
     };
 
     config.resolve.modules = [

@@ -2,17 +2,16 @@ import { replayPlayback, startPlayback, stopPlayback } from "ui/actions/timeline
 import { selectors } from "ui/reducers";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
-import { displayedEndForFocusRegion } from "ui/utils/timeline";
 
 export default function PlayPauseButton() {
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(selectors.getCurrentTime);
-  const focusRegion = useAppSelector(selectors.getFocusRegion);
+  const displayedFocusRegion = useAppSelector(selectors.getDisplayedFocusRegion);
   const playback = useAppSelector(selectors.getPlayback);
   const recordingDuration = useAppSelector(selectors.getRecordingDuration);
 
-  const isAtEnd = focusRegion
-    ? currentTime === displayedEndForFocusRegion(focusRegion)
+  const isAtEnd = displayedFocusRegion
+    ? currentTime === displayedFocusRegion.end
     : currentTime == recordingDuration;
 
   let onClick;

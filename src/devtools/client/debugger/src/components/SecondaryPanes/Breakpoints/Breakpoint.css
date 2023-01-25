@@ -10,11 +10,6 @@
   border-top-width: none;
 }
 
-.breakpoints-list *:focus:not(:focus-visible) {
-  outline: none;
-  background: inherit;
-}
-
 .breakpoints-list * {
   user-select: none;
 }
@@ -48,12 +43,15 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  gap: 1ch;
   align-items: center;
   overflow: hidden;
   color: var(--theme-text-color-strong);
   position: relative;
-  padding: 4px 8px;
-  line-height: 16px;
+  white-space: nowrap;
+  padding: 0.25rem 0.5rem;
+  min-height: 2rem;
+  border-top: 1px solid var(--theme-splitter-color);
 }
 
 .breakpoints-list .breakpoint:hover {
@@ -73,7 +71,6 @@
   position: relative;
   cursor: pointer;
   overflow: hidden;
-  border-bottom: 1px solid var(--theme-splitter-color);
 }
 
 .breakpoints-list .breakpoint-heading-label {
@@ -85,16 +82,12 @@
 
 .breakpoints-list .breakpoint-options {
   display: flex;
+  flex-direction: column;
   justify-content: flex-start;
+  flex: 1 1 auto;
   align-items: flex-start;
   align-content: flex-start;
   overflow: hidden;
-}
-
-.breakpoints-list .breakpoint-options > * {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
 }
 
 .breakpoints-list .breakpoint-options > *:not(:last-child) {

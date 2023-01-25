@@ -40,7 +40,7 @@ html[dir="rtl"] .command-bar {
 
 .command-bar .divider {
   width: 1px;
-  background: var(--theme-splitter-color);
-  height: 10px;
+  background: var(--body-color);
+  height: 14px;
   margin: 11px 6px 0 6px;
 }

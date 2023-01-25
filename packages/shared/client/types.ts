@@ -32,12 +32,14 @@ import {
   TimeRange,
   TimeStampedPoint,
   TimeStampedPointRange,
+  VariableMapping,
   createPauseResult,
   getAllFramesResult,
   getScopeResult,
   keyboardEvents,
   navigationEvents,
   repaintGraphicsResult,
+  requestFocusRangeResult,
 } from "@replayio/protocol";
 
 import { AnalysisParams } from "protocol/analysisManager";
@@ -67,6 +69,15 @@ export type Events = {
   navigationEvents: NavigationEvent[];
 };
 
+export const POINT_BEHAVIOR_ENABLED = "enabled";
+export const POINT_BEHAVIOR_DISABLED = "disabled";
+export const POINT_BEHAVIOR_DISABLED_TEMPORARILY = "disabled-temporarily";
+
+type PointBehavior =
+  | typeof POINT_BEHAVIOR_ENABLED
+  | typeof POINT_BEHAVIOR_DISABLED
+  | typeof POINT_BEHAVIOR_DISABLED_TEMPORARILY;
+
 export type PointId = string;
 export type Badge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow";
 export type Point = {
@@ -76,8 +87,8 @@ export type Point = {
   createdAtTime: number;
   id: PointId;
   location: Location;
-  shouldBreak: boolean;
-  shouldLog: boolean;
+  shouldBreak: PointBehavior;
+  shouldLog: PointBehavior;
 };
 
 export type RunAnalysisParams = Omit<AnalysisParams, "locations"> & { location?: Location };
@@ -137,12 +148,13 @@ export interface ReplayClientInterface {
     level?: ObjectPreviewLevel
   ): Promise<PauseData>;
   getObjectProperty(objectId: ObjectId, pauseId: PauseId, propertyName: string): Promise<Result>;
-  getPointNearTime(time: number): Promise<{ point: TimeStampedPoint; precise: boolean }>;
+  getPointNearTime(time: number): Promise<TimeStampedPoint>;
   getPointsBoundingTime(time: number): Promise<PointsBoundingTime>;
   getPreferredLocation(locations: Location[]): Location | null;
   getRecordingCapabilities(): Promise<RecordingCapabilities>;
   getRecordingId(): RecordingId | null;
   getScope(pauseId: PauseId, scopeId: ScopeId): Promise<getScopeResult>;
+  getScopeMap(location: Location): Promise<VariableMapping[] | undefined>;
   getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
   getSessionId(): SessionId | null;
   getSourceHitCounts(
@@ -154,7 +166,7 @@ export interface ReplayClientInterface {
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   isOriginalSource(sourceId: SourceId): boolean;
   isPrettyPrintedSource(sourceId: SourceId): boolean;
-  loadRegion(range: TimeRange, duration: number): Promise<void>;
+  requestFocusRange(range: TimeRange): Promise<requestFocusRangeResult>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;
   repaintGraphics(pauseId: PauseId): Promise<repaintGraphicsResult>;
   runAnalysis<Result>(analysisParams: RunAnalysisParams): Promise<Result[]>;

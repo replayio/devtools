@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import React, { KeyboardEvent, MouseEvent, ReactNode } from "react";
 
+import useEventContextMenu from "ui/components/Events/useEventContextMenu";
 import { ReplayEvent } from "ui/state/app";
 import { getFormattedTime } from "ui/utils/timeline";
 
@@ -40,29 +41,35 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
   const onKeyDown = (e: KeyboardEvent) => e.key === " " && e.preventDefault();
   const onClick = (e: MouseEvent) => onSeek(point, time);
 
+  const { contextMenu, onContextMenu } = useEventContextMenu(event);
+
   return (
-    <div
-      onClick={onClick}
-      onKeyDown={onKeyDown}
-      className={classNames(
-        "event user-select-none mb-1 mt-1 flex flex-row items-center justify-between",
-        "group block w-full cursor-pointer rounded-lg py-1 pl-3 pr-2 hover:bg-themeMenuHighlight focus:outline-none",
-        {
-          "text-lightGrey": currentTime < time,
-          "font-semibold text-primaryAccent": isPaused,
-        }
-      )}
-    >
-      <div className="flex flex-row items-center space-x-2 overflow-hidden">
-        <MaterialIcon className="group-hover:text-primaryAccent" iconSize="xl">
-          {icon}
-        </MaterialIcon>
-        <Label>{label}</Label>
+    <>
+      <div
+        className={classNames(
+          "event user-select-none mb-1 mt-1 flex flex-row items-center justify-between",
+          "group block w-full cursor-pointer rounded-lg py-1 pl-3 pr-2 hover:bg-themeMenuHighlight focus:outline-none",
+          {
+            "text-lightGrey": currentTime < time,
+            "font-semibold text-primaryAccent": isPaused,
+          }
+        )}
+        onClick={onClick}
+        onContextMenu={onContextMenu}
+        onKeyDown={onKeyDown}
+      >
+        <div className="flex flex-row items-center space-x-2 overflow-hidden">
+          <MaterialIcon className="group-hover:text-primaryAccent" iconSize="xl">
+            {icon}
+          </MaterialIcon>
+          <Label>{label}</Label>
+        </div>
+        <div className="flex space-x-2">
+          <div>{getFormattedTime(time)}</div>
+        </div>
       </div>
-      <div className="flex space-x-2">
-        <div>{getFormattedTime(time)}</div>
-      </div>
-    </div>
+      {contextMenu}
+    </>
   );
 }
 

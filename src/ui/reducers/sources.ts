@@ -8,12 +8,12 @@ import {
 } from "@reduxjs/toolkit";
 import { Location, MappedLocation, SourceKind, newSource } from "@replayio/protocol";
 
-import { preCacheSources } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
-import { getStreamingSourceContentsHelper } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import type { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import { getTextAtPosition } from "devtools/client/debugger/src/utils/source";
 import { assert } from "protocol/utils";
+import { preCacheSources } from "replay-next/src/suspense/SourcesCache";
+import { getStreamingSourceContentsHelper } from "replay-next/src/suspense/SourcesCache";
 import { UIThunkAction } from "ui/actions";
 import { listenForCondition } from "ui/setup/listenerMiddleware";
 import { UIState } from "ui/state";
@@ -418,6 +418,18 @@ export function getAlternateLocation(sources: SourcesState, locations: MappedLoc
     return locations.find(l => l.sourceId == alternateId);
   }
   return null;
+}
+
+export function getGeneratedLocation(
+  sourcesById: Dictionary<SourceDetails>,
+  locations: MappedLocation
+): Location {
+  const location = locations.find(location => {
+    const source = sourcesById[location.sourceId];
+    return source?.generated.length === 0;
+  });
+  assert(location, "no generated location found");
+  return location || locations[0];
 }
 
 export function getHasSiblingOfSameName(state: UIState, source: MiniSource) {
