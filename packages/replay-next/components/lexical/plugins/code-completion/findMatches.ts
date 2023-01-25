@@ -69,7 +69,6 @@ function fetchQueryData(
           !PREVIEW_CAN_OVERFLOW
         );
 
-        // TODO [FE-1168] These need to be weighted more
         properties =
           preview?.properties?.map(property => ({
             ...property,
@@ -94,7 +93,6 @@ function fetchQueryData(
               distance: depth + 1,
             })) ?? [];
 
-          // TODO [FE-1168] These need to be weighted less
           properties = properties ? properties.concat(weightedProperties) : weightedProperties;
 
           currentPrototypeId = prototypePreview?.prototypeId;
