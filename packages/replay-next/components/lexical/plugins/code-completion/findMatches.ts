@@ -8,6 +8,12 @@ import { ReplayClientInterface } from "shared/client/types";
 import findMatchingScopesAndProperties from "./findMatchingScopesAndProperties";
 import { Match } from "./types";
 
+export const MAX_DISTANCE = Number.MAX_SAFE_INTEGER;
+
+export type WeightedProperty = Property & {
+  distance: number;
+};
+
 // The legacy auto-complete allowed property previews to overflow.
 // This meant we only got a couple of them, which was only of limited use.
 // Let's try not allowing overflow and we can disable it if it's too slow.
@@ -40,10 +46,10 @@ function fetchQueryData(
   frameId: FrameId | null,
   pauseId: PauseId | null
 ): {
-  properties: Property[] | null;
+  properties: WeightedProperty[] | null;
   scopes: Scope[] | null;
 } {
-  let properties: Property[] | null = null;
+  let properties: WeightedProperty[] | null = null;
 
   let scopes = null;
   if (frameId && pauseId) {
@@ -62,7 +68,13 @@ function fetchQueryData(
           maybeObjectId,
           !PREVIEW_CAN_OVERFLOW
         );
-        properties = preview?.properties || null;
+
+        // TODO [FE-1168] These need to be weighted more
+        properties =
+          preview?.properties?.map(property => ({
+            ...property,
+            distance: 0,
+          })) ?? null;
 
         // Auto-complete should not just include own properties.
         // If there's a prototype chain, fetch those properties also.
@@ -75,7 +87,16 @@ function fetchQueryData(
             currentPrototypeId,
             !PREVIEW_CAN_OVERFLOW
           );
-          properties = properties ? properties.concat(prototypePreview?.properties || []) : [];
+
+          const weightedProperties: WeightedProperty[] =
+            prototypePreview?.properties?.map(property => ({
+              ...property,
+              distance: depth + 1,
+            })) ?? [];
+
+          // TODO [FE-1168] These need to be weighted less
+          properties = properties ? properties.concat(weightedProperties) : weightedProperties;
+
           currentPrototypeId = prototypePreview?.prototypeId;
           depth++;
         }
@@ -91,7 +112,12 @@ function fetchQueryData(
             maybeGlobalObjectId,
             !PREVIEW_CAN_OVERFLOW
           );
-          properties = preview?.properties || null;
+
+          properties =
+            preview?.properties?.map(property => ({
+              ...property,
+              distance: MAX_DISTANCE,
+            })) ?? null;
         }
       }
     }
