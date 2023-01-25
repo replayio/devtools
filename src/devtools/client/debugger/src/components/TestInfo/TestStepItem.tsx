@@ -5,16 +5,12 @@ import { highlightNodes, unhighlightNode } from "devtools/client/inspector/marku
 import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
 import { evaluateAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { getCurrentPoint } from "ui/actions/app";
 import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { getStepRanges, useStepState } from "ui/hooks/useStepState";
 import { useTestStepActions } from "ui/hooks/useTestStepActions";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
-import {
-  getCurrentTime,
-  isDragging as isDraggingSelector,
-  isPlaying as isPlayingSelector,
-} from "ui/reducers/timeline";
+import { getCurrentTime, isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AnnotatedTestStep } from "ui/types";
 
@@ -23,41 +19,6 @@ import { TestCaseContext } from "./TestCase";
 import { TestInfoContext } from "./TestInfo";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { TestStepRow } from "./TestStepRow";
-
-function useStepState(step: AnnotatedTestStep) {
-  const currentTime = useAppSelector(getCurrentTime);
-  const currentPoint = useAppSelector(getCurrentPoint);
-  const isPlaying = useAppSelector(isPlayingSelector);
-  const isDragging = useAppSelector(isDraggingSelector);
-
-  const { point: pointEnd } = step.annotations.end || {};
-  const { point: pointStart } = step.annotations.start || {};
-
-  const shouldUseTimes = isPlaying || isDragging;
-
-  if (step.relativeStartTime == null) {
-    return "pending";
-  }
-
-  const currentPointBigInt = currentPoint ? BigInt(currentPoint) : null;
-  const pointEndBigInt = pointEnd ? BigInt(pointEnd) : null;
-  const isPast =
-    !shouldUseTimes && currentPointBigInt && pointEndBigInt
-      ? currentPointBigInt > pointEndBigInt
-      : currentTime > step.absoluteStartTime;
-  const isPaused =
-    !shouldUseTimes && currentPointBigInt && pointEndBigInt && pointStart
-      ? currentPointBigInt >= BigInt(pointStart) && currentPointBigInt <= pointEndBigInt
-      : currentTime >= step.absoluteStartTime && currentTime < step.absoluteEndTime;
-
-  if (isPaused) {
-    return "paused";
-  } else if (isPast) {
-    return "past";
-  }
-
-  return "pending";
-}
 
 // relies on the scrolling parent to be the nearest positioning context
 function scrollIntoView(node: HTMLDivElement) {
@@ -227,20 +188,21 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
 
   const { endPauseId, consoleProps } = localPauseData || {};
   const onClick = useCallback(() => {
-    if (id) {
-      if (pointEnd) {
+    const { timeRange, pointRange } = getStepRanges(step);
+    if (id && timeRange) {
+      if (pointRange) {
         if (endPauseId && consoleProps) {
           setConsoleProps(consoleProps);
           setPauseId(endPauseId);
         }
-        dispatch(seek(pointEnd!, step.absoluteEndTime, false, endPauseId));
+        dispatch(seek(pointRange[1], timeRange[1], false, endPauseId));
       } else {
-        dispatch(seekToTime(step.absoluteEndTime, false));
+        dispatch(seekToTime(timeRange[1], false));
       }
 
       dispatch(setSelectedStep(step));
     }
-  }, [step, pointEnd, endPauseId, consoleProps, dispatch, setConsoleProps, id, setPauseId]);
+  }, [step, endPauseId, consoleProps, dispatch, setConsoleProps, id, setPauseId]);
 
   const onMouseEnter = () => {
     if (state === "paused") {
