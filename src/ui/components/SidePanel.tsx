@@ -58,12 +58,12 @@ function TestResultsSummary({ testCases }: { testCases: TestItem[] }) {
   return (
     <div className="ml-4 flex gap-2 px-1 py-1">
       <div className="flex items-center gap-1">
-        <Icon filename="testsuites-success" size="small" className="bg-green-700" />
-        <div className="text-sm text-green-700">{passed}</div>
+        <Icon filename="testsuites-success" size="small" className={styles.SuccessIcon} />
+        <div className={`text-sm ${styles.SuccessText}`}>{passed}</div>
       </div>
       <div className="mr-1 flex items-center gap-1">
-        <Icon filename="testsuites-fail" size="small" className="bg-red-500" />
-        <div className="text-sm text-red-500">{failed}</div>
+        <Icon filename="testsuites-fail" size="small" className={styles.ErrorIcon} />
+        <div className={`text-sm ${styles.ErrorText}`}>{failed}</div>
       </div>
     </div>
   );
@@ -144,7 +144,7 @@ function EventsPane({ items }: { items: any[] }) {
             <button
               onClick={onReset}
               className="flex flex-grow gap-1 truncate"
-              style={{ minHeight: "64px", alignSelf: "flex-start" }}
+              style={{ alignSelf: "flex-start" }}
             >
               <div
                 className="img arrowhead-right h-32 w-32"
@@ -165,7 +165,7 @@ function EventsPane({ items }: { items: any[] }) {
                 <Icon
                   filename="testsuites-success"
                   size="medium"
-                  className="bg-green-700"
+                  className={styles.SuccessIcon}
                   style={{ alignSelf: "flex-start" }}
                 />
               )}
@@ -211,7 +211,7 @@ function TestRunAttributes({ workspaceId, testRunId }: { workspaceId: string; te
   };
 
   return (
-    <div className="p-2">
+    <div className="p-2 pt-0">
       <Attributes testRun={thisSpecRun} />
     </div>
   );
