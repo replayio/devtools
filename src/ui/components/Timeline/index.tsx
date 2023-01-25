@@ -116,6 +116,11 @@ export default function Timeline() {
     }
   };
 
+  const onMouseLeave = () => {
+    setIsHovered(false);
+    dispatch(setTimelineToTime(null, false));
+  };
+
   return (
     <>
       <FocusModePopout />
@@ -128,7 +133,7 @@ export default function Timeline() {
           className="progress-bar-container"
           onMouseDown={onMouseDown}
           onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+          onMouseLeave={onMouseLeave}
           onMouseMove={onMouseMove}
           onMouseUp={onMouseUp}
         >
