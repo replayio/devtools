@@ -30,10 +30,6 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
   const [loading, setLoading] = useState<boolean>(true);
   const [pauseId, setPauseId] = useState<string | null>(null);
 
-  const showTest = (index: number) => {
-    return selectedTest === null || selectedTest === index;
-  };
-
   return (
     <TestInfoContext.Provider
       value={{ loading, setLoading, consoleProps, setConsoleProps, pauseId, setPauseId }}
@@ -41,7 +37,11 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
       <TestInfoContextMenuContextRoot>
         <div className="flex flex-grow flex-col overflow-hidden">
           <div className="relative flex flex-grow flex-col space-y-1 overflow-auto border-t border-splitter px-2 pt-3">
-            {testCases.map((t, i) => showTest(i) && <TestCase test={t} key={i} index={i} />)}
+            {selectedTest == null ? (
+              <TestCaseTree testCases={testCases} />
+            ) : (
+              <TestCase test={testCases[selectedTest]} index={selectedTest} />
+            )}
           </div>
           {selectedTest !== null ? <Console /> : null}
           <ContextMenuWrapper />
@@ -49,6 +49,66 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
       </TestInfoContextMenuContextRoot>
     </TestInfoContext.Provider>
   );
+}
+
+interface TestTree {
+  branches: Record<string, TestTree>;
+  tests: { index: number; test: TestItem }[];
+}
+
+const createTree = () =>
+  ({
+    branches: {},
+    tests: [],
+  } as TestTree);
+
+function TestCaseBranch({ name, tree }: { name?: string; tree: TestTree }) {
+  const branchNames = Object.keys(tree.branches);
+  const hasBranches = branchNames.length > 0;
+  const hasTests = tree.tests.length > 0;
+
+  if (!hasBranches && !hasTests) {
+    return null;
+  }
+
+  return (
+    <>
+      {name ? <li className="p-1">{name}</li> : null}
+      <ol className={name ? "ml-3" : undefined}>
+        {branchNames.map(name => (
+          <TestCaseBranch key={"branch-" + name} tree={tree.branches[name]} name={name} />
+        ))}
+        {tree.tests.map(t => (
+          <TestCase key={t.index} test={t.test} index={t.index} />
+        ))}
+      </ol>
+    </>
+  );
+}
+
+function TestCaseTree({ testCases }: { testCases: TestItem[] }) {
+  const tree = useMemo(
+    () =>
+      testCases.reduce((acc, t, i) => {
+        let branch = acc;
+        const describes = t.path?.slice(3, t.path.length - 1);
+
+        describes?.forEach(d => {
+          if (!branch.branches[d]) {
+            branch.branches[d] = createTree();
+          }
+
+          branch = branch.branches[d];
+        });
+
+        branch.tests.push({ index: i, test: t });
+
+        return acc;
+      }, createTree()),
+    [testCases]
+  );
+
+  return <TestCaseBranch tree={tree} />;
 }
 
 function Console() {
