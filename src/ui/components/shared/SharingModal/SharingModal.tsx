@@ -124,8 +124,6 @@ function CollaboratorsSection({
               )}
             </div>
 
-            <div className="mt-4 mb-2 font-bold">Add People</div>
-
             <Collaborators recordingId={recording.id} />
           </div>
           <CollaboratorRequests recording={recording} />
@@ -287,7 +285,6 @@ function DownloadSection({ recording }: { recording: Recording }) {
         </MaterialIcon>
         {buttonStates[downloadState].label}
       </button>
-
     </div>
   );
 }
@@ -307,14 +304,12 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
         <div className="flex flex-col space-y-0" style={{ width: 390 }}>
           <Header modalMode={modalMode} setModalMode={setModalMode} />
           {modalMode == "sharing" ? (
-            <>
-              <SharingSection
-                recording={recording}
-                showEnvironmentVariables={showEnvironmentVariables}
-                showPrivacy={showPrivacy}
-                setShowPrivacy={setShowPrivacy}
-              />
-            </>
+            <SharingSection
+              recording={recording}
+              showEnvironmentVariables={showEnvironmentVariables}
+              showPrivacy={showPrivacy}
+              setShowPrivacy={setShowPrivacy}
+            />
           ) : null}
         </div>
         {showPrivacy ? (

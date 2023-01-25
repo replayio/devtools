@@ -24,13 +24,17 @@ export default function HitPointTimeline({
   hitPoints,
   hitPointStatus,
   point,
+  shouldLog,
   toggleConditional,
+  toggleShouldLog,
 }: {
   hasConditional: boolean;
   hitPoints: TimeStampedPoint[];
   hitPointStatus: HitPointStatus;
+  shouldLog: boolean;
   point: Point;
   toggleConditional: () => void;
+  toggleShouldLog: () => void;
 }) {
   const client = useContext(ReplayClientContext);
   const { duration } = useContext(SessionContext);
@@ -132,7 +136,9 @@ export default function HitPointTimeline({
         hitPoints={hitPoints}
         hitPointStatus={hitPointStatus}
         point={point}
+        shouldLog={shouldLog}
         toggleConditional={toggleConditional}
+        toggleShouldLog={toggleShouldLog}
       />
       <button
         className={styles.NextButton}

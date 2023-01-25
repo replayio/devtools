@@ -1,12 +1,12 @@
 import { Object as ProtocolObject } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
-import { getSelectedTest } from "ui/reducers/reporter";
-import { useAppSelector } from "ui/setup/hooks";
+import { getSelectedTest, setSelectedTest } from "ui/reducers/reporter";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem } from "ui/types";
 
 import ContextMenuWrapper from "./ContextMenu";
@@ -25,10 +25,22 @@ type TestInfoContextType = {
 export const TestInfoContext = createContext<TestInfoContextType>(null as any);
 
 export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
+  const dispatch = useAppDispatch();
   const selectedTest = useAppSelector(getSelectedTest);
   const [consoleProps, setConsoleProps] = useState<ProtocolObject>();
   const [loading, setLoading] = useState<boolean>(true);
   const [pauseId, setPauseId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (testCases.length === 1) {
+      dispatch(
+        setSelectedTest({
+          index: 0,
+          title: testCases[0].title,
+        })
+      );
+    }
+  }, [testCases, dispatch]);
 
   return (
     <TestInfoContext.Provider

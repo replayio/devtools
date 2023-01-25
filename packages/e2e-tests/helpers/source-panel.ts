@@ -48,7 +48,7 @@ export async function addConditional(
 ) {
   await toggleConditional(page, {
     lineNumber: options.lineNumber,
-    state: "on",
+    state: true,
   });
 
   const { condition, lineNumber } = options;
@@ -275,6 +275,27 @@ export function getSourceTab(page: Page, url: string): Locator {
   return page.locator(`[data-test-name="Source-${url}"]`);
 }
 
+export async function openLogPointPanelContextMenu(
+  page: Page,
+  options: {
+    lineNumber: number;
+  }
+) {
+  const { lineNumber } = options;
+
+  const contextMenu = page.locator(`[data-test-id="LogPointContextMenu-Line-${lineNumber}"]`);
+  const isVisible = await contextMenu.isVisible();
+  if (!isVisible) {
+    await debugPrint(page, `Opening log point panel context menu`, "openLogPointPanelContextMenu");
+
+    const pointPanelLocator = getPointPanelLocator(page, lineNumber);
+    const capsule = pointPanelLocator.locator('[data-test-name="LogPointCapsule"]');
+    await capsule.click();
+
+    await contextMenu.waitFor();
+  }
+}
+
 export async function removeAllBreakpoints(page: Page): Promise<void> {
   await debugPrint(page, `Removing all breakpoints for the current source`, "removeBreakpoint");
 
@@ -349,7 +370,7 @@ export async function removeConditional(
 ) {
   await toggleConditional(page, {
     lineNumber: options.lineNumber,
-    state: "off",
+    state: false,
   });
 }
 
@@ -391,37 +412,71 @@ export async function toggleConditional(
   page: Page,
   options: {
     lineNumber: number;
-    state: "on" | "off";
+    state: boolean;
   }
 ) {
   const { lineNumber, state: targetState } = options;
 
+  await openLogPointPanelContextMenu(page, { lineNumber });
+
   const contextMenu = page.locator(`[data-test-id="LogPointContextMenu-Line-${lineNumber}"]`);
-  const isVisible = await contextMenu.isVisible();
-  if (!isVisible) {
-    const pointPanelLocator = getPointPanelLocator(page, lineNumber);
-    const capsule = pointPanelLocator.locator('[data-test-name="LogPointCapsule"]');
-    await capsule.click();
-
-    await contextMenu.waitFor();
-  }
-
   const contextMenuItem = contextMenu.locator(
     '[data-test-name="ContextMenuItem-ToggleConditional"]'
   );
   await contextMenuItem.waitFor();
-  const actualState = await contextMenuItem.getAttribute("data-test-state");
+  const actualState = (await contextMenuItem.getAttribute("data-test-state")) === "true";
   if (actualState !== targetState) {
     await debugPrint(
       page,
-      targetState === "on"
-        ? `Adding conditional to line ${lineNumber}`
-        : `Removing conditional from line ${lineNumber}`,
+      targetState
+        ? `Removing conditional from line ${lineNumber}`
+        : `Adding conditional to line ${lineNumber}`,
       "toggleConditional"
     );
 
     await contextMenuItem.click();
   }
+}
+
+export async function toggleShouldLog(
+  page: Page,
+  options: {
+    lineNumber: number;
+    state: boolean;
+  }
+) {
+  const { lineNumber, state: targetState } = options;
+
+  await openLogPointPanelContextMenu(page, { lineNumber });
+
+  const contextMenu = page.locator(`[data-test-id="LogPointContextMenu-Line-${lineNumber}"]`);
+  const contextMenuItem = contextMenu.locator('[data-test-name="ContextMenuItem-ToggleEnabled"]');
+  await contextMenuItem.waitFor();
+  const actualState = (await contextMenuItem.getAttribute("data-test-state")) === "true";
+  if (actualState !== targetState) {
+    await debugPrint(
+      page,
+      targetState
+        ? `Disable logging for line ${lineNumber}`
+        : `Enable logging for line ${lineNumber}`,
+      "toggleShouldLog"
+    );
+
+    await contextMenuItem.click();
+  }
+}
+
+export async function seekToPreviousLogPointHit(page: Page, lineNumber: number) {
+  await debugPrint(
+    page,
+    `Seeking to previous log-point hit at line ${chalk.bold(`${lineNumber}`)}`,
+    "removeLogpoint"
+  );
+
+  const line = await getSourceLine(page, lineNumber);
+  const previousButton = line.locator('[data-test-name="PreviousHitPointButton"]');
+  await previousButton.waitFor();
+  await previousButton.click();
 }
 
 export async function toggleMappedSources(page: Page, targetState: "on" | "off"): Promise<void> {

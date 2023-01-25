@@ -14,7 +14,9 @@ export default function Capsule({
   hitPoints,
   hitPointStatus,
   point,
+  shouldLog,
   toggleConditional,
+  toggleShouldLog,
 }: {
   currentHitPoint: TimeStampedPoint | null;
   currentHitPointIndex: number | null;
@@ -22,13 +24,17 @@ export default function Capsule({
   hitPoints: TimeStampedPoint[];
   hitPointStatus: HitPointStatus;
   point: Point;
+  shouldLog: boolean;
   toggleConditional: () => void;
+  toggleShouldLog: () => void;
 }) {
   const { contextMenu, onContextMenu } = useLogPointPanelContextMenu({
     currentHitPoint,
     hasConditional,
     lineNumber: point.location.line,
+    shouldLog,
     toggleConditional,
+    toggleShouldLog,
   });
 
   let tooManyPointsToFind = false;
