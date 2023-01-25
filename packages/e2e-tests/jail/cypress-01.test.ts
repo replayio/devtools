@@ -15,7 +15,7 @@ import {
 
 const url = "cypress/basic";
 
-test.skip(`cypress-01: Test basic cypress reporter functionality`, async ({ page }) => {
+test(`cypress-01: Test basic cypress reporter functionality`, async ({ page }) => {
   await startTest(page, url);
 
   // shows the cypress logo
