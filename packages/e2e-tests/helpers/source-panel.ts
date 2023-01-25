@@ -265,7 +265,7 @@ export async function getSelectedLineNumber(page: Page): Promise<number | null> 
 export function getLineNumberHitCount(lineNumber: number, page: Page): Locator {
   return page
     .locator(`[data-test-id=SourceLine-${lineNumber}]`)
-    .locator("[class*=SourceListRow_LineHitCountLabel]");
+    .locator("[data-test-id=SourceLine-HitCount]");
 }
 
 export async function getSourceLine(page: Page, lineNumber: number): Promise<Locator> {

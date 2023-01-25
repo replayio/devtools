@@ -91,7 +91,7 @@ export default function FocusInputs() {
     );
   } else {
     return (
-      <div className={styles.Container}>
+      <div data-test-id="Timeline-FocusInputs-TimeContainer" className={styles.Container}>
         <span className={styles.CurrentTimeLabel} style={{ width: `${inputSize}ch` }}>
           {formattedCurrentTime}
         </span>

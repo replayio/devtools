@@ -9,8 +9,13 @@ const url = "cypress/basic";
 // maps test index to line number in spec file that should have 1 hit
 const specLines = [30, 38, 44, 56, 66, 84, 93, 99, 105];
 
-test(`cypress-01: Test cypress reporter focus and timeline behavior`, async ({ page }) => {
+test(`cypress-02: Test cypress reporter focus and timeline behavior`, async ({ page }) => {
   await startTest(page, url);
+
+  // wait for the recording to be loaded
+  await page.waitForSelector('[data-test-id="Timeline-FocusInputs-TimeContainer"]', {
+    timeout: 60_000,
+  });
 
   // shows the cypress logo
   const logo = await getCypressLogo(page);
@@ -21,7 +26,7 @@ test(`cypress-01: Test cypress reporter focus and timeline behavior`, async ({ p
   await expect(rows).toHaveCount(9);
   await page.waitForTimeout(1000);
 
-  for await (let [testIndex, lineNumber] of specLines.entries()) {
+  for (let [testIndex, lineNumber] of specLines.entries()) {
     const testRow = rows.nth(testIndex);
 
     // open the test
@@ -33,18 +38,18 @@ test(`cypress-01: Test cypress reporter focus and timeline behavior`, async ({ p
 
     // navigate to the source via the context menu
     await firstStep.click();
-    await page.waitForTimeout(5000);
     await firstStep.locator("[data-test-id='TestSuites-TestCase-TestStepRow-Actions']").click();
     await page
       .locator('[data-test-id="TestSuites-TestCase-TestStepRow-ContextMenu"]')
       .locator("text=Jump to source")
       .click();
 
-    await page.waitForTimeout(5000);
-
     // verify hit counts
-    await page.locator(".source-tab").first().waitFor({ state: "attached" });
-    await page.locator("[data-test-id^=SourceLine]").first().waitFor({ state: "attached" });
+    await page.locator(".source-tab").first().waitFor({ state: "attached", timeout: 60_000 });
+    await page
+      .locator("[data-test-id^=SourceLine]")
+      .first()
+      .waitFor({ state: "attached", timeout: 30_000 });
     const hitCount = getLineNumberHitCount(lineNumber, page);
     expect(hitCount, `Failed to find hits for test ${testIndex}`).toHaveText("1", {
       timeout: 10000,

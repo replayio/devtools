@@ -364,7 +364,10 @@ const SourceListRow = memo(
 
           <div className={`${styles.LineHitCountBar} ${hitCountBarClassName}`} />
           {showHitCounts && (
-            <div className={`${styles.LineHitCountLabel} ${hitCountLabelClassName}`}>
+            <div
+              data-test-id="SourceLine-HitCount"
+              className={`${styles.LineHitCountLabel} ${hitCountLabelClassName}`}
+            >
               {hitCount !== null ? formatHitCount(hitCount) : ""}
             </div>
           )}

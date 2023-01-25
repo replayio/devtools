@@ -141,7 +141,11 @@ function EventsPane({ items }: { items: any[] }) {
       <div className="flex h-full flex-1 flex-col overflow-hidden">
         <div className={styles.ToolbarHeader}>
           {selectedTest !== null ? (
-            <button onClick={onReset} className="my-1 flex flex-grow gap-1 self-start truncate">
+            <button
+              data-test-id="TestSuite-TestCaseHeader"
+              onClick={onReset}
+              className="my-1 flex flex-grow gap-1 self-start truncate"
+            >
               <div
                 className="img arrowhead-right mt-1 h-32 w-32"
                 style={{ transform: "rotate(180deg)", marginTop: "2px" }}
