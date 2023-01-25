@@ -203,7 +203,7 @@ export async function addConditional(
     sourceId: string;
   }
 ) {
-  await toggleConditional(page, { ...options, state: "on" });
+  await toggleConditional(page, { ...options, state: true });
 
   const { condition, lineNumber, saveAfterAdding } = options;
   if (condition != null) {
@@ -586,7 +586,7 @@ export async function removeConditional(
     sourceId: string;
   }
 ) {
-  await toggleConditional(page, { ...options, state: "off" });
+  await toggleConditional(page, { ...options, state: false });
 }
 
 export async function removeLogPoint(
@@ -657,7 +657,7 @@ export async function toggleConditional(
   options: {
     lineNumber: number;
     sourceId: string;
-    state: "off" | "on";
+    state: boolean;
   }
 ) {
   const { lineNumber, sourceId, state: targetState } = options;
@@ -679,13 +679,13 @@ export async function toggleConditional(
     '[data-test-name="ContextMenuItem-ToggleConditional"]'
   );
   await contextMenuItem.waitFor();
-  const actualState = await contextMenuItem.getAttribute("data-test-state");
+  const actualState = (await contextMenuItem.getAttribute("data-test-state")) === "true";
   if (actualState !== targetState) {
     await debugPrint(
       page,
-      targetState === "on"
-        ? `Adding conditional to line ${lineNumber}`
-        : `Removing conditional from line ${lineNumber}`,
+      targetState
+        ? `Removing conditional from line ${lineNumber}`
+        : `Adding conditional to line ${lineNumber}`,
       "removeConditional"
     );
 
