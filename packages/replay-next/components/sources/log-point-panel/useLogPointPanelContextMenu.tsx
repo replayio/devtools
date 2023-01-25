@@ -14,12 +14,16 @@ export default function useLogPointPanelContextMenu({
   currentHitPoint,
   hasConditional,
   lineNumber,
+  shouldLog,
   toggleConditional,
+  toggleShouldLog,
 }: {
   currentHitPoint: TimeStampedPoint | null;
   hasConditional: boolean;
   lineNumber: number;
+  shouldLog: boolean;
   toggleConditional: () => void;
+  toggleShouldLog: () => void;
 }) {
   const { rangeForDisplay, update } = useContext(FocusContext);
   const { duration } = useContext(SessionContext);
@@ -54,8 +58,18 @@ export default function useLogPointPanelContextMenu({
         onClick={toggleConditional}
       >
         <>
-          <Icon className={styles.ConditionalIcon} type="conditional" />
+          <Icon className={styles.SmallerIcon} type="conditional" />
           {hasConditional ? "Remove conditional" : "Add conditional"}
+        </>
+      </ContextMenuItem>
+      <ContextMenuItem
+        dataTestName="ContextMenuItem-ToggleEnabled"
+        dataTestState={shouldLog ? "true" : "false"}
+        onClick={toggleShouldLog}
+      >
+        <>
+          <Icon className={styles.SmallerIcon} type={shouldLog ? "toggle-off" : "toggle-on"} />
+          {shouldLog ? "Disable logging" : "Enable logging"}
         </>
       </ContextMenuItem>
       <ContextMenuDivider />

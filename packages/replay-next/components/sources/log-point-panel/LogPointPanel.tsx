@@ -30,7 +30,12 @@ import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/Points
 import { findIndexBigInt } from "replay-next/src/utils/array";
 import { validate } from "replay-next/src/utils/points";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { HitPointStatus, POINT_BEHAVIOR_ENABLED, Point } from "shared/client/types";
+import {
+  HitPointStatus,
+  POINT_BEHAVIOR_DISABLED_TEMPORARILY,
+  POINT_BEHAVIOR_ENABLED,
+  Point,
+} from "shared/client/types";
 
 import Loader from "../../Loader";
 import { SetLinePointState } from "../SourceListRow";
@@ -182,6 +187,12 @@ function PointPanelWithHitPoints({
       setEditableCondition("");
       setLinePointState(lineIndex, "point-with-conditional");
     }
+  };
+
+  const toggleShouldLog = () => {
+    editPoint(point.id, {
+      shouldLog: shouldLog ? POINT_BEHAVIOR_DISABLED_TEMPORARILY : POINT_BEHAVIOR_ENABLED,
+    });
   };
 
   let showTooManyPointsMessage = false;
@@ -409,7 +420,9 @@ function PointPanelWithHitPoints({
           hitPoints={hitPoints}
           hitPointStatus={hitPointStatus}
           point={point}
+          shouldLog={shouldLog}
           toggleConditional={toggleCondition}
+          toggleShouldLog={toggleShouldLog}
         />
       </div>
     </div>
