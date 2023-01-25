@@ -133,7 +133,7 @@ jobs:
         run: npx @replayio/playwright install
       - uses: replayio/action-playwright@main
         with:
-          command: npx playwright test --reporter=@replayio/playwright/reporter,line testsuites/*.test.ts --project replay-chromium || exit 0
+          command: npx playwright test --reporter=@replayio/playwright/reporter,line jail/*.test.ts --project replay-chromium || exit 0
           working-directory: ./packages/e2e-tests
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
           public: true
