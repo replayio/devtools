@@ -16,6 +16,7 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
 import { useGetTestRunForWorkspace } from "ui/hooks/tests";
+import { getFlatEvents } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import {
   getReporterAnnotationsForTests,
@@ -72,31 +73,32 @@ function TestResultsSummary({ testCases }: { testCases: TestItem[] }) {
 export default function SidePanel() {
   const { value: resolveRecording } = useFeature("resolveRecording");
   const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
-
+  const events = useAppSelector(getFlatEvents);
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
 
   const items: any[] = [];
 
   // if (recording?.metadata?.test?.tests?.length) {
-  items.push(
-    {
-      header: "Info",
-      buttons: resolveRecording ? <StatusDropdown /> : null,
-      className: "replay-info",
-      component: <ReplayInfo />,
-      opened: !replayInfoCollapsed,
-      onToggle: () => setReplayInfoCollapsed(!replayInfoCollapsed),
-    },
-    {
+  items.push({
+    header: "Info",
+    buttons: resolveRecording ? <StatusDropdown /> : null,
+    className: "replay-info",
+    component: <ReplayInfo />,
+    opened: !replayInfoCollapsed,
+    onToggle: () => setReplayInfoCollapsed(!replayInfoCollapsed),
+  });
+
+  if (events.length > 0) {
+    items.push({
       header: "Events",
       buttons: null,
       className: "events-info flex-1 border-t overflow-hidden border-themeBorder",
       component: <Events />,
       opened: !eventsCollapsed,
       onToggle: () => setEventsCollapsed(!eventsCollapsed),
-    }
-  );
+    });
+  }
 
   return (
     <div

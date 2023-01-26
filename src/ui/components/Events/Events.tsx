@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import sortedLastIndex from "lodash/sortedLastIndex";
-import React from "react";
+import React, { useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
@@ -23,6 +23,7 @@ function CurrentTimeLine({ isActive }: { isActive: boolean }) {
 
 function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
   const { userSettings } = hooks.useGetUserSettings();
+  const [items, setItems] = useState([]);
 
   const onSeek = (point: string, time: number) => {
     trackEvent("events_timeline.select");
@@ -33,26 +34,30 @@ function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
     events.map(e => e.time),
     currentTime
   );
-  return (
-    <div className="bg-bodyBgcolor py-1.5 text-xs">
-      {events.map((e, i) => {
-        return (
-          <div key={e.point}>
-            <CurrentTimeLine isActive={currentEventIndex === i} />
-            <div className="px-1.5">
-              <Event
-                onSeek={onSeek}
-                event={e}
-                currentTime={currentTime}
-                executionPoint={executionPoint}
-              />
+  if (events.length > 0) {
+    return (
+      <div className="bg-bodyBgcolor py-1.5 text-xs">
+        {events.map((e, i) => {
+          return (
+            <div key={e.point}>
+              <CurrentTimeLine isActive={currentEventIndex === i} />
+              <div className="px-1.5">
+                <Event
+                  onSeek={onSeek}
+                  event={e}
+                  currentTime={currentTime}
+                  executionPoint={executionPoint}
+                />
+              </div>
             </div>
-          </div>
-        );
-      })}
-      <CurrentTimeLine isActive={currentEventIndex === events.length && !!events.length} />
-    </div>
-  );
+          );
+        })}
+        <CurrentTimeLine isActive={currentEventIndex === events.length && !!events.length} />
+      </div>
+    );
+  } else {
+    return null;
+  }
 }
 
 const connector = connect(
