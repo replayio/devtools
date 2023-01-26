@@ -130,6 +130,7 @@ export type ExperimentalSettings = {
   enableRoutines?: boolean;
   rerunRoutines?: boolean;
   profileWorkerThreads?: boolean;
+  trackRecordingAssetsInDatabase?: boolean;
 };
 
 type SessionCallbacks = {
