@@ -2,7 +2,7 @@ import { LocalNag } from "ui/setup/prefs";
 
 export type LayoutState = {
   showCommandPalette: boolean;
-  selectedPrimaryPanel: PrimaryPanelName;
+  selectedPrimaryPanel: PrimaryPanelName | null;
   selectedPanel: SecondaryPanelName;
   viewMode: ViewMode;
   toolboxLayout: ToolboxLayout;
