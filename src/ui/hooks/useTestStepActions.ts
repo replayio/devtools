@@ -1,10 +1,9 @@
 import { Frame, Location } from "@replayio/protocol";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import semver from "semver";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getContext } from "devtools/client/debugger/src/selectors";
-import { ThreadFront } from "protocol/thread";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { getCurrentPoint } from "ui/actions/app";
 import { seek, seekToTime, startPlayback } from "ui/actions/timeline";
@@ -72,8 +71,8 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
   const [sourcesLoading, setSourcesLoading] = useState(true);
 
   useEffect(() => {
-    ThreadFront.ensureAllSources().then(() => setSourcesLoading(false));
-  }, []);
+    client.waitForLoadedSources().then(() => setSourcesLoading(false));
+  }, [client]);
 
   const cypressVersion =
     recording?.metadata?.test?.runner?.name === "cypress"
