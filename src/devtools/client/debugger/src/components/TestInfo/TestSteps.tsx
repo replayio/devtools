@@ -57,7 +57,9 @@ function useGetTestSections(
   return useMemo(() => {
     const simplifiedSteps = steps?.reduce<TestStep[]>((acc, s) => {
       const previous = acc[acc.length - 1];
-      if (previous && s.name === "as" && typeof s.args?.[0] === "string") {
+      if (s.name === "then") {
+        return acc;
+      } else if (previous && s.name === "as" && typeof s.args?.[0] === "string") {
         acc[acc.length - 1] = {
           ...previous,
           alias: s.args[0],
