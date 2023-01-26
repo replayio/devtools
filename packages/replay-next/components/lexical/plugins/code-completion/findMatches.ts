@@ -26,7 +26,8 @@ export default function findMatches(
   queryScope: string | null,
   replayClient: ReplayClientInterface,
   frameId: FrameId | null,
-  pauseId: PauseId | null
+  pauseId: PauseId | null,
+  useOriginalVariables: boolean
 ): Match[] {
   // Remove leading "."
   query = query.slice(1);
@@ -35,7 +36,13 @@ export default function findMatches(
     return [];
   }
 
-  const { properties, scopes } = fetchQueryData(replayClient, queryScope, frameId, pauseId);
+  const { properties, scopes } = fetchQueryData(
+    replayClient,
+    queryScope,
+    frameId,
+    pauseId,
+    useOriginalVariables
+  );
 
   return findMatchingScopesAndProperties(queryScope, query, scopes, properties) || [];
 }
@@ -44,16 +51,20 @@ function fetchQueryData(
   replayClient: ReplayClientInterface,
   queryScope: string | null,
   frameId: FrameId | null,
-  pauseId: PauseId | null
+  pauseId: PauseId | null,
+  useOriginalVariables: boolean
 ): {
   properties: WeightedProperty[] | null;
   scopes: Scope[] | null;
 } {
   let properties: WeightedProperty[] | null = null;
 
-  let scopes = null;
+  let generatedScopes: Scope[] | null = null;
+  let scopes: Scope[] | null = null;
   if (frameId && pauseId) {
-    scopes = getFrameScopesSuspense(replayClient, pauseId, frameId)?.generatedScopes || null;
+    const allScopes = getFrameScopesSuspense(replayClient, pauseId, frameId);
+    generatedScopes = allScopes.generatedScopes;
+    scopes = (useOriginalVariables ? allScopes.originalScopes : generatedScopes) || null;
   }
 
   if (pauseId) {
@@ -101,8 +112,8 @@ function fetchQueryData(
       }
     } else {
       // Evaluate the properties of the global/window object
-      if (scopes && scopes.length > 0) {
-        const maybeGlobalObjectId = scopes[scopes.length - 1]?.object;
+      if (generatedScopes && generatedScopes.length > 0) {
+        const maybeGlobalObjectId = generatedScopes[generatedScopes.length - 1]?.object;
         if (maybeGlobalObjectId) {
           const { preview } = getObjectWithPreviewSuspense(
             replayClient,

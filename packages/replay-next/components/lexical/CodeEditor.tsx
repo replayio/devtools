@@ -48,6 +48,7 @@ export default function CodeEditor({
   onSave,
   pauseAndFrameId,
   placeholder = "",
+  useOriginalVariables,
 }: {
   allowWrapping?: boolean;
   autoFocus?: boolean;
@@ -61,6 +62,7 @@ export default function CodeEditor({
   onSave: (markdown: string, editorState: SerializedEditorState) => void;
   pauseAndFrameId: PauseAndFrameId | null;
   placeholder?: string;
+  useOriginalVariables: boolean;
 }): JSX.Element {
   const historyState = useMemo(() => createEmptyHistoryState(), []);
 
@@ -184,6 +186,7 @@ export default function CodeEditor({
           dataTestId={dataTestId ? `${dataTestId}-CodeTypeAhead` : undefined}
           dataTestName={dataTestName ? `${dataTestName}-CodeTypeAhead` : undefined}
           pauseAndFrameId={pauseAndFrameId}
+          useOriginalVariables={useOriginalVariables}
         />
       </>
     </LexicalComposer>
