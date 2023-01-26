@@ -171,7 +171,7 @@ async function countEvents(eventCountsRaw: Record<string, number>) {
   if (!targetCountEvents) {
     if (!isEmpty(eventCountsRaw)) {
       console.error(
-        `recordingTarget "${recordingTarget}" has events but is missing CountEvents function`
+        `Internal Error: recordingTarget "${recordingTarget}" has events but is missing CountEvents function`
       );
     }
     return [];

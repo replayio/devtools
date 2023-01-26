@@ -81,6 +81,8 @@ function EventsListCategories({
           filterByText={filterByText}
         />
       ))}
+      { commonEventCategories.length && otherEventCategories.length && 
+        <hr className="border-splitter" /> }
       {otherEventCategories.map(eventCategory => (
         <EventCategory
           key={eventCategory.category}
