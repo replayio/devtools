@@ -1,4 +1,5 @@
 import { Object as ProtocolObject } from "@replayio/protocol";
+import classNames from "classnames";
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
@@ -257,6 +258,10 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const progress = actualProgress > 100 ? 100 : actualProgress;
   const displayedProgress =
     (step.duration === 1 && state === "paused") || progress == 100 ? 0 : progress;
+  const isSelected = selectedStep?.id === id;
+  const matchingElementCount = consoleProps?.preview?.properties?.find(
+    p => p.name === "Elements"
+  )?.value;
 
   return (
     <TestStepRow
@@ -277,12 +282,33 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
           <ProgressBar progress={displayedProgress} error={!!step.error} />
         </div>
         <div className="opacity-70 ">{index + 1}</div>
-        <div className={`truncate font-medium ${state === "paused" ? "font-bold" : ""}`}>
+        <div className={`flex-grow truncate font-medium ${state === "paused" ? "font-bold" : ""}`}>
           {step.parentId ? "- " : ""}
           {step.name} <span className="opacity-70">{argString}</span>
         </div>
       </button>
-      <Actions step={step} isSelected={selectedStep?.id === id} />
+      {step.name === "get" && matchingElementCount > 1 ? (
+        <span
+          className={classNames(
+            "-my-1 flex-shrink rounded p-1 text-xs",
+            isSelected ? "bg-gray-300" : "bg-gray-200"
+          )}
+        >
+          {matchingElementCount}
+        </span>
+      ) : null}
+      {step.alias ? (
+        <span
+          className={classNames(
+            "-my-1 flex-shrink rounded p-1 text-xs",
+            isSelected ? "bg-gray-300" : "bg-gray-200"
+          )}
+          title={`'${argString}' aliased as '${step.alias}'`}
+        >
+          {step.alias}
+        </span>
+      ) : null}
+      <Actions step={step} isSelected={isSelected} />
     </TestStepRow>
   );
 }
