@@ -179,6 +179,7 @@ export function protocolValueToClientValue(
         case "Uint8ClampedArray":
         case "Uint16Array":
         case "Uint32Array":
+        case "jQuery.fn.init":
           type = "array";
           break;
         case "Date":
