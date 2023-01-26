@@ -55,8 +55,22 @@ function useGetTestSections(
   const events = useAppSelector(getEvents);
 
   return useMemo(() => {
+    const simplifiedSteps = steps?.reduce<TestStep[]>((acc, s) => {
+      const previous = acc[acc.length - 1];
+      if (previous && s.name === "as" && typeof s.args?.[0] === "string") {
+        acc[acc.length - 1] = {
+          ...previous,
+          alias: s.args[0],
+        };
+      } else {
+        acc.push(s);
+      }
+
+      return acc;
+    }, []);
+
     const stepsByTime =
-      steps?.map<StepEvent>((s, i) => {
+      simplifiedSteps?.map<StepEvent>((s, i) => {
         const annotations = {
           end: annotationsEnd.find(a => a.message.id === s.id),
           enqueue: annotationsEnqueue.find(a => a.message.id === s.id),

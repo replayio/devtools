@@ -210,6 +210,7 @@ export type TestStep = {
   relativeStartTime?: number;
   id: string;
   parentId?: string;
+  alias?: string;
   error?: TestItemError;
   hook?: "beforeEach" | "afterEach";
 };
