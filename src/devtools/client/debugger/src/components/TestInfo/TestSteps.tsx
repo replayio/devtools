@@ -243,6 +243,9 @@ function NewUrlRow({ time, message }: { time: number; message: CypressAnnotation
 }
 
 function TestSection({ events, header }: { events: CompositeTestEvent[]; header?: string }) {
+  const firstStep = events.find((e): e is StepEvent => e.type === "step");
+  const firstIndex = firstStep?.event.index || 0;
+
   if (events.length === 0) {
     return null;
   }
@@ -263,7 +266,7 @@ function TestSection({ events, header }: { events: CompositeTestEvent[]; header?
           <TestStepItem
             step={s}
             key={s.id}
-            index={s.index}
+            index={s.index - firstIndex}
             argString={
               s.args ? s.args.filter((s): s is string => s && typeof s === "string").join(", ") : ""
             }
