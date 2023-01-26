@@ -1,5 +1,6 @@
 import { FrameId, PauseId, Property, Scope } from "@replayio/protocol";
 
+import { getFrameSuspense } from "replay-next/src/suspense/FrameCache";
 import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
 import { evaluateSuspense } from "replay-next/src/suspense/PauseCache";
 import { getFrameScopesSuspense } from "replay-next/src/suspense/ScopeCache";
@@ -59,12 +60,15 @@ function fetchQueryData(
 } {
   let properties: WeightedProperty[] | null = null;
 
+  let frame = null;
   let generatedScopes: Scope[] | null = null;
   let scopes: Scope[] | null = null;
   if (frameId && pauseId) {
-    const allScopes = getFrameScopesSuspense(replayClient, pauseId, frameId);
-    generatedScopes = allScopes.generatedScopes;
-    scopes = (useOriginalVariables ? allScopes.originalScopes : generatedScopes) || null;
+    frame = getFrameSuspense(replayClient, pauseId, frameId);
+
+    const data = getFrameScopesSuspense(replayClient, pauseId, frameId);
+    generatedScopes = data.generatedScopes;
+    scopes = useOriginalVariables ? data.originalScopes ?? null : generatedScopes;
   }
 
   if (pauseId) {
@@ -111,22 +115,33 @@ function fetchQueryData(
         }
       }
     } else {
+      if (frame?.this) {
+        properties = [
+          {
+            distance: MAX_DISTANCE,
+            name: "this",
+          },
+        ];
+      }
+
       // Evaluate the properties of the global/window object
       if (generatedScopes && generatedScopes.length > 0) {
-        const maybeGlobalObjectId = generatedScopes[generatedScopes.length - 1]?.object;
-        if (maybeGlobalObjectId) {
+        const globalScope = generatedScopes.find(scope => scope.type === "global");
+        if (globalScope?.object) {
           const { preview } = getObjectWithPreviewSuspense(
             replayClient,
             pauseId,
-            maybeGlobalObjectId,
+            globalScope.object,
             !PREVIEW_CAN_OVERFLOW
           );
-
-          properties =
-            preview?.properties?.map(property => ({
+          if (preview?.properties) {
+            const weightedProperties: WeightedProperty[] = preview.properties.map(property => ({
               ...property,
               distance: MAX_DISTANCE,
-            })) ?? null;
+            }));
+
+            properties = properties ? properties.concat(weightedProperties) : weightedProperties;
+          }
         }
       }
     }
