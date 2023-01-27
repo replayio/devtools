@@ -220,7 +220,7 @@ export function TestSteps({ test }: { test: TestItem }) {
           <div>
             <div className="flex flex-row items-center space-x-1 p-2">
               <Icon filename="warning" size="small" className="bg-testsuitesErrorColor" />
-              <div className="font-bold">Error</div>
+              <div className="font-bold">Assertion Error</div>
             </div>
             <div className="wrap space-y-1 overflow-hidden p-2 font-mono">{test.error.message}</div>
           </div>

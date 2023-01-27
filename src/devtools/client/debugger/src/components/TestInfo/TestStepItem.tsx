@@ -299,7 +299,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
           <ProgressBar progress={displayedProgress} error={!!step.error} />
         </div>
         <div className="opacity-70 ">{index + 1}</div>
-        <div className={`flex-grow truncate font-medium ${state === "paused" ? "font-bold" : ""}`}>
+        <div className={`flex-grow font-medium ${state === "paused" ? "font-bold" : ""}`}>
           {step.parentId ? "- " : ""}
           {step.name} <span className="opacity-70">{argString}</span>
         </div>
