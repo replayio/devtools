@@ -10,6 +10,7 @@ import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getStepRanges, useStepState } from "ui/hooks/useStepState";
 import { useTestStepActions } from "ui/hooks/useTestStepActions";
+import { getViewMode } from "ui/reducers/layout";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
 import { getCurrentTime, isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -57,6 +58,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     pauseId: string;
     nodeIds: string[];
   }>();
+  const viewMode = useAppSelector(getViewMode);
   const isPlaying = useAppSelector(isPlayingSelector);
   const currentTime = useAppSelector(getCurrentTime);
   const selectedStep = useAppSelector(getSelectedStep);
@@ -65,6 +67,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const { point: pointEnd, message: messageEnd } = step.annotations.end || {};
   const { point: pointStart } = step.annotations.start || {};
   const state = useStepState(step);
+  const actions = useTestStepActions(step);
 
   // compare points if possible and
   useEffect(() => {
@@ -201,9 +204,23 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
         dispatch(seekToTime(timeRange[1], false));
       }
 
+      if (viewMode === "dev") {
+        actions.showStepSource();
+      }
+
       dispatch(setSelectedStep(step));
     }
-  }, [step, endPauseId, consoleProps, dispatch, setConsoleProps, id, setPauseId]);
+  }, [
+    actions,
+    viewMode,
+    step,
+    endPauseId,
+    consoleProps,
+    dispatch,
+    setConsoleProps,
+    id,
+    setPauseId,
+  ]);
 
   const onMouseEnter = () => {
     if (state === "paused") {
