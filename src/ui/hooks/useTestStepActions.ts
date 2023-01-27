@@ -1,5 +1,5 @@
 import { Frame, Location } from "@replayio/protocol";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import semver from "semver";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
@@ -68,6 +68,11 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
   const client = useContext(ReplayClientContext);
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
+  const [sourcesLoading, setSourcesLoading] = useState(true);
+
+  useEffect(() => {
+    client.waitForLoadedSources().then(() => setSourcesLoading(false));
+  }, [client]);
 
   const cypressVersion =
     recording?.metadata?.test?.runner?.name === "cypress"
@@ -79,6 +84,10 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
 
   const stepEnd = testStep ? isStepEnd(testStep, currentTime, currentPoint) : false;
   const canJumpToAfter = testStep && !stepEnd && testStep.name !== "assert";
+
+  const isChaiAssertion = testStep?.name === "assert" && !testStep.annotations.enqueue;
+  const annotation = isChaiAssertion ? testStep.annotations.start : testStep?.annotations.enqueue;
+  const canShowStepSource = !!cypressVersion && !sourcesLoading && annotation;
 
   const canPlayback = (
     test: TestItem
@@ -113,7 +122,7 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
   };
 
   const seekToStepStart = () => {
-    if (!canJumpToBefore || !testStep) {
+    if (!canJumpToBefore) {
       return;
     }
 
@@ -126,7 +135,7 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
   };
 
   const seekToStepEnd = () => {
-    if (!canJumpToAfter || !testStep) {
+    if (!canJumpToAfter) {
       return;
     }
 
@@ -139,10 +148,7 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
   };
 
   const showStepSource = async () => {
-    const isChaiAssertion = testStep?.name === "assert" && !testStep.annotations.enqueue;
-    const annotation = isChaiAssertion ? testStep.annotations.start : testStep?.annotations.enqueue;
-
-    if (!annotation || !cypressVersion) {
+    if (!canShowStepSource) {
       return;
     }
 
@@ -179,6 +185,6 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
     seekToStepEnd,
     seekToStepStart,
     showStepSource,
-    canShowStepSource: !!cypressVersion,
+    canShowStepSource,
   };
 };

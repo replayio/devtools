@@ -1,7 +1,9 @@
 import { ReactNode } from "react";
 
 import { filterNonEnumerableProperties } from "replay-next/src/utils/protocol";
+import { isNumeric } from "replay-next/src/utils/text";
 
+import KeyValueRenderer from "../KeyValueRenderer";
 import ValueRenderer from "../ValueRenderer";
 import { ObjectPreviewRendererProps } from "./types";
 import styles from "./shared.module.css";
@@ -30,12 +32,23 @@ export default function ArrayRenderer({ context, object, pauseId }: ObjectPrevie
 
   let propertiesList: ReactNode[] | null = null;
   if (context !== "nested") {
-    propertiesList = slice.map((property, index) => (
-      <span key={index} className={styles.Value}>
-        <ValueRenderer context="nested" pauseId={pauseId} protocolValue={property} />
-        {index < slice.length - 1 && <span className={styles.Separator}>, </span>}
-      </span>
-    ));
+    propertiesList = slice.map((property, index) => {
+      if (isNumeric(property.name)) {
+        return (
+          <span key={index} className={styles.Value}>
+            <ValueRenderer context="nested" pauseId={pauseId} protocolValue={property} />
+            {index < slice.length - 1 && <span className={styles.Separator}>, </span>}
+          </span>
+        );
+      } else {
+        return (
+          <span key={index} className={styles.Value}>
+            <KeyValueRenderer context="nested" pauseId={pauseId} protocolValue={property} />
+            {index < slice.length - 1 && <span className={styles.Separator}>, </span>}
+          </span>
+        );
+      }
+    });
 
     if (showOverflowMarker) {
       propertiesList.push(
