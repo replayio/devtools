@@ -162,16 +162,13 @@ const baseNextConfig = {
       fs: false,
     };
 
+    const reLibrariesWithSourcemaps = /node_modules.+(immer|@reduxjs|react-window).+\.js$/;
+
     config.module.rules.push({
-      test: /\.js$/,
+      test: reLibrariesWithSourcemaps,
       enforce: "pre",
       use: ["source-map-loader"],
     });
-
-    if (!config.ignoreWarnings) {
-      config.ignoreWarnings = [];
-    }
-    config.ignoreWarnings.push(/Failed to parse source map/);
 
     // JS files that need to be imported as strings,
     // such as the React DevTools backend to be injected into pauses
