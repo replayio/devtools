@@ -39,10 +39,6 @@ but without a background color so we can use hover effects
 
 /* replay info */
 
-.icon.external {
-  -webkit-mask-image: url(/icons/external.svg);
-}
-
 .icon.globe {
   -webkit-mask-image: url(/icons/globe.svg);
 }
@@ -55,8 +51,32 @@ but without a background color so we can use hover effects
   -webkit-mask-image: url(/icons/lock.svg);
 }
 
+.icon.external {
+  -webkit-mask-image: url(/icons/external.svg);
+}
+
 .icon.shield-check {
   -webkit-mask-image: url(/icons/shield-check.svg);
+}
+
+.icon.globe-circle {
+  -webkit-mask-image: url(/icons/globe-circle.svg);
+}
+
+.icon.group-circle {
+  -webkit-mask-image: url(/icons/group-circle.svg);
+}
+
+.icon.lock-circle {
+  -webkit-mask-image: url(/icons/lock-circle.svg);
+}
+
+.icon.link-circle {
+  -webkit-mask-image: url(/icons/link-circle.svg);
+}
+
+.icon.shield-check-circle {
+  -webkit-mask-image: url(/icons/shield-check-circle.svg);
 }
 
 .icon.drawer {

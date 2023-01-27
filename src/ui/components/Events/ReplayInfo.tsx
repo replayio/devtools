@@ -63,7 +63,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
         <div>
           {isAuthenticated ? (
             <Row>
-              <Icon filename={icon} className="cursor-pointer bg-iconColor" />
+              <Icon filename="external-circle" className="cursor-pointer bg-iconColor" />
               <div>
                 <PrivacyDropdown {...{ recording }} />
               </div>
@@ -73,7 +73,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
         <div>
           {!isTest && recording.url ? (
             <Row>
-              <Icon filename="external" className="cursor-pointer bg-iconColor" />
+              <Icon filename="link-circle" className="cursor-pointer bg-primaryAccent" />
               <div
                 className="overflow-hidden overflow-ellipsis whitespace-pre hover:underline"
                 title={recording.url}
@@ -162,7 +162,7 @@ function OperationsRow({
   return (
     <div>
       <Row onClick={onClick}>
-        <Icon filename="shield-check" className="bg-iconColor" />
+        <Icon filename="shield-check-circle" className="bg-[#F39A32]" />
         <div>{`Potentially sensitive data`}</div>
       </Row>
     </div>
