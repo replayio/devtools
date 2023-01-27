@@ -55,16 +55,16 @@ declare global {
     logMessage: (message: string) => void;
     jsondiffpatch: any;
   }
-
-  // These types aren't actually attached to `window`, but _should_ be in
-  // scope when we evaluate code at the original annotation timestamps.
-  let latestDispatchedActions: Record<string, LastSavedValues>;
-
-  let action: AnyAction;
-  let state: any;
-  let extractedConfig: ExtractedExtensionConfig;
-  let config: Config;
 }
+
+// These types aren't actually attached to `window`, but _should_ be in
+// scope when we evaluate code at the original annotation timestamps.
+// Use `declare let x` to make code in _this_ file only accept those.
+declare let latestDispatchedActions: Record<string, LastSavedValues>;
+declare let action: AnyAction;
+declare let state: any;
+declare let extractedConfig: ExtractedExtensionConfig;
+declare let config: Config;
 
 function mutateWindowForSetup() {
   window.evaluationLogs = [];
