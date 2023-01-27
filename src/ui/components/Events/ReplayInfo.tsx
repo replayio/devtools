@@ -19,7 +19,7 @@ import PrivacyDropdown from "../shared/SharingModal/PrivacyDropdown";
 import { getUniqueDomains } from "../UploadScreen/Privacy";
 
 const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void }) => {
-  const classes = "flex flex-row space-x-2 p-1.5 px-3 items-center text-left overflow-hidden";
+  const classes = "flex flex-row space-x-2 p-1 px-4 items-center text-left overflow-hidden";
 
   if (onClick) {
     return (
@@ -55,7 +55,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
       <div className="mt-.5 mb-2 flex w-full cursor-default flex-col self-stretch overflow-hidden px-1.5 pb-0 text-xs">
         {recording.user ? (
           <Row>
-            <AvatarImage className="avatar h-5 w-5 rounded-full" src={recording.user.picture} />
+            <AvatarImage className="avatar rounded-full" style={{height: "1.25rem", width: "1.25rem"}} src={recording.user.picture} />
             <div>{recording.user.name}</div>
             <div className="opacity-50">{time}</div>
           </Row>
@@ -63,7 +63,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
         <div>
           {isAuthenticated ? (
             <Row>
-              <Icon filename="external-circle" className="cursor-pointer bg-iconColor" />
+              <Icon filename={`${icon}-circle`} className="cursor-pointer bg-iconColor" />
               <div>
                 <PrivacyDropdown {...{ recording }} />
               </div>
