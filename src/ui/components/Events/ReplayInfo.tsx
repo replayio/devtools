@@ -55,7 +55,11 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
       <div className="mt-.5 mb-2 flex w-full cursor-default flex-col self-stretch overflow-hidden px-1.5 pb-0 text-xs">
         {recording.user ? (
           <Row>
-            <AvatarImage className="avatar rounded-full" style={{height: "1.25rem", width: "1.25rem"}} src={recording.user.picture} />
+            <AvatarImage
+              className="avatar rounded-full"
+              style={{ height: "1.25rem", width: "1.25rem" }}
+              src={recording.user.picture}
+            />
             <div>{recording.user.name}</div>
             <div className="opacity-50">{time}</div>
           </Row>
@@ -163,7 +167,16 @@ function OperationsRow({
     <div>
       <Row>
         <Icon filename="shield-check-circle" className="bg-[#F39A32]" />
-        <div className="flex">{`Potentially sensitive data`} <span className="flex align-top ml-1" onClick={onClick}><Icon filename="learnmore-questionmark" className="bg-bodyColor hover:cursor-pointer" size="small" /></span></div>
+        <div className="flex">
+          {`Potentially sensitive data`}{" "}
+          <span className="ml-1 flex align-top" onClick={onClick}>
+            <Icon
+              filename="learnmore-questionmark"
+              className="bg-bodyColor hover:cursor-pointer"
+              size="small"
+            />
+          </span>
+        </div>
       </Row>
     </div>
   );

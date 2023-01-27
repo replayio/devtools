@@ -79,8 +79,7 @@ but without a background color so we can use hover effects
   -webkit-mask-image: url(/icons/shield-check-circle.svg);
 }
 
-.icon.learnmore-questionmark
-{
+.icon.learnmore-questionmark {
   -webkit-mask-image: url(/icons/learnmore-questionmark.svg);
 }
 
