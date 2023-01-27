@@ -208,7 +208,7 @@ export function TestSteps({ test }: { test: TestItem }) {
   const { beforeEach, testBody, afterEach } = useGetTestSections(testCaseStartTime, test.steps);
 
   return (
-    <div className="flex flex-col rounded-lg px-2">
+    <div className="flex flex-col px-2 rounded-lg">
       <TestSection events={beforeEach} header="Before Each" />
       <TestSection
         events={testBody}
@@ -218,11 +218,11 @@ export function TestSteps({ test }: { test: TestItem }) {
       {test.error ? (
         <TestStepRow error>
           <div>
-            <div className="flex flex-row items-center space-x-1 p-2">
+            <div className="flex flex-row items-center p-2 space-x-1">
               <Icon filename="warning" size="small" className="bg-testsuitesErrorColor" />
-              <div className="font-bold">Error</div>
+              <div className="font-bold">Assertion Error</div>
             </div>
-            <div className="wrap space-y-1 overflow-hidden p-2 font-mono">{test.error.message}</div>
+            <div className="p-2 space-y-1 overflow-hidden font-mono wrap">{test.error.message}</div>
           </div>
         </TestStepRow>
       ) : null}
@@ -235,7 +235,7 @@ function NewUrlRow({ time, message }: { time: number; message: CypressAnnotation
 
   return (
     <TestStepRow pending={time > currentTime} key={(message.url || "url") + time}>
-      <div className="truncate italic opacity-70" title={message.url}>
+      <div className="italic truncate opacity-70" title={message.url}>
         new url {message.url}
       </div>
     </TestStepRow>
@@ -255,7 +255,7 @@ function TestSection({ events, header }: { events: CompositeTestEvent[]; header?
       {header ? (
         <div
           data-test-id="TestSuites-TestCase-SectionHeader"
-          className="pt-6 pb-2  font-semibold uppercase opacity-50 first:pt-0"
+          className="pt-6 pb-2 font-semibold uppercase opacity-50 first:pt-0"
           style={{ fontSize: "10px" }}
         >
           {header}

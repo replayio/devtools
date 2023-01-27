@@ -292,14 +292,14 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     >
       <button
         onClick={onClick}
-        className="flex w-0 flex-grow items-start space-x-2 text-start"
+        className="flex items-start flex-grow w-0 space-x-2 text-start"
         title={`Step ${index + 1}: ${step.name} ${argString || ""}`}
       >
-        <div title={"" + displayedProgress} className="flex h-4 items-center">
+        <div title={"" + displayedProgress} className="flex items-center h-4">
           <ProgressBar progress={displayedProgress} error={!!step.error} />
         </div>
         <div className="opacity-70 ">{index + 1}</div>
-        <div className={`flex-grow truncate font-medium ${state === "paused" ? "font-bold" : ""}`}>
+        <div className={`flex-grow font-medium ${state === "paused" ? "font-bold" : ""}`}>
           {step.parentId ? "- " : ""}
           {step.name} <span className="opacity-70">{argString}</span>
         </div>
