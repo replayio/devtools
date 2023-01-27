@@ -1,5 +1,4 @@
 import type { UIStore } from "ui/actions";
-import { isInspectorSelected } from "ui/reducers/app";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
 import { getBoundingRectAsync, getComputedStyleAsync } from "ui/suspense/styleCaches";
 
@@ -12,29 +11,42 @@ export function setupBoxModel(store: UIStore, startAppListening: AppStartListeni
   startAppListening({
     actionCreator: nodeSelected,
     effect: async (action, listenerApi) => {
-      const { extra, getState, dispatch } = listenerApi;
+      const { extra, getState, dispatch, cancelActiveListeners, pause } = listenerApi;
       const { ThreadFront, protocolClient, replayClient } = extra;
       const state = getState();
-      const { selectedNode, tree } = state.markup;
+      const { selectedNode } = state.markup;
 
-      if (!isInspectorSelected(state) || !selectedNode) {
+      // If any other instance of the "fetch box model data" listener
+      // is running, cancel it. Only fetch data for this selected node.
+      cancelActiveListeners();
+
+      const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
+
+      if (!selectedNode) {
         return;
       }
 
-      const nodeInfo = tree.entities[selectedNode];
+      const [bounds, style] = await pause(
+        Promise.all([
+          getBoundingRectAsync(
+            protocolClient,
+            ThreadFront.sessionId!,
+            originalPauseId,
+            selectedNode
+          ),
+          getComputedStyleAsync(
+            protocolClient,
+            ThreadFront.sessionId!,
+            originalPauseId,
+            selectedNode
+          ),
+        ])
+      );
 
-      if (!nodeInfo) {
-        return;
-      }
+      const currentPauseId = await ThreadFront.getCurrentPauseId(replayClient);
 
-      const pauseId = await ThreadFront.getCurrentPauseId(replayClient);
-
-      const [bounds, style] = await Promise.all([
-        getBoundingRectAsync(protocolClient, ThreadFront.sessionId!, pauseId, selectedNode),
-        getComputedStyleAsync(protocolClient, ThreadFront.sessionId!, pauseId, selectedNode),
-      ]);
-
-      if (!bounds || !style) {
+      // If we don't have data, or the user has unpaused, bail out.
+      if (!bounds || !style || currentPauseId !== originalPauseId) {
         return;
       }
 
