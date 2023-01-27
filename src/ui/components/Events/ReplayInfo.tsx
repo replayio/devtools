@@ -161,9 +161,9 @@ function OperationsRow({
 
   return (
     <div>
-      <Row onClick={onClick}>
+      <Row>
         <Icon filename="shield-check-circle" className="bg-[#F39A32]" />
-        <div>{`Potentially sensitive data`}</div>
+        <div className="flex">{`Potentially sensitive data`} <span className="flex align-top ml-1" onClick={onClick}><Icon filename="learnmore-questionmark" className="bg-bodyColor hover:cursor-pointer" size="small" /></span></div>
       </Row>
     </div>
   );
