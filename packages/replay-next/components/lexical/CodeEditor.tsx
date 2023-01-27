@@ -7,8 +7,10 @@ import { createEmptyHistoryState } from "@lexical/react/LexicalHistoryPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { $selectAll } from "@lexical/selection";
 import { $rootTextContent } from "@lexical/text";
+import { mergeRegister } from "@lexical/utils";
 import {
   $getRoot,
+  $getSelection,
   COMMAND_PRIORITY_CRITICAL,
   EditorState,
   KEY_ENTER_COMMAND,
@@ -16,6 +18,7 @@ import {
   LexicalEditor,
   LexicalNode,
   LineBreakNode,
+  SELECTION_CHANGE_COMMAND,
   SerializedEditorState,
   TextNode,
 } from "lexical";
@@ -154,7 +157,31 @@ export default function CodeEditor({
           return false;
         };
 
-        return editor.registerCommand(KEY_ENTER_COMMAND, onEnter, COMMAND_PRIORITY_CRITICAL);
+        // Make sure the cursor is visible (if there is overflow)
+        const onSelectionChange = () => {
+          const selection = $getSelection();
+          if (selection) {
+            const nodes = selection.getNodes();
+            if (nodes?.length > 0) {
+              const node = nodes[0];
+              const element = editor.getElementByKey(node.__key);
+              if (element) {
+                element.scrollIntoView({ block: "nearest", inline: "nearest" });
+              }
+            }
+          }
+
+          return false;
+        };
+
+        return mergeRegister(
+          editor.registerCommand(
+            SELECTION_CHANGE_COMMAND,
+            onSelectionChange,
+            COMMAND_PRIORITY_CRITICAL
+          ),
+          editor.registerCommand(KEY_ENTER_COMMAND, onEnter, COMMAND_PRIORITY_CRITICAL)
+        );
       }
     }
   }, [allowWrapping, editorRef]);
