@@ -164,7 +164,7 @@ export default function CodeEditor({
               const node = nodes[0];
               const element = editor.getElementByKey(node.__key);
               if (element) {
-                element.scrollIntoView();
+                element.scrollIntoView({ block: "nearest", inline: "nearest" });
               }
             }
           }
