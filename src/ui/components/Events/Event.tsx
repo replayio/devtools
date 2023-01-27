@@ -94,14 +94,13 @@ const { getValueAsync: getClickEventListenerLocationAsync } = createGenericCache
     });
 
     let sourceLocation: Location | undefined;
+    const sourcesById = getSourceDetailsEntities(state);
 
     if (res.returned?.object) {
       const preview = await getObjectWithPreviewHelper(replayClient, pauseId, res.returned.object);
 
       // The evaluation may have found an `onClick` function somewhere.
       const onClickProp = preview?.preview?.properties?.find(p => p.name === "onClick");
-
-      const sourcesById = getSourceDetailsEntities(state);
 
       if (onClickProp) {
         // If it did find a React `onClick` handler, get its
@@ -128,6 +127,12 @@ const { getValueAsync: getClickEventListenerLocationAsync } = createGenericCache
     if (!sourceLocation) {
       // Otherwise, use the location from the actual JS event handler.
       sourceLocation = getPreferredLocation(state.sources, topFrame.location);
+      const sourceDetails = sourcesById[sourceLocation.sourceId];
+
+      if (sourceDetails?.url?.includes("react-dom")) {
+        // Intentionally _don't_ jump to React's internals
+        sourceLocation = undefined;
+      }
     }
 
     return sourceLocation!;
@@ -243,7 +248,7 @@ function jumpToClickEventFunctionLocation(
       // Look for the next click event within a short timeframe after the "mouse event".
       // Yes, this is hacky, but it does seem pretty consistent.
       const arbitraryEndTime = time + 200;
-      const loadedRegions = getLoadedRegions(state);
+      const loadedRegions = getLoadedRegions(getState());
 
       // Safety check: don't ask for points if this time isn't loaded
       const isEndTimeInLoadedRegion = loadedRegions?.loaded.some(
