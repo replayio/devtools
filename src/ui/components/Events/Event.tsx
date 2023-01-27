@@ -3,6 +3,7 @@ import {
   Location,
   Node,
   Object as ProtocolObject,
+  KeyboardEvent as ReplayKeyboardEvent,
   MouseEvent as ReplayMouseEvent,
   Value,
 } from "@replayio/protocol";
@@ -12,6 +13,7 @@ import React, { KeyboardEvent, MouseEvent, ReactNode } from "react";
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import type { ThreadFront as TF } from "protocol/thread";
+import { RecordingTarget } from "protocol/thread/thread";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { MAPPER as EVENTS_MAPPER, EventLog } from "replay-next/src/suspense/EventsCache";
 import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
@@ -28,7 +30,8 @@ import {
 } from "ui/actions/event-listeners";
 import useEventContextMenu from "ui/components/Events/useEventContextMenu";
 import { getLoadedRegions } from "ui/reducers/app";
-import { getPreferredLocation, getSourceDetailsEntities } from "ui/reducers/sources";
+import { getViewMode } from "ui/reducers/layout";
+import { SourceDetails, getPreferredLocation, getSourceDetailsEntities } from "ui/reducers/sources";
 import { useAppDispatch } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import { ReplayEvent } from "ui/state/app";
@@ -37,17 +40,73 @@ import { getFormattedTime } from "ui/utils/timeline";
 import MaterialIcon from "../shared/MaterialIcon";
 import { getReplayEvent } from "./eventKinds";
 
-const { getValueAsync: getNextClickEventAsync } = createGenericCache<
-  [replayClient: ReplayClientInterface, point: ExecutionPoint, endTime: number],
+type SEARCHABLE_EVENT_TYPES = "mousedown" | "keypress";
+
+const EVENTS_FOR_RECORDING_TARGET: Partial<
+  Record<RecordingTarget, Record<SEARCHABLE_EVENT_TYPES, string>>
+> = {
+  gecko: {
+    mousedown: "event.mouse.click",
+    keypress: "event.keyboard.keypress",
+  },
+  // TODO [FE-1178] Fill in Chromium event types here?
+  // chromium: {},
+};
+
+const REACT_EVENT_PROPS: Record<SEARCHABLE_EVENT_TYPES, string[]> = {
+  mousedown: ["onClick"],
+  // Users may have added `onChange` to an <input>, or `onkeyPress` to other elements
+  keypress: ["onChange", "onKeyPress"],
+};
+
+const EVENT_CLASS_FOR_EVENT_TYPE: Record<SEARCHABLE_EVENT_TYPES, string> = {
+  mousedown: "MouseEvent",
+  keypress: "InputEvent",
+};
+
+const IGNORABLE_PARTIAL_SOURCE_URLS = [
+  // Don't jump into React internals
+  "react-dom",
+  // or CodeSandbox
+  "webpack:///src/sandbox/",
+];
+
+function shouldIgnoreEventFromSource(sourceDetails?: SourceDetails) {
+  const url = sourceDetails?.url ?? "";
+
+  return IGNORABLE_PARTIAL_SOURCE_URLS.some(partialUrl => url.includes(partialUrl));
+}
+
+const { getValueAsync: getNextInteractionEventAsync } = createGenericCache<
+  [
+    replayClient: ReplayClientInterface,
+    ThreadFront: typeof TF,
+    point: ExecutionPoint,
+    replayEventType: SEARCHABLE_EVENT_TYPES,
+    endTime: number
+  ],
   EventLog | undefined
 >(
-  "clickEventCache",
-  async (replayClient, point, endTime) => {
+  "nextInteractionEventCache",
+  async (replayClient, ThreadFront, point, replayEventType, endTime) => {
     const pointNearEndTime = await replayClient.getPointNearTime(endTime);
+
+    const recordingTarget = await ThreadFront.getRecordingTarget();
+
+    // Limit to browsers
+    if (!["gecko", "chromium"].includes(recordingTarget)) {
+      return;
+    }
+
+    const eventType = EVENTS_FOR_RECORDING_TARGET[recordingTarget]?.[replayEventType];
+
+    if (!eventType) {
+      return;
+    }
 
     const entryPoints = await replayClient.runAnalysis<EventLog>({
       effectful: false,
-      eventHandlerEntryPoints: [{ eventType: "event.mouse.click" }],
+      eventHandlerEntryPoints: [{ eventType }],
       mapper: EVENTS_MAPPER,
       range: {
         begin: point,
@@ -58,20 +117,21 @@ const { getValueAsync: getNextClickEventAsync } = createGenericCache<
     entryPoints.sort((a, b) => compareExecutionPoints(a.point, b.point));
     return entryPoints[0];
   },
-  (replayClient, point) => point
+  (replayClient, ThreadFront, point) => point
 );
 
-const { getValueAsync: getClickEventListenerLocationAsync } = createGenericCache<
+const { getValueAsync: getEventListenerLocationAsync } = createGenericCache<
   [
     ThreadFront: typeof TF,
     replayClient: ReplayClientInterface,
     getState: () => UIState,
-    pauseId: string
+    pauseId: string,
+    replayEventType: SEARCHABLE_EVENT_TYPES
   ],
   Location | undefined
 >(
-  "clickEventListenerLocationCache",
-  async (ThreadFront, replayClient, getState, pauseId) => {
+  "eventListenerLocationCache",
+  async (ThreadFront, replayClient, getState, pauseId, replayEventType) => {
     const stackFrames = await getFramesAsync(replayClient, pauseId);
     if (!stackFrames) {
       return;
@@ -83,12 +143,14 @@ const { getValueAsync: getClickEventListenerLocationAsync } = createGenericCache
 
     const state = getState();
 
-    // Introspect the click event's target DOM node, and find the nearest
-    // React `onClick` event handler if any exists.
+    const evaluatedEventMapper = createReactEventMapper(replayEventType);
+
+    // Introspect the event's target DOM node, and find the nearest
+    // React event handler if any exists.
     const res = await ThreadFront.evaluateNew({
       replayClient,
       pauseId,
-      text: FIND_MOUSE_EVENT_TARGET_AND_REACT_CLICK_HANDLER,
+      text: evaluatedEventMapper,
       frameId,
       pure: false,
     });
@@ -99,16 +161,16 @@ const { getValueAsync: getClickEventListenerLocationAsync } = createGenericCache
     if (res.returned?.object) {
       const preview = await getObjectWithPreviewHelper(replayClient, pauseId, res.returned.object);
 
-      // The evaluation may have found an `onClick` function somewhere.
-      const onClickProp = preview?.preview?.properties?.find(p => p.name === "onClick");
+      // The evaluation may have found a React prop function somewhere.
+      const handlerProp = preview?.preview?.properties?.find(p => p.name === "handlerProp");
 
-      if (onClickProp) {
-        // If it did find a React `onClick` handler, get its
+      if (handlerProp) {
+        // If it did find a React prop function, get its
         // preview and format it so we know the preferred location.
         const onClickPreview = (await getObjectWithPreviewHelper(
           replayClient,
           pauseId,
-          onClickProp.object!
+          handlerProp.object!
         )) as FunctionWithPreview;
 
         const formattedEventListener = await formatEventListener(
@@ -129,8 +191,8 @@ const { getValueAsync: getClickEventListenerLocationAsync } = createGenericCache
       sourceLocation = getPreferredLocation(state.sources, topFrame.location);
       const sourceDetails = sourcesById[sourceLocation.sourceId];
 
-      if (sourceDetails?.url?.includes("react-dom")) {
-        // Intentionally _don't_ jump to React's internals
+      if (shouldIgnoreEventFromSource(sourceDetails)) {
+        // Intentionally _don't_ jump to into specific ignorable libraries, like React
         sourceLocation = undefined;
       }
     }
@@ -163,84 +225,116 @@ export const getEventLabel = (event: ReplayEvent) => {
   return label;
 };
 
-const FIND_MOUSE_EVENT_TARGET_AND_REACT_CLICK_HANDLER = `
-  // Outer body runs in scope of the "current" click handler.
-  // Grab the click handler's arguments.
-  const args = [...arguments];
-  
-  (function findEventTargetAndClickHandler() {
-    // One of the args should be a mouse event
-    const foundMouseEvent  = args.find(a => typeof a === "object" && a instanceof MouseEvent);
+function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
+  const reactEventPropNames = REACT_EVENT_PROPS[eventType];
+  const eventClassName = EVENT_CLASS_FOR_EVENT_TYPE[eventType];
 
-    if (foundMouseEvent) {
-      // We _could_ probably just return the onClick function or undefined here
-      const res = {
-        target: event.target,
-      }
+  const evaluatedEventMapper = `
+    // Outer body runs in scope of the "current" event handler.
+    // Grab the event handler's arguments.
+    const args = [...arguments];
+    
+    (function findEventTargetAndHandler() {
+      // One of the args should be a browser event
+      const matchingEvent  = args.find(a => typeof a === "object" && a instanceof ${eventClassName});
 
-      // Search the event target node and all of its ancestors
-      // for React internal props data, and specifically look
-      // for the nearest node with an onClick prop if any.
-      let currentNode = event.target;
-      while (currentNode) {
-        const keys = Object.keys(currentNode)
-        const reactPropsKey = keys.find(key => {
-          return (
-            key.startsWith("${REACT_16_EVENT_LISTENER_PROP_KEY}") || 
-            key.startsWith("${REACT_17_18_EVENT_LISTENER_PROP_KEY}")
-          )
-        });
-
-        if (reactPropsKey) {
-          const props = currentNode[reactPropsKey];
-          if (props.onClick) {
-            res.onClick = props.onClick;
-            res.handlerNode = currentNode;
-            break;
-          }
+      if (matchingEvent) {
+        // We _could_ probably just return the prop function or undefined here
+        const res = {
+          target: event.target,
         }
-        currentNode = currentNode.parentNode;
+
+        // Search the event target node and all of its ancestors
+        // for React internal props data, and specifically look
+        // for the nearest node with a relevant React event handler prop if any.
+        let currentNode = event.target;
+        while (currentNode) {
+          const keys = Object.keys(currentNode)
+          const reactPropsKey = keys.find(key => {
+            return (
+              key.startsWith("${REACT_16_EVENT_LISTENER_PROP_KEY}") || 
+              key.startsWith("${REACT_17_18_EVENT_LISTENER_PROP_KEY}")
+            )
+          });
+
+          if (reactPropsKey) {
+            const props = currentNode[reactPropsKey] || {};
+            const possibleReactPropNames = ${JSON.stringify(reactEventPropNames)}
+
+            
+            // Depending on the type of event, there could be different
+            // React event handler prop names in use.
+            // For example, an input is likely to have "onChange",
+            // whereas some other element might have "onKeyPress".
+            let handler = undefined;            
+            for (let possibleReactProp of possibleReactPropNames) {
+              if (possibleReactProp in props) {
+                handler = props[possibleReactProp];
+              }
+            } 
+
+            if (handler) {
+              res.handlerProp = handler;
+              res.handlerNode = currentNode;
+              break;
+            }
+          }
+          currentNode = currentNode.parentNode;
+        }
+        
+        return res;
       }
-      
-      return res;
-    }
-  })()
-`;
+    })()
+  `;
+
+  return evaluatedEventMapper;
+}
 
 /*
-Jump to the function location that ran for a given info sidebar "Click" event list item.
+Jump to the function location that ran for a given info sidebar event list item,
+such as "Click" or "Key Press: L"
 
 This requires stringing together a series of assumptions and special cases:
 
-- The info sidebar "Click" events come from `Session.findMouseEvents`.
+- The info sidebar "Click" events come from `Session.findMouseEvents`, and keyboard events
+  from `Session.findKeyboardEvents`
   These events are recorded in our browser forks _before_ any actual JS code runs.
-- However, we can assume that a _real_ `"click"` event occurs shortly thereafter.
-- We can find that "click" event based on a timeboxed search, with the initial event time
+- However, we can assume that a _real_ "user interaction event" such as 
+  `"click"` or `"keypress"` event occurs shortly thereafter.
+- We can find that event based on a timeboxed search, with the initial sidebar event time
   as the starting point.
-- We can use the "click" event's stack frame to know the location of the JS event handler
+- We can use the interaction event's stack frame to know the location of the JS event handler
   that started running in response to the event. _However_, React attaches noop handlers,
   and implements its own event listener lookups at the top level (delegation).
 - Fortunately, React 16/17/18 add a secret expando property to DOM nodes, containing 
   the actual props that the user rendered for that DOM node, such as `onClick`.
-- All "click" events will have a `MouseEvent` as one of their arguments
-- Once we find the `MouseEvent`, we can look at `event.target` to find the clicked node
+- All interaction events will have a JS event object such as `MouseEvent`or `InputEvent`
+   as one of their arguments
+- Once we find the event object, we can look at `event.target` to find the clicked node
 - But, the _target_ may not have had the handler due to delegation - the user-provided
-  React `onClick` prop may have been on an ancestor DOM node instead.
+  React handler prop may have been on an ancestor DOM node instead.
 - So, we can walk up the parent node chain and find the first node that has a React
-  `onClick` prop attached to it, if any, and return that
+  handler prop with a relevant name attached to it, if any, and return that
 - In order to optimize the API calls and network traffic, that parent node traversal
-  is done via a single JS evaluation, which returns `{target, onClick?}`.
-- If we found a React `onClick` in the chain, jump to that location. Otherwise,
+  is done via a single JS evaluation, which returns `{target, handlerProp?}`.
+- If we found a React event handler prop in the chain, jump to that location. Otherwise,
   jump to the location of the plain JS event handler in the stack frame.
 
 We _could_ do more analysis and find the nearest time where the first breakable location
 inside that function is running, then seek to that point in time, but skipping for now.
 */
 function jumpToClickEventFunctionLocation(
-  event: ReplayMouseEvent,
+  event: ReplayMouseEvent | ReplayKeyboardEvent,
   onSeek: (point: ExecutionPoint, time: number) => void
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
+    const viewMode = getViewMode(getState());
+
+    if (viewMode === "non-dev") {
+      // Only try jumping to the location if "DevTools" mode is active
+      return;
+    }
+
     const { point: executionPoint, time } = event;
     try {
       // Actual browser click events get recorded a fraction later then the
@@ -262,9 +356,11 @@ function jumpToClickEventFunctionLocation(
       // The sidebar event time/point is a fraction earlier than any
       // actual JS that executed in response. Find the next click event
       // within a small time window
-      const nextClickEvent = await getNextClickEventAsync(
+      const nextClickEvent = await getNextInteractionEventAsync(
         replayClient,
+        ThreadFront,
         executionPoint,
+        event.kind as SEARCHABLE_EVENT_TYPES,
         arbitraryEndTime
       );
 
@@ -281,11 +377,12 @@ function jumpToClickEventFunctionLocation(
       // If we did have a click event, timewarp to that click's point
       onSeek(nextClickEvent.point, nextClickEvent.time);
 
-      const sourceLocation = await getClickEventListenerLocationAsync(
+      const sourceLocation = await getEventListenerLocationAsync(
         ThreadFront,
         replayClient,
         getState,
-        pauseId
+        pauseId,
+        event.kind as SEARCHABLE_EVENT_TYPES
       );
 
       if (sourceLocation) {
@@ -311,12 +408,12 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
   const onKeyDown = (e: KeyboardEvent) => e.key === " " && e.preventDefault();
 
   const onClick = () => {
-    if (event.kind === "mousedown") {
-      // Seek to the sidebar event timestamp right away.
-      // That way we're at least _close_ to the right time
-      onSeek(point, time);
+    // Seek to the sidebar event timestamp right away.
+    // That way we're at least _close_ to the right time
+    onSeek(point, time);
+
+    if (event.kind === "mousedown" || event.kind === "keypress") {
       dispatch(jumpToClickEventFunctionLocation(event, onSeek));
-    } else {
     }
   };
 
