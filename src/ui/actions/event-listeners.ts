@@ -58,20 +58,22 @@ export type NodeWithPreview = DeepRequired<
   ["preview", "node"] | ["preview", "getterValues"]
 >;
 
-const isFunctionPreview = (obj?: ObjectPreview): obj is FunctionPreview => {
+export const isFunctionPreview = (obj?: ObjectPreview): obj is FunctionPreview => {
   return (
     !!obj && "functionName" in obj && "functionLocation" in obj && "functionParameterNames" in obj
   );
 };
 
-const isFunctionWithPreview = (obj: ProtocolObject): obj is FunctionWithPreview => {
+export const isFunctionWithPreview = (obj: ProtocolObject): obj is FunctionWithPreview => {
   return obj.className === "Function" && isFunctionPreview(obj.preview);
 };
 
-const REACT_16_EVENT_LISTENER_PROP_KEY = "__reactEventHandlers$";
-const REACT_17_18_EVENT_LISTENER_PROP_KEY = "__reactProps$";
+export const REACT_16_EVENT_LISTENER_PROP_KEY = "__reactEventHandlers$";
+export const REACT_17_18_EVENT_LISTENER_PROP_KEY = "__reactProps$";
 
-const formatEventListener = async (
+export type FormattedEventListener = Awaited<ReturnType<typeof formatEventListener>>;
+
+export const formatEventListener = async (
   replayClient: ReplayClientInterface,
   listener: { type: string; capture: boolean },
   fnPreview: FunctionWithPreview,
@@ -107,11 +109,16 @@ const formatEventListener = async (
 
 const eventListenersCacheByPause = new Map<string, Map<string, EventListenerWithFunctionInfo[]>>();
 
+// Also see the related implementation specific to the info sidebar
+// "Click" event list items over in `src/ui/components/Events/Event.tsx`
 export function getNodeEventListeners(
-  nodeId: string
+  nodeId: string,
+  pauseId?: string
 ): UIThunkAction<Promise<EventListenerWithFunctionInfo[]>> {
   return async (dispatch, getState, { ThreadFront, protocolClient, replayClient, objectCache }) => {
-    const pauseId = await ThreadFront.getCurrentPauseId(replayClient);
+    if (!pauseId) {
+      pauseId = await ThreadFront.getCurrentPauseId(replayClient);
+    }
 
     if (!eventListenersCacheByPause.has(pauseId)) {
       eventListenersCacheByPause.set(pauseId, new Map());
@@ -142,7 +149,7 @@ export function getNodeEventListeners(
       listeners.map(listener => {
         // TODO These entries exist in current testing, but what's fetching them earlier?
         const listenerHandler = objectCache.getObjectThrows(
-          pauseId,
+          pauseId!,
           listener.handler
         ) as FunctionWithPreview;
 
@@ -196,7 +203,7 @@ export function getNodeEventListeners(
             name: prop.name,
             value: (await objectCache.getObjectWithPreviewHelper(
               replayClient,
-              pauseId,
+              pauseId!,
               prop.object!
             )) as FunctionWithPreview,
           }))

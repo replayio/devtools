@@ -166,7 +166,7 @@ export default function Toolbar({
           <ToolbarButton
             icon="cypress"
             label="Cypress Panel"
-            name="events"
+            name="cypress"
             sidePanelRef={sidePanelRef}
           />
         ) : (

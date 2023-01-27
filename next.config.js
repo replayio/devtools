@@ -162,6 +162,14 @@ const baseNextConfig = {
       fs: false,
     };
 
+    const reLibrariesWithSourcemaps = /node_modules.+(immer|@reduxjs|react-window).+\.js$/;
+
+    config.module.rules.push({
+      test: reLibrariesWithSourcemaps,
+      enforce: "pre",
+      use: ["source-map-loader"],
+    });
+
     // JS files that need to be imported as strings,
     // such as the React DevTools backend to be injected into pauses
     config.module.rules.push({

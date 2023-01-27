@@ -89,6 +89,19 @@ export async function executeAndVerifyTerminalExpression(
   }
 }
 
+export function getConsoleTerminalContentTypeAhead(page: Page): Locator {
+  return page.locator('[data-test-id="ConsoleTerminalInput-CodeTypeAhead"]');
+}
+
+export async function verifyConsoleTerminalTypeAheadSuggestions(
+  page: Page,
+  expectedPartialList: string[]
+) {
+  const actualTextContent = (await getConsoleTerminalContentTypeAhead(page).textContent()) || "";
+  const expectedTextContent = expectedPartialList.join("");
+  expect(actualTextContent.startsWith(expectedTextContent)).toBe(true);
+}
+
 export async function expandConsoleMessage(message: Locator) {
   const expander = message.locator('[data-test-name="Expandable"]');
   const state = await expander.getAttribute("data-test-state");

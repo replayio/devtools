@@ -18,34 +18,34 @@ export function setupRules(store: UIStore, startAppListening: AppStartListening)
   startAppListening({
     actionCreator: nodeSelected,
     effect: async (action, listenerApi) => {
-      const { extra, getState, dispatch, condition } = listenerApi;
+      const { extra, getState, dispatch, condition, cancelActiveListeners, pause } = listenerApi;
       const { ThreadFront, protocolClient, replayClient } = extra;
       const state = getState();
+
+      // If any other instance of the "fetch CSS rules data" listener
+      // is running, cancel it. Only fetch data for this selected node.
+      cancelActiveListeners();
 
       const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
       const selectedNode = getSelectedDomNodeId(state);
 
-      if (!isInspectorSelected(state) || !selectedNode) {
-        console.log("Bailing out of rule fetching", selectedNode);
+      if (!selectedNode) {
         dispatch(rulesUpdated([]));
         return;
       }
 
-      let nodeInfo = getMarkupNodeById(state, selectedNode);
+      // Unlike the "box model" listener, we need to wait for the markup
+      // data to be fetched, because we can't get rules for some types of nodes.
 
-      if (!nodeInfo) {
-        await condition((action, currentState) => {
-          return !!getMarkupNodeById(currentState, selectedNode);
-        }, 3000);
-        nodeInfo = getMarkupNodeById(getState(), selectedNode);
-      }
+      await condition((action, currentState) => {
+        return !!getMarkupNodeById(currentState, selectedNode);
+      });
 
-      if (ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
-        return;
-      }
+      const nodeInfo = getMarkupNodeById(getState(), selectedNode);
 
-      if (!nodeInfo?.isConnected || !nodeInfo?.isElement) {
-        console.log("No node info for rules", nodeInfo);
+      const currentPauseId = await ThreadFront.getCurrentPauseId(replayClient);
+
+      if (currentPauseId !== originalPauseId || !nodeInfo?.isConnected || !nodeInfo?.isElement) {
         dispatch(rulesUpdated([]));
         return;
       }
@@ -58,12 +58,7 @@ export function setupRules(store: UIStore, startAppListening: AppStartListening)
         protocolClient
       );
 
-      // The legacy rule style code used a timeout to keep the rules
-      // panel update from blocking the UI
-      // This is probably not necessary right now, but \o/
-      await new Promise(resolve => setTimeout(resolve, 0));
-
-      await elementStyle.populate();
+      await pause(elementStyle.populate());
       dispatch(rulesUpdated(elementStyle.rules));
       dispatch(setComputedProperties(elementStyle));
     },
