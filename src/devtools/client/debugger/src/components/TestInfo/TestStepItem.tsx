@@ -21,6 +21,7 @@ import { TestCaseContext } from "./TestCase";
 import { TestInfoContext } from "./TestInfo";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { TestStepRow } from "./TestStepRow";
+import styles from "./TestStepItem.module.css";
 
 // relies on the scrolling parent to be the nearest positioning context
 function scrollIntoView(node: HTMLDivElement) {
@@ -300,8 +301,9 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
         </div>
         <div className="opacity-70 ">{index + 1}</div>
         <div className={`flex-grow font-medium ${state === "paused" ? "font-bold" : ""}`}>
-          {step.parentId ? "- " : ""}
-          {step.name} <span className="opacity-70">{argString}</span>
+          {step.parentId ? "- " : ""}{" "}
+          <span className={`${styles.step} ${styles[step.name]}`}>{step.name}</span>
+          <span className="opacity-70">{argString}</span>
         </div>
       </button>
       {step.name === "get" && matchingElementCount > 1 ? (

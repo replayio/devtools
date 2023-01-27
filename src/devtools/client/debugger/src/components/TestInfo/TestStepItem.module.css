@@ -1,0 +1,22 @@
+.BorderPending {
+  border-left: transparent;
+}
+
+.BorderActive {
+  border-left: var(--primary-accent);
+}
+
+.BorderError {
+  border-left: red;
+}
+
+.step {
+  border-radius: 4px;
+  padding: 1px 3px;
+  margin-right: 3px;
+}
+
+.BorderError .assert {
+  background-color: red;
+  color: #fff;
+}
