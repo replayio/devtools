@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import sortedLastIndex from "lodash/sortedLastIndex";
+import React from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
@@ -32,30 +33,26 @@ function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
     events.map(e => e.time),
     currentTime
   );
-  if (events.length > 0) {
-    return (
-      <div className="bg-bodyBgcolor py-1.5 text-xs">
-        {events.map((e, i) => {
-          return (
-            <div key={e.point}>
-              <CurrentTimeLine isActive={currentEventIndex === i} />
-              <div className="px-1.5">
-                <Event
-                  onSeek={onSeek}
-                  event={e}
-                  currentTime={currentTime}
-                  executionPoint={executionPoint}
-                />
-              </div>
+  return (
+    <div className="bg-bodyBgcolor py-1.5 text-xs">
+      {events.map((e, i) => {
+        return (
+          <div key={e.point}>
+            <CurrentTimeLine isActive={currentEventIndex === i} />
+            <div className="px-1.5">
+              <Event
+                onSeek={onSeek}
+                event={e}
+                currentTime={currentTime}
+                executionPoint={executionPoint}
+              />
             </div>
-          );
-        })}
-        <CurrentTimeLine isActive={currentEventIndex === events.length && !!events.length} />
-      </div>
-    );
-  } else {
-    return null;
-  }
+          </div>
+        );
+      })}
+      <CurrentTimeLine isActive={currentEventIndex === events.length && !!events.length} />
+    </div>
+  );
 }
 
 const connector = connect(
