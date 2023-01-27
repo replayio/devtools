@@ -1,283 +1,356 @@
-import React, { useContext, useMemo } from "react";
+import { Object as ProtocolObject } from "@replayio/protocol";
+import classNames from "classnames";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 
-import {
-  RequestSummary,
-  partialRequestsToCompleteSummaries,
-} from "ui/components/NetworkMonitor/utils";
-import Icon from "ui/components/shared/Icon";
-import { getEvents, getRequests } from "ui/reducers/network";
-import {
-  getReporterAnnotationsForTitle,
-  getReporterAnnotationsForTitleEnd,
-  getReporterAnnotationsForTitleNavigation,
-  getReporterAnnotationsForTitleStart,
-} from "ui/reducers/reporter";
-import { getCurrentTime } from "ui/reducers/timeline";
-import { useAppSelector } from "ui/setup/hooks";
-import { AnnotatedTestStep, CypressAnnotationMessage, TestItem, TestStep } from "ui/types";
+import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
+import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
+import { evaluateAsync } from "replay-next/src/suspense/PauseCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { getStepRanges, useStepState } from "ui/hooks/useStepState";
+import { useTestStepActions } from "ui/hooks/useTestStepActions";
+import { getViewMode } from "ui/reducers/layout";
+import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
+import { getCurrentTime, isPlaying as isPlayingSelector } from "ui/reducers/timeline";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { AnnotatedTestStep } from "ui/types";
 
-import { NetworkEvent } from "./NetworkEvent";
+import { ProgressBar } from "./ProgressBar";
 import { TestCaseContext } from "./TestCase";
-import { TestStepItem } from "./TestStepItem";
+import { TestInfoContext } from "./TestInfo";
+import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { TestStepRow } from "./TestStepRow";
 
-type StepEvent = {
-  time: number;
-  type: "step";
-  event: AnnotatedTestStep;
-};
-type NetworkEvent = {
-  time: number;
-  type: "network";
-  event: RequestSummary;
-};
-type NavigationEvent = {
-  time: number;
-  type: "navigation";
-  event: CypressAnnotationMessage;
-};
+// relies on the scrolling parent to be the nearest positioning context
+function scrollIntoView(node: HTMLDivElement) {
+  if (!node.offsetParent) {
+    return;
+  }
 
-type CompositeTestEvent = StepEvent | NetworkEvent | NavigationEvent;
+  const parentBounds = node.offsetParent.getBoundingClientRect();
+  const nodeBounds = node.getBoundingClientRect();
 
-function useGetTestSections(
-  startTime: number,
-  steps?: TestStep[]
-): {
-  beforeEach: CompositeTestEvent[];
-  testBody: CompositeTestEvent[];
-  afterEach: CompositeTestEvent[];
-} {
-  const navigationEvents = useAppSelector(getReporterAnnotationsForTitleNavigation);
-  const annotationsEnqueue = useAppSelector(getReporterAnnotationsForTitle);
-  const annotationsEnd = useAppSelector(getReporterAnnotationsForTitleEnd);
-  const annotationsStart = useAppSelector(getReporterAnnotationsForTitleStart);
-  const requests = useAppSelector(getRequests);
-  const events = useAppSelector(getEvents);
-
-  return useMemo(() => {
-    const simplifiedSteps = steps?.reduce<TestStep[]>((acc, s) => {
-      const previous = acc[acc.length - 1];
-      if (s.name === "then") {
-        return acc;
-      } else if (previous && s.name === "as" && typeof s.args?.[0] === "string") {
-        acc[acc.length - 1] = {
-          ...previous,
-          alias: s.args[0],
-        };
-      } else {
-        acc.push(s);
-      }
-
-      return acc;
-    }, []);
-
-    const stepsByTime =
-      simplifiedSteps?.map<StepEvent>((s, i) => {
-        const annotations = {
-          end: annotationsEnd.find(a => a.message.id === s.id),
-          enqueue: annotationsEnqueue.find(a => a.message.id === s.id),
-          start: annotationsStart.find(a => a.message.id === s.id),
-        };
-
-        let duration = s.duration || 1;
-        let absoluteStartTime = annotations.start?.time ?? startTime + (s.relativeStartTime || 0);
-        let absoluteEndTime = annotations.end?.time ?? absoluteStartTime + duration;
-
-        if (s.name === "assert") {
-          // start failed asserts at their end time so they line up with the end
-          // of the failed command but successful asserts with their start time
-          if (s.error) {
-            absoluteStartTime = absoluteEndTime - 1;
-          } else {
-            absoluteEndTime = absoluteStartTime + 1;
-          }
-          duration = 1;
-        }
-
-        return {
-          time: absoluteStartTime,
-          type: "step",
-          event: {
-            ...s,
-            relativeStartTime: s.relativeStartTime,
-            absoluteStartTime,
-            absoluteEndTime: Math.max(0, absoluteEndTime - 1),
-            duration,
-            index: i,
-            annotations,
-          },
-        };
-      }) || [];
-
-    const times = stepsByTime.reduce(
-      (acc, s) => ({
-        min: Math.min(acc.min, s.event.absoluteStartTime),
-        max: Math.max(acc.max, s.event.absoluteEndTime),
-      }),
-      { min: Infinity, max: 0 }
-    );
-
-    const isDuringSteps = (time: number) => {
-      return time >= times.min && time < times.max;
-    };
-
-    const networkDataByTime = partialRequestsToCompleteSummaries(requests, events, new Set())
-      .filter(n => {
-        return (n.cause === "xhr" || n.cause === "fetch") && n.end != null && isDuringSteps(n.end);
-      })
-      .map<NetworkEvent>(n => ({ time: n.end!, type: "network", event: n }));
-
-    const navigationEventsByTime = navigationEvents
-      .filter(e => isDuringSteps(e.time))
-      .map<NavigationEvent>(n => ({ time: n.time, type: "navigation", event: n.message }));
-
-    const allEvents = [...networkDataByTime, ...stepsByTime, ...navigationEventsByTime].sort(
-      (a, b) => {
-        if (a.type === "step" && b.type === "step" && a.event.hook !== b.event.hook) {
-          // sort steps by hook first and then by time if they're the same
-          if (a.event.hook === "beforeEach" && b.event.hook !== "beforeEach") {
-            return -1;
-          } else if (a.event.hook === "afterEach" && b.event.hook !== "afterEach") {
-            return 1;
-          }
-        }
-
-        return a.time - b.time;
-      }
-    );
-
-    const beforeEach: CompositeTestEvent[] = [];
-    const testBody: CompositeTestEvent[] = [];
-    const afterEach: CompositeTestEvent[] = [];
-
-    let currentStack: CompositeTestEvent[] = beforeEach;
-    let nonStepStack: CompositeTestEvent[] = [];
-
-    for (let e of allEvents) {
-      if (e.type === "step") {
-        let stackChanged = false;
-        if (e.event.hook === "beforeEach") {
-          stackChanged = currentStack !== beforeEach;
-          currentStack = beforeEach;
-        } else if (e.event.hook === "afterEach") {
-          stackChanged = currentStack !== afterEach;
-          currentStack = afterEach;
-        } else if (!e.event.hook) {
-          stackChanged = currentStack !== testBody;
-          currentStack = testBody;
-        }
-
-        if (!stackChanged) {
-          currentStack.push(...nonStepStack.splice(0, nonStepStack.length));
-        }
-
-        currentStack.push(e);
-        currentStack.push(...nonStepStack.splice(0, nonStepStack.length));
-      } else {
-        if (currentStack.length !== 0) {
-          nonStepStack.push(e);
-        }
-      }
-    }
-
-    if (nonStepStack.length) {
-      if (afterEach.length) {
-        afterEach.push(...nonStepStack);
-      } else if (testBody.length) {
-        testBody.push(...nonStepStack);
-      } else if (beforeEach.length) {
-        beforeEach.push(...nonStepStack);
-      }
-    }
-
-    return { beforeEach, testBody, afterEach };
-  }, [
-    steps,
-    annotationsEnd,
-    annotationsEnqueue,
-    requests,
-    events,
-    startTime,
-    navigationEvents,
-    annotationsStart,
-  ]);
+  if (nodeBounds.top < parentBounds.top || nodeBounds.bottom > parentBounds.bottom) {
+    node.scrollIntoView();
+  }
 }
 
-export function TestSteps({ test }: { test: TestItem }) {
-  const { startTime: testCaseStartTime } = useContext(TestCaseContext);
-  const { beforeEach, testBody, afterEach } = useGetTestSections(testCaseStartTime, test.steps);
-
-  return (
-    <div className="flex flex-col rounded-lg px-2">
-      <TestSection events={beforeEach} header="Before Each" />
-      <TestSection
-        events={testBody}
-        header={beforeEach.length + afterEach.length > 0 ? "Test Body" : undefined}
-      />
-      <TestSection events={afterEach} header="After Each" />
-      {test.error ? (
-        <TestStepRow error>
-          <div>
-            <div className="flex flex-row items-center space-x-1 p-2">
-              <Icon filename="warning" size="small" className="bg-testsuitesErrorColor" />
-              <div className="font-bold">Error</div>
-            </div>
-            <div className="wrap space-y-1 overflow-hidden p-2 font-mono">{test.error.message}</div>
-          </div>
-        </TestStepRow>
-      ) : null}
-    </div>
-  );
+export interface TestStepItemProps {
+  step: AnnotatedTestStep;
+  argString?: string;
+  index: number;
+  id: string | null;
 }
 
-function NewUrlRow({ time, message }: { time: number; message: CypressAnnotationMessage }) {
+export function TestStepItem({ step, argString, index, id }: TestStepItemProps) {
+  const hasScrolled = useRef(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const [localPauseData, setLocalPauseData] = useState<{
+    startPauseFailed?: boolean;
+    startPauseId?: string;
+    endPauseFailed?: boolean;
+    endPauseId?: string;
+    consoleProps?: ProtocolObject;
+  }>();
+  const { loading, setLoading, setConsoleProps, setPauseId } = useContext(TestInfoContext);
+  const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
+    pauseId: string;
+    nodeIds: string[];
+  }>();
+  const viewMode = useAppSelector(getViewMode);
+  const isPlaying = useAppSelector(isPlayingSelector);
   const currentTime = useAppSelector(getCurrentTime);
+  const selectedStep = useAppSelector(getSelectedStep);
+  const dispatch = useAppDispatch();
+  const client = useContext(ReplayClientContext);
+  const { point: pointEnd, message: messageEnd } = step.annotations.end || {};
+  const { point: pointStart } = step.annotations.start || {};
+  const state = useStepState(step);
+  const actions = useTestStepActions(step);
+
+  // compare points if possible and
+  useEffect(() => {
+    setLoading(true);
+
+    (async () => {
+      try {
+        let consoleProps: ProtocolObject | undefined;
+
+        const endPauseResult = pointEnd ? await client.createPause(pointEnd) : undefined;
+        const frames = endPauseResult?.data.frames;
+
+        if (endPauseResult && frames) {
+          const callerFrame = frames[1];
+
+          if (messageEnd?.commandVariable) {
+            const cmdResult = await evaluateAsync(
+              client,
+              endPauseResult.pauseId,
+              callerFrame.frameId,
+              `${messageEnd.commandVariable}.get("subject")`
+            );
+
+            const cmdObjectId = cmdResult.returned?.object;
+
+            if (cmdObjectId) {
+              const cmdObject = await getObjectWithPreviewHelper(
+                client,
+                endPauseResult.pauseId,
+                cmdObjectId,
+                true
+              );
+
+              const props = cmdObject?.preview?.properties;
+              const length: number = props?.find(o => o.name === "length")?.value || 0;
+              const nodeIds = [];
+              for (let i = 0; i < length; i++) {
+                const v = props?.find(p => p.name === String(i));
+                if (v?.object) {
+                  nodeIds.push(v.object);
+                }
+              }
+
+              setSubjectNodePauseData({ pauseId: endPauseResult.pauseId, nodeIds });
+            }
+          }
+
+          if (messageEnd?.logVariable) {
+            const logResult = await evaluateAsync(
+              client,
+              endPauseResult.pauseId,
+              callerFrame.frameId,
+              messageEnd.logVariable
+            );
+
+            if (logResult.returned?.object) {
+              const logObject = await getObjectWithPreviewHelper(
+                client,
+                endPauseResult.pauseId,
+                logResult.returned.object
+              );
+              const consolePropsProperty = logObject.preview?.properties?.find(
+                p => p.name === "consoleProps"
+              );
+
+              if (consolePropsProperty?.object) {
+                consoleProps = await getObjectWithPreviewHelper(
+                  client,
+                  endPauseResult.pauseId,
+                  consolePropsProperty.object,
+                  true
+                );
+              }
+            }
+          }
+
+          const endPauseId = endPauseResult.pauseId;
+          setLocalPauseData(v => ({
+            ...v,
+            endPauseFailed: false,
+            endPauseId,
+            consoleProps,
+          }));
+        }
+      } catch {
+        setLocalPauseData(v => ({
+          ...v,
+          endPauseFailed: true,
+        }));
+      }
+    })();
+
+    (async () => {
+      try {
+        const startPauseResult = pointStart ? await client.createPause(pointStart) : undefined;
+
+        if (startPauseResult) {
+          const startPauseId = startPauseResult.pauseId;
+          setLocalPauseData(v => ({
+            ...v,
+            loading: false,
+            startPauseId,
+          }));
+        }
+      } catch {
+        setLocalPauseData(v => ({
+          ...v,
+          startPauseFailed: true,
+        }));
+      }
+    })();
+  }, [client, messageEnd, pointEnd, pointStart, setLoading]);
+
+  useEffect(() => {
+    const { endPauseFailed, endPauseId } = localPauseData || {};
+    // Loading is used by step details which only relies on the end pause
+    // completing
+    if (loading && (endPauseFailed || endPauseId)) {
+      setLoading(false);
+    }
+  }, [localPauseData, loading, setLoading]);
+
+  const { endPauseId, consoleProps } = localPauseData || {};
+  const onClick = useCallback(() => {
+    const { timeRange, pointRange } = getStepRanges(step);
+    if (id && timeRange) {
+      if (pointRange) {
+        if (endPauseId && consoleProps) {
+          setConsoleProps(consoleProps);
+          setPauseId(endPauseId);
+        }
+        dispatch(seek(pointRange[1], timeRange[1], false, endPauseId));
+      } else {
+        dispatch(seekToTime(timeRange[1], false));
+      }
+
+      if (viewMode === "dev") {
+        actions.showStepSource();
+      }
+
+      dispatch(setSelectedStep(step));
+    }
+  }, [
+    actions,
+    viewMode,
+    step,
+    endPauseId,
+    consoleProps,
+    dispatch,
+    setConsoleProps,
+    id,
+    setPauseId,
+  ]);
+
+  const onMouseEnter = () => {
+    if (state === "paused") {
+      return;
+    }
+
+    dispatch(setTimelineToTime(step.absoluteEndTime));
+    if (localPauseData?.endPauseId) {
+      dispatch(
+        setTimelineToPauseTime(
+          step.absoluteEndTime,
+          localPauseData.endPauseId,
+          step.annotations.start?.point
+        )
+      );
+    }
+    if (subjectNodePauseData) {
+      dispatch(highlightNodes(subjectNodePauseData.nodeIds, subjectNodePauseData.pauseId));
+    }
+  };
+  const onMouseLeave = () => {
+    if (state === "paused") {
+      return;
+    }
+
+    dispatch(setTimelineToTime(null));
+    dispatch(unhighlightNode());
+  };
+
+  useEffect(() => {
+    if (
+      !isPlaying &&
+      ref.current &&
+      currentTime >= step.absoluteStartTime &&
+      currentTime <= step.absoluteEndTime
+    ) {
+      scrollIntoView(ref.current);
+    }
+  }, [isPlaying, ref, currentTime, step]);
+
+  useEffect(() => {
+    if (step.error && ref.current && !hasScrolled.current) {
+      hasScrolled.current = true;
+      scrollIntoView(ref.current);
+      onClick();
+    }
+  }, [step, ref, onClick]);
+
+  // This math is bananas don't look here until this is cleaned up :)
+  const bump = state !== "pending" ? 10 : 0;
+  const actualProgress = bump + 90 * ((currentTime - step.absoluteStartTime) / step.duration);
+  const progress = actualProgress > 100 ? 100 : actualProgress;
+  const displayedProgress =
+    (step.duration === 1 && state === "paused") || progress == 100 ? 0 : progress;
+  const isSelected = selectedStep?.id === id;
+  const matchingElementCount = consoleProps?.preview?.properties?.find(
+    p => p.name === "Elements"
+  )?.value;
 
   return (
-    <TestStepRow pending={time > currentTime} key={(message.url || "url") + time}>
-      <div className="truncate italic opacity-70" title={message.url}>
-        new url {message.url}
-      </div>
+    <TestStepRow
+      active={state === "paused"}
+      pending={state === "pending"}
+      error={!!step.error}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      ref={ref}
+      data-test-id="TestSuites-TestCase-TestStepRow"
+    >
+      <button
+        onClick={onClick}
+        className="flex w-0 flex-grow items-start space-x-2 text-start"
+        title={`Step ${index + 1}: ${step.name} ${argString || ""}`}
+      >
+        <div title={"" + displayedProgress} className="flex h-4 items-center">
+          <ProgressBar progress={displayedProgress} error={!!step.error} />
+        </div>
+        <div className="opacity-70 ">{index + 1}</div>
+        <div className={`flex-grow font-medium ${state === "paused" ? "font-bold" : ""}`}>
+          {step.parentId ? "- " : ""}
+          {step.name} <span className="opacity-70">{argString}</span>
+        </div>
+      </button>
+      {step.name === "get" && matchingElementCount > 1 ? (
+        <span
+          className={classNames(
+            "-my-1 flex-shrink rounded p-1 text-xs",
+            isSelected ? "bg-gray-300" : "bg-gray-200"
+          )}
+        >
+          {matchingElementCount}
+        </span>
+      ) : null}
+      {step.alias ? (
+        <span
+          className={classNames(
+            "-my-1 flex-shrink rounded p-1 text-xs",
+            isSelected ? "bg-gray-300" : "bg-gray-200"
+          )}
+          title={`'${argString}' aliased as '${step.alias}'`}
+        >
+          {step.alias}
+        </span>
+      ) : null}
+      <Actions step={step} isSelected={isSelected} />
     </TestStepRow>
   );
 }
 
-function TestSection({ events, header }: { events: CompositeTestEvent[]; header?: string }) {
-  const firstStep = events.find((e): e is StepEvent => e.type === "step");
-  const firstIndex = firstStep?.event.index || 0;
+function Actions({ step, isSelected }: { step: AnnotatedTestStep; isSelected: boolean }) {
+  const { test } = useContext(TestCaseContext);
+  const { show } = useContext(TestInfoContextMenuContext);
+  const stepActions = useTestStepActions(step);
 
-  if (events.length === 0) {
+  if (!stepActions.canPlayback(test)) {
     return null;
   }
 
+  const onClick = (e: React.MouseEvent) => {
+    show({ x: e.pageX, y: e.pageY }, test, step);
+  };
+
   return (
-    <>
-      {header ? (
-        <div
-          data-test-id="TestSuites-TestCase-SectionHeader"
-          className="pt-6 pb-2  font-semibold uppercase opacity-50 first:pt-0"
-          style={{ fontSize: "10px" }}
-        >
-          {header}
-        </div>
-      ) : null}
-      {events.map(({ event: s, type, time }, i) =>
-        type === "step" ? (
-          <TestStepItem
-            step={s}
-            key={s.id}
-            index={s.index - firstIndex}
-            argString={
-              s.args ? s.args.filter((s): s is string => s && typeof s === "string").join(", ") : ""
-            }
-            id={s.id}
-          />
-        ) : type === "network" ? (
-          <NetworkEvent key={s.id} request={s} />
-        ) : (
-          <NewUrlRow message={s} time={time} key={s.id} />
-        )
-      )}
-    </>
+    <button
+      onClick={onClick}
+      className={`${isSelected ? "" : "invisible"} group-hover/step:visible`}
+    >
+      <div className="flex items-center">
+        <MaterialIcon>more_vert</MaterialIcon>
+      </div>
+    </button>
   );
 }
