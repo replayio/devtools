@@ -1,6 +1,5 @@
 import classNames from "classnames";
 import sortedLastIndex from "lodash/sortedLastIndex";
-import React, { useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
@@ -23,7 +22,6 @@ function CurrentTimeLine({ isActive }: { isActive: boolean }) {
 
 function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
   const { userSettings } = hooks.useGetUserSettings();
-  const [items, setItems] = useState([]);
 
   const onSeek = (point: string, time: number) => {
     trackEvent("events_timeline.select");
