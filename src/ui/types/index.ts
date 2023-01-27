@@ -164,7 +164,7 @@ export type TestMetadata = {
   version: number;
   tests?: TestItem[];
   run?: { id: string; title?: string };
-  runner?: { name: string; version: string };
+  runner?: { name: string; version: string; plugin: string };
   path?: string[];
   file?: string;
 };

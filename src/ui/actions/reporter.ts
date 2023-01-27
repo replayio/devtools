@@ -2,7 +2,7 @@ import { Annotation } from "@replayio/protocol";
 import debounce from "lodash/debounce";
 
 import type { ThreadFront as TF } from "protocol/thread";
-import { addReporterAnnotations } from "ui/reducers/reporter";
+import { addReporterAnnotations, completeReporterAnnotations } from "ui/reducers/reporter";
 
 import { UIStore } from ".";
 
@@ -45,5 +45,7 @@ export async function setupReporter(store: UIStore, ThreadFront: typeof TF) {
   ThreadFront.getAnnotations(annotations => {
     receivedAnnotations.push(...annotations);
     onAnnotationsReceived();
-  }, kind);
+  }, kind).then(r => {
+    store.dispatch(completeReporterAnnotations());
+  });
 }

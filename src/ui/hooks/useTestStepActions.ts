@@ -1,6 +1,5 @@
 import { Frame, Location } from "@replayio/protocol";
 import { useContext, useEffect, useState } from "react";
-import semver from "semver";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getContext } from "devtools/client/debugger/src/selectors";
@@ -10,6 +9,7 @@ import { seek, seekToTime, startPlayback } from "ui/actions/timeline";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AnnotatedTestStep, TestItem } from "ui/types";
+import { gte } from "ui/utils/semver";
 
 import { useGetRecording, useGetRecordingId } from "./recordings";
 import { isStepEnd, isStepStart } from "./useStepState";
@@ -160,7 +160,7 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
 
     if (frames) {
       let location: Location | undefined;
-      if (semver.gte(cypressVersion, "8.0.0")) {
+      if (gte(cypressVersion, "8.0.0")) {
         location = findSourceLocationCypress8Plus(frames, {
           isChaiAssertion,
         });
