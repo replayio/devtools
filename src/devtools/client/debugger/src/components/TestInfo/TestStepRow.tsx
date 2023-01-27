@@ -1,18 +1,25 @@
 import classnames from "classnames";
 import React, { forwardRef } from "react";
 
+import { ProgressBar } from "./ProgressBar";
+
 interface TestStepRowProps {
   error?: boolean;
   active?: boolean;
   pending?: boolean;
+  progress?: number;
+  index?: number;
 }
 
 export function TestStepRowBase({
+  children,
   clientRef,
   className,
   active,
   pending,
   error,
+  index,
+  progress,
   ...rest
 }: TestStepRowProps & React.HTMLProps<HTMLDivElement> & { clientRef?: React.Ref<HTMLDivElement> }) {
   return (
@@ -37,7 +44,13 @@ export function TestStepRowBase({
           "hover:bg-testsuitesStepsBgcolorHover": !pending && !active && !error,
         }
       )}
-    />
+    >
+      <div title={progress == null ? "" : String(progress)} className="flex h-4 w-4 items-center">
+        {progress == null ? null : <ProgressBar progress={progress} error={!!error} />}
+      </div>
+      <div className="w-4 text-center opacity-70">{index}</div>
+      {children}
+    </div>
   );
 }
 

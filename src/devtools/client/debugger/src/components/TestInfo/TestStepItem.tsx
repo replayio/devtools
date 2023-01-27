@@ -272,16 +272,14 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
       onMouseLeave={onMouseLeave}
       ref={ref}
       data-test-id="TestSuites-TestCase-TestStepRow"
+      index={index + 1}
+      progress={displayedProgress}
     >
       <button
         onClick={onClick}
         className="flex w-0 flex-grow items-start space-x-2 text-start"
         title={`Step ${index + 1}: ${step.name} ${argString || ""}`}
       >
-        <div title={"" + displayedProgress} className="flex h-4 items-center">
-          <ProgressBar progress={displayedProgress} error={!!step.error} />
-        </div>
-        <div className="opacity-70 ">{index + 1}</div>
         <div className={`flex-grow truncate font-medium ${state === "paused" ? "font-bold" : ""}`}>
           {step.parentId ? "- " : ""}
           {step.name} <span className="opacity-70">{argString}</span>

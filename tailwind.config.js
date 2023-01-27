@@ -53,6 +53,7 @@ module.exports = {
         testsuitesErrorBgcolor: "var(--testsuites-error-bgcolor)",
         testsuitesErrorBgcolorHover: "var(--testsuites-error-bgcolor-hover)",
         testsuitesErrorColor: "var(--testsuites-error-color)",
+        testsuitesSuccessColor: "var(--testsuites-success-color)",
         testsuitesStepsBgcolor: "var(--testsuites-steps-bgcolor)",
         testsuitesStepsBgcolorHover: "var(--testsuites-steps-bgcolor-hover)",
         themeBorder: "var(--theme-border)",
