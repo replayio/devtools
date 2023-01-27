@@ -28,6 +28,7 @@ import {
 } from "ui/actions/event-listeners";
 import useEventContextMenu from "ui/components/Events/useEventContextMenu";
 import { getLoadedRegions } from "ui/reducers/app";
+import { getViewMode } from "ui/reducers/layout";
 import { getPreferredLocation, getSourceDetailsEntities } from "ui/reducers/sources";
 import { useAppDispatch } from "ui/setup/hooks";
 import { UIState } from "ui/state";
@@ -241,6 +242,12 @@ function jumpToClickEventFunctionLocation(
   onSeek: (point: ExecutionPoint, time: number) => void
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
+    const viewMode = getViewMode(getState());
+    if (viewMode === "non-dev") {
+      // Only try jumping to the location if "DevTools" mode is active
+      return;
+    }
+
     const { point: executionPoint, time } = event;
     try {
       // Actual browser click events get recorded a fraction later then the
