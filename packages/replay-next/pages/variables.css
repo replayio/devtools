@@ -259,18 +259,18 @@
   --comment-card-source-preview-background-color: #081221;
   --comment-card-source-preview-background-color-hover: #3e434a;
 
-  --object-inspector-go-to-definition-icon-color: #dddddd;
-  --object-inspector-go-to-definition-icon-color-hover: #ffffff;
-  --object-inspector-invoke-getter-icon-color: #dddddd;
-  --object-inspector-invoke-getter-icon-color-hover: #ffffff;
-  --object-inspector-prototype-color: #939395;
-  --object-inspector-separator-color: #939395;
+  --object-inspector-bucket-color: #939395;
+  --object-inspector-expanded-key-with-flag: #5ca9cf;
+  --object-inspector-expanded-key: #81d5ff;
   --object-inspector-function-keyword: #ff7de9;
   --object-inspector-function-name: #bcc5ce;
-  --object-inspector-expanded-key: #81d5ff;
-  --object-inspector-expanded-key-with-flag: #5ca9cf;
+  --object-inspector-go-to-definition-icon-color-hover: #ffffff;
+  --object-inspector-go-to-definition-icon-color: #dddddd;
   --object-inspector-inline-key: #36d1c4;
-  --object-inspector-bucket-color: #939395;
+  --object-inspector-invoke-getter-icon-color-hover: #ffffff;
+  --object-inspector-invoke-getter-icon-color: #dddddd;
+  --object-inspector-prototype-color: #939395;
+  --object-inspector-separator-color: #939395;
 
   --value-type-bigint: #86de74;
   --value-type-boolean: #86de74;
