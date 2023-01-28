@@ -80,7 +80,6 @@ function useInitialPrimaryPanel() {
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
-  const events = useAppSelector(getFlatEvents);
 
   const initialPrimaryPanel = isTestSuitesReplay(recording) ? "cypress" : "events";
 
@@ -98,6 +97,7 @@ export default function SidePanel() {
   const selectedPrimaryPanel = useInitialPrimaryPanel();
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
+  const events = useAppSelector(getFlatEvents);
 
   const items: any[] = [];
 
