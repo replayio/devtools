@@ -2,6 +2,126 @@
   --font-family-default: Inter, sans-serif;
   --font-family-monospace: Menlo, ui-monospace, SFMono-Regular, Monaco, Consolas, Liberation Mono,
     Courier New, monospace;
+
+  /* Migration note: everyone below this was removed from src/devtools/client/themes/variables.css */
+
+  --theme-focus-border-color-textbox: #0675d3;
+  --theme-textbox-box-shadow: rgba(97, 181, 255, 0.75);
+
+  /* Text sizes */
+  --devtools-base-font-size: 12px;
+  --root-font-size: 16px;
+  --theme-body-font-size: 12px;
+  --theme-code-font-size: 11px;
+  --theme-code-line-height: calc(15 / 11);
+  --theme-tab-font-size: 15px;
+
+  /* Toolbar size (excluding borders) */
+  --theme-toolbar-height: 24px;
+
+  /* For accessibility purposes we want to enhance the focus styling. 
+  This should improve keyboard navigation usability. */
+  --toolbarbutton-checked-background: var(--theme-selection-background);
+  --toolbarbutton-checked-color: var(--theme-selection-color);
+  --toolbarbutton-checked-focus-background: var(--blue-60);
+  --toolbarbutton-focus-bgcolor: var(--theme-selection-focus-background);
+  --toolbarbutton-focus-color: var(--theme-selection-focus-color);
+  --theme-focus-box-shadow-textbox: 0 0 0 1px var(--theme-textbox-box-shadow);
+  --theme-focus-outline: 1px dotted var(--theme-focus-outline-color);
+
+  /* The photon animation curve */
+  --animation-curve: cubic-bezier(0.07, 0.95, 0, 1);
+
+  --primary-accent: #01acfd;
+  --primary-accent-hover: #0194ff;
+
+  --secondary-accent: #f02d5e;
+  --secondary-accent-hover: #d72451;
+  --secondary-accent-stroke: #f02d5e;
+
+  /* used in our codebase, to be refactored */
+  --blue-30: #75baff;
+  --blue-40: #45a1ff;
+  --blue-50: #0a84ff;
+  --blue-55: #0074e8;
+  --blue-60: #0060df;
+  --blue-70: #003eaa;
+  --blue-80: #002275;
+  --cool-gray-200: #e5e7eb;
+  --cool-gray-300: #d1d5db;
+  --cool-gray-400: #9ca3af;
+  --cool-gray-500: #6b7280;
+  --green-50: #30e60b;
+  --green-60: #12bc00;
+  --green-70: #058b00;
+  --grey-10-a15: rgba(249, 249, 250, 0.15);
+  --grey-10-a20: rgba(249, 249, 250, 0.2);
+  --grey-10-a25: rgba(249, 249, 250, 0.25);
+  --grey-10-a30: rgba(249, 249, 250, 0.3);
+  --grey-10: #f9f9fa;
+  --grey-20: #ededf0;
+  --grey-25: #e0e0e2;
+  --grey-30: #d7d7db;
+  --grey-40: #b1b1b3;
+  --grey-43: #a4a4a4;
+  --grey-45: #939395;
+  --grey-50: #737373;
+  --grey-55: #5c5c5f;
+  --grey-60: #4a4a4f;
+  --grey-70: #38383d;
+  --grey-80: #2a2a2e;
+  --grey-90-a10: rgba(12, 12, 13, 0.1);
+  --grey-90-a30: rgba(12, 12, 13, 0.3);
+  --grey-90: #0c0c0d;
+  --magenta-65: #dd00a9;
+  --purple-50: #9400ff;
+  --red-20: #ffb3d2;
+  --red-40: #ff3b6b;
+  --red-50: #ff0039;
+  --red-60: #d70022;
+  --red-70: #a4000f;
+  --yellow-50: #ffe900;
+  --yellow-60: #d7b600;
+  --yellow-65: #be9b00;
+  --yellow-70: #a47f00;
+  --yellow-80: #715100;
+  --yellow-90: #3e2800;
+
+  /* Z-index scale */
+
+  /* Z-index values should always be defined in #app. This allows us to at a glance determine
+  relative layers of our application and prevents bugs arising from arbitrary z-index values. */
+
+  /* Whenever possible, we should rely on the element stack order instead of z-index. If you're
+  certain that you **have** to use a z-index (e.g. element with position: absolute/fixed), define a
+  custom variable for it below so we can keep track of everything in one place. */
+
+  --z-index-1: 10;
+  --z-index-2: 20;
+  --z-index-3: 30;
+  --z-index-4: 40;
+  --z-index-5: 50;
+  --z-index-6: 60;
+  --z-index-7: 70;
+  --z-index-8: 80;
+  --z-index-9: 90;
+  --z-index-10: 100;
+  --z-index-1--timeline-comment: var(--z-index-1);
+  --z-index-1--paused-comment: var(--z-index-1);
+  --z-index-1--paused-message: var(--z-index-1);
+  --z-index-1--comment-container: var(--z-index-1);
+  --z-index-1--icon-tooltip: var(--z-index-1);
+  --z-index-1--timeline-tooltip: var(--z-index-1);
+  --z-index-2--hovered-point-secondary: var(--z-index-2);
+  --z-index-3--hovered-point-primary: var(--z-index-3);
+  --z-index-3--hovered-comment-primary: var(--z-index-3);
+  --z-index-4--name: var(--z-index-4);
+  --z-index-5--name: var(--z-index-5);
+  --z-index-6--name: var(--z-index-6);
+  --z-index-7--name: var(--z-index-7);
+  --z-index-7--mask: var(--z-index-7);
+  --z-index-8--modal: var(--z-index-8);
+  --z-index-8--dropdown: var(--z-index-8);
 }
 
 :root,
@@ -24,7 +144,6 @@
   --color-transparent: rgba(0, 0, 0, 0);
 
   /* Color ramp (Dark) */
-  /* Migration note: copy/pasted with src/devtools/client/themes/variables.css */
   --theme-base-100: #000; /* background chrome */
   --theme-base-95: #192230; /* tab bars */
   --theme-base-90: #3d4552; /* editor and selected tab */
@@ -34,45 +153,65 @@
   --theme-base-60: #c3c6c8;
 
   /* Tabs (Dark) */
-  /* Migration note: removed from src/devtools/client/themes/variables.css */
   --tab-bgcolor: var(--theme-base-100);
   --tab-color: var(--theme-base-40);
   --tab-hover-bgcolor: var(--theme-base-85);
   --tab-hover-color: var(--tab-selected-color);
   --tab-selected-bgcolor: var(--theme-base-95);
   --tab-selected-color: #fff;
+  --tab-standard-color: rgba(255, 255, 255, 0.5);
 
-  --scroll-thumb-color: #454950;
-  --dropshadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  /* Core classes (Dark) */
   --body-bgcolor: var(--theme-base-95);
+  --body-color: var(--grey-30);
+  --body-sub-color: var(--grey-40);
+  --buttontext-color: #f4f8fa;
+  --checkbox-border: var(--theme-base-90);
+  --checkbox: var(--theme-base-80);
+  --chrome: #081120; /* bg app */
+  --dropshadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --icon-color: var(--body-color);
+  --modal-bgcolor: var(--theme-base-100);
+  --modal-border: #222;
+  --scroll-thumb-color: #454950;
+  --tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
+  --tab-selected-bgcolor: var(--theme-base-95);
+  --text-field-border: var(--theme-base-85);
+  --theme-border: var(--theme-base-100);
+  --theme-focuser-bgcolor: var(--primary-accent);
+  --theme-sidebar-background: var(--body-bgcolor);
+  --theme-text-field-bgcolor-hover: var(--theme-base-95);
+  --theme-text-field-bgcolor: var(--theme-base-85);
+  --theme-text-field-color: #fff;
+  --tooltip-bgcolor: var(--theme-base-85);
+  --tooltip-color: #fff;
 
   --background-color-contrast-1: #0e1119;
   --background-color-contrast-2: #192230;
   --background-color-contrast-3: #2a3343;
   --background-color-contrast-4: #454950;
   --background-color-contrast-5: #e1e6ed;
-  --background-color-default: #081120;
-  --background-color-error: #473036;
-  --background-color-light: #18181a;
-  --background-color-primary-button: #02acfd;
-  --background-color-primary-button-disabled: #17527b;
-  --background-color-secondary-button: #f02d5e;
-  --background-color-tertiary-button: #929292;
-  --background-color-disabled-button: #454950;
-  --background-color-high-contrast-button: #081120;
   --background-color-current-execution-point: #25364e;
   --background-color-current-search-result: #25364e;
-  --background-color-warning: #42381f;
-  --background-color-inputs: #0e1119;
-  --background-color-source-search: #25364e;
+  --background-color-default: #081120;
+  --background-color-disabled-button: #454950;
+  --background-color-error: #473036;
+  --background-color-high-contrast-button: #081120;
+  --background-color-inputs: var(--theme-text-field-bgcolor);
+  --background-color-light: #18181a;
+  --background-color-primary-button-disabled: #17527b;
+  --background-color-primary-button: #02acfd;
   --background-color-resize-handle: #242e3d;
+  --background-color-secondary-button: #f02d5e;
+  --background-color-source-search: #25364e;
+  --background-color-warning: #42381f;
 
-  --border-color: #e1e6ed;
   --border-color-current-execution-point: #2563be;
-  --border-color-source-search: #2563be;
-  --border-color-light: #18181a;
   --border-color-error: #724543;
+  --border-color-light: #18181a;
+  --border-color-source-search: #2563be;
   --border-color-warning: #6f5920;
+  --border-color: #e1e6ed;
 
   --color-brand: #02acfd;
   --color-contrast: #081121;
@@ -82,10 +221,8 @@
   --color-dimmer: #666666;
   --color-error: #ffb3d2;
   --color-link: var(--color-brand);
-  --color-toggle-active: #6ba6ff;
   --color-primary-button: #ffffff;
   --color-secondary-button: #ffffff;
-  --color-tertiary-button: #000000;
   --color-disabled-button: #ffffff;
   --color-high-contrast-button: #ffffff;
   --color-warning: #fce2a1;
@@ -101,7 +238,6 @@
   --color-hit-counts-label-background-2: #006290;
   --color-hit-counts-label-background-3: #006290;
   --color-hit-counts-label-color: #d7d7db;
-  --color-line-number-with-hits: #d7d7db;
   --color-line-number-without-hits: var(--color-dimmer);
 
   --color-primary-background: var(--background-color-contrast-1);
@@ -119,23 +255,22 @@
   --context-menu-bgcolor: #3d4552;
   --context-menu-bgcolor-divider: var(--background-color-contrast-3);
   --context-menu-bgcolor-hover: var(--theme-base-95);
-  --context-menu-dropshadow: var(--dropshadow);
 
   --comment-card-source-preview-background-color: #081221;
   --comment-card-source-preview-background-color-hover: #3e434a;
 
-  --object-inspector-go-to-definition-icon-color: #dddddd;
-  --object-inspector-go-to-definition-icon-color-hover: #ffffff;
-  --object-inspector-invoke-getter-icon-color: #dddddd;
-  --object-inspector-invoke-getter-icon-color-hover: #ffffff;
-  --object-inspector-prototype-color: #939395;
-  --object-inspector-separator-color: #939395;
+  --object-inspector-bucket-color: #939395;
+  --object-inspector-expanded-key-with-flag: #5ca9cf;
+  --object-inspector-expanded-key: #81d5ff;
   --object-inspector-function-keyword: #ff7de9;
   --object-inspector-function-name: #bcc5ce;
-  --object-inspector-expanded-key: #81d5ff;
-  --object-inspector-expanded-key-with-flag: #5ca9cf;
+  --object-inspector-go-to-definition-icon-color-hover: #ffffff;
+  --object-inspector-go-to-definition-icon-color: #dddddd;
   --object-inspector-inline-key: #36d1c4;
-  --object-inspector-bucket-color: #939395;
+  --object-inspector-invoke-getter-icon-color-hover: #ffffff;
+  --object-inspector-invoke-getter-icon-color: #dddddd;
+  --object-inspector-prototype-color: #939395;
+  --object-inspector-separator-color: #939395;
 
   --value-type-bigint: #86de74;
   --value-type-boolean: #86de74;
@@ -157,13 +292,18 @@
   --value-type-html-text: #d7d7db;
 
   --point-panel-background-color: #1f2b43;
-  --point-panel-button-background-color: #8a8f95;
+  --point-panel-conditional-icon: var(--blue-40);
   --point-panel-input-background-color: #000000;
   --point-panel-input-border-color: transparent;
+  --point-panel-input-border-color-hover: #273149;
+  --point-panel-input-border-color-focus: var(--theme-selection-background);
   --point-panel-input-edit-button-color: #747476;
-  --point-panel-button-background-color-disabled: #464648;
-  --point-panel-button-color: #0f1119;
-  --point-panel-button-color-disabled: #9eb6d0;
+  --point-panel-input-edit-button-color-hover: var(--primary-accent);
+  --point-panel-input-cancel-button-color: #484445;
+  --point-panel-input-cancel-button-color-hover: #747476;
+  --point-panel-input-disabled-link-color-hover: #fff;
+  --point-panel-input-disabled-cancel-button-color: #a65858;
+  --point-panel-input-disabled-cancel-button-color-hover: #d3aaaa;
   --point-panel-timeline-background-color: #000000;
   --point-panel-timeline-button-background-color: #000000;
   --point-panel-timeline-button-color: var(--color-brand);
@@ -173,8 +313,8 @@
   --point-panel-timeline-label-color: var(--color-brand);
 
   --badge-picker-background-color: #28282a;
-  --badge-default-color: #747476;
-  --badge-default-contrast-color: #000;
+  --badge-picker-invalid-background-color: #724543;
+  --badge-default-color: rgba(255, 255, 255, 0.2);
   --badge-green-color: #69e261;
   --badge-green-contrast-color: #050;
   --badge-orange-color: #ff9a19;
@@ -204,8 +344,8 @@
   --token-comment-color: #8f8f92;
   --token-definition-color: #fefefe;
   --token-local-color: #fefefe;
-  --token-keyword-color: #ff42a9;
   --token-meta-color: #8f8f92;
+  --token-keyword-color: #ff42a9;
   --token-number-color: #ffff00;
   --token-operator-color: #fefefe;
   --token-propertyName-color: #ff98eb;
@@ -219,12 +359,99 @@
 
   /*
   Migration notes:
+    * things below this point were removed from other files
+  */
+
+  /* src/devtools/client/debugger/src/components/SecondaryPanes/FrameTimeline.css */
+  --progressbar-background: var(--theme-base-90);
+  --progressbar-unfocused-background: #8fa7be;
+  --replay-head-background: var(--theme-highlight-purple);
+
+  /* src/devtools/client/debugger/src/components/Editor/Breakpoints/Breakpoints.css */
+  --gutter-hover-background-color: #414141;
+
+  /* src/devtools/client/themes/tooltips.css */
+
+  --theme-tooltip-background: var(--theme-popup-background);
+  --theme-tooltip-color: var(--theme-text-color-strong);
+  --theme-tooltip-shadow: rgba(25, 25, 25, 0.76);
+
+  --theme-arrowpanel-background: var(--theme-popup-background);
+  --theme-arrowpanel-border-color: var(--theme-popup-border-color);
+  --theme-arrowpanel-color: var(--theme-popup-color);
+  --theme-arrowpanel-dimmed-further: rgba(249, 249, 250, 0.15);
+  --theme-arrowpanel-dimmed: var(--theme-popup-dimmed);
+  --theme-arrowpanel-disabled-color: rgba(249, 249, 250, 0.5);
+  --theme-arrowpanel-separator: rgba(249, 249, 250, 0.1);
+
+  /* src/devtools/client/themes/splitview.css */
+  --sidemenu-selected-arrow-rtl: url("/images/item-arrow-dark-rtl.svg");
+  --sidemenu-selected-arrow: url("/images/item-arrow-dark-ltr.svg");
+
+  /* src/devtools/client/themes/boxmodel.css */
+  --borderbox-color: var(--grey-70);
+  --contentbox-border-color: #00b8ff;
+  --contentbox-color: #407aa4;
+  --marginbox-border-color: #bdca00;
+  --marginbox-color: #73764a;
+  --paddingbox-color: #6657a6;
+  --position-border-color: var(--grey-40);
+
+  /* src/devtools/client/themes/rules.css */
+  --rule-header-background-color: #222225;
+  --rule-highlight-background-color: #521c76;
+  --rule-overridden-name-text-color: var(--grey-45);
+  --rule-overridden-value-text-color: #787878;
+  --rule-pseudo-class-text-color: var(--yellow-50);
+  --rule-unused-name-text-color: var(--grey-45);
+  --rule-unused-value-text-color: #787878;
+
+  /* src/devtools/client/themes/changes.css */
+  --diff-add-background-color: rgba(18, 188, 0, 0.15);
+  --diff-add-text-color: #12bc00;
+  --diff-level-offset: 10px;
+  --diff-level: 0;
+  --diff-remove-background-color: rgba(255, 0, 57, 0.15);
+  --diff-remove-text-color: #ff0039;
+  --diff-source-background: #222225;
+  /*
+    Minimum padding so content on the first level (zero) isn't touching the edge. Added
+    and removed lines will re-declare this to add extra padding to clear the +/- icons.
+  */
+  --diff-level-min-offset: 5px;
+
+  /* src/devtools/client/themes/computed.css */
+  --row-striped-background: rgba(255, 255, 255, 0.05);
+
+  /* src/devtools/client/themes/memory.css */
+  --cell-border-color: rgba(255, 255, 255, 0.15);
+  --link-color-active: var(--blue-30);
+  --link-color: var(--blue-40);
+  --row-alt-background-color: rgba(86, 117, 185, 0.15);
+  --row-hover-background-color: rgba(86, 117, 185, 0.25);
+
+  /* src/devtools/client/themes/components-frame.css */
+  --frame-link-line-color: hsl(210, 40%, 60%);
+  --frame-link-source: var(--blue-40);
+
+  /* src/devtools/client/themes/widgets.css */
+  --sidemenu-selected-arrow-rtl: url("/images/item-arrow-dark-rtl.svg");
+  --sidemenu-selected-arrow: url("/images/item-arrow-dark-ltr.svg");
+  --table-splitter-color: rgba(255, 255, 255, 0.15);
+  --table-zebra-background: rgba(255, 255, 255, 0.05);
+
+  /* src/devtools/client/themes/perf.css */
+  --highlight-color: var(--blue-55);
+  --slider-thumb-color: var(--grey-40);
+  --slider-track-color: var(--grey-60);
+
+  /*
+  Migration notes:
     * removed from src/devtools/client/themes/variables.css
     * things below this point are not organized yet
   */
 
   /* Timeline (Dark) */
-  --progressbar-preview-max: var(--theme-base-70);
   --progressbar-preview-min: var(--primary-accent);
 
   /* Menus (Dark) */
@@ -235,37 +462,19 @@
   --theme-menu-highlight: var(--theme-text-field-bgcolor);
 
   /* Code Mirror (Dark) */
-  --cm-linenumber: var(--grey-40);
-  --cm-keyword: #ff42a8;
-  --cm-def: #fff;
+  --caret-color: #fff;
   --cm-string: #01acfd;
   --cm-variable: #58e0ff;
-  --cm-number: yellow;
-  --cm-property: #ff98eb;
-  --cm-atom: #fff;
-  --caret-color: #fff;
-  --debug-line-border: var(--theme-base-85);
   --debug-line-background: var(--theme-base-100);
-  --gutter-hit-count-background: #081121;
-  --gutter-hit-count-foreground: #6a717e;
-  --line-hit-background-color-1: #2563be25;
-  --line-hit-background-color-2: #6ba6ff25;
-  --line-hit-background-color-3: #baecfa25;
-  --line-hit-border-color-0: #445064;
-  --line-hit-border-color-1: #2563be;
-  --line-hit-border-color-2: #6ba6ff;
-  --line-hit-border-color-3: #baecfa;
-  --line-hit-color: #a4c6f8;
+  --debug-line-border: var(--theme-base-85);
 
   /* Breakpoints (Dark) */
   --breakpoint-arrow-disabled: var(--theme-base-80);
   --breakpoint-arrow: var(--theme-base-60);
-  --breakpoint-editfield-active: var(--console-message-background);
-  --breakpoint-editfield-hover: var(--console-message-background);
+  --breakpoint-label: var(--cm-string);
   --breakpoint-status-bg: var(--theme-base-90);
   --breakpoint-status: var(--body-color);
   --breakpoint-tip: #fff;
-  --breakpoint-label: var(--cm-string);
 
   /* Testsuites (Dark) */
   --testsuites-capsule-error-bgcolor: rgb(237, 36, 36);
@@ -283,69 +492,136 @@
 
   /* To organise (Dark) */
   --jellyfish-bgcolor: rgba(40, 40, 40, 0.8);
-  --timejump-text: var(--buttontext-color);
   --theme-console-input-bgcolor: var(--theme-base-95);
-  --theme-toggle-handle-bgcolor: var(--theme-base-100);
-  --theme-toggle-handle-bgcolor-hover: #005f92;
   --theme-toggle-bgcolor: var(--theme-base-85);
   --theme-toggle-color: white;
-  --toolbarbutton-focus-bgcolor: var(--theme-toggle-bgcolor);
-  --toolbox-bgcolor: var(--theme-base-100);
-  --unloaded-region-img: url("/images/dotted-mask-dark.svg");
+  --theme-toggle-handle-bgcolor: var(--theme-base-100);
+  --timejump-text: var(--buttontext-color);
   --title-hover-bgcolor: var(--theme-toggle-bgcolor);
+  --toolbarbutton-focus-bgcolor: var(--theme-toggle-bgcolor);
+  --unloaded-region-img: url("/images/dotted-mask-dark.svg");
 
-  /* Toolbar */
-  --theme-toolbar-panel-icon-color: var(--icon-color);
+  /* Toolbar (Dark) */
   --theme-tab-toolbar-background: var(--grey-90);
+  --theme-toolbar-background-alt: var(--grey-85);
+  --theme-toolbar-background-hover: #232327;
   --theme-toolbar-background: #18181a;
   --theme-toolbar-color: var(--body-color);
-  --theme-toolbar-selected-color: white;
   --theme-toolbar-highlighted-color: var(--green-50);
-  --theme-toolbar-background-hover: #232327;
-  --theme-toolbar-background-alt: var(--grey-85);
-  --theme-toolbar-hover: #232327;
   --theme-toolbar-hover-active: #252526;
+  --theme-toolbar-hover: #232327;
+  --theme-toolbar-panel-icon-color: var(--icon-color);
+  --theme-toolbar-selected-color: white;
   --theme-toolbar-separator: var(--grey-10-a20);
 
-  /* Toolbar buttons */
-  --toolbarbutton-background: var(--grey-70);
+  /* Toolbar buttons (Dark) */
   --toolbarbutton-hover-background: var(--grey-70);
+  --toolbarbutton-background: var(--grey-70);
 
-  /* Buttons */
-  --theme-button-background: rgba(249, 249, 250, 0.1);
+  /* Buttons (Dark) */
   --theme-button-active-background: rgba(249, 249, 250, 0.15);
+  --theme-button-background: rgba(249, 249, 250, 0.1);
 
-  /* Accordion headers */
+  /* Accordion headers (Dark) */
   --theme-accordion-header-background: #232327;
   --theme-accordion-header-hover: #2a2a2e;
 
-  /* Selection */
-  --theme-selection-background: var(--primary-accent);
+  /* Selection (Dark) */
   --theme-selection-background-hover: #353b48;
-  --theme-table-selection-background-hover: var(--theme-toolbar-background);
+  --theme-selection-background: var(--primary-accent);
+  --theme-selection-color: #ffffff;
   --theme-selection-focus-background: var(--grey-60);
   --theme-selection-focus-color: var(--grey-30);
-  --theme-selection-color: #ffffff;
+  --theme-table-selection-background-hover: var(--theme-toolbar-background);
 
-  /* Border color that splits the toolbars/panels/headers. */
-  --theme-splitter-color: black;
-  --theme-emphasized-splitter-color: var(--grey-60);
+  /* Border color that splits the toolbars/panels/headers. (Dark) */
   --theme-emphasized-splitter-color-hover: var(--grey-50);
+  --theme-emphasized-splitter-color: var(--grey-60);
+  --theme-splitter-color: black;
 
-  /* Icon colors */
-  --theme-icon-color: rgba(249, 249, 250, 0.7);
-  --theme-icon-hover-color: #fff;
-  --theme-icon-dimmed-color: rgba(147, 147, 149, 0.9);
+  /* Icon colors (Dark) */
   --theme-icon-checked-color: var(--blue-30);
+  --theme-icon-color: rgba(249, 249, 250, 0.7);
+  --theme-icon-dimmed-color: rgba(147, 147, 149, 0.9);
   --theme-icon-error-color: var(--red-40);
+  --theme-icon-hover-color: #fff;
   --theme-icon-warning-color: var(--yellow-60);
+
+  /* Text color (Dark) */
+  --theme-comment: var(--grey-45);
+  --theme-text-color-alt: var(--grey-45);
+  --theme-text-color-inactive: var(--grey-50);
+  --theme-text-color-strong: var(--grey-30);
+
+  --theme-highlight-blue: #75bfff;
+  --theme-highlight-green: #86de74;
+  --theme-highlight-purple: #b98eff;
+  --theme-highlight-red: #ff7de9;
+  --theme-highlight-yellow: #fff89e;
+
+  /* These theme-highlight color variables have not been photonized. */
+  --theme-highlight-bluegrey: #5e88b0;
+  --theme-highlight-gray: #e9f4fe;
+  --theme-highlight-lightorange: #d99b28;
+  --theme-highlight-orange: #d96629;
+
+  /* For accessibility purposes we want to enhance the focus styling. This
+   * should improve keyboard navigation usability. */
+  --theme-focus-outline-color: #ced3d9;
+
+  /* Colors used in Graphs, like performance tools. */
+
+  /* Common popup styles(used by HTMLTooltip and autocomplete) */
+  --theme-popup-background: var(--grey-60);
+  --theme-popup-border-color: #27272b;
+  --theme-popup-color: rgb(249, 249, 250);
+  --theme-popup-dimmed: rgba(249, 249, 250, 0.1);
+
+  /* Styling for devtool buttons */
+  --theme-toolbarbutton-active-background: var(--grey-10-a30);
+  --theme-toolbarbutton-active-color: var(--grey-30);
+  --theme-toolbarbutton-background: none;
+  --theme-toolbarbutton-checked-background: var(--grey-10-a20);
+  --theme-toolbarbutton-checked-color: var(--grey-30);
+  --theme-toolbarbutton-checked-hover-background: var(--grey-10-a25);
+  --theme-toolbarbutton-checked-hover-color: var(--grey-30);
+  --theme-toolbarbutton-color: var(--grey-40);
+  --theme-toolbarbutton-hover-background: var(--grey-10-a15);
+
+  /* Warning colors */
+  --theme-warning-background: hsl(42, 37%, 19%);
+  --theme-warning-border: hsl(60, 30%, 26%);
+  --theme-warning-color: hsl(43, 94%, 81%);
+
+  /* Flashing colors used to highlight updates */
+  --theme-contrast-background: #1a4380;
+  --theme-contrast-color: white;
+
+  /* Timeline Navigation */
+  --replay-head-background: var(--purple-50);
+  --replaying-marker-fill: var(--primary-accent);
+  --replaying-marker-future-fill: var(--primary-accent);
+  --replaying-paused-marker-fill: var(--secondary-accent);
+  --replaying-paused-marker-stroke: var(--secondary-accent-stroke);
+
+  /* Loading screen */
+  --loading-background: var(--theme-base-100);
+  --loading-boxes: var(--chrome);
+
+  /* Focus mode editor (dark) */
+  --focus-mode-capsule-bgcolor-hover: #232938;
+  --focus-mode-capsule-bgcolor: var(--theme-base-90);
+  --focus-mode-loaded-indexed-color: var(--primary-accent);
+  --focus-mode-loading-color: #00567f;
+  --focus-mode-popout-icon-background-color: var(--primary-accent);
+  --focus-mode-popout-icon-color: white;
+  --focus-mode-popout-text-input-background-color: #33373d;
 }
 
 :root.theme-light {
   --color-transparent: rgba(255, 255, 255, 0);
 
-  /* Tabs (Light) */
-  /* Migration note: removed from src/devtools/client/themes/variables.css */
+  /* Color ramp (Light) */
   --theme-base-100: hsl(0, 0%, 100%);
   --theme-base-95: hsl(0, 0%, 95%);
   --theme-base-90: hsl(0, 0%, 90%);
@@ -355,7 +631,6 @@
   --theme-base-60: hsl(0, 0%, 60%);
 
   /* Tabs (Light) */
-  /* Migration note: removed from src/devtools/client/themes/variables.css */
   --tab-bgcolor: var(--theme-base-90);
   --tab-color: var(--theme-base-40);
   --tab-hover-bgcolor: var(--theme-base-85);
@@ -363,12 +638,31 @@
   --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
   --tab-selected-color: var(--body-color);
   --tab-standard-color: rgba(0, 0, 0, 0.5);
-  --tab-standard-hover-bgcolor: var(--theme-toolbar-hover);
-  --tab-bgcolor: var(--theme-base-90); /* bg tabs */
 
-  --scroll-thumb-color: #aaaaaa;
-  --dropshadow: 0 4px 6px -1px rgb(100 100 255 / 0.7), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  /* Core classes (Light) */
   --body-bgcolor: var(--theme-base-100); /* bg text */
+  --body-color: #38383d;
+  --body-sub-color: #a9a9b1;
+  --buttontext-color: #f4f8fa;
+  --checkbox-border: var(--theme-base-80);
+  --checkbox: #fff;
+  --chrome: var(--theme-base-95); /* bg app */
+  --dropshadow: 0 4px 6px -1px rgb(100 100 255 / 0.7), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --icon-color: var(--body-color);
+  --modal-bgcolor: rgba(255, 255, 255, 0.98);
+  --modal-border: none;
+  --scroll-thumb-color: #aaaaaa;
+  --tab-bgcolor-alt-subtle: var(--theme-base-100); /* info, events */
+  --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
+  --text-field-border: var(--cool-gray-300);
+  --theme-border: #d2d5da;
+  --theme-focuser-bgcolor: var(--primary-accent);
+  --theme-sidebar-background: var(--theme-base-100);
+  --theme-text-field-bgcolor-hover: var(--theme-base-95);
+  --theme-text-field-bgcolor: #f8f8f8;
+  --theme-text-field-color: var(--theme-body-color);
+  --tooltip-bgcolor: #38383d;
+  --tooltip-color: white;
 
   --background-color-contrast-1: #e6e6e6;
   --background-color-contrast-2: #ffffff;
@@ -376,27 +670,27 @@
   --background-color-contrast-4: #223344;
   --background-color-contrast-5: #081121;
   --background-color-default: #e9e9e9;
-  --background-color-error: #fcefee;
-  --background-color-light: #f9f9fa;
-  --background-color-primary-button: #05acfd;
-  --background-color-primary-button-disabled: #7acff9;
-  --background-color-secondary-button: #f02d5e;
-  --background-color-tertiary-button: #929292;
   --background-color-disabled-button: #666666;
+  --background-color-error: #fcefee;
   --background-color-high-contrast-button: #f2f2f2;
+  --background-color-light: #f9f9fa;
+  --background-color-primary-button-disabled: #d2d2d2;
+  --background-color-primary-button: #05acfd;
+  --background-color-secondary-button: #f02d5e;
+
   --background-color-current-execution-point: #eaf3ff;
   --background-color-current-search-result: #eaf3ff;
-  --background-color-warning: #fffac8;
-  --background-color-inputs: #e6e6e6;
-  --background-color-source-search: #eaf3ff;
+  --background-color-inputs: var(--theme-text-field-bgcolor);
   --background-color-resize-handle: #cfcfcf;
+  --background-color-source-search: #eaf3ff;
+  --background-color-warning: #fffac8;
 
-  --border-color: #081121;
   --border-color-current-execution-point: #69a6ff;
-  --border-color-source-search: #69a6ff;
-  --border-color-light: #f9f9fa;
   --border-color-error: #f4d8d8;
+  --border-color-light: #f9f9fa;
+  --border-color-source-search: #69a6ff;
   --border-color-warning: #fce2a1;
+  --border-color: #081121;
 
   --color-brand: #05acfd;
   --color-contrast: #ffffff;
@@ -404,16 +698,14 @@
   --color-default: #223344;
   --color-dim: #666666;
   --color-dimmer: #aaaaaa;
-  --color-error: #ff0000;
-  --color-link: var(--color-brand);
-  --color-toggle-active: #2979ef;
-  --color-primary-button: #ffffff;
-  --color-secondary-button: #ffffff;
-  --color-tertiary-button: #ffffff;
   --color-disabled-button: #ffffff;
+  --color-error: #ff0000;
   --color-high-contrast-button: #000000;
-  --color-warning: #6c5914;
+  --color-link: var(--color-brand);
+  --color-primary-button: #ffffff;
   --color-search-results: #47628b;
+  --color-secondary-button: #ffffff;
+  --color-warning: #6c5914;
 
   --color-hit-counts-bar-0: #f3f4f6;
   --color-hit-counts-bar-1: #c4e6f7;
@@ -425,46 +717,50 @@
   --color-hit-counts-label-background-2: #d5f1ff;
   --color-hit-counts-label-background-3: #aae4fe;
   --color-hit-counts-label-color: #47628b;
-  --color-line-number-with-hits: var(--color-default);
   --color-line-number-without-hits: var(--color-dimmer);
 
+  --color-control-background-active: var(--background-color-primary-button);
+  --color-control-background: var(--background-color-contrast-1);
   --color-primary-background: #ffffff;
   --color-secondary-background: #eeeeee;
-  --color-control-background: var(--background-color-contrast-1);
-  --color-control-background-active: var(--background-color-primary-button);
 
   --nag-background-color: #f02d5e;
+  --nag-color: #ffffff;
   --nag-gradient-color-begin: #ff3087;
   --nag-gradient-color-end: #ed265c;
-  --nag-color: #ffffff;
 
   --collapsible-toggle-color: #868688;
 
-  --context-menu-bgcolor: #f8f8f9;
   --context-menu-bgcolor-divider: #e0e0e0;
   --context-menu-bgcolor-hover: var(--theme-base-95);
-  --context-menu-dropshadow: var(--dropshadow);
+  --context-menu-bgcolor: #f8f8f9;
 
-  --comment-card-source-preview-background-color: #f2f3f2;
   --comment-card-source-preview-background-color-hover: #e6e6e6;
+  --comment-card-source-preview-background-color: #f2f3f2;
 
-  --object-inspector-go-to-definition-icon-color: #222222;
-  --object-inspector-go-to-definition-icon-color-hover: #000000;
-  --object-inspector-invoke-getter-icon-color: #222222;
-  --object-inspector-invoke-getter-icon-color-hover: #000000;
-  --object-inspector-prototype-color: #737373;
-  --object-inspector-separator-color: #737373;
+  --object-inspector-bucket-color: #737373;
+  --object-inspector-expanded-key-with-flag: #0074e8;
+  --object-inspector-expanded-key: #0074e8;
   --object-inspector-function-keyword: #dd00a8;
   --object-inspector-function-name: #0074e8;
-  --object-inspector-expanded-key: #0074e8;
-  --object-inspector-expanded-key-with-flag: #0074e8;
+  --object-inspector-go-to-definition-icon-color-hover: #000000;
+  --object-inspector-go-to-definition-icon-color: #222222;
   --object-inspector-inline-key: #0074e8;
-  --object-inspector-bucket-color: #737373;
+  --object-inspector-invoke-getter-icon-color-hover: #000000;
+  --object-inspector-invoke-getter-icon-color: #222222;
+  --object-inspector-prototype-color: #737373;
+  --object-inspector-separator-color: #737373;
 
   --value-type-bigint: #058b00;
   --value-type-boolean: #058b00;
   --value-type-date: #34d3c6;
   --value-type-error: #ff0000;
+  --value-type-html-attribute-name: #dd00a9;
+  --value-type-html-attribute-separator: #737373;
+  --value-type-html-attribute-value: #003eaa;
+  --value-type-html-tag-bracket: #0c0c0d;
+  --value-type-html-tag: #0074e8;
+  --value-type-html-text: #0c0c0d;
   --value-type-nan: #86de74;
   --value-type-null: #737373;
   --value-type-number: #058b00;
@@ -473,36 +769,35 @@
   --value-type-string: #0c0c0d;
   --value-type-symbol: #dd00a9;
   --value-type-undefined: #737373;
-  --value-type-html-attribute-name: #dd00a9;
-  --value-type-html-attribute-separator: #737373;
-  --value-type-html-attribute-value: #003eaa;
-  --value-type-html-tag: #0074e8;
-  --value-type-html-tag-bracket: #0c0c0d;
-  --value-type-html-text: #0c0c0d;
 
   --point-panel-background-color: #f0f1f4;
-  --point-panel-button-background-color: #e6e6e6;
+  --point-panel-conditional-icon: var(--blue-60);
   --point-panel-input-background-color: #ffffff;
+  --point-panel-input-border-color-focus: var(--theme-selection-background);
+  --point-panel-input-border-color-hover: #e9ebef;
   --point-panel-input-border-color: transparent;
-  --point-panel-input-edit-button-color: var(--color-brand);
-  --point-panel-button-background-color-disabled: #f0f0f0;
-  --point-panel-button-color: #747476;
-  --point-panel-button-color-disabled: #c5dff9;
+  --point-panel-input-cancel-button-color-hover: #afafb5;
+  --point-panel-input-cancel-button-color: #e2e2e2;
+  --point-panel-input-disabled-cancel-button-color-hover: #c07171;
+  --point-panel-input-disabled-cancel-button-color: #d3aaaa;
+  --point-panel-input-disabled-link-color-hover: #b9000d;
+  --point-panel-input-edit-button-color-hover: var(--primary-accent);
+  --point-panel-input-edit-button-color: var(--color-dimmer);
   --point-panel-timeline-background-color: #ffffff;
   --point-panel-timeline-button-background-color: #ffffff;
-  --point-panel-timeline-button-color: var(--color-brand);
   --point-panel-timeline-button-color-disabled: #e7f7ff;
+  --point-panel-timeline-button-color: var(--color-brand);
   --point-panel-timeline-button-shadow: 0px 0px 2px 0px hsla(0, 0%, 0%, 0.12);
   --point-panel-timeline-label-background-color: #ffffff;
   --point-panel-timeline-label-color: var(--color-brand);
 
-  --badge-picker-background-color: #f9f9fa;
-  --badge-default-color: #e6e6e6;
-  --badge-default-contrast-color: #000;
+  --badge-default-color: rgba(0, 0, 0, 0.08);
   --badge-green-color: #73cc6d;
   --badge-green-contrast-color: #fff;
   --badge-orange-color: #da7c04;
   --badge-orange-contrast-color: #fff;
+  --badge-picker-background-color: #f9f9fa;
+  --badge-picker-invalid-background-color: #f4d8d8;
   --badge-purple-color: #a973cd;
   --badge-purple-contrast-color: #fff;
   --badge-unicorn-color: #ff6ddf;
@@ -516,20 +811,21 @@
   --focus-mode-active-background-color: var(--background-color-contrast-2);
   --focus-mode-thumb-color: var(--background-color-contrast-5);
   --region-focused-color: var(--background-color-contrast-5);
-  --region-unfocused-color: var(--background-color-contrast-1);
   --region-loaded-color: #ff0000;
   --region-loading-color: #73cc6d;
+  --region-unfocused-color: var(--background-color-contrast-1);
 
   --search-result-active-background-color: #fffd03;
   --search-result-active-color: #000000;
   --search-result-inactive-background-color: #ff9632;
   --search-result-inactive-color: #000000;
 
+  --inspectable-token-hover-background-color: #ffffaa;
   --token-comment-color: #737373;
   --token-definition-color: #3172e0;
+  --token-keyword-color: #de00aa;
   --token-local-color: #4e4e52;
   --token-meta-color: #737373;
-  --token-keyword-color: #de00aa;
   --token-number-color: #18181a;
   --token-operator-color: #4e4e52;
   --token-propertyName-color: #dd00a9;
@@ -539,7 +835,94 @@
   --token-typeName-color: #0074e8;
   --token-variableName-color: #8d1bdc;
   --token-variableName2-color: #8d1bdc;
-  --inspectable-token-hover-background-color: #ffffaa;
+
+  /*
+  Migration notes:
+    * things below this point were removed from other files
+  */
+
+  /* src/devtools/client/debugger/src/components/SecondaryPanes/FrameTimeline.css */
+  --progressbar-background: var(--theme-base-100);
+  --progressbar-unfocused-background: var(--theme-base-70);
+  --replay-head-background: var(--purple-50);
+
+  /* src/devtools/client/debugger/src/components/Editor/Breakpoints/Breakpoints.css */
+  --gutter-hover-background-color: #dde1e4;
+
+  /* src/devtools/client/themes/tooltips.css */
+
+  --theme-tooltip-background: var(--theme-popup-background);
+  --theme-tooltip-color: var(--theme-text-color-strong);
+  --theme-tooltip-shadow: rgba(25, 25, 25, 0.76);
+
+  --theme-arrowpanel-background: var(--theme-popup-background);
+  --theme-arrowpanel-border-color: var(--theme-popup-border-color);
+  --theme-arrowpanel-color: var(--theme-popup-color);
+  --theme-arrowpanel-dimmed-further: rgba(249, 249, 250, 0.15);
+  --theme-arrowpanel-dimmed: var(--theme-popup-dimmed);
+  --theme-arrowpanel-disabled-color: rgba(249, 249, 250, 0.5);
+  --theme-arrowpanel-separator: rgba(249, 249, 250, 0.1);
+
+  /* src/devtools/client/themes/splitview.css */
+  --sidemenu-selected-arrow-rtl: url("/images/item-arrow-rtl.svg");
+  --sidemenu-selected-arrow: url("/images/item-arrow-ltr.svg");
+
+  /* src/devtools/client/themes/boxmodel.css */
+  --borderbox-color: var(--grey-50);
+  --contentbox-border-color: #54a9ff;
+  --contentbox-color: #cff0fb;
+  --marginbox-border-color: #d8e60a;
+  --marginbox-color: #fdffdf;
+  --paddingbox-color: #e3dcff;
+  --position-border-color: var(--grey-50);
+
+  /* src/devtools/client/themes/rules.css */
+  --rule-header-background-color: var(--theme-toolbar-background);
+  --rule-highlight-background-color: var(--theme-highlight-yellow);
+  --rule-overridden-name-text-color: var(--grey-50);
+  --rule-overridden-value-text-color: var(--grey-45);
+  --rule-pseudo-class-text-color: var(--yellow-70);
+  --rule-unused-name-text-color: var(--grey-50);
+  --rule-unused-value-text-color: var(--grey-45);
+
+  /* src/devtools/client/themes/changes.css */
+  --diff-add-background-color: #f1feec;
+  --diff-add-text-color: #54983f;
+  --diff-level-offset: 10px;
+  --diff-level: 0;
+  --diff-remove-background-color: #fbf2f5;
+  --diff-remove-text-color: #bf7173;
+  --diff-source-background: var(--theme-toolbar-background);
+  /*
+    Minimum padding so content on the first level (zero) isn't touching the edge. Added 
+    and removed lines will re-declare this to add extra padding to clear the +/- icons.
+  */
+  --diff-level-min-offset: 5px;
+
+  /* src/devtools/client/themes/computed.css */
+  --row-striped-background: rgba(247, 247, 247, 0.8);
+
+  /* src/devtools/client/themes/memory.css */
+  --cell-border-color: rgba(0, 0, 0, 0.15);
+  --link-color-active: var(--blue-70);
+  --link-color: var(--blue-60);
+  --row-alt-background-color: rgba(76, 158, 217, 0.1);
+  --row-hover-background-color: rgba(76, 158, 217, 0.2);
+
+  /* src/devtools/client/themes/components-frame.css */
+  --frame-link-line-color: var(--theme-highlight-blue);
+  --frame-link-source: var(--theme-highlight-purple);
+
+  /* src/devtools/client/themes/widgets.css */
+  --sidemenu-selected-arrow-rtl: url("/images/item-arrow-rtl.svg");
+  --sidemenu-selected-arrow: url("/images/item-arrow-ltr.svg");
+  --table-splitter-color: rgba(0, 0, 0, 0.15);
+  --table-zebra-background: rgba(0, 0, 0, 0.05);
+
+  /* src/devtools/client/themes/perf.css */
+  --highlight-color: var(--blue-55);
+  --slider-thumb-color: var(--grey-50);
+  --slider-track-color: var(--grey-30);
 
   /*
   Migration notes:
@@ -548,7 +931,6 @@
   */
 
   /* Timeline (Light) */
-  --progressbar-preview-max: var(--theme-base-85);
   --progressbar-preview-min: var(--primary-accent);
 
   /* Menus (Light) */
@@ -559,35 +941,19 @@
   --theme-menu-highlight: #f3f4f6;
 
   /* Code Mirror (Light) */
-  --cm-linenumber: var(--grey-80);
-  --cm-keyword: #dd00a9;
-  --cm-variable: #8000d7;
-  --cm-def: #3172e0;
-  --cm-string: #0842a4;
-  --cm-number: #18181a;
   --caret-color: #18181a;
-  --debug-line-border: var(--primary-accent);
+  --cm-string: #0842a4;
+  --cm-variable: #8000d7;
   --debug-line-background: #e8f5fb;
-  --gutter-hit-count-background: #f3f4f6;
-  --gutter-hit-count-foreground: #aeaeae;
-  --line-hit-background-color-1: #bbeafa25;
-  --line-hit-background-color-2: #69a6ff25;
-  --line-hit-background-color-3: #2979ef25;
-  --line-hit-border-color-0: #d9dad9;
-  --line-hit-border-color-1: #bbeafa;
-  --line-hit-border-color-2: #69a6ff;
-  --line-hit-border-color-3: #2979ef;
-  --line-hit-color: #47628b;
+  --debug-line-border: var(--primary-accent);
 
   /* Breakpoints (Light) */
   --breakpoint-arrow-disabled: var(--theme-base-90);
   --breakpoint-arrow: var(--theme-base-60);
-  --breakpoint-editfield-active: var(--theme-base-100);
-  --breakpoint-editfield-hover: var(--theme-base-100);
+  --breakpoint-label: var(--cm-string);
   --breakpoint-status-bg: var(--theme-base-90);
   --breakpoint-status: var(--body-color);
   --breakpoint-tip: var(--theme-highlight-purple);
-  --breakpoint-label: var(--cm-string);
 
   /* Testsuites (Light) */
   --testsuites-capsule-error-bgcolor: rgb(203, 0, 0);
@@ -603,17 +969,28 @@
   --testsuites-steps-bgcolor: #f7f7f7;
   --testsuites-success-color: #058b00;
 
+  /* To organise (Light) */
+  --jellyfish-bgcolor: rgba(255, 255, 255, 0.8);
+  --theme-console-input-bgcolor: var(--body-bgcolor);
+  --theme-toggle-bgcolor: var(--theme-base-85);
+  --theme-toggle-color: var(--grey-70);
+  --theme-toggle-handle-bgcolor: var(--theme-base-100);
+  --timejump-text: var(--buttontext-color);
+  --title-hover-bgcolor: #e6e6e6;
+  --toolbarbutton-focus-bgcolor: var(--theme-base-90);
+  --unloaded-region-img: url("/images/dotted-mask-light.svg");
+
   /* Toolbar */
   --theme-tab-toolbar-background: var(--grey-20);
+  --theme-toolbar-background-alt: #f5f5f5;
+  --theme-toolbar-background-hover: rgba(221, 225, 228, 0.66);
   --theme-toolbar-background: var(--grey-10);
   --theme-toolbar-color: var(--body-color);
-  --theme-toolbar-selected-color: var(--body-color);
-  --theme-toolbar-panel-icon-color: #bcbcbc;
   --theme-toolbar-highlighted-color: var(--green-60);
-  --theme-toolbar-background-hover: rgba(221, 225, 228, 0.66);
-  --theme-toolbar-background-alt: #f5f5f5;
-
   --theme-toolbar-hover-active: var(--grey-20);
+  --theme-toolbar-hover: #fff;
+  --theme-toolbar-panel-icon-color: #bcbcbc;
+  --theme-toolbar-selected-color: var(--body-color);
   --theme-toolbar-separator: var(--grey-90-a10);
 
   /* Toolbar buttons */
@@ -621,31 +998,130 @@
   --toolbarbutton-hover-background: var(--theme-toolbar-hover);
 
   /* Buttons */
-  --theme-button-background: rgba(12, 12, 13, 0.05);
   --theme-button-active-background: rgba(12, 12, 13, 0.1);
+  --theme-button-background: rgba(12, 12, 13, 0.05);
 
-  /* Accordion headers */
+  /* Accordion headers (Light) */
   --theme-accordion-header-background: var(--theme-toolbar-background);
   --theme-accordion-header-hover: var(--theme-toolbar-hover);
 
-  /* Selection */
-  --theme-selection-background: var(--primary-accent);
+  /* Selection (Light) */
   --theme-selection-background-hover: #f0f9fe;
-  --theme-table-selection-background-hover: var(--theme-toolbar-background);
+  --theme-selection-background: var(--primary-accent);
+  --theme-selection-color: #ffffff;
   --theme-selection-focus-background: var(--toolbarbutton-hover-background);
   --theme-selection-focus-color: var(--grey-70);
-  --theme-selection-color: #ffffff;
+  --theme-table-selection-background-hover: var(--theme-toolbar-background);
 
   /* Border color that splits the toolbars/panels/headers. */
-  --theme-splitter-color: var(--grey-25);
-  --theme-emphasized-splitter-color: var(--grey-30);
   --theme-emphasized-splitter-color-hover: var(--grey-40);
+  --theme-emphasized-splitter-color: var(--grey-30);
+  --theme-splitter-color: #e0e0e2;
 
-  /* Icon colors */
-  --theme-icon-color: rgba(12, 12, 13, 0.8);
-  --theme-icon-hover-color: #000;
-  --theme-icon-dimmed-color: rgba(135, 135, 137, 0.9);
+  /* Icon colors (Light) */
   --theme-icon-checked-color: var(--blue-60);
+  --theme-icon-color: rgba(12, 12, 13, 0.8);
+  --theme-icon-dimmed-color: rgba(135, 135, 137, 0.9);
   --theme-icon-error-color: var(--red-60);
+  --theme-icon-hover-color: #000;
   --theme-icon-warning-color: var(--yellow-65);
+
+  /* Text color (Light) */
+  --theme-comment: var(--grey-50);
+  --theme-text-color-alt: var(--grey-50);
+  --theme-text-color-inactive: var(--grey-40);
+  --theme-text-color-strong: var(--grey-90);
+
+  --theme-highlight-blue: var(--blue-55);
+  --theme-highlight-green: var(--green-70);
+  --theme-highlight-purple: var(--blue-70);
+  --theme-highlight-red: var(--magenta-65);
+  --theme-highlight-yellow: #fff89e;
+
+  /* These theme-highlight color variables have not been photonized. */
+  --theme-highlight-bluegrey: #0072ab;
+  --theme-highlight-gray: #dde1e4;
+  --theme-highlight-lightorange: #d97e00;
+  --theme-highlight-orange: #f13c00;
+
+  /* For accessibility purposes we want to enhance the focus styling. This
+   * should improve keyboard navigation usability. */
+  --theme-focus-outline-color: #000000;
+
+  /* Common popup styles(used by HTMLTooltip and autocomplete) */
+  --theme-popup-background: white;
+  --theme-popup-border-color: ThreeDShadow;
+  --theme-popup-color: var(--grey-70);
+  --theme-popup-dimmed: hsla(0, 0%, 80%, 0.3);
+
+  /* Styling for devtool buttons */
+  --theme-toolbarbutton-active-background: var(--grey-90-a20);
+  --theme-toolbarbutton-active-color: var(--grey-90);
+  --theme-toolbarbutton-background: none;
+  --theme-toolbarbutton-checked-background: var(--grey-90-a10);
+  --theme-toolbarbutton-checked-color: var(--grey-90);
+  --theme-toolbarbutton-checked-hover-background: var(--grey-90-a15);
+  --theme-toolbarbutton-checked-hover-color: var(--grey-90);
+  --theme-toolbarbutton-color: var(--grey-70);
+  --theme-toolbarbutton-hover-background: var(--grey-90-a05);
+
+  /* Warning colors */
+  --theme-warning-background: hsl(54, 100%, 92%);
+  --theme-warning-border: rgba(215, 182, 0, 0.28); /* Yellow 60 + opacity */
+  --theme-warning-color: var(--yellow-80);
+
+  /* Flashing colors used to highlight updates */
+  --theme-contrast-background: #fff9bb;
+  --theme-contrast-color: black;
+
+  /* Timeline Navigation */
+  --replay-head-background: var(--purple-50);
+  --replaying-marker-fill: var(--primary-accent);
+  --replaying-marker-future-fill: var(--primary-accent);
+  --replaying-paused-marker-fill: var(--secondary-accent);
+  --replaying-paused-marker-stroke: var(--secondary-accent-stroke);
+
+  /* Loading screen */
+  --loading-background: var(--chrome);
+  --loading-boxes: white;
+
+  /* Focus mode editor (light) */
+  --focus-mode-capsule-bgcolor-hover: #d8d8d8;
+  --focus-mode-capsule-bgcolor: #e6e6e6;
+  --focus-mode-loaded-indexed-color: var(--primary-accent);
+  --focus-mode-loading-color: white;
+  --focus-mode-popout-icon-background-color: white;
+  --focus-mode-popout-icon-color: black;
+  --focus-mode-popout-text-input-background-color: var(--theme-base-85);
+}
+
+/*
+  Migration notes:
+  * removed from src/devtools/client/themes/variables.css
+  * things below this point are not organized yet
+  */
+
+/*
+   * For doorhangers elsewhere in Firefox, Mac uses fixed colors rather than
+   * system colors.
+   */
+:root[platform="mac"].theme-light {
+  --theme-popup-border-color: var(--grey-90-a20);
+  --theme-popup-color: hsl(0, 0%, 10%);
+}
+
+/* browser specific tweaks */
+@-moz-document url-prefix() {
+  :root.theme-dark {
+    --modal-bgcolor: rgba(0, 0, 0, 0.98);
+  }
+}
+
+@keyframes linearFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
