@@ -4,16 +4,10 @@ import { openDevToolsTab, startTest } from "../helpers";
 import {
   addLogpoint,
   editLogPoint,
-  getLogPointPanelContentTypeAhead,
+  verifyLogPointTypeAheadSuggestions,
 } from "../helpers/source-panel";
 
 const url = "log_points_and_block_scope.html";
-
-async function verifyLogPointTypeAheadSuggestions(page: Page, expectedPartialList: string[]) {
-  const actualTextContent = (await getLogPointPanelContentTypeAhead(page).textContent()) || "";
-  const expectedTextContent = expectedPartialList.join("");
-  expect(actualTextContent.startsWith(expectedTextContent)).toBe(true);
-}
 
 test(`logpoints-05: should auto-complete based on log point location`, async ({ page }) => {
   await startTest(page, url);

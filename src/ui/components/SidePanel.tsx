@@ -1,9 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPanes";
 import Accordion from "devtools/client/debugger/src/components/shared/Accordion";
 import TestInfo from "devtools/client/debugger/src/components/TestInfo/TestInfo";
+import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import {
   setFocusRegionFromTimeRange,
   syncFocusedRegion,
@@ -52,6 +53,10 @@ function getSpecFilename(recording: Recording | void) {
   return file.includes("/") ? file.split("/").pop() : file;
 }
 
+function isTestSuitesReplay(recording?: Recording) {
+  return !!recording?.metadata?.test?.tests?.length;
+}
+
 function TestResultsSummary({ testCases }: { testCases: TestItem[] }) {
   const failed = testCases.filter(c => c.result === "failed").length;
   const passed = testCases.filter(c => c.result === "passed").length;
@@ -70,10 +75,27 @@ function TestResultsSummary({ testCases }: { testCases: TestItem[] }) {
   );
 }
 
-export default function SidePanel() {
-  const { value: resolveRecording } = useFeature("resolveRecording");
+function useInitialPrimaryPanel() {
+  const dispatch = useAppDispatch();
+  const recordingId = useGetRecordingId();
+  const { recording } = useGetRecording(recordingId);
   const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
   const events = useAppSelector(getFlatEvents);
+
+  const initialPrimaryPanel = isTestSuitesReplay(recording) ? "cypress" : "events";
+
+  useEffect(() => {
+    if (selectedPrimaryPanel == null) {
+      dispatch(setSelectedPrimaryPanel(initialPrimaryPanel));
+    }
+  }, [dispatch, selectedPrimaryPanel, initialPrimaryPanel]);
+
+  return selectedPrimaryPanel || initialPrimaryPanel;
+}
+
+export default function SidePanel() {
+  const { value: resolveRecording } = useFeature("resolveRecording");
+  const selectedPrimaryPanel = useInitialPrimaryPanel();
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
 
@@ -109,18 +131,22 @@ export default function SidePanel() {
       {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}
       {selectedPrimaryPanel === "comments" && <CommentCardsList />}
       {selectedPrimaryPanel === "events" && <EventsPane items={items} />}
+      {selectedPrimaryPanel === "cypress" && <TestSuitePanel />}
       {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
       {selectedPrimaryPanel === "search" && <SearchFilesReduxAdapter />}
     </div>
   );
 }
 
-function EventsPane({ items }: { items: any[] }) {
+function TestSuitePanel() {
+  const dispatch = useAppDispatch();
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
-  const annotations = useAppSelector(getReporterAnnotationsForTests);
   const selectedTest = useAppSelector(getSelectedTest);
-  const dispatch = useAppDispatch();
+  const annotations = useAppSelector(getReporterAnnotationsForTests);
+
+  const workspaceId = recording?.workspace?.id;
+  const testRunId = recording?.metadata?.test?.run?.id;
 
   const testCases = useMemo(
     () => maybeCorrectTestTimes(recording, annotations),
@@ -135,61 +161,65 @@ function EventsPane({ items }: { items: any[] }) {
     dispatch(updateFocusRegionParam());
   };
 
-  const workspaceId = recording?.workspace?.id;
-  const testRunId = recording?.metadata?.test?.run?.id;
-
-  if (recording?.metadata?.test?.tests?.length) {
-    return (
-      <div className="flex h-full flex-1 flex-col overflow-hidden">
-        <div className={styles.ToolbarHeader}>
-          {selectedTest !== null ? (
-            <button onClick={onReset} className="my-1 flex flex-grow gap-1 self-start truncate">
-              <div
-                className="img arrowhead-right mt-1 h-32 w-32"
-                style={{ transform: "rotate(180deg)", marginTop: "2px" }}
-              />
-              <span className="flex-grow whitespace-normal text-left">
-                {" "}
-                {testCases[selectedTest].title}
-              </span>
-              {testCases[selectedTest].error ? (
-                <Icon
-                  filename="testsuites-fail"
-                  size="small"
-                  className={`self-start ${styles.ErrorIcon}`}
-                />
-              ) : (
-                <Icon
-                  filename="testsuites-success"
-                  size="medium"
-                  className={styles.SuccessIcon}
-                  style={{ alignSelf: "flex-start" }}
-                />
-              )}
-            </button>
-          ) : (
-            <>
-              <div className="flex flex-grow items-center ">
-                <span className="flex-grow truncate pl-1">{getSpecFilename(recording)}</span>
-              </div>
-              <TestResultsSummary testCases={testCases} />
-            </>
-          )}
-        </div>
-        {workspaceId && testRunId ? (
-          <TestRunAttributes workspaceId={workspaceId} testRunId={testRunId} />
-        ) : null}
-        {annotations ? (
-          <TestInfo testCases={testCases} />
-        ) : (
-          <div className="flex flex-grow flex-col overflow-hidden">
-            <div className="flex flex-grow flex-col space-y-1 overflow-auto px-2">Loading...</div>
-          </div>
-        )}
-      </div>
-    );
+  if (!isTestSuitesReplay(recording)) {
+    // We shouldn't hit this because the toolbar button should not show for a
+    // non-cypress replay and the panel should only be auto-selected for a
+    // test suites replay.
+    return null;
   }
 
+  return (
+    <div className="flex h-full flex-1 flex-col overflow-hidden">
+      <div className={styles.ToolbarHeader}>
+        {selectedTest !== null ? (
+          <button onClick={onReset} className="my-1 flex flex-grow gap-1 self-start truncate">
+            <div
+              className="img arrowhead-right mt-1 h-32 w-32"
+              style={{ transform: "rotate(180deg)", marginTop: "2px" }}
+            />
+            <span className="flex-grow whitespace-normal text-left">
+              {" "}
+              {testCases[selectedTest].title}
+            </span>
+            {testCases[selectedTest].error ? (
+              <Icon
+                filename="testsuites-fail"
+                size="small"
+                className={`self-start ${styles.ErrorIcon}`}
+              />
+            ) : (
+              <Icon
+                filename="testsuites-success"
+                size="medium"
+                className={styles.SuccessIcon}
+                style={{ alignSelf: "flex-start" }}
+              />
+            )}
+          </button>
+        ) : (
+          <>
+            <div className="flex flex-grow items-center ">
+              <span className="flex-grow truncate pl-1">{getSpecFilename(recording)}</span>
+            </div>
+            <TestResultsSummary testCases={testCases} />
+          </>
+        )}
+      </div>
+      {workspaceId && testRunId ? (
+        <TestRunAttributes workspaceId={workspaceId} testRunId={testRunId} />
+      ) : null}
+      {annotations ? (
+        <TestInfo testCases={testCases} />
+      ) : (
+        <div className="flex flex-grow flex-col overflow-hidden">
+          <div className="flex flex-grow flex-col space-y-1 overflow-auto px-2">Loading...</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EventsPane({ items }: { items: any[] }) {
   return <Accordion items={items} />;
 }
 

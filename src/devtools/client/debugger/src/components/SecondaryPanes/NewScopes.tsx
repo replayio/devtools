@@ -4,6 +4,7 @@ import { Suspense, useContext } from "react";
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import Inspector from "replay-next/components/inspector/Inspector";
 import ScopesInspector from "replay-next/components/inspector/ScopesInspector";
+import { getFrameSuspense } from "replay-next/src/suspense/FrameCache";
 import { getFrameScopesSuspense } from "replay-next/src/suspense/ScopeCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { enterFocusMode } from "ui/actions/timeline";
@@ -11,7 +12,6 @@ import { Redacted } from "ui/components/Redacted";
 import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
 import { getPreferredGeneratedSources } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { getFrameSuspense } from "ui/suspense/frameCache";
 import { pickScopes } from "ui/suspense/scopeCache";
 
 import { getSelectedFrameId } from "../../selectors";
@@ -30,7 +30,7 @@ function ScopesRenderer() {
     );
   }
 
-  const frame = getFrameSuspense(replayClient, selectedFrameId);
+  const frame = getFrameSuspense(replayClient, selectedFrameId.pauseId, selectedFrameId.frameId);
   if (!frame) {
     return null;
   }

@@ -179,7 +179,7 @@ function Console() {
 
         <ErrorBoundary fallback={errorFallback}>
           <div
-            className={`flex flex-grow flex-col gap-1 p-2 font-mono transition-all ${
+            className={`flex flex-grow flex-col gap-1 overflow-y-auto p-2 font-mono transition-all  ${
               showStepDetails ? "visible" : "hidden"
             }`}
           >

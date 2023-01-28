@@ -8,6 +8,7 @@ import {
   useTransition,
 } from "react";
 
+import { assert } from "protocol/utils";
 import Icon from "replay-next/components/Icon";
 import CodeEditor from "replay-next/components/lexical/CodeEditor";
 import {
@@ -27,6 +28,7 @@ import { useNag } from "replay-next/src/hooks/useNag";
 import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
 import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
 import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/PointsCache";
+import { getSource } from "replay-next/src/suspense/SourcesCache";
 import { findIndexBigInt } from "replay-next/src/utils/array";
 import { validate } from "replay-next/src/utils/points";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -165,6 +167,16 @@ function PointPanelWithHitPoints({
       pauseId,
     };
   }
+
+  let source = getSource(client, point.location.sourceId);
+  if (source?.kind === "prettyPrinted") {
+    assert(
+      source.generatedSourceIds,
+      `pretty-printed source ${point.location.sourceId} has no generatedSourceIds`
+    );
+    source = getSource(client, source.generatedSourceIds[0]);
+  }
+  const useOriginalVariables = source?.kind === "sourceMapped";
 
   const shouldLog = point.shouldLog === POINT_BEHAVIOR_ENABLED;
 
@@ -327,6 +339,7 @@ function PointPanelWithHitPoints({
                       onChange={onEditableConditionChange}
                       onSave={onSubmit}
                       pauseAndFrameId={pauseAndFrameId}
+                      useOriginalVariables={useOriginalVariables}
                     />
                   </div>
 
@@ -391,6 +404,7 @@ function PointPanelWithHitPoints({
                     onChange={onEditableContentChange}
                     onSave={onSubmit}
                     pauseAndFrameId={pauseAndFrameId}
+                    useOriginalVariables={useOriginalVariables}
                   />
                 </div>
               </div>

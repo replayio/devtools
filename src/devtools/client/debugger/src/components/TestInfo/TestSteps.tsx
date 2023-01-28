@@ -55,8 +55,24 @@ function useGetTestSections(
   const events = useAppSelector(getEvents);
 
   return useMemo(() => {
+    const simplifiedSteps = steps?.reduce<TestStep[]>((acc, s) => {
+      const previous = acc[acc.length - 1];
+      if (s.name === "then") {
+        return acc;
+      } else if (previous && s.name === "as" && typeof s.args?.[0] === "string") {
+        acc[acc.length - 1] = {
+          ...previous,
+          alias: s.args[0],
+        };
+      } else {
+        acc.push(s);
+      }
+
+      return acc;
+    }, []);
+
     const stepsByTime =
-      steps?.map<StepEvent>((s, i) => {
+      simplifiedSteps?.map<StepEvent>((s, i) => {
         const annotations = {
           end: annotationsEnd.find(a => a.message.id === s.id),
           enqueue: annotationsEnqueue.find(a => a.message.id === s.id),
@@ -204,7 +220,7 @@ export function TestSteps({ test }: { test: TestItem }) {
           <div>
             <div className="flex flex-row items-center space-x-1 p-2">
               <Icon filename="warning" size="small" className="bg-testsuitesErrorColor" />
-              <div className="font-bold">Error</div>
+              <div className="font-bold">Assertion Error</div>
             </div>
             <div className="wrap space-y-1 overflow-hidden p-2 font-mono">{test.error.message}</div>
           </div>
@@ -227,6 +243,9 @@ function NewUrlRow({ time, message }: { time: number; message: CypressAnnotation
 }
 
 function TestSection({ events, header }: { events: CompositeTestEvent[]; header?: string }) {
+  const firstStep = events.find((e): e is StepEvent => e.type === "step");
+  const firstIndex = firstStep?.event.index || 0;
+
   if (events.length === 0) {
     return null;
   }
@@ -247,7 +266,7 @@ function TestSection({ events, header }: { events: CompositeTestEvent[]; header?
           <TestStepItem
             step={s}
             key={s.id}
-            index={s.index}
+            index={s.index - firstIndex}
             argString={
               s.args ? s.args.filter((s): s is string => s && typeof s === "string").join(", ") : ""
             }

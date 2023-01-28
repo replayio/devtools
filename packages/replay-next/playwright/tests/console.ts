@@ -2,6 +2,7 @@ import { Page, expect, test } from "@playwright/test";
 
 import {
   addTerminalExpression,
+  getConsoleInputTypeAhead,
   hideSearchInput,
   locateMessage,
   messageLocator,
@@ -423,6 +424,20 @@ test("should suggest type-ahead options from prototype objects as well", async (
     newListItem,
     "terminal-expression-at-execution-point-with-parent-property"
   );
+});
+
+test("should add this keyword to the list of suggestions", async ({ page }) => {
+  await setup(page);
+  await toggleProtocolMessage(page, "logs", true);
+
+  const listItem = await locateMessage(page, "console-log", "This is a log");
+  await seekToMessage(page, listItem);
+
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "th");
+  await delay(500); // HACK Give the type-ahead data time to load
+
+  const typeAhead = getConsoleInputTypeAhead(page);
+  await takeScreenshot(page, typeAhead, "console-terminal-input-type-ahead");
 });
 
 test("should evaluate terminal expressions without an execution point", async ({ page }) => {
