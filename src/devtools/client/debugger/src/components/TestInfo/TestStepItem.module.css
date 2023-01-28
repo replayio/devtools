@@ -3,20 +3,30 @@
 }
 
 .BorderActive {
-  border-left: var(--primary-accent);
+  border-left: 2px solid var(--primary-accent);
 }
 
 .BorderError {
-  border-left: red;
+  border-left: 2px solid var(--testsuites-error-border-color);
 }
 
 .step {
   border-radius: 4px;
+  margin-right: 5px;
+}
+
+.BorderError .assert,
+.BorderPending .assert {
   padding: 1px 3px;
-  margin-right: 3px;
 }
 
 .BorderError .assert {
-  background-color: red;
-  color: #fff;
+  background-color: var(--testsuites-capsule-error-bgcolor);
+  color: var(--testsuites-capsule-error-color);
+}
+
+.BorderActive .assert,
+.BorderPending .assert {
+  background-color: var(--testsuites-capsule-success-bgcolor);
+  color: var(--testsuites-capsule-success-color);
 }
