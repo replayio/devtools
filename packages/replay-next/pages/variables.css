@@ -359,7 +359,7 @@
 
   /*
   Migration notes:
-    * things below this point were removed from other files
+  * things below this point were removed from other files
   */
 
   /* src/devtools/client/debugger/src/components/SecondaryPanes/FrameTimeline.css */
@@ -413,9 +413,10 @@
   --diff-source-background: #222225;
   --diff-level: 0;
   --diff-level-offset: 10px;
+
   /*
-    Minimum padding so content on the first level (zero) isn't touching the edge. Added
-    and removed lines will re-declare this to add extra padding to clear the +/- icons.
+  Minimum padding so content on the first level (zero) isn't touching the edge. Added
+  and removed lines will re-declare this to add extra padding to clear the +/- icons.
   */
   --diff-level-min-offset: 5px;
 
@@ -446,8 +447,8 @@
 
   /*
   Migration notes:
-    * removed from src/devtools/client/themes/variables.css
-    * things below this point are not organized yet
+  * removed from src/devtools/client/themes/variables.css
+  * things below this point are not organized yet
   */
 
   /* Timeline (Dark) */
@@ -837,7 +838,7 @@
 
   /*
   Migration notes:
-    * things below this point were removed from other files
+  * things below this point were removed from other files
   */
 
   /* src/devtools/client/debugger/src/components/SecondaryPanes/FrameTimeline.css */
@@ -893,8 +894,8 @@
   --diff-level: 0;
   --diff-level-offset: 10px;
   /*
-    Minimum padding so content on the first level (zero) isn't touching the edge. Added 
-    and removed lines will re-declare this to add extra padding to clear the +/- icons.
+  Minimum padding so content on the first level (zero) isn't touching the edge. Added 
+  and removed lines will re-declare this to add extra padding to clear the +/- icons.
   */
   --diff-level-min-offset: 5px;
 
@@ -925,8 +926,8 @@
 
   /*
   Migration notes:
-    * removed from src/devtools/client/themes/variables.css
-    * things below this point are not organized yet
+  * removed from src/devtools/client/themes/variables.css
+  * things below this point are not organized yet
   */
 
   /* Timeline (Light) */
