@@ -477,10 +477,15 @@
   --breakpoint-tip: #fff;
 
   /* Testsuites (Dark) */
-  --testsuites-error-bgcolor-hover: #7a1712;
-  --testsuites-error-bgcolor: var(--background-color-error);
-  --testsuites-error-color: rgb(255, 197, 197);
-  --testsuites-error-icon-bgcolor: rgb(255, 115, 115);
+  --testsuites-capsule-error-bgcolor: rgb(237, 36, 36);
+  --testsuites-capsule-error-color: white;
+  --testsuites-capsule-success-bgcolor: var(--testsuites-success-color);
+  --testsuites-capsule-success-color: rgb(16, 114, 0);
+  --testsuites-error-bgcolor-hover: rgba(237, 36, 36, 0.672);
+  --testsuites-error-bgcolor: rgba(237, 36, 36, 0.672);
+  --testsuites-error-border-color: var(--testsuites-error-icon-bgcolor);
+  --testsuites-error-color: #ffe0e0;
+  --testsuites-error-icon-bgcolor: rgb(237, 36, 36);
   --testsuites-steps-bgcolor-hover: var(--theme-base-90);
   --testsuites-steps-bgcolor: var(--theme-base-100);
   --testsuites-success-color: #30e60b;
@@ -951,10 +956,15 @@
   --breakpoint-tip: var(--theme-highlight-purple);
 
   /* Testsuites (Light) */
+  --testsuites-capsule-error-bgcolor: rgb(203, 0, 0);
+  --testsuites-capsule-error-color: #fff;
+  --testsuites-capsule-success-bgcolor: var(--testsuites-success-color);
+  --testsuites-capsule-success-color: #ffffff;
   --testsuites-error-bgcolor-hover: #ffe0e0;
   --testsuites-error-bgcolor: #ffe9e9;
+  --testsuites-error-border-color: var(--testsuites-error-icon-bgcolor);
   --testsuites-error-color: #eb5757;
-  --testsuites-error-icon-bgcolor: #eb5757;
+  --testsuites-error-icon-bgcolor: rgb(203, 0, 0);
   --testsuites-steps-bgcolor-hover: #f4f4f4;
   --testsuites-steps-bgcolor: #f7f7f7;
   --testsuites-success-color: #058b00;
