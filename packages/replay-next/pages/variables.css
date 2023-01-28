@@ -9,24 +9,25 @@
   --theme-textbox-box-shadow: rgba(97, 181, 255, 0.75);
 
   /* Text sizes */
-  --root-font-size: 16px;
   --devtools-base-font-size: 12px;
+  --root-font-size: 16px;
   --theme-body-font-size: 12px;
   --theme-code-font-size: 11px;
-  --theme-tab-font-size: 15px;
   --theme-code-line-height: calc(15 / 11);
+  --theme-tab-font-size: 15px;
+
   /* Toolbar size (excluding borders) */
   --theme-toolbar-height: 24px;
 
   /* For accessibility purposes we want to enhance the focus styling. 
   This should improve keyboard navigation usability. */
-  --theme-focus-outline: 1px dotted var(--theme-focus-outline-color);
-  --theme-focus-box-shadow-textbox: 0 0 0 1px var(--theme-textbox-box-shadow);
-  --toolbarbutton-focus-bgcolor: var(--theme-selection-focus-background);
-  --toolbarbutton-focus-color: var(--theme-selection-focus-color);
   --toolbarbutton-checked-background: var(--theme-selection-background);
   --toolbarbutton-checked-color: var(--theme-selection-color);
   --toolbarbutton-checked-focus-background: var(--blue-60);
+  --toolbarbutton-focus-bgcolor: var(--theme-selection-focus-background);
+  --toolbarbutton-focus-color: var(--theme-selection-focus-color);
+  --theme-focus-box-shadow-textbox: 0 0 0 1px var(--theme-textbox-box-shadow);
+  --theme-focus-outline: 1px dotted var(--theme-focus-outline-color);
 
   /* The photon animation curve */
   --animation-curve: cubic-bezier(0.07, 0.95, 0, 1);
@@ -39,12 +40,6 @@
   --secondary-accent-stroke: #f02d5e;
 
   /* used in our codebase, to be refactored */
-  --cool-gray-200: #e5e7eb;
-  --cool-gray-300: #d1d5db;
-  --cool-gray-400: #9ca3af;
-  --cool-gray-500: #6b7280;
-  --magenta-65: #dd00a9;
-  --purple-50: #9400ff;
   --blue-30: #75baff;
   --blue-40: #45a1ff;
   --blue-50: #0a84ff;
@@ -52,25 +47,18 @@
   --blue-60: #0060df;
   --blue-70: #003eaa;
   --blue-80: #002275;
+  --cool-gray-200: #e5e7eb;
+  --cool-gray-300: #d1d5db;
+  --cool-gray-400: #9ca3af;
+  --cool-gray-500: #6b7280;
   --green-50: #30e60b;
   --green-60: #12bc00;
   --green-70: #058b00;
-  --yellow-50: #ffe900;
-  --yellow-60: #d7b600;
-  --yellow-65: #be9b00;
-  --yellow-70: #a47f00;
-  --yellow-80: #715100;
-  --yellow-90: #3e2800;
-  --red-20: #ffb3d2;
-  --red-40: #ff3b6b;
-  --red-50: #ff0039;
-  --red-60: #d70022;
-  --red-70: #a4000f;
-  --grey-10: #f9f9fa;
   --grey-10-a15: rgba(249, 249, 250, 0.15);
   --grey-10-a20: rgba(249, 249, 250, 0.2);
   --grey-10-a25: rgba(249, 249, 250, 0.25);
   --grey-10-a30: rgba(249, 249, 250, 0.3);
+  --grey-10: #f9f9fa;
   --grey-20: #ededf0;
   --grey-25: #e0e0e2;
   --grey-30: #d7d7db;
@@ -82,9 +70,22 @@
   --grey-60: #4a4a4f;
   --grey-70: #38383d;
   --grey-80: #2a2a2e;
-  --grey-90: #0c0c0d;
   --grey-90-a10: rgba(12, 12, 13, 0.1);
   --grey-90-a30: rgba(12, 12, 13, 0.3);
+  --grey-90: #0c0c0d;
+  --magenta-65: #dd00a9;
+  --purple-50: #9400ff;
+  --red-20: #ffb3d2;
+  --red-40: #ff3b6b;
+  --red-50: #ff0039;
+  --red-60: #d70022;
+  --red-70: #a4000f;
+  --yellow-50: #ffe900;
+  --yellow-60: #d7b600;
+  --yellow-65: #be9b00;
+  --yellow-70: #a47f00;
+  --yellow-80: #715100;
+  --yellow-90: #3e2800;
 
   /* Z-index scale */
 
@@ -161,56 +162,56 @@
   --tab-standard-color: rgba(255, 255, 255, 0.5);
 
   /* Core classes (Dark) */
-  --scroll-thumb-color: #454950;
-  --dropshadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --body-bgcolor: var(--theme-base-95);
-  --chrome: #081120; /* bg app */
   --body-color: var(--grey-30);
   --body-sub-color: var(--grey-40);
   --buttontext-color: #f4f8fa;
   --checkbox-border: var(--theme-base-90);
   --checkbox: var(--theme-base-80);
+  --chrome: #081120; /* bg app */
+  --dropshadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --icon-color: var(--body-color);
   --modal-bgcolor: var(--theme-base-100);
   --modal-border: #222;
+  --scroll-thumb-color: #454950;
   --tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
+  --tab-selected-bgcolor: var(--theme-base-95);
+  --text-field-border: var(--theme-base-85);
   --theme-border: var(--theme-base-100);
-  --icon-color: var(--body-color);
   --theme-focuser-bgcolor: var(--primary-accent);
   --theme-sidebar-background: var(--body-bgcolor);
-  --theme-text-field-color: #fff;
-  --theme-text-field-bgcolor: var(--theme-base-85);
   --theme-text-field-bgcolor-hover: var(--theme-base-95);
-  --text-field-border: var(--theme-base-85);
-  --tab-selected-bgcolor: var(--theme-base-95);
-  --tooltip-color: #fff;
+  --theme-text-field-bgcolor: var(--theme-base-85);
+  --theme-text-field-color: #fff;
   --tooltip-bgcolor: var(--theme-base-85);
+  --tooltip-color: #fff;
 
   --background-color-contrast-1: #0e1119;
   --background-color-contrast-2: #192230;
   --background-color-contrast-3: #2a3343;
   --background-color-contrast-4: #454950;
   --background-color-contrast-5: #e1e6ed;
-  --background-color-default: #081120;
-  --background-color-error: #473036;
-  --background-color-light: #18181a;
-  --background-color-primary-button: #02acfd;
-  --background-color-primary-button-disabled: #17527b;
-  --background-color-secondary-button: #f02d5e;
-  --background-color-disabled-button: #454950;
-  --background-color-high-contrast-button: #081120;
   --background-color-current-execution-point: #25364e;
   --background-color-current-search-result: #25364e;
-  --background-color-warning: #42381f;
+  --background-color-default: #081120;
+  --background-color-disabled-button: #454950;
+  --background-color-error: #473036;
+  --background-color-high-contrast-button: #081120;
   --background-color-inputs: var(--theme-text-field-bgcolor);
-  --background-color-source-search: #25364e;
+  --background-color-light: #18181a;
+  --background-color-primary-button-disabled: #17527b;
+  --background-color-primary-button: #02acfd;
   --background-color-resize-handle: #242e3d;
+  --background-color-secondary-button: #f02d5e;
+  --background-color-source-search: #25364e;
+  --background-color-warning: #42381f;
 
-  --border-color: #e1e6ed;
   --border-color-current-execution-point: #2563be;
-  --border-color-source-search: #2563be;
-  --border-color-light: #18181a;
   --border-color-error: #724543;
+  --border-color-light: #18181a;
+  --border-color-source-search: #2563be;
   --border-color-warning: #6f5920;
+  --border-color: #e1e6ed;
 
   --color-brand: #02acfd;
   --color-contrast: #081121;
@@ -363,25 +364,24 @@
 
   /* src/devtools/client/debugger/src/components/SecondaryPanes/FrameTimeline.css */
   --progressbar-background: var(--theme-base-90);
-  --replay-head-background: var(--theme-highlight-purple);
   --progressbar-unfocused-background: #8fa7be;
+  --replay-head-background: var(--theme-highlight-purple);
 
   /* src/devtools/client/debugger/src/components/Editor/Breakpoints/Breakpoints.css */
   --gutter-hover-background-color: #414141;
 
   /* src/devtools/client/themes/tooltips.css */
 
-  --theme-tooltip-color: var(--theme-text-color-strong);
-  --theme-tooltip-background: var(--theme-popup-background);
-  --theme-tooltip-shadow: rgba(25, 25, 25, 0.76);
-
   --theme-arrowpanel-background: var(--theme-popup-background);
-  --theme-arrowpanel-color: var(--theme-popup-color);
   --theme-arrowpanel-border-color: var(--theme-popup-border-color);
-  --theme-arrowpanel-separator: rgba(249, 249, 250, 0.1);
+  --theme-arrowpanel-color: var(--theme-popup-color);
   --theme-arrowpanel-dimmed: var(--theme-popup-dimmed);
   --theme-arrowpanel-dimmed-further: rgba(249, 249, 250, 0.15);
   --theme-arrowpanel-disabled-color: rgba(249, 249, 250, 0.5);
+  --theme-arrowpanel-separator: rgba(249, 249, 250, 0.1);
+  --theme-tooltip-background: var(--theme-popup-background);
+  --theme-tooltip-color: var(--theme-text-color-strong);
+  --theme-tooltip-shadow: rgba(25, 25, 25, 0.76);
 
   /* src/devtools/client/themes/splitview.css */
   --sidemenu-selected-arrow: url("/images/item-arrow-dark-ltr.svg");
