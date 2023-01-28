@@ -6,7 +6,7 @@
   border-left: 2px solid var(--primary-accent);
 }
 
-.BorderError {
+.TestsuitesErrorColor {
   border-left: 2px solid var(--testsuites-error-border-color);
 }
 
@@ -21,13 +21,17 @@
   padding: 1px 3px;
 }
 
-.BorderError .assert {
-  background-color: var(--testsuites-capsule-error-bgcolor);
-  color: var(--testsuites-capsule-error-color);
-}
-
 .BorderActive .assert,
 .BorderPending .assert {
   background-color: var(--testsuites-capsule-success-bgcolor);
   color: var(--testsuites-capsule-success-color);
+}
+
+.TestsuitesErrorColor .assert {
+  background-color: var(--testsuites-capsule-error-bgcolor);
+  color: var(--testsuites-capsule-error-color);
+}
+
+.TestsuitesErrorColor {
+  color: var(--testsuites-error-color);
 }
