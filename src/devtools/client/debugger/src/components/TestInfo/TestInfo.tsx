@@ -6,6 +6,7 @@ import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { getSelectedTest, setSelectedTest } from "ui/reducers/reporter";
+import { setPlaybackFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem } from "ui/types";
 
@@ -30,6 +31,10 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
   const [consoleProps, setConsoleProps] = useState<ProtocolObject>();
   const [loading, setLoading] = useState<boolean>(true);
   const [pauseId, setPauseId] = useState<string | null>(null);
+
+  useEffect(() => {
+    dispatch(setPlaybackFocusRegion(!!selectedTest));
+  }, [dispatch, selectedTest]);
 
   useEffect(() => {
     if (testCases.length === 1) {

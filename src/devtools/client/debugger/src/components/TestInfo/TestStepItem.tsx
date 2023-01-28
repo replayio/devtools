@@ -22,6 +22,12 @@ import { TestInfoContext } from "./TestInfo";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { TestStepRow } from "./TestStepRow";
 
+function preventClickFromSpaceBar(ev: React.KeyboardEvent<HTMLButtonElement>) {
+  if (ev.key === " ") {
+    ev.preventDefault();
+  }
+}
+
 // relies on the scrolling parent to be the nearest positioning context
 function scrollIntoView(node: HTMLDivElement) {
   if (!node.offsetParent) {
@@ -292,6 +298,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     >
       <button
         onClick={onClick}
+        onKeyUp={preventClickFromSpaceBar}
         className="flex w-0 flex-grow items-start space-x-2 text-start"
         title={`Step ${index + 1}: ${step.name} ${argString || ""}`}
       >
