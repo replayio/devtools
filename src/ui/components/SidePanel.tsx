@@ -89,7 +89,7 @@ export default function SidePanel() {
     onToggle: () => setReplayInfoCollapsed(!replayInfoCollapsed),
   });
 
-  if (events.length > 0) {
+  if (events && Array.isArray(events) && events.length > 0) {
     items.push({
       header: "Events",
       buttons: null,
