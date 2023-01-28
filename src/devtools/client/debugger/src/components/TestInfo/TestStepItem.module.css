@@ -1,0 +1,33 @@
+.BorderPending {
+  border-left: 2px solid transparent;
+}
+
+.BorderActive {
+  border-left: 2px solid var(--primary-accent);
+}
+
+.BorderError {
+  border-left: 2px solid var(--testsuites-error-border-color);
+}
+
+.step {
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+.BorderError .assert,
+.BorderPending .assert,
+.BorderActive .assert {
+  padding: 1px 3px;
+}
+
+.BorderError .assert {
+  background-color: var(--testsuites-capsule-error-bgcolor);
+  color: var(--testsuites-capsule-error-color);
+}
+
+.BorderActive .assert,
+.BorderPending .assert {
+  background-color: var(--testsuites-capsule-success-bgcolor);
+  color: var(--testsuites-capsule-success-color);
+}
