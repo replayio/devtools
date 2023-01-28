@@ -31,7 +31,7 @@ export function TestStepRowBase({
           [styles.BorderActive]: (!pending || active) && !error,
 
           // background / foreground
-          "text-testsuitesErrorColor": error,
+          [styles.TestsuitesErrorColor]: error,
           "bg-testsuitesErrorBgcolor hover:bg-testsuitesErrorBgcolorHover": error && pending,
           "bg-testsuitesErrorBgcolorHover": error && active,
           "bg-toolbarBackgroundHover": active && !error,
