@@ -309,7 +309,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
       {step.name === "get" && matchingElementCount > 1 ? (
         <span
           className={classNames(
-            "-my-1 flex-shrink rounded p-1 text-xs",
+            "-my-1 flex-shrink rounded p-1 text-xs text-gray-800",
             isSelected ? "bg-gray-300" : "bg-gray-200"
           )}
         >
@@ -319,7 +319,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
       {step.alias ? (
         <span
           className={classNames(
-            "-my-1 flex-shrink rounded p-1 text-xs",
+            "-my-1 flex-shrink rounded p-1 text-xs text-gray-800",
             isSelected ? "bg-gray-300" : "bg-gray-200"
           )}
           title={`'${argString}' aliased as '${step.alias}'`}

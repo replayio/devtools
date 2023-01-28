@@ -1,5 +1,5 @@
 .BorderPending {
-  border-left: transparent;
+  border-left: 2px solid transparent;
 }
 
 .BorderActive {
@@ -16,7 +16,8 @@
 }
 
 .BorderError .assert,
-.BorderPending .assert {
+.BorderPending .assert,
+.BorderActive .assert {
   padding: 1px 3px;
 }
 
