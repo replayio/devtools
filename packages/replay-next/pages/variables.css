@@ -312,7 +312,9 @@
   --point-panel-timeline-label-background-color: #000000;
   --point-panel-timeline-label-color: var(--color-brand);
 
+  --point-panel-timeline-label-unselected-color: #747476;
   --point-panel-timeline-label-selected-color: #b765f8;
+
   --point-panel-timeline-label-edit-hover-background-color: #434343;
   --point-panel-timeline-label-edit-hover-color: #747476;
   --point-panel-timeline-label-edit-background-color: var(--color-brand);
@@ -797,7 +799,9 @@
   --point-panel-timeline-label-background-color: #ffffff;
   --point-panel-timeline-label-color: var(--color-brand);
 
+  --point-panel-timeline-label-unselected-color: #d1d5db;
   --point-panel-timeline-label-selected-color: ##8330f4;
+
   --point-panel-timeline-label-edit-hover-background-color: #f5f5f5;
   --point-panel-timeline-label-edit-hover-color: #e2e2e2;
   --point-panel-timeline-label-edit-background-color: var(--color-brand);
