@@ -202,6 +202,7 @@ export function createSocket(
         listenForMetrics: !!prefs.listenForMetrics,
         profileWorkerThreads: !!features.profileWorkerThreads,
         enableRoutines: !!features.enableRoutines,
+        rerunRoutines: !!features.rerunRoutines,
       };
       if (features.newControllerOnRefresh) {
         experimentalSettings.controllerKey = String(Date.now());

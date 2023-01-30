@@ -37,6 +37,7 @@ pref("devtools.features.newControllerOnRefresh", false);
 pref("devtools.features.originalClassNames", false);
 pref("devtools.features.profileWorkerThreads", false);
 pref("devtools.features.enableRoutines", false);
+pref("devtools.features.rerunRoutines", false);
 pref("devtools.features.protocolTimeline", false);
 pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.resolveRecording", false);
@@ -77,6 +78,7 @@ export const features = new PrefsHelper("devtools.features", {
   protocolTimeline: ["Bool", "protocolTimeline"],
   repaintEvaluations: ["Bool", "repaintEvaluations"],
   resolveRecording: ["Bool", "resolveRecording"],
+  rerunRoutines: ["Bool", "rerunRoutines"],
   chromiumNetMonitor: ["Bool", "chromiumNetMonitor"],
   brokenSourcemapWorkaround: ["Bool", "brokenSourcemapWorkaround"],
 });
