@@ -22,11 +22,13 @@ export default function TerminalContextController({ children }: PropsWithChildre
   const addMessage = useCallback((partialTerminalExpression: NewTerminalExpression) => {
     // New expressions should be added in a transition because they suspend.
     startTransition(() => {
+      const id = idCounterRef.current++;
+
       setMessages(prev => [
         ...prev,
         {
           ...partialTerminalExpression,
-          id: idCounterRef.current++,
+          id,
           type: "TerminalExpression",
         },
       ]);

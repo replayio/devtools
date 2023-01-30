@@ -38,6 +38,7 @@ import {
   POINT_BEHAVIOR_ENABLED,
   Point,
 } from "shared/client/types";
+import { isThennable } from "shared/proxy/utils";
 
 import Loader from "../../Loader";
 import { SetLinePointState } from "../SourceListRow";
@@ -157,15 +158,22 @@ function PointPanelWithHitPoints({
   // Otherwise fall back to using the global execution point.
   const executionPoint = closestHitPoint ? closestHitPoint.point : currentExecutionPoint;
   const time = closestHitPoint ? closestHitPoint.time : currentTime;
-  const pauseId = getPauseIdSuspense(client, executionPoint, time);
-  const frames = getFramesSuspense(client, pauseId);
-  const frameId = frames?.[0]?.frameId ?? null;
   let pauseAndFrameId: PauseAndFrameId | null = null;
-  if (frameId !== null) {
-    pauseAndFrameId = {
-      frameId,
-      pauseId,
-    };
+  try {
+    const pauseId = getPauseIdSuspense(client, executionPoint, time);
+    const frames = getFramesSuspense(client, pauseId);
+    const frameId = frames?.[0]?.frameId ?? null;
+    if (frameId !== null) {
+      pauseAndFrameId = {
+        frameId,
+        pauseId,
+      };
+    }
+  } catch (errorOrPromise) {
+    if (isThennable(errorOrPromise)) {
+      throw errorOrPromise;
+    }
+    console.error(`Failed to fetch frames for point ${executionPoint}`, errorOrPromise);
   }
 
   let source = getSource(client, point.location.sourceId);

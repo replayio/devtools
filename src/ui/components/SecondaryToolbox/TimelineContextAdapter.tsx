@@ -33,10 +33,9 @@ export default function TimelineContextAdapter({ children }: PropsWithChildren) 
 
   const update = useCallback(
     async (time: number, executionPoint: ExecutionPoint, openSource: boolean) => {
-      const pauseId = await getPauseIdAsync(client, executionPoint, time);
-      dispatch(seek(executionPoint, time, openSource, pauseId));
+      dispatch(seek(executionPoint, time, openSource));
     },
-    [client, dispatch]
+    [dispatch]
   );
 
   useLayoutEffect(() => {

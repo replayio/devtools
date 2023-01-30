@@ -22,8 +22,9 @@ import useTerminalHistory from "./hooks/useTerminalHistory";
 import styles from "./ConsoleInput.module.css";
 
 export default function ConsoleInput({ inputRef }: { inputRef?: RefObject<ImperativeHandle> }) {
+  const { executionPoint } = useContext(TimelineContext);
   return (
-    <ErrorBoundary fallback={<ErrorFallback />}>
+    <ErrorBoundary resetKey={executionPoint} fallback={<ErrorFallback />}>
       <Suspense fallback={<Loader />}>
         <ConsoleInputSuspends inputRef={inputRef} />
       </Suspense>
@@ -186,7 +187,7 @@ function ErrorFallback() {
   return (
     <div className={styles.FallbackState}>
       <Icon className={styles.Icon} type="terminal-prompt" />
-      Input disabled for session because of an error
+      Input disabled because of an error
     </div>
   );
 }
