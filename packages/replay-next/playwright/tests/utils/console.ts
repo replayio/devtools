@@ -1,7 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
-import { debugPrint, getCommandKey, getElementCount, waitFor } from "./general";
+import { debugPrint, delay, getCommandKey, getElementCount, waitFor } from "./general";
 import { Expected, MessageType } from "./types";
 
 type ToggleName = "errors" | "exceptions" | "logs" | "nodeModules" | "timestamps" | "warnings";
@@ -15,6 +15,10 @@ export async function addTerminalExpression(page: Page, text: string): Promise<v
   await input.fill(text);
   await page.keyboard.press("Enter");
   await verifyConsoleMessage(page, text, "terminal-expression", 1);
+}
+
+export async function filterByText(page: Page, text: string) {
+  await page.fill("[data-test-id=ConsoleFilterInput]", text);
 }
 
 export async function findConsoleMessage(
@@ -230,7 +234,22 @@ export async function verifyConsoleMessage(
     await message.waitFor();
   }
 }
+export async function verifyTypeAheadContainsSuggestions(page: Page, ...suggestions: Expected[]) {
+  const typeAhead = getConsoleInputTypeAhead(page);
 
-export async function filterByText(page: Page, text: string) {
-  await page.fill("[data-test-id=ConsoleFilterInput]", text);
+  for (let index = 0; index < suggestions.length; index++) {
+    const suggestion = suggestions[index];
+
+    await debugPrint(
+      page,
+      `Verifying terminal type-ahead contains suggestion "${chalk.bold(suggestion)}"`,
+      "verifyTypeAheadContainsSuggestions"
+    );
+
+    await waitFor(async () => {
+      const results = typeAhead.locator(`[data-test-name="CodeTypeAhead-Item"]`);
+      const allTextContents = await results.allTextContents();
+      return expect(allTextContents).toContain(suggestion);
+    });
+  }
 }
