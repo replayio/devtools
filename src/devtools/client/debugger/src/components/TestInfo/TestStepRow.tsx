@@ -1,6 +1,8 @@
 import classnames from "classnames";
 import React, { forwardRef } from "react";
 
+import styles from "./TestStepItem.module.css";
+
 interface TestStepRowProps {
   error?: boolean;
   active?: boolean;
@@ -24,12 +26,12 @@ export function TestStepRowBase({
         "group/step relative flex items-start gap-1 border-b border-l-2 border-themeBase-90 py-2 pl-3 pr-1 font-mono",
         {
           // border
-          "border-l-transparent": pending,
-          "border-l-red-500": (!pending || active) && error,
-          "border-l-primaryAccent": (!pending || active) && !error,
+          [styles.BorderPending]: pending,
+          [styles.BorderError]: (!pending || active) && error,
+          [styles.BorderActive]: (!pending || active) && !error,
 
           // background / foreground
-          "text-testsuitesErrorColor": error,
+          [styles.TestsuitesErrorColor]: error,
           "bg-testsuitesErrorBgcolor hover:bg-testsuitesErrorBgcolorHover": error && pending,
           "bg-testsuitesErrorBgcolorHover": error && active,
           "bg-toolbarBackgroundHover": active && !error,

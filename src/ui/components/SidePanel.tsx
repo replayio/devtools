@@ -8,6 +8,7 @@ import Events from "ui/components/Events";
 import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
 import { useFeature } from "ui/hooks/settings";
 import { useTestInfo } from "ui/hooks/useTestInfo";
+import { getFlatEvents } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -38,28 +39,30 @@ export default function SidePanel() {
   const selectedPrimaryPanel = useInitialPrimaryPanel();
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
+  const events = useAppSelector(getFlatEvents);
 
   const items: any[] = [];
 
   // if (recording?.metadata?.test?.tests?.length) {
-  items.push(
-    {
-      header: "Info",
-      buttons: resolveRecording ? <StatusDropdown /> : null,
-      className: "replay-info",
-      component: <ReplayInfo />,
-      opened: !replayInfoCollapsed,
-      onToggle: () => setReplayInfoCollapsed(!replayInfoCollapsed),
-    },
-    {
+  items.push({
+    header: "Info",
+    buttons: resolveRecording ? <StatusDropdown /> : null,
+    className: "replay-info",
+    component: <ReplayInfo />,
+    opened: !replayInfoCollapsed,
+    onToggle: () => setReplayInfoCollapsed(!replayInfoCollapsed),
+  });
+
+  if (events.length > 0) {
+    items.push({
       header: "Events",
       buttons: null,
       className: "events-info flex-1 border-t overflow-hidden border-themeBorder",
       component: <Events />,
       opened: !eventsCollapsed,
       onToggle: () => setEventsCollapsed(!eventsCollapsed),
-    }
-  );
+    });
+  }
 
   return (
     <div
