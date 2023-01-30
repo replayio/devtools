@@ -12,6 +12,7 @@ import {
   toggleProtocolMessage,
   toggleProtocolMessages,
   toggleSideMenu,
+  verifyTypeAheadContainsSuggestions,
 } from "./utils/console";
 import {
   delay,
@@ -434,10 +435,21 @@ test("should add this keyword to the list of suggestions", async ({ page }) => {
   await seekToMessage(page, listItem);
 
   await page.fill("[data-test-id=ConsoleTerminalInput]", "th");
-  await delay(500); // HACK Give the type-ahead data time to load
+  await verifyTypeAheadContainsSuggestions(page, "this", "globalThis");
+});
 
-  const typeAhead = getConsoleInputTypeAhead(page);
-  await takeScreenshot(page, typeAhead, "console-terminal-input-type-ahead");
+test("should add true/false keywords to the list of suggestions", async ({ page }) => {
+  await setup(page);
+  await toggleProtocolMessage(page, "logs", true);
+
+  const listItem = await locateMessage(page, "console-log", "This is a log");
+  await seekToMessage(page, listItem);
+
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "tr");
+  await verifyTypeAheadContainsSuggestions(page, "true");
+
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "fa");
+  await verifyTypeAheadContainsSuggestions(page, "false");
 });
 
 test("should evaluate terminal expressions without an execution point", async ({ page }) => {

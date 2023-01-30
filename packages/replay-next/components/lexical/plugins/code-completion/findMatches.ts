@@ -115,14 +115,25 @@ function fetchQueryData(
         }
       }
     } else {
+      properties = [];
+
       if (frame?.this) {
-        properties = [
-          {
-            distance: MAX_DISTANCE,
-            name: "this",
-          },
-        ];
+        properties.push({
+          distance: MAX_DISTANCE,
+          name: "this",
+        });
       }
+
+      // There are certain keywords that are commonly used that won't be in the scope.
+      // We should include them in the auto-complete.
+      properties.push({
+        distance: MAX_DISTANCE,
+        name: "true",
+      });
+      properties.push({
+        distance: MAX_DISTANCE,
+        name: "false",
+      });
 
       // Evaluate the properties of the global/window object
       if (generatedScopes && generatedScopes.length > 0) {
@@ -135,12 +146,12 @@ function fetchQueryData(
             !PREVIEW_CAN_OVERFLOW
           );
           if (preview?.properties) {
-            const weightedProperties: WeightedProperty[] = preview.properties.map(property => ({
-              ...property,
-              distance: MAX_DISTANCE,
-            }));
-
-            properties = properties ? properties.concat(weightedProperties) : weightedProperties;
+            properties = properties.concat(
+              preview.properties.map(property => ({
+                ...property,
+                distance: MAX_DISTANCE,
+              }))
+            );
           }
         }
       }
