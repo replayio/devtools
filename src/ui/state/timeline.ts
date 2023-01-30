@@ -24,6 +24,7 @@ export interface TimelineState {
     beginDate: number;
     time: number;
   } | null;
+  playbackFocusRegion: boolean;
   playbackPrecachedTime: number;
   paints: TimeStampedPoint[];
   points: TimeStampedPoint[];

@@ -33,6 +33,7 @@ import {
   getHoverTime,
   getHoveredItem,
   getPlayback,
+  getPlaybackFocusRegion,
   getPlaybackPrecachedTime,
   getRecordingDuration,
   getShowFocusModeControls,
@@ -325,10 +326,17 @@ export function startPlayback(
       return;
     }
 
-    const endTime = optEndTime || getZoomRegion(state).endTime;
+    const endTime =
+      optEndTime ||
+      (getPlaybackFocusRegion(state) && getFocusRegion(state)?.end.time) ||
+      getZoomRegion(state).endTime;
 
     const beginDate = Date.now();
-    const beginTime = optBeginTime || (currentTime >= endTime ? 0 : currentTime);
+    const beginTime =
+      optBeginTime ||
+      (currentTime >= endTime
+        ? (getPlaybackFocusRegion(state) && getFocusRegion(state)?.begin.time) || 0
+        : currentTime);
 
     dispatch(
       setTimelineState({
