@@ -6,9 +6,11 @@ import styles from "./ConsoleSearch.module.css";
 
 export default function ConsoleSearch({
   className,
+  onHide,
   searchInputRef,
 }: {
   className: string;
+  onHide: () => void;
   searchInputRef: MutableRefObject<HTMLInputElement | null>;
 }) {
   const [searchState, searchActions] = useContext(ConsoleSearchContext);
@@ -19,11 +21,17 @@ export default function ConsoleSearch({
     searchActions.search(event.currentTarget.value);
   };
 
+  const onClickHideButton = () => {
+    searchActions.hide();
+    onHide();
+  };
+
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
       case "Escape": {
         event.preventDefault();
         searchActions.hide();
+        onHide();
         break;
       }
       case "Enter": {
@@ -65,7 +73,7 @@ export default function ConsoleSearch({
         <button
           className={styles.ResultsIconButton}
           data-test-id="ConsoleSearchClearButton"
-          onClick={searchActions.hide}
+          onClick={onClickHideButton}
         >
           <Icon className={styles.ResultsIcon} type="cancel" />
         </button>

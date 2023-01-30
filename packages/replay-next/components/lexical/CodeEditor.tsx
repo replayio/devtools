@@ -22,7 +22,16 @@ import {
   SerializedEditorState,
   TextNode,
 } from "lexical";
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import {
+  ForwardedRef,
+  createElement,
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from "react";
 
 import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
 
@@ -38,27 +47,18 @@ import styles from "./styles.module.css";
 // Diffing is simplest when the Code plug-in has a flat structure.
 const NODES: Array<Klass<LexicalNode>> = [LineBreakNode, CodeNode, TextNode];
 
-export default function CodeEditor({
-  allowWrapping = true,
-  autoFocus = false,
-  autoSelect = false,
-  dataTestId,
-  dataTestName,
-  editable,
-  initialValue,
-  onCancel,
-  onChange,
-  onSave,
-  pauseAndFrameId,
-  placeholder = "",
-  useOriginalVariables,
-}: {
+export type ImperativeHandle = {
+  focus: () => void;
+};
+
+type Props = {
   allowWrapping?: boolean;
   autoFocus?: boolean;
   autoSelect?: boolean;
   dataTestId?: string;
   dataTestName?: string;
   editable: boolean;
+  forwardedRef?: ForwardedRef<ImperativeHandle>;
   initialValue: string;
   onCancel?: () => void;
   onChange?: (markdown: string, editorState: SerializedEditorState) => void;
@@ -66,11 +66,38 @@ export default function CodeEditor({
   pauseAndFrameId: PauseAndFrameId | null;
   placeholder?: string;
   useOriginalVariables: boolean;
-}): JSX.Element {
+};
+
+function CodeEditor({
+  allowWrapping = true,
+  autoFocus = false,
+  autoSelect = false,
+  dataTestId,
+  dataTestName,
+  editable,
+  forwardedRef,
+  initialValue,
+  onCancel,
+  onChange,
+  onSave,
+  pauseAndFrameId,
+  placeholder = "",
+  useOriginalVariables,
+}: Props): JSX.Element {
   const historyState = useMemo(() => createEmptyHistoryState(), []);
 
   const editorRef = useRef<LexicalEditor>(null);
   const backupEditorStateRef = useRef<EditorState | null>(null);
+
+  useImperativeHandle(
+    forwardedRef,
+    () => ({
+      focus() {
+        editorRef.current?.focus();
+      },
+    }),
+    []
+  );
 
   const didMountRef = useRef(false);
   useLayoutEffect(() => {
@@ -219,6 +246,14 @@ export default function CodeEditor({
     </LexicalComposer>
   );
 }
+
+const CodeEditorForwardRef = forwardRef<ImperativeHandle, Props>(
+  (props: Props, ref: ForwardedRef<ImperativeHandle>) =>
+    createElement(CodeEditor, { ...props, forwardedRef: ref })
+);
+CodeEditorForwardRef.displayName = "ForwardRef<CodeEditor>";
+
+export default CodeEditorForwardRef;
 
 function createInitialConfig(code: string, editable: boolean) {
   return {
