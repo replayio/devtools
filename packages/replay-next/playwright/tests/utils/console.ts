@@ -49,6 +49,10 @@ export async function focusOnConsole(page: Page) {
   await expect(consoleRoot).toBeFocused();
 }
 
+export function getConsoleInputTypeAhead(page: Page): Locator {
+  return page.locator('[data-test-id="ConsoleTerminalInput-CodeTypeAhead"]');
+}
+
 export async function hideSearchInput(page: Page) {
   const count = await getElementCount(page, '[data-test-id="ConsoleSearchInput"]');
   if (count === 0) {

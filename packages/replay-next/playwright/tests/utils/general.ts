@@ -160,6 +160,9 @@ export async function takeScreenshot(page: Page, locator: Locator, name: string)
 
   // Make sure any suspended components finish loading data before taking the screenshot.
   await awaitNoLoaders(page, locator);
+  // dark screenshots (which are taken first) seemed to be flakier than the light ones,
+  // adding a little delay here seems to help
+  await delay(1);
 
   if (VISUAL_DEBUG) {
     await new Promise(resolve => resolve(250));

@@ -10,16 +10,17 @@ import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getStepRanges, useStepState } from "ui/hooks/useStepState";
 import { useTestStepActions } from "ui/hooks/useTestStepActions";
+import { getViewMode } from "ui/reducers/layout";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
 import { getCurrentTime, isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AnnotatedTestStep } from "ui/types";
 
-import { ProgressBar } from "./ProgressBar";
 import { TestCaseContext } from "./TestCase";
 import { TestInfoContext } from "./TestInfo";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { TestStepRow } from "./TestStepRow";
+import styles from "./TestStepItem.module.css";
 
 // relies on the scrolling parent to be the nearest positioning context
 function scrollIntoView(node: HTMLDivElement) {
@@ -57,6 +58,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     pauseId: string;
     nodeIds: string[];
   }>();
+  const viewMode = useAppSelector(getViewMode);
   const isPlaying = useAppSelector(isPlayingSelector);
   const currentTime = useAppSelector(getCurrentTime);
   const selectedStep = useAppSelector(getSelectedStep);
@@ -65,6 +67,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const { point: pointEnd, message: messageEnd } = step.annotations.end || {};
   const { point: pointStart } = step.annotations.start || {};
   const state = useStepState(step);
+  const actions = useTestStepActions(step);
 
   // compare points if possible and
   useEffect(() => {
@@ -201,9 +204,23 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
         dispatch(seekToTime(timeRange[1], false));
       }
 
+      if (viewMode === "dev") {
+        actions.showStepSource();
+      }
+
       dispatch(setSelectedStep(step));
     }
-  }, [step, endPauseId, consoleProps, dispatch, setConsoleProps, id, setPauseId]);
+  }, [
+    actions,
+    viewMode,
+    step,
+    endPauseId,
+    consoleProps,
+    dispatch,
+    setConsoleProps,
+    id,
+    setPauseId,
+  ]);
 
   const onMouseEnter = () => {
     if (state === "paused") {
@@ -280,15 +297,16 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
         className="flex w-0 flex-grow items-start space-x-2 text-start"
         title={`Step ${index + 1}: ${step.name} ${argString || ""}`}
       >
-        <div className={`flex-grow truncate font-medium ${state === "paused" ? "font-bold" : ""}`}>
-          {step.parentId ? "- " : ""}
-          {step.name} <span className="opacity-70">{argString}</span>
+        <div className={`flex-grow font-medium ${state === "paused" ? "font-bold" : ""}`}>
+          {step.parentId ? "- " : ""}{" "}
+          <span className={`${styles.step} ${styles[step.name]}`}>{step.name}</span>
+          <span className="opacity-70">{argString}</span>
         </div>
       </button>
       {step.name === "get" && matchingElementCount > 1 ? (
         <span
           className={classNames(
-            "-my-1 flex-shrink rounded p-1 text-xs",
+            "-my-1 flex-shrink rounded p-1 text-xs text-gray-800",
             isSelected ? "bg-gray-300" : "bg-gray-200"
           )}
         >
@@ -298,7 +316,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
       {step.alias ? (
         <span
           className={classNames(
-            "-my-1 flex-shrink rounded p-1 text-xs",
+            "-my-1 flex-shrink rounded p-1 text-xs text-gray-800",
             isSelected ? "bg-gray-300" : "bg-gray-200"
           )}
           title={`'${argString}' aliased as '${step.alias}'`}

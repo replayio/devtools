@@ -1,5 +1,6 @@
 import { FrameId, PauseId, Property, Scope } from "@replayio/protocol";
 
+import { getFrameSuspense } from "replay-next/src/suspense/FrameCache";
 import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
 import { evaluateSuspense } from "replay-next/src/suspense/PauseCache";
 import { getFrameScopesSuspense } from "replay-next/src/suspense/ScopeCache";
@@ -26,7 +27,8 @@ export default function findMatches(
   queryScope: string | null,
   replayClient: ReplayClientInterface,
   frameId: FrameId | null,
-  pauseId: PauseId | null
+  pauseId: PauseId | null,
+  useOriginalVariables: boolean
 ): Match[] {
   // Remove leading "."
   query = query.slice(1);
@@ -35,7 +37,13 @@ export default function findMatches(
     return [];
   }
 
-  const { properties, scopes } = fetchQueryData(replayClient, queryScope, frameId, pauseId);
+  const { properties, scopes } = fetchQueryData(
+    replayClient,
+    queryScope,
+    frameId,
+    pauseId,
+    useOriginalVariables
+  );
 
   return findMatchingScopesAndProperties(queryScope, query, scopes, properties) || [];
 }
@@ -44,16 +52,23 @@ function fetchQueryData(
   replayClient: ReplayClientInterface,
   queryScope: string | null,
   frameId: FrameId | null,
-  pauseId: PauseId | null
+  pauseId: PauseId | null,
+  useOriginalVariables: boolean
 ): {
   properties: WeightedProperty[] | null;
   scopes: Scope[] | null;
 } {
   let properties: WeightedProperty[] | null = null;
 
-  let scopes = null;
+  let frame = null;
+  let generatedScopes: Scope[] | null = null;
+  let scopes: Scope[] | null = null;
   if (frameId && pauseId) {
-    scopes = getFrameScopesSuspense(replayClient, pauseId, frameId)?.generatedScopes || null;
+    frame = getFrameSuspense(replayClient, pauseId, frameId);
+
+    const data = getFrameScopesSuspense(replayClient, pauseId, frameId);
+    generatedScopes = data.generatedScopes;
+    scopes = useOriginalVariables ? data.originalScopes ?? null : generatedScopes;
   }
 
   if (pauseId) {
@@ -100,22 +115,33 @@ function fetchQueryData(
         }
       }
     } else {
+      if (frame?.this) {
+        properties = [
+          {
+            distance: MAX_DISTANCE,
+            name: "this",
+          },
+        ];
+      }
+
       // Evaluate the properties of the global/window object
-      if (scopes && scopes.length > 0) {
-        const maybeGlobalObjectId = scopes[scopes.length - 1]?.object;
-        if (maybeGlobalObjectId) {
+      if (generatedScopes && generatedScopes.length > 0) {
+        const globalScope = generatedScopes.find(scope => scope.type === "global");
+        if (globalScope?.object) {
           const { preview } = getObjectWithPreviewSuspense(
             replayClient,
             pauseId,
-            maybeGlobalObjectId,
+            globalScope.object,
             !PREVIEW_CAN_OVERFLOW
           );
-
-          properties =
-            preview?.properties?.map(property => ({
+          if (preview?.properties) {
+            const weightedProperties: WeightedProperty[] = preview.properties.map(property => ({
               ...property,
               distance: MAX_DISTANCE,
-            })) ?? null;
+            }));
+
+            properties = properties ? properties.concat(weightedProperties) : weightedProperties;
+          }
         }
       }
     }

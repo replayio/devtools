@@ -238,6 +238,15 @@ export function getLogPointPanelContentTypeAhead(page: Page): Locator {
   return page.locator('[data-test-name="PointPanel-ContentInput-CodeTypeAhead"]');
 }
 
+export async function verifyLogPointTypeAheadSuggestions(
+  page: Page,
+  expectedPartialList: string[]
+) {
+  const actualTextContent = (await getLogPointPanelContentTypeAhead(page).textContent()) || "";
+  const expectedTextContent = expectedPartialList.join("");
+  expect(actualTextContent.startsWith(expectedTextContent)).toBe(true);
+}
+
 export async function getSelectedLineNumber(page: Page): Promise<number | null> {
   let currentLineLocator = null;
 

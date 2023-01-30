@@ -1,4 +1,4 @@
-import { Frame, PauseId } from "@replayio/protocol";
+import { Frame, FrameId, PauseId } from "@replayio/protocol";
 
 import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
@@ -23,3 +23,12 @@ export const {
   },
   pauseId => pauseId
 );
+
+export function getFrameSuspense(
+  replayClient: ReplayClientInterface,
+  pauseId: PauseId,
+  frameId: FrameId
+) {
+  const frames = getFramesSuspense(replayClient, pauseId);
+  return frames?.find(frame => frame.frameId === frameId);
+}
