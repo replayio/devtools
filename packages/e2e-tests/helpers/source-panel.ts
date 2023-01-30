@@ -590,9 +590,9 @@ export async function waitForSelectedSource(page: Page, url: string) {
     await expect(await sourceHeader.getAttribute("data-status")).toBe("active");
 
     // Make sure the visible source is the same source as the selected tab.
-    const headerSourceId = await sourceHeader.getAttribute("data-test-sourceid");
+    const headerSourceId = await sourceHeader.getAttribute("data-test-source-id");
     expect(
-      await page.locator('[data-test-name="Source"]:visible').getAttribute("data-test-sourceid")
+      await page.locator('[data-test-name="Source"]:visible').getAttribute("data-test-source-id")
     ).toBe(headerSourceId);
 
     // HACK Assume that the source file has loaded when the combined text of the first
