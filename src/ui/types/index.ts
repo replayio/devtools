@@ -23,6 +23,7 @@ export type LocalExperimentalUserSettings = {
   enableColumnBreakpoints: boolean;
   enableUnstableQueryCache: boolean;
   enableRoutines: boolean;
+  rerunRoutines: boolean;
   profileWorkerThreads: boolean;
   brokenSourcemapWorkaround: boolean;
 };
