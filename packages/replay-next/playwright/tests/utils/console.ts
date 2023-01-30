@@ -47,14 +47,22 @@ export async function findConsoleMessage(
 export async function focusOnConsole(page: Page) {
   await debugPrint(page, `Focusing on console`, "focusOnConsole");
 
-  const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
+  const consoleRoot = page.locator('[data-test-id="ConsoleTerminalInput"]');
   await expect(consoleRoot).toBeVisible();
   await consoleRoot.focus();
   await expect(consoleRoot).toBeFocused();
 }
 
+export function getConsoleInput(page: Page): Locator {
+  return page.locator('[data-test-id="ConsoleTerminalInput"]');
+}
+
 export function getConsoleInputTypeAhead(page: Page): Locator {
   return page.locator('[data-test-id="ConsoleTerminalInput-CodeTypeAhead"]');
+}
+
+export function getConsoleSearchInput(page: Page): Locator {
+  return page.locator('[data-test-id="ConsoleSearchInput"]');
 }
 
 export async function hideSearchInput(page: Page) {
@@ -143,7 +151,7 @@ export async function showSearchInput(page: Page) {
   await page.keyboard.type("f");
   await page.keyboard.up(getCommandKey());
 
-  const input = page.locator(`[data-test-id=ConsoleSearchInput]`);
+  const input = getConsoleSearchInput(page);
   await expect(input).toBeVisible();
 }
 

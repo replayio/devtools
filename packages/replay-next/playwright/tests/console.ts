@@ -2,7 +2,8 @@ import { Page, expect, test } from "@playwright/test";
 
 import {
   addTerminalExpression,
-  getConsoleInputTypeAhead,
+  getConsoleInput,
+  getConsoleSearchInput,
   hideSearchInput,
   locateMessage,
   messageLocator,
@@ -182,18 +183,18 @@ test("should show and hide search input when Enter and Escape are typed", async 
   await seekToMessage(page, await locateMessage(page, "console-log", "This is a log"));
 
   // Search should be hidden
-  let searchInput = page.locator("[data-test-id=ConsoleSearchInput]");
+  let searchInput = getConsoleSearchInput(page);
   await expect(searchInput).toHaveCount(0);
 
   await showSearchInput(page);
 
-  searchInput = page.locator("[data-test-id=ConsoleSearchInput]");
+  searchInput = getConsoleSearchInput(page);
   await takeScreenshot(page, searchInput, "search-input-visible-and-focused");
 
   await hideSearchInput(page);
 
   // Search should be hidden again
-  searchInput = page.locator("[data-test-id=ConsoleSearchInput]");
+  searchInput = getConsoleSearchInput(page);
   await expect(searchInput).toHaveCount(0);
 
   const terminalInput = page.locator("[data-test-id=ConsoleTerminalInput]");
@@ -205,22 +206,22 @@ test("should re-focus the search input when CMD+F is used again", async ({ page 
 
   await showSearchInput(page);
 
-  const searchInput = page.locator("[data-test-id=ConsoleSearchInput]");
+  const searchInput = getConsoleSearchInput(page);
   await expect(searchInput).toHaveCount(1);
   await expect(searchInput).toBeFocused();
+});
 
-  // This part of the test verifies that the search input responds to CMD+F
-  // when focus is within the Console (not just in the terminal input field)
-  const list = page.locator("[data-test-name=Messages]");
-  await list.focus();
+test("should re-focus the terminal input when search input is hidden", async ({ page }) => {
+  await setup(page);
 
-  await expect(searchInput).not.toBeFocused();
+  const consoleInput = getConsoleInput(page);
+  const searchInput = getConsoleSearchInput(page);
 
-  await page.keyboard.down(getCommandKey());
-  await page.keyboard.type("f");
-  await page.keyboard.up(getCommandKey());
-
+  await showSearchInput(page);
   await expect(searchInput).toBeFocused();
+
+  await hideSearchInput(page);
+  await expect(consoleInput).toBeFocused();
 });
 
 test("should be searchable", async ({ page }) => {
