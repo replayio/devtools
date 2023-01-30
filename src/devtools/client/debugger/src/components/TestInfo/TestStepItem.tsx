@@ -3,9 +3,12 @@ import classNames from "classnames";
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
+import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
 import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
-import { evaluateAsync } from "replay-next/src/suspense/PauseCache";
+import { evaluateAsync, getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
+import { ReplayClient } from "shared/client/ReplayClient";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { ReplayClientInterface } from "shared/client/types";
 import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getStepRanges, useStepState } from "ui/hooks/useStepState";
@@ -49,17 +52,87 @@ export interface TestStepItemProps {
   id: string | null;
 }
 
+async function getCypressSubjectNodeIds(
+  client: ReplayClientInterface,
+  endPauseId?: string,
+  callerFrameId?: string,
+  commandVariable?: string
+) {
+  if (!endPauseId || !callerFrameId || !commandVariable) {
+    return [];
+  }
+
+  const cmdResult = await evaluateAsync(
+    client,
+    endPauseId,
+    callerFrameId,
+    `${commandVariable}.get("subject")`
+  );
+
+  const cmdObjectId = cmdResult.returned?.object;
+
+  if (cmdObjectId) {
+    const cmdObject = await getObjectWithPreviewHelper(client, endPauseId, cmdObjectId, true);
+
+    const props = cmdObject?.preview?.properties;
+    const length: number = props?.find(o => o.name === "length")?.value || 0;
+    const nodeIds = [];
+    for (let i = 0; i < length; i++) {
+      const v = props?.find(p => p.name === String(i));
+      if (v?.object) {
+        nodeIds.push(v.object);
+      }
+    }
+
+    return nodeIds;
+  }
+
+  return [];
+}
+
+async function getCypressConsoleProps(
+  client: ReplayClientInterface,
+  endPauseId?: string,
+  callerFrameId?: string,
+  logVariable?: string
+) {
+  if (!endPauseId || !callerFrameId || !logVariable) {
+    return;
+  }
+
+  const logResult = await evaluateAsync(client, endPauseId, callerFrameId, logVariable);
+
+  if (logResult.returned?.object) {
+    const logObject = await getObjectWithPreviewHelper(
+      client,
+      endPauseId,
+      logResult.returned.object
+    );
+    const consolePropsProperty = logObject.preview?.properties?.find(
+      p => p.name === "consoleProps"
+    );
+
+    if (consolePropsProperty?.object) {
+      return await getObjectWithPreviewHelper(
+        client,
+        endPauseId,
+        consolePropsProperty.object,
+        true
+      );
+    }
+  }
+}
+
 export function TestStepItem({ step, argString, index, id }: TestStepItemProps) {
   const hasScrolled = useRef(false);
   const ref = useRef<HTMLDivElement>(null);
   const [localPauseData, setLocalPauseData] = useState<{
-    startPauseFailed?: boolean;
-    startPauseId?: string;
+    loading: boolean;
     endPauseFailed?: boolean;
     endPauseId?: string;
     consoleProps?: ProtocolObject;
-  }>();
-  const { loading, setLoading, setConsoleProps, setPauseId } = useContext(TestInfoContext);
+  }>({ loading: true });
+  const { setConsoleProps, setPauseId } = useContext(TestInfoContext);
   const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
     pauseId: string;
     nodeIds: string[];
@@ -70,131 +143,58 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const selectedStep = useAppSelector(getSelectedStep);
   const dispatch = useAppDispatch();
   const client = useContext(ReplayClientContext);
-  const { point: pointEnd, message: messageEnd } = step.annotations.end || {};
-  const { point: pointStart } = step.annotations.start || {};
+  const { point: pointEnd, message: messageEnd, time: timeEnd } = step.annotations.end || {};
   const state = useStepState(step);
   const actions = useTestStepActions(step);
 
-  // compare points if possible and
   useEffect(() => {
-    setLoading(true);
+    setLocalPauseData(v => ({
+      ...v,
+      loading: true,
+    }));
 
     (async () => {
       try {
-        let consoleProps: ProtocolObject | undefined;
+        const endPauseId =
+          pointEnd && timeEnd != null
+            ? await getPauseIdAsync(client, pointEnd, timeEnd)
+            : undefined;
+        const frames = endPauseId ? await getFramesAsync(client, endPauseId) : undefined;
 
-        const endPauseResult = pointEnd ? await client.createPause(pointEnd) : undefined;
-        const frames = endPauseResult?.data.frames;
-
-        if (endPauseResult && frames) {
+        if (endPauseId && frames) {
           const callerFrame = frames[1];
 
-          if (messageEnd?.commandVariable) {
-            const cmdResult = await evaluateAsync(
-              client,
-              endPauseResult.pauseId,
-              callerFrame.frameId,
-              `${messageEnd.commandVariable}.get("subject")`
-            );
-
-            const cmdObjectId = cmdResult.returned?.object;
-
-            if (cmdObjectId) {
-              const cmdObject = await getObjectWithPreviewHelper(
-                client,
-                endPauseResult.pauseId,
-                cmdObjectId,
-                true
-              );
-
-              const props = cmdObject?.preview?.properties;
-              const length: number = props?.find(o => o.name === "length")?.value || 0;
-              const nodeIds = [];
-              for (let i = 0; i < length; i++) {
-                const v = props?.find(p => p.name === String(i));
-                if (v?.object) {
-                  nodeIds.push(v.object);
-                }
-              }
-
-              setSubjectNodePauseData({ pauseId: endPauseResult.pauseId, nodeIds });
-            }
-          }
-
-          if (messageEnd?.logVariable) {
-            const logResult = await evaluateAsync(
-              client,
-              endPauseResult.pauseId,
-              callerFrame.frameId,
-              messageEnd.logVariable
-            );
-
-            if (logResult.returned?.object) {
-              const logObject = await getObjectWithPreviewHelper(
-                client,
-                endPauseResult.pauseId,
-                logResult.returned.object
-              );
-              const consolePropsProperty = logObject.preview?.properties?.find(
-                p => p.name === "consoleProps"
-              );
-
-              if (consolePropsProperty?.object) {
-                consoleProps = await getObjectWithPreviewHelper(
-                  client,
-                  endPauseResult.pauseId,
-                  consolePropsProperty.object,
-                  true
-                );
-              }
-            }
-          }
-
-          const endPauseId = endPauseResult.pauseId;
-          setLocalPauseData(v => ({
-            ...v,
-            endPauseFailed: false,
+          await getCypressSubjectNodeIds(
+            client,
             endPauseId,
-            consoleProps,
-          }));
+            callerFrame.frameId,
+            messageEnd?.commandVariable
+          ).then(nodeIds => setSubjectNodePauseData({ pauseId: endPauseId, nodeIds }));
+
+          await getCypressConsoleProps(
+            client,
+            endPauseId,
+            callerFrame.frameId,
+            messageEnd?.logVariable
+          ).then(consoleProps =>
+            setLocalPauseData(v => ({
+              ...v,
+              loading: false,
+              endPauseFailed: false,
+              endPauseId,
+              consoleProps,
+            }))
+          );
         }
       } catch {
         setLocalPauseData(v => ({
           ...v,
+          loading: false,
           endPauseFailed: true,
         }));
       }
     })();
-
-    (async () => {
-      try {
-        const startPauseResult = pointStart ? await client.createPause(pointStart) : undefined;
-
-        if (startPauseResult) {
-          const startPauseId = startPauseResult.pauseId;
-          setLocalPauseData(v => ({
-            ...v,
-            loading: false,
-            startPauseId,
-          }));
-        }
-      } catch {
-        setLocalPauseData(v => ({
-          ...v,
-          startPauseFailed: true,
-        }));
-      }
-    })();
-  }, [client, messageEnd, pointEnd, pointStart, setLoading]);
-
-  useEffect(() => {
-    const { endPauseFailed, endPauseId } = localPauseData || {};
-    // Loading is used by step details which only relies on the end pause
-    // completing
-    if (loading && (endPauseFailed || endPauseId)) {
-      setLoading(false);
-    }
-  }, [localPauseData, loading, setLoading]);
+  }, [client, messageEnd, timeEnd, pointEnd]);
 
   const { endPauseId, consoleProps } = localPauseData || {};
   const onClick = useCallback(() => {
@@ -239,7 +239,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
         setTimelineToPauseTime(
           step.absoluteEndTime,
           localPauseData.endPauseId,
-          step.annotations.start?.point
+          step.annotations.end?.point
         )
       );
     }
