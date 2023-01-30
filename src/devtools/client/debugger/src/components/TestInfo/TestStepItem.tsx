@@ -16,7 +16,6 @@ import { getCurrentTime, isPlaying as isPlayingSelector } from "ui/reducers/time
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AnnotatedTestStep } from "ui/types";
 
-import { ProgressBar } from "./ProgressBar";
 import { TestCaseContext } from "./TestCase";
 import { TestInfoContext } from "./TestInfo";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
@@ -296,6 +295,8 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
       onMouseLeave={onMouseLeave}
       ref={ref}
       data-test-id="TestSuites-TestCase-TestStepRow"
+      index={index + 1}
+      progress={displayedProgress}
     >
       <button
         onClick={onClick}
@@ -303,10 +304,6 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
         className="flex w-0 flex-grow items-start space-x-2 text-start"
         title={`Step ${index + 1}: ${step.name} ${argString || ""}`}
       >
-        <div title={"" + displayedProgress} className="flex h-4 items-center">
-          <ProgressBar progress={displayedProgress} error={!!step.error} />
-        </div>
-        <div className="opacity-70 ">{index + 1}</div>
         <div className={`flex-grow font-medium ${state === "paused" ? "font-bold" : ""}`}>
           {step.parentId ? "- " : ""}{" "}
           <span className={`${styles.step} ${styles[step.name]}`}>{step.name}</span>

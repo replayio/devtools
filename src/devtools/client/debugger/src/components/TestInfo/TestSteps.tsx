@@ -1,10 +1,12 @@
 import React, { useContext, useMemo } from "react";
 
+import { seekToTime } from "ui/actions/timeline";
 import {
   RequestSummary,
   partialRequestsToCompleteSummaries,
 } from "ui/components/NetworkMonitor/utils";
 import Icon from "ui/components/shared/Icon";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getEvents, getRequests } from "ui/reducers/network";
 import {
   getReporterAnnotationsForTitle,
@@ -13,7 +15,7 @@ import {
   getReporterAnnotationsForTitleStart,
 } from "ui/reducers/reporter";
 import { getCurrentTime } from "ui/reducers/timeline";
-import { useAppSelector } from "ui/setup/hooks";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AnnotatedTestStep, CypressAnnotationMessage, TestItem, TestStep } from "ui/types";
 
 import { NetworkEvent } from "./NetworkEvent";
@@ -232,11 +234,25 @@ export function TestSteps({ test }: { test: TestItem }) {
 
 function NewUrlRow({ time, message }: { time: number; message: CypressAnnotationMessage }) {
   const currentTime = useAppSelector(getCurrentTime);
+  const dispatch = useAppDispatch();
+
+  const onClick = () => {
+    dispatch(seekToTime(time));
+  };
 
   return (
-    <TestStepRow pending={time > currentTime} key={(message.url || "url") + time}>
+    <TestStepRow
+      active={time === currentTime}
+      pending={time > currentTime}
+      key={(message.url || "url") + time}
+      onClick={onClick}
+      className="cursor-pointer"
+    >
+      <MaterialIcon className="mr-1 opacity-70" iconSize="sm">
+        navigation
+      </MaterialIcon>
       <div className="truncate italic opacity-70" title={message.url}>
-        new url {message.url}
+        {message.url}
       </div>
     </TestStepRow>
   );
