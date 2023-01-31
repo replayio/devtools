@@ -1,5 +1,5 @@
 import { Value as ProtocolValue } from "@replayio/protocol";
-import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { Suspense, memo, useContext } from "react";
 
@@ -10,7 +10,7 @@ import Inspector from "replay-next/components/inspector";
 import Loader from "replay-next/components/Loader";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { UncaughtException } from "replay-next/src/suspense/ExceptionsCache";
+import { getExceptionSuspense, UncaughtException } from "replay-next/src/suspense/ExceptionsCache";
 import { formatTimestamp } from "replay-next/src/utils/time";
 
 import MessageHoverButton from "../MessageHoverButton";
@@ -34,12 +34,6 @@ function UncaughtExceptionRenderer({
 
   const { contextMenu, onContextMenu } = useConsoleContextMenu(uncaughtException);
 
-  const locations = useMemo(() => {
-    return Array.isArray(uncaughtException.location)
-      ? uncaughtException.location
-      : [uncaughtException.location];
-  }, [uncaughtException.location]);
-
   const ref = useRef<HTMLDivElement>(null);
 
   const [isHovered, setIsHovered] = useState(false);
@@ -55,29 +49,7 @@ function UncaughtExceptionRenderer({
     className = `${className} ${styles.Focused}`;
   }
 
-  const frames = uncaughtException.data.frames || EMPTY_ARRAY;
-  const showExpandable = frames.length > 0;
-
-  const argumentValues = uncaughtException.values || EMPTY_ARRAY;
-  const primaryContent =
-    argumentValues.length > 0 ? (
-      <span className={styles.LogContents} data-test-name="LogContents">
-        <Suspense fallback={<Loader />}>
-          {argumentValues.map((argumentValue: ProtocolValue, index: number) => (
-            <Fragment key={index}>
-              <Inspector
-                context="console"
-                pauseId={uncaughtException.pauseId}
-                protocolValue={argumentValue}
-              />
-              {index < argumentValues.length - 1 && " "}
-            </Fragment>
-          ))}
-        </Suspense>
-      </span>
-    ) : (
-      " "
-    );
+  const locations = uncaughtException.frame!;
 
   return (
     <>
@@ -102,18 +74,9 @@ function UncaughtExceptionRenderer({
             {locations.length > 0 && <Source locations={locations} />}
           </Suspense>
         </span>
-        {showExpandable ? (
-          <Expandable
-            children={
-              <StackRenderer frames={frames} stack={frames.map(({ frameId }) => frameId)} />
-            }
-            className={styles.Expandable}
-            header={primaryContent}
-            useBlockLayoutWhenExpanded={false}
-          />
-        ) : (
-          primaryContent
-        )}
+        <Suspense fallback={<Loader />}>
+          <AnalyzedContent uncaughtException={uncaughtException} />
+        </Suspense>
         {isHovered && (
           <MessageHoverButton
             executionPoint={uncaughtException.point}
@@ -125,6 +88,45 @@ function UncaughtExceptionRenderer({
       </div>
       {contextMenu}
     </>
+  );
+}
+
+function AnalyzedContent({ uncaughtException }: { uncaughtException: UncaughtException }) {
+  const uncaughtExceptionResult = getExceptionSuspense(uncaughtException.point);
+
+  const frames = uncaughtExceptionResult.data.frames || EMPTY_ARRAY;
+  const showExpandable = frames.length > 0;
+
+  const argumentValues = uncaughtExceptionResult.values || EMPTY_ARRAY;
+  const primaryContent =
+    argumentValues.length > 0 ? (
+      <span className={styles.LogContents} data-test-name="LogContents">
+        <Suspense fallback={<Loader />}>
+          {argumentValues.map((argumentValue: ProtocolValue, index: number) => (
+            <Fragment key={index}>
+              <Inspector
+                context="console"
+                pauseId={uncaughtExceptionResult.pauseId}
+                protocolValue={argumentValue}
+              />
+              {index < argumentValues.length - 1 && " "}
+            </Fragment>
+          ))}
+        </Suspense>
+      </span>
+    ) : (
+      <>" "</>
+    );
+
+  return showExpandable ? (
+    <Expandable
+      children={<StackRenderer frames={frames} stack={frames.map(({ frameId }) => frameId)} />}
+      className={styles.Expandable}
+      header={primaryContent}
+      useBlockLayoutWhenExpanded={false}
+    />
+  ) : (
+    primaryContent
   );
 }
 

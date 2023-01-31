@@ -13,7 +13,7 @@ import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { PointInstance, PointsContext } from "replay-next/src/contexts/PointsContext";
 import { TerminalContext, TerminalExpression } from "replay-next/src/contexts/TerminalContext";
 import { EventLog, getEventTypeEntryPointsSuspense } from "replay-next/src/suspense/EventsCache";
-import { UncaughtException, getExceptionsSuspense } from "replay-next/src/suspense/ExceptionsCache";
+import { UncaughtException, getExceptionPointsSuspense } from "replay-next/src/suspense/ExceptionsCache";
 import { ProtocolMessage, getMessagesSuspense } from "replay-next/src/suspense/MessagesCache";
 import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/PointsCache";
 import { loggableSort } from "replay-next/src/utils/loggables";
@@ -59,7 +59,14 @@ export function LoggablesContextRoot({
     showWarnings,
   } = useContext(ConsoleFiltersContext);
 
-  const { range: focusRange } = useContext(FocusContext);
+  const { range: focusRange, endPoint } = useContext(FocusContext);
+  const range = useMemo(
+    () =>
+      focusRange
+        ? { begin: focusRange.begin.point, end: focusRange.end.point }
+        : { begin: "0", end: endPoint!.point },
+    [endPoint, focusRange]
+  );
 
   // Find the set of event type handlers we should be displaying in the console.
   const eventTypesToLoad = useMemo<EventHandlerType[]>(() => {
@@ -123,7 +130,7 @@ export function LoggablesContextRoot({
   // We may suspend based on this value, so let's this value changes at sync priority,
   let exceptions: UncaughtException[] = EMPTY_ARRAY;
   if (showExceptions) {
-    exceptions = getExceptionsSuspense(client, focusRange);
+    exceptions = getExceptionPointsSuspense(client, range);
   }
 
   // Trim eventLogs and logPoints by focusRange.
