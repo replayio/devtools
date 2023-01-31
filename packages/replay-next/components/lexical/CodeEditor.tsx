@@ -37,6 +37,7 @@ import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
 
 import LexicalEditorRefSetter from "./LexicalEditorRefSetter";
 import CodeCompletionPlugin from "./plugins/code-completion/CodeCompletionPlugin";
+import { Context } from "./plugins/code-completion/findMatches";
 import CodeNode from "./plugins/code/CodeNode";
 import CodePlugin from "./plugins/code/CodePlugin";
 import parsedTokensToCodeTextNode from "./plugins/code/utils/parsedTokensToCodeTextNode";
@@ -55,6 +56,7 @@ type Props = {
   allowWrapping?: boolean;
   autoFocus?: boolean;
   autoSelect?: boolean;
+  context: Context;
   dataTestId?: string;
   dataTestName?: string;
   editable: boolean;
@@ -65,13 +67,13 @@ type Props = {
   onSave: (markdown: string, editorState: SerializedEditorState) => void;
   pauseAndFrameId: PauseAndFrameId | null;
   placeholder?: string;
-  useOriginalVariables: boolean;
 };
 
 function CodeEditor({
   allowWrapping = true,
   autoFocus = false,
   autoSelect = false,
+  context,
   dataTestId,
   dataTestName,
   editable,
@@ -82,7 +84,6 @@ function CodeEditor({
   onSave,
   pauseAndFrameId,
   placeholder = "",
-  useOriginalVariables,
 }: Props): JSX.Element {
   const historyState = useMemo(() => createEmptyHistoryState(), []);
 
@@ -237,10 +238,10 @@ function CodeEditor({
         <FormPlugin onCancel={onFormCancel} onChange={onFormChange} onSubmit={onFormSubmit} />
         <CodePlugin />
         <CodeCompletionPlugin
+          context={context}
           dataTestId={dataTestId ? `${dataTestId}-CodeTypeAhead` : undefined}
           dataTestName={dataTestName ? `${dataTestName}-CodeTypeAhead` : undefined}
           pauseAndFrameId={pauseAndFrameId}
-          useOriginalVariables={useOriginalVariables}
         />
       </>
     </LexicalComposer>

@@ -9,22 +9,37 @@ import {
 import {
   addLogpoint,
   editLogPoint,
-  verifyLogPointTypeAheadSuggestions,
+  toggleMappedSources,
+  verifyLogPointContentTypeAheadSuggestions,
 } from "../helpers/source-panel";
 
-test(`logpoints-07: should use both original and global variables in auto-complete`, async ({
-  page,
-}) => {
+test(`logpoints-07: should use the correct scope in auto-complete`, async ({ page }) => {
   await startTest(page, "cra/dist/index.html");
   await openDevToolsTab(page);
 
-  const url = "App.js";
-  await addLogpoint(page, { lineNumber: 13, url });
+  let url = "App.js";
+  let lineNumber = 13;
 
-  await warpToMessage(page, "update", 13);
+  await addLogpoint(page, { lineNumber, url });
+  await warpToMessage(page, "update", lineNumber);
+
+  // Log point should use original source (since we're viewing it)
+  await editLogPoint(page, { content: "set", lineNumber, saveAfterEdit: false, url });
+  await verifyLogPointContentTypeAheadSuggestions(page, ["setInterval", "setList"]);
+
+  // Console should assume original source as well (by default)
   await executeTerminalExpression(page, "set", false);
   await verifyConsoleTerminalTypeAheadSuggestions(page, ["setInterval", "setList"]);
 
-  await editLogPoint(page, { content: "set", lineNumber: 13, saveAfterEdit: false, url });
-  await verifyLogPointTypeAheadSuggestions(page, ["setInterval", "setList"]);
+  // Log point should use generated source (if we're viewing that)
+  await toggleMappedSources(page, "off");
+
+  lineNumber = 19;
+
+  await addLogpoint(page, { lineNumber });
+  await editLogPoint(page, { content: "set", lineNumber, saveAfterEdit: false });
+  await verifyLogPointContentTypeAheadSuggestions(page, ["setInterval"], ["setList"]);
+
+  await editLogPoint(page, { content: "l", lineNumber, saveAfterEdit: false });
+  await verifyLogPointContentTypeAheadSuggestions(page, ["l", "la", "le", "li"]);
 });

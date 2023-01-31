@@ -242,6 +242,7 @@ export async function verifyConsoleMessage(
     await message.waitFor();
   }
 }
+
 export async function verifyTypeAheadContainsSuggestions(page: Page, ...suggestions: Expected[]) {
   const typeAhead = getConsoleInputTypeAhead(page);
 
