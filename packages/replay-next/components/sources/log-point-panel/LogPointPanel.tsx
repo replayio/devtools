@@ -281,7 +281,11 @@ function PointPanelWithHitPoints({
 
   const onSubmit = () => {
     if (isConditionValid && isContentValid && hasChanged) {
-      editPoint(point.id, { condition: editableCondition || null, content: editableContent });
+      editPoint(point.id, {
+        condition: editableCondition || null,
+        content: editableContent,
+        shouldLog: POINT_BEHAVIOR_ENABLED,
+      });
     }
     setIsEditing(false);
     dismissEditBreakpointNag();
@@ -419,7 +423,10 @@ function PointPanelWithHitPoints({
                   disabled={isPending}
                   data-test-name="PointPanel-EditButton"
                 >
-                  <Icon className={styles.EditButtonIcon} type="edit" />
+                  <Icon
+                    className={styles.EditButtonIcon}
+                    type={shouldLog ? "edit" : "toggle-off"}
+                  />
                 </button>
               </>
             )}

@@ -28,6 +28,7 @@ import {
   searchSourcesByName,
   toggleColumnBreakpoint,
   toggleLogPointBadge,
+  toggleShouldLog,
   verifyCurrentSearchResult,
   verifyHitPointButtonsEnabled,
   verifyLogPointStep,
@@ -212,14 +213,14 @@ test("should support custom badge styles for log points", async ({ page }) => {
 });
 
 test("should handle too many points to find", async ({ page }) => {
-  await addLogPoint(page, { sourceId, lineNumber: 68 });
+  await addLogPoint(page, { sourceId, lineNumber: 68, saveAfterEdit: false });
 
   const popup = getPointPanelLocator(page, 68);
   await takeScreenshot(page, popup, "log-point-message-too-many-points-to-find");
 });
 
 test("should handle too many points to run analysis", async ({ page }) => {
-  await addLogPoint(page, { sourceId, lineNumber: 70 });
+  await addLogPoint(page, { sourceId, lineNumber: 70, saveAfterEdit: false });
 
   // Give the analysis a little extra time to run.
   await delay(1000);
@@ -578,4 +579,16 @@ test("should expand and contract line height when log points are added and remov
   await takeScreenshot(page, lineLocator, "line-with-log-point");
   await removeLogPoint(page, { sourceId, lineNumber: 13 });
   await takeScreenshot(page, lineLocator, "line-without-log-point");
+});
+
+test("should show different background color and edit icon when log point disabled", async ({
+  page,
+}) => {
+  await addLogPoint(page, { sourceId, lineNumber: 13 });
+  const logPointPanel = getPointPanelLocator(page, 13);
+  await takeScreenshot(page, logPointPanel, "log-point-panel-enabled");
+  await toggleShouldLog(page, { sourceId, lineNumber: 13, state: false });
+  await takeScreenshot(page, logPointPanel, "log-point-panel-disabled");
+  await toggleShouldLog(page, { sourceId, lineNumber: 13, state: true });
+  await takeScreenshot(page, logPointPanel, "log-point-panel-enabled");
 });
