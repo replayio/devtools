@@ -55,6 +55,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
     pauseId: string | undefined;
     nodeIds: string[] | undefined;
+    point: string | undefined;
   }>();
   const viewMode = useAppSelector(getViewMode);
   const isPlaying = useAppSelector(isPlayingSelector);
@@ -93,22 +94,21 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   }, [actions, viewMode, step, endPauseId, dispatch, id]);
 
   const onMouseEnter = () => {
+    const { pauseId, point, nodeIds } = subjectNodePauseData || {};
+
     if (state === "paused") {
       return;
     }
 
-    dispatch(setTimelineToTime(step.absoluteEndTime));
-    if (subjectNodePauseData?.pauseId) {
-      dispatch(
-        setTimelineToPauseTime(
-          step.absoluteEndTime,
-          subjectNodePauseData.pauseId,
-          step.annotations.end?.point
-        )
-      );
+    if (!pauseId) {
+      dispatch(setTimelineToTime(step.absoluteEndTime));
+      return;
     }
-    if (subjectNodePauseData?.nodeIds && subjectNodePauseData.pauseId) {
-      dispatch(highlightNodes(subjectNodePauseData.nodeIds, subjectNodePauseData.pauseId));
+
+    dispatch(setTimelineToPauseTime(step.absoluteEndTime, pauseId, point));
+
+    if (nodeIds) {
+      dispatch(highlightNodes(nodeIds, pauseId));
     }
   };
   const onMouseLeave = () => {

@@ -194,5 +194,5 @@ export async function getCypressSubjectNodeIdsAsync(
     }
   }
 
-  return { nodeIds, pauseId };
+  return { nodeIds, pauseId, point };
 }
