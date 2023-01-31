@@ -96,14 +96,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
         badge: null,
         content: "",
         condition: null,
-        createdByUser: currentUserInfo
-          ? {
-              email: currentUserInfo.email,
-              id: currentUserInfo.id,
-              name: currentUserInfo.name,
-              picture: currentUserInfo.picture,
-            }
-          : null,
+        createdByUserId: currentUserInfo?.id ?? null,
         createdAtTime: Date.now(),
         recordingId,
         shouldBreak: POINT_BEHAVIOR_DISABLED,
