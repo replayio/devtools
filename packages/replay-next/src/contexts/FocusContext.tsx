@@ -1,4 +1,4 @@
-import { TimeStampedPointRange } from "@replayio/protocol";
+import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import {
   PropsWithChildren,
   createContext,
@@ -31,6 +31,7 @@ export type FocusContextType = {
   range: TimeStampedPointRange | null;
   rangeForDisplay: TimeStampedPointRange | null;
   update: (value: Range | null, debounce: boolean) => void;
+  endPoint?: TimeStampedPoint;
 };
 
 export const FocusContext = createContext<FocusContextType>(null as any);

@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { Suspense, memo, useContext } from "react";
 
@@ -13,7 +13,7 @@ import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { InspectableTimestampedPointContext } from "replay-next/src/contexts/InspectorContext";
 import { PointInstance } from "replay-next/src/contexts/PointsContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { runAnalysisSuspense } from "replay-next/src/suspense/AnalysisCache";
+import { getAnalysisResultSuspense } from "replay-next/src/suspense/NewAnalysisCache";
 import { primitiveToClientValue } from "replay-next/src/utils/protocol";
 import { formatTimestamp } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -122,21 +122,16 @@ function LogPointRenderer({
 
 function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance }) {
   const client = useContext(ReplayClientContext);
-  const { range: focusRange } = useContext(FocusContext);
+  const { range: focusRange, endPoint } = useContext(FocusContext);
+  const range = useMemo(
+    () =>
+      focusRange
+        ? { begin: focusRange.begin.point, end: focusRange.end.point }
+        : { begin: "0", end: endPoint!.point },
+    [endPoint, focusRange]
+  );
 
   const { point, timeStampedHitPoint } = logPointInstance;
-
-  const pointRange = focusRange
-    ? { begin: focusRange.begin.point, end: focusRange.end.point }
-    : null;
-
-  const analysisResults = runAnalysisSuspense(
-    client,
-    pointRange,
-    point.location,
-    point.content,
-    point.condition
-  );
 
   const context = useMemo(
     () => ({
@@ -146,14 +141,15 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
     [timeStampedHitPoint]
   );
 
-  const entry = analysisResults(timeStampedHitPoint);
+  const entry = getAnalysisResultSuspense(client, range, timeStampedHitPoint.point, point.location, point.content, point.condition);
   if (entry === null) {
     console.error(`No analysis results found for execution point "${timeStampedHitPoint.point}"`);
 
     return <span className={styles.AnalysisError}>Analysis error</span>;
   }
 
-  const { isRemote, pauseId, values } = entry;
+  const { pauseId, values } = entry;
+  const isRemote = true; //TODO support local analysis
 
   const children = isRemote
     ? values.map((value, index) => (

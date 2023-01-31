@@ -1,10 +1,10 @@
 import { PropsWithChildren, useCallback, useEffect, useMemo, useState, useTransition } from "react";
 
-import { FocusContext, FocusContextType } from "replay-next/src/contexts/FocusContext";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { Range } from "replay-next/src/types";
 import { enterFocusMode, setFocusRegionFromTimeRange } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
-import { getFocusRegion } from "ui/reducers/timeline";
+import { getFocusRegion, getPoints } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { FocusRegion } from "ui/state/timeline";
 import { rangeForFocusRegion } from "ui/utils/timeline";
@@ -14,6 +14,8 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
   const dispatch = useAppDispatch();
   const loadedRegions = useAppSelector(getLoadedRegions);
   const focusRegion = useAppSelector(getFocusRegion);
+  const receivedPoints = useAppSelector(getPoints);
+  const endPoint = receivedPoints[receivedPoints.length - 1];
 
   const [isPending, startTransition] = useTransition();
   const [deferredFocusRegion, setDeferredFocusRegion] = useState<FocusRegion | null>(null);
@@ -45,12 +47,13 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
       enterFocusMode: () => {
         dispatch(enterFocusMode());
       },
+      endPoint,
       isTransitionPending: isPending,
       range: deferredFocusRegion ? rangeForFocusRegion(deferredFocusRegion) : null,
       rangeForDisplay: focusRegion ? rangeForFocusRegion(focusRegion) : null,
       update,
     };
-  }, [deferredFocusRegion, dispatch, isPending, focusRegion, update]);
+  }, [deferredFocusRegion, dispatch, endPoint, isPending, focusRegion, update]);
 
   return <FocusContext.Provider value={context}>{children}</FocusContext.Provider>;
 }
