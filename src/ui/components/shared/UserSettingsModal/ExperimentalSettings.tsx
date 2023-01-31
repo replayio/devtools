@@ -69,6 +69,12 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     description: "Always re-run routines instead of using cached results",
     key: "rerunRoutines",
   },
+  {
+    label: "Track recording assets in the database",
+    description:
+      "Enable writing to and reading from the backend database when storing or retrieving recording assets",
+    key: "trackRecordingAssetsInDatabase",
+  },
 ];
 
 const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [];
@@ -124,6 +130,9 @@ export default function ExperimentalSettings({}) {
   const { value: enableRoutines, update: updateEnableRoutines } = useFeature("enableRoutines");
   const { value: rerunRoutines, update: updatererunRoutines } = useFeature("rerunRoutines");
 
+  const { value: trackRecordingAssetsInDatabase, update: updateTrackRecordingAssetsInDatabase } =
+    useFeature("trackRecordingAssetsInDatabase");
+
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
@@ -145,6 +154,8 @@ export default function ExperimentalSettings({}) {
       updateEnableRoutines(!enableRoutines);
     } else if (key === "rerunRoutines") {
       updatererunRoutines(!rerunRoutines);
+    } else if (key === "trackRecordingAssetsInDatabase") {
+      updateTrackRecordingAssetsInDatabase(!trackRecordingAssetsInDatabase);
     }
   };
 
@@ -159,6 +170,7 @@ export default function ExperimentalSettings({}) {
     enableRoutines,
     rerunRoutines,
     profileWorkerThreads,
+    trackRecordingAssetsInDatabase,
   };
 
   const settings = { ...userSettings, ...localSettings };

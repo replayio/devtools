@@ -26,6 +26,7 @@ export type LocalExperimentalUserSettings = {
   rerunRoutines: boolean;
   profileWorkerThreads: boolean;
   brokenSourcemapWorkaround: boolean;
+  trackRecordingAssetsInDatabase: boolean;
 };
 
 export type LocalUserSettings = LocalExperimentalUserSettings & {
