@@ -1,18 +1,11 @@
-import {
-  EventHandlerType,
-  ExecutionPoint,
-  Frame,
-  Location,
-  PauseId,
-  Object as RecordReplayObject,
-} from "@replayio/protocol";
+import { EventHandlerType, ExecutionPoint, PointDescription, PointRange } from "@replayio/protocol";
 
 import { ReplayClientInterface } from "shared/client/types";
 
 import { STANDARD_EVENT_CATEGORIES } from "../constants";
 import { createWakeable } from "../utils/suspense";
-import { cachePauseData } from "./PauseCache";
-import { Record, STATUS_PENDING, STATUS_RESOLVED, Wakeable } from "./types";
+import { getAnalysisCache } from "./NewAnalysisCache";
+import { Wakeable } from "./types";
 
 export type Event = {
   count: number;
@@ -25,20 +18,11 @@ export type EventCategory = {
   events: Event[];
 };
 
-export type EventLog = {
-  data: {
-    frames: Frame[];
-    objects: RecordReplayObject[];
-  };
-  location: Location[];
-  pauseId: PauseId;
-  point: ExecutionPoint;
-  time: number;
+export type EventLog = PointDescription & {
+  eventType: EventHandlerType;
   type: "EventLog";
-  values: any[];
 };
 
-let eventTypeToEntryPointMap = new Map<EventHandlerType, Record<EventLog[]>>();
 let eventCategoryCounts: EventCategory[] | null = null;
 let inProgressEventCategoryCountsWakeable: Wakeable<EventCategory[]> | null = null;
 
@@ -56,29 +40,6 @@ export function getEventCategoryCountsSuspense(client: ReplayClientInterface): E
   }
 
   throw inProgressEventCategoryCountsWakeable;
-}
-
-export function getEventTypeEntryPointsSuspense(
-  client: ReplayClientInterface,
-  eventType: EventHandlerType
-): EventLog[] {
-  let record = eventTypeToEntryPointMap.get(eventType);
-  if (record == null) {
-    record = {
-      status: STATUS_PENDING,
-      value: createWakeable<EventLog[]>("getEventTypeEntryPointsSuspense"),
-    };
-
-    eventTypeToEntryPointMap.set(eventType, record);
-
-    fetchEventTypeEntryPoints(client, eventType, record);
-  }
-
-  if (record.status === STATUS_RESOLVED) {
-    return record.value;
-  } else {
-    throw record.value;
-  }
 }
 
 async function fetchEventCategoryCounts(client: ReplayClientInterface) {
@@ -101,34 +62,6 @@ async function fetchEventCategoryCounts(client: ReplayClientInterface) {
 
   inProgressEventCategoryCountsWakeable!.resolve(pendingEventCategoryCounts);
   inProgressEventCategoryCountsWakeable = null;
-}
-
-async function fetchEventTypeEntryPoints(
-  client: ReplayClientInterface,
-  eventType: EventHandlerType,
-  record: Record<EventLog[]>
-) {
-  const entryPoints = await client.runAnalysis<EventLog>({
-    effectful: false,
-    eventHandlerEntryPoints: [{ eventType }],
-    mapper: MAPPER,
-  });
-
-  // Pre-cache object previews that came back with our new analysis data.
-  // This will avoid us having to turn around and request them again when rendering the logs.
-  entryPoints.forEach(entryPoint => cachePauseData(client, entryPoint.pauseId, entryPoint.data));
-
-  const eventLogs: EventLog[] = entryPoints.map(entryPoint => ({
-    ...entryPoint,
-    type: "EventLog",
-  }));
-
-  const wakeable = record.value;
-
-  record.status = STATUS_RESOLVED;
-  record.value = eventLogs;
-
-  wakeable.resolve(eventLogs);
 }
 
 export const MAPPER = `
@@ -197,3 +130,45 @@ export const MAPPER = `
     },
   ];
 `;
+
+function getEventCache(eventType: EventHandlerType) {
+  return getAnalysisCache<EventLog>(
+    {
+      eventTypes: [eventType],
+      mapper: MAPPER,
+    },
+    point => ({ ...point, eventType, type: "EventLog" })
+  );
+}
+
+export function getEventPointsSuspense(
+  client: ReplayClientInterface,
+  eventType: EventHandlerType,
+  range: PointRange
+) {
+  return getEventCache(eventType).getPointsSuspense(client, range);
+}
+
+export function getEventPointsAsync(
+  client: ReplayClientInterface,
+  eventType: EventHandlerType,
+  range: PointRange
+) {
+  return getEventCache(eventType).getPointsAsync(client, range);
+}
+
+export function getCachedEventPoints(eventType: EventHandlerType, range: PointRange) {
+  return getEventCache(eventType).getCachedPoints(range);
+}
+
+export function getEventSuspense(eventType: EventHandlerType, point: ExecutionPoint) {
+  return getEventCache(eventType).getResultSuspense(point);
+}
+
+export function getEventAsync(eventType: EventHandlerType, point: ExecutionPoint) {
+  return getEventCache(eventType).getResultAsync(point);
+}
+
+export function getEventIfCached(eventType: EventHandlerType, point: ExecutionPoint) {
+  return getEventCache(eventType).getResultIfCached(point);
+}
