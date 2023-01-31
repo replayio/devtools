@@ -6,8 +6,7 @@ import PropertiesRenderer from "replay-next/components/inspector/PropertiesRende
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useTestInfo } from "ui/hooks/useTestInfo";
-
-import { getCypressConsolePropsSuspense } from "./getCypressConsolePropsSuspense";
+import { getCypressConsolePropsSuspense } from "ui/suspense/testStepCache";
 
 function ConsoleProps({ open }: { open: boolean }) {
   const client = useContext(ReplayClientContext);

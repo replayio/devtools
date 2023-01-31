@@ -10,17 +10,15 @@ import { ReplayClientInterface } from "shared/client/types";
 import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getStepRanges, useStepState } from "ui/hooks/useStepState";
-import { useTestInfo } from "ui/hooks/useTestInfo";
 import { useTestStepActions } from "ui/hooks/useTestStepActions";
 import { getViewMode } from "ui/reducers/layout";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
 import { getCurrentTime, isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { getCypressConsolePropsSuspense } from "ui/suspense/testStepCache";
 import { AnnotatedTestStep } from "ui/types";
 
-import { getCypressConsolePropsSuspense } from "./getCypressConsolePropsSuspense";
 import { TestCaseContext } from "./TestCase";
-import { TestInfoContext } from "./TestInfo";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { TestStepRow } from "./TestStepRow";
 import styles from "./TestStepItem.module.css";
