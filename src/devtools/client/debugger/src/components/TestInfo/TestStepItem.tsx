@@ -1,4 +1,3 @@
-import { Object as ProtocolObject } from "@replayio/protocol";
 import classNames from "classnames";
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 
@@ -6,12 +5,12 @@ import { highlightNodes, unhighlightNode } from "devtools/client/inspector/marku
 import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
 import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
 import { evaluateAsync, getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
-import { ReplayClient } from "shared/client/ReplayClient";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getStepRanges, useStepState } from "ui/hooks/useStepState";
+import { useTestInfo } from "ui/hooks/useTestInfo";
 import { useTestStepActions } from "ui/hooks/useTestStepActions";
 import { getViewMode } from "ui/reducers/layout";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
@@ -19,6 +18,7 @@ import { getCurrentTime, isPlaying as isPlayingSelector } from "ui/reducers/time
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AnnotatedTestStep } from "ui/types";
 
+import { getCypressConsolePropsSuspense } from "./getCypressConsolePropsSuspense";
 import { TestCaseContext } from "./TestCase";
 import { TestInfoContext } from "./TestInfo";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
@@ -90,49 +90,9 @@ async function getCypressSubjectNodeIds(
   return [];
 }
 
-async function getCypressConsoleProps(
-  client: ReplayClientInterface,
-  endPauseId?: string,
-  callerFrameId?: string,
-  logVariable?: string
-) {
-  if (!endPauseId || !callerFrameId || !logVariable) {
-    return;
-  }
-
-  const logResult = await evaluateAsync(client, endPauseId, callerFrameId, logVariable);
-
-  if (logResult.returned?.object) {
-    const logObject = await getObjectWithPreviewHelper(
-      client,
-      endPauseId,
-      logResult.returned.object
-    );
-    const consolePropsProperty = logObject.preview?.properties?.find(
-      p => p.name === "consoleProps"
-    );
-
-    if (consolePropsProperty?.object) {
-      return await getObjectWithPreviewHelper(
-        client,
-        endPauseId,
-        consolePropsProperty.object,
-        true
-      );
-    }
-  }
-}
-
 export function TestStepItem({ step, argString, index, id }: TestStepItemProps) {
   const hasScrolled = useRef(false);
   const ref = useRef<HTMLDivElement>(null);
-  const [localPauseData, setLocalPauseData] = useState<{
-    loading: boolean;
-    endPauseFailed?: boolean;
-    endPauseId?: string;
-    consoleProps?: ProtocolObject;
-  }>({ loading: true });
-  const { setConsoleProps, setPauseId } = useContext(TestInfoContext);
   const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
     pauseId: string;
     nodeIds: string[];
@@ -148,63 +108,29 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const actions = useTestStepActions(step);
 
   useEffect(() => {
-    setLocalPauseData(v => ({
-      ...v,
-      loading: true,
-    }));
-
     (async () => {
-      try {
-        const endPauseId =
-          pointEnd && timeEnd != null
-            ? await getPauseIdAsync(client, pointEnd, timeEnd)
-            : undefined;
-        const frames = endPauseId ? await getFramesAsync(client, endPauseId) : undefined;
+      const endPauseId =
+        pointEnd && timeEnd != null ? await getPauseIdAsync(client, pointEnd, timeEnd) : undefined;
+      const frames = endPauseId ? await getFramesAsync(client, endPauseId) : undefined;
 
-        if (endPauseId && frames) {
-          const callerFrame = frames[1];
+      if (endPauseId && frames) {
+        const callerFrame = frames[1];
 
-          await getCypressSubjectNodeIds(
-            client,
-            endPauseId,
-            callerFrame.frameId,
-            messageEnd?.commandVariable
-          ).then(nodeIds => setSubjectNodePauseData({ pauseId: endPauseId, nodeIds }));
-
-          await getCypressConsoleProps(
-            client,
-            endPauseId,
-            callerFrame.frameId,
-            messageEnd?.logVariable
-          ).then(consoleProps =>
-            setLocalPauseData(v => ({
-              ...v,
-              loading: false,
-              endPauseFailed: false,
-              endPauseId,
-              consoleProps,
-            }))
-          );
-        }
-      } catch {
-        setLocalPauseData(v => ({
-          ...v,
-          loading: false,
-          endPauseFailed: true,
-        }));
+        await getCypressSubjectNodeIds(
+          client,
+          endPauseId,
+          callerFrame.frameId,
+          messageEnd?.commandVariable
+        ).then(nodeIds => setSubjectNodePauseData({ pauseId: endPauseId, nodeIds }));
       }
     })();
   }, [client, messageEnd, timeEnd, pointEnd]);
 
-  const { endPauseId, consoleProps } = localPauseData || {};
+  const { pauseId: endPauseId } = subjectNodePauseData || {};
   const onClick = useCallback(() => {
     const { timeRange, pointRange } = getStepRanges(step);
     if (id && timeRange) {
       if (pointRange) {
-        if (endPauseId && consoleProps) {
-          setConsoleProps(consoleProps);
-          setPauseId(endPauseId);
-        }
         dispatch(seek(pointRange[1], timeRange[1], false, endPauseId));
       } else {
         dispatch(seekToTime(timeRange[1], false));
@@ -216,17 +142,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
 
       dispatch(setSelectedStep(step));
     }
-  }, [
-    actions,
-    viewMode,
-    step,
-    endPauseId,
-    consoleProps,
-    dispatch,
-    setConsoleProps,
-    id,
-    setPauseId,
-  ]);
+  }, [actions, viewMode, step, endPauseId, dispatch, id]);
 
   const onMouseEnter = () => {
     if (state === "paused") {
@@ -234,11 +150,11 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     }
 
     dispatch(setTimelineToTime(step.absoluteEndTime));
-    if (localPauseData?.endPauseId) {
+    if (subjectNodePauseData?.pauseId) {
       dispatch(
         setTimelineToPauseTime(
           step.absoluteEndTime,
-          localPauseData.endPauseId,
+          subjectNodePauseData.pauseId,
           step.annotations.end?.point
         )
       );
@@ -282,9 +198,6 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const displayedProgress =
     (step.duration === 1 && state === "paused") || progress == 100 ? 0 : progress;
   const isSelected = selectedStep?.id === id;
-  const matchingElementCount = consoleProps?.preview?.properties?.find(
-    p => p.name === "Elements"
-  )?.value;
 
   return (
     <TestStepRow
@@ -310,16 +223,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
           <span className="opacity-70">{argString}</span>
         </div>
       </button>
-      {step.name === "get" && matchingElementCount > 1 ? (
-        <span
-          className={classNames(
-            "-my-1 flex-shrink rounded p-1 text-xs text-gray-800",
-            isSelected ? "bg-gray-300" : "bg-gray-200"
-          )}
-        >
-          {matchingElementCount}
-        </span>
-      ) : null}
+      <MatchingElementBadge selected={isSelected} step={step} />
       {step.alias ? (
         <span
           className={classNames(
@@ -331,12 +235,40 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
           {step.alias}
         </span>
       ) : null}
-      <Actions step={step} isSelected={isSelected} />
+      <Actions step={step} selected={isSelected} />
     </TestStepRow>
   );
 }
 
-function Actions({ step, isSelected }: { step: AnnotatedTestStep; isSelected: boolean }) {
+function MatchingElementBadge({ step, selected }: { step: AnnotatedTestStep; selected: boolean }) {
+  const client = useContext(ReplayClientContext);
+
+  if (step.name !== "get") {
+    return null;
+  }
+
+  const { pauseId, consoleProps } = getCypressConsolePropsSuspense(client, step) || {};
+
+  const count = consoleProps?.preview?.properties?.find(p => p.name === "Elements")?.value;
+
+  if (!pauseId || !count || count < 1) {
+    // maybe an error?
+    return null;
+  }
+
+  return (
+    <span
+      className={classNames(
+        "-my-1 flex-shrink rounded p-1 text-xs text-gray-800",
+        selected ? "bg-gray-300" : "bg-gray-200"
+      )}
+    >
+      {count}
+    </span>
+  );
+}
+
+function Actions({ step, selected }: { step: AnnotatedTestStep; selected: boolean }) {
   const { test } = useContext(TestCaseContext);
   const { show } = useContext(TestInfoContextMenuContext);
   const stepActions = useTestStepActions(step);
@@ -350,10 +282,7 @@ function Actions({ step, isSelected }: { step: AnnotatedTestStep; isSelected: bo
   };
 
   return (
-    <button
-      onClick={onClick}
-      className={`${isSelected ? "" : "invisible"} group-hover/step:visible`}
-    >
+    <button onClick={onClick} className={`${selected ? "" : "invisible"} group-hover/step:visible`}>
       <div className="flex items-center">
         <MaterialIcon>more_vert</MaterialIcon>
       </div>
