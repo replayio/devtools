@@ -568,3 +568,24 @@ function sourceIdAndFocusRangeToKey(
   }
   return key;
 }
+
+export const {
+  getValueAsync: getSourceContentsAsync,
+  getValueSuspense: getSourceContentsSuspense,
+  getValueIfCached: getSourceContentsIfCached,
+  getStatus: getSourceContentsStatus,
+} = createGenericCache<
+  [replayClient: ReplayClientInterface, sourceId: string],
+  StreamingSourceContents | undefined
+>(
+  "sourceContentsCache",
+  async (replayClient, sourceId) => {
+    const res = await getStreamingSourceContentsHelper(replayClient, sourceId);
+    if (res) {
+      // Ensure that follow-on caches have the entire text available
+      const sourceContents = await res.resolver;
+      return sourceContents;
+    }
+  },
+  (replayClient, sourceId) => sourceId
+);

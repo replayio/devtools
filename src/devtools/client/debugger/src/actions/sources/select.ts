@@ -16,7 +16,6 @@ import {
   getSourceDetails,
   getSourceIdToDisplayForUrl,
   getSourceToDisplayForUrl,
-  loadSourceText,
   locationSelected,
   preferSource,
 } from "ui/reducers/sources";
@@ -172,10 +171,6 @@ export function selectLocation(
       dispatch(setSelectedPanel("debugger"));
     }
 
-    // This adds the source's text to the client-side parser, which is a necessary step
-    // before we can ask the parser to return symbols in `fetchSymbolsForSource`.
-    await dispatch(loadSourceText(source.id));
-
     // Set shownSource to null first, then the actual source to trigger
     // a proper re-render in the SourcesTree component
     dispatch(setShownSource(null));
@@ -188,6 +183,7 @@ export function selectLocation(
       return;
     }
 
+    // Kick off Babel parsing for symbols so that the "Outline" view can display functions
     dispatch(fetchSymbolsForSource(loadedSource.id));
   };
 }

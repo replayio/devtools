@@ -6,10 +6,8 @@
 
 import { getUnicodeUrl } from "devtools/client/shared/unicode-url";
 import { truncate as truncateText } from "replay-next/src/utils/text";
-import { MiniSource, SourceContent } from "ui/reducers/sources";
-import { LoadingStatus } from "ui/utils/LoadingStatus";
+import { MiniSource } from "ui/reducers/sources";
 
-import type { SymbolDeclarations } from "../reducers/ast";
 import { getURL } from "./sources-tree/getURL";
 import { parse as parseURL } from "./url";
 
@@ -25,8 +23,6 @@ export const sourceTypes = {
 };
 
 type UrlResult = ReturnType<typeof getURL>;
-
-const javascriptLikeExtensions = ["marko", "es6", "vue", "jsm"];
 
 const IGNORED_URLS = ["debugger eval code", "XStringBundle"];
 
@@ -45,20 +41,6 @@ function getPath(source: MiniSource) {
   result.push("");
 
   return result;
-}
-
-/**
- * Returns true if the specified url and/or content type are specific to
- * javascript files.
- *
- */
-export function isJavaScript(source: MiniSource, content: SourceContent["value"]) {
-  const extension = getFileExtension(source).toLowerCase();
-  const contentType = content?.contentType;
-  return (
-    javascriptLikeExtensions.includes(extension) ||
-    !!(contentType && contentType.includes("javascript"))
-  );
 }
 
 export function isPretty(source: MiniSource) {
@@ -229,21 +211,6 @@ export function getFileURL(source: MiniSource, truncate = true) {
   return resolveFileURL(url, getUnicodeUrl, truncate);
 }
 
-const contentTypeModeMap = {
-  "text/javascript": { name: "javascript" },
-  "text/typescript": { name: "javascript", typescript: true },
-  "text/coffeescript": { name: "coffeescript" },
-  "text/typescript-jsx": {
-    name: "jsx",
-    base: { name: "javascript", typescript: true },
-  },
-  "text/jsx": { name: "jsx" },
-  "text/x-elm": { name: "elm" },
-  "text/x-clojure": { name: "clojure" },
-  "text/x-clojurescript": { name: "clojure" },
-  "text/html": { name: "htmlmixed" },
-};
-
 export function getSourcePath(url?: UrlResult): string {
   if (!url) {
     return "";
@@ -252,147 +219,6 @@ export function getSourcePath(url?: UrlResult): string {
   const { path, href } = parseURL(url);
   // for URLs like "about:home" the path is null so we pass the full href
   return path || href;
-}
-
-/**
- * Returns amount of lines in the source. If source is a WebAssembly binary,
- * the function returns amount of bytes.
- */
-export function getSourceLineCount(content: SourceContent["value"]) {
-  let count = 0;
-
-  for (let i = 0; i < content!.value.length; ++i) {
-    if (content!.value[i] === "\n") {
-      ++count;
-    }
-  }
-
-  return count + 1;
-}
-
-// eslint-disable-next-line complexity
-export function getMode(
-  source: MiniSource,
-  content: SourceContent["value"],
-  symbols: SymbolDeclarations
-) {
-  const extension = getFileExtension(source);
-
-  if (content!.type !== "text") {
-    return { name: "text" };
-  }
-
-  const { contentType, value: text } = content!;
-
-  if (extension === "jsx" || (symbols && symbols.hasJsx)) {
-    if (extension === "tsx" || (symbols && symbols.hasTypes)) {
-      return { name: "text/typescript-jsx" };
-    }
-    return { name: "jsx" };
-  }
-
-  if (symbols && symbols.hasTypes) {
-    if (symbols.hasJsx) {
-      return { name: "text/typescript-jsx" };
-    }
-
-    return { name: "text/typescript" };
-  }
-
-  const languageMimeMap = [
-    { ext: "ts", mode: "text/typescript" },
-    { ext: "tsx", mode: "text/typescript-jsx" },
-    { ext: "c", mode: "text/x-csrc" },
-    { ext: "kt", mode: "text/x-kotlin" },
-    { ext: "cpp", mode: "text/x-c++src" },
-    { ext: "m", mode: "text/x-objectivec" },
-    { ext: "rs", mode: "text/x-rustsrc" },
-    { ext: "hx", mode: "text/x-haxe" },
-  ];
-
-  // check for C and other non JS languages
-  const result = languageMimeMap.find(({ ext }) => extension === ext);
-  if (result !== undefined) {
-    return { name: result.mode };
-  }
-
-  // if the url ends with a known Javascript-like URL, provide JavaScript mode.
-  // uses the first part of the URL to ignore query string
-  if (javascriptLikeExtensions.find(ext => ext === extension)) {
-    return { name: "javascript" };
-  }
-
-  // Use HTML mode for files in which the first non whitespace
-  // character is `<` regardless of extension.
-  const isHTMLLike = text.match(/^\s*</);
-  if (!contentType) {
-    if (isHTMLLike) {
-      return { name: "htmlmixed" };
-    }
-    return { name: "text" };
-  }
-
-  // // @flow or /* @flow */
-  if (text.match(/^\s*(\/\/ @flow|\/\* @flow \*\/)/)) {
-    return contentTypeModeMap["text/typescript"];
-  }
-
-  if (/script|elm|jsx|clojure|html/.test(contentType)) {
-    if (contentType in contentTypeModeMap) {
-      return contentTypeModeMap[contentType as keyof typeof contentTypeModeMap];
-    }
-
-    return contentTypeModeMap["text/javascript"];
-  }
-
-  if (isHTMLLike) {
-    return { name: "htmlmixed" };
-  }
-
-  return { name: "text" };
-}
-
-type SourceContentObject = {
-  contentType: string;
-  type: string;
-  value: string;
-};
-
-// Cache line-split source file text
-const sourceContentToLines = new WeakMap<SourceContentObject, string[]>();
-
-export const getLineText = (asyncContent?: SourceContent, line: number = 0) => {
-  if (!asyncContent || asyncContent.status !== LoadingStatus.LOADED) {
-    return "";
-  }
-
-  const content = asyncContent.value;
-
-  if (!content) {
-    return "";
-  }
-
-  let lines: string[] = [];
-
-  if (sourceContentToLines.has(content)) {
-    lines = sourceContentToLines.get(content)!;
-  } else {
-    lines = content.value.split("\n");
-    sourceContentToLines.set(content, lines);
-  }
-
-  const lineText = lines[line - 1];
-  return lineText || "";
-};
-
-export function getTextAtPosition(
-  asyncContent?: SourceContent,
-  location: { column?: number; line?: number } = {}
-) {
-  const { column, line = 0 } = location;
-
-  const lineText = getLineText(asyncContent, line);
-  return lineText.slice(column, column! + 100).trim();
 }
 
 export function getSourceClassnames(source?: MiniSource) {

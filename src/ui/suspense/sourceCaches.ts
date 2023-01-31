@@ -1,30 +1,7 @@
 import type { SymbolDeclarations } from "devtools/client/debugger/src/reducers/ast";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
-import {
-  StreamingSourceContents,
-  getStreamingSourceContentsHelper,
-} from "replay-next/src/suspense/SourcesCache";
+import { getSourceContentsAsync } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
-
-export const {
-  getValueAsync: getSourceContentsAsync,
-  getValueSuspense: getSourceContentsSuspense,
-  getStatus: getSourceContentsStatus,
-} = createGenericCache<
-  [replayClient: ReplayClientInterface, sourceId: string],
-  StreamingSourceContents | undefined
->(
-  "sourceContentsCache",
-  async (replayClient, sourceId) => {
-    const res = await getStreamingSourceContentsHelper(replayClient, sourceId);
-    if (res) {
-      // Ensure that follow-on caches have the entire text available
-      const sourceContents = await res.resolver;
-      return sourceContents;
-    }
-  },
-  (replayClient, sourceId) => sourceId
-);
 
 export const {
   getValueAsync: getSymbolsAsync,
