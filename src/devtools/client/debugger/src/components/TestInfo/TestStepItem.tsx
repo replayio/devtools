@@ -2,11 +2,7 @@ import classNames from "classnames";
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
-import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
-import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
-import { evaluateAsync, getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { ReplayClientInterface } from "shared/client/types";
 import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getStepRanges, useStepState } from "ui/hooks/useStepState";
@@ -15,7 +11,10 @@ import { getViewMode } from "ui/reducers/layout";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
 import { getCurrentTime, isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { getCypressConsolePropsSuspense } from "ui/suspense/testStepCache";
+import {
+  getCypressConsolePropsSuspense,
+  getCypressSubjectNodeIdsAsync,
+} from "ui/suspense/testStepCache";
 import { AnnotatedTestStep } from "ui/types";
 
 import { TestCaseContext } from "./TestCase";
@@ -50,50 +49,12 @@ export interface TestStepItemProps {
   id: string | null;
 }
 
-async function getCypressSubjectNodeIds(
-  client: ReplayClientInterface,
-  endPauseId?: string,
-  callerFrameId?: string,
-  commandVariable?: string
-) {
-  if (!endPauseId || !callerFrameId || !commandVariable) {
-    return [];
-  }
-
-  const cmdResult = await evaluateAsync(
-    client,
-    endPauseId,
-    callerFrameId,
-    `${commandVariable}.get("subject")`
-  );
-
-  const cmdObjectId = cmdResult.returned?.object;
-
-  if (cmdObjectId) {
-    const cmdObject = await getObjectWithPreviewHelper(client, endPauseId, cmdObjectId, true);
-
-    const props = cmdObject?.preview?.properties;
-    const length: number = props?.find(o => o.name === "length")?.value || 0;
-    const nodeIds = [];
-    for (let i = 0; i < length; i++) {
-      const v = props?.find(p => p.name === String(i));
-      if (v?.object) {
-        nodeIds.push(v.object);
-      }
-    }
-
-    return nodeIds;
-  }
-
-  return [];
-}
-
 export function TestStepItem({ step, argString, index, id }: TestStepItemProps) {
   const hasScrolled = useRef(false);
   const ref = useRef<HTMLDivElement>(null);
   const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
-    pauseId: string;
-    nodeIds: string[];
+    pauseId: string | undefined;
+    nodeIds: string[] | undefined;
   }>();
   const viewMode = useAppSelector(getViewMode);
   const isPlaying = useAppSelector(isPlayingSelector);
@@ -101,28 +62,17 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const selectedStep = useAppSelector(getSelectedStep);
   const dispatch = useAppDispatch();
   const client = useContext(ReplayClientContext);
-  const { point: pointEnd, message: messageEnd, time: timeEnd } = step.annotations.end || {};
   const state = useStepState(step);
   const actions = useTestStepActions(step);
 
   useEffect(() => {
-    (async () => {
-      const endPauseId =
-        pointEnd && timeEnd != null ? await getPauseIdAsync(client, pointEnd, timeEnd) : undefined;
-      const frames = endPauseId ? await getFramesAsync(client, endPauseId) : undefined;
-
-      if (endPauseId && frames) {
-        const callerFrame = frames[1];
-
-        await getCypressSubjectNodeIds(
-          client,
-          endPauseId,
-          callerFrame.frameId,
-          messageEnd?.commandVariable
-        ).then(nodeIds => setSubjectNodePauseData({ pauseId: endPauseId, nodeIds }));
-      }
-    })();
-  }, [client, messageEnd, timeEnd, pointEnd]);
+    getCypressSubjectNodeIdsAsync(client, step)
+      .then(setSubjectNodePauseData)
+      .catch(e => {
+        console.error("Failed to fetch subject nodes for step");
+        console.error(e);
+      });
+  }, [client, step]);
 
   const { pauseId: endPauseId } = subjectNodePauseData || {};
   const onClick = useCallback(() => {
@@ -157,7 +107,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
         )
       );
     }
-    if (subjectNodePauseData) {
+    if (subjectNodePauseData?.nodeIds && subjectNodePauseData.pauseId) {
       dispatch(highlightNodes(subjectNodePauseData.nodeIds, subjectNodePauseData.pauseId));
     }
   };

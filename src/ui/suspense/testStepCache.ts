@@ -3,8 +3,15 @@ import cloneDeep from "lodash/cloneDeep";
 
 import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
 import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
-import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
-import { evaluateSuspense, getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
+import {
+  getObjectWithPreviewHelper,
+  getObjectWithPreviewSuspense,
+} from "replay-next/src/suspense/ObjectPreviews";
+import {
+  evaluateAsync,
+  evaluateSuspense,
+  getPauseIdSuspense,
+} from "replay-next/src/suspense/PauseCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { AnnotatedTestStep, TestMetadata } from "ui/types";
@@ -147,4 +154,45 @@ export function getCypressConsolePropsSuspense(
     consoleProps: undefined,
     pauseId: endPauseId,
   };
+}
+
+export async function getCypressSubjectNodeIdsAsync(
+  client: ReplayClientInterface,
+  step: AnnotatedTestStep | null
+) {
+  const { point, message, time } = step?.annotations.end || {};
+
+  let nodeIds: string[] | undefined = undefined;
+  const pauseId = point && time != null ? await getPauseIdAsync(client, point, time) : undefined;
+  const frames = pauseId ? await getFramesAsync(client, pauseId) : undefined;
+
+  const callerFrameId = frames?.[1]?.frameId;
+  const commandVariable = message?.commandVariable;
+
+  if (pauseId && callerFrameId && commandVariable) {
+    const cmdResult = await evaluateAsync(
+      client,
+      pauseId,
+      callerFrameId,
+      `${commandVariable}.get("subject")`
+    );
+
+    const cmdObjectId = cmdResult.returned?.object;
+
+    if (cmdObjectId) {
+      const cmdObject = await getObjectWithPreviewHelper(client, pauseId, cmdObjectId, true);
+
+      const props = cmdObject?.preview?.properties;
+      const length: number = props?.find(o => o.name === "length")?.value || 0;
+      nodeIds = [];
+      for (let i = 0; i < length; i++) {
+        const v = props?.find(p => p.name === String(i));
+        if (v?.object) {
+          nodeIds.push(v.object);
+        }
+      }
+    }
+  }
+
+  return { nodeIds, pauseId };
 }
