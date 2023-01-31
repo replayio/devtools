@@ -95,6 +95,7 @@ export type Point = {
   createdAtTime: number;
   id: PointId;
   location: Location;
+  recordingId: RecordingId;
   shouldBreak: PointBehavior;
   shouldLog: PointBehavior;
 };

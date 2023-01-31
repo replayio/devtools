@@ -105,6 +105,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
             }
           : null,
         createdAtTime: Date.now(),
+        recordingId,
         shouldBreak: POINT_BEHAVIOR_DISABLED,
         shouldLog: POINT_BEHAVIOR_DISABLED,
         ...partialPoint,
@@ -120,7 +121,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
         return prevPoints.slice(0, index).concat([point], prevPoints.slice(index));
       });
     },
-    [currentUserInfo, setPointsHelper, trackEvent]
+    [currentUserInfo, recordingId, setPointsHelper, trackEvent]
   );
 
   const deletePoints = useCallback(
