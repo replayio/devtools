@@ -7,6 +7,7 @@ on:
       - main
 env:
   RECORD_REPLAY_API_KEY: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
+  RECORD_REPLAY_CHROMIUM_DOWNLOAD_FILE: linux-chromium-20230129-4b983f809f2e-d1bfc6dc868f.tar.xz
 
 jobs:
   download-browser:
