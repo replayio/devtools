@@ -24,40 +24,48 @@ export function getCypressConsolePropsSuspense(
   const frames = getFramesSuspense(client, endPauseId);
   const callerFrameId = frames?.[1]?.frameId;
 
-  if (!callerFrameId) {
-    return;
-  }
-
-  const { returned: logResult } = evaluateSuspense(client, endPauseId, callerFrameId, logVariable);
-
-  if (logResult?.object) {
-    const logObject = getObjectWithPreviewSuspense(client, endPauseId, logResult.object);
-    const consolePropsProperty = logObject.preview?.properties?.find(
-      p => p.name === "consoleProps"
+  if (callerFrameId) {
+    const { returned: logResult } = evaluateSuspense(
+      client,
+      endPauseId,
+      callerFrameId,
+      logVariable
     );
 
-    if (consolePropsProperty?.object) {
-      const consoleProps = getObjectWithPreviewSuspense(
-        client,
-        endPauseId,
-        consolePropsProperty.object,
-        true
+    if (logResult?.object) {
+      const logObject = getObjectWithPreviewSuspense(client, endPauseId, logResult.object);
+      const consolePropsProperty = logObject.preview?.properties?.find(
+        p => p.name === "consoleProps"
       );
 
-      const sanitized = cloneDeep(consoleProps);
-      if (sanitized?.preview?.properties) {
-        sanitized.preview.properties = sanitized.preview.properties.filter(
-          p => p.name !== "Snapshot"
+      if (consolePropsProperty?.object) {
+        const consoleProps = getObjectWithPreviewSuspense(
+          client,
+          endPauseId,
+          consolePropsProperty.object,
+          true
         );
 
-        // suppress the prototype entry in the properties output
-        sanitized.preview.prototypeId = undefined;
-      }
+        const sanitized = cloneDeep(consoleProps);
+        if (sanitized?.preview?.properties) {
+          sanitized.preview.properties = sanitized.preview.properties.filter(
+            p => p.name !== "Snapshot"
+          );
 
-      return {
-        consoleProps: sanitized,
-        pauseId: endPauseId,
-      };
+          // suppress the prototype entry in the properties output
+          sanitized.preview.prototypeId = undefined;
+        }
+
+        return {
+          consoleProps: sanitized,
+          pauseId: endPauseId,
+        };
+      }
     }
   }
+
+  return {
+    consoleProps: undefined,
+    pauseId: endPauseId,
+  };
 }

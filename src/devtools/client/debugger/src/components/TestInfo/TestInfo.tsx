@@ -111,7 +111,7 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
               <TestCase test={testCases[selectedTest]} index={selectedTest} />
             )}
           </div>
-          {selectedTest !== null ? <StepDetails /> : null}
+          {selectedTest !== null && info.supportsStepAnnotations ? <StepDetails /> : null}
           <ContextMenuWrapper />
         </div>
       </TestInfoContextMenuContextRoot>

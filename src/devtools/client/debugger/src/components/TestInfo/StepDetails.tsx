@@ -1,4 +1,5 @@
-import React, { useContext } from "react";
+import classNames from "classnames";
+import React, { useContext, useEffect } from "react";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
@@ -14,19 +15,24 @@ function ConsoleProps({ open }: { open: boolean }) {
 
   const { pauseId, consoleProps } = getCypressConsolePropsSuspense(client, selectedStep) || {};
 
-  if (!pauseId || !consoleProps) {
-    // maybe an error?
-    return null;
-  }
-
   return (
     <div
       className={`flex flex-grow flex-col gap-1 overflow-y-auto p-2 font-mono transition-all  ${
         open ? "visible" : "hidden"
       }`}
     >
-      <div className={`flex flex-grow flex-col gap-1 p-2 font-mono`}>
-        <PropertiesRenderer pauseId={pauseId} object={consoleProps} />
+      <div
+        className={classNames(`flex flex-grow flex-col gap-1 p-2 font-mono`, {
+          "items-center justify-center": !consoleProps || !selectedStep,
+        })}
+      >
+        {!selectedStep ? (
+          <span>Select a step above to view its details</span>
+        ) : pauseId && consoleProps ? (
+          <PropertiesRenderer pauseId={pauseId} object={consoleProps} />
+        ) : (
+          <span>Unable to retrieve step details for this step</span>
+        )}
       </div>
     </div>
   );
