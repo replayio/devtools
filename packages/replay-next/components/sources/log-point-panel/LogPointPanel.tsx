@@ -307,7 +307,7 @@ function PointPanelWithHitPoints({
 
   return (
     <div
-      className={`${shouldLog ? styles.PanelEnabled : styles.PanelDisabled} ${className}`}
+      className={`${styles.Panel} ${className}`}
       data-test-id={`PointPanel-${lineNumber}`}
       data-test-state={isEditing ? "edit" : "view"}
     >
@@ -316,6 +316,7 @@ function PointPanelWithHitPoints({
           <div className={styles.EditableContentWrapperRow}>
             <div
               className={isConditionValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}
+              data-logging-disabled={!shouldLog || undefined}
               onClick={showTooManyPointsMessage ? undefined : () => startEditing("condition")}
             >
               <div
@@ -386,6 +387,7 @@ function PointPanelWithHitPoints({
         ) : (
           <div
             className={isContentValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}
+            data-logging-disabled={!shouldLog || undefined}
             onClick={showTooManyPointsMessage ? undefined : () => startEditing("content")}
           >
             <BadgePicker invalid={!isContentValid} point={point} />
