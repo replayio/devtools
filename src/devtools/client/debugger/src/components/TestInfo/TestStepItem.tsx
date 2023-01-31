@@ -171,7 +171,9 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
           <span className="opacity-70">{argString}</span>
         </div>
       </button>
-      <MatchingElementBadge selected={isSelected} step={step} />
+      <React.Suspense>
+        <MatchingElementBadge selected={isSelected} step={step} />
+      </React.Suspense>
       {step.alias ? (
         <span
           className={classNames(
