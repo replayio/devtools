@@ -1,4 +1,5 @@
 import {
+  AnalysisEntry,
   BreakpointId,
   ContentType,
   Result as EvaluationResult,
@@ -185,6 +186,11 @@ export interface ReplayClientInterface {
     },
     onMatches: (matches: SearchSourceContentsMatch[], didOverflow: boolean) => void
   ): Promise<void>;
+  streamAnalysis(
+    params: AnalysisParams,
+    onPoints: (points: PointDescription[]) => void,
+    onResults: (results: AnalysisEntry[]) => void
+  ): { pointsReceived: Promise<void>; resultsReceived: Promise<void> };
   streamSourceContents(
     sourceId: SourceId,
     onSourceContentsInfo: ({

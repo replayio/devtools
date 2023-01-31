@@ -1,4 +1,5 @@
 import {
+  AnalysisEntry,
   BreakpointId,
   Result as EvaluationResult,
   ExecutionPoint,
@@ -42,7 +43,7 @@ import {
 import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
 
-import analysisManager from "protocol/analysisManager";
+import analysisManager, { AnalysisParams } from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
@@ -926,6 +927,28 @@ export class ReplayClient implements ReplayClientInterface {
         reject(error);
       }
     });
+  }
+
+  streamAnalysis(
+    params: AnalysisParams,
+    onPoints: (points: PointDescription[]) => void,
+    onResults: (results: AnalysisEntry[]) => void
+  ): { pointsReceived: Promise<void>; resultsReceived: Promise<void> } {
+    let resolvePointsReceived!: () => void;
+    const pointsReceived = new Promise<void>(resolve => (resolvePointsReceived = resolve));
+    let resolveResultsReceived!: () => void;
+    const resultsReceived = new Promise<void>(resolve => (resolveResultsReceived = resolve));
+
+    this._waitForRangeToBeLoaded(params.range || null).then(() =>
+      analysisManager.runAnalysis(params, {
+        onAnalysisPoints: onPoints,
+        onAnalysisResult: results => onResults(results),
+        onPointsFinished: resolvePointsReceived,
+        onFinished: resolveResultsReceived,
+      })
+    );
+
+    return { pointsReceived, resultsReceived };
   }
 
   async streamSourceContents(

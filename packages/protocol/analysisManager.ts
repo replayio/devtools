@@ -84,6 +84,7 @@ export interface AnalysisHandler<T> {
   onAnalysisPoints?: (points: PointDescription[]) => void;
   onAnalysisResult?: (result: AnalysisEntry[]) => void;
   onFinished?(): T;
+  onPointsFinished?(): any;
 }
 
 // When running analyses in batches, limit on the points to use in each batch.
@@ -166,7 +167,10 @@ class AnalysisManager {
       this.handlers.set(analysisId, handler);
       await Promise.all([
         !handler.onAnalysisResult || client.Analysis.runAnalysis({ analysisId }, sessionId),
-        !handler.onAnalysisPoints || client.Analysis.findAnalysisPoints({ analysisId }, sessionId),
+        !(handler.onAnalysisPoints || handler.onPointsFinished) ||
+          client.Analysis.findAnalysisPoints({ analysisId }, sessionId).then(
+            handler.onPointsFinished
+          ),
       ]);
     } catch (e) {
       this.onAnalysisError({ analysisId, error: e instanceof Error ? e.message : "Unknown Error" });

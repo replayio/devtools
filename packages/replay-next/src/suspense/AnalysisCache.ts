@@ -260,7 +260,7 @@ function createMapperForCondition(condition: string): string {
   `;
 }
 
-function createMapperForAnalysis(code: string, condition: string | null): string {
+export function createMapperForAnalysis(code: string, condition: string | null): string {
   const escapedCode = code.replace(/"/g, '\\"');
   return `
     const finalData = { frames: [], scopes: [], objects: [] };
