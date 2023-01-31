@@ -15,6 +15,8 @@ export type WeightedProperty = Property & {
   distance: number;
 };
 
+export type Context = "console" | "logpoint-generated-source" | "logpoint-original-source";
+
 // The legacy auto-complete allowed property previews to overflow.
 // This meant we only got a couple of them, which was only of limited use.
 // Let's try not allowing overflow and we can disable it if it's too slow.
@@ -28,7 +30,7 @@ export default function findMatches(
   replayClient: ReplayClientInterface,
   frameId: FrameId | null,
   pauseId: PauseId | null,
-  useOriginalVariables: boolean
+  context: Context
 ): Match[] {
   // Remove leading "."
   query = query.slice(1);
@@ -42,7 +44,7 @@ export default function findMatches(
     queryScope,
     frameId,
     pauseId,
-    useOriginalVariables
+    context
   );
 
   return findMatchingScopesAndProperties(queryScope, query, scopes, properties) || [];
@@ -53,7 +55,7 @@ function fetchQueryData(
   queryScope: string | null,
   frameId: FrameId | null,
   pauseId: PauseId | null,
-  useOriginalVariables: boolean
+  context: Context
 ): {
   properties: WeightedProperty[] | null;
   scopes: Scope[] | null;
@@ -68,7 +70,20 @@ function fetchQueryData(
 
     const data = getFrameScopesSuspense(replayClient, pauseId, frameId);
     generatedScopes = data.generatedScopes;
-    scopes = useOriginalVariables ? data.originalScopes ?? null : generatedScopes;
+
+    switch (context) {
+      case "console":
+        // People usually view original sources, but the Console doesn't know which mode they're using.
+        // So try to show the original scopes if they're available, otherwise fall back to the generated scopes.
+        scopes = data.originalScopes ?? generatedScopes;
+        break;
+      case "logpoint-generated-source":
+        scopes = generatedScopes;
+        break;
+      case "logpoint-original-source":
+        scopes = data.originalScopes ?? null;
+        break;
+    }
   }
 
   if (pauseId) {

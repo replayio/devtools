@@ -8,22 +8,22 @@ import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import TypeAheadPlugin from "../typeahead/TypeAheadPlugin";
-import findMatches from "./findMatches";
+import findMatches, { Context } from "./findMatches";
 import getQueryData from "./getQueryData";
 import isExactMatch from "./isExactMatch";
 import { Match } from "./types";
 import styles from "./styles.module.css";
 
 export default function CodeCompletionPlugin({
+  context,
   dataTestId,
   dataTestName = "CodeTypeAhead",
   pauseAndFrameId = null,
-  useOriginalVariables,
 }: {
+  context: Context;
   dataTestId?: string;
   dataTestName?: string;
   pauseAndFrameId: PauseAndFrameId | null;
-  useOriginalVariables: boolean;
 }): JSX.Element {
   const [editor] = useLexicalComposerContext();
 
@@ -37,7 +37,7 @@ export default function CodeCompletionPlugin({
   }
 
   const findMatchesWrapper = (query: string, queryScope: string | null) => {
-    return findMatches(query, queryScope, replayClient, frameId, pauseId, useOriginalVariables);
+    return findMatches(query, queryScope, replayClient, frameId, pauseId, context);
   };
 
   useEffect(() => {

@@ -134,7 +134,7 @@ export async function addLogpoint(
     lineNumber: number;
     condition?: string;
     content?: string;
-    url: string;
+    url?: string;
     saveAfterEdit?: boolean;
   }
 ): Promise<void> {
@@ -187,14 +187,16 @@ export async function editLogPoint(
     condition?: string;
     lineNumber: number;
     saveAfterEdit?: boolean;
-    url: string;
+    url?: string;
   }
 ) {
   const { condition, content, lineNumber, saveAfterEdit = true, url } = options;
 
   await debugPrint(
     page,
-    `Editing log-point at ${chalk.bold(`${url}:${lineNumber}`)}`,
+    url
+      ? `Editing log-point at ${chalk.bold(`${url}:${lineNumber}`)}`
+      : `Editing log-point at ${chalk.bold(`${lineNumber}`)}`,
     "editLogPoint"
   );
 
@@ -238,13 +240,50 @@ export function getLogPointPanelContentTypeAhead(page: Page): Locator {
   return page.locator('[data-test-name="PointPanel-ContentInput-CodeTypeAhead"]');
 }
 
-export async function verifyLogPointTypeAheadSuggestions(
+export async function verifyLogPointContentTypeAheadSuggestions(
   page: Page,
-  expectedPartialList: string[]
+  expectedSuggestionsPartial: string[],
+  unexpectedSuggestionsPartial: string[] = []
 ) {
-  const actualTextContent = (await getLogPointPanelContentTypeAhead(page).textContent()) || "";
-  const expectedTextContent = expectedPartialList.join("");
-  expect(actualTextContent.startsWith(expectedTextContent)).toBe(true);
+  const typeAhead = getLogPointPanelContentTypeAhead(page);
+
+  for (let index = 0; index < expectedSuggestionsPartial.length; index++) {
+    const suggestion = expectedSuggestionsPartial[index];
+
+    await debugPrint(
+      page,
+      `Verifying log-point content type-ahead contains suggestion "${chalk.bold(suggestion)}"`,
+      "verifyLogPointContentTypeAheadSuggestions"
+    );
+
+    await waitFor(async () => {
+      const results = typeAhead.locator(
+        `[data-test-name="PointPanel-ContentInput-CodeTypeAhead-Item"]`
+      );
+      const allTextContents = await results.allTextContents();
+      return expect(allTextContents).toContain(suggestion);
+    });
+  }
+
+  for (let index = 0; index < unexpectedSuggestionsPartial.length; index++) {
+    const suggestion = unexpectedSuggestionsPartial[index];
+
+    await debugPrint(
+      page,
+      `Verifying log-point content type-ahead does not contain suggestion "${chalk.bold(
+        suggestion
+      )}"`,
+      "verifyLogPointContentTypeAheadSuggestions"
+    );
+
+    await waitFor(async () => {
+      const results = typeAhead.locator(
+        `[data-test-name="PointPanel-ContentInput-CodeTypeAhead-Item"]`
+      );
+      const allTextContents = await results.allTextContents();
+      return expect(allTextContents).not.toContain(suggestion);
+    });
+  }
 }
 
 export async function getSelectedLineNumber(page: Page): Promise<number | null> {
@@ -530,14 +569,16 @@ export async function waitForLogpoint(
   options: {
     columnIndex?: number;
     lineNumber: number;
-    url: string;
+    url?: string;
   }
 ): Promise<void> {
   const { lineNumber, url } = options;
 
   await debugPrint(
     page,
-    `Waiting for log-point at ${chalk.bold(`${url}:${lineNumber}`)}`,
+    url
+      ? `Waiting for log-point at ${chalk.bold(`${url}:${lineNumber}`)}`
+      : `Waiting for log-point at ${chalk.bold(`${lineNumber}`)}`,
     "waitForLogpoint"
   );
 

@@ -162,6 +162,7 @@ function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHan
         <div className={styles.Input}>
           <CodeEditor
             autoFocus={autoFocus}
+            context="console"
             dataTestId="ConsoleTerminalInput"
             editable={true}
             initialValue={expression}
@@ -170,7 +171,6 @@ function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHan
             onSave={onSubmit}
             pauseAndFrameId={selectedPauseAndFrameId}
             ref={inputRef}
-            useOriginalVariables={true}
           />
         </div>
       </div>

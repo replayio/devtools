@@ -176,7 +176,8 @@ function PointPanelWithHitPoints({
     );
     source = getSource(client, source.generatedSourceIds[0]);
   }
-  const useOriginalVariables = source?.kind === "sourceMapped";
+  const context =
+    source?.kind === "sourceMapped" ? "logpoint-original-source" : "logpoint-generated-source";
 
   const shouldLog = point.shouldLog === POINT_BEHAVIOR_ENABLED;
 
@@ -331,6 +332,7 @@ function PointPanelWithHitPoints({
                       allowWrapping={false}
                       autoFocus={editReason === "condition"}
                       autoSelect={editReason === "condition"}
+                      context={context}
                       dataTestId={`PointPanel-ConditionInput-${lineNumber}`}
                       dataTestName="PointPanel-ConditionInput"
                       editable={true}
@@ -339,7 +341,6 @@ function PointPanelWithHitPoints({
                       onChange={onEditableConditionChange}
                       onSave={onSubmit}
                       pauseAndFrameId={pauseAndFrameId}
-                      useOriginalVariables={useOriginalVariables}
                     />
                   </div>
 
@@ -396,6 +397,7 @@ function PointPanelWithHitPoints({
                     allowWrapping={false}
                     autoFocus={showEditBreakpointNag || editReason === "content"}
                     autoSelect={editReason === "content"}
+                    context={context}
                     dataTestId={`PointPanel-ContentInput-${lineNumber}`}
                     dataTestName="PointPanel-ContentInput"
                     editable={true}
@@ -404,7 +406,6 @@ function PointPanelWithHitPoints({
                     onChange={onEditableContentChange}
                     onSave={onSubmit}
                     pauseAndFrameId={pauseAndFrameId}
-                    useOriginalVariables={useOriginalVariables}
                   />
                 </div>
               </div>
