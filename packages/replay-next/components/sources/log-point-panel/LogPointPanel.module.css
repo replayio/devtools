@@ -10,6 +10,9 @@
 .PanelEnabled {
   background-color: var(--point-panel-background-color);
 }
+.PanelDisabled {
+  background-color: var(--point-panel-disabled-background-color);
+}
 
 .FocusModeLink {
   text-decoration: underline;
