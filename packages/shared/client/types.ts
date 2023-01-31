@@ -78,12 +78,20 @@ type PointBehavior =
   | typeof POINT_BEHAVIOR_DISABLED
   | typeof POINT_BEHAVIOR_DISABLED_TEMPORARILY;
 
+export type PartialUser = {
+  email: string;
+  id: string;
+  name: string | null;
+  picture: string | null;
+};
+
 export type PointId = string;
 export type Badge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow";
 export type Point = {
   badge: Badge | null;
   condition: string | null;
   content: string;
+  createdByUser: PartialUser | null;
   createdAtTime: number;
   id: PointId;
   location: Location;
