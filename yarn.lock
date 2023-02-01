@@ -5428,10 +5428,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stripe/stripe-js@npm:^1.26.0":
-  version: 1.32.0
-  resolution: "@stripe/stripe-js@npm:1.32.0"
-  checksum: 47a8c9764318223b0f244e63aabb0d4d2ca3a85a4e99388c6772b6076a5200e7a6f45a175468fc798ae1abafc7859215bf0207e2d5158d2c83a8629a17a92353
+"@stripe/stripe-js@npm:^1.46.0":
+  version: 1.46.0
+  resolution: "@stripe/stripe-js@npm:1.46.0"
+  checksum: e9f1a6c1abc1e9eb5cfe7d604066230078958d3ada61089912829b57d090e768d6310149f054c8da0a8c49d7a313c44418705f91174909c2d2313c9ded781be1
   languageName: node
   linkType: hard
 
@@ -20072,7 +20072,7 @@ __metadata:
     "@storybook/manager-webpack5": ^6.4.20
     "@storybook/react": ^6.5.9
     "@stripe/react-stripe-js": ^1.7.0
-    "@stripe/stripe-js": ^1.26.0
+    "@stripe/stripe-js": ^1.46.0
     "@svgr/webpack": ^6.2.1
     "@tailwindcss/forms": ^0.5.0
     "@testing-library/jest-dom": ^5.16.3
