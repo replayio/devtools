@@ -1,5 +1,10 @@
 import { assert } from "protocol/utils";
-import { PaymentMethod, PlanPricing, Subscription, SubscriptionWithPricing } from "ui/types";
+import {
+  PaymentMethod,
+  PlanPricing,
+  Subscription,
+  SubscriptionWithPricing,
+} from "shared/graphql/types";
 
 export type Views =
   | "details"

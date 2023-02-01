@@ -4,8 +4,8 @@ src/devtools/client/shared/vendor/
 src/devtools/client/shared/sourceeditor/codemirror
 packages/third-party/
 public/test/examples
-src/graphql
 packages/accordion/website/
+packages/shared/graphql/generated
 **/*.config.js
 **/.eslintrc*
 **/*.d.ts

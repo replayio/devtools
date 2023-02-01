@@ -4,7 +4,7 @@ import Link from "next/link";
 import React, { ReactNode, useEffect, useState } from "react";
 
 import Services from "devtools/shared/services";
-import { GetConnection, GetConnectionVariables } from "graphql/GetConnection";
+import { GetConnection, GetConnectionVariables } from "shared/graphql/generated/GetConnection";
 import { query } from "ui/utils/apolloClient";
 import { getAuthClientId, getAuthHost } from "ui/utils/auth";
 import { requestBrowserLogin, setUserInBrowserPrefs } from "ui/utils/browser";

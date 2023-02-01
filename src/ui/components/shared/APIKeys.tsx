@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import { ApiKey, ApiKeyResponse, ApiKeyScope } from "ui/types";
+import { ApiKey, ApiKeyResponse, ApiKeyScope } from "shared/graphql/types";
 
 import { useConfirm } from "./Confirm";
 import TextInput from "./Forms/TextInput";

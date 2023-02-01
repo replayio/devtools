@@ -1,8 +1,8 @@
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 
 import { compareNumericStrings } from "protocol/utils";
+import { AnnotatedTestStep, Annotation } from "shared/graphql/types";
 import { UIState } from "ui/state";
-import { AnnotatedTestStep, Annotation } from "ui/types";
 
 export interface ReporterState {
   annotations: Annotation[];

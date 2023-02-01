@@ -9,10 +9,10 @@ import { POINTS_DATABASE } from "replay-next/src/contexts/PointsContext";
 import { preloadIDBInitialValues } from "replay-next/src/hooks/useIndexedDB";
 import { preCacheExecutionPointForTime } from "replay-next/src/suspense/PointsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { UserInfo } from "shared/graphql/types";
+import { getCurrentUserInfo } from "shared/graphql/User";
 
 import { SessionContext, SessionContextType } from "../src/contexts/SessionContext";
-import { UserInfo } from "../src/graphql/types";
-import { getCurrentUserInfo } from "../src/graphql/User";
 import { preCacheSources } from "../src/suspense/SourcesCache";
 import Loader from "./Loader";
 import styles from "./Initializer.module.css";

@@ -1,6 +1,6 @@
 import { MockedResponse } from "@apollo/client/testing";
 
-import { GetUserSettings } from "graphql/GetUserSettings";
+import { GetUserSettings } from "shared/graphql/generated/GetUserSettings";
 import { GET_USER_SETTINGS } from "ui/graphql/settings";
 
 import { cloneResponse } from "./utils";

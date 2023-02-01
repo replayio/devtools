@@ -1,5 +1,11 @@
 import React, { useContext, useMemo } from "react";
 
+import {
+  AnnotatedTestStep,
+  CypressAnnotationMessage,
+  TestItem,
+  TestStep,
+} from "shared/graphql/types";
 import { seekToTime } from "ui/actions/timeline";
 import {
   RequestSummary,
@@ -16,7 +22,6 @@ import {
 } from "ui/reducers/reporter";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { AnnotatedTestStep, CypressAnnotationMessage, TestItem, TestStep } from "ui/types";
 
 import { NetworkEvent } from "./NetworkEvent";
 import { TestCaseContext } from "./TestCase";

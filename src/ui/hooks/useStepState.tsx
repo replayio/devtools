@@ -1,4 +1,5 @@
 import { compareNumericStrings } from "replay-next/src/utils/string";
+import { AnnotatedTestStep } from "shared/graphql/types";
 import { getCurrentPoint } from "ui/actions/app";
 import {
   getCurrentTime,
@@ -6,7 +7,6 @@ import {
   isPlaying as isPlayingSelector,
 } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
-import { AnnotatedTestStep } from "ui/types";
 
 export function isStepStart(step: AnnotatedTestStep, time: number, point: string | null) {
   const { timeRange, pointRange } = getStepRanges(step);

@@ -6,7 +6,7 @@ module.exports = {
     "!**/*.d.ts",
     "!**/node_modules/**",
     "!**/fixtures/**",
-    "!src/graphql/*.ts",
+    "!packages/shared/graphql/generated/*.ts",
   ],
   moduleNameMapper: {
     "^devtools/(.*)": "<rootDir>/src/devtools/$1",

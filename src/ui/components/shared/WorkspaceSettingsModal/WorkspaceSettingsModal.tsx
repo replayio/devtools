@@ -1,12 +1,12 @@
 import React, { ChangeEvent, useMemo, useState } from "react";
 
+import { WorkspaceUser } from "shared/graphql/types";
 import * as actions from "ui/actions/app";
 import { useRedirectToTeam } from "ui/components/Library/Team/utils";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
 import * as selectors from "ui/reducers/app";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { WorkspaceUser } from "ui/types";
 import { validateEmail } from "ui/utils/helpers";
 import { trackEvent } from "ui/utils/telemetry";
 

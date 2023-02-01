@@ -12,7 +12,7 @@ import { showMenu } from "devtools/shared/contextmenu";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { Redacted } from "ui/components/Redacted";
 import type { SourceDetails } from "ui/reducers/sources";
-import { getHasSiblingOfSameName, getSourceContent, isFulfilled } from "ui/reducers/sources";
+import { getHasSiblingOfSameName } from "ui/reducers/sources";
 import type { UIState } from "ui/state";
 
 import type { ContextMenuItem } from "../../reducers/types";
@@ -37,11 +37,10 @@ interface STIProps {
 }
 
 const mapStateToProps = (state: UIState, props: STIProps) => {
-  const { source, item } = props;
+  const { source } = props;
   return {
     cx: getContext(state),
     hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
-    sourceContent: source ? getSourceContentValue(state, source) : null,
   };
 };
 
@@ -209,11 +208,6 @@ class SourceTreeItem extends Component<FinalSTIProps> {
       </div>
     );
   }
-}
-
-function getSourceContentValue(state: UIState, source: SourceDetails) {
-  const content = getSourceContent(state, source.id);
-  return content && isFulfilled(content) ? content.value : null;
 }
 
 export default connector(SourceTreeItem);

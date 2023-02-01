@@ -1,8 +1,8 @@
 import sortBy from "lodash/sortBy";
 import { useMemo, useState } from "react";
 
+import { Recording } from "shared/graphql/types";
 import { SecondaryButton } from "ui/components/shared/Button";
-import { Recording } from "ui/types";
 
 import { RecordingsError } from "../Recordings/RecordingsError";
 import TestResultRow from "./TestResultRow";

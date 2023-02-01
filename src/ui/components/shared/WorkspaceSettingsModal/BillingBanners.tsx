@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Subscription, Workspace } from "ui/types";
+import { Subscription, Workspace } from "shared/graphql/types";
 
 import MaterialIcon from "../MaterialIcon";
 import { Banner } from "./Banner";

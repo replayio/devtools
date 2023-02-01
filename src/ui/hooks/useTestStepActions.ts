@@ -3,11 +3,11 @@ import { useContext, useEffect, useState } from "react";
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getContext } from "devtools/client/debugger/src/selectors";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { AnnotatedTestStep, TestItem } from "shared/graphql/types";
 import { getCurrentPoint } from "ui/actions/app";
 import { seek, seekToTime, startPlayback } from "ui/actions/timeline";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { AnnotatedTestStep, TestItem } from "ui/types";
 
 import { getTestStepSourceLocationAsync } from "../suspense/testStepCache";
 import { isStepEnd, isStepStart } from "./useStepState";

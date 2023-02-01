@@ -2,21 +2,28 @@ import { DocumentNode, gql, useMutation, useQuery } from "@apollo/client";
 import { useEffect, useMemo, useState } from "react";
 
 import Services from "devtools/shared/services";
-import { CreateUserAPIKey, CreateUserAPIKeyVariables } from "graphql/CreateUserAPIKey";
-import { DeleteUserAPIKey, DeleteUserAPIKeyVariables } from "graphql/DeleteUserAPIKey";
-import { GetUserSettings } from "graphql/GetUserSettings";
+import {
+  CreateUserAPIKey,
+  CreateUserAPIKeyVariables,
+} from "shared/graphql/generated/CreateUserAPIKey";
+import {
+  DeleteUserAPIKey,
+  DeleteUserAPIKeyVariables,
+} from "shared/graphql/generated/DeleteUserAPIKey";
+import { GetUserSettings } from "shared/graphql/generated/GetUserSettings";
 import {
   UpdateUserDefaultWorkspace,
   UpdateUserDefaultWorkspaceVariables,
-} from "graphql/UpdateUserDefaultWorkspace";
+} from "shared/graphql/generated/UpdateUserDefaultWorkspace";
 import {
   UpdateUserSettingsEventLink,
   UpdateUserSettingsEventLinkVariables,
-} from "graphql/UpdateUserSettingsEventLink";
+} from "shared/graphql/generated/UpdateUserSettingsEventLink";
 import {
   UpdateUserSettingsLogRocket,
   UpdateUserSettingsLogRocketVariables,
-} from "graphql/UpdateUserSettingsLogRocket";
+} from "shared/graphql/generated/UpdateUserSettingsLogRocket";
+import type { ApiKey, ExperimentalUserSettings } from "shared/graphql/types";
 import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
 import { ADD_USER_API_KEY, DELETE_USER_API_KEY, GET_USER_SETTINGS } from "ui/graphql/settings";
 import { query } from "ui/utils/apolloClient";
@@ -24,8 +31,6 @@ import { isTest } from "ui/utils/environment";
 import { maybeTrackTeamChange } from "ui/utils/mixpanel";
 import { features, prefs } from "ui/utils/prefs";
 import useAuth0 from "ui/utils/useAuth0";
-
-import type { ApiKey, ExperimentalUserSettings } from "../types";
 
 const { prefs: prefsService } = Services;
 

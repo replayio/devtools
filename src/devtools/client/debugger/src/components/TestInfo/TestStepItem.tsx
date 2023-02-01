@@ -4,6 +4,7 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from "rea
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { setHighlightedNodesLoading } from "devtools/client/inspector/markup/reducers/markup";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { AnnotatedTestStep } from "shared/graphql/types";
 import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getStepRanges, useStepState } from "ui/hooks/useStepState";
@@ -16,7 +17,6 @@ import {
   getCypressConsolePropsSuspense,
   getCypressSubjectNodeIdsAsync,
 } from "ui/suspense/testStepCache";
-import { AnnotatedTestStep } from "ui/types";
 
 import { TestCaseContext } from "./TestCase";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
@@ -203,7 +203,9 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
           <span className="opacity-70">{argString}</span>
         </div>
       </button>
-      <MatchingElementBadge selected={isSelected} step={step} />
+      <React.Suspense>
+        <MatchingElementBadge selected={isSelected} step={step} />
+      </React.Suspense>
       {step.alias ? (
         <span
           className={classNames(

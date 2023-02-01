@@ -13,9 +13,9 @@ import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientCont
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { addComment as addCommentGraphQL } from "replay-next/src/graphql/Comments";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { addComment as addCommentGraphQL } from "shared/graphql/Comments";
 
 export default function useSourceContextMenu({
   lineNumber,

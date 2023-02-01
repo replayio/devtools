@@ -1,8 +1,8 @@
 import classNames from "classnames";
 import React from "react";
 
+import { Subscription } from "shared/graphql/types";
 import hooks from "ui/hooks";
-import { Subscription } from "ui/types";
 
 export function CancelSubscription({
   subscription,

@@ -1,11 +1,11 @@
 import userEvent from "@testing-library/user-event";
 import React from "react";
 
+import { Recording } from "shared/graphql/types";
 import { loadFixtureData } from "test/testFixtureUtils";
 import { filterCommonTestWarnings, render, screen } from "test/testUtils";
 import { UIStore } from "ui/actions";
 import { setLoadingFinished, setModal } from "ui/actions/app";
-import { Recording } from "ui/types";
 import { getRecordingURL } from "ui/utils/recording";
 
 import App from "../App";

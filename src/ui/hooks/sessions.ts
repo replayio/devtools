@@ -1,9 +1,12 @@
 import { useQuery } from "@apollo/client";
 import { RecordingId } from "@replayio/protocol";
 
-import { GetActiveSessions, GetActiveSessionsVariables } from "graphql/GetActiveSessions";
+import {
+  GetActiveSessions,
+  GetActiveSessionsVariables,
+} from "shared/graphql/generated/GetActiveSessions";
+import { User } from "shared/graphql/types";
 import { GET_ACTIVE_SESSIONS } from "ui/graphql/sessions";
-import { User } from "ui/state/session";
 
 import { useGetUserId } from "./users";
 

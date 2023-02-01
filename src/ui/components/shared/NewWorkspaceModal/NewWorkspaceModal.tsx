@@ -10,11 +10,11 @@ import React, {
 } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
-import { CreateNewWorkspace_createWorkspace_workspace } from "graphql/CreateNewWorkspace";
+import { CreateNewWorkspace_createWorkspace_workspace } from "shared/graphql/generated/CreateNewWorkspace";
+import { Workspace, WorkspaceUser } from "shared/graphql/types";
 import * as actions from "ui/actions/app";
 import { useRedirectToTeam } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
-import { Workspace, WorkspaceUser } from "ui/types";
 import { removeUrlParameters } from "ui/utils/environment";
 import { isValidTeamName, validateEmail } from "ui/utils/helpers";
 

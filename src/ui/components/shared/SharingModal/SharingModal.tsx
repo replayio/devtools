@@ -3,6 +3,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { getGraphicsAtTime } from "protocol/graphics";
+import { OperationsData } from "shared/graphql/types";
+import { CollaboratorRequest, Recording } from "shared/graphql/types";
 import { actions } from "ui/actions";
 import { AvatarImage } from "ui/components/Avatar";
 import Modal from "ui/components/shared/NewModal";
@@ -18,8 +20,6 @@ import { getRecordingTarget } from "ui/reducers/app";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
-import { OperationsData } from "ui/types";
-import { CollaboratorRequest, Recording } from "ui/types";
 import useToken from "ui/utils/useToken";
 
 import { PrimaryButton } from "../Button";

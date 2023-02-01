@@ -3,53 +3,74 @@ import { RecordingId } from "@replayio/protocol";
 import { useRouter } from "next/router";
 import { useEffect, useMemo } from "react";
 
+import { assert } from "protocol/utils";
 import {
   AcceptRecordingCollaboratorRequest,
   AcceptRecordingCollaboratorRequestVariables,
-} from "graphql/AcceptRecordingCollaboratorRequest";
-import { DeleteRecording, DeleteRecordingVariables } from "graphql/DeleteRecording";
+} from "shared/graphql/generated/AcceptRecordingCollaboratorRequest";
+import {
+  DeleteRecording,
+  DeleteRecordingVariables,
+} from "shared/graphql/generated/DeleteRecording";
 import {
   GetMyRecordings,
   GetMyRecordingsVariables,
   GetMyRecordings_viewer_recordings_edges_node,
-} from "graphql/GetMyRecordings";
+} from "shared/graphql/generated/GetMyRecordings";
 import {
   GetOwnerAndCollaborators,
   GetOwnerAndCollaboratorsVariables,
-} from "graphql/GetOwnerAndCollaborators";
-import { GetRecording, GetRecordingVariables, GetRecording_recording } from "graphql/GetRecording";
-import { getRecordingPhoto, getRecordingPhotoVariables } from "graphql/getRecordingPhoto";
-import { GetRecordingPrivacy, GetRecordingPrivacyVariables } from "graphql/GetRecordingPrivacy";
-import { GetRecordingUserId, GetRecordingUserIdVariables } from "graphql/GetRecordingUserId";
+} from "shared/graphql/generated/GetOwnerAndCollaborators";
+import {
+  GetRecording,
+  GetRecordingVariables,
+  GetRecording_recording,
+} from "shared/graphql/generated/GetRecording";
+import {
+  getRecordingPhoto,
+  getRecordingPhotoVariables,
+} from "shared/graphql/generated/getRecordingPhoto";
+import {
+  GetRecordingPrivacy,
+  GetRecordingPrivacyVariables,
+} from "shared/graphql/generated/GetRecordingPrivacy";
+import {
+  GetRecordingUserId,
+  GetRecordingUserIdVariables,
+} from "shared/graphql/generated/GetRecordingUserId";
 import {
   GetWorkspaceRecordings,
   GetWorkspaceRecordingsVariables,
-  GetWorkspaceRecordings_node_Workspace_recordings_edges,
   GetWorkspaceRecordings_node_Workspace_recordings_edges_node,
-} from "graphql/GetWorkspaceRecordings";
-import { InitializeRecording, InitializeRecordingVariables } from "graphql/InitializeRecording";
+} from "shared/graphql/generated/GetWorkspaceRecordings";
+import {
+  InitializeRecording,
+  InitializeRecordingVariables,
+} from "shared/graphql/generated/InitializeRecording";
 import {
   RequestRecordingAccess,
   RequestRecordingAccessVariables,
-} from "graphql/RequestRecordingAccess";
+} from "shared/graphql/generated/RequestRecordingAccess";
 import {
   SetRecordingIsPrivate,
   SetRecordingIsPrivateVariables,
-} from "graphql/SetRecordingIsPrivate";
+} from "shared/graphql/generated/SetRecordingIsPrivate";
 import {
   UpdateRecordingResolution,
   UpdateRecordingResolutionVariables,
-} from "graphql/UpdateRecordingResolution";
-import { UpdateRecordingTitle, UpdateRecordingTitleVariables } from "graphql/UpdateRecordingTitle";
+} from "shared/graphql/generated/UpdateRecordingResolution";
+import {
+  UpdateRecordingTitle,
+  UpdateRecordingTitleVariables,
+} from "shared/graphql/generated/UpdateRecordingTitle";
 import {
   UpdateRecordingWorkspace,
   UpdateRecordingWorkspaceVariables,
-} from "graphql/UpdateRecordingWorkspace";
-import { assert } from "protocol/utils";
+} from "shared/graphql/generated/UpdateRecordingWorkspace";
+import { Recording, RecordingRole, User, Workspace } from "shared/graphql/types";
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
 import { GET_RECORDING, GET_RECORDING_USER_ID, SUBSCRIBE_RECORDING } from "ui/graphql/recordings";
 import { WorkspaceId } from "ui/state/app";
-import { Recording, RecordingRole, User, Workspace } from "ui/types";
 import { query } from "ui/utils/apolloClient";
 import { extractIdAndSlug } from "ui/utils/helpers";
 import { getRecordingId } from "ui/utils/recording";
@@ -280,7 +301,11 @@ export function convertRecording(
       });
   }
   if ("collaboratorRequests" in rec) {
-    recording.collaboratorRequests = rec.collaboratorRequests?.edges.map(({ node }) => node);
+    recording.collaboratorRequests = rec.collaboratorRequests?.edges.map(({ node }) => ({
+      id: node.id,
+      // TODO GetRecording_recording_collaboratorRequests_edges does not have an "id" field
+      user: node.user as unknown as User,
+    }));
   }
   if ("ownerNeedsInvite" in rec) {
     recording.ownerNeedsInvite = rec.ownerNeedsInvite;

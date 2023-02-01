@@ -1,9 +1,9 @@
 import React, { Dispatch, ReactNode, SetStateAction, useState } from "react";
 
+import { Recording, Workspace } from "shared/graphql/types";
 import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
 import hooks from "ui/hooks";
 import { WorkspaceId } from "ui/state/app";
-import { Recording, Workspace } from "ui/types";
 import { isPublicDisabled } from "ui/utils/org";
 import { trackEvent } from "ui/utils/telemetry";
 

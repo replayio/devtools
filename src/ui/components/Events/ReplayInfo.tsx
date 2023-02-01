@@ -1,11 +1,11 @@
 import React, { ReactNode } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { OperationsData } from "shared/graphql/types";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { getRecordingTarget } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
-import { OperationsData } from "ui/types";
 import { formatRelativeTime } from "ui/utils/comments";
 import { getDisplayedUrl } from "ui/utils/environment";
 import { getRecordingId, showDurationWarning } from "ui/utils/recording";

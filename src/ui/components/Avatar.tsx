@@ -1,7 +1,7 @@
 import classNames from "classnames/bind";
 import React from "react";
 
-import { User } from "ui/types";
+import { User } from "shared/graphql/types";
 import useAuth0 from "ui/utils/useAuth0";
 import { getAvatarColor } from "ui/utils/user";
 

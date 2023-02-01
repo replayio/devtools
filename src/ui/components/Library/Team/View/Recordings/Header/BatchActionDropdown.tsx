@@ -2,10 +2,10 @@ import { RecordingId } from "@replayio/protocol";
 import classNames from "classnames";
 import React, { useState } from "react";
 
+import { Recording } from "shared/graphql/types";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
 import { WorkspaceId } from "ui/state/app";
-import { Recording } from "ui/types";
 import { useIsPublicEnabled } from "ui/utils/org";
 
 import { DisabledButton, getButtonClasses } from "../../../../../shared/Button";

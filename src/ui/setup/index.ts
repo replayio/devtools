@@ -9,6 +9,7 @@ import { preloadIDBInitialValues } from "replay-next/src/hooks/useIndexedDB";
 import { preCacheExecutionPointForTime } from "replay-next/src/suspense/PointsCache";
 import { ReplayClient } from "shared/client/ReplayClient";
 import { replayClient } from "shared/client/ReplayClientContext";
+import { Recording } from "shared/graphql/types";
 import { UIStore } from "ui/actions";
 import { getRecording } from "ui/hooks/recordings";
 import { getUserSettings } from "ui/hooks/settings";
@@ -25,7 +26,6 @@ import {
 } from "ui/reducers/sources";
 import { ReplaySession, getReplaySession } from "ui/setup/prefs";
 import type { LayoutState } from "ui/state/layout";
-import { Recording } from "ui/types";
 import { setUserInBrowserPrefs } from "ui/utils/browser";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
 import { maybeSetMixpanelContext } from "ui/utils/mixpanel";

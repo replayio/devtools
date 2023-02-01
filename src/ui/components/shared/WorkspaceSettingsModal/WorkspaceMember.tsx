@@ -2,13 +2,13 @@ import classnames from "classnames";
 import React, { useEffect, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { WorkspaceUser, WorkspaceUserRole } from "shared/graphql/types";
 import * as actions from "ui/actions/app";
 import { AvatarImage } from "ui/components/Avatar";
 import { Dropdown, DropdownDivider, DropdownItem } from "ui/components/Library/LibraryDropdown";
 import { useRedirectToTeam } from "ui/components/Library/Team/utils";
 import PortalDropdown from "ui/components/shared/PortalDropdown";
 import hooks from "ui/hooks";
-import { WorkspaceUser, WorkspaceUserRole } from "ui/types";
 
 import { useConfirm } from "../Confirm";
 import MaterialIcon from "../MaterialIcon";

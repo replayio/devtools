@@ -1,9 +1,9 @@
 import React from "react";
 
+import { CombinedExperimentalUserSettings } from "shared/graphql/types";
 import Icon from "ui/components/shared/Icon";
 import hooks from "ui/hooks";
 import { useFeature } from "ui/hooks/settings";
-import { CombinedExperimentalUserSettings } from "ui/types";
 
 import { CheckboxRow } from "./CheckboxRow";
 

@@ -2,9 +2,9 @@ import classNames from "classnames/bind";
 import { useContext, useRef } from "react";
 
 import useModalDismissSignal from "replay-next/src/hooks/useModalDismissSignal";
+import { AnnotatedTestStep, TestItem } from "shared/graphql/types";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useTestStepActions } from "ui/hooks/useTestStepActions";
-import { AnnotatedTestStep, TestItem } from "ui/types";
 
 import { Coordinates, TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import styles from "./ContextMenu.module.css";
