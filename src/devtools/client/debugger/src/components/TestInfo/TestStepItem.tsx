@@ -189,7 +189,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
       <React.Suspense>
         <MatchingElementBadge selected={isSelected} step={step} />
       </React.Suspense>
-      {styles.Alias ? (
+      {step.alias ? (
         <span
           className={`${styles.Alias} ${isSelected ? styles.AliasSelected : ""}`}
           title={`'${argString}' aliased as '${step.alias}'`}
