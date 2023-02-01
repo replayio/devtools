@@ -47,7 +47,8 @@
   color: var(--testsuites-capsule-alias-color);
 }
 
-.AliasSelected {
+.AliasSelected,
+.BadgeSelected {
   background-color: var(--testsuites-capsule-alias-selected-bgcolor);
   color: var(--testsuites-capsule-alias-selected-color);
 }
