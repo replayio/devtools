@@ -14010,6 +14010,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"immer@npm:^9.0.19":
+  version: 9.0.19
+  resolution: "immer@npm:9.0.19"
+  checksum: f02ee53989989c287cd548a3d817fccf0bfe56db919755ee94a72ea3ae78a00363fba93ee6c010fe54a664380c29c53d44ed4091c6a86cae60957ad2cfabc010
+  languageName: node
+  linkType: hard
+
 "immer@npm:^9.0.7":
   version: 9.0.15
   resolution: "immer@npm:9.0.15"
@@ -20139,7 +20146,7 @@ __metadata:
     graphql-ws: ^5.9.0
     graphqurl: ^1.0.1
     identity-obj-proxy: ^3.0.0
-    immer: ^9.0.7
+    immer: ^9.0.19
     import-sort: ^6.0.0
     import-sort-style-replay: "workspace:*"
     isomorphic-fetch: ^3.0.0
