@@ -140,7 +140,7 @@ const { getValueAsync: getEventListenerLocationAsync } = createGenericCache<
 
     // Introspect the event's target DOM node, and find the nearest
     // React event handler if any exists.
-    const res = await ThreadFront.evaluateNew({
+    const res = await ThreadFront.evaluate({
       replayClient,
       pauseId,
       text: evaluatedEventMapper,

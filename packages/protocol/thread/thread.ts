@@ -486,7 +486,7 @@ class _ThreadFront {
 
   // Same as evaluate, but returns the result without wrapping a ValueFront around them.
   // TODO Replace usages of evaluate with this.
-  async evaluateNew({
+  async evaluate({
     replayClient,
     pauseId,
     text,
