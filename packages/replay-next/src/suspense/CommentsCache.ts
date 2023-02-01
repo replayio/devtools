@@ -1,9 +1,10 @@
 import { RecordingId } from "@replayio/protocol";
 import { unstable_getCacheForType as getCacheForType } from "react";
 
-import { getComments as getCommentsGraphQL } from "../graphql/Comments";
-import { GraphQLClientInterface } from "../graphql/GraphQLClient";
-import { Comment } from "../graphql/types";
+import { getComments as getCommentsGraphQL } from "shared/graphql/Comments";
+import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
+import { Comment } from "shared/graphql/types";
+
 import { createWakeable } from "../utils/suspense";
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 

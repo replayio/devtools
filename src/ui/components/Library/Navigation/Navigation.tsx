@@ -1,5 +1,5 @@
+import { Workspace } from "shared/graphql/types";
 import hooks from "ui/hooks";
-import { Workspace } from "ui/types";
 
 import { LibrarySpinner } from "../LibrarySpinner";
 import { MY_LIBRARY_TEAM } from "../Team/TeamContextRoot";

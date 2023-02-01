@@ -1,8 +1,8 @@
 import React from "react";
 
+import { Recording, User } from "shared/graphql/types";
 import { AvatarImage } from "ui/components/Avatar";
 import hooks from "ui/hooks";
-import { Recording, User } from "ui/types";
 
 import MaterialIcon from "../MaterialIcon";
 

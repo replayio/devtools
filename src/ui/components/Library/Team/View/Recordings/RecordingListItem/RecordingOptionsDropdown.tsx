@@ -2,13 +2,13 @@ import { RecordingId } from "@replayio/protocol";
 import classNames from "classnames";
 import React, { useState } from "react";
 
+import { Recording } from "shared/graphql/types";
 import { setModal } from "ui/actions/app";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
 import { useGetUserPermissions } from "ui/hooks/users";
 import { useAppDispatch } from "ui/setup/hooks";
 import { WorkspaceId } from "ui/state/app";
-import { Recording } from "ui/types";
 import { useIsPublicEnabled } from "ui/utils/org";
 
 import { useConfirm } from "../../../../../shared/Confirm";

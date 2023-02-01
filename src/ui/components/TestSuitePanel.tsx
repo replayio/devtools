@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 
 import TestInfo from "devtools/client/debugger/src/components/TestInfo/TestInfo";
+import { Annotation, Recording, TestItem } from "shared/graphql/types";
 import {
   setFocusRegionFromTimeRange,
   syncFocusedRegion,
@@ -17,7 +18,6 @@ import {
   setSelectedTest,
 } from "ui/reducers/reporter";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { Annotation, Recording, TestItem } from "ui/types";
 import { getRecordingId } from "ui/utils/recording";
 
 import { Attributes } from "./Library/Team/View/TestRuns/Overview/RunSummary";

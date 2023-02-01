@@ -1,6 +1,7 @@
 import classnames from "classnames";
 import { createContext, useCallback, useEffect, useState } from "react";
 
+import { TestItem, TestResult, TestStep } from "shared/graphql/types";
 import {
   seek,
   seekToTime,
@@ -17,7 +18,6 @@ import {
   setSelectedTest,
 } from "ui/reducers/reporter";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { TestItem, TestResult, TestStep } from "ui/types";
 
 import { TestSteps } from "./TestSteps";
 import styles from "src/ui/components/SidePanel.module.css";

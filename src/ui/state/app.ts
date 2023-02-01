@@ -10,7 +10,7 @@ import {
 } from "@replayio/protocol";
 
 import type { RecordingTarget } from "protocol/thread/thread";
-import { Workspace } from "ui/types";
+import { Workspace } from "shared/graphql/types";
 
 import { Reply } from "./comments";
 

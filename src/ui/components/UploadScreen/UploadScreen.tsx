@@ -1,9 +1,9 @@
 import React, { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
 
+import { ExperimentalUserSettings, Recording } from "shared/graphql/types";
 import Modal from "ui/components/shared/NewModal";
 import hooks from "ui/hooks";
 import { useGetRecordingId } from "ui/hooks/recordings";
-import { ExperimentalUserSettings, Recording } from "ui/types";
 import { showDurationWarning } from "ui/utils/recording";
 import { trackEvent } from "ui/utils/telemetry";
 import { decodeWorkspaceId } from "ui/utils/workspace";

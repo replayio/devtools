@@ -1,7 +1,10 @@
 import { MockedResponse } from "@apollo/client/testing";
 
-import { GetComments, GetCommentsVariables } from "graphql/GetComments";
-import { GetCommentsTime, GetCommentsTimeVariables } from "graphql/GetCommentsTime";
+import { GetComments, GetCommentsVariables } from "shared/graphql/generated/GetComments";
+import {
+  GetCommentsTime,
+  GetCommentsTimeVariables,
+} from "shared/graphql/generated/GetCommentsTime";
 import { GET_COMMENTS, GET_COMMENTS_TIME } from "ui/graphql/comments";
 
 import { cloneResponse } from "./utils";

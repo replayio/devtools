@@ -1,13 +1,19 @@
 import { ApolloError, gql, useMutation, useQuery } from "@apollo/client";
 import { RecordingId } from "@replayio/protocol";
 
-import { GetComments, GetCommentsVariables } from "graphql/GetComments";
-import { GetCommentsTime, GetCommentsTimeVariables } from "graphql/GetCommentsTime";
-import { UpdateCommentContent, UpdateCommentContentVariables } from "graphql/UpdateCommentContent";
+import { GetComments, GetCommentsVariables } from "shared/graphql/generated/GetComments";
+import {
+  GetCommentsTime,
+  GetCommentsTimeVariables,
+} from "shared/graphql/generated/GetCommentsTime";
+import {
+  UpdateCommentContent,
+  UpdateCommentContentVariables,
+} from "shared/graphql/generated/UpdateCommentContent";
 import {
   UpdateCommentReplyContent,
   UpdateCommentReplyContentVariables,
-} from "graphql/UpdateCommentReplyContent";
+} from "shared/graphql/generated/UpdateCommentReplyContent";
 import { GET_COMMENTS, GET_COMMENTS_TIME } from "ui/graphql/comments";
 import { Comment, CommentPosition } from "ui/state/comments";
 import { query } from "ui/utils/apolloClient";

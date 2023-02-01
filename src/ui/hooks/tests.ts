@@ -1,27 +1,30 @@
 import { gql, useQuery } from "@apollo/client";
 import orderBy from "lodash/orderBy";
 
+import { assert } from "protocol/utils";
 import {
   GetTest,
   GetTestVariables,
   GetTest_node_Workspace_tests,
   GetTest_node_Workspace_tests_recordings,
-} from "graphql/GetTest";
-import { GetTestsForWorkspace, GetTestsForWorkspaceVariables } from "graphql/GetTestsForWorkspace";
+} from "shared/graphql/generated/GetTest";
+import {
+  GetTestsForWorkspace,
+  GetTestsForWorkspaceVariables,
+} from "shared/graphql/generated/GetTestsForWorkspace";
 import {
   GetTestsRun,
   GetTestsRunVariables,
   GetTestsRun_node_Workspace_testRuns,
   GetTestsRun_node_Workspace_testRuns_recordings,
-} from "graphql/GetTestsRun";
+} from "shared/graphql/generated/GetTestsRun";
 import {
   GetTestsRunsForWorkspace,
   GetTestsRunsForWorkspaceVariables,
   GetTestsRunsForWorkspace_node_Workspace_testRuns,
-} from "graphql/GetTestsRunsForWorkspace";
-import { assert } from "protocol/utils";
+} from "shared/graphql/generated/GetTestsRunsForWorkspace";
+import { Recording } from "shared/graphql/types";
 import { WorkspaceId } from "ui/state/app";
-import { Recording } from "ui/types";
 
 export interface Test {
   title: string | null;

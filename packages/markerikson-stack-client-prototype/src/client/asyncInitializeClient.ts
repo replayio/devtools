@@ -1,7 +1,6 @@
 import { ReplayClientInterface } from "shared/client/types";
-
-import { UserInfo } from "../graphql/types";
-import { getCurrentUserInfo } from "../graphql/User";
+import { UserInfo } from "shared/graphql/types";
+import { getCurrentUserInfo } from "shared/graphql/User";
 
 export default async function asyncInitializeClient(replayClient: ReplayClientInterface) {
   // Read some of the hard-coded values from query params.

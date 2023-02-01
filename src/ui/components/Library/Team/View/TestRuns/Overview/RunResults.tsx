@@ -1,8 +1,8 @@
 import orderBy from "lodash/orderBy";
 import { useContext, useState } from "react";
 
+import { Recording } from "shared/graphql/types";
 import Icon from "ui/components/shared/Icon";
-import { Recording } from "ui/types";
 
 import { TestResultListItem } from "./TestResultListItem";
 import { TestRunOverviewContext } from "./TestRunOverviewContainerContextType";

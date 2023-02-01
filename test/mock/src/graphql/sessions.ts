@@ -1,6 +1,9 @@
 import { MockedResponse } from "@apollo/client/testing";
 
-import { GetActiveSessions, GetActiveSessionsVariables } from "graphql/GetActiveSessions";
+import {
+  GetActiveSessions,
+  GetActiveSessionsVariables,
+} from "shared/graphql/generated/GetActiveSessions";
 import { GET_ACTIVE_SESSIONS } from "ui/graphql/sessions";
 
 import { cloneResponse } from "./utils";

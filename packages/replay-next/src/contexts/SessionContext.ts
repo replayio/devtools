@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import { UserInfo } from "../graphql/types";
+import { UserInfo } from "shared/graphql/types";
 
 export type SessionContextType = {
   accessToken: string | null;

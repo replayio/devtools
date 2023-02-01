@@ -1,9 +1,9 @@
 import React from "react";
 
+import { Workspace } from "shared/graphql/types";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
 import { WorkspaceId } from "ui/state/app";
-import { Workspace } from "ui/types";
 import { subscriptionExpired } from "ui/utils/workspace";
 
 import { DropdownDivider, DropdownItem } from "../../../../LibraryDropdown";

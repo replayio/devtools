@@ -10,9 +10,9 @@ import {
   VisualCommentTypeData,
   createTypeDataForNetworkRequestComment,
 } from "replay-next/components/sources/utils/comments";
-import { CommentSourceLocation } from "replay-next/src/graphql/types";
 import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientInterface } from "shared/client/types";
+import { CommentSourceLocation } from "shared/graphql/types";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { ADD_COMMENT_MUTATION, AddCommentMutation } from "ui/hooks/comments/useAddComment";
 import { selectors } from "ui/reducers";
