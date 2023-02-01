@@ -40,3 +40,11 @@ export function getFunctionBody(fn: Function) {
   var s = removeCommentsFromSource(fn.toString());
   return s.substring(s.indexOf("{") + 1, s.lastIndexOf("}"));
 }
+
+export function replaceMultipleStrings(originalText: string, replacements: Record<string, string>) {
+  let updatedText = originalText;
+  for (let [searchText, replacementText] of Object.entries(replacements)) {
+    updatedText = updatedText.replace(searchText, replacementText);
+  }
+  return updatedText;
+}
