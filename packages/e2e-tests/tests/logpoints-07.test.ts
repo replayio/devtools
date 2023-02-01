@@ -18,7 +18,7 @@ test(`logpoints-07: should use the correct scope in auto-complete`, async ({ pag
   await openDevToolsTab(page);
 
   let url = "App.js";
-  let lineNumber = 13;
+  let lineNumber = 17;
 
   await addLogpoint(page, { lineNumber, url });
   await warpToMessage(page, "update", lineNumber);
