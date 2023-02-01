@@ -2,6 +2,7 @@ import classNames from "classnames";
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
+import { setHighlightedNodesLoading } from "devtools/client/inspector/markup/reducers/markup";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -49,14 +50,24 @@ export interface TestStepItemProps {
   id: string | null;
 }
 
+async function awaitWithTimeout<T>(promise: Promise<T>, timeout = 500): Promise<T | undefined> {
+  return Promise.race([
+    new Promise<undefined>(resolve => setTimeout(() => resolve(undefined), timeout)),
+    promise,
+  ]);
+}
+
 export function TestStepItem({ step, argString, index, id }: TestStepItemProps) {
+  const isHovered = useRef(false);
   const hasScrolled = useRef(false);
   const ref = useRef<HTMLDivElement>(null);
-  const [subjectNodePauseData, setSubjectNodePauseData] = useState<{
-    pauseId: string | undefined;
-    nodeIds: string[] | undefined;
-    point: string | undefined;
-  }>();
+  const [subjectNodePauseData, setSubjectNodePauseData] = useState<
+    Promise<{
+      pauseId: string | undefined;
+      nodeIds: string[] | undefined;
+      point: string | undefined;
+    }>
+  >();
   const viewMode = useAppSelector(getViewMode);
   const isPlaying = useAppSelector(isPlayingSelector);
   const currentTime = useAppSelector(getCurrentTime);
@@ -67,20 +78,15 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const actions = useTestStepActions(step);
 
   useEffect(() => {
-    getCypressSubjectNodeIdsAsync(client, step)
-      .then(setSubjectNodePauseData)
-      .catch(e => {
-        console.error("Failed to fetch subject nodes for step");
-        console.error(e);
-      });
+    setSubjectNodePauseData(getCypressSubjectNodeIdsAsync(client, step));
   }, [client, step]);
 
-  const { pauseId: endPauseId } = subjectNodePauseData || {};
-  const onClick = useCallback(() => {
+  const onClick = useCallback(async () => {
     const { timeRange, pointRange } = getStepRanges(step);
-    if (id && timeRange) {
-      if (pointRange) {
-        dispatch(seek(pointRange[1], timeRange[1], false, endPauseId));
+    if (id && timeRange && subjectNodePauseData) {
+      const pauseData = await awaitWithTimeout(subjectNodePauseData);
+      if (pointRange && pauseData?.pauseId) {
+        dispatch(seek(pointRange[1], timeRange[1], false, pauseData?.pauseId));
       } else {
         dispatch(seekToTime(timeRange[1], false));
       }
@@ -91,27 +97,52 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
 
       dispatch(setSelectedStep(step));
     }
-  }, [actions, viewMode, step, endPauseId, dispatch, id]);
+  }, [actions, viewMode, step, subjectNodePauseData, dispatch, id]);
 
-  const onMouseEnter = () => {
-    const { pauseId, point, nodeIds } = subjectNodePauseData || {};
-
-    if (state === "paused") {
+  const onMouseEnter = async () => {
+    isHovered.current = true;
+    if (state === "paused" || !subjectNodePauseData) {
       return;
     }
 
-    if (!pauseId) {
-      dispatch(setTimelineToTime(step.absoluteEndTime));
-      return;
-    }
+    try {
+      let pauseData = await Promise.race([
+        new Promise<"timeout">(resolve => setTimeout(() => resolve("timeout"), 500)),
+        subjectNodePauseData,
+      ]);
 
-    dispatch(setTimelineToPauseTime(step.absoluteEndTime, pauseId, point));
+      if (pauseData === "timeout") {
+        dispatch(setHighlightedNodesLoading(true));
+        pauseData = await subjectNodePauseData;
 
-    if (nodeIds) {
-      dispatch(highlightNodes(nodeIds, pauseId));
+        if (!isHovered.current) {
+          return;
+        }
+
+        dispatch(setHighlightedNodesLoading(false));
+      }
+
+      const { pauseId, point, nodeIds } = pauseData;
+
+      if (!pauseId) {
+        dispatch(setTimelineToTime(step.absoluteEndTime));
+        return;
+      }
+
+      dispatch(setTimelineToPauseTime(step.absoluteEndTime, pauseId, point));
+
+      if (nodeIds) {
+        dispatch(highlightNodes(nodeIds, pauseId));
+      }
+    } catch (e) {
+      console.error("Failed to highlight nodes");
+      console.error(e);
     }
   };
   const onMouseLeave = () => {
+    isHovered.current = false;
+    dispatch(setHighlightedNodesLoading(false));
+
     if (state === "paused") {
       return;
     }
