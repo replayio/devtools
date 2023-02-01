@@ -50,9 +50,13 @@ export interface TestStepItemProps {
   id: string | null;
 }
 
-async function awaitWithTimeout<T>(promise: Promise<T>, timeout = 500): Promise<T | undefined> {
+const AwaitTimeout = Symbol("await-timeout");
+async function awaitWithTimeout<T>(
+  promise: Promise<T>,
+  timeout = 500
+): Promise<T | typeof AwaitTimeout> {
   return Promise.race([
-    new Promise<undefined>(resolve => setTimeout(() => resolve(undefined), timeout)),
+    new Promise<typeof AwaitTimeout>(resolve => setTimeout(() => resolve(AwaitTimeout), timeout)),
     promise,
   ]);
 }
@@ -85,8 +89,8 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     const { timeRange, pointRange } = getStepRanges(step);
     if (id && timeRange && subjectNodePauseData) {
       const pauseData = await awaitWithTimeout(subjectNodePauseData);
-      if (pointRange && pauseData?.pauseId) {
-        dispatch(seek(pointRange[1], timeRange[1], false, pauseData?.pauseId));
+      if (pointRange && pauseData !== AwaitTimeout) {
+        dispatch(seek(pointRange[1], timeRange[1], false, pauseData.pauseId));
       } else {
         dispatch(seekToTime(timeRange[1], false));
       }
@@ -106,12 +110,9 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     }
 
     try {
-      let pauseData = await Promise.race([
-        new Promise<"timeout">(resolve => setTimeout(() => resolve("timeout"), 500)),
-        subjectNodePauseData,
-      ]);
+      let pauseData = await awaitWithTimeout(subjectNodePauseData);
 
-      if (pauseData === "timeout") {
+      if (pauseData === AwaitTimeout) {
         dispatch(setHighlightedNodesLoading(true));
         pauseData = await subjectNodePauseData;
 
