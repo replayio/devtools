@@ -1,6 +1,4 @@
-This entire folder's content is auto-generated.
-
-Editing any of these files manually is not recommended.
+The contents of the `"generated"` directory are auto-generated. Editing any of these files manually **is not recommended**.
 
 ### Generating GraphQL types for Typescript
 
