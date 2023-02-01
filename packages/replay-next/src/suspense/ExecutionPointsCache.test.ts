@@ -41,7 +41,7 @@ describe("PointsCache", () => {
     replayClient = mockClient as any as ReplayClientInterface;
 
     // Clear and recreate cached data between tests.
-    const module = require("./PointsCache");
+    const module = require("./ExecutionPointsCache");
     getCachedHitPointsForLocation = module.getCachedHitPointsForLocation;
     getClosestPointForTimeSuspense = module.getClosestPointForTimeSuspense;
     getHitPointsForLocationSuspense = module.getHitPointsForLocationSuspense;

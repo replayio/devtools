@@ -6,7 +6,7 @@ import { ThreadFront } from "protocol/thread";
 import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { POINTS_DATABASE } from "replay-next/src/contexts/PointsContext";
 import { preloadIDBInitialValues } from "replay-next/src/hooks/useIndexedDB";
-import { preCacheExecutionPointForTime } from "replay-next/src/suspense/PointsCache";
+import { preCacheExecutionPointForTime } from "replay-next/src/suspense/ExecutionPointsCache";
 import { ReplayClient } from "shared/client/ReplayClient";
 import { replayClient } from "shared/client/ReplayClientContext";
 import { Recording } from "shared/graphql/types";

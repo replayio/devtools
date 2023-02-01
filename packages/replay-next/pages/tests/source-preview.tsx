@@ -2,9 +2,9 @@ import { Suspense, useContext } from "react";
 
 import SourcePreviewInspector from "replay-next/components/inspector/SourcePreviewInspector";
 import Loader from "replay-next/components/Loader";
+import { getClosestPointForTimeSuspense } from "replay-next/src/suspense/ExecutionPointsCache";
 import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
 import { evaluateSuspense, getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
-import { getClosestPointForTimeSuspense } from "replay-next/src/suspense/PointsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import createTest from "./utils/createTest";

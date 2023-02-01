@@ -23,7 +23,7 @@ import { DownloadCancelledError } from "protocol/screenshot-cache";
 import { ThreadFront } from "protocol/thread";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { waitForTime } from "protocol/utils";
-import { getPointsBoundingTimeAsync } from "replay-next/src/suspense/PointsCache";
+import { getPointsBoundingTimeAsync } from "replay-next/src/suspense/ExecutionPointsCache";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import { mayClearSelectedStep } from "ui/reducers/reporter";
 import {
