@@ -13,11 +13,16 @@ import {
   Wakeable,
 } from "./types";
 
+export { STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED } from "./types";
+
+type CacheRecordStatus = typeof STATUS_PENDING | typeof STATUS_RESOLVED | typeof STATUS_REJECTED;
+
 export interface GenericCache<TParams extends Array<any>, TValue> {
   getValueSuspense(...args: TParams): TValue;
   getValueAsync(...args: TParams): Thennable<TValue> | TValue;
   getValueIfCached(...args: TParams): { value: TValue } | undefined;
   addValue(value: TValue, ...args: TParams): void;
+  getStatus(...args: TParams): CacheRecordStatus | undefined;
 }
 
 export interface GenericCache2<TExtra, TParams extends Array<any>, TValue> {
@@ -25,6 +30,7 @@ export interface GenericCache2<TExtra, TParams extends Array<any>, TValue> {
   getValueAsync(extra: TExtra, ...args: TParams): Thennable<TValue> | TValue;
   getValueIfCached(...args: TParams): { value: TValue } | undefined;
   addValue(value: TValue, ...args: TParams): void;
+  getStatus(...args: TParams): CacheRecordStatus | undefined;
 }
 
 interface HookState<TValue> {
@@ -48,6 +54,7 @@ export function createGenericCache<TParams extends Array<any>, TValue>(
     getValueAsync: (...args) => cache.getValueAsync(undefined, ...args),
     getValueIfCached: (...args) => cache.getValueIfCached(...args),
     addValue: (value, ...args) => cache.addValue(value, ...args),
+    getStatus: (...args) => cache.getStatus(...args),
   };
 }
 
@@ -138,6 +145,11 @@ export function createGenericCache2<TExtra, TParams extends Array<any>, TValue>(
     addValue(value: TValue, ...args: TParams) {
       const cacheKey = getCacheKey(...args);
       recordMap.set(cacheKey, { status: STATUS_RESOLVED, value });
+    },
+
+    getStatus(...args: TParams) {
+      const cacheKey = getCacheKey(...args);
+      return recordMap.get(cacheKey)?.status;
     },
   };
 }

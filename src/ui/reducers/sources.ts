@@ -9,13 +9,8 @@ import {
 import { Location, MappedLocation, SourceKind, newSource } from "@replayio/protocol";
 
 import type { PartialLocation } from "devtools/client/debugger/src/actions/sources";
-import { parser } from "devtools/client/debugger/src/utils/bootstrap";
-import { getTextAtPosition } from "devtools/client/debugger/src/utils/source";
 import { assert } from "protocol/utils";
 import { preCacheSources } from "replay-next/src/suspense/SourcesCache";
-import { getStreamingSourceContentsHelper } from "replay-next/src/suspense/SourcesCache";
-import { UIThunkAction } from "ui/actions";
-import { listenForCondition } from "ui/setup/listenerMiddleware";
 import { UIState } from "ui/state";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 import { newSourcesToCompleteSourceDetails } from "ui/utils/sources";
@@ -43,24 +38,7 @@ export interface MiniSource {
   url?: string;
 }
 
-export interface SourceContentValue {
-  contentType: string;
-  type: string;
-  value: string;
-}
-
-export interface SourceContent {
-  id: string;
-  status: LoadingStatus;
-  value?: SourceContentValue;
-}
-
 const sourceDetailsAdapter = createEntityAdapter<SourceDetails>();
-const contentsAdapter = createEntityAdapter<SourceContent>();
-
-export const { selectById: getSourceContentsEntry } = contentsAdapter.getSelectors(
-  (state: UIState) => state.sources.contents
-);
 
 export const {
   selectAll: getAllSourceDetails,
@@ -72,7 +50,6 @@ export const {
 export interface SourcesState {
   allSourcesReceived: boolean;
   sourceDetails: EntityState<SourceDetails>;
-  contents: EntityState<SourceContent>;
   selectedLocation: PartialLocation | null;
   selectedLocationHistory: PartialLocation[];
   selectedLocationHasScrolled: boolean;
@@ -84,7 +61,6 @@ export interface SourcesState {
 export const initialState: SourcesState = {
   allSourcesReceived: false,
   sourceDetails: sourceDetailsAdapter.getInitialState(),
-  contents: contentsAdapter.getInitialState(),
   selectedLocation: null,
   selectedLocationHistory: [],
   selectedLocationHasScrolled: false,
@@ -124,37 +100,6 @@ const sourcesSlice = createSlice({
       }
       state.sourcesByUrl = sourcesByUrl;
     },
-    sourceLoading: (state, action: PayloadAction<string>) => {
-      contentsAdapter.upsertOne(state.contents, {
-        id: action.payload,
-        status: LoadingStatus.LOADING,
-      });
-    },
-    sourceLoaded: (
-      state,
-      action: PayloadAction<{ sourceId: string; contents: string; contentType: string }>
-    ) => {
-      contentsAdapter.upsertOne(state.contents, {
-        id: action.payload.sourceId,
-        status: LoadingStatus.LOADED,
-        value: {
-          contentType: action.payload.contentType,
-          value: action.payload.contents,
-          type: action.payload.contentType.slice(0, action.payload.contentType.indexOf("/")),
-        },
-      });
-    },
-    sourceErrored: (state, action: PayloadAction<string>) => {
-      const existing = state.contents.entities[action.payload];
-      if (existing?.status === LoadingStatus.LOADED) {
-        return;
-      }
-
-      contentsAdapter.upsertOne(state.contents, {
-        id: action.payload,
-        status: LoadingStatus.ERRORED,
-      });
-    },
     locationSelected: (
       state,
       action: PayloadAction<{ location: PartialLocation; source: SourceDetails }>
@@ -192,51 +137,8 @@ const sourcesSlice = createSlice({
   },
 });
 
-export const {
-  allSourcesReceived,
-  clearSelectedLocation,
-  locationSelected,
-  preferSource,
-  sourceLoading,
-  sourceLoaded,
-  sourceErrored,
-} = sourcesSlice.actions;
-
-export const loadSourceText = (sourceId: string): UIThunkAction<Promise<void>> => {
-  return async (dispatch, getState, { replayClient }) => {
-    const existing = getSourceContentsEntry(getState(), sourceId);
-    if (existing?.status === LoadingStatus.LOADING) {
-      // in flight - resolve this thunk's promise when it completes
-      // TODO Replace this with RTK Query!
-      return dispatch(
-        listenForCondition(() => {
-          // Check the status of this source after every action
-          const status = getSourceContentsEntry(getState(), sourceId)?.status;
-          return status === LoadingStatus.LOADED;
-        })
-      );
-    }
-    if (existing?.status === LoadingStatus.LOADED) {
-      return;
-    }
-    dispatch(sourceLoading(sourceId));
-
-    try {
-      const { resolver } = await getStreamingSourceContentsHelper(replayClient, sourceId);
-      const { contents, contentType } = await resolver;
-
-      parser.setSource(sourceId, {
-        type: "text",
-        value: contents,
-        contentType,
-      });
-
-      dispatch(sourceLoaded({ contents: contents!, contentType: contentType!, sourceId }));
-    } catch (e) {
-      dispatch(sourceErrored(sourceId));
-    }
-  };
-};
+export const { allSourcesReceived, clearSelectedLocation, locationSelected, preferSource } =
+  sourcesSlice.actions;
 
 export const getSourcesLoading = (state: UIState) => !state.sources.allSourcesReceived;
 
@@ -263,20 +165,6 @@ export const getCorrespondingSourceIdsFromSourcesState = (sources: SourcesState,
   // assert(source, `unknown source ${id}`);
   return source?.correspondingSourceIds || [id];
 };
-export const getSourceContent = (state: UIState, id: string) => {
-  return state.sources.contents.entities[id];
-};
-export const getSelectedSourceWithContent = (state: UIState) => {
-  const selectedSourceId = getSelectedSourceId(state);
-  return selectedSourceId ? getSourceContent(state, selectedSourceId) : null;
-};
-export const getTextAtLocation = (state: UIState, location: Location) => {
-  const content = getSourceContent(state, location.sourceId);
-  if (!content) {
-    return null;
-  }
-  return getTextAtPosition(content, location);
-};
 
 export const getSelectedLocationHasScrolled = (state: UIState) =>
   state.sources.selectedLocationHasScrolled;
@@ -300,11 +188,6 @@ export const getUniqueUrlForSource = (state: UIState, sourceId: string) => {
   } else {
     return sourceDetails.url;
   }
-};
-
-export const getSourceContentsLoaded = (state: UIState, sourceId: string) => {
-  const entry = getSourceContentsEntry(state, sourceId);
-  return entry && isFulfilled(entry);
 };
 
 export const isFulfilled = (item?: { status: LoadingStatus }) => {
@@ -489,42 +372,19 @@ export const getPreviousPersistedLocation = (state: UIState) =>
 export const getPreferredGeneratedSources = (state: UIState) =>
   state.sources.preferredGeneratedSources;
 
-/*
-export const getStableLocationForLocation = (
-  state: UIState,
-  location: Location
-): StableLocation => {
-  const sourceDetails = getSourceDetails(state, location.sourceId);
-  if (!sourceDetails) {
-    throw "Cannot find source details for sourceId: " + location.sourceId;
-  }
-  return {
-    ...location,
-    kind: sourceDetails.kind,
-    url: sourceDetails.url!,
-    contentHash: sourceDetails.contentHash!,
-  };
-};
-*/
-
 export const selectors = {
   getAllSourceDetails,
   getSourceDetails,
   getSourceDetailsEntities,
   getSourceDetailsCount,
-  getSourceContentsEntry,
   getSourcesLoading,
   getSelectedLocation,
   getSelectedSourceId,
   getSelectedSource,
   getSourcesById,
   getCorrespondingSourceIds,
-  getSourceContent,
-  getSelectedSourceWithContent,
-  getTextAtLocation,
   getSelectedLocationHasScrolled,
   getUniqueUrlForSource,
-  getSourceContentsLoaded,
   getHasSiblingOfSameName,
   getPreviousPersistedLocation,
   getSourceToDisplayById,
