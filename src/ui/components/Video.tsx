@@ -95,7 +95,7 @@ function Video({
         </CommentsOverlay>
       ) : null}
       {isNodePickerInitializing ? <Tooltip label="Loading…" targetID="video" /> : null}
-      {panel === "events" && <CypressToggler />}
+      {panel === "cypress" && <CypressToggler />}
       <div id="highlighter-root">
         {highlightedNodeIds?.map(nodeId => (
           <PreviewNodeHighlighter key={nodeId} nodeId={nodeId} />
