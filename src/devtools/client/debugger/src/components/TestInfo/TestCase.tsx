@@ -20,7 +20,8 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem, TestResult, TestStep } from "ui/types";
 
 import { TestSteps } from "./TestSteps";
-import styles from "src/ui/components/SidePanel.module.css";
+import stylesTestInfo from "src/devtools/client/debugger/src/components/TestInfo/TestInfo.module.css";
+import stylesSidePanel from "src/ui/components/SidePanel.module.css";
 
 export type TestCaseContextType = {
   test: TestItem;
@@ -106,6 +107,18 @@ export function TestCase({ test, index }: { test: TestItem; index: number }) {
     dispatch(startPlayback({ beginTime, endTime: testEndTime - 1 }));
   };
 
+  /*
+  const TestStepsDiv = document.getElementById(stylesTestInfo.TestSteps);
+
+  if (TestStepsDiv && TestStepsDiv.offsetWidth < 380) {
+    TestStepsDiv.classList.add(stylesTestInfo.tiny);
+    console.log("add tiny");
+  } else if (TestStepsDiv && TestStepsDiv.offsetWidth > 380) {
+    console.log("remove tiny");
+    TestStepsDiv.classList.remove(stylesTestInfo.tiny);
+  }
+*/
+
   return (
     <TestCaseContext.Provider
       value={{ startTime: testStartTime, endTime: testEndTime, onReplay, onPlayFromHere, test }}
@@ -156,7 +169,7 @@ export function Status({ result }: { result: TestResult }) {
     <Icon
       filename={result === "passed" ? "testsuites-success" : "testsuites-fail"}
       size="small"
-      className={result === "passed" ? styles.SuccessIcon : styles.ErrorIcon}
+      className={result === "passed" ? stylesSidePanel.SuccessIcon : stylesSidePanel.ErrorIcon}
     />
   );
 }

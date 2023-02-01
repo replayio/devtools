@@ -35,3 +35,21 @@
 .TestsuitesErrorColor {
   color: var(--testsuites-error-color);
 }
+
+.Alias {
+  padding: 0.25rem;
+  color: #1f2937;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  flex-shrink: 1;
+  border-radius: 0.25rem;
+  background-color: #ececec;
+}
+
+.AliasSelected {
+  background-color: #bbb;
+}
+
+.AliasHidden {
+  display: none;
+}

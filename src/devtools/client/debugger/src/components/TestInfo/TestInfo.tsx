@@ -11,6 +11,7 @@ import ContextMenuWrapper from "./ContextMenu";
 import { StepDetails } from "./StepDetails";
 import { TestCase } from "./TestCase";
 import { TestInfoContextMenuContextRoot } from "./TestInfoContextMenuContext";
+import styles from "./TestInfo.module.css";
 
 type TestInfoContextType = {
   consoleProps?: ProtocolObject;
@@ -55,7 +56,7 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
     >
       <TestInfoContextMenuContextRoot>
         <div className="flex flex-grow flex-col overflow-hidden">
-          <div className="relative flex flex-grow flex-col space-y-1 overflow-auto border-t border-splitter px-2 pt-3">
+          <div id={styles.TestSteps}>
             {missingSteps ? (
               <aside className="m-1 space-y-4 rounded-lg border border-amber-200 bg-amber-100 px-4 py-3">
                 <div>

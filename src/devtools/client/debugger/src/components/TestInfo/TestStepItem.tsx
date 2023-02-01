@@ -20,6 +20,7 @@ import { AnnotatedTestStep } from "ui/types";
 import { TestCaseContext } from "./TestCase";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { TestStepRow } from "./TestStepRow";
+import stylesTestInfo from "src/devtools/client/debugger/src/components/TestInfo/TestInfo.module.css";
 import styles from "./TestStepItem.module.css";
 
 function preventClickFromSpaceBar(ev: React.KeyboardEvent<HTMLButtonElement>) {
@@ -147,6 +148,20 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     (step.duration === 1 && state === "paused") || progress == 100 ? 0 : progress;
   const isSelected = selectedStep?.id === id;
 
+  const TestStepsDiv = document.getElementById(stylesTestInfo.TestSteps);
+  const AliasDivs = document.querySelectorAll(`.${styles.Alias}`);
+
+  if (TestStepsDiv && TestStepsDiv.offsetWidth < 380) {
+    AliasDivs.forEach(aliasDiv => {
+      aliasDiv.classList.add(styles.AliasHidden);
+    });
+    console.log(AliasDivs);
+  } else if (TestStepsDiv && TestStepsDiv.offsetWidth > 380) {
+    AliasDivs.forEach(aliasDiv => {
+      aliasDiv.classList.remove(styles.AliasHidden);
+    });
+  }
+
   return (
     <TestStepRow
       active={state === "paused"}
@@ -174,12 +189,9 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
       <React.Suspense>
         <MatchingElementBadge selected={isSelected} step={step} />
       </React.Suspense>
-      {step.alias ? (
+      {styles.Alias ? (
         <span
-          className={classNames(
-            "-my-1 flex-shrink rounded p-1 text-xs text-gray-800",
-            isSelected ? "bg-gray-300" : "bg-gray-200"
-          )}
+          className={`${styles.Alias} ${isSelected ? styles.AliasSelected : ""}`}
           title={`'${argString}' aliased as '${step.alias}'`}
         >
           {step.alias}
