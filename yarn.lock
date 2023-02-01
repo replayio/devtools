@@ -18581,14 +18581,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-chromium@npm:^1.23.1":
-  version: 1.29.0
-  resolution: "playwright-chromium@npm:1.29.0"
+"playwright-chromium@npm:^1.30.0":
+  version: 1.30.0
+  resolution: "playwright-chromium@npm:1.30.0"
   dependencies:
-    playwright-core: 1.29.0
+    playwright-core: 1.30.0
   bin:
     playwright: cli.js
-  checksum: 4e4e93289a17360dcc9e6285b580ccf69173be22b236c517b275be9eac5018cac92bae0e6c6cb3d56d774d4bbb0d205621fa91baadbfbff38abaacf9d5b381d8
+  checksum: 5628430b2ca370e6e5f41910dd2a5ef2877128ead7977003148e661cc40cc75ddf5e55c4f9d7d9d358e311e9a5a2da2a6c4341135330a6fc8634c925922f016b
   languageName: node
   linkType: hard
 
@@ -18610,12 +18610,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.29.0":
-  version: 1.29.0
-  resolution: "playwright-core@npm:1.29.0"
+"playwright-core@npm:1.30.0":
+  version: 1.30.0
+  resolution: "playwright-core@npm:1.30.0"
   bin:
     playwright: cli.js
-  checksum: 5e4b690b0b449ed27ab7f7d7c9bf778db53e6c6b37a8e7258fb070fe6e96f147ad5d66221a3953c9e4d0b2044b701c493d7a0708d7bdb6486e38a3518f62fdce
+  checksum: 4c5693f27245a1168f94708ecd8e1eb0d200de435b25cc07cfa25b97a094633818954dc00baf24e0ff551825f672050b83d1309362c1f97213fe8ebd2a147ed9
   languageName: node
   linkType: hard
 
@@ -20546,7 +20546,7 @@ __metadata:
     lodash: ^4.17.21
     next: 13.1.3-canary.4
     node-fetch: ^2.0.0
-    playwright-chromium: ^1.23.1
+    playwright-chromium: ^1.30.0
     pretty-ms: ^7.0.1
     protocol: "workspace:*"
     react: 0.0.0-experimental-e7d0053e6-20220325
