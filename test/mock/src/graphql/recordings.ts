@@ -1,13 +1,17 @@
 import { MockedResponse } from "@apollo/client/testing";
 
-import { GetRecording, GetRecordingVariables, GetRecording_recording } from "graphql/GetRecording";
+import {
+  GetRecording,
+  GetRecordingVariables,
+  GetRecording_recording,
+} from "shared/graphql/generated/GetRecording";
 import {
   GetRecordingUserId,
   GetRecordingUserIdVariables,
   GetRecordingUserId_recording,
-} from "graphql/GetRecordingUserId";
+} from "shared/graphql/generated/GetRecordingUserId";
+import { Recording, RecordingRole, User } from "shared/graphql/types";
 import { GET_RECORDING, GET_RECORDING_USER_ID } from "ui/graphql/recordings";
-import { Recording, RecordingRole, User } from "ui/types";
 
 import { cloneResponse } from "./utils";
 

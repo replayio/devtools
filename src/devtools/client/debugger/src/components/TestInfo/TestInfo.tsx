@@ -1,11 +1,11 @@
 import { Object as ProtocolObject } from "@replayio/protocol";
 import React, { createContext, useEffect, useMemo, useState } from "react";
 
+import { TestItem } from "shared/graphql/types";
 import { useTestInfo } from "ui/hooks/useTestInfo";
 import { getSelectedTest, setSelectedTest } from "ui/reducers/reporter";
 import { setPlaybackFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { TestItem } from "ui/types";
 
 import ContextMenuWrapper from "./ContextMenu";
 import { StepDetails } from "./StepDetails";

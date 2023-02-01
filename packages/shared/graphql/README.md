@@ -1,8 +1,6 @@
-# This entire folder's content is auto-generated
+The contents of the `"generated"` directory are auto-generated. Editing any of these files manually **is not recommended**.
 
-Editing any of these files manually is not recommended.
-
-## Generating GraphQL types for Typescript
+### Generating GraphQL types for Typescript
 
 ```bash
 HASURA_KEY=<key> yarn gql

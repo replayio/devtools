@@ -1,6 +1,6 @@
 import React from "react";
 
-import { SubscriptionWithPricing } from "ui/types";
+import { SubscriptionWithPricing } from "shared/graphql/types";
 
 import { Button } from "../Button";
 import ExternalLink from "../ExternalLink";

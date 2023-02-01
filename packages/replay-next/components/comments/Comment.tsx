@@ -12,15 +12,15 @@ import Icon from "replay-next/components/Icon";
 import CommentEditor from "replay-next/components/lexical/CommentEditor";
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { formatRelativeTime } from "replay-next/src/utils/time";
 import {
   addCommentReply as addCommentReplyGraphQL,
   deleteComment as deleteCommentGraphQL,
   deleteCommentReply as deleteCommentReplyGraphQL,
   updateComment as updateCommentGraphQL,
   updateCommentReply as updateCommentReplyGraphQL,
-} from "replay-next/src/graphql/Comments";
-import { Comment, CommentSourceLocation, User } from "replay-next/src/graphql/types";
-import { formatRelativeTime } from "replay-next/src/utils/time";
+} from "shared/graphql/Comments";
+import { Comment, CommentSourceLocation, User } from "shared/graphql/types";
 
 import CommentPreview from "./CommentPreview";
 import styles from "./Comment.module.css";
@@ -192,8 +192,8 @@ function EditableRemark({
   return (
     <div className={className}>
       <div className={styles.HeaderRow}>
-        <AvatarImage className={styles.Avatar} src={owner.picture} />
-        <div className={styles.UserName} title={owner.name}>
+        <AvatarImage className={styles.Avatar} src={owner.picture || undefined} />
+        <div className={styles.UserName} title={owner.name || undefined}>
           {owner.name}
         </div>
         <div className={styles.Time}>{formatRelativeTime(new Date(createdAt))}</div>

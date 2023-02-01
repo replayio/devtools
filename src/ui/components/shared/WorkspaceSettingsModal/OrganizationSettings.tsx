@@ -2,8 +2,8 @@ import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
 import classNames from "classnames";
 import React, { useEffect } from "react";
 
+import { PartialWorkspaceSettingsFeatures } from "shared/graphql/types";
 import hooks from "ui/hooks";
-import { PartialWorkspaceSettingsFeatures } from "ui/types";
 
 import useDebounceState from "./useDebounceState";
 import { sanitizeUrlList } from "./utils";

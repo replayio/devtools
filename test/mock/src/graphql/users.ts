@@ -1,8 +1,8 @@
 import { MockedResponse } from "@apollo/client/testing";
 
-import { DismissNag, DismissNagVariables } from "graphql/DismissNag";
-import { GetUser } from "graphql/GetUser";
-import { GetUserId } from "graphql/GetUserId";
+import { DismissNag, DismissNagVariables } from "shared/graphql/generated/DismissNag";
+import { GetUser } from "shared/graphql/generated/GetUser";
+import { GetUserId } from "shared/graphql/generated/GetUserId";
 import { DISMISS_NAG, GET_USER_ID, GET_USER_INFO } from "ui/graphql/users";
 
 import { cloneResponse } from "./utils";

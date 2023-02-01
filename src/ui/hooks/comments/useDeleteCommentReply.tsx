@@ -1,6 +1,9 @@
 import { gql, useMutation } from "@apollo/client";
 
-import { DeleteCommentReply, DeleteCommentReplyVariables } from "graphql/DeleteCommentReply";
+import {
+  DeleteCommentReply,
+  DeleteCommentReplyVariables,
+} from "shared/graphql/generated/DeleteCommentReply";
 
 export default function useDeleteCommentReply() {
   const [deleteCommentReply] = useMutation<DeleteCommentReply, DeleteCommentReplyVariables>(

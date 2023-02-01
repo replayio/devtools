@@ -1,9 +1,9 @@
 import { ReactNode, createContext } from "react";
 
+import { Workspace } from "shared/graphql/types";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
 import { useGetWorkspace } from "ui/hooks/workspaces";
-import { Workspace } from "ui/types";
 
 import { LibrarySpinner } from "../LibrarySpinner";
 

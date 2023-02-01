@@ -22,8 +22,6 @@ import { PointsContext } from "replay-next/src/contexts/PointsContext";
 import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { addComment as addCommentGraphQL } from "replay-next/src/graphql/Comments";
-import { Nag } from "replay-next/src/graphql/types";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
 import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
@@ -38,6 +36,8 @@ import {
   POINT_BEHAVIOR_ENABLED,
   Point,
 } from "shared/client/types";
+import { addComment as addCommentGraphQL } from "shared/graphql/Comments";
+import { Nag } from "shared/graphql/types";
 import { isThennable } from "shared/proxy/utils";
 
 import Loader from "../../Loader";

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Workspace } from "ui/types";
+import { Workspace } from "shared/graphql/types";
 import { inUnpaidFreeTrial, subscriptionEndsIn } from "ui/utils/workspace";
 
 import { TrialEnd } from "../shared/TrialEnd";

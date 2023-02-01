@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Subscription } from "ui/types";
+import { Subscription } from "shared/graphql/types";
 
 import { formatDate } from "./formatDate";
 import { isTrial } from "./utils";

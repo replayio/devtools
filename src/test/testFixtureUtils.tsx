@@ -2,10 +2,10 @@ import { readFileSync } from "fs";
 import { gql } from "@apollo/client";
 
 import { ThreadFront } from "protocol/thread";
+import { Recording } from "shared/graphql/types";
 import { LoadedRegionsTuple, MessageTuple, SourceTuple } from "shared/utils/testing";
 import { UIStore } from "ui/actions";
 import { convertRecording } from "ui/hooks/recordings";
-import { Recording } from "ui/types";
 import { getMockEnvironmentForTesting } from "ui/utils/environment";
 
 import { createTestStore } from "./testUtils";

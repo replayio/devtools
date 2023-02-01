@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import { GraphQLClient, GraphQLClientInterface } from "../graphql/GraphQLClient";
+import { GraphQLClient, GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 
 export type GraphQLClientContextType = GraphQLClientInterface;
 

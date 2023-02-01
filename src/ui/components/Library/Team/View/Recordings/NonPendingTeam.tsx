@@ -1,9 +1,9 @@
 import React, { useContext } from "react";
 
+import { Workspace } from "shared/graphql/types";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import Base64Image from "ui/components/shared/Base64Image";
 import hooks from "ui/hooks";
-import { Workspace } from "ui/types";
 
 import { TeamContext } from "../../TeamContextRoot";
 import { FilterContext } from "../FilterContext";

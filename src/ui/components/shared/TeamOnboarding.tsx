@@ -2,10 +2,10 @@ import { useRouter } from "next/router";
 import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
-import { CreateNewWorkspace_createWorkspace_workspace } from "graphql/CreateNewWorkspace";
+import { CreateNewWorkspace_createWorkspace_workspace } from "shared/graphql/generated/CreateNewWorkspace";
+import { Workspace, WorkspaceUser } from "shared/graphql/types";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
-import { Workspace, WorkspaceUser } from "ui/types";
 import { removeUrlParameters } from "ui/utils/environment";
 import { isValidTeamName, validateEmail } from "ui/utils/helpers";
 import { trackEvent } from "ui/utils/telemetry";

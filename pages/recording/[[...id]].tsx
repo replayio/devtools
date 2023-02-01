@@ -5,6 +5,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { Recording as RecordingInfo } from "shared/graphql/types";
 import { setModal } from "ui/actions/app";
 import { setExpectedError } from "ui/actions/errors";
 import { getAccessibleRecording } from "ui/actions/session";
@@ -20,7 +21,6 @@ import {
 import useConfigureReplayClientInterop from "ui/hooks/useReplayClient";
 import setupDevtools, { migratePerRecordingPersistedSettings } from "ui/setup/dynamic/devtools";
 import { useAppDispatch, useAppStore } from "ui/setup/hooks";
-import { Recording as RecordingInfo } from "ui/types";
 import { isTest } from "ui/utils/environment";
 import { extractIdAndSlug } from "ui/utils/helpers";
 import { startUploadWaitTracking } from "ui/utils/mixpanel";

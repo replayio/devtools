@@ -2,8 +2,8 @@ import * as Sentry from "@sentry/react";
 import LogRocket from "logrocket";
 import setupLogRocketReact from "logrocket-react";
 
+import { ExperimentalUserSettings, Recording } from "shared/graphql/types";
 import { UserInfo } from "ui/hooks/users";
-import { ExperimentalUserSettings, Recording } from "ui/types";
 import { skipTelemetry } from "ui/utils/environment";
 
 let setup = false;

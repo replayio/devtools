@@ -1,6 +1,6 @@
 import slugify from "slugify";
 
-import { Recording } from "ui/types";
+import { Recording } from "shared/graphql/types";
 
 import { usesWindow } from "../../ssr";
 import { SLUG_SEPARATOR, extractIdAndSlug } from "./helpers";

@@ -1,6 +1,6 @@
 import { PropsWithChildren, createContext, useCallback, useMemo, useState } from "react";
 
-import { AnnotatedTestStep, TestItem } from "ui/types";
+import { AnnotatedTestStep, TestItem } from "shared/graphql/types";
 
 export type Coordinates = {
   x: number;

@@ -2,8 +2,8 @@ import { RecordingId } from "@replayio/protocol";
 import Link from "next/link";
 import { useContext } from "react";
 
+import { Recording } from "shared/graphql/types";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { Recording } from "ui/types";
 
 import { TeamContext } from "../../../TeamContextRoot";
 import styles from "../../../../Library.module.css";

@@ -11,6 +11,7 @@ import {
 } from "protocol/socket";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { assert, waitForTime } from "protocol/utils";
+import { Recording } from "shared/graphql/types";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import { getRecording } from "ui/hooks/recordings";
@@ -31,7 +32,6 @@ import {
   responseReceived,
 } from "ui/reducers/protocolMessages";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
-import { Recording } from "ui/types";
 import { extractGraphQLError } from "ui/utils/apolloClient";
 import { isMock, isTest } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";

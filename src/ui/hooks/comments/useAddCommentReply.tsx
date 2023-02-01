@@ -1,6 +1,9 @@
 import { gql, useMutation } from "@apollo/client";
 
-import { AddCommentReply, AddCommentReplyVariables } from "graphql/AddCommentReply";
+import {
+  AddCommentReply,
+  AddCommentReplyVariables,
+} from "shared/graphql/generated/AddCommentReply";
 
 export default function useAddCommentReply() {
   const [addCommentReply] = useMutation<AddCommentReply, AddCommentReplyVariables>(

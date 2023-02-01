@@ -19,7 +19,7 @@ lint:
         - .github
         - docs/codebase-notes
         - public
-        - src/graphql
+        - packages/shared/graphql/generated
         - test/fixtures
         - "**/*.config.js"
         - packages/import-sort-style-replay

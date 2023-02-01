@@ -1,7 +1,6 @@
 import { RecordingId } from "@replayio/protocol";
 
-import { CommentType } from "replay-next/src/graphql/types";
-import { User } from "ui/types";
+import { CommentType, User } from "shared/graphql/types";
 
 export interface SourceLocation {
   sourceUrl: string;

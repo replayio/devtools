@@ -4,9 +4,9 @@ import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import React from "react";
 import LazyLoad from "react-lazyload";
 
+import { Recording } from "shared/graphql/types";
 import hooks from "ui/hooks";
 import { useGetUserPermissions } from "ui/hooks/users";
-import { Recording } from "ui/types";
 import { getDisplayedUrl } from "ui/utils/environment";
 import { getRecordingURL } from "ui/utils/recording";
 

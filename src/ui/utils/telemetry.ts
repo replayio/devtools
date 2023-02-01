@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 
-import { Recording } from "ui/types";
+import { Recording } from "shared/graphql/types";
 import { skipTelemetry } from "ui/utils/environment";
 
 import { initializeMixpanel, trackMixpanelEvent } from "./mixpanel";

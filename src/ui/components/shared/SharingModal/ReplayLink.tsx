@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 
-import { Recording } from "ui/types";
+import { Recording } from "shared/graphql/types";
 import { getRecordingURL } from "ui/utils/recording";
 import { trackEvent } from "ui/utils/telemetry";
 

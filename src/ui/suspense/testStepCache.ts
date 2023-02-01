@@ -14,7 +14,7 @@ import {
 } from "replay-next/src/suspense/PauseCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
-import { AnnotatedTestStep, TestMetadata } from "ui/types";
+import { AnnotatedTestStep, TestMetadata } from "shared/graphql/types";
 import { gte } from "ui/utils/semver";
 
 function getCypressTestStepSourceLocation8Plus(
