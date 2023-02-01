@@ -43,13 +43,27 @@
   line-height: 1rem;
   flex-shrink: 1;
   border-radius: 0.25rem;
-  background-color: #ececec;
+  background-color: var(--testsuites-capsule-alias-bgcolor);
+  color: var(--testsuites-capsule-alias-color);
 }
 
 .AliasSelected {
-  background-color: #bbb;
+  background-color: var(--testsuites-capsule-alias-selected-bgcolor);
+  color: var(--testsuites-capsule-alias-selected-color);
 }
 
 .AliasHidden {
   display: none;
+}
+
+.Badge {
+  padding: 0.25rem;
+  margin-top: -0.25rem;
+  margin-bottom: -0.25rem;
+  background-color: var(--testsuites-capsule-alias-bgcolor);
+  color: var(--testsuites-capsule-alias-color);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  flex-shrink: 1;
+  border-radius: 0.25rem;
 }

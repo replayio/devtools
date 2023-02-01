@@ -219,12 +219,7 @@ function MatchingElementBadge({ step, selected }: { step: AnnotatedTestStep; sel
   }
 
   return (
-    <span
-      className={classNames(
-        "-my-1 flex-shrink rounded p-1 text-xs text-gray-800",
-        selected ? "bg-gray-300" : "bg-gray-200"
-      )}
-    >
+    <span className={classNames(styles.Badge, selected ? "bg-gray-300" : "bg-gray-200")}>
       {count}
     </span>
   );

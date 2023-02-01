@@ -486,6 +486,10 @@
   --breakpoint-tip: #fff;
 
   /* Testsuites (Dark) */
+  --testsuites-capsule-alias-bgcolor: var(--theme-base-85);
+  --testsuites-capsule-alias-color: var(--body-color);
+  --testsuites-capsule-alias-selected-bgcolor: var(--theme-base-100);
+  --testsuites-capsule-alias-selected-color: var(--body-color);
   --testsuites-capsule-error-bgcolor: rgb(237, 36, 36);
   --testsuites-capsule-error-color: white;
   --testsuites-capsule-success-bgcolor: var(--testsuites-success-color);
@@ -974,6 +978,10 @@
   --breakpoint-tip: var(--theme-highlight-purple);
 
   /* Testsuites (Light) */
+  --testsuites-capsule-alias-bgcolor: var(--theme-base-85);
+  --testsuites-capsule-alias-color: var(--body-color);
+  --testsuites-capsule-alias-selected-bgcolor: var(--theme-base-100);
+  --testsuites-capsule-alias-selected-color: var(--body-color);
   --testsuites-capsule-error-bgcolor: rgb(203, 0, 0);
   --testsuites-capsule-error-color: #fff;
   --testsuites-capsule-success-bgcolor: var(--testsuites-success-color);
