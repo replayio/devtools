@@ -12,10 +12,11 @@ import React, { KeyboardEvent, MouseEvent, ReactNode } from "react";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
+import { getFunctionBody } from "protocol/evaluation-utils";
 import type { ThreadFront as TF } from "protocol/thread";
 import { RecordingTarget } from "protocol/thread/thread";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
-import { MAPPER as EVENTS_MAPPER, EventLog } from "replay-next/src/suspense/EventsCache";
+import { EventLog, eventsMapper } from "replay-next/src/suspense/EventsCache";
 import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
 import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
@@ -103,7 +104,7 @@ const { getValueAsync: getNextInteractionEventAsync } = createGenericCache<
     const entryPoints = await replayClient.runAnalysis<EventLog>({
       effectful: false,
       eventHandlerEntryPoints: [{ eventType }],
-      mapper: EVENTS_MAPPER,
+      mapper: getFunctionBody(eventsMapper),
       range: {
         begin: point,
         end: pointNearEndTime.point,

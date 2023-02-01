@@ -3,10 +3,12 @@ import {
   ExecutionPoint,
   Frame,
   Location,
+  PauseData,
   PauseId,
   Object as RecordReplayObject,
 } from "@replayio/protocol";
 
+import { AnalysisInput, SendCommand, getFunctionBody } from "protocol/evaluation-utils";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { STANDARD_EVENT_CATEGORIES } from "../constants";
@@ -111,7 +113,7 @@ async function fetchEventTypeEntryPoints(
   const entryPoints = await client.runAnalysis<EventLog>({
     effectful: false,
     eventHandlerEntryPoints: [{ eventType }],
-    mapper: MAPPER,
+    mapper: getFunctionBody(eventsMapper),
   });
 
   // Pre-cache object previews that came back with our new analysis data.
@@ -131,56 +133,54 @@ async function fetchEventTypeEntryPoints(
   wakeable.resolve(eventLogs);
 }
 
-export const MAPPER = `
-  const finalData = { frames: [], scopes: [], objects: [] };
-  function addPauseData({ frames, scopes, objects }) {
+// Variables in scope in an analysis
+declare let sendCommand: SendCommand;
+declare let input: AnalysisInput;
+
+export function eventsMapper() {
+  const finalData: Required<PauseData> = { frames: [], scopes: [], objects: [] };
+  function addPauseData({ frames, scopes, objects }: PauseData) {
     finalData.frames.push(...(frames || []));
     finalData.scopes.push(...(scopes || []));
     finalData.objects.push(...(objects || []));
   }
   function getTopFrame() {
-    const { frame, data } = sendCommand("Pause.getTopFrame");
+    const { frame, data } = sendCommand("Pause.getTopFrame", {});
     addPauseData(data);
-    return finalData.frames.find((f) => f.frameId == frame);
+    return finalData.frames.find(f => f.frameId == frame);
   }
 
   const { time, pauseId, point } = input;
-  const { frameId, location } = getTopFrame();
+  const { frameId, location } = getTopFrame()!;
+  // Retrieve protocol value details on the stack frame's arguments
   const { result } = sendCommand("Pause.evaluateInFrame", {
     frameId,
     expression: "[...arguments]",
   });
   const values = [];
   addPauseData(result.data);
+
   if (result.exception) {
     values.push(result.exception);
   } else {
-    {
-      const { object } = result.returned;
-      const { result: lengthResult } = sendCommand("Pause.getObjectProperty", {
-        object,
-        name: "length",
+    // We got back an array of arguments. The protocol requires that we ask for each
+    // array index's contents separately, which is annoying.
+    const { object } = result.returned!;
+    const { result: lengthResult } = sendCommand("Pause.getObjectProperty", {
+      object: object!,
+      name: "length",
+    });
+    addPauseData(lengthResult.data);
+    const length = lengthResult.returned!.value;
+    for (let i = 0; i < length; i++) {
+      const { result: elementResult } = sendCommand("Pause.getObjectProperty", {
+        object: object!,
+        name: i.toString(),
       });
-      addPauseData(lengthResult.data);
-      const length = lengthResult.returned.value;
-      for (let i = 0; i < length; i++) {
-        const { result: elementResult } = sendCommand("Pause.getObjectProperty", {
-          object,
-          name: i.toString(),
-        });
-        values.push(elementResult.returned);
-        addPauseData(elementResult.data);
-      }
+      values.push(elementResult.returned);
+      addPauseData(elementResult.data);
     }
   }
-  let frameworkListeners;
-
-  const { result: frameworkResult } = sendCommand("Pause.evaluateInFrame", {
-    frameId,
-    expression: "",
-  });
-  addPauseData(frameworkResult.data);
-  frameworkListeners = frameworkResult.returned;
 
   return [
     {
@@ -192,8 +192,7 @@ export const MAPPER = `
         location,
         values,
         data: finalData,
-        frameworkListeners,
       },
     },
   ];
-`;
+}

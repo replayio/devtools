@@ -3,6 +3,7 @@ import {
   Frame,
   Location,
   Object,
+  PauseData,
   PauseId,
   PointRange,
   Scope,
@@ -10,6 +11,12 @@ import {
 } from "@replayio/protocol";
 import jsTokens from "js-tokens";
 
+import {
+  AnalysisInput,
+  AnalysisResultWrapper,
+  SendCommand,
+  getFunctionBody,
+} from "protocol/evaluation-utils";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
@@ -241,11 +248,12 @@ async function runRemoteAnalysis(
 }
 
 function createMapperForCondition(condition: string): string {
-  return `
-    const { result: conditionResult } = sendCommand(
-      "Pause.evaluateInFrame",
-      { frameId, expression: ${JSON.stringify(condition)}, useOriginalScopes: true }
-    );
+  function conditionMapper() {
+    const { result: conditionResult } = sendCommand("Pause.evaluateInFrame", {
+      frameId,
+      expression: "",
+      useOriginalScopes: true,
+    });
     addPauseData(conditionResult.data);
     if (conditionResult.returned) {
       const { returned } = conditionResult;
@@ -257,35 +265,59 @@ function createMapperForCondition(condition: string): string {
         return [];
       }
     }
-  `;
+  }
+
+  const mapperBody = getFunctionBody(conditionMapper);
+  const stringifiedCondition = JSON.stringify(condition);
+  const mapperBodyWithExpression = mapperBody.replace(
+    `expression: ""`,
+    `expression: ${stringifiedCondition}`
+  );
+  return mapperBodyWithExpression;
 }
+
+// Variables in scope in an analysis
+declare let sendCommand: SendCommand;
+declare let input: AnalysisInput;
+declare function addPauseData(pauseData: PauseData): void;
+declare let frameId: string;
 
 function createMapperForAnalysis(code: string, condition: string | null): string {
   const escapedCode = code.replace(/"/g, '\\"');
-  return `
-    const finalData = { frames: [], scopes: [], objects: [] };
+
+  /**
+   * An evaluated Analysis mapper function that in turn evaluates code in the top frame
+   * and returns the results.
+   *
+   * The input code string is expected to be a comma-separated array of expressions.
+   *
+   * If a `condition` is provided, the mapper will evaluate the condition and bail out
+   * with no results if the result is falsy.
+   */
+  function analysisMapper(): AnalysisResultWrapper<RemoteAnalysisResult>[] {
+    const finalData: Required<PauseData> = { frames: [], scopes: [], objects: [] };
     const { point, time, pauseId } = input;
-    const { frameId, functionName, location } = getTopFrame();
+    const { frameId, location } = getTopFrame()!;
 
-    ${condition ? createMapperForCondition(condition) : ""}
+    // Location of the optional text to run the condition check and bail out early
+    // $REPLACE_ME_CONDITION_MAPPER
 
-    function addPauseData({ frames, scopes, objects }) {
+    function addPauseData({ frames, scopes, objects }: PauseData) {
       finalData.frames.push(...(frames || []));
       finalData.scopes.push(...(scopes || []));
       finalData.objects.push(...(objects || []));
     }
 
     function getTopFrame() {
-      const { frame, data } = sendCommand("Pause.getTopFrame");
+      const { frame, data } = sendCommand("Pause.getTopFrame", {});
       addPauseData(data);
-      return finalData.frames.find((f) => f.frameId == frame);
+      return finalData.frames.find(f => f.frameId == frame);
     }
 
-    const bindings = [{ name: "displayName", value: functionName || "" }];
+    // Evaluate the user-provided code as the first field in an array
     const { result } = sendCommand("Pause.evaluateInFrame", {
       frameId,
-      bindings,
-      expression: "[" + "${escapedCode}" + "]",
+      expression: `[$REPLACE_ME_ESCAPED_CODE]`,
       useOriginalScopes: true,
     });
     const values = [];
@@ -294,19 +326,20 @@ function createMapperForAnalysis(code: string, condition: string | null): string
       values.push(result.exception);
     } else {
       {
-        const { object } = result.returned;
+        // Extract the contents of the array via the protocol
+        const { object } = result.returned!;
         const { result: lengthResult } = sendCommand("Pause.getObjectProperty", {
-          object,
+          object: object!,
           name: "length",
         });
         addPauseData(lengthResult.data);
-        const length = lengthResult.returned.value;
+        const length = lengthResult.returned!.value;
         for (let i = 0; i < length; i++) {
           const { result: elementResult } = sendCommand("Pause.getObjectProperty", {
-            object,
+            object: object!,
             name: i.toString(),
           });
-          values.push(elementResult.returned);
+          values.push(elementResult.returned!);
           addPauseData(elementResult.data);
         }
       }
@@ -317,5 +350,21 @@ function createMapperForAnalysis(code: string, condition: string | null): string
         value: { time, pauseId, point, location, values, data: finalData },
       },
     ];
-  `;
+  }
+
+  let analysisMapperBody = getFunctionBody(analysisMapper);
+
+  // Insert the text of the user-provided analysis string
+  analysisMapperBody = analysisMapperBody.replace("$REPLACE_ME_ESCAPED_CODE", escapedCode);
+
+  if (condition) {
+    const conditionMapper = createMapperForCondition(condition);
+    // Insert the text of the user-provided condition string
+    analysisMapperBody = analysisMapperBody.replace(
+      `// $REPLACE_ME_CONDITION_MAPPER`,
+      conditionMapper
+    );
+  }
+
+  return analysisMapperBody;
 }
