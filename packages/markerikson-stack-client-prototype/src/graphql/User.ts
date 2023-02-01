@@ -1,4 +1,4 @@
-import { UserInfo } from "./types";
+import { UserInfo } from "shared/graphql/types";
 
 // TODO Pass this client via Context
 let GRAPHQL_URL = "https://api.replay.io/v1/graphql";
