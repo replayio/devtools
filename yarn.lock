@@ -1838,9 +1838,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/lang-javascript@npm:^6.0.2":
-  version: 6.0.2
-  resolution: "@codemirror/lang-javascript@npm:6.0.2"
+"@codemirror/lang-javascript@npm:^6.1.2":
+  version: 6.1.2
+  resolution: "@codemirror/lang-javascript@npm:6.1.2"
   dependencies:
     "@codemirror/autocomplete": ^6.0.0
     "@codemirror/language": ^6.0.0
@@ -1849,7 +1849,7 @@ __metadata:
     "@codemirror/view": ^6.0.0
     "@lezer/common": ^1.0.0
     "@lezer/javascript": ^1.0.0
-  checksum: a63058e6970a54779c945eccc2d5a88ccda5bcd3049dd18cd787e684414861a7f1d78097115eadc155bf0a199a1d8770e1538daf976cdcd5641348cf174101e6
+  checksum: f4336b7efd44e4158b9979f0c23918184c897d0fe3e40b5414bd9243a9899ecdba4dfe13970fe5024a1894579af80cb4c5dd574c6c2b7bd7ff06d8c8cb88616b
   languageName: node
   linkType: hard
 
@@ -16499,7 +16499,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "markerikson-stack-client-prototype-227d06@workspace:packages/markerikson-stack-client-prototype"
   dependencies:
-    "@codemirror/lang-javascript": ^6.0.2
+    "@codemirror/lang-javascript": ^6.1.2
     "@replayio/protocol": ^0.32.2
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
