@@ -12771,7 +12771,7 @@ __metadata:
     chalk: ^4
     cli-spinners: ^2.7.0
     log-update: ^4
-    playwright: ^1.25.1
+    playwright: ^1.30.0
     ts-node: ^10.7.0
     yargs: ^17.6.0
   languageName: unknown
@@ -18619,14 +18619,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright@npm:^1.25.1":
-  version: 1.26.1
-  resolution: "playwright@npm:1.26.1"
-  dependencies:
-    playwright-core: 1.26.1
+"playwright-core@npm:1.30.0":
+  version: 1.30.0
+  resolution: "playwright-core@npm:1.30.0"
   bin:
     playwright: cli.js
-  checksum: 42af6e949af68dec3327d5cce2e7f2f0d6d175528ba983b9b76f8f21995ae223f901d672799e655446b71ec5d19223464f7c587d3f569312a452718cbf8a706a
+  checksum: 4c5693f27245a1168f94708ecd8e1eb0d200de435b25cc07cfa25b97a094633818954dc00baf24e0ff551825f672050b83d1309362c1f97213fe8ebd2a147ed9
+  languageName: node
+  linkType: hard
+
+"playwright@npm:^1.30.0":
+  version: 1.30.0
+  resolution: "playwright@npm:1.30.0"
+  dependencies:
+    playwright-core: 1.30.0
+  bin:
+    playwright: cli.js
+  checksum: 1987446ed07e25c0c6dedce8314209b49536eb4c7fa82e57e7fea9bd8128bacd08e49f9e89af30a647839bf2603b8c8321f50e23e334a11c1c29eedb838a81a3
   languageName: node
   linkType: hard
 

@@ -22,7 +22,7 @@
     "@replayio/playwright": "0.3.16",
     "cli-spinners": "^2.7.0",
     "log-update": "^4",
-    "playwright": "^1.25.1",
+    "playwright": "^1.30.0",
     "ts-node": "^10.7.0",
     "yargs": "^17.6.0"
   },
