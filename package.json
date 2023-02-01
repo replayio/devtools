@@ -119,7 +119,7 @@
     "@recordreplay/sourcemap-upload-cli": "^0.1.1",
     "@replayio/replay": "^0.9.6",
     "@storybook/addon-actions": "^6.4.20",
-    "@storybook/addon-essentials": "^6.5.9",
+    "@storybook/addon-essentials": "^6.5.16",
     "@storybook/addon-links": "^6.4.20",
     "@storybook/addon-postcss": "^2.0.0",
     "@storybook/builder-webpack5": "^6.4.21",
