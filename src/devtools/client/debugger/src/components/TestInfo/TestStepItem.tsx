@@ -1,5 +1,12 @@
 import classNames from "classnames";
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -140,6 +147,18 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     }
   }, [step, ref, onClick]);
 
+  useLayoutEffect(() => {
+    if (TestStepsDiv && TestStepsDiv.offsetWidth < 380) {
+      AliasDivs.forEach(aliasDiv => {
+        aliasDiv.classList.add(styles.AliasHidden);
+      });
+    } else if (TestStepsDiv && TestStepsDiv.offsetWidth > 380) {
+      AliasDivs.forEach(aliasDiv => {
+        aliasDiv.classList.remove(styles.AliasHidden);
+      });
+    }
+  });
+
   // This math is bananas don't look here until this is cleaned up :)
   const bump = state !== "pending" ? 10 : 0;
   const actualProgress = bump + 90 * ((currentTime - step.absoluteStartTime) / step.duration);
@@ -150,17 +169,6 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
 
   const TestStepsDiv = document.getElementById(stylesTestInfo.TestSteps);
   const AliasDivs = document.querySelectorAll(`.${styles.Alias}`);
-
-  if (TestStepsDiv && TestStepsDiv.offsetWidth < 380) {
-    AliasDivs.forEach(aliasDiv => {
-      aliasDiv.classList.add(styles.AliasHidden);
-    });
-    console.log(AliasDivs);
-  } else if (TestStepsDiv && TestStepsDiv.offsetWidth > 380) {
-    AliasDivs.forEach(aliasDiv => {
-      aliasDiv.classList.remove(styles.AliasHidden);
-    });
-  }
 
   return (
     <TestStepRow
