@@ -144,14 +144,12 @@ export function eventsMapper() {
     finalData.scopes.push(...(scopes || []));
     finalData.objects.push(...(objects || []));
   }
-  function getTopFrame() {
-    const { frame, data } = sendCommand("Pause.getTopFrame", {});
-    addPauseData(data);
-    return finalData.frames.find(f => f.frameId == frame);
-  }
 
   const { time, pauseId, point } = input;
-  const { frameId, location } = getTopFrame()!;
+  const { frame, data } = sendCommand("Pause.getTopFrame", {});
+  addPauseData(data);
+  const { frameId, location } = finalData.frames.find(f => f.frameId == frame)!;
+
   // Retrieve protocol value details on the stack frame's arguments
   const { result } = sendCommand("Pause.evaluateInFrame", {
     frameId,

@@ -2,10 +2,10 @@ import {
   ExecutionPoint,
   Frame,
   Location,
-  Object,
   PauseData,
   PauseId,
   PointRange,
+  Object as ProtocolObject,
   Scope,
   TimeStampedPoint,
 } from "@replayio/protocol";
@@ -36,7 +36,7 @@ type AnalysisResult = {
 export type AnalysisResults = (timeStampedPoint: TimeStampedPoint) => AnalysisResult | null;
 
 export type RemoteAnalysisResult = {
-  data: { frames: Frame[]; objects: Object[]; scopes: Scope[] };
+  data: { frames: Frame[]; objects: ProtocolObject[]; scopes: Scope[] };
   location: Location | Location[];
   pauseId: PauseId;
   point: ExecutionPoint;
@@ -247,42 +247,17 @@ async function runRemoteAnalysis(
   }
 }
 
-function createMapperForCondition(condition: string): string {
-  function conditionMapper() {
-    const { result: conditionResult } = sendCommand("Pause.evaluateInFrame", {
-      frameId,
-      expression: "",
-      useOriginalScopes: true,
-    });
-    addPauseData(conditionResult.data);
-    if (conditionResult.returned) {
-      const { returned } = conditionResult;
-      if ("value" in returned && !returned.value) {
-        return [];
-      }
-      if (!Object.keys(returned).length) {
-        // Undefined.
-        return [];
-      }
-    }
-  }
-
-  const mapperBody = getFunctionBody(conditionMapper);
-  const stringifiedCondition = JSON.stringify(condition);
-  const mapperBodyWithExpression = mapperBody.replace(
-    `expression: ""`,
-    `expression: ${stringifiedCondition}`
-  );
-  return mapperBodyWithExpression;
-}
-
 // Variables in scope in an analysis
 declare let sendCommand: SendCommand;
 declare let input: AnalysisInput;
-declare function addPauseData(pauseData: PauseData): void;
-declare let frameId: string;
 
-function createMapperForAnalysis(code: string, condition: string | null): string {
+// Additional variables we'll be injecting to the mapper string
+declare let injectedValues: {
+  condition: string | null;
+  escapedCodeExpression: string;
+};
+
+function createMapperForAnalysis(code: string, userCondition: string | null): string {
   const escapedCode = code.replace(/"/g, '\\"');
 
   /**
@@ -296,11 +271,6 @@ function createMapperForAnalysis(code: string, condition: string | null): string
    */
   function analysisMapper(): AnalysisResultWrapper<RemoteAnalysisResult>[] {
     const finalData: Required<PauseData> = { frames: [], scopes: [], objects: [] };
-    const { point, time, pauseId } = input;
-    const { frameId, location } = getTopFrame()!;
-
-    // Location of the optional text to run the condition check and bail out early
-    // $REPLACE_ME_CONDITION_MAPPER
 
     function addPauseData({ frames, scopes, objects }: PauseData) {
       finalData.frames.push(...(frames || []));
@@ -308,16 +278,35 @@ function createMapperForAnalysis(code: string, condition: string | null): string
       finalData.objects.push(...(objects || []));
     }
 
-    function getTopFrame() {
-      const { frame, data } = sendCommand("Pause.getTopFrame", {});
-      addPauseData(data);
-      return finalData.frames.find(f => f.frameId == frame);
+    const { point, time, pauseId } = input;
+
+    const { frame, data } = sendCommand("Pause.getTopFrame", {});
+    addPauseData(data);
+    const { frameId, location } = finalData.frames.find(f => f.frameId == frame)!;
+
+    if (injectedValues.condition) {
+      const { result: conditionResult } = sendCommand("Pause.evaluateInFrame", {
+        frameId,
+        expression: injectedValues.condition,
+        useOriginalScopes: true,
+      });
+      addPauseData(conditionResult.data);
+      if (conditionResult.returned) {
+        const { returned } = conditionResult;
+        if ("value" in returned && !returned.value) {
+          return [];
+        }
+        if (!Object.keys(returned).length) {
+          // Undefined.
+          return [];
+        }
+      }
     }
 
-    // Evaluate the user-provided code as the first field in an array
     const { result } = sendCommand("Pause.evaluateInFrame", {
       frameId,
-      expression: `[$REPLACE_ME_ESCAPED_CODE]`,
+      // Turn the comma-separated user-provided expression into an array of values
+      expression: `[${injectedValues.escapedCodeExpression}]`,
       useOriginalScopes: true,
     });
     const values = [];
@@ -333,7 +322,7 @@ function createMapperForAnalysis(code: string, condition: string | null): string
           name: "length",
         });
         addPauseData(lengthResult.data);
-        const length = lengthResult.returned!.value;
+        const length = lengthResult.returned?.value ?? 0;
         for (let i = 0; i < length; i++) {
           const { result: elementResult } = sendCommand("Pause.getObjectProperty", {
             object: object!,
@@ -354,17 +343,21 @@ function createMapperForAnalysis(code: string, condition: string | null): string
 
   let analysisMapperBody = getFunctionBody(analysisMapper);
 
-  // Insert the text of the user-provided analysis string
-  analysisMapperBody = analysisMapperBody.replace("$REPLACE_ME_ESCAPED_CODE", escapedCode);
+  // Unlike evaluations, which _cannot_ have an explicit `return` statement,
+  // Analysis mappers _must_ have a `return` statement.
+  // Also, the backend requires that all `sendCommand()` calls must exist at the
+  // top level of the body, as it will rewrite the logic to use generator syntax
+  // with a Babel transform on the backend.
+  // Because of that, we can't use an IIFE the way that the React Event Listener
+  // logic does. We construct this mapper as a single snippet, no function wrapper.
+  const finalAnalysisMapper = `
+    const injectedValues = {
+      condition: ${userCondition ? JSON.stringify(userCondition) : null},
+      escapedCodeExpression:  "${escapedCode}"
+    }
 
-  if (condition) {
-    const conditionMapper = createMapperForCondition(condition);
-    // Insert the text of the user-provided condition string
-    analysisMapperBody = analysisMapperBody.replace(
-      `// $REPLACE_ME_CONDITION_MAPPER`,
-      conditionMapper
-    );
-  }
+    ${analysisMapperBody}
+  `;
 
-  return analysisMapperBody;
+  return finalAnalysisMapper;
 }

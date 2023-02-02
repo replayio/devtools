@@ -151,8 +151,11 @@ const { getValueAsync: getEventListenerLocationAsync } = createGenericCache<
     let sourceLocation: Location | undefined;
     const sourcesById = getSourceDetailsEntities(state);
 
+    console.log("Evaluation res: ", res);
+
     if (res.returned?.object) {
       const preview = await getObjectWithPreviewHelper(replayClient, pauseId, res.returned.object);
+      console.log("DOM node preview: ", preview);
 
       // The evaluation may have found a React prop function somewhere.
       const handlerProp = preview?.preview?.properties?.find(p => p.name === "handlerProp");
@@ -177,6 +180,9 @@ const { getValueAsync: getEventListenerLocationAsync } = createGenericCache<
 
         sourceLocation = formattedEventListener.location;
       }
+    } else if (res.exception?.object) {
+      const error = await getObjectWithPreviewHelper(replayClient, pauseId, res.exception.object);
+      console.log("Error: ", error);
     }
 
     if (!sourceLocation) {
@@ -221,6 +227,13 @@ export const getEventLabel = (event: ReplayEvent) => {
 // Local variables in scope at the time of evaluation
 declare let event: MouseEvent | KeyboardEvent;
 
+interface InjectedValues {
+  $REACT_16_EVENT_LISTENER_PROP_KEY: string;
+  $REACT_17_18_EVENT_LISTENER_PROP_KEY: string;
+  EVENT_CLASS_NAME: string;
+  possibleReactPropNames: string[];
+  args: any[];
+}
 interface EventMapperResult {
   target: HTMLElement;
   handlerProp?: Function;
@@ -232,82 +245,78 @@ function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
   const eventClassName = EVENT_CLASS_FOR_EVENT_TYPE[eventType];
 
   // This will became evaluated JS code
-  function evaluatedEventMapper() {
-    // Outer body runs in scope of the "current" event handler.
-    // Grab the event handler's arguments.
-    const args = [...arguments];
 
-    // At evaluation runtime IIFE will execute and return its result
-    (function findEventTargetAndHandler() {
-      // One of the args should be a browser event
-      const matchingEvent = args.find(a => typeof a === "object" && a instanceof Event);
+  function findEventTargetAndHandler(injectedValues: InjectedValues) {
+    // One of the args should be a browser event
+    const targetEventClass = window[injectedValues.EVENT_CLASS_NAME as any] as any;
+    const matchingEvent = injectedValues.args.find(
+      a => typeof a === "object" && a instanceof targetEventClass
+    );
 
-      if (matchingEvent) {
-        // We _could_ probably just return the prop function or undefined here
-        const res: EventMapperResult = {
-          target: event.target as HTMLElement,
-        };
+    if (matchingEvent) {
+      // We _could_ probably just return the prop function or undefined here
+      const res: EventMapperResult = {
+        target: event.target as HTMLElement,
+      };
 
-        // Search the event target node and all of its ancestors
-        // for React internal props data, and specifically look
-        // for the nearest node with a relevant React event handler prop if any.
-        let currentNode = event.target as HTMLElement;
-        while (currentNode) {
-          const keys = Object.keys(currentNode);
-          const reactPropsKey = keys.find(key => {
-            return (
-              key.startsWith("$REACT_16_EVENT_LISTENER_PROP_KEY") ||
-              key.startsWith("$REACT_17_18_EVENT_LISTENER_PROP_KEY")
-            );
-          });
+      // Search the event target node and all of its ancestors
+      // for React internal props data, and specifically look
+      // for the nearest node with a relevant React event handler prop if any.
+      let currentNode = event.target as HTMLElement;
+      while (currentNode) {
+        const keys = Object.keys(currentNode);
+        const reactPropsKey = keys.find(key => {
+          return (
+            key.startsWith(injectedValues.$REACT_16_EVENT_LISTENER_PROP_KEY) ||
+            key.startsWith(injectedValues.$REACT_17_18_EVENT_LISTENER_PROP_KEY)
+          );
+        });
 
-          if (reactPropsKey) {
-            let props: Record<string, Function> = {};
-            if (reactPropsKey in currentNode) {
-              // @ts-ignore
-              props = currentNode[reactPropsKey];
-            }
-            const possibleReactPropNames: string[] = [];
+        if (reactPropsKey) {
+          let props: Record<string, Function> = {};
+          if (reactPropsKey in currentNode) {
+            // @ts-ignore
+            props = currentNode[reactPropsKey];
+          }
 
-            // Depending on the type of event, there could be different
-            // React event handler prop names in use.
-            // For example, an input is likely to have "onChange",
-            // whereas some other element might have "onKeyPress".
-            let handler = undefined;
-            for (let possibleReactProp of possibleReactPropNames) {
-              if (possibleReactProp in props) {
-                handler = props[possibleReactProp];
-              }
-            }
-
-            if (handler) {
-              res.handlerProp = handler;
-              res.handlerNode = currentNode as HTMLElement;
-              break;
+          // Depending on the type of event, there could be different
+          // React event handler prop names in use.
+          // For example, an input is likely to have "onChange",
+          // whereas some other element might have "onKeyPress".
+          let handler = undefined;
+          for (let possibleReactProp of injectedValues.possibleReactPropNames) {
+            if (possibleReactProp in props) {
+              handler = props[possibleReactProp];
             }
           }
-          currentNode = (currentNode!.parentNode as HTMLElement)!;
 
-          return res;
+          if (handler) {
+            res.handlerProp = handler;
+            res.handlerNode = currentNode as HTMLElement;
+            break;
+          }
         }
+        currentNode = (currentNode!.parentNode as HTMLElement)!;
       }
-    })();
+
+      return res;
+    }
   }
 
-  let evaluatedEventMapperBody = getFunctionBody(evaluatedEventMapper);
+  const evaluatedEventMapperBody = `
+    (${findEventTargetAndHandler})({
+      $REACT_16_EVENT_LISTENER_PROP_KEY: "${REACT_16_EVENT_LISTENER_PROP_KEY}",
+      $REACT_17_18_EVENT_LISTENER_PROP_KEY: "${REACT_17_18_EVENT_LISTENER_PROP_KEY}",
+      EVENT_CLASS_NAME: "${eventClassName}",
+      possibleReactPropNames: ${JSON.stringify(reactEventPropNames)},
+      
+      // Outer body runs in scope of the "current" event handler.
+      // Grab the event handler's arguments.
+      args: [...arguments]
+    })
+  `;
 
-  // Fix up the function body text with the dynamic pieces we need for this check
-  const finalEvaluatedEventMapperBody = replaceMultipleStrings(evaluatedEventMapperBody, {
-    "a instanceof Event": `a instanceof ${eventClassName}`,
-    $REACT_16_EVENT_LISTENER_PROP_KEY: REACT_16_EVENT_LISTENER_PROP_KEY,
-    $REACT_17_18_EVENT_LISTENER_PROP_KEY: REACT_17_18_EVENT_LISTENER_PROP_KEY,
-    // Note that the search string already has its TS compiled away
-    "const possibleReactPropNames = []": `const possibleReactPropNames = ${JSON.stringify(
-      reactEventPropNames
-    )}`,
-  });
-
-  return finalEvaluatedEventMapperBody;
+  return evaluatedEventMapperBody;
 }
 
 /*
