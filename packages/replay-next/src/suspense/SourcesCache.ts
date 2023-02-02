@@ -250,13 +250,15 @@ export const {
   getValueAsync: getBreakpointPositionsAsync,
   getValueIfCached: getBreakpointPositionsIfCached,
 } = createGenericCache<
-  [replayClient: ReplayClientInterface, sourceId: ProtocolSourceId],
+  [replayClient: ReplayClientInterface],
+  [sourceId: ProtocolSourceId],
   [
     breakablePositions: ProtocolSameLineSourceLocations[],
     breakablePositionsByLine: Map<number, ProtocolSameLineSourceLocations>
   ]
 >(
   "SourcesCache: getBreakpointPositions",
+  1,
   async (client, sourceId) => {
     const breakablePositions = await client.getBreakpointPositions(sourceId, null);
 
@@ -275,7 +277,7 @@ export const {
     }
     return [breakablePositions, breakablePositionsByLine];
   },
-  (_, sourceId) => sourceId
+  sourceId => sourceId
 );
 
 async function fetchSources(client: ReplayClientInterface) {
@@ -575,10 +577,12 @@ export const {
   getValueIfCached: getSourceContentsIfCached,
   getStatus: getSourceContentsStatus,
 } = createGenericCache<
-  [replayClient: ReplayClientInterface, sourceId: string],
+  [replayClient: ReplayClientInterface],
+  [sourceId: string],
   StreamingSourceContents | undefined
 >(
   "sourceContentsCache",
+  1,
   async (replayClient, sourceId) => {
     const res = await getStreamingSourceContentsHelper(replayClient, sourceId);
     if (res) {
@@ -587,5 +591,5 @@ export const {
       return sourceContents;
     }
   },
-  (replayClient, sourceId) => sourceId
+  sourceId => sourceId
 );

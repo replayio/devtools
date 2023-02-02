@@ -8,10 +8,12 @@ export const {
   getStatus: getSymbolsStatus,
   getValueSuspense: getSymbolsSuspense,
 } = createGenericCache<
-  [replayClient: ReplayClientInterface, sourceId: string],
+  [replayClient: ReplayClientInterface],
+  [sourceId: string],
   SymbolDeclarations | undefined
 >(
   "sourceSymbolsCache",
+  1,
   async (replayClient, sourceId) => {
     const { parser } = await import("devtools/client/debugger/src/utils/bootstrap");
     const sourceContents = await getSourceContentsAsync(replayClient, sourceId);
@@ -29,12 +31,13 @@ export const {
       return symbols;
     }
   },
-  (replayClient, sourceId) => sourceId
+  sourceId => sourceId
 );
 
 export const { getValueAsync: getSourceLinesAsync, getValueSuspense: getSourceLinesSuspense } =
-  createGenericCache<[replayClient: ReplayClientInterface, sourceId: string], string[]>(
+  createGenericCache<[replayClient: ReplayClientInterface], [sourceId: string], string[]>(
     "sourceLinesCache",
+    1,
     async (replayClient, sourceId) => {
       const sourceContents = await getSourceContentsAsync(replayClient, sourceId);
       if (!sourceContents) {
@@ -45,5 +48,5 @@ export const { getValueAsync: getSourceLinesAsync, getValueSuspense: getSourceLi
 
       return contents?.split("\n") ?? [];
     },
-    (replayClient, sourceId) => sourceId
+    sourceId => sourceId
   );

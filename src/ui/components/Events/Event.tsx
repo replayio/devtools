@@ -78,16 +78,12 @@ function shouldIgnoreEventFromSource(sourceDetails?: SourceDetails) {
 }
 
 const { getValueAsync: getNextInteractionEventAsync } = createGenericCache<
-  [
-    replayClient: ReplayClientInterface,
-    ThreadFront: typeof TF,
-    point: ExecutionPoint,
-    replayEventType: SEARCHABLE_EVENT_TYPES,
-    endTime: number
-  ],
+  [replayClient: ReplayClientInterface, ThreadFront: typeof TF],
+  [point: ExecutionPoint, replayEventType: SEARCHABLE_EVENT_TYPES, endTime: number],
   EventLog | undefined
 >(
   "nextInteractionEventCache",
+  2,
   async (replayClient, ThreadFront, point, replayEventType, endTime) => {
     const pointNearEndTime = await replayClient.getPointNearTime(endTime);
 
@@ -117,20 +113,16 @@ const { getValueAsync: getNextInteractionEventAsync } = createGenericCache<
     entryPoints.sort((a, b) => compareExecutionPoints(a.point, b.point));
     return entryPoints[0];
   },
-  (replayClient, ThreadFront, point) => point
+  point => point
 );
 
 const { getValueAsync: getEventListenerLocationAsync } = createGenericCache<
-  [
-    ThreadFront: typeof TF,
-    replayClient: ReplayClientInterface,
-    getState: () => UIState,
-    pauseId: string,
-    replayEventType: SEARCHABLE_EVENT_TYPES
-  ],
+  [ThreadFront: typeof TF, replayClient: ReplayClientInterface, getState: () => UIState],
+  [pauseId: string, replayEventType: SEARCHABLE_EVENT_TYPES],
   Location | undefined
 >(
   "eventListenerLocationCache",
+  3,
   async (ThreadFront, replayClient, getState, pauseId, replayEventType) => {
     const stackFrames = await getFramesAsync(replayClient, pauseId);
     if (!stackFrames) {
@@ -199,7 +191,7 @@ const { getValueAsync: getEventListenerLocationAsync } = createGenericCache<
 
     return sourceLocation!;
   },
-  (ThreadFront, replayClient, getState, pauseId) => pauseId
+  pauseId => pauseId
 );
 
 type EventProps = {

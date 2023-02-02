@@ -11,7 +11,7 @@ import { ProtocolError, isCommandError } from "shared/utils/error";
 
 import { createWakeable } from "../utils/suspense";
 import { isExecutionPointsLessThan } from "../utils/time";
-import { createGenericCache2 } from "./createGenericCache";
+import { createGenericCache } from "./createGenericCache";
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 export type CachedPointsForTime = Map<number, ExecutionPoint>;
@@ -391,8 +391,9 @@ export const {
   getValueSuspense: getPointsBoundingTimeSuspense,
   getValueAsync: getPointsBoundingTimeAsync,
   getValueIfCached: getPointsBoundingTimeIfCached,
-} = createGenericCache2<ReplayClientInterface, [time: number], PointsBoundingTime>(
+} = createGenericCache<[replayClient: ReplayClientInterface], [time: number], PointsBoundingTime>(
   "PointsCache: getPointsBoundingTime",
+  1,
   async (client, time) => client.getPointsBoundingTime(time),
   time => `${time}`
 );

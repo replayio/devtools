@@ -101,7 +101,7 @@ export function flashLineRange(location: HighlightedRange): UIThunkAction {
 
 export function copyToClipboard(source: SourceDetails): UIThunkAction {
   return (dispatch, getState, { replayClient }) => {
-    const sourceContents = getSourceContentsIfCached(replayClient, source.id);
+    const sourceContents = getSourceContentsIfCached(source.id);
 
     if (typeof sourceContents?.value?.contents === "string") {
       copyTextToClipboard(sourceContents.value.contents);
