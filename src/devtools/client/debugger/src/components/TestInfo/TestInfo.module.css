@@ -35,16 +35,3 @@
 .TestsuitesErrorColor {
   color: var(--testsuites-error-color);
 }
-
-#TestSteps {
-  display: flex;
-  overflow: auto;
-  position: relative;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-  padding-top: 0.75rem;
-  margin-top: 0.25rem;
-  flex-direction: column;
-  flex-grow: 1;
-  border-top-width: 1px;
-}
