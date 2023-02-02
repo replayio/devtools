@@ -539,13 +539,13 @@ test("should show the context menu on top of other messages and the current time
   await seekToMessage(page, listItem);
 
   listItem = await locateMessage(page, "console-log", "This is a log");
-  await openContextMenu(listItem);
+  await openContextMenu(page, listItem);
   await takeScreenshot(page, list, "context-menu-position-one");
 
   await page.keyboard.press("Escape");
 
   listItem = await locateMessage(page, "console-error", "This is an error");
-  await openContextMenu(listItem);
+  await openContextMenu(page, listItem);
   await takeScreenshot(page, list, "context-menu-position-two");
 });
 
@@ -556,7 +556,7 @@ test("should support setting focus range via the context menu", async ({ page })
   let listItem;
 
   listItem = await locateMessage(page, "console-warning", "This is a warning");
-  await openContextMenu(listItem);
+  await openContextMenu(page, listItem);
   await page.click("[data-test-id=ConsoleContextMenu-SetFocusStartButton]");
   await stopHovering(page);
   // Give the UI time to settle.
@@ -564,7 +564,7 @@ test("should support setting focus range via the context menu", async ({ page })
   await takeScreenshot(page, list, "context-menu-focus-after-start");
 
   listItem = await locateMessage(page, "console-error", "This is an error");
-  await openContextMenu(listItem);
+  await openContextMenu(page, listItem);
   await stopHovering(page);
   await page.click("[data-test-id=ConsoleContextMenu-SetFocusEndButton]");
   // Give the UI time to settle.

@@ -203,11 +203,11 @@ test("should support custom badge styles for log points", async ({ page }) => {
 
   const message = page.locator("[data-test-name=Message]");
 
-  await openContextMenu(message);
+  await openContextMenu(page, message);
   await page.click("[data-test-id=ConsoleContextMenu-Badge-yellow]");
   await takeScreenshot(page, message, "log-point-message-with-yellow-badge");
 
-  await openContextMenu(message);
+  await openContextMenu(page, message);
   await page.click("[data-test-id=ConsoleContextMenu-Badge-unicorn]");
   await takeScreenshot(page, message, "log-point-message-with-unicorn-badge");
 });

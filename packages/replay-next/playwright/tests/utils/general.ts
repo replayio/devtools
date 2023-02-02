@@ -50,7 +50,7 @@ export async function debugPrint(page: Page | null, message: string, scope?: str
   }
 }
 
-export async function delay(duration: number) {
+export async function delay(duration: number = 250) {
   await new Promise(resolve => setTimeout(resolve, duration));
 }
 
