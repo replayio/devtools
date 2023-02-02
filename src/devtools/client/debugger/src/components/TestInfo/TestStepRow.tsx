@@ -2,7 +2,7 @@ import classnames from "classnames";
 import React, { forwardRef } from "react";
 
 import { ProgressBar } from "./ProgressBar";
-import styles from "./TestStepItem.module.css";
+import styles from "./TestInfo.module.css";
 
 interface TestStepRowProps {
   error?: boolean;

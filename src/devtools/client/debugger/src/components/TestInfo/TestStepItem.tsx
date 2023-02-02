@@ -20,7 +20,7 @@ import {
 import { TestCaseContext } from "./TestCase";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { TestStepRow } from "./TestStepRow";
-import styles from "./TestStepItem.module.css";
+import styles from "./TestInfo.module.css";
 
 function preventClickFromSpaceBar(ev: React.KeyboardEvent<HTMLButtonElement>) {
   if (ev.key === " ") {
