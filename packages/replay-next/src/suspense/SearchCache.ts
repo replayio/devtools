@@ -4,7 +4,7 @@ import { insert } from "replay-next/src/utils/array";
 import { isBowerComponent, isModuleFromCdn, isNodeModule } from "replay-next/src/utils/source";
 import { ReplayClientInterface } from "shared/client/types";
 
-import { createGenericCache2 } from "./createGenericCache";
+import { createGenericCache } from "./createGenericCache";
 import { getSourcesAsync } from "./SourcesCache";
 
 // TODO Create a generic cache variant that
@@ -51,12 +51,13 @@ export const {
   getValueSuspense: searchSourcesSuspense,
   getValueAsync: searchSourcesAsync,
   getValueIfCached: getCachedSourceSearchResults,
-} = createGenericCache2<
-  ReplayClientInterface,
+} = createGenericCache<
+  [replayClient: ReplayClientInterface],
   [query: string, includeNodeModules: boolean, limit?: number],
   StreamingSourceSearchResults
 >(
   "SearchCache: searchSources",
+  1,
   async (
     client: ReplayClientInterface,
     query: string,

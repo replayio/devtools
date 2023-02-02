@@ -80,12 +80,12 @@ export function ReduxDevToolsContents({ point, time }: RDTCProps) {
       switch (selectedTab) {
         case "action":
         case "state": {
-          const res = await getActionStateValuesAsync(point, time, replayClient);
+          const res = await getActionStateValuesAsync(replayClient, point, time);
           setReduxValues(res ?? null);
           break;
         }
         case "diff": {
-          const diffRes = await getDiffAsync(point, time, replayClient);
+          const diffRes = await getDiffAsync(replayClient, point, time);
           setDiff(diffRes ?? null);
           break;
         }

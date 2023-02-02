@@ -3,19 +3,20 @@ import cloneDeep from "lodash/cloneDeep";
 
 import { ReplayClientInterface } from "shared/client/types";
 
-import { createGenericCache2, createUseGetValue } from "./createGenericCache";
+import { createGenericCache, createUseGetValue } from "./createGenericCache";
 import { updateMappedLocation } from "./PauseCache";
 
 export const {
   getValueSuspense: getFrameStepsSuspense,
   getValueAsync: getFrameStepsAsync,
   getValueIfCached: getFrameStepsIfCached,
-} = createGenericCache2<
-  ReplayClientInterface,
+} = createGenericCache<
+  [replayClient: ReplayClientInterface],
   [pauseId: PauseId, frameId: FrameId],
   PointDescription[] | undefined
 >(
   "FrameStepsCache: getFrameSteps",
+  1,
   async (client, pauseId, frameId) => {
     try {
       const frameSteps = await client.getFrameSteps(pauseId, frameId);

@@ -310,7 +310,7 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
     setQuickOpenQuery(e.target.value);
 
     const selectedContentLoaded =
-      selectedSource && getSourceContentsStatus(null as any, selectedSource.id) === STATUS_RESOLVED;
+      selectedSource && getSourceContentsStatus(selectedSource.id) === STATUS_RESOLVED;
     const noSource = !selectedSource || !selectedContentLoaded;
 
     if ((noSource && this.isFunctionQuery()) || this.isGotoQuery()) {

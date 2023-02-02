@@ -3,7 +3,7 @@ import { FrameId, MappedLocation, PauseId, Scope, ScopeId } from "@replayio/prot
 import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
 
-import { createGenericCache2 } from "./createGenericCache";
+import { createGenericCache } from "./createGenericCache";
 import { getFramesAsync } from "./FrameCache";
 import { cachePauseData } from "./PauseCache";
 
@@ -18,8 +18,13 @@ export const {
   getValueAsync: getScopeAsync,
   getValueIfCached: getScopeIfCached,
   addValue: cacheScope,
-} = createGenericCache2<ReplayClientInterface, [pauseId: PauseId, scopeId: ScopeId], Scope>(
+} = createGenericCache<
+  [replayClient: ReplayClientInterface],
+  [pauseId: PauseId, scopeId: ScopeId],
+  Scope
+>(
   "ScopeCache: getScope",
+  1,
   async (client, pauseId, scopeId) => {
     const result = await client.getScope(pauseId, scopeId);
     await client.waitForLoadedSources();
@@ -35,8 +40,13 @@ export const {
   getValueSuspense: getFrameScopesSuspense,
   getValueAsync: getFrameScopesAsync,
   getValueIfCached: getFrameScopesIfCached,
-} = createGenericCache2<ReplayClientInterface, [pauseId: PauseId, frameId: FrameId], FrameScopes>(
+} = createGenericCache<
+  [replayClient: ReplayClientInterface],
+  [pauseId: PauseId, frameId: FrameId],
+  FrameScopes
+>(
   "ScopeCache: getFrameScopes",
+  1,
   async (client, pauseId, frameId) => {
     const frame = (await getFramesAsync(client, pauseId))?.find(
       frame => frame.frameId === frameId
