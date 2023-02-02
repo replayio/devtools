@@ -68,9 +68,12 @@ export const DialogIllustration = ({
   className,
   ...props
 }: HTMLProps<HTMLHeadingElement>) => {
+  const randomNum = Math.floor(Math.random() * 3) + 1;
+  const imagePath = `/images/illustrations/ready${randomNum}.png`;
+
   return (
     <div>
-      <img src="/images/illustrations/ready1.png" className="w-fill mb-8 rounded-lg" />
+      <img src={imagePath} className="w-fill mb-8 rounded-lg" />
     </div>
   );
 };
