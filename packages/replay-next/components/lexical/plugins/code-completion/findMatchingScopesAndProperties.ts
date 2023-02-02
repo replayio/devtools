@@ -1,68 +1,74 @@
-import { Property, Scope } from "@replayio/protocol";
+import { Scope } from "@replayio/protocol";
 
-import { findIndex, findIndexString, insert, insertString } from "replay-next/src/utils/array";
+import {
+  MAX_DISTANCE,
+  WeightedProperty,
+} from "replay-next/components/lexical/plugins/code-completion/findMatches";
+import { findIndex, insert } from "replay-next/src/utils/array";
 
 type Match = {
+  distance: number;
   text: string;
   weight: number;
 };
+
+const IdentifierRegex = /^[a-zA-Z_$][0-9a-zA-Z_$]*$/;
 
 export default function findMatchingScopesAndProperties(
   queryScope: string | null,
   query: string | null,
   scopes: Scope[] | null,
-  properties: Property[] | null
+  properties: WeightedProperty[] | null
 ): string[] | null {
   matchComparator = query ? createComparatorForNeedle(query) : null;
 
+  let names: string[] | null = null;
   if (queryScope) {
     // We're searching the properties of an object.
     // Ignore scope values because they aren't part of that object.
     if (query) {
       const matches = findMatches(query, null, properties);
-      return matches.map(match => match.text);
+      names = matches.map(match => match.text);
     } else {
       // Show all properties until a user has started narrowing things down.
-      return flatten(null, properties);
+      names = flatten(properties);
     }
   } else if (query) {
     // If there's no expression head, we might be searching values in scope,
     // or we might be searching global/window properties.
     const matches = findMatches(query, scopes, properties);
-    return matches.map(match => match.text);
-  } else {
-    return null;
+    names = matches.map(match => match.text);
   }
+
+  // Type-ahead should not suggest numeric values (e.g. array indices)
+  // or any other name that would require bracket notation.
+  if (names) {
+    names = names.filter(name => name.match(IdentifierRegex));
+  }
+
+  return names;
 }
 
-function flatten(scopes: Scope[] | null, properties: Property[] | null): string[] {
-  const matches: string[] = [];
+function flatten(properties: WeightedProperty[] | null): string[] {
+  matchComparator = createComparatorForNeedle("");
 
-  if (scopes) {
-    scopes.forEach(scope => {
-      scope.bindings?.forEach(({ name }) => {
-        if (findIndexString(matches, name) < 0) {
-          insertString(matches, name);
-        }
-      });
-    });
-  }
-
+  const matches: Match[] = [];
   if (properties) {
-    properties.forEach(({ name }) => {
-      if (findIndexString(matches, name) < 0) {
-        insertString(matches, name);
+    properties.forEach(({ distance, name }) => {
+      const match: Match = { distance, text: name, weight: 0 };
+      if (findIndexMatch(matches, match) < 0) {
+        insertMatch(matches, match);
       }
     });
   }
 
-  return matches;
+  return matches.map(match => match.text);
 }
 
 function findMatches(
   needle: string,
   scopes: Scope[] | null,
-  properties: Property[] | null
+  properties: WeightedProperty[] | null
 ): Match[] {
   const matches: Match[] = [];
 
@@ -79,7 +85,7 @@ function findMatches(
       scope.bindings?.forEach(({ name }) => {
         if (name.match(needleRegExp) !== null) {
           const weight = getMatchWeight(name, needle);
-          const match: Match = { text: name, weight };
+          const match: Match = { distance: MAX_DISTANCE, text: name, weight };
           if (findIndexMatch(matches, match) < 0) {
             insertMatch(matches, match);
           }
@@ -89,10 +95,10 @@ function findMatches(
   }
 
   if (properties) {
-    properties.forEach(({ name }) => {
+    properties.forEach(({ distance, name }) => {
       if (name.match(needleRegExp) !== null) {
         const weight = getMatchWeight(name, needle);
-        const match: Match = { text: name, weight };
+        const match: Match = { distance, text: name, weight };
         if (findIndexMatch(matches, match) < 0) {
           insertMatch(matches, match);
         }
@@ -154,6 +160,11 @@ function createComparatorForNeedle(needle: string): MatchComparator {
   const lowerCaseNeedle = needle.toLowerCase();
 
   return (a: Match, b: Match) => {
+    if (a.distance !== b.distance) {
+      // Matches that are closer to the object's prototype should come first.
+      return a.distance < b.distance ? -1 : 1;
+    }
+
     const aStart = a.text.startsWith(needle);
     const bStart = b.text.startsWith(needle);
     if (aStart != bStart) {

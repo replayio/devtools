@@ -6,7 +6,6 @@ import "replay-next/pages/variables.css";
 import "devtools/client/themes/variables.css";
 
 /////////////////// here be dragons ... ////////////////////
-import "codemirror/lib/codemirror.css";
 import "devtools/client/debugger/src/components/A11yIntention.css";
 import "devtools/client/debugger/src/components/App.css";
 import "devtools/client/debugger/src/components/Editor/Breakpoints/Breakpoints.css";
@@ -79,7 +78,6 @@ import "ui/components/shared/SettingsModal/SettingsModal.css";
 import "ui/components/shared/SettingsModal/SettingsNavigation.css";
 import "ui/components/shared/SharingModal/CollaboratorsList.css";
 import "ui/components/shared/SharingModal/EmailForm.css";
-import "ui/components/shared/SharingModal/ReplayLink.css";
 import "ui/components/shared/WorkspaceSettingsModal/WorkspaceMember.css";
 import "ui/components/Timeline/MessageMarker.css";
 import "ui/components/Timeline/Timeline.css";

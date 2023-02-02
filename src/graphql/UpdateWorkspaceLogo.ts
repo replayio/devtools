@@ -19,4 +19,5 @@ export interface UpdateWorkspaceLogo {
 export interface UpdateWorkspaceLogoVariables {
   workspaceId: string;
   logo?: string | null;
+  format?: string | null;
 }

@@ -131,7 +131,7 @@ async function fetchEventTypeEntryPoints(
   wakeable.resolve(eventLogs);
 }
 
-const MAPPER = `
+export const MAPPER = `
   const finalData = { frames: [], scopes: [], objects: [] };
   function addPauseData({ frames, scopes, objects }) {
     finalData.frames.push(...(frames || []));

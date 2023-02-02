@@ -1,16 +1,16 @@
-import { useContext, useState } from "react";
+import { MouseEvent, useContext, useState } from "react";
 
 import { PointsContext } from "replay-next/src/contexts/PointsContext";
 import { Badge, Point } from "shared/client/types";
 
-import Icon from "../Icon";
-import { getBadgeStyleVars } from "./utils/getBadgeStyleVars";
+import Icon from "../../Icon";
+import { getBadgeStyleVars } from "../utils/getBadgeStyleVars";
 import styles from "./BadgePicker.module.css";
 
 // Three states prevents close animation from being shown on mount.
 type State = "initial" | "open" | "closed";
 
-export default function BadgePicker({ point }: { point: Point }) {
+export default function BadgePicker({ invalid, point }: { invalid: boolean; point: Point }) {
   const { editPoint } = useContext(PointsContext);
 
   const [state, setState] = useState<State>("initial");
@@ -23,13 +23,23 @@ export default function BadgePicker({ point }: { point: Point }) {
   const isInitial = state === "initial";
   const isOpen = state === "open";
 
+  const onClick = (event: MouseEvent) => {
+    event.stopPropagation();
+
+    if (isOpen) {
+      toggle(null);
+    } else {
+      setState("open");
+    }
+  };
+
   return (
-    <div className={styles.BadgePicker}>
+    <div className={styles.BadgePicker} data-invalid={invalid || undefined}>
       <button
-        className={`${styles.BadgePickerButton} ${styles.BadgePickerButtonToggle}`}
+        className={styles.BadgePickerButton}
         data-test-name={isOpen ? "BadgeButtonButton-default" : "BadgePickerButton"}
         data-test-state={point.badge || "default"}
-        onClick={() => (isOpen ? toggle(null) : setState("open"))}
+        onClick={onClick}
       >
         {isOpen ? (
           <Icon className={styles.BadgePickerButtonToggleIcon} type="remove" />
@@ -63,7 +73,10 @@ function BadgePickerButton({
 }) {
   let onClick;
   if (targetBadge && toggle) {
-    onClick = () => toggle(targetBadge);
+    onClick = (event: MouseEvent) => {
+      event.stopPropagation();
+      toggle(targetBadge);
+    };
   }
 
   return (

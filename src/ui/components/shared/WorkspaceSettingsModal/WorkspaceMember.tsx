@@ -183,23 +183,25 @@ export function NonRegisteredWorkspaceMember({
       <div className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre">
         {member.email}
       </div>
-      <PortalDropdown
-        buttonContent={<Status member={member} />}
-        setExpanded={setExpanded}
-        expanded={expanded}
-        buttonStyle="group"
-        position="bottom-right"
-      >
-        <Dropdown>
-          <WorkspaceMemberRoles
-            member={member}
-            isAdmin={isAdmin}
-            onClick={() => setExpanded(false)}
-          />
-          <DropdownDivider />
-          <DropdownItem onClick={handleDelete}>Remove</DropdownItem>
-        </Dropdown>
-      </PortalDropdown>
+      <div className="flex-shrink">
+        <PortalDropdown
+          buttonContent={<Status member={member} />}
+          setExpanded={setExpanded}
+          expanded={expanded}
+          buttonStyle="group"
+          position="bottom-right"
+        >
+          <Dropdown>
+            <WorkspaceMemberRoles
+              member={member}
+              isAdmin={isAdmin}
+              onClick={() => setExpanded(false)}
+            />
+            <DropdownDivider />
+            <DropdownItem onClick={handleDelete}>Remove</DropdownItem>
+          </Dropdown>
+        </PortalDropdown>
+      </div>
     </li>
   );
 }
@@ -291,7 +293,9 @@ function WorkspaceMember({ member, hideModal, isAdmin, canLeave = false }: Works
       <div className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre" data-private>
         {member.user!.name}
       </div>
-      <Role member={member} hideModal={hideModal} isAdmin={isAdmin} canLeave={canLeave} />
+      <div className="flex-shrink">
+        <Role member={member} hideModal={hideModal} isAdmin={isAdmin} canLeave={canLeave} />
+      </div>
     </li>
   );
 }

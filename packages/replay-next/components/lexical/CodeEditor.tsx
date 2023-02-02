@@ -5,9 +5,12 @@ import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { createEmptyHistoryState } from "@lexical/react/LexicalHistoryPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { $selectAll } from "@lexical/selection";
 import { $rootTextContent } from "@lexical/text";
+import { mergeRegister } from "@lexical/utils";
 import {
   $getRoot,
+  $getSelection,
   COMMAND_PRIORITY_CRITICAL,
   EditorState,
   KEY_ENTER_COMMAND,
@@ -15,10 +18,11 @@ import {
   LexicalEditor,
   LexicalNode,
   LineBreakNode,
+  SELECTION_CHANGE_COMMAND,
   SerializedEditorState,
   TextNode,
 } from "lexical";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 
 import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
 
@@ -37,6 +41,7 @@ const NODES: Array<Klass<LexicalNode>> = [LineBreakNode, CodeNode, TextNode];
 export default function CodeEditor({
   allowWrapping = true,
   autoFocus = false,
+  autoSelect = false,
   dataTestId,
   dataTestName,
   editable,
@@ -46,9 +51,11 @@ export default function CodeEditor({
   onSave,
   pauseAndFrameId,
   placeholder = "",
+  useOriginalVariables,
 }: {
   allowWrapping?: boolean;
   autoFocus?: boolean;
+  autoSelect?: boolean;
   dataTestId?: string;
   dataTestName?: string;
   editable: boolean;
@@ -58,11 +65,33 @@ export default function CodeEditor({
   onSave: (markdown: string, editorState: SerializedEditorState) => void;
   pauseAndFrameId: PauseAndFrameId | null;
   placeholder?: string;
+  useOriginalVariables: boolean;
 }): JSX.Element {
   const historyState = useMemo(() => createEmptyHistoryState(), []);
 
   const editorRef = useRef<LexicalEditor>(null);
   const backupEditorStateRef = useRef<EditorState | null>(null);
+
+  const didMountRef = useRef(false);
+  useLayoutEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+
+      if (autoSelect) {
+        const editor = editorRef.current;
+        if (editor) {
+          editor.update(() => {
+            const root = $getRoot();
+            const firstChild = root.getFirstChild();
+            if (firstChild) {
+              const selection = firstChild.select(0, 0);
+              $selectAll(selection);
+            }
+          });
+        }
+      }
+    }
+  }, [autoSelect]);
 
   useEffect(() => {
     const editor = editorRef.current;
@@ -128,7 +157,31 @@ export default function CodeEditor({
           return false;
         };
 
-        return editor.registerCommand(KEY_ENTER_COMMAND, onEnter, COMMAND_PRIORITY_CRITICAL);
+        // Make sure the cursor is visible (if there is overflow)
+        const onSelectionChange = () => {
+          const selection = $getSelection();
+          if (selection) {
+            const nodes = selection.getNodes();
+            if (nodes?.length > 0) {
+              const node = nodes[0];
+              const element = editor.getElementByKey(node.__key);
+              if (element) {
+                element.scrollIntoView({ block: "nearest", inline: "nearest" });
+              }
+            }
+          }
+
+          return false;
+        };
+
+        return mergeRegister(
+          editor.registerCommand(
+            SELECTION_CHANGE_COMMAND,
+            onSelectionChange,
+            COMMAND_PRIORITY_CRITICAL
+          ),
+          editor.registerCommand(KEY_ENTER_COMMAND, onEnter, COMMAND_PRIORITY_CRITICAL)
+        );
       }
     }
   }, [allowWrapping, editorRef]);
@@ -160,6 +213,7 @@ export default function CodeEditor({
           dataTestId={dataTestId ? `${dataTestId}-CodeTypeAhead` : undefined}
           dataTestName={dataTestName ? `${dataTestName}-CodeTypeAhead` : undefined}
           pauseAndFrameId={pauseAndFrameId}
+          useOriginalVariables={useOriginalVariables}
         />
       </>
     </LexicalComposer>

@@ -41,7 +41,7 @@ type CompositeTestEvent = StepEvent | NetworkEvent | NavigationEvent;
 
 function useGetTestSections(
   startTime: number,
-  steps: TestStep[]
+  steps?: TestStep[]
 ): {
   beforeEach: CompositeTestEvent[];
   testBody: CompositeTestEvent[];
@@ -55,44 +55,59 @@ function useGetTestSections(
   const events = useAppSelector(getEvents);
 
   return useMemo(() => {
-    const stepsByTime = steps.map<StepEvent>((s, i) => {
-      const annotations = {
-        end: annotationsEnd.find(a => a.message.id === s.id),
-        enqueue: annotationsEnqueue.find(a => a.message.id === s.id),
-        start: annotationsStart.find(a => a.message.id === s.id),
-      };
-
-      let duration = s.duration || 1;
-      let absoluteStartTime = annotations.start?.time ?? startTime + (s.relativeStartTime || 0);
-      let absoluteEndTime = annotations.end?.time ?? absoluteStartTime + duration;
-
-      if (s.name === "assert") {
-        // start failed asserts at their end time so they line up with the end
-        // of the failed command but successful asserts with their start time
-        if (s.error) {
-          absoluteStartTime = absoluteEndTime - 1;
-          annotations.start = annotations.end;
-        } else {
-          absoluteEndTime = absoluteStartTime + 1;
-          annotations.end = annotations.start;
-        }
-        duration = 1;
+    const simplifiedSteps = steps?.reduce<TestStep[]>((acc, s) => {
+      const previous = acc[acc.length - 1];
+      if (s.name === "then") {
+        return acc;
+      } else if (previous && s.name === "as" && typeof s.args?.[0] === "string") {
+        acc[acc.length - 1] = {
+          ...previous,
+          alias: s.args[0],
+        };
+      } else {
+        acc.push(s);
       }
 
-      return {
-        time: absoluteStartTime,
-        type: "step",
-        event: {
-          ...s,
-          relativeStartTime: s.relativeStartTime,
-          absoluteStartTime,
-          absoluteEndTime: Math.max(0, absoluteEndTime - 1),
-          duration,
-          index: i,
-          annotations,
-        },
-      };
-    });
+      return acc;
+    }, []);
+
+    const stepsByTime =
+      simplifiedSteps?.map<StepEvent>((s, i) => {
+        const annotations = {
+          end: annotationsEnd.find(a => a.message.id === s.id),
+          enqueue: annotationsEnqueue.find(a => a.message.id === s.id),
+          start: annotationsStart.find(a => a.message.id === s.id),
+        };
+
+        let duration = s.duration || 1;
+        let absoluteStartTime = annotations.start?.time ?? startTime + (s.relativeStartTime || 0);
+        let absoluteEndTime = annotations.end?.time ?? absoluteStartTime + duration;
+
+        if (s.name === "assert") {
+          // start failed asserts at their end time so they line up with the end
+          // of the failed command but successful asserts with their start time
+          if (s.error) {
+            absoluteStartTime = absoluteEndTime - 1;
+          } else {
+            absoluteEndTime = absoluteStartTime + 1;
+          }
+          duration = 1;
+        }
+
+        return {
+          time: absoluteStartTime,
+          type: "step",
+          event: {
+            ...s,
+            relativeStartTime: s.relativeStartTime,
+            absoluteStartTime,
+            absoluteEndTime: Math.max(0, absoluteEndTime - 1),
+            duration,
+            index: i,
+            annotations,
+          },
+        };
+      }) || [];
 
     const times = stepsByTime.reduce(
       (acc, s) => ({
@@ -205,7 +220,7 @@ export function TestSteps({ test }: { test: TestItem }) {
           <div>
             <div className="flex flex-row items-center space-x-1 p-2">
               <Icon filename="warning" size="small" className="bg-testsuitesErrorColor" />
-              <div className="font-bold">Error</div>
+              <div className="font-bold">Assertion Error</div>
             </div>
             <div className="wrap space-y-1 overflow-hidden p-2 font-mono">{test.error.message}</div>
           </div>
@@ -228,6 +243,9 @@ function NewUrlRow({ time, message }: { time: number; message: CypressAnnotation
 }
 
 function TestSection({ events, header }: { events: CompositeTestEvent[]; header?: string }) {
+  const firstStep = events.find((e): e is StepEvent => e.type === "step");
+  const firstIndex = firstStep?.event.index || 0;
+
   if (events.length === 0) {
     return null;
   }
@@ -248,8 +266,10 @@ function TestSection({ events, header }: { events: CompositeTestEvent[]; header?
           <TestStepItem
             step={s}
             key={s.id}
-            index={s.index}
-            argString={s.args?.toString()}
+            index={s.index - firstIndex}
+            argString={
+              s.args ? s.args.filter((s): s is string => s && typeof s === "string").join(", ") : ""
+            }
             id={s.id}
           />
         ) : type === "network" ? (

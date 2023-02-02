@@ -19,7 +19,7 @@ import PrivacyDropdown from "../shared/SharingModal/PrivacyDropdown";
 import { getUniqueDomains } from "../UploadScreen/Privacy";
 
 const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void }) => {
-  const classes = "flex flex-row space-x-2 p-1.5 px-3 items-center text-left overflow-hidden";
+  const classes = "flex flex-row space-x-2 p-1 px-4 items-center text-left overflow-hidden";
 
   if (onClick) {
     return (
@@ -52,36 +52,34 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
   const isTest = recording.metadata?.test;
   return (
     <div className="flex-column flex items-center overflow-hidden border-splitter bg-bodyBgcolor">
-      <div className="my-1.5 flex w-full cursor-default flex-col self-stretch overflow-hidden px-1.5 pb-0 text-xs">
+      <div className="mt-.5 mb-2 flex w-full cursor-default flex-col self-stretch overflow-hidden px-1.5 pb-0 text-xs">
         {recording.user ? (
           <Row>
-            <AvatarImage className="avatar h-5 w-5 rounded-full" src={recording.user.picture} />
+            <AvatarImage
+              className="avatar rounded-full"
+              style={{ height: "1.25rem", width: "1.25rem" }}
+              src={recording.user.picture}
+            />
             <div>{recording.user.name}</div>
             <div className="opacity-50">{time}</div>
           </Row>
         ) : null}
-        <div className="group">
+        <div>
           {isAuthenticated ? (
             <Row>
-              <Icon
-                filename={icon}
-                className="cursor-pointer bg-iconColor group-hover:bg-primaryAccent"
-              />
+              <Icon filename={`${icon}-circle`} className="cursor-pointer bg-iconColor" />
               <div>
                 <PrivacyDropdown {...{ recording }} />
               </div>
             </Row>
           ) : null}
         </div>
-        <div className="group">
+        <div>
           {!isTest && recording.url ? (
             <Row>
-              <Icon
-                filename="external"
-                className="cursor-pointer bg-iconColor group-hover:bg-primaryAccent"
-              />
+              <Icon filename="link-circle" className="cursor-pointer bg-primaryAccent" />
               <div
-                className="overflow-hidden overflow-ellipsis whitespace-pre"
+                className="overflow-hidden overflow-ellipsis whitespace-pre hover:underline"
                 title={recording.url}
               >
                 <a href={recording.url} target="_blank" rel="noopener noreferrer">
@@ -91,19 +89,9 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
             </Row>
           ) : null}
         </div>
-        <div className="group">
+        <div>
           {recording.metadata && (
             <>
-              <Row>
-                <MaterialIcon className="text-xl">schedule</MaterialIcon>
-                <div
-                  className="overflow-hidden overflow-ellipsis whitespace-pre"
-                  title={recording.metadata.source?.branch}
-                >
-                  {time === "Now" ? time : time + " ago"}
-                </div>
-              </Row>
-
               {isTest ? (
                 <Row>
                   <MaterialIcon>person</MaterialIcon>
@@ -142,7 +130,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
 
 function EnvironmentVariablesRow() {
   return (
-    <div className="group">
+    <div>
       <Row>
         <Icon filename="warning" className="bg-iconColor" />
         <div>This node recording contains all environment variables</div>
@@ -153,7 +141,7 @@ function EnvironmentVariablesRow() {
 
 function DurationWarningRow() {
   return (
-    <div className="group">
+    <div>
       <Row>
         <Icon filename="warning" className="bg-iconColor" />
         <div>This replay is over two minutes, which can cause delays</div>
@@ -176,10 +164,19 @@ function OperationsRow({
   }
 
   return (
-    <div className="group">
-      <Row onClick={onClick}>
-        <Icon filename="shield-check" className="bg-iconColor group-hover:bg-primaryAccent" />
-        <div>{`Contains potentially sensitive data from ${uniqueDomains.length} domains`}</div>
+    <div>
+      <Row>
+        <Icon filename="shield-check-circle" className="bg-[#F39A32]" />
+        <div className="flex">
+          {`Potentially sensitive data`}{" "}
+          <span className="ml-1 flex align-top" onClick={onClick}>
+            <Icon
+              filename="learnmore-questionmark"
+              className="bg-bodyColor hover:cursor-pointer"
+              size="small"
+            />
+          </span>
+        </div>
       </Row>
     </div>
   );

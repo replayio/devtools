@@ -15,7 +15,7 @@ import {
 
 const url = "cypress/basic";
 
-test.skip(`cypress-01: Test basic cypress reporter functionality`, async ({ page }) => {
+test(`cypress-01: Test basic cypress reporter functionality`, async ({ page }) => {
   await startTest(page, url);
 
   // shows the cypress logo
@@ -47,7 +47,7 @@ test.skip(`cypress-01: Test basic cypress reporter functionality`, async ({ page
   const sections = await getTestCaseSections(selectedRow);
   await expect(sections).toHaveCount(2);
   const steps = await getTestCaseSteps(selectedRow);
-  await expect(steps).toHaveCount(5);
+  await expect(steps).toHaveCount(4);
 
   // failed test should be visible
   await steps.nth(4).isVisible();

@@ -56,7 +56,7 @@ function Links({ recordingTarget }: { recordingTarget: RecordingTarget | null })
   const showShareButton = isAuthenticated && !showDevtoolsNag;
 
   return (
-    <div className={styles.Links}>
+    <div className={styles.Links} data-test-name="Header">
       <RecordingTrialEnd />
       {showShareButton ? <ShareButton /> : null}
       <Avatars recordingId={recordingId} />

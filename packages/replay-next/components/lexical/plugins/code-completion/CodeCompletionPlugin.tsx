@@ -18,10 +18,12 @@ export default function CodeCompletionPlugin({
   dataTestId,
   dataTestName = "CodeTypeAhead",
   pauseAndFrameId = null,
+  useOriginalVariables,
 }: {
   dataTestId?: string;
   dataTestName?: string;
   pauseAndFrameId: PauseAndFrameId | null;
+  useOriginalVariables: boolean;
 }): JSX.Element {
   const [editor] = useLexicalComposerContext();
 
@@ -35,7 +37,7 @@ export default function CodeCompletionPlugin({
   }
 
   const findMatchesWrapper = (query: string, queryScope: string | null) => {
-    return findMatches(query, queryScope, replayClient, frameId, pauseId);
+    return findMatches(query, queryScope, replayClient, frameId, pauseId, useOriginalVariables);
   };
 
   useEffect(() => {

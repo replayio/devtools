@@ -1,18 +1,19 @@
 .BadgePicker {
-  --badge-picker-button-size: 1.25rem;
-  --badge-picker-icon-size: 1rem;
-
   width: var(--badge-picker-button-size);
   height: var(--badge-picker-button-size);
   position: relative;
-  font-size: var(--font-size-regular);
+
+  --background-color: var(--badge-picker-background-color);
+}
+.BadgePicker[data-invalid] {
+  --background-color: var(--badge-picker-invalid-background-color);
 }
 
 .BadgePickerButton {
   width: var(--badge-picker-button-size);
   height: var(--badge-picker-button-size);
   border-radius: var(--badge-picker-button-size);
-  background-color: var(--badge-picker-background-color);
+  background-color: var(--background-color);
   flex-grow: 0;
   flex-shrink: 0;
   padding: 0;
@@ -22,12 +23,10 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-}
-
-.BadgePickerButtonToggle {
   position: relative;
   z-index: 2;
 }
+
 .BadgePickerButtonIcon,
 .BadgePickerButtonToggleIcon {
   position: relative;
@@ -60,6 +59,7 @@
 }
 
 .BadgePickerButtonToggleIcon {
+  background-color: var(--background-color);
   fill: var(--badge-default-color);
   flex: 0 0 0.75rem;
   height: 0.75rem;
@@ -82,7 +82,7 @@
 }
 
 .BadgePickerPopOut {
-  background-color: var(--badge-picker-background-color);
+  background-color: var(--background-color);
   border-radius: var(--badge-picker-button-size);
   display: flex;
   align-items: center;
@@ -114,7 +114,7 @@
   flex: 0 0 var(--badge-picker-icon-size);
   width: var(--badge-picker-icon-size);
   height: var(--badge-picker-icon-size);
-  background-image: url(../../public/unicorn.svg) !important;
+  background-image: url(../../../public/unicorn.svg) !important;
   background-size: auto 100%;
 }
 

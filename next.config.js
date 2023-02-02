@@ -1,6 +1,5 @@
 const { patchWebpackConfig } = require("next-global-css");
 const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
-const withPlugins = require("next-compose-plugins");
 
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
@@ -18,12 +17,6 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
  * >}
  */
 const baseNextConfig = {
-  // bumping Next from 12.0.9 to 12.1.0 required this as a temp WAR
-  // (see https://github.com/vercel/next.js/pull/34500)
-  experimental: {
-    browsersListForSwc: true,
-  },
-
   eslint: {
     // which folders to run ESLint on during production builds (next build)
     dirs: ["src", "pages", "packages"],
@@ -169,6 +162,14 @@ const baseNextConfig = {
       fs: false,
     };
 
+    const reLibrariesWithSourcemaps = /node_modules.+(immer|@reduxjs|react-window).+\.js$/;
+
+    config.module.rules.push({
+      test: reLibrariesWithSourcemaps,
+      enforce: "pre",
+      use: ["source-map-loader"],
+    });
+
     // JS files that need to be imported as strings,
     // such as the React DevTools backend to be injected into pauses
     config.module.rules.push({
@@ -199,4 +200,16 @@ const baseNextConfig = {
   },
 };
 
-module.exports = withPlugins([withBundleAnalyzer], baseNextConfig);
+const plugins = [withBundleAnalyzer];
+
+module.exports = (phase, defaultConfig) => {
+  const config = plugins.reduce(
+    (acc, plugin) => {
+      const update = plugin(acc);
+      return typeof update === "function" ? update(phase, defaultConfig) : update;
+    },
+    { ...baseNextConfig }
+  );
+
+  return config;
+};

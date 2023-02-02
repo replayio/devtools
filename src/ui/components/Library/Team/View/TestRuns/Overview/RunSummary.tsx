@@ -51,10 +51,8 @@ function RunnerLink({ testRun }: { testRun: TestRun }) {
   }
 
   return (
-    <Link href={triggerUrl}>
-      <a target="_blank" rel="noreferrer noopener" className="hover:underline">
-        <span>View run in GitHub</span>
-      </a>
+    <Link href={triggerUrl} target="_blank" rel="noreferrer noopener" className="hover:underline">
+      <span>View run in GitHub</span>
     </Link>
   );
 }

@@ -20,6 +20,7 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { TestItem, TestResult, TestStep } from "ui/types";
 
 import { TestSteps } from "./TestSteps";
+import styles from "src/ui/components/SidePanel.module.css";
 
 export type TestCaseContextType = {
   test: TestItem;
@@ -47,7 +48,7 @@ export const TestCaseContext = createContext<TestCaseContextType>(null as any);
 export function TestCase({ test, index }: { test: TestItem; index: number }) {
   const [expandSteps, setExpandSteps] = useState(false);
   const dispatch = useAppDispatch();
-  const expandable = test.steps || test.error;
+  const expandable = !!test.steps;
   const selectedTest = useAppSelector(getSelectedTest);
   const isSelected = selectedTest === index;
   const annotationsEnd = useAppSelector(getReporterAnnotationsForTitleEnd);
@@ -155,7 +156,7 @@ export function Status({ result }: { result: TestResult }) {
     <Icon
       filename={result === "passed" ? "testsuites-success" : "testsuites-fail"}
       size="small"
-      className={result === "passed" ? "bg-[#219653]" : "bg-[#EB5757]"}
+      className={result === "passed" ? styles.SuccessIcon : styles.ErrorIcon}
     />
   );
 }

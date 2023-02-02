@@ -24,8 +24,8 @@ function ContextMenu({
   const classnames = classNames.bind(styles);
   const actions = useTestStepActions(testStep);
 
-  const isFirstStep = test.steps[0].id === testStep.id;
-  const isLastStep = test.steps[test.steps.length - 1].id === testStep.id;
+  const isFirstStep = test.steps?.[0].id === testStep.id;
+  const isLastStep = test.steps?.[test.steps.length - 1].id === testStep.id;
 
   useModalDismissSignal(ref, hide, true);
 
@@ -67,10 +67,12 @@ function ContextMenu({
         top: mouseCoordinates.y,
       }}
     >
-      <div className={styles.ContextMenuItem} onClick={onGoToLocation}>
-        <MaterialIcon>code</MaterialIcon>
-        Jump to source
-      </div>
+      {actions.canShowStepSource ? (
+        <div className={styles.ContextMenuItem} onClick={onGoToLocation}>
+          <MaterialIcon>code</MaterialIcon>
+          Jump to source
+        </div>
+      ) : null}
       <div
         className={classnames("ContextMenuItem", { disabled: isFirstStep })}
         onClick={onPlayToHere}
@@ -87,7 +89,7 @@ function ContextMenu({
       </div>
       <div
         className={classnames("ContextMenuItem", {
-          disabled: actions.isAtStepStart,
+          disabled: !actions.canJumpToBefore,
         })}
         onClick={onJumpToBefore}
       >
@@ -96,7 +98,7 @@ function ContextMenu({
       </div>
       <div
         className={classnames("ContextMenuItem", {
-          disabled: actions.isAtStepEnd,
+          disabled: !actions.canJumpToAfter,
         })}
         onClick={onJumpToAfter}
       >

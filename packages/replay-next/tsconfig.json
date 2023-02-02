@@ -19,6 +19,11 @@
       "design/*": ["../design/*"],
       "protocol/*": ["../protocol/*"],
       "shared/*": ["../shared/*"],
+      "@codemirror/lang-javascript": ["@codemirror/lang-javascript_replay_next"],
+      "@codemirror/language": ["@codemirror/language_replay_next"],
+      "@codemirror/state": ["@codemirror/state_replay_next"],
+      "@lezer/common": ["@lezer/common_replay_next"],
+      "@lezer/highlight": ["@lezer/highlight_replay_next"]
     }
   },
   "include": [

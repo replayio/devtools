@@ -1,19 +1,18 @@
-import { Object as ProtocolObject, createPauseResult } from "@replayio/protocol";
+import { Object as ProtocolObject } from "@replayio/protocol";
+import classNames from "classnames";
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
+import { evaluateAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { getCurrentPoint } from "ui/actions/app";
 import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { getStepRanges, useStepState } from "ui/hooks/useStepState";
 import { useTestStepActions } from "ui/hooks/useTestStepActions";
+import { getViewMode } from "ui/reducers/layout";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
-import {
-  getCurrentTime,
-  isDragging as isDraggingSelector,
-  isPlaying as isPlayingSelector,
-} from "ui/reducers/timeline";
+import { getCurrentTime, isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AnnotatedTestStep } from "ui/types";
 
@@ -22,48 +21,7 @@ import { TestCaseContext } from "./TestCase";
 import { TestInfoContext } from "./TestInfo";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { TestStepRow } from "./TestStepRow";
-
-export function returnFirst<T, R>(
-  list: T[] | undefined,
-  fn: (value: T, index: number, list: T[]) => R | null
-) {
-  return list ? list.reduce<R | null>((acc, v, i, l) => acc ?? fn(v, i, l), null) : null;
-}
-
-function useStepState(step: AnnotatedTestStep) {
-  const currentTime = useAppSelector(getCurrentTime);
-  const currentPoint = useAppSelector(getCurrentPoint);
-  const isPlaying = useAppSelector(isPlayingSelector);
-  const isDragging = useAppSelector(isDraggingSelector);
-
-  const { point: pointEnd } = step.annotations.end || {};
-  const { point: pointStart } = step.annotations.start || {};
-
-  const shouldUseTimes = isPlaying || isDragging;
-
-  if (step.relativeStartTime == null) {
-    return "pending";
-  }
-
-  const currentPointBigInt = currentPoint ? BigInt(currentPoint) : null;
-  const pointEndBigInt = pointEnd ? BigInt(pointEnd) : null;
-  const isPast =
-    !shouldUseTimes && currentPointBigInt && pointEndBigInt
-      ? currentPointBigInt > pointEndBigInt
-      : currentTime > step.absoluteStartTime;
-  const isPaused =
-    !shouldUseTimes && currentPointBigInt && pointEndBigInt && pointStart
-      ? currentPointBigInt >= BigInt(pointStart) && currentPointBigInt <= pointEndBigInt
-      : currentTime >= step.absoluteStartTime && currentTime < step.absoluteEndTime;
-
-  if (isPaused) {
-    return "paused";
-  } else if (isPast) {
-    return "past";
-  }
-
-  return "pending";
-}
+import styles from "./TestStepItem.module.css";
 
 // relies on the scrolling parent to be the nearest positioning context
 function scrollIntoView(node: HTMLDivElement) {
@@ -101,6 +59,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
     pauseId: string;
     nodeIds: string[];
   }>();
+  const viewMode = useAppSelector(getViewMode);
   const isPlaying = useAppSelector(isPlayingSelector);
   const currentTime = useAppSelector(getCurrentTime);
   const selectedStep = useAppSelector(getSelectedStep);
@@ -109,6 +68,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const { point: pointEnd, message: messageEnd } = step.annotations.end || {};
   const { point: pointStart } = step.annotations.start || {};
   const state = useStepState(step);
+  const actions = useTestStepActions(step);
 
   // compare points if possible and
   useEffect(() => {
@@ -125,50 +85,63 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
           const callerFrame = frames[1];
 
           if (messageEnd?.commandVariable) {
-            const cmdResult = await client.evaluateExpression(
+            const cmdResult = await evaluateAsync(
+              client,
               endPauseResult.pauseId,
-              `${messageEnd.commandVariable}.get("subject")`,
-              callerFrame.frameId
+              callerFrame.frameId,
+              `${messageEnd.commandVariable}.get("subject")`
             );
 
-            const cmdObject = cmdResult.data.objects?.find(
-              o => o.objectId === cmdResult.returned?.object
-            );
-            const length: number | undefined = cmdObject?.preview?.properties?.find(
-              o => o.name === "length"
-            )?.value;
-            const subjects = Array.from({ length: length || 0 }, (_, i) =>
-              cmdResult.data.objects?.find(
-                obj =>
-                  obj.objectId ===
-                  cmdObject?.preview?.properties?.find(p => p.name === String(i))?.object
-              )
-            );
+            const cmdObjectId = cmdResult.returned?.object;
 
-            const nodeIds = subjects.filter(s => s?.preview?.node).map(s => s?.objectId!);
-            setSubjectNodePauseData({ pauseId: endPauseResult.pauseId, nodeIds });
+            if (cmdObjectId) {
+              const cmdObject = await getObjectWithPreviewHelper(
+                client,
+                endPauseResult.pauseId,
+                cmdObjectId,
+                true
+              );
+
+              const props = cmdObject?.preview?.properties;
+              const length: number = props?.find(o => o.name === "length")?.value || 0;
+              const nodeIds = [];
+              for (let i = 0; i < length; i++) {
+                const v = props?.find(p => p.name === String(i));
+                if (v?.object) {
+                  nodeIds.push(v.object);
+                }
+              }
+
+              setSubjectNodePauseData({ pauseId: endPauseResult.pauseId, nodeIds });
+            }
           }
 
           if (messageEnd?.logVariable) {
-            const logResult = await client.evaluateExpression(
+            const logResult = await evaluateAsync(
+              client,
               endPauseResult.pauseId,
-              messageEnd.logVariable,
-              callerFrame.frameId
+              callerFrame.frameId,
+              messageEnd.logVariable
             );
 
-            const consolePropsProperty = returnFirst(logResult.data.objects, o => {
-              return logResult.returned && o.objectId === logResult.returned.object
-                ? returnFirst(o.preview?.properties, p => (p.name === "consoleProps" ? p : null))
-                : null;
-            });
-
-            if (consolePropsProperty?.object) {
-              consoleProps = await getObjectWithPreviewHelper(
+            if (logResult.returned?.object) {
+              const logObject = await getObjectWithPreviewHelper(
                 client,
                 endPauseResult.pauseId,
-                consolePropsProperty.object,
-                true
+                logResult.returned.object
               );
+              const consolePropsProperty = logObject.preview?.properties?.find(
+                p => p.name === "consoleProps"
+              );
+
+              if (consolePropsProperty?.object) {
+                consoleProps = await getObjectWithPreviewHelper(
+                  client,
+                  endPauseResult.pauseId,
+                  consolePropsProperty.object,
+                  true
+                );
+              }
             }
           }
 
@@ -220,20 +193,35 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
 
   const { endPauseId, consoleProps } = localPauseData || {};
   const onClick = useCallback(() => {
-    if (id) {
-      if (pointEnd) {
+    const { timeRange, pointRange } = getStepRanges(step);
+    if (id && timeRange) {
+      if (pointRange) {
         if (endPauseId && consoleProps) {
           setConsoleProps(consoleProps);
           setPauseId(endPauseId);
         }
-        dispatch(seek(pointEnd!, step.absoluteEndTime, false, endPauseId));
+        dispatch(seek(pointRange[1], timeRange[1], false, endPauseId));
       } else {
-        dispatch(seekToTime(step.absoluteEndTime, false));
+        dispatch(seekToTime(timeRange[1], false));
+      }
+
+      if (viewMode === "dev") {
+        actions.showStepSource();
       }
 
       dispatch(setSelectedStep(step));
     }
-  }, [step, pointEnd, endPauseId, consoleProps, dispatch, setConsoleProps, id, setPauseId]);
+  }, [
+    actions,
+    viewMode,
+    step,
+    endPauseId,
+    consoleProps,
+    dispatch,
+    setConsoleProps,
+    id,
+    setPauseId,
+  ]);
 
   const onMouseEnter = () => {
     if (state === "paused") {
@@ -288,6 +276,10 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const progress = actualProgress > 100 ? 100 : actualProgress;
   const displayedProgress =
     (step.duration === 1 && state === "paused") || progress == 100 ? 0 : progress;
+  const isSelected = selectedStep?.id === id;
+  const matchingElementCount = consoleProps?.preview?.properties?.find(
+    p => p.name === "Elements"
+  )?.value;
 
   return (
     <TestStepRow
@@ -302,18 +294,40 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
       <button
         onClick={onClick}
         className="flex w-0 flex-grow items-start space-x-2 text-start"
-        title={`Step ${index + 1}: ${step.name} ${argString}`}
+        title={`Step ${index + 1}: ${step.name} ${argString || ""}`}
       >
         <div title={"" + displayedProgress} className="flex h-4 items-center">
           <ProgressBar progress={displayedProgress} error={!!step.error} />
         </div>
         <div className="opacity-70 ">{index + 1}</div>
-        <div className={`truncate font-medium ${state === "paused" ? "font-bold" : ""}`}>
-          {step.parentId ? "- " : ""}
-          {step.name} <span className="opacity-70">{argString}</span>
+        <div className={`flex-grow font-medium ${state === "paused" ? "font-bold" : ""}`}>
+          {step.parentId ? "- " : ""}{" "}
+          <span className={`${styles.step} ${styles[step.name]}`}>{step.name}</span>
+          <span className="opacity-70">{argString}</span>
         </div>
       </button>
-      <Actions step={step} isSelected={selectedStep?.id === id} />
+      {step.name === "get" && matchingElementCount > 1 ? (
+        <span
+          className={classNames(
+            "-my-1 flex-shrink rounded p-1 text-xs text-gray-800",
+            isSelected ? "bg-gray-300" : "bg-gray-200"
+          )}
+        >
+          {matchingElementCount}
+        </span>
+      ) : null}
+      {step.alias ? (
+        <span
+          className={classNames(
+            "-my-1 flex-shrink rounded p-1 text-xs text-gray-800",
+            isSelected ? "bg-gray-300" : "bg-gray-200"
+          )}
+          title={`'${argString}' aliased as '${step.alias}'`}
+        >
+          {step.alias}
+        </span>
+      ) : null}
+      <Actions step={step} isSelected={isSelected} />
     </TestStepRow>
   );
 }

@@ -20,7 +20,7 @@ import {
 import { getTestUrl, waitFor } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
-testSetup("88eab88a-380f-4eda-837c-0cdd49fa18bc");
+testSetup("ba2082dc-b69b-44dd-878f-e019e3f8a2dc");
 
 type LocatorFunction = (
   page: Page,
@@ -125,7 +125,7 @@ test("should copy dates", async ({ page }) => {
     "date",
     "2023",
     "Copy date",
-    '"2023-01-06T00:09:26.752Z"'
+    '"2023-01-26T15:24:05.181Z"'
   );
 });
 

@@ -6,12 +6,14 @@ export default function ContextMenuItem({
   children,
   dataTestId,
   dataTestName = "ContextMenuItem",
+  dataTestState,
   disabled = false,
   onClick: onClickProp,
 }: {
   children: ReactNode;
   dataTestId?: string;
   dataTestName?: string;
+  dataTestState?: string;
   disabled?: boolean;
   onClick?: () => void;
 }) {
@@ -34,6 +36,7 @@ export default function ContextMenuItem({
       className={disabled ? styles.ContextMenuItemDisabled : styles.ContextMenuItem}
       data-test-id={dataTestId}
       data-test-name={dataTestName}
+      data-test-state={dataTestState}
       onClick={onClick}
     >
       {children}

@@ -169,6 +169,7 @@ function ConsoleInputSuspends() {
             onChange={onChange}
             onSave={onSubmit}
             pauseAndFrameId={selectedPauseAndFrameId}
+            useOriginalVariables={true}
           />
         </div>
       </div>

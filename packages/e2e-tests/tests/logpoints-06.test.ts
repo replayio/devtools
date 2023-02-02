@@ -8,7 +8,7 @@ import {
   openPrintStatementsAccordionPane,
   togglePoint,
 } from "../helpers/pause-information-panel";
-import { addLogpoint, removeLogPoint } from "../helpers/source-panel";
+import { addLogpoint, removeLogPoint, toggleShouldLog } from "../helpers/source-panel";
 
 const url = "log_points_and_block_scope.html";
 
@@ -37,6 +37,12 @@ test(`logpoints-06: should be temporarily disabled`, async ({ page }) => {
 
   // Temporarily enable and verify log point text in console
   await togglePoint(page, logpoint, true);
+  await verifyConsoleMessage(page, MESSAGE, "log-point", 1);
+
+  // Now disable and re-enable the log point using the context menu
+  await toggleShouldLog(page, { lineNumber: 5, state: false });
+  await verifyConsoleMessage(page, MESSAGE, "log-point", 0);
+  await toggleShouldLog(page, { lineNumber: 5, state: true });
   await verifyConsoleMessage(page, MESSAGE, "log-point", 1);
 
   // Delete the logpoint and verify that it's no longer in the side panel

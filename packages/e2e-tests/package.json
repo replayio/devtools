@@ -19,7 +19,7 @@
   "devDependencies": {
     "@playwright/test": "^1.25.1",
     "@recordreplay/playwright": "^1.18.3",
-    "@replayio/playwright": "0.3.11",
+    "@replayio/playwright": "0.3.16",
     "cli-spinners": "^2.7.0",
     "log-update": "^4",
     "playwright": "^1.25.1",

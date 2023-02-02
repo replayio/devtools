@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 import hooks from "ui/hooks";
 
+import Base64Image from "../Base64Image";
 import useDebounceState from "./useDebounceState";
 
 const Label = ({ className, children }: { className?: string; children: React.ReactNode }) => {
@@ -23,18 +24,21 @@ const Row = ({ children }: { children: React.ReactNode }) => {
 
 const useImageUpload = (
   image: string | null | undefined,
+  imageFormat: string | null | undefined,
   maxSize: number,
-  callback: (img: string) => void
+  callback: (format: string, img: string) => void
 ) => {
   const [err, setErr] = useState<string>();
   const [img, setImg] = useState(image);
+  const [fmt, setImgFmt] = useState(imageFormat);
 
   const onUpload = (input: HTMLInputElement) => {
-    if (!input.files?.[0]) {
+    const f = input.files?.[0];
+    if (!f) {
       return;
     }
 
-    input.files[0].arrayBuffer().then(b => {
+    f.arrayBuffer().then(b => {
       if (maxSize && b.byteLength > maxSize * 1024) {
         setErr(`Image must be less than ${maxSize} kilobytes`);
         return;
@@ -44,25 +48,31 @@ const useImageUpload = (
       const str = ua.reduce((a, b) => a + String.fromCharCode(b), "");
       const newImage = btoa(str);
       setErr(undefined);
+      callback(f.type, newImage);
       setImg(newImage);
-      callback(newImage);
+      setImgFmt(f.type);
     });
   };
 
-  return { img, err, onUpload };
+  return { img, format: fmt, err, onUpload };
 };
 
 const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
   const { workspace } = hooks.useGetWorkspace(workspaceId);
   const updateWorkspaceSettings = hooks.useUpdateWorkspaceSettings();
   const updateWorkspaceLogo = hooks.useUpdateWorkspaceLogo();
-  const { img, err, onUpload } = useImageUpload(workspace?.logo, 50, logo =>
-    updateWorkspaceLogo({
-      variables: {
-        workspaceId,
-        logo,
-      },
-    })
+  const { img, format, err, onUpload } = useImageUpload(
+    workspace?.logo,
+    workspace?.logoFormat,
+    50,
+    (format, logo) =>
+      updateWorkspaceLogo({
+        variables: {
+          workspaceId,
+          logo,
+          format,
+        },
+      })
   );
 
   const [name, setName] = useDebounceState(
@@ -105,12 +115,12 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
         <Label className="self-start">Logo</Label>
         <Input>
           <div className="flex flex-col items-start space-y-4">
-            {img ? <img className="block max-h-12" src={`data:image/png;base64,${img}`} /> : null}
+            {img ? <Base64Image className="block max-h-12" format={format} src={img} /> : null}
             <label className="flex-inline cursor-pointer items-center justify-center rounded-md border p-2">
               <input
                 type="file"
                 className="invisible h-1 w-0"
-                accept="image/png"
+                accept="image/*"
                 onChange={e => onUpload(e.currentTarget)}
               />
               <span>Upload</span>

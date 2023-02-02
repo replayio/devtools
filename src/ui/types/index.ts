@@ -175,7 +175,7 @@ export type TestItem = {
   result: TestResult;
   relativeStartTime?: number;
   duration?: number;
-  steps: TestStep[];
+  steps?: TestStep[];
   id?: string;
   path?: string[];
   error?: TestItemError;
@@ -204,12 +204,13 @@ export interface Annotation {
 }
 
 export type TestStep = {
-  args?: string[];
+  args?: any[];
   name: string;
   duration: number;
   relativeStartTime?: number;
   id: string;
   parentId?: string;
+  alias?: string;
   error?: TestItemError;
   hook?: "beforeEach" | "afterEach";
 };
@@ -276,6 +277,7 @@ export interface PendingWorkspaceInvitation extends Workspace {
 export interface Workspace {
   apiKeys?: ApiKey[];
   logo?: string | null;
+  logoFormat?: string | null;
   domain?: string | null;
   hasPaymentMethod?: boolean;
   id: string;

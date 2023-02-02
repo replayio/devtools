@@ -7,6 +7,8 @@ import {
   useCallback,
   useContext,
   useMemo,
+  useState,
+  useTransition,
 } from "react";
 
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -59,6 +61,7 @@ export const PointsContext = createContext<PointsContextType>(null as any);
 export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   const { recordingId, trackEvent } = useContext(SessionContext);
   const replayClient = useContext(ReplayClientContext);
+  const [isPending, startTransition] = useTransition();
 
   // Both high-pri state and transition state should be managed by useIndexedDB,
   // Else values from other tabs will only be synced to the high-pri state.
@@ -68,24 +71,16 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     recordName: recordingId,
     storeName: "high-priority",
   });
-  const {
-    setValue: setPointsForAnalysis,
-    status: pointsForAnalysisStatus,
-    value: pointsForAnalysis,
-  } = useIndexedDB<Point[]>({
-    database: POINTS_DATABASE,
-    initialValue: EMPTY_ARRAY,
-    recordName: recordingId,
-    scheduleUpdatesAsTransitions: true,
-    storeName: "transition",
-  });
-
-  const isPending = pointsForAnalysisStatus === "update-pending";
+  // We pre-load our IndexedDB values at app startup, so it's safe to synchronously
+  // use `points` to initialize the `useState` hook here.
+  const [pointsForAnalysis, setPointsForAnalysis] = useState<Point[]>(points);
 
   const setPointsHelper = useCallback(
-    (action: SetStateAction<Point[]>) => {
-      setPoints(action);
-      setPointsForAnalysis(action);
+    (updater: SetStateAction<Point[]>) => {
+      setPoints(updater);
+      startTransition(() => {
+        setPointsForAnalysis(updater);
+      });
     },
     [setPoints, setPointsForAnalysis]
   );

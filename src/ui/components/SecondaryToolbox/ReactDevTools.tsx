@@ -337,24 +337,11 @@ async function loadReactDevToolsInlineModuleFromProtocol(
       replayClient,
       text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("getBridgeProtocol", undefined)`,
     });
-    if (response.returned?.object) {
+    if (response.returned) {
       // Unwrap the nested eval objects by asking the backend for contents
       // of the nested fields: `{data: {version: 123}}`
-      const responseDataObject = await getObjectPropertyHelper(
-        replayClient,
-        pauseId,
-        response.returned.object,
-        "data"
-      );
-      const versionData = (await getObjectPropertyHelper(
-        replayClient,
-        pauseId,
-        responseDataObject.object!,
-        "version"
-      )) as { value: number };
-      if (versionData.value) {
-        backendBridgeProtocolVersion = versionData.value;
-      }
+      const result: any = await getJSON(replayClient, pauseId, response.returned);
+      backendBridgeProtocolVersion = result?.data?.version ?? 2;
     }
   }
 

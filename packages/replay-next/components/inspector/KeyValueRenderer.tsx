@@ -18,7 +18,7 @@ export type Props = {
   context: "console" | "default" | "nested";
   enableInspection?: boolean;
   expandByDefault?: boolean;
-  layout: "horizontal" | "vertical";
+  layout?: "horizontal" | "vertical";
   onContextMenu?: (event: MouseEvent) => void;
   pauseId: PauseId;
   protocolValue: ProtocolValue;

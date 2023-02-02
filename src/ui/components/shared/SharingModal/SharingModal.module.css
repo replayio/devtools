@@ -1,0 +1,37 @@
+.copy-link input[type="text"] {
+  padding: 8px;
+  border: 1px solid var(--cool-gray-300);
+  border-radius: 8px;
+  width: 100%;
+}
+
+.copyURL,
+.downloadVideo {
+  padding: 0.5rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  background-color: var(--theme-base-100);
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow,
+    transform;
+  border-radius: 0.5rem;
+}
+
+.downloadVideo {
+  display: flex;
+  align-items: center;
+}
+
+.copyURL:hover,
+.downloadVideo:hover {
+  background-color: var(--primary-accent);
+  color: #fff;
+}
+
+.copyIcon {
+  margin-right: 0.25rem;
+  background-color: var(--body-color);
+}
+
+.copyURL:hover .copyIcon {
+  background-color: #fff;
+}
