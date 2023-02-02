@@ -17,7 +17,7 @@ import useLoadedRegions from "../hooks/useRegions";
 import {
   imperativelyGetClosestPointForTime,
   preCacheExecutionPointForTime,
-} from "../suspense/PointsCache";
+} from "../suspense/ExecutionPointsCache";
 import { Range } from "../types";
 import { SessionContext } from "./SessionContext";
 

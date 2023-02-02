@@ -126,11 +126,13 @@ async function evaluateNoArgsFunction(
 // applied to a given pause in a session. So, we only need to do this once for
 // a given Pause, and we want to retain the info even if the RDT component unmounts.
 export const { getValueAsync: getActionStateValuesAsync } = createGenericCache<
-  [point: ExecutionPoint, time: number, replayClient: ReplayClientInterface],
+  [replayClient: ReplayClientInterface],
+  [point: ExecutionPoint, time: number],
   ReduxActionStateValues | undefined
 >(
   "reduxDevtools: getActionStateValues",
-  async (point, time, replayClient) => {
+  1,
+  async (replayClient, point, time) => {
     const pauseId = await getPauseIdAsync(replayClient, point, time);
     if (!pauseId) {
       return;
@@ -166,11 +168,13 @@ export const { getValueAsync: getActionStateValuesAsync } = createGenericCache<
 );
 
 export const { getValueAsync: getDiffAsync } = createGenericCache<
-  [point: ExecutionPoint, time: number, replayClient: ReplayClientInterface],
+  [replayClient: ReplayClientInterface],
+  [point: ExecutionPoint, time: number],
   Delta | undefined
 >(
   "reduxDevtools: getDiff",
-  async (point, time, replayClient) => {
+  1,
+  async (replayClient, point, time) => {
     const pauseId = await getPauseIdAsync(replayClient, point, time);
     if (!pauseId) {
       return;

@@ -12,10 +12,12 @@ export const {
   getValueAsync: getMappedLocationAsync,
   getValueIfCached: getMappedLocationIfCached,
 } = createGenericCache<
-  [replayClient: ReplayClientInterface, location: ProtocolLocation],
+  [replayClient: ReplayClientInterface],
+  [location: ProtocolLocation],
   ProtocolMappedLocation
 >(
   "MappedLocationCache: getMappedLocation",
+  1,
   (client, location) => client.getMappedLocation(location),
-  (client, location) => `${location.sourceId}:${location.line}:${location.column}`
+  location => `${location.sourceId}:${location.line}:${location.column}`
 );

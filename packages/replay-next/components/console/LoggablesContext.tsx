@@ -14,8 +14,8 @@ import { PointInstance, PointsContext } from "replay-next/src/contexts/PointsCon
 import { TerminalContext, TerminalExpression } from "replay-next/src/contexts/TerminalContext";
 import { EventLog, getEventTypeEntryPointsSuspense } from "replay-next/src/suspense/EventsCache";
 import { UncaughtException, getExceptionsSuspense } from "replay-next/src/suspense/ExceptionsCache";
+import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/ExecutionPointsCache";
 import { ProtocolMessage, getMessagesSuspense } from "replay-next/src/suspense/MessagesCache";
-import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/PointsCache";
 import { loggableSort } from "replay-next/src/utils/loggables";
 import { isInNodeModules } from "replay-next/src/utils/messages";
 import { suspendInParallel } from "replay-next/src/utils/suspense";

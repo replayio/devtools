@@ -7,7 +7,7 @@ import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { POINTS_DATABASE } from "replay-next/src/contexts/PointsContext";
 import { preloadIDBInitialValues } from "replay-next/src/hooks/useIndexedDB";
-import { preCacheExecutionPointForTime } from "replay-next/src/suspense/PointsCache";
+import { preCacheExecutionPointForTime } from "replay-next/src/suspense/ExecutionPointsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { UserInfo } from "shared/graphql/types";
 import { getCurrentUserInfo } from "shared/graphql/User";

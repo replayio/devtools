@@ -17,16 +17,12 @@ export const {
   getValueAsync: getAppliedRulesAsync,
   getValueIfCached: getAppliedRulesIfCached,
 } = createGenericCache<
-  [
-    client: ProtocolClient,
-    replayClient: ReplayClientInterface,
-    sessionId: string,
-    pauseId: PauseId,
-    nodeId: string
-  ],
+  [client: ProtocolClient, replayClient: ReplayClientInterface, sessionId: string],
+  [pauseId: PauseId, nodeId: string],
   WiredAppliedRule[]
 >(
   "styleCaches: getAppliedRules",
+  3,
   async (client, replayClient, sessionId, pauseId, nodeId) => {
     const { rules, data } = await client.CSS.getAppliedRules({ node: nodeId }, sessionId, pauseId);
 
@@ -72,7 +68,7 @@ export const {
     });
     return wiredRules;
   },
-  (client, replayClient, sessionId, pauseId, nodeId) => `${pauseId}|${nodeId}`
+  (pauseId, nodeId) => `${pauseId}|${nodeId}`
 );
 
 export const {
@@ -80,10 +76,12 @@ export const {
   getValueAsync: getComputedStyleAsync,
   getValueIfCached: getComputedStyleIfCached,
 } = createGenericCache<
-  [client: ProtocolClient, sessionId: string, pauseId: PauseId, nodeId: string],
+  [client: ProtocolClient, sessionId: string],
+  [pauseId: PauseId, nodeId: string],
   Map<string, string> | undefined
 >(
   "styleCaches: getComputedStyle",
+  2,
   async (client, sessionId, pauseId, nodeId) => {
     try {
       const { computedStyle } = await client.CSS.getComputedStyle(
@@ -104,7 +102,7 @@ export const {
       return;
     }
   },
-  (client, sessionId, pauseId, nodeId) => `${pauseId}|${nodeId}`
+  (pauseId, nodeId) => `${pauseId}|${nodeId}`
 );
 
 export const {
@@ -112,11 +110,12 @@ export const {
   getValueAsync: getBoundingRectAsync,
   getValueIfCached: getBoundingRectIfCached,
 } = createGenericCache<
-  [client: ProtocolClient, sessionId: string, pauseId: PauseId, nodeId: string],
+  [client: ProtocolClient, sessionId: string],
+  [pauseId: PauseId, nodeId: string],
   DOMRect | undefined
 >(
   "styleCaches: getBoundingRect",
-
+  2,
   async (client, sessionId, pauseId, nodeId) => {
     try {
       const { rect } = await client.DOM.getBoundingClientRect(
@@ -132,5 +131,5 @@ export const {
       return;
     }
   },
-  (client, sessionId, pauseId, nodeId) => `${pauseId}|${nodeId}`
+  (pauseId, nodeId) => `${pauseId}|${nodeId}`
 );

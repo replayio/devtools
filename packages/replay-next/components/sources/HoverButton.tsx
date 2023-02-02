@@ -11,7 +11,7 @@ import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useNag } from "replay-next/src/hooks/useNag";
-import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/PointsCache";
+import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/ExecutionPointsCache";
 import {
   compareExecutionPoints,
   isExecutionPointsGreaterThan,

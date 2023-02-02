@@ -22,7 +22,7 @@ import { AwaitTimeout, awaitWithTimeout } from "../../../../../../ui/utils/await
 import { TestCaseContext } from "./TestCase";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { TestStepRow } from "./TestStepRow";
-import styles from "./TestStepItem.module.css";
+import styles from "./TestInfo.module.css";
 
 function preventClickFromSpaceBar(ev: React.KeyboardEvent<HTMLButtonElement>) {
   if (ev.key === " ") {
@@ -49,6 +49,17 @@ export interface TestStepItemProps {
   argString?: string;
   index: number;
   id: string | null;
+}
+
+const AwaitTimeout = Symbol("await-timeout");
+async function awaitWithTimeout<T>(
+  promise: Promise<T>,
+  timeout = 500
+): Promise<T | typeof AwaitTimeout> {
+  return Promise.race([
+    new Promise<typeof AwaitTimeout>(resolve => setTimeout(() => resolve(AwaitTimeout), timeout)),
+    promise,
+  ]);
 }
 
 export function TestStepItem({ step, argString, index, id }: TestStepItemProps) {
