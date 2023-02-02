@@ -317,7 +317,7 @@ export function createSocket(
       });
 
       window.sessionId = sessionId;
-      ThreadFront.setSessionId(sessionId);
+      ThreadFront.setSessionId(sessionId, features);
       const recordingTarget = await ThreadFront.recordingTargetWaiter.promise;
       dispatch(actions.setRecordingTarget(recordingTarget));
 

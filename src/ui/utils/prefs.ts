@@ -42,6 +42,7 @@ pref("devtools.features.protocolTimeline", false);
 pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.resolveRecording", false);
 pref("devtools.features.chromiumNetMonitor", true);
+pref("devtools.features.chromiumRepaints", false);
 pref("devtools.features.brokenSourcemapWorkaround", true);
 pref("devtools.features.trackRecordingAssetsInDatabase", false);
 
@@ -81,9 +82,12 @@ export const features = new PrefsHelper("devtools.features", {
   resolveRecording: ["Bool", "resolveRecording"],
   rerunRoutines: ["Bool", "rerunRoutines"],
   chromiumNetMonitor: ["Bool", "chromiumNetMonitor"],
+  chromiumRepaints: ["Bool", "chromiumRepaints"],
   brokenSourcemapWorkaround: ["Bool", "brokenSourcemapWorkaround"],
   trackRecordingAssetsInDatabase: ["Bool", "trackRecordingAssetsInDatabase"],
 });
+
+export type Features = typeof features;
 
 export const asyncStore = asyncStoreHelper("devtools", {
   replaySessions: ["Json", "replay-sessions", {} as Record<string, ReplaySession>],
