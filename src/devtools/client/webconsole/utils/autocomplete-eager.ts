@@ -18,7 +18,7 @@ export async function getEvaluatedProperties(
   fetchObject: ObjectFetcher
 ): Promise<string[]> {
   try {
-    const { returned, exception } = await ThreadFront.evaluateNew({
+    const { returned, exception } = await ThreadFront.evaluate({
       replayClient,
       pauseId,
       frameId,
@@ -47,7 +47,7 @@ async function eagerEvaluateExpression(
   frameId?: string
 ): Promise<Value | null> {
   try {
-    const { returned, exception } = await ThreadFront.evaluateNew({
+    const { returned, exception } = await ThreadFront.evaluate({
       replayClient,
       pauseId,
       frameId,

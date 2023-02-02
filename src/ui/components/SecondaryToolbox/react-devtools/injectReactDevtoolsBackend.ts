@@ -78,7 +78,7 @@ async function evaluateNoArgsFunction(
   replayClient: ReplayClientInterface,
   fn: Function
 ) {
-  return await ThreadFront.evaluateNew({
+  return await ThreadFront.evaluate({
     replayClient,
     text: `(${fn})()`,
   });
@@ -107,7 +107,7 @@ export async function injectReactDevtoolsBackend(
   const reactDevtoolsBackendSource = require("./react_devtools_backend.raw.js").default;
 
   await evaluateNoArgsFunction(ThreadFront, replayClient, mutateWindowForSetup);
-  await ThreadFront.evaluateNew({
+  await ThreadFront.evaluate({
     replayClient,
     pauseId,
     text: injectGlobalHookSource,
@@ -115,7 +115,7 @@ export async function injectReactDevtoolsBackend(
 
   await evaluateNoArgsFunction(ThreadFront, replayClient, copyMountedRoots);
 
-  await ThreadFront.evaluateNew({
+  await ThreadFront.evaluate({
     replayClient,
     text: reactDevtoolsBackendSource,
   });
