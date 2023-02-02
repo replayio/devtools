@@ -151,11 +151,8 @@ const { getValueAsync: getEventListenerLocationAsync } = createGenericCache<
     let sourceLocation: Location | undefined;
     const sourcesById = getSourceDetailsEntities(state);
 
-    console.log("Evaluation res: ", res);
-
     if (res.returned?.object) {
       const preview = await getObjectWithPreviewHelper(replayClient, pauseId, res.returned.object);
-      console.log("DOM node preview: ", preview);
 
       // The evaluation may have found a React prop function somewhere.
       const handlerProp = preview?.preview?.properties?.find(p => p.name === "handlerProp");
@@ -182,7 +179,6 @@ const { getValueAsync: getEventListenerLocationAsync } = createGenericCache<
       }
     } else if (res.exception?.object) {
       const error = await getObjectWithPreviewHelper(replayClient, pauseId, res.exception.object);
-      console.log("Error: ", error);
     }
 
     if (!sourceLocation) {
