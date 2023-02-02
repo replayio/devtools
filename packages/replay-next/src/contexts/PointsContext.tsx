@@ -11,6 +11,8 @@ import {
   useTransition,
 } from "react";
 
+import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
+import { getPointsSuspense } from "replay-next/src/suspense/PointsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_DISABLED, Point, PointId } from "shared/client/types";
 
@@ -59,7 +61,8 @@ export const isValidPoint = (maybePoint: unknown): maybePoint is Point => {
 export const PointsContext = createContext<PointsContextType>(null as any);
 
 export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
-  const { currentUserInfo, recordingId, trackEvent } = useContext(SessionContext);
+  const graphQLClient = useContext(GraphQLClientContext);
+  const { accessToken, currentUserInfo, recordingId, trackEvent } = useContext(SessionContext);
   const replayClient = useContext(ReplayClientContext);
   const [isPending, startTransition] = useTransition();
 
@@ -160,6 +163,9 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     }),
     [addPoint, deletePoints, editPoint, isPending, points, pointsForAnalysis]
   );
+
+  const graphQLPoints = getPointsSuspense(graphQLClient, recordingId, accessToken);
+  console.log("graphQLPoints:", graphQLPoints);
 
   return <PointsContext.Provider value={context}>{children}</PointsContext.Provider>;
 }

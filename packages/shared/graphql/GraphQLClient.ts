@@ -1,5 +1,15 @@
+import { DocumentNode } from "graphql";
+
+type Data = {
+  operationName: string;
+  query: string | DocumentNode;
+  variables: {
+    [key: string]: any;
+  };
+};
+
 export interface GraphQLClientInterface {
-  send<T>(body: Object, accessToken: string | null): Promise<T>;
+  send<T>(data: Data, accessToken: string | null): Promise<T>;
 }
 
 // Longer term we probably want to consider using Relay for this;
@@ -11,7 +21,11 @@ export class GraphQLClient implements GraphQLClientInterface {
     this.url = url;
   }
 
-  async send<T>(body: Object, accessToken: string | null): Promise<T> {
+  async send<T>(data: Data, accessToken: string | null): Promise<T> {
+    if (typeof data.query !== "string") {
+      data.query = data.query.loc?.source.body ?? "";
+    }
+
     const response = await fetch(this.url, {
       method: "POST",
       headers: {
@@ -20,7 +34,7 @@ export class GraphQLClient implements GraphQLClientInterface {
         }),
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(data),
     });
 
     const json = await response.json();

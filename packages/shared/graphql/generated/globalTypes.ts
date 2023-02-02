@@ -29,6 +29,20 @@ export interface AddCommentReplyInput {
   isPublished: boolean;
 }
 
+export interface AddPointInput {
+  content: string;
+  location: any;
+  recordingId: string;
+  shouldBreak: string;
+  shouldLog: string;
+}
+
+export interface UpdatePointInput {
+  content: string;
+  shouldBreak: string;
+  shouldLog: string;
+}
+
 //==============================================================
 // END Enums and Input Objects
 //==============================================================

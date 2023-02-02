@@ -73,7 +73,7 @@ export const POINT_BEHAVIOR_ENABLED = "enabled";
 export const POINT_BEHAVIOR_DISABLED = "disabled";
 export const POINT_BEHAVIOR_DISABLED_TEMPORARILY = "disabled-temporarily";
 
-type PointBehavior =
+export type PointBehavior =
   | typeof POINT_BEHAVIOR_ENABLED
   | typeof POINT_BEHAVIOR_DISABLED
   | typeof POINT_BEHAVIOR_DISABLED_TEMPORARILY;

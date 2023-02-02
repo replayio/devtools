@@ -1,5 +1,7 @@
 import { ExecutionPoint } from "@replayio/protocol";
 
+import { Point as PointData } from "shared/client/types";
+
 export enum Nag {
   FIRST_LOG_IN = "first_log_in",
   FIRST_REPLAY_2 = "first_replay_2",
@@ -16,6 +18,18 @@ export enum EmailSubscription {
   REPLAY_COMMENT = "replay_comment",
   NEW_TEAM_INVITE = "new_team_invite",
 }
+
+export type Point = {
+  badge: string | null;
+  condition: string | null;
+  content: string;
+  createdByUserId: string | null;
+  id: string;
+  location: Location;
+  recordingId: string;
+  shouldBreak: string;
+  shouldLog: string;
+};
 
 export interface User {
   id: string;
