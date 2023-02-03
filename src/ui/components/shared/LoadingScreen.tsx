@@ -1,5 +1,6 @@
+import { Colorway } from "@replayio/overboard";
 import dynamic from "next/dynamic";
-import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { getAwaitingSourcemaps, getLoadingFinished, getUploading } from "ui/reducers/app";
@@ -10,8 +11,9 @@ import { BubbleViewportWrapper } from "./Viewport";
 
 const colorOptions: Array<"blue" | "green" | "red"> = ["blue", "green", "red"];
 
-const Hoverboard = dynamic(() => import("@replayio/overboard").then(m => m.Hoverboard), {
+const Hoverboard = dynamic(() => import("./Hoverboard"), {
   ssr: false,
+  loading: () => <div />,
 });
 
 export function LoadingScreenTemplate({
@@ -23,16 +25,21 @@ export function LoadingScreenTemplate({
 }) {
   const [hoverboardColor, setHoverboardColor] = useState(colorOptions[2]);
 
-  const handleHoverboardClick = () => {
+  const changeHoverboardColor = () => {
     const randomIndex = Math.floor(Math.random() * colorOptions.length);
     setHoverboardColor(colorOptions[randomIndex]);
   };
+
+  useEffect(() => {
+    const interval = setInterval(changeHoverboardColor, 5_000);
+    return () => clearInterval(interval);
+  }, [hoverboardColor]);
 
   return (
     <BubbleViewportWrapper>
       <div className="relative flex w-96 flex-col items-center space-y-1 rounded-lg bg-loadingBoxes p-8 py-12 shadow-sm">
         <div className="flex flex-col items-center space-y-8">
-          <div className="w-32" onClick={handleHoverboardClick}>
+          <div className="w-32" onClick={changeHoverboardColor}>
             <Hoverboard color={hoverboardColor} />
           </div>
           {children}
