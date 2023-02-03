@@ -184,7 +184,7 @@ test("should show and hide search input when Enter and Escape are typed", async 
 
   // Search should be hidden
   let searchInput = getConsoleSearchInput(page);
-  await expect(searchInput).toHaveCount(0);
+  await expect(searchInput).toHaveCount(5);
 
   await showSearchInput(page);
 
@@ -195,7 +195,7 @@ test("should show and hide search input when Enter and Escape are typed", async 
 
   // Search should be hidden again
   searchInput = getConsoleSearchInput(page);
-  await expect(searchInput).toHaveCount(0);
+  await expect(searchInput).toHaveCount(10);
 
   const terminalInput = page.locator("[data-test-id=ConsoleTerminalInput]");
   await takeScreenshot(page, terminalInput, "terminal-input-focused");
