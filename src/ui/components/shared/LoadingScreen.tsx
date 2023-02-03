@@ -1,3 +1,4 @@
+import { Hoverboard } from "@replayio/overboard";
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
@@ -8,18 +9,29 @@ import { LoadingTips } from "./LoadingTips";
 import ReplayLogo from "./ReplayLogo";
 import { BubbleViewportWrapper } from "./Viewport";
 
+const colorOptions: Array<"blue" | "green" | "red"> = ["blue", "green", "red"];
+
 export function LoadingScreenTemplate({
   children,
-  showTips,
+  showTips = false,
 }: {
   children?: ReactNode;
   showTips?: boolean;
 }) {
+  const [hoverboardColor, setHoverboardColor] = useState(colorOptions[2]);
+
+  const handleHoverboardClick = () => {
+    const randomIndex = Math.floor(Math.random() * colorOptions.length);
+    setHoverboardColor(colorOptions[randomIndex]);
+  };
+
   return (
     <BubbleViewportWrapper>
       <div className="relative flex w-96 flex-col items-center space-y-1 rounded-lg bg-loadingBoxes p-8 py-12 shadow-sm">
         <div className="flex flex-col items-center space-y-8">
-          <ReplayLogo size="md" />
+          <div className="w-32" onClick={handleHoverboardClick}>
+            <Hoverboard color={hoverboardColor} />
+          </div>
           {children}
         </div>
       </div>
