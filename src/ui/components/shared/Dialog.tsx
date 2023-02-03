@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import React, { HTMLProps } from "react";
+import { useEffect, useState } from "react";
 
 import ReplayLogo from "./ReplayLogo";
 
@@ -68,8 +69,24 @@ export const DialogIllustration = ({
   className,
   ...props
 }: HTMLProps<HTMLHeadingElement>) => {
+  const [theme, setTheme] = useState("light");
+
+  useEffect(() => {
+    const handleMediaQueryChange = (e: MediaQueryListEvent) => {
+      setTheme(e.matches ? "dark" : "light");
+    };
+
+    const mql = window.matchMedia("(prefers-color-scheme: dark)");
+    mql.addListener(handleMediaQueryChange);
+    setTheme(mql.matches ? "dark" : "light");
+
+    return () => mql.removeListener(handleMediaQueryChange);
+  }, []);
+
   const randomNum = Math.floor(Math.random() * 3) + 1;
-  const imagePath = `/images/illustrations/ready${randomNum}.png`;
+  const imagePath = `/images/illustrations/${
+    theme === "light" ? "dark/" : "light/"
+  }ready${randomNum}.png`;
 
   return (
     <div>
