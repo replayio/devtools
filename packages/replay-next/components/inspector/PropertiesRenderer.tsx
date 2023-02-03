@@ -7,7 +7,7 @@ import {
   Property as ProtocolProperty,
 } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
-import { FC, Fragment, Suspense, useContext, useMemo } from "react";
+import { FC, Fragment, ReactNode, Suspense, useContext, useMemo } from "react";
 
 import Expandable from "replay-next/components/Expandable";
 import Loader from "replay-next/components/Loader";
@@ -28,9 +28,11 @@ const PROPERTY_BUCKET_SIZE = 100;
 // https://static.replay.io/protocol/tot/Pause/#type-Property
 export default function PropertiesRenderer({
   object,
+  path,
   pauseId,
 }: {
   object: ProtocolObject;
+  path?: string;
   pauseId: ProtocolPauseId;
 }) {
   const client = useContext(ReplayClientContext);
@@ -100,81 +102,99 @@ export default function PropertiesRenderer({
     }
   }
 
+  let renderedPrototype: ReactNode = null;
+  if (prototype != null) {
+    const prototypePath = addPathSegment(path, "[[Prototype]]");
+    renderedPrototype = (
+      <Expandable
+        children={<PropertiesRenderer object={prototype} path={prototypePath} pauseId={pauseId} />}
+        header={
+          <span className={styles.Prototype}>
+            <span className={styles.PrototypeName}>[[Prototype]]: </span>
+            {prototype.className}
+          </span>
+        }
+        persistenceKey={prototypePath}
+      />
+    );
+  }
+
   return (
     <>
       <EntriesRenderer containerEntries={containerEntries} pauseId={pauseId} />
 
-      {buckets.map((bucket, index) => (
-        <Expandable
-          key={`bucketed-properties-${index}`}
-          children={
-            <Suspense fallback={<Loader />}>
-              {bucket.properties.map((property, index) => (
-                <Fragment key={index}>
-                  {property.hasOwnProperty("get") && (
-                    <GetterRenderer
-                      parentObjectId={objectId}
+      {buckets.map((bucket, index) => {
+        const bucketPath = addPathSegment(path, bucket.header);
+        return (
+          <Expandable
+            key={`bucketed-properties-${index}`}
+            children={
+              <Suspense fallback={<Loader />}>
+                {bucket.properties.map((property, index) => (
+                  <Fragment key={index}>
+                    {property.hasOwnProperty("get") && (
+                      <GetterRenderer
+                        parentObjectId={objectId}
+                        path={addPathSegment(bucketPath, `get ${property.name}`)}
+                        pauseId={pauseId}
+                        protocolProperty={property}
+                      />
+                    )}
+                    <KeyValueRenderer
+                      context="default"
+                      layout="vertical"
+                      path={addPathSegment(bucketPath, property.name)}
                       pauseId={pauseId}
-                      protocolProperty={property}
+                      protocolValue={property}
                     />
-                  )}
-                  <KeyValueRenderer
-                    context="default"
-                    layout="vertical"
-                    pauseId={pauseId}
-                    protocolValue={property}
-                  />
-                </Fragment>
-              ))}
-            </Suspense>
-          }
-          header={<span className={styles.Bucket}>{bucket.header}</span>}
-        />
-      ))}
+                  </Fragment>
+                ))}
+              </Suspense>
+            }
+            header={<span className={styles.Bucket}>{bucket.header}</span>}
+            persistenceKey={bucketPath}
+          />
+        );
+      })}
 
       {buckets.length === 0 && (
         <Suspense fallback={<Loader />}>
-          {properties.map((property, index) => (
-            <Fragment key={index}>
-              {property.hasOwnProperty("get") && (
-                <GetterRenderer
-                  parentObjectId={objectId}
+          {properties.map((property, index) => {
+            return (
+              <Fragment key={index}>
+                {property.hasOwnProperty("get") && (
+                  <GetterRenderer
+                    parentObjectId={objectId}
+                    path={addPathSegment(path, `get ${property.name}`)}
+                    pauseId={pauseId}
+                    protocolProperty={property}
+                  />
+                )}
+                <KeyValueRenderer
+                  context="default"
+                  layout="vertical"
+                  path={addPathSegment(path, property.name)}
                   pauseId={pauseId}
-                  protocolProperty={property}
+                  protocolValue={property}
                 />
-              )}
-              <KeyValueRenderer
-                context="default"
-                layout="vertical"
-                pauseId={pauseId}
-                protocolValue={property}
-              />
-            </Fragment>
-          ))}
+              </Fragment>
+            );
+          })}
         </Suspense>
       )}
 
-      {prototype != null && (
-        <Expandable
-          children={<PropertiesRenderer object={prototype} pauseId={pauseId} />}
-          header={
-            <span className={styles.Prototype}>
-              <span className={styles.PrototypeName}>[[Prototype]]: </span>
-              {prototype !== null ? prototype.className : null}
-            </span>
-          }
-        />
-      )}
+      {renderedPrototype}
     </>
   );
 }
 
 type EntriesRendererProps = {
   containerEntries: ProtocolContainerEntry[];
+  path?: string;
   pauseId: PauseId;
 };
 
-function ContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
+function ContainerEntriesRenderer({ containerEntries, path, pauseId }: EntriesRendererProps) {
   if (containerEntries.length === 0) {
     return null;
   }
@@ -183,14 +203,23 @@ function ContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRenderer
     <Expandable
       defaultOpen={true}
       children={
-        <ContainerEntriesChildrenRenderer containerEntries={containerEntries} pauseId={pauseId} />
+        <ContainerEntriesChildrenRenderer
+          containerEntries={containerEntries}
+          path={path}
+          pauseId={pauseId}
+        />
       }
       header={<span className={styles.BucketLabel}>[[Entries]]</span>}
+      persistenceKey={path}
     />
   );
 }
 
-function ContainerEntriesChildrenRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
+function ContainerEntriesChildrenRenderer({
+  containerEntries,
+  path,
+  pauseId,
+}: EntriesRendererProps) {
   return (
     <Suspense fallback={<Loader />}>
       {containerEntries.map(({ key, value }, index) => (
@@ -199,6 +228,7 @@ function ContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entries
           context="nested"
           layout="vertical"
           pauseId={pauseId}
+          path={addPathSegment(path, `${key?.value ?? index}`)}
           protocolValue={value}
         />
       ))}
@@ -210,14 +240,99 @@ function ContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entries
 // Unlike the other property lists, Map entries are formatted like:
 //   ▼ <index>: {"<key>" -> <value>}
 //        key: "<key>"
-//        key: <value>
-function MapContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
+//        value: <value>
+function MapContainerEntriesRenderer({ containerEntries, path, pauseId }: EntriesRendererProps) {
   return (
     <Expandable
       defaultOpen={true}
       children={
         <MapContainerEntriesChildrenRenderer
           containerEntries={containerEntries}
+          path={path}
+          pauseId={pauseId}
+        />
+      }
+      header={<span className={styles.BucketLabel}>[[Entries]]</span>}
+      persistenceKey={path}
+    />
+  );
+}
+
+function MapContainerEntriesChildrenRenderer({
+  containerEntries,
+  path,
+  pauseId,
+}: EntriesRendererProps) {
+  if (containerEntries.length === 0) {
+    return <span className={styles.NoEntries}>No properties</span>;
+  }
+
+  return (
+    <Suspense fallback={<Loader />}>
+      {containerEntries.map(({ key, value }, index) => {
+        const entryPath = addPathSegment(path, `${key?.value ?? index}`);
+        return (
+          <Expandable
+            key={index}
+            children={
+              <>
+                <KeyValueRenderer
+                  before={
+                    <>
+                      <span className={styles.MapEntryPrefix}>key</span>
+                      <span className={styles.Separator}>: </span>
+                    </>
+                  }
+                  context="nested"
+                  layout="vertical"
+                  path={addPathSegment(entryPath, "key")}
+                  pauseId={pauseId}
+                  protocolValue={key!}
+                />
+                <KeyValueRenderer
+                  before={
+                    <>
+                      <span className={styles.MapEntryPrefix}>value</span>
+                      <span className={styles.Separator}>: </span>
+                    </>
+                  }
+                  context="nested"
+                  layout="vertical"
+                  path={addPathSegment(entryPath, "value")}
+                  pauseId={pauseId}
+                  protocolValue={value}
+                />
+              </>
+            }
+            header={
+              <>
+                <span className={styles.MapIndex}>{index}</span>: {"{"}
+                <ValueRenderer context="nested" pauseId={pauseId} protocolValue={key!} />
+                &nbsp;{"→"}&nbsp;
+                <ValueRenderer context="nested" pauseId={pauseId} protocolValue={value} />
+                {"}"}
+              </>
+            }
+            persistenceKey={entryPath}
+          />
+        );
+      })}
+    </Suspense>
+  );
+}
+
+// Set entries are a special case.
+// Unlike the other property lists, Set entries are formatted like:
+//   ▼ <index>: <value>
+//        key: <value>
+function SetContainerEntriesRenderer({ containerEntries, path, pauseId }: EntriesRendererProps) {
+  return (
+    <Expandable
+      defaultOpen={true}
+      children={
+        <SetContainerEntriesChildrenRenderer
+          containerEntries={containerEntries}
+          path={path}
           pauseId={pauseId}
         />
       }
@@ -226,30 +341,23 @@ function MapContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRende
   );
 }
 
-function MapContainerEntriesChildrenRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
+function SetContainerEntriesChildrenRenderer({
+  containerEntries,
+  path,
+  pauseId,
+}: EntriesRendererProps) {
   if (containerEntries.length === 0) {
     return <span className={styles.NoEntries}>No properties</span>;
   }
 
   return (
     <Suspense fallback={<Loader />}>
-      {containerEntries.map(({ key, value }, index) => (
-        <Expandable
-          key={index}
-          children={
-            <>
-              <KeyValueRenderer
-                before={
-                  <>
-                    <span className={styles.MapEntryPrefix}>key</span>
-                    <span className={styles.Separator}>: </span>
-                  </>
-                }
-                context="nested"
-                layout="vertical"
-                pauseId={pauseId}
-                protocolValue={key!}
-              />
+      {containerEntries.map(({ value }, index) => {
+        const entryPath = addPathSegment(path, `${index}`);
+        return (
+          <Expandable
+            key={index}
+            children={
               <KeyValueRenderer
                 before={
                   <>
@@ -259,78 +367,29 @@ function MapContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entr
                 }
                 context="nested"
                 layout="vertical"
+                path={entryPath}
                 pauseId={pauseId}
                 protocolValue={value}
               />
-            </>
-          }
-          header={
-            <>
-              <span className={styles.MapIndex}>{index}</span>: {"{"}
-              <ValueRenderer context="nested" pauseId={pauseId} protocolValue={key!} />
-              &nbsp;{"→"}&nbsp;
-              <ValueRenderer context="nested" pauseId={pauseId} protocolValue={value} />
-              {"}"}
-            </>
-          }
-        />
-      ))}
+            }
+            header={
+              <>
+                <span className={styles.MapIndex}>{index}</span>: {"{"}
+                <ValueRenderer context="nested" pauseId={pauseId} protocolValue={value} />
+                {"}"}
+              </>
+            }
+            persistenceKey={entryPath}
+          />
+        );
+      })}
     </Suspense>
   );
 }
 
-// Set entries are a special case.
-// Unlike the other property lists, Set entries are formatted like:
-//   ▼ <index>: <value>
-//        key: <value>
-function SetContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
-  return (
-    <Expandable
-      defaultOpen={true}
-      children={
-        <SetContainerEntriesChildrenRenderer
-          containerEntries={containerEntries}
-          pauseId={pauseId}
-        />
-      }
-      header={<span className={styles.BucketLabel}>[[Entries]]</span>}
-    />
-  );
-}
-
-function SetContainerEntriesChildrenRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
-  if (containerEntries.length === 0) {
-    return <span className={styles.NoEntries}>No properties</span>;
+export function addPathSegment(path: string | undefined, segment: string): string | undefined {
+  if (path === undefined) {
+    return undefined;
   }
-
-  return (
-    <Suspense fallback={<Loader />}>
-      {containerEntries.map(({ value }, index) => (
-        <Expandable
-          key={index}
-          children={
-            <KeyValueRenderer
-              before={
-                <>
-                  <span className={styles.MapEntryPrefix}>value</span>
-                  <span className={styles.Separator}>: </span>
-                </>
-              }
-              context="nested"
-              layout="vertical"
-              pauseId={pauseId}
-              protocolValue={value}
-            />
-          }
-          header={
-            <>
-              <span className={styles.MapIndex}>{index}</span>: {"{"}
-              <ValueRenderer context="nested" pauseId={pauseId} protocolValue={value} />
-              {"}"}
-            </>
-          }
-        />
-      ))}
-    </Suspense>
-  );
+  return `${path}/${segment}`;
 }

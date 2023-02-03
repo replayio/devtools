@@ -20,6 +20,7 @@ export type Props = {
   expandByDefault?: boolean;
   layout?: "horizontal" | "vertical";
   onContextMenu?: (event: MouseEvent) => void;
+  path?: string;
   pauseId: PauseId;
   protocolValue: ProtocolValue;
 };
@@ -40,6 +41,7 @@ export default function KeyValueRenderer({
   expandByDefault = false,
   layout = "horizontal",
   onContextMenu,
+  path,
   pauseId,
   protocolValue,
 }: Props) {
@@ -100,6 +102,7 @@ export default function KeyValueRenderer({
                   }
                   defaultOpen={expandByDefault}
                   object={objectWithPreview!}
+                  path={path}
                   pauseId={pauseId}
                   protocolValue={protocolValue}
                 />
@@ -173,12 +176,13 @@ export default function KeyValueRenderer({
       <Expandable
         children={
           <Suspense fallback={<Loader />}>
-            <PropertiesRenderer object={objectWithPreview!} pauseId={pauseId} />
+            <PropertiesRenderer object={objectWithPreview!} path={path} pauseId={pauseId} />
           </Suspense>
         }
         defaultOpen={expandByDefault}
         header={header}
         onChange={setIsExpanded}
+        persistenceKey={path}
       />
     );
   } else {

@@ -1,20 +1,23 @@
-import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
+import { NamedValue, PauseId } from "@replayio/protocol";
 import { Suspense } from "react";
 
 import Expandable from "replay-next/components/Expandable";
 import Loader from "replay-next/components/Loader";
 
 import Inspector from "./Inspector";
+import { addPathSegment } from "./PropertiesRenderer";
 import styles from "./ScopesInspector.module.css";
 
 export default function ScopesInspector({
   name,
+  path,
   pauseId,
   protocolValues,
 }: {
   name: string;
+  path?: string;
   pauseId: PauseId;
-  protocolValues: ProtocolValue[];
+  protocolValues: NamedValue[];
 }) {
   return (
     <div className={styles.ScopesInspector} data-test-name="ScopesInspector">
@@ -25,11 +28,13 @@ export default function ScopesInspector({
             <Inspector
               context="default"
               key={index}
+              path={addPathSegment(path, protocolValue.name)}
               pauseId={pauseId}
               protocolValue={protocolValue}
             />
           ))}
           header={name}
+          persistenceKey={path}
         />
       </Suspense>
     </div>

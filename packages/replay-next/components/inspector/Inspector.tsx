@@ -11,12 +11,14 @@ export default function Inspector({
   className,
   context,
   expandByDefault,
+  path,
   pauseId,
   protocolValue,
 }: {
   className?: string;
   context: "console" | "default";
   expandByDefault?: boolean;
+  path?: string;
   pauseId: PauseId;
   protocolValue: ProtocolValue | ProtocolNamedValue;
 }) {
@@ -25,6 +27,7 @@ export default function Inspector({
       context={context}
       expandByDefault={expandByDefault}
       layout="horizontal"
+      path={path}
       pauseId={pauseId}
       protocolValue={protocolValue}
     />

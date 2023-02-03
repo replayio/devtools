@@ -37,8 +37,8 @@ test(`object_preview-03: Test previews when switching between frames and steppin
   const blockScope = getScopeChildren(page, "Block");
 
   await toggleExpandable(page, { scope: blockScope, text: "barobj" });
-  await waitForScopeValue(page, "barprop1", 2);
-  await waitForScopeValue(page, "barprop2", 3);
+  await waitForScopeValue(page, "barprop1", 2, false);
+  await waitForScopeValue(page, "barprop2", 3, false);
 
   await waitForFrameTimeline(page, target == "gecko" ? "42%" : "75%");
 
@@ -46,21 +46,17 @@ test(`object_preview-03: Test previews when switching between frames and steppin
   await selectFrame(page, 1);
   await expandAllScopesBlocks(page);
   await toggleExpandable(page, { scope: blockScope, text: "fooobj" });
-  await waitForScopeValue(page, "fooprop1", 0);
-  await waitForScopeValue(page, "fooprop2", 1);
+  await waitForScopeValue(page, "fooprop1", 0, false);
+  await waitForScopeValue(page, "fooprop2", 1, false);
 
   await selectFrame(page, 0);
   await stepOverToLine(page, 18);
   await waitForFrameTimeline(page, target == "gecko" ? "71%" : "100%");
-  await expandAllScopesBlocks(page);
-  await toggleExpandable(page, { scope: blockScope, text: "barobj" });
-  await waitForScopeValue(page, "barprop1", '"updated"');
-  await waitForScopeValue(page, "barprop2", 3);
+  await waitForScopeValue(page, "barprop1", '"updated"', false);
+  await waitForScopeValue(page, "barprop2", 3, false);
 
   await reverseStepOverToLine(page, 17);
-  await expandAllScopesBlocks(page);
-  await toggleExpandable(page, { scope: blockScope, text: "barobj" });
-  await waitForScopeValue(page, "barprop1", "2");
+  await waitForScopeValue(page, "barprop1", "2", false);
 
   await stepInToLine(page, 21);
   await stepOverToLine(page, 22);
