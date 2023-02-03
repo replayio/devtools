@@ -1,4 +1,4 @@
-import { Hoverboard } from "@replayio/overboard";
+import dynamic from "next/dynamic";
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
@@ -6,10 +6,13 @@ import { getAwaitingSourcemaps, getLoadingFinished, getUploading } from "ui/redu
 import { UIState } from "ui/state";
 
 import { LoadingTips } from "./LoadingTips";
-import ReplayLogo from "./ReplayLogo";
 import { BubbleViewportWrapper } from "./Viewport";
 
 const colorOptions: Array<"blue" | "green" | "red"> = ["blue", "green", "red"];
+
+const Hoverboard = dynamic(() => import("@replayio/overboard").then(m => m.Hoverboard), {
+  ssr: false,
+});
 
 export function LoadingScreenTemplate({
   children,
