@@ -13,7 +13,7 @@ const colorOptions: Array<"blue" | "green" | "red"> = ["blue", "green", "red"];
 
 export function LoadingScreenTemplate({
   children,
-  showTips = false,
+  showTips = true,
 }: {
   children?: ReactNode;
   showTips?: boolean;
