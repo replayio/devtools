@@ -23,9 +23,6 @@ export const {
     graphQLClient: GraphQLClientInterface,
     recordingId: RecordingId,
     accessToken: string | null
-  ) => {
-    const points = await getPointsGraphQL(graphQLClient, recordingId, accessToken);
-    return points;
-  },
+  ) => await getPointsGraphQL(graphQLClient, recordingId, accessToken),
   (recordingId: RecordingId, _accessToken: string | null) => recordingId
 );
