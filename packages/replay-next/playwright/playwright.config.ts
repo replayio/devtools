@@ -1,4 +1,5 @@
-import { FullConfig } from "@playwright/test";
+import { PlaywrightTestConfig, devices } from "@playwright/test";
+import { devices as replayDevices } from "@replayio/playwright";
 
 const { CI, RECORD_PROTOCOL_DATA, RECORD_VIDEO, SLOW_MO, VISUAL_DEBUG } = process.env;
 
@@ -11,9 +12,8 @@ if (SLOW_MO) {
   slowMo = 100;
 }
 
-const config: FullConfig = {
+const config: PlaywrightTestConfig = {
   forbidOnly: !!CI,
-  globalSetup: require.resolve("./playwright.globalSetup"),
   // @ts-ignore
   reporter: CI ? "github" : "list",
   retries: RECORD_VIDEO || VISUAL_DEBUG ? 0 : 2,
@@ -33,6 +33,20 @@ const config: FullConfig = {
   testDir: __dirname,
   testMatch: ["tests/**/*.ts"],
   timeout: 30_000,
+  projects: [
+    // {
+    //   name: "chromium",
+    //   use: { ...devices["Desktop Chromium"] },
+    // },
+    {
+      name: "replay-chromium",
+      use: { ...replayDevices["Replay Chromium"] as any },
+    },
+    // {
+    //   name: "replay-firefox",
+    //   use: { ...replayDevices["Replay Firefox"] as any },
+    // },
+  ]
 };
 
 if (VISUAL_DEBUG || RECORD_PROTOCOL_DATA) {

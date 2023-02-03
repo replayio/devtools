@@ -55,7 +55,7 @@ jobs:
       - name: Run playwright tests
         run: yarn visuals
         working-directory: packages/replay-next/playwright  
-      - name: Upload results
-        if: always()
-        run: ./uploadSnapshots.js
-        working-directory: packages/replay-next
+      # - name: Upload results
+      #   if: always()
+      #   run: ./uploadSnapshots.js
+      #   working-directory: packages/replay-next

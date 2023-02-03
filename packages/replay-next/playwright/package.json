@@ -3,6 +3,7 @@
   "packageManager": "yarn@3.2.1",
   "devDependencies": {
     "@playwright/test": "^1.25.1",
+    "@replayio/playwright": "^0.3.17",
     "chalk": "^4",
     "playwright": "^1.25.1"
   },
