@@ -8,6 +8,7 @@ import { AnnotatedTestStep } from "shared/graphql/types";
 import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getStepRanges, useStepState } from "ui/hooks/useStepState";
+import { useTestInfo } from "ui/hooks/useTestInfo";
 import { useTestStepActions } from "ui/hooks/useTestStepActions";
 import { getViewMode } from "ui/reducers/layout";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
@@ -80,6 +81,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const client = useContext(ReplayClientContext);
   const state = useStepState(step);
   const actions = useTestStepActions(step);
+  const info = useTestInfo();
 
   useEffect(() => {
     setSubjectNodePauseData(getCypressSubjectNodeIdsAsync(client, step));
@@ -178,12 +180,13 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const displayedProgress =
     (step.duration === 1 && state === "paused") || progress == 100 ? 0 : progress;
   const isSelected = selectedStep?.id === id;
+  const error = !!(step.error || info.getStepAsserts(step).some(s => !!s.error));
 
   return (
     <TestStepRow
       active={state === "paused"}
       pending={state === "pending"}
-      error={!!step.error}
+      error={error}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       ref={ref}
