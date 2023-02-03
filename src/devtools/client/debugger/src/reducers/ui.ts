@@ -28,8 +28,6 @@ export interface UISliceState {
   fullTextSearchQuery: string;
   fullTextSearchFocus: boolean;
   shownSource?: SourceDetails | null;
-  startPanelCollapsed: boolean;
-  endPanelCollapsed: boolean;
   sourcesCollapsed: boolean;
   frameworkGroupingOn: boolean;
   viewport?: Range | null;
@@ -43,8 +41,6 @@ export const createUIState = (): UISliceState => ({
   fullTextSearchQuery: "",
   fullTextSearchFocus: false,
   shownSource: null,
-  startPanelCollapsed: prefs.startPanelCollapsed as boolean,
-  endPanelCollapsed: prefs.endPanelCollapsed as boolean,
   sourcesCollapsed: prefs.sourcesCollapsed as boolean,
   frameworkGroupingOn: prefs.frameworkGroupingOn as boolean,
   highlightedLineRange: undefined,
@@ -64,9 +60,6 @@ const uiSlice = createSlice({
     },
     setShownSource(state, action: PayloadAction<SourceDetails | null>) {
       state.shownSource = action.payload;
-    },
-    toggleStartPanel(state) {
-      state.startPanelCollapsed = !state.startPanelCollapsed;
     },
     toggleSources(state) {
       state.sourcesCollapsed = !state.sourcesCollapsed;
@@ -110,18 +103,13 @@ const uiSlice = createSlice({
     // Here: pause info panel is open, sources are open
     // Layout reducer: selected primary panel is "explorer"
     sourcesDisplayed(state) {
-      state.startPanelCollapsed = false;
       state.sourcesCollapsed = false;
     },
   },
   extraReducers: builder => {
-    builder
-      .addCase("set_selected_primary_panel", state => {
-        state.startPanelCollapsed = false;
-      })
-      .addCase(closeQuickOpen, state => {
-        state.highlightedLineRange = {};
-      });
+    builder.addCase(closeQuickOpen, state => {
+      state.highlightedLineRange = {};
+    });
   },
 });
 
@@ -139,7 +127,6 @@ export const {
   sourcesPanelExpanded,
   toggleActiveSearch,
   toggleFrameworkGrouping,
-  toggleStartPanel,
   toggleSources,
 } = uiSlice.actions;
 
@@ -153,7 +140,6 @@ export const getSelectedPrimaryPaneTab = (state: UIState) => state.ui.selectedPr
 export const getActiveSearch = (state: UIState) => state.ui.activeSearch;
 export const getFrameworkGroupingState = (state: UIState) => state.ui.frameworkGroupingOn;
 export const getShownSource = (state: UIState) => state.ui.shownSource;
-export const getPaneCollapse = (state: UIState) => state.ui.startPanelCollapsed;
 export const getSourcesCollapsed = (state: UIState) => state.ui.sourcesCollapsed;
 export const getHighlightedLineRange = (state: UIState) => state.ui.highlightedLineRange;
 export const getViewport = (state: UIState) => state.ui.viewport;

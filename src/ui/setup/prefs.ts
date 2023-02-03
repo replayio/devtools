@@ -73,13 +73,6 @@ export const updatePrefs = (state: UIState, oldState: UIState) => {
       state => state.ui.frameworkGroupingOn
     );
 
-    updateDebuggerPrefs(
-      state,
-      oldState,
-      "startPanelCollapsed",
-      state => state.ui.startPanelCollapsed
-    );
-
     updateDebuggerPrefs(state, oldState, "sourcesCollapsed", state => state.ui.sourcesCollapsed);
 
     updateDebuggerPrefs(

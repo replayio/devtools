@@ -48,7 +48,6 @@ function KeyboardShortcuts({
   setViewMode,
   toggleCommandPalette,
   toggleFocusMode,
-  togglePaneCollapse,
   viewMode,
   toggleThemeAction,
   toggleQuickOpen,
@@ -80,13 +79,6 @@ function KeyboardShortcuts({
 
     const toggleFunctionQuickOpenModal = (e: KeyboardEvent) => {
       toggleQuickOpenModal(e, "@");
-    };
-
-    const toggleLeftSidebar = (e: KeyboardEvent) => {
-      e.preventDefault();
-
-      trackEvent("key_shortcut.toggle_left_sidebar");
-      togglePaneCollapse();
     };
 
     const togglePalette = (e: KeyboardEvent) => {
@@ -146,7 +138,6 @@ function KeyboardShortcuts({
 
     const shortcuts: Record<string, (e: KeyboardEvent) => void> = {
       "CmdOrCtrl+Shift+F": openFullTextSearch,
-      "CmdOrCtrl+B": toggleLeftSidebar,
       "CmdOrCtrl+K": togglePalette,
 
       // Should be ignored when an editable element is focused
@@ -176,7 +167,6 @@ function KeyboardShortcuts({
     setViewMode,
     toggleCommandPalette,
     toggleFocusMode,
-    togglePaneCollapse,
     updateProtocolTimeline,
     viewMode,
     toggleThemeAction,
@@ -211,7 +201,6 @@ const connector = connect(
     focusFullTextInput: dbgActions.focusFullTextInput,
     setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
     setViewMode: actions.setViewMode,
-    togglePaneCollapse: actions.togglePaneCollapse,
     toggleCommandPalette: actions.toggleCommandPalette,
     toggleFocusMode: actions.toggleFocusMode,
     toggleThemeAction: actions.toggleTheme,
