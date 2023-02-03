@@ -1,4 +1,4 @@
-import { FullConfig } from "@playwright/test";
+import { PlaywrightTestConfig } from "@playwright/test";
 
 const { CI, RECORD_PROTOCOL_DATA, RECORD_VIDEO, SLOW_MO, VISUAL_DEBUG } = process.env;
 
@@ -11,9 +11,8 @@ if (SLOW_MO) {
   slowMo = 100;
 }
 
-const config: FullConfig = {
+const config: PlaywrightTestConfig = {
   forbidOnly: !!CI,
-  globalSetup: require.resolve("./playwright.globalSetup"),
   // @ts-ignore
   reporter: CI ? "github" : "list",
   retries: RECORD_VIDEO || VISUAL_DEBUG ? 0 : 2,
