@@ -9,6 +9,7 @@ import {
 
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import { ThreadFront } from "protocol/thread";
+import { ExpandablesContextRoot } from "replay-next/src/contexts/ExpandablesContext";
 import { PointsContextRoot } from "replay-next/src/contexts/PointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
 import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
@@ -226,12 +227,14 @@ function _DevTools({
               <SelectedFrameContextRoot SelectedFrameContextAdapter={SelectedFrameContextAdapter}>
                 <TerminalContextAdapter>
                   <InspectorContextReduxAdapter>
-                    <KeyModifiers>
-                      <Header />
-                      <Body />
-                      {showCommandPalette ? <CommandPaletteModal /> : null}
-                      <KeyboardShortcuts />
-                    </KeyModifiers>
+                    <ExpandablesContextRoot>
+                      <KeyModifiers>
+                        <Header />
+                        <Body />
+                        {showCommandPalette ? <CommandPaletteModal /> : null}
+                        <KeyboardShortcuts />
+                      </KeyModifiers>
+                    </ExpandablesContextRoot>
                   </InspectorContextReduxAdapter>
                 </TerminalContextAdapter>
               </SelectedFrameContextRoot>
