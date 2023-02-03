@@ -41,6 +41,7 @@
     "@lexical/mark": "^0.6.5",
     "@lexical/react": "^0.6.5",
     "@reduxjs/toolkit": "^1.8.4",
+    "@replayio/overboard": "^0.4.1",
     "@replayio/protocol": "0.37.0",
     "@sentry/react": "^7.9.0",
     "@sentry/tracing": "^7.9.0",
