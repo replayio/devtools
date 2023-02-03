@@ -42,7 +42,7 @@ test.beforeEach(async ({ page }) => {
   page.setDefaultTimeout(5000);
 });
 
-test.only("should display list of messages", async ({ page }) => {
+test("should display list of messages", async ({ page }) => {
   await setup(page, true);
 
   const list = page.locator("[data-test-name=Messages]");
