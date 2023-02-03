@@ -13,6 +13,7 @@ env:
   FORCE_COLOR: 1
   FLAKINESS_CONNECTION_STRING: ${{ secrets.FLAKINESS_CONNECTION_STRING }}
   DEBUG: pw:api
+  RECORD_REPLAY_API_KEY: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
 
 jobs:
   run_tests:
@@ -60,3 +61,8 @@ jobs:
       #   if: always()
       #   run: ./uploadSnapshots.js
       #   working-directory: packages/replay-next
+      - name: Upload replays
+        if: always()
+        uses: replayio/action-upload@v0.4.7
+        with:
+          api-key: ${{ env.RECORD_REPLAY_API_KEY }}
