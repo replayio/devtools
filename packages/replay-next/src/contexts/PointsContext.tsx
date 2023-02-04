@@ -104,7 +104,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       insert<Point>(mergedPoints, point, comparePoints);
     });
     remotePoints?.forEach(point => {
-      if (currentUserId && currentUserId === point.createdByUserId) {
+      if (currentUserId && currentUserId === point.createdByUser?.id) {
         return;
       }
 
@@ -139,7 +139,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
         badge: null,
         content: "",
         condition: null,
-        createdByUserId: currentUserInfo?.id ?? null,
+        createdByUser: currentUserInfo,
         createdAtTime: Date.now(),
         recordingId,
         shouldBreak: POINT_BEHAVIOR_DISABLED,

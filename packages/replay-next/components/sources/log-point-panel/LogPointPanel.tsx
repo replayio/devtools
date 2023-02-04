@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import { assert } from "protocol/utils";
+import AvatarImage from "replay-next/components/AvatarImage";
 import Icon from "replay-next/components/Icon";
 import CodeEditor from "replay-next/components/lexical/CodeEditor";
 import {
@@ -34,6 +35,7 @@ import {
   HitPointStatus,
   POINT_BEHAVIOR_DISABLED_TEMPORARILY,
   POINT_BEHAVIOR_ENABLED,
+  PartialUser,
   Point,
 } from "shared/client/types";
 import { addComment as addCommentGraphQL } from "shared/graphql/Comments";
@@ -118,8 +120,10 @@ function PointPanelWithHitPoints({
   const { showCommentsPanel } = useContext(InspectorContext);
   const { editPoint } = useContext(PointsContext);
   const client = useContext(ReplayClientContext);
-  const { accessToken, recordingId, trackEvent } = useContext(SessionContext);
+  const { accessToken, currentUserInfo, recordingId, trackEvent } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: currentTime } = useContext(TimelineContext);
+
+  const editable = point.createdByUser?.id === currentUserInfo?.id;
 
   const [showEditBreakpointNag, dismissEditBreakpointNag] = useNag(Nag.FIRST_BREAKPOINT_EDIT);
 
@@ -193,6 +197,10 @@ function PointPanelWithHitPoints({
   const lineIndex = point.location.line - 1;
 
   const toggleCondition = () => {
+    if (!editable) {
+      return;
+    }
+
     if (hasCondition) {
       if (isEditing) {
         setEditableCondition(null);
@@ -226,7 +234,7 @@ function PointPanelWithHitPoints({
   }
 
   const startEditing = (editReason: EditReason | null = null) => {
-    if (isEditing) {
+    if (isEditing || !editable) {
       return;
     }
 
@@ -324,8 +332,10 @@ function PointPanelWithHitPoints({
           <div className={styles.EditableContentWrapperRow}>
             <div
               className={isConditionValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}
-              data-logging-disabled={!shouldLog || undefined}
-              onClick={showTooManyPointsMessage ? undefined : () => startEditing("condition")}
+              data-logging-disabled={!shouldLog || !editable || undefined}
+              onClick={
+                showTooManyPointsMessage && editable ? undefined : () => startEditing("condition")
+              }
             >
               <div
                 className={styles.ConditionalIconWrapper}
@@ -348,7 +358,7 @@ function PointPanelWithHitPoints({
                       context={context}
                       dataTestId={`PointPanel-ConditionInput-${lineNumber}`}
                       dataTestName="PointPanel-ConditionInput"
-                      editable={true}
+                      editable={editable}
                       initialValue={editableCondition || ""}
                       onCancel={onCancel}
                       onChange={onEditableConditionChange}
@@ -395,10 +405,12 @@ function PointPanelWithHitPoints({
         ) : (
           <div
             className={isContentValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}
-            data-logging-disabled={!shouldLog || undefined}
-            onClick={showTooManyPointsMessage ? undefined : () => startEditing("content")}
+            data-logging-disabled={!shouldLog || !editable || undefined}
+            onClick={
+              showTooManyPointsMessage && editable ? undefined : () => startEditing("content")
+            }
           >
-            <BadgePicker invalid={!isContentValid} point={point} />
+            <BadgePicker disabled={!editable} invalid={!isContentValid} point={point} />
 
             {isEditing ? (
               <div className={styles.Content}>
@@ -414,7 +426,7 @@ function PointPanelWithHitPoints({
                     context={context}
                     dataTestId={`PointPanel-ContentInput-${lineNumber}`}
                     dataTestName="PointPanel-ContentInput"
-                    editable={true}
+                    editable={editable}
                     initialValue={editableContent}
                     onCancel={onCancel}
                     onChange={onEditableContentChange}
@@ -428,16 +440,26 @@ function PointPanelWithHitPoints({
                 <div className={styles.Content}>
                   <SyntaxHighlightedLine code={point.content} />
                 </div>
-                <button
-                  className={styles.EditButton}
-                  disabled={isPending}
-                  data-test-name="PointPanel-EditButton"
-                >
-                  <Icon
-                    className={styles.EditButtonIcon}
-                    type={shouldLog ? "edit" : "toggle-off"}
-                  />
-                </button>
+                {editable ? (
+                  <button
+                    className={styles.EditButton}
+                    disabled={isPending}
+                    data-test-name="PointPanel-EditButton"
+                  >
+                    <Icon
+                      className={styles.EditButtonIcon}
+                      type={shouldLog ? "edit" : "toggle-off"}
+                    />
+                  </button>
+                ) : (
+                  <div className={styles.DisabledIconAndAvatar}>
+                    <Icon className={styles.EditButtonIcon} type="toggle-off" />
+                    <AvatarImage
+                      className={styles.CreatedByAvatar}
+                      src={point.createdByUser?.picture || undefined}
+                    />
+                  </div>
+                )}
               </>
             )}
           </div>

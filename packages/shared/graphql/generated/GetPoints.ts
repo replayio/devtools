@@ -10,6 +10,8 @@
 export interface GetPoints_recording_points_user {
   __typename: "User";
   id: string;
+  name: string | null;
+  picture: string | null;
 }
 
 export interface GetPoints_recording_points {

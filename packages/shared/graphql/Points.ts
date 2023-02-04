@@ -35,6 +35,8 @@ export const GET_POINTS_QUERY = gql`
         id
         user {
           id
+          name
+          picture
         }
         badge
         condition
@@ -61,7 +63,7 @@ export async function addPoint(
   accessToken: string,
   point: ClientPoint
 ) {
-  const { createdAtTime, createdByUserId, ...rest } = point;
+  const { createdAtTime, createdByUser, ...rest } = point;
   const input: AddPointInput = {
     createdAt: new Date(createdAtTime).toISOString(),
     ...rest,
@@ -116,7 +118,7 @@ export async function getPoints(
         badge: point.badge as Badge,
         condition: point.condition,
         content: point.content!,
-        createdByUserId: point.user?.id!,
+        createdByUser: point.user,
         createdAtTime: new Date(point.createdAt).getTime(),
         id: point.id,
         location: point.location as Location,
@@ -133,7 +135,7 @@ export async function updatePoint(
   accessToken: string,
   point: ClientPoint
 ) {
-  const { createdAtTime, createdByUserId, location, recordingId, ...input } = point;
+  const { createdAtTime, createdByUser, location, recordingId, ...input } = point;
 
   await graphQLClient.send<GetPoints>(
     {

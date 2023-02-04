@@ -10,7 +10,15 @@ import styles from "./BadgePicker.module.css";
 // Three states prevents close animation from being shown on mount.
 type State = "initial" | "open" | "closed";
 
-export default function BadgePicker({ invalid, point }: { invalid: boolean; point: Point }) {
+export default function BadgePicker({
+  disabled,
+  invalid,
+  point,
+}: {
+  disabled: boolean;
+  invalid: boolean;
+  point: Point;
+}) {
   const { editPoint } = useContext(PointsContext);
 
   const [state, setState] = useState<State>("initial");
@@ -39,6 +47,7 @@ export default function BadgePicker({ invalid, point }: { invalid: boolean; poin
         className={styles.BadgePickerButton}
         data-test-name={isOpen ? "BadgeButtonButton-default" : "BadgePickerButton"}
         data-test-state={point.badge || "default"}
+        disabled={disabled}
         onClick={onClick}
       >
         {isOpen ? (

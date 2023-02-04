@@ -232,3 +232,16 @@
   height: 1rem;
   width: 1rem;
 }
+
+.DisabledIconAndAvatar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--point-panel-input-edit-button-color);
+}
+
+.CreatedByAvatar {
+  height: 1rem;
+  width: 1rem;
+  border-radius: 1rem;
+}

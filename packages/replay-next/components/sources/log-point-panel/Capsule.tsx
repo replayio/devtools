@@ -10,6 +10,7 @@ import styles from "./Capsule.module.css";
 export default function Capsule({
   currentHitPoint,
   currentHitPointIndex,
+  editable,
   hasConditional,
   hitPoints,
   hitPointStatus,
@@ -20,6 +21,7 @@ export default function Capsule({
 }: {
   currentHitPoint: TimeStampedPoint | null;
   currentHitPointIndex: number | null;
+  editable: boolean;
   hasConditional: boolean;
   hitPoints: TimeStampedPoint[];
   hitPointStatus: HitPointStatus;
@@ -30,6 +32,7 @@ export default function Capsule({
 }) {
   const { contextMenu, onContextMenu } = useLogPointPanelContextMenu({
     currentHitPoint,
+    editable,
     hasConditional,
     lineNumber: point.location.line,
     shouldLog,

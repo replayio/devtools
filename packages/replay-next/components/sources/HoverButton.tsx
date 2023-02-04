@@ -52,10 +52,14 @@ export default function HoverButton({
   const { isMetaKeyActive, isShiftKeyActive } = useContext(KeyboardModifiersContext);
   const client = useContext(ReplayClientContext);
   const { executionPoint, update } = useContext(TimelineContext);
+  const { currentUserInfo } = useContext(SessionContext);
   const { findClosestFunctionName } = useContext(SourcesContext);
-  const { trackEvent } = useContext(SessionContext);
 
   const [showNag, dismissNag] = useNag(Nag.FIRST_BREAKPOINT_ADD);
+
+  if (point?.createdByUser && point.createdByUser.id !== currentUserInfo?.id) {
+    return null;
+  }
 
   if (isMetaKeyActive) {
     if (lineHitCounts === null) {
