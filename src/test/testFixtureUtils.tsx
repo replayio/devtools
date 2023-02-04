@@ -64,7 +64,7 @@ export async function loadFixtureData(
 
   // This is necessary to unblock various event listeners and parsing.
   // Actual session ID value _probably_ doesn't matter here.
-  await ThreadFront.setSessionId(sessionId);
+  await ThreadFront.setSessionId(sessionId, {});
 
   // Initialize state using exported websocket messages,
   // sent through the mock environment straight to socket parsing.

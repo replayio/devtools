@@ -43,6 +43,7 @@ import {
 } from "replay-next/src/suspense/PauseCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
+import type { Features } from "ui/utils/prefs";
 
 import { MappedLocationCache } from "../mapped-location-cache";
 import { client } from "../socket";
@@ -236,7 +237,7 @@ class _ThreadFront {
     );
   }
 
-  async setSessionId(sessionId: SessionId) {
+  async setSessionId(sessionId: SessionId, features: Partial<Features>) {
     this.sessionId = sessionId;
     assert(sessionId, "there should be a sessionId");
     this.sessionWaiter.resolve(sessionId);
@@ -254,7 +255,7 @@ class _ThreadFront {
           supportsEagerEvaluation: false,
           supportsEventTypes: false,
           supportsNetworkRequests: false,
-          supportsRepaintingGraphics: true,
+          supportsRepaintingGraphics: features.chromiumRepaints ?? false,
           supportsPureEvaluation: false,
         };
 
@@ -486,7 +487,7 @@ class _ThreadFront {
 
   // Same as evaluate, but returns the result without wrapping a ValueFront around them.
   // TODO Replace usages of evaluate with this.
-  async evaluateNew({
+  async evaluate({
     replayClient,
     pauseId,
     text,

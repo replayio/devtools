@@ -114,7 +114,7 @@ async function evaluateNoArgsFunction(
   pauseId?: string,
   frameId?: string
 ) {
-  return await ThreadFront.evaluateNew({
+  return await ThreadFront.evaluate({
     replayClient,
     text: `(${fn})()`,
     pauseId,
@@ -187,7 +187,7 @@ export const { getValueAsync: getDiffAsync } = createGenericCache<
 
     const jsondiffpatchSource = require("./jsondiffpatch.umd.slim.raw.js").default;
 
-    await ThreadFront.evaluateNew({
+    await ThreadFront.evaluate({
       replayClient,
       pauseId,
       text: jsondiffpatchSource,

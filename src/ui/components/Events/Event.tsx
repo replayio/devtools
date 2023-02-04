@@ -1,46 +1,32 @@
 import {
   ExecutionPoint,
-  Location,
-  Node,
-  Object as ProtocolObject,
   KeyboardEvent as ReplayKeyboardEvent,
   MouseEvent as ReplayMouseEvent,
-  Value,
 } from "@replayio/protocol";
 import classNames from "classnames";
-import React, { KeyboardEvent, MouseEvent, ReactNode } from "react";
+import React, { ReactNode } from "react";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
+import { getFunctionBody } from "protocol/evaluation-utils";
 import type { ThreadFront as TF } from "protocol/thread";
 import { RecordingTarget } from "protocol/thread/thread";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
-import { MAPPER as EVENTS_MAPPER, EventLog } from "replay-next/src/suspense/EventsCache";
-import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
-import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
+import { EventLog, eventsMapper } from "replay-next/src/suspense/EventsCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import type { UIThunkAction } from "ui/actions";
-import {
-  FunctionWithPreview,
-  REACT_16_EVENT_LISTENER_PROP_KEY,
-  REACT_17_18_EVENT_LISTENER_PROP_KEY,
-  formatEventListener,
-} from "ui/actions/event-listeners";
+import { SEARCHABLE_EVENT_TYPES, getEventListenerLocationAsync } from "ui/actions/event-listeners";
 import useEventContextMenu from "ui/components/Events/useEventContextMenu";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getViewMode } from "ui/reducers/layout";
-import { SourceDetails, getPreferredLocation, getSourceDetailsEntities } from "ui/reducers/sources";
 import { useAppDispatch } from "ui/setup/hooks";
-import { UIState } from "ui/state";
 import { ReplayEvent } from "ui/state/app";
 import { getFormattedTime } from "ui/utils/timeline";
 
 import MaterialIcon from "../shared/MaterialIcon";
 import { getReplayEvent } from "./eventKinds";
-
-type SEARCHABLE_EVENT_TYPES = "mousedown" | "keypress";
 
 const EVENTS_FOR_RECORDING_TARGET: Partial<
   Record<RecordingTarget, Record<SEARCHABLE_EVENT_TYPES, string>>
@@ -52,30 +38,6 @@ const EVENTS_FOR_RECORDING_TARGET: Partial<
   // TODO [FE-1178] Fill in Chromium event types here?
   // chromium: {},
 };
-
-const REACT_EVENT_PROPS: Record<SEARCHABLE_EVENT_TYPES, string[]> = {
-  mousedown: ["onClick"],
-  // Users may have added `onChange` to an <input>, or `onkeyPress` to other elements
-  keypress: ["onChange", "onKeyPress"],
-};
-
-const EVENT_CLASS_FOR_EVENT_TYPE: Record<SEARCHABLE_EVENT_TYPES, string> = {
-  mousedown: "MouseEvent",
-  keypress: "InputEvent",
-};
-
-const IGNORABLE_PARTIAL_SOURCE_URLS = [
-  // Don't jump into React internals
-  "react-dom",
-  // or CodeSandbox
-  "webpack:///src/sandbox/",
-];
-
-function shouldIgnoreEventFromSource(sourceDetails?: SourceDetails) {
-  const url = sourceDetails?.url ?? "";
-
-  return IGNORABLE_PARTIAL_SOURCE_URLS.some(partialUrl => url.includes(partialUrl));
-}
 
 const { getValueAsync: getNextInteractionEventAsync } = createGenericCache<
   [replayClient: ReplayClientInterface, ThreadFront: typeof TF],
@@ -103,7 +65,7 @@ const { getValueAsync: getNextInteractionEventAsync } = createGenericCache<
     const entryPoints = await replayClient.runAnalysis<EventLog>({
       effectful: false,
       eventHandlerEntryPoints: [{ eventType }],
-      mapper: EVENTS_MAPPER,
+      mapper: getFunctionBody(eventsMapper),
       range: {
         begin: point,
         end: pointNearEndTime.point,
@@ -114,84 +76,6 @@ const { getValueAsync: getNextInteractionEventAsync } = createGenericCache<
     return entryPoints[0];
   },
   point => point
-);
-
-const { getValueAsync: getEventListenerLocationAsync } = createGenericCache<
-  [ThreadFront: typeof TF, replayClient: ReplayClientInterface, getState: () => UIState],
-  [pauseId: string, replayEventType: SEARCHABLE_EVENT_TYPES],
-  Location | undefined
->(
-  "eventListenerLocationCache",
-  3,
-  async (ThreadFront, replayClient, getState, pauseId, replayEventType) => {
-    const stackFrames = await getFramesAsync(replayClient, pauseId);
-    if (!stackFrames) {
-      return;
-    }
-    const topFrame = stackFrames[0];
-    const { frameId } = topFrame;
-
-    await ThreadFront.ensureAllSources();
-
-    const state = getState();
-
-    const evaluatedEventMapper = createReactEventMapper(replayEventType);
-
-    // Introspect the event's target DOM node, and find the nearest
-    // React event handler if any exists.
-    const res = await ThreadFront.evaluateNew({
-      replayClient,
-      pauseId,
-      text: evaluatedEventMapper,
-      frameId,
-      pure: false,
-    });
-
-    let sourceLocation: Location | undefined;
-    const sourcesById = getSourceDetailsEntities(state);
-
-    if (res.returned?.object) {
-      const preview = await getObjectWithPreviewHelper(replayClient, pauseId, res.returned.object);
-
-      // The evaluation may have found a React prop function somewhere.
-      const handlerProp = preview?.preview?.properties?.find(p => p.name === "handlerProp");
-
-      if (handlerProp) {
-        // If it did find a React prop function, get its
-        // preview and format it so we know the preferred location.
-        const onClickPreview = (await getObjectWithPreviewHelper(
-          replayClient,
-          pauseId,
-          handlerProp.object!
-        )) as FunctionWithPreview;
-
-        const formattedEventListener = await formatEventListener(
-          replayClient,
-          { type: "onClick", capture: false },
-          onClickPreview,
-          state,
-          sourcesById,
-          "react"
-        );
-
-        sourceLocation = formattedEventListener.location;
-      }
-    }
-
-    if (!sourceLocation) {
-      // Otherwise, use the location from the actual JS event handler.
-      sourceLocation = getPreferredLocation(state.sources, topFrame.location);
-      const sourceDetails = sourcesById[sourceLocation.sourceId];
-
-      if (shouldIgnoreEventFromSource(sourceDetails)) {
-        // Intentionally _don't_ jump to into specific ignorable libraries, like React
-        sourceLocation = undefined;
-      }
-    }
-
-    return sourceLocation!;
-  },
-  pauseId => pauseId
 );
 
 type EventProps = {
@@ -216,71 +100,6 @@ export const getEventLabel = (event: ReplayEvent) => {
 
   return label;
 };
-
-function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
-  const reactEventPropNames = REACT_EVENT_PROPS[eventType];
-  const eventClassName = EVENT_CLASS_FOR_EVENT_TYPE[eventType];
-
-  const evaluatedEventMapper = `
-    // Outer body runs in scope of the "current" event handler.
-    // Grab the event handler's arguments.
-    const args = [...arguments];
-    
-    (function findEventTargetAndHandler() {
-      // One of the args should be a browser event
-      const matchingEvent  = args.find(a => typeof a === "object" && a instanceof ${eventClassName});
-
-      if (matchingEvent) {
-        // We _could_ probably just return the prop function or undefined here
-        const res = {
-          target: event.target,
-        }
-
-        // Search the event target node and all of its ancestors
-        // for React internal props data, and specifically look
-        // for the nearest node with a relevant React event handler prop if any.
-        let currentNode = event.target;
-        while (currentNode) {
-          const keys = Object.keys(currentNode)
-          const reactPropsKey = keys.find(key => {
-            return (
-              key.startsWith("${REACT_16_EVENT_LISTENER_PROP_KEY}") || 
-              key.startsWith("${REACT_17_18_EVENT_LISTENER_PROP_KEY}")
-            )
-          });
-
-          if (reactPropsKey) {
-            const props = currentNode[reactPropsKey] || {};
-            const possibleReactPropNames = ${JSON.stringify(reactEventPropNames)}
-
-            
-            // Depending on the type of event, there could be different
-            // React event handler prop names in use.
-            // For example, an input is likely to have "onChange",
-            // whereas some other element might have "onKeyPress".
-            let handler = undefined;            
-            for (let possibleReactProp of possibleReactPropNames) {
-              if (possibleReactProp in props) {
-                handler = props[possibleReactProp];
-              }
-            } 
-
-            if (handler) {
-              res.handlerProp = handler;
-              res.handlerNode = currentNode;
-              break;
-            }
-          }
-          currentNode = currentNode.parentNode;
-        }
-        
-        return res;
-      }
-    })()
-  `;
-
-  return evaluatedEventMapper;
-}
 
 /*
 Jump to the function location that ran for a given info sidebar event list item,
@@ -397,7 +216,7 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
   const label = getEventLabel(event);
   const { icon } = getReplayEvent(kind);
 
-  const onKeyDown = (e: KeyboardEvent) => e.key === " " && e.preventDefault();
+  const onKeyDown = (e: React.KeyboardEvent) => e.key === " " && e.preventDefault();
 
   const onClick = () => {
     // Seek to the sidebar event timestamp right away.

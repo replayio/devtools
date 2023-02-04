@@ -195,6 +195,9 @@ export async function editLogPoint(
 
     const saveButton = pointPanelLocator.locator('[data-test-name="PointPanel-SaveButton"]');
     await saveButton.click({ force: true });
+
+    // Give log point time to be processed.
+    await delay();
   }
 }
 
@@ -224,9 +227,13 @@ export async function addConditional(
     await clearTextArea(page, conditionLocator);
     await conditionLocator.fill(condition);
 
+    // Give time for the type-ahead to be evaluated and hide if it needed
+    await delay();
+
     const typeAheadLocator = getLogPointPanelConditionTypeAhead(page);
     if (await typeAheadLocator.isVisible()) {
       await page.keyboard.press("Escape");
+      await expect(await typeAheadLocator).not.toBeVisible();
     }
 
     if (saveAfterAdding) {
