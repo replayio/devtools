@@ -9,10 +9,10 @@ import {
 } from "@replayio/protocol";
 import isEmpty from "lodash/isEmpty";
 import size from "lodash/size";
-import sumBy from "lodash/sumBy";
 import without from "lodash/without";
 
 import { AnalysisInput, SendCommand, getFunctionBody } from "protocol/evaluation-utils";
+import { ThreadFront } from 'protocol/thread';
 import { RecordingTarget } from "protocol/thread/thread";
 import { ReplayClientInterface } from "shared/client/types";
 
