@@ -17,5 +17,5 @@ export interface DeletePoint {
 }
 
 export interface DeletePointVariables {
-  commentId: string;
+  id: string;
 }

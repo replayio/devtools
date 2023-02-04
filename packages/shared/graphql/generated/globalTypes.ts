@@ -30,7 +30,11 @@ export interface AddCommentReplyInput {
 }
 
 export interface AddPointInput {
+  badge?: string | null;
+  condition?: string | null;
   content: string;
+  createdAt: any;
+  id: string;
   location: any;
   recordingId: string;
   shouldBreak: string;
@@ -38,7 +42,10 @@ export interface AddPointInput {
 }
 
 export interface UpdatePointInput {
+  badge?: string | null;
+  condition?: string | null;
   content: string;
+  id: string;
   shouldBreak: string;
   shouldLog: string;
 }

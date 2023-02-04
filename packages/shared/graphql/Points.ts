@@ -3,10 +3,10 @@ import { Location, RecordingId } from "@replayio/protocol";
 
 import { Badge, PointBehavior } from "shared/client/types";
 import { Point as ClientPoint } from "shared/client/types";
+import { AddPoint } from "shared/graphql/generated/AddPoint";
 import { GetPoints } from "shared/graphql/generated/GetPoints";
+import { AddPointInput } from "shared/graphql/generated/globalTypes";
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
-
-import { Point } from "./types";
 
 export const ADD_POINT_QUERY = gql`
   mutation AddPoint($input: AddPointInput!) {
@@ -20,8 +20,8 @@ export const ADD_POINT_QUERY = gql`
 `;
 
 export const DELETE_POINT_QUERY = gql`
-  mutation DeletePoint($commentId: ID!) {
-    deletePoint(input: { id: $commentId }) {
+  mutation DeletePoint($id: ID!) {
+    deletePoint(input: { id: $id }) {
       success
     }
   }
@@ -59,14 +59,20 @@ export const UPDATE_POINT_QUERY = gql`
 export async function addPoint(
   graphQLClient: GraphQLClientInterface,
   accessToken: string,
-  point: Omit<Point, "id">
+  point: ClientPoint
 ) {
-  await graphQLClient.send(
+  const { createdAtTime, createdByUserId, ...rest } = point;
+  const input: AddPointInput = {
+    createdAt: new Date(createdAtTime).toISOString(),
+    ...rest,
+  };
+
+  await graphQLClient.send<AddPoint>(
     {
       operationName: "AddPoint",
       query: ADD_POINT_QUERY,
       variables: {
-        input: point,
+        input,
       },
     },
     accessToken
@@ -125,13 +131,15 @@ export async function getPoints(
 export async function updatePoint(
   graphQLClient: GraphQLClientInterface,
   accessToken: string,
-  point: Point
+  point: ClientPoint
 ) {
+  const { createdAtTime, createdByUserId, location, recordingId, ...input } = point;
+
   await graphQLClient.send<GetPoints>(
     {
       operationName: "UpdatePointContent",
       query: UPDATE_POINT_QUERY,
-      variables: point,
+      variables: { input },
     },
     accessToken
   );

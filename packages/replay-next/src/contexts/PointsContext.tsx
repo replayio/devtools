@@ -2,19 +2,27 @@ import { Location, TimeStampedPoint } from "@replayio/protocol";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import {
   PropsWithChildren,
-  SetStateAction,
   createContext,
   useCallback,
   useContext,
+  useDeferredValue,
+  useEffect,
   useMemo,
+  useRef,
   useState,
-  useTransition,
 } from "react";
 
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
-import { getPointsSuspense } from "replay-next/src/suspense/PointsCache";
+import { getPointsAsync } from "replay-next/src/suspense/PointsCache";
+import { findIndex, insert } from "replay-next/src/utils/array";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_DISABLED, Point, PointId } from "shared/client/types";
+import {
+  addPoint as addPointGraphQL,
+  deletePoint as deletePointGraphQL,
+  updatePoint as updatePointGraphQL,
+} from "shared/graphql/Points";
+import { UserInfo } from "shared/graphql/types";
 
 import useBreakpointIdsFromServer from "../hooks/useBreakpointIdsFromServer";
 import useIndexedDB, { IDBOptions } from "../hooks/useIndexedDB";
@@ -46,7 +54,7 @@ export type PointsContextType = {
   editPoint: EditPoint;
   isPending: boolean;
   points: Point[];
-  pointsForAnalysis: Point[];
+  pointsForSuspense: Point[];
 };
 
 export const isValidPoint = (maybePoint: unknown): maybePoint is Point => {
@@ -64,36 +72,68 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   const graphQLClient = useContext(GraphQLClientContext);
   const { accessToken, currentUserInfo, recordingId, trackEvent } = useContext(SessionContext);
   const replayClient = useContext(ReplayClientContext);
-  const [isPending, startTransition] = useTransition();
 
-  // Both high-pri state and transition state should be managed by useIndexedDB,
-  // Else values from other tabs will only be synced to the high-pri state.
-  const { setValue: setPoints, value: points } = useIndexedDB<Point[]>({
+  const { setValue: setLocalPoints, value: localPoints } = useIndexedDB<Point[]>({
     database: POINTS_DATABASE,
     initialValue: EMPTY_ARRAY,
     recordName: recordingId,
     storeName: "high-priority",
   });
-  // We pre-load our IndexedDB values at app startup, so it's safe to synchronously
-  // use `points` to initialize the `useState` hook here.
-  const [pointsForAnalysis, setPointsForAnalysis] = useState<Point[]>(points);
 
-  const setPointsHelper = useCallback(
-    (updater: SetStateAction<Point[]>) => {
-      setPoints(updater);
-      startTransition(() => {
-        setPointsForAnalysis(updater);
-      });
-    },
-    [setPoints, setPointsForAnalysis]
-  );
+  // Note that we fetch using the async helper rather than Suspense,
+  // because it's better to load the rest of the app earlier than to wait on Points.
+  const [remotePoints, setRemotePoints] = useState<Point[] | null>(null);
+  useEffect(() => {
+    async function fetchPoints() {
+      const points = await getPointsAsync(graphQLClient, recordingId, accessToken);
+      setRemotePoints(points);
+    }
+
+    fetchPoints();
+  }, [graphQLClient, recordingId, accessToken]);
+
+  // Merge points from IndexedDB and GraphQL.
+  // Current user points may exist in both places, so for simplicity we only include the local version.
+  // This has an added benefit of ensuring edits/deletions always reflect the latest state
+  // without requiring refetching data from GraphQL.
+  const mergedPoints = useMemo<Point[]>(() => {
+    const currentUserId = currentUserInfo?.id ?? null;
+
+    const mergedPoints: Point[] = [];
+    localPoints?.forEach(point => {
+      insert<Point>(mergedPoints, point, comparePoints);
+    });
+    remotePoints?.forEach(point => {
+      if (currentUserId && currentUserId === point.createdByUserId) {
+        return;
+      }
+
+      insert<Point>(mergedPoints, point, comparePoints);
+    });
+    return mergedPoints;
+  }, [currentUserInfo, localPoints, remotePoints]);
+
+  // We also store a separate copy of points so that e.g. if the Console suspends to fetch remote values
+  // it won't prevent the log point editor UI from updating in response to user input.
+  // These get updated at a lower, transition priority.
+  const pointsForSuspense = useDeferredValue<Point[]>(mergedPoints);
+  const isPending = mergedPoints !== pointsForSuspense;
+
+  // Track the latest committed values for e.g. the editPoint function.
+  const committedPointsRef = useRef<Point[]>(mergedPoints);
+  useEffect(() => {
+    committedPointsRef.current = mergedPoints;
+  });
 
   const addPoint = useCallback(
     (partialPoint: Partial<Point> | null, location: Location) => {
+      // TODO Determine if we should track "breakpoint.add_column" here
+      trackEvent("breakpoint.add");
+
       // Points (and their ids) are shared between tabs (via IndexedDB),
       // so the id numbers should be deterministic;
       // a single incrementing counter wouldn't work well unless it was also synced.
-      const id = `${location.sourceId}:${location.line}:${location.column}`;
+      const id = createPointId(currentUserInfo, location);
 
       const point: Point = {
         badge: null,
@@ -109,48 +149,71 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
         location,
       };
 
-      trackEvent("breakpoint.add");
-      // TODO Determine if we should track "breakpoint.add_column" here
-
-      setPointsHelper((prevPoints: Point[]) => {
+      setLocalPoints((prevPoints: Point[]) => {
         const index = sortedIndexBy(prevPoints, point, ({ location }) => location.line);
         return prevPoints.slice(0, index).concat([point], prevPoints.slice(index));
       });
+
+      // If the current user is signed-in, sync this new point to GraphQL
+      // to be shared with other users who can view this recording.
+      if (accessToken) {
+        addPointGraphQL(graphQLClient, accessToken, point).then(id => {
+          console.log("addPointGraphQL ->", id);
+        });
+      }
     },
-    [currentUserInfo, recordingId, setPointsHelper, trackEvent]
+    [accessToken, currentUserInfo, graphQLClient, recordingId, setLocalPoints, trackEvent]
   );
 
   const deletePoints = useCallback(
     (...ids: PointId[]) => {
       trackEvent("breakpoint.remove");
-      setPointsHelper((prevPoints: Point[]) => prevPoints.filter(point => !ids.includes(point.id)));
+
+      setLocalPoints((prevPoints: Point[]) => prevPoints.filter(point => !ids.includes(point.id)));
+
+      // If the current user is signed-in, also delete this point from GraphQL.
+      if (accessToken) {
+        ids.forEach(id => deletePointGraphQL(graphQLClient, accessToken, id));
+      }
     },
 
-    [setPointsHelper, trackEvent]
+    [accessToken, graphQLClient, setLocalPoints, trackEvent]
   );
 
   const editPoint = useCallback(
     (id: PointId, partialPoint: Partial<Point>) => {
       trackEvent("breakpoint.edit");
-      setPointsHelper((prevPoints: Point[]) => {
-        const index = prevPoints.findIndex(point => point.id === id);
-        if (index >= 0) {
-          const prevPoint = prevPoints[index];
-          const newPoint: Point = {
-            ...prevPoint,
-            ...partialPoint,
-          };
-          const points = prevPoints.slice();
-          points.splice(index, 1, newPoint);
-          return points;
+
+      const committedPoints = committedPointsRef.current;
+      const prevPoint = committedPoints.find(point => point.id === id);
+      if (prevPoint) {
+        const newPoint: Point = {
+          ...prevPoint,
+          ...partialPoint,
+        };
+
+        setLocalPoints((prevPoints: Point[]) => {
+          const index = prevPoints.findIndex(point => point.id === id);
+          if (index >= 0) {
+            const points = prevPoints.slice();
+            points.splice(index, 1, newPoint);
+            return points;
+          }
+
+          throw Error(`Could not find point with id "${id}"`);
+        });
+
+        // If the current user is signed-in, sync this new edit to GraphQL
+        // to be shared with other users who can view this recording.
+        if (accessToken) {
+          updatePointGraphQL(graphQLClient, accessToken, newPoint);
         }
-        throw Error(`Could not find point with id "${id}"`);
-      });
+      }
     },
-    [setPointsHelper, trackEvent]
+    [accessToken, graphQLClient, setLocalPoints, trackEvent]
   );
 
-  useBreakpointIdsFromServer(points, editPoint, deletePoints, replayClient);
+  useBreakpointIdsFromServer(replayClient, mergedPoints, deletePoints);
 
   const context = useMemo(
     () => ({
@@ -158,14 +221,31 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       deletePoints,
       editPoint,
       isPending,
-      points: points,
-      pointsForAnalysis: pointsForAnalysis,
+      points: mergedPoints,
+      pointsForSuspense: pointsForSuspense,
     }),
-    [addPoint, deletePoints, editPoint, isPending, points, pointsForAnalysis]
+    [addPoint, deletePoints, editPoint, isPending, mergedPoints, pointsForSuspense]
   );
 
-  const graphQLPoints = getPointsSuspense(graphQLClient, recordingId, accessToken);
-  console.log("graphQLPoints:", graphQLPoints);
-
   return <PointsContext.Provider value={context}>{children}</PointsContext.Provider>;
+}
+
+function comparePoints(pointA: Point, pointB: Point): number {
+  const locationA = pointA.location;
+  const locationB = pointB.location;
+
+  if (locationA.sourceId !== locationB.sourceId) {
+    return locationA.sourceId.localeCompare(locationB.sourceId);
+  } else if (locationA.line !== locationB.line) {
+    return locationA.line - locationB.line;
+  } else if (locationA.column !== locationB.column) {
+    return locationA.column - locationB.column;
+  } else {
+    return pointA.createdAtTime - pointB.createdAtTime;
+  }
+}
+
+function createPointId(userInfo: UserInfo | null, location: Location): string {
+  const locationKey = `${location.sourceId}:${location.line}:${location.column}`;
+  return userInfo ? `${userInfo.id}:${locationKey}` : locationKey;
 }

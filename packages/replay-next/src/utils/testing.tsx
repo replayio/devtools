@@ -128,7 +128,7 @@ export async function renderFocused(
     editPoint: jest.fn(),
     isPending: false,
     points: [],
-    pointsForAnalysis: [],
+    pointsForSuspense: [],
     ...options?.pointsContext,
   };
 

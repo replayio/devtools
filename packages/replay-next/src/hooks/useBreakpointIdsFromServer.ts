@@ -9,10 +9,9 @@ import { ReplayClientInterface } from "shared/client/types";
 
 // Breakpoints must be synced with the server so the stepping controls will work.
 export default function useBreakpointIdsFromServer(
+  replayClient: ReplayClientInterface,
   points: Point[] | undefined,
-  editPoint: (id: PointId, partialPoint: Partial<Point>) => void,
-  deletePoints: (...ids: PointId[]) => void,
-  replayClient: ReplayClientInterface
+  deletePoints: (...ids: PointId[]) => void
 ): void {
   const client = useContext(ReplayClientContext);
 
@@ -119,5 +118,5 @@ export default function useBreakpointIdsFromServer(
     }
 
     setUpBreakpoints();
-  }, [client, editPoint, deletePoints, points, replayClient]);
+  }, [client, deletePoints, points, replayClient]);
 }
