@@ -1,9 +1,9 @@
-import { Frame, PauseId } from "@replayio/protocol";
+import { Frame, FrameId, PauseId } from "@replayio/protocol";
 
 import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
 
-import { createGenericCache2 } from "./createGenericCache";
+import { createGenericCache } from "./createGenericCache";
 import { cachePauseData } from "./PauseCache";
 
 export const {
@@ -11,8 +11,13 @@ export const {
   getValueAsync: getFramesAsync,
   getValueIfCached: getFramesIfCached,
   addValue: cacheFrames,
-} = createGenericCache2<ReplayClientInterface, [pauseId: PauseId], Frame[] | undefined>(
+} = createGenericCache<
+  [replayClient: ReplayClientInterface],
+  [pauseId: PauseId],
+  Frame[] | undefined
+>(
   "FrameCache: getFrames",
+  1,
   async (client, pauseId) => {
     const framesResult = await client.getAllFrames(pauseId);
     await client.waitForLoadedSources();
@@ -23,3 +28,12 @@ export const {
   },
   pauseId => pauseId
 );
+
+export function getFrameSuspense(
+  replayClient: ReplayClientInterface,
+  pauseId: PauseId,
+  frameId: FrameId
+) {
+  const frames = getFramesSuspense(replayClient, pauseId);
+  return frames?.find(frame => frame.frameId === frameId);
+}

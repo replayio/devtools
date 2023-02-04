@@ -7,8 +7,10 @@ import { createEmptyHistoryState } from "@lexical/react/LexicalHistoryPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { $selectAll } from "@lexical/selection";
 import { $rootTextContent } from "@lexical/text";
+import { mergeRegister } from "@lexical/utils";
 import {
   $getRoot,
+  $getSelection,
   COMMAND_PRIORITY_CRITICAL,
   EditorState,
   KEY_ENTER_COMMAND,
@@ -16,15 +18,26 @@ import {
   LexicalEditor,
   LexicalNode,
   LineBreakNode,
+  SELECTION_CHANGE_COMMAND,
   SerializedEditorState,
   TextNode,
 } from "lexical";
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import {
+  ForwardedRef,
+  createElement,
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from "react";
 
 import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
 
 import LexicalEditorRefSetter from "./LexicalEditorRefSetter";
 import CodeCompletionPlugin from "./plugins/code-completion/CodeCompletionPlugin";
+import { Context } from "./plugins/code-completion/findMatches";
 import CodeNode from "./plugins/code/CodeNode";
 import CodePlugin from "./plugins/code/CodePlugin";
 import parsedTokensToCodeTextNode from "./plugins/code/utils/parsedTokensToCodeTextNode";
@@ -35,37 +48,57 @@ import styles from "./styles.module.css";
 // Diffing is simplest when the Code plug-in has a flat structure.
 const NODES: Array<Klass<LexicalNode>> = [LineBreakNode, CodeNode, TextNode];
 
-export default function CodeEditor({
-  allowWrapping = true,
-  autoFocus = false,
-  autoSelect = false,
-  dataTestId,
-  dataTestName,
-  editable,
-  initialValue,
-  onCancel,
-  onChange,
-  onSave,
-  pauseAndFrameId,
-  placeholder = "",
-}: {
+export type ImperativeHandle = {
+  focus: () => void;
+};
+
+type Props = {
   allowWrapping?: boolean;
   autoFocus?: boolean;
   autoSelect?: boolean;
+  context: Context;
   dataTestId?: string;
   dataTestName?: string;
   editable: boolean;
+  forwardedRef?: ForwardedRef<ImperativeHandle>;
   initialValue: string;
   onCancel?: () => void;
   onChange?: (markdown: string, editorState: SerializedEditorState) => void;
   onSave: (markdown: string, editorState: SerializedEditorState) => void;
   pauseAndFrameId: PauseAndFrameId | null;
   placeholder?: string;
-}): JSX.Element {
+};
+
+function CodeEditor({
+  allowWrapping = true,
+  autoFocus = false,
+  autoSelect = false,
+  context,
+  dataTestId,
+  dataTestName,
+  editable,
+  forwardedRef,
+  initialValue,
+  onCancel,
+  onChange,
+  onSave,
+  pauseAndFrameId,
+  placeholder = "",
+}: Props): JSX.Element {
   const historyState = useMemo(() => createEmptyHistoryState(), []);
 
   const editorRef = useRef<LexicalEditor>(null);
   const backupEditorStateRef = useRef<EditorState | null>(null);
+
+  useImperativeHandle(
+    forwardedRef,
+    () => ({
+      focus() {
+        editorRef.current?.focus();
+      },
+    }),
+    []
+  );
 
   const didMountRef = useRef(false);
   useLayoutEffect(() => {
@@ -152,7 +185,31 @@ export default function CodeEditor({
           return false;
         };
 
-        return editor.registerCommand(KEY_ENTER_COMMAND, onEnter, COMMAND_PRIORITY_CRITICAL);
+        // Make sure the cursor is visible (if there is overflow)
+        const onSelectionChange = () => {
+          const selection = $getSelection();
+          if (selection) {
+            const nodes = selection.getNodes();
+            if (nodes?.length > 0) {
+              const node = nodes[0];
+              const element = editor.getElementByKey(node.__key);
+              if (element) {
+                element.scrollIntoView({ block: "nearest", inline: "nearest" });
+              }
+            }
+          }
+
+          return false;
+        };
+
+        return mergeRegister(
+          editor.registerCommand(
+            SELECTION_CHANGE_COMMAND,
+            onSelectionChange,
+            COMMAND_PRIORITY_CRITICAL
+          ),
+          editor.registerCommand(KEY_ENTER_COMMAND, onEnter, COMMAND_PRIORITY_CRITICAL)
+        );
       }
     }
   }, [allowWrapping, editorRef]);
@@ -181,6 +238,7 @@ export default function CodeEditor({
         <FormPlugin onCancel={onFormCancel} onChange={onFormChange} onSubmit={onFormSubmit} />
         <CodePlugin />
         <CodeCompletionPlugin
+          context={context}
           dataTestId={dataTestId ? `${dataTestId}-CodeTypeAhead` : undefined}
           dataTestName={dataTestName ? `${dataTestName}-CodeTypeAhead` : undefined}
           pauseAndFrameId={pauseAndFrameId}
@@ -189,6 +247,14 @@ export default function CodeEditor({
     </LexicalComposer>
   );
 }
+
+const CodeEditorForwardRef = forwardRef<ImperativeHandle, Props>(
+  (props: Props, ref: ForwardedRef<ImperativeHandle>) =>
+    createElement(CodeEditor, { ...props, forwardedRef: ref })
+);
+CodeEditorForwardRef.displayName = "ForwardRef<CodeEditor>";
+
+export default CodeEditorForwardRef;
 
 function createInitialConfig(code: string, editable: boolean) {
   return {

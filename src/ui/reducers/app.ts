@@ -1,6 +1,7 @@
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 
 import { RecordingTarget } from "protocol/thread/thread";
+import { Workspace } from "shared/graphql/types";
 import { getCurrentTime, getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import {
@@ -18,7 +19,6 @@ import {
   UnexpectedError,
   UploadInfo,
 } from "ui/state/app";
-import { Workspace } from "ui/types";
 import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
 import { getSystemColorSchemePreference } from "ui/utils/environment";
 import { compareBigInt } from "ui/utils/helpers";

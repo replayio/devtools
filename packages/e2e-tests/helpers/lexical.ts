@@ -24,11 +24,11 @@ export async function focus(page: Page, selector: string) {
 }
 
 export async function hideTypeAheadSuggestions(page: Page, selector: string) {
-  const list = page.locator('[data-test-name="TypeAheadList"]');
+  const list = page.locator('[data-test-name="CodeTypeAhead"]');
 
   if (await list.isVisible()) {
     const input = page.locator(selector);
-    await input.type("Escape");
+    await input.press("Escape");
   }
 }
 
@@ -39,6 +39,7 @@ export async function type(page: Page, selector: string, text: string, shouldSub
   await input.type(text);
 
   if (shouldSubmit) {
+    await delay(200);
     await submitCurrentText(page, selector);
   }
 }

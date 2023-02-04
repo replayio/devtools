@@ -8,10 +8,10 @@ import {
   createTypeDataForSourceCodeComment,
 } from "replay-next/components/sources/utils/comments";
 import { isSourceCodeCommentTypeData } from "replay-next/components/sources/utils/comments";
-import { CommentSourceLocation } from "replay-next/src/graphql/types";
 import { ParsedToken, parsedTokensToHtml } from "replay-next/src/suspense/SyntaxParsingCache";
 import { getSourceFileNameFromUrl } from "replay-next/src/utils/source";
 import { replayClient } from "shared/client/ReplayClientContext";
+import { CommentSourceLocation } from "shared/graphql/types";
 import { setViewMode } from "ui/actions/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Comment } from "ui/state/comments";

@@ -1,13 +1,13 @@
 import { useRouter } from "next/router";
 import React from "react";
 
+import { Recording } from "shared/graphql/types";
+import { Workspace } from "shared/graphql/types";
 import { setModal } from "ui/actions/app";
 import { MY_LIBRARY_TEAM } from "ui/components/Library/Team/TeamContextRoot";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
 import { useAppDispatch } from "ui/setup/hooks";
-import { Recording } from "ui/types";
-import { Workspace } from "ui/types";
 
 import { PrimaryButton, SecondaryButton } from "../../../../../shared/Button";
 import BatchActionDropdown from "./BatchActionDropdown";

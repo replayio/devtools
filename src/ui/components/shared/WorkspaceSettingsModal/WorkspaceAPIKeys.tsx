@@ -1,8 +1,8 @@
 import React from "react";
 
 import { assert } from "protocol/utils";
+import { ApiKey } from "shared/graphql/types";
 import hooks from "ui/hooks";
-import { ApiKey } from "ui/types";
 
 import APIKeys from "../APIKeys";
 

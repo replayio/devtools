@@ -2,6 +2,7 @@ import { RecordingId } from "@replayio/protocol";
 import { ClipboardEvent, KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
 
 import { RecordingTarget } from "protocol/thread/thread";
+import { Recording } from "shared/graphql/types";
 import { getRecordingTarget } from "ui/actions/app";
 import Avatar from "ui/components/Avatar";
 import UserOptions from "ui/components/Header/UserOptions";
@@ -11,7 +12,6 @@ import hooks from "ui/hooks";
 import { useGetActiveSessions } from "ui/hooks/sessions";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
-import { Recording } from "ui/types";
 import { trackEvent } from "ui/utils/telemetry";
 import useAuth0 from "ui/utils/useAuth0";
 

@@ -1,11 +1,23 @@
 import { Property, Scope } from "@replayio/protocol";
 
+import { WeightedProperty } from "replay-next/components/lexical/plugins/code-completion/findMatches";
+
 import findMatches from "./findMatchingScopesAndProperties";
 
-function createPropertiesFromNames(...names: string[]): Property[] {
-  return names.map(name => ({
-    name,
-  }));
+function createPropertiesFromNames(...names: string[]): WeightedProperty[] {
+  return names.map(name => {
+    let distance = 0;
+    if (name.indexOf(":") >= 0) {
+      const pieces = name.split(":");
+      name = pieces[0];
+      distance = parseInt(pieces[1], 10);
+    }
+
+    return {
+      distance,
+      name,
+    };
+  });
 }
 
 function createScopesFromNames(...names: string[]): Scope[] {
@@ -87,14 +99,38 @@ describe("findMatches", () => {
     ).toEqual(["Array", "array", "UintArray"]);
   });
 
-  it("should escape special characters", () => {
-    expect(
-      findMatches(
-        null,
-        "fb(",
-        null,
-        createPropertiesFromNames("fooBar()", "fooBarBaz()", "barBaz()")
-      )
-    ).toEqual(["fooBar()", "fooBarBaz()"]);
+  // FE-1133
+  it("should not suggest array indices or any other names that require bracket notations", () => {
+    const properties = createPropertiesFromNames(
+      "0",
+      "1",
+      "2",
+      "foo",
+      "foo-bar",
+      "foo_bar",
+      "qux2"
+    );
+    const scopes = createScopesFromNames();
+
+    expect(findMatches("array", null, scopes, properties)).toEqual(["foo", "foo_bar", "qux2"]);
+    expect(findMatches("array", "2", scopes, properties)).toEqual(["qux2"]);
+  });
+
+  // FE-1169
+  it("should display matches for an object's own properties above inherited properties", () => {
+    const properties = createPropertiesFromNames("foo:0", "fooBar:1", "fooBaz:1", "fooBarBaz:2");
+    const scopes = createScopesFromNames();
+
+    expect(findMatches("array", null, scopes, properties)).toEqual([
+      "foo",
+      "fooBar",
+      "fooBaz",
+      "fooBarBaz",
+    ]);
+    expect(findMatches("array", "fooB", scopes, properties)).toEqual([
+      "fooBar",
+      "fooBaz",
+      "fooBarBaz",
+    ]);
   });
 });

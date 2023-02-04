@@ -55,14 +55,6 @@ const OMITTED = "<OMITTED>";
 const sanitizeStateForDevtools = <S>(state: S) => {
   // Use Immer to simplify nested immutable updates when making a copy of the state
   const sanitizedState = customImmer.produce(state, (draft: UIState) => {
-    if (draft.sources) {
-      Object.values(draft.sources.contents.entities).forEach(contentsItem => {
-        if (contentsItem!.value) {
-          contentsItem!.value.value = OMITTED;
-        }
-      });
-    }
-
     if (draft.protocolMessages) {
       // @ts-expect-error
       draft.protocolMessages = OMITTED;

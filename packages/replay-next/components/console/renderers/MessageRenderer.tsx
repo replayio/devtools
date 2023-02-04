@@ -1,5 +1,5 @@
 import { Value as ProtocolValue } from "@replayio/protocol";
-import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { Suspense, memo, useContext } from "react";
 
@@ -13,8 +13,10 @@ import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersCo
 import { InspectableTimestampedPointContext } from "replay-next/src/contexts/InspectorContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { ProtocolMessage } from "replay-next/src/suspense/MessagesCache";
+import { protocolValueToClientValue } from "replay-next/src/utils/protocol";
 import { formatTimestamp } from "replay-next/src/utils/time";
 
+import ErrorStackRenderer from "../ErrorStackRenderer";
 import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 import StackRenderer from "../StackRenderer";
@@ -97,12 +99,32 @@ function MessageRenderer({
   const primaryContent =
     argumentValues.length > 0 ? (
       <Suspense fallback={<Loader />}>
-        {argumentValues.map((argumentValue: ProtocolValue, index: number) => (
-          <Fragment key={index}>
+        {argumentValues.map((argumentValue: ProtocolValue, index: number) => {
+          const argumentInspector = (
             <Inspector context="console" pauseId={message.pauseId} protocolValue={argumentValue} />
-            {index < argumentValues.length - 1 && " "}
-          </Fragment>
-        ))}
+          );
+          return (
+            <Fragment key={index}>
+              {protocolValueToClientValue(message.pauseId, argumentValue).type === "error" &&
+              argumentValue.object ? (
+                <Expandable
+                  children={
+                    <ErrorStackRenderer
+                      pauseId={message.pauseId}
+                      errorObjectId={argumentValue.object}
+                    />
+                  }
+                  className={styles.Expandable}
+                  header={argumentInspector}
+                  useBlockLayoutWhenExpanded={false}
+                />
+              ) : (
+                argumentInspector
+              )}
+              {index < argumentValues.length - 1 && " "}
+            </Fragment>
+          );
+        })}
       </Suspense>
     ) : (
       " "

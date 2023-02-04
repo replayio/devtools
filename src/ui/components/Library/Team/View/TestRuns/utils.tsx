@@ -1,4 +1,4 @@
-import { Recording } from "ui/types";
+import { Recording } from "shared/graphql/types";
 
 export function getDuration(recordings: Recording[]) {
   return recordings

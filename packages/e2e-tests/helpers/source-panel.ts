@@ -48,7 +48,7 @@ export async function addConditional(
 ) {
   await toggleConditional(page, {
     lineNumber: options.lineNumber,
-    state: "on",
+    state: true,
   });
 
   const { condition, lineNumber } = options;
@@ -134,7 +134,7 @@ export async function addLogpoint(
     lineNumber: number;
     condition?: string;
     content?: string;
-    url: string;
+    url?: string;
     saveAfterEdit?: boolean;
   }
 ): Promise<void> {
@@ -187,14 +187,16 @@ export async function editLogPoint(
     condition?: string;
     lineNumber: number;
     saveAfterEdit?: boolean;
-    url: string;
+    url?: string;
   }
 ) {
   const { condition, content, lineNumber, saveAfterEdit = true, url } = options;
 
   await debugPrint(
     page,
-    `Editing log-point at ${chalk.bold(`${url}:${lineNumber}`)}`,
+    url
+      ? `Editing log-point at ${chalk.bold(`${url}:${lineNumber}`)}`
+      : `Editing log-point at ${chalk.bold(`${lineNumber}`)}`,
     "editLogPoint"
   );
 
@@ -238,6 +240,52 @@ export function getLogPointPanelContentTypeAhead(page: Page): Locator {
   return page.locator('[data-test-name="PointPanel-ContentInput-CodeTypeAhead"]');
 }
 
+export async function verifyLogPointContentTypeAheadSuggestions(
+  page: Page,
+  expectedSuggestionsPartial: string[],
+  unexpectedSuggestionsPartial: string[] = []
+) {
+  const typeAhead = getLogPointPanelContentTypeAhead(page);
+
+  for (let index = 0; index < expectedSuggestionsPartial.length; index++) {
+    const suggestion = expectedSuggestionsPartial[index];
+
+    await debugPrint(
+      page,
+      `Verifying log-point content type-ahead contains suggestion "${chalk.bold(suggestion)}"`,
+      "verifyLogPointContentTypeAheadSuggestions"
+    );
+
+    await waitFor(async () => {
+      const results = typeAhead.locator(
+        `[data-test-name="PointPanel-ContentInput-CodeTypeAhead-Item"]`
+      );
+      const allTextContents = await results.allTextContents();
+      return expect(allTextContents).toContain(suggestion);
+    });
+  }
+
+  for (let index = 0; index < unexpectedSuggestionsPartial.length; index++) {
+    const suggestion = unexpectedSuggestionsPartial[index];
+
+    await debugPrint(
+      page,
+      `Verifying log-point content type-ahead does not contain suggestion "${chalk.bold(
+        suggestion
+      )}"`,
+      "verifyLogPointContentTypeAheadSuggestions"
+    );
+
+    await waitFor(async () => {
+      const results = typeAhead.locator(
+        `[data-test-name="PointPanel-ContentInput-CodeTypeAhead-Item"]`
+      );
+      const allTextContents = await results.allTextContents();
+      return expect(allTextContents).not.toContain(suggestion);
+    });
+  }
+}
+
 export async function getSelectedLineNumber(page: Page): Promise<number | null> {
   let currentLineLocator = null;
 
@@ -273,6 +321,27 @@ export function getSourceLineSelector(lineNumber: number): string {
 
 export function getSourceTab(page: Page, url: string): Locator {
   return page.locator(`[data-test-name="Source-${url}"]`);
+}
+
+export async function openLogPointPanelContextMenu(
+  page: Page,
+  options: {
+    lineNumber: number;
+  }
+) {
+  const { lineNumber } = options;
+
+  const contextMenu = page.locator(`[data-test-id="LogPointContextMenu-Line-${lineNumber}"]`);
+  const isVisible = await contextMenu.isVisible();
+  if (!isVisible) {
+    await debugPrint(page, `Opening log point panel context menu`, "openLogPointPanelContextMenu");
+
+    const pointPanelLocator = getPointPanelLocator(page, lineNumber);
+    const capsule = pointPanelLocator.locator('[data-test-name="LogPointCapsule"]');
+    await capsule.click();
+
+    await contextMenu.waitFor();
+  }
 }
 
 export async function removeAllBreakpoints(page: Page): Promise<void> {
@@ -349,7 +418,7 @@ export async function removeConditional(
 ) {
   await toggleConditional(page, {
     lineNumber: options.lineNumber,
-    state: "off",
+    state: false,
   });
 }
 
@@ -391,37 +460,71 @@ export async function toggleConditional(
   page: Page,
   options: {
     lineNumber: number;
-    state: "on" | "off";
+    state: boolean;
   }
 ) {
   const { lineNumber, state: targetState } = options;
 
+  await openLogPointPanelContextMenu(page, { lineNumber });
+
   const contextMenu = page.locator(`[data-test-id="LogPointContextMenu-Line-${lineNumber}"]`);
-  const isVisible = await contextMenu.isVisible();
-  if (!isVisible) {
-    const pointPanelLocator = getPointPanelLocator(page, lineNumber);
-    const capsule = pointPanelLocator.locator('[data-test-name="LogPointCapsule"]');
-    await capsule.click();
-
-    await contextMenu.waitFor();
-  }
-
   const contextMenuItem = contextMenu.locator(
     '[data-test-name="ContextMenuItem-ToggleConditional"]'
   );
   await contextMenuItem.waitFor();
-  const actualState = await contextMenuItem.getAttribute("data-test-state");
+  const actualState = (await contextMenuItem.getAttribute("data-test-state")) === "true";
   if (actualState !== targetState) {
     await debugPrint(
       page,
-      targetState === "on"
-        ? `Adding conditional to line ${lineNumber}`
-        : `Removing conditional from line ${lineNumber}`,
+      targetState
+        ? `Removing conditional from line ${lineNumber}`
+        : `Adding conditional to line ${lineNumber}`,
       "toggleConditional"
     );
 
     await contextMenuItem.click();
   }
+}
+
+export async function toggleShouldLog(
+  page: Page,
+  options: {
+    lineNumber: number;
+    state: boolean;
+  }
+) {
+  const { lineNumber, state: targetState } = options;
+
+  await openLogPointPanelContextMenu(page, { lineNumber });
+
+  const contextMenu = page.locator(`[data-test-id="LogPointContextMenu-Line-${lineNumber}"]`);
+  const contextMenuItem = contextMenu.locator('[data-test-name="ContextMenuItem-ToggleEnabled"]');
+  await contextMenuItem.waitFor();
+  const actualState = (await contextMenuItem.getAttribute("data-test-state")) === "true";
+  if (actualState !== targetState) {
+    await debugPrint(
+      page,
+      targetState
+        ? `Disable logging for line ${lineNumber}`
+        : `Enable logging for line ${lineNumber}`,
+      "toggleShouldLog"
+    );
+
+    await contextMenuItem.click();
+  }
+}
+
+export async function seekToPreviousLogPointHit(page: Page, lineNumber: number) {
+  await debugPrint(
+    page,
+    `Seeking to previous log-point hit at line ${chalk.bold(`${lineNumber}`)}`,
+    "removeLogpoint"
+  );
+
+  const line = await getSourceLine(page, lineNumber);
+  const previousButton = line.locator('[data-test-name="PreviousHitPointButton"]');
+  await previousButton.waitFor();
+  await previousButton.click();
 }
 
 export async function toggleMappedSources(page: Page, targetState: "on" | "off"): Promise<void> {
@@ -466,14 +569,16 @@ export async function waitForLogpoint(
   options: {
     columnIndex?: number;
     lineNumber: number;
-    url: string;
+    url?: string;
   }
 ): Promise<void> {
   const { lineNumber, url } = options;
 
   await debugPrint(
     page,
-    `Waiting for log-point at ${chalk.bold(`${url}:${lineNumber}`)}`,
+    url
+      ? `Waiting for log-point at ${chalk.bold(`${url}:${lineNumber}`)}`
+      : `Waiting for log-point at ${chalk.bold(`${lineNumber}`)}`,
     "waitForLogpoint"
   );
 
@@ -526,9 +631,9 @@ export async function waitForSelectedSource(page: Page, url: string) {
     await expect(await sourceHeader.getAttribute("data-status")).toBe("active");
 
     // Make sure the visible source is the same source as the selected tab.
-    const headerSourceId = await sourceHeader.getAttribute("data-test-sourceid");
+    const headerSourceId = await sourceHeader.getAttribute("data-test-source-id");
     expect(
-      await page.locator('[data-test-name="Source"]:visible').getAttribute("data-test-sourceid")
+      await page.locator('[data-test-name="Source"]:visible').getAttribute("data-test-source-id")
     ).toBe(headerSourceId);
 
     // HACK Assume that the source file has loaded when the combined text of the first

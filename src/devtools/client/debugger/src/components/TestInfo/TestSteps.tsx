@@ -1,10 +1,18 @@
 import React, { useContext, useMemo } from "react";
 
 import {
+  AnnotatedTestStep,
+  CypressAnnotationMessage,
+  TestItem,
+  TestStep,
+} from "shared/graphql/types";
+import { seekToTime } from "ui/actions/timeline";
+import {
   RequestSummary,
   partialRequestsToCompleteSummaries,
 } from "ui/components/NetworkMonitor/utils";
 import Icon from "ui/components/shared/Icon";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getEvents, getRequests } from "ui/reducers/network";
 import {
   getReporterAnnotationsForTitle,
@@ -13,8 +21,7 @@ import {
   getReporterAnnotationsForTitleStart,
 } from "ui/reducers/reporter";
 import { getCurrentTime } from "ui/reducers/timeline";
-import { useAppSelector } from "ui/setup/hooks";
-import { AnnotatedTestStep, CypressAnnotationMessage, TestItem, TestStep } from "ui/types";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { NetworkEvent } from "./NetworkEvent";
 import { TestCaseContext } from "./TestCase";
@@ -55,8 +62,24 @@ function useGetTestSections(
   const events = useAppSelector(getEvents);
 
   return useMemo(() => {
+    const simplifiedSteps = steps?.reduce<TestStep[]>((acc, s) => {
+      const previous = acc[acc.length - 1];
+      if (s.name === "then") {
+        return acc;
+      } else if (previous && s.name === "as" && typeof s.args?.[0] === "string") {
+        acc[acc.length - 1] = {
+          ...previous,
+          alias: s.args[0],
+        };
+      } else {
+        acc.push(s);
+      }
+
+      return acc;
+    }, []);
+
     const stepsByTime =
-      steps?.map<StepEvent>((s, i) => {
+      simplifiedSteps?.map<StepEvent>((s, i) => {
         const annotations = {
           end: annotationsEnd.find(a => a.message.id === s.id),
           enqueue: annotationsEnqueue.find(a => a.message.id === s.id),
@@ -72,10 +95,8 @@ function useGetTestSections(
           // of the failed command but successful asserts with their start time
           if (s.error) {
             absoluteStartTime = absoluteEndTime - 1;
-            annotations.start = annotations.end;
           } else {
             absoluteEndTime = absoluteStartTime + 1;
-            annotations.end = annotations.start;
           }
           duration = 1;
         }
@@ -206,7 +227,7 @@ export function TestSteps({ test }: { test: TestItem }) {
           <div>
             <div className="flex flex-row items-center space-x-1 p-2">
               <Icon filename="warning" size="small" className="bg-testsuitesErrorColor" />
-              <div className="font-bold">Error</div>
+              <div className="font-bold">Assertion Error</div>
             </div>
             <div className="wrap space-y-1 overflow-hidden p-2 font-mono">{test.error.message}</div>
           </div>
@@ -218,17 +239,34 @@ export function TestSteps({ test }: { test: TestItem }) {
 
 function NewUrlRow({ time, message }: { time: number; message: CypressAnnotationMessage }) {
   const currentTime = useAppSelector(getCurrentTime);
+  const dispatch = useAppDispatch();
+
+  const onClick = () => {
+    dispatch(seekToTime(time));
+  };
 
   return (
-    <TestStepRow pending={time > currentTime} key={(message.url || "url") + time}>
+    <TestStepRow
+      active={time === currentTime}
+      pending={time > currentTime}
+      key={(message.url || "url") + time}
+      onClick={onClick}
+      className="cursor-pointer"
+    >
+      <MaterialIcon className="mr-1 opacity-70" iconSize="sm">
+        navigation
+      </MaterialIcon>
       <div className="truncate italic opacity-70" title={message.url}>
-        new url {message.url}
+        {message.url}
       </div>
     </TestStepRow>
   );
 }
 
 function TestSection({ events, header }: { events: CompositeTestEvent[]; header?: string }) {
+  const firstStep = events.find((e): e is StepEvent => e.type === "step");
+  const firstIndex = firstStep?.event.index || 0;
+
   if (events.length === 0) {
     return null;
   }
@@ -249,7 +287,7 @@ function TestSection({ events, header }: { events: CompositeTestEvent[]; header?
           <TestStepItem
             step={s}
             key={s.id}
-            index={s.index}
+            index={s.index - firstIndex}
             argString={
               s.args ? s.args.filter((s): s is string => s && typeof s === "string").join(", ") : ""
             }

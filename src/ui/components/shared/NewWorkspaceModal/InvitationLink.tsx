@@ -1,8 +1,8 @@
 import classNames from "classnames";
 import React, { useRef, useState } from "react";
 
+import { Workspace } from "shared/graphql/types";
 import hooks from "ui/hooks";
-import { Workspace } from "ui/types";
 
 export function TextInputCopy({
   text,

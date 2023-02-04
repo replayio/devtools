@@ -4,9 +4,9 @@ import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import React from "react";
 import LazyLoad from "react-lazyload";
 
+import { Recording } from "shared/graphql/types";
 import hooks from "ui/hooks";
 import { useGetUserPermissions } from "ui/hooks/users";
-import { Recording } from "ui/types";
 import { getDisplayedUrl } from "ui/utils/environment";
 import { getRecordingURL } from "ui/utils/recording";
 
@@ -199,7 +199,7 @@ function RecordingRow({
           )}
         </div>
         <div
-          className="relative flex w-6 flex-shrink-0 flex-row items-center justify-center py-3 pr-4"
+          className="relative flex w-10 flex-shrink-0 flex-row items-center justify-center py-3 pr-4"
           onClick={e => e.stopPropagation()}
         >
           {!isEditing ? <RecordingOptionsDropdown {...{ recording }} /> : null}

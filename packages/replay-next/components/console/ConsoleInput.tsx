@@ -1,9 +1,9 @@
 import { FrameId, PauseId } from "@replayio/protocol";
-import { Suspense, useContext, useEffect, useRef, useState } from "react";
+import { RefObject, Suspense, useContext, useEffect, useRef, useState } from "react";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import Icon from "replay-next/components/Icon";
-import CodeEditor from "replay-next/components/lexical/CodeEditor";
+import CodeEditor, { ImperativeHandle } from "replay-next/components/lexical/CodeEditor";
 import Loader from "replay-next/components/Loader";
 import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
@@ -21,17 +21,18 @@ import EagerEvaluationResult from "./EagerEvaluationResult";
 import useTerminalHistory from "./hooks/useTerminalHistory";
 import styles from "./ConsoleInput.module.css";
 
-export default function ConsoleInput() {
+export default function ConsoleInput({ inputRef }: { inputRef?: RefObject<ImperativeHandle> }) {
+  const { executionPoint } = useContext(TimelineContext);
   return (
-    <ErrorBoundary fallback={<ErrorFallback />}>
+    <ErrorBoundary resetKey={executionPoint} fallback={<ErrorFallback />}>
       <Suspense fallback={<Loader />}>
-        <ConsoleInputSuspends />
+        <ConsoleInputSuspends inputRef={inputRef} />
       </Suspense>
     </ErrorBoundary>
   );
 }
 
-function ConsoleInputSuspends() {
+function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHandle> }) {
   const replayClient = useContext(ReplayClientContext);
   const [searchState] = useContext(ConsoleSearchContext);
   const { addMessage } = useContext(TerminalContext);
@@ -162,6 +163,7 @@ function ConsoleInputSuspends() {
         <div className={styles.Input}>
           <CodeEditor
             autoFocus={autoFocus}
+            context="console"
             dataTestId="ConsoleTerminalInput"
             editable={true}
             initialValue={expression}
@@ -169,6 +171,7 @@ function ConsoleInputSuspends() {
             onChange={onChange}
             onSave={onSubmit}
             pauseAndFrameId={selectedPauseAndFrameId}
+            ref={inputRef}
           />
         </div>
       </div>
@@ -184,7 +187,7 @@ function ErrorFallback() {
   return (
     <div className={styles.FallbackState}>
       <Icon className={styles.Icon} type="terminal-prompt" />
-      Input disabled for session because of an error
+      Input disabled because of an error
     </div>
   );
 }

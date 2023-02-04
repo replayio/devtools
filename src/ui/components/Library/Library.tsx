@@ -1,11 +1,11 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
+import { ExperimentalUserSettings } from "shared/graphql/types";
 import { useGetTeamRouteParams, useRedirectToTeam } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
 import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
 import { UserInfo } from "ui/hooks/users";
-import { ExperimentalUserSettings } from "ui/types";
 import logrocket from "ui/utils/logrocket";
 import useAuth0 from "ui/utils/useAuth0";
 

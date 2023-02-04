@@ -48,19 +48,20 @@ export const DEFAULT_MAX_CHARACTERS = 500_000;
 export const DEFAULT_MAX_TIME = 5_000;
 
 export const { getValueSuspense: parse } = createGenericCache<
+  [],
   [code: string, fileName: string],
   Array<ParsedToken[]> | null
->("SyntaxParsingCache: parse", highlighter, identity);
+>("SyntaxParsingCache: parse", 0, highlighter, identity);
 
 export const {
   getValueAsync: parseStreamingAsync,
   getValueSuspense: parseStreaming,
   getValueIfCached: getParsedValueIfCached,
-} = createGenericCache<[source: StreamingSourceContents, maxTime?: number], StreamingParser | null>(
-  "SyntaxParsingCache: parseStreaming",
-  streamingSourceContentsToStreamingParser,
-  identity
-);
+} = createGenericCache<
+  [],
+  [source: StreamingSourceContents, maxTime?: number],
+  StreamingParser | null
+>("SyntaxParsingCache: parseStreaming", 0, streamingSourceContentsToStreamingParser, identity);
 
 async function streamingSourceContentsToStreamingParser(
   source: StreamingSourceContents,

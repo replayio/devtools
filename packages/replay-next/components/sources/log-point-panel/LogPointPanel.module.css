@@ -1,14 +1,12 @@
-.PanelEnabled,
-.PanelDisabled {
+.Panel {
   display: flex;
   flex-direction: column;
   padding: 0.5rem;
   gap: 0.25rem;
+  background-color: var(--point-panel-background-color);
+
   --badge-picker-button-size: 1.25rem;
   --badge-picker-icon-size: 1rem;
-}
-.PanelEnabled {
-  background-color: var(--point-panel-background-color);
 }
 
 .FocusModeLink {
@@ -59,11 +57,14 @@
   align-items: center;
   gap: 1ch;
 }
+.ContentWrapper[data-logging-disabled] {
+  background-color: var(--point-panel-input-disabled-background-color);
+}
 .ContentWrapper:hover {
   border-color: var(--point-panel-input-border-color-hover);
 }
-.PanelEnabled[data-test-state="edit"] .ContentWrapper:focus,
-.PanelEnabled[data-test-state="edit"] .ContentWrapper:focus-within {
+.Panel[data-test-state="edit"] .ContentWrapper:focus,
+.Panel[data-test-state="edit"] .ContentWrapper:focus-within {
   border-color: var(--point-panel-input-border-color-focus);
 }
 

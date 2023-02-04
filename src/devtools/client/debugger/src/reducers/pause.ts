@@ -284,6 +284,10 @@ export function getPauseId(state: UIState) {
   return state.pause.id;
 }
 
+export function getPauseErrored(state: UIState) {
+  return state.pause.pauseErrored;
+}
+
 export function getPausePreviewLocation(state: UIState) {
   return state.pause.pausePreviewLocation;
 }

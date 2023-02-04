@@ -10,9 +10,8 @@ import { AddPoint, DeletePoints, EditPoint } from "replay-next/src/contexts/Poin
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { Nag } from "replay-next/src/graphql/types";
 import { useNag } from "replay-next/src/hooks/useNag";
-import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/PointsCache";
+import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/ExecutionPointsCache";
 import {
   compareExecutionPoints,
   isExecutionPointsGreaterThan,
@@ -22,6 +21,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_DISABLED, POINT_BEHAVIOR_ENABLED, Point } from "shared/client/types";
 import { LineHitCounts } from "shared/client/types";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
+import { Nag } from "shared/graphql/types";
 
 import styles from "./HoverButton.module.css";
 

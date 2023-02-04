@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import Icon from "replay-next/components/Icon";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { imperativelyGetClosestPointForTime } from "replay-next/src/suspense/PointsCache";
+import { imperativelyGetClosestPointForTime } from "replay-next/src/suspense/ExecutionPointsCache";
 import {
   isExecutionPointsGreaterThan,
   isExecutionPointsLessThan,
@@ -24,13 +24,17 @@ export default function HitPointTimeline({
   hitPoints,
   hitPointStatus,
   point,
+  shouldLog,
   toggleConditional,
+  toggleShouldLog,
 }: {
   hasConditional: boolean;
   hitPoints: TimeStampedPoint[];
   hitPointStatus: HitPointStatus;
+  shouldLog: boolean;
   point: Point;
   toggleConditional: () => void;
+  toggleShouldLog: () => void;
 }) {
   const client = useContext(ReplayClientContext);
   const { duration } = useContext(SessionContext);
@@ -132,7 +136,9 @@ export default function HitPointTimeline({
         hitPoints={hitPoints}
         hitPointStatus={hitPointStatus}
         point={point}
+        shouldLog={shouldLog}
         toggleConditional={toggleConditional}
+        toggleShouldLog={toggleShouldLog}
       />
       <button
         className={styles.NextButton}

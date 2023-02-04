@@ -57,7 +57,7 @@ export async function addLogPoint(
     sourceId: string;
   }
 ) {
-  const { badge, condition, content, lineNumber, sourceId } = options;
+  const { badge, condition, content, lineNumber, saveAfterEdit = true, sourceId } = options;
 
   await debugPrint(
     page,
@@ -80,7 +80,7 @@ export async function addLogPoint(
     await toggle.click({ force: true });
   }
 
-  if (condition !== undefined || content !== undefined) {
+  if (condition !== undefined || content !== undefined || saveAfterEdit) {
     await editLogPoint(page, options);
   }
 
@@ -161,11 +161,9 @@ export async function editLogPoint(
   await openSourceFile(page, sourceId);
   await goToLine(page, sourceId, lineNumber);
 
-  const pointPanelLocator = getPointPanelLocator(page, options.lineNumber);
-  if (!(await pointPanelLocator.isVisible())) {
-    await hoverOverLine(page, { lineNumber, sourceId });
-  }
+  await hoverOverLine(page, { lineNumber, sourceId });
 
+  const pointPanelLocator = getPointPanelLocator(page, options.lineNumber);
   const editButtonLocator = await pointPanelLocator.locator(
     "[data-test-name=PointPanel-EditButton]"
   );
@@ -189,8 +187,17 @@ export async function editLogPoint(
   }
 
   if (saveAfterEdit) {
+    await debugPrint(
+      page,
+      `Saving log point for source "${chalk.bold(sourceId)}" at line ${chalk.bold(lineNumber)}`,
+      "editLogPoint"
+    );
+
     const saveButton = pointPanelLocator.locator('[data-test-name="PointPanel-SaveButton"]');
     await saveButton.click({ force: true });
+
+    // Give log point time to be processed.
+    await delay();
   }
 }
 
@@ -203,7 +210,7 @@ export async function addConditional(
     sourceId: string;
   }
 ) {
-  await toggleConditional(page, { ...options, state: "on" });
+  await toggleConditional(page, { ...options, state: true });
 
   const { condition, lineNumber, saveAfterAdding } = options;
   if (condition != null) {
@@ -220,9 +227,13 @@ export async function addConditional(
     await clearTextArea(page, conditionLocator);
     await conditionLocator.fill(condition);
 
+    // Give time for the type-ahead to be evaluated and hide if it needed
+    await delay();
+
     const typeAheadLocator = getLogPointPanelConditionTypeAhead(page);
     if (await typeAheadLocator.isVisible()) {
       await page.keyboard.press("Escape");
+      await expect(await typeAheadLocator).not.toBeVisible();
     }
 
     if (saveAfterAdding) {
@@ -454,7 +465,11 @@ export async function hoverOverLine(
     }
     suffix = `with ${chalk.bold(keys.join(" and "))}`;
   }
-  await debugPrint(page, `Hovering over line ${chalk.bold(lineNumber)} ${suffix}`, "hoverOverLine");
+  await debugPrint(
+    page,
+    `Hovering over source "${chalk.bold(sourceId)}" line ${chalk.bold(lineNumber)} ${suffix}`,
+    "hoverOverLine"
+  );
 
   await goToLine(page, sourceId, lineNumber);
 
@@ -534,6 +549,27 @@ export async function isLineCurrentSearchResult(page: Page, lineNumber: number):
   return isVisible;
 }
 
+export async function openLogPointPanelContextMenu(
+  page: Page,
+  options: {
+    lineNumber: number;
+  }
+) {
+  const { lineNumber } = options;
+
+  const contextMenu = page.locator(`[data-test-id="LogPointContextMenu-Line-${lineNumber}"]`);
+  const isVisible = await contextMenu.isVisible();
+  if (!isVisible) {
+    await debugPrint(page, `Opening log point panel context menu`, "openLogPointPanelContextMenu");
+
+    const pointPanelLocator = getPointPanelLocator(page, lineNumber);
+    const capsule = pointPanelLocator.locator('[data-test-name="LogPointCapsule"]');
+    await capsule.click();
+
+    await contextMenu.waitFor();
+  }
+}
+
 export async function openSourceFile(page: Page, sourceId: string) {
   const sourceTabLocator = getSourceTabLocator(page, sourceId);
   const sourceTabIsVisible = await sourceTabLocator.isVisible();
@@ -586,7 +622,7 @@ export async function removeConditional(
     sourceId: string;
   }
 ) {
-  await toggleConditional(page, { ...options, state: "off" });
+  await toggleConditional(page, { ...options, state: false });
 }
 
 export async function removeLogPoint(
@@ -657,7 +693,7 @@ export async function toggleConditional(
   options: {
     lineNumber: number;
     sourceId: string;
-    state: "off" | "on";
+    state: boolean;
   }
 ) {
   const { lineNumber, sourceId, state: targetState } = options;
@@ -665,27 +701,20 @@ export async function toggleConditional(
   await openSourceFile(page, sourceId);
   await goToLine(page, sourceId, lineNumber);
 
+  await openLogPointPanelContextMenu(page, { lineNumber });
+
   const contextMenu = page.locator(`[data-test-id="LogPointContextMenu-Line-${lineNumber}"]`);
-  const isVisible = await contextMenu.isVisible();
-  if (!isVisible) {
-    const pointPanelLocator = getPointPanelLocator(page, lineNumber);
-    const capsule = pointPanelLocator.locator('[data-test-name="LogPointCapsule"]');
-    await capsule.click();
-
-    await contextMenu.waitFor();
-  }
-
   const contextMenuItem = contextMenu.locator(
     '[data-test-name="ContextMenuItem-ToggleConditional"]'
   );
   await contextMenuItem.waitFor();
-  const actualState = await contextMenuItem.getAttribute("data-test-state");
+  const actualState = (await contextMenuItem.getAttribute("data-test-state")) === "true";
   if (actualState !== targetState) {
     await debugPrint(
       page,
-      targetState === "on"
-        ? `Adding conditional to line ${lineNumber}`
-        : `Removing conditional from line ${lineNumber}`,
+      targetState
+        ? `Removing conditional from line ${lineNumber}`
+        : `Adding conditional to line ${lineNumber}`,
       "removeConditional"
     );
 
@@ -764,6 +793,35 @@ export async function toggleLogPointBadge(
   }
 
   await stopHovering(page);
+}
+
+export async function toggleShouldLog(
+  page: Page,
+  options: {
+    lineNumber: number;
+    sourceId: string;
+    state: boolean;
+  }
+) {
+  const { lineNumber, state: targetState } = options;
+
+  await openLogPointPanelContextMenu(page, { lineNumber });
+
+  const contextMenu = page.locator(`[data-test-id="LogPointContextMenu-Line-${lineNumber}"]`);
+  const contextMenuItem = contextMenu.locator('[data-test-name="ContextMenuItem-ToggleEnabled"]');
+  await contextMenuItem.waitFor();
+  const actualState = (await contextMenuItem.getAttribute("data-test-state")) === "true";
+  if (actualState !== targetState) {
+    await debugPrint(
+      page,
+      targetState
+        ? `Disable logging for line ${lineNumber}`
+        : `Enable logging for line ${lineNumber}`,
+      "toggleShouldLog"
+    );
+
+    await contextMenuItem.click();
+  }
 }
 
 export async function verifyCurrentExecutionPoint(

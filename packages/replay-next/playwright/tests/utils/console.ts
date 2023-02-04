@@ -1,7 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
-import { debugPrint, getCommandKey, getElementCount, waitFor } from "./general";
+import { debugPrint, delay, getCommandKey, getElementCount, waitFor } from "./general";
 import { Expected, MessageType } from "./types";
 
 type ToggleName = "errors" | "exceptions" | "logs" | "nodeModules" | "timestamps" | "warnings";
@@ -15,6 +15,13 @@ export async function addTerminalExpression(page: Page, text: string): Promise<v
   await input.fill(text);
   await page.keyboard.press("Enter");
   await verifyConsoleMessage(page, text, "terminal-expression", 1);
+}
+
+export async function filterByText(page: Page, text: string) {
+  await page.fill("[data-test-id=ConsoleFilterInput]", text);
+
+  // Give filter time to be applied
+  await delay();
 }
 
 export async function findConsoleMessage(
@@ -43,10 +50,26 @@ export async function findConsoleMessage(
 export async function focusOnConsole(page: Page) {
   await debugPrint(page, `Focusing on console`, "focusOnConsole");
 
-  const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
+  const consoleRoot = page.locator('[data-test-id="ConsoleTerminalInput"]');
   await expect(consoleRoot).toBeVisible();
   await consoleRoot.focus();
   await expect(consoleRoot).toBeFocused();
+}
+
+export function getConsoleContextMenu(page: Page): Locator {
+  return page.locator("[data-test-id=ConsoleContextMenu]");
+}
+
+export function getConsoleInput(page: Page): Locator {
+  return page.locator('[data-test-id="ConsoleTerminalInput"]');
+}
+
+export function getConsoleInputTypeAhead(page: Page): Locator {
+  return page.locator('[data-test-id="ConsoleTerminalInput-CodeTypeAhead"]');
+}
+
+export function getConsoleSearchInput(page: Page): Locator {
+  return page.locator('[data-test-id="ConsoleSearchInput"]');
 }
 
 export async function hideSearchInput(page: Page) {
@@ -99,10 +122,13 @@ export async function locateMessage<T>(
   }
 }
 
-export async function openContextMenu(listItem: Locator) {
+export async function openContextMenu(page: Page, listItem: Locator) {
   // Click to the left of the list item to avoid accidentally clicking on an Inspector instance
   // Inspector has its own context menu with "copy object"
   await listItem.click({ button: "right", position: { x: 10, y: 10 } });
+
+  const contextMenu = getConsoleContextMenu(page);
+  await expect(contextMenu).toBeVisible();
 }
 
 export function messageLocator(
@@ -135,7 +161,7 @@ export async function showSearchInput(page: Page) {
   await page.keyboard.type("f");
   await page.keyboard.up(getCommandKey());
 
-  const input = page.locator(`[data-test-id=ConsoleSearchInput]`);
+  const input = getConsoleSearchInput(page);
   await expect(input).toBeVisible();
 }
 
@@ -227,6 +253,22 @@ export async function verifyConsoleMessage(
   }
 }
 
-export async function filterByText(page: Page, text: string) {
-  await page.fill("[data-test-id=ConsoleFilterInput]", text);
+export async function verifyTypeAheadContainsSuggestions(page: Page, ...suggestions: Expected[]) {
+  const typeAhead = getConsoleInputTypeAhead(page);
+
+  for (let index = 0; index < suggestions.length; index++) {
+    const suggestion = suggestions[index];
+
+    await debugPrint(
+      page,
+      `Verifying terminal type-ahead contains suggestion "${chalk.bold(suggestion)}"`,
+      "verifyTypeAheadContainsSuggestions"
+    );
+
+    await waitFor(async () => {
+      const results = typeAhead.locator(`[data-test-name="CodeTypeAhead-Item"]`);
+      const allTextContents = await results.allTextContents();
+      return expect(allTextContents).toContain(suggestion);
+    });
+  }
 }

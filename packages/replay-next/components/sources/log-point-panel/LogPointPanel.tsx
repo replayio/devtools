@@ -8,6 +8,7 @@ import {
   useTransition,
 } from "react";
 
+import { assert } from "protocol/utils";
 import Icon from "replay-next/components/Icon";
 import CodeEditor from "replay-next/components/lexical/CodeEditor";
 import {
@@ -21,16 +22,23 @@ import { PointsContext } from "replay-next/src/contexts/PointsContext";
 import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { addComment as addCommentGraphQL } from "replay-next/src/graphql/Comments";
-import { Nag } from "replay-next/src/graphql/types";
 import { useNag } from "replay-next/src/hooks/useNag";
+import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/ExecutionPointsCache";
 import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
 import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
-import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/PointsCache";
+import { getSource } from "replay-next/src/suspense/SourcesCache";
 import { findIndexBigInt } from "replay-next/src/utils/array";
 import { validate } from "replay-next/src/utils/points";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { HitPointStatus, POINT_BEHAVIOR_ENABLED, Point } from "shared/client/types";
+import {
+  HitPointStatus,
+  POINT_BEHAVIOR_DISABLED_TEMPORARILY,
+  POINT_BEHAVIOR_ENABLED,
+  Point,
+} from "shared/client/types";
+import { addComment as addCommentGraphQL } from "shared/graphql/Comments";
+import { Nag } from "shared/graphql/types";
+import { isThennable } from "shared/proxy/utils";
 
 import Loader from "../../Loader";
 import { SetLinePointState } from "../SourceListRow";
@@ -84,7 +92,7 @@ function PointPanel(props: ExternalProps) {
   const [hitPoints, hitPointStatus] = getHitPointsForLocationSuspense(
     client,
     point.location,
-    null,
+    point.condition,
     focusRange
   );
 
@@ -150,16 +158,34 @@ function PointPanelWithHitPoints({
   // Otherwise fall back to using the global execution point.
   const executionPoint = closestHitPoint ? closestHitPoint.point : currentExecutionPoint;
   const time = closestHitPoint ? closestHitPoint.time : currentTime;
-  const pauseId = getPauseIdSuspense(client, executionPoint, time);
-  const frames = getFramesSuspense(client, pauseId);
-  const frameId = frames?.[0]?.frameId ?? null;
   let pauseAndFrameId: PauseAndFrameId | null = null;
-  if (frameId !== null) {
-    pauseAndFrameId = {
-      frameId,
-      pauseId,
-    };
+  try {
+    const pauseId = getPauseIdSuspense(client, executionPoint, time);
+    const frames = getFramesSuspense(client, pauseId);
+    const frameId = frames?.[0]?.frameId ?? null;
+    if (frameId !== null) {
+      pauseAndFrameId = {
+        frameId,
+        pauseId,
+      };
+    }
+  } catch (errorOrPromise) {
+    if (isThennable(errorOrPromise)) {
+      throw errorOrPromise;
+    }
+    console.error(`Failed to fetch frames for point ${executionPoint}`, errorOrPromise);
   }
+
+  let source = getSource(client, point.location.sourceId);
+  if (source?.kind === "prettyPrinted") {
+    assert(
+      source.generatedSourceIds,
+      `pretty-printed source ${point.location.sourceId} has no generatedSourceIds`
+    );
+    source = getSource(client, source.generatedSourceIds[0]);
+  }
+  const context =
+    source?.kind === "sourceMapped" ? "logpoint-original-source" : "logpoint-generated-source";
 
   const shouldLog = point.shouldLog === POINT_BEHAVIOR_ENABLED;
 
@@ -182,6 +208,12 @@ function PointPanelWithHitPoints({
       setEditableCondition("");
       setLinePointState(lineIndex, "point-with-conditional");
     }
+  };
+
+  const toggleShouldLog = () => {
+    editPoint(point.id, {
+      shouldLog: shouldLog ? POINT_BEHAVIOR_DISABLED_TEMPORARILY : POINT_BEHAVIOR_ENABLED,
+    });
   };
 
   let showTooManyPointsMessage = false;
@@ -257,7 +289,11 @@ function PointPanelWithHitPoints({
 
   const onSubmit = () => {
     if (isConditionValid && isContentValid && hasChanged) {
-      editPoint(point.id, { condition: editableCondition || null, content: editableContent });
+      editPoint(point.id, {
+        condition: editableCondition || null,
+        content: editableContent,
+        shouldLog: POINT_BEHAVIOR_ENABLED,
+      });
     }
     setIsEditing(false);
     dismissEditBreakpointNag();
@@ -279,7 +315,7 @@ function PointPanelWithHitPoints({
 
   return (
     <div
-      className={`${shouldLog ? styles.PanelEnabled : styles.PanelDisabled} ${className}`}
+      className={`${styles.Panel} ${className}`}
       data-test-id={`PointPanel-${lineNumber}`}
       data-test-state={isEditing ? "edit" : "view"}
     >
@@ -288,6 +324,7 @@ function PointPanelWithHitPoints({
           <div className={styles.EditableContentWrapperRow}>
             <div
               className={isConditionValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}
+              data-logging-disabled={!shouldLog || undefined}
               onClick={showTooManyPointsMessage ? undefined : () => startEditing("condition")}
             >
               <div
@@ -308,6 +345,7 @@ function PointPanelWithHitPoints({
                       allowWrapping={false}
                       autoFocus={editReason === "condition"}
                       autoSelect={editReason === "condition"}
+                      context={context}
                       dataTestId={`PointPanel-ConditionInput-${lineNumber}`}
                       dataTestName="PointPanel-ConditionInput"
                       editable={true}
@@ -357,6 +395,7 @@ function PointPanelWithHitPoints({
         ) : (
           <div
             className={isContentValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}
+            data-logging-disabled={!shouldLog || undefined}
             onClick={showTooManyPointsMessage ? undefined : () => startEditing("content")}
           >
             <BadgePicker invalid={!isContentValid} point={point} />
@@ -372,6 +411,7 @@ function PointPanelWithHitPoints({
                     allowWrapping={false}
                     autoFocus={showEditBreakpointNag || editReason === "content"}
                     autoSelect={editReason === "content"}
+                    context={context}
                     dataTestId={`PointPanel-ContentInput-${lineNumber}`}
                     dataTestName="PointPanel-ContentInput"
                     editable={true}
@@ -393,7 +433,10 @@ function PointPanelWithHitPoints({
                   disabled={isPending}
                   data-test-name="PointPanel-EditButton"
                 >
-                  <Icon className={styles.EditButtonIcon} type="edit" />
+                  <Icon
+                    className={styles.EditButtonIcon}
+                    type={shouldLog ? "edit" : "toggle-off"}
+                  />
                 </button>
               </>
             )}
@@ -409,7 +452,9 @@ function PointPanelWithHitPoints({
           hitPoints={hitPoints}
           hitPointStatus={hitPointStatus}
           point={point}
+          shouldLog={shouldLog}
           toggleConditional={toggleCondition}
+          toggleShouldLog={toggleShouldLog}
         />
       </div>
     </div>

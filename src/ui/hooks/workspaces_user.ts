@@ -3,25 +3,28 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   AcceptPendingInvitation,
   AcceptPendingInvitationVariables,
-} from "graphql/AcceptPendingInvitation";
+} from "shared/graphql/generated/AcceptPendingInvitation";
 import {
   ClaimTeamInvitationCode,
   ClaimTeamInvitationCodeVariables,
-} from "graphql/ClaimTeamInvitationCode";
+} from "shared/graphql/generated/ClaimTeamInvitationCode";
 import {
   DeleteUserFromWorkspace,
   DeleteUserFromWorkspaceVariables,
-} from "graphql/DeleteUserFromWorkspace";
-import { GetWorkspaceMembers, GetWorkspaceMembersVariables } from "graphql/GetWorkspaceMembers";
+} from "shared/graphql/generated/DeleteUserFromWorkspace";
+import {
+  GetWorkspaceMembers,
+  GetWorkspaceMembersVariables,
+} from "shared/graphql/generated/GetWorkspaceMembers";
 import {
   InviteNewWorkspaceMember,
   InviteNewWorkspaceMemberVariables,
-} from "graphql/InviteNewWorkspaceMember";
+} from "shared/graphql/generated/InviteNewWorkspaceMember";
 import {
   RejectPendingInvitation,
   RejectPendingInvitationVariables,
-} from "graphql/RejectPendingInvitation";
-import { WorkspaceUser, WorkspaceUserRole } from "ui/types";
+} from "shared/graphql/generated/RejectPendingInvitation";
+import { WorkspaceUser, WorkspaceUserRole } from "shared/graphql/types";
 
 export function useGetWorkspaceMembers(workspaceId: string) {
   const { data, loading, error } = useQuery<GetWorkspaceMembers, GetWorkspaceMembersVariables>(

@@ -18,6 +18,7 @@ function initialTimelineState(): TimelineState {
     hoverTime: null,
     hoveredItem: null,
     playback: null,
+    playbackFocusRegion: false,
     playbackPrecachedTime: 0,
     paints: [{ time: 0, point: "0" }],
     points: [{ time: 0, point: "0" }],
@@ -52,6 +53,9 @@ const timelineSlice = createSlice({
     },
     setPlaybackPrecachedTime(state, action: PayloadAction<number>) {
       state.playbackPrecachedTime = action.payload;
+    },
+    setPlaybackFocusRegion(state, action: PayloadAction<boolean>) {
+      state.playbackFocusRegion = action.payload;
     },
     setFocusRegion(state, action: PayloadAction<FocusRegion | null>) {
       state.focusRegion = action.payload;
@@ -90,6 +94,7 @@ export const {
   setDragging,
   setHoveredItem,
   setPlaybackPrecachedTime,
+  setPlaybackFocusRegion,
   setPlaybackStalled,
   setFocusRegion,
   setDisplayedFocusRegion,
@@ -126,6 +131,7 @@ export const getBasicProcessingProgress = (state: UIState) => {
   return (1.0 * (maxPaint?.time || 0)) / maxPoint.time;
 };
 export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
+export const getPlaybackFocusRegion = (state: UIState) => state.timeline.playbackFocusRegion;
 export const getFocusRegion = (state: UIState) => state.timeline.focusRegion;
 export const getDisplayedFocusRegion = (state: UIState) => state.timeline.displayedFocusRegion;
 export const isMaximumFocusRegion = (state: UIState) => {

@@ -1,7 +1,7 @@
 import { FetchResult, gql, useMutation } from "@apollo/client";
 import omit from "lodash/omit";
 
-import { AddComment, AddCommentVariables } from "graphql/AddComment";
+import { AddComment, AddCommentVariables } from "shared/graphql/generated/AddComment";
 import { Comment } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
 

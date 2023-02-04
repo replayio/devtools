@@ -145,7 +145,7 @@ function SourceRenderer({
     <div
       className={styles.Source}
       data-test-id={`Source-${source.sourceId}`}
-      data-test-sourceid={source.sourceId}
+      data-test-source-id={source.sourceId}
       data-test-name="Source"
       onMouseEnter={trackMouseHover}
     >

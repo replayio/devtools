@@ -55,16 +55,16 @@ declare global {
     logMessage: (message: string) => void;
     jsondiffpatch: any;
   }
-
-  // These types aren't actually attached to `window`, but _should_ be in
-  // scope when we evaluate code at the original annotation timestamps.
-  let latestDispatchedActions: Record<string, LastSavedValues>;
-
-  let action: AnyAction;
-  let state: any;
-  let extractedConfig: ExtractedExtensionConfig;
-  let config: Config;
 }
+
+// These types aren't actually attached to `window`, but _should_ be in
+// scope when we evaluate code at the original annotation timestamps.
+// Use `declare let x` to make code in _this_ file only accept those.
+declare let latestDispatchedActions: Record<string, LastSavedValues>;
+declare let action: AnyAction;
+declare let state: any;
+declare let extractedConfig: ExtractedExtensionConfig;
+declare let config: Config;
 
 function mutateWindowForSetup() {
   window.evaluationLogs = [];
@@ -114,7 +114,7 @@ async function evaluateNoArgsFunction(
   pauseId?: string,
   frameId?: string
 ) {
-  return await ThreadFront.evaluateNew({
+  return await ThreadFront.evaluate({
     replayClient,
     text: `(${fn})()`,
     pauseId,
@@ -126,11 +126,13 @@ async function evaluateNoArgsFunction(
 // applied to a given pause in a session. So, we only need to do this once for
 // a given Pause, and we want to retain the info even if the RDT component unmounts.
 export const { getValueAsync: getActionStateValuesAsync } = createGenericCache<
-  [point: ExecutionPoint, time: number, replayClient: ReplayClientInterface],
+  [replayClient: ReplayClientInterface],
+  [point: ExecutionPoint, time: number],
   ReduxActionStateValues | undefined
 >(
   "reduxDevtools: getActionStateValues",
-  async (point, time, replayClient) => {
+  1,
+  async (replayClient, point, time) => {
     const pauseId = await getPauseIdAsync(replayClient, point, time);
     if (!pauseId) {
       return;
@@ -166,11 +168,13 @@ export const { getValueAsync: getActionStateValuesAsync } = createGenericCache<
 );
 
 export const { getValueAsync: getDiffAsync } = createGenericCache<
-  [point: ExecutionPoint, time: number, replayClient: ReplayClientInterface],
+  [replayClient: ReplayClientInterface],
+  [point: ExecutionPoint, time: number],
   Delta | undefined
 >(
   "reduxDevtools: getDiff",
-  async (point, time, replayClient) => {
+  1,
+  async (replayClient, point, time) => {
     const pauseId = await getPauseIdAsync(replayClient, point, time);
     if (!pauseId) {
       return;
@@ -183,7 +187,7 @@ export const { getValueAsync: getDiffAsync } = createGenericCache<
 
     const jsondiffpatchSource = require("./jsondiffpatch.umd.slim.raw.js").default;
 
-    await ThreadFront.evaluateNew({
+    await ThreadFront.evaluate({
       replayClient,
       pauseId,
       text: jsondiffpatchSource,

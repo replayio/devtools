@@ -177,7 +177,6 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
         data-test-name="Messages"
         ref={forwardedRef as MutableRefObject<HTMLDivElement>}
         role="list"
-        tabIndex={0}
       >
         {listItems.map((item, index) => (
           <ErrorBoundary

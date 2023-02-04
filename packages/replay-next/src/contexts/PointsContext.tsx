@@ -59,7 +59,7 @@ export const isValidPoint = (maybePoint: unknown): maybePoint is Point => {
 export const PointsContext = createContext<PointsContextType>(null as any);
 
 export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
-  const { recordingId, trackEvent } = useContext(SessionContext);
+  const { currentUserInfo, recordingId, trackEvent } = useContext(SessionContext);
   const replayClient = useContext(ReplayClientContext);
   const [isPending, startTransition] = useTransition();
 
@@ -96,7 +96,9 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
         badge: null,
         content: "",
         condition: null,
+        createdByUserId: currentUserInfo?.id ?? null,
         createdAtTime: Date.now(),
+        recordingId,
         shouldBreak: POINT_BEHAVIOR_DISABLED,
         shouldLog: POINT_BEHAVIOR_DISABLED,
         ...partialPoint,
@@ -112,7 +114,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
         return prevPoints.slice(0, index).concat([point], prevPoints.slice(index));
       });
     },
-    [setPointsHelper, trackEvent]
+    [currentUserInfo, recordingId, setPointsHelper, trackEvent]
   );
 
   const deletePoints = useCallback(

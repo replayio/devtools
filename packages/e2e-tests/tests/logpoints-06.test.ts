@@ -8,24 +8,30 @@ import {
   openPrintStatementsAccordionPane,
   togglePoint,
 } from "../helpers/pause-information-panel";
-import { addLogpoint, removeLogPoint } from "../helpers/source-panel";
+import {
+  addLogpoint,
+  editLogPoint,
+  removeLogPoint,
+  toggleShouldLog,
+} from "../helpers/source-panel";
 
+const lineNumber = 5;
 const url = "log_points_and_block_scope.html";
-
-const MESSAGE = "Test log point";
 
 test(`logpoints-06: should be temporarily disabled`, async ({ page }) => {
   await startTest(page, url);
   await openDevToolsTab(page);
 
+  let MESSAGE = "Test log point";
+
   // Add log point and verify text in console
-  await addLogpoint(page, { content: `"${MESSAGE}"`, lineNumber: 5, url });
+  await addLogpoint(page, { content: `"${MESSAGE}"`, lineNumber, url });
   await verifyConsoleMessage(page, MESSAGE, "log-point", 1);
 
   // Find the newly added point in the side panel
   await openPauseInformationPanel(page);
   await openPrintStatementsAccordionPane(page);
-  const logpoints = findPoints(page, "logpoint", { lineNumber: 5 });
+  const logpoints = findPoints(page, "logpoint", { lineNumber });
   await expect(await logpoints.count()).toBe(1);
   const logpoint = logpoints.first();
 
@@ -35,11 +41,23 @@ test(`logpoints-06: should be temporarily disabled`, async ({ page }) => {
   await verifyConsoleMessage(page, MESSAGE, "log-point", 0);
   await expect(await logpoints.count()).toBe(1);
 
-  // Temporarily enable and verify log point text in console
-  await togglePoint(page, logpoint, true);
+  MESSAGE = "Test log point: edit";
+
+  // Editing and cancelling should not re-enable the log point
+  await editLogPoint(page, { content: `"${MESSAGE}"`, lineNumber, saveAfterEdit: false, url });
+  await verifyConsoleMessage(page, MESSAGE, "log-point", 0);
+
+  // Editing and saving should re-enable the log point
+  await editLogPoint(page, { content: `"${MESSAGE}"`, lineNumber, url });
+  await verifyConsoleMessage(page, MESSAGE, "log-point", 1);
+
+  // Now disable and re-enable the log point using the context menu
+  await toggleShouldLog(page, { lineNumber, state: false });
+  await verifyConsoleMessage(page, MESSAGE, "log-point", 0);
+  await toggleShouldLog(page, { lineNumber, state: true });
   await verifyConsoleMessage(page, MESSAGE, "log-point", 1);
 
   // Delete the logpoint and verify that it's no longer in the side panel
-  await removeLogPoint(page, { lineNumber: 5, url });
+  await removeLogPoint(page, { lineNumber, url });
   await expect(await logpoints.count()).toBe(0);
 });

@@ -37,11 +37,14 @@ pref("devtools.features.newControllerOnRefresh", false);
 pref("devtools.features.originalClassNames", false);
 pref("devtools.features.profileWorkerThreads", false);
 pref("devtools.features.enableRoutines", false);
+pref("devtools.features.rerunRoutines", false);
 pref("devtools.features.protocolTimeline", false);
 pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.resolveRecording", false);
 pref("devtools.features.chromiumNetMonitor", true);
+pref("devtools.features.chromiumRepaints", false);
 pref("devtools.features.brokenSourcemapWorkaround", true);
+pref("devtools.features.trackRecordingAssetsInDatabase", false);
 
 export const prefs = new PrefsHelper("devtools", {
   colorScheme: ["String", "colorScheme"],
@@ -77,9 +80,14 @@ export const features = new PrefsHelper("devtools.features", {
   protocolTimeline: ["Bool", "protocolTimeline"],
   repaintEvaluations: ["Bool", "repaintEvaluations"],
   resolveRecording: ["Bool", "resolveRecording"],
+  rerunRoutines: ["Bool", "rerunRoutines"],
   chromiumNetMonitor: ["Bool", "chromiumNetMonitor"],
+  chromiumRepaints: ["Bool", "chromiumRepaints"],
   brokenSourcemapWorkaround: ["Bool", "brokenSourcemapWorkaround"],
+  trackRecordingAssetsInDatabase: ["Bool", "trackRecordingAssetsInDatabase"],
 });
+
+export type Features = typeof features;
 
 export const asyncStore = asyncStoreHelper("devtools", {
   replaySessions: ["Json", "replay-sessions", {} as Record<string, ReplaySession>],

@@ -1,9 +1,10 @@
 import { useCallback, useContext, useMemo } from "react";
 
+import { Nag } from "shared/graphql/types";
+import { dismissNag } from "shared/graphql/User";
+
 import { GraphQLClientContext } from "../contexts/GraphQLClientContext";
 import { SessionContext } from "../contexts/SessionContext";
-import { Nag } from "../graphql/types";
-import { dismissNag } from "../graphql/User";
 
 export function useNag(nag: Nag): [shouldShow: boolean, dismiss: () => void] {
   const { accessToken, currentUserInfo, refetchUser } = useContext(SessionContext);

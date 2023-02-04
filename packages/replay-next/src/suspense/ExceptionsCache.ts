@@ -1,5 +1,11 @@
-import { TimeStampedPointRange } from "@replayio/protocol";
+import { PauseData, TimeStampedPointRange } from "@replayio/protocol";
 
+import {
+  AnalysisInput,
+  AnalysisResultWrapper,
+  SendCommand,
+  getFunctionBody,
+} from "protocol/evaluation-utils";
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 
@@ -124,7 +130,7 @@ async function fetchExceptions(client: ReplayClientInterface) {
     const results = await client.runAnalysis<RemoteAnalysisResult>({
       effectful: false,
       exceptionPoints: true,
-      mapper: EXCEPTIONS_MAPPER,
+      mapper: getFunctionBody(exceptionsMapper),
       range: inFlightFocusRange
         ? { begin: inFlightFocusRange.begin.point, end: inFlightFocusRange.end.point }
         : undefined,
@@ -170,10 +176,14 @@ async function fetchExceptions(client: ReplayClientInterface) {
   }
 }
 
-const EXCEPTIONS_MAPPER = `
-  const finalData = { frames: [], scopes: [], objects: [] };
+// Variables in scope in an analysis
+declare let sendCommand: SendCommand;
+declare let input: AnalysisInput;
 
-  function addPauseData({ frames, scopes, objects }) {
+function exceptionsMapper(): AnalysisResultWrapper<RemoteAnalysisResult>[] {
+  const finalData: Required<PauseData> = { frames: [], scopes: [], objects: [] };
+
+  function addPauseData({ frames, scopes, objects }: PauseData) {
     finalData.frames.push(...(frames || []));
     finalData.scopes.push(...(scopes || []));
     finalData.objects.push(...(objects || []));
@@ -181,19 +191,13 @@ const EXCEPTIONS_MAPPER = `
 
   const { pauseId, point, time } = input;
 
-  const {
-    data: exceptionValueData,
-    exception,
-  } = sendCommand("Pause.getExceptionValue");
+  const { data: exceptionValueData, exception } = sendCommand("Pause.getExceptionValue", {});
   addPauseData(exceptionValueData);
 
-  const {
-    data: allFramesData,
-    frames,
-  } = sendCommand("Pause.getAllFrames");
+  const { data: allFramesData, frames } = sendCommand("Pause.getAllFrames", {});
   addPauseData(allFramesData);
 
-  const topFrame = finalData.frames.find(f => f.frameId === frames[0]);
+  const topFrame = finalData.frames.find(f => f.frameId === frames[0])!;
   const location = topFrame.location;
 
   return [
@@ -205,8 +209,8 @@ const EXCEPTIONS_MAPPER = `
         pauseId,
         point,
         time,
-        values: [exception],
+        values: [exception!],
       },
     },
   ];
-`;
+}

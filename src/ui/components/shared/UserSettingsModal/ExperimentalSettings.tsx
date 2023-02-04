@@ -1,9 +1,9 @@
 import React from "react";
 
+import { CombinedExperimentalUserSettings } from "shared/graphql/types";
 import Icon from "ui/components/shared/Icon";
 import hooks from "ui/hooks";
 import { useFeature } from "ui/hooks/settings";
-import { CombinedExperimentalUserSettings } from "ui/types";
 
 import { CheckboxRow } from "./CheckboxRow";
 
@@ -50,7 +50,7 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "consoleFilterDrawerDefaultsToOpen",
   },
   {
-    label: "Disable Scan Data Cache",
+    label: "Disable scan data cache",
     description: "Do not cache the results of indexing the recording",
     key: "disableScanDataCache",
   },
@@ -60,9 +60,20 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "brokenSourcemapWorkaround",
   },
   {
-    label: "Enable Backend Processing Routines",
+    label: "Enable backend processing routines",
     description: "Enable backend support for running processing routines (like React DevTools)",
     key: "enableRoutines",
+  },
+  {
+    label: "Retry backend processing routines",
+    description: "Always re-run routines instead of using cached results",
+    key: "rerunRoutines",
+  },
+  {
+    label: "Track recording assets in the database",
+    description:
+      "Enable writing to and reading from the backend database when storing or retrieving recording assets",
+    key: "trackRecordingAssetsInDatabase",
   },
 ];
 
@@ -117,6 +128,10 @@ export default function ExperimentalSettings({}) {
   );
 
   const { value: enableRoutines, update: updateEnableRoutines } = useFeature("enableRoutines");
+  const { value: rerunRoutines, update: updatererunRoutines } = useFeature("rerunRoutines");
+
+  const { value: trackRecordingAssetsInDatabase, update: updateTrackRecordingAssetsInDatabase } =
+    useFeature("trackRecordingAssetsInDatabase");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
@@ -137,6 +152,10 @@ export default function ExperimentalSettings({}) {
       updateBrokenSourcemapWorkaround(!brokenSourcemapWorkaround);
     } else if (key === "enableRoutines") {
       updateEnableRoutines(!enableRoutines);
+    } else if (key === "rerunRoutines") {
+      updatererunRoutines(!rerunRoutines);
+    } else if (key === "trackRecordingAssetsInDatabase") {
+      updateTrackRecordingAssetsInDatabase(!trackRecordingAssetsInDatabase);
     }
   };
 
@@ -149,7 +168,9 @@ export default function ExperimentalSettings({}) {
     enableColumnBreakpoints,
     enableUnstableQueryCache,
     enableRoutines,
+    rerunRoutines,
     profileWorkerThreads,
+    trackRecordingAssetsInDatabase,
   };
 
   const settings = { ...userSettings, ...localSettings };

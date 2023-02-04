@@ -128,6 +128,8 @@ function Advanced() {
     useBoolPref("logTelemetryEvent");
   const { value: protocolTimeline, update: updateProtocolTimeline } =
     useFeature("protocolTimeline");
+  const { value: chromiumRepaints, update: updateChromiumRepaints } =
+    useFeature("chromiumRepaints");
   const { value: logProtocol, update: updateLogProtocol } = useFeature("logProtocol");
   const { value: newControllerOnRefresh, update: updateNewControllerOnRefresh } =
     useFeature("newControllerOnRefresh");
@@ -167,6 +169,15 @@ function Advanced() {
           onChange={() => updateNewControllerOnRefresh(!newControllerOnRefresh)}
           checked={newControllerOnRefresh}
           label={"Get a new controller upon each page refresh"}
+          description={""}
+        />
+      </div>
+      <div className="mb-4">
+        <CheckboxRow
+          id={"chromium-repaints"}
+          onChange={() => updateChromiumRepaints(!chromiumRepaints)}
+          checked={chromiumRepaints}
+          label={"Allow DOM.repaintGraphics inside of Chromium recordings"}
           description={""}
         />
       </div>

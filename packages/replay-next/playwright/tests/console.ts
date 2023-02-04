@@ -2,6 +2,8 @@ import { Page, expect, test } from "@playwright/test";
 
 import {
   addTerminalExpression,
+  getConsoleInput,
+  getConsoleSearchInput,
   hideSearchInput,
   locateMessage,
   messageLocator,
@@ -11,6 +13,7 @@ import {
   toggleProtocolMessage,
   toggleProtocolMessages,
   toggleSideMenu,
+  verifyTypeAheadContainsSuggestions,
 } from "./utils/console";
 import {
   delay,
@@ -180,18 +183,18 @@ test("should show and hide search input when Enter and Escape are typed", async 
   await seekToMessage(page, await locateMessage(page, "console-log", "This is a log"));
 
   // Search should be hidden
-  let searchInput = page.locator("[data-test-id=ConsoleSearchInput]");
+  let searchInput = getConsoleSearchInput(page);
   await expect(searchInput).toHaveCount(0);
 
   await showSearchInput(page);
 
-  searchInput = page.locator("[data-test-id=ConsoleSearchInput]");
+  searchInput = getConsoleSearchInput(page);
   await takeScreenshot(page, searchInput, "search-input-visible-and-focused");
 
   await hideSearchInput(page);
 
   // Search should be hidden again
-  searchInput = page.locator("[data-test-id=ConsoleSearchInput]");
+  searchInput = getConsoleSearchInput(page);
   await expect(searchInput).toHaveCount(0);
 
   const terminalInput = page.locator("[data-test-id=ConsoleTerminalInput]");
@@ -203,22 +206,22 @@ test("should re-focus the search input when CMD+F is used again", async ({ page 
 
   await showSearchInput(page);
 
-  const searchInput = page.locator("[data-test-id=ConsoleSearchInput]");
+  const searchInput = getConsoleSearchInput(page);
   await expect(searchInput).toHaveCount(1);
   await expect(searchInput).toBeFocused();
+});
 
-  // This part of the test verifies that the search input responds to CMD+F
-  // when focus is within the Console (not just in the terminal input field)
-  const list = page.locator("[data-test-name=Messages]");
-  await list.focus();
+test("should re-focus the terminal input when search input is hidden", async ({ page }) => {
+  await setup(page);
 
-  await expect(searchInput).not.toBeFocused();
+  const consoleInput = getConsoleInput(page);
+  const searchInput = getConsoleSearchInput(page);
 
-  await page.keyboard.down(getCommandKey());
-  await page.keyboard.type("f");
-  await page.keyboard.up(getCommandKey());
-
+  await showSearchInput(page);
   await expect(searchInput).toBeFocused();
+
+  await hideSearchInput(page);
+  await expect(consoleInput).toBeFocused();
 });
 
 test("should be searchable", async ({ page }) => {
@@ -425,6 +428,31 @@ test("should suggest type-ahead options from prototype objects as well", async (
   );
 });
 
+test("should add this keyword to the list of suggestions", async ({ page }) => {
+  await setup(page);
+  await toggleProtocolMessage(page, "logs", true);
+
+  const listItem = await locateMessage(page, "console-log", "This is a log");
+  await seekToMessage(page, listItem);
+
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "th");
+  await verifyTypeAheadContainsSuggestions(page, "this", "globalThis");
+});
+
+test("should add true/false keywords to the list of suggestions", async ({ page }) => {
+  await setup(page);
+  await toggleProtocolMessage(page, "logs", true);
+
+  const listItem = await locateMessage(page, "console-log", "This is a log");
+  await seekToMessage(page, listItem);
+
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "tr");
+  await verifyTypeAheadContainsSuggestions(page, "true");
+
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "fa");
+  await verifyTypeAheadContainsSuggestions(page, "false");
+});
+
 test("should evaluate terminal expressions without an execution point", async ({ page }) => {
   await setup(page);
 
@@ -511,13 +539,13 @@ test("should show the context menu on top of other messages and the current time
   await seekToMessage(page, listItem);
 
   listItem = await locateMessage(page, "console-log", "This is a log");
-  await openContextMenu(listItem);
+  await openContextMenu(page, listItem);
   await takeScreenshot(page, list, "context-menu-position-one");
 
   await page.keyboard.press("Escape");
 
   listItem = await locateMessage(page, "console-error", "This is an error");
-  await openContextMenu(listItem);
+  await openContextMenu(page, listItem);
   await takeScreenshot(page, list, "context-menu-position-two");
 });
 
@@ -528,7 +556,7 @@ test("should support setting focus range via the context menu", async ({ page })
   let listItem;
 
   listItem = await locateMessage(page, "console-warning", "This is a warning");
-  await openContextMenu(listItem);
+  await openContextMenu(page, listItem);
   await page.click("[data-test-id=ConsoleContextMenu-SetFocusStartButton]");
   await stopHovering(page);
   // Give the UI time to settle.
@@ -536,7 +564,7 @@ test("should support setting focus range via the context menu", async ({ page })
   await takeScreenshot(page, list, "context-menu-focus-after-start");
 
   listItem = await locateMessage(page, "console-error", "This is an error");
-  await openContextMenu(listItem);
+  await openContextMenu(page, listItem);
   await stopHovering(page);
   await page.click("[data-test-id=ConsoleContextMenu-SetFocusEndButton]");
   // Give the UI time to settle.

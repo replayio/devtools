@@ -5,6 +5,10 @@ function waitForTime(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function throwError() {
+  throw new Error("Baz");
+}
+
 function App() {
   const [list, setList] = React.useState([]);
 
@@ -25,7 +29,11 @@ function App() {
       await waitForTime(100);
       console.log("Removed an entry");
 
-      console.error(new Error("Baz"));
+      try {
+        throwError();
+      } catch (error) {
+        console.error(error);
+      }
 
       // eslint-disable-next-line no-undef
       console.log("ExampleFinished");

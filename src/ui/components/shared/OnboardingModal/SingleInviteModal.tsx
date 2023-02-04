@@ -2,10 +2,10 @@ import React, { useRef, useState } from "react";
 import { useEffect } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { PendingWorkspaceInvitation } from "shared/graphql/types";
 import * as actions from "ui/actions/app";
 import { useRedirectToTeam } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
-import { PendingWorkspaceInvitation } from "ui/types";
 
 import { OnboardingContent, OnboardingModalContainer } from "../Onboarding/index";
 import Spinner from "../Spinner";

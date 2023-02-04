@@ -226,7 +226,7 @@ export class ReplayClient implements ReplayClientInterface {
 
     this._sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
-    this._threadFront.setSessionId(sessionId);
+    this._threadFront.setSessionId(sessionId, {});
 
     return sessionId;
   }

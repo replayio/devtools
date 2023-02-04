@@ -89,11 +89,33 @@ export async function executeAndVerifyTerminalExpression(
   }
 }
 
+export function getConsoleTerminalContentTypeAhead(page: Page): Locator {
+  return page.locator('[data-test-id="ConsoleTerminalInput-CodeTypeAhead"]');
+}
+
+export async function verifyConsoleTerminalTypeAheadSuggestions(
+  page: Page,
+  expectedPartialList: string[]
+) {
+  const actualTextContent = (await getConsoleTerminalContentTypeAhead(page).textContent()) || "";
+  const expectedTextContent = expectedPartialList.join("");
+  expect(actualTextContent.startsWith(expectedTextContent)).toBe(true);
+}
+
 export async function expandConsoleMessage(message: Locator) {
-  const expander = message.locator('[data-test-name="Expandable"]');
+  const expander = message.locator('[data-test-name="Expandable"]').first();
   const state = await expander.getAttribute("data-test-state");
   if (state === "closed") {
     await expander.click();
+  }
+}
+
+export async function expandErrorStack(message: Locator) {
+  const expander = message.locator('[data-test-name="Expandable"]').last();
+  const state = await expander.getAttribute("data-test-state");
+  if (state === "closed") {
+    await expander.click();
+    await message.locator('[data-test-name="ErrorStack"]').waitFor();
   }
 }
 
@@ -149,6 +171,14 @@ export async function getFrameLocationsFromMessage(message: Locator) {
   await expandConsoleMessage(message);
   const frameLocations = message.locator(
     '[data-test-name="Stack"] [data-test-name="Console-Source"]'
+  );
+  return await frameLocations.allInnerTexts();
+}
+
+export async function getErrorFrameLocationsFromMessage(message: Locator) {
+  await expandErrorStack(message);
+  const frameLocations = message.locator(
+    '[data-test-name="ErrorStack"] [data-test-name="Console-Source"]'
   );
   return await frameLocations.allInnerTexts();
 }

@@ -1,8 +1,8 @@
 import uniq from "lodash/uniq";
 import React, { Dispatch, SetStateAction } from "react";
 
+import { OperationsData } from "shared/graphql/types";
 import { useGetRecording } from "ui/hooks/recordings";
-import { OperationsData } from "ui/types";
 import { getRecordingId } from "ui/utils/recording";
 
 import ExternalLink from "../shared/ExternalLink";

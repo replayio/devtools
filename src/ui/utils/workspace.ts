@@ -1,7 +1,7 @@
 import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 
 import { assert } from "protocol/utils";
-import { Workspace, WorkspaceSubscriptionStatus } from "ui/types";
+import { Workspace, WorkspaceSubscriptionStatus } from "shared/graphql/types";
 
 export function inUnpaidFreeTrial(workspace: Workspace) {
   const subscription = workspace.subscription;

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 
+import { PendingWorkspaceInvitation } from "shared/graphql/types";
 import { PrimaryButton, SecondaryButton } from "ui/components/shared/Button";
 import { useConfirm } from "ui/components/shared/Confirm";
 import hooks from "ui/hooks";
-import { PendingWorkspaceInvitation } from "ui/types";
 
 import { useRedirectToTeam } from "../../../utils";
 

@@ -2,8 +2,10 @@ import { TimeStampedPoint } from "@replayio/protocol";
 import { useContext, useLayoutEffect, useMemo } from "react";
 
 import { ThreadFront } from "protocol/thread";
-import { preCacheExecutionPointForTime } from "replay-next/src/suspense/PointsCache";
-import { addCachedPointsForTimeListener } from "replay-next/src/suspense/PointsCache";
+import {
+  addCachedPointsForTimeListener,
+  preCacheExecutionPointForTime,
+} from "replay-next/src/suspense/ExecutionPointsCache";
 import { Wakeable } from "replay-next/src/suspense/types";
 import { createWakeable } from "replay-next/src/utils/suspense";
 import createReplayClientPlayer from "shared/client/createReplayClientPlayer";

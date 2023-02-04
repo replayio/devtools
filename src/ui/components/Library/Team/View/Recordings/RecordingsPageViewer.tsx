@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { Recording } from "ui/types";
+import { Recording } from "shared/graphql/types";
 
 import ViewerHeader from "./Header/RecordingsPageViewerHeader";
 import { Recordings } from "./Recordings";

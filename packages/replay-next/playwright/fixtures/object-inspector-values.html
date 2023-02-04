@@ -121,6 +121,8 @@
       }
       const arrayWithObjects = [{ foo: 123, bar: "abc" }, [1, 2]];
       const arrayThatNeedsBucketing = new Array(205).fill(true).map((_, index) => index);
+      const arrayWithExtraProperties = [1, 2, 3];
+      arrayWithExtraProperties.test = "FE-1164";
 
       const int8Array = Int8Array.from([1, 2, 3]);
       const uint8Array = Uint8Array.from([1, 2, 3]);
@@ -265,6 +267,7 @@
         overflowingArray,
         arrayOfHtmlElements,
         arrayThatNeedsBucketing,
+        arrayWithExtraProperties,
         int8Array,
         uint8Array,
         uint8ClampedArray,

@@ -11,6 +11,7 @@ import {
 } from "protocol/socket";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { assert, waitForTime } from "protocol/utils";
+import { Recording } from "shared/graphql/types";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import { getRecording } from "ui/hooks/recordings";
@@ -31,7 +32,6 @@ import {
   responseReceived,
 } from "ui/reducers/protocolMessages";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
-import { Recording } from "ui/types";
 import { extractGraphQLError } from "ui/utils/apolloClient";
 import { isMock, isTest } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
@@ -202,6 +202,8 @@ export function createSocket(
         listenForMetrics: !!prefs.listenForMetrics,
         profileWorkerThreads: !!features.profileWorkerThreads,
         enableRoutines: !!features.enableRoutines,
+        rerunRoutines: !!features.rerunRoutines,
+        trackRecordingAssetsInDatabase: !!features.trackRecordingAssetsInDatabase,
       };
       if (features.newControllerOnRefresh) {
         experimentalSettings.controllerKey = String(Date.now());
@@ -315,7 +317,7 @@ export function createSocket(
       });
 
       window.sessionId = sessionId;
-      ThreadFront.setSessionId(sessionId);
+      ThreadFront.setSessionId(sessionId, features);
       const recordingTarget = await ThreadFront.recordingTargetWaiter.promise;
       dispatch(actions.setRecordingTarget(recordingTarget));
 

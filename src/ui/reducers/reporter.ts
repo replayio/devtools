@@ -1,11 +1,12 @@
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 
 import { compareNumericStrings } from "protocol/utils";
+import { AnnotatedTestStep, Annotation } from "shared/graphql/types";
 import { UIState } from "ui/state";
-import { AnnotatedTestStep, Annotation } from "ui/types";
 
 export interface ReporterState {
   annotations: Annotation[];
+  annotationsComplete: boolean;
   selectedStep: AnnotatedTestStep | null;
   selectedTest: number | null;
   selectedTestTitle: string | null;
@@ -13,6 +14,7 @@ export interface ReporterState {
 
 const initialState: ReporterState = {
   annotations: [],
+  annotationsComplete: false,
   selectedStep: null,
   selectedTest: null,
   selectedTestTitle: null,
@@ -22,6 +24,9 @@ const reporterSlice = createSlice({
   name: "pause",
   initialState,
   reducers: {
+    completeReporterAnnotations(state) {
+      state.annotationsComplete = true;
+    },
     addReporterAnnotations(state, action: PayloadAction<Annotation[]>) {
       const annotations = [...state.annotations, ...action.payload];
       annotations.sort((a1, a2) => compareNumericStrings(a1.point, a2.point));
@@ -60,9 +65,16 @@ const reporterSlice = createSlice({
 });
 
 export default reporterSlice.reducer;
-export const { addReporterAnnotations, setSelectedStep, setSelectedTest, mayClearSelectedStep } =
-  reporterSlice.actions;
+export const {
+  addReporterAnnotations,
+  completeReporterAnnotations,
+  setSelectedStep,
+  setSelectedTest,
+  mayClearSelectedStep,
+} = reporterSlice.actions;
 export const getReporterAnnotations = (state: UIState) => state.reporter.annotations;
+export const getReporterAnnotationsComplete = (state: UIState) =>
+  state.reporter.annotationsComplete;
 export const getSelectedStep = (state: UIState) => state.reporter.selectedStep;
 export const getSelectedTest = (state: UIState) => state.reporter.selectedTest;
 export const getSelectedTestTitle = (state: UIState) => state.reporter.selectedTestTitle;

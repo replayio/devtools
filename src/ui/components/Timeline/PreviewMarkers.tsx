@@ -3,7 +3,7 @@ import { Suspense, useContext } from "react";
 
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/PointsCache";
+import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/ExecutionPointsCache";
 import { getSourceHitCountsSuspense } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { selectors } from "ui/reducers";

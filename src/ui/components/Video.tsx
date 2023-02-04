@@ -4,6 +4,7 @@ import { ConnectedProps, connect } from "react-redux";
 
 import { CypressToggler } from "devtools/client/debugger/src/components/TestInfo/CypressToggler";
 import { PreviewNodeHighlighter } from "devtools/client/inspector/markup/components/PreviewNodeHighlighter";
+import { getHighlightedNodesLoading } from "devtools/client/inspector/markup/selectors/markup";
 import { installObserver, refreshGraphics } from "protocol/graphics";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
 import CommentTool from "ui/components/shared/CommentTool";
@@ -35,6 +36,7 @@ function Video({
   stalled,
   mouseTargetsLoading,
   videoUrl,
+  highlightedNodesLoading,
 }: PropsFromRedux) {
   const recordingId = hooks.useGetRecordingId();
   const viewMode = useAppSelector(getViewMode);
@@ -76,6 +78,9 @@ function Video({
 
   const showCommentTool =
     isPaused && !isNodeTarget && !isNodePickerActive && !isNodePickerInitializing;
+  const showSpinner =
+    highlightedNodesLoading || (isNodePickerActive && mouseTargetsLoading) || stalled;
+
   return (
     <div id="video" className="relative bg-toolbarBackground">
       <div className="absolute flex h-full w-full items-center justify-center bg-chrome">
@@ -87,7 +92,7 @@ function Video({
       {showCommentTool ? (
         <CommentsOverlay>
           <CommentLoader recordingId={recordingId} />
-          {((isNodePickerActive && mouseTargetsLoading) || stalled) && (
+          {showSpinner && (
             <div className="absolute bottom-5 right-5 z-20 flex opacity-50">
               <Spinner className="w-4 animate-spin" />
             </div>
@@ -95,7 +100,7 @@ function Video({
         </CommentsOverlay>
       ) : null}
       {isNodePickerInitializing ? <Tooltip label="Loading…" targetID="video" /> : null}
-      {panel === "events" && <CypressToggler />}
+      {panel === "cypress" && <CypressToggler />}
       <div id="highlighter-root">
         {highlightedNodeIds?.map(nodeId => (
           <PreviewNodeHighlighter key={nodeId} nodeId={nodeId} />
@@ -114,6 +119,7 @@ const connector = connect((state: UIState) => ({
   videoUrl: selectors.getVideoUrl(state),
   stalled: selectors.isPlaybackStalled(state),
   mouseTargetsLoading: selectors.getAreMouseTargetsLoading(state),
+  highlightedNodesLoading: getHighlightedNodesLoading(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

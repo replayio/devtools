@@ -8,13 +8,14 @@ import debounce from "lodash/debounce";
 import React, { Component } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { STATUS_RESOLVED } from "replay-next/src/suspense/createGenericCache";
+import { getSourceContentsStatus } from "replay-next/src/suspense/SourcesCache";
 import { setViewMode } from "ui/actions/layout";
 import { getViewMode } from "ui/reducers/layout";
 import {
   SourceDetails,
   getAllSourceDetails,
   getSelectedSource,
-  getSourceContentsLoaded,
   getSourcesLoading,
   getSourcesToDisplayByUrl,
 } from "ui/reducers/sources";
@@ -53,8 +54,6 @@ const maxResults = 100;
 
 const SIZE_BIG = { size: "big" };
 const SIZE_DEFAULT = {};
-
-type $FixTypeLater = any;
 
 function filter(values: SearchResult[], query: string) {
   const preparedQuery = fuzzyAldrin.prepareQuery(query);
@@ -307,9 +306,13 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
   };
 
   onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { selectedSource, selectedContentLoaded, setQuickOpenQuery } = this.props;
+    const { selectedSource, setQuickOpenQuery } = this.props;
     setQuickOpenQuery(e.target.value);
+
+    const selectedContentLoaded =
+      selectedSource && getSourceContentsStatus(selectedSource.id) === STATUS_RESOLVED;
     const noSource = !selectedSource || !selectedContentLoaded;
+
     if ((noSource && this.isFunctionQuery()) || this.isGotoQuery()) {
       return;
     }
@@ -494,9 +497,6 @@ function mapStateToProps(state: UIState) {
     project: getQuickOpenProject(state),
     query: getQuickOpenQuery(state),
     searchType: getQuickOpenType(state),
-    selectedContentLoaded: selectedSource
-      ? getSourceContentsLoaded(state, selectedSource.id)
-      : undefined,
     selectedSource,
     showOnlyOpenSources: getShowOnlyOpenSources(state),
     sourcesForTabs: getSourcesForTabs(state),

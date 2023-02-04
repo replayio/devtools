@@ -1,8 +1,8 @@
 import classNames from "classnames";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 
+import { Workspace } from "shared/graphql/types";
 import hooks from "ui/hooks";
-import { Workspace } from "ui/types";
 import { isPublicDisabled } from "ui/utils/org";
 
 import { Toggle } from "../shared/Forms";

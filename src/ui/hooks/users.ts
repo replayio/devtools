@@ -1,16 +1,19 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
 
-import { AcceptTOS, AcceptTOSVariables } from "graphql/AcceptTOS";
-import { DismissNag, DismissNagVariables } from "graphql/DismissNag";
-import { GetUser } from "graphql/GetUser";
-import { GetUserId } from "graphql/GetUserId";
-import { subscribeToEmailType, subscribeToEmailTypeVariables } from "graphql/subscribeToEmailType";
+import { AcceptTOS, AcceptTOSVariables } from "shared/graphql/generated/AcceptTOS";
+import { DismissNag, DismissNagVariables } from "shared/graphql/generated/DismissNag";
+import { GetUser } from "shared/graphql/generated/GetUser";
+import { GetUserId } from "shared/graphql/generated/GetUserId";
+import {
+  subscribeToEmailType,
+  subscribeToEmailTypeVariables,
+} from "shared/graphql/generated/subscribeToEmailType";
 import {
   unsubscribeToEmailType,
   unsubscribeToEmailTypeVariables,
-} from "graphql/unsubscribeToEmailType";
+} from "shared/graphql/generated/unsubscribeToEmailType";
+import { Recording, Workspace } from "shared/graphql/types";
 import { DISMISS_NAG, GET_USER_ID, GET_USER_INFO } from "ui/graphql/users";
-import { Recording, Workspace } from "ui/types";
 import { mutate, query } from "ui/utils/apolloClient";
 import { getRecordingId } from "ui/utils/recording";
 import { sendTelemetryEvent } from "ui/utils/telemetry";

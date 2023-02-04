@@ -3104,6 +3104,91 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@motionone/animation@npm:^10.15.1":
+  version: 10.15.1
+  resolution: "@motionone/animation@npm:10.15.1"
+  dependencies:
+    "@motionone/easing": ^10.15.1
+    "@motionone/types": ^10.15.1
+    "@motionone/utils": ^10.15.1
+    tslib: ^2.3.1
+  checksum: 75b7a1e6c47c27073a578eb5559ea0a6e7075862c72e1eb1598403c8c2725f596a95b0369514c9e72f3c7439a9845c468b85a14d4e500df48e09d01b0739d4a7
+  languageName: node
+  linkType: hard
+
+"@motionone/dom@npm:^10.15.5":
+  version: 10.15.5
+  resolution: "@motionone/dom@npm:10.15.5"
+  dependencies:
+    "@motionone/animation": ^10.15.1
+    "@motionone/generators": ^10.15.1
+    "@motionone/types": ^10.15.1
+    "@motionone/utils": ^10.15.1
+    hey-listen: ^1.0.8
+    tslib: ^2.3.1
+  checksum: 2453fe3df6a2b4b339d075bcd598bda1eee1926ba0ad881edfd154362b0992c91f31c08d83c469c7e8cb8bf8ebc0ed5530972673cf5c74d99e46e3772cf5f1cb
+  languageName: node
+  linkType: hard
+
+"@motionone/easing@npm:^10.15.1":
+  version: 10.15.1
+  resolution: "@motionone/easing@npm:10.15.1"
+  dependencies:
+    "@motionone/utils": ^10.15.1
+    tslib: ^2.3.1
+  checksum: cf7cfcf9917525d892334c58282425aafc69d9ab9004c190bfa7cf91317a680e8143f227adc79557424e7f26cdf8478dcbb2ae467e744cebc58195d6f0b8153a
+  languageName: node
+  linkType: hard
+
+"@motionone/generators@npm:^10.15.1":
+  version: 10.15.1
+  resolution: "@motionone/generators@npm:10.15.1"
+  dependencies:
+    "@motionone/types": ^10.15.1
+    "@motionone/utils": ^10.15.1
+    tslib: ^2.3.1
+  checksum: 0eb6797a64d536bb5c26628343d6594a2ebc45c3c447b8ce442b4ac3a41be847b860ac009bda7968fc7d339d2ee49b18bfe36306c5dd99cf17c7d84c82de93f3
+  languageName: node
+  linkType: hard
+
+"@motionone/svelte@npm:^10.15.5":
+  version: 10.15.5
+  resolution: "@motionone/svelte@npm:10.15.5"
+  dependencies:
+    "@motionone/dom": ^10.15.5
+    tslib: ^2.3.1
+  checksum: 17c7cf75f9c2635b1f11204fc4944a62b6febe19d9ffca50b15b45019e98d74cb9c7b9c1a780d8dbd945d8f397ebc3ff97a765d16cad7aae99d1ec979c3aa5ad
+  languageName: node
+  linkType: hard
+
+"@motionone/types@npm:^10.15.1":
+  version: 10.15.1
+  resolution: "@motionone/types@npm:10.15.1"
+  checksum: 98091f7dca257508d94d1080678c433da39a814e8e58aaa742212bf6c2a5b5e2120a6251a06e3ea522219ce6d1b6eb6aa2cab224b803fe52789033d8398ef0aa
+  languageName: node
+  linkType: hard
+
+"@motionone/utils@npm:^10.15.1":
+  version: 10.15.1
+  resolution: "@motionone/utils@npm:10.15.1"
+  dependencies:
+    "@motionone/types": ^10.15.1
+    hey-listen: ^1.0.8
+    tslib: ^2.3.1
+  checksum: 6ef13cd6637ec87c340e5536f849f8c40d30cc90139a3856d11cd70d78e3740f8815b0e63564fefd23c05a060da7a0ea5395390549606ed8801a7b832b74e04e
+  languageName: node
+  linkType: hard
+
+"@motionone/vue@npm:^10.15.5":
+  version: 10.15.5
+  resolution: "@motionone/vue@npm:10.15.5"
+  dependencies:
+    "@motionone/dom": ^10.15.5
+    tslib: ^2.3.1
+  checksum: c87c019edfa1224aed7f2edf3f0f764829eeebbc6efefeca2235a5cabbd1553b7516376c744a39e1f7e6b13a7699bceac02c7cb59091d4d1019d5e9dd11c8cf2
+  languageName: node
+  linkType: hard
+
 "@mrmlnc/readdir-enhanced@npm:^2.2.1":
   version: 2.2.1
   resolution: "@mrmlnc/readdir-enhanced@npm:2.2.1"
@@ -3878,6 +3963,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@popmotion/easing@npm:^1.0.1":
+  version: 1.0.2
+  resolution: "@popmotion/easing@npm:1.0.2"
+  checksum: 5825b083c9a4cc449809c876e0c9a4f7c7fc6f19bc62e20be9881c09e16ad6158c445c09a282870f9b8140e55167161f26cd366b8897201e1dbaee3b5abc4a0d
+  languageName: node
+  linkType: hard
+
+"@popmotion/popcorn@npm:^0.4.4":
+  version: 0.4.4
+  resolution: "@popmotion/popcorn@npm:0.4.4"
+  dependencies:
+    "@popmotion/easing": ^1.0.1
+    framesync: ^4.0.1
+    hey-listen: ^1.0.8
+    style-value-types: ^3.1.7
+    tslib: ^1.10.0
+  checksum: 70e433763ba5328dc9f82d26bf245ff965f6de0fd931fe15452e855a53b620dd90d45139234a5e0bfa8d3498a3f762bdd75c1e29f56705323571785ee526ea5e
+  languageName: node
+  linkType: hard
+
 "@recordreplay/accordion@workspace:packages/accordion":
   version: 0.0.0-use.local
   resolution: "@recordreplay/accordion@workspace:packages/accordion"
@@ -3957,18 +4062,32 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/playwright@npm:0.3.11":
-  version: 0.3.11
-  resolution: "@replayio/playwright@npm:0.3.11"
+"@replayio/overboard@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@replayio/overboard@npm:0.4.1"
   dependencies:
-    "@replayio/replay": ^0.10.7
-    "@replayio/test-utils": ^0.3.5
+    "@popmotion/popcorn": ^0.4.4
+    lottie-web: ^5.9.6
+    motion: ^10.13.1
+  peerDependencies:
+    react: ">0.16.0"
+    react-dom: ">0.16.0"
+  checksum: b2c217e7367ae6695a77789d46788cd38cd8c3dc9d6f11ad753402ee8a630b21664d06847085c6eb62fb676626e272b5aa7a3f398a155b763935d6a8eb18a640
+  languageName: node
+  linkType: hard
+
+"@replayio/playwright@npm:0.3.16":
+  version: 0.3.16
+  resolution: "@replayio/playwright@npm:0.3.16"
+  dependencies:
+    "@replayio/replay": ^0.12.0
+    "@replayio/test-utils": ^0.4.0
     uuid: ^8.3.2
   peerDependencies:
     "@playwright/test": 1.19.x
   bin:
     replayio-playwright: bin/replayio-playwright.js
-  checksum: 7d6a81cdef66666c0603075daf5ebb84b8f12ecd946f9e8bfb544370e4e7f7ec339cae67171968e5913c7827636c273aef6161ac1ffa006792d3770132b38739
+  checksum: 752228129cf7499d8b8f199c1108105698a3119e04a51a546c94bf6784cd8ac178dc34780ac7ee4d14360603220811a2813f4f1724847498a2bad2e5b7c87fbd
   languageName: node
   linkType: hard
 
@@ -3993,21 +4112,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/replay@npm:^0.10.7":
-  version: 0.10.7
-  resolution: "@replayio/replay@npm:0.10.7"
+"@replayio/replay@npm:^0.12.0":
+  version: 0.12.0
+  resolution: "@replayio/replay@npm:0.12.0"
   dependencies:
     "@replayio/sourcemap-upload": ^1.0.5
     commander: ^7.2.0
     debug: ^4.3.4
     is-uuid: ^1.0.2
     jsonata: ^1.8.6
+    node-fetch: ^2.6.8
+    p-map: ^4.0.0
     superstruct: ^0.15.4
     text-table: ^0.2.0
     ws: ^7.5.0
   bin:
     replay: bin/replay.js
-  checksum: ed1d256026f71ad6e4041a2083e97561586e82bed33887ffd277a3106b026bad0e96337acaf814742890ebb61eb053977aacf0096d6e06ec064ec3f34d9b1599
+  checksum: ccc278b5ecd55197d098e8c1e404fa0cfd103192cc94d47ef544641e4b4a2fd73a5fe2025b6d63798c980dde993d319b7a0b38ff57196c5506561c14128fc8d4
   languageName: node
   linkType: hard
 
@@ -4055,15 +4176,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/test-utils@npm:^0.3.5":
-  version: 0.3.5
-  resolution: "@replayio/test-utils@npm:0.3.5"
+"@replayio/test-utils@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@replayio/test-utils@npm:0.4.0"
   dependencies:
-    "@replayio/replay": ^0.10.7
+    "@replayio/replay": ^0.12.0
     "@types/node-fetch": ^2.6.2
     node-fetch: ^2.6.7
     uuid: ^8.3.2
-  checksum: c620d00a62c9576bb87a4825cecc306322c84cb10c4b76e87dd6da22632ebbeafc044375306f0395102f7eb89c913d727698f4fb0ae419b3818973dbf57f4b20
+  checksum: 9936f553fab1a2d224a89b1df709da40c7beaa81660543948d1befa06d8da87958693fb288a14ff1f8dd9de4f9a2dd265d87510b26f471851a8cf42d7fb886d4
   languageName: node
   linkType: hard
 
@@ -6255,13 +6376,6 @@ __metadata:
   version: 0.16.2
   resolution: "@types/scheduler@npm:0.16.2"
   checksum: b6b4dcfeae6deba2e06a70941860fb1435730576d3689225a421280b7742318d1548b3d22c1f66ab68e414f346a9542f29240bc955b6332c5b11e561077583bc
-  languageName: node
-  linkType: hard
-
-"@types/semver@npm:^7.3.13":
-  version: 7.3.13
-  resolution: "@types/semver@npm:7.3.13"
-  checksum: 00c0724d54757c2f4bc60b5032fe91cda6410e48689633d5f35ece8a0a66445e3e57fa1d6e07eb780f792e82ac542948ec4d0b76eb3484297b79bd18b8cf1cb0
   languageName: node
   linkType: hard
 
@@ -11093,7 +11207,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"error-stack-parser@npm:^2.0.6":
+"error-stack-parser@npm:^2.0.6, error-stack-parser@npm:^2.1.4":
   version: 2.1.4
   resolution: "error-stack-parser@npm:2.1.4"
   dependencies:
@@ -12589,6 +12703,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"framesync@npm:^4.0.1":
+  version: 4.1.0
+  resolution: "framesync@npm:4.1.0"
+  dependencies:
+    hey-listen: ^1.0.5
+  checksum: 3caaddc32d3c8c4a5b0eacfb82d74aa63fc690765274ebbb8622555879aa713b36e8a557a917de4ae24d5f49e38f9c79459327493b071cec15a1fdea96601cea
+  languageName: node
+  linkType: hard
+
 "fresh@npm:0.5.2":
   version: 0.5.2
   resolution: "fresh@npm:0.5.2"
@@ -12772,7 +12895,7 @@ __metadata:
   dependencies:
     "@playwright/test": ^1.25.1
     "@recordreplay/playwright": ^1.18.3
-    "@replayio/playwright": 0.3.11
+    "@replayio/playwright": 0.3.16
     chalk: ^4
     cli-spinners: ^2.7.0
     log-update: ^4
@@ -13645,7 +13768,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hey-listen@npm:^1.0.8":
+"hey-listen@npm:^1.0.5, hey-listen@npm:^1.0.8":
   version: 1.0.8
   resolution: "hey-listen@npm:1.0.8"
   checksum: 6bad60b367688f5348e25e7ca3276a74b59ac5a09b0455e6ff8ab7d4a9e38cd2116c708a7dcd8a954d27253ce1d8717ec891d175723ea739885b828cf44e4072
@@ -13937,7 +14060,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"iconv-lite@npm:0.6.3, iconv-lite@npm:^0.6.2":
+"iconv-lite@npm:0.6.3, iconv-lite@npm:^0.6.2, iconv-lite@npm:^0.6.3":
   version: 0.6.3
   resolution: "iconv-lite@npm:0.6.3"
   dependencies:
@@ -16325,6 +16448,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lottie-web@npm:^5.9.6":
+  version: 5.10.2
+  resolution: "lottie-web@npm:5.10.2"
+  checksum: 9ec80b479d8d03c079bd4f246d301f0c4aac2c4d6f8daaa79f6f3fc285aaba377c64879f6748d49c1db52b9854aea81c3203d858e9c686f7a47cd8b771d112d0
+  languageName: node
+  linkType: hard
+
 "loud-rejection@npm:^1.0.0":
   version: 1.6.0
   resolution: "loud-rejection@npm:1.6.0"
@@ -17108,6 +17238,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"motion@npm:^10.13.1":
+  version: 10.15.5
+  resolution: "motion@npm:10.15.5"
+  dependencies:
+    "@motionone/animation": ^10.15.1
+    "@motionone/dom": ^10.15.5
+    "@motionone/svelte": ^10.15.5
+    "@motionone/types": ^10.15.1
+    "@motionone/utils": ^10.15.1
+    "@motionone/vue": ^10.15.5
+  checksum: 43e7883d95da6e4949b2e5ca01732bce28214f4978bf940511a3fbd8e00943ab7c00fcb28f3f1ce1ed099a404016f784243330be161c4805958deaf60d1b0571
+  languageName: node
+  linkType: hard
+
 "move-concurrently@npm:^1.0.1":
   version: 1.0.1
   resolution: "move-concurrently@npm:1.0.1"
@@ -17487,6 +17631,20 @@ __metadata:
     encoding:
       optional: true
   checksum: 8d816ffd1ee22cab8301c7756ef04f3437f18dace86a1dae22cf81db8ef29c0bf6655f3215cb0cdb22b420b6fe141e64b26905e7f33f9377a7fa59135ea3e10b
+  languageName: node
+  linkType: hard
+
+"node-fetch@npm:^2.6.8":
+  version: 2.6.8
+  resolution: "node-fetch@npm:2.6.8"
+  dependencies:
+    whatwg-url: ^5.0.0
+  peerDependencies:
+    encoding: ^0.1.0
+  peerDependenciesMeta:
+    encoding:
+      optional: true
+  checksum: 91f57be68e29f9b1382750693619e199733a6936998e6d618f1aa779853ad8fc4a2facf170db7957bf1d2510bad33449edf74b5802713d81b63de5986fa3be00
   languageName: node
   linkType: hard
 
@@ -19751,13 +19909,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-resizable-panels@npm:^0.0.34":
-  version: 0.0.34
-  resolution: "react-resizable-panels@npm:0.0.34"
+"react-resizable-panels@npm:^0.0.36":
+  version: 0.0.36
+  resolution: "react-resizable-panels@npm:0.0.36"
   peerDependencies:
     react: ^16.14.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0
-  checksum: 42f70195663fc1385a0567eb2fb8a56c63322877d2bf36cce10daa5c84d8d0cbc26321847798ade32eda583a7e53bdee9404b2b95e96615898377e0aad67669f
+  checksum: 166083b04e0e85298f562ba8982bcd70bf97521469ea26c3bf6e2ac9a1302f01f1236ad2fbdbcdc1d32203dd322a92ff31999dac3b54ff5313f528e811b4b055
   languageName: node
   linkType: hard
 
@@ -20051,6 +20209,7 @@ __metadata:
     "@recordreplay/playwright": ^1.18.3
     "@recordreplay/sourcemap-upload-cli": ^0.1.1
     "@reduxjs/toolkit": ^1.8.4
+    "@replayio/overboard": ^0.4.1
     "@replayio/protocol": 0.37.0
     "@replayio/replay": ^0.9.6
     "@sentry/react": ^7.9.0
@@ -20090,7 +20249,6 @@ __metadata:
     "@types/react-transition-group": ^4.4.5
     "@types/react-virtualized-auto-sizer": ^1.0.1
     "@types/react-window": ^1.8.5
-    "@types/semver": ^7.3.13
     "@types/styled-components": ^5.1.25
     "@types/uuid": ^8.3.1
     "@typescript-eslint/parser": ^5.38.1
@@ -20109,6 +20267,7 @@ __metadata:
     date-fns: ^2.28.0
     design: "workspace:*"
     dotenv: ^16.0.0
+    error-stack-parser: ^2.1.4
     escape-html: ^1.0.3
     eslint: ^8.13.0
     eslint-config-airbnb: ^19.0.4
@@ -20176,7 +20335,7 @@ __metadata:
     react-lazyload: ^3.2.0
     react-merge-refs: ^1.1.0
     react-redux: ^8.0.2
-    react-resizable-panels: ^0.0.34
+    react-resizable-panels: ^0.0.36
     react-table: ^7.7.0
     react-tooltip: ^4.5.1
     react-transition-group: ^4.4.2
@@ -20185,10 +20344,10 @@ __metadata:
     reactjs-popup: ^2.0.5
     replay-next: "workspace:*"
     reselect: ^4.1.5
-    semver: ^7.3.8
     shared: "workspace:*"
     sharp: ^0.30.3
     slugify: ^1.6.5
+    source-map-loader: ^4.0.1
     storybook-addon-root-attribute: ^1.0.2
     storybook-css-modules-preset: ^1.1.1
     style-loader: ^3.3.1
@@ -20989,17 +21148,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.3.8":
-  version: 7.3.8
-  resolution: "semver@npm:7.3.8"
-  dependencies:
-    lru-cache: ^6.0.0
-  bin:
-    semver: bin/semver.js
-  checksum: ba9c7cbbf2b7884696523450a61fee1a09930d888b7a8d7579025ad93d459b2d1949ee5bbfeb188b2be5f4ac163544c5e98491ad6152df34154feebc2cc337c1
-  languageName: node
-  linkType: hard
-
 "send@npm:0.16.2":
   version: 0.16.2
   resolution: "send@npm:0.16.2"
@@ -21476,6 +21624,19 @@ __metadata:
   version: 1.0.2
   resolution: "source-map-js@npm:1.0.2"
   checksum: c049a7fc4deb9a7e9b481ae3d424cc793cb4845daa690bc5a05d428bf41bf231ced49b4cf0c9e77f9d42fdb3d20d6187619fc586605f5eabe995a316da8d377c
+  languageName: node
+  linkType: hard
+
+"source-map-loader@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "source-map-loader@npm:4.0.1"
+  dependencies:
+    abab: ^2.0.6
+    iconv-lite: ^0.6.3
+    source-map-js: ^1.0.2
+  peerDependencies:
+    webpack: ^5.72.1
+  checksum: 4ddca8b03dc61f406effd4bffe70de4b87fef48bae6f737017b2dabcbc7d609133325be1e73838e9265331de28039111d729fcbb8bce88a6018a816bef510eb1
   languageName: node
   linkType: hard
 
@@ -22102,6 +22263,16 @@ __metadata:
     hey-listen: ^1.0.8
     tslib: ^2.1.0
   checksum: 16d198302cd102edf9dba94e7752a2364c93b1eaa5cc7c32b42b28eef4af4ccb5149a3f16bc2a256adc02616a2404f4612bd15f3081c1e8ca06132cae78be6c0
+  languageName: node
+  linkType: hard
+
+"style-value-types@npm:^3.1.7":
+  version: 3.2.0
+  resolution: "style-value-types@npm:3.2.0"
+  dependencies:
+    hey-listen: ^1.0.8
+    tslib: ^1.10.0
+  checksum: 26cee764836641e4423572a9f559ef22ac0f7759c3defc5514bb0c6376047839d70dcb9395819af461d15f50b0f9a1a518be1ffcc81b3cce7ca37d0c63a2c6c8
   languageName: node
   linkType: hard
 

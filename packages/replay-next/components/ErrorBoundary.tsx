@@ -1,20 +1,46 @@
 import { captureException } from "@sentry/browser";
-import React, { Component, PropsWithChildren, ReactNode, createElement } from "react";
+import React, { Component, PropsWithChildren, ReactNode } from "react";
 
 import styles from "./ErrorBoundary.module.css";
 
-type ErrorBoundaryState = { error: Error | null };
+type ErrorBoundaryState = {
+  error: Error | null;
+  erroredOnResetKey: string | number | undefined | null;
+};
 
 type ErrorBoundaryProps = PropsWithChildren<{
   fallback?: ReactNode;
   fallbackClassName?: string;
+  /**
+   * If `resetKey` changes after the ErrorBoundary caught an error, it will reset its state.
+   * Use `resetKey` instead of `key` if you don't want the child components to be recreated
+   * (and hence lose their state) every time the key changes.
+   */
+  resetKey?: string | number;
 }>;
 
 export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  state: ErrorBoundaryState = { error: null };
+  state: ErrorBoundaryState = { error: null, erroredOnResetKey: null };
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { error };
+    return { error, erroredOnResetKey: null };
+  }
+
+  static getDerivedStateFromProps(
+    props: ErrorBoundaryProps,
+    state: ErrorBoundaryState
+  ): Partial<ErrorBoundaryState> | null {
+    if (state.error) {
+      if (state.erroredOnResetKey === null) {
+        // we just caught the error and need to save the current resetKey
+        return { erroredOnResetKey: props.resetKey };
+      }
+      if (props.resetKey !== state.erroredOnResetKey) {
+        // the resetKey changed after an error was caught so we need to reset the state
+        return { error: null, erroredOnResetKey: null };
+      }
+    }
+    return null;
   }
 
   componentDidCatch(error: Error) {

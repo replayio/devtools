@@ -84,9 +84,11 @@ export type Point = {
   badge: Badge | null;
   condition: string | null;
   content: string;
+  createdByUserId: string | null;
   createdAtTime: number;
   id: PointId;
   location: Location;
+  recordingId: RecordingId;
   shouldBreak: PointBehavior;
   shouldLog: PointBehavior;
 };

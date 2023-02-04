@@ -1,5 +1,5 @@
+import { Recording, RecordingMetadata, TestMetadata } from "shared/graphql/types";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { Recording, RecordingMetadata, TestMetadata } from "ui/types";
 import { getRecordingURL } from "ui/utils/recording";
 
 import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/RecordingListItem";

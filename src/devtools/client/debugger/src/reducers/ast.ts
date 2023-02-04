@@ -8,6 +8,7 @@ import { SourceLocation } from "@replayio/protocol";
 import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/sourceVisualizations";
 import { MiniSource, SourceDetails, getSourceDetailsEntities } from "ui/reducers/sources";
 import { UIState } from "ui/state";
+import { getSymbolsAsync } from "ui/suspense/sourceCaches";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 
@@ -108,11 +109,11 @@ export const fetchSymbolsForSource = createAsyncThunk<
   { state: UIState; extra: ThunkExtraArgs }
 >(
   "ast/fetchSymbolsForSource",
-  async sourceId => {
-    const { parser } = await import("devtools/client/debugger/src/utils/bootstrap");
+  async (sourceId, { extra }) => {
+    const { replayClient } = extra;
 
-    const symbols = (await parser.getSymbols(sourceId)) as SymbolDeclarations;
-    return symbols;
+    const symbols = await getSymbolsAsync(replayClient, sourceId);
+    return symbols!;
   },
   {
     condition(arg, thunkApi) {

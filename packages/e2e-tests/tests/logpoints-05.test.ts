@@ -4,16 +4,10 @@ import { openDevToolsTab, startTest } from "../helpers";
 import {
   addLogpoint,
   editLogPoint,
-  getLogPointPanelContentTypeAhead,
+  verifyLogPointContentTypeAheadSuggestions,
 } from "../helpers/source-panel";
 
 const url = "log_points_and_block_scope.html";
-
-async function verifyLogPointTypeAheadSuggestions(page: Page, expectedPartialList: string[]) {
-  const actualTextContent = (await getLogPointPanelContentTypeAhead(page).textContent()) || "";
-  const expectedTextContent = expectedPartialList.join("");
-  expect(actualTextContent.startsWith(expectedTextContent)).toBe(true);
-}
 
 test(`logpoints-05: should auto-complete based on log point location`, async ({ page }) => {
   await startTest(page, url);
@@ -25,10 +19,10 @@ test(`logpoints-05: should auto-complete based on log point location`, async ({ 
 
   // Verify different auto-complete options based on location
   await editLogPoint(page, { content: "array", lineNumber: 5, saveAfterEdit: false, url });
-  await verifyLogPointTypeAheadSuggestions(page, ["arrayGlobal", "Array", "ArrayBuffer"]);
+  await verifyLogPointContentTypeAheadSuggestions(page, ["arrayGlobal", "Array", "ArrayBuffer"]);
 
   await editLogPoint(page, { content: "array", lineNumber: 12, saveAfterEdit: false, url });
-  await verifyLogPointTypeAheadSuggestions(page, [
+  await verifyLogPointContentTypeAheadSuggestions(page, [
     "arrayBlockOne",
     "arrayBlockOuter",
     "arrayGlobal",
@@ -37,7 +31,7 @@ test(`logpoints-05: should auto-complete based on log point location`, async ({ 
   ]);
 
   await editLogPoint(page, { content: "array", lineNumber: 17, saveAfterEdit: false, url });
-  await verifyLogPointTypeAheadSuggestions(page, [
+  await verifyLogPointContentTypeAheadSuggestions(page, [
     "arrayBlockOuter",
     "arrayBlockTwo",
     "arrayGlobal",
@@ -47,10 +41,10 @@ test(`logpoints-05: should auto-complete based on log point location`, async ({ 
 
   // Alpha sorting should impact priority
   await editLogPoint(page, { content: "Array", lineNumber: 5, saveAfterEdit: false, url });
-  await verifyLogPointTypeAheadSuggestions(page, ["Array", "ArrayBuffer", "arrayGlobal"]);
+  await verifyLogPointContentTypeAheadSuggestions(page, ["Array", "ArrayBuffer", "arrayGlobal"]);
 
   await editLogPoint(page, { content: "Array", lineNumber: 12, saveAfterEdit: false, url });
-  await verifyLogPointTypeAheadSuggestions(page, [
+  await verifyLogPointContentTypeAheadSuggestions(page, [
     "Array",
     "ArrayBuffer",
     "arrayBlockOne",
@@ -59,7 +53,7 @@ test(`logpoints-05: should auto-complete based on log point location`, async ({ 
   ]);
 
   await editLogPoint(page, { content: "Array", lineNumber: 17, saveAfterEdit: false, url });
-  await verifyLogPointTypeAheadSuggestions(page, [
+  await verifyLogPointContentTypeAheadSuggestions(page, [
     "Array",
     "ArrayBuffer",
     "arrayBlockOuter",

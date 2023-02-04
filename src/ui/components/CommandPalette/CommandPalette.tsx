@@ -3,11 +3,11 @@ import clamp from "lodash/clamp";
 import React, { ChangeEvent, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { ExperimentalUserSettings } from "shared/graphql/types";
 import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
-import { ExperimentalUserSettings } from "ui/types";
 
 import CommandButton from "./CommandButton";
 import SearchInput from "./SearchInput";

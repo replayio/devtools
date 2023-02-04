@@ -1,8 +1,11 @@
 import { gql, useQuery } from "@apollo/client";
 import { useContext, useMemo } from "react";
 
-import { GetCollaboratorNames, GetCollaboratorNamesVariables } from "graphql/GetCollaboratorNames";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import {
+  GetCollaboratorNames,
+  GetCollaboratorNamesVariables,
+} from "shared/graphql/generated/GetCollaboratorNames";
 import { useGetRecordingId } from "ui/hooks/recordings";
 
 export type PartialUser = {

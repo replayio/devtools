@@ -12,7 +12,7 @@ import cloneDeep from "lodash/cloneDeep";
 
 import { ReplayClientInterface } from "shared/client/types";
 
-import { createGenericCache2 } from "./createGenericCache";
+import { createGenericCache } from "./createGenericCache";
 import { cacheFrames } from "./FrameCache";
 import { preCacheObjects } from "./ObjectPreviews";
 import { cacheScope } from "./ScopeCache";
@@ -21,8 +21,13 @@ const {
   getValueSuspense: getPauseIdForExecutionPointSuspense,
   getValueAsync: getPauseIdForExecutionPointAsync,
   getValueIfCached: getPauseIdForExecutionPointIfCached,
-} = createGenericCache2<ReplayClientInterface, [executionPoint: ExecutionPoint], PauseId>(
+} = createGenericCache<
+  [replayClient: ReplayClientInterface],
+  [executionPoint: ExecutionPoint],
+  PauseId
+>(
   "PauseCache: getPauseIdForExecutionPoint",
+  1,
   async (client, executionPoint) => {
     const createPauseResult = await client.createPause(executionPoint);
     await client.waitForLoadedSources();
@@ -69,12 +74,13 @@ export const {
   getValueSuspense: evaluateSuspense,
   getValueAsync: evaluateAsync,
   getValueIfCached: getEvaluationResultIfCached,
-} = createGenericCache2<
-  ReplayClientInterface,
+} = createGenericCache<
+  [replayClient: ReplayClientInterface],
   [pauseId: PauseId, frameId: FrameId | null, expression: string, uid?: string],
   Omit<Result, "data">
 >(
   "PauseCache: evaluate",
+  1,
   async (client, pauseId, frameId, expression) => {
     const result = await client.evaluateExpression(pauseId, expression, frameId);
     await client.waitForLoadedSources();

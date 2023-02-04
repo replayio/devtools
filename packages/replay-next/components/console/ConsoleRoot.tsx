@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import {
   KeyboardEvent,
+  MouseEvent,
   unstable_Offscreen as Offscreen,
   ReactNode,
   RefObject,
@@ -13,6 +14,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
+import { ImperativeHandle } from "replay-next/components/lexical/CodeEditor";
 import Loader from "replay-next/components/Loader";
 import { ConsoleFiltersContextRoot } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { TerminalContext } from "replay-next/src/contexts/TerminalContext";
@@ -77,6 +79,8 @@ function Console({
   searchInputRef: RefObject<HTMLInputElement>;
   showFiltersByDefault?: boolean;
 }) {
+  const inputRef = useRef<ImperativeHandle>(null);
+
   const [_, searchActions] = useContext(ConsoleSearchContext);
   const { clearMessages: clearConsoleEvaluations, messages: consoleEvaluations } =
     useContext(TerminalContext);
@@ -129,12 +133,29 @@ function Console({
     }
   };
 
+  const onClick = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    const testName = target.getAttribute("data-test-name");
+    if (testName === "Messages") {
+      const input = inputRef.current;
+      if (input) {
+        input.focus();
+      }
+    }
+  };
+
+  const onSearchInputHide = () => {
+    const input = inputRef.current;
+    if (input) {
+      input.focus();
+    }
+  };
+
   return (
     <div
       className={classNames(styles.ConsoleRoot, isMenuOpen && styles.ConsoleRootOpen)}
       data-test-id="ConsoleRoot"
       onKeyDown={onKeyDown}
-      tabIndex={0}
     >
       <PanelGroup autoSaveId="ConsoleRoot" direction="horizontal">
         <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
@@ -194,15 +215,16 @@ function Console({
             }
           >
             <ErrorBoundary fallbackClassName={styles.ErrorBoundaryFallback}>
-              <div className={styles.MessageColumn}>
+              <div className={styles.MessageColumn} onClick={onClick}>
                 {nagHeader}
 
                 <MessagesList ref={messageListRef} />
 
-                <ConsoleInput />
+                <ConsoleInput inputRef={inputRef} />
 
                 <ConsoleSearch
                   className={styles.ConsoleSearchRow}
+                  onHide={onSearchInputHide}
                   searchInputRef={searchInputRef}
                 />
               </div>

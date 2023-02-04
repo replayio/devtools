@@ -168,7 +168,7 @@ const SourceListRow = memo(
       if (tokens) {
         for (let index = 0; index < tokens.length; index++) {
           const token = tokens[index];
-          if (token.columnIndex + token.value.length > columnIndexEnd) {
+          if (token.columnIndex >= columnIndexEnd) {
             break;
           } else if (token.columnIndex >= columnIndexStart) {
             rendered.push(

@@ -18,3 +18,5 @@ export const isNodeExpanded = (state: UIState, nodeId: string) =>
 
 export const getParentNodeId = (state: UIState, nodeId: string) =>
   getNodeInfo(state, nodeId)?.parentNodeId;
+
+export const getHighlightedNodesLoading = (state: UIState) => state.markup.highlightedNodesLoading;

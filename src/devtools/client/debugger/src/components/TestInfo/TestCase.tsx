@@ -1,6 +1,7 @@
 import classnames from "classnames";
 import { createContext, useCallback, useEffect, useState } from "react";
 
+import { TestItem, TestResult, TestStep } from "shared/graphql/types";
 import {
   seek,
   seekToTime,
@@ -17,9 +18,9 @@ import {
   setSelectedTest,
 } from "ui/reducers/reporter";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { TestItem, TestResult, TestStep } from "ui/types";
 
 import { TestSteps } from "./TestSteps";
+import styles from "src/ui/components/SidePanel.module.css";
 
 export type TestCaseContextType = {
   test: TestItem;
@@ -155,7 +156,7 @@ export function Status({ result }: { result: TestResult }) {
     <Icon
       filename={result === "passed" ? "testsuites-success" : "testsuites-fail"}
       size="small"
-      className={result === "passed" ? "bg-[#219653]" : "bg-[#EB5757]"}
+      className={result === "passed" ? styles.SuccessIcon : styles.ErrorIcon}
     />
   );
 }

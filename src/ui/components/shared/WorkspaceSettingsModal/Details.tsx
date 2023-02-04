@@ -1,6 +1,6 @@
 import React from "react";
 
-import { SubscriptionWithPricing, Workspace } from "ui/types";
+import { SubscriptionWithPricing, Workspace } from "shared/graphql/types";
 import { inUnpaidFreeTrial, subscriptionEndsIn } from "ui/utils/workspace";
 
 import { Button } from "../Button";

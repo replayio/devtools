@@ -2,10 +2,10 @@ import { readFileSync } from "fs";
 import { gql } from "@apollo/client";
 
 import { ThreadFront } from "protocol/thread";
+import { Recording } from "shared/graphql/types";
 import { LoadedRegionsTuple, MessageTuple, SourceTuple } from "shared/utils/testing";
 import { UIStore } from "ui/actions";
 import { convertRecording } from "ui/hooks/recordings";
-import { Recording } from "ui/types";
 import { getMockEnvironmentForTesting } from "ui/utils/environment";
 
 import { createTestStore } from "./testUtils";
@@ -64,7 +64,7 @@ export async function loadFixtureData(
 
   // This is necessary to unblock various event listeners and parsing.
   // Actual session ID value _probably_ doesn't matter here.
-  await ThreadFront.setSessionId(sessionId);
+  await ThreadFront.setSessionId(sessionId, {});
 
   // Initialize state using exported websocket messages,
   // sent through the mock environment straight to socket parsing.

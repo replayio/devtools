@@ -129,7 +129,7 @@ class ReplayWall implements Wall {
           }
           this.highlightedElementId = id;
 
-          const response = await ThreadFront.evaluateNew({
+          const response = await ThreadFront.evaluate({
             replayClient: this.replayClient,
             text: `${getDOMNodes}(${rendererID}, ${id})[0]`,
           });
@@ -202,7 +202,7 @@ class ReplayWall implements Wall {
   // send a request to the backend in the recording and the reply to the frontend
   private async sendRequest(event: string, payload: any) {
     try {
-      const response = await ThreadFront.evaluateNew({
+      const response = await ThreadFront.evaluate({
         replayClient: this.replayClient,
         text: ` window.__RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("${event}", ${JSON.stringify(
           payload
@@ -230,7 +230,7 @@ class ReplayWall implements Wall {
       const rendererID = this.store!._rootIDToRendererID.get(rootID)!;
       const elementIDs = JSON.stringify(this.collectElementIDs(rootID));
       const expr = `${elementIDs}.reduce((map, id) => { for (node of ${getDOMNodes}(${rendererID}, id) || []) { map.set(node, id); } return map; }, new Map())`;
-      const response = await ThreadFront.evaluateNew({
+      const response = await ThreadFront.evaluate({
         replayClient: this.replayClient,
         text: expr,
       });
@@ -333,7 +333,7 @@ async function loadReactDevToolsInlineModuleFromProtocol(
 
   if (recordingTarget === "gecko") {
     // For Gecko recordings, introspect the page to determine what RDT version was used
-    const response = await ThreadFront.evaluateNew({
+    const response = await ThreadFront.evaluate({
       replayClient,
       text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("getBridgeProtocol", undefined)`,
     });
