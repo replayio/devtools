@@ -213,15 +213,19 @@ function useGetTestSections(
 export function TestSteps({ test }: { test: TestItem }) {
   const { startTime: testCaseStartTime } = useContext(TestCaseContext);
   const { beforeEach, testBody, afterEach } = useGetTestSections(testCaseStartTime, test.steps);
+  const autoSelectId =
+    test.steps?.find(s => !!s.error)?.id ||
+    (beforeEach[0] || testBody[0] || afterEach[0])?.event?.id;
 
   return (
     <div className="flex flex-col rounded-lg px-2">
-      <TestSection events={beforeEach} header="Before Each" />
+      <TestSection events={beforeEach} header="Before Each" autoSelectId={autoSelectId} />
       <TestSection
         events={testBody}
         header={beforeEach.length + afterEach.length > 0 ? "Test Body" : undefined}
+        autoSelectId={autoSelectId}
       />
-      <TestSection events={afterEach} header="After Each" />
+      <TestSection events={afterEach} header="After Each" autoSelectId={autoSelectId} />
       {test.error ? (
         <TestStepRow error>
           <div>
@@ -263,7 +267,15 @@ function NewUrlRow({ time, message }: { time: number; message: CypressAnnotation
   );
 }
 
-function TestSection({ events, header }: { events: CompositeTestEvent[]; header?: string }) {
+function TestSection({
+  events,
+  header,
+  autoSelectId,
+}: {
+  events: CompositeTestEvent[];
+  header?: string;
+  autoSelectId?: string;
+}) {
   const firstStep = events.find((e): e is StepEvent => e.type === "step");
   const firstIndex = firstStep?.event.index || 0;
 
@@ -292,6 +304,7 @@ function TestSection({ events, header }: { events: CompositeTestEvent[]; header?
               s.args ? s.args.filter((s): s is string => s && typeof s === "string").join(", ") : ""
             }
             id={s.id}
+            autoSelect={s.id === autoSelectId}
           />
         ) : type === "network" ? (
           <NetworkEvent key={s.id} request={s} />

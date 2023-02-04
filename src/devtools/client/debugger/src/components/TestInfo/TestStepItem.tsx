@@ -39,7 +39,7 @@ function scrollIntoView(node: HTMLDivElement) {
   const nodeBounds = node.getBoundingClientRect();
 
   if (nodeBounds.top < parentBounds.top || nodeBounds.bottom > parentBounds.bottom) {
-    node.scrollIntoView();
+    node.scrollIntoView({ block: "center", behavior: "smooth" });
   }
 }
 
@@ -48,6 +48,7 @@ export interface TestStepItemProps {
   argString?: string;
   index: number;
   id: string | null;
+  autoSelect?: boolean;
 }
 
 const AwaitTimeout = Symbol("await-timeout");
@@ -61,7 +62,13 @@ async function awaitWithTimeout<T>(
   ]);
 }
 
-export function TestStepItem({ step, argString, index, id }: TestStepItemProps) {
+export function TestStepItem({
+  step,
+  argString,
+  index,
+  id,
+  autoSelect = false,
+}: TestStepItemProps) {
   const isHovered = useRef(false);
   const hasScrolled = useRef(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -100,6 +107,8 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
       }
 
       dispatch(setSelectedStep(step));
+
+      return true;
     }
   }, [actions, viewMode, step, subjectNodePauseData, dispatch, id]);
 
@@ -164,12 +173,15 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   }, [isPlaying, ref, currentTime, step]);
 
   useEffect(() => {
-    if (step.error && ref.current && !hasScrolled.current) {
-      hasScrolled.current = true;
-      scrollIntoView(ref.current);
-      onClick();
+    if (autoSelect && ref.current && !hasScrolled.current) {
+      onClick().then(clicked => {
+        if (clicked && ref.current) {
+          hasScrolled.current = true;
+          scrollIntoView(ref.current);
+        }
+      });
     }
-  }, [step, ref, onClick]);
+  }, [autoSelect, ref, onClick]);
 
   // This math is bananas don't look here until this is cleaned up :)
   const bump = state !== "pending" ? 10 : 0;
