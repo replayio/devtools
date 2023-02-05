@@ -39,7 +39,7 @@ export function LoadingScreenTemplate({
     <BubbleViewportWrapper>
       <div className="relative flex w-96 flex-col items-center space-y-1 rounded-lg bg-loadingBoxes p-8 py-12 shadow-sm">
         <div className="flex flex-col items-center space-y-8">
-          <div className="w-32" onClick={changeHoverboardColor}>
+          <div className="h-32 w-32" onClick={changeHoverboardColor}>
             <Hoverboard color={hoverboardColor} />
           </div>
           {children}
