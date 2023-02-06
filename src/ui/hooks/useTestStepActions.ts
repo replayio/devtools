@@ -5,9 +5,12 @@ import { getContext } from "devtools/client/debugger/src/selectors";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { AnnotatedTestStep, TestItem } from "shared/graphql/types";
 import { getCurrentPoint } from "ui/actions/app";
+import { setViewMode } from "ui/actions/layout";
 import { seek, seekToTime, startPlayback } from "ui/actions/timeline";
+import { setSourcesUserActionPending } from "ui/reducers/sources";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { AwaitTimeout, awaitWithTimeout } from "ui/utils/awaitWithTimeout";
 
 import { getTestStepSourceLocationAsync } from "../suspense/testStepCache";
 import { isStepEnd, isStepStart } from "./useStepState";
@@ -101,11 +104,21 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
       return;
     }
 
-    const location = await getTestStepSourceLocationAsync(client, info.metadata, testStep);
+    dispatch(setViewMode("dev"));
+
+    const locationPromise = getTestStepSourceLocationAsync(client, info.metadata, testStep);
+
+    let location = await awaitWithTimeout(locationPromise);
+    if (location === AwaitTimeout) {
+      dispatch(setSourcesUserActionPending(true));
+      location = await locationPromise;
+    }
 
     if (location) {
       dispatch(selectLocation(cx, location));
     }
+
+    dispatch(setSourcesUserActionPending(false));
   };
 
   return {

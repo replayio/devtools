@@ -17,6 +17,7 @@ import {
   getCypressConsolePropsSuspense,
   getCypressSubjectNodeIdsAsync,
 } from "ui/suspense/testStepCache";
+import { AwaitTimeout, awaitWithTimeout } from "ui/utils/awaitWithTimeout";
 
 import { TestCaseContext } from "./TestCase";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
@@ -48,17 +49,6 @@ export interface TestStepItemProps {
   argString?: string;
   index: number;
   id: string | null;
-}
-
-const AwaitTimeout = Symbol("await-timeout");
-async function awaitWithTimeout<T>(
-  promise: Promise<T>,
-  timeout = 500
-): Promise<T | typeof AwaitTimeout> {
-  return Promise.race([
-    new Promise<typeof AwaitTimeout>(resolve => setTimeout(() => resolve(AwaitTimeout), timeout)),
-    promise,
-  ]);
 }
 
 export function TestStepItem({ step, argString, index, id }: TestStepItemProps) {
