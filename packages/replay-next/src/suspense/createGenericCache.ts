@@ -135,7 +135,7 @@ interface HookState<TValue> {
 }
 
 export function createUseGetValue<TParams extends Array<any>, TValue>(
-  getValueAsync: (...args: TParams) => Promise<TValue>,
+  getValueAsync: (...args: TParams) => Thennable<TValue> | TValue,
   getValueIfCached: (...args: TParams) => { value: TValue } | undefined,
   getCacheKey: (...args: TParams) => string
 ): (...args: TParams) => HookState<TValue> {
@@ -156,7 +156,11 @@ export function createUseGetValue<TParams extends Array<any>, TValue>(
 
       if (!cachedValue && !caught) {
         fetchingForKey.current = key;
-        getValueAsync(...args).then(maybeTriggerRendering, maybeTriggerRendering);
+        // Convince both JS and TS it's safe to call `.then()` here
+        Promise.resolve(getValueAsync(...args) as Promise<TValue>).then(
+          maybeTriggerRendering,
+          maybeTriggerRendering
+        );
       }
 
       function maybeTriggerRendering() {
