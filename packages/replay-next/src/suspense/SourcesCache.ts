@@ -16,7 +16,7 @@ import { ProtocolError, isCommandError } from "shared/utils/error";
 import { isPointRange, toPointRange } from "shared/utils/time";
 
 import { createFetchAsyncFromFetchSuspense, createWakeable } from "../utils/suspense";
-import { createGenericCache } from "./createGenericCache";
+import { createGenericCache, createUseGetValue } from "./createGenericCache";
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 export type ProtocolSourceContents = {
@@ -188,14 +188,24 @@ export function getCachedMinMaxSourceHitCounts(
   return minMaxHitCountsMap.get(key) || [null, null];
 }
 
-export function getSourceHitCountsSuspense(
+export function getSourceHitCountsCacheKey(
   client: ReplayClientInterface,
   sourceId: ProtocolSourceId,
   locationRange: SourceLocationRange,
   focusRange: TimeStampedPointRange | PointRange | null
-): LineNumberToHitCountMap {
+) {
   // Focus range is tracked as TimeStampedPointRange.
   // For convenience, this public API accepts either type.
+  let pointRange: PointRange | null = focusRangeToPointRange(focusRange);
+
+  let key = `${sourceId}:${locationRange.start.line}:${locationRange.start.column}:${locationRange.end.line}:${locationRange.end.column}`;
+  if (pointRange !== null) {
+    key = `${key}:${pointRange.begin}:${pointRange.end}`;
+  }
+  return key;
+}
+
+function focusRangeToPointRange(focusRange: TimeStampedPointRange | PointRange | null) {
   let pointRange: PointRange | null = null;
   if (focusRange !== null) {
     if (isPointRange(focusRange)) {
@@ -207,11 +217,18 @@ export function getSourceHitCountsSuspense(
       };
     }
   }
+  return pointRange;
+}
 
-  let key = `${sourceId}:${locationRange.start.line}:${locationRange.start.column}:${locationRange.end.line}:${locationRange.end.column}`;
-  if (pointRange !== null) {
-    key = `${key}:${pointRange.begin}:${pointRange.end}`;
-  }
+export function getSourceHitCountsSuspense(
+  client: ReplayClientInterface,
+  sourceId: ProtocolSourceId,
+  locationRange: SourceLocationRange,
+  focusRange: TimeStampedPointRange | PointRange | null
+): LineNumberToHitCountMap {
+  const key = getSourceHitCountsCacheKey(client, sourceId, locationRange, focusRange);
+
+  const pointRange = focusRangeToPointRange(focusRange);
 
   let record = hitCountRecordsMap.get(key);
   if (record == null) {
@@ -233,6 +250,39 @@ export function getSourceHitCountsSuspense(
   }
 }
 
+export const getSourceHitCountsAsync = createFetchAsyncFromFetchSuspense(
+  getSourceHitCountsSuspense
+);
+
+export function getSourceHitCountsIfCached(
+  client: ReplayClientInterface,
+  sourceId: ProtocolSourceId,
+  locationRange: SourceLocationRange,
+  focusRange: TimeStampedPointRange | PointRange | null
+) {
+  const cacheKey = getSourceHitCountsCacheKey(client, sourceId, locationRange, focusRange);
+  const record = hitCountRecordsMap.get(cacheKey);
+  switch (record?.status) {
+    case STATUS_RESOLVED: {
+      return { value: record.value };
+    }
+    case STATUS_REJECTED: {
+      throw record.value;
+    }
+  }
+}
+
+export const useGetSourceHitCounts = createUseGetValue(
+  getSourceHitCountsAsync,
+  getSourceHitCountsIfCached,
+  getSourceHitCountsCacheKey
+);
+
+export type BreakpointPositionsResult = [
+  breakablePositions: ProtocolSameLineSourceLocations[],
+  breakablePositionsByLine: Map<number, ProtocolSameLineSourceLocations>
+];
+
 export const {
   getValueSuspense: getBreakpointPositionsSuspense,
   getValueAsync: getBreakpointPositionsAsync,
@@ -241,10 +291,7 @@ export const {
 } = createGenericCache<
   [replayClient: ReplayClientInterface],
   [sourceId: ProtocolSourceId],
-  [
-    breakablePositions: ProtocolSameLineSourceLocations[],
-    breakablePositionsByLine: Map<number, ProtocolSameLineSourceLocations>
-  ]
+  BreakpointPositionsResult
 >(
   "SourcesCache: getBreakpointPositions",
   1,
@@ -267,6 +314,12 @@ export const {
     return [breakablePositions, breakablePositionsByLine];
   },
   sourceId => sourceId
+);
+
+export const useGetBreakablePositions = createUseGetValue(
+  getBreakpointPositionsAsync,
+  (replayClient, ...params) => getBreakpointPositionsIfCached(...params),
+  (replayClient, ...params) => getBreakpointPositionsCacheKey(...params)
 );
 
 async function fetchSources(client: ReplayClientInterface) {

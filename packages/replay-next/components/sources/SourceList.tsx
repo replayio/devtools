@@ -19,20 +19,28 @@ import { PointsContext } from "replay-next/src/contexts/PointsContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import {
+  BreakpointPositionsResult,
   StreamingSourceContents,
-  getBreakpointPositionsSuspense,
   getCachedMinMaxSourceHitCounts,
-  getSourceHitCountsSuspense,
+  useGetBreakablePositions,
+  useGetSourceHitCounts,
 } from "replay-next/src/suspense/SourcesCache";
 import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { POINT_BEHAVIOR_DISABLED, Point } from "shared/client/types";
+import { POINT_BEHAVIOR_DISABLED, Point, SourceLocationRange } from "shared/client/types";
 
 import useFontBasedListMeasurements from "./hooks/useFontBasedListMeasurements";
 import SourceListRow, { ItemData, PointStateEnum, SetLinePointState } from "./SourceListRow";
 import { formatHitCount } from "./utils/formatHitCount";
 import getScrollbarWidth from "./utils/getScrollbarWidth";
 import styles from "./SourceList.module.css";
+
+const NO_SOURCE_LOCATIONS: SourceLocationRange = {
+  start: { line: 0, column: 0 },
+  end: { line: 0, column: 0 },
+};
+
+const NO_BREAKABLE_POSITIONS: BreakpointPositionsResult = [[], new Map()];
 
 export default function SourceList({
   height,
@@ -77,6 +85,23 @@ export default function SourceList({
     () => streamingSourceContents.lineCount
   );
 
+  // Both hit counts and breakable positions are key info,
+  // but neither should actually _block_ us from showing source text.
+  // Fetch those in the background via the caches,
+  // and re-render once that data is available.
+  const { value: hitCounts = null } = useGetSourceHitCounts(
+    client,
+    sourceId,
+    visibleLines ?? NO_SOURCE_LOCATIONS,
+    focusRange
+  );
+
+  const { value: breakablePositionsValue = NO_BREAKABLE_POSITIONS } = useGetBreakablePositions(
+    client,
+    sourceId
+  );
+  const [, breakablePositionsByLine] = breakablePositionsValue;
+
   useEffect(() => {
     const focusedSourceId = focusedSource?.sourceId ?? null;
     const startLineIndex = focusedSource?.startLineIndex ?? null;
@@ -103,13 +128,6 @@ export default function SourceList({
 
   const togglesLocalStorageKey = `Replay:ShowHitCounts`;
   const [showHitCounts] = useLocalStorage<boolean>(togglesLocalStorageKey, true);
-
-  // Note that getSourceHitCountsSuspense also suspends on getBreakpointPositions*
-  const [_, breakablePositionsByLine] = getBreakpointPositionsSuspense(client, sourceId);
-
-  const hitCounts = visibleLines
-    ? getSourceHitCountsSuspense(client, sourceId, visibleLines, focusRange)
-    : null;
 
   const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
 
