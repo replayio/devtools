@@ -23,6 +23,7 @@ export interface GenericCache<TExtraParams extends Array<any>, TParams extends A
   getValueIfCached(...args: TParams): { value: TValue } | undefined;
   addValue(value: TValue, ...args: TParams): void;
   getStatus(...args: TParams): CacheRecordStatus | undefined;
+  getCacheKey(...args: TParams): string;
 }
 
 export function createGenericCache<
@@ -122,6 +123,8 @@ export function createGenericCache<
       const cacheKey = getCacheKey(...args);
       return recordMap.get(cacheKey)?.status;
     },
+
+    getCacheKey,
   };
 }
 
