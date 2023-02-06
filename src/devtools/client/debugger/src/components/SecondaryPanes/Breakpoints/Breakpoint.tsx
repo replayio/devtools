@@ -28,6 +28,7 @@ import { getContext } from "../../../selectors";
 import { compareSourceLocation } from "../../../utils/location";
 import { CloseButton } from "../../shared/Button";
 import BreakpointOptions from "./BreakpointOptions";
+import styles from "./Breakpoint.module.css";
 
 const mapStateToProps = (state: UIState) => ({
   cx: getContext(state),
@@ -40,6 +41,7 @@ const connector = connect(mapStateToProps, {
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 interface PropsFromParent {
+  editable: boolean;
   onEditPointBehavior: EditPointBehavior;
   onRemoveBreakpoint: (cx: Context, point: Point) => void;
   point: Point;
@@ -86,12 +88,17 @@ class Breakpoint extends PureComponent<BreakpointProps> {
     const columnVal = columnIndex != null ? `:${columnIndex}` : "";
     const location = `${lineNumber}${columnVal}`;
 
-    return <div className="breakpoint-line">{location}</div>;
+    return (
+      <div className={styles.Location} data-test-name="PointLocation">
+        {location}
+      </div>
+    );
   }
 
   render() {
     const {
       cx,
+      editable,
       replayClient,
       onEditPointBehavior,
       onRemoveBreakpoint,
@@ -160,14 +167,12 @@ class Breakpoint extends PureComponent<BreakpointProps> {
 
     return (
       <div
-        className={classnames({
-          point,
-          paused: this.isCurrentlyPausedAtBreakpoint(frame),
-        })}
+        className={styles.Point}
         data-test-name="Breakpoint"
         data-test-type={type}
         data-test-column-index={point.columnIndex}
         data-test-line-number={point.lineNumber}
+        data-test-state={this.isCurrentlyPausedAtBreakpoint(frame) ? "paused" : undefined}
         data-test-source-id={point.sourceId}
         onClick={this.selectBreakpoint}
       >
@@ -180,11 +185,9 @@ class Breakpoint extends PureComponent<BreakpointProps> {
         </label>
         <BreakpointOptions breakpoint={point} type={type} />
         {this.renderSourceLocation()}
-        <CloseButton
-          buttonClass={null}
-          handleClick={onCloseButtonClick}
-          tooltip={"Remove this breakpoint"}
-        />
+        {editable && (
+          <CloseButton handleClick={onCloseButtonClick} tooltip={"Remove this breakpoint"} />
+        )}
       </div>
     );
   }

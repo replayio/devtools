@@ -6,6 +6,8 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 import { getSourceLinesSuspense } from "ui/suspense/sourceCaches";
 
+import styles from "./BreakpointOptions.module.css";
+
 type BreakpointProps = {
   type: "breakpoint" | "logpoint";
   breakpoint: Point;
@@ -37,31 +39,33 @@ function BreakpointLineContents({ breakpoint }: BreakpointProps) {
 }
 
 export default function BreakpointOptions({ breakpoint, type }: BreakpointProps) {
+  const { condition, content } = breakpoint;
+
   let children = null;
   if (type === "logpoint") {
-    if (breakpoint.condition) {
+    if (condition) {
       children = (
         <>
-          <span className="breakpoint-label cm-s-mozilla devtools-monospace">
+          <span className={styles.Label}>
             if(
-            <SyntaxHighlightedLine code={breakpoint.condition} />)
+            <SyntaxHighlightedLine code={condition} />)
           </span>
-          <span className="breakpoint-label cm-s-mozilla devtools-monospace">
+          <span className={styles.Label}>
             log(
-            <SyntaxHighlightedLine code={breakpoint.content} />)
+            <SyntaxHighlightedLine code={content} />)
           </span>
         </>
       );
     } else {
       children = (
-        <span className="breakpoint-label cm-s-mozilla devtools-monospace">
-          <SyntaxHighlightedLine code={breakpoint.content} />
+        <span className={styles.Label}>
+          <SyntaxHighlightedLine code={content} />
         </span>
       );
     }
   } else {
     children = (
-      <span className="breakpoint-label cm-s-mozilla devtools-monospace">
+      <span className={styles.Label}>
         <Suspense fallback={<Loader />}>
           <BreakpointLineContents breakpoint={breakpoint} type={type} />
         </Suspense>
@@ -69,5 +73,5 @@ export default function BreakpointOptions({ breakpoint, type }: BreakpointProps)
     );
   }
 
-  return <div className="breakpoint-options">{children}</div>;
+  return <div className={styles.Options}>{children}</div>;
 }

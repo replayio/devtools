@@ -457,7 +457,7 @@ function PointPanelWithHitPoints({
                   </button>
                 ) : (
                   <div className={styles.DisabledIconAndAvatar}>
-                    <Icon className={styles.EditButtonIcon} type="toggle-off" />
+                    {shouldLog || <Icon className={styles.EditButtonIcon} type="toggle-off" />}
                     <AvatarImage
                       className={styles.CreatedByAvatar}
                       src={point.user?.picture || undefined}

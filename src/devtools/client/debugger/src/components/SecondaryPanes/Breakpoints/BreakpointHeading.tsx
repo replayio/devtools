@@ -14,6 +14,7 @@ import { getExecutionPoint } from "../../../reducers/pause";
 import { getContext } from "../../../selectors";
 import { getFileURL, getSourceQueryString, getTruncatedFileName } from "../../../utils/source";
 import { CloseButton } from "../../shared/Button";
+import styles from "./BreakpointHeading.module.css";
 
 type BHExtraProps = {
   sourceId: SourceId;
@@ -78,19 +79,16 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
 
     return (
       <div
-        className="breakpoint-heading"
+        className={styles.Heading}
         title={getFileURL(source, false)}
         onContextMenu={this.onContextMenu}
         onClick={this.onClick}
       >
-        <Redacted className="breakpoint-heading-label">{fileName}</Redacted>
-        <div className="breakpoint-heading-actions">
-          <CloseButton
-            buttonClass={null}
-            handleClick={this.removeBreakpoint}
-            tooltip={"Remove all breakpoint from this source"}
-          />
-        </div>
+        <Redacted className={styles.Label}>{fileName}</Redacted>
+        <CloseButton
+          handleClick={this.removeBreakpoint}
+          tooltip={"Remove all breakpoint from this source"}
+        />
       </div>
     );
   }

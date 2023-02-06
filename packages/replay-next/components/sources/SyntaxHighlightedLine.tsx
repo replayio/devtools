@@ -24,6 +24,10 @@ function SyntaxHighlightedLineSuspends({ code, className = "", fileExtension = "
   const html = parsedTokensToHtml(tokens?.[0] ?? []);
 
   return (
-    <span className={`${className} ${styles.Code}`} dangerouslySetInnerHTML={{ __html: html }} />
+    <span
+      className={`${className} ${styles.Code}`}
+      dangerouslySetInnerHTML={{ __html: html }}
+      title={code}
+    />
   );
 }
