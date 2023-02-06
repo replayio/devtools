@@ -1,3 +1,4 @@
+import { AnnotatedTestStep } from "shared/graphql/types";
 import {
   getReporterAnnotationsComplete,
   getSelectedStep,
@@ -29,6 +30,9 @@ export function useTestInfo() {
 
   const isLoading = loading || (supportsStepAnnotations && !annotationsComplete);
 
+  const getStepAsserts = (step: AnnotatedTestStep) =>
+    selectedTest?.steps?.filter(s => step.assertIds?.includes(s.id)) || [];
+
   return {
     loading: isLoading,
     metadata,
@@ -41,5 +45,6 @@ export function useTestInfo() {
     pluginVersion,
     supportsSteps,
     supportsStepAnnotations,
+    getStepAsserts,
   };
 }
