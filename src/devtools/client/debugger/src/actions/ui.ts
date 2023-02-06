@@ -22,7 +22,6 @@ import {
   sourcesPanelExpanded,
   toggleActiveSearch,
   toggleSources,
-  toggleStartPanel,
 } from "../reducers/ui";
 import { getActiveSearch, getContext, getQuickOpenEnabled } from "../selectors";
 import { selectSource } from "./sources/select";
@@ -42,7 +41,6 @@ export {
   sourcesPanelExpanded,
   toggleActiveSearch,
   toggleFrameworkGrouping,
-  toggleStartPanel,
   toggleSources,
 } from "../reducers/ui";
 
@@ -63,7 +61,6 @@ export function setActiveSearch(activeSearch: ActiveSearchType): UIThunkAction {
 
 // Preserve existing export names
 export const ensureSourcesIsVisible = sourcesDisplayed;
-export const togglePaneCollapse = toggleStartPanel;
 export const toggleSourcesCollapse = toggleSources;
 export const expandSourcesPane = sourcesPanelExpanded;
 export const updateCursorPosition = setCursorPosition;

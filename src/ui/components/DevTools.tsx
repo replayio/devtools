@@ -11,6 +11,7 @@ import InspectorContextReduxAdapter from "devtools/client/debugger/src/component
 import { ThreadFront } from "protocol/thread";
 import { PointsContextRoot } from "replay-next/src/contexts/PointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
+import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
@@ -78,7 +79,8 @@ function Body() {
 
   const sidePanelRef = useRef<ImperativePanelHandle>(null);
 
-  const [sidePanelCollapsed, setSidePanelCollapsed] = useState(false);
+  const sidePanelStorageKey = "Replay:SidePanelCollapsed";
+  const [sidePanelCollapsed, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
 
   const onSidePanelCollapse = (isCollapsed: boolean) => {
     setSidePanelCollapsed(isCollapsed);

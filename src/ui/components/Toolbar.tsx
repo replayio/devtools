@@ -58,39 +58,17 @@ function ToolbarButton({
   icon,
   label,
   name,
-  sidePanelRef,
+  onClick,
   showBadge,
 }: {
   icon: string;
   label: string;
   name: PrimaryPanelName;
-  sidePanelRef: RefObject<ImperativePanelHandle>;
+  onClick: (name: PrimaryPanelName) => void;
   showBadge?: boolean;
 }) {
   const selectedPrimaryPanel = useAppSelector(selectors.getSelectedPrimaryPanel);
-  const panelCollapsed = useAppSelector(selectors.getPaneCollapse);
-  const dispatch = useAppDispatch();
 
-  const handleClick = (panelName: PrimaryPanelName) => {
-    if (panelCollapsed || (selectedPrimaryPanel == panelName && !panelCollapsed)) {
-      trackEvent(`toolbox.toggle_sidebar`);
-      dispatch(actions.togglePaneCollapse());
-    }
-
-    if (selectedPrimaryPanel != panelName) {
-      trackEvent(`toolbox.primary.${panelName}_select`);
-      dispatch(actions.setSelectedPrimaryPanel(panelName));
-    } else {
-      const panel = sidePanelRef.current;
-      if (panel) {
-        if (panel.getCollapsed()) {
-          panel.expand();
-        } else {
-          panel.collapse();
-        }
-      }
-    }
-  };
   const imageIcon = (
     <MaterialIcon
       className={classNames("toolbar-panel-icon text-themeToolbarPanelIconColor", name)}
@@ -111,7 +89,7 @@ function ToolbarButton({
           icon={imageIcon}
           content={label}
           dataTestName={`ToolbarButton-${label.replace(/ /g, "")}`}
-          handleClick={() => handleClick(name)}
+          handleClick={() => onClick(name)}
         />
       </div>
       {showBadge ? (
@@ -135,6 +113,7 @@ export default function Toolbar({
   sidePanelCollapsed: boolean;
   sidePanelRef: RefObject<ImperativePanelHandle>;
 }) {
+  const dispatch = useAppDispatch();
   const replayClient = useContext(ReplayClientContext);
   const pauseId = useAppSelector(getPauseId);
   const frames = useGetFrames(replayClient, pauseId);
@@ -159,6 +138,32 @@ export default function Toolbar({
     }
   }, [selectedPrimaryPanel, showCommentsBadge]);
 
+  const togglePanel = () => {
+    const panel = sidePanelRef.current;
+    if (panel) {
+      if (sidePanelCollapsed) {
+        panel.expand();
+      } else {
+        panel.collapse();
+      }
+    }
+  };
+
+  const handleButtonClick = (panelName: PrimaryPanelName) => {
+    const samePanelSelected = selectedPrimaryPanel === panelName;
+    const shouldTogglePanel = sidePanelCollapsed || samePanelSelected;
+
+    if (!samePanelSelected) {
+      trackEvent(`toolbox.primary.${panelName}_select`);
+      dispatch(actions.setSelectedPrimaryPanel(panelName));
+    }
+
+    if (shouldTogglePanel) {
+      trackEvent(`toolbox.toggle_sidebar`);
+      togglePanel();
+    }
+  };
+
   return (
     <div className="toolbox-toolbar-container flex flex-col items-center justify-between py-1">
       <div id="toolbox-toolbar">
@@ -167,14 +172,14 @@ export default function Toolbar({
             icon="cypress"
             label="Cypress Panel"
             name="cypress"
-            sidePanelRef={sidePanelRef}
+            onClick={handleButtonClick}
           />
         ) : (
           <ToolbarButton
             icon="info"
             label="Replay Info"
             name="events"
-            sidePanelRef={sidePanelRef}
+            onClick={handleButtonClick}
           />
         )}
         <ToolbarButton
@@ -182,7 +187,7 @@ export default function Toolbar({
           label="Comments"
           name="comments"
           showBadge={showCommentsBadge}
-          sidePanelRef={sidePanelRef}
+          onClick={handleButtonClick}
         />
         {viewMode == "dev" ? (
           <>
@@ -190,20 +195,20 @@ export default function Toolbar({
               icon="description"
               name="explorer"
               label="Source Explorer"
-              sidePanelRef={sidePanelRef}
+              onClick={handleButtonClick}
             />
-            <ToolbarButton icon="search" name="search" label="Search" sidePanelRef={sidePanelRef} />
+            <ToolbarButton icon="search" name="search" label="Search" onClick={handleButtonClick} />
             <ToolbarButton
               icon="motion_photos_paused"
               name="debugger"
               label="Pause Information"
               showBadge={hasFrames}
-              sidePanelRef={sidePanelRef}
+              onClick={handleButtonClick}
             />
           </>
         ) : null}
         {logProtocol ? (
-          <ToolbarButton icon="code" label="Protocol" name="protocol" sidePanelRef={sidePanelRef} />
+          <ToolbarButton icon="code" label="Protocol" name="protocol" onClick={handleButtonClick} />
         ) : null}
         <div className="grow"></div>
         <div className="relative px-2">
@@ -221,16 +226,7 @@ export default function Toolbar({
               }
               content={sidePanelCollapsed ? "Expand side panel" : "Collapse side panel"}
               dataTestName={`ToolbarButton-ExpandSidePanel`}
-              handleClick={() => {
-                const panel = sidePanelRef.current;
-                if (panel) {
-                  if (sidePanelCollapsed) {
-                    panel.expand();
-                  } else {
-                    panel.collapse();
-                  }
-                }
-              }}
+              handleClick={togglePanel}
             />
           </div>
         </div>
