@@ -15,7 +15,7 @@ import {
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import { isPointRange, toPointRange } from "shared/utils/time";
 
-import { createWakeable } from "../utils/suspense";
+import { createFetchAsyncFromFetchSuspense, createWakeable } from "../utils/suspense";
 import { createGenericCache } from "./createGenericCache";
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
@@ -103,21 +103,7 @@ export function getSourcesByUrlSuspense(client: ReplayClientInterface) {
 
 // Wrapper method around getSources Suspense method.
 // This method can be used by non-React code to prefetch/prime the Suspense cache by loading object properties.
-export async function getSourcesAsync(client: ReplayClientInterface): Promise<ProtocolSource[]> {
-  try {
-    return getSourcesSuspense(client);
-  } catch (errorOrPromise) {
-    if (
-      errorOrPromise != null &&
-      typeof errorOrPromise === "object" &&
-      errorOrPromise.hasOwnProperty("then")
-    ) {
-      return errorOrPromise as Promise<ProtocolSource[]>;
-    } else {
-      throw errorOrPromise;
-    }
-  }
-}
+export const getSourcesAsync = createFetchAsyncFromFetchSuspense(getSourcesSuspense);
 
 export async function getSourceAsync(
   client: ReplayClientInterface,
@@ -150,24 +136,9 @@ export function getCachedSourceContents(
   return record?.status === STATUS_RESOLVED ? record.value : null;
 }
 
-export async function getStreamingSourceContentsAsync(
-  client: ReplayClientInterface,
-  sourceId: ProtocolSourceId
-): Promise<StreamingSourceContents | null> {
-  try {
-    return getStreamingSourceContentsSuspense(client, sourceId);
-  } catch (errorOrPromise) {
-    if (
-      errorOrPromise != null &&
-      typeof errorOrPromise === "object" &&
-      errorOrPromise.hasOwnProperty("then")
-    ) {
-      return errorOrPromise as Promise<StreamingSourceContents>;
-    } else {
-      throw errorOrPromise;
-    }
-  }
-}
+export const getStreamingSourceContentsAsync = createFetchAsyncFromFetchSuspense(
+  getStreamingSourceContentsSuspense
+);
 
 export function getStreamingSourceContentsSuspense(
   client: ReplayClientInterface,
@@ -266,6 +237,7 @@ export const {
   getValueSuspense: getBreakpointPositionsSuspense,
   getValueAsync: getBreakpointPositionsAsync,
   getValueIfCached: getBreakpointPositionsIfCached,
+  getCacheKey: getBreakpointPositionsCacheKey,
 } = createGenericCache<
   [replayClient: ReplayClientInterface],
   [sourceId: ProtocolSourceId],
