@@ -30,7 +30,9 @@ const csp = (props: any) => {
       // Required to talk to local backend in development. Enabling
       // localhost:8000 for prod to support the ?dispatch parameter when running
       // the local backend
-      isDev ? "http://localhost:* http://*.replay.local ws://localhost:*" : "ws://localhost:8000"
+      isDev
+        ? "http://localhost:* http://*.replay.local ws://*.replay.local ws://localhost:*"
+        : "ws://localhost:8000"
     }`,
     `frame-src replay: https://js.stripe.com https://hooks.stripe.com https://${authHost} https://www.loom.com/`,
     // Required by some of our external services
