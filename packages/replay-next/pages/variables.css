@@ -464,11 +464,12 @@
   --progressbar-preview-min: var(--primary-accent);
 
   /* Menus (Dark) */
-  --menu-bgcolor: var(--theme-base-90);
+  --menu-bgcolor: var(--body-bgcolor);
   --menu-color: var(--body-color);
-  --menu-hover-bgcolor: var(--theme-base-95);
+  --menu-hover-bgcolor: var(--theme-base-90);
   --menu-hover-color: white;
   --theme-menu-highlight: var(--theme-text-field-bgcolor);
+  --menu-border: 1px solid rgba(39, 46, 61, 1);
 
   /* Code Mirror (Dark) */
   --caret-color: #fff;
@@ -961,6 +962,7 @@
   --menu-hover-bgcolor: var(--theme-base-95);
   --menu-hover-color: #000;
   --theme-menu-highlight: #f3f4f6;
+  --menu-border: 1px solid transparent;
 
   /* Code Mirror (Light) */
   --caret-color: #18181a;
