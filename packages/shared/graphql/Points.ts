@@ -1,27 +1,27 @@
 import { gql } from "@apollo/client";
 import { Location, RecordingId } from "@replayio/protocol";
 
-import { Badge, PointBehavior } from "shared/client/types";
+import { Badge } from "shared/client/types";
+import { Point } from "shared/client/types";
+import { PointBehavior } from "shared/client/types";
 import { Point as ClientPoint } from "shared/client/types";
 import { AddPoint } from "shared/graphql/generated/AddPoint";
 import { GetPoints } from "shared/graphql/generated/GetPoints";
-import { AddPointInput } from "shared/graphql/generated/globalTypes";
+import { AddPointInput, UpdatePointInput } from "shared/graphql/generated/globalTypes";
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
+import { UserInfo } from "shared/graphql/types";
 
 export const ADD_POINT_QUERY = gql`
   mutation AddPoint($input: AddPointInput!) {
     addPoint(input: $input) {
       success
-      point {
-        id
-      }
     }
   }
 `;
 
 export const DELETE_POINT_QUERY = gql`
-  mutation DeletePoint($id: ID!) {
-    deletePoint(input: { id: $id }) {
+  mutation DeletePoint($input: DeletePointInput!) {
+    deletePoint(input: $input) {
       success
     }
   }
@@ -32,19 +32,18 @@ export const GET_POINTS_QUERY = gql`
     recording(uuid: $recordingId) {
       uuid
       points {
-        id
+        badge
+        columnIndex
+        condition
+        content
+        createdAt
+        lineNumber
+        sourceId
         user {
           id
           name
           picture
         }
-        badge
-        condition
-        content
-        createdAt
-        location
-        shouldBreak
-        shouldLog
       }
     }
   }
@@ -63,11 +62,8 @@ export async function addPoint(
   accessToken: string,
   point: ClientPoint
 ) {
-  const { createdAtTime, createdByUser, ...rest } = point;
-  const input: AddPointInput = {
-    createdAt: new Date(createdAtTime).toISOString(),
-    ...rest,
-  };
+  const { createdAt, id, user, ...rest } = point;
+  const input: AddPointInput = rest;
 
   await graphQLClient.send<AddPoint>(
     {
@@ -84,13 +80,18 @@ export async function addPoint(
 export async function deletePoint(
   graphQLClient: GraphQLClientInterface,
   accessToken: string,
-  id: string
+  point: Point
 ) {
   await graphQLClient.send(
     {
       operationName: "DeletePoint",
       query: DELETE_POINT_QUERY,
-      variables: { id },
+      variables: {
+        columnIndex: point.columnIndex,
+        lineNumber: point.lineNumber,
+        recordingId: point.recordingId,
+        sourceId: point.sourceId,
+      },
     },
     accessToken
   );
@@ -114,17 +115,22 @@ export async function getPoints(
 
   return (
     points?.map(point => {
+      // ID is a composite of the source location, created-by user, and recording.
+      const id = `${point.user!.id}:${recordingId}:${point.sourceId}:${point.lineNumber}:${
+        point.columnIndex
+      }`;
+
       return {
         badge: point.badge as Badge,
+        columnIndex: point.columnIndex,
         condition: point.condition,
         content: point.content!,
-        createdByUser: point.user,
-        createdAtTime: new Date(point.createdAt).getTime(),
-        id: point.id,
-        location: point.location as Location,
+        createdAt: new Date(point.createdAt),
+        id,
+        lineNumber: point.lineNumber,
         recordingId,
-        shouldBreak: point.shouldBreak as PointBehavior,
-        shouldLog: point.shouldLog as PointBehavior,
+        sourceId: point.sourceId,
+        user: point.user,
       };
     }) ?? []
   );
@@ -135,7 +141,8 @@ export async function updatePoint(
   accessToken: string,
   point: ClientPoint
 ) {
-  const { createdAtTime, createdByUser, location, recordingId, ...input } = point;
+  const { createdAt, id, user, ...rest } = point;
+  const input: UpdatePointInput = rest;
 
   await graphQLClient.send<GetPoints>(
     {
@@ -145,4 +152,21 @@ export async function updatePoint(
     },
     accessToken
   );
+}
+
+// Point ID is a virtual attribute;
+// It only exists on the client, to simplify equality checks and PointBehavior mapping.
+// It is a composite of the source location, created-by user, and recording.
+export function createPointId(
+  recordingId: RecordingId,
+  userInfo: UserInfo | null,
+  location: Location
+): string {
+  return JSON.stringify({
+    column: location.column,
+    line: location.line,
+    recordingId,
+    sourceId: location.sourceId,
+    userId: userInfo?.id ?? null,
+  });
 }

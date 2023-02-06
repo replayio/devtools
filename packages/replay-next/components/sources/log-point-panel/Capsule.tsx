@@ -34,7 +34,7 @@ export default function Capsule({
     currentHitPoint,
     editable,
     hasConditional,
-    lineNumber: point.location.line,
+    lineNumber: point.lineNumber,
     shouldLog,
     toggleConditional,
     toggleShouldLog,

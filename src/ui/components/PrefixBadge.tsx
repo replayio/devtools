@@ -11,12 +11,11 @@ import styles from "./PrefixBadge.module.css";
 export default function PrefixBadgeButton({ point }: { point: Point }) {
   const { editPoint } = useContext(PointsContext);
 
-  const { id } = point;
   const onSelect = useCallback(
     (newBadge: Badge | undefined) => {
-      editPoint(id, { badge: newBadge || null });
+      editPoint(point.id, { ...point, badge: newBadge || null });
     },
-    [editPoint, id]
+    [editPoint, point]
   );
 
   return <PrefixBadgePicker initialValue={point.badge || undefined} onSelect={onSelect} />;

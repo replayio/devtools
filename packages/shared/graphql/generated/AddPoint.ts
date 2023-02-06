@@ -9,15 +9,9 @@ import { AddPointInput } from "./globalTypes";
 // GraphQL mutation operation: AddPoint
 // ====================================================
 
-export interface AddPoint_addPoint_point {
-  __typename: "Point";
-  id: string;
-}
-
 export interface AddPoint_addPoint {
   __typename: "AddPoint";
   success: boolean | null;
-  point: AddPoint_addPoint_point;
 }
 
 export interface AddPoint {

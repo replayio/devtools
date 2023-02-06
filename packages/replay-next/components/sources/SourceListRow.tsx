@@ -17,7 +17,13 @@ import SearchResultHighlight from "replay-next/components/sources/SearchResultHi
 import { SourceSearchContext } from "replay-next/components/sources/SourceSearchContext";
 import useSourceContextMenu from "replay-next/components/sources/useSourceContextMenu";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { AddPoint, DeletePoints, EditPoint } from "replay-next/src/contexts/PointsContext";
+import {
+  AddPoint,
+  DeletePoints,
+  EditPoint,
+  EditPointBehavior,
+  PointBehaviorsMap,
+} from "replay-next/src/contexts/PointsContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { ParsedToken, StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import {
@@ -51,6 +57,7 @@ export type ItemData = {
   breakablePositionsByLine: Map<number, SameLineSourceLocations>;
   deletePoints: DeletePoints;
   editPoint: EditPoint;
+  editPointBehavior: EditPointBehavior;
   hitCounts: LineNumberToHitCountMap | null;
   maxHitCount: number | null;
   minHitCount: number | null;
@@ -59,6 +66,7 @@ export type ItemData = {
   pointPanelHeight: number;
   pointPanelWithConditionalHeight: number;
   points: Point[];
+  pointBehaviors: PointBehaviorsMap;
   setLinePointState: SetLinePointState;
   showColumnBreakpoints: boolean;
   showHitCounts: boolean;
@@ -91,11 +99,13 @@ const SourceListRow = memo(
       breakablePositionsByLine,
       deletePoints,
       editPoint,
+      editPointBehavior,
       hitCounts,
       maxHitCount,
       minHitCount,
       onLineMouseEnter,
       onLineMouseLeave,
+      pointBehaviors,
       points,
       setLinePointState,
       showColumnBreakpoints,
@@ -129,7 +139,8 @@ const SourceListRow = memo(
 
     const pointsForLine = findPointsForLocation(points, sourceId, lineNumber);
     const firstPoint = pointsForLine[0] ?? null;
-    const showPointPanel = firstPoint !== null && firstPoint.shouldLog !== POINT_BEHAVIOR_DISABLED;
+    const firstPointBehavior = firstPoint ? pointBehaviors.get(firstPoint.id) ?? null : null;
+    const showPointPanel = firstPoint && firstPointBehavior?.shouldLog !== POINT_BEHAVIOR_DISABLED;
 
     const hitCount = lineHitCounts?.count || null;
     const lineHasHits = hitCount !== null && hitCount > 0;
@@ -205,15 +216,19 @@ const SourceListRow = memo(
             renderBetween(lineSegments, lastColumnIndex, columnIndex);
           }
 
+          const firstPoint = pointsForLine.find(point => point.columnIndex === columnIndex) ?? null;
+          const pointBehavior = firstPoint ? pointBehaviors.get(firstPoint.id) ?? null : null;
+
           lineSegments.push(
             <ColumnBreakpointMarker
               addPoint={addPoint}
               columnIndex={columnIndex}
               deletePoints={deletePoints}
-              editPoint={editPoint}
+              editPointBehavior={editPointBehavior}
               key={lineSegments.length}
               lineNumber={lineNumber}
-              point={pointsForLine.find(point => point.location.column === columnIndex) ?? null}
+              point={pointsForLine.find(point => point.columnIndex === columnIndex) ?? null}
+              pointBehavior={pointBehavior}
               sourceId={sourceId}
             />
           );
@@ -246,7 +261,7 @@ const SourceListRow = memo(
       lineSegments = <SourceLineLoadingPlaceholder width={loadingPlaceholderWidth} />;
     }
 
-    const shouldBreak = firstPoint?.shouldBreak === POINT_BEHAVIOR_ENABLED;
+    const shouldBreak = firstPointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED;
 
     const toggleBreakpoint = () => {
       if (lineHitCounts === null) {
@@ -258,7 +273,13 @@ const SourceListRow = memo(
       if (pointsForLine.length === 0) {
         addPoint(
           {
+            badge: null,
+            condition: null,
+            content: "",
+          },
+          {
             shouldBreak: POINT_BEHAVIOR_ENABLED,
+            shouldLog: POINT_BEHAVIOR_DISABLED,
           },
           {
             column: lineHitCounts.firstBreakableColumnIndex,
@@ -274,7 +295,7 @@ const SourceListRow = memo(
         // 1. If it logs and breaks, then we should disable breaking
         // 2. If it only breaks then we should delete that point (and all others on the line)
         if (showPointPanel) {
-          editPoint(firstPoint.id, {
+          editPointBehavior(firstPoint.id, {
             shouldBreak: shouldBreak ? POINT_BEHAVIOR_DISABLED : POINT_BEHAVIOR_ENABLED,
           });
         } else {
@@ -316,15 +337,16 @@ const SourceListRow = memo(
 
     let breakPointTestState = "off";
     if (firstPoint !== null) {
-      switch (firstPoint.shouldBreak) {
+      switch (firstPointBehavior?.shouldBreak) {
         case POINT_BEHAVIOR_ENABLED:
           breakPointTestState = "on";
           break;
-        case POINT_BEHAVIOR_DISABLED:
-          breakPointTestState = "off";
-          break;
         case POINT_BEHAVIOR_DISABLED_TEMPORARILY:
           breakPointTestState = "off-temporarily";
+          break;
+        case POINT_BEHAVIOR_DISABLED:
+        default:
+          breakPointTestState = "off";
           break;
       }
     }
@@ -393,10 +415,12 @@ const SourceListRow = memo(
                   buttonClassName={styles.HoverButton}
                   deletePoints={deletePoints}
                   editPoint={editPoint}
+                  editPointBehavior={editPointBehavior}
                   iconClassName={styles.HoverButtonIcon}
                   lineHitCounts={lineHitCounts}
                   lineNumber={lineNumber}
                   point={firstPoint}
+                  pointBehavior={firstPointBehavior}
                   setLinePointState={setLinePointState}
                   source={source}
                 />

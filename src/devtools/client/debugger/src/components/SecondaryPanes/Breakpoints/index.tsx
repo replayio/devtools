@@ -18,7 +18,7 @@ export default function Breakpoints({
   emptyContent: ReactNode;
   type: "breakpoint" | "logpoint";
 }) {
-  const { deletePoints, editPoint, points } = useContext(PointsContext);
+  const { deletePoints, editPointBehavior, points, pointBehaviors } = useContext(PointsContext);
 
   const sourceDetailsEntities = useAppSelector(getSourceDetailsEntities);
 
@@ -30,24 +30,26 @@ export default function Breakpoints({
           // Either we might not have sources fetched yet,
           // or there could be obsolete persisted source IDs for points.
           // Ensure we only show points that have valid sources available.
-          const sourceExists = !!sourceDetailsEntities[point.location.sourceId];
+          const sourceExists = !!sourceDetailsEntities[point.sourceId];
+
+          const { shouldBreak, shouldLog } = pointBehaviors.get(point.id) ?? {};
 
           // Show both enabled and temporarily disabled points.
-          const behavior = type === "breakpoint" ? point.shouldBreak : point.shouldLog;
+          const behavior = type === "breakpoint" ? shouldBreak : shouldLog;
           const matchesType = behavior !== POINT_BEHAVIOR_DISABLED;
 
           return sourceExists && matchesType;
         })
-        .sort((a, b) => a.location.line - b.location.line),
-    [points, type, sourceDetailsEntities]
+        .sort((a, b) => a.lineNumber - b.lineNumber),
+    [pointBehaviors, points, type, sourceDetailsEntities]
   );
 
   const sourceIdToPointsMap = useMemo(() => {
     return filteredAndSortedPoints.reduce((map: SourceIdToPointsMap, point) => {
-      if (!map.hasOwnProperty(point.location.sourceId)) {
-        map[point.location.sourceId] = [point];
+      if (!map.hasOwnProperty(point.sourceId)) {
+        map[point.sourceId] = [point];
       } else {
-        map[point.location.sourceId].push(point);
+        map[point.sourceId].push(point);
       }
       return map;
     }, {});
@@ -77,12 +79,16 @@ export default function Breakpoints({
               onRemoveBreakpoints={() => deletePoints(...points.map(point => point.id))}
             />
             {points.map(point => {
+              const pointBehavior = pointBehaviors.get(point.id);
+
               return (
                 <Breakpoint
                   key={point.id}
-                  breakpoint={point}
-                  onEditPoint={editPoint}
+                  onEditPointBehavior={editPointBehavior}
                   onRemoveBreakpoint={() => deletePoints(point.id)}
+                  point={point}
+                  shouldBreak={pointBehavior?.shouldBreak ?? POINT_BEHAVIOR_DISABLED}
+                  shouldLog={pointBehavior?.shouldLog ?? POINT_BEHAVIOR_DISABLED}
                   type={type}
                 />
               );

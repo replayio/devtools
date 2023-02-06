@@ -6,7 +6,12 @@ import Icon from "replay-next/components/Icon";
 import { SetLinePointState } from "replay-next/components/sources/SourceListRow";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { KeyboardModifiersContext } from "replay-next/src/contexts/KeyboardModifiersContext";
-import { AddPoint, DeletePoints, EditPoint } from "replay-next/src/contexts/PointsContext";
+import {
+  AddPoint,
+  DeletePoints,
+  EditPoint,
+  EditPointBehavior,
+} from "replay-next/src/contexts/PointsContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
@@ -18,7 +23,12 @@ import {
   isExecutionPointsLessThan,
 } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { POINT_BEHAVIOR_DISABLED, POINT_BEHAVIOR_ENABLED, Point } from "shared/client/types";
+import {
+  POINT_BEHAVIOR_DISABLED,
+  POINT_BEHAVIOR_ENABLED,
+  Point,
+  PointBehavior,
+} from "shared/client/types";
 import { LineHitCounts } from "shared/client/types";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { Nag } from "shared/graphql/types";
@@ -30,10 +40,12 @@ export default function HoverButton({
   buttonClassName,
   deletePoints,
   editPoint,
+  editPointBehavior,
   iconClassName,
   lineHitCounts,
   lineNumber,
   point,
+  pointBehavior,
   setLinePointState,
   source,
 }: {
@@ -41,10 +53,12 @@ export default function HoverButton({
   buttonClassName: string;
   deletePoints: DeletePoints;
   editPoint: EditPoint;
+  editPointBehavior: EditPointBehavior;
   iconClassName: string;
   lineHitCounts: LineHitCounts | null;
   lineNumber: number;
   point: Point | null;
+  pointBehavior: PointBehavior | null;
   setLinePointState: SetLinePointState;
   source: ProtocolSource;
 }) {
@@ -57,7 +71,7 @@ export default function HoverButton({
 
   const [showNag, dismissNag] = useNag(Nag.FIRST_BREAKPOINT_ADD);
 
-  if (point?.createdByUser && point.createdByUser.id !== currentUserInfo?.id) {
+  if (point?.user && point.user.id !== currentUserInfo?.id) {
     return null;
   }
 
@@ -134,11 +148,14 @@ export default function HoverButton({
       }
 
       if (point) {
-        editPoint(point.id, { content, shouldLog: POINT_BEHAVIOR_ENABLED });
+        editPoint(point.id, { content });
+        editPointBehavior(point.id, { shouldLog: POINT_BEHAVIOR_ENABLED });
       } else {
         addPoint(
           {
             content,
+          },
+          {
             shouldLog: POINT_BEHAVIOR_ENABLED,
           },
           location
@@ -149,7 +166,7 @@ export default function HoverButton({
     };
 
     const { shouldBreak = POINT_BEHAVIOR_DISABLED, shouldLog = POINT_BEHAVIOR_DISABLED } =
-      point || {};
+      pointBehavior || {};
 
     // If a point's behavior has been temporarily disabled, the hover button should take that into account.
     const hasOrDidBreak = shouldBreak !== POINT_BEHAVIOR_DISABLED;
@@ -158,7 +175,7 @@ export default function HoverButton({
     const togglePoint = () => {
       if (point) {
         if (!hasOrDidLog || hasOrDidBreak) {
-          editPoint(point.id, {
+          editPointBehavior(point.id, {
             shouldLog: hasOrDidLog ? POINT_BEHAVIOR_DISABLED : POINT_BEHAVIOR_ENABLED,
           });
         } else {

@@ -1,5 +1,6 @@
+import { Location } from "@replayio/protocol";
 import classNames from "classnames";
-import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { Suspense, memo, useContext } from "react";
 
@@ -55,12 +56,19 @@ function LogPointRenderer({
     className = `${className} ${styles.Focused}`;
   }
 
-  const locations = useMemo(
-    () => [logPointInstance.point.location],
-    [logPointInstance.point.location]
+  const locations = useMemo<Location[]>(
+    () => [
+      {
+        column: logPointInstance.point.columnIndex,
+        line: logPointInstance.point.lineNumber,
+        sourceId: logPointInstance.point.sourceId,
+      },
+    ],
+    [logPointInstance.point]
   );
 
-  const showNewBadgeFlash = Date.now() - logPointInstance.point.createdAtTime < NEW_BADGE_THRESHOLD;
+  const showNewBadgeFlash =
+    Date.now() - logPointInstance.point.createdAt.getTime() < NEW_BADGE_THRESHOLD;
 
   // Note the Suspense key below is set to the log point expression's content/code.
   // This causes the Suspense boundary to immediately show a fallback state when content is edited,
@@ -130,10 +138,16 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
     ? { begin: focusRange.begin.point, end: focusRange.end.point }
     : null;
 
+  const location: Location = {
+    column: point.columnIndex,
+    line: point.lineNumber,
+    sourceId: point.sourceId,
+  };
+
   const analysisResults = runAnalysisSuspense(
     client,
     pointRange,
-    point.location,
+    location,
     point.content,
     point.condition
   );

@@ -16,15 +16,14 @@ export interface GetPoints_recording_points_user {
 
 export interface GetPoints_recording_points {
   __typename: "Point";
-  id: string;
-  user: GetPoints_recording_points_user | null;
   badge: string | null;
+  columnIndex: number;
   condition: string | null;
   content: string;
   createdAt: any;
-  location: any;
-  shouldBreak: string;
-  shouldLog: string;
+  lineNumber: number;
+  sourceId: string;
+  user: GetPoints_recording_points_user | null;
 }
 
 export interface GetPoints_recording {

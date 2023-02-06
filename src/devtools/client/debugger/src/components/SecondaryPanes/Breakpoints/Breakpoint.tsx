@@ -1,3 +1,4 @@
+import { Location } from "@replayio/protocol";
 import classnames from "classnames";
 import { ChangeEvent, PureComponent, Suspense, useContext } from "react";
 import { MouseEvent } from "react";
@@ -8,9 +9,10 @@ import {
   PauseFrame,
   getSelectedFrameId,
 } from "devtools/client/debugger/src/reducers/pause";
-import { EditPoint } from "replay-next/src/contexts/PointsContext";
+import { EditPointBehavior } from "replay-next/src/contexts/PointsContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
+  POINT_BEHAVIOR,
   POINT_BEHAVIOR_DISABLED,
   POINT_BEHAVIOR_DISABLED_TEMPORARILY,
   POINT_BEHAVIOR_ENABLED,
@@ -38,18 +40,24 @@ const connector = connect(mapStateToProps, {
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 interface PropsFromParent {
-  breakpoint: Point;
-  onEditPoint: EditPoint;
-  onRemoveBreakpoint: (cx: Context, breakpoint: Point) => void;
+  onEditPointBehavior: EditPointBehavior;
+  onRemoveBreakpoint: (cx: Context, point: Point) => void;
+  point: Point;
+  shouldBreak: POINT_BEHAVIOR;
+  shouldLog: POINT_BEHAVIOR;
   type: "logpoint" | "breakpoint";
 }
 type BreakpointProps = PropsFromRedux & PropsFromParent & { replayClient: ReplayClientInterface };
 
 class Breakpoint extends PureComponent<BreakpointProps> {
-  get selectedLocation() {
-    const { breakpoint } = this.props;
+  get selectedLocation(): Location {
+    const { point } = this.props;
 
-    return breakpoint.location;
+    return {
+      column: point.columnIndex,
+      line: point.lineNumber,
+      sourceId: point.sourceId,
+    };
   }
 
   selectBreakpoint = (event: MouseEvent) => {
@@ -72,11 +80,11 @@ class Breakpoint extends PureComponent<BreakpointProps> {
   }
 
   renderSourceLocation() {
-    const { breakpoint } = this.props;
-    const { column, line } = breakpoint.location;
+    const { point } = this.props;
+    const { columnIndex, lineNumber } = point;
 
-    const columnVal = column ? `:${column}` : "";
-    const location = `${line}${columnVal}`;
+    const columnVal = columnIndex != null ? `:${columnIndex}` : "";
+    const location = `${lineNumber}${columnVal}`;
 
     return <div className="breakpoint-line">{location}</div>;
   }
@@ -85,9 +93,11 @@ class Breakpoint extends PureComponent<BreakpointProps> {
     const {
       cx,
       replayClient,
-      breakpoint,
-      onEditPoint,
+      onEditPointBehavior,
       onRemoveBreakpoint,
+      point,
+      shouldBreak,
+      shouldLog,
       type,
       selectedFrameId,
       sourcesState,
@@ -96,7 +106,7 @@ class Breakpoint extends PureComponent<BreakpointProps> {
       ? getPauseFrameSuspense(replayClient, selectedFrameId, sourcesState)
       : undefined;
 
-    const behavior = type === "breakpoint" ? breakpoint.shouldBreak : breakpoint.shouldLog;
+    const behavior = type === "breakpoint" ? shouldBreak : shouldLog;
     const isChecked = behavior === POINT_BEHAVIOR_ENABLED;
 
     // Prevent clicks on the <input> from selecting the location.
@@ -111,11 +121,13 @@ class Breakpoint extends PureComponent<BreakpointProps> {
         : POINT_BEHAVIOR_DISABLED_TEMPORARILY;
 
       if (type === "breakpoint") {
-        onEditPoint(breakpoint.id, {
+        onEditPointBehavior(point.id, {
           shouldBreak: behavior,
+          shouldLog,
         });
       } else {
-        onEditPoint(breakpoint.id, {
+        onEditPointBehavior(point.id, {
+          shouldBreak,
           shouldLog: behavior,
         });
       }
@@ -126,20 +138,22 @@ class Breakpoint extends PureComponent<BreakpointProps> {
       event.stopPropagation();
 
       if (type === "breakpoint") {
-        if (breakpoint.shouldLog === POINT_BEHAVIOR_ENABLED) {
-          onEditPoint(breakpoint.id, {
+        if (shouldLog === POINT_BEHAVIOR_ENABLED) {
+          onEditPointBehavior(point.id, {
             shouldBreak: POINT_BEHAVIOR_DISABLED,
+            shouldLog,
           });
         } else {
-          onRemoveBreakpoint(cx, breakpoint);
+          onRemoveBreakpoint(cx, point);
         }
       } else {
-        if (breakpoint.shouldBreak === POINT_BEHAVIOR_ENABLED) {
-          onEditPoint(breakpoint.id, {
+        if (shouldBreak === POINT_BEHAVIOR_ENABLED) {
+          onEditPointBehavior(point.id, {
+            shouldBreak,
             shouldLog: POINT_BEHAVIOR_DISABLED,
           });
         } else {
-          onRemoveBreakpoint(cx, breakpoint);
+          onRemoveBreakpoint(cx, point);
         }
       }
     };
@@ -147,14 +161,14 @@ class Breakpoint extends PureComponent<BreakpointProps> {
     return (
       <div
         className={classnames({
-          breakpoint,
+          point,
           paused: this.isCurrentlyPausedAtBreakpoint(frame),
         })}
         data-test-name="Breakpoint"
         data-test-type={type}
-        data-test-column-index={breakpoint.location.column}
-        data-test-line-number={breakpoint.location.line}
-        data-test-source-id={breakpoint.location.sourceId}
+        data-test-column-index={point.columnIndex}
+        data-test-line-number={point.lineNumber}
+        data-test-source-id={point.sourceId}
         onClick={this.selectBreakpoint}
       >
         <label
@@ -164,7 +178,7 @@ class Breakpoint extends PureComponent<BreakpointProps> {
         >
           <Checkbox checked={isChecked} onChange={onCheckboxChange} />
         </label>
-        <BreakpointOptions breakpoint={breakpoint} type={type} />
+        <BreakpointOptions breakpoint={point} type={type} />
         {this.renderSourceLocation()}
         <CloseButton
           buttonClass={null}

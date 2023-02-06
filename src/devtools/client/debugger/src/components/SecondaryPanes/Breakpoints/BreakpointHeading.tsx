@@ -46,10 +46,10 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
 
   getLabel() {
     const { breakpoint, source, hasSiblingOfSameName } = this.props;
-    const { column, line } = breakpoint?.location ?? {};
+    const { columnIndex, lineNumber } = breakpoint ?? {};
 
-    const columnVal = features.columnBreakpoints && column ? `:${column}` : "";
-    const location = `:${line}${columnVal}`;
+    const columnVal = features.columnBreakpoints && columnIndex != null ? `:${columnIndex}` : "";
+    const location = `:${lineNumber}${columnVal}`;
 
     const query = hasSiblingOfSameName ? getSourceQueryString(source) : "";
     const fileName = getTruncatedFileName(source, query);

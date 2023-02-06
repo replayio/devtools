@@ -1,8 +1,13 @@
 import { SourceId } from "@replayio/protocol";
 
 import Icon from "replay-next/components/Icon";
-import { AddPoint, DeletePoints, EditPoint } from "replay-next/src/contexts/PointsContext";
-import { POINT_BEHAVIOR_DISABLED, POINT_BEHAVIOR_ENABLED, Point } from "shared/client/types";
+import { AddPoint, DeletePoints, EditPointBehavior } from "replay-next/src/contexts/PointsContext";
+import {
+  POINT_BEHAVIOR_DISABLED,
+  POINT_BEHAVIOR_ENABLED,
+  Point,
+  PointBehavior,
+} from "shared/client/types";
 
 import styles from "./ColumnBreakpointMarker.module.css";
 
@@ -10,22 +15,25 @@ export default function ColumnBreakpointMarker({
   addPoint,
   columnIndex,
   deletePoints,
-  editPoint,
+  editPointBehavior,
   lineNumber,
   point,
+  pointBehavior,
   sourceId,
 }: {
   addPoint: AddPoint;
   columnIndex: number;
   deletePoints: DeletePoints;
-  editPoint: EditPoint;
+  editPointBehavior: EditPointBehavior;
   lineNumber: number;
   point: Point | null;
+  pointBehavior: PointBehavior | null;
   sourceId: SourceId;
 }) {
   const onClick = () => {
     if (point === null) {
       addPoint(
+        {},
         {
           shouldBreak: POINT_BEHAVIOR_ENABLED,
         },
@@ -36,10 +44,10 @@ export default function ColumnBreakpointMarker({
         }
       );
     } else {
-      if (point.shouldLog === POINT_BEHAVIOR_ENABLED) {
-        editPoint(point.id, {
+      if (pointBehavior?.shouldLog === POINT_BEHAVIOR_ENABLED) {
+        editPointBehavior(point.id, {
           shouldBreak:
-            point.shouldBreak === POINT_BEHAVIOR_ENABLED
+            pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED
               ? POINT_BEHAVIOR_DISABLED
               : POINT_BEHAVIOR_ENABLED,
         });
@@ -49,7 +57,7 @@ export default function ColumnBreakpointMarker({
     }
   };
 
-  const shouldBreak = point?.shouldBreak === POINT_BEHAVIOR_ENABLED;
+  const shouldBreak = pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED;
 
   return (
     <button

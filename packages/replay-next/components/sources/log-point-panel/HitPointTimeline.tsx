@@ -37,13 +37,15 @@ export default function HitPointTimeline({
   toggleShouldLog: () => void;
 }) {
   const client = useContext(ReplayClientContext);
-  const { duration } = useContext(SessionContext);
+  const { currentUserInfo, duration } = useContext(SessionContext);
   const {
     executionPoint: currentExecutionPoint,
     isPending,
     time: currentTime,
     update,
   } = useContext(TimelineContext);
+
+  const pointEditable = point.user?.id === currentUserInfo?.id;
 
   const [hoverCoordinates, setHoverCoordinates] = useState<{
     clientX: number;
@@ -132,6 +134,7 @@ export default function HitPointTimeline({
       <Capsule
         currentHitPoint={currentHitPoint}
         currentHitPointIndex={currentHitPointIndex}
+        editable={pointEditable}
         hasConditional={hasConditional}
         hitPoints={hitPoints}
         hitPointStatus={hitPointStatus}

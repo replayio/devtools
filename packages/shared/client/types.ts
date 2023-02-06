@@ -74,7 +74,7 @@ export const POINT_BEHAVIOR_ENABLED = "enabled";
 export const POINT_BEHAVIOR_DISABLED = "disabled";
 export const POINT_BEHAVIOR_DISABLED_TEMPORARILY = "disabled-temporarily";
 
-export type PointBehavior =
+export type POINT_BEHAVIOR =
   | typeof POINT_BEHAVIOR_ENABLED
   | typeof POINT_BEHAVIOR_DISABLED
   | typeof POINT_BEHAVIOR_DISABLED_TEMPORARILY;
@@ -87,17 +87,38 @@ export type PartialUser = {
 
 export type PointId = string;
 export type Badge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow";
+
+// Points are saved to GraphQL.
+// They can be viewed by all users who have access to a recording.
+// They can only be edited or deleted by the user who created them.
+//
+// Note that Points are only saved to GraphQL for authenticated users.
+// They are also saved to IndexedDB to support unauthenticated users.
 export type Point = {
   badge: Badge | null;
+  columnIndex: number;
   condition: string | null;
   content: string;
-  createdByUser: PartialUser | null;
-  createdAtTime: number;
-  id: PointId;
-  location: Location;
+  createdAt: Date;
+  lineNumber: number;
   recordingId: RecordingId;
-  shouldBreak: PointBehavior;
-  shouldLog: PointBehavior;
+  sourceId: SourceId;
+  user: PartialUser | null;
+
+  // This is a virtual attribute;
+  // It only exists on the client, to simplify equality checks and PointBehavior mapping.
+  // It is a composite of the source location, created-by user, and recording.
+  id: PointId;
+};
+
+// Point behaviors are saved to IndexedDB.
+// (They are remembered between sessions but are not shared with other users.)
+// They control a given point behaves locally (e.g. does it log to the console)
+// Behaviors are modifiable by everyone (regardless of who created a point).
+export type PointBehavior = {
+  pointId: PointId;
+  shouldBreak: POINT_BEHAVIOR;
+  shouldLog: POINT_BEHAVIOR;
 };
 
 export type RunAnalysisParams = Omit<AnalysisParams, "locations"> & { location?: Location };

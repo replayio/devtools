@@ -65,7 +65,8 @@ export default function SourceList({
   const listRef = useRef<List>(null);
 
   const { range: focusRange } = useContext(FocusContext);
-  const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
+  const { addPoint, deletePoints, editPoint, editPointBehavior, pointBehaviors, points } =
+    useContext(PointsContext);
   const client = useContext(ReplayClientContext);
   const {
     focusedSource,
@@ -140,9 +141,9 @@ export default function SourceList({
       // This is a really lazy way of invalidating cached measurements;
       // It's better than invalidating from index 0, but it's still likely to be more work than necessary.
       const prevPointsIndex =
-        prevPoints.length > 0 ? prevPoints[0].location.line - 1 : Number.MAX_SAFE_INTEGER;
+        prevPoints.length > 0 ? prevPoints[0].lineNumber - 1 : Number.MAX_SAFE_INTEGER;
       const nextPointsIndex =
-        points.length > 0 ? points[0].location.line - 1 : Number.MAX_SAFE_INTEGER;
+        points.length > 0 ? points[0].lineNumber - 1 : Number.MAX_SAFE_INTEGER;
       const index = Math.min(prevPointsIndex, nextPointsIndex);
       list.resetAfterIndex(index);
     }
@@ -199,12 +200,14 @@ export default function SourceList({
       breakablePositionsByLine,
       deletePoints,
       editPoint,
+      editPointBehavior,
       hitCounts,
       lineHeight,
       maxHitCount,
       minHitCount,
       onLineMouseEnter,
       onLineMouseLeave: onLineMouseLeaveDebounced,
+      pointBehaviors,
       pointPanelHeight,
       pointPanelWithConditionalHeight,
       points,
@@ -219,12 +222,14 @@ export default function SourceList({
       breakablePositionsByLine,
       deletePoints,
       editPoint,
+      editPointBehavior,
       hitCounts,
       lineHeight,
       maxHitCount,
       minHitCount,
       onLineMouseEnter,
       onLineMouseLeaveDebounced,
+      pointBehaviors,
       pointPanelHeight,
       pointPanelWithConditionalHeight,
       points,
@@ -247,6 +252,8 @@ export default function SourceList({
         return lineHeight;
       }
 
+      const pointBehavior = pointBehaviors.get(point.id);
+
       const lineState = lineIndexToPointStateMap.get(index) ?? "no-point";
       switch (lineState) {
         case "point":
@@ -254,7 +261,7 @@ export default function SourceList({
         case "point-with-conditional":
           return lineHeight + pointPanelWithConditionalHeight;
         default:
-          if (point && point.shouldLog !== POINT_BEHAVIOR_DISABLED) {
+          if (pointBehavior?.shouldLog !== POINT_BEHAVIOR_DISABLED) {
             // This Point might have been restored by a previous session.
             // In this case we should use its persisted values.
             if (point.condition !== null) {
@@ -270,6 +277,7 @@ export default function SourceList({
     [
       lineHeight,
       lineIndexToPointStateMap,
+      pointBehaviors,
       points,
       pointPanelHeight,
       pointPanelWithConditionalHeight,

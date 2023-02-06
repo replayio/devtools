@@ -48,7 +48,8 @@ export function LoggablesContextRoot({
   messageListRef: MutableRefObject<HTMLElement | null>;
 }) {
   const client = useContext(ReplayClientContext);
-  const { pointsForSuspense: points } = useContext(PointsContext);
+  const { pointBehaviorsForSuspense: pointBehaviors, pointsForSuspense: points } =
+    useContext(PointsContext);
   const {
     eventTypes,
     filterByText,
@@ -142,10 +143,15 @@ export function LoggablesContextRoot({
     const pointInstances: PointInstance[] = [];
 
     points.forEach(point => {
-      if (point.shouldLog === POINT_BEHAVIOR_ENABLED) {
+      const pointBehavior = pointBehaviors.get(point.id);
+      if (pointBehavior?.shouldLog === POINT_BEHAVIOR_ENABLED) {
         const [hitPoints, status] = getHitPointsForLocationSuspense(
           client,
-          point.location,
+          {
+            column: point.columnIndex,
+            line: point.lineNumber,
+            sourceId: point.sourceId,
+          },
           point.condition,
           focusRange
         );
@@ -171,7 +177,7 @@ export function LoggablesContextRoot({
     });
 
     return pointInstances;
-  }, [client, focusRange, points]);
+  }, [client, focusRange, pointBehaviors, points]);
 
   const { messages: terminalExpressions } = useContext(TerminalContext);
   const sortedTerminalExpressions = useMemo(() => {

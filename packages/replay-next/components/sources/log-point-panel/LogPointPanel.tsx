@@ -35,7 +35,6 @@ import {
   HitPointStatus,
   POINT_BEHAVIOR_DISABLED_TEMPORARILY,
   POINT_BEHAVIOR_ENABLED,
-  PartialUser,
   Point,
 } from "shared/client/types";
 import { addComment as addCommentGraphQL } from "shared/graphql/Comments";
@@ -93,7 +92,11 @@ function PointPanel(props: ExternalProps) {
 
   const [hitPoints, hitPointStatus] = getHitPointsForLocationSuspense(
     client,
-    point.location,
+    {
+      column: point.columnIndex,
+      line: point.lineNumber,
+      sourceId: point.sourceId,
+    },
     point.condition,
     focusRange
   );
@@ -118,12 +121,12 @@ function PointPanelWithHitPoints({
 }: InternalProps) {
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
-  const { editPoint } = useContext(PointsContext);
+  const { editPoint, editPointBehavior, pointBehaviors } = useContext(PointsContext);
   const client = useContext(ReplayClientContext);
   const { accessToken, currentUserInfo, recordingId, trackEvent } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: currentTime } = useContext(TimelineContext);
 
-  const editable = point.createdByUser?.id === currentUserInfo?.id;
+  const editable = point.user?.id === currentUserInfo?.id;
 
   const [showEditBreakpointNag, dismissEditBreakpointNag] = useNag(Nag.FIRST_BREAKPOINT_EDIT);
 
@@ -147,7 +150,7 @@ function PointPanelWithHitPoints({
   );
   const hasChanged = editableCondition !== point.condition || editableContent !== point.content;
 
-  const lineNumber = point.location.line;
+  const lineNumber = point.lineNumber;
 
   // Log point code suggestions should always be relative to location of the the point panel.
   // This is a more intuitive experience than using the current execution point,
@@ -180,21 +183,22 @@ function PointPanelWithHitPoints({
     console.error(`Failed to fetch frames for point ${executionPoint}`, errorOrPromise);
   }
 
-  let source = getSource(client, point.location.sourceId);
+  let source = getSource(client, point.sourceId);
   if (source?.kind === "prettyPrinted") {
     assert(
       source.generatedSourceIds,
-      `pretty-printed source ${point.location.sourceId} has no generatedSourceIds`
+      `pretty-printed source ${point.sourceId} has no generatedSourceIds`
     );
     source = getSource(client, source.generatedSourceIds[0]);
   }
   const context =
     source?.kind === "sourceMapped" ? "logpoint-original-source" : "logpoint-generated-source";
 
-  const shouldLog = point.shouldLog === POINT_BEHAVIOR_ENABLED;
+  const pointBehavior = pointBehaviors.get(point.id);
+  const shouldLog = pointBehavior?.shouldLog === POINT_BEHAVIOR_ENABLED;
 
   const hasCondition = isEditing ? editableCondition !== null : point.condition !== null;
-  const lineIndex = point.location.line - 1;
+  const lineIndex = point.lineNumber - 1;
 
   const toggleCondition = () => {
     if (!editable) {
@@ -205,7 +209,7 @@ function PointPanelWithHitPoints({
       if (isEditing) {
         setEditableCondition(null);
       } else {
-        editPoint(point.id, { condition: null, content: editableContent });
+        editPoint(point.id, { ...point, condition: null, content: editableContent });
       }
 
       setLinePointState(lineIndex, "point");
@@ -219,7 +223,7 @@ function PointPanelWithHitPoints({
   };
 
   const toggleShouldLog = () => {
-    editPoint(point.id, {
+    editPointBehavior(point.id, {
       shouldLog: shouldLog ? POINT_BEHAVIOR_DISABLED_TEMPORARILY : POINT_BEHAVIOR_ENABLED,
     });
   };
@@ -259,9 +263,9 @@ function PointPanelWithHitPoints({
 
       const typeData = await createTypeDataForSourceCodeComment(
         client,
-        point.location.sourceId,
-        point.location.line,
-        point.location.column
+        point.sourceId,
+        point.lineNumber,
+        point.columnIndex
       );
 
       await addCommentGraphQL(graphQLClient, accessToken, recordingId, {
@@ -298,9 +302,9 @@ function PointPanelWithHitPoints({
   const onSubmit = () => {
     if (isConditionValid && isContentValid && hasChanged) {
       editPoint(point.id, {
+        badge: point.badge,
         condition: editableCondition || null,
         content: editableContent,
-        shouldLog: POINT_BEHAVIOR_ENABLED,
       });
     }
     setIsEditing(false);
@@ -456,7 +460,8 @@ function PointPanelWithHitPoints({
                     <Icon className={styles.EditButtonIcon} type="toggle-off" />
                     <AvatarImage
                       className={styles.CreatedByAvatar}
-                      src={point.createdByUser?.picture || undefined}
+                      src={point.user?.picture || undefined}
+                      title={point.user?.name || undefined}
                     />
                   </div>
                 )}

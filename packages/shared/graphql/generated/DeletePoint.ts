@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { DeletePointInput } from "./globalTypes";
+
 // ====================================================
 // GraphQL mutation operation: DeletePoint
 // ====================================================
@@ -17,5 +19,5 @@ export interface DeletePoint {
 }
 
 export interface DeletePointVariables {
-  id: string;
+  input: DeletePointInput;
 }

@@ -63,6 +63,9 @@
 .ContentWrapper:hover {
   border-color: var(--point-panel-input-border-color-hover);
 }
+.ContentWrapper[data-logging-disabled] {
+  border-color: var(--point-panel-input-border-color);
+}
 .Panel[data-test-state="edit"] .ContentWrapper:focus,
 .Panel[data-test-state="edit"] .ContentWrapper:focus-within {
   border-color: var(--point-panel-input-border-color-focus);
