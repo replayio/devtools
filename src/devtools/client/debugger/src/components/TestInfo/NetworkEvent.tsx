@@ -3,6 +3,7 @@ import React from "react";
 
 import { setSelectedPanel, setViewMode } from "ui/actions/layout";
 import { selectAndFetchRequest } from "ui/actions/network";
+import { setTimelineToTime } from "ui/actions/timeline";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -14,10 +15,28 @@ export function NetworkEvent({ request }: { request: RequestSummary }) {
 
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(getCurrentTime);
+  const active = start <= currentTime && !!end && end >= currentTime;
+
   const onClick = () => {
     dispatch(setViewMode("dev"));
     dispatch(setSelectedPanel("network"));
     dispatch(selectAndFetchRequest(id));
+  };
+
+  const handleMouseEnter = async () => {
+    if (active || end == null) {
+      return;
+    }
+
+    dispatch(setTimelineToTime(end));
+  };
+
+  const handleMouseLeave = () => {
+    if (active) {
+      return;
+    }
+
+    dispatch(setTimelineToTime(null));
   };
 
   const pathname = new URL(url).pathname;
@@ -26,8 +45,10 @@ export function NetworkEvent({ request }: { request: RequestSummary }) {
   return (
     <TestStepRow
       pending={!!end && start > currentTime}
-      active={start <= currentTime && !!end && end >= currentTime}
+      active={active}
       error={error}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <button
         className="flex items-center truncate italic opacity-70"

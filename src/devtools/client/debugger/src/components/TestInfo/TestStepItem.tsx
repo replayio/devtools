@@ -8,6 +8,7 @@ import { AnnotatedTestStep } from "shared/graphql/types";
 import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getStepRanges, useStepState } from "ui/hooks/useStepState";
+import { useTestInfo } from "ui/hooks/useTestInfo";
 import { useTestStepActions } from "ui/hooks/useTestStepActions";
 import { getViewMode } from "ui/reducers/layout";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
@@ -17,6 +18,7 @@ import {
   getCypressConsolePropsSuspense,
   getCypressSubjectNodeIdsAsync,
 } from "ui/suspense/testStepCache";
+import { AwaitTimeout, awaitWithTimeout } from "ui/utils/awaitWithTimeout";
 
 import { TestCaseContext } from "./TestCase";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
@@ -51,17 +53,6 @@ export interface TestStepItemProps {
   autoSelect?: boolean;
 }
 
-const AwaitTimeout = Symbol("await-timeout");
-async function awaitWithTimeout<T>(
-  promise: Promise<T>,
-  timeout = 500
-): Promise<T | typeof AwaitTimeout> {
-  return Promise.race([
-    new Promise<typeof AwaitTimeout>(resolve => setTimeout(() => resolve(AwaitTimeout), timeout)),
-    promise,
-  ]);
-}
-
 export function TestStepItem({
   step,
   argString,
@@ -87,6 +78,7 @@ export function TestStepItem({
   const client = useContext(ReplayClientContext);
   const state = useStepState(step);
   const actions = useTestStepActions(step);
+  const info = useTestInfo();
 
   useEffect(() => {
     setSubjectNodePauseData(getCypressSubjectNodeIdsAsync(client, step));
@@ -190,12 +182,13 @@ export function TestStepItem({
   const displayedProgress =
     (step.duration === 1 && state === "paused") || progress == 100 ? 0 : progress;
   const isSelected = selectedStep?.id === id;
+  const error = !!(step.error || info.getStepAsserts(step).some(s => !!s.error));
 
   return (
     <TestStepRow
       active={state === "paused"}
       pending={state === "pending"}
-      error={!!step.error}
+      error={error}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       ref={ref}

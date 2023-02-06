@@ -288,6 +288,8 @@ export type TestStep = {
   alias?: string;
   error?: TestItemError;
   hook?: "beforeEach" | "afterEach";
+  commandId?: string;
+  assertIds?: string[];
 };
 
 export type AnnotatedTestStep = TestStep & {

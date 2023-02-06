@@ -56,6 +56,7 @@ export interface SourcesState {
   persistedSelectedLocation: PartialLocation | null;
   sourcesByUrl: Record<string, string[]>;
   preferredGeneratedSources: string[];
+  sourcesUserActionPending: boolean;
 }
 
 export const initialState: SourcesState = {
@@ -68,6 +69,7 @@ export const initialState: SourcesState = {
   persistedSelectedLocation: null,
   sourcesByUrl: {},
   preferredGeneratedSources: [],
+  sourcesUserActionPending: false,
 };
 
 const sourcesSlice = createSlice({
@@ -129,6 +131,9 @@ const sourcesSlice = createSlice({
         }
       }
     },
+    setSourcesUserActionPending: (state, action: PayloadAction<boolean>) => {
+      state.sourcesUserActionPending = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase("debuggerUI/setViewport", state => {
@@ -137,8 +142,13 @@ const sourcesSlice = createSlice({
   },
 });
 
-export const { allSourcesReceived, clearSelectedLocation, locationSelected, preferSource } =
-  sourcesSlice.actions;
+export const {
+  allSourcesReceived,
+  clearSelectedLocation,
+  locationSelected,
+  preferSource,
+  setSourcesUserActionPending,
+} = sourcesSlice.actions;
 
 export const getSourcesLoading = (state: UIState) => !state.sources.allSourcesReceived;
 
@@ -372,6 +382,9 @@ export const getPreviousPersistedLocation = (state: UIState) =>
 export const getPreferredGeneratedSources = (state: UIState) =>
   state.sources.preferredGeneratedSources;
 
+export const getSourcesUserActionPending = (state: UIState) =>
+  state.sources.sourcesUserActionPending;
+
 export const selectors = {
   getAllSourceDetails,
   getSourceDetails,
@@ -394,6 +407,7 @@ export const selectors = {
   getSourceIdsByUrl,
   getSourcesToDisplayByUrl,
   getPreferredGeneratedSources,
+  getSourcesUserActionPending,
 };
 
 export default sourcesSlice.reducer;
