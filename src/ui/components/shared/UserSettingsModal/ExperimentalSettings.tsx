@@ -130,8 +130,10 @@ export default function ExperimentalSettings({}) {
   const { value: enableRoutines, update: updateEnableRoutines } = useFeature("enableRoutines");
   const { value: rerunRoutines, update: updatererunRoutines } = useFeature("rerunRoutines");
 
-  const { value: disableRecordingAssetsInDatabase, update: updateDisableRecordingAssetsInDatabase } =
-    useFeature("disableRecordingAssetsInDatabase");
+  const {
+    value: disableRecordingAssetsInDatabase,
+    update: updateDisableRecordingAssetsInDatabase,
+  } = useFeature("disableRecordingAssetsInDatabase");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
