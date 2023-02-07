@@ -44,6 +44,8 @@ export async function recordPlaywright(
 
 export async function uploadLastRecording(url: string) {
   const list = cli.listAllRecordings();
+  const latest = cli.viewLatestRecording();
+  console.log(">>> line 46 in uploadLastRecording, latest: ", latest);
   console.log(`>>> line 47 uploadLastRecording list ${JSON.stringify(list)}`);
   const id = findLast(list, rec => rec.metadata.uri === url)?.id;
 
