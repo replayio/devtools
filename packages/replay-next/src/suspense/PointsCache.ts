@@ -10,19 +10,18 @@ export const {
   getValueSuspense: getPointsSuspense,
   getValueAsync: getPointsAsync,
   getValueIfCached: getPointsIfCached,
-  addValue: cacheFrames,
   addValue: setLatestIDBValue,
 } = createGenericCache<
-  [graphQLClient: GraphQLClientInterface],
-  [recordingId: RecordingId, accessToken: string | null],
+  [graphQLClient: GraphQLClientInterface, accessToken: string | null],
+  [recordingId: RecordingId],
   Point[]
 >(
   "PointsCache: getPointsGraphQL",
-  1,
+  2,
   async (
     graphQLClient: GraphQLClientInterface,
-    recordingId: RecordingId,
-    accessToken: string | null
+    accessToken: string | null,
+    recordingId: RecordingId
   ) => await getPointsGraphQL(graphQLClient, recordingId, accessToken),
-  (recordingId: RecordingId, _accessToken: string | null) => recordingId
+  (recordingId: RecordingId) => recordingId
 );

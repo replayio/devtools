@@ -9,19 +9,18 @@ export const {
   getValueSuspense: getCommentListSuspense,
   getValueAsync: getCommentListAsync,
   getValueIfCached: getCommentListIfCached,
-  addValue: cacheFrames,
   addValue: setLatestIDBValue,
 } = createGenericCache<
-  [graphQLClient: GraphQLClientInterface],
-  [recordingId: RecordingId, accessToken: string | null],
+  [graphQLClient: GraphQLClientInterface, accessToken: string | null],
+  [recordingId: RecordingId],
   Comment[]
 >(
   "CommentsCache: getCommentsGraphQL",
-  1,
+  2,
   async (
     graphQLClient: GraphQLClientInterface,
-    recordingId: RecordingId,
-    accessToken: string | null
+    accessToken: string | null,
+    recordingId: RecordingId
   ) => await getCommentsGraphQL(graphQLClient, recordingId, accessToken),
-  (recordingId: RecordingId, _accessToken: string | null) => recordingId
+  (recordingId: RecordingId) => recordingId
 );

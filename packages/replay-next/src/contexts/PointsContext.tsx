@@ -115,7 +115,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   const [remotePoints, setRemotePoints] = useState<Point[] | null>(null);
   useEffect(() => {
     async function fetchPoints() {
-      const points = await getPointsAsync(graphQLClient, recordingId, accessToken);
+      const points = await getPointsAsync(graphQLClient, accessToken, recordingId);
       setRemotePoints(points);
     }
 
