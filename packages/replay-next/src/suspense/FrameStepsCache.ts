@@ -10,6 +10,7 @@ export const {
   getValueSuspense: getFrameStepsSuspense,
   getValueAsync: getFrameStepsAsync,
   getValueIfCached: getFrameStepsIfCached,
+  getCacheKey,
 } = createGenericCache<
   [replayClient: ReplayClientInterface],
   [pauseId: PauseId, frameId: FrameId],
@@ -42,5 +43,5 @@ export const useGetFrameSteps = createUseGetValue<
     pauseId && frameId ? await getFrameStepsAsync(replayClient, pauseId, frameId) : undefined,
   (replayClient, pauseId, frameId) =>
     pauseId && frameId ? getFrameStepsIfCached(pauseId, frameId) : { value: undefined },
-  (replayClient, pauseId, frameId) => `${pauseId}:${frameId}`
+  (replayClient, pauseId, frameId) => getCacheKey(pauseId!, frameId!)
 );
