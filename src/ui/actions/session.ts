@@ -98,7 +98,7 @@ function getRecordingNotAccessibleError(
   recording?: Recording,
   userId?: string
 ): ExpectedError | undefined {
-  const isAuthorized = !!((isTest() && !isMock()) || recording);
+  const isAuthorized = !!((!isMock()) || recording);
   const isAuthenticated = !!(isTest() || isMock() || !!tokenManager.getState()?.token);
 
   if (isAuthorized) {
