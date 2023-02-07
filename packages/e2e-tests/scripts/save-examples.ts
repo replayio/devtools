@@ -162,6 +162,7 @@ async function saveBrowserExample({ exampleFilename }: { exampleFilename: string
   });
 
   try {
+    console.log(`>>> line 165 exampleUrl ${exampleUrl}`);
     const recordingId = await uploadLastRecording(exampleUrl);
     console.log(`>>> line 165: recordingId ${recordingId}`);
 
