@@ -19,6 +19,8 @@ import config from "../config";
 import { recordNodeExample } from "./record-node";
 import { recordPlaywright, uploadLastRecording } from "./record-playwright";
 
+export const API_KEY = "rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ";
+
 const playwright = require("@recordreplay/playwright");
 
 type Target = "all" | "browser" | "node";
