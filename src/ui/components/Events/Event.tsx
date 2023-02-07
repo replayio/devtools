@@ -25,6 +25,7 @@ import { useAppDispatch } from "ui/setup/hooks";
 import { ReplayEvent } from "ui/state/app";
 import { getFormattedTime } from "ui/utils/timeline";
 
+import Icon from "../shared/Icon";
 import MaterialIcon from "../shared/MaterialIcon";
 import { getReplayEvent } from "./eventKinds";
 
@@ -218,11 +219,11 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
 
   const onKeyDown = (e: React.KeyboardEvent) => e.key === " " && e.preventDefault();
 
-  const onClick = () => {
-    // Seek to the sidebar event timestamp right away.
-    // That way we're at least _close_ to the right time
+  const onClickSeek = () => {
     onSeek(point, time);
+  };
 
+  const onClickJumpToCode = () => {
     if (event.kind === "mousedown" || event.kind === "keypress") {
       dispatch(jumpToClickEventFunctionLocation(event, onSeek));
     }
@@ -241,18 +242,28 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
             "font-semibold text-primaryAccent": isPaused,
           }
         )}
-        onClick={onClick}
+        onClick={onClickSeek}
         onContextMenu={onContextMenu}
         onKeyDown={onKeyDown}
       >
         <div className="flex flex-row items-center space-x-2 overflow-hidden">
-          <MaterialIcon className="group-hover:text-primaryAccent" iconSize="xl">
-            {icon}
-          </MaterialIcon>
+          <MaterialIcon iconSize="xl">{icon}</MaterialIcon>
           <Label>{label}</Label>
         </div>
         <div className="flex space-x-2">
-          <div>x!</div>
+          <div onClick={onClickJumpToCode}>
+            <Icon
+              filename="code"
+              className={classNames(
+                "bg-bodyColor hover:cursor-pointer hover:bg-primaryAccent",
+                {
+                  "bg-lightGrey": currentTime < time,
+                },
+                "small"
+              )}
+              size="small"
+            />
+          </div>
         </div>
       </div>
       {contextMenu}
