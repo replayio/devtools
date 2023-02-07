@@ -15,6 +15,7 @@ import { FrameComponent } from "./Frame";
 import FrameIndent from "./FrameIndent";
 import FrameMenu from "./FrameMenu";
 import type { CommonFrameComponentProps } from "./index";
+import { useStackFrameContextMenu } from "./useStackFrameContextMenu";
 
 function FrameLocation({ frame, expanded }: { frame: PauseFrame; expanded: boolean }) {
   const library = frame.library || getLibraryFromUrl(frame);
@@ -51,10 +52,11 @@ export function Group({
   const [expanded, setExpanded] = useState(false);
   const isSelectable = panel == "console";
 
-  const onContextMenu = (event: React.MouseEvent) => {
-    const frame = group[0];
-    FrameMenu(frame, frameworkGroupingOn, { copyStackTrace, toggleFrameworkGrouping }, event);
-  };
+  const { contextMenu, onContextMenu } = useStackFrameContextMenu({
+    frameworkGroupingOn,
+    toggleFrameworkGrouping,
+    copyStackTrace,
+  });
 
   const toggleFrames = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -116,12 +118,15 @@ export function Group({
   }
 
   return (
-    <div
-      className={classNames("frames-group", { expanded })}
-      onContextMenu={disableContextMenu ? undefined : onContextMenu}
-    >
-      {description}
-      {frames}
-    </div>
+    <>
+      <div
+        className={classNames("frames-group", { expanded })}
+        onContextMenu={disableContextMenu ? undefined : onContextMenu}
+      >
+        {description}
+        {frames}
+      </div>
+      {contextMenu}
+    </>
   );
 }

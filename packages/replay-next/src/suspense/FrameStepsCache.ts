@@ -1,4 +1,4 @@
-import { FrameId, PauseId, PointDescription } from "@replayio/protocol";
+import { FrameId, Location, PauseId, PointDescription } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
 
 import { ReplayClientInterface } from "shared/client/types";
@@ -45,3 +45,20 @@ export const useGetFrameSteps = createUseGetValue<
     pauseId && frameId ? getFrameStepsIfCached(pauseId, frameId) : { value: undefined },
   (replayClient, pauseId, frameId) => getCacheKey(pauseId!, frameId!)
 );
+
+export async function getFrameStepForFrameLocation(
+  replayClient: ReplayClientInterface,
+  pauseId: string,
+  protocolFrameId: string,
+  location: Location
+) {
+  const frameSteps = await getFrameStepsAsync(replayClient, pauseId, protocolFrameId);
+
+  const matchingFrameStep = frameSteps?.find(step => {
+    return step.frame?.find(location => {
+      return location.sourceId === location.sourceId && location.line === location.line;
+    });
+  });
+
+  return matchingFrameStep;
+}

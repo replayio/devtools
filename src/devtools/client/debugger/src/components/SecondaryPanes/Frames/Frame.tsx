@@ -3,8 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import classNames from "classnames";
-//
-import React, { Component } from "react";
+import React from "react";
 
 import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
 import { Redacted } from "ui/components/Redacted";
@@ -14,8 +13,8 @@ import { formatDisplayName } from "../../../utils/pause/frames";
 import { getFileURL, getFilename } from "../../../utils/source";
 import AccessibleImage from "../../shared/AccessibleImage";
 import FrameIndent from "./FrameIndent";
-import FrameMenu from "./FrameMenu";
 import type { CommonFrameComponentProps } from "./index";
+import { useStackFrameContextMenu } from "./useStackFrameContextMenu";
 
 type FrameNameOptions = Parameters<typeof formatDisplayName>[1];
 
@@ -80,12 +79,13 @@ export function FrameComponent({
   cx,
 }: FrameProps) {
   const isSelectable = panel === "console";
-  const isDebugger = panel === "debugger";
 
-  const onContextMenu = (event: React.MouseEvent) => {
-    // const { frame, copyStackTrace, toggleFrameworkGrouping, frameworkGroupingOn, cx } = this.props;
-    FrameMenu(frame, frameworkGroupingOn, { copyStackTrace, toggleFrameworkGrouping }, event);
-  };
+  const { contextMenu, onContextMenu } = useStackFrameContextMenu({
+    frame,
+    frameworkGroupingOn,
+    copyStackTrace,
+    toggleFrameworkGrouping,
+  });
 
   const onMouseDown = (e: React.MouseEvent) => {
     if (e.button !== 0) {
@@ -120,23 +120,31 @@ export function FrameComponent({
     : undefined;
 
   return (
-    <Redacted
-      role="listitem"
-      key={frame.id}
-      className={className}
-      onMouseDown={onMouseDown}
-      onKeyUp={onKeyUp}
-      onContextMenu={disableContextMenu ? undefined : e => onContextMenu(e)}
-      tabIndex={0}
-      title={title}
-    >
-      {isSelectable && <FrameIndent />}
-      <div className={classNames("frame-description", panel === "webconsole" ? "frame-link" : "")}>
-        <FrameTitle frame={frame} options={{ shouldMapDisplayName }} />
-        {!hideLocation && <span className="clipboard-only"> </span>}
-        {!hideLocation && <FrameLocation frame={frame} displayFullUrl={displayFullUrl} />}
-        {isSelectable && <br className="clipboard-only" />}
-      </div>
-    </Redacted>
+    <>
+      <Redacted
+        role="listitem"
+        key={frame.id}
+        className={className}
+        onMouseDown={onMouseDown}
+        onKeyUp={onKeyUp}
+        onContextMenu={disableContextMenu ? undefined : e => onContextMenu(e)}
+        tabIndex={0}
+        title={title}
+      >
+        {isSelectable && <FrameIndent />}
+        <div
+          className={classNames("frame-description", panel === "webconsole" ? "frame-link" : "")}
+        >
+          <FrameTitle frame={frame} options={{ shouldMapDisplayName }} />
+          {!hideLocation && <span className="clipboard-only"> </span>}
+          {!hideLocation && <FrameLocation frame={frame} displayFullUrl={displayFullUrl} />}
+          {isSelectable && <br className="clipboard-only" />}
+        </div>
+      </Redacted>
+
+      {/*Keep the context menu separate to avoid `onMouseDown`
+      bubbling up and causing unwanted frame selection behavior*/}
+      {contextMenu}
+    </>
   );
 }
