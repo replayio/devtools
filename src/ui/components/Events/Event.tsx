@@ -224,6 +224,10 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
   };
 
   const onClickJumpToCode = () => {
+    // Seek to the sidebar event timestamp right away.
+    // That way we're at least _close_ to the right time
+    onSeek(point, time);
+
     if (event.kind === "mousedown" || event.kind === "keypress") {
       dispatch(jumpToClickEventFunctionLocation(event, onSeek));
     }
