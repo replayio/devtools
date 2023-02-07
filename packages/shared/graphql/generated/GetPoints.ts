@@ -17,11 +17,11 @@ export interface GetPoints_recording_points_user {
 export interface GetPoints_recording_points {
   __typename: "Point";
   badge: string | null;
-  columnIndex: number;
+  column: number;
   condition: string | null;
   content: string;
   createdAt: any;
-  lineNumber: number;
+  line: number;
   sourceId: string;
   user: GetPoints_recording_points_user | null;
 }

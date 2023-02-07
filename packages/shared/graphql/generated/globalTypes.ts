@@ -31,27 +31,27 @@ export interface AddCommentReplyInput {
 
 export interface AddPointInput {
   badge?: string | null;
-  columnIndex: number;
+  column: number;
   condition?: string | null;
   content: string;
-  lineNumber: number;
+  line: number;
   recordingId: string;
   sourceId: string;
 }
 
 export interface DeletePointInput {
-  columnIndex: number;
-  lineNumber: number;
+  column: number;
+  line: number;
   recordingId: string;
   sourceId: string;
 }
 
 export interface UpdatePointInput {
   badge?: string | null;
-  columnIndex: number;
+  column: number;
   condition?: string | null;
   content: string;
-  lineNumber: number;
+  line: number;
   recordingId: string;
   sourceId: string;
 }

@@ -33,11 +33,11 @@ export const GET_POINTS_QUERY = gql`
       uuid
       points {
         badge
-        columnIndex
+        column
         condition
         content
         createdAt
-        lineNumber
+        line
         sourceId
         user {
           id
@@ -62,8 +62,12 @@ export async function addPoint(
   accessToken: string,
   point: ClientPoint
 ) {
-  const { createdAt, id, user, ...rest } = point;
-  const input: AddPointInput = rest;
+  const { columnIndex, createdAt, id, lineNumber, user, ...rest } = point;
+  const input: UpdatePointInput = {
+    column: columnIndex,
+    line: lineNumber,
+    ...rest,
+  };
 
   await graphQLClient.send<AddPoint>(
     {
@@ -87,7 +91,7 @@ export async function deletePoint(
       operationName: "DeletePoint",
       query: DELETE_POINT_QUERY,
       variables: {
-        columnIndex: point.columnIndex,
+        column: point.columnIndex,
         lineNumber: point.lineNumber,
         recordingId: point.recordingId,
         sourceId: point.sourceId,
@@ -116,18 +120,16 @@ export async function getPoints(
   return (
     points?.map(point => {
       // ID is a composite of the source location, created-by user, and recording.
-      const id = `${point.user!.id}:${recordingId}:${point.sourceId}:${point.lineNumber}:${
-        point.columnIndex
-      }`;
+      const id = `${point.user!.id}:${recordingId}:${point.sourceId}:${point.line}:${point.column}`;
 
       return {
         badge: point.badge as Badge,
-        columnIndex: point.columnIndex,
+        columnIndex: point.column,
         condition: point.condition,
         content: point.content!,
         createdAt: new Date(point.createdAt),
         id,
-        lineNumber: point.lineNumber,
+        lineNumber: point.line,
         recordingId,
         sourceId: point.sourceId,
         user: point.user,
@@ -141,8 +143,12 @@ export async function updatePoint(
   accessToken: string,
   point: ClientPoint
 ) {
-  const { createdAt, id, user, ...rest } = point;
-  const input: UpdatePointInput = rest;
+  const { columnIndex, createdAt, id, lineNumber, user, ...rest } = point;
+  const input: UpdatePointInput = {
+    column: columnIndex,
+    line: lineNumber,
+    ...rest,
+  };
 
   await graphQLClient.send<GetPoints>(
     {
