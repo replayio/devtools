@@ -54,13 +54,7 @@ type BreakpointProps = PropsFromRedux & PropsFromParent & { replayClient: Replay
 
 class Breakpoint extends PureComponent<BreakpointProps> {
   get selectedLocation(): Location {
-    const { point } = this.props;
-
-    return {
-      column: point.columnIndex,
-      line: point.lineNumber,
-      sourceId: point.sourceId,
-    };
+    return this.props.point.sourceLocation;
   }
 
   selectBreakpoint = (event: MouseEvent) => {
@@ -84,10 +78,10 @@ class Breakpoint extends PureComponent<BreakpointProps> {
 
   renderSourceLocation() {
     const { point } = this.props;
-    const { columnIndex, lineNumber } = point;
+    const { column, line } = point.sourceLocation;
 
-    const columnVal = columnIndex != null ? `:${columnIndex}` : "";
-    const location = `${lineNumber}${columnVal}`;
+    const columnVal = column != null ? `:${column}` : "";
+    const location = `${line}${columnVal}`;
 
     return (
       <div className={styles.Location} data-test-name="PointLocation">
@@ -171,10 +165,10 @@ class Breakpoint extends PureComponent<BreakpointProps> {
         className={styles.Point}
         data-test-name="Breakpoint"
         data-test-type={type}
-        data-test-column-index={point.columnIndex}
-        data-test-line-number={point.lineNumber}
+        data-test-column-index={point.sourceLocation.column}
+        data-test-line-number={point.sourceLocation.line}
         data-test-state={this.isCurrentlyPausedAtBreakpoint(frame) ? "paused" : undefined}
-        data-test-source-id={point.sourceId}
+        data-test-source-id={point.sourceLocation.sourceId}
         onClick={this.selectBreakpoint}
       >
         <label

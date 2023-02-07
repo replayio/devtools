@@ -92,11 +92,7 @@ function PointPanel(props: ExternalProps) {
 
   const [hitPoints, hitPointStatus] = getHitPointsForLocationSuspense(
     client,
-    {
-      column: point.columnIndex,
-      line: point.lineNumber,
-      sourceId: point.sourceId,
-    },
+    point.sourceLocation,
     point.condition,
     focusRange
   );
@@ -150,7 +146,7 @@ function PointPanelWithHitPoints({
   );
   const hasChanged = editableCondition !== point.condition || editableContent !== point.content;
 
-  const lineNumber = point.lineNumber;
+  const lineNumber = point.sourceLocation.line;
 
   // Log point code suggestions should always be relative to location of the the point panel.
   // This is a more intuitive experience than using the current execution point,
@@ -183,22 +179,22 @@ function PointPanelWithHitPoints({
     console.error(`Failed to fetch frames for point ${executionPoint}`, errorOrPromise);
   }
 
-  let source = getSource(client, point.sourceId);
+  let source = getSource(client, point.sourceLocation.sourceId);
   if (source?.kind === "prettyPrinted") {
     assert(
       source.generatedSourceIds,
-      `pretty-printed source ${point.sourceId} has no generatedSourceIds`
+      `pretty-printed source ${point.sourceLocation.sourceId} has no generatedSourceIds`
     );
     source = getSource(client, source.generatedSourceIds[0]);
   }
   const context =
     source?.kind === "sourceMapped" ? "logpoint-original-source" : "logpoint-generated-source";
 
-  const pointBehavior = pointBehaviors.get(point.key);
+  const pointBehavior = pointBehaviors[point.key];
   const shouldLog = pointBehavior?.shouldLog === POINT_BEHAVIOR_ENABLED;
 
   const hasCondition = isEditing ? editableCondition !== null : point.condition !== null;
-  const lineIndex = point.lineNumber - 1;
+  const lineIndex = point.sourceLocation.line - 1;
 
   const toggleCondition = () => {
     if (!editable) {
@@ -263,9 +259,9 @@ function PointPanelWithHitPoints({
 
       const typeData = await createTypeDataForSourceCodeComment(
         client,
-        point.sourceId,
-        point.lineNumber,
-        point.columnIndex
+        point.sourceLocation.sourceId,
+        point.sourceLocation.line,
+        point.sourceLocation.column
       );
 
       await addCommentGraphQL(graphQLClient, accessToken, recordingId, {

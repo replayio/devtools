@@ -141,9 +141,9 @@ export default function SourceList({
       // This is a really lazy way of invalidating cached measurements;
       // It's better than invalidating from index 0, but it's still likely to be more work than necessary.
       const prevPointsIndex =
-        prevPoints.length > 0 ? prevPoints[0].lineNumber - 1 : Number.MAX_SAFE_INTEGER;
+        prevPoints.length > 0 ? prevPoints[0].sourceLocation.line - 1 : Number.MAX_SAFE_INTEGER;
       const nextPointsIndex =
-        points.length > 0 ? points[0].lineNumber - 1 : Number.MAX_SAFE_INTEGER;
+        points.length > 0 ? points[0].sourceLocation.line - 1 : Number.MAX_SAFE_INTEGER;
       const index = Math.min(prevPointsIndex, nextPointsIndex);
       list.resetAfterIndex(index);
     }
@@ -252,7 +252,7 @@ export default function SourceList({
         return lineHeight;
       }
 
-      const pointBehavior = pointBehaviors.get(point.key);
+      const pointBehavior = pointBehaviors[point.key];
 
       const lineState = lineIndexToPointStateMap.get(index) ?? "no-point";
       switch (lineState) {

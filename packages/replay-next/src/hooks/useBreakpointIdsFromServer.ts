@@ -1,7 +1,7 @@
 import { BreakpointId, Location } from "@replayio/protocol";
 import { useContext, useEffect, useRef } from "react";
 
-import { PointBehaviorsMap } from "replay-next/src/contexts/PointsContext";
+import { PointBehaviorsObject } from "replay-next/src/contexts/PointsContext";
 import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
 import { getSourcesAsync } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -12,13 +12,13 @@ import { ReplayClientInterface } from "shared/client/types";
 export default function useBreakpointIdsFromServer(
   replayClient: ReplayClientInterface,
   points: Point[] | undefined,
-  pointBehaviors: PointBehaviorsMap,
+  pointBehaviors: PointBehaviorsObject,
   deletePoints: (...keys: PointKey[]) => void
 ): void {
   const client = useContext(ReplayClientContext);
 
   const prevPointsRef = useRef<Point[] | null>(null);
-  const prevPointBehaviorsRef = useRef<PointBehaviorsMap | null>(null);
+  const prevPointBehaviorsRef = useRef<PointBehaviorsObject | null>(null);
   const pointKeyToBreakpointIdMKeyRef = useRef<Map<PointKey, BreakpointId[]>>(new Map());
 
   useEffect(() => {
@@ -51,9 +51,10 @@ export default function useBreakpointIdsFromServer(
           const pointsToRemove: string[] = [];
 
           for (let point of points) {
-            const { columnIndex, key, lineNumber, sourceId } = point;
+            const { key, sourceLocation } = point;
+            const { column, line, sourceId } = sourceLocation;
 
-            const pointBehavior = pointBehaviors.get(key);
+            const pointBehavior = pointBehaviors[key];
 
             if (!allSourceIds.has(sourceId)) {
               // It's possible this persisted point has an obsolete
@@ -71,8 +72,8 @@ export default function useBreakpointIdsFromServer(
             // _Now_ we can tell the backend about this breakpoint.
             if (pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED) {
               const location: Location = {
-                column: columnIndex,
-                line: lineNumber,
+                column,
+                line,
                 sourceId,
               };
 
@@ -90,16 +91,17 @@ export default function useBreakpointIdsFromServer(
           // The user has probably been interacting with the app and we _should_ have breakable positions
           // for these files already.
           points.forEach(point => {
-            const { columnIndex, key, lineNumber, sourceId } = point;
+            const { key, sourceLocation } = point;
+            const { column, line, sourceId } = sourceLocation;
 
             const location: Location = {
-              column: columnIndex,
-              line: lineNumber,
+              column,
+              line,
               sourceId,
             };
 
-            const pointBehavior = pointBehaviors.get(key);
-            const prevPointBehavior = prevPointBehaviors?.get(key);
+            const pointBehavior = pointBehaviors[key];
+            const prevPointBehavior = prevPointBehaviors?.[key];
 
             const prevPoint = prevPoints.find(({ key }) => key === point.key);
             if (prevPoint == null) {

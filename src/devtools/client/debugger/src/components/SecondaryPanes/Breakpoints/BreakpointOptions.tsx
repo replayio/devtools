@@ -15,17 +15,17 @@ type BreakpointProps = {
 
 function BreakpointLineContents({ breakpoint }: BreakpointProps) {
   const replayClient = useContext(ReplayClientContext);
-  const { sourceId } = breakpoint;
+  const { sourceId } = breakpoint.sourceLocation;
 
   const sourceLines = getSourceLinesSuspense(replayClient, sourceId);
 
   const snippet = useMemo(() => {
-    const { columnIndex, lineNumber = 0 } = breakpoint;
+    const { column, line } = breakpoint.sourceLocation;
     let snippet = "";
 
     if (sourceLines.length > 0) {
-      const lineText = sourceLines[lineNumber - 1];
-      return lineText.slice(columnIndex, columnIndex! + 100).trim();
+      const lineText = sourceLines[line - 1];
+      return lineText.slice(column, column! + 100).trim();
     }
 
     return snippet;

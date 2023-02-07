@@ -11,6 +11,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { v4 as uuid } from "uuid";
 
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
 import { getPointsAsync } from "replay-next/src/suspense/PointsCache";
@@ -19,7 +20,6 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_DISABLED, Point, PointBehavior, PointKey } from "shared/client/types";
 import {
   addPoint as addPointGraphQL,
-  createPointKey,
   deletePoint as deletePointGraphQL,
   updatePoint as updatePointGraphQL,
 } from "shared/graphql/Points";
@@ -28,10 +28,10 @@ import useBreakpointIdsFromServer from "../hooks/useBreakpointIdsFromServer";
 import useIndexedDB, { IDBOptions } from "../hooks/useIndexedDB";
 import { SessionContext } from "./SessionContext";
 
-export type PointBehaviorsMap = Map<PointKey, PointBehavior>;
+export type PointBehaviorsObject = { [key: PointKey]: PointBehavior };
 
 const EMPTY_ARRAY: Point[] = [];
-const EMPTY_MAP: PointBehaviorsMap = new Map();
+const EMPTY_OBJECT: PointBehaviorsObject = {};
 
 // NOTE: If any change is made like adding a store name, bump the version number
 // to ensure that the database is recreated properly.
@@ -59,11 +59,11 @@ export type AddPoint = (
 ) => void;
 export type DeletePoints = (...pointIds: PointKey[]) => void;
 export type EditPoint = (
-  id: PointKey,
+  key: PointKey,
   partialPoint: Partial<Pick<Point, "badge" | "condition" | "content">>
 ) => void;
 export type EditPointBehavior = (
-  id: PointKey,
+  key: PointKey,
   pointBehavior: Partial<Omit<PointBehavior, "pointId">>
 ) => void;
 
@@ -73,8 +73,8 @@ export type PointsContextType = {
   editPoint: EditPoint;
   editPointBehavior: EditPointBehavior;
   isPending: boolean;
-  pointBehaviors: PointBehaviorsMap;
-  pointBehaviorsForSuspense: PointBehaviorsMap;
+  pointBehaviors: PointBehaviorsObject;
+  pointBehaviorsForSuspense: PointBehaviorsObject;
   points: Point[];
   pointsForSuspense: Point[];
 };
@@ -103,12 +103,14 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     storeName: "high-priority",
   });
 
-  const { setValue: setPointBehaviors, value: pointBehaviors } = useIndexedDB<PointBehaviorsMap>({
-    database: POINT_BEHAVIORS_DATABASE,
-    initialValue: EMPTY_MAP,
-    recordName: recordingId,
-    storeName: "high-priority",
-  });
+  const { setValue: setPointBehaviors, value: pointBehaviors } = useIndexedDB<PointBehaviorsObject>(
+    {
+      database: POINT_BEHAVIORS_DATABASE,
+      initialValue: EMPTY_OBJECT,
+      recordName: recordingId,
+      storeName: "high-priority",
+    }
+  );
 
   // Note that we fetch using the async helper rather than Suspense,
   // because it's better to load the rest of the app earlier than to wait on Points.
@@ -154,8 +156,8 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   // Track the latest committed values for e.g. the editPoint function.
   const committedValuesRef = useRef<{
     points: Point[];
-    pointBehaviors: PointBehaviorsMap;
-  }>({ points: EMPTY_ARRAY, pointBehaviors: EMPTY_MAP });
+    pointBehaviors: PointBehaviorsObject;
+  }>({ points: EMPTY_ARRAY, pointBehaviors: EMPTY_OBJECT });
   useEffect(() => {
     committedValuesRef.current.pointBehaviors = pointBehaviors;
     committedValuesRef.current.points = mergedPoints;
@@ -173,18 +175,16 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       // Points (and their ids) are shared between tabs (via IndexedDB),
       // so the id numbers should be deterministic;
       // a single incrementing counter wouldn't work well unless it was also synced.
-      const key = createPointKey(recordingId, currentUserInfo?.id ?? null, location);
+      const key = uuid();
 
       const point: Point = {
         badge: null,
-        columnIndex: location.column,
         condition: null,
         content: "",
         createdAt: new Date(),
         key,
-        lineNumber: location.line,
-        sourceId: location.sourceId,
         recordingId,
+        sourceLocation: { ...location },
         user: currentUserInfo,
         ...partialPoint,
       };
@@ -197,13 +197,14 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       };
 
       setLocalPoints((prevPoints: Point[]) => {
-        const index = sortedIndexBy(prevPoints, point, ({ lineNumber }) => lineNumber);
+        const index = sortedIndexBy(prevPoints, point, ({ sourceLocation }) => sourceLocation.line);
         return prevPoints.slice(0, index).concat([point], prevPoints.slice(index));
       });
       setPointBehaviors(prev => {
-        const clonedMap = new Map(prev);
-        clonedMap.set(key, pointBehavior);
-        return clonedMap;
+        return {
+          ...prev,
+          [key]: pointBehavior,
+        };
       });
 
       // If the current user is signed-in, sync this new point to GraphQL
@@ -224,23 +225,25 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   );
 
   const deletePoints = useCallback<DeletePoints>(
-    (...ids: PointKey[]) => {
+    (...keys: PointKey[]) => {
       trackEvent("breakpoint.remove");
 
-      setLocalPoints((prevPoints: Point[]) => prevPoints.filter(point => !ids.includes(point.key)));
+      setLocalPoints((prevPoints: Point[]) =>
+        prevPoints.filter(point => !keys.includes(point.key))
+      );
       setPointBehaviors(prev => {
-        const clonedMap = new Map(prev);
-        ids.forEach(id => {
-          clonedMap.delete(id);
+        const cloned = { ...prev };
+        keys.forEach(key => {
+          delete cloned[key];
         });
-        return clonedMap;
+        return cloned;
       });
 
       // If the current user is signed-in, also delete this point from GraphQL.
       if (accessToken) {
         const { points } = committedValuesRef.current;
-        ids.forEach(id => {
-          const prevPoint = points.find(point => point.key === id);
+        keys.forEach(key => {
+          const prevPoint = points.find(point => point.key === key);
           if (prevPoint) {
             deletePointGraphQL(graphQLClient, accessToken, prevPoint);
           }
@@ -252,11 +255,11 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   );
 
   const editPoint = useCallback<EditPoint>(
-    (id: PointKey, partialPoint: Partial<Pick<Point, "badge" | "condition" | "content">>) => {
+    (key: PointKey, partialPoint: Partial<Pick<Point, "badge" | "condition" | "content">>) => {
       trackEvent("breakpoint.edit");
 
       const { points } = committedValuesRef.current;
-      const prevPoint = points.find(point => point.key === id);
+      const prevPoint = points.find(point => point.key === key);
       if (prevPoint) {
         const newPoint: Point = {
           ...prevPoint,
@@ -264,14 +267,14 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
         };
 
         setLocalPoints((prevPoints: Point[]) => {
-          const index = prevPoints.findIndex(point => point.key === id);
+          const index = prevPoints.findIndex(point => point.key === key);
           if (index >= 0) {
             const points = prevPoints.slice();
             points.splice(index, 1, newPoint);
             return points;
           }
 
-          throw Error(`Could not find point with id "${id}"`);
+          throw Error(`Could not find point with key "${key}"`);
         });
 
         // If the current user is signed-in, sync this new edit to GraphQL
@@ -289,17 +292,18 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       trackEvent("breakpoint.edit");
 
       const { pointBehaviors } = committedValuesRef.current;
-      const prevPointBehavior = pointBehaviors.get(key);
+      const prevPointBehavior = pointBehaviors[key];
 
       setPointBehaviors(prev => {
-        const clonedMap = new Map(prev);
-        clonedMap.set(key, {
-          shouldBreak: prevPointBehavior?.shouldBreak ?? POINT_BEHAVIOR_DISABLED,
-          shouldLog: prevPointBehavior?.shouldLog ?? POINT_BEHAVIOR_DISABLED,
-          ...pointBehavior,
-          key,
-        });
-        return clonedMap;
+        return {
+          ...prev,
+          [key]: {
+            shouldBreak: prevPointBehavior?.shouldBreak ?? POINT_BEHAVIOR_DISABLED,
+            shouldLog: prevPointBehavior?.shouldLog ?? POINT_BEHAVIOR_DISABLED,
+            ...pointBehavior,
+            key,
+          },
+        };
       });
     },
     [setPointBehaviors, trackEvent]
@@ -336,12 +340,14 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
 }
 
 function comparePoints(pointA: Point, pointB: Point): number {
-  if (pointA.sourceId !== pointB.sourceId) {
-    return pointA.sourceId.localeCompare(pointB.sourceId);
-  } else if (pointA.lineNumber !== pointB.lineNumber) {
-    return pointA.lineNumber - pointB.lineNumber;
-  } else if (pointA.columnIndex !== pointB.columnIndex) {
-    return pointA.columnIndex - pointB.columnIndex;
+  const sourceLocationA = pointA.sourceLocation;
+  const sourceLocationB = pointB.sourceLocation;
+  if (sourceLocationA.sourceId !== sourceLocationB.sourceId) {
+    return sourceLocationA.sourceId.localeCompare(sourceLocationB.sourceId);
+  } else if (sourceLocationA.line !== sourceLocationB.line) {
+    return sourceLocationA.line - sourceLocationB.line;
+  } else if (sourceLocationA.column !== sourceLocationB.column) {
+    return sourceLocationA.column - sourceLocationB.column;
   } else {
     return pointA.createdAt.getTime() - pointB.createdAt.getTime();
   }

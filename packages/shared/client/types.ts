@@ -100,11 +100,9 @@ export type Point = {
   key: PointKey;
 
   // These attributes are fixed after Point creation
-  columnIndex: number;
   createdAt: Date;
-  lineNumber: number;
   recordingId: RecordingId;
-  sourceId: SourceId;
+  sourceLocation: Location;
   user: PartialUser | null;
 
   // These attributes are editable, although only by the Point's owner

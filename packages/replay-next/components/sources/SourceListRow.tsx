@@ -22,7 +22,7 @@ import {
   DeletePoints,
   EditPoint,
   EditPointBehavior,
-  PointBehaviorsMap,
+  PointBehaviorsObject,
 } from "replay-next/src/contexts/PointsContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { ParsedToken, StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
@@ -66,7 +66,7 @@ export type ItemData = {
   pointPanelHeight: number;
   pointPanelWithConditionalHeight: number;
   points: Point[];
-  pointBehaviors: PointBehaviorsMap;
+  pointBehaviors: PointBehaviorsObject;
   setLinePointState: SetLinePointState;
   showColumnBreakpoints: boolean;
   showHitCounts: boolean;
@@ -139,7 +139,7 @@ const SourceListRow = memo(
 
     const pointsForLine = findPointsForLocation(points, sourceId, lineNumber);
     const firstPoint = pointsForLine[0] ?? null;
-    const firstPointBehavior = firstPoint ? pointBehaviors.get(firstPoint.key) ?? null : null;
+    const firstPointBehavior = firstPoint ? pointBehaviors[firstPoint.key] ?? null : null;
     const showPointPanel = firstPoint && firstPointBehavior?.shouldLog !== POINT_BEHAVIOR_DISABLED;
 
     const hitCount = lineHitCounts?.count || null;
@@ -216,8 +216,9 @@ const SourceListRow = memo(
             renderBetween(lineSegments, lastColumnIndex, columnIndex);
           }
 
-          const firstPoint = pointsForLine.find(point => point.columnIndex === columnIndex) ?? null;
-          const pointBehavior = firstPoint ? pointBehaviors.get(firstPoint.key) ?? null : null;
+          const firstPoint =
+            pointsForLine.find(point => point.sourceLocation.column === columnIndex) ?? null;
+          const pointBehavior = firstPoint ? pointBehaviors[firstPoint.key] ?? null : null;
 
           lineSegments.push(
             <ColumnBreakpointMarker
@@ -227,7 +228,9 @@ const SourceListRow = memo(
               editPointBehavior={editPointBehavior}
               key={lineSegments.length}
               lineNumber={lineNumber}
-              point={pointsForLine.find(point => point.columnIndex === columnIndex) ?? null}
+              point={
+                pointsForLine.find(point => point.sourceLocation.column === columnIndex) ?? null
+              }
               pointBehavior={pointBehavior}
               sourceId={sourceId}
             />

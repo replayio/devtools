@@ -33,9 +33,9 @@ export default function Breakpoints({
           // Either we might not have sources fetched yet,
           // or there could be obsolete persisted source IDs for points.
           // Ensure we only show points that have valid sources available.
-          const sourceExists = !!sourceDetailsEntities[point.sourceId];
+          const sourceExists = !!sourceDetailsEntities[point.sourceLocation.sourceId];
 
-          const { shouldBreak, shouldLog } = pointBehaviors.get(point.key) ?? {};
+          const { shouldBreak, shouldLog } = pointBehaviors[point.key] ?? {};
 
           // Show both enabled and temporarily disabled points.
           // Also show all shared points (even if disabled).
@@ -45,16 +45,16 @@ export default function Breakpoints({
 
           return sourceExists && matchesType;
         })
-        .sort((a, b) => a.lineNumber - b.lineNumber),
+        .sort((a, b) => a.sourceLocation.line - b.sourceLocation.line),
     [currentUserInfo, pointBehaviors, points, type, sourceDetailsEntities]
   );
 
   const sourceIdToPointsMap = useMemo(() => {
     return filteredAndSortedPoints.reduce((map: SourceIdToPointsMap, point) => {
-      if (!map.hasOwnProperty(point.sourceId)) {
-        map[point.sourceId] = [point];
+      if (!map.hasOwnProperty(point.sourceLocation.sourceId)) {
+        map[point.sourceLocation.sourceId] = [point];
       } else {
-        map[point.sourceId].push(point);
+        map[point.sourceLocation.sourceId].push(point);
       }
       return map;
     }, {});
@@ -82,7 +82,7 @@ export default function Breakpoints({
               onRemoveBreakpoints={() => deletePoints(...points.map(point => point.key))}
             />
             {points.map(point => {
-              const pointBehavior = pointBehaviors.get(point.key);
+              const pointBehavior = pointBehaviors[point.key];
               const editable = point.user?.id === currentUserInfo?.id;
 
               return (

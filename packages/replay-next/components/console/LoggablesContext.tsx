@@ -143,15 +143,11 @@ export function LoggablesContextRoot({
     const pointInstances: PointInstance[] = [];
 
     points.forEach(point => {
-      const pointBehavior = pointBehaviors.get(point.key);
+      const pointBehavior = pointBehaviors[point.key];
       if (pointBehavior?.shouldLog === POINT_BEHAVIOR_ENABLED) {
         const [hitPoints, status] = getHitPointsForLocationSuspense(
           client,
-          {
-            column: point.columnIndex,
-            line: point.lineNumber,
-            sourceId: point.sourceId,
-          },
+          point.sourceLocation,
           point.condition,
           focusRange
         );

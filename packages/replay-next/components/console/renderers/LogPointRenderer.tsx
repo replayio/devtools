@@ -57,13 +57,7 @@ function LogPointRenderer({
   }
 
   const locations = useMemo<Location[]>(
-    () => [
-      {
-        column: logPointInstance.point.columnIndex,
-        line: logPointInstance.point.lineNumber,
-        sourceId: logPointInstance.point.sourceId,
-      },
-    ],
+    () => [logPointInstance.point.sourceLocation],
     [logPointInstance.point]
   );
 
@@ -110,7 +104,7 @@ function LogPointRenderer({
       >
         <span className={styles.Source}>
           <Suspense fallback={<Loader />}>
-            {locations.length > 0 && <Source locations={locations} />}
+            <Source locations={locations} />
           </Suspense>
         </span>
         {primaryContent}
@@ -138,16 +132,10 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
     ? { begin: focusRange.begin.point, end: focusRange.end.point }
     : null;
 
-  const location: Location = {
-    column: point.columnIndex,
-    line: point.lineNumber,
-    sourceId: point.sourceId,
-  };
-
   const analysisResults = runAnalysisSuspense(
     client,
     pointRange,
-    location,
+    point.sourceLocation,
     point.content,
     point.condition
   );

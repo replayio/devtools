@@ -3,7 +3,6 @@ import { Location, RecordingId } from "@replayio/protocol";
 
 import { Badge } from "shared/client/types";
 import { Point } from "shared/client/types";
-import { PointBehavior } from "shared/client/types";
 import { Point as ClientPoint } from "shared/client/types";
 import { AddPoint } from "shared/graphql/generated/AddPoint";
 import { GetPoints } from "shared/graphql/generated/GetPoints";
@@ -13,7 +12,6 @@ import {
   UpdatePointInput,
 } from "shared/graphql/generated/globalTypes";
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
-import { UserInfo } from "shared/graphql/types";
 
 export const ADD_POINT_QUERY = gql`
   mutation AddPoint($input: AddPointInput!) {
@@ -35,15 +33,13 @@ export const GET_POINTS_QUERY = gql`
   query GetPoints($recordingId: UUID!) {
     recording(uuid: $recordingId) {
       uuid
-      points {
+      recording_points {
         badge
-        column
         condition
         content
         createdAt
         key
-        line
-        sourceId
+        sourceLocation
         user {
           id
           name
@@ -67,10 +63,13 @@ export async function addPoint(
   accessToken: string,
   point: ClientPoint
 ) {
-  const { columnIndex, createdAt, lineNumber, user, ...rest } = point;
+  const { createdAt, sourceLocation, user, ...rest } = point;
   const input: AddPointInput = {
-    column: columnIndex,
-    line: lineNumber,
+    sourceLocation: {
+      column: sourceLocation.column,
+      line: sourceLocation.line,
+      source_id: sourceLocation.sourceId,
+    },
     ...rest,
   };
 
@@ -93,6 +92,7 @@ export async function deletePoint(
 ) {
   const input: DeletePointInput = {
     key: point.key,
+    recordingId: point.recordingId,
   };
 
   await graphQLClient.send(
@@ -119,20 +119,22 @@ export async function getPoints(
     accessToken
   );
 
-  const points = response?.recording?.points;
+  const points = response?.recording?.recording_points;
 
   return (
     points?.map(point => {
       return {
         badge: point.badge as Badge,
-        columnIndex: point.column,
         condition: point.condition,
         content: point.content!,
         createdAt: new Date(point.createdAt),
         key: point.key,
-        lineNumber: point.line,
         recordingId,
-        sourceId: point.sourceId,
+        sourceLocation: {
+          column: point.sourceLocation.column,
+          line: point.sourceLocation.line,
+          sourceId: point.sourceLocation.source_id,
+        },
         user: point.user,
       };
     }) ?? []
@@ -149,6 +151,7 @@ export async function updatePoint(
     condition: point.condition,
     content: point.content,
     key: point.key,
+    recordingId: point.recordingId,
   };
 
   await graphQLClient.send<GetPoints>(
