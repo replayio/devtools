@@ -71,7 +71,7 @@ function logAnimated(text: string): () => void {
 async function saveRecording(example: string, recordingId?: string) {
   if (recordingId) {
   } else {
-    const recordings = listAllRecordings();
+    const recordings = listAllRecordings({ directory: "/root/.replay" });
     if (recordings.length > 0) {
       const lastRecording = recordings[recordings.length - 1];
       recordingId = lastRecording.id;
