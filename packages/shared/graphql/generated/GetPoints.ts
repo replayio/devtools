@@ -21,6 +21,7 @@ export interface GetPoints_recording_points {
   condition: string | null;
   content: string;
   createdAt: any;
+  key: string;
   line: number;
   sourceId: string;
   user: GetPoints_recording_points_user | null;

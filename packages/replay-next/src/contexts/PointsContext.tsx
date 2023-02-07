@@ -16,10 +16,10 @@ import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientCont
 import { getPointsAsync } from "replay-next/src/suspense/PointsCache";
 import { insert } from "replay-next/src/utils/array";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { POINT_BEHAVIOR_DISABLED, Point, PointBehavior, PointId } from "shared/client/types";
+import { POINT_BEHAVIOR_DISABLED, Point, PointBehavior, PointKey } from "shared/client/types";
 import {
   addPoint as addPointGraphQL,
-  createPointId,
+  createPointKey,
   deletePoint as deletePointGraphQL,
   updatePoint as updatePointGraphQL,
 } from "shared/graphql/Points";
@@ -28,7 +28,7 @@ import useBreakpointIdsFromServer from "../hooks/useBreakpointIdsFromServer";
 import useIndexedDB, { IDBOptions } from "../hooks/useIndexedDB";
 import { SessionContext } from "./SessionContext";
 
-export type PointBehaviorsMap = Map<PointId, PointBehavior>;
+export type PointBehaviorsMap = Map<PointKey, PointBehavior>;
 
 const EMPTY_ARRAY: Point[] = [];
 const EMPTY_MAP: PointBehaviorsMap = new Map();
@@ -57,13 +57,13 @@ export type AddPoint = (
   partialPointBehavior: Partial<Omit<PointBehavior, "pointId">>,
   location: Location
 ) => void;
-export type DeletePoints = (...pointIds: PointId[]) => void;
+export type DeletePoints = (...pointIds: PointKey[]) => void;
 export type EditPoint = (
-  id: PointId,
+  id: PointKey,
   partialPoint: Partial<Pick<Point, "badge" | "condition" | "content">>
 ) => void;
 export type EditPointBehavior = (
-  id: PointId,
+  id: PointKey,
   pointBehavior: Partial<Omit<PointBehavior, "pointId">>
 ) => void;
 
@@ -74,7 +74,7 @@ export type PointsContextType = {
   editPointBehavior: EditPointBehavior;
   isPending: boolean;
   pointBehaviors: PointBehaviorsMap;
-  pointBehaviorsForSuspense: Map<PointId, PointBehavior>;
+  pointBehaviorsForSuspense: Map<PointKey, PointBehavior>;
   points: Point[];
   pointsForSuspense: Point[];
 };
@@ -173,7 +173,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       // Points (and their ids) are shared between tabs (via IndexedDB),
       // so the id numbers should be deterministic;
       // a single incrementing counter wouldn't work well unless it was also synced.
-      const id = createPointId(recordingId, currentUserInfo, location);
+      const key = createPointKey(recordingId, currentUserInfo?.id ?? null, location);
 
       const point: Point = {
         badge: null,
@@ -181,7 +181,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
         condition: null,
         content: "",
         createdAt: new Date(),
-        id,
+        key,
         lineNumber: location.line,
         sourceId: location.sourceId,
         recordingId,
@@ -190,7 +190,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       };
 
       const pointBehavior: PointBehavior = {
-        pointId: id,
+        key,
         shouldBreak: POINT_BEHAVIOR_DISABLED,
         shouldLog: POINT_BEHAVIOR_DISABLED,
         ...partialPointBehavior,
@@ -202,16 +202,14 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       });
       setPointBehaviors(prev => {
         const clonedMap = new Map(prev);
-        clonedMap.set(id, pointBehavior);
+        clonedMap.set(key, pointBehavior);
         return clonedMap;
       });
 
       // If the current user is signed-in, sync this new point to GraphQL
       // to be shared with other users who can view this recording.
       if (accessToken) {
-        addPointGraphQL(graphQLClient, accessToken, point).then(id => {
-          console.log("addPointGraphQL ->", id);
-        });
+        addPointGraphQL(graphQLClient, accessToken, point);
       }
     },
     [
@@ -226,10 +224,10 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   );
 
   const deletePoints = useCallback<DeletePoints>(
-    (...ids: PointId[]) => {
+    (...ids: PointKey[]) => {
       trackEvent("breakpoint.remove");
 
-      setLocalPoints((prevPoints: Point[]) => prevPoints.filter(point => !ids.includes(point.id)));
+      setLocalPoints((prevPoints: Point[]) => prevPoints.filter(point => !ids.includes(point.key)));
       setPointBehaviors(prev => {
         const clonedMap = new Map(prev);
         ids.forEach(id => {
@@ -242,7 +240,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       if (accessToken) {
         const { points } = committedValuesRef.current;
         ids.forEach(id => {
-          const prevPoint = points.find(point => point.id === id);
+          const prevPoint = points.find(point => point.key === id);
           if (prevPoint) {
             deletePointGraphQL(graphQLClient, accessToken, prevPoint);
           }
@@ -254,11 +252,11 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   );
 
   const editPoint = useCallback<EditPoint>(
-    (id: PointId, partialPoint: Partial<Pick<Point, "badge" | "condition" | "content">>) => {
+    (id: PointKey, partialPoint: Partial<Pick<Point, "badge" | "condition" | "content">>) => {
       trackEvent("breakpoint.edit");
 
       const { points } = committedValuesRef.current;
-      const prevPoint = points.find(point => point.id === id);
+      const prevPoint = points.find(point => point.key === id);
       if (prevPoint) {
         const newPoint: Point = {
           ...prevPoint,
@@ -266,7 +264,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
         };
 
         setLocalPoints((prevPoints: Point[]) => {
-          const index = prevPoints.findIndex(point => point.id === id);
+          const index = prevPoints.findIndex(point => point.key === id);
           if (index >= 0) {
             const points = prevPoints.slice();
             points.splice(index, 1, newPoint);
@@ -287,19 +285,19 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   );
 
   const editPointBehavior = useCallback<EditPointBehavior>(
-    (id: PointId, pointBehavior: Partial<Omit<PointBehavior, "id">>) => {
+    (key: PointKey, pointBehavior: Partial<Omit<PointBehavior, "key">>) => {
       trackEvent("breakpoint.edit");
 
       const { pointBehaviors } = committedValuesRef.current;
-      const prevPointBehavior = pointBehaviors.get(id);
+      const prevPointBehavior = pointBehaviors.get(key);
 
       setPointBehaviors(prev => {
         const clonedMap = new Map(prev);
-        clonedMap.set(id, {
+        clonedMap.set(key, {
           shouldBreak: prevPointBehavior?.shouldBreak ?? POINT_BEHAVIOR_DISABLED,
           shouldLog: prevPointBehavior?.shouldLog ?? POINT_BEHAVIOR_DISABLED,
           ...pointBehavior,
-          pointId: id,
+          key,
         });
         return clonedMap;
       });

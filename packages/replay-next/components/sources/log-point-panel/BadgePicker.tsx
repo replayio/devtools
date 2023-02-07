@@ -24,7 +24,7 @@ export default function BadgePicker({
   const [state, setState] = useState<State>("initial");
 
   const toggle = (badge: Badge | null) => {
-    editPoint(point.id, { ...point, badge });
+    editPoint(point.key, { ...point, badge });
     setState("closed");
   };
 

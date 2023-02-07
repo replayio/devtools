@@ -252,7 +252,7 @@ export default function SourceList({
         return lineHeight;
       }
 
-      const pointBehavior = pointBehaviors.get(point.id);
+      const pointBehavior = pointBehaviors.get(point.key);
 
       const lineState = lineIndexToPointStateMap.get(index) ?? "no-point";
       switch (lineState) {

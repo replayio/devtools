@@ -148,8 +148,8 @@ export default function HoverButton({
       }
 
       if (point) {
-        editPoint(point.id, { content });
-        editPointBehavior(point.id, { shouldLog: POINT_BEHAVIOR_ENABLED });
+        editPoint(point.key, { content });
+        editPointBehavior(point.key, { shouldLog: POINT_BEHAVIOR_ENABLED });
       } else {
         addPoint(
           {
@@ -175,11 +175,11 @@ export default function HoverButton({
     const togglePoint = () => {
       if (point) {
         if (!hasOrDidLog || hasOrDidBreak) {
-          editPointBehavior(point.id, {
+          editPointBehavior(point.key, {
             shouldLog: hasOrDidLog ? POINT_BEHAVIOR_DISABLED : POINT_BEHAVIOR_ENABLED,
           });
         } else {
-          deletePoints(point.id);
+          deletePoints(point.key);
 
           setLinePointState(lineNumber - 1, null);
         }

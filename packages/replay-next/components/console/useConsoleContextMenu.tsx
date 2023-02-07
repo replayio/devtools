@@ -36,7 +36,7 @@ export default function useConsoleContextMenu(loggable: Loggable) {
 
   const setBadge = (badge: Badge | null) => {
     if (isPointInstance(loggable)) {
-      editPoint(loggable.point.id, { badge });
+      editPoint(loggable.point.key, { badge });
     }
   };
 

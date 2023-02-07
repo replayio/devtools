@@ -35,7 +35,7 @@ export default function Breakpoints({
           // Ensure we only show points that have valid sources available.
           const sourceExists = !!sourceDetailsEntities[point.sourceId];
 
-          const { shouldBreak, shouldLog } = pointBehaviors.get(point.id) ?? {};
+          const { shouldBreak, shouldLog } = pointBehaviors.get(point.key) ?? {};
 
           // Show both enabled and temporarily disabled points.
           // Also show all shared points (even if disabled).
@@ -79,18 +79,18 @@ export default function Breakpoints({
               key="header"
               breakpoint={points[0]}
               sourceId={sourceId}
-              onRemoveBreakpoints={() => deletePoints(...points.map(point => point.id))}
+              onRemoveBreakpoints={() => deletePoints(...points.map(point => point.key))}
             />
             {points.map(point => {
-              const pointBehavior = pointBehaviors.get(point.id);
+              const pointBehavior = pointBehaviors.get(point.key);
               const editable = point.user?.id === currentUserInfo?.id;
 
               return (
                 <Breakpoint
                   editable={editable}
-                  key={point.id}
+                  key={point.key}
                   onEditPointBehavior={editPointBehavior}
-                  onRemoveBreakpoint={editable ? () => deletePoints(point.id) : () => {}}
+                  onRemoveBreakpoint={editable ? () => deletePoints(point.key) : () => {}}
                   point={point}
                   shouldBreak={pointBehavior?.shouldBreak ?? POINT_BEHAVIOR_DISABLED}
                   shouldLog={pointBehavior?.shouldLog ?? POINT_BEHAVIOR_DISABLED}

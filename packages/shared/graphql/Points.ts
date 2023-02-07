@@ -7,7 +7,11 @@ import { PointBehavior } from "shared/client/types";
 import { Point as ClientPoint } from "shared/client/types";
 import { AddPoint } from "shared/graphql/generated/AddPoint";
 import { GetPoints } from "shared/graphql/generated/GetPoints";
-import { AddPointInput, UpdatePointInput } from "shared/graphql/generated/globalTypes";
+import {
+  AddPointInput,
+  DeletePointInput,
+  UpdatePointInput,
+} from "shared/graphql/generated/globalTypes";
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 import { UserInfo } from "shared/graphql/types";
 
@@ -37,6 +41,7 @@ export const GET_POINTS_QUERY = gql`
         condition
         content
         createdAt
+        key
         line
         sourceId
         user {
@@ -62,8 +67,8 @@ export async function addPoint(
   accessToken: string,
   point: ClientPoint
 ) {
-  const { columnIndex, createdAt, id, lineNumber, user, ...rest } = point;
-  const input: UpdatePointInput = {
+  const { columnIndex, createdAt, lineNumber, user, ...rest } = point;
+  const input: AddPointInput = {
     column: columnIndex,
     line: lineNumber,
     ...rest,
@@ -86,16 +91,15 @@ export async function deletePoint(
   accessToken: string,
   point: Point
 ) {
+  const input: DeletePointInput = {
+    key: point.key,
+  };
+
   await graphQLClient.send(
     {
       operationName: "DeletePoint",
       query: DELETE_POINT_QUERY,
-      variables: {
-        column: point.columnIndex,
-        lineNumber: point.lineNumber,
-        recordingId: point.recordingId,
-        sourceId: point.sourceId,
-      },
+      variables: { input },
     },
     accessToken
   );
@@ -119,16 +123,13 @@ export async function getPoints(
 
   return (
     points?.map(point => {
-      // ID is a composite of the source location, created-by user, and recording.
-      const id = `${point.user!.id}:${recordingId}:${point.sourceId}:${point.line}:${point.column}`;
-
       return {
         badge: point.badge as Badge,
         columnIndex: point.column,
         condition: point.condition,
         content: point.content!,
         createdAt: new Date(point.createdAt),
-        id,
+        key: point.key,
         lineNumber: point.line,
         recordingId,
         sourceId: point.sourceId,
@@ -143,11 +144,11 @@ export async function updatePoint(
   accessToken: string,
   point: ClientPoint
 ) {
-  const { columnIndex, createdAt, id, lineNumber, user, ...rest } = point;
   const input: UpdatePointInput = {
-    column: columnIndex,
-    line: lineNumber,
-    ...rest,
+    badge: point.badge,
+    condition: point.condition,
+    content: point.content,
+    key: point.key,
   };
 
   await graphQLClient.send<GetPoints>(
@@ -163,9 +164,9 @@ export async function updatePoint(
 // Point ID is a virtual attribute;
 // It only exists on the client, to simplify equality checks and PointBehavior mapping.
 // It is a composite of the source location, created-by user, and recording.
-export function createPointId(
+export function createPointKey(
   recordingId: RecordingId,
-  userInfo: UserInfo | null,
+  userId: string | null,
   location: Location
 ): string {
   return JSON.stringify({
@@ -173,6 +174,6 @@ export function createPointId(
     line: location.line,
     recordingId,
     sourceId: location.sourceId,
-    userId: userInfo?.id ?? null,
+    userId: userId,
   });
 }

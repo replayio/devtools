@@ -34,26 +34,21 @@ export interface AddPointInput {
   column: number;
   condition?: string | null;
   content: string;
+  key: string;
   line: number;
   recordingId: string;
   sourceId: string;
 }
 
 export interface DeletePointInput {
-  column: number;
-  line: number;
-  recordingId: string;
-  sourceId: string;
+  key: string;
 }
 
 export interface UpdatePointInput {
   badge?: string | null;
-  column: number;
   condition?: string | null;
   content: string;
-  line: number;
-  recordingId: string;
-  sourceId: string;
+  key: string;
 }
 
 //==============================================================

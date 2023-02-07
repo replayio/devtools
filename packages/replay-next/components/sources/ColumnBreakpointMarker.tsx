@@ -45,14 +45,14 @@ export default function ColumnBreakpointMarker({
       );
     } else {
       if (pointBehavior?.shouldLog === POINT_BEHAVIOR_ENABLED) {
-        editPointBehavior(point.id, {
+        editPointBehavior(point.key, {
           shouldBreak:
             pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED
               ? POINT_BEHAVIOR_DISABLED
               : POINT_BEHAVIOR_ENABLED,
         });
       } else {
-        deletePoints(point.id);
+        deletePoints(point.key);
       }
     }
   };

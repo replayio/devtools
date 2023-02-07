@@ -85,7 +85,7 @@ export type PartialUser = {
   picture: string | null;
 };
 
-export type PointId = string;
+export type PointKey = string;
 export type Badge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow";
 
 // Points are saved to GraphQL.
@@ -95,20 +95,22 @@ export type Badge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow
 // Note that Points are only saved to GraphQL for authenticated users.
 // They are also saved to IndexedDB to support unauthenticated users.
 export type Point = {
-  badge: Badge | null;
+  // This a client-assigned value is used as the primary key on the server.
+  // It exists to simplify equality checks and PointBehavior mapping.
+  key: PointKey;
+
+  // These attributes are fixed after Point creation
   columnIndex: number;
-  condition: string | null;
-  content: string;
   createdAt: Date;
   lineNumber: number;
   recordingId: RecordingId;
   sourceId: SourceId;
   user: PartialUser | null;
 
-  // This is a virtual attribute;
-  // It only exists on the client, to simplify equality checks and PointBehavior mapping.
-  // It is a composite of the source location, created-by user, and recording.
-  id: PointId;
+  // These attributes are editable, although only by the Point's owner
+  badge: Badge | null;
+  condition: string | null;
+  content: string;
 };
 
 // Point behaviors are saved to IndexedDB.
@@ -116,7 +118,7 @@ export type Point = {
 // They control a given point behaves locally (e.g. does it log to the console)
 // Behaviors are modifiable by everyone (regardless of who created a point).
 export type PointBehavior = {
-  pointId: PointId;
+  key: PointKey;
   shouldBreak: POINT_BEHAVIOR;
   shouldLog: POINT_BEHAVIOR;
 };

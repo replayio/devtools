@@ -194,7 +194,7 @@ function PointPanelWithHitPoints({
   const context =
     source?.kind === "sourceMapped" ? "logpoint-original-source" : "logpoint-generated-source";
 
-  const pointBehavior = pointBehaviors.get(point.id);
+  const pointBehavior = pointBehaviors.get(point.key);
   const shouldLog = pointBehavior?.shouldLog === POINT_BEHAVIOR_ENABLED;
 
   const hasCondition = isEditing ? editableCondition !== null : point.condition !== null;
@@ -209,7 +209,7 @@ function PointPanelWithHitPoints({
       if (isEditing) {
         setEditableCondition(null);
       } else {
-        editPoint(point.id, { ...point, condition: null, content: editableContent });
+        editPoint(point.key, { ...point, condition: null, content: editableContent });
       }
 
       setLinePointState(lineIndex, "point");
@@ -223,7 +223,7 @@ function PointPanelWithHitPoints({
   };
 
   const toggleShouldLog = () => {
-    editPointBehavior(point.id, {
+    editPointBehavior(point.key, {
       shouldLog: shouldLog ? POINT_BEHAVIOR_DISABLED_TEMPORARILY : POINT_BEHAVIOR_ENABLED,
     });
   };
@@ -301,7 +301,7 @@ function PointPanelWithHitPoints({
 
   const onSubmit = () => {
     if (isConditionValid && isContentValid && hasChanged) {
-      editPoint(point.id, {
+      editPoint(point.key, {
         badge: point.badge,
         condition: editableCondition || null,
         content: editableContent,

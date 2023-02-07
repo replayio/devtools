@@ -139,7 +139,7 @@ const SourceListRow = memo(
 
     const pointsForLine = findPointsForLocation(points, sourceId, lineNumber);
     const firstPoint = pointsForLine[0] ?? null;
-    const firstPointBehavior = firstPoint ? pointBehaviors.get(firstPoint.id) ?? null : null;
+    const firstPointBehavior = firstPoint ? pointBehaviors.get(firstPoint.key) ?? null : null;
     const showPointPanel = firstPoint && firstPointBehavior?.shouldLog !== POINT_BEHAVIOR_DISABLED;
 
     const hitCount = lineHitCounts?.count || null;
@@ -217,7 +217,7 @@ const SourceListRow = memo(
           }
 
           const firstPoint = pointsForLine.find(point => point.columnIndex === columnIndex) ?? null;
-          const pointBehavior = firstPoint ? pointBehaviors.get(firstPoint.id) ?? null : null;
+          const pointBehavior = firstPoint ? pointBehaviors.get(firstPoint.key) ?? null : null;
 
           lineSegments.push(
             <ColumnBreakpointMarker
@@ -295,11 +295,11 @@ const SourceListRow = memo(
         // 1. If it logs and breaks, then we should disable breaking
         // 2. If it only breaks then we should delete that point (and all others on the line)
         if (showPointPanel) {
-          editPointBehavior(firstPoint.id, {
+          editPointBehavior(firstPoint.key, {
             shouldBreak: shouldBreak ? POINT_BEHAVIOR_DISABLED : POINT_BEHAVIOR_ENABLED,
           });
         } else {
-          deletePoints(...pointsForLine.map(point => point.id));
+          deletePoints(...pointsForLine.map(point => point.key));
         }
       }
     };

@@ -129,12 +129,12 @@ class Breakpoint extends PureComponent<BreakpointProps> {
         : POINT_BEHAVIOR_DISABLED_TEMPORARILY;
 
       if (type === "breakpoint") {
-        onEditPointBehavior(point.id, {
+        onEditPointBehavior(point.key, {
           shouldBreak: behavior,
           shouldLog,
         });
       } else {
-        onEditPointBehavior(point.id, {
+        onEditPointBehavior(point.key, {
           shouldBreak,
           shouldLog: behavior,
         });
@@ -147,7 +147,7 @@ class Breakpoint extends PureComponent<BreakpointProps> {
 
       if (type === "breakpoint") {
         if (shouldLog === POINT_BEHAVIOR_ENABLED) {
-          onEditPointBehavior(point.id, {
+          onEditPointBehavior(point.key, {
             shouldBreak: POINT_BEHAVIOR_DISABLED,
             shouldLog,
           });
@@ -156,7 +156,7 @@ class Breakpoint extends PureComponent<BreakpointProps> {
         }
       } else {
         if (shouldBreak === POINT_BEHAVIOR_ENABLED) {
-          onEditPointBehavior(point.id, {
+          onEditPointBehavior(point.key, {
             shouldBreak,
             shouldLog: POINT_BEHAVIOR_DISABLED,
           });

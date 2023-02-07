@@ -13,7 +13,7 @@ export default function PrefixBadgeButton({ point }: { point: Point }) {
 
   const onSelect = useCallback(
     (newBadge: Badge | undefined) => {
-      editPoint(point.id, { ...point, badge: newBadge || null });
+      editPoint(point.key, { ...point, badge: newBadge || null });
     },
     [editPoint, point]
   );
