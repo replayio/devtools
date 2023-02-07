@@ -252,7 +252,7 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
           <Label>{label}</Label>
         </div>
         <div className="flex space-x-2">
-          <div>{getFormattedTime(time)}</div>
+          <div>x!</div>
         </div>
       </div>
       {contextMenu}
