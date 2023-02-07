@@ -74,7 +74,7 @@ export type PointsContextType = {
   editPointBehavior: EditPointBehavior;
   isPending: boolean;
   pointBehaviors: PointBehaviorsMap;
-  pointBehaviorsForSuspense: Map<PointKey, PointBehavior>;
+  pointBehaviorsForSuspense: PointBehaviorsMap;
   points: Point[];
   pointsForSuspense: Point[];
 };
