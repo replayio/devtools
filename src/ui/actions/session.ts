@@ -203,7 +203,7 @@ export function createSocket(
         profileWorkerThreads: !!features.profileWorkerThreads,
         enableRoutines: !!features.enableRoutines,
         rerunRoutines: !!features.rerunRoutines,
-        trackRecordingAssetsInDatabase: !!features.trackRecordingAssetsInDatabase,
+        disableRecordingAssetsInDatabase: !!features.disableRecordingAssetsInDatabase,
       };
       if (features.newControllerOnRefresh) {
         experimentalSettings.controllerKey = String(Date.now());
