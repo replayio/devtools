@@ -26,11 +26,11 @@ const csp = (props: any) => {
   const authHost = getAuthHost();
   return [
     `default-src 'self'`,
-    `connect-src 'self' https://api.replay.io wss://api.replay.io wss://dispatch.replay.io ws://*.replay.prod http://*.replay.prod https://telemetry.replay.io https://${authHost} https://api-js.mixpanel.com https://*.sentry.io https://*.launchdarkly.com https://*.logrocket.io https://*.lr-ingest.io https://*.logrocket.com https://*.lr-in.com https://api.stripe.com https://vitals.vercel-insights.com ${
+    `connect-src 'self' https://api.replay.io wss://api.replay.io wss://dispatch.replay.io ws://*.replay.prod http://*.replay.prod https://telemetry.replay.io https://${authHost} https://api-js.mixpanel.com https://*.sentry.io https://*.launchdarkly.com https://*.logrocket.io https://*.lr-ingest.io https://*.logrocket.com https://*.lr-in.com https://api.stripe.com https://vitals.vercel-insights.com nonce-${hash} ${
       // Required to talk to local backend in development. Enabling
       // localhost:8000 for prod to support the ?dispatch parameter when running
       // the local backend
-      "http://localhost:* http://*.replay.local ws://*.replay.local ws://localhost:* webpack://_N_E/*"
+      "http://localhost:* http://*.replay.local ws://*.replay.local ws://localhost:*"
     }`,
     `frame-src replay: https://js.stripe.com https://hooks.stripe.com https://${authHost} https://www.loom.com/`,
     // Required by some of our external services
