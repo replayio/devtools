@@ -223,7 +223,9 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
     onSeek(point, time);
   };
 
-  const onClickJumpToCode = () => {
+  const onClickJumpToCode = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
     // Seek to the sidebar event timestamp right away.
     // That way we're at least _close_ to the right time
     onSeek(point, time);
