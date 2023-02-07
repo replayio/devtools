@@ -19,7 +19,6 @@ import config from "../config";
 import { recordNodeExample } from "./record-node";
 import { recordPlaywright, uploadLastRecording } from "./record-playwright";
 
-
 const playwright = require("@recordreplay/playwright");
 
 type Target = "all" | "browser" | "node";
@@ -85,7 +84,8 @@ async function saveRecording(example: string, recordingId?: string) {
 
   const id = await uploadRecording(recordingId, {
     apiKey: config.replayApiKey,
-    server: config.backendUrl
+    server: config.backendUrl,
+    verbose: true,
   });
 
   await makeReplayPublic(config.replayApiKey, recordingId);
