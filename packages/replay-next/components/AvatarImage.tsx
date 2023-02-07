@@ -1,17 +1,45 @@
-import { ImgHTMLAttributes } from "react";
+import { ImgHTMLAttributes, useState } from "react";
 
 import styles from "./AvatarImage.module.css";
 
-export default function AvatarImage(props: ImgHTMLAttributes<HTMLImageElement>) {
-  // The user image URLs that we get from Google sometimes fail to load, in that case
-  // we fall back to a transparent image (instead of showing the browser's icon for broken images)
+type Props = {
+  name?: string;
+} & ImgHTMLAttributes<HTMLImageElement>;
+
+export default function AvatarImage({ className, name, src, title, ...rest }: Props) {
+  const [source, setSource] = useState(src);
+  const [showNameBadge, setShowNameBadge] = useState(name && !src);
+
+  // If the user has no image, their initials can be shown as a fallback.
+  if (name && showNameBadge) {
+    const initials = name
+      .split(" ")
+      .map(n => n.charAt(0))
+      .join("");
+    return (
+      <div className={`${styles.Name} ${className}`} title={title || name}>
+        {initials}
+      </div>
+    );
+  }
+
+  // If a user image fails to load, show a fallback.
   const onError = ({ currentTarget }: any) => {
-    currentTarget.src = "/images/avatar-fallback.png";
+    if (name) {
+      setShowNameBadge(true);
+    } else {
+      setSource("/images/avatar-fallback.png");
+    }
   };
 
-  const { className = "", ...rest } = props;
-
   return (
-    <img {...rest} className={`${styles.Image} ${className}`} data-private onError={onError} />
+    <img
+      {...rest}
+      className={`${styles.Image} ${className}`}
+      data-private
+      onError={onError}
+      src={source}
+      title={title || name}
+    />
   );
 }

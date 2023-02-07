@@ -9,6 +9,7 @@ import {
   PauseFrame,
   getSelectedFrameId,
 } from "devtools/client/debugger/src/reducers/pause";
+import AvatarImage from "replay-next/components/AvatarImage";
 import { EditPointBehavior } from "replay-next/src/contexts/PointsContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
@@ -185,8 +186,15 @@ class Breakpoint extends PureComponent<BreakpointProps> {
         </label>
         <BreakpointOptions breakpoint={point} type={type} />
         {this.renderSourceLocation()}
-        {editable && (
+        {editable ? (
           <CloseButton handleClick={onCloseButtonClick} tooltip={"Remove this breakpoint"} />
+        ) : (
+          <AvatarImage
+            className={styles.CreatedByAvatar}
+            name={point.user?.name || undefined}
+            src={point.user?.picture || undefined}
+            title={point.user?.name || undefined}
+          />
         )}
       </div>
     );
