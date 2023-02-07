@@ -26,6 +26,7 @@ export let clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 export async function query<TData = any, TVariables = OperationVariables>(
   options: QueryOptions<TVariables, TData>
 ) {
+  console.log(">>>>>>>>>query ran");
   const apolloClient = await clientWaiter.promise;
   return await apolloClient.query<TData, TVariables>(options);
 }
