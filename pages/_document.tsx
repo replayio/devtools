@@ -34,19 +34,19 @@ const csp = (props: any) => {
     }`,
     `frame-src replay: https://js.stripe.com https://hooks.stripe.com https://${authHost} https://www.loom.com/`,
     // Required by some of our external services
-    `script-src 'self' 'unsafe-eval' https://cdn.logrocket.io https://cdn.lr-ingest.io https://cdn.lr-in.com https://js.stripe.com ${hash}`,
+    `script-src 'self' 'unsafe-eval' https://cdn.logrocket.io https://cdn.lr-ingest.io https://cdn.lr-in.com https://js.stripe.com ${hash} nonce-${hash}`,
     `form-action https://${authHost}`,
 
     // From vercel's CSP config and Google fonts
-    `font-src 'self' data: https://fonts.gstatic.com`,
+    `font-src 'self' data: https://fonts.gstatic.com nonce-${hash}`,
     // Google fonts
-    `style-src-elem 'self' 'unsafe-inline' https://fonts.gstatic.com`,
+    `style-src-elem 'self' 'unsafe-inline' https://fonts.gstatic.com nonce-${hash}`,
     // Required by LogRocket
     `child-src 'self' blob:`,
     `worker-src 'self' blob:`,
 
     // Required by some of our external services
-    `style-src 'self' 'unsafe-inline'`,
+    `style-src 'self' nonce-${hash} 'unsafe-inline'`,
 
     // Required to inline images from the database and from external avaters
     `img-src 'self' data: https:`,
