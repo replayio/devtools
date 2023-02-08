@@ -186,6 +186,8 @@
   --tooltip-bgcolor: var(--theme-base-85);
   --tooltip-color: #fff;
 
+  --event-row-hover-background-color: rgba(8, 17, 32, 0.5);
+
   --background-color-contrast-1: #0e1119;
   --background-color-contrast-2: #192230;
   --background-color-contrast-3: #2a3343;
@@ -677,6 +679,8 @@
   --theme-text-field-color: var(--theme-body-color);
   --tooltip-bgcolor: #38383d;
   --tooltip-color: white;
+
+  --event-row-hover-background-color: rgba(232, 234, 237, 0.5);
 
   --background-color-contrast-1: #e6e6e6;
   --background-color-contrast-2: #ffffff;
