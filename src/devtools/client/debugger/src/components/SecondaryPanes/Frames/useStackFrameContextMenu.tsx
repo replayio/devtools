@@ -10,7 +10,6 @@ import { getFrameStepForFrameLocation } from "replay-next/src/suspense/FrameStep
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { setFocusRegionBeginTime, setFocusRegionEndTime } from "ui/actions/timeline";
 import { seek } from "ui/actions/timeline";
-import FigmaIcon from "ui/components/shared/Icon";
 import { useAppDispatch } from "ui/setup/hooks";
 
 interface StackFrameContextMenuOptions {
@@ -70,7 +69,7 @@ export function useStackFrameContextMenu({
       <>
         <ContextMenuItem dataTestId="CallStackContextMenu-CopySourceUri" onClick={copySourceUri}>
           <>
-            <FigmaIcon filename="copy" />
+            <Icon type="copy" />
             Copy source URI
           </>
         </ContextMenuItem>
@@ -111,7 +110,7 @@ export function useStackFrameContextMenu({
       </ContextMenuItem>
       <ContextMenuItem dataTestId="CallStackContextMenu-CopyStackTrace" onClick={copyStackTrace}>
         <>
-          <FigmaIcon filename="copy" className="bg-bodyColor" />
+          <Icon type="copy" />
           Copy stack trace
         </>
       </ContextMenuItem>

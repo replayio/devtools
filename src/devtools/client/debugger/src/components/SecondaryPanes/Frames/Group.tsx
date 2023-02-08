@@ -3,7 +3,6 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import classNames from "classnames";
-//
 import React, { useState } from "react";
 
 import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
@@ -13,7 +12,6 @@ import AccessibleImage from "../../shared/AccessibleImage";
 import Badge from "../../shared/Badge";
 import { FrameComponent } from "./Frame";
 import FrameIndent from "./FrameIndent";
-import FrameMenu from "./FrameMenu";
 import type { CommonFrameComponentProps } from "./index";
 import { useStackFrameContextMenu } from "./useStackFrameContextMenu";
 

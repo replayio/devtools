@@ -8,6 +8,15 @@
 import React, { Component } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { focusItem, setExpandedState } from "devtools/client/debugger/src/actions/source-tree";
+import { selectSource } from "devtools/client/debugger/src/actions/sources/select";
+// Selectors
+import { getContext } from "devtools/client/debugger/src/reducers/pause";
+import {
+  getExpandedState,
+  getFocusedSourceItem,
+} from "devtools/client/debugger/src/reducers/source-tree";
+import { getShownSource } from "devtools/client/debugger/src/reducers/ui";
 import {
   SourceDetails,
   getSelectedSource,
@@ -18,15 +27,6 @@ import {
 import type { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 
-// Actions
-import actions from "../../actions";
-// Selectors
-import {
-  getContext,
-  getExpandedState,
-  getFocusedSourceItem,
-  getShownSource,
-} from "../../selectors";
 // Utils
 import {
   SourcesMap,
@@ -37,8 +37,8 @@ import {
   nodeHasChildren,
   updateTree,
 } from "../../utils/sources-tree";
-import { TreeDirectory, TreeNode, TreeSource } from "../../utils/sources-tree/types";
-import ManagedTree, { ManagedTreeProps } from "../shared/ManagedTree";
+import { TreeDirectory, TreeNode } from "../../utils/sources-tree/types";
+import ManagedTree from "../shared/ManagedTree";
 // Components
 import SourcesTreeItem from "./SourcesTreeItem";
 
@@ -77,9 +77,9 @@ const mapStateToProps = (state: UIState) => {
 };
 
 const connector = connect(mapStateToProps, {
-  selectSource: actions.selectSource,
-  setExpandedState: actions.setExpandedState,
-  focusItem: actions.focusItem,
+  selectSource,
+  setExpandedState,
+  focusItem,
 });
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
