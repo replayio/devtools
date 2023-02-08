@@ -44,7 +44,7 @@ export default function Expandable({
   useBlockLayoutWhenExpanded?: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
-  const { isExpanded, setIsExpanded } = useContext(ExpandablesContext);
+  const { isExpanded, persistIsExpanded } = useContext(ExpandablesContext);
   if (persistenceKey !== undefined) {
     defaultOpen = isExpanded(persistenceKey) ?? defaultOpen;
   }
@@ -68,7 +68,7 @@ export default function Expandable({
       onChange(newIsOpen);
       setIsOpen(newIsOpen);
       if (persistenceKey !== undefined) {
-        setIsExpanded(persistenceKey, newIsOpen);
+        persistIsExpanded(persistenceKey, newIsOpen);
       }
     });
   };
@@ -84,7 +84,7 @@ export default function Expandable({
         onChange(newIsOpen);
         setIsOpen(newIsOpen);
         if (persistenceKey !== undefined) {
-          setIsExpanded(persistenceKey, newIsOpen);
+          persistIsExpanded(persistenceKey, newIsOpen);
         }
         break;
     }

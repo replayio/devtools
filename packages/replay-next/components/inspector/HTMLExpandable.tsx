@@ -35,7 +35,7 @@ export default function HTMLExpandable({
   pauseId: ProtocolPauseId;
   protocolValue: ProtocolValue;
 }) {
-  const { isExpanded, setIsExpanded } = useContext(ExpandablesContext);
+  const { isExpanded, persistIsExpanded } = useContext(ExpandablesContext);
   if (path !== undefined) {
     defaultOpen = isExpanded(path) ?? defaultOpen;
   }
@@ -45,7 +45,7 @@ export default function HTMLExpandable({
     event.stopPropagation();
     setIsOpen(!isOpen);
     if (path !== undefined) {
-      setIsExpanded(path, !isOpen);
+      persistIsExpanded(path, !isOpen);
     }
   };
 
