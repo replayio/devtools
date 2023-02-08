@@ -20,7 +20,7 @@ function CurrentTimeLine({ isActive }: { isActive: boolean }) {
   );
 }
 
-function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
+function Events({ currentTime, events, executionPoint, seek, showToast }: PropsFromRedux) {
   const { userSettings } = hooks.useGetUserSettings();
 
   const onSeek = (point: string, time: number) => {
@@ -45,6 +45,7 @@ function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
                   event={e}
                   currentTime={currentTime}
                   executionPoint={executionPoint}
+                  showToast={showToast}
                 />
               </div>
             </div>
