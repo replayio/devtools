@@ -29,6 +29,7 @@ import { getFormattedTime } from "ui/utils/timeline";
 
 import MaterialIcon from "../shared/MaterialIcon";
 import { getReplayEvent } from "./eventKinds";
+import styles from "./Event.module.css";
 
 const EVENTS_FOR_RECORDING_TARGET: Partial<
   Record<RecordingTarget, Record<SEARCHABLE_EVENT_TYPES, string>>
@@ -85,6 +86,7 @@ type EventProps = {
   event: ReplayEvent;
   executionPoint: any;
   onSeek: (point: string, time: number) => void;
+  showToast: any;
 };
 
 export const getEventLabel = (event: ReplayEvent) => {
@@ -138,7 +140,8 @@ inside that function is running, then seek to that point in time, but skipping f
 */
 function jumpToClickEventFunctionLocation(
   event: ReplayMouseEvent | ReplayKeyboardEvent,
-  onSeek: (point: ExecutionPoint, time: number) => void
+  onSeek: (point: ExecutionPoint, time: number) => void,
+  showToast: () => void
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const { point: executionPoint, time } = event;
@@ -196,6 +199,8 @@ function jumpToClickEventFunctionLocation(
         // Open the source file and jump to the line of this function.
         // NOTE: this is the _definition_ line,  _not_ the first _executing_ line!
         dispatch(selectLocation(cx, sourceLocation));
+      } else {
+        showToast();
       }
     } catch (err) {
       // Let's just swallow this silently for now
@@ -203,7 +208,13 @@ function jumpToClickEventFunctionLocation(
   };
 }
 
-export default function Event({ currentTime, executionPoint, event, onSeek }: EventProps) {
+export default function Event({
+  currentTime,
+  executionPoint,
+  event,
+  onSeek,
+  showToast,
+}: EventProps) {
   const dispatch = useAppDispatch();
   const { kind, point, time } = event;
   const isPaused = time === currentTime && executionPoint === point;
@@ -225,7 +236,7 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
     onSeek(point, time);
 
     if (event.kind === "mousedown" || event.kind === "keypress") {
-      dispatch(jumpToClickEventFunctionLocation(event, onSeek));
+      dispatch(jumpToClickEventFunctionLocation(event, onSeek, showToast));
     }
   };
 
@@ -239,9 +250,8 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
   return (
     <>
       <div
-        className={classNames(
-          "event user-select-none mb-1 mt-1 flex flex-row items-center justify-between",
-          "group block w-full cursor-pointer rounded-full py-1 pl-4 pr-1 hover:bg-themeMenuHighlight focus:outline-none",
+        className={classNames(styles.eventRow,
+          "group block w-full",
           {
             "text-lightGrey": currentTime < time,
             "font-semibold text-primaryAccent": isPaused,
