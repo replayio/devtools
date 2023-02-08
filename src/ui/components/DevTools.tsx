@@ -38,6 +38,7 @@ import FocusContextReduxAdapter from "./FocusContextReduxAdapter";
 import Header from "./Header/index";
 import KeyboardShortcuts from "./KeyboardShortcuts";
 import { KeyModifiers } from "./KeyModifiers";
+import LayoutContextAdapter from "./LayoutContextAdapter";
 import TimelineContextAdapter from "./SecondaryToolbox/TimelineContextAdapter";
 import SelectedFrameContextAdapter from "./SelectedFrameContextAdapter";
 import SessionContextAdapter from "./SessionContextAdapter";
@@ -230,12 +231,14 @@ function _DevTools({
                 <TerminalContextAdapter>
                   <InspectorContextReduxAdapter>
                     <ExpandablesContextRoot>
-                      <KeyModifiers>
-                        <Header />
-                        <Body />
-                        {showCommandPalette ? <CommandPaletteModal /> : null}
-                        <KeyboardShortcuts />
-                      </KeyModifiers>
+                      <LayoutContextAdapter>
+                        <KeyModifiers>
+                          <Header />
+                          <Body />
+                          {showCommandPalette ? <CommandPaletteModal /> : null}
+                          <KeyboardShortcuts />
+                        </KeyModifiers>
+                      </LayoutContextAdapter>
                     </ExpandablesContextRoot>
                   </InspectorContextReduxAdapter>
                 </TerminalContextAdapter>
