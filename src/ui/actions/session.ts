@@ -33,7 +33,7 @@ import {
 } from "ui/reducers/protocolMessages";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import { extractGraphQLError } from "ui/utils/apolloClient";
-import { isMock, isTest } from "ui/utils/environment";
+import { getPausePointParams, isMock, isTest } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
 import { endMixpanelSession } from "ui/utils/mixpanel";
 import { features, prefs } from "ui/utils/prefs";
@@ -43,7 +43,7 @@ import { subscriptionExpired } from "ui/utils/workspace";
 
 import { setExpectedError, setUnexpectedError } from "./errors";
 import { setViewMode } from "./layout";
-import { getInitialPausePoint, jumpToInitialPausePoint } from "./timeline";
+import { jumpToInitialPausePoint } from "./timeline";
 
 export { setUnexpectedError, setExpectedError };
 
@@ -231,12 +231,7 @@ export function createSocket(
         }
       }
 
-      const initialPausePoint = await getInitialPausePoint(ThreadFront.recordingId!);
-      const focusRegion =
-        initialPausePoint && "focusRegion" in initialPausePoint
-          ? initialPausePoint.focusRegion
-          : undefined;
-
+      const focusRegion = getPausePointParams()?.focusRegion;
       const focusRange = focusRegion
         ? {
             begin: focusRegion.begin.time,
