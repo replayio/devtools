@@ -9,11 +9,13 @@ import { addPathSegment } from "./PropertiesRenderer";
 import styles from "./ScopesInspector.module.css";
 
 export default function ScopesInspector({
+  expandByDefault,
   name,
   path,
   pauseId,
   protocolValues,
 }: {
+  expandByDefault?: boolean;
   name: string;
   path?: string;
   pauseId: PauseId;
@@ -33,6 +35,7 @@ export default function ScopesInspector({
               protocolValue={protocolValue}
             />
           ))}
+          defaultOpen={expandByDefault}
           header={name}
           persistenceKey={path}
         />
