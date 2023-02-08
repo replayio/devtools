@@ -195,15 +195,18 @@ function jumpToClickEventFunctionLocation(
       );
 
       if (sourceLocation) {
+        console.log('Something found');
         const cx = getThreadContext(getState());
         // Open the source file and jump to the line of this function.
         // NOTE: this is the _definition_ line,  _not_ the first _executing_ line!
         dispatch(selectLocation(cx, sourceLocation));
       } else {
-        showToast();
+        // showToast();
+        console.log('Nothing found');
       }
     } catch (err) {
       // Let's just swallow this silently for now
+      console.log('Error');
     }
   };
 }
