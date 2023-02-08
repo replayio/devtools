@@ -259,11 +259,11 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
             onMouseLeave={() => setIsHovered(false)}
             className={`${
               isHovered ? "h-6 px-2 shadow-sm" : "h-6 w-6"
-            } flex items-center justify-center rounded-full bg-primaryAccent transition-all duration-100 ease-out`}
+            } flex items-center justify-center rounded-full bg-primaryAccent transition-width duration-100 ease-out`}
           >
             <div className="flex items-center space-x-1">
-              <Icon type={timeLabel} className="w-3.5 text-white" />
               {isHovered && <span className="truncate text-white ">Jump to code</span>}
+              <Icon type={timeLabel} className="w-3.5 text-white" />              
             </div>
           </div>
         </div>
