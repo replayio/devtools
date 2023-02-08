@@ -7,6 +7,9 @@
 import classnames from "classnames";
 import React, { Component, useLayoutEffect, useRef } from "react";
 
+import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
+import useContextMenu from "replay-next/components/context-menu/useContextMenu";
+import Icon from "replay-next/components/Icon";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { Redacted } from "ui/components/Redacted";
 import type { SourceDetails } from "ui/reducers/sources";
@@ -29,7 +32,7 @@ interface STIProps {
   selectItem: (item: TreeNode) => void;
   source: SourceDetails;
   debuggeeUrl: string;
-  setExpanded: (item: TreeNode, a: boolean, b: boolean) => void;
+  setExpanded: (item: TreeNode, isExpanded: boolean) => void;
 }
 
 function getItemName(item: TreeNode) {
@@ -71,6 +74,65 @@ function SourceTreeIcon({ item, source, depth }: TreeIconProps) {
   return null;
 }
 
+function useSourceTreeItemContextMenu({
+  item,
+  setExpanded,
+  source,
+}: Pick<STIProps, "item" | "setExpanded" | "source">) {
+  let menuItems: React.ReactNode = null;
+
+  if (isDirectory(item)) {
+    const expandAll = () => {
+      setExpanded(item, true);
+    };
+    const collapseAll = () => {
+      setExpanded(item, false);
+    };
+    menuItems = (
+      <>
+        <ContextMenuItem dataTestId="SourceTreeItemContextMenu-ExpandAll" onClick={expandAll}>
+          <>
+            <Icon type="chevron-down" />
+            Expand all
+          </>
+        </ContextMenuItem>
+        <ContextMenuItem dataTestId="SourceTreeItemContextMenu-CollapseAll" onClick={collapseAll}>
+          <>
+            <Icon type="chevron-right" />
+            Collapse all
+          </>
+        </ContextMenuItem>
+      </>
+    );
+  } else {
+    const { contents } = item;
+
+    if (!Array.isArray(contents)) {
+      if (source) {
+        const copySourceUri = () => {
+          if (source?.url) {
+            copyToClipboard(source.url);
+          }
+        };
+
+        menuItems = (
+          <ContextMenuItem
+            dataTestId="SourceTreeItemContextMenu-CopySourceUri"
+            onClick={copySourceUri}
+          >
+            <>
+              <Icon type="copy" />
+              Copy source URI
+            </>
+          </ContextMenuItem>
+        );
+      }
+    }
+  }
+
+  return useContextMenu(<>{menuItems}</>);
+}
+
 function SourceTreeItem2({
   autoExpand,
   item,
@@ -84,11 +146,22 @@ function SourceTreeItem2({
 }: STIProps) {
   const hasSiblingOfSameName = useAppSelector(state => getHasSiblingOfSameName(state, source));
 
+  const { contextMenu, onContextMenu } = useSourceTreeItemContextMenu({
+    item,
+    source,
+    setExpanded,
+  });
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    onContextMenu(e);
+    e.stopPropagation();
+  };
+
   const isFirstMountRef = useRef(true);
 
   useLayoutEffect(() => {
     if (autoExpand && isFirstMountRef.current) {
-      setExpanded(item, true, false);
+      setExpanded(item, true);
     }
 
     isFirstMountRef.current = false;
@@ -120,22 +193,25 @@ function SourceTreeItem2({
   );
 
   return (
-    <div
-      className={classnames("node", { focused })}
-      data-item-name={`SourceTreeItem-${item.name.replace(/ /g, "")}`}
-      key={item.path}
-      onClick={onClick}
-      // onContextMenu={e => this.onContextMenu(e, item)}
-      title={tooltip}
-    >
-      {itemArrow}
-      <SourceTreeIcon source={source} depth={depth} item={item} />
+    <>
+      <div
+        className={classnames("node", { focused })}
+        data-item-name={`SourceTreeItem-${item.name.replace(/ /g, "")}`}
+        key={item.path}
+        onClick={onClick}
+        onContextMenu={handleContextMenu}
+        title={tooltip}
+      >
+        {itemArrow}
+        <SourceTreeIcon source={source} depth={depth} item={item} />
 
-      <Redacted className="label">
-        {getItemName(item)}
-        {query}
-      </Redacted>
-    </div>
+        <Redacted className="label">
+          {getItemName(item)}
+          {query}
+        </Redacted>
+      </div>
+      {contextMenu}
+    </>
   );
 }
 
