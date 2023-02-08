@@ -61,6 +61,7 @@ function ScopesRenderer() {
       <div className={`${styles.Popup} preview-popup`}>
         {scopes.map((scope, scopeIndex) => (
           <Scope
+            expandByDefault={scopeIndex === 0}
             key={scopeIndex}
             path={`${path}/${scopeIndex}`}
             pauseId={selectedFrameId.pauseId}
@@ -73,10 +74,12 @@ function ScopesRenderer() {
 }
 
 function Scope({
+  expandByDefault,
   path,
   pauseId,
   scope,
 }: {
+  expandByDefault?: boolean;
   path?: string;
   pauseId: PauseId;
   scope: ConvertedScope;
@@ -85,6 +88,7 @@ function Scope({
     return (
       <Inspector
         context="default"
+        expandByDefault={expandByDefault}
         path={path}
         pauseId={pauseId}
         protocolValue={{ object: scope.objectId, name: scope.title } as Value}
@@ -94,6 +98,7 @@ function Scope({
   if (scope.bindings) {
     return (
       <ScopesInspector
+        expandByDefault={expandByDefault}
         name={scope.title!}
         path={path}
         pauseId={pauseId}

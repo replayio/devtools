@@ -32,7 +32,6 @@ test(`object_preview-02: should allow objects in scope to be inspected`, async (
   const blockScope = getScopeChildren(page, "Block").first();
 
   // We should be able to expand the window and see its properties.
-  await openScopeBlocks(page, "Block");
   await toggleExpandable(page, {
     scope: blockScope,
     text: "this",
