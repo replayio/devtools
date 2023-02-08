@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-fs.readFile('main.js', 'utf-8', (err, data) => {
+fs.readFile('./node_modules/@replayio/replay/src/main.js', 'utf-8', (err, data) => {
     if (err) throw err;
 
     let newData = data.split('\n');
