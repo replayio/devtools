@@ -38,12 +38,7 @@ const EMPTY_OBJECT: PointBehaviorsObject = {};
 export const POINTS_DATABASE: IDBOptions = {
   databaseName: "Points",
   databaseVersion: 2,
-  storeNames: ["high-priority", "transition"],
-};
-export const POINT_BEHAVIORS_DATABASE: IDBOptions = {
-  databaseName: "PointBehaviors",
-  databaseVersion: 1,
-  storeNames: ["high-priority", "transition"],
+  storeNames: ["points", "point-behaviors"],
 };
 
 export type PointInstance = {
@@ -100,15 +95,15 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     database: POINTS_DATABASE,
     initialValue: EMPTY_ARRAY,
     recordName: recordingId,
-    storeName: "high-priority",
+    storeName: "points",
   });
 
   const { setValue: setPointBehaviors, value: pointBehaviors } = useIndexedDB<PointBehaviorsObject>(
     {
-      database: POINT_BEHAVIORS_DATABASE,
+      database: POINTS_DATABASE,
       initialValue: EMPTY_OBJECT,
       recordName: recordingId,
-      storeName: "high-priority",
+      storeName: "point-behaviors",
     }
   );
 
