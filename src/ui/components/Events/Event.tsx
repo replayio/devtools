@@ -4,16 +4,18 @@ import {
   MouseEvent as ReplayMouseEvent,
 } from "@replayio/protocol";
 import classNames from "classnames";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import { getFunctionBody } from "protocol/evaluation-utils";
 import type { ThreadFront as TF } from "protocol/thread";
 import { RecordingTarget } from "protocol/thread/thread";
+import Icon from "replay-next/components/Icon";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { EventLog, eventsMapper } from "replay-next/src/suspense/EventsCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
+import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import type { UIThunkAction } from "ui/actions";
@@ -25,7 +27,6 @@ import { useAppDispatch } from "ui/setup/hooks";
 import { ReplayEvent } from "ui/state/app";
 import { getFormattedTime } from "ui/utils/timeline";
 
-import Icon from "../shared/Icon";
 import MaterialIcon from "../shared/MaterialIcon";
 import { getReplayEvent } from "./eventKinds";
 
@@ -140,13 +141,6 @@ function jumpToClickEventFunctionLocation(
   onSeek: (point: ExecutionPoint, time: number) => void
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
-    const viewMode = getViewMode(getState());
-
-    if (viewMode === "non-dev") {
-      // Only try jumping to the location if "DevTools" mode is active
-      return;
-    }
-
     const { point: executionPoint, time } = event;
     try {
       // Actual browser click events get recorded a fraction later then the
@@ -213,7 +207,7 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
   const dispatch = useAppDispatch();
   const { kind, point, time } = event;
   const isPaused = time === currentTime && executionPoint === point;
-
+  const [isHovered, setIsHovered] = useState(false);
   const label = getEventLabel(event);
   const { icon } = getReplayEvent(kind);
 
@@ -237,12 +231,17 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
 
   const { contextMenu, onContextMenu } = useEventContextMenu(event);
 
+  const timeLabel =
+    executionPoint === null || isExecutionPointsGreaterThan(event.point, executionPoint)
+      ? "fast-forward"
+      : "rewind";
+
   return (
     <>
       <div
         className={classNames(
           "event user-select-none mb-1 mt-1 flex flex-row items-center justify-between",
-          "group block w-full cursor-pointer rounded-lg py-1 pl-4 pr-2 hover:bg-themeMenuHighlight focus:outline-none",
+          "group block w-full cursor-pointer rounded-full py-1 pl-4 pr-1 hover:bg-themeMenuHighlight focus:outline-none",
           {
             "text-lightGrey": currentTime < time,
             "font-semibold text-primaryAccent": isPaused,
@@ -256,19 +255,23 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
           <MaterialIcon iconSize="xl">{icon}</MaterialIcon>
           <Label>{label}</Label>
         </div>
-        <div className="flex space-x-2">
-          <div onClick={onClickJumpToCode}>
-            <Icon
-              filename="code"
-              className={classNames(
-                "bg-bodyColor hover:cursor-pointer hover:bg-primaryAccent",
-                {
-                  "bg-lightGrey": currentTime < time,
-                },
-                "small"
-              )}
-              size="small"
-            />
+        <div className="flex space-x-2 opacity-0 group-hover:opacity-100">
+          <div
+            onClick={onClickJumpToCode}
+            onMouseEnter={() => {
+              setIsHovered(true);
+            }}
+            onMouseLeave={() => {
+              setIsHovered(false);
+            }}
+            className={`${
+              isHovered ? "h-6 px-2 shadow-sm" : "h-6 w-6"
+            } flex items-center justify-center rounded-full bg-primaryAccent transition-all duration-100 ease-out`}
+          >
+            <div className="flex items-center space-x-1">
+              <Icon type={timeLabel} className="w-3.5 text-white" />
+              {isHovered && <span className="truncate text-white ">Jump to code</span>}
+            </div>
           </div>
         </div>
       </div>
