@@ -147,7 +147,7 @@ export function LoggablesContextRoot({
       if (pointBehavior?.shouldLog === POINT_BEHAVIOR_ENABLED) {
         const [hitPoints, status] = getHitPointsForLocationSuspense(
           client,
-          point.sourceLocation,
+          point.location,
           point.condition,
           focusRange
         );

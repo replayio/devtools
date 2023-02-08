@@ -184,7 +184,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
         createdAt: new Date(),
         key,
         recordingId,
-        sourceLocation: { ...location },
+        location,
         user: currentUserInfo,
         ...partialPoint,
       };
@@ -197,7 +197,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       };
 
       setLocalPoints((prevPoints: Point[]) => {
-        const index = sortedIndexBy(prevPoints, point, ({ sourceLocation }) => sourceLocation.line);
+        const index = sortedIndexBy(prevPoints, point, ({ location }) => location.line);
         return prevPoints.slice(0, index).concat([point], prevPoints.slice(index));
       });
       setPointBehaviors(prev => {
@@ -340,14 +340,14 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
 }
 
 function comparePoints(pointA: Point, pointB: Point): number {
-  const sourceLocationA = pointA.sourceLocation;
-  const sourceLocationB = pointB.sourceLocation;
-  if (sourceLocationA.sourceId !== sourceLocationB.sourceId) {
-    return sourceLocationA.sourceId.localeCompare(sourceLocationB.sourceId);
-  } else if (sourceLocationA.line !== sourceLocationB.line) {
-    return sourceLocationA.line - sourceLocationB.line;
-  } else if (sourceLocationA.column !== sourceLocationB.column) {
-    return sourceLocationA.column - sourceLocationB.column;
+  const locationA = pointA.location;
+  const locationB = pointB.location;
+  if (locationA.sourceId !== locationB.sourceId) {
+    return locationA.sourceId.localeCompare(locationB.sourceId);
+  } else if (locationA.line !== locationB.line) {
+    return locationA.line - locationB.line;
+  } else if (locationA.column !== locationB.column) {
+    return locationA.column - locationB.column;
   } else {
     return pointA.createdAt.getTime() - pointB.createdAt.getTime();
   }

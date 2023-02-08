@@ -57,7 +57,7 @@ function LogPointRenderer({
   }
 
   const locations = useMemo<Location[]>(
-    () => [logPointInstance.point.sourceLocation],
+    () => [logPointInstance.point.location],
     [logPointInstance.point]
   );
 
@@ -135,7 +135,7 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
   const analysisResults = runAnalysisSuspense(
     client,
     pointRange,
-    point.sourceLocation,
+    point.location,
     point.content,
     point.condition
   );

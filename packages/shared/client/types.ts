@@ -101,8 +101,8 @@ export type Point = {
 
   // These attributes are fixed after Point creation
   createdAt: Date;
+  location: Location;
   recordingId: RecordingId;
-  sourceLocation: Location;
   user: PartialUser | null;
 
   // These attributes are editable, although only by the Point's owner

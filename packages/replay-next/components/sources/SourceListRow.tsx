@@ -217,7 +217,7 @@ const SourceListRow = memo(
           }
 
           const firstPoint =
-            pointsForLine.find(point => point.sourceLocation.column === columnIndex) ?? null;
+            pointsForLine.find(point => point.location.column === columnIndex) ?? null;
           const pointBehavior = firstPoint ? pointBehaviors[firstPoint.key] ?? null : null;
 
           lineSegments.push(
@@ -228,9 +228,7 @@ const SourceListRow = memo(
               editPointBehavior={editPointBehavior}
               key={lineSegments.length}
               lineNumber={lineNumber}
-              point={
-                pointsForLine.find(point => point.sourceLocation.column === columnIndex) ?? null
-              }
+              point={pointsForLine.find(point => point.location.column === columnIndex) ?? null}
               pointBehavior={pointBehavior}
               sourceId={sourceId}
             />

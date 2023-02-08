@@ -47,7 +47,7 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
 
   getLabel() {
     const { breakpoint, source, hasSiblingOfSameName } = this.props;
-    const { column, line } = breakpoint?.sourceLocation ?? {};
+    const { column, line } = breakpoint?.location ?? {};
 
     const columnVal = features.columnBreakpoints && column != null ? `:${column}` : "";
     const location = `:${line}${columnVal}`;

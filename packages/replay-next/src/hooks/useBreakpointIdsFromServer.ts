@@ -51,8 +51,8 @@ export default function useBreakpointIdsFromServer(
           const pointsToRemove: string[] = [];
 
           for (let point of points) {
-            const { key, sourceLocation } = point;
-            const { column, line, sourceId } = sourceLocation;
+            const { key, location } = point;
+            const { column, line, sourceId } = location;
 
             const pointBehavior = pointBehaviors[key];
 
@@ -91,8 +91,8 @@ export default function useBreakpointIdsFromServer(
           // The user has probably been interacting with the app and we _should_ have breakable positions
           // for these files already.
           points.forEach(point => {
-            const { key, sourceLocation } = point;
-            const { column, line, sourceId } = sourceLocation;
+            const { key } = point;
+            const { column, line, sourceId } = point.location;
 
             const location: Location = {
               column,

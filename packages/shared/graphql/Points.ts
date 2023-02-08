@@ -63,12 +63,12 @@ export async function addPoint(
   accessToken: string,
   point: ClientPoint
 ) {
-  const { createdAt, sourceLocation, user, ...rest } = point;
+  const { createdAt, location, user, ...rest } = point;
   const input: AddPointInput = {
     sourceLocation: {
-      column: sourceLocation.column,
-      line: sourceLocation.line,
-      source_id: sourceLocation.sourceId,
+      column: location.column,
+      line: location.line,
+      source_id: location.sourceId,
     },
     ...rest,
   };
@@ -129,12 +129,12 @@ export async function getPoints(
         content: point.content!,
         createdAt: new Date(point.createdAt),
         key: point.key,
-        recordingId,
-        sourceLocation: {
+        location: {
           column: point.sourceLocation.column,
           line: point.sourceLocation.line,
           sourceId: point.sourceLocation.source_id,
         },
+        recordingId,
         user: point.user,
       };
     }) ?? []

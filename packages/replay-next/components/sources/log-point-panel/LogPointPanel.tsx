@@ -92,7 +92,7 @@ function PointPanel(props: ExternalProps) {
 
   const [hitPoints, hitPointStatus] = getHitPointsForLocationSuspense(
     client,
-    point.sourceLocation,
+    point.location,
     point.condition,
     focusRange
   );
@@ -146,7 +146,7 @@ function PointPanelWithHitPoints({
   );
   const hasChanged = editableCondition !== point.condition || editableContent !== point.content;
 
-  const lineNumber = point.sourceLocation.line;
+  const lineNumber = point.location.line;
 
   // Log point code suggestions should always be relative to location of the the point panel.
   // This is a more intuitive experience than using the current execution point,
@@ -179,11 +179,11 @@ function PointPanelWithHitPoints({
     console.error(`Failed to fetch frames for point ${executionPoint}`, errorOrPromise);
   }
 
-  let source = getSource(client, point.sourceLocation.sourceId);
+  let source = getSource(client, point.location.sourceId);
   if (source?.kind === "prettyPrinted") {
     assert(
       source.generatedSourceIds,
-      `pretty-printed source ${point.sourceLocation.sourceId} has no generatedSourceIds`
+      `pretty-printed source ${point.location.sourceId} has no generatedSourceIds`
     );
     source = getSource(client, source.generatedSourceIds[0]);
   }
@@ -194,7 +194,7 @@ function PointPanelWithHitPoints({
   const shouldLog = pointBehavior?.shouldLog === POINT_BEHAVIOR_ENABLED;
 
   const hasCondition = isEditing ? editableCondition !== null : point.condition !== null;
-  const lineIndex = point.sourceLocation.line - 1;
+  const lineIndex = point.location.line - 1;
 
   const toggleCondition = () => {
     if (!editable) {
@@ -259,9 +259,9 @@ function PointPanelWithHitPoints({
 
       const typeData = await createTypeDataForSourceCodeComment(
         client,
-        point.sourceLocation.sourceId,
-        point.sourceLocation.line,
-        point.sourceLocation.column
+        point.location.sourceId,
+        point.location.line,
+        point.location.column
       );
 
       await addCommentGraphQL(graphQLClient, accessToken, recordingId, {

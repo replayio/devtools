@@ -33,7 +33,7 @@ export default function Breakpoints({
           // Either we might not have sources fetched yet,
           // or there could be obsolete persisted source IDs for points.
           // Ensure we only show points that have valid sources available.
-          const sourceExists = !!sourceDetailsEntities[point.sourceLocation.sourceId];
+          const sourceExists = !!sourceDetailsEntities[point.location.sourceId];
 
           const { shouldBreak, shouldLog } = pointBehaviors[point.key] ?? {};
 
@@ -45,16 +45,16 @@ export default function Breakpoints({
 
           return sourceExists && matchesType;
         })
-        .sort((a, b) => a.sourceLocation.line - b.sourceLocation.line),
+        .sort((a, b) => a.location.line - b.location.line),
     [currentUserInfo, pointBehaviors, points, type, sourceDetailsEntities]
   );
 
   const sourceIdToPointsMap = useMemo(() => {
     return filteredAndSortedPoints.reduce((map: SourceIdToPointsMap, point) => {
-      if (!map.hasOwnProperty(point.sourceLocation.sourceId)) {
-        map[point.sourceLocation.sourceId] = [point];
+      if (!map.hasOwnProperty(point.location.sourceId)) {
+        map[point.location.sourceId] = [point];
       } else {
-        map[point.sourceLocation.sourceId].push(point);
+        map[point.location.sourceId].push(point);
       }
       return map;
     }, {});
