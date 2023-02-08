@@ -86,7 +86,6 @@ type EventProps = {
   event: ReplayEvent;
   executionPoint: any;
   onSeek: (point: string, time: number) => void;
-  showToast: any;
 };
 
 export const getEventLabel = (event: ReplayEvent) => {
@@ -140,8 +139,7 @@ inside that function is running, then seek to that point in time, but skipping f
 */
 function jumpToClickEventFunctionLocation(
   event: ReplayMouseEvent | ReplayKeyboardEvent,
-  onSeek: (point: ExecutionPoint, time: number) => void,
-  showToast: () => void
+  onSeek: (point: ExecutionPoint, time: number) => void
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const { point: executionPoint, time } = event;
@@ -195,29 +193,18 @@ function jumpToClickEventFunctionLocation(
       );
 
       if (sourceLocation) {
-        console.log('Something found');
         const cx = getThreadContext(getState());
         // Open the source file and jump to the line of this function.
         // NOTE: this is the _definition_ line,  _not_ the first _executing_ line!
         dispatch(selectLocation(cx, sourceLocation));
-      } else {
-        // showToast();
-        console.log('Nothing found');
       }
     } catch (err) {
       // Let's just swallow this silently for now
-      console.log('Error');
     }
   };
 }
 
-export default function Event({
-  currentTime,
-  executionPoint,
-  event,
-  onSeek,
-  showToast,
-}: EventProps) {
+export default function Event({ currentTime, executionPoint, event, onSeek }: EventProps) {
   const dispatch = useAppDispatch();
   const { kind, point, time } = event;
   const isPaused = time === currentTime && executionPoint === point;
@@ -239,7 +226,7 @@ export default function Event({
     onSeek(point, time);
 
     if (event.kind === "mousedown" || event.kind === "keypress") {
-      dispatch(jumpToClickEventFunctionLocation(event, onSeek, showToast));
+      dispatch(jumpToClickEventFunctionLocation(event, onSeek));
     }
   };
 
@@ -253,13 +240,10 @@ export default function Event({
   return (
     <>
       <div
-        className={classNames(styles.eventRow,
-          "group block w-full",
-          {
-            "text-lightGrey": currentTime < time,
-            "font-semibold text-primaryAccent": isPaused,
-          }
-        )}
+        className={classNames(styles.eventRow, "group block w-full", {
+          "text-lightGrey": currentTime < time,
+          "font-semibold text-primaryAccent": isPaused,
+        })}
         onClick={onClickSeek}
         onContextMenu={onContextMenu}
         onKeyDown={onKeyDown}
@@ -271,12 +255,8 @@ export default function Event({
         <div className="flex space-x-2 opacity-0 group-hover:opacity-100">
           <div
             onClick={onClickJumpToCode}
-            onMouseEnter={() => {
-              setIsHovered(true);
-            }}
-            onMouseLeave={() => {
-              setIsHovered(false);
-            }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
             className={`${
               isHovered ? "h-6 px-2 shadow-sm" : "h-6 w-6"
             } flex items-center justify-center rounded-full bg-primaryAccent transition-all duration-100 ease-out`}

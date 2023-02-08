@@ -30,3 +30,4 @@ storybook-static/
 test/.yarn/cache/
 *.mp4
 videos/
+.vercel

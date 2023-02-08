@@ -20,9 +20,7 @@ function CurrentTimeLine({ isActive }: { isActive: boolean }) {
   );
 }
 
-function Events({ currentTime, events, executionPoint, seek, showToast }: PropsFromRedux) {
-  const { userSettings } = hooks.useGetUserSettings();
-
+function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
   const onSeek = (point: string, time: number) => {
     trackEvent("events_timeline.select");
     seek(point, time, false);
@@ -45,7 +43,6 @@ function Events({ currentTime, events, executionPoint, seek, showToast }: PropsF
                   event={e}
                   currentTime={currentTime}
                   executionPoint={executionPoint}
-                  showToast={showToast}
                 />
               </div>
             </div>
