@@ -95,6 +95,8 @@ export function runAnalysisSuspense(
   }
 }
 
+export const runAnalysisAsync = createFetchAsyncFromFetchSuspense(runAnalysisSuspense);
+
 export function canRunLocalAnalysis(code: string): boolean {
   const tokens = jsTokens(code);
   // @ts-ignore
