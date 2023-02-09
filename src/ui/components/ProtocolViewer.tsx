@@ -1,3 +1,5 @@
+import { Tab as HeadlessTab } from "@headlessui/react";
+import classnames from "classnames";
 import dynamic from "next/dynamic";
 import React, {
   MutableRefObject,
@@ -9,6 +11,7 @@ import React, {
   useState,
 } from "react";
 
+import { Tab } from "devtools/client/shared/components/ResponsiveTabs";
 import { CommandResponse } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import Icon from "ui/components/shared/Icon";
@@ -17,6 +20,9 @@ import { useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserInfo } from "ui/hooks/users";
 import { getTheme } from "ui/reducers/app";
 import {
+  ProtocolErrorMap,
+  ProtocolRequestMap,
+  ProtocolResponseMap,
   Recorded,
   RequestSummary,
   getProtocolErrorMap,
@@ -207,14 +213,16 @@ function ProtocolRequestDetail({
   );
 }
 
-export default function ProtocolViewer() {
+interface ProtocolViewerProps {
+  errorMap: ProtocolErrorMap;
+  requestMap: ProtocolRequestMap;
+  responseMap: ProtocolResponseMap;
+}
+
+export function ProtocolViewer({ errorMap, requestMap, responseMap }: ProtocolViewerProps) {
   const [clearBeforeIndex, setClearBeforeIndex] = useState(0);
   const [filterText, setFilterText] = useState("");
   const deferredFilterText = useDeferredValue(filterText);
-
-  const errorMap = useAppSelector(getProtocolErrorMap);
-  const requestMap = useAppSelector(getProtocolRequestMap);
-  const responseMap = useAppSelector(getProtocolResponseMap);
 
   const [selectedChunk, setSelectedChunk] = useState<RequestSummaryChunk | null>(null);
 
@@ -444,3 +452,60 @@ function ProtocolChunk({
 }
 
 const ProtocolChunkMemo = React.memo(ProtocolChunk);
+
+export function LiveAppProtocolViewer() {
+  const errorMap = useAppSelector(getProtocolErrorMap);
+  const requestMap = useAppSelector(getProtocolRequestMap);
+  const responseMap = useAppSelector(getProtocolResponseMap);
+
+  return <ProtocolViewer errorMap={errorMap} requestMap={requestMap} responseMap={responseMap} />;
+}
+
+export function RecordedAppProtocolViewer() {
+  const [errorMap, requestMap, responseMap] = useMemo(() => {
+    return [{} as ProtocolErrorMap, {} as ProtocolRequestMap, {} as ProtocolResponseMap];
+  }, []);
+
+  return <ProtocolViewer errorMap={errorMap} requestMap={requestMap} responseMap={responseMap} />;
+}
+
+type ProtocolViewerTabs = "live" | "recorded";
+interface ProtocolTab {
+  id: ProtocolViewerTabs;
+  text: string;
+}
+const tabs: readonly ProtocolTab[] = [
+  { id: "live", text: "Live" },
+  { id: "recorded", text: "Recorded" },
+];
+
+export function ProtocolViewerPanel() {
+  return (
+    <div>
+      <div className="tabs">
+        <HeadlessTab.Group>
+          <HeadlessTab.List
+            className="tabs-navigation"
+            style={{
+              borderBottom: "1px solid var(--theme-splitter-color)",
+            }}
+          >
+            {tabs.map(tab => (
+              <HeadlessTab key={tab.id}>
+                {({ selected }) => {
+                  return <Tab id={tab.id} text={tab.text} active={selected} />;
+                }}
+              </HeadlessTab>
+            ))}
+          </HeadlessTab.List>
+          <HeadlessTab.Panels>
+            <HeadlessTab.Panel as={LiveAppProtocolViewer} />
+            <HeadlessTab.Panel as={RecordedAppProtocolViewer} />
+          </HeadlessTab.Panels>
+        </HeadlessTab.Group>
+      </div>
+    </div>
+  );
+}
+
+export default ProtocolViewerPanel;
