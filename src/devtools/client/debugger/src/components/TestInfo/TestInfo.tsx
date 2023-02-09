@@ -11,6 +11,7 @@ import ContextMenuWrapper from "./ContextMenu";
 import { StepDetails } from "./StepDetails";
 import { TestCase } from "./TestCase";
 import { TestInfoContextMenuContextRoot } from "./TestInfoContextMenuContext";
+import styles from "./TestInfo.module.css";
 
 type TestInfoContextType = {
   consoleProps?: ProtocolObject;
@@ -56,10 +57,10 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
       <TestInfoContextMenuContextRoot>
         <div className="flex flex-grow flex-col overflow-hidden">
           <div className="relative flex flex-grow flex-col space-y-1 overflow-auto border-t border-splitter px-2 pt-3">
-            {missingSteps ? (
-              <aside className="m-1 space-y-4 rounded-lg border border-amber-200 bg-amber-100 px-4 py-3">
+            {!missingSteps ? (
+              <aside className={styles.aside}>
                 <div>
-                  <strong>Hey there!</strong>
+                  <strong>👋 Hey there!</strong>
                 </div>
                 <div>
                   You seem to be missing test steps for this replay. You'll still be able to use the
