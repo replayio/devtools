@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 
 interface IconWithTooltipProps {
@@ -27,6 +27,12 @@ export default function IconWithTooltip({
     setHovered(false);
     clearTimeout(timeoutKey.current);
   };
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(timeoutKey.current);
+    };
+  }, []);
 
   return (
     <div className="icon-with-tooltip text-sm">

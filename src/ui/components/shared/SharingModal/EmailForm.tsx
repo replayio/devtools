@@ -1,6 +1,6 @@
 import { CheckCircleIcon, ExclamationCircleIcon, PaperAirplaneIcon } from "@heroicons/react/solid";
 import { RecordingId } from "@replayio/protocol";
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction, useState, useRef, useEffect } from "react";
 
 import hooks from "ui/hooks";
 import { validateEmail } from "ui/utils/helpers";
@@ -61,6 +61,7 @@ function AutocompleteAction({
 }
 
 export default function EmailForm({ recordingId }: { recordingId: RecordingId }) {
+  const timeOutID: any = useRef(null);
   const [inputValue, setInputValue] = useState("");
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [status, setStatus] = useState<ActionStatus>("pending");
@@ -76,7 +77,7 @@ export default function EmailForm({ recordingId }: { recordingId: RecordingId })
   );
 
   const delayedReset = () => {
-    setTimeout(() => {
+    timeOutID.current = setTimeout(() => {
       setStatus("pending");
       setShowAutocomplete(false);
       setInputValue("");
@@ -109,6 +110,12 @@ export default function EmailForm({ recordingId }: { recordingId: RecordingId })
     });
     setStatus("loading");
   };
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(timeOutID.current);
+    };
+  }, []);
 
   return (
     <form className="new-collaborator-form" onSubmit={handleSubmit}>

@@ -1,10 +1,11 @@
 import classNames from "classnames";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 
 import MaterialIcon from "../shared/MaterialIcon";
 import { RawBody } from "./content";
 
 const BodyDownload = ({ raw, filename }: { raw: RawBody; filename: string }) => {
+  const timeOutID: any = useRef(null);
   const [downloaded, setDownloaded] = useState(false);
   const dataURL = useMemo(
     () => URL.createObjectURL(new Blob([raw.content.buffer], { type: raw.contentType })),
@@ -12,7 +13,10 @@ const BodyDownload = ({ raw, filename }: { raw: RawBody; filename: string }) => 
   );
 
   useEffect(() => {
-    return () => URL.revokeObjectURL(dataURL);
+    return () => {
+      URL.revokeObjectURL(dataURL);
+      clearTimeout(timeOutID.current);
+    };
   }, [dataURL]);
 
   return (
@@ -24,7 +28,7 @@ const BodyDownload = ({ raw, filename }: { raw: RawBody; filename: string }) => 
       rel="noreferrer noopener"
       onClick={() => {
         setDownloaded(true);
-        setTimeout(() => {
+        timeOutID.current = setTimeout(() => {
           setDownloaded(false);
         }, 2000);
       }}

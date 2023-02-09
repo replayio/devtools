@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { motion } from "framer-motion";
-import type { ComponentProps, ReactNode } from "react";
+import type { ComponentProps, ReactNode, useEffect } from "react";
 import { Children, cloneElement, isValidElement, useRef, useState } from "react";
 
 import styles from "./Picker.module.css";
@@ -20,6 +20,7 @@ export function Picker<Values extends any>({
   style?: React.CSSProperties;
   title?: string;
 }) {
+  const timeOutID: any = useRef(null);
   const previousId = useRef(null);
   const transitioning = useRef(false);
   const [isActive, setIsActive] = useState(false);
@@ -28,6 +29,12 @@ export function Picker<Values extends any>({
     duration: isOpen ? 0.16 : 0.2,
     opacity: { duration: isOpen ? 0.1 : 0.04 },
   };
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(timeOutID.current);
+    };
+  }, []);
 
   return (
     <motion.div
@@ -85,7 +92,7 @@ export function Picker<Values extends any>({
             setIsActive(true);
           } else {
             /** Wait until the fill is finished animating before removing the active background color. */
-            setTimeout(() => {
+            timeOutID.current = setTimeout(() => {
               setIsActive(false);
               transitioning.current = false;
             }, transition.duration * 1000);

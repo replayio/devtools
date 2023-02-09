@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import type { MouseEventHandler } from "react";
-import { forwardRef, useRef, useState } from "react";
+import { forwardRef, useRef, useState, useEffect } from "react";
 import mergeRefs from "react-merge-refs";
 import { Transition } from "react-transition-group";
 
@@ -47,6 +47,12 @@ export const AddCommentButton = forwardRef<HTMLButtonElement, AddCommentButtonPr
       },
       className
     );
+
+    useEffect(() => {
+      return () => {
+        clearTimeout(hoverRef.current);
+      };
+    }, []);
 
     return (
       <div className={styles.Root}>

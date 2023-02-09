@@ -41,6 +41,7 @@ function unstable_getAuth0Token() {
 }
 
 class TokenManager {
+  private static timeOutID: any;
   auth0Client: Auth0ContextInterface | undefined;
   private deferredState = defer<TokenState>();
   private currentState?: TokenState;
@@ -109,7 +110,7 @@ class TokenManager {
               return;
             }
 
-            setTimeout(() => {
+            TokenManager.timeOutID = setTimeout(() => {
               if (apiKey) {
                 this.setExternalAuth(apiKey);
               } else if (
@@ -252,6 +253,11 @@ class TokenManager {
       0
     );
     this.refreshTimeout = window.setTimeout(() => this.update(true), refreshDelay);
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.refreshTimeout);
+    clearTimeout(TokenManager.timeOutID);
   }
 }
 

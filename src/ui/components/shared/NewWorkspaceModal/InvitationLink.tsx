@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 import { Workspace } from "shared/graphql/types";
 import hooks from "ui/hooks";
@@ -26,6 +26,12 @@ export function TextInputCopy({
     setShowCopied(true);
     timeoutKey.current = setTimeout(() => setShowCopied(false), 2000);
   };
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(timeoutKey.current);
+    };
+  }, []);
 
   return (
     <div className="relative flex w-full flex-col items-center p-0.5">

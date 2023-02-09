@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useState, useRef, useEffect } from "react";
 
 import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
 import {
@@ -25,6 +25,7 @@ function DropdownButton({ disabled, children }: { disabled?: boolean; children: 
 }
 
 export default function StatusDropdown() {
+  const timeOutID: any = useRef(null);
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId!);
   const [expanded, setExpanded] = useState(false);
@@ -36,6 +37,12 @@ export default function StatusDropdown() {
   }
 
   const isResolved = recording.resolution?.resolvedAt;
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(timeOutID.current);
+    };
+  }, []);
 
   return (
     <div className="rounded-md px-2 py-1">
@@ -68,7 +75,7 @@ export default function StatusDropdown() {
               setShowConfetti(true);
               setExpanded(false);
               setIsResolved(true);
-              setTimeout(() => setShowConfetti(false), 6000);
+              timeOutID.current = setTimeout(() => setShowConfetti(false), 6000);
             }}
           >
             <DropdownItemContent icon="resolved" selected={false}>

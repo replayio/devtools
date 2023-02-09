@@ -5,6 +5,12 @@ export default function useDebounceState<T>(
   callback: (value: T) => void,
   timeout = 500
 ): [T | undefined, (value: T) => void, (value: T) => void] {
+  useEffect(() => {
+    return () => {
+      clearTimeout(ref.current);
+    };
+  }, []);
+
   const [value, updateValue] = useState(original); // nosemgrep typescript.react.best-practice.react-props-in-state.react-props-in-state
   const ref = useRef<NodeJS.Timeout | undefined>();
 

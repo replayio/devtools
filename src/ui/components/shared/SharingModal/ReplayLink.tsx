@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 import { Recording } from "shared/graphql/types";
 import { getRecordingURL } from "ui/utils/recording";
@@ -23,6 +23,12 @@ export function CopyButton({ recording }: { recording: Recording }) {
     setShowCopied(true);
     timeoutKey.current = setTimeout(() => setShowCopied(false), 2000);
   };
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(timeoutKey.current);
+    };
+  }, []);
 
   return (
     <div className="copy-link relative flex flex-shrink-0 flex-col items-center">
@@ -55,6 +61,12 @@ export function UrlCopy({ url }: { url: string }) {
     setShowCopied(true);
     timeoutKey.current = setTimeout(() => setShowCopied(false), 2000);
   };
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(timeoutKey.current);
+    };
+  }, []);
 
   return (
     <div className="copy-link relative flex flex-col items-center">

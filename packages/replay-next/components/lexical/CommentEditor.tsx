@@ -155,18 +155,23 @@ export default function CommentEditor({
 
   // Toggle editor's enabled state when the prop changes.
   useEffect(() => {
+    let timeOutID: any = null;
     const editor = editorRef.current;
     if (editor != null) {
       if (editor.isEditable() !== editable) {
         editor.setEditable(editable);
 
         if (editable) {
-          setTimeout(() => {
+          timeOutID = setTimeout(() => {
             editor.focus();
           });
         }
       }
     }
+
+    return () => {
+      clearTimeout(timeOutID);
+    };
   }, [editable]);
 
   // Save a backup of the editor state in case we need to cancel/discard pending changes.

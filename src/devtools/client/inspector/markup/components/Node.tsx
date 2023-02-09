@@ -32,6 +32,7 @@ interface NodeProps {
 type FinalNodeProps = NodeProps & PropsFromRedux;
 
 class _Node extends PureComponent<FinalNodeProps> {
+  private static timeOutID: any;
   onExpanderToggle = (event: MouseEvent) => {
     event.stopPropagation();
     const { node } = this.props;
@@ -72,6 +73,7 @@ class _Node extends PureComponent<FinalNodeProps> {
       // Chrome sometimes ignores element.scrollIntoView() here,
       // calling it with a little delay fixes it
       setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "center" }));
+      _Node.timeOutID = setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "center" }));
     }
   };
 
@@ -208,6 +210,10 @@ class _Node extends PureComponent<FinalNodeProps> {
         {this.renderClosingTag()}
       </li>
     );
+  }
+
+  componentWillUnmount() {
+    clearTimeout(_Node.timeOutID);
   }
 }
 

@@ -82,6 +82,7 @@ function HeaderTitle({
   recording: Recording;
   recordingId: RecordingId;
 }) {
+  const timeOutID: any = useRef(null);
   const [editState, setEditState] = useState(EditState.Inactive);
   const contentEditableRef = useRef<HTMLSpanElement>(null);
   const updateRecordingTitle = hooks.useUpdateRecordingTitle();
@@ -104,6 +105,10 @@ function HeaderTitle({
     } else if (editState === EditState.Saving && !contentEditableRef.current.innerText) {
       contentEditableRef.current.innerText = "Untitled";
     }
+
+    return () => {
+      clearTimeout(timeOutID.current);
+    };
   }, [editState, hasTitle, title]);
 
   if (!canEditTitle) {
@@ -126,7 +131,7 @@ function HeaderTitle({
 
       // HACK
       // Waiting until the end of the microtask queue works around a selection bug in Safari.
-      setTimeout(() => {
+      timeOutID.current = setTimeout(() => {
         const selection = window.getSelection();
         if (selection) {
           const range = document.createRange();

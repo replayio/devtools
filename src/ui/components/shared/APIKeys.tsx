@@ -15,9 +15,14 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    let timeOutID: any = null;
     if (copied) {
-      setTimeout(() => setCopied(false), 2000);
+      timeOutID = setTimeout(() => setCopied(false), 2000);
     }
+
+    return () => {
+      clearTimeout(timeOutID);
+    };
   }, [copied, setCopied]);
 
   return (

@@ -30,9 +30,13 @@ function DeletedScreen({ url }: { url: string }) {
     window.location.href = url;
   };
   useEffect(() => {
-    setTimeout(() => {
+    const timeOutID = setTimeout(() => {
       navigateToUrl();
     }, 1200);
+
+    return () => {
+      clearTimeout(timeOutID);
+    };
   });
 
   return (

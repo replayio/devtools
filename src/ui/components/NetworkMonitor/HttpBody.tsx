@@ -1,7 +1,7 @@
 import { BodyData } from "@replayio/protocol";
 import classNames from "classnames";
 import dynamic from "next/dynamic";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 
 import { getTheme } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
@@ -25,7 +25,14 @@ const ReactJson = dynamic(() => import("react-json-view"), {
 });
 
 const TextBodyComponent = ({ raw, text }: { raw: RawBody; text: string }) => {
+  const timeOutID: any = useRef(null);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(timeOutID.current);
+    };
+  }, []);
 
   return (
     <div
@@ -41,7 +48,7 @@ const TextBodyComponent = ({ raw, text }: { raw: RawBody; text: string }) => {
             const blob = new Blob([asString.content], { type: "text/plain" });
             navigator.clipboard.write([new ClipboardItem({ "text/plain": blob })]);
             setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
+            timeOutID.current = setTimeout(() => setCopied(false), 2000);
           }}
         >
           <MaterialIcon

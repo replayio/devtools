@@ -28,6 +28,10 @@ export default function TabSpotlight() {
       timeoutKey.current = null;
     }, 2000);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    return () => {
+      clearTimeout(timeoutKey.current);
+    };
   }, [selectedSource?.sourceId]);
 
   return (
