@@ -1,0 +1,80 @@
+<div id="foo" class="bar" style="visibility: visible" blahblah>BAR</div>
+<script>
+
+function recordingFinished() {
+  console.log("ExampleFinished");
+}
+
+class C {
+  get bar() { return "bar"; }
+  baz = "baz";
+}
+
+function foo() {
+// Create various objects which the debugger must be able to show in the scopes
+// pane using only the pause data, i.e. without additional debugger requests.
+// Not performing debugger requests allows the debugger to finish updating the
+// UI using cached pause data, and without any replaying process actually being
+// at the point where we are pausing.
+var a = Array();
+var b = new Uint8Array(20);
+var c = new Set([{a:0},{b:1}]);
+var d = new Map([[{a:0},{b:1}]]);
+var e = new WeakSet();
+var f = new WeakMap();
+var g = { a:0 };
+for (let i = 0; i < 20; i++) {
+  a.push(i);
+  b[i] = i;
+  c.add(i);
+  d.set(i, i + 1);
+  e.add({ i });
+  f.set({ i }, { j: i + 1 });
+  g[`a${i}`] = i;
+}
+var h = /abc/gi;
+var i = new Date(1666130037374);
+var j = RangeError("foo");
+var k = document.getElementById("foo");
+var l = bar;
+var m = [undefined, true, 3, null, "z", 40n];
+var n = new Proxy({ a: 0 }, {
+  get(target, prop, receiver) {
+    dump("Hello\n");
+  }
+});
+var o = Symbol();
+var p = Symbol("symbol");
+var q = { [o]: 42, [p]: o };
+var r = { _foo: new C(), get foo() { return this._foo; } }
+console.log(a);
+console.log(b);
+console.log(c);
+console.log(d);
+console.log(e);
+console.log(f);
+console.log(g);
+console.log(h);
+console.log(i);
+console.log(j);
+console.log(k);
+console.log(l);
+console.log(m);
+console.log(n);
+console.log(o);
+console.log(p);
+console.log(q);
+console.log(r);
+console.log("Done");
+window.setTimeout(recordingFinished);
+}
+foo();
+
+function bar() {
+console.log("bar");
+}
+
+function baz() {
+console.log("baz");
+}
+</script>

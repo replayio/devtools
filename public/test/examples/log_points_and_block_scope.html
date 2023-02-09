@@ -1,0 +1,28 @@
+<html lang="en" dir="ltr">
+<body>
+<script>
+  var arrayGlobal = [1, 2];
+  arrayGlobal.push(3);
+
+  {
+    const arrayBlockOuter = [];
+
+    {
+      const arrayBlockOne = ["a", "b"];
+      arrayBlockOne.push("c");
+    }
+
+    {
+      const arrayBlockTwo = [true];
+      arrayBlockTwo.push(false);
+    }
+  }
+
+  // e2e test recorder waits for this log.
+  // Give Playwright a chance to add a listener before logging it.
+  setTimeout(() => {
+    console.log('ExampleFinished');
+  }, 1000);
+</script>
+</body>
+</html>
