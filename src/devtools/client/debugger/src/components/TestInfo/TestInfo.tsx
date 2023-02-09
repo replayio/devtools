@@ -57,7 +57,7 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
       <TestInfoContextMenuContextRoot>
         <div className="flex flex-grow flex-col overflow-hidden">
           <div className="relative flex flex-grow flex-col space-y-1 overflow-auto border-t border-splitter px-2 pt-3">
-            {!missingSteps ? (
+            {missingSteps ? (
               <aside className={styles.aside}>
                 <div>
                   <strong>👋 Hey there!</strong>
