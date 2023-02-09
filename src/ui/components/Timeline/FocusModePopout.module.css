@@ -19,7 +19,7 @@
   flex-direction: row;
   align-items: center;
   gap: 1rem;
-  padding: 0.5rem 1.25rem 0.5rem .87rem;
+  padding: 0.5rem 1.25rem 0.5rem 0.87rem;
   color: var(--focus-mode-popout-color);
   background-color: var(--focus-mode-popout-no-transparency);
   -webkit-backdrop-filter: blur(12px);

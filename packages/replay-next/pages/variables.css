@@ -637,7 +637,7 @@
   --focus-mode-popout-text-input-background-color: #33373d;
   --focus-mode-popout-background-color: rgba(67, 71, 73, 0.6);
   --focus-mode-popout-background-color-no-transparency: rgba(0, 0, 0, 1);
-  --focus-mode-popout-color: white;  
+  --focus-mode-popout-color: white;
 }
 
 :root.theme-light {
@@ -1136,7 +1136,7 @@
   --focus-mode-popout-text-input-background-color: var(--theme-base-85);
   --focus-mode-popout-background-color: rgba(0, 0, 0, 0.6);
   --focus-mode-popout-background-color-no-transparency: rgba(0, 0, 0, 1);
-  --focus-mode-popout-color: white;  
+  --focus-mode-popout-color: white;
 }
 
 /*
