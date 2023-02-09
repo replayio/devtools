@@ -6277,6 +6277,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-devtools-inline@npm:^4.24.3":
+  version: 4.24.3
+  resolution: "@types/react-devtools-inline@npm:4.24.3"
+  dependencies:
+    "@types/react": "*"
+    "@types/react-reconciler": "*"
+  checksum: 31fd091dfa723bdd83c654a013988714744cd5a635681b199987268dd534eddf79762f784b5a3f6471b175b8ff5a7af5bb918b2b5649552521ebeeb2ff9a847a
+  languageName: node
+  linkType: hard
+
 "@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.0.5":
   version: 18.0.5
   resolution: "@types/react-dom@npm:18.0.5"
@@ -6292,6 +6302,15 @@ __metadata:
   dependencies:
     "@types/react": "*"
   checksum: bb9399481be2b1f4eaef67d24497951a5e5d2a3cfef6a24157da71d2b8f0abbb0ab1d72a89c05705bb8b5dc1c980a0ee4af3d5c435a6533da240836e8fd410b8
+  languageName: node
+  linkType: hard
+
+"@types/react-reconciler@npm:*":
+  version: 0.28.2
+  resolution: "@types/react-reconciler@npm:0.28.2"
+  dependencies:
+    "@types/react": "*"
+  checksum: 9720f76a334ce4f25205d5bb72303a04f458bb2981cb9bd7f9ed0c16513f6c6ab809099bb5f46dc13e443d4c54e3a77a6038316a127a4dc844db2273f287a669
   languageName: node
   linkType: hard
 
@@ -20242,6 +20261,7 @@ __metadata:
     "@types/mixpanel-browser": ^2.35.6
     "@types/node": ^18.0.0
     "@types/react": ^18.0.12
+    "@types/react-devtools-inline": ^4.24.3
     "@types/react-dom": ^18.0.5
     "@types/react-lazyload": ^3.2.0
     "@types/react-router-dom": ^5.1.7
