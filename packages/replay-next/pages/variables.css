@@ -489,6 +489,9 @@
   --breakpoint-tip: #fff;
 
   /* Testsuites (Dark) */
+  --testsuites-aside-background-color: var(--theme-base-90);
+  --testsuites-aside-color: #fff;
+  --testsuites-aside-border-color: #fdce22;
   --testsuites-capsule-alias-bgcolor: var(--theme-base-85);
   --testsuites-capsule-alias-color: var(--body-color);
   --testsuites-capsule-alias-selected-bgcolor: var(--theme-base-100);
@@ -984,6 +987,9 @@
   --breakpoint-tip: var(--theme-highlight-purple);
 
   /* Testsuites (Light) */
+  --testsuites-aside-background-color: rgb(254 243 199);
+  --testsuites-aside-color: var(--body-color);
+  --testsuites-aside-border-color: rgb(253 230 138);    
   --testsuites-capsule-alias-bgcolor: var(--theme-base-85);
   --testsuites-capsule-alias-color: var(--body-color);
   --testsuites-capsule-alias-selected-bgcolor: var(--theme-base-100);

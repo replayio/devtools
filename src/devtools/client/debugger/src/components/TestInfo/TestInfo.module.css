@@ -35,3 +35,20 @@
 .TestsuitesErrorColor {
   color: var(--testsuites-error-color);
 }
+
+.aside
+{
+  padding: 0.75rem;
+  margin: 0.25rem; 
+  margin-top: 0.25rem; 
+  border-radius: 0.5rem; 
+  border-width: 1px;
+  background-color: var(--testsuites-aside-background-color);
+  border: 1px solid var(--testsuites-aside-border-color);
+  color: var(--testsuites-aside-color);
+}
+
+.aside div
+{
+  margin-bottom: 5px;
+}
