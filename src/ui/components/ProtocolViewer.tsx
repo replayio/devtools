@@ -1,7 +1,11 @@
+import { Tab as HeadlessTab } from "@headlessui/react";
+import { FunctionMatch, Location, Value as ProtocolValue } from "@replayio/protocol";
 import dynamic from "next/dynamic";
 import React, {
   MutableRefObject,
   ReactNode,
+  Suspense,
+  useContext,
   useDeferredValue,
   useLayoutEffect,
   useMemo,
@@ -9,21 +13,37 @@ import React, {
   useState,
 } from "react";
 
+import { Tab } from "devtools/client/shared/components/ResponsiveTabs";
 import { CommandResponse } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
+import Loader from "replay-next/components/Loader";
+import { AnalysisResult, runAnalysisAsync } from "replay-next/src/suspense/AnalysisCache";
+import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
+import { getHitPointsForLocationAsync } from "replay-next/src/suspense/ExecutionPointsCache";
+import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
+import { ReplayClient } from "shared/client/ReplayClient";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { ReplayClientInterface } from "shared/client/types";
+import { UIThunkAction } from "ui/actions";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserInfo } from "ui/hooks/users";
 import { getTheme } from "ui/reducers/app";
 import {
+  ProtocolErrorMap,
+  ProtocolRequestMap,
+  ProtocolResponseMap,
   Recorded,
   RequestSummary,
   getProtocolErrorMap,
   getProtocolRequestMap,
   getProtocolResponseMap,
 } from "ui/reducers/protocolMessages";
-import { useAppSelector } from "ui/setup/hooks";
+import { SourceDetails, getAllSourceDetails } from "ui/reducers/sources";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { getSymbolsAsync } from "ui/suspense/sourceCaches";
+import { getJSON } from "ui/utils/objectFetching";
 import { formatDuration, formatTimestamp } from "ui/utils/time";
 
 import { PrimarySmButton } from "./shared/Button";
@@ -207,14 +227,16 @@ function ProtocolRequestDetail({
   );
 }
 
-export default function ProtocolViewer() {
+interface ProtocolViewerProps {
+  errorMap: ProtocolErrorMap;
+  requestMap: ProtocolRequestMap;
+  responseMap: ProtocolResponseMap;
+}
+
+export function ProtocolViewer({ errorMap, requestMap, responseMap }: ProtocolViewerProps) {
   const [clearBeforeIndex, setClearBeforeIndex] = useState(0);
   const [filterText, setFilterText] = useState("");
   const deferredFilterText = useDeferredValue(filterText);
-
-  const errorMap = useAppSelector(getProtocolErrorMap);
-  const requestMap = useAppSelector(getProtocolRequestMap);
-  const responseMap = useAppSelector(getProtocolResponseMap);
 
   const [selectedChunk, setSelectedChunk] = useState<RequestSummaryChunk | null>(null);
 
@@ -444,3 +466,225 @@ function ProtocolChunk({
 }
 
 const ProtocolChunkMemo = React.memo(ProtocolChunk);
+
+export function LiveAppProtocolViewer() {
+  const requestMap = useAppSelector(getProtocolRequestMap);
+  const responseMap = useAppSelector(getProtocolResponseMap);
+  const errorMap = useAppSelector(getProtocolErrorMap);
+
+  return <ProtocolViewer errorMap={errorMap} requestMap={requestMap} responseMap={responseMap} />;
+}
+
+interface AllProtocolMessages {
+  requestMap: ProtocolRequestMap;
+  responseMap: ProtocolResponseMap;
+  errorMap: ProtocolErrorMap;
+}
+
+const NO_PROTOCOL_MESSAGES: AllProtocolMessages = {
+  requestMap: {},
+  responseMap: {},
+  errorMap: {},
+};
+
+interface ProtocolMessageCommon {
+  id: number;
+  recordedAt: number;
+}
+
+const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericCache<
+  [replayClient: ReplayClientInterface],
+  [sourceDetails: SourceDetails[]],
+  AllProtocolMessages
+>(
+  "recordedPotocolMessagesCache",
+  1,
+  async (replayClient, sourceDetails) => {
+    const sessionSource = sourceDetails.find(source => source.url?.includes("ui/actions/session"));
+
+    if (!sessionSource) {
+      return NO_PROTOCOL_MESSAGES;
+    }
+
+    const [breakablePositionsSorted] = await getBreakpointPositionsAsync(
+      replayClient,
+      sessionSource.id
+    );
+    const symbols = await getSymbolsAsync(replayClient, sessionSource.id, sourceDetails);
+
+    const mapNamesToCallbackNames: Record<keyof AllProtocolMessages, string> = {
+      requestMap: "onRequest",
+      responseMap: "onResponse",
+      errorMap: "onResponseError",
+    };
+
+    const results = { ...NO_PROTOCOL_MESSAGES };
+
+    const promises = Object.entries(mapNamesToCallbackNames).map(
+      async ([fieldName, functionName]) => {
+        // Start by finding the parsed listing for this function
+        const functionEntry = symbols?.functions.find(entry => entry.name === functionName);
+
+        if (!functionEntry) {
+          return;
+        }
+
+        const { start, end } = functionEntry.location;
+
+        // There should be a breakable position starting on the next line
+        const firstBreakablePosition = breakablePositionsSorted.find(
+          bp => bp.line > start.line && bp.line < end.line
+        );
+
+        if (!firstBreakablePosition) {
+          return;
+        }
+        const position: Location = {
+          sourceId: sessionSource.id,
+          line: firstBreakablePosition.line,
+          column: firstBreakablePosition.columns[0],
+        };
+
+        // Get all the times that first line was hit
+        const [hitPoints] = await getHitPointsForLocationAsync(replayClient, position, null, null);
+
+        // For every hit, grab the first arg, which should be the `event`
+        // that is either the request, response, or error data
+        const getAnalysisResults = await runAnalysisAsync(
+          replayClient,
+          null,
+          position,
+          "[...arguments][0]",
+          null
+        );
+
+        // `getAnalysisResults` is a lookup function, so convert the
+        // hit execution points to the actual results
+        const hitPointsWithResults = hitPoints
+          .map(hp => {
+            return getAnalysisResults(hp);
+          })
+          .filter(b => !!b) as AnalysisResult[];
+
+        // For every analysis result, download the entire event object
+        // as a real JS object, and add the relevant timestamp
+        const events = await Promise.all(
+          hitPointsWithResults.map(async analysisResult => {
+            const values: ProtocolValue[] = analysisResult.values;
+            const [eventValue] = values;
+
+            // @ts-ignore
+            let parsedObject: ProtocolMessageCommon = {};
+
+            if (eventValue?.object) {
+              parsedObject = (await getJSON(
+                replayClient,
+                analysisResult.pauseId!,
+                eventValue
+              )) as unknown as ProtocolMessageCommon;
+            }
+
+            parsedObject.recordedAt = analysisResult.time;
+
+            return parsedObject;
+          })
+        );
+
+        const eventsById: Record<string, ProtocolMessageCommon> = {};
+
+        // The `<ProtocolViewer>` wants these normalized by ID
+        events.forEach(event => {
+          eventsById[event.id] = event;
+        });
+
+        // @ts-ignore it wants specific field names, not `string`
+        results[fieldName] = eventsById;
+      }
+    );
+
+    await Promise.all(promises);
+
+    return results;
+  },
+  () => "alwaysCacheThis"
+);
+
+function RecordedProtocolMessages({ sourceDetails }: { sourceDetails: SourceDetails[] }) {
+  const replayClient = useContext(ReplayClientContext);
+
+  const allProtocolMessages = getRecordedProtocolMessagesSuspense(replayClient, sourceDetails);
+
+  return <ProtocolViewer {...allProtocolMessages} />;
+}
+
+export function RecordedAppProtocolViewer() {
+  const sourceDetails = useAppSelector(getAllSourceDetails);
+
+  const isRecordingOfReplay = useMemo(() => {
+    const hasKnownReplaySources = sourceDetails.some(source => {
+      return (
+        source.url?.includes("src/ui/setup/store.ts") ||
+        source.url?.includes("src/ui/setup/dynamic/devtools.ts")
+      );
+    });
+
+    return hasKnownReplaySources;
+  }, [sourceDetails]);
+
+  let content: React.ReactNode;
+
+  if (sourceDetails.length === 0) {
+    content = <i>Loading sources...</i>;
+  } else if (!isRecordingOfReplay) {
+    content = <span className="text-base">Not a recording of Replay</span>;
+  } else {
+    content = (
+      <Suspense fallback={<Loader />}>
+        <RecordedProtocolMessages sourceDetails={sourceDetails} />
+      </Suspense>
+    );
+  }
+
+  return <div>{content}</div>;
+}
+
+type ProtocolViewerTabs = "live" | "recorded";
+interface ProtocolTab {
+  id: ProtocolViewerTabs;
+  text: string;
+}
+const tabs: readonly ProtocolTab[] = [
+  { id: "live", text: "Live" },
+  { id: "recorded", text: "Recorded" },
+];
+
+export function ProtocolViewerPanel() {
+  return (
+    <div className="flex h-full flex-col">
+      <HeadlessTab.Group>
+        <div className="tabs shrink">
+          <HeadlessTab.List
+            className="tabs-navigation"
+            style={{
+              borderBottom: "1px solid var(--theme-splitter-color)",
+            }}
+          >
+            {tabs.map(tab => (
+              <HeadlessTab key={tab.id}>
+                {({ selected }) => {
+                  return <Tab id={tab.id} text={tab.text} active={selected} />;
+                }}
+              </HeadlessTab>
+            ))}
+          </HeadlessTab.List>
+        </div>
+        <HeadlessTab.Panels className="h-full grow">
+          <HeadlessTab.Panel as={LiveAppProtocolViewer} />
+          <HeadlessTab.Panel as={RecordedAppProtocolViewer} />
+        </HeadlessTab.Panels>
+      </HeadlessTab.Group>
+    </div>
+  );
+}
+
+export default ProtocolViewerPanel;

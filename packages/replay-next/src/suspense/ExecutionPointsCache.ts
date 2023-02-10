@@ -9,7 +9,7 @@ import {
 import { HitPointsAndStatusTuple, ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 
-import { createWakeable } from "../utils/suspense";
+import { createFetchAsyncFromFetchSuspense, createWakeable } from "../utils/suspense";
 import { isExecutionPointsLessThan } from "../utils/time";
 import { createGenericCache } from "./createGenericCache";
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
@@ -308,6 +308,10 @@ export function getHitPointsForLocationSuspense(
     throw record.value;
   }
 }
+
+export const getHitPointsForLocationAsync = createFetchAsyncFromFetchSuspense(
+  getHitPointsForLocationSuspense
+);
 
 function getKey(
   location: Location,

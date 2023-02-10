@@ -9,6 +9,28 @@ import React, {
   useState,
 } from "react";
 
+interface TabProps {
+  id: string;
+  text: string;
+  active?: boolean;
+  onClick?: () => void;
+}
+
+export function Tab({ id, text, active, onClick }: TabProps) {
+  return (
+    <span
+      className={cx("tabs-menu-item", {
+        "is-active": active,
+      })}
+    >
+      <span className="devtools-tab-line"></span>
+      <button id={`${id}-tab`} title={text} role="tab" onClick={onClick}>
+        {text}
+      </button>
+    </span>
+  );
+}
+
 type ResponsiveTabsProps = {
   className?: string;
   dropdownButton?: ReactNode;
