@@ -5,7 +5,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useDeferredValue,
   useEffect,
   useMemo,
   useRef,
@@ -14,24 +13,35 @@ import {
 import { v4 as uuid } from "uuid";
 
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
+import { EMPTY_ARRAY, EMPTY_OBJECT } from "replay-next/src/contexts/points/constants";
 import { getPointsAsync } from "replay-next/src/suspense/PointsCache";
-import { insert } from "replay-next/src/utils/array";
+import { findIndex, insert } from "replay-next/src/utils/array";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { POINT_BEHAVIOR_DISABLED, Point, PointBehavior, PointKey } from "shared/client/types";
+import {
+  Badge,
+  POINT_BEHAVIOR_DISABLED,
+  Point,
+  PointBehavior,
+  PointKey,
+} from "shared/client/types";
 import {
   addPoint as addPointGraphQL,
   deletePoint as deletePointGraphQL,
   updatePoint as updatePointGraphQL,
 } from "shared/graphql/Points";
 
-import useBreakpointIdsFromServer from "../hooks/useBreakpointIdsFromServer";
-import useIndexedDB, { IDBOptions } from "../hooks/useIndexedDB";
-import { SessionContext } from "./SessionContext";
-
-export type PointBehaviorsObject = { [key: PointKey]: PointBehavior };
-
-const EMPTY_ARRAY: Point[] = [];
-const EMPTY_OBJECT: PointBehaviorsObject = {};
+import useBreakpointIdsFromServer from "../../hooks/useBreakpointIdsFromServer";
+import useIndexedDB, { IDBOptions } from "../../hooks/useIndexedDB";
+import { SessionContext } from "../SessionContext";
+import comparePoints from "./comparePoints";
+import {
+  AddPoint,
+  DeletePoints,
+  EditPointBadge,
+  EditPointBehavior,
+  EditPointDangerousToUseDirectly,
+  PointBehaviorsObject,
+} from "./types";
 
 // NOTE: If any change is made like adding a store name, bump the version number
 // to ensure that the database is recreated properly.
@@ -47,31 +57,14 @@ export type PointInstance = {
   type: "PointInstance";
 };
 
-export type AddPoint = (
-  partialPoint: Partial<Pick<Point, "badge" | "condition" | "content">>,
-  partialPointBehavior: Partial<Omit<PointBehavior, "pointId">>,
-  location: Location
-) => void;
-export type DeletePoints = (...pointIds: PointKey[]) => void;
-export type EditPoint = (
-  key: PointKey,
-  partialPoint: Partial<Pick<Point, "badge" | "condition" | "content">>
-) => void;
-export type EditPointBehavior = (
-  key: PointKey,
-  pointBehavior: Partial<Omit<PointBehavior, "pointId">>
-) => void;
-
-export type PointsContextType = {
+export type ContextType = {
   addPoint: AddPoint;
   deletePoints: DeletePoints;
-  editPoint: EditPoint;
+  editPointBadge: EditPointBadge;
   editPointBehavior: EditPointBehavior;
-  isPending: boolean;
+  editPointDangerousToUseDirectly: EditPointDangerousToUseDirectly;
   pointBehaviors: PointBehaviorsObject;
-  pointBehaviorsForSuspense: PointBehaviorsObject;
   points: Point[];
-  pointsForSuspense: Point[];
 };
 
 export const isValidPoint = (maybePoint: unknown): maybePoint is Point => {
@@ -84,9 +77,12 @@ export const isValidPoint = (maybePoint: unknown): maybePoint is Point => {
   );
 };
 
-export const PointsContext = createContext<PointsContextType>(null as any);
+// This context should almost never be used directly.
+// The ConsolePointsContext or SourceListPointsContext should be used instead.
+// See the README for more information.
+export const PointsContextDangerousToUseDirectly = createContext<ContextType>(null as any);
 
-export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
+export function ContextRoot({ children }: PropsWithChildren<{}>) {
   const graphQLClient = useContext(GraphQLClientContext);
   const { accessToken, currentUserInfo, recordingId, trackEvent } = useContext(SessionContext);
   const replayClient = useContext(ReplayClientContext);
@@ -124,31 +120,20 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   // This has an added benefit of ensuring edits/deletions always reflect the latest state
   // without requiring refetching data from GraphQL.
   const mergedPoints = useMemo<Point[]>(() => {
-    const currentUserId = currentUserInfo?.id ?? null;
-
     const mergedPoints: Point[] = [];
     localPoints?.forEach(point => {
       insert<Point>(mergedPoints, point, comparePoints);
     });
     remotePoints?.forEach(point => {
-      if (currentUserId && currentUserId === point.user?.id) {
-        return;
+      const index = findIndex<Point>(mergedPoints, point, comparePoints);
+      if (index < 0) {
+        insert<Point>(mergedPoints, point, comparePoints);
       }
-
-      insert<Point>(mergedPoints, point, comparePoints);
     });
     return mergedPoints;
-  }, [currentUserInfo, localPoints, remotePoints]);
+  }, [localPoints, remotePoints]);
 
-  // We also store a separate copy of points so that e.g. if the Console suspends to fetch remote values
-  // it won't prevent the log point editor UI from updating in response to user input.
-  // These get updated at a lower, transition priority.
-  const pointsForSuspense = useDeferredValue<Point[]>(mergedPoints);
-  const pointBehaviorsForSuspense = useDeferredValue(pointBehaviors);
-  const isPending =
-    mergedPoints !== pointsForSuspense || pointBehaviors !== pointBehaviorsForSuspense;
-
-  // Track the latest committed values for e.g. the editPoint function.
+  // Track the latest committed values for e.g. the editPointBadge function.
   const committedValuesRef = useRef<{
     points: Point[];
     pointBehaviors: PointBehaviorsObject;
@@ -249,7 +234,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     [accessToken, graphQLClient, setLocalPoints, setPointBehaviors, trackEvent]
   );
 
-  const editPoint = useCallback<EditPoint>(
+  const editPointDangerousToUseDirectly = useCallback<EditPointDangerousToUseDirectly>(
     (key: PointKey, partialPoint: Partial<Pick<Point, "badge" | "condition" | "content">>) => {
       trackEvent("breakpoint.edit");
 
@@ -304,46 +289,39 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     [setPointBehaviors, trackEvent]
   );
 
+  const editPointBadge = useCallback<EditPointBadge>(
+    (key: PointKey, badge: Badge | null) => {
+      editPointDangerousToUseDirectly(key, { badge });
+    },
+    [editPointDangerousToUseDirectly]
+  );
+
   useBreakpointIdsFromServer(replayClient, mergedPoints, pointBehaviors, deletePoints);
 
   const context = useMemo(
     () => ({
       addPoint,
       deletePoints,
-      editPoint,
+      editPointBadge,
       editPointBehavior,
-      isPending,
+      editPointDangerousToUseDirectly,
       pointBehaviors,
-      pointBehaviorsForSuspense,
       points: mergedPoints,
-      pointsForSuspense,
     }),
     [
       addPoint,
       deletePoints,
-      editPoint,
+      editPointBadge,
       editPointBehavior,
-      isPending,
+      editPointDangerousToUseDirectly,
       mergedPoints,
       pointBehaviors,
-      pointBehaviorsForSuspense,
-      pointsForSuspense,
     ]
   );
 
-  return <PointsContext.Provider value={context}>{children}</PointsContext.Provider>;
-}
-
-function comparePoints(pointA: Point, pointB: Point): number {
-  const locationA = pointA.location;
-  const locationB = pointB.location;
-  if (locationA.sourceId !== locationB.sourceId) {
-    return locationA.sourceId.localeCompare(locationB.sourceId);
-  } else if (locationA.line !== locationB.line) {
-    return locationA.line - locationB.line;
-  } else if (locationA.column !== locationB.column) {
-    return locationA.column - locationB.column;
-  } else {
-    return pointA.createdAt.getTime() - pointB.createdAt.getTime();
-  }
+  return (
+    <PointsContextDangerousToUseDirectly.Provider value={context}>
+      {children}
+    </PointsContextDangerousToUseDirectly.Provider>
+  );
 }

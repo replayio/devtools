@@ -17,6 +17,7 @@ import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { ImperativeHandle } from "replay-next/components/lexical/CodeEditor";
 import Loader from "replay-next/components/Loader";
 import { ConsoleFiltersContextRoot } from "replay-next/src/contexts/ConsoleFiltersContext";
+import { ContextRoot as ConsolePointsContextRoot } from "replay-next/src/contexts/points/ConsolePointsContext";
 import { TerminalContext } from "replay-next/src/contexts/TerminalContext";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 
@@ -47,20 +48,22 @@ export default function ConsoleRoot({
     <ErrorBoundary>
       <Suspense fallback={<IndeterminateLoader />}>
         <ConsoleFiltersContextRoot>
-          <LoggablesContextRoot messageListRef={messageListRef}>
-            <ConsoleSearchContextRoot
-              messageListRef={messageListRef}
-              searchInputRef={searchInputRef}
-              showSearchInputByDefault={showSearchInputByDefault}
-            >
-              <Console
+          <ConsolePointsContextRoot>
+            <LoggablesContextRoot messageListRef={messageListRef}>
+              <ConsoleSearchContextRoot
                 messageListRef={messageListRef}
-                nagHeader={nagHeader}
                 searchInputRef={searchInputRef}
-                showFiltersByDefault={showFiltersByDefault}
-              />
-            </ConsoleSearchContextRoot>
-          </LoggablesContextRoot>
+                showSearchInputByDefault={showSearchInputByDefault}
+              >
+                <Console
+                  messageListRef={messageListRef}
+                  nagHeader={nagHeader}
+                  searchInputRef={searchInputRef}
+                  showFiltersByDefault={showFiltersByDefault}
+                />
+              </ConsoleSearchContextRoot>
+            </LoggablesContextRoot>
+          </ConsolePointsContextRoot>
         </ConsoleFiltersContextRoot>
       </Suspense>
     </ErrorBoundary>

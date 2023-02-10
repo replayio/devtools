@@ -15,7 +15,7 @@ import { VariableSizeList as List, ListOnItemsRenderedProps } from "react-window
 
 import { findPointForLocation } from "replay-next/components/sources/utils/points";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { PointsContext } from "replay-next/src/contexts/PointsContext";
+import { Context as SourceListPointsContext } from "replay-next/src/contexts/points/SourceListPointsContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import {
@@ -27,7 +27,12 @@ import {
 } from "replay-next/src/suspense/SourcesCache";
 import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { POINT_BEHAVIOR_DISABLED, Point, SourceLocationRange } from "shared/client/types";
+import {
+  POINT_BEHAVIOR_DISABLED,
+  POINT_BEHAVIOR_ENABLED,
+  Point,
+  SourceLocationRange,
+} from "shared/client/types";
 
 import useFontBasedListMeasurements from "./hooks/useFontBasedListMeasurements";
 import SourceListRow, { ItemData, PointStateEnum, SetLinePointState } from "./SourceListRow";
@@ -65,8 +70,7 @@ export default function SourceList({
   const listRef = useRef<List>(null);
 
   const { range: focusRange } = useContext(FocusContext);
-  const { addPoint, deletePoints, editPoint, editPointBehavior, pointBehaviors, points } =
-    useContext(PointsContext);
+  const { pointBehaviors, points } = useContext(SourceListPointsContext);
   const client = useContext(ReplayClientContext);
   const {
     focusedSource,
@@ -196,11 +200,7 @@ export default function SourceList({
 
   const itemData = useMemo<ItemData>(
     () => ({
-      addPoint,
       breakablePositionsByLine,
-      deletePoints,
-      editPoint,
-      editPointBehavior,
       hitCounts,
       lineHeight,
       maxHitCount,
@@ -218,11 +218,7 @@ export default function SourceList({
       streamingParser,
     }),
     [
-      addPoint,
       breakablePositionsByLine,
-      deletePoints,
-      editPoint,
-      editPointBehavior,
       hitCounts,
       lineHeight,
       maxHitCount,
@@ -255,15 +251,25 @@ export default function SourceList({
       const pointBehavior = pointBehaviors[point.key];
 
       const lineState = lineIndexToPointStateMap.get(index) ?? "no-point";
+      console.log(
+        `getItemSize:${lineNumber} lineState:"${lineState}", pointBehavior:`,
+        pointBehavior
+      );
       switch (lineState) {
         case "point":
           return lineHeight + pointPanelHeight;
         case "point-with-conditional":
           return lineHeight + pointPanelWithConditionalHeight;
         default:
-          if (pointBehavior?.shouldLog !== POINT_BEHAVIOR_DISABLED) {
-            // This Point might have been restored by a previous session.
-            // In this case we should use its persisted values.
+          // This Point might have been restored by a previous session.
+          // In this case we should use its persisted values.
+          // Else by default, shared print statements should be shown.
+          // Points that have no content (breakpoints) should be hidden by default though.
+          const shouldLog =
+            pointBehavior?.shouldLog ?? point.content
+              ? POINT_BEHAVIOR_ENABLED
+              : POINT_BEHAVIOR_DISABLED;
+          if (shouldLog !== POINT_BEHAVIOR_DISABLED) {
             if (point.condition !== null) {
               return lineHeight + pointPanelWithConditionalHeight;
             } else {

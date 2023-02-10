@@ -9,9 +9,9 @@ import { KeyboardModifiersContext } from "replay-next/src/contexts/KeyboardModif
 import {
   AddPoint,
   DeletePoints,
-  EditPoint,
   EditPointBehavior,
-} from "replay-next/src/contexts/PointsContext";
+  EditPointText,
+} from "replay-next/src/contexts/points/types";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
@@ -39,7 +39,7 @@ export default function HoverButton({
   addPoint,
   buttonClassName,
   deletePoints,
-  editPoint,
+  editPointText,
   editPointBehavior,
   iconClassName,
   lineHitCounts,
@@ -52,7 +52,7 @@ export default function HoverButton({
   addPoint: AddPoint;
   buttonClassName: string;
   deletePoints: DeletePoints;
-  editPoint: EditPoint;
+  editPointText: EditPointText;
   editPointBehavior: EditPointBehavior;
   iconClassName: string;
   lineHitCounts: LineHitCounts | null;
@@ -148,7 +148,7 @@ export default function HoverButton({
       }
 
       if (point) {
-        editPoint(point.key, { content });
+        editPointText(point.key, { content });
         editPointBehavior(point.key, { shouldLog: POINT_BEHAVIOR_ENABLED });
       } else {
         addPoint(
@@ -175,9 +175,14 @@ export default function HoverButton({
     const togglePoint = () => {
       if (point) {
         if (!hasOrDidLog || hasOrDidBreak) {
+          const newShouldLog = hasOrDidLog ? POINT_BEHAVIOR_DISABLED : POINT_BEHAVIOR_ENABLED;
           editPointBehavior(point.key, {
-            shouldLog: hasOrDidLog ? POINT_BEHAVIOR_DISABLED : POINT_BEHAVIOR_ENABLED,
+            shouldLog: newShouldLog,
           });
+
+          if (!newShouldLog) {
+            setLinePointState(lineNumber - 1, null);
+          }
         } else {
           deletePoints(point.key);
 

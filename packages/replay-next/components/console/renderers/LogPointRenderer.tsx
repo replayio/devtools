@@ -12,7 +12,7 @@ import Loader from "replay-next/components/Loader";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { InspectableTimestampedPointContext } from "replay-next/src/contexts/InspectorContext";
-import { PointInstance } from "replay-next/src/contexts/PointsContext";
+import { PointInstance } from "replay-next/src/contexts/points/PointsContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { runAnalysisSuspense } from "replay-next/src/suspense/AnalysisCache";
 import { primitiveToClientValue } from "replay-next/src/utils/protocol";

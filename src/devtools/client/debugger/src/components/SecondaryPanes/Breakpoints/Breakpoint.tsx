@@ -1,5 +1,4 @@
 import { Location } from "@replayio/protocol";
-import classnames from "classnames";
 import { ChangeEvent, PureComponent, Suspense, useContext } from "react";
 import { MouseEvent } from "react";
 import { ConnectedProps, connect } from "react-redux";
@@ -10,7 +9,7 @@ import {
   getSelectedFrameId,
 } from "devtools/client/debugger/src/reducers/pause";
 import AvatarImage from "replay-next/components/AvatarImage";
-import { EditPointBehavior } from "replay-next/src/contexts/PointsContext";
+import { EditPointBehavior } from "replay-next/src/contexts/points/types";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   POINT_BEHAVIOR,
@@ -112,7 +111,7 @@ class Breakpoint extends PureComponent<BreakpointProps> {
     const isChecked = behavior === POINT_BEHAVIOR_ENABLED;
 
     // Prevent clicks on the <input> from selecting the location.
-    const onCheckboxClick = (event: MouseEvent) => {
+    const onLabelClick = (event: MouseEvent) => {
       event.preventDefault();
       event.stopPropagation();
     };
@@ -174,7 +173,7 @@ class Breakpoint extends PureComponent<BreakpointProps> {
         <label
           data-test-name="BreakpointToggle"
           data-test-state={isChecked ? POINT_BEHAVIOR_ENABLED : POINT_BEHAVIOR_DISABLED_TEMPORARILY}
-          onClick={onCheckboxClick}
+          onClick={onLabelClick}
         >
           <Checkbox checked={isChecked} onChange={onCheckboxChange} />
         </label>

@@ -1,7 +1,7 @@
 import { SourceId } from "@replayio/protocol";
 import { ReactNode, useContext, useMemo } from "react";
 
-import { PointsContext } from "replay-next/src/contexts/PointsContext";
+import { Context as SourceListPointsContext } from "replay-next/src/contexts/points/SourceListPointsContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { POINT_BEHAVIOR_DISABLED, Point } from "shared/client/types";
 import { getSourceDetailsEntities } from "ui/reducers/sources";
@@ -20,7 +20,8 @@ export default function Breakpoints({
   emptyContent: ReactNode;
   type: "breakpoint" | "logpoint";
 }) {
-  const { deletePoints, editPointBehavior, points, pointBehaviors } = useContext(PointsContext);
+  const { deletePoints, editPointBehavior, points, pointBehaviors } =
+    useContext(SourceListPointsContext);
   const { currentUserInfo } = useContext(SessionContext);
 
   const sourceDetailsEntities = useAppSelector(getSourceDetailsEntities);

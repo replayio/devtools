@@ -1,7 +1,7 @@
 import { BreakpointId, Location } from "@replayio/protocol";
 import { useContext, useEffect, useRef } from "react";
 
-import { PointBehaviorsObject } from "replay-next/src/contexts/PointsContext";
+import { PointBehaviorsObject } from "replay-next/src/contexts/points/types";
 import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
 import { getSourcesAsync } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";

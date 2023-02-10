@@ -3,7 +3,7 @@ import SourceExplorer from "replay-next/components/sources/SourceExplorer";
 import Sources from "replay-next/components/sources/Sources";
 import { FocusContextRoot } from "replay-next/src/contexts/FocusContext";
 import { KeyboardModifiersContextRoot } from "replay-next/src/contexts/KeyboardModifiersContext";
-import { PointsContextRoot } from "replay-next/src/contexts/PointsContext";
+import { ContextRoot as PointsContextRoot } from "replay-next/src/contexts/points/PointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
 import { SourcesContextRoot } from "replay-next/src/contexts/SourcesContext";
 import { TerminalContextRoot } from "replay-next/src/contexts/TerminalContext";

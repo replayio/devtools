@@ -10,7 +10,8 @@ import {
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import { ThreadFront } from "protocol/thread";
 import { ExpandablesContextRoot } from "replay-next/src/contexts/ExpandablesContext";
-import { PointsContextRoot } from "replay-next/src/contexts/PointsContext";
+import { ContextRoot as PointsContextRoot } from "replay-next/src/contexts/points/PointsContext";
+import { ContextRoot as SourceListPointsContext } from "replay-next/src/contexts/points/SourceListPointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
@@ -235,24 +236,26 @@ function _DevTools({
       <SourcesContextAdapter>
         <FocusContextReduxAdapter>
           <PointsContextRoot>
-            <TimelineContextAdapter>
-              <SelectedFrameContextRoot SelectedFrameContextAdapter={SelectedFrameContextAdapter}>
-                <TerminalContextAdapter>
-                  <InspectorContextReduxAdapter>
-                    <ExpandablesContextRoot>
-                      <LayoutContextAdapter>
-                        <KeyModifiers>
-                          <Header />
-                          <Body />
-                          {showCommandPalette ? <CommandPaletteModal /> : null}
-                          <KeyboardShortcuts />
-                        </KeyModifiers>
-                      </LayoutContextAdapter>
-                    </ExpandablesContextRoot>
-                  </InspectorContextReduxAdapter>
-                </TerminalContextAdapter>
-              </SelectedFrameContextRoot>
-            </TimelineContextAdapter>
+            <SourceListPointsContext>
+              <TimelineContextAdapter>
+                <SelectedFrameContextRoot SelectedFrameContextAdapter={SelectedFrameContextAdapter}>
+                  <TerminalContextAdapter>
+                    <InspectorContextReduxAdapter>
+                      <ExpandablesContextRoot>
+                        <LayoutContextAdapter>
+                          <KeyModifiers>
+                            <Header />
+                            <Body />
+                            {showCommandPalette ? <CommandPaletteModal /> : null}
+                            <KeyboardShortcuts />
+                          </KeyModifiers>
+                        </LayoutContextAdapter>
+                      </ExpandablesContextRoot>
+                    </InspectorContextReduxAdapter>
+                  </TerminalContextAdapter>
+                </SelectedFrameContextRoot>
+              </TimelineContextAdapter>
+            </SourceListPointsContext>
           </PointsContextRoot>
         </FocusContextReduxAdapter>
       </SourcesContextAdapter>

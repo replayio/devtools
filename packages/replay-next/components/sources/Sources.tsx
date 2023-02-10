@@ -1,5 +1,6 @@
 import { KeyboardEvent, MouseEvent, useContext, useRef } from "react";
 
+import { ContextRoot as SourceListPointsContext } from "replay-next/src/contexts/points/SourceListPointsContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { getSource } from "replay-next/src/suspense/SourcesCache";
 import { getSourceFileName } from "replay-next/src/utils/source";
@@ -21,7 +22,9 @@ export default function SourcesRoot() {
   return (
     <SourceFileNameSearchContextRoot>
       <SourceSearchContextRoot>
-        <Sources />
+        <SourceListPointsContext>
+          <Sources />
+        </SourceListPointsContext>
       </SourceSearchContextRoot>
     </SourceFileNameSearchContextRoot>
   );

@@ -1,7 +1,7 @@
 import { SourceId } from "@replayio/protocol";
 
 import Icon from "replay-next/components/Icon";
-import { AddPoint, DeletePoints, EditPointBehavior } from "replay-next/src/contexts/PointsContext";
+import { AddPoint, DeletePoints, EditPointBehavior } from "replay-next/src/contexts/points/types";
 import {
   POINT_BEHAVIOR_DISABLED,
   POINT_BEHAVIOR_ENABLED,

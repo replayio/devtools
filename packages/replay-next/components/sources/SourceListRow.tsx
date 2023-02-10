@@ -17,13 +17,8 @@ import SearchResultHighlight from "replay-next/components/sources/SearchResultHi
 import { SourceSearchContext } from "replay-next/components/sources/SourceSearchContext";
 import useSourceContextMenu from "replay-next/components/sources/useSourceContextMenu";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import {
-  AddPoint,
-  DeletePoints,
-  EditPoint,
-  EditPointBehavior,
-  PointBehaviorsObject,
-} from "replay-next/src/contexts/PointsContext";
+import { Context as SourceListPointsContext } from "replay-next/src/contexts/points/SourceListPointsContext";
+import { PointBehaviorsObject } from "replay-next/src/contexts/points/types";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { ParsedToken, StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import {
@@ -53,11 +48,7 @@ export type PointStateEnum = "point" | "point-with-conditional";
 export type SetLinePointState = (lineIndex: number, state: PointStateEnum | null) => void;
 
 export type ItemData = {
-  addPoint: AddPoint;
   breakablePositionsByLine: Map<number, SameLineSourceLocations>;
-  deletePoints: DeletePoints;
-  editPoint: EditPoint;
-  editPointBehavior: EditPointBehavior;
   hitCounts: LineNumberToHitCountMap | null;
   maxHitCount: number | null;
   minHitCount: number | null;
@@ -78,6 +69,8 @@ const SourceListRow = memo(
   ({ data, index, style }: { data: ItemData; index: number; style: CSSProperties }) => {
     const { setCursorLocation } = useContext(SourcesContext);
     const { isTransitionPending: isFocusRangePending } = useContext(FocusContext);
+    const { addPoint, deletePoints, editPointText, editPointBehavior } =
+      useContext(SourceListPointsContext);
     const [searchState] = useContext(SourceSearchContext);
 
     const setCursorLocationFromMouseEvent = (event: MouseEvent) => {
@@ -95,11 +88,7 @@ const SourceListRow = memo(
     const lineNumber = index + 1;
 
     const {
-      addPoint,
       breakablePositionsByLine,
-      deletePoints,
-      editPoint,
-      editPointBehavior,
       hitCounts,
       maxHitCount,
       minHitCount,
@@ -415,7 +404,7 @@ const SourceListRow = memo(
                   addPoint={addPoint}
                   buttonClassName={styles.HoverButton}
                   deletePoints={deletePoints}
-                  editPoint={editPoint}
+                  editPointText={editPointText}
                   editPointBehavior={editPointBehavior}
                   iconClassName={styles.HoverButtonIcon}
                   lineHitCounts={lineHitCounts}

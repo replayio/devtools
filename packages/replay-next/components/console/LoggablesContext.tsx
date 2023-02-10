@@ -10,7 +10,8 @@ import {
 
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { PointInstance, PointsContext } from "replay-next/src/contexts/PointsContext";
+import { Context as ConsolePointsContext } from "replay-next/src/contexts/points/ConsolePointsContext";
+import { PointInstance } from "replay-next/src/contexts/points/PointsContext";
 import { TerminalContext, TerminalExpression } from "replay-next/src/contexts/TerminalContext";
 import { EventLog, getEventTypeEntryPointsSuspense } from "replay-next/src/suspense/EventsCache";
 import { UncaughtException, getExceptionsSuspense } from "replay-next/src/suspense/ExceptionsCache";
@@ -48,8 +49,7 @@ export function LoggablesContextRoot({
   messageListRef: MutableRefObject<HTMLElement | null>;
 }) {
   const client = useContext(ReplayClientContext);
-  const { pointBehaviorsForSuspense: pointBehaviors, pointsForSuspense: points } =
-    useContext(PointsContext);
+  const { pointBehaviors, points } = useContext(ConsolePointsContext);
   const {
     eventTypes,
     filterByText,

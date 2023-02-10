@@ -1,6 +1,6 @@
 import { MouseEvent, useContext, useState } from "react";
 
-import { PointsContext } from "replay-next/src/contexts/PointsContext";
+import { PointsContextDangerousToUseDirectly as PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { Badge, Point } from "shared/client/types";
 
 import Icon from "../../Icon";
@@ -19,12 +19,12 @@ export default function BadgePicker({
   invalid: boolean;
   point: Point;
 }) {
-  const { editPoint } = useContext(PointsContext);
+  const { editPointBadge } = useContext(PointsContext);
 
   const [state, setState] = useState<State>("initial");
 
   const toggle = (badge: Badge | null) => {
-    editPoint(point.key, { ...point, badge });
+    editPointBadge(point.key, badge);
     setState("closed");
   };
 

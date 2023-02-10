@@ -11,7 +11,18 @@ import {
   ConsoleFiltersContextType,
 } from "../contexts/ConsoleFiltersContext";
 import { FocusContext, FocusContextType } from "../contexts/FocusContext";
-import { PointsContext, PointsContextType } from "../contexts/PointsContext";
+import {
+  Context as ConsolePointsContext,
+  ContextType as ConsolePointsContextType,
+} from "../contexts/points/ConsolePointsContext";
+import {
+  PointsContextDangerousToUseDirectly as PointsContext,
+  ContextType as PointsContextType,
+} from "../contexts/points/PointsContext";
+import {
+  Context as SourceListPointsContext,
+  ContextType as SourceListPointsContextType,
+} from "../contexts/points/SourceListPointsContext";
 import { SessionContext, SessionContextType } from "../contexts/SessionContext";
 import { TimelineContext, TimelineContextType } from "../contexts/TimelineContext";
 
@@ -75,11 +86,13 @@ export async function renderFocused(
   children: ReactNode,
   options?: {
     consoleFiltersContext?: Partial<ConsoleFiltersContextType>;
+    consolePointsContext?: Partial<ConsolePointsContextType>;
     focusContext?: Partial<FocusContextType>;
     timelineContext?: Partial<TimelineContextType>;
     pointsContext?: Partial<PointsContextType>;
     replayClient?: Partial<ReplayClientInterface>;
     sessionContext?: Partial<SessionContextType>;
+    sourceListPointsContext?: Partial<SourceListPointsContextType>;
   }
 ): Promise<{
   consoleFiltersContext: ConsoleFiltersContextType;
@@ -125,25 +138,47 @@ export async function renderFocused(
   const pointsContext: PointsContextType = {
     addPoint: jest.fn(),
     deletePoints: jest.fn(),
-    editPoint: jest.fn(),
+    editPointBadge: jest.fn(),
     editPointBehavior: jest.fn(),
+    editPointDangerousToUseDirectly: jest.fn(),
+    pointBehaviors: {},
+    points: [],
+    ...options?.pointsContext,
+  };
+
+  const consolePointsContext: ConsolePointsContextType = {
     isPending: false,
     pointBehaviors: {},
-    pointBehaviorsForSuspense: {},
     points: [],
-    pointsForSuspense: [],
-    ...options?.pointsContext,
+    ...options?.consolePointsContext,
+  };
+
+  const sourceListPointsContext: SourceListPointsContextType = {
+    addPoint: jest.fn(),
+    discardPendingPoint: jest.fn(),
+    deletePoints: jest.fn(),
+    editPointBadge: jest.fn(),
+    editPointBehavior: jest.fn(),
+    editPointText: jest.fn(),
+    pointBehaviors: {},
+    points: [],
+    savePendingPoint: jest.fn(),
+    ...options?.sourceListPointsContext,
   };
 
   const renderResponse = await render(
     <PointsContext.Provider value={pointsContext}>
-      <TimelineContext.Provider value={timelineContext}>
-        <FocusContext.Provider value={focusContext}>
-          <ConsoleFiltersContext.Provider value={consoleFiltersContext}>
-            {children}
-          </ConsoleFiltersContext.Provider>
-        </FocusContext.Provider>
-      </TimelineContext.Provider>
+      <ConsolePointsContext.Provider value={consolePointsContext}>
+        <SourceListPointsContext.Provider value={sourceListPointsContext}>
+          <TimelineContext.Provider value={timelineContext}>
+            <FocusContext.Provider value={focusContext}>
+              <ConsoleFiltersContext.Provider value={consoleFiltersContext}>
+                {children}
+              </ConsoleFiltersContext.Provider>
+            </FocusContext.Provider>
+          </TimelineContext.Provider>
+        </SourceListPointsContext.Provider>
+      </ConsolePointsContext.Provider>
     </PointsContext.Provider>,
     {
       replayClient: options?.replayClient,

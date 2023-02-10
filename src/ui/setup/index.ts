@@ -4,7 +4,7 @@ import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
 import { EMPTY_TABS } from "devtools/client/debugger/src/reducers/tabs";
 import { ThreadFront } from "protocol/thread";
 import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
-import { POINTS_DATABASE } from "replay-next/src/contexts/PointsContext";
+import { POINTS_DATABASE } from "replay-next/src/contexts/points/PointsContext";
 import { preloadIDBInitialValues } from "replay-next/src/hooks/useIndexedDB";
 import { preCacheExecutionPointForTime } from "replay-next/src/suspense/ExecutionPointsCache";
 import { ReplayClient } from "shared/client/ReplayClient";

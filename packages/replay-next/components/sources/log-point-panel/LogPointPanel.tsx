@@ -19,7 +19,7 @@ import {
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
-import { PointsContext } from "replay-next/src/contexts/PointsContext";
+import { Context as SourceListPointsContext } from "replay-next/src/contexts/points/SourceListPointsContext";
 import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
@@ -117,7 +117,7 @@ function PointPanelWithHitPoints({
 }: InternalProps) {
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
-  const { editPoint, editPointBehavior, pointBehaviors } = useContext(PointsContext);
+  const { editPointText, editPointBehavior, pointBehaviors } = useContext(SourceListPointsContext);
   const client = useContext(ReplayClientContext);
   const { accessToken, currentUserInfo, recordingId, trackEvent } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: currentTime } = useContext(TimelineContext);
@@ -205,7 +205,7 @@ function PointPanelWithHitPoints({
       if (isEditing) {
         setEditableCondition(null);
       } else {
-        editPoint(point.key, { ...point, condition: null, content: editableContent });
+        editPointText(point.key, { condition: null, content: editableContent });
       }
 
       setLinePointState(lineIndex, "point");
@@ -297,8 +297,7 @@ function PointPanelWithHitPoints({
 
   const onSubmit = () => {
     if (isConditionValid && isContentValid && hasChanged) {
-      editPoint(point.key, {
-        badge: point.badge,
+      editPointText(point.key, {
         condition: editableCondition || null,
         content: editableContent,
       });
