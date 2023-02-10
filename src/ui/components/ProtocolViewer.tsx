@@ -510,7 +510,7 @@ const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericC
       replayClient,
       sessionSource.id
     );
-    const symbols = await getSymbolsAsync(replayClient, sessionSource.id);
+    const symbols = await getSymbolsAsync(replayClient, sessionSource.id, sourceDetails);
 
     const mapNamesToCallbackNames: Record<keyof AllProtocolMessages, string> = {
       requestMap: "onRequest",
