@@ -1,13 +1,13 @@
 import classNames from "classnames";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
 import {
   VisualCommentTypeData,
   createTypeDataForVisualComment,
 } from "replay-next/components/sources/utils/comments";
+import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { getAreMouseTargetsLoading, getCanvas } from "ui/actions/app";
 import { createFrameComment } from "ui/actions/comments";
-import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Canvas } from "ui/state/app";
@@ -68,6 +68,7 @@ export default function CommentTool({ comments }: { comments: (Comment | Reply)[
   const canvas = useAppSelector(getCanvas);
   const areMouseTargetsLoading = useAppSelector(getAreMouseTargetsLoading);
   const { isAuthenticated } = useAuth0();
+  const { showCommentsPanel } = useContext(InspectorContext);
 
   const dispatch = useAppDispatch();
 
@@ -102,7 +103,7 @@ export default function CommentTool({ comments }: { comments: (Comment | Reply)[
           dispatch(createFrameComment(position, recordingId, typeData));
         }
 
-        dispatch(setSelectedPrimaryPanel("comments"));
+        showCommentsPanel?.();
       };
 
       const onMouseMove = (e: MouseEvent) => setMousePosition(mouseEventCanvasPosition(e));
@@ -124,7 +125,7 @@ export default function CommentTool({ comments }: { comments: (Comment | Reply)[
         videoNode.removeEventListener("mouseleave", onMouseLeave);
       };
     }
-  }, [comments, dispatch, isAuthenticated, recordingId]);
+  }, [comments, dispatch, isAuthenticated, recordingId, showCommentsPanel]);
 
   // Un-authenticated users can't comment on Replays.
   if (!isAuthenticated) {
