@@ -12,6 +12,7 @@ import {
   toggleMappedSources,
   verifyLogPointContentTypeAheadSuggestions,
 } from "../helpers/source-panel";
+import { delay } from "../helpers/utils";
 
 test(`logpoints-07: should use the correct scope in auto-complete`, async ({ page }) => {
   await startTest(page, "cra/dist/index.html");
@@ -33,6 +34,7 @@ test(`logpoints-07: should use the correct scope in auto-complete`, async ({ pag
 
   // Log point should use generated source (if we're viewing that)
   await toggleMappedSources(page, "off");
+  await delay(1000);
 
   lineNumber = 19;
 
