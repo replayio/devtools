@@ -14,23 +14,9 @@ import { TestCase } from "./TestCase";
 import { TestCaseTree } from "./TestCaseTree";
 import { TestInfoContextMenuContextRoot } from "./TestInfoContextMenuContext";
 
-type TestInfoContextType = {
-  consoleProps?: ProtocolObject;
-  setConsoleProps: (obj?: ProtocolObject) => void;
-  loading: boolean;
-  setLoading: (loading: boolean) => void;
-  pauseId: string | null;
-  setPauseId: (id: string | null) => void;
-};
-
-export const TestInfoContext = createContext<TestInfoContextType>(null as any);
-
 export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
   const dispatch = useAppDispatch();
   const selectedTest = useAppSelector(getSelectedTest);
-  const [consoleProps, setConsoleProps] = useState<ProtocolObject>();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [pauseId, setPauseId] = useState<string | null>(null);
   const info = useTestInfo();
 
   const missingSteps =
@@ -52,23 +38,19 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
   }, [testCases, dispatch]);
 
   return (
-    <TestInfoContext.Provider
-      value={{ loading, setLoading, consoleProps, setConsoleProps, pauseId, setPauseId }}
-    >
-      <TestInfoContextMenuContextRoot>
-        <div className="flex flex-grow flex-col overflow-hidden">
-          <div className="relative flex flex-grow flex-col space-y-1 overflow-auto border-t border-splitter px-2 pt-3">
-            {missingSteps ? <MissingSteps /> : null}
-            {selectedTest == null ? (
-              <TestCaseTree testCases={testCases} />
-            ) : (
-              <TestCase test={testCases[selectedTest]} />
-            )}
-          </div>
-          {selectedTest !== null && info.supportsStepAnnotations ? <StepDetails /> : null}
-          <ContextMenuWrapper />
+    <TestInfoContextMenuContextRoot>
+      <div className="flex flex-grow flex-col overflow-hidden">
+        <div className="relative flex flex-grow flex-col space-y-1 overflow-auto border-t border-splitter px-2 pt-3">
+          {missingSteps ? <MissingSteps /> : null}
+          {selectedTest == null ? (
+            <TestCaseTree testCases={testCases} />
+          ) : (
+            <TestCase test={testCases[selectedTest]} />
+          )}
         </div>
-      </TestInfoContextMenuContextRoot>
-    </TestInfoContext.Provider>
+        {selectedTest !== null && info.supportsStepAnnotations ? <StepDetails /> : null}
+        <ContextMenuWrapper />
+      </div>
+    </TestInfoContextMenuContextRoot>
   );
 }

@@ -30,6 +30,7 @@ export function TestCaseRow({ test, index }: { test: TestItem; index: number }) 
 
   return (
     <button
+      data-test-id="TestSuite-TestCaseRow"
       className={classnames(
         "flex flex-row items-center justify-between gap-1 rounded-lg p-1 transition",
         {
