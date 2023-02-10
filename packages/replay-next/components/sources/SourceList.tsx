@@ -69,7 +69,7 @@ export default function SourceList({
   const listRef = useRef<List>(null);
 
   const { range: focusRange } = useContext(FocusContext);
-  const { pointBehaviorsForSourceList: pointBehaviors, pointsForSourceList: points } =
+  const { pointBehaviorsForDefaultPriority: pointBehaviors, pointForDefaultPriority: points } =
     useContext(PointsContext);
   const client = useContext(ReplayClientContext);
   const {

@@ -49,7 +49,7 @@ export function LoggablesContextRoot({
   messageListRef: MutableRefObject<HTMLElement | null>;
 }) {
   const client = useContext(ReplayClientContext);
-  const { pointBehaviorsForConsole: pointBehaviors, pointsForConsole: points } =
+  const { pointBehaviorsForSuspense: pointBehaviors, pointsForSuspense: points } =
     useContext(PointsContext);
   const {
     eventTypes,

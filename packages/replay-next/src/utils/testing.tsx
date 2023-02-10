@@ -124,16 +124,16 @@ export async function renderFocused(
 
   const pointsContext: PointsContextType = {
     addPoint: jest.fn(),
-    consolePointsPending: false,
+    pointsTransitionPending: false,
     deletePoints: jest.fn(),
     discardPendingPointText: jest.fn(),
     editPendingPointText: jest.fn(),
     editPointBadge: jest.fn(),
     editPointBehavior: jest.fn(),
-    pointBehaviorsForConsole: {},
-    pointBehaviorsForSourceList: {},
-    pointsForConsole: [],
-    pointsForSourceList: [],
+    pointBehaviorsForSuspense: {},
+    pointBehaviorsForDefaultPriority: {},
+    pointsForSuspense: [],
+    pointForDefaultPriority: [],
     savePendingPointText: jest.fn(),
     ...options?.pointsContext,
   };

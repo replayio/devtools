@@ -118,7 +118,7 @@ function PointPanelWithHitPoints({
     discardPendingPointText,
     editPendingPointText,
     editPointBehavior,
-    pointBehaviorsForSourceList: pointBehaviors,
+    pointBehaviorsForDefaultPriority: pointBehaviors,
     savePendingPointText,
   } = useContext(PointsContext);
   const client = useContext(ReplayClientContext);

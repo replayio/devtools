@@ -23,8 +23,8 @@ export default function Breakpoints({
   const {
     deletePoints,
     editPointBehavior,
-    pointsForSourceList: points,
-    pointBehaviorsForSourceList: pointBehaviors,
+    pointForDefaultPriority: points,
+    pointBehaviorsForDefaultPriority: pointBehaviors,
   } = useContext(PointsContext);
   const { currentUserInfo } = useContext(SessionContext);
 

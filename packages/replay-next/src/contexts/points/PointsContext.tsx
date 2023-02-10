@@ -49,26 +49,24 @@ export type PointsContextType = {
   editPointBehavior: EditPointBehavior;
 
   /************************************
-   * Console centric values
+   * Intended for use with components that suspend as a result of point text or behaviors.
    */
 
-  // Intended for use with components that suspend as a result of point text or behaviors.
   // These values are updated at transition priority.
-  pointBehaviorsForConsole: PointBehaviorsObject;
-  pointsForConsole: Point[];
+  pointBehaviorsForSuspense: PointBehaviorsObject;
+  pointsForSuspense: Point[];
 
   // Points or behaviors have a pending transition.
   // Components may want to render a normal priority, non-suspending update (e.g. dim or spinner).
-  consolePointsPending: boolean;
+  pointsTransitionPending: boolean;
 
   /************************************
-   * Source viewer centric values
+   * Intended for use with components that edit point text but to not suspend as a result of point text.
    */
 
-  // Intended for use with components that edit point text but to not suspend as a result of point text.
   // These values are updated at normal priority.
-  pointBehaviorsForSourceList: PointBehaviorsObject;
-  pointsForSourceList: Point[];
+  pointBehaviorsForDefaultPriority: PointBehaviorsObject;
+  pointForDefaultPriority: Point[];
 
   // These methods make pending changes to point text.
   // They must be explicitly saved or discarded once editing has finished.
@@ -126,7 +124,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   // Transition priority points and behaviors (for components that suspend)
   const deferredPoints = useDeferredValue(savedPoints);
   const deferredPointBehaviors = useDeferredValue(localPointBehaviors);
-  const consolePointsPending =
+  const pointsTransitionPending =
     deferredPoints !== savedPoints || deferredPointBehaviors !== localPointBehaviors;
 
   // Pending point text edits go here until they're either saved or discarded.
@@ -136,7 +134,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
 
   // Merge saved points with local edits;
   // Local edits should take precedence so they're reflected in the Source viewer.
-  const pointsForSourceList = useMemo<Point[]>(
+  const pointForDefaultPriority = useMemo<Point[]>(
     () =>
       savedPoints.map(point => {
         const partialPoint = pendingPointText.get(point.key);
@@ -243,21 +241,20 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   const context = useMemo<PointsContextType>(
     () => ({
       addPoint,
-      consolePointsPending,
       deletePoints,
       discardPendingPointText,
       editPendingPointText,
       editPointBadge,
       editPointBehavior,
-      pointBehaviorsForConsole: deferredPointBehaviors,
-      pointBehaviorsForSourceList: localPointBehaviors,
-      pointsForConsole: deferredPoints,
-      pointsForSourceList,
+      pointBehaviorsForSuspense: deferredPointBehaviors,
+      pointBehaviorsForDefaultPriority: localPointBehaviors,
+      pointsForSuspense: deferredPoints,
+      pointForDefaultPriority,
+      pointsTransitionPending,
       savePendingPointText,
     }),
     [
       addPoint,
-      consolePointsPending,
       deferredPointBehaviors,
       deferredPoints,
       deletePoints,
@@ -266,7 +263,8 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       editPointBadge,
       editPointBehavior,
       localPointBehaviors,
-      pointsForSourceList,
+      pointForDefaultPriority,
+      pointsTransitionPending,
       savePendingPointText,
     ]
   );
