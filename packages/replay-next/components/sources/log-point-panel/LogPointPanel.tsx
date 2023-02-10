@@ -42,7 +42,6 @@ import { Nag } from "shared/graphql/types";
 import { isThennable } from "shared/proxy/utils";
 
 import Loader from "../../Loader";
-import { SetLinePointState } from "../SourceListRow";
 import SyntaxHighlightedLine from "../SyntaxHighlightedLine";
 import BadgePicker from "./BadgePicker";
 import CommentButton from "./CommentButton";
@@ -54,7 +53,6 @@ type EditReason = "condition" | "content";
 type ExternalProps = {
   className: string;
   point: Point;
-  setLinePointState: SetLinePointState;
 };
 
 type InternalProps = ExternalProps & {
@@ -113,11 +111,16 @@ function PointPanelWithHitPoints({
   hitPoints,
   hitPointStatus,
   point,
-  setLinePointState,
 }: InternalProps) {
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
-  const { editPointText, editPointBehavior, pointBehaviors } = useContext(SourceListPointsContext);
+  const {
+    discardPendingPoint,
+    editPointText,
+    editPointBehavior,
+    pointBehaviors,
+    savePendingPoint,
+  } = useContext(SourceListPointsContext);
   const client = useContext(ReplayClientContext);
   const { accessToken, currentUserInfo, recordingId, trackEvent } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: currentTime } = useContext(TimelineContext);
@@ -133,18 +136,14 @@ function PointPanelWithHitPoints({
 
   const [isPending, startTransition] = useTransition();
 
-  const [editableCondition, setEditableCondition] = useState(point.condition);
-  const [editableContent, setEditableContent] = useState(point.content);
-
   const isContentValid = useMemo(
-    () => !!editableContent && validate(editableContent),
-    [editableContent]
+    () => !isEditing || validate(point.content),
+    [isEditing, point.content]
   );
   const isConditionValid = useMemo(
-    () => editableCondition === null || validate(editableCondition),
-    [editableCondition]
+    () => !isEditing || point.condition === null || validate(point.condition),
+    [isEditing, point.condition]
   );
-  const hasChanged = editableCondition !== point.condition || editableContent !== point.content;
 
   const lineNumber = point.location.line;
 
@@ -193,7 +192,7 @@ function PointPanelWithHitPoints({
   const pointBehavior = pointBehaviors[point.key];
   const shouldLog = pointBehavior?.shouldLog === POINT_BEHAVIOR_ENABLED;
 
-  const hasCondition = isEditing ? editableCondition !== null : point.condition !== null;
+  const hasCondition = point.condition !== null;
   const lineIndex = point.location.line - 1;
 
   const toggleCondition = () => {
@@ -202,19 +201,12 @@ function PointPanelWithHitPoints({
     }
 
     if (hasCondition) {
-      if (isEditing) {
-        setEditableCondition(null);
-      } else {
-        editPointText(point.key, { condition: null, content: editableContent });
-      }
-
-      setLinePointState(lineIndex, "point");
+      editPointText(point.key, { condition: null });
     } else {
       if (!isEditing) {
         startEditing("condition");
       }
-      setEditableCondition("");
-      setLinePointState(lineIndex, "point-with-conditional");
+      editPointText(point.key, { condition: "" });
     }
   };
 
@@ -239,11 +231,8 @@ function PointPanelWithHitPoints({
     }
 
     trackEvent("breakpoint.start_edit");
-    setEditableCondition(point.condition || null);
-    setEditableContent(point.content);
     setIsEditing(true);
     setEditReason(editReason);
-    setLinePointState(lineIndex, point.condition !== null ? "point-with-conditional" : "point");
   };
 
   const addComment = () => {
@@ -279,31 +268,26 @@ function PointPanelWithHitPoints({
   };
 
   const onCancel = () => {
-    setEditableContent(point.content);
-    setEditableCondition(point.condition);
     setIsEditing(false);
-    setLinePointState(lineIndex, point.condition !== null ? "point-with-conditional" : "point");
+    discardPendingPoint(point.key);
   };
 
   const onEditableContentChange = (newContent: string) => {
     trackEvent("breakpoint.set_log");
-    setEditableContent(newContent);
+    editPointText(point.key, { content: newContent });
   };
 
   const onEditableConditionChange = (newCondition: string) => {
     trackEvent("breakpoint.set_condition");
-    setEditableCondition(newCondition);
+    editPointText(point.key, { condition: newCondition });
   };
 
   const onSubmit = () => {
-    if (isConditionValid && isContentValid && hasChanged) {
-      editPointText(point.key, {
-        condition: editableCondition || null,
-        content: editableContent,
-      });
+    if (isConditionValid && isContentValid) {
+      setIsEditing(false);
+      savePendingPoint(point.key);
+      dismissEditBreakpointNag();
     }
-    setIsEditing(false);
-    dismissEditBreakpointNag();
   };
 
   const saveButton = (
@@ -358,7 +342,7 @@ function PointPanelWithHitPoints({
                       dataTestId={`PointPanel-ConditionInput-${lineNumber}`}
                       dataTestName="PointPanel-ConditionInput"
                       editable={editable}
-                      initialValue={editableCondition || ""}
+                      initialValue={point.condition || ""}
                       onCancel={onCancel}
                       onChange={onEditableConditionChange}
                       onSave={onSubmit}
@@ -426,7 +410,7 @@ function PointPanelWithHitPoints({
                     dataTestId={`PointPanel-ContentInput-${lineNumber}`}
                     dataTestName="PointPanel-ContentInput"
                     editable={editable}
-                    initialValue={editableContent}
+                    initialValue={point.content}
                     onCancel={onCancel}
                     onChange={onEditableContentChange}
                     onSave={onSubmit}

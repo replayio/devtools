@@ -3,7 +3,6 @@ import findLast from "lodash/findLast";
 import { useContext } from "react";
 
 import Icon from "replay-next/components/Icon";
-import { SetLinePointState } from "replay-next/components/sources/SourceListRow";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { KeyboardModifiersContext } from "replay-next/src/contexts/KeyboardModifiersContext";
 import {
@@ -46,7 +45,6 @@ export default function HoverButton({
   lineNumber,
   point,
   pointBehavior,
-  setLinePointState,
   source,
 }: {
   addPoint: AddPoint;
@@ -59,7 +57,6 @@ export default function HoverButton({
   lineNumber: number;
   point: Point | null;
   pointBehavior: PointBehavior | null;
-  setLinePointState: SetLinePointState;
   source: ProtocolSource;
 }) {
   const { range: focusRange } = useContext(FocusContext);
@@ -160,13 +157,13 @@ export default function HoverButton({
           },
           location
         );
-
-        setLinePointState(lineNumber - 1, "point");
       }
     };
 
-    const { shouldBreak = POINT_BEHAVIOR_DISABLED, shouldLog = POINT_BEHAVIOR_DISABLED } =
-      pointBehavior || {};
+    const {
+      shouldBreak = POINT_BEHAVIOR_DISABLED,
+      shouldLog = point?.content ? POINT_BEHAVIOR_ENABLED : POINT_BEHAVIOR_DISABLED,
+    } = pointBehavior || {};
 
     // If a point's behavior has been temporarily disabled, the hover button should take that into account.
     const hasOrDidBreak = shouldBreak !== POINT_BEHAVIOR_DISABLED;
@@ -179,14 +176,8 @@ export default function HoverButton({
           editPointBehavior(point.key, {
             shouldLog: newShouldLog,
           });
-
-          if (!newShouldLog) {
-            setLinePointState(lineNumber - 1, null);
-          }
         } else {
           deletePoints(point.key);
-
-          setLinePointState(lineNumber - 1, null);
         }
       }
     };

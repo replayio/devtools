@@ -9,7 +9,6 @@ import {
   useState,
 } from "react";
 
-import { EMPTY_ARRAY } from "replay-next/src/contexts/points/constants";
 import {
   PointsContextDangerousToUseDirectly as PointsContext,
   ContextType as PointsContextType,
@@ -54,7 +53,7 @@ export function ContextRoot({ children }: PropsWithChildren) {
   const committedValuesRef = useRef<{
     pendingPartialPoints: Map<PointKey, Pick<Point, "condition" | "content">>;
     savedPoints: Point[];
-  }>({ pendingPartialPoints: new Map(), savedPoints: EMPTY_ARRAY });
+  }>({ pendingPartialPoints: new Map(), savedPoints: [] });
   useEffect(() => {
     committedValuesRef.current.pendingPartialPoints = pendingPartialPoints;
     committedValuesRef.current.savedPoints = savedPoints;

@@ -1,5 +1,4 @@
 import { Location, TimeStampedPoint } from "@replayio/protocol";
-import sortedIndexBy from "lodash/sortedIndexBy";
 import {
   PropsWithChildren,
   createContext,
@@ -13,9 +12,9 @@ import {
 import { v4 as uuid } from "uuid";
 
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
-import { EMPTY_ARRAY, EMPTY_OBJECT } from "replay-next/src/contexts/points/constants";
+import useLocalPointBehaviors from "replay-next/src/contexts/points/useLocalPointBehaviors";
+import useLocalPoints from "replay-next/src/contexts/points/useLocalPoints";
 import { getPointsAsync } from "replay-next/src/suspense/PointsCache";
-import { findIndex, insert } from "replay-next/src/utils/array";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   Badge,
@@ -31,15 +30,15 @@ import {
 } from "shared/graphql/Points";
 
 import useBreakpointIdsFromServer from "../../hooks/useBreakpointIdsFromServer";
-import useIndexedDB, { IDBOptions } from "../../hooks/useIndexedDB";
+import useIndexedDB, { IDBOptions, getLatestIDBValueAsync } from "../../hooks/useIndexedDB";
 import { SessionContext } from "../SessionContext";
-import comparePoints from "./comparePoints";
 import {
   AddPoint,
   DeletePoints,
   EditPointBadge,
   EditPointBehavior,
   EditPointDangerousToUseDirectly,
+  LocalPointsObject,
   PointBehaviorsObject,
 } from "./types";
 
@@ -87,32 +86,19 @@ export function ContextRoot({ children }: PropsWithChildren<{}>) {
   const { accessToken, currentUserInfo, recordingId, trackEvent } = useContext(SessionContext);
   const replayClient = useContext(ReplayClientContext);
 
-  const { setValue: setLocalPoints, value: localPoints } = useIndexedDB<Point[]>({
-    database: POINTS_DATABASE,
-    initialValue: EMPTY_ARRAY,
-    recordName: recordingId,
-    storeName: "points",
-  });
+  const [localPoints, setLocalPoints] = useLocalPoints({ recordingId });
+  const [localPointBehaviors, setLocalPointBehaviors] = useLocalPointBehaviors({ recordingId });
 
-  const { setValue: setPointBehaviors, value: pointBehaviors } = useIndexedDB<PointBehaviorsObject>(
-    {
-      database: POINTS_DATABASE,
-      initialValue: EMPTY_OBJECT,
-      recordName: recordingId,
-      storeName: "point-behaviors",
-    }
-  );
-
-  // Note that we fetch using the async helper rather than Suspense,
+  // Note that we fetch Points using async helpers rather than Suspense,
   // because it's better to load the rest of the app earlier than to wait on Points.
-  const [remotePoints, setRemotePoints] = useState<Point[] | null>(null);
+  const [remotePoints, setRemotePoints] = useState<Point[]>([]);
   useEffect(() => {
-    async function fetchPoints() {
+    async function fetchRemotePoints() {
       const points = await getPointsAsync(graphQLClient, accessToken, recordingId);
       setRemotePoints(points);
     }
 
-    fetchPoints();
+    fetchRemotePoints();
   }, [graphQLClient, recordingId, accessToken]);
 
   // Merge points from IndexedDB and GraphQL.
@@ -120,14 +106,10 @@ export function ContextRoot({ children }: PropsWithChildren<{}>) {
   // This has an added benefit of ensuring edits/deletions always reflect the latest state
   // without requiring refetching data from GraphQL.
   const mergedPoints = useMemo<Point[]>(() => {
-    const mergedPoints: Point[] = [];
-    localPoints?.forEach(point => {
-      insert<Point>(mergedPoints, point, comparePoints);
-    });
-    remotePoints?.forEach(point => {
-      const index = findIndex<Point>(mergedPoints, point, comparePoints);
-      if (index < 0) {
-        insert<Point>(mergedPoints, point, comparePoints);
+    const mergedPoints: Point[] = Array.from(Object.values(localPoints));
+    remotePoints.forEach(remotePoint => {
+      if (localPoints[remotePoint.key] == null) {
+        mergedPoints.push(remotePoint);
       }
     });
     return mergedPoints;
@@ -137,9 +119,9 @@ export function ContextRoot({ children }: PropsWithChildren<{}>) {
   const committedValuesRef = useRef<{
     points: Point[];
     pointBehaviors: PointBehaviorsObject;
-  }>({ points: EMPTY_ARRAY, pointBehaviors: EMPTY_OBJECT });
+  }>({ points: [], pointBehaviors: {} });
   useEffect(() => {
-    committedValuesRef.current.pointBehaviors = pointBehaviors;
+    committedValuesRef.current.pointBehaviors = localPointBehaviors;
     committedValuesRef.current.points = mergedPoints;
   });
 
@@ -176,11 +158,13 @@ export function ContextRoot({ children }: PropsWithChildren<{}>) {
         ...partialPointBehavior,
       };
 
-      setLocalPoints((prevPoints: Point[]) => {
-        const index = sortedIndexBy(prevPoints, point, ({ location }) => location.line);
-        return prevPoints.slice(0, index).concat([point], prevPoints.slice(index));
+      setLocalPoints(prev => {
+        const cloned = { ...prev };
+        cloned[key] = point;
+        return cloned;
       });
-      setPointBehaviors(prev => {
+
+      setLocalPointBehaviors(prev => {
         return {
           ...prev,
           [key]: pointBehavior,
@@ -199,7 +183,7 @@ export function ContextRoot({ children }: PropsWithChildren<{}>) {
       graphQLClient,
       recordingId,
       setLocalPoints,
-      setPointBehaviors,
+      setLocalPointBehaviors,
       trackEvent,
     ]
   );
@@ -208,10 +192,15 @@ export function ContextRoot({ children }: PropsWithChildren<{}>) {
     (...keys: PointKey[]) => {
       trackEvent("breakpoint.remove");
 
-      setLocalPoints((prevPoints: Point[]) =>
-        prevPoints.filter(point => !keys.includes(point.key))
-      );
-      setPointBehaviors(prev => {
+      setLocalPoints(prev => {
+        const cloned = { ...prev };
+        keys.forEach(key => {
+          delete cloned[key];
+        });
+        return cloned;
+      });
+
+      setLocalPointBehaviors(prev => {
         const cloned = { ...prev };
         keys.forEach(key => {
           delete cloned[key];
@@ -228,10 +217,23 @@ export function ContextRoot({ children }: PropsWithChildren<{}>) {
             deletePointGraphQL(graphQLClient, accessToken, prevPoint);
           }
         });
+
+        // GraphQL is currently only loaded during initialization.
+        // To prevent Points from being left behind in memory, also remove them from local state.
+        setRemotePoints(prev => {
+          const cloned = [...prev];
+          keys.forEach(key => {
+            const index = cloned.findIndex(point => point.key === key);
+            if (index >= 0) {
+              cloned.splice(index, 1);
+            }
+          });
+          return cloned;
+        });
       }
     },
 
-    [accessToken, graphQLClient, setLocalPoints, setPointBehaviors, trackEvent]
+    [accessToken, graphQLClient, setLocalPoints, setLocalPointBehaviors, trackEvent]
   );
 
   const editPointDangerousToUseDirectly = useCallback<EditPointDangerousToUseDirectly>(
@@ -246,15 +248,10 @@ export function ContextRoot({ children }: PropsWithChildren<{}>) {
           ...partialPoint,
         };
 
-        setLocalPoints((prevPoints: Point[]) => {
-          const index = prevPoints.findIndex(point => point.key === key);
-          if (index >= 0) {
-            const points = prevPoints.slice();
-            points.splice(index, 1, newPoint);
-            return points;
-          }
-
-          throw Error(`Could not find point with key "${key}"`);
+        setLocalPoints(prev => {
+          const cloned = { ...prev };
+          cloned[key] = newPoint;
+          return cloned;
         });
 
         // If the current user is signed-in, sync this new edit to GraphQL
@@ -274,7 +271,7 @@ export function ContextRoot({ children }: PropsWithChildren<{}>) {
       const { pointBehaviors } = committedValuesRef.current;
       const prevPointBehavior = pointBehaviors[key];
 
-      setPointBehaviors(prev => ({
+      setLocalPointBehaviors(prev => ({
         ...prev,
         [key]: {
           shouldBreak: prevPointBehavior?.shouldBreak ?? POINT_BEHAVIOR_DISABLED,
@@ -284,7 +281,7 @@ export function ContextRoot({ children }: PropsWithChildren<{}>) {
         },
       }));
     },
-    [setPointBehaviors, trackEvent]
+    [setLocalPointBehaviors, trackEvent]
   );
 
   const editPointBadge = useCallback<EditPointBadge>(
@@ -294,7 +291,7 @@ export function ContextRoot({ children }: PropsWithChildren<{}>) {
     [editPointDangerousToUseDirectly]
   );
 
-  useBreakpointIdsFromServer(replayClient, mergedPoints, pointBehaviors, deletePoints);
+  useBreakpointIdsFromServer(replayClient, mergedPoints, localPointBehaviors, deletePoints);
 
   const context = useMemo(
     () => ({
@@ -303,7 +300,7 @@ export function ContextRoot({ children }: PropsWithChildren<{}>) {
       editPointBadge,
       editPointBehavior,
       editPointDangerousToUseDirectly,
-      pointBehaviors,
+      pointBehaviors: localPointBehaviors,
       points: mergedPoints,
     }),
     [
@@ -312,8 +309,8 @@ export function ContextRoot({ children }: PropsWithChildren<{}>) {
       editPointBadge,
       editPointBehavior,
       editPointDangerousToUseDirectly,
+      localPointBehaviors,
       mergedPoints,
-      pointBehaviors,
     ]
   );
 

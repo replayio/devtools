@@ -44,9 +44,6 @@ const syntaxHighlightingEnabled =
   typeof window !== "undefined" &&
   new URL(window?.location?.href).searchParams.get("disableSyntaxHighlighting") == null;
 
-export type PointStateEnum = "point" | "point-with-conditional";
-export type SetLinePointState = (lineIndex: number, state: PointStateEnum | null) => void;
-
 export type ItemData = {
   breakablePositionsByLine: Map<number, SameLineSourceLocations>;
   hitCounts: LineNumberToHitCountMap | null;
@@ -58,7 +55,6 @@ export type ItemData = {
   pointPanelWithConditionalHeight: number;
   points: Point[];
   pointBehaviors: PointBehaviorsObject;
-  setLinePointState: SetLinePointState;
   showColumnBreakpoints: boolean;
   showHitCounts: boolean;
   source: ProtocolSource;
@@ -96,7 +92,6 @@ const SourceListRow = memo(
       onLineMouseLeave,
       pointBehaviors,
       points,
-      setLinePointState,
       showColumnBreakpoints,
       showHitCounts,
       source,
@@ -411,20 +406,13 @@ const SourceListRow = memo(
                   lineNumber={lineNumber}
                   point={firstPoint}
                   pointBehavior={firstPointBehavior}
-                  setLinePointState={setLinePointState}
                   source={source}
                 />
               </Suspense>
             )}
           </div>
 
-          {showPointPanel && (
-            <LogPointPanel
-              className={styles.PointPanel}
-              point={firstPoint}
-              setLinePointState={setLinePointState}
-            />
-          )}
+          {showPointPanel && <LogPointPanel className={styles.PointPanel} point={firstPoint} />}
         </div>
 
         <CurrentLineHighlight lineNumber={lineNumber} sourceId={sourceId} />
