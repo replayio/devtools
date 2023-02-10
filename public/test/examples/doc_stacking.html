@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html><body>
+<style>
+body > div {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  padding: 5px;
+}
+.box1 {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  width: 40px;
+  height: 40px;
+  background-color: red;
+}
+.box2 {
+  position: absolute;
+  left: 30px;
+  top: 30px;
+  width: 40px;
+  height: 40px;
+  background-color: green;
+}
+</style>
+<div style="left: 0px; top: 0px;">
+  <div class="box1"></div>
+  <div class="box2"></div>
+</div>
+<div style="left: 100px; top: 0px;">
+  <div class="box1"></div>
+  <div class="box2" style="position: static;"></div>
+</div>
+<div style="left: 200px; top: 0px;">
+  <div class="box1" style="z-index: -1;"></div>
+</div>
+<div style="left: 300px; top: 0px;">
+  <div class="box1" style="z-index: 2;"></div>
+  <div class="box2" style="z-index: 1;"></div>
+</div>
+<div style="left: 0px; top: 100px;">
+  <div class="box1" style="position: static; float: left;"></div>
+  <div style="height: 20px;"></div>
+  <div class="box2" style="position: static;"></div>
+</div>
+<div style="left: 100px; top: 100px;">
+  <div class="box1"></div>
+  <div class="box2" style="visibility: hidden;"></div>
+</div>
+<div style="left: 200px; top: 100px;">
+  <div class="box1"></div>
+  <div class="box2" style="pointer-events: none;"></div>
+</div>
+<div style="left: 300px; top: 100px;">
+  <div class="box1" style="position: static; z-index: 1;"></div>
+  <div class="box2"></div>
+</div>
+<div style="left: 0px; top: 200px; display: flex;">
+  <div class="box1" style="position: static; z-index: 1;"></div>
+  <div class="box2"></div>
+</div>
+<div style="left: 100px; top: 200px; display: grid;">
+  <div class="box1" style="position: static; z-index: 1;"></div>
+  <div class="box2"></div>
+</div>
+<div style="left: 200px; top: 200px;">
+  <div class="box1" style="z-index: 2;"></div>
+</div>
+<div style="left: 200px; top: 200px;">
+  <div class="box2" style="z-index: 1;"></div>
+</div>
+<div style="left: 300px; top: 200px;">
+  <div style="position: relative; left: 5px; top: 5px;">
+    <div class="box1" style="position: static;"></div>
+  </div>
+  <div style="margin-left: 25px; margin-top: -15px;">
+    <div class="box2" style="position: static;"></div>
+  </div>
+</div>
+<div style="left: 0px; top: 300px;">
+  <div class="box1">
+    <span>Foo HelloWorld</span>
+  </div>
+</div>
+<div style="left: 100px; top: 300px;">
+  <div style="width: 40px; height: 20px; overflow: hidden;">
+    <div class="box1" style="position: static;"></div>
+  </div>
+</div>
+<div style="left: 200px; top: 300px;">
+  <div style="width: 40px; height: 20px; overflow: hidden;">
+    <div class="box1"></div>
+  </div>
+</div>
+<div style="left: 300px; top: 300px;">
+  <div style="width: 40px; height: 20px; overflow: hidden;">
+    <div class="box1" style="position: relative;"></div>
+  </div>
+</div>
+<script>
+  window.setTimeout(() => {
+    console.log("ExampleFinished");
+  });
+</script>  
+</body></html>

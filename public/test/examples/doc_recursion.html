@@ -1,0 +1,18 @@
+<html lang="en" dir="ltr">
+<body>
+<div id="maindiv" style="padding-top:50px">Hello World!</div>
+</body>
+<script>
+function recordingFinished() {
+  console.log("ExampleFinished");
+}
+function foo(n) {
+  console.log("Hello " + n);
+  if (n > 0) {
+    foo(n - 1);
+  }
+}
+foo(3);
+window.setTimeout(recordingFinished);
+</script>
+</html>

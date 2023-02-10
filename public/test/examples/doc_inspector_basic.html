@@ -1,0 +1,26 @@
+<body>
+<div style="color: red" onclick="console.log('LOG')" id="maindiv">HELLO</div>
+<script>
+function recordingFinished() {
+  console.log("ExampleFinished");
+}
+
+function foo() {
+  document.getElementById("maindiv").innerHTML = "GOODBYE";
+  window.setTimeout(recordingFinished);
+}
+
+function iframeFinished() {
+  window.setTimeout(foo);
+}
+</script>
+<div id="div1">
+  <div id="div2">
+    <div id="div3">
+      STUFF
+    </div>
+  </div>
+  <div id="div4" some-attribute="STUFF"></div>
+</div>
+<iframe src="iframe.html" id="myiframe"></iframe>
+</body>

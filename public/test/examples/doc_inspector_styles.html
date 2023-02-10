@@ -1,0 +1,17 @@
+<body>
+<link rel="stylesheet" href="styles.css">
+<div id="maindiv">HELLO</div>
+<div id="conflict">CONFLICT</div>
+<div id="important">IMPORTANT</div>
+<script>
+function recordingFinished() {
+  console.log("ExampleFinished");
+}
+function foo() {
+  document.getElementById("maindiv").innerHTML = "GOODBYE";
+  document.getElementById("maindiv").style.backgroundColor = "blue";
+  window.setTimeout(recordingFinished);
+}
+window.setTimeout(foo);
+</script>
+</body>

@@ -1,0 +1,25 @@
+<html>
+<head>
+  <link rel="stylesheet" href="shorthand_styles.css">
+</head>
+<body>
+  <div id="first" class="parent">
+    Foo
+    <div id="second" class="child">
+      Bar
+    </div>
+  </div>
+  <div class="parent" style="font-family: serif; font-variant: normal; margin: unset;">
+    Foo
+    <div class="child" style="font-size: inherit; font-family: unset; font-weight: initial;">
+      Bar
+    </div>
+  </div>
+</body>
+<script>
+  function recordingFinished() {
+    console.log("ExampleFinished");
+  }
+  window.setTimeout(recordingFinished);
+</script>
+</html>

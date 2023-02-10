@@ -1,0 +1,23 @@
+<html lang="en" dir="ltr">
+<body>
+<div id="maindiv" style="padding-top:50px">Hello Worker!</div>
+</body>
+<script>
+
+function recordingFinished() {
+  console.log("ExampleFinished");
+}
+
+const worker = new Worker("worker.js");
+worker.addEventListener("message", messageHandler);
+
+setTimeout(() => {
+  worker.postMessage("hello");
+}, 0);
+
+function messageHandler(data) {
+  console.log(data);
+  recordingFinished();
+}
+</script>
+</html>
