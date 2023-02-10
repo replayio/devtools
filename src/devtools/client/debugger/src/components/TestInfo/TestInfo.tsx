@@ -1,5 +1,5 @@
 import { Object as ProtocolObject } from "@replayio/protocol";
-import React, { createContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 
 import { TestItem } from "shared/graphql/types";
 import { useTestInfo } from "ui/hooks/useTestInfo";
@@ -8,10 +8,11 @@ import { setPlaybackFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import ContextMenuWrapper from "./ContextMenu";
+import { MissingSteps } from "./MissingSteps";
 import { StepDetails } from "./StepDetails";
 import { TestCase } from "./TestCase";
+import { TestCaseTree } from "./TestCaseTree";
 import { TestInfoContextMenuContextRoot } from "./TestInfoContextMenuContext";
-import styles from "./TestInfo.module.css";
 
 type TestInfoContextType = {
   consoleProps?: ProtocolObject;
@@ -57,59 +58,11 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
       <TestInfoContextMenuContextRoot>
         <div className="flex flex-grow flex-col overflow-hidden">
           <div className="relative flex flex-grow flex-col space-y-1 overflow-auto border-t border-splitter px-2 pt-3">
-            {missingSteps ? (
-              <aside className={styles.aside}>
-                <div>
-                  <strong>👋 Hey there!</strong>
-                </div>
-                <div>
-                  You seem to be missing test steps for this replay. You'll still be able to use the
-                  core Replay tools but adding test steps will give you a much better debugging
-                  experience.
-                </div>
-                {info.runner === "cypress" ? (
-                  <div>
-                    This usually means you need to include the{" "}
-                    <code>@replayio/cypress/support</code> module in your project's support file.
-                    More information is available in our{" "}
-                    <a
-                      className="underline"
-                      href="https://docs.replay.io/recording-browser-tests-(beta)/cypress-instructions"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      docs
-                    </a>
-                    .
-                  </div>
-                ) : null}
-                <div>
-                  If you're stuck, reach out to us over{" "}
-                  <a
-                    className="underline"
-                    href="mailto:support@replay.io"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    email
-                  </a>{" "}
-                  or{" "}
-                  <a
-                    href="https://replay.io/discord"
-                    className="underline"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    discord
-                  </a>{" "}
-                  and we can help you get set up.
-                </div>
-              </aside>
-            ) : null}
+            {missingSteps ? <MissingSteps /> : null}
             {selectedTest == null ? (
               <TestCaseTree testCases={testCases} />
             ) : (
-              <TestCase test={testCases[selectedTest]} index={selectedTest} />
+              <TestCase test={testCases[selectedTest]} />
             )}
           </div>
           {selectedTest !== null && info.supportsStepAnnotations ? <StepDetails /> : null}
@@ -118,64 +71,4 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
       </TestInfoContextMenuContextRoot>
     </TestInfoContext.Provider>
   );
-}
-
-interface TestTree {
-  branches: Record<string, TestTree>;
-  tests: { index: number; test: TestItem }[];
-}
-
-const createTree = () =>
-  ({
-    branches: {},
-    tests: [],
-  } as TestTree);
-
-function TestCaseBranch({ name, tree }: { name?: string; tree: TestTree }) {
-  const branchNames = Object.keys(tree.branches);
-  const hasBranches = branchNames.length > 0;
-  const hasTests = tree.tests.length > 0;
-
-  if (!hasBranches && !hasTests) {
-    return null;
-  }
-
-  return (
-    <>
-      {name ? <li className="p-1">{name}</li> : null}
-      <ol className={name ? "ml-3" : undefined}>
-        {branchNames.map(name => (
-          <TestCaseBranch key={"branch-" + name} tree={tree.branches[name]} name={name} />
-        ))}
-        {tree.tests.map(t => (
-          <TestCase key={t.index} test={t.test} index={t.index} />
-        ))}
-      </ol>
-    </>
-  );
-}
-
-function TestCaseTree({ testCases }: { testCases: TestItem[] }) {
-  const tree = useMemo(
-    () =>
-      testCases.reduce((acc, t, i) => {
-        let branch = acc;
-        const describes = t.path?.slice(3, t.path.length - 1);
-
-        describes?.forEach(d => {
-          if (!branch.branches[d]) {
-            branch.branches[d] = createTree();
-          }
-
-          branch = branch.branches[d];
-        });
-
-        branch.tests.push({ index: i, test: t });
-
-        return acc;
-      }, createTree()),
-    [testCases]
-  );
-
-  return <TestCaseBranch tree={tree} />;
 }
