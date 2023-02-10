@@ -54,6 +54,8 @@ const Viewer = React.lazy(() => import("./Viewer"));
 
 type DevToolsProps = PropsFromRedux & { apiKey?: string; uploadComplete: boolean };
 
+export const sidePanelStorageKey = "Replay:SidePanelCollapsed";
+
 function ViewLoader() {
   const [showLoader, setShowLoader] = useState(false);
   const idRef = useRef<ReturnType<typeof setTimeout>>();
@@ -81,17 +83,24 @@ function Body() {
 
   const sidePanelRef = useRef<ImperativePanelHandle>(null);
 
-  const sidePanelStorageKey = "Replay:SidePanelCollapsed";
   const [sidePanelCollapsed, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
 
   const onSidePanelCollapse = (isCollapsed: boolean) => {
     setSidePanelCollapsed(isCollapsed);
   };
 
+  useEffect(() => {
+    if (sidePanelCollapsed) {
+      sidePanelRef.current?.collapse();
+    } else {
+      sidePanelRef.current?.expand();
+    }
+  }, [sidePanelCollapsed]);
+
   return (
     <div className="vertical-panels pr-2">
       <div className="flex h-full flex-row overflow-hidden bg-chrome">
-        <Toolbar sidePanelCollapsed={sidePanelCollapsed} sidePanelRef={sidePanelRef} />
+        <Toolbar />
         <PanelGroup autoSaveId="DevTools-horizontal" className="split-box" direction="horizontal">
           <Panel
             className="flex=1 flex h-full overflow-hidden"
