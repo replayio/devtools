@@ -133,7 +133,7 @@ export async function renderFocused(
     pointBehaviorsForSuspense: {},
     pointBehaviorsForDefaultPriority: {},
     pointsForSuspense: [],
-    pointForDefaultPriority: [],
+    pointsForDefaultPriority: [],
     savePendingPointText: jest.fn(),
     ...options?.pointsContext,
   };

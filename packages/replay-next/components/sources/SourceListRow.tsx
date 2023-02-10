@@ -35,7 +35,7 @@ import HoverButton from "./HoverButton";
 import LogPointPanel from "./log-point-panel/LogPointPanel";
 import SourceLineLoadingPlaceholder from "./SourceLineLoadingPlaceholder";
 import { formatHitCount } from "./utils/formatHitCount";
-import { findPointsForLocation } from "./utils/points";
+import { findPointForLocation, findPointsForLocation } from "./utils/points";
 import styles from "./SourceListRow.module.css";
 
 // Primarily exists as a way for e2e tests to disable syntax highlighting
@@ -53,7 +53,8 @@ export type ItemData = {
   onLineMouseLeave: (lineIndex: number, lineNumberNode: HTMLElement) => void;
   pointPanelHeight: number;
   pointPanelWithConditionalHeight: number;
-  points: Point[];
+  pointsForDefaultPriority: Point[];
+  pointsForSuspense: Point[];
   pointBehaviors: PointBehaviorsObject;
   showColumnBreakpoints: boolean;
   showHitCounts: boolean;
@@ -91,7 +92,8 @@ const SourceListRow = memo(
       onLineMouseEnter,
       onLineMouseLeave,
       pointBehaviors,
-      points,
+      pointsForDefaultPriority,
+      pointsForSuspense,
       showColumnBreakpoints,
       showHitCounts,
       source,
@@ -121,10 +123,16 @@ const SourceListRow = memo(
 
     const plainText = index < rawTextByLine.length ? rawTextByLine[index] : null;
 
-    const pointsForLine = findPointsForLocation(points, sourceId, lineNumber);
-    const firstPoint = pointsForLine[0] ?? null;
-    const firstPointBehavior = firstPoint ? pointBehaviors[firstPoint.key] ?? null : null;
-    const showPointPanel = firstPoint && firstPointBehavior?.shouldLog !== POINT_BEHAVIOR_DISABLED;
+    const pointForSuspense = findPointForLocation(pointsForSuspense, sourceId, lineNumber);
+    const pointsForLine = findPointsForLocation(pointsForDefaultPriority, sourceId, lineNumber);
+    const pointForDefaultPriority = pointsForLine[0] ?? null;
+    const pointBehavior = pointForDefaultPriority
+      ? pointBehaviors[pointForDefaultPriority.key] ?? null
+      : null;
+    const showPointPanel =
+      pointForDefaultPriority &&
+      pointForSuspense &&
+      pointBehavior?.shouldLog !== POINT_BEHAVIOR_DISABLED;
 
     const hitCount = lineHitCounts?.count || null;
     const lineHasHits = hitCount !== null && hitCount > 0;
@@ -152,7 +160,7 @@ const SourceListRow = memo(
       hitCountLabelClassName = `${hitCountLabelClassName} ${styles.LineHitCountLabelPending}`;
     }
 
-    const showBreakpointMarkers = showColumnBreakpoints && firstPoint != null;
+    const showBreakpointMarkers = showColumnBreakpoints && pointForDefaultPriority != null;
     const breakableColumnIndices = breakablePositionsByLine.get(lineNumber)?.columns ?? [];
 
     const renderBetween = (
@@ -200,9 +208,11 @@ const SourceListRow = memo(
             renderBetween(lineSegments, lastColumnIndex, columnIndex);
           }
 
-          const firstPoint =
+          const pointForDefaultPriority =
             pointsForLine.find(point => point.location.column === columnIndex) ?? null;
-          const pointBehavior = firstPoint ? pointBehaviors[firstPoint.key] ?? null : null;
+          const pointBehavior = pointForDefaultPriority
+            ? pointBehaviors[pointForDefaultPriority.key] ?? null
+            : null;
 
           lineSegments.push(
             <ColumnBreakpointMarker
@@ -246,7 +256,7 @@ const SourceListRow = memo(
       lineSegments = <SourceLineLoadingPlaceholder width={loadingPlaceholderWidth} />;
     }
 
-    const shouldBreak = firstPointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED;
+    const shouldBreak = pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED;
 
     const toggleBreakpoint = () => {
       if (lineHitCounts === null) {
@@ -280,7 +290,7 @@ const SourceListRow = memo(
         // 1. If it logs and breaks, then we should disable breaking
         // 2. If it only breaks then we should delete that point (and all others on the line)
         if (showPointPanel) {
-          editPointBehavior(firstPoint.key, {
+          editPointBehavior(pointForDefaultPriority.key, {
             shouldBreak: shouldBreak ? POINT_BEHAVIOR_DISABLED : POINT_BEHAVIOR_ENABLED,
           });
         } else {
@@ -321,8 +331,8 @@ const SourceListRow = memo(
     );
 
     let breakPointTestState = "off";
-    if (firstPoint !== null) {
-      switch (firstPointBehavior?.shouldBreak) {
+    if (pointForDefaultPriority !== null) {
+      switch (pointBehavior?.shouldBreak) {
         case POINT_BEHAVIOR_ENABLED:
           breakPointTestState = "on";
           break;
@@ -404,15 +414,21 @@ const SourceListRow = memo(
                   iconClassName={styles.HoverButtonIcon}
                   lineHitCounts={lineHitCounts}
                   lineNumber={lineNumber}
-                  point={firstPoint}
-                  pointBehavior={firstPointBehavior}
+                  point={pointForDefaultPriority}
+                  pointBehavior={pointBehavior}
                   source={source}
                 />
               </Suspense>
             )}
           </div>
 
-          {showPointPanel && <LogPointPanel className={styles.PointPanel} point={firstPoint} />}
+          {showPointPanel && (
+            <LogPointPanel
+              className={styles.PointPanel}
+              pointForDefaultPriority={pointForDefaultPriority}
+              pointForSuspense={pointForSuspense}
+            />
+          )}
         </div>
 
         <CurrentLineHighlight lineNumber={lineNumber} sourceId={sourceId} />

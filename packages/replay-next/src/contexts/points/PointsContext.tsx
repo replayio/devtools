@@ -66,7 +66,7 @@ export type PointsContextType = {
 
   // These values are updated at normal priority.
   pointBehaviorsForDefaultPriority: PointBehaviorsObject;
-  pointForDefaultPriority: Point[];
+  pointsForDefaultPriority: Point[];
 
   // These methods make pending changes to point text.
   // They must be explicitly saved or discarded once editing has finished.
@@ -249,7 +249,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       pointBehaviorsForSuspense: deferredPointBehaviors,
       pointBehaviorsForDefaultPriority: localPointBehaviors,
       pointsForSuspense: deferredPoints,
-      pointForDefaultPriority,
+      pointsForDefaultPriority: pointForDefaultPriority,
       pointsTransitionPending,
       savePendingPointText,
     }),

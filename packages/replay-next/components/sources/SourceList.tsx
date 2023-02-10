@@ -29,7 +29,6 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   POINT_BEHAVIOR_DISABLED,
   POINT_BEHAVIOR_ENABLED,
-  Point,
   SourceLocationRange,
 } from "shared/client/types";
 
@@ -69,8 +68,11 @@ export default function SourceList({
   const listRef = useRef<List>(null);
 
   const { range: focusRange } = useContext(FocusContext);
-  const { pointBehaviorsForDefaultPriority: pointBehaviors, pointForDefaultPriority: points } =
-    useContext(PointsContext);
+  const {
+    pointBehaviorsForDefaultPriority: pointBehaviors,
+    pointsForDefaultPriority,
+    pointsForSuspense,
+  } = useContext(PointsContext);
   const client = useContext(ReplayClientContext);
   const {
     focusedSource,
@@ -145,7 +147,7 @@ export default function SourceList({
     if (list) {
       list.resetAfterIndex(0);
     }
-  }, [pointBehaviors, points]);
+  }, [pointBehaviors, pointsForDefaultPriority]);
 
   // React's rules-of-hooks doesn't like useCallback(debounce(...))
   // It will error with a false positive: seCallback received a function whose dependencies are unknown
@@ -178,7 +180,8 @@ export default function SourceList({
       pointBehaviors,
       pointPanelHeight,
       pointPanelWithConditionalHeight,
-      points,
+      pointsForDefaultPriority,
+      pointsForSuspense,
       showColumnBreakpoints,
       showHitCounts,
       source,
@@ -195,7 +198,8 @@ export default function SourceList({
       pointBehaviors,
       pointPanelHeight,
       pointPanelWithConditionalHeight,
-      points,
+      pointsForDefaultPriority,
+      pointsForSuspense,
       showHitCounts,
       showColumnBreakpoints,
       source,
@@ -206,7 +210,7 @@ export default function SourceList({
   const getItemSize = useCallback(
     (index: number) => {
       const lineNumber = index + 1;
-      const point = findPointForLocation(points, sourceId, lineNumber);
+      const point = findPointForLocation(pointsForDefaultPriority, sourceId, lineNumber);
       if (!point) {
         // If the Point has been removed by some external action,
         // e.g. the Pause Information side panel,
@@ -235,9 +239,9 @@ export default function SourceList({
     [
       lineHeight,
       pointBehaviors,
-      points,
       pointPanelHeight,
       pointPanelWithConditionalHeight,
+      pointsForDefaultPriority,
       sourceId,
     ]
   );
