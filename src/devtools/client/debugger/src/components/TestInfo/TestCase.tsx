@@ -24,19 +24,6 @@ export type TestCaseContextType = {
   onPlayFromHere: (startTime: number) => void;
 };
 
-export function formatStepError(step?: TestStep) {
-  if (!step || !step.error || !step.args) {
-    return null;
-  }
-
-  return (
-    <>
-      <strong className="bold">Error:</strong>&nbsp;
-      {step.args.map((e, i) => (typeof e === "string" ? <span key={i}>{e}&nbsp;</span> : null))}
-    </>
-  );
-}
-
 export const TestCaseContext = createContext<TestCaseContextType>(null as any);
 
 export function TestCase({ test }: { test: TestItem }) {

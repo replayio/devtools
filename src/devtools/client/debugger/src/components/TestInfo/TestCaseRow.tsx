@@ -1,11 +1,24 @@
 import classnames from "classnames";
 
-import { TestItem } from "shared/graphql/types";
+import { TestItem, TestStep } from "shared/graphql/types";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { setSelectedTest } from "ui/reducers/reporter";
 import { useAppDispatch } from "ui/setup/hooks";
 
-import { Status, formatStepError } from "./TestCase";
+import { Status } from "./TestCase";
+
+function formatStepError(step?: TestStep) {
+  if (!step || !step.error || !step.args) {
+    return null;
+  }
+
+  return (
+    <>
+      <strong className="bold">Error:</strong>&nbsp;
+      {step.args.map((e, i) => (typeof e === "string" ? <span key={i}>{e}&nbsp;</span> : null))}
+    </>
+  );
+}
 
 export function TestCaseRow({ test, index }: { test: TestItem; index: number }) {
   const dispatch = useAppDispatch();
