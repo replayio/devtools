@@ -24,6 +24,7 @@ import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useNag } from "replay-next/src/hooks/useNag";
+import useSuspendAfterMount from "replay-next/src/hooks/useSuspendAfterMount";
 import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/ExecutionPointsCache";
 import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
 import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
@@ -33,6 +34,7 @@ import { validate } from "replay-next/src/utils/points";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   HitPointStatus,
+  HitPointsAndStatusTuple,
   POINT_BEHAVIOR_DISABLED_TEMPORARILY,
   POINT_BEHAVIOR_ENABLED,
   Point,
@@ -59,7 +61,7 @@ type ExternalProps = {
 type InternalProps = ExternalProps & {
   enterFocusMode: () => void;
   hitPoints: TimeStampedPoint[];
-  hitPointStatus: HitPointStatus;
+  hitPointStatus: HitPointStatus | null;
 };
 
 export default function PointPanelWrapper(props: ExternalProps) {
@@ -89,12 +91,14 @@ function PointPanel(props: ExternalProps) {
 
   const client = useContext(ReplayClientContext);
 
-  const [hitPoints, hitPointStatus] = getHitPointsForLocationSuspense(
-    client,
-    pointForSuspense.location,
-    pointForSuspense.condition,
-    focusRange
-  );
+  const [hitPoints, hitPointStatus] = useSuspendAfterMount<HitPointsAndStatusTuple>(() =>
+    getHitPointsForLocationSuspense(
+      client,
+      pointForSuspense.location,
+      pointForSuspense.condition,
+      focusRange
+    )
+  ) ?? [[], null];
 
   return (
     <PointPanelWithHitPoints

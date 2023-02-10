@@ -30,7 +30,7 @@ export default function HitPointTimeline({
 }: {
   hasConditional: boolean;
   hitPoints: TimeStampedPoint[];
-  hitPointStatus: HitPointStatus;
+  hitPointStatus: HitPointStatus | null;
   shouldLog: boolean;
   point: Point;
   toggleConditional: () => void;

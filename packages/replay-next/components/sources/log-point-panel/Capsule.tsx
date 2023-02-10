@@ -24,7 +24,7 @@ export default function Capsule({
   editable: boolean;
   hasConditional: boolean;
   hitPoints: TimeStampedPoint[];
-  hitPointStatus: HitPointStatus;
+  hitPointStatus: HitPointStatus | null;
   point: Point;
   shouldLog: boolean;
   toggleConditional: () => void;
