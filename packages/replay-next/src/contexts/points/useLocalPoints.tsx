@@ -1,9 +1,8 @@
 import { RecordingId } from "@replayio/protocol";
 
 import useIndexedDB from "replay-next/src/hooks/useIndexedDB";
-import { Point } from "shared/client/types";
 
-import { POINTS_DATABASE } from "./PointsContext";
+import { POINTS_DATABASE } from "./constants";
 import { LocalPointsObject } from "./types";
 
 export default function useLocalPoints({

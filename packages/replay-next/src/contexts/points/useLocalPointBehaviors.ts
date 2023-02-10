@@ -2,7 +2,7 @@ import { RecordingId } from "@replayio/protocol";
 
 import useIndexedDB from "replay-next/src/hooks/useIndexedDB";
 
-import { POINTS_DATABASE } from "./PointsContext";
+import { POINTS_DATABASE } from "./constants";
 import { PointBehaviorsObject } from "./types";
 
 export default function useLocalPointBehaviors({

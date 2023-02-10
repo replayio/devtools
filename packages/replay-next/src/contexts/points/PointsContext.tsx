@@ -30,7 +30,6 @@ import {
 } from "shared/graphql/Points";
 
 import useBreakpointIdsFromServer from "../../hooks/useBreakpointIdsFromServer";
-import useIndexedDB, { IDBOptions, getLatestIDBValueAsync } from "../../hooks/useIndexedDB";
 import { SessionContext } from "../SessionContext";
 import {
   AddPoint,
@@ -38,17 +37,8 @@ import {
   EditPointBadge,
   EditPointBehavior,
   EditPointDangerousToUseDirectly,
-  LocalPointsObject,
   PointBehaviorsObject,
 } from "./types";
-
-// NOTE: If any change is made like adding a store name, bump the version number
-// to ensure that the database is recreated properly.
-export const POINTS_DATABASE: IDBOptions = {
-  databaseName: "Points",
-  databaseVersion: 2,
-  storeNames: ["points", "point-behaviors"],
-};
 
 export type PointInstance = {
   point: Point;
