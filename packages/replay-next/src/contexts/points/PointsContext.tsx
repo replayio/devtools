@@ -234,6 +234,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     committedValuesRef,
     saveLocalAndRemotePoints,
     setPendingPointText,
+    setPointBehaviors: setLocalPointBehaviors,
   });
 
   useBreakpointIdsFromServer(replayClient, savedPoints, localPointBehaviors, deletePoints);
