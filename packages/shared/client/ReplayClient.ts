@@ -1,4 +1,5 @@
 import {
+  AnalysisEntry,
   BreakpointId,
   Result as EvaluationResult,
   ExecutionPoint,
@@ -42,7 +43,7 @@ import {
 import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
 
-import analysisManager, { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/analysisManager";
+import analysisManager, { AnalysisParams } from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
@@ -53,12 +54,9 @@ import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCac
 import { insert } from "replay-next/src/utils/array";
 import { areRangesEqual, compareExecutionPoints } from "replay-next/src/utils/time";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
-import { ProtocolError, isCommandError } from "shared/utils/error";
 import { isPointInRegions, isRangeInRegions, isTimeInRegions } from "shared/utils/time";
 
 import {
-  HitPointStatus,
-  HitPointsAndStatusTuple,
   LineNumberToHitCountMap,
   ReplayClientEvents,
   ReplayClientInterface,
@@ -380,157 +378,6 @@ export class ReplayClient implements ReplayClientInterface {
     const sessionId = this.getSessionIdThrows();
     const { steps } = await client.Pause.getFrameSteps({ frameId }, sessionId, pauseId);
     return steps;
-  }
-
-  async getHitPointsForLocation(
-    focusRange: TimeStampedPointRange | null,
-    location: Location,
-    condition: string | null
-  ): Promise<HitPointsAndStatusTuple> {
-    const collectedHitPoints: TimeStampedPoint[] = [];
-    let status: HitPointStatus | null = null;
-
-    // Don't try to fetch hit points in unloaded regions.
-    // The result might be invalid (and may get cached by a Suspense caller).
-    await this._waitForRangeToBeLoaded(focusRange);
-
-    const locations = this.getCorrespondingLocations(location).map(location => ({ location }));
-    await Promise.all(
-      locations.map(location => getBreakpointPositionsAsync(this, location.location.sourceId))
-    );
-
-    // The backend doesn't support filtering hit points by condition, so we fall back to running analysis.
-    // This is less efficient so we only do it if we have a condition.
-    // We should delete this once the backend supports filtering (see BAC-2103).
-    if (condition) {
-      const mapper = `
-        const { point, time } = input;
-        const { frame: frameId } = sendCommand("Pause.getTopFrame");
-
-        const { result: conditionResult } = sendCommand(
-          "Pause.evaluateInFrame",
-          { frameId, expression: ${JSON.stringify(condition)}, useOriginalScopes: true }
-        );
-
-        let result;
-        if (conditionResult.returned) {
-          const { returned } = conditionResult;
-          if ("value" in returned && !returned.value) {
-            result = 0;
-          } else if (!Object.keys(returned).length) {
-            // Undefined.
-            result = 0;
-          } else {
-            result = 1;
-          }
-        } else {
-          result = 1;
-        }
-
-        return [
-          {
-            key: point,
-            value: {
-              match: result,
-              point,
-              time,
-            },
-          },
-        ];
-      `;
-
-      try {
-        await analysisManager.runAnalysis(
-          {
-            effectful: false,
-            locations,
-            mapper,
-            range: focusRange
-              ? { begin: focusRange.begin.point, end: focusRange.end.point }
-              : undefined,
-          },
-          {
-            onAnalysisError: (error: unknown) => {
-              if (isCommandError(error, ProtocolError.TooManyPoints)) {
-                status = "too-many-points-to-find";
-              } else {
-                console.error(error);
-
-                status = "unknown-error";
-              }
-            },
-            onAnalysisResult: results => {
-              results.forEach(({ value }) => {
-                if (value.match) {
-                  const timeStampedPoint = {
-                    point: value.point,
-                    time: value.time,
-                  };
-                  insert<TimeStampedPoint>(collectedHitPoints, timeStampedPoint, (a, b) =>
-                    compareExecutionPoints(a.point, b.point)
-                  );
-                }
-              });
-            },
-          }
-        );
-      } catch (error) {
-        if (isCommandError(error, ProtocolError.TooManyPoints)) {
-          status = "too-many-points-to-find";
-        } else {
-          console.error(error);
-
-          status = "unknown-error";
-        }
-      }
-    } else {
-      try {
-        await analysisManager.runAnalysis(
-          {
-            effectful: false,
-            locations,
-            mapper: "",
-            range: focusRange
-              ? { begin: focusRange.begin.point, end: focusRange.end.point }
-              : undefined,
-          },
-          {
-            onAnalysisError: (error: unknown) => {
-              if (isCommandError(error, ProtocolError.TooManyPoints)) {
-                status = "too-many-points-to-find";
-              } else {
-                throw error;
-              }
-            },
-            onAnalysisPoints: (pointDescriptions: PointDescription[]) => {
-              pointDescriptions.forEach(timeStampedPoint => {
-                insert<TimeStampedPoint>(collectedHitPoints, timeStampedPoint, (a, b) =>
-                  compareExecutionPoints(a.point, b.point)
-                );
-              });
-            },
-          }
-        );
-      } catch (error) {
-        if (isCommandError(error, ProtocolError.TooManyPoints)) {
-          status = "too-many-points-to-find";
-        } else {
-          console.error(error);
-
-          status = "unknown-error";
-        }
-      }
-    }
-
-    if (status == null) {
-      if (collectedHitPoints.length > MAX_POINTS_FOR_FULL_ANALYSIS) {
-        status = "too-many-points-to-run-analysis";
-      } else {
-        status = "complete";
-      }
-    }
-
-    return [collectedHitPoints, status];
   }
 
   async getObjectProperty(
@@ -927,7 +774,7 @@ export class ReplayClient implements ReplayClientInterface {
           onAnalysisError: (error: unknown) => {
             reject(error);
           },
-          onAnalysisResult: analysisEntries => {
+          onAnalysisResults: analysisEntries => {
             results.push(...analysisEntries.map(entry => entry.value));
           },
         });
@@ -937,6 +784,32 @@ export class ReplayClient implements ReplayClientInterface {
         reject(error);
       }
     });
+  }
+
+  streamAnalysis(
+    params: AnalysisParams,
+    handlers: {
+      onPoints?: (points: PointDescription[]) => void;
+      onResults?: (results: AnalysisEntry[]) => void;
+      onError?: (error: any) => void;
+    }
+  ): { pointsFinished: Promise<void>; resultsFinished: Promise<void> } {
+    let resolvePointsFinished!: () => void;
+    const pointsFinished = new Promise<void>(resolve => (resolvePointsFinished = resolve));
+    let resolveResultsFinished!: () => void;
+    const resultsFinished = new Promise<void>(resolve => (resolveResultsFinished = resolve));
+
+    this._waitForRangeToBeLoaded(params.range || null).then(() =>
+      analysisManager.runAnalysis(params, {
+        onAnalysisPoints: handlers.onPoints,
+        onAnalysisResults: handlers.onResults,
+        onAnalysisError: handlers.onError,
+        onPointsFinished: resolvePointsFinished,
+        onFinished: resolveResultsFinished,
+      })
+    );
+
+    return { pointsFinished, resultsFinished };
   }
 
   async streamSourceContents(

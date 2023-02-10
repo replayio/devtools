@@ -1,5 +1,5 @@
 import { Tab as HeadlessTab } from "@headlessui/react";
-import { FunctionMatch, Location, Value as ProtocolValue } from "@replayio/protocol";
+import { FunctionMatch, Location, PointRange, Value as ProtocolValue } from "@replayio/protocol";
 import dynamic from "next/dynamic";
 import React, {
   MutableRefObject,
@@ -17,9 +17,10 @@ import { Tab } from "devtools/client/shared/components/ResponsiveTabs";
 import { CommandResponse } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import Loader from "replay-next/components/Loader";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { AnalysisResult, runAnalysisAsync } from "replay-next/src/suspense/AnalysisCache";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
-import { getHitPointsForLocationAsync } from "replay-next/src/suspense/ExecutionPointsCache";
+import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClient } from "shared/client/ReplayClient";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -495,12 +496,12 @@ interface ProtocolMessageCommon {
 
 const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericCache<
   [replayClient: ReplayClientInterface],
-  [sourceDetails: SourceDetails[]],
+  [sourceDetails: SourceDetails[], range: PointRange],
   AllProtocolMessages
 >(
   "recordedPotocolMessagesCache",
   1,
-  async (replayClient, sourceDetails) => {
+  async (replayClient, sourceDetails, range) => {
     const sessionSource = sourceDetails.find(source => source.url?.includes("ui/actions/session"));
 
     if (!sessionSource) {
@@ -547,7 +548,7 @@ const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericC
         };
 
         // Get all the times that first line was hit
-        const [hitPoints] = await getHitPointsForLocationAsync(replayClient, position, null, null);
+        const [hitPoints] = await getHitPointsForLocationAsync(replayClient, position, null, range);
 
         // For every hit, grab the first arg, which should be the `event`
         // that is either the request, response, or error data
@@ -607,13 +608,18 @@ const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericC
 
     return results;
   },
-  () => "alwaysCacheThis"
+  (sourceDetails, range) => `${range.begin}-${range.end}`
 );
 
 function RecordedProtocolMessages({ sourceDetails }: { sourceDetails: SourceDetails[] }) {
   const replayClient = useContext(ReplayClientContext);
+  const { rangeForAnalysis } = useContext(FocusContext);
 
-  const allProtocolMessages = getRecordedProtocolMessagesSuspense(replayClient, sourceDetails);
+  const allProtocolMessages = getRecordedProtocolMessagesSuspense(
+    replayClient,
+    sourceDetails,
+    rangeForAnalysis
+  );
 
   return <ProtocolViewer {...allProtocolMessages} />;
 }

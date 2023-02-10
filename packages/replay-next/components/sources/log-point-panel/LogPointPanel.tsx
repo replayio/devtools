@@ -24,7 +24,7 @@ import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useNag } from "replay-next/src/hooks/useNag";
 import useSuspendAfterMount from "replay-next/src/hooks/useSuspendAfterMount";
-import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/ExecutionPointsCache";
+import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/HitPointsCache";
 import { getSource } from "replay-next/src/suspense/SourcesCache";
 import { findIndexBigInt } from "replay-next/src/utils/array";
 import { validate } from "replay-next/src/utils/points";
@@ -83,7 +83,7 @@ export default function PointPanelWrapper(props: ExternalProps) {
 function PointPanel(props: ExternalProps) {
   const { pointForSuspense } = props;
 
-  const { enterFocusMode, range: focusRange } = useContext(FocusContext);
+  const { enterFocusMode, rangeForAnalysis } = useContext(FocusContext);
 
   const client = useContext(ReplayClientContext);
 
@@ -92,7 +92,7 @@ function PointPanel(props: ExternalProps) {
       client,
       pointForSuspense.location,
       pointForSuspense.condition,
-      focusRange
+      rangeForAnalysis
     )
   ) ?? [[], null];
 
