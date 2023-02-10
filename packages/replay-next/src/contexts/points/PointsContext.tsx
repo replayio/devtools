@@ -274,17 +274,15 @@ export function ContextRoot({ children }: PropsWithChildren<{}>) {
       const { pointBehaviors } = committedValuesRef.current;
       const prevPointBehavior = pointBehaviors[key];
 
-      setPointBehaviors(prev => {
-        return {
-          ...prev,
-          [key]: {
-            shouldBreak: prevPointBehavior?.shouldBreak ?? POINT_BEHAVIOR_DISABLED,
-            shouldLog: prevPointBehavior?.shouldLog ?? POINT_BEHAVIOR_DISABLED,
-            ...pointBehavior,
-            key,
-          },
-        };
-      });
+      setPointBehaviors(prev => ({
+        ...prev,
+        [key]: {
+          shouldBreak: prevPointBehavior?.shouldBreak ?? POINT_BEHAVIOR_DISABLED,
+          shouldLog: prevPointBehavior?.shouldLog ?? POINT_BEHAVIOR_DISABLED,
+          ...pointBehavior,
+          key,
+        },
+      }));
     },
     [setPointBehaviors, trackEvent]
   );
