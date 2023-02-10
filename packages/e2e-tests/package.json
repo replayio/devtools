@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "playwright test --reporter=@replayio/playwright/reporter,line",
+    "test": "playwright test",
     "test:chromium": "playwright test --project chromium --reporter=@replayio/playwright/reporter,line",
     "test:replay-chromium": "playwright test --project replay-chromium --reporter=@replayio/playwright/reporter,line",
     "test:debug": "playwright test --workers 1 --headed",
