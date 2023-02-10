@@ -1,7 +1,7 @@
 import { SourceId } from "@replayio/protocol";
 import { ReactNode, useContext, useMemo } from "react";
 
-import { Context as SourceListPointsContext } from "replay-next/src/contexts/points/SourceListPointsContext";
+import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { POINT_BEHAVIOR_DISABLED, Point } from "shared/client/types";
 import { getSourceDetailsEntities } from "ui/reducers/sources";
@@ -20,8 +20,12 @@ export default function Breakpoints({
   emptyContent: ReactNode;
   type: "breakpoint" | "logpoint";
 }) {
-  const { deletePoints, editPointBehavior, points, pointBehaviors } =
-    useContext(SourceListPointsContext);
+  const {
+    deletePoints,
+    editPointBehavior,
+    pointsForSourceList: points,
+    pointBehaviorsForSourceList: pointBehaviors,
+  } = useContext(PointsContext);
   const { currentUserInfo } = useContext(SessionContext);
 
   const sourceDetailsEntities = useAppSelector(getSourceDetailsEntities);
@@ -41,13 +45,20 @@ export default function Breakpoints({
           // Show both enabled and temporarily disabled points.
           // Also show all shared points (even if disabled).
           const behavior = type === "breakpoint" ? shouldBreak : shouldLog;
-          const matchesType =
-            point.user?.id !== currentUserInfo?.id || behavior !== POINT_BEHAVIOR_DISABLED;
+
+          let matchesType = false;
+          if (behavior != null) {
+            matchesType = behavior !== POINT_BEHAVIOR_DISABLED;
+          } else {
+            if (type === "logpoint") {
+              matchesType = !!point.content;
+            }
+          }
 
           return sourceExists && matchesType;
         })
         .sort((a, b) => a.location.line - b.location.line),
-    [currentUserInfo, pointBehaviors, points, type, sourceDetailsEntities]
+    [pointBehaviors, points, type, sourceDetailsEntities]
   );
 
   const sourceIdToPointsMap = useMemo(() => {

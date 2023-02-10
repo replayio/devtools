@@ -14,7 +14,7 @@ import { VariableSizeList as List, ListOnItemsRenderedProps } from "react-window
 
 import { findPointForLocation } from "replay-next/components/sources/utils/points";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { Context as SourceListPointsContext } from "replay-next/src/contexts/points/SourceListPointsContext";
+import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import {
@@ -69,7 +69,8 @@ export default function SourceList({
   const listRef = useRef<List>(null);
 
   const { range: focusRange } = useContext(FocusContext);
-  const { pointBehaviors, points } = useContext(SourceListPointsContext);
+  const { pointBehaviorsForSourceList: pointBehaviors, pointsForSourceList: points } =
+    useContext(PointsContext);
   const client = useContext(ReplayClientContext);
   const {
     focusedSource,
@@ -144,7 +145,7 @@ export default function SourceList({
     if (list) {
       list.resetAfterIndex(0);
     }
-  }, [points]);
+  }, [pointBehaviors, points]);
 
   // React's rules-of-hooks doesn't like useCallback(debounce(...))
   // It will error with a false positive: seCallback received a function whose dependencies are unknown
@@ -219,9 +220,8 @@ export default function SourceList({
       // Else by default, shared print statements should be shown.
       // Points that have no content (breakpoints) should be hidden by default though.
       const shouldLog =
-        pointBehavior?.shouldLog ?? point.content
-          ? POINT_BEHAVIOR_ENABLED
-          : POINT_BEHAVIOR_DISABLED;
+        pointBehavior?.shouldLog ??
+        (point.content ? POINT_BEHAVIOR_ENABLED : POINT_BEHAVIOR_DISABLED);
       if (shouldLog !== POINT_BEHAVIOR_DISABLED) {
         if (point.condition !== null) {
           return lineHeight + pointPanelWithConditionalHeight;

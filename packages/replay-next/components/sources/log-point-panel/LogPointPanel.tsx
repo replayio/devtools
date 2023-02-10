@@ -19,7 +19,7 @@ import {
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
-import { Context as SourceListPointsContext } from "replay-next/src/contexts/points/SourceListPointsContext";
+import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
@@ -115,12 +115,12 @@ function PointPanelWithHitPoints({
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
   const {
-    discardPendingPoint,
-    editPointText,
+    discardPendingPointText,
+    editPendingPointText,
     editPointBehavior,
-    pointBehaviors,
-    savePendingPoint,
-  } = useContext(SourceListPointsContext);
+    pointBehaviorsForSourceList: pointBehaviors,
+    savePendingPointText,
+  } = useContext(PointsContext);
   const client = useContext(ReplayClientContext);
   const { accessToken, currentUserInfo, recordingId, trackEvent } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: currentTime } = useContext(TimelineContext);
@@ -201,12 +201,12 @@ function PointPanelWithHitPoints({
     }
 
     if (hasCondition) {
-      editPointText(point.key, { condition: null });
+      editPendingPointText(point.key, { condition: null });
     } else {
       if (!isEditing) {
         startEditing("condition");
       }
-      editPointText(point.key, { condition: "" });
+      editPendingPointText(point.key, { condition: "" });
     }
   };
 
@@ -269,23 +269,23 @@ function PointPanelWithHitPoints({
 
   const onCancel = () => {
     setIsEditing(false);
-    discardPendingPoint(point.key);
+    discardPendingPointText(point.key);
   };
 
   const onEditableContentChange = (newContent: string) => {
     trackEvent("breakpoint.set_log");
-    editPointText(point.key, { content: newContent });
+    editPendingPointText(point.key, { content: newContent });
   };
 
   const onEditableConditionChange = (newCondition: string) => {
     trackEvent("breakpoint.set_condition");
-    editPointText(point.key, { condition: newCondition });
+    editPendingPointText(point.key, { condition: newCondition });
   };
 
   const onSubmit = () => {
     if (isConditionValid && isContentValid) {
       setIsEditing(false);
-      savePendingPoint(point.key);
+      savePendingPointText(point.key);
       dismissEditBreakpointNag();
     }
   };

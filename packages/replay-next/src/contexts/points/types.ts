@@ -20,7 +20,7 @@ export type DeletePoints = (...pointIds: PointKey[]) => void;
 
 export type EditPointBadge = (key: PointKey, badge: Badge | null) => void;
 
-export type EditPointText = (
+export type EditPendingPointText = (
   key: PointKey,
   partialPoint: Partial<Pick<Point, "condition" | "content">>
 ) => void;
@@ -30,7 +30,9 @@ export type EditPointBehavior = (
   pointBehavior: Partial<Omit<PointBehavior, "pointId">>
 ) => void;
 
-export type EditPointDangerousToUseDirectly = (
+export type SaveOrDiscardPendingText = (key: PointKey) => void;
+
+export type SaveLocalAndRemotePoints = (
   key: PointKey,
   partialPoint: Partial<Pick<Point, "badge" | "condition" | "content">>
 ) => void;

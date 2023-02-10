@@ -17,7 +17,7 @@ import SearchResultHighlight from "replay-next/components/sources/SearchResultHi
 import { SourceSearchContext } from "replay-next/components/sources/SourceSearchContext";
 import useSourceContextMenu from "replay-next/components/sources/useSourceContextMenu";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { Context as SourceListPointsContext } from "replay-next/src/contexts/points/SourceListPointsContext";
+import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { PointBehaviorsObject } from "replay-next/src/contexts/points/types";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { ParsedToken, StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
@@ -65,8 +65,8 @@ const SourceListRow = memo(
   ({ data, index, style }: { data: ItemData; index: number; style: CSSProperties }) => {
     const { setCursorLocation } = useContext(SourcesContext);
     const { isTransitionPending: isFocusRangePending } = useContext(FocusContext);
-    const { addPoint, deletePoints, editPointText, editPointBehavior } =
-      useContext(SourceListPointsContext);
+    const { addPoint, deletePoints, editPendingPointText, editPointBehavior } =
+      useContext(PointsContext);
     const [searchState] = useContext(SourceSearchContext);
 
     const setCursorLocationFromMouseEvent = (event: MouseEvent) => {
@@ -399,7 +399,7 @@ const SourceListRow = memo(
                   addPoint={addPoint}
                   buttonClassName={styles.HoverButton}
                   deletePoints={deletePoints}
-                  editPointText={editPointText}
+                  editPendingPointText={editPendingPointText}
                   editPointBehavior={editPointBehavior}
                   iconClassName={styles.HoverButtonIcon}
                   lineHitCounts={lineHitCounts}

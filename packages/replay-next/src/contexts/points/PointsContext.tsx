@@ -1,69 +1,93 @@
-import { Location, TimeStampedPoint } from "@replayio/protocol";
 import {
   PropsWithChildren,
   createContext,
   useCallback,
   useContext,
+  useDeferredValue,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-import { v4 as uuid } from "uuid";
 
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
-import useLocalPointBehaviors from "replay-next/src/contexts/points/useLocalPointBehaviors";
-import useLocalPoints from "replay-next/src/contexts/points/useLocalPoints";
 import { getPointsAsync } from "replay-next/src/suspense/PointsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import {
-  Badge,
-  POINT_BEHAVIOR_DISABLED,
-  Point,
-  PointBehavior,
-  PointKey,
-} from "shared/client/types";
-import {
-  addPoint as addPointGraphQL,
-  deletePoint as deletePointGraphQL,
-  updatePoint as updatePointGraphQL,
-} from "shared/graphql/Points";
+import { Badge, Point, PointKey } from "shared/client/types";
+import { updatePoint as updatePointGraphQL } from "shared/graphql/Points";
 
 import useBreakpointIdsFromServer from "../../hooks/useBreakpointIdsFromServer";
 import { SessionContext } from "../SessionContext";
+import useAddPoint from "./hooks/useAddPoint";
+import useDeletePoints from "./hooks/useDeletePoints";
+import useDiscardPendingPointText from "./hooks/useDiscardPendingPointText";
+import useEditPendingPointText from "./hooks/useEditPendingPointText";
+import useEditPointBehavior from "./hooks/useEditPointBehavior";
+import useLocalPointBehaviors from "./hooks/useLocalPointBehaviors";
+import useLocalPoints from "./hooks/useLocalPoints";
+import useSavePendingPointText from "./hooks/useSavePendingPointText";
 import {
   AddPoint,
   DeletePoints,
+  EditPendingPointText,
   EditPointBadge,
   EditPointBehavior,
-  EditPointDangerousToUseDirectly,
   PointBehaviorsObject,
+  SaveLocalAndRemotePoints,
+  SaveOrDiscardPendingText,
 } from "./types";
 
 export type PointsContextType = {
+  // Saves a new point to IndexedDB as well as GraphQL (if authenticated).
   addPoint: AddPoint;
+
+  // Deletes all copies of a point (IndexedDB, GraphQL, and React state) at normal priority.
   deletePoints: DeletePoints;
+
+  // These methods update points and behaviors at both normal and transition priorities.
   editPointBadge: EditPointBadge;
   editPointBehavior: EditPointBehavior;
-  editPointDangerousToUseDirectly: EditPointDangerousToUseDirectly;
-  pointBehaviors: PointBehaviorsObject;
-  points: Point[];
+
+  /************************************
+   * Console centric values
+   */
+
+  // Intended for use with components that suspend as a result of point text or behaviors.
+  // These values are updated at transition priority.
+  pointBehaviorsForConsole: PointBehaviorsObject;
+  pointsForConsole: Point[];
+
+  // Points or behaviors have a pending transition.
+  // Components may want to render a normal priority, non-suspending update (e.g. dim or spinner).
+  consolePointsPending: boolean;
+
+  /************************************
+   * Source viewer centric values
+   */
+
+  // Intended for use with components that edit point text but to not suspend as a result of point text.
+  // These values are updated at normal priority.
+  pointBehaviorsForSourceList: PointBehaviorsObject;
+  pointsForSourceList: Point[];
+
+  // These methods make pending changes to point text.
+  // They must be explicitly saved or discarded once editing has finished.
+  // Changes update SourceList points at normal priority (for editing UI)
+  // but do not update Console points until/unless they are explicitly saved.
+  discardPendingPointText: SaveOrDiscardPendingText;
+  editPendingPointText: EditPendingPointText;
+  savePendingPointText: SaveOrDiscardPendingText;
 };
 
-export const isValidPoint = (maybePoint: unknown): maybePoint is Point => {
-  return (
-    typeof maybePoint === "object" &&
-    maybePoint !== null &&
-    maybePoint.hasOwnProperty("badge") &&
-    maybePoint.hasOwnProperty("condition") &&
-    maybePoint.hasOwnProperty("content")
-  );
-};
-
-// This context should almost never be used directly.
-// The ConsolePointsContext or SourceListPointsContext should be used instead.
-// See the README for more information.
 export const PointsContext = createContext<PointsContextType>(null as any);
+
+export type CommittedValuesRef = {
+  current: {
+    pendingPointText: Map<PointKey, Pick<Point, "condition" | "content">>;
+    points: Point[];
+    pointBehaviors: PointBehaviorsObject;
+  };
+};
 
 export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   const graphQLClient = useContext(GraphQLClientContext);
@@ -89,7 +113,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   // Current user points may exist in both places, so for simplicity we only include the local version.
   // This has an added benefit of ensuring edits/deletions always reflect the latest state
   // without requiring refetching data from GraphQL.
-  const mergedPoints = useMemo<Point[]>(() => {
+  const savedPoints = useMemo<Point[]>(() => {
     const mergedPoints: Point[] = Array.from(Object.values(localPoints));
     remotePoints.forEach(remotePoint => {
       if (localPoints[remotePoint.key] == null) {
@@ -99,128 +123,69 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     return mergedPoints;
   }, [localPoints, remotePoints]);
 
+  // Transition priority points and behaviors (for components that suspend)
+  const deferredPoints = useDeferredValue(savedPoints);
+  const deferredPointBehaviors = useDeferredValue(localPointBehaviors);
+  const consolePointsPending =
+    deferredPoints !== savedPoints || deferredPointBehaviors !== localPointBehaviors;
+
+  // Pending point text edits go here until they're either saved or discarded.
+  const [pendingPointText, setPendingPointText] = useState<
+    Map<PointKey, Pick<Point, "condition" | "content">>
+  >(new Map());
+
+  // Merge saved points with local edits;
+  // Local edits should take precedence so they're reflected in the Source viewer.
+  const pointsForSourceList = useMemo<Point[]>(
+    () =>
+      savedPoints.map(point => {
+        const partialPoint = pendingPointText.get(point.key);
+        if (partialPoint) {
+          return {
+            ...point,
+            ...partialPoint,
+          };
+        } else {
+          return point;
+        }
+      }),
+    [pendingPointText, savedPoints]
+  );
+
   // Track the latest committed values for e.g. the editPointBadge function.
-  const committedValuesRef = useRef<{
-    points: Point[];
-    pointBehaviors: PointBehaviorsObject;
-  }>({ points: [], pointBehaviors: {} });
+  const committedValuesRef = useRef<CommittedValuesRef["current"]>({
+    pendingPointText: new Map(),
+    points: [],
+    pointBehaviors: {},
+  });
   useEffect(() => {
+    committedValuesRef.current.pendingPointText = pendingPointText;
     committedValuesRef.current.pointBehaviors = localPointBehaviors;
-    committedValuesRef.current.points = mergedPoints;
+    committedValuesRef.current.points = savedPoints;
   });
 
-  const addPoint = useCallback<AddPoint>(
-    (
-      partialPoint: Partial<Pick<Point, "badge" | "condition" | "content">>,
-      partialPointBehavior: Partial<Omit<PointBehavior, "pointId">>,
-      location: Location
-    ) => {
-      // TODO Determine if we should track "breakpoint.add_column" here
-      trackEvent("breakpoint.add");
+  const addPoint = useAddPoint({
+    accessToken,
+    currentUserInfo,
+    graphQLClient,
+    recordingId,
+    setLocalPoints,
+    setLocalPointBehaviors,
+    trackEvent,
+  });
 
-      // Points (and their ids) are shared between tabs (via IndexedDB),
-      // so the id numbers should be deterministic;
-      // a single incrementing counter wouldn't work well unless it was also synced.
-      const key = uuid();
+  const deletePoints = useDeletePoints({
+    accessToken,
+    committedValuesRef,
+    graphQLClient,
+    setLocalPoints,
+    setLocalPointBehaviors,
+    setPendingPointText,
+    setRemotePoints,
+    trackEvent,
+  });
 
-      const point: Point = {
-        badge: null,
-        condition: null,
-        content: "",
-        createdAt: new Date(),
-        key,
-        recordingId,
-        location,
-        user: currentUserInfo,
-        ...partialPoint,
-      };
-
-      const pointBehavior: PointBehavior = {
-        key,
-        shouldBreak: POINT_BEHAVIOR_DISABLED,
-        shouldLog: POINT_BEHAVIOR_DISABLED,
-        ...partialPointBehavior,
-      };
-
-      setLocalPoints(prev => {
-        const cloned = { ...prev };
-        cloned[key] = point;
-        return cloned;
-      });
-
-      setLocalPointBehaviors(prev => {
-        return {
-          ...prev,
-          [key]: pointBehavior,
-        };
-      });
-
-      // If the current user is signed-in, sync this new point to GraphQL
-      // to be shared with other users who can view this recording.
-      if (accessToken) {
-        addPointGraphQL(graphQLClient, accessToken, point);
-      }
-    },
-    [
-      accessToken,
-      currentUserInfo,
-      graphQLClient,
-      recordingId,
-      setLocalPoints,
-      setLocalPointBehaviors,
-      trackEvent,
-    ]
-  );
-
-  const deletePoints = useCallback<DeletePoints>(
-    (...keys: PointKey[]) => {
-      trackEvent("breakpoint.remove");
-
-      setLocalPoints(prev => {
-        const cloned = { ...prev };
-        keys.forEach(key => {
-          delete cloned[key];
-        });
-        return cloned;
-      });
-
-      setLocalPointBehaviors(prev => {
-        const cloned = { ...prev };
-        keys.forEach(key => {
-          delete cloned[key];
-        });
-        return cloned;
-      });
-
-      // If the current user is signed-in, also delete this point from GraphQL.
-      if (accessToken) {
-        const { points } = committedValuesRef.current;
-        keys.forEach(key => {
-          const prevPoint = points.find(point => point.key === key);
-          if (prevPoint) {
-            deletePointGraphQL(graphQLClient, accessToken, prevPoint);
-          }
-        });
-
-        // GraphQL is currently only loaded during initialization.
-        // To prevent Points from being left behind in memory, also remove them from local state.
-        setRemotePoints(prev => {
-          const cloned = [...prev];
-          keys.forEach(key => {
-            const index = cloned.findIndex(point => point.key === key);
-            if (index >= 0) {
-              cloned.splice(index, 1);
-            }
-          });
-          return cloned;
-        });
-      }
-    },
-
-    [accessToken, graphQLClient, setLocalPoints, setLocalPointBehaviors, trackEvent]
-  );
-
-  const editPointDangerousToUseDirectly = useCallback<EditPointDangerousToUseDirectly>(
+  const saveLocalAndRemotePoints = useCallback<SaveLocalAndRemotePoints>(
     (key: PointKey, partialPoint: Partial<Pick<Point, "badge" | "condition" | "content">>) => {
       trackEvent("breakpoint.edit");
 
@@ -248,53 +213,61 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     [accessToken, graphQLClient, setLocalPoints, trackEvent]
   );
 
-  const editPointBehavior = useCallback<EditPointBehavior>(
-    (key: PointKey, pointBehavior: Partial<Omit<PointBehavior, "key">>) => {
-      trackEvent("breakpoint.edit");
-
-      const { pointBehaviors } = committedValuesRef.current;
-      const prevPointBehavior = pointBehaviors[key];
-
-      setLocalPointBehaviors(prev => ({
-        ...prev,
-        [key]: {
-          shouldBreak: prevPointBehavior?.shouldBreak ?? POINT_BEHAVIOR_DISABLED,
-          shouldLog: prevPointBehavior?.shouldLog ?? POINT_BEHAVIOR_DISABLED,
-          ...pointBehavior,
-          key,
-        },
-      }));
-    },
-    [setLocalPointBehaviors, trackEvent]
-  );
-
   const editPointBadge = useCallback<EditPointBadge>(
     (key: PointKey, badge: Badge | null) => {
-      editPointDangerousToUseDirectly(key, { badge });
+      saveLocalAndRemotePoints(key, { badge });
     },
-    [editPointDangerousToUseDirectly]
+    [saveLocalAndRemotePoints]
   );
 
-  useBreakpointIdsFromServer(replayClient, mergedPoints, localPointBehaviors, deletePoints);
+  const editPointBehavior = useEditPointBehavior({
+    committedValuesRef,
+    setPointBehaviors: setLocalPointBehaviors,
+    trackEvent,
+  });
 
-  const context = useMemo(
+  const editPendingPointText = useEditPendingPointText({
+    committedValuesRef,
+    setPendingPointText,
+  });
+
+  const discardPendingPointText = useDiscardPendingPointText({ setPendingPointText });
+  const savePendingPointText = useSavePendingPointText({
+    committedValuesRef,
+    saveLocalAndRemotePoints,
+    setPendingPointText,
+  });
+
+  useBreakpointIdsFromServer(replayClient, savedPoints, localPointBehaviors, deletePoints);
+
+  const context = useMemo<PointsContextType>(
     () => ({
       addPoint,
+      consolePointsPending,
       deletePoints,
+      discardPendingPointText,
+      editPendingPointText,
       editPointBadge,
       editPointBehavior,
-      editPointDangerousToUseDirectly,
-      pointBehaviors: localPointBehaviors,
-      points: mergedPoints,
+      pointBehaviorsForConsole: deferredPointBehaviors,
+      pointBehaviorsForSourceList: localPointBehaviors,
+      pointsForConsole: deferredPoints,
+      pointsForSourceList,
+      savePendingPointText,
     }),
     [
       addPoint,
+      consolePointsPending,
+      deferredPointBehaviors,
+      deferredPoints,
       deletePoints,
+      discardPendingPointText,
+      editPendingPointText,
       editPointBadge,
       editPointBehavior,
-      editPointDangerousToUseDirectly,
       localPointBehaviors,
-      mergedPoints,
+      pointsForSourceList,
+      savePendingPointText,
     ]
   );
 
