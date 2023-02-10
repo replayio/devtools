@@ -1,5 +1,5 @@
 import { Location } from "@replayio/protocol";
-import { ChangeEvent, PureComponent, Suspense, startTransition, useContext } from "react";
+import { ChangeEvent, PureComponent, Suspense, useContext } from "react";
 import { MouseEvent } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
@@ -121,24 +121,17 @@ class Breakpoint extends PureComponent<BreakpointProps> {
         ? POINT_BEHAVIOR_ENABLED
         : POINT_BEHAVIOR_DISABLED_TEMPORARILY;
 
-      // HACK TODO [FE-1138]
-      // This transition wrapper should not be necessary.
-      // Changing this value should never trigger Suspense.
-      // For some reason, the Checkbox UI component is slow to update without it.
-      // See app.replay.io/recording/8b8c0fa6-955e-48d9-8588-bce16b308c83
-      startTransition(() => {
-        if (type === "breakpoint") {
-          onEditPointBehavior(point.key, {
-            shouldBreak: behavior,
-            shouldLog,
-          });
-        } else {
-          onEditPointBehavior(point.key, {
-            shouldBreak,
-            shouldLog: behavior,
-          });
-        }
-      });
+      if (type === "breakpoint") {
+        onEditPointBehavior(point.key, {
+          shouldBreak: behavior,
+          shouldLog,
+        });
+      } else {
+        onEditPointBehavior(point.key, {
+          shouldBreak,
+          shouldLog: behavior,
+        });
+      }
     };
 
     const onCloseButtonClick = (event: MouseEvent) => {

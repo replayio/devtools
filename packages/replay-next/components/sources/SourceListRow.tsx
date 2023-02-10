@@ -129,10 +129,15 @@ const SourceListRow = memo(
     const pointBehavior = pointForDefaultPriority
       ? pointBehaviors[pointForDefaultPriority.key] ?? null
       : null;
-    const showPointPanel =
-      pointForDefaultPriority &&
-      pointForSuspense &&
-      pointBehavior?.shouldLog !== POINT_BEHAVIOR_DISABLED;
+
+    let showPointPanel = false;
+    if (pointForDefaultPriority && pointForSuspense) {
+      if (pointBehavior) {
+        showPointPanel = pointBehavior.shouldLog !== POINT_BEHAVIOR_DISABLED;
+      } else {
+        showPointPanel = !!pointForDefaultPriority.content;
+      }
+    }
 
     const hitCount = lineHitCounts?.count || null;
     const lineHasHits = hitCount !== null && hitCount > 0;
@@ -426,7 +431,7 @@ const SourceListRow = memo(
             <LogPointPanel
               className={styles.PointPanel}
               pointForDefaultPriority={pointForDefaultPriority}
-              pointForSuspense={pointForSuspense}
+              pointForSuspense={pointForSuspense!}
             />
           )}
         </div>
