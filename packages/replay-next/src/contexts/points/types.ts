@@ -1,7 +1,12 @@
-import { Location } from "@replayio/protocol";
+import { Location, TimeStampedPoint } from "@replayio/protocol";
 
 import { Badge, Point, PointBehavior, PointKey } from "shared/client/types";
 
+export type PointInstance = {
+  point: Point;
+  timeStampedHitPoint: TimeStampedPoint;
+  type: "PointInstance";
+};
 export type LocalPointsObject = { [key: PointKey]: Point };
 export type PointBehaviorsObject = { [key: PointKey]: PointBehavior };
 

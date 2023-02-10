@@ -40,12 +40,6 @@ import {
   PointBehaviorsObject,
 } from "./types";
 
-export type PointInstance = {
-  point: Point;
-  timeStampedHitPoint: TimeStampedPoint;
-  type: "PointInstance";
-};
-
 export type PointsContextType = {
   addPoint: AddPoint;
   deletePoints: DeletePoints;
