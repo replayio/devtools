@@ -15,10 +15,7 @@ import {
   Context as ConsolePointsContext,
   ContextType as ConsolePointsContextType,
 } from "../contexts/points/ConsolePointsContext";
-import {
-  PointsContextDangerousToUseDirectly as PointsContext,
-  ContextType as PointsContextType,
-} from "../contexts/points/PointsContext";
+import { PointsContext, PointsContextType } from "../contexts/points/PointsContext";
 import {
   Context as SourceListPointsContext,
   ContextType as SourceListPointsContextType,

@@ -46,7 +46,7 @@ export type PointInstance = {
   type: "PointInstance";
 };
 
-export type ContextType = {
+export type PointsContextType = {
   addPoint: AddPoint;
   deletePoints: DeletePoints;
   editPointBadge: EditPointBadge;
@@ -69,9 +69,9 @@ export const isValidPoint = (maybePoint: unknown): maybePoint is Point => {
 // This context should almost never be used directly.
 // The ConsolePointsContext or SourceListPointsContext should be used instead.
 // See the README for more information.
-export const PointsContextDangerousToUseDirectly = createContext<ContextType>(null as any);
+export const PointsContext = createContext<PointsContextType>(null as any);
 
-export function ContextRoot({ children }: PropsWithChildren<{}>) {
+export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   const graphQLClient = useContext(GraphQLClientContext);
   const { accessToken, currentUserInfo, recordingId, trackEvent } = useContext(SessionContext);
   const replayClient = useContext(ReplayClientContext);
@@ -304,9 +304,5 @@ export function ContextRoot({ children }: PropsWithChildren<{}>) {
     ]
   );
 
-  return (
-    <PointsContextDangerousToUseDirectly.Provider value={context}>
-      {children}
-    </PointsContextDangerousToUseDirectly.Provider>
-  );
+  return <PointsContext.Provider value={context}>{children}</PointsContext.Provider>;
 }

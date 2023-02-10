@@ -2,7 +2,7 @@ import { PropsWithChildren, createContext, useContext, useDeferredValue, useMemo
 
 import { Point } from "shared/client/types";
 
-import { PointsContextDangerousToUseDirectly as PointsContext } from "./PointsContext";
+import { PointsContext } from "./PointsContext";
 import { PointBehaviorsObject } from "./types";
 
 export type ContextType = {

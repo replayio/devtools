@@ -1,6 +1,6 @@
 import { MouseEvent, useContext, useState } from "react";
 
-import { PointsContextDangerousToUseDirectly as PointsContext } from "replay-next/src/contexts/points/PointsContext";
+import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { Badge, Point } from "shared/client/types";
 
 import Icon from "../../Icon";

@@ -9,10 +9,7 @@ import {
   useState,
 } from "react";
 
-import {
-  PointsContextDangerousToUseDirectly as PointsContext,
-  ContextType as PointsContextType,
-} from "replay-next/src/contexts/points/PointsContext";
+import { PointsContext, PointsContextType } from "replay-next/src/contexts/points/PointsContext";
 import { Point, PointKey } from "shared/client/types";
 
 import { DeletePoints, EditPointText } from "./types";
