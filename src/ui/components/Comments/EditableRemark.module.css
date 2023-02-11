@@ -56,7 +56,7 @@
 
 .Editing {
   background-color: var(--background-color-inputs);
-  margin-left: 1em;
+  margin-left: .5em;
 }
 
 .Content p {
