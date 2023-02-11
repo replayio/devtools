@@ -720,7 +720,7 @@
   --color-contrast: #ffffff;
   --color-current: #f02d5e;
   --color-default: #223344;
-  --color-dim: #666666;
+  --color-dim: rgba(135, 135, 137, 0.9);  
   --color-dimmer: #aaaaaa;
   --color-disabled-button: #ffffff;
   --color-error: #ff0000;

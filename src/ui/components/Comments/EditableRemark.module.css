@@ -56,10 +56,12 @@
 
 .Editing {
   background-color: var(--background-color-inputs);
+  margin-left: 1em;
 }
 
 .Content p {
   margin: 0;
+  margin-left: 0.25em;
 }
 
 .Icon {
