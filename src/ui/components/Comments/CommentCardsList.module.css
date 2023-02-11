@@ -24,7 +24,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   padding: 8px;
-  padding-left: .75em;
+  padding-left: 0.75em;
 }
 
 .List {
