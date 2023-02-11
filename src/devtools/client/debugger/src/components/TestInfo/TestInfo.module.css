@@ -49,3 +49,8 @@
 .aside div {
   margin-bottom: 5px;
 }
+
+/* TestInfo adds a narrow class when the panel is < 300px */
+.narrow .alias {
+  display: none;
+}
