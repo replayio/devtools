@@ -1,0 +1,1 @@
+import "@replayio/cypress/support";

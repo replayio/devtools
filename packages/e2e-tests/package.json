@@ -21,12 +21,14 @@
     "@recordreplay/playwright": "^1.18.3",
     "@replayio/playwright": "0.3.16",
     "cli-spinners": "^2.7.0",
+    "cypress": "^12.5.1",
     "log-update": "^4",
     "playwright": "^1.25.1",
     "ts-node": "^10.7.0",
     "yargs": "^17.6.0"
   },
   "dependencies": {
+    "@replayio/cypress": "^0.5.0",
     "chalk": "^4"
   }
 }
