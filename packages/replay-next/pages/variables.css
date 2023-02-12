@@ -259,7 +259,11 @@
   --context-menu-bgcolor-hover: var(--theme-base-95);
 
   --comment-card-source-preview-background-color: #081221;
-  --comment-card-source-preview-background-color-hover: #3e434a;
+  --comment-card-source-preview-background-color-hover: #000;
+  --comment-reply-unpublished-background-color: var(--point-panel-background-color);
+  --comment-reply-unpublished-textfield-background-color: #000;
+  --comment-reply-unpublished-textfield-color: #fff;
+  
 
   --object-inspector-bucket-color: #939395;
   --object-inspector-expanded-key-with-flag: #5ca9cf;
@@ -761,6 +765,9 @@
 
   --comment-card-source-preview-background-color-hover: #e6e6e6;
   --comment-card-source-preview-background-color: #f2f3f2;
+  --comment-reply-unpublished-background-color: var(--point-panel-background-color);
+  --comment-reply-unpublished-textfield-background-color: #fff;
+  --comment-reply-unpublished-textfield-color: #000;
 
   --object-inspector-bucket-color: #737373;
   --object-inspector-expanded-key-with-flag: #0074e8;

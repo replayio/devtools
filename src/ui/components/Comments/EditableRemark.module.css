@@ -51,11 +51,12 @@
 }
 
 .Unpublished {
-  color: var(--theme-comment);
+  color: var(--theme-comment);  
 }
 
 .Editing {
-  background-color: var(--background-color-inputs);
+  background-color: var(--comment-reply-unpublished-textfield-background-color);
+  color: var(--comment-reply-unpublished-textfield-color);
   margin-left: 0.5em;
 }
 
