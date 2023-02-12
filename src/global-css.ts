@@ -65,7 +65,6 @@ import "ui/components/Header/ViewToggle.css";
 import "ui/components/reactjs-popup.css";
 import "ui/components/Events/Events.css";
 import "ui/components/SecondaryToolbox/SecondaryToolbox.css";
-import "ui/components/shared/CommentTool.css";
 import "ui/components/shared/Dialog.css";
 import "ui/components/shared/Dropdown.css";
 import "ui/components/shared/IconWithTooltip.css";
