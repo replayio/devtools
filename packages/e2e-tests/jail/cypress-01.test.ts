@@ -32,7 +32,7 @@ test(`cypress-01: Test basic cypress reporter functionality`, async ({ page }) =
   await chevron.isVisible();
 
   // shows the error icon and message
-  const failedRow = rows.nth(4);
+  const failedRow = rows.nth(3);
   await failedRow.locator(".testsuites-fail").isVisible();
   const failedRowError = await getTestRowError(failedRow);
   await expect(failedRowError).toContainText("Error");
@@ -47,5 +47,5 @@ test(`cypress-01: Test basic cypress reporter functionality`, async ({ page }) =
   await expect(steps).toHaveCount(3);
 
   // failed test should be visible
-  await steps.nth(3).isVisible();
+  await steps.nth(2).isVisible();
 });
