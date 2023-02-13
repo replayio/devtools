@@ -146,7 +146,11 @@ export default function HoverButton({
 
       if (point) {
         editPendingPointText(point.key, { content });
-        editPointBehavior(point.key, { shouldLog: POINT_BEHAVIOR_ENABLED });
+        editPointBehavior(
+          point.key,
+          { shouldLog: POINT_BEHAVIOR_ENABLED },
+          point.user?.id === currentUserInfo?.id
+        );
       } else {
         addPoint(
           {
@@ -173,9 +177,13 @@ export default function HoverButton({
       if (point) {
         if (!hasOrDidLog || hasOrDidBreak) {
           const newShouldLog = hasOrDidLog ? POINT_BEHAVIOR_DISABLED : POINT_BEHAVIOR_ENABLED;
-          editPointBehavior(point.key, {
-            shouldLog: newShouldLog,
-          });
+          editPointBehavior(
+            point.key,
+            {
+              shouldLog: newShouldLog,
+            },
+            point.user?.id === currentUserInfo?.id
+          );
         } else {
           deletePoints(point.key);
         }

@@ -11,7 +11,7 @@ import {
 } from "react";
 
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
-import { getPointsAsync } from "replay-next/src/suspense/PointsCache";
+import useRemotePoints from "replay-next/src/contexts/points/hooks/useRemotePoints";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Badge, Point, PointKey } from "shared/client/types";
 import { updatePoint as updatePointGraphQL } from "shared/graphql/Points";
@@ -94,18 +94,11 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
 
   const [localPoints, setLocalPoints] = useLocalPoints({ recordingId });
   const [localPointBehaviors, setLocalPointBehaviors] = useLocalPointBehaviors({ recordingId });
-
-  // Note that we fetch Points using async helpers rather than Suspense,
-  // because it's better to load the rest of the app earlier than to wait on Points.
-  const [remotePoints, setRemotePoints] = useState<Point[]>([]);
-  useEffect(() => {
-    async function fetchRemotePoints() {
-      const points = await getPointsAsync(graphQLClient, accessToken, recordingId);
-      setRemotePoints(points);
-    }
-
-    fetchRemotePoints();
-  }, [graphQLClient, recordingId, accessToken]);
+  const [remotePoints, setRemotePoints] = useRemotePoints({
+    accessToken,
+    graphQLClient,
+    recordingId,
+  });
 
   // Merge points from IndexedDB and GraphQL.
   // Current user points may exist in both places, so for simplicity we only include the local version.

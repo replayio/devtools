@@ -19,6 +19,7 @@ import {
   Point,
   ReplayClientInterface,
 } from "shared/client/types";
+import { UserInfo } from "shared/graphql/types";
 import Checkbox from "ui/components/shared/Forms/Checkbox";
 import type { UIState } from "ui/state";
 import { getPauseFrameSuspense } from "ui/suspense/frameCache";
@@ -41,6 +42,7 @@ const connector = connect(mapStateToProps, {
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 interface PropsFromParent {
+  currentUserInfo: UserInfo | null;
   editable: boolean;
   onEditPointBehavior: EditPointBehavior;
   onRemoveBreakpoint: (cx: Context, point: Point) => void;
@@ -91,6 +93,7 @@ class Breakpoint extends PureComponent<BreakpointProps> {
 
   render() {
     const {
+      currentUserInfo,
       cx,
       editable,
       replayClient,
@@ -116,21 +119,29 @@ class Breakpoint extends PureComponent<BreakpointProps> {
       event.stopPropagation();
     };
 
+    const createdByCurrentUser = point.user?.id === currentUserInfo?.id;
+
     const onCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
       const behavior = event.target.checked
         ? POINT_BEHAVIOR_ENABLED
         : POINT_BEHAVIOR_DISABLED_TEMPORARILY;
 
       if (type === "breakpoint") {
-        onEditPointBehavior(point.key, {
-          shouldBreak: behavior,
-          shouldLog,
-        });
+        onEditPointBehavior(
+          point.key,
+          {
+            shouldBreak: behavior,
+          },
+          createdByCurrentUser
+        );
       } else {
-        onEditPointBehavior(point.key, {
-          shouldBreak,
-          shouldLog: behavior,
-        });
+        onEditPointBehavior(
+          point.key,
+          {
+            shouldLog: behavior,
+          },
+          createdByCurrentUser
+        );
       }
     };
 
@@ -140,19 +151,25 @@ class Breakpoint extends PureComponent<BreakpointProps> {
 
       if (type === "breakpoint") {
         if (shouldLog === POINT_BEHAVIOR_ENABLED) {
-          onEditPointBehavior(point.key, {
-            shouldBreak: POINT_BEHAVIOR_DISABLED,
-            shouldLog,
-          });
+          onEditPointBehavior(
+            point.key,
+            {
+              shouldBreak: POINT_BEHAVIOR_DISABLED,
+            },
+            createdByCurrentUser
+          );
         } else {
           onRemoveBreakpoint(cx, point);
         }
       } else {
         if (shouldBreak === POINT_BEHAVIOR_ENABLED) {
-          onEditPointBehavior(point.key, {
-            shouldBreak,
-            shouldLog: POINT_BEHAVIOR_DISABLED,
-          });
+          onEditPointBehavior(
+            point.key,
+            {
+              shouldLog: POINT_BEHAVIOR_DISABLED,
+            },
+            createdByCurrentUser
+          );
         } else {
           onRemoveBreakpoint(cx, point);
         }

@@ -8,12 +8,14 @@ import {
   Point,
   PointBehavior,
 } from "shared/client/types";
+import { UserInfo } from "shared/graphql/types";
 
 import styles from "./ColumnBreakpointMarker.module.css";
 
 export default function ColumnBreakpointMarker({
   addPoint,
   columnIndex,
+  currentUserInfo,
   deletePoints,
   editPointBehavior,
   lineNumber,
@@ -23,6 +25,7 @@ export default function ColumnBreakpointMarker({
 }: {
   addPoint: AddPoint;
   columnIndex: number;
+  currentUserInfo: UserInfo | null;
   deletePoints: DeletePoints;
   editPointBehavior: EditPointBehavior;
   lineNumber: number;
@@ -45,12 +48,16 @@ export default function ColumnBreakpointMarker({
       );
     } else {
       if (pointBehavior?.shouldLog === POINT_BEHAVIOR_ENABLED) {
-        editPointBehavior(point.key, {
-          shouldBreak:
-            pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED
-              ? POINT_BEHAVIOR_DISABLED
-              : POINT_BEHAVIOR_ENABLED,
-        });
+        editPointBehavior(
+          point.key,
+          {
+            shouldBreak:
+              pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED
+                ? POINT_BEHAVIOR_DISABLED
+                : POINT_BEHAVIOR_ENABLED,
+          },
+          point.user?.id === currentUserInfo?.id
+        );
       } else {
         deletePoints(point.key);
       }

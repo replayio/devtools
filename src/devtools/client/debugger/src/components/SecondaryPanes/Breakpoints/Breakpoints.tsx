@@ -51,7 +51,13 @@ export default function Breakpoints({
             matchesType = behavior !== POINT_BEHAVIOR_DISABLED;
           } else {
             if (type === "logpoint") {
+              // Don't show shared print statements without content;
+              // it would be a confusing user experience (since they aren't editable anyway).
+              // Note this is an edge case guard that shouldn't be necessary
+              // because useRemotePoints filters breaking-only points.
               matchesType = !!point.content;
+            } else {
+              matchesType = true;
             }
           }
 
@@ -99,6 +105,7 @@ export default function Breakpoints({
 
               return (
                 <Breakpoint
+                  currentUserInfo={currentUserInfo}
                   editable={editable}
                   key={point.key}
                   onEditPointBehavior={editPointBehavior}

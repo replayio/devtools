@@ -217,9 +217,13 @@ function PointPanelWithHitPoints({
   };
 
   const toggleShouldLog = () => {
-    editPointBehavior(key, {
-      shouldLog: shouldLog ? POINT_BEHAVIOR_DISABLED_TEMPORARILY : POINT_BEHAVIOR_ENABLED,
-    });
+    editPointBehavior(
+      key,
+      {
+        shouldLog: shouldLog ? POINT_BEHAVIOR_DISABLED_TEMPORARILY : POINT_BEHAVIOR_ENABLED,
+      },
+      user?.id === currentUserInfo?.id
+    );
   };
 
   let showTooManyPointsMessage = false;

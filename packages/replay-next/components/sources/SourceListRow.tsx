@@ -19,6 +19,7 @@ import useSourceContextMenu from "replay-next/components/sources/useSourceContex
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { PointBehaviorsObject } from "replay-next/src/contexts/points/types";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { ParsedToken, StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import {
@@ -64,6 +65,7 @@ export type ItemData = {
 
 const SourceListRow = memo(
   ({ data, index, style }: { data: ItemData; index: number; style: CSSProperties }) => {
+    const { currentUserInfo } = useContext(SessionContext);
     const { setCursorLocation } = useContext(SourcesContext);
     const { isTransitionPending: isFocusRangePending } = useContext(FocusContext);
     const { addPoint, deletePoints, editPendingPointText, editPointBehavior } =
@@ -223,6 +225,7 @@ const SourceListRow = memo(
             <ColumnBreakpointMarker
               addPoint={addPoint}
               columnIndex={columnIndex}
+              currentUserInfo={currentUserInfo}
               deletePoints={deletePoints}
               editPointBehavior={editPointBehavior}
               key={lineSegments.length}
@@ -295,9 +298,17 @@ const SourceListRow = memo(
         // 1. If it logs and breaks, then we should disable breaking
         // 2. If it only breaks then we should delete that point (and all others on the line)
         if (showPointPanel) {
-          editPointBehavior(pointForDefaultPriority.key, {
-            shouldBreak: shouldBreak ? POINT_BEHAVIOR_DISABLED : POINT_BEHAVIOR_ENABLED,
-          });
+          editPointBehavior(
+            pointForDefaultPriority.key,
+            {
+              shouldBreak:
+                pointBehavior?.shouldBreak === POINT_BEHAVIOR_DISABLED ||
+                pointBehavior?.shouldBreak === POINT_BEHAVIOR_DISABLED_TEMPORARILY
+                  ? POINT_BEHAVIOR_ENABLED
+                  : POINT_BEHAVIOR_DISABLED,
+            },
+            pointForDefaultPriority.user?.id === currentUserInfo?.id
+          );
         } else {
           deletePoints(...pointsForLine.map(point => point.key));
         }
@@ -346,7 +357,11 @@ const SourceListRow = memo(
           break;
         case POINT_BEHAVIOR_DISABLED:
         default:
-          breakPointTestState = "off";
+          if (pointForDefaultPriority.user?.id !== currentUserInfo?.id) {
+            breakPointTestState = "off-temporarily";
+          } else {
+            breakPointTestState = "off";
+          }
           break;
       }
     }

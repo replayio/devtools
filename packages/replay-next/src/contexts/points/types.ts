@@ -27,7 +27,8 @@ export type EditPendingPointText = (
 
 export type EditPointBehavior = (
   key: PointKey,
-  pointBehavior: Partial<Omit<PointBehavior, "pointId">>
+  pointBehavior: Partial<Omit<PointBehavior, "pointId">>,
+  createdByCurrentUser: boolean
 ) => void;
 
 export type SaveOrDiscardPendingText = (key: PointKey) => void;
