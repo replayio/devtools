@@ -155,24 +155,15 @@ async function saveBrowserExample({ exampleFilename }: { exampleFilename: string
     await page.goto(exampleUrl);
     await waitUntilMessage(page as Page, "ExampleFinished");
   });
+  const recordingId = await uploadLastRecording(exampleUrl);
 
-  try {
-    const recordingId = await uploadLastRecording(exampleUrl);
+  done();
 
-    done();
-
-    if (config.useExampleFile && recordingId) {
-      try {
-        await saveRecording(exampleFilename, recordingId);
-      } catch (e) {
-        throw e;
-      }
-    }
-    if (recordingId) {
-      removeRecording(recordingId);
-    }
-  } catch (e) {
-    throw e;
+  if (config.useExampleFile && recordingId) {
+    await saveRecording(exampleFilename, recordingId);
+  }
+  if (recordingId) {
+    removeRecording(recordingId);
   }
 }
 
