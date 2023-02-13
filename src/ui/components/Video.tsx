@@ -16,6 +16,7 @@ import useVideoCommentTool from "ui/components/useVideoCommentTool";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { getPlayback, isPlaybackStalled } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
+import { getRecordingId } from "ui/utils/recording";
 
 import ReplayLogo from "./shared/ReplayLogo";
 import Spinner from "./shared/Spinner";
@@ -32,11 +33,18 @@ export default function Video() {
   const stalled = useAppSelector(isPlaybackStalled);
   const mouseTargetsLoading = useAppSelector(getAreMouseTargetsLoading);
   const highlightedNodesLoading = useAppSelector(getHighlightedNodesLoading);
+  const recordingId = useAppSelector(getRecordingId);
 
   const isPaused = !playback;
   const isNodeTarget = recordingTarget == "node";
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const { onClick, onMouseEnter, onMouseLeave, onMouseMove, tooltip } = useVideoCommentTool({
+    areMouseTargetsLoading: mouseTargetsLoading,
+    canvasRef,
+    recordingId: recordingId!,
+  });
 
   useEffect(() => {
     installObserver();
@@ -73,9 +81,6 @@ export default function Video() {
     isPaused && !isNodeTarget && !isNodePickerActive && !isNodePickerInitializing;
   const showSpinner =
     highlightedNodesLoading || (isNodePickerActive && mouseTargetsLoading) || stalled;
-
-  const { onClick, onMouseEnter, onMouseLeave, onMouseMove, tooltip } =
-    useVideoCommentTool(canvasRef);
 
   return (
     <div id="video" className="relative bg-toolbarBackground">
