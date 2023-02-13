@@ -24,9 +24,6 @@ const baseNextConfig = {
     // We rely on Trunk's hold-the-line functionality.
     ignoreDuringBuilds: true,
   },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   productionBrowserSourceMaps: true,
 
   async redirects() {
