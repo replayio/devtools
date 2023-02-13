@@ -20,6 +20,7 @@ export function setupTelemetry() {
     "Response not successful: Received status code 500",
     "Response not successful: Received status code 401",
     "NetworkError: Load failed",
+    "3000ms timeout exceeded",
     // error messages from the backend
     "The session is unknown or has been destroyed",
     "The session was destroyed while the command was in progress",
