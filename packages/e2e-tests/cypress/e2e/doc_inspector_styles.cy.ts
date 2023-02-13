@@ -1,6 +1,6 @@
 describe("doc_inspector_styles", () => {
   beforeEach("visits baseURL", () => {
-    cy.visit("/doc_inspector_styles.html");
+    cy.visit("/test/examples/doc_inspector_styles.html");
   });
 
   describe("passing", () => {

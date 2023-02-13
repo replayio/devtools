@@ -11,6 +11,7 @@ import { listAllRecordings, removeRecording, uploadRecording } from "@replayio/r
 import axios from "axios";
 import chalk from "chalk";
 import { dots } from "cli-spinners";
+import cypress from "cypress";
 import logUpdate from "log-update";
 import { v4 as uuidv4 } from "uuid";
 import yargs from "yargs";
@@ -21,7 +22,7 @@ import { recordPlaywright, uploadLastRecording } from "./record-playwright";
 
 const playwright = require("@recordreplay/playwright");
 
-type Target = "all" | "browser" | "node";
+type Target = "all" | "browser" | "node" | "cypress";
 
 // TODO [FE-626] Support target "cra"
 const argv = yargs
@@ -34,7 +35,7 @@ const argv = yargs
     alias: "t",
     default: "all",
     description: "Only re-generate tests for this target",
-    choices: ["all", "browser", "node"],
+    choices: ["all", "browser", "node", "cypress"],
   })
   .help()
   .alias("help", "h")
@@ -195,6 +196,54 @@ async function saveNodeExamples() {
   );
 }
 
+async function saveCypressExamples() {
+  if (target === "all" || target === "cypress") {
+    await saveCypressExample("doc_inspector_styles");
+  }
+}
+
+async function saveCypressExample(exampleFilename: string) {
+  const done = logAnimated(`Recording cypress example ${chalk.bold(exampleFilename)}`);
+
+  const exampleUrl = `${config.devtoolsUrl}/test/examples`;
+  const specName = `cypress/e2e/${exampleFilename}.cy.ts`;
+
+  const options = await cypress.cli.parseRunArguments([
+    "cypress",
+    "run",
+    "-q",
+    "--browser",
+    config.browserName === "chromium" ? "replay-chromium" : "replay-firefox",
+    "--spec",
+    specName,
+  ]);
+  await cypress.run({
+    ...options,
+    env: {
+      CYPRESS_BASE_URL: exampleUrl,
+    },
+  });
+
+  const recordingId = listAllRecordings({
+    filter: `function ($v) { $v.metadata.test.file = "${specName}" }`,
+  })[0]?.id;
+
+  if (recordingId) {
+    await uploadRecording(recordingId, {
+      apiKey: config.replayApiKey,
+    });
+  }
+
+  done();
+
+  if (config.useExampleFile && recordingId) {
+    await saveRecording(`cypress/${exampleFilename}`, recordingId);
+  }
+  if (recordingId) {
+    removeRecording(recordingId);
+  }
+}
+
 async function makeReplayPublic(apiKey: string, recordingId: string) {
   const variables = {
     recordingId: recordingId,
@@ -258,6 +307,7 @@ async function waitUntilMessage(
   try {
     await saveBrowserExamples();
     await saveNodeExamples();
+    await saveCypressExamples();
 
     process.exit(0);
   } catch (error) {
