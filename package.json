@@ -243,6 +243,7 @@
     "react": "0.0.0-experimental-e7d0053e6-20220325",
     "react-dom": "0.0.0-experimental-e7d0053e6-20220325",
     "react-is": "18.2.0",
+    "terser": "5.16.3",
     "ts-invariant": "0.10.3",
     "typescript": "4.6.3",
     "react-json-view@1.21.3": "patch:react-json-view@npm:1.21.3#.yarn/patches/react-json-view-npm-1.21.3-7827bb54c4.patch",

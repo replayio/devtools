@@ -19,10 +19,6 @@ import { ThunkExtraArgs } from "ui/utils/thunk";
 
 import { SearchResult, formatProjectFunctions } from "../utils/quick-open";
 
-const babelParserPkg = require("node_modules/@babel/parser/package.json");
-
-console.log("Babel parser package: ", babelParserPkg);
-
 export type AstPosition = { line: number; column: number };
 export type AstLocation = { end: AstPosition; start: AstPosition };
 
