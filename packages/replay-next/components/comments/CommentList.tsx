@@ -14,7 +14,7 @@ import styles from "./CommentList.module.css";
 export default function CommentList() {
   const graphQLClient = useContext(GraphQLClientContext);
   const { accessToken, recordingId } = useContext(SessionContext);
-  const commentList = getCommentListSuspense(graphQLClient, recordingId, accessToken);
+  const commentList = getCommentListSuspense(graphQLClient, accessToken, recordingId);
 
   return (
     <ErrorBoundary>

@@ -8,14 +8,13 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
-  useState,
   useSyncExternalStore,
 } from "react";
 import { VariableSizeList as List, ListOnItemsRenderedProps } from "react-window";
 
 import { findPointForLocation } from "replay-next/components/sources/utils/points";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { PointsContext } from "replay-next/src/contexts/PointsContext";
+import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import {
@@ -27,10 +26,14 @@ import {
 } from "replay-next/src/suspense/SourcesCache";
 import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { POINT_BEHAVIOR_DISABLED, Point, SourceLocationRange } from "shared/client/types";
+import {
+  POINT_BEHAVIOR_DISABLED,
+  POINT_BEHAVIOR_ENABLED,
+  SourceLocationRange,
+} from "shared/client/types";
 
 import useFontBasedListMeasurements from "./hooks/useFontBasedListMeasurements";
-import SourceListRow, { ItemData, PointStateEnum, SetLinePointState } from "./SourceListRow";
+import SourceListRow, { ItemData } from "./SourceListRow";
 import { formatHitCount } from "./utils/formatHitCount";
 import getScrollbarWidth from "./utils/getScrollbarWidth";
 import styles from "./SourceList.module.css";
@@ -65,7 +68,11 @@ export default function SourceList({
   const listRef = useRef<List>(null);
 
   const { range: focusRange } = useContext(FocusContext);
-  const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
+  const {
+    pointBehaviorsForDefaultPriority: pointBehaviors,
+    pointsForDefaultPriority,
+    pointsForSuspense,
+  } = useContext(PointsContext);
   const client = useContext(ReplayClientContext);
   const {
     focusedSource,
@@ -131,24 +138,16 @@ export default function SourceList({
 
   const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
 
-  const prevPointsRef = useRef<Point[]>([]);
   useLayoutEffect(() => {
+    // TODO
+    // This is overly expensive; ideally we'd only reset this...
+    // (1) if Points changed for the current source
+    // (2) after the index of the point that changed
     const list = listRef.current;
     if (list) {
-      const prevPoints = prevPointsRef.current;
-      // HACK
-      // This is a really lazy way of invalidating cached measurements;
-      // It's better than invalidating from index 0, but it's still likely to be more work than necessary.
-      const prevPointsIndex =
-        prevPoints.length > 0 ? prevPoints[0].location.line - 1 : Number.MAX_SAFE_INTEGER;
-      const nextPointsIndex =
-        points.length > 0 ? points[0].location.line - 1 : Number.MAX_SAFE_INTEGER;
-      const index = Math.min(prevPointsIndex, nextPointsIndex);
-      list.resetAfterIndex(index);
+      list.resetAfterIndex(0);
     }
-
-    prevPointsRef.current = points;
-  }, [points]);
+  }, [pointBehaviors, pointsForDefaultPriority]);
 
   // React's rules-of-hooks doesn't like useCallback(debounce(...))
   // It will error with a false positive: seCallback received a function whose dependencies are unknown
@@ -169,66 +168,38 @@ export default function SourceList({
     [onLineMouseLeaveDebounced, setHoveredLocation]
   );
 
-  const [lineIndexToPointStateMap, setLineIndexToPointStateMap] = useState<
-    Map<number, PointStateEnum>
-  >(new Map());
-
-  const setLinePointState = useCallback<SetLinePointState>(
-    (lineIndex: number, state: PointStateEnum | null) => {
-      setLineIndexToPointStateMap(prev => {
-        const cloned = new Map(prev.entries());
-        if (state === null) {
-          cloned.delete(lineIndex);
-        } else {
-          cloned.set(lineIndex, state);
-        }
-        return cloned;
-      });
-
-      const list = listRef.current;
-      if (list) {
-        list.resetAfterIndex(lineIndex);
-      }
-    },
-    []
-  );
-
   const itemData = useMemo<ItemData>(
     () => ({
-      addPoint,
       breakablePositionsByLine,
-      deletePoints,
-      editPoint,
       hitCounts,
       lineHeight,
       maxHitCount,
       minHitCount,
       onLineMouseEnter,
       onLineMouseLeave: onLineMouseLeaveDebounced,
+      pointBehaviors,
       pointPanelHeight,
       pointPanelWithConditionalHeight,
-      points,
-      setLinePointState,
+      pointsForDefaultPriority,
+      pointsForSuspense,
       showColumnBreakpoints,
       showHitCounts,
       source,
       streamingParser,
     }),
     [
-      addPoint,
       breakablePositionsByLine,
-      deletePoints,
-      editPoint,
       hitCounts,
       lineHeight,
       maxHitCount,
       minHitCount,
       onLineMouseEnter,
       onLineMouseLeaveDebounced,
+      pointBehaviors,
       pointPanelHeight,
       pointPanelWithConditionalHeight,
-      points,
-      setLinePointState,
+      pointsForDefaultPriority,
+      pointsForSuspense,
       showHitCounts,
       showColumnBreakpoints,
       source,
@@ -239,7 +210,7 @@ export default function SourceList({
   const getItemSize = useCallback(
     (index: number) => {
       const lineNumber = index + 1;
-      const point = findPointForLocation(points, sourceId, lineNumber);
+      const point = findPointForLocation(pointsForDefaultPriority, sourceId, lineNumber);
       if (!point) {
         // If the Point has been removed by some external action,
         // e.g. the Pause Information side panel,
@@ -247,32 +218,30 @@ export default function SourceList({
         return lineHeight;
       }
 
-      const lineState = lineIndexToPointStateMap.get(index) ?? "no-point";
-      switch (lineState) {
-        case "point":
-          return lineHeight + pointPanelHeight;
-        case "point-with-conditional":
+      const pointBehavior = pointBehaviors[point.key];
+      // This Point might have been restored by a previous session.
+      // In this case we should use its persisted values.
+      // Else by default, shared print statements should be shown.
+      // Points that have no content (breakpoints) should be hidden by default though.
+      const shouldLog =
+        pointBehavior?.shouldLog ??
+        (point.content ? POINT_BEHAVIOR_ENABLED : POINT_BEHAVIOR_DISABLED);
+      if (shouldLog !== POINT_BEHAVIOR_DISABLED) {
+        if (point.condition !== null) {
           return lineHeight + pointPanelWithConditionalHeight;
-        default:
-          if (point && point.shouldLog !== POINT_BEHAVIOR_DISABLED) {
-            // This Point might have been restored by a previous session.
-            // In this case we should use its persisted values.
-            if (point.condition !== null) {
-              return lineHeight + pointPanelWithConditionalHeight;
-            } else {
-              return lineHeight + pointPanelHeight;
-            }
-          }
-
-          return lineHeight;
+        } else {
+          return lineHeight + pointPanelHeight;
+        }
       }
+
+      return lineHeight;
     },
     [
       lineHeight,
-      lineIndexToPointStateMap,
-      points,
+      pointBehaviors,
       pointPanelHeight,
       pointPanelWithConditionalHeight,
+      pointsForDefaultPriority,
       sourceId,
     ]
   );

@@ -1,5 +1,6 @@
+import { Location } from "@replayio/protocol";
 import classNames from "classnames";
-import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { Suspense, memo, useContext } from "react";
 
@@ -11,7 +12,7 @@ import Loader from "replay-next/components/Loader";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { InspectableTimestampedPointContext } from "replay-next/src/contexts/InspectorContext";
-import { PointInstance } from "replay-next/src/contexts/PointsContext";
+import { PointInstance } from "replay-next/src/contexts/points/types";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { runAnalysisSuspense } from "replay-next/src/suspense/AnalysisCache";
 import { primitiveToClientValue } from "replay-next/src/utils/protocol";
@@ -55,12 +56,13 @@ function LogPointRenderer({
     className = `${className} ${styles.Focused}`;
   }
 
-  const locations = useMemo(
+  const locations = useMemo<Location[]>(
     () => [logPointInstance.point.location],
-    [logPointInstance.point.location]
+    [logPointInstance.point]
   );
 
-  const showNewBadgeFlash = Date.now() - logPointInstance.point.createdAtTime < NEW_BADGE_THRESHOLD;
+  const showNewBadgeFlash =
+    Date.now() - logPointInstance.point.createdAt.getTime() < NEW_BADGE_THRESHOLD;
 
   // Note the Suspense key below is set to the log point expression's content/code.
   // This causes the Suspense boundary to immediately show a fallback state when content is edited,
@@ -102,7 +104,7 @@ function LogPointRenderer({
       >
         <span className={styles.Source}>
           <Suspense fallback={<Loader />}>
-            {locations.length > 0 && <Source locations={locations} />}
+            <Source locations={locations} />
           </Suspense>
         </span>
         {primaryContent}
