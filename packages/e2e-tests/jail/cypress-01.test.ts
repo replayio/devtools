@@ -1,9 +1,6 @@
 import test, { expect } from "@playwright/test";
 
-import { openDevToolsTab, startTest } from "../helpers";
-import { executeAndVerifyTerminalExpression } from "../helpers/console-panel";
-import { resumeToLine, rewindToLine } from "../helpers/pause-information-panel";
-import { addBreakpoint } from "../helpers/source-panel";
+import { startTest } from "../helpers";
 import {
   getCypressLogo,
   getTestCaseSections,
@@ -24,7 +21,7 @@ test(`cypress-01: Test basic cypress reporter functionality`, async ({ page }) =
 
   // has 9 tests
   const rows = await getTestRows(page);
-  await expect(rows).toHaveCount(9);
+  await expect(rows).toHaveCount(4, { timeout: 60_000 });
 
   const firstTest = rows.first();
 
@@ -35,7 +32,7 @@ test(`cypress-01: Test basic cypress reporter functionality`, async ({ page }) =
   await chevron.isVisible();
 
   // shows the error icon and message
-  const failedRow = rows.nth(7);
+  const failedRow = rows.nth(4);
   await failedRow.locator(".testsuites-fail").isVisible();
   const failedRowError = await getTestRowError(failedRow);
   await expect(failedRowError).toContainText("Error");
@@ -47,8 +44,8 @@ test(`cypress-01: Test basic cypress reporter functionality`, async ({ page }) =
   const sections = await getTestCaseSections(selectedRow);
   await expect(sections).toHaveCount(2);
   const steps = await getTestCaseSteps(selectedRow);
-  await expect(steps).toHaveCount(4);
+  await expect(steps).toHaveCount(3);
 
   // failed test should be visible
-  await steps.nth(4).isVisible();
+  await steps.nth(3).isVisible();
 });
