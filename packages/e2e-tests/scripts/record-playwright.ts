@@ -45,15 +45,9 @@ export async function recordPlaywright(
 export async function uploadLastRecording(url: string) {
   const list = cli.listAllRecordings();
   const latest = cli.viewLatestRecording();
-  console.log(">>> line 46 in uploadLastRecording, latest: ", latest);
-  console.log(`>>> line 47 uploadLastRecording list ${JSON.stringify(list)}`);
   const id = findLast(list, rec => rec.metadata.uri === url)?.id;
 
-  console.log(">>> line 49 in uploadLastRecording, id: ", id);
-
   if (id) {
-    console.log(">>> line 52 in uploadLastRecording, id: ", id);
-
     // When running the Replay backend tests, we run against a selfcontained backend and we don't
     // want to force it to run Recording.processRecording on every test fixture because it would be
     // really slow and not do anything useful. By hardcoding this metadata, we can convince the Replay

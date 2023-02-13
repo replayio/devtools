@@ -91,23 +91,15 @@ async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
 }
 
 async function getCurrentSource(page: Page): Promise<Locator | null> {
-  console.log(">>>page in getCurrentSource, line 94", JSON.stringify(page));
   const sources = page.locator("[data-test-name=Source]");
 
-  console.log(">>> sources (line 96)");
-  console.log(`>>>>${JSON.stringify(sources)}`);
-
   for (let index = 0; index < (await sources.count()); index++) {
-    console.log(">>>found some sources (line 100)");
-    console.log(`>>>>${JSON.stringify(sources)}`);
     const source = sources.nth(index);
     if (await source.isVisible()) {
-      console.log(">>> source.isVisible() is true (line 104)");
       return source;
     }
   }
 
-  console.log(">>>> returning null (line 109)");
   return null;
 }
 
@@ -320,13 +312,7 @@ export async function getSelectedLineNumber(page: Page): Promise<number | null> 
 }
 
 export async function getSourceLine(page: Page, lineNumber: number): Promise<Locator> {
-  console.log(">>>getSourceLine ran");
-  console.log(">>>>page", JSON.stringify(page));
-  console.log(">>>>lineNumber", JSON.stringify(lineNumber));
-
   const source = await getCurrentSource(page);
-
-  console.log(">>>>>source", JSON.stringify(source));
   return source!.locator(`[data-test-id=SourceLine-${lineNumber}]`);
 }
 
