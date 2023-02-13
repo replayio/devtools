@@ -178,6 +178,9 @@ jobs:
             **/node_modules
           key: yarn-cache-folder-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
           restore-keys: "yarn-cache-folder-"
+      # Replay
+      - name: Install xz-utils
+        run: apt-get install xz-utils
       # Actually install packages with Yarn
       - name: Install packages
         run: yarn install
