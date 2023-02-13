@@ -38,7 +38,6 @@ test(`logpoints-07: should use the correct scope in auto-complete`, async ({ pag
 
   lineNumber = 19;
 
-  ////// (mbudayr) FAILURE MODE HERE.
   await addLogpoint(page, { lineNumber });
   await editLogPoint(page, { content: "set", lineNumber, saveAfterEdit: false });
   await verifyLogPointContentTypeAheadSuggestions(page, ["setInterval"], ["setList"]);

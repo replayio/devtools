@@ -81,8 +81,6 @@ async function saveRecording(example: string, recordingId?: string) {
   }
 
   const done = logAnimated(`Saving ${chalk.bold(example)} with recording id ${recordingId}`);
-
-  console.log(`config.backendUrl: ${config.backendUrl}}`);
   const id = await uploadRecording(recordingId, {
     apiKey: config.replayApiKey,
     server: config.backendUrl,
@@ -159,9 +157,7 @@ async function saveBrowserExample({ exampleFilename }: { exampleFilename: string
   });
 
   try {
-    console.log(`>>> line 165 exampleUrl ${exampleUrl}`);
     const recordingId = await uploadLastRecording(exampleUrl);
-    console.log(`>>> line 165: recordingId ${recordingId}`);
 
     done();
 
@@ -169,7 +165,6 @@ async function saveBrowserExample({ exampleFilename }: { exampleFilename: string
       try {
         await saveRecording(exampleFilename, recordingId);
       } catch (e) {
-        console.log(`>>> line 173: error from saveRecording ${e}`);
         throw e;
       }
     }

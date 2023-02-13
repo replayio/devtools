@@ -44,7 +44,6 @@ export async function recordPlaywright(
 
 export async function uploadLastRecording(url: string) {
   const list = cli.listAllRecordings();
-  const latest = cli.viewLatestRecording();
   const id = findLast(list, rec => rec.metadata.uri === url)?.id;
 
   if (id) {
