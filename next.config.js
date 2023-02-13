@@ -14,6 +14,7 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
  *   | 'redirects'
  *   | 'productionBrowserSourceMaps'
  *   | 'headers'
+ *   | 'swcMinify'
  * >}
  */
 const baseNextConfig = {
@@ -24,6 +25,7 @@ const baseNextConfig = {
     // We rely on Trunk's hold-the-line functionality.
     ignoreDuringBuilds: true,
   },
+  swcMinify: true,
 
   productionBrowserSourceMaps: true,
 
