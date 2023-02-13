@@ -1,0 +1,20 @@
+diff --git a/lib/index.js b/lib/index.js
+index 5a6ba795aa481c4e3331b852fbff7c5bd7d0e1ff..387bcbf52b77ff88c367fc1ab54d49dbb88b0ab9 100644
+--- a/lib/index.js
++++ b/lib/index.js
+@@ -3619,6 +3619,7 @@ class UtilParser extends Tokenizer {
+   }
+   semicolon(allowAsi = true) {
+     if (allowAsi ? this.isLineTerminator() : this.eat(13)) return;
++    console.log("parse.semicolon() - raising MissingSemiColon error");
+     this.raise(Errors.MissingSemicolon, {
+       at: this.state.lastTokEndLoc
+     });
+@@ -13015,6 +13016,7 @@ class StatementParser extends ExpressionParser {
+   parseVarStatement(node, kind, allowMissingInitializer = false) {
+     this.next();
+     this.parseVar(node, false, kind, allowMissingInitializer);
++    console.log("parseVarStatement(): ",  node,  kind,  allowMissingInitializer);
+     this.semicolon();
+     return this.finishNode(node, "VariableDeclaration");
+   }

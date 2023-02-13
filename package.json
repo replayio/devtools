@@ -246,7 +246,8 @@
     "react-is": "18.2.0",
     "ts-invariant": "0.10.3",
     "typescript": "4.6.3",
-    "react-json-view@1.21.3": "patch:react-json-view@npm:1.21.3#.yarn/patches/react-json-view-npm-1.21.3-7827bb54c4.patch"
+    "react-json-view@1.21.3": "patch:react-json-view@npm:1.21.3#.yarn/patches/react-json-view-npm-1.21.3-7827bb54c4.patch",
+    "@babel/parser@7.20.13": "patch:@babel/parser@npm:7.20.13#.yarn/patches/@babel-parser-npm-7.20.13-5e7ca52733.patch"
   },
   "importSort": {
     ".js, .jsx, .ts, .tsx": {

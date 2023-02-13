@@ -56,12 +56,16 @@ export const {
       //   value: contents,
       //   contentType,
       // });
+
+      console.log("Parsing symbols: ", sourceId, contents);
+
       setSource({
         id: sourceId,
         text: contents,
         contentType,
       });
       const symbols = getSymbols(sourceId) as SymbolDeclarations;
+
       // const symbols = (await parser.getSymbols(sourceId)) as SymbolDeclarations;
       return symbols;
     }
