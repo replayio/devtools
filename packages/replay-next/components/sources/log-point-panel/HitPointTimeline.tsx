@@ -117,6 +117,14 @@ export default function HitPointTimeline({
   const nextButtonEnabled =
     lastHitPoint != null && isExecutionPointsGreaterThan(lastHitPoint.point, currentExecutionPoint);
 
+  const goToIndex = (index: number) => {
+    const hitPoint = hitPoints[index];
+    if (hitPoint !== null) {
+      setOptimisticTime(hitPoint.time);
+      update(hitPoint.time, hitPoint.point, false);
+    }
+  };
+
   const goToPrevious = () => {
     const [prevHitPoint] = findHitPointBefore(hitPoints, currentExecutionPoint);
     if (prevHitPoint !== null) {
@@ -148,6 +156,7 @@ export default function HitPointTimeline({
         closestHitPointIndex={closestHitPointIndex}
         currentHitPoint={currentHitPoint}
         editable={pointEditable}
+        goToIndex={goToIndex}
         hasConditional={hasConditional}
         hitPoints={hitPoints}
         hitPointStatus={hitPointStatus}
