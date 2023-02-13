@@ -14,7 +14,6 @@ import { getExecutionPoint } from "../../../reducers/pause";
 import { getContext } from "../../../selectors";
 import { getFileURL, getSourceQueryString, getTruncatedFileName } from "../../../utils/source";
 import { CloseButton } from "../../shared/Button";
-import styles from "./BreakpointHeading.module.css";
 
 type BHExtraProps = {
   sourceId: SourceId;
@@ -49,7 +48,7 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
     const { breakpoint, source, hasSiblingOfSameName } = this.props;
     const { column, line } = breakpoint?.location ?? {};
 
-    const columnVal = features.columnBreakpoints && column != null ? `:${column}` : "";
+    const columnVal = features.columnBreakpoints && column ? `:${column}` : "";
     const location = `:${line}${columnVal}`;
 
     const query = hasSiblingOfSameName ? getSourceQueryString(source) : "";
@@ -79,16 +78,19 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
 
     return (
       <div
-        className={styles.Heading}
+        className="breakpoint-heading"
         title={getFileURL(source, false)}
         onContextMenu={this.onContextMenu}
         onClick={this.onClick}
       >
-        <Redacted className={styles.Label}>{fileName}</Redacted>
-        <CloseButton
-          handleClick={this.removeBreakpoint}
-          tooltip={"Remove all breakpoint from this source"}
-        />
+        <Redacted className="breakpoint-heading-label">{fileName}</Redacted>
+        <div className="breakpoint-heading-actions">
+          <CloseButton
+            buttonClass={null}
+            handleClick={this.removeBreakpoint}
+            tooltip={"Remove all breakpoint from this source"}
+          />
+        </div>
       </div>
     );
   }

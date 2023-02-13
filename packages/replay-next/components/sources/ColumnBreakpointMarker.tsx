@@ -1,42 +1,31 @@
 import { SourceId } from "@replayio/protocol";
 
 import Icon from "replay-next/components/Icon";
-import { AddPoint, DeletePoints, EditPointBehavior } from "replay-next/src/contexts/points/types";
-import {
-  POINT_BEHAVIOR_DISABLED,
-  POINT_BEHAVIOR_ENABLED,
-  Point,
-  PointBehavior,
-} from "shared/client/types";
-import { UserInfo } from "shared/graphql/types";
+import { AddPoint, DeletePoints, EditPoint } from "replay-next/src/contexts/PointsContext";
+import { POINT_BEHAVIOR_DISABLED, POINT_BEHAVIOR_ENABLED, Point } from "shared/client/types";
 
 import styles from "./ColumnBreakpointMarker.module.css";
 
 export default function ColumnBreakpointMarker({
   addPoint,
   columnIndex,
-  currentUserInfo,
   deletePoints,
-  editPointBehavior,
+  editPoint,
   lineNumber,
   point,
-  pointBehavior,
   sourceId,
 }: {
   addPoint: AddPoint;
   columnIndex: number;
-  currentUserInfo: UserInfo | null;
   deletePoints: DeletePoints;
-  editPointBehavior: EditPointBehavior;
+  editPoint: EditPoint;
   lineNumber: number;
   point: Point | null;
-  pointBehavior: PointBehavior | null;
   sourceId: SourceId;
 }) {
   const onClick = () => {
     if (point === null) {
       addPoint(
-        {},
         {
           shouldBreak: POINT_BEHAVIOR_ENABLED,
         },
@@ -47,24 +36,20 @@ export default function ColumnBreakpointMarker({
         }
       );
     } else {
-      if (pointBehavior?.shouldLog === POINT_BEHAVIOR_ENABLED) {
-        editPointBehavior(
-          point.key,
-          {
-            shouldBreak:
-              pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED
-                ? POINT_BEHAVIOR_DISABLED
-                : POINT_BEHAVIOR_ENABLED,
-          },
-          point.user?.id === currentUserInfo?.id
-        );
+      if (point.shouldLog === POINT_BEHAVIOR_ENABLED) {
+        editPoint(point.id, {
+          shouldBreak:
+            point.shouldBreak === POINT_BEHAVIOR_ENABLED
+              ? POINT_BEHAVIOR_DISABLED
+              : POINT_BEHAVIOR_ENABLED,
+        });
       } else {
-        deletePoints(point.key);
+        deletePoints(point.id);
       }
     }
   };
 
-  const shouldBreak = pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED;
+  const shouldBreak = point?.shouldBreak === POINT_BEHAVIOR_ENABLED;
 
   return (
     <button

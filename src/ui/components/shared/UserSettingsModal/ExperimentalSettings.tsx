@@ -70,10 +70,10 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "rerunRoutines",
   },
   {
-    label: "Disable tracking recording assets in the database",
+    label: "Track recording assets in the database",
     description:
-      "Disable writing to and reading from the backend database when storing or retrieving recording assets",
-    key: "disableRecordingAssetsInDatabase",
+      "Enable writing to and reading from the backend database when storing or retrieving recording assets",
+    key: "trackRecordingAssetsInDatabase",
   },
 ];
 
@@ -130,10 +130,8 @@ export default function ExperimentalSettings({}) {
   const { value: enableRoutines, update: updateEnableRoutines } = useFeature("enableRoutines");
   const { value: rerunRoutines, update: updatererunRoutines } = useFeature("rerunRoutines");
 
-  const {
-    value: disableRecordingAssetsInDatabase,
-    update: updateDisableRecordingAssetsInDatabase,
-  } = useFeature("disableRecordingAssetsInDatabase");
+  const { value: trackRecordingAssetsInDatabase, update: updateTrackRecordingAssetsInDatabase } =
+    useFeature("trackRecordingAssetsInDatabase");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
@@ -156,8 +154,8 @@ export default function ExperimentalSettings({}) {
       updateEnableRoutines(!enableRoutines);
     } else if (key === "rerunRoutines") {
       updatererunRoutines(!rerunRoutines);
-    } else if (key === "disableRecordingAssetsInDatabase") {
-      updateDisableRecordingAssetsInDatabase(!disableRecordingAssetsInDatabase);
+    } else if (key === "trackRecordingAssetsInDatabase") {
+      updateTrackRecordingAssetsInDatabase(!trackRecordingAssetsInDatabase);
     }
   };
 
@@ -172,7 +170,7 @@ export default function ExperimentalSettings({}) {
     enableRoutines,
     rerunRoutines,
     profileWorkerThreads,
-    disableRecordingAssetsInDatabase,
+    trackRecordingAssetsInDatabase,
   };
 
   const settings = { ...userSettings, ...localSettings };

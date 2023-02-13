@@ -1,9 +1,9 @@
 import classnames from "classnames";
 import classNames from "classnames";
-import React, { useContext, useEffect, useState } from "react";
+import React, { ReactNode, RefObject, useContext, useEffect, useState } from "react";
+import { ImperativePanelHandle } from "react-resizable-panels";
 
 import { getPauseId } from "devtools/client/debugger/src/selectors";
-import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -19,7 +19,6 @@ import { trackEvent } from "ui/utils/telemetry";
 
 import { actions } from "../actions";
 import { selectors } from "../reducers";
-import { sidePanelStorageKey } from "./DevTools";
 
 function CypressIcon() {
   return (
@@ -107,7 +106,13 @@ function ToolbarButton({
   );
 }
 
-export default function Toolbar() {
+export default function Toolbar({
+  sidePanelCollapsed,
+  sidePanelRef,
+}: {
+  sidePanelCollapsed: boolean;
+  sidePanelRef: RefObject<ImperativePanelHandle>;
+}) {
   const dispatch = useAppDispatch();
   const replayClient = useContext(ReplayClientContext);
   const pauseId = useAppSelector(getPauseId);
@@ -120,7 +125,6 @@ export default function Toolbar() {
   const { recording } = useGetRecording(recordingId);
   const { comments, loading } = hooks.useGetComments(recordingId);
   const { value: logProtocol } = useFeature("logProtocol");
-  const [sidePanelCollapsed, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
 
   useEffect(() => {
     if (!loading && comments.length > 0) {
@@ -135,7 +139,14 @@ export default function Toolbar() {
   }, [selectedPrimaryPanel, showCommentsBadge]);
 
   const togglePanel = () => {
-    setSidePanelCollapsed(!sidePanelCollapsed);
+    const panel = sidePanelRef.current;
+    if (panel) {
+      if (sidePanelCollapsed) {
+        panel.expand();
+      } else {
+        panel.collapse();
+      }
+    }
   };
 
   const handleButtonClick = (panelName: PrimaryPanelName) => {

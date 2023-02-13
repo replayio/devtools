@@ -1,25 +1,23 @@
-import { BreakpointId, Location } from "@replayio/protocol";
+import { BreakpointId } from "@replayio/protocol";
 import { useContext, useEffect, useRef } from "react";
 
-import { PointBehaviorsObject } from "replay-next/src/contexts/points/types";
 import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
 import { getSourcesAsync } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { POINT_BEHAVIOR_ENABLED, Point, PointKey } from "shared/client/types";
+import { POINT_BEHAVIOR_ENABLED, Point, PointId } from "shared/client/types";
 import { ReplayClientInterface } from "shared/client/types";
 
 // Breakpoints must be synced with the server so the stepping controls will work.
 export default function useBreakpointIdsFromServer(
-  replayClient: ReplayClientInterface,
   points: Point[] | undefined,
-  pointBehaviors: PointBehaviorsObject,
-  deletePoints: (...keys: PointKey[]) => void
+  editPoint: (id: PointId, partialPoint: Partial<Point>) => void,
+  deletePoints: (...ids: PointId[]) => void,
+  replayClient: ReplayClientInterface
 ): void {
   const client = useContext(ReplayClientContext);
 
   const prevPointsRef = useRef<Point[] | null>(null);
-  const prevPointBehaviorsRef = useRef<PointBehaviorsObject | null>(null);
-  const pointKeyToBreakpointIdMKeyRef = useRef<Map<PointKey, BreakpointId[]>>(new Map());
+  const pointIdToBreakpointIdMapRef = useRef<Map<PointId, BreakpointId[]>>(new Map());
 
   useEffect(() => {
     async function setUpBreakpoints() {
@@ -27,10 +25,9 @@ export default function useBreakpointIdsFromServer(
         return;
       }
 
-      const pointKeyToBreakpointKeyMap = pointKeyToBreakpointIdMKeyRef.current;
+      const pointIdToBreakpointIdMap = pointIdToBreakpointIdMapRef.current;
       const prevPoints = prevPointsRef.current;
-      const prevPointBehaviors = prevPointBehaviorsRef.current;
-      if (prevPoints !== points || prevPointBehaviors !== pointBehaviors) {
+      if (prevPoints !== points) {
         if (prevPoints === null) {
           // This should specifically be the case when we're starting up and have points from storage.
           // Here we _need_ to make sure we have breakable positions before we try to add the points,
@@ -51,34 +48,24 @@ export default function useBreakpointIdsFromServer(
           const pointsToRemove: string[] = [];
 
           for (let point of points) {
-            const { key, location } = point;
-            const { column, line, sourceId } = location;
-
-            const pointBehavior = pointBehaviors[key];
-
+            const { sourceId } = point.location;
             if (!allSourceIds.has(sourceId)) {
               // It's possible this persisted point has an obsolete
               // `sourceId`. Ignore it, and we'll remove it at the end.
-              pointsToRemove.push(key);
+              pointsToRemove.push(point.id);
               continue;
             }
 
             if (!sourcesWithFetchedPositions.has(sourceId)) {
               sourcesWithFetchedPositions.add(sourceId);
               // We haven't fetched breakable positions for this yet. Get them.
-              await getBreakpointPositionsAsync(client, sourceId);
+              await getBreakpointPositionsAsync(client, point.location.sourceId);
             }
 
             // _Now_ we can tell the backend about this breakpoint.
-            if (pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED) {
-              const location: Location = {
-                column,
-                line,
-                sourceId,
-              };
-
-              client.breakpointAdded(location, point.condition).then(serverKeys => {
-                pointKeyToBreakpointKeyMap.set(key, serverKeys);
+            if (point.shouldBreak === POINT_BEHAVIOR_ENABLED) {
+              client.breakpointAdded(point.location, point.condition).then(serverIds => {
+                pointIdToBreakpointIdMap.set(point.id, serverIds);
               });
             }
           }
@@ -91,34 +78,22 @@ export default function useBreakpointIdsFromServer(
           // The user has probably been interacting with the app and we _should_ have breakable positions
           // for these files already.
           points.forEach(point => {
-            const { key } = point;
-            const { column, line, sourceId } = point.location;
-
-            const location: Location = {
-              column,
-              line,
-              sourceId,
-            };
-
-            const pointBehavior = pointBehaviors[key];
-            const prevPointBehavior = prevPointBehaviors?.[key];
-
-            const prevPoint = prevPoints.find(({ key }) => key === point.key);
+            const prevPoint = prevPoints.find(({ id }) => id === point.id);
             if (prevPoint == null) {
-              if (pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED) {
-                client.breakpointAdded(location, point.condition).then(serverKeys => {
-                  pointKeyToBreakpointKeyMap.set(key, serverKeys);
+              if (point.shouldBreak === POINT_BEHAVIOR_ENABLED) {
+                client.breakpointAdded(point.location, point.condition).then(serverIds => {
+                  pointIdToBreakpointIdMap.set(point.id, serverIds);
                 });
               }
-            } else if (prevPointBehavior?.shouldBreak !== pointBehavior?.shouldBreak) {
-              if (pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED) {
-                client.breakpointAdded(location, point.condition).then(serverKeys => {
-                  pointKeyToBreakpointKeyMap.set(key, serverKeys);
+            } else if (prevPoint.shouldBreak !== point.shouldBreak) {
+              if (point.shouldBreak === POINT_BEHAVIOR_ENABLED) {
+                client.breakpointAdded(point.location, point.condition).then(serverIds => {
+                  pointIdToBreakpointIdMap.set(point.id, serverIds);
                 });
               } else {
-                const serverKeys = pointKeyToBreakpointKeyMap.get(key);
-                if (serverKeys != null) {
-                  serverKeys.forEach(serverId => {
+                const serverIds = pointIdToBreakpointIdMap.get(point.id);
+                if (serverIds != null) {
+                  serverIds.forEach(serverId => {
                     client.breakpointRemoved(serverId);
                   });
                 }
@@ -127,11 +102,11 @@ export default function useBreakpointIdsFromServer(
           });
 
           prevPoints.forEach(prevPoint => {
-            const point = points.find(({ key }) => key === prevPoint.key);
+            const point = points.find(({ id }) => id === prevPoint.id);
             if (point == null) {
-              const serverKeys = pointKeyToBreakpointKeyMap.get(prevPoint.key);
-              if (serverKeys != null) {
-                serverKeys.forEach(serverId => {
+              const serverIds = pointIdToBreakpointIdMap.get(prevPoint.id);
+              if (serverIds != null) {
+                serverIds.forEach(serverId => {
                   client.breakpointRemoved(serverId);
                 });
               }
@@ -141,9 +116,8 @@ export default function useBreakpointIdsFromServer(
       }
 
       prevPointsRef.current = points;
-      prevPointBehaviorsRef.current = pointBehaviors;
     }
 
     setUpBreakpoints();
-  }, [client, deletePoints, pointBehaviors, points, replayClient]);
+  }, [client, editPoint, deletePoints, points, replayClient]);
 }

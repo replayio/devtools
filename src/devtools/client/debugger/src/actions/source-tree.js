@@ -3,12 +3,10 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 //
 
-import { TreeNode } from "../utils/sources-tree/types";
-
-export function setExpandedState(expanded: unknown) {
+export function setExpandedState(expanded) {
   return { type: "SET_EXPANDED_STATE", expanded };
 }
 
-export function focusItem(item: TreeNode | undefined) {
+export function focusItem(item) {
   return { type: "SET_FOCUSED_SOURCE_ITEM", item };
 }

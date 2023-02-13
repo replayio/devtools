@@ -9,8 +9,7 @@ import {
 
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import { ThreadFront } from "protocol/thread";
-import { ExpandablesContextRoot } from "replay-next/src/contexts/ExpandablesContext";
-import { PointsContextRoot } from "replay-next/src/contexts/points/PointsContext";
+import { PointsContextRoot } from "replay-next/src/contexts/PointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
@@ -38,7 +37,6 @@ import FocusContextReduxAdapter from "./FocusContextReduxAdapter";
 import Header from "./Header/index";
 import KeyboardShortcuts from "./KeyboardShortcuts";
 import { KeyModifiers } from "./KeyModifiers";
-import LayoutContextAdapter from "./LayoutContextAdapter";
 import TimelineContextAdapter from "./SecondaryToolbox/TimelineContextAdapter";
 import SelectedFrameContextAdapter from "./SelectedFrameContextAdapter";
 import SessionContextAdapter from "./SessionContextAdapter";
@@ -53,8 +51,6 @@ import Video from "./Video";
 const Viewer = React.lazy(() => import("./Viewer"));
 
 type DevToolsProps = PropsFromRedux & { apiKey?: string; uploadComplete: boolean };
-
-export const sidePanelStorageKey = "Replay:SidePanelCollapsed";
 
 function ViewLoader() {
   const [showLoader, setShowLoader] = useState(false);
@@ -83,24 +79,17 @@ function Body() {
 
   const sidePanelRef = useRef<ImperativePanelHandle>(null);
 
+  const sidePanelStorageKey = "Replay:SidePanelCollapsed";
   const [sidePanelCollapsed, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
 
   const onSidePanelCollapse = (isCollapsed: boolean) => {
     setSidePanelCollapsed(isCollapsed);
   };
 
-  useEffect(() => {
-    if (sidePanelCollapsed) {
-      sidePanelRef.current?.collapse();
-    } else {
-      sidePanelRef.current?.expand();
-    }
-  }, [sidePanelCollapsed]);
-
   return (
     <div className="vertical-panels pr-2">
       <div className="flex h-full flex-row overflow-hidden bg-chrome">
-        <Toolbar />
+        <Toolbar sidePanelCollapsed={sidePanelCollapsed} sidePanelRef={sidePanelRef} />
         <PanelGroup autoSaveId="DevTools-horizontal" className="split-box" direction="horizontal">
           <Panel
             className="flex=1 flex h-full overflow-hidden"
@@ -239,16 +228,12 @@ function _DevTools({
               <SelectedFrameContextRoot SelectedFrameContextAdapter={SelectedFrameContextAdapter}>
                 <TerminalContextAdapter>
                   <InspectorContextReduxAdapter>
-                    <ExpandablesContextRoot>
-                      <LayoutContextAdapter>
-                        <KeyModifiers>
-                          <Header />
-                          <Body />
-                          {showCommandPalette ? <CommandPaletteModal /> : null}
-                          <KeyboardShortcuts />
-                        </KeyModifiers>
-                      </LayoutContextAdapter>
-                    </ExpandablesContextRoot>
+                    <KeyModifiers>
+                      <Header />
+                      <Body />
+                      {showCommandPalette ? <CommandPaletteModal /> : null}
+                      <KeyboardShortcuts />
+                    </KeyModifiers>
                   </InspectorContextReduxAdapter>
                 </TerminalContextAdapter>
               </SelectedFrameContextRoot>

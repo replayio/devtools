@@ -37,12 +37,6 @@ but without a background color so we can use hover effects
   -webkit-mask-image: url(/icons/replay-logo.svg);
 }
 
-/* context menu */
-
-.icon.copy {
-  -webkit-mask-image: url(/icons/copy.svg);
-}
-
 /* replay info */
 
 .icon.globe {

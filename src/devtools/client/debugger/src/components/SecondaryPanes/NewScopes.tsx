@@ -10,7 +10,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { enterFocusMode } from "ui/actions/timeline";
 import { Redacted } from "ui/components/Redacted";
 import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
-import { getPreferredLocation, getPreferredSourceId } from "ui/reducers/sources";
+import { getPreferredGeneratedSources } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { pickScopes } from "ui/suspense/scopeCache";
 
@@ -20,7 +20,7 @@ import styles from "./NewObjectInspector.module.css";
 
 function ScopesRenderer() {
   const replayClient = useContext(ReplayClientContext);
-  const sourcesState = useAppSelector(state => state.sources);
+  const preferredGeneratedSources = useAppSelector(getPreferredGeneratedSources);
   const selectedFrameId = useAppSelector(getSelectedFrameId);
   if (!selectedFrameId) {
     return (
@@ -34,22 +34,9 @@ function ScopesRenderer() {
   if (!frame) {
     return null;
   }
-
-  let path = "scope:";
-  if (frame.functionLocation) {
-    const functionLocation = getPreferredLocation(sourcesState, frame.functionLocation);
-    path += `${functionLocation.sourceId}:${functionLocation.line}:${functionLocation.column}`;
-  } else if (frame.type !== "global") {
-    const sourceId = getPreferredSourceId(
-      sourcesState.sourceDetails.entities,
-      frame.location.map(l => l.sourceId)
-    );
-    path += `${sourceId}:`;
-  }
-
   const { scopes: protocolScopes, originalScopesUnavailable } = pickScopes(
     getFrameScopesSuspense(replayClient, selectedFrameId.pauseId, selectedFrameId.frameId),
-    sourcesState.preferredGeneratedSources
+    preferredGeneratedSources
   );
   const scopes = convertScopes(protocolScopes, frame, selectedFrameId.pauseId);
 
@@ -60,36 +47,18 @@ function ScopesRenderer() {
       ) : null}
       <div className={`${styles.Popup} preview-popup`}>
         {scopes.map((scope, scopeIndex) => (
-          <Scope
-            expandByDefault={scopeIndex === 0}
-            key={scopeIndex}
-            path={`${path}/${scopeIndex}`}
-            pauseId={selectedFrameId.pauseId}
-            scope={scope}
-          />
+          <Scope key={scopeIndex} pauseId={selectedFrameId.pauseId} scope={scope} />
         ))}
       </div>
     </>
   );
 }
 
-function Scope({
-  expandByDefault,
-  path,
-  pauseId,
-  scope,
-}: {
-  expandByDefault?: boolean;
-  path?: string;
-  pauseId: PauseId;
-  scope: ConvertedScope;
-}) {
+function Scope({ pauseId, scope }: { pauseId: PauseId; scope: ConvertedScope }) {
   if (scope.type === "object") {
     return (
       <Inspector
         context="default"
-        expandByDefault={expandByDefault}
-        path={path}
         pauseId={pauseId}
         protocolValue={{ object: scope.objectId, name: scope.title } as Value}
       />
@@ -97,13 +66,7 @@ function Scope({
   }
   if (scope.bindings) {
     return (
-      <ScopesInspector
-        expandByDefault={expandByDefault}
-        name={scope.title!}
-        path={path}
-        pauseId={pauseId}
-        protocolValues={scope.bindings}
-      />
+      <ScopesInspector name={scope.title!} pauseId={pauseId} protocolValues={scope.bindings} />
     );
   }
   return null;

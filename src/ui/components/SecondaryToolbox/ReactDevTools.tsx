@@ -1,10 +1,8 @@
-import { ExecutionPoint, NodeBounds, ObjectId, Object as ProtocolObject } from "@replayio/protocol";
-import React, { useContext, useMemo } from "react";
+import { ExecutionPoint, NodeBounds, ObjectId } from "@replayio/protocol";
+import React, { useContext } from "react";
 import { useEffect, useState } from "react";
-import type { SerializedElement, Store, Wall } from "react-devtools-inline/frontend";
+import type { Store, Wall } from "react-devtools-inline/frontend";
 
-import { selectLocation } from "devtools/client/debugger/src/actions/sources";
-import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ThreadFront } from "protocol/thread";
 import { RecordingCapabilities, RecordingTarget } from "protocol/thread/thread";
@@ -16,7 +14,6 @@ import {
 import { getRecordingCapabilitiesSuspense } from "replay-next/src/suspense/RecordingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
-import { UIThunkAction } from "ui/actions";
 import { fetchMouseTargetsForPause } from "ui/actions/app";
 import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactDevTools";
 import {
@@ -30,7 +27,6 @@ import {
   getProtocolCheckFailed,
   getReactInitPoint,
 } from "ui/reducers/reactDevTools";
-import { getPreferredLocation } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Annotation } from "ui/state/reactDevTools";
 import { getMouseTarget } from "ui/suspense/nodeCaches";
@@ -49,22 +45,13 @@ type NodeOptsWithoutBounds = Omit<NodePickerOpts, "onCheckNodeBounds">;
 
 const getDOMNodes = `((rendererID, id) => __REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.get(rendererID).findNativeNodesForFiberID(id))`;
 
-// Some internal values not currently included in `@types/react-devtools-inline`
-type ElementWithChildren = SerializedElement & {
-  children: number[];
-};
-
-type StoreWithInternals = Store & {
-  _idToElement: Map<number, ElementWithChildren>;
-};
-
 // used by the frontend to communicate with the backend
 class ReplayWall implements Wall {
   private _listener?: (msg: any) => void;
   private inspectedElements = new Set();
   private highlightedElementId?: number;
   private recordingTarget: RecordingTarget | null = null;
-  store?: StoreWithInternals;
+  store?: Store;
 
   constructor(
     private enablePicker: (opts: NodeOptsWithoutBounds) => void,
@@ -239,8 +226,8 @@ class ReplayWall implements Wall {
     await this.ensureReactDevtoolsBackendLoaded();
 
     const nodeToElementId = new Map<ObjectId, number>();
-    for (const rootID of this.store!.roots) {
-      const rendererID = this.store!.rootIDToRendererID.get(rootID)!;
+    for (const rootID of this.store!._roots) {
+      const rendererID = this.store!._rootIDToRendererID.get(rootID)!;
       const elementIDs = JSON.stringify(this.collectElementIDs(rootID));
       const expr = `${elementIDs}.reduce((map, id) => { for (node of ${getDOMNodes}(${rendererID}, id) || []) { map.set(node, id); } return map; }, new Map())`;
       const response = await ThreadFront.evaluate({
@@ -278,62 +265,6 @@ class ReplayWall implements Wall {
     }
     return elementIDs;
   }
-
-  public async getComponentLocation(elementID: number) {
-    const rendererID = this.store!.getRendererIDForElement(elementID);
-    if (rendererID != null) {
-      // See original React DevTools extension implementation for comparison:
-      // https://github.com/facebook/react/blob/v18.0.0/packages/react-devtools-extensions/src/main.js#L194-L220
-
-      // Ask the renderer interface to determine the component function,
-      // and store it as a global variable on the window
-      this.sendRequest("viewElementSource", { id: elementID, rendererID });
-
-      // This will be evaluated in the paused browser
-      function retrieveSelectedReactComponentFunction() {
-        const $type: React.ComponentType | undefined = (window as any).$type;
-        if ($type != null) {
-          if ($type && $type.prototype && $type.prototype.isReactComponent) {
-            // inspect Component.render, not constructor
-            return $type.prototype.render;
-          } else {
-            // inspect Functional Component
-            return $type;
-          }
-        }
-      }
-
-      const findSavedComponentFunctionCommand = `
-      (${retrieveSelectedReactComponentFunction})()
-    `;
-
-      const res = await ThreadFront.evaluate({
-        replayClient: this.replayClient,
-        text: findSavedComponentFunctionCommand,
-      });
-
-      if (res?.returned?.object) {
-        const componentFunctionPreview = await getObjectWithPreviewHelper(
-          this.replayClient,
-          this.pauseId!,
-          res.returned.object
-        );
-        return componentFunctionPreview;
-      }
-    }
-  }
-}
-
-function jumpToComponentPreferredSource(componentPreview: ProtocolObject): UIThunkAction {
-  return (dispatch, getState) => {
-    const state = getState();
-    const cx = getThreadContext(state);
-    const location = getPreferredLocation(
-      state.sources,
-      componentPreview.preview!.functionLocation!
-    );
-    dispatch(selectLocation(cx, location, true));
-  };
 }
 
 function createReactDevTools(
@@ -352,7 +283,7 @@ function createReactDevTools(
 ) {
   const { createBridge, createStore, initialize } = reactDevToolsInlineModule;
 
-  const target = { postMessage() {} } as unknown as Window;
+  const target = { postMessage() {} };
   const wall = new ReplayWall(
     enablePicker,
     initializePicker,
@@ -369,7 +300,7 @@ function createReactDevTools(
     checkBridgeProtocolCompatibility: false,
     supportsNativeInspection: true,
   });
-  wall.store = store as StoreWithInternals;
+  wall.store = store;
   const ReactDevTools = initialize(target, { bridge, store });
 
   for (const { message, point } of annotations) {
@@ -378,7 +309,7 @@ function createReactDevTools(
     }
   }
 
-  return [ReactDevTools, wall] as const;
+  return ReactDevTools;
 }
 
 // React DevTools (RD) changed its internal data structure slightly in a minor update.
@@ -453,6 +384,7 @@ export default function ReactDevtoolsPanel() {
       );
     }
   });
+
   if (currentPoint === null) {
     return null;
   }
@@ -532,9 +464,7 @@ export default function ReactDevtoolsPanel() {
     );
   }
 
-  // Still not sure on the entire behavior here, but apparently wrapping
-  // this in a `useMemo` is a _bad_ idea and breaks the E2E test
-  const [ReactDevTools, wall] = createReactDevTools(
+  const ReactDevTools = createReactDevTools(
     reactDevToolsInlineModule,
     annotations,
     currentPoint,
@@ -560,12 +490,7 @@ export default function ReactDevtoolsPanel() {
       hideToggleErrorAction={true}
       hideToggleSuspenseAction={true}
       hideLogAction={true}
-      viewElementSourceFunction={async (id, inspectedElement) => {
-        const componentPreview = await wall.getComponentLocation(id);
-        if (componentPreview?.preview?.functionLocation) {
-          dispatch(jumpToComponentPreferredSource(componentPreview));
-        }
-      }}
+      hideViewSourceAction={true}
     />
   );
 }

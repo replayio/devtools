@@ -26,8 +26,8 @@ import { selectFrame as selectFrameAction } from "../../../actions/pause/selectF
 import { toggleFrameworkGrouping as setFrameworkGroupingAction } from "../../../reducers/ui";
 import { getAllCachedPauseFrames } from "../../../utils/frames";
 import { collapseFrames, formatCopyName } from "../../../utils/pause/frames";
-import { FrameComponent as Frame } from "./Frame";
-import { Group } from "./Group";
+import Frame from "./Frame";
+import Group from "./Group";
 import { CommonFrameComponentProps } from ".";
 
 function FramesRenderer({

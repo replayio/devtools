@@ -10,7 +10,6 @@ export enum ProtocolError {
   CommandFailed = 33,
   RecordingUnloaded = 38,
   DocumentIsUnavailable = 45,
-  TimedOut = 46,
   LinkerDoesNotSupportAction = 48,
   InvalidRecording = 50,
   ServiceUnavailable = 51,

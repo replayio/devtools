@@ -6,5 +6,5 @@
 }
 
 .Unpublished {
-  background-color: var(--comment-reply-unpublished-background-color);
+  background-color: var(--theme-base-90);
 }

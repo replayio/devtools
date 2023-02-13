@@ -63,9 +63,6 @@
 .ContentWrapper:hover {
   border-color: var(--point-panel-input-border-color-hover);
 }
-.ContentWrapper[data-logging-disabled] {
-  border-color: var(--point-panel-input-border-color);
-}
 .Panel[data-test-state="edit"] .ContentWrapper:focus,
 .Panel[data-test-state="edit"] .ContentWrapper:focus-within {
   border-color: var(--point-panel-input-border-color-focus);
@@ -234,17 +231,4 @@
 .SaveButtonIcon {
   height: 1rem;
   width: 1rem;
-}
-
-.DisabledIconAndAvatar {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--point-panel-input-edit-button-color);
-}
-
-.CreatedByAvatar {
-  height: 1rem;
-  width: 1rem;
-  border-radius: 1rem;
 }

@@ -352,12 +352,7 @@ export async function waitForPaused(page: Page, line?: number): Promise<void> {
   }
 }
 
-export async function waitForScopeValue(
-  page: Page,
-  name: string,
-  expectedValue: Expected,
-  expandScopes = true
-) {
+export async function waitForScopeValue(page: Page, name: string, expectedValue: Expected) {
   await debugPrint(
     page,
     `Waiting for scope with variable "${chalk.bold(name)}" to have value "${chalk.bold(
@@ -369,9 +364,7 @@ export async function waitForScopeValue(
   const escapedValue =
     typeof expectedValue === "string" ? expectedValue.replace(/"/g, '\\"') : expectedValue;
 
-  if (expandScopes) {
-    await expandAllScopesBlocks(page);
-  }
+  await expandAllScopesBlocks(page);
 
   const scopesPanel = getScopesPanel(page);
   const scopeValue = scopesPanel

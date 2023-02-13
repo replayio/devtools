@@ -3,14 +3,10 @@ import findLast from "lodash/findLast";
 import { useContext } from "react";
 
 import Icon from "replay-next/components/Icon";
+import { SetLinePointState } from "replay-next/components/sources/SourceListRow";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { KeyboardModifiersContext } from "replay-next/src/contexts/KeyboardModifiersContext";
-import {
-  AddPoint,
-  DeletePoints,
-  EditPendingPointText,
-  EditPointBehavior,
-} from "replay-next/src/contexts/points/types";
+import { AddPoint, DeletePoints, EditPoint } from "replay-next/src/contexts/PointsContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
@@ -22,12 +18,7 @@ import {
   isExecutionPointsLessThan,
 } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import {
-  POINT_BEHAVIOR_DISABLED,
-  POINT_BEHAVIOR_ENABLED,
-  Point,
-  PointBehavior,
-} from "shared/client/types";
+import { POINT_BEHAVIOR_DISABLED, POINT_BEHAVIOR_ENABLED, Point } from "shared/client/types";
 import { LineHitCounts } from "shared/client/types";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { Nag } from "shared/graphql/types";
@@ -38,39 +29,33 @@ export default function HoverButton({
   addPoint,
   buttonClassName,
   deletePoints,
-  editPendingPointText,
-  editPointBehavior,
+  editPoint,
   iconClassName,
   lineHitCounts,
   lineNumber,
   point,
-  pointBehavior,
+  setLinePointState,
   source,
 }: {
   addPoint: AddPoint;
   buttonClassName: string;
   deletePoints: DeletePoints;
-  editPendingPointText: EditPendingPointText;
-  editPointBehavior: EditPointBehavior;
+  editPoint: EditPoint;
   iconClassName: string;
   lineHitCounts: LineHitCounts | null;
   lineNumber: number;
   point: Point | null;
-  pointBehavior: PointBehavior | null;
+  setLinePointState: SetLinePointState;
   source: ProtocolSource;
 }) {
   const { range: focusRange } = useContext(FocusContext);
   const { isMetaKeyActive, isShiftKeyActive } = useContext(KeyboardModifiersContext);
   const client = useContext(ReplayClientContext);
   const { executionPoint, update } = useContext(TimelineContext);
-  const { currentUserInfo } = useContext(SessionContext);
   const { findClosestFunctionName } = useContext(SourcesContext);
+  const { trackEvent } = useContext(SessionContext);
 
   const [showNag, dismissNag] = useNag(Nag.FIRST_BREAKPOINT_ADD);
-
-  if (point?.user && point.user.id !== currentUserInfo?.id) {
-    return null;
-  }
 
   if (isMetaKeyActive) {
     if (lineHitCounts === null) {
@@ -145,29 +130,22 @@ export default function HoverButton({
       }
 
       if (point) {
-        editPendingPointText(point.key, { content });
-        editPointBehavior(
-          point.key,
-          { shouldLog: POINT_BEHAVIOR_ENABLED },
-          point.user?.id === currentUserInfo?.id
-        );
+        editPoint(point.id, { content, shouldLog: POINT_BEHAVIOR_ENABLED });
       } else {
         addPoint(
           {
             content,
-          },
-          {
             shouldLog: POINT_BEHAVIOR_ENABLED,
           },
           location
         );
+
+        setLinePointState(lineNumber - 1, "point");
       }
     };
 
-    const {
-      shouldBreak = POINT_BEHAVIOR_DISABLED,
-      shouldLog = point?.content ? POINT_BEHAVIOR_ENABLED : POINT_BEHAVIOR_DISABLED,
-    } = pointBehavior || {};
+    const { shouldBreak = POINT_BEHAVIOR_DISABLED, shouldLog = POINT_BEHAVIOR_DISABLED } =
+      point || {};
 
     // If a point's behavior has been temporarily disabled, the hover button should take that into account.
     const hasOrDidBreak = shouldBreak !== POINT_BEHAVIOR_DISABLED;
@@ -176,16 +154,13 @@ export default function HoverButton({
     const togglePoint = () => {
       if (point) {
         if (!hasOrDidLog || hasOrDidBreak) {
-          const newShouldLog = hasOrDidLog ? POINT_BEHAVIOR_DISABLED : POINT_BEHAVIOR_ENABLED;
-          editPointBehavior(
-            point.key,
-            {
-              shouldLog: newShouldLog,
-            },
-            point.user?.id === currentUserInfo?.id
-          );
+          editPoint(point.id, {
+            shouldLog: hasOrDidLog ? POINT_BEHAVIOR_DISABLED : POINT_BEHAVIOR_ENABLED,
+          });
         } else {
-          deletePoints(point.key);
+          deletePoints(point.id);
+
+          setLinePointState(lineNumber - 1, null);
         }
       }
     };

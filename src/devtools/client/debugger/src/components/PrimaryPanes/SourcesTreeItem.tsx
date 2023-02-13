@@ -5,17 +5,18 @@
 //
 
 import classnames from "classnames";
-import React, { Component, useLayoutEffect, useRef } from "react";
+import React, { Component } from "react";
+import { ConnectedProps, connect } from "react-redux";
 
-import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
-import useContextMenu from "replay-next/components/context-menu/useContextMenu";
-import Icon from "replay-next/components/Icon";
+import { showMenu } from "devtools/shared/contextmenu";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { Redacted } from "ui/components/Redacted";
 import type { SourceDetails } from "ui/reducers/sources";
 import { getHasSiblingOfSameName } from "ui/reducers/sources";
-import { useAppSelector } from "ui/setup/hooks";
+import type { UIState } from "ui/state";
 
+import type { ContextMenuItem } from "../../reducers/types";
+import { getContext } from "../../selectors";
 import { getSourceQueryString } from "../../utils/source";
 import { getPathWithoutThread, isDirectory } from "../../utils/sources-tree";
 import { TreeNode } from "../../utils/sources-tree/types";
@@ -32,187 +33,181 @@ interface STIProps {
   selectItem: (item: TreeNode) => void;
   source: SourceDetails;
   debuggeeUrl: string;
-  setExpanded: (item: TreeNode, isExpanded: boolean) => void;
+  setExpanded: (item: TreeNode, a: boolean, b: boolean) => void;
 }
 
-function getItemName(item: TreeNode) {
-  switch (item.name) {
-    case "ng://":
-      return "Angular";
-    case "webpack://":
-      return "Webpack";
-    default:
-      return `${unescape(item.name)}`;
-  }
-}
-
-interface TreeIconProps {
-  item: TreeNode;
-  source: SourceDetails;
-  depth: number;
-}
-
-function SourceTreeIcon({ item, source, depth }: TreeIconProps) {
-  if (item.name === "webpack://") {
-    return <AccessibleImage className="webpack" />;
-  } else if (item.name === "ng://") {
-    return <AccessibleImage className="angular" />;
-  }
-
-  if (isDirectory(item)) {
-    // Domain level
-    if (depth === 0) {
-      return <AccessibleImage className="globe-small" />;
-    }
-    return <AccessibleImage className="folder" />;
-  }
-
-  if (source) {
-    return <SourceIcon source={source} shouldHide={(icon: string) => icon === "extension"} />;
-  }
-
-  return null;
-}
-
-function useSourceTreeItemContextMenu({
-  item,
-  setExpanded,
-  source,
-}: Pick<STIProps, "item" | "setExpanded" | "source">) {
-  let menuItems: React.ReactNode = null;
-
-  if (isDirectory(item)) {
-    const expandAll = () => {
-      setExpanded(item, true);
-    };
-    const collapseAll = () => {
-      setExpanded(item, false);
-    };
-    menuItems = (
-      <>
-        <ContextMenuItem dataTestId="SourceTreeItemContextMenu-ExpandAll" onClick={expandAll}>
-          <>
-            <Icon type="chevron-down" />
-            Expand all
-          </>
-        </ContextMenuItem>
-        <ContextMenuItem dataTestId="SourceTreeItemContextMenu-CollapseAll" onClick={collapseAll}>
-          <>
-            <Icon type="chevron-right" />
-            Collapse all
-          </>
-        </ContextMenuItem>
-      </>
-    );
-  } else {
-    const { contents } = item;
-
-    if (!Array.isArray(contents)) {
-      if (source) {
-        const copySourceUri = () => {
-          if (source?.url) {
-            copyToClipboard(source.url);
-          }
-        };
-
-        menuItems = (
-          <ContextMenuItem
-            dataTestId="SourceTreeItemContextMenu-CopySourceUri"
-            onClick={copySourceUri}
-          >
-            <>
-              <Icon type="copy" />
-              Copy source URI
-            </>
-          </ContextMenuItem>
-        );
-      }
-    }
-  }
-
-  return useContextMenu(<>{menuItems}</>);
-}
-
-function SourceTreeItem2({
-  autoExpand,
-  item,
-  depth,
-  focused,
-  source,
-  expanded,
-  focusItem,
-  selectItem,
-  setExpanded,
-}: STIProps) {
-  const hasSiblingOfSameName = useAppSelector(state => getHasSiblingOfSameName(state, source));
-
-  const { contextMenu, onContextMenu } = useSourceTreeItemContextMenu({
-    item,
-    source,
-    setExpanded,
-  });
-
-  const handleContextMenu = (e: React.MouseEvent) => {
-    onContextMenu(e);
-    e.stopPropagation();
+const mapStateToProps = (state: UIState, props: STIProps) => {
+  const { source } = props;
+  return {
+    cx: getContext(state),
+    hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
   };
+};
 
-  const isFirstMountRef = useRef(true);
+const connector = connect(mapStateToProps);
 
-  useLayoutEffect(() => {
-    if (autoExpand && isFirstMountRef.current) {
-      setExpanded(item, true);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+type FinalSTIProps = PropsFromRedux & STIProps;
+
+class SourceTreeItem extends Component<FinalSTIProps> {
+  componentDidMount() {
+    const { autoExpand, item } = this.props;
+    if (autoExpand) {
+      this.props.setExpanded(item, true, false);
     }
+  }
 
-    isFirstMountRef.current = false;
-  }, [autoExpand, setExpanded, item]);
+  onClick = () => {
+    const { item, focusItem, selectItem } = this.props;
 
-  const onClick = () => {
     focusItem(item);
     if (!isDirectory(item)) {
       selectItem(item);
     }
   };
 
-  let querystring;
-  if (hasSiblingOfSameName) {
-    querystring = getSourceQueryString(source);
+  onContextMenu = (event: React.MouseEvent, item: TreeNode) => {
+    // TODO [FE-926] Review source editor context menu for re-adding later
+    // This includes actual implementation (legacy FF menu vs something new),
+    // as well as what menu items it should contain.
+    const copySourceUri2Label = "Copy source URI";
+    const copySourceUri2Key = "u";
+
+    event.stopPropagation();
+    event.preventDefault();
+
+    const menuOptions: ContextMenuItem[] = [];
+
+    if (!isDirectory(item)) {
+      // Flow requires some extra handling to ensure the value of contents.
+      const { contents } = item;
+
+      if (!Array.isArray(contents)) {
+        const copySourceUri2: ContextMenuItem = {
+          id: "node-menu-copy-source",
+          label: copySourceUri2Label,
+          accesskey: copySourceUri2Key,
+          disabled: false,
+          click: () => copyToClipboard(contents.url || ""),
+        };
+
+        const { source } = this.props;
+        if (source) {
+          menuOptions.push(copySourceUri2);
+        }
+      }
+    }
+
+    if (isDirectory(item)) {
+      this.addCollapseExpandAllOptions(menuOptions, item);
+    }
+
+    showMenu(event, menuOptions);
+  };
+
+  addCollapseExpandAllOptions = (menuOptions: ContextMenuItem[], item: TreeNode) => {
+    const { setExpanded } = this.props;
+
+    menuOptions.push({
+      id: "node-menu-collapse-all",
+      label: "Collapse all",
+      disabled: false,
+      click: () => setExpanded(item, false, true),
+    });
+
+    menuOptions.push({
+      id: "node-menu-expand-all",
+      label: "Expand all",
+      disabled: false,
+      click: () => setExpanded(item, true, true),
+    });
+  };
+
+  renderItemArrow() {
+    const { item, expanded } = this.props;
+    const shouldShowArrow = isDirectory(item) || item.type === "multiSource";
+    return shouldShowArrow ? (
+      <AccessibleImage className={classnames("arrow", { expanded })} />
+    ) : (
+      <span className="img no-arrow" />
+    );
   }
 
-  const query =
-    hasSiblingOfSameName && querystring ? <span className="query">{querystring}</span> : null;
+  renderIcon(item: TreeNode, depth: number) {
+    const { source } = this.props;
 
-  const tooltip =
-    item.type === "source" ? unescape(item.contents.url!) : getPathWithoutThread(item.path);
+    if (item.name === "webpack://") {
+      return <AccessibleImage className="webpack" />;
+    } else if (item.name === "ng://") {
+      return <AccessibleImage className="angular" />;
+    }
 
-  const shouldShowArrow = isDirectory(item) || item.type === "multiSource";
-  const itemArrow = shouldShowArrow ? (
-    <AccessibleImage className={classnames("arrow", { expanded })} />
-  ) : (
-    <span className="img no-arrow" />
-  );
+    if (isDirectory(item)) {
+      // Domain level
+      if (depth === 0) {
+        return <AccessibleImage className="globe-small" />;
+      }
+      return <AccessibleImage className="folder" />;
+    }
 
-  return (
-    <>
+    if (source) {
+      return <SourceIcon source={source} shouldHide={(icon: string) => icon === "extension"} />;
+    }
+
+    return null;
+  }
+
+  renderItemName(depth: number) {
+    const { item } = this.props;
+
+    switch (item.name) {
+      case "ng://":
+        return "Angular";
+      case "webpack://":
+        return "Webpack";
+      default:
+        return `${unescape(item.name)}`;
+    }
+  }
+
+  renderItemTooltip() {
+    const { item, depth } = this.props;
+
+    return item.type === "source" ? unescape(item.contents.url!) : getPathWithoutThread(item.path);
+  }
+
+  render() {
+    const { item, depth, source, focused, hasSiblingOfSameName } = this.props;
+
+    const suffix = null;
+
+    let querystring;
+    if (hasSiblingOfSameName) {
+      querystring = getSourceQueryString(source);
+    }
+
+    const query =
+      hasSiblingOfSameName && querystring ? <span className="query">{querystring}</span> : null;
+
+    return (
       <div
         className={classnames("node", { focused })}
         data-item-name={`SourceTreeItem-${item.name.replace(/ /g, "")}`}
         key={item.path}
-        onClick={onClick}
-        onContextMenu={handleContextMenu}
-        title={tooltip}
+        onClick={this.onClick}
+        onContextMenu={e => this.onContextMenu(e, item)}
+        title={this.renderItemTooltip()}
       >
-        {itemArrow}
-        <SourceTreeIcon source={source} depth={depth} item={item} />
+        {this.renderItemArrow()}
+        {this.renderIcon(item, depth)}
 
         <Redacted className="label">
-          {getItemName(item)}
-          {query}
+          {this.renderItemName(depth)}
+          {query} {suffix}
         </Redacted>
       </div>
-      {contextMenu}
-    </>
-  );
+    );
+  }
 }
 
-export default React.memo(SourceTreeItem2);
+export default connector(SourceTreeItem);

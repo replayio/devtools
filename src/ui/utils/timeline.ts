@@ -336,10 +336,10 @@ export function mergeSortedPointLists(
     if (destinationIndexPoint == null) {
       destination.push(sourcePoint);
       sourceIndex++;
-    } else if (sourcePoint.point === destinationIndexPoint.point) {
+    } else if (sourcePoint.time === destinationIndexPoint.time) {
       // Don't add duplicates.
       sourceIndex++;
-    } else if (BigInt(sourcePoint.point) < BigInt(destinationIndexPoint.point)) {
+    } else if (sourcePoint.time < destinationIndexPoint.time) {
       destination.splice(destinationIndex, 0, sourcePoint);
       sourceIndex++;
       destinationIndex++;

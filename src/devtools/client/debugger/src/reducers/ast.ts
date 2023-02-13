@@ -6,12 +6,7 @@ import { EntityState, createAsyncThunk, createEntityAdapter, createSlice } from 
 import { SourceLocation } from "@replayio/protocol";
 
 import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/sourceVisualizations";
-import {
-  MiniSource,
-  SourceDetails,
-  getAllSourceDetails,
-  getSourceDetailsEntities,
-} from "ui/reducers/sources";
+import { MiniSource, SourceDetails, getSourceDetailsEntities } from "ui/reducers/sources";
 import { UIState } from "ui/state";
 import { getSymbolsAsync } from "ui/suspense/sourceCaches";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
@@ -114,12 +109,10 @@ export const fetchSymbolsForSource = createAsyncThunk<
   { state: UIState; extra: ThunkExtraArgs }
 >(
   "ast/fetchSymbolsForSource",
-  async (sourceId, { extra, getState }) => {
+  async (sourceId, { extra }) => {
     const { replayClient } = extra;
 
-    const sourceDetails = getAllSourceDetails(getState());
-
-    const symbols = await getSymbolsAsync(replayClient, sourceId, sourceDetails);
+    const symbols = await getSymbolsAsync(replayClient, sourceId);
     return symbols!;
   },
   {

@@ -1,5 +1,4 @@
 import { mergeRegister } from "@lexical/utils";
-import { captureException } from "@sentry/react";
 import {
   BLUR_COMMAND,
   COMMAND_PRIORITY_HIGH,
@@ -10,9 +9,7 @@ import {
   KEY_TAB_COMMAND,
   LexicalEditor,
 } from "lexical";
-import { ReactNode, useLayoutEffect, useRef, useState } from "react";
-
-import { isThennable } from "shared/proxy/utils";
+import { ReactNode, Suspense, useLayoutEffect, useRef, useState } from "react";
 
 import { INSERT_ITEM_COMMAND } from "./commands";
 import TypeAheadListRenderer from "./TypeAheadListRenderer";
@@ -48,31 +45,24 @@ export default function TypeAheadPopUpSuspends<Item>({
   queryData: QueryData;
   updateQueryData: (queryData: QueryData | null) => void;
 }) {
-  let items: Item[] = [];
-  try {
-    items = findMatches(queryData.query, queryData.queryAdditionalData);
-  } catch (errorOrPromise) {
-    if (isThennable(errorOrPromise)) {
-      throw errorOrPromise;
-    }
-    console.error("Failed to find matches for the TypeAheadPopup", errorOrPromise);
-    captureException(errorOrPromise);
-  }
+  const items = findMatches(queryData.query, queryData.queryAdditionalData);
 
   return (
-    <TypeAheadPopUp
-      anchorElem={anchorElem}
-      dataTestId={dataTestId}
-      dataTestName={dataTestName}
-      editor={editor}
-      isExactMatch={isExactMatch}
-      itemClassName={itemClassName}
-      itemRenderer={itemRenderer}
-      items={items}
-      listClassName={listClassName}
-      queryData={queryData}
-      updateQueryData={updateQueryData}
-    />
+    <Suspense>
+      <TypeAheadPopUp
+        anchorElem={anchorElem}
+        dataTestId={dataTestId}
+        dataTestName={dataTestName}
+        editor={editor}
+        isExactMatch={isExactMatch}
+        itemClassName={itemClassName}
+        itemRenderer={itemRenderer}
+        items={items}
+        listClassName={listClassName}
+        queryData={queryData}
+        updateQueryData={updateQueryData}
+      />
+    </Suspense>
   );
 }
 

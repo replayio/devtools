@@ -23,7 +23,6 @@ export interface GenericCache<TExtraParams extends Array<any>, TParams extends A
   getValueIfCached(...args: TParams): { value: TValue } | undefined;
   addValue(value: TValue, ...args: TParams): void;
   getStatus(...args: TParams): CacheRecordStatus | undefined;
-  getCacheKey(...args: TParams): string;
 }
 
 export function createGenericCache<
@@ -123,8 +122,6 @@ export function createGenericCache<
       const cacheKey = getCacheKey(...args);
       return recordMap.get(cacheKey)?.status;
     },
-
-    getCacheKey,
   };
 }
 
@@ -135,7 +132,7 @@ interface HookState<TValue> {
 }
 
 export function createUseGetValue<TParams extends Array<any>, TValue>(
-  getValueAsync: (...args: TParams) => Thennable<TValue> | TValue,
+  getValueAsync: (...args: TParams) => Promise<TValue>,
   getValueIfCached: (...args: TParams) => { value: TValue } | undefined,
   getCacheKey: (...args: TParams) => string
 ): (...args: TParams) => HookState<TValue> {
@@ -156,11 +153,7 @@ export function createUseGetValue<TParams extends Array<any>, TValue>(
 
       if (!cachedValue && !caught) {
         fetchingForKey.current = key;
-        // Convince both JS and TS it's safe to call `.then()` here
-        Promise.resolve(getValueAsync(...args) as Promise<TValue>).then(
-          maybeTriggerRendering,
-          maybeTriggerRendering
-        );
+        getValueAsync(...args).then(maybeTriggerRendering, maybeTriggerRendering);
       }
 
       function maybeTriggerRendering() {

@@ -41,7 +41,6 @@ import {
   repaintGraphicsResult,
   requestFocusRangeResult,
 } from "@replayio/protocol";
-import { string } from "prop-types";
 
 import { AnalysisParams } from "protocol/analysisManager";
 import { RecordingCapabilities } from "protocol/thread/thread";
@@ -74,51 +73,24 @@ export const POINT_BEHAVIOR_ENABLED = "enabled";
 export const POINT_BEHAVIOR_DISABLED = "disabled";
 export const POINT_BEHAVIOR_DISABLED_TEMPORARILY = "disabled-temporarily";
 
-export type POINT_BEHAVIOR =
+type PointBehavior =
   | typeof POINT_BEHAVIOR_ENABLED
   | typeof POINT_BEHAVIOR_DISABLED
   | typeof POINT_BEHAVIOR_DISABLED_TEMPORARILY;
 
-export type PartialUser = {
-  id: string;
-  name: string | null;
-  picture: string | null;
-};
-
-export type PointKey = string;
+export type PointId = string;
 export type Badge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow";
-
-// Points are saved to GraphQL.
-// They can be viewed by all users who have access to a recording.
-// They can only be edited or deleted by the user who created them.
-//
-// Note that Points are only saved to GraphQL for authenticated users.
-// They are also saved to IndexedDB to support unauthenticated users.
 export type Point = {
-  // This a client-assigned value is used as the primary key on the server.
-  // It exists to simplify equality checks and PointBehavior mapping.
-  key: PointKey;
-
-  // These attributes are fixed after Point creation
-  createdAt: Date;
-  location: Location;
-  recordingId: RecordingId;
-  user: PartialUser | null;
-
-  // These attributes are editable, although only by the Point's owner
   badge: Badge | null;
   condition: string | null;
   content: string;
-};
-
-// Point behaviors are saved to IndexedDB.
-// (They are remembered between sessions but are not shared with other users.)
-// They control a given point behaves locally (e.g. does it log to the console)
-// Behaviors are modifiable by everyone (regardless of who created a point).
-export type PointBehavior = {
-  key: PointKey;
-  shouldBreak: POINT_BEHAVIOR;
-  shouldLog: POINT_BEHAVIOR;
+  createdByUserId: string | null;
+  createdAtTime: number;
+  id: PointId;
+  location: Location;
+  recordingId: RecordingId;
+  shouldBreak: PointBehavior;
+  shouldLog: PointBehavior;
 };
 
 export type RunAnalysisParams = Omit<AnalysisParams, "locations"> & { location?: Location };

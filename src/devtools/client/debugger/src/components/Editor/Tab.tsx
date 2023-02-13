@@ -5,7 +5,6 @@ import { DragEventHandler, MouseEvent } from "react";
 import { selectSource } from "devtools/client/debugger/src/actions/sources";
 import { closeTab } from "devtools/client/debugger/src/actions/tabs";
 import useTabContextMenu from "devtools/client/debugger/src/components/Editor/useTabContextMenu";
-import useTooltip from "replay-next/src/hooks/useTooltip";
 import { Redacted } from "ui/components/Redacted";
 import { SourceDetails, getHasSiblingOfSameName, getSelectedSource } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -72,12 +71,6 @@ export default function Tab({
     source,
   });
 
-  const { onMouseEnter, onMouseLeave, tooltip } = useTooltip({
-    delay: 250,
-    position: "below",
-    tooltip: getFileURL(source, false),
-  });
-
   const url = getFileURL(source, false);
   const fileName = url.split("/").pop();
 
@@ -95,11 +88,10 @@ export default function Tab({
         key={sourceId}
         onClick={handleTabClick}
         onContextMenu={onContextMenu}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
         // Accommodate middle click to close tab
         onMouseUp={e => e.button === 1 && closeTab(cx, source)}
         refToForward={elementRef => setTabRef(sourceId, elementRef as HTMLDivElement | null)}
+        title={getFileURL(source, false)}
       >
         <SourceIcon
           source={source}
@@ -109,7 +101,6 @@ export default function Tab({
         <CloseButton buttonClass="" handleClick={onClickClose} tooltip={"Close tab"} />
       </Redacted>
       {contextMenu}
-      {tooltip}
     </>
   );
 }

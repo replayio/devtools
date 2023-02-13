@@ -233,6 +233,10 @@ export function UserSettingsModal(props: PropsFromRedux) {
     if (!user.features.library) {
       hiddenTabs.push("API Keys");
     }
+
+    if (!user.internal) {
+      hiddenTabs.push("Advanced");
+    }
   }
 
   return (

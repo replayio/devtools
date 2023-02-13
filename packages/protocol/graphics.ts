@@ -106,6 +106,12 @@ const gMouseClickEvents: MouseEvent[] = [];
 // Device pixel ratio used by the current screenshot.
 let gDevicePixelRatio = 1;
 
+let gAllNecessaryPaintDataReceived = false;
+
+export const videoReady: Deferred<void> = defer();
+
+const gPaintPromises: Promise<ScreenShot | undefined>[] = [];
+
 function onPaints(paints: PaintPoint[]) {
   if (typeof onPointsReceived === "function") {
     onPointsReceived(paints);
@@ -114,6 +120,32 @@ function onPaints(paints: PaintPoint[]) {
   paints.forEach(async ({ point, time, screenShots }) => {
     const paintHash = screenShots.find(desc => desc.mimeType == "image/jpeg")!.hash;
     insertEntrySorted(gPaintPoints, { point, time, paintHash });
+
+    if (gAllNecessaryPaintDataReceived) {
+      // We are all set on the loading front, no need to proactively grab these
+      // paints
+      return;
+    }
+
+    let loadTarget = MINIMUM_VIDEO_CONTENT;
+    if (hasAllPaintPoints) {
+      const lastPaintTime = gPaintPoints[gPaintPoints.length - 1].time;
+      // if we have all of the paints, and the last one happens before the 5
+      // second mark, make that the new goal for considering the video ready
+      if (lastPaintTime < MINIMUM_VIDEO_CONTENT) {
+        loadTarget = lastPaintTime;
+      }
+    }
+
+    if (time < loadTarget) {
+      const screenShotPromise = screenshotCache.getScreenshotForPlayback(point, paintHash);
+      gPaintPromises.push(screenShotPromise);
+    }
+    if (time >= loadTarget) {
+      gAllNecessaryPaintDataReceived = true;
+      await Promise.all(gPaintPromises);
+      videoReady.resolve();
+    }
   });
 }
 
@@ -157,16 +189,15 @@ export function setupGraphics() {
 
     const { client } = await import("./socket");
     client.Graphics.findPaints({}, sessionId).then(async () => {
-      initialPaintsReceivedWaiter.resolve(null);
       hasAllPaintPoints = true;
       onAllPaintsReceived(true);
+
+      await Promise.all(gPaintPromises);
       maybePaintGraphics();
+      videoReady.resolve();
     });
     client.Graphics.addPaintPointsListener(async ({ paints }) => {
       onPaints(paints);
-      if (gPaintPoints.length >= INITIAL_PAINT_COUNT) {
-        initialPaintsReceivedWaiter.resolve(null);
-      }
       const latestPaint = BigInt(maxBy(paints, p => BigInt(p.point))?.point || 0);
       const currentPoint = BigInt(ThreadFront.currentPoint);
       if (currentPoint && latestPaint >= currentPoint) {
@@ -576,13 +607,8 @@ async function getScreenshotDimensions(screen: ScreenShot) {
   return { width: img.width, height: img.height };
 }
 
-// the maximum number of paints to be considered when looking for the first meaningful paint
-const INITIAL_PAINT_COUNT = 10;
-const initialPaintsReceivedWaiter = defer();
-
-export async function getFirstMeaningfulPaint() {
-  await initialPaintsReceivedWaiter.promise;
-  for (const paintPoint of gPaintPoints.slice(0, INITIAL_PAINT_COUNT)) {
+export async function getFirstMeaningfulPaint(limit: number = 10) {
+  for (const paintPoint of gPaintPoints.slice(0, limit)) {
     const { screen } = await getGraphicsAtTime(paintPoint.time);
     if (!screen) {
       continue;

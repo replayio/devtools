@@ -1,5 +1,3 @@
-import type { FiberRootNode } from "react-devtools-inline/frontend";
-
 import type { ThreadFront as TF } from "protocol/thread";
 import { ReplayClientInterface } from "shared/client/types";
 
@@ -10,6 +8,7 @@ const pausesWithDevtoolsInjected = new Set<string>();
 
 declare global {
   interface Window {
+    __REACT_DEVTOOLS_GLOBAL_HOOK__: any;
     __REACT_DEVTOOLS_SAVED_RENDERERS__: any[];
     savedOperations: number[][];
     evaluationLogs: string[];
@@ -31,8 +30,6 @@ function mutateWindowForSetup() {
   };
 
   // Erase the stub global hook from Chromium
-  // The RDT types say it's non-optional, so ignore the TS error
-  // @ts-ignore
   delete window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
 }
 
@@ -71,11 +68,7 @@ function injectExistingRenderers() {
     const hookRoots = window.__REACT_DEVTOOLS_GLOBAL_HOOK__.getFiberRoots(rendererID);
     for (let root of hookRoots) {
       // Force the extension to crawl the current DOM contents so it knows what nodes exist
-      window.__REACT_DEVTOOLS_GLOBAL_HOOK__.onCommitFiberRoot(
-        rendererID,
-        root as unknown as Record<string, unknown>,
-        1
-      );
+      window.__REACT_DEVTOOLS_GLOBAL_HOOK__.onCommitFiberRoot(rendererID, root, 1);
     }
   }
 }

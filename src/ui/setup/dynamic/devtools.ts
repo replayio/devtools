@@ -32,7 +32,7 @@ import { addEventListener, initSocket, client as protocolClient } from "protocol
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
 import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
-import { POINTS_DATABASE } from "replay-next/src/contexts/points/constants";
+import { POINTS_DATABASE } from "replay-next/src/contexts/PointsContext";
 import { IDBOptions } from "replay-next/src/hooks/useIndexedDB";
 import {
   getCachedObject,
@@ -303,7 +303,12 @@ const settingsToMigrate: MigrationSetting[] = [
   {
     regexp: /^(?<recordingId>.+)::points$/,
     database: POINTS_DATABASE,
-    storeName: "points",
+    storeName: "high-priority",
+  },
+  {
+    regexp: /^(?<recordingId>.+)::points::transition$/,
+    database: POINTS_DATABASE,
+    storeName: "transition",
   },
   {
     regexp: /^(?<recordingId>.+)::terminalExpressionHistory$/,

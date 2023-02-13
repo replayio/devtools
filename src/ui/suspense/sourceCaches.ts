@@ -2,29 +2,6 @@ import type { SymbolDeclarations } from "devtools/client/debugger/src/reducers/a
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { getSourceContentsAsync } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
-import { SourceDetails } from "ui/reducers/sources";
-
-// Based on similar logic in `replay-next/src/suspense/SourcesCache`
-function urlToContentType(fileName: string): string {
-  const extension = fileName.split(".").pop()!.split("?").shift()!;
-  switch (extension) {
-    case "js":
-      return "text/javascript";
-    case "jsx":
-      return "text/jsx";
-    case "ts":
-    case "tsx":
-      return "text/typescript";
-    case "json":
-      return "text/json";
-    case "html":
-      return "text/html";
-    case "vue":
-      return "text/vue";
-    default:
-      return "text/javascript";
-  }
-}
 
 export const {
   getValueAsync: getSymbolsAsync,
@@ -32,21 +9,17 @@ export const {
   getValueSuspense: getSymbolsSuspense,
 } = createGenericCache<
   [replayClient: ReplayClientInterface],
-  [sourceId: string, sourceDetails: SourceDetails[]],
+  [sourceId: string],
   SymbolDeclarations | undefined
 >(
   "sourceSymbolsCache",
   1,
-  async (replayClient, sourceId, sourceDetails) => {
+  async (replayClient, sourceId) => {
     const { parser } = await import("devtools/client/debugger/src/utils/bootstrap");
     const sourceContents = await getSourceContentsAsync(replayClient, sourceId);
 
     if (sourceContents !== undefined) {
-      const { contents, sourceId } = sourceContents;
-
-      const matchingSource = sourceDetails.find(sd => sd.id === sourceId);
-
-      const contentType = urlToContentType(matchingSource?.url ?? "");
+      const { contents, contentType } = sourceContents;
 
       // Our Babel parser worker requires a copy of the source text be sent over first
       parser.setSource(sourceId, {

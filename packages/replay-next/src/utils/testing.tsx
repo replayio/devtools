@@ -11,7 +11,7 @@ import {
   ConsoleFiltersContextType,
 } from "../contexts/ConsoleFiltersContext";
 import { FocusContext, FocusContextType } from "../contexts/FocusContext";
-import { PointsContext, PointsContextType } from "../contexts/points/PointsContext";
+import { PointsContext, PointsContextType } from "../contexts/PointsContext";
 import { SessionContext, SessionContextType } from "../contexts/SessionContext";
 import { TimelineContext, TimelineContextType } from "../contexts/TimelineContext";
 
@@ -124,17 +124,11 @@ export async function renderFocused(
 
   const pointsContext: PointsContextType = {
     addPoint: jest.fn(),
-    pointsTransitionPending: false,
     deletePoints: jest.fn(),
-    discardPendingPointText: jest.fn(),
-    editPendingPointText: jest.fn(),
-    editPointBadge: jest.fn(),
-    editPointBehavior: jest.fn(),
-    pointBehaviorsForSuspense: {},
-    pointBehaviorsForDefaultPriority: {},
-    pointsForSuspense: [],
-    pointsForDefaultPriority: [],
-    savePendingPointText: jest.fn(),
+    editPoint: jest.fn(),
+    isPending: false,
+    points: [],
+    pointsForAnalysis: [],
     ...options?.pointsContext,
   };
 

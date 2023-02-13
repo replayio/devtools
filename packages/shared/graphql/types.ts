@@ -1,6 +1,4 @@
-import { ExecutionPoint, Location } from "@replayio/protocol";
-
-import { Point as PointData } from "shared/client/types";
+import { ExecutionPoint } from "@replayio/protocol";
 
 export enum Nag {
   FIRST_LOG_IN = "first_log_in",
@@ -101,7 +99,7 @@ export type LocalExperimentalUserSettings = {
   rerunRoutines: boolean;
   profileWorkerThreads: boolean;
   brokenSourcemapWorkaround: boolean;
-  disableRecordingAssetsInDatabase: boolean;
+  trackRecordingAssetsInDatabase: boolean;
 };
 
 export type LocalUserSettings = LocalExperimentalUserSettings & {

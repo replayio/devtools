@@ -10,9 +10,7 @@ import { selectNode } from "devtools/client/inspector/markup/actions/markup";
 import { onViewSourceInDebugger } from "devtools/client/webconsole/actions";
 import { ThreadFront } from "protocol/thread";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
-import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { setSelectedPanel, setSelectedPrimaryPanel } from "ui/actions/layout";
-import { sidePanelStorageKey } from "ui/components/DevTools";
 import { getSourceDetailsEntities } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -20,7 +18,6 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 export default function InspectorContextReduxAdapter({ children }: { children: ReactNode }) {
   const sourcesById = useAppSelector(getSourceDetailsEntities);
   const dispatch = useAppDispatch();
-  const [, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
 
   const inspectFunctionDefinition = useCallback(
     (mappedLocation: MappedLocation) => {
@@ -44,8 +41,7 @@ export default function InspectorContextReduxAdapter({ children }: { children: R
 
   const showCommentsPanel = useCallback(() => {
     dispatch(setSelectedPrimaryPanel("comments"));
-    setSidePanelCollapsed(false);
-  }, [dispatch, setSidePanelCollapsed]);
+  }, [dispatch]);
 
   const inspectHTMLElement = useCallback(
     (protocolValue: ProtocolValue, pauseId: PauseId, point: ExecutionPoint, time: number) => {

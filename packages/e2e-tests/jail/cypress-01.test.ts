@@ -41,7 +41,7 @@ test(`cypress-01: Test basic cypress reporter functionality`, async ({ page }) =
   await expect(failedRowError).toContainText("Error");
 
   // can open tests
-  await failedRow.click();
+  await failedRow.locator("button").click();
   const selectedRow = await getTestRows(page);
   expect(selectedRow).toHaveCount(1);
   const sections = await getTestCaseSections(selectedRow);

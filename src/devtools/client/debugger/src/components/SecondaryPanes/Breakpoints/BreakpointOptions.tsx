@@ -6,8 +6,6 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 import { getSourceLinesSuspense } from "ui/suspense/sourceCaches";
 
-import styles from "./BreakpointOptions.module.css";
-
 type BreakpointProps = {
   type: "breakpoint" | "logpoint";
   breakpoint: Point;
@@ -20,7 +18,7 @@ function BreakpointLineContents({ breakpoint }: BreakpointProps) {
   const sourceLines = getSourceLinesSuspense(replayClient, sourceId);
 
   const snippet = useMemo(() => {
-    const { column, line } = breakpoint.location;
+    const { column, line = 0 } = breakpoint.location;
     let snippet = "";
 
     if (sourceLines.length > 0) {
@@ -39,33 +37,31 @@ function BreakpointLineContents({ breakpoint }: BreakpointProps) {
 }
 
 export default function BreakpointOptions({ breakpoint, type }: BreakpointProps) {
-  const { condition, content } = breakpoint;
-
   let children = null;
   if (type === "logpoint") {
-    if (condition) {
+    if (breakpoint.condition) {
       children = (
         <>
-          <span className={styles.Label}>
+          <span className="breakpoint-label cm-s-mozilla devtools-monospace">
             if(
-            <SyntaxHighlightedLine code={condition} />)
+            <SyntaxHighlightedLine code={breakpoint.condition} />)
           </span>
-          <span className={styles.Label}>
+          <span className="breakpoint-label cm-s-mozilla devtools-monospace">
             log(
-            <SyntaxHighlightedLine code={content} />)
+            <SyntaxHighlightedLine code={breakpoint.content} />)
           </span>
         </>
       );
     } else {
       children = (
-        <span className={styles.Label}>
-          <SyntaxHighlightedLine code={content} />
+        <span className="breakpoint-label cm-s-mozilla devtools-monospace">
+          <SyntaxHighlightedLine code={breakpoint.content} />
         </span>
       );
     }
   } else {
     children = (
-      <span className={styles.Label}>
+      <span className="breakpoint-label cm-s-mozilla devtools-monospace">
         <Suspense fallback={<Loader />}>
           <BreakpointLineContents breakpoint={breakpoint} type={type} />
         </Suspense>
@@ -73,5 +69,5 @@ export default function BreakpointOptions({ breakpoint, type }: BreakpointProps)
     );
   }
 
-  return <div className={styles.Options}>{children}</div>;
+  return <div className="breakpoint-options">{children}</div>;
 }

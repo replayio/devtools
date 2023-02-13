@@ -1,14 +1,3 @@
 .Image {
   background-color: var(--background-color-contrast-3);
 }
-
-.Name {
-  background-color: var(--background-color-contrast-3);
-  color: var(--color-default);
-  border-radius: 100%;
-  font-size: var(--font-size-tiny);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}

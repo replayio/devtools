@@ -3,7 +3,8 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import classNames from "classnames";
-import React from "react";
+//
+import React, { Component } from "react";
 
 import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
 import { Redacted } from "ui/components/Redacted";
@@ -13,8 +14,8 @@ import { formatDisplayName } from "../../../utils/pause/frames";
 import { getFileURL, getFilename } from "../../../utils/source";
 import AccessibleImage from "../../shared/AccessibleImage";
 import FrameIndent from "./FrameIndent";
+import FrameMenu from "./FrameMenu";
 import type { CommonFrameComponentProps } from "./index";
-import { useStackFrameContextMenu } from "./useStackFrameContextMenu";
 
 type FrameNameOptions = Parameters<typeof formatDisplayName>[1];
 
@@ -58,36 +59,32 @@ FrameLocation.displayName = "FrameLocation";
 
 type FrameProps = CommonFrameComponentProps & {
   frame: PauseFrame;
-  hideLocation?: boolean;
-  shouldMapDisplayName?: boolean;
+  hideLocation: boolean;
+  shouldMapDisplayName: boolean;
   getFrameTitle?: (url: string) => string;
 };
 
-export function FrameComponent({
-  hideLocation = false,
-  shouldMapDisplayName = true,
-  disableContextMenu = true,
-  panel,
-  frame,
-  selectedFrameId,
-  displayFullUrl,
-  getFrameTitle,
-  selectFrame,
-  copyStackTrace,
-  toggleFrameworkGrouping,
-  frameworkGroupingOn,
-  cx,
-}: FrameProps) {
-  const isSelectable = panel === "console";
+export default class FrameComponent extends Component<FrameProps> {
+  static defaultProps = {
+    hideLocation: false,
+    shouldMapDisplayName: true,
+    disableContextMenu: false,
+  };
 
-  const { contextMenu, onContextMenu } = useStackFrameContextMenu({
-    frame,
-    frameworkGroupingOn,
-    copyStackTrace,
-    toggleFrameworkGrouping,
-  });
+  get isSelectable() {
+    return this.props.panel == "console";
+  }
 
-  const onMouseDown = (e: React.MouseEvent) => {
+  get isDebugger() {
+    return this.props.panel == "debugger";
+  }
+
+  onContextMenu(event: React.MouseEvent) {
+    const { frame, copyStackTrace, toggleFrameworkGrouping, frameworkGroupingOn, cx } = this.props;
+    FrameMenu(frame, frameworkGroupingOn, { copyStackTrace, toggleFrameworkGrouping }, event);
+  }
+
+  onMouseDown(e: React.MouseEvent, frame: PauseFrame) {
     if (e.button !== 0) {
       return;
     }
@@ -95,56 +92,63 @@ export function FrameComponent({
     e.stopPropagation();
     e.preventDefault();
     trackEvent("call_stack.select_frame");
-    selectFrame(cx, frame);
-  };
+    this.props.selectFrame(this.props.cx, frame);
+  }
 
-  const onKeyUp = (event: React.KeyboardEvent) => {
+  onKeyUp(event: React.KeyboardEvent, frame: PauseFrame) {
     if (event.key != "Enter") {
       return;
     }
 
-    selectFrame(cx, frame);
-  };
-
-  const className = classNames("frame", {
-    selected:
-      selectedFrameId?.pauseId === frame.pauseId && selectedFrameId?.frameId === frame.protocolId,
-  });
-
-  if (!frame.source) {
-    throw new Error("no frame source");
+    this.props.selectFrame(this.props.cx, frame);
   }
 
-  const title = getFrameTitle
-    ? getFrameTitle(`${getFileURL(frame.source, false)}:${frame.location.line}`)
-    : undefined;
+  render() {
+    const {
+      frame,
+      selectedFrameId,
+      hideLocation,
+      shouldMapDisplayName,
+      displayFullUrl,
+      getFrameTitle,
+      disableContextMenu,
+      panel,
+    } = this.props;
 
-  return (
-    <>
+    const className = classNames("frame", {
+      selected:
+        selectedFrameId?.pauseId === frame.pauseId && selectedFrameId?.frameId === frame.protocolId,
+    });
+
+    if (!frame.source) {
+      throw new Error("no frame source");
+    }
+
+    const title = getFrameTitle
+      ? getFrameTitle(`${getFileURL(frame.source, false)}:${frame.location.line}`)
+      : undefined;
+
+    return (
       <Redacted
         role="listitem"
         key={frame.id}
         className={className}
-        onMouseDown={onMouseDown}
-        onKeyUp={onKeyUp}
-        onContextMenu={disableContextMenu ? undefined : e => onContextMenu(e)}
+        onMouseDown={e => this.onMouseDown(e, frame)}
+        onKeyUp={e => this.onKeyUp(e, frame)}
+        onContextMenu={disableContextMenu ? undefined : e => this.onContextMenu(e)}
         tabIndex={0}
         title={title}
       >
-        {isSelectable && <FrameIndent />}
+        {this.isSelectable && <FrameIndent />}
         <div
           className={classNames("frame-description", panel === "webconsole" ? "frame-link" : "")}
         >
           <FrameTitle frame={frame} options={{ shouldMapDisplayName }} />
           {!hideLocation && <span className="clipboard-only"> </span>}
           {!hideLocation && <FrameLocation frame={frame} displayFullUrl={displayFullUrl} />}
-          {isSelectable && <br className="clipboard-only" />}
+          {this.isSelectable && <br className="clipboard-only" />}
         </div>
       </Redacted>
-
-      {/*Keep the context menu separate to avoid `onMouseDown`
-      bubbling up and causing unwanted frame selection behavior*/}
-      {contextMenu}
-    </>
-  );
+    );
+  }
 }

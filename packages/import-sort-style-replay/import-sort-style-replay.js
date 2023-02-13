@@ -82,7 +82,7 @@ function sortImports(styleApi) {
           isGlobalReduxStoreConfig,
           // import { ThreadFront } from "protocol/thread"
           isProtocolModule,
-          // import { Context as PointsContext } from "replay-next/src/contexts/points/PointsContext";
+          // import { PointsContext } from "replay-next/src/contexts/PointsContext";
           isNewPrototypeModule,
           // import { Icon } from "design/Icon"
           isOtherInternalPackageModule,

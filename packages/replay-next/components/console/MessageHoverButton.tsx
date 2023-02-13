@@ -15,7 +15,6 @@ import {
 } from "replay-next/components/sources/utils/comments";
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
-import { LayoutContext } from "replay-next/src/contexts/LayoutContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useNag } from "replay-next/src/hooks/useNag";
@@ -45,7 +44,6 @@ export default function MessageHoverButton({
   const { accessToken, recordingId } = useContext(SessionContext);
   const graphQLClient = useContext(GraphQLClientContext);
   const { executionPoint: currentExecutionPoint, update } = useContext(TimelineContext);
-  const { canShowConsoleAndSources } = useContext(LayoutContext);
 
   const invalidateCache = useCacheRefresh();
   const [isPending, startTransition] = useTransition();
@@ -109,10 +107,9 @@ export default function MessageHoverButton({
       event.preventDefault();
       event.stopPropagation();
 
-      // we only want to open the source if this doesn't hide the console
-      update(time, executionPoint, canShowConsoleAndSources);
+      update(time, executionPoint, true);
 
-      if (canShowConsoleAndSources && inspectFunctionDefinition !== null && location !== null) {
+      if (inspectFunctionDefinition !== null && location !== null) {
         inspectFunctionDefinition([location]);
       }
 

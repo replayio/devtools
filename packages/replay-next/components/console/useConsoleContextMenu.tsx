@@ -5,7 +5,7 @@ import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem
 import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import Icon from "replay-next/components/Icon";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
+import { PointsContext } from "replay-next/src/contexts/PointsContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { getLoggableTime, isPointInstance } from "replay-next/src/utils/loggables";
 import { Badge } from "shared/client/types";
@@ -17,7 +17,7 @@ const BADGES: Badge[] = ["green", "yellow", "orange", "purple"];
 
 export default function useConsoleContextMenu(loggable: Loggable) {
   const { rangeForDisplay, update } = useContext(FocusContext);
-  const { editPointBadge } = useContext(PointsContext);
+  const { editPoint } = useContext(PointsContext);
   const { duration } = useContext(SessionContext);
 
   const setFocusBegin = () => {
@@ -36,7 +36,7 @@ export default function useConsoleContextMenu(loggable: Loggable) {
 
   const setBadge = (badge: Badge | null) => {
     if (isPointInstance(loggable)) {
-      editPointBadge(loggable.point.key, badge);
+      editPoint(loggable.point.id, { badge });
     }
   };
 

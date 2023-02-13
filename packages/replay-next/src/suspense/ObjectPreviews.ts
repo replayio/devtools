@@ -1,7 +1,7 @@
 import { Object, ObjectId, PauseId, Value as ProtocolValue } from "@replayio/protocol";
 
 import { ReplayClientInterface } from "../../../shared/client/types";
-import { createFetchAsyncFromFetchSuspense, createWakeable } from "../utils/suspense";
+import { createWakeable } from "../utils/suspense";
 import { cachePauseData } from "./PauseCache";
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
@@ -147,9 +147,26 @@ export function getObjectWithPreviewSuspense(
 // Wrapper method around Suspense method.
 // This method can be used by non-React code to prefetch/prime the Suspense cache by loading preview data.
 // Loaded properties can also be accessed via getCachedObject().
-export const getObjectWithPreviewHelper = createFetchAsyncFromFetchSuspense(
-  getObjectWithPreviewSuspense
-);
+export async function getObjectWithPreviewHelper(
+  client: ReplayClientInterface,
+  pauseId: PauseId,
+  objectId: ObjectId,
+  noOverflow: boolean = false
+): Promise<Object> {
+  try {
+    return getObjectWithPreviewSuspense(client, pauseId, objectId, noOverflow);
+  } catch (errorOrPromise) {
+    if (
+      errorOrPromise != null &&
+      typeof errorOrPromise === "object" &&
+      errorOrPromise.hasOwnProperty("then")
+    ) {
+      return errorOrPromise as Promise<Object>;
+    } else {
+      throw errorOrPromise;
+    }
+  }
+}
 
 export function getObjectPropertySuspense(
   client: ReplayClientInterface,
@@ -187,7 +204,26 @@ export function getObjectPropertySuspense(
 // Wrapper method around Suspense method.
 // This method can be used by non-React code to prefetch/prime the Suspense cache by loading object properties.
 // Loaded properties can also be accessed via getCachedObjectProperty().
-export const getObjectPropertyHelper = createFetchAsyncFromFetchSuspense(getObjectPropertySuspense);
+export async function getObjectPropertyHelper(
+  client: ReplayClientInterface,
+  pauseId: PauseId,
+  objectId: ObjectId,
+  propertyName: string
+): Promise<ProtocolValue> {
+  try {
+    return getObjectPropertySuspense(client, pauseId, objectId, propertyName);
+  } catch (errorOrPromise) {
+    if (
+      errorOrPromise != null &&
+      typeof errorOrPromise === "object" &&
+      errorOrPromise.hasOwnProperty("then")
+    ) {
+      return errorOrPromise as Promise<ProtocolValue>;
+    } else {
+      throw errorOrPromise;
+    }
+  }
+}
 
 export function preCacheObjects(pauseId: PauseId, objects: Object[]): void {
   objects.forEach(object => preCacheObject(pauseId, object));

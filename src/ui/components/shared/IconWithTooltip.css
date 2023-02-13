@@ -30,5 +30,16 @@
 }
 
 .icon-tooltip {
-  font-size: var(--font-size-large);
+  animation: tooltip-pop-up 200ms ease;
+}
+
+@keyframes tooltip-pop-up {
+  0% {
+    transform: scale(0.5, 0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1, 1);
+    opacity: 1;
+  }
 }
