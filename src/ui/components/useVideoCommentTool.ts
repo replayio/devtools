@@ -1,3 +1,4 @@
+import { RecordingId } from "@replayio/protocol";
 import { MouseEvent, RefObject, useContext } from "react";
 
 import {
@@ -6,19 +7,27 @@ import {
 } from "replay-next/components/sources/utils/comments";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import useTooltip from "replay-next/src/hooks/useTooltip";
-import { getAreMouseTargetsLoading } from "ui/actions/app";
 import { createFrameComment } from "ui/actions/comments";
-import { useGetRecordingId } from "ui/hooks/recordings";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useAppDispatch } from "ui/setup/hooks";
 import useAuth0 from "ui/utils/useAuth0";
 
-export default function useVideoCommentTool(canvasRef: RefObject<HTMLCanvasElement>) {
+export default function useVideoCommentTool({
+  areMouseTargetsLoading,
+  canvasRef,
+  recordingId,
+}: {
+  areMouseTargetsLoading: boolean;
+  canvasRef: RefObject<HTMLCanvasElement>;
+  recordingId: RecordingId;
+}) {
   const { showCommentsPanel } = useContext(InspectorContext);
 
-  const dispatch = useAppDispatch();
+  const { onMouseEnter, onMouseLeave, onMouseMove, tooltip } = useTooltip({
+    containerRef: canvasRef,
+    tooltip: areMouseTargetsLoading ? "Targets loading..." : "Add comment",
+  });
 
-  const areMouseTargetsLoading = useAppSelector(getAreMouseTargetsLoading);
-  const recordingId = useAppSelector(useGetRecordingId);
+  const dispatch = useAppDispatch();
 
   const { isAuthenticated } = useAuth0();
 
@@ -43,11 +52,6 @@ export default function useVideoCommentTool(canvasRef: RefObject<HTMLCanvasEleme
 
     showCommentsPanel?.();
   };
-
-  const { onMouseEnter, onMouseLeave, onMouseMove, tooltip } = useTooltip({
-    containerRef: canvasRef,
-    tooltip: areMouseTargetsLoading ? "Targets loading..." : "Add comment",
-  });
 
   return { onClick, onMouseEnter, onMouseLeave, onMouseMove, tooltip };
 }
