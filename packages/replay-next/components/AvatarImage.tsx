@@ -1,5 +1,7 @@
 import { ImgHTMLAttributes, useState } from "react";
 
+import useTooltip from "replay-next/src/hooks/useTooltip";
+
 import styles from "./AvatarImage.module.css";
 
 type Props = {
@@ -10,21 +12,28 @@ export default function AvatarImage({ className, name, src, title, ...rest }: Pr
   const [source, setSource] = useState(src);
   const [showNameBadge, setShowNameBadge] = useState(name && !src);
 
+  const tooltipOrTitle = title ?? name ?? "";
+
+  const { onMouseEnter, onMouseLeave, tooltip } = useTooltip({
+    tooltip: tooltipOrTitle,
+  });
+
   // If the user has no image, their initials can be shown as a fallback.
   if (name && showNameBadge) {
     const initials = name
       .split(" ")
       .map(n => n.charAt(0))
       .join("");
+
     return (
-      <div className={`${styles.Name} ${className}`} title={title || name}>
+      <div className={`${styles.Name} ${className}`} title={tooltipOrTitle}>
         {initials}
       </div>
     );
   }
 
   // If a user image fails to load, show a fallback.
-  const onError = ({ currentTarget }: any) => {
+  const onError = () => {
     if (name) {
       setShowNameBadge(true);
     } else {
@@ -33,13 +42,17 @@ export default function AvatarImage({ className, name, src, title, ...rest }: Pr
   };
 
   return (
-    <img
-      {...rest}
-      className={`${styles.Image} ${className}`}
-      data-private
-      onError={onError}
-      src={source}
-      title={title || name}
-    />
+    <>
+      <img
+        {...rest}
+        className={`${styles.Image} ${className}`}
+        data-private
+        onError={onError}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        src={source}
+      />
+      {tooltip}
+    </>
   );
 }
