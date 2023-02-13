@@ -1,4 +1,6 @@
 import type { SymbolDeclarations } from "devtools/client/debugger/src/reducers/ast";
+import { getSymbols } from "devtools/client/debugger/src/workers/parser/getSymbols";
+import { setSource } from "devtools/client/debugger/src/workers/parser/sources";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { getSourceContentsAsync } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
@@ -49,12 +51,18 @@ export const {
       const contentType = urlToContentType(matchingSource?.url ?? "");
 
       // Our Babel parser worker requires a copy of the source text be sent over first
-      parser.setSource(sourceId, {
-        type: "text",
-        value: contents,
+      // parser.setSource(sourceId, {
+      //   type: "text",
+      //   value: contents,
+      //   contentType,
+      // });
+      setSource({
+        id: sourceId,
+        text: contents,
         contentType,
       });
-      const symbols = (await parser.getSymbols(sourceId)) as SymbolDeclarations;
+      const symbols = getSymbols(sourceId) as SymbolDeclarations;
+      // const symbols = (await parser.getSymbols(sourceId)) as SymbolDeclarations;
       return symbols;
     }
   },
