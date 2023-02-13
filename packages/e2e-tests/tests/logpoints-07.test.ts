@@ -34,8 +34,7 @@ test(`logpoints-07: should use the correct scope in auto-complete`, async ({ pag
 
   // Log point should use generated source (if we're viewing that)
   await toggleMappedSources(page, "off");
-  // Give the UI a little time to change after toggle.
-  await delay(500);
+  await delay(1000);
 
   lineNumber = 19;
 
