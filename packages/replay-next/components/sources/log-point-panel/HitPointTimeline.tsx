@@ -1,5 +1,13 @@
 import { TimeStampedPoint } from "@replayio/protocol";
-import { MouseEvent, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  MouseEvent,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 
 import Icon from "replay-next/components/Icon";
@@ -63,7 +71,12 @@ export default function HitPointTimeline({
     setOptimisticTime(null);
   }, [currentTime]);
 
-  const [currentHitPoint, currentHitPointIndex] = findHitPoint(hitPoints, currentExecutionPoint);
+  const [closestHitPoint, closestHitPointIndex] = useMemo(
+    () => findHitPoint(hitPoints, currentExecutionPoint, false),
+    [currentExecutionPoint, hitPoints]
+  );
+
+  const currentHitPoint = closestHitPoint?.point === currentExecutionPoint ? closestHitPoint : null;
 
   const onTimelineClick = async (event: MouseEvent) => {
     if (isPending) {
@@ -132,8 +145,8 @@ export default function HitPointTimeline({
         <Icon className={styles.PreviousButtonIcon} type="arrow-left" />
       </button>
       <Capsule
+        closestHitPointIndex={closestHitPointIndex}
         currentHitPoint={currentHitPoint}
-        currentHitPointIndex={currentHitPointIndex}
         editable={pointEditable}
         hasConditional={hasConditional}
         hitPoints={hitPoints}

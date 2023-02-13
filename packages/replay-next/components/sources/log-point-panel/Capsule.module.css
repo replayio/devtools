@@ -33,3 +33,11 @@
   height: 0.5rem;
   width: 0.5rem;
 }
+
+.NearMatch {
+  color: var(--point-panel-timeline-label-unselected-color);
+}
+
+.ExactMatch {
+  color: var(--point-panel-timeline-label-selected-color);
+}

@@ -8,8 +8,8 @@ import useLogPointPanelContextMenu from "./useLogPointPanelContextMenu";
 import styles from "./Capsule.module.css";
 
 export default function Capsule({
+  closestHitPointIndex,
   currentHitPoint,
-  currentHitPointIndex,
   editable,
   hasConditional,
   hitPoints,
@@ -19,8 +19,8 @@ export default function Capsule({
   toggleConditional,
   toggleShouldLog,
 }: {
+  closestHitPointIndex: number;
   currentHitPoint: TimeStampedPoint | null;
-  currentHitPointIndex: number | null;
   editable: boolean;
   hasConditional: boolean;
   hitPoints: TimeStampedPoint[];
@@ -67,11 +67,11 @@ export default function Capsule({
 
   let label: ReactNode = "10k+";
   if (!tooManyPointsToFind) {
-    if (currentHitPointIndex != null) {
-      label = `${currentHitPointIndex + 1}/${hitPoints.length}`;
-    } else {
-      label = `${hitPoints.length}`;
-    }
+    label = (
+      <span className={currentHitPoint !== null ? styles.ExactMatch : styles.NearMatch}>
+        {closestHitPointIndex + 1}
+      </span>
+    );
   }
 
   return (
@@ -89,7 +89,7 @@ export default function Capsule({
             minWidth: `${minLabelWidthCh}ch`,
           }}
         >
-          {label}
+          {label}/{hitPoints.length}
         </div>
 
         {/* Use a none-standard SVG component/size to simplify layout/margin/gap styles */}
