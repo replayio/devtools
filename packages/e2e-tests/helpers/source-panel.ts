@@ -92,7 +92,6 @@ async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
 
 async function getCurrentSource(page: Page): Promise<Locator | null> {
   const sources = page.locator("[data-test-name=Source]");
-
   for (let index = 0; index < (await sources.count()); index++) {
     const source = sources.nth(index);
     if (await source.isVisible()) {
@@ -554,18 +553,14 @@ export async function waitForBreakpoint(
 
   await openPauseInformationPanel(page);
 
-  const breakpointGroup = await page.waitForSelector(
-    `[data-test-name="BreakpointsList"]:has-text("${url}")`
-  );
+  const breakpointGroup = await page.waitForSelector(`.breakpoints-list-source:has-text("${url}")`);
 
   if (columnIndex != null) {
     await breakpointGroup.waitForSelector(
-      `[data-test-name="PointLocation"]:has-text("${lineNumber}:${columnIndex}")`
+      `.breakpoint-line:has-text("${lineNumber}:${columnIndex}")`
     );
   } else {
-    await breakpointGroup.waitForSelector(
-      `[data-test-name="PointLocation"]:has-text("${lineNumber}")`
-    );
+    await breakpointGroup.waitForSelector(`.breakpoint-line:has-text("${lineNumber}")`);
   }
 }
 
