@@ -28,7 +28,7 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "gql:schema": "gq https://graphql.replay.io/v1/graphql -H \"X-Hasura-Admin-Secret: $HASURA_KEY\" --introspect > schema.graphql",
-    "gql:gen": "apollo codegen:generate --localSchemaFile=schema.graphql --target=typescript --tagName=gql --outputFlat packages/shared/graphql/generated",
+    "gql:gen": "apollo codegen:generate --localSchemaFile=schema.graphql --includes='{packages/shared,src}/**/*.{ts,tsx}' --target=typescript --tagName=gql --outputFlat packages/shared/graphql/generated",
     "gql": "yarn gql:schema && yarn gql:gen"
   },
   "dependencies": {
@@ -145,6 +145,7 @@
     "@types/mixpanel-browser": "^2.35.6",
     "@types/node": "^18.0.0",
     "@types/react": "^18.0.12",
+    "@types/react-devtools-inline": "^4.24.3",
     "@types/react-dom": "^18.0.5",
     "@types/react-lazyload": "^3.2.0",
     "@types/react-router-dom": "^5.1.7",

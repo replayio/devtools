@@ -127,3 +127,25 @@ export function suspendInParallel<T extends AnyFunction[]>(
 export function __setCircularThenableCheckMaxCount(value: number) {
   CIRCULAR_THENABLE_CHECK_MAX_COUNT = value;
 }
+
+export function createFetchAsyncFromFetchSuspense<TParams extends Array<any>, TValue>(
+  fetchAsyncMethod: (...params: TParams) => TValue
+) {
+  const fetchAsync = async (...params: TParams) => {
+    try {
+      return fetchAsyncMethod(...params);
+    } catch (errorOrPromise) {
+      if (
+        errorOrPromise != null &&
+        typeof errorOrPromise === "object" &&
+        errorOrPromise.hasOwnProperty("then")
+      ) {
+        return errorOrPromise as Promise<TValue>;
+      } else {
+        throw errorOrPromise;
+      }
+    }
+  };
+
+  return fetchAsync;
+}

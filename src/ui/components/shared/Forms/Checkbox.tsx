@@ -11,12 +11,14 @@ export default function Checkbox({
   return (
     <input
       type="checkbox"
+      checked={checked}
       disabled={disabled}
       className={classNames(
         "m-0 h-4 w-4 cursor-pointer rounded border-checkboxBorder bg-checkbox text-primaryAccent focus:ring-primaryAccent",
         className
       )}
-      {...{ id, checked, onChange }}
+      id={id}
+      onChange={onChange}
     />
   );
 }

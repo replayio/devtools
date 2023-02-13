@@ -20,11 +20,15 @@ export type RequestSummary = Omit<CommandRequest, "method"> & {
   recordedAt: number;
 };
 
+export type ProtocolResponseMap = { [id: number]: CommandResponse & Recorded };
+export type ProtocolRequestMap = { [id: number]: RequestSummary };
+export type ProtocolErrorMap = { [id: number]: CommandResponse & Recorded };
+
 export interface ProtocolMessagesState {
   events: (ProtocolEvent & Recorded)[];
-  idToResponseMap: { [id: number]: CommandResponse & Recorded };
-  idToRequestMap: { [id: number]: RequestSummary };
-  idToErrorMap: { [id: number]: CommandResponse & Recorded };
+  idToResponseMap: ProtocolResponseMap;
+  idToRequestMap: ProtocolRequestMap;
+  idToErrorMap: ProtocolErrorMap;
 }
 
 const protocolMessagesSlice = createSlice({

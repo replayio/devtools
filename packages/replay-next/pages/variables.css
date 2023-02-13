@@ -110,8 +110,7 @@
   --z-index-1--paused-comment: var(--z-index-1);
   --z-index-1--paused-message: var(--z-index-1);
   --z-index-1--comment-container: var(--z-index-1);
-  --z-index-1--icon-tooltip: var(--z-index-1);
-  --z-index-1--timeline-tooltip: var(--z-index-1);
+  --z-index-1--tooltip: var(--z-index-1);
   --z-index-2--hovered-point-secondary: var(--z-index-2);
   --z-index-3--hovered-point-primary: var(--z-index-3);
   --z-index-3--hovered-comment-primary: var(--z-index-3);
@@ -186,6 +185,8 @@
   --tooltip-bgcolor: var(--theme-base-85);
   --tooltip-color: #fff;
 
+  --event-row-hover-background-color: rgba(8, 17, 32, 0.5);
+
   --background-color-contrast-1: #0e1119;
   --background-color-contrast-2: #192230;
   --background-color-contrast-3: #2a3343;
@@ -257,7 +258,10 @@
   --context-menu-bgcolor-hover: var(--theme-base-95);
 
   --comment-card-source-preview-background-color: #081221;
-  --comment-card-source-preview-background-color-hover: #3e434a;
+  --comment-card-source-preview-background-color-hover: #000;
+  --comment-reply-unpublished-background-color: var(--point-panel-background-color);
+  --comment-reply-unpublished-textfield-background-color: #000;
+  --comment-reply-unpublished-textfield-color: #fff;
 
   --object-inspector-bucket-color: #939395;
   --object-inspector-expanded-key-with-flag: #5ca9cf;
@@ -487,6 +491,9 @@
   --breakpoint-tip: #fff;
 
   /* Testsuites (Dark) */
+  --testsuites-aside-background-color: var(--theme-base-90);
+  --testsuites-aside-color: #fff;
+  --testsuites-aside-border-color: #fdce22;
   --testsuites-capsule-alias-bgcolor: var(--theme-base-85);
   --testsuites-capsule-alias-color: var(--body-color);
   --testsuites-capsule-alias-selected-bgcolor: var(--theme-base-100);
@@ -627,9 +634,12 @@
   --focus-mode-capsule-bgcolor: var(--theme-base-90);
   --focus-mode-loaded-indexed-color: var(--primary-accent);
   --focus-mode-loading-color: #00567f;
-  --focus-mode-popout-icon-background-color: var(--primary-accent);
-  --focus-mode-popout-icon-color: white;
+  --focus-mode-popout-icon-background-color: white;
+  --focus-mode-popout-icon-color: var(--theme-base-100);
   --focus-mode-popout-text-input-background-color: #33373d;
+  --focus-mode-popout-background-color: rgba(67, 71, 73, 0.6);
+  --focus-mode-popout-background-color-no-transparency: rgba(0, 0, 0, 1);
+  --focus-mode-popout-color: white;
 }
 
 :root.theme-light {
@@ -678,6 +688,8 @@
   --tooltip-bgcolor: #38383d;
   --tooltip-color: white;
 
+  --event-row-hover-background-color: rgba(232, 234, 237, 0.5);
+
   --background-color-contrast-1: #e6e6e6;
   --background-color-contrast-2: #ffffff;
   --background-color-contrast-3: #82888c;
@@ -710,7 +722,7 @@
   --color-contrast: #ffffff;
   --color-current: #f02d5e;
   --color-default: #223344;
-  --color-dim: #666666;
+  --color-dim: rgba(135, 135, 137, 0.9);
   --color-dimmer: #aaaaaa;
   --color-disabled-button: #ffffff;
   --color-error: #ff0000;
@@ -751,6 +763,9 @@
 
   --comment-card-source-preview-background-color-hover: #e6e6e6;
   --comment-card-source-preview-background-color: #f2f3f2;
+  --comment-reply-unpublished-background-color: var(--point-panel-background-color);
+  --comment-reply-unpublished-textfield-background-color: #fff;
+  --comment-reply-unpublished-textfield-color: #000;
 
   --object-inspector-bucket-color: #737373;
   --object-inspector-expanded-key-with-flag: #0074e8;
@@ -980,6 +995,9 @@
   --breakpoint-tip: var(--theme-highlight-purple);
 
   /* Testsuites (Light) */
+  --testsuites-aside-background-color: rgb(254 243 199);
+  --testsuites-aside-color: var(--body-color);
+  --testsuites-aside-border-color: rgb(253 230 138);
   --testsuites-capsule-alias-bgcolor: var(--theme-base-85);
   --testsuites-capsule-alias-color: var(--body-color);
   --testsuites-capsule-alias-selected-bgcolor: var(--theme-base-100);
@@ -1121,6 +1139,9 @@
   --focus-mode-popout-icon-background-color: white;
   --focus-mode-popout-icon-color: black;
   --focus-mode-popout-text-input-background-color: var(--theme-base-85);
+  --focus-mode-popout-background-color: rgba(0, 0, 0, 0.6);
+  --focus-mode-popout-background-color-no-transparency: rgba(0, 0, 0, 1);
+  --focus-mode-popout-color: white;
 }
 
 /*

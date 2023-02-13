@@ -2,7 +2,6 @@ import {
   PauseId,
   Object as ProtocolObject,
   Property as ProtocolProperty,
-  Value as ProtocolValue,
 } from "@replayio/protocol";
 import classNames from "classnames";
 import {
@@ -25,7 +24,6 @@ import {
 import { Value as ClientValue, protocolValueToClientValue } from "replay-next/src/utils/protocol";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import HTMLExpandable from "./HTMLExpandable";
 import PropertiesRenderer from "./PropertiesRenderer";
 import useClientValue from "./useClientValue";
 import ValueRenderer from "./ValueRenderer";
@@ -33,10 +31,12 @@ import styles from "./GetterRenderer.module.css";
 
 export default function GetterRenderer({
   parentObjectId,
+  path,
   pauseId,
   protocolProperty,
 }: {
   parentObjectId: string;
+  path?: string;
   pauseId: PauseId;
   protocolProperty: ProtocolProperty;
 }) {
@@ -134,11 +134,12 @@ export default function GetterRenderer({
       <Expandable
         children={
           <Suspense fallback={<Loader />}>
-            <PropertiesRenderer object={getterValueWithPreview!} pauseId={pauseId} />
+            <PropertiesRenderer object={getterValueWithPreview!} path={path} pauseId={pauseId} />
           </Suspense>
         }
         header={header}
         onChange={setIsExpanded}
+        persistenceKey={path}
       />
     );
   } else {

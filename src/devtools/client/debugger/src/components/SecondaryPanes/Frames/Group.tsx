@@ -3,18 +3,17 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import classNames from "classnames";
-//
-import React, { Component } from "react";
+import React, { useState } from "react";
 
 import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
 
 import { getLibraryFromUrl } from "../../../utils/pause/frames";
 import AccessibleImage from "../../shared/AccessibleImage";
 import Badge from "../../shared/Badge";
-import FrameComponent from "./Frame";
+import { FrameComponent } from "./Frame";
 import FrameIndent from "./FrameIndent";
-import FrameMenu from "./FrameMenu";
 import type { CommonFrameComponentProps } from "./index";
+import { useStackFrameContextMenu } from "./useStackFrameContextMenu";
 
 function FrameLocation({ frame, expanded }: { frame: PauseFrame; expanded: boolean }) {
   const library = frame.library || getLibraryFromUrl(frame);
@@ -36,51 +35,59 @@ type GroupProps = CommonFrameComponentProps & {
   group: PauseFrame[];
 };
 
-interface GroupState {
-  expanded: boolean;
-}
+export function Group({
+  cx,
+  group,
+  selectFrame,
+  selectedFrameId,
+  toggleFrameworkGrouping,
+  frameworkGroupingOn,
+  copyStackTrace,
+  displayFullUrl,
+  disableContextMenu,
+  panel,
+}: GroupProps) {
+  const [expanded, setExpanded] = useState(false);
+  const isSelectable = panel == "console";
 
-export default class Group extends Component<GroupProps, GroupState> {
-  state = { expanded: false };
+  const { contextMenu, onContextMenu } = useStackFrameContextMenu({
+    frameworkGroupingOn,
+    toggleFrameworkGrouping,
+    copyStackTrace,
+  });
 
-  get isSelectable() {
-    return this.props.panel == "console";
-  }
-
-  onContextMenu(event: React.MouseEvent) {
-    const { group, copyStackTrace, toggleFrameworkGrouping, frameworkGroupingOn, cx } = this.props;
-    const frame = group[0];
-    FrameMenu(frame, frameworkGroupingOn, { copyStackTrace, toggleFrameworkGrouping }, event);
-  }
-
-  toggleFrames = (event: React.MouseEvent) => {
+  const toggleFrames = (event: React.MouseEvent) => {
     event.stopPropagation();
-    this.setState(prevState => ({ expanded: !prevState.expanded }));
+    setExpanded(prevExpanded => !prevExpanded);
   };
 
-  renderFrames() {
-    const {
-      cx,
-      group,
-      selectFrame,
-      selectedFrameId,
-      toggleFrameworkGrouping,
-      frameworkGroupingOn,
-      copyStackTrace,
-      displayFullUrl,
-      disableContextMenu,
-      panel,
-    } = this.props;
+  const frame = group[0];
+  const title = expanded ? `Collapse ${frame.library} frames` : `Expand ${frame.library} frames`;
 
-    const { expanded } = this.state;
-    if (!expanded) {
-      return null;
-    }
+  const description = (
+    <div
+      role="listitem"
+      key={frame.id}
+      className={classNames("group")}
+      onClick={toggleFrames}
+      tabIndex={0}
+      title={title}
+    >
+      {isSelectable && <FrameIndent />}
+      <FrameLocation frame={frame} expanded={expanded} />
+      {isSelectable && <span className="clipboard-only"> </span>}
+      <Badge>{group.length}</Badge>
+      {isSelectable && <br className="clipboard-only" />}
+    </div>
+  );
 
-    return (
+  let frames: React.ReactNode = null;
+
+  if (expanded) {
+    frames = (
       <div className="frames-list">
         {group.reduce((acc, frame, i) => {
-          if (this.isSelectable) {
+          if (isSelectable) {
             acc.push(<FrameIndent key={`frame-indent-${i}`} />);
           }
           const commonProps: CommonFrameComponentProps = {
@@ -108,44 +115,16 @@ export default class Group extends Component<GroupProps, GroupState> {
     );
   }
 
-  renderDescription() {
-    const { group } = this.props;
-
-    const frame = group[0];
-    const expanded = this.state.expanded;
-    const title = this.state.expanded
-      ? `Collapse ${frame.library} frames`
-      : `Expand ${frame.library} frames`;
-
-    return (
-      <div
-        role="listitem"
-        key={frame.id}
-        className={classNames("group")}
-        onClick={this.toggleFrames}
-        tabIndex={0}
-        title={title}
-      >
-        {this.isSelectable && <FrameIndent />}
-        <FrameLocation frame={frame} expanded={expanded} />
-        {this.isSelectable && <span className="clipboard-only"> </span>}
-        <Badge>{this.props.group.length}</Badge>
-        {this.isSelectable && <br className="clipboard-only" />}
-      </div>
-    );
-  }
-
-  render() {
-    const { expanded } = this.state;
-    const { disableContextMenu } = this.props;
-    return (
+  return (
+    <>
       <div
         className={classNames("frames-group", { expanded })}
-        onContextMenu={disableContextMenu ? undefined : e => this.onContextMenu(e)}
+        onContextMenu={disableContextMenu ? undefined : onContextMenu}
       >
-        {this.renderDescription()}
-        {this.renderFrames()}
+        {description}
+        {frames}
       </div>
-    );
-  }
+      {contextMenu}
+    </>
+  );
 }

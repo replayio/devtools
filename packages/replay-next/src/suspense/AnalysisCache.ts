@@ -19,13 +19,13 @@ import {
 } from "protocol/evaluation-utils";
 import { ReplayClientInterface } from "shared/client/types";
 
-import { createWakeable } from "../utils/suspense";
+import { createFetchAsyncFromFetchSuspense, createWakeable } from "../utils/suspense";
 import { cachePauseData } from "./PauseCache";
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 type Value = any;
 
-type AnalysisResult = {
+export type AnalysisResult = {
   executionPoint: ExecutionPoint;
   isRemote: boolean;
   pauseId: PauseId | null;
@@ -33,7 +33,7 @@ type AnalysisResult = {
   values: Value[];
 };
 
-export type AnalysisResults = (timeStampedPoint: TimeStampedPoint) => AnalysisResult | null;
+export type GetAnalysisResult = (timeStampedPoint: TimeStampedPoint) => AnalysisResult | null;
 
 export type RemoteAnalysisResult = {
   data: { frames: Frame[]; objects: ProtocolObject[]; scopes: Scope[] };
@@ -56,7 +56,7 @@ function getKey(
   }`;
 }
 
-const locationAndTimeToValueMap: Map<string, Record<AnalysisResults>> = new Map();
+const locationAndTimeToValueMap: Map<string, Record<GetAnalysisResult>> = new Map();
 
 // TODO (FE-469) Filter in-memory if the range gets smaller (and we haven't overflowed)
 // Currently we re-run the analysis which seems wasteful.
@@ -67,12 +67,12 @@ export function runAnalysisSuspense(
   location: Location,
   code: string,
   condition: string | null
-): AnalysisResults {
+): GetAnalysisResult {
   const key = getKey(focusRange, location, code, condition);
 
   let record = locationAndTimeToValueMap.get(key);
   if (record == null) {
-    const wakeable = createWakeable<AnalysisResults>(`runAnalysisSuspense: ${key}`);
+    const wakeable = createWakeable<GetAnalysisResult>(`runAnalysisSuspense: ${key}`);
 
     record = {
       status: STATUS_PENDING,
@@ -94,6 +94,8 @@ export function runAnalysisSuspense(
     throw record.value;
   }
 }
+
+export const runAnalysisAsync = createFetchAsyncFromFetchSuspense(runAnalysisSuspense);
 
 export function canRunLocalAnalysis(code: string): boolean {
   const tokens = jsTokens(code);
@@ -147,11 +149,11 @@ export function canRunLocalAnalysis(code: string): boolean {
 
 async function runLocalAnalysis(
   code: string,
-  record: Record<AnalysisResults>,
-  wakeable: Wakeable<AnalysisResults>
+  record: Record<GetAnalysisResult>,
+  wakeable: Wakeable<GetAnalysisResult>
 ) {
   try {
-    const analysisResults = await new Promise<AnalysisResults>((resolve, reject) => {
+    const analysisResults = await new Promise<GetAnalysisResult>((resolve, reject) => {
       if (code === "location") {
         reject();
       }
@@ -167,7 +169,7 @@ async function runLocalAnalysis(
       const worker = new Worker(objectURL);
       worker.addEventListener("message", event => {
         const values = event.data;
-        const analysisResults: AnalysisResults = (timeStampedPoint: TimeStampedPoint) => ({
+        const analysisResults: GetAnalysisResult = (timeStampedPoint: TimeStampedPoint) => ({
           executionPoint: timeStampedPoint.point,
           isRemote: false,
           pauseId: null,
@@ -207,8 +209,8 @@ async function runRemoteAnalysis(
   location: Location,
   code: string,
   condition: string | null,
-  record: Record<AnalysisResults>,
-  wakeable: Wakeable<AnalysisResults>
+  record: Record<GetAnalysisResult>,
+  wakeable: Wakeable<GetAnalysisResult>
 ) {
   try {
     const results = await client.runAnalysis<RemoteAnalysisResult>({

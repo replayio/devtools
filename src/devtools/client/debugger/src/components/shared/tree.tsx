@@ -960,6 +960,10 @@ export class Tree<T> extends React.Component<TreeProps<T>, TreeState> {
             // created in `renderItem`.
             e.stopPropagation();
 
+            if (e.defaultPrevented) {
+              return;
+            }
+
             // Since the user just clicked the node, there's no need to check if
             // it should be scrolled into view.
             this._focus(item, { preventAutoScroll: true });

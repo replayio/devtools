@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import React from "react";
+import { MouseEvent } from "react";
 
 import AccessibleImage from "../AccessibleImage";
 
@@ -9,6 +9,12 @@ export default function CommandBarButton({
   onClick,
   tooltip,
   type,
+}: {
+  disabled?: boolean;
+  disabledTooltip?: string;
+  onClick: (event: MouseEvent) => void;
+  tooltip: string;
+  type: string;
 }) {
   return (
     <button

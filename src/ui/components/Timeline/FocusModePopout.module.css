@@ -18,10 +18,17 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  background-color: var(--theme-popup-color);
-  color: var(--theme-popup-background);
+  gap: 1rem;
+  padding: 0.5rem 1.25rem 0.5rem 0.87rem;
+  color: var(--focus-mode-popout-color);
+  background-color: var(--focus-mode-popout-background-color-no-transparency);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+@supports (-webkit-backdrop-filter: blur(12px)) {
+  .Content {
+    background-color: var(--focus-mode-popout-background-color);
+  }
 }
 
 .IconContainer {
