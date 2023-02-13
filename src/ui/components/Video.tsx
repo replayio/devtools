@@ -1,49 +1,42 @@
-import {} from "devtools/client/inspector/markup/reducers/markup";
 import { useEffect, useRef } from "react";
-import { ConnectedProps, connect } from "react-redux";
 
 import { CypressToggler } from "devtools/client/debugger/src/components/TestInfo/CypressToggler";
 import { PreviewNodeHighlighter } from "devtools/client/inspector/markup/components/PreviewNodeHighlighter";
 import { getHighlightedNodesLoading } from "devtools/client/inspector/markup/selectors/markup";
 import { installObserver, refreshGraphics } from "protocol/graphics";
+import {
+  getAreMouseTargetsLoading,
+  getIsNodePickerActive,
+  getIsNodePickerInitializing,
+  getRecordingTarget,
+  getVideoUrl,
+} from "ui/actions/app";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
-import CommentTool from "ui/components/shared/CommentTool";
-import hooks from "ui/hooks";
-import { getSelectedPrimaryPanel, getViewMode } from "ui/reducers/layout";
+import useVideoCommentTool from "ui/components/useVideoCommentTool";
+import { getSelectedPrimaryPanel } from "ui/reducers/layout";
+import { getPlayback, isPlaybackStalled } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
-import { UIState } from "ui/state";
 
-import { selectors } from "../reducers";
 import ReplayLogo from "./shared/ReplayLogo";
 import Spinner from "./shared/Spinner";
 import Tooltip from "./shared/Tooltip";
 
-function CommentLoader({ recordingId }: { recordingId: string }) {
-  const { comments, loading } = hooks.useGetComments(recordingId);
-
-  if (loading) {
-    return null;
-  }
-
-  return <CommentTool comments={comments} />;
-}
-
-function Video({
-  playback,
-  isNodePickerActive,
-  isNodePickerInitializing,
-  recordingTarget,
-  stalled,
-  mouseTargetsLoading,
-  videoUrl,
-  highlightedNodesLoading,
-}: PropsFromRedux) {
-  const recordingId = hooks.useGetRecordingId();
-  const viewMode = useAppSelector(getViewMode);
+export default function Video() {
   const panel = useAppSelector(getSelectedPrimaryPanel);
   const highlightedNodeIds = useAppSelector(state => state.markup.highlightedNodes);
+  const isNodePickerActive = useAppSelector(getIsNodePickerActive);
+  const isNodePickerInitializing = useAppSelector(getIsNodePickerInitializing);
+  const playback = useAppSelector(getPlayback);
+  const recordingTarget = useAppSelector(getRecordingTarget);
+  const videoUrl = useAppSelector(getVideoUrl);
+  const stalled = useAppSelector(isPlaybackStalled);
+  const mouseTargetsLoading = useAppSelector(getAreMouseTargetsLoading);
+  const highlightedNodesLoading = useAppSelector(getHighlightedNodesLoading);
+
   const isPaused = !playback;
   const isNodeTarget = recordingTarget == "node";
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     installObserver();
@@ -81,6 +74,9 @@ function Video({
   const showSpinner =
     highlightedNodesLoading || (isNodePickerActive && mouseTargetsLoading) || stalled;
 
+  const { onClick, onMouseEnter, onMouseLeave, onMouseMove, tooltip } =
+    useVideoCommentTool(canvasRef);
+
   return (
     <div id="video" className="relative bg-toolbarBackground">
       <div className="absolute flex h-full w-full items-center justify-center bg-chrome">
@@ -88,10 +84,17 @@ function Video({
       </div>
 
       <video id="graphicsVideo" src={videoUrl || undefined} />
-      <canvas id="graphics" onMouseDown={onMouseDown} />
+      <canvas
+        id="graphics"
+        onClick={onClick}
+        onMouseDown={onMouseDown}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        onMouseMove={onMouseMove}
+        ref={canvasRef}
+      />
       {showCommentTool ? (
         <CommentsOverlay>
-          <CommentLoader recordingId={recordingId} />
           {showSpinner && (
             <div className="absolute bottom-5 right-5 z-20 flex opacity-50">
               <Spinner className="w-4 animate-spin" />
@@ -99,6 +102,7 @@ function Video({
           )}
         </CommentsOverlay>
       ) : null}
+      {showCommentTool && tooltip}
       {isNodePickerInitializing ? <Tooltip label="Loading…" targetID="video" /> : null}
       {panel === "cypress" && <CypressToggler />}
       <div id="highlighter-root">
@@ -109,18 +113,3 @@ function Video({
     </div>
   );
 }
-
-const connector = connect((state: UIState) => ({
-  isNodePickerActive: selectors.getIsNodePickerActive(state),
-  isNodePickerInitializing: selectors.getIsNodePickerInitializing(state),
-  currentTime: selectors.getCurrentTime(state),
-  playback: selectors.getPlayback(state),
-  recordingTarget: selectors.getRecordingTarget(state),
-  videoUrl: selectors.getVideoUrl(state),
-  stalled: selectors.isPlaybackStalled(state),
-  mouseTargetsLoading: selectors.getAreMouseTargetsLoading(state),
-  highlightedNodesLoading: getHighlightedNodesLoading(state),
-}));
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(Video);
