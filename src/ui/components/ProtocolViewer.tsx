@@ -467,13 +467,14 @@ function ProtocolChunk({
 
 const ProtocolChunkMemo = React.memo(ProtocolChunk);
 
-export function LiveAppProtocolViewer() {
+// HeadlessUI tries to add refs - forward to fix warnings
+export const LiveAppProtocolViewer = React.forwardRef(function LiveAppProtocolViewer() {
   const requestMap = useAppSelector(getProtocolRequestMap);
   const responseMap = useAppSelector(getProtocolResponseMap);
   const errorMap = useAppSelector(getProtocolErrorMap);
 
   return <ProtocolViewer errorMap={errorMap} requestMap={requestMap} responseMap={responseMap} />;
-}
+});
 
 interface AllProtocolMessages {
   requestMap: ProtocolRequestMap;
@@ -617,7 +618,8 @@ function RecordedProtocolMessages({ sourceDetails }: { sourceDetails: SourceDeta
   return <ProtocolViewer {...allProtocolMessages} />;
 }
 
-export function RecordedAppProtocolViewer() {
+// HeadlessUI tries to add refs - forward to fix warnings
+export const RecordedAppProtocolViewer = React.forwardRef(function RecordedAppProtocolViewer() {
   const sourceDetails = useAppSelector(getAllSourceDetails);
 
   const isRecordingOfReplay = useMemo(() => {
@@ -646,7 +648,7 @@ export function RecordedAppProtocolViewer() {
   }
 
   return <div>{content}</div>;
-}
+});
 
 type ProtocolViewerTabs = "live" | "recorded";
 interface ProtocolTab {
@@ -670,7 +672,7 @@ export function ProtocolViewerPanel() {
             }}
           >
             {tabs.map(tab => (
-              <HeadlessTab key={tab.id}>
+              <HeadlessTab key={tab.id} as="span">
                 {({ selected }) => {
                   return <Tab id={tab.id} text={tab.text} active={selected} />;
                 }}
