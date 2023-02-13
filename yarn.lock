@@ -827,6 +827,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/parser@npm:^7.0.0-beta.54, @babel/parser@npm:^7.1.0, @babel/parser@npm:^7.1.3, @babel/parser@npm:^7.12.11, @babel/parser@npm:^7.14.7, @babel/parser@npm:^7.16.7, @babel/parser@npm:^7.20.13, @babel/parser@npm:^7.20.7":
+  version: 7.20.15
+  resolution: "@babel/parser@npm:7.20.15"
+  bin:
+    parser: ./bin/babel-parser.js
+  checksum: 1d0f47ca67ff2652f1c0ff1570bed8deccbc4b53509e7cd73476af9cc7ed23480c99f1179bd6d0be01612368b92b39e206d330ad6054009d699934848a89298b
+  languageName: node
+  linkType: hard
+
+"@babel/parser@patch:@babel/parser@npm:7.20.13#.yarn/patches/@babel-parser-npm-7.20.13-5e7ca52733.patch::locator=recordreplay-devtools%40workspace%3A.":
+  version: 7.20.13
+  resolution: "@babel/parser@patch:@babel/parser@npm%3A7.20.13#.yarn/patches/@babel-parser-npm-7.20.13-5e7ca52733.patch::version=7.20.13&hash=4d359c&locator=recordreplay-devtools%40workspace%3A."
+  bin:
+    parser: ./bin/babel-parser.js
+  checksum: e240130535b4010aead81d1033df3b460abcc4b09027555ff73749026efc1ceb1f1c0e7f02ab698a86d31a8b599cc1374f8b777b96ad3d44da4f0327c4eff1ed
+  languageName: node
+  linkType: hard
+
 "@babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression@npm:^7.17.12":
   version: 7.17.12
   resolution: "@babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression@npm:7.17.12"
@@ -21480,7 +21498,7 @@ __metadata:
     "@auth0/auth0-react": 1.2.0
     "@babel/core": ^7.20.12
     "@babel/generator": ^7.20.7
-    "@babel/parser": ^7.20.13
+    "@babel/parser": 7.20.13
     "@babel/plugin-proposal-class-properties": ^7.18.6
     "@babel/plugin-proposal-logical-assignment-operators": ^7.20.7
     "@babel/plugin-proposal-nullish-coalescing-operator": ^7.18.6
