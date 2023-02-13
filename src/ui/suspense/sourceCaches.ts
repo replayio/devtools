@@ -40,7 +40,7 @@ export const {
   "sourceSymbolsCache",
   1,
   async (replayClient, sourceId, sourceDetails) => {
-    const { parser } = await import("devtools/client/debugger/src/utils/bootstrap");
+    // const { parser } = await import("devtools/client/debugger/src/utils/bootstrap");
     const sourceContents = await getSourceContentsAsync(replayClient, sourceId);
 
     if (sourceContents !== undefined) {

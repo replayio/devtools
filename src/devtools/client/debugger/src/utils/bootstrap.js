@@ -10,11 +10,11 @@ export let parser;
 export function bootstrapWorkers(panelWorkers) {
   parser = new ParserDispatcher();
 
-  parser.start(() => new Worker(new URL("../workers/parser/worker", import.meta.url)), "parser");
+  // parser.start(() => new Worker(new URL("../workers/parser/worker", import.meta.url)), "parser");
   search.start(() => new Worker(new URL("../workers/search/worker", import.meta.url)), "search");
 }
 
 export function teardownWorkers() {
-  parser.stop();
+  //  parser.stop();
   search.stop();
 }
