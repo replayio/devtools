@@ -554,14 +554,18 @@ export async function waitForBreakpoint(
 
   await openPauseInformationPanel(page);
 
-  const breakpointGroup = await page.waitForSelector(`.breakpoints-list-source:has-text("${url}")`);
+  const breakpointGroup = await page.waitForSelector(
+    `[data-test-name="BreakpointsList"]:has-text("${url}")`
+  );
 
   if (columnIndex != null) {
     await breakpointGroup.waitForSelector(
-      `.breakpoint-line:has-text("${lineNumber}:${columnIndex}")`
+      `[data-test-name="PointLocation"]:has-text("${lineNumber}:${columnIndex}")`
     );
   } else {
-    await breakpointGroup.waitForSelector(`.breakpoint-line:has-text("${lineNumber}")`);
+    await breakpointGroup.waitForSelector(
+      `[data-test-name="PointLocation"]:has-text("${lineNumber}")`
+    );
   }
 }
 

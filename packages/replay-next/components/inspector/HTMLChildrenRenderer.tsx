@@ -9,6 +9,7 @@ import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPre
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import KeyValueRenderer from "./KeyValueRenderer";
+import { addPathSegment } from "./PropertiesRenderer";
 
 // HTML entries are a special case.
 // Unlike the other property lists, HTML entries only display child nodes:
@@ -20,9 +21,11 @@ import KeyValueRenderer from "./KeyValueRenderer";
 //         </li>
 export default function HTMLChildrenRenderer({
   object,
+  path,
   pauseId,
 }: {
   object: ProtocolObject;
+  path?: string;
   pauseId: ProtocolPauseId;
 }) {
   const childNodes = object.preview?.node?.childNodes ?? [];
@@ -33,7 +36,12 @@ export default function HTMLChildrenRenderer({
   return (
     <>
       {childNodes.map((objectId: ProtocolObjectId, index: number) => (
-        <HTMLChildRenderer key={index} objectId={objectId} pauseId={pauseId} />
+        <HTMLChildRenderer
+          key={index}
+          objectId={objectId}
+          path={addPathSegment(path, `${index}`)}
+          pauseId={pauseId}
+        />
       ))}
     </>
   );
@@ -41,9 +49,11 @@ export default function HTMLChildrenRenderer({
 
 function HTMLChildRenderer({
   objectId,
+  path,
   pauseId,
 }: {
   objectId: ProtocolObjectId;
+  path?: string;
   pauseId: ProtocolPauseId;
 }) {
   const client = useContext(ReplayClientContext);
@@ -61,6 +71,7 @@ function HTMLChildRenderer({
     <KeyValueRenderer
       context="nested"
       layout="vertical"
+      path={path}
       pauseId={pauseId}
       protocolValue={protocolValue}
     />

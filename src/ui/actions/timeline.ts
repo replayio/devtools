@@ -143,7 +143,7 @@ export async function getInitialPausePoint(recordingId: string) {
     return { point, time };
   }
 
-  const firstMeaningfulPaint = await getFirstMeaningfulPaint(10);
+  const firstMeaningfulPaint = await getFirstMeaningfulPaint();
   if (firstMeaningfulPaint) {
     const { point, time } = firstMeaningfulPaint;
     return { point, time };

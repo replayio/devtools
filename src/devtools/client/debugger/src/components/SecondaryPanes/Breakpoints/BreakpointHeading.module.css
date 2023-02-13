@@ -1,0 +1,21 @@
+.Heading {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  font-size: var(font-size-regular);
+  line-height: 1rem;
+  padding: 0.25rem 0.5rem;
+  justify-content: space-between;
+  background-color: var(--theme-toolbar-background);
+  color: var(--theme-text-color-strong);
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.Label {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

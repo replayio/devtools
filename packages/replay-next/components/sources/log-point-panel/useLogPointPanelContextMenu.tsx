@@ -12,6 +12,7 @@ import styles from "./ContextMenu.module.css";
 
 export default function useLogPointPanelContextMenu({
   currentHitPoint,
+  editable,
   hasConditional,
   lineNumber,
   shouldLog,
@@ -19,6 +20,7 @@ export default function useLogPointPanelContextMenu({
   toggleShouldLog,
 }: {
   currentHitPoint: TimeStampedPoint | null;
+  editable: boolean;
   hasConditional: boolean;
   lineNumber: number;
   shouldLog: boolean;
@@ -55,6 +57,7 @@ export default function useLogPointPanelContextMenu({
       <ContextMenuItem
         dataTestName="ContextMenuItem-ToggleConditional"
         dataTestState={hasConditional ? "true" : "false"}
+        disabled={!editable}
         onClick={toggleConditional}
       >
         <>
