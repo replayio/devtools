@@ -92,6 +92,7 @@ async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
 
 async function getCurrentSource(page: Page): Promise<Locator | null> {
   const sources = page.locator("[data-test-name=Source]");
+
   for (let index = 0; index < (await sources.count()); index++) {
     const source = sources.nth(index);
     if (await source.isVisible()) {
