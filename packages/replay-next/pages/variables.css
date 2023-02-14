@@ -317,6 +317,7 @@
   --point-panel-timeline-button-shadow: 0px 0px 2px 0px hsla(0, 0%, 0%, 0.12);
   --point-panel-timeline-label-background-color: #000000;
   --point-panel-timeline-label-color: var(--color-brand);
+  --point-panel-timeline-label-hover-color: #35dfff;
   --point-panel-timeline-label-unselected-color: #747476;
   --point-panel-timeline-label-selected-color: #f02d5e;
   --point-panel-timeline-label-edit-hover-background-color: #434343;
@@ -818,6 +819,7 @@
   --point-panel-timeline-button-shadow: 0px 0px 2px 0px hsla(0, 0%, 0%, 0.12);
   --point-panel-timeline-label-background-color: #ffffff;
   --point-panel-timeline-label-color: var(--color-brand);
+  --point-panel-timeline-label-hover-color: #008adb;
   --point-panel-timeline-label-unselected-color: #d1d5db;
   --point-panel-timeline-label-selected-color: #f02d5e;
   --point-panel-timeline-label-edit-hover-background-color: #f5f5f5;
