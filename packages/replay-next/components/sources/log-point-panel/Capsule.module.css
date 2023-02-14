@@ -26,6 +26,9 @@
   padding-left: 2ch;
   cursor: text;
 }
+.Label[data-test-state="too-many-points"] {
+  cursor: default;
+}
 
 .CurrentIndex {
   color: var(--point-panel-timeline-label-unselected-color);
@@ -49,7 +52,7 @@
   outline: none;
   box-shadow: none;
 }
-.Label:hover .CurrentIndex {
+.Label:hover .CurrentIndex:not(:disabled) {
   background-color: var(--point-panel-timeline-label-edit-hover-background-color);
 }
 

@@ -62,7 +62,7 @@ export default function Capsule({
   // pre-calculate the max width of the capsule (e.g. "10/10").
   const minLabelWidthCh = useMemo(() => {
     if (tooManyPointsToFind) {
-      return 1;
+      return "10k+".length;
     } else {
       return `${hitPoints.length}/${hitPoints.length}`.length;
     }
@@ -79,6 +79,10 @@ export default function Capsule({
   };
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (tooManyPointsToFind) {
+      return;
+    }
+
     const input = inputRef.current!;
     const numChars = input.value.length;
     const maxChars = `${hitPoints.length}`.length;
@@ -86,6 +90,10 @@ export default function Capsule({
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
+    if (tooManyPointsToFind) {
+      return;
+    }
+
     switch (event.code) {
       case "Enter":
         event.preventDefault();
@@ -112,7 +120,7 @@ export default function Capsule({
     selectAll(currentTarget);
   };
 
-  const inputDefaultValue = tooManyPointsToFind ? "10k" : `${closestHitPointIndex + 1}`;
+  const inputDefaultValue = tooManyPointsToFind ? "10k+" : `${closestHitPointIndex + 1}`;
 
   return (
     <>
@@ -123,9 +131,10 @@ export default function Capsule({
       >
         <div
           className={styles.Label}
+          data-test-state={tooManyPointsToFind ? "too-many-points" : "valid"}
           onClick={onLabelClick}
           style={{
-            minWidth: `${minLabelWidthCh}ch`,
+            minWidth: minLabelWidthCh,
           }}
         >
           <input
@@ -134,7 +143,7 @@ export default function Capsule({
             data-test-exact={currentHitPoint !== null || undefined}
             data-test-name="LogPointCurrentStepInput"
             disabled={tooManyPointsToFind}
-            key={closestHitPointIndex}
+            key={inputDefaultValue}
             max={hitPoints.length}
             min={0}
             onBlur={onBlur}
@@ -148,12 +157,14 @@ export default function Capsule({
             }}
             type={tooManyPointsToFind ? "text" : "number"}
           />
-          <span className={styles.Divider}>/</span>
+          {tooManyPointsToFind || <span className={styles.Divider}>/</span>}
         </div>
 
-        <div className={styles.Denominator} data-test-name="LogPointDenominator">
-          {hitPoints.length}
-        </div>
+        {tooManyPointsToFind || (
+          <div className={styles.Denominator} data-test-name="LogPointDenominator">
+            {hitPoints.length}
+          </div>
+        )}
 
         <div
           className={styles.CaretContainer}
