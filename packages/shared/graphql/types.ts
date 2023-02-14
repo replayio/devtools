@@ -258,7 +258,7 @@ export type TestItem = {
   error?: TestItemError;
 };
 
-type TestItemError = {
+export type TestItemError = {
   message: string;
   line?: number;
   column?: number;
