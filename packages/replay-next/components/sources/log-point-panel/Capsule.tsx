@@ -118,7 +118,6 @@ export default function Capsule({
       >
         <div
           className={styles.Label}
-          data-test-name="LogPointStatus"
           onClick={onLabelClick}
           style={{
             minWidth: `${minLabelWidthCh}ch`,
@@ -128,6 +127,7 @@ export default function Capsule({
             className={styles.CurrentIndex}
             defaultValue={tooManyPointsToFind ? "10k" : closestHitPointIndex + 1}
             data-test-exact={currentHitPoint !== null || undefined}
+            data-test-name="LogPointCurrentStepInput"
             disabled={tooManyPointsToFind}
             key={closestHitPointIndex}
             max={hitPoints.length}
@@ -141,7 +141,9 @@ export default function Capsule({
           <span className={styles.Divider}>/</span>
         </div>
 
-        <div className={styles.Denominator}>{hitPoints.length}</div>
+        <div className={styles.Denominator} data-test-name="LogPointDenominator">
+          {hitPoints.length}
+        </div>
 
         <div
           className={styles.CaretContainer}

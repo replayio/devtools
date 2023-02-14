@@ -37,8 +37,11 @@
   appearance: none;
   font-size: inherit;
   padding: 0 0.25ch;
+
+  /* Even if all text is deleted, don't shrink smaller than a single digit (plus padding) */
   min-width: 1.5ch;
-  width: 1.5ch;
+
+  --horizontal-padding: 0.5ch;
 }
 .CurrentIndex[data-test-exact] {
   color: var(--point-panel-timeline-label-selected-color);
