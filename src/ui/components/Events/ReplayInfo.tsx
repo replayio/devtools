@@ -10,7 +10,6 @@ import { formatRelativeTime } from "ui/utils/comments";
 import { getDisplayedUrl } from "ui/utils/environment";
 import { getRecordingId, showDurationWarning } from "ui/utils/recording";
 import useAuth0 from "ui/utils/useAuth0";
-import { shouldShowNag } from "ui/utils/tour";
 
 import { AvatarImage } from "../Avatar";
 import Icon from "../shared/Icon";
