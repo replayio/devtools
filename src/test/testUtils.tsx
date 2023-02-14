@@ -4,6 +4,7 @@ import type { RenderOptions } from "@testing-library/react";
 import React, { PropsWithChildren } from "react";
 import { act } from "react-dom/test-utils";
 import { Provider } from "react-redux";
+import { v4 as uuid } from "uuid";
 
 import { createMockReplayClient } from "replay-next/src/utils/testing";
 import type { UIStore } from "ui/actions";
@@ -17,8 +18,6 @@ import {
   createRecordingOwnerUserIdMock,
   createUserSettingsMock,
 } from "../../test/mock/src/graphql";
-
-const { v4: uuid } = require("uuid");
 
 const recordingId = uuid();
 const userId = uuid();
