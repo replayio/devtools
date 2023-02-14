@@ -18,6 +18,7 @@ import { ThreadFront } from "protocol/thread";
 import { preCacheExecutionPointForTime } from "replay-next/src/suspense/ExecutionPointsCache";
 
 import { client } from "./socket";
+import { assert } from "./utils";
 
 export const MAX_POINTS_FOR_FULL_ANALYSIS = 200;
 
