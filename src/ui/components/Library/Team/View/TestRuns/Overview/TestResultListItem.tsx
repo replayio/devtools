@@ -31,11 +31,16 @@ function ViewReplay({ passed, recordingId }: { passed: boolean; recordingId: Rec
 }
 
 function Title({ recording }: { recording: Recording }) {
+  const errorMsg = recording.metadata?.test?.tests
+    ?.map(test => test.error?.message)
+    .filter(Boolean)[0];
+
   return (
     <div className="flex flex-grow flex-row items-center space-x-2 overflow-hidden hover:cursor-pointer">
       <div className="flex flex-grow flex-col overflow-hidden py-2">
         {recording.metadata?.test?.title}
         <div className="text-xs text-bodySubColor">{recording.metadata?.test?.file}</div>
+        {errorMsg ? <div className="text-xs text-bodySubColor">{errorMsg}</div> : null}
       </div>
     </div>
   );
