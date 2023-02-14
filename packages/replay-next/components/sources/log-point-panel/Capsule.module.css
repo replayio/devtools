@@ -24,19 +24,18 @@
 }
 .Label {
   padding-left: 2ch;
+  cursor: text;
 }
 
 .CurrentIndex {
   color: var(--point-panel-timeline-label-unselected-color);
-  padding: 0 0.125rem;
+  padding: 0;
   line-height: 1;
   overflow: hidden;
-  min-width: calc(1ch + 0.25rem);
   background-color: transparent;
   border: none;
   appearance: none;
   font-size: inherit;
-  padding: 0;
 
   /* Even if all text is deleted, don't shrink smaller than a single digit */
   min-width: 1;

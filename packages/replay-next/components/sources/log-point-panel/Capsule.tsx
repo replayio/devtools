@@ -112,6 +112,8 @@ export default function Capsule({
     selectAll(currentTarget);
   };
 
+  const inputDefaultValue = tooManyPointsToFind ? "10k" : `${closestHitPointIndex + 1}`;
+
   return (
     <>
       <div
@@ -128,7 +130,7 @@ export default function Capsule({
         >
           <input
             className={styles.CurrentIndex}
-            defaultValue={tooManyPointsToFind ? "10k" : closestHitPointIndex + 1}
+            defaultValue={inputDefaultValue}
             data-test-exact={currentHitPoint !== null || undefined}
             data-test-name="LogPointCurrentStepInput"
             disabled={tooManyPointsToFind}
@@ -141,6 +143,9 @@ export default function Capsule({
             onKeyDown={onKeyDown}
             ref={inputRef}
             size={`${hitPoints.length}`.length}
+            style={{
+              width: `${inputDefaultValue.length}ch`,
+            }}
             type={tooManyPointsToFind ? "text" : "number"}
           />
           <span className={styles.Divider}>/</span>
