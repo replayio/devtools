@@ -20,7 +20,7 @@
       "jsx": true
     },
     "ecmaVersion": 2018,
-    "project": ["tsconfig.eslint.json"],
+    "project": ["tsconfig.eslint.json", "packages/e2e-tests/tsconfig.eslint.json"],
     "sourceType": "module"
   },
   "plugins": ["import", "react", "prettier"],
