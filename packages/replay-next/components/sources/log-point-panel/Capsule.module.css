@@ -43,8 +43,11 @@
   /* Even if all text is deleted, don't shrink smaller than a single digit */
   min-width: 1;
 }
-.CurrentIndex[data-test-exact] {
+.CurrentIndex[data-exact] {
   color: var(--point-panel-timeline-label-selected-color);
+}
+.CurrentIndex[data-too-many-points-to-find] {
+  color: var(--point-panel-timeline-label-color);
 }
 .CurrentIndex:focus {
   background-color: var(--point-panel-timeline-label-edit-hover-background-color);

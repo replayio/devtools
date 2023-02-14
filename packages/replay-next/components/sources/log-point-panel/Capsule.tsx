@@ -140,8 +140,9 @@ export default function Capsule({
           <input
             className={styles.CurrentIndex}
             defaultValue={inputDefaultValue}
-            data-test-exact={currentHitPoint !== null || undefined}
+            data-exact={currentHitPoint !== null || undefined}
             data-test-name="LogPointCurrentStepInput"
+            data-too-many-points-to-find={tooManyPointsToFind || undefined}
             disabled={tooManyPointsToFind}
             key={inputDefaultValue}
             max={hitPoints.length}
