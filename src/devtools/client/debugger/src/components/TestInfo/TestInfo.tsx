@@ -48,7 +48,7 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
       <div
         ref={ref}
         className={classNames("flex flex-grow flex-col overflow-hidden", {
-          narrow: !widthObserver || widthObserver < 300,
+          narrow: !widthObserver || widthObserver < 400,
         })}
       >
         <div className="relative flex flex-grow flex-col space-y-1 overflow-auto border-t border-splitter px-2 pt-3">
