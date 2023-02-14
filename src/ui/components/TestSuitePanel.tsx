@@ -131,7 +131,7 @@ export function TestSuitePanel() {
         <TestInfo testCases={testCases} />
       ) : (
         <div className="flex flex-grow flex-col overflow-hidden">
-          <div className="flex flex-grow flex-col space-y-1 overflow-auto px-2">Loading...</div>
+          <div className="flex flex-grow flex-col space-y-1 overflow-auto px-4">Loading...</div>
         </div>
       )}
     </div>
