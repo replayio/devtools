@@ -3,6 +3,7 @@ import findLast from "lodash/findLast";
 import { useContext } from "react";
 
 import Icon from "replay-next/components/Icon";
+import useGetDefaultLogPointContent from "replay-next/components/sources/hooks/useGetDefaultLogPointContent";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { KeyboardModifiersContext } from "replay-next/src/contexts/KeyboardModifiersContext";
 import {
@@ -12,7 +13,6 @@ import {
   EditPointBehavior,
 } from "replay-next/src/contexts/points/types";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
-import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/ExecutionPointsCache";
@@ -64,7 +64,12 @@ export default function HoverButton({
   const client = useContext(ReplayClientContext);
   const { executionPoint, update } = useContext(TimelineContext);
   const { currentUserInfo } = useContext(SessionContext);
-  const { findClosestFunctionName } = useContext(SourcesContext);
+
+  const getDefaultLogPointContent = useGetDefaultLogPointContent({
+    lineHitCounts,
+    lineNumber,
+    source,
+  });
 
   const [showNag, dismissNag] = useNag(Nag.FIRST_BREAKPOINT_ADD);
 
@@ -124,25 +129,22 @@ export default function HoverButton({
     );
   } else {
     const addLogPoint = () => {
-      if (lineHitCounts === null) {
+      if (!lineHitCounts) {
+        return;
+      }
+
+      const content = getDefaultLogPointContent();
+      if (!content) {
         return;
       }
 
       dismissNag();
 
-      const fileName = source?.url?.split("/")?.pop();
-      let content = `"${fileName}", ${lineNumber}`;
       const location = {
         column: lineHitCounts.firstBreakableColumnIndex,
         line: lineNumber,
         sourceId: source.sourceId,
       };
-      if (source?.sourceId) {
-        const closestFunctionName = findClosestFunctionName(source?.sourceId, location);
-        if (closestFunctionName) {
-          content = `"${closestFunctionName}", ${lineNumber}`;
-        }
-      }
 
       if (point) {
         editPendingPointText(point.key, { content });
