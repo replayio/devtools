@@ -159,6 +159,9 @@ const baseNextConfig = {
       };
     }
 
+    // TODO Temporarily turn off minification for testing
+    config.optimization.minimize = false;
+
     config.resolve.fallback = {
       fs: false,
     };
