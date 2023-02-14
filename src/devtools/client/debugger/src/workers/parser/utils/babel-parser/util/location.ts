@@ -20,12 +20,14 @@ export class Position {
 export class SourceLocation {
   start: Position;
   end: Position;
+  // @ts-expect-error
   filename: string;
   identifierName: string | undefined | null;
 
   constructor(start: Position, end?: Position) {
     this.start = start;
     // (may start as null, but initialized later)
+    // @ts-expect-error
     this.end = end;
   }
 }
@@ -36,10 +38,7 @@ export class SourceLocation {
  * boundaries, such as TemplateElement ends before tt.templateNonTail. This
  * function does not skip whitespaces.
  */
-export function createPositionWithColumnOffset(
-  position: Position,
-  columnOffset: number,
-) {
+export function createPositionWithColumnOffset(position: Position, columnOffset: number) {
   const { line, column, index } = position;
   return new Position(line, column + columnOffset, index + columnOffset);
 }

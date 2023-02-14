@@ -2,6 +2,7 @@ src/devtools/client/debugger/**/fixtures/**
 node_modules
 src/devtools/client/shared/vendor/
 src/devtools/client/shared/sourceeditor/codemirror
+src/devtools/client/debugger/src/parser/utils/babel-parser/
 packages/third-party/
 public/test/examples
 packages/accordion/website/

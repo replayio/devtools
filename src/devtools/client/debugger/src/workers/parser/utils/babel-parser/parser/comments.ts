@@ -1,8 +1,9 @@
 /*:: declare var invariant; */
 
-import BaseParser from "./base";
-import type { Comment, Node } from "../types";
 import * as charCodes from "charcodes";
+
+import type { Comment, Node } from "../types";
+import BaseParser from "./base";
 import type { Undone } from "./node";
 
 /**
@@ -66,14 +67,11 @@ function setLeadingComments(node: Undone<Node>, comments: Array<Comment>) {
  * innerComments. New comments will be placed before old comments
  * because the commentStack is enumerated reversely.
  */
-export function setInnerComments(
-  node: Undone<Node>,
-  comments?: Array<Comment>,
-) {
+export function setInnerComments(node: Undone<Node>, comments?: Array<Comment>) {
   if (node.innerComments === undefined) {
     node.innerComments = comments;
   } else {
-    node.innerComments.unshift(...comments);
+    node.innerComments.unshift(...(comments ?? []));
   }
 }
 
@@ -85,7 +83,7 @@ export function setInnerComments(
 function adjustInnerComments(
   node: Undone<Node>,
   elements: Array<Node>,
-  commentWS: CommentWhitespace,
+  commentWS: CommentWhitespace
 ) {
   let lastElement = null;
   let i = elements.length;
@@ -166,15 +164,15 @@ export default class CommentsParser extends BaseParser {
         // If a commentWhitespace follows a comma and the containingNode allows
         // list structures with trailing comma, merge it to the trailingComment
         // of the last non-null list element
-        switch (node.type) {
+        switch (node!.type) {
           case "ObjectExpression":
           case "ObjectPattern":
           case "RecordExpression":
-            adjustInnerComments(node, node.properties, commentWS);
+            adjustInnerComments(node!, node!.properties, commentWS);
             break;
           case "CallExpression":
           case "OptionalCallExpression":
-            adjustInnerComments(node, node.arguments, commentWS);
+            adjustInnerComments(node!, node!.arguments, commentWS);
             break;
           case "FunctionDeclaration":
           case "FunctionExpression":
@@ -182,23 +180,23 @@ export default class CommentsParser extends BaseParser {
           case "ObjectMethod":
           case "ClassMethod":
           case "ClassPrivateMethod":
-            adjustInnerComments(node, node.params, commentWS);
+            adjustInnerComments(node!, node!.params, commentWS);
             break;
           case "ArrayExpression":
           case "ArrayPattern":
           case "TupleExpression":
-            adjustInnerComments(node, node.elements, commentWS);
+            adjustInnerComments(node!, node!.elements, commentWS);
             break;
           case "ExportNamedDeclaration":
           case "ImportDeclaration":
-            adjustInnerComments(node, node.specifiers, commentWS);
+            adjustInnerComments(node!, node!.specifiers, commentWS);
             break;
           default: {
-            setInnerComments(node, comments);
+            setInnerComments(node!, comments);
           }
         }
       } else {
-        setInnerComments(node, comments);
+        setInnerComments(node!, comments);
       }
     }
   }

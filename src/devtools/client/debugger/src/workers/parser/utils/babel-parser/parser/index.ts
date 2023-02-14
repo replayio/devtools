@@ -1,9 +1,9 @@
 import type { Options } from "../options";
-import type * as N from "../types";
-import type { PluginList } from "../plugin-utils";
 import { getOptions } from "../options";
-import StatementParser from "./statement";
+import type { PluginList } from "../plugin-utils";
+import type * as N from "../types";
 import ScopeHandler from "../util/scope";
+import StatementParser from "./statement";
 
 export type PluginsMap = Map<
   string,
@@ -41,6 +41,7 @@ export default class Parser extends StatementParser {
     const file = this.startNode() as N.File;
     const program = this.startNode() as N.Program;
     this.nextToken();
+    // @ts-expect-error
     file.errors = null;
     this.parseTopLevel(file, program);
     file.errors = this.state.errors;

@@ -1,4 +1,6 @@
+// @ts-expect-error
 const entities: {
+  // @ts-expect-error
   __proto__: null;
   [name: string]: string;
 } = {

@@ -1,12 +1,11 @@
 import type { Options } from "../options";
-import type * as N from "../types";
-import type { CommentWhitespace } from "../parser/comments";
-import { Position } from "../util/location";
-
-import { types as ct, type TokContext } from "./context";
-import { tt, type TokenType } from "./types";
 import type { Errors } from "../parse-error";
-import { type ParseError } from "../parse-error";
+import { ParseError } from "../parse-error";
+import type { CommentWhitespace } from "../parser/comments";
+import type * as N from "../types";
+import { Position } from "../util/location";
+import { TokContext, types as ct } from "./context";
+import { TokenType, tt } from "./types";
 
 export type DeferredStrictError =
   | typeof Errors.StrictNumericEscape
@@ -25,22 +24,23 @@ type TopicContextState = {
 };
 
 export default class State {
+  // @ts-expect-error
   strict: boolean;
+  // @ts-expect-error
   curLine: number;
+  // @ts-expect-error
   lineStart: number;
 
   // And, if locations are used, the {line, column} object
   // corresponding to those offsets
+  // @ts-expect-error
   startLoc: Position;
+  // @ts-expect-error
   endLoc: Position;
 
   init({ strictMode, sourceType, startLine, startColumn }: Options): void {
     this.strict =
-      strictMode === false
-        ? false
-        : strictMode === true
-        ? true
-        : sourceType === "module";
+      strictMode === false ? false : strictMode === true ? true : sourceType === "module";
 
     this.curLine = startLine;
     this.lineStart = -startColumn;
@@ -114,8 +114,10 @@ export default class State {
 
   // Position information for the previous token
   // this is initialized when generating the second token.
+  // @ts-expect-error
   lastTokEndLoc: Position = null;
   // this is initialized when generating the second token.
+  // @ts-expect-error
   lastTokStartLoc: Position = null;
   lastTokStart: number = 0;
 

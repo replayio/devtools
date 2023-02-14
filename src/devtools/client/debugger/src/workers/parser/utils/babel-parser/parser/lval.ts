@@ -178,6 +178,7 @@ export default abstract class LValParser extends NodeUtils {
 
       case "ParenthesizedExpression":
         /*::invariant (parenthesized !== undefined) */
+        // @ts-expect-error
         this.toAssignable(parenthesized, isLHS);
         break;
 
@@ -269,6 +270,7 @@ export default abstract class LValParser extends NodeUtils {
 
       case "ArrayExpression":
         return (node as ArrayExpression).elements.every(
+          // @ts-expect-error
           element => element === null || this.isAssignable(element)
         );
 
@@ -370,6 +372,7 @@ export default abstract class LValParser extends NodeUtils {
         this.expect(tt.comma);
       }
       if (allowEmpty && this.match(tt.comma)) {
+        // @ts-expect-error
         elts.push(null);
       } else if (this.eat(close)) {
         break;

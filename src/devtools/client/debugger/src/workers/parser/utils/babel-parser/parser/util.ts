@@ -1,29 +1,17 @@
-import { type Position } from "../util/location";
-import {
-  tokenIsLiteralPropertyName,
-  tt,
-  type TokenType,
-} from "../tokenizer/types";
+import { Errors, ParseError, ParseErrorConstructor } from "../parse-error";
 import Tokenizer from "../tokenizer";
 import type State from "../tokenizer/state";
+import { TokenType, tokenIsLiteralPropertyName, tt } from "../tokenizer/types";
 import type { EstreePropertyDefinition, Node, ObjectProperty } from "../types";
-import { lineBreak, skipWhiteSpaceToLineBreak } from "../util/whitespace";
-import { isIdentifierChar } from "../util/identifier";
 import ClassScopeHandler from "../util/class-scope";
 import ExpressionScopeHandler from "../util/expression-scope";
-import { SCOPE_PROGRAM } from "../util/scopeflags";
-import ProductionParameterHandler, {
-  PARAM_AWAIT,
-  PARAM,
-} from "../util/production-parameter";
-import {
-  Errors,
-  type ParseError,
-  type ParseErrorConstructor,
-} from "../parse-error";
-import type Parser from ".";
-
+import { isIdentifierChar } from "../util/identifier";
+import { Position } from "../util/location";
+import ProductionParameterHandler, { PARAM, PARAM_AWAIT } from "../util/production-parameter";
 import type ScopeHandler from "../util/scope";
+import { SCOPE_PROGRAM } from "../util/scopeflags";
+import { lineBreak, skipWhiteSpaceToLineBreak } from "../util/whitespace";
+import type Parser from ".";
 
 type TryParse<Node, Error, Thrown, Aborted, FailState> = {
   node: Node;
@@ -39,12 +27,7 @@ export default abstract class UtilParser extends Tokenizer {
   // Forward-declaration: defined in parser/index.js
   abstract getScopeHandler(): { new (...args: any): ScopeHandler };
 
-  addExtra(
-    node: Partial<Node>,
-    key: string,
-    value: any,
-    enumerable: boolean = true,
-  ): void {
+  addExtra(node: Partial<Node>, key: string, value: any, enumerable: boolean = true): void {
     if (!node) return;
 
     const extra = (node.extra = node.extra || {});
@@ -93,10 +76,7 @@ export default abstract class UtilParser extends Tokenizer {
 
   // Asserts that following token is given contextual keyword.
 
-  expectContextual(
-    token: TokenType,
-    toParseError?: ParseErrorConstructor<any>,
-  ): void {
+  expectContextual(token: TokenType, toParseError?: ParseErrorConstructor<any>): void {
     if (!this.eatContextual(token)) {
       if (toParseError != null) {
         throw this.raise(toParseError, { at: this.state.startLoc });
@@ -108,17 +88,11 @@ export default abstract class UtilParser extends Tokenizer {
   // Test whether a semicolon can be inserted at the current position.
 
   canInsertSemicolon(): boolean {
-    return (
-      this.match(tt.eof) ||
-      this.match(tt.braceR) ||
-      this.hasPrecedingLineBreak()
-    );
+    return this.match(tt.eof) || this.match(tt.braceR) || this.hasPrecedingLineBreak();
   }
 
   hasPrecedingLineBreak(): boolean {
-    return lineBreak.test(
-      this.input.slice(this.state.lastTokEndLoc.index, this.state.start),
-    );
+    return lineBreak.test(this.input.slice(this.state.lastTokEndLoc.index, this.state.start));
   }
 
   hasFollowingLineBreak(): boolean {
@@ -149,7 +123,7 @@ export default abstract class UtilParser extends Tokenizer {
   // It is expensive and should be used with cautions
   tryParse<T extends Node | ReadonlyArray<Node>>(
     fn: (abort: (node?: T) => never) => T,
-    oldState: State = this.state.clone(),
+    oldState: State = this.state.clone()
   ):
     | TryParse<T, null, false, false, null>
     | TryParse<T | null, ParseError<any>, boolean, false, State>
@@ -158,6 +132,7 @@ export default abstract class UtilParser extends Tokenizer {
       node: T | null;
     } = { node: null };
     try {
+      // @ts-expect-error
       const node = fn((node = null) => {
         abortSignal.node = node;
         throw abortSignal;
@@ -208,21 +183,14 @@ export default abstract class UtilParser extends Tokenizer {
 
   checkExpressionErrors(
     refExpressionErrors: ExpressionErrors | undefined | null,
-    andThrow: boolean,
+    andThrow: boolean
   ) {
     if (!refExpressionErrors) return false;
-    const {
-      shorthandAssignLoc,
-      doubleProtoLoc,
-      privateKeyLoc,
-      optionalParametersLoc,
-    } = refExpressionErrors;
+    const { shorthandAssignLoc, doubleProtoLoc, privateKeyLoc, optionalParametersLoc } =
+      refExpressionErrors;
 
     const hasErrors =
-      !!shorthandAssignLoc ||
-      !!doubleProtoLoc ||
-      !!optionalParametersLoc ||
-      !!privateKeyLoc;
+      !!shorthandAssignLoc || !!doubleProtoLoc || !!optionalParametersLoc || !!privateKeyLoc;
 
     if (!andThrow) {
       return hasErrors;
@@ -284,22 +252,16 @@ export default abstract class UtilParser extends Tokenizer {
    */
   hasPropertyAsPrivateName(node: Node): boolean {
     return (
-      (node.type === "MemberExpression" ||
-        node.type === "OptionalMemberExpression") &&
+      (node.type === "MemberExpression" || node.type === "OptionalMemberExpression") &&
       this.isPrivateName(node.property)
     );
   }
 
   isOptionalChain(node: Node): boolean {
-    return (
-      node.type === "OptionalMemberExpression" ||
-      node.type === "OptionalCallExpression"
-    );
+    return node.type === "OptionalMemberExpression" || node.type === "OptionalCallExpression";
   }
 
-  isObjectProperty(
-    node: Node,
-  ): node is ObjectProperty | EstreePropertyDefinition {
+  isObjectProperty(node: Node): node is ObjectProperty | EstreePropertyDefinition {
     return node.type === "ObjectProperty";
   }
 
@@ -309,7 +271,7 @@ export default abstract class UtilParser extends Tokenizer {
 
   initializeScopes(
     this: Parser,
-    inModule: boolean = this.options.sourceType === "module",
+    inModule: boolean = this.options.sourceType === "module"
   ): () => void {
     // Initialize state
     const oldLabels = this.state.labels;

@@ -1,11 +1,11 @@
-import {
-  CLASS_ELEMENT_KIND_ACCESSOR,
-  CLASS_ELEMENT_FLAG_STATIC,
-  type ClassElementTypes,
-} from "./scopeflags";
-import type { Position } from "./location";
 import { Errors } from "../parse-error";
 import type Tokenizer from "../tokenizer";
+import type { Position } from "./location";
+import {
+  CLASS_ELEMENT_FLAG_STATIC,
+  CLASS_ELEMENT_KIND_ACCESSOR,
+  ClassElementTypes,
+} from "./scopeflags";
 
 export class ClassScope {
   // A list of private named declared in the current class
@@ -45,6 +45,7 @@ export default class ClassScopeHandler {
     const current = this.current();
 
     // Array.from is needed because this is compiled to an array-like for loop
+    // @ts-expect-error
     for (const [name, loc] of Array.from(oldClassScope.undefinedPrivateNames)) {
       if (current) {
         if (!current.undefinedPrivateNames.has(name)) {
@@ -59,13 +60,8 @@ export default class ClassScopeHandler {
     }
   }
 
-  declarePrivateName(
-    name: string,
-    elementType: ClassElementTypes,
-    loc: Position,
-  ) {
-    const { privateNames, loneAccessors, undefinedPrivateNames } =
-      this.current();
+  declarePrivateName(name: string, elementType: ClassElementTypes, loc: Position) {
+    const { privateNames, loneAccessors, undefinedPrivateNames } = this.current();
     let redefined = privateNames.has(name);
 
     if (elementType & CLASS_ELEMENT_KIND_ACCESSOR) {

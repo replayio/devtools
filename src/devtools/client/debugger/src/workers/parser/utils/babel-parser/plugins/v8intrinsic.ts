@@ -1,11 +1,11 @@
 import type Parser from "../parser";
+import type { ExpressionErrors } from "../parser/util";
 import { tokenIsIdentifier, tt } from "../tokenizer/types";
 import type * as N from "../types";
-import type { ExpressionErrors } from "../parser/util";
 
 export default (superClass: typeof Parser) =>
   class V8IntrinsicMixin extends superClass implements Parser {
-    parseV8Intrinsic(): N.Expression {
+    parseV8Intrinsic(): N.Expression | undefined {
       if (this.match(tt.modulo)) {
         const v8IntrinsicStartLoc = this.state.startLoc;
         // let the `loc` of Identifier starts from `%`
@@ -29,8 +29,7 @@ export default (superClass: typeof Parser) =>
      * ============================================================ */
 
     parseExprAtom(refExpressionErrors?: ExpressionErrors | null): N.Expression {
-      return (
-        this.parseV8Intrinsic() || super.parseExprAtom(refExpressionErrors)
-      );
+      // @ts-expect-error
+      return this.parseV8Intrinsic() || super.parseExprAtom(refExpressionErrors);
     }
   };

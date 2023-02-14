@@ -1,48 +1,50 @@
+/* eslint-disable */
 /*:: declare var invariant; */
 
+import * as charCodes from "charcodes";
+
+import { Errors, ParseErrorEnum } from "../../parse-error";
+import type Parser from "../../parser";
+import { ParseBindingListFlags } from "../../parser/lval";
+import { Undone, cloneIdentifier } from "../../parser/node";
+import type { ParseStatementFlag } from "../../parser/statement";
+import type { ExpressionErrors } from "../../parser/util";
+import { types as tc } from "../../tokenizer/context";
 import type State from "../../tokenizer/state";
 import {
+  TokenType,
+  tokenCanStartExpression,
   tokenIsIdentifier,
+  tokenIsKeywordOrIdentifier,
   tokenIsTSDeclarationStart,
   tokenIsTSTypeOperator,
-  tokenOperatorPrecedence,
-  tokenIsKeywordOrIdentifier,
-  tt,
-  type TokenType,
   tokenIsTemplate,
-  tokenCanStartExpression,
+  tokenOperatorPrecedence,
+  tt,
 } from "../../tokenizer/types";
-import { types as tc } from "../../tokenizer/context";
 import type * as N from "../../types";
-import type { Position } from "../../util/location";
-import { createPositionWithColumnOffset } from "../../util/location";
-import type Parser from "../../parser";
-import {
-  type BindingTypes,
-  SCOPE_TS_MODULE,
-  SCOPE_OTHER,
-  BIND_TS_ENUM,
-  BIND_TS_CONST_ENUM,
-  BIND_TS_TYPE,
-  BIND_TS_INTERFACE,
-  BIND_TS_AMBIENT,
-  BIND_TS_NAMESPACE,
-  BIND_TS_TYPE_IMPORT,
-  BIND_CLASS,
-  BIND_NONE,
-  BIND_FLAGS_TS_IMPORT,
-} from "../../util/scopeflags";
-import TypeScriptScopeHandler from "./scope";
-import * as charCodes from "charcodes";
-import type { ExpressionErrors } from "../../parser/util";
-import type { ParseStatementFlag } from "../../parser/statement";
-import { PARAM } from "../../util/production-parameter";
-import { Errors, ParseErrorEnum } from "../../parse-error";
-import { cloneIdentifier, type Undone } from "../../parser/node";
 import type { Pattern } from "../../types";
 import type { Expression } from "../../types";
+import type { Position } from "../../util/location";
+import { createPositionWithColumnOffset } from "../../util/location";
+import { PARAM } from "../../util/production-parameter";
+import {
+  BIND_CLASS,
+  BIND_FLAGS_TS_IMPORT,
+  BIND_NONE,
+  BIND_TS_AMBIENT,
+  BIND_TS_CONST_ENUM,
+  BIND_TS_ENUM,
+  BIND_TS_INTERFACE,
+  BIND_TS_NAMESPACE,
+  BIND_TS_TYPE,
+  BIND_TS_TYPE_IMPORT,
+  BindingTypes,
+  SCOPE_OTHER,
+  SCOPE_TS_MODULE,
+} from "../../util/scopeflags";
 import type { IJSXParserMixin } from "../jsx";
-import { ParseBindingListFlags } from "../../parser/lval";
+import TypeScriptScopeHandler from "./scope";
 
 const getOwn = <T extends {}>(object: T, key: keyof T) =>
   Object.hasOwnProperty.call(object, key) && object[key];
@@ -86,34 +88,24 @@ type ModifierBase = {
 const TSErrors = ParseErrorEnum`typescript`({
   AbstractMethodHasImplementation: ({ methodName }: { methodName: string }) =>
     `Method '${methodName}' cannot have an implementation because it is marked abstract.`,
-  AbstractPropertyHasInitializer: ({
-    propertyName,
-  }: {
-    propertyName: string;
-  }) =>
+  AbstractPropertyHasInitializer: ({ propertyName }: { propertyName: string }) =>
     `Property '${propertyName}' cannot have an initializer because it is marked abstract.`,
-  AccesorCannotDeclareThisParameter:
-    "'get' and 'set' accessors cannot declare 'this' parameters.",
+  AccesorCannotDeclareThisParameter: "'get' and 'set' accessors cannot declare 'this' parameters.",
   AccesorCannotHaveTypeParameters: "An accessor cannot have type parameters.",
-  AccessorCannotBeOptional:
-    "An 'accessor' property cannot be declared optional.",
+  AccessorCannotBeOptional: "An 'accessor' property cannot be declared optional.",
   ClassMethodHasDeclare: "Class methods cannot have the 'declare' modifier.",
   ClassMethodHasReadonly: "Class methods cannot have the 'readonly' modifier.",
   ConstInitiailizerMustBeStringOrNumericLiteralOrLiteralEnumReference:
     "A 'const' initializer in an ambient context must be a string or numeric literal or literal enum reference.",
-  ConstructorHasTypeParameters:
-    "Type parameters cannot appear on a constructor declaration.",
+  ConstructorHasTypeParameters: "Type parameters cannot appear on a constructor declaration.",
   DeclareAccessor: ({ kind }: { kind: "get" | "set" }) =>
     `'declare' is not allowed in ${kind}ters.`,
-  DeclareClassFieldHasInitializer:
-    "Initializers are not allowed in ambient contexts.",
-  DeclareFunctionHasImplementation:
-    "An implementation cannot be declared in ambient contexts.",
+  DeclareClassFieldHasInitializer: "Initializers are not allowed in ambient contexts.",
+  DeclareFunctionHasImplementation: "An implementation cannot be declared in ambient contexts.",
   DuplicateAccessibilityModifier:
     // `Accessibility modifier already seen: ${modifier}` would be more helpful.
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    ({ modifier }: { modifier: N.Accessibility }) =>
-      `Accessibility modifier already seen.`,
+    ({ modifier }: { modifier: N.Accessibility }) => `Accessibility modifier already seen.`,
   DuplicateModifier: ({ modifier }: { modifier: TsModifier }) =>
     `Duplicate modifier: '${modifier}'.`,
   // `token` matches the terminology used by typescript:
@@ -122,75 +114,42 @@ const TSErrors = ParseErrorEnum`typescript`({
     `'${token}' list cannot be empty.`,
   EmptyTypeArguments: "Type argument list cannot be empty.",
   EmptyTypeParameters: "Type parameter list cannot be empty.",
-  ExpectedAmbientAfterExportDeclare:
-    "'export declare' must be followed by an ambient declaration.",
+  ExpectedAmbientAfterExportDeclare: "'export declare' must be followed by an ambient declaration.",
   ImportAliasHasImportType: "An import alias can not use 'import type'.",
-  ImportReflectionHasImportType:
-    "An `import module` declaration can not use `type` modifier",
-  IncompatibleModifiers: ({
-    modifiers,
-  }: {
-    modifiers: [TsModifier, TsModifier];
-  }) =>
+  ImportReflectionHasImportType: "An `import module` declaration can not use `type` modifier",
+  IncompatibleModifiers: ({ modifiers }: { modifiers: [TsModifier, TsModifier] }) =>
     `'${modifiers[0]}' modifier cannot be used with '${modifiers[1]}' modifier.`,
-  IndexSignatureHasAbstract:
-    "Index signatures cannot have the 'abstract' modifier.",
-  IndexSignatureHasAccessibility: ({
-    modifier,
-  }: {
-    modifier: N.Accessibility;
-  }) =>
+  IndexSignatureHasAbstract: "Index signatures cannot have the 'abstract' modifier.",
+  IndexSignatureHasAccessibility: ({ modifier }: { modifier: N.Accessibility }) =>
     `Index signatures cannot have an accessibility modifier ('${modifier}').`,
-  IndexSignatureHasDeclare:
-    "Index signatures cannot have the 'declare' modifier.",
-  IndexSignatureHasOverride:
-    "'override' modifier cannot appear on an index signature.",
-  IndexSignatureHasStatic:
-    "Index signatures cannot have the 'static' modifier.",
-  InitializerNotAllowedInAmbientContext:
-    "Initializers are not allowed in ambient contexts.",
+  IndexSignatureHasDeclare: "Index signatures cannot have the 'declare' modifier.",
+  IndexSignatureHasOverride: "'override' modifier cannot appear on an index signature.",
+  IndexSignatureHasStatic: "Index signatures cannot have the 'static' modifier.",
+  InitializerNotAllowedInAmbientContext: "Initializers are not allowed in ambient contexts.",
   InvalidModifierOnTypeMember: ({ modifier }: { modifier: TsModifier }) =>
     `'${modifier}' modifier cannot appear on a type member.`,
   InvalidModifierOnTypeParameter: ({ modifier }: { modifier: TsModifier }) =>
     `'${modifier}' modifier cannot appear on a type parameter.`,
-  InvalidModifierOnTypeParameterPositions: ({
-    modifier,
-  }: {
-    modifier: TsModifier;
-  }) =>
+  InvalidModifierOnTypeParameterPositions: ({ modifier }: { modifier: TsModifier }) =>
     `'${modifier}' modifier can only appear on a type parameter of a class, interface or type alias.`,
-  InvalidModifiersOrder: ({
-    orderedModifiers,
-  }: {
-    orderedModifiers: [TsModifier, TsModifier];
-  }) =>
+  InvalidModifiersOrder: ({ orderedModifiers }: { orderedModifiers: [TsModifier, TsModifier] }) =>
     `'${orderedModifiers[0]}' modifier must precede '${orderedModifiers[1]}' modifier.`,
   InvalidPropertyAccessAfterInstantiationExpression:
     "Invalid property access after an instantiation expression. " +
     "You can either wrap the instantiation expression in parentheses, or delete the type arguments.",
-  InvalidTupleMemberLabel:
-    "Tuple members must be labeled with a simple identifier.",
-  MissingInterfaceName:
-    "'interface' declarations must be followed by an identifier.",
-  MixedLabeledAndUnlabeledElements:
-    "Tuple members must all have names or all not have names.",
-  NonAbstractClassHasAbstractMethod:
-    "Abstract methods can only appear within an abstract class.",
+  InvalidTupleMemberLabel: "Tuple members must be labeled with a simple identifier.",
+  MissingInterfaceName: "'interface' declarations must be followed by an identifier.",
+  MixedLabeledAndUnlabeledElements: "Tuple members must all have names or all not have names.",
+  NonAbstractClassHasAbstractMethod: "Abstract methods can only appear within an abstract class.",
   NonClassMethodPropertyHasAbstractModifer:
     "'abstract' modifier can only appear on a class, method, or property declaration.",
-  OptionalTypeBeforeRequired:
-    "A required element cannot follow an optional element.",
+  OptionalTypeBeforeRequired: "A required element cannot follow an optional element.",
   OverrideNotInSubClass:
     "This member cannot have an 'override' modifier because its containing class does not extend another class.",
   PatternIsOptional:
     "A binding pattern parameter cannot be optional in an implementation signature.",
-  PrivateElementHasAbstract:
-    "Private elements cannot have the 'abstract' modifier.",
-  PrivateElementHasAccessibility: ({
-    modifier,
-  }: {
-    modifier: N.Accessibility;
-  }) =>
+  PrivateElementHasAbstract: "Private elements cannot have the 'abstract' modifier.",
+  PrivateElementHasAccessibility: ({ modifier }: { modifier: N.Accessibility }) =>
     `Private elements cannot have an accessibility modifier ('${modifier}').`,
   ReadonlyForMethodSignature:
     "'readonly' modifier can only appear on a property declaration or index signature.",
@@ -199,20 +158,12 @@ const TSErrors = ParseErrorEnum`typescript`({
   ReservedTypeAssertion:
     "This syntax is reserved in files with the .mts or .cts extension. Use an `as` expression instead.",
   // TODO: Accesor -> Accessor
-  SetAccesorCannotHaveOptionalParameter:
-    "A 'set' accessor cannot have an optional parameter.",
-  SetAccesorCannotHaveRestParameter:
-    "A 'set' accessor cannot have rest parameter.",
-  SetAccesorCannotHaveReturnType:
-    "A 'set' accessor cannot have a return type annotation.",
-  SingleTypeParameterWithoutTrailingComma: ({
-    typeParameterName,
-  }: {
-    typeParameterName: string;
-  }) =>
+  SetAccesorCannotHaveOptionalParameter: "A 'set' accessor cannot have an optional parameter.",
+  SetAccesorCannotHaveRestParameter: "A 'set' accessor cannot have rest parameter.",
+  SetAccesorCannotHaveReturnType: "A 'set' accessor cannot have a return type annotation.",
+  SingleTypeParameterWithoutTrailingComma: ({ typeParameterName }: { typeParameterName: string }) =>
     `Single type parameter ${typeParameterName} should have a trailing comma. Example usage: <${typeParameterName},>.`,
-  StaticBlockCannotHaveModifier:
-    "Static class blocks cannot have any modifier.",
+  StaticBlockCannotHaveModifier: "Static class blocks cannot have any modifier.",
   TypeAnnotationAfterAssign:
     "Type annotations must come before default assignments, e.g. instead of `age = 25: number` use `age: number = 25`.",
   TypeImportCannotSpecifyDefaultAndNamed:
@@ -227,8 +178,7 @@ const TSErrors = ParseErrorEnum`typescript`({
     "'readonly' type modifier is only permitted on array and tuple literal types.",
   UnexpectedTypeAnnotation: "Did not expect a type annotation here.",
   UnexpectedTypeCastInParameter: "Unexpected type cast in parameter position.",
-  UnsupportedImportTypeArgument:
-    "Argument in a type import must be a string literal.",
+  UnsupportedImportTypeArgument: "Argument in a type import must be a string literal.",
   UnsupportedParameterPropertyKind:
     "A parameter property may not be declared using a binding pattern.",
   UnsupportedSignatureParameterKind: ({ type }: { type: string }) =>
@@ -267,21 +217,16 @@ function keywordTypeFromName(value: string): N.TsKeywordTypeType | undefined {
 }
 
 function tsIsAccessModifier(modifier: string): modifier is N.Accessibility {
-  return (
-    modifier === "private" || modifier === "public" || modifier === "protected"
-  );
+  return modifier === "private" || modifier === "public" || modifier === "protected";
 }
 
-function tsIsVarianceAnnotations(
-  modifier: string,
-): modifier is N.VarianceAnnotations {
+function tsIsVarianceAnnotations(modifier: string): modifier is N.VarianceAnnotations {
   return modifier === "in" || modifier === "out";
 }
 
-type ClassWithMixin<
-  T extends new (...args: any) => any,
-  M extends object,
-> = T extends new (...args: infer P) => infer I
+type ClassWithMixin<T extends new (...args: any) => any, M extends object> = T extends new (
+  ...args: infer P
+) => infer I
   ? new (...args: P) => I & M
   : never;
 
@@ -323,7 +268,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     /** Parses a modifier matching one the given modifier names. */
     tsParseModifier<T extends TsModifier>(
       allowedModifiers: T[],
-      stopOnStartOfClassStaticBlock?: boolean,
+      stopOnStartOfClassStaticBlock?: boolean
     ): T | undefined | null {
       if (!tokenIsIdentifier(this.state.type) && this.state.type !== tt._in) {
         return undefined;
@@ -364,7 +309,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         loc: Position,
         modifier: TsModifier,
         before: TsModifier,
-        after: TsModifier,
+        after: TsModifier
       ) => {
         if (modifier === before && modified[after]) {
           this.raise(TSErrors.InvalidModifiersOrder, {
@@ -377,12 +322,9 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         loc: Position,
         modifier: TsModifier,
         mod1: TsModifier,
-        mod2: TsModifier,
+        mod2: TsModifier
       ) => {
-        if (
-          (modified[mod1] && modifier === mod2) ||
-          (modified[mod2] && modifier === mod1)
-        ) {
+        if ((modified[mod1] && modifier === mod2) || (modified[mod2] && modifier === mod1)) {
           this.raise(TSErrors.IncompatibleModifiers, {
             at: loc,
             modifiers: [mod1, mod2],
@@ -394,7 +336,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         const { startLoc } = this.state;
         const modifier: TsModifier | undefined | null = this.tsParseModifier(
           allowedModifiers.concat(disallowedModifiers ?? []),
-          stopOnStartOfClassStaticBlock,
+          stopOnStartOfClassStaticBlock
         );
 
         if (!modifier) break;
@@ -459,10 +401,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       throw new Error("Unreachable");
     }
 
-    tsParseList<T extends N.Node>(
-      kind: ParsingContext,
-      parseElement: () => T,
-    ): T[] {
+    tsParseList<T extends N.Node>(kind: ParsingContext, parseElement: () => T): T[] {
       const result: T[] = [];
       while (!this.tsIsListTerminator(kind)) {
         // Skipping "parseListElement" from the TS source since that's just for error handling.
@@ -476,15 +415,15 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       parseElement: () => T,
       refTrailingCommaPos?: {
         value: number;
-      },
+      }
     ): T[] {
       return nonNull(
         this.tsParseDelimitedListWorker(
           kind,
           parseElement,
           /* expectSuccess */ true,
-          refTrailingCommaPos,
-        ),
+          refTrailingCommaPos
+        )
       );
     }
 
@@ -498,7 +437,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       expectSuccess: boolean,
       refTrailingCommaPos?: {
         value: number;
-      },
+      }
     ): T[] | undefined | null {
       const result = [];
       let trailingCommaPos = -1;
@@ -545,7 +484,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       skipFirstToken: boolean,
       refTrailingCommaPos?: {
         value: number;
-      },
+      }
     ): T[] {
       if (!skipFirstToken) {
         if (bracket) {
@@ -555,11 +494,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         }
       }
 
-      const result = this.tsParseDelimitedList(
-        kind,
-        parseElement,
-        refTrailingCommaPos,
-      );
+      const result = this.tsParseDelimitedList(kind, parseElement, refTrailingCommaPos);
 
       if (bracket) {
         this.expect(tt.bracketR);
@@ -598,8 +533,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     tsParseEntityName(allowReservedWords: boolean = true): N.TsEntityName {
       let entity: N.TsEntityName = this.parseIdentifier(allowReservedWords);
       while (this.eat(tt.dot)) {
-        const node: Undone<N.TsQualifiedName> =
-          this.startNodeAtNode<N.TsQualifiedName>(entity);
+        const node: Undone<N.TsQualifiedName> = this.startNodeAtNode<N.TsQualifiedName>(entity);
         node.left = entity;
         node.right = this.parseIdentifier(allowReservedWords);
         entity = this.finishNode(node, "TSQualifiedName");
@@ -673,9 +607,10 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     }
 
     tsParseTypeParameter(
-      parseModifiers: (
-        node: Undone<N.TsTypeParameter>,
-      ) => void = this.tsParseNoneModifiers.bind(this),
+      // @ts-expect-error
+      parseModifiers: (node: Undone<N.TsTypeParameter>) => void = this.tsParseNoneModifiers.bind(
+        this
+      )
     ): N.TsTypeParameter {
       const node = this.startNode<N.TsTypeParameter>();
 
@@ -688,16 +623,14 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     }
 
     tsTryParseTypeParameters(
-      parseModifiers?: ((node: N.TsTypeParameter) => void) | null,
+      parseModifiers?: ((node: N.TsTypeParameter) => void) | null
     ): N.TsTypeParameterDeclaration | undefined | null {
       if (this.match(tt.lt)) {
         return this.tsParseTypeParameters(parseModifiers);
       }
     }
 
-    tsParseTypeParameters(
-      parseModifiers?: ((node: N.TsTypeParameter) => void) | null,
-    ) {
+    tsParseTypeParameters(parseModifiers?: ((node: N.TsTypeParameter) => void) | null) {
       const node = this.startNode<N.TsTypeParameterDeclaration>();
 
       if (this.match(tt.lt) || this.match(tt.jsxTagStart)) {
@@ -714,7 +647,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         this.tsParseTypeParameter.bind(this, parseModifiers),
         /* bracket */ false,
         /* skipFirstToken */ true,
-        refTrailingCommaPos,
+        refTrailingCommaPos
       );
       if (node.params.length === 0) {
         this.raise(TSErrors.EmptyTypeParameters, { at: node });
@@ -727,28 +660,21 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
     // Note: In TypeScript implementation we must provide `yieldContext` and `awaitContext`,
     // but here it's always false, because this is only used for types.
-    tsFillSignature(
-      returnToken: TokenType,
-      signature: Undone<N.TsSignatureDeclaration>,
-    ): void {
+    tsFillSignature(returnToken: TokenType, signature: Undone<N.TsSignatureDeclaration>): void {
       // Arrow fns *must* have return token (`=>`). Normal functions can omit it.
       const returnTokenRequired = returnToken === tt.arrow;
 
       // https://github.com/babel/babel/issues/9231
       const paramsKey = process.env.BABEL_8_BREAKING ? "params" : "parameters";
-      const returnTypeKey = process.env.BABEL_8_BREAKING
-        ? "returnType"
-        : "typeAnnotation";
+      const returnTypeKey = process.env.BABEL_8_BREAKING ? "returnType" : "typeAnnotation";
 
       signature.typeParameters = this.tsTryParseTypeParameters();
       this.expect(tt.parenL);
       signature[paramsKey] = this.tsParseBindingListForSignature();
       if (returnTokenRequired) {
-        signature[returnTypeKey] =
-          this.tsParseTypeOrTypePredicateAnnotation(returnToken);
+        signature[returnTypeKey] = this.tsParseTypeOrTypePredicateAnnotation(returnToken);
       } else if (this.match(returnToken)) {
-        signature[returnTypeKey] =
-          this.tsParseTypeOrTypePredicateAnnotation(returnToken);
+        signature[returnTypeKey] = this.tsParseTypeOrTypePredicateAnnotation(returnToken);
       }
     }
 
@@ -759,7 +685,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         .parseBindingList(
           tt.parenR,
           charCodes.rightParenthesis,
-          ParseBindingListFlags.IS_FUNCTION_PARAMS,
+          ParseBindingListFlags.IS_FUNCTION_PARAMS
         )
         .map(pattern => {
           if (
@@ -785,9 +711,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
     tsParseSignatureMember(
       kind: "TSCallSignatureDeclaration" | "TSConstructSignatureDeclaration",
-      node: Undone<
-        N.TsCallSignatureDeclaration | N.TsConstructSignatureDeclaration
-      >,
+      node: Undone<N.TsCallSignatureDeclaration | N.TsConstructSignatureDeclaration>
     ): N.TsCallSignatureDeclaration | N.TsConstructSignatureDeclaration {
       this.tsFillSignature(tt.colon, node);
       this.tsParseTypeMemberSemicolon();
@@ -804,7 +728,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     }
 
     tsTryParseIndexSignature(
-      node: Undone<N.TsIndexSignature>,
+      node: Undone<N.TsIndexSignature>
     ): N.TsIndexSignature | undefined | null {
       if (
         !(
@@ -831,7 +755,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
     tsParsePropertyOrMethodSignature(
       node: N.TsPropertySignature | N.TsMethodSignature,
-      readonly: boolean,
+      readonly: boolean
     ): N.TsPropertySignature | N.TsMethodSignature {
       if (this.eat(tt.question)) node.optional = true;
       const nodeAny: any = node;
@@ -848,12 +772,8 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         }
         this.tsFillSignature(tt.colon, method);
         this.tsParseTypeMemberSemicolon();
-        const paramsKey = process.env.BABEL_8_BREAKING
-          ? "params"
-          : "parameters";
-        const returnTypeKey = process.env.BABEL_8_BREAKING
-          ? "returnType"
-          : "typeAnnotation";
+        const paramsKey = process.env.BABEL_8_BREAKING ? "params" : "parameters";
+        const returnTypeKey = process.env.BABEL_8_BREAKING ? "returnType" : "typeAnnotation";
         if (method.kind === "get") {
           if (method[paramsKey].length > 0) {
             this.raise(Errors.BadGetterArity, { at: this.state.curPosition() });
@@ -873,10 +793,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
                 at: this.state.curPosition(),
               });
             }
-            if (
-              firstParameter.type === "Identifier" &&
-              firstParameter.optional
-            ) {
+            if (firstParameter.type === "Identifier" && firstParameter.optional) {
               this.raise(TSErrors.SetAccesorCannotHaveOptionalParameter, {
                 at: this.state.curPosition(),
               });
@@ -889,6 +806,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
           }
           if (method[returnTypeKey]) {
             this.raise(TSErrors.SetAccesorCannotHaveReturnType, {
+              // @ts-expect-error
               at: method[returnTypeKey],
             });
           }
@@ -917,10 +835,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         const id = this.startNode<N.Identifier>();
         this.next();
         if (this.match(tt.parenL) || this.match(tt.lt)) {
-          return this.tsParseSignatureMember(
-            "TSConstructSignatureDeclaration",
-            node,
-          );
+          return this.tsParseSignatureMember("TSConstructSignatureDeclaration", node);
         } else {
           node.key = this.createIdentifier(id, "new");
           return this.tsParsePropertyOrMethodSignature(node, false);
@@ -967,10 +882,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
     tsParseObjectTypeMembers(): Array<N.TsTypeElement> {
       this.expect(tt.braceL);
-      const members = this.tsParseList(
-        "TypeMembers",
-        this.tsParseTypeMember.bind(this),
-      );
+      const members = this.tsParseList("TypeMembers", this.tsParseTypeMember.bind(this));
       this.expect(tt.braceR);
       return members;
     }
@@ -1041,7 +953,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         "TupleElementTypes",
         this.tsParseTupleElementType.bind(this),
         /* bracket */ true,
-        /* skipFirstToken */ false,
+        /* skipFirstToken */ false
       );
 
       // Validate the elementTypes to ensure that no mandatory elements
@@ -1063,8 +975,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         }
 
         seenOptionalElement ||=
-          (type === "TSNamedTupleMember" && elementNode.optional) ||
-          type === "TSOptionalType";
+          (type === "TSNamedTupleMember" && elementNode.optional) || type === "TSOptionalType";
 
         // When checking labels, check the argument of the spread operator
         let checkType = type;
@@ -1139,19 +1050,15 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
     tsParseFunctionOrConstructorType(
       type: "TSFunctionType" | "TSConstructorType",
-      abstract?: boolean,
+      abstract?: boolean
     ): N.TsFunctionOrConstructorType {
-      const node = this.startNode<
-        N.TsFunctionOrConstructorType | N.TsConstructorType
-      >();
+      const node = this.startNode<N.TsFunctionOrConstructorType | N.TsConstructorType>();
       if (type === "TSConstructorType") {
         (node as Undone<N.TsConstructorType>).abstract = !!abstract;
         if (abstract) this.next();
         this.next(); // eat `new`
       }
-      this.tsInAllowConditionalTypesContext(() =>
-        this.tsFillSignature(tt.arrow, node),
-      );
+      this.tsInAllowConditionalTypesContext(() => this.tsFillSignature(tt.arrow, node));
       return this.finishNode(node, type);
     }
 
@@ -1245,21 +1152,14 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
           return this.tsParseTemplateLiteralType();
         default: {
           const { type } = this.state;
-          if (
-            tokenIsIdentifier(type) ||
-            type === tt._void ||
-            type === tt._null
-          ) {
+          if (tokenIsIdentifier(type) || type === tt._void || type === tt._null) {
             const nodeType =
               type === tt._void
                 ? "TSVoidKeyword"
                 : type === tt._null
                 ? "TSNullKeyword"
                 : keywordTypeFromName(this.state.value);
-            if (
-              nodeType !== undefined &&
-              this.lookaheadCharCode() !== charCodes.dot
-            ) {
+            if (nodeType !== undefined && this.lookaheadCharCode() !== charCodes.dot) {
               const node = this.startNode<N.TsKeywordType>();
               this.next();
               return this.finishNode(node, nodeType);
@@ -1301,7 +1201,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       if (operator === "readonly") {
         this.tsCheckTypeAnnotationForReadOnly(
           // @ts-expect-error todo(flow->ts)
-          node,
+          node
         );
       }
 
@@ -1323,43 +1223,33 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       this.expectContextual(tt._infer);
       const typeParameter = this.startNode<N.TsTypeParameter>();
       typeParameter.name = this.tsParseTypeParameterName();
-      typeParameter.constraint = this.tsTryParse(() =>
-        this.tsParseConstraintForInferType(),
-      );
+      typeParameter.constraint = this.tsTryParse(() => this.tsParseConstraintForInferType());
       node.typeParameter = this.finishNode(typeParameter, "TSTypeParameter");
       return this.finishNode(node, "TSInferType");
     }
 
     tsParseConstraintForInferType() {
       if (this.eat(tt._extends)) {
-        const constraint = this.tsInDisallowConditionalTypesContext(() =>
-          this.tsParseType(),
-        );
-        if (
-          this.state.inDisallowConditionalTypesContext ||
-          !this.match(tt.question)
-        ) {
+        const constraint = this.tsInDisallowConditionalTypesContext(() => this.tsParseType());
+        if (this.state.inDisallowConditionalTypesContext || !this.match(tt.question)) {
           return constraint;
         }
       }
     }
 
     tsParseTypeOperatorOrHigher(): N.TsType {
-      const isTypeOperator =
-        tokenIsTSTypeOperator(this.state.type) && !this.state.containsEsc;
+      const isTypeOperator = tokenIsTSTypeOperator(this.state.type) && !this.state.containsEsc;
       return isTypeOperator
         ? this.tsParseTypeOperator()
         : this.isContextual(tt._infer)
         ? this.tsParseInferType()
-        : this.tsInAllowConditionalTypesContext(() =>
-            this.tsParseArrayTypeOrHigher(),
-          );
+        : this.tsInAllowConditionalTypesContext(() => this.tsParseArrayTypeOrHigher());
     }
 
     tsParseUnionOrIntersectionType(
       kind: "TSUnionType" | "TSIntersectionType",
       parseConstituentType: () => N.TsType,
-      operator: TokenType,
+      operator: TokenType
     ): N.TsType {
       const node = this.startNode<N.TsUnionType | N.TsIntersectionType>();
       const hasLeadingOperator = this.eat(operator);
@@ -1378,7 +1268,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       return this.tsParseUnionOrIntersectionType(
         "TSIntersectionType",
         this.tsParseTypeOperatorOrHigher.bind(this),
-        tt.bitwiseAND,
+        tt.bitwiseAND
       );
     }
 
@@ -1386,7 +1276,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       return this.tsParseUnionOrIntersectionType(
         "TSUnionType",
         this.tsParseIntersectionTypeOrHigher.bind(this),
-        tt.bitwiseOR,
+        tt.bitwiseOR
       );
     }
 
@@ -1427,7 +1317,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
           super.parseBindingList(
             tt.bracketR,
             charCodes.rightSquareBracket,
-            ParseBindingListFlags.ALLOW_EMPTY,
+            ParseBindingListFlags.ALLOW_EMPTY
           );
           return errors.length === previousErrorCount;
         } catch {
@@ -1469,18 +1359,14 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       return false;
     }
 
-    tsParseTypeOrTypePredicateAnnotation(
-      returnToken: TokenType,
-    ): N.TsTypeAnnotation {
+    tsParseTypeOrTypePredicateAnnotation(returnToken: TokenType): N.TsTypeAnnotation {
       return this.tsInType(() => {
         const t = this.startNode<N.TsTypeAnnotation>();
         this.expect(returnToken);
 
         const node = this.startNode<N.TsTypePredicate>();
 
-        const asserts = !!this.tsTryParse(
-          this.tsParseTypePredicateAsserts.bind(this),
-        );
+        const asserts = !!this.tsTryParse(this.tsParseTypePredicateAsserts.bind(this));
 
         if (asserts && this.match(tt._this)) {
           // When asserts is false, thisKeyword is handled by tsParseNonArrayType
@@ -1502,8 +1388,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         }
 
         const typePredicateVariable =
-          this.tsIsIdentifier() &&
-          this.tsTryParse(this.tsParseTypePredicatePrefix.bind(this));
+          this.tsIsIdentifier() && this.tsTryParse(this.tsParseTypePredicatePrefix.bind(this));
 
         if (!typePredicateVariable) {
           if (!asserts) {
@@ -1529,13 +1414,8 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       });
     }
 
-    tsTryParseTypeOrTypePredicateAnnotation():
-      | N.TsTypeAnnotation
-      | undefined
-      | null {
-      return this.match(tt.colon)
-        ? this.tsParseTypeOrTypePredicateAnnotation(tt.colon)
-        : undefined;
+    tsTryParseTypeOrTypePredicateAnnotation(): N.TsTypeAnnotation | undefined | null {
+      return this.match(tt.colon) ? this.tsParseTypeOrTypePredicateAnnotation(tt.colon) : undefined;
     }
 
     tsTryParseTypeAnnotation(): N.TsTypeAnnotation | undefined | null {
@@ -1576,7 +1456,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
     tsParseTypeAnnotation(
       eatColon = true,
-      t: Undone<N.TsTypeAnnotation> = this.startNode<N.TsTypeAnnotation>(),
+      t: Undone<N.TsTypeAnnotation> = this.startNode<N.TsTypeAnnotation>()
     ): N.TsTypeAnnotation {
       this.tsInType(() => {
         if (eatColon) this.expect(tt.colon);
@@ -1602,26 +1482,20 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       node.checkType = type;
 
       node.extendsType = this.tsInDisallowConditionalTypesContext(() =>
-        this.tsParseNonConditionalType(),
+        this.tsParseNonConditionalType()
       );
 
       this.expect(tt.question);
-      node.trueType = this.tsInAllowConditionalTypesContext(() =>
-        this.tsParseType(),
-      );
+      node.trueType = this.tsInAllowConditionalTypesContext(() => this.tsParseType());
 
       this.expect(tt.colon);
-      node.falseType = this.tsInAllowConditionalTypesContext(() =>
-        this.tsParseType(),
-      );
+      node.falseType = this.tsInAllowConditionalTypesContext(() => this.tsParseType());
 
       return this.finishNode(node, "TSConditionalType");
     }
 
     isAbstractConstructorSignature(): boolean {
-      return (
-        this.isContextual(tt._abstract) && this.lookahead().type === tt._new
-      );
+      return this.isContextual(tt._abstract) && this.lookahead().type === tt._new;
     }
 
     tsParseNonConditionalType(): N.TsType {
@@ -1633,10 +1507,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         return this.tsParseFunctionOrConstructorType("TSConstructorType");
       } else if (this.isAbstractConstructorSignature()) {
         // As in `abstract new () => Date`
-        return this.tsParseFunctionOrConstructorType(
-          "TSConstructorType",
-          /* abstract */ true,
-        );
+        return this.tsParseFunctionOrConstructorType("TSConstructorType", /* abstract */ true);
       }
       return this.tsParseUnionTypeOrHigher();
     }
@@ -1649,32 +1520,25 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       const node = this.startNode<N.TsTypeAssertion>();
       node.typeAnnotation = this.tsInType(() => {
         this.next(); // "<"
-        return this.match(tt._const)
-          ? this.tsParseTypeReference()
-          : this.tsParseType();
+        return this.match(tt._const) ? this.tsParseTypeReference() : this.tsParseType();
       });
       this.expect(tt.gt);
       node.expression = this.parseMaybeUnary();
       return this.finishNode(node, "TSTypeAssertion");
     }
 
-    tsParseHeritageClause(
-      token: "extends" | "implements",
-    ): Array<N.TsExpressionWithTypeArguments> {
+    tsParseHeritageClause(token: "extends" | "implements"): Array<N.TsExpressionWithTypeArguments> {
       const originalStartLoc = this.state.startLoc;
 
-      const delimitedList = this.tsParseDelimitedList(
-        "HeritageClauseElement",
-        () => {
-          const node = this.startNode<N.TsExpressionWithTypeArguments>();
-          node.expression = this.tsParseEntityName();
-          if (this.match(tt.lt)) {
-            node.typeParameters = this.tsParseTypeArguments();
-          }
+      const delimitedList = this.tsParseDelimitedList("HeritageClauseElement", () => {
+        const node = this.startNode<N.TsExpressionWithTypeArguments>();
+        node.expression = this.tsParseEntityName();
+        if (this.match(tt.lt)) {
+          node.typeParameters = this.tsParseTypeArguments();
+        }
 
-          return this.finishNode(node, "TSExpressionWithTypeArguments");
-        },
-      );
+        return this.finishNode(node, "TSExpressionWithTypeArguments");
+      });
 
       if (!delimitedList.length) {
         this.raise(TSErrors.EmptyHeritageClauseType, {
@@ -1690,7 +1554,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       node: Undone<N.TsInterfaceDeclaration>,
       properties: {
         declare?: true;
-      } = {},
+      } = {}
     ): N.TsInterfaceDeclaration | undefined | null {
       if (this.hasFollowingLineBreak()) return null;
       this.expectContextual(tt._interface);
@@ -1703,9 +1567,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         this.raise(TSErrors.MissingInterfaceName, { at: this.state.startLoc });
       }
 
-      node.typeParameters = this.tsTryParseTypeParameters(
-        this.tsParseInOutModifiers.bind(this),
-      );
+      node.typeParameters = this.tsTryParseTypeParameters(this.tsParseInOutModifiers.bind(this));
       if (this.eat(tt._extends)) {
         node.extends = this.tsParseHeritageClause("extends");
       }
@@ -1715,23 +1577,16 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       return this.finishNode(node, "TSInterfaceDeclaration");
     }
 
-    tsParseTypeAliasDeclaration(
-      node: N.TsTypeAliasDeclaration,
-    ): N.TsTypeAliasDeclaration {
+    tsParseTypeAliasDeclaration(node: N.TsTypeAliasDeclaration): N.TsTypeAliasDeclaration {
       node.id = this.parseIdentifier();
       this.checkIdentifier(node.id, BIND_TS_TYPE);
 
       node.typeAnnotation = this.tsInType(() => {
-        node.typeParameters = this.tsTryParseTypeParameters(
-          this.tsParseInOutModifiers.bind(this),
-        );
+        node.typeParameters = this.tsTryParseTypeParameters(this.tsParseInOutModifiers.bind(this));
 
         this.expect(tt.eq);
 
-        if (
-          this.isContextual(tt._intrinsic) &&
-          this.lookahead().type !== tt.dot
-        ) {
+        if (this.isContextual(tt._intrinsic) && this.lookahead().type !== tt.dot) {
           const node = this.startNode<N.TsKeywordType>();
           this.next();
           return this.finishNode(node, "TSIntrinsicKeyword");
@@ -1770,26 +1625,22 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     }
 
     tsInDisallowConditionalTypesContext<T>(cb: () => T): T {
-      const oldInDisallowConditionalTypesContext =
-        this.state.inDisallowConditionalTypesContext;
+      const oldInDisallowConditionalTypesContext = this.state.inDisallowConditionalTypesContext;
       this.state.inDisallowConditionalTypesContext = true;
       try {
         return cb();
       } finally {
-        this.state.inDisallowConditionalTypesContext =
-          oldInDisallowConditionalTypesContext;
+        this.state.inDisallowConditionalTypesContext = oldInDisallowConditionalTypesContext;
       }
     }
 
     tsInAllowConditionalTypesContext<T>(cb: () => T): T {
-      const oldInDisallowConditionalTypesContext =
-        this.state.inDisallowConditionalTypesContext;
+      const oldInDisallowConditionalTypesContext = this.state.inDisallowConditionalTypesContext;
       this.state.inDisallowConditionalTypesContext = false;
       try {
         return cb();
       } finally {
-        this.state.inDisallowConditionalTypesContext =
-          oldInDisallowConditionalTypesContext;
+        this.state.inDisallowConditionalTypesContext = oldInDisallowConditionalTypesContext;
       }
     }
 
@@ -1829,22 +1680,16 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       properties: {
         const?: true;
         declare?: true;
-      } = {},
+      } = {}
     ): N.TsEnumDeclaration {
       if (properties.const) node.const = true;
       if (properties.declare) node.declare = true;
       this.expectContextual(tt._enum);
       node.id = this.parseIdentifier();
-      this.checkIdentifier(
-        node.id,
-        node.const ? BIND_TS_CONST_ENUM : BIND_TS_ENUM,
-      );
+      this.checkIdentifier(node.id, node.const ? BIND_TS_CONST_ENUM : BIND_TS_ENUM);
 
       this.expect(tt.braceL);
-      node.members = this.tsParseDelimitedList(
-        "EnumMembers",
-        this.tsParseEnumMember.bind(this),
-      );
+      node.members = this.tsParseDelimitedList("EnumMembers", this.tsParseEnumMember.bind(this));
       this.expect(tt.braceR);
       return this.finishNode(node, "TSEnumDeclaration");
     }
@@ -1859,7 +1704,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         (node.body = []),
         /* directives */ undefined,
         /* topLevel */ true,
-        /* end */ tt.braceR,
+        /* end */ tt.braceR
       );
       this.scope.exit();
       return this.finishNode(node, "TSModuleBlock");
@@ -1867,7 +1712,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
     tsParseModuleOrNamespaceDeclaration(
       node: Undone<N.TsModuleDeclaration>,
-      nested: boolean = false,
+      nested: boolean = false
     ): N.TsModuleDeclaration {
       node.id = this.parseIdentifier();
 
@@ -1890,9 +1735,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       return this.finishNode(node, "TSModuleDeclaration");
     }
 
-    tsParseAmbientExternalModuleDeclaration(
-      node: N.TsModuleDeclaration,
-    ): N.TsModuleDeclaration {
+    tsParseAmbientExternalModuleDeclaration(node: N.TsModuleDeclaration): N.TsModuleDeclaration {
       if (this.isContextual(tt._global)) {
         node.global = true;
         node.id = this.parseIdentifier();
@@ -1916,17 +1759,14 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
     tsParseImportEqualsDeclaration(
       node: Undone<N.TsImportEqualsDeclaration>,
-      isExport?: boolean,
+      isExport?: boolean
     ): N.TsImportEqualsDeclaration {
       node.isExport = isExport || false;
       node.id = this.parseIdentifier();
       this.checkIdentifier(node.id, BIND_FLAGS_TS_IMPORT);
       this.expect(tt.eq);
       const moduleReference = this.tsParseModuleReference();
-      if (
-        node.importKind === "type" &&
-        moduleReference.type !== "TSExternalModuleReference"
-      ) {
+      if (node.importKind === "type" && moduleReference.type !== "TSExternalModuleReference") {
         this.raise(TSErrors.ImportAliasHasImportType, {
           at: moduleReference,
         });
@@ -1938,8 +1778,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
     tsIsExternalModuleReference(): boolean {
       return (
-        this.isContextual(tt._require) &&
-        this.lookaheadCharCode() === charCodes.leftParenthesis
+        this.isContextual(tt._require) && this.lookaheadCharCode() === charCodes.leftParenthesis
       );
     }
 
@@ -1971,13 +1810,11 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       return res;
     }
 
-    tsTryParseAndCatch<T extends N.NodeBase | undefined | null>(
-      f: () => T,
-    ): T | undefined | null {
+    tsTryParseAndCatch<T extends N.NodeBase | undefined | null>(f: () => T): T | undefined | null {
       const result = this.tryParse(
         abort =>
           // @ts-expect-error todo(flow->ts)
-          f() || abort(),
+          f() || abort()
       );
 
       if (result.aborted || !result.node) return undefined;
@@ -2016,7 +1853,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
           return super.parseFunctionStatement(
             nany,
             /* async */ false,
-            /* isHangingDeclaration */ false,
+            /* isHangingDeclaration */ false
           );
         }
 
@@ -2024,11 +1861,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
           // While this is also set by tsParseExpressionStatement, we need to set it
           // before parsing the class declaration to know how to register it in the scope.
           nany.declare = true;
-          return this.parseClass(
-            nany,
-            /* isStatement */ true,
-            /* optionalId */ false,
-          );
+          return this.parseClass(nany, /* isStatement */ true, /* optionalId */ false);
         }
 
         if (starttype === tt._enum) {
@@ -2065,7 +1898,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
             nany,
             this.state.value,
             /* next */ true,
-            /* decorators */ null,
+            /* decorators */ null
           );
         }
       });
@@ -2077,14 +1910,14 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         this.startNode(),
         this.state.value,
         /* next */ true,
-        /* decorators */ null,
+        /* decorators */ null
       );
     }
 
     tsParseExpressionStatement(
       node: Undone<N.TsModuleDeclaration>,
       expr: N.Identifier,
-      decorators: N.Decorator[] | null,
+      decorators: N.Decorator[] | null
     ): N.Declaration | undefined | null {
       switch (expr.name) {
         case "declare": {
@@ -2112,12 +1945,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
           break;
 
         default:
-          return this.tsParseDeclaration(
-            node,
-            expr.name,
-            /* next */ false,
-            decorators,
-          );
+          return this.tsParseDeclaration(node, expr.name, /* next */ false, decorators);
       }
     }
 
@@ -2126,7 +1954,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       node: any,
       value: string,
       next: boolean,
-      decorators: N.Decorator[] | null,
+      decorators: N.Decorator[] | null
     ): N.Declaration | undefined | null {
       // no declaration apart from enum can be followed by a line break.
       switch (value) {
@@ -2150,19 +1978,13 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
           break;
 
         case "namespace":
-          if (
-            this.tsCheckLineTerminator(next) &&
-            tokenIsIdentifier(this.state.type)
-          ) {
+          if (this.tsCheckLineTerminator(next) && tokenIsIdentifier(this.state.type)) {
             return this.tsParseModuleOrNamespaceDeclaration(node);
           }
           break;
 
         case "type":
-          if (
-            this.tsCheckLineTerminator(next) &&
-            tokenIsIdentifier(this.state.type)
-          ) {
+          if (this.tsCheckLineTerminator(next) && tokenIsIdentifier(this.state.type)) {
             return this.tsParseTypeAliasDeclaration(node);
           }
           break;
@@ -2179,7 +2001,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     }
 
     tsTryParseGenericAsyncArrowFunction(
-      startLoc: Position,
+      startLoc: Position
     ): N.ArrowFunctionExpression | undefined | null {
       if (!this.match(tt.lt)) {
         return undefined;
@@ -2188,8 +2010,8 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       const oldMaybeInArrowParameters = this.state.maybeInArrowParameters;
       this.state.maybeInArrowParameters = true;
 
-      const res: Undone<N.ArrowFunctionExpression> | undefined | null =
-        this.tsTryParseAndCatch(() => {
+      const res: Undone<N.ArrowFunctionExpression> | undefined | null = this.tsTryParseAndCatch(
+        () => {
           const node = this.startNodeAt<N.ArrowFunctionExpression>(startLoc);
           node.typeParameters = this.tsParseTypeParameters();
           // Don't use overloaded parseFunctionParams which would look for "<" again.
@@ -2197,7 +2019,8 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
           node.returnType = this.tsTryParseTypeOrTypePredicateAnnotation();
           this.expect(tt.arrow);
           return node;
-        });
+        }
+      );
 
       this.state.maybeInArrowParameters = oldMaybeInArrowParameters;
 
@@ -2205,11 +2028,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         return undefined;
       }
 
-      return super.parseArrowExpression(
-        res,
-        /* params are already set */ null,
-        /* async */ true,
-      );
+      return super.parseArrowExpression(res, /* params are already set */ null, /* async */ true);
     }
 
     // Used when parsing type arguments from ES productions, where the first token
@@ -2229,9 +2048,9 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
           this.expect(tt.lt);
           return this.tsParseDelimitedList(
             "TypeParametersOrArguments",
-            this.tsParseType.bind(this),
+            this.tsParseType.bind(this)
           );
-        }),
+        })
       );
       if (node.params.length === 0) {
         this.raise(TSErrors.EmptyTypeArguments, { at: node });
@@ -2255,7 +2074,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
     parseAssignableListItem(
       flags: ParseBindingListFlags,
-      decorators: N.Decorator[],
+      decorators: N.Decorator[]
     ): N.Pattern | N.TSParameterProperty {
       // Store original location to include modifiers in range
       const startLoc = this.state.startLoc;
@@ -2263,13 +2082,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       const modified: ModifierBase = {};
       this.tsParseModifiers({
         modified,
-        allowedModifiers: [
-          "public",
-          "private",
-          "protected",
-          "override",
-          "readonly",
-        ],
+        allowedModifiers: ["public", "private", "protected", "override", "readonly"],
       });
       const accessibility = modified.accessibility;
       const override = modified.override;
@@ -2308,8 +2121,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
     isSimpleParameter(node: N.Pattern | N.TSParameterProperty) {
       return (
-        (node.type === "TSParameterProperty" &&
-          super.isSimpleParameter(node.parameter)) ||
+        (node.type === "TSParameterProperty" && super.isSimpleParameter(node.parameter)) ||
         super.isSimpleParameter(node)
       );
     }
@@ -2329,18 +2141,14 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     setArrowFunctionParameters(
       node: Undone<N.ArrowFunctionExpression>,
       params: N.Expression[],
-      trailingCommaLoc?: Position | null,
+      trailingCommaLoc?: Position | null
     ): void {
       super.setArrowFunctionParameters(node, params, trailingCommaLoc);
       this.tsDisallowOptionalPattern(node);
     }
 
     parseFunctionBodyAndFinish<
-      T extends
-        | N.Function
-        | N.TSDeclareMethod
-        | N.TSDeclareFunction
-        | N.ClassPrivateMethod,
+      T extends N.Function | N.TSDeclareMethod | N.TSDeclareFunction | N.ClassPrivateMethod
     >(node: Undone<T>, type: T["type"], isMethod: boolean = false): T {
       if (this.match(tt.colon)) {
         node.returnType = this.tsParseTypeOrTypePredicateAnnotation(tt.colon);
@@ -2389,7 +2197,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     toReferencedList(
       exprList: Array<N.Expression | undefined | null>,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      isInParens?: boolean,
+      isInParens?: boolean
     ): Array<N.Expression | undefined | null> {
       // Handles invalid scenarios like: `f(a:b)`, `(a:b);`, and `(a:b,c:d)`.
       //
@@ -2403,14 +2211,9 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       close: TokenType,
       canBePattern: boolean,
       isTuple: boolean,
-      refExpressionErrors?: ExpressionErrors | null,
+      refExpressionErrors?: ExpressionErrors | null
     ): N.ArrayExpression | N.TupleExpression {
-      const node = super.parseArrayLike(
-        close,
-        canBePattern,
-        isTuple,
-        refExpressionErrors,
-      );
+      const node = super.parseArrayLike(close, canBePattern, isTuple, refExpressionErrors);
 
       if (node.type === "ArrayExpression") {
         this.tsCheckForInvalidTypeCasts(node.elements);
@@ -2424,7 +2227,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
       startLoc: Position,
       noCalls: boolean | undefined | null,
-      state: N.ParseSubscriptState,
+      state: N.ParseSubscriptState
     ): N.Expression {
       if (!this.hasPrecedingLineBreak() && this.match(tt.bang)) {
         // When ! is consumed as a postfix operator (non-null assertion),
@@ -2433,17 +2236,13 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         this.state.canStartJSXElement = false;
         this.next();
 
-        const nonNullExpression =
-          this.startNodeAt<N.TsNonNullExpression>(startLoc);
+        const nonNullExpression = this.startNodeAt<N.TsNonNullExpression>(startLoc);
         nonNullExpression.expression = base;
         return this.finishNode(nonNullExpression, "TSNonNullExpression");
       }
 
       let isOptionalCall = false;
-      if (
-        this.match(tt.questionDot) &&
-        this.lookaheadCharCode() === charCodes.lessThan
-      ) {
+      if (this.match(tt.questionDot) && this.lookaheadCharCode() === charCodes.lessThan) {
         if (noCalls) {
           state.stop = true;
           return base;
@@ -2462,8 +2261,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
           if (!noCalls && this.atPossibleAsyncArrow(base)) {
             // Almost certainly this is a generic async function `async <T>() => ...
             // But it might be a call with a type argument `async<T>();`
-            const asyncArrowFn =
-              this.tsTryParseGenericAsyncArrowFunction(startLoc);
+            const asyncArrowFn = this.tsTryParseGenericAsyncArrowFunction(startLoc);
             if (asyncArrowFn) {
               return asyncArrowFn;
             }
@@ -2482,22 +2280,20 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
               base,
 
               startLoc,
-              state,
+              state
             );
             result.typeParameters = typeArguments;
             return result;
           }
 
           if (!noCalls && this.eat(tt.parenL)) {
-            const node = this.startNodeAt<
-              N.CallExpression | N.OptionalCallExpression
-            >(startLoc);
+            const node = this.startNodeAt<N.CallExpression | N.OptionalCallExpression>(startLoc);
             node.callee = base;
             // possibleAsync always false here, because we would have handled it above.
             // @ts-expect-error (won't be any undefined arguments)
             node.arguments = this.parseCallExpressionArguments(
               tt.parenR,
-              /* possibleAsync */ false,
+              /* possibleAsync */ false
             );
 
             // Handles invalid case: `f<T>(a:b)`
@@ -2505,8 +2301,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
             node.typeParameters = typeArguments;
             if (state.optionalChainMember) {
-              (node as Undone<N.OptionalCallExpression>).optional =
-                isOptionalCall;
+              (node as Undone<N.OptionalCallExpression>).optional = isOptionalCall;
             }
 
             return this.finishCallExpression(node, state.optionalChainMember);
@@ -2544,10 +2339,9 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
               (this.match(tt.questionDot) &&
                 this.lookaheadCharCode() !== charCodes.leftParenthesis))
           ) {
-            this.raise(
-              TSErrors.InvalidPropertyAccessAfterInstantiationExpression,
-              { at: this.state.startLoc },
-            );
+            this.raise(TSErrors.InvalidPropertyAccessAfterInstantiationExpression, {
+              at: this.state.startLoc,
+            });
           }
           return result;
         }
@@ -2560,30 +2354,20 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       super.parseNewCallee(node);
 
       const { callee } = node;
-      if (
-        callee.type === "TSInstantiationExpression" &&
-        !callee.extra?.parenthesized
-      ) {
+      if (callee.type === "TSInstantiationExpression" && !callee.extra?.parenthesized) {
         node.typeParameters = callee.typeParameters;
         node.callee = callee.expression;
       }
     }
 
-    parseExprOp(
-      left: N.Expression,
-      leftStartLoc: Position,
-      minPrec: number,
-    ): N.Expression {
+    parseExprOp(left: N.Expression, leftStartLoc: Position, minPrec: number): N.Expression {
       let isSatisfies: boolean;
       if (
         tokenOperatorPrecedence(tt._in) > minPrec &&
         !this.hasPrecedingLineBreak() &&
-        (this.isContextual(tt._as) ||
-          (isSatisfies = this.isContextual(tt._satisfies)))
+        (this.isContextual(tt._as) || (isSatisfies = this.isContextual(tt._satisfies)))
       ) {
-        const node = this.startNodeAt<
-          N.TsAsExpression | N.TsSatisfiesExpression
-        >(leftStartLoc);
+        const node = this.startNodeAt<N.TsAsExpression | N.TsSatisfiesExpression>(leftStartLoc);
         node.expression = left;
         node.typeAnnotation = this.tsInType(() => {
           this.next(); // "as" or "satisfies"
@@ -2599,17 +2383,15 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
           return this.tsParseType();
         });
-        this.finishNode(
-          node,
-          isSatisfies ? "TSSatisfiesExpression" : "TSAsExpression",
-        );
+        // @ts-expect-error
+        this.finishNode(node, isSatisfies ? "TSSatisfiesExpression" : "TSAsExpression");
         // rescan `<`, `>` because they were scanned when this.state.inType was true
         this.reScan_lt_gt();
         return this.parseExprOp(
           // @ts-expect-error todo(flow->ts)
           node,
           leftStartLoc,
-          minPrec,
+          minPrec
         );
       }
 
@@ -2620,7 +2402,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       word: string,
       startLoc: Position,
       checkKeywords: boolean,
-      isBinding: boolean,
+      isBinding: boolean
     ): void {
       // Strict mode words may be allowed as in `declare namespace N { const static: number; }`.
       // And we have a type checker anyway, so don't bother having the parser do it.
@@ -2649,15 +2431,9 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     */
     checkDuplicateExports() {}
 
-    parseImport(
-      node: Undone<N.ImportDeclaration | N.TsImportEqualsDeclaration>,
-    ): N.AnyImport {
+    parseImport(node: Undone<N.ImportDeclaration | N.TsImportEqualsDeclaration>): N.AnyImport {
       node.importKind = "value";
-      if (
-        tokenIsIdentifier(this.state.type) ||
-        this.match(tt.star) ||
-        this.match(tt.braceL)
-      ) {
+      if (tokenIsIdentifier(this.state.type) || this.match(tt.star) || this.match(tt.braceL)) {
         let ahead = this.lookahead();
 
         if (
@@ -2675,9 +2451,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         }
 
         if (tokenIsIdentifier(this.state.type) && ahead.type === tt.eq) {
-          return this.tsParseImportEqualsDeclaration(
-            node as Undone<N.TsImportEqualsDeclaration>,
-          );
+          return this.tsParseImportEqualsDeclaration(node as Undone<N.TsImportEqualsDeclaration>);
         }
       }
 
@@ -2701,17 +2475,11 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       return importNode;
     }
 
-    parseExport(
-      node: Undone<N.Node>,
-      decorators: N.Decorator[] | null,
-    ): N.AnyExport {
+    parseExport(node: Undone<N.Node>, decorators: N.Decorator[] | null): N.AnyExport {
       if (this.match(tt._import)) {
         // `export import A = B;`
         this.next(); // eat `tt._import`
-        if (
-          this.isContextual(tt._type) &&
-          this.lookaheadCharCode() !== charCodes.equalsTo
-        ) {
+        if (this.isContextual(tt._type) && this.lookaheadCharCode() !== charCodes.equalsTo) {
           node.importKind = "type";
           this.next(); // eat "type"
         } else {
@@ -2719,7 +2487,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         }
         return this.tsParseImportEqualsDeclaration(
           node as Undone<N.TsImportEqualsDeclaration>,
-          /* isExport */ true,
+          /* isExport */ true
         );
       } else if (this.eat(tt.eq)) {
         // `export = x;`
@@ -2736,10 +2504,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         this.semicolon();
         return this.finishNode(decl, "TSNamespaceExportDeclaration");
       } else {
-        if (
-          this.isContextual(tt._type) &&
-          this.lookahead().type === tt.braceL
-        ) {
+        if (this.isContextual(tt._type) && this.lookahead().type === tt.braceL) {
           this.next();
           node.exportKind = "type";
         } else {
@@ -2748,15 +2513,13 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
         return super.parseExport(
           node as Undone<N.ExportAllDeclaration | N.ExportDefaultDeclaration>,
-          decorators,
+          decorators
         );
       }
     }
 
     isAbstractClass(): boolean {
-      return (
-        this.isContextual(tt._abstract) && this.lookahead().type === tt._class
-      );
+      return this.isContextual(tt._abstract) && this.lookahead().type === tt._class;
     }
 
     parseExportDefaultExpression(): N.Expression | N.Declaration {
@@ -2770,9 +2533,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       // export default interface allowed in:
       // https://github.com/Microsoft/TypeScript/pull/16040
       if (this.match(tt._interface)) {
-        const result = this.tsParseInterfaceDeclaration(
-          this.startNode<N.TsInterfaceDeclaration>(),
-        );
+        const result = this.tsParseInterfaceDeclaration(this.startNode<N.TsInterfaceDeclaration>());
         if (result) return result;
       }
 
@@ -2782,13 +2543,13 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     parseVarStatement(
       node: N.VariableDeclaration,
       kind: "var" | "let" | "const" | "using",
-      allowMissingInitializer: boolean = false,
+      allowMissingInitializer: boolean = false
     ) {
       const { isAmbientContext } = this.state;
       const declaration = super.parseVarStatement(
         node,
         kind,
-        allowMissingInitializer || isAmbientContext,
+        allowMissingInitializer || isAmbientContext
       );
 
       if (!isAmbientContext) return declaration;
@@ -2802,13 +2563,10 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
           this.raise(TSErrors.InitializerNotAllowedInAmbientContext, {
             at: init,
           });
-        } else if (
-          !isValidAmbientConstInitializer(init, this.hasPlugin("estree"))
-        ) {
-          this.raise(
-            TSErrors.ConstInitiailizerMustBeStringOrNumericLiteralOrLiteralEnumReference,
-            { at: init },
-          );
+        } else if (!isValidAmbientConstInitializer(init, this.hasPlugin("estree"))) {
+          this.raise(TSErrors.ConstInitiailizerMustBeStringOrNumericLiteralOrLiteralEnumReference, {
+            at: init,
+          });
         }
       }
 
@@ -2817,7 +2575,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
     parseStatementContent(
       flags: ParseStatementFlag,
-      decorators?: N.Decorator[] | null,
+      decorators?: N.Decorator[] | null
     ): N.Statement {
       if (this.match(tt._const) && this.isLookaheadContextual("enum")) {
         const node = this.startNode<N.TsEnumDeclaration>();
@@ -2826,9 +2584,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       }
 
       if (this.isContextual(tt._enum)) {
-        return this.tsParseEnumDeclaration(
-          this.startNode<N.TsEnumDeclaration>(),
-        );
+        return this.tsParseEnumDeclaration(this.startNode<N.TsEnumDeclaration>());
       }
 
       if (this.isContextual(tt._interface)) {
@@ -2853,17 +2609,10 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     }
 
     tsIsStartOfStaticBlocks() {
-      return (
-        this.isContextual(tt._static) &&
-        this.lookaheadCharCode() === charCodes.leftCurlyBrace
-      );
+      return this.isContextual(tt._static) && this.lookaheadCharCode() === charCodes.leftCurlyBrace;
     }
 
-    parseClassMember(
-      classBody: N.ClassBody,
-      member: any,
-      state: N.ParseClassMemberState,
-    ): void {
+    parseClassMember(classBody: N.ClassBody, member: any, state: N.ParseClassMemberState): void {
       const modifiers = [
         "declare",
         "private",
@@ -2893,12 +2642,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
           }
           super.parseClassStaticBlock(classBody, member as N.StaticBlock);
         } else {
-          this.parseClassMemberWithIsStatic(
-            classBody,
-            member,
-            state,
-            !!member.static,
-          );
+          this.parseClassMemberWithIsStatic(classBody, member, state, !!member.static);
         }
       };
       if (member.declare) {
@@ -2912,11 +2656,9 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       classBody: N.ClassBody,
       member: Undone<N.ClassMember | N.TsIndexSignature>,
       state: N.ParseClassMemberState,
-      isStatic: boolean,
+      isStatic: boolean
     ): void {
-      const idx = this.tsTryParseIndexSignature(
-        member as Undone<N.TsIndexSignature>,
-      );
+      const idx = this.tsTryParseIndexSignature(member as Undone<N.TsIndexSignature>);
       if (idx) {
         classBody.body.push(idx);
 
@@ -2957,12 +2699,12 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         classBody,
         member as Undone<N.ClassMember>,
         state,
-        isStatic,
+        isStatic
       );
     }
 
     parsePostMemberNameModifiers(
-      methodOrProp: N.ClassMethod | N.ClassProperty | N.ClassPrivateProperty,
+      methodOrProp: N.ClassMethod | N.ClassProperty | N.ClassPrivateProperty
     ): void {
       const optional = this.eat(tt.question);
       if (optional) methodOrProp.optional = true;
@@ -2984,7 +2726,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     parseExpressionStatement(
       node: Undone<N.ExpressionStatement>,
       expr: N.Expression,
-      decorators: N.Decorator[] | null,
+      decorators: N.Decorator[] | null
     ): N.Statement {
       const decl =
         expr.type === "Identifier"
@@ -3006,7 +2748,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       expr: N.Expression,
 
       startLoc: Position,
-      refExpressionErrors?: ExpressionErrors | null,
+      refExpressionErrors?: ExpressionErrors | null
     ): N.Expression {
       // only do the expensive clone if there is a question mark
       // and if we come from inside parens
@@ -3015,17 +2757,16 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
           expr,
 
           startLoc,
-          refExpressionErrors,
+          refExpressionErrors
         );
       }
 
-      const result = this.tryParse(() =>
-        super.parseConditional(expr, startLoc),
-      );
+      const result = this.tryParse(() => super.parseConditional(expr, startLoc));
 
       if (!result.node) {
         if (result.error) {
           /*:: invariant(refExpressionErrors != null) */
+          // @ts-expect-error
           super.setOptionalParametersError(refExpressionErrors, result.error);
         }
 
@@ -3040,7 +2781,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     parseParenItem(
       node: N.Expression,
 
-      startLoc: Position,
+      startLoc: Position
     ): N.Expression {
       node = super.parseParenItem(node, startLoc);
       if (this.eat(tt.question)) {
@@ -3062,9 +2803,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       return node;
     }
 
-    parseExportDeclaration(
-      node: N.ExportNamedDeclaration,
-    ): N.Declaration | undefined | null {
+    parseExportDeclaration(node: N.ExportNamedDeclaration): N.Declaration | undefined | null {
       if (!this.state.isAmbientContext && this.isContextual(tt._declare)) {
         return this.tsInAmbientContext(() => this.parseExportDeclaration(node));
       }
@@ -3074,10 +2813,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
       const isDeclare = this.eatContextual(tt._declare);
 
-      if (
-        isDeclare &&
-        (this.isContextual(tt._declare) || !this.shouldParseExportDeclaration())
-      ) {
+      if (isDeclare && (this.isContextual(tt._declare) || !this.shouldParseExportDeclaration())) {
         throw this.raise(TSErrors.ExpectedAmbientAfterExportDeclare, {
           at: this.state.startLoc,
         });
@@ -3085,8 +2821,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
       const isIdentifier = tokenIsIdentifier(this.state.type);
       const declaration: N.Declaration | undefined | null =
-        (isIdentifier && this.tsTryParseExportDeclaration()) ||
-        super.parseExportDeclaration(node);
+        (isIdentifier && this.tsTryParseExportDeclaration()) || super.parseExportDeclaration(node);
 
       if (!declaration) return null;
 
@@ -3113,7 +2848,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       isStatement: boolean,
       optionalId?: boolean | null,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      bindingType?: BindingTypes,
+      bindingType?: BindingTypes
     ): void {
       if ((!isStatement || optionalId) && this.isContextual(tt._implements)) {
         return;
@@ -3123,16 +2858,14 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         node,
         isStatement,
         optionalId,
-        (node as any).declare ? BIND_TS_AMBIENT : BIND_CLASS,
+        (node as any).declare ? BIND_TS_AMBIENT : BIND_CLASS
       );
-      const typeParameters = this.tsTryParseTypeParameters(
-        this.tsParseInOutModifiers.bind(this),
-      );
+      const typeParameters = this.tsTryParseTypeParameters(this.tsParseInOutModifiers.bind(this));
       if (typeParameters) node.typeParameters = typeParameters;
     }
 
     parseClassPropertyAnnotation(
-      node: N.ClassProperty | N.ClassPrivateProperty | N.ClassAccessorProperty,
+      node: N.ClassProperty | N.ClassPrivateProperty | N.ClassAccessorProperty
     ): void {
       if (!node.optional) {
         if (this.eat(tt.bang)) {
@@ -3172,9 +2905,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       return super.parseClassProperty(node);
     }
 
-    parseClassPrivateProperty(
-      node: N.ClassPrivateProperty,
-    ): N.ClassPrivateProperty {
+    parseClassPrivateProperty(node: N.ClassPrivateProperty): N.ClassPrivateProperty {
       // @ts-expect-error abstract may not index node
       if (node.abstract) {
         this.raise(TSErrors.PrivateElementHasAbstract, { at: node });
@@ -3193,9 +2924,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       return super.parseClassPrivateProperty(node);
     }
 
-    parseClassAccessorProperty(
-      node: N.ClassAccessorProperty,
-    ): N.ClassAccessorProperty {
+    parseClassAccessorProperty(node: N.ClassAccessorProperty): N.ClassAccessorProperty {
       this.parseClassPropertyAnnotation(node);
       if (node.optional) {
         this.raise(TSErrors.AccessorCannotBeOptional, { at: node });
@@ -3209,7 +2938,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       isGenerator: boolean,
       isAsync: boolean,
       isConstructor: boolean,
-      allowsDirectSuper: boolean,
+      allowsDirectSuper: boolean
     ): void {
       const typeParameters = this.tsTryParseTypeParameters();
       if (typeParameters && isConstructor) {
@@ -3231,7 +2960,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         isGenerator,
         isAsync,
         isConstructor,
-        allowsDirectSuper,
+        allowsDirectSuper
       );
     }
 
@@ -3239,7 +2968,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       classBody: N.ClassBody,
       method: N.ClassPrivateMethod,
       isGenerator: boolean,
-      isAsync: boolean,
+      isAsync: boolean
     ): void {
       const typeParameters = this.tsTryParseTypeParameters();
       if (typeParameters) method.typeParameters = typeParameters;
@@ -3248,7 +2977,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
     declareClassPrivateMethodInScope(
       node: N.ClassPrivateMethod | N.EstreeMethodDefinition | N.TSDeclareMethod,
-      kind: number,
+      kind: number
     ) {
       if (node.type === "TSDeclareMethod") return;
       // This happens when using the "estree" plugin.
@@ -3276,7 +3005,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       isAsync: boolean,
       isPattern: boolean,
       isAccessor: boolean,
-      refExpressionErrors?: ExpressionErrors | null,
+      refExpressionErrors?: ExpressionErrors | null
     ) {
       const typeParameters = this.tsTryParseTypeParameters();
       if (typeParameters) prop.typeParameters = typeParameters;
@@ -3289,7 +3018,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         isAsync,
         isPattern,
         isAccessor,
-        refExpressionErrors,
+        refExpressionErrors
       );
     }
 
@@ -3300,16 +3029,9 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     }
 
     // `let x: number;`
-    parseVarId(
-      decl: N.VariableDeclarator,
-      kind: "var" | "let" | "const" | "using",
-    ): void {
+    parseVarId(decl: N.VariableDeclarator, kind: "var" | "let" | "const" | "using"): void {
       super.parseVarId(decl, kind);
-      if (
-        decl.id.type === "Identifier" &&
-        !this.hasPrecedingLineBreak() &&
-        this.eat(tt.bang)
-      ) {
+      if (decl.id.type === "Identifier" && !this.hasPrecedingLineBreak() && this.eat(tt.bang)) {
         decl.definite = true;
       }
 
@@ -3323,7 +3045,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     // parse the return type of an async arrow function - let foo = (async (): number => {});
     parseAsyncArrowFromCallExpression(
       node: N.ArrowFunctionExpression,
-      call: N.CallExpression,
+      call: N.CallExpression
     ): N.ArrowFunctionExpression {
       if (this.match(tt.colon)) {
         node.returnType = this.tsParseTypeAnnotation();
@@ -3333,7 +3055,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
     parseMaybeAssign(
       refExpressionErrors?: ExpressionErrors | null,
-      afterLeftParse?: Function,
+      afterLeftParse?: Function
     ): N.Expression {
       // Note: When the JSX plugin is on, type assertions (`<T> x`) aren't valid syntax.
 
@@ -3341,20 +3063,18 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       let jsx;
       let typeCast;
 
-      if (
-        this.hasPlugin("jsx") &&
-        (this.match(tt.jsxTagStart) || this.match(tt.lt))
-      ) {
+      if (this.hasPlugin("jsx") && (this.match(tt.jsxTagStart) || this.match(tt.lt))) {
         // Prefer to parse JSX if possible. But may be an arrow fn.
         state = this.state.clone();
 
         jsx = this.tryParse(
           () => super.parseMaybeAssign(refExpressionErrors, afterLeftParse),
-          state,
+          state
         );
 
         /*:: invariant(!jsx.aborted) */
         /*:: invariant(jsx.node != null) */
+        // @ts-expect-error
         if (!jsx.error) return jsx.node;
 
         // Remove `tc.j_expr` or `tc.j_oTag` from context added
@@ -3382,15 +3102,9 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       const arrow = this.tryParse(abort => {
         // This is similar to TypeScript's `tryParseParenthesizedArrowFunctionExpression`.
         typeParameters = this.tsParseTypeParameters();
-        const expr = super.parseMaybeAssign(
-          refExpressionErrors,
-          afterLeftParse,
-        );
+        const expr = super.parseMaybeAssign(refExpressionErrors, afterLeftParse);
 
-        if (
-          expr.type !== "ArrowFunctionExpression" ||
-          expr.extra?.parenthesized
-        ) {
+        if (expr.type !== "ArrowFunctionExpression" || expr.extra?.parenthesized) {
           abort();
         }
 
@@ -3442,11 +3156,11 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         // But don't directly call `this.tsParseTypeAssertion` because we want to handle any binary after it.
         typeCast = this.tryParse(
           () => super.parseMaybeAssign(refExpressionErrors, afterLeftParse),
-          state,
+          state
         );
         /*:: invariant(!typeCast.aborted) */
         /*:: invariant(typeCast.node != null) */
-        if (!typeCast.error) return typeCast.node;
+        if (!typeCast.error) return typeCast.node!;
       }
 
       if (jsx?.node) {
@@ -3489,7 +3203,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     // Handle type assertions
     parseMaybeUnary(
       refExpressionErrors?: ExpressionErrors | null,
-      sawUnary?: boolean,
+      sawUnary?: boolean
     ): N.Expression {
       if (!this.hasPlugin("jsx") && this.match(tt.lt)) {
         return this.tsParseTypeAssertion();
@@ -3498,17 +3212,16 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       }
     }
 
+    // @ts-expect-error
     parseArrow(
-      node: Undone<N.ArrowFunctionExpression>,
+      node: Undone<N.ArrowFunctionExpression>
     ): Undone<N.ArrowFunctionExpression> | undefined | null {
       if (this.match(tt.colon)) {
         // This is different from how the TS parser does it.
         // TS uses lookahead. The Babel Parser parses it as a parenthesized expression and converts.
 
         const result = this.tryParse(abort => {
-          const returnType = this.tsParseTypeOrTypePredicateAnnotation(
-            tt.colon,
-          );
+          const returnType = this.tsParseTypeOrTypePredicateAnnotation(tt.colon);
           if (this.canInsertSemicolon() || !this.match(tt.arrow)) abort();
           return returnType;
         });
@@ -3526,10 +3239,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     }
 
     // Allow type annotations inside of a parameter list.
-    parseAssignableListItemTypes(
-      param: N.Pattern,
-      flags: ParseBindingListFlags,
-    ) {
+    parseAssignableListItemTypes(param: N.Pattern, flags: ParseBindingListFlags) {
       if (!(flags & ParseBindingListFlags.IS_FUNCTION_PARAMS)) return param;
 
       if (this.eat(tt.question)) {
@@ -3565,7 +3275,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
           if (isLHS) {
             this.expressionScope.recordArrowParameterBindingError(
               TSErrors.UnexpectedTypeCastInParameter,
-              { at: node },
+              { at: node }
             );
           } else {
             this.raise(TSErrors.UnexpectedTypeCastInParameter, { at: node });
@@ -3619,7 +3329,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         | "TSSatisfiesExpression"
         | "TSTypeAssertion",
       isUnparenthesizedInAssign: boolean,
-      binding: BindingTypes,
+      binding: BindingTypes
     ) {
       return (
         getOwn(
@@ -3630,14 +3340,20 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
             TSTypeCastExpression: true,
             TSParameterProperty: "parameter",
             TSNonNullExpression: "expression",
-            TSAsExpression: (binding !== BIND_NONE ||
-              !isUnparenthesizedInAssign) && ["expression", true],
-            TSSatisfiesExpression: (binding !== BIND_NONE ||
-              !isUnparenthesizedInAssign) && ["expression", true],
-            TSTypeAssertion: (binding !== BIND_NONE ||
-              !isUnparenthesizedInAssign) && ["expression", true],
+            TSAsExpression: (binding !== BIND_NONE || !isUnparenthesizedInAssign) && [
+              "expression",
+              true,
+            ],
+            TSSatisfiesExpression: (binding !== BIND_NONE || !isUnparenthesizedInAssign) && [
+              "expression",
+              true,
+            ],
+            TSTypeAssertion: (binding !== BIND_NONE || !isUnparenthesizedInAssign) && [
+              "expression",
+              true,
+            ],
           },
-          type,
+          type
         ) || super.isValidLVal(type, isUnparenthesizedInAssign, binding)
       );
     }
@@ -3669,9 +3385,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       return super.parseMaybeDecoratorArguments(expr);
     }
 
-    checkCommaAfterRest(
-      close: typeof charCodes[keyof typeof charCodes],
-    ): boolean {
+    checkCommaAfterRest(close: typeof charCodes[keyof typeof charCodes]): boolean {
       if (
         this.state.isAmbientContext &&
         this.match(tt.comma) &&
@@ -3694,15 +3408,10 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     }
 
     isClassProperty(): boolean {
-      return (
-        this.match(tt.bang) || this.match(tt.colon) || super.isClassProperty()
-      );
+      return this.match(tt.bang) || this.match(tt.colon) || super.isClassProperty();
     }
 
-    parseMaybeDefault(
-      startLoc?: Position | null,
-      left?: Pattern | null,
-    ): N.Pattern {
+    parseMaybeDefault(startLoc?: Position | null, left?: Pattern | null): N.Pattern {
       const node = super.parseMaybeDefault(startLoc, left);
 
       if (
@@ -3756,14 +3465,12 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
     toAssignableList(
       exprList: Expression[],
       trailingCommaLoc: Position | undefined | null,
-      isLHS: boolean,
+      isLHS: boolean
     ): void {
       for (let i = 0; i < exprList.length; i++) {
         const expr = exprList[i];
         if (expr?.type === "TSTypeCastExpression") {
-          exprList[i] = this.typeCastToParameter(
-            expr as N.TsTypeCastExpression,
-          );
+          exprList[i] = this.typeCastToParameter(expr as N.TsTypeCastExpression);
         }
       }
       super.toAssignableList(exprList, trailingCommaLoc, isLHS);
@@ -3793,14 +3500,12 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       return super.canHaveLeadingDecorator() || this.isAbstractClass();
     }
 
-    jsxParseOpeningElementAfterName(
-      node: N.JSXOpeningElement,
-    ): N.JSXOpeningElement {
+    jsxParseOpeningElementAfterName(node: N.JSXOpeningElement): N.JSXOpeningElement {
       // handles `<Component<<T>`
       if (this.match(tt.lt) || this.match(tt.bitShiftL)) {
         const typeArguments = this.tsTryParseAndCatch(() =>
           // @ts-expect-error: refine typings
-          this.tsParseTypeArgumentsInExpression(),
+          this.tsParseTypeArgumentsInExpression()
         );
         // @ts-expect-error: refine typings
         if (typeArguments) node.typeParameters = typeArguments;
@@ -3808,9 +3513,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       return super.jsxParseOpeningElementAfterName(node);
     }
 
-    getGetterSetterExpectedParamCount(
-      method: N.ObjectMethod | N.ClassMethod,
-    ): number {
+    getGetterSetterExpectedParamCount(method: N.ObjectMethod | N.ClassMethod): number {
       const baseCount = super.getGetterSetterExpectedParamCount(method);
       const params = this.getObjectOrClassMethodParams(method);
       const firstParam = params[0];
@@ -3841,11 +3544,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       }
     }
 
-    parseClass<T extends N.Class>(
-      node: Undone<T>,
-      isStatement: boolean,
-      optionalId?: boolean,
-    ): T {
+    parseClass<T extends N.Class>(node: Undone<T>, isStatement: boolean, optionalId?: boolean): T {
       const oldInAbstractClass = this.state.inAbstractClass;
       this.state.inAbstractClass = !!(node as any).abstract;
       try {
@@ -3857,7 +3556,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
 
     tsParseAbstractDeclaration(
       node: any,
-      decorators: N.Decorator[] | null,
+      decorators: N.Decorator[] | null
     ): N.ClassDeclaration | N.TsInterfaceDeclaration | undefined | null {
       if (this.match(tt._class)) {
         node.abstract = true;
@@ -3866,8 +3565,8 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
           this.parseClass<N.ClassDeclaration>(
             node as N.ClassDeclaration,
             /* isStatement */ true,
-            /* optionalId */ false,
-          ),
+            /* optionalId */ false
+          )
         );
       } else if (this.isContextual(tt._interface)) {
         // for invalid abstract interface
@@ -3880,25 +3579,21 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
           this.raise(TSErrors.NonClassMethodPropertyHasAbstractModifer, {
             at: node,
           });
-          return this.tsParseInterfaceDeclaration(
-            node as N.TsInterfaceDeclaration,
-          );
+          return this.tsParseInterfaceDeclaration(node as N.TsInterfaceDeclaration);
         }
       } else {
         this.unexpected(null, tt._class);
       }
     }
 
-    parseMethod<
-      T extends N.ObjectMethod | N.ClassMethod | N.ClassPrivateMethod,
-    >(
+    parseMethod<T extends N.ObjectMethod | N.ClassMethod | N.ClassPrivateMethod>(
       node: Undone<T>,
       isGenerator: boolean,
       isAsync: boolean,
       isConstructor: boolean,
       allowDirectSuper: boolean,
       type: T["type"],
-      inClassScope?: boolean,
+      inClassScope?: boolean
     ) {
       const method = super.parseMethod<T>(
         node,
@@ -3907,7 +3602,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         isConstructor,
         allowDirectSuper,
         type,
-        inClassScope,
+        inClassScope
       );
       // @ts-expect-error todo(flow->ts) property not defined for all types in union
       if (method.abstract) {
@@ -3956,23 +3651,14 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       node: Undone<N.ExportSpecifier>,
       isString: boolean,
       isInTypeExport: boolean,
-      isMaybeTypeOnly: boolean,
+      isMaybeTypeOnly: boolean
     ) {
       if (!isString && isMaybeTypeOnly) {
-        this.parseTypeOnlyImportExportSpecifier(
-          node,
-          /* isImport */ false,
-          isInTypeExport,
-        );
+        this.parseTypeOnlyImportExportSpecifier(node, /* isImport */ false, isInTypeExport);
         return this.finishNode<N.ExportSpecifier>(node, "ExportSpecifier");
       }
       node.exportKind = "value";
-      return super.parseExportSpecifier(
-        node,
-        isString,
-        isInTypeExport,
-        isMaybeTypeOnly,
-      );
+      return super.parseExportSpecifier(node, isString, isInTypeExport, isMaybeTypeOnly);
     }
 
     parseImportSpecifier(
@@ -3981,14 +3667,10 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       isInTypeOnlyImport: boolean,
       isMaybeTypeOnly: boolean,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      bindingType: BindingTypes | undefined,
+      bindingType: BindingTypes | undefined
     ): N.ImportSpecifier {
       if (!importedIsString && isMaybeTypeOnly) {
-        this.parseTypeOnlyImportExportSpecifier(
-          specifier,
-          /* isImport */ true,
-          isInTypeOnlyImport,
-        );
+        this.parseTypeOnlyImportExportSpecifier(specifier, /* isImport */ true, isInTypeOnlyImport);
         return this.finishNode<N.ImportSpecifier>(specifier, "ImportSpecifier");
       }
       specifier.importKind = "value";
@@ -3997,14 +3679,14 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         importedIsString,
         isInTypeOnlyImport,
         isMaybeTypeOnly,
-        isInTypeOnlyImport ? BIND_TS_TYPE_IMPORT : BIND_FLAGS_TS_IMPORT,
+        isInTypeOnlyImport ? BIND_TS_TYPE_IMPORT : BIND_FLAGS_TS_IMPORT
       );
     }
 
     parseTypeOnlyImportExportSpecifier(
       node: any,
       isImport: boolean,
-      isInTypeOnlyImportExport: boolean,
+      isInTypeOnlyImportExport: boolean
     ): void {
       const leftOfAsKey = isImport ? "imported" : "local";
       const rightOfAsKey = isImport ? "local" : "exported";
@@ -4032,9 +3714,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
             // { type as as something }
             hasTypeSpecifier = true;
             leftOfAs = firstAs;
-            rightOfAs = isImport
-              ? this.parseIdentifier()
-              : this.parseModuleExportName();
+            rightOfAs = isImport ? this.parseIdentifier() : this.parseModuleExportName();
             canParseAsKeyword = false;
           } else {
             // { type as as }
@@ -4044,9 +3724,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         } else if (tokenIsKeywordOrIdentifier(this.state.type)) {
           // { type as something }
           canParseAsKeyword = false;
-          rightOfAs = isImport
-            ? this.parseIdentifier()
-            : this.parseModuleExportName();
+          rightOfAs = isImport ? this.parseIdentifier() : this.parseModuleExportName();
         } else {
           // { type as }
           hasTypeSpecifier = true;
@@ -4058,12 +3736,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
         if (isImport) {
           leftOfAs = this.parseIdentifier(true);
           if (!this.isContextual(tt._as)) {
-            this.checkReservedWord(
-              leftOfAs.name,
-              leftOfAs.loc.start,
-              true,
-              true,
-            );
+            this.checkReservedWord(leftOfAs.name, leftOfAs.loc.start, true, true);
           }
         } else {
           leftOfAs = this.parseModuleExportName();
@@ -4074,7 +3747,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
           isImport
             ? TSErrors.TypeModifierIsUsedInTypeImports
             : TSErrors.TypeModifierIsUsedInTypeExports,
-          { at: loc },
+          { at: loc }
         );
       }
 
@@ -4085,9 +3758,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       node[kindKey] = hasTypeSpecifier ? "type" : "value";
 
       if (canParseAsKeyword && this.eatContextual(tt._as)) {
-        node[rightOfAsKey] = isImport
-          ? this.parseIdentifier()
-          : this.parseModuleExportName();
+        node[rightOfAsKey] = isImport ? this.parseIdentifier() : this.parseModuleExportName();
       }
       if (!node[rightOfAsKey]) {
         node[rightOfAsKey] = cloneIdentifier(node[leftOfAsKey]);
@@ -4095,7 +3766,7 @@ export default (superClass: ClassWithMixin<typeof Parser, IJSXParserMixin>) =>
       if (isImport) {
         this.checkIdentifier(
           node[rightOfAsKey],
-          hasTypeSpecifier ? BIND_TS_TYPE_IMPORT : BIND_FLAGS_TS_IMPORT,
+          hasTypeSpecifier ? BIND_TS_TYPE_IMPORT : BIND_FLAGS_TS_IMPORT
         );
       }
     }
@@ -4123,10 +3794,7 @@ function isPossiblyLiteralEnum(expression: N.Expression): boolean {
 // enum reference, but we allow anything that "could be" a literal enum
 // in `isPossiblyLiteralEnum` since we don't have all the information
 // that the typescript compiler has.
-function isValidAmbientConstInitializer(
-  expression: N.Expression,
-  estree: boolean,
-): boolean {
+function isValidAmbientConstInitializer(expression: N.Expression, estree: boolean): boolean {
   const { type } = expression;
   if (expression.extra?.parenthesized) {
     return false;
@@ -4162,10 +3830,7 @@ function isNumber(expression: N.Expression, estree: boolean): boolean {
       (typeof expression.value === "number" || "bigint" in expression)
     );
   } else {
-    return (
-      expression.type === "NumericLiteral" ||
-      expression.type === "BigIntLiteral"
-    );
+    return expression.type === "NumericLiteral" || expression.type === "BigIntLiteral";
   }
 }
 

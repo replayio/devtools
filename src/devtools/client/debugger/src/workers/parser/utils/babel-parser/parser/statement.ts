@@ -438,6 +438,7 @@ export default abstract class StatementParser extends ExpressionParser {
       case tt._class:
         if (!allowDeclaration) this.unexpected();
         return this.parseClass(
+          // @ts-expect-error
           this.maybeTakeDecorators(decorators, node as Undone<N.ClassDeclaration>),
           true
         );
@@ -546,6 +547,7 @@ export default abstract class StatementParser extends ExpressionParser {
             node as Undone<
               N.ExportAllDeclaration | N.ExportDefaultDeclaration | N.ExportDefaultDeclaration
             >,
+            // @ts-expect-error
             decorators
           );
 
@@ -599,6 +601,7 @@ export default abstract class StatementParser extends ExpressionParser {
         flags
       );
     } else {
+      // @ts-expect-error
       return this.parseExpressionStatement(node as Undone<N.ExpressionStatement>, expr, decorators);
     }
   }
@@ -1031,6 +1034,7 @@ export default abstract class StatementParser extends ExpressionParser {
         clause.param = this.parseCatchClauseParam();
         this.expect(tt.parenR);
       } else {
+        // @ts-expect-error
         clause.param = null;
         this.scope.enter(SCOPE_OTHER);
       }
@@ -2586,6 +2590,7 @@ export default abstract class StatementParser extends ExpressionParser {
           at: node.specifiers[0].loc.start,
         });
       }
+      // @ts-expect-error
       if (node.assertions?.length > 0) {
         this.raise(Errors.ImportReflectionHasAssertion, {
           at: node.specifiers[0].loc.start,

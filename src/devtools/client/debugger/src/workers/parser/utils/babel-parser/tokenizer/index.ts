@@ -1,48 +1,28 @@
 /*:: declare var invariant; */
+/* eslint-disable */
+
+import * as charCodes from "charcodes";
 
 import type { Options } from "../options";
-import {
-  Position,
-  SourceLocation,
-  createPositionWithColumnOffset,
-} from "../util/location";
-import CommentsParser, { type CommentWhitespace } from "../parser/comments";
+import { Errors, ParseError, ParseErrorConstructor, RaiseProperties } from "../parse-error";
+import CommentsParser, { CommentWhitespace } from "../parser/comments";
 import type * as N from "../types";
-import * as charCodes from "charcodes";
-import { isIdentifierStart, isIdentifierChar } from "../util/identifier";
-import {
-  tokenIsKeyword,
-  tokenLabelName,
-  tt,
-  keywords as keywordTypes,
-  type TokenType,
-} from "./types";
-import { type TokContext } from "./context";
-import {
-  Errors,
-  type ParseError,
-  type ParseErrorConstructor,
-  type RaiseProperties,
-} from "../parse-error";
-import {
-  lineBreakG,
-  isNewLine,
-  isWhitespace,
-  skipWhiteSpace,
-} from "../util/whitespace";
-import State from "./state";
-import type { LookaheadState, DeferredStrictError } from "./state";
-
-import {
-  readInt,
-  readCodePoint,
-  readStringContents,
-  type IntErrorHandlers,
-  type CodePointErrorHandlers,
-  type StringContentsErrorHandlers,
-} from "@babel/helper-string-parser";
-
 import type { Plugin } from "../typings";
+import { isIdentifierChar, isIdentifierStart } from "../util/identifier";
+import { Position, SourceLocation, createPositionWithColumnOffset } from "../util/location";
+import { isNewLine, isWhitespace, lineBreakG, skipWhiteSpace } from "../util/whitespace";
+import {
+  CodePointErrorHandlers,
+  IntErrorHandlers,
+  StringContentsErrorHandlers,
+  readCodePoint,
+  readInt,
+  readStringContents,
+} from "./babel-string-parser";
+import { TokContext } from "./context";
+import State from "./state";
+import type { DeferredStrictError, LookaheadState } from "./state";
+import { TokenType, keywords as keywordTypes, tokenIsKeyword, tokenLabelName, tt } from "./types";
 
 function buildPosition(pos: number, lineStart: number, curLine: number) {
   return new Position(curLine, pos - lineStart, pos);
@@ -220,9 +200,7 @@ export default abstract class Tokenizer extends CommentsParser {
       // after a "use strict" directive. Strict mode will be set at parse
       // time for any literals that occur after the next node of the strict
       // directive.
-      this.state.strictErrors.forEach(([toParseError, at]) =>
-        this.raise(toParseError, { at }),
-      );
+      this.state.strictErrors.forEach(([toParseError, at]) => this.raise(toParseError, { at }));
       this.state.strictErrors.clear();
     }
   }
@@ -250,7 +228,7 @@ export default abstract class Tokenizer extends CommentsParser {
   // *-/ is used by the Flow plugin, when parsing block comments nested
   // inside Flow comments.
   skipBlockComment(commentEnd: "*/" | "*-/"): N.CommentBlock | undefined {
-    let startLoc;
+    let startLoc: any;
     if (!this.isLookahead) startLoc = this.state.curPosition();
     const start = this.state.pos;
     const end = this.input.indexOf(commentEnd, start + 2);
@@ -280,7 +258,7 @@ export default abstract class Tokenizer extends CommentsParser {
       value: this.input.slice(start + 2, end),
       start,
       end: end + commentEnd.length,
-      loc: new SourceLocation(startLoc, this.state.curPosition()),
+      loc: new SourceLocation(startLoc!, this.state.curPosition()),
     };
     if (this.options.tokens) this.pushToken(comment);
     return comment;
@@ -288,7 +266,7 @@ export default abstract class Tokenizer extends CommentsParser {
 
   skipLineComment(startSkip: number): N.CommentLine | undefined {
     const start = this.state.pos;
-    let startLoc;
+    let startLoc: any;
     if (!this.isLookahead) startLoc = this.state.curPosition();
     let ch = this.input.charCodeAt((this.state.pos += startSkip));
     if (this.state.pos < this.length) {
@@ -310,7 +288,7 @@ export default abstract class Tokenizer extends CommentsParser {
       value,
       start,
       end,
-      loc: new SourceLocation(startLoc, this.state.curPosition()),
+      loc: new SourceLocation(startLoc!, this.state.curPosition()),
     };
     if (this.options.tokens) this.pushToken(comment);
     return comment;
@@ -331,9 +309,7 @@ export default abstract class Tokenizer extends CommentsParser {
           ++this.state.pos;
           break;
         case charCodes.carriageReturn:
-          if (
-            this.input.charCodeAt(this.state.pos + 1) === charCodes.lineFeed
-          ) {
+          if (this.input.charCodeAt(this.state.pos + 1) === charCodes.lineFeed) {
             ++this.state.pos;
           }
         // fall through
@@ -486,7 +462,7 @@ export default abstract class Tokenizer extends CommentsParser {
           next === charCodes.leftCurlyBrace
             ? Errors.RecordExpressionHashIncorrectStartSyntaxType
             : Errors.TupleExpressionHashIncorrectStartSyntaxType,
-          { at: this.state.curPosition() },
+          { at: this.state.curPosition() }
         );
       }
 
@@ -516,10 +492,7 @@ export default abstract class Tokenizer extends CommentsParser {
       return;
     }
 
-    if (
-      next === charCodes.dot &&
-      this.input.charCodeAt(this.state.pos + 2) === charCodes.dot
-    ) {
+    if (next === charCodes.dot && this.input.charCodeAt(this.state.pos + 2) === charCodes.dot) {
       this.state.pos += 3;
       this.finishToken(tt.ellipsis);
     } else {
@@ -590,10 +563,7 @@ export default abstract class Tokenizer extends CommentsParser {
       if (this.input.charCodeAt(this.state.pos + 2) === charCodes.equalsTo) {
         this.finishOp(tt.assign, 3);
       } else {
-        this.finishOp(
-          code === charCodes.verticalBar ? tt.logicalOR : tt.logicalAND,
-          2,
-        );
+        this.finishOp(code === charCodes.verticalBar ? tt.logicalOR : tt.logicalAND, 2);
       }
       return;
     }
@@ -605,10 +575,7 @@ export default abstract class Tokenizer extends CommentsParser {
         return;
       }
       // '|}'
-      if (
-        this.hasPlugin("recordAndTuple") &&
-        next === charCodes.rightCurlyBrace
-      ) {
+      if (this.hasPlugin("recordAndTuple") && next === charCodes.rightCurlyBrace) {
         if (this.getPluginOption("recordAndTuple", "syntaxType") !== "bar") {
           throw this.raise(Errors.RecordExpressionBarIncorrectEndSyntaxType, {
             at: this.state.curPosition(),
@@ -620,10 +587,7 @@ export default abstract class Tokenizer extends CommentsParser {
       }
 
       // '|]'
-      if (
-        this.hasPlugin("recordAndTuple") &&
-        next === charCodes.rightSquareBracket
-      ) {
+      if (this.hasPlugin("recordAndTuple") && next === charCodes.rightSquareBracket) {
         if (this.getPluginOption("recordAndTuple", "syntaxType") !== "bar") {
           throw this.raise(Errors.TupleExpressionBarIncorrectEndSyntaxType, {
             at: this.state.curPosition(),
@@ -640,10 +604,7 @@ export default abstract class Tokenizer extends CommentsParser {
       return;
     }
 
-    this.finishOp(
-      code === charCodes.verticalBar ? tt.bitwiseOR : tt.bitwiseAND,
-      1,
-    );
+    this.finishOp(code === charCodes.verticalBar ? tt.bitwiseOR : tt.bitwiseAND, 1);
   }
 
   readToken_caret(): void {
@@ -661,10 +622,7 @@ export default abstract class Tokenizer extends CommentsParser {
       next === charCodes.caret &&
       // If the ^^ token is not enabled, we don't throw but parse two single ^s
       // because it could be a ^ hack token followed by a ^ binary operator.
-      this.hasPlugin([
-        "pipelineOperator",
-        { proposal: "hack", topicToken: "^^" },
-      ])
+      this.hasPlugin(["pipelineOperator", { proposal: "hack", topicToken: "^^" }])
     ) {
       this.finishOp(tt.doubleCaret, 2);
 
@@ -686,10 +644,7 @@ export default abstract class Tokenizer extends CommentsParser {
     // '@@'
     if (
       next === charCodes.atSign &&
-      this.hasPlugin([
-        "pipelineOperator",
-        { proposal: "hack", topicToken: "@@" },
-      ])
+      this.hasPlugin(["pipelineOperator", { proposal: "hack", topicToken: "@@" }])
     ) {
       this.finishOp(tt.doubleAt, 2);
     }
@@ -744,8 +699,7 @@ export default abstract class Tokenizer extends CommentsParser {
     const next = this.input.charCodeAt(pos + 1);
 
     if (next === charCodes.greaterThan) {
-      const size =
-        this.input.charCodeAt(pos + 2) === charCodes.greaterThan ? 3 : 2;
+      const size = this.input.charCodeAt(pos + 2) === charCodes.greaterThan ? 3 : 2;
       if (this.input.charCodeAt(pos + size) === charCodes.equalsTo) {
         this.finishOp(tt.assign, size + 1);
         return;
@@ -769,9 +723,7 @@ export default abstract class Tokenizer extends CommentsParser {
     if (next === charCodes.equalsTo) {
       this.finishOp(
         tt.equality,
-        this.input.charCodeAt(this.state.pos + 2) === charCodes.equalsTo
-          ? 3
-          : 2,
+        this.input.charCodeAt(this.state.pos + 2) === charCodes.equalsTo ? 3 : 2
       );
       return;
     }
@@ -841,10 +793,9 @@ export default abstract class Tokenizer extends CommentsParser {
           this.input.charCodeAt(this.state.pos + 1) === charCodes.verticalBar
         ) {
           if (this.getPluginOption("recordAndTuple", "syntaxType") !== "bar") {
-            throw this.raise(
-              Errors.TupleExpressionBarIncorrectStartSyntaxType,
-              { at: this.state.curPosition() },
-            );
+            throw this.raise(Errors.TupleExpressionBarIncorrectStartSyntaxType, {
+              at: this.state.curPosition(),
+            });
           }
 
           // [|
@@ -865,10 +816,9 @@ export default abstract class Tokenizer extends CommentsParser {
           this.input.charCodeAt(this.state.pos + 1) === charCodes.verticalBar
         ) {
           if (this.getPluginOption("recordAndTuple", "syntaxType") !== "bar") {
-            throw this.raise(
-              Errors.RecordExpressionBarIncorrectStartSyntaxType,
-              { at: this.state.curPosition() },
-            );
+            throw this.raise(Errors.RecordExpressionBarIncorrectStartSyntaxType, {
+              at: this.state.curPosition(),
+            });
           }
 
           // {|
@@ -1109,7 +1059,7 @@ export default abstract class Tokenizer extends CommentsParser {
     radix: number,
     len?: number,
     forceLen: boolean = false,
-    allowNumSeparator: boolean | "bail" = true,
+    allowNumSeparator: boolean | "bail" = true
   ): number | null {
     const { n, pos } = readInt(
       this.input,
@@ -1121,7 +1071,7 @@ export default abstract class Tokenizer extends CommentsParser {
       forceLen,
       allowNumSeparator,
       this.errorHandlers_readInt,
-      /* bailOnError */ false,
+      /* bailOnError */ false
     );
     this.state.pos = pos;
     return n;
@@ -1156,9 +1106,7 @@ export default abstract class Tokenizer extends CommentsParser {
     }
 
     if (isBigInt) {
-      const str = this.input
-        .slice(startLoc.index, this.state.pos)
-        .replace(/[_n]/g, "");
+      const str = this.input.slice(startLoc.index, this.state.pos).replace(/[_n]/g, "");
       this.finishToken(tt.bigint, str);
       return;
     }
@@ -1181,8 +1129,7 @@ export default abstract class Tokenizer extends CommentsParser {
       this.raise(Errors.InvalidNumber, { at: this.state.curPosition() });
     }
     const hasLeadingZero =
-      this.state.pos - start >= 2 &&
-      this.input.charCodeAt(start) === charCodes.digit0;
+      this.state.pos - start >= 2 && this.input.charCodeAt(start) === charCodes.digit0;
 
     if (hasLeadingZero) {
       const integer = this.input.slice(start, this.state.pos);
@@ -1208,10 +1155,7 @@ export default abstract class Tokenizer extends CommentsParser {
       next = this.input.charCodeAt(this.state.pos);
     }
 
-    if (
-      (next === charCodes.uppercaseE || next === charCodes.lowercaseE) &&
-      !isOctal
-    ) {
+    if ((next === charCodes.uppercaseE || next === charCodes.lowercaseE) && !isOctal) {
       next = this.input.charCodeAt(++this.state.pos);
       if (next === charCodes.plusSign || next === charCodes.dash) {
         ++this.state.pos;
@@ -1275,7 +1219,7 @@ export default abstract class Tokenizer extends CommentsParser {
       this.state.lineStart,
       this.state.curLine,
       throwOnInvalid,
-      this.errorHandlers_readCodePoint,
+      this.errorHandlers_readCodePoint
     );
     this.state.pos = pos;
     return code;
@@ -1288,7 +1232,7 @@ export default abstract class Tokenizer extends CommentsParser {
       this.state.pos + 1, // skip the quote
       this.state.lineStart,
       this.state.curLine,
-      this.errorHandlers_readStringContents_string,
+      this.errorHandlers_readStringContents_string
     );
     this.state.pos = pos + 1; // skip the quote
     this.state.lineStart = lineStart;
@@ -1309,15 +1253,14 @@ export default abstract class Tokenizer extends CommentsParser {
   // Reads template string tokens.
   readTemplateToken(): void {
     const opening = this.input[this.state.pos];
-    const { str, firstInvalidLoc, pos, curLine, lineStart } =
-      readStringContents(
-        "template",
-        this.input,
-        this.state.pos + 1, // skip '`' or `}`
-        this.state.lineStart,
-        this.state.curLine,
-        this.errorHandlers_readStringContents_template,
-      );
+    const { str, firstInvalidLoc, pos, curLine, lineStart } = readStringContents(
+      "template",
+      this.input,
+      this.state.pos + 1, // skip '`' or `}`
+      this.state.lineStart,
+      this.state.curLine,
+      this.errorHandlers_readStringContents_template
+    );
     this.state.pos = pos + 1; // skip '`' or `$`
     this.state.lineStart = lineStart;
     this.state.curLine = curLine;
@@ -1326,28 +1269,19 @@ export default abstract class Tokenizer extends CommentsParser {
       this.state.firstInvalidTemplateEscapePos = new Position(
         firstInvalidLoc.curLine,
         firstInvalidLoc.pos - firstInvalidLoc.lineStart,
-        firstInvalidLoc.pos,
+        firstInvalidLoc.pos
       );
     }
 
     if (this.input.codePointAt(pos) === charCodes.graveAccent) {
-      this.finishToken(
-        tt.templateTail,
-        firstInvalidLoc ? null : opening + str + "`",
-      );
+      this.finishToken(tt.templateTail, firstInvalidLoc ? null : opening + str + "`");
     } else {
       this.state.pos++; // skip '{'
-      this.finishToken(
-        tt.templateNonTail,
-        firstInvalidLoc ? null : opening + str + "${",
-      );
+      this.finishToken(tt.templateNonTail, firstInvalidLoc ? null : opening + str + "${");
     }
   }
 
-  recordStrictModeErrors(
-    toParseError: DeferredStrictError,
-    { at }: { at: Position },
-  ) {
+  recordStrictModeErrors(toParseError: DeferredStrictError, { at }: { at: Position }) {
     const index = at.index;
 
     if (this.state.strict && !this.state.strictErrors.has(index)) {
@@ -1384,8 +1318,7 @@ export default abstract class Tokenizer extends CommentsParser {
 
         word += this.input.slice(chunkStart, this.state.pos);
         const escStart = this.state.curPosition();
-        const identifierCheck =
-          this.state.pos === start ? isIdentifierStart : isIdentifierChar;
+        const identifierCheck = this.state.pos === start ? isIdentifierStart : isIdentifierChar;
 
         if (this.input.charCodeAt(++this.state.pos) !== charCodes.lowercaseU) {
           this.raise(Errors.MissingUnicodeEscape, {
@@ -1448,7 +1381,7 @@ export default abstract class Tokenizer extends CommentsParser {
    */
   raise<ErrorDetails>(
     toParseError: ParseErrorConstructor<ErrorDetails>,
-    raiseProperties: RaiseProperties<ErrorDetails>,
+    raiseProperties: RaiseProperties<ErrorDetails>
   ): ParseError<ErrorDetails> {
     const { at, ...details } = raiseProperties;
     const loc = at instanceof Position ? at : at.loc.start;
@@ -1469,7 +1402,7 @@ export default abstract class Tokenizer extends CommentsParser {
    */
   raiseOverwrite<ErrorDetails>(
     toParseError: ParseErrorConstructor<ErrorDetails>,
-    raiseProperties: RaiseProperties<ErrorDetails>,
+    raiseProperties: RaiseProperties<ErrorDetails>
   ): ParseError<ErrorDetails> | never {
     const { at, ...details } = raiseProperties;
     const loc = at instanceof Position ? at : at.loc.start;
@@ -1539,12 +1472,8 @@ export default abstract class Tokenizer extends CommentsParser {
       // Continue parsing the number as if there was no invalid digit.
       return true;
     },
-    numericSeparatorInEscapeSequence: this.errorBuilder(
-      Errors.NumericSeparatorInEscapeSequence,
-    ),
-    unexpectedNumericSeparator: this.errorBuilder(
-      Errors.UnexpectedNumericSeparator,
-    ),
+    numericSeparatorInEscapeSequence: this.errorBuilder(Errors.NumericSeparatorInEscapeSequence),
+    unexpectedNumericSeparator: this.errorBuilder(Errors.UnexpectedNumericSeparator),
   };
 
   errorHandlers_readCodePoint: CodePointErrorHandlers = {

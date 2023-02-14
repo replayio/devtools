@@ -1,24 +1,24 @@
-import {
-  SCOPE_ARROW,
-  SCOPE_DIRECT_SUPER,
-  SCOPE_FUNCTION,
-  SCOPE_SIMPLE_CATCH,
-  SCOPE_SUPER,
-  SCOPE_PROGRAM,
-  SCOPE_VAR,
-  SCOPE_CLASS,
-  SCOPE_STATIC_BLOCK,
-  BIND_SCOPE_FUNCTION,
-  BIND_SCOPE_VAR,
-  BIND_SCOPE_LEXICAL,
-  BIND_KIND_VALUE,
-  type ScopeFlags,
-  type BindingTypes,
-} from "./scopeflags";
-import type { Position } from "./location";
-import type * as N from "../types";
 import { Errors } from "../parse-error";
 import type Tokenizer from "../tokenizer";
+import type * as N from "../types";
+import type { Position } from "./location";
+import {
+  BIND_KIND_VALUE,
+  BIND_SCOPE_FUNCTION,
+  BIND_SCOPE_LEXICAL,
+  BIND_SCOPE_VAR,
+  BindingTypes,
+  SCOPE_ARROW,
+  SCOPE_CLASS,
+  SCOPE_DIRECT_SUPER,
+  SCOPE_FUNCTION,
+  SCOPE_PROGRAM,
+  SCOPE_SIMPLE_CATCH,
+  SCOPE_STATIC_BLOCK,
+  SCOPE_SUPER,
+  SCOPE_VAR,
+  ScopeFlags,
+} from "./scopeflags";
 
 // Start an AST node, attaching a start offset.
 export class Scope {
@@ -92,12 +92,13 @@ export default class ScopeHandler<IScope extends Scope = Scope> {
 
   enter(flags: ScopeFlags) {
     /*:: +createScope: (flags: ScopeFlags) => IScope; */
-    // @ts-expect-error This method will be overwritten by subclasses
+    // @ts-expect-error
     this.scopeStack.push(this.createScope(flags));
   }
 
   exit(): ScopeFlags {
     const scope = this.scopeStack.pop();
+    // @ts-expect-error
     return scope.flags;
   }
 
@@ -146,12 +147,7 @@ export default class ScopeHandler<IScope extends Scope = Scope> {
     }
   }
 
-  checkRedeclarationInScope(
-    scope: IScope,
-    name: string,
-    bindingType: BindingTypes,
-    loc: Position,
-  ) {
+  checkRedeclarationInScope(scope: IScope, name: string, bindingType: BindingTypes, loc: Position) {
     if (this.isRedeclaredInScope(scope, name, bindingType)) {
       this.parser.raise(Errors.VarRedeclaration, {
         at: loc,
@@ -160,34 +156,22 @@ export default class ScopeHandler<IScope extends Scope = Scope> {
     }
   }
 
-  isRedeclaredInScope(
-    scope: IScope,
-    name: string,
-    bindingType: BindingTypes,
-  ): boolean {
+  isRedeclaredInScope(scope: IScope, name: string, bindingType: BindingTypes): boolean {
     if (!(bindingType & BIND_KIND_VALUE)) return false;
 
     if (bindingType & BIND_SCOPE_LEXICAL) {
-      return (
-        scope.lexical.has(name) ||
-        scope.functions.has(name) ||
-        scope.var.has(name)
-      );
+      return scope.lexical.has(name) || scope.functions.has(name) || scope.var.has(name);
     }
 
     if (bindingType & BIND_SCOPE_FUNCTION) {
       return (
-        scope.lexical.has(name) ||
-        (!this.treatFunctionsAsVarInScope(scope) && scope.var.has(name))
+        scope.lexical.has(name) || (!this.treatFunctionsAsVarInScope(scope) && scope.var.has(name))
       );
     }
 
     return (
       (scope.lexical.has(name) &&
-        !(
-          scope.flags & SCOPE_SIMPLE_CATCH &&
-          scope.lexical.values().next().value === name
-        )) ||
+        !(scope.flags & SCOPE_SIMPLE_CATCH && scope.lexical.values().next().value === name)) ||
       (!this.treatFunctionsAsVarInScope(scope) && scope.functions.has(name))
     );
   }
