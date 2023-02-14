@@ -18,8 +18,8 @@ import { ThreadFront } from "protocol/thread";
 import { preCacheExecutionPointForTime } from "replay-next/src/suspense/ExecutionPointsCache";
 
 import { client } from "./socket";
-import { MAX_POINTS_FOR_FULL_ANALYSIS } from "./thread/analysis";
-import { assert } from "./utils";
+
+export const MAX_POINTS_FOR_FULL_ANALYSIS = 200;
 
 // For more information about these params, see:
 // https://static.replay.io/protocol/tot/Analysis
