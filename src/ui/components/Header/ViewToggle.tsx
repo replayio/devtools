@@ -8,7 +8,7 @@ import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ViewMode } from "ui/state/layout";
 import { isTest } from "ui/utils/environment";
-import { shouldShowNag } from "ui/utils/user";
+import { shouldShowNag } from "ui/utils/tour";
 
 import MaterialIcon from "../shared/MaterialIcon";
 
@@ -61,20 +61,7 @@ export default function ViewToggle() {
   }
 
   return (
-    <div className="flex">
-      {showDevtoolsNag && (
-        <button
-          type="button"
-          onClick={() => handleToggle("dev")}
-          className="mr-3 flex items-center space-x-1.5 rounded-lg bg-primaryAccent text-sm text-buttontextColor hover:bg-primaryAccentHover"
-          style={{ padding: "5px 12px" }}
-        >
-          <div className="overflow-hidden whitespace-nowrap">
-            Welcome to Replay ❤️ Check out DevTools!
-          </div>
-          <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
-        </button>
-      )}
+    <div className="flex">     
       <div className="view-toggle" role="button">
         <div
           className="handle"

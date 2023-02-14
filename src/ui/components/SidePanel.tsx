@@ -65,17 +65,23 @@ export default function SidePanel() {
   }
 
   return (
-    <div
-      className="w-full overflow-hidden rounded-lg bg-bodyBgcolor text-xs"
-      data-test-id="leftSidebar"
-    >
-      {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}
-      {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}
-      {selectedPrimaryPanel === "comments" && <CommentCardsList />}
-      {selectedPrimaryPanel === "events" && <EventsPane items={items} />}
-      {selectedPrimaryPanel === "cypress" && <TestSuitePanel />}
-      {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
-      {selectedPrimaryPanel === "search" && <SearchFilesReduxAdapter />}
+    <div className="flex flex-col w-full gap-1">
+      
+      {1 == 1 && (
+      <div className="p-2 rounded-md bg-primaryAccent">
+        This is where we will say things!
+      </div>
+    )}
+      
+      <div className="w-full overflow-hidden rounded-lg bg-bodyBgcolor text-xs">
+        {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}
+        {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}
+        {selectedPrimaryPanel === "comments" && <CommentCardsList />}
+        {selectedPrimaryPanel === "events" && <EventsPane items={items} />}
+        {selectedPrimaryPanel === "cypress" && <TestSuitePanel />}
+        {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
+        {selectedPrimaryPanel === "search" && <SearchFilesReduxAdapter />}
+      </div>
     </div>
   );
 }

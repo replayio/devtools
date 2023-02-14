@@ -10,6 +10,7 @@ import { formatRelativeTime } from "ui/utils/comments";
 import { getDisplayedUrl } from "ui/utils/environment";
 import { getRecordingId, showDurationWarning } from "ui/utils/recording";
 import useAuth0 from "ui/utils/useAuth0";
+import { shouldShowNag } from "ui/utils/tour";
 
 import { AvatarImage } from "../Avatar";
 import Icon from "../shared/Icon";
@@ -50,8 +51,8 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
   };
 
   const isTest = recording.metadata?.test;
-  return (
-    <div className="flex-column flex items-center overflow-hidden border-splitter bg-bodyBgcolor">
+  return (      
+    <div className="flex-column flex items-center overflow-hidden border-splitter bg-bodyBgcolor">     
       <div className="mt-.5 mb-2 flex w-full cursor-default flex-col self-stretch overflow-hidden px-1.5 pb-0 text-xs">
         {recording.user ? (
           <Row>
