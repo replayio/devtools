@@ -222,16 +222,10 @@ function Header({
 
 function DownloadSection({ recording }: { recording: Recording }) {
   const token = useToken();
-  const currentTime = useAppSelector(getCurrentTime);
-  const [screen, setScreen] = useState<ScreenShot | null>(null);
 
   const [downloadState, setDownloadState] = useState<
     "not-started" | "downloading" | "success" | "error"
   >("not-started");
-
-  useEffect(() => {
-    getGraphicsAtTime(currentTime).then(res => res.screen && setScreen(res.screen));
-  }, [currentTime]);
 
   const buttonStates = {
     "not-started": {
