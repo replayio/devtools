@@ -13,6 +13,7 @@ import {
 } from "react";
 import { areEqual } from "react-window";
 
+import useGetDefaultLogPointContent from "replay-next/components/sources/hooks/useGetDefaultLogPointContent";
 import SearchResultHighlight from "replay-next/components/sources/SearchResultHighlight";
 import { SourceSearchContext } from "replay-next/components/sources/SourceSearchContext";
 import useSourceContextMenu from "replay-next/components/sources/useSourceContextMenu";
@@ -117,6 +118,12 @@ const SourceListRow = memo(
     );
 
     const lineHitCounts = hitCounts?.get(lineNumber) || null;
+
+    const getDefaultLogPointContent = useGetDefaultLogPointContent({
+      lineHitCounts,
+      lineNumber,
+      source,
+    });
 
     let tokens: ParsedToken[] | null = null;
     if (syntaxHighlightingEnabled && index < parsedTokensByLine.length) {
@@ -264,8 +271,6 @@ const SourceListRow = memo(
       lineSegments = <SourceLineLoadingPlaceholder width={loadingPlaceholderWidth} />;
     }
 
-    const shouldBreak = pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED;
-
     const toggleBreakpoint = () => {
       if (lineHitCounts === null) {
         return;
@@ -278,7 +283,7 @@ const SourceListRow = memo(
           {
             badge: null,
             condition: null,
-            content: "",
+            content: getDefaultLogPointContent() || "",
           },
           {
             shouldBreak: POINT_BEHAVIOR_ENABLED,

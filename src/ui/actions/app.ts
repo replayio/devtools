@@ -7,7 +7,7 @@ import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { ReplayClientInterface } from "shared/client/types";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
-import * as selectors from "ui/reducers/app";
+import { getEventsForType } from "ui/reducers/app";
 import { getTheme } from "ui/reducers/app";
 import { Canvas, EventKind, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
 import { getBoundingRectsAsync } from "ui/suspense/nodeCaches";
@@ -146,10 +146,7 @@ function loadReceivedKeyboardEvents(): UIThunkAction {
 
 function onNavigationEvents(events: ReplayNavigationEvent[], store: UIStore) {
   const currentNavEvents: ReplayNavigationEvent[] = events.map(e => ({ ...e, kind: "navigation" }));
-  const newNavEvents = [
-    ...selectors.getEventsForType(store.getState(), "navigation"),
-    ...currentNavEvents,
-  ];
+  const newNavEvents = [...getEventsForType(store.getState(), "navigation"), ...currentNavEvents];
   newNavEvents.sort((a, b) => compareBigInt(BigInt(a.point), BigInt(b.point)));
 
   store.dispatch(loadReceivedEvents({ navigation: newNavEvents }));
