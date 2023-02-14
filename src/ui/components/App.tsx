@@ -1,4 +1,4 @@
-import React, { ReactNode, createContext, useEffect } from "react";
+import React, { ReactNode, useEffect } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import QuickOpenModal from "devtools/client/debugger/src/components/QuickOpenModal";
@@ -6,8 +6,8 @@ import { getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
 import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
-import * as selectors from "ui/reducers/app";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { getLoadingFinished, getModal, getTheme } from "ui/reducers/app";
+import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
 import { isTest } from "ui/utils/environment";
@@ -39,7 +39,7 @@ const SingleInviteModal = React.lazy(() => import("./shared/OnboardingModal/Sing
 const FirstReplayModal = React.lazy(() => import("./shared/FirstReplayModal"));
 
 function AppModal({ hideModal, modal }: { hideModal: () => void; modal: ModalType }) {
-  const loadingFinished = useAppSelector(selectors.getLoadingFinished);
+  const loadingFinished = useAppSelector(getLoadingFinished);
 
   // Dismiss modal if the "Escape" key is pressed.
   useEffect(() => {
@@ -114,7 +114,7 @@ function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
   const auth = useAuth0();
   const dismissNag = hooks.useDismissNag();
   const userInfo = useGetUserInfo();
-  const theme = useAppSelector(selectors.getTheme);
+  const theme = useAppSelector(getTheme);
 
   useEffect(() => {
     if (userInfo.nags && shouldShowNag(userInfo.nags, Nag.FIRST_LOG_IN)) {
@@ -180,7 +180,7 @@ function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
 
 const connector = connect(
   (state: UIState) => ({
-    modal: selectors.getModal(state),
+    modal: getModal(state),
 
     // Only read quick open state if it exists, to ensure safe loads
     quickOpenEnabled: !!state.quickOpen && getQuickOpenEnabled(state),

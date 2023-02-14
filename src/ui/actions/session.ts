@@ -23,7 +23,7 @@ import {
   setCurrentPoint,
   setTrialExpired,
 } from "ui/reducers/app";
-import * as selectors from "ui/reducers/app";
+import { getUnexpectedError } from "ui/reducers/app";
 import {
   ProtocolEvent,
   errorReceived,
@@ -331,7 +331,7 @@ export function createSocket(
       await ThreadFront.loadingHasBegun.promise;
       dispatch(jumpToInitialPausePoint());
     } catch (e: any) {
-      const currentError = selectors.getUnexpectedError(getState());
+      const currentError = getUnexpectedError(getState());
 
       // Don't overwrite an existing error.
       if (!currentError) {
