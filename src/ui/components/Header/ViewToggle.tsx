@@ -61,7 +61,7 @@ export default function ViewToggle() {
   }
 
   return (
-    <div className="flex">     
+    <div className="flex">
       <div className="view-toggle" role="button">
         <div
           className="handle"

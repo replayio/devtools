@@ -12,8 +12,8 @@ import { UIState } from "ui/state";
 import { ModalType } from "ui/state/app";
 import { isTest } from "ui/utils/environment";
 import { trackEvent } from "ui/utils/telemetry";
-import useAuth0 from "ui/utils/useAuth0";
 import { shouldShowNag } from "ui/utils/tour";
+import useAuth0 from "ui/utils/useAuth0";
 
 import { ConfirmRenderer } from "./shared/Confirm";
 import AppErrors from "./shared/Error";

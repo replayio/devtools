@@ -5,11 +5,15 @@ import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPan
 import Accordion from "devtools/client/debugger/src/components/shared/Accordion";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import Events from "ui/components/Events";
+import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
 import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
+import hooks from "ui/hooks";
 import { useFeature } from "ui/hooks/settings";
+import { Nag } from "ui/hooks/users";
 import { useTestInfo } from "ui/hooks/useTestInfo";
 import { getFlatEvents } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
+import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import CommentCardsList from "./Comments/CommentCardsList";
@@ -41,6 +45,11 @@ export default function SidePanel() {
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
   const events = useAppSelector(getFlatEvents);
 
+  const viewMode = useAppSelector(getViewMode);
+  const { nags } = hooks.useGetUserInfo();
+
+  const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
+
   const items: any[] = [];
 
   // if (recording?.metadata?.test?.tests?.length) {
@@ -65,14 +74,11 @@ export default function SidePanel() {
   }
 
   return (
-    <div className="flex flex-col w-full gap-1">
-      
-      {1 == 1 && (
-      <div className="p-2 rounded-md bg-primaryAccent">
-        This is where we will say things!
-      </div>
-    )}
-      
+    <div className="flex w-full flex-col gap-1">
+      {shouldShowDevToolsNag(nags, viewMode) && (
+        <div className="rounded-md bg-primaryAccent p-2">Welcome to Replay!</div>
+      )}
+
       <div className="w-full overflow-hidden rounded-lg bg-bodyBgcolor text-xs">
         {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}
         {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}

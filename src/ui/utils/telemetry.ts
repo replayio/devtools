@@ -37,7 +37,7 @@ export function setupTelemetry() {
     // sporadic errors from Next.js
     "Failed to execute 'measure' on 'Performance'",
     "Cannot read properties of undefined (reading 'digest')",
-    "can't access property \"digest\", t is undefined",
+    'can\'t access property "digest", t is undefined',
   ];
   // We always initialize mixpanel here. This allows us to force enable mixpanel events even if
   // telemetry events are being skipped for any reason, e.g. development, test, etc.
