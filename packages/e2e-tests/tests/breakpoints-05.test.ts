@@ -7,6 +7,7 @@ import {
   rewindToLine,
 } from "../helpers/pause-information-panel";
 import { addBreakpoint, removeBreakpoint } from "../helpers/source-panel";
+import { delay } from "../helpers/utils";
 
 const url = "doc_debugger_statements.html";
 
@@ -16,6 +17,7 @@ test(`breakpoints-05: Test interaction of breakpoints with debugger statements`,
   await startTest(page, url);
   await openDevToolsTab(page);
   await openPauseInformationPanel(page);
+  await delay(1000);
 
   // Without any breakpoints, this test should rewind to the closest debugger statement.
   await rewindToLine(page, { lineNumber: 9 });

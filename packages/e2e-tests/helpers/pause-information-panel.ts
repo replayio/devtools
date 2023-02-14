@@ -221,12 +221,16 @@ export async function rewindToLine(
   await debugPrint(page, `Rewinding to line ${chalk.bold(lineNumber)}`, "rewindToLine");
 
   if (url !== null) {
+    console.log(">>>>>line 224");
     await openSource(page, url);
   }
 
   await openPauseInformationPanel(page);
+  console.log(">>>>>line 229");
 
   while (true) {
+    console.log(">>>>>line 232");
+
     const button = page.locator('[title="Rewind Execution"]');
     await button.click();
 
