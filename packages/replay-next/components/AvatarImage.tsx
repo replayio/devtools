@@ -15,6 +15,7 @@ export default function AvatarImage({ className, name, src, title, ...rest }: Pr
   const tooltipOrTitle = title ?? name ?? "";
 
   const { onMouseEnter, onMouseLeave, tooltip } = useTooltip({
+    position: "above",
     tooltip: tooltipOrTitle,
   });
 
