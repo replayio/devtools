@@ -87,7 +87,8 @@
   },
   "exclude": [
     "src/devtools/client/debugger/src/workers/parser/tests/fixtures/scopes/*",
-    "node_modules"
+    "node_modules",
+    "packages/e2e-tests",
   ],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
 }
