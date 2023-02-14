@@ -68,6 +68,28 @@ export async function addConditional(
   }
 }
 
+export async function jumpToLogPointHit(
+  page: Page,
+  number: number,
+  options: {
+    lineNumber: number;
+  }
+) {
+  const { lineNumber } = options;
+
+  await debugPrint(
+    page,
+    `Jumping directly to hit "${chalk.bold(number)}" for line ${chalk.bold(lineNumber)}`,
+    "jumpToLogPointHit"
+  );
+
+  const input = page.locator('[data-test-name="LogPointCurrentStepInput"]');
+  await input.focus();
+  await clearTextArea(page, input);
+  await page.keyboard.type(`${number}`);
+  await page.keyboard.press("Enter");
+}
+
 async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
   const lineLocator = await getSourceLine(page, lineNumber);
   const lineIsVisible = await lineLocator.isVisible();
