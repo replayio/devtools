@@ -14,10 +14,8 @@ import {
   getUniqueDomains,
 } from "ui/components/UploadScreen/Privacy";
 import hooks from "ui/hooks";
-import { getRecording, useHasNoRole } from "ui/hooks/recordings";
-import * as selectors from "ui/reducers/app";
-import { getRecordingTarget } from "ui/reducers/app";
-import { getCurrentTime } from "ui/reducers/timeline";
+import { useHasNoRole } from "ui/hooks/recordings";
+import { getModalOptions, getRecordingTarget } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import useToken from "ui/utils/useToken";
@@ -318,7 +316,7 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
 
 const connector = connect(
   (state: UIState) => ({
-    modalOptions: selectors.getModalOptions(state),
+    modalOptions: getModalOptions(state),
   }),
   {
     hideModal: actions.hideModal,
