@@ -182,8 +182,9 @@
   --theme-text-field-bgcolor-hover: var(--theme-base-95);
   --theme-text-field-bgcolor: var(--theme-base-85);
   --theme-text-field-color: #fff;
-  --tooltip-bgcolor: var(--theme-base-85);
+  --tooltip-bgcolor: var(--theme-base-100);
   --tooltip-color: #fff;
+  --tooltip-border: 1px solid rgba(43, 46, 49, 1);
 
   --event-row-hover-background-color: rgba(8, 17, 32, 0.5);
 
@@ -519,7 +520,7 @@
   --theme-toggle-handle-bgcolor: var(--theme-base-100);
   --timejump-text: var(--buttontext-color);
   --title-hover-bgcolor: var(--theme-toggle-bgcolor);
-  --toolbarbutton-focus-bgcolor: var(--theme-toggle-bgcolor);
+  --toolbarbutton-focus-bgcolor: var(--theme-base-95);
   --unloaded-region-img: url("/images/dotted-mask-dark.svg");
 
   /* Toolbar (Dark) */
@@ -687,6 +688,7 @@
   --theme-text-field-color: var(--theme-body-color);
   --tooltip-bgcolor: #38383d;
   --tooltip-color: white;
+  --tooltip-border: 1px solid transparent;
 
   --event-row-hover-background-color: rgba(232, 234, 237, 0.5);
 
