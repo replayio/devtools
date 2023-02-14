@@ -1,4 +1,4 @@
-import classNames from "classnames";
+import classNamesBind from "classnames/bind";
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
@@ -24,6 +24,8 @@ import { TestCaseContext } from "./TestCase";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { TestStepRow } from "./TestStepRow";
 import styles from "./TestInfo.module.css";
+
+const classNames = classNamesBind.bind(styles);
 
 function preventClickFromSpaceBar(ev: React.KeyboardEvent<HTMLButtonElement>) {
   if (ev.key === " ") {
@@ -202,7 +204,7 @@ export function TestStepItem({
         className="flex w-0 flex-grow items-start space-x-2 text-start"
         title={`Step ${index + 1}: ${step.name} ${argString || ""}`}
       >
-        <div className={`flex-grow font-medium ${state === "paused" ? "font-bold" : ""}`}>
+        <div className={`flex-grow font-medium break-all ${state === "paused" ? "font-bold" : ""}`}>
           {step.parentId ? "- " : ""}{" "}
           <span className={`${styles.step} ${styles[step.name]}`}>{step.name}</span>
           <span className="opacity-70">{argString}</span>
@@ -214,6 +216,8 @@ export function TestStepItem({
       {step.alias ? (
         <span
           className={classNames(
+            "alias",
+            // TODO [ryanjduffy]: Migrate these into the CSS module class
             "-my-1 flex-shrink rounded p-1 text-xs text-gray-800",
             isSelected ? "bg-gray-300" : "bg-gray-200"
           )}

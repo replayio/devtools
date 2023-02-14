@@ -1,4 +1,6 @@
-import { ExecutionPoint } from "@replayio/protocol";
+import { ExecutionPoint, Location } from "@replayio/protocol";
+
+import { Point as PointData } from "shared/client/types";
 
 export enum Nag {
   FIRST_LOG_IN = "first_log_in",

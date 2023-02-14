@@ -1,0 +1,27 @@
+.Tooltip {
+  position: absolute;
+  z-index: var(--z-index-1--tooltip);
+  background-color: var(--tooltip-bgcolor);
+  border: var(--tooltip-border);
+  color: var(--tooltip-color);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  pointer-events: none;
+  font-family: var(--font-family-default);
+  font-size: var(--font-size-regular);
+  white-space: nowrap;
+  animation: tooltip-pop-in 100ms ease;
+  transition: margin 200ms ease;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.05));
+}
+
+@keyframes tooltip-pop-in {
+  0% {
+    transform: scale(0.5, 0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1, 1);
+    opacity: 1;
+  }
+}

@@ -1,17 +1,59 @@
-import { ImgHTMLAttributes } from "react";
+import { ImgHTMLAttributes, useState } from "react";
+
+import useTooltip from "replay-next/src/hooks/useTooltip";
 
 import styles from "./AvatarImage.module.css";
 
-export default function AvatarImage(props: ImgHTMLAttributes<HTMLImageElement>) {
-  // The user image URLs that we get from Google sometimes fail to load, in that case
-  // we fall back to a transparent image (instead of showing the browser's icon for broken images)
-  const onError = ({ currentTarget }: any) => {
-    currentTarget.src = "/avatar-fallback.png";
+type Props = {
+  name?: string;
+} & ImgHTMLAttributes<HTMLImageElement>;
+
+export default function AvatarImage({ className, name, src, title, ...rest }: Props) {
+  const [source, setSource] = useState(src);
+  const [showNameBadge, setShowNameBadge] = useState(name && !src);
+
+  const tooltipOrTitle = title ?? name ?? "";
+
+  const { onMouseEnter, onMouseLeave, tooltip } = useTooltip({
+    position: "above",
+    tooltip: tooltipOrTitle,
+  });
+
+  // If the user has no image, their initials can be shown as a fallback.
+  if (name && showNameBadge) {
+    const initials = name
+      .split(" ")
+      .map(n => n.charAt(0))
+      .join("");
+
+    return (
+      <div className={`${styles.Name} ${className}`} title={tooltipOrTitle}>
+        {initials}
+      </div>
+    );
+  }
+
+  // If a user image fails to load, show a fallback.
+  const onError = () => {
+    if (name) {
+      setShowNameBadge(true);
+    } else {
+      setSource("/images/avatar-fallback.png");
+    }
   };
 
-  const { className = "", ...rest } = props;
-
   return (
-    <img {...rest} className={`${styles.Image} ${className}`} data-private onError={onError} />
+    <>
+      <img
+        {...rest}
+        className={`${styles.Image} ${className}`}
+        data-private
+        onError={onError}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        src={source}
+      />
+      {tooltip}
+    </>
   );
 }

@@ -8,7 +8,7 @@ import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
 import { RulesApp } from "devtools/client/inspector/rules/components/RulesApp";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
-import { ResponsiveTabs } from "../../shared/components/ResponsiveTabs";
+import { ResponsiveTabs, Tab } from "../../shared/components/ResponsiveTabs";
 import { setActiveTab } from "../actions";
 import { EventListenersApp } from "../event-listeners/EventListenersApp";
 import { InspectorActiveTab } from "../reducers";
@@ -55,22 +55,13 @@ export default function InspectorApp() {
                           {availableTabs.map(panelId => {
                             const isPanelSelected = activeTab === panelId;
                             return (
-                              <span
+                              <Tab
                                 key={panelId}
-                                className={classnames("tabs-menu-item", {
-                                  "is-active": isPanelSelected,
-                                })}
-                              >
-                                <span className="devtools-tab-line"></span>
-                                <button
-                                  id={`${panelId}-tab`}
-                                  title={INSPECTOR_TAB_TITLES[panelId]}
-                                  role="tab"
-                                  onClick={() => dispatch(setActiveTab(panelId))}
-                                >
-                                  {INSPECTOR_TAB_TITLES[panelId]}
-                                </button>
-                              </span>
+                                id={panelId}
+                                active={isPanelSelected}
+                                text={INSPECTOR_TAB_TITLES[panelId]}
+                                onClick={() => dispatch(setActiveTab(panelId))}
+                              />
                             );
                           })}
                         </ResponsiveTabs>

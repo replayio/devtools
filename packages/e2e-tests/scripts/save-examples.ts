@@ -82,9 +82,10 @@ async function saveRecording(example: string, recordingId?: string) {
   }
 
   const done = logAnimated(`Saving ${chalk.bold(example)} with recording id ${recordingId}`);
-
   const id = await uploadRecording(recordingId, {
     apiKey: config.replayApiKey,
+    server: config.backendUrl,
+    verbose: true,
   });
 
   await makeReplayPublic(config.replayApiKey, recordingId);
@@ -132,6 +133,7 @@ async function saveExamples(
 
 async function saveBrowserExamples() {
   await saveExamples("browser", config.browserExamplesPath, ".html", saveBrowserExample);
+
   // This example is in a subdirectory so we can't look it up as easily, so we just do it manually.
   if (
     (target === "all" || target === "browser") &&
@@ -154,7 +156,6 @@ async function saveBrowserExample({ exampleFilename }: { exampleFilename: string
     await page.goto(exampleUrl);
     await waitUntilMessage(page as Page, "ExampleFinished");
   });
-
   const recordingId = await uploadLastRecording(exampleUrl);
 
   done();

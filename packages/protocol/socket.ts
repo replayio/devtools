@@ -93,12 +93,15 @@ if (typeof window !== "undefined") {
 }
 
 const noCallerStackTracesForErrorCodes = new Set<ProtocolError>([
+  ProtocolError.CommandFailed,
   ProtocolError.GraphicsUnavailableAtPoint,
   ProtocolError.InternalError,
   ProtocolError.InvalidRecording,
+  ProtocolError.RecordingUnloaded,
   ProtocolError.SessionCreationFailure,
   ProtocolError.SessionDestroyed,
   ProtocolError.ServiceUnavailable,
+  ProtocolError.TimedOut,
   ProtocolError.TooManyPoints,
   ProtocolError.UnknownBuild,
   ProtocolError.UnknownSession,

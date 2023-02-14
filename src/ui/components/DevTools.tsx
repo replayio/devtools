@@ -10,7 +10,7 @@ import {
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import { ThreadFront } from "protocol/thread";
 import { ExpandablesContextRoot } from "replay-next/src/contexts/ExpandablesContext";
-import { PointsContextRoot } from "replay-next/src/contexts/PointsContext";
+import { PointsContextRoot } from "replay-next/src/contexts/points/PointsContext";
 import { SelectedFrameContextRoot } from "replay-next/src/contexts/SelectedFrameContext";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";

@@ -10,7 +10,8 @@ import {
 
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { PointInstance, PointsContext } from "replay-next/src/contexts/PointsContext";
+import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
+import { PointInstance } from "replay-next/src/contexts/points/types";
 import { TerminalContext, TerminalExpression } from "replay-next/src/contexts/TerminalContext";
 import { EventLog, getEventTypeEntryPointsSuspense } from "replay-next/src/suspense/EventsCache";
 import { UncaughtException, getExceptionsSuspense } from "replay-next/src/suspense/ExceptionsCache";
@@ -48,7 +49,8 @@ export function LoggablesContextRoot({
   messageListRef: MutableRefObject<HTMLElement | null>;
 }) {
   const client = useContext(ReplayClientContext);
-  const { pointsForAnalysis: points } = useContext(PointsContext);
+  const { pointBehaviorsForSuspense: pointBehaviors, pointsForSuspense: points } =
+    useContext(PointsContext);
   const {
     eventTypes,
     filterByText,
@@ -142,7 +144,8 @@ export function LoggablesContextRoot({
     const pointInstances: PointInstance[] = [];
 
     points.forEach(point => {
-      if (point.shouldLog === POINT_BEHAVIOR_ENABLED) {
+      const pointBehavior = pointBehaviors[point.key];
+      if (pointBehavior?.shouldLog === POINT_BEHAVIOR_ENABLED) {
         const [hitPoints, status] = getHitPointsForLocationSuspense(
           client,
           point.location,
@@ -171,7 +174,7 @@ export function LoggablesContextRoot({
     });
 
     return pointInstances;
-  }, [client, focusRange, points]);
+  }, [client, focusRange, pointBehaviors, points]);
 
   const { messages: terminalExpressions } = useContext(TerminalContext);
   const sortedTerminalExpressions = useMemo(() => {

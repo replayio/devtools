@@ -110,8 +110,7 @@
   --z-index-1--paused-comment: var(--z-index-1);
   --z-index-1--paused-message: var(--z-index-1);
   --z-index-1--comment-container: var(--z-index-1);
-  --z-index-1--icon-tooltip: var(--z-index-1);
-  --z-index-1--timeline-tooltip: var(--z-index-1);
+  --z-index-1--tooltip: var(--z-index-1);
   --z-index-2--hovered-point-secondary: var(--z-index-2);
   --z-index-3--hovered-point-primary: var(--z-index-3);
   --z-index-3--hovered-comment-primary: var(--z-index-3);
@@ -183,8 +182,9 @@
   --theme-text-field-bgcolor-hover: var(--theme-base-95);
   --theme-text-field-bgcolor: var(--theme-base-85);
   --theme-text-field-color: #fff;
-  --tooltip-bgcolor: var(--theme-base-85);
+  --tooltip-bgcolor: var(--theme-base-100);
   --tooltip-color: #fff;
+  --tooltip-border: 1px solid rgba(43, 46, 49, 1);
 
   --event-row-hover-background-color: rgba(8, 17, 32, 0.5);
 
@@ -259,7 +259,10 @@
   --context-menu-bgcolor-hover: var(--theme-base-95);
 
   --comment-card-source-preview-background-color: #081221;
-  --comment-card-source-preview-background-color-hover: #3e434a;
+  --comment-card-source-preview-background-color-hover: #000;
+  --comment-reply-unpublished-background-color: var(--point-panel-background-color);
+  --comment-reply-unpublished-textfield-background-color: #000;
+  --comment-reply-unpublished-textfield-color: #fff;
 
   --object-inspector-bucket-color: #939395;
   --object-inspector-expanded-key-with-flag: #5ca9cf;
@@ -517,7 +520,7 @@
   --theme-toggle-handle-bgcolor: var(--theme-base-100);
   --timejump-text: var(--buttontext-color);
   --title-hover-bgcolor: var(--theme-toggle-bgcolor);
-  --toolbarbutton-focus-bgcolor: var(--theme-toggle-bgcolor);
+  --toolbarbutton-focus-bgcolor: var(--theme-base-95);
   --unloaded-region-img: url("/images/dotted-mask-dark.svg");
 
   /* Toolbar (Dark) */
@@ -685,6 +688,7 @@
   --theme-text-field-color: var(--theme-body-color);
   --tooltip-bgcolor: #38383d;
   --tooltip-color: white;
+  --tooltip-border: 1px solid transparent;
 
   --event-row-hover-background-color: rgba(232, 234, 237, 0.5);
 
@@ -720,7 +724,7 @@
   --color-contrast: #ffffff;
   --color-current: #f02d5e;
   --color-default: #223344;
-  --color-dim: #666666;
+  --color-dim: rgba(135, 135, 137, 0.9);
   --color-dimmer: #aaaaaa;
   --color-disabled-button: #ffffff;
   --color-error: #ff0000;
@@ -761,6 +765,9 @@
 
   --comment-card-source-preview-background-color-hover: #e6e6e6;
   --comment-card-source-preview-background-color: #f2f3f2;
+  --comment-reply-unpublished-background-color: var(--point-panel-background-color);
+  --comment-reply-unpublished-textfield-background-color: #fff;
+  --comment-reply-unpublished-textfield-color: #000;
 
   --object-inspector-bucket-color: #737373;
   --object-inspector-expanded-key-with-flag: #0074e8;
