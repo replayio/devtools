@@ -1,13 +1,5 @@
 import { TimeStampedPoint } from "@replayio/protocol";
-import {
-  CSSProperties,
-  ChangeEvent,
-  FocusEvent,
-  KeyboardEvent,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-} from "react";
+import { CSSProperties, ChangeEvent, FocusEvent, KeyboardEvent, useMemo, useRef } from "react";
 
 import { HitPointStatus, Point } from "shared/client/types";
 import { deselect, selectAll } from "shared/utils/selection";
@@ -86,18 +78,29 @@ export default function Capsule({
     deselect(currentTarget);
   };
 
+  const onChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const input = inputRef.current!;
+    const numChars = input.value.length;
+    const maxChars = `${hitPoints.length}`.length;
+    input.style.width = `${Math.min(numChars, maxChars)}ch`;
+  };
+
   const onKeyDown = (event: KeyboardEvent) => {
     switch (event.code) {
       case "Enter":
         event.preventDefault();
 
-        const value = inputRef.current!.value;
-        const index = parseInt(value, 10);
-        if (index > 0 && index <= hitPoints.length) {
-          goToIndex(index);
-        }
+        const input = inputRef.current!;
+        const value = input.value;
+        const number = parseInt(value, 10);
+        if (!isNaN(number)) {
+          const index = Math.max(0, Math.min(hitPoints.length - 1, number - 1));
 
-        inputRef.current!.blur();
+          goToIndex(index);
+
+          input.value = `${index + 1}`;
+          input.blur();
+        }
         break;
       case "Escape":
         inputRef.current!.blur();
@@ -133,9 +136,11 @@ export default function Capsule({
             max={hitPoints.length}
             min={0}
             onBlur={onBlur}
+            onChange={onChange}
             onFocus={onFocus}
             onKeyDown={onKeyDown}
             ref={inputRef}
+            size={`${hitPoints.length}`.length}
             type={tooManyPointsToFind ? "text" : "number"}
           />
           <span className={styles.Divider}>/</span>
