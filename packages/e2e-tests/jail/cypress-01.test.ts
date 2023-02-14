@@ -10,7 +10,7 @@ import {
   getTestRows,
 } from "../helpers/testsuites";
 
-const url = "cypress/basic";
+const url = "cypress/doc_inspector_styles";
 
 test(`cypress-01: Test basic cypress reporter functionality`, async ({ page }) => {
   await startTest(page, url);
