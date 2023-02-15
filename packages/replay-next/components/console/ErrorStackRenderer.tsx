@@ -39,6 +39,11 @@ function ErrorStackRendererSuspends({
   const client = useContext(ReplayClientContext);
   const stack = getObjectPropertySuspense(client, pauseId, errorObjectId, "stack").value;
   assert(typeof stack === "string", "no stack string found in error object");
+  // Handle cases where there is no meaningful stack string;
+  if (stack.trim().length === 0) {
+    return <span>No stack available</span>;
+  }
+
   const frames = ErrorStackParser.parse({ name: "", message: "", stack });
   return (
     <>
