@@ -65,6 +65,7 @@
 {
  font-size: var(--font-size-large);
  margin-bottom: .25em;
+ font-weight: bold;
 }
 
 .TourBox p

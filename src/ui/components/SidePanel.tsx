@@ -92,7 +92,7 @@ const handleToggle = async (mode: ViewMode) => {
 
   return (
     <div className="flex w-full flex-col gap-2">
-      {!shouldShowDevToolsNag(nags, viewMode) && (
+      {shouldShowDevToolsNag(nags, viewMode) && (
         <div className={styles.TourBox}>
           <h2>Welcome to Replay!</h2>
             <p>
