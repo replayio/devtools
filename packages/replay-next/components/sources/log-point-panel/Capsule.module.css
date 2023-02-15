@@ -12,6 +12,14 @@
   font-variant-numeric: tabular-nums;
 }
 
+.Capsule[data-loading] {
+  padding: 0 2ch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-dimmer);
+}
+
 .Label,
 .Denominator {
   flex: 1 0 auto;
