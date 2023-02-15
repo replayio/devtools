@@ -129,7 +129,7 @@ function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHan
       }
     }
 
-    if (!frameId || !pauseId) {
+    if (!pauseId) {
       // Unexpected edge case.
       // In this case, the getPauseAndFrameIdSuspends() will log Error info to the console.
       return;
@@ -138,8 +138,8 @@ function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHan
     if (expression.trim() !== "") {
       addMessage({
         expression,
-        frameId: frameId!,
-        pauseId: pauseId!,
+        frameId,
+        pauseId,
         point: executionPoint || "",
         time: time || 0,
       });

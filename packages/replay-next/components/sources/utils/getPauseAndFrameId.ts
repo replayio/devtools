@@ -1,4 +1,9 @@
-import { ExecutionPoint, loadedRegions as LoadedRegions } from "@replayio/protocol";
+import {
+  ExecutionPoint,
+  FrameId,
+  loadedRegions as LoadedRegions,
+  PauseId,
+} from "@replayio/protocol";
 
 import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
 import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
@@ -14,23 +19,23 @@ export function getPauseAndFrameIdSuspends(
   time: number,
   loadedRegions: LoadedRegions | null,
   throwOnFail: boolean
-): PauseAndFrameId | null {
+): {
+  frameId: FrameId | null;
+  pauseId: PauseId | null;
+} {
   const isLoaded = loadedRegions !== null && isPointInRegions(executionPoint, loadedRegions.loaded);
   if (!isLoaded) {
-    return null;
+    return { frameId: null, pauseId: null };
   }
 
-  let pauseAndFrameId: PauseAndFrameId | null = null;
+  let frameId: FrameId | null = null;
+  let pauseId: PauseId | null = null;
+
   try {
-    const pauseId = getPauseIdSuspense(replayClient, executionPoint, time);
+    pauseId = getPauseIdSuspense(replayClient, executionPoint, time);
+
     const frames = getFramesSuspense(replayClient, pauseId);
-    const frameId = frames?.[0]?.frameId ?? null;
-    if (frameId !== null) {
-      pauseAndFrameId = {
-        frameId,
-        pauseId,
-      };
-    }
+    frameId = frames?.[0]?.frameId ?? null;
   } catch (errorOrThennable) {
     if (throwOnFail || isThennable(errorOrThennable)) {
       throw errorOrThennable;
@@ -39,7 +44,7 @@ export function getPauseAndFrameIdSuspends(
     console.error(errorOrThennable);
   }
 
-  return pauseAndFrameId;
+  return { frameId, pauseId };
 }
 
 export const getPauseAndFrameIdAsync = createFetchAsyncFromFetchSuspense(
