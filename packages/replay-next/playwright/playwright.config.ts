@@ -1,5 +1,5 @@
 import { FullConfig } from "@playwright/test";
-import replay from "@replayio/playwright";
+import { devices } from "@replayio/playwright";
 
 const { CI, RECORD_PROTOCOL_DATA, RECORD_VIDEO, SLOW_MO, VISUAL_DEBUG } = process.env;
 
@@ -22,7 +22,7 @@ const config: FullConfig = {
   use: {
     browserName: "chromium",
     launchOptions: {
-      ...replay.devices["Replay Chromium"].launchOptions,
+      ...devices["Replay Chromium"].launchOptions,
       slowMo,
     },
 
