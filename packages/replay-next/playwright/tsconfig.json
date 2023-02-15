@@ -1,6 +1,0 @@
-{
-  "compilerOptions": {
-    "baseUrl": ".", // This must be specified if "paths" is.
-    
-  }
-}
