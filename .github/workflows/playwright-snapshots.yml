@@ -59,3 +59,8 @@ jobs:
         if: always()
         run: ./uploadSnapshots.js
         working-directory: packages/replay-next
+      - name: Upload Replays
+        if: always()
+        uses: replayio/action-upload@v0.4.7
+        with:
+          api-key: rwk_4mEiT150uOHyLQiQvZfPZiNjmBe4NrOXOm9yG9nS794
