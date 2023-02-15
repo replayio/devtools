@@ -20,14 +20,11 @@ import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
-import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useNag } from "replay-next/src/hooks/useNag";
 import useSuspendAfterMount from "replay-next/src/hooks/useSuspendAfterMount";
 import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/ExecutionPointsCache";
-import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
-import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
 import { getSource } from "replay-next/src/suspense/SourcesCache";
 import { findIndexBigInt } from "replay-next/src/utils/array";
 import { validate } from "replay-next/src/utils/points";
@@ -41,7 +38,6 @@ import {
 } from "shared/client/types";
 import { addComment as addCommentGraphQL } from "shared/graphql/Comments";
 import { Nag } from "shared/graphql/types";
-import { isThennable } from "shared/proxy/utils";
 
 import Loader from "../../Loader";
 import SyntaxHighlightedLine from "../SyntaxHighlightedLine";
@@ -167,23 +163,6 @@ function PointPanelWithHitPoints({
   // Otherwise fall back to using the global execution point.
   const executionPoint = closestHitPoint ? closestHitPoint.point : currentExecutionPoint;
   const time = closestHitPoint ? closestHitPoint.time : currentTime;
-  let pauseAndFrameId: PauseAndFrameId | null = null;
-  try {
-    const pauseId = getPauseIdSuspense(client, executionPoint, time);
-    const frames = getFramesSuspense(client, pauseId);
-    const frameId = frames?.[0]?.frameId ?? null;
-    if (frameId !== null) {
-      pauseAndFrameId = {
-        frameId,
-        pauseId,
-      };
-    }
-  } catch (errorOrPromise) {
-    if (isThennable(errorOrPromise)) {
-      throw errorOrPromise;
-    }
-    console.error(`Failed to fetch frames for point ${executionPoint}`, errorOrPromise);
-  }
 
   let source = getSource(client, location.sourceId);
   if (source?.kind === "prettyPrinted") {
@@ -352,11 +331,12 @@ function PointPanelWithHitPoints({
                       dataTestId={`PointPanel-ConditionInput-${lineNumber}`}
                       dataTestName="PointPanel-ConditionInput"
                       editable={editable}
+                      executionPoint={executionPoint}
                       initialValue={condition || ""}
                       onCancel={onCancel}
                       onChange={onEditableConditionChange}
                       onSave={onSubmit}
-                      pauseAndFrameId={pauseAndFrameId}
+                      time={time}
                     />
                   </div>
 
@@ -424,11 +404,12 @@ function PointPanelWithHitPoints({
                     dataTestId={`PointPanel-ContentInput-${lineNumber}`}
                     dataTestName="PointPanel-ContentInput"
                     editable={editable}
+                    executionPoint={executionPoint}
                     initialValue={content}
                     onCancel={onCancel}
                     onChange={onEditableContentChange}
                     onSave={onSubmit}
-                    pauseAndFrameId={pauseAndFrameId}
+                    time={time}
                   />
                 </div>
               </div>

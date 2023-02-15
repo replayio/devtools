@@ -5,16 +5,13 @@ import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import Icon from "replay-next/components/Icon";
 import CodeEditor, { ImperativeHandle } from "replay-next/components/lexical/CodeEditor";
 import Loader from "replay-next/components/Loader";
+import { getPauseAndFrameIdAsync } from "replay-next/components/sources/utils/getPauseAndFrameId";
 import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TerminalContext } from "replay-next/src/contexts/TerminalContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import useLoadedRegions from "replay-next/src/hooks/useRegions";
-import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
-import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { isThennable } from "shared/proxy/utils";
-import { isPointInRegions } from "shared/utils/time";
 
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
 import EagerEvaluationResult from "./EagerEvaluationResult";
@@ -33,11 +30,12 @@ export default function ConsoleInput({ inputRef }: { inputRef?: RefObject<Impera
 }
 
 function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHandle> }) {
-  const replayClient = useContext(ReplayClientContext);
   const [searchState] = useContext(ConsoleSearchContext);
+  const { selectedPauseAndFrameId } = useContext(SelectedFrameContext);
+  const replayClient = useContext(ReplayClientContext);
+  const { recordingId } = useContext(SessionContext);
   const { addMessage } = useContext(TerminalContext);
   const { executionPoint, time } = useContext(TimelineContext);
-  const { recordingId } = useContext(SessionContext);
 
   const loadedRegions = useLoadedRegions(replayClient);
 
@@ -57,28 +55,6 @@ function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHan
 
     searchStateVisibleRef.current = searchState.visible;
   }, [searchState.visible]);
-
-  const { selectedPauseAndFrameId } = useContext(SelectedFrameContext);
-  let pauseId: PauseId | null = null;
-  let frameId: FrameId | null = null;
-  if (selectedPauseAndFrameId) {
-    pauseId = selectedPauseAndFrameId.pauseId;
-    frameId = selectedPauseAndFrameId.frameId;
-  } else {
-    const isLoaded =
-      loadedRegions !== null && isPointInRegions(executionPoint, loadedRegions.loaded);
-    if (isLoaded) {
-      pauseId = getPauseIdSuspense(replayClient, executionPoint, time);
-      try {
-        const frames = getFramesSuspense(replayClient, pauseId);
-        frameId = frames?.[0]?.frameId ?? null;
-      } catch (errorOrPromise) {
-        if (isThennable(errorOrPromise)) {
-          throw errorOrPromise;
-        }
-      }
-    }
-  }
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.defaultPrevented) {
@@ -133,7 +109,32 @@ function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHan
     setExpression(newExpression);
   };
 
-  const onSubmit = (expression: string) => {
+  const onSubmit = async (expression: string) => {
+    let pauseId: PauseId | null = null;
+    let frameId: FrameId | null = null;
+    if (selectedPauseAndFrameId) {
+      pauseId = selectedPauseAndFrameId.pauseId;
+      frameId = selectedPauseAndFrameId.frameId;
+    } else {
+      const pauseAndFrameId = await getPauseAndFrameIdAsync(
+        replayClient,
+        executionPoint,
+        time,
+        loadedRegions,
+        false
+      );
+      if (pauseAndFrameId) {
+        pauseId = pauseAndFrameId.pauseId;
+        frameId = pauseAndFrameId.frameId;
+      }
+    }
+
+    if (!frameId || !pauseId) {
+      // Unexpected edge case.
+      // In this case, the getPauseAndFrameIdSuspends() will log Error info to the console.
+      return;
+    }
+
     if (expression.trim() !== "") {
       addMessage({
         expression,
@@ -166,12 +167,13 @@ function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHan
             context="console"
             dataTestId="ConsoleTerminalInput"
             editable={true}
+            executionPoint={executionPoint}
             initialValue={expression}
             key={incrementedKey}
             onChange={onChange}
             onSave={onSubmit}
-            pauseAndFrameId={selectedPauseAndFrameId}
             ref={inputRef}
+            time={time}
           />
         </div>
       </div>
