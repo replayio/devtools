@@ -4,19 +4,27 @@ import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPanes";
 import Accordion from "devtools/client/debugger/src/components/shared/Accordion";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
+import { setViewMode } from "ui/actions/layout";
 import Events from "ui/components/Events";
+import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
 import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
+import hooks from "ui/hooks";
 import { useFeature } from "ui/hooks/settings";
+import { Nag } from "ui/hooks/users";
 import { useTestInfo } from "ui/hooks/useTestInfo";
 import { getFlatEvents } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
+import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { ViewMode } from "ui/state/layout";
 
 import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
 import ProtocolViewer from "./ProtocolViewer";
 import StatusDropdown from "./shared/StatusDropdown";
 import { TestSuitePanel } from "./TestSuitePanel";
+import styles from "src/ui/components/SidePanel.module.css";
 
 function useInitialPrimaryPanel() {
   const dispatch = useAppDispatch();
@@ -40,6 +48,20 @@ export default function SidePanel() {
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
   const events = useAppSelector(getFlatEvents);
+
+  const viewMode = useAppSelector(getViewMode);
+  const { nags } = hooks.useGetUserInfo();
+
+  const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
+  const dispatch = useAppDispatch();
+  const dismissNag = hooks.useDismissNag();
+
+  const handleToggle = async (mode: ViewMode) => {
+    dispatch(setViewMode(mode));
+    if (showDevtoolsNag) {
+      dismissNag(Nag.VIEW_DEVTOOLS);
+    }
+  };
 
   const items: any[] = [];
 
@@ -65,17 +87,27 @@ export default function SidePanel() {
   }
 
   return (
-    <div
-      className="w-full overflow-hidden rounded-lg bg-bodyBgcolor text-xs"
-      data-test-id="leftSidebar"
-    >
-      {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}
-      {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}
-      {selectedPrimaryPanel === "comments" && <CommentCardsList />}
-      {selectedPrimaryPanel === "events" && <EventsPane items={items} />}
-      {selectedPrimaryPanel === "cypress" && <TestSuitePanel />}
-      {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
-      {selectedPrimaryPanel === "search" && <SearchFilesReduxAdapter />}
+    <div className="flex w-full flex-col gap-2">
+      {shouldShowDevToolsNag(nags, viewMode) && (
+        <div className={styles.TourBox}>
+          <h2>Welcome to Replay!</h2>
+          <p>To get started, click into DevTools so we can show off some time travel features!</p>
+          <button type="button" onClick={() => handleToggle("dev")} style={{ padding: "5px 12px" }}>
+            <div>Open DevTools</div>
+            <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
+          </button>
+        </div>
+      )}
+
+      <div className="h-0 flex-grow w-full overflow-hidden rounded-lg bg-bodyBgcolor text-xs">
+        {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}
+        {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}
+        {selectedPrimaryPanel === "comments" && <CommentCardsList />}
+        {selectedPrimaryPanel === "events" && <EventsPane items={items} />}
+        {selectedPrimaryPanel === "cypress" && <TestSuitePanel />}
+        {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
+        {selectedPrimaryPanel === "search" && <SearchFilesReduxAdapter />}
+      </div>
     </div>
   );
 }

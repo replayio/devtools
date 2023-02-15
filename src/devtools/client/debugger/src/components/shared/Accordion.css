@@ -20,7 +20,7 @@
 
 .accordion ._header {
   display: flex;
-  font-size: 15px;
+  font-size: var(--font-size-large);
   line-height: calc(16 / 12);
   padding: 8px;
   width: 100%;

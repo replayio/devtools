@@ -4,7 +4,7 @@ import React, { useContext } from "react";
 import { LoggablesContext } from "replay-next/components/console/LoggablesContext";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
-import { shouldShowNag } from "ui/utils/user";
+import { shouldShowNag } from "ui/utils/tour";
 
 import MaterialIcon from "../MaterialIcon";
 

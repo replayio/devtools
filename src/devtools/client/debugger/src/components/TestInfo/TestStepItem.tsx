@@ -204,7 +204,7 @@ export function TestStepItem({
         className="flex w-0 flex-grow items-start space-x-2 text-start"
         title={`Step ${index + 1}: ${step.name} ${argString || ""}`}
       >
-        <div className={`flex-grow font-medium break-all ${state === "paused" ? "font-bold" : ""}`}>
+        <div className={`flex-grow break-all font-medium ${state === "paused" ? "font-bold" : ""}`}>
           {step.parentId ? "- " : ""}{" "}
           <span className={`${styles.step} ${styles[step.name]}`}>{step.name}</span>
           <span className="opacity-70">{argString}</span>
