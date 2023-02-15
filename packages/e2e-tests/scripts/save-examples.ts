@@ -11,7 +11,6 @@ import { listAllRecordings, removeRecording, uploadRecording } from "@replayio/r
 import axios from "axios";
 import chalk from "chalk";
 import { dots } from "cli-spinners";
-import cypress from "cypress";
 import logUpdate from "log-update";
 import { v4 as uuidv4 } from "uuid";
 import yargs from "yargs";
@@ -206,34 +205,10 @@ async function saveCypressExamples() {
 async function saveCypressExample(exampleFilename: string) {
   const done = logAnimated(`Recording cypress example ${chalk.bold(exampleFilename)}`);
 
-  const exampleUrl = `${config.devtoolsUrl}/test/examples`;
-  const specName = `cypress/e2e/${exampleFilename}.cy.ts`;
-
-  const options = await cypress.cli.parseRunArguments([
-    "cypress",
-    "run",
-    "-q",
-    "--browser",
-    config.browserName === "chromium" ? "replay-chromium" : "replay-firefox",
-    "--spec",
-    specName,
-  ]);
-  await cypress.run({
-    ...options,
-    env: {
-      CYPRESS_BASE_URL: exampleUrl,
-    },
-  });
-
-  const recordingId = listAllRecordings({
-    filter: `function ($v) { $v.metadata.test.file = "${specName}" }`,
-  })[0]?.id;
-
-  if (recordingId) {
-    await uploadRecording(recordingId, {
-      apiKey: config.replayApiKey,
-    });
-  }
+  const recordingId = await require("./record-cypress").recordCypress(
+    config.browserName,
+    exampleFilename
+  );
 
   done();
 

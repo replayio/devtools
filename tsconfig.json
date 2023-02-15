@@ -88,7 +88,12 @@
   "exclude": [
     "src/devtools/client/debugger/src/workers/parser/tests/fixtures/scopes/*",
     "node_modules",
-    "packages/e2e-tests",
+
+    // exclude Cypress from root typechecking to avoid conflicts with globals
+    // like expect()
+    "packages/e2e-tests/**/*.cy.ts",
+    "packages/e2e-tests/cypress.config.ts",
+    "packages/e2e-tests/scripts/record-cypress.ts",
   ],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
 }
