@@ -70,3 +70,4 @@ jobs:
         with:
           api-key: rwk_4mEiT150uOHyLQiQvZfPZiNjmBe4NrOXOm9yG9nS794
           filter: ${{ 'function($v) { $v.metadata.test.result = "failed" }' }}
+          public: true
