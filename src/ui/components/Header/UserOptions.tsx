@@ -19,10 +19,6 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   const [expanded, setExpanded] = useState(false);
   const { isAuthenticated } = useAuth0();
 
-  if (!isAuthenticated) {
-    return <LoginButton />;
-  }
-
   const onDocsClick: React.MouseEventHandler = event => {
     trackEvent("user_options.select_docs");
     const docsUrl = `https://docs.replay.io`;
