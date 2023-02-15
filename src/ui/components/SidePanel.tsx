@@ -18,7 +18,7 @@ import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ViewMode } from "ui/state/layout";
-
+import useAuth0 from "ui/utils/useAuth0";
 import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
 import ProtocolViewer from "./ProtocolViewer";
@@ -48,19 +48,25 @@ export default function SidePanel() {
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
   const events = useAppSelector(getFlatEvents);
-
+  const { isAuthenticated } = useAuth0();
   const viewMode = useAppSelector(getViewMode);
   const { nags } = hooks.useGetUserInfo();
-
   const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
   const dispatch = useAppDispatch();
   const dismissNag = hooks.useDismissNag();
-
   const handleToggle = async (mode: ViewMode) => {
     dispatch(setViewMode(mode));
     if (showDevtoolsNag) {
       dismissNag(Nag.VIEW_DEVTOOLS);
     }
+  };
+  
+  const launchQuickstart = () => {
+    console.log("launch quickstart");
+  };
+  
+  const signIn = () => {
+    console.log("signIn");
   };
 
   const items: any[] = [];
@@ -86,6 +92,7 @@ export default function SidePanel() {
     });
   }
 
+  
   return (
     <div className="flex w-full flex-col gap-2">
       {shouldShowDevToolsNag(nags, viewMode) && (
@@ -98,6 +105,22 @@ export default function SidePanel() {
           </button>
         </div>
       )}
+      
+      {!isAuthenticated && (
+        <div className={styles.TourBox}>
+          <h2>Welcome to Replay!</h2>
+          <p>To get started with Replay, please sign in or read our quickstart guide.</p>
+          <button type="button" onClick={() => signIn()} style={{ padding: "5px 12px" }}>
+            <div className="mr-1">Sign in</div>
+            <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
+          </button>
+          <button type="button" onClick={() => launchQuickstart()} style={{ padding: "5px 12px" }}>
+            <div className="mr-1">Quickstart guide</div>
+            <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
+          </button>
+        </div>
+      )}
+      
 
       <div className="h-0 flex-grow w-full overflow-hidden rounded-lg bg-bodyBgcolor text-xs">
         {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}
