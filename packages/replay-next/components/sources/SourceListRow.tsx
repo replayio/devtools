@@ -247,7 +247,7 @@ const SourceListRow = memo(
         }
 
         if (lastColumnIndex < plainText.length - 1) {
-          renderBetween(lineSegments, lastColumnIndex, plainText.length - 1);
+          renderBetween(lineSegments, lastColumnIndex, plainText.length);
         }
       } else {
         if (tokens !== null) {
