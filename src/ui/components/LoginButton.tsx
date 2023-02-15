@@ -20,11 +20,10 @@ const LoginButton = () => {
 
   return (
     <button
-      className="inline-flex items-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 text-sm font-medium leading-4 text-buttontextColor hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      className="row logout"
       onClick={() => loginAndReturn()}
-      color="blue"
     >
-      Sign In
+      <span className="inline-flex items-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 text-sm font-medium leading-4 text-buttontextColor hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full justify-center">Sign In</span>
     </button>
   );
 };
