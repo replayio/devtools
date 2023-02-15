@@ -58,7 +58,7 @@ jobs:
       - name: Wait until server is up
         run: npx wait-on --timeout=60000 http-get://localhost:3000
       - name: Run playwright tests
-        run: yarn visuals --reporter @replayio/playwright/reporter
+        run: yarn visuals --reporter @replayio/playwright/reporter,line
         working-directory: packages/replay-next/playwright  
       - name: Upload results
         if: always()
