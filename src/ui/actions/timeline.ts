@@ -1,5 +1,12 @@
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
-import { ExecutionPoint, PauseId, ScreenShot, TimeRange } from "@replayio/protocol";
+import {
+  ExecutionPoint,
+  PauseId,
+  ScreenShot,
+  TimeRange,
+  TimeStampedPoint,
+} from "@replayio/protocol";
+import clamp from "lodash/clamp";
 import throttle from "lodash/throttle";
 
 import { framePositionsCleared, resumed } from "devtools/client/debugger/src/reducers/pause";
@@ -22,8 +29,9 @@ import {
 import { DownloadCancelledError } from "protocol/screenshot-cache";
 import { ThreadFront } from "protocol/thread";
 import { PauseEventArgs } from "protocol/thread/thread";
-import { waitForTime } from "protocol/utils";
+import { Deferred, defer, waitForTime } from "protocol/utils";
 import { getPointsBoundingTimeAsync } from "replay-next/src/suspense/ExecutionPointsCache";
+import { ReplayClientInterface } from "shared/client/types";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import { mayClearSelectedStep } from "ui/reducers/reporter";
 import {
@@ -96,7 +104,7 @@ export async function setupTimeline(store: UIStore) {
 
 export function jumpToInitialPausePoint(): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
-    const endpoint = await replayClient.getSessionEndpoint(replayClient.getSessionId()!);
+    const endpoint = await getEndpoint(replayClient);
     dispatch(pointsReceived([endpoint]));
     let { point, time } = endpoint;
 
@@ -143,7 +151,7 @@ export async function getInitialPausePoint(recordingId: string) {
     return { point, time };
   }
 
-  const firstMeaningfulPaint = await getFirstMeaningfulPaint(10);
+  const firstMeaningfulPaint = await getFirstMeaningfulPaint();
   if (firstMeaningfulPaint) {
     const { point, time } = firstMeaningfulPaint;
     return { point, time };
@@ -279,6 +287,8 @@ export function seekToTime(targetTime: number, autoPlay?: boolean): UIThunkActio
       return;
     }
 
+    targetTime = await clampTime(replayClient, targetTime);
+
     // getPointNearTime could take time while we're processing the recording
     // so we optimistically set the timeline to the target time
     dispatch(setTimelineToTime(targetTime));
@@ -296,6 +306,19 @@ export function seekToTime(targetTime: number, autoPlay?: boolean): UIThunkActio
       dispatch(startPlayback());
     }
   };
+}
+
+let endpointPromise: Promise<TimeStampedPoint> | undefined;
+function getEndpoint(client: ReplayClientInterface) {
+  if (!endpointPromise) {
+    endpointPromise = client.getSessionEndpoint(client.getSessionId()!);
+  }
+  return endpointPromise;
+}
+
+async function clampTime(client: ReplayClientInterface, time: number) {
+  const endpoint = await getEndpoint(client);
+  return clamp(time, 0, endpoint.time);
 }
 
 export function togglePlayback(): UIThunkAction {
@@ -547,8 +570,8 @@ export function setFocusRegionFromTimeRange(
     }
 
     const [pointsBoundingBegin, pointsBoundingEnd] = await Promise.all([
-      getPointsBoundingTimeAsync(replayClient, timeRange.begin),
-      getPointsBoundingTimeAsync(replayClient, timeRange.end),
+      getPointsBoundingTimeAsync(replayClient, await clampTime(replayClient, timeRange.begin)),
+      getPointsBoundingTimeAsync(replayClient, await clampTime(replayClient, timeRange.end)),
     ]);
     const begin = pointsBoundingBegin.before;
     const end = pointsBoundingEnd.after;

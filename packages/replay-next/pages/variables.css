@@ -110,8 +110,7 @@
   --z-index-1--paused-comment: var(--z-index-1);
   --z-index-1--paused-message: var(--z-index-1);
   --z-index-1--comment-container: var(--z-index-1);
-  --z-index-1--icon-tooltip: var(--z-index-1);
-  --z-index-1--timeline-tooltip: var(--z-index-1);
+  --z-index-1--tooltip: var(--z-index-1);
   --z-index-2--hovered-point-secondary: var(--z-index-2);
   --z-index-3--hovered-point-primary: var(--z-index-3);
   --z-index-3--hovered-comment-primary: var(--z-index-3);
@@ -183,8 +182,11 @@
   --theme-text-field-bgcolor-hover: var(--theme-base-95);
   --theme-text-field-bgcolor: var(--theme-base-85);
   --theme-text-field-color: #fff;
-  --tooltip-bgcolor: var(--theme-base-85);
+  --tooltip-bgcolor: var(--theme-base-100);
   --tooltip-color: #fff;
+  --tooltip-border: 1px solid rgba(43, 46, 49, 1);
+
+  --event-row-hover-background-color: rgba(8, 17, 32, 0.5);
 
   --background-color-contrast-1: #0e1119;
   --background-color-contrast-2: #192230;
@@ -257,7 +259,10 @@
   --context-menu-bgcolor-hover: var(--theme-base-95);
 
   --comment-card-source-preview-background-color: #081221;
-  --comment-card-source-preview-background-color-hover: #3e434a;
+  --comment-card-source-preview-background-color-hover: #000;
+  --comment-reply-unpublished-background-color: var(--point-panel-background-color);
+  --comment-reply-unpublished-textfield-background-color: #000;
+  --comment-reply-unpublished-textfield-color: #fff;
 
   --object-inspector-bucket-color: #939395;
   --object-inspector-expanded-key-with-flag: #5ca9cf;
@@ -312,13 +317,10 @@
   --point-panel-timeline-button-shadow: 0px 0px 2px 0px hsla(0, 0%, 0%, 0.12);
   --point-panel-timeline-label-background-color: #000000;
   --point-panel-timeline-label-color: var(--color-brand);
-
+  --point-panel-timeline-label-hover-color: #35dfff;
   --point-panel-timeline-label-unselected-color: #747476;
-  --point-panel-timeline-label-selected-color: #b765f8;
-
+  --point-panel-timeline-label-selected-color: #f02d5e;
   --point-panel-timeline-label-edit-hover-background-color: #434343;
-  --point-panel-timeline-label-edit-hover-color: #747476;
-  --point-panel-timeline-label-edit-background-color: var(--color-brand);
   --point-panel-timeline-label-edit-color: #fff;
 
   --badge-picker-background-color: #28282a;
@@ -464,11 +466,12 @@
   --progressbar-preview-min: var(--primary-accent);
 
   /* Menus (Dark) */
-  --menu-bgcolor: var(--theme-base-90);
+  --menu-bgcolor: var(--body-bgcolor);
   --menu-color: var(--body-color);
-  --menu-hover-bgcolor: var(--theme-base-95);
+  --menu-hover-bgcolor: var(--theme-base-90);
   --menu-hover-color: white;
   --theme-menu-highlight: var(--theme-text-field-bgcolor);
+  --menu-border: 1px solid rgba(39, 46, 61, 1);
 
   /* Code Mirror (Dark) */
   --caret-color: #fff;
@@ -486,6 +489,9 @@
   --breakpoint-tip: #fff;
 
   /* Testsuites (Dark) */
+  --testsuites-aside-background-color: var(--theme-base-90);
+  --testsuites-aside-color: #fff;
+  --testsuites-aside-border-color: #fdce22;
   --testsuites-capsule-alias-bgcolor: var(--theme-base-85);
   --testsuites-capsule-alias-color: var(--body-color);
   --testsuites-capsule-alias-selected-bgcolor: var(--theme-base-100);
@@ -511,7 +517,7 @@
   --theme-toggle-handle-bgcolor: var(--theme-base-100);
   --timejump-text: var(--buttontext-color);
   --title-hover-bgcolor: var(--theme-toggle-bgcolor);
-  --toolbarbutton-focus-bgcolor: var(--theme-toggle-bgcolor);
+  --toolbarbutton-focus-bgcolor: var(--theme-base-95);
   --unloaded-region-img: url("/images/dotted-mask-dark.svg");
 
   /* Toolbar (Dark) */
@@ -626,9 +632,12 @@
   --focus-mode-capsule-bgcolor: var(--theme-base-90);
   --focus-mode-loaded-indexed-color: var(--primary-accent);
   --focus-mode-loading-color: #00567f;
-  --focus-mode-popout-icon-background-color: var(--primary-accent);
-  --focus-mode-popout-icon-color: white;
+  --focus-mode-popout-icon-background-color: white;
+  --focus-mode-popout-icon-color: var(--theme-base-100);
   --focus-mode-popout-text-input-background-color: #33373d;
+  --focus-mode-popout-background-color: rgba(67, 71, 73, 0.6);
+  --focus-mode-popout-background-color-no-transparency: rgba(0, 0, 0, 1);
+  --focus-mode-popout-color: white;
 }
 
 :root.theme-light {
@@ -676,6 +685,9 @@
   --theme-text-field-color: var(--theme-body-color);
   --tooltip-bgcolor: #38383d;
   --tooltip-color: white;
+  --tooltip-border: 1px solid transparent;
+
+  --event-row-hover-background-color: rgba(232, 234, 237, 0.5);
 
   --background-color-contrast-1: #e6e6e6;
   --background-color-contrast-2: #ffffff;
@@ -709,7 +721,7 @@
   --color-contrast: #ffffff;
   --color-current: #f02d5e;
   --color-default: #223344;
-  --color-dim: #666666;
+  --color-dim: rgba(135, 135, 137, 0.9);
   --color-dimmer: #aaaaaa;
   --color-disabled-button: #ffffff;
   --color-error: #ff0000;
@@ -750,6 +762,9 @@
 
   --comment-card-source-preview-background-color-hover: #e6e6e6;
   --comment-card-source-preview-background-color: #f2f3f2;
+  --comment-reply-unpublished-background-color: var(--point-panel-background-color);
+  --comment-reply-unpublished-textfield-background-color: #fff;
+  --comment-reply-unpublished-textfield-color: #000;
 
   --object-inspector-bucket-color: #737373;
   --object-inspector-expanded-key-with-flag: #0074e8;
@@ -804,14 +819,11 @@
   --point-panel-timeline-button-shadow: 0px 0px 2px 0px hsla(0, 0%, 0%, 0.12);
   --point-panel-timeline-label-background-color: #ffffff;
   --point-panel-timeline-label-color: var(--color-brand);
-
+  --point-panel-timeline-label-hover-color: #008adb;
   --point-panel-timeline-label-unselected-color: #d1d5db;
-  --point-panel-timeline-label-selected-color: #8330f4;
-
+  --point-panel-timeline-label-selected-color: #f02d5e;
   --point-panel-timeline-label-edit-hover-background-color: #f5f5f5;
-  --point-panel-timeline-label-edit-hover-color: #e2e2e2;
-  --point-panel-timeline-label-edit-background-color: var(--color-brand);
-  --point-panel-timeline-label-edit-color: #fff;
+  --point-panel-timeline-label-edit-color: #223344;
 
   --badge-default-color: rgba(0, 0, 0, 0.08);
   --badge-green-color: #73cc6d;
@@ -961,6 +973,7 @@
   --menu-hover-bgcolor: var(--theme-base-95);
   --menu-hover-color: #000;
   --theme-menu-highlight: #f3f4f6;
+  --menu-border: 1px solid transparent;
 
   /* Code Mirror (Light) */
   --caret-color: #18181a;
@@ -978,6 +991,9 @@
   --breakpoint-tip: var(--theme-highlight-purple);
 
   /* Testsuites (Light) */
+  --testsuites-aside-background-color: rgb(254 243 199);
+  --testsuites-aside-color: var(--body-color);
+  --testsuites-aside-border-color: rgb(253 230 138);
   --testsuites-capsule-alias-bgcolor: var(--theme-base-85);
   --testsuites-capsule-alias-color: var(--body-color);
   --testsuites-capsule-alias-selected-bgcolor: var(--theme-base-100);
@@ -1119,6 +1135,9 @@
   --focus-mode-popout-icon-background-color: white;
   --focus-mode-popout-icon-color: black;
   --focus-mode-popout-text-input-background-color: var(--theme-base-85);
+  --focus-mode-popout-background-color: rgba(0, 0, 0, 0.6);
+  --focus-mode-popout-background-color-no-transparency: rgba(0, 0, 0, 1);
+  --focus-mode-popout-color: white;
 }
 
 /*

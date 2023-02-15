@@ -68,6 +68,28 @@ export async function addConditional(
   }
 }
 
+export async function jumpToLogPointHit(
+  page: Page,
+  number: number,
+  options: {
+    lineNumber: number;
+  }
+) {
+  const { lineNumber } = options;
+
+  await debugPrint(
+    page,
+    `Jumping directly to hit "${chalk.bold(number)}" for line ${chalk.bold(lineNumber)}`,
+    "jumpToLogPointHit"
+  );
+
+  const input = page.locator('[data-test-name="LogPointCurrentStepInput"]');
+  await input.focus();
+  await clearTextArea(page, input);
+  await page.keyboard.type(`${number}`);
+  await page.keyboard.press("Enter");
+}
+
 async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
   const lineLocator = await getSourceLine(page, lineNumber);
   const lineIsVisible = await lineLocator.isVisible();
@@ -92,6 +114,7 @@ async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
 
 async function getCurrentSource(page: Page): Promise<Locator | null> {
   const sources = page.locator("[data-test-name=Source]");
+
   for (let index = 0; index < (await sources.count()); index++) {
     const source = sources.nth(index);
     if (await source.isVisible()) {
@@ -337,7 +360,7 @@ export async function openLogPointPanelContextMenu(
     await debugPrint(page, `Opening log point panel context menu`, "openLogPointPanelContextMenu");
 
     const pointPanelLocator = getPointPanelLocator(page, lineNumber);
-    const capsule = pointPanelLocator.locator('[data-test-name="LogPointCapsule"]');
+    const capsule = pointPanelLocator.locator('[data-test-name="LogPointCapsule-DropDownTrigger"]');
     await capsule.click();
 
     await contextMenu.waitFor();
@@ -553,14 +576,18 @@ export async function waitForBreakpoint(
 
   await openPauseInformationPanel(page);
 
-  const breakpointGroup = await page.waitForSelector(`.breakpoints-list-source:has-text("${url}")`);
+  const breakpointGroup = await page.waitForSelector(
+    `[data-test-name="BreakpointsList"]:has-text("${url}")`
+  );
 
   if (columnIndex != null) {
     await breakpointGroup.waitForSelector(
-      `.breakpoint-line:has-text("${lineNumber}:${columnIndex}")`
+      `[data-test-name="PointLocation"]:has-text("${lineNumber}:${columnIndex}")`
     );
   } else {
-    await breakpointGroup.waitForSelector(`.breakpoint-line:has-text("${lineNumber}")`);
+    await breakpointGroup.waitForSelector(
+      `[data-test-name="PointLocation"]:has-text("${lineNumber}")`
+    );
   }
 }
 
@@ -617,9 +644,20 @@ export async function verifyLogpointStep(
     "verifyLogpointStep"
   );
 
-  const line = await getSourceLine(page, lineNumber);
-  const status = line.locator(`[data-test-name="LogPointStatus"]:has-text("${expectedStatus}")`);
-  await status.waitFor();
+  const lineLocator = await getSourceLine(page, lineNumber);
+
+  await waitFor(async () => {
+    const currentStepInputLocator = lineLocator.locator(
+      '[data-test-name="LogPointCurrentStepInput"]'
+    );
+    const currentStep = await currentStepInputLocator.inputValue();
+    const denominatorLocator = lineLocator.locator('[data-test-name="LogPointDenominator"]');
+    const denominator = await denominatorLocator.textContent();
+
+    const actualStatus = `${currentStep}/${denominator}`;
+
+    expect(actualStatus).toBe(expectedStatus);
+  });
 }
 
 // TODO [FE-626] Rewrite this helper to reduce complexity.

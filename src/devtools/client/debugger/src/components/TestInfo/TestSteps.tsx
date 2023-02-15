@@ -4,15 +4,14 @@ import {
   AnnotatedTestStep,
   CypressAnnotationMessage,
   TestItem,
+  TestItemError,
   TestStep,
 } from "shared/graphql/types";
-import { seekToTime } from "ui/actions/timeline";
 import {
   RequestSummary,
   partialRequestsToCompleteSummaries,
 } from "ui/components/NetworkMonitor/utils";
 import Icon from "ui/components/shared/Icon";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getEvents, getRequests } from "ui/reducers/network";
 import {
   getReporterAnnotationsForTitle,
@@ -20,9 +19,9 @@ import {
   getReporterAnnotationsForTitleNavigation,
   getReporterAnnotationsForTitleStart,
 } from "ui/reducers/reporter";
-import { getCurrentTime } from "ui/reducers/timeline";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useAppSelector } from "ui/setup/hooks";
 
+import { NavigationEvent } from "./NavigationEvent";
 import { NetworkEvent } from "./NetworkEvent";
 import { TestCaseContext } from "./TestCase";
 import { TestStepItem } from "./TestStepItem";
@@ -213,57 +212,49 @@ function useGetTestSections(
 export function TestSteps({ test }: { test: TestItem }) {
   const { startTime: testCaseStartTime } = useContext(TestCaseContext);
   const { beforeEach, testBody, afterEach } = useGetTestSections(testCaseStartTime, test.steps);
+  const autoSelectId =
+    test.steps?.find(s => !!s.error)?.id ||
+    (beforeEach[0] || testBody[0] || afterEach[0])?.event?.id;
+
+  const hasStepError = test.steps?.find(s => !!s.error) || false;
 
   return (
     <div className="flex flex-col rounded-lg px-2">
-      <TestSection events={beforeEach} header="Before Each" />
+      <TestSection events={beforeEach} header="Before Each" autoSelectId={autoSelectId} />
       <TestSection
         events={testBody}
         header={beforeEach.length + afterEach.length > 0 ? "Test Body" : undefined}
+        autoSelectId={autoSelectId}
       />
-      <TestSection events={afterEach} header="After Each" />
-      {test.error ? (
-        <TestStepRow error>
-          <div>
-            <div className="flex flex-row items-center space-x-1 p-2">
-              <Icon filename="warning" size="small" className="bg-testsuitesErrorColor" />
-              <div className="font-bold">Assertion Error</div>
-            </div>
-            <div className="wrap space-y-1 overflow-hidden p-2 font-mono">{test.error.message}</div>
-          </div>
-        </TestStepRow>
-      ) : null}
+      <TestSection events={afterEach} header="After Each" autoSelectId={autoSelectId} />
+      {!hasStepError && test.error ? <TestError error={test.error} /> : null}
     </div>
   );
 }
 
-function NewUrlRow({ time, message }: { time: number; message: CypressAnnotationMessage }) {
-  const currentTime = useAppSelector(getCurrentTime);
-  const dispatch = useAppDispatch();
-
-  const onClick = () => {
-    dispatch(seekToTime(time));
-  };
-
+function TestError({ error }: { error: TestItemError }) {
   return (
-    <TestStepRow
-      active={time === currentTime}
-      pending={time > currentTime}
-      key={(message.url || "url") + time}
-      onClick={onClick}
-      className="cursor-pointer"
-    >
-      <MaterialIcon className="mr-1 opacity-70" iconSize="sm">
-        navigation
-      </MaterialIcon>
-      <div className="truncate italic opacity-70" title={message.url}>
-        {message.url}
+    <TestStepRow error>
+      <div>
+        <div className="flex flex-row items-center space-x-1 p-2">
+          <Icon filename="warning" size="small" className="bg-testsuitesErrorColor" />
+          <div className="font-bold">Assertion Error</div>
+        </div>
+        <div className="wrap space-y-1 overflow-hidden p-2 font-mono">{error.message}</div>
       </div>
     </TestStepRow>
   );
 }
 
-function TestSection({ events, header }: { events: CompositeTestEvent[]; header?: string }) {
+function TestSection({
+  events,
+  header,
+  autoSelectId,
+}: {
+  events: CompositeTestEvent[];
+  header?: string;
+  autoSelectId?: string;
+}) {
   const firstStep = events.find((e): e is StepEvent => e.type === "step");
   const firstIndex = firstStep?.event.index || 0;
 
@@ -284,19 +275,25 @@ function TestSection({ events, header }: { events: CompositeTestEvent[]; header?
       ) : null}
       {events.map(({ event: s, type, time }, i) =>
         type === "step" ? (
-          <TestStepItem
-            step={s}
-            key={s.id}
-            index={s.index - firstIndex}
-            argString={
-              s.args ? s.args.filter((s): s is string => s && typeof s === "string").join(", ") : ""
-            }
-            id={s.id}
-          />
+          <>
+            <TestStepItem
+              step={s}
+              key={s.id}
+              index={s.index - firstIndex}
+              argString={
+                s.args
+                  ? s.args.filter((s): s is string => s && typeof s === "string").join(", ")
+                  : ""
+              }
+              id={s.id}
+              autoSelect={s.id === autoSelectId}
+            />
+            {s.error ? <TestError error={s.error!} /> : null}
+          </>
         ) : type === "network" ? (
           <NetworkEvent key={s.id} request={s} />
         ) : (
-          <NewUrlRow message={s} time={time} key={s.id} />
+          <NavigationEvent message={s} time={time} key={s.id} />
         )
       )}
     </>

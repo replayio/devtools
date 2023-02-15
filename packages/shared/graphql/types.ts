@@ -1,4 +1,6 @@
-import { ExecutionPoint } from "@replayio/protocol";
+import { ExecutionPoint, Location } from "@replayio/protocol";
+
+import { Point as PointData } from "shared/client/types";
 
 export enum Nag {
   FIRST_LOG_IN = "first_log_in",
@@ -99,7 +101,7 @@ export type LocalExperimentalUserSettings = {
   rerunRoutines: boolean;
   profileWorkerThreads: boolean;
   brokenSourcemapWorkaround: boolean;
-  trackRecordingAssetsInDatabase: boolean;
+  disableRecordingAssetsInDatabase: boolean;
 };
 
 export type LocalUserSettings = LocalExperimentalUserSettings & {
@@ -256,7 +258,7 @@ export type TestItem = {
   error?: TestItemError;
 };
 
-type TestItemError = {
+export type TestItemError = {
   message: string;
   line?: number;
   column?: number;
@@ -288,6 +290,8 @@ export type TestStep = {
   alias?: string;
   error?: TestItemError;
   hook?: "beforeEach" | "afterEach";
+  commandId?: string;
+  assertIds?: string[];
 };
 
 export type AnnotatedTestStep = TestStep & {

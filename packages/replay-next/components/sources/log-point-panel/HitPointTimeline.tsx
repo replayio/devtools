@@ -1,5 +1,13 @@
 import { TimeStampedPoint } from "@replayio/protocol";
-import { MouseEvent, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  MouseEvent,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 
 import Icon from "replay-next/components/Icon";
@@ -30,20 +38,22 @@ export default function HitPointTimeline({
 }: {
   hasConditional: boolean;
   hitPoints: TimeStampedPoint[];
-  hitPointStatus: HitPointStatus;
+  hitPointStatus: HitPointStatus | null;
   shouldLog: boolean;
   point: Point;
   toggleConditional: () => void;
   toggleShouldLog: () => void;
 }) {
   const client = useContext(ReplayClientContext);
-  const { duration } = useContext(SessionContext);
+  const { currentUserInfo, duration } = useContext(SessionContext);
   const {
     executionPoint: currentExecutionPoint,
     isPending,
     time: currentTime,
     update,
   } = useContext(TimelineContext);
+
+  const pointEditable = point.user?.id === currentUserInfo?.id;
 
   const [hoverCoordinates, setHoverCoordinates] = useState<{
     clientX: number;
@@ -61,7 +71,12 @@ export default function HitPointTimeline({
     setOptimisticTime(null);
   }, [currentTime]);
 
-  const [currentHitPoint, currentHitPointIndex] = findHitPoint(hitPoints, currentExecutionPoint);
+  const [closestHitPoint, closestHitPointIndex] = useMemo(
+    () => findHitPoint(hitPoints, currentExecutionPoint, false),
+    [currentExecutionPoint, hitPoints]
+  );
+
+  const currentHitPoint = closestHitPoint?.point === currentExecutionPoint ? closestHitPoint : null;
 
   const onTimelineClick = async (event: MouseEvent) => {
     if (isPending) {
@@ -102,6 +117,14 @@ export default function HitPointTimeline({
   const nextButtonEnabled =
     lastHitPoint != null && isExecutionPointsGreaterThan(lastHitPoint.point, currentExecutionPoint);
 
+  const goToIndex = (index: number) => {
+    const hitPoint = hitPoints[index];
+    if (hitPoint !== null) {
+      setOptimisticTime(hitPoint.time);
+      update(hitPoint.time, hitPoint.point, false);
+    }
+  };
+
   const goToPrevious = () => {
     const [prevHitPoint] = findHitPointBefore(hitPoints, currentExecutionPoint);
     if (prevHitPoint !== null) {
@@ -130,8 +153,10 @@ export default function HitPointTimeline({
         <Icon className={styles.PreviousButtonIcon} type="arrow-left" />
       </button>
       <Capsule
+        closestHitPointIndex={closestHitPointIndex}
         currentHitPoint={currentHitPoint}
-        currentHitPointIndex={currentHitPointIndex}
+        editable={pointEditable}
+        goToIndex={goToIndex}
         hasConditional={hasConditional}
         hitPoints={hitPoints}
         hitPointStatus={hitPointStatus}

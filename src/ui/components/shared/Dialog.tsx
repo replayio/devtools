@@ -68,7 +68,7 @@ export const DialogIllustration = ({
   className,
   ...props
 }: HTMLProps<HTMLHeadingElement>) => {
-  const randomNum = Math.floor(Math.random() * 3) + 1;
+  const randomNum = Math.floor(Math.random() * 5) + 1;
   const imagePath = `/images/illustrations/ready${randomNum}.png`;
 
   return (
@@ -92,10 +92,7 @@ export const DialogDescription = ({
   ...props
 }: HTMLProps<HTMLParagraphElement>) => {
   return (
-    <p
-      {...props}
-      className="break-word mb-2 whitespace-pre-wrap text-center text-sm text-themeBase-70"
-    >
+    <p {...props} className="break-word mb-2 whitespace-pre-wrap text-center text-sm">
       {children}
     </p>
   );

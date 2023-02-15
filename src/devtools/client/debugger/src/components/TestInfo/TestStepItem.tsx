@@ -1,4 +1,4 @@
-import classNames from "classnames";
+import classNamesBind from "classnames/bind";
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
@@ -8,6 +8,7 @@ import { AnnotatedTestStep } from "shared/graphql/types";
 import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getStepRanges, useStepState } from "ui/hooks/useStepState";
+import { useTestInfo } from "ui/hooks/useTestInfo";
 import { useTestStepActions } from "ui/hooks/useTestStepActions";
 import { getViewMode } from "ui/reducers/layout";
 import { getSelectedStep, setSelectedStep } from "ui/reducers/reporter";
@@ -17,11 +18,14 @@ import {
   getCypressConsolePropsSuspense,
   getCypressSubjectNodeIdsAsync,
 } from "ui/suspense/testStepCache";
+import { AwaitTimeout, awaitWithTimeout } from "ui/utils/awaitWithTimeout";
 
 import { TestCaseContext } from "./TestCase";
 import { TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import { TestStepRow } from "./TestStepRow";
 import styles from "./TestInfo.module.css";
+
+const classNames = classNamesBind.bind(styles);
 
 function preventClickFromSpaceBar(ev: React.KeyboardEvent<HTMLButtonElement>) {
   if (ev.key === " ") {
@@ -39,7 +43,7 @@ function scrollIntoView(node: HTMLDivElement) {
   const nodeBounds = node.getBoundingClientRect();
 
   if (nodeBounds.top < parentBounds.top || nodeBounds.bottom > parentBounds.bottom) {
-    node.scrollIntoView();
+    node.scrollIntoView({ block: "center", behavior: "smooth" });
   }
 }
 
@@ -48,20 +52,16 @@ export interface TestStepItemProps {
   argString?: string;
   index: number;
   id: string | null;
+  autoSelect?: boolean;
 }
 
-const AwaitTimeout = Symbol("await-timeout");
-async function awaitWithTimeout<T>(
-  promise: Promise<T>,
-  timeout = 500
-): Promise<T | typeof AwaitTimeout> {
-  return Promise.race([
-    new Promise<typeof AwaitTimeout>(resolve => setTimeout(() => resolve(AwaitTimeout), timeout)),
-    promise,
-  ]);
-}
-
-export function TestStepItem({ step, argString, index, id }: TestStepItemProps) {
+export function TestStepItem({
+  step,
+  argString,
+  index,
+  id,
+  autoSelect = false,
+}: TestStepItemProps) {
   const isHovered = useRef(false);
   const hasScrolled = useRef(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -80,6 +80,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const client = useContext(ReplayClientContext);
   const state = useStepState(step);
   const actions = useTestStepActions(step);
+  const info = useTestInfo();
 
   useEffect(() => {
     setSubjectNodePauseData(getCypressSubjectNodeIdsAsync(client, step));
@@ -100,6 +101,8 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
       }
 
       dispatch(setSelectedStep(step));
+
+      return true;
     }
   }, [actions, viewMode, step, subjectNodePauseData, dispatch, id]);
 
@@ -164,12 +167,15 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   }, [isPlaying, ref, currentTime, step]);
 
   useEffect(() => {
-    if (step.error && ref.current && !hasScrolled.current) {
-      hasScrolled.current = true;
-      scrollIntoView(ref.current);
-      onClick();
+    if (autoSelect && ref.current && !hasScrolled.current) {
+      onClick().then(clicked => {
+        if (clicked && ref.current) {
+          hasScrolled.current = true;
+          scrollIntoView(ref.current);
+        }
+      });
     }
-  }, [step, ref, onClick]);
+  }, [autoSelect, ref, onClick]);
 
   // This math is bananas don't look here until this is cleaned up :)
   const bump = state !== "pending" ? 10 : 0;
@@ -178,12 +184,13 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
   const displayedProgress =
     (step.duration === 1 && state === "paused") || progress == 100 ? 0 : progress;
   const isSelected = selectedStep?.id === id;
+  const error = !!(step.error || info.getStepAsserts(step).some(s => !!s.error));
 
   return (
     <TestStepRow
       active={state === "paused"}
       pending={state === "pending"}
-      error={!!step.error}
+      error={error}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       ref={ref}
@@ -197,7 +204,7 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
         className="flex w-0 flex-grow items-start space-x-2 text-start"
         title={`Step ${index + 1}: ${step.name} ${argString || ""}`}
       >
-        <div className={`flex-grow font-medium ${state === "paused" ? "font-bold" : ""}`}>
+        <div className={`flex-grow font-medium break-all ${state === "paused" ? "font-bold" : ""}`}>
           {step.parentId ? "- " : ""}{" "}
           <span className={`${styles.step} ${styles[step.name]}`}>{step.name}</span>
           <span className="opacity-70">{argString}</span>
@@ -209,6 +216,8 @@ export function TestStepItem({ step, argString, index, id }: TestStepItemProps) 
       {step.alias ? (
         <span
           className={classNames(
+            "alias",
+            // TODO [ryanjduffy]: Migrate these into the CSS module class
             "-my-1 flex-shrink rounded p-1 text-xs text-gray-800",
             isSelected ? "bg-gray-300" : "bg-gray-200"
           )}

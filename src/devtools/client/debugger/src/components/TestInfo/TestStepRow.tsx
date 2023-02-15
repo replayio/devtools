@@ -49,7 +49,7 @@ export function TestStepRowBase({
       <div title={progress == null ? "" : String(progress)} className="flex h-4 w-4 items-center">
         {progress == null ? null : <ProgressBar progress={progress} error={!!error} />}
       </div>
-      <div className="w-4 text-center opacity-70">{index}</div>
+      <div className="w-6 text-center opacity-70">{index}</div>
       {children}
     </div>
   );

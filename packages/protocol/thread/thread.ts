@@ -423,68 +423,6 @@ class _ThreadFront {
     this.allSourcesWaiter.resolve();
   }
 
-  getBreakpointPositionsCompressed(
-    sourceId: SourceId,
-    range?: { start: SourceLocation; end: SourceLocation }
-  ) {
-    let breakpointPositionsPromise = this.breakpointPositions.get(sourceId);
-    if (!breakpointPositionsPromise) {
-      breakpointPositionsPromise = this._getBreakpointPositionsCompressed(sourceId, range);
-      if (!range) {
-        this.breakpointPositions.set(sourceId, breakpointPositionsPromise);
-      }
-    }
-    return breakpointPositionsPromise;
-  }
-
-  private async _getBreakpointPositionsCompressed(
-    sourceId: SourceId,
-    range?: { start: SourceLocation; end: SourceLocation }
-  ) {
-    assert(this.sessionId, "no sessionId");
-    const begin = range ? range.start : undefined;
-    const end = range ? range.end : undefined;
-    const { lineLocations } = await client.Debugger.getPossibleBreakpoints(
-      { sourceId, begin, end },
-      this.sessionId
-    );
-    return lineLocations;
-  }
-
-  async setBreakpoint(sourceId: SourceId, line: number, column: number, condition?: string) {
-    try {
-      this._invalidateResumeTargets(async () => {
-        assert(this.sessionId, "no sessionId");
-        await this.getBreakpointPositionsCompressed(sourceId);
-        const location = { sourceId, line, column };
-        const { breakpointId } = await client.Debugger.setBreakpoint(
-          { location, condition },
-          this.sessionId!
-        );
-        if (breakpointId) {
-          this.breakpoints.set(breakpointId, { location });
-        }
-      });
-    } catch (e) {
-      // An error will be generated if the breakpoint location is not valid for
-      // this source. We don't keep precise track of which locations are valid
-      // for which inline sources in an HTML file (which share the same URL),
-      // so ignore these errors.
-    }
-  }
-
-  async removeBreakpoint(sourceId: SourceId, line: number, column: number) {
-    for (const [breakpointId, { location }] of this.breakpoints.entries()) {
-      if (sourceId === location.sourceId && location.line == line && location.column == column) {
-        this.breakpoints.delete(breakpointId);
-        this._invalidateResumeTargets(async () => {
-          assert(this.sessionId, "no sessionId");
-          await client.Debugger.removeBreakpoint({ breakpointId }, this.sessionId);
-        });
-      }
-    }
-  }
-
   // Same as evaluate, but returns the result without wrapping a ValueFront around them.
   // TODO Replace usages of evaluate with this.
   async evaluate({
@@ -538,37 +476,6 @@ class _ThreadFront {
     } else {
       return { exception: null, returned: null };
     }
-  }
-
-  // Perform an operation that will change our cached targets about where resume
-  // operations will finish.
-  private async _invalidateResumeTargets(callback: () => Promise<void>) {
-    this.resumeTargets.clear();
-    this.resumeTargetEpoch++;
-    this.numPendingInvalidateCommands++;
-
-    try {
-      await callback();
-    } finally {
-      if (--this.numPendingInvalidateCommands == 0) {
-        this.invalidateCommandWaiters.forEach(resolve => resolve());
-        this.invalidateCommandWaiters.length = 0;
-      }
-    }
-  }
-
-  // Wait for any in flight invalidation commands to finish. Note: currently
-  // this is only used during tests. Uses could be expanded to ensure that we
-  // don't perform resumes until all invalidating commands have settled, though
-  // this risks slowing things down and/or getting stuck if the server is having
-  // a problem.
-  waitForInvalidateCommandsToFinish() {
-    if (!this.numPendingInvalidateCommands) {
-      return;
-    }
-    const { promise, resolve } = defer<void>();
-    this.invalidateCommandWaiters.push(resolve as () => void);
-    return promise;
   }
 
   private async _findResumeTarget(

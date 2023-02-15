@@ -2,6 +2,8 @@ import { createContext } from "react";
 
 import { UserInfo } from "shared/graphql/types";
 
+export type TrackEvent = (event: string, ...args: any[]) => void;
+
 export type SessionContextType = {
   accessToken: string | null;
   currentUserInfo: UserInfo | null;
@@ -9,8 +11,8 @@ export type SessionContextType = {
   recordingId: string;
   sessionId: string;
   refetchUser: () => void;
-  trackEvent: (event: string, ...args: any[]) => void;
-  trackEventOnce: (event: string, ...args: any[]) => void;
+  trackEvent: TrackEvent;
+  trackEventOnce: TrackEvent;
 };
 
 export const SessionContext = createContext<SessionContextType>(null as any);

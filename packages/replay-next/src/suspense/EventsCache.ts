@@ -5,6 +5,7 @@ import {
   Location,
   PauseData,
   PauseId,
+  Value as ProtocolValue,
   Object as RecordReplayObject,
 } from "@replayio/protocol";
 import isEmpty from "lodash/isEmpty";
@@ -20,7 +21,7 @@ import { STANDARD_EVENT_CATEGORIES } from "../constants";
 import { groupEntries } from "../utils/group";
 import { createWakeable } from "../utils/suspense";
 import { cachePauseData } from "./PauseCache";
-import { STATUS_PENDING, STATUS_RESOLVED, Wakeable, Record as WakeableRecord } from "./types";
+import { Record as WakeableRecord, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 export type EventCounter = {
   count: number;
@@ -47,7 +48,7 @@ export type EventLog = {
   point: ExecutionPoint;
   time: number;
   type: "EventLog";
-  values: any[];
+  values: ProtocolValue[];
 };
 
 type EventCategoriesByEvent = Record<string, string>;
@@ -136,27 +137,52 @@ async function fetchEventTypeEntryPoints(
   eventType: EventHandlerType,
   record: WakeableRecord<EventLog[]>
 ) {
-  const entryPoints = await client.runAnalysis<EventLog>({
-    effectful: false,
-    eventHandlerEntryPoints: [{ eventType }],
-    mapper: getFunctionBody(eventsMapper),
-  });
-
-  // Pre-cache object previews that came back with our new analysis data.
-  // This will avoid us having to turn around and request them again when rendering the logs.
-  entryPoints.forEach(entryPoint => cachePauseData(client, entryPoint.pauseId, entryPoint.data));
-
-  const eventLogs: EventLog[] = entryPoints.map(entryPoint => ({
-    ...entryPoint,
-    type: "EventLog",
-  }));
-
   const wakeable = record.value;
+  try {
+    const entryPoints = await client.runAnalysis<EventLog>({
+      effectful: false,
+      eventHandlerEntryPoints: [{ eventType }],
+      mapper: getFunctionBody(eventsMapper),
+    });
 
-  record.status = STATUS_RESOLVED;
-  record.value = eventLogs;
+    // Pre-cache object previews that came back with our new analysis data.
+    // This will avoid us having to turn around and request them again when rendering the logs.
+    entryPoints.forEach(entryPoint => cachePauseData(client, entryPoint.pauseId, entryPoint.data));
 
-  wakeable.resolve(eventLogs);
+    const eventLogs: EventLog[] = entryPoints.map(entryPoint => ({
+      ...entryPoint,
+      type: "EventLog",
+    }));
+
+    record.status = STATUS_RESOLVED;
+    record.value = eventLogs;
+  } catch (err) {
+    // Handle any analysis errors (such as "too many hits found") by resolving the record with
+    // a dummy `EventLog` entry that will get shown as a single console message at the top of
+    // the list.  That way we at least communicate to the user what happened.
+    // TODO [FE-1257] Show a better indicator that there were too many events found, like an overlay.
+    record.status = STATUS_RESOLVED;
+    record.value = [
+      {
+        data: {
+          frames: [],
+          objects: [],
+        },
+        location: [],
+        pauseId: "",
+        point: "",
+        time: 0,
+        type: "EventLog",
+        values: [
+          {
+            value: `❗Too many messages of type "${eventType}" found!`,
+          },
+        ],
+      },
+    ];
+  } finally {
+    wakeable.resolve(record.value);
+  }
 }
 
 async function getRecordingTarget() {

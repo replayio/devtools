@@ -6,7 +6,7 @@ import { AvatarImage } from "ui/components/Avatar";
 import hooks from "ui/hooks";
 import { useBoolPref, useFeature } from "ui/hooks/settings";
 import { UserInfo, useGetUserInfo } from "ui/hooks/users";
-import * as selectors from "ui/reducers/app";
+import { getDefaultSettingsTab, getModalOptions } from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { SettingsTabTitle } from "ui/state/app";
 import useAuth0 from "ui/utils/useAuth0";
@@ -233,10 +233,6 @@ export function UserSettingsModal(props: PropsFromRedux) {
     if (!user.features.library) {
       hiddenTabs.push("API Keys");
     }
-
-    if (!user.internal) {
-      hiddenTabs.push("Advanced");
-    }
   }
 
   return (
@@ -252,10 +248,10 @@ export function UserSettingsModal(props: PropsFromRedux) {
 
 const connector = connect(
   (state: UIState) => {
-    const opts = selectors.getModalOptions(state);
+    const opts = getModalOptions(state);
     const view = opts && "view" in opts ? opts.view : null;
     return {
-      defaultSettingsTab: selectors.getDefaultSettingsTab(state),
+      defaultSettingsTab: getDefaultSettingsTab(state),
       view,
     };
   },

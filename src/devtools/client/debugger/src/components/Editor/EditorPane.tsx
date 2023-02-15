@@ -1,12 +1,13 @@
 import classNames from "classnames";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
+import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
 import { setUnexpectedError } from "ui/actions/errors";
 import { ReplayUpdatedError } from "ui/components/ErrorBoundary";
 import { Redacted } from "ui/components/Redacted";
 import { useFeature } from "ui/hooks/settings";
 import { getToolboxLayout } from "ui/reducers/layout";
-import { getSelectedSource } from "ui/reducers/sources";
+import { getSelectedSource, getSourcesUserActionPending } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import useWidthObserver from "ui/utils/useWidthObserver";
 
@@ -20,6 +21,7 @@ export const EditorPane = () => {
   const dispatch = useAppDispatch();
   const toolboxLayout = useAppSelector(getToolboxLayout);
   const selectedSource = useAppSelector(getSelectedSource);
+  const sourcesUserActionPending = useAppSelector(getSourcesUserActionPending);
   const panelEl = useRef(null);
   const { value: enableLargeText } = useFeature("enableLargeText");
 
@@ -57,6 +59,7 @@ export const EditorPane = () => {
       ref={panelEl}
     >
       <div className="editor-container relative">
+        {sourcesUserActionPending ? <IndeterminateProgressBar /> : null}
         <EditorTabs />
         {selectedSource ? (
           <Redacted className="h-full">

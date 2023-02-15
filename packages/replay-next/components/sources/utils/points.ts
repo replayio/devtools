@@ -9,39 +9,77 @@ import {
 import { Point } from "shared/client/types";
 
 type HitPointAndIndexTuple = [hitPoint: TimeStampedPoint, index: number];
-type NullTuple = [null, null];
+type NoMatchTuple = [null, number];
 
-const nullTuple: NullTuple = [null, null];
+const noMatchTuple: NoMatchTuple = [null, -1];
 
 export function findClosestHitPoint(
   hitPoints: TimeStampedPoint[],
   executionPoint: ExecutionPoint
-): HitPointAndIndexTuple | NullTuple {
+): HitPointAndIndexTuple | NoMatchTuple {
   const index = binarySearch(0, hitPoints.length, (index: number) =>
     compareExecutionPoints(executionPoint, hitPoints[index].point)
   );
+
   if (index >= 0 && index < hitPoints.length) {
     const hitPoint = hitPoints[index];
+    if (hitPoint.point === executionPoint) {
+      // Exact match
+      return [hitPoint, index];
+    }
+
+    const executionBigInt = BigInt(executionPoint);
+    const currentBigInt = BigInt(hitPoint.point);
+
+    if (executionBigInt < currentBigInt) {
+      const currentDelta = currentBigInt - executionBigInt;
+      const prevHitPoint = hitPoints[index - 1] ?? null;
+      if (prevHitPoint) {
+        const prevBigInt = BigInt(prevHitPoint.point);
+        const prevDelta = executionBigInt - prevBigInt;
+        if (prevDelta < currentDelta) {
+          return [prevHitPoint, index - 1];
+        }
+      }
+    } else {
+      const currentDelta = executionBigInt - currentBigInt;
+      const nextHitPoint = hitPoints[index + 1] ?? null;
+      if (nextHitPoint) {
+        const nextBigInt = BigInt(nextHitPoint.point);
+        const nextDelta = nextBigInt - executionBigInt;
+        if (nextDelta < currentDelta) {
+          return [nextHitPoint, index + 1];
+        }
+      }
+    }
+
+    // Nearest match
     return [hitPoint, index];
   }
-  return nullTuple;
+
+  return noMatchTuple;
 }
 
 export function findHitPoint(
   hitPoints: TimeStampedPoint[],
-  executionPoint: ExecutionPoint
-): HitPointAndIndexTuple | NullTuple {
+  executionPoint: ExecutionPoint,
+  exactMatch: boolean = true
+): HitPointAndIndexTuple | NoMatchTuple {
   const [hitPoint, hitPointIndex] = findClosestHitPoint(hitPoints, executionPoint);
-  if (hitPoint !== null && hitPoint.point === executionPoint) {
-    return [hitPoint, hitPointIndex];
+  if (hitPoint !== null) {
+    if (hitPoint.point === executionPoint) {
+      return [hitPoint, hitPointIndex];
+    } else if (!exactMatch) {
+      return [hitPoint, hitPointIndex];
+    }
   }
-  return nullTuple;
+  return noMatchTuple;
 }
 
 export function findHitPointAfter(
   hitPoints: TimeStampedPoint[],
   executionPoint: ExecutionPoint
-): HitPointAndIndexTuple | NullTuple {
+): HitPointAndIndexTuple | NoMatchTuple {
   const [hitPoint, index] = findClosestHitPoint(hitPoints, executionPoint);
   if (hitPoint !== null) {
     if (isExecutionPointsGreaterThan(hitPoint.point, executionPoint)) {
@@ -53,13 +91,13 @@ export function findHitPointAfter(
       }
     }
   }
-  return nullTuple;
+  return noMatchTuple;
 }
 
 export function findHitPointBefore(
   hitPoints: TimeStampedPoint[],
   executionPoint: ExecutionPoint
-): HitPointAndIndexTuple | NullTuple {
+): HitPointAndIndexTuple | NoMatchTuple {
   const [hitPoint, index] = findClosestHitPoint(hitPoints, executionPoint);
   if (hitPoint !== null) {
     if (isExecutionPointsLessThan(hitPoint.point, executionPoint)) {
@@ -71,7 +109,7 @@ export function findHitPointBefore(
       }
     }
   }
-  return nullTuple;
+  return noMatchTuple;
 }
 
 export function findPointForLocation(

@@ -18,8 +18,6 @@ pref("devtools.debugger.scopes-visible", true);
 pref("devtools.debugger.breakpoints-visible", true);
 pref("devtools.debugger.logpoints-visible", true);
 pref("devtools.debugger.event-listeners-visible", false);
-pref("devtools.debugger.start-panel-collapsed", false);
-pref("devtools.debugger.end-panel-collapsed", false);
 pref("devtools.debugger.ui.framework-grouping-on", true);
 pref("devtools.debugger.pending-selected-location", "{}");
 pref("devtools.debugger.features.column-breakpoints", true);
@@ -27,8 +25,6 @@ pref("devtools.debugger.features.column-breakpoints", true);
 export const prefs = new PrefsHelper("devtools", {
   outlineExpanded: ["Bool", "debugger.outline-expanded"],
   sourcesCollapsed: ["Bool", "debugger.sources-collapsed"],
-  startPanelCollapsed: ["Bool", "debugger.start-panel-collapsed"],
-  endPanelCollapsed: ["Bool", "debugger.end-panel-collapsed"],
   frameworkGroupingOn: ["Bool", "debugger.ui.framework-grouping-on"],
   pendingSelectedLocation: ["Json", "debugger.pending-selected-location"],
   debuggerPrefsSchemaVersion: ["Int", "debugger.prefs-schema-version"],

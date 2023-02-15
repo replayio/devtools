@@ -3,6 +3,7 @@ import { ClipboardEvent, KeyboardEvent, useLayoutEffect, useRef, useState } from
 
 import { RecordingTarget } from "protocol/thread/thread";
 import { Recording } from "shared/graphql/types";
+import { selectAll } from "shared/utils/selection";
 import { getRecordingTarget } from "ui/actions/app";
 import Avatar from "ui/components/Avatar";
 import UserOptions from "ui/components/Header/UserOptions";
@@ -122,20 +123,7 @@ function HeaderTitle({
 
     const contentEditable = contentEditableRef.current;
     if (contentEditable) {
-      contentEditable.focus();
-
-      // HACK
-      // Waiting until the end of the microtask queue works around a selection bug in Safari.
-      setTimeout(() => {
-        const selection = window.getSelection();
-        if (selection) {
-          const range = document.createRange();
-          range.selectNodeContents(contentEditable);
-
-          selection.removeAllRanges();
-          selection.addRange(range);
-        }
-      }, 0);
+      selectAll(contentEditable);
     }
   };
   const onBlur = () => {

@@ -23,7 +23,7 @@ import {
   setCurrentPoint,
   setTrialExpired,
 } from "ui/reducers/app";
-import * as selectors from "ui/reducers/app";
+import { getUnexpectedError } from "ui/reducers/app";
 import {
   ProtocolEvent,
   errorReceived,
@@ -33,7 +33,7 @@ import {
 } from "ui/reducers/protocolMessages";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import { extractGraphQLError } from "ui/utils/apolloClient";
-import { isMock, isTest } from "ui/utils/environment";
+import { getPausePointParams, isMock, isTest } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
 import { endMixpanelSession } from "ui/utils/mixpanel";
 import { features, prefs } from "ui/utils/prefs";
@@ -43,7 +43,7 @@ import { subscriptionExpired } from "ui/utils/workspace";
 
 import { setExpectedError, setUnexpectedError } from "./errors";
 import { setViewMode } from "./layout";
-import { getInitialPausePoint, jumpToInitialPausePoint } from "./timeline";
+import { jumpToInitialPausePoint } from "./timeline";
 
 export { setUnexpectedError, setExpectedError };
 
@@ -203,7 +203,7 @@ export function createSocket(
         profileWorkerThreads: !!features.profileWorkerThreads,
         enableRoutines: !!features.enableRoutines,
         rerunRoutines: !!features.rerunRoutines,
-        trackRecordingAssetsInDatabase: !!features.trackRecordingAssetsInDatabase,
+        disableRecordingAssetsInDatabase: !!features.disableRecordingAssetsInDatabase,
       };
       if (features.newControllerOnRefresh) {
         experimentalSettings.controllerKey = String(Date.now());
@@ -231,12 +231,7 @@ export function createSocket(
         }
       }
 
-      const initialPausePoint = await getInitialPausePoint(ThreadFront.recordingId!);
-      const focusRegion =
-        initialPausePoint && "focusRegion" in initialPausePoint
-          ? initialPausePoint.focusRegion
-          : undefined;
-
+      const focusRegion = getPausePointParams()?.focusRegion;
       const focusRange = focusRegion
         ? {
             begin: focusRegion.begin.time,
@@ -336,7 +331,7 @@ export function createSocket(
       await ThreadFront.loadingHasBegun.promise;
       dispatch(jumpToInitialPausePoint());
     } catch (e: any) {
-      const currentError = selectors.getUnexpectedError(getState());
+      const currentError = getUnexpectedError(getState());
 
       // Don't overwrite an existing error.
       if (!currentError) {

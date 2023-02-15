@@ -5,7 +5,7 @@ import { loadedRegions as LoadedRegions } from "@replayio/protocol";
 import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 
 import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
-import { POINTS_DATABASE } from "replay-next/src/contexts/PointsContext";
+import { POINTS_DATABASE } from "replay-next/src/contexts/points/constants";
 import { preloadIDBInitialValues } from "replay-next/src/hooks/useIndexedDB";
 import { preCacheExecutionPointForTime } from "replay-next/src/suspense/ExecutionPointsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";

@@ -107,8 +107,8 @@ function SourceRenderer({
     // If something else (like the AutoComplete component) has prevented this event, don't show a hover preview.
     // Clear any existing hover preview though, to avoid showing a stale popup.
     if (!defaultPrevented) {
-      const source = sourceRef.current!;
-      if (!source.contains(target as Node)) {
+      const source = sourceRef.current;
+      if (!source?.contains(target as Node)) {
         // Don't react to mouse move events within e.g. the preview popup.
         return;
       }

@@ -1,9 +1,7 @@
 .Capsule {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
 
-  padding: 0 2ch;
   height: 1rem;
   border-radius: 1rem;
 
@@ -14,11 +12,16 @@
   font-variant-numeric: tabular-nums;
 }
 
-.Capsule:hover {
-  cursor: pointer;
+.Capsule[data-loading] {
+  padding: 0 2ch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-dimmer);
 }
 
-.Label {
+.Label,
+.Denominator {
   flex: 1 0 auto;
   display: flex;
   align-items: center;
@@ -27,9 +30,73 @@
   /* Visually center the font within the capsule */
   padding-top: 1px;
 }
+.Label {
+  padding-left: 2ch;
+  cursor: text;
+}
+.Label[data-test-state="too-many-points"] {
+  cursor: default;
+}
+
+.CurrentIndex {
+  color: var(--point-panel-timeline-label-unselected-color);
+  padding: 0;
+  line-height: 1;
+  overflow: hidden;
+  background-color: transparent;
+  border: none;
+  appearance: none;
+  font-size: inherit;
+
+  /* Even if all text is deleted, don't shrink smaller than a single digit */
+  min-width: 1;
+}
+.CurrentIndex[data-exact] {
+  color: var(--point-panel-timeline-label-selected-color);
+}
+.CurrentIndex[data-too-many-points-to-find] {
+  color: var(--point-panel-timeline-label-color);
+}
+.CurrentIndex:focus {
+  background-color: var(--point-panel-timeline-label-edit-hover-background-color);
+  color: var(--point-panel-timeline-label-edit-color);
+  outline: none;
+  box-shadow: none;
+}
+.Label:hover .CurrentIndex:not(:disabled) {
+  background-color: var(--point-panel-timeline-label-edit-hover-background-color);
+}
+
+/* Chrome, Safari, Edge, Opera */
+.CurrentIndex::-webkit-outer-spin-button,
+.CurrentIndex::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.CurrentIndex[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.Divider {
+  margin: 0 0.125rem;
+}
+
+.CaretContainer {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding-left: 0.25rem;
+  padding-right: 2ch;
+  cursor: pointer;
+}
 
 .CaretIcon {
   flex: 0 0 0.5rem;
   height: 0.5rem;
   width: 0.5rem;
+}
+.CaretContainer:hover .CaretIcon {
+  color: var(--point-panel-timeline-label-hover-color);
 }

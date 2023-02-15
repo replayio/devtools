@@ -1,0 +1,31 @@
+.Label {
+  display: inline-block;
+  cursor: pointer;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-size: 11px;
+  margin-top: 1px;
+  margin-right: 1em;
+  font-family: var(--monospace-font-family);
+  color: var(--breakpoint-label);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.Options {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex: 1 1 auto;
+  align-items: flex-start;
+  align-content: flex-start;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.Options > *:not(:last-child) {
+  margin-bottom: 4px;
+}

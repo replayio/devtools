@@ -21,8 +21,6 @@ function CurrentTimeLine({ isActive }: { isActive: boolean }) {
 }
 
 function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
-  const { userSettings } = hooks.useGetUserSettings();
-
   const onSeek = (point: string, time: number) => {
     trackEvent("events_timeline.select");
     seek(point, time, false);

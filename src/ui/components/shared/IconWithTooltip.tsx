@@ -1,5 +1,4 @@
-import React, { useRef, useState } from "react";
-import ReactDOM from "react-dom";
+import useTooltip from "replay-next/src/hooks/useTooltip";
 
 interface IconWithTooltipProps {
   dataTestName?: string;
@@ -16,45 +15,25 @@ export default function IconWithTooltip({
   content,
   handleClick,
 }: IconWithTooltipProps) {
-  const timeoutKey = useRef<any>(null);
-  const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
-  const [hovered, setHovered] = useState(false);
-
-  const handleMouseEnter = () => {
-    timeoutKey.current = setTimeout(() => setHovered(true), 300);
-  };
-  const handleMouseLeave = () => {
-    setHovered(false);
-    clearTimeout(timeoutKey.current);
-  };
+  const { onMouseEnter, onMouseLeave, tooltip } = useTooltip({
+    className: "icon-tooltip",
+    delay: 250,
+    position: "right-of",
+    tooltip: content,
+  });
 
   return (
     <div className="icon-with-tooltip text-sm">
       <button
         className="icon-with-tooltip-button"
         data-test-name={dataTestName}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
         onClick={handleClick}
-        ref={node => setTargetNode(node)}
       >
         {icon}
       </button>
-      {targetNode && hovered ? <IconTooltip targetNode={targetNode}>{content}</IconTooltip> : null}
+      {tooltip}
     </div>
-  );
-}
-
-function IconTooltip({ targetNode, children }: { targetNode: HTMLElement; children: string }) {
-  const { top, left } = targetNode.getBoundingClientRect();
-  let style = { top: `${top}px`, left: `${left}px` };
-
-  return ReactDOM.createPortal(
-    <div className="icon-tooltip absolute z-10 ml-10 mt-0.5" style={style}>
-      <div className="rounded-md bg-tooltipBgcolor px-2 py-1 text-sm text-tooltipColor">
-        {children}
-      </div>
-    </div>,
-    document.body
   );
 }

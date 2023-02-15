@@ -42,14 +42,14 @@ import {
 import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
 
-import analysisManager from "protocol/analysisManager";
+import analysisManager, { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
-import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { RecordingCapabilities } from "protocol/thread/thread";
 import { binarySearch, compareNumericStrings, defer, waitForTime } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
+import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
 import { insert } from "replay-next/src/utils/array";
 import { areRangesEqual, compareExecutionPoints } from "replay-next/src/utils/time";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
@@ -398,6 +398,9 @@ export class ReplayClient implements ReplayClientInterface {
     await this._waitForRangeToBeLoaded(focusRange);
 
     const locations = this.getCorrespondingLocations(location).map(location => ({ location }));
+    await Promise.all(
+      locations.map(location => getBreakpointPositionsAsync(this, location.location.sourceId))
+    );
 
     // The backend doesn't support filtering hit points by condition, so we fall back to running analysis.
     // This is less efficient so we only do it if we have a condition.
@@ -912,6 +915,9 @@ export class ReplayClient implements ReplayClientInterface {
       let locations;
       if (location) {
         locations = this.getCorrespondingLocations(location).map(location => ({ location }));
+        await Promise.all(
+          locations.map(location => getBreakpointPositionsAsync(this, location.location.sourceId))
+        );
       }
 
       const analysisParams = {

@@ -3,9 +3,12 @@ import React, {
   KeyboardEvent,
   MouseEvent,
   ReactNode,
+  useContext,
   useState,
   useTransition,
 } from "react";
+
+import { ExpandablesContext } from "replay-next/src/contexts/ExpandablesContext";
 
 import Icon from "./Icon";
 import LazyOffscreen from "./LazyOffscreen";
@@ -24,6 +27,7 @@ export default function Expandable({
   header,
   headerClassName = "",
   onChange = noopOnChange,
+  persistenceKey,
   style,
   useBlockLayoutWhenExpanded = true,
 }: {
@@ -35,10 +39,15 @@ export default function Expandable({
   header: ReactNode;
   headerClassName?: string;
   onChange?: (value: boolean) => void;
+  persistenceKey?: string;
   style?: CSSProperties;
   useBlockLayoutWhenExpanded?: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
+  const { isExpanded, persistIsExpanded } = useContext(ExpandablesContext);
+  if (persistenceKey !== undefined) {
+    defaultOpen = isExpanded(persistenceKey) ?? defaultOpen;
+  }
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   const onClick = (event: MouseEvent) => {
@@ -58,6 +67,9 @@ export default function Expandable({
     startTransition(() => {
       onChange(newIsOpen);
       setIsOpen(newIsOpen);
+      if (persistenceKey !== undefined) {
+        persistIsExpanded(persistenceKey, newIsOpen);
+      }
     });
   };
 
@@ -71,6 +83,9 @@ export default function Expandable({
 
         onChange(newIsOpen);
         setIsOpen(newIsOpen);
+        if (persistenceKey !== undefined) {
+          persistIsExpanded(persistenceKey, newIsOpen);
+        }
         break;
     }
   };

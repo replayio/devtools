@@ -3,7 +3,9 @@ import {
   PauseId as ProtocolPauseId,
   Value as ProtocolValue,
 } from "@replayio/protocol";
-import { ReactNode, Suspense, useState } from "react";
+import { ReactNode, Suspense, useContext, useState } from "react";
+
+import { ExpandablesContext } from "replay-next/src/contexts/ExpandablesContext";
 
 import Icon from "../Icon";
 import LazyOffscreen from "../LazyOffscreen";
@@ -22,20 +24,29 @@ export default function HTMLExpandable({
   before = null,
   defaultOpen = false,
   object,
+  path,
   pauseId,
   protocolValue,
 }: {
   before?: ReactNode;
   defaultOpen?: boolean;
   object: ProtocolObject;
+  path?: string;
   pauseId: ProtocolPauseId;
   protocolValue: ProtocolValue;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isExpanded, persistIsExpanded } = useContext(ExpandablesContext);
+  if (path !== undefined) {
+    defaultOpen = isExpanded(path) ?? defaultOpen;
+  }
+  const [isOpen, setIsOpen] = useState(defaultOpen);
 
   const toggle = (event: React.MouseEvent) => {
     event.stopPropagation();
     setIsOpen(!isOpen);
+    if (path !== undefined) {
+      persistIsExpanded(path, !isOpen);
+    }
   };
 
   return (
@@ -66,7 +77,7 @@ export default function HTMLExpandable({
       <LazyOffscreen mode={isOpen ? "visible" : "hidden"}>
         <span className={styles.Children} data-test-name="ExpandableChildren">
           <Suspense fallback={<Loader />}>
-            <HTMLChildrenRenderer object={object} pauseId={pauseId} />
+            <HTMLChildrenRenderer object={object} path={path} pauseId={pauseId} />
           </Suspense>
 
           <HTMLElementRenderer
