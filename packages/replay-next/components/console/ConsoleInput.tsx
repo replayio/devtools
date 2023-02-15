@@ -1,4 +1,9 @@
-import { FrameId, PauseId } from "@replayio/protocol";
+import {
+  ExecutionPoint,
+  FrameId,
+  loadedRegions as LoadedRegions,
+  PauseId,
+} from "@replayio/protocol";
 import { RefObject, Suspense, useContext, useEffect, useRef, useState } from "react";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
@@ -8,10 +13,11 @@ import Loader from "replay-next/components/Loader";
 import { getPauseAndFrameIdAsync } from "replay-next/components/sources/utils/getPauseAndFrameId";
 import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
-import { TerminalContext } from "replay-next/src/contexts/TerminalContext";
+import { NewTerminalExpression, TerminalContext } from "replay-next/src/contexts/TerminalContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import useLoadedRegions from "replay-next/src/hooks/useRegions";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { ReplayClientInterface } from "shared/client/types";
 
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
 import EagerEvaluationResult from "./EagerEvaluationResult";
@@ -110,46 +116,27 @@ function ConsoleInputSuspends({ inputRef }: { inputRef?: RefObject<ImperativeHan
   };
 
   const onSubmit = async (expression: string) => {
-    let pauseId: PauseId | null = null;
-    let frameId: FrameId | null = null;
-    if (selectedPauseAndFrameId) {
-      pauseId = selectedPauseAndFrameId.pauseId;
-      frameId = selectedPauseAndFrameId.frameId;
-    } else {
-      const pauseAndFrameId = await getPauseAndFrameIdAsync(
-        replayClient,
-        executionPoint,
-        time,
-        loadedRegions,
-        false
-      );
-      if (pauseAndFrameId) {
-        pauseId = pauseAndFrameId.pauseId;
-        frameId = pauseAndFrameId.frameId;
-      }
-    }
-
-    if (!pauseId) {
-      // Unexpected edge case.
-      // In this case, the getPauseAndFrameIdSuspends() will log Error info to the console.
+    const trimmedExpression = expression.trim();
+    if (trimmedExpression === "") {
       return;
     }
 
-    if (expression.trim() !== "") {
-      addMessage({
-        expression,
-        frameId,
-        pauseId,
-        point: executionPoint || "",
-        time: time || 0,
-      });
+    // Don't block on loading Pause and Frame data.
+    addMessageAsync(
+      addMessage,
+      trimmedExpression,
+      replayClient,
+      selectedPauseAndFrameId?.pauseId ?? null,
+      selectedPauseAndFrameId?.frameId ?? null,
+      executionPoint,
+      time,
+      loadedRegions
+    );
 
-      setHistoryIndex(null);
-      addExpression(expression);
-
-      setExpression("");
-      setIncrementedKey(incrementedKey + 1);
-    }
+    setHistoryIndex(null);
+    addExpression(expression);
+    setExpression("");
+    setIncrementedKey(incrementedKey + 1);
   };
 
   // Don't auto-focus the Console input on the initial render.
@@ -192,4 +179,43 @@ function ErrorFallback() {
       Input disabled because of an error
     </div>
   );
+}
+
+async function addMessageAsync(
+  addMessage: (partialTerminalExpression: NewTerminalExpression) => void,
+  expression: string,
+  replayClient: ReplayClientInterface,
+  pauseId: PauseId | null,
+  frameId: FrameId | null,
+  executionPoint: ExecutionPoint,
+  time: number,
+  loadedRegions: LoadedRegions | null
+): Promise<void> {
+  if (!pauseId) {
+    const pauseAndFrameId = await getPauseAndFrameIdAsync(
+      replayClient,
+      executionPoint,
+      time,
+      loadedRegions,
+      false
+    );
+    if (pauseAndFrameId) {
+      pauseId = pauseAndFrameId.pauseId;
+      frameId = pauseAndFrameId.frameId;
+    }
+  }
+
+  if (!pauseId) {
+    // Unexpected edge case.
+    // In this case, the getPauseAndFrameIdSuspends() will log Error info to the console.
+    return;
+  }
+
+  addMessage({
+    expression,
+    frameId,
+    pauseId,
+    point: executionPoint,
+    time,
+  });
 }
