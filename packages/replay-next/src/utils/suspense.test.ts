@@ -1,6 +1,19 @@
-import { Wakeable } from "replay-next/src/suspense/types";
+import {
+  STATUS_PENDING,
+  STATUS_REJECTED,
+  STATUS_RESOLVED,
+  StatusPending,
+  StatusRejected,
+  StatusResolved,
+  Wakeable,
+} from "replay-next/src/suspense/types";
 
-import { __setCircularThenableCheckMaxCount, createWakeable, suspendInParallel } from "./suspense";
+import {
+  __setCircularThenableCheckMaxCount,
+  createFetchAsyncFromFetchSuspense,
+  createWakeable,
+  suspendInParallel,
+} from "./suspense";
 
 describe("Suspense util", () => {
   describe("createWakeable", () => {
@@ -205,6 +218,71 @@ describe("Suspense util", () => {
 
       // But Wakeable B should not
       registerSyncListeners(wakeableB, 2);
+    });
+  });
+
+  describe("createFetchAsyncFromFetchSuspense", () => {
+    function createFakeSuspenseCache(): (resolvedValue?: number) => number {
+      const wakeable: Wakeable<number> | null = createWakeable<number>("Fake value");
+
+      let status: StatusPending | StatusRejected | StatusResolved | null = null;
+
+      return function getValue(resolvedValue?: number) {
+        if (status === null) {
+          status = STATUS_PENDING;
+
+          Promise.resolve().then(() => {
+            if (resolvedValue !== undefined) {
+              wakeable?.resolve(resolvedValue);
+            } else {
+              wakeable?.reject(Error("Failed"));
+            }
+          });
+
+          throw wakeable;
+        } else {
+          if (resolvedValue !== undefined) {
+            status = STATUS_RESOLVED;
+            return resolvedValue;
+          } else {
+            status = STATUS_REJECTED;
+            throw Error("Failed");
+          }
+        }
+      };
+    }
+
+    it("awaits the result of a function that suspends", async () => {
+      const cache = createFakeSuspenseCache();
+      const callback = createFetchAsyncFromFetchSuspense(cache);
+      expect(await callback(123)).toBe(123);
+      expect(await callback(234)).toBe(234);
+    });
+
+    it("awaits the result of a function that suspends multiple times", async () => {
+      const cache1 = createFakeSuspenseCache();
+      const cache2 = createFakeSuspenseCache();
+      const compositeCache = (num: number) => {
+        return cache1(100) + cache2(10) + num;
+      };
+      const callback = await createFetchAsyncFromFetchSuspense(compositeCache);
+      expect(await callback(1)).toBe(111);
+    });
+
+    it("re-throws errors", async () => {
+      const cache = createFakeSuspenseCache();
+      const callback = createFetchAsyncFromFetchSuspense(cache);
+      await expect(callback).rejects.toThrowError("Failed");
+    });
+
+    it("re-throws errors after suspending", async () => {
+      const cache1 = createFakeSuspenseCache();
+      const cache2 = createFakeSuspenseCache();
+      const compositeCache = () => {
+        return cache1(100) + cache2();
+      };
+      const callback = createFetchAsyncFromFetchSuspense(compositeCache);
+      await expect(callback).rejects.toThrowError("Failed");
     });
   });
 
