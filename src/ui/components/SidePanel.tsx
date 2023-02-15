@@ -25,6 +25,7 @@ import ProtocolViewer from "./ProtocolViewer";
 import StatusDropdown from "./shared/StatusDropdown";
 import { TestSuitePanel } from "./TestSuitePanel";
 import styles from "src/ui/components/SidePanel.module.css";
+import LoginButton from "ui/components/LoginButton";
 
 function useInitialPrimaryPanel() {
   const dispatch = useAppDispatch();
@@ -62,7 +63,7 @@ export default function SidePanel() {
   };
   
   const launchQuickstart = () => {
-    console.log("launch quickstart");
+    window.open('https://docs.replay.io/recording-a-web-app/viewing-and-collaborating', '_blank');
   };
   
   const signIn = () => {
@@ -99,8 +100,8 @@ export default function SidePanel() {
         <div className={styles.TourBox}>
           <h2>Welcome to Replay!</h2>
           <p>To get started, click into DevTools so we can show off some time travel features!</p>
-          <button type="button" onClick={() => handleToggle("dev")} style={{ padding: "5px 12px" }}>
-            <div>Open DevTools</div>
+          <button type="button" onClick={() => handleToggle("dev")} style={{ padding: "4px 8px" }}>
+            <div className="mr-1">Open DevTools</div>
             <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
           </button>
         </div>
@@ -110,11 +111,10 @@ export default function SidePanel() {
         <div className={styles.TourBox}>
           <h2>Welcome to Replay!</h2>
           <p>To get started with Replay, please sign in or read our quickstart guide.</p>
-          <button type="button" onClick={() => signIn()} style={{ padding: "5px 12px" }}>
-            <div className="mr-1">Sign in</div>
-            <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
-          </button>
-          <button type="button" onClick={() => launchQuickstart()} style={{ padding: "5px 12px" }}>
+          
+          <LoginButton variant="Tour" />
+                      
+          <button type="button" onClick={() => launchQuickstart()} style={{ padding: "4px 8px" }}>
             <div className="mr-1">Quickstart guide</div>
             <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
           </button>

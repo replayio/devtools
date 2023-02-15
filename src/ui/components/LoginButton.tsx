@@ -1,9 +1,13 @@
-import React from "react";
-
+import React, { FC } from "react";
 import Avatar from "ui/components/Avatar";
 import useAuth0 from "ui/utils/useAuth0";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 
-const LoginButton = () => {
+interface LoginButtonProps {
+  variant?: string;
+}
+
+const LoginButton: FC<LoginButtonProps> = ({ variant }) => {
   const { loginAndReturn, isAuthenticated, logout, user } = useAuth0();
 
   if (isAuthenticated) {
@@ -14,6 +18,15 @@ const LoginButton = () => {
       >
         <Avatar player={user} isFirstPlayer={true} />
         <span>Sign Out</span>
+      </button>
+    );
+  }
+
+  if (variant === "Tour") {
+    return (
+      <button type="button" onClick={() => loginAndReturn()} style={{ padding: "4px 8px" }}>
+        <div className="mr-1">Sign in</div>
+        <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
       </button>
     );
   }
@@ -29,3 +42,4 @@ const LoginButton = () => {
 };
 
 export default LoginButton;
+
