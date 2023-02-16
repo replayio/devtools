@@ -363,12 +363,17 @@ export class ReplayClient implements ReplayClientInterface {
     return kinds;
   }
 
-  async getEventCountForTypes(eventTypes: string[]): Promise<Record<string, number>> {
+  async getEventCountForTypes(
+    eventTypes: string[],
+    range: PointRange | null
+  ): Promise<Record<string, number>> {
     const sessionId = this.getSessionIdThrows();
     const { counts }: { counts: { type: string; count: number }[] } =
-      await client.Debugger.getEventHandlerCounts({ eventTypes }, sessionId);
-    const countsObject = Object.fromEntries(counts.map(({ type, count }) => [type, count]));
-    return countsObject;
+      await client.Debugger.getEventHandlerCounts(
+        { eventTypes, range: range ?? undefined },
+        sessionId
+      );
+    return Object.fromEntries(counts.map(({ type, count }) => [type, count]));
   }
 
   async getFrameSteps(pauseId: PauseId, frameId: FrameId): Promise<PointDescription[]> {
