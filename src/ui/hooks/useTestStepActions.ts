@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getContext } from "devtools/client/debugger/src/selectors";
@@ -47,33 +47,39 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
     return test.relativeStartTime != null && test.duration != null;
   };
 
-  const playFromStep = (test: TestItem) => {
-    if (!testStep || !canPlayback(test)) {
-      return;
-    }
+  const playFromStep = useCallback(
+    (test: TestItem) => {
+      if (!testStep || !canPlayback(test)) {
+        return;
+      }
 
-    dispatch(
-      startPlayback({
-        beginTime: testStep.absoluteStartTime,
-        endTime: test.relativeStartTime + test.duration,
-      })
-    );
-  };
+      dispatch(
+        startPlayback({
+          beginTime: testStep.absoluteStartTime,
+          endTime: test.relativeStartTime + test.duration,
+        })
+      );
+    },
+    [dispatch, testStep]
+  );
 
-  const playToStep = (test: TestItem) => {
-    if (!testStep || !canPlayback(test)) {
-      return;
-    }
-    dispatch(
-      startPlayback({
-        beginTime: test.relativeStartTime || 0,
-        endTime: testStep.annotations.end?.time || testStep.absoluteEndTime,
-        endPoint: testStep.annotations.end?.point,
-      })
-    );
-  };
+  const playToStep = useCallback(
+    (test: TestItem) => {
+      if (!testStep || !canPlayback(test)) {
+        return;
+      }
+      dispatch(
+        startPlayback({
+          beginTime: test.relativeStartTime || 0,
+          endTime: testStep.annotations.end?.time || testStep.absoluteEndTime,
+          endPoint: testStep.annotations.end?.point,
+        })
+      );
+    },
+    [dispatch, testStep]
+  );
 
-  const seekToStepStart = () => {
+  const seekToStepStart = useCallback(() => {
     if (!canJumpToBefore) {
       return;
     }
@@ -84,9 +90,9 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
     } else {
       dispatch(seekToTime(testStep.absoluteStartTime));
     }
-  };
+  }, [dispatch, testStep, canJumpToBefore]);
 
-  const seekToStepEnd = () => {
+  const seekToStepEnd = useCallback(() => {
     if (!canJumpToAfter) {
       return;
     }
@@ -97,9 +103,9 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
     } else {
       dispatch(seekToTime(testStep.absoluteEndTime - 1));
     }
-  };
+  }, [dispatch, testStep, canJumpToAfter]);
 
-  const showStepSource = async () => {
+  const showStepSource = useCallback(async () => {
     if (!canShowStepSource) {
       return;
     }
@@ -119,19 +125,34 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
     }
 
     dispatch(setSourcesUserActionPending(false));
-  };
+  }, [dispatch, testStep, canShowStepSource, client, cx, info.metadata]);
 
-  return {
-    canPlayback,
-    canJumpToAfter,
-    canJumpToBefore,
-    isAtStepEnd: stepEnd,
-    isAtStepStart: stepStart,
-    playFromStep,
-    playToStep,
-    seekToStepEnd,
-    seekToStepStart,
-    showStepSource,
-    canShowStepSource,
-  };
+  return useMemo(
+    () => ({
+      canPlayback,
+      canJumpToAfter,
+      canJumpToBefore,
+      isAtStepEnd: stepEnd,
+      isAtStepStart: stepStart,
+      playFromStep,
+      playToStep,
+      seekToStepEnd,
+      seekToStepStart,
+      showStepSource,
+      canShowStepSource,
+    }),
+    [
+      canPlayback,
+      canJumpToAfter,
+      canJumpToBefore,
+      stepEnd,
+      stepStart,
+      playFromStep,
+      playToStep,
+      seekToStepEnd,
+      seekToStepStart,
+      showStepSource,
+      canShowStepSource,
+    ]
+  );
 };

@@ -1,5 +1,5 @@
 import classNamesBind from "classnames/bind";
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { setHighlightedNodesLoading } from "devtools/client/inspector/markup/reducers/markup";
@@ -63,33 +63,34 @@ export function TestStepItem({
   autoSelect = false,
 }: TestStepItemProps) {
   const isHovered = useRef(false);
-  const hasScrolled = useRef(false);
+  const autoSelectState = useRef(0);
   const ref = useRef<HTMLDivElement>(null);
-  const [subjectNodePauseData, setSubjectNodePauseData] = useState<
-    Promise<{
-      pauseId: string | undefined;
-      nodeIds: string[] | undefined;
-      point: string | undefined;
-    }>
-  >();
+  const client = useContext(ReplayClientContext);
+  const getSubjectNodePauseData = useMemo(() => {
+    let promise: ReturnType<typeof getCypressSubjectNodeIdsAsync> | undefined;
+
+    return async () => {
+      if (!promise) {
+        promise = getCypressSubjectNodeIdsAsync(client, step);
+      }
+
+      return promise;
+    };
+  }, [client, step]);
   const viewMode = useAppSelector(getViewMode);
   const isPlaying = useAppSelector(isPlayingSelector);
   const currentTime = useAppSelector(getCurrentTime);
   const selectedStep = useAppSelector(getSelectedStep);
   const dispatch = useAppDispatch();
-  const client = useContext(ReplayClientContext);
   const state = useStepState(step);
   const actions = useTestStepActions(step);
   const info = useTestInfo();
 
-  useEffect(() => {
-    setSubjectNodePauseData(getCypressSubjectNodeIdsAsync(client, step));
-  }, [client, step]);
-
   const onClick = useCallback(async () => {
     const { timeRange, pointRange } = getStepRanges(step);
-    if (id && timeRange && subjectNodePauseData) {
-      const pauseData = await awaitWithTimeout(subjectNodePauseData);
+
+    if (id && timeRange) {
+      const pauseData = await awaitWithTimeout(getSubjectNodePauseData());
       if (pointRange && pauseData !== AwaitTimeout) {
         dispatch(seek(pointRange[1], timeRange[1], false, pauseData.pauseId));
       } else {
@@ -104,20 +105,20 @@ export function TestStepItem({
 
       return true;
     }
-  }, [actions, viewMode, step, subjectNodePauseData, dispatch, id]);
+  }, [actions, viewMode, step, getSubjectNodePauseData, dispatch, id]);
 
   const onMouseEnter = async () => {
     isHovered.current = true;
-    if (state === "paused" || !subjectNodePauseData) {
+    if (state === "paused" || !getSubjectNodePauseData) {
       return;
     }
 
     try {
-      let pauseData = await awaitWithTimeout(subjectNodePauseData);
+      let pauseData = await awaitWithTimeout(getSubjectNodePauseData());
 
       if (pauseData === AwaitTimeout) {
         dispatch(setHighlightedNodesLoading(true));
-        pauseData = await subjectNodePauseData;
+        pauseData = await getSubjectNodePauseData();
 
         if (!isHovered.current) {
           return;
@@ -167,13 +168,18 @@ export function TestStepItem({
   }, [isPlaying, ref, currentTime, step]);
 
   useEffect(() => {
-    if (autoSelect && ref.current && !hasScrolled.current) {
-      onClick().then(clicked => {
-        if (clicked && ref.current) {
-          hasScrolled.current = true;
-          scrollIntoView(ref.current);
-        }
-      });
+    if (autoSelect && ref.current && !autoSelectState.current) {
+      autoSelectState.current = 1;
+      onClick()
+        .then(clicked => {
+          if (clicked && ref.current) {
+            autoSelectState.current = 2;
+            scrollIntoView(ref.current);
+          }
+        })
+        .catch(() => {
+          autoSelectState.current = 0;
+        });
     }
   }, [autoSelect, ref, onClick]);
 
