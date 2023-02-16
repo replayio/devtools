@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useLayoutEffect, useRef } from "react";
 
 import styles from "./SearchResultHighlight.module.css";
 
@@ -18,10 +18,21 @@ export default function SearchResultHighlight({
   const searchResultColumnEndIndex = searchResultColumnStartIndex + searchText.length;
   const className = isActive ? styles.ActiveMark : styles.InactiveMark;
 
+  const markRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (isActive) {
+      // Horizontally scroll if needed.
+      console.log("scrollIntoView:", markRef.current);
+      markRef.current?.scrollIntoView({ behavior: "auto", block: "nearest", inline: "center" });
+    }
+  }, [isActive]);
+
   let children: ReactNode[] = [
     <div
       className={styles.LeadingSpacer}
       key={0}
+      ref={markRef}
       style={{
         marginLeft: `${searchResultColumnStartIndex + 1}ch`,
       }}
