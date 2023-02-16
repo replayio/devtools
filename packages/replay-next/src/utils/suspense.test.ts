@@ -11,6 +11,7 @@ import {
 import {
   __setCircularThenableCheckMaxCount,
   createFetchAsyncFromFetchSuspense,
+  createInfallibleSuspenseCache,
   createWakeable,
   suspendInParallel,
 } from "./suspense";
@@ -283,6 +284,27 @@ describe("Suspense util", () => {
       };
       const callback = createFetchAsyncFromFetchSuspense(compositeCache);
       await expect(callback).rejects.toThrowError("Failed");
+    });
+  });
+
+  describe("createInfallibleSuspenseCache", () => {
+    it("should pass through params and return value when Suspense is successful", () => {
+      const cache = jest.fn().mockImplementation(params => {
+        return params * 2;
+      });
+      const infallibleCache = createInfallibleSuspenseCache(cache);
+
+      expect(infallibleCache(1)).toEqual(2);
+      expect(infallibleCache(123)).toEqual(246);
+    });
+
+    it("it should return undefined when the Suspense cache throws", () => {
+      const cache = jest.fn().mockImplementation(() => {
+        throw Error("Expected error");
+      });
+      const infallibleCache = createInfallibleSuspenseCache(cache);
+
+      expect(infallibleCache()).toEqual(undefined);
     });
   });
 

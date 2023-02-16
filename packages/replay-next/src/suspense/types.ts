@@ -1,6 +1,6 @@
-export const STATUS_PENDING = 0;
-export const STATUS_RESOLVED = 1;
-export const STATUS_REJECTED = 2;
+export const STATUS_PENDING = "pending";
+export const STATUS_RESOLVED = "resolved";
+export const STATUS_REJECTED = "rejected";
 
 export type StatusPending = typeof STATUS_PENDING;
 export type StatusResolved = typeof STATUS_RESOLVED;
