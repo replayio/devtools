@@ -16,6 +16,12 @@ import { getTestStepSourceLocationAsync } from "../suspense/testStepCache";
 import { isStepEnd, isStepStart } from "./useStepState";
 import { useTestInfo } from "./useTestInfo";
 
+const canPlayback = (
+  test: TestItem
+): test is TestItem & { relativeStartTime: number; duration: number } => {
+  return test.relativeStartTime != null && test.duration != null;
+};
+
 export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(getCurrentTime);
@@ -40,12 +46,6 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
   const isChaiAssertion = testStep?.name === "assert" && !testStep.annotations.enqueue;
   const annotation = isChaiAssertion ? testStep.annotations.start : testStep?.annotations.enqueue;
   const canShowStepSource = !!cypressVersion && !sourcesLoading && annotation;
-
-  const canPlayback = (
-    test: TestItem
-  ): test is TestItem & { relativeStartTime: number; duration: number } => {
-    return test.relativeStartTime != null && test.duration != null;
-  };
 
   const playFromStep = useCallback(
     (test: TestItem) => {
@@ -142,7 +142,6 @@ export const useTestStepActions = (testStep: AnnotatedTestStep | null) => {
       canShowStepSource,
     }),
     [
-      canPlayback,
       canJumpToAfter,
       canJumpToBefore,
       stepEnd,
