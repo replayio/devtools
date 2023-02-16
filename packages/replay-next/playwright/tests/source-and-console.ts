@@ -1,13 +1,21 @@
 import { expect, test } from "@playwright/test";
 
 import { openContextMenu, toggleProtocolMessages, verifyConsoleMessage } from "./utils/console";
-import { delay, getTestUrl, stopHovering, takeScreenshot, waitFor } from "./utils/general";
+import {
+  delay,
+  getTestUrl,
+  stopHovering,
+  takeScreenshot,
+  typeCommandKey,
+  waitFor,
+} from "./utils/general";
 import {
   addBreakPoint,
   addConditional,
   addLogPoint,
   clearSearchResult,
   editLogPoint,
+  focusOnSource,
   getPointPanelContentAutoCompleteListLocator,
   getPointPanelLocator,
   getSearchSourceLocator,
@@ -293,6 +301,28 @@ test("should remember search results count per source", async ({ page }) => {
   await expect(await resultsLabel.isVisible()).toBe(false);
   await openSourceFile(page, sourceId);
   await expect(await resultsLabel.isVisible()).toBe(false);
+});
+
+test("should hide results when search is closed, and remember previous search string if re-opened", async ({
+  page,
+}) => {
+  await openSourceFile(page, sourceId);
+  const sourceSearchLocator = getSearchSourceLocator(page);
+  await expect(sourceSearchLocator).not.toBeVisible();
+  await searchSourceText(page, "function");
+  await verifyCurrentSearchResult(page, { fileName: "source-and-console.html", lineNumber: 17 });
+
+  const sourceLocator = getSourceLocator(page, sourceId);
+  await takeScreenshot(page, sourceLocator, "source-search-highlights");
+
+  await page.keyboard.press("Escape");
+  await expect(sourceSearchLocator).not.toBeVisible();
+
+  await focusOnSource(page);
+  await typeCommandKey(page, "f");
+
+  await verifyCurrentSearchResult(page, { fileName: "source-and-console.html", lineNumber: 17 });
+  await takeScreenshot(page, sourceLocator, "source-search-highlights");
 });
 
 test("should support break points", async ({ page }) => {
