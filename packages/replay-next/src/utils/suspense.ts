@@ -129,6 +129,22 @@ export function createFetchAsyncFromFetchSuspense<TParams extends Array<any>, TV
   };
 }
 
+export function createInfallibleSuspenseCache<TParams extends Array<any>, TValue>(
+  suspenseCache: (...params: TParams) => TValue
+): (...params: TParams) => TValue | undefined {
+  return function createInfallibleSuspenseCache(...params) {
+    try {
+      return suspenseCache(...params);
+    } catch (errorOrThennable) {
+      if (isThennable(errorOrThennable)) {
+        throw errorOrThennable;
+      } else {
+        return undefined;
+      }
+    }
+  };
+}
+
 // Helper function to read from multiple Suspense caches in parallel.
 // This method will re-throw any thrown value, but only after also calling subsequent caches.
 export function suspendInParallel<T extends AnyFunction<any>[]>(
