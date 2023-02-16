@@ -14,8 +14,8 @@ export default function CurrentTimeIndicator({ editMode }: { editMode: EditMode 
 
   // When the focus region is being resized, the video preview updates to track its drag handle.
   // During this time, the currentTime indicator should be de-emphasized.
-  const isResizingFocusRegion =
-    editMode?.type === "resize-end" || editMode?.type === "resize-start";
+  // Same for when the region is being dragged.
+  const isResizingFocusRegion = editMode !== null;
 
   return (
     <div
