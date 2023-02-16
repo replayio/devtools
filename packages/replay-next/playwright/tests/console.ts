@@ -435,6 +435,8 @@ test("should add this keyword to the list of suggestions", async ({ page }) => {
   const listItem = await locateMessage(page, "console-log", "This is a log");
   await seekToMessage(page, listItem);
 
+  await delay(100);
+
   await page.fill("[data-test-id=ConsoleTerminalInput]", "th");
   await verifyTypeAheadContainsSuggestions(page, "this", "globalThis");
 });
@@ -445,6 +447,8 @@ test("should add true/false keywords to the list of suggestions", async ({ page 
 
   const listItem = await locateMessage(page, "console-log", "This is a log");
   await seekToMessage(page, listItem);
+
+  await delay(100);
 
   await page.fill("[data-test-id=ConsoleTerminalInput]", "tr");
   await verifyTypeAheadContainsSuggestions(page, "true");

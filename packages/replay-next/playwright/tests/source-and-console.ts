@@ -283,7 +283,7 @@ test("should remember search results count per source", async ({ page }) => {
   await expect(await resultsLabel.textContent()).toBe("3 of 5 results");
 
   await openSourceFile(page, altSourceId);
-  await expect(await resultsLabel.textContent()).toBe("? of 20 results");
+  await waitFor(async () => expect(await resultsLabel.textContent()).toBe("? of 20 results"));
   await goToNextSourceSearchResult(page);
   await goToNextSourceSearchResult(page);
   await goToNextSourceSearchResult(page);
