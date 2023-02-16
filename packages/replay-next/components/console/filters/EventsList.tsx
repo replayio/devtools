@@ -1,6 +1,7 @@
 import { ChangeEvent, Suspense, useContext, useMemo, useState, useTransition } from "react";
 
 import Loader from "replay-next/components/Loader";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { getEventCategoryCountsSuspense } from "replay-next/src/suspense/EventsCache";
 import type { EventCategory as EventCategoryType } from "replay-next/src/suspense/EventsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -47,8 +48,9 @@ function EventsListCategories({
   isPending: boolean;
 }) {
   const client = useContext(ReplayClientContext);
-
-  const eventCategoryCounts = getEventCategoryCountsSuspense(client);
+  const { range } = useContext(FocusContext);
+  const pointRange = range ? { begin: range.begin.point, end: range.end.point } : null;
+  const eventCategoryCounts = getEventCategoryCountsSuspense(client, pointRange);
 
   const [commonEventCategories, otherEventCategories] = useMemo<
     [EventCategoryType[], EventCategoryType[]]
