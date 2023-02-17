@@ -4,7 +4,8 @@ import {
   MouseEvent as ReplayMouseEvent,
 } from "@replayio/protocol";
 import classNames from "classnames";
-import React, { ReactNode, useState } from "react";
+import classnames from "classnames";
+import React, { ReactNode, useRef, useState } from "react";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
@@ -12,6 +13,8 @@ import { getFunctionBody } from "protocol/evaluation-utils";
 import type { ThreadFront as TF } from "protocol/thread";
 import { RecordingTarget } from "protocol/thread/thread";
 import Icon from "replay-next/components/Icon";
+import { usePositionedTooltip } from "replay-next/src/hooks/usePositionedTooltip";
+import useTooltip from "replay-next/src/hooks/useTooltip";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { EventLog, eventsMapper } from "replay-next/src/suspense/EventsCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
@@ -101,6 +104,14 @@ export const getEventLabel = (event: ReplayEvent) => {
   return label;
 };
 
+type JumpToCodeFailureReason = "not_loaded" | "no_hits";
+type JumpToCodeResult = JumpToCodeFailureReason | "found";
+
+const errorToastMessages: Record<JumpToCodeFailureReason, string> = {
+  not_loaded: "Event not in a loaded region",
+  no_hits: "No source location found",
+};
+
 /*
 Jump to the function location that ran for a given info sidebar event list item,
 such as "Click" or "Key Press: L"
@@ -137,9 +148,10 @@ inside that function is running, then seek to that point in time, but skipping f
 function jumpToClickEventFunctionLocation(
   event: ReplayMouseEvent | ReplayKeyboardEvent,
   onSeek: (point: ExecutionPoint, time: number) => void
-): UIThunkAction {
+): UIThunkAction<Promise<JumpToCodeResult>> {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const { point: executionPoint, time } = event;
+
     try {
       // Actual browser click events get recorded a fraction later then the
       // "mouse events" used by the sidebar.
@@ -154,7 +166,7 @@ function jumpToClickEventFunctionLocation(
       );
 
       if (!isEndTimeInLoadedRegion) {
-        return;
+        return "not_loaded";
       }
 
       // The sidebar event time/point is a fraction earlier than any
@@ -169,7 +181,7 @@ function jumpToClickEventFunctionLocation(
       );
 
       if (!nextClickEvent) {
-        return;
+        return "no_hits";
       }
 
       const pauseId = await getPauseIdAsync(
@@ -194,20 +206,55 @@ function jumpToClickEventFunctionLocation(
         // Open the source file and jump to the line of this function.
         // NOTE: this is the _definition_ line,  _not_ the first _executing_ line!
         dispatch(selectLocation(cx, sourceLocation));
+        return "found";
+      } else {
+        return "no_hits";
       }
     } catch (err) {
       // Let's just swallow this silently for now
     }
+
+    return "no_hits";
   };
 }
 
-export default function Event({ currentTime, executionPoint, event, onSeek }: EventProps) {
+export default React.memo(function Event({
+  currentTime,
+  executionPoint,
+  event,
+  onSeek,
+}: EventProps) {
   const dispatch = useAppDispatch();
   const { kind, point, time } = event;
   const isPaused = time === currentTime && executionPoint === point;
   const [isHovered, setIsHovered] = useState(false);
   const label = getEventLabel(event);
   const { icon } = getReplayEvent(kind);
+  const [jumpToCodeError, setJumpToCodeError] = useState<JumpToCodeFailureReason | null>(null);
+
+  const tooltipTargetRef = useRef<HTMLDivElement>(null);
+
+  const tooltipContent = (
+    <div>{errorToastMessages[jumpToCodeError ?? ("" as JumpToCodeFailureReason)]}</div>
+  );
+
+  // Two separate copies of the "jump to code" error tooltip.
+  // 1) Manual control via a timer, so it's visible when the error first happens
+  const { tooltip: popupTooltip, setShowTooltip: setShowPopupTooltip } = usePositionedTooltip({
+    tooltip: tooltipContent,
+    position: "above",
+    targetRef: tooltipTargetRef,
+  });
+
+  // 2) On hover over the jump button later
+  const {
+    tooltip: hoverTooltip,
+    onMouseEnter: onTooltipMouseEnter,
+    onMouseLeave: onTooltipMouseLeave,
+  } = useTooltip({
+    position: "above",
+    tooltip: tooltipContent,
+  });
 
   const onKeyDown = (e: React.KeyboardEvent) => e.key === " " && e.preventDefault();
 
@@ -215,7 +262,7 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
     onSeek(point, time);
   };
 
-  const onClickJumpToCode = (e: React.MouseEvent) => {
+  const onClickJumpToCode = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
     // Seek to the sidebar event timestamp right away.
@@ -223,7 +270,13 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
     onSeek(point, time);
 
     if (event.kind === "mousedown" || event.kind === "keypress") {
-      dispatch(jumpToClickEventFunctionLocation(event, onSeek));
+      const result = await dispatch(jumpToClickEventFunctionLocation(event, onSeek));
+      if (result !== "found") {
+        setJumpToCodeError(result);
+
+        setShowPopupTooltip(true);
+        setTimeout(() => setShowPopupTooltip(false), 5000);
+      }
     }
   };
 
@@ -233,6 +286,35 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
     executionPoint === null || isExecutionPointsGreaterThan(event.point, executionPoint)
       ? "fast-forward"
       : "rewind";
+
+  const jumpToCodeButtonAvailable = jumpToCodeError === null;
+
+  const jumpToCodeButtonClassname = classnames(
+    "transition-width flex items-center justify-center rounded-full  duration-100 ease-out h-6",
+    {
+      "bg-primaryAccent": jumpToCodeButtonAvailable,
+      "bg-gray-400 cursor-not-allowed": !jumpToCodeButtonAvailable,
+      "px-2 shadow-sm": isHovered,
+      "w-6": !isHovered,
+    }
+  );
+
+  const onJumpButtonMouseEnter = (e: React.MouseEvent) => {
+    setIsHovered(true);
+
+    if (!jumpToCodeButtonAvailable) {
+      setShowPopupTooltip(false);
+      onTooltipMouseEnter(e);
+    }
+  };
+
+  const onJumpButtonMouseLeave = (e: React.MouseEvent) => {
+    setIsHovered(false);
+
+    if (!jumpToCodeButtonAvailable) {
+      onTooltipMouseLeave(e);
+    }
+  };
 
   return (
     <>
@@ -249,15 +331,13 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
           <MaterialIcon iconSize="xl">{icon}</MaterialIcon>
           <Label>{label}</Label>
         </div>
-        <div className="flex space-x-2 opacity-0 group-hover:opacity-100">
+        <div className="flex space-x-2 opacity-0 group-hover:opacity-100" ref={tooltipTargetRef}>
           {event.kind === "mousedown" || event.kind === "keypress" ? (
             <div
-              onClick={onClickJumpToCode}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              className={`${
-                isHovered ? "h-6 px-2 shadow-sm" : "h-6 w-6"
-              } transition-width flex items-center justify-center rounded-full bg-primaryAccent duration-100 ease-out`}
+              onClick={jumpToCodeButtonAvailable ? onClickJumpToCode : undefined}
+              onMouseEnter={onJumpButtonMouseEnter}
+              onMouseLeave={onJumpButtonMouseLeave}
+              className={jumpToCodeButtonClassname}
             >
               <div className="flex items-center space-x-1">
                 {isHovered && <span className="truncate text-white ">Jump to code</span>}
@@ -268,9 +348,11 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
         </div>
       </div>
       {contextMenu}
+      {popupTooltip}
+      {hoverTooltip}
     </>
   );
-}
+});
 
 const Label = ({ children }: { children: ReactNode }) => (
   <div className="overflow-hidden overflow-ellipsis whitespace-pre font-normal">{children}</div>
