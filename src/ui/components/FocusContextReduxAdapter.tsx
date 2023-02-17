@@ -1,6 +1,15 @@
-import { PropsWithChildren, useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import {
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
 
-import { FocusContext, FocusContextType } from "replay-next/src/contexts/FocusContext";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { Range } from "replay-next/src/types";
 import { enterFocusMode, setFocusRegionFromTimeRange } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
@@ -14,6 +23,7 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
   const dispatch = useAppDispatch();
   const loadedRegions = useAppSelector(getLoadedRegions);
   const focusRegion = useAppSelector(getFocusRegion);
+  const { endpoint } = useContext(SessionContext);
 
   const [isPending, startTransition] = useTransition();
   const [deferredFocusRegion, setDeferredFocusRegion] = useState<FocusRegion | null>(null);
@@ -23,6 +33,14 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
       setDeferredFocusRegion(focusRegion);
     });
   }, [focusRegion, loadedRegions]);
+
+  const rangeForAnalysis = useMemo(
+    () =>
+      deferredFocusRegion
+        ? { begin: deferredFocusRegion.begin.point, end: deferredFocusRegion.end.point }
+        : { begin: "0", end: endpoint },
+    [deferredFocusRegion, endpoint]
+  );
 
   const update = useCallback(
     (value: Range | null, _: boolean) => {
@@ -47,10 +65,11 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
       },
       isTransitionPending: isPending,
       range: deferredFocusRegion ? rangeForFocusRegion(deferredFocusRegion) : null,
+      rangeForAnalysis,
       rangeForDisplay: focusRegion ? rangeForFocusRegion(focusRegion) : null,
       update,
     };
-  }, [deferredFocusRegion, dispatch, isPending, focusRegion, update]);
+  }, [deferredFocusRegion, dispatch, isPending, focusRegion, rangeForAnalysis, update]);
 
   return <FocusContext.Provider value={context}>{children}</FocusContext.Provider>;
 }

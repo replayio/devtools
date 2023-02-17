@@ -1,10 +1,13 @@
 import {
+  AnalysisEntry,
+  PointDescription,
   SearchSourceContentsMatch,
   SourceId,
   sourceContentsChunk,
   sourceContentsInfo,
 } from "@replayio/protocol";
 
+import { AnalysisParams } from "protocol/analysisManager";
 import createRecorder, { RecorderAPI } from "shared/proxy/createRecorder";
 import { Entry } from "shared/proxy/types";
 
@@ -107,12 +110,64 @@ export default function createReplayClientRecorder(
     flushRecord();
   }
 
+  function streamAnalysis(
+    params: AnalysisParams,
+    handlers: {
+      onPoints?: (points: PointDescription[]) => void;
+      onResults?: (results: AnalysisEntry[]) => void;
+      onError?: (error: any) => void;
+    }
+  ) {
+    const recorderAPI = arguments[arguments.length - 1] as RecorderAPI;
+    const flushRecord = recorderAPI.holdUntil();
+    const { onPoints, onResults, onError } = handlers;
+
+    const onPointsWrapper = onPoints
+      ? (points: PointDescription[]) => {
+          recorderAPI.callParamWithArgs(0, points);
+          onPoints?.(points);
+        }
+      : undefined;
+
+    const onResultsWrapper = onResults
+      ? (results: AnalysisEntry[]) => {
+          recorderAPI.callParamWithArgs(1, results);
+          onResults?.(results);
+        }
+      : undefined;
+
+    const onErrorWrapper = onError
+      ? (error: any) => {
+          recorderAPI.callParamWithArgs(2, error);
+          onError?.(error);
+        }
+      : undefined;
+
+    const { pointsFinished, resultsFinished } = replayClient.streamAnalysis(params, {
+      onPoints: onPointsWrapper,
+      onResults: onResultsWrapper,
+      onError: onErrorWrapper,
+    });
+
+    onAsyncRequestPending();
+
+    resultsFinished.then(() => {
+      onAsyncRequestResolved();
+      flushRecord();
+    });
+
+    return {
+      pointsFinished,
+      resultsFinished,
+    };
+  }
+
   const [proxyReplayClient] = createRecorder<ReplayClientInterface>(replayClient, {
     onAsyncRequestPending,
     onAsyncRequestResolved,
     onEntriesChanged,
     sanitizeArgs,
-    overrides: { searchSources, streamSourceContents },
+    overrides: { searchSources, streamAnalysis, streamSourceContents },
   });
 
   return proxyReplayClient;

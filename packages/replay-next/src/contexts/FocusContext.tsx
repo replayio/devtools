@@ -1,4 +1,4 @@
-import { TimeStampedPointRange } from "@replayio/protocol";
+import { PointRange, TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import {
   PropsWithChildren,
   createContext,
@@ -29,6 +29,7 @@ export type FocusContextType = {
   enterFocusMode: () => void;
   isTransitionPending: boolean;
   range: TimeStampedPointRange | null;
+  rangeForAnalysis: PointRange;
   rangeForDisplay: TimeStampedPointRange | null;
   update: (value: Range | null, debounce: boolean) => void;
 };
@@ -37,7 +38,7 @@ export const FocusContext = createContext<FocusContextType>(null as any);
 
 export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
   const client = useContext(ReplayClientContext);
-  const { duration } = useContext(SessionContext);
+  const { duration, endpoint } = useContext(SessionContext);
   const loadedRegions = useLoadedRegions(client);
 
   // Changing the focus range may cause us to suspend (while fetching new info from the backend).
@@ -60,6 +61,14 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
       });
     },
     FOCUS_DEBOUNCE_DURATION
+  );
+
+  const rangeForAnalysis = useMemo(
+    () =>
+      deferredRange
+        ? { begin: deferredRange.begin.point, end: deferredRange.end.point }
+        : { begin: "0", end: endpoint },
+    [deferredRange, endpoint]
   );
 
   // Refine the loaded ranges based on the focus window.
@@ -123,9 +132,10 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
       isTransitionPending,
       rangeForDisplay: range,
       range: deferredRange,
+      rangeForAnalysis,
       update: updateFocusRange,
     }),
-    [deferredRange, isTransitionPending, range, updateFocusRange]
+    [deferredRange, isTransitionPending, range, rangeForAnalysis, updateFocusRange]
   );
 
   return <FocusContext.Provider value={focusContext}>{children}</FocusContext.Provider>;

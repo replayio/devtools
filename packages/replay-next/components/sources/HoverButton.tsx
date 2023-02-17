@@ -15,7 +15,7 @@ import {
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useNag } from "replay-next/src/hooks/useNag";
-import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/ExecutionPointsCache";
+import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/HitPointsCache";
 import {
   compareExecutionPoints,
   isExecutionPointsGreaterThan,
@@ -59,7 +59,7 @@ export default function HoverButton({
   pointBehavior: PointBehavior | null;
   source: ProtocolSource;
 }) {
-  const { range: focusRange } = useContext(FocusContext);
+  const { rangeForAnalysis } = useContext(FocusContext);
   const { isMetaKeyActive, isShiftKeyActive } = useContext(KeyboardModifiersContext);
   const client = useContext(ReplayClientContext);
   const { executionPoint, update } = useContext(TimelineContext);
@@ -93,7 +93,7 @@ export default function HoverButton({
               sourceId: source.sourceId,
             },
             null,
-            focusRange
+            rangeForAnalysis
           );
 
     let targetPoint: TimeStampedPoint | null = null;

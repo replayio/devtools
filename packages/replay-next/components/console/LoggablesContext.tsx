@@ -15,7 +15,7 @@ import { PointInstance } from "replay-next/src/contexts/points/types";
 import { TerminalContext, TerminalExpression } from "replay-next/src/contexts/TerminalContext";
 import { EventLog, getEventTypeEntryPointsSuspense } from "replay-next/src/suspense/EventsCache";
 import { UncaughtException, getExceptionsSuspense } from "replay-next/src/suspense/ExceptionsCache";
-import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/ExecutionPointsCache";
+import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/HitPointsCache";
 import { ProtocolMessage, getMessagesSuspense } from "replay-next/src/suspense/MessagesCache";
 import { loggableSort } from "replay-next/src/utils/loggables";
 import { isInNodeModules } from "replay-next/src/utils/messages";
@@ -61,7 +61,7 @@ export function LoggablesContextRoot({
     showWarnings,
   } = useContext(ConsoleFiltersContext);
 
-  const { range: focusRange } = useContext(FocusContext);
+  const { range: focusRange, rangeForAnalysis } = useContext(FocusContext);
 
   // Find the set of event type handlers we should be displaying in the console.
   const eventTypesToLoad = useMemo<EventHandlerType[]>(() => {
@@ -150,7 +150,7 @@ export function LoggablesContextRoot({
           client,
           point.location,
           point.condition,
-          focusRange
+          rangeForAnalysis
         );
 
         switch (status) {
@@ -174,7 +174,7 @@ export function LoggablesContextRoot({
     });
 
     return pointInstances;
-  }, [client, focusRange, pointBehaviors, points]);
+  }, [client, pointBehaviors, points, rangeForAnalysis]);
 
   const { messages: terminalExpressions } = useContext(TerminalContext);
   const sortedTerminalExpressions = useMemo(() => {

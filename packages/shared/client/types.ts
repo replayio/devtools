@@ -1,4 +1,5 @@
 import {
+  AnalysisEntry,
   BreakpointId,
   ContentType,
   Result as EvaluationResult,
@@ -169,11 +170,6 @@ export interface ReplayClientInterface {
     focusRange: PointRange | null
   ): Promise<Record<string, number>>;
   getFrameSteps(pauseId: PauseId, frameId: FrameId): Promise<PointDescription[]>;
-  getHitPointsForLocation(
-    focusRange: TimeStampedPointRange | null,
-    location: Location,
-    condition: string | null
-  ): Promise<HitPointsAndStatusTuple>;
   getMappedLocation(location: Location): Promise<MappedLocation>;
   getObjectWithPreview(
     objectId: ObjectId,
@@ -218,6 +214,14 @@ export interface ReplayClientInterface {
     },
     onMatches: (matches: SearchSourceContentsMatch[], didOverflow: boolean) => void
   ): Promise<void>;
+  streamAnalysis(
+    params: AnalysisParams,
+    handlers: {
+      onPoints?: (points: PointDescription[]) => void;
+      onResults?: (results: AnalysisEntry[]) => void;
+      onError?: (error: any) => void;
+    }
+  ): { pointsFinished: Promise<void>; resultsFinished: Promise<void> };
   streamSourceContents(
     sourceId: SourceId,
     onSourceContentsInfo: ({
