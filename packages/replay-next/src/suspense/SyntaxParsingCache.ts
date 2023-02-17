@@ -51,7 +51,7 @@ export const { getValueSuspense: parse } = createGenericCache<
   [],
   [code: string, fileName: string],
   Array<ParsedToken[]> | null
->("SyntaxParsingCache: parse", highlighter, identity);
+>("SyntaxParsingCache: parse", highlighter, (code, fileName) => code);
 
 export const {
   getValueAsync: parseStreamingAsync,
@@ -59,9 +59,13 @@ export const {
   getValueIfCached: getParsedValueIfCached,
 } = createGenericCache<
   [],
-  [source: StreamingSourceContents, maxTime?: number],
+  [source: StreamingSourceContents, maxCharacters?: number, maxTime?: number],
   StreamingParser | null
->("SyntaxParsingCache: parseStreaming", streamingSourceContentsToStreamingParser, identity);
+>(
+  "SyntaxParsingCache: parseStreaming",
+  streamingSourceContentsToStreamingParser,
+  (source, maxCharacters, maxTime) => source.contents || ""
+);
 
 async function streamingSourceContentsToStreamingParser(
   source: StreamingSourceContents,
@@ -288,10 +292,6 @@ function highlighter(code: string, fileName: string): Array<ParsedToken[]> | nul
   parser.parseChunk(code, true);
 
   return parser.parsedTokensByLine;
-}
-
-function identity(any: any) {
-  return any;
 }
 
 function contentTypeToLanguage(contentType: ContentType): LRLanguage {
