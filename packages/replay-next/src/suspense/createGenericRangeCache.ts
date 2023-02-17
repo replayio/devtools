@@ -171,9 +171,25 @@ export function createGenericRangeCache<T>(
 
   function getValuesSuspense(client: ReplayClientInterface, pointRange: PointRange): T[] {
     const range = pointRangeToRange(pointRange);
-    if (getMissingRanges(range, store.cachedRanges).length > 0) {
+    const missingRanges = getMissingRanges(
+      range,
+      mergeRanges(store.cachedRanges, store.pendingRanges)
+    );
+
+    const failedRange = failedRanges.find(failedRange =>
+      missingRanges.some(missingRange => rangeContains(missingRange, failedRange.range))
+    );
+    if (failedRange) {
+      throw failedRange.error;
+    }
+
+    if (
+      missingRanges.length > 0 ||
+      store.pendingRanges.some(pendingRange => rangesOverlap(pendingRange, range))
+    ) {
       throw store.fetchMissingRanges(client, pointRange);
     }
+
     return getCachedValues(pointRange);
   }
 

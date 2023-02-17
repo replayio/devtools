@@ -803,7 +803,11 @@ export class ReplayClient implements ReplayClientInterface {
       analysisManager.runAnalysis(params, {
         onAnalysisPoints: handlers.onPoints,
         onAnalysisResults: handlers.onResults,
-        onAnalysisError: handlers.onError,
+        onAnalysisError: error => {
+          resolvePointsFinished();
+          resolveResultsFinished();
+          handlers.onError?.(error);
+        },
         onPointsFinished: resolvePointsFinished,
         onFinished: resolveResultsFinished,
       })
