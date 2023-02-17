@@ -603,7 +603,12 @@ test("should expand and contract line height when log points are added and remov
   await takeScreenshot(page, lineLocator, "line-without-log-point");
   await addLogPoint(page, { sourceId, lineNumber: 13 });
   await takeScreenshot(page, lineLocator, "line-with-log-point");
-  await addConditional(page, { condition: "true", lineNumber: 13, sourceId });
+  await addConditional(page, {
+    condition: "true",
+    lineNumber: 13,
+    saveAfterAdding: true,
+    sourceId,
+  });
   await takeScreenshot(page, lineLocator, "line-with-conditional-log-point");
   await removeConditional(page, { lineNumber: 13, sourceId });
   await takeScreenshot(page, lineLocator, "line-with-log-point");
