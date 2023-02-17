@@ -499,7 +499,6 @@ const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericC
   AllProtocolMessages
 >(
   "recordedPotocolMessagesCache",
-  1,
   async (replayClient, sourceDetails) => {
     const sessionSource = sourceDetails.find(source => source.url?.includes("ui/actions/session"));
 

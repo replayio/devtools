@@ -17,7 +17,6 @@ export const {
   Point[]
 >(
   "PointsCache: getPointsGraphQL",
-  2,
   async (
     graphQLClient: GraphQLClientInterface,
     accessToken: string | null,

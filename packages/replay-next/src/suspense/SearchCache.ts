@@ -57,7 +57,6 @@ export const {
   StreamingSourceSearchResults
 >(
   "SearchCache: searchSources",
-  1,
   async (
     client: ReplayClientInterface,
     query: string,

@@ -16,7 +16,6 @@ export const {
   Comment[]
 >(
   "CommentsCache: getCommentsGraphQL",
-  2,
   async (
     graphQLClient: GraphQLClientInterface,
     accessToken: string | null,

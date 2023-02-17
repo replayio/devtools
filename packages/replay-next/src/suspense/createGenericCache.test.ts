@@ -28,7 +28,7 @@ describe("createGenericCache", () => {
     getCacheKey = jest.fn();
     getCacheKey.mockImplementation(key => key.toString());
 
-    cache = createGenericCache<[], [string], string>("test", 0, fetchValue, getCacheKey);
+    cache = createGenericCache<[], [string], string>("test", fetchValue, getCacheKey);
   });
 
   describe("addValue", () => {

@@ -17,7 +17,6 @@ export const {
   ProtocolMappedLocation
 >(
   "MappedLocationCache: getMappedLocation",
-  1,
   (client, location) => client.getMappedLocation(location),
   location => `${location.sourceId}:${location.line}:${location.column}`
 );

@@ -42,12 +42,13 @@ export function createGenericCache<
   TValue
 >(
   debugLabel: string,
-  extraParamsLength: TExtraParams["length"],
   fetchValue: (...args: [...TExtraParams, ...TParams]) => Thennable<TValue> | TValue,
   getCacheKey: (...args: TParams) => string
 ): GenericCache<TExtraParams, TParams, TValue> {
   const recordMap = new Map<string, Record<TValue>>();
   const subscriberMap = new Map<string, Set<SubscribeCallback>>();
+
+  const extraParamsLength = fetchValue.length - getCacheKey.length;
 
   function getOrCreateRecord(...args: [...TExtraParams, ...TParams]): Record<TValue> {
     const cacheKey = getCacheKey(...(args.slice(extraParamsLength) as TParams));

@@ -17,7 +17,6 @@ export const {
   Frame[] | undefined
 >(
   "FrameCache: getFrames",
-  1,
   async (client, pauseId) => {
     const framesResult = await client.getAllFrames(pauseId);
     await client.waitForLoadedSources();

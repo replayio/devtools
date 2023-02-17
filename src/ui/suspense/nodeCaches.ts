@@ -52,7 +52,6 @@ export const {
   ProtocolObject[]
 >(
   "nodeCaches: getNodeData",
-  3,
   async (client, replayClient, sessionId, pauseId, options) => {
     let nodeIds: string[] = [];
     let pauseData = null as PauseData | null;
@@ -174,7 +173,6 @@ export const {
   EventListener[] | undefined
 >(
   "nodeCaches: getNodeEventListeners",
-  3,
   async (client, replayClient, sessionId, pauseId, nodeId) => {
     const { listeners, data } = await client.DOM.getEventListeners(
       {
@@ -200,7 +198,6 @@ export const {
   NodeBounds[]
 >(
   "nodeCaches: getBoundingRects",
-  2,
   async (client, sessionId, pauseId) => {
     const { elements } = await client.DOM.getAllBoundingClientRects({}, sessionId, pauseId);
     return elements;
@@ -218,7 +215,6 @@ export const {
   BoxModel
 >(
   "nodeCaches: getBoxModel",
-  2,
   async (client, sessionId, pauseId, nodeId) => {
     const { model: nodeBoxModel } = await client.DOM.getBoxModel(
       {

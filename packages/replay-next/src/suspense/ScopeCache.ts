@@ -24,7 +24,6 @@ export const {
   Scope
 >(
   "ScopeCache: getScope",
-  1,
   async (client, pauseId, scopeId) => {
     const result = await client.getScope(pauseId, scopeId);
     await client.waitForLoadedSources();
@@ -46,7 +45,6 @@ export const {
   FrameScopes
 >(
   "ScopeCache: getFrameScopes",
-  1,
   async (client, pauseId, frameId) => {
     const frame = (await getFramesAsync(client, pauseId))?.find(
       frame => frame.frameId === frameId

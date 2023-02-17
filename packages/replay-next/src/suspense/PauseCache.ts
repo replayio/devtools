@@ -27,7 +27,6 @@ const {
   PauseId
 >(
   "PauseCache: getPauseIdForExecutionPoint",
-  1,
   async (client, executionPoint) => {
     const createPauseResult = await client.createPause(executionPoint);
     await client.waitForLoadedSources();
@@ -80,7 +79,6 @@ export const {
   Omit<Result, "data">
 >(
   "PauseCache: evaluate",
-  1,
   async (client, pauseId, frameId, expression) => {
     const result = await client.evaluateExpression(pauseId, expression, frameId);
     await client.waitForLoadedSources();

@@ -276,7 +276,6 @@ export const { getValueAsync: getEventListenerLocationAsync } = createGenericCac
   Location | undefined
 >(
   "eventListenerLocationCache",
-  3,
   async (ThreadFront, replayClient, getState, pauseId, replayEventType) => {
     const stackFrames = await getFramesAsync(replayClient, pauseId);
     if (!stackFrames) {

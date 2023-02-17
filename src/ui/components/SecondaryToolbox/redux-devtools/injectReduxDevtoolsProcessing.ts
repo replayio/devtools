@@ -131,7 +131,6 @@ export const { getValueAsync: getActionStateValuesAsync } = createGenericCache<
   ReduxActionStateValues | undefined
 >(
   "reduxDevtools: getActionStateValues",
-  1,
   async (replayClient, point, time) => {
     const pauseId = await getPauseIdAsync(replayClient, point, time);
     if (!pauseId) {
@@ -173,7 +172,6 @@ export const { getValueAsync: getDiffAsync } = createGenericCache<
   Delta | undefined
 >(
   "reduxDevtools: getDiff",
-  1,
   async (replayClient, point, time) => {
     const pauseId = await getPauseIdAsync(replayClient, point, time);
     if (!pauseId) {

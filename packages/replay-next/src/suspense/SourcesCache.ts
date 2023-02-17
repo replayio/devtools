@@ -294,7 +294,6 @@ export const {
   BreakpointPositionsResult
 >(
   "SourcesCache: getBreakpointPositions",
-  1,
   async (client, sourceId) => {
     const breakablePositions = await client.getBreakpointPositions(sourceId, null);
 
@@ -644,7 +643,6 @@ export const {
   StreamingSourceContents | undefined
 >(
   "sourceContentsCache",
-  1,
   async (replayClient, sourceId) => {
     const res = await getStreamingSourceContentsHelper(replayClient, sourceId);
     if (res) {

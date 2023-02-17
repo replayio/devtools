@@ -397,7 +397,6 @@ export const {
   getValueIfCached: getPointsBoundingTimeIfCached,
 } = createGenericCache<[replayClient: ReplayClientInterface], [time: number], PointsBoundingTime>(
   "PointsCache: getPointsBoundingTime",
-  1,
   async (client, time) => client.getPointsBoundingTime(time),
   time => `${time}`
 );

@@ -48,7 +48,6 @@ const { getValueAsync: getNextInteractionEventAsync } = createGenericCache<
   EventLog | undefined
 >(
   "nextInteractionEventCache",
-  2,
   async (replayClient, ThreadFront, point, replayEventType, endTime) => {
     const pointNearEndTime = await replayClient.getPointNearTime(endTime);
 
