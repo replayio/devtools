@@ -22,8 +22,7 @@ export const {
   WiredAppliedRule[]
 >(
   "styleCaches: getAppliedRules",
-  3,
-  async (client, replayClient, sessionId, pauseId, nodeId) => {
+  async (pauseId, nodeId, client, replayClient, sessionId) => {
     const { rules, data } = await client.CSS.getAppliedRules({ node: nodeId }, sessionId, pauseId);
 
     const uniqueRules = uniqBy(rules, rule => `${rule.rule}|${rule.pseudoElement}`);
@@ -81,8 +80,7 @@ export const {
   Map<string, string> | undefined
 >(
   "styleCaches: getComputedStyle",
-  2,
-  async (client, sessionId, pauseId, nodeId) => {
+  async (pauseId, nodeId, client, sessionId) => {
     try {
       const { computedStyle } = await client.CSS.getComputedStyle(
         {
@@ -115,8 +113,7 @@ export const {
   DOMRect | undefined
 >(
   "styleCaches: getBoundingRect",
-  2,
-  async (client, sessionId, pauseId, nodeId) => {
+  async (pauseId, nodeId, client, sessionId) => {
     try {
       const { rect } = await client.DOM.getBoundingClientRect(
         {

@@ -34,7 +34,7 @@ export function getPauseAndFrameIdSuspends(
   try {
     pauseId = getPauseIdSuspense(replayClient, executionPoint, time);
 
-    const frames = getFramesSuspense(replayClient, pauseId);
+    const frames = getFramesSuspense(pauseId, replayClient);
     frameId = frames?.[0]?.frameId ?? null;
   } catch (errorOrThennable) {
     if (throwOnFail || isThennable(errorOrThennable)) {

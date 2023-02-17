@@ -51,7 +51,7 @@ export const { getValueSuspense: parse } = createGenericCache<
   [],
   [code: string, fileName: string],
   Array<ParsedToken[]> | null
->("SyntaxParsingCache: parse", 0, highlighter, identity);
+>("SyntaxParsingCache: parse", highlighter, identity);
 
 export const {
   getValueAsync: parseStreamingAsync,
@@ -61,7 +61,7 @@ export const {
   [],
   [source: StreamingSourceContents, maxTime?: number],
   StreamingParser | null
->("SyntaxParsingCache: parseStreaming", 0, streamingSourceContentsToStreamingParser, identity);
+>("SyntaxParsingCache: parseStreaming", streamingSourceContentsToStreamingParser, identity);
 
 async function streamingSourceContentsToStreamingParser(
   source: StreamingSourceContents,

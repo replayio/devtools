@@ -30,7 +30,7 @@ function createHitPointsCache(location: Location, condition: string | null) {
         location,
       }));
       await Promise.all(
-        locations.map(location => getBreakpointPositionsAsync(client, location.location.sourceId))
+        locations.map(location => getBreakpointPositionsAsync(location.location.sourceId, client))
       );
 
       if (condition) {

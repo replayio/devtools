@@ -186,7 +186,7 @@ export function fetchMouseTargetsForPause(): UIThunkAction<Promise<NodeBounds[] 
       return;
     }
 
-    return getBoundingRectsAsync(protocolClient, sessionId, pauseId);
+    return getBoundingRectsAsync(pauseId, protocolClient, sessionId);
   };
 }
 

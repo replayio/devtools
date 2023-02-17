@@ -34,8 +34,20 @@ function Suspender() {
 
   // This code is roughly approximating the shape of data from the Scopes panel.
 
-  const { returned: globalValue } = evaluateSuspense(replayClient, pauseId, null, "globalValues");
-  const { returned: windowValue } = evaluateSuspense(replayClient, pauseId, null, "window");
+  const { returned: globalValue } = evaluateSuspense(
+    pauseId,
+    null,
+    "globalValues",
+    undefined,
+    replayClient
+  );
+  const { returned: windowValue } = evaluateSuspense(
+    pauseId,
+    null,
+    "window",
+    undefined,
+    replayClient
+  );
 
   const globalClientValue = getObjectWithPreviewSuspense(
     replayClient,

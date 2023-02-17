@@ -50,7 +50,7 @@ function EventsListCategories({
   const client = useContext(ReplayClientContext);
   const { range } = useContext(FocusContext);
   const pointRange = range ? { begin: range.begin.point, end: range.end.point } : null;
-  const eventCategoryCounts = getEventCategoryCountsSuspense(client, pointRange);
+  const eventCategoryCounts = getEventCategoryCountsSuspense(pointRange, client);
 
   const [commonEventCategories, otherEventCategories] = useMemo<
     [EventCategoryType[], EventCategoryType[]]

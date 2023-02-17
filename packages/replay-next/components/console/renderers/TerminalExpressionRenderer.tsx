@@ -134,11 +134,11 @@ function EvaluatedContent({ terminalExpression }: { terminalExpression: Terminal
   // We pass the id of the terminal expression so that each evaluation is cached separately.
   // See FE-1111 for an example of why this is beneficial.
   const result = evaluateSuspense(
-    client,
     pauseId,
     frameId,
     terminalExpression.expression,
-    "" + terminalExpression.id
+    "" + terminalExpression.id,
+    client
   );
   const { exception, returned } = result;
 

@@ -760,7 +760,7 @@ export class ReplayClient implements ReplayClientInterface {
       if (location) {
         locations = this.getCorrespondingLocations(location).map(location => ({ location }));
         await Promise.all(
-          locations.map(location => getBreakpointPositionsAsync(this, location.location.sourceId))
+          locations.map(location => getBreakpointPositionsAsync(location.location.sourceId, this))
         );
       }
 

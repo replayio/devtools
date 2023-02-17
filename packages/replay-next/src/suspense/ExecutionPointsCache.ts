@@ -55,7 +55,7 @@ async function fetchPointsBoundingTime(
   rethrowError: boolean
 ) {
   try {
-    const pointsBoundingTime = await getPointsBoundingTimeAsync(client, time);
+    const pointsBoundingTime = await getPointsBoundingTimeAsync(time, client);
     const point = getClosestPointInPointsBoundingTime(time, pointsBoundingTime);
 
     // Pre-cache time-to-point match and insert into sorted ExecutionPoints array.
@@ -301,7 +301,6 @@ export const {
   getValueIfCached: getPointsBoundingTimeIfCached,
 } = createGenericCache<[replayClient: ReplayClientInterface], [time: number], PointsBoundingTime>(
   "PointsCache: getPointsBoundingTime",
-  1,
-  async (client, time) => client.getPointsBoundingTime(time),
+  async (time, client) => client.getPointsBoundingTime(time),
   time => `${time}`
 );

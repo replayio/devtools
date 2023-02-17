@@ -57,12 +57,11 @@ export const {
   StreamingSourceSearchResults
 >(
   "SearchCache: searchSources",
-  1,
   async (
-    client: ReplayClientInterface,
     query: string,
     includeNodeModules: boolean,
-    limit: number = MAX_SEARCH_RESULTS_TO_DISPLAY
+    limit: number = MAX_SEARCH_RESULTS_TO_DISPLAY,
+    client: ReplayClientInterface
   ) => {
     const subscribers: Set<Subscriber> = new Set();
 

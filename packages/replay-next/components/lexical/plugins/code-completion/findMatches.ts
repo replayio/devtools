@@ -89,7 +89,7 @@ function fetchQueryData(
   if (frameId && pauseId) {
     frame = getFrameSuspense(replayClient, pauseId, frameId);
 
-    const data = getFrameScopesSuspense(replayClient, pauseId, frameId);
+    const data = getFrameScopesSuspense(pauseId, frameId, replayClient);
     generatedScopes = data.generatedScopes;
 
     switch (context) {
@@ -110,8 +110,8 @@ function fetchQueryData(
   if (pauseId) {
     if (queryScope) {
       // Evaluate the properties of an object (queryScope)
-      const maybeObjectId = evaluateSuspense(replayClient, pauseId, frameId, queryScope)?.returned
-        ?.object;
+      const maybeObjectId = evaluateSuspense(pauseId, frameId, queryScope, undefined, replayClient)
+        ?.returned?.object;
       if (maybeObjectId) {
         const { preview } = getObjectWithPreviewSuspense(
           replayClient,

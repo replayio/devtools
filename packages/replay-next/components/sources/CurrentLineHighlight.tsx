@@ -44,7 +44,7 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
   const pauseId = selectedPauseAndFrameId?.pauseId || null;
 
   if (pauseId !== null && frameId !== null) {
-    const frames = getFramesSuspense(client, pauseId);
+    const frames = getFramesSuspense(pauseId, client);
     if (frames) {
       const correspondingSourceIds = client.getCorrespondingSourceIds(sourceId);
       const selectedFrame = frames.find(frame => frame.frameId === frameId);

@@ -298,15 +298,15 @@ async function getResumePoint(replayClient: ReplayClientInterface, state: UIStat
   if (!executionPoint || !selectedFrameId) {
     return;
   }
-  const frames = await getFramesAsync(replayClient, selectedFrameId.pauseId);
+  const frames = await getFramesAsync(selectedFrameId.pauseId, replayClient);
   const frame = frames?.find(frame => frame.frameId === selectedFrameId.frameId);
   if (!frames || !frame || frame === frames[0]) {
     return;
   }
   const frameSteps = await getFrameStepsAsync(
-    replayClient,
     selectedFrameId.pauseId,
-    selectedFrameId.frameId
+    selectedFrameId.frameId,
+    replayClient
   );
   if (!frameSteps?.length) {
     return;

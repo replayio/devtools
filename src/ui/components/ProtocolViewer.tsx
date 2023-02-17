@@ -22,10 +22,8 @@ import { AnalysisResult, runAnalysisAsync } from "replay-next/src/suspense/Analy
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
-import { ReplayClient } from "shared/client/ReplayClient";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
-import { UIThunkAction } from "ui/actions";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useGetRecordingId } from "ui/hooks/recordings";
@@ -42,7 +40,7 @@ import {
   getProtocolResponseMap,
 } from "ui/reducers/protocolMessages";
 import { SourceDetails, getAllSourceDetails } from "ui/reducers/sources";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useAppSelector } from "ui/setup/hooks";
 import { getSymbolsAsync } from "ui/suspense/sourceCaches";
 import { getJSON } from "ui/utils/objectFetching";
 import { formatDuration, formatTimestamp } from "ui/utils/time";
@@ -500,8 +498,7 @@ const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericC
   AllProtocolMessages
 >(
   "recordedPotocolMessagesCache",
-  1,
-  async (replayClient, sourceDetails, range) => {
+  async (sourceDetails, range, replayClient) => {
     const sessionSource = sourceDetails.find(source => source.url?.includes("ui/actions/session"));
 
     if (!sessionSource) {
@@ -509,10 +506,10 @@ const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericC
     }
 
     const [breakablePositionsSorted] = await getBreakpointPositionsAsync(
-      replayClient,
-      sessionSource.id
+      sessionSource.id,
+      replayClient
     );
-    const symbols = await getSymbolsAsync(replayClient, sessionSource.id, sourceDetails);
+    const symbols = await getSymbolsAsync(sessionSource.id, sourceDetails, replayClient);
 
     const mapNamesToCallbackNames: Record<keyof AllProtocolMessages, string> = {
       requestMap: "onRequest",
@@ -616,9 +613,9 @@ function RecordedProtocolMessages({ sourceDetails }: { sourceDetails: SourceDeta
   const { rangeForAnalysis } = useContext(FocusContext);
 
   const allProtocolMessages = getRecordedProtocolMessagesSuspense(
-    replayClient,
     sourceDetails,
-    rangeForAnalysis
+    rangeForAnalysis,
+    replayClient
   );
 
   return <ProtocolViewer {...allProtocolMessages} />;

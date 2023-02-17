@@ -53,8 +53,7 @@ export const {
   EventCategory[]
 >(
   "getEventCategoryCounts",
-  1,
-  async (client, range) => {
+  async (range, client) => {
     const allEvents = await client.getEventCountForTypes(
       Object.values(STANDARD_EVENT_CATEGORIES)
         .map(c => c.events.map(e => e.type))

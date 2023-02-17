@@ -18,7 +18,7 @@ export const useGetFrames = createUseGetValue<
   Frame[] | undefined
 >(
   async (replayClient, pauseId) =>
-    pauseId ? await getFramesAsync(replayClient, pauseId) : undefined,
+    pauseId ? await getFramesAsync(pauseId, replayClient) : undefined,
   (replayClient, pauseId) => (pauseId ? getFramesIfCached(pauseId) : { value: undefined }),
   (replayClient, pauseId) => pauseId ?? ""
 );
@@ -28,7 +28,7 @@ export function getPauseFramesSuspense(
   pauseId: PauseId,
   sourcesState: SourcesState
 ) {
-  const frames = getFramesSuspense(replayClient, pauseId);
+  const frames = getFramesSuspense(pauseId, replayClient);
   return frames ? createPauseFrames(pauseId, frames, sourcesState) : undefined;
 }
 
@@ -47,7 +47,7 @@ export async function getPauseFramesAsync(
   pauseId: PauseId,
   sourcesState: SourcesState
 ) {
-  const frames = await getFramesAsync(replayClient, pauseId);
+  const frames = await getFramesAsync(pauseId, replayClient);
   return frames ? createPauseFrames(pauseId, frames, sourcesState) : undefined;
 }
 
@@ -56,7 +56,7 @@ export async function getPauseFrameAsync(
   pauseAndFrameId: PauseAndFrameId,
   sourcesState: SourcesState
 ) {
-  const frame = (await getFramesAsync(replayClient, pauseAndFrameId.pauseId))?.find(
+  const frame = (await getFramesAsync(pauseAndFrameId.pauseId, replayClient))?.find(
     frame => frame.frameId === pauseAndFrameId.frameId
   );
   return frame ? createPauseFrames(pauseAndFrameId.pauseId, [frame], sourcesState)[0] : undefined;
