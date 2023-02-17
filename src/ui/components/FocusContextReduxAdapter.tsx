@@ -26,7 +26,7 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
   const { endpoint } = useContext(SessionContext);
 
   const [isPending, startTransition] = useTransition();
-  const [deferredFocusRegion, setDeferredFocusRegion] = useState<FocusRegion | null>(null);
+  const [deferredFocusRegion, setDeferredFocusRegion] = useState<FocusRegion | null>(focusRegion);
 
   useEffect(() => {
     startTransition(() => {
