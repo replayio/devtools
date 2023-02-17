@@ -79,13 +79,13 @@ export const {
   Omit<Result, "data">
 >(
   "PauseCache: evaluate",
-  async (client, pauseId, frameId, expression) => {
+  async (client, pauseId, frameId, expression, uid) => {
     const result = await client.evaluateExpression(pauseId, expression, frameId);
     await client.waitForLoadedSources();
     cachePauseData(client, pauseId, result.data);
     return { exception: result.exception, failed: result.failed, returned: result.returned };
   },
-  (pauseId, frameId, expression, uid = "") => `${pauseId}:${frameId}:${expression}:${uid}`
+  (pauseId, frameId, expression, uid) => `${pauseId}:${frameId}:${expression}:${uid || ""}`
 );
 
 export function cachePauseData(

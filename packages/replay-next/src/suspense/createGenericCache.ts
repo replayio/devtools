@@ -50,6 +50,11 @@ export function createGenericCache<
 
   const extraParamsLength = fetchValue.length - getCacheKey.length;
 
+  if (process.env.NODE_ENV === "development") {
+    verifyNoDefaultParametersInDev(fetchValue, debugLabel);
+    verifyNoDefaultParametersInDev(getCacheKey, debugLabel);
+  }
+
   function getOrCreateRecord(...args: [...TExtraParams, ...TParams]): Record<TValue> {
     const cacheKey = getCacheKey(...(args.slice(extraParamsLength) as TParams));
 
@@ -225,4 +230,15 @@ export function createUseGetValue<TParams extends Array<any>, TValue>(
 
     return { loading: !cachedValue && !caught, value: cachedValue?.value, error: caught?.error };
   };
+}
+
+function verifyNoDefaultParametersInDev(func: Function, debugLabel: string) {
+  const source = func.toString();
+  const index = source.indexOf(")");
+  const signature = source.slice(1, index);
+  if (signature.includes("=")) {
+    throw new Error(
+      `Default parameters disallowed for generic cache methods (${debugLabel})\n\n${signature}`
+    );
+  }
 }

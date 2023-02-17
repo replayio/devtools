@@ -61,8 +61,12 @@ export const {
     client: ReplayClientInterface,
     query: string,
     includeNodeModules: boolean,
-    limit: number = MAX_SEARCH_RESULTS_TO_DISPLAY
+    limit?: number
   ) => {
+    if (limit === undefined) {
+      limit = MAX_SEARCH_RESULTS_TO_DISPLAY;
+    }
+
     const subscribers: Set<Subscriber> = new Set();
 
     const orderedResults: SourceSearchResult[] = [];

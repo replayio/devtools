@@ -15,14 +15,7 @@ import {
   toggleSideMenu,
   verifyTypeAheadContainsSuggestions,
 } from "./utils/console";
-import {
-  delay,
-  getCommandKey,
-  getElementCount,
-  getTestUrl,
-  stopHovering,
-  takeScreenshot,
-} from "./utils/general";
+import { delay, getElementCount, getTestUrl, stopHovering, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
 testSetup("4ccc9f9f-f0d3-4418-ac21-1b316e462a44");
