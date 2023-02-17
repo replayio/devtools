@@ -16,11 +16,10 @@ export const {
   Comment[]
 >(
   "CommentsCache: getCommentsGraphQL",
-  2,
   async (
+    recordingId: RecordingId,
     graphQLClient: GraphQLClientInterface,
-    accessToken: string | null,
-    recordingId: RecordingId
+    accessToken: string | null
   ) => await getCommentsGraphQL(graphQLClient, recordingId, accessToken),
   (recordingId: RecordingId) => recordingId
 );

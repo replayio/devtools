@@ -14,7 +14,6 @@ export const {
   VariableMapping[] | undefined
 >(
   "ScopeMapCache: getScopeMap",
-  1,
-  (client, location) => client.getScopeMap(location),
+  (location, client) => client.getScopeMap(location),
   location => `${location.sourceId}:${location.line}:${location.column}`
 );

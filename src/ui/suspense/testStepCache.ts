@@ -77,7 +77,7 @@ export async function getTestStepSourceLocationAsync(
 
     if (annotation?.point && annotation.time != null) {
       const pauseId = await getPauseIdAsync(client, annotation.point, annotation.time);
-      const frames = await getFramesAsync(client, pauseId);
+      const frames = await getFramesAsync(pauseId, client);
 
       if (frames) {
         if (gte(runnerVersion, "8.0.0")) {
@@ -107,15 +107,16 @@ export function getCypressConsolePropsSuspense(
   }
 
   const endPauseId = getPauseIdSuspense(client, point, time);
-  const frames = getFramesSuspense(client, endPauseId);
+  const frames = getFramesSuspense(endPauseId, client);
   const callerFrameId = frames?.[1]?.frameId;
 
   if (callerFrameId) {
     const { returned: logResult } = evaluateSuspense(
-      client,
       endPauseId,
       callerFrameId,
-      logVariable
+      logVariable,
+      undefined,
+      client
     );
 
     if (logResult?.object) {
@@ -164,17 +165,18 @@ export async function getCypressSubjectNodeIdsAsync(
 
   let nodeIds: string[] | undefined = undefined;
   const pauseId = point && time != null ? await getPauseIdAsync(client, point, time) : undefined;
-  const frames = pauseId ? await getFramesAsync(client, pauseId) : undefined;
+  const frames = pauseId ? await getFramesAsync(pauseId, client) : undefined;
 
   const callerFrameId = frames?.[1]?.frameId;
   const commandVariable = message?.commandVariable;
 
   if (pauseId && callerFrameId && commandVariable) {
     const cmdResult = await evaluateAsync(
-      client,
       pauseId,
       callerFrameId,
-      `${commandVariable}.get("subject")`
+      `${commandVariable}.get("subject")`,
+      undefined,
+      client
     );
 
     const cmdObjectId = cmdResult.returned?.object;

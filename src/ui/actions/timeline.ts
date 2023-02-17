@@ -565,8 +565,8 @@ export function setFocusRegionFromTimeRange(
     }
 
     const [pointsBoundingBegin, pointsBoundingEnd] = await Promise.all([
-      getPointsBoundingTimeAsync(replayClient, await clampTime(replayClient, timeRange.begin)),
-      getPointsBoundingTimeAsync(replayClient, await clampTime(replayClient, timeRange.end)),
+      getPointsBoundingTimeAsync(await clampTime(replayClient, timeRange.begin), replayClient),
+      getPointsBoundingTimeAsync(await clampTime(replayClient, timeRange.end), replayClient),
     ]);
     const begin = pointsBoundingBegin.before;
     const end = pointsBoundingEnd.after;

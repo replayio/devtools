@@ -22,10 +22,8 @@ import type { UIThunkAction } from "ui/actions";
 import { SEARCHABLE_EVENT_TYPES, getEventListenerLocationAsync } from "ui/actions/event-listeners";
 import useEventContextMenu from "ui/components/Events/useEventContextMenu";
 import { getLoadedRegions } from "ui/reducers/app";
-import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch } from "ui/setup/hooks";
 import { ReplayEvent } from "ui/state/app";
-import { getFormattedTime } from "ui/utils/timeline";
 
 import MaterialIcon from "../shared/MaterialIcon";
 import { getReplayEvent } from "./eventKinds";
@@ -48,8 +46,7 @@ const { getValueAsync: getNextInteractionEventAsync } = createGenericCache<
   EventLog | undefined
 >(
   "nextInteractionEventCache",
-  2,
-  async (replayClient, ThreadFront, point, replayEventType, endTime) => {
+  async (point, replayEventType, endTime, replayClient, ThreadFront) => {
     const pointNearEndTime = await replayClient.getPointNearTime(endTime);
 
     const recordingTarget = await ThreadFront.getRecordingTarget();
@@ -164,11 +161,11 @@ function jumpToClickEventFunctionLocation(
       // actual JS that executed in response. Find the next click event
       // within a small time window
       const nextClickEvent = await getNextInteractionEventAsync(
-        replayClient,
-        ThreadFront,
         executionPoint,
         event.kind as SEARCHABLE_EVENT_TYPES,
-        arbitraryEndTime
+        arbitraryEndTime,
+        replayClient,
+        ThreadFront
       );
 
       if (!nextClickEvent) {
@@ -185,11 +182,11 @@ function jumpToClickEventFunctionLocation(
       onSeek(nextClickEvent.point, nextClickEvent.time);
 
       const sourceLocation = await getEventListenerLocationAsync(
+        pauseId,
+        event.kind as SEARCHABLE_EVENT_TYPES,
         ThreadFront,
         replayClient,
-        getState,
-        pauseId,
-        event.kind as SEARCHABLE_EVENT_TYPES
+        getState
       );
 
       if (sourceLocation) {

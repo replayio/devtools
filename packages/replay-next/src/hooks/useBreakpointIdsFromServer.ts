@@ -66,7 +66,7 @@ export default function useBreakpointIdsFromServer(
             if (!sourcesWithFetchedPositions.has(sourceId)) {
               sourcesWithFetchedPositions.add(sourceId);
               // We haven't fetched breakable positions for this yet. Get them.
-              await getBreakpointPositionsAsync(client, sourceId);
+              await getBreakpointPositionsAsync(sourceId, client);
             }
 
             // _Now_ we can tell the backend about this breakpoint.

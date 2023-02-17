@@ -96,8 +96,8 @@ export const formatEventListener = async (
   }
 
   const scopeMap = await getScopeMapAsync(
-    replayClient,
-    getGeneratedLocation(sourcesById, functionLocation)
+    getGeneratedLocation(sourcesById, functionLocation),
+    replayClient
   );
   const originalFunctionName = scopeMap?.find(mapping => mapping[0] === functionName)?.[1];
 
@@ -276,9 +276,8 @@ export const { getValueAsync: getEventListenerLocationAsync } = createGenericCac
   Location | undefined
 >(
   "eventListenerLocationCache",
-  3,
-  async (ThreadFront, replayClient, getState, pauseId, replayEventType) => {
-    const stackFrames = await getFramesAsync(replayClient, pauseId);
+  async (pauseId, replayEventType, ThreadFront, replayClient, getState) => {
+    const stackFrames = await getFramesAsync(pauseId, replayClient);
     if (!stackFrames) {
       return;
     }

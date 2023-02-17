@@ -24,8 +24,7 @@ export const {
   Scope
 >(
   "ScopeCache: getScope",
-  1,
-  async (client, pauseId, scopeId) => {
+  async (pauseId, scopeId, client) => {
     const result = await client.getScope(pauseId, scopeId);
     await client.waitForLoadedSources();
     cachePauseData(client, pauseId, result.data);
@@ -46,17 +45,16 @@ export const {
   FrameScopes
 >(
   "ScopeCache: getFrameScopes",
-  1,
-  async (client, pauseId, frameId) => {
-    const frame = (await getFramesAsync(client, pauseId))?.find(
+  async (pauseId, frameId, client) => {
+    const frame = (await getFramesAsync(pauseId, client))?.find(
       frame => frame.frameId === frameId
     )!;
     const generatedScopes = await Promise.all(
-      frame.scopeChain.map(scopeId => getScopeAsync(client, pauseId, scopeId))
+      frame.scopeChain.map(scopeId => getScopeAsync(pauseId, scopeId, client))
     );
     const originalScopes = frame.originalScopeChain
       ? await Promise.all(
-          frame.originalScopeChain.map(scopeId => getScopeAsync(client, pauseId, scopeId))
+          frame.originalScopeChain.map(scopeId => getScopeAsync(pauseId, scopeId, client))
         )
       : undefined;
 

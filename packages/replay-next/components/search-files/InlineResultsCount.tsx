@@ -26,7 +26,7 @@ export default function InlineResultsCount({
     return null;
   }
 
-  const streamingResults = searchSourcesSuspense(client, query, includeNodeModules, limit);
+  const streamingResults = searchSourcesSuspense(query, includeNodeModules, limit, client);
 
   return <StreamingInlineResultsCount isPending={isPending} streamingResults={streamingResults} />;
 }

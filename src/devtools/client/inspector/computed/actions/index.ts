@@ -35,10 +35,10 @@ export function setComputedProperties(elementStyle: ElementStyle): InspectorThun
   return async (dispatch, getState, { protocolClient, ThreadFront, replayClient }) => {
     const pauseId = await ThreadFront.getCurrentPauseId(replayClient);
     const computed = await getComputedStyleAsync(
-      protocolClient,
-      ThreadFront.sessionId!,
       pauseId,
-      elementStyle.nodeId
+      elementStyle.nodeId,
+      protocolClient,
+      ThreadFront.sessionId!
     );
     const properties = await createComputedProperties(elementStyle, computed);
     return dispatch({ type: "set_computed_properties", properties });

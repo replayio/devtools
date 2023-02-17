@@ -72,8 +72,8 @@ function ErrorFrameRendererSuspends({ frame }: { frame: StackFrame }) {
       line: lineNumber,
       column: columnNumber,
     };
-    const mappedLocation = getMappedLocationSuspense(client, location);
-    const scopeMap = getScopeMapSuspense(client, location);
+    const mappedLocation = getMappedLocationSuspense(location, client);
+    const scopeMap = getScopeMapSuspense(location, client);
     originalFunctionName = scopeMap?.find(mapping => mapping[0] === frame.functionName)?.[1];
     renderedSource = <Source className={styles.Source} locations={mappedLocation} />;
   } else {

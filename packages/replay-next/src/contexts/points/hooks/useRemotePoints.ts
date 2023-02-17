@@ -20,7 +20,7 @@ export default function useRemotePoints({
 
   useEffect(() => {
     async function fetchRemotePoints() {
-      let points = await getPointsAsync(graphQLClient, accessToken, recordingId);
+      let points = await getPointsAsync(recordingId, graphQLClient, accessToken);
 
       // Shared log points are the primary use case here.
       // Sharing points that are break-only causes a weird UX, so we filter them.
