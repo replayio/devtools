@@ -1,4 +1,4 @@
-import { ReactNode, useLayoutEffect, useRef } from "react";
+import { ReactNode } from "react";
 
 import styles from "./SearchResultHighlight.module.css";
 
@@ -17,15 +17,6 @@ export default function SearchResultHighlight({
 }) {
   const searchResultColumnEndIndex = searchResultColumnStartIndex + searchText.length;
   const className = isActive ? styles.ActiveMark : styles.InactiveMark;
-
-  const markRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    if (isActive) {
-      // Horizontally scroll if needed.
-      markRef.current?.scrollIntoView({ behavior: "auto", block: "nearest", inline: "nearest" });
-    }
-  }, [isActive]);
 
   let children: ReactNode[] = [
     <div
@@ -49,7 +40,7 @@ export default function SearchResultHighlight({
           const charIndexEnd = breakableColumnIndex - searchResultColumnStartIndex;
           const text = searchText.substring(charIndexStart, charIndexEnd);
           children.push(
-            <span className={className} key={children.length} ref={markRef}>
+            <span className={className} key={children.length}>
               {text}
             </span>
           );
@@ -66,7 +57,7 @@ export default function SearchResultHighlight({
     const charIndexStart = columnIndex - searchResultColumnStartIndex;
     const text = searchText.substring(charIndexStart);
     children.push(
-      <span className={className} key={children.length} ref={markRef}>
+      <span className={className} key={children.length}>
         {text}
       </span>
     );
