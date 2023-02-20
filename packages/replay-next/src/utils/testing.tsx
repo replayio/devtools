@@ -110,7 +110,6 @@ export async function renderFocused(
     enterFocusMode: () => {},
     isTransitionPending: false,
     range: null,
-    rangeForAnalysis: { begin: "0", end: "1000" },
     rangeForDisplay: null,
     update: jest.fn(),
     ...options?.focusContext,

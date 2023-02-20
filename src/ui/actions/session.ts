@@ -31,6 +31,7 @@ import {
   requestSent,
   responseReceived,
 } from "ui/reducers/protocolMessages";
+import { setFocusRegion } from "ui/reducers/timeline";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import { extractGraphQLError } from "ui/utils/apolloClient";
 import { getPausePointParams, isMock, isTest } from "ui/utils/environment";
@@ -330,6 +331,11 @@ export function createSocket(
 
       await ThreadFront.loadingHasBegun.promise;
       dispatch(jumpToInitialPausePoint());
+
+      if (!focusRegion) {
+        const initialFocusRegion = await ThreadFront.initialFocusRegionWaiter.promise;
+        dispatch(setFocusRegion(initialFocusRegion));
+      }
     } catch (e: any) {
       const currentError = getUnexpectedError(getState());
 

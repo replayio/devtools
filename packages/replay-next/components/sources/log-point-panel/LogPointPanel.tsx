@@ -83,18 +83,21 @@ export default function PointPanelWrapper(props: ExternalProps) {
 function PointPanel(props: ExternalProps) {
   const { pointForSuspense } = props;
 
-  const { enterFocusMode, rangeForAnalysis } = useContext(FocusContext);
+  const { enterFocusMode, range: focusRange } = useContext(FocusContext);
 
   const client = useContext(ReplayClientContext);
 
-  const [hitPoints, hitPointStatus] = useSuspendAfterMount<HitPointsAndStatusTuple>(() =>
-    getHitPointsForLocationSuspense(
+  const [hitPoints, hitPointStatus] = useSuspendAfterMount<HitPointsAndStatusTuple | null>(() => {
+    if (!focusRange) {
+      return null;
+    }
+    return getHitPointsForLocationSuspense(
       client,
       pointForSuspense.location,
       pointForSuspense.condition,
-      rangeForAnalysis
-    )
-  ) ?? [[], null];
+      { begin: focusRange.begin.point, end: focusRange.end.point }
+    );
+  }) ?? [[], null];
 
   return (
     <PointPanelWithHitPoints

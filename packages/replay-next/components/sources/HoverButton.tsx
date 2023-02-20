@@ -59,7 +59,7 @@ export default function HoverButton({
   pointBehavior: PointBehavior | null;
   source: ProtocolSource;
 }) {
-  const { rangeForAnalysis } = useContext(FocusContext);
+  const { range: focusRange } = useContext(FocusContext);
   const { isMetaKeyActive, isShiftKeyActive } = useContext(KeyboardModifiersContext);
   const client = useContext(ReplayClientContext);
   const { executionPoint, update } = useContext(TimelineContext);
@@ -83,7 +83,7 @@ export default function HoverButton({
     }
 
     const [hitPoints, hitPointStatus] =
-      lineHitCounts.count >= TOO_MANY_POINTS_TO_FIND
+      lineHitCounts.count >= TOO_MANY_POINTS_TO_FIND || !focusRange
         ? [null, null]
         : getHitPointsForLocationSuspense(
             client,
@@ -93,7 +93,7 @@ export default function HoverButton({
               sourceId: source.sourceId,
             },
             null,
-            rangeForAnalysis
+            { begin: focusRange.begin.point, end: focusRange.end.point }
           );
 
     let targetPoint: TimeStampedPoint | null = null;

@@ -23,7 +23,6 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
   const dispatch = useAppDispatch();
   const loadedRegions = useAppSelector(getLoadedRegions);
   const focusRegion = useAppSelector(getFocusRegion);
-  const { endpoint } = useContext(SessionContext);
 
   const [isPending, startTransition] = useTransition();
   const [deferredFocusRegion, setDeferredFocusRegion] = useState<FocusRegion | null>(focusRegion);
@@ -33,14 +32,6 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
       setDeferredFocusRegion(focusRegion);
     });
   }, [focusRegion, loadedRegions]);
-
-  const rangeForAnalysis = useMemo(
-    () =>
-      deferredFocusRegion
-        ? { begin: deferredFocusRegion.begin.point, end: deferredFocusRegion.end.point }
-        : { begin: "0", end: endpoint },
-    [deferredFocusRegion, endpoint]
-  );
 
   const update = useCallback(
     (value: Range | null, _: boolean) => {
@@ -65,11 +56,10 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
       },
       isTransitionPending: isPending,
       range: deferredFocusRegion ? rangeForFocusRegion(deferredFocusRegion) : null,
-      rangeForAnalysis,
       rangeForDisplay: focusRegion ? rangeForFocusRegion(focusRegion) : null,
       update,
     };
-  }, [deferredFocusRegion, dispatch, isPending, focusRegion, rangeForAnalysis, update]);
+  }, [deferredFocusRegion, dispatch, isPending, focusRegion, update]);
 
   return <FocusContext.Provider value={context}>{children}</FocusContext.Provider>;
 }
