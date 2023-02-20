@@ -12,6 +12,7 @@ import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersCo
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { PointInstance } from "replay-next/src/contexts/points/types";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TerminalContext, TerminalExpression } from "replay-next/src/contexts/TerminalContext";
 import { EventLog, getEventTypeEntryPointsSuspense } from "replay-next/src/suspense/EventsCache";
 import { UncaughtException, getExceptionsSuspense } from "replay-next/src/suspense/ExceptionsCache";
@@ -61,7 +62,8 @@ export function LoggablesContextRoot({
     showWarnings,
   } = useContext(ConsoleFiltersContext);
 
-  const { range: focusRange, rangeForAnalysis } = useContext(FocusContext);
+  const { range: focusRange } = useContext(FocusContext);
+  const { endpoint } = useContext(SessionContext);
 
   // Find the set of event type handlers we should be displaying in the console.
   const eventTypesToLoad = useMemo<EventHandlerType[]>(() => {
@@ -81,7 +83,7 @@ export function LoggablesContextRoot({
     ).flat();
   }, [client, eventTypesToLoad]);
 
-  const { messages } = getMessagesSuspense(client, focusRange);
+  const { messages } = getMessagesSuspense(client, focusRange, endpoint);
 
   // Pre-filter in-focus messages by non text based search criteria.
   const preFilteredMessages = useMemo<ProtocolMessage[]>(() => {
@@ -141,6 +143,10 @@ export function LoggablesContextRoot({
   }, [eventLogs, focusRange]);
 
   const pointInstances = useMemo<PointInstance[]>(() => {
+    if (!focusRange) {
+      return [];
+    }
+
     const pointInstances: PointInstance[] = [];
 
     points.forEach(point => {
@@ -150,7 +156,7 @@ export function LoggablesContextRoot({
           client,
           point.location,
           point.condition,
-          rangeForAnalysis
+          { begin: focusRange.begin.point, end: focusRange.end.point }
         );
 
         switch (status) {
@@ -174,7 +180,7 @@ export function LoggablesContextRoot({
     });
 
     return pointInstances;
-  }, [client, pointBehaviors, points, rangeForAnalysis]);
+  }, [client, pointBehaviors, points, focusRange]);
 
   const { messages: terminalExpressions } = useContext(TerminalContext);
   const sortedTerminalExpressions = useMemo(() => {

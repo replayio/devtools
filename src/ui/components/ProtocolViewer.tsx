@@ -610,13 +610,15 @@ const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericC
 
 function RecordedProtocolMessages({ sourceDetails }: { sourceDetails: SourceDetails[] }) {
   const replayClient = useContext(ReplayClientContext);
-  const { rangeForAnalysis } = useContext(FocusContext);
+  const { range: focusRange } = useContext(FocusContext);
 
-  const allProtocolMessages = getRecordedProtocolMessagesSuspense(
-    sourceDetails,
-    rangeForAnalysis,
-    replayClient
-  );
+  const allProtocolMessages = focusRange
+    ? getRecordedProtocolMessagesSuspense(
+        sourceDetails,
+        { begin: focusRange.begin.point, end: focusRange.end.point },
+        replayClient
+      )
+    : { errorMap: {}, requestMap: {}, responseMap: {} };
 
   return <ProtocolViewer {...allProtocolMessages} />;
 }

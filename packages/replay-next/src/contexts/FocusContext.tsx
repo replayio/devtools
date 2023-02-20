@@ -1,4 +1,4 @@
-import { PointRange, TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
+import { TimeStampedPointRange } from "@replayio/protocol";
 import {
   PropsWithChildren,
   createContext,
@@ -29,7 +29,6 @@ export type FocusContextType = {
   enterFocusMode: () => void;
   isTransitionPending: boolean;
   range: TimeStampedPointRange | null;
-  rangeForAnalysis: PointRange;
   rangeForDisplay: TimeStampedPointRange | null;
   update: (value: Range | null, debounce: boolean) => void;
 };
@@ -44,8 +43,12 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
   // Changing the focus range may cause us to suspend (while fetching new info from the backend).
   // Wrapping it in a transition enables us to show the older set of messages (in a pending state) while new data loads.
   // This is less jarring than the alternative of unmounting all messages and rendering a fallback loader.
-  const [range, setRange] = useState<TimeStampedPointRange | null>(null);
-  const [deferredRange, setDeferredRange] = useState<TimeStampedPointRange | null>(null);
+  const initialRange: TimeStampedPointRange = {
+    begin: { point: "0", time: 0 },
+    end: { point: endpoint, time: duration },
+  };
+  const [range, setRange] = useState<TimeStampedPointRange | null>(initialRange);
+  const [deferredRange, setDeferredRange] = useState<TimeStampedPointRange | null>(initialRange);
 
   // Using a deferred values enables the focus UI to update quickly,
   // and the slower operation of Suspending to load points to be deferred.
@@ -61,14 +64,6 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
       });
     },
     FOCUS_DEBOUNCE_DURATION
-  );
-
-  const rangeForAnalysis = useMemo(
-    () =>
-      deferredRange
-        ? { begin: deferredRange.begin.point, end: deferredRange.end.point }
-        : { begin: "0", end: endpoint },
-    [deferredRange, endpoint]
   );
 
   // Refine the loaded ranges based on the focus window.
@@ -132,10 +127,9 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
       isTransitionPending,
       rangeForDisplay: range,
       range: deferredRange,
-      rangeForAnalysis,
       update: updateFocusRange,
     }),
-    [deferredRange, isTransitionPending, range, rangeForAnalysis, updateFocusRange]
+    [deferredRange, isTransitionPending, range, updateFocusRange]
   );
 
   return <FocusContext.Provider value={focusContext}>{children}</FocusContext.Provider>;

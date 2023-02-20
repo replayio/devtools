@@ -20,7 +20,7 @@ function PreviewMarkers() {
   const replayClient = useContext(ReplayClientContext);
 
   const { focusedSource, hoveredLineIndex, visibleLines } = useContext(SourcesContext);
-  const { range: focusRange, rangeForAnalysis } = useContext(FocusContext);
+  const { range: focusRange } = useContext(FocusContext);
 
   const focusedSourceId = focusedSource?.sourceId ?? null;
 
@@ -39,7 +39,10 @@ function PreviewMarkers() {
   }
 
   const [hitPoints, hitPointStatus] =
-    focusedSourceId !== null && firstColumnWithHitCounts !== null && hoveredLineIndex !== null
+    focusRange &&
+    focusedSourceId !== null &&
+    firstColumnWithHitCounts !== null &&
+    hoveredLineIndex !== null
       ? getHitPointsForLocationSuspense(
           replayClient,
           {
@@ -48,7 +51,7 @@ function PreviewMarkers() {
             line: hoveredLineIndex + 1,
           },
           null,
-          rangeForAnalysis
+          { begin: focusRange.begin.point, end: focusRange.end.point }
         )
       : [null, null];
 
