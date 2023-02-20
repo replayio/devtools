@@ -32,7 +32,7 @@ export function TestCaseRow({ test, index }: { test: TestItem; index: number }) 
     <button
       data-test-id="TestSuite-TestCaseRow"
       className={classnames(
-        "flex flex-row items-center justify-between gap-1 rounded-lg p-1 transition",
+        "flex flex-row items-center text-left justify-between gap-1 rounded-lg p-1 transition",
         {
           "group hover:cursor-pointer": expandable,
         }
@@ -44,7 +44,7 @@ export function TestCaseRow({ test, index }: { test: TestItem; index: number }) 
         <Status result={test.result} />
         <div className="flex flex-col items-start text-bodyColor">
           <div
-            className={`overflow-hidden overflow-ellipsis whitespace-pre ${"group-hover:underline"}`}
+            className={`overflow-hidden overflow-ellipsis ${"group-hover:underline"}`}
           >
             {test.title}
           </div>
