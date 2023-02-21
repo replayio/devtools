@@ -167,7 +167,6 @@ function ModernSourceCodePreview({
   return (
     <div className={styles.LabelGroup} onClick={onSelectSource} title="Show in the Editor">
       <div className={styles.Labels}>
-        {location}
         {codePreview}
       </div>
       <Icon className={styles.Icon} type="chevron-right" />
