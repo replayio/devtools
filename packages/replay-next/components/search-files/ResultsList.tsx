@@ -51,7 +51,7 @@ export default function ResultsList({
     return null;
   }
 
-  const streamingResults = searchSourcesSuspense(client, query, includeNodeModules, limit);
+  const streamingResults = searchSourcesSuspense(query, includeNodeModules, limit, client);
   const sources = getSourcesSuspense(client);
 
   return (

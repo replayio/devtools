@@ -347,8 +347,11 @@ const SourceListRow = memo(
 
     const currentSearchResult = searchState.results[searchState.index] || null;
     const searchResultsForLine = useMemo(
-      () => searchState.results.filter(result => result.lineIndex === index),
-      [index, searchState.results]
+      () =>
+        searchState.enabled
+          ? searchState.results.filter(result => result.lineIndex === index)
+          : null,
+      [index, searchState.enabled, searchState.results]
     );
 
     let breakPointTestState = "off";
@@ -412,7 +415,7 @@ const SourceListRow = memo(
           )}
 
           <div className={styles.LineSegmentsAndPointPanel}>
-            {searchResultsForLine.map((result, resultIndex) => (
+            {searchResultsForLine?.map((result, resultIndex) => (
               <SearchResultHighlight
                 breakableColumnIndices={breakableColumnIndices}
                 key={resultIndex}

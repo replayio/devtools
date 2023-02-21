@@ -76,6 +76,7 @@ export default function Initializer({
           accessToken: activeAccessToken,
           currentUserInfo,
           duration: endpoint.time,
+          endpoint: endpoint.point,
           recordingId: activeRecordingId,
           sessionId,
           refetchUser: () => {},

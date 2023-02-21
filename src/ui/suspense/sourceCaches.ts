@@ -36,10 +36,9 @@ export const {
   SymbolDeclarations | undefined
 >(
   "sourceSymbolsCache",
-  1,
-  async (replayClient, sourceId, sourceDetails) => {
+  async (sourceId, sourceDetails, replayClient) => {
     const { parser } = await import("devtools/client/debugger/src/utils/bootstrap");
-    const sourceContents = await getSourceContentsAsync(replayClient, sourceId);
+    const sourceContents = await getSourceContentsAsync(sourceId, replayClient);
 
     if (sourceContents !== undefined) {
       const { contents, sourceId } = sourceContents;
@@ -64,9 +63,8 @@ export const {
 export const { getValueAsync: getSourceLinesAsync, getValueSuspense: getSourceLinesSuspense } =
   createGenericCache<[replayClient: ReplayClientInterface], [sourceId: string], string[]>(
     "sourceLinesCache",
-    1,
-    async (replayClient, sourceId) => {
-      const sourceContents = await getSourceContentsAsync(replayClient, sourceId);
+    async (sourceId, replayClient) => {
+      const sourceContents = await getSourceContentsAsync(sourceId, replayClient);
       if (!sourceContents) {
         return [];
       }

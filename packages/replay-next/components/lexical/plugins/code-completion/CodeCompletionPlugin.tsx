@@ -1,10 +1,10 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
-import { FrameId, PauseId } from "@replayio/protocol";
+import { ExecutionPoint, FrameId, PauseId } from "@replayio/protocol";
 import { $createTextNode, TextNode } from "lexical";
 import { useContext, useEffect } from "react";
 
-import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
+import useRegions from "replay-next/src/hooks/useRegions";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import TypeAheadPlugin from "../typeahead/TypeAheadPlugin";
@@ -18,26 +18,31 @@ export default function CodeCompletionPlugin({
   context,
   dataTestId,
   dataTestName = "CodeTypeAhead",
-  pauseAndFrameId = null,
+  executionPoint,
+  time,
 }: {
   context: Context;
   dataTestId?: string;
   dataTestName?: string;
-  pauseAndFrameId: PauseAndFrameId | null;
+  executionPoint: ExecutionPoint;
+  time: number;
 }): JSX.Element {
   const [editor] = useLexicalComposerContext();
 
   const replayClient = useContext(ReplayClientContext);
 
-  let pauseId: PauseId | null = null;
-  let frameId: FrameId | null = null;
-  if (pauseAndFrameId != null) {
-    pauseId = pauseAndFrameId.pauseId;
-    frameId = pauseAndFrameId.frameId;
-  }
+  const loadedRegions = useRegions(replayClient);
 
   const findMatchesWrapper = (query: string, queryScope: string | null) => {
-    return findMatches(query, queryScope, replayClient, frameId, pauseId, context);
+    return findMatches(
+      query,
+      queryScope,
+      replayClient,
+      executionPoint,
+      time,
+      loadedRegions,
+      context
+    );
   };
 
   useEffect(() => {

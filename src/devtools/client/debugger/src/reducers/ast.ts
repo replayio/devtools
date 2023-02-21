@@ -119,7 +119,7 @@ export const fetchSymbolsForSource = createAsyncThunk<
 
     const sourceDetails = getAllSourceDetails(getState());
 
-    const symbols = await getSymbolsAsync(replayClient, sourceId, sourceDetails);
+    const symbols = await getSymbolsAsync(sourceId, sourceDetails, replayClient);
     return symbols!;
   },
   {

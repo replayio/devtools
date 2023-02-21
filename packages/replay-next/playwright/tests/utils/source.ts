@@ -247,6 +247,7 @@ export async function focusOnSource(page: Page) {
 
   const sourcesRoot = page.locator('[data-test-id="SourcesRoot"]');
   await expect(sourcesRoot).toBeVisible();
+  await delay(100);
   await sourcesRoot.focus();
   await expect(sourcesRoot).toBeFocused();
 }

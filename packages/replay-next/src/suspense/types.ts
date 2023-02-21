@@ -1,19 +1,23 @@
-export const STATUS_PENDING = 0;
-export const STATUS_RESOLVED = 1;
-export const STATUS_REJECTED = 2;
+export const STATUS_PENDING = "pending";
+export const STATUS_RESOLVED = "resolved";
+export const STATUS_REJECTED = "rejected";
+
+export type StatusPending = typeof STATUS_PENDING;
+export type StatusResolved = typeof STATUS_RESOLVED;
+export type StatusRejected = typeof STATUS_REJECTED;
 
 export type PendingRecord<T> = {
-  status: 0;
+  status: StatusPending;
   value: Wakeable<T>;
 };
 
 export type ResolvedRecord<T> = {
-  status: 1;
+  status: StatusResolved;
   value: T;
 };
 
 export type RejectedRecord = {
-  status: 2;
+  status: StatusRejected;
   value: any;
 };
 

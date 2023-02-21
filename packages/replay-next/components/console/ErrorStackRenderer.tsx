@@ -39,6 +39,11 @@ function ErrorStackRendererSuspends({
   const client = useContext(ReplayClientContext);
   const stack = getObjectPropertySuspense(client, pauseId, errorObjectId, "stack").value;
   assert(typeof stack === "string", "no stack string found in error object");
+  // Handle cases where there is no meaningful stack string;
+  if (stack.trim().length === 0) {
+    return <span>No stack available</span>;
+  }
+
   const frames = ErrorStackParser.parse({ name: "", message: "", stack });
   return (
     <>
@@ -67,8 +72,8 @@ function ErrorFrameRendererSuspends({ frame }: { frame: StackFrame }) {
       line: lineNumber,
       column: columnNumber,
     };
-    const mappedLocation = getMappedLocationSuspense(client, location);
-    const scopeMap = getScopeMapSuspense(client, location);
+    const mappedLocation = getMappedLocationSuspense(location, client);
+    const scopeMap = getScopeMapSuspense(location, client);
     originalFunctionName = scopeMap?.find(mapping => mapping[0] === frame.functionName)?.[1];
     renderedSource = <Source className={styles.Source} locations={mappedLocation} />;
   } else {

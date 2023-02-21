@@ -131,14 +131,13 @@ export const { getValueAsync: getActionStateValuesAsync } = createGenericCache<
   ReduxActionStateValues | undefined
 >(
   "reduxDevtools: getActionStateValues",
-  1,
-  async (replayClient, point, time) => {
+  async (point, time, replayClient) => {
     const pauseId = await getPauseIdAsync(replayClient, point, time);
     if (!pauseId) {
       return;
     }
 
-    const frames = await getFramesAsync(replayClient, pauseId);
+    const frames = await getFramesAsync(pauseId, replayClient);
     if (!frames) {
       return;
     }
@@ -173,14 +172,13 @@ export const { getValueAsync: getDiffAsync } = createGenericCache<
   Delta | undefined
 >(
   "reduxDevtools: getDiff",
-  1,
-  async (replayClient, point, time) => {
+  async (point, time, replayClient) => {
     const pauseId = await getPauseIdAsync(replayClient, point, time);
     if (!pauseId) {
       return;
     }
 
-    const frames = await getFramesAsync(replayClient, pauseId);
+    const frames = await getFramesAsync(pauseId, replayClient);
     if (!frames) {
       return;
     }

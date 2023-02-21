@@ -34,7 +34,7 @@ function CypressIcon() {
       <path
         d="M128 2C197.645 2 254 58.3555 254 128C254 197.645 197.645 254 128 254C58.3555 254 2 197.645 2 128C2 58.3555 58.3555 2 128 2Z"
         fill="currentColor"
-        stroke="white"
+        stroke="transparent"
         strokeWidth="4"
       />
       <path

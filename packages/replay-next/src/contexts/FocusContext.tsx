@@ -37,14 +37,18 @@ export const FocusContext = createContext<FocusContextType>(null as any);
 
 export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
   const client = useContext(ReplayClientContext);
-  const { duration } = useContext(SessionContext);
+  const { duration, endpoint } = useContext(SessionContext);
   const loadedRegions = useLoadedRegions(client);
 
   // Changing the focus range may cause us to suspend (while fetching new info from the backend).
   // Wrapping it in a transition enables us to show the older set of messages (in a pending state) while new data loads.
   // This is less jarring than the alternative of unmounting all messages and rendering a fallback loader.
-  const [range, setRange] = useState<TimeStampedPointRange | null>(null);
-  const [deferredRange, setDeferredRange] = useState<TimeStampedPointRange | null>(null);
+  const initialRange: TimeStampedPointRange = {
+    begin: { point: "0", time: 0 },
+    end: { point: endpoint, time: duration },
+  };
+  const [range, setRange] = useState<TimeStampedPointRange | null>(initialRange);
+  const [deferredRange, setDeferredRange] = useState<TimeStampedPointRange | null>(initialRange);
 
   // Using a deferred values enables the focus UI to update quickly,
   // and the slower operation of Suspending to load points to be deferred.

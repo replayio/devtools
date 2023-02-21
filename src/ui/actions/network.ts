@@ -115,7 +115,7 @@ export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
       timeStampedPoint.point,
       timeStampedPoint.time
     );
-    const frames = (await getFramesAsync(replayClient, pauseId)) || [];
+    const frames = (await getFramesAsync(pauseId, replayClient)) || [];
     await ThreadFront.ensureAllSources();
     state = getState();
     const formattedFrames = frames?.map((frame, i) =>
