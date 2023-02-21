@@ -64,7 +64,7 @@ export default function SidePanel() {
   };
 
   const launchQuickstart = () => {
-    window.open("https://docs.replay.io/recording-a-web-app/viewing-and-collaborating", "_blank");
+    window.open("https://docs.replay.io/debugging", "_blank");
   };
 
   const signIn = () => {
@@ -112,7 +112,7 @@ export default function SidePanel() {
       {isAuthenticated && (
         <div className={styles.TourBox}>
           <h2>Welcome to Replay!</h2>
-          <p>To get started with Replay, please check out our docs.</p>
+          <p>Just getting started with time travel debugging? Check out our docs!</p>
 
           <button type="button" onClick={() => launchQuickstart()} style={{ padding: "4px 8px" }}>
             <div className="mr-1">Documentation</div>
