@@ -13,8 +13,6 @@ import { getFunctionBody } from "protocol/evaluation-utils";
 import type { ThreadFront as TF } from "protocol/thread";
 import { RecordingTarget } from "protocol/thread/thread";
 import Icon from "replay-next/components/Icon";
-import { usePositionedTooltip } from "replay-next/src/hooks/usePositionedTooltip";
-import useTooltip from "replay-next/src/hooks/useTooltip";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { EventLog, eventsMapper } from "replay-next/src/suspense/EventsCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
@@ -107,9 +105,9 @@ export const getEventLabel = (event: ReplayEvent) => {
 type JumpToCodeFailureReason = "not_loaded" | "no_hits";
 type JumpToCodeResult = JumpToCodeFailureReason | "found";
 
-const errorToastMessages: Record<JumpToCodeFailureReason, string> = {
-  not_loaded: "Event not in a loaded region",
-  no_hits: "No source location found",
+const errorMessages: Record<JumpToCodeFailureReason, string> = {
+  not_loaded: "Not loaded",
+  no_hits: "No results",
 };
 
 /*
@@ -232,30 +230,6 @@ export default React.memo(function Event({
   const { icon } = getReplayEvent(kind);
   const [jumpToCodeError, setJumpToCodeError] = useState<JumpToCodeFailureReason | null>(null);
 
-  const tooltipTargetRef = useRef<HTMLDivElement>(null);
-
-  const tooltipContent = (
-    <div>{errorToastMessages[jumpToCodeError ?? ("" as JumpToCodeFailureReason)]}</div>
-  );
-
-  // Two separate copies of the "jump to code" error tooltip.
-  // 1) Manual control via a timer, so it's visible when the error first happens
-  const { tooltip: popupTooltip, setShowTooltip: setShowPopupTooltip } = usePositionedTooltip({
-    tooltip: tooltipContent,
-    position: "above",
-    targetRef: tooltipTargetRef,
-  });
-
-  // 2) On hover over the jump button later
-  const {
-    tooltip: hoverTooltip,
-    onMouseEnter: onTooltipMouseEnter,
-    onMouseLeave: onTooltipMouseLeave,
-  } = useTooltip({
-    position: "above",
-    tooltip: tooltipContent,
-  });
-
   const onKeyDown = (e: React.KeyboardEvent) => e.key === " " && e.preventDefault();
 
   const onClickSeek = () => {
@@ -274,8 +248,13 @@ export default React.memo(function Event({
       if (result !== "found") {
         setJumpToCodeError(result);
 
-        setShowPopupTooltip(true);
-        setTimeout(() => setShowPopupTooltip(false), 5000);
+        if (result === "not_loaded") {
+          // Clear this out after a few seconds since the user could change focus.
+          // Simpler than trying to watch the focus region change over time.
+          setTimeout(() => {
+            setJumpToCodeError(null);
+          }, 5000);
+        }
       }
     }
   };
@@ -293,7 +272,7 @@ export default React.memo(function Event({
     "transition-width flex items-center justify-center rounded-full  duration-100 ease-out h-6",
     {
       "bg-primaryAccent": jumpToCodeButtonAvailable,
-      "bg-gray-400 cursor-not-allowed": !jumpToCodeButtonAvailable,
+      "bg-gray-400 cursor-default": !jumpToCodeButtonAvailable,
       "px-2 shadow-sm": isHovered,
       "w-6": !isHovered,
     }
@@ -301,20 +280,17 @@ export default React.memo(function Event({
 
   const onJumpButtonMouseEnter = (e: React.MouseEvent) => {
     setIsHovered(true);
-
-    if (!jumpToCodeButtonAvailable) {
-      setShowPopupTooltip(false);
-      onTooltipMouseEnter(e);
-    }
   };
 
   const onJumpButtonMouseLeave = (e: React.MouseEvent) => {
     setIsHovered(false);
-
-    if (!jumpToCodeButtonAvailable) {
-      onTooltipMouseLeave(e);
-    }
   };
+
+  let jumpButtonText = "Jump to code";
+
+  if (jumpToCodeError) {
+    jumpButtonText = errorMessages[jumpToCodeError];
+  }
 
   return (
     <>
@@ -331,7 +307,7 @@ export default React.memo(function Event({
           <MaterialIcon iconSize="xl">{icon}</MaterialIcon>
           <Label>{label}</Label>
         </div>
-        <div className="flex space-x-2 opacity-0 group-hover:opacity-100" ref={tooltipTargetRef}>
+        <div className="flex space-x-2 opacity-0 group-hover:opacity-100">
           {event.kind === "mousedown" || event.kind === "keypress" ? (
             <div
               onClick={jumpToCodeButtonAvailable ? onClickJumpToCode : undefined}
@@ -340,7 +316,7 @@ export default React.memo(function Event({
               className={jumpToCodeButtonClassname}
             >
               <div className="flex items-center space-x-1">
-                {isHovered && <span className="truncate text-white ">Jump to code</span>}
+                {isHovered && <span className="truncate text-white ">{jumpButtonText}</span>}
                 <Icon type={timeLabel} className="w-3.5 text-white" />
               </div>
             </div>
@@ -348,8 +324,6 @@ export default React.memo(function Event({
         </div>
       </div>
       {contextMenu}
-      {popupTooltip}
-      {hoverTooltip}
     </>
   );
 });
