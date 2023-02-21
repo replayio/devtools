@@ -10,48 +10,35 @@ import {
 } from "react";
 
 import Tooltip from "replay-next/components/Tooltip";
-import useDebouncedCallback from "replay-next/src/hooks/useDebouncedCallback";
 
-export type TooltipPosition = "above" | "below" | "left-of" | "right-of";
+import { MARGIN_LARGE, MARGIN_SMALL, TooltipPosition } from "./useTooltip";
 
-export const MARGIN_LARGE = 8;
-export const MARGIN_SMALL = 4;
-
-export default function useTooltip({
+// A copy-pasted version of the other `useTooltip` hook,
+// but exposing `setShowTooltip` for control from the parent component
+// instead of controlling display itself on hover.
+// TODO Find a better way to consolidate these or extract common logic
+export function usePositionedTooltip({
   className,
   containerRef,
-  delay = 0,
   position,
   tooltip,
+  targetRef,
 }: {
   className?: string;
   containerRef?: RefObject<HTMLElement>;
-  delay?: number;
-  position?: TooltipPosition;
+  position: TooltipPosition;
+  targetRef: RefObject<HTMLElement>;
   tooltip: ReactNode;
 }): {
-  onMouseEnter: (event: MouseEvent) => void;
-  onMouseLeave: (event: MouseEvent) => void;
-  onMouseMove: (event: MouseEvent) => void;
+  setShowTooltip: Dispatch<SetStateAction<boolean>>;
   tooltip: ReactNode;
 } {
   const tooltipRef = useRef<HTMLDivElement>(null);
 
-  const [mouseCoordinates, setMouseCoordinates] = useState<Pick<
-    MouseEvent,
-    "clientX" | "clientY"
-  > | null>(null);
-
-  const [mouseTarget, setMouseTarget] = useState<HTMLElement | null>(null);
-
   const [showTooltip, setShowTooltip] = useState(false);
 
-  const setShowTooltipDebounced = useDebouncedCallback((value: boolean) => {
-    setShowTooltip(value);
-  }, delay);
-
   useLayoutEffect(() => {
-    if (mouseCoordinates === null || mouseTarget === null || showTooltip === false) {
+    if (!targetRef.current || showTooltip === false) {
       return;
     }
 
@@ -59,6 +46,8 @@ export default function useTooltip({
     if (tooltip === null) {
       return;
     }
+
+    const mouseTarget = targetRef.current;
 
     const container = containerRef?.current ?? document.body;
 
@@ -95,19 +84,6 @@ export default function useTooltip({
             styleLeft = targetRect.left + mouseTarget.offsetWidth + MARGIN_SMALL;
             break;
         }
-      } else {
-        styleLeft = mouseCoordinates.clientX + MARGIN_LARGE;
-        styleTop = mouseCoordinates.clientY + MARGIN_LARGE;
-
-        // For the target we intentionally use the bounding rect (rather than clientWidth/clientHeight)
-        // because this takes scale into consideration, which is important for targets like HTMLCanvasElements.
-        const containerRect = container.getBoundingClientRect();
-        if (styleLeft + tooltipWidth + MARGIN_LARGE > containerRect.left + containerRect.width) {
-          marginLeft = `-${tooltipWidth + MARGIN_LARGE * 2}px`;
-        }
-        if (styleTop + tooltipHeight + MARGIN_LARGE > containerRect.top + containerRect.height) {
-          marginTop = `-${tooltipHeight + MARGIN_LARGE * 2}px`;
-        }
       }
 
       tooltip.style.setProperty("left", `${styleLeft}px`);
@@ -117,8 +93,6 @@ export default function useTooltip({
     };
 
     const onScroll = () => {
-      setMouseCoordinates(null);
-      setMouseTarget(null);
       setShowTooltip(false);
     };
 
@@ -149,7 +123,7 @@ export default function useTooltip({
       observer.unobserve(mouseTarget);
       observer.disconnect();
     };
-  }, [containerRef, mouseCoordinates, mouseTarget, position, showTooltip]);
+  }, [containerRef, position, showTooltip, targetRef]);
 
   let renderedTooltip: ReactNode = null;
   if (showTooltip) {
@@ -160,37 +134,5 @@ export default function useTooltip({
     );
   }
 
-  const onMouseEnter = (event: MouseEvent) => {
-    setMouseCoordinates({
-      clientX: event.clientX,
-      clientY: event.clientY,
-    });
-    setMouseTarget(event.currentTarget as HTMLElement);
-
-    if (delay === 0) {
-      setShowTooltip(true);
-    } else {
-      setShowTooltipDebounced(true);
-    }
-  };
-
-  const onMouseLeave = (event: MouseEvent) => {
-    setMouseCoordinates(null);
-    setMouseTarget(null);
-    setShowTooltip(false);
-    setShowTooltipDebounced.cancel();
-  };
-
-  const onMouseMove = (event: MouseEvent) => {
-    if (position) {
-      return;
-    }
-
-    setMouseCoordinates({
-      clientX: event.clientX,
-      clientY: event.clientY,
-    });
-  };
-
-  return { onMouseEnter, onMouseLeave, onMouseMove, tooltip: renderedTooltip };
+  return { tooltip: renderedTooltip, setShowTooltip };
 }
