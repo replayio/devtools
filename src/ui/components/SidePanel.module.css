@@ -39,8 +39,8 @@
   padding: 0.5em;
   color: #fff;
   background: linear-gradient(116.71deg, #ff2f86 21.74%, #ec275d 83.58%),
-  linear-gradient(133.71deg, #01acfd 3.31%, #f155ff 106.39%, #f477f8 157.93%, #f33685 212.38%),
-  #007aff;
+    linear-gradient(133.71deg, #01acfd 3.31%, #f155ff 106.39%, #f477f8 157.93%, #f33685 212.38%),
+    #007aff;
   border-radius: 4px;
 }
 
@@ -48,7 +48,7 @@
   background-color: #fff;
   color: #f33685;
   display: flex;
-  margin-top: 0.50rem;
+  margin-top: 0.5rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
   align-items: center;
