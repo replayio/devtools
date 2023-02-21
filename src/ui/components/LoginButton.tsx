@@ -23,15 +23,6 @@ const LoginButton: FC<LoginButtonProps> = ({ variant }) => {
     );
   }
 
-  if (variant === "Tour") {
-    return (
-      <button type="button" onClick={() => loginAndReturn()} style={{ padding: "4px 8px" }}>
-        <div className="mr-1">Sign in</div>
-        <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
-      </button>
-    );
-  }
-
   return (
     <button className="row logout" onClick={() => loginAndReturn()}>
       <span className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 text-sm font-medium leading-4 text-buttontextColor hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">

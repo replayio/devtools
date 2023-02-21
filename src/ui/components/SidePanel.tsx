@@ -65,7 +65,8 @@ export default function SidePanel() {
 
   const launchQuickstart = () => {
     window.open("https://docs.replay.io/debugging", "_blank");
-  };  const items: any[] = [];
+  };
+  const items: any[] = [];
 
   // if (recording?.metadata?.test?.tests?.length) {
   items.push({

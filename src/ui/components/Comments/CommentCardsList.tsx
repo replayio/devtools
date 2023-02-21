@@ -2,11 +2,11 @@ import sortBy from "lodash/sortBy";
 import React, { useMemo } from "react";
 
 import CommentCard from "ui/components/Comments/CommentCard";
+import LoginButton from "ui/components/LoginButton";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { Comment } from "ui/state/comments";
 import useAuth0 from "ui/utils/useAuth0";
-import LoginButton from "ui/components/LoginButton";
 
 import styles from "./CommentCardsList.module.css";
 
@@ -41,13 +41,19 @@ export default function CommentCardsList() {
       <div className={styles.NoComments}>
         <MaterialIcon className={styles.NoCommentsIcon}>forum</MaterialIcon>
         <h2>{isAuthenticated ? "" : "Sign in to get started"}</h2>
-        
+
         <>
-          {isAuthenticated
-            ? (<p>Add a comment to the video, a line of code, or a console message.</p>)
-            : (<div><p>Once signed in, you can add comments and make your voice heard!</p><p><LoginButton /></p></div>)}
-      </>
-       
+          {isAuthenticated ? (
+            <p>Add a comment to the video, a line of code, or a console message.</p>
+          ) : (
+            <div>
+              <p>Once signed in, you can add comments and make your voice heard!</p>
+              <p>
+                <LoginButton />
+              </p>
+            </div>
+          )}
+        </>
       </div>
     );
   }
