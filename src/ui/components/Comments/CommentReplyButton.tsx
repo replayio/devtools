@@ -24,7 +24,7 @@ export default function CommentReplyButton({ comment }: { comment: Comment }) {
     return null;
   }
 
-  const addReply: MouseEventHandler = async (event) => {
+  const addReply: MouseEventHandler = async event => {
     event.stopPropagation();
     setIsPending(true);
 

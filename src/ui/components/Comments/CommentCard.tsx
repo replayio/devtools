@@ -1,24 +1,26 @@
 import classNames from "classnames";
 import { MouseEvent } from "react";
-import { selectLocation } from "devtools/client/debugger/src/actions/sources";
-import { trackEvent } from "ui/utils/telemetry";
-import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
-import { seekToComment } from "ui/actions/comments";
-import { getViewMode } from "ui/reducers/layout";
 
-import SourceCodePreview from "./TranscriptComments/SourceCodePreview";
+import { selectLocation } from "devtools/client/debugger/src/actions/sources";
+import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
+import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import { isSourceCodeCommentTypeData } from "replay-next/components/sources/utils/comments";
+import { seekToComment } from "ui/actions/comments";
+import { setViewMode } from "ui/actions/layout";
+import { getViewMode } from "ui/reducers/layout";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Comment } from "ui/state/comments";
 import { isCommentContentEmpty } from "ui/utils/comments";
-import { getThreadContext } from "devtools/client/debugger/src/selectors";
+import { trackEvent } from "ui/utils/telemetry";
+
 import CommentPreview from "./CommentPreview";
 import CommentReplyButton from "./CommentReplyButton";
 import EditableRemark from "./EditableRemark";
 import ReplyCard from "./ReplyCard";
+import SourceCodePreview from "./TranscriptComments/SourceCodePreview";
 import styles from "./CommentCard.module.css";
-import { setViewMode } from "ui/actions/layout";
+
 export default function CommentCard({ comment }: { comment: Comment }) {
   const currentTime = useAppSelector(getCurrentTime);
   const executionPoint = useAppSelector(getExecutionPoint);
@@ -32,24 +34,21 @@ export default function CommentCard({ comment }: { comment: Comment }) {
     event.stopPropagation();
     const openSource = viewMode === "dev";
     dispatch(seekToComment(comment, comment.sourceLocation, openSource));
-    
-    
+
     const { type, typeData } = comment;
     if (openSource && isSourceCodeCommentTypeData(type, typeData)) {
-    
-    dispatch(setViewMode("dev"));
-    trackEvent("comments.select_location");      
-      
-    dispatch(
-      selectLocation(context, {
-        column: typeData.columnIndex,
-        line: typeData.lineNumber,
-        sourceId: typeData.sourceId,
-        sourceUrl: typeData.sourceUrl || undefined,
-      })
-    );    
-  }
-  
+      dispatch(setViewMode("dev"));
+      trackEvent("comments.select_location");
+
+      dispatch(
+        selectLocation(context, {
+          column: typeData.columnIndex,
+          line: typeData.lineNumber,
+          sourceId: typeData.sourceId,
+          sourceUrl: typeData.sourceUrl || undefined,
+        })
+      );
+    }
   };
 
   const onPreviewClick = (event: MouseEvent) => {

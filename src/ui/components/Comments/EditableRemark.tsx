@@ -92,11 +92,11 @@ export default function EditableRemark({
     classNames.push(styles.Editing);
   }
 
-  const onContextMenuClick: MouseEventHandler = (event) => {
-  event.stopPropagation();
-  onContextMenu(event);
-  }
-  
+  const onContextMenuClick: MouseEventHandler = event => {
+    event.stopPropagation();
+    onContextMenu(event);
+  };
+
   const { contextMenu, onContextMenu } = useCommentContextMenu({
     deleteRemark: deleteRemark,
     editRemark: startEditing,
@@ -114,7 +114,12 @@ export default function EditableRemark({
         </div>
         <div className={styles.Time}>{formatRelativeTime(new Date(remark.createdAt))}</div>
 
-        <MaterialIcon className={styles.Icon} disabled={isPending} outlined onClick={onContextMenuClick}>
+        <MaterialIcon
+          className={styles.Icon}
+          disabled={isPending}
+          outlined
+          onClick={onContextMenuClick}
+        >
           more_vert
         </MaterialIcon>
       </div>

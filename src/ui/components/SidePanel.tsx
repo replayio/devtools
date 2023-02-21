@@ -99,7 +99,7 @@ export default function SidePanel() {
         </div>
       )}
 
-      <div className="h-0 flex-grow w-full overflow-hidden rounded-lg bg-bodyBgcolor text-xs">
+      <div className="h-0 w-full flex-grow overflow-hidden rounded-lg bg-bodyBgcolor text-xs">
         {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}
         {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}
         {selectedPrimaryPanel === "comments" && <CommentCardsList />}
