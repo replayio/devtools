@@ -65,13 +65,7 @@ export default function SidePanel() {
 
   const launchQuickstart = () => {
     window.open("https://docs.replay.io/debugging", "_blank");
-  };
-
-  const signIn = () => {
-    console.log("signIn");
-  };
-
-  const items: any[] = [];
+  };  const items: any[] = [];
 
   // if (recording?.metadata?.test?.tests?.length) {
   items.push({
@@ -109,7 +103,7 @@ export default function SidePanel() {
         </div>
       )}
 
-      {isAuthenticated && (
+      {!isAuthenticated && (
         <div className={styles.TourBox}>
           <h2>Welcome to Replay!</h2>
           <p>Just getting started with time travel debugging? Check out our docs!</p>
