@@ -30,6 +30,7 @@ export interface GenericCache<TExtraParams extends Array<any>, TParams extends A
   getValueAsync(...args: [...TParams, ...TExtraParams]): Thennable<TValue> | TValue;
   getValueIfCached(...args: TParams): { value: TValue } | undefined;
   getValueSuspense(...args: [...TParams, ...TExtraParams]): TValue;
+  remove(...args: TParams): void;
   subscribeToStatus: (
     callback: SubscribeCallback,
     ...args: TParams
@@ -173,6 +174,11 @@ export function createGenericCache<
     getStatus,
 
     getCacheKey,
+
+    remove(...args) {
+      const cacheKey = getCacheKey(...args);
+      recordMap.delete(cacheKey);
+    },
 
     subscribeToStatus,
   };
