@@ -223,9 +223,6 @@ export function TestStepItem({
         <span
           className={classNames(
             "alias",
-            // TODO [ryanjduffy]: Migrate these into the CSS module class
-            "-my-1 flex-shrink rounded p-1 text-xs text-gray-800",
-            isSelected ? "bg-gray-300" : "bg-gray-200"
           )}
           title={`'${argString}' aliased as '${step.alias}'`}
         >
@@ -256,8 +253,7 @@ function MatchingElementBadge({ step, selected }: { step: AnnotatedTestStep; sel
   return (
     <span
       className={classNames(
-        "-my-1 flex-shrink rounded p-1 text-xs text-gray-800",
-        selected ? "bg-gray-300" : "bg-gray-200"
+        "ElementBadge",
       )}
     >
       {count}
