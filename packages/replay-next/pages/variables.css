@@ -764,7 +764,7 @@
 
   --comment-card-preview-background-color-hover: #e6e6e6;
   --comment-card-preview-background-color: #f2f3f2;
-  --comment-card-source-preview-background-color-hover: #E3ECF9;
+  --comment-card-source-preview-background-color-hover: #e3ecf9;
   --comment-card-source-preview-background-color: var(--background-color-current-execution-point);
   --comment-reply-unpublished-background-color: var(--point-panel-background-color);
   --comment-reply-unpublished-textfield-background-color: #fff;

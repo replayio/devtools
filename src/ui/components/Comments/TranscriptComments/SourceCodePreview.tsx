@@ -3,13 +3,13 @@ import { ReactNode, useEffect, useState } from "react";
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import Icon from "replay-next/components/Icon";
-import useTooltip from "replay-next/src/hooks/useTooltip";
-import Tooltip from "replay-next/components/Tooltip";
 import {
   SourceCodeCommentTypeData,
   createTypeDataForSourceCodeComment,
 } from "replay-next/components/sources/utils/comments";
 import { isSourceCodeCommentTypeData } from "replay-next/components/sources/utils/comments";
+import Tooltip from "replay-next/components/Tooltip";
+import useTooltip from "replay-next/src/hooks/useTooltip";
 import { ParsedToken, parsedTokensToHtml } from "replay-next/src/suspense/SyntaxParsingCache";
 import { getSourceFileNameFromUrl } from "replay-next/src/utils/source";
 import { replayClient } from "shared/client/ReplayClientContext";
@@ -126,7 +126,6 @@ function ModernSourceCodePreview({
   sourceId: string;
   sourceUrl: string | null;
 }) {
-    
   const context = useAppSelector(getThreadContext);
   const dispatch = useAppDispatch();
 
@@ -155,7 +154,7 @@ function ModernSourceCodePreview({
       </div>
     );
   }
-  
+
   const { onMouseEnter, onMouseLeave, tooltip } = useTooltip({
     position: "above",
     tooltip: location,
@@ -177,9 +176,7 @@ function ModernSourceCodePreview({
     <div className={styles.LabelGroup} onClick={onSelectSource}>
       <div className={styles.Labels} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
         {codePreview}
-        <Tooltip>
-          {tooltip}
-        </Tooltip>
+        <Tooltip>{tooltip}</Tooltip>
       </div>
       <Icon className={styles.Icon} type="chevron-right" />
     </div>
