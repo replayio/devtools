@@ -125,7 +125,7 @@ export default function SidePanel() {
       {!isAuthenticated && info.isTestSuiteReplay && (
         <div className={styles.TourBox}>
           <h2>Welcome! 👋</h2>
-          <p>We've written some docs to get the most out of Replay testsuites. Check them out!</p>
+          <p>We've written some docs to get the most out of Replay test suites. Check them out!</p>
 
           <button
             type="button"
