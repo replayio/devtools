@@ -74,6 +74,7 @@ function RecordingHead({ metadata }: MetadataProps) {
       <title>{title}</title>
       {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
       <meta property="og:title" content={title} />
+      <meta property="og:type" content="website" />
       {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
       <meta property="og:description" content={description} />
       {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
