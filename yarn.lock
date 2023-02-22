@@ -4091,6 +4091,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@replayio/playwright@npm:^0.3.23":
+  version: 0.3.23
+  resolution: "@replayio/playwright@npm:0.3.23"
+  dependencies:
+    "@replayio/replay": ^0.12.4
+    "@replayio/test-utils": ^0.5.3
+    uuid: ^8.3.2
+  peerDependencies:
+    "@playwright/test": 1.19.x
+  bin:
+    replayio-playwright: bin/replayio-playwright.js
+  checksum: 907afe94f93eaada52aa302cfdcda71308e8b456aac31e1378ae3d9c0ad1fbdb0b3044f8558c94dbe61dd5a6af1bcf08c29b8ea21e1099806bd8231a9d1a282a
+  languageName: node
+  linkType: hard
+
 "@replayio/protocol@npm:0.37.0":
   version: 0.37.0
   resolution: "@replayio/protocol@npm:0.37.0"
@@ -4132,34 +4147,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/replay@npm:^0.9.6":
-  version: 0.9.6
-  resolution: "@replayio/replay@npm:0.9.6"
+"@replayio/replay@npm:^0.12.4":
+  version: 0.12.4
+  resolution: "@replayio/replay@npm:0.12.4"
   dependencies:
-    "@replayio/sourcemap-upload": ^1.0.3
+    "@replayio/sourcemap-upload": ^1.0.6
     commander: ^7.2.0
     debug: ^4.3.4
     is-uuid: ^1.0.2
     jsonata: ^1.8.6
+    node-fetch: ^2.6.8
+    p-map: ^4.0.0
     superstruct: ^0.15.4
     text-table: ^0.2.0
     ws: ^7.5.0
   bin:
     replay: bin/replay.js
-  checksum: 121831f2eac02a872249d693113f4c23ec79c987587233aad867f69eea04569c36a19585f7397ef88eb23f38575a878907b87785ec2b1a7244076ce24c219d71
-  languageName: node
-  linkType: hard
-
-"@replayio/sourcemap-upload@npm:^1.0.3":
-  version: 1.0.3
-  resolution: "@replayio/sourcemap-upload@npm:1.0.3"
-  dependencies:
-    commander: ^7.2.0
-    debug: ^4.3.1
-    glob: ^7.1.6
-    node-fetch: ^2.6.1
-    string.prototype.matchall: ^4.0.5
-  checksum: ba3c51be7762e702c097436e40288f04de330cc06d49987060ec4803455d6e1de1cfe77bf663c838183759a601c9221af8367d72ca1ef33828c839cad3d23304
+  checksum: bb2b6c7a2bb6f9167352f4ce29eb532cd8d788679782d6bebb49655d86dd785d3c6be2e7c6292b3be9d50401dfedda1b4367f10bfe62e96143cd327c642012a5
   languageName: node
   linkType: hard
 
@@ -4176,6 +4180,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@replayio/sourcemap-upload@npm:^1.0.6":
+  version: 1.0.6
+  resolution: "@replayio/sourcemap-upload@npm:1.0.6"
+  dependencies:
+    commander: ^7.2.0
+    debug: ^4.3.1
+    glob: ^7.1.6
+    node-fetch: ^2.6.1
+    string.prototype.matchall: ^4.0.5
+  checksum: 6368b9afaf72bdfe966400ce6d90f0b3f92619b88e884486fd84f5beb48898d88abd1eabd9b6a6c145715dc48c14cb30483ffd44b5fc2c749440c1b0fd6ed9f7
+  languageName: node
+  linkType: hard
+
 "@replayio/test-utils@npm:^0.4.0":
   version: 0.4.0
   resolution: "@replayio/test-utils@npm:0.4.0"
@@ -4185,6 +4202,19 @@ __metadata:
     node-fetch: ^2.6.7
     uuid: ^8.3.2
   checksum: 9936f553fab1a2d224a89b1df709da40c7beaa81660543948d1befa06d8da87958693fb288a14ff1f8dd9de4f9a2dd265d87510b26f471851a8cf42d7fb886d4
+  languageName: node
+  linkType: hard
+
+"@replayio/test-utils@npm:^0.5.3":
+  version: 0.5.3
+  resolution: "@replayio/test-utils@npm:0.5.3"
+  dependencies:
+    "@replayio/replay": ^0.12.4
+    "@types/node-fetch": ^2.6.2
+    debug: ^4.3.4
+    node-fetch: ^2.6.7
+    uuid: ^8.3.2
+  checksum: d1c4e85f39e82a9cfe25bec3621f7b52770e3890df5ac638b9e1420656619962110f5ebbf3159643c6aa053df6bb6799aa9cffa076f49f959f8c7625c5ecee42
   languageName: node
   linkType: hard
 
@@ -20229,8 +20259,9 @@ __metadata:
     "@recordreplay/sourcemap-upload-cli": ^0.1.1
     "@reduxjs/toolkit": ^1.8.4
     "@replayio/overboard": ^0.4.1
+    "@replayio/playwright": ^0.3.23
     "@replayio/protocol": 0.37.0
-    "@replayio/replay": ^0.9.6
+    "@replayio/replay": ^0.12.4
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0
     "@storybook/addon-actions": ^6.4.20
