@@ -31,10 +31,8 @@ import {
   TimeStampedPointRange,
   Value,
   findAnnotationsResult,
-  missingRegions,
   requestBodyData,
   responseBodyData,
-  unprocessedRegions,
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
@@ -305,24 +303,6 @@ class _ThreadFront {
     return this.sessionWaiter.promise;
   }
 
-  async ensureProcessed(
-    level?: "basic",
-    onMissingRegions?: ((parameters: missingRegions) => void) | undefined,
-    onUnprocessedRegions?: ((parameters: unprocessedRegions) => void) | undefined
-  ) {
-    const sessionId = await this.waitForSession();
-
-    if (onMissingRegions) {
-      client.Session.addMissingRegionsListener(onMissingRegions);
-    }
-
-    if (onUnprocessedRegions) {
-      client.Session.addUnprocessedRegionsListener(onUnprocessedRegions);
-    }
-
-    await client.Session.ensureProcessed({ level }, sessionId);
-  }
-
   private _listeningForLoadChanges: boolean = false;
   private _loadedRegionsListeners: LoadedRegionListener[] = [];
   private _mostRecentLoadedRegions: LoadedRegions | null = null;
@@ -455,23 +435,23 @@ class _ThreadFront {
     const abilities = await this.recordingCapabilitiesWaiter.promise;
     const { result } = frameId
       ? await client.Pause.evaluateInFrame(
-          {
-            frameId,
-            expression: text,
-            useOriginalScopes: true,
-            pure: abilities.supportsPureEvaluation && pure,
-          },
-          this.sessionId!,
-          pauseId
-        )
+        {
+          frameId,
+          expression: text,
+          useOriginalScopes: true,
+          pure: abilities.supportsPureEvaluation && pure,
+        },
+        this.sessionId!,
+        pauseId
+      )
       : await client.Pause.evaluateInGlobal(
-          {
-            expression: text,
-            pure: abilities.supportsPureEvaluation && pure,
-          },
-          this.sessionId!,
-          pauseId
-        );
+        {
+          expression: text,
+          pure: abilities.supportsPureEvaluation && pure,
+        },
+        this.sessionId!,
+        pauseId
+      );
     cachePauseData(replayClient, pauseId, result.data);
 
     if (repaintAfterEvaluationsExperimentalFlag) {

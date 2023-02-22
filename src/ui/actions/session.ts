@@ -235,9 +235,9 @@ export function createSocket(
       const focusRegion = getPausePointParams()?.focusRegion;
       const focusRange = focusRegion
         ? {
-            begin: focusRegion.begin.time,
-            end: focusRegion.end.time,
-          }
+          begin: focusRegion.begin.time,
+          end: focusRegion.end.time,
+        }
         : undefined;
 
       const sessionId = await createSession(
@@ -320,7 +320,6 @@ export function createSocket(
       // We don't want to show the non-dev version of the app for node replays.
       if (recordingTarget === "node") {
         dispatch(setViewMode("dev"));
-        dispatch(onLoadingFinished());
       }
 
       dispatch(onLoadingFinished());
