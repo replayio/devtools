@@ -258,8 +258,10 @@
   --context-menu-bgcolor-divider: var(--background-color-contrast-3);
   --context-menu-bgcolor-hover: var(--theme-base-95);
 
-  --comment-card-source-preview-background-color: #081221;
-  --comment-card-source-preview-background-color-hover: #000;
+  --comment-card-preview-background-color-hover: #2d3c4f;
+  --comment-card-preview-background-color: #253446;
+  --comment-card-source-preview-background-color: var(--background-color-current-execution-point);
+  --comment-card-source-preview-background-color-hover: #364052;
   --comment-reply-unpublished-background-color: var(--point-panel-background-color);
   --comment-reply-unpublished-textfield-background-color: #000;
   --comment-reply-unpublished-textfield-color: #fff;
@@ -760,8 +762,10 @@
   --context-menu-bgcolor-hover: var(--theme-base-95);
   --context-menu-bgcolor: #f8f8f9;
 
-  --comment-card-source-preview-background-color-hover: #e6e6e6;
-  --comment-card-source-preview-background-color: #f2f3f2;
+  --comment-card-preview-background-color-hover: #e6e6e6;
+  --comment-card-preview-background-color: #f2f3f2;
+  --comment-card-source-preview-background-color-hover: #e3ecf9;
+  --comment-card-source-preview-background-color: var(--background-color-current-execution-point);
   --comment-reply-unpublished-background-color: var(--point-panel-background-color);
   --comment-reply-unpublished-textfield-background-color: #fff;
   --comment-reply-unpublished-textfield-color: #000;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { MouseEventHandler, useState } from "react";
 
 import { setModal } from "ui/actions/app";
 import useAddCommentReply from "ui/hooks/comments/useAddCommentReply";
@@ -24,7 +24,8 @@ export default function CommentReplyButton({ comment }: { comment: Comment }) {
     return null;
   }
 
-  const addReply = async () => {
+  const addReply: MouseEventHandler = async event => {
+    event.stopPropagation();
     setIsPending(true);
 
     // By default, a Reply is a new unpublished comment.
