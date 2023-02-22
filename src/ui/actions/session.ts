@@ -235,9 +235,9 @@ export function createSocket(
       const focusRegion = getPausePointParams()?.focusRegion;
       const focusRange = focusRegion
         ? {
-          begin: focusRegion.begin.time,
-          end: focusRegion.end.time,
-        }
+            begin: focusRegion.begin.time,
+            end: focusRegion.end.time,
+          }
         : undefined;
 
       const sessionId = await createSession(

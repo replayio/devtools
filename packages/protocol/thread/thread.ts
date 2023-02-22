@@ -435,23 +435,23 @@ class _ThreadFront {
     const abilities = await this.recordingCapabilitiesWaiter.promise;
     const { result } = frameId
       ? await client.Pause.evaluateInFrame(
-        {
-          frameId,
-          expression: text,
-          useOriginalScopes: true,
-          pure: abilities.supportsPureEvaluation && pure,
-        },
-        this.sessionId!,
-        pauseId
-      )
+          {
+            frameId,
+            expression: text,
+            useOriginalScopes: true,
+            pure: abilities.supportsPureEvaluation && pure,
+          },
+          this.sessionId!,
+          pauseId
+        )
       : await client.Pause.evaluateInGlobal(
-        {
-          expression: text,
-          pure: abilities.supportsPureEvaluation && pure,
-        },
-        this.sessionId!,
-        pauseId
-      );
+          {
+            expression: text,
+            pure: abilities.supportsPureEvaluation && pure,
+          },
+          this.sessionId!,
+          pauseId
+        );
     cachePauseData(replayClient, pauseId, result.data);
 
     if (repaintAfterEvaluationsExperimentalFlag) {

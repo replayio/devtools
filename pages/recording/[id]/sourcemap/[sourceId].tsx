@@ -18,13 +18,13 @@ import tokenManager from "ui/utils/tokenManager";
 
 type SourcemapResult =
   | {
-    source: string;
-    map: string | undefined;
-    url: string | undefined;
-  }
+      source: string;
+      map: string | undefined;
+      url: string | undefined;
+    }
   | {
-    error: string;
-  };
+      error: string;
+    };
 
 async function loadSourceMap(
   recordingId: string,
