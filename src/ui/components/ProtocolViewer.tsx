@@ -18,9 +18,12 @@ import { CommandResponse } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import Loader from "replay-next/components/Loader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { AnalysisResult, runAnalysisAsync } from "replay-next/src/suspense/AnalysisCache";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
+import {
+  AnalysisResult,
+  getLogPointAnalysisResultAsync,
+} from "replay-next/src/suspense/LogPointAnalysisCache";
 import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
@@ -549,21 +552,20 @@ const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericC
 
         // For every hit, grab the first arg, which should be the `event`
         // that is either the request, response, or error data
-        const getAnalysisResults = await runAnalysisAsync(
-          replayClient,
-          null,
-          position,
-          "[...arguments][0]",
-          null
-        );
-
-        // `getAnalysisResults` is a lookup function, so convert the
-        // hit execution points to the actual results
-        const hitPointsWithResults = hitPoints
-          .map(hp => {
-            return getAnalysisResults(hp);
-          })
-          .filter(b => !!b) as AnalysisResult[];
+        const hitPointsWithResults = (
+          await Promise.all(
+            hitPoints.map(hp =>
+              getLogPointAnalysisResultAsync(
+                replayClient,
+                range,
+                hp,
+                position,
+                "[...arguments][0]",
+                null
+              )
+            )
+          )
+        ).filter(b => !!b) as AnalysisResult[];
 
         // For every analysis result, download the entire event object
         // as a real JS object, and add the relevant timestamp
