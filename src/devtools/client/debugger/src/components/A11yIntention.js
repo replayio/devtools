@@ -3,28 +3,22 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import React from "react";
+import React, { useState } from "react";
 
-export default class A11yIntention extends React.Component {
-  state = { keyboard: false };
+export default function A11yIntention({ children }) {
+  const [isKeyboard, setIsKeyboard] = useState(false);
 
-  handleKeyDown = () => {
-    this.setState({ keyboard: true });
-  };
+  handleKeyDown = () => setIsKeyboard(true);
 
-  handleMouseDown = () => {
-    this.setState({ keyboard: false });
-  };
+  handleMouseDown = () => setIsKeyboard(false);
 
-  render() {
-    return (
-      <div
-        className={this.state.keyboard ? "A11y-keyboard" : "A11y-mouse"}
-        onKeyDown={this.handleKeyDown}
-        onMouseDown={this.handleMouseDown}
-      >
-        {this.props.children}
-      </div>
-    );
-  }
+  return (
+    <div
+      className={isKeyboard ? "A11y-keyboard" : "A11y-mouse"}
+      onKeyDown={handleKeyDown}
+      onMouseDown={handleMouseDown}
+    >
+      {children}
+    </div>
+  );
 }
