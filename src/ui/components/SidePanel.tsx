@@ -88,12 +88,11 @@ export default function SidePanel() {
       onToggle: () => setEventsCollapsed(!eventsCollapsed),
     });
   }
-  
+
   const info = useTestInfo();
 
   return (
     <div className="flex w-full flex-col gap-2">
-      
       {shouldShowDevToolsNag(nags, viewMode) && (
         <div className={styles.TourBox}>
           <h2>Welcome to Replay!</h2>
@@ -107,24 +106,34 @@ export default function SidePanel() {
         </div>
       )}
 
-      {isAuthenticated && !info.isTestSuiteReplay &&  (
+      {!isAuthenticated && !info.isTestSuiteReplay && (
         <div className={styles.TourBox}>
           <h2>Welcome to Replay!</h2>
           <p>Just getting started with time travel debugging? Check out our docs!</p>
 
-          <button type="button" onClick={() => launchQuickstart("https://docs.replay.io/debugging")} style={{ padding: "4px 8px" }}>
+          <button
+            type="button"
+            onClick={() => launchQuickstart("https://docs.replay.io/debugging")}
+            style={{ padding: "4px 8px" }}
+          >
             <div className="mr-1">Documentation</div>
             <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
           </button>
         </div>
       )}
-      
-      {isAuthenticated && info.isTestSuiteReplay &&  (
+
+      {!isAuthenticated && info.isTestSuiteReplay && (
         <div className={styles.TourBox}>
           <h2>Welcome! 👋</h2>
           <p>We've written some docs to get the most out of Replay testsuites. Check them out!</p>
-      
-          <button type="button" onClick={() => launchQuickstart("https://docs.replay.io/recording-browser-tests-(beta)/test-replays")} style={{ padding: "4px 8px" }}>
+
+          <button
+            type="button"
+            onClick={() =>
+              launchQuickstart("https://docs.replay.io/recording-browser-tests-(beta)/test-replays")
+            }
+            style={{ padding: "4px 8px" }}
+          >
             <div className="mr-1">Documentation</div>
             <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
           </button>
