@@ -1,7 +1,9 @@
 import {
   ExecutionPoint,
+  Location,
   KeyboardEvent as ReplayKeyboardEvent,
   MouseEvent as ReplayMouseEvent,
+  SameLineSourceLocations,
 } from "@replayio/protocol";
 import classNames from "classnames";
 import classnames from "classnames";
@@ -15,12 +17,18 @@ import { RecordingTarget } from "protocol/thread/thread";
 import Icon from "replay-next/components/Icon";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { EventLog, eventsMapper } from "replay-next/src/suspense/EventsCache";
+import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
+import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import type { UIThunkAction } from "ui/actions";
-import { SEARCHABLE_EVENT_TYPES, getEventListenerLocationAsync } from "ui/actions/event-listeners";
+import {
+  SEARCHABLE_EVENT_TYPES,
+  getEventListenerLocationAsync,
+  removeEventListenerLocationEntry,
+} from "ui/actions/event-listeners";
 import useEventContextMenu from "ui/components/Events/useEventContextMenu";
 import { getLoadedRegions } from "ui/reducers/app";
 import { useAppDispatch } from "ui/setup/hooks";
@@ -191,7 +199,7 @@ function jumpToClickEventFunctionLocation(
       // If we did have a click event, timewarp to that click's point
       onSeek(nextClickEvent.point, nextClickEvent.time);
 
-      const sourceLocation = await getEventListenerLocationAsync(
+      const functionSourceLocation = await getEventListenerLocationAsync(
         pauseId,
         event.kind as SEARCHABLE_EVENT_TYPES,
         ThreadFront,
@@ -199,11 +207,68 @@ function jumpToClickEventFunctionLocation(
         getState
       );
 
-      if (sourceLocation) {
+      if (functionSourceLocation) {
+        const [breakablePositions, breakablePositionsByLine] = await getBreakpointPositionsAsync(
+          functionSourceLocation.sourceId,
+          replayClient
+        );
+
+        // Since we're doing these checks without knowing the end of the function
+        // (due to parsing concerns), let's find all breakable positions on this line and the next 2.
+        const nearestLines: SameLineSourceLocations[] = [];
+        for (let i = 0; i < 3; i++) {
+          const lineToCheck = functionSourceLocation.line + i;
+          const linePositions = breakablePositionsByLine.get(lineToCheck);
+          if (linePositions) {
+            nearestLines.push(linePositions);
+          }
+        }
+
+        const positionsAsLocations: Location[] = nearestLines.flatMap(line => {
+          return line.columns.map(column => {
+            return {
+              sourceId: functionSourceLocation.sourceId,
+              line: line.line,
+              column,
+            };
+          });
+        });
+
+        // We _hope_ that the first breakable position _after_ this function declaration is the first
+        // position _inside_ the function itself, either a later column on the same line or on the next line.
+        const nextBreakablePosition = positionsAsLocations.find(
+          p =>
+            (p.line === functionSourceLocation.line && p.column > functionSourceLocation.column) ||
+            p.line > functionSourceLocation.line
+        );
+
         const cx = getThreadContext(getState());
-        // Open the source file and jump to the line of this function.
-        // NOTE: this is the _definition_ line,  _not_ the first _executing_ line!
-        dispatch(selectLocation(cx, sourceLocation));
+
+        const locationToOpen = nextBreakablePosition ?? functionSourceLocation;
+
+        // Open the source file and jump to the found position.
+        // This is either the function definition itself, or the first position _inside_ the function.
+        dispatch(selectLocation(cx, locationToOpen));
+
+        if (nextBreakablePosition) {
+          // We think we know the first position _inside_ the function.
+          // Run analysis to find the next time this position got hit.
+          const pointNearEndTime = await replayClient.getPointNearTime(arbitraryEndTime);
+          const [hitPoints] = await getHitPointsForLocationAsync(
+            replayClient,
+            nextBreakablePosition,
+            null,
+            { begin: executionPoint, end: pointNearEndTime.point }
+          );
+
+          const [firstHitPoint] = hitPoints;
+          if (firstHitPoint) {
+            // Assuming the position got hit, timewarp to that exact time.
+            // This should put the execution line+time inside the function,
+            // where the actual event listener logic is executing.
+            onSeek(firstHitPoint.point, firstHitPoint.time);
+          }
+        }
         return "found";
       } else {
         return "no_hits";
