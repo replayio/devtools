@@ -27,7 +27,6 @@ function initialTimelineState(): TimelineState {
     showFocusModeControls: false,
     stalled: false,
     timelineDimensions: { left: 1, top: 1, width: 1 },
-    unprocessedRegions: [],
     /** @deprecated This appears to be obsolete for now? */
     zoomRegion: { beginTime: 0, endTime: 0, scale: 1 },
     dragging: false,
@@ -113,7 +112,6 @@ export const getShowFocusModeControls = (state: UIState) => state.timeline.showF
 export const isDragging = (state: UIState) => state.timeline.dragging;
 export const isPlaying = (state: UIState) => state.timeline.playback !== null;
 export const isPlaybackStalled = (state: UIState) => state.timeline.stalled;
-export const getUnprocessedRegions = (state: UIState) => state.timeline.unprocessedRegions;
 export const getRecordingDuration = (state: UIState) => state.timeline.recordingDuration;
 export const getTimelineDimensions = (state: UIState) => state.timeline.timelineDimensions;
 export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;

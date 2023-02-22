@@ -33,7 +33,6 @@ export interface TimelineState {
   showFocusModeControls: boolean;
   stalled?: boolean;
   timelineDimensions: { width: number; left: number; top: number };
-  unprocessedRegions: TimeRange[];
   zoomRegion: ZoomRegion;
   dragging: boolean;
 }

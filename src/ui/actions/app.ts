@@ -1,4 +1,4 @@
-import { KeyboardEvent, NodeBounds, unprocessedRegions } from "@replayio/protocol";
+import { KeyboardEvent, NodeBounds } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
@@ -15,7 +15,6 @@ import { compareBigInt } from "ui/utils/helpers";
 import { getRecordingId } from "ui/utils/recording";
 
 import {
-  durationSeen,
   getIsIndexed,
   getLoadingStatusSlow,
   loadReceivedEvents,
@@ -68,10 +67,6 @@ export async function setupApp(
     );
   });
 
-  ThreadFront.ensureProcessed("basic", undefined, regions =>
-    store.dispatch(onUnprocessedRegions(regions))
-  );
-
   // The backend doesn't give up on loading and indexing; apparently it keeps trying until the entire session errors.
   // Practically speaking though, there are cases where updates take so long it feels like things are broken.
   // In that case the UI should show a visual indicator that the loading is slow.
@@ -111,15 +106,8 @@ export async function setupApp(
   ThreadFront.listenForLoadChanges(parameters => {
     lastLoadChangeUpdateTime = now();
 
-    store.dispatch(durationSeen(Math.max(...parameters.loading.map(r => r.end.time))));
     store.dispatch(setLoadedRegions(parameters));
   });
-}
-
-export function onUnprocessedRegions({ regions }: unprocessedRegions): UIThunkAction {
-  return dispatch => {
-    dispatch(durationSeen(Math.max(...regions.map(r => r.end.time), 0)));
-  };
 }
 
 const allKeyboardEvents: KeyboardEvent[] = [];
