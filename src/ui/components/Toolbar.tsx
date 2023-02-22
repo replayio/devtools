@@ -196,7 +196,7 @@ export default function Toolbar() {
             />
           </>
         ) : null}
-        {logProtocol ? (
+        {logProtocol && viewMode === "dev" ? (
           <ToolbarButton icon="code" label="Protocol" name="protocol" onClick={handleButtonClick} />
         ) : null}
         <div className="grow"></div>
