@@ -7,6 +7,7 @@ import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { setViewMode } from "ui/actions/layout";
 import Events from "ui/components/Events";
 import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
+import LoginButton from "ui/components/LoginButton";
 import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
@@ -18,6 +19,7 @@ import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ViewMode } from "ui/state/layout";
+import useAuth0 from "ui/utils/useAuth0";
 
 import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
@@ -48,14 +50,12 @@ export default function SidePanel() {
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
   const events = useAppSelector(getFlatEvents);
-
+  const { isAuthenticated } = useAuth0();
   const viewMode = useAppSelector(getViewMode);
   const { nags } = hooks.useGetUserInfo();
-
   const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
   const dispatch = useAppDispatch();
   const dismissNag = hooks.useDismissNag();
-
   const handleToggle = async (mode: ViewMode) => {
     dispatch(setViewMode(mode));
     if (showDevtoolsNag) {
@@ -63,6 +63,9 @@ export default function SidePanel() {
     }
   };
 
+  const launchQuickstart = (url: string) => {
+    window.open(url, "_blank");
+  };
   const items: any[] = [];
 
   // if (recording?.metadata?.test?.tests?.length) {
@@ -86,14 +89,52 @@ export default function SidePanel() {
     });
   }
 
+  const info = useTestInfo();
+
   return (
     <div className="flex w-full flex-col gap-2">
       {shouldShowDevToolsNag(nags, viewMode) && (
         <div className={styles.TourBox}>
           <h2>Welcome to Replay!</h2>
           <p>To get started, click into DevTools so we can show off some time travel features!</p>
-          <button type="button" onClick={() => handleToggle("dev")} style={{ padding: "5px 12px" }}>
-            <div>Open DevTools</div>
+
+          <button type="button" onClick={() => handleToggle("dev")} style={{ padding: "4px 8px" }}>
+            <div className="mr-1">Open DevTools</div>
+
+            <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
+          </button>
+        </div>
+      )}
+
+      {!isAuthenticated && !info.isTestSuiteReplay && (
+        <div className={styles.TourBox}>
+          <h2>Welcome to Replay!</h2>
+          <p>Just getting started with time travel debugging? Check out our docs!</p>
+
+          <button
+            type="button"
+            onClick={() => launchQuickstart("https://docs.replay.io/debugging")}
+            style={{ padding: "4px 8px" }}
+          >
+            <div className="mr-1">Documentation</div>
+            <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
+          </button>
+        </div>
+      )}
+
+      {!isAuthenticated && info.isTestSuiteReplay && (
+        <div className={styles.TourBox}>
+          <h2>Welcome! 👋</h2>
+          <p>We've written some docs to get the most out of Replay test suites. Check them out!</p>
+
+          <button
+            type="button"
+            onClick={() =>
+              launchQuickstart("https://docs.replay.io/recording-browser-tests-(beta)/test-replays")
+            }
+            style={{ padding: "4px 8px" }}
+          >
+            <div className="mr-1">Documentation</div>
             <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
           </button>
         </div>

@@ -47,11 +47,11 @@
   background-color: #fff;
   color: #f33685;
   display: flex;
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
   align-items: center;
-  border-radius: 0.5rem;
+  border-radius: 0.25rem;
 }
 
 .TourBox button:hover {
