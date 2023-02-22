@@ -54,7 +54,7 @@ export function paused({
 
     const cx = getThreadContext(getState());
 
-    const frames = await getFramesAsync(replayClient, pauseId);
+    const frames = await getFramesAsync(pauseId, replayClient);
     if (!frames?.length) {
       return;
     }

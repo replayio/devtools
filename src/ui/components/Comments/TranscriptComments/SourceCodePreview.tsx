@@ -8,6 +8,8 @@ import {
   createTypeDataForSourceCodeComment,
 } from "replay-next/components/sources/utils/comments";
 import { isSourceCodeCommentTypeData } from "replay-next/components/sources/utils/comments";
+import Tooltip from "replay-next/components/Tooltip";
+import useTooltip from "replay-next/src/hooks/useTooltip";
 import { ParsedToken, parsedTokensToHtml } from "replay-next/src/suspense/SyntaxParsingCache";
 import { getSourceFileNameFromUrl } from "replay-next/src/utils/source";
 import { replayClient } from "shared/client/ReplayClientContext";
@@ -147,11 +149,17 @@ function ModernSourceCodePreview({
     const fileName = getSourceFileNameFromUrl(sourceUrl);
 
     location = (
-      <div className={styles.PrimaryLabel}>
+      <div>
         ${fileName}:{lineNumber}
       </div>
     );
   }
+
+  const { onMouseEnter, onMouseLeave, tooltip } = useTooltip({
+    position: "above",
+    tooltip: location,
+    delay: 200,
+  });
 
   let codePreview: ReactNode | null = null;
   if (parsedTokens) {
@@ -165,10 +173,10 @@ function ModernSourceCodePreview({
   }
 
   return (
-    <div className={styles.LabelGroup} onClick={onSelectSource} title="Show in the Editor">
-      <div className={styles.Labels}>
-        {location}
+    <div className={styles.LabelGroup} onClick={onSelectSource}>
+      <div className={styles.Labels} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
         {codePreview}
+        <Tooltip>{tooltip}</Tooltip>
       </div>
       <Icon className={styles.Icon} type="chevron-right" />
     </div>

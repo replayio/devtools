@@ -17,7 +17,7 @@ function BreakpointLineContents({ breakpoint }: BreakpointProps) {
   const replayClient = useContext(ReplayClientContext);
   const { sourceId } = breakpoint.location;
 
-  const sourceLines = getSourceLinesSuspense(replayClient, sourceId);
+  const sourceLines = getSourceLinesSuspense(sourceId, replayClient);
 
   const snippet = useMemo(() => {
     const { column, line } = breakpoint.location;

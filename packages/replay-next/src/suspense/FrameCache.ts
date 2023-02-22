@@ -17,8 +17,7 @@ export const {
   Frame[] | undefined
 >(
   "FrameCache: getFrames",
-  1,
-  async (client, pauseId) => {
+  async (pauseId, client) => {
     const framesResult = await client.getAllFrames(pauseId);
     await client.waitForLoadedSources();
     cachePauseData(client, pauseId, framesResult.data, framesResult.frames);
@@ -34,6 +33,6 @@ export function getFrameSuspense(
   pauseId: PauseId,
   frameId: FrameId
 ) {
-  const frames = getFramesSuspense(replayClient, pauseId);
+  const frames = getFramesSuspense(pauseId, replayClient);
   return frames?.find(frame => frame.frameId === frameId);
 }

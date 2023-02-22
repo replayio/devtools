@@ -1,3 +1,4 @@
+import { ExecutionPoint } from "@replayio/protocol";
 import { createContext } from "react";
 
 import { UserInfo } from "shared/graphql/types";
@@ -8,6 +9,7 @@ export type SessionContextType = {
   accessToken: string | null;
   currentUserInfo: UserInfo | null;
   duration: number;
+  endpoint: ExecutionPoint;
   recordingId: string;
   sessionId: string;
   refetchUser: () => void;

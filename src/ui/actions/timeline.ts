@@ -29,7 +29,7 @@ import {
 import { DownloadCancelledError } from "protocol/screenshot-cache";
 import { ThreadFront } from "protocol/thread";
 import { PauseEventArgs } from "protocol/thread/thread";
-import { Deferred, defer, waitForTime } from "protocol/utils";
+import { waitForTime } from "protocol/utils";
 import { getPointsBoundingTimeAsync } from "replay-next/src/suspense/ExecutionPointsCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { getFirstComment } from "ui/hooks/comments/comments";
@@ -123,11 +123,6 @@ export function jumpToInitialPausePoint(): UIThunkAction {
     const initialPausePoint = await getInitialPausePoint(ThreadFront.recordingId!);
 
     if (initialPausePoint) {
-      const focusRegion =
-        "focusRegion" in initialPausePoint ? initialPausePoint.focusRegion : undefined;
-      if (focusRegion) {
-        dispatch(newFocusRegion(focusRegion));
-      }
       point = initialPausePoint.point;
       time = initialPausePoint.time;
     }
@@ -570,8 +565,8 @@ export function setFocusRegionFromTimeRange(
     }
 
     const [pointsBoundingBegin, pointsBoundingEnd] = await Promise.all([
-      getPointsBoundingTimeAsync(replayClient, await clampTime(replayClient, timeRange.begin)),
-      getPointsBoundingTimeAsync(replayClient, await clampTime(replayClient, timeRange.end)),
+      getPointsBoundingTimeAsync(await clampTime(replayClient, timeRange.begin), replayClient),
+      getPointsBoundingTimeAsync(await clampTime(replayClient, timeRange.end), replayClient),
     ]);
     const begin = pointsBoundingBegin.before;
     const end = pointsBoundingEnd.after;

@@ -177,7 +177,7 @@ async function getCurrentPauseSourceLocation(
   if (!pauseId) {
     return;
   }
-  const frame = (await getFramesAsync(replayClient, pauseId))?.[0];
+  const frame = (await getFramesAsync(pauseId, replayClient))?.[0];
   if (!frame) {
     return;
   }

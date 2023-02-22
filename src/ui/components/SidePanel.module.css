@@ -7,7 +7,6 @@
   font-weight: 400;
   color: var(--body-color);
   overflow: hidden;
-  white-space: nowrap;
   text-overflow: ellipsis;
   padding: 8px;
   border-bottom: 1px;

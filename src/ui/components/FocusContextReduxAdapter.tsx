@@ -1,6 +1,15 @@
-import { PropsWithChildren, useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import {
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
 
-import { FocusContext, FocusContextType } from "replay-next/src/contexts/FocusContext";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { Range } from "replay-next/src/types";
 import { enterFocusMode, setFocusRegionFromTimeRange } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
@@ -16,7 +25,7 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
   const focusRegion = useAppSelector(getFocusRegion);
 
   const [isPending, startTransition] = useTransition();
-  const [deferredFocusRegion, setDeferredFocusRegion] = useState<FocusRegion | null>(null);
+  const [deferredFocusRegion, setDeferredFocusRegion] = useState<FocusRegion | null>(focusRegion);
 
   useEffect(() => {
     startTransition(() => {

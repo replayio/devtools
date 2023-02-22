@@ -1,13 +1,21 @@
 import { expect, test } from "@playwright/test";
 
 import { openContextMenu, toggleProtocolMessages, verifyConsoleMessage } from "./utils/console";
-import { delay, getTestUrl, stopHovering, takeScreenshot, waitFor } from "./utils/general";
+import {
+  delay,
+  getTestUrl,
+  stopHovering,
+  takeScreenshot,
+  typeCommandKey,
+  waitFor,
+} from "./utils/general";
 import {
   addBreakPoint,
   addConditional,
   addLogPoint,
   clearSearchResult,
   editLogPoint,
+  focusOnSource,
   getPointPanelContentAutoCompleteListLocator,
   getPointPanelLocator,
   getSearchSourceLocator,
@@ -275,7 +283,7 @@ test("should remember search results count per source", async ({ page }) => {
   await expect(await resultsLabel.textContent()).toBe("3 of 5 results");
 
   await openSourceFile(page, altSourceId);
-  await expect(await resultsLabel.textContent()).toBe("? of 20 results");
+  await waitFor(async () => expect(await resultsLabel.textContent()).toBe("? of 20 results"));
   await goToNextSourceSearchResult(page);
   await goToNextSourceSearchResult(page);
   await goToNextSourceSearchResult(page);
@@ -293,6 +301,28 @@ test("should remember search results count per source", async ({ page }) => {
   await expect(await resultsLabel.isVisible()).toBe(false);
   await openSourceFile(page, sourceId);
   await expect(await resultsLabel.isVisible()).toBe(false);
+});
+
+test("should hide results when search is closed, and remember previous search string if re-opened", async ({
+  page,
+}) => {
+  await openSourceFile(page, sourceId);
+  const sourceSearchLocator = getSearchSourceLocator(page);
+  await expect(sourceSearchLocator).not.toBeVisible();
+  await searchSourceText(page, "function");
+  await verifyCurrentSearchResult(page, { fileName: "source-and-console.html", lineNumber: 17 });
+
+  const sourceLocator = getSourceLocator(page, sourceId);
+  await takeScreenshot(page, sourceLocator, "source-search-highlights");
+
+  await page.keyboard.press("Escape");
+  await expect(sourceSearchLocator).not.toBeVisible();
+
+  await focusOnSource(page);
+  await typeCommandKey(page, "f");
+
+  await verifyCurrentSearchResult(page, { fileName: "source-and-console.html", lineNumber: 17 });
+  await takeScreenshot(page, sourceLocator, "source-search-highlights");
 });
 
 test("should support break points", async ({ page }) => {
@@ -573,7 +603,12 @@ test("should expand and contract line height when log points are added and remov
   await takeScreenshot(page, lineLocator, "line-without-log-point");
   await addLogPoint(page, { sourceId, lineNumber: 13 });
   await takeScreenshot(page, lineLocator, "line-with-log-point");
-  await addConditional(page, { condition: "true", lineNumber: 13, sourceId });
+  await addConditional(page, {
+    condition: "true",
+    lineNumber: 13,
+    saveAfterAdding: true,
+    sourceId,
+  });
   await takeScreenshot(page, lineLocator, "line-with-conditional-log-point");
   await removeConditional(page, { lineNumber: 13, sourceId });
   await takeScreenshot(page, lineLocator, "line-with-log-point");
