@@ -37,12 +37,12 @@ import {
   createPauseResult,
   getAllFramesResult,
   getScopeResult,
+  getTopFrameResult,
   keyboardEvents,
   navigationEvents,
   repaintGraphicsResult,
   requestFocusRangeResult,
 } from "@replayio/protocol";
-import { string } from "prop-types";
 
 import { AnalysisParams } from "protocol/analysisManager";
 import { RecordingCapabilities } from "protocol/thread/thread";
@@ -192,6 +192,7 @@ export interface ReplayClientInterface {
     sourceLocations: SameLineSourceLocations[],
     focusRange: PointRange | null
   ): Promise<LineNumberToHitCountMap>;
+  getTopFrame(pauseId: PauseId): Promise<getTopFrameResult>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   isOriginalSource(sourceId: SourceId): boolean;
   isPrettyPrintedSource(sourceId: SourceId): boolean;

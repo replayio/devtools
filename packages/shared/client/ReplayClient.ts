@@ -32,6 +32,7 @@ import {
   functionsMatches,
   getAllFramesResult,
   getScopeResult,
+  getTopFrameResult,
   keyboardEvents,
   navigationEvents,
   repaintGraphicsResult,
@@ -352,6 +353,12 @@ export class ReplayClient implements ReplayClientInterface {
   async getAllFrames(pauseId: PauseId): Promise<getAllFramesResult> {
     const sessionId = this.getSessionIdThrows();
     const result = await client.Pause.getAllFrames({}, sessionId, pauseId);
+    return result;
+  }
+
+  async getTopFrame(pauseId: PauseId): Promise<getTopFrameResult> {
+    const sessionId = this.getSessionIdThrows();
+    const result = await client.Pause.getTopFrame({}, sessionId, pauseId);
     return result;
   }
 

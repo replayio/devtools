@@ -5,7 +5,7 @@ import type { Location, ObjectPreview, Object as ProtocolObject } from "@replayi
 
 import type { ThreadFront as TF } from "protocol/thread";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
-import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
+import { getTopFrameAsync } from "replay-next/src/suspense/FrameCache";
 import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { getScopeMapAsync } from "replay-next/src/suspense/ScopeMapCache";
@@ -277,11 +277,11 @@ export const { getValueAsync: getEventListenerLocationAsync } = createGenericCac
 >(
   "eventListenerLocationCache",
   async (pauseId, replayEventType, ThreadFront, replayClient, getState) => {
-    const stackFrames = await getFramesAsync(pauseId, replayClient);
-    if (!stackFrames) {
+    const topFrame = await getTopFrameAsync(pauseId, replayClient);
+
+    if (!topFrame) {
       return;
     }
-    const topFrame = stackFrames[0];
     const { frameId } = topFrame;
 
     await ThreadFront.ensureAllSources();

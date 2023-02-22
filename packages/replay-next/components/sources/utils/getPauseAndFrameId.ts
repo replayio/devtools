@@ -5,8 +5,7 @@ import {
   PauseId,
 } from "@replayio/protocol";
 
-import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
-import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
+import { getTopFrameSuspense } from "replay-next/src/suspense/FrameCache";
 import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
 import { createFetchAsyncFromFetchSuspense } from "replay-next/src/utils/suspense";
 import { ReplayClientInterface } from "shared/client/types";
@@ -34,8 +33,8 @@ export function getPauseAndFrameIdSuspends(
   try {
     pauseId = getPauseIdSuspense(replayClient, executionPoint, time);
 
-    const frames = getFramesSuspense(pauseId, replayClient);
-    frameId = frames?.[0]?.frameId ?? null;
+    const topFrame = getTopFrameSuspense(pauseId, replayClient);
+    frameId = topFrame?.frameId ?? null;
   } catch (errorOrThennable) {
     if (throwOnFail || isThennable(errorOrThennable)) {
       throw errorOrThennable;

@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
-import { dirname, join } from "path";
+import { dirname, join, sep } from "path";
 import { ConsoleMessage, test } from "@playwright/test";
 
 type Entry = {
@@ -24,7 +24,7 @@ function getFixtureDataPath(testFileName: string, testCaseName: string): string 
 }
 
 function getRelativeFixtureDataPath(testFileName: string, testCaseName: string): string {
-  const directoryName = testFileName.replace("tests/", "").replace(".ts", "");
+  const directoryName = testFileName.replace(`tests${sep}`, "").replace(".ts", "");
   const fileName = `${testCaseName.replace(/[\/ \+]/g, "-")}.json`;
   return join(directoryName, fileName);
 }
