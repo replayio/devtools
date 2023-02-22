@@ -495,7 +495,7 @@
   --testsuites-active-bgcolor: var(--background-color-current-execution-point);
   --testsuites-aside-background-color: var(--theme-base-90);
   --testsuites-aside-color: #fff;
-  --testsuites-aside-border-color: #fdce22;  
+  --testsuites-aside-border-color: #fdce22;
   --testsuites-capsule-alias-bgcolor: var(--theme-base-90);
   --testsuites-capsule-alias-color: #fff;
   --testsuites-capsule-alias-selected-bgcolor: var(--theme-base-100);
@@ -510,9 +510,9 @@
   --testsuites-error-color: #ffe0e0;
   --testsuites-error-icon-bgcolor: rgb(237, 36, 36);
   --testsuites-steps-bgcolor-hover: #252d3b;
-  --testsuites-steps-bgcolor: #191F2A;
+  --testsuites-steps-bgcolor: #191f2a;
   --testsuites-success-color: #30e60b;
-  
+
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
 
   /* To organise (Dark) */
@@ -1020,7 +1020,7 @@
   --testsuites-steps-bgcolor-hover: #f7f7f7;
   --testsuites-steps-bgcolor: #fff;
   --testsuites-success-color: #058b00;
-  
+
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
 
   /* To organise (Light) */
