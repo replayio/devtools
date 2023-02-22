@@ -295,8 +295,8 @@ export const getFlatEvents = (state: UIState) => {
   // Only show the events in the current focused region
   return focusRegion
     ? filteredEvents.filter(
-      e => e.point >= focusRegion.begin.point && e.point < focusRegion.end.point
-    )
+        e => e.point >= focusRegion.begin.point && e.point < focusRegion.end.point
+      )
     : filteredEvents;
 };
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;
