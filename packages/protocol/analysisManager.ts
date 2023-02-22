@@ -83,8 +83,9 @@ export type EventHandlerEntryPoint = Omit<addEventHandlerEntryPointsParameters, 
 export interface AnalysisHandler<T> {
   onAnalysisError?: (error: unknown) => void;
   onAnalysisPoints?: (points: PointDescription[]) => void;
-  onAnalysisResult?: (result: AnalysisEntry[]) => void;
+  onAnalysisResults?: (result: AnalysisEntry[]) => void;
   onFinished?(): T;
+  onPointsFinished?(): any;
 }
 
 // When running analyses in batches, limit on the points to use in each batch.
@@ -106,7 +107,7 @@ class AnalysisManager {
 
     this.initialized = true;
 
-    addEventListener("Analysis.analysisResult", this.onAnalysisResult);
+    addEventListener("Analysis.analysisResult", this.onAnalysisResults);
     addEventListener("Analysis.analysisPoints", this.onAnalysisPoints);
     addEventListener("Analysis.analysisError", this.onAnalysisError);
   }
@@ -165,10 +166,21 @@ class AnalysisManager {
       }
 
       this.handlers.set(analysisId, handler);
-      await Promise.all([
-        !handler.onAnalysisResult || client.Analysis.runAnalysis({ analysisId }, sessionId),
-        !handler.onAnalysisPoints || client.Analysis.findAnalysisPoints({ analysisId }, sessionId),
-      ]);
+      const promises: Promise<any>[] = [];
+      if (handler.onAnalysisPoints || handler.onPointsFinished) {
+        // We check onAnalysisPoints too even though it isn't directly referenced here
+        // because unless we call Analysis.findAnalysisPoints,
+        // that callback won't be called.
+        promises.push(
+          client.Analysis.findAnalysisPoints({ analysisId }, sessionId).then(
+            handler.onPointsFinished
+          )
+        );
+      }
+      if (handler.onAnalysisResults) {
+        promises.push(client.Analysis.runAnalysis({ analysisId }, sessionId));
+      }
+      await Promise.all(promises);
     } catch (e) {
       this.onAnalysisError({ analysisId, error: e instanceof Error ? e.message : "Unknown Error" });
       console.error(e);
@@ -186,7 +198,7 @@ class AnalysisManager {
     maxPoints: number
   ) {
     assert(!handler.onAnalysisPoints, "There should be no onAnalysisPoints handler.");
-    assert(handler.onAnalysisResult, "There should be an onAnalysisResults handler");
+    assert(handler.onAnalysisResults, "There should be an onAnalysisResults handler");
 
     const pointsHandler: AnalysisHandler<void> = {};
     const allPoints: PointDescription[] = [];
@@ -209,10 +221,10 @@ class AnalysisManager {
     }
   }
 
-  private readonly onAnalysisResult = ({ analysisId, results }: analysisResult) => {
+  private readonly onAnalysisResults = ({ analysisId, results }: analysisResult) => {
     const handler = this.handlers.get(analysisId);
-    if (handler != null && typeof handler.onAnalysisResult === "function") {
-      handler.onAnalysisResult(results);
+    if (handler != null && typeof handler.onAnalysisResults === "function") {
+      handler.onAnalysisResults(results);
     }
   };
 

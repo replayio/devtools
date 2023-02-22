@@ -5,6 +5,7 @@ import { Badge, Checkbox } from "design";
 import Icon from "replay-next/components/Icon";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { getStatus, subscribeForStatus } from "replay-next/src/suspense/ExceptionsCache";
 import { CategoryCounts, getMessagesSuspense } from "replay-next/src/suspense/MessagesCache";
 import { getRecordingCapabilitiesSuspense } from "replay-next/src/suspense/RecordingCache";
@@ -141,8 +142,9 @@ function Toggle({
 function ToggleCategoryCount({ category }: { category: keyof CategoryCounts }) {
   const { range: focusRange } = useContext(FocusContext);
   const client = useContext(ReplayClientContext);
+  const { endpoint } = useContext(SessionContext);
 
-  const { didError, categoryCounts } = getMessagesSuspense(client, focusRange);
+  const { didError, categoryCounts } = getMessagesSuspense(client, focusRange, endpoint);
   const count = categoryCounts[category];
 
   if (didError) {
@@ -161,8 +163,9 @@ function ToggleCategoryCount({ category }: { category: keyof CategoryCounts }) {
 function NodeModulesCount() {
   const client = useContext(ReplayClientContext);
   const { range } = useContext(FocusContext);
+  const { endpoint } = useContext(SessionContext);
 
-  const { didError, messages } = getMessagesSuspense(client, range);
+  const { didError, messages } = getMessagesSuspense(client, range, endpoint);
 
   const count = useMemo(() => {
     return messages ? messages.filter(message => isInNodeModules(message)).length : 0;

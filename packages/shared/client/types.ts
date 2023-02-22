@@ -1,4 +1,5 @@
 import {
+  AnalysisEntry,
   BreakpointId,
   ContentType,
   Result as EvaluationResult,
@@ -36,12 +37,12 @@ import {
   createPauseResult,
   getAllFramesResult,
   getScopeResult,
+  getTopFrameResult,
   keyboardEvents,
   navigationEvents,
   repaintGraphicsResult,
   requestFocusRangeResult,
 } from "@replayio/protocol";
-import { string } from "prop-types";
 
 import { AnalysisParams } from "protocol/analysisManager";
 import { RecordingCapabilities } from "protocol/thread/thread";
@@ -164,13 +165,11 @@ export interface ReplayClientInterface {
   ): Promise<SameLineSourceLocations[]>;
   getCorrespondingLocations(location: Location): Location[];
   getCorrespondingSourceIds(sourceId: SourceId): SourceId[];
-  getEventCountForTypes(eventTypes: EventHandlerType[]): Promise<Record<string, number>>;
+  getEventCountForTypes(
+    eventTypes: EventHandlerType[],
+    focusRange: PointRange | null
+  ): Promise<Record<string, number>>;
   getFrameSteps(pauseId: PauseId, frameId: FrameId): Promise<PointDescription[]>;
-  getHitPointsForLocation(
-    focusRange: TimeStampedPointRange | null,
-    location: Location,
-    condition: string | null
-  ): Promise<HitPointsAndStatusTuple>;
   getMappedLocation(location: Location): Promise<MappedLocation>;
   getObjectWithPreview(
     objectId: ObjectId,
@@ -193,6 +192,7 @@ export interface ReplayClientInterface {
     sourceLocations: SameLineSourceLocations[],
     focusRange: PointRange | null
   ): Promise<LineNumberToHitCountMap>;
+  getTopFrame(pauseId: PauseId): Promise<getTopFrameResult>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   isOriginalSource(sourceId: SourceId): boolean;
   isPrettyPrintedSource(sourceId: SourceId): boolean;
@@ -215,6 +215,14 @@ export interface ReplayClientInterface {
     },
     onMatches: (matches: SearchSourceContentsMatch[], didOverflow: boolean) => void
   ): Promise<void>;
+  streamAnalysis(
+    params: AnalysisParams,
+    handlers: {
+      onPoints?: (points: PointDescription[]) => void;
+      onResults?: (results: AnalysisEntry[]) => void;
+      onError?: (error: any) => void;
+    }
+  ): { pointsFinished: Promise<void>; resultsFinished: Promise<void> };
   streamSourceContents(
     sourceId: SourceId,
     onSourceContentsInfo: ({

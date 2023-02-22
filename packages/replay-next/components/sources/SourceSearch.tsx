@@ -142,7 +142,14 @@ export default function SourceSearch({
           <button
             className={styles.ResultsIconButton}
             data-test-id="SourceSearchClearButton"
-            onClick={searchActions.disable}
+            onClick={() => {
+              searchActions.disable();
+
+              const container = containerRef.current;
+              if (container) {
+                container.focus();
+              }
+            }}
           >
             <Icon className={styles.ResultsIcon} type="cancel" />
           </button>

@@ -11,13 +11,24 @@ import {
   OnboardingModalContainer,
 } from "ui/components/shared/Onboarding";
 import { useUpdateUserSetting } from "ui/hooks/settings";
+import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 export default function ImportSettings() {
   const router = useRouter();
   const updateUserSetting = useUpdateUserSetting("role");
   const setRole = (role: string) => {
     // TODO [ryanjduffy]: Should this route to the tutorial app?
-    updateUserSetting({ variables: { role } }).then(() => router.push("/"));
+    updateUserSetting({ variables: { role } })
+      .then(() => router.push("/"))
+      .catch(e => {
+        sendTelemetryEvent("DevtoolsGraphQLError", {
+          source: "updateUserSetting",
+          role,
+          message: e,
+        });
+
+        router.push("/");
+      });
   };
 
   return (

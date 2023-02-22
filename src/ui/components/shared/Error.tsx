@@ -8,7 +8,7 @@ import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import Modal from "ui/components/shared/NewModal";
 import hooks from "ui/hooks";
 import { useRequestRecordingAccess } from "ui/hooks/recordings";
-import * as selectors from "ui/reducers/app";
+import { getExpectedError, getTrialExpired, getUnexpectedError } from "ui/reducers/app";
 import { useAppDispatch } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import { ErrorActions, ExpectedError, UnexpectedError } from "ui/state/app";
@@ -215,9 +215,9 @@ function _AppErrors({ expectedError, unexpectedError, trialExpired }: PropsFromR
 }
 
 const connector = connect((state: UIState) => ({
-  expectedError: selectors.getExpectedError(state),
-  unexpectedError: selectors.getUnexpectedError(state),
-  trialExpired: selectors.getTrialExpired(state),
+  expectedError: getExpectedError(state),
+  unexpectedError: getUnexpectedError(state),
+  trialExpired: getTrialExpired(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(_AppErrors);

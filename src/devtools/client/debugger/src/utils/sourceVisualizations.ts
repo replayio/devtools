@@ -196,8 +196,8 @@ function getAlternateSourceIdForPositionSuspense(
   sourcesById: Dictionary<SourceDetails>
 ) {
   const [breakablePositions, breakablePositionsByLine] = getBreakpointPositionsSuspense(
-    client,
-    source.id
+    source.id,
+    client
   );
 
   // We want to find the first breakable line starting from the given cursor location,
@@ -226,11 +226,14 @@ function getAlternateSourceIdForPositionSuspense(
   // Now we can ask the backend for alternate locations with that line.
   let breakableColumn = breakableLineLocations.columns[0];
 
-  const mappedLocation = getMappedLocationSuspense(client, {
-    sourceId: source.id,
-    line: breakableLineLocations.line,
-    column: breakableColumn,
-  });
+  const mappedLocation = getMappedLocationSuspense(
+    {
+      sourceId: source.id,
+      line: breakableLineLocations.line,
+      column: breakableColumn,
+    },
+    client
+  );
   return source.isSourceMapped
     ? getBestNonSourceMappedSourceId(
         sourcesById,

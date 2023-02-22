@@ -1,5 +1,14 @@
 import { Object as ProtocolObject } from "@replayio/protocol";
+import { useContext } from "react";
 
+import {
+  getObjectPropertyHelper,
+  getObjectPropertySuspense,
+} from "replay-next/src/suspense/ObjectPreviews";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { ReplayClientInterface } from "shared/client/types";
+
+import ValueRenderer from "../ValueRenderer";
 import { ObjectPreviewRendererProps } from "./types";
 import styles from "./shared.module.css";
 
@@ -7,16 +16,69 @@ import styles from "./shared.module.css";
 //   ErrorName: Error message...
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
-export default function ErrorRenderer({ object }: ObjectPreviewRendererProps) {
-  return <span className={styles.Error}>{errorProtocolObjectToString(object)}</span>;
+export default function ErrorRenderer({ object, pauseId }: ObjectPreviewRendererProps) {
+  const replayClient = useContext(ReplayClientContext);
+  const { className } = object;
+
+  const messageProperty = object?.preview?.properties?.find(
+    property => property.name === "message"
+  );
+
+  let errorContent: React.ReactNode = className;
+
+  if (messageProperty) {
+    // Handle cases where `error.message` is actually a getter
+    if (messageProperty.hasOwnProperty("get")) {
+      const getterValue = getObjectPropertySuspense(
+        replayClient,
+        pauseId,
+        object.objectId,
+        "message"
+      );
+
+      errorContent = (
+        <ValueRenderer
+          context="nested"
+          layout="vertical"
+          pauseId={pauseId}
+          protocolValue={getterValue}
+        />
+      );
+    } else {
+      errorContent = messageProperty.value;
+    }
+  }
+
+  return (
+    <span className={styles.Error}>
+      {className}: {errorContent}
+    </span>
+  );
 }
 
-export function errorProtocolObjectToString(protocolObject: ProtocolObject) {
+export async function errorProtocolObjectToString(
+  replayClient: ReplayClientInterface,
+  pauseId: string,
+  protocolObject: ProtocolObject
+) {
   const { className } = protocolObject;
 
   const messageProperty = protocolObject?.preview?.properties?.find(
     property => property.name === "message"
   );
 
-  return messageProperty ? `${className}: ${messageProperty.value}` : className;
+  let value = messageProperty?.value;
+
+  // Handle cases where `error.message` is actually a getter
+  if (messageProperty?.hasOwnProperty("get")) {
+    const getterValue = await getObjectPropertyHelper(
+      replayClient,
+      pauseId,
+      protocolObject.objectId,
+      "message"
+    );
+    value = getterValue.value;
+  }
+
+  return messageProperty ? `${className}: ${value}` : className;
 }

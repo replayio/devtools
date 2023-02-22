@@ -1,3 +1,4 @@
+import { PointRange } from "@replayio/protocol";
 import {
   EventHandlerType,
   ExecutionPoint,
@@ -5,6 +6,7 @@ import {
   Location,
   PauseData,
   PauseId,
+  Value as ProtocolValue,
   Object as RecordReplayObject,
 } from "@replayio/protocol";
 
@@ -13,8 +15,9 @@ import { ReplayClientInterface } from "shared/client/types";
 
 import { STANDARD_EVENT_CATEGORIES } from "../constants";
 import { createWakeable } from "../utils/suspense";
+import { createGenericCache } from "./createGenericCache";
 import { cachePauseData } from "./PauseCache";
-import { Record, STATUS_PENDING, STATUS_RESOLVED, Wakeable } from "./types";
+import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 export type Event = {
   count: number;
@@ -37,28 +40,40 @@ export type EventLog = {
   point: ExecutionPoint;
   time: number;
   type: "EventLog";
-  values: any[];
+  values: ProtocolValue[];
 };
 
-let eventTypeToEntryPointMap = new Map<EventHandlerType, Record<EventLog[]>>();
-let eventCategoryCounts: EventCategory[] | null = null;
-let inProgressEventCategoryCountsWakeable: Wakeable<EventCategory[]> | null = null;
-
-export function getEventCategoryCountsSuspense(client: ReplayClientInterface): EventCategory[] {
-  if (eventCategoryCounts !== null) {
-    return eventCategoryCounts;
-  }
-
-  if (inProgressEventCategoryCountsWakeable === null) {
-    inProgressEventCategoryCountsWakeable = createWakeable<EventCategory[]>(
-      "getEventCategoryCountsSuspense"
+export const {
+  getValueSuspense: getEventCategoryCountsSuspense,
+  getValueAsync: getEventCategoryCountsAsync,
+  getValueIfCached: getEventCategoryCountsIfCached,
+} = createGenericCache<
+  [client: ReplayClientInterface],
+  [range: PointRange | null],
+  EventCategory[]
+>(
+  "getEventCategoryCounts",
+  async (range, client) => {
+    const allEvents = await client.getEventCountForTypes(
+      Object.values(STANDARD_EVENT_CATEGORIES)
+        .map(c => c.events.map(e => e.type))
+        .flat(),
+      range
     );
+    return Object.values(STANDARD_EVENT_CATEGORIES).map(category => {
+      return {
+        ...category,
+        events: category.events.map(eventType => ({
+          ...eventType,
+          count: allEvents[eventType.type],
+        })),
+      };
+    });
+  },
+  range => (range ? `${range.begin}:${range.end}` : "")
+);
 
-    fetchEventCategoryCounts(client);
-  }
-
-  throw inProgressEventCategoryCountsWakeable;
-}
+let eventTypeToEntryPointMap = new Map<EventHandlerType, Record<EventLog[]>>();
 
 export function getEventTypeEntryPointsSuspense(
   client: ReplayClientInterface,
@@ -83,54 +98,57 @@ export function getEventTypeEntryPointsSuspense(
   }
 }
 
-async function fetchEventCategoryCounts(client: ReplayClientInterface) {
-  const pendingEventCategoryCounts: EventCategory[] = [];
-
-  const allEvents = await client.getEventCountForTypes(
-    Object.values(STANDARD_EVENT_CATEGORIES)
-      .map(c => c.events.map(e => e.type))
-      .flat()
-  );
-  eventCategoryCounts = Object.values(STANDARD_EVENT_CATEGORIES).map(category => {
-    return {
-      ...category,
-      events: category.events.map(eventType => ({
-        ...eventType,
-        count: allEvents[eventType.type],
-      })),
-    };
-  });
-
-  inProgressEventCategoryCountsWakeable!.resolve(pendingEventCategoryCounts);
-  inProgressEventCategoryCountsWakeable = null;
-}
-
 async function fetchEventTypeEntryPoints(
   client: ReplayClientInterface,
   eventType: EventHandlerType,
   record: Record<EventLog[]>
 ) {
-  const entryPoints = await client.runAnalysis<EventLog>({
-    effectful: false,
-    eventHandlerEntryPoints: [{ eventType }],
-    mapper: getFunctionBody(eventsMapper),
-  });
-
-  // Pre-cache object previews that came back with our new analysis data.
-  // This will avoid us having to turn around and request them again when rendering the logs.
-  entryPoints.forEach(entryPoint => cachePauseData(client, entryPoint.pauseId, entryPoint.data));
-
-  const eventLogs: EventLog[] = entryPoints.map(entryPoint => ({
-    ...entryPoint,
-    type: "EventLog",
-  }));
-
   const wakeable = record.value;
+  try {
+    const entryPoints = await client.runAnalysis<EventLog>({
+      effectful: false,
+      eventHandlerEntryPoints: [{ eventType }],
+      mapper: getFunctionBody(eventsMapper),
+    });
 
-  record.status = STATUS_RESOLVED;
-  record.value = eventLogs;
+    // Pre-cache object previews that came back with our new analysis data.
+    // This will avoid us having to turn around and request them again when rendering the logs.
+    entryPoints.forEach(entryPoint => cachePauseData(client, entryPoint.pauseId, entryPoint.data));
 
-  wakeable.resolve(eventLogs);
+    const eventLogs: EventLog[] = entryPoints.map(entryPoint => ({
+      ...entryPoint,
+      type: "EventLog",
+    }));
+
+    record.status = STATUS_RESOLVED;
+    record.value = eventLogs;
+  } catch (err) {
+    // Handle any analysis errors (such as "too many hits found") by resolving the record with
+    // a dummy `EventLog` entry that will get shown as a single console message at the top of
+    // the list.  That way we at least communicate to the user what happened.
+    // TODO [FE-1257] Show a better indicator that there were too many events found, like an overlay.
+    record.status = STATUS_RESOLVED;
+    record.value = [
+      {
+        data: {
+          frames: [],
+          objects: [],
+        },
+        location: [],
+        pauseId: "",
+        point: "",
+        time: 0,
+        type: "EventLog",
+        values: [
+          {
+            value: `❗Too many messages of type "${eventType}" found!`,
+          },
+        ],
+      },
+    ];
+  } finally {
+    wakeable.resolve(record.value);
+  }
 }
 
 // Variables in scope in an analysis

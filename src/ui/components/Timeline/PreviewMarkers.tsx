@@ -3,7 +3,7 @@ import { Suspense, useContext } from "react";
 
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/ExecutionPointsCache";
+import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/HitPointsCache";
 import { getSourceHitCountsSuspense } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { selectors } from "ui/reducers";
@@ -39,7 +39,10 @@ function PreviewMarkers() {
   }
 
   const [hitPoints, hitPointStatus] =
-    focusedSourceId !== null && firstColumnWithHitCounts !== null && hoveredLineIndex !== null
+    focusRange &&
+    focusedSourceId !== null &&
+    firstColumnWithHitCounts !== null &&
+    hoveredLineIndex !== null
       ? getHitPointsForLocationSuspense(
           replayClient,
           {
@@ -48,7 +51,7 @@ function PreviewMarkers() {
             line: hoveredLineIndex + 1,
           },
           null,
-          focusRange
+          { begin: focusRange.begin.point, end: focusRange.end.point }
         )
       : [null, null];
 

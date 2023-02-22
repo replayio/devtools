@@ -14,7 +14,7 @@
   --theme-body-font-size: 12px;
   --theme-code-font-size: 11px;
   --theme-code-line-height: calc(15 / 11);
-  --theme-tab-font-size: 15px;
+  --theme-tab-font-size: var(--font-size-large);
 
   /* Toolbar size (excluding borders) */
   --theme-toolbar-height: 24px;
@@ -258,8 +258,10 @@
   --context-menu-bgcolor-divider: var(--background-color-contrast-3);
   --context-menu-bgcolor-hover: var(--theme-base-95);
 
-  --comment-card-source-preview-background-color: #081221;
-  --comment-card-source-preview-background-color-hover: #000;
+  --comment-card-preview-background-color-hover: #2d3c4f;
+  --comment-card-preview-background-color: #253446;
+  --comment-card-source-preview-background-color: var(--background-color-current-execution-point);
+  --comment-card-source-preview-background-color-hover: #364052;
   --comment-reply-unpublished-background-color: var(--point-panel-background-color);
   --comment-reply-unpublished-textfield-background-color: #000;
   --comment-reply-unpublished-textfield-color: #fff;
@@ -317,13 +319,10 @@
   --point-panel-timeline-button-shadow: 0px 0px 2px 0px hsla(0, 0%, 0%, 0.12);
   --point-panel-timeline-label-background-color: #000000;
   --point-panel-timeline-label-color: var(--color-brand);
-
+  --point-panel-timeline-label-hover-color: #35dfff;
   --point-panel-timeline-label-unselected-color: #747476;
-  --point-panel-timeline-label-selected-color: #b765f8;
-
+  --point-panel-timeline-label-selected-color: #f02d5e;
   --point-panel-timeline-label-edit-hover-background-color: #434343;
-  --point-panel-timeline-label-edit-hover-color: #747476;
-  --point-panel-timeline-label-edit-background-color: var(--color-brand);
   --point-panel-timeline-label-edit-color: #fff;
 
   --badge-picker-background-color: #28282a;
@@ -763,8 +762,10 @@
   --context-menu-bgcolor-hover: var(--theme-base-95);
   --context-menu-bgcolor: #f8f8f9;
 
-  --comment-card-source-preview-background-color-hover: #e6e6e6;
-  --comment-card-source-preview-background-color: #f2f3f2;
+  --comment-card-preview-background-color-hover: #e6e6e6;
+  --comment-card-preview-background-color: #f2f3f2;
+  --comment-card-source-preview-background-color-hover: #e3ecf9;
+  --comment-card-source-preview-background-color: var(--background-color-current-execution-point);
   --comment-reply-unpublished-background-color: var(--point-panel-background-color);
   --comment-reply-unpublished-textfield-background-color: #fff;
   --comment-reply-unpublished-textfield-color: #000;
@@ -822,14 +823,11 @@
   --point-panel-timeline-button-shadow: 0px 0px 2px 0px hsla(0, 0%, 0%, 0.12);
   --point-panel-timeline-label-background-color: #ffffff;
   --point-panel-timeline-label-color: var(--color-brand);
-
+  --point-panel-timeline-label-hover-color: #008adb;
   --point-panel-timeline-label-unselected-color: #d1d5db;
-  --point-panel-timeline-label-selected-color: #8330f4;
-
+  --point-panel-timeline-label-selected-color: #f02d5e;
   --point-panel-timeline-label-edit-hover-background-color: #f5f5f5;
-  --point-panel-timeline-label-edit-hover-color: #e2e2e2;
-  --point-panel-timeline-label-edit-background-color: var(--color-brand);
-  --point-panel-timeline-label-edit-color: #fff;
+  --point-panel-timeline-label-edit-color: #223344;
 
   --badge-default-color: rgba(0, 0, 0, 0.08);
   --badge-green-color: #73cc6d;

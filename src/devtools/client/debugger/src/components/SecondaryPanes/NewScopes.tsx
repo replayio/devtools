@@ -48,7 +48,7 @@ function ScopesRenderer() {
   }
 
   const { scopes: protocolScopes, originalScopesUnavailable } = pickScopes(
-    getFrameScopesSuspense(replayClient, selectedFrameId.pauseId, selectedFrameId.frameId),
+    getFrameScopesSuspense(selectedFrameId.pauseId, selectedFrameId.frameId, replayClient),
     sourcesState.preferredGeneratedSources
   );
   const scopes = convertScopes(protocolScopes, frame, selectedFrameId.pauseId);

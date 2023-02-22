@@ -1,15 +1,42 @@
 import { Entry } from "./types";
 import { findMatch, isIterator } from "./utils";
 
-export default function createPlayer<T>(entries: Entry[]): T {
+type WithLogEntryParam<T> = {
+  [P in keyof T]: T[P] extends (...args: any) => any
+    ? (logEntry: Entry, ...args: Parameters<T[P]>) => ReturnType<T[P]>
+    : T[P];
+};
+
+type Options<T> = {
+  overrides?: Partial<WithLogEntryParam<T>>;
+};
+
+export default function createPlayer<T>(entries: Entry[], options?: Options<T>): T {
+  const { overrides } = options || {};
+
   const proxy = new Proxy(
     {},
     {
-      get(_: any, prop: string) {
+      get(target: any, prop: string) {
         const logEntry = findMatch(entries, prop, null);
         if (logEntry?.isGetter) {
           const { isAsync, result } = logEntry;
           return isAsync ? Promise.resolve(result) : result;
+        }
+
+        if (overrides && prop in overrides) {
+          return (...args: any[]) => {
+            const logEntry = findMatch(entries, prop, args);
+            if (logEntry != null) {
+              return (overrides as any)[prop](logEntry, ...args);
+            } else {
+              console.error(
+                `Could not find matching prop for "${prop}" with args ${JSON.stringify(args)}`
+              );
+
+              throw Error(`Could not find matching prop for "${prop}"`);
+            }
+          };
         }
 
         return (...args: any[]) => {

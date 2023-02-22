@@ -104,8 +104,8 @@ export default function SourceList({
   );
 
   const { value: breakablePositionsValue = NO_BREAKABLE_POSITIONS } = useGetBreakablePositions(
-    client,
-    sourceId
+    sourceId,
+    client
   );
   const [, breakablePositionsByLine] = breakablePositionsValue;
 

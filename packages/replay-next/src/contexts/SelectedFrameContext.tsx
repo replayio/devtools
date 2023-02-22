@@ -13,7 +13,7 @@ import {
   useState,
 } from "react";
 
-import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
+import { getTopFrameAsync } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegions } from "shared/utils/time";
 
@@ -97,7 +97,8 @@ function DefaultSelectedFrameContextAdapter() {
 
       // TODO
       // Select the top frame by default because the test harness doesn't have a Call Stack UI yet.
-      const frameId = (await getFramesAsync(client, pauseId))?.[0]?.frameId;
+      // Note that in the main app, the `SelectedFrameContextAdapter` can pass in _any_ frame ID.
+      const frameId = (await getTopFrameAsync(pauseId, client))?.frameId;
 
       const pauseAndFrameId = frameId ? { pauseId, frameId } : null;
       setSelectedPauseAndFrameId(prevPauseAndFrameId => {

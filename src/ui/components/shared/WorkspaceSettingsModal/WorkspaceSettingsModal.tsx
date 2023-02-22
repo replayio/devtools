@@ -5,7 +5,7 @@ import * as actions from "ui/actions/app";
 import { useRedirectToTeam } from "ui/components/Library/Team/utils";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
-import * as selectors from "ui/reducers/app";
+import { getModalOptions } from "ui/reducers/app";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { validateEmail } from "ui/utils/helpers";
 import { trackEvent } from "ui/utils/telemetry";
@@ -232,7 +232,7 @@ const tabNameForView = {
 
 export default function WorkspaceSettingsModal() {
   const selectedTab = useAppSelector(state => {
-    const opts = selectors.getModalOptions(state);
+    const opts = getModalOptions(state);
     const view = opts && "view" in opts ? opts.view : null;
     return view && tabNameForView[view as keyof typeof tabNameForView];
   });

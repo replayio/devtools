@@ -247,6 +247,7 @@ export async function focusOnSource(page: Page) {
 
   const sourcesRoot = page.locator('[data-test-id="SourcesRoot"]');
   await expect(sourcesRoot).toBeVisible();
+  await delay(100);
   await sourcesRoot.focus();
   await expect(sourcesRoot).toBeFocused();
 }
@@ -563,7 +564,7 @@ export async function openLogPointPanelContextMenu(
     await debugPrint(page, `Opening log point panel context menu`, "openLogPointPanelContextMenu");
 
     const pointPanelLocator = getPointPanelLocator(page, lineNumber);
-    const capsule = pointPanelLocator.locator('[data-test-name="LogPointCapsule"]');
+    const capsule = pointPanelLocator.locator('[data-test-name="LogPointCapsule-DropDownTrigger"]');
     await capsule.click();
 
     await contextMenu.waitFor();
@@ -946,11 +947,18 @@ export async function verifyLogPointStep(
   );
 
   const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
-  const statusLocator = lineLocator.locator('[data-test-name="LogPointStatus"]');
+  await waitFor(async () => {
+    const currentStepInputLocator = lineLocator.locator(
+      '[data-test-name="LogPointCurrentStepInput"]'
+    );
+    const currentStep = await currentStepInputLocator.inputValue();
+    const denominatorLocator = lineLocator.locator('[data-test-name="LogPointDenominator"]');
+    const denominator = await denominatorLocator.textContent();
 
-  const actualStatus = await statusLocator.textContent();
+    const actualStatus = `${currentStep}/${denominator}`;
 
-  expect(actualStatus).toBe(expectedStatus);
+    expect(actualStatus).toBe(expectedStatus);
+  });
 }
 
 async function waitForTimelineToUpdate(timelineLocator: Locator) {

@@ -28,6 +28,7 @@ import {
   SourceKind,
   SourceLocation,
   TimeStamp,
+  TimeStampedPointRange,
   Value,
   findAnnotationsResult,
   missingRegions,
@@ -42,6 +43,7 @@ import {
   getPauseIdForExecutionPointIfCached,
 } from "replay-next/src/suspense/PauseCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
+import { areRangesEqual } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import type { Features } from "ui/utils/prefs";
 
@@ -162,6 +164,8 @@ class _ThreadFront {
 
   // Waiter which resolves when there is at least one loading region
   loadingHasBegun = defer<void>();
+
+  initialFocusRegionWaiter = defer<TimeStampedPointRange>();
 
   // Waiter which resolves when all sources have been loaded.
   private allSourcesWaiter = defer<void>();
@@ -336,6 +340,13 @@ class _ThreadFront {
 
         this.loadingHasBegun.resolve();
 
+        if (areRangesEqual(loadedRegions.indexed, loadedRegions.loading)) {
+          assert(
+            loadedRegions.loading.length === 1,
+            "there should be exactly one initially loaded region"
+          );
+          this.initialFocusRegionWaiter.resolve(loadedRegions.loading[0]);
+        }
         this._loadedRegionsListeners.forEach(callback => callback(loadedRegions));
       });
 

@@ -29,16 +29,16 @@ export function setupBoxModel(store: UIStore, startAppListening: AppStartListeni
       const [bounds, style] = await pause(
         Promise.all([
           getBoundingRectAsync(
-            protocolClient,
-            ThreadFront.sessionId!,
             originalPauseId,
-            selectedNode
+            selectedNode,
+            protocolClient,
+            ThreadFront.sessionId!
           ),
           getComputedStyleAsync(
-            protocolClient,
-            ThreadFront.sessionId!,
             originalPauseId,
-            selectedNode
+            selectedNode,
+            protocolClient,
+            ThreadFront.sessionId!
           ),
         ])
       );

@@ -4,6 +4,7 @@ import {
   AnnotatedTestStep,
   CypressAnnotationMessage,
   TestItem,
+  TestItemError,
   TestStep,
 } from "shared/graphql/types";
 import {
@@ -215,6 +216,8 @@ export function TestSteps({ test }: { test: TestItem }) {
     test.steps?.find(s => !!s.error)?.id ||
     (beforeEach[0] || testBody[0] || afterEach[0])?.event?.id;
 
+  const hasStepError = test.steps?.find(s => !!s.error) || false;
+
   return (
     <div className="flex flex-col rounded-lg px-2">
       <TestSection events={beforeEach} header="Before Each" autoSelectId={autoSelectId} />
@@ -224,18 +227,22 @@ export function TestSteps({ test }: { test: TestItem }) {
         autoSelectId={autoSelectId}
       />
       <TestSection events={afterEach} header="After Each" autoSelectId={autoSelectId} />
-      {test.error ? (
-        <TestStepRow error>
-          <div>
-            <div className="flex flex-row items-center space-x-1 p-2">
-              <Icon filename="warning" size="small" className="bg-testsuitesErrorColor" />
-              <div className="font-bold">Assertion Error</div>
-            </div>
-            <div className="wrap space-y-1 overflow-hidden p-2 font-mono">{test.error.message}</div>
-          </div>
-        </TestStepRow>
-      ) : null}
+      {!hasStepError && test.error ? <TestError error={test.error} /> : null}
     </div>
+  );
+}
+
+function TestError({ error }: { error: TestItemError }) {
+  return (
+    <TestStepRow error>
+      <div>
+        <div className="flex flex-row items-center space-x-1 p-2">
+          <Icon filename="warning" size="small" className="bg-testsuitesErrorColor" />
+          <div className="font-bold">Assertion Error</div>
+        </div>
+        <div className="wrap space-y-1 overflow-hidden p-2 font-mono">{error.message}</div>
+      </div>
+    </TestStepRow>
   );
 }
 
@@ -268,16 +275,21 @@ function TestSection({
       ) : null}
       {events.map(({ event: s, type, time }, i) =>
         type === "step" ? (
-          <TestStepItem
-            step={s}
-            key={s.id}
-            index={s.index - firstIndex}
-            argString={
-              s.args ? s.args.filter((s): s is string => s && typeof s === "string").join(", ") : ""
-            }
-            id={s.id}
-            autoSelect={s.id === autoSelectId}
-          />
+          <>
+            <TestStepItem
+              step={s}
+              key={s.id}
+              index={s.index - firstIndex}
+              argString={
+                s.args
+                  ? s.args.filter((s): s is string => s && typeof s === "string").join(", ")
+                  : ""
+              }
+              id={s.id}
+              autoSelect={s.id === autoSelectId}
+            />
+            {s.error ? <TestError error={s.error!} /> : null}
+          </>
         ) : type === "network" ? (
           <NetworkEvent key={s.id} request={s} />
         ) : (

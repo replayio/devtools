@@ -13,6 +13,7 @@ import {
 } from "react";
 import { areEqual } from "react-window";
 
+import useGetDefaultLogPointContent from "replay-next/components/sources/hooks/useGetDefaultLogPointContent";
 import SearchResultHighlight from "replay-next/components/sources/SearchResultHighlight";
 import { SourceSearchContext } from "replay-next/components/sources/SourceSearchContext";
 import useSourceContextMenu from "replay-next/components/sources/useSourceContextMenu";
@@ -117,6 +118,12 @@ const SourceListRow = memo(
     );
 
     const lineHitCounts = hitCounts?.get(lineNumber) || null;
+
+    const getDefaultLogPointContent = useGetDefaultLogPointContent({
+      lineHitCounts,
+      lineNumber,
+      source,
+    });
 
     let tokens: ParsedToken[] | null = null;
     if (syntaxHighlightingEnabled && index < parsedTokensByLine.length) {
@@ -240,7 +247,7 @@ const SourceListRow = memo(
         }
 
         if (lastColumnIndex < plainText.length - 1) {
-          renderBetween(lineSegments, lastColumnIndex, plainText.length - 1);
+          renderBetween(lineSegments, lastColumnIndex, plainText.length);
         }
       } else {
         if (tokens !== null) {
@@ -264,8 +271,6 @@ const SourceListRow = memo(
       lineSegments = <SourceLineLoadingPlaceholder width={loadingPlaceholderWidth} />;
     }
 
-    const shouldBreak = pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED;
-
     const toggleBreakpoint = () => {
       if (lineHitCounts === null) {
         return;
@@ -278,7 +283,7 @@ const SourceListRow = memo(
           {
             badge: null,
             condition: null,
-            content: "",
+            content: getDefaultLogPointContent() || "",
           },
           {
             shouldBreak: POINT_BEHAVIOR_ENABLED,
@@ -342,8 +347,11 @@ const SourceListRow = memo(
 
     const currentSearchResult = searchState.results[searchState.index] || null;
     const searchResultsForLine = useMemo(
-      () => searchState.results.filter(result => result.lineIndex === index),
-      [index, searchState.results]
+      () =>
+        searchState.enabled
+          ? searchState.results.filter(result => result.lineIndex === index)
+          : null,
+      [index, searchState.enabled, searchState.results]
     );
 
     let breakPointTestState = "off";
@@ -407,7 +415,7 @@ const SourceListRow = memo(
           )}
 
           <div className={styles.LineSegmentsAndPointPanel}>
-            {searchResultsForLine.map((result, resultIndex) => (
+            {searchResultsForLine?.map((result, resultIndex) => (
               <SearchResultHighlight
                 breakableColumnIndices={breakableColumnIndices}
                 key={resultIndex}

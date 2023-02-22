@@ -8,6 +8,7 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { $selectAll } from "@lexical/selection";
 import { $rootTextContent } from "@lexical/text";
 import { mergeRegister } from "@lexical/utils";
+import { ExecutionPoint } from "@replayio/protocol";
 import {
   $getRoot,
   $getSelection,
@@ -32,8 +33,6 @@ import {
   useMemo,
   useRef,
 } from "react";
-
-import { PauseAndFrameId } from "replay-next/src/contexts/SelectedFrameContext";
 
 import LexicalEditorRefSetter from "./LexicalEditorRefSetter";
 import CodeCompletionPlugin from "./plugins/code-completion/CodeCompletionPlugin";
@@ -60,13 +59,14 @@ type Props = {
   dataTestId?: string;
   dataTestName?: string;
   editable: boolean;
+  executionPoint: ExecutionPoint;
   forwardedRef?: ForwardedRef<ImperativeHandle>;
   initialValue: string;
   onCancel?: () => void;
   onChange?: (markdown: string, editorState: SerializedEditorState) => void;
   onSave: (markdown: string, editorState: SerializedEditorState) => void;
-  pauseAndFrameId: PauseAndFrameId | null;
   placeholder?: string;
+  time: number;
 };
 
 function CodeEditor({
@@ -77,13 +77,14 @@ function CodeEditor({
   dataTestId,
   dataTestName,
   editable,
+  executionPoint,
   forwardedRef,
   initialValue,
   onCancel,
   onChange,
   onSave,
-  pauseAndFrameId,
   placeholder = "",
+  time,
 }: Props): JSX.Element {
   const historyState = useMemo(() => createEmptyHistoryState(), []);
 
@@ -241,7 +242,8 @@ function CodeEditor({
           context={context}
           dataTestId={dataTestId ? `${dataTestId}-CodeTypeAhead` : undefined}
           dataTestName={dataTestName ? `${dataTestName}-CodeTypeAhead` : undefined}
-          pauseAndFrameId={pauseAndFrameId}
+          executionPoint={executionPoint}
+          time={time}
         />
       </>
     </LexicalComposer>
