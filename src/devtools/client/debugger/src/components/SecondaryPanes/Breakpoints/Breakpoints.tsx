@@ -91,13 +91,17 @@ export default function Breakpoints({
   return (
     <div className={styles.Breakpoints}>
       {entries.map(([sourceId, points]) => {
+        const allBreakpointsAreShared =
+          points.filter(point => point.user?.id == currentUserInfo?.id).length === 0;
+
         return (
           <div className={styles.List} data-test-name="BreakpointsList" key={sourceId}>
             <BreakpointHeading
-              key="header"
+              allBreakpointsAreShared={allBreakpointsAreShared}
               breakpoint={points[0]}
-              sourceId={sourceId}
+              key="header"
               onRemoveBreakpoints={() => deletePoints(...points.map(point => point.key))}
+              sourceId={sourceId}
             />
             {points.map(point => {
               const pointBehavior = pointBehaviors[point.key];
