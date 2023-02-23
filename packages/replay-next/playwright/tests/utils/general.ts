@@ -99,7 +99,7 @@ export function getTestUrl(testRoute: string, additionalQueryParams: string[] = 
 
   const url = `http://${host}:3000/tests/${testRoute}?${queryParams.join("&")}`;
 
-  console.log(url);
+  console.log(`         Opening ${chalk.underline.blue.bold(url)}`);
 
   return url;
 }
