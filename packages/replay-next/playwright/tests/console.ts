@@ -15,10 +15,17 @@ import {
   toggleSideMenu,
   verifyTypeAheadContainsSuggestions,
 } from "./utils/console";
-import { delay, getElementCount, getTestUrl, stopHovering, takeScreenshot } from "./utils/general";
+import {
+  delay,
+  getCommandKey,
+  getElementCount,
+  getTestUrl,
+  stopHovering,
+  takeScreenshot,
+} from "./utils/general";
 import testSetup from "./utils/testSetup";
 
-testSetup("27a42866-ffd6-4f74-8813-c4feb2b78b6c");
+testSetup("4ccc9f9f-f0d3-4418-ac21-1b316e462a44");
 
 async function setup(page: Page, toggleState: boolean | null = null) {
   await page.goto(getTestUrl("console"));
@@ -41,8 +48,7 @@ test("should display list of messages", async ({ page }) => {
   const list = page.locator("[data-test-name=Messages]");
   await expect(list).toContainText("This is a log");
   await expect(list).toContainText("This is a warning");
-  await expect(list).toContainText("This is an error string");
-  await expect(list).toContainText("This is an error object");
+  await expect(list).toContainText("This is an error");
   await expect(list).toContainText("Uncaught exception");
   await toggleProtocolMessage(page, "timestamps", false);
 
@@ -52,6 +58,19 @@ test("should display list of messages", async ({ page }) => {
   await takeScreenshot(page, list, "message-list-with-timestamps");
 });
 
+test("should display toggleable stack for errors", async ({ page }) => {
+  await setup(page);
+  await toggleProtocolMessage(page, "errors", true);
+
+  const listItem = await locateMessage(page, "console-error", "This is an error");
+  await takeScreenshot(page, listItem, "error-stack-collapsed");
+
+  const toggle = listItem.locator("[role=button]", { hasText: "This is an error" });
+  await toggle.click();
+  await takeScreenshot(page, listItem, "error-stack-expanded");
+});
+
+// 27a42866-ffd6-4f74-8813-c4feb2b78b6c
 test("should show error object stacks by default", async ({ page }) => {
   await setup(page);
   await toggleProtocolMessage(page, "errors", true);
@@ -62,18 +81,6 @@ test("should show error object stacks by default", async ({ page }) => {
   const toggle = listItem.locator("[role=button]", { hasText: "This is an error object" });
   await toggle.click();
   await takeScreenshot(page, listItem, "error-object-stack-expanded");
-});
-
-test("should display toggleable stack for errors", async ({ page }) => {
-  await setup(page);
-  await toggleProtocolMessage(page, "errors", true);
-
-  const listItem = await locateMessage(page, "console-error", "This is an error string");
-  await takeScreenshot(page, listItem, "error-stack-collapsed");
-
-  const toggle = listItem.locator("[role=button]", { hasText: "This is an error string" });
-  await toggle.click();
-  await takeScreenshot(page, listItem, "error-stack-expanded");
 });
 
 test("should display toggleable stack for warnings", async ({ page }) => {
@@ -554,7 +561,7 @@ test("should show the context menu on top of other messages and the current time
 
   await page.keyboard.press("Escape");
 
-  listItem = await locateMessage(page, "console-error", "This is an error string");
+  listItem = await locateMessage(page, "console-error", "This is an error");
   await openContextMenu(page, listItem);
   await takeScreenshot(page, list, "context-menu-position-two");
 });
@@ -573,7 +580,7 @@ test("should support setting focus range via the context menu", async ({ page })
   await expect(messageLocator(page, "console-log", "This is a log")).toBeHidden();
   await takeScreenshot(page, list, "context-menu-focus-after-start");
 
-  listItem = await locateMessage(page, "console-error", "This is an error string");
+  listItem = await locateMessage(page, "console-error", "This is an error");
   await openContextMenu(page, listItem);
   await stopHovering(page);
   await page.click("[data-test-id=ConsoleContextMenu-SetFocusEndButton]");
