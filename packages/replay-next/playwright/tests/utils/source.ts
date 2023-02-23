@@ -669,6 +669,9 @@ export async function searchSourceText(page: Page, text: string) {
 
   await clearTextArea(page, input);
   await page.keyboard.type(text);
+
+  // Give time for the search results to update if needed
+  await delay();
 }
 
 export async function searchSourcesByName(page: Page, text: string) {
