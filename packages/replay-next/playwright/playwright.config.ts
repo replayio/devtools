@@ -22,7 +22,6 @@ const config: FullConfig = {
   use: {
     browserName: "chromium",
     launchOptions: {
-      ...devices["Replay Chromium"].launchOptions,
       slowMo,
     },
 
@@ -35,6 +34,14 @@ const config: FullConfig = {
   testMatch: ["tests/**/*.ts"],
   timeout: 30_000,
 };
+
+if (CI) {
+  // @ts-ignore
+  config.use.launchOptions = {
+    ...devices["Replay Chromium"].launchOptions,
+    slowMo,
+  };
+}
 
 if (VISUAL_DEBUG || RECORD_PROTOCOL_DATA) {
   config.workers = 1;
