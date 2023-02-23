@@ -22,7 +22,6 @@
   /* Ensure error borders are visible above non-error rows */
   z-index: 2;
 
-  --color-default: var(--color-error);
   --value-type-string: var(--color-error);
 }
 .WarningRow {
@@ -34,7 +33,6 @@
   /* Ensure warning borders are visible above regular rows */
   z-index: 1;
 
-  --color-default: var(--color-warning);
   --value-type-string: var(--color-warning);
 }
 
@@ -189,6 +187,7 @@
 }
 
 .Expandable {
+  color: var(--color-default);
   width: 100%;
 }
 
