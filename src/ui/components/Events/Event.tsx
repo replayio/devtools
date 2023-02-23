@@ -29,8 +29,10 @@ import {
   getEventListenerLocationAsync,
   removeEventListenerLocationEntry,
 } from "ui/actions/event-listeners";
+import { setViewMode } from "ui/actions/layout";
 import useEventContextMenu from "ui/components/Events/useEventContextMenu";
 import { getLoadedRegions } from "ui/reducers/app";
+import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch } from "ui/setup/hooks";
 import { ReplayEvent } from "ui/state/app";
 
@@ -111,7 +113,7 @@ export const getEventLabel = (event: ReplayEvent) => {
 };
 
 type JumpToCodeFailureReason = "not_loaded" | "no_hits";
-type JumpToCodeResult = JumpToCodeFailureReason | "found";
+type JumpToCodeStatus = JumpToCodeFailureReason | "not_checked" | "loading" | "found";
 
 const errorMessages: Record<JumpToCodeFailureReason, string> = {
   not_loaded: "Not loaded",
@@ -154,7 +156,7 @@ inside that function is running, then seek to that point in time, but skipping f
 function jumpToClickEventFunctionLocation(
   event: ReplayMouseEvent | ReplayKeyboardEvent,
   onSeek: (point: ExecutionPoint, time: number) => void
-): UIThunkAction<Promise<JumpToCodeResult>> {
+): UIThunkAction<Promise<JumpToCodeStatus>> {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const { point: executionPoint, time } = event;
 
@@ -173,6 +175,12 @@ function jumpToClickEventFunctionLocation(
 
       if (!isEndTimeInLoadedRegion) {
         return "not_loaded";
+      }
+
+      // Go ahead and ensure that we're on DevTools mode right away,
+      // even before we know if there's a valid location to jump to
+      if (getViewMode(getState()) !== "dev") {
+        dispatch(setViewMode("dev"));
       }
 
       // The sidebar event time/point is a fraction earlier than any
@@ -208,6 +216,9 @@ function jumpToClickEventFunctionLocation(
       );
 
       if (functionSourceLocation) {
+        // TODO This sequence of logic could probably be cached too.
+        // Not immediately critical, because the individual calls are cached.
+
         const [breakablePositions, breakablePositionsByLine] = await getBreakpointPositionsAsync(
           functionSourceLocation.sourceId,
           replayClient
@@ -293,7 +304,7 @@ export default React.memo(function Event({
   const [isHovered, setIsHovered] = useState(false);
   const label = getEventLabel(event);
   const { icon } = getReplayEvent(kind);
-  const [jumpToCodeError, setJumpToCodeError] = useState<JumpToCodeFailureReason | null>(null);
+  const [jumpToCodeStatus, setJumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
 
   const onKeyDown = (e: React.KeyboardEvent) => e.key === " " && e.preventDefault();
 
@@ -309,17 +320,16 @@ export default React.memo(function Event({
     onSeek(point, time);
 
     if (event.kind === "mousedown" || event.kind === "keypress") {
+      setJumpToCodeStatus("loading");
       const result = await dispatch(jumpToClickEventFunctionLocation(event, onSeek));
-      if (result !== "found") {
-        setJumpToCodeError(result);
 
-        if (result === "not_loaded") {
-          // Clear this out after a few seconds since the user could change focus.
-          // Simpler than trying to watch the focus region change over time.
-          setTimeout(() => {
-            setJumpToCodeError(null);
-          }, 5000);
-        }
+      setJumpToCodeStatus(result);
+      if (result === "not_loaded") {
+        // Clear this out after a few seconds since the user could change focus.
+        // Simpler than trying to watch the focus region change over time.
+        setTimeout(() => {
+          setJumpToCodeStatus("not_checked");
+        }, 5000);
       }
     }
   };
@@ -331,7 +341,8 @@ export default React.memo(function Event({
       ? "fast-forward"
       : "rewind";
 
-  const jumpToCodeButtonAvailable = jumpToCodeError === null;
+  const jumpToCodeButtonAvailable =
+    jumpToCodeStatus === "not_checked" || jumpToCodeStatus === "found";
 
   const jumpToCodeButtonClassname = classnames(
     "transition-width flex items-center justify-center rounded-full  duration-100 ease-out h-6",
@@ -353,8 +364,10 @@ export default React.memo(function Event({
 
   let jumpButtonText = "Jump to code";
 
-  if (jumpToCodeError) {
-    jumpButtonText = errorMessages[jumpToCodeError];
+  if (jumpToCodeStatus in errorMessages) {
+    jumpButtonText = errorMessages[jumpToCodeStatus as JumpToCodeFailureReason];
+  } else if (jumpToCodeStatus === "loading") {
+    jumpButtonText = "Loading...";
   }
 
   return (
