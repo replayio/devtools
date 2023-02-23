@@ -4132,34 +4132,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/replay@npm:^0.9.6":
-  version: 0.9.6
-  resolution: "@replayio/replay@npm:0.9.6"
+"@replayio/replay@npm:^0.12.4":
+  version: 0.12.4
+  resolution: "@replayio/replay@npm:0.12.4"
   dependencies:
-    "@replayio/sourcemap-upload": ^1.0.3
+    "@replayio/sourcemap-upload": ^1.0.6
     commander: ^7.2.0
     debug: ^4.3.4
     is-uuid: ^1.0.2
     jsonata: ^1.8.6
+    node-fetch: ^2.6.8
+    p-map: ^4.0.0
     superstruct: ^0.15.4
     text-table: ^0.2.0
     ws: ^7.5.0
   bin:
     replay: bin/replay.js
-  checksum: 121831f2eac02a872249d693113f4c23ec79c987587233aad867f69eea04569c36a19585f7397ef88eb23f38575a878907b87785ec2b1a7244076ce24c219d71
-  languageName: node
-  linkType: hard
-
-"@replayio/sourcemap-upload@npm:^1.0.3":
-  version: 1.0.3
-  resolution: "@replayio/sourcemap-upload@npm:1.0.3"
-  dependencies:
-    commander: ^7.2.0
-    debug: ^4.3.1
-    glob: ^7.1.6
-    node-fetch: ^2.6.1
-    string.prototype.matchall: ^4.0.5
-  checksum: ba3c51be7762e702c097436e40288f04de330cc06d49987060ec4803455d6e1de1cfe77bf663c838183759a601c9221af8367d72ca1ef33828c839cad3d23304
+  checksum: bb2b6c7a2bb6f9167352f4ce29eb532cd8d788679782d6bebb49655d86dd785d3c6be2e7c6292b3be9d50401dfedda1b4367f10bfe62e96143cd327c642012a5
   languageName: node
   linkType: hard
 
@@ -4173,6 +4162,19 @@ __metadata:
     node-fetch: ^2.6.1
     string.prototype.matchall: ^4.0.5
   checksum: 05a9a8b8f2360c3186e8b56680c4b72b12c4bd6f8d17e32fceab468a070bc78e102cea3157f85f765bfbad5de1bd6602339d233793fc0be489943cadab01e2ab
+  languageName: node
+  linkType: hard
+
+"@replayio/sourcemap-upload@npm:^1.0.6":
+  version: 1.0.6
+  resolution: "@replayio/sourcemap-upload@npm:1.0.6"
+  dependencies:
+    commander: ^7.2.0
+    debug: ^4.3.1
+    glob: ^7.1.6
+    node-fetch: ^2.6.1
+    string.prototype.matchall: ^4.0.5
+  checksum: 6368b9afaf72bdfe966400ce6d90f0b3f92619b88e884486fd84f5beb48898d88abd1eabd9b6a6c145715dc48c14cb30483ffd44b5fc2c749440c1b0fd6ed9f7
   languageName: node
   linkType: hard
 
@@ -20230,7 +20232,7 @@ __metadata:
     "@reduxjs/toolkit": ^1.8.4
     "@replayio/overboard": ^0.4.1
     "@replayio/protocol": 0.37.0
-    "@replayio/replay": ^0.9.6
+    "@replayio/replay": ^0.12.4
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0
     "@storybook/addon-actions": ^6.4.20

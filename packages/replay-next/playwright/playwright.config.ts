@@ -1,4 +1,5 @@
 import { FullConfig } from "@playwright/test";
+import { devices } from "@replayio/playwright";
 
 const { CI, RECORD_PROTOCOL_DATA, RECORD_VIDEO, SLOW_MO, VISUAL_DEBUG } = process.env;
 
@@ -21,10 +22,10 @@ const config: FullConfig = {
   use: {
     browserName: "chromium",
     launchOptions: {
+      ...devices["Replay Chromium"].launchOptions,
       slowMo,
     },
-    trace: "on-first-retry",
-    video: RECORD_VIDEO ? "on" : "off",
+
     viewport: {
       width: 1024,
       height: 600,

@@ -12,6 +12,8 @@ env:
   # Force terminal colors. @see https://www.npmjs.com/package/colors
   FORCE_COLOR: 1
   FLAKINESS_CONNECTION_STRING: ${{ secrets.FLAKINESS_CONNECTION_STRING }}
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+  RECORD_REPLAY_METADATA_TEST_SUITE: Snapshot Tests
 
 jobs:
   run_tests:
@@ -47,15 +49,26 @@ jobs:
         run: yarn install
         shell: bash
         working-directory: packages/replay-next/playwright
+      - name: Install Replay Browser
+        run: npx @replayio/playwright install
+        shell: bash
+        working-directory: packages/replay-next/playwright
       - name: Run dev server
         run: yarn dev &
         working-directory: packages/replay-next
       - name: Wait until server is up
         run: npx wait-on --timeout=60000 http-get://localhost:3000
       - name: Run playwright tests
-        run: yarn visuals
+        run: yarn visuals --reporter @replayio/playwright/reporter,line
         working-directory: packages/replay-next/playwright  
       - name: Upload results
         if: always()
         run: ./uploadSnapshots.js
         working-directory: packages/replay-next
+      - name: Upload Replays
+        if: always()
+        uses: replayio/action-upload@v0.4.7
+        with:
+          api-key: rwk_4mEiT150uOHyLQiQvZfPZiNjmBe4NrOXOm9yG9nS794
+          filter: ${{ 'function($v) { $v.metadata.test.result = "failed" }' }}
+          public: true
