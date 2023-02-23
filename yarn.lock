@@ -20712,6 +20712,7 @@ __metadata:
     "@types/uuid": ^7.0.3
     date-fns: ^2.28.0
     design: "workspace:*"
+    escape-html: ^1.0.3
     idb: ^7.1.1
     jest: ^28.0.2
     jest-environment-jsdom: ^28.0.2

@@ -10,6 +10,7 @@ import { LRLanguage, ensureSyntaxTree } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
 import { classHighlighter, highlightTree } from "@lezer/highlight";
 import { ContentType } from "@replayio/protocol";
+import escapeHTML from "escape-html";
 
 import classNameToTokenTypes from "replay-next/components/sources/utils/classNameToTokenTypes";
 
@@ -378,7 +379,9 @@ export function parsedTokensToHtml(tokens: ParsedToken[]): string {
         className = token.types.map(type => `tok-${type}`).join(" ");
       }
 
-      return `<span class="${className}">${token.value}</span>`;
+      const escapedValue = escapeHTML(token.value);
+
+      return `<span class="${className}">${escapedValue}</span>`;
     })
     .join("");
 }

@@ -627,3 +627,21 @@ test("should show different background color and edit icon when log point disabl
   await toggleShouldLog(page, { sourceId, lineNumber: 13, state: true });
   await takeScreenshot(page, logPointPanel, "log-point-panel-enabled");
 });
+
+test("should escape HTML tags in log point content", async ({ page }) => {
+  await addLogPoint(page, {
+    content: '"<Example>"',
+    saveAfterEdit: false,
+    sourceId,
+    lineNumber: 13,
+  });
+  const logPointPanel = getPointPanelLocator(page, 13);
+  await takeScreenshot(page, logPointPanel, "log-point-panel-with-html-tags-edit-mode");
+  await editLogPoint(page, {
+    content: '"<Example>"',
+    saveAfterEdit: true,
+    sourceId,
+    lineNumber: 13,
+  });
+  await takeScreenshot(page, logPointPanel, "log-point-panel-with-html-tags-view-mode");
+});
