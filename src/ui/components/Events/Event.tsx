@@ -1,7 +1,9 @@
 import {
   ExecutionPoint,
+  Location,
   KeyboardEvent as ReplayKeyboardEvent,
   MouseEvent as ReplayMouseEvent,
+  SameLineSourceLocations,
 } from "@replayio/protocol";
 import classNames from "classnames";
 import classnames from "classnames";
@@ -15,14 +17,22 @@ import { RecordingTarget } from "protocol/thread/thread";
 import Icon from "replay-next/components/Icon";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { EventLog, eventsMapper } from "replay-next/src/suspense/EventsCache";
+import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
+import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import type { UIThunkAction } from "ui/actions";
-import { SEARCHABLE_EVENT_TYPES, getEventListenerLocationAsync } from "ui/actions/event-listeners";
+import {
+  SEARCHABLE_EVENT_TYPES,
+  getEventListenerLocationAsync,
+  removeEventListenerLocationEntry,
+} from "ui/actions/event-listeners";
+import { setViewMode } from "ui/actions/layout";
 import useEventContextMenu from "ui/components/Events/useEventContextMenu";
 import { getLoadedRegions } from "ui/reducers/app";
+import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch } from "ui/setup/hooks";
 import { ReplayEvent } from "ui/state/app";
 
@@ -103,7 +113,7 @@ export const getEventLabel = (event: ReplayEvent) => {
 };
 
 type JumpToCodeFailureReason = "not_loaded" | "no_hits";
-type JumpToCodeResult = JumpToCodeFailureReason | "found";
+type JumpToCodeStatus = JumpToCodeFailureReason | "not_checked" | "loading" | "found";
 
 const errorMessages: Record<JumpToCodeFailureReason, string> = {
   not_loaded: "Not loaded",
@@ -146,7 +156,7 @@ inside that function is running, then seek to that point in time, but skipping f
 function jumpToClickEventFunctionLocation(
   event: ReplayMouseEvent | ReplayKeyboardEvent,
   onSeek: (point: ExecutionPoint, time: number) => void
-): UIThunkAction<Promise<JumpToCodeResult>> {
+): UIThunkAction<Promise<JumpToCodeStatus>> {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const { point: executionPoint, time } = event;
 
@@ -165,6 +175,12 @@ function jumpToClickEventFunctionLocation(
 
       if (!isEndTimeInLoadedRegion) {
         return "not_loaded";
+      }
+
+      // Go ahead and ensure that we're on DevTools mode right away,
+      // even before we know if there's a valid location to jump to
+      if (getViewMode(getState()) !== "dev") {
+        dispatch(setViewMode("dev"));
       }
 
       // The sidebar event time/point is a fraction earlier than any
@@ -191,7 +207,7 @@ function jumpToClickEventFunctionLocation(
       // If we did have a click event, timewarp to that click's point
       onSeek(nextClickEvent.point, nextClickEvent.time);
 
-      const sourceLocation = await getEventListenerLocationAsync(
+      const functionSourceLocation = await getEventListenerLocationAsync(
         pauseId,
         event.kind as SEARCHABLE_EVENT_TYPES,
         ThreadFront,
@@ -199,11 +215,71 @@ function jumpToClickEventFunctionLocation(
         getState
       );
 
-      if (sourceLocation) {
+      if (functionSourceLocation) {
+        // TODO This sequence of logic could probably be cached too.
+        // Not immediately critical, because the individual calls are cached.
+
+        const [breakablePositions, breakablePositionsByLine] = await getBreakpointPositionsAsync(
+          functionSourceLocation.sourceId,
+          replayClient
+        );
+
+        // Since we're doing these checks without knowing the end of the function
+        // (due to parsing concerns), let's find all breakable positions on this line and the next 2.
+        const nearestLines: SameLineSourceLocations[] = [];
+        for (let i = 0; i < 3; i++) {
+          const lineToCheck = functionSourceLocation.line + i;
+          const linePositions = breakablePositionsByLine.get(lineToCheck);
+          if (linePositions) {
+            nearestLines.push(linePositions);
+          }
+        }
+
+        const positionsAsLocations: Location[] = nearestLines.flatMap(line => {
+          return line.columns.map(column => {
+            return {
+              sourceId: functionSourceLocation.sourceId,
+              line: line.line,
+              column,
+            };
+          });
+        });
+
+        // We _hope_ that the first breakable position _after_ this function declaration is the first
+        // position _inside_ the function itself, either a later column on the same line or on the next line.
+        const nextBreakablePosition = positionsAsLocations.find(
+          p =>
+            (p.line === functionSourceLocation.line && p.column > functionSourceLocation.column) ||
+            p.line > functionSourceLocation.line
+        );
+
         const cx = getThreadContext(getState());
-        // Open the source file and jump to the line of this function.
-        // NOTE: this is the _definition_ line,  _not_ the first _executing_ line!
-        dispatch(selectLocation(cx, sourceLocation));
+
+        const locationToOpen = nextBreakablePosition ?? functionSourceLocation;
+
+        // Open the source file and jump to the found position.
+        // This is either the function definition itself, or the first position _inside_ the function.
+        dispatch(selectLocation(cx, locationToOpen));
+
+        if (nextBreakablePosition) {
+          // We think we know the first position _inside_ the function.
+          // Run analysis to find the next time this position got hit.
+          const pointNearEndTime = await replayClient.getPointNearTime(arbitraryEndTime);
+          const [hitPoints] = await getHitPointsForLocationAsync(
+            replayClient,
+            nextBreakablePosition,
+            null,
+            { begin: executionPoint, end: pointNearEndTime.point }
+          );
+
+          const [firstHitPoint] = hitPoints;
+          if (firstHitPoint) {
+            // Assuming the position got hit, timewarp to that exact time.
+            // This should put the execution line+time inside the function,
+            // where the actual event listener logic is executing.
+            onSeek(firstHitPoint.point, firstHitPoint.time);
+          }
+        }
         return "found";
       } else {
         return "no_hits";
@@ -228,7 +304,7 @@ export default React.memo(function Event({
   const [isHovered, setIsHovered] = useState(false);
   const label = getEventLabel(event);
   const { icon } = getReplayEvent(kind);
-  const [jumpToCodeError, setJumpToCodeError] = useState<JumpToCodeFailureReason | null>(null);
+  const [jumpToCodeStatus, setJumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
 
   const onKeyDown = (e: React.KeyboardEvent) => e.key === " " && e.preventDefault();
 
@@ -244,17 +320,16 @@ export default React.memo(function Event({
     onSeek(point, time);
 
     if (event.kind === "mousedown" || event.kind === "keypress") {
+      setJumpToCodeStatus("loading");
       const result = await dispatch(jumpToClickEventFunctionLocation(event, onSeek));
-      if (result !== "found") {
-        setJumpToCodeError(result);
 
-        if (result === "not_loaded") {
-          // Clear this out after a few seconds since the user could change focus.
-          // Simpler than trying to watch the focus region change over time.
-          setTimeout(() => {
-            setJumpToCodeError(null);
-          }, 5000);
-        }
+      setJumpToCodeStatus(result);
+      if (result === "not_loaded") {
+        // Clear this out after a few seconds since the user could change focus.
+        // Simpler than trying to watch the focus region change over time.
+        setTimeout(() => {
+          setJumpToCodeStatus("not_checked");
+        }, 5000);
       }
     }
   };
@@ -266,7 +341,8 @@ export default React.memo(function Event({
       ? "fast-forward"
       : "rewind";
 
-  const jumpToCodeButtonAvailable = jumpToCodeError === null;
+  const jumpToCodeButtonAvailable =
+    jumpToCodeStatus === "not_checked" || jumpToCodeStatus === "found";
 
   const jumpToCodeButtonClassname = classnames(
     "transition-width flex items-center justify-center rounded-full  duration-100 ease-out h-6",
@@ -288,8 +364,10 @@ export default React.memo(function Event({
 
   let jumpButtonText = "Jump to code";
 
-  if (jumpToCodeError) {
-    jumpButtonText = errorMessages[jumpToCodeError];
+  if (jumpToCodeStatus in errorMessages) {
+    jumpButtonText = errorMessages[jumpToCodeStatus as JumpToCodeFailureReason];
+  } else if (jumpToCodeStatus === "loading") {
+    jumpButtonText = "Loading...";
   }
 
   return (
