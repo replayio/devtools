@@ -28,8 +28,9 @@
       }
 
       function baz() {
-        console.error("This is an error", { foo, number: 123, string: "abc" });
+        console.error("This is an error string", { foo, number: 123, string: "abc" });
         console.trace("This is a trace");
+        console.error(Error("This is an error object"));
 
         throw Error("Uncaught exception");
       }
