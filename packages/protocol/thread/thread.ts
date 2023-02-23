@@ -31,10 +31,8 @@ import {
   TimeStampedPointRange,
   Value,
   findAnnotationsResult,
-  missingRegions,
   requestBodyData,
   responseBodyData,
-  unprocessedRegions,
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
@@ -303,24 +301,6 @@ class _ThreadFront {
 
   waitForSession() {
     return this.sessionWaiter.promise;
-  }
-
-  async ensureProcessed(
-    level?: "basic",
-    onMissingRegions?: ((parameters: missingRegions) => void) | undefined,
-    onUnprocessedRegions?: ((parameters: unprocessedRegions) => void) | undefined
-  ) {
-    const sessionId = await this.waitForSession();
-
-    if (onMissingRegions) {
-      client.Session.addMissingRegionsListener(onMissingRegions);
-    }
-
-    if (onUnprocessedRegions) {
-      client.Session.addUnprocessedRegionsListener(onUnprocessedRegions);
-    }
-
-    await client.Session.ensureProcessed({ level }, sessionId);
   }
 
   private _listeningForLoadChanges: boolean = false;

@@ -220,15 +220,7 @@ export function TestStepItem({
         <MatchingElementBadge selected={isSelected} step={step} />
       </React.Suspense>
       {step.alias ? (
-        <span
-          className={classNames(
-            "alias",
-            // TODO [ryanjduffy]: Migrate these into the CSS module class
-            "-my-1 flex-shrink rounded p-1 text-xs text-gray-800",
-            isSelected ? "bg-gray-300" : "bg-gray-200"
-          )}
-          title={`'${argString}' aliased as '${step.alias}'`}
-        >
+        <span className={classNames("alias")} title={`'${argString}' aliased as '${step.alias}'`}>
           {step.alias}
         </span>
       ) : null}
@@ -253,16 +245,7 @@ function MatchingElementBadge({ step, selected }: { step: AnnotatedTestStep; sel
     return null;
   }
 
-  return (
-    <span
-      className={classNames(
-        "-my-1 flex-shrink rounded p-1 text-xs text-gray-800",
-        selected ? "bg-gray-300" : "bg-gray-200"
-      )}
-    >
-      {count}
-    </span>
-  );
+  return <span className={classNames("ElementBadge")}>{count}</span>;
 }
 
 function Actions({ step, selected }: { step: AnnotatedTestStep; selected: boolean }) {

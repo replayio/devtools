@@ -50,6 +50,28 @@
   margin-bottom: 5px;
 }
 
+.alias,
+.ElementBadge {
+  background-color: var(--testsuites-capsule-alias-bgcolor);
+  color: var(--testsuites-capsule-alias-color);
+  padding: 0.25rem;
+  margin-top: -0.25rem;
+  margin-bottom: -0.25rem;
+  line-height: 1rem;
+  flex-shrink: 1;
+  border-radius: 0.25rem;
+}
+
+.alias {
+  font-size: 0.6rem;
+}
+
+.BorderCurrent .alias,
+.BorderCurrent .ElementBadge {
+  background-color: var(--testsuites-capsule-alias-selected-bgcolor);
+  color: var(--testsuites-capsule-alias-selected-color);
+}
+
 /* TestInfo adds a narrow class when the panel is < 300px */
 .narrow .alias {
   display: none;

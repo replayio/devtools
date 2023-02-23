@@ -29,18 +29,19 @@ export function TestStepRowBase({
       ref={clientRef}
       className={classnames(
         className,
-        "group/step relative flex items-start gap-1 border-b border-l-2 border-themeBase-90 py-2 pl-3 pr-1 font-mono",
+        "group/step relative flex items-start gap-1 border-b border-l-2 border-testStepBorder py-2 pl-3 pr-1 font-mono",
         {
           // border
           [styles.BorderPending]: pending,
           [styles.BorderError]: (!pending || active) && error,
           [styles.BorderActive]: (!pending || active) && !error,
+          [styles.BorderCurrent]: active && !error,
 
           // background / foreground
           [styles.TestsuitesErrorColor]: error,
           "bg-testsuitesErrorBgcolor hover:bg-testsuitesErrorBgcolorHover": error && pending,
           "bg-testsuitesErrorBgcolorHover": error && active,
-          "bg-toolbarBackgroundHover": active && !error,
+          "bg-testsuitesActiveBgcolor": active && !error,
           "bg-testsuitesStepsBgcolor hover:bg-testsuitesStepsBgcolorHover": pending && !error,
           "hover:bg-testsuitesStepsBgcolorHover": !pending && !active && !error,
         }
