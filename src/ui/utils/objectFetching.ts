@@ -28,7 +28,7 @@ export async function loadObjectProperties(
   pauseId: string,
   objectId: string
 ) {
-  const obj = await getObjectWithPreviewHelper(replayClient, pauseId, objectId);
+  const obj = await getObjectWithPreviewHelper(replayClient, pauseId, objectId, true);
 
   const properties = obj.preview?.properties ?? [];
   const objectProperties = properties.filter(entry => "object" in entry) ?? [];
