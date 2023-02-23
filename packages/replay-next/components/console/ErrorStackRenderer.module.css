@@ -1,0 +1,4 @@
+.ErrorStack {
+  color: var(--color-error);
+  margin-left: 2rem;
+}

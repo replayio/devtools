@@ -11,18 +11,18 @@ import { getSourcesByUrlSuspense } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Source from "./Source";
-import styles from "./StackRenderer.module.css";
+import styles from "./ErrorStackRenderer.module.css";
 
 export default function ErrorStackRenderer({
-  pauseId,
   errorObjectId,
+  pauseId,
 }: {
-  pauseId: PauseId;
   errorObjectId: ObjectId;
+  pauseId: PauseId;
 }) {
   return (
     <Suspense fallback={<Loader />}>
-      <div className={styles.StackGrid} data-test-name="ErrorStack">
+      <div className={styles.ErrorStack} data-test-name="ErrorStack">
         <ErrorStackRendererSuspends pauseId={pauseId} errorObjectId={errorObjectId} />
       </div>
     </Suspense>
@@ -30,11 +30,11 @@ export default function ErrorStackRenderer({
 }
 
 function ErrorStackRendererSuspends({
-  pauseId,
   errorObjectId,
+  pauseId,
 }: {
-  pauseId: PauseId;
   errorObjectId: ObjectId;
+  pauseId: PauseId;
 }) {
   const client = useContext(ReplayClientContext);
   const stack = getObjectPropertySuspense(client, pauseId, errorObjectId, "stack").value;
@@ -87,10 +87,8 @@ function ErrorFrameRendererSuspends({ frame }: { frame: StackFrame }) {
   }
 
   return (
-    <>
-      <span>{originalFunctionName || frame.functionName || "(anonymous)"}</span>
-      <span>@</span>
-      <span className={styles.SourceColumn}>{renderedSource}</span>
-    </>
+    <div>
+      at {originalFunctionName || frame.functionName || "(anonymous)"} ({renderedSource})
+    </div>
   );
 }
