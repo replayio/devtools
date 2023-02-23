@@ -80,7 +80,7 @@ const PanelButtons: FC<PanelButtonsProps> = ({
     <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
       {supportsRepaintingGraphics && <NodePicker />}
       <PanelButton panel="console">Console</PanelButton>
-      {supportsRepaintingGraphics && <PanelButton panel="inspector">Elements</PanelButton>}
+      <PanelButton panel="inspector">Elements</PanelButton>
       {toolboxLayout !== "ide" && (
         <PanelButton panel="debugger">
           <SourcesTabLabel />
