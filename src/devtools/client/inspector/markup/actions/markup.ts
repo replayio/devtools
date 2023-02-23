@@ -586,6 +586,11 @@ export function highlightNodes(
   duration?: number
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, protocolClient, replayClient }) => {
+    const recordingCapabilities = await ThreadFront.getRecordingCapabilities();
+    if (!recordingCapabilities.supportsRepaintingGraphics) {
+      return;
+    }
+
     if (nodeIds.length === 0) {
       return;
     }

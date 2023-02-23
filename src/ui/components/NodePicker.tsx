@@ -7,7 +7,6 @@ import {
   selectNode,
   unhighlightNode,
 } from "devtools/client/inspector/markup/actions/markup";
-import { ThreadFront } from "protocol/thread";
 import {
   fetchMouseTargetsForPause,
   loadMouseTargets,
