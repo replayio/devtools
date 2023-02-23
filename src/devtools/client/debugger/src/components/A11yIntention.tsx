@@ -5,12 +5,12 @@
 //
 import React, { useState } from "react";
 
-export default function A11yIntention({ children }) {
+export default function A11yIntention({ children }: { children: React.ReactNode }) {
   const [isKeyboard, setIsKeyboard] = useState(false);
 
-  handleKeyDown = () => setIsKeyboard(true);
+  const handleKeyDown = () => setIsKeyboard(true);
 
-  handleMouseDown = () => setIsKeyboard(false);
+  const handleMouseDown = () => setIsKeyboard(false);
 
   return (
     <div
