@@ -231,11 +231,13 @@ export function TestStepItem({
 
 function MatchingElementBadge({ step, selected }: { step: AnnotatedTestStep; selected: boolean }) {
   const client = useContext(ReplayClientContext);
+  const shouldRenderRef = useRef(selected);
 
-  if (step.name !== "get") {
+  if (step.name !== "get" || (!shouldRenderRef.current && !selected)) {
     return null;
   }
 
+  shouldRenderRef.current = true;
   const { pauseId, consoleProps } = getCypressConsolePropsSuspense(client, step) || {};
 
   const count = consoleProps?.preview?.properties?.find(p => p.name === "Elements")?.value;
