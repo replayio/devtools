@@ -65,7 +65,7 @@ export default function SourceFileNameSearch({
         searchActions.goToPrevious();
         break;
       }
-      case "Enter": {
+      case "Enter" || "NumpadEnter": {
         event.preventDefault();
 
         if (searchState.goToLineNumber === null) {

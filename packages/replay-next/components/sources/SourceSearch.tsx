@@ -23,7 +23,7 @@ export default function SourceSearch({
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
-      case "Enter": {
+      case "Enter" || "NumpadEnter": {
         event.preventDefault();
         if (event.shiftKey) {
           searchActions.goToPrevious();

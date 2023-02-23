@@ -34,7 +34,7 @@ export default function ConsoleSearch({
         onHide();
         break;
       }
-      case "Enter": {
+      case "Enter" || "NumpadEnter": {
         event.preventDefault();
         if (event.shiftKey) {
           searchActions.goToPrevious();
