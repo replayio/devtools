@@ -188,11 +188,11 @@
 
   --event-row-hover-background-color: rgba(8, 17, 32, 0.5);
 
-  --background-color-contrast-1: #0e1119;
-  --background-color-contrast-2: #192230;
-  --background-color-contrast-3: #2a3343;
-  --background-color-contrast-4: #454950;
-  --background-color-contrast-5: #e1e6ed;
+  --background-color-contrast-1: aqua;
+  --background-color-contrast-2: aqua;
+  --background-color-contrast-3: aqua;
+  --background-color-contrast-4: aqua;
+  --background-color-contrast-5: aqua;
   --background-color-current-execution-point: #25364e;
   --background-color-current-search-result: #25364e;
   --background-color-default: #081120;
@@ -244,7 +244,7 @@
 
   --color-primary-background: var(--background-color-contrast-1);
   --color-secondary-background: var(--background-color-contrast-3);
-  --color-control-background: var(--background-color-contrast-4);
+  --color-control-background: var(--background-color-inputs);
   --color-control-background-active: var(--background-color-primary-button);
 
   --nag-background-color: #ff005b;
@@ -254,10 +254,10 @@
 
   --collapsible-toggle-color: #9ba0a5;
 
-  --context-menu-bgcolor: #3d4552;
-  --context-menu-bgcolor-divider: var(--background-color-contrast-3);
-  --context-menu-bgcolor-hover: var(--theme-base-95);
-
+  --context-menu-bgcolor: var(--menu-bgcolor);
+  --context-menu-bgcolor-divider: var(--theme-base-90);
+  --context-menu-bgcolor-hover: var(--theme-base-90);
+  
   --comment-card-preview-background-color-hover: #2d3c4f;
   --comment-card-preview-background-color: #253446;
   --comment-card-source-preview-background-color: var(--background-color-current-execution-point);
@@ -695,11 +695,11 @@
 
   --event-row-hover-background-color: rgba(232, 234, 237, 0.5);
 
-  --background-color-contrast-1: #e6e6e6;
-  --background-color-contrast-2: #ffffff;
-  --background-color-contrast-3: #82888c;
-  --background-color-contrast-4: #223344;
-  --background-color-contrast-5: #081121;
+  --background-color-contrast-1: aqua;
+  --background-color-contrast-2: aqua;
+  --background-color-contrast-3: aqua;
+  --background-color-contrast-4: aqua;
+  --background-color-contrast-5: aqua;
   --background-color-default: #e9e9e9;
   --background-color-disabled-button: #666666;
   --background-color-error: #fcefee;
@@ -751,7 +751,7 @@
   --color-line-number-without-hits: var(--color-dimmer);
 
   --color-control-background-active: var(--background-color-primary-button);
-  --color-control-background: var(--background-color-contrast-1);
+  --color-control-background: var(--background-color-inputs);
   --color-primary-background: #ffffff;
   --color-secondary-background: #eeeeee;
 
@@ -764,7 +764,7 @@
 
   --context-menu-bgcolor-divider: #e0e0e0;
   --context-menu-bgcolor-hover: var(--theme-base-95);
-  --context-menu-bgcolor: #f8f8f9;
+  --context-menu-bgcolor: var(--menu-bgcolor);
 
   --comment-card-preview-background-color-hover: #e6e6e6;
   --comment-card-preview-background-color: #f2f3f2;

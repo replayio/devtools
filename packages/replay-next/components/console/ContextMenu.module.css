@@ -10,7 +10,7 @@
   background-color: var(--badge-color);
 }
 .ColorBadgeClear {
-  border: 0.25rem solid var(--background-color-contrast-5);
+  background: var(--theme-base-80);
 }
 .UnicornBadge {
   background-image: url(../../public/unicorn.svg) !important;
