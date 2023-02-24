@@ -13,7 +13,6 @@
 
   /* Account for -1px margin-top offset of rows (to align top/bottom borders) */
   padding-top: 1px;
-  padding-right: 5px;
 }
 .ContainerPending {
   opacity: 0.5;
