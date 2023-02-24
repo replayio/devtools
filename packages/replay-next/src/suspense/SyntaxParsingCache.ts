@@ -60,12 +60,18 @@ export const {
   getValueIfCached: getParsedValueIfCached,
 } = createGenericCache<
   [],
-  [source: StreamingSourceContents, maxTime?: number],
+  [
+    source: StreamingSourceContents,
+    fileName: string | null,
+    maxCharacters?: number,
+    maxTime?: number
+  ],
   StreamingParser | null
 >("SyntaxParsingCache: parseStreaming", streamingSourceContentsToStreamingParser, identity);
 
 async function streamingSourceContentsToStreamingParser(
   source: StreamingSourceContents,
+  fileName: string | null,
   maxCharacters: number = DEFAULT_MAX_CHARACTERS,
   maxTime: number = DEFAULT_MAX_TIME
 ): Promise<StreamingParser | null> {
@@ -124,7 +130,7 @@ async function streamingSourceContentsToStreamingParser(
         if (streamingParser.rawTextPercentage === 1 || source.contents.length >= maxCharacters) {
           didParse = true;
 
-          const parser = incrementalParser(undefined, source.contentType!)!;
+          const parser = incrementalParser(fileName, source.contentType!)!;
           parser.parseChunk(source.contents, source.complete, maxCharacters, maxTime);
 
           // TODO [FE-853]
@@ -150,7 +156,10 @@ async function streamingSourceContentsToStreamingParser(
   return streamingParser;
 }
 
-function incrementalParser(fileName?: string, contentType?: ContentType): IncrementalParser | null {
+function incrementalParser(
+  fileName: string | null,
+  contentType?: ContentType
+): IncrementalParser | null {
   let complete: boolean = false;
 
   const parsedTokens: Array<ParsedToken[]> = [];
@@ -186,11 +195,18 @@ function incrementalParser(fileName?: string, contentType?: ContentType): Increm
       codeToParse = codeToParse.slice(0, index + 1);
     }
 
-    let language = javascriptLanguage;
-    if (contentType) {
-      language = contentTypeToLanguage(contentType);
-    } else if (fileName) {
+    // If possible, use the file extension to infer the language syntax.
+    // Extensions like *.tsx or *.jsx end up with a contentType of "text/javascript"
+    // but parsing those files with the JavaScript language extension won't be fully accurate.
+    let language: LRLanguage | null = null;
+    if (fileName) {
       language = urlToLanguage(fileName);
+    }
+    if (language === null && contentType) {
+      language = contentTypeToLanguage(contentType);
+    }
+    if (language === null) {
+      language = javascriptLanguage;
     }
 
     const state = EditorState.create({
