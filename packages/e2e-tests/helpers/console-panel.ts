@@ -4,7 +4,7 @@ import chalk from "chalk";
 import { submitCurrentText as submitCurrentTextLexical, type as typeLexical } from "./lexical";
 import { waitForPaused } from "./pause-information-panel";
 import { Expected, MessageType } from "./types";
-import { debugPrint, waitFor } from "./utils";
+import { debugPrint, toggleExpandable, waitFor } from "./utils";
 
 const categoryNames = {
   keyboard: "Keyboard",
@@ -87,6 +87,10 @@ export async function executeAndVerifyTerminalExpression(
   if (clearConsoleAfter) {
     await clearConsoleEvaluations(page);
   }
+}
+
+export async function clearTerminalExpressions(page: Page) {
+  await page.click("[data-test-id=ClearConsoleEvaluationsButton]");
 }
 
 export function getConsoleTerminalContentTypeAhead(page: Page): Locator {
@@ -255,6 +259,25 @@ export async function verifyConsoleMessage(
 
   const messages = await findConsoleMessage(page, expected, messageType);
   await verifyExpectedCount(messages, expectedCount);
+}
+
+export async function verifyConsoleMessageObjectContents(
+  page: Page,
+  expected: Expected,
+  contents: string[]
+) {
+  const objectInspector = (await findConsoleMessage(page, expected)).locator(
+    '[data-test-name="LogContents"]'
+  );
+  toggleExpandable(page, { scope: objectInspector, targetState: "open" });
+  await objectInspector
+    .locator('[data-test-name="ExpandableChildren"] [data-test-name="KeyValue"]')
+    .first()
+    .waitFor();
+  const actualContents = (
+    await objectInspector.locator('[data-test-name="ExpandableChildren"]').first().innerText()
+  ).split("\n");
+  expect(actualContents).toStrictEqual(contents);
 }
 
 export async function verifyEagerEvaluationResult(page: Page, expected: Expected) {

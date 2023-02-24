@@ -219,6 +219,9 @@
         currentArray = currentArray[1];
       }
 
+      const promise = Promise.resolve(object);
+      const proxy = new Proxy(object, {});
+
       // Note that the naming and ordering of properties in the object below is significant.
       // The corresponding Playwright tests may operate on the first match for a given locator/selector.
       const complexObject = {
@@ -294,6 +297,8 @@
         simpleSet: set,
         weakSet,
         overflowingSet,
+        promise,
+        proxy,
 
         // Classes and instances
         BaseClass,
