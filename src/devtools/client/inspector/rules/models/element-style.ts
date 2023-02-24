@@ -92,11 +92,11 @@ export default class ElementStyle {
     }
 
     const wiredRules = await getAppliedRulesAsync(
+      this.pauseId,
+      this.nodeId,
       this.client,
       this.replayClient,
-      this.sessionId,
-      this.pauseId,
-      this.nodeId
+      this.sessionId
     );
 
     // Show rules applied to pseudo-elements first.
@@ -153,11 +153,11 @@ export default class ElementStyle {
         }
 
         const parentApplied = await getAppliedRulesAsync(
+          this.pauseId,
+          parentNodeId,
           this.client,
           this.replayClient,
-          this.sessionId,
-          this.pauseId,
-          parentNodeId
+          this.sessionId
         );
 
         if (parentApplied === null) {

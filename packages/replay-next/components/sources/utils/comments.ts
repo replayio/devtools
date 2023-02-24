@@ -7,6 +7,7 @@ import {
 import { parseStreamingAsync } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ParsedToken } from "replay-next/src/suspense/SyntaxParsingCache";
 import { getBase64Png } from "replay-next/src/utils/canvas";
+import { getSourceFileName } from "replay-next/src/utils/source";
 import { ReplayClientInterface } from "shared/client/types";
 
 export enum CanonicalRequestType {
@@ -83,11 +84,12 @@ export async function createTypeDataForSourceCodeComment(
 
   const source = await getSourceAsync(replayClient, sourceId);
   const sourceUrl = source?.url ?? null;
+  const fileName = source ? getSourceFileName(source) : null;
 
   // Secondary label is used to store the syntax-highlighted markup for the line
   const streamingSource = await getStreamingSourceContentsAsync(replayClient, sourceId);
   if (streamingSource != null) {
-    const parsedSource = await parseStreamingAsync(streamingSource);
+    const parsedSource = await parseStreamingAsync(streamingSource, fileName);
     if (parsedSource != null) {
       if (parsedSource.rawTextByLine.length < lineNumber) {
         // If the streaming source hasn't finished loading yet, wait for it to load;

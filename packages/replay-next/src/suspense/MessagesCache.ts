@@ -1,4 +1,4 @@
-import { Message, TimeStampedPointRange } from "@replayio/protocol";
+import { ExecutionPoint, Message, TimeStampedPointRange } from "@replayio/protocol";
 
 import { ReplayClientInterface } from "../../../shared/client/types";
 import { isFirefoxInternalMessage } from "../utils/messages";
@@ -58,7 +58,8 @@ let lastFilteredMessages: ProtocolMessage[] | null = null;
 // This method is Suspense friendly; it is meant to be called from a React component during render.
 export function getMessagesSuspense(
   client: ReplayClientInterface,
-  focusRange: TimeStampedPointRange | null
+  focusRange: TimeStampedPointRange | null,
+  recordingEndpoint: ExecutionPoint
 ): MessageData {
   if (focusRange !== null && focusRange.begin.point === focusRange.end.point) {
     // Edge case scenario handling.
@@ -217,12 +218,16 @@ export function getMessagesSuspense(
   }
 
   // Note that the only time when it's safe for us to specify the number of trimmed messages
-  // is when we are trimming from the complete set of messages (aka no focus region).
+  // is when we are trimming from the complete set of messages.
   // Otherwise even if we do trim some messages locally, the number isn't meaningful.
+  const allMessagesFetched =
+    lastFetchedFocusRange &&
+    lastFetchedFocusRange.begin.point === "0" &&
+    lastFetchedFocusRange.end.point === recordingEndpoint;
   return {
     categoryCounts: lastFilteredCategoryCounts!,
-    countAfter: lastFetchedFocusRange === null ? lastFilteredCountAfter : -1,
-    countBefore: lastFetchedFocusRange === null ? lastFilteredCountBefore : -1,
+    countAfter: allMessagesFetched ? lastFilteredCountAfter : -1,
+    countBefore: allMessagesFetched ? lastFilteredCountBefore : -1,
     didOverflow: lastFetchDidOverflow,
     didError: false,
     error: null,

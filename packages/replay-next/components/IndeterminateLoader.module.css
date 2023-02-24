@@ -12,8 +12,8 @@
   top: 0;
   width: 100%;
   z-index: 10;
-  height: 0.25rem;
-  background-color: var(--background-color-contrast-3);
+  height: 2px;
+  background-color: var(--theme-base-100);
   overflow: hidden;
 }
 

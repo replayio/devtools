@@ -52,15 +52,31 @@ export default function PropertiesRenderer({
       return [];
     }
 
-    const [properties] = mergePropertiesAndGetterValues(
+    let [properties] = mergePropertiesAndGetterValues(
       preview.properties || [],
       preview.getterValues || []
     );
 
-    return sortBy(properties, ({ name }) => {
+    properties = sortBy(properties, ({ name }) => {
       const maybeNumber = Number(name);
       return isNaN(maybeNumber) ? name : maybeNumber;
     });
+
+    if (preview.promiseState) {
+      if (preview.promiseState.value) {
+        properties.unshift({ name: "<value>", ...preview.promiseState.value });
+      }
+      properties.unshift({ name: "<state>", value: preview.promiseState.state });
+    }
+
+    if (preview.proxyState) {
+      properties.unshift(
+        { name: "<target>", ...preview.proxyState.target },
+        { name: "<handler>", ...preview.proxyState.handler }
+      );
+    }
+
+    return properties;
   }, [preview]);
 
   const prototypeId = preview?.prototypeId ?? null;
@@ -374,9 +390,9 @@ function SetContainerEntriesChildrenRenderer({
             }
             header={
               <>
-                <span className={styles.MapIndex}>{index}</span>: {"{"}
+                <span className={styles.MapIndex}>{index}</span>
+                <span className={styles.Separator}>: </span>
                 <ValueRenderer context="nested" pauseId={pauseId} protocolValue={value} />
-                {"}"}
               </>
             }
             persistenceKey={entryPath}

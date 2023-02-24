@@ -118,7 +118,7 @@ export function TestSuitePanel() {
         ) : (
           <>
             <div className="flex flex-grow items-center ">
-              <span className="flex-grow truncate pl-1">{getSpecFilename(recording)}</span>
+              <span className="flex-grow pl-1">{getSpecFilename(recording)}</span>
             </div>
             <TestResultsSummary testCases={testCases} />
           </>

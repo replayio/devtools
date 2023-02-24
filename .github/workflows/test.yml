@@ -7,6 +7,7 @@ on:
       - main
 env:
   RECORD_REPLAY_API_KEY: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
+  RECORD_REPLAY_METADATA_TEST_SUITE: E2E Tests
 
 jobs:
   download-browser:

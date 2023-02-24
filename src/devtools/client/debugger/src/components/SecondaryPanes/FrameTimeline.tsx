@@ -230,7 +230,7 @@ function FrameTimeline() {
   const source = useAppSelector(getSelectedSource);
   const symbols = useAppSelector(state => (source ? getSymbols(state, source) : null));
   const frameSteps = selectedFrame
-    ? getFrameStepsSuspense(replayClient, selectedFrame.pauseId, selectedFrame.protocolId)
+    ? getFrameStepsSuspense(selectedFrame.pauseId, selectedFrame.protocolId, replayClient)
     : undefined;
   const dispatch = useAppDispatch();
 

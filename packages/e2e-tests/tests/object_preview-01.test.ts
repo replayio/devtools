@@ -2,9 +2,12 @@ import test from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
 import {
+  clearTerminalExpressions,
   executeTerminalExpression,
+  findConsoleMessage,
   openConsolePanel,
   verifyConsoleMessage,
+  verifyConsoleMessageObjectContents,
   warpToMessage,
 } from "../helpers/console-panel";
 
@@ -31,7 +34,11 @@ test(`object_preview-01: expressions in the console after time warping`, async (
 
   await verifyConsoleMessage(page, "ƒbar()");
 
-  await verifyConsoleMessage(page, "Proxy{}");
+  await verifyConsoleMessageObjectContents(page, "Proxy{}", [
+    "<target>: {a: 0}",
+    "<handler>: {get: ƒget(target, prop, receiver)}",
+  ]);
+
   await verifyConsoleMessage(page, "Symbol()");
   await verifyConsoleMessage(page, "Symbol(symbol)");
   await verifyConsoleMessage(page, `{Symbol(): 42, Symbol(symbol): Symbol()}`);
@@ -47,7 +54,13 @@ test(`object_preview-01: expressions in the console after time warping`, async (
   await verifyConsoleMessage(page, "Error: there");
 
   await executeTerminalExpression(page, "Array(1, 2, 3)");
-  await verifyConsoleMessage(page, "(3) [1, 2, 3]");
+  await verifyConsoleMessageObjectContents(page, "(3) [1, 2, 3]", [
+    "0: 1",
+    "1: 2",
+    "2: 3",
+    "length: 3",
+    "[[Prototype]]: Array",
+  ]);
 
   await executeTerminalExpression(page, "new Uint8Array([1, 2, 3, 4])");
   await verifyConsoleMessage(page, "Uint8Array(4) [1, 2, 3, 4]");
@@ -56,10 +69,23 @@ test(`object_preview-01: expressions in the console after time warping`, async (
   await verifyConsoleMessage(page, "/abd/g");
 
   await executeTerminalExpression(page, "new Set([1, 2, 3])");
-  await verifyConsoleMessage(page, "Set(3) [1, 2, 3]");
+  await verifyConsoleMessageObjectContents(page, "Set(3) [1, 2, 3]", [
+    "[[Entries]]",
+    "0: 1",
+    "1: 2",
+    "2: 3",
+    "size: 3",
+    "[[Prototype]]: Set.prototype",
+  ]);
 
   await executeTerminalExpression(page, "new Map([[1, {a:1}], [2, {b:2}]])");
-  await verifyConsoleMessage(page, "Map(2) {1 → {…}, 2 → {…}}");
+  await verifyConsoleMessageObjectContents(page, "Map(2) {1 → {…}, 2 → {…}}", [
+    "[[Entries]]",
+    "0: {1 → {…}}",
+    "1: {2 → {…}}",
+    "size: 2",
+    "[[Prototype]]: Map.prototype",
+  ]);
 
   await executeTerminalExpression(page, "new WeakSet([{a:1}, {b:2}])");
   await verifyConsoleMessage(page, "WeakSet(2) [{…}, {…}]");
@@ -68,13 +94,26 @@ test(`object_preview-01: expressions in the console after time warping`, async (
   await verifyConsoleMessage(page, "WeakMap(2) {{…} → {…}, {…} → {…}}");
 
   await executeTerminalExpression(page, "new Promise(() => {})");
-  await verifyConsoleMessage(page, "Promise{}");
+  await verifyConsoleMessageObjectContents(page, "Promise{}", [
+    '<state>: "pending"',
+    "[[Prototype]]: Promise.prototype",
+  ]);
 
+  await clearTerminalExpressions(page);
   await executeTerminalExpression(page, "Promise.resolve({ a: 1 })");
-  await verifyConsoleMessage(page, "Promise{}");
+  await verifyConsoleMessageObjectContents(page, "Promise{}", [
+    '<state>: "fulfilled"',
+    "<value>: {a: 1}",
+    "[[Prototype]]: Promise.prototype",
+  ]);
 
+  await clearTerminalExpressions(page);
   await executeTerminalExpression(page, "Promise.reject({ a: 1 })");
-  await verifyConsoleMessage(page, "Promise{}");
+  await verifyConsoleMessageObjectContents(page, "Promise{}", [
+    '<state>: "rejected"',
+    "<value>: {a: 1}",
+    "[[Prototype]]: Promise.prototype",
+  ]);
 
   await executeTerminalExpression(page, "baz");
   await verifyConsoleMessage(page, "ƒbaz()");

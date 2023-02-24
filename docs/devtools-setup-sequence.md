@@ -69,7 +69,6 @@ There's also some setting of global variables, like `window.gToolbox` for manipu
 - `ui/actions/app.ts::setupApp(store)`:
   - Auth token setup
   - Waits for thread session, sets session ID, loads various kinds of events (keyboard, nav, etc)
-  - Calls `ThreadFront.ensureProcessed()` for "basic" and "executionIndexed", sets loading actions
   - Listens for loading region changes and dispatches
 - `ui/actions/timeline.ts::setupTimeline(store)`:
   - Dispatches on pause

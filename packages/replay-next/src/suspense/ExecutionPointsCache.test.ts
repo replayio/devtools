@@ -1,12 +1,6 @@
-import {
-  ExecutionPoint,
-  Location,
-  getPointsBoundingTimeResult as PointsBoundingTime,
-  TimeStampedPoint,
-  TimeStampedPointRange,
-} from "@replayio/protocol";
+import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
 
-import { HitPointsAndStatusTuple, ReplayClientInterface } from "shared/client/types";
+import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, commandError } from "shared/utils/error";
 
 import { createMockReplayClient } from "../utils/testing";
@@ -15,21 +9,10 @@ describe("PointsCache", () => {
   let mockClient: { [key: string]: jest.Mock };
   let replayClient: ReplayClientInterface;
 
-  let getCachedHitPointsForLocation: (
-    location: Location,
-    condition: string | null,
-    focusRange: TimeStampedPointRange | null
-  ) => HitPointsAndStatusTuple;
   let getClosestPointForTimeSuspense: (
     client: ReplayClientInterface,
     time: number
   ) => ExecutionPoint;
-  let getHitPointsForLocationSuspense: (
-    client: ReplayClientInterface,
-    location: Location,
-    condition: string | null,
-    focusRange: TimeStampedPointRange | null
-  ) => HitPointsAndStatusTuple;
   let imperativelyGetClosestPointForTime: (
     client: ReplayClientInterface,
     time: number
@@ -42,9 +25,7 @@ describe("PointsCache", () => {
 
     // Clear and recreate cached data between tests.
     const module = require("./ExecutionPointsCache");
-    getCachedHitPointsForLocation = module.getCachedHitPointsForLocation;
     getClosestPointForTimeSuspense = module.getClosestPointForTimeSuspense;
-    getHitPointsForLocationSuspense = module.getHitPointsForLocationSuspense;
     imperativelyGetClosestPointForTime = module.imperativelyGetClosestPointForTime;
     preCacheExecutionPointForTime = module.preCacheExecutionPointForTime;
   });
@@ -122,92 +103,6 @@ describe("PointsCache", () => {
       await expect(await getClosestPointForTimeHelper(72)).toBe("70");
       await expect(await getClosestPointForTimeHelper(80)).toBe("80");
       expect(mockClient.getPointsBoundingTime).toHaveBeenCalledTimes(4);
-    });
-  });
-
-  describe("getHitPointsForLocation", () => {
-    async function getHitPointsForLocationHelper(
-      location: Location,
-      conditional: string | null,
-      focusRange: TimeStampedPointRange | null
-    ): Promise<HitPointsAndStatusTuple> {
-      try {
-        return getHitPointsForLocationSuspense(replayClient, location, conditional, focusRange);
-      } catch (promise) {
-        await promise;
-
-        return getHitPointsForLocationSuspense(replayClient, location, conditional, focusRange);
-      }
-    }
-
-    let mockLocation: Location = {
-      line: 0,
-      column: 0,
-      sourceId: "source",
-    };
-
-    it("should cache results to avoid requesting more than once", async () => {
-      const tsp = { time: 0, point: "0" };
-      mockClient.getHitPointsForLocation.mockReturnValue([[tsp], "complete"]);
-
-      await getHitPointsForLocationHelper(mockLocation, null, null);
-      await getHitPointsForLocationHelper(mockLocation, null, null);
-
-      expect(mockClient.getHitPointsForLocation).toBeCalledTimes(1);
-
-      // Verify that the cached getter returns the same thing without re-querying the client.
-      const [cachedTimeStampedPoint, cachedStatus] = getCachedHitPointsForLocation(
-        mockLocation,
-        null,
-        null
-      );
-      expect(cachedTimeStampedPoint).toEqual([tsp]);
-      expect(cachedStatus).toEqual("complete");
-      expect(mockClient.getHitPointsForLocation).toBeCalledTimes(1);
-    });
-
-    it("should re-request hit points for a location if the conditional changes", async () => {
-      mockClient.getHitPointsForLocation.mockReturnValue([[], "complete"]);
-
-      await getHitPointsForLocationHelper(mockLocation, null, null);
-      expect(mockClient.getHitPointsForLocation).toBeCalledTimes(1);
-      await getHitPointsForLocationHelper(mockLocation, "true", null);
-      expect(mockClient.getHitPointsForLocation).toBeCalledTimes(2);
-      await getHitPointsForLocationHelper(mockLocation, "123", null);
-      expect(mockClient.getHitPointsForLocation).toBeCalledTimes(3);
-
-      // But these values should be cached for future requests.
-      await getHitPointsForLocationHelper(mockLocation, null, null);
-      await getHitPointsForLocationHelper(mockLocation, "true", null);
-      await getHitPointsForLocationHelper(mockLocation, "123", null);
-      expect(mockClient.getHitPointsForLocation).toBeCalledTimes(3);
-    });
-
-    it("should re-request hit points for a location if the focus region changes", async () => {
-      mockClient.getHitPointsForLocation.mockReturnValue([[], "complete"]);
-
-      await getHitPointsForLocationHelper(mockLocation, null, null);
-      await getHitPointsForLocationHelper(mockLocation, null, {
-        begin: { time: 0, point: "0" },
-        end: { time: 100, point: "100" },
-      });
-      await getHitPointsForLocationHelper(mockLocation, null, {
-        begin: { time: 10, point: "10" },
-        end: { time: 120, point: "120" },
-      });
-      expect(mockClient.getHitPointsForLocation).toBeCalledTimes(3);
-
-      // But these values should be cached for future requests.
-      await getHitPointsForLocationHelper(mockLocation, null, null);
-      await getHitPointsForLocationHelper(mockLocation, null, {
-        begin: { time: 0, point: "0" },
-        end: { time: 100, point: "100" },
-      });
-      await getHitPointsForLocationHelper(mockLocation, null, {
-        begin: { time: 10, point: "10" },
-        end: { time: 120, point: "120" },
-      });
-      expect(mockClient.getHitPointsForLocation).toBeCalledTimes(3);
     });
   });
 

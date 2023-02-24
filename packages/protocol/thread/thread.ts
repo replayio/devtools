@@ -28,12 +28,11 @@ import {
   SourceKind,
   SourceLocation,
   TimeStamp,
+  TimeStampedPointRange,
   Value,
   findAnnotationsResult,
-  missingRegions,
   requestBodyData,
   responseBodyData,
-  unprocessedRegions,
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
@@ -42,6 +41,7 @@ import {
   getPauseIdForExecutionPointIfCached,
 } from "replay-next/src/suspense/PauseCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
+import { areRangesEqual } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import type { Features } from "ui/utils/prefs";
 
@@ -95,6 +95,7 @@ type FindTargetCommand = (
 
 export type RecordingCapabilities = {
   supportsEagerEvaluation: boolean;
+  supportsElementsInspector: boolean;
   supportsEventTypes: boolean;
   supportsNetworkRequests: boolean;
   supportsRepaintingGraphics: boolean;
@@ -162,6 +163,8 @@ class _ThreadFront {
 
   // Waiter which resolves when there is at least one loading region
   loadingHasBegun = defer<void>();
+
+  initialFocusRegionWaiter = defer<TimeStampedPointRange>();
 
   // Waiter which resolves when all sources have been loaded.
   private allSourcesWaiter = defer<void>();
@@ -253,6 +256,7 @@ class _ThreadFront {
       case "chromium": {
         recordingCapabilities = {
           supportsEagerEvaluation: false,
+          supportsElementsInspector: true,
           supportsEventTypes: false,
           supportsNetworkRequests: false,
           supportsRepaintingGraphics: features.chromiumRepaints ?? false,
@@ -264,6 +268,7 @@ class _ThreadFront {
       case "gecko": {
         recordingCapabilities = {
           supportsEagerEvaluation: true,
+          supportsElementsInspector: true,
           supportsEventTypes: true,
           supportsNetworkRequests: true,
           supportsRepaintingGraphics: true,
@@ -274,6 +279,7 @@ class _ThreadFront {
       case "node": {
         recordingCapabilities = {
           supportsEagerEvaluation: true,
+          supportsElementsInspector: false,
           supportsEventTypes: true,
           supportsNetworkRequests: true,
           supportsRepaintingGraphics: false,
@@ -285,6 +291,7 @@ class _ThreadFront {
       default: {
         recordingCapabilities = {
           supportsEagerEvaluation: false,
+          supportsElementsInspector: false,
           supportsEventTypes: false,
           supportsNetworkRequests: false,
           supportsRepaintingGraphics: false,
@@ -299,24 +306,6 @@ class _ThreadFront {
 
   waitForSession() {
     return this.sessionWaiter.promise;
-  }
-
-  async ensureProcessed(
-    level?: "basic",
-    onMissingRegions?: ((parameters: missingRegions) => void) | undefined,
-    onUnprocessedRegions?: ((parameters: unprocessedRegions) => void) | undefined
-  ) {
-    const sessionId = await this.waitForSession();
-
-    if (onMissingRegions) {
-      client.Session.addMissingRegionsListener(onMissingRegions);
-    }
-
-    if (onUnprocessedRegions) {
-      client.Session.addUnprocessedRegionsListener(onUnprocessedRegions);
-    }
-
-    await client.Session.ensureProcessed({ level }, sessionId);
   }
 
   private _listeningForLoadChanges: boolean = false;
@@ -336,6 +325,13 @@ class _ThreadFront {
 
         this.loadingHasBegun.resolve();
 
+        if (areRangesEqual(loadedRegions.indexed, loadedRegions.loading)) {
+          assert(
+            loadedRegions.loading.length === 1,
+            "there should be exactly one initially loaded region"
+          );
+          this.initialFocusRegionWaiter.resolve(loadedRegions.loading[0]);
+        }
         this._loadedRegionsListeners.forEach(callback => callback(loadedRegions));
       });
 

@@ -1,7 +1,7 @@
 import { Nag } from "ui/hooks/users";
 import { isReplayBrowser } from "ui/utils/environment";
 
-import { shouldShowNag } from "./user";
+import { shouldShowNag } from "./tour";
 
 function queryParams() {
   return new URL(window.location.href).searchParams;

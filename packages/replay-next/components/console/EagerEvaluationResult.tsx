@@ -55,7 +55,7 @@ function EagerEvaluationResultSuspends({
 }) {
   const client = useContext(ReplayClientContext);
 
-  const result = evaluateSuspense(client, pauseId, frameId, expression, cacheKey);
+  const result = evaluateSuspense(pauseId, frameId, expression, cacheKey, client);
   const { exception, returned } = result;
 
   let children: ReactNode | null = null;

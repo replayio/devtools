@@ -1,6 +1,6 @@
 import { Locator, Page } from "@playwright/test";
 
-import { debugPrint } from "./general";
+import { debugPrint, delay } from "./general";
 
 export async function findClientValues(
   page: Page,
@@ -64,5 +64,7 @@ export async function toggleExpandable<T>(
 
     const button = expandable.locator(`[role="button"]`);
     await button.click();
+
+    await delay();
   }
 }

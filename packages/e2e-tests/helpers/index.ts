@@ -47,7 +47,9 @@ export async function startTest(page: Page, example: string) {
   await page.goto(url);
 
   // Wait for the recording basic information to load such that the primary tabs are visible.
-  if (!example.startsWith("node")) {
+  if (example.startsWith("node")) {
+    await page.locator('[data-panel-id="Panel-SecondaryToolbox"]').waitFor();
+  } else {
     // Node recordings don't have the "Viewer/DevTools" toggle
     await page.locator('[data-test-id="ViewToggle-Viewer"]').waitFor();
     await page.locator('[data-test-id="ViewToggle-DevTools"]').waitFor();

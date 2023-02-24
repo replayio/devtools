@@ -5,8 +5,11 @@ import type { Location, ObjectPreview, Object as ProtocolObject } from "@replayi
 
 import type { ThreadFront as TF } from "protocol/thread";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
-import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
-import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
+import { getTopFrameAsync } from "replay-next/src/suspense/FrameCache";
+import {
+  getObjectPropertyHelper,
+  getObjectWithPreviewHelper,
+} from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { getScopeMapAsync } from "replay-next/src/suspense/ScopeMapCache";
 import { ReplayClientInterface } from "shared/client/types";
@@ -17,6 +20,7 @@ import {
   getSourceDetailsEntities,
 } from "ui/reducers/sources";
 import { UIState } from "ui/state";
+import { getJSON } from "ui/utils/objectFetching";
 
 import { UIThunkAction } from "./index";
 
@@ -96,8 +100,8 @@ export const formatEventListener = async (
   }
 
   const scopeMap = await getScopeMapAsync(
-    replayClient,
-    getGeneratedLocation(sourcesById, functionLocation)
+    getGeneratedLocation(sourcesById, functionLocation),
+    replayClient
   );
   const originalFunctionName = scopeMap?.find(mapping => mapping[0] === functionName)?.[1];
 
@@ -270,19 +274,21 @@ function shouldIgnoreEventFromSource(sourceDetails?: SourceDetails) {
   return IGNORABLE_PARTIAL_SOURCE_URLS.some(partialUrl => url.includes(partialUrl));
 }
 
-export const { getValueAsync: getEventListenerLocationAsync } = createGenericCache<
+export const {
+  getValueAsync: getEventListenerLocationAsync,
+  remove: removeEventListenerLocationEntry,
+} = createGenericCache<
   [ThreadFront: typeof TF, replayClient: ReplayClientInterface, getState: () => UIState],
   [pauseId: string, replayEventType: SEARCHABLE_EVENT_TYPES],
   Location | undefined
 >(
   "eventListenerLocationCache",
-  3,
-  async (ThreadFront, replayClient, getState, pauseId, replayEventType) => {
-    const stackFrames = await getFramesAsync(replayClient, pauseId);
-    if (!stackFrames) {
+  async (pauseId, replayEventType, ThreadFront, replayClient, getState) => {
+    const topFrame = await getTopFrameAsync(pauseId, replayClient);
+
+    if (!topFrame) {
       return;
     }
-    const topFrame = stackFrames[0];
     const { frameId } = topFrame;
 
     await ThreadFront.ensureAllSources();
@@ -306,7 +312,6 @@ export const { getValueAsync: getEventListenerLocationAsync } = createGenericCac
 
     if (res.returned?.object) {
       const preview = await getObjectWithPreviewHelper(replayClient, pauseId, res.returned.object);
-
       // The evaluation may have found a React prop function somewhere.
       const handlerProp = preview?.preview?.properties?.find(p => p.name === "handlerProp");
 
@@ -332,6 +337,7 @@ export const { getValueAsync: getEventListenerLocationAsync } = createGenericCac
       }
     } else if (res.exception?.object) {
       const error = await getObjectWithPreviewHelper(replayClient, pauseId, res.exception.object);
+      console.error("Error fetching event listener location: ", error);
     }
 
     if (!sourceLocation) {
@@ -360,10 +366,19 @@ interface InjectedValues {
   possibleReactPropNames: string[];
   args: any[];
 }
+
+interface SearchedNode {
+  name: string;
+  searchPropKeys?: string[];
+  propKeys?: string[];
+}
+
 interface EventMapperResult {
   target: HTMLElement;
+  fieldName?: string;
   handlerProp?: Function;
   handlerNode?: HTMLElement;
+  searchedNodes: SearchedNode[];
 }
 
 function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
@@ -380,16 +395,40 @@ function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
     );
 
     if (matchingEvent) {
-      // We _could_ probably just return the prop function or undefined here
+      const searchedNodes: SearchedNode[] = [];
       const res: EventMapperResult = {
         target: event.target as HTMLElement,
+        searchedNodes,
       };
+
+      // Debugging: trace nodes we've looked at, like `"input#id.classname"`
+      function stringifyNode(node: HTMLElement) {
+        const tokens = [node.nodeName];
+
+        if (node.id) {
+          tokens.push("#" + node.id);
+        }
+
+        if (typeof node.className === "string") {
+          for (let className of node.className.split(" ")) {
+            tokens.push("." + className);
+          }
+        }
+
+        return tokens.join("").toLowerCase();
+      }
 
       // Search the event target node and all of its ancestors
       // for React internal props data, and specifically look
       // for the nearest node with a relevant React event handler prop if any.
-      let currentNode = event.target as HTMLElement;
+      const startingNode = event.target as HTMLElement;
+      let currentNode = startingNode;
       while (currentNode) {
+        const searchedNode: SearchedNode = {
+          name: stringifyNode(currentNode),
+        };
+        searchedNodes.push(searchedNode);
+
         const keys = Object.keys(currentNode);
         const reactPropsKey = keys.find(key => {
           return (
@@ -403,6 +442,7 @@ function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
           if (reactPropsKey in currentNode) {
             // @ts-ignore
             props = currentNode[reactPropsKey];
+            searchedNode.propKeys = Object.keys(props);
           }
 
           // Depending on the type of event, there could be different
@@ -410,15 +450,28 @@ function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
           // For example, an input is likely to have "onChange",
           // whereas some other element might have "onKeyPress".
           let handler = undefined;
-          for (let possibleReactProp of injectedValues.possibleReactPropNames) {
+          let name: string | undefined = undefined;
+          let possibleReactPropNames = injectedValues.possibleReactPropNames;
+
+          // `<input>` tags often have an `onChange` prop, including checkboxes;
+          // _If_ the original target DOM node is an input, add that to the list of prop names.
+          if (currentNode === startingNode && currentNode.nodeName.toLowerCase() === "input") {
+            possibleReactPropNames = possibleReactPropNames.concat("onChange");
+          }
+
+          searchedNode.searchPropKeys = possibleReactPropNames;
+
+          for (let possibleReactProp of possibleReactPropNames) {
             if (possibleReactProp in props) {
               handler = props[possibleReactProp];
+              name = possibleReactProp;
             }
           }
 
           if (handler) {
             res.handlerProp = handler;
             res.handlerNode = currentNode as HTMLElement;
+            res.fieldName = name;
             break;
           }
         }

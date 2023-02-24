@@ -122,6 +122,20 @@ export default function Capsule({
 
   const inputDefaultValue = tooManyPointsToFind ? "10k+" : `${closestHitPointIndex + 1}`;
 
+  // Don't show "0/0" while hit points are loading.
+  if (hitPointStatus === null) {
+    return (
+      <div
+        className={styles.Capsule}
+        data-loading
+        data-test-name="LogPointCapsule"
+        style={badgeStyle as CSSProperties}
+      >
+        –
+      </div>
+    );
+  }
+
   return (
     <>
       <div

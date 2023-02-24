@@ -14,7 +14,7 @@ import {
 let store: UIStore;
 
 export function getPreferredLocation(locations: MappedLocation | undefined) {
-  if (!locations) {
+  if (!locations || locations.length === 0) {
     return;
   }
   const state = store.getState();

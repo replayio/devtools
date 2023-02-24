@@ -1,25 +1,22 @@
 import {
   ExecutionPoint,
-  Location,
   getPointsBoundingTimeResult as PointsBoundingTime,
   TimeStampedPoint,
-  TimeStampedPointRange,
 } from "@replayio/protocol";
 
-import { HitPointsAndStatusTuple, ReplayClientInterface } from "shared/client/types";
+import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 
-import { createFetchAsyncFromFetchSuspense, createWakeable } from "../utils/suspense";
+import { createWakeable } from "../utils/suspense";
 import { isExecutionPointsLessThan } from "../utils/time";
 import { createGenericCache } from "./createGenericCache";
-import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
+import { Wakeable } from "./types";
 
 export type CachedPointsForTime = Map<number, ExecutionPoint>;
 type ChangeHandler = (timeStampedPoint: TimeStampedPoint) => void;
 
 const cachedPointsForTime: CachedPointsForTime = new Map();
 const cachedPointsForTimeChangeHandlers: Set<ChangeHandler> = new Set();
-const locationToHitPointsMap: Map<string, Record<HitPointsAndStatusTuple>> = new Map();
 const sortedExecutionPoints: TimeStampedPoint[] = [];
 const sortedPointsBoundingTimes: PointsBoundingTime[] = [];
 const timeToInFlightRequestMap: Map<number, Wakeable<ExecutionPoint>> = new Map();
@@ -58,7 +55,7 @@ async function fetchPointsBoundingTime(
   rethrowError: boolean
 ) {
   try {
-    const pointsBoundingTime = await getPointsBoundingTimeAsync(client, time);
+    const pointsBoundingTime = await getPointsBoundingTimeAsync(time, client);
     const point = getClosestPointInPointsBoundingTime(time, pointsBoundingTime);
 
     // Pre-cache time-to-point match and insert into sorted ExecutionPoints array.
@@ -125,33 +122,6 @@ async function fetchPointsBoundingTime(
   }
 }
 
-async function fetchHitPointsForLocation(
-  client: ReplayClientInterface,
-  focusRange: TimeStampedPointRange | null,
-  location: Location,
-  condition: string | null,
-  record: Record<HitPointsAndStatusTuple>,
-  wakeable: Wakeable<HitPointsAndStatusTuple>
-) {
-  try {
-    const [executionPoints, status] = await client.getHitPointsForLocation(
-      focusRange,
-      location,
-      condition
-    );
-
-    record.status = STATUS_RESOLVED;
-    record.value = [executionPoints, status];
-
-    wakeable.resolve(record.value);
-  } catch (error) {
-    record.status = STATUS_REJECTED;
-    record.value = error;
-
-    wakeable.reject(error);
-  }
-}
-
 function findCachePointsForTime(time: number): ExecutionPoint | null {
   let indexBegin = 0;
   let indexEnd = sortedPointsBoundingTimes.length - 1;
@@ -210,23 +180,6 @@ export function getCachedHitPoints(): Map<number, ExecutionPoint> {
   return cachedPointsForTime;
 }
 
-// Does not suspend.
-// This method is safe to call outside of render.
-// It returns a cached object property if one has been previously loaded, or null.
-export function getCachedHitPointsForLocation(
-  location: Location,
-  condition: string | null,
-  focusRange: TimeStampedPointRange | null
-): HitPointsAndStatusTuple | null {
-  const key = getKey(location, condition, focusRange);
-  const record = locationToHitPointsMap.get(key);
-  if (record?.status === STATUS_RESOLVED) {
-    return record.value;
-  }
-
-  return null;
-}
-
 export function getClosestPointForTimeSuspense(
   client: ReplayClientInterface,
   time: number
@@ -273,55 +226,6 @@ function getClosestPointInPointsBoundingTime(
     Math.abs(pointsBoundingTime.after.time - time)
     ? pointsBoundingTime.before.point
     : pointsBoundingTime.after.point;
-}
-
-export function getHitPointsForLocationSuspense(
-  client: ReplayClientInterface,
-  location: Location,
-  condition: string | null,
-  focusRange: TimeStampedPointRange | null
-): HitPointsAndStatusTuple {
-  // TODO We could add an optimization here to avoid re-fetching if we ever fetched all points (no focus range)
-  // without any overflow, and then later fetch for a focus range. Right now we re-fetch in this case.
-
-  const key = getKey(location, condition, focusRange);
-  let record = locationToHitPointsMap.get(key);
-  if (record == null) {
-    const wakeable = createWakeable<HitPointsAndStatusTuple>(
-      `getHitPointsForLocationSuspense: ${key}`
-    );
-
-    record = {
-      status: STATUS_PENDING,
-      value: wakeable,
-    };
-
-    locationToHitPointsMap.set(key, record);
-
-    // Fire and forget for the purposes of Suspense.
-    fetchHitPointsForLocation(client, focusRange, location, condition, record, wakeable);
-  }
-
-  if (record.status === STATUS_RESOLVED) {
-    return record.value;
-  } else {
-    throw record.value;
-  }
-}
-
-export const getHitPointsForLocationAsync = createFetchAsyncFromFetchSuspense(
-  getHitPointsForLocationSuspense
-);
-
-function getKey(
-  location: Location,
-  condition: string | null,
-  focusRange: TimeStampedPointRange | null
-): string {
-  const locationKey = `${location.sourceId}:${location.line}:${location.column}:${condition}`;
-  return focusRange
-    ? `${locationKey}:${focusRange.begin.point}:${focusRange.end.point}`
-    : locationKey;
 }
 
 // Note that this method does not work with Suspense.
@@ -397,7 +301,6 @@ export const {
   getValueIfCached: getPointsBoundingTimeIfCached,
 } = createGenericCache<[replayClient: ReplayClientInterface], [time: number], PointsBoundingTime>(
   "PointsCache: getPointsBoundingTime",
-  1,
-  async (client, time) => client.getPointsBoundingTime(time),
+  async (time, client) => client.getPointsBoundingTime(time),
   time => `${time}`
 );

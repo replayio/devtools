@@ -1,8 +1,8 @@
-import { SourceId } from "@replayio/protocol";
+import { Frame, SourceId } from "@replayio/protocol";
 import { Suspense, memo, useContext } from "react";
 
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
+import { getFramesSuspense, getTopFrameSuspense } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { SelectedFrameContext } from "../../src/contexts/SelectedFrameContext";
@@ -44,33 +44,46 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
   const pauseId = selectedPauseAndFrameId?.pauseId || null;
 
   if (pauseId !== null && frameId !== null) {
-    const frames = getFramesSuspense(client, pauseId);
-    if (frames) {
+    let showHighlight = false;
+    // The 95% use case is that we'll be in the top frame. Start by fetching that.
+    const topFrame = getTopFrameSuspense(pauseId, client);
+
+    if (topFrame) {
+      // Assuming there's at least a top frame, we can now see _which_ frame we're paused in.
+
+      let selectedFrame: Frame | undefined = topFrame;
+      if (selectedFrame?.frameId !== frameId) {
+        // We must not be paused in the top frame. Get _all_ frames and find a match.
+        // This is a more expensive request, so only fetch all frames if we have to.
+        const allFrames = getFramesSuspense(pauseId, client);
+        selectedFrame = allFrames?.find(frame => frame.frameId === frameId);
+      }
+
       const correspondingSourceIds = client.getCorrespondingSourceIds(sourceId);
-      const selectedFrame = frames.find(frame => frame.frameId === frameId);
-      if (selectedFrame) {
-        if (
-          selectedFrame.location.find(location => {
-            if (correspondingSourceIds.includes(location.sourceId)) {
-              const correspondingLocations = client.getCorrespondingLocations(location);
-              return (
-                correspondingLocations.findIndex(
-                  correspondingLocation =>
-                    correspondingLocation.line === lineNumber &&
-                    correspondingLocation.sourceId === sourceId
-                ) >= 0
-              );
-            }
-          })
-        ) {
+
+      // Assuming we found a frame, check to see if there's a matching location for the frame.
+      // If so, we should show the highlight line.
+      showHighlight = !!selectedFrame?.location.find(location => {
+        if (correspondingSourceIds.includes(location.sourceId)) {
+          const correspondingLocations = client.getCorrespondingLocations(location);
           return (
-            <div
-              className={styles.CurrentExecutionPoint}
-              data-test-name="CurrentExecutionPointLineHighlight"
-            />
+            correspondingLocations.findIndex(
+              correspondingLocation =>
+                correspondingLocation.line === lineNumber &&
+                correspondingLocation.sourceId === sourceId
+            ) >= 0
           );
         }
-      }
+      });
+    }
+
+    if (showHighlight) {
+      return (
+        <div
+          className={styles.CurrentExecutionPoint}
+          data-test-name="CurrentExecutionPointLineHighlight"
+        />
+      );
     }
   }
 

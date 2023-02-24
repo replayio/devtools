@@ -100,26 +100,27 @@ function MessageRenderer({
     argumentValues.length > 0 ? (
       <Suspense fallback={<Loader />}>
         {argumentValues.map((argumentValue: ProtocolValue, index: number) => {
-          const argumentInspector = (
-            <Inspector context="console" pauseId={message.pauseId} protocolValue={argumentValue} />
-          );
+          const clientValue = protocolValueToClientValue(message.pauseId, argumentValue);
           return (
             <Fragment key={index}>
-              {protocolValueToClientValue(message.pauseId, argumentValue).type === "error" &&
-              argumentValue.object ? (
-                <Expandable
-                  children={
-                    <ErrorStackRenderer
-                      pauseId={message.pauseId}
-                      errorObjectId={argumentValue.object}
-                    />
-                  }
-                  className={styles.Expandable}
-                  header={argumentInspector}
-                  useBlockLayoutWhenExpanded={false}
-                />
+              {clientValue.type === "error" && argumentValue.object ? (
+                <>
+                  <Inspector
+                    context="console"
+                    pauseId={message.pauseId}
+                    protocolValue={argumentValue}
+                  />
+                  <ErrorStackRenderer
+                    errorObjectId={argumentValue.object}
+                    pauseId={message.pauseId}
+                  />
+                </>
               ) : (
-                argumentInspector
+                <Inspector
+                  context="console"
+                  pauseId={message.pauseId}
+                  protocolValue={argumentValue}
+                />
               )}
               {index < argumentValues.length - 1 && " "}
             </Fragment>

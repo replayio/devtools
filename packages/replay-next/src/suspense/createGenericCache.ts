@@ -15,15 +15,26 @@ import {
 
 export { STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED } from "./types";
 
-type CacheRecordStatus = typeof STATUS_PENDING | typeof STATUS_RESOLVED | typeof STATUS_REJECTED;
+export type CacheRecordStatus =
+  | typeof STATUS_PENDING
+  | typeof STATUS_RESOLVED
+  | typeof STATUS_REJECTED;
+
+export type SubscribeCallback = (status: CacheRecordStatus | undefined) => void;
+export type UnsubscribeFromCacheStatusFunction = () => void;
 
 export interface GenericCache<TExtraParams extends Array<any>, TParams extends Array<any>, TValue> {
-  getValueSuspense(...args: [...TExtraParams, ...TParams]): TValue;
-  getValueAsync(...args: [...TExtraParams, ...TParams]): Thennable<TValue> | TValue;
-  getValueIfCached(...args: TParams): { value: TValue } | undefined;
   addValue(value: TValue, ...args: TParams): void;
-  getStatus(...args: TParams): CacheRecordStatus | undefined;
   getCacheKey(...args: TParams): string;
+  getStatus(...args: TParams): CacheRecordStatus | undefined;
+  getValueAsync(...args: [...TParams, ...TExtraParams]): Thennable<TValue> | TValue;
+  getValueIfCached(...args: TParams): { value: TValue } | undefined;
+  getValueSuspense(...args: [...TParams, ...TExtraParams]): TValue;
+  remove(...args: TParams): void;
+  subscribeToStatus: (
+    callback: SubscribeCallback,
+    ...args: TParams
+  ) => UnsubscribeFromCacheStatusFunction;
 }
 
 export function createGenericCache<
@@ -32,14 +43,14 @@ export function createGenericCache<
   TValue
 >(
   debugLabel: string,
-  extraParamsLength: TExtraParams["length"],
-  fetchValue: (...args: [...TExtraParams, ...TParams]) => Thennable<TValue> | TValue,
+  fetchValue: (...args: [...TParams, ...TExtraParams]) => Thennable<TValue> | TValue,
   getCacheKey: (...args: TParams) => string
 ): GenericCache<TExtraParams, TParams, TValue> {
   const recordMap = new Map<string, Record<TValue>>();
+  const subscriberMap = new Map<string, Set<SubscribeCallback>>();
 
-  function getOrCreateRecord(...args: [...TExtraParams, ...TParams]): Record<TValue> {
-    const cacheKey = getCacheKey(...(args.slice(extraParamsLength) as TParams));
+  function getOrCreateRecord(...args: [...TParams, ...TExtraParams]): Record<TValue> {
+    const cacheKey = getCacheKey(...(args as unknown as TParams));
 
     let record = recordMap.get(cacheKey);
     if (!record) {
@@ -51,16 +62,50 @@ export function createGenericCache<
 
       recordMap.set(cacheKey, record);
 
+      notifySubscribers(...(args as unknown as TParams));
+
       fetchAndStoreValue(record, record.value, ...args).catch(handleError);
     }
 
     return record;
   }
 
+  function notifySubscribers(...args: TParams) {
+    const cacheKey = getCacheKey(...args);
+    const set = subscriberMap.get(cacheKey);
+    if (set) {
+      set.forEach(callback => callback(getStatus(...args)));
+    }
+  }
+
+  function subscribeToStatus(callback: SubscribeCallback, ...args: TParams) {
+    const cacheKey = getCacheKey(...args);
+    let set = subscriberMap.get(cacheKey);
+    if (set) {
+      set.add(callback);
+    } else {
+      set = new Set([callback]);
+      subscriberMap.set(cacheKey, set);
+    }
+
+    try {
+      const status = getStatus(...args);
+
+      callback(status);
+    } finally {
+      return () => {
+        set!.delete(callback);
+        if (set!.size === 0) {
+          subscriberMap.delete(cacheKey);
+        }
+      };
+    }
+  }
+
   async function fetchAndStoreValue(
     record: Record<TValue>,
     wakeable: Wakeable<TValue>,
-    ...args: [...TExtraParams, ...TParams]
+    ...args: [...TParams, ...TExtraParams]
   ) {
     try {
       const valueOrThennable = fetchValue(...args);
@@ -75,11 +120,18 @@ export function createGenericCache<
       record.value = error;
 
       wakeable.reject(error);
+    } finally {
+      notifySubscribers(...(args as unknown as TParams));
     }
   }
 
+  function getStatus(...args: TParams) {
+    const cacheKey = getCacheKey(...args);
+    return recordMap.get(cacheKey)?.status;
+  }
+
   return {
-    getValueSuspense(...args: [...TExtraParams, ...TParams]): TValue {
+    getValueSuspense(...args: [...TParams, ...TExtraParams]): TValue {
       const record = getOrCreateRecord(...args);
       if (record.status === STATUS_RESOLVED) {
         return record.value;
@@ -88,7 +140,7 @@ export function createGenericCache<
       }
     },
 
-    getValueAsync(...args: [...TExtraParams, ...TParams]): Thennable<TValue> | TValue {
+    getValueAsync(...args: [...TParams, ...TExtraParams]): Thennable<TValue> | TValue {
       const record = getOrCreateRecord(...args);
       switch (record.status) {
         case STATUS_PENDING:
@@ -119,12 +171,16 @@ export function createGenericCache<
       recordMap.set(cacheKey, { status: STATUS_RESOLVED, value });
     },
 
-    getStatus(...args: TParams) {
-      const cacheKey = getCacheKey(...args);
-      return recordMap.get(cacheKey)?.status;
-    },
+    getStatus,
 
     getCacheKey,
+
+    remove(...args) {
+      const cacheKey = getCacheKey(...args);
+      recordMap.delete(cacheKey);
+    },
+
+    subscribeToStatus,
   };
 }
 

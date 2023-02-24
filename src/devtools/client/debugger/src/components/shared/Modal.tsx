@@ -10,27 +10,34 @@ import { Transition } from "react-transition-group";
 
 export const transitionTimeout = 50;
 
-export class Modal extends React.Component {
-  onClick = e => {
-    e.stopPropagation();
-  };
-
-  render() {
-    const { additionalClass, children, handleClose, status, width } = this.props;
-
-    return (
-      <div className="modal-wrapper" onClick={handleClose}>
-        <div
-          style={{ width }}
-          className={classnames("modal", additionalClass, status)}
-          onClick={this.onClick}
-        >
-          {children}
-        </div>
-      </div>
-    );
-  }
+interface IModalProps {
+  additionalClass: string;
+  children: React.ReactNode;
+  handleClose: () => void;
+  width: string | number;
+  status?: string;
 }
+
+interface ISlideProps extends IModalProps {
+  in: boolean | undefined;
+}
+
+export const Modal = ({ additionalClass, children, handleClose, status, width }: IModalProps) => {
+  const onClick = (e: React.MouseEvent) => e.stopPropagation();
+  return (
+    <div className="modal-wrapper" onClick={handleClose}>
+      <div
+        style={{
+          width,
+        }}
+        className={classnames("modal", additionalClass, status)}
+        onClick={onClick}
+      >
+        {children}
+      </div>
+    </div>
+  );
+};
 
 export default function Slide({
   width = "50%",
@@ -38,7 +45,7 @@ export default function Slide({
   children,
   additionalClass,
   handleClose,
-}) {
+}: ISlideProps) {
   return (
     <Transition in={inProp} timeout={transitionTimeout} appear>
       {status => (

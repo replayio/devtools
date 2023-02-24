@@ -17,8 +17,7 @@ export const {
   PointDescription[] | undefined
 >(
   "FrameStepsCache: getFrameSteps",
-  1,
-  async (client, pauseId, frameId) => {
+  async (pauseId, frameId, client) => {
     try {
       const frameSteps = await client.getFrameSteps(pauseId, frameId);
       const updatedFrameSteps = cloneDeep(frameSteps);
@@ -40,7 +39,7 @@ export const useGetFrameSteps = createUseGetValue<
   PointDescription[] | undefined
 >(
   async (replayClient, pauseId, frameId) =>
-    pauseId && frameId ? await getFrameStepsAsync(replayClient, pauseId, frameId) : undefined,
+    pauseId && frameId ? await getFrameStepsAsync(pauseId, frameId, replayClient) : undefined,
   (replayClient, pauseId, frameId) =>
     pauseId && frameId ? getFrameStepsIfCached(pauseId, frameId) : { value: undefined },
   (replayClient, pauseId, frameId) => getCacheKey(pauseId!, frameId!)
@@ -52,7 +51,7 @@ export async function getFrameStepForFrameLocation(
   protocolFrameId: string,
   location: Location
 ) {
-  const frameSteps = await getFrameStepsAsync(replayClient, pauseId, protocolFrameId);
+  const frameSteps = await getFrameStepsAsync(pauseId, protocolFrameId, replayClient);
 
   const matchingFrameStep = frameSteps?.find(step => {
     return step.frame?.find(location => {

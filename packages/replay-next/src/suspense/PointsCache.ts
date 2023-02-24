@@ -17,11 +17,10 @@ export const {
   Point[]
 >(
   "PointsCache: getPointsGraphQL",
-  2,
   async (
+    recordingId: RecordingId,
     graphQLClient: GraphQLClientInterface,
-    accessToken: string | null,
-    recordingId: RecordingId
+    accessToken: string | null
   ) => await getPointsGraphQL(graphQLClient, recordingId, accessToken),
   (recordingId: RecordingId) => recordingId
 );

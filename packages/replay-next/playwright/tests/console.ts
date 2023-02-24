@@ -70,6 +70,19 @@ test("should display toggleable stack for errors", async ({ page }) => {
   await takeScreenshot(page, listItem, "error-stack-expanded");
 });
 
+// 27a42866-ffd6-4f74-8813-c4feb2b78b6c
+test("should show error object stacks by default", async ({ page }) => {
+  await setup(page);
+  await toggleProtocolMessage(page, "errors", true);
+
+  const listItem = await locateMessage(page, "console-error", "This is an error object");
+  await takeScreenshot(page, listItem, "error-object-stack");
+
+  const toggle = listItem.locator("[role=button]", { hasText: "This is an error object" });
+  await toggle.click();
+  await takeScreenshot(page, listItem, "error-object-stack-expanded");
+});
+
 test("should display toggleable stack for warnings", async ({ page }) => {
   await setup(page);
   await toggleProtocolMessage(page, "warnings", true);
@@ -435,6 +448,8 @@ test("should add this keyword to the list of suggestions", async ({ page }) => {
   const listItem = await locateMessage(page, "console-log", "This is a log");
   await seekToMessage(page, listItem);
 
+  await delay(100);
+
   await page.fill("[data-test-id=ConsoleTerminalInput]", "th");
   await verifyTypeAheadContainsSuggestions(page, "this", "globalThis");
 });
@@ -445,6 +460,8 @@ test("should add true/false keywords to the list of suggestions", async ({ page 
 
   const listItem = await locateMessage(page, "console-log", "This is a log");
   await seekToMessage(page, listItem);
+
+  await delay(100);
 
   await page.fill("[data-test-id=ConsoleTerminalInput]", "tr");
   await verifyTypeAheadContainsSuggestions(page, "true");
