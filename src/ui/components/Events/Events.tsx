@@ -15,7 +15,7 @@ function CurrentTimeLine({ isActive }: { isActive: boolean }) {
   return (
     <div
       className={classNames("m-0", isActive ? "bg-secondaryAccent" : "bg-transparent")}
-      style={{ height: "3px" }}
+      style={{ height: "2px" }}
     />
   );
 }
