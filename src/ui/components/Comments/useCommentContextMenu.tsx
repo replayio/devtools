@@ -35,13 +35,13 @@ export default function useCommentContextMenu({
   const confirmDelete = () => {
     const deleteDescription =
       type === "comment"
-        ? "Deleting this comment will permanently remove it and its replies"
-        : "Deleting this comment will permanently remove it";
+        ? "This will delete this comment and its replies."
+        : "You're about to delete a comment.";
 
     confirmDestructive({
       acceptLabel: "Delete comment",
-      description: `${deleteDescription}. Are you sure you want to proceed?`,
-      message: type === "comment" ? "Delete comment and replies" : "Delete comment",
+      description: `${deleteDescription}`,
+      message: "Are you sure?",
     }).then(async confirmed => {
       if (!confirmed) {
         return;

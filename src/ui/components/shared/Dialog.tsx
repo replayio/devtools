@@ -57,8 +57,8 @@ export function Dialog({
 
 export const DialogLogo = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
   return (
-    <div {...props} className={classNames("mb-5 flex justify-center", className)}>
-      <ReplayLogo size="md" />
+    <div {...props} className={classNames("my-5 flex justify-center", className)}>
+      <ReplayLogo size="sm" />
     </div>
   );
 };
@@ -92,7 +92,7 @@ export const DialogDescription = ({
   ...props
 }: HTMLProps<HTMLParagraphElement>) => {
   return (
-    <p {...props} className="break-word mb-2 whitespace-pre-wrap text-center text-sm">
+    <p {...props} className="break-word mb-2 whitespace-pre-wrap text-center text-sm px-6">
       {children}
     </p>
   );
