@@ -1,6 +1,15 @@
 import "ui/setup/dynamic/inspector";
 import classnames from "classnames";
-import React, { FC, ReactNode, RefObject, Suspense, useContext, useEffect, useState } from "react";
+import React, {
+  FC,
+  ReactNode,
+  RefObject,
+  Suspense,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from "react";
 import { ImperativePanelHandle } from "react-resizable-panels";
 
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
@@ -165,9 +174,11 @@ function SecondaryToolbox({
   const hasReactComponents = kindsSet.has("react-devtools-hook");
   const hasReduxAnnotations = kindsSet.has("redux-devtools-data");
 
-  if (selectedPanel === "react-components" && !hasReactComponents) {
-    dispatch(setSelectedPanel("console"));
-  }
+  useLayoutEffect(() => {
+    if (selectedPanel === "react-components" && !hasReactComponents) {
+      dispatch(setSelectedPanel("console"));
+    }
+  }, [selectedPanel, hasReactComponents, dispatch]);
 
   useEffect(() => {
     async function fetchKinds() {

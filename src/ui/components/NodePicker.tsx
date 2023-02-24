@@ -101,9 +101,6 @@ export function NodePicker() {
           dispatch(unhighlightNode());
         },
         async onPicked(nodeId) {
-          setGlobalNodePickerActive(false);
-          dispatch(setIsNodePickerActive(false));
-          dispatch(setMouseTargetsLoading(false));
           nodePickerRemoveTime.current = Date.now();
 
           if (nodeId) {
@@ -111,6 +108,10 @@ export function NodePicker() {
           } else {
             dispatch(unhighlightNode());
           }
+
+          setGlobalNodePickerActive(false);
+          dispatch(setIsNodePickerActive(false));
+          dispatch(setMouseTargetsLoading(false));
         },
         onCheckNodeBounds: async (x, y, nodeIds) => {
           const boundingRects = await dispatch(fetchMouseTargetsForPause());
