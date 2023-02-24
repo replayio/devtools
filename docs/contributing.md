@@ -1,10 +1,18 @@
 # Contributing
 
+Replay is a small team building a time traveling debugger for the web. We value focus and try to make every minute count. Therefore we only accept PRs that fit the following criteria:
+
+1. A simple change that fixes a simple problem, like a typo.
+2. A fix for a bug that is verified with a regression test.
+3. You're a person we have established a relationship with, probably over Discord or Email.
+
+If your pull request does not meet these criteria, it will be closed.
+
 ## Contributors
 
 ### Getting started
 
-DevTools is a React app built with webpack. Here are the steps for getting started, if you have any questions, you can always ask us in our #community Discord channel.
+DevTools is a React app built with webpack. Here are the steps for getting started, if you have any questions, you can always ask us in our Discord server.
 
 ```bash
 git clone git@github.com:RecordReplay/devtools.git
@@ -13,26 +21,6 @@ yarn dev
 ```
 
 Once you see `Compiled succesfully` in your terminal, open your browser and go to [this link](http://localhost:8080/recording/79f0cacd-727b-456d-8970-dbb4866ce6c7).
-
-## Maintainers
-
-### Updating a PR
-
-Github allows maintainers to push to contributor branches
-
-1. check to see if the PR allows edits [link](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/allowing-changes-to-a-pull-request-branch-created-from-a-fork)
-
-2. Add the contributor's fork as a remote e.g.
-
-```bash
-git remote add jaril git@github.com:jaril/webreplay-devtools.git
-```
-
-3. push your updates
-
-```bash
-git push jaril readme-changes
-```
 
 ## Issue Labeling Guide
 
