@@ -7,9 +7,47 @@ import {
 } from "replay-next/components/sources/utils/comments";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import useTooltip from "replay-next/src/hooks/useTooltip";
+import { UIAction, UIThunkAction } from "ui/actions";
+import { getIsNodePickerActive } from "ui/actions/app";
 import { createFrameComment } from "ui/actions/comments";
 import { useAppDispatch } from "ui/setup/hooks";
 import useAuth0 from "ui/utils/useAuth0";
+
+function addVideoComment(
+  recordingId: RecordingId,
+  isAuthenticated: boolean,
+  event: MouseEvent,
+  showCommentsPanel: (() => void) | null
+): UIThunkAction {
+  return async (dispatch, getState) => {
+    const isNodePickerActive = getIsNodePickerActive(getState());
+
+    if (isNodePickerActive) {
+      // User was trying to select something from the video preview, not add a comment
+      return;
+    }
+
+    // Un-authenticated users can't comment on Replays.
+    if (isAuthenticated) {
+      const position = mouseEventCanvasPosition(event);
+
+      let typeData: VisualCommentTypeData | null = null;
+
+      const canvas = document.querySelector("canvas#graphics");
+      if (canvas) {
+        typeData = await createTypeDataForVisualComment(
+          canvas as HTMLCanvasElement,
+          event.pageX,
+          event.pageY
+        );
+      }
+
+      dispatch(createFrameComment(position, recordingId, typeData));
+    }
+
+    showCommentsPanel?.();
+  };
+}
 
 export default function useVideoCommentTool({
   areMouseTargetsLoading,
@@ -31,26 +69,8 @@ export default function useVideoCommentTool({
 
   const { isAuthenticated } = useAuth0();
 
-  const onClick = async (event: MouseEvent) => {
-    // Un-authenticated users can't comment on Replays.
-    if (isAuthenticated) {
-      const position = mouseEventCanvasPosition(event);
-
-      let typeData: VisualCommentTypeData | null = null;
-
-      const canvas = document.querySelector("canvas#graphics");
-      if (canvas) {
-        typeData = await createTypeDataForVisualComment(
-          canvas as HTMLCanvasElement,
-          event.pageX,
-          event.pageY
-        );
-      }
-
-      dispatch(createFrameComment(position, recordingId, typeData));
-    }
-
-    showCommentsPanel?.();
+  const onClick = (event: MouseEvent) => {
+    dispatch(addVideoComment(recordingId, isAuthenticated, event, showCommentsPanel));
   };
 
   return { onClick, onMouseEnter, onMouseLeave, onMouseMove, tooltip };

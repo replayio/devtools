@@ -11,34 +11,33 @@ export interface NodePickerOpts {
   enabledNodeIds?: string[];
 }
 
-interface Position {
-  x: number;
-  y: number;
-}
-
 export class NodePicker {
   private opts: NodePickerOpts | undefined;
-  private pickerPosition: Position | undefined;
   private hoveredNodeId: string | undefined;
+
+  private canvas: HTMLElement | null = null;
 
   enable(opts: NodePickerOpts) {
     this.opts = opts;
-    document.body.addEventListener("mousemove", this.onMouseMove);
-    document.body.addEventListener("mouseup", this.onMouseClick);
+    this.canvas = document.getElementById("graphics");
+    if (this.canvas) {
+      this.canvas.addEventListener("mousemove", this.onMouseMove);
+      this.canvas.addEventListener("click", this.onMouseClick);
+    }
   }
 
   disable() {
-    document.body.removeEventListener("mousemove", this.onMouseMove);
-    document.body.removeEventListener("mouseup", this.onMouseClick);
+    if (this.canvas) {
+      this.canvas.removeEventListener("mousemove", this.onMouseMove);
+      this.canvas.removeEventListener("click", this.onMouseClick);
+    }
     this.opts = undefined;
-    this.pickerPosition = undefined;
     this.hoveredNodeId = undefined;
   }
 
   private onMouseMove = async (e: MouseEvent) => {
     const pos = this.mouseEventCanvasPosition(e);
     const opts = this.opts;
-    this.pickerPosition = pos;
     let nodeBounds: NodeBounds | null = null;
     if (pos) {
       if (opts?.onCheckNodeBounds) {
@@ -58,6 +57,8 @@ export class NodePicker {
   };
 
   private onMouseClick = async (e: MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     const opts = this.opts;
     this.disable();
     const pos = this.mouseEventCanvasPosition(e);
@@ -72,11 +73,10 @@ export class NodePicker {
 
   // Get the x/y coordinate of a mouse event wrt the recording's DOM.
   private mouseEventCanvasPosition(e: MouseEvent) {
-    const canvas = document.getElementById("graphics");
-    if (!canvas) {
+    if (!this.canvas) {
       return undefined;
     }
-    const bounds = canvas.getBoundingClientRect();
+    const bounds = this.canvas.getBoundingClientRect();
     if (
       e.clientX < bounds.left ||
       e.clientX > bounds.right ||
@@ -87,7 +87,7 @@ export class NodePicker {
       return undefined;
     }
 
-    const scale = bounds.width / canvas.offsetWidth;
+    const scale = bounds.width / this.canvas.offsetWidth;
     const pixelRatio = getDevicePixelRatio();
     if (!pixelRatio) {
       return undefined;
