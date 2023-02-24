@@ -14,8 +14,8 @@ interface IModalProps {
   additionalClass: string;
   children: React.ReactNode;
   handleClose: () => void;
-  status: string;
   width: string | number;
+  status?: string;
 }
 
 interface ISlideProps extends IModalProps {
