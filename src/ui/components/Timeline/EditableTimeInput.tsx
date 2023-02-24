@@ -89,6 +89,7 @@ function EditableTimeInput({
         setPendingValue(defaultValue);
         break;
       case "Enter":
+      case "NumpadEnter":
         // we don't want this event to reach the handler in FocusModePopout
         event.nativeEvent.cancelBubble = true;
         // Always save on Enter, even if the value has not been modified.
