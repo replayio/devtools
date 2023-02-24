@@ -73,14 +73,15 @@ const PanelButtons: FC<PanelButtonsProps> = ({
   toolboxLayout,
   recordingCapabilities,
 }) => {
-  const { supportsNetworkRequests, supportsRepaintingGraphics } = recordingCapabilities;
+  const { supportsElementsInspector, supportsNetworkRequests, supportsRepaintingGraphics } =
+    recordingCapabilities;
   const { value: chromiumNetMonitorEnabled } = useFeature("chromiumNetMonitor");
 
   return (
     <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
       {supportsRepaintingGraphics && <NodePicker />}
       <PanelButton panel="console">Console</PanelButton>
-      <PanelButton panel="inspector">Elements</PanelButton>
+      {supportsElementsInspector && <PanelButton panel="inspector">Elements</PanelButton>}
       {toolboxLayout !== "ide" && (
         <PanelButton panel="debugger">
           <SourcesTabLabel />
