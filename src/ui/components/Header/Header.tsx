@@ -165,9 +165,9 @@ export default function Header() {
 
   const onNavigateBack: React.MouseEventHandler = event => {
     if (event.metaKey) {
-      return window.open(dashboardUrl, 'library-tab');
+      return window.open(dashboardUrl, "library-tab");
     }
-    window.open(dashboardUrl, 'library-tab');
+    window.open(dashboardUrl, "library-tab");
   };
 
   if (loading) {
