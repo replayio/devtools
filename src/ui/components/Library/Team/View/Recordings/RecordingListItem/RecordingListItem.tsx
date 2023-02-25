@@ -141,7 +141,7 @@ function RecordingRow({
           <div className="flex flex-row items-center space-x-4 overflow-hidden">
             <div className="h-9 w-16 flex-shrink-0 overflow-hidden rounded-sm bg-chrome">
               <LazyLoad height={36} scrollContainer="#recording-list" once>
-                <ItemScreenshot recordingId={recording.id} />
+                <ItemScreenshot recordingId={recording.id} recordingTitle={recording.title} />
               </LazyLoad>
             </div>
 
@@ -157,14 +157,14 @@ function RecordingRow({
                   className="flex flex-row items-center space-x-1 overflow-hidden overflow-ellipsis whitespace-pre"
                   style={{ minWidth: "5rem" }}
                 >
-                  <img src="/images/timer.svg" className="w-3" />
+                  <img src="/images/timer.svg" className="w-3" alt="Timer logo" />
                   <span>{getDurationString(recording.duration)}</span>
                 </div>
                 <div
                   className="flex flex-row items-center space-x-1 overflow-hidden overflow-ellipsis whitespace-pre"
                   style={{ minWidth: "6rem" }}
                 >
-                  <img src="/images/today.svg" className="w-3" />
+                  <img src="/images/today.svg" className="w-3" alt="Calendar logo" />
                   <span>{getRelativeDate(recording.date)}</span>
                 </div>
                 <div className="overflow-hidden overflow-ellipsis whitespace-pre font-light text-gray-400">
@@ -191,7 +191,7 @@ function RecordingRow({
             <div className="inline-block">
               <div className="flex flex-row space-x-1">
                 <span>{recording.comments.length}</span>
-                <img src="/images/comment-outline.svg" className="w-3" />
+                <img src="/images/comment-outline.svg" className="w-3" alt="Comment" />
               </div>
             </div>
           ) : (
@@ -209,11 +209,11 @@ function RecordingRow({
   );
 }
 
-export function ItemScreenshot({ recordingId }: { recordingId: RecordingId }) {
+export function ItemScreenshot({ recordingId, recordingTitle }: { recordingId: RecordingId, recordingTitle?: string | null }) {
   const { screenData } = hooks.useGetRecordingPhoto(recordingId);
   return (
     <Redacted>
-      <div>{screenData && <img className="h-9 w-full object-contain" src={screenData} />}</div>
+      <div>{screenData && <img className="h-9 w-full object-contain" src={screenData} alt={`Recording - ${recordingTitle} Preview`} />}</div>
     </Redacted>
   );
 }

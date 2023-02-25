@@ -32,7 +32,7 @@ export default function WelcomeBox() {
             >
               <div className="w-full truncate pt-1 text-right">Command palette</div>
               <div className="flex w-full flex-row">
-                <img src="/images/command.svg" /> <img src="/images/k.svg" />
+                <img src="/images/command.svg" alt="Command key" /> <img src="/images/k.svg" alt="K Letter" />
               </div>
             </div>
             <div
@@ -41,7 +41,7 @@ export default function WelcomeBox() {
             >
               <div className="w-full pt-1 text-right">Go to file</div>
               <div className="flex w-full flex-row">
-                <img src="/images/command.svg" /> <img src="/images/p.svg" />
+                <img src="/images/command.svg" alt="Command key" /> <img src="/images/p.svg" alt="P Letter" />
               </div>
             </div>
             <div
@@ -50,8 +50,8 @@ export default function WelcomeBox() {
             >
               <div className="w-full pt-1 text-right">Find in file</div>
               <div className="flex w-full flex-row">
-                <img src="/images/command.svg" /> <img src="/images/shift.svg" />{" "}
-                <img src="/images/f.svg" />
+                <img src="/images/command.svg" alt="Command key" /> <img src="/images/shift.svg" alt="Shift key" />{" "}
+                <img src="/images/f.svg" alt="F Letter" />
               </div>
             </div>
           </div>

@@ -46,14 +46,14 @@ function MockRecordingRow({ date, name }: { date: string; name: string }) {
                 className="flex flex-row items-center space-x-1 overflow-hidden overflow-ellipsis whitespace-pre"
                 style={{ minWidth: "5rem" }}
               >
-                <img src="/images/timer.svg" className="w-3" />
+                <img src="/images/timer.svg" className="w-3" alt="Timer logo" />
                 <span>{getDurationString(Math.floor(Math.random() * 120000))}</span>
               </div>
               <div
                 className="flex flex-row items-center space-x-1 overflow-hidden overflow-ellipsis whitespace-pre"
                 style={{ minWidth: "6rem" }}
               >
-                <img src="/images/today.svg" className="w-3" />
+                <img src="/images/today.svg" className="w-3" alt="Calendar logo" />
                 <span>{getRelativeDate(date)}</span>
               </div>
               <div className="overflow-hidden overflow-ellipsis whitespace-pre text-gray-400">

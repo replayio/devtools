@@ -58,7 +58,7 @@ const csp = (props: any) => {
 export default class MyDocument extends Document {
   render() {
     return (
-      <Html>
+      <Html lang="en">
         <Head>
           {/* nosemgrep typescript.react.security.audit.react-http-leak.react-http-leak */}
           <meta httpEquiv="Content-Security-Policy" content={csp(this.props)} />

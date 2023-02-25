@@ -39,7 +39,7 @@ export default function PlayPauseButton() {
   return (
     <button className="relative" onClick={onClick}>
       <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
-        <img className="m-auto h-6 w-6" src={icon} />
+        <img className="m-auto h-6 w-6" src={icon} alt="Play pause logo" />
       </div>
     </button>
   );
