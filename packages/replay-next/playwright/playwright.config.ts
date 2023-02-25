@@ -1,4 +1,5 @@
 import { FullConfig } from "@playwright/test";
+import { devices } from "@replayio/playwright";
 
 const { CI, RECORD_PROTOCOL_DATA, RECORD_VIDEO, SLOW_MO, VISUAL_DEBUG } = process.env;
 
@@ -23,8 +24,7 @@ const config: FullConfig = {
     launchOptions: {
       slowMo,
     },
-    trace: "on-first-retry",
-    video: RECORD_VIDEO ? "on" : "off",
+
     viewport: {
       width: 1024,
       height: 600,
@@ -34,6 +34,14 @@ const config: FullConfig = {
   testMatch: ["tests/**/*.ts"],
   timeout: 30_000,
 };
+
+if (CI) {
+  // @ts-ignore
+  config.use.launchOptions = {
+    ...devices["Replay Chromium"].launchOptions,
+    slowMo,
+  };
+}
 
 if (VISUAL_DEBUG || RECORD_PROTOCOL_DATA) {
   config.workers = 1;

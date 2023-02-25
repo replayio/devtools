@@ -71,15 +71,6 @@ export default function Timeline() {
       setResumePlaybackOnMouseUp(true);
       dispatch(stopPlayback(false));
     }
-
-    const mouseTime = getTimeFromPosition(
-      event.pageX,
-      progressBarRef.current!.getBoundingClientRect(),
-      zoomRegion
-    );
-
-    dispatch(setTimelineState({ currentTime: mouseTime }));
-    dispatch(setTimelineToTime(mouseTime, true));
   };
 
   const onMouseMove = (event: MouseEvent) => {
@@ -108,8 +99,12 @@ export default function Timeline() {
       zoomRegion
     );
 
+    if (!editMode) {
+      // If we're editing focus mode, don't update the current time marker.
+      dispatch(seekToTime(mouseTime, resumePlaybackOnMouseUp));
+    }
+
     dispatch(setDragging(false));
-    dispatch(seekToTime(mouseTime, resumePlaybackOnMouseUp));
 
     if (resumePlaybackOnMouseUp) {
       setResumePlaybackOnMouseUp(false);

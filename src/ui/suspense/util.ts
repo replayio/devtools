@@ -15,11 +15,11 @@ export function getAsyncParentPauseIdSuspense(
   loadedRegions: TimeStampedPointRange[]
 ): PauseId | null | undefined {
   while (asyncIndex > 0) {
-    const frames = getFramesSuspense(replayClient, pauseId)!;
+    const frames = getFramesSuspense(pauseId, replayClient)!;
     if (!frames?.length) {
       return;
     }
-    const steps = getFrameStepsSuspense(replayClient, pauseId, frames[frames.length - 1].frameId);
+    const steps = getFrameStepsSuspense(pauseId, frames[frames.length - 1].frameId, replayClient);
     if (!steps?.length) {
       return;
     }

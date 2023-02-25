@@ -40,7 +40,13 @@ export default function Video() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const { onClick, onMouseEnter, onMouseLeave, onMouseMove, tooltip } = useVideoCommentTool({
+  const {
+    onClick: onVideoCommentClick,
+    onMouseEnter,
+    onMouseLeave,
+    onMouseMove,
+    tooltip,
+  } = useVideoCommentTool({
     areMouseTargetsLoading: mouseTargetsLoading,
     canvasRef,
     recordingId: recordingId!,
@@ -75,6 +81,14 @@ export default function Video() {
     if (isNodePickerActive || isNodePickerInitializing) {
       return;
     }
+  };
+
+  const onClick = (e: React.MouseEvent) => {
+    if (isNodePickerActive || isNodePickerInitializing) {
+      return;
+    }
+
+    onVideoCommentClick(e);
   };
 
   const showCommentTool =

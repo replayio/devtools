@@ -2,6 +2,7 @@ import { ForwardedRef, MutableRefObject, ReactNode, forwardRef, useContext, useM
 
 import Icon from "replay-next/components/Icon";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import useLoadedRegions from "replay-next/src/hooks/useRegions";
 import { getMessagesSuspense } from "replay-next/src/suspense/MessagesCache";
@@ -42,6 +43,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
   const replayClient = useContext(ReplayClientContext);
   const [searchState] = useContext(ConsoleSearchContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
+  const { endpoint } = useContext(SessionContext);
 
   const loadedRegions = useLoadedRegions(replayClient);
 
@@ -63,7 +65,11 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
 
   // TRICKY
   // Message filtering is done client-side, but overflow/counts are server-side so it comes from Suspense.
-  const { countAfter, countBefore, didOverflow } = getMessagesSuspense(replayClient, focusRange);
+  const { countAfter, countBefore, didOverflow } = getMessagesSuspense(
+    replayClient,
+    focusRange,
+    endpoint
+  );
 
   // This component only needs to render a pending UI when a focus changes,
   // because this might require an async backend request.

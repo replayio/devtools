@@ -2,12 +2,11 @@
   display: flex;
   border-bottom: 1px;
   flex-shrink: 0;
-  font-size: 15px;
+  font-size: var(--font-size-large);
   line-height: 19px;
   font-weight: 400;
   color: var(--body-color);
   overflow: hidden;
-  white-space: nowrap;
   text-overflow: ellipsis;
   padding: 8px;
   border-bottom: 1px;
@@ -33,4 +32,39 @@
 
 .ErrorTextLighter {
   color: var(--testsuites-error-icon-bgcolor);
+}
+
+.TourBox {
+  padding: 0.5em;
+  color: #fff;
+  background: linear-gradient(116.71deg, #ff2f86 21.74%, #ec275d 83.58%),
+    linear-gradient(133.71deg, #01acfd 3.31%, #f155ff 106.39%, #f477f8 157.93%, #f33685 212.38%),
+    #007aff;
+  border-radius: 4px;
+}
+
+.TourBox button {
+  background-color: #fff;
+  color: #f33685;
+  display: flex;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  align-items: center;
+  border-radius: 0.25rem;
+}
+
+.TourBox button:hover {
+  background-color: #fee;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.TourBox h2 {
+  font-size: var(--font-size-large);
+  margin-bottom: 0.25em;
+  font-weight: bold;
+}
+
+.TourBox p {
+  font-size: var(--font-size-regular);
 }

@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React, { useEffect, useRef } from "react";
 
-import { setTimelineToTime, updateDisplayedFocusRegion } from "ui/actions/timeline";
+import { updateDisplayedFocusRegion } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPositionFromTime, getTimeFromPosition } from "ui/utils/timeline";
@@ -31,7 +31,6 @@ export default function ConditionalFocuser({ editMode, setEditMode }: Props) {
 
 function Focuser({ editMode, setEditMode }: Props) {
   const dispatch = useAppDispatch();
-  const currentTime = useAppSelector(selectors.getCurrentTime);
   const displayedFocusRegion = useAppSelector(selectors.getDisplayedFocusRegion);
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
 
@@ -60,9 +59,6 @@ function Focuser({ editMode, setEditMode }: Props) {
           }
 
           setEditMode(null);
-
-          // Once dragging stops, reset the preview to the current time.
-          dispatch(setTimelineToTime(currentTime));
           break;
         }
       }

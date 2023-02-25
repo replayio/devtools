@@ -26,7 +26,7 @@ cp .env.sample .env
 yarn dev
 ```
 
-Once you see `Compiled succesfully` in your terminal, open your browser and go to [this link](http://localhost:8080/recording/d5ce272f-a3de-4af6-8943-2595cb54f1e3).
+Once you see `Compiled succesfully` in your terminal, open your browser and go to [this link](http://localhost:8080/recording/overboard--5fea8bd7-b755-42d4-8941-e915430137ba).
 
 **You just successfully opened your first Replay recording!** That recording uses your locally running copy of Replay DevTools to debug our test recording.
 

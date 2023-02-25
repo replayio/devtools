@@ -1,9 +1,18 @@
-import { MouseEvent, ReactNode, RefObject, useLayoutEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  MouseEvent,
+  ReactNode,
+  RefObject,
+  SetStateAction,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 import Tooltip from "replay-next/components/Tooltip";
 import useDebouncedCallback from "replay-next/src/hooks/useDebouncedCallback";
 
-type TooltipPosition = "above" | "below" | "left-of" | "right-of";
+export type TooltipPosition = "above" | "below" | "left-of" | "right-of";
 
 export const MARGIN_LARGE = 8;
 export const MARGIN_SMALL = 4;

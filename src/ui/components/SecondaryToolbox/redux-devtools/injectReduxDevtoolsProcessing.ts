@@ -3,7 +3,7 @@ import { ExecutionPoint, Value } from "@replayio/protocol";
 import type { ThreadFront as TF } from "protocol/thread";
 import { ThreadFront } from "protocol/thread";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
-import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
+import { getTopFrameAsync } from "replay-next/src/suspense/FrameCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 
@@ -131,15 +131,14 @@ export const { getValueAsync: getActionStateValuesAsync } = createGenericCache<
   ReduxActionStateValues | undefined
 >(
   "reduxDevtools: getActionStateValues",
-  1,
-  async (replayClient, point, time) => {
+  async (point, time, replayClient) => {
     const pauseId = await getPauseIdAsync(replayClient, point, time);
     if (!pauseId) {
       return;
     }
 
-    const frames = await getFramesAsync(replayClient, pauseId);
-    if (!frames) {
+    const topFrame = await getTopFrameAsync(pauseId, replayClient);
+    if (!topFrame) {
       return;
     }
 
@@ -148,7 +147,7 @@ export const { getValueAsync: getActionStateValuesAsync } = createGenericCache<
       replayClient,
       getActionObjectId,
       pauseId,
-      frames[0].frameId
+      topFrame.frameId
     );
 
     const stateRes = await evaluateNoArgsFunction(
@@ -156,7 +155,7 @@ export const { getValueAsync: getActionStateValuesAsync } = createGenericCache<
       replayClient,
       getStateObjectId,
       pauseId,
-      frames[0].frameId
+      topFrame.frameId
     );
 
     if (actionRes.returned && stateRes.returned) {
@@ -173,15 +172,14 @@ export const { getValueAsync: getDiffAsync } = createGenericCache<
   Delta | undefined
 >(
   "reduxDevtools: getDiff",
-  1,
-  async (replayClient, point, time) => {
+  async (point, time, replayClient) => {
     const pauseId = await getPauseIdAsync(replayClient, point, time);
     if (!pauseId) {
       return;
     }
 
-    const frames = await getFramesAsync(replayClient, pauseId);
-    if (!frames) {
+    const topFrame = await getTopFrameAsync(pauseId, replayClient);
+    if (!topFrame) {
       return;
     }
 
@@ -198,7 +196,7 @@ export const { getValueAsync: getDiffAsync } = createGenericCache<
       replayClient,
       diffStates,
       pauseId,
-      frames[0].frameId
+      topFrame.frameId
     );
 
     if (diffResult.returned?.value) {

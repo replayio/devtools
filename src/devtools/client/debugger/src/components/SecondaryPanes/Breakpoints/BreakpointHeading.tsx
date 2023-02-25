@@ -17,9 +17,10 @@ import { CloseButton } from "../../shared/Button";
 import styles from "./BreakpointHeading.module.css";
 
 type BHExtraProps = {
-  sourceId: SourceId;
   breakpoint: Point;
+  allBreakpointsAreShared: boolean;
   onRemoveBreakpoints: (cx: Context, source: MiniSource) => void;
+  sourceId: SourceId;
 };
 
 const mapStateToProps = (state: UIState, { sourceId }: BHExtraProps) => {
@@ -72,7 +73,7 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
   };
 
   render() {
-    const { source, hasSiblingOfSameName } = this.props;
+    const { allBreakpointsAreShared, source, hasSiblingOfSameName } = this.props;
 
     const query = hasSiblingOfSameName ? getSourceQueryString(source) : "";
     const fileName = getTruncatedFileName(source, query);
@@ -85,10 +86,12 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
         onClick={this.onClick}
       >
         <Redacted className={styles.Label}>{fileName}</Redacted>
-        <CloseButton
-          handleClick={this.removeBreakpoint}
-          tooltip={"Remove all breakpoint from this source"}
-        />
+        {allBreakpointsAreShared || (
+          <CloseButton
+            handleClick={this.removeBreakpoint}
+            tooltip={"Remove all breakpoint from this source"}
+          />
+        )}
       </div>
     );
   }

@@ -31,7 +31,7 @@ export function ToggleShowPrivacyButton({
     <button
       type="button"
       onClick={() => setShowPrivacy(!showPrivacy)}
-      className="group flex w-full flex-row items-center justify-between rounded-lg px-3 pt-3 text-left font-normal"
+      className="group flex w-full flex-row items-center justify-between px-3 py-1 text-left font-normal"
     >
       <div className="flex flex-row items-center space-x-2">
         <MaterialIcon iconSize="xl">storage</MaterialIcon>

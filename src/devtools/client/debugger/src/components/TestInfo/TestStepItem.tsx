@@ -1,5 +1,5 @@
 import classNamesBind from "classnames/bind";
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { setHighlightedNodesLoading } from "devtools/client/inspector/markup/reducers/markup";
@@ -63,33 +63,34 @@ export function TestStepItem({
   autoSelect = false,
 }: TestStepItemProps) {
   const isHovered = useRef(false);
-  const hasScrolled = useRef(false);
+  const autoSelectState = useRef(0);
   const ref = useRef<HTMLDivElement>(null);
-  const [subjectNodePauseData, setSubjectNodePauseData] = useState<
-    Promise<{
-      pauseId: string | undefined;
-      nodeIds: string[] | undefined;
-      point: string | undefined;
-    }>
-  >();
+  const client = useContext(ReplayClientContext);
+  const getSubjectNodePauseData = useMemo(() => {
+    let promise: ReturnType<typeof getCypressSubjectNodeIdsAsync> | undefined;
+
+    return async () => {
+      if (!promise) {
+        promise = getCypressSubjectNodeIdsAsync(client, step);
+      }
+
+      return promise;
+    };
+  }, [client, step]);
   const viewMode = useAppSelector(getViewMode);
   const isPlaying = useAppSelector(isPlayingSelector);
   const currentTime = useAppSelector(getCurrentTime);
   const selectedStep = useAppSelector(getSelectedStep);
   const dispatch = useAppDispatch();
-  const client = useContext(ReplayClientContext);
   const state = useStepState(step);
   const actions = useTestStepActions(step);
   const info = useTestInfo();
 
-  useEffect(() => {
-    setSubjectNodePauseData(getCypressSubjectNodeIdsAsync(client, step));
-  }, [client, step]);
-
   const onClick = useCallback(async () => {
     const { timeRange, pointRange } = getStepRanges(step);
-    if (id && timeRange && subjectNodePauseData) {
-      const pauseData = await awaitWithTimeout(subjectNodePauseData);
+
+    if (id && timeRange) {
+      const pauseData = await awaitWithTimeout(getSubjectNodePauseData());
       if (pointRange && pauseData !== AwaitTimeout) {
         dispatch(seek(pointRange[1], timeRange[1], false, pauseData.pauseId));
       } else {
@@ -104,20 +105,20 @@ export function TestStepItem({
 
       return true;
     }
-  }, [actions, viewMode, step, subjectNodePauseData, dispatch, id]);
+  }, [actions, viewMode, step, getSubjectNodePauseData, dispatch, id]);
 
   const onMouseEnter = async () => {
     isHovered.current = true;
-    if (state === "paused" || !subjectNodePauseData) {
+    if (state === "paused" || !getSubjectNodePauseData) {
       return;
     }
 
     try {
-      let pauseData = await awaitWithTimeout(subjectNodePauseData);
+      let pauseData = await awaitWithTimeout(getSubjectNodePauseData());
 
       if (pauseData === AwaitTimeout) {
         dispatch(setHighlightedNodesLoading(true));
-        pauseData = await subjectNodePauseData;
+        pauseData = await getSubjectNodePauseData();
 
         if (!isHovered.current) {
           return;
@@ -167,13 +168,18 @@ export function TestStepItem({
   }, [isPlaying, ref, currentTime, step]);
 
   useEffect(() => {
-    if (autoSelect && ref.current && !hasScrolled.current) {
-      onClick().then(clicked => {
-        if (clicked && ref.current) {
-          hasScrolled.current = true;
-          scrollIntoView(ref.current);
-        }
-      });
+    if (autoSelect && ref.current && !autoSelectState.current) {
+      autoSelectState.current = 1;
+      onClick()
+        .then(clicked => {
+          if (clicked && ref.current) {
+            autoSelectState.current = 2;
+            scrollIntoView(ref.current);
+          }
+        })
+        .catch(() => {
+          autoSelectState.current = 0;
+        });
     }
   }, [autoSelect, ref, onClick]);
 
@@ -204,7 +210,7 @@ export function TestStepItem({
         className="flex w-0 flex-grow items-start space-x-2 text-start"
         title={`Step ${index + 1}: ${step.name} ${argString || ""}`}
       >
-        <div className={`flex-grow font-medium break-all ${state === "paused" ? "font-bold" : ""}`}>
+        <div className={`flex-grow break-all font-medium ${state === "paused" ? "font-bold" : ""}`}>
           {step.parentId ? "- " : ""}{" "}
           <span className={`${styles.step} ${styles[step.name]}`}>{step.name}</span>
           <span className="opacity-70">{argString}</span>
@@ -214,15 +220,7 @@ export function TestStepItem({
         <MatchingElementBadge selected={isSelected} step={step} />
       </React.Suspense>
       {step.alias ? (
-        <span
-          className={classNames(
-            "alias",
-            // TODO [ryanjduffy]: Migrate these into the CSS module class
-            "-my-1 flex-shrink rounded p-1 text-xs text-gray-800",
-            isSelected ? "bg-gray-300" : "bg-gray-200"
-          )}
-          title={`'${argString}' aliased as '${step.alias}'`}
-        >
+        <span className={classNames("alias")} title={`'${argString}' aliased as '${step.alias}'`}>
           {step.alias}
         </span>
       ) : null}
@@ -233,11 +231,13 @@ export function TestStepItem({
 
 function MatchingElementBadge({ step, selected }: { step: AnnotatedTestStep; selected: boolean }) {
   const client = useContext(ReplayClientContext);
+  const shouldRenderRef = useRef(selected);
 
-  if (step.name !== "get") {
+  if (step.name !== "get" || (!shouldRenderRef.current && !selected)) {
     return null;
   }
 
+  shouldRenderRef.current = true;
   const { pauseId, consoleProps } = getCypressConsolePropsSuspense(client, step) || {};
 
   const count = consoleProps?.preview?.properties?.find(p => p.name === "Elements")?.value;
@@ -247,16 +247,7 @@ function MatchingElementBadge({ step, selected }: { step: AnnotatedTestStep; sel
     return null;
   }
 
-  return (
-    <span
-      className={classNames(
-        "-my-1 flex-shrink rounded p-1 text-xs text-gray-800",
-        selected ? "bg-gray-300" : "bg-gray-200"
-      )}
-    >
-      {count}
-    </span>
-  );
+  return <span className={classNames("ElementBadge")}>{count}</span>;
 }
 
 function Actions({ step, selected }: { step: AnnotatedTestStep; selected: boolean }) {

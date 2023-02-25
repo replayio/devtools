@@ -73,7 +73,6 @@ const reduxDevToolsOptions: ReduxDevToolsOptions = {
     "protocolMessages/responseReceived",
     "protocolMessages/errorReceived",
     "protocolMessages/requestSent",
-    "app/durationSeen",
     "timeline/setPlaybackPrecachedTime",
   ],
 };

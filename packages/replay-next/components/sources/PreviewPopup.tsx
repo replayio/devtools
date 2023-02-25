@@ -42,7 +42,7 @@ function SuspendingPreviewPopup({
 
   let value: ProtocolValue | null = null;
   if (frameId !== null && pauseId !== null) {
-    const result = evaluateSuspense(client, pauseId, frameId, expression);
+    const result = evaluateSuspense(pauseId, frameId, expression, undefined, client);
 
     value = result.returned || null;
   }

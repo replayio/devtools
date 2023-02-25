@@ -7,7 +7,7 @@ import { client, initSocket } from "protocol/socket";
 import { assert } from "protocol/utils";
 import renderSourcemap from "third-party/sourcemap-visualizer/sourcemapVisualizer";
 import { UIStore } from "ui/actions";
-import { onUnprocessedRegions, setAppMode } from "ui/actions/app";
+import { setAppMode } from "ui/actions/app";
 import { getAccessibleRecording } from "ui/actions/session";
 import { ExpectedErrorScreen } from "ui/components/shared/Error";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
@@ -53,14 +53,6 @@ async function loadSourceMap(
       await client.Authentication.setAccessToken({ accessToken: token.token });
     }
     const { sessionId } = await client.Recording.createSession({ recordingId });
-
-    // this will show a progress bar in the LoadingScreen, note that the
-    // sourcemap visualizer is shown as soon as the requested source and its sourcemap
-    // have been loaded, which may happen before the progress bar reaches 100%
-    client.Session.ensureProcessed({ level: "basic" }, sessionId);
-    client.Session.addUnprocessedRegionsListener(regions =>
-      store.dispatch(onUnprocessedRegions(regions))
-    );
 
     const sources: Map<string, newSource> = new Map();
     client.Debugger.addNewSourceListener(newSource => {

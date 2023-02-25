@@ -2,17 +2,17 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { TimeRange, TimeStampedPoint } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 
-import { UIThunkAction } from "ui/actions";
 import { MAX_FOCUS_REGION_DURATION } from "ui/actions/timeline";
 import { UIState } from "ui/state";
 import { FocusRegion, HoveredItem, TimelineState } from "ui/state/timeline";
+import { getPausePointParams } from "ui/utils/environment";
 import { mergeSortedPointLists } from "ui/utils/timeline";
 
 function initialTimelineState(): TimelineState {
   return {
     allPaintsReceived: false,
     currentTime: 0,
-    focusRegion: null,
+    focusRegion: getPausePointParams()?.focusRegion || null,
     focusRegionBackup: null,
     displayedFocusRegion: null,
     hoverTime: null,
@@ -27,7 +27,6 @@ function initialTimelineState(): TimelineState {
     showFocusModeControls: false,
     stalled: false,
     timelineDimensions: { left: 1, top: 1, width: 1 },
-    unprocessedRegions: [],
     /** @deprecated This appears to be obsolete for now? */
     zoomRegion: { beginTime: 0, endTime: 0, scale: 1 },
     dragging: false,
@@ -113,7 +112,6 @@ export const getShowFocusModeControls = (state: UIState) => state.timeline.showF
 export const isDragging = (state: UIState) => state.timeline.dragging;
 export const isPlaying = (state: UIState) => state.timeline.playback !== null;
 export const isPlaybackStalled = (state: UIState) => state.timeline.stalled;
-export const getUnprocessedRegions = (state: UIState) => state.timeline.unprocessedRegions;
 export const getRecordingDuration = (state: UIState) => state.timeline.recordingDuration;
 export const getTimelineDimensions = (state: UIState) => state.timeline.timelineDimensions;
 export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;

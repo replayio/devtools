@@ -14,7 +14,7 @@
   --theme-body-font-size: 12px;
   --theme-code-font-size: 11px;
   --theme-code-line-height: calc(15 / 11);
-  --theme-tab-font-size: 15px;
+  --theme-tab-font-size: var(--font-size-large);
 
   /* Toolbar size (excluding borders) */
   --theme-toolbar-height: 24px;
@@ -258,8 +258,10 @@
   --context-menu-bgcolor-divider: var(--background-color-contrast-3);
   --context-menu-bgcolor-hover: var(--theme-base-95);
 
-  --comment-card-source-preview-background-color: #081221;
-  --comment-card-source-preview-background-color-hover: #000;
+  --comment-card-preview-background-color-hover: #2d3c4f;
+  --comment-card-preview-background-color: #253446;
+  --comment-card-source-preview-background-color: var(--background-color-current-execution-point);
+  --comment-card-source-preview-background-color-hover: #364052;
   --comment-reply-unpublished-background-color: var(--point-panel-background-color);
   --comment-reply-unpublished-textfield-background-color: #000;
   --comment-reply-unpublished-textfield-color: #fff;
@@ -489,11 +491,13 @@
   --breakpoint-tip: #fff;
 
   /* Testsuites (Dark) */
+  --test-step-border: #000;
+  --testsuites-active-bgcolor: var(--background-color-current-execution-point);
   --testsuites-aside-background-color: var(--theme-base-90);
   --testsuites-aside-color: #fff;
   --testsuites-aside-border-color: #fdce22;
-  --testsuites-capsule-alias-bgcolor: var(--theme-base-85);
-  --testsuites-capsule-alias-color: var(--body-color);
+  --testsuites-capsule-alias-bgcolor: var(--theme-base-90);
+  --testsuites-capsule-alias-color: #fff;
   --testsuites-capsule-alias-selected-bgcolor: var(--theme-base-100);
   --testsuites-capsule-alias-selected-color: var(--body-color);
   --testsuites-capsule-error-bgcolor: rgb(237, 36, 36);
@@ -505,9 +509,11 @@
   --testsuites-error-border-color: var(--testsuites-error-icon-bgcolor);
   --testsuites-error-color: #ffe0e0;
   --testsuites-error-icon-bgcolor: rgb(237, 36, 36);
-  --testsuites-steps-bgcolor-hover: var(--theme-base-90);
-  --testsuites-steps-bgcolor: var(--theme-base-100);
+  --testsuites-steps-bgcolor-hover: #252d3b;
+  --testsuites-steps-bgcolor: #191f2a;
   --testsuites-success-color: #30e60b;
+
+  --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
 
   /* To organise (Dark) */
   --jellyfish-bgcolor: rgba(40, 40, 40, 0.8);
@@ -760,8 +766,10 @@
   --context-menu-bgcolor-hover: var(--theme-base-95);
   --context-menu-bgcolor: #f8f8f9;
 
-  --comment-card-source-preview-background-color-hover: #e6e6e6;
-  --comment-card-source-preview-background-color: #f2f3f2;
+  --comment-card-preview-background-color-hover: #e6e6e6;
+  --comment-card-preview-background-color: #f2f3f2;
+  --comment-card-source-preview-background-color-hover: #e3ecf9;
+  --comment-card-source-preview-background-color: var(--background-color-current-execution-point);
   --comment-reply-unpublished-background-color: var(--point-panel-background-color);
   --comment-reply-unpublished-textfield-background-color: #fff;
   --comment-reply-unpublished-textfield-color: #000;
@@ -991,10 +999,12 @@
   --breakpoint-tip: var(--theme-highlight-purple);
 
   /* Testsuites (Light) */
+  --test-step-border: rgba(0, 0, 0, 0.05);
+  --testsuites-active-bgcolor: var(--background-color-current-execution-point);
   --testsuites-aside-background-color: rgb(254 243 199);
   --testsuites-aside-color: var(--body-color);
   --testsuites-aside-border-color: rgb(253 230 138);
-  --testsuites-capsule-alias-bgcolor: var(--theme-base-85);
+  --testsuites-capsule-alias-bgcolor: var(--theme-base-90);
   --testsuites-capsule-alias-color: var(--body-color);
   --testsuites-capsule-alias-selected-bgcolor: var(--theme-base-100);
   --testsuites-capsule-alias-selected-color: var(--body-color);
@@ -1007,9 +1017,11 @@
   --testsuites-error-border-color: var(--testsuites-error-icon-bgcolor);
   --testsuites-error-color: #eb5757;
   --testsuites-error-icon-bgcolor: rgb(203, 0, 0);
-  --testsuites-steps-bgcolor-hover: #f4f4f4;
-  --testsuites-steps-bgcolor: #f7f7f7;
+  --testsuites-steps-bgcolor-hover: #f7f7f7;
+  --testsuites-steps-bgcolor: #fff;
   --testsuites-success-color: #058b00;
+
+  --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
 
   /* To organise (Light) */
   --jellyfish-bgcolor: rgba(255, 255, 255, 0.8);

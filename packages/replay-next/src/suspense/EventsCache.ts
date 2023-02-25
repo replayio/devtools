@@ -1,3 +1,4 @@
+import { PointRange } from "@replayio/protocol";
 import {
   EventHandlerType,
   ExecutionPoint,
@@ -17,11 +18,12 @@ import { ThreadFront } from 'protocol/thread';
 import { RecordingTarget } from "protocol/thread/thread";
 import { ReplayClientInterface } from "shared/client/types";
 
-import { STANDARD_EVENT_CATEGORIES } from "../constants";
+import { EventCategory, STANDARD_EVENT_CATEGORIES } from "../constants";
 import { groupEntries } from "../utils/group";
 import { createWakeable } from "../utils/suspense";
+import { createGenericCache } from "./createGenericCache";
 import { cachePauseData } from "./PauseCache";
-import { Record as WakeableRecord, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
+import { Record as WakeableRecord, STATUS_PENDING, STATUS_RESOLVED, Wakeable } from "./types";
 
 export type EventCounter = {
   count: number;
@@ -81,23 +83,37 @@ function decodeChromiumEventType(rawEventType: string) {
   return [nonUniqueEventType, eventTargetName];
 }
 
-export function getEventCategoryCountsSuspense(
-  client: ReplayClientInterface
-): EventCategoryWithCount[] {
-  if (eventCategoryCounts !== null) {
-    return eventCategoryCounts;
-  }
-
-  if (inProgressEventCategoryCountsWakeable === null) {
-    inProgressEventCategoryCountsWakeable = createWakeable<EventCategoryWithCount[]>(
-      "getEventCategoryCountsSuspense"
+export const {
+  getValueSuspense: getEventCategoryCountsSuspense,
+  getValueAsync: getEventCategoryCountsAsync,
+  getValueIfCached: getEventCategoryCountsIfCached,
+} = createGenericCache<
+  [client: ReplayClientInterface],
+  [range: PointRange | null],
+  EventCategory[]
+>(
+  "getEventCategoryCounts",
+  // TODO fix this absolute mess
+  async (range, client) => {
+    const allEvents = await client.getEventCountForTypes(
+      Object.values(STANDARD_EVENT_CATEGORIES)
+        .map(c => c.events.map(e => e.type))
+        .flat(),
+      range
     );
+    return Object.values(STANDARD_EVENT_CATEGORIES).map(category => {
+      return {
+        ...category,
+        events: category.events.map(eventType => ({
+          ...eventType,
+          count: allEvents[eventType.type],
+        })),
+      };
+    });
+  },
+  range => (range ? `${range.begin}:${range.end}` : "")
+);
 
-    fetchEventCategoryCounts(client);
-  }
-
-  throw inProgressEventCategoryCountsWakeable;
-}
 
 export function getEventTypeEntryPointsSuspense(
   client: ReplayClientInterface,

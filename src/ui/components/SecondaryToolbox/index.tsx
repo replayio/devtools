@@ -1,6 +1,15 @@
 import "ui/setup/dynamic/inspector";
 import classnames from "classnames";
-import React, { FC, ReactNode, RefObject, Suspense, useContext, useEffect, useState } from "react";
+import React, {
+  FC,
+  ReactNode,
+  RefObject,
+  Suspense,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from "react";
 import { ImperativePanelHandle } from "react-resizable-panels";
 
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
@@ -73,14 +82,15 @@ const PanelButtons: FC<PanelButtonsProps> = ({
   toolboxLayout,
   recordingCapabilities,
 }) => {
-  const { supportsNetworkRequests, supportsRepaintingGraphics } = recordingCapabilities;
+  const { supportsElementsInspector, supportsNetworkRequests, supportsRepaintingGraphics } =
+    recordingCapabilities;
   const { value: chromiumNetMonitorEnabled } = useFeature("chromiumNetMonitor");
 
   return (
     <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
       {supportsRepaintingGraphics && <NodePicker />}
       <PanelButton panel="console">Console</PanelButton>
-      {supportsRepaintingGraphics && <PanelButton panel="inspector">Elements</PanelButton>}
+      {supportsElementsInspector && <PanelButton panel="inspector">Elements</PanelButton>}
       {toolboxLayout !== "ide" && (
         <PanelButton panel="debugger">
           <SourcesTabLabel />
@@ -165,9 +175,11 @@ function SecondaryToolbox({
   const hasReactComponents = kindsSet.has("react-devtools-hook");
   const hasReduxAnnotations = kindsSet.has("redux-devtools-data");
 
-  if (selectedPanel === "react-components" && !hasReactComponents) {
-    dispatch(setSelectedPanel("console"));
-  }
+  useLayoutEffect(() => {
+    if (selectedPanel === "react-components" && !hasReactComponents) {
+      dispatch(setSelectedPanel("console"));
+    }
+  }, [selectedPanel, hasReactComponents, dispatch]);
 
   useEffect(() => {
     async function fetchKinds() {

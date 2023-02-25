@@ -64,13 +64,6 @@ const appSlice = createSlice({
     setMouseTargetsLoading(state, action: PayloadAction<boolean>) {
       state.mouseTargetsLoading = action.payload;
     },
-    durationSeen(state, action: PayloadAction<number>) {
-      // If this is the longest duration we have seen yet, we should update the
-      // store
-      if (action.payload > state.recordingDuration) {
-        state.recordingDuration = action.payload;
-      }
-    },
     setUploading(state, action: PayloadAction<UploadInfo | null>) {
       state.uploading = action.payload;
     },
@@ -171,7 +164,6 @@ const appSlice = createSlice({
 
 export const {
   clearExpectedError,
-  durationSeen: durationSeen,
   setAppMode,
   setAwaitingSourcemaps,
   setCanvas,

@@ -1,5 +1,13 @@
-import { FrameId, PauseId, Property, Scope } from "@replayio/protocol";
+import {
+  ExecutionPoint,
+  FrameId,
+  PauseId,
+  Property,
+  Scope,
+  loadedRegions,
+} from "@replayio/protocol";
 
+import { getPauseAndFrameIdSuspends } from "replay-next/components/sources/utils/getPauseAndFrameId";
 import { getFrameSuspense } from "replay-next/src/suspense/FrameCache";
 import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
 import { evaluateSuspense } from "replay-next/src/suspense/PauseCache";
@@ -28,8 +36,9 @@ export default function findMatches(
   query: string,
   queryScope: string | null,
   replayClient: ReplayClientInterface,
-  frameId: FrameId | null,
-  pauseId: PauseId | null,
+  executionPoint: ExecutionPoint,
+  time: number,
+  loadedRegions: loadedRegions | null,
   context: Context
 ): Match[] {
   // Remove leading "."
@@ -42,8 +51,9 @@ export default function findMatches(
   const { properties, scopes } = fetchQueryData(
     replayClient,
     queryScope,
-    frameId,
-    pauseId,
+    executionPoint,
+    time,
+    loadedRegions,
     context
   );
 
@@ -53,8 +63,9 @@ export default function findMatches(
 function fetchQueryData(
   replayClient: ReplayClientInterface,
   queryScope: string | null,
-  frameId: FrameId | null,
-  pauseId: PauseId | null,
+  executionPoint: ExecutionPoint,
+  time: number,
+  loadedRegions: loadedRegions | null,
   context: Context
 ): {
   properties: WeightedProperty[] | null;
@@ -62,13 +73,23 @@ function fetchQueryData(
 } {
   let properties: WeightedProperty[] | null = null;
 
+  const pauseAndFrameId = getPauseAndFrameIdSuspends(
+    replayClient,
+    executionPoint,
+    time,
+    loadedRegions,
+    false
+  );
+  const frameId: FrameId | null = pauseAndFrameId?.frameId ?? null;
+  const pauseId: PauseId | null = pauseAndFrameId?.pauseId ?? null;
+
   let frame = null;
   let generatedScopes: Scope[] | null = null;
   let scopes: Scope[] | null = null;
   if (frameId && pauseId) {
     frame = getFrameSuspense(replayClient, pauseId, frameId);
 
-    const data = getFrameScopesSuspense(replayClient, pauseId, frameId);
+    const data = getFrameScopesSuspense(pauseId, frameId, replayClient);
     generatedScopes = data.generatedScopes;
 
     switch (context) {
@@ -89,8 +110,8 @@ function fetchQueryData(
   if (pauseId) {
     if (queryScope) {
       // Evaluate the properties of an object (queryScope)
-      const maybeObjectId = evaluateSuspense(replayClient, pauseId, frameId, queryScope)?.returned
-        ?.object;
+      const maybeObjectId = evaluateSuspense(pauseId, frameId, queryScope, undefined, replayClient)
+        ?.returned?.object;
       if (maybeObjectId) {
         const { preview } = getObjectWithPreviewSuspense(
           replayClient,

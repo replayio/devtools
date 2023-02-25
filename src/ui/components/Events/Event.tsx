@@ -1,10 +1,13 @@
 import {
   ExecutionPoint,
+  Location,
   KeyboardEvent as ReplayKeyboardEvent,
   MouseEvent as ReplayMouseEvent,
+  SameLineSourceLocations,
 } from "@replayio/protocol";
 import classNames from "classnames";
-import React, { ReactNode, useState } from "react";
+import classnames from "classnames";
+import React, { ReactNode, useRef, useState } from "react";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
@@ -14,18 +17,24 @@ import { RecordingTarget } from "protocol/thread/thread";
 import Icon from "replay-next/components/Icon";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { EventLog, eventsMapper } from "replay-next/src/suspense/EventsCache";
+import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
+import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import type { UIThunkAction } from "ui/actions";
-import { SEARCHABLE_EVENT_TYPES, getEventListenerLocationAsync } from "ui/actions/event-listeners";
+import {
+  SEARCHABLE_EVENT_TYPES,
+  getEventListenerLocationAsync,
+  removeEventListenerLocationEntry,
+} from "ui/actions/event-listeners";
+import { setViewMode } from "ui/actions/layout";
 import useEventContextMenu from "ui/components/Events/useEventContextMenu";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch } from "ui/setup/hooks";
 import { ReplayEvent } from "ui/state/app";
-import { getFormattedTime } from "ui/utils/timeline";
 
 import MaterialIcon from "../shared/MaterialIcon";
 import { getReplayEvent } from "./eventKinds";
@@ -48,8 +57,7 @@ const { getValueAsync: getNextInteractionEventAsync } = createGenericCache<
   EventLog | undefined
 >(
   "nextInteractionEventCache",
-  2,
-  async (replayClient, ThreadFront, point, replayEventType, endTime) => {
+  async (point, replayEventType, endTime, replayClient, ThreadFront) => {
     const pointNearEndTime = await replayClient.getPointNearTime(endTime);
 
     const recordingTarget = await ThreadFront.getRecordingTarget();
@@ -104,6 +112,14 @@ export const getEventLabel = (event: ReplayEvent) => {
   return label;
 };
 
+type JumpToCodeFailureReason = "not_loaded" | "no_hits";
+type JumpToCodeStatus = JumpToCodeFailureReason | "not_checked" | "loading" | "found";
+
+const errorMessages: Record<JumpToCodeFailureReason, string> = {
+  not_loaded: "Not loaded",
+  no_hits: "No results",
+};
+
 /*
 Jump to the function location that ran for a given info sidebar event list item,
 such as "Click" or "Key Press: L"
@@ -140,9 +156,10 @@ inside that function is running, then seek to that point in time, but skipping f
 function jumpToClickEventFunctionLocation(
   event: ReplayMouseEvent | ReplayKeyboardEvent,
   onSeek: (point: ExecutionPoint, time: number) => void
-): UIThunkAction {
+): UIThunkAction<Promise<JumpToCodeStatus>> {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const { point: executionPoint, time } = event;
+
     try {
       // Actual browser click events get recorded a fraction later then the
       // "mouse events" used by the sidebar.
@@ -157,22 +174,28 @@ function jumpToClickEventFunctionLocation(
       );
 
       if (!isEndTimeInLoadedRegion) {
-        return;
+        return "not_loaded";
+      }
+
+      // Go ahead and ensure that we're on DevTools mode right away,
+      // even before we know if there's a valid location to jump to
+      if (getViewMode(getState()) !== "dev") {
+        dispatch(setViewMode("dev"));
       }
 
       // The sidebar event time/point is a fraction earlier than any
       // actual JS that executed in response. Find the next click event
       // within a small time window
       const nextClickEvent = await getNextInteractionEventAsync(
-        replayClient,
-        ThreadFront,
         executionPoint,
         event.kind as SEARCHABLE_EVENT_TYPES,
-        arbitraryEndTime
+        arbitraryEndTime,
+        replayClient,
+        ThreadFront
       );
 
       if (!nextClickEvent) {
-        return;
+        return "no_hits";
       }
 
       const pauseId = await getPauseIdAsync(
@@ -184,33 +207,104 @@ function jumpToClickEventFunctionLocation(
       // If we did have a click event, timewarp to that click's point
       onSeek(nextClickEvent.point, nextClickEvent.time);
 
-      const sourceLocation = await getEventListenerLocationAsync(
+      const functionSourceLocation = await getEventListenerLocationAsync(
+        pauseId,
+        event.kind as SEARCHABLE_EVENT_TYPES,
         ThreadFront,
         replayClient,
-        getState,
-        pauseId,
-        event.kind as SEARCHABLE_EVENT_TYPES
+        getState
       );
 
-      if (sourceLocation) {
+      if (functionSourceLocation) {
+        // TODO This sequence of logic could probably be cached too.
+        // Not immediately critical, because the individual calls are cached.
+
+        const [breakablePositions, breakablePositionsByLine] = await getBreakpointPositionsAsync(
+          functionSourceLocation.sourceId,
+          replayClient
+        );
+
+        // Since we're doing these checks without knowing the end of the function
+        // (due to parsing concerns), let's find all breakable positions on this line and the next 2.
+        const nearestLines: SameLineSourceLocations[] = [];
+        for (let i = 0; i < 3; i++) {
+          const lineToCheck = functionSourceLocation.line + i;
+          const linePositions = breakablePositionsByLine.get(lineToCheck);
+          if (linePositions) {
+            nearestLines.push(linePositions);
+          }
+        }
+
+        const positionsAsLocations: Location[] = nearestLines.flatMap(line => {
+          return line.columns.map(column => {
+            return {
+              sourceId: functionSourceLocation.sourceId,
+              line: line.line,
+              column,
+            };
+          });
+        });
+
+        // We _hope_ that the first breakable position _after_ this function declaration is the first
+        // position _inside_ the function itself, either a later column on the same line or on the next line.
+        const nextBreakablePosition = positionsAsLocations.find(
+          p =>
+            (p.line === functionSourceLocation.line && p.column > functionSourceLocation.column) ||
+            p.line > functionSourceLocation.line
+        );
+
         const cx = getThreadContext(getState());
-        // Open the source file and jump to the line of this function.
-        // NOTE: this is the _definition_ line,  _not_ the first _executing_ line!
-        dispatch(selectLocation(cx, sourceLocation));
+
+        const locationToOpen = nextBreakablePosition ?? functionSourceLocation;
+
+        // Open the source file and jump to the found position.
+        // This is either the function definition itself, or the first position _inside_ the function.
+        dispatch(selectLocation(cx, locationToOpen));
+
+        if (nextBreakablePosition) {
+          // We think we know the first position _inside_ the function.
+          // Run analysis to find the next time this position got hit.
+          const pointNearEndTime = await replayClient.getPointNearTime(arbitraryEndTime);
+          const [hitPoints] = await getHitPointsForLocationAsync(
+            replayClient,
+            nextBreakablePosition,
+            null,
+            { begin: executionPoint, end: pointNearEndTime.point }
+          );
+
+          const [firstHitPoint] = hitPoints;
+          if (firstHitPoint) {
+            // Assuming the position got hit, timewarp to that exact time.
+            // This should put the execution line+time inside the function,
+            // where the actual event listener logic is executing.
+            onSeek(firstHitPoint.point, firstHitPoint.time);
+          }
+        }
+        return "found";
+      } else {
+        return "no_hits";
       }
     } catch (err) {
       // Let's just swallow this silently for now
     }
+
+    return "no_hits";
   };
 }
 
-export default function Event({ currentTime, executionPoint, event, onSeek }: EventProps) {
+export default React.memo(function Event({
+  currentTime,
+  executionPoint,
+  event,
+  onSeek,
+}: EventProps) {
   const dispatch = useAppDispatch();
   const { kind, point, time } = event;
   const isPaused = time === currentTime && executionPoint === point;
   const [isHovered, setIsHovered] = useState(false);
   const label = getEventLabel(event);
   const { icon } = getReplayEvent(kind);
+  const [jumpToCodeStatus, setJumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
 
   const onKeyDown = (e: React.KeyboardEvent) => e.key === " " && e.preventDefault();
 
@@ -218,7 +312,7 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
     onSeek(point, time);
   };
 
-  const onClickJumpToCode = (e: React.MouseEvent) => {
+  const onClickJumpToCode = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
     // Seek to the sidebar event timestamp right away.
@@ -226,7 +320,17 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
     onSeek(point, time);
 
     if (event.kind === "mousedown" || event.kind === "keypress") {
-      dispatch(jumpToClickEventFunctionLocation(event, onSeek));
+      setJumpToCodeStatus("loading");
+      const result = await dispatch(jumpToClickEventFunctionLocation(event, onSeek));
+
+      setJumpToCodeStatus(result);
+      if (result === "not_loaded") {
+        // Clear this out after a few seconds since the user could change focus.
+        // Simpler than trying to watch the focus region change over time.
+        setTimeout(() => {
+          setJumpToCodeStatus("not_checked");
+        }, 5000);
+      }
     }
   };
 
@@ -236,6 +340,35 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
     executionPoint === null || isExecutionPointsGreaterThan(event.point, executionPoint)
       ? "fast-forward"
       : "rewind";
+
+  const jumpToCodeButtonAvailable =
+    jumpToCodeStatus === "not_checked" || jumpToCodeStatus === "found";
+
+  const jumpToCodeButtonClassname = classnames(
+    "transition-width flex items-center justify-center rounded-full  duration-100 ease-out h-6",
+    {
+      "bg-primaryAccent": jumpToCodeButtonAvailable,
+      "bg-gray-400 cursor-default": !jumpToCodeButtonAvailable,
+      "px-2 shadow-sm": isHovered,
+      "w-6": !isHovered,
+    }
+  );
+
+  const onJumpButtonMouseEnter = (e: React.MouseEvent) => {
+    setIsHovered(true);
+  };
+
+  const onJumpButtonMouseLeave = (e: React.MouseEvent) => {
+    setIsHovered(false);
+  };
+
+  let jumpButtonText = "Jump to code";
+
+  if (jumpToCodeStatus in errorMessages) {
+    jumpButtonText = errorMessages[jumpToCodeStatus as JumpToCodeFailureReason];
+  } else if (jumpToCodeStatus === "loading") {
+    jumpButtonText = "Loading...";
+  }
 
   return (
     <>
@@ -255,15 +388,13 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
         <div className="flex space-x-2 opacity-0 group-hover:opacity-100">
           {event.kind === "mousedown" || event.kind === "keypress" ? (
             <div
-              onClick={onClickJumpToCode}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              className={`${
-                isHovered ? "h-6 px-2 shadow-sm" : "h-6 w-6"
-              } transition-width flex items-center justify-center rounded-full bg-primaryAccent duration-100 ease-out`}
+              onClick={jumpToCodeButtonAvailable ? onClickJumpToCode : undefined}
+              onMouseEnter={onJumpButtonMouseEnter}
+              onMouseLeave={onJumpButtonMouseLeave}
+              className={jumpToCodeButtonClassname}
             >
               <div className="flex items-center space-x-1">
-                {isHovered && <span className="truncate text-white ">Jump to code</span>}
+                {isHovered && <span className="truncate text-white ">{jumpButtonText}</span>}
                 <Icon type={timeLabel} className="w-3.5 text-white" />
               </div>
             </div>
@@ -273,7 +404,7 @@ export default function Event({ currentTime, executionPoint, event, onSeek }: Ev
       {contextMenu}
     </>
   );
-}
+});
 
 const Label = ({ children }: { children: ReactNode }) => (
   <div className="overflow-hidden overflow-ellipsis whitespace-pre font-normal">{children}</div>

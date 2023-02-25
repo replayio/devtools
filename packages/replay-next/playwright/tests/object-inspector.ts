@@ -4,7 +4,7 @@ import { filterByText, toggleProtocolMessage, toggleProtocolMessages } from "./u
 import { getTestUrl, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
-testSetup("ba2082dc-b69b-44dd-878f-e019e3f8a2dc");
+testSetup("bc6df6be-8305-4e1e-9eda-c1da63ef023d");
 
 async function inspectAndTakeScreenshotOf(page: Page, partialText: string, screenshotName: string) {
   const messageItem = await page
@@ -191,4 +191,12 @@ test("should properly bucket properties for an overflowing array", async ({ page
   });
   await secondBucket.click();
   await takeScreenshotOfMessages(page, "overflowing-array-second-bucket-expanded");
+});
+
+test("should render and inspect a Promise", async ({ page }) => {
+  await inspectAndTakeScreenshotOf(page, "promise", "render-promise");
+});
+
+test("should render and inspect a Proxy", async ({ page }) => {
+  await inspectAndTakeScreenshotOf(page, "proxy", "render-proxy");
 });

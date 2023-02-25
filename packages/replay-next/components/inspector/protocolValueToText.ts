@@ -69,7 +69,9 @@ async function protocolValueToTextHelper(
             break;
           }
           case "error": {
-            valueToCopy = JSON.stringify(errorProtocolObjectToString(object));
+            valueToCopy = JSON.stringify(
+              await errorProtocolObjectToString(client, pauseId, object)
+            );
             break;
           }
           case "function": {

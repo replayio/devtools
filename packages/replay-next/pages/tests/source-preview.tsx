@@ -29,7 +29,7 @@ function Suspender() {
   const time = 1000;
   const point = getClosestPointForTimeSuspense(replayClient, time);
   const pauseId = getPauseIdSuspense(replayClient, point, time);
-  const { returned } = evaluateSuspense(replayClient, pauseId, null, "globalValues");
+  const { returned } = evaluateSuspense(pauseId, null, "globalValues", undefined, replayClient);
 
   const objectWithPreview = getObjectWithPreviewSuspense(replayClient, pauseId, returned!.object!);
   return (

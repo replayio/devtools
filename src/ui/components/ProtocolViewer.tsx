@@ -1,5 +1,5 @@
 import { Tab as HeadlessTab } from "@headlessui/react";
-import { FunctionMatch, Location, Value as ProtocolValue } from "@replayio/protocol";
+import { FunctionMatch, Location, PointRange, Value as ProtocolValue } from "@replayio/protocol";
 import dynamic from "next/dynamic";
 import React, {
   MutableRefObject,
@@ -17,14 +17,16 @@ import { Tab } from "devtools/client/shared/components/ResponsiveTabs";
 import { CommandResponse } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import Loader from "replay-next/components/Loader";
-import { AnalysisResult, runAnalysisAsync } from "replay-next/src/suspense/AnalysisCache";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
-import { getHitPointsForLocationAsync } from "replay-next/src/suspense/ExecutionPointsCache";
+import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
+import {
+  AnalysisResult,
+  getLogPointAnalysisResultAsync,
+} from "replay-next/src/suspense/LogPointAnalysisCache";
 import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
-import { ReplayClient } from "shared/client/ReplayClient";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
-import { UIThunkAction } from "ui/actions";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useGetRecordingId } from "ui/hooks/recordings";
@@ -41,7 +43,7 @@ import {
   getProtocolResponseMap,
 } from "ui/reducers/protocolMessages";
 import { SourceDetails, getAllSourceDetails } from "ui/reducers/sources";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useAppSelector } from "ui/setup/hooks";
 import { getSymbolsAsync } from "ui/suspense/sourceCaches";
 import { getJSON } from "ui/utils/objectFetching";
 import { formatDuration, formatTimestamp } from "ui/utils/time";
@@ -495,12 +497,11 @@ interface ProtocolMessageCommon {
 
 const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericCache<
   [replayClient: ReplayClientInterface],
-  [sourceDetails: SourceDetails[]],
+  [sourceDetails: SourceDetails[], range: PointRange],
   AllProtocolMessages
 >(
   "recordedPotocolMessagesCache",
-  1,
-  async (replayClient, sourceDetails) => {
+  async (sourceDetails, range, replayClient) => {
     const sessionSource = sourceDetails.find(source => source.url?.includes("ui/actions/session"));
 
     if (!sessionSource) {
@@ -508,10 +509,10 @@ const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericC
     }
 
     const [breakablePositionsSorted] = await getBreakpointPositionsAsync(
-      replayClient,
-      sessionSource.id
+      sessionSource.id,
+      replayClient
     );
-    const symbols = await getSymbolsAsync(replayClient, sessionSource.id, sourceDetails);
+    const symbols = await getSymbolsAsync(sessionSource.id, sourceDetails, replayClient);
 
     const mapNamesToCallbackNames: Record<keyof AllProtocolMessages, string> = {
       requestMap: "onRequest",
@@ -547,25 +548,24 @@ const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericC
         };
 
         // Get all the times that first line was hit
-        const [hitPoints] = await getHitPointsForLocationAsync(replayClient, position, null, null);
+        const [hitPoints] = await getHitPointsForLocationAsync(replayClient, position, null, range);
 
         // For every hit, grab the first arg, which should be the `event`
         // that is either the request, response, or error data
-        const getAnalysisResults = await runAnalysisAsync(
-          replayClient,
-          null,
-          position,
-          "[...arguments][0]",
-          null
-        );
-
-        // `getAnalysisResults` is a lookup function, so convert the
-        // hit execution points to the actual results
-        const hitPointsWithResults = hitPoints
-          .map(hp => {
-            return getAnalysisResults(hp);
-          })
-          .filter(b => !!b) as AnalysisResult[];
+        const hitPointsWithResults = (
+          await Promise.all(
+            hitPoints.map(hp =>
+              getLogPointAnalysisResultAsync(
+                replayClient,
+                range,
+                hp,
+                position,
+                "[...arguments][0]",
+                null
+              )
+            )
+          )
+        ).filter(b => !!b) as AnalysisResult[];
 
         // For every analysis result, download the entire event object
         // as a real JS object, and add the relevant timestamp
@@ -607,13 +607,20 @@ const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericC
 
     return results;
   },
-  () => "alwaysCacheThis"
+  (sourceDetails, range) => `${range.begin}-${range.end}`
 );
 
 function RecordedProtocolMessages({ sourceDetails }: { sourceDetails: SourceDetails[] }) {
   const replayClient = useContext(ReplayClientContext);
+  const { range: focusRange } = useContext(FocusContext);
 
-  const allProtocolMessages = getRecordedProtocolMessagesSuspense(replayClient, sourceDetails);
+  const allProtocolMessages = focusRange
+    ? getRecordedProtocolMessagesSuspense(
+        sourceDetails,
+        { begin: focusRange.begin.point, end: focusRange.end.point },
+        replayClient
+      )
+    : { errorMap: {}, requestMap: {}, responseMap: {} };
 
   return <ProtocolViewer {...allProtocolMessages} />;
 }

@@ -14,7 +14,7 @@ import { ReplayClientInterface } from "shared/client/types";
 
 import { createGenericCache } from "./createGenericCache";
 import { cacheFrames } from "./FrameCache";
-import { preCacheObjects } from "./ObjectPreviews";
+import { getCachedObject, preCacheObjects } from "./ObjectPreviews";
 import { cacheScope } from "./ScopeCache";
 
 const {
@@ -27,8 +27,7 @@ const {
   PauseId
 >(
   "PauseCache: getPauseIdForExecutionPoint",
-  1,
-  async (client, executionPoint) => {
+  async (executionPoint, client) => {
     const createPauseResult = await client.createPause(executionPoint);
     await client.waitForLoadedSources();
     cachePauseData(
@@ -55,7 +54,7 @@ export function getPauseIdSuspense(
   point: ExecutionPoint,
   time: number
 ) {
-  const pauseId = getPauseIdForExecutionPointSuspense(replayClient, point);
+  const pauseId = getPauseIdForExecutionPointSuspense(point, replayClient);
   pointAndTimeByPauseId.set(pauseId, { point, time });
   return pauseId;
 }
@@ -65,7 +64,7 @@ export async function getPauseIdAsync(
   point: ExecutionPoint,
   time: number
 ) {
-  const pauseId = await getPauseIdForExecutionPointAsync(replayClient, point);
+  const pauseId = await getPauseIdForExecutionPointAsync(point, replayClient);
   pointAndTimeByPauseId.set(pauseId, { point, time });
   return pauseId;
 }
@@ -80,8 +79,7 @@ export const {
   Omit<Result, "data">
 >(
   "PauseCache: evaluate",
-  1,
-  async (client, pauseId, frameId, expression) => {
+  async (pauseId, frameId, expression, uid, client) => {
     const result = await client.evaluateExpression(pauseId, expression, frameId);
     await client.waitForLoadedSources();
     cachePauseData(client, pauseId, result.data);

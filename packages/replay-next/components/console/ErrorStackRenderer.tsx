@@ -11,18 +11,18 @@ import { getSourcesByUrlSuspense } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Source from "./Source";
-import styles from "./StackRenderer.module.css";
+import styles from "./ErrorStackRenderer.module.css";
 
 export default function ErrorStackRenderer({
-  pauseId,
   errorObjectId,
+  pauseId,
 }: {
-  pauseId: PauseId;
   errorObjectId: ObjectId;
+  pauseId: PauseId;
 }) {
   return (
     <Suspense fallback={<Loader />}>
-      <div className={styles.StackGrid} data-test-name="ErrorStack">
+      <div className={styles.ErrorStack} data-test-name="ErrorStack">
         <ErrorStackRendererSuspends pauseId={pauseId} errorObjectId={errorObjectId} />
       </div>
     </Suspense>
@@ -30,15 +30,20 @@ export default function ErrorStackRenderer({
 }
 
 function ErrorStackRendererSuspends({
-  pauseId,
   errorObjectId,
+  pauseId,
 }: {
-  pauseId: PauseId;
   errorObjectId: ObjectId;
+  pauseId: PauseId;
 }) {
   const client = useContext(ReplayClientContext);
   const stack = getObjectPropertySuspense(client, pauseId, errorObjectId, "stack").value;
   assert(typeof stack === "string", "no stack string found in error object");
+  // Handle cases where there is no meaningful stack string;
+  if (stack.trim().length === 0) {
+    return <span>No stack available</span>;
+  }
+
   const frames = ErrorStackParser.parse({ name: "", message: "", stack });
   return (
     <>
@@ -67,8 +72,8 @@ function ErrorFrameRendererSuspends({ frame }: { frame: StackFrame }) {
       line: lineNumber,
       column: columnNumber,
     };
-    const mappedLocation = getMappedLocationSuspense(client, location);
-    const scopeMap = getScopeMapSuspense(client, location);
+    const mappedLocation = getMappedLocationSuspense(location, client);
+    const scopeMap = getScopeMapSuspense(location, client);
     originalFunctionName = scopeMap?.find(mapping => mapping[0] === frame.functionName)?.[1];
     renderedSource = <Source className={styles.Source} locations={mappedLocation} />;
   } else {
@@ -82,10 +87,8 @@ function ErrorFrameRendererSuspends({ frame }: { frame: StackFrame }) {
   }
 
   return (
-    <>
-      <span>{originalFunctionName || frame.functionName || "(anonymous)"}</span>
-      <span>@</span>
-      <span className={styles.SourceColumn}>{renderedSource}</span>
-    </>
+    <div>
+      at {originalFunctionName || frame.functionName || "(anonymous)"} ({renderedSource})
+    </div>
   );
 }

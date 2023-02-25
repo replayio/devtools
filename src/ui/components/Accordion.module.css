@@ -29,7 +29,7 @@
 .accordionItemContainer .header {
   background: var(--tab-bgcolor);
   cursor: pointer;
-  font-size: 15px;
+  font-size: var(--font-size-large);
   line-height: 1.25;
   padding: 8px;
   position: sticky;

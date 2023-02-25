@@ -97,7 +97,11 @@ export function getTestUrl(testRoute: string, additionalQueryParams: string[] = 
 
   queryParams.push(...additionalQueryParams);
 
-  return `http://${host}:3000/tests/${testRoute}?${queryParams.join("&")}`;
+  const url = `http://${host}:3000/tests/${testRoute}?${queryParams.join("&")}`;
+
+  console.log(`         Opening ${chalk.underline.blue.bold(url)}`);
+
+  return url;
 }
 
 type Rect = {
