@@ -11,9 +11,13 @@
   white-space: pre-wrap;
 
   /* Account for -1px margin-top offset of rows (to align top/bottom borders) */
-  padding-right:5px;
   overflow-y: auto;
   padding-top: 1px;
+  scroll-margin-left: 5px;
+  
+}
+.Container::-webkit-scrollbar-track{
+border-left: solid 5px transparent;
 }
 .ContainerPending {
   opacity: 0.5;
