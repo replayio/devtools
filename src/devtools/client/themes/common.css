@@ -563,8 +563,9 @@ checkbox:-moz-focusring {
 }
 
 .devtools-searchinput .textbox-input::placeholder,
-.devtools-filterinput .textbox-input::placeholder {
+.devtools-filterinput .textbox-input::placeholder, input::placeholder {
   font-style: normal;
+  color: var(--theme-text-field-placeholder-color);
 }
 
 .devtools-textinput:focus,
