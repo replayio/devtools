@@ -182,17 +182,22 @@
   --theme-text-field-bgcolor-hover: var(--theme-base-95);
   --theme-text-field-bgcolor: var(--theme-base-85);
   --theme-text-field-color: #fff;
+  --theme-text-field-placeholder-color: #babbbc;
   --tooltip-bgcolor: var(--theme-base-100);
   --tooltip-color: #fff;
   --tooltip-border: 1px solid rgba(43, 46, 49, 1);
 
   --event-row-hover-background-color: rgba(8, 17, 32, 0.5);
 
-  --background-color-contrast-1: #0e1119;
-  --background-color-contrast-2: #192230;
-  --background-color-contrast-3: #2a3343;
-  --background-color-contrast-4: #454950;
-  --background-color-contrast-5: #e1e6ed;
+  /* 
+    Note: these contrast-[x] classes are deprecated.
+    Please use our theme-base-[x] classes instead.
+  */
+  --background-color-contrast-1: var(--theme-base-90);
+  --background-color-contrast-2: var(--theme-base-100);
+  --background-color-contrast-3: var(--theme-base-60);
+  --background-color-contrast-5: #081121;
+
   --background-color-current-execution-point: #25364e;
   --background-color-current-search-result: #25364e;
   --background-color-default: #081120;
@@ -242,9 +247,9 @@
   --color-hit-counts-label-color: #d7d7db;
   --color-line-number-without-hits: var(--color-dimmer);
 
-  --color-primary-background: var(--background-color-contrast-1);
+  --color-primary-background: var(--chrome);
   --color-secondary-background: var(--background-color-contrast-3);
-  --color-control-background: var(--background-color-contrast-4);
+  --color-control-background: var(--background-color-inputs);
   --color-control-background-active: var(--background-color-primary-button);
 
   --nag-background-color: #ff005b;
@@ -254,9 +259,10 @@
 
   --collapsible-toggle-color: #9ba0a5;
 
-  --context-menu-bgcolor: #3d4552;
-  --context-menu-bgcolor-divider: var(--background-color-contrast-3);
-  --context-menu-bgcolor-hover: var(--theme-base-95);
+  --context-menu-bgcolor: var(--menu-bgcolor);
+  --context-menu-bgcolor-hover: var(--menu-hover-bgcolor);
+  --context-menu-divider: var(--menu-divider);
+  --context-menu-border-color: var(--menu-border-color);
 
   --comment-card-preview-background-color-hover: #2d3c4f;
   --comment-card-preview-background-color: #253446;
@@ -340,7 +346,7 @@
   --badge-yellow-contrast-color: rgb(99, 79, 5);
 
   --pulse-color-off: var(--color-transparent);
-  --pulse-color-on: var(--background-color-contrast-3);
+  --pulse-color-on: var(--theme-base-90);
 
   --focus-mode-active-background-color: var(--background-color-contrast-4);
   --focus-mode-thumb-color: var(--background-color-contrast-3);
@@ -468,12 +474,13 @@
   --progressbar-preview-min: var(--primary-accent);
 
   /* Menus (Dark) */
-  --menu-bgcolor: var(--body-bgcolor);
+  --menu-bgcolor: #000;
   --menu-color: var(--body-color);
-  --menu-hover-bgcolor: var(--theme-base-90);
+  --menu-hover-bgcolor: #1b2332;
   --menu-hover-color: white;
   --theme-menu-highlight: var(--theme-text-field-bgcolor);
-  --menu-border: 1px solid rgba(39, 46, 61, 1);
+  --menu-border-color: rgba(39, 46, 61, 1);
+  --menu-divider: var(--theme-base-90);
 
   /* Code Mirror (Dark) */
   --caret-color: #fff;
@@ -689,17 +696,22 @@
   --theme-text-field-bgcolor-hover: var(--theme-base-95);
   --theme-text-field-bgcolor: #f8f8f8;
   --theme-text-field-color: var(--theme-body-color);
+  --theme-text-field-placeholder-color: #a9a9b1;
   --tooltip-bgcolor: #38383d;
   --tooltip-color: white;
   --tooltip-border: 1px solid transparent;
 
   --event-row-hover-background-color: rgba(232, 234, 237, 0.5);
 
-  --background-color-contrast-1: #e6e6e6;
-  --background-color-contrast-2: #ffffff;
-  --background-color-contrast-3: #82888c;
-  --background-color-contrast-4: #223344;
-  --background-color-contrast-5: #081121;
+  /* 
+    Note: these contrast-[x] classes are deprecated.
+    Please use our theme-base-[x] classes instead.
+  */
+  --background-color-contrast-1: var(--theme-base-100);
+  --background-color-contrast-2: var(--theme-base-95);
+  --background-color-contrast-3: var(--theme-base-90);
+  --background-color-contrast-5: #e1e6ed;
+
   --background-color-default: #e9e9e9;
   --background-color-disabled-button: #666666;
   --background-color-error: #fcefee;
@@ -751,20 +763,21 @@
   --color-line-number-without-hits: var(--color-dimmer);
 
   --color-control-background-active: var(--background-color-primary-button);
-  --color-control-background: var(--background-color-contrast-1);
+  --color-control-background: var(--background-color-inputs);
   --color-primary-background: #ffffff;
   --color-secondary-background: #eeeeee;
 
   --nag-background-color: #f02d5e;
-  --nag-color: #ffffff;
   --nag-gradient-color-begin: #ff3087;
   --nag-gradient-color-end: #ed265c;
+  --nag-color: #ffffff;
 
   --collapsible-toggle-color: #868688;
 
-  --context-menu-bgcolor-divider: #e0e0e0;
-  --context-menu-bgcolor-hover: var(--theme-base-95);
-  --context-menu-bgcolor: #f8f8f9;
+  --context-menu-bgcolor: var(--menu-bgcolor);
+  --context-menu-bgcolor-hover: var(--menu-hover-bgcolor);
+  --context-menu-divider: var(--menu-divider);
+  --context-menu-border-color: var(--menu-border-color);
 
   --comment-card-preview-background-color-hover: #e6e6e6;
   --comment-card-preview-background-color: #f2f3f2;
@@ -848,7 +861,7 @@
   --badge-yellow-contrast-color: rgb(99, 79, 5);
 
   --pulse-color-off: var(--color-transparent);
-  --pulse-color-on: #f2f2f2;
+  --pulse-color-on: var(--theme-base-90);
 
   --focus-mode-active-background-color: var(--background-color-contrast-2);
   --focus-mode-thumb-color: var(--background-color-contrast-5);
@@ -981,7 +994,8 @@
   --menu-hover-bgcolor: var(--theme-base-95);
   --menu-hover-color: #000;
   --theme-menu-highlight: #f3f4f6;
-  --menu-border: 1px solid transparent;
+  --menu-border-color: #f3f4f6;
+  --menu-divider: var(--theme-base-85);
 
   /* Code Mirror (Light) */
   --caret-color: #18181a;

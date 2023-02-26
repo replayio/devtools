@@ -7,7 +7,7 @@
 
 .Header {
   padding: 0.25rem;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--theme-base-80);
   color: var(--color-default);
 }
 

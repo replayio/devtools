@@ -3,5 +3,5 @@
   padding: 0 0.25rem;
   border-radius: 0.25rem;
   font-size: var(--font-size-small);
-  background-color: var(--color-secondary-background);
+  background-color: var(--theme-menu-highlight);
 }
