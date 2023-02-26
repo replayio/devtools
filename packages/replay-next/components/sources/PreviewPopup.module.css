@@ -3,6 +3,8 @@
   max-height: 400px;
   height: auto;
   overflow: hidden;
-  background-color: var(--color-primary-background);
-  border: 1px solid var(--border-color);
+  background-color: var(--menu-bgcolor);
+  border: 1px solid var(--theme-base-80);
+  border-radius: 0.25rem;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));
 }

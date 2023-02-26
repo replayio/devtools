@@ -63,7 +63,7 @@
 }
 
 .Focused {
-  background-color: var(--background-color-contrast-1);
+  background-color: var(--color-hit-counts-label-background-2);
 }
 
 .PrimaryRowWithTimestamps,
@@ -165,7 +165,7 @@
 
 .PulsingBadge {
   box-shadow: 0 0 0 0 var(--pulse-color-off);
-  animation: pulse 1.2s 5;
+  animation: pulse 2.4s 1;
 }
 
 .UnicornBadge {

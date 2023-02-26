@@ -242,7 +242,7 @@
   --color-hit-counts-label-color: #d7d7db;
   --color-line-number-without-hits: var(--color-dimmer);
 
-  --color-primary-background: var(--background-color-contrast-1);
+  --color-primary-background: var(--chrome);
   --color-secondary-background: var(--background-color-contrast-3);
   --color-control-background: var(--background-color-inputs);
   --color-control-background-active: var(--background-color-primary-button);
@@ -255,8 +255,9 @@
   --collapsible-toggle-color: #9ba0a5;
 
   --context-menu-bgcolor: var(--menu-bgcolor);
-  --context-menu-bgcolor-divider: var(--theme-base-90);
-  --context-menu-bgcolor-hover: var(--theme-base-90);
+  --context-menu-bgcolor-hover: var(--menu-hover-bgcolor);
+  --context-menu-divider: var(--menu-divider);
+  --context-menu-border-color: var(--menu-border-color);
   
   --comment-card-preview-background-color-hover: #2d3c4f;
   --comment-card-preview-background-color: #253446;
@@ -340,7 +341,7 @@
   --badge-yellow-contrast-color: rgb(99, 79, 5);
 
   --pulse-color-off: var(--color-transparent);
-  --pulse-color-on: var(--background-color-contrast-3);
+  --pulse-color-on: var(--theme-base-90);
 
   --focus-mode-active-background-color: var(--background-color-contrast-4);
   --focus-mode-thumb-color: var(--background-color-contrast-3);
@@ -468,12 +469,13 @@
   --progressbar-preview-min: var(--primary-accent);
 
   /* Menus (Dark) */
-  --menu-bgcolor: var(--body-bgcolor);
+  --menu-bgcolor: #000;
   --menu-color: var(--body-color);
-  --menu-hover-bgcolor: var(--theme-base-90);
+  --menu-hover-bgcolor: #1B2332;
   --menu-hover-color: white;
   --theme-menu-highlight: var(--theme-text-field-bgcolor);
-  --menu-border: 1px solid rgba(39, 46, 61, 1);
+  --menu-border-color: rgba(39, 46, 61, 1);
+  --menu-divider: var(--theme-base-90);
 
   /* Code Mirror (Dark) */
   --caret-color: #fff;
@@ -756,16 +758,17 @@
   --color-secondary-background: #eeeeee;
 
   --nag-background-color: #f02d5e;
-  --nag-color: #ffffff;
   --nag-gradient-color-begin: #ff3087;
-  --nag-gradient-color-end: #ed265c;
+  --nag-gradient-color-end: #ed265c;  
+  --nag-color: #ffffff;
 
   --collapsible-toggle-color: #868688;
 
-  --context-menu-bgcolor-divider: #e0e0e0;
-  --context-menu-bgcolor-hover: var(--theme-base-95);
   --context-menu-bgcolor: var(--menu-bgcolor);
-
+  --context-menu-bgcolor-hover: var(--menu-hover-bgcolor);
+  --context-menu-divider: var(--menu-divider);
+  --context-menu-border-color: var(--menu-border-color);
+  
   --comment-card-preview-background-color-hover: #e6e6e6;
   --comment-card-preview-background-color: #f2f3f2;
   --comment-card-source-preview-background-color-hover: #e3ecf9;
@@ -848,7 +851,7 @@
   --badge-yellow-contrast-color: rgb(99, 79, 5);
 
   --pulse-color-off: var(--color-transparent);
-  --pulse-color-on: #f2f2f2;
+  --pulse-color-on: var(--theme-base-90);
 
   --focus-mode-active-background-color: var(--background-color-contrast-2);
   --focus-mode-thumb-color: var(--background-color-contrast-5);
@@ -981,7 +984,8 @@
   --menu-hover-bgcolor: var(--theme-base-95);
   --menu-hover-color: #000;
   --theme-menu-highlight: #f3f4f6;
-  --menu-border: 1px solid transparent;
+  --menu-border-color: #f3f4f6;
+  --menu-divider: var(--theme-base-85);
 
   /* Code Mirror (Light) */
   --caret-color: #18181a;
