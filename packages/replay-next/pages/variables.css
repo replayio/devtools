@@ -197,9 +197,7 @@
   --background-color-contrast-2: var(--theme-base-100);
   --background-color-contrast-3: var(--theme-base-60);
   --background-color-contrast-5: #081121;
-  
-  
-  
+
   --background-color-current-execution-point: #25364e;
   --background-color-current-search-result: #25364e;
   --background-color-default: #081120;
@@ -265,7 +263,7 @@
   --context-menu-bgcolor-hover: var(--menu-hover-bgcolor);
   --context-menu-divider: var(--menu-divider);
   --context-menu-border-color: var(--menu-border-color);
-  
+
   --comment-card-preview-background-color-hover: #2d3c4f;
   --comment-card-preview-background-color: #253446;
   --comment-card-source-preview-background-color: var(--background-color-current-execution-point);
@@ -478,7 +476,7 @@
   /* Menus (Dark) */
   --menu-bgcolor: #000;
   --menu-color: var(--body-color);
-  --menu-hover-bgcolor: #1B2332;
+  --menu-hover-bgcolor: #1b2332;
   --menu-hover-color: white;
   --theme-menu-highlight: var(--theme-text-field-bgcolor);
   --menu-border-color: rgba(39, 46, 61, 1);
@@ -712,9 +710,8 @@
   --background-color-contrast-1: var(--theme-base-100);
   --background-color-contrast-2: var(--theme-base-95);
   --background-color-contrast-3: var(--theme-base-90);
-  --background-color-contrast-5: #E1E6ED;
-  
-  
+  --background-color-contrast-5: #e1e6ed;
+
   --background-color-default: #e9e9e9;
   --background-color-disabled-button: #666666;
   --background-color-error: #fcefee;
@@ -772,7 +769,7 @@
 
   --nag-background-color: #f02d5e;
   --nag-gradient-color-begin: #ff3087;
-  --nag-gradient-color-end: #ed265c;  
+  --nag-gradient-color-end: #ed265c;
   --nag-color: #ffffff;
 
   --collapsible-toggle-color: #868688;
@@ -781,7 +778,7 @@
   --context-menu-bgcolor-hover: var(--menu-hover-bgcolor);
   --context-menu-divider: var(--menu-divider);
   --context-menu-border-color: var(--menu-border-color);
-  
+
   --comment-card-preview-background-color-hover: #e6e6e6;
   --comment-card-preview-background-color: #f2f3f2;
   --comment-card-source-preview-background-color-hover: #e3ecf9;
