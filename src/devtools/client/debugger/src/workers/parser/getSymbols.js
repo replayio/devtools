@@ -9,7 +9,7 @@ import * as t from "@babel/types";
 import { traverseAst } from "./utils/ast";
 import getFunctionName from "./utils/getFunctionName";
 import { getCode, getFunctionParameterNames, isFunction } from "./utils/helpers";
-import { inferClassName } from "./utils/inferClassName";
+import { inferClassName ,inferParent} from "./utils/inferClassName";
 import createSimplePath from "./utils/simple-path";
 
 let symbolDeclarations = new Map();
@@ -27,6 +27,7 @@ function extractSymbol(path, symbols, state) {
     symbols.functions.push({
       name,
       klass: inferClassName(path),
+      parent: inferParent(path),
       location: path.node.loc,
       parameterNames: getFunctionParameterNames(path),
       identifier: path.node.id,
