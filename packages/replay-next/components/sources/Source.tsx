@@ -9,6 +9,7 @@ import {
   getStreamingSourceContentsSuspense,
 } from "replay-next/src/suspense/SourcesCache";
 import { StreamingParser, parseStreaming } from "replay-next/src/suspense/SyntaxParsingCache";
+import { getSourceFileName } from "replay-next/src/utils/source";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Loader from "../Loader";
@@ -56,7 +57,8 @@ function SourceLoader({
     return null;
   }
 
-  const streamingParser = parseStreaming(streamingSourceContents);
+  const fileName = getSourceFileName(source);
+  const streamingParser = parseStreaming(streamingSourceContents, fileName);
   if (streamingParser === null) {
     return null;
   }

@@ -208,9 +208,12 @@ export function createMockReplayClient() {
     })),
     getPreferredLocation: jest.fn().mockImplementation(async () => ({})),
     getRecordingCapabilities: jest.fn().mockImplementation(async () => ({
+      supportsEagerEvaluation: false,
+      supportsElementsInspector: false,
       supportsEventTypes: false,
       supportsNetworkRequests: false,
       supportsRepaintingGraphics: false,
+      supportsPureEvaluation: false,
     })),
     getRecordingId: jest.fn().mockImplementation(async () => "fake-recording-id"),
     getScope: jest.fn().mockImplementation(async () => {}),
