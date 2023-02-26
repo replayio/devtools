@@ -2,7 +2,6 @@
 .ContainerPending {
   flex: 1 1 auto;
   position: relative;
-  overflow-y: auto;
   overflow-x: hidden;
   font-family: var(--font-family-monospace);
   font-size: var(--font-size-regular);
@@ -12,6 +11,8 @@
   white-space: pre-wrap;
 
   /* Account for -1px margin-top offset of rows (to align top/bottom borders) */
+  padding-right:5px;
+  overflow-y: auto;
   padding-top: 1px;
 }
 .ContainerPending {
