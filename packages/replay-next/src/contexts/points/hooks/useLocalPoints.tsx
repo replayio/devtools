@@ -3,7 +3,7 @@ import { useContext, useEffect, useMemo } from "react";
 
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import useIndexedDB from "replay-next/src/hooks/useIndexedDB";
-import { Badge, PointBehavior } from "shared/client/types";
+import { Badge, PartialUser, PointBehavior } from "shared/client/types";
 import { createPointKey } from "shared/graphql/Points";
 
 import { POINTS_DATABASE } from "../constants";
@@ -58,6 +58,16 @@ export default function useLocalPoints({
       valueOld.forEach(point => {
         const key = createPointKey(point.recordingId, currentUserInfo?.id ?? null, point.location);
 
+        // Assume legacy log points were created by the current user.
+        // See https://github.com/replayio/devtools/pull/8837
+        const user: PartialUser | null = currentUserInfo
+          ? {
+              id: currentUserInfo.id,
+              name: currentUserInfo.name,
+              picture: currentUserInfo.picture,
+            }
+          : null;
+
         migrated[key] = {
           badge: point.badge,
           condition: point.condition,
@@ -66,13 +76,7 @@ export default function useLocalPoints({
           key,
           location: point.location,
           recordingId: point.recordingId,
-          user: point.createdByUserId
-            ? {
-                id: point.createdByUserId,
-                name: null,
-                picture: null,
-              }
-            : null,
+          user,
         };
       });
       return migrated;
