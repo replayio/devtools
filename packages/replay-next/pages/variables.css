@@ -519,6 +519,7 @@
   --testsuites-steps-bgcolor-hover: #252d3b;
   --testsuites-steps-bgcolor: #191f2a;
   --testsuites-success-color: #30e60b;
+  --testsuites-skipped-color: var(--theme-base-70);
 
   --circular-progress-bar-trail-color: var(--testsuites-steps-bgcolor);
 

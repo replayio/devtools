@@ -30,6 +30,14 @@
   color: var(--testsuites-error-color);
 }
 
+.SkippedIcon {
+  background-color: var(--testsuites-skipped-color);
+}
+
+.SkippedText {
+  color: var(--testsuites-skipped-color);
+}
+
 .ErrorTextLighter {
   color: var(--testsuites-error-icon-bgcolor);
 }
