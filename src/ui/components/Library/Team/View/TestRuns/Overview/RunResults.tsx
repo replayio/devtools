@@ -13,7 +13,9 @@ export function RunResults() {
 
   const sortedRecordings = orderBy(testRun.recordings, "date", "desc");
   const passedRecordings = sortedRecordings.filter(r => r.metadata?.test?.result === "passed");
-  const failedRecordings = sortedRecordings.filter(r => r.metadata?.test?.result !== "passed");
+  const failedRecordings = sortedRecordings.filter(
+    r => r.metadata?.test?.result && ["failed", "timedOut"].includes(r.metadata?.test?.result)
+  );
 
   return (
     <div className="no-scrollbar flex flex-col overflow-y-auto">
