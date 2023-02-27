@@ -30,7 +30,7 @@ export function Attributes({ testRun }: { testRun: TestRun }) {
   return (
     <div className="flex flex-row flex-wrap items-center pl-1">
       <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
-      <AttributeContainer icon="person">{user!}</AttributeContainer>
+      {user ? <AttributeContainer icon="person">{user}</AttributeContainer> : null}
       {mergeId && (
         <AttributeContainer title={mergeTitle} icon="merge_type">
           {mergeId}
