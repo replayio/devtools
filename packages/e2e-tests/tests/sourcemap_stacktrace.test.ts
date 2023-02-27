@@ -7,6 +7,7 @@ import {
   getFrameLocationsFromMessage,
   openConsolePanel,
 } from "../helpers/console-panel";
+import { delay } from "../helpers/utils";
 
 test("sourcemap_stacktrace: Test that stacktraces are sourcemapped", async ({ page }) => {
   await startTest(page, "cra/dist/index.html");
@@ -24,6 +25,8 @@ test("sourcemap_stacktrace: Test that stacktraces are sourcemapped", async ({ pa
     "asyncToGenerator.js:22",
   ]);
   const errorLocations = await getErrorFrameLocationsFromMessage(message);
+
+  await delay(1000);
   expect(errorLocations.slice(0, 7)).toEqual([
     "App.js:9",
     "App.js:33",
