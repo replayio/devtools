@@ -21,6 +21,7 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ViewMode } from "ui/state/layout";
 import useAuth0 from "ui/utils/useAuth0";
 
+import Tour from "./Tour/Checklist";
 import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
 import ProtocolViewer from "./ProtocolViewer";
@@ -144,6 +145,7 @@ export default function SidePanel() {
         {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}
         {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}
         {selectedPrimaryPanel === "comments" && <CommentCardsList />}
+        {selectedPrimaryPanel === "tour" && <Tour />}  
         {selectedPrimaryPanel === "events" && <EventsPane items={items} />}
         {selectedPrimaryPanel === "cypress" && <TestSuitePanel />}
         {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}

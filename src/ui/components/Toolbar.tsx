@@ -156,6 +156,7 @@ export default function Toolbar() {
   return (
     <div className="toolbox-toolbar-container flex flex-col items-center justify-between py-1">
       <div id="toolbox-toolbar">
+        <ToolbarButton icon="school" name="tour" label="Replay Tour" onClick={handleButtonClick} />
         {recording?.metadata?.test?.runner?.name == "cypress" ? (
           <ToolbarButton
             icon="cypress"
