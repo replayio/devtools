@@ -23,8 +23,8 @@
 }
 
 .ArrowBackground {
-  fill: var(--border-color);
+  fill: var(--theme-base-80);
 }
 .ArrowForeground {
-  fill: var(--color-primary-background);
+  fill: var(--menu-bgcolor);
 }
