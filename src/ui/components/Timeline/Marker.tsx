@@ -1,8 +1,7 @@
 import { Location, PauseId } from "@replayio/protocol";
 import classnames from "classnames";
 import React, { MouseEventHandler } from "react";
-import { ConnectedProps, connect } from "react-redux";
-
+import { useAppDispatch } from "ui/setup/hooks";
 import { actions } from "ui/actions/index";
 import { timelineMarkerWidth as pointWidth } from "ui/constants";
 import { HoveredItem, ZoomRegion } from "ui/state/timeline";
@@ -22,7 +21,7 @@ export function Circle() {
   );
 }
 
-type MarkerProps = PropsFromRedux & {
+type MarkerProps = {
   point: string;
   time: number;
   location?: Location;
@@ -35,19 +34,19 @@ type MarkerProps = PropsFromRedux & {
 
 
 const Marker = (props : MarkerProps) => {
-
+  const appDispatch = useAppDispatch();
   const onClick: MouseEventHandler = e => {
-    const { seek, point, time, pauseId } = props;
+    const { point, time, pauseId } = props;
     trackEvent("timeline.marker_select");
 
     e.preventDefault();
     e.stopPropagation();
 
-    seek(point, time, true, pauseId);
+    appDispatch( actions.seek(point, time, true, pauseId) );
   };
 
   const onMouseEnter = () => {
-    const { point, time, location, setHoveredItem } = props;
+    const { point, time, location } = props;
     const hoveredItem: HoveredItem = {
       point,
       time,
@@ -55,7 +54,7 @@ const Marker = (props : MarkerProps) => {
       target: "timeline",
     };
 
-    setHoveredItem(hoveredItem);
+    appDispatch( actions.setHoveredItem( hoveredItem ) );
   };
 
   const { time, currentTime, isPrimaryHighlighted, zoomRegion } = props;
@@ -96,11 +95,4 @@ const shouldMarkerUpdate = (prevProps: Readonly<MarkerProps>, nextProps: Readonl
   );
 }
 
-const connector = connect(null, {
-  setHoveredItem: actions.setHoveredItem,
-  seek: actions.seek,
-  clearHoveredItem: actions.clearHoveredItem,
-});
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector( React.memo( Marker, shouldMarkerUpdate ) );
+export default React.memo( Marker, shouldMarkerUpdate );
