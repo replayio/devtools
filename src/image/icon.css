@@ -242,3 +242,7 @@ but without a background color so we can use hover effects
 .icon.testsuites-fail {
   -webkit-mask-image: url(/icons/testsuites-fail.svg);
 }
+
+.icon.testsuites-skip {
+  -webkit-mask-image: url(/icons/questionmark.svg);
+}

@@ -5,7 +5,7 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { setSelectedTest } from "ui/reducers/reporter";
 import { useAppDispatch } from "ui/setup/hooks";
 
-import { Status } from "./TestCase";
+import { TestCaseResultIcon } from "./TestCase";
 
 function formatStepError(step?: TestStep) {
   if (!step || !step.error || !step.args) {
@@ -41,7 +41,7 @@ export function TestCaseRow({ test, index }: { test: TestItem; index: number }) 
       disabled={!expandable}
     >
       <div className="flex flex-grow flex-row gap-1 overflow-hidden">
-        <Status result={test.result} />
+        <TestCaseResultIcon result={test.result} />
         <div className="flex flex-col items-start text-bodyColor">
           <div className={`overflow-hidden overflow-ellipsis ${"group-hover:underline"}`}>
             {test.title}
