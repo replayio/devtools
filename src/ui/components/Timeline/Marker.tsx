@@ -33,21 +33,11 @@ type MarkerProps = PropsFromRedux & {
   pauseId?: PauseId;
 };
 
-class Marker extends React.Component<MarkerProps> {
-  shouldComponentUpdate(nextProps: Readonly<MarkerProps>) {
-    const highlightChanged = this.props.isPrimaryHighlighted !== nextProps.isPrimaryHighlighted;
 
-    return (
-      highlightChanged ||
-      this.props.time !== nextProps.time ||
-      this.props.currentTime !== nextProps.currentTime ||
-      this.props.overlayWidth !== nextProps.overlayWidth ||
-      this.props.zoomRegion !== nextProps.zoomRegion
-    );
-  }
+const Marker = (props : MarkerProps) => {
 
-  onClick: MouseEventHandler = e => {
-    const { seek, point, time, pauseId } = this.props;
+  const onClick: MouseEventHandler = e => {
+    const { seek, point, time, pauseId } = props;
     trackEvent("timeline.marker_select");
 
     e.preventDefault();
@@ -56,8 +46,8 @@ class Marker extends React.Component<MarkerProps> {
     seek(point, time, true, pauseId);
   };
 
-  onMouseEnter = () => {
-    const { point, time, location, setHoveredItem } = this.props;
+  const onMouseEnter = () => {
+    const { point, time, location, setHoveredItem } = props;
     const hoveredItem: HoveredItem = {
       point,
       time,
@@ -68,31 +58,42 @@ class Marker extends React.Component<MarkerProps> {
     setHoveredItem(hoveredItem);
   };
 
-  render() {
-    const { time, currentTime, isPrimaryHighlighted, zoomRegion } = this.props;
+  const { time, currentTime, isPrimaryHighlighted, zoomRegion } = props;
 
-    const offsetPercent = getVisiblePosition({ time, zoom: zoomRegion }) * 100;
-    if (offsetPercent < 0 || offsetPercent > 100) {
-      return null;
-    }
-
-    return (
-      <a
-        tabIndex={0}
-        className={classnames("marker", {
-          "primary-highlight": isPrimaryHighlighted,
-          paused: time === currentTime,
-        })}
-        style={{
-          left: `calc(${offsetPercent}% - ${pointWidth / 2}px)`,
-        }}
-        onMouseEnter={this.onMouseEnter}
-        onClick={this.onClick}
-      >
-        <Circle />
-      </a>
-    );
+  const offsetPercent = getVisiblePosition({ time, zoom: zoomRegion }) * 100;
+  if (offsetPercent < 0 || offsetPercent > 100) {
+    return null;
   }
+
+  return (
+    <a
+      tabIndex={0}
+      className={classnames("marker", {
+        "primary-highlight": isPrimaryHighlighted,
+        paused: time === currentTime,
+      })}
+      style={{
+        left: `calc(${offsetPercent}% - ${pointWidth / 2}px)`,
+      }}
+      onMouseEnter={onMouseEnter}
+      onClick={onClick}
+    >
+      <Circle />
+    </a>
+  );
+}
+
+
+const shouldMarkerUpdate = (prevProps: Readonly<MarkerProps>, nextProps: Readonly<MarkerProps>) => {
+  const highlightChanged = prevProps.isPrimaryHighlighted !== nextProps.isPrimaryHighlighted;
+
+  return (
+    highlightChanged ||
+    prevProps.time !== nextProps.time ||
+    prevProps.currentTime !== nextProps.currentTime ||
+    prevProps.overlayWidth !== nextProps.overlayWidth ||
+    prevProps.zoomRegion !== nextProps.zoomRegion
+  );
 }
 
 const connector = connect(null, {
@@ -102,4 +103,4 @@ const connector = connect(null, {
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-export default connector(Marker);
+export default connector( React.memo( Marker, shouldMarkerUpdate ) );
