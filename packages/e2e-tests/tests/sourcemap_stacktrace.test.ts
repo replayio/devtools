@@ -7,6 +7,7 @@ import {
   getFrameLocationsFromMessage,
   openConsolePanel,
 } from "../helpers/console-panel";
+import { waitFor } from "../helpers/utils";
 
 test("sourcemap_stacktrace: Test that stacktraces are sourcemapped", async ({ page }) => {
   await startTest(page, "cra/dist/index.html");
@@ -23,14 +24,16 @@ test("sourcemap_stacktrace: Test that stacktraces are sourcemapped", async ({ pa
     "asyncToGenerator.js:3",
     "asyncToGenerator.js:22",
   ]);
-  const errorLocations = await getErrorFrameLocationsFromMessage(message);
-  expect(errorLocations.slice(0, 7)).toEqual([
-    "App.js:9",
-    "App.js:33",
-    "regeneratorRuntime.js:44",
-    "regeneratorRuntime.js:125",
-    "regeneratorRuntime.js:69",
-    "asyncToGenerator.js:3",
-    "asyncToGenerator.js:22",
-  ]);
+  await waitFor(async () => {
+    const errorLocations = await getErrorFrameLocationsFromMessage(message);
+    expect(errorLocations.slice(0, 7)).toEqual([
+      "App.js:9",
+      "App.js:33",
+      "regeneratorRuntime.js:44",
+      "regeneratorRuntime.js:125",
+      "regeneratorRuntime.js:69",
+      "asyncToGenerator.js:3",
+      "asyncToGenerator.js:22",
+    ]);
+  });
 });
