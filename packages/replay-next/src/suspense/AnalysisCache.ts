@@ -9,6 +9,7 @@ import {
   Scope,
 } from "@replayio/protocol";
 
+import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/analysisManager";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
@@ -80,6 +81,7 @@ function createCache<T extends { point: ExecutionPoint }>(
     getCachedValues: getCachedPoints,
   } = createGenericRangeCache<T>(
     async (client, range, cacheValues, cacheError) => {
+      let pointsCount = 0;
       await client.streamAnalysis(
         {
           locations: params.location ? [{ location: params.location }] : undefined,
@@ -90,7 +92,10 @@ function createCache<T extends { point: ExecutionPoint }>(
           range,
         },
         {
-          onPoints: points => cacheValues(points.map(transformPoint)),
+          onPoints: points => {
+            pointsCount += points.length;
+            cacheValues(points.map(transformPoint));
+          },
           onResults: analysisEntries => {
             for (const analysisEntry of analysisEntries) {
               const result = analysisEntry.value;
@@ -111,6 +116,10 @@ function createCache<T extends { point: ExecutionPoint }>(
           onError: cacheError,
         }
       ).pointsFinished;
+
+      if (pointsCount > MAX_POINTS_FOR_FULL_ANALYSIS) {
+        cacheError(new Error("Too many points to run analysis"));
+      }
     },
     pointDescription => pointDescription.point
   );

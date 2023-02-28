@@ -15,7 +15,10 @@ import { PointInstance } from "replay-next/src/contexts/points/types";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TerminalContext, TerminalExpression } from "replay-next/src/contexts/TerminalContext";
 import { EventLog, getEventTypeEntryPointsSuspense } from "replay-next/src/suspense/EventsCache";
-import { UncaughtException, getExceptionsSuspense } from "replay-next/src/suspense/ExceptionsCache";
+import {
+  UncaughtException,
+  getInfallibleExceptionPointsSuspense,
+} from "replay-next/src/suspense/ExceptionsCache";
 import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/HitPointsCache";
 import { ProtocolMessage, getMessagesSuspense } from "replay-next/src/suspense/MessagesCache";
 import { loggableSort } from "replay-next/src/utils/loggables";
@@ -24,6 +27,8 @@ import { suspendInParallel } from "replay-next/src/utils/suspense";
 import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_ENABLED } from "shared/client/types";
+import { isThennable } from "shared/proxy/utils";
+import { toPointRange } from "shared/utils/time";
 
 export type Loggable =
   | EventLog
@@ -126,8 +131,9 @@ export function LoggablesContextRoot({
 
   // We may suspend based on this value, so let's this value changes at sync priority,
   let exceptions: UncaughtException[] = EMPTY_ARRAY;
-  if (showExceptions) {
-    exceptions = getExceptionsSuspense(client, focusRange);
+  if (focusRange && showExceptions) {
+    exceptions =
+      getInfallibleExceptionPointsSuspense(client, toPointRange(focusRange)) ?? EMPTY_ARRAY;
   }
 
   // Trim eventLogs and logPoints by focusRange.
@@ -156,7 +162,7 @@ export function LoggablesContextRoot({
           client,
           point.location,
           point.condition,
-          { begin: focusRange.begin.point, end: focusRange.end.point }
+          toPointRange(focusRange)
         );
 
         switch (status) {
