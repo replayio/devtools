@@ -1,0 +1,15 @@
+{
+  "name": "log-gpt",
+  "packageManager": "yarn@3.2.1",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "build": "esbuild index.js --bundle --loader:.js=ts --platform=node --outfile=out/index.js --sourcemap"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.21.2",
+    "@babel/types": "^7.21.2",
+    "babel-traverse": "^6.26.0",
+    "esbuild": "^0.17.10"
+  }
+}

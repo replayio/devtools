@@ -31,3 +31,6 @@ test/.yarn/cache/
 *.mp4
 videos/
 .vercel
+
+packages/logGPT/input/
+packages/logGPT/out/
