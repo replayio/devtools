@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { shouldShowJonDonut, shouldShowConsoleNavigate, shouldShowBreakpointAdd, shouldShowBreakpointEdit  } from "ui/utils/onboarding";
+import { shouldShowConsoleNavigate, shouldShowBreakpointAdd, shouldShowBreakpointEdit  } from "ui/utils/onboarding";
 import { UserInfo } from "ui/hooks/users";
 
 import Events from "ui/components/Events";
@@ -9,7 +9,8 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getViewMode } from "ui/reducers/layout";
 import { ViewMode } from "ui/state/layout";
 import hooks from "ui/hooks";
-
+import styles from "./Tour.module.css";
+import Icon from "replay-next/components/Icon";
 
 interface TourSection {
   title: string;
@@ -59,7 +60,6 @@ const Checklist: React.FC = () => {
 
   const { nags } = hooks.useGetUserInfo();
   const viewMode = useAppSelector(getViewMode);
-  const showJonDonutNag = shouldShowJonDonut(nags, viewMode);
   const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
   
   const showConsoleNavigate = shouldShowConsoleNavigate(nags, viewMode);
@@ -74,60 +74,19 @@ const Checklist: React.FC = () => {
 
   return (
 	  
-	  <div>
+	  <div className={styles.TourBoxWrapper}>
+	  <div className={styles.TourBox}>
 	  <div className="p-3">
-		<h1 className="text-lg font-bold text-pink-500">Jon wiring things up here:</h1>
+		<h1 className={styles.h1}>Getting started</h1>
 		
-		<ul>
-		  <li>Open DevTools yet? {showDevtoolsNag ? "No" : "Yep!"}</li>
-		  <li>Given Jon a donut? {showJonDonutNag ? "No" : "Yep!"}</li>
-		  <li>Navigated the console yet? {showConsoleNavigate ? "No" : "Yep!"}</li>
-		  <li>Added a breakpoint? {showBreakpointAdd ? "No" : "Yep!"}</li>
-		  <li>Edited a breakpoint? {showBreakpointEdit ? "No" : "Yep!"}</li>
-		  
+		<ul className={styles.checklist}>
+		  <li><Icon className={styles.Icon} type={showDevtoolsNag ? "unchecked-rounded" : "checked-rounded"} />Open DevTools</li>
+		  <li><Icon className={styles.Icon} type={showConsoleNavigate ? "unchecked-rounded" : "checked-rounded"} />Time travel in the console</li>
+		  <li><Icon className={styles.Icon} type={showBreakpointAdd ? "unchecked-rounded" : "checked-rounded"} /> Magic print statements </li>
+		  <li><Icon className={styles.Icon} type={showBreakpointEdit ? "unchecked-rounded" : "checked-rounded"} /> Edit a print statement</li>				  
 		</ul>
 		
 	  </div>
-	  
-	  
-	<div className="p-3">
-	  <h1 className="text-lg font-bold text-pink-500">Welcome!</h1>
-	  
-	  		  
-	  {tourData.map((section, sectionIndex) => (
-		<div key={section.title} className="mt-2">
-		  <p className="text-lg font-medium mb-2">{section.title}</p>
-		  <ul className="text-left">
-			{section.items.map((item, itemIndex) => (
-			  <li
-				key={item.text}
-				className="flex items-center justify-between py-1"
-				onClick={() => setCheckedItems([sectionIndex, itemIndex])}
-			  >
-				<span
-				  className={`ml-4 w-full ${
-					checkedItems[0] === sectionIndex && checkedItems[1] === itemIndex
-					  ? "line-through text-gray-500"
-					  : ""
-				  }`}
-				>
-				  {item.text}
-				</span>
-				<a
-				  href="#"
-				  className="text-blue-500 underline whitespace-nowrap"
-				  onClick={(event) => {
-					event.preventDefault();
-					handleShowHowClick(itemIndex);
-				  }}
-				>
-				  Show how
-				</a>
-			  </li>
-			))}
-		  </ul>
-		</div>
-	  ))}
 	</div>
 	</div>
   );

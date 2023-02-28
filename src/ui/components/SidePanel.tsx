@@ -21,7 +21,7 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ViewMode } from "ui/state/layout";
 import useAuth0 from "ui/utils/useAuth0";
 
-import Tour from "./Tour/Checklist";
+import Tour from "./Tour/Tour";
 import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
 import ProtocolViewer from "./ProtocolViewer";
@@ -93,20 +93,7 @@ export default function SidePanel() {
   const info = useTestInfo();
 
   return (
-    <div className="flex w-full flex-col gap-2">
-      {!shouldShowDevToolsNag(nags, viewMode) && (
-        <div className={styles.TourBox}>
-          <h2>Welcome to Replay!</h2>
-          <p>To get started, click into DevTools so we can show off some time travel features!</p>
-
-          <button type="button" onClick={() => handleToggle("dev")} style={{ padding: "4px 8px" }}>
-            <div className="mr-1">Open DevTools</div>
-
-            <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
-          </button>
-        </div>
-      )}
-
+    <div className="flex w-full flex-col gap-2">     
       {!isAuthenticated && !info.isTestSuiteReplay && (
         <div className={styles.TourBox}>
           <h2>Welcome to Replay!</h2>

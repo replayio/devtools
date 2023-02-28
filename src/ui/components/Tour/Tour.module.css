@@ -1,0 +1,36 @@
+.TourBoxWrapper {
+  background-color: #e7376f; 
+  height: 100%;
+  background-image: url('/images/illustrations/tour1.png');
+  background-repeat: no-repeat;
+  background-position: bottom left;
+}
+
+.TourBox {
+  padding: 0.5em;
+  color: #fff;
+}
+
+.h1
+{
+  color: #fff;
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.checklist li
+{  
+  padding-bottom: .5rem;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+}
+
+.Icon
+{
+  height: 18px;  
+  margin-right: .25rem;
+  color: #fff;
+}
+
