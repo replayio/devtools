@@ -33,9 +33,12 @@ export function TestCase({ test }: { test: TestItem }) {
   const testStartTime = test.relativeStartTime || 0;
   const testEndTime = testStartTime + (test.duration || 0);
 
-  const onFocus = useCallback(() => {
+  const onFocus = useCallback(async () => {
     if (testEndTime > testStartTime) {
-      dispatch(
+      // This method makes an API request to convert time range to point range.
+      // Wait for it to finish before calling syncFocusedRegion below,
+      // or we may end up syncing the wrong range.
+      await dispatch(
         setFocusRegionFromTimeRange({
           begin: testStartTime,
           end: testEndTime,
