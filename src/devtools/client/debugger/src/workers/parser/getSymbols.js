@@ -27,7 +27,11 @@ function extractSymbol(path, symbols, state) {
     symbols.functions.push({
       name,
       klass: inferClassName(path),
-      parent: inferParent(path),
+      parent: superClass
+      ? {
+          name: t.isMemberExpression(superClass) ? getCode(superClass) : superClass.name,
+          location: superClass.loc,
+        }: null,
       location: path.node.loc,
       parameterNames: getFunctionParameterNames(path),
       identifier: path.node.id,

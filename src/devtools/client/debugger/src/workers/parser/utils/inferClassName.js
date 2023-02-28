@@ -86,7 +86,3 @@ export function inferClassName(path) {
 
   return null;
 }
-
-export function inferParent(path){
-return path.findParent(p=>t.isClassDeclaration(p.node));
-}
