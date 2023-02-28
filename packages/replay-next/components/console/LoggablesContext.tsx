@@ -14,7 +14,11 @@ import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { PointInstance } from "replay-next/src/contexts/points/types";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TerminalContext, TerminalExpression } from "replay-next/src/contexts/TerminalContext";
-import { EventLog, getEventTypeEntryPointsSuspense } from "replay-next/src/suspense/EventsCache";
+import {
+  EventLog,
+  getEventPointsSuspense,
+  getInfallibleEventPointsSuspense,
+} from "replay-next/src/suspense/EventsCache";
 import {
   UncaughtException,
   getInfallibleExceptionPointsSuspense,
@@ -82,11 +86,17 @@ export function LoggablesContextRoot({
   }, [eventTypes]);
 
   // Load the event type data from the protocol and flatten into a single array (to be filtered and sorted below).
-  const eventLogs = useMemo<EventLog[]>(() => {
+  const focusedEventLogs = useMemo<EventLog[]>(() => {
+    if (!focusRange) {
+      return [];
+    }
     return suspendInParallel(
-      ...eventTypesToLoad.map(eventType => () => getEventTypeEntryPointsSuspense(client, eventType))
+      ...eventTypesToLoad.map(
+        eventType => () =>
+          getInfallibleEventPointsSuspense(client, eventType, toPointRange(focusRange)) ?? []
+      )
     ).flat();
-  }, [client, eventTypesToLoad]);
+  }, [client, eventTypesToLoad, focusRange]);
 
   const { messages } = getMessagesSuspense(client, focusRange, endpoint);
 
@@ -135,18 +145,6 @@ export function LoggablesContextRoot({
     exceptions =
       getInfallibleExceptionPointsSuspense(client, toPointRange(focusRange)) ?? EMPTY_ARRAY;
   }
-
-  // Trim eventLogs and logPoints by focusRange.
-  // Messages will have already been filtered from the backend.
-  const focusedEventLogs = useMemo<EventLog[]>(() => {
-    if (focusRange === null) {
-      return eventLogs;
-    } else {
-      return eventLogs.filter(eventLog =>
-        isExecutionPointsWithinRange(eventLog.point, focusRange.begin.point, focusRange.end.point)
-      );
-    }
-  }, [eventLogs, focusRange]);
 
   const pointInstances = useMemo<PointInstance[]>(() => {
     if (!focusRange) {
