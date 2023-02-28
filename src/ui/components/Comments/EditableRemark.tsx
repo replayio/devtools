@@ -104,8 +104,60 @@ export default function EditableRemark({
     saveRemark: saveChanges,
     type: type,
   });
+  var textClassname=styles.Other; 
+  var parsedContent=content;
+
+function handleText(){
+  if(parsedContent!="")
+  {
+  var obj=JSON.parse(content);
+  var len=obj.root.children[0].children[0].text.length
+  if(obj.root.children[0].children[0].text[0]=='!'){
+  textClassname=styles.Bug;
+  obj.root.children[0].children[0].text=(obj.root.children[0].children[0].text.substring(1,len));}
+  else if(obj.root.children[0].children[0].text[0]=='*'){
+  textClassname=styles.BreadCrumb;
+  obj.root.children[0].children[0].text=(obj.root.children[0].children[0].text.substring(1,len));}
+  else if(obj.root.children[0].children[0].text[0]=='&'){
+  textClassname=styles.Info;
+  obj.root.children[0].children[0].text=(obj.root.children[0].children[0].text.substring(1,len));}
+  else if(obj.root.children[0].children[0].text[0]=='#'){
+  textClassname=styles.Question;
+  obj.root.children[0].children[0].text=(obj.root.children[0].children[0].text.substring(1,len));}
+  parsedContent=JSON.stringify(obj);
+  
+  }
+
+}
+handleText();
+   const Bug=()=>{
+    return(
+      <h1 className={styles.Buglabel}>⛔  BUG</h1>
+    );
+   }
+   const BreadCrumb=()=>{
+    return(
+      <h1 className={styles.BreadCrumblabel}>🧩  BREADCRUMB</h1>
+    );
+   }
+   const Info=()=>{
+    return(
+      <h1 className={styles.Infolabel}>📚  INFO</h1>
+    );
+   }
+   const Question=()=>{
+    return(
+      <h1 className={styles.Questionlabel}>❓  QUESTION</h1>
+    );
+   }
+   const Other=()=>{
+    return(
+      <h1 className={styles.Otherlabel}>🌍  OTHER</h1>
+    );
+   }
 
   return (
+    
     <>
       <div className={styles.HeaderRow}>
         <AvatarImage className={styles.Avatar} src={user?.picture} />
@@ -123,20 +175,27 @@ export default function EditableRemark({
           more_vert
         </MaterialIcon>
       </div>
-
+      <div className={styles.Container}>
+      {textClassname==styles.Bug && <Bug/>}
+      {textClassname==styles.BreadCrumb && <BreadCrumb/>}
+      {textClassname==styles.Info && <Info/>}
+      {textClassname==styles.Question && <Question/>}
+      {textClassname==styles.Other && <Other/>} 
       <div className={classNames.join(" ")} onDoubleClick={onDoubleClick}>
-        <CommentEditor
+        <div className={textClassname}>
+         <CommentEditor
           autoFocus={isEditing}
           collaborators={collaborators}
           editable={isEditing && !isPending}
-          initialValue={content}
+          initialValue={parsedContent}
           onCancel={discardPendingChanges}
           onDelete={deleteRemark}
           onSave={saveChanges}
           placeholder={type === "reply" ? "Write a reply..." : "Type a comment"}
         />
+        </div>
+        </div>
       </div>
-
       {contextMenu}
     </>
   );

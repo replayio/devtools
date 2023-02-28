@@ -68,3 +68,104 @@
 .Icon {
   color: rgb(156 163 175 / var(--tw-text-opacity));
 }
+.Bug{
+  color: red;
+  font-weight: 400;
+  font-size: 14px;
+}
+.BreadCrumb{
+  color: rgb(245, 179, 225);
+  font-weight: 400;
+  font-size: 14px;
+}
+.Question{
+  color: rgb(0, 166, 255);;
+  font-weight: 400;
+  font-size: 14px;
+}
+.Info{
+  color: green;
+  font-weight: 400;
+  font-size: 14px;
+}
+.Other{
+  color: white;
+  font-weight: 400;
+  font-size: 14px;
+}
+.Buglabel{
+  /* text-align: center; */
+  background-color: rgb(245, 179, 225);
+  border-radius: 12px;
+  border-width: 2px;
+  border-color: white;
+  width: 70px;
+  margin-left: 2%;
+  color: red;
+  margin-bottom: 4px;
+  font-weight: bold;
+  
+  
+  
+}
+.BreadCrumblabel{
+  text-align: center;
+  background-color: rgb(213, 179, 245);
+  border-radius: 12px;
+  border-width: 2px;
+  border-color: white;
+  width: 130px;
+  margin-left: 2%;
+  color: purple;
+  margin-bottom: 4px;
+  font-weight: bold;
+  
+}
+.Infolabel{
+  text-align: center;
+  background-color: rgb(179, 238, 245);
+  border-radius: 12px;
+  border-width: 2px;
+  border-color: white;
+  width: 80px;
+  margin-left: 2%;
+  color:green;
+  margin-bottom: 4px;
+  font-weight: bold;
+  
+}
+.Questionlabel{
+  text-align: center;
+  background-color: rgba(179, 230, 245, 0.582);
+  border-radius: 12px;
+  border-width: 2px;
+  border-color: white;
+  width: 110px;
+  margin-left: 2%;
+  color: rgb(0, 72, 255);
+  margin-bottom: 4px;
+  font-weight: bold;
+  
+}
+.Otherlabel{
+  text-align: center;
+  background-color:rgba(255, 255, 0, 0.478);
+  border-radius: 12px;
+  border-width: 2px;
+  border-color: white;
+  width: 80px;
+  margin-left: 2%;
+  margin-bottom: 4px;
+  color:white;
+  font-weight: bold;
+  
+}
+.Container{
+  background-color: rgba(128, 128, 128, 0.402);
+  border-radius: 12px;
+  width: 270px;
+  margin-left: 3%;
+  border-color: black;
+  border-width: 3px;
+  padding: 10px;
+}
