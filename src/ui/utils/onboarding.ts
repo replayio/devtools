@@ -39,3 +39,18 @@ export function downloadReplay(nags: Nag[], dismissNag: (nag: Nag) => void): boo
 export function shouldShowJonDonut(nags: Nag[]): boolean {
   return shouldShowNag(nags, Nag.GIVE_JON_A_DONUT);
 }
+
+export function shouldShowConsoleNavigate(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.FIRST_CONSOLE_NAVIGATE);
+}
+
+export function shouldShowBreakpointAdd(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
+}
+
+export function shouldShowBreakpointEdit(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.FIRST_BREAKPOINT_EDIT);
+}
+
+
+

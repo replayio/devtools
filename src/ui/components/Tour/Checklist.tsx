@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { shouldShowJonDonut } from "ui/utils/onboarding";
+import { shouldShowJonDonut, shouldShowConsoleNavigate, shouldShowBreakpointAdd, shouldShowBreakpointEdit  } from "ui/utils/onboarding";
 import { UserInfo } from "ui/hooks/users";
 
 import Events from "ui/components/Events";
@@ -59,8 +59,13 @@ const Checklist: React.FC = () => {
 
   const { nags } = hooks.useGetUserInfo();
   const viewMode = useAppSelector(getViewMode);
-  const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
   const showJonDonutNag = shouldShowJonDonut(nags, viewMode);
+  const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
+  
+  const showConsoleNavigate = shouldShowConsoleNavigate(nags, viewMode);
+	const showBreakpointAdd = shouldShowBreakpointAdd(nags, viewMode);
+  const showBreakpointEdit = shouldShowBreakpointEdit(nags, viewMode);
+  
   const [checkedItems, setCheckedItems] = useState([0]);
   
   const handleShowHowClick = (index: number) => {
@@ -76,6 +81,10 @@ const Checklist: React.FC = () => {
 		<ul>
 		  <li>Open DevTools yet? {showDevtoolsNag ? "No" : "Yep!"}</li>
 		  <li>Given Jon a donut? {showJonDonutNag ? "No" : "Yep!"}</li>
+		  <li>Navigated the console yet? {showConsoleNavigate ? "No" : "Yep!"}</li>
+		  <li>Added a breakpoint? {showBreakpointAdd ? "No" : "Yep!"}</li>
+		  <li>Edited a breakpoint? {showBreakpointEdit ? "No" : "Yep!"}</li>
+		  
 		</ul>
 		
 	  </div>
