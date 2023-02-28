@@ -43,6 +43,7 @@ function ViewerHeaderActions({
         <PrimaryButton color="blue" onClick={handleDoneEditing}>
           Done
         </PrimaryButton>
+        <p> </p>
       </>
     );
   }
@@ -76,6 +77,7 @@ function ViewerHeaderActions({
           >
             Edit
           </SecondaryButton>
+          <p> </p>
         </>
       ) : (
         <></>
