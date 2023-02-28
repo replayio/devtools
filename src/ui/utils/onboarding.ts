@@ -35,3 +35,7 @@ export function downloadReplay(nags: Nag[], dismissNag: (nag: Nag) => void): boo
 
   return shouldShowNag(nags, Nag.DOWNLOAD_REPLAY);
 }
+
+export function shouldShowJonDonut(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.GIVE_JON_A_DONUT);
+}

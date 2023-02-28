@@ -94,7 +94,7 @@ export default function SidePanel() {
 
   return (
     <div className="flex w-full flex-col gap-2">
-      {shouldShowDevToolsNag(nags, viewMode) && (
+      {!shouldShowDevToolsNag(nags, viewMode) && (
         <div className={styles.TourBox}>
           <h2>Welcome to Replay!</h2>
           <p>To get started, click into DevTools so we can show off some time travel features!</p>

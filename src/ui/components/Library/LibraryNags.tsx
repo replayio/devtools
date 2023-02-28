@@ -5,7 +5,7 @@ import { setModal } from "ui/actions/app";
 import hooks from "ui/hooks";
 import { UserInfo } from "ui/hooks/users";
 import { useAppDispatch } from "ui/setup/hooks";
-import { downloadReplay, firstReplay, singleInvitation } from "ui/utils/onboarding";
+import { downloadReplay, firstReplay, singleInvitation, jonDonut } from "ui/utils/onboarding";
 import { trackEvent } from "ui/utils/telemetry";
 
 function useGetNagPreRequisites() {
@@ -42,6 +42,8 @@ function NagSwitcher({
     } else if (firstReplay(userInfo.nags)) {
       trackEvent("onboarding.demo_replay_prompt");
       dispatch(setModal("first-replay"));
+    } else if (jonDonut(userInfo.nags)) {
+      alert('donut successfully passed');
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
