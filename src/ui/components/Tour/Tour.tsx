@@ -12,50 +12,6 @@ import hooks from "ui/hooks";
 import styles from "./Tour.module.css";
 import Icon from "replay-next/components/Icon";
 
-interface TourSection {
-  title: string;
-  items: TourItem[];
-}
-
-interface TourItem {
-  text: string;
-  showHowLink: string;
-  additionalText: string;
-}
-
-const tourData: TourSection[] = [
-  {
-	title: 'Getting Started (1/5)',
-	items: [
-	  {
-		text: 'Open DevTools',
-		showHowLink: '#',
-		additionalText: 'This will open the DevTools window.'
-	  },
-	  {
-		text: 'Add a comment',
-		showHowLink: '#',
-		additionalText: 'This will add a comment to the code.'
-	  },
-	  {
-		text: 'Jump to code',
-		showHowLink: '#',
-		additionalText: 'This will jump to the code.'
-	  },
-	  {
-		text: 'Open Pause Info',
-		showHowLink: '#',
-		additionalText: 'This will open the Pause Info window.'
-	  },
-	  {
-		text: 'Create a print statement',
-		showHowLink: '#',
-		additionalText: 'This will create a print statement in the console.'
-	  },
-	],
-  },  
-];
-
 const Checklist: React.FC = () => {
 
   const { nags } = hooks.useGetUserInfo();
@@ -63,7 +19,7 @@ const Checklist: React.FC = () => {
   const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
   
   const showConsoleNavigate = shouldShowConsoleNavigate(nags, viewMode);
-	const showBreakpointAdd = shouldShowBreakpointAdd(nags, viewMode);
+  const showBreakpointAdd = shouldShowBreakpointAdd(nags, viewMode);
   const showBreakpointEdit = shouldShowBreakpointEdit(nags, viewMode);
   
   const [checkedItems, setCheckedItems] = useState([0]);
@@ -71,6 +27,9 @@ const Checklist: React.FC = () => {
   const handleShowHowClick = (index: number) => {
 	alert("instructional text");
   };
+  
+  const isComplete = !showDevtoolsNag && !showConsoleNavigate && !showBreakpointAdd && !showBreakpointEdit;
+
 
   return (
 	  
@@ -85,6 +44,12 @@ const Checklist: React.FC = () => {
 		  <li><Icon className={styles.Icon} type={showBreakpointAdd ? "unchecked-rounded" : "checked-rounded"} /> Magic print statements </li>
 		  <li><Icon className={styles.Icon} type={showBreakpointEdit ? "unchecked-rounded" : "checked-rounded"} /> Edit a print statement</li>				  
 		</ul>
+		
+		{isComplete ? (
+			<div className="bg-yellow-200 text-lg p-2 rounded-md text-black mt-8">
+				Congratulations! You completed the checklist! Confetti and stuff!
+			</div>
+		  ) : null}
 		
 	  </div>
 	</div>
