@@ -17,7 +17,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "^1.25.1",
+    "@playwright/test": "^1.31.1",
     "@recordreplay/playwright": "^1.18.3",
     "@replayio/cypress": "^0.5.0",
     "@replayio/playwright": "^0.3.20",

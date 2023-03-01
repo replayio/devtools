@@ -3929,27 +3929,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:^1.23.1":
-  version: 1.23.1
-  resolution: "@playwright/test@npm:1.23.1"
+"@playwright/test@npm:^1.31.1":
+  version: 1.31.1
+  resolution: "@playwright/test@npm:1.31.1"
   dependencies:
     "@types/node": "*"
-    playwright-core: 1.23.1
+    fsevents: 2.3.2
+    playwright-core: 1.31.1
+  dependenciesMeta:
+    fsevents:
+      optional: true
   bin:
     playwright: cli.js
-  checksum: 27fc6b4424dfb0f0dfaaecb01a33bf77c0f95e6a1e635fe85dd4ad36e5053afdbe4ad1de4be1c5705e482451b43f7ddacf667f6c5b70ab5f8e32c30110211c29
-  languageName: node
-  linkType: hard
-
-"@playwright/test@npm:^1.25.1":
-  version: 1.26.1
-  resolution: "@playwright/test@npm:1.26.1"
-  dependencies:
-    "@types/node": "*"
-    playwright-core: 1.26.1
-  bin:
-    playwright: cli.js
-  checksum: 872bc58dfa8f8a94547b69aaf7e88178213e2201a17aced1b425ef6b13bdd2b53e7274ae8f7ca57dfc189b214be5da5e3290f80b03e5bf5bdc4f3ff0ccd38375
+  checksum: 9e3364034c1390658d05f7dc0b0bbbae1464267331b738f986f37bef2630d7689446dabef8de0aa1b5acbdf3f5654114e07b8b2e3828917e1c0a6664eb37f145
   languageName: node
   linkType: hard
 
@@ -13165,6 +13157,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fsevents@npm:2.3.2, fsevents@npm:^2.1.2, fsevents@npm:^2.3.2, fsevents@npm:~2.3.2":
+  version: 2.3.2
+  resolution: "fsevents@npm:2.3.2"
+  dependencies:
+    node-gyp: latest
+  checksum: 97ade64e75091afee5265e6956cb72ba34db7819b4c3e94c431d4be2b19b8bb7a2d4116da417950c3425f17c8fe693d25e20212cac583ac1521ad066b77ae31f
+  conditions: os=darwin
+  languageName: node
+  linkType: hard
+
 "fsevents@npm:^1.2.7":
   version: 1.2.13
   resolution: "fsevents@npm:1.2.13"
@@ -13176,12 +13178,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fsevents@npm:^2.1.2, fsevents@npm:^2.3.2, fsevents@npm:~2.3.2":
+"fsevents@patch:fsevents@2.3.2#~builtin<compat/fsevents>, fsevents@patch:fsevents@^2.1.2#~builtin<compat/fsevents>, fsevents@patch:fsevents@^2.3.2#~builtin<compat/fsevents>, fsevents@patch:fsevents@~2.3.2#~builtin<compat/fsevents>":
   version: 2.3.2
-  resolution: "fsevents@npm:2.3.2"
+  resolution: "fsevents@patch:fsevents@npm%3A2.3.2#~builtin<compat/fsevents>::version=2.3.2&hash=18f3a7"
   dependencies:
     node-gyp: latest
-  checksum: 97ade64e75091afee5265e6956cb72ba34db7819b4c3e94c431d4be2b19b8bb7a2d4116da417950c3425f17c8fe693d25e20212cac583ac1521ad066b77ae31f
   conditions: os=darwin
   languageName: node
   linkType: hard
@@ -13192,15 +13193,6 @@ __metadata:
   dependencies:
     bindings: ^1.5.0
     nan: ^2.12.1
-  conditions: os=darwin
-  languageName: node
-  linkType: hard
-
-"fsevents@patch:fsevents@^2.1.2#~builtin<compat/fsevents>, fsevents@patch:fsevents@^2.3.2#~builtin<compat/fsevents>, fsevents@patch:fsevents@~2.3.2#~builtin<compat/fsevents>":
-  version: 2.3.2
-  resolution: "fsevents@patch:fsevents@npm%3A2.3.2#~builtin<compat/fsevents>::version=2.3.2&hash=18f3a7"
-  dependencies:
-    node-gyp: latest
   conditions: os=darwin
   languageName: node
   linkType: hard
@@ -13235,7 +13227,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "functional-tests@workspace:packages/e2e-tests"
   dependencies:
-    "@playwright/test": ^1.25.1
+    "@playwright/test": ^1.31.1
     "@recordreplay/playwright": ^1.18.3
     "@replayio/cypress": ^0.5.0
     "@replayio/playwright": ^0.3.20
@@ -19264,15 +19256,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.23.1":
-  version: 1.23.1
-  resolution: "playwright-core@npm:1.23.1"
-  bin:
-    playwright: cli.js
-  checksum: 1e6a3a7a9aaee1864b22195c7fef52b6980fcafc6d667749737455360a44a182a7035f12bfd76f298f957d1b99550420a8748f6a473ceeacf2cb2db42beb9be0
-  languageName: node
-  linkType: hard
-
 "playwright-core@npm:1.26.1":
   version: 1.26.1
   resolution: "playwright-core@npm:1.26.1"
@@ -19288,6 +19271,15 @@ __metadata:
   bin:
     playwright: cli.js
   checksum: 5e4b690b0b449ed27ab7f7d7c9bf778db53e6c6b37a8e7258fb070fe6e96f147ad5d66221a3953c9e4d0b2044b701c493d7a0708d7bdb6486e38a3518f62fdce
+  languageName: node
+  linkType: hard
+
+"playwright-core@npm:1.31.1":
+  version: 1.31.1
+  resolution: "playwright-core@npm:1.31.1"
+  bin:
+    playwright: cli.js
+  checksum: 8add37db15e607c11c356c82dd65926813d116bbea513bfb18f4d89c03e8d9c2b36b86ca980c8754f4e90b3d6ecbff3f4fd1165cd828e73de986ab3f53238362
   languageName: node
   linkType: hard
 
@@ -21239,7 +21231,7 @@ __metadata:
     "@codemirror/state_replay_next": "npm:@codemirror/state@6.1.2"
     "@lezer/common_replay_next": "npm:@lezer/common@1.0.1"
     "@lezer/highlight_replay_next": "npm:@lezer/highlight@1.1.1"
-    "@playwright/test": ^1.23.1
+    "@playwright/test": ^1.31.1
     "@replayio/protocol": ^0.32.3
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
