@@ -1,16 +1,19 @@
 import camelCase from "lodash/camelCase";
-import React, { ReactNode, Suspense, useContext, useMemo, useSyncExternalStore } from "react";
+import React, { ReactNode, Suspense, useContext, useMemo } from "react";
 
 import { Badge, Checkbox } from "design";
 import Icon from "replay-next/components/Icon";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
-import { getStatus, subscribeForStatus } from "replay-next/src/suspense/ExceptionsCache";
+import { getExceptionPointsSuspense } from "replay-next/src/suspense/ExceptionsCache";
 import { CategoryCounts, getMessagesSuspense } from "replay-next/src/suspense/MessagesCache";
 import { getRecordingCapabilitiesSuspense } from "replay-next/src/suspense/RecordingCache";
 import { isInNodeModules } from "replay-next/src/utils/messages";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { isThennable } from "shared/proxy/utils";
+import { ProtocolError, isCommandError } from "shared/utils/error";
+import { toPointRange } from "shared/utils/time";
 
 import EventsList from "./EventsList";
 import styles from "./FilterToggles.module.css";
@@ -29,29 +32,14 @@ export default function FilterToggles() {
   const replayClient = useContext(ReplayClientContext);
   const recordingCapabilities = getRecordingCapabilitiesSuspense(replayClient);
 
-  const status = useSyncExternalStore(subscribeForStatus, getStatus, getStatus);
-  let exceptionsBadge = null;
-  switch (status) {
-    case "failed-too-many-points": {
-      if (showExceptions) {
-        exceptionsBadge = (
-          <span title="There are too many exceptions. Please focus to a smaller time range and try again.">
-            <Icon className={styles.ExceptionsErrorIcon} type="warning" />
-          </span>
-        );
-      }
-      break;
-    }
-    case "request-in-progress": {
-      exceptionsBadge = <Icon className={styles.SpinnerIcon} type="spinner" />;
-      break;
-    }
-  }
-
   return (
     <div className={styles.Filters} data-test-id="ConsoleFilterToggles">
       <Toggle
-        afterContent={exceptionsBadge}
+        afterContent={
+          <Suspense fallback={<Icon className={styles.SpinnerIcon} type="spinner" />}>
+            <ExceptionsBadgeSuspends />
+          </Suspense>
+        }
         checked={showExceptions}
         label="Exceptions"
         onChange={showExceptions => update({ showExceptions })}
@@ -182,4 +170,41 @@ function NodeModulesCount() {
   } else {
     return null;
   }
+}
+
+function ExceptionsBadgeSuspends() {
+  const replayClient = useContext(ReplayClientContext);
+  const { rangeForDisplay: focusRange } = useContext(FocusContext);
+  const { showExceptionsForDisplay: showExceptions } = useContext(ConsoleFiltersContext);
+
+  if (!focusRange || !showExceptions) {
+    return null;
+  }
+
+  try {
+    getExceptionPointsSuspense(replayClient, toPointRange(focusRange));
+  } catch (errorOrPromise) {
+    if (isThennable(errorOrPromise)) {
+      throw errorOrPromise;
+    }
+
+    let title: string;
+    if (
+      isCommandError(errorOrPromise, ProtocolError.TooManyPoints) ||
+      (errorOrPromise instanceof Error &&
+        errorOrPromise.message === "Too many points to run analysis")
+    ) {
+      title = "There are too many exceptions. Please focus to a smaller time range and try again.";
+    } else {
+      title = "Failed to fetch exceptions.";
+    }
+
+    return (
+      <span title={title}>
+        <Icon className={styles.ExceptionsErrorIcon} type="warning" />
+      </span>
+    );
+  }
+
+  return null;
 }

@@ -1,4 +1,4 @@
-import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { Suspense, memo, useContext } from "react";
 
@@ -8,7 +8,7 @@ import Loader from "replay-next/components/Loader";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { InspectableTimestampedPointContext } from "replay-next/src/contexts/InspectorContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { EventLog } from "replay-next/src/suspense/EventsCache";
+import { EventLog, getEventSuspense } from "replay-next/src/suspense/EventsCache";
 import { formatTimestamp } from "replay-next/src/utils/time";
 
 import MessageHoverButton from "../MessageHoverButton";
@@ -24,14 +24,13 @@ function EventLogRenderer({
   index: number;
   isFocused: boolean;
 }) {
-  const { showTimestamps } = useContext(ConsoleFiltersContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
   const ref = useRef<HTMLDivElement>(null);
 
   const [isHovered, setIsHovered] = useState(false);
 
-  const { point, pauseId, time, values } = eventLog;
+  const { point, time } = eventLog;
 
   const context = useMemo(
     () => ({
@@ -52,34 +51,7 @@ function EventLogRenderer({
     className = `${className} ${styles.Focused}`;
   }
 
-  const content =
-    values.length > 0
-      ? values.map((value, index) => (
-          <Fragment key={index}>
-            <Inspector context="console" pauseId={pauseId} protocolValue={value} />
-            {index < values.length - 1 && " "}
-          </Fragment>
-        ))
-      : null;
-
   const { contextMenu, onContextMenu } = useConsoleContextMenu(eventLog);
-
-  const primaryContent = (
-    <>
-      {showTimestamps && (
-        <span className={styles.TimeStamp}>{formatTimestamp(eventLog.time, true)} </span>
-      )}
-      {content ? (
-        <span className={styles.LogContents} data-test-name="LogContents">
-          {content}
-        </span>
-      ) : (
-        <span className={styles.LogContentsEmpty} data-test-name="LogContents">
-          No data to display.
-        </span>
-      )}
-    </>
-  );
 
   return (
     <>
@@ -98,14 +70,16 @@ function EventLogRenderer({
         >
           <span className={styles.Source}>
             <Suspense fallback={<Loader />}>
-              <Source locations={eventLog.location} />
+              <Source locations={eventLog.frame!} />
             </Suspense>
           </span>
-          {primaryContent}
+          <Suspense fallback={<Loader />}>
+            <AnalyzedContent eventLog={eventLog} />
+          </Suspense>
           {isHovered && (
             <MessageHoverButton
               executionPoint={eventLog.point}
-              locations={eventLog.location}
+              locations={eventLog.frame!}
               showAddCommentButton={true}
               time={eventLog.time}
             />
@@ -113,6 +87,39 @@ function EventLogRenderer({
         </div>
       </InspectableTimestampedPointContext.Provider>
       {contextMenu}
+    </>
+  );
+}
+
+function AnalyzedContent({ eventLog }: { eventLog: EventLog }) {
+  const { showTimestamps } = useContext(ConsoleFiltersContext);
+
+  const { pauseId, values } = getEventSuspense(eventLog.eventType, eventLog.point);
+
+  const content =
+    values.length > 0
+      ? values.map((value, index) => (
+          <Fragment key={index}>
+            <Inspector context="console" pauseId={pauseId} protocolValue={value} />
+            {index < values.length - 1 && " "}
+          </Fragment>
+        ))
+      : null;
+
+  return (
+    <>
+      {showTimestamps && (
+        <span className={styles.TimeStamp}>{formatTimestamp(eventLog.time, true)} </span>
+      )}
+      {content ? (
+        <span className={styles.LogContents} data-test-name="LogContents">
+          {content}
+        </span>
+      ) : (
+        <span className={styles.LogContentsEmpty} data-test-name="LogContents">
+          No data to display.
+        </span>
+      )}
     </>
   );
 }

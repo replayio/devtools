@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 
+import { TestCaseResultIcon } from "devtools/client/debugger/src/components/TestInfo/TestCase";
 import TestInfo from "devtools/client/debugger/src/components/TestInfo/TestInfo";
 import { Annotation, Recording, TestItem } from "shared/graphql/types";
 import {
@@ -41,19 +42,26 @@ function getSpecFilename(recording: Recording | void) {
 }
 
 function TestResultsSummary({ testCases }: { testCases: TestItem[] }) {
-  const failed = testCases.filter(c => c.result === "failed").length;
+  const failed = testCases.filter(c => c.result === "failed" || c.result === "timedOut").length;
   const passed = testCases.filter(c => c.result === "passed").length;
+  const skipped = testCases.filter(c => c.result === "skipped").length;
 
   return (
     <div className="ml-4 flex gap-2 px-1 py-1">
-      <div className="flex items-center gap-1">
-        <Icon filename="testsuites-success" size="small" className={styles.SuccessIcon} />
+      <div className="flex items-center gap-1" title="Passed">
+        <TestCaseResultIcon result="passed" />
         <div className={`text-sm ${styles.SuccessText}`}>{passed}</div>
       </div>
-      <div className="mr-1 flex items-center gap-1">
-        <Icon filename="testsuites-fail" size="small" className={styles.ErrorIcon} />
+      <div className="flex items-center gap-1" title="Failed">
+        <TestCaseResultIcon result="failed" />
         <div className={`text-sm ${styles.ErrorTextLighter}`}>{failed}</div>
       </div>
+      {skipped > 0 ? (
+        <div className="flex items-center gap-1" title="Skipped">
+          <TestCaseResultIcon result="skipped" />
+          <div className={`text-sm ${styles.SkippedText}`}>{skipped}</div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -100,20 +108,7 @@ export function TestSuitePanel() {
               {" "}
               {testCases[selectedTest].title}
             </span>
-            {testCases[selectedTest].error ? (
-              <Icon
-                filename="testsuites-fail"
-                size="small"
-                className={`self-start ${styles.ErrorIcon}`}
-              />
-            ) : (
-              <Icon
-                filename="testsuites-success"
-                size="medium"
-                className={styles.SuccessIcon}
-                style={{ alignSelf: "flex-start" }}
-              />
-            )}
+            <TestCaseResultIcon result={testCases[selectedTest].result} size="medium" />
           </button>
         ) : (
           <>

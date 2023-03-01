@@ -127,10 +127,11 @@ function HeaderTitle({
     }
   };
   const onBlur = () => {
-    if (editState !== EditState.Active) {
+    const contentEditable = contentEditableRef.current;
+    if (editState !== EditState.Active || !contentEditable) {
       return;
     }
-    const currentValue = contentEditableRef.current!.textContent || "";
+    const currentValue = contentEditable.textContent || "";
 
     setEditState(EditState.Saving);
     updateRecordingTitle(recordingId, currentValue).then(() => {

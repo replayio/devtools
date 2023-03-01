@@ -387,8 +387,7 @@ export function replayPlayback(): UIThunkAction {
   return (dispatch, getState) => {
     const beginTime = 0;
 
-    dispatch(seekToTime(beginTime));
-    dispatch(startPlayback());
+    dispatch(seekToTime(beginTime, true));
   };
 }
 
