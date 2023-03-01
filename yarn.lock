@@ -1838,18 +1838,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/lang-javascript@npm:^6.0.2":
-  version: 6.0.2
-  resolution: "@codemirror/lang-javascript@npm:6.0.2"
+"@codemirror/lang-javascript@npm:^6.1.4":
+  version: 6.1.4
+  resolution: "@codemirror/lang-javascript@npm:6.1.4"
   dependencies:
     "@codemirror/autocomplete": ^6.0.0
-    "@codemirror/language": ^6.0.0
+    "@codemirror/language": ^6.6.0
     "@codemirror/lint": ^6.0.0
     "@codemirror/state": ^6.0.0
     "@codemirror/view": ^6.0.0
     "@lezer/common": ^1.0.0
     "@lezer/javascript": ^1.0.0
-  checksum: a63058e6970a54779c945eccc2d5a88ccda5bcd3049dd18cd787e684414861a7f1d78097115eadc155bf0a199a1d8770e1538daf976cdcd5641348cf174101e6
+  checksum: d550db179c522cd7c39d26815ee47ac4751656c856d42eeb3743e67482d4377692c4fcd3413b0e97c2c7070b6b10aaa582909c6234f42b04145d56efc49c8a6b
   languageName: node
   linkType: hard
 
@@ -1874,6 +1874,20 @@ __metadata:
     "@lezer/lr": ^1.0.0
     style-mod: ^4.0.0
   checksum: b98844f221ef5a1f8fb4ef1c74891056b7a4c063d1373a45cfb4ac0add080decc4f5a90650fad0112fe91f969f535008351b1d6c440826e80ccee0c7aaeeb0f8
+  languageName: node
+  linkType: hard
+
+"@codemirror/language@npm:^6.6.0":
+  version: 6.6.0
+  resolution: "@codemirror/language@npm:6.6.0"
+  dependencies:
+    "@codemirror/state": ^6.0.0
+    "@codemirror/view": ^6.0.0
+    "@lezer/common": ^1.0.0
+    "@lezer/highlight": ^1.0.0
+    "@lezer/lr": ^1.0.0
+    style-mod: ^4.0.0
+  checksum: bb9411620e2f231653a3f0c4429e0d19a3843bff5dbc117df4649d7bf783ec4ad809c0add8bc0887a4ec3f48b4f8f941621168e47d76101d5383f0d670af1722
   languageName: node
   linkType: hard
 
@@ -17143,7 +17157,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "markerikson-stack-client-prototype-227d06@workspace:packages/markerikson-stack-client-prototype"
   dependencies:
-    "@codemirror/lang-javascript": ^6.0.2
+    "@codemirror/lang-javascript": ^6.1.4
     "@replayio/protocol": ^0.32.2
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
