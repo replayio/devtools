@@ -5,7 +5,7 @@ import { setViewMode } from "ui/actions/layout";
 import Events from "ui/components/Events";
 import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
 import hooks from "ui/hooks";
-import { Nag } from "ui/hooks";
+import { Nag } from "ui/hooks/users";
 import { useDismissNag } from "ui/hooks/users";
 import { UserInfo } from "ui/hooks/users";
 import { getViewMode } from "ui/reducers/layout";
@@ -23,9 +23,8 @@ import styles from "./Tour.module.css";
 const useNagDismissal = () => {
   const dismissNag = useDismissNag();
   const dismissDevtoolsNag = () => {
-    // dismissNag(Nag.VIEW_DEVTOOLS);
-    console.log(dismissNag);
-    console.log(Nag);
+    dismissNag(Nag.DISMISS_TOUR);
+    console.log("Dismissed probably!");
   };
   return { dismissDevtoolsNag };
 };
@@ -38,6 +37,7 @@ const Checklist: React.FC = () => {
   const showConsoleNavigate = shouldShowConsoleNavigate(nags, viewMode);
   const showBreakpointAdd = shouldShowBreakpointAdd(nags, viewMode);
   const showBreakpointEdit = shouldShowBreakpointEdit(nags, viewMode);
+  const showTour = shouldShowTour(nags, viewMode);
 
   const [checkedItems, setCheckedItems] = useState([0]);
 
@@ -104,7 +104,7 @@ const Checklist: React.FC = () => {
                 <li>
                   <Icon
                     className={styles.Icon}
-                    type={shouldShowTour ? "unchecked-rounded" : "checked-rounded"}
+                    type={showTour ? "unchecked-rounded" : "checked-rounded"}
                   />{" "}
                   Finish tour
                 </li>
