@@ -8,7 +8,7 @@ export default function NewSourceNag() {
   const [showAddBreakpointNag] = useNag(Nag.FIRST_BREAKPOINT_ADD);
   const [showEditBreakpointNag] = useNag(Nag.FIRST_BREAKPOINT_EDIT);
   const [showConsoleNavigate] = useNag(Nag.FIRST_CONSOLE_NAVIGATE);
-  
+
   if (!showAddBreakpointNag && !showEditBreakpointNag) {
     return null;
   }

@@ -11,7 +11,7 @@ export enum Nag {
   FIRST_BREAKPOINT_ADD = "first_breakpoint_add",
   FIRST_BREAKPOINT_SAVE = "first_breakpoint_save",
   DOWNLOAD_REPLAY = "download_replay",
-  DISMISS_TOUR = "dismiss_tour"
+  DISMISS_TOUR = "dismiss_tour",
 }
 
 export enum EmailSubscription {

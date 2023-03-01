@@ -20,6 +20,16 @@ import {
 
 import styles from "./Tour.module.css";
 
+const useNagDismissal = () => {
+  const dismissNag = useDismissNag();
+  const dismissDevtoolsNag = () => {
+    // dismissNag(Nag.VIEW_DEVTOOLS);
+    console.log(dismissNag);
+    console.log(Nag);
+  };
+  return { dismissDevtoolsNag };
+};
+
 const Checklist: React.FC = () => {
   const { nags } = hooks.useGetUserInfo();
   const viewMode = useAppSelector(getViewMode);
@@ -40,11 +50,7 @@ const Checklist: React.FC = () => {
   const hasCompletedTour =
     !showDevtoolsNag && !showConsoleNavigate && !showBreakpointAdd && !showBreakpointEdit;
 
-  const butt = () => {
-    // const dismissNag = hooks.useDismissNag();
-    // dismissNag(Nag.VIEW_DEVTOOLS);
-    console.log("butt");
-  };
+  const { dismissDevtoolsNag } = useNagDismissal();
 
   return (
     <div className={styles.TourBoxWrapper}>
@@ -111,7 +117,7 @@ const Checklist: React.FC = () => {
               Congratulations! You completed the checklist! Confetti and stuff!
               <p>
                 Let’s{" "}
-                <a href="#" onClick={butt}>
+                <a href="#" onClick={dismissDevtoolsNag}>
                   dismiss it
                 </a>
                 .

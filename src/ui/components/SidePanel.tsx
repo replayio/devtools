@@ -21,12 +21,12 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ViewMode } from "ui/state/layout";
 import useAuth0 from "ui/utils/useAuth0";
 
-import Tour from "./Tour/Tour";
 import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
 import ProtocolViewer from "./ProtocolViewer";
 import StatusDropdown from "./shared/StatusDropdown";
 import { TestSuitePanel } from "./TestSuitePanel";
+import Tour from "./Tour/Tour";
 import styles from "src/ui/components/SidePanel.module.css";
 
 function useInitialPrimaryPanel() {
@@ -93,7 +93,7 @@ export default function SidePanel() {
   const info = useTestInfo();
 
   return (
-    <div className="flex w-full flex-col gap-2">     
+    <div className="flex w-full flex-col gap-2">
       {!isAuthenticated && !info.isTestSuiteReplay && (
         <div className={styles.TourBox}>
           <h2>Welcome to Replay!</h2>
@@ -132,7 +132,7 @@ export default function SidePanel() {
         {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}
         {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}
         {selectedPrimaryPanel === "comments" && <CommentCardsList />}
-        {selectedPrimaryPanel === "tour" && <Tour />}  
+        {selectedPrimaryPanel === "tour" && <Tour />}
         {selectedPrimaryPanel === "events" && <EventsPane items={items} />}
         {selectedPrimaryPanel === "cypress" && <TestSuitePanel />}
         {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}

@@ -5,7 +5,7 @@ import { setModal } from "ui/actions/app";
 import hooks from "ui/hooks";
 import { UserInfo } from "ui/hooks/users";
 import { useAppDispatch } from "ui/setup/hooks";
-import { downloadReplay, firstReplay, singleInvitation, dismissTour } from "ui/utils/onboarding";
+import { dismissTour, downloadReplay, firstReplay, singleInvitation } from "ui/utils/onboarding";
 import { trackEvent } from "ui/utils/telemetry";
 
 function useGetNagPreRequisites() {
