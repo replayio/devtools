@@ -48,5 +48,8 @@ export function shouldShowBreakpointEdit(nags: Nag[]): boolean {
   return shouldShowNag(nags, Nag.FIRST_BREAKPOINT_EDIT);
 }
 
+export function shouldShowTour(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.DISMISS_TOUR);
+}
 
 

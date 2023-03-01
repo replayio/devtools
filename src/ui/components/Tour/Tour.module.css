@@ -1,7 +1,7 @@
 .TourBoxWrapper {
-  background-color: #e7376f; 
+  background-color: #e7376f;
   height: 100%;
-  background-image: url('/images/illustrations/tour1.png');
+  background-image: url("/images/illustrations/tour1.png");
   background-repeat: no-repeat;
   background-position: bottom left;
 }
@@ -11,26 +11,29 @@
   color: #fff;
 }
 
-.h1
-{
+.h1 {
   color: #fff;
   font-size: 20px;
   font-weight: 500;
   margin-bottom: 1rem;
 }
 
-.checklist li
-{  
-  padding-bottom: .5rem;
+.h1 p {
+  margin-bottom: 16px;
+  line-height: 120%;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.checklist li {
+  padding-bottom: 0.5rem;
   display: flex;
   align-items: center;
   font-size: 16px;
+  background-color: rgba(231, 55, 111, 0.851);
 }
 
-.Icon
-{
-  height: 18px;  
-  margin-right: .25rem;
+.Icon {
+  height: 18px;
+  margin-right: 0.25rem;
   color: #fff;
 }
-
