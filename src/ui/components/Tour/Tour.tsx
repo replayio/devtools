@@ -42,7 +42,7 @@ const Checklist: React.FC = () => {
   const viewMode = useAppSelector(getViewMode);
   const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
 
-  const showConsoleNavigate = shouldShowConsoleNavigate(nags, viewMode);
+  const showConsoleNavigate = shouldShowConsoleNavigate(nags);
   const showBreakpointAdd = shouldShowBreakpointAdd(nags, viewMode);
   const showBreakpointEdit = shouldShowBreakpointEdit(nags, viewMode);
   const showTour = shouldShowTour(nags, viewMode);
