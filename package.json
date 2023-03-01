@@ -198,7 +198,7 @@
     "postcss-loader": "^6.2.1",
     "prettier": "^2.6.2",
     "prettier-plugin-import-sort": "^0.0.7",
-    "prettier-plugin-tailwindcss": "^0.1.7",
+    "prettier-plugin-tailwindcss": "^0.2.3",
     "raw-loader": "^4.0.2",
     "sharp": "^0.30.3",
     "source-map-loader": "^4.0.1",
