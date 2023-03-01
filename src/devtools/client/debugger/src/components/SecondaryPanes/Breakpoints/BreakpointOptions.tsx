@@ -2,9 +2,11 @@ import React, { Suspense, useContext, useMemo } from "react";
 
 import Loader from "replay-next/components/Loader";
 import SyntaxHighlightedLine from "replay-next/components/sources/SyntaxHighlightedLine";
+import { getStreamingSourceContentsSuspense } from "replay-next/src/suspense/SourcesCache";
+import { getParsedValueIfCached } from "replay-next/src/suspense/SyntaxParsingCache";
+import { ParsedToken } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
-import { getSourceLinesSuspense } from "ui/suspense/sourceCaches";
 
 import styles from "./BreakpointOptions.module.css";
 
@@ -17,25 +19,38 @@ function BreakpointLineContents({ breakpoint }: BreakpointProps) {
   const replayClient = useContext(ReplayClientContext);
   const { sourceId } = breakpoint.location;
 
-  const sourceLines = getSourceLinesSuspense(sourceId, replayClient);
+  const streamingSourceContent = getStreamingSourceContentsSuspense(replayClient, sourceId);
+  const parsed = getParsedValueIfCached(streamingSourceContent, null)?.value;
 
-  const snippet = useMemo(() => {
+  const parsedTokensByLine = parsed?.parsedTokensByLine;
+  const rawTextByLine = parsed?.rawTextByLine;
+
+  const { snippet, tokens } = useMemo((): { snippet: string; tokens: ParsedToken[] } => {
     const { column, line } = breakpoint.location;
     let snippet = "";
+    let tokens: ParsedToken[] = [];
 
-    if (sourceLines.length > 0) {
-      const lineText = sourceLines[line - 1];
-      return lineText.slice(column, column! + 100).trim();
+    if (
+      rawTextByLine &&
+      rawTextByLine.length > 0 &&
+      parsedTokensByLine &&
+      parsedTokensByLine[line - 1]
+    ) {
+      const lineText = rawTextByLine[line - 1];
+      tokens = parsedTokensByLine[line - 1].slice(
+        parsedTokensByLine[line - 1].findIndex(parsedToken => parsedToken.columnIndex === column)
+      );
+      return { snippet: lineText.slice(column, column! + 100).trim(), tokens };
     }
 
-    return snippet;
-  }, [sourceLines, breakpoint]);
+    return { snippet, tokens };
+  }, [rawTextByLine, parsedTokensByLine, breakpoint]);
 
-  if (!snippet) {
+  if (!snippet || !tokens) {
     return null;
   }
 
-  return <SyntaxHighlightedLine code={snippet} />;
+  return <SyntaxHighlightedLine code={snippet} tokens={tokens} />;
 }
 
 export default function BreakpointOptions({ breakpoint, type }: BreakpointProps) {
@@ -54,6 +69,7 @@ export default function BreakpointOptions({ breakpoint, type }: BreakpointProps)
             log(
             <SyntaxHighlightedLine code={content} />)
           </span>
+          ;
         </>
       );
     } else {
