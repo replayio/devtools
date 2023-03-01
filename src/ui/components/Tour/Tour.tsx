@@ -2,12 +2,14 @@ import React, { useState } from "react";
 
 import Icon from "replay-next/components/Icon";
 import { setViewMode } from "ui/actions/layout";
+import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import Events from "ui/components/Events";
 import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { useDismissNag } from "ui/hooks/users";
 import { UserInfo } from "ui/hooks/users";
+import { useTestInfo } from "ui/hooks/useTestInfo";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ViewMode } from "ui/state/layout";
@@ -22,9 +24,15 @@ import styles from "./Tour.module.css";
 
 const useNagDismissal = () => {
   const dismissNag = useDismissNag();
+  const dispatch = useAppDispatch();
+  const info = useTestInfo();
+
   const dismissDevtoolsNag = () => {
     dismissNag(Nag.DISMISS_TOUR);
     console.log("Dismissed probably!");
+
+    const initialPrimaryPanel = info.isTestSuiteReplay ? "cypress" : "events";
+    dispatch(setSelectedPrimaryPanel(initialPrimaryPanel));
   };
   return { dismissDevtoolsNag };
 };
