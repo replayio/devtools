@@ -3244,12 +3244,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@next/bundle-analyzer@npm:^12.2.0":
-  version: 12.2.0
-  resolution: "@next/bundle-analyzer@npm:12.2.0"
+"@next/bundle-analyzer@npm:^13.2.3":
+  version: 13.2.3
+  resolution: "@next/bundle-analyzer@npm:13.2.3"
   dependencies:
-    webpack-bundle-analyzer: 4.3.0
-  checksum: e08770ed2f7bfa4fb38c29d58d1e3ad198fa7e9a8c061ea5e15950dd10576bed0b5b8c19266e18503af1d211a0d8d450b5fed4926f6863135b38e585d6fd1980
+    webpack-bundle-analyzer: 4.7.0
+  checksum: 54648ea4a2f0c093c57279197bfcb6e6a316b4b794a4f331fc9210993e3ae806561942b6398c33fb27d64daf7b398b2636b949e99d8892f99ac742dca26d59a0
   languageName: node
   linkType: hard
 
@@ -9930,7 +9930,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:^6.2.0, commander@npm:^6.2.1":
+"commander@npm:^6.2.1":
   version: 6.2.1
   resolution: "commander@npm:6.2.1"
   checksum: d7090410c0de6bc5c67d3ca41c41760d6d268f3c799e530aafb73b7437d1826bbf0d2a3edac33f8b57cc9887b4a986dce307fa5557e109be40eadb7c43b21742
@@ -20758,7 +20758,7 @@ __metadata:
     "@lexical/link": ^0.6.5
     "@lexical/mark": ^0.6.5
     "@lexical/react": ^0.6.5
-    "@next/bundle-analyzer": ^12.2.0
+    "@next/bundle-analyzer": ^13.2.3
     "@recordreplay/playwright": ^1.18.3
     "@recordreplay/sourcemap-upload-cli": ^0.1.1
     "@reduxjs/toolkit": ^1.8.4
@@ -24745,14 +24745,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-bundle-analyzer@npm:4.3.0":
-  version: 4.3.0
-  resolution: "webpack-bundle-analyzer@npm:4.3.0"
+"webpack-bundle-analyzer@npm:4.7.0":
+  version: 4.7.0
+  resolution: "webpack-bundle-analyzer@npm:4.7.0"
   dependencies:
     acorn: ^8.0.4
     acorn-walk: ^8.0.0
     chalk: ^4.1.0
-    commander: ^6.2.0
+    commander: ^7.2.0
     gzip-size: ^6.0.0
     lodash: ^4.17.20
     opener: ^1.5.2
@@ -24760,7 +24760,7 @@ __metadata:
     ws: ^7.3.1
   bin:
     webpack-bundle-analyzer: lib/bin/analyzer.js
-  checksum: 00b7bf4ac9fca17062b66b6897145b94e87153d3ec8815f0e0c05a3b8a1ca75320262db01a5fa634f604ee3d41aecde1ee59838d05b6d03cd5be62eb1addbcf8
+  checksum: 4ce3b379c61ce16b2219756843407cc99f2b82cd191f653043f1b705a3e32b3af03834af0dfded98ab852313a892a148bed1a8effaacd6440f028c19f41581f3
   languageName: node
   linkType: hard
 
