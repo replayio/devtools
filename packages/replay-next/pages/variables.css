@@ -695,7 +695,7 @@
   --theme-focuser-bgcolor: var(--primary-accent);
   --theme-sidebar-background: var(--theme-base-100);
   --theme-text-field-bgcolor-hover: var(--theme-base-95);
-  --theme-text-field-bgcolor: #f8f8f8;
+  --theme-text-field-bgcolor: #e6e6e6;
   --theme-text-field-color: var(--theme-body-color);
   --theme-text-field-placeholder-color: #a9a9b1;
   --tooltip-bgcolor: #38383d;
