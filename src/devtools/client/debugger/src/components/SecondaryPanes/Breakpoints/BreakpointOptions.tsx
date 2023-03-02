@@ -3,8 +3,7 @@ import React, { Suspense, useContext, useMemo } from "react";
 import Loader from "replay-next/components/Loader";
 import SyntaxHighlightedLine from "replay-next/components/sources/SyntaxHighlightedLine";
 import { getStreamingSourceContentsSuspense } from "replay-next/src/suspense/SourcesCache";
-import { getParsedValueIfCached } from "replay-next/src/suspense/SyntaxParsingCache";
-import { ParsedToken } from "replay-next/src/suspense/SyntaxParsingCache";
+import { ParsedToken, getParsedValueIfCached } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 
@@ -69,7 +68,6 @@ export default function BreakpointOptions({ breakpoint, type }: BreakpointProps)
             log(
             <SyntaxHighlightedLine code={content} />)
           </span>
-          ;
         </>
       );
     } else {
