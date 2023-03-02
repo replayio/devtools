@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`syntax-highlighting syntax highliting should work when tokens are passed to SyntaxHighlitedLine 1`] = `
+<span
+  className=" Code"
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": "<span class=\\"tok-variableName\\">button</span><span class=\\"tok-operator\\">.</span><span class=\\"tok-propertyName\\">addEventListener</span><span class=\\"tok-punctuation\\">(</span><span class=\\"tok-string\\">&quot;click&quot;</span><span class=\\"tok-punctuation\\">,</span><span class=\\"undefined\\"> </span><span class=\\"tok-punctuation\\">(</span><span class=\\"tok-punctuation\\">)</span><span class=\\"undefined\\"> </span><span class=\\"tok-punctuation\\">=&gt;</span><span class=\\"undefined\\"> </span><span class=\\"tok-variableName\\">onClick</span><span class=\\"tok-punctuation\\">(</span><span class=\\"tok-variableName\\">button</span><span class=\\"tok-punctuation\\">,</span><span class=\\"undefined\\"> </span><span class=\\"tok-variableName\\">index</span><span class=\\"undefined\\"> </span><span class=\\"tok-operator\\">+</span><span class=\\"undefined\\"> </span><span class=\\"tok-number\\">1</span><span class=\\"tok-punctuation\\">)</span><span class=\\"tok-punctuation\\">)</span><span class=\\"tok-punctuation\\">;</span>",
+    }
+  }
+  title="button.addEventListener(\\"click\\", () => onClick(button, index + 1));"
+/>
+`;
+
+exports[`syntax-highlighting syntax highliting should work without passing tokens to SyntaxHighlitedLine 1`] = `
+<span
+  className=" Code"
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": "<span class=\\"tok-variableName\\">button</span><span class=\\"tok-operator\\">.</span><span class=\\"tok-propertyName\\">addEventListener</span><span class=\\"tok-punctuation\\">(</span><span class=\\"tok-string\\">&quot;click&quot;</span><span class=\\"tok-punctuation\\">,</span><span class=\\"undefined\\"> </span><span class=\\"tok-punctuation\\">(</span><span class=\\"tok-punctuation\\">)</span><span class=\\"undefined\\"> </span><span class=\\"tok-punctuation\\">=&gt;</span><span class=\\"undefined\\"> </span><span class=\\"tok-variableName\\">onClick</span><span class=\\"tok-punctuation\\">(</span><span class=\\"tok-variableName\\">button</span><span class=\\"tok-punctuation\\">,</span><span class=\\"undefined\\"> </span><span class=\\"tok-variableName\\">index</span><span class=\\"undefined\\"> </span><span class=\\"tok-operator\\">+</span><span class=\\"undefined\\"> </span><span class=\\"tok-number\\">1</span><span class=\\"tok-punctuation\\">)</span><span class=\\"tok-punctuation\\">)</span><span class=\\"tok-punctuation\\">;</span>",
+    }
+  }
+  title="button.addEventListener(\\"click\\", () => onClick(button, index + 1));"
+/>
+`;

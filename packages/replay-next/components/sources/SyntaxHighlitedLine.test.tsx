@@ -1,5 +1,4 @@
-import { render, screen } from "@testing-library/react";
-
+import renderer from 'react-test-renderer';
 import SyntaxHighlightedLine from "./SyntaxHighlightedLine";
 
 const SNIPPET = 'button.addEventListener("click", () => onClick(button, index + 1));';
@@ -31,17 +30,14 @@ const SNIPPET_TOKENS = [
   { columnIndex: 70, types: ["punctuation"], value: ";" },
 ];
 
-const EXPECTED_SNIPPET_HTML =
-  '<span class=" Code" title="button.addEventListener(&quot;click&quot;, () => onClick(button, index + 1));"><span class="tok-variableName">button</span><span class="tok-operator">.</span><span class="tok-propertyName">addEventListener</span><span class="tok-punctuation">(</span><span class="tok-string">"click"</span><span class="tok-punctuation">,</span><span class="undefined"> </span><span class="tok-punctuation">(</span><span class="tok-punctuation">)</span><span class="undefined"> </span><span class="tok-punctuation">=&gt;</span><span class="undefined"> </span><span class="tok-variableName">onClick</span><span class="tok-punctuation">(</span><span class="tok-variableName">button</span><span class="tok-punctuation">,</span><span class="undefined"> </span><span class="tok-variableName">index</span><span class="undefined"> </span><span class="tok-operator">+</span><span class="undefined"> </span><span class="tok-number">1</span><span class="tok-punctuation">)</span><span class="tok-punctuation">)</span><span class="tok-punctuation">;</span></span>';
-
 describe("syntax-highlighting", () => {
   it("syntax highliting should work without passing tokens to SyntaxHighlitedLine", async () => {
-    render(<SyntaxHighlightedLine code={SNIPPET} />);
-    expect(screen.getByTitle(SNIPPET).outerHTML).toMatch(EXPECTED_SNIPPET_HTML);
+    const tree = renderer.create(<SyntaxHighlightedLine code={SNIPPET} />).toJSON()
+    expect(tree).toMatchSnapshot();
   });
 
   it("syntax highliting should work when tokens are passed to SyntaxHighlitedLine", async () => {
-    render(<SyntaxHighlightedLine code={SNIPPET} tokens={SNIPPET_TOKENS} />);
-    expect(screen.getByTitle(SNIPPET).outerHTML).toMatch(EXPECTED_SNIPPET_HTML);
+    const tree = renderer.create(<SyntaxHighlightedLine code={SNIPPET} tokens={SNIPPET_TOKENS} />).toJSON();
+    expect(tree).toMatchSnapshot();
   });
 });
