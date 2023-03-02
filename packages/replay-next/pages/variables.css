@@ -257,7 +257,7 @@
   --context-menu-bgcolor: var(--menu-bgcolor);
   --context-menu-bgcolor-divider: var(--theme-base-90);
   --context-menu-bgcolor-hover: var(--theme-base-90);
-  
+
   --comment-card-preview-background-color-hover: #2d3c4f;
   --comment-card-preview-background-color: #253446;
   --comment-card-source-preview-background-color: var(--background-color-current-execution-point);
