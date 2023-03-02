@@ -27,6 +27,7 @@ import tokenManager from "ui/utils/tokenManager";
 
 import "../src/base.css";
 import useAuthTelemetry from "ui/hooks/useAuthTelemetry";
+import { useFeature } from "ui/hooks/settings";
 
 if (isMock()) {
   // If this is an end to end test, bootstrap the mock environment.
@@ -83,11 +84,19 @@ function AppUtilities({ children }: { children: ReactNode }) {
 }
 function Routing({ Component, pageProps }: AppProps) {
   const [store, setStore] = useState<Store | null>(null);
+  const { update: updateLogProtocol } = useFeature("logProtocol");
   const { getFeatureFlag } = useLaunchDarkly();
 
   useEffect(() => {
+    // Check what the initial value of logProtocol should be
+    if (window) {
+      const logProtocolParam = new URL(window.location.href).searchParams.get("logProtocol");
+      if (logProtocolParam) {
+        updateLogProtocol(true);
+      }
+    }
     bootstrapApp().then((store: Store) => setStore(store));
-  }, []);
+  }, [updateLogProtocol]);
 
   if (!store) {
     // We hide the tips here since we don't have the store ready yet, which
