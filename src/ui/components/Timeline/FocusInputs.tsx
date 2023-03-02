@@ -1,11 +1,6 @@
 import React from "react";
 
-import {
-  exitFocusMode,
-  syncFocusedRegion,
-  updateDisplayedFocusRegion,
-  updateFocusRegionParam,
-} from "ui/actions/timeline";
+import { updateDisplayedFocusRegion } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getFormattedTime, getSecondsFromFormattedTime } from "ui/utils/timeline";
