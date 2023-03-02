@@ -63,7 +63,7 @@ export function setViewMode(viewMode: ViewMode): UIThunkAction {
     if (viewMode === "dev" && !localNags.includes(LocalNag.YANK_TO_SOURCE)) {
       dispatch(dismissLocalNag(LocalNag.YANK_TO_SOURCE));
       const currentPrimaryPanel = getSelectedPrimaryPanel(getState());
-      if (currentPrimaryPanel !== "cypress") {
+      if (currentPrimaryPanel !== "cypress" && currentPrimaryPanel !== "tour") {
         dispatch(setSelectedPrimaryPanel("explorer"));
       }
     }

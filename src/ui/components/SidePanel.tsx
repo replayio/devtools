@@ -19,6 +19,7 @@ import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ViewMode } from "ui/state/layout";
+import { shouldShowTour } from "ui/utils/onboarding";
 import useAuth0 from "ui/utils/useAuth0";
 
 import CommentCardsList from "./Comments/CommentCardsList";
@@ -34,7 +35,9 @@ function useInitialPrimaryPanel() {
   const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
   const info = useTestInfo();
 
-  const initialPrimaryPanel = info.isTestSuiteReplay ? "cypress" : "events";
+  const { nags } = hooks.useGetUserInfo();
+  const showTour = shouldShowTour(nags);
+  const initialPrimaryPanel = showTour ? "tour" : info.isTestSuiteReplay ? "cypress" : "events";
 
   useEffect(() => {
     if (selectedPrimaryPanel == null) {
