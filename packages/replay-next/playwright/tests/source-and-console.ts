@@ -52,6 +52,7 @@ test.beforeEach(async ({ page }) => {
   page.setDefaultTimeout(5000);
 
   await page.goto(getTestUrl("source-and-console"));
+  await page.locator('[data-test-id="ConsoleRoot"]').waitFor();
   await openSourceFile(page, sourceId);
 });
 
