@@ -259,18 +259,7 @@ export function seek(
     if (pauseId) {
       ThreadFront.timeWarpToPause({ point, time, pauseId }, openSource);
     } else {
-      const regions = getLoadedRegions(getState());
-      const focusRegion = getFocusRegion(getState());
-      const isTimeInLoadedRegion = regions !== null && isTimeInRegions(time, regions.loaded);
-      if (isTimeInLoadedRegion) {
-        ThreadFront.timeWarp(point, time, openSource);
-      } else {
-        // We can't time-wrap in this case because trying to pause outside of a loaded region will throw.
-        // In this case the best we can do is update the current time and the "video" frame.
-        dispatch(setTimelineState({ currentTime: time }));
-        dispatch(setTimelineToTime(time, true));
-        updatePausePointParams({ point, time, focusRegion });
-      }
+      ThreadFront.timeWarp(point, time, openSource);
     }
     return true;
   };
