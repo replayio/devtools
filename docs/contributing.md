@@ -1,6 +1,6 @@
 # Contributing
 
-### Getting started
+## Getting started
 
 DevTools is a React app built with webpack. Here are the steps for getting started, if you have any questions, you can always ask us in our #community Discord channel.
 
@@ -12,8 +12,8 @@ yarn dev
 
 Once you see `Compiled succesfully` in your terminal, open your browser and go to [this link](http://localhost:8080/recording/79f0cacd-727b-456d-8970-dbb4866ce6c7).
 
-### Contributing code
-> #### 💡 WARNING: Not following these rules will result in your PR being closed
+## Contributing code
+> ### 💡 WARNING: Not following these rules will result in your PR being closed
 
 Contributing to Open Source can be challenging. Mistakes –even small ones– can prevent a change from being accepted. We ask that you follow the rules below to make the process as smooth as possible!
 
