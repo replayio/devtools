@@ -82,21 +82,28 @@ export default function FilterToggles() {
       )}
       <div className={styles.EmptySpaceFiller} />
       <hr className={styles.Divider} />
-      <Toggle
-        afterContent={
-          <Suspense fallback={null}>
-            <NodeModulesCount />
-          </Suspense>
-        }
-        checked={showNodeModules}
-        label="Node modules"
-        onChange={showNodeModules => update({ showNodeModules })}
-      />
-      <Toggle
-        checked={showTimestamps}
-        label="Timestamps"
-        onChange={showTimestamps => update({ showTimestamps })}
-      />
+
+      <div className="py-1">
+        <div>
+          <Toggle
+            afterContent={
+              <Suspense fallback={null}>
+                <NodeModulesCount />
+              </Suspense>
+            }
+            checked={showNodeModules}
+            label="Node modules"
+            onChange={showNodeModules => update({ showNodeModules })}
+          />
+        </div>
+        <div className="my-1">
+          <Toggle
+            checked={showTimestamps}
+            label="Timestamps"
+            onChange={showTimestamps => update({ showTimestamps })}
+          />
+        </div>
+      </div>
     </div>
   );
 }

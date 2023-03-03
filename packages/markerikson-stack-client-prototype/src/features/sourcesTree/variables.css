@@ -157,7 +157,7 @@
   --theme-sidebar-background: var(--theme-base-100);
   --theme-text-field-color: var(--theme-body-color);
   --theme-text-field-bgcolor: var(--theme-base-90);
-  --text-field-border: var(--cool-gray-300);
+  --input-border: var(--cool-gray-300);
   --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
 
   /* Tabs (Light) */
@@ -425,7 +425,7 @@
   --theme-sidebar-background: var(--body-bgcolor);
   --theme-text-field-color: #fff;
   --theme-text-field-bgcolor: var(--body-bgcolor);
-  --text-field-border: var(--theme-base-85);
+  --input-border: var(--theme-base-85);
   --tab-selected-bgcolor: var(--theme-base-95);
 
   /* Tabs (Dark) */

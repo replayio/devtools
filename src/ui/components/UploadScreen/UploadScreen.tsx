@@ -201,7 +201,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
                   setIsPublic={setIsPublic}
                 />
                 {isPublic && recording.operations ? (
-                  <div className="border border-textFieldBorder focus:bg-red-500 focus:text-blue-800">
+                  <div className="border border-inputBorder focus:bg-red-500 focus:text-blue-800">
                     <ToggleShowPrivacyButton
                       showPrivacy={showPrivacy}
                       operations={recording.operations}

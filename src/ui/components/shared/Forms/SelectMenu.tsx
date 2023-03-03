@@ -64,10 +64,10 @@ export default function SelectMenu({
         <>
           {label ? <Listbox.Label className="block font-medium">label</Listbox.Label> : null}
           <div className={`relative ${className || ""}`}>
-            <Listbox.Button className="relative w-full cursor-default rounded-md border border-textFieldBorder bg-themeBase-95 py-1.5 pl-2.5 pr-8 text-left shadow-sm focus:border-primaryAccentHover focus:outline-none focus:ring-1 focus:ring-primaryAccent">
+            <Listbox.Button className="relative w-full cursor-default rounded-md border border-inputBorder bg-themeBase-95 py-1.5 pl-2.5 pr-8 text-left shadow-sm focus:border-primaryAccentHover focus:outline-none focus:ring-1 focus:ring-primaryAccent">
               <span className="block truncate">{selectedName}</span>
               <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1.5">
-                <SelectorIcon className="h-4 w-4 text-textFieldBorder" aria-hidden="true" />
+                <SelectorIcon className="h-4 w-4 text-inputBorder" aria-hidden="true" />
               </span>
             </Listbox.Button>
             <Transition

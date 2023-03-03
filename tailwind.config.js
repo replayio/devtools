@@ -48,7 +48,7 @@ module.exports = {
 				secondaryAccent: 'var(--secondary-accent)',
 				secondaryAccentHover: 'var(--secondary-accent-hover)',
 				splitter: 'var(--theme-splitter-color)',
-				textFieldBorder: 'var(--text-field-border)',
+				inputBorder: 'var(--input-border)',
 				bodyBgcolor: 'var(--body-bgcolor)',
 				testStepBorder: 'var(--test-step-border)',
 				testsuitesActiveBgcolor: 'var(--testsuites-active-bgcolor)',
