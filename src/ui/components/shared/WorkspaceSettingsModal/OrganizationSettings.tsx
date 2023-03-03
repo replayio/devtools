@@ -28,7 +28,7 @@ function CSVInput({
       id={id}
       className={classNames("h-20 w-full rounded-md text-sm", {
         "bg-themeTextFieldBgcolor": disabled,
-        "border-textFieldBorder": disabled,
+        "border-inputBorder": disabled,
       })}
       disabled={disabled}
       onChange={e => setCurrentValue(e.currentTarget.value)}
@@ -133,8 +133,8 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
           <label className="flex items-center" htmlFor="disable_public_recordings">
             <input
               className={classNames("ml-0 rounded-sm text-sm", {
-                "bg-toolbarBackground": disabled,
-                "border-gray-300": disabled,
+                "bg-themeTextFieldBgcolor": disabled,
+                "border-inputBorder": disabled,
               })}
               disabled={disabled}
               type="checkbox"
@@ -186,8 +186,8 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
           <label className="flex items-center" htmlFor="restrict_users_to_domain">
             <input
               className={classNames("ml-0 rounded-sm text-sm", {
-                "bg-toolbarBackground": disabled,
-                "border-gray-300": disabled,
+                "bg-themeTextFieldBgcolor": disabled,
+                "border-inputBorder": disabled,
               })}
               disabled={disabled}
               type="checkbox"
@@ -205,8 +205,8 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
           <label className="flex items-center" htmlFor="auto_add_users">
             <select
               className={classNames("ml-0 rounded-sm text-sm", {
-                "bg-toolbarBackground": disabled,
-                "border-gray-300": disabled,
+                "bg-themeTextFieldBgcolor": disabled,
+                "border-inputBorder": disabled,
               })}
               disabled={disabled}
               id="auto_add_users"
@@ -234,7 +234,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
           <label className="flex items-center" htmlFor="restrict_users_to_domain">
             <input
               className={classNames("rounded-sm ml-0 text-sm", {
-                "bg-toolbarBackground": disabled,
+                "bg-themeTextFieldBgcolor": disabled,
                 "border-gray-300": disabled,
               })}
               disabled={disabled}
@@ -251,7 +251,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
           <textarea
             className={classNames("h-20 w-full rounded-md text-sm", {
               "bg-themeTextFieldBgcolor": disabled,
-              "border-textFieldBorder": disabled,
+              "border-inputBorder": disabled,
             })}
             disabled={disabled}
             onChange={e => setMessage(e.currentTarget.value)}
