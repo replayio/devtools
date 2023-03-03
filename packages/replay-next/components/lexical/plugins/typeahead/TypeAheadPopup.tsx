@@ -308,6 +308,7 @@ function TypeAheadPopUp<Item>({
           return true;
         }
         case "Enter":
+        case "NumpadEnter":
         case "Tab": {
           const { selectedIndex, items } = committedStateRef.current;
           const selectedItem = items[selectedIndex];

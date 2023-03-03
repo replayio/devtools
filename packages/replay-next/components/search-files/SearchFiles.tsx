@@ -32,6 +32,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
       case "Enter":
+      case "NumpadEnter":
         startTransition(() => {
           setQueryForSuspense(queryForDisplay);
         });
