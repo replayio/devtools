@@ -6,9 +6,10 @@
 
 import React from "react";
 
+import { getCurrentPoint } from "ui/actions/app";
+import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 
-import { getPauseErrored, getPauseId } from "../../reducers/pause";
 import { useDebuggerPrefs } from "../../utils/prefs";
 import BreakpointsPane from "./BreakpointsPane";
 import CommandBar from "./CommandBar";
@@ -20,8 +21,9 @@ import NewScopes from "./NewScopes";
 import { Accordion, AccordionPane } from "@recordreplay/accordion";
 
 export default function SecondaryPanes() {
-  const pauseId = useAppSelector(getPauseId);
-  const pauseErrored = useAppSelector(getPauseErrored);
+  const currentPoint = useAppSelector(getCurrentPoint);
+  const currentTime = useAppSelector(getCurrentTime);
+
   const { value: scopesExpanded, update: updateScopesExpanded } =
     useDebuggerPrefs("scopes-visible");
   const { value: callstackVisible, update: updateCallstackVisible } =
@@ -58,12 +60,7 @@ export default function SecondaryPanes() {
           expanded={callstackVisible}
           onToggle={() => updateCallstackVisible(!callstackVisible)}
         >
-          {pauseId && <NewFrames pauseId={pauseId} panel="debugger" />}
-          {pauseErrored && (
-            <div className="pane frames" data-test-id="FramesPanel">
-              <div className="pane-info empty">Error loading frames</div>
-            </div>
-          )}
+          {currentPoint && <NewFrames point={currentPoint} time={currentTime} panel="debugger" />}
         </AccordionPane>
         <AccordionPane
           header="Scopes"
