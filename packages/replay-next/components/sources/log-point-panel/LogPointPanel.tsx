@@ -3,6 +3,7 @@ import {
   Suspense,
   unstable_useCacheRefresh as useCacheRefresh,
   useContext,
+  useEffect,
   useMemo,
   useState,
   useTransition,
@@ -133,7 +134,6 @@ function PointPanelWithHitPoints({
   const client = useContext(ReplayClientContext);
   const { accessToken, currentUserInfo, recordingId, trackEvent } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: currentTime } = useContext(TimelineContext);
-
   // Most of this component should use default priority Point values.
   // Only parts that may suspend should use lower priority values.
   const { condition, content, key, location, user } = pointForDefaultPriority;
@@ -312,6 +312,27 @@ function PointPanelWithHitPoints({
     trackEvent("breakpoint.set_log");
     editPendingPointText(key, { content: newContent });
   };
+
+  useEffect(() => {
+    if (!code) {
+      return;
+    }
+    fetch("/api/prefill-print", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        lineNumber: location.line,
+        code: code.slice(0, lineNumber).join("\n"),
+      }),
+    })
+      .then(r => r.text())
+      .then(value => {
+        editPendingPointText(key, { content: value.slice(4, -1) });
+        setTimeout(() => savePendingPointText(key), 300);
+      });
+  }, [location, code, lineNumber, editPendingPointText, savePendingPointText, key]);
 
   const onEditableConditionChange = (newCondition: string) => {
     trackEvent("breakpoint.set_condition");
