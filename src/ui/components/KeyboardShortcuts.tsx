@@ -52,6 +52,8 @@ function KeyboardShortcuts({
   toggleThemeAction,
   toggleQuickOpen,
   closeOpenModalsOnEscape,
+  jumpToLastPause,
+  jumpToNextPause,
 }: PropsFromRedux) {
   const recordingId = useGetRecordingId();
   const { isAuthenticated } = useAuth0();
@@ -152,7 +154,8 @@ function KeyboardShortcuts({
       // Can pre-fill the dialog with specific filter prefixes
       "CmdOrCtrl+Shift+O": toggleFunctionQuickOpenModal,
       "CmdOrCtrl+O": toggleProjectFunctionQuickOpenModal,
-
+      "CmdOrCtrl+Z": jumpToLastPause,
+      "Shift+CmdOrCtrl+Z": jumpToNextPause,
       "~": toggleProtocolTimeline,
 
       Escape: closeOpenModalsOnEscape,
@@ -174,6 +177,8 @@ function KeyboardShortcuts({
     closeOpenModalsOnEscape,
     createFrameComment,
     recordingId,
+    jumpToLastPause,
+    jumpToNextPause,
   ]);
 
   useEffect(() => {
@@ -206,6 +211,8 @@ const connector = connect(
     toggleThemeAction: actions.toggleTheme,
     toggleQuickOpen,
     closeOpenModalsOnEscape,
+    jumpToLastPause: actions.jumpToLastPause,
+    jumpToNextPause: actions.jumpToNextPause,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
