@@ -43,6 +43,7 @@ import Loader from "../../Loader";
 import SyntaxHighlightedLine from "../SyntaxHighlightedLine";
 import BadgePicker from "./BadgePicker";
 import CommentButton from "./CommentButton";
+import ExplainButton from "./ExplainButton";
 import HitPointTimeline from "./HitPointTimeline";
 import styles from "./LogPointPanel.module.css";
 
@@ -52,6 +53,7 @@ type ExternalProps = {
   className: string;
   pointForDefaultPriority: Point;
   pointForSuspense: Point;
+  code?: string[];
 };
 
 type InternalProps = ExternalProps & {
@@ -116,7 +118,9 @@ function PointPanelWithHitPoints({
   hitPointStatus,
   pointForDefaultPriority,
   pointForSuspense,
+  code,
 }: InternalProps) {
+  const [isExplaining, setIsExplaining] = useState(false);
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
   const {
@@ -227,6 +231,46 @@ function PointPanelWithHitPoints({
     setEditReason(editReason);
   };
 
+  const explain = () => {
+    if (accessToken === null) {
+      return;
+    }
+
+    startTransition(async () => {
+      setIsExplaining(true);
+      const text = await fetch("/api/ai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          code,
+          lineNumber: location.line,
+        }),
+      }).then(res => res.text());
+
+      const typeData = await createTypeDataForSourceCodeComment(
+        client,
+        location.sourceId,
+        location.line,
+        location.column
+      );
+
+      await addCommentGraphQL(graphQLClient, accessToken, recordingId, {
+        content: text,
+        hasFrames: true,
+        isPublished: true,
+        point: currentExecutionPoint,
+        time: currentTime,
+        type: COMMENT_TYPE_SOURCE_CODE,
+        typeData,
+      });
+
+      invalidateCache();
+      setIsExplaining(false);
+    });
+  };
+
   const addComment = () => {
     if (accessToken === null) {
       return;
@@ -292,6 +336,10 @@ function PointPanelWithHitPoints({
 
   const addCommentButton = accessToken !== null && (
     <CommentButton disabled={isPending} hitPoints={hitPoints} onClick={addComment} />
+  );
+
+  const explainButton = (
+    <ExplainButton disabled={isExplaining} hitPoints={hitPoints} onClick={explain} />
   );
 
   const contentSpacer = accessToken !== null && <div className={styles.ContentButtonSpacer} />;
@@ -364,7 +412,14 @@ function PointPanelWithHitPoints({
               )}
             </div>
 
-            {isEditing ? saveButton : addCommentButton}
+            {isEditing ? (
+              saveButton
+            ) : (
+              <>
+                {addCommentButton}
+                {explainButton}
+              </>
+            )}
           </div>
         ) /* hasCondition */
       }
@@ -447,7 +502,16 @@ function PointPanelWithHitPoints({
           </div>
         )}
 
-        {hasCondition ? contentSpacer : isEditing ? saveButton : addCommentButton}
+        {hasCondition ? (
+          contentSpacer
+        ) : isEditing ? (
+          saveButton
+        ) : (
+          <>
+            {addCommentButton}
+            {explainButton}
+          </>
+        )}
       </div>
 
       <div className={styles.TimelineWrapperRow}>

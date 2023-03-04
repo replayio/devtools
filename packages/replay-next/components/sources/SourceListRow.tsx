@@ -455,6 +455,7 @@ const SourceListRow = memo(
               className={styles.PointPanel}
               pointForDefaultPriority={pointForDefaultPriority}
               pointForSuspense={pointForSuspense!}
+              code={rawTextByLine}
             />
           )}
         </div>
