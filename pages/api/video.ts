@@ -99,7 +99,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { sessionId } = await client.Recording.createSession({ recordingId });
     console.log(`sessionId: ${sessionId}`);
-
     const paintPoints = await fetchPaintPoints({ client, sessionId });
     const inputFilename = await fetchGraphics(tmpDir, paintPoints, { client, sessionId });
 

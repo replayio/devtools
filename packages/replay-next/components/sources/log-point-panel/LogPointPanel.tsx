@@ -39,6 +39,7 @@ import {
 } from "shared/client/types";
 import { addComment as addCommentGraphQL } from "shared/graphql/Comments";
 import { Nag } from "shared/graphql/types";
+import useToken from "ui/utils/useToken";
 
 import Loader from "../../Loader";
 import SyntaxHighlightedLine from "../SyntaxHighlightedLine";
@@ -134,6 +135,8 @@ function PointPanelWithHitPoints({
   const client = useContext(ReplayClientContext);
   const { accessToken, currentUserInfo, recordingId, trackEvent } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: currentTime } = useContext(TimelineContext);
+  const token = useToken();
+
   // Most of this component should use default priority Point values.
   // Only parts that may suspend should use lower priority values.
   const { condition, content, key, location, user } = pointForDefaultPriority;
@@ -325,14 +328,27 @@ function PointPanelWithHitPoints({
       body: JSON.stringify({
         lineNumber: location.line,
         code: code.slice(0, lineNumber).join("\n"),
+        token: accessToken,
+        closestHitPoint: closestHitPoint?.point,
+        recordingId,
       }),
     })
       .then(r => r.text())
       .then(value => {
-        editPendingPointText(key, { content: value.slice(4, -1) });
+        editPendingPointText(key, { content: value });
         setTimeout(() => savePendingPointText(key), 300);
       });
-  }, [location, code, lineNumber, editPendingPointText, savePendingPointText, key]);
+  }, [
+    location,
+    code,
+    lineNumber,
+    editPendingPointText,
+    savePendingPointText,
+    key,
+    recordingId,
+    accessToken,
+    closestHitPoint,
+  ]);
 
   const onEditableConditionChange = (newCondition: string) => {
     trackEvent("breakpoint.set_condition");
