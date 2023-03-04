@@ -1,5 +1,8 @@
 import { NextApiHandler } from "next";
 
+/**
+ * @todo put this behind an auth gate so that only Replay.io can use it
+ */
 const handler: NextApiHandler = async (req, res) => {
     const { code, lineNumber } = req.body;
 
