@@ -124,9 +124,11 @@ export const RulesApp: FC = ({}) => {
 
     return (
       <>
+      <div style={{overflow:"scroll",height:"220px"}}>
         {pseudoElementRules.length !== 0 && renderPseudoElementRules(pseudoElementRules)}
         {styleRules.length !== 0 && renderStyleRules(styleRules)}
         {inheritedRules.length !== 0 && renderInheritedRules(inheritedRules)}
+        </div>
       </>
     );
   }, [rules, rulesQuery, renderInheritedRules, renderStyleRules, renderPseudoElementRules]);
