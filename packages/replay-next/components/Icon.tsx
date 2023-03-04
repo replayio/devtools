@@ -2,74 +2,81 @@ import { CSSProperties, ReactNode } from "react";
 
 import styles from "./Icon.module.css";
 
+export type IconType =
+  | "add"
+  | "ai"
+  | "arrow"
+  | "arrow-left"
+  | "arrow-right"
+  | "breakpoint"
+  | "cancel"
+  | "chevron-down"
+  | "chevron-right"
+  | "check"
+  | "close"
+  | "comment"
+  | "comments"
+  | "conditional"
+  | "confirm"
+  | "continue-to-next"
+  | "continue-to-previous"
+  | "copy"
+  | "delete"
+  | "document"
+  | "down"
+  | "eager-evaluation"
+  | "edit"
+  | "error"
+  | "fast-forward"
+  | "file"
+  | "folder"
+  | "invisible"
+  | "invoke-getter"
+  | "menu-closed"
+  | "menu-open"
+  | "pause"
+  | "preview"
+  | "print"
+  | "prompt"
+  | "protocol"
+  | "protocol-viewer"
+  | "remove"
+  | "remove-alternate"
+  | "rewind"
+  | "save"
+  | "search"
+  | "set-focus-end"
+  | "set-focus-start"
+  | "share"
+  | "source-explorer"
+  | "spinner"
+  | "terminal-prompt"
+  | "terminal-result"
+  | "toggle-off"
+  | "toggle-on"
+  | "up"
+  | "view-function-source"
+  | "view-html-element"
+  | "visible"
+  | "warning";
+
 export default function Icon({
   className = styles.DefaultIcon,
   style,
   type,
 }: {
   className?: string;
-  type:
-    | "add"
-    | "arrow"
-    | "arrow-left"
-    | "arrow-right"
-    | "breakpoint"
-    | "cancel"
-    | "chevron-down"
-    | "chevron-right"
-    | "check"
-    | "close"
-    | "comment"
-    | "comments"
-    | "conditional"
-    | "confirm"
-    | "continue-to-next"
-    | "continue-to-previous"
-    | "copy"
-    | "delete"
-    | "document"
-    | "down"
-    | "eager-evaluation"
-    | "edit"
-    | "error"
-    | "fast-forward"
-    | "file"
-    | "folder"
-    | "invisible"
-    | "invoke-getter"
-    | "menu-closed"
-    | "menu-open"
-    | "pause"
-    | "preview"
-    | "print"
-    | "prompt"
-    | "protocol"
-    | "protocol-viewer"
-    | "remove"
-    | "remove-alternate"
-    | "rewind"
-    | "save"
-    | "search"
-    | "set-focus-end"
-    | "set-focus-start"
-    | "share"
-    | "source-explorer"
-    | "spinner"
-    | "terminal-prompt"
-    | "terminal-result"
-    | "toggle-off"
-    | "toggle-on"
-    | "up"
-    | "view-function-source"
-    | "view-html-element"
-    | "visible"
-    | "warning";
+  type: IconType;
   style?: CSSProperties;
 }) {
   let path: ReactNode = null;
   switch (type) {
     case "add":
       path = "M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z";
+      break;
+    case "ai":
+      path =
+        "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z";
       break;
     case "arrow":
       path = "M8 5v14l11-7z";
