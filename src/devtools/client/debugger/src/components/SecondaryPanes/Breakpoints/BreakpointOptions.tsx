@@ -29,17 +29,16 @@ function BreakpointLineContents({ breakpoint }: BreakpointProps) {
     let snippet = "";
     let tokens: ParsedToken[] = [];
 
-    if (
-      rawTextByLine &&
-      rawTextByLine.length > 0 &&
-      parsedTokensByLine &&
-      parsedTokensByLine[line - 1]
-    ) {
+    if (rawTextByLine && rawTextByLine.length > 0) {
       const lineText = rawTextByLine[line - 1];
-      tokens = parsedTokensByLine[line - 1].slice(
-        parsedTokensByLine[line - 1].findIndex(parsedToken => parsedToken.columnIndex === column)
+      snippet = lineText.slice(column, column! + 100).trim();
+    }
+
+    if (parsedTokensByLine && parsedTokensByLine[line - 1]) {
+      const lineTokens = parsedTokensByLine[line - 1];
+      tokens = lineTokens.slice(
+        lineTokens.findIndex(parsedToken => parsedToken.columnIndex === column)
       );
-      return { snippet: lineText.slice(column, column! + 100).trim(), tokens };
     }
 
     return { snippet, tokens };
