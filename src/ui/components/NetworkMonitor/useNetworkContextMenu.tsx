@@ -8,7 +8,7 @@ import { useAppDispatch } from "ui/setup/hooks";
 
 import { RequestSummary } from "./utils";
 
-export default function useNetworkContextMenu(row: Row<RequestSummary>) {
+export default function useNetworkContextMenu(row: Row<RequestSummary>, data: RequestSummary) {
   const dispatch = useAppDispatch();
 
   const beginTime = row.original?.start;
@@ -22,6 +22,10 @@ export default function useNetworkContextMenu(row: Row<RequestSummary>) {
     dispatch(setFocusRegionBeginTime(beginTime!, true));
   };
 
+  const copyAsCurl = () => {
+    navigator.clipboard.writeText(`curl '${row.values.url}'`);
+  }
+
   return useContextMenu(
     <>
       <ContextMenuItem disabled={beginTime == null} onClick={setFocusStart}>
@@ -34,6 +38,12 @@ export default function useNetworkContextMenu(row: Row<RequestSummary>) {
         <>
           <Icon type="set-focus-end" />
           Set focus end
+        </>
+      </ContextMenuItem>
+      <ContextMenuItem disabled={endTime == null} onClick={copyAsCurl}>
+        <>
+          <Icon type="copy" />
+          Copy as curl
         </>
       </ContextMenuItem>
     </>

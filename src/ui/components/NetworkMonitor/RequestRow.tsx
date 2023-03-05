@@ -16,6 +16,7 @@ export const RequestRow = ({
   onClick,
   onSeek,
   row,
+  data
 }: {
   currentTime: number;
   isFirstInFuture: boolean;
@@ -25,6 +26,7 @@ export const RequestRow = ({
   onClick: (row: RequestSummary) => void;
   onSeek: (row: RequestSummary) => void;
   row: Row<RequestSummary>;
+  data: RequestSummary
 }) => {
   const prevIsSelectedRef = useRef<boolean>(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -38,7 +40,7 @@ export const RequestRow = ({
     prevIsSelectedRef.current = isSelected;
   }, [isSelected]);
 
-  const { contextMenu, onContextMenu } = useNetworkContextMenu(row);
+  const { contextMenu, onContextMenu } = useNetworkContextMenu(row, data);
 
   return (
     <>
