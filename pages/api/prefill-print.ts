@@ -4,48 +4,101 @@ import { createClient } from "node-protocol";
 
 const address = process.env.NEXT_PUBLIC_DISPATCH_URL;
 
-async function generateExpression({ code, lineNumber }: { code: string; lineNumber: number }) {
-  const responseFromChatGpt = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: `            
-You are an experienced web developer whose job is to help me add print statements that will help me understand the code.
+const SYSTEM_PROMPT = () => `
+You are an experienced web developer whose job is to help me understand the JavaScript code that I am looking at.
 
-- You must respond to me in the following format \`log("prefix", ...variables)\`
-- Variables should not have quotes around them
-- There should be at most 3 variables
-- You should first include the variables that are used on the line
-- You should not include variables that are imported from other files or packages
-- Do not include variables that refer to functions or classes
-- The prefix should be a short description of what the line does
-- The prefix should be less than 30 characters
+Can you please add print statements to the code that I am looking at to help me understand the code?
 
-            `,
-        },
-        {
-          role: "user",
-          content: `
-          
-Please return a print statement that is on line ${lineNumber} 
+Here are some suggestions for the values to include:
+- there should be 3 relevant values
+- values should ideally be defined recently
+- values can be expressions like foo?.bar
 
-~~~    
-${code}
-~~~`,
-        },
-      ],
-    }),
-  }).then(r => r.json());
+Here are some suggestions for prefixes:
+- Prefixes should describe what the line is doing
+- prefixes should be less than 30 characters
+- prefixes should not include brackets [] or parentheses ()
+- prefixes should not be capitalized
+- prefixes do not need terms like logging, debug, or info because they are implied
 
-  const expression = responseFromChatGpt.choices[0].message.content.slice(4, -1);
-  return expression;
+
+Could you also include a description of what the print statement will log and why you chose the variables/expressions you used?`;
+
+const USER_PROMPT = ({ code, lineNumber }: { code: string; lineNumber: number }) => `
+
+Please return a print statement that is on line ${lineNumber}
+
+~~~
+${code
+  .split("\n")
+  .slice(Math.max(0, lineNumber - 10), lineNumber - 1)
+  .join("\n")}
+~~~`;
+
+const USER_ERROR_PROMPT = ({
+  lineNumber,
+  error,
+}: {
+  lineNumber: number;
+  error: { error: string; expression: string };
+}) => `
+The previous expression ${error.expression} failed with the error ${error.error}. ${
+  error.error.includes("SyntaxError") ? "Can you try rephrasing the expression?" : ""
+}${
+  error.error.includes("ReferenceError") || error.error.includes("TypeError")
+    ? "Can you try a different variable?"
+    : ""
+}
+
+Could you try creating a new print statement on line ${lineNumber} with the format \`log("prefix", ...variables)\`?`;
+
+async function addPrintStatements({
+  code,
+  lineNumber,
+  errors,
+}: {
+  code: string;
+  lineNumber: number;
+  errors: { expression: string; error: string }[];
+}): Promise<{ expression: string; content: string; description: string }> {
+  try {
+    const responseFromChatGpt = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: SYSTEM_PROMPT(),
+          },
+          {
+            role: "user",
+            content: USER_PROMPT({ code, lineNumber }),
+          },
+          ...errors.map(error => ({
+            role: "user",
+            content: USER_ERROR_PROMPT({ error, lineNumber }),
+          })),
+        ],
+      }),
+    }).then(r => r.json());
+
+    const content = responseFromChatGpt.choices[0].message.content;
+    const expression = content.match(/console.log\((.*)\)/)?.[1];
+    if (!expression) {
+      console.log("could not find expression", content);
+    }
+
+    const description = content.split("\n").slice(5).join("\n");
+
+    return { expression, content, description };
+  } catch (e) {
+    return { expression: "", content: "", description: "" };
+  }
 }
 
 async function evalExpression({
@@ -54,33 +107,45 @@ async function evalExpression({
   token,
   closestHitPoint,
 }: {
-  expression: string;
+  expression: string | undefined;
   recordingId: string;
   token: string;
   closestHitPoint: string;
-}) {
+}): Promise<{ succeeded: boolean; error?: { error: string; expression: string } }> {
+  if (!expression) {
+    return { succeeded: false, error: { error: "No expression", expression: "" } };
+  }
   const { client } = await createClient({ address });
   await client.Authentication.setAccessToken({ accessToken: token });
 
   const { sessionId } = await client.Recording.createSession({ recordingId });
-  console.log(`sessionId`, sessionId, closestHitPoint);
   const pause = await client.Session.createPause({ point: closestHitPoint }, sessionId);
 
   if (!pause.stack) {
-    return { succeeded: false, error: "No stack trace" };
+    return { succeeded: false, error: { error: "No stack trace", expression } };
   }
-  console.log("pause", pause);
 
   const response = await client.Pause.evaluateInFrame(
-    { frameId: pause.stack[0], expression },
+    { frameId: pause.stack[0], expression, useOriginalScopes: true },
     sessionId,
     pause.pauseId
   );
 
-  if (response.result.failed || response.result.exception) {
-    console.log(`expression`, expression);
-    console.log(JSON.stringify(response, null, 2));
-    return { succeeded: false, error: response.result.exception };
+  client.Recording.releaseSession({ sessionId });
+
+  if (response.result.exception) {
+    const exceptionId = response.result.exception.object;
+    const exception = response.result.data.objects?.find(o => o.objectId === exceptionId);
+    const values: any = exception?.preview?.getterValues?.reduce((acc: any, v) => {
+      acc[v.name] = v.value;
+      return acc;
+    }, {});
+    const error = `${values.name} ${values.message}`;
+    return { succeeded: false, error: { error, expression } };
+  }
+
+  if (response.result.failed) {
+    return { succeeded: false, error: { error: "Failed to evaluate", expression } };
   }
 
   return { succeeded: true };
@@ -92,28 +157,42 @@ async function evalExpression({
 const handler: NextApiHandler = async (req, res) => {
   const { code, lineNumber, token, recordingId, closestHitPoint } = req.body;
 
-  let expression = await generateExpression({
-    code,
-    lineNumber,
-  });
+  let attempts = 0;
+  const errors = [];
 
-  // eval expression
-  // if good -> return
-  const result = await evalExpression({
-    expression,
-    recordingId,
-    token,
-    closestHitPoint,
-  });
+  try {
+    while (attempts++ < 5) {
+      const statement = await addPrintStatements({
+        code,
+        lineNumber,
+        errors,
+      });
 
-  console.log(`result`, result);
+      const { expression, content, description } = statement;
+      console.log(`content`, content);
+      console.log(`description`, description);
 
-  return res.status(200).end({ expression, result });
-  if (result.succeeded) {
-    return res.status(200).end({ expression, result });
+      const result = await evalExpression({
+        expression,
+        recordingId,
+        token,
+        closestHitPoint,
+      });
+
+      console.log(`result`, result);
+
+      if (result.succeeded) {
+        return res.status(200).json({ status: true, expression, description });
+      }
+
+      errors.push(result.error);
+    }
+
+    return res.status(200).json({ status: false });
+  } catch (e) {
+    console.error(e);
+    return res.status(200).json({ status: false });
   }
-
-  // if bad -> generate new expression
 };
 
 export default handler;

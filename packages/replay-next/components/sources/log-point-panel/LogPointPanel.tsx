@@ -135,7 +135,7 @@ function PointPanelWithHitPoints({
   const client = useContext(ReplayClientContext);
   const { accessToken, currentUserInfo, recordingId, trackEvent } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: currentTime } = useContext(TimelineContext);
-  const token = useToken();
+  const [description, setDescription] = useState();
 
   // Most of this component should use default priority Point values.
   // Only parts that may suspend should use lower priority values.
@@ -317,7 +317,7 @@ function PointPanelWithHitPoints({
   };
 
   useEffect(() => {
-    if (!code) {
+    if (!code || !closestHitPoint) {
       return;
     }
     fetch("/api/prefill-print", {
@@ -327,28 +327,25 @@ function PointPanelWithHitPoints({
       },
       body: JSON.stringify({
         lineNumber: location.line,
-        code: code.slice(0, lineNumber).join("\n"),
+        code: code.join("\n"),
         token: accessToken,
         closestHitPoint: closestHitPoint?.point,
         recordingId,
       }),
     })
-      .then(r => r.text())
-      .then(value => {
-        editPendingPointText(key, { content: value });
-        setTimeout(() => savePendingPointText(key), 300);
+      .then(r => r.json())
+      .then(({ status, expression, description }) => {
+        if (status) {
+          console.log("---");
+          console.log(expression);
+          console.log(description);
+          console.log("---");
+          setDescription(description);
+          editPendingPointText(key, { content: expression });
+          setTimeout(() => savePendingPointText(key), 300);
+        }
       });
-  }, [
-    location,
-    code,
-    lineNumber,
-    editPendingPointText,
-    savePendingPointText,
-    key,
-    recordingId,
-    accessToken,
-    closestHitPoint,
-  ]);
+  }, [code, closestHitPoint]);
 
   const onEditableConditionChange = (newCondition: string) => {
     trackEvent("breakpoint.set_condition");
@@ -517,6 +514,7 @@ function PointPanelWithHitPoints({
                   <button
                     className={styles.EditButton}
                     disabled={isPending}
+                    title={description}
                     data-test-name="PointPanel-EditButton"
                   >
                     <Icon
