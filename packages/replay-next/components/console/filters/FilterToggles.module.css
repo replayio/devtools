@@ -1,6 +1,6 @@
 .Filters {
   height: 100%;
-  padding: 0.5rem 0;
+  padding: 0.5rem 0 0 0;
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
@@ -13,6 +13,11 @@
   align-items: center;
   width: 100%;
   padding: 0 0.5rem;
+}
+
+.Filter input {
+  border: 1px solid var(--input-border);
+  margin-right: 0.15rem;
 }
 
 .Divider {

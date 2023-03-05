@@ -61,7 +61,7 @@ function getColorClasses(color: Colors, style: ButtonStyles) {
     bgStyle = `border-${getColorCode(color, 600)} hover:border-${getColorCode(color, 700)}`;
   } else {
     textStyle = getTextClass("gray");
-    bgStyle = `bg-gray-300`;
+    bgStyle = `bg-gray-200`;
   }
 
   return `${textStyle} ${bgStyle}`;

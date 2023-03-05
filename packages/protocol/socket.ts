@@ -97,7 +97,6 @@ const noCallerStackTracesForErrorCodes = new Set<ProtocolError>([
   ProtocolError.GraphicsUnavailableAtPoint,
   ProtocolError.InternalError,
   ProtocolError.InvalidRecording,
-  ProtocolError.RecordingUnloaded,
   ProtocolError.SessionCreationFailure,
   ProtocolError.SessionDestroyed,
   ProtocolError.ServiceUnavailable,

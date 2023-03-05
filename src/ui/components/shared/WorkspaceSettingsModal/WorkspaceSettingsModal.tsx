@@ -104,14 +104,24 @@ function WorkspaceForm({ members = [] }: WorkspaceFormProps) {
     }
   };
 
+  const canSubmit = inputValue.length > 0;
+  console.log(canSubmit);
+
   return (
     <form className="flex flex-col" onSubmit={handleAddMember}>
       <div className="flex flex-grow flex-row space-x-3 p-0.5">
-        <TextInput placeholder="Email address" value={inputValue} onChange={onChange} />
-        {!isLoading ? (
+        <TextInput
+          placeholder="Email address"
+          value={inputValue}
+          onChange={onChange}
+          className="border-inputBorder"
+        />
+        {isLoading ? (
+          <DisabledButton>Loading...</DisabledButton>
+        ) : canSubmit ? (
           <PrimaryButton color="blue">Invite</PrimaryButton>
         ) : (
-          <DisabledButton>Loading</DisabledButton>
+          <DisabledButton>Invite</DisabledButton>
         )}
       </div>
       {errorMessage ? <div className="py-3 text-xs text-red-500">{errorMessage}</div> : null}

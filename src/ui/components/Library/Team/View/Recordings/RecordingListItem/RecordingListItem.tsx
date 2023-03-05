@@ -151,7 +151,7 @@ function RecordingRow({
               onClick={e => e.stopPropagation()}
               onChange={toggleChecked}
               checked={selected}
-              className="focus:primaryAccentHover h-4 w-4 rounded border-themeBorder text-primaryAccent"
+              className="focus:primaryAccentHover h-4 w-4 rounded border-inputBorder text-primaryAccent"
             />
           ) : null}
         </div>
