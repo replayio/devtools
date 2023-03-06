@@ -1,19 +1,14 @@
 import { Location, VariableMapping } from "@replayio/protocol";
+import { createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 
-import { createGenericCache } from "./createGenericCache";
-
 export const {
-  getValueSuspense: getScopeMapSuspense,
-  getValueAsync: getScopeMapAsync,
+  read: getScopeMapSuspense,
+  readAsync: getScopeMapAsync,
   getValueIfCached: getScopeMapIfCached,
-} = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [location: Location],
-  VariableMapping[] | undefined
->(
-  "ScopeMapCache: getScopeMap",
-  (location, client) => client.getScopeMap(location),
-  location => `${location.sourceId}:${location.line}:${location.column}`
-);
+} = createCache<[Location, ReplayClientInterface], VariableMapping[] | undefined>({
+  debugLabel: "ScopeMapCache",
+  getKey: location => `${location.sourceId}:${location.line}:${location.column}`,
+  load: (location, client) => client.getScopeMap(location),
+});
