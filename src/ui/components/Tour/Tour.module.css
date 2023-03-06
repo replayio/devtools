@@ -1,27 +1,40 @@
 .TourBoxWrapper {
-  background-color: #e7376f;
+  background-color: #bbe4f8;
   height: 100%;
-  background-image: url("/images/illustrations/tour1.png");
-  background-repeat: no-repeat;
-  background-position: bottom left;
+  position: relative;
+  padding: 0;
+}
+
+.Larry {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  max-height: 250px;
 }
 
 .TourBox {
   padding: 0.5em;
-  color: #fff;
+  color: #068;
 }
 
 .h1 {
-  color: #fff;
+  color: #dd4261;
+}
+
+.intro {
+  color: #068;
   font-size: 20px;
   font-weight: 500;
   margin-bottom: 1rem;
 }
 
-.h1 p {
+.intro p {
   margin-bottom: 16px;
   line-height: 120%;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.checklist {
+  margin-top: 2rem;
 }
 
 .checklist li {
@@ -29,11 +42,12 @@
   display: flex;
   align-items: center;
   font-size: 16px;
-  background-color: rgba(231, 55, 111, 0.851);
+  font-weight: medium;
+  background-color: #bbe4f8;
 }
 
 .Icon {
   height: 18px;
   margin-right: 0.25rem;
-  color: #fff;
+  color: #068;
 }

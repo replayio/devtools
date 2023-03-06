@@ -43,15 +43,11 @@ const Checklist: React.FC = () => {
   const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
 
   const showConsoleNavigate = shouldShowConsoleNavigate(nags);
-  const showBreakpointAdd = shouldShowBreakpointAdd(nags, viewMode);
-  const showBreakpointEdit = shouldShowBreakpointEdit(nags, viewMode);
-  const showTour = shouldShowTour(nags, viewMode);
+  const showBreakpointAdd = shouldShowBreakpointAdd(nags);
+  const showBreakpointEdit = shouldShowBreakpointEdit(nags);
+  const showTour = shouldShowTour(nags);
 
   const [checkedItems, setCheckedItems] = useState([0]);
-
-  const handleShowHowClick = (index: number) => {
-    alert("instructional text");
-  };
 
   const isNewUser =
     showDevtoolsNag && showConsoleNavigate && showBreakpointAdd && showBreakpointEdit;
@@ -60,25 +56,35 @@ const Checklist: React.FC = () => {
 
   const { dismissDevtoolsNag } = useNagDismissal();
 
+  console.log("showDevtoolsNag:", showDevtoolsNag);
+  console.log("showConsoleNavigate:", showConsoleNavigate);
+  console.log("showBreakpointAdd:", showBreakpointAdd);
+  console.log("showBreakpointEdit:", showBreakpointEdit);
+
   return (
     <div className={styles.TourBoxWrapper}>
       <div className={styles.TourBox}>
         <div className="p-3">
           {isNewUser ? (
             <>
-              <div className={styles.h1}>
-                <p>Hello!</p>
+              <div className={styles.intro}>
+                <p className={styles.h1}>Hello and welcome!</p>
                 <p>
-                  Replay is powerful stuff, so we want to make sure to get you off on the right
-                  foot.
+                  Replay is the first time-travel enabled DevTools. It’s designed to be familiar,
+                  futuristic, and fun :)
                 </p>
-                <p>First things first, see that DevTools toggle at the top right?</p>
-                <p>Let’s click it.</p>
+                <p>To get started, click on DevTools in the top right.</p>
+              </div>
+
+              <div className={styles.Larry}>
+                <img src="/images/illustrations/tour2.png" />
               </div>
             </>
           ) : (
             <>
-              <h1 className={styles.h1}>Getting started</h1>
+              <span className={styles.intro}>
+                <h1 className={styles.h1}>Quickstart</h1>
+              </span>
 
               <ul className={styles.checklist}>
                 <li>
@@ -86,52 +92,93 @@ const Checklist: React.FC = () => {
                     className={styles.Icon}
                     type={showDevtoolsNag ? "unchecked-rounded" : "checked-rounded"}
                   />
-                  Open DevTools
+                  Time travel-enabled DevTools
                 </li>
                 <li>
                   <Icon
                     className={styles.Icon}
                     type={showConsoleNavigate ? "unchecked-rounded" : "checked-rounded"}
                   />
-                  Time travel in the console
+                  Fast-forward to any message
                 </li>
-                <li>
-                  <Icon
-                    className={styles.Icon}
-                    type={showBreakpointAdd ? "unchecked-rounded" : "checked-rounded"}
-                  />{" "}
-                  Magic print statements{" "}
-                </li>
+
                 <li>
                   <Icon
                     className={styles.Icon}
                     type={showBreakpointEdit ? "unchecked-rounded" : "checked-rounded"}
                   />{" "}
-                  Edit a print statement
-                </li>
-                <li>
-                  <Icon
-                    className={styles.Icon}
-                    type={showTour ? "unchecked-rounded" : "checked-rounded"}
-                  />{" "}
-                  Finish tour
+                  Add logs with a single click
                 </li>
               </ul>
+              <div className="absolute bottom-0 left-0 w-full border-t border-primaryAccent">
+                <div className="text-md italics px-4 py-6">
+                  {showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
+                    <>
+                      <b>Console</b>
+                      <p>
+                        Hover over the lines in the console and you’ll see a fast-forward button.
+                        Try clicking it!
+                      </p>
+                    </>
+                  )}
+
+                  {!showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
+                    <>
+                      <b>Add a print statement</b>
+                      <p>
+                        Now you should see something like this. Whatever you type here will show up
+                        in your console, so type something and hit enter.
+                      </p>
+                    </>
+                  )}
+
+                  {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && (
+                    <>
+                      <b>Isn't that cool?</b>
+                      <p>
+                        Take a look at the console and you’ll see that Replay re-ran the entire
+                        recording and retroactively added your print statement each time that line
+                        of code was called! 🤯
+                      </p>
+                    </>
+                  )}
+
+                  {hasCompletedTour && (
+                    <>
+                      <b>Congratulations!</b>
+                      <p>You completed the checklist!</p>
+                      <p className="mt-3">
+                        <a href="#" onClick={dismissDevtoolsNag} className="underline">
+                          Click to dismiss
+                        </a>
+                      </p>
+                    </>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <span className="text-mg absolute right-0 bottom-0 bg-pink-500 p-1 text-white">
+                    these are temporary gifs, stay tuned
+                  </span>
+                  {showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
+                    <img src="/images/tour/fast-forward.gif" />
+                  )}
+
+                  {!showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
+                    <img src="/images/tour/addlogs.gif" />
+                  )}
+
+                  {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && (
+                    <img src="/images/tour/editlogs.gif" />
+                  )}
+
+                  {hasCompletedTour && (
+                    <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExN2MxYmNhMDQzNDhmZTE0MjQ1NzY4OTQ0NGZjYTJjMzFhMjNjODMxYiZjdD1n/1KwQEj4MoTmZPSL5bs/giphy.gif" />
+                  )}
+                </div>
+              </div>
             </>
           )}
-
-          {hasCompletedTour ? (
-            <div className="mt-8 rounded-md bg-yellow-200 p-2 text-lg text-black">
-              Congratulations! You completed the checklist! Confetti and stuff!
-              <p>
-                Let’s{" "}
-                <a href="#" onClick={dismissDevtoolsNag}>
-                  dismiss it
-                </a>
-                .
-              </p>
-            </div>
-          ) : null}
         </div>
       </div>
     </div>
