@@ -30,7 +30,7 @@ import { Redacted } from "../Redacted";
 import Loader from "../shared/Loader";
 import ReplayLogo from "../shared/ReplayLogo";
 import WaitForReduxSlice from "../WaitForReduxSlice";
-import { getRecordingCapabilitiesSuspense } from "./getRecordingCapabilities";
+import { recordingCapabilitiesCache } from "./getRecordingCapabilities";
 import NewConsoleRoot from "./NewConsole";
 import SourcesTabLabel from "./SourcesTabLabel";
 import { ShowVideoButton } from "./ToolboxButton";
@@ -168,7 +168,7 @@ function SecondaryToolbox({
   const dispatch = useAppDispatch();
   const replayClient = useContext(ReplayClientContext);
 
-  const recordingCapabilities = getRecordingCapabilitiesSuspense();
+  const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
   const { value: chromiumNetMonitorEnabled } = useFeature("chromiumNetMonitor");
 
   const kindsSet = new Set(annotationKinds);
