@@ -25,7 +25,7 @@
     "react-dom": "0.0.0-experimental-49f741046-20230305",
     "react-virtualized-auto-sizer": "^1.0.7",
     "shared": "workspace:*",
-    "suspense": "^0.0.14",
+    "suspense": "^0.0.15",
     "uuid": "^7.0.3"
   },
   "devDependencies": {
