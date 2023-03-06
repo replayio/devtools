@@ -15,6 +15,7 @@ import { ReplayClientInterface } from "shared/client/types";
 import { createWakeable } from "../utils/suspense";
 import { createGenericRangeCache } from "./createGenericRangeCache";
 import { cachePauseData } from "./PauseCache";
+import { getBreakpointPositionsAsync } from "./SourcesCache";
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Thennable } from "./types";
 
 export type RemoteAnalysisResult = {
@@ -81,10 +82,21 @@ function createCache<T extends { point: ExecutionPoint }>(
     getCachedValues: getCachedPoints,
   } = createGenericRangeCache<T>(
     async (client, range, cacheValues, cacheError) => {
+      const locations = params.location
+        ? client.getCorrespondingLocations(params.location).map(location => ({
+            location,
+          }))
+        : undefined;
+      if (locations) {
+        await Promise.all(
+          locations.map(location => getBreakpointPositionsAsync(location.location.sourceId, client))
+        );
+      }
+
       let pointsCount = 0;
       await client.streamAnalysis(
         {
-          locations: params.location ? [{ location: params.location }] : undefined,
+          locations,
           eventHandlerEntryPoints: params.eventTypes?.map(eventType => ({ eventType })),
           exceptionPoints: params.exceptions,
           mapper: params.mapper,
