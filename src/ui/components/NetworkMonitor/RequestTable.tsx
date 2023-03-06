@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import React, { useState } from "react";
 import { Row, TableInstance } from "react-table";
 
 import { getLoadedRegions } from "ui/reducers/app";
@@ -36,10 +37,16 @@ const RequestTable = ({
 
   const loadedRegions = useAppSelector(getLoadedRegions);
 
+  const [showCopied, setShowCopied] = useState(false);
   const onSeek = (request: RequestSummary) => {
     trackEvent("net_monitor.seek_to_request");
     seek(request.point.point, request.point.time, true);
     onRowSelect(request);
+  };
+
+  const onCopyToClipboard = () => {
+    setShowCopied(true);
+    setTimeout(() => setShowCopied(false), 2700);
   };
 
   let inPast = true;
@@ -52,6 +59,17 @@ const RequestTable = ({
         {...getTableProps()}
       >
         <HeaderGroups columns={columns as any} headerGroups={headerGroups} />
+
+        {showCopied ? (
+          <div className="absolute z-50 grid h-56 grid-cols-1 content-end place-self-center">
+            <div
+              id="showCopied"
+              className="mb-1.5 flex shrink rounded-lg bg-black p-1.5 text-center text-white opacity-100 shadow-2xl transition-all duration-700 ease-in-out"
+            >
+              Copied to clipboard
+            </div>
+          </div>
+        ) : null}
 
         <div className="relative w-fit min-w-full overflow-y-auto" {...getTableBodyProps()}>
           {filteredBeforeCount > 0 && (
@@ -81,6 +99,7 @@ const RequestTable = ({
                 key={row.getRowProps().key}
                 onClick={onRowSelect}
                 onSeek={onSeek}
+                onClipboardCopy={onCopyToClipboard}
                 row={row}
               />
             );

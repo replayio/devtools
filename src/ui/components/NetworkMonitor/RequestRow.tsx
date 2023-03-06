@@ -11,6 +11,7 @@ export const RequestRow = ({
   currentTime,
   isFirstInFuture,
   isInLoadedRegion,
+  onClipboardCopy,
   isInPast,
   isSelected,
   onClick,
@@ -22,6 +23,7 @@ export const RequestRow = ({
   isInLoadedRegion: boolean;
   isInPast: boolean;
   isSelected: boolean;
+  onClipboardCopy: () => void;
   onClick: (row: RequestSummary) => void;
   onSeek: (row: RequestSummary) => void;
   row: Row<RequestSummary>;
@@ -38,7 +40,7 @@ export const RequestRow = ({
     prevIsSelectedRef.current = isSelected;
   }, [isSelected]);
 
-  const { contextMenu, onContextMenu } = useNetworkContextMenu(row);
+  const { contextMenu, onContextMenu } = useNetworkContextMenu({ row, onClipboardCopy });
 
   return (
     <>
