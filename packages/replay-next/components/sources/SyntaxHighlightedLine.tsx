@@ -33,17 +33,14 @@ function SyntaxHighlightedLineSuspends({
   code,
   className = "",
   fileExtension = ".js",
-  tokens,
+  tokens = [],
 }: Props) {
-  if (tokens && tokens.length === 0) {
+
+  if (tokens.length === 0) {
     const parsed = parse(code, fileExtension);
     if (parsed && parsed.length > 0) {
       tokens = parsed[0];
     }
-  }
-
-  if (tokens === undefined) {
-    tokens = [];
   }
 
   const html = parsedTokensToHtml(tokens);
