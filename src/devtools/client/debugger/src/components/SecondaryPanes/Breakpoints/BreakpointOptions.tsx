@@ -29,7 +29,7 @@ function BreakpointLineContents({ breakpoint }: BreakpointProps) {
     let snippet = "";
     let tokens: ParsedToken[] = [];
 
-    if (rawTextByLine && rawTextByLine.length > 0) {
+    if (rawTextByLine && rawTextByLine[line - 1]) {
       const lineText = rawTextByLine[line - 1];
       snippet = lineText.slice(column, column! + 100).trim();
     }
