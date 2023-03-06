@@ -14,8 +14,8 @@
     "lodash": "^4.17.21",
     "next": "^12.1.6",
     "protocol": "workspace:*",
-    "react": "0.0.0-experimental-e7d0053e6-20220325",
-    "react-dom": "0.0.0-experimental-e7d0053e6-20220325",
+    "react": "0.0.0-experimental-49f741046-20230305",
+    "react-dom": "0.0.0-experimental-49f741046-20230305",
     "replay-next": "workspace:*",
     "shared": "*"
   },
