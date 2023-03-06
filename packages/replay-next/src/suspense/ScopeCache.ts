@@ -1,9 +1,9 @@
 import { FrameId, MappedLocation, PauseId, Scope, ScopeId } from "@replayio/protocol";
+import { createCache } from "suspense";
 
 import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
 
-import { createGenericCache } from "./createGenericCache";
 import { getFramesAsync } from "./FrameCache";
 import { cachePauseData } from "./PauseCache";
 
@@ -14,51 +14,44 @@ export interface FrameScopes {
 }
 
 export const {
-  getValueSuspense: getScopeSuspense,
-  getValueAsync: getScopeAsync,
+  read: getScopeSuspense,
+  readAsync: getScopeAsync,
   getValueIfCached: getScopeIfCached,
-  addValue: cacheScope,
-} = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [pauseId: PauseId, scopeId: ScopeId],
-  Scope
->(
-  "ScopeCache: getScope",
-  async (pauseId, scopeId, client) => {
+  cache: cacheScope,
+} = createCache<[PauseId, ScopeId, ReplayClientInterface], Scope>({
+  debugLabel: "ScopeCache: getScope",
+  getKey: (pauseId: PauseId, scopeId: ScopeId) => `${pauseId}:${scopeId}`,
+  load: async (pauseId: PauseId, scopeId: ScopeId, client: ReplayClientInterface) => {
     const result = await client.getScope(pauseId, scopeId);
     await client.waitForLoadedSources();
     cachePauseData(client, pauseId, result.data);
-    const cached: { value: Scope } | undefined = getScopeIfCached(pauseId, scopeId);
+    const cached: Scope | undefined = getScopeIfCached(pauseId, scopeId, client);
     assert(cached, `Scope ${scopeId} for pause ${pauseId} not found in cache`);
-    return cached.value;
+    return cached!;
   },
-  (pauseId, scopeId) => `${pauseId}:${scopeId}`
-);
+});
 
 export const {
-  getValueSuspense: getFrameScopesSuspense,
-  getValueAsync: getFrameScopesAsync,
+  read: getFrameScopesSuspense,
+  readAsync: getFrameScopesAsync,
   getValueIfCached: getFrameScopesIfCached,
-} = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [pauseId: PauseId, frameId: FrameId],
-  FrameScopes
->(
-  "ScopeCache: getFrameScopes",
-  async (pauseId, frameId, client) => {
+} = createCache<[PauseId, FrameId, ReplayClientInterface], FrameScopes>({
+  debugLabel: "ScopeCache: getFrameScopes",
+  getKey: (pauseId: PauseId, frameId: FrameId) => `${pauseId}:${frameId}`,
+  load: async (pauseId: PauseId, frameId: FrameId, client: ReplayClientInterface) => {
     const frame = (await getFramesAsync(pauseId, client))?.find(
       frame => frame.frameId === frameId
     )!;
+
     const generatedScopes = await Promise.all(
-      frame.scopeChain.map(scopeId => getScopeAsync(pauseId, scopeId, client))
+      frame.scopeChain.map(scopeId => getScopeAsync(pauseId, scopeId, client) as Scope)
     );
     const originalScopes = frame.originalScopeChain
       ? await Promise.all(
-          frame.originalScopeChain.map(scopeId => getScopeAsync(pauseId, scopeId, client))
+          frame.originalScopeChain.map(scopeId => getScopeAsync(pauseId, scopeId, client) as Scope)
         )
       : undefined;
 
-    return { frameLocation: frame.location, generatedScopes, originalScopes };
+    return { frameLocation: frame.location, generatedScopes: generatedScopes!, originalScopes };
   },
-  (pauseId, frameId) => `${pauseId}:${frameId}`
-);
+});

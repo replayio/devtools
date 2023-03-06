@@ -105,7 +105,7 @@ export function cachePauseData(
   }
   if (pauseData.scopes) {
     for (const scope of pauseData.scopes) {
-      cacheScope(scope, pauseId, scope.scopeId);
+      cacheScope(scope, pauseId, scope.scopeId, client);
     }
   }
 }
