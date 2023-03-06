@@ -44,11 +44,11 @@ export const {
     )!;
 
     const generatedScopes = await Promise.all(
-      frame.scopeChain.map(scopeId => getScopeAsync(pauseId, scopeId, client) as Scope)
+      frame.scopeChain.map(scopeId => getScopeAsync(pauseId, scopeId, client))
     );
     const originalScopes = frame.originalScopeChain
       ? await Promise.all(
-          frame.originalScopeChain.map(scopeId => getScopeAsync(pauseId, scopeId, client) as Scope)
+          frame.originalScopeChain.map(scopeId => getScopeAsync(pauseId, scopeId, client))
         )
       : undefined;
 
