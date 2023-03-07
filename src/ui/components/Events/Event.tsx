@@ -8,6 +8,7 @@ import {
 import classNames from "classnames";
 import classnames from "classnames";
 import React, { ReactNode, useRef, useState } from "react";
+import { createCache } from "suspense";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
@@ -15,7 +16,6 @@ import { getFunctionBody } from "protocol/evaluation-utils";
 import type { ThreadFront as TF } from "protocol/thread";
 import { RecordingTarget } from "protocol/thread/thread";
 import Icon from "replay-next/components/Icon";
-import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { EventLog, eventsMapper } from "replay-next/src/suspense/EventsCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
@@ -24,11 +24,7 @@ import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import type { UIThunkAction } from "ui/actions";
-import {
-  SEARCHABLE_EVENT_TYPES,
-  getEventListenerLocationAsync,
-  removeEventListenerLocationEntry,
-} from "ui/actions/event-listeners";
+import { SEARCHABLE_EVENT_TYPES, getEventListenerLocationAsync } from "ui/actions/event-listeners";
 import { setViewMode } from "ui/actions/layout";
 import useEventContextMenu from "ui/components/Events/useEventContextMenu";
 import { getLoadedRegions } from "ui/reducers/app";
@@ -51,13 +47,19 @@ const EVENTS_FOR_RECORDING_TARGET: Partial<
   // chromium: {},
 };
 
-const { getValueAsync: getNextInteractionEventAsync } = createGenericCache<
-  [replayClient: ReplayClientInterface, ThreadFront: typeof TF],
-  [point: ExecutionPoint, replayEventType: SEARCHABLE_EVENT_TYPES, endTime: number],
+const nextInteractionEventCache = createCache<
+  [
+    point: ExecutionPoint,
+    replayEventType: SEARCHABLE_EVENT_TYPES,
+    endTime: number,
+    replayClient: ReplayClientInterface,
+    ThreadFront: typeof TF
+  ],
   EventLog | undefined
->(
-  "nextInteractionEventCache",
-  async (point, replayEventType, endTime, replayClient, ThreadFront) => {
+>({
+  debugLabel: "nextInteractionEventCache",
+  getKey: point => point,
+  load: async (point, replayEventType, endTime, replayClient, ThreadFront) => {
     const pointNearEndTime = await replayClient.getPointNearTime(endTime);
 
     const recordingTarget = await ThreadFront.getRecordingTarget();
@@ -86,8 +88,7 @@ const { getValueAsync: getNextInteractionEventAsync } = createGenericCache<
     entryPoints.sort((a, b) => compareExecutionPoints(a.point, b.point));
     return entryPoints[0];
   },
-  point => point
-);
+});
 
 type EventProps = {
   currentTime: any;
@@ -186,7 +187,7 @@ function jumpToClickEventFunctionLocation(
       // The sidebar event time/point is a fraction earlier than any
       // actual JS that executed in response. Find the next click event
       // within a small time window
-      const nextClickEvent = await getNextInteractionEventAsync(
+      const nextClickEvent = await nextInteractionEventCache.readAsync(
         executionPoint,
         event.kind as SEARCHABLE_EVENT_TYPES,
         arbitraryEndTime,
