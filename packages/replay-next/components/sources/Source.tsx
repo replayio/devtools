@@ -173,6 +173,7 @@ function SourceRenderer({
           containerRef={sourceRef}
           dismiss={() => setHoveredState(null)}
           expression={hoveredState.expression}
+          sourceId={source.sourceId}
           target={hoveredState.target}
         />
       ) : null}
