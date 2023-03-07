@@ -2,21 +2,19 @@ import {
   Location as ProtocolLocation,
   MappedLocation as ProtocolMappedLocation,
 } from "@replayio/protocol";
+import { createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 
-import { createGenericCache } from "./createGenericCache";
-
 export const {
-  getValueSuspense: getMappedLocationSuspense,
-  getValueAsync: getMappedLocationAsync,
   getValueIfCached: getMappedLocationIfCached,
-} = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [location: ProtocolLocation],
+  read: getMappedLocationSuspense,
+  readAsync: getMappedLocationAsync,
+} = createCache<
+  [location: ProtocolLocation, replayClient: ReplayClientInterface],
   ProtocolMappedLocation
->(
-  "MappedLocationCache: getMappedLocation",
-  (location, client) => client.getMappedLocation(location),
-  location => `${location.sourceId}:${location.line}:${location.column}`
-);
+>({
+  debugLabel: "MappedLocationCache: getMappedLocation",
+  getKey: location => `${location.sourceId}:${location.line}:${location.column}`,
+  load: async (location, client) => client.getMappedLocation(location),
+});
