@@ -12,13 +12,13 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { createCache } from "suspense";
 
 import { Tab } from "devtools/client/shared/components/ResponsiveTabs";
 import { CommandResponse } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import Loader from "replay-next/components/Loader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import {
   AnalysisResult,
@@ -495,13 +495,13 @@ interface ProtocolMessageCommon {
   recordedAt: number;
 }
 
-const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [sourceDetails: SourceDetails[], range: PointRange],
+const recordedProtocolMessagesCache = createCache<
+  [sourceDetails: SourceDetails[], range: PointRange, replayClient: ReplayClientInterface],
   AllProtocolMessages
->(
-  "recordedPotocolMessagesCache",
-  async (sourceDetails, range, replayClient) => {
+>({
+  debugLabel: "recordedProtocolMessagesCache",
+  getKey: (sourceDetails, range) => `${range.begin}-${range.end}`,
+  load: async (sourceDetails, range, replayClient) => {
     const sessionSource = sourceDetails.find(source => source.url?.includes("ui/actions/session"));
 
     if (!sessionSource) {
@@ -611,15 +611,14 @@ const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericC
 
     return results;
   },
-  (sourceDetails, range) => `${range.begin}-${range.end}`
-);
+});
 
 function RecordedProtocolMessages({ sourceDetails }: { sourceDetails: SourceDetails[] }) {
   const replayClient = useContext(ReplayClientContext);
   const { range: focusRange } = useContext(FocusContext);
 
   const allProtocolMessages = focusRange
-    ? getRecordedProtocolMessagesSuspense(
+    ? recordedProtocolMessagesCache.read(
         sourceDetails,
         { begin: focusRange.begin.point, end: focusRange.end.point },
         replayClient
