@@ -14,13 +14,12 @@ export interface FrameScopes {
 }
 
 export const {
+  cache: cacheScope,
+  getValueIfCached: getScopeIfCached,
   read: getScopeSuspense,
   readAsync: getScopeAsync,
-  getValueIfCached: getScopeIfCached,
-  cache: cacheScope,
 } = createCache<[PauseId, ScopeId, ReplayClientInterface], Scope>({
   debugLabel: "ScopeCache: getScope",
-  getKey: (pauseId: PauseId, scopeId: ScopeId) => `${pauseId}:${scopeId}`,
   load: async (pauseId: PauseId, scopeId: ScopeId, client: ReplayClientInterface) => {
     const result = await client.getScope(pauseId, scopeId);
     await client.waitForLoadedSources();
@@ -32,12 +31,11 @@ export const {
 });
 
 export const {
+  getValueIfCached: getFrameScopesIfCached,
   read: getFrameScopesSuspense,
   readAsync: getFrameScopesAsync,
-  getValueIfCached: getFrameScopesIfCached,
 } = createCache<[PauseId, FrameId, ReplayClientInterface], FrameScopes>({
   debugLabel: "ScopeCache: getFrameScopes",
-  getKey: (pauseId: PauseId, frameId: FrameId) => `${pauseId}:${frameId}`,
   load: async (pauseId: PauseId, frameId: FrameId, client: ReplayClientInterface) => {
     const frame = (await getFramesAsync(pauseId, client))?.find(
       frame => frame.frameId === frameId

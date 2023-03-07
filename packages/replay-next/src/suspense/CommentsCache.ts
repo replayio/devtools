@@ -20,5 +20,4 @@ export const {
     graphQLClient: GraphQLClientInterface,
     accessToken: string | null
   ) => await getCommentsGraphQL(graphQLClient, recordingId, accessToken),
-  getKey: (recordingId: RecordingId) => recordingId,
 });

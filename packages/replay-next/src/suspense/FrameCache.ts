@@ -13,7 +13,6 @@ export const {
   readAsync: getFramesAsync,
 } = createCache<[pauseId: PauseId, replayClient: ReplayClientInterface], Frame[] | undefined>({
   debugLabel: "FrameCache: getFrames",
-  getKey: pauseId => pauseId,
   load: async (pauseId, client) => {
     const framesResult = await client.getAllFrames(pauseId);
     await client.waitForLoadedSources();
@@ -39,7 +38,6 @@ export const {
   readAsync: getTopFrameAsync,
 } = createCache<[pauseId: PauseId, replayClient: ReplayClientInterface], Frame | undefined>({
   debugLabel: "FrameCache: getTopFrame",
-  getKey: pauseId => pauseId,
   load: async (pauseId, client) => {
     // In most cases, we probably already have a full set of frames cached for this pause ID.
     // Try to use the first frame from there if possible.

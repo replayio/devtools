@@ -302,5 +302,4 @@ export const {
 } = createCache<[time: number, client: ReplayClientInterface], PointsBoundingTime>({
   debugLabel: "PointsCache",
   load: async (time, client) => client.getPointsBoundingTime(time),
-  getKey: time => `${time}`,
 });

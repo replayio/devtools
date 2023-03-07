@@ -6,20 +6,15 @@ import { ReplayClientInterface } from "shared/client/types";
 
 import { updateMappedLocation } from "./PauseCache";
 
-export function getCacheKey(pauseId: PauseId, frameId: FrameId) {
-  return `${pauseId}:${frameId}`;
-}
-
 export const {
+  getValueIfCached: getFrameStepsIfCached,
   read: getFrameStepsSuspense,
   readAsync: getFrameStepsAsync,
-  getValueIfCached: getFrameStepsIfCached,
 } = createCache<
   [pauseId: PauseId, frameId: FrameId, replayClient: ReplayClientInterface],
   PointDescription[] | undefined
 >({
   debugLabel: "FrameStepsCache: getFrameSteps",
-  getKey: getCacheKey,
   load: async (pauseId, frameId, client) => {
     try {
       const frameSteps = await client.getFrameSteps(pauseId, frameId);
