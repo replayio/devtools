@@ -110,21 +110,31 @@ const Checklist: React.FC = () => {
                   Add logs with a single click
                 </li>
               </ul>
-              <div className="absolute bottom-0 left-0 w-full border-t border-primaryAccent">
-                <div className="text-md italics px-4 py-6">
+              <div className={styles.info}>
+                <div className={styles.text}>
                   {showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
                     <>
-                      <b>Console</b>
+                      <div className={styles.header}>Console</div>
                       <p>
                         Hover over the lines in the console and you’ll see a fast-forward button.
-                        Try clicking it!
+                        Click it!
                       </p>
                     </>
                   )}
 
                   {!showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
                     <>
-                      <b>Add a print statement</b>
+                      <div className={styles.header}>Add a print statement</div>
+                      <p>
+                        Now click the plus button on a line of code to set a print statement. This
+                        is where it gets interesting.
+                      </p>
+                    </>
+                  )}
+
+                  {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && (
+                    <>
+                      <div className={styles.header}>Edit a print statement</div>
                       <p>
                         Now you should see something like this. Whatever you type here will show up
                         in your console, so type something and hit enter.
@@ -132,21 +142,15 @@ const Checklist: React.FC = () => {
                     </>
                   )}
 
-                  {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && (
+                  {hasCompletedTour && (
                     <>
-                      <b>Isn't that cool?</b>
+                      <div className={styles.header}>Cool, eh?</div>
                       <p>
                         Take a look at the console and you’ll see that Replay re-ran the entire
                         recording and retroactively added your print statement each time that line
                         of code was called! 🤯
                       </p>
-                    </>
-                  )}
 
-                  {hasCompletedTour && (
-                    <>
-                      <b>Congratulations!</b>
-                      <p>You completed the checklist!</p>
                       <p className="mt-3">
                         <a href="#" onClick={dismissDevtoolsNag} className="underline">
                           Click to dismiss
@@ -172,9 +176,7 @@ const Checklist: React.FC = () => {
                     <img src="/images/tour/editlogs.gif" />
                   )}
 
-                  {hasCompletedTour && (
-                    <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExN2MxYmNhMDQzNDhmZTE0MjQ1NzY4OTQ0NGZjYTJjMzFhMjNjODMxYiZjdD1n/1KwQEj4MoTmZPSL5bs/giphy.gif" />
-                  )}
+                  {hasCompletedTour && <img src="/images/tour/consoleupdate.gif" />}
                 </div>
               </div>
             </>

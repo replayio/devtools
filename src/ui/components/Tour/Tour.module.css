@@ -1,5 +1,7 @@
 .TourBoxWrapper {
-  background-color: #bbe4f8;
+  background-color: #cfe9f2;
+  background-image: linear-gradient(207deg, #cfe9f2 0%, #d695e2 100%);
+
   height: 100%;
   position: relative;
   padding: 0;
@@ -24,13 +26,37 @@
 .intro {
   color: #068;
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 300;
   margin-bottom: 1rem;
 }
 
 .intro p {
   margin-bottom: 16px;
   line-height: 120%;
+}
+
+.info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  border-top: 1px solid #fff;
+  font-size: 15px;
+  background-color: #e1f1fb;
+}
+
+.info .text {
+  padding-left: 1rem; /* equivalent to px-4 in Tailwind */
+  padding-right: 1rem; /* equivalent to px-4 in Tailwind */
+  padding-top: 1.5rem; /* equivalent to py-6 in Tailwind */
+  padding-bottom: 1.5rem;
+}
+
+.info .text .header {
+  font-size: 16px;
+  color: #dd4261;
+  margin-bottom: 10px;
+  font-weight: 300;
 }
 
 .checklist {
@@ -41,9 +67,8 @@
   padding-bottom: 0.5rem;
   display: flex;
   align-items: center;
-  font-size: 16px;
-  font-weight: medium;
-  background-color: #bbe4f8;
+  font-size: 15px;
+  font-weight: 300;
 }
 
 .Icon {
