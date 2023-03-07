@@ -58,7 +58,7 @@ const RequestTable = ({
             <div className={styles.banner}>{filteredBeforeCount} requests filtered before</div>
           )}
 
-          {rows.map((row: Row<RequestSummary>, index: number) => {
+          {rows.map((row: Row<RequestSummary>) => {
             let firstInFuture = false;
             if (inPast && row.original.point.time >= currentTime) {
               inPast = false;
@@ -82,7 +82,6 @@ const RequestTable = ({
                 onClick={onRowSelect}
                 onSeek={onSeek}
                 row={row}
-                data={data[index]}
               />
             );
           })}

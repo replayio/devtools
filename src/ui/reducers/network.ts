@@ -1,6 +1,7 @@
 import {
   RequestBodyData,
   RequestEventInfo,
+  RequestId,
   RequestInfo,
   ResponseBodyData,
 } from "@replayio/protocol";
@@ -22,6 +23,7 @@ export type NetworkState = {
   requestBodies: Record<string, RequestBodyData[]>;
   requests: RequestInfo[];
   selectedRequestId: string | null;
+  copyCUrlAble: Record<RequestId, boolean>;
 };
 
 const initialState = (): NetworkState => ({
@@ -31,6 +33,7 @@ const initialState = (): NetworkState => ({
   responseBodies: {},
   requestBodies: {},
   selectedRequestId: null,
+  copyCUrlAble: {}
 });
 
 const update = (state: NetworkState = initialState(), action: NetworkAction): NetworkState => {
@@ -85,6 +88,14 @@ const update = (state: NetworkState = initialState(), action: NetworkAction): Ne
         ...state,
         selectedRequestId: null,
       };
+    case "ENABLE_COPY_CURL":
+      return {
+        ...state,
+        copyCUrlAble:{
+          ...state.copyCUrlAble,
+          [action.payload.requestId]: true
+        }
+      }
     default:
       return state;
   }
@@ -128,6 +139,7 @@ export const getFocusedRequests = createSelector(
 export const getResponseBodies = (state: UIState) => state.network.responseBodies;
 export const getRequestBodies = (state: UIState) => state.network.requestBodies;
 export const getSelectedRequestId = (state: UIState) => state.network.selectedRequestId;
+export const getCopyCUrlAbleById = (state: UIState, requestId: RequestId) => state.network.copyCUrlAble[requestId]
 export const getSummaryById = (state: UIState, id: string) => {
   const summaries = partialRequestsToCompleteSummaries(
     getRequests(state),

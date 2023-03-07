@@ -42,6 +42,11 @@ type HideRequestDetailsAction = {
   type: "HIDE_REQUEST_DETAILS";
 };
 
+type EnableCopyCUrlAction = {
+  type: "ENABLE_COPY_CURL";
+  payload: { requestId: string }
+}
+
 type NetworkRequestsLoadedAction = { type: "NETWORK_REQUESTS_LOADED" };
 
 export type NetworkAction =
@@ -50,7 +55,8 @@ export type NetworkAction =
   | NewRequestBodyPartsAction
   | NewResponseBodyPartsAction
   | ShowRequestDetailsAction
-  | HideRequestDetailsAction;
+  | HideRequestDetailsAction
+  | EnableCopyCUrlAction;
 
 export const newResponseBodyParts = (
   responseBodyParts: responseBodyData
@@ -86,6 +92,14 @@ export function hideRequestDetails() {
     type: "HIDE_REQUEST_DETAILS",
   };
 }
+
+export const enableCopyCUrl = (requestId: RequestId)  => {
+  return {
+    type: "ENABLE_COPY_CURL",
+    payload: { requestId }
+  } 
+}
+
 
 export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, protocolClient, replayClient }) => {

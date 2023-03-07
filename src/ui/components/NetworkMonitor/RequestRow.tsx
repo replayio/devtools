@@ -1,11 +1,15 @@
 import classNames from "classnames";
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useCallback, useLayoutEffect, useRef } from "react";
 import { Row } from "react-table";
-
+// eslint-disable-next-line no-restricted-imports
+import { client } from 'protocol/socket'
 import useNetworkContextMenu from "ui/components/NetworkMonitor/useNetworkContextMenu";
 
 import { RequestSummary } from "./utils";
 import styles from "./RequestTable.module.css";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { getSessionId } from "ui/actions/app";
+import { enableCopyCUrl } from "ui/actions/network";
 
 export const RequestRow = ({
   currentTime,
@@ -16,7 +20,6 @@ export const RequestRow = ({
   onClick,
   onSeek,
   row,
-  data
 }: {
   currentTime: number;
   isFirstInFuture: boolean;
@@ -26,11 +29,11 @@ export const RequestRow = ({
   onClick: (row: RequestSummary) => void;
   onSeek: (row: RequestSummary) => void;
   row: Row<RequestSummary>;
-  data: RequestSummary
 }) => {
+  const dispath = useAppDispatch()
   const prevIsSelectedRef = useRef<boolean>(false);
   const ref = useRef<HTMLDivElement>(null);
-
+  const data = row.original
   // Make sure newly selected Network requests have been scrolled into view.
   useLayoutEffect(() => {
     if (isSelected && !prevIsSelectedRef.current) {
@@ -39,8 +42,20 @@ export const RequestRow = ({
 
     prevIsSelectedRef.current = isSelected;
   }, [isSelected]);
+  
+  const sessionId = useAppSelector(getSessionId)!;
 
-  const { contextMenu, onContextMenu } = useNetworkContextMenu(row, data);
+   
+  const { contextMenu, onContextMenu } = useNetworkContextMenu(row);
+  
+  const onNetworkContextMenu = useCallback(async (event: any) => {
+    
+    onContextMenu(event)
+    if (data.hasRequestBody) {
+      await client.Network.getRequestBody({ id: data.id, range: { end: 5e9 } }, sessionId);
+      dispath(enableCopyCUrl(data.id))      
+    }
+  }, [data.id, data.hasRequestBody, sessionId, onContextMenu, dispath])
 
   return (
     <>
@@ -53,7 +68,7 @@ export const RequestRow = ({
           [styles.unloaded]: !isInLoadedRegion,
         })}
         onClick={() => onClick(row.original)}
-        onContextMenu={onContextMenu}
+        onContextMenu={onNetworkContextMenu}
         ref={ref}
         tabIndex={0}
       >
