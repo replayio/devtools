@@ -7,8 +7,8 @@ import fuzzyAldrin from "fuzzaldrin-plus";
 import debounce from "lodash/debounce";
 import React, { Component } from "react";
 import { ConnectedProps, connect } from "react-redux";
+import { STATUS_RESOLVED } from "suspense";
 
-import { STATUS_RESOLVED } from "replay-next/src/suspense/createGenericCache";
 import { getSourceContentsStatus } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { setViewMode } from "ui/actions/layout";

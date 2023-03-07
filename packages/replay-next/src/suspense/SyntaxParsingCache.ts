@@ -11,10 +11,10 @@ import { EditorState } from "@codemirror/state";
 import { classHighlighter, highlightTree } from "@lezer/highlight";
 import { ContentType } from "@replayio/protocol";
 import escapeHTML from "escape-html";
+import { createCache } from "suspense";
 
 import classNameToTokenTypes from "replay-next/components/sources/utils/classNameToTokenTypes";
 
-import { createGenericCache } from "./createGenericCache";
 import { StreamingSourceContents } from "./SourcesCache";
 
 export type ParsedToken = {
@@ -48,18 +48,13 @@ export type StreamingParser = {
 export const DEFAULT_MAX_CHARACTERS = 500_000;
 export const DEFAULT_MAX_TIME = 5_000;
 
-export const { getValueSuspense: parse } = createGenericCache<
-  [],
+export const syntaxParsingCache = createCache<
   [code: string, fileName: string],
   Array<ParsedToken[]> | null
->("SyntaxParsingCache: parse", highlighter, identity);
+>({ debugLabel: "SyntaxParsingCache", load: highlighter });
 
-export const {
-  getValueAsync: parseStreamingAsync,
-  getValueSuspense: parseStreaming,
-  getValueIfCached: getParsedValueIfCached,
-} = createGenericCache<
-  [],
+// TODO Refactor to use createStreamingCache
+export const streamingSyntaxParsingCache = createCache<
   [
     source: StreamingSourceContents,
     fileName: string | null,
@@ -67,7 +62,10 @@ export const {
     maxTime?: number
   ],
   StreamingParser | null
->("SyntaxParsingCache: parseStreaming", streamingSourceContentsToStreamingParser, identity);
+>({
+  debugLabel: "StreamingSyntaxParsingCache",
+  load: streamingSourceContentsToStreamingParser,
+});
 
 async function streamingSourceContentsToStreamingParser(
   source: StreamingSourceContents,
