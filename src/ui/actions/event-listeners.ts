@@ -2,14 +2,11 @@
 
 import { Dictionary } from "@reduxjs/toolkit";
 import type { Location, ObjectPreview, Object as ProtocolObject } from "@replayio/protocol";
+import { createCache } from "suspense";
 
 import type { ThreadFront as TF } from "protocol/thread";
-import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { getTopFrameAsync } from "replay-next/src/suspense/FrameCache";
-import {
-  getObjectPropertyHelper,
-  getObjectWithPreviewHelper,
-} from "replay-next/src/suspense/ObjectPreviews";
+import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { getScopeMapAsync } from "replay-next/src/suspense/ScopeMapCache";
 import { ReplayClientInterface } from "shared/client/types";
@@ -20,7 +17,6 @@ import {
   getSourceDetailsEntities,
 } from "ui/reducers/sources";
 import { UIState } from "ui/state";
-import { getJSON } from "ui/utils/objectFetching";
 
 import { UIThunkAction } from "./index";
 
@@ -274,16 +270,19 @@ function shouldIgnoreEventFromSource(sourceDetails?: SourceDetails) {
   return IGNORABLE_PARTIAL_SOURCE_URLS.some(partialUrl => url.includes(partialUrl));
 }
 
-export const {
-  getValueAsync: getEventListenerLocationAsync,
-  remove: removeEventListenerLocationEntry,
-} = createGenericCache<
-  [ThreadFront: typeof TF, replayClient: ReplayClientInterface, getState: () => UIState],
-  [pauseId: string, replayEventType: SEARCHABLE_EVENT_TYPES],
+export const eventListenerLocationCache = createCache<
+  [
+    pauseId: string,
+    replayEventType: SEARCHABLE_EVENT_TYPES,
+    ThreadFront: typeof TF,
+    replayClient: ReplayClientInterface,
+    getState: () => UIState
+  ],
   Location | undefined
->(
-  "eventListenerLocationCache",
-  async (pauseId, replayEventType, ThreadFront, replayClient, getState) => {
+>({
+  debugLabel: "eventListenerLocationCache",
+  getKey: pauseId => pauseId,
+  load: async (pauseId, replayEventType, ThreadFront, replayClient, getState) => {
     const topFrame = await getTopFrameAsync(pauseId, replayClient);
 
     if (!topFrame) {
@@ -353,8 +352,7 @@ export const {
 
     return sourceLocation!;
   },
-  pauseId => pauseId
-);
+});
 
 // Local variables in scope at the time of evaluation
 declare let event: MouseEvent | KeyboardEvent;
