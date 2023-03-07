@@ -9,25 +9,22 @@ import {
   Result,
 } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
+import { createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 
-import { createGenericCache } from "./createGenericCache";
 import { cacheFrames } from "./FrameCache";
 import { preCacheObjects } from "./ObjectPreviews";
 import { cacheScope } from "./ScopeCache";
 
-const {
-  getValueSuspense: getPauseIdForExecutionPointSuspense,
-  getValueAsync: getPauseIdForExecutionPointAsync,
+export const {
   getValueIfCached: getPauseIdForExecutionPointIfCached,
-} = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [executionPoint: ExecutionPoint],
-  PauseId
->(
-  "PauseCache: getPauseIdForExecutionPoint",
-  async (executionPoint, client) => {
+  read: getPauseIdForExecutionPointSuspense,
+  readAsync: getPauseIdForExecutionPointAsync,
+} = createCache<[executionPoint: ExecutionPoint, replayClient: ReplayClientInterface], PauseId>({
+  debugLabel: "PauseCache: getPauseIdForExecutionPoint",
+  getKey: executionPoint => executionPoint,
+  load: async (executionPoint, client) => {
     const createPauseResult = await client.createPause(executionPoint);
     await client.waitForLoadedSources();
     cachePauseData(
@@ -38,10 +35,7 @@ const {
     );
     return createPauseResult.pauseId;
   },
-  executionPoint => executionPoint
-);
-
-export { getPauseIdForExecutionPointIfCached };
+});
 
 const pointAndTimeByPauseId = new Map<PauseId, { point: ExecutionPoint; time: number }>();
 
@@ -70,23 +64,28 @@ export async function getPauseIdAsync(
 }
 
 export const {
-  getValueSuspense: evaluateSuspense,
-  getValueAsync: evaluateAsync,
   getValueIfCached: getEvaluationResultIfCached,
-} = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [pauseId: PauseId, frameId: FrameId | null, expression: string, uid?: string],
+  read: evaluateSuspense,
+  readAsync: evaluateAsync,
+} = createCache<
+  [
+    pauseId: PauseId,
+    frameId: FrameId | null,
+    expression: string,
+    uid: string | undefined,
+    replayClient: ReplayClientInterface
+  ],
   Omit<Result, "data">
->(
-  "PauseCache: evaluate",
-  async (pauseId, frameId, expression, uid, client) => {
+>({
+  debugLabel: "PauseCache: evaluate",
+  getKey: (pauseId, frameId, expression, uid) => `${pauseId}:${frameId}:${expression}:${uid}`,
+  load: async (pauseId, frameId, expression, uid, client) => {
     const result = await client.evaluateExpression(pauseId, expression, frameId);
     await client.waitForLoadedSources();
     cachePauseData(client, pauseId, result.data);
     return { exception: result.exception, failed: result.failed, returned: result.returned };
   },
-  (pauseId, frameId, expression, uid = "") => `${pauseId}:${frameId}:${expression}:${uid}`
-);
+});
 
 export function cachePauseData(
   client: ReplayClientInterface,

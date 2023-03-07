@@ -229,7 +229,9 @@ class _ThreadFront {
    */
   get currentPauseIdUnsafe() {
     return (
-      this.currentPauseId ?? getPauseIdForExecutionPointIfCached(this.currentPoint)?.value ?? null
+      this.currentPauseId ??
+      getPauseIdForExecutionPointIfCached(this.currentPoint, null as any) ??
+      null
     );
   }
 

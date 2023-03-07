@@ -39,7 +39,7 @@ export function getAllCachedPauseFrames(
     if (!steps?.length) {
       break;
     }
-    const asyncParentPauseId = getPauseIdForExecutionPointIfCached(steps[0].point)?.value;
+    const asyncParentPauseId = getPauseIdForExecutionPointIfCached(steps[0].point, replayClient);
     if (!asyncParentPauseId || asyncParentPauseId === pauseId) {
       break;
     }
