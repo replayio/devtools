@@ -31,11 +31,15 @@ export function getAllCachedPauseFrames(
     }
     allPauseFrames = allPauseFrames.concat(pauseFrames);
 
-    const steps = getFrameStepsIfCached(pauseId, pauseFrames[pauseFrames.length - 1].protocolId);
-    if (!steps?.value?.length) {
+    const steps = getFrameStepsIfCached(
+      pauseId,
+      pauseFrames[pauseFrames.length - 1].protocolId,
+      replayClient
+    );
+    if (!steps?.length) {
       break;
     }
-    const asyncParentPauseId = getPauseIdForExecutionPointIfCached(steps.value[0].point)?.value;
+    const asyncParentPauseId = getPauseIdForExecutionPointIfCached(steps[0].point)?.value;
     if (!asyncParentPauseId || asyncParentPauseId === pauseId) {
       break;
     }

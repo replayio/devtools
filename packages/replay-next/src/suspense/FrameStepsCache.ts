@@ -1,23 +1,26 @@
 import { FrameId, Location, PauseId, PointDescription } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
+import { createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 
-import { createGenericCache, createUseGetValue } from "./createGenericCache";
 import { updateMappedLocation } from "./PauseCache";
 
+export function getCacheKey(pauseId: PauseId, frameId: FrameId) {
+  return `${pauseId}:${frameId}`;
+}
+
 export const {
-  getValueSuspense: getFrameStepsSuspense,
-  getValueAsync: getFrameStepsAsync,
+  read: getFrameStepsSuspense,
+  readAsync: getFrameStepsAsync,
   getValueIfCached: getFrameStepsIfCached,
-  getCacheKey,
-} = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [pauseId: PauseId, frameId: FrameId],
+} = createCache<
+  [pauseId: PauseId, frameId: FrameId, replayClient: ReplayClientInterface],
   PointDescription[] | undefined
->(
-  "FrameStepsCache: getFrameSteps",
-  async (pauseId, frameId, client) => {
+>({
+  debugLabel: "FrameStepsCache: getFrameSteps",
+  getKey: getCacheKey,
+  load: async (pauseId, frameId, client) => {
     try {
       const frameSteps = await client.getFrameSteps(pauseId, frameId);
       const updatedFrameSteps = cloneDeep(frameSteps);
@@ -31,19 +34,7 @@ export const {
       return undefined;
     }
   },
-  (pauseId, frameId) => `${pauseId}:${frameId}`
-);
-
-export const useGetFrameSteps = createUseGetValue<
-  [replayClient: ReplayClientInterface, pauseId: PauseId | undefined, frameId: FrameId | undefined],
-  PointDescription[] | undefined
->(
-  async (replayClient, pauseId, frameId) =>
-    pauseId && frameId ? await getFrameStepsAsync(pauseId, frameId, replayClient) : undefined,
-  (replayClient, pauseId, frameId) =>
-    pauseId && frameId ? getFrameStepsIfCached(pauseId, frameId) : { value: undefined },
-  (replayClient, pauseId, frameId) => getCacheKey(pauseId!, frameId!)
-);
+});
 
 export async function getFrameStepForFrameLocation(
   replayClient: ReplayClientInterface,

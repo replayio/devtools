@@ -11,7 +11,7 @@ import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import Services from "devtools/shared/services";
 import { getFramesIfCached } from "replay-next/src/suspense/FrameCache";
-import { useGetFrameSteps } from "replay-next/src/suspense/FrameStepsCache";
+import { getFrameStepsIfCached } from "replay-next/src/suspense/FrameStepsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
@@ -77,11 +77,11 @@ export default function CommandBar() {
   const frames = selectedFrameId?.pauseId
     ? getFramesIfCached(selectedFrameId?.pauseId, replayClient)
     : undefined;
-  const frameSteps = useGetFrameSteps(
-    replayClient,
-    selectedFrameId?.pauseId,
-    selectedFrameId?.frameId
-  );
+  const frameSteps =
+    selectedFrameId?.pauseId && selectedFrameId?.frameId
+      ? getFrameStepsIfCached(selectedFrameId?.pauseId, selectedFrameId?.frameId, replayClient)
+      : undefined;
+
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -116,7 +116,7 @@ export default function CommandBar() {
     };
   }, [cx, dispatch]);
 
-  const hasFramePositions = !!frameSteps.value?.length;
+  const hasFramePositions = !!frameSteps?.length;
   const isPaused = !!frames?.length;
   const disabled = !isPaused || !hasFramePositions;
   const disabledTooltip = !isPaused
