@@ -6,6 +6,7 @@ import {
   newSource as ProtocolSource,
   SourceId as ProtocolSourceId,
 } from "@replayio/protocol";
+import { createCache } from "suspense";
 
 import {
   LineNumberToHitCountMap,
@@ -16,7 +17,6 @@ import { ProtocolError, isCommandError } from "shared/utils/error";
 import { isPointRange, toPointRange } from "shared/utils/time";
 
 import { createFetchAsyncFromFetchSuspense, createWakeable } from "../utils/suspense";
-import { createGenericCache, createUseGetValue } from "./createGenericCache";
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 export type ProtocolSourceContents = {
@@ -188,23 +188,6 @@ export function getCachedMinMaxSourceHitCounts(
   return minMaxHitCountsMap.get(key) || [null, null];
 }
 
-export function getSourceHitCountsCacheKey(
-  client: ReplayClientInterface,
-  sourceId: ProtocolSourceId,
-  locationRange: SourceLocationRange,
-  focusRange: TimeStampedPointRange | PointRange | null
-) {
-  // Focus range is tracked as TimeStampedPointRange.
-  // For convenience, this public API accepts either type.
-  let pointRange: PointRange | null = focusRangeToPointRange(focusRange);
-
-  let key = `${sourceId}:${locationRange.start.line}:${locationRange.start.column}:${locationRange.end.line}:${locationRange.end.column}`;
-  if (pointRange !== null) {
-    key = `${key}:${pointRange.begin}:${pointRange.end}`;
-  }
-  return key;
-}
-
 function focusRangeToPointRange(focusRange: TimeStampedPointRange | PointRange | null) {
   let pointRange: PointRange | null = null;
   if (focusRange !== null) {
@@ -220,81 +203,194 @@ function focusRangeToPointRange(focusRange: TimeStampedPointRange | PointRange |
   return pointRange;
 }
 
-export function getSourceHitCountsSuspense(
-  client: ReplayClientInterface,
-  sourceId: ProtocolSourceId,
-  locationRange: SourceLocationRange,
-  focusRange: TimeStampedPointRange | PointRange | null
-): LineNumberToHitCountMap {
-  const key = getSourceHitCountsCacheKey(client, sourceId, locationRange, focusRange);
+export const sourceHitCountsCache = createCache<
+  [
+    client: ReplayClientInterface,
+    sourceId: ProtocolSourceId,
+    locationRange: SourceLocationRange,
+    focusRange: TimeStampedPointRange | PointRange | null
+  ],
+  LineNumberToHitCountMap
+>({
+  debugLabel: "sourceHitCountsCache",
+  getKey: (
+    client: ReplayClientInterface,
+    sourceId: ProtocolSourceId,
+    locationRange: SourceLocationRange,
+    focusRange: TimeStampedPointRange | PointRange | null
+  ) => {
+    // Focus range is tracked as TimeStampedPointRange.
+    // For convenience, this public API accepts either type.
+    let pointRange: PointRange | null = focusRangeToPointRange(focusRange);
 
-  const pointRange = focusRangeToPointRange(focusRange);
-
-  let record = hitCountRecordsMap.get(key);
-  if (record == null) {
-    record = {
-      status: STATUS_PENDING,
-      value: createWakeable<LineNumberToHitCountMap>(`getSourceHitCountsSuspense ${key}`),
-    };
-
-    hitCountRecordsMap.set(key, record);
-
-    // Suspense caches fire and forget; errors will be handled within the fetch function.
-    fetchSourceHitCounts(client, sourceId, locationRange, pointRange, record, record.value);
-  }
-
-  if (record!.status === STATUS_RESOLVED) {
-    return record!.value;
-  } else {
-    throw record!.value;
-  }
-}
-
-export const getSourceHitCountsAsync = createFetchAsyncFromFetchSuspense(
-  getSourceHitCountsSuspense
-);
-
-export function getSourceHitCountsIfCached(
-  client: ReplayClientInterface,
-  sourceId: ProtocolSourceId,
-  locationRange: SourceLocationRange,
-  focusRange: TimeStampedPointRange | PointRange | null
-) {
-  const cacheKey = getSourceHitCountsCacheKey(client, sourceId, locationRange, focusRange);
-  const record = hitCountRecordsMap.get(cacheKey);
-  switch (record?.status) {
-    case STATUS_RESOLVED: {
-      return { value: record.value };
+    let key = `${sourceId}:${locationRange.start.line}:${locationRange.start.column}:${locationRange.end.line}:${locationRange.end.column}`;
+    if (pointRange !== null) {
+      key = `${key}:${pointRange.begin}:${pointRange.end}`;
     }
-    case STATUS_REJECTED: {
-      throw record.value;
-    }
-  }
-}
+    return key;
+  },
+  load: async (
+    client: ReplayClientInterface,
+    sourceId: ProtocolSourceId,
+    locationRange: SourceLocationRange,
+    focusRangeOrPointRange: TimeStampedPointRange | PointRange | null
+  ) => {
+    const pointRange = focusRangeToPointRange(focusRangeOrPointRange);
 
-export const useGetSourceHitCounts = createUseGetValue(
-  getSourceHitCountsAsync,
-  getSourceHitCountsIfCached,
-  getSourceHitCountsCacheKey
-);
+    try {
+      const [locations] = await getBreakpointPositionsAsync(sourceId, client);
+
+      // This Suspense cache works a little different from others,
+      // because the "key" includes a range of lines and we may have fetched some of them already.
+      // The first thing we should do then is decide if we need to fetch anything new,
+      // and then return a Map that contains the merged results.
+      //
+      // Note that we could also treat focus range in the same way (and refine in memory)
+      // but give that hit counts can overflow in some recordings (requiring the focus range to be shrunk)
+      // it's probably okay to just re-request when the focus range changes.
+
+      let protocolRequests: LineNumberToHitCountMap[] = [];
+
+      const key = sourceIdAndFocusRangeToKey(sourceId, pointRange);
+
+      let map = cachedHitCountsMap.get(key);
+      // TODO [hbenl] fix this cache instead of disabling it in tests
+      const isTest = window?.location.pathname.startsWith("/tests/");
+      if (isTest || map == null) {
+        map = new Map(map);
+
+        cachedHitCountsMap.set(key, map);
+
+        // This is the first time we've fetched lines for this source+focus range.
+        // The fastest thing is to fetch all of them.
+        const hitCounts = await client.getSourceHitCounts(
+          sourceId,
+          locationRange,
+          locations,
+          pointRange
+        );
+
+        protocolRequests.push(hitCounts);
+      } else {
+        // We may have fetched some of these lines already.
+        // If so, we can skip fetching the ones we already have.
+
+        let startLineNumber = null;
+        let endLineNumber = null;
+        let promises: Promise<void>[] = [];
+
+        for (
+          let lineNumber = locationRange.start.line;
+          lineNumber <= locationRange.end.line;
+          lineNumber++
+        ) {
+          // If this is the last line, check if we should fetch a final chunk.
+          let shouldFetch = lineNumber === locationRange.end.line && startLineNumber !== null;
+
+          if (map.has(lineNumber)) {
+            // If we've reached the end of a range of unloaded lines, we should fetch them.
+            shouldFetch = startLineNumber != null;
+          } else {
+            if (startLineNumber === null) {
+              startLineNumber = lineNumber;
+            }
+            endLineNumber = lineNumber;
+          }
+
+          if (shouldFetch) {
+            const locationRange = {
+              start: {
+                line: startLineNumber!,
+                column: 0,
+              },
+              end: {
+                line: endLineNumber!,
+                column: Number.MAX_SAFE_INTEGER,
+              },
+            };
+
+            promises.push(
+              client
+                .getSourceHitCounts(sourceId, locationRange, locations, pointRange)
+                .then(hitCounts => {
+                  protocolRequests.push(hitCounts);
+                })
+            );
+
+            startLineNumber = null;
+            endLineNumber = null;
+          }
+        }
+
+        if (promises.length > 0) {
+          await Promise.all(promises);
+        }
+      }
+
+      protocolRequests.forEach(hitCounts => {
+        hitCounts.forEach((hitCount, lineNumber) => {
+          map!.set(lineNumber, hitCount);
+        });
+
+        // Refine cached min-max hit count as we load more information about a source.
+        // Because hit counts may be filtered by a range of lines, this value may change as new information is loaded in.
+        let [minHitCount, maxHitCount] = minMaxHitCountsMap.get(key) || [
+          Number.MAX_SAFE_INTEGER,
+          0,
+        ];
+        hitCounts.forEach(hitCount => {
+          const { count } = hitCount;
+          minHitCount = Math.min(minHitCount, count);
+          maxHitCount = Math.max(maxHitCount, count);
+        });
+        minMaxHitCountsMap.set(key, [minHitCount, maxHitCount]);
+      });
+
+      // At this point, we've fetched all of the data we need.
+      const mergedHitCounts: LineNumberToHitCountMap = new Map();
+      for (
+        let lineNumber = locationRange.start.line;
+        lineNumber <= locationRange.end.line;
+        lineNumber++
+      ) {
+        mergedHitCounts.set(lineNumber, map.get(lineNumber)!);
+      }
+
+      return mergedHitCounts;
+    } catch (error) {
+      if (
+        isCommandError(error, ProtocolError.TooManyLocationsToPerformAnalysis) ||
+        isCommandError(error, ProtocolError.LinkerDoesNotSupportAction)
+      ) {
+        return new Map();
+      }
+
+      throw error;
+    }
+  },
+});
+
+export const {
+  read: getSourceHitCountsSuspense,
+  readAsync: getSourceHitCountsAsync,
+  getValueIfCached: getSourceHitCountsIfCached,
+} = sourceHitCountsCache;
 
 export type BreakpointPositionsResult = [
   breakablePositions: ProtocolSameLineSourceLocations[],
   breakablePositionsByLine: Map<number, ProtocolSameLineSourceLocations>
 ];
 
-export const {
-  getValueSuspense: getBreakpointPositionsSuspense,
-  getValueAsync: getBreakpointPositionsAsync,
-  getValueIfCached: getBreakpointPositionsIfCached,
-  getCacheKey: getBreakpointPositionsCacheKey,
-} = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [sourceId: ProtocolSourceId],
+function getBreakpointPositionsCacheKey(sourceId: SourceId): string {
+  return `${sourceId}`;
+}
+
+export const breakablePositionsCache = createCache<
+  [sourceId: ProtocolSourceId, replayClient: ReplayClientInterface],
   BreakpointPositionsResult
->(
-  "SourcesCache: getBreakpointPositions",
-  async (sourceId, client) => {
+>({
+  debugLabel: "SourcesCache: getBreakpointPositions",
+  load: async (sourceId, client) => {
     const breakablePositions = await client.getBreakpointPositions(sourceId, null);
 
     const breakablePositionsByLine = new Map<number, ProtocolSameLineSourceLocations>();
@@ -310,16 +406,17 @@ export const {
       // Maps iterate items in insertion order - this is useful later
       breakablePositionsByLine.set(position.line, position);
     }
+
     return [breakablePositions, breakablePositionsByLine];
   },
-  sourceId => sourceId
-);
+  getKey: getBreakpointPositionsCacheKey,
+});
 
-export const useGetBreakablePositions = createUseGetValue(
-  getBreakpointPositionsAsync,
-  (sourceId, replayClient) => getBreakpointPositionsIfCached(sourceId),
-  (sourceId, replayClient) => getBreakpointPositionsCacheKey(sourceId)
-);
+export const {
+  getValueIfCached: getBreakpointPositionsIfCached,
+  read: getBreakpointPositionsSuspense,
+  readAsync: getBreakpointPositionsAsync,
+} = breakablePositionsCache;
 
 async function fetchSources(client: ReplayClientInterface) {
   const protocolSources = await client.findSources();
@@ -407,150 +504,6 @@ async function fetchStreamingSourceContents(
   }
 }
 
-async function fetchSourceHitCounts(
-  client: ReplayClientInterface,
-  sourceId: ProtocolSourceId,
-  locationRange: SourceLocationRange,
-  focusRange: PointRange | null,
-  record: Record<LineNumberToHitCountMap>,
-  wakeable: Wakeable<LineNumberToHitCountMap>
-) {
-  try {
-    const [locations] = await getBreakpointPositionsAsync(sourceId, client);
-
-    // This Suspense cache works a little different from others,
-    // because the "key" includes a range of lines and we may have fetched some of them already.
-    // The first thing we should do then is decide if we need to fetch anything new,
-    // and then return a Map that contains the merged results.
-    //
-    // Note that we could also treat focus range in the same way (and refine in memory)
-    // but give that hit counts can overflow in some recordings (requiring the focus range to be shrunk)
-    // it's probably okay to just re-request when the focus range changes.
-
-    let protocolRequests: LineNumberToHitCountMap[] = [];
-
-    const key = sourceIdAndFocusRangeToKey(sourceId, focusRange);
-
-    let map = cachedHitCountsMap.get(key);
-    // TODO [hbenl] fix this cache instead of disabling it in tests
-    const isTest = window?.location.pathname.startsWith("/tests/");
-    if (isTest || map == null) {
-      map = new Map(map);
-
-      cachedHitCountsMap.set(key, map);
-
-      // This is the first time we've fetched lines for this source+focus range.
-      // The fastest thing is to fetch all of them.
-      const hitCounts = await client.getSourceHitCounts(
-        sourceId,
-        locationRange,
-        locations,
-        focusRange
-      );
-
-      protocolRequests.push(hitCounts);
-    } else {
-      // We may have fetched some of these lines already.
-      // If so, we can skip fetching the ones we already have.
-
-      let startLineNumber = null;
-      let endLineNumber = null;
-      let promises: Promise<void>[] = [];
-
-      for (
-        let lineNumber = locationRange.start.line;
-        lineNumber <= locationRange.end.line;
-        lineNumber++
-      ) {
-        // If this is the last line, check if we should fetch a final chunk.
-        let shouldFetch = lineNumber === locationRange.end.line && startLineNumber !== null;
-
-        if (map.has(lineNumber)) {
-          // If we've reached the end of a range of unloaded lines, we should fetch them.
-          shouldFetch = startLineNumber != null;
-        } else {
-          if (startLineNumber === null) {
-            startLineNumber = lineNumber;
-          }
-          endLineNumber = lineNumber;
-        }
-
-        if (shouldFetch) {
-          const locationRange = {
-            start: {
-              line: startLineNumber!,
-              column: 0,
-            },
-            end: {
-              line: endLineNumber!,
-              column: Number.MAX_SAFE_INTEGER,
-            },
-          };
-
-          promises.push(
-            client
-              .getSourceHitCounts(sourceId, locationRange, locations, focusRange)
-              .then(hitCounts => {
-                protocolRequests.push(hitCounts);
-              })
-          );
-
-          startLineNumber = null;
-          endLineNumber = null;
-        }
-      }
-
-      if (promises.length > 0) {
-        await Promise.all(promises);
-      }
-    }
-
-    protocolRequests.forEach(hitCounts => {
-      hitCounts.forEach((hitCount, lineNumber) => {
-        map!.set(lineNumber, hitCount);
-      });
-
-      // Refine cached min-max hit count as we load more information about a source.
-      // Because hit counts may be filtered by a range of lines, this value may change as new information is loaded in.
-      let [minHitCount, maxHitCount] = minMaxHitCountsMap.get(key) || [Number.MAX_SAFE_INTEGER, 0];
-      hitCounts.forEach(hitCount => {
-        const { count } = hitCount;
-        minHitCount = Math.min(minHitCount, count);
-        maxHitCount = Math.max(maxHitCount, count);
-      });
-      minMaxHitCountsMap.set(key, [minHitCount, maxHitCount]);
-    });
-
-    // At this point, we've fetched all of the data we need.
-    const mergedHitCounts: LineNumberToHitCountMap = new Map();
-    for (
-      let lineNumber = locationRange.start.line;
-      lineNumber <= locationRange.end.line;
-      lineNumber++
-    ) {
-      mergedHitCounts.set(lineNumber, map.get(lineNumber)!);
-    }
-
-    record.status = STATUS_RESOLVED;
-    record.value = mergedHitCounts;
-
-    wakeable.resolve(record.value);
-  } catch (error) {
-    if (
-      isCommandError(error, ProtocolError.TooManyLocationsToPerformAnalysis) ||
-      isCommandError(error, ProtocolError.LinkerDoesNotSupportAction)
-    ) {
-      record.status = STATUS_RESOLVED;
-      record.value = new Map();
-    } else {
-      record.status = STATUS_REJECTED;
-      record.value = error;
-
-      wakeable.reject(error);
-    }
-  }
-}
-
 export function isIndexedSource(source: ProtocolSource): source is IndexedSource {
   return source.hasOwnProperty("contentHashIndex");
 }
@@ -633,17 +586,16 @@ function sourceIdAndFocusRangeToKey(
 }
 
 export const {
-  getValueAsync: getSourceContentsAsync,
-  getValueSuspense: getSourceContentsSuspense,
-  getValueIfCached: getSourceContentsIfCached,
   getStatus: getSourceContentsStatus,
-} = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [sourceId: string],
+  getValueIfCached: getSourceContentsIfCached,
+  read: getSourceContentsSuspense,
+  readAsync: getSourceContentsAsync,
+} = createCache<
+  [sourceId: string, replayClient: ReplayClientInterface],
   StreamingSourceContents | undefined
->(
-  "sourceContentsCache",
-  async (sourceId, replayClient) => {
+>({
+  debugLabel: "sourceContentsCache",
+  load: async (sourceId, replayClient) => {
     const res = await getStreamingSourceContentsHelper(replayClient, sourceId);
     if (res) {
       // Ensure that follow-on caches have the entire text available
@@ -651,5 +603,4 @@ export const {
       return sourceContents;
     }
   },
-  sourceId => sourceId
-);
+});

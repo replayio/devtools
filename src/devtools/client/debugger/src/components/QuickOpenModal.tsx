@@ -10,6 +10,7 @@ import { ConnectedProps, connect } from "react-redux";
 
 import { STATUS_RESOLVED } from "replay-next/src/suspense/createGenericCache";
 import { getSourceContentsStatus } from "replay-next/src/suspense/SourcesCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { setViewMode } from "ui/actions/layout";
 import { getViewMode } from "ui/reducers/layout";
 import {
@@ -74,6 +75,9 @@ interface QOMState {
 }
 
 export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
+  declare context: React.ContextType<typeof ReplayClientContext>;
+  static contextType = ReplayClientContext;
+
   constructor(props: PropsFromRedux) {
     super(props);
 
@@ -309,8 +313,11 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
     const { selectedSource, setQuickOpenQuery } = this.props;
     setQuickOpenQuery(e.target.value);
 
+    const replayClient = this.context;
+
     const selectedContentLoaded =
-      selectedSource && getSourceContentsStatus(selectedSource.id) === STATUS_RESOLVED;
+      selectedSource &&
+      getSourceContentsStatus(selectedSource.id, replayClient) === STATUS_RESOLVED;
     const noSource = !selectedSource || !selectedContentLoaded;
 
     if ((noSource && this.isFunctionQuery()) || this.isGotoQuery()) {
