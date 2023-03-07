@@ -23,7 +23,6 @@ export const {
   readAsync: getPauseIdForExecutionPointAsync,
 } = createCache<[executionPoint: ExecutionPoint, replayClient: ReplayClientInterface], PauseId>({
   debugLabel: "PauseCache: getPauseIdForExecutionPoint",
-  getKey: executionPoint => executionPoint,
   load: async (executionPoint, client) => {
     const createPauseResult = await client.createPause(executionPoint);
     await client.waitForLoadedSources();
