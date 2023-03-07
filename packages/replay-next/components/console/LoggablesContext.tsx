@@ -130,14 +130,14 @@ export function LoggablesContextRoot({
 
       // TODO This seems expensive; can we cache the message-to-node-modules relationship?
       if (!showNodeModules) {
-        if (isInNodeModules(message)) {
+        if (isInNodeModules(client, message)) {
           return false;
         }
       }
 
       return true;
     });
-  }, [messages, showErrors, showLogs, showNodeModules, showWarnings]);
+  }, [client, messages, showErrors, showLogs, showNodeModules, showWarnings]);
 
   // We may suspend based on this value, so let's this value changes at sync priority,
   let exceptions: UncaughtException[] = EMPTY_ARRAY;

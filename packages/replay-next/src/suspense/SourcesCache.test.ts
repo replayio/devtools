@@ -37,7 +37,7 @@ describe("SourcesCache", () => {
     // Clear and recreate cached data between tests.
     const module = require("./SourcesCache");
     getCachedMinMaxSourceHitCounts = module.getCachedMinMaxSourceHitCounts;
-    getSourceHitCountsSuspense = module.getSourceHitCountsSuspense;
+    getSourceHitCountsSuspense = module.sourceHitCountsCache.read;
   });
 
   afterEach(() => {

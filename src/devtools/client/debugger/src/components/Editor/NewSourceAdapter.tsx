@@ -10,7 +10,7 @@ import {
 } from "replay-next/components/sources/SourceSearchContext";
 import { KeyboardModifiersContextRoot } from "replay-next/src/contexts/KeyboardModifiersContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { getSource } from "replay-next/src/suspense/SourcesCache";
+import { sourceCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useFeature } from "ui/hooks/settings";
 import { getSelectedLocation, getSelectedLocationHasScrolled } from "ui/reducers/sources";
@@ -131,7 +131,7 @@ function NewSourceAdapter() {
     >
       <NewSourceNag />
       {openSourceIds.map(sourceId => {
-        const source = getSource(replayClient, sourceId);
+        const source = sourceCache.read(replayClient, sourceId);
         return (
           <LazyOffscreen key={sourceId} mode={sourceId === focusedSourceId ? "visible" : "hidden"}>
             <Source source={source!} showColumnBreakpoints={showColumnBreakpoints} />

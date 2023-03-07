@@ -6,7 +6,7 @@
 
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import { copyToClipboard as copyTextToClipboard } from "replay-next/components/sources/utils/clipboard";
-import { getSourceContentsIfCached } from "replay-next/src/suspense/SourcesCache";
+import { sourceContentsCache } from "replay-next/src/suspense/SourcesCache";
 import type { UIThunkAction } from "ui/actions";
 import { SourceDetails, getSourceDetails } from "ui/reducers/sources";
 
@@ -98,10 +98,10 @@ export function flashLineRange(location: HighlightedRange): UIThunkAction {
 
 export function copyToClipboard(source: SourceDetails): UIThunkAction {
   return (dispatch, getState, { replayClient }) => {
-    const sourceContents = getSourceContentsIfCached(source.id, null as any);
+    const sourceContents = sourceContentsCache.getValueIfCached(source.id, null as any);
 
-    if (typeof sourceContents?.contents === "string") {
-      copyTextToClipboard(sourceContents.contents);
+    if (typeof sourceContents?.value === "string") {
+      copyTextToClipboard(sourceContents.value);
     }
   };
 }

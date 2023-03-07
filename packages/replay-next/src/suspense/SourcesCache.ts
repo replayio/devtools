@@ -6,7 +6,13 @@ import {
   newSource as ProtocolSource,
   SourceId as ProtocolSourceId,
 } from "@replayio/protocol";
-import { createCache } from "suspense";
+import {
+  StreamingCacheLoadOptions,
+  StreamingValue,
+  createCache,
+  createSingleEntryCache,
+  createStreamingCache,
+} from "suspense";
 
 import {
   LineNumberToHitCountMap,
@@ -15,9 +21,6 @@ import {
 } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import { isPointRange, toPointRange } from "shared/utils/time";
-
-import { createFetchAsyncFromFetchSuspense, createWakeable } from "../utils/suspense";
-import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 export type ProtocolSourceContents = {
   contents: string;
@@ -32,153 +35,63 @@ export type IndexedSource = ProtocolSource & {
 export type StreamSubscriber = () => void;
 export type UnsubscribeFromStream = () => void;
 
-export type StreamingSourceContents = {
-  codeUnitCount: number | null;
-  complete: boolean;
-  contents: string | null;
-  contentType: ProtocolContentType | null;
-  lineCount: number | null;
-  resolver: Promise<StreamingSourceContents>;
-  sourceId: ProtocolSourceId;
-  subscribe(subscriber: StreamSubscriber): UnsubscribeFromStream;
+export type StreamingSourceMetadata = {
+  codeUnitCount: number;
+  contentType: ProtocolContentType;
+  lineCount: number;
 };
-
-let inProgressSourcesWakeable: Wakeable<ProtocolSource[]> | null = null;
-let sources: ProtocolSource[] | null = null;
-let sourcesByUrl: Map<string, ProtocolSource[]> | null = null;
 
 type MinMaxHitCountTuple = [minHitCount: number, maxHitCount: number];
 
 type SourceIdAndFocusRange = string;
 
-// Source id, location range, and focus range to Record of hit counts;
-// this value is what drives Suspense.
-const hitCountRecordsMap: Map<string, Record<LineNumberToHitCountMap>> = new Map();
 // Source id and focus range to map of cached hit counts by line;
 // this map enables us to avoid re-requesting the same lines.
 const cachedHitCountsMap: Map<string, LineNumberToHitCountMap> = new Map();
+
 // Source id and focus range to the a tuple of min and max hit counts;
 // this value is updated as we fetch new hit counts for the source (and focus range)
 const minMaxHitCountsMap: Map<SourceIdAndFocusRange, MinMaxHitCountTuple> = new Map();
 
-const sourceIdToStreamingSourceContentsMap: Map<
-  ProtocolSourceId,
-  Record<StreamingSourceContents>
-> = new Map();
+export const sourcesByUrlCache = createSingleEntryCache<
+  [client: ReplayClientInterface],
+  Map<string, ProtocolSource[]>
+>({
+  debugLabel: "SourcesByUrlCache",
+  load: async (client: ReplayClientInterface) => {
+    const protocolSources = await client.findSources();
 
-export function preCacheSources(value: ProtocolSource[]): void {
-  sources = toIndexedSources(value);
-  sourcesByUrl = groupSourcesByUrl(value);
-}
+    sourcesCache.cache(toIndexedSources(protocolSources), client);
 
-export function getSourcesSuspense(client: ReplayClientInterface) {
-  if (sources !== null) {
-    return sources;
-  }
+    return groupSourcesByUrl(protocolSources);
+  },
+});
 
-  if (inProgressSourcesWakeable === null) {
-    inProgressSourcesWakeable = createWakeable("getSourcesSuspense");
+export const sourcesCache = createSingleEntryCache<
+  [client: ReplayClientInterface],
+  ProtocolSource[]
+>({
+  debugLabel: "SourcesCache",
+  load: async (client: ReplayClientInterface) => {
+    const protocolSources = await client.findSources();
 
-    // Suspense caches fire and forget; errors will be handled within the fetch function.
-    fetchSources(client);
-  }
+    sourcesByUrlCache.cache(groupSourcesByUrl(protocolSources), client);
 
-  throw inProgressSourcesWakeable;
-}
+    return toIndexedSources(protocolSources);
+  },
+});
 
-export function getSourcesByUrlSuspense(client: ReplayClientInterface) {
-  if (sourcesByUrl !== null) {
-    return sourcesByUrl;
-  }
-
-  if (inProgressSourcesWakeable === null) {
-    inProgressSourcesWakeable = createWakeable("getSourcesSuspense");
-
-    // Suspense caches fire and forget; errors will be handled within the fetch function.
-    fetchSources(client);
-  }
-
-  throw inProgressSourcesWakeable.then(() => sourcesByUrl);
-}
-
-// Wrapper method around getSources Suspense method.
-// This method can be used by non-React code to prefetch/prime the Suspense cache by loading object properties.
-export const getSourcesAsync = createFetchAsyncFromFetchSuspense(getSourcesSuspense);
-
-export async function getSourceAsync(
-  client: ReplayClientInterface,
-  sourceId: ProtocolSourceId
-): Promise<ProtocolSource | null> {
-  await getSourcesAsync(client);
-  return getSource(client, sourceId);
-}
-
-export function getSource(
-  client: ReplayClientInterface,
-  sourceId: ProtocolSourceId
-): ProtocolSource | null {
-  const sources = getSourcesSuspense(client);
-  return sources.find(source => source.sourceId === sourceId) || null;
-}
-
-export function getSourceIfAlreadyLoaded(sourceId: ProtocolSourceId): ProtocolSource | null {
-  if (sources !== null) {
+export const sourceCache = createCache<
+  [client: ReplayClientInterface, sourceId: ProtocolSourceId],
+  ProtocolSource | null
+>({
+  debugLabel: "SourceCache",
+  getKey: (client: ReplayClientInterface, sourceId: ProtocolSourceId) => sourceId,
+  load: async (client: ReplayClientInterface, sourceId: ProtocolSourceId) => {
+    const sources = await sourcesCache.readAsync(client);
     return sources.find(source => source.sourceId === sourceId) || null;
-  }
-
-  return null;
-}
-
-export function getCachedSourceContents(
-  sourceId: ProtocolSourceId
-): StreamingSourceContents | null {
-  const record = sourceIdToStreamingSourceContentsMap.get(sourceId);
-  return record?.status === STATUS_RESOLVED ? record.value : null;
-}
-
-export const getStreamingSourceContentsAsync = createFetchAsyncFromFetchSuspense(
-  getStreamingSourceContentsSuspense
-);
-
-export function getStreamingSourceContentsSuspense(
-  client: ReplayClientInterface,
-  sourceId: ProtocolSourceId
-): StreamingSourceContents {
-  let record = sourceIdToStreamingSourceContentsMap.get(sourceId);
-  if (record == null) {
-    record = {
-      status: STATUS_PENDING,
-      value: createWakeable<StreamingSourceContents>(
-        `getStreamingSourceContentsSuspense sourceId: ${sourceId}`
-      ),
-    };
-
-    sourceIdToStreamingSourceContentsMap.set(sourceId, record);
-
-    // Suspense caches fire and forget; errors will be handled within the fetch function.
-    fetchStreamingSourceContents(client, sourceId, record, record.value);
-  }
-
-  if (record!.status === STATUS_RESOLVED) {
-    return record!.value;
-  } else {
-    throw record!.value;
-  }
-}
-
-// Wrapper method around getSourceContents Suspense method.
-// This method can be used by non-React code to prefetch/prime the Suspense cache by loading object properties.
-export async function getStreamingSourceContentsHelper(
-  client: ReplayClientInterface,
-  sourceId: ProtocolSourceId
-): Promise<StreamingSourceContents> {
-  try {
-    return getStreamingSourceContentsSuspense(client, sourceId);
-  } catch (errorOrPromise) {
-    await errorOrPromise;
-    return getStreamingSourceContentsSuspense(client, sourceId);
-  }
-}
+  },
+});
 
 export function getCachedMinMaxSourceHitCounts(
   sourceId: ProtocolSourceId,
@@ -370,26 +283,17 @@ export const sourceHitCountsCache = createCache<
   },
 });
 
-export const {
-  read: getSourceHitCountsSuspense,
-  readAsync: getSourceHitCountsAsync,
-  getValueIfCached: getSourceHitCountsIfCached,
-} = sourceHitCountsCache;
-
 export type BreakpointPositionsResult = [
   breakablePositions: ProtocolSameLineSourceLocations[],
   breakablePositionsByLine: Map<number, ProtocolSameLineSourceLocations>
 ];
-
-function getBreakpointPositionsCacheKey(sourceId: SourceId): string {
-  return `${sourceId}`;
-}
 
 export const breakablePositionsCache = createCache<
   [sourceId: ProtocolSourceId, replayClient: ReplayClientInterface],
   BreakpointPositionsResult
 >({
   debugLabel: "SourcesCache: getBreakpointPositions",
+  getKey: (sourceId, client) => sourceId,
   load: async (sourceId, client) => {
     const breakablePositions = await client.getBreakpointPositions(sourceId, null);
 
@@ -409,7 +313,6 @@ export const breakablePositionsCache = createCache<
 
     return [breakablePositions, breakablePositionsByLine];
   },
-  getKey: getBreakpointPositionsCacheKey,
 });
 
 export const {
@@ -418,98 +321,12 @@ export const {
   readAsync: getBreakpointPositionsAsync,
 } = breakablePositionsCache;
 
-async function fetchSources(client: ReplayClientInterface) {
-  const protocolSources = await client.findSources();
-  sources = toIndexedSources(protocolSources);
-  sourcesByUrl = groupSourcesByUrl(protocolSources);
-
-  inProgressSourcesWakeable!.resolve(sources!);
-  inProgressSourcesWakeable = null;
-}
-
-async function fetchStreamingSourceContents(
-  client: ReplayClientInterface,
-  sourceId: ProtocolSourceId,
-  record: Record<StreamingSourceContents>,
-  wakeable: Wakeable<StreamingSourceContents>
-) {
-  try {
-    let notifyResolver: (streamingSourceContents: StreamingSourceContents) => void;
-    const resolver = new Promise<StreamingSourceContents>(resolve => {
-      notifyResolver = resolve;
-    });
-
-    const subscribers: Set<StreamSubscriber> = new Set();
-    const streamingSourceContents: StreamingSourceContents = {
-      codeUnitCount: null,
-      complete: false,
-      contents: null,
-      contentType: null,
-      lineCount: null,
-      resolver,
-      sourceId,
-      subscribe(subscriber: StreamSubscriber) {
-        subscribers.add(subscriber);
-        return () => {
-          subscribers.delete(subscriber);
-        };
-      },
-    };
-
-    const notifySubscribers = () => {
-      subscribers.forEach(subscriber => subscriber());
-    };
-
-    // Fire and forget; data streams in.
-    client
-      .streamSourceContents(
-        sourceId,
-        ({ codeUnitCount, contentType, lineCount }) => {
-          streamingSourceContents.codeUnitCount = codeUnitCount;
-          streamingSourceContents.contentType = contentType;
-          streamingSourceContents.lineCount = lineCount;
-          notifySubscribers();
-        },
-        ({ chunk }) => {
-          if (streamingSourceContents.contents === null) {
-            streamingSourceContents.contents = chunk;
-          } else {
-            streamingSourceContents.contents += chunk;
-          }
-
-          const isComplete =
-            streamingSourceContents.contents.length === streamingSourceContents.codeUnitCount;
-          if (isComplete) {
-            streamingSourceContents.complete = true;
-          }
-
-          notifySubscribers();
-        }
-      )
-      .then(() => {
-        subscribers.clear();
-
-        notifyResolver(streamingSourceContents);
-      });
-
-    record.status = STATUS_RESOLVED;
-    record.value = streamingSourceContents;
-
-    wakeable.resolve(record.value);
-  } catch (error) {
-    record.status = STATUS_REJECTED;
-    record.value = error;
-
-    wakeable.reject(error);
-  }
-}
-
 export function isIndexedSource(source: ProtocolSource): source is IndexedSource {
   return source.hasOwnProperty("contentHashIndex");
 }
 
 export function getSourcesToDisplay(client: ReplayClientInterface): ProtocolSource[] {
-  const sources = getSourcesSuspense(client);
+  const sources = sourcesCache.read(client);
   return sources.filter(source => source.kind !== "inlineScript");
 }
 
@@ -585,22 +402,62 @@ function sourceIdAndFocusRangeToKey(
   return key;
 }
 
-export const {
-  getStatus: getSourceContentsStatus,
-  getValueIfCached: getSourceContentsIfCached,
-  read: getSourceContentsSuspense,
-  readAsync: getSourceContentsAsync,
-} = createCache<
+export type StreamingSourceContents = StreamingValue<string, StreamingSourceMetadata>;
+
+export const sourceContentsCache = createCache<
   [sourceId: string, replayClient: ReplayClientInterface],
   StreamingSourceContents | undefined
 >({
   debugLabel: "sourceContentsCache",
   load: async (sourceId, replayClient) => {
-    const res = await getStreamingSourceContentsHelper(replayClient, sourceId);
-    if (res) {
-      // Ensure that follow-on caches have the entire text available
-      const sourceContents = await res.resolver;
-      return sourceContents;
+    const stream = streamingSourceContentsCache.stream(replayClient, sourceId);
+
+    // Ensure that follow-on caches have the entire text available
+    const sourceContents = await stream.resolver;
+
+    return sourceContents;
+  },
+});
+
+export const streamingSourceContentsCache = createStreamingCache<
+  [client: ReplayClientInterface, sourceId: ProtocolSourceId],
+  string,
+  StreamingSourceMetadata
+>({
+  debugLabel: "streamingSourceContentsCache",
+  getKey: (client: ReplayClientInterface, sourceId: ProtocolSourceId) => sourceId,
+  load: async (
+    options: StreamingCacheLoadOptions<string, StreamingSourceMetadata>,
+    client: ReplayClientInterface,
+    sourceId: ProtocolSourceId
+  ) => {
+    const { reject, update, resolve } = options;
+
+    try {
+      let content: string = "";
+      let metadata: StreamingSourceMetadata | null = null;
+
+      await client.streamSourceContents(
+        sourceId,
+        ({ codeUnitCount, contentType, lineCount }) => {
+          metadata = {
+            codeUnitCount: codeUnitCount,
+            contentType: contentType,
+            lineCount: lineCount,
+          };
+
+          update("", 0, metadata);
+        },
+        ({ chunk }) => {
+          content += chunk;
+
+          update(content, content.length / metadata!.codeUnitCount);
+        }
+      );
+
+      resolve();
+    } catch (error) {
+      reject(error);
     }
   },
 });

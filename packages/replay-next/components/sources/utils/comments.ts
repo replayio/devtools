@@ -1,9 +1,6 @@
 import { SourceId } from "@replayio/protocol";
 
-import {
-  getSourceAsync,
-  getStreamingSourceContentsAsync,
-} from "replay-next/src/suspense/SourcesCache";
+import { sourceCache, streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
 import { streamingSyntaxParsingCache } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ParsedToken } from "replay-next/src/suspense/SyntaxParsingCache";
 import { getBase64Png } from "replay-next/src/utils/canvas";
@@ -82,12 +79,12 @@ export async function createTypeDataForSourceCodeComment(
   let parsedTokens: ParsedToken[] | null = null;
   let rawText: string | null = null;
 
-  const source = await getSourceAsync(replayClient, sourceId);
+  const source = await sourceCache.readAsync(replayClient, sourceId);
   const sourceUrl = source?.url ?? null;
   const fileName = source ? getSourceFileName(source) : null;
 
   // Secondary label is used to store the syntax-highlighted markup for the line
-  const streamingSource = await getStreamingSourceContentsAsync(replayClient, sourceId);
+  const streamingSource = streamingSourceContentsCache.stream(replayClient, sourceId);
   if (streamingSource != null) {
     const parsedSource = await streamingSyntaxParsingCache.readAsync(streamingSource, fileName);
     if (parsedSource != null) {

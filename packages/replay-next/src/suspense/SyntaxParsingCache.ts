@@ -95,15 +95,17 @@ async function streamingSourceContentsToStreamingParser(
   let sourceIndex = 0;
 
   const processChunk = () => {
-    if (source.contents !== null) {
+    const { data, value } = source;
+
+    if (data != null && value != null) {
+      const { codeUnitCount, contentType, lineCount } = data;
+
       if (streamingParser.rawTextByLine.length === 0) {
-        streamingParser.rawTextByLine = streamingParser.rawTextByLine.concat(
-          source.contents.split("\n")
-        );
+        streamingParser.rawTextByLine = streamingParser.rawTextByLine.concat(value.split("\n"));
       } else {
         const lastLine = streamingParser.rawTextByLine[streamingParser.rawTextByLine.length - 1];
 
-        const newLines = source.contents.substring(sourceIndex).split("\n");
+        const newLines = value.substring(sourceIndex).split("\n");
         newLines[0] = lastLine + newLines[0];
 
         streamingParser.rawTextByLine = streamingParser.rawTextByLine
@@ -111,25 +113,22 @@ async function streamingSourceContentsToStreamingParser(
           .concat(newLines);
       }
 
-      sourceIndex = source.contents.length;
+      sourceIndex = value.length;
 
-      streamingParser.rawTextPercentage = source.contents.length / source.codeUnitCount!;
+      streamingParser.rawTextPercentage = value.length / codeUnitCount;
 
       // HACK [FE-925]
       // Unprettified sources without source maps can have a lot of text on a single line.
       // Mouse interactions (e.g. hover) sometimes crash the browser with such large text.
       // A rough metric for identifying this type of file is to look at the average number of code units per line.
-      const badFormat =
-        source.lineCount !== null &&
-        source.codeUnitCount !== null &&
-        source.codeUnitCount / source.lineCount > 2_500;
+      const badFormat = codeUnitCount / lineCount > 2_500;
 
       if (!didParse && !badFormat) {
-        if (streamingParser.rawTextPercentage === 1 || source.contents.length >= maxCharacters) {
+        if (streamingParser.rawTextPercentage === 1 || value.length >= maxCharacters) {
           didParse = true;
 
-          const parser = incrementalParser(fileName, source.contentType!)!;
-          parser.parseChunk(source.contents, source.complete, maxCharacters, maxTime);
+          const parser = incrementalParser(fileName, contentType)!;
+          parser.parseChunk(value, source.complete, maxCharacters, maxTime);
 
           // TODO [FE-853]
           // Handle the case where the last line wasn't fully processed.
@@ -147,7 +146,7 @@ async function streamingSourceContentsToStreamingParser(
 
   source.subscribe(processChunk);
 
-  if (source.lineCount !== null) {
+  if (source?.data?.lineCount !== null) {
     processChunk();
   }
 

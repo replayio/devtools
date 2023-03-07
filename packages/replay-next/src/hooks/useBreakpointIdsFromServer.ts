@@ -3,7 +3,7 @@ import { useContext, useEffect, useRef } from "react";
 
 import { PointBehaviorsObject } from "replay-next/src/contexts/points/types";
 import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
-import { getSourcesAsync } from "replay-next/src/suspense/SourcesCache";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_ENABLED, Point, PointKey } from "shared/client/types";
 import { ReplayClientInterface } from "shared/client/types";
@@ -40,7 +40,7 @@ export default function useBreakpointIdsFromServer(
           // There's no point (hah!) in restoring breakpoints until after
           // we have sources to work with, and it's also possible that
           // some persisted points have obsolete source IDs.
-          const allSources = await getSourcesAsync(replayClient);
+          const allSources = await sourcesCache.readAsync(replayClient);
 
           const allSourceIds = new Set<string>();
           for (let source of allSources) {

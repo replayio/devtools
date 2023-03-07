@@ -163,8 +163,8 @@ function NodeModulesCount() {
   const { didError, messages } = getMessagesSuspense(client, range, endpoint);
 
   const count = useMemo(() => {
-    return messages ? messages.filter(message => isInNodeModules(message)).length : 0;
-  }, [messages]);
+    return messages ? messages.filter(message => isInNodeModules(client, message)).length : 0;
+  }, [client, messages]);
 
   if (didError) {
     return (

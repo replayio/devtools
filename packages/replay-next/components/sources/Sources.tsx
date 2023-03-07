@@ -1,7 +1,7 @@
 import { KeyboardEvent, MouseEvent, useContext, useRef } from "react";
 
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { getSource } from "replay-next/src/suspense/SourcesCache";
+import { sourceCache } from "replay-next/src/suspense/SourcesCache";
 import { getSourceFileName } from "replay-next/src/utils/source";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -107,7 +107,7 @@ function Sources() {
       >
         <div className={styles.Tabs}>
           {openSourceIds.map(sourceId => {
-            const source = getSource(client, sourceId);
+            const source = sourceCache.read(client, sourceId);
             const fileName = (source && getSourceFileName(source, true)) || "unknown";
 
             const onOpenButtonClick = (event: MouseEvent) => {
@@ -145,7 +145,7 @@ function Sources() {
         <div className={styles.Content}>
           {openSourceIds.length === 0 && <div className={styles.NoOpenSources}>Sources</div>}
           {openSourceIds.map(sourceId => {
-            const source = getSource(client, sourceId);
+            const source = sourceCache.read(client, sourceId);
             return (
               <LazyOffscreen
                 key={sourceId}

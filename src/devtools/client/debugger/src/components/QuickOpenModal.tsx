@@ -9,7 +9,7 @@ import React, { Component } from "react";
 import { ConnectedProps, connect } from "react-redux";
 import { STATUS_RESOLVED } from "suspense";
 
-import { getSourceContentsStatus } from "replay-next/src/suspense/SourcesCache";
+import { sourceContentsCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { setViewMode } from "ui/actions/layout";
 import { getViewMode } from "ui/reducers/layout";
@@ -317,7 +317,7 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
 
     const selectedContentLoaded =
       selectedSource &&
-      getSourceContentsStatus(selectedSource.id, replayClient) === STATUS_RESOLVED;
+      sourceContentsCache.getStatus(selectedSource.id, replayClient) === STATUS_RESOLVED;
     const noSource = !selectedSource || !selectedContentLoaded;
 
     if ((noSource && this.isFunctionQuery()) || this.isGotoQuery()) {

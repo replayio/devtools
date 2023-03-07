@@ -89,8 +89,8 @@ export default function SourceList({
 
   const lineCount = useSyncExternalStore(
     streamingSourceContents.subscribe,
-    () => streamingSourceContents.lineCount,
-    () => streamingSourceContents.lineCount
+    () => streamingSourceContents.data?.lineCount,
+    () => streamingSourceContents.data?.lineCount
   );
 
   // Both hit counts and breakable positions are key info,

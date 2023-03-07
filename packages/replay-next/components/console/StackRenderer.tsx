@@ -2,7 +2,6 @@ import { CallStack, Frame, FrameId } from "@replayio/protocol";
 import React, { Suspense, memo, useContext } from "react";
 
 import Loader from "replay-next/components/Loader";
-import { getSource } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Source from "./Source";

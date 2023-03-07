@@ -1,7 +1,7 @@
 import { createCache } from "suspense";
 
 import type { SymbolDeclarations } from "devtools/client/debugger/src/reducers/ast";
-import { getSourceContentsAsync } from "replay-next/src/suspense/SourcesCache";
+import { sourceContentsCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { SourceDetails } from "ui/reducers/sources";
 
@@ -35,10 +35,10 @@ export const sourceSymbolsCache = createCache<
   getKey: sourceId => sourceId,
   load: async (sourceId, sourceDetails, replayClient) => {
     const { parser } = await import("devtools/client/debugger/src/utils/bootstrap");
-    const sourceContents = await getSourceContentsAsync(sourceId, replayClient);
+    const sourceContents = await sourceContentsCache.readAsync(sourceId, replayClient);
 
     if (sourceContents !== undefined) {
-      const { contents, sourceId } = sourceContents;
+      const { value } = sourceContents;
 
       const matchingSource = sourceDetails.find(sd => sd.id === sourceId);
 
@@ -47,7 +47,7 @@ export const sourceSymbolsCache = createCache<
       // Our Babel parser worker requires a copy of the source text be sent over first
       parser.setSource(sourceId, {
         type: "text",
-        value: contents,
+        value,
         contentType,
       });
       const symbols = (await parser.getSymbols(sourceId)) as SymbolDeclarations;
@@ -63,13 +63,11 @@ export const sourceLinesCache = createCache<
   debugLabel: "sourceLinesCache",
   getKey: sourceId => sourceId,
   load: async (sourceId, replayClient) => {
-    const sourceContents = await getSourceContentsAsync(sourceId, replayClient);
+    const sourceContents = await sourceContentsCache.readAsync(sourceId, replayClient);
     if (!sourceContents) {
       return [];
     }
 
-    const { contents } = sourceContents;
-
-    return contents?.split("\n") ?? [];
+    return sourceContents.value?.split("\n") ?? [];
   },
 });
