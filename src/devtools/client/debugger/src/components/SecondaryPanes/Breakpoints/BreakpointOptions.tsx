@@ -4,7 +4,7 @@ import Loader from "replay-next/components/Loader";
 import SyntaxHighlightedLine from "replay-next/components/sources/SyntaxHighlightedLine";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
-import { getSourceLinesSuspense } from "ui/suspense/sourceCaches";
+import { sourceLinesCache } from "ui/suspense/sourceCaches";
 
 import styles from "./BreakpointOptions.module.css";
 
@@ -17,7 +17,7 @@ function BreakpointLineContents({ breakpoint }: BreakpointProps) {
   const replayClient = useContext(ReplayClientContext);
   const { sourceId } = breakpoint.location;
 
-  const sourceLines = getSourceLinesSuspense(sourceId, replayClient);
+  const sourceLines = sourceLinesCache.read(sourceId, replayClient);
 
   const snippet = useMemo(() => {
     const { column, line } = breakpoint.location;

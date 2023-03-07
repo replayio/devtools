@@ -13,7 +13,7 @@ import {
   getSourceDetailsEntities,
 } from "ui/reducers/sources";
 import { UIState } from "ui/state";
-import { getSymbolsAsync } from "ui/suspense/sourceCaches";
+import { sourceSymbolsCache } from "ui/suspense/sourceCaches";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 
@@ -119,7 +119,7 @@ export const fetchSymbolsForSource = createAsyncThunk<
 
     const sourceDetails = getAllSourceDetails(getState());
 
-    const symbols = await getSymbolsAsync(sourceId, sourceDetails, replayClient);
+    const symbols = await sourceSymbolsCache.readAsync(sourceId, sourceDetails, replayClient);
     return symbols!;
   },
   {

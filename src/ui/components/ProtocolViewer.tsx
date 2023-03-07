@@ -44,7 +44,7 @@ import {
 } from "ui/reducers/protocolMessages";
 import { SourceDetails, getAllSourceDetails } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
-import { getSymbolsAsync } from "ui/suspense/sourceCaches";
+import { sourceSymbolsCache } from "ui/suspense/sourceCaches";
 import { getJSON } from "ui/utils/objectFetching";
 import { formatDuration, formatTimestamp } from "ui/utils/time";
 
@@ -512,7 +512,11 @@ const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericC
       sessionSource.id,
       replayClient
     );
-    const symbols = await getSymbolsAsync(sessionSource.id, sourceDetails, replayClient);
+    const symbols = await sourceSymbolsCache.readAsync(
+      sessionSource.id,
+      sourceDetails,
+      replayClient
+    );
 
     const mapNamesToCallbackNames: Record<keyof AllProtocolMessages, string> = {
       requestMap: "onRequest",

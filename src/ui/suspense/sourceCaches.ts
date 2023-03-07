@@ -1,5 +1,6 @@
+import { createCache } from "suspense";
+
 import type { SymbolDeclarations } from "devtools/client/debugger/src/reducers/ast";
-import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { getSourceContentsAsync } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { SourceDetails } from "ui/reducers/sources";
@@ -26,17 +27,13 @@ function urlToContentType(fileName: string): string {
   }
 }
 
-export const {
-  getValueAsync: getSymbolsAsync,
-  getStatus: getSymbolsStatus,
-  getValueSuspense: getSymbolsSuspense,
-} = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [sourceId: string, sourceDetails: SourceDetails[]],
+export const sourceSymbolsCache = createCache<
+  [sourceId: string, sourceDetails: SourceDetails[], replayClient: ReplayClientInterface],
   SymbolDeclarations | undefined
->(
-  "sourceSymbolsCache",
-  async (sourceId, sourceDetails, replayClient) => {
+>({
+  debugLabel: "sourceSymbolsCache",
+  getKey: sourceId => sourceId,
+  load: async (sourceId, sourceDetails, replayClient) => {
     const { parser } = await import("devtools/client/debugger/src/utils/bootstrap");
     const sourceContents = await getSourceContentsAsync(sourceId, replayClient);
 
@@ -57,21 +54,22 @@ export const {
       return symbols;
     }
   },
-  sourceId => sourceId
-);
+});
 
-export const { getValueAsync: getSourceLinesAsync, getValueSuspense: getSourceLinesSuspense } =
-  createGenericCache<[replayClient: ReplayClientInterface], [sourceId: string], string[]>(
-    "sourceLinesCache",
-    async (sourceId, replayClient) => {
-      const sourceContents = await getSourceContentsAsync(sourceId, replayClient);
-      if (!sourceContents) {
-        return [];
-      }
+export const sourceLinesCache = createCache<
+  [sourceId: string, replayClient: ReplayClientInterface],
+  string[]
+>({
+  debugLabel: "sourceLinesCache",
+  getKey: sourceId => sourceId,
+  load: async (sourceId, replayClient) => {
+    const sourceContents = await getSourceContentsAsync(sourceId, replayClient);
+    if (!sourceContents) {
+      return [];
+    }
 
-      const { contents } = sourceContents;
+    const { contents } = sourceContents;
 
-      return contents?.split("\n") ?? [];
-    },
-    sourceId => sourceId
-  );
+    return contents?.split("\n") ?? [];
+  },
+});

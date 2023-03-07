@@ -1,5 +1,3 @@
-import { useEffect, useRef, useState } from "react";
-
 import { handleError } from "protocol/utils";
 import { isThennable } from "shared/proxy/utils";
 
