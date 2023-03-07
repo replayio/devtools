@@ -107,14 +107,14 @@ const SourceListRow = memo(
 
     const parsedTokensByLine = useSyncExternalStore(
       streamingParser.subscribe,
-      () => streamingParser.parsedTokensByLine,
-      () => streamingParser.parsedTokensByLine
+      () => streamingParser.data?.parsedTokensByLine ?? [],
+      () => streamingParser.data?.parsedTokensByLine ?? []
     );
 
     const rawTextByLine = useSyncExternalStore(
       streamingParser.subscribe,
-      () => streamingParser.rawTextByLine,
-      () => streamingParser.rawTextByLine
+      () => streamingParser.data?.rawTextByLine ?? [],
+      () => streamingParser.data?.rawTextByLine ?? []
     );
 
     const lineHitCounts = hitCounts?.get(lineNumber) || null;

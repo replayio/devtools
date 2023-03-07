@@ -11,7 +11,12 @@ import { EditorState } from "@codemirror/state";
 import { classHighlighter, highlightTree } from "@lezer/highlight";
 import { ContentType } from "@replayio/protocol";
 import escapeHTML from "escape-html";
-import { createCache } from "suspense";
+import {
+  StreamingCacheLoadOptions,
+  StreamingValue,
+  createCache,
+  createStreamingCache,
+} from "suspense";
 
 import classNameToTokenTypes from "replay-next/components/sources/utils/classNameToTokenTypes";
 
@@ -37,13 +42,14 @@ export type IncrementalParser = {
 export type StreamSubscriber = () => void;
 export type UnsubscribeFromStream = () => void;
 
-export type StreamingParser = {
+export type StreamingParserMetadata = {
   parsedTokensByLine: Array<ParsedToken[]>;
   parsedTokensPercentage: number;
   rawTextByLine: string[];
   rawTextPercentage: number;
-  subscribe(subscriber: StreamSubscriber): UnsubscribeFromStream;
 };
+
+export type StreamingParser = StreamingValue<null, StreamingParserMetadata>;
 
 export const DEFAULT_MAX_CHARACTERS = 500_000;
 export const DEFAULT_MAX_TIME = 5_000;
@@ -53,105 +59,99 @@ export const syntaxParsingCache = createCache<
   Array<ParsedToken[]> | null
 >({ debugLabel: "SyntaxParsingCache", load: highlighter });
 
-// TODO Refactor to use createStreamingCache
-export const streamingSyntaxParsingCache = createCache<
+export const streamingSyntaxParsingCache = createStreamingCache<
   [
     source: StreamingSourceContents,
     fileName: string | null,
     maxCharacters?: number,
     maxTime?: number
   ],
-  StreamingParser | null
+  null,
+  StreamingParserMetadata
 >({
   debugLabel: "StreamingSyntaxParsingCache",
-  load: streamingSourceContentsToStreamingParser,
-});
+  load: async (
+    options: StreamingCacheLoadOptions<null, StreamingParserMetadata>,
+    source: StreamingSourceContents,
+    fileName: string | null,
+    maxCharacters: number = DEFAULT_MAX_CHARACTERS,
+    maxTime: number = DEFAULT_MAX_TIME
+  ) => {
+    const { resolve, update } = options;
 
-async function streamingSourceContentsToStreamingParser(
-  source: StreamingSourceContents,
-  fileName: string | null,
-  maxCharacters: number = DEFAULT_MAX_CHARACTERS,
-  maxTime: number = DEFAULT_MAX_TIME
-): Promise<StreamingParser | null> {
-  const subscribers: Set<StreamSubscriber> = new Set();
+    const metadata: StreamingParserMetadata = {
+      parsedTokensByLine: [],
+      parsedTokensPercentage: 0,
+      rawTextByLine: [],
+      rawTextPercentage: 0,
+    };
 
-  // TODO [source viewer]
-  // Incrementally parse (more than just the first chunk)
-  let didParse = false;
+    // TODO [source viewer]
+    // Incrementally parse (more than just the first chunk)
+    let didParse = false;
+    let sourceIndex = 0;
 
-  const streamingParser: StreamingParser = {
-    parsedTokensByLine: [],
-    parsedTokensPercentage: 0,
-    rawTextByLine: [],
-    rawTextPercentage: 0,
-    subscribe(subscriber: StreamSubscriber) {
-      subscribers.add(subscriber);
-      return () => {
-        subscribers.delete(subscriber);
-      };
-    },
-  };
+    const processChunk = () => {
+      const { data, value } = source;
 
-  let sourceIndex = 0;
+      if (data != null && value != null) {
+        const { codeUnitCount, contentType, lineCount } = data;
 
-  const processChunk = () => {
-    const { data, value } = source;
+        if (metadata.rawTextByLine.length === 0) {
+          metadata.rawTextByLine = metadata.rawTextByLine.concat(value.split("\n"));
+        } else {
+          const lastLine = metadata.rawTextByLine[metadata.rawTextByLine.length - 1];
 
-    if (data != null && value != null) {
-      const { codeUnitCount, contentType, lineCount } = data;
+          const newLines = value.substring(sourceIndex).split("\n");
+          newLines[0] = lastLine + newLines[0];
 
-      if (streamingParser.rawTextByLine.length === 0) {
-        streamingParser.rawTextByLine = streamingParser.rawTextByLine.concat(value.split("\n"));
-      } else {
-        const lastLine = streamingParser.rawTextByLine[streamingParser.rawTextByLine.length - 1];
-
-        const newLines = value.substring(sourceIndex).split("\n");
-        newLines[0] = lastLine + newLines[0];
-
-        streamingParser.rawTextByLine = streamingParser.rawTextByLine
-          .slice(0, streamingParser.rawTextByLine.length - 1)
-          .concat(newLines);
-      }
-
-      sourceIndex = value.length;
-
-      streamingParser.rawTextPercentage = value.length / codeUnitCount;
-
-      // HACK [FE-925]
-      // Unprettified sources without source maps can have a lot of text on a single line.
-      // Mouse interactions (e.g. hover) sometimes crash the browser with such large text.
-      // A rough metric for identifying this type of file is to look at the average number of code units per line.
-      const badFormat = codeUnitCount / lineCount > 2_500;
-
-      if (!didParse && !badFormat) {
-        if (streamingParser.rawTextPercentage === 1 || value.length >= maxCharacters) {
-          didParse = true;
-
-          const parser = incrementalParser(fileName, contentType)!;
-          parser.parseChunk(value, source.complete, maxCharacters, maxTime);
-
-          // TODO [FE-853]
-          // Handle the case where the last line wasn't fully processed.
-          // We could do a partial line, but that might be slow for long lines.
-          streamingParser.parsedTokensByLine = parser.isComplete()
-            ? parser.parsedTokensByLine
-            : parser.parsedTokensByLine.slice(0, parser.parsedTokensByLine.length - 1);
-          streamingParser.parsedTokensPercentage = streamingParser.rawTextPercentage;
+          metadata.rawTextByLine = metadata.rawTextByLine
+            .slice(0, metadata.rawTextByLine.length - 1)
+            .concat(newLines);
         }
+
+        sourceIndex = value.length;
+
+        metadata.rawTextPercentage = value.length / codeUnitCount;
+
+        // HACK [FE-925]
+        // Unprettified sources without source maps can have a lot of text on a single line.
+        // Mouse interactions (e.g. hover) sometimes crash the browser with such large text.
+        // A rough metric for identifying this type of file is to look at the average number of code units per line.
+        const badFormat = codeUnitCount / lineCount > 2_500;
+
+        if (!didParse && !badFormat) {
+          if (metadata.rawTextPercentage === 1 || value.length >= maxCharacters) {
+            didParse = true;
+
+            const parser = incrementalParser(fileName, contentType)!;
+            parser.parseChunk(value, source.complete, maxCharacters, maxTime);
+
+            // TODO [FE-853]
+            // Handle the case where the last line wasn't fully processed.
+            // We could do a partial line, but that might be slow for long lines.
+            metadata.parsedTokensByLine = parser.isComplete()
+              ? parser.parsedTokensByLine
+              : parser.parsedTokensByLine.slice(0, parser.parsedTokensByLine.length - 1);
+            metadata.parsedTokensPercentage = metadata.rawTextPercentage;
+          }
+        }
+
+        update(null, (metadata.rawTextPercentage + metadata.parsedTokensPercentage) / 2, metadata);
       }
+    };
 
-      subscribers.forEach(subscriber => subscriber());
+    source.subscribe(processChunk);
+
+    if (source?.data?.lineCount !== null) {
+      processChunk();
     }
-  };
 
-  source.subscribe(processChunk);
+    await source.resolver;
 
-  if (source?.data?.lineCount !== null) {
-    processChunk();
-  }
-
-  return streamingParser;
-}
+    resolve();
+  },
+});
 
 function incrementalParser(
   fileName: string | null,
@@ -302,10 +302,6 @@ function highlighter(code: string, fileName: string): Array<ParsedToken[]> | nul
   parser.parseChunk(code, true);
 
   return parser.parsedTokensByLine;
-}
-
-function identity(any: any) {
-  return any;
 }
 
 function contentTypeToLanguage(contentType: ContentType): LRLanguage {

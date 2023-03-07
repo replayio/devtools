@@ -86,26 +86,28 @@ export async function createTypeDataForSourceCodeComment(
   // Secondary label is used to store the syntax-highlighted markup for the line
   const streamingSource = streamingSourceContentsCache.stream(replayClient, sourceId);
   if (streamingSource != null) {
-    const parsedSource = await streamingSyntaxParsingCache.readAsync(streamingSource, fileName);
-    if (parsedSource != null) {
-      if (parsedSource.rawTextByLine.length < lineNumber) {
+    const parsedSource = await streamingSyntaxParsingCache.stream(streamingSource, fileName);
+    if (parsedSource?.data != null) {
+      const { parsedTokensByLine, rawTextByLine } = parsedSource.data;
+
+      if (rawTextByLine.length < lineNumber) {
         // If the streaming source hasn't finished loading yet, wait for it to load;
         // Note that it's important to check raw lines as parsed lines may be clipped
         // if the source is larger than the parser has been configured to handle.
         await new Promise<void>(resolve => {
           parsedSource.subscribe(() => {
-            if (parsedSource.rawTextByLine.length >= lineNumber) {
+            if (rawTextByLine.length >= lineNumber) {
               resolve();
             }
           });
         });
       }
 
-      rawText = parsedSource.rawTextByLine[lineNumber - 1];
+      rawText = rawTextByLine[lineNumber - 1];
       if (rawText.length <= maxTextLength) {
         // If the raw text is longer than the max length, we can't safely use the parsed tokens.
-        if (parsedSource.parsedTokensByLine.length >= lineNumber) {
-          parsedTokens = parsedSource.parsedTokensByLine[lineNumber - 1] ?? null;
+        if (parsedTokensByLine.length >= lineNumber) {
+          parsedTokens = parsedTokensByLine[lineNumber - 1] ?? null;
         }
       } else {
         rawText = rawText.substring(0, maxTextLength);
