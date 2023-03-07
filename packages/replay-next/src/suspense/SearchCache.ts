@@ -1,10 +1,10 @@
 import { Location, SearchSourceContentsMatch, SourceId } from "@replayio/protocol";
+import { createCache } from "suspense";
 
 import { insert } from "replay-next/src/utils/array";
 import { isBowerComponent, isModuleFromCdn, isNodeModule } from "replay-next/src/utils/source";
 import { ReplayClientInterface } from "shared/client/types";
 
-import { createGenericCache } from "./createGenericCache";
 import { getSourcesAsync } from "./SourcesCache";
 
 // TODO Create a generic cache variant that
@@ -48,16 +48,22 @@ export function isSourceSearchResultMatch(
 }
 
 export const {
-  getValueSuspense: searchSourcesSuspense,
-  getValueAsync: searchSourcesAsync,
   getValueIfCached: getCachedSourceSearchResults,
-} = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [query: string, includeNodeModules: boolean, limit?: number],
+  read: searchSourcesSuspense,
+  readAsync: searchSourcesAsync,
+} = createCache<
+  [
+    query: string,
+    includeNodeModules: boolean,
+    limit: number | undefined,
+    replayClient: ReplayClientInterface
+  ],
   StreamingSourceSearchResults
->(
-  "SearchCache: searchSources",
-  async (
+>({
+  debugLabel: "SearchCache: searchSources",
+  getKey: (query: string, includeNodeModules: boolean, limit: number | undefined) =>
+    `${includeNodeModules}:${limit || "-"}:${query}`,
+  load: async (
     query: string,
     includeNodeModules: boolean,
     limit: number = MAX_SEARCH_RESULTS_TO_DISPLAY,
@@ -127,9 +133,7 @@ export const {
 
     return result;
   },
-  (query: string, includeNodeModules: boolean, limit?: number) =>
-    `${includeNodeModules}:${limit || "-"}:${query}`
-);
+});
 
 async function initializeSourceIds(client: ReplayClientInterface) {
   sourceIdsWithNodeModules = [];
