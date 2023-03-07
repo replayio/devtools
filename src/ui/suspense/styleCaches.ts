@@ -1,8 +1,8 @@
 import { PauseId, ProtocolClient, Object as ProtocolObject } from "@replayio/protocol";
 import uniqBy from "lodash/uniqBy";
+import { createCache } from "suspense";
 
 import { RuleFront } from "devtools/client/inspector/rules/models/fronts/rule";
-import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
@@ -12,17 +12,25 @@ export interface WiredAppliedRule {
   pseudoElement?: string;
 }
 
-export const {
-  getValueSuspense: getAppliedRulesSuspense,
-  getValueAsync: getAppliedRulesAsync,
-  getValueIfCached: getAppliedRulesIfCached,
-} = createGenericCache<
-  [client: ProtocolClient, replayClient: ReplayClientInterface, sessionId: string],
-  [pauseId: PauseId, nodeId: string],
+export const appliedStyleRulesCache = createCache<
+  [
+    pauseId: PauseId,
+    nodeId: string,
+    client: ProtocolClient,
+    replayClient: ReplayClientInterface,
+    sessionId: string
+  ],
   WiredAppliedRule[]
->(
-  "styleCaches: getAppliedRules",
-  async (pauseId, nodeId, client, replayClient, sessionId) => {
+>({
+  debugLabel: "styleCaches: getAppliedRules",
+  getKey: (pauseId: PauseId, nodeId: string) => `${pauseId}|${nodeId}`,
+  load: async (
+    pauseId: PauseId,
+    nodeId: string,
+    client: ProtocolClient,
+    replayClient: ReplayClientInterface,
+    sessionId: string
+  ) => {
     const { rules, data } = await client.CSS.getAppliedRules({ node: nodeId }, sessionId, pauseId);
 
     const uniqueRules = uniqBy(rules, rule => `${rule.rule}|${rule.pseudoElement}`);
@@ -67,20 +75,15 @@ export const {
     });
     return wiredRules;
   },
-  (pauseId, nodeId) => `${pauseId}|${nodeId}`
-);
+});
 
-export const {
-  getValueSuspense: getComputedStyleSuspense,
-  getValueAsync: getComputedStyleAsync,
-  getValueIfCached: getComputedStyleIfCached,
-} = createGenericCache<
-  [client: ProtocolClient, sessionId: string],
-  [pauseId: PauseId, nodeId: string],
+export const computedStylesCache = createCache<
+  [pauseId: PauseId, nodeId: string, client: ProtocolClient, sessionId: string],
   Map<string, string> | undefined
->(
-  "styleCaches: getComputedStyle",
-  async (pauseId, nodeId, client, sessionId) => {
+>({
+  debugLabel: "styleCaches: getComputedStyle",
+  getKey: (pauseId, nodeId) => `${pauseId}|${nodeId}`,
+  load: async (pauseId, nodeId, client, sessionId) => {
     try {
       const { computedStyle } = await client.CSS.getComputedStyle(
         {
@@ -100,20 +103,15 @@ export const {
       return;
     }
   },
-  (pauseId, nodeId) => `${pauseId}|${nodeId}`
-);
+});
 
-export const {
-  getValueSuspense: getBoundingRectSuspense,
-  getValueAsync: getBoundingRectAsync,
-  getValueIfCached: getBoundingRectIfCached,
-} = createGenericCache<
-  [client: ProtocolClient, sessionId: string],
-  [pauseId: PauseId, nodeId: string],
+export const boundingRectsCache = createCache<
+  [pauseId: PauseId, nodeId: string, client: ProtocolClient, sessionId: string],
   DOMRect | undefined
->(
-  "styleCaches: getBoundingRect",
-  async (pauseId, nodeId, client, sessionId) => {
+>({
+  debugLabel: "styleCaches: getBoundingRect",
+  getKey: (pauseId, nodeId) => `${pauseId}|${nodeId}`,
+  load: async (pauseId, nodeId, client, sessionId) => {
     try {
       const { rect } = await client.DOM.getBoundingClientRect(
         {
@@ -128,5 +126,4 @@ export const {
       return;
     }
   },
-  (pauseId, nodeId) => `${pauseId}|${nodeId}`
-);
+});

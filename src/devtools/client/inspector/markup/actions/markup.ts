@@ -15,7 +15,7 @@ import {
   getNodeDataAsync,
   getNodeEventListenersAsync,
 } from "ui/suspense/nodeCaches";
-import { getBoundingRectAsync, getComputedStyleAsync } from "ui/suspense/styleCaches";
+import { boundingRectsCache, computedStylesCache } from "ui/suspense/styleCaches";
 
 import {
   NodeInfo,
@@ -669,7 +669,7 @@ export const getNodeBoundingRect = (
     const pauseId = state.pause.id;
     const sessionId = state.app.sessionId;
 
-    return getBoundingRectAsync(pauseId!, nodeId, protocolClient, sessionId!);
+    return boundingRectsCache.readAsync(pauseId!, nodeId, protocolClient, sessionId!);
   };
 };
 
@@ -685,7 +685,7 @@ async function convertNode(
 ): Promise<NodeInfo> {
   const [nodeObject, computedStyle, eventListeners] = await Promise.all([
     getObjectWithPreviewHelper(replayClient, pauseId, nodeId),
-    getComputedStyleAsync(pauseId, nodeId, client, sessionId),
+    computedStylesCache.readAsync(pauseId, nodeId, client, sessionId),
     getNodeEventListenersAsync(pauseId, nodeId, client, replayClient, sessionId),
   ]);
 

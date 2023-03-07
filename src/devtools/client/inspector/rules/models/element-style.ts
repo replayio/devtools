@@ -9,7 +9,7 @@ import Services from "devtools/shared/services";
 import { assert } from "protocol/utils";
 import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
-import { getAppliedRulesAsync } from "ui/suspense/styleCaches";
+import { appliedStyleRulesCache } from "ui/suspense/styleCaches";
 
 import { RuleFront } from "./fronts/rule";
 import { StyleFront } from "./fronts/style";
@@ -91,7 +91,7 @@ export default class ElementStyle {
       return;
     }
 
-    const wiredRules = await getAppliedRulesAsync(
+    const wiredRules = await appliedStyleRulesCache.readAsync(
       this.pauseId,
       this.nodeId,
       this.client,
@@ -152,7 +152,7 @@ export default class ElementStyle {
           }
         }
 
-        const parentApplied = await getAppliedRulesAsync(
+        const parentApplied = await appliedStyleRulesCache.readAsync(
           this.pauseId,
           parentNodeId,
           this.client,

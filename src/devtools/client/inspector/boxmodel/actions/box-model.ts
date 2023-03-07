@@ -1,6 +1,6 @@
 import type { UIStore } from "ui/actions";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
-import { getBoundingRectAsync, getComputedStyleAsync } from "ui/suspense/styleCaches";
+import { boundingRectsCache, computedStylesCache } from "ui/suspense/styleCaches";
 
 import { nodeSelected } from "../../markup/reducers/markup";
 import { LAYOUT_NUMERIC_FIELDS, Layout, layoutUpdated } from "../reducers/box-model";
@@ -28,13 +28,13 @@ export function setupBoxModel(store: UIStore, startAppListening: AppStartListeni
 
       const [bounds, style] = await pause(
         Promise.all([
-          getBoundingRectAsync(
+          boundingRectsCache.readAsync(
             originalPauseId,
             selectedNode,
             protocolClient,
             ThreadFront.sessionId!
           ),
-          getComputedStyleAsync(
+          computedStylesCache.readAsync(
             originalPauseId,
             selectedNode,
             protocolClient,

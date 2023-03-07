@@ -2,7 +2,7 @@ import { Action, ThunkAction } from "@reduxjs/toolkit";
 
 import CSSProperties from "third-party/css/css-properties";
 import { OutputParser } from "third-party/css/output-parser";
-import { getComputedStyleAsync } from "ui/suspense/styleCaches";
+import { computedStylesCache } from "ui/suspense/styleCaches";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 
 import ElementStyle from "../../rules/models/element-style";
@@ -34,7 +34,7 @@ export type InspectorThunkAction<TReturn = void> = ThunkAction<
 export function setComputedProperties(elementStyle: ElementStyle): InspectorThunkAction {
   return async (dispatch, getState, { protocolClient, ThreadFront, replayClient }) => {
     const pauseId = await ThreadFront.getCurrentPauseId(replayClient);
-    const computed = await getComputedStyleAsync(
+    const computed = await computedStylesCache.readAsync(
       pauseId,
       elementStyle.nodeId,
       protocolClient,
