@@ -1,7 +1,6 @@
 import { IDBPDatabase, openDB } from "idb";
-import { SetStateAction, useCallback, useEffect, useRef, useState, useTransition } from "react";
-
-import { createGenericCache } from "../suspense/createGenericCache";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { createCache } from "suspense";
 
 export interface IDBOptions {
   databaseName: string;
@@ -42,12 +41,13 @@ export async function preloadIDBInitialValues(
 }
 
 export const {
-  getValueSuspense: getIDBInstanceSuspense,
-  getValueAsync: getIDBInstanceAsync,
   getValueIfCached: getIDBInstanceIfCached,
-} = createGenericCache<[], [dbOptions: IDBOptions], IDBPDatabase>(
-  "useIndexedDB: getIDBInstance",
-  async dbOptions => {
+  read: getIDBInstanceSuspense,
+  readAsync: getIDBInstanceAsync,
+} = createCache<[dbOptions: IDBOptions], IDBPDatabase>({
+  debugLabel: "useIndexedDB: getIDBInstance",
+  getKey: dbOptions => dbOptions.databaseName + dbOptions.databaseVersion,
+  load: async dbOptions => {
     const { databaseName, databaseVersion, storeNames } = dbOptions;
     // Create a single shared IDB instance for this DB definition
     const dbInstance = await openDB(databaseName, databaseVersion, {
@@ -63,24 +63,23 @@ export const {
     });
     return dbInstance;
   },
-  dbOptions => dbOptions.databaseName + dbOptions.databaseVersion
-);
+});
 
 export const {
-  getValueSuspense: getLatestIDBValueSuspense,
-  getValueAsync: getLatestIDBValueAsync,
+  cache: setLatestIDBValue,
   getValueIfCached: getLatestIDBValueIfCached,
-  addValue: setLatestIDBValue,
-} = createGenericCache<[], [dbOptions: IDBOptions, storeName: string, recordName: string], any>(
-  "MappedLocationCache: getLatestIDBValue",
-  async (dbOptions, storeName, recordName) => {
+  read: getLatestIDBValueSuspense,
+  readAsync: getLatestIDBValueAsync,
+} = createCache<[dbOptions: IDBOptions, storeName: string, recordName: string], any>({
+  debugLabel: "MappedLocationCache: getLatestIDBValue",
+  getKey: (dbOptions, storeName, recordName) =>
+    dbOptions.databaseName + dbOptions.databaseVersion + storeName + recordName,
+  load: async (dbOptions, storeName, recordName) => {
     // Only look up this initial stored value once
     const dbInstance = await getIDBInstanceAsync(dbOptions);
     return dbInstance.get(storeName, recordName);
   },
-  (dbOptions, storeName, recordName) =>
-    dbOptions.databaseName + dbOptions.databaseVersion + storeName + recordName
-);
+});
 
 /**
 Stores value in IndexedDB and synchronizes it between sessions.
