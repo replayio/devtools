@@ -8,6 +8,7 @@ import {
   TimeStampedPoint,
 } from "@replayio/protocol";
 import jsTokens from "js-tokens";
+import { createCache } from "suspense";
 
 import {
   AnalysisInput,
@@ -19,7 +20,6 @@ import { ReplayClientInterface } from "shared/client/types";
 
 import { createFetchAsyncFromFetchSuspense } from "../utils/suspense";
 import { RemoteAnalysisResult, getAnalysisCache } from "./AnalysisCache";
-import { createGenericCache } from "./createGenericCache";
 
 type Value = any;
 
@@ -42,7 +42,7 @@ export function getLogPointAnalysisResultSuspense(
   condition: string | null
 ): AnalysisResult {
   if (canRunLocalAnalysis(code, condition)) {
-    const localResult = localAnalysisCache.getValueSuspense(code);
+    const localResult = localAnalysisCache.read(code);
     return {
       executionPoint: point.point,
       isRemote: false,
@@ -128,9 +128,9 @@ export function canRunLocalAnalysis(code: string, condition: string | null): boo
   return true;
 }
 
-const localAnalysisCache = createGenericCache<[], [code: string], any[]>(
-  "localAnalysisCache: evaluateInWorker",
-  code =>
+const localAnalysisCache = createCache<[code: string], any[]>({
+  debugLabel: "localAnalysisCache: evaluateInWorker",
+  load: code =>
     new Promise<any[]>((resolve, reject) => {
       if (code === "location") {
         reject();
@@ -159,8 +159,7 @@ const localAnalysisCache = createGenericCache<[], [code: string], any[]>(
         reject("Timed out");
       }, 5000);
     }),
-  code => code
-);
+});
 
 // Variables in scope in an analysis
 declare let sendCommand: SendCommand;
