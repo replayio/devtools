@@ -27,14 +27,13 @@ const useNagDismissal = () => {
   const dispatch = useAppDispatch();
   const info = useTestInfo();
 
-  const dismissDevtoolsNag = () => {
+  const dismissTourNag = () => {
     dismissNag(Nag.DISMISS_TOUR);
-    console.log("Dismissed probably!");
 
     const initialPrimaryPanel = info.isTestSuiteReplay ? "cypress" : "events";
     dispatch(setSelectedPrimaryPanel(initialPrimaryPanel));
   };
-  return { dismissDevtoolsNag };
+  return { dismissTourNag };
 };
 
 const Checklist: React.FC = () => {
@@ -54,7 +53,7 @@ const Checklist: React.FC = () => {
   const hasCompletedTour =
     !showDevtoolsNag && !showConsoleNavigate && !showBreakpointAdd && !showBreakpointEdit;
 
-  const { dismissDevtoolsNag } = useNagDismissal();
+  const { dismissTourNag } = useNagDismissal();
 
   console.log("showDevtoolsNag:", showDevtoolsNag);
   console.log("showConsoleNavigate:", showConsoleNavigate);
@@ -116,6 +115,7 @@ const Checklist: React.FC = () => {
                     <>
                       <div className={styles.header}>Console</div>
                       <p>
+                        Look underneath the video and introduce yourself to the Replay console.
                         Hover over the lines in the console and you’ll see a fast-forward button.
                         Click it!
                       </p>
@@ -136,8 +136,9 @@ const Checklist: React.FC = () => {
                     <>
                       <div className={styles.header}>Edit a print statement</div>
                       <p>
-                        Now you should see something like this. Whatever you type here will show up
-                        in your console, so type something and hit enter.
+                        Now you should see a textfield for making a print statement. You can pass
+                        anything you want here, including passing objects. Later we can even show
+                        you how to add a unicorn.
                       </p>
                     </>
                   )}
@@ -151,9 +152,13 @@ const Checklist: React.FC = () => {
                         of code was called! 🤯
                       </p>
 
-                      <p className="mt-3">
-                        <a href="#" onClick={dismissDevtoolsNag} className="underline">
-                          Click to dismiss
+                      <p className="mt-6">
+                        <a
+                          href="#"
+                          onClick={dismissTourNag}
+                          className="rounded-lg bg-primaryAccent px-3 py-1 text-white hover:bg-primaryAccentHover"
+                        >
+                          All done, dismiss the tour!
                         </a>
                       </p>
                     </>
