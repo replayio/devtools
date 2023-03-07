@@ -20923,7 +20923,7 @@ __metadata:
     style-loader: ^3.3.1
     stylelint: ^14.16.0
     stylelint-config-prettier: ^9.0.4
-    suspense: ^0.0.15
+    suspense: ^0.0.18
     tailwindcss: ^3.2.4
     ts-node: ^10.7.0
     tsconfig-paths: ^3.14.1
@@ -21278,7 +21278,7 @@ __metadata:
     react-dom: 0.0.0-experimental-49f741046-20230305
     react-virtualized-auto-sizer: ^1.0.7
     shared: "workspace:*"
-    suspense: ^0.0.15
+    suspense: ^0.0.18
     typescript: ^4.6.3
     uuid: ^7.0.3
   languageName: unknown
@@ -23103,16 +23103,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"suspense@npm:^0.0.15":
-  version: 0.0.15
-  resolution: "suspense@npm:0.0.15"
+"suspense@npm:^0.0.18":
+  version: 0.0.18
+  resolution: "suspense@npm:0.0.18"
   dependencies:
     interval-utilities: ^0.0.1
     point-utilities: ^0.0.2
   peerDependencies:
     react: ^18.0.0
     react-dom: ^18.0.0
-  checksum: 22b12e75263221851125599a8f16a9b49e71ae3588693f9f073aa80fde03ea9a0394d37e44bd7b40aba20307066e615b5438c488fd5e30aab21d68c28c7fb8bd
+  checksum: 576aaa3492a0860ff1620393f0c70dee2f43ae5f0065e896a3bddc24a392c72aed2ebbb818fac0fd5f630880fbaa706e6a0e427970f21f5771f889128571a996
   languageName: node
   linkType: hard
 
