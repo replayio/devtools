@@ -119,6 +119,7 @@ function PauseFrames({
 }) {
   const sourcesState = useAppSelector(state => state.sources);
   const currentPauseId = useAppSelector(getPauseId);
+  const replayClient = useContext(ReplayClientContext);
   const loadedRegions = useAppSelector(getLoadedRegions);
   const cx = useAppSelector(getThreadContext);
   const frameworkGroupingOn = useAppSelector(getFrameworkGroupingState);
@@ -145,7 +146,7 @@ function PauseFrames({
   }
 
   function copyStackTrace() {
-    const framesToCopy = getAllCachedPauseFrames(pauseId, sourcesState)
+    const framesToCopy = getAllCachedPauseFrames(replayClient, pauseId, sourcesState)
       ?.map(f => formatCopyName(f))
       .join("\n");
     copyToClipboard(framesToCopy || "");

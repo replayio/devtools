@@ -3,7 +3,6 @@ import { Frame, PauseId } from "@replayio/protocol";
 import { createFrame } from "devtools/client/debugger/src/client/create";
 import { PauseAndFrameId } from "devtools/client/debugger/src/selectors";
 import { formatCallStackFrames } from "devtools/client/debugger/src/selectors/getCallStackFrames";
-import { createUseGetValue } from "replay-next/src/suspense/createGenericCache";
 import {
   getFrameSuspense,
   getFramesAsync,
@@ -12,16 +11,6 @@ import {
 } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { SourcesState } from "ui/reducers/sources";
-
-export const useGetFrames = createUseGetValue<
-  [replayClient: ReplayClientInterface, pauseId: PauseId | undefined],
-  Frame[] | undefined
->(
-  async (replayClient, pauseId) =>
-    pauseId ? await getFramesAsync(pauseId, replayClient) : undefined,
-  (replayClient, pauseId) => (pauseId ? getFramesIfCached(pauseId) : { value: undefined }),
-  (replayClient, pauseId) => pauseId ?? ""
-);
 
 export function getPauseFramesSuspense(
   replayClient: ReplayClientInterface,
@@ -62,12 +51,16 @@ export async function getPauseFrameAsync(
   return frame ? createPauseFrames(pauseAndFrameId.pauseId, [frame], sourcesState)[0] : undefined;
 }
 
-export function getPauseFramesIfCached(pauseId: PauseId, sourcesState: SourcesState) {
-  const frames = getFramesIfCached(pauseId);
-  if (!frames?.value) {
+export function getPauseFramesIfCached(
+  replayClient: ReplayClientInterface,
+  pauseId: PauseId,
+  sourcesState: SourcesState
+) {
+  const frames = getFramesIfCached(pauseId, replayClient);
+  if (!frames) {
     return undefined;
   }
-  return createPauseFrames(pauseId, frames.value, sourcesState);
+  return createPauseFrames(pauseId, frames, sourcesState);
 }
 
 function createPauseFrames(pauseId: PauseId, frames: Frame[], sourcesState: SourcesState) {

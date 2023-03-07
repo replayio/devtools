@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 
 import { getPauseId } from "devtools/client/debugger/src/selectors";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
+import { getFramesIfCached } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -13,7 +14,6 @@ import { useFeature } from "ui/hooks/settings";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { PrimaryPanelName } from "ui/state/layout";
-import { useGetFrames } from "ui/suspense/frameCache";
 // TODO [ryanjduffy]: Refactor shared styling more completely
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -111,8 +111,8 @@ export default function Toolbar() {
   const dispatch = useAppDispatch();
   const replayClient = useContext(ReplayClientContext);
   const pauseId = useAppSelector(getPauseId);
-  const frames = useGetFrames(replayClient, pauseId);
-  const hasFrames = !!frames.value?.length;
+  const frames = pauseId ? getFramesIfCached(pauseId, replayClient) : undefined;
+  const hasFrames = !!frames?.length;
   const viewMode = useAppSelector(selectors.getViewMode);
   const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
   const [showCommentsBadge, setShowCommentsBadge] = useState(false);
