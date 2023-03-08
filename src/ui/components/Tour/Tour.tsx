@@ -81,112 +81,80 @@ const Checklist: React.FC = () => {
             </>
           ) : (
             <>
-              <span className={styles.intro}>
-                <h1 className={styles.h1}>Quickstart</h1>
-              </span>
+              <div className={styles.intro}>
+                {showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
+                  <>
+                    <div className={styles.h1}>Console</div>
+                    <p>
+                      Look underneath the video and introduce yourself to the Replay console. Hover
+                      over the lines in the console and you’ll see a fast-forward button. Click it!
+                    </p>
+                  </>
+                )}
 
-              <ul className={styles.checklist}>
-                <li>
-                  <Icon
-                    className={styles.Icon}
-                    type={showDevtoolsNag ? "unchecked-rounded" : "checked-rounded"}
-                  />
-                  Time travel-enabled DevTools
-                </li>
-                <li>
-                  <Icon
-                    className={styles.Icon}
-                    type={showConsoleNavigate ? "unchecked-rounded" : "checked-rounded"}
-                  />
-                  Fast-forward to any message
-                </li>
+                {!showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
+                  <>
+                    <div className={styles.h1}>Add a print statement</div>
+                    <p>
+                      Now click the plus button on a line of code to set a print statement. This is
+                      where it gets interesting.
+                    </p>
+                  </>
+                )}
 
-                <li>
-                  <Icon
-                    className={styles.Icon}
-                    type={showBreakpointEdit ? "unchecked-rounded" : "checked-rounded"}
-                  />{" "}
-                  Add logs with a single click
-                </li>
-              </ul>
-              <div className={styles.info}>
-                <div className={styles.text}>
-                  {showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
-                    <>
-                      <div className={styles.header}>Console</div>
-                      <p>
-                        Look underneath the video and introduce yourself to the Replay console.
-                        Hover over the lines in the console and you’ll see a fast-forward button.
-                        Click it!
-                      </p>
-                    </>
-                  )}
+                {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && (
+                  <>
+                    <div className={styles.h1}>Edit a print statement</div>
+                    <p>
+                      Now you should see a textfield for making a print statement. You can pass
+                      anything you want here, including passing objects. Later we can even show you
+                      how to add a unicorn.
+                    </p>
+                  </>
+                )}
 
-                  {!showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
-                    <>
-                      <div className={styles.header}>Add a print statement</div>
-                      <p>
-                        Now click the plus button on a line of code to set a print statement. This
-                        is where it gets interesting.
-                      </p>
-                    </>
-                  )}
+                {hasCompletedTour && (
+                  <>
+                    <div className={styles.h1}>Cool, eh?</div>
+                    <p>
+                      Take a look at the console and you’ll see that Replay re-ran the entire
+                      recording and retroactively added your print statement each time that line of
+                      code was called! 🤯
+                    </p>
 
-                  {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && (
-                    <>
-                      <div className={styles.header}>Edit a print statement</div>
-                      <p>
-                        Now you should see a textfield for making a print statement. You can pass
-                        anything you want here, including passing objects. Later we can even show
-                        you how to add a unicorn.
-                      </p>
-                    </>
-                  )}
-
-                  {hasCompletedTour && (
-                    <>
-                      <div className={styles.header}>Cool, eh?</div>
-                      <p>
-                        Take a look at the console and you’ll see that Replay re-ran the entire
-                        recording and retroactively added your print statement each time that line
-                        of code was called! 🤯
-                      </p>
-
-                      <p className="mt-6">
-                        <a
-                          href="#"
-                          onClick={dismissTourNag}
-                          className="rounded-lg bg-primaryAccent px-3 py-1 text-white hover:bg-primaryAccentHover"
-                        >
-                          All done, dismiss the tour!
-                        </a>
-                      </p>
-                    </>
-                  )}
-                </div>
-
-                <div className="relative">
-                  <span className="text-mg absolute right-0 bottom-0 bg-pink-500 p-1 text-white">
-                    these are temporary gifs, stay tuned
-                  </span>
-                  {showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
-                    <img src="/images/tour/fast-forward.gif" />
-                  )}
-
-                  {!showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
-                    <img src="/images/tour/addlogs.gif" />
-                  )}
-
-                  {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && (
-                    <img src="/images/tour/editlogs.gif" />
-                  )}
-
-                  {hasCompletedTour && <img src="/images/tour/consoleupdate.gif" />}
-                </div>
+                    <p className="mt-6">
+                      <a
+                        href="#"
+                        onClick={dismissTourNag}
+                        className="rounded-lg bg-primaryAccent px-3 py-1 text-white hover:bg-primaryAccentHover"
+                      >
+                        All done, dismiss the tour!
+                      </a>
+                    </p>
+                  </>
+                )}
               </div>
             </>
           )}
         </div>
+      </div>
+      <div className="relative">
+        <span className="text-mg absolute right-0 bottom-0 bg-pink-500 p-1 text-white">
+          these are temporary gifs, stay tuned
+        </span>
+        {showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
+          <img src="/images/tour/fast-forward.gif" />
+        )}
+
+        {!showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
+          <img src="/images/tour/addlogs.gif" />
+        )}
+
+        {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && (
+          <img src="/images/tour/editlogs.gif" />
+        )}
+
+        {hasCompletedTour && <img src="/images/tour/consoleupdate.gif" />}
       </div>
     </div>
   );
