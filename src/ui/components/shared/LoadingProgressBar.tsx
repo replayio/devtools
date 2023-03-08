@@ -24,5 +24,11 @@ export default function LoadingProgressBar({ initialProgress = 0 }) {
     }, 200);
   }, [displayedProgress]);
 
-  return <div className="loading-progress-bar z-10" style={{ width: `${displayedProgress}%` }} />;
+  return (
+    <div
+      className="loading-progress-bar z-10"
+      data-testid="loading-progress-bar"
+      style={{ width: `${displayedProgress}%` }}
+    />
+  );
 }
