@@ -123,9 +123,9 @@ export function getNewZoomRegion({
 // Format a time value to mm:ss
 export function getFormattedTime(time: number, showMilliseconds: boolean = false) {
   const date = new Date(time);
-  let minutes = date.getMinutes();
-  let seconds = date.getSeconds();
-  const milliseconds = date.getMilliseconds();
+  let minutes = date.getUTCMinutes();
+  let seconds = date.getUTCSeconds();
+  const milliseconds = date.getUTCMilliseconds();
 
   if (!showMilliseconds) {
     if (milliseconds >= 500) {
