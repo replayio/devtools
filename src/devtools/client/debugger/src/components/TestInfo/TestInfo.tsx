@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react";
 
 import { TestItem } from "shared/graphql/types";
 import { useTestInfo } from "ui/hooks/useTestInfo";
-import { getSelectedTest, setSelectedTest } from "ui/reducers/reporter";
+import { getSelectedTest } from "ui/reducers/reporter";
 import { setPlaybackFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import useWidthObserver from "ui/utils/useWidthObserver";
@@ -32,16 +32,16 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
     dispatch(setPlaybackFocusRegion(!!selectedTest));
   }, [dispatch, selectedTest]);
 
-  useEffect(() => {
-    if (testCases.length === 1) {
-      dispatch(
-        setSelectedTest({
-          index: 0,
-          title: testCases[0].title,
-        })
-      );
-    }
-  }, [testCases, dispatch]);
+  // useEffect(() => {
+  //   if (testCases.length === 1) {
+  //     dispatch(
+  //       setSelectedTest({
+  //         index: 0,
+  //         title: testCases[0].title,
+  //       })
+  //     );
+  //   }
+  // }, [testCases, dispatch]);
 
   return (
     <TestInfoContextMenuContextRoot>
