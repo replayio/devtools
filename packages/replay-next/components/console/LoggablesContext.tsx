@@ -31,7 +31,6 @@ import { suspendInParallel } from "replay-next/src/utils/suspense";
 import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_ENABLED } from "shared/client/types";
-import { isThennable } from "shared/proxy/utils";
 import { toPointRange } from "shared/utils/time";
 
 export type Loggable =

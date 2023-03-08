@@ -8,15 +8,23 @@ import {
   Object as ProtocolObject,
   Scope,
 } from "@replayio/protocol";
+import {
+  PendingRecord,
+  Record,
+  STATUS_PENDING,
+  STATUS_REJECTED,
+  STATUS_RESOLVED,
+  createDeferred,
+  isPendingRecord,
+  isResolvedRecord,
+} from "suspense";
 
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/analysisManager";
 import { ReplayClientInterface } from "shared/client/types";
 
-import { createWakeable } from "../utils/suspense";
 import { createGenericRangeCache } from "./createGenericRangeCache";
 import { cachePauseData } from "./PauseCache";
 import { getBreakpointPositionsAsync } from "./SourcesCache";
-import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Thennable } from "./types";
 
 export type RemoteAnalysisResult = {
   data: { frames: Frame[]; objects: ProtocolObject[]; scopes: Scope[] };
@@ -29,10 +37,10 @@ export type RemoteAnalysisResult = {
 
 export interface AnalysisCache<T extends { point: ExecutionPoint }> {
   getPointsSuspense(client: ReplayClientInterface, range: PointRange): T[];
-  getPointsAsync(client: ReplayClientInterface, range: PointRange): Thennable<T[]> | T[];
+  getPointsAsync(client: ReplayClientInterface, range: PointRange): PromiseLike<T[]> | T[];
   getCachedPoints(range: PointRange): T[];
   getResultSuspense(point: ExecutionPoint): RemoteAnalysisResult;
-  getResultAsync(point: ExecutionPoint): Thennable<RemoteAnalysisResult> | RemoteAnalysisResult;
+  getResultAsync(point: ExecutionPoint): PromiseLike<RemoteAnalysisResult> | RemoteAnalysisResult;
   getResultIfCached(point: ExecutionPoint): RemoteAnalysisResult | undefined;
 }
 
@@ -114,13 +122,21 @@ function createCache<T extends { point: ExecutionPoint }>(
               cachePauseData(client, result.pauseId, result.data);
               const record = results.get(result.point);
               if (record) {
-                record.value.resolve(result);
-                record.status = STATUS_RESOLVED;
-                record.value = result;
-              } else {
-                results.set(result.point, {
+                const deferred = (record as PendingRecord<any>).data.deferred;
+                deferred.resolve(result);
+
+                record.data = {
                   status: STATUS_RESOLVED,
                   value: result,
+                  weakRef: null,
+                };
+              } else {
+                results.set(result.point, {
+                  data: {
+                    status: STATUS_RESOLVED,
+                    value: result,
+                    weakRef: null,
+                  },
                 });
               }
             }
@@ -139,11 +155,16 @@ function createCache<T extends { point: ExecutionPoint }>(
   function getOrCreateRecord(point: ExecutionPoint) {
     let record = results.get(point);
     if (!record) {
-      const wakeable = createWakeable<RemoteAnalysisResult>("AnalysisCache.getResultSuspense");
+      const deferred = createDeferred<RemoteAnalysisResult>("AnalysisCache.getResultSuspense");
+
       record = {
-        status: STATUS_PENDING,
-        value: wakeable,
+        data: {
+          abortController: null as any, // Does not support interruption
+          deferred,
+          status: STATUS_PENDING,
+        },
       };
+
       results.set(point, record);
     }
     return record;
@@ -151,26 +172,30 @@ function createCache<T extends { point: ExecutionPoint }>(
 
   function getResultSuspense(point: ExecutionPoint) {
     const record = getOrCreateRecord(point);
-    if (record.status === STATUS_RESOLVED) {
-      return record.value;
+    if (isResolvedRecord(record)) {
+      return record.data.value;
+    } else if (isPendingRecord(record)) {
+      throw record.data.deferred;
     } else {
-      throw record.value;
+      throw record.data.error;
     }
   }
 
   function getResultAsync(point: ExecutionPoint) {
     const record = getOrCreateRecord(point);
-    if (record.status !== STATUS_REJECTED) {
-      return record.value;
+    if (isResolvedRecord(record)) {
+      return record.data.value;
+    } else if (isPendingRecord(record)) {
+      return record.data.deferred;
     } else {
-      throw record.value;
+      throw record.data.error;
     }
   }
 
   function getResultIfCached(point: ExecutionPoint) {
     const record = results.get(point);
-    if (record?.status === STATUS_RESOLVED) {
-      return record.value;
+    if (record && isResolvedRecord(record)) {
+      return record.data.value;
     }
   }
 

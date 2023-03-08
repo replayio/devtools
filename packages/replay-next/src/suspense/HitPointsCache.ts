@@ -1,5 +1,5 @@
 import { ExecutionPoint, Location, PointRange, TimeStampedPoint } from "@replayio/protocol";
-import { createIntervalCache } from "suspense";
+import { createIntervalCache, isPromiseLike } from "suspense";
 
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/analysisManager";
 import { createFetchAsyncFromFetchSuspense } from "replay-next/src/utils/suspense";
@@ -9,7 +9,6 @@ import {
   HitPointsAndStatusTuple,
   ReplayClientInterface,
 } from "shared/client/types";
-import { isThennable } from "shared/proxy/utils";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 
 import { getBreakpointPositionsAsync } from "./SourcesCache";
@@ -146,7 +145,7 @@ export function getHitPointsForLocationSuspense(
       hitPointStatus = "too-many-points-to-run-analysis";
     }
   } catch (error) {
-    if (isThennable(error)) {
+    if (isPromiseLike(error)) {
       throw error;
     }
 

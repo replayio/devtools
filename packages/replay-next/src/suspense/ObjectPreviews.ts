@@ -1,9 +1,19 @@
 import { Object, ObjectId, PauseId, Value as ProtocolValue } from "@replayio/protocol";
+import {
+  Deferred,
+  Record,
+  ResolvedRecord,
+  STATUS_PENDING,
+  STATUS_REJECTED,
+  STATUS_RESOLVED,
+  createDeferred,
+  isRejectedRecord,
+  isResolvedRecord,
+} from "suspense";
 
 import { ReplayClientInterface } from "../../../shared/client/types";
-import { createFetchAsyncFromFetchSuspense, createWakeable } from "../utils/suspense";
+import { createFetchAsyncFromFetchSuspense } from "../utils/suspense";
 import { cachePauseData } from "./PauseCache";
-import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 type ObjectMap = Map<ObjectId, Object>;
 type RecordMap = Map<ObjectId, Record<Object>>;
@@ -67,13 +77,13 @@ export function getCachedObject(pauseId: PauseId, objectId: ObjectId): Object | 
   }
 
   let record = maps.fullPreviewRecordMap.get(objectId);
-  if (record?.status === STATUS_RESOLVED) {
-    return record.value;
+  if (record && isResolvedRecord(record)) {
+    return record.data.value;
   }
 
   record = maps.previewRecordMap.get(objectId);
-  if (record?.status === STATUS_RESOLVED) {
-    return record.value;
+  if (record && isResolvedRecord(record)) {
+    return record.data.value;
   }
 
   const object = maps.objectMap.get(objectId);
@@ -94,8 +104,13 @@ export function getCachedObjectProperty(
   }
 
   const key = `${objectId}:${propertyName}`;
-  const value = maps.objectPropertyMap.get(key);
-  return value || null;
+  const record = maps.objectPropertyMap.get(key);
+
+  if (record && isResolvedRecord(record)) {
+    return record.data.value;
+  } else {
+    return null;
+  }
 }
 
 // Does not suspend.
@@ -123,24 +138,29 @@ export function getObjectWithPreviewSuspense(
 
   let record = recordMap.get(objectId);
   if (record == null) {
-    const wakeable = createWakeable<Object>(
+    const deferred = createDeferred<Object>(
       `getObjectWithPreviewSuspense objectId: ${objectId} and pauseId: ${pauseId}`
     );
 
     record = {
-      status: STATUS_PENDING,
-      value: wakeable,
+      data: {
+        abortController: null as any, // Does not support interruption
+        deferred,
+        status: STATUS_PENDING,
+      },
     };
 
     recordMap.set(objectId, record);
 
-    fetchObjectWithPreview(client, pauseId, objectId, record, wakeable, noOverflow);
+    fetchObjectWithPreview(client, pauseId, objectId, record, deferred, noOverflow);
   }
 
-  if (record!.status === STATUS_RESOLVED) {
-    return record!.value;
+  if (isResolvedRecord(record)) {
+    return record.data.value;
+  } else if (isRejectedRecord(record)) {
+    throw record.data.error;
   } else {
-    throw record!.value;
+    throw record.data.deferred;
   }
 }
 
@@ -163,24 +183,29 @@ export function getObjectPropertySuspense(
 
   let record = recordMap.get(key);
   if (record == null) {
-    const wakeable = createWakeable<ProtocolValue>(
+    const deferred = createDeferred<ProtocolValue>(
       `getObjectProperty objectId: ${objectId} and pauseId: ${pauseId} and propertyName: ${propertyName}`
     );
 
     record = {
-      status: STATUS_PENDING,
-      value: wakeable,
+      data: {
+        abortController: null as any, // Does not support interruption
+        deferred,
+        status: STATUS_PENDING,
+      },
     };
 
     recordMap.set(key, record);
 
-    fetchObjectProperty(client, pauseId, objectId, record, wakeable, propertyName);
+    fetchObjectProperty(client, pauseId, objectId, record, deferred, propertyName);
   }
 
-  if (record!.status === STATUS_RESOLVED) {
-    return record!.value;
+  if (isResolvedRecord(record)) {
+    return record.data.value;
+  } else if (isRejectedRecord(record)) {
+    throw record.data.error;
   } else {
-    throw record!.value;
+    throw record.data.deferred;
   }
 }
 
@@ -205,29 +230,39 @@ export function preCacheObject(pauseId: PauseId, object: Object): void {
 
   // Only cache objects with previews in the recordMap map though.
   if (object.preview != null) {
-    const record = previewRecordMap.get(objectId);
+    let record = previewRecordMap.get(objectId);
     if (record == null) {
       previewRecordMap.set(objectId, {
+        data: {
+          status: STATUS_RESOLVED,
+          value: object,
+          weakRef: null,
+        },
+      });
+    } else if (record.data.status !== STATUS_RESOLVED) {
+      record.data = {
         status: STATUS_RESOLVED,
         value: object,
-      });
-    } else if (record.status !== STATUS_RESOLVED) {
-      // @ts-ignore
-      record.status = STATUS_RESOLVED;
-      record.value = object;
+        weakRef: null,
+      };
     }
 
     if (!object.preview.overflow) {
       const record = fullPreviewRecordMap.get(objectId);
       if (record == null) {
         fullPreviewRecordMap.set(objectId, {
+          data: {
+            status: STATUS_RESOLVED,
+            value: object,
+            weakRef: null,
+          },
+        });
+      } else if (record.data.status !== STATUS_RESOLVED) {
+        record.data = {
           status: STATUS_RESOLVED,
           value: object,
-        });
-      } else if (record.status !== STATUS_RESOLVED) {
-        // @ts-ignore
-        record.status = STATUS_RESOLVED;
-        record.value = object;
+          weakRef: null,
+        };
       }
     }
   }
@@ -238,7 +273,7 @@ async function fetchObjectProperty(
   pauseId: PauseId,
   objectId: ObjectId,
   record: Record<ProtocolValue>,
-  wakeable: Wakeable<ProtocolValue>,
+  deferred: Deferred<ProtocolValue>,
   propertyName: string
 ) {
   try {
@@ -246,15 +281,20 @@ async function fetchObjectProperty(
 
     cachePauseData(client, pauseId, data);
 
-    record.status = STATUS_RESOLVED;
-    record.value = returned;
+    record.data = {
+      status: STATUS_RESOLVED,
+      value: returned!,
+      weakRef: null,
+    };
 
-    wakeable.resolve(record.value);
+    deferred.resolve(returned);
   } catch (error) {
-    record.status = STATUS_REJECTED;
-    record.value = error;
+    record.data = {
+      error,
+      status: STATUS_REJECTED,
+    };
 
-    wakeable.reject(error);
+    deferred.reject(error);
   }
 }
 
@@ -263,7 +303,7 @@ async function fetchObjectWithPreview(
   pauseId: PauseId,
   objectId: ObjectId,
   record: Record<Object>,
-  wakeable: Wakeable<Object>,
+  deferred: Deferred<Object>,
   noOverflow: boolean = false
 ) {
   try {
@@ -276,11 +316,13 @@ async function fetchObjectWithPreview(
     cachePauseData(client, pauseId, data);
 
     // The cachePauseData() will have updated the Record's status and value already.
-    wakeable.resolve(record.value);
+    deferred.resolve((record as ResolvedRecord<Object>).data.value);
   } catch (error) {
-    record.status = STATUS_REJECTED;
-    record.value = error;
+    record.data = {
+      error,
+      status: STATUS_REJECTED,
+    };
 
-    wakeable.reject(error);
+    deferred.reject(error);
   }
 }

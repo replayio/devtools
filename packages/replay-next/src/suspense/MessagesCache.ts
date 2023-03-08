@@ -1,8 +1,8 @@
 import { ExecutionPoint, Message, TimeStampedPointRange } from "@replayio/protocol";
+import { Deferred, createDeferred } from "suspense";
 
 import { ReplayClientInterface } from "../../../shared/client/types";
 import { isFirefoxInternalMessage } from "../utils/messages";
-import { createWakeable } from "../utils/suspense";
 import {
   isExecutionPointsGreaterThan,
   isExecutionPointsLessThan,
@@ -10,7 +10,6 @@ import {
   isRangeSubset,
 } from "../utils/time";
 import { cachePauseData } from "./PauseCache";
-import { Wakeable } from "./types";
 
 export type ProtocolMessage = Message & {
   type: "ProtocolMessage";
@@ -38,7 +37,7 @@ const EMPTY_ARRAY: any[] = [];
 // It's tempting to think that I don't need to, because the recording session data is global,
 // but could this cause problems if React wants to render a high-priority update while a lower one is suspended?
 
-let inFlightWakeable: Wakeable<ProtocolMessage[] | null> | null = null;
+let inFlightDeferred: Deferred<ProtocolMessage[] | null> | null = null;
 let inFlightFocusRange: TimeStampedPointRange | null = null;
 
 let lastFetchDidOverflow: boolean = false;
@@ -53,7 +52,7 @@ let lastFilteredFocusRange: TimeStampedPointRange | null = null;
 let lastFilteredMessages: ProtocolMessage[] | null = null;
 
 // Synchronously returns an array of filtered Messages,
-// or throws a Wakeable to be resolved once messages have been fetched.
+// or throws a Deferred to be resolved once messages have been fetched.
 //
 // This method is Suspense friendly; it is meant to be called from a React component during render.
 export function getMessagesSuspense(
@@ -80,11 +79,11 @@ export function getMessagesSuspense(
     };
   }
 
-  if (inFlightWakeable !== null) {
-    // If we're already fetching this data, rethrow the same Wakeable (for Suspense reasons).
+  if (inFlightDeferred !== null) {
+    // If we're already fetching this data, rethrow the same Deferred (for Suspense reasons).
     // We check equality here rather than subset because it's possible a larger range might overflow.
     if (isRangeEqual(inFlightFocusRange, focusRange)) {
-      throw inFlightWakeable;
+      throw inFlightDeferred;
     }
   }
 
@@ -119,15 +118,15 @@ export function getMessagesSuspense(
   if (shouldFetch) {
     inFlightFocusRange = focusRange;
 
-    const wakeable = (inFlightWakeable = createWakeable(
+    const deferred = (inFlightDeferred = createDeferred(
       `getMessagesSuspense: ${
         focusRange ? `${focusRange.begin.point}-${focusRange.end.point}` : "-"
       }`
     ));
 
-    fetchMessages(client, focusRange, wakeable);
+    fetchMessages(client, focusRange, deferred);
 
-    throw inFlightWakeable;
+    throw inFlightDeferred;
   }
 
   if (lastFetchError) {
@@ -238,7 +237,7 @@ export function getMessagesSuspense(
 async function fetchMessages(
   client: ReplayClientInterface,
   focusRange: TimeStampedPointRange | null,
-  wakeable: Wakeable<ProtocolMessage[] | null>
+  deferred: Deferred<ProtocolMessage[] | null>
 ) {
   try {
     const { messages, overflow } = await client.findMessages(focusRange);
@@ -255,8 +254,8 @@ async function fetchMessages(
     // We'd have to be careful though to only merge data from overlapping points,
     // so that we didn't omit messages that happened between points.
     // I'm still a little unclear on the exact relationship between time and point.
-    if (inFlightWakeable === wakeable) {
-      inFlightWakeable = null;
+    if (inFlightDeferred === deferred) {
+      inFlightDeferred = null;
 
       lastFetchDidOverflow = overflow;
       lastFetchError = null;
@@ -268,10 +267,10 @@ async function fetchMessages(
       cachePauseData(client, message.pauseId, message.data);
     });
 
-    wakeable.resolve(protocolMessage);
+    deferred.resolve(protocolMessage);
   } catch (error) {
     inFlightFocusRange = null;
-    inFlightWakeable = null;
+    inFlightDeferred = null;
 
     console.error("getMessage() Error for range", printPointRange(focusRange), error);
 
@@ -280,7 +279,7 @@ async function fetchMessages(
     lastFetchedFocusRange = focusRange;
     lastFetchedMessages = null;
 
-    wakeable.resolve(null);
+    deferred.resolve(null);
   }
 }
 

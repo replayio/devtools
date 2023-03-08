@@ -1,5 +1,6 @@
 import camelCase from "lodash/camelCase";
 import React, { ReactNode, Suspense, useContext, useMemo } from "react";
+import { isPromiseLike } from "suspense";
 
 import { Badge, Checkbox } from "design";
 import Icon from "replay-next/components/Icon";
@@ -11,7 +12,6 @@ import { CategoryCounts, getMessagesSuspense } from "replay-next/src/suspense/Me
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/RecordingCache";
 import { isInNodeModules } from "replay-next/src/utils/messages";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { isThennable } from "shared/proxy/utils";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import { toPointRange } from "shared/utils/time";
 
@@ -191,7 +191,7 @@ function ExceptionsBadgeSuspends() {
   try {
     getExceptionPointsSuspense(replayClient, toPointRange(focusRange));
   } catch (errorOrPromise) {
-    if (isThennable(errorOrPromise)) {
+    if (isPromiseLike(errorOrPromise)) {
       throw errorOrPromise;
     }
 
