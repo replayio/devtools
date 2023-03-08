@@ -76,6 +76,7 @@ export default function Expandable({
   const onKeyDown = (event: KeyboardEvent) => {
     switch (event.key) {
       case "Enter":
+      case "NumpadEnter":
       case " ":
         event.stopPropagation();
 

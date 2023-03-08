@@ -1,4 +1,4 @@
-import { PauseId } from "@replayio/protocol";
+import { ExecutionPoint, PauseId } from "@replayio/protocol";
 import { Suspense, useContext, useMemo } from "react";
 
 import {
@@ -12,7 +12,7 @@ import {
 import { ThreadFront } from "protocol/thread/thread";
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
-import { getPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";
+import { getPauseIdSuspense, getPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { enterFocusMode } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
@@ -181,23 +181,23 @@ function PauseFrames({
   );
 }
 
-export default function Frames({
-  panel,
-  pauseId,
-}: {
+interface FramesProps {
   panel: CommonFrameComponentProps["panel"];
-  pauseId: PauseId;
-}) {
+  point: ExecutionPoint;
+  time: number;
+}
+
+function Frames({ panel, point, time }: FramesProps) {
+  const replayClient = useContext(ReplayClientContext);
   const sourcesLoading = useAppSelector(getSourcesLoading);
   const loadedRegions = useAppSelector(getLoadedRegions);
   const dispatch = useAppDispatch();
-  const pointAndTime = getPointAndTimeForPauseId(pauseId);
 
-  if (sourcesLoading || !loadedRegions || !pointAndTime) {
+  if (sourcesLoading || !loadedRegions) {
     return null;
   }
 
-  if (!isPointInRegions(loadedRegions.loaded, pointAndTime.point)) {
+  if (!isPointInRegions(loadedRegions.loaded, point)) {
     return (
       <div className="pane frames">
         <div className="pane-info empty">
@@ -210,6 +210,8 @@ export default function Frames({
       </div>
     );
   }
+
+  const pauseId = getPauseIdSuspense(replayClient, point, time);
 
   return (
     <div className="pane frames" data-test-id="FramesPanel">
@@ -224,5 +226,13 @@ export default function Frames({
         </Suspense>
       </ErrorBoundary>
     </div>
+  );
+}
+
+export default function FramesSuspenseWrapper(props: FramesProps) {
+  return (
+    <Suspense fallback={<div className="pane-info empty">Loading…</div>}>
+      <Frames {...props} />
+    </Suspense>
   );
 }

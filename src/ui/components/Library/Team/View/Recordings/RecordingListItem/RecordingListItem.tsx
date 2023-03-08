@@ -50,9 +50,27 @@ export function getRelativeDate(date: string, truncate: boolean = false) {
 
   const daysSince = (new Date().getTime() - new Date(date).getTime()) / (1000 * 3600 * 24);
 
+  let formatter;
+  try {
+    // Attempt to get the user's preferred language from the browser
+    const userLocale = navigator.language;
+    formatter = new Intl.DateTimeFormat(userLocale, {
+      day: "numeric",
+      month: "numeric",
+      year: "numeric",
+    });
+  } catch (e) {
+    // Use the default US format if we can't determine the user's preferred language
+    formatter = new Intl.DateTimeFormat("en-US", {
+      day: "numeric",
+      month: "numeric",
+      year: "numeric",
+    });
+  }
+
   // Show relative time if under 2 weeks, otherwise, use the template below.
   if (daysSince > 14) {
-    content = formatDate(new Date(date), "M/d/yyyy");
+    content = formatter.format(new Date(date));
   }
 
   return content;
@@ -133,7 +151,7 @@ function RecordingRow({
               onClick={e => e.stopPropagation()}
               onChange={toggleChecked}
               checked={selected}
-              className="focus:primaryAccentHover h-4 w-4 rounded border-themeBorder text-primaryAccent"
+              className="focus:primaryAccentHover h-4 w-4 rounded border-inputBorder text-primaryAccent"
             />
           ) : null}
         </div>

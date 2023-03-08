@@ -829,6 +829,7 @@ export class Tree<T> extends React.Component<TreeProps<T>, TreeState> {
         return;
 
       case "Enter":
+      case "NumpadEnter":
       case " ":
         if (this.treeRef.current === doc!.activeElement) {
           this._preventEvent(e);

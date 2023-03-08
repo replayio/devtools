@@ -175,7 +175,7 @@
   --scroll-thumb-color: #454950;
   --tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
   --tab-selected-bgcolor: var(--theme-base-95);
-  --text-field-border: var(--theme-base-85);
+  --input-border: var(--theme-base-85);
   --theme-border: var(--theme-base-100);
   --theme-focuser-bgcolor: var(--primary-accent);
   --theme-sidebar-background: var(--body-bgcolor);
@@ -690,12 +690,12 @@
   --scroll-thumb-color: #aaaaaa;
   --tab-bgcolor-alt-subtle: var(--theme-base-100); /* info, events */
   --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
-  --text-field-border: var(--cool-gray-300);
+  --input-border: var(--cool-gray-200);
   --theme-border: #d2d5da;
   --theme-focuser-bgcolor: var(--primary-accent);
   --theme-sidebar-background: var(--theme-base-100);
   --theme-text-field-bgcolor-hover: var(--theme-base-95);
-  --theme-text-field-bgcolor: #f8f8f8;
+  --theme-text-field-bgcolor: #f6f6f6;
   --theme-text-field-color: var(--theme-body-color);
   --theme-text-field-placeholder-color: #a9a9b1;
   --tooltip-bgcolor: #38383d;

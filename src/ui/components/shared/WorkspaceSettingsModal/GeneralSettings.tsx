@@ -99,7 +99,7 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
         {workspace.isOrganization ? (
           <Input>
             <input
-              className="w-full rounded-md border-textFieldBorder bg-themeTextFieldBgcolor text-sm"
+              className="w-full rounded-md border-inputBorder bg-themeTextFieldBgcolor text-sm"
               type="text"
               value={name}
               onChange={e => setName(e.currentTarget.value)}
@@ -116,7 +116,7 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
         <Input>
           <div className="flex flex-col items-start space-y-4">
             {img ? <Base64Image className="block max-h-12" format={format} src={img} /> : null}
-            <label className="flex-inline cursor-pointer items-center justify-center rounded-md border p-2">
+            <label className="flex-inline cursor-pointer text-primaryAccent hover:underline">
               <input
                 type="file"
                 className="invisible h-1 w-0"
@@ -124,7 +124,6 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
                 onChange={e => onUpload(e.currentTarget)}
               />
               <span>Upload</span>
-              <span className="material-icons ml-2 text-sm">upload</span>
             </label>
             {err ? <div className="text-red-500">{err}</div> : null}
           </div>

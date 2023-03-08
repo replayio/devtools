@@ -96,6 +96,7 @@ export default function Capsule({
 
     switch (event.code) {
       case "Enter":
+      case "NumpadEnter":
         event.preventDefault();
 
         const input = inputRef.current!;
