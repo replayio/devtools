@@ -86,9 +86,28 @@ export function useGetUserSettings() {
   return { userSettings, error, loading };
 }
 
+const runtimeFeatureOverrides = (() => {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  const query = new URLSearchParams(window.location.search);
+  return query.get("features")?.split(",") || [];
+})();
+
+const getFullKey = (prefKey: keyof typeof features) => `devtools.features.${prefKey}`;
+
+export const getFeature = (prefKey: keyof typeof features): boolean => {
+  if (runtimeFeatureOverrides.includes(prefKey)) {
+    return true;
+  }
+
+  return prefsService.getBoolPref(getFullKey(prefKey));
+};
+
 export const useFeature = (prefKey: keyof typeof features) => {
-  const fullKey = `devtools.features.${prefKey}`;
-  const [pref, setPref] = useState(prefsService.getBoolPref(fullKey));
+  const fullKey = getFullKey(prefKey);
+  const [pref, setPref] = useState(getFeature(prefKey));
 
   useEffect(() => {
     const onUpdate = (prefs: any) => {
@@ -102,7 +121,11 @@ export const useFeature = (prefKey: keyof typeof features) => {
   return {
     value: pref,
     update: (newValue: boolean) => {
-      prefsService.setBoolPref(fullKey, newValue);
+      if (runtimeFeatureOverrides.includes(prefKey)) {
+        console.warn(`${prefKey} is force-enabled by a run-time override`);
+      } else {
+        prefsService.setBoolPref(fullKey, newValue);
+      }
     },
   };
 };

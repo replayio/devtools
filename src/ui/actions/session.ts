@@ -15,7 +15,7 @@ import { Recording } from "shared/graphql/types";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import { getRecording } from "ui/hooks/recordings";
-import { getUserSettings } from "ui/hooks/settings";
+import { getFeature, getUserSettings } from "ui/hooks/settings";
 import { getUserId, getUserInfo } from "ui/hooks/users";
 import {
   clearExpectedError,
@@ -247,17 +247,17 @@ export function createSocket(
         focusRange,
         {
           onEvent: (event: ProtocolEvent) => {
-            if (features.logProtocolEvents) {
+            if (getFeature("logProtocolEvents")) {
               queueAction(eventReceived({ ...event, recordedAt: window.performance.now() }));
             }
           },
           onRequest: (request: CommandRequest) => {
-            if (features.logProtocol) {
+            if (getFeature("logProtocol")) {
               queueAction(requestSent({ ...request, recordedAt: window.performance.now() }));
             }
           },
           onResponse: (response: CommandResponse) => {
-            if (features.logProtocol) {
+            if (getFeature("logProtocol")) {
               const clonedResponse = { ...response, recordedAt: window.performance.now() };
 
               if (isSourceContentsCommandResponse(clonedResponse)) {
@@ -273,7 +273,7 @@ export function createSocket(
             }
           },
           onResponseError: (error: CommandResponse) => {
-            if (features.logProtocol) {
+            if (getFeature("logProtocol")) {
               queueAction(errorReceived({ ...error, recordedAt: window.performance.now() }));
             }
           },
