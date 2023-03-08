@@ -328,7 +328,7 @@ export function createSocket(
 
       ThreadFront.on("paused", ({ point }) => dispatch(setCurrentPoint(point)));
 
-      await ThreadFront.loadingHasBegun.promise;
+      await ThreadFront.waitForSession();
       dispatch(jumpToInitialPausePoint());
 
       if (!focusRegion) {
