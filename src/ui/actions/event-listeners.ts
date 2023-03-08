@@ -251,7 +251,7 @@ export function getNodeEventListeners(
 export type SEARCHABLE_EVENT_TYPES = "mousedown" | "keypress";
 
 const REACT_EVENT_PROPS: Record<SEARCHABLE_EVENT_TYPES, string[]> = {
-  mousedown: ["onClick"],
+  mousedown: ["onClick", "onSubmit"],
   // Users may have added `onChange` to an <input>, or `onkeyPress` to other elements
   keypress: ["onChange", "onKeyPress"],
 };

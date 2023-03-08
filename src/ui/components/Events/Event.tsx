@@ -153,8 +153,8 @@ This requires stringing together a series of assumptions and special cases:
 We _could_ do more analysis and find the nearest time where the first breakable location
 inside that function is running, then seek to that point in time, but skipping for now.
 */
-function jumpToClickEventFunctionLocation(
-  event: ReplayMouseEvent | ReplayKeyboardEvent,
+export function jumpToClickEventFunctionLocation(
+  event: { point: string; time: number; kind: "mousedown" | "keypress" },
   onSeek: (point: ExecutionPoint, time: number) => void
 ): UIThunkAction<Promise<JumpToCodeStatus>> {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {

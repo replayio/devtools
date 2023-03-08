@@ -3,8 +3,12 @@ import { useContext, useRef } from "react";
 
 import useModalDismissSignal from "replay-next/src/hooks/useModalDismissSignal";
 import { AnnotatedTestStep, TestItem } from "shared/graphql/types";
+import { getFlatEvents } from "ui/actions/app";
+import { seek } from "ui/actions/timeline";
+import { jumpToClickEventFunctionLocation } from "ui/components/Events/Event";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useTestStepActions } from "ui/hooks/useTestStepActions";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { Coordinates, TestInfoContextMenuContext } from "./TestInfoContextMenuContext";
 import styles from "./ContextMenu.module.css";
@@ -20,6 +24,8 @@ function ContextMenu({
   testStep: AnnotatedTestStep;
   test: TestItem;
 }) {
+  const dispatch = useAppDispatch();
+  const clickEvents = useAppSelector(getFlatEvents);
   const ref = useRef<HTMLDivElement>(null);
   const classnames = classNames.bind(styles);
   const actions = useTestStepActions(testStep);
@@ -53,6 +59,15 @@ function ContextMenu({
     hide();
     actions.seekToStepEnd();
   };
+  const onJumpToClickEvent = async () => {
+    const onSeek = (point: string, time: number) => dispatch(seek(point, time, true));
+    dispatch(
+      jumpToClickEventFunctionLocation(
+        { ...testStep.annotations.start!, kind: "mousedown" },
+        onSeek
+      )
+    );
+  };
   const onGoToLocation = async () => {
     hide();
     actions.showStepSource();
@@ -60,6 +75,7 @@ function ContextMenu({
 
   return (
     <div
+      data-test-id="TestSuites-TestCase-ContextMenu"
       className={styles.ContextMenu}
       ref={ref}
       style={{
@@ -67,6 +83,10 @@ function ContextMenu({
         top: mouseCoordinates.y,
       }}
     >
+      <div className={styles.ContextMenuItem} onClick={onJumpToClickEvent}>
+        <MaterialIcon>code</MaterialIcon>
+        Jump to Click Event
+      </div>
       {actions.canShowStepSource ? (
         <div className={styles.ContextMenuItem} onClick={onGoToLocation}>
           <MaterialIcon>code</MaterialIcon>
