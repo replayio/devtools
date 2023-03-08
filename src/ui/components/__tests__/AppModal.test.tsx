@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event";
 import React from "react";
+import { act } from "react-dom/test-utils";
 
 import { Recording } from "shared/graphql/types";
 import { loadFixtureData } from "test/testFixtureUtils";
@@ -44,7 +45,9 @@ describe("AppModal", () => {
     });
 
     // Show the Privacy modal because it's the simplest and requires the least mocking/stubbing
-    store.dispatch(setModal("privacy", { recordingId: recording.id }));
+    act(() => {
+      store.dispatch(setModal("privacy", { recordingId: recording.id }));
+    });
 
     // Verify modal is visible
     await findByText("Privacy");
