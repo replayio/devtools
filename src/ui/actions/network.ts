@@ -44,8 +44,8 @@ type HideRequestDetailsAction = {
 
 type EnableCopyCUrlAction = {
   type: "ENABLE_COPY_CURL";
-  payload: { requestId: string }
-}
+  payload: { requestId: string };
+};
 
 type NetworkRequestsLoadedAction = { type: "NETWORK_REQUESTS_LOADED" };
 
@@ -93,13 +93,12 @@ export function hideRequestDetails() {
   };
 }
 
-export const enableCopyCUrl = (requestId: RequestId)  => {
+export const enableCopyCUrl = (requestId: RequestId) => {
   return {
     type: "ENABLE_COPY_CURL",
-    payload: { requestId }
-  } 
-}
-
+    payload: { requestId },
+  };
+};
 
 export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, protocolClient, replayClient }) => {

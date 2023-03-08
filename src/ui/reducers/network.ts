@@ -33,7 +33,7 @@ const initialState = (): NetworkState => ({
   responseBodies: {},
   requestBodies: {},
   selectedRequestId: null,
-  copyCUrlAble: {}
+  copyCUrlAble: {},
 });
 
 const update = (state: NetworkState = initialState(), action: NetworkAction): NetworkState => {
@@ -91,11 +91,11 @@ const update = (state: NetworkState = initialState(), action: NetworkAction): Ne
     case "ENABLE_COPY_CURL":
       return {
         ...state,
-        copyCUrlAble:{
+        copyCUrlAble: {
           ...state.copyCUrlAble,
-          [action.payload.requestId]: true
-        }
-      }
+          [action.payload.requestId]: true,
+        },
+      };
     default:
       return state;
   }
@@ -139,7 +139,8 @@ export const getFocusedRequests = createSelector(
 export const getResponseBodies = (state: UIState) => state.network.responseBodies;
 export const getRequestBodies = (state: UIState) => state.network.requestBodies;
 export const getSelectedRequestId = (state: UIState) => state.network.selectedRequestId;
-export const getCopyCUrlAbleById = (state: UIState, requestId: RequestId) => state.network.copyCUrlAble[requestId]
+export const getCopyCUrlAbleById = (state: UIState, requestId: RequestId) =>
+  state.network.copyCUrlAble[requestId];
 export const getSummaryById = (state: UIState, id: string) => {
   const summaries = partialRequestsToCompleteSummaries(
     getRequests(state),
