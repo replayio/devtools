@@ -161,9 +161,6 @@ class _ThreadFront {
   // Waiter which resolves when the debugger has loaded and we've warped to the endpoint.
   initializedWaiter = defer<void>();
 
-  // Waiter which resolves when there is at least one loading region
-  loadingHasBegun = defer<void>();
-
   initialFocusRegionWaiter = defer<TimeStampedPointRange>();
 
   // Waiter which resolves when all sources have been loaded.
@@ -322,8 +319,6 @@ class _ThreadFront {
 
       client.Session.addLoadedRegionsListener((loadedRegions: LoadedRegions) => {
         this._mostRecentLoadedRegions = loadedRegions;
-
-        this.loadingHasBegun.resolve();
 
         if (areRangesEqual(loadedRegions.indexed, loadedRegions.loading)) {
           assert(
