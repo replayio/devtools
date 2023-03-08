@@ -128,14 +128,12 @@ function createCache<T extends { point: ExecutionPoint }>(
                 record.data = {
                   status: STATUS_RESOLVED,
                   value: result,
-                  weakRef: null,
                 };
               } else {
                 results.set(result.point, {
                   data: {
                     status: STATUS_RESOLVED,
                     value: result,
-                    weakRef: null,
                   },
                 });
               }
@@ -173,7 +171,7 @@ function createCache<T extends { point: ExecutionPoint }>(
   function getResultSuspense(point: ExecutionPoint) {
     const record = getOrCreateRecord(point);
     if (isResolvedRecord(record)) {
-      return record.data.value;
+      return record.data.value!;
     } else if (isPendingRecord(record)) {
       throw record.data.deferred;
     } else {
@@ -184,7 +182,7 @@ function createCache<T extends { point: ExecutionPoint }>(
   function getResultAsync(point: ExecutionPoint) {
     const record = getOrCreateRecord(point);
     if (isResolvedRecord(record)) {
-      return record.data.value;
+      return record.data.value!;
     } else if (isPendingRecord(record)) {
       return record.data.deferred;
     } else {
@@ -195,7 +193,7 @@ function createCache<T extends { point: ExecutionPoint }>(
   function getResultIfCached(point: ExecutionPoint) {
     const record = results.get(point);
     if (record && isResolvedRecord(record)) {
-      return record.data.value;
+      return record.data.value!;
     }
   }
 

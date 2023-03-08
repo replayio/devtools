@@ -78,12 +78,12 @@ export function getCachedObject(pauseId: PauseId, objectId: ObjectId): Object | 
 
   let record = maps.fullPreviewRecordMap.get(objectId);
   if (record && isResolvedRecord(record)) {
-    return record.data.value;
+    return record.data.value!;
   }
 
   record = maps.previewRecordMap.get(objectId);
   if (record && isResolvedRecord(record)) {
-    return record.data.value;
+    return record.data.value!;
   }
 
   const object = maps.objectMap.get(objectId);
@@ -107,7 +107,7 @@ export function getCachedObjectProperty(
   const record = maps.objectPropertyMap.get(key);
 
   if (record && isResolvedRecord(record)) {
-    return record.data.value;
+    return record.data.value!;
   } else {
     return null;
   }
@@ -156,7 +156,7 @@ export function getObjectWithPreviewSuspense(
   }
 
   if (isResolvedRecord(record)) {
-    return record.data.value;
+    return record.data.value!;
   } else if (isRejectedRecord(record)) {
     throw record.data.error;
   } else {
@@ -201,7 +201,7 @@ export function getObjectPropertySuspense(
   }
 
   if (isResolvedRecord(record)) {
-    return record.data.value;
+    return record.data.value!;
   } else if (isRejectedRecord(record)) {
     throw record.data.error;
   } else {
@@ -236,14 +236,12 @@ export function preCacheObject(pauseId: PauseId, object: Object): void {
         data: {
           status: STATUS_RESOLVED,
           value: object,
-          weakRef: null,
         },
       });
     } else if (record.data.status !== STATUS_RESOLVED) {
       record.data = {
         status: STATUS_RESOLVED,
         value: object,
-        weakRef: null,
       };
     }
 
@@ -254,14 +252,12 @@ export function preCacheObject(pauseId: PauseId, object: Object): void {
           data: {
             status: STATUS_RESOLVED,
             value: object,
-            weakRef: null,
           },
         });
       } else if (record.data.status !== STATUS_RESOLVED) {
         record.data = {
           status: STATUS_RESOLVED,
           value: object,
-          weakRef: null,
         };
       }
     }
@@ -284,7 +280,6 @@ async function fetchObjectProperty(
     record.data = {
       status: STATUS_RESOLVED,
       value: returned!,
-      weakRef: null,
     };
 
     deferred.resolve(returned);
