@@ -75,7 +75,8 @@ interface QOMState {
 }
 
 export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
-  declare context: React.ContextType<typeof ReplayClientContext>;
+  context: React.ContextType<typeof ReplayClientContext> = null as any;
+
   static contextType = ReplayClientContext;
 
   constructor(props: PropsFromRedux) {
