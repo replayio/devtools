@@ -46,6 +46,7 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
   return (
     <TestInfoContextMenuContextRoot>
       <div
+        data-test-id="TestSuite-TestInfoPanel"
         ref={ref}
         className={classNames("flex flex-grow flex-col overflow-hidden", {
           narrow: !widthObserver || widthObserver < 400,
