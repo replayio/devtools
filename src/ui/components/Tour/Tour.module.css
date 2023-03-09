@@ -1,30 +1,37 @@
 .TourBoxWrapper {
-  background-color: #d3f6fd;
-  background-image: linear-gradient(207deg, #d3f6fd 0%, #ffbcf9 100%);
-  height: 100%;
   position: relative;
-  padding: 0;
+  background: linear-gradient(323deg, rgba(226, 85, 215, 0.497), rgba(79, 205, 230, 0.777));
 }
 
-.Larry {
-  bottom: 0;
-  left: 0;
-  position: absolute;
-  max-height: 250px;
+.TourBoxGradient {
+  background: linear-gradient(323deg, rgba(241, 108, 229, 0.897), rgba(126, 217, 235, 0.736));
+  background-size: 400% 400%;
+
+  -webkit-animation: AnimationName 12s ease infinite;
+  -moz-animation: AnimationName 12s ease infinite;
+  animation: AnimationName 12s ease infinite;
+
+  position: relative;
 }
 
 .TourBox {
-  color: #068;
+  color: #fff;
+  padding: 0.5rem;
+  height: 100vh;
 }
 
 .h1 {
-  color: #dd4261;
+  color: #fff;
   margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 1rem;
 }
 
 .intro {
-  color: #068;
-  font-size: 20px;
+  color: #fff;
+  font-size: 18px;
   font-weight: 300;
   margin-bottom: 1rem;
   height: 100%;
@@ -59,20 +66,46 @@
   font-weight: 300;
 }
 
-.checklist {
-  margin-top: 2rem;
-}
-
-.checklist li {
-  padding-bottom: 0.5rem;
-  display: flex;
-  align-items: center;
-  font-size: 15px;
-  font-weight: 300;
-}
-
 .Icon {
   height: 18px;
   margin-right: 0.25rem;
   color: #068;
+}
+
+.videoExample {
+  width: 100%;
+}
+
+@-webkit-keyframes AnimationName {
+  0% {
+    background-position: 58% 0%;
+  }
+  50% {
+    background-position: 43% 100%;
+  }
+  100% {
+    background-position: 58% 0%;
+  }
+}
+@-moz-keyframes AnimationName {
+  0% {
+    background-position: 58% 0%;
+  }
+  50% {
+    background-position: 43% 100%;
+  }
+  100% {
+    background-position: 58% 0%;
+  }
+}
+@keyframes AnimationName {
+  0% {
+    background-position: 58% 0%;
+  }
+  50% {
+    background-position: 43% 100%;
+  }
+  100% {
+    background-position: 58% 0%;
+  }
 }

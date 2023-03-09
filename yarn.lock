@@ -6012,6 +6012,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/granim@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "@types/granim@npm:2.0.1"
+  checksum: 7bf8c6d865be3b9143d8829934c0268cfaab249bfaddce3309eabe8213103b458f91ab5fe46507c81cb57e391d028b9a28db603d68a4e6b49738ea6ef2836f61
+  languageName: node
+  linkType: hard
+
 "@types/hast@npm:^2.0.0":
   version: 2.3.4
   resolution: "@types/hast@npm:2.3.4"
@@ -13706,6 +13713,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"granim@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "granim@npm:2.0.0"
+  checksum: b1609edf32aa2e9c1972c0e444b7538d7d2c626f649847ee7b143af2e02890301b5304fde36d5a7aa00442b8d50b78e50478ad7832b33a4fb1ed576fef34675b
+  languageName: node
+  linkType: hard
+
 "graphql-config@npm:^4.1.0":
   version: 4.3.1
   resolution: "graphql-config@npm:4.3.1"
@@ -19318,6 +19332,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"poline@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "poline@npm:0.6.0"
+  checksum: 2892fd629cfd08a4ce26d423ddc26bc559e46ffb93a56ae33faba36212ef2d0c5e1a8081e9ac941009b904aea6d958660ab43655d489cd1f08ae5fe36e473f9f
+  languageName: node
+  linkType: hard
+
 "polished@npm:^4.2.2":
   version: 4.2.2
   resolution: "polished@npm:4.2.2"
@@ -20788,6 +20809,7 @@ __metadata:
     "@types/escape-html": ^1.0.1
     "@types/fuzzaldrin-plus": ^0.6.2
     "@types/glob": ^7.2.0
+    "@types/granim": ^2.0.1
     "@types/isomorphic-fetch": ^0.0.36
     "@types/jest": ^27.4.1
     "@types/lodash": ^4.14.181
@@ -20840,6 +20862,7 @@ __metadata:
     fs-extra: ^10.0.1
     fuzzaldrin-plus: ^0.6.0
     glob: ^8.0.3
+    granim: ^2.0.0
     graphql: 15.8.0
     graphql-ws: ^5.9.0
     graphqurl: ^1.0.1
@@ -20868,6 +20891,7 @@ __metadata:
     node-fetch: 2.x
     node-protocol: "workspace:*"
     parse-script-tags: ^0.1.7
+    poline: ^0.6.0
     postcss: ^8.4.12
     postcss-loader: ^6.2.1
     prettier: ^2.6.2
