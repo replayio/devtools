@@ -126,11 +126,7 @@ export function jumpToInitialPausePoint(): UIThunkAction {
       point = initialPausePoint.point;
       time = initialPausePoint.time;
     }
-    if (isPointInLoadingRegion(state, point)) {
-      ThreadFront.timeWarp(point, time, false);
-    } else {
-      ThreadFront.timeWarp(endpoint.point, endpoint.time, false);
-    }
+    ThreadFront.timeWarp(point, time, false);
   };
 }
 
