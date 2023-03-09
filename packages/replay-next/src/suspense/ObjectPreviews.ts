@@ -3,12 +3,13 @@ import {
   Deferred,
   Record,
   ResolvedRecord,
-  STATUS_PENDING,
-  STATUS_REJECTED,
-  STATUS_RESOLVED,
   createDeferred,
+  createPendingRecord,
+  createResolvedRecord,
   isRejectedRecord,
   isResolvedRecord,
+  updateRecordToRejected,
+  updateRecordToResolved,
 } from "suspense";
 
 import { ReplayClientInterface } from "../../../shared/client/types";
@@ -142,13 +143,7 @@ export function getObjectWithPreviewSuspense(
       `getObjectWithPreviewSuspense objectId: ${objectId} and pauseId: ${pauseId}`
     );
 
-    record = {
-      data: {
-        abortController: null as any, // Does not support interruption
-        deferred,
-        status: STATUS_PENDING,
-      },
-    };
+    record = createPendingRecord<Object>(deferred);
 
     recordMap.set(objectId, record);
 
@@ -160,7 +155,7 @@ export function getObjectWithPreviewSuspense(
   } else if (isRejectedRecord(record)) {
     throw record.data.error;
   } else {
-    throw record.data.deferred;
+    throw record.data.deferred.promise;
   }
 }
 
@@ -187,13 +182,7 @@ export function getObjectPropertySuspense(
       `getObjectProperty objectId: ${objectId} and pauseId: ${pauseId} and propertyName: ${propertyName}`
     );
 
-    record = {
-      data: {
-        abortController: null as any, // Does not support interruption
-        deferred,
-        status: STATUS_PENDING,
-      },
-    };
+    record = createPendingRecord<ProtocolValue>(deferred);
 
     recordMap.set(key, record);
 
@@ -205,7 +194,7 @@ export function getObjectPropertySuspense(
   } else if (isRejectedRecord(record)) {
     throw record.data.error;
   } else {
-    throw record.data.deferred;
+    throw record.data.deferred.promise;
   }
 }
 
@@ -232,33 +221,17 @@ export function preCacheObject(pauseId: PauseId, object: Object): void {
   if (object.preview != null) {
     let record = previewRecordMap.get(objectId);
     if (record == null) {
-      previewRecordMap.set(objectId, {
-        data: {
-          status: STATUS_RESOLVED,
-          value: object,
-        },
-      });
-    } else if (record.data.status !== STATUS_RESOLVED) {
-      record.data = {
-        status: STATUS_RESOLVED,
-        value: object,
-      };
+      previewRecordMap.set(objectId, createResolvedRecord(object));
+    } else if (isResolvedRecord(record)) {
+      updateRecordToResolved(record, object);
     }
 
     if (!object.preview.overflow) {
       const record = fullPreviewRecordMap.get(objectId);
       if (record == null) {
-        fullPreviewRecordMap.set(objectId, {
-          data: {
-            status: STATUS_RESOLVED,
-            value: object,
-          },
-        });
-      } else if (record.data.status !== STATUS_RESOLVED) {
-        record.data = {
-          status: STATUS_RESOLVED,
-          value: object,
-        };
+        fullPreviewRecordMap.set(objectId, createResolvedRecord(object));
+      } else if (isResolvedRecord(record)) {
+        updateRecordToResolved(record, object);
       }
     }
   }
@@ -277,17 +250,11 @@ async function fetchObjectProperty(
 
     cachePauseData(client, pauseId, data);
 
-    record.data = {
-      status: STATUS_RESOLVED,
-      value: returned!,
-    };
+    updateRecordToResolved(record, returned!);
 
     deferred.resolve(returned);
   } catch (error) {
-    record.data = {
-      error,
-      status: STATUS_REJECTED,
-    };
+    updateRecordToRejected(record, error);
 
     deferred.reject(error);
   }
@@ -313,10 +280,7 @@ async function fetchObjectWithPreview(
     // The cachePauseData() will have updated the Record's status and value already.
     deferred.resolve((record as ResolvedRecord<Object>).data.value);
   } catch (error) {
-    record.data = {
-      error,
-      status: STATUS_REJECTED,
-    };
+    updateRecordToRejected(record, error);
 
     deferred.reject(error);
   }

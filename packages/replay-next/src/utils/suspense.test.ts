@@ -35,7 +35,7 @@ describe("Suspense util", () => {
             }
           });
 
-          throw deferred;
+          throw deferred.promise;
         } else {
           if (resolvedValue !== undefined) {
             status = STATUS_RESOLVED;

@@ -11,12 +11,12 @@ import {
 import {
   PendingRecord,
   Record,
-  STATUS_PENDING,
-  STATUS_REJECTED,
-  STATUS_RESOLVED,
   createDeferred,
+  createPendingRecord,
+  createResolvedRecord,
   isPendingRecord,
   isResolvedRecord,
+  updateRecordToResolved,
 } from "suspense";
 
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/analysisManager";
@@ -125,17 +125,9 @@ function createCache<T extends { point: ExecutionPoint }>(
                 const deferred = (record as PendingRecord<any>).data.deferred;
                 deferred.resolve(result);
 
-                record.data = {
-                  status: STATUS_RESOLVED,
-                  value: result,
-                };
+                updateRecordToResolved(record, result);
               } else {
-                results.set(result.point, {
-                  data: {
-                    status: STATUS_RESOLVED,
-                    value: result,
-                  },
-                });
+                results.set(result.point, createResolvedRecord<RemoteAnalysisResult>(result));
               }
             }
           },
@@ -155,13 +147,7 @@ function createCache<T extends { point: ExecutionPoint }>(
     if (!record) {
       const deferred = createDeferred<RemoteAnalysisResult>("AnalysisCache.getResultSuspense");
 
-      record = {
-        data: {
-          abortController: null as any, // Does not support interruption
-          deferred,
-          status: STATUS_PENDING,
-        },
-      };
+      record = createPendingRecord<RemoteAnalysisResult>(deferred);
 
       results.set(point, record);
     }
@@ -173,7 +159,7 @@ function createCache<T extends { point: ExecutionPoint }>(
     if (isResolvedRecord(record)) {
       return record.data.value!;
     } else if (isPendingRecord(record)) {
-      throw record.data.deferred;
+      throw record.data.deferred.promise;
     } else {
       throw record.data.error;
     }
@@ -184,7 +170,7 @@ function createCache<T extends { point: ExecutionPoint }>(
     if (isResolvedRecord(record)) {
       return record.data.value!;
     } else if (isPendingRecord(record)) {
-      return record.data.deferred;
+      return record.data.deferred.promise;
     } else {
       throw record.data.error;
     }

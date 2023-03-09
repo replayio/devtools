@@ -213,7 +213,7 @@ export function getClosestPointForTimeSuspense(
     fetchPointsBoundingTime(client, time, deferred, false);
   }
 
-  throw deferred;
+  throw deferred.promise;
 }
 
 function getClosestPointInPointsBoundingTime(

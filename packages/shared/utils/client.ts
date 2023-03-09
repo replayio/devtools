@@ -68,7 +68,7 @@ function getEncodedSuspense(host: string, fixtureDataPath: string): string {
         });
     }
 
-    throw deferred;
+    throw deferred.promise;
   }
 
   return encoded;

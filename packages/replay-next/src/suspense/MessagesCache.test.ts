@@ -4,6 +4,7 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
+import { isPromiseLike } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 
@@ -28,8 +29,12 @@ describe("MessagesCache", () => {
   ): Promise<MessageData> {
     try {
       return getMessagesSuspense(client as any as ReplayClientInterface, range, endpoint);
-    } catch (promise) {
-      await promise;
+    } catch (thrown) {
+      if (isPromiseLike(thrown)) {
+        await thrown;
+      } else {
+        throw thrown;
+      }
 
       return getMessagesSuspense(client as any as ReplayClientInterface, range, endpoint);
     }

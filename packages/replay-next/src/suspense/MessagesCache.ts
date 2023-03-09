@@ -83,7 +83,7 @@ export function getMessagesSuspense(
     // If we're already fetching this data, rethrow the same Deferred (for Suspense reasons).
     // We check equality here rather than subset because it's possible a larger range might overflow.
     if (isRangeEqual(inFlightFocusRange, focusRange)) {
-      throw inFlightDeferred;
+      throw inFlightDeferred.promise;
     }
   }
 
@@ -126,7 +126,9 @@ export function getMessagesSuspense(
 
     fetchMessages(client, focusRange, deferred);
 
-    throw inFlightDeferred;
+    if (inFlightDeferred != null) {
+      throw inFlightDeferred.promise;
+    }
   }
 
   if (lastFetchError) {
