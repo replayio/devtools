@@ -133,6 +133,7 @@ export type ExperimentalSettings = {
   rerunRoutines?: boolean;
   profileWorkerThreads?: boolean;
   disableRecordingAssetsInDatabase?: boolean;
+  keepAllTraces?: boolean;
 };
 
 type SessionCallbacks = {

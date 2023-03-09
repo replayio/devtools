@@ -199,15 +199,16 @@ export function createSocket(
       }
 
       const experimentalSettings: ExperimentalSettings = {
-        disableScanDataCache: !!features.disableScanDataCache,
+        disableScanDataCache: getFeature("disableScanDataCache"),
         disableCache: !!prefs.disableCache,
-        disableStableQueryCache: !!features.disableStableQueryCache,
-        disableUnstableQueryCache: !features.enableUnstableQueryCache,
+        disableStableQueryCache: getFeature("disableStableQueryCache"),
+        disableUnstableQueryCache: getFeature("enableUnstableQueryCache"),
         listenForMetrics: !!prefs.listenForMetrics,
-        profileWorkerThreads: !!features.profileWorkerThreads,
-        enableRoutines: !!features.enableRoutines,
-        rerunRoutines: !!features.rerunRoutines,
-        disableRecordingAssetsInDatabase: !!features.disableRecordingAssetsInDatabase,
+        profileWorkerThreads: getFeature("profileWorkerThreads"),
+        enableRoutines: getFeature("enableRoutines"),
+        rerunRoutines: getFeature("rerunRoutines"),
+        disableRecordingAssetsInDatabase: getFeature("disableRecordingAssetsInDatabase"),
+        keepAllTraces: getFeature("keepAllTraces"),
       };
       if (features.newControllerOnRefresh) {
         experimentalSettings.controllerKey = String(Date.now());
