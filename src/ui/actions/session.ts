@@ -168,8 +168,11 @@ export function createSocket(
       }
       ThreadFront.recordingId = recordingId;
 
-      const userSettings = await getUserSettings();
-      const [userInfo, recording] = await Promise.all([getUserInfo(), getRecording(recordingId)]);
+      const [userSettings, userInfo, recording] = await Promise.all([
+        getUserSettings(),
+        getUserInfo(),
+        getRecording(recordingId),
+      ]);
       assert(recording, "failed to load recording");
 
       if (recording.title) {
@@ -322,14 +325,15 @@ export function createSocket(
         dispatch(setViewMode("dev"));
       }
 
-      dispatch(onLoadingFinished());
       dispatch(actions.setUploading(null));
       dispatch(actions.setAwaitingSourcemaps(false));
 
       ThreadFront.on("paused", ({ point }) => dispatch(setCurrentPoint(point)));
 
       await ThreadFront.waitForSession();
-      dispatch(jumpToInitialPausePoint());
+      await dispatch(jumpToInitialPausePoint());
+
+      dispatch(actions.setLoadingFinished(true));
 
       if (!focusRegion) {
         const initialFocusRegion = await ThreadFront.initialFocusRegionWaiter.promise;
@@ -349,24 +353,6 @@ export function createSocket(
         );
       }
     }
-    ThreadFront.initializedWaiter.resolve();
-  };
-}
-
-function onLoadingFinished(): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront }) => {
-    await waitForTime(300);
-    async function initThreadFront() {
-      await ThreadFront.waitForSession();
-      await ThreadFront.initializedWaiter.promise;
-      await ThreadFront.ensureAllSources();
-    }
-
-    initThreadFront();
-
-    await ThreadFront.initializedWaiter.promise;
-
-    dispatch(actions.setLoadingFinished(true));
   };
 }
 

@@ -102,7 +102,7 @@ export async function setupTimeline(store: UIStore) {
   shortcuts.attach(window.document);
 }
 
-export function jumpToInitialPausePoint(): UIThunkAction {
+export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const endpoint = await getEndpoint(replayClient);
     dispatch(pointsReceived([endpoint]));
