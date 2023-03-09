@@ -116,14 +116,17 @@ const Checklist: React.FC = () => {
                         Replay just re-ran your recording and retroactively added your print
                         statement each time that line of code was called! 🤯
                       </p>
-                      <p>We call this our "ah-ha moment."</p>
-                      <p className="mt-24">
+                      <p>
+                        We call this our "ah-ha moment," and Replay is full of them. Happy
+                        exploring!
+                      </p>
+                      <p className="mt-20">
                         <a
                           href="#"
                           onClick={dismissTourNag}
-                          className="hover:cursor-hand rounded-lg bg-white px-3 py-1 font-bold text-primaryAccent shadow-lg"
+                          className="hover:cursor-hand whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg"
                         >
-                          Neat, thanks for the tour!
+                          Awesome, thanks!
                         </a>
                       </p>
                     </>

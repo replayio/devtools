@@ -4,7 +4,7 @@
 }
 
 .TourBoxGradient {
-  background: linear-gradient(323deg, rgba(241, 108, 229, 0.897), rgba(126, 217, 235, 0.736));
+  background: linear-gradient(323deg, rgba(241, 108, 229, 0.897), rgba(49, 189, 216, 0.736));
   background-size: 400% 400%;
 
   -webkit-animation: AnimationName 12s ease infinite;
