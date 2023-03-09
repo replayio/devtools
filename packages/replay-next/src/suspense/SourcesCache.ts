@@ -406,7 +406,7 @@ async function fetchStreamingSourceContents(
         notifyResolver(streamingSourceContents);
       });
 
-    updateRecordToRejected(record, streamingSourceContents);
+    updateRecordToResolved(record, streamingSourceContents);
 
     deferred.resolve(streamingSourceContents);
   } catch (error) {
