@@ -20,6 +20,7 @@ export const {
   readAsync: getScopeAsync,
 } = createCache<[PauseId, ScopeId, ReplayClientInterface], Scope>({
   debugLabel: "ScopeCache: getScope",
+  getKey: (pauseId, scopeId) => `${pauseId}:${scopeId}`,
   load: async (pauseId: PauseId, scopeId: ScopeId, client: ReplayClientInterface) => {
     const result = await client.getScope(pauseId, scopeId);
     await client.waitForLoadedSources();
@@ -36,6 +37,7 @@ export const {
   readAsync: getFrameScopesAsync,
 } = createCache<[PauseId, FrameId, ReplayClientInterface], FrameScopes>({
   debugLabel: "ScopeCache: getFrameScopes",
+  getKey: (pauseId, frameId) => `${pauseId}:${frameId}`,
   load: async (pauseId: PauseId, frameId: FrameId, client: ReplayClientInterface) => {
     const frame = (await getFramesAsync(pauseId, client))?.find(
       frame => frame.frameId === frameId

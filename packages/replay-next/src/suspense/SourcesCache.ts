@@ -409,6 +409,7 @@ export const sourceContentsCache = createCache<
   StreamingSourceContents | undefined
 >({
   debugLabel: "sourceContentsCache",
+  getKey: sourceId => sourceId,
   load: async (sourceId, replayClient) => {
     const stream = streamingSourceContentsCache.stream(replayClient, sourceId);
 

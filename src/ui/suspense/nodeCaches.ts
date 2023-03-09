@@ -79,7 +79,7 @@ export const {
         break;
       }
       default: {
-        return assertUnreachable(options);
+        assertUnreachable(options);
       }
     }
 
@@ -183,6 +183,7 @@ export const {
   EventListener[] | undefined
 >({
   debugLabel: "nodeCaches: getNodeEventListeners",
+  getKey: (pauseId, nodeId, client, replayClient, sessionId) => `${pauseId}|${nodeId}|${sessionId}`,
   load: async (pauseId, nodeId, client, replayClient, sessionId) => {
     const { listeners, data } = await client.DOM.getEventListeners(
       {
@@ -203,6 +204,7 @@ export const {
   readAsync: getBoundingRectsAsync,
 } = createCache<[pauseId: PauseId, client: ProtocolClient, sessionId: string], NodeBounds[]>({
   debugLabel: "nodeCaches: getBoundingRects",
+  getKey: (pauseId, client, sessionId) => `${pauseId}|${sessionId}`,
   load: async (pauseId, client, sessionId) => {
     const { elements } = await client.DOM.getAllBoundingClientRects({}, sessionId, pauseId);
     return elements;
@@ -218,6 +220,7 @@ export const {
   BoxModel
 >({
   debugLabel: "nodeCaches: getBoxModel",
+  getKey: (pauseId, nodeId, client, sessionId) => `${pauseId}|${nodeId}|${sessionId}`,
   load: async (pauseId, nodeId, client, sessionId) => {
     const { model: nodeBoxModel } = await client.DOM.getBoxModel(
       {

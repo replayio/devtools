@@ -15,6 +15,7 @@ export const {
   PointDescription[] | undefined
 >({
   debugLabel: "FrameStepsCache: getFrameSteps",
+  getKey: (pauseId, frameId) => `${pauseId}:${frameId}`,
   load: async (pauseId, frameId, client) => {
     try {
       const frameSteps = await client.getFrameSteps(pauseId, frameId);

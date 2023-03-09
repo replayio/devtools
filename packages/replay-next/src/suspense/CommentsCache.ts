@@ -15,6 +15,7 @@ export const {
   Comment[]
 >({
   debugLabel: "CommentsCache",
+  getKey: (recordingId, graphQLClient, accessToken) => recordingId,
   load: async (
     recordingId: RecordingId,
     graphQLClient: GraphQLClientInterface,

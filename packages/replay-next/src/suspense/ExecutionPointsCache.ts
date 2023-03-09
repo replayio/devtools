@@ -299,5 +299,6 @@ export const {
   readAsync: getPointsBoundingTimeAsync,
 } = createCache<[time: number, client: ReplayClientInterface], PointsBoundingTime>({
   debugLabel: "PointsCache",
+  getKey: time => `${time}`,
   load: async (time, client) => client.getPointsBoundingTime(time),
 });
