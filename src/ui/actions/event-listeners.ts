@@ -261,14 +261,16 @@ const EVENT_CLASS_FOR_EVENT_TYPE: Record<SEARCHABLE_EVENT_TYPES, string> = {
   keypress: "InputEvent",
 };
 
-const IGNORABLE_PARTIAL_SOURCE_URLS = [
+export const IGNORABLE_PARTIAL_SOURCE_URLS = [
   // Don't jump into React internals
   "react-dom",
   // or CodeSandbox
   "webpack:///src/sandbox/",
+  "webpack:///sandpack-core/",
+  "webpack:////home/circleci/codesandbox-client",
 ];
 
-function shouldIgnoreEventFromSource(sourceDetails?: SourceDetails) {
+export function shouldIgnoreEventFromSource(sourceDetails?: SourceDetails) {
   const url = sourceDetails?.url ?? "";
 
   return IGNORABLE_PARTIAL_SOURCE_URLS.some(partialUrl => url.includes(partialUrl));

@@ -226,31 +226,9 @@ function jumpToClickEventFunctionLocation(
 
         // Since we're doing these checks without knowing the end of the function
         // (due to parsing concerns), let's find all breakable positions on this line and the next 2.
-        const nearestLines: SameLineSourceLocations[] = [];
-        for (let i = 0; i < 3; i++) {
-          const lineToCheck = functionSourceLocation.line + i;
-          const linePositions = breakablePositionsByLine.get(lineToCheck);
-          if (linePositions) {
-            nearestLines.push(linePositions);
-          }
-        }
-
-        const positionsAsLocations: Location[] = nearestLines.flatMap(line => {
-          return line.columns.map(column => {
-            return {
-              sourceId: functionSourceLocation.sourceId,
-              line: line.line,
-              column,
-            };
-          });
-        });
-
-        // We _hope_ that the first breakable position _after_ this function declaration is the first
-        // position _inside_ the function itself, either a later column on the same line or on the next line.
-        const nextBreakablePosition = positionsAsLocations.find(
-          p =>
-            (p.line === functionSourceLocation.line && p.column > functionSourceLocation.column) ||
-            p.line > functionSourceLocation.line
+        const nextBreakablePosition = findFirstBreakablePositionForFunction(
+          functionSourceLocation,
+          breakablePositionsByLine
         );
 
         const cx = getThreadContext(getState());
@@ -409,3 +387,36 @@ export default React.memo(function Event({
 const Label = ({ children }: { children: ReactNode }) => (
   <div className="overflow-hidden overflow-ellipsis whitespace-pre font-normal">{children}</div>
 );
+
+export function findFirstBreakablePositionForFunction(
+  functionSourceLocation: Location,
+  breakablePositionsByLine: Map<number, SameLineSourceLocations>
+) {
+  const nearestLines: SameLineSourceLocations[] = [];
+  for (let i = 0; i < 3; i++) {
+    const lineToCheck = functionSourceLocation.line + i;
+    const linePositions = breakablePositionsByLine.get(lineToCheck);
+    if (linePositions) {
+      nearestLines.push(linePositions);
+    }
+  }
+
+  const positionsAsLocations: Location[] = nearestLines.flatMap(line => {
+    return line.columns.map(column => {
+      return {
+        sourceId: functionSourceLocation.sourceId,
+        line: line.line,
+        column,
+      };
+    });
+  });
+
+  // We _hope_ that the first breakable position _after_ this function declaration is the first
+  // position _inside_ the function itself, either a later column on the same line or on the next line.
+  const nextBreakablePosition = positionsAsLocations.find(
+    p =>
+      (p.line === functionSourceLocation.line && p.column > functionSourceLocation.column) ||
+      p.line > functionSourceLocation.line
+  );
+  return nextBreakablePosition;
+}
