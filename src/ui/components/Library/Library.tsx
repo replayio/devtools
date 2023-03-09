@@ -87,7 +87,7 @@ function Library({
   }, [teamId, isValidTeamId, redirectToTeam]);
 
   if (!teamId) {
-    return <LoadingScreen fallbackMessage="Loading team information..." />;
+    return null;
   }
 
   return (
