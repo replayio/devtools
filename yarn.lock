@@ -14761,6 +14761,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"interval-utilities@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "interval-utilities@npm:0.0.1"
+  dependencies:
+    point-utilities: latest
+  checksum: b962019efba5650209a22c292ca8629b054f2740cfd5e08c3b63e51aa6e15134c8f3a3ddb76e4b1dfd5dd062f2074e3322729239ee2d22a00ecbb6a66ce12b17
+  languageName: node
+  linkType: hard
+
 "iota-array@npm:^1.0.0":
   version: 1.0.0
   resolution: "iota-array@npm:1.0.0"
@@ -19318,6 +19327,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"point-utilities@npm:^0.0.2, point-utilities@npm:latest":
+  version: 0.0.2
+  resolution: "point-utilities@npm:0.0.2"
+  checksum: 3df016f2cc73def99316c19994eb9225705e8a723550679495381a3f2aa3e0ddcc436f1f795c560e019b8a1c43ceee7e1b3def9b03bf09bb099392aeaa5c4421
+  languageName: node
+  linkType: hard
+
 "polished@npm:^4.2.2":
   version: 4.2.2
   resolution: "polished@npm:4.2.2"
@@ -20298,15 +20314,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:0.0.0-experimental-e7d0053e6-20220325":
-  version: 0.0.0-experimental-e7d0053e6-20220325
-  resolution: "react-dom@npm:0.0.0-experimental-e7d0053e6-20220325"
+"react-dom@npm:0.0.0-experimental-49f741046-20230305":
+  version: 0.0.0-experimental-49f741046-20230305
+  resolution: "react-dom@npm:0.0.0-experimental-49f741046-20230305"
   dependencies:
     loose-envify: ^1.1.0
-    scheduler: 0.0.0-experimental-e7d0053e6-20220325
+    scheduler: 0.0.0-experimental-49f741046-20230305
   peerDependencies:
-    react: 0.0.0-experimental-e7d0053e6-20220325
-  checksum: bd9f9ce7bd249e5e59b4c19a6a8e022a2a159c8cfe2f5a624731250caeda027c9b4e0a48b697bd19a0cfbe0f0c53d34d24d62f638dd2071281f3a2c87284426c
+    react: 0.0.0-experimental-49f741046-20230305
+  checksum: 49f59fad0f67ba1ce10a745a9a4e5a5bcb04936e46351e91b3f9768e5961563a72c942c0cdc4d89c2dc87384d9b722b8bf74ffc79a796ae2e51beab93f69ebd9
   languageName: node
   linkType: hard
 
@@ -20570,12 +20586,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:0.0.0-experimental-e7d0053e6-20220325":
-  version: 0.0.0-experimental-e7d0053e6-20220325
-  resolution: "react@npm:0.0.0-experimental-e7d0053e6-20220325"
+"react@npm:0.0.0-experimental-49f741046-20230305":
+  version: 0.0.0-experimental-49f741046-20230305
+  resolution: "react@npm:0.0.0-experimental-49f741046-20230305"
   dependencies:
     loose-envify: ^1.1.0
-  checksum: 256859d20081b858ef183b81e4e2ecd19948dcb0ccf7ba7108a74a1f301f6a68db14798690fefa7e097245ee2ba34f7bcb91871717c081c9ce8ab1d1d6240e61
+  checksum: 4dd1591cc8c894e39d93c1242f27faf3fdebc149d27a7abdef4ea658e38ad68cae4a21a11c6aa4838cd0866aabb7a3f1edaa65eb3abd2dd7502857adf6201271
   languageName: node
   linkType: hard
 
@@ -20877,12 +20893,12 @@ __metadata:
     prop-types: ^15.8.1
     protocol: "workspace:*"
     raw-loader: ^4.0.2
-    react: 0.0.0-experimental-1e5245df8-20220817
+    react: 0.0.0-experimental-49f741046-20230305
     react-canvas-confetti: ^1.3.0
     react-circular-progressbar: ^2.0.4
     react-devtools-inline: ^4.24.5
     react-devtools-inline_4_18_0: "npm:react-devtools-inline@4.18.0"
-    react-dom: 0.0.0-experimental-1e5245df8-20220817
+    react-dom: 0.0.0-experimental-49f741046-20230305
     react-is: ^18.2.0
     react-json-tree: ^0.18.0
     react-json-view: 1.21.3
@@ -20907,6 +20923,7 @@ __metadata:
     style-loader: ^3.3.1
     stylelint: ^14.16.0
     stylelint-config-prettier: ^9.0.4
+    suspense: ^0.0.24
     tailwindcss: ^3.2.4
     ts-node: ^10.7.0
     tsconfig-paths: ^3.14.1
@@ -21261,6 +21278,7 @@ __metadata:
     react-dom: 0.0.0-experimental-e7d0053e6-20220325
     react-virtualized-auto-sizer: ^1.0.7
     shared: "workspace:*"
+    suspense: ^0.0.24
     typescript: ^4.6.3
     uuid: ^7.0.3
   languageName: unknown
@@ -21621,12 +21639,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"scheduler@npm:0.0.0-experimental-e7d0053e6-20220325":
-  version: 0.0.0-experimental-e7d0053e6-20220325
-  resolution: "scheduler@npm:0.0.0-experimental-e7d0053e6-20220325"
+"scheduler@npm:0.0.0-experimental-49f741046-20230305":
+  version: 0.0.0-experimental-49f741046-20230305
+  resolution: "scheduler@npm:0.0.0-experimental-49f741046-20230305"
   dependencies:
     loose-envify: ^1.1.0
-  checksum: a43e52cf35a7014a3da37c2f6c8ec1a5741cbe4ffe043e86c882d5b43de7ac9d7c0938b587f04f835a1189a7de5f074a079c3ff38dc9dfd41a0558fc27879189
+  checksum: 1c8eafb273e53fffa660ab1134f3fbe2b3aca650bfd8932271f657d749e91c49bac1e501a345d50da1ddce4387b09fcf2c36ec2c31db2aef9bab7b9c8ba1ea7d
   languageName: node
   linkType: hard
 
@@ -23082,6 +23100,19 @@ __metadata:
   version: 1.0.0
   resolution: "supports-preserve-symlinks-flag@npm:1.0.0"
   checksum: 53b1e247e68e05db7b3808b99b892bd36fb096e6fba213a06da7fab22045e97597db425c724f2bbd6c99a3c295e1e73f3e4de78592289f38431049e1277ca0ae
+  languageName: node
+  linkType: hard
+
+"suspense@npm:^0.0.24":
+  version: 0.0.24
+  resolution: "suspense@npm:0.0.24"
+  dependencies:
+    interval-utilities: ^0.0.1
+    point-utilities: ^0.0.2
+  peerDependencies:
+    react: ^18.0.0
+    react-dom: ^18.0.0
+  checksum: 6ffa4451bda535a31fc64f047be0816dedb423e04ed4a8d53750554ed84a4654f7cde9639fe3eb48c6f52c89e77933a368594ade9991b4fcf5098c3a2596f2f2
   languageName: node
   linkType: hard
 
