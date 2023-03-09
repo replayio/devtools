@@ -56,7 +56,7 @@ export default function LibraryLoader() {
   const { loading: userInfoLoading, ...userInfo } = hooks.useGetUserInfo();
 
   if (userSettingsLoading || userInfoLoading) {
-    return <LoadingScreen fallbackMessage="Reloading team details..." />;
+    return;
   }
 
   return <Library userSettings={userSettings} userInfo={userInfo} />;

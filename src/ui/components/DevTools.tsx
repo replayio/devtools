@@ -223,7 +223,7 @@ function _DevTools({
   }, [recording]);
 
   if (!loadingFinished) {
-    return <LoadingScreen fallbackMessage="Starting your session..." />;
+    return <LoadingScreen fallbackMessage="Loading replay..." />;
   }
 
   if (loadedRegions === null) {
