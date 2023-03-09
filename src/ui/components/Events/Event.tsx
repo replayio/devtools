@@ -90,9 +90,9 @@ const { getValueAsync: getNextInteractionEventAsync } = createGenericCache<
 );
 
 type EventProps = {
-  currentTime: any;
+  currentTime: number;
   event: ReplayEvent;
-  executionPoint: any;
+  executionPoint: string;
   onSeek: (point: string, time: number) => void;
 };
 
@@ -112,10 +112,10 @@ export const getEventLabel = (event: ReplayEvent) => {
   return label;
 };
 
-type JumpToCodeFailureReason = "not_loaded" | "no_hits";
-type JumpToCodeStatus = JumpToCodeFailureReason | "not_checked" | "loading" | "found";
+export type JumpToCodeFailureReason = "not_loaded" | "no_hits";
+export type JumpToCodeStatus = JumpToCodeFailureReason | "not_checked" | "loading" | "found";
 
-const errorMessages: Record<JumpToCodeFailureReason, string> = {
+export const errorMessages: Record<JumpToCodeFailureReason, string> = {
   not_loaded: "Not loaded",
   no_hits: "No results",
 };
