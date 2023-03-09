@@ -24,6 +24,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
 import ProtocolViewer from "./ProtocolViewer";
+import { ReactPanel } from "./ReactPanel";
 import StatusDropdown from "./shared/StatusDropdown";
 import { TestSuitePanel } from "./TestSuitePanel";
 import styles from "src/ui/components/SidePanel.module.css";
@@ -148,6 +149,7 @@ export default function SidePanel() {
         {selectedPrimaryPanel === "cypress" && <TestSuitePanel />}
         {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
         {selectedPrimaryPanel === "search" && <SearchFilesReduxAdapter />}
+        {selectedPrimaryPanel === "react" && <ReactPanel />}
       </div>
     </div>
   );
