@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Row } from "react-table";
 
 import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
@@ -8,7 +9,14 @@ import { getCopyCUrlAbleById, getRequestBodies } from "ui/reducers/network";
 import { useAppDispatch } from "ui/setup/hooks";
 import { useAppSelector } from "ui/setup/hooks";
 
-import { RequestSummary } from "./utils";
+import {
+  BodyPartsToUInt8Array,
+  RawToImageMaybe,
+  RawToUTF8,
+  StringToObjectMaybe,
+  URLEncodedToPlaintext,
+} from "./content";
+import { RequestSummary, findHeader } from "./utils";
 
 export default function useNetworkContextMenu(row: Row<RequestSummary>) {
   const dispatch = useAppDispatch();
@@ -32,6 +40,14 @@ export default function useNetworkContextMenu(row: Row<RequestSummary>) {
 
   const requestBody = useAppSelector(getRequestBodies)[data.id];
 
+  const raw = useMemo(
+    () =>
+      BodyPartsToUInt8Array(
+        requestBody || [],
+        findHeader(data.requestHeaders, "content-type") || "unknown"
+      ),
+    [requestBody, data.requestHeaders]
+  );
   const genCUrlText = () => {
     let curlText = `curl "${row.values.url}"`;
     if (!isAsset) {
@@ -39,7 +55,9 @@ export default function useNetworkContextMenu(row: Row<RequestSummary>) {
         .map(item => `-H '${item.name}: ${item.value}'`)
         .join(" ")}`;
       if (data.hasRequestBody) {
-        curlText += ` --data-raw '${JSON.stringify(requestBody)}'`;
+        curlText += ` --data '${
+          StringToObjectMaybe(URLEncodedToPlaintext(RawToUTF8(RawToImageMaybe(raw)))).content
+        }'`;
       }
     }
     return curlText;
