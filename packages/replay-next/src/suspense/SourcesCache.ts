@@ -6,7 +6,13 @@ import {
   newSource as ProtocolSource,
   SourceId as ProtocolSourceId,
 } from "@replayio/protocol";
-import { Deferred, createDeferred } from "suspense";
+import {
+  Deferred,
+  STATUS_PENDING,
+  STATUS_REJECTED,
+  STATUS_RESOLVED,
+  createDeferred,
+} from "suspense";
 
 import {
   LineNumberToHitCountMap,
@@ -18,7 +24,7 @@ import { isPointRange, toPointRange } from "shared/utils/time";
 
 import { createFetchAsyncFromFetchSuspense } from "../utils/suspense";
 import { createGenericCache, createUseGetValue } from "./createGenericCache";
-import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED } from "./types";
+import { Record } from "./types";
 
 export type ProtocolSourceContents = {
   contents: string;

@@ -1,10 +1,16 @@
 import { Object, ObjectId, PauseId, Value as ProtocolValue } from "@replayio/protocol";
-import { Deferred, createDeferred } from "suspense";
+import {
+  Deferred,
+  STATUS_PENDING,
+  STATUS_REJECTED,
+  STATUS_RESOLVED,
+  createDeferred,
+} from "suspense";
 
 import { ReplayClientInterface } from "../../../shared/client/types";
 import { createFetchAsyncFromFetchSuspense } from "../utils/suspense";
 import { cachePauseData } from "./PauseCache";
-import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED } from "./types";
+import { Record } from "./types";
 
 type ObjectMap = Map<ObjectId, Object>;
 type RecordMap = Map<ObjectId, Record<Object>>;

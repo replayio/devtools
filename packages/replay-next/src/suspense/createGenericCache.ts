@@ -1,11 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import { Deferred, createDeferred, isPromiseLike } from "suspense";
+import {
+  Deferred,
+  STATUS_PENDING,
+  STATUS_REJECTED,
+  STATUS_RESOLVED,
+  createDeferred,
+  isPromiseLike,
+} from "suspense";
 
 import { handleError } from "protocol/utils";
 
-import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED } from "./types";
-
-export { STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED } from "./types";
+import { Record } from "./types";
 
 export type CacheRecordStatus =
   | typeof STATUS_PENDING

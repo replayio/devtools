@@ -8,7 +8,7 @@ import {
   Object as ProtocolObject,
   Scope,
 } from "@replayio/protocol";
-import { createDeferred } from "suspense";
+import { STATUS_PENDING, STATUS_RESOLVED, createDeferred } from "suspense";
 
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/analysisManager";
 import { ReplayClientInterface } from "shared/client/types";
@@ -16,7 +16,7 @@ import { ReplayClientInterface } from "shared/client/types";
 import { createGenericRangeCache } from "./createGenericRangeCache";
 import { cachePauseData } from "./PauseCache";
 import { getBreakpointPositionsAsync } from "./SourcesCache";
-import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED } from "./types";
+import { Record } from "./types";
 
 export type RemoteAnalysisResult = {
   data: { frames: Frame[]; objects: ProtocolObject[]; scopes: Scope[] };

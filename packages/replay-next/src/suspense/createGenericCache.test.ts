@@ -1,12 +1,6 @@
-import { isPromiseLike } from "suspense";
+import { STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, isPromiseLike } from "suspense";
 
-import {
-  GenericCache,
-  STATUS_PENDING,
-  STATUS_REJECTED,
-  STATUS_RESOLVED,
-  createGenericCache,
-} from "./createGenericCache";
+import { GenericCache, createGenericCache } from "./createGenericCache";
 
 describe("createGenericCache", () => {
   let fetchValue: jest.Mock;

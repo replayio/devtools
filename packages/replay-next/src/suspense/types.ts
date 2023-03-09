@@ -1,8 +1,4 @@
-import { Deferred } from "suspense";
-
-export const STATUS_PENDING = "pending";
-export const STATUS_RESOLVED = "resolved";
-export const STATUS_REJECTED = "rejected";
+import { Deferred, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED } from "suspense";
 
 export type StatusPending = typeof STATUS_PENDING;
 export type StatusResolved = typeof STATUS_RESOLVED;
