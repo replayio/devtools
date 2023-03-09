@@ -16,7 +16,7 @@ import { createWakeable } from "../utils/suspense";
 import { createGenericRangeCache } from "./createGenericRangeCache";
 import { cachePauseData } from "./PauseCache";
 import { getBreakpointPositionsAsync } from "./SourcesCache";
-import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Thennable } from "./types";
+import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED } from "./types";
 
 export type RemoteAnalysisResult = {
   data: { frames: Frame[]; objects: ProtocolObject[]; scopes: Scope[] };
@@ -29,10 +29,10 @@ export type RemoteAnalysisResult = {
 
 export interface AnalysisCache<T extends { point: ExecutionPoint }> {
   getPointsSuspense(client: ReplayClientInterface, range: PointRange): T[];
-  getPointsAsync(client: ReplayClientInterface, range: PointRange): Thennable<T[]> | T[];
+  getPointsAsync(client: ReplayClientInterface, range: PointRange): PromiseLike<T[]> | T[];
   getCachedPoints(range: PointRange): T[];
   getResultSuspense(point: ExecutionPoint): RemoteAnalysisResult;
-  getResultAsync(point: ExecutionPoint): Thennable<RemoteAnalysisResult> | RemoteAnalysisResult;
+  getResultAsync(point: ExecutionPoint): PromiseLike<RemoteAnalysisResult> | RemoteAnalysisResult;
   getResultIfCached(point: ExecutionPoint): RemoteAnalysisResult | undefined;
 }
 

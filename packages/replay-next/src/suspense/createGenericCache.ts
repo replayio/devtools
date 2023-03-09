@@ -1,17 +1,10 @@
 import { useEffect, useRef, useState } from "react";
+import { isPromiseLike } from "suspense";
 
 import { handleError } from "protocol/utils";
-import { isThennable } from "shared/proxy/utils";
 
 import { createWakeable } from "../utils/suspense";
-import {
-  Record,
-  STATUS_PENDING,
-  STATUS_REJECTED,
-  STATUS_RESOLVED,
-  Thennable,
-  Wakeable,
-} from "./types";
+import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 export { STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED } from "./types";
 
@@ -27,7 +20,7 @@ export interface GenericCache<TExtraParams extends Array<any>, TParams extends A
   addValue(value: TValue, ...args: TParams): void;
   getCacheKey(...args: TParams): string;
   getStatus(...args: TParams): CacheRecordStatus | undefined;
-  getValueAsync(...args: [...TParams, ...TExtraParams]): Thennable<TValue> | TValue;
+  getValueAsync(...args: [...TParams, ...TExtraParams]): PromiseLike<TValue> | TValue;
   getValueIfCached(...args: TParams): { value: TValue } | undefined;
   getValueSuspense(...args: [...TParams, ...TExtraParams]): TValue;
   remove(...args: TParams): void;
@@ -43,7 +36,7 @@ export function createGenericCache<
   TValue
 >(
   debugLabel: string,
-  fetchValue: (...args: [...TParams, ...TExtraParams]) => Thennable<TValue> | TValue,
+  fetchValue: (...args: [...TParams, ...TExtraParams]) => PromiseLike<TValue> | TValue,
   getCacheKey: (...args: TParams) => string
 ): GenericCache<TExtraParams, TParams, TValue> {
   const recordMap = new Map<string, Record<TValue>>();
@@ -108,8 +101,10 @@ export function createGenericCache<
     ...args: [...TParams, ...TExtraParams]
   ) {
     try {
-      const valueOrThennable = fetchValue(...args);
-      const value = isThennable(valueOrThennable) ? await valueOrThennable : valueOrThennable;
+      const valueOrPromiseLike = fetchValue(...args);
+      const value = isPromiseLike(valueOrPromiseLike)
+        ? await valueOrPromiseLike
+        : valueOrPromiseLike;
 
       record.status = STATUS_RESOLVED;
       record.value = value;
@@ -140,7 +135,7 @@ export function createGenericCache<
       }
     },
 
-    getValueAsync(...args: [...TParams, ...TExtraParams]): Thennable<TValue> | TValue {
+    getValueAsync(...args: [...TParams, ...TExtraParams]): PromiseLike<TValue> | TValue {
       const record = getOrCreateRecord(...args);
       switch (record.status) {
         case STATUS_PENDING:
@@ -191,7 +186,7 @@ interface HookState<TValue> {
 }
 
 export function createUseGetValue<TParams extends Array<any>, TValue>(
-  getValueAsync: (...args: TParams) => Thennable<TValue> | TValue,
+  getValueAsync: (...args: TParams) => PromiseLike<TValue> | TValue,
   getValueIfCached: (...args: TParams) => { value: TValue } | undefined,
   getCacheKey: (...args: TParams) => string
 ): (...args: TParams) => HookState<TValue> {

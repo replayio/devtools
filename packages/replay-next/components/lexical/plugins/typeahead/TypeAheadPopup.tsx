@@ -11,8 +11,7 @@ import {
   LexicalEditor,
 } from "lexical";
 import { ReactNode, useLayoutEffect, useRef, useState } from "react";
-
-import { isThennable } from "shared/proxy/utils";
+import { isPromiseLike } from "suspense";
 
 import { INSERT_ITEM_COMMAND } from "./commands";
 import TypeAheadListRenderer from "./TypeAheadListRenderer";
@@ -52,7 +51,7 @@ export default function TypeAheadPopUpSuspends<Item>({
   try {
     items = findMatches(queryData.query, queryData.queryAdditionalData);
   } catch (errorOrPromise) {
-    if (isThennable(errorOrPromise)) {
+    if (isPromiseLike(errorOrPromise)) {
       throw errorOrPromise;
     }
     console.error("Failed to find matches for the TypeAheadPopup", errorOrPromise);

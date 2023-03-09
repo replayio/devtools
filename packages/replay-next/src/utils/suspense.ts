@@ -1,4 +1,4 @@
-import { isThennable } from "shared/proxy/utils";
+import { isPromiseLike } from "suspense";
 
 import { Wakeable } from "../suspense/types";
 
@@ -6,11 +6,11 @@ type AnyFunction<ReturnType> = (...args: any[]) => ReturnType;
 
 let MAX_LOOP_COUNT = 1_000;
 
-// A "thennable" is a subset of the Promise API.
-// We could use a Promise as thennable, but Promises have a downside: they use the microtask queue.
-// An advantage to creating a custom thennable is synchronous resolution (or rejection).
+// A "thenable" is a subset of the Promise API.
+// We could use a Promise as thenable, but Promises have a downside: they use the microtask queue.
+// An advantage to creating a custom thenable is synchronous resolution (or rejection).
 //
-// A "wakeable" is a "thennable" that has convenience resolve/reject methods.
+// A "wakeable" is a "thenable" that has convenience resolve/reject methods.
 export function createWakeable<T>(debugLabel: string): Wakeable<T> {
   const resolveCallbacks: Set<(value: T) => void> = new Set();
   const rejectCallbacks: Set<(error: Error) => void> = new Set();
@@ -31,6 +31,7 @@ export function createWakeable<T>(debugLabel: string): Wakeable<T> {
   };
 
   const wakeable: Wakeable<T> = {
+    // @ts-ignore Temporary; this type will be replaced soon
     then(resolveCallback: (value: T) => void, rejectCallback: (error: Error) => void) {
       switch (status) {
         case "unresolved":
@@ -115,7 +116,7 @@ export function createFetchAsyncFromFetchSuspense<TParams extends Array<any>, TV
       try {
         return await suspenseCache(...params);
       } catch (errorOrPromise) {
-        if (isThennable(errorOrPromise)) {
+        if (isPromiseLike(errorOrPromise)) {
           await errorOrPromise;
         } else {
           throw errorOrPromise;
@@ -135,9 +136,9 @@ export function createInfallibleSuspenseCache<TParams extends Array<any>, TValue
   return function createInfallibleSuspenseCache(...params) {
     try {
       return suspenseCache(...params);
-    } catch (errorOrThennable) {
-      if (isThennable(errorOrThennable)) {
-        throw errorOrThennable;
+    } catch (errorOrThenable) {
+      if (isPromiseLike(errorOrThenable)) {
+        throw errorOrThenable;
       } else {
         return undefined;
       }
