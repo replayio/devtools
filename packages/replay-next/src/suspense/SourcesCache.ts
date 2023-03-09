@@ -8,10 +8,14 @@ import {
 } from "@replayio/protocol";
 import {
   Deferred,
-  STATUS_PENDING,
-  STATUS_REJECTED,
-  STATUS_RESOLVED,
+  Record,
   createDeferred,
+  createPendingRecord,
+  isPendingRecord,
+  isRejectedRecord,
+  isResolvedRecord,
+  updateRecordToRejected,
+  updateRecordToResolved,
 } from "suspense";
 
 import {
@@ -24,7 +28,6 @@ import { isPointRange, toPointRange } from "shared/utils/time";
 
 import { createFetchAsyncFromFetchSuspense } from "../utils/suspense";
 import { createGenericCache, createUseGetValue } from "./createGenericCache";
-import { Record } from "./types";
 
 export type ProtocolSourceContents = {
   contents: string;
@@ -140,7 +143,7 @@ export function getCachedSourceContents(
   sourceId: ProtocolSourceId
 ): StreamingSourceContents | null {
   const record = sourceIdToStreamingSourceContentsMap.get(sourceId);
-  return record?.status === STATUS_RESOLVED ? record.value : null;
+  return record && isResolvedRecord(record) ? record.data.value ?? null : null;
 }
 
 export const getStreamingSourceContentsAsync = createFetchAsyncFromFetchSuspense(
@@ -153,25 +156,24 @@ export function getStreamingSourceContentsSuspense(
 ): StreamingSourceContents {
   let record = sourceIdToStreamingSourceContentsMap.get(sourceId);
   if (record == null) {
-    record = {
-      status: STATUS_PENDING,
-      value: createDeferred<StreamingSourceContents>(
-        `getStreamingSourceContentsSuspense sourceId: ${sourceId}`
-      ),
-    };
+    const deferred = createDeferred<StreamingSourceContents>(
+      `getStreamingSourceContentsSuspense sourceId: ${sourceId}`
+    );
+
+    record = createPendingRecord<StreamingSourceContents>(deferred);
 
     sourceIdToStreamingSourceContentsMap.set(sourceId, record);
 
     // Suspense caches fire and forget; errors will be handled within the fetch function.
-    fetchStreamingSourceContents(client, sourceId, record, record.value);
+    fetchStreamingSourceContents(client, sourceId, record, deferred);
   }
 
-  if (record!.status === STATUS_RESOLVED) {
-    return record!.value;
-  } else if (record!.status === STATUS_PENDING) {
-    throw record!.value.promise;
+  if (isPendingRecord(record)) {
+    throw record.data.deferred.promise;
+  } else if (isRejectedRecord(record)) {
+    throw record.data.error;
   } else {
-    throw record!.value;
+    return record.data.value as StreamingSourceContents;
   }
 }
 
@@ -241,23 +243,22 @@ export function getSourceHitCountsSuspense(
 
   let record = hitCountRecordsMap.get(key);
   if (record == null) {
-    record = {
-      status: STATUS_PENDING,
-      value: createDeferred<LineNumberToHitCountMap>(`getSourceHitCountsSuspense ${key}`),
-    };
+    const deferred = createDeferred<LineNumberToHitCountMap>(`getSourceHitCountsSuspense ${key}`);
+
+    record = createPendingRecord<LineNumberToHitCountMap>(deferred);
 
     hitCountRecordsMap.set(key, record);
 
     // Suspense caches fire and forget; errors will be handled within the fetch function.
-    fetchSourceHitCounts(client, sourceId, locationRange, pointRange, record, record.value);
+    fetchSourceHitCounts(client, sourceId, locationRange, pointRange, record, deferred);
   }
 
-  if (record!.status === STATUS_RESOLVED) {
-    return record!.value;
-  } else if (record!.status === STATUS_PENDING) {
-    throw record!.value.promise;
+  if (isPendingRecord(record)) {
+    throw record.data.deferred.promise;
+  } else if (isRejectedRecord(record)) {
+    throw record.data.error;
   } else {
-    throw record!.value;
+    return record.data.value as LineNumberToHitCountMap;
   }
 }
 
@@ -273,12 +274,11 @@ export function getSourceHitCountsIfCached(
 ) {
   const cacheKey = getSourceHitCountsCacheKey(client, sourceId, locationRange, focusRange);
   const record = hitCountRecordsMap.get(cacheKey);
-  switch (record?.status) {
-    case STATUS_RESOLVED: {
-      return { value: record.value };
-    }
-    case STATUS_REJECTED: {
-      throw record.value;
+  if (record) {
+    if (isResolvedRecord(record)) {
+      return { value: record.data.value as LineNumberToHitCountMap };
+    } else if (isRejectedRecord(record)) {
+      throw record.data.error;
     }
   }
 }
@@ -406,13 +406,11 @@ async function fetchStreamingSourceContents(
         notifyResolver(streamingSourceContents);
       });
 
-    record.status = STATUS_RESOLVED;
-    record.value = streamingSourceContents;
+    updateRecordToRejected(record, streamingSourceContents);
 
-    deferred.resolve(record.value);
+    deferred.resolve(streamingSourceContents);
   } catch (error) {
-    record.status = STATUS_REJECTED;
-    record.value = error;
+    updateRecordToRejected(record, error);
 
     deferred.reject(error);
   }
@@ -542,20 +540,17 @@ async function fetchSourceHitCounts(
       mergedHitCounts.set(lineNumber, map.get(lineNumber)!);
     }
 
-    record.status = STATUS_RESOLVED;
-    record.value = mergedHitCounts;
+    updateRecordToResolved(record, mergedHitCounts);
 
-    deferred.resolve(record.value);
+    deferred.resolve(mergedHitCounts);
   } catch (error) {
     if (
       isCommandError(error, ProtocolError.TooManyLocationsToPerformAnalysis) ||
       isCommandError(error, ProtocolError.LinkerDoesNotSupportAction)
     ) {
-      record.status = STATUS_RESOLVED;
-      record.value = new Map();
+      deferred.resolve(new Map());
     } else {
-      record.status = STATUS_REJECTED;
-      record.value = error;
+      updateRecordToRejected(record, error);
 
       deferred.reject(error);
     }

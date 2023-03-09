@@ -3,10 +3,11 @@ import {
   STATUS_PENDING,
   STATUS_REJECTED,
   STATUS_RESOLVED,
+  StatusPending,
+  StatusRejected,
+  StatusResolved,
   createDeferred,
 } from "suspense";
-
-import { StatusPending, StatusRejected, StatusResolved } from "replay-next/src/suspense/types";
 
 import {
   __setCircularThenableCheckMaxCount,

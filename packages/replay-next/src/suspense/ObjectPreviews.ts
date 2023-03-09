@@ -1,16 +1,21 @@
 import { Object, ObjectId, PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import {
   Deferred,
-  STATUS_PENDING,
-  STATUS_REJECTED,
-  STATUS_RESOLVED,
+  Record,
+  ResolvedRecord,
   createDeferred,
+  createPendingRecord,
+  createResolvedRecord,
+  isPendingRecord,
+  isRejectedRecord,
+  isResolvedRecord,
+  updateRecordToRejected,
+  updateRecordToResolved,
 } from "suspense";
 
 import { ReplayClientInterface } from "../../../shared/client/types";
 import { createFetchAsyncFromFetchSuspense } from "../utils/suspense";
 import { cachePauseData } from "./PauseCache";
-import { Record } from "./types";
 
 type ObjectMap = Map<ObjectId, Object>;
 type RecordMap = Map<ObjectId, Record<Object>>;
@@ -74,13 +79,13 @@ export function getCachedObject(pauseId: PauseId, objectId: ObjectId): Object | 
   }
 
   let record = maps.fullPreviewRecordMap.get(objectId);
-  if (record?.status === STATUS_RESOLVED) {
-    return record.value;
+  if (record && isResolvedRecord(record)) {
+    return record.data.value ?? null;
   }
 
   record = maps.previewRecordMap.get(objectId);
-  if (record?.status === STATUS_RESOLVED) {
-    return record.value;
+  if (record && isResolvedRecord(record)) {
+    return record.data.value ?? null;
   }
 
   const object = maps.objectMap.get(objectId);
@@ -101,8 +106,13 @@ export function getCachedObjectProperty(
   }
 
   const key = `${objectId}:${propertyName}`;
-  const value = maps.objectPropertyMap.get(key);
-  return value || null;
+  const record = maps.objectPropertyMap.get(key);
+
+  if (record && isResolvedRecord(record)) {
+    return record.data.value ?? null;
+  } else {
+    return null;
+  }
 }
 
 // Does not suspend.
@@ -134,22 +144,19 @@ export function getObjectWithPreviewSuspense(
       `getObjectWithPreviewSuspense objectId: ${objectId} and pauseId: ${pauseId}`
     );
 
-    record = {
-      status: STATUS_PENDING,
-      value: deferred,
-    };
+    record = createPendingRecord<Object>(deferred);
 
     recordMap.set(objectId, record);
 
     fetchObjectWithPreview(client, pauseId, objectId, record, deferred, noOverflow);
   }
 
-  if (record!.status === STATUS_RESOLVED) {
-    return record!.value;
-  } else if (record!.status === STATUS_PENDING) {
-    throw record!.value.promise;
+  if (isPendingRecord(record)) {
+    throw record.data.deferred.promise;
+  } else if (isRejectedRecord(record)) {
+    throw record.data.error;
   } else {
-    throw record!.value;
+    return record.data.value as Object;
   }
 }
 
@@ -176,20 +183,19 @@ export function getObjectPropertySuspense(
       `getObjectProperty objectId: ${objectId} and pauseId: ${pauseId} and propertyName: ${propertyName}`
     );
 
-    record = {
-      status: STATUS_PENDING,
-      value: deferred,
-    };
+    record = createPendingRecord<ProtocolValue>(deferred);
 
     recordMap.set(key, record);
 
     fetchObjectProperty(client, pauseId, objectId, record, deferred, propertyName);
   }
 
-  if (record!.status === STATUS_RESOLVED) {
-    return record!.value;
+  if (isPendingRecord(record)) {
+    throw record.data.deferred.promise;
+  } else if (isRejectedRecord(record)) {
+    throw record.data.error;
   } else {
-    throw record!.value;
+    return record.data.value as ProtocolValue;
   }
 }
 
@@ -216,27 +222,17 @@ export function preCacheObject(pauseId: PauseId, object: Object): void {
   if (object.preview != null) {
     const record = previewRecordMap.get(objectId);
     if (record == null) {
-      previewRecordMap.set(objectId, {
-        status: STATUS_RESOLVED,
-        value: object,
-      });
-    } else if (record.status !== STATUS_RESOLVED) {
-      // @ts-ignore
-      record.status = STATUS_RESOLVED;
-      record.value = object;
+      previewRecordMap.set(objectId, createResolvedRecord(object));
+    } else if (!isResolvedRecord(record)) {
+      updateRecordToResolved(record, object);
     }
 
     if (!object.preview.overflow) {
       const record = fullPreviewRecordMap.get(objectId);
       if (record == null) {
-        fullPreviewRecordMap.set(objectId, {
-          status: STATUS_RESOLVED,
-          value: object,
-        });
-      } else if (record.status !== STATUS_RESOLVED) {
-        // @ts-ignore
-        record.status = STATUS_RESOLVED;
-        record.value = object;
+        fullPreviewRecordMap.set(objectId, createResolvedRecord(object));
+      } else if (!isResolvedRecord(record)) {
+        updateRecordToResolved(record, object);
       }
     }
   }
@@ -255,13 +251,11 @@ async function fetchObjectProperty(
 
     cachePauseData(client, pauseId, data);
 
-    record.status = STATUS_RESOLVED;
-    record.value = returned;
+    updateRecordToResolved(record, returned);
 
-    deferred.resolve(record.value);
+    deferred.resolve(returned);
   } catch (error) {
-    record.status = STATUS_REJECTED;
-    record.value = error;
+    updateRecordToRejected(record, error);
 
     deferred.reject(error);
   }
@@ -285,10 +279,9 @@ async function fetchObjectWithPreview(
     cachePauseData(client, pauseId, data);
 
     // The cachePauseData() will have updated the Record's status and value already.
-    deferred.resolve(record.value);
+    deferred.resolve((record as ResolvedRecord<Object>).data.value);
   } catch (error) {
-    record.status = STATUS_REJECTED;
-    record.value = error;
+    updateRecordToRejected(record, error);
 
     deferred.reject(error);
   }

@@ -1,29 +1,28 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Deferred,
-  STATUS_PENDING,
-  STATUS_REJECTED,
-  STATUS_RESOLVED,
+  Record,
+  Status,
   createDeferred,
+  createPendingRecord,
+  createResolvedRecord,
+  isPendingRecord,
   isPromiseLike,
+  isRejectedRecord,
+  isResolvedRecord,
+  updateRecordToRejected,
+  updateRecordToResolved,
 } from "suspense";
 
 import { handleError } from "protocol/utils";
 
-import { Record } from "./types";
-
-export type CacheRecordStatus =
-  | typeof STATUS_PENDING
-  | typeof STATUS_RESOLVED
-  | typeof STATUS_REJECTED;
-
-export type SubscribeCallback = (status: CacheRecordStatus | undefined) => void;
+export type SubscribeCallback = (status: Status | undefined) => void;
 export type UnsubscribeFromCacheStatusFunction = () => void;
 
 export interface GenericCache<TExtraParams extends Array<any>, TParams extends Array<any>, TValue> {
   addValue(value: TValue, ...args: TParams): void;
   getCacheKey(...args: TParams): string;
-  getStatus(...args: TParams): CacheRecordStatus | undefined;
+  getStatus(...args: TParams): Status | undefined;
   getValueAsync(...args: [...TParams, ...TExtraParams]): PromiseLike<TValue> | TValue;
   getValueIfCached(...args: TParams): { value: TValue } | undefined;
   getValueSuspense(...args: [...TParams, ...TExtraParams]): TValue;
@@ -52,16 +51,13 @@ export function createGenericCache<
     let record = recordMap.get(cacheKey);
     if (!record) {
       const deferred = createDeferred<TValue>(`${debugLabel} ${cacheKey}}`);
-      record = {
-        status: STATUS_PENDING,
-        value: deferred,
-      } as Record<TValue>;
+      record = createPendingRecord<TValue>(deferred);
 
       recordMap.set(cacheKey, record);
 
       notifySubscribers(...(args as unknown as TParams));
 
-      fetchAndStoreValue(record, record.value, ...args).catch(handleError);
+      fetchAndStoreValue(record, deferred, ...args).catch(handleError);
     }
 
     return record;
@@ -110,13 +106,11 @@ export function createGenericCache<
         ? await valueOrPromiseLike
         : valueOrPromiseLike;
 
-      record.status = STATUS_RESOLVED;
-      record.value = value;
+      updateRecordToResolved(record, value);
 
       deferred.resolve(value);
     } catch (error) {
-      record.status = STATUS_REJECTED;
-      record.value = error;
+      updateRecordToRejected(record, error);
 
       deferred.reject(error);
     } finally {
@@ -126,52 +120,47 @@ export function createGenericCache<
 
   function getStatus(...args: TParams) {
     const cacheKey = getCacheKey(...args);
-    return recordMap.get(cacheKey)?.status;
+    return recordMap.get(cacheKey)?.data.status;
   }
 
   return {
     getValueSuspense(...args: [...TParams, ...TExtraParams]): TValue {
       const record = getOrCreateRecord(...args);
-      if (record.status === STATUS_RESOLVED) {
-        return record.value;
-      } else if (record.status === STATUS_PENDING) {
-        throw record.value.promise;
-      } else {
-        throw record.value;
+      if (isPendingRecord(record)) {
+        throw record.data.deferred.promise;
+      } else if (isRejectedRecord(record)) {
+        throw record.data.error;
       }
+
+      return record.data.value as TValue;
     },
 
     getValueAsync(...args: [...TParams, ...TExtraParams]): PromiseLike<TValue> | TValue {
       const record = getOrCreateRecord(...args);
-      switch (record.status) {
-        case STATUS_PENDING: {
-          return record.value.promise;
-        }
-        case STATUS_RESOLVED: {
-          return record.value;
-        }
-        case STATUS_REJECTED: {
-          throw record.value;
-        }
+      if (isPendingRecord(record)) {
+        return record.data.deferred.promise;
+      } else if (isRejectedRecord(record)) {
+        throw record.data.error;
       }
+
+      return record.data.value as TValue;
     },
 
     getValueIfCached(...args: TParams): { value: TValue } | undefined {
       const cacheKey = getCacheKey(...args);
       const record = recordMap.get(cacheKey);
-      switch (record?.status) {
-        case STATUS_RESOLVED: {
-          return { value: record.value };
-        }
-        case STATUS_REJECTED: {
-          throw record.value;
+      if (record) {
+        if (isResolvedRecord(record)) {
+          return { value: record.data.value as TValue };
+        } else if (isRejectedRecord(record)) {
+          throw record.data.error;
         }
       }
     },
 
     addValue(value: TValue, ...args: TParams) {
       const cacheKey = getCacheKey(...args);
-      recordMap.set(cacheKey, { status: STATUS_RESOLVED, value });
+      recordMap.set(cacheKey, createResolvedRecord(value));
     },
 
     getStatus,
