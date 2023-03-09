@@ -9,7 +9,7 @@ import {
 
 import { getPauseAndFrameIdSuspends } from "replay-next/components/sources/utils/getPauseAndFrameId";
 import { getFrameSuspense } from "replay-next/src/suspense/FrameCache";
-import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { evaluateSuspense } from "replay-next/src/suspense/PauseCache";
 import { getFrameScopesSuspense } from "replay-next/src/suspense/ScopeCache";
 import { ReplayClientInterface } from "shared/client/types";
@@ -113,7 +113,7 @@ function fetchQueryData(
       const maybeObjectId = evaluateSuspense(pauseId, frameId, queryScope, undefined, replayClient)
         ?.returned?.object;
       if (maybeObjectId) {
-        const { preview } = getObjectWithPreviewSuspense(
+        const { preview } = objectCache.read(
           replayClient,
           pauseId,
           maybeObjectId,
@@ -131,7 +131,7 @@ function fetchQueryData(
         let currentPrototypeId = preview?.prototypeId;
         let depth = 0;
         while (currentPrototypeId && depth < MAX_PROTOTYPE_DEPTH) {
-          const { preview: prototypePreview } = getObjectWithPreviewSuspense(
+          const { preview: prototypePreview } = objectCache.read(
             replayClient,
             pauseId,
             currentPrototypeId,
@@ -175,7 +175,7 @@ function fetchQueryData(
       if (generatedScopes && generatedScopes.length > 0) {
         const globalScope = generatedScopes.find(scope => scope.type === "global");
         if (globalScope?.object) {
-          const { preview } = getObjectWithPreviewSuspense(
+          const { preview } = objectCache.read(
             replayClient,
             pauseId,
             globalScope.object,

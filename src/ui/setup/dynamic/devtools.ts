@@ -34,12 +34,7 @@ import { assert } from "protocol/utils";
 import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { POINTS_DATABASE } from "replay-next/src/contexts/points/constants";
 import { IDBOptions } from "replay-next/src/hooks/useIndexedDB";
-import {
-  getCachedObject,
-  getObjectPropertyHelper,
-  getObjectThrows,
-  getObjectWithPreviewHelper,
-} from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 import { UIStore, actions } from "ui/actions";
 import { setCanvas } from "ui/actions/app";
@@ -179,12 +174,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     ThreadFront,
     replayClient,
     protocolClient,
-    objectCache: {
-      getCachedObject,
-      getObjectThrows,
-      getObjectWithPreviewHelper,
-      getObjectPropertyHelper,
-    },
+    objectCache,
   };
 
   // Add all these new slice reducers and some related state in a single call,

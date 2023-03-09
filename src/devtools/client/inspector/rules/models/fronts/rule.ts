@@ -1,7 +1,7 @@
 import { Object as ProtocolObject, Rule } from "@replayio/protocol";
 
 import { assert } from "protocol/utils";
-import { getCachedObject } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 
 import { StyleFront } from "./style";
 import { StyleSheetFront } from "./styleSheet";
@@ -53,7 +53,10 @@ export class RuleFront {
     if (this._rule.style) {
       if (!this._styleFront) {
         // `ElementStyle` makes sure this data is cached already
-        this._styleFront = new StyleFront(getCachedObject(this.pauseId, this._rule.style!)!);
+        // The getValueIfCached method doesn't use the "client" param
+        this._styleFront = new StyleFront(
+          objectCache.getValueIfCached(null as any, this.pauseId, this._rule.style!)!
+        );
       }
       return this._styleFront;
     }
@@ -64,7 +67,8 @@ export class RuleFront {
     if (this._rule.parentStyleSheet) {
       if (!this._styleSheetFront) {
         this._styleSheetFront = new StyleSheetFront(
-          getCachedObject(this.pauseId, this._rule.parentStyleSheet!)!
+          // The getValueIfCached method doesn't use the "client" param
+          objectCache.getValueIfCached(null as any, this.pauseId, this._rule.parentStyleSheet!)!
         );
       }
       return this._styleSheetFront;

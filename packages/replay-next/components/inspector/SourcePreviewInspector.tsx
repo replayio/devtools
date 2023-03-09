@@ -3,7 +3,7 @@ import { ForwardedRef, Suspense, forwardRef, useContext } from "react";
 
 import Inspector from "replay-next/components/inspector";
 import Loader from "replay-next/components/Loader";
-import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import PropertiesRenderer from "./PropertiesRenderer";
@@ -76,7 +76,7 @@ function ObjectWrapper({
 
   const { name, objectId, type } = clientValue;
 
-  const objectWithPreview = getObjectWithPreviewSuspense(client, pauseId, objectId!);
+  const objectWithPreview = objectCache.read(client, pauseId, objectId!);
   if (objectWithPreview == null) {
     throw Error(`Could not find object with ID "${objectId!}"`);
   }

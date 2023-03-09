@@ -1,10 +1,7 @@
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import { FC, memo, useContext } from "react";
 
-import {
-  getCachedObject,
-  getObjectWithPreviewSuspense,
-} from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useClientValue from "./useClientValue";
@@ -81,9 +78,7 @@ function ValueRenderer({
     // Avoid loading object preview data for inline layouts because this can be expensive.
     // The downside is that value renderers won't be able to display as much information (e.g. "Array" rather than "Array(3)")
     // but this is how the old console works and each value renderer should be able to downgrade like this.
-    const object =
-      getCachedObject(pauseId, clientValue.objectId!) ||
-      getObjectWithPreviewSuspense(client, pauseId, clientValue.objectId!, noOverflow);
+    const object = objectCache.read(client, pauseId, clientValue.objectId!, true, noOverflow);
 
     if (object == null) {
       throw Error(`Could not find object with ID "${clientValue.objectId}"`);

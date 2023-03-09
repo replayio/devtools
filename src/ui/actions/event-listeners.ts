@@ -6,7 +6,7 @@ import { createCache } from "suspense";
 
 import type { ThreadFront as TF } from "protocol/thread";
 import { getTopFrameAsync } from "replay-next/src/suspense/FrameCache";
-import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { getScopeMapAsync } from "replay-next/src/suspense/ScopeMapCache";
 import { ReplayClientInterface } from "shared/client/types";
@@ -152,7 +152,8 @@ export function getNodeEventListeners(
     const formattedListenerEntries = await Promise.all(
       listeners.map(listener => {
         // TODO These entries exist in current testing, but what's fetching them earlier?
-        const listenerHandler = objectCache.getObjectThrows(
+        const listenerHandler = objectCache.getValue(
+          replayClient,
           pauseId!,
           listener.handler
         ) as FunctionWithPreview;
@@ -168,7 +169,7 @@ export function getNodeEventListeners(
     // a real file like `Counter.tsx:27` instead.
 
     // Start by getting "the JS object that represents this DOM node".
-    const domNodeObject = (await objectCache.getObjectWithPreviewHelper(
+    const domNodeObject = (await objectCache.readAsync(
       replayClient,
       pauseId,
       nodeId
@@ -189,7 +190,7 @@ export function getNodeEventListeners(
     if (reactEventListenerProperty) {
       // Assuming we found the magic "props metadata" object name/ID,
       // retrieve the actual object contents.
-      const listenerPropObj = await objectCache.getObjectWithPreviewHelper(
+      const listenerPropObj = await objectCache.readAsync(
         replayClient,
         pauseId,
         reactEventListenerProperty.object!
@@ -205,7 +206,7 @@ export function getNodeEventListeners(
         const allPropertyPreviews = await Promise.all(
           objectProperties.map(async prop => ({
             name: prop.name,
-            value: (await objectCache.getObjectWithPreviewHelper(
+            value: (await objectCache.readAsync(
               replayClient,
               pauseId!,
               prop.object!
@@ -310,14 +311,14 @@ export const eventListenerLocationCache = createCache<
     const sourcesById = getSourceDetailsEntities(state);
 
     if (res.returned?.object) {
-      const preview = await getObjectWithPreviewHelper(replayClient, pauseId, res.returned.object);
+      const preview = await objectCache.readAsync(replayClient, pauseId, res.returned.object);
       // The evaluation may have found a React prop function somewhere.
       const handlerProp = preview?.preview?.properties?.find(p => p.name === "handlerProp");
 
       if (handlerProp) {
         // If it did find a React prop function, get its
         // preview and format it so we know the preferred location.
-        const onClickPreview = (await getObjectWithPreviewHelper(
+        const onClickPreview = (await objectCache.readAsync(
           replayClient,
           pauseId,
           handlerProp.object!
@@ -335,7 +336,7 @@ export const eventListenerLocationCache = createCache<
         sourceLocation = formattedEventListener.location;
       }
     } else if (res.exception?.object) {
-      const error = await getObjectWithPreviewHelper(replayClient, pauseId, res.exception.object);
+      const error = await objectCache.readAsync(replayClient, pauseId, res.exception.object);
       console.error("Error fetching event listener location: ", error);
     }
 

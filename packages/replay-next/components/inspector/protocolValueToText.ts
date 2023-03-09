@@ -5,11 +5,10 @@ import {
   Value as ProtocolValue,
 } from "@replayio/protocol";
 
-import { dateProtocolObjectToString } from "replay-next/components/inspector/values/DateRenderer";
 import { errorProtocolObjectToString } from "replay-next/components/inspector/values/ErrorRenderer";
 import { functionProtocolObjectToString } from "replay-next/components/inspector/values/FunctionRenderer";
 import { regExpProtocolObjectToString } from "replay-next/components/inspector/values/RegExpRenderer";
-import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import {
   filterNonEnumerableProperties,
   protocolValueToClientValue,
@@ -59,7 +58,7 @@ async function protocolValueToTextHelper(
     } else {
       objectIdSet.add(objectId);
 
-      const object = await getObjectWithPreviewHelper(client, pauseId, objectId, true);
+      const object = await objectCache.readAsync(client, pauseId, objectId, true);
       if (object && object.preview) {
         switch (type) {
           case "date": {

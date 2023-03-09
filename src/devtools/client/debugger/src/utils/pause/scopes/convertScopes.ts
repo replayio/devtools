@@ -1,7 +1,7 @@
 import { Frame, NamedValue, ObjectId, PauseId, Scope } from "@replayio/protocol";
 
 import { assert } from "protocol/utils";
-import { getCachedObject } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 
 import { simplifyDisplayName } from "../frames";
 
@@ -68,7 +68,8 @@ function convertScope(
     assert(scope.object, `a scope without bindings must have an object`);
     return {
       type: "object",
-      title: getCachedObject(pauseId, scope.object)?.className,
+      // The "client" param isn't used for reading cached values
+      title: objectCache.getValueIfCached(null as any, pauseId, scope.object)?.className,
       objectId: scope.object,
     };
   }

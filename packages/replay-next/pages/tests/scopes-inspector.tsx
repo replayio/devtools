@@ -4,7 +4,7 @@ import Inspector from "replay-next/components/inspector";
 import ScopesInspector from "replay-next/components/inspector/ScopesInspector";
 import Loader from "replay-next/components/Loader";
 import { getClosestPointForTimeSuspense } from "replay-next/src/suspense/ExecutionPointsCache";
-import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { evaluateSuspense, getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -49,12 +49,7 @@ function Suspender() {
     replayClient
   );
 
-  const globalClientValue = getObjectWithPreviewSuspense(
-    replayClient,
-    pauseId,
-    globalValue?.object!,
-    true
-  );
+  const globalClientValue = objectCache.read(replayClient, pauseId, globalValue?.object!, true);
 
   const fakeScopeProperties = [
     { name: "<this>", object: windowValue!.object },

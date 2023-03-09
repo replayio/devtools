@@ -9,7 +9,7 @@ import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup
 import { ThreadFront } from "protocol/thread";
 import { RecordingTarget } from "protocol/thread/thread";
 import { compareNumericStrings } from "protocol/utils";
-import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { isPointInRegions } from "shared/utils/time";
@@ -246,7 +246,7 @@ class ReplayWall implements Wall {
         text: expr,
       });
       if (response.returned?.object) {
-        const mapObjData = await getObjectWithPreviewHelper(
+        const mapObjData = await objectCache.readAsync(
           this.replayClient,
           this.pauseId!,
           response.returned.object
@@ -311,7 +311,7 @@ class ReplayWall implements Wall {
       });
 
       if (res?.returned?.object) {
-        const componentFunctionPreview = await getObjectWithPreviewHelper(
+        const componentFunctionPreview = await objectCache.readAsync(
           this.replayClient,
           this.pauseId!,
           res.returned.object

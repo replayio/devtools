@@ -7,7 +7,7 @@ import { ProtocolClient } from "@replayio/protocol";
 import RuleModel, { NodeWithId } from "devtools/client/inspector/rules/models/rule";
 import Services from "devtools/shared/services";
 import { assert } from "protocol/utils";
-import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 import { appliedStyleRulesCache } from "ui/suspense/styleCaches";
 
@@ -80,11 +80,7 @@ export default class ElementStyle {
   async populate() {
     this.rules = [];
 
-    const nodeObject = await getObjectWithPreviewHelper(
-      this.replayClient,
-      this.pauseId,
-      this.nodeId
-    );
+    const nodeObject = await objectCache.readAsync(this.replayClient, this.pauseId, this.nodeId);
     const node = nodeObject?.preview?.node;
 
     if (!node) {
@@ -108,7 +104,7 @@ export default class ElementStyle {
 
     // The inline rule has higher priority than applied rules.
     if (node.style) {
-      const inlineStyleObject = await getObjectWithPreviewHelper(
+      const inlineStyleObject = await objectCache.readAsync(
         this.replayClient,
         this.pauseId,
         node.style
@@ -128,11 +124,7 @@ export default class ElementStyle {
 
     // Show relevant rules applied to parent elements.
     while (parentNodeId) {
-      const nodeObject = await getObjectWithPreviewHelper(
-        this.replayClient,
-        this.pauseId,
-        parentNodeId
-      );
+      const nodeObject = await objectCache.readAsync(this.replayClient, this.pauseId, parentNodeId);
       const elem = nodeObject.preview?.node;
       if (!elem) {
         break;
@@ -141,7 +133,7 @@ export default class ElementStyle {
 
       if (elem.nodeType == Node.ELEMENT_NODE) {
         if (elem.style) {
-          const styleObject = await getObjectWithPreviewHelper(
+          const styleObject = await objectCache.readAsync(
             this.replayClient,
             this.pauseId,
             elem.style!

@@ -5,7 +5,7 @@ import {
 } from "@replayio/protocol";
 import { useContext } from "react";
 
-import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import KeyValueRenderer from "./KeyValueRenderer";
@@ -59,7 +59,7 @@ function HTMLChildRenderer({
   const client = useContext(ReplayClientContext);
 
   // Filter out empty text nodes to avoid displaying a bunch of white space entries.
-  const object = getObjectWithPreviewSuspense(client, pauseId, objectId);
+  const object = objectCache.read(client, pauseId, objectId);
   if (isEmptyTextNode(object)) {
     return null;
   }

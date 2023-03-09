@@ -7,7 +7,7 @@ import {
   InspectorContext,
 } from "replay-next/src/contexts/InspectorContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import {
   Value as ClientValue,
   filterNonEnumerableProperties,
@@ -64,7 +64,7 @@ export default function HTMLElementRenderer({
   const childNodes = object.preview?.node?.childNodes ?? [];
   let inlineText: string | null = null;
   if (childNodes.length === 1) {
-    const childNode = getObjectWithPreviewSuspense(client, pauseId, childNodes[0]);
+    const childNode = objectCache.read(client, pauseId, childNodes[0]);
     if (childNode.className === "Text") {
       inlineText = childNode.preview?.node?.nodeValue || null;
     }

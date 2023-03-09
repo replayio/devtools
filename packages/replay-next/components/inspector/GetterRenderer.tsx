@@ -17,10 +17,7 @@ import {
 import Expandable from "replay-next/components/Expandable";
 import Icon from "replay-next/components/Icon";
 import Loader from "replay-next/components/Loader";
-import {
-  getObjectPropertySuspense,
-  getObjectWithPreviewSuspense,
-} from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache, objectPropertyCache } from "replay-next/src/suspense/ObjectPreviews";
 import { Value as ClientValue, protocolValueToClientValue } from "replay-next/src/utils/protocol";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -50,7 +47,7 @@ export default function GetterRenderer({
   const [invokeGetter, setInvokeGetter] = useState(false);
 
   const getterValue = invokeGetter
-    ? getObjectPropertySuspense(client, pauseId, parentObjectId, name!)
+    ? objectPropertyCache.read(client, pauseId, parentObjectId, name!)
     : null;
 
   const getterClientValueRef = useRef<ClientValue>(null);
@@ -71,11 +68,7 @@ export default function GetterRenderer({
     case "object":
     case "regexp":
     case "set": {
-      getterValueWithPreview = getObjectWithPreviewSuspense(
-        client,
-        pauseId,
-        getterClientValue.objectId!
-      );
+      getterValueWithPreview = objectCache.read(client, pauseId, getterClientValue.objectId!);
       if (getterValueWithPreview == null) {
         throw Error(`Could not find object with ID "${getterClientValue.objectId}"`);
       }
