@@ -8,11 +8,11 @@ import {
   Object as ProtocolObject,
   Scope,
 } from "@replayio/protocol";
+import { createDeferred } from "suspense";
 
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/analysisManager";
 import { ReplayClientInterface } from "shared/client/types";
 
-import { createWakeable } from "../utils/suspense";
 import { createGenericRangeCache } from "./createGenericRangeCache";
 import { cachePauseData } from "./PauseCache";
 import { getBreakpointPositionsAsync } from "./SourcesCache";
@@ -139,10 +139,10 @@ function createCache<T extends { point: ExecutionPoint }>(
   function getOrCreateRecord(point: ExecutionPoint) {
     let record = results.get(point);
     if (!record) {
-      const wakeable = createWakeable<RemoteAnalysisResult>("AnalysisCache.getResultSuspense");
+      const deferred = createDeferred<RemoteAnalysisResult>("AnalysisCache.getResultSuspense");
       record = {
         status: STATUS_PENDING,
-        value: wakeable,
+        value: deferred,
       };
       results.set(point, record);
     }
@@ -153,6 +153,8 @@ function createCache<T extends { point: ExecutionPoint }>(
     const record = getOrCreateRecord(point);
     if (record.status === STATUS_RESOLVED) {
       return record.value;
+    } else if (record.status === STATUS_PENDING) {
+      throw record.value.promise;
     } else {
       throw record.value;
     }
@@ -160,8 +162,10 @@ function createCache<T extends { point: ExecutionPoint }>(
 
   function getResultAsync(point: ExecutionPoint) {
     const record = getOrCreateRecord(point);
-    if (record.status !== STATUS_REJECTED) {
+    if (record.status === STATUS_RESOLVED) {
       return record.value;
+    } else if (record.status === STATUS_PENDING) {
+      throw record.value.promise;
     } else {
       throw record.value;
     }

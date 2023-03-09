@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { isPromiseLike } from "suspense";
+import { Deferred, createDeferred, isPromiseLike } from "suspense";
 
 import { handleError } from "protocol/utils";
 
-import { createWakeable } from "../utils/suspense";
-import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
+import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED } from "./types";
 
 export { STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED } from "./types";
 
@@ -47,10 +46,10 @@ export function createGenericCache<
 
     let record = recordMap.get(cacheKey);
     if (!record) {
-      const wakeable = createWakeable<TValue>(`${debugLabel} ${cacheKey}}`);
+      const deferred = createDeferred<TValue>(`${debugLabel} ${cacheKey}}`);
       record = {
         status: STATUS_PENDING,
-        value: wakeable,
+        value: deferred,
       } as Record<TValue>;
 
       recordMap.set(cacheKey, record);
@@ -97,7 +96,7 @@ export function createGenericCache<
 
   async function fetchAndStoreValue(
     record: Record<TValue>,
-    wakeable: Wakeable<TValue>,
+    deferred: Deferred<TValue>,
     ...args: [...TParams, ...TExtraParams]
   ) {
     try {
@@ -109,12 +108,12 @@ export function createGenericCache<
       record.status = STATUS_RESOLVED;
       record.value = value;
 
-      wakeable.resolve(value);
+      deferred.resolve(value);
     } catch (error) {
       record.status = STATUS_REJECTED;
       record.value = error;
 
-      wakeable.reject(error);
+      deferred.reject(error);
     } finally {
       notifySubscribers(...(args as unknown as TParams));
     }
@@ -130,6 +129,8 @@ export function createGenericCache<
       const record = getOrCreateRecord(...args);
       if (record.status === STATUS_RESOLVED) {
         return record.value;
+      } else if (record.status === STATUS_PENDING) {
+        throw record.value.promise;
       } else {
         throw record.value;
       }
@@ -138,7 +139,9 @@ export function createGenericCache<
     getValueAsync(...args: [...TParams, ...TExtraParams]): PromiseLike<TValue> | TValue {
       const record = getOrCreateRecord(...args);
       switch (record.status) {
-        case STATUS_PENDING:
+        case STATUS_PENDING: {
+          return record.value.promise;
+        }
         case STATUS_RESOLVED: {
           return record.value;
         }

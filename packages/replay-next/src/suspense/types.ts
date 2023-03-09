@@ -1,3 +1,5 @@
+import { Deferred } from "suspense";
+
 export const STATUS_PENDING = "pending";
 export const STATUS_RESOLVED = "resolved";
 export const STATUS_REJECTED = "rejected";
@@ -8,7 +10,7 @@ export type StatusRejected = typeof STATUS_REJECTED;
 
 export type PendingRecord<T> = {
   status: StatusPending;
-  value: Wakeable<T>;
+  value: Deferred<T>;
 };
 
 export type ResolvedRecord<T> = {
@@ -22,10 +24,3 @@ export type RejectedRecord = {
 };
 
 export type Record<T> = PendingRecord<T> | ResolvedRecord<T> | RejectedRecord;
-
-// Convenience type used by Suspense caches.
-// Adds the ability to resolve or reject a pending Thenable.
-export interface Wakeable<T> extends PromiseLike<T> {
-  reject(error: any): void;
-  resolve(value: T): void;
-}

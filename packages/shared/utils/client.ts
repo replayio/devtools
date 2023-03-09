@@ -1,13 +1,12 @@
 import { TimeStampedPoint } from "@replayio/protocol";
 import { useContext, useLayoutEffect, useMemo } from "react";
+import { Deferred, createDeferred } from "suspense";
 
 import { ThreadFront } from "protocol/thread";
 import {
   addCachedPointsForTimeListener,
   preCacheExecutionPointForTime,
 } from "replay-next/src/suspense/ExecutionPointsCache";
-import { Wakeable } from "replay-next/src/suspense/types";
-import { createWakeable } from "replay-next/src/utils/suspense";
 import createReplayClientPlayer from "shared/client/createReplayClientPlayer";
 import createReplayClientRecorder from "shared/client/createReplayClientRecorder";
 import { decode } from "shared/client/encoder";
@@ -47,29 +46,29 @@ export function createReplayClientForProduction(): ReplayClientInterface {
 
 let caughtError: Error | null = null;
 let encoded: string | null = null;
-let wakeable: Wakeable<string> | null = null;
+let deferred: Deferred<string> | null = null;
 function getEncodedSuspense(host: string, fixtureDataPath: string): string {
   if (encoded === null) {
     if (caughtError !== null) {
       throw caughtError;
-    } else if (wakeable === null) {
-      wakeable = createWakeable<string>(`getEncodedSuspense`);
+    } else if (deferred === null) {
+      deferred = createDeferred<string>(`getEncodedSuspense`);
       fetch(`http://${host}:3000/api/data?fixtureDataPath=${fixtureDataPath}`)
         .then(async response => {
           encoded = await response.text();
 
-          wakeable!.resolve(encoded);
-          wakeable = null;
+          deferred!.resolve(encoded);
+          deferred = null;
         })
         .catch(error => {
           caughtError = error;
 
-          wakeable!.reject(error);
-          wakeable = null;
+          deferred!.reject(error);
+          deferred = null;
         });
     }
 
-    throw wakeable;
+    throw deferred.promise;
   }
 
   return encoded;

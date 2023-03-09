@@ -6,6 +6,7 @@ import {
   newSource as ProtocolSource,
   SourceId as ProtocolSourceId,
 } from "@replayio/protocol";
+import { Deferred, createDeferred } from "suspense";
 
 import {
   LineNumberToHitCountMap,
@@ -15,9 +16,9 @@ import {
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import { isPointRange, toPointRange } from "shared/utils/time";
 
-import { createFetchAsyncFromFetchSuspense, createWakeable } from "../utils/suspense";
+import { createFetchAsyncFromFetchSuspense } from "../utils/suspense";
 import { createGenericCache, createUseGetValue } from "./createGenericCache";
-import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
+import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED } from "./types";
 
 export type ProtocolSourceContents = {
   contents: string;
@@ -43,7 +44,7 @@ export type StreamingSourceContents = {
   subscribe(subscriber: StreamSubscriber): UnsubscribeFromStream;
 };
 
-let inProgressSourcesWakeable: Wakeable<ProtocolSource[]> | null = null;
+let inProgressSourcesDeferred: Deferred<ProtocolSource[]> | null = null;
 let sources: ProtocolSource[] | null = null;
 let sourcesByUrl: Map<string, ProtocolSource[]> | null = null;
 
@@ -76,14 +77,14 @@ export function getSourcesSuspense(client: ReplayClientInterface) {
     return sources;
   }
 
-  if (inProgressSourcesWakeable === null) {
-    inProgressSourcesWakeable = createWakeable("getSourcesSuspense");
+  if (inProgressSourcesDeferred === null) {
+    inProgressSourcesDeferred = createDeferred("getSourcesSuspense");
 
     // Suspense caches fire and forget; errors will be handled within the fetch function.
     fetchSources(client);
   }
 
-  throw inProgressSourcesWakeable;
+  throw inProgressSourcesDeferred.promise;
 }
 
 export function getSourcesByUrlSuspense(client: ReplayClientInterface) {
@@ -91,14 +92,14 @@ export function getSourcesByUrlSuspense(client: ReplayClientInterface) {
     return sourcesByUrl;
   }
 
-  if (inProgressSourcesWakeable === null) {
-    inProgressSourcesWakeable = createWakeable("getSourcesSuspense");
+  if (inProgressSourcesDeferred === null) {
+    inProgressSourcesDeferred = createDeferred("getSourcesSuspense");
 
     // Suspense caches fire and forget; errors will be handled within the fetch function.
     fetchSources(client);
   }
 
-  throw inProgressSourcesWakeable.then(() => sourcesByUrl);
+  throw inProgressSourcesDeferred.promise.then(() => sourcesByUrl);
 }
 
 // Wrapper method around getSources Suspense method.
@@ -148,7 +149,7 @@ export function getStreamingSourceContentsSuspense(
   if (record == null) {
     record = {
       status: STATUS_PENDING,
-      value: createWakeable<StreamingSourceContents>(
+      value: createDeferred<StreamingSourceContents>(
         `getStreamingSourceContentsSuspense sourceId: ${sourceId}`
       ),
     };
@@ -161,6 +162,8 @@ export function getStreamingSourceContentsSuspense(
 
   if (record!.status === STATUS_RESOLVED) {
     return record!.value;
+  } else if (record!.status === STATUS_PENDING) {
+    throw record!.value.promise;
   } else {
     throw record!.value;
   }
@@ -234,7 +237,7 @@ export function getSourceHitCountsSuspense(
   if (record == null) {
     record = {
       status: STATUS_PENDING,
-      value: createWakeable<LineNumberToHitCountMap>(`getSourceHitCountsSuspense ${key}`),
+      value: createDeferred<LineNumberToHitCountMap>(`getSourceHitCountsSuspense ${key}`),
     };
 
     hitCountRecordsMap.set(key, record);
@@ -245,6 +248,8 @@ export function getSourceHitCountsSuspense(
 
   if (record!.status === STATUS_RESOLVED) {
     return record!.value;
+  } else if (record!.status === STATUS_PENDING) {
+    throw record!.value.promise;
   } else {
     throw record!.value;
   }
@@ -326,15 +331,15 @@ async function fetchSources(client: ReplayClientInterface) {
   sources = toIndexedSources(protocolSources);
   sourcesByUrl = groupSourcesByUrl(protocolSources);
 
-  inProgressSourcesWakeable!.resolve(sources!);
-  inProgressSourcesWakeable = null;
+  inProgressSourcesDeferred!.resolve(sources!);
+  inProgressSourcesDeferred = null;
 }
 
 async function fetchStreamingSourceContents(
   client: ReplayClientInterface,
   sourceId: ProtocolSourceId,
   record: Record<StreamingSourceContents>,
-  wakeable: Wakeable<StreamingSourceContents>
+  deferred: Deferred<StreamingSourceContents>
 ) {
   try {
     let notifyResolver: (streamingSourceContents: StreamingSourceContents) => void;
@@ -398,12 +403,12 @@ async function fetchStreamingSourceContents(
     record.status = STATUS_RESOLVED;
     record.value = streamingSourceContents;
 
-    wakeable.resolve(record.value);
+    deferred.resolve(record.value);
   } catch (error) {
     record.status = STATUS_REJECTED;
     record.value = error;
 
-    wakeable.reject(error);
+    deferred.reject(error);
   }
 }
 
@@ -413,7 +418,7 @@ async function fetchSourceHitCounts(
   locationRange: SourceLocationRange,
   focusRange: PointRange | null,
   record: Record<LineNumberToHitCountMap>,
-  wakeable: Wakeable<LineNumberToHitCountMap>
+  deferred: Deferred<LineNumberToHitCountMap>
 ) {
   try {
     const [locations] = await getBreakpointPositionsAsync(sourceId, client);
@@ -534,7 +539,7 @@ async function fetchSourceHitCounts(
     record.status = STATUS_RESOLVED;
     record.value = mergedHitCounts;
 
-    wakeable.resolve(record.value);
+    deferred.resolve(record.value);
   } catch (error) {
     if (
       isCommandError(error, ProtocolError.TooManyLocationsToPerformAnalysis) ||
@@ -546,7 +551,7 @@ async function fetchSourceHitCounts(
       record.status = STATUS_REJECTED;
       record.value = error;
 
-      wakeable.reject(error);
+      deferred.reject(error);
     }
   }
 }
