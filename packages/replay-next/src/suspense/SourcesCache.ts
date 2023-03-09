@@ -548,7 +548,11 @@ async function fetchSourceHitCounts(
       isCommandError(error, ProtocolError.TooManyLocationsToPerformAnalysis) ||
       isCommandError(error, ProtocolError.LinkerDoesNotSupportAction)
     ) {
-      deferred.resolve(new Map());
+      const map = new Map();
+
+      updateRecordToResolved(record, map);
+
+      deferred.resolve(map);
     } else {
       updateRecordToRejected(record, error);
 
