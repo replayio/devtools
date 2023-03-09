@@ -1,5 +1,11 @@
-import { Location, SameLineSourceLocations, TimeStampedPointRange } from "@replayio/protocol";
-import { useContext } from "react";
+import {
+  Frame,
+  Location,
+  SameLineSourceLocations,
+  TimeStampedPoint,
+  TimeStampedPointRange,
+} from "@replayio/protocol";
+import { useContext, useState } from "react";
 
 import AccessibleImage from "devtools/client/debugger/src/components/shared/AccessibleImage";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
@@ -14,6 +20,7 @@ import {
   shouldIgnoreEventFromSource,
 } from "ui/actions/event-listeners";
 import {
+  SourceDetails,
   getAllSourceDetails,
   getGeneratedLocation,
   getPreferredLocation,
@@ -31,7 +38,24 @@ const MORE_IGNORABLE_PARTIAL_URLS = IGNORABLE_PARTIAL_SOURCE_URLS.concat(
   "node_modules"
 );
 
-function findQueuedRendersForRange(range: TimeStampedPointRange): UIThunkAction {
+interface FormattedFrame {
+  location: Location | undefined;
+  locationUrl: string | undefined;
+  functionName: string;
+  originalFunctionName: string | undefined;
+  source: SourceDetails | undefined;
+}
+
+interface ReactQueuedRenderDetails {
+  point: TimeStampedPoint;
+  frames: Frame[];
+  formattedFrames: FormattedFrame[];
+  filteredFrames: FormattedFrame[];
+}
+
+function findQueuedRendersForRange(
+  range: TimeStampedPointRange
+): UIThunkAction<Promise<ReactQueuedRenderDetails[] | void>> {
   return async (dispatch, getState, { replayClient }) => {
     const sourcesByUrl = getSourceIdsByUrl(getState());
     const sourcesById = getSourceDetailsEntities(getState());
@@ -83,7 +107,7 @@ function findQueuedRendersForRange(range: TimeStampedPointRange): UIThunkAction 
         const frames = (await getFramesAsync(pauseId, replayClient)) ?? [];
 
         const formattedFrames = await Promise.all(
-          frames.map(async frame => {
+          frames.map(async (frame): Promise<FormattedFrame> => {
             const { functionLocation = [], functionName = "" } = frame;
             let location: Location | undefined = undefined;
             let locationUrl: string | undefined = undefined;
@@ -98,6 +122,7 @@ function findQueuedRendersForRange(range: TimeStampedPointRange): UIThunkAction 
               getGeneratedLocation(sourcesById, functionLocation),
               replayClient
             );
+            console.log("Scope map: ", functionName, scopeMap);
             const originalFunctionName = scopeMap?.find(
               mapping => mapping[0] === functionName
             )?.[1];
@@ -121,6 +146,7 @@ function findQueuedRendersForRange(range: TimeStampedPointRange): UIThunkAction 
         });
 
         return {
+          point: hitPoint,
           frames,
           formattedFrames,
           filteredFrames,
@@ -129,17 +155,40 @@ function findQueuedRendersForRange(range: TimeStampedPointRange): UIThunkAction 
     );
 
     console.log("Queued renders: ", queuedRenders);
+
+    return queuedRenders;
   };
 }
 
 export function ReactPanel() {
   const dispatch = useAppDispatch();
   const { rangeForDisplay: focusRange } = useContext(FocusContext);
+  const [renderDetails, setRenderDetails] = useState<ReactQueuedRenderDetails[]>([]);
 
-  const handleClick = () => {
+  const handleClick = async () => {
     console.log("Focus range: ", focusRange);
-    dispatch(findQueuedRendersForRange(focusRange!));
+    const foundRenders = await dispatch(findQueuedRendersForRange(focusRange!));
+    if (foundRenders?.length) {
+      setRenderDetails(foundRenders);
+    }
   };
+
+  const renderedRenderEntries = renderDetails.map(entry => {
+    const [firstFrame] = entry.filteredFrames;
+
+    if (!firstFrame) {
+      return <li key={entry.point.point}>No function found</li>;
+    }
+
+    return (
+      <li key={entry.point.point}>
+        Function: {firstFrame.functionName}
+        <br />
+        Location: {firstFrame.locationUrl}
+        <br />
+      </li>
+    );
+  });
 
   return (
     <div>
@@ -158,6 +207,10 @@ export function ReactPanel() {
         >
           Find React Renders
         </button>
+      </div>
+      <div>
+        <h3 className="text-lg">Renders In Range</h3>
+        <ul>{renderedRenderEntries}</ul>
       </div>
     </div>
   );
