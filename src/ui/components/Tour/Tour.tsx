@@ -36,7 +36,7 @@ const useNagDismissal = () => {
   return { dismissTourNag };
 };
 
-const Checklist: React.FC = () => {
+const Tour: React.FC = () => {
   const { nags } = hooks.useGetUserInfo();
   const viewMode = useAppSelector(getViewMode);
   const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
@@ -140,7 +140,7 @@ const Checklist: React.FC = () => {
       <div className="absolute bottom-28 w-full">
         {isNewUser && (
           <div className="relative bottom-0">
-            <img src="/images/illustrations/tour2.png" className="z-1 w-full" />
+            <img src="/images/illustrations/larry_wave.png" className="z-1 w-full" />
           </div>
         )}
 
@@ -164,4 +164,4 @@ const Checklist: React.FC = () => {
   );
 };
 
-export default Checklist;
+export default Tour;
