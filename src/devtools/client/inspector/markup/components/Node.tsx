@@ -176,6 +176,7 @@ class _Node extends PureComponent<FinalNodeProps> {
 
     return (
       <li
+        data-testid="Inspector-Nodes-Node"
         className={classnames("child", {
           collapsed: !node.isExpanded,
           "not-displayed": !node.isDisplayed,
