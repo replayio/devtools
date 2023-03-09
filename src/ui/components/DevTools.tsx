@@ -223,11 +223,11 @@ function _DevTools({
   }, [recording]);
 
   if (!loadingFinished) {
-    return <LoadingScreen fallbackMessage="Loading replay..." />;
+    return <LoadingScreen fallbackMessage="Loading..." />;
   }
 
   if (loadedRegions === null) {
-    return <LoadingScreen fallbackMessage="Loading timeline..." />;
+    return <LoadingScreen fallbackMessage="Loading..." />;
   }
 
   return (
