@@ -24,7 +24,7 @@ import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPoints
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { getScopeMapAsync } from "replay-next/src/suspense/ScopeMapCache";
 import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
-import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
+import { compareExecutionPoints, isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { UIThunkAction } from "ui/actions";
 import {
   IGNORABLE_PARTIAL_SOURCE_URLS,
@@ -76,6 +76,11 @@ interface ReactQueuedRenderDetails extends TimeStampedPoint {
   userPauseFrameTime?: TimeStampedPoint;
 }
 
+interface RenderAnalysisResults {
+  queuedRenders: ReactQueuedRenderDetails[];
+  committedRenders: TimeStampedPoint[];
+}
+
 declare let input: AnalysisInput;
 
 export function hitMapper() {
@@ -89,7 +94,7 @@ export function hitMapper() {
 
 function findQueuedRendersForRange(
   range: TimeStampedPointRange
-): UIThunkAction<Promise<ReactQueuedRenderDetails[] | void>> {
+): UIThunkAction<Promise<RenderAnalysisResults | void>> {
   return async (dispatch, getState, { replayClient }) => {
     const sourcesByUrl = getSourceIdsByUrl(getState());
     const sourcesById = getSourceDetailsEntities(getState());
@@ -118,122 +123,96 @@ function findQueuedRendersForRange(
     const shouldUpdateFiberSymbol = symbols?.functions.find(
       f => f.name === "scheduleUpdateOnFiber"
     )!;
+    const onCommitRootSymbol = symbols?.functions.find(f => f.name === "onCommitRoot")!;
+    console.log("onCommitRoot: ", onCommitRootSymbol);
 
     console.log("shouldUpdateFiber: ", shouldUpdateFiberSymbol);
-    const firstBreakablePosition = findFirstBreakablePositionForFunction(
+    const firstScheduleUpdateFiberPosition = findFirstBreakablePositionForFunction(
       { ...shouldUpdateFiberSymbol.location.start, sourceId: preferredSource.id },
       breakablePositionsByLine
     );
-    if (!firstBreakablePosition) {
+    const firstOnCommitRootPosition = findFirstBreakablePositionForFunction(
+      { ...onCommitRootSymbol.location.start, sourceId: preferredSource.id },
+      breakablePositionsByLine
+    );
+    if (!firstScheduleUpdateFiberPosition || !firstOnCommitRootPosition) {
       return;
     }
-    console.log("First breakable position: ", firstBreakablePosition);
 
-    const [hitPoints] = await getHitPointsForLocationAsync(
+    const scheduleFiberUpdatePromise = getHitPointsForLocationAsync(
       replayClient,
-      firstBreakablePosition,
+      firstScheduleUpdateFiberPosition,
       null,
       { begin: range.begin.point, end: range.end.point }
     );
-    console.log("Hit points: ", hitPoints);
 
-    const hitPointsToCheck = hitPoints.slice(0, 200);
-    try {
-      const queuedRenders = await Promise.all(
-        hitPointsToCheck.map(async (hitPoint): Promise<ReactQueuedRenderDetails> => {
-          const pauseId = await getPauseIdAsync(replayClient, hitPoint.point, hitPoint.time);
+    const onCommitFiberHitsPromise = getHitPointsForLocationAsync(
+      replayClient,
+      firstOnCommitRootPosition,
+      null,
+      { begin: range.begin.point, end: range.end.point }
+    );
 
-          // const frames = (await getFramesAsync(pauseId, replayClient)) ?? [];
+    const [[scheduleUpdateHitPoints], [onCommitFiberHitPoints]] = await Promise.all([
+      scheduleFiberUpdatePromise,
+      onCommitFiberHitsPromise,
+    ]);
+    console.log("Hit points: ", scheduleUpdateHitPoints);
 
-          // const formattedFrames = await Promise.all(
-          //   frames.map(async (frame): Promise<FormattedFrame> => {
-          //     const { functionLocation = [], functionName = "" } = frame;
-          //     let location: Location | undefined = undefined;
-          //     let locationUrl: string | undefined = undefined;
-          //     if (functionLocation) {
-          //       location = getPreferredLocation(sourcesState, functionLocation);
+    const scheduleUpdateHitPointsToCheck = scheduleUpdateHitPoints.slice(0, 200);
+    const queuedRendersPromise = Promise.all(
+      scheduleUpdateHitPointsToCheck.map(async (hitPoint): Promise<ReactQueuedRenderDetails> => {
+        const pauseId = await getPauseIdAsync(replayClient, hitPoint.point, hitPoint.time);
 
-          //       locationUrl =
-          //         functionLocation?.length > 0 ? sourcesById[location.sourceId]?.url : undefined;
-          //     }
-
-          //     const scopeMap = await getScopeMapAsync(
-          //       getGeneratedLocation(sourcesById, functionLocation),
-          //       replayClient
-          //     );
-          //     const originalFunctionName = scopeMap?.find(
-          //       mapping => mapping[0] === functionName
-          //     )?.[1];
-          //     return {
-          //       location,
-          //       locationUrl,
-          //       functionName,
-          //       originalFunctionName,
-          //       source: location ? sourcesById[location.sourceId] : undefined,
-          //     };
-          //   })
-          // );
-
-          // const filteredFrames = formattedFrames.filter(entry => {
-          //   if (!entry.locationUrl) {
-          //     return false;
-          //   }
-          //   return !MORE_IGNORABLE_PARTIAL_URLS.some(partialUrl =>
-          //     entry.locationUrl!.includes(partialUrl)
-          //   );
-          // });
-
-          const pauseFrames =
-            (await getPauseFramesAsync(replayClient, pauseId, sourcesState)) ?? [];
-          const filteredPauseFrames = pauseFrames.filter(frame => {
-            const { source } = frame;
-            if (!source) {
-              return false;
-            }
-            return !MORE_IGNORABLE_PARTIAL_URLS.some(partialUrl =>
-              source.url?.includes(partialUrl)
-            );
-          });
-
-          const [userPauseFrame] = filteredPauseFrames.slice(-1);
-
-          let userPauseFrameTime: TimeStampedPoint | undefined = undefined;
-
-          if (userPauseFrame) {
-            const arbitraryStartPoint = hitPoint.time - 50;
-            const pointNearTime = await replayClient.getPointNearTime(arbitraryStartPoint);
-            const { location } = userPauseFrame;
-            const functionHits = await replayClient.runAnalysis<AnalysisInput>({
-              effectful: false,
-              mapper: getFunctionBody(hitMapper),
-              location,
-              range: {
-                begin: pointNearTime.point,
-                end: hitPoint.point,
-              },
-            });
-            [userPauseFrameTime] = functionHits.slice(-1);
+        const pauseFrames = (await getPauseFramesAsync(replayClient, pauseId, sourcesState)) ?? [];
+        const filteredPauseFrames = pauseFrames.filter(frame => {
+          const { source } = frame;
+          if (!source) {
+            return false;
           }
+          return !MORE_IGNORABLE_PARTIAL_URLS.some(partialUrl => source.url?.includes(partialUrl));
+        });
 
-          return {
-            ...hitPoint,
-            // frames,
-            // formattedFrames,
-            // filteredFrames,
-            pauseFrames,
-            filteredPauseFrames,
-            userPauseFrame,
-            userPauseFrameTime,
-          };
-        })
-      );
+        const [userPauseFrame] = filteredPauseFrames.slice(-1);
 
-      console.log("Queued renders: ", queuedRenders);
+        let userPauseFrameTime: TimeStampedPoint | undefined = undefined;
 
-      return queuedRenders;
-    } catch (err) {
-      console.error("Error loading frames: ", err);
-    }
+        if (userPauseFrame) {
+          const arbitraryStartPoint = hitPoint.time - 50;
+          const pointNearTime = await replayClient.getPointNearTime(arbitraryStartPoint);
+          const { location } = userPauseFrame;
+          const functionHits = await replayClient.runAnalysis<AnalysisInput>({
+            effectful: false,
+            mapper: getFunctionBody(hitMapper),
+            location,
+            range: {
+              begin: pointNearTime.point,
+              end: hitPoint.point,
+            },
+          });
+          [userPauseFrameTime] = functionHits.slice(-1);
+        }
+
+        return {
+          ...hitPoint,
+          pauseFrames,
+          filteredPauseFrames,
+          userPauseFrame,
+          userPauseFrameTime,
+        };
+      })
+    );
+
+    const committedRenders = onCommitFiberHitPoints.slice(0, 200);
+
+    const [queuedRenders] = await Promise.all([queuedRendersPromise]);
+
+    console.log("Queued renders: ", queuedRenders);
+
+    return {
+      queuedRenders,
+      committedRenders,
+    };
   };
 }
 
@@ -241,14 +220,22 @@ const Label = ({ children }: { children: ReactNode }) => (
   <div className="overflow-hidden overflow-ellipsis whitespace-pre font-normal">{children}</div>
 );
 
-type EventProps = {
+type CommonProps = {
   currentTime: number;
-  renderDetails: ReactQueuedRenderDetails;
   executionPoint: string;
   onSeek: (point: string, time: number) => void;
 };
 
-function ReactRenderListItem({ currentTime, renderDetails, executionPoint, onSeek }: EventProps) {
+type QueuedRenderProps = CommonProps & {
+  renderDetails: ReactQueuedRenderDetails;
+};
+
+function ReactQueuedRenderListItem({
+  currentTime,
+  renderDetails,
+  executionPoint,
+  onSeek,
+}: QueuedRenderProps) {
   const dispatch = useAppDispatch();
   const { point, time } = renderDetails;
   const isPaused = time === currentTime && executionPoint === point;
@@ -318,7 +305,7 @@ function ReactRenderListItem({ currentTime, renderDetails, executionPoint, onSee
         <div className="flex flex-row items-center space-x-2 overflow-hidden">
           <MaterialIcon iconSize="xl">ads_click</MaterialIcon>
           <Label>
-            {filename}: {userPauseFrame.displayName}
+            {filename}: {userPauseFrame!.displayName}
           </Label>
         </div>
         <div className="flex space-x-2 opacity-0 group-hover:opacity-100">
@@ -341,19 +328,52 @@ function ReactRenderListItem({ currentTime, renderDetails, executionPoint, onSee
   );
 }
 
+type CommittedRenderProps = CommonProps & {
+  commitPoint: TimeStampedPoint;
+};
+
+function ReactCommittedRenderListItem({
+  currentTime,
+  commitPoint,
+  executionPoint,
+  onSeek,
+}: CommittedRenderProps) {
+  const { point, time } = commitPoint;
+  const isPaused = time === currentTime && executionPoint === point;
+
+  const onClickSeek = () => {
+    onSeek(point, time);
+  };
+
+  return (
+    <>
+      <div
+        className={classnames(styles.eventRow, "group block w-full", {
+          "text-lightGrey": currentTime < time,
+          "font-semibold text-primaryAccent": isPaused,
+        })}
+        onClick={onClickSeek}
+      >
+        <div className="flex flex-row items-center space-x-2 overflow-hidden">
+          <MaterialIcon iconSize="xl">check_circle_outline</MaterialIcon>
+          <Label>React Render Committed</Label>
+        </div>
+      </div>
+    </>
+  );
+}
+
 export function ReactPanel() {
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(getCurrentTime);
   const executionPoint = useAppSelector(getExecutionPoint);
   const { rangeForDisplay: focusRange } = useContext(FocusContext);
-  const [renderDetails, setRenderDetails] = useState<ReactQueuedRenderDetails[]>([]);
+  const [renderDetails, setRenderDetails] = useState<RenderAnalysisResults | null>(null);
 
   const handleClick = async () => {
     console.log("Focus range: ", focusRange);
-    const foundRenders = await dispatch(findQueuedRendersForRange(focusRange!));
-    if (foundRenders?.length) {
-      setRenderDetails(foundRenders);
-    }
+    const renderAnalysisResults = (await dispatch(findQueuedRendersForRange(focusRange!))) ?? null;
+    setRenderDetails(renderAnalysisResults);
   };
 
   const onSeek = (point: string, time: number) => {
@@ -361,22 +381,43 @@ export function ReactPanel() {
     dispatch(seek(point, time, false));
   };
 
-  const renderedRenderEntries = renderDetails.map(entry => {
-    const [oldestPauseFrame] = entry.filteredPauseFrames.slice(-1);
+  const { queuedRenders = [], committedRenders = [] } = renderDetails ?? {};
 
-    if (!oldestPauseFrame) {
-      return null;
+  const allEntriesSorted: (ReactQueuedRenderDetails | TimeStampedPoint)[] = [
+    ...queuedRenders,
+    ...committedRenders,
+  ];
+
+  allEntriesSorted.sort((a, b) => compareExecutionPoints(a.point, b.point));
+
+  const queuedRenderEntries = allEntriesSorted.map(entry => {
+    if ("filteredPauseFrames" in entry) {
+      const [oldestPauseFrame] = entry.filteredPauseFrames.slice(-1);
+
+      if (!oldestPauseFrame) {
+        return null;
+      }
+
+      return (
+        <ReactQueuedRenderListItem
+          currentTime={currentTime}
+          executionPoint={executionPoint!}
+          renderDetails={entry}
+          onSeek={onSeek}
+          key={entry.point}
+        />
+      );
+    } else {
+      return (
+        <ReactCommittedRenderListItem
+          currentTime={currentTime}
+          executionPoint={executionPoint!}
+          commitPoint={entry}
+          onSeek={onSeek}
+          key={entry.point}
+        />
+      );
     }
-
-    return (
-      <ReactRenderListItem
-        currentTime={currentTime}
-        executionPoint={executionPoint!}
-        renderDetails={entry}
-        onSeek={onSeek}
-        key={entry.point}
-      />
-    );
   });
 
   return (
@@ -402,7 +443,7 @@ export function ReactPanel() {
         <div
           style={{ overflowY: "auto", display: "flex", flexDirection: "column", maxHeight: 725 }}
         >
-          {renderedRenderEntries}
+          {queuedRenderEntries}
         </div>
       </div>
     </div>
