@@ -188,7 +188,12 @@ const pauseSlice = createSlice({
       state.selectedFrameId = frame ? { pauseId: frame.pauseId, frameId: frame.protocolId } : null;
       state.threadcx.pauseCounter++;
       state.pausePreviewLocation = null;
-      if (time && state.pauseHistoryIndex === state.pauseHistory.length - 1 && ( state.pauseHistory.length >= 1 && state.pauseHistory[state.pauseHistory.length - 1]?.time !== time) ) {
+      if (
+        time &&
+        state.pauseHistoryIndex === state.pauseHistory.length - 1 &&
+        state.pauseHistory.length >= 1 &&
+        state.pauseHistory[state.pauseHistory.length - 1]?.time !== time
+      ) {
         console.log("pause state added", state.pauseHistoryIndex, state.pauseHistory.length);
         state.pauseHistory.push({
           pauseId: id,
@@ -240,8 +245,8 @@ const pauseSlice = createSlice({
     },
     resumed(state) {
       Object.assign(state, resumedPauseState);
-      if( state.pauseHistoryIndex !== state.pauseHistory.length - 1 ){
-        while( state.pauseHistoryIndex !== state.pauseHistory.length - 1 ){
+      if (state.pauseHistoryIndex !== state.pauseHistory.length - 1) {
+        while (state.pauseHistoryIndex !== state.pauseHistory.length - 1) {
           state.pauseHistory.pop();
         }
       }

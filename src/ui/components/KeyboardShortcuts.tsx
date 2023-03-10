@@ -139,14 +139,14 @@ function KeyboardShortcuts({
     };
 
     const OverRiddenJumpToLastPause = (e: KeyboardEvent) => {
-      if( !e.target || !isEditableElement(e.target)){
+      if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
         jumpToLastPause();
       }
     };
 
     const OverRiddenJumpToNextPause = (e: KeyboardEvent) => {
-      if( !e.target || !isEditableElement(e.target)){
+      if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
         jumpToNextPause();
       }
