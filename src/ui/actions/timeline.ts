@@ -121,6 +121,11 @@ export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
     }
 
     const initialPausePoint = await getInitialPausePoint(ThreadFront.recordingId!);
+    if (ThreadFront.currentPoint !== "0") {
+      // the user has already selected a point in the recording,
+      // so we don't want to jump to a different point now
+      return;
+    }
 
     if (initialPausePoint) {
       point = initialPausePoint.point;
