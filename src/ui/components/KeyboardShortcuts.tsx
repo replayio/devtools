@@ -138,6 +138,20 @@ function KeyboardShortcuts({
       }
     };
 
+    const OverRiddenJumpToLastPause = (e: KeyboardEvent) => {
+      if( !e.target || !isEditableElement(e.target)){
+        e.preventDefault();
+        jumpToLastPause();
+      }
+    };
+
+    const OverRiddenJumpToNextPause = (e: KeyboardEvent) => {
+      if( !e.target || !isEditableElement(e.target)){
+        e.preventDefault();
+        jumpToNextPause();
+      }
+    };
+
     const shortcuts: Record<string, (e: KeyboardEvent) => void> = {
       "CmdOrCtrl+Shift+F": openFullTextSearch,
       "CmdOrCtrl+K": togglePalette,
@@ -154,8 +168,8 @@ function KeyboardShortcuts({
       // Can pre-fill the dialog with specific filter prefixes
       "CmdOrCtrl+Shift+O": toggleFunctionQuickOpenModal,
       "CmdOrCtrl+O": toggleProjectFunctionQuickOpenModal,
-      "CmdOrCtrl+Z": jumpToLastPause,
-      "Shift+CmdOrCtrl+Z": jumpToNextPause,
+      "CmdOrCtrl+[": OverRiddenJumpToLastPause,
+      "CmdOrCtrl+]": OverRiddenJumpToNextPause,
       "~": toggleProtocolTimeline,
 
       Escape: closeOpenModalsOnEscape,
