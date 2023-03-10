@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 
 import Icon from "replay-next/components/Icon";
+import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { setViewMode } from "ui/actions/layout";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import Events from "ui/components/Events";
 import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
+import Confetti from "ui/components/shared//Confetti";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { useDismissNag } from "ui/hooks/users";
@@ -28,11 +30,11 @@ const useNagDismissal = () => {
   const info = useTestInfo();
 
   const dismissTourNag = () => {
-    dismissNag(Nag.DISMISS_TOUR);
-
-    const initialPrimaryPanel = info.isTestSuiteReplay ? "cypress" : "events";
+    const initialPrimaryPanel = "events";
     dispatch(setSelectedPrimaryPanel(initialPrimaryPanel));
+    dismissNag(Nag.DISMISS_TOUR);
   };
+
   return { dismissTourNag };
 };
 
@@ -46,7 +48,7 @@ const Tour: React.FC = () => {
   const showBreakpointEdit = shouldShowBreakpointEdit(nags);
   const showTour = shouldShowTour(nags);
 
-  const [checkedItems, setCheckedItems] = useState([0]);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const info = useTestInfo();
 
@@ -131,11 +133,19 @@ const Tour: React.FC = () => {
                       <p className="mt-20">
                         <a
                           href="#"
-                          onClick={dismissTourNag}
+                          onClick={e => {
+                            e.stopPropagation();
+                            setShowConfetti(true);
+                            setTimeout(() => {
+                              setShowConfetti(false);
+                              dismissTourNag();
+                            }, 2500);
+                          }}
                           className="hover:cursor-hand whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg"
                         >
-                          Awesome, thanks!
+                          Thanks, please dismiss!
                         </a>
+                        {showConfetti ? <Confetti /> : null}
                       </p>
                     </>
                   )}
