@@ -113,7 +113,7 @@ const initialState: PauseState = {
   ...resumedPauseState,
   command: null,
   pauseHistory: [],
-  pauseHistoryIndex: 0,
+  pauseHistoryIndex: -1,
 };
 
 export const executeCommandOperation = createAsyncThunk<
@@ -188,7 +188,8 @@ const pauseSlice = createSlice({
       state.selectedFrameId = frame ? { pauseId: frame.pauseId, frameId: frame.protocolId } : null;
       state.threadcx.pauseCounter++;
       state.pausePreviewLocation = null;
-      if (time && state.pauseHistoryIndex === state.pauseHistory.length) {
+      if (time && state.pauseHistoryIndex === state.pauseHistory.length - 1 && ( state.pauseHistory.length >= 1 && state.pauseHistory[state.pauseHistory.length - 1]?.time !== time) ) {
+        console.log("pause state added", state.pauseHistoryIndex, state.pauseHistory.length);
         state.pauseHistory.push({
           pauseId: id,
           time,
@@ -239,6 +240,11 @@ const pauseSlice = createSlice({
     },
     resumed(state) {
       Object.assign(state, resumedPauseState);
+      if( state.pauseHistoryIndex !== state.pauseHistory.length - 1 ){
+        while( state.pauseHistoryIndex !== state.pauseHistory.length - 1 ){
+          state.pauseHistory.pop();
+        }
+      }
       state.threadcx.isPaused = false;
     },
   },
