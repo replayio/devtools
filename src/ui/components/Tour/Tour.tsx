@@ -48,10 +48,14 @@ const Tour: React.FC = () => {
 
   const [checkedItems, setCheckedItems] = useState([0]);
 
+  const info = useTestInfo();
+
   const isNewUser =
     showDevtoolsNag && showConsoleNavigate && showBreakpointAdd && showBreakpointEdit;
   const hasCompletedTour =
     !showDevtoolsNag && !showConsoleNavigate && !showBreakpointAdd && !showBreakpointEdit;
+
+  const typeOfReplay = info.isTestSuiteReplay ? "cypress" : "events";
 
   const { dismissTourNag } = useNagDismissal();
 
@@ -69,11 +73,15 @@ const Tour: React.FC = () => {
               <>
                 <div className={styles.intro}>
                   <p className={styles.h1}>Hello and welcome!</p>
-                  <p>
-                    Replay is the first time-travel enabled DevTools. It’s designed to be familiar,
-                    futuristic, and fun :)
-                  </p>
-                  <p>To get started, click on DevTools in the top right.</p>
+                  {typeOfReplay === "events" ? (
+                    <>
+                      <p>
+                        Replay is the first time-travel enabled DevTools. It’s designed to be
+                        familiar, futuristic, and fun :)
+                      </p>
+                      <p>To get started, click on DevTools in the top right.</p>
+                    </>
+                  ) : null}
                 </div>
               </>
             ) : (
