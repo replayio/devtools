@@ -102,7 +102,7 @@ export async function setupTimeline(store: UIStore) {
   shortcuts.attach(window.document);
 }
 
-export function jumpToInitialPausePoint(): UIThunkAction {
+export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const endpoint = await getEndpoint(replayClient);
     dispatch(pointsReceived([endpoint]));
@@ -126,11 +126,7 @@ export function jumpToInitialPausePoint(): UIThunkAction {
       point = initialPausePoint.point;
       time = initialPausePoint.time;
     }
-    if (isPointInLoadingRegion(state, point)) {
-      ThreadFront.timeWarp(point, time, false);
-    } else {
-      ThreadFront.timeWarp(endpoint.point, endpoint.time, false);
-    }
+    ThreadFront.timeWarp(point, time, false);
   };
 }
 

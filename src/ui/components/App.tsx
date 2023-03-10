@@ -52,7 +52,7 @@ function AppModal({ hideModal, modal }: { hideModal: () => void; modal: ModalTyp
     return () => {
       document.removeEventListener("keydown", onDocumentKeyDown);
     };
-  }, [hideModal, loadingFinished]);
+  }, [hideModal]);
 
   if (!loadingFinished) {
     return null;

@@ -81,7 +81,7 @@ export function TestCase({ test }: { test: TestItem }) {
     <TestCaseContext.Provider
       value={{ startTime: testStartTime, endTime: testEndTime, onReplay, onPlayFromHere, test }}
     >
-      <div className="flex flex-col" data-test-id="TestSuite-TestCaseRow">
+      <div className="flex flex-col" data-test-id="TestSuite-TestCase">
         <TestSteps test={test} />
       </div>
     </TestCaseContext.Provider>
