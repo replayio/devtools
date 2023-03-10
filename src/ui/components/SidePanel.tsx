@@ -37,7 +37,7 @@ function useInitialPrimaryPanel() {
 
   const { nags } = hooks.useGetUserInfo();
   const showTour = shouldShowTour(nags);
-  const initialPrimaryPanel = showTour ? "tour" : info.isTestSuiteReplay ? "cypress" : "events";
+  const initialPrimaryPanel = info.isTestSuiteReplay ? "cypress" : showTour ? "tour" : "events";
 
   useEffect(() => {
     if (selectedPrimaryPanel == null) {
