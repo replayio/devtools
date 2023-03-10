@@ -42,7 +42,7 @@ function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
                   onSeek={onSeek}
                   event={e}
                   currentTime={currentTime}
-                  executionPoint={executionPoint}
+                  executionPoint={executionPoint!}
                 />
               </div>
             </div>

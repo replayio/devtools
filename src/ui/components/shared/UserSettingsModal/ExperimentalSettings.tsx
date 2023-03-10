@@ -75,6 +75,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
       "Disable writing to and reading from the backend database when storing or retrieving recording assets",
     key: "disableRecordingAssetsInDatabase",
   },
+  {
+    label: "Enable React Panel",
+    description: "Enable experimental React render details panel",
+    key: "reactPanel",
+  },
 ];
 
 const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [];
@@ -129,6 +134,7 @@ export default function ExperimentalSettings({}) {
 
   const { value: enableRoutines, update: updateEnableRoutines } = useFeature("enableRoutines");
   const { value: rerunRoutines, update: updatererunRoutines } = useFeature("rerunRoutines");
+  const { value: reactPanel, update: updateReactPanel } = useFeature("reactPanel");
 
   const {
     value: disableRecordingAssetsInDatabase,
@@ -158,6 +164,8 @@ export default function ExperimentalSettings({}) {
       updatererunRoutines(!rerunRoutines);
     } else if (key === "disableRecordingAssetsInDatabase") {
       updateDisableRecordingAssetsInDatabase(!disableRecordingAssetsInDatabase);
+    } else if (key === "reactPanel") {
+      updateReactPanel(!reactPanel);
     }
   };
 
@@ -173,6 +181,7 @@ export default function ExperimentalSettings({}) {
     rerunRoutines,
     profileWorkerThreads,
     disableRecordingAssetsInDatabase,
+    reactPanel,
   };
 
   const settings = { ...userSettings, ...localSettings };

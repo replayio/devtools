@@ -145,6 +145,7 @@ export default function Toolbar() {
   const { recording } = useGetRecording(recordingId);
   const { comments, loading } = hooks.useGetComments(recordingId);
   const { value: logProtocol } = useFeature("logProtocol");
+  const { value: showReactPanel } = useFeature("reactPanel");
   const [sidePanelCollapsed, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
 
   useEffect(() => {
@@ -219,7 +220,9 @@ export default function Toolbar() {
               showBadge={hasFrames}
               onClick={handleButtonClick}
             />
-            <ToolbarButton icon="react" name="react" label="React" onClick={handleButtonClick} />
+            {showReactPanel && (
+              <ToolbarButton icon="react" name="react" label="React" onClick={handleButtonClick} />
+            )}
           </>
         ) : null}
         {logProtocol && viewMode === "dev" ? (
