@@ -11,6 +11,7 @@ import {
 import {
   PendingRecord,
   Record,
+  assertPendingRecord,
   createPendingRecord,
   createResolvedRecord,
   isPendingRecord,
@@ -118,13 +119,17 @@ function createCache<T extends { point: ExecutionPoint }>(
           },
           onResults: analysisEntries => {
             for (const analysisEntry of analysisEntries) {
-              const result = analysisEntry.value;
+              const result = analysisEntry.value as RemoteAnalysisResult;
               cachePauseData(client, result.pauseId, result.data);
               const record = results.get(result.point);
               if (record) {
-                (record as PendingRecord<RemoteAnalysisResult>).data.deferred.resolve(result);
+                assertPendingRecord(record);
 
-                updateRecordToResolved(result, result);
+                const { deferred } = (record as PendingRecord<RemoteAnalysisResult>).data;
+
+                updateRecordToResolved(record, result);
+
+                deferred.resolve(result);
               } else {
                 results.set(result.point, createResolvedRecord<RemoteAnalysisResult>(result));
               }
