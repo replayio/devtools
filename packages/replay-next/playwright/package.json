@@ -4,8 +4,10 @@
   "devDependencies": {
     "@playwright/test": "^1.25.1",
     "@replayio/playwright": "^0.3.21",
+    "@types/window-size": "^1.1.1",
     "chalk": "^4",
-    "playwright": "^1.25.1"
+    "playwright": "^1.25.1",
+    "window-size": "^1.1.1"
   },
   "scripts": {
     "playwright:install": "playwright install chromium",

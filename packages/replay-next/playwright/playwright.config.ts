@@ -16,7 +16,7 @@ const config: FullConfig = {
   forbidOnly: !!CI,
   globalSetup: require.resolve("./playwright.globalSetup"),
   // @ts-ignore
-  reporter: CI ? "github" : "list",
+  reporter: CI ? "github" : "./custom-reporter.ts",
   retries: RECORD_VIDEO || VISUAL_DEBUG ? 0 : 2,
   snapshotDir: "./snapshots",
   use: {

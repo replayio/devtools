@@ -6552,6 +6552,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/window-size@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@types/window-size@npm:1.1.1"
+  dependencies:
+    "@types/node": "*"
+  checksum: 055a6c513481b8c681e6497e7cc26212413e646dada1e4fcb07bef8e1c96d4fecc9a639d57e578f2e67830861ebf544ea8b06495772044521fa4eaa342c332a8
+  languageName: node
+  linkType: hard
+
 "@types/ws@npm:^8.0.0":
   version: 8.5.3
   resolution: "@types/ws@npm:8.5.3"
@@ -20805,6 +20814,7 @@ __metadata:
     "@types/react-window": ^1.8.5
     "@types/styled-components": ^5.1.25
     "@types/uuid": ^7.0.3
+    "@types/window-size": ^1.1.1
     "@typescript-eslint/parser": ^5.38.1
     apollo: ^2.33.10
     autoprefixer: ^10.4.4
