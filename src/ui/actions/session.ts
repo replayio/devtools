@@ -202,7 +202,7 @@ export function createSocket(
         disableScanDataCache: getFeature("disableScanDataCache"),
         disableCache: !!prefs.disableCache,
         disableStableQueryCache: getFeature("disableStableQueryCache"),
-        disableUnstableQueryCache: getFeature("enableUnstableQueryCache"),
+        disableUnstableQueryCache: !getFeature("enableUnstableQueryCache"),
         listenForMetrics: !!prefs.listenForMetrics,
         profileWorkerThreads: getFeature("profileWorkerThreads"),
         enableRoutines: getFeature("enableRoutines"),
