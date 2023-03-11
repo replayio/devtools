@@ -15,6 +15,7 @@ import { getScopeMapAsync } from "replay-next/src/suspense/ScopeMapCache";
 import { ReplayClientInterface } from "shared/client/types";
 import {
   SourceDetails,
+  SourcesState,
   getGeneratedLocation,
   getPreferredLocation,
   getSourceDetailsEntities,
@@ -84,17 +85,17 @@ export type FormattedEventListener = Awaited<ReturnType<typeof formatEventListen
 export const formatEventListener = async (
   replayClient: ReplayClientInterface,
   listener: { type: string; capture: boolean },
-  fnPreview: FunctionWithPreview,
-  state: UIState,
+  fnPreview: FunctionWithPreview["preview"],
+  sourcesState: SourcesState,
   sourcesById: Dictionary<SourceDetails>,
   framework?: string
 ) => {
-  const { functionLocation, functionName = "", functionParameterNames = [] } = fnPreview.preview;
+  const { functionLocation, functionName = "", functionParameterNames = [] } = fnPreview;
 
   let location: Location | undefined = undefined;
   let locationUrl: string | undefined = undefined;
   if (functionLocation) {
-    location = getPreferredLocation(state.sources, functionLocation);
+    location = getPreferredLocation(sourcesState, functionLocation);
 
     locationUrl = functionLocation?.length > 0 ? sourcesById[location.sourceId]?.url : undefined;
   }
@@ -161,7 +162,13 @@ export function getNodeEventListeners(
           listener.handler
         ) as FunctionWithPreview;
 
-        return formatEventListener(replayClient, listener, listenerHandler, state, sourcesById);
+        return formatEventListener(
+          replayClient,
+          listener,
+          listenerHandler.preview,
+          state.sources,
+          sourcesById
+        );
       })
     );
 
@@ -228,8 +235,8 @@ export function getNodeEventListeners(
               return formatEventListener(
                 replayClient,
                 { type: obj.name, capture: false },
-                obj.value,
-                state,
+                obj.value.preview,
+                state.sources,
                 sourcesById,
                 // We're only finding React-specific event handlers atm
                 "react"
@@ -261,14 +268,16 @@ const EVENT_CLASS_FOR_EVENT_TYPE: Record<SEARCHABLE_EVENT_TYPES, string> = {
   keypress: "InputEvent",
 };
 
-const IGNORABLE_PARTIAL_SOURCE_URLS = [
+export const IGNORABLE_PARTIAL_SOURCE_URLS = [
   // Don't jump into React internals
   "react-dom",
   // or CodeSandbox
   "webpack:///src/sandbox/",
+  "webpack:///sandpack-core/",
+  "webpack:////home/circleci/codesandbox-client",
 ];
 
-function shouldIgnoreEventFromSource(sourceDetails?: SourceDetails) {
+export function shouldIgnoreEventFromSource(sourceDetails?: SourceDetails) {
   const url = sourceDetails?.url ?? "";
 
   return IGNORABLE_PARTIAL_SOURCE_URLS.some(partialUrl => url.includes(partialUrl));
@@ -327,8 +336,8 @@ export const {
         const formattedEventListener = await formatEventListener(
           replayClient,
           { type: "onClick", capture: false },
-          onClickPreview,
-          state,
+          onClickPreview.preview,
+          state.sources,
           sourcesById,
           "react"
         );

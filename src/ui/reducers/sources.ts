@@ -38,7 +38,7 @@ export interface MiniSource {
   url?: string;
 }
 
-const sourceDetailsAdapter = createEntityAdapter<SourceDetails>();
+export const sourceDetailsAdapter = createEntityAdapter<SourceDetails>();
 
 export const {
   selectAll: getAllSourceDetails,

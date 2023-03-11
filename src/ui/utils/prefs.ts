@@ -39,6 +39,7 @@ pref("devtools.features.profileWorkerThreads", false);
 pref("devtools.features.enableRoutines", false);
 pref("devtools.features.rerunRoutines", false);
 pref("devtools.features.protocolTimeline", false);
+pref("devtools.features.reactPanel", false);
 pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.resolveRecording", false);
 pref("devtools.features.chromiumNetMonitor", true);
@@ -79,6 +80,7 @@ export const features = new PrefsHelper("devtools.features", {
   originalClassNames: ["Bool", "originalClassNames"],
   profileWorkerThreads: ["Bool", "profileWorkerThreads"],
   protocolTimeline: ["Bool", "protocolTimeline"],
+  reactPanel: ["Bool", "reactPanel"],
   repaintEvaluations: ["Bool", "repaintEvaluations"],
   resolveRecording: ["Bool", "resolveRecording"],
   rerunRoutines: ["Bool", "rerunRoutines"],
