@@ -1,9 +1,8 @@
 import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import classnames from "classnames";
-import { ReactNode, useContext, useState } from "react";
+import { ReactNode, useContext, useEffect, useState } from "react";
 
 import { selectFrame as selectFrameAction } from "devtools/client/debugger/src/actions/pause/selectFrame";
-import AccessibleImage from "devtools/client/debugger/src/components/shared/AccessibleImage";
 import {
   PauseFrame,
   getExecutionPoint,
@@ -11,6 +10,7 @@ import {
 } from "devtools/client/debugger/src/reducers/pause";
 import type { AstPosition } from "devtools/client/debugger/src/selectors";
 import { findClosestofSymbol } from "devtools/client/debugger/src/utils/ast";
+import { simplifyDisplayName } from "devtools/client/debugger/src/utils/pause/frames/displayName";
 import { getFilename } from "devtools/client/debugger/src/utils/source";
 import { AnalysisInput, getFunctionBody } from "protocol/evaluation-utils";
 import Icon from "replay-next/components/Icon";
@@ -18,7 +18,7 @@ import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
-import { compareExecutionPoints, isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
+import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { UIThunkAction } from "ui/actions";
 import { IGNORABLE_PARTIAL_SOURCE_URLS } from "ui/actions/event-listeners";
 import { seek } from "ui/actions/timeline";
@@ -258,8 +258,6 @@ function findQueuedRendersForRange(
 
     const [queuedRenders] = await Promise.all([queuedRendersPromise]);
 
-    // console.log("Queued renders: ", queuedRenders);
-
     return {
       queuedRenders,
       committedRenders,
@@ -359,9 +357,7 @@ function ReactQueuedRenderListItem({
       >
         <div className="flex flex-row items-center space-x-2 overflow-hidden">
           <MaterialIcon iconSize="xl">ads_click</MaterialIcon>
-          <Label>
-            {filename}: {userPauseFrame!.displayName}
-          </Label>
+          <Label>{simplifyDisplayName(userPauseFrame!.displayName)}</Label>
         </div>
         <div className="flex space-x-2 opacity-0 group-hover:opacity-100">
           {
@@ -425,74 +421,39 @@ export function ReactPanel() {
   const { rangeForDisplay: focusRange } = useContext(FocusContext);
   const [renderDetails, setRenderDetails] = useState<RenderAnalysisResults | null>(null);
 
-  const handleClick = async () => {
-    console.log("Focus range: ", focusRange);
-    const renderAnalysisResults = (await dispatch(findQueuedRendersForRange(focusRange!))) ?? null;
-    setRenderDetails(renderAnalysisResults);
-  };
+  useEffect(() => {
+    setRenderDetails(null);
+    (async () => {
+      const renderAnalysisResults =
+        (await dispatch(findQueuedRendersForRange(focusRange!))) ?? null;
+      setRenderDetails(renderAnalysisResults);
+    })();
+  }, [focusRange, dispatch]);
 
   const onSeek = (point: string, time: number) => {
     // trackEvent("events_timeline.select");
     dispatch(seek(point, time, false));
   };
 
-  const { queuedRenders = [], committedRenders = [] } = renderDetails ?? {};
-
-  const allEntriesSorted: (ReactQueuedRenderDetails | TimeStampedPoint)[] = [
-    ...queuedRenders,
-    ...committedRenders,
-  ];
-
-  allEntriesSorted.sort((a, b) => compareExecutionPoints(a.point, b.point));
-
-  const queuedRenderEntries = allEntriesSorted.map(entry => {
-    if ("userPauseFrame" in entry) {
-      return (
-        <ReactQueuedRenderListItem
-          currentTime={currentTime}
-          executionPoint={executionPoint!}
-          renderDetails={entry}
-          onSeek={onSeek}
-          key={entry.point}
-        />
-      );
-    } else {
-      return (
-        <ReactCommittedRenderListItem
-          currentTime={currentTime}
-          executionPoint={executionPoint!}
-          commitPoint={entry}
-          onSeek={onSeek}
-          key={entry.point}
-        />
-      );
-    }
-  });
+  const queuedRenders = renderDetails?.queuedRenders.filter(entry => entry.userPauseFrame) ?? [];
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <div
-        className="text-xl"
-        style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
-      >
-        React Renders <AccessibleImage className="annotation-logo react" />
-      </div>
-      <div>
-        <button
-          type="button"
-          onClick={handleClick}
-          className="mr-0 flex items-center space-x-1.5 rounded-lg bg-primaryAccent text-buttontextColor hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
-          style={{ padding: "5px 12px" }}
-        >
-          Find React Renders
-        </button>
-      </div>
       <div style={{ flexGrow: 1, height: "100%" }}>
-        <h3 className="text-lg">Renders In Range</h3>
         <div
           style={{ overflowY: "auto", display: "flex", flexDirection: "column", maxHeight: 725 }}
         >
-          {queuedRenderEntries}
+          {renderDetails
+            ? queuedRenders.map(entry => (
+                <ReactQueuedRenderListItem
+                  currentTime={currentTime}
+                  executionPoint={executionPoint!}
+                  renderDetails={entry}
+                  onSeek={onSeek}
+                  key={entry.point}
+                />
+              ))
+            : "Loading..."}
         </div>
       </div>
     </div>
