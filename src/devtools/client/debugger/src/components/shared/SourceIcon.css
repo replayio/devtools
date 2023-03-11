@@ -65,7 +65,7 @@
   background-color: transparent !important;
 }
 
-.img.react {
+.sources-list .img.react {
   background-color: var(--theme-highlight-bluegrey);
 }
 
