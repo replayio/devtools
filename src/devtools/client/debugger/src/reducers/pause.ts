@@ -191,10 +191,8 @@ const pauseSlice = createSlice({
       if (
         time &&
         state.pauseHistoryIndex === state.pauseHistory.length - 1 &&
-        state.pauseHistory.length >= 1 &&
         state.pauseHistory[state.pauseHistory.length - 1]?.time !== time
       ) {
-        console.log("pause state added", state.pauseHistoryIndex, state.pauseHistory.length);
         state.pauseHistory.push({
           pauseId: id,
           time,
