@@ -5,6 +5,7 @@
 /* Tabs General Styles */
 
 .tabs {
+  height: 100%;
   background: var(--theme-sidebar-background);
   display: flex;
   flex-direction: column;
