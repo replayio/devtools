@@ -2,6 +2,7 @@ import classnames from "classnames";
 import classNames from "classnames";
 import React, { useContext, useEffect, useState } from "react";
 
+import AccessibleImage from "devtools/client/debugger/src/components/shared/AccessibleImage";
 import { getPauseId } from "devtools/client/debugger/src/selectors";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -45,6 +46,15 @@ function CypressIcon() {
   );
 }
 
+function ReactIcon() {
+  return (
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+      {" "}
+      <AccessibleImage className="annotation-logo react" />
+    </div>
+  );
+}
+
 function ToolbarButtonTab({ active }: { active: boolean }) {
   return (
     <div
@@ -70,12 +80,27 @@ function ToolbarButton({
 }) {
   const selectedPrimaryPanel = useAppSelector(selectors.getSelectedPrimaryPanel);
 
+  let iconContents: string | JSX.Element = icon;
+
+  switch (icon) {
+    case "cypress": {
+      iconContents = <CypressIcon />;
+      break;
+    }
+    case "react": {
+      iconContents = <ReactIcon />;
+      break;
+    }
+    default:
+      break;
+  }
+
   const imageIcon = (
     <MaterialIcon
       className={classNames("toolbar-panel-icon text-themeToolbarPanelIconColor", name)}
       iconSize="2xl"
     >
-      {icon === "cypress" ? <CypressIcon /> : icon}
+      {iconContents}
     </MaterialIcon>
   );
   return (
@@ -120,6 +145,7 @@ export default function Toolbar() {
   const { recording } = useGetRecording(recordingId);
   const { comments, loading } = hooks.useGetComments(recordingId);
   const { value: logProtocol } = useFeature("logProtocol");
+  const { value: showReactPanel } = useFeature("reactPanel");
   const [sidePanelCollapsed, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
 
   useEffect(() => {
@@ -194,6 +220,9 @@ export default function Toolbar() {
               showBadge={hasFrames}
               onClick={handleButtonClick}
             />
+            {showReactPanel && (
+              <ToolbarButton icon="react" name="react" label="React" onClick={handleButtonClick} />
+            )}
           </>
         ) : null}
         {logProtocol && viewMode === "dev" ? (
