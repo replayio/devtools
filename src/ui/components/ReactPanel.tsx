@@ -1,10 +1,4 @@
-import {
-  Frame,
-  Location,
-  SameLineSourceLocations,
-  TimeStampedPoint,
-  TimeStampedPointRange,
-} from "@replayio/protocol";
+import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import classnames from "classnames";
 import { ReactNode, useContext, useState } from "react";
 
@@ -15,41 +9,30 @@ import {
   getExecutionPoint,
   getThreadContext,
 } from "devtools/client/debugger/src/reducers/pause";
+import type { AstPosition } from "devtools/client/debugger/src/selectors";
+import { findClosestofSymbol } from "devtools/client/debugger/src/utils/ast";
 import { getFilename } from "devtools/client/debugger/src/utils/source";
 import { AnalysisInput, getFunctionBody } from "protocol/evaluation-utils";
 import Icon from "replay-next/components/Icon";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
-import { getScopeMapAsync } from "replay-next/src/suspense/ScopeMapCache";
 import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
 import { compareExecutionPoints, isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { UIThunkAction } from "ui/actions";
-import {
-  IGNORABLE_PARTIAL_SOURCE_URLS,
-  shouldIgnoreEventFromSource,
-} from "ui/actions/event-listeners";
+import { IGNORABLE_PARTIAL_SOURCE_URLS } from "ui/actions/event-listeners";
 import { seek } from "ui/actions/timeline";
 import {
-  SourceDetails,
   getAllSourceDetails,
-  getGeneratedLocation,
-  getPreferredLocation,
-  getSourceDetailsEntities,
   getSourceIdsByUrl,
   getSourceToDisplayForUrl,
 } from "ui/reducers/sources";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
-import { getSymbolsAsync } from "ui/suspense/sourceCaches";
+import { getSourceLinesAsync, getSymbolsAsync } from "ui/suspense/sourceCaches";
 
-import {
-  JumpToCodeFailureReason,
-  JumpToCodeStatus,
-  findFirstBreakablePositionForFunction,
-} from "./Events/Event";
+import { JumpToCodeStatus, findFirstBreakablePositionForFunction } from "./Events/Event";
 import MaterialIcon from "./shared/MaterialIcon";
 import styles from "./Events/Event.module.css";
 
@@ -57,14 +40,6 @@ const MORE_IGNORABLE_PARTIAL_URLS = IGNORABLE_PARTIAL_SOURCE_URLS.concat(
   // Ignore _any_ 3rd-party package for now
   "node_modules"
 );
-
-interface FormattedFrame {
-  location: Location | undefined;
-  locationUrl: string | undefined;
-  functionName: string;
-  originalFunctionName: string | undefined;
-  source: SourceDetails | undefined;
-}
 
 interface ReactQueuedRenderDetails extends TimeStampedPoint {
   // frames: Frame[];
@@ -97,47 +72,113 @@ function findQueuedRendersForRange(
 ): UIThunkAction<Promise<RenderAnalysisResults | void>> {
   return async (dispatch, getState, { replayClient }) => {
     const sourcesByUrl = getSourceIdsByUrl(getState());
-    const sourcesById = getSourceDetailsEntities(getState());
     const allSources = getAllSourceDetails(getState());
     const sourcesState = getState().sources;
-    const reactDomDevUrl = Object.keys(sourcesByUrl).find(key => {
-      return key.includes("react-dom.development");
+    const reactDomUrl = Object.keys(sourcesByUrl).find(key => {
+      return key.includes("react-dom.");
     });
 
-    if (!reactDomDevUrl) {
-      console.error("No ReactDOM url");
+    if (!reactDomUrl) {
+      // console.error("No ReactDOM url");
       return;
     }
 
-    const preferredSource = getSourceToDisplayForUrl(getState(), reactDomDevUrl);
-    if (!preferredSource) {
-      console.error("No preferred source");
+    const reactDomSource = getSourceToDisplayForUrl(getState(), reactDomUrl);
+    if (!reactDomSource || !reactDomSource.url) {
+      // console.error("No preferred source");
       return;
     }
-    console.log("Getting symbols and positions");
+    // console.log("Getting symbols and positions");
     const [symbols, breakablePositionsResult] = await Promise.all([
-      getSymbolsAsync(preferredSource.id, allSources, replayClient),
-      getBreakpointPositionsAsync(preferredSource.id, replayClient),
+      getSymbolsAsync(reactDomSource.id, allSources, replayClient),
+      getBreakpointPositionsAsync(reactDomSource.id, replayClient),
     ]);
-    const [breakablePositions, breakablePositionsByLine] = breakablePositionsResult;
-    const shouldUpdateFiberSymbol = symbols?.functions.find(
-      f => f.name === "scheduleUpdateOnFiber"
-    )!;
-    const onCommitRootSymbol = symbols?.functions.find(f => f.name === "onCommitRoot")!;
-    console.log("onCommitRoot: ", onCommitRootSymbol);
 
-    console.log("shouldUpdateFiber: ", shouldUpdateFiberSymbol);
+    if (!symbols) {
+      return;
+    }
+
+    // console.log("Symbols: ", symbols);
+    const [breakablePositions, breakablePositionsByLine] = breakablePositionsResult;
+
+    let scheduleUpdateFiberDeclaration: AstPosition | undefined;
+    let onCommitFiberRootDeclaration: AstPosition | undefined;
+
+    if (reactDomSource.url!.includes(".development")) {
+      const shouldUpdateFiberSymbol = symbols?.functions.find(
+        f => f.name === "scheduleUpdateOnFiber"
+      )!;
+      const onCommitRootSymbol = symbols?.functions.find(f => f.name === "onCommitRoot")!;
+      // console.log("onCommitRoot: ", onCommitRootSymbol);
+
+      // console.log("shouldUpdateFiber: ", shouldUpdateFiberSymbol);
+      scheduleUpdateFiberDeclaration = shouldUpdateFiberSymbol?.location.start;
+      onCommitFiberRootDeclaration = onCommitRootSymbol?.location.start;
+    } else if (reactDomSource.url!.includes(".production")) {
+      // HACK We'll do this the hard way! This _should_ work back to React 16.14
+      // By careful inspection, we know that every minified version of `scheduleUpdateOnFiber`
+      // has a React extracted error code call of `someErrorFn(185)`. We also know that every
+      // minified version of `onCommitRoot` looks for the `.onCommitFiberRoot` function on the
+      // React DevTools global hook.
+      // By doing line-by-line string comparisons looking for these specific bits of code,
+      // we can consistently find the specific minified functions that we care about,
+      // across multiple React production builds, without needing to track minified function names.
+
+      const reactDomSourceLines = await getSourceLinesAsync(reactDomSource!.id, replayClient);
+
+      // A build-extracted React error code
+      const MAGIC_SCHEDULE_UPDATE_CONTENTS = "(185)";
+      // A call to the React DevTools global hook object
+      const MAGIC_ON_COMMIT_ROOT_CONTENTS = ".onCommitFiberRoot(";
+
+      // Brute-force search over all lines in the file to find the two functions that we
+      // actually care about, based on the magic strings that will exist.
+      for (let [lineZeroIndex, line] of reactDomSourceLines.entries()) {
+        const scheduleUpdateIndex = line.indexOf(MAGIC_SCHEDULE_UPDATE_CONTENTS);
+        const onCommitIndex = line.indexOf(MAGIC_ON_COMMIT_ROOT_CONTENTS);
+        if (scheduleUpdateIndex > -1) {
+          const res = findClosestofSymbol(symbols.functions, {
+            line: lineZeroIndex + 1,
+            column: scheduleUpdateIndex,
+          });
+          if (res) {
+            scheduleUpdateFiberDeclaration = res.location.start;
+          }
+        }
+        if (onCommitIndex > -1) {
+          const res = findClosestofSymbol(symbols.functions, {
+            line: lineZeroIndex + 1,
+            column: onCommitIndex,
+          });
+          if (res) {
+            onCommitFiberRootDeclaration = res.location.start;
+          }
+        }
+
+        if (scheduleUpdateFiberDeclaration && onCommitFiberRootDeclaration) {
+          break;
+        }
+      }
+    }
+
+    if (!scheduleUpdateFiberDeclaration || !onCommitFiberRootDeclaration) {
+      // console.error("Could not find scheduleUpdate or onCommit");
+      return;
+    }
+
     const firstScheduleUpdateFiberPosition = findFirstBreakablePositionForFunction(
-      { ...shouldUpdateFiberSymbol.location.start, sourceId: preferredSource.id },
+      { ...scheduleUpdateFiberDeclaration, sourceId: reactDomSource.id },
       breakablePositionsByLine
     );
     const firstOnCommitRootPosition = findFirstBreakablePositionForFunction(
-      { ...onCommitRootSymbol.location.start, sourceId: preferredSource.id },
+      { ...onCommitFiberRootDeclaration, sourceId: reactDomSource.id },
       breakablePositionsByLine
     );
     if (!firstScheduleUpdateFiberPosition || !firstOnCommitRootPosition) {
       return;
     }
+
+    // console.log("Found positions: ", firstScheduleUpdateFiberPosition, firstOnCommitRootPosition);
 
     const scheduleFiberUpdatePromise = getHitPointsForLocationAsync(
       replayClient,
@@ -157,8 +198,9 @@ function findQueuedRendersForRange(
       scheduleFiberUpdatePromise,
       onCommitFiberHitsPromise,
     ]);
-    console.log("Hit points: ", scheduleUpdateHitPoints);
+    // console.log("Hit points: ", scheduleUpdateHitPoints);
 
+    // TODO Arbitrary max of 200 points here. We need to figure out a better strategy.
     const scheduleUpdateHitPointsToCheck = scheduleUpdateHitPoints.slice(0, 200);
     const queuedRendersPromise = Promise.all(
       scheduleUpdateHitPointsToCheck.map(async (hitPoint): Promise<ReactQueuedRenderDetails> => {
@@ -173,24 +215,33 @@ function findQueuedRendersForRange(
           return !MORE_IGNORABLE_PARTIAL_URLS.some(partialUrl => source.url?.includes(partialUrl));
         });
 
-        const [userPauseFrame] = filteredPauseFrames.slice(-1);
+        let userPauseFrame: PauseFrame | undefined = filteredPauseFrames.slice(-1)[0];
 
         let userPauseFrameTime: TimeStampedPoint | undefined = undefined;
 
         if (userPauseFrame) {
-          const arbitraryStartPoint = hitPoint.time - 50;
-          const pointNearTime = await replayClient.getPointNearTime(arbitraryStartPoint);
-          const { location } = userPauseFrame;
-          const functionHits = await replayClient.runAnalysis<AnalysisInput>({
-            effectful: false,
-            mapper: getFunctionBody(hitMapper),
-            location,
-            range: {
-              begin: pointNearTime.point,
-              end: hitPoint.point,
-            },
-          });
-          [userPauseFrameTime] = functionHits.slice(-1);
+          try {
+            // TODO Need a _much_ better way of identifying the exact point of the earlier frame!
+            // This also doesn't seem to consistently work with the _first_ render.
+            const arbitraryStartPoint = hitPoint.time - 50;
+            const pointNearTime = await replayClient.getPointNearTime(arbitraryStartPoint);
+            const { location } = userPauseFrame;
+            const functionHits = await replayClient.runAnalysis<AnalysisInput>({
+              effectful: false,
+              mapper: getFunctionBody(hitMapper),
+              location,
+              range: {
+                begin: pointNearTime.point,
+                end: hitPoint.point,
+              },
+            });
+            [userPauseFrameTime] = functionHits.slice(-1);
+
+            // TODO Use scope mapping ala `event-listeners.ts` to get better function names
+          } catch (err) {
+            // console.error("Error finding parent frame time: ", err);
+            userPauseFrame = undefined;
+          }
         }
 
         return {
@@ -207,7 +258,7 @@ function findQueuedRendersForRange(
 
     const [queuedRenders] = await Promise.all([queuedRendersPromise]);
 
-    console.log("Queued renders: ", queuedRenders);
+    // console.log("Queued renders: ", queuedRenders);
 
     return {
       queuedRenders,
@@ -245,7 +296,11 @@ function ReactQueuedRenderListItem({
   const [jumpToCodeStatus, setJumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
 
   const { userPauseFrame, userPauseFrameTime } = renderDetails;
-  const { source } = userPauseFrame!;
+
+  if (!userPauseFrame) {
+    return null;
+  }
+  const { source } = userPauseFrame;
 
   const filename = source ? getFilename(source) : "Unknown";
 
@@ -391,13 +446,7 @@ export function ReactPanel() {
   allEntriesSorted.sort((a, b) => compareExecutionPoints(a.point, b.point));
 
   const queuedRenderEntries = allEntriesSorted.map(entry => {
-    if ("filteredPauseFrames" in entry) {
-      const [oldestPauseFrame] = entry.filteredPauseFrames.slice(-1);
-
-      if (!oldestPauseFrame) {
-        return null;
-      }
-
+    if ("userPauseFrame" in entry) {
       return (
         <ReactQueuedRenderListItem
           currentTime={currentTime}

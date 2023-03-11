@@ -37,7 +37,7 @@ export function containsPosition(a: PositionRange, b: SourceLocation) {
   return startsBefore && endsAfter;
 }
 
-function findClosestofSymbol(
+export function findClosestofSymbol(
   declarations: (FunctionDeclaration | ClassDeclaration)[],
   location: SourceLocation
 ) {
