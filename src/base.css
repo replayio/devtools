@@ -12,6 +12,8 @@ body {
 
 * {
   box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: transparent;
 }
 
 .showRedactions[data-private="true"] {
@@ -26,7 +28,7 @@ body {
   --light-blue: #61cdff;
   --light-grey: #969696;
   font-family: "Inter", sans-serif;
-}
+ }
 
 #__next,
 #app-container {
@@ -69,3 +71,5 @@ img.avatar,
   border-radius: 8px;
   background: rgba(113, 113, 113, 0.5);
 }
+
+

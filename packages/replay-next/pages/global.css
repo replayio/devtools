@@ -27,6 +27,7 @@ button {
   background: transparent;
 }
 
+
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
@@ -40,3 +41,4 @@ button {
   border-radius: 0.75rem;
   background: var(--scroll-thumb-color);
 }
+
