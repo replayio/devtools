@@ -49,7 +49,7 @@ class LayoutApp extends React.PureComponent<FinalLAProps> {
     return (
       <div className="layout-container">
         <div className="h-full overflow-y-auto">
-          <Accordion items={items} style={{ overflow: "scroll",height:"220px" }} />
+          <Accordion items={items} style={{ overflow: "auto" }} />
         </div>
       </div>
     );
