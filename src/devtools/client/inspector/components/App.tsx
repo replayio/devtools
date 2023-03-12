@@ -61,39 +61,34 @@ export default function InspectorApp() {
             <div className="devtools-inspector-tab-panel">
               <div id="inspector-sidebar-container">
                 <div id="inspector-sidebar">
-                  <div className="devtools-sidebar-tabs">
-                    <div className="tabs">
-                      <nav
-                        className="tabs-navigation"
-                        style={{
-                          borderBottom: "1px solid var(--theme-splitter-color)",
-                        }}
-                      >
-                        <ResponsiveTabs activeIdx={availableTabs.indexOf(activeTab)}>
-                          {availableTabs.map(panelId => {
-                            const isPanelSelected = activeTab === panelId;
-                            return (
-                              <Tab
-                                key={panelId}
-                                id={panelId}
-                                active={isPanelSelected}
-                                text={INSPECTOR_TAB_TITLES[panelId]}
-                                onClick={() => dispatch(setActiveTab(panelId))}
-                              />
-                            );
-                          })}
-                        </ResponsiveTabs>
-                      </nav>
-                      <div className="panels">
-                        <div className="tab-panel-box" role="tabpanel">
-                          {activeTab === "computedview" && <ComputedApp />}
-                          {activeTab === "eventsview" && <EventListenersApp />}
-                          {activeTab === "layoutview" && (
-                            <LayoutApp showBoxModelProperties={true} />
-                          )}
-                          {activeTab === "ruleview" && <RulesApp />}
-                        </div>
-                      </div>
+                  <div className="devtools-sidebar-tabs tabs">
+                    <nav
+                      className="tabs-navigation"
+                      style={{
+                        borderBottom: "1px solid var(--theme-splitter-color)",
+                      }}
+                    >
+                      <ResponsiveTabs activeIdx={availableTabs.indexOf(activeTab)}>
+                        {availableTabs.map(panelId => {
+                          const isPanelSelected = activeTab === panelId;
+                          return (
+                            <Tab
+                              key={panelId}
+                              id={panelId}
+                              active={isPanelSelected}
+                              text={INSPECTOR_TAB_TITLES[panelId]}
+                              onClick={() => dispatch(setActiveTab(panelId))}
+                            />
+                          );
+                        })}
+                      </ResponsiveTabs>
+                    </nav>
+
+                    <div className="tab-panel-box panels" role="tabpanel">
+                      {activeTab === "computedview" && <ComputedApp />}
+                      {activeTab === "eventsview" && <EventListenersApp />}
+                      {activeTab === "layoutview" && <LayoutApp showBoxModelProperties={true} />}
+                      {activeTab === "ruleview" && <RulesApp />}
                     </div>
                   </div>
                 </div>
