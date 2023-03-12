@@ -186,7 +186,9 @@ function RecordingRow({
                   <span>{getRelativeDate(recording.date)}</span>
                 </div>
                 <div className="overflow-hidden overflow-ellipsis whitespace-pre font-light text-gray-400">
-                  {getDisplayedUrl(recording.url)}
+                  <a href={recording.url} target="_blank" rel="noopener noreferrer">
+                    {getDisplayedUrl(recording.url)}
+                  </a>
                 </div>
                 {recording.metadata?.test?.file ? (
                   <div className="overflow-hidden overflow-ellipsis whitespace-pre font-light text-gray-400">
