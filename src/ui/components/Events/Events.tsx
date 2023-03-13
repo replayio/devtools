@@ -1,12 +1,12 @@
 import classNames from "classnames";
 import sortedLastIndex from "lodash/sortedLastIndex";
-import { ConnectedProps, connect } from "react-redux";
+import React from "react";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
-import { actions } from "ui/actions";
-import hooks from "ui/hooks";
-import { selectors } from "ui/reducers";
-import { UIState } from "ui/state";
+import { getFilteredEventsForFocusRegion } from "ui/actions/app";
+import { seek } from "ui/actions/timeline";
+import { getCurrentTime } from "ui/reducers/timeline";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
 import Event from "./Event";
@@ -20,10 +20,15 @@ function CurrentTimeLine({ isActive }: { isActive: boolean }) {
   );
 }
 
-function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
+function Events() {
+  const dispatch = useAppDispatch();
+  const currentTime = useAppSelector(getCurrentTime);
+  const executionPoint = useAppSelector(getExecutionPoint);
+  const events = useAppSelector(getFilteredEventsForFocusRegion);
+
   const onSeek = (point: string, time: number) => {
     trackEvent("events_timeline.select");
-    seek(point, time, false);
+    dispatch(seek(point, time, false));
   };
 
   const currentEventIndex = sortedLastIndex(
@@ -56,13 +61,4 @@ function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
   }
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    currentTime: selectors.getCurrentTime(state),
-    events: selectors.getFlatEvents(state),
-    executionPoint: getExecutionPoint(state),
-  }),
-  { seek: actions.seek }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(Events);
+export default React.memo(Events);
