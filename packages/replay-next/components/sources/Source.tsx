@@ -29,6 +29,9 @@ export type HoveredState = {
   target: HTMLElement;
 };
 
+/**
+ * Rendered in the main app by `<NewSourceAdapter>`
+ */
 export default function Source({
   source,
   showColumnBreakpoints,
