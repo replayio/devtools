@@ -55,6 +55,10 @@ const maxResults = 100;
 const SIZE_BIG = { size: "big" };
 const SIZE_DEFAULT = {};
 
+export type SearchResultWithHighlighting = Omit<SearchResult, "title"> & {
+  title: string | JSX.Element;
+};
+
 function filter(values: SearchResult[], query: string) {
   const preparedQuery = fuzzyAldrin.prepareQuery(query);
 
@@ -219,13 +223,13 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
 
   updateResults = this.getUpdateResultsCallback();
 
-  setModifier = (item: SearchResult) => {
+  setModifier = (item: SearchResultWithHighlighting) => {
     if (["@", "#", ":"].includes(item.id)) {
       this.props.setQuickOpenQuery(item.id);
     }
   };
 
-  selectResultItem = (e: any, item: SearchResult) => {
+  selectResultItem = (e: any, item: SearchResultWithHighlighting) => {
     if (item == null) {
       return;
     }
@@ -383,7 +387,7 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
     return <div dangerouslySetInnerHTML={{ __html: html }} />;
   }
 
-  highlightMatching = (query: string, results: SearchResult[]) => {
+  highlightMatching = (query: string, results: SearchResult[]): SearchResultWithHighlighting[] => {
     let newQuery = query;
     if (newQuery === "") {
       return results;

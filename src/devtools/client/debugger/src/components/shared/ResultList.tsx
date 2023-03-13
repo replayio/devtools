@@ -6,22 +6,33 @@ import classnames from "classnames";
 //
 import React, { Component } from "react";
 
+import { SearchResultWithHighlighting } from "../QuickOpenModal";
 import AccessibleImage from "./AccessibleImage";
 
-export default class ResultList extends Component {
+interface ResultListProps {
+  dataTestId?: string;
+  role?: string;
+  items: SearchResultWithHighlighting[];
+  expanded: boolean;
+  selected: number;
+  size?: string;
+  selectItem: (e: any, item: SearchResultWithHighlighting) => void;
+}
+
+export default class ResultList extends Component<ResultListProps> {
   static defaultProps = {
     size: "small",
     role: "listbox",
   };
 
-  renderListItem = (item, index) => {
+  renderListItem = (item: SearchResultWithHighlighting, index: number) => {
     if (item.value === "/" && item.title === "") {
       item.title = "(index)";
     }
 
     const { selectItem, selected } = this.props;
     const props = {
-      onClick: event => selectItem(event, item, index),
+      onClick: (event: any) => selectItem(event, item),
       key: `${item.id}${item.value}${index}`,
       ref: String(index),
       title: item.value,
