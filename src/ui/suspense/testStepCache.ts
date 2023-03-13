@@ -3,10 +3,7 @@ import cloneDeep from "lodash/cloneDeep";
 
 import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
 import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
-import {
-  getObjectWithPreviewHelper,
-  getObjectWithPreviewSuspense,
-} from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import {
   evaluateAsync,
   evaluateSuspense,
@@ -120,17 +117,17 @@ export function getCypressConsolePropsSuspense(
     );
 
     if (logResult?.object) {
-      const logObject = getObjectWithPreviewSuspense(client, endPauseId, logResult.object);
+      const logObject = objectCache.read(client, endPauseId, logResult.object, "canOverflow");
       const consolePropsProperty = logObject.preview?.properties?.find(
         p => p.name === "consoleProps"
       );
 
       if (consolePropsProperty?.object) {
-        const consoleProps = getObjectWithPreviewSuspense(
+        const consoleProps = objectCache.read(
           client,
           endPauseId,
           consolePropsProperty.object,
-          true
+          "full"
         );
 
         const sanitized = cloneDeep(consoleProps);
@@ -182,7 +179,7 @@ export async function getCypressSubjectNodeIdsAsync(
     const cmdObjectId = cmdResult.returned?.object;
 
     if (cmdObjectId) {
-      const cmdObject = await getObjectWithPreviewHelper(client, pauseId, cmdObjectId, true);
+      const cmdObject = await objectCache.readAsync(client, pauseId, cmdObjectId, "full");
 
       const props = cmdObject?.preview?.properties;
       const length: number = props?.find(o => o.name === "length")?.value || 0;

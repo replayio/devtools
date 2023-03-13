@@ -6,10 +6,7 @@ import type { Location, ObjectPreview, Object as ProtocolObject } from "@replayi
 import type { ThreadFront as TF } from "protocol/thread";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { getTopFrameAsync } from "replay-next/src/suspense/FrameCache";
-import {
-  getObjectPropertyHelper,
-  getObjectWithPreviewHelper,
-} from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { getScopeMapAsync } from "replay-next/src/suspense/ScopeMapCache";
 import { ReplayClientInterface } from "shared/client/types";
@@ -157,9 +154,11 @@ export function getNodeEventListeners(
     const formattedListenerEntries = await Promise.all(
       listeners.map(listener => {
         // TODO These entries exist in current testing, but what's fetching them earlier?
-        const listenerHandler = objectCache.getObjectThrows(
+        const listenerHandler = objectCache.getValue(
+          replayClient,
           pauseId!,
-          listener.handler
+          listener.handler,
+          "none"
         ) as FunctionWithPreview;
 
         return formatEventListener(
@@ -179,10 +178,11 @@ export function getNodeEventListeners(
     // a real file like `Counter.tsx:27` instead.
 
     // Start by getting "the JS object that represents this DOM node".
-    const domNodeObject = (await objectCache.getObjectWithPreviewHelper(
+    const domNodeObject = (await objectCache.readAsync(
       replayClient,
       pauseId,
-      nodeId
+      nodeId,
+      "canOverflow"
     )) as NodeWithPreview;
 
     // DOM nodes can have normal JS object properties.
@@ -200,10 +200,11 @@ export function getNodeEventListeners(
     if (reactEventListenerProperty) {
       // Assuming we found the magic "props metadata" object name/ID,
       // retrieve the actual object contents.
-      const listenerPropObj = await objectCache.getObjectWithPreviewHelper(
+      const listenerPropObj = await objectCache.readAsync(
         replayClient,
         pauseId,
-        reactEventListenerProperty.object!
+        reactEventListenerProperty.object!,
+        "canOverflow"
       );
 
       // The object might contain both primitives and objects/functions.
@@ -216,10 +217,11 @@ export function getNodeEventListeners(
         const allPropertyPreviews = await Promise.all(
           objectProperties.map(async prop => ({
             name: prop.name,
-            value: (await objectCache.getObjectWithPreviewHelper(
+            value: (await objectCache.readAsync(
               replayClient,
               pauseId!,
-              prop.object!
+              prop.object!,
+              "canOverflow"
             )) as FunctionWithPreview,
           }))
         );
@@ -320,17 +322,23 @@ export const {
     const sourcesById = getSourceDetailsEntities(state);
 
     if (res.returned?.object) {
-      const preview = await getObjectWithPreviewHelper(replayClient, pauseId, res.returned.object);
+      const preview = await objectCache.readAsync(
+        replayClient,
+        pauseId,
+        res.returned.object,
+        "canOverflow"
+      );
       // The evaluation may have found a React prop function somewhere.
       const handlerProp = preview?.preview?.properties?.find(p => p.name === "handlerProp");
 
       if (handlerProp) {
         // If it did find a React prop function, get its
         // preview and format it so we know the preferred location.
-        const onClickPreview = (await getObjectWithPreviewHelper(
+        const onClickPreview = (await objectCache.readAsync(
           replayClient,
           pauseId,
-          handlerProp.object!
+          handlerProp.object!,
+          "canOverflow"
         )) as FunctionWithPreview;
 
         const formattedEventListener = await formatEventListener(
@@ -345,7 +353,12 @@ export const {
         sourceLocation = formattedEventListener.location;
       }
     } else if (res.exception?.object) {
-      const error = await getObjectWithPreviewHelper(replayClient, pauseId, res.exception.object);
+      const error = await objectCache.readAsync(
+        replayClient,
+        pauseId,
+        res.exception.object,
+        "canOverflow"
+      );
       console.error("Error fetching event listener location: ", error);
     }
 

@@ -4,7 +4,7 @@ import { MouseEvent, ReactNode, Suspense, useContext, useState } from "react";
 
 import Expandable from "replay-next/components/Expandable";
 import Loader from "replay-next/components/Loader";
-import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import HTMLExpandable from "./HTMLExpandable";
@@ -64,7 +64,7 @@ export default function KeyValueRenderer({
       case "object":
       case "regexp":
       case "set": {
-        objectWithPreview = getObjectWithPreviewSuspense(client, pauseId, objectId!);
+        objectWithPreview = objectCache.read(client, pauseId, objectId!, "canOverflow");
         if (objectWithPreview == null) {
           throw Error(`Could not find object with ID "${objectId}"`);
         }
@@ -74,12 +74,12 @@ export default function KeyValueRenderer({
           // This is because text node children and HTML element children are treated differently.
           // Text node children may be rendered as part of the inline preview, if there is only one child.
           if (objectWithPreview.preview!.overflow) {
-            objectWithPreview = getObjectWithPreviewSuspense(client, pauseId, objectId!, true);
+            objectWithPreview = objectCache.read(client, pauseId, objectId!, "full");
           }
 
           const childNodes = objectWithPreview.preview?.node?.childNodes ?? [];
           const htmlElementChildren = childNodes.filter(childNodeId => {
-            const childNode = getObjectWithPreviewSuspense(client, pauseId, childNodeId);
+            const childNode = objectCache.read(client, pauseId, childNodeId, "canOverflow");
             return childNode.className !== "Text";
           });
 

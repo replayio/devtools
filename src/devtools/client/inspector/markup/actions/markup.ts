@@ -3,7 +3,7 @@ import { ProtocolClient, Object as ProtocolObject } from "@replayio/protocol";
 import { paused } from "devtools/client/debugger/src/reducers/pause";
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { Deferred, assert, defer } from "protocol/utils";
-import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import type { UIStore, UIThunkAction } from "ui/actions";
@@ -354,10 +354,11 @@ export function selectionChanged(
     dispatch(nodeSelected(latestSelectedNodeId));
 
     // collect the selected node's ancestors in top-down order
-    const selectedNode = await getObjectWithPreviewHelper(
+    const selectedNode = await objectCache.readAsync(
       replayClient,
       pauseId,
-      latestSelectedNodeId
+      latestSelectedNodeId,
+      "canOverflow"
     );
     let ancestors: string[] = [];
 
@@ -368,7 +369,7 @@ export function selectionChanged(
     while (ancestorId) {
       ancestors.unshift(ancestorId);
 
-      const node = await getObjectWithPreviewHelper(replayClient, pauseId, ancestorId);
+      const node = await objectCache.readAsync(replayClient, pauseId, ancestorId, "canOverflow");
       ancestorId = node?.preview?.node?.parentNode;
     }
 
@@ -684,7 +685,7 @@ async function convertNode(
   { isExpanded = false } = {}
 ): Promise<NodeInfo> {
   const [nodeObject, computedStyle, eventListeners] = await Promise.all([
-    getObjectWithPreviewHelper(replayClient, pauseId, nodeId),
+    objectCache.readAsync(replayClient, pauseId, nodeId, "canOverflow"),
     getComputedStyleAsync(pauseId, nodeId, client, sessionId),
     getNodeEventListenersAsync(pauseId, nodeId, client, replayClient, sessionId),
   ]);

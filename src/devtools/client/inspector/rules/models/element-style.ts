@@ -7,7 +7,7 @@ import { ProtocolClient } from "@replayio/protocol";
 import RuleModel, { NodeWithId } from "devtools/client/inspector/rules/models/rule";
 import Services from "devtools/shared/services";
 import { assert } from "protocol/utils";
-import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 import { getAppliedRulesAsync } from "ui/suspense/styleCaches";
 
@@ -80,10 +80,11 @@ export default class ElementStyle {
   async populate() {
     this.rules = [];
 
-    const nodeObject = await getObjectWithPreviewHelper(
+    const nodeObject = await objectCache.readAsync(
       this.replayClient,
       this.pauseId,
-      this.nodeId
+      this.nodeId,
+      "canOverflow"
     );
     const node = nodeObject?.preview?.node;
 
@@ -108,10 +109,11 @@ export default class ElementStyle {
 
     // The inline rule has higher priority than applied rules.
     if (node.style) {
-      const inlineStyleObject = await getObjectWithPreviewHelper(
+      const inlineStyleObject = await objectCache.readAsync(
         this.replayClient,
         this.pauseId,
-        node.style
+        node.style,
+        "canOverflow"
       );
       const styleFront = new StyleFront(inlineStyleObject);
       this._maybeAddRule(styleFront);
@@ -128,10 +130,11 @@ export default class ElementStyle {
 
     // Show relevant rules applied to parent elements.
     while (parentNodeId) {
-      const nodeObject = await getObjectWithPreviewHelper(
+      const nodeObject = await objectCache.readAsync(
         this.replayClient,
         this.pauseId,
-        parentNodeId
+        parentNodeId,
+        "canOverflow"
       );
       const elem = nodeObject.preview?.node;
       if (!elem) {
@@ -141,10 +144,11 @@ export default class ElementStyle {
 
       if (elem.nodeType == Node.ELEMENT_NODE) {
         if (elem.style) {
-          const styleObject = await getObjectWithPreviewHelper(
+          const styleObject = await objectCache.readAsync(
             this.replayClient,
             this.pauseId,
-            elem.style!
+            elem.style!,
+            "canOverflow"
           );
           const parentInline = new StyleFront(styleObject);
           if (parentInline.properties.length > 0) {
