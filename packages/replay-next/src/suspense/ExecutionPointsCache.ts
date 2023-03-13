@@ -3,14 +3,13 @@ import {
   getPointsBoundingTimeResult as PointsBoundingTime,
   TimeStampedPoint,
 } from "@replayio/protocol";
+import { Deferred, createDeferred } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 
-import { createWakeable } from "../utils/suspense";
 import { isExecutionPointsLessThan } from "../utils/time";
 import { createGenericCache } from "./createGenericCache";
-import { Wakeable } from "./types";
 
 export type CachedPointsForTime = Map<number, ExecutionPoint>;
 type ChangeHandler = (timeStampedPoint: TimeStampedPoint) => void;
@@ -19,7 +18,7 @@ const cachedPointsForTime: CachedPointsForTime = new Map();
 const cachedPointsForTimeChangeHandlers: Set<ChangeHandler> = new Set();
 const sortedExecutionPoints: TimeStampedPoint[] = [];
 const sortedPointsBoundingTimes: PointsBoundingTime[] = [];
-const timeToInFlightRequestMap: Map<number, Wakeable<ExecutionPoint>> = new Map();
+const timeToInFlightRequestMap: Map<number, Deferred<ExecutionPoint>> = new Map();
 const timeToErrorMap: Map<number, any> = new Map();
 
 export function addCachedPointsForTimeListener(handler: ChangeHandler): () => void {
@@ -51,7 +50,7 @@ function callCachedPointsForTimeListeners(time: number, point: ExecutionPoint): 
 async function fetchPointsBoundingTime(
   client: ReplayClientInterface,
   time: number,
-  wakeable: Wakeable<ExecutionPoint>,
+  deferred: Deferred<ExecutionPoint>,
   rethrowError: boolean
 ) {
   try {
@@ -102,7 +101,7 @@ async function fetchPointsBoundingTime(
       }
     }
 
-    wakeable.resolve(point);
+    deferred.resolve(point);
   } catch (error) {
     if (rethrowError) {
       throw error;
@@ -116,7 +115,7 @@ async function fetchPointsBoundingTime(
       timeToErrorMap.set(time, error);
     }
 
-    wakeable.reject(error);
+    deferred.reject(error);
   } finally {
     timeToInFlightRequestMap.delete(time);
   }
@@ -205,17 +204,17 @@ export function getClosestPointForTimeSuspense(
   }
 
   // Otherwise let's fetch the closest points for this time.
-  let wakeable = timeToInFlightRequestMap.get(time);
-  if (wakeable == null) {
-    wakeable = createWakeable<ExecutionPoint>(`getClosestPointForTimeSuspense time: ${time}`);
+  let deferred = timeToInFlightRequestMap.get(time);
+  if (deferred == null) {
+    deferred = createDeferred<ExecutionPoint>(`getClosestPointForTimeSuspense time: ${time}`);
 
-    timeToInFlightRequestMap.set(time, wakeable);
+    timeToInFlightRequestMap.set(time, deferred);
 
     // Fire and forget for the purposes of Suspense.
-    fetchPointsBoundingTime(client, time, wakeable, false);
+    fetchPointsBoundingTime(client, time, deferred, false);
   }
 
-  throw wakeable;
+  throw deferred.promise;
 }
 
 function getClosestPointInPointsBoundingTime(
@@ -254,7 +253,7 @@ export async function imperativelyGetClosestPointForTime(
     await fetchPointsBoundingTime(
       client,
       time,
-      createWakeable<ExecutionPoint>(`imperativelyGetClosestPointForTime time: ${time}`),
+      createDeferred<ExecutionPoint>(`imperativelyGetClosestPointForTime time: ${time}`),
       true
     );
     return cachedPointsForTime.get(time)!;

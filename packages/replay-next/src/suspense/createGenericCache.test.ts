@@ -1,12 +1,6 @@
-import { isThennable } from "shared/proxy/utils";
+import { STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, isPromiseLike } from "suspense";
 
-import {
-  GenericCache,
-  STATUS_PENDING,
-  STATUS_REJECTED,
-  STATUS_RESOLVED,
-  createGenericCache,
-} from "./createGenericCache";
+import { GenericCache, createGenericCache } from "./createGenericCache";
 
 describe("createGenericCache", () => {
   let fetchValue: jest.Mock;
@@ -87,11 +81,11 @@ describe("createGenericCache", () => {
 
   describe("getValueAsync", () => {
     it("should return async values", async () => {
-      const thennable = cache.getValueAsync("async");
+      const thenable = cache.getValueAsync("async");
 
-      expect(isThennable(thennable)).toBe(true);
+      expect(isPromiseLike(thenable)).toBe(true);
 
-      await expect(await thennable).toBe("async");
+      await expect(await thenable).toBe("async");
     });
 
     it("should return sync values", () => {
@@ -139,10 +133,10 @@ describe("createGenericCache", () => {
         cache.getValueSuspense("async");
 
         throw new Error("should have suspended");
-      } catch (thennable) {
-        expect(isThennable(thennable)).toBe(true);
+      } catch (thenable) {
+        expect(isPromiseLike(thenable)).toBe(true);
 
-        await thennable;
+        await thenable;
 
         expect(cache.getValueSuspense("async")).toBe("async");
       }
@@ -199,12 +193,12 @@ describe("createGenericCache", () => {
       expect(callbackA).toHaveBeenCalledTimes(1);
       expect(callbackA).toHaveBeenCalledWith(undefined);
 
-      const thennable = cache.getValueAsync("async");
+      const thenable = cache.getValueAsync("async");
 
       expect(callbackA).toHaveBeenCalledTimes(2);
       expect(callbackA).toHaveBeenCalledWith(STATUS_PENDING);
 
-      await thennable;
+      await thenable;
 
       expect(callbackA).toHaveBeenCalledTimes(3);
       expect(callbackA).toHaveBeenCalledWith(STATUS_RESOLVED);

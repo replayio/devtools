@@ -1,5 +1,3 @@
-import { Thennable } from "replay-next/src/suspense/types";
-
 import { Entry } from "./types";
 
 export function findMatch(entries: Entry[], prop: string, args: any[] | null): Entry | null {
@@ -32,8 +30,4 @@ export function findMatch(entries: Entry[], prop: string, args: any[] | null): E
 
 export function isIterator(value: any): boolean {
   return typeof value === "symbol" && (value as Symbol).toString().includes("Symbol.iterator");
-}
-
-export function isThennable(value: any): value is Thennable<any> {
-  return value != null && typeof value.then === "function";
 }
