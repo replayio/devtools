@@ -6,6 +6,7 @@ import classnames from "classnames";
 //
 import React, { Component } from "react";
 
+import { scrollList } from "../../utils/result-list";
 import { SearchResultWithHighlighting } from "../QuickOpenModal";
 import AccessibleImage from "./AccessibleImage";
 
@@ -20,9 +21,17 @@ interface ResultListProps {
 }
 
 export default class ResultList extends Component<ResultListProps> {
+  listItemNodes: Record<number, HTMLElement> = {};
+
   static defaultProps = {
     size: "small",
     role: "listbox",
+  };
+
+  scrollList = (newSelectedIndex: number) => {
+    if (newSelectedIndex in this.listItemNodes) {
+      scrollList(this.listItemNodes, newSelectedIndex);
+    }
   };
 
   renderListItem = (item: SearchResultWithHighlighting, index: number) => {
@@ -31,10 +40,17 @@ export default class ResultList extends Component<ResultListProps> {
     }
 
     const { selectItem, selected } = this.props;
-    const props = {
+    const props: React.ComponentPropsWithRef<"li"> = {
       onClick: (event: any) => selectItem(event, item),
       key: `${item.id}${item.value}${index}`,
-      ref: String(index),
+      ref: element => {
+        // Keep a lookup table of items by index for scrolling
+        if (element) {
+          this.listItemNodes[index] = element;
+        } else {
+          delete this.listItemNodes[index];
+        }
+      },
       title: item.value,
       "aria-labelledby": `${item.id}-title`,
       "aria-describedby": `${item.id}-subtitle`,

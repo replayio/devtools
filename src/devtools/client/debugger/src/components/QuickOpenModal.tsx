@@ -45,7 +45,6 @@ import {
   formatSymbols,
   parseLineColumn,
 } from "../utils/quick-open";
-import { scrollList } from "../utils/result-list";
 import Modal from "./shared/Modal";
 import ResultList from "./shared/ResultList";
 import SearchInput from "./shared/SearchInput";
@@ -78,6 +77,7 @@ interface QOMState {
 }
 
 export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
+  resultList = React.createRef<ResultList>();
   constructor(props: PropsFromRedux) {
     super(props);
 
@@ -99,12 +99,7 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
   componentDidUpdate(prevProps: PropsFromRedux) {
     const hasChanged = (field: keyof PropsFromRedux) => prevProps[field] !== this.props[field];
 
-    // TODO Replace use of string refs
-    // @ts-expect-error ignore refs
-    if (this.refs.resultList && this.refs.resultList.refs) {
-      // @ts-expect-error ignore refs
-      scrollList(this.refs.resultList.refs, this.state.selectedIndex);
-    }
+    this.resultList.current?.scrollList(this.state.selectedIndex);
 
     if (hasChanged("sourceCount")) {
       // If the source count has changed, we need to update the throttled
@@ -476,7 +471,7 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
             items={items}
             selected={selectedIndex}
             selectItem={this.selectResultItem}
-            ref="resultList"
+            ref={this.resultList}
             expanded={expanded}
             {...(this.isSourceSearch() ? SIZE_BIG : SIZE_DEFAULT)}
           />
