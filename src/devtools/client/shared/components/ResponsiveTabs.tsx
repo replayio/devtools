@@ -33,6 +33,7 @@ export function Tab({ id, text, active, onClick }: TabProps) {
 
 type ResponsiveTabsProps = {
   className?: string;
+  dataTestId?: string;
   dropdownButton?: ReactNode;
   dropdownClassName?: string;
   dropdownStyle?: CSSProperties;
@@ -42,6 +43,7 @@ type ResponsiveTabsProps = {
 
 export const ResponsiveTabs = ({
   className = "",
+  dataTestId,
   dropdownButton,
   dropdownClassName,
   dropdownStyle,
@@ -143,7 +145,7 @@ export const ResponsiveTabs = ({
   const hasDropdown = visibleItemsCount < tabs.length;
 
   return (
-    <div className="relative max-w-full">
+    <div className="relative max-w-full" data-test-id={dataTestId}>
       <div className={cx("flex overflow-hidden", className)} ref={containerRef}>
         {orderedTabs.map((tab, idx) => (
           <span
@@ -165,7 +167,10 @@ export const ResponsiveTabs = ({
           className={cx("absolute right-0 top-0 flex h-full items-center", dropdownClassName)}
         >
           {dropdownButton ?? (
-            <span className="flex h-full cursor-pointer select-none items-center px-1 hover:bg-[color:var(--tab-bgcolor)]">
+            <span
+              className="flex h-full cursor-pointer select-none items-center px-1 hover:bg-[color:var(--tab-bgcolor)]"
+              data-test-name="ResponsiveTabsDropDownButton"
+            >
               ···
             </span>
           )}
@@ -175,7 +180,9 @@ export const ResponsiveTabs = ({
               style={dropdownStyle}
             >
               {orderedTabs.slice(visibleItemsCount).map(tab => (
-                <div key={tab.key}>{tab}</div>
+                <div key={tab.key} data-test-name="ResponsiveTabsDropDownItem">
+                  {tab}
+                </div>
               ))}
             </div>
           )}

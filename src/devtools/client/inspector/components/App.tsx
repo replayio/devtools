@@ -69,7 +69,10 @@ export default function InspectorApp() {
                           borderBottom: "1px solid var(--theme-splitter-color)",
                         }}
                       >
-                        <ResponsiveTabs activeIdx={availableTabs.indexOf(activeTab)}>
+                        <ResponsiveTabs
+                          activeIdx={availableTabs.indexOf(activeTab)}
+                          dataTestId="InspectorTabs"
+                        >
                           {availableTabs.map(panelId => {
                             const isPanelSelected = activeTab === panelId;
                             return (
