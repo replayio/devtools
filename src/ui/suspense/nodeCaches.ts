@@ -9,7 +9,7 @@ import {
 } from "@replayio/protocol";
 
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
-import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 
@@ -81,7 +81,12 @@ export const {
         break;
       }
       case "childNodes": {
-        const nodeObject = await getObjectWithPreviewHelper(replayClient, pauseId, options.nodeId);
+        const nodeObject = await objectCache.readAsync(
+          replayClient,
+          pauseId,
+          options.nodeId,
+          "canOverflow"
+        );
 
         nodeIds = nodeObject?.preview?.node?.childNodes ?? [];
 
@@ -128,7 +133,7 @@ export const {
     }
 
     const nodePromises = nodeIds.map(nodeId =>
-      getObjectWithPreviewHelper(replayClient, pauseId, nodeId)
+      objectCache.readAsync(replayClient, pauseId, nodeId, "canOverflow")
     );
 
     return Promise.all(nodePromises);

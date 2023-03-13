@@ -1,288 +1,87 @@
-import { Object, ObjectId, PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import {
-  Deferred,
-  Record,
-  ResolvedRecord,
-  createDeferred,
-  createPendingRecord,
-  createResolvedRecord,
-  isPendingRecord,
-  isRejectedRecord,
-  isResolvedRecord,
-  updateRecordToRejected,
-  updateRecordToResolved,
-} from "suspense";
+  Object,
+  ObjectId,
+  ObjectPreviewLevel,
+  PauseId,
+  Value as ProtocolValue,
+} from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 
 import { ReplayClientInterface } from "../../../shared/client/types";
-import { createFetchAsyncFromFetchSuspense } from "../utils/suspense";
 import { cachePauseData } from "./PauseCache";
 
-type ObjectMap = Map<ObjectId, Object>;
-type RecordMap = Map<ObjectId, Record<Object>>;
-type PropertyRecordMap = Map<string, Record<ProtocolValue>>;
+export const objectCache: Cache<
+  [
+    client: ReplayClientInterface,
+    pauseId: PauseId,
+    objectId: ObjectId,
+    previewLevel: ObjectPreviewLevel
+  ],
+  Object
+> = createCache({
+  // The protocol only sends objects once per session;
+  // disable weak ref caching to ensure we don't lose data
+  config: { useWeakRef: false },
+  debugLabel: "objectCache",
+  getKey: ([client, pauseId, objectId, previewLevel]) => `${pauseId}:${objectId}:${previewLevel}`,
+  load: async ([client, pauseId, objectId, previewLevel]) => {
+    const data = await client.getObjectWithPreview(objectId, pauseId, previewLevel);
 
-type ObjectMaps = {
-  // This map contains Objects with no guarantee of preview information.
-  // These objects may only specify the non-optional "objectId" and "className" fields.
-  //
-  // We store this information separately because it is enough for type determination (which renderer to use).
-  //
-  // https://static.replay.io/protocol/tot/Pause/#type-Object
-  objectMap: ObjectMap;
+    cachePauseData(client, pauseId, data);
 
-  // This map contains Records of Object properties.
-  // This information is fetched (via Suspense) by calling Pause.getObjectProperty().
-  //
-  // https://static.replay.io/protocol/tot/Pause/#method-getObjectProperty
-  objectPropertyMap: PropertyRecordMap;
+    // cachePauseData() calls preCacheObjects()
+    // so the object should be in the cache now
+    return objectCache.getValue(client, pauseId, objectId, previewLevel);
+  },
+});
 
-  // These maps contain Records of Objects with preview information.
-  // This information is fetched (via Suspense) by calling Pause.getObjectPreview().
-  //
-  // https://static.replay.io/protocol/tot/Pause/#method-getObjectPreview
-  previewRecordMap: RecordMap;
-  fullPreviewRecordMap: RecordMap;
-};
+export const objectPropertyCache: Cache<
+  [client: ReplayClientInterface, pauseId: PauseId, objectId: ObjectId, propertyName: string],
+  ProtocolValue | null
+> = createCache({
+  // The protocol only sends objects once per session;
+  // disable weak ref caching to ensure we don't lose data
+  config: { useWeakRef: false },
+  debugLabel: "objectPropertyCache",
+  getKey: ([client, pauseId, objectId, propertyName]) => `${pauseId}:${objectId}:${propertyName}`,
+  load: async ([client, pauseId, objectId, propertyName]) => {
+    const { data, returned } = await client.getObjectProperty(objectId, pauseId, propertyName);
 
-// Object ids are only unique within the scope of a Pause.
-// Object caching must be done per Pause id.
-// This will change if "persistentId" becomes standard.
-//
-// https://static.replay.io/protocol/tot/Debugger/#type-PersistentObjectId
-type PauseMap = Map<PauseId, ObjectMaps>;
+    cachePauseData(client, pauseId, data);
 
-const pauseMap: PauseMap = new Map();
+    return returned ?? null;
+  },
+});
 
-// For now (until/unless PersistentObjectId ships) ObjectIds are only unique within the scope of a pause.
-function getOrCreateObjectWithPreviewMap(pauseId: PauseId): ObjectMaps {
-  let maps = pauseMap.get(pauseId);
-  if (!maps) {
-    maps = {
-      objectMap: new Map(),
-      objectPropertyMap: new Map(),
-      previewRecordMap: new Map(),
-      fullPreviewRecordMap: new Map(),
-    };
-
-    pauseMap.set(pauseId, maps);
-  }
-  return maps!;
-}
-
-// Does not suspend.
 // This method is safe to call outside of render.
 // The Objects it returns are not guaranteed to contain preview information.
 export function getCachedObject(pauseId: PauseId, objectId: ObjectId): Object | null {
-  const maps = getOrCreateObjectWithPreviewMap(pauseId);
-  if (maps == null) {
-    return null;
-  }
-
-  let record = maps.fullPreviewRecordMap.get(objectId);
-  if (record && isResolvedRecord(record)) {
-    return record.data.value ?? null;
-  }
-
-  record = maps.previewRecordMap.get(objectId);
-  if (record && isResolvedRecord(record)) {
-    return record.data.value ?? null;
-  }
-
-  const object = maps.objectMap.get(objectId);
-  return object || null;
+  // The objectCache only uses the "client" param for fetching values, not caching them
+  const nullClient = null as any;
+  return (
+    objectCache.getValueIfCached(nullClient, pauseId, objectId, "full") ??
+    objectCache.getValueIfCached(nullClient, pauseId, objectId, "canOverflow") ??
+    objectCache.getValueIfCached(nullClient, pauseId, objectId, "none") ??
+    null
+  );
 }
-
-// Does not suspend.
-// This method is safe to call outside of render.
-// It returns a cached object property if one has been previously loaded, or null.
-export function getCachedObjectProperty(
-  pauseId: PauseId,
-  objectId: ObjectId,
-  propertyName: string
-): ProtocolValue | null {
-  const maps = getOrCreateObjectWithPreviewMap(pauseId);
-  if (maps == null) {
-    return null;
-  }
-
-  const key = `${objectId}:${propertyName}`;
-  const record = maps.objectPropertyMap.get(key);
-
-  if (record && isResolvedRecord(record)) {
-    return record.data.value ?? null;
-  } else {
-    return null;
-  }
-}
-
-// Does not suspend.
-// This method is safe to call outside of render.
-// The Objects it returns are not guaranteed to contain preview information.
-export function getObjectThrows(pauseId: PauseId, objectId: ObjectId): Object {
-  const object = getCachedObject(pauseId, objectId);
-  if (!object) {
-    throw Error(`Could not find object "${objectId}" at pause "${pauseId}".`);
-  }
-  return object;
-}
-
-// Suspends if no Object can be found, or if one is found without a Preview.
-// This method should only be called during render.
-// The Objects it returns are guaranteed to contain preview information.
-export function getObjectWithPreviewSuspense(
-  client: ReplayClientInterface,
-  pauseId: PauseId,
-  objectId: ObjectId,
-  noOverflow: boolean = false
-): Object {
-  const maps = getOrCreateObjectWithPreviewMap(pauseId);
-  const recordMap = noOverflow ? maps.fullPreviewRecordMap : maps.previewRecordMap;
-
-  let record = recordMap.get(objectId);
-  if (record == null) {
-    const deferred = createDeferred<Object>(
-      `getObjectWithPreviewSuspense objectId: ${objectId} and pauseId: ${pauseId}`
-    );
-
-    record = createPendingRecord<Object>(deferred);
-
-    recordMap.set(objectId, record);
-
-    fetchObjectWithPreview(client, pauseId, objectId, record, deferred, noOverflow);
-  }
-
-  if (isPendingRecord(record)) {
-    throw record.data.deferred.promise;
-  } else if (isRejectedRecord(record)) {
-    throw record.data.error;
-  } else {
-    return record.data.value as Object;
-  }
-}
-
-// Wrapper method around Suspense method.
-// This method can be used by non-React code to prefetch/prime the Suspense cache by loading preview data.
-// Loaded properties can also be accessed via getCachedObject().
-export const getObjectWithPreviewHelper = createFetchAsyncFromFetchSuspense(
-  getObjectWithPreviewSuspense
-);
-
-export function getObjectPropertySuspense(
-  client: ReplayClientInterface,
-  pauseId: PauseId,
-  objectId: ObjectId,
-  propertyName: string
-): ProtocolValue {
-  const maps = getOrCreateObjectWithPreviewMap(pauseId);
-  const recordMap = maps.objectPropertyMap;
-  const key = `${objectId}:${propertyName}`;
-
-  let record = recordMap.get(key);
-  if (record == null) {
-    const deferred = createDeferred<ProtocolValue>(
-      `getObjectProperty objectId: ${objectId} and pauseId: ${pauseId} and propertyName: ${propertyName}`
-    );
-
-    record = createPendingRecord<ProtocolValue>(deferred);
-
-    recordMap.set(key, record);
-
-    fetchObjectProperty(client, pauseId, objectId, record, deferred, propertyName);
-  }
-
-  if (isPendingRecord(record)) {
-    throw record.data.deferred.promise;
-  } else if (isRejectedRecord(record)) {
-    throw record.data.error;
-  } else {
-    return record.data.value as ProtocolValue;
-  }
-}
-
-// Wrapper method around Suspense method.
-// This method can be used by non-React code to prefetch/prime the Suspense cache by loading object properties.
-// Loaded properties can also be accessed via getCachedObjectProperty().
-export const getObjectPropertyHelper = createFetchAsyncFromFetchSuspense(getObjectPropertySuspense);
 
 export function preCacheObjects(pauseId: PauseId, objects: Object[]): void {
   objects.forEach(object => preCacheObject(pauseId, object));
 }
 
 export function preCacheObject(pauseId: PauseId, object: Object): void {
-  const { objectMap, previewRecordMap, fullPreviewRecordMap } =
-    getOrCreateObjectWithPreviewMap(pauseId);
   const { objectId } = object;
 
-  // Always cache Objects in the objectMap map, even onces without previews or with overflow.
-  if (!objectMap.has(objectId)) {
-    objectMap.set(objectId, object);
-  }
+  // Always cache basic object data
+  objectCache.cache(object, null as any, pauseId, objectId, "none");
 
-  // Only cache objects with previews in the recordMap map though.
+  // Only cache objects with previews if they meet the criteria
   if (object.preview != null) {
-    const record = previewRecordMap.get(objectId);
-    if (record == null) {
-      previewRecordMap.set(objectId, createResolvedRecord(object));
-    } else if (!isResolvedRecord(record)) {
-      updateRecordToResolved(record, object);
-    }
+    objectCache.cache(object, null as any, pauseId, objectId, "canOverflow");
 
     if (!object.preview.overflow) {
-      const record = fullPreviewRecordMap.get(objectId);
-      if (record == null) {
-        fullPreviewRecordMap.set(objectId, createResolvedRecord(object));
-      } else if (!isResolvedRecord(record)) {
-        updateRecordToResolved(record, object);
-      }
+      objectCache.cache(object, null as any, pauseId, objectId, "full");
     }
-  }
-}
-
-async function fetchObjectProperty(
-  client: ReplayClientInterface,
-  pauseId: PauseId,
-  objectId: ObjectId,
-  record: Record<ProtocolValue>,
-  deferred: Deferred<ProtocolValue>,
-  propertyName: string
-) {
-  try {
-    const { data, returned } = await client.getObjectProperty(objectId, pauseId, propertyName);
-
-    cachePauseData(client, pauseId, data);
-
-    updateRecordToResolved(record, returned);
-
-    deferred.resolve(returned);
-  } catch (error) {
-    updateRecordToRejected(record, error);
-
-    deferred.reject(error);
-  }
-}
-
-async function fetchObjectWithPreview(
-  client: ReplayClientInterface,
-  pauseId: PauseId,
-  objectId: ObjectId,
-  record: Record<Object>,
-  deferred: Deferred<Object>,
-  noOverflow: boolean = false
-) {
-  try {
-    const data = await client.getObjectWithPreview(
-      objectId,
-      pauseId,
-      noOverflow ? "full" : "canOverflow"
-    );
-
-    cachePauseData(client, pauseId, data);
-
-    // The cachePauseData() will have updated the Record's status and value already.
-    deferred.resolve((record as ResolvedRecord<Object>).data.value);
-  } catch (error) {
-    updateRecordToRejected(record, error);
-
-    deferred.reject(error);
   }
 }

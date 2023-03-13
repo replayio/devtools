@@ -9,7 +9,7 @@ import {
   Value as ProtocolValue,
 } from "@replayio/protocol";
 
-import { getObjectThrows } from "../suspense/ObjectPreviews";
+import { objectCache } from "../suspense/ObjectPreviews";
 
 type ValueType =
   | "array"
@@ -161,7 +161,8 @@ export function protocolValueToClientValue(
     }
 
     if (objectId) {
-      const object = getObjectThrows(pauseId, objectId);
+      // The "client" param isn't used for reading cached values
+      const object = objectCache.getValue(null as any, pauseId, objectId, "none");
       const className = object.className;
 
       let preview: string | undefined;

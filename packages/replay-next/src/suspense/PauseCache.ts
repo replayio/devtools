@@ -14,7 +14,7 @@ import { ReplayClientInterface } from "shared/client/types";
 
 import { createGenericCache } from "./createGenericCache";
 import { cacheFrames } from "./FrameCache";
-import { getCachedObject, preCacheObjects } from "./ObjectPreviews";
+import { preCacheObjects } from "./ObjectPreviews";
 import { cacheScope } from "./ScopeCache";
 
 const {

@@ -5,7 +5,7 @@ import { ReactNode, Suspense, useContext } from "react";
 import { assert } from "protocol/utils";
 import Loader from "replay-next/components/Loader";
 import { getMappedLocationSuspense } from "replay-next/src/suspense/MappedLocationCache";
-import { getObjectPropertySuspense } from "replay-next/src/suspense/ObjectPreviews";
+import { objectPropertyCache } from "replay-next/src/suspense/ObjectPreviews";
 import { getScopeMapSuspense } from "replay-next/src/suspense/ScopeMapCache";
 import { getSourcesByUrlSuspense } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -37,7 +37,7 @@ function ErrorStackRendererSuspends({
   pauseId: PauseId;
 }) {
   const client = useContext(ReplayClientContext);
-  const stack = getObjectPropertySuspense(client, pauseId, errorObjectId, "stack").value;
+  const stack = objectPropertyCache.read(client, pauseId, errorObjectId, "stack")?.value;
   assert(typeof stack === "string", "no stack string found in error object");
   // Handle cases where there is no meaningful stack string;
   if (stack.trim().length === 0) {
