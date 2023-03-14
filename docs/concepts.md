@@ -48,7 +48,20 @@ A "region" is an entire interval of time (and not just a single point in time) t
 
 An entire recording has way too many objects that go in and out of existence and carry too many details for us to be able to hold all of that information in the memory at once. And that's why every recording is split into "regions" - smaller chunks of data that can be transmitted over network and stored in memory on the client, and further data derived from and interacted with. "Regions" are not something that user ever particularly cares about (beside being forced to wait for them to be loaded) and that they interact with, and instead, the user interacts with "pauses". A "pause" is that single moment in time for which the user can inspect the state of the application.
 
-A single `Pause` exists for each JS instruction. (TODO explain this and how it's related to debug stepping and `ExecutionPoint`s)
+A single `Pause` exists for each JS instruction. 
+
+#### How `Pause` is related to debug stepping and `ExecutionPoint`s
+
+In the Replay DevTools, a `Pause` represents the state of the JavaScript execution at a specific `ExecutionPoint`.Each `ExecutionPoint` corresponds to a specific line of code in the JavaScript program.
+
+When the Replay client requests that the backend pause the recording, it sends a request for a `Pause` object that contains information about the debuggee's state at the specific `ExecutionPoint`. This `Pause` object contains details about the `Frames`, `Scopes`, and `Objects` that were alive at that point in time.
+
+When the user interacts with the DevTools, they are stepping through the code and requesting new `Pause` objects for different `ExecutionPoints`. The user can step forward or backward through the `ExecutionPoints` to view the state of the JavaScript program at different points in time.
+
+Each `Pause` corresponds to a single `ExecutionPoint`, which means that there is one Pause for each line of code in the JavaScript program. This allows the user to debug the program by stepping through the code and viewing the state of the program at each line of code.
+
+Overall, `ExecutionPoints`, `Pause` objects, and the ability to step through the code are all key components of the Replay DevTools that allow users to inspect and debug the JavaScript program.
+
 
 (defined in `node_modules/@replayio/protocol/js/protocol/Pause.d.ts`, client implementation in `src/protocol/thread/pause.ts`)
 
@@ -64,7 +77,41 @@ A frame is not something that the user interacts with and is used to derive furt
 
 (in `node_modules/@replayio/protocol/js/protocol/Pause.d.ts`)
 
-TODO why "Frame" exists and how it's used, what sort of info is derived using it
+
+#### why `Frame` exists and how it's used, what sort of info is derived using it
+
+`Frame` is a key concept used in the Replay DevTools codebase to describe the stack frames of the JavaScript program. A `Frame` object is returned as part of a `Pause` object when the user requests the state of the JavaScript program at a specific ExecutionPoint.
+
+A `Frame` contains information about the current state of a function call stack frame. It includes details such as the function name, the location of the function in the code, and the values of its arguments and local variables at the specific `ExecutionPoint`.
+
+The `Frame` concept is important because it helps the user understand the flow of the program and the sequence of function calls that led to the current state. The DevTools can display the Frame information in a call stack, allowing the user to see the sequence of function calls that led to the current state of the program.
+
+<details>
+  <summary>There are four types of `Frames` in the Replay DevTools codebase:</summary>
+  <ul>
+    <li><strong>Call:</strong> represents a function call.</li>
+    <li><strong>Function location: </strong> represents the global scope.</li>
+    <li><strong>Arguments: </strong> represents a module scope.</li>
+    <li><strong>`this` object:</strong> represents an eval function call.</li>
+  </ul>
+</details>
+
+The `Frame` object can have multiple `Scopes`, which describe the variables and functions available in the current lexical scope of the frame. The `Scope` objects are nested within the `Frame` object and can be accessed through it.
+
+<details>
+  <summary>Some of the information that can be derived from a `Frame` object includes:</summary>
+  <ul>
+    <li><strong>Function name:</strong> the name of the function that the stack frame corresponds to</li>
+    <li><strong>Function location: </strong> the location of the function in the source code</li>
+    <li><strong>Arguments: </strong> the arguments passed to the function when it was called</li>
+    <li><strong>`this` object:</strong> the object that the function was called on (if applicable)</li>
+    <li><strong>Local variables:</strong> the variables that were defined within the function</li>
+    <li><strong>Scopes:</strong> the scopes associated with the stack frame</li>
+  </ul>
+</details>
+
+Overall, the `Frame` concept is a fundamental component of the Replay DevTools codebase that provides critical information about the flow of the JavaScript program and the sequence of function calls.
+
 
 ### `Scope`
 
@@ -295,7 +342,7 @@ The DevTools application and UI can be split into several different major areas 
 ### `Object Inspector`
 
 `Object Inspector` (`OI`) is used to display a value of a certain JS object whose entire content is only loaded through user interactions, where the user expands the object progressively and loads further pieces of the content one by one.
-
+TODO
 It's mostly used in Console and Editor, so that the user can inspect the value of an object:
 
 https://user-images.githubusercontent.com/1355455/156434746-a9656732-0d20-4a83-ba14-62373637d39a.mp4
