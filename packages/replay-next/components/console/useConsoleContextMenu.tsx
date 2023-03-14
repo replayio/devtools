@@ -70,16 +70,9 @@ export default function useConsoleContextMenu(loggable: Loggable) {
         </>
       </ContextMenuItem>
 
-      <ContextMenuDivider />
-      <ContextMenuItem dataTestId="ConsoleContextMenu-ScrollToPauseButton" onClick={scrollToPause}>
-        <>
-          <Icon className={styles.SmallerIcon} type="console" />
-          Scroll to pause
-        </>
-      </ContextMenuItem>
-
       {isPointInstance(loggable) && (
         <>
+          <ContextMenuDivider />
           <ContextMenuItem
             dataTestId="ConsoleContextMenu-ToggleLoggingButton"
             onClick={disableLogging}
@@ -89,7 +82,6 @@ export default function useConsoleContextMenu(loggable: Loggable) {
               Disable logging
             </>
           </ContextMenuItem>
-          <ContextMenuDivider />
           <ContextMenuItem>
             <div
               className={styles.UnicornBadge}
@@ -112,6 +104,14 @@ export default function useConsoleContextMenu(loggable: Loggable) {
           </ContextMenuItem>
         </>
       )}
+
+      <ContextMenuDivider />
+      <ContextMenuItem dataTestId="ConsoleContextMenu-ScrollToPauseButton" onClick={scrollToPause}>
+        <>
+          <Icon className={styles.SmallerIcon} type="console" />
+          Scroll to pause
+        </>
+      </ContextMenuItem>
     </>,
     {
       dataTestId: "ConsoleContextMenu",
