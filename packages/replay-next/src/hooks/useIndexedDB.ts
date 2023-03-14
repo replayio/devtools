@@ -1,24 +1,12 @@
 import { IDBPDatabase, openDB } from "idb";
-import { SetStateAction, useCallback, useEffect, useRef, useState, useTransition } from "react";
-
-import { createGenericCache } from "../suspense/createGenericCache";
+import { SetStateAction, useCallback, useEffect } from "react";
+import { Cache, Status, createCache, useCacheMutation, useCacheStatus } from "suspense";
 
 export interface IDBOptions {
   databaseName: string;
   databaseVersion: number;
   storeNames: string[];
 }
-
-const STATUS_INITIALIZATION_COMPLETE = "initialization-complete";
-const STATUS_INITIALIZATION_ERRORED = "initialization-errored";
-const STATUS_INITIALIZATION_PENDING = "initialization-pending";
-const STATUS_UPDATE_PENDING = "update-pending";
-
-type Status =
-  | typeof STATUS_INITIALIZATION_PENDING
-  | typeof STATUS_INITIALIZATION_COMPLETE
-  | typeof STATUS_INITIALIZATION_ERRORED
-  | typeof STATUS_UPDATE_PENDING;
 
 export async function preloadIDBInitialValues(
   idbPrefsDatabase: IDBOptions[],
@@ -33,7 +21,7 @@ export async function preloadIDBInitialValues(
   if (recordingId) {
     for (let dbOptions of idbPrefsDatabase) {
       for (let storeName of dbOptions.storeNames) {
-        idbPrefsPromises.push(getLatestIDBValueAsync(dbOptions, storeName, recordingId));
+        idbPrefsPromises.push(latestIndexedDbCache.readAsync(dbOptions, storeName, recordingId));
       }
     }
   }
@@ -41,19 +29,14 @@ export async function preloadIDBInitialValues(
   return Promise.all(idbPrefsPromises);
 }
 
-export const {
-  getValueSuspense: getIDBInstanceSuspense,
-  getValueAsync: getIDBInstanceAsync,
-  getValueIfCached: getIDBInstanceIfCached,
-} = createGenericCache<[], [dbOptions: IDBOptions], IDBPDatabase>(
-  "useIndexedDB: getIDBInstance",
-  async dbOptions => {
+export const indexedDbCache: Cache<[dbOptions: IDBOptions], IDBPDatabase> = createCache({
+  debugLabel: "IndexedDB",
+  getKey: ([dbOptions]) => dbOptions.databaseName + dbOptions.databaseVersion,
+  load: async ([dbOptions]) => {
     const { databaseName, databaseVersion, storeNames } = dbOptions;
-    // Create a single shared IDB instance for this DB definition
     const dbInstance = await openDB(databaseName, databaseVersion, {
       upgrade(db) {
-        // The "upgrade" callback runs both on initial creation (when a DB does not exist),
-        // and on version number change.
+        // The callback runs both on initial creation (no DB yet) and on version number change.
         for (let storeName of storeNames) {
           if (!db.objectStoreNames.contains(storeName)) {
             db.createObjectStore(storeName);
@@ -63,24 +46,20 @@ export const {
     });
     return dbInstance;
   },
-  dbOptions => dbOptions.databaseName + dbOptions.databaseVersion
-);
+});
 
-export const {
-  getValueSuspense: getLatestIDBValueSuspense,
-  getValueAsync: getLatestIDBValueAsync,
-  getValueIfCached: getLatestIDBValueIfCached,
-  addValue: setLatestIDBValue,
-} = createGenericCache<[], [dbOptions: IDBOptions, storeName: string, recordName: string], any>(
-  "MappedLocationCache: getLatestIDBValue",
-  async (dbOptions, storeName, recordName) => {
-    // Only look up this initial stored value once
-    const dbInstance = await getIDBInstanceAsync(dbOptions);
+export const latestIndexedDbCache: Cache<
+  [dbOptions: IDBOptions, storeName: string, recordName: string],
+  any
+> = createCache({
+  debugLabel: "LatestIndexedDB",
+  getKey: ([dbOptions, storeName, recordName]) =>
+    dbOptions.databaseName + dbOptions.databaseVersion + storeName + recordName,
+  load: async ([dbOptions, storeName, recordName]) => {
+    const dbInstance = await indexedDbCache.readAsync(dbOptions);
     return dbInstance.get(storeName, recordName);
   },
-  (dbOptions, storeName, recordName) =>
-    dbOptions.databaseName + dbOptions.databaseVersion + storeName + recordName
-);
+});
 
 /**
 Stores value in IndexedDB and synchronizes it between sessions.
@@ -101,70 +80,53 @@ export default function useIndexedDB<T>(options: {
   database: IDBOptions;
   initialValue: T;
   recordName: string;
-  scheduleUpdatesAsTransitions?: boolean;
   storeName: string;
 }): {
   setValue: (value: T | ((prevValue: T) => T)) => void;
   status: Status;
   value: T;
 } {
-  const { databaseName, databaseVersion, storeNames } = options.database;
-  const { initialValue, recordName, scheduleUpdatesAsTransitions = false, storeName } = options;
+  const { database, initialValue, recordName, storeName } = options;
 
-  const [isPending, startTransition] = useTransition();
-  const [value, setValue] = useState<T>(() => {
-    // In order for persistence to work properly, `getInitialIDBValueAsync` _must_ have been
-    // called in an early app entry point (such as `src/ui/setup/index.ts::bootstrapApp()`, or `components/Initializer.tsx`).
-    return (
-      getLatestIDBValueIfCached(options.database, storeName, recordName)?.value ?? initialValue
-    );
-  });
-  const [status, setStatus] = useState<Status>(STATUS_INITIALIZATION_PENDING);
+  const { mutateAsync: mutateDbAsync } = useCacheMutation(indexedDbCache);
+  const { mutateSync: mutateLatestSync } = useCacheMutation(latestIndexedDbCache);
 
-  const databaseRef = useRef<IDBPDatabase | null>(null);
-  const setValueWrapper = useCallback(
-    (newValue: T | ((prevValue: T) => T)) => {
-      if (scheduleUpdatesAsTransitions) {
-        startTransition(() => {
-          setValue(newValue);
-        });
+  // This hook is not meant to suspend;
+  // Return the value if it's loaded, else return the default.
+  const value =
+    latestIndexedDbCache.getValueIfCached(database, storeName, recordName) ?? initialValue;
+
+  const status = useCacheStatus(latestIndexedDbCache, database, storeName, recordName);
+
+  useEffect(() => {
+    // If the value hasn't been loaded, this will start loading it.
+    // useCacheStatus() will ensure we re-render once loading has finished.
+    latestIndexedDbCache.prefetch(database, storeName, recordName);
+  }, [database, storeName, recordName]);
+
+  const setValue = useCallback(
+    (action: SetStateAction<T>) => {
+      let newValue: T;
+      if (action instanceof Function) {
+        newValue = action(value);
       } else {
-        setValue(newValue);
+        newValue = action;
       }
+
+      mutateLatestSync([database, storeName, recordName], newValue);
+
+      mutateDbAsync([database], async () => {
+        const dbInstance = await indexedDbCache.readAsync(database);
+        dbInstance.put(storeName, newValue, recordName);
+        return dbInstance;
+      });
     },
-    [scheduleUpdatesAsTransitions]
+    [database, mutateDbAsync, mutateLatestSync, recordName, storeName, value]
   );
 
-  useEffect(() => {
-    if (status === "initialization-complete") {
-      // Only sync data to IDB after we've finished reading it,
-      // to avoid accidentally overwriting with the initial value
-      databaseRef.current?.put(storeName, value, recordName);
-      // Also overwrite the cached value so that we can synchronously read
-      // this if the hook unmounts and remounts in the same session.
-      setLatestIDBValue(value, options.database, storeName, recordName);
-    }
-  }, [value, options.database, recordName, storeName, status]);
-
-  useEffect(() => {
-    async function setupDatabaseForHook() {
-      if (typeof window !== "undefined" && typeof window.indexedDB !== "undefined") {
-        // Save the DB instance so we can sync updates later
-        const dbInstance = await getIDBInstanceAsync(options.database);
-        databaseRef.current = dbInstance;
-        setStatus(STATUS_INITIALIZATION_COMPLETE);
-      } else {
-        // No IndexedDB available - this might be a local unit test
-        setStatus(STATUS_INITIALIZATION_COMPLETE);
-      }
-    }
-
-    setupDatabaseForHook();
-  }, [options.database, databaseName, databaseVersion, recordName, storeName, storeNames]);
-
   return {
-    setValue: setValueWrapper,
-    status: isPending ? STATUS_UPDATE_PENDING : status,
+    setValue,
+    status,
     value,
   };
 }
