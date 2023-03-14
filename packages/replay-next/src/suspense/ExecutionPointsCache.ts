@@ -3,13 +3,12 @@ import {
   getPointsBoundingTimeResult as PointsBoundingTime,
   TimeStampedPoint,
 } from "@replayio/protocol";
-import { Deferred, createDeferred } from "suspense";
+import { Cache, Deferred, createCache, createDeferred } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 
 import { isExecutionPointsLessThan } from "../utils/time";
-import { createGenericCache } from "./createGenericCache";
 
 export type CachedPointsForTime = Map<number, ExecutionPoint>;
 type ChangeHandler = (timeStampedPoint: TimeStampedPoint) => void;
@@ -54,7 +53,7 @@ async function fetchPointsBoundingTime(
   rethrowError: boolean
 ) {
   try {
-    const pointsBoundingTime = await getPointsBoundingTimeAsync(time, client);
+    const pointsBoundingTime = await pointsBoundingTimeCache.readAsync(client, time);
     const point = getClosestPointInPointsBoundingTime(time, pointsBoundingTime);
 
     // Pre-cache time-to-point match and insert into sorted ExecutionPoints array.
@@ -294,12 +293,11 @@ export function preCacheExecutionPointForTime(timeStampedPoint: TimeStampedPoint
   }
 }
 
-export const {
-  getValueSuspense: getPointsBoundingTimeSuspense,
-  getValueAsync: getPointsBoundingTimeAsync,
-  getValueIfCached: getPointsBoundingTimeIfCached,
-} = createGenericCache<[replayClient: ReplayClientInterface], [time: number], PointsBoundingTime>(
-  "PointsCache: getPointsBoundingTime",
-  async (time, client) => client.getPointsBoundingTime(time),
-  time => `${time}`
-);
+export const pointsBoundingTimeCache: Cache<
+  [replayClient: ReplayClientInterface, time: number],
+  PointsBoundingTime
+> = createCache({
+  debugLabel: "PointsBoundingTime",
+  getKey: ([client, time]) => `${time}`,
+  load: async ([client, time]) => client.getPointsBoundingTime(time),
+});
