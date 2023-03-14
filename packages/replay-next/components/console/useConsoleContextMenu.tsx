@@ -1,5 +1,6 @@
 import { useContext } from "react";
 
+import { scrollCurrentTimeIndicatorIntoView } from "replay-next/components/console/CurrentTimeIndicator";
 import ContextMenuDivider from "replay-next/components/context-menu/ContextMenuDivider";
 import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
 import useContextMenu from "replay-next/components/context-menu/useContextMenu";
@@ -8,7 +9,7 @@ import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { getLoggableTime, isPointInstance } from "replay-next/src/utils/loggables";
-import { Badge } from "shared/client/types";
+import { Badge, POINT_BEHAVIOR_DISABLED_TEMPORARILY } from "shared/client/types";
 
 import { Loggable } from "./LoggablesContext";
 import styles from "./ContextMenu.module.css";
@@ -17,8 +18,8 @@ const BADGES: Badge[] = ["green", "yellow", "orange", "purple"];
 
 export default function useConsoleContextMenu(loggable: Loggable) {
   const { rangeForDisplay, update } = useContext(FocusContext);
-  const { editPointBadge } = useContext(PointsContext);
-  const { duration } = useContext(SessionContext);
+  const { editPointBadge, editPointBehavior } = useContext(PointsContext);
+  const { currentUserInfo, duration } = useContext(SessionContext);
 
   const setFocusBegin = () => {
     const begin = getLoggableTime(loggable);
@@ -40,6 +41,20 @@ export default function useConsoleContextMenu(loggable: Loggable) {
     }
   };
 
+  const scrollToPause = scrollCurrentTimeIndicatorIntoView;
+
+  const disableLogging = () => {
+    if (isPointInstance(loggable)) {
+      editPointBehavior(
+        loggable.point.key,
+        {
+          shouldLog: POINT_BEHAVIOR_DISABLED_TEMPORARILY,
+        },
+        loggable.point.user?.id === currentUserInfo?.id
+      );
+    }
+  };
+
   return useContextMenu(
     <>
       <ContextMenuItem dataTestId="ConsoleContextMenu-SetFocusStartButton" onClick={setFocusBegin}>
@@ -54,8 +69,26 @@ export default function useConsoleContextMenu(loggable: Loggable) {
           Set focus end
         </>
       </ContextMenuItem>
+
+      <ContextMenuDivider />
+      <ContextMenuItem dataTestId="ConsoleContextMenu-ScrollToPauseButton" onClick={scrollToPause}>
+        <>
+          <Icon className={styles.SmallerIcon} type="console" />
+          Scroll to pause
+        </>
+      </ContextMenuItem>
+
       {isPointInstance(loggable) && (
         <>
+          <ContextMenuItem
+            dataTestId="ConsoleContextMenu-ToggleLoggingButton"
+            onClick={disableLogging}
+          >
+            <>
+              <Icon className={styles.SmallerIcon} type="toggle-off" />
+              Disable logging
+            </>
+          </ContextMenuItem>
           <ContextMenuDivider />
           <ContextMenuItem>
             <div
