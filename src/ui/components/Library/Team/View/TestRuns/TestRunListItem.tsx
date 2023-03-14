@@ -8,6 +8,7 @@ import { TestRun } from "ui/hooks/tests";
 import { TeamContext } from "../../TeamContextRoot";
 import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/RecordingListItem";
 import { AttributeContainer } from "./AttributeContainer";
+import { ModeAttribute } from "./Overview/RunSummary";
 import { RunStats } from "./RunStats";
 import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "../../../Library.module.css";
@@ -41,6 +42,7 @@ function Attributes({ testRun }: { testRun: TestRun }) {
           {branch || ""}
         </AttributeContainer>
       )}
+      <ModeAttribute testRun={testRun} />
     </div>
   );
 }
