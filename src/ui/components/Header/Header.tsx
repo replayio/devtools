@@ -108,7 +108,11 @@ function HeaderTitle({
   }, [editState, hasTitle, title]);
 
   if (!canEditTitle) {
-    return <span className={styles.ReadOnlyTitle}>{displayTitle}</span>;
+    return (
+      <span className={styles.ReadOnlyTitle} data-testid="Header-Title">
+        {displayTitle}
+      </span>
+    );
   }
 
   const onKeyDownOrKeyPress = (event: KeyboardEvent) => {
@@ -141,6 +145,7 @@ function HeaderTitle({
 
   return (
     <span
+      data-testid="Header-Title"
       className={styles.EditableTitle}
       contentEditable
       onBlur={onBlur}
