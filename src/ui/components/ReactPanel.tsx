@@ -3,6 +3,7 @@ import classnames from "classnames";
 import { ReactNode, useContext, useEffect, useState } from "react";
 
 import { selectFrame as selectFrameAction } from "devtools/client/debugger/src/actions/pause/selectFrame";
+import AccessibleImage from "devtools/client/debugger/src/components/shared/AccessibleImage";
 import {
   PauseFrame,
   getExecutionPoint,
@@ -11,9 +12,9 @@ import {
 import type { AstPosition } from "devtools/client/debugger/src/selectors";
 import { findClosestofSymbol } from "devtools/client/debugger/src/utils/ast";
 import { simplifyDisplayName } from "devtools/client/debugger/src/utils/pause/frames/displayName";
-import { getFilename } from "devtools/client/debugger/src/utils/source";
 import { AnalysisInput, getFunctionBody } from "protocol/evaluation-utils";
 import Icon from "replay-next/components/Icon";
+import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
@@ -54,6 +55,7 @@ interface ReactQueuedRenderDetails extends TimeStampedPoint {
 interface RenderAnalysisResults {
   queuedRenders: ReactQueuedRenderDetails[];
   committedRenders: TimeStampedPoint[];
+  error?: string;
 }
 
 declare let input: AnalysisInput;
@@ -71,197 +73,199 @@ function findQueuedRendersForRange(
   range: TimeStampedPointRange
 ): UIThunkAction<Promise<RenderAnalysisResults | void>> {
   return async (dispatch, getState, { replayClient }) => {
-    const sourcesByUrl = getSourceIdsByUrl(getState());
-    const allSources = getAllSourceDetails(getState());
-    const sourcesState = getState().sources;
-    const reactDomUrl = Object.keys(sourcesByUrl).find(key => {
-      return key.includes("react-dom.");
-    });
+    try {
+      if (!range?.begin) {
+        return;
+      }
 
-    if (!reactDomUrl) {
-      // console.error("No ReactDOM url");
-      return;
-    }
+      const sourcesByUrl = getSourceIdsByUrl(getState());
+      const allSources = getAllSourceDetails(getState());
+      const sourcesState = getState().sources;
+      const reactDomUrl = Object.keys(sourcesByUrl).find(key => {
+        return key.includes("react-dom.");
+      });
 
-    const reactDomSource = getSourceToDisplayForUrl(getState(), reactDomUrl);
-    if (!reactDomSource || !reactDomSource.url) {
-      // console.error("No preferred source");
-      return;
-    }
-    // console.log("Getting symbols and positions");
-    const [symbols, breakablePositionsResult] = await Promise.all([
-      getSymbolsAsync(reactDomSource.id, allSources, replayClient),
-      getBreakpointPositionsAsync(reactDomSource.id, replayClient),
-    ]);
+      if (!reactDomUrl) {
+        return;
+      }
 
-    if (!symbols) {
-      return;
-    }
+      const reactDomSource = getSourceToDisplayForUrl(getState(), reactDomUrl);
+      if (!reactDomSource || !reactDomSource.url) {
+        return;
+      }
 
-    // console.log("Symbols: ", symbols);
-    const [breakablePositions, breakablePositionsByLine] = breakablePositionsResult;
+      const [symbols, breakablePositionsResult] = await Promise.all([
+        getSymbolsAsync(reactDomSource.id, allSources, replayClient),
+        getBreakpointPositionsAsync(reactDomSource.id, replayClient),
+      ]);
 
-    let scheduleUpdateFiberDeclaration: AstPosition | undefined;
-    let onCommitFiberRootDeclaration: AstPosition | undefined;
+      if (!symbols) {
+        return;
+      }
 
-    if (reactDomSource.url!.includes(".development")) {
-      const shouldUpdateFiberSymbol = symbols?.functions.find(
-        f => f.name === "scheduleUpdateOnFiber"
-      )!;
-      const onCommitRootSymbol = symbols?.functions.find(f => f.name === "onCommitRoot")!;
-      // console.log("onCommitRoot: ", onCommitRootSymbol);
+      const [breakablePositions, breakablePositionsByLine] = breakablePositionsResult;
 
-      // console.log("shouldUpdateFiber: ", shouldUpdateFiberSymbol);
-      scheduleUpdateFiberDeclaration = shouldUpdateFiberSymbol?.location.start;
-      onCommitFiberRootDeclaration = onCommitRootSymbol?.location.start;
-    } else if (reactDomSource.url!.includes(".production")) {
-      // HACK We'll do this the hard way! This _should_ work back to React 16.14
-      // By careful inspection, we know that every minified version of `scheduleUpdateOnFiber`
-      // has a React extracted error code call of `someErrorFn(185)`. We also know that every
-      // minified version of `onCommitRoot` looks for the `.onCommitFiberRoot` function on the
-      // React DevTools global hook.
-      // By doing line-by-line string comparisons looking for these specific bits of code,
-      // we can consistently find the specific minified functions that we care about,
-      // across multiple React production builds, without needing to track minified function names.
+      let scheduleUpdateFiberDeclaration: AstPosition | undefined;
+      let onCommitFiberRootDeclaration: AstPosition | undefined;
 
-      const reactDomSourceLines = await getSourceLinesAsync(reactDomSource!.id, replayClient);
+      if (reactDomSource.url!.includes(".development")) {
+        const shouldUpdateFiberSymbol = symbols?.functions.find(
+          f => f.name === "scheduleUpdateOnFiber"
+        )!;
+        const onCommitRootSymbol = symbols?.functions.find(f => f.name === "onCommitRoot")!;
 
-      // A build-extracted React error code
-      const MAGIC_SCHEDULE_UPDATE_CONTENTS = "(185)";
-      // A call to the React DevTools global hook object
-      const MAGIC_ON_COMMIT_ROOT_CONTENTS = ".onCommitFiberRoot(";
+        scheduleUpdateFiberDeclaration = shouldUpdateFiberSymbol?.location.start;
+        onCommitFiberRootDeclaration = onCommitRootSymbol?.location.start;
+      } else if (reactDomSource.url!.includes(".production")) {
+        // HACK We'll do this the hard way! This _should_ work back to React 16.14
+        // By careful inspection, we know that every minified version of `scheduleUpdateOnFiber`
+        // has a React extracted error code call of `someErrorFn(185)`. We also know that every
+        // minified version of `onCommitRoot` looks for the `.onCommitFiberRoot` function on the
+        // React DevTools global hook.
+        // By doing line-by-line string comparisons looking for these specific bits of code,
+        // we can consistently find the specific minified functions that we care about,
+        // across multiple React production builds, without needing to track minified function names.
 
-      // Brute-force search over all lines in the file to find the two functions that we
-      // actually care about, based on the magic strings that will exist.
-      for (let [lineZeroIndex, line] of reactDomSourceLines.entries()) {
-        const scheduleUpdateIndex = line.indexOf(MAGIC_SCHEDULE_UPDATE_CONTENTS);
-        const onCommitIndex = line.indexOf(MAGIC_ON_COMMIT_ROOT_CONTENTS);
-        if (scheduleUpdateIndex > -1) {
-          const res = findClosestofSymbol(symbols.functions, {
-            line: lineZeroIndex + 1,
-            column: scheduleUpdateIndex,
-          });
-          if (res) {
-            scheduleUpdateFiberDeclaration = res.location.start;
+        const reactDomSourceLines = await getSourceLinesAsync(reactDomSource!.id, replayClient);
+
+        // A build-extracted React error code
+        const MAGIC_SCHEDULE_UPDATE_CONTENTS = "(185)";
+        // A call to the React DevTools global hook object
+        const MAGIC_ON_COMMIT_ROOT_CONTENTS = ".onCommitFiberRoot(";
+
+        // Brute-force search over all lines in the file to find the two functions that we
+        // actually care about, based on the magic strings that will exist.
+        for (let [lineZeroIndex, line] of reactDomSourceLines.entries()) {
+          const scheduleUpdateIndex = line.indexOf(MAGIC_SCHEDULE_UPDATE_CONTENTS);
+          const onCommitIndex = line.indexOf(MAGIC_ON_COMMIT_ROOT_CONTENTS);
+          if (scheduleUpdateIndex > -1) {
+            const res = findClosestofSymbol(symbols.functions, {
+              line: lineZeroIndex + 1,
+              column: scheduleUpdateIndex,
+            });
+            if (res) {
+              scheduleUpdateFiberDeclaration = res.location.start;
+            }
           }
-        }
-        if (onCommitIndex > -1) {
-          const res = findClosestofSymbol(symbols.functions, {
-            line: lineZeroIndex + 1,
-            column: onCommitIndex,
-          });
-          if (res) {
-            onCommitFiberRootDeclaration = res.location.start;
+          if (onCommitIndex > -1) {
+            const res = findClosestofSymbol(symbols.functions, {
+              line: lineZeroIndex + 1,
+              column: onCommitIndex,
+            });
+            if (res) {
+              onCommitFiberRootDeclaration = res.location.start;
+            }
           }
-        }
 
-        if (scheduleUpdateFiberDeclaration && onCommitFiberRootDeclaration) {
-          break;
+          if (scheduleUpdateFiberDeclaration && onCommitFiberRootDeclaration) {
+            break;
+          }
         }
       }
-    }
 
-    if (!scheduleUpdateFiberDeclaration || !onCommitFiberRootDeclaration) {
-      // console.error("Could not find scheduleUpdate or onCommit");
-      return;
-    }
+      if (!scheduleUpdateFiberDeclaration || !onCommitFiberRootDeclaration) {
+        return;
+      }
 
-    const firstScheduleUpdateFiberPosition = findFirstBreakablePositionForFunction(
-      { ...scheduleUpdateFiberDeclaration, sourceId: reactDomSource.id },
-      breakablePositionsByLine
-    );
-    const firstOnCommitRootPosition = findFirstBreakablePositionForFunction(
-      { ...onCommitFiberRootDeclaration, sourceId: reactDomSource.id },
-      breakablePositionsByLine
-    );
-    if (!firstScheduleUpdateFiberPosition || !firstOnCommitRootPosition) {
-      return;
-    }
+      const firstScheduleUpdateFiberPosition = findFirstBreakablePositionForFunction(
+        { ...scheduleUpdateFiberDeclaration, sourceId: reactDomSource.id },
+        breakablePositionsByLine
+      );
+      const firstOnCommitRootPosition = findFirstBreakablePositionForFunction(
+        { ...onCommitFiberRootDeclaration, sourceId: reactDomSource.id },
+        breakablePositionsByLine
+      );
+      if (!firstScheduleUpdateFiberPosition || !firstOnCommitRootPosition) {
+        return;
+      }
 
-    // console.log("Found positions: ", firstScheduleUpdateFiberPosition, firstOnCommitRootPosition);
+      const scheduleFiberUpdatePromise = getHitPointsForLocationAsync(
+        replayClient,
+        firstScheduleUpdateFiberPosition,
+        null,
+        { begin: range.begin.point, end: range.end.point }
+      );
 
-    const scheduleFiberUpdatePromise = getHitPointsForLocationAsync(
-      replayClient,
-      firstScheduleUpdateFiberPosition,
-      null,
-      { begin: range.begin.point, end: range.end.point }
-    );
+      const onCommitFiberHitsPromise = getHitPointsForLocationAsync(
+        replayClient,
+        firstOnCommitRootPosition,
+        null,
+        { begin: range.begin.point, end: range.end.point }
+      );
 
-    const onCommitFiberHitsPromise = getHitPointsForLocationAsync(
-      replayClient,
-      firstOnCommitRootPosition,
-      null,
-      { begin: range.begin.point, end: range.end.point }
-    );
+      const [[scheduleUpdateHitPoints], [onCommitFiberHitPoints]] = await Promise.all([
+        scheduleFiberUpdatePromise,
+        onCommitFiberHitsPromise,
+      ]);
 
-    const [[scheduleUpdateHitPoints], [onCommitFiberHitPoints]] = await Promise.all([
-      scheduleFiberUpdatePromise,
-      onCommitFiberHitsPromise,
-    ]);
-    // console.log("Hit points: ", scheduleUpdateHitPoints);
+      // TODO Arbitrary max of 200 points here. We need to figure out a better strategy.
+      const scheduleUpdateHitPointsToCheck = scheduleUpdateHitPoints.slice(0, 200);
+      const queuedRendersPromise = Promise.all(
+        scheduleUpdateHitPointsToCheck.map(async (hitPoint): Promise<ReactQueuedRenderDetails> => {
+          const pauseId = await getPauseIdAsync(replayClient, hitPoint.point, hitPoint.time);
 
-    // TODO Arbitrary max of 200 points here. We need to figure out a better strategy.
-    const scheduleUpdateHitPointsToCheck = scheduleUpdateHitPoints.slice(0, 200);
-    const queuedRendersPromise = Promise.all(
-      scheduleUpdateHitPointsToCheck.map(async (hitPoint): Promise<ReactQueuedRenderDetails> => {
-        const pauseId = await getPauseIdAsync(replayClient, hitPoint.point, hitPoint.time);
+          const pauseFrames =
+            (await getPauseFramesAsync(replayClient, pauseId, sourcesState)) ?? [];
+          const filteredPauseFrames = pauseFrames.filter(frame => {
+            const { source } = frame;
+            if (!source) {
+              return false;
+            }
+            return !MORE_IGNORABLE_PARTIAL_URLS.some(partialUrl =>
+              source.url?.includes(partialUrl)
+            );
+          });
 
-        const pauseFrames = (await getPauseFramesAsync(replayClient, pauseId, sourcesState)) ?? [];
-        const filteredPauseFrames = pauseFrames.filter(frame => {
-          const { source } = frame;
-          if (!source) {
-            return false;
+          let userPauseFrame: PauseFrame | undefined = filteredPauseFrames.slice(-1)[0];
+
+          let userPauseFrameTime: TimeStampedPoint | undefined = undefined;
+
+          if (userPauseFrame) {
+            try {
+              // TODO Need a _much_ better way of identifying the exact point of the earlier frame!
+              // This also doesn't seem to consistently work with the _first_ render.
+              const arbitraryStartPoint = hitPoint.time - 50;
+              const pointNearTime = await replayClient.getPointNearTime(arbitraryStartPoint);
+              const { location } = userPauseFrame;
+              const functionHits = await replayClient.runAnalysis<AnalysisInput>({
+                effectful: false,
+                mapper: getFunctionBody(hitMapper),
+                location,
+                range: {
+                  begin: pointNearTime.point,
+                  end: hitPoint.point,
+                },
+              });
+              [userPauseFrameTime] = functionHits.slice(-1);
+
+              // TODO Use scope mapping ala `event-listeners.ts` to get better function names
+            } catch (err) {
+              userPauseFrame = undefined;
+            }
           }
-          return !MORE_IGNORABLE_PARTIAL_URLS.some(partialUrl => source.url?.includes(partialUrl));
-        });
 
-        let userPauseFrame: PauseFrame | undefined = filteredPauseFrames.slice(-1)[0];
+          return {
+            ...hitPoint,
+            pauseFrames,
+            filteredPauseFrames,
+            userPauseFrame,
+            userPauseFrameTime,
+          };
+        })
+      );
 
-        let userPauseFrameTime: TimeStampedPoint | undefined = undefined;
+      const committedRenders = onCommitFiberHitPoints.slice(0, 200);
 
-        if (userPauseFrame) {
-          try {
-            // TODO Need a _much_ better way of identifying the exact point of the earlier frame!
-            // This also doesn't seem to consistently work with the _first_ render.
-            const arbitraryStartPoint = hitPoint.time - 50;
-            const pointNearTime = await replayClient.getPointNearTime(arbitraryStartPoint);
-            const { location } = userPauseFrame;
-            const functionHits = await replayClient.runAnalysis<AnalysisInput>({
-              effectful: false,
-              mapper: getFunctionBody(hitMapper),
-              location,
-              range: {
-                begin: pointNearTime.point,
-                end: hitPoint.point,
-              },
-            });
-            [userPauseFrameTime] = functionHits.slice(-1);
+      const [queuedRenders] = await Promise.all([queuedRendersPromise]);
 
-            // TODO Use scope mapping ala `event-listeners.ts` to get better function names
-          } catch (err) {
-            // console.error("Error finding parent frame time: ", err);
-            userPauseFrame = undefined;
-          }
-        }
-
-        return {
-          ...hitPoint,
-          pauseFrames,
-          filteredPauseFrames,
-          userPauseFrame,
-          userPauseFrameTime,
-        };
-      })
-    );
-
-    const committedRenders = onCommitFiberHitPoints.slice(0, 200);
-
-    const [queuedRenders] = await Promise.all([queuedRendersPromise]);
-
-    return {
-      queuedRenders,
-      committedRenders,
-    };
+      return {
+        queuedRenders,
+        committedRenders,
+      };
+    } catch (err) {
+      console.error("Error getting React render data: ", err);
+      return { error: "failed to fetch events...", queuedRenders: [], committedRenders: [] };
+    }
   };
 }
 
@@ -269,38 +273,34 @@ const Label = ({ children }: { children: ReactNode }) => (
   <div className="overflow-hidden overflow-ellipsis whitespace-pre font-normal">{children}</div>
 );
 
-type CommonProps = {
-  currentTime: number;
-  executionPoint: string;
-  onSeek: (point: string, time: number) => void;
-};
-
-type QueuedRenderProps = CommonProps & {
-  renderDetails: ReactQueuedRenderDetails;
-};
-
 function ReactQueuedRenderListItem({
   currentTime,
   renderDetails,
   executionPoint,
   onSeek,
-}: QueuedRenderProps) {
+}: {
+  currentTime: number;
+  executionPoint: string;
+  onSeek: (point: string, time: number) => void;
+  renderDetails: ReactQueuedRenderDetails;
+}) {
   const dispatch = useAppDispatch();
   const { point, time } = renderDetails;
   const isPaused = time === currentTime && executionPoint === point;
   const [isHovered, setIsHovered] = useState(false);
   const cx = useAppSelector(getThreadContext);
 
-  const [jumpToCodeStatus, setJumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
+  const [jumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
 
   const { userPauseFrame, userPauseFrameTime } = renderDetails;
 
   if (!userPauseFrame) {
     return null;
   }
-  const { source } = userPauseFrame;
 
-  const filename = source ? getFilename(source) : "Unknown";
+  const onMouseEnter = () => {};
+
+  const onMouseLeave = () => {};
 
   const onClickSeek = () => {
     if (userPauseFrameTime) {
@@ -346,6 +346,11 @@ function ReactQueuedRenderListItem({
 
   let jumpButtonText = "Jump to code";
 
+  let eventType = "react";
+  if (renderDetails.pauseFrames.some(frame => frame.source?.url?.includes("react-redux"))) {
+    eventType = "redux";
+  }
+
   return (
     <>
       <div
@@ -353,10 +358,16 @@ function ReactQueuedRenderListItem({
           "text-lightGrey": currentTime < time,
           "font-semibold text-primaryAccent": isPaused,
         })}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
         onClick={onClickSeek}
       >
         <div className="flex flex-row items-center space-x-2 overflow-hidden">
-          <MaterialIcon iconSize="xl">ads_click</MaterialIcon>
+          {eventType ? (
+            <AccessibleImage className={`${eventType} `} />
+          ) : (
+            <MaterialIcon iconSize="xl">ads_click</MaterialIcon>
+          )}
           <Label>{simplifyDisplayName(userPauseFrame!.displayName)}</Label>
         </div>
         <div className="flex space-x-2 opacity-0 group-hover:opacity-100">
@@ -373,41 +384,6 @@ function ReactQueuedRenderListItem({
               </div>
             </div>
           }
-        </div>
-      </div>
-    </>
-  );
-}
-
-type CommittedRenderProps = CommonProps & {
-  commitPoint: TimeStampedPoint;
-};
-
-function ReactCommittedRenderListItem({
-  currentTime,
-  commitPoint,
-  executionPoint,
-  onSeek,
-}: CommittedRenderProps) {
-  const { point, time } = commitPoint;
-  const isPaused = time === currentTime && executionPoint === point;
-
-  const onClickSeek = () => {
-    onSeek(point, time);
-  };
-
-  return (
-    <>
-      <div
-        className={classnames(styles.eventRow, "group block w-full", {
-          "text-lightGrey": currentTime < time,
-          "font-semibold text-primaryAccent": isPaused,
-        })}
-        onClick={onClickSeek}
-      >
-        <div className="flex flex-row items-center space-x-2 overflow-hidden">
-          <MaterialIcon iconSize="xl">check_circle_outline</MaterialIcon>
-          <Label>React Render Committed</Label>
         </div>
       </div>
     </>
@@ -435,27 +411,36 @@ export function ReactPanel() {
     dispatch(seek(point, time, false));
   };
 
-  const queuedRenders = renderDetails?.queuedRenders.filter(entry => entry.userPauseFrame) ?? [];
+  if (!renderDetails) {
+    return (
+      <div style={{ height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+        <IndeterminateLoader />
+      </div>
+    );
+  }
 
-  return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <div style={{ flexGrow: 1, height: "100%" }}>
-        <div
-          style={{ overflowY: "auto", display: "flex", flexDirection: "column", maxHeight: 725 }}
-        >
-          {renderDetails
-            ? queuedRenders.map(entry => (
-                <ReactQueuedRenderListItem
-                  currentTime={currentTime}
-                  executionPoint={executionPoint!}
-                  renderDetails={entry}
-                  onSeek={onSeek}
-                  key={entry.point}
-                />
-              ))
-            : "Loading..."}
+  if (renderDetails.error) {
+    return (
+      <div style={{ height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+        <div className="flex h-full items-center justify-center text-gray-400">
+          <span>{renderDetails.error}</span>
         </div>
       </div>
+    );
+  }
+
+  const queuedRenders = renderDetails?.queuedRenders.filter(entry => entry.userPauseFrame) ?? [];
+  return (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+      {queuedRenders.map(entry => (
+        <ReactQueuedRenderListItem
+          currentTime={currentTime}
+          executionPoint={executionPoint!}
+          renderDetails={entry}
+          onSeek={onSeek}
+          key={entry.point}
+        />
+      ))}
     </div>
   );
 }
