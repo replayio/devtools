@@ -69,7 +69,8 @@
   display: inline-block;
 }
 
-.LineWithHits:hover .HoverButton {
+.LineWithHits:hover .HoverButton,
+.LineWithoutHits:hover .HoverButton {
   display: flex;
 }
 
