@@ -342,7 +342,6 @@ The DevTools application and UI can be split into several different major areas 
 ### `Object Inspector`
 
 `Object Inspector` (`OI`) is used to display a value of a certain JS object whose entire content is only loaded through user interactions, where the user expands the object progressively and loads further pieces of the content one by one.
-TODO
 It's mostly used in Console and Editor, so that the user can inspect the value of an object:
 
 https://user-images.githubusercontent.com/1355455/156434746-a9656732-0d20-4a83-ba14-62373637d39a.mp4
