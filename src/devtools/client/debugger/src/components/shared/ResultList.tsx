@@ -6,24 +6,51 @@ import classnames from "classnames";
 //
 import React, { Component } from "react";
 
+import { scrollList } from "../../utils/result-list";
+import { SearchResultWithHighlighting } from "../QuickOpenModal";
 import AccessibleImage from "./AccessibleImage";
 
-export default class ResultList extends Component {
+interface ResultListProps {
+  dataTestId?: string;
+  role?: string;
+  items: SearchResultWithHighlighting[];
+  expanded: boolean;
+  selected: number;
+  size?: string;
+  selectItem: (e: any, item: SearchResultWithHighlighting) => void;
+}
+
+export default class ResultList extends Component<ResultListProps> {
+  listItemNodes: Record<number, HTMLElement> = {};
+
   static defaultProps = {
     size: "small",
     role: "listbox",
   };
 
-  renderListItem = (item, index) => {
+  scrollList = (newSelectedIndex: number) => {
+    if (newSelectedIndex in this.listItemNodes) {
+      scrollList(this.listItemNodes, newSelectedIndex);
+    }
+  };
+
+  renderListItem = (item: SearchResultWithHighlighting, index: number) => {
     if (item.value === "/" && item.title === "") {
       item.title = "(index)";
     }
 
     const { selectItem, selected } = this.props;
-    const props = {
-      onClick: event => selectItem(event, item, index),
+    const props: React.ComponentPropsWithRef<"li"> = {
+      onClick: (event: any) => selectItem(event, item),
       key: `${item.id}${item.value}${index}`,
-      ref: String(index),
+      ref: element => {
+        // Keep a lookup table of items by index for scrolling
+        if (element) {
+          this.listItemNodes[index] = element;
+        } else {
+          delete this.listItemNodes[index];
+        }
+      },
       title: item.value,
       "aria-labelledby": `${item.id}-title`,
       "aria-describedby": `${item.id}-subtitle`,
