@@ -32,14 +32,15 @@ function RenameReplayModal({
   return (
     <Modal onMaskClick={dismissModal} options={{ maskTransparency: "translucent" }}>
       <Dialog>
-        <DialogTitle>Edit Replay</DialogTitle>
-        <TextInput value={title} onChange={onChange} autoFocus />
-        <DialogActions>
-          <div className="flex w-full flex-row justify-center space-x-2">
-            <SecondaryButton color="blue" onClick={dismissModal}>{`Cancel`}</SecondaryButton>
+        <div className="mb-1 w-full px-2 text-left text-lg font-medium">Rename</div>
+        <div className="flex w-full items-center px-2">
+          <div className="flex-1">
+            <TextInput value={title} onChange={onChange} autoFocus />
+          </div>
+          <div className="gap-3 px-2">
             <PrimaryButton color="blue" onClick={onSave}>{`Save`}</PrimaryButton>
           </div>
-        </DialogActions>
+        </div>
       </Dialog>
     </Modal>
   );

@@ -4,6 +4,7 @@ import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import React from "react";
 import LazyLoad from "react-lazyload";
 
+import { TestCaseResultIcon } from "devtools/client/debugger/src/components/TestInfo/TestCase";
 import { Recording } from "shared/graphql/types";
 import hooks from "ui/hooks";
 import { useGetUserPermissions } from "ui/hooks/users";
@@ -12,7 +13,6 @@ import { getRecordingURL } from "ui/utils/recording";
 
 import { Redacted } from "../../../../../Redacted";
 import RecordingOptionsDropdown from "./RecordingOptionsDropdown";
-import { TestResult } from "./TestResult";
 import styles from "../../../../Library.module.css";
 
 export function getDurationString(durationMs: number | null | undefined) {
@@ -50,9 +50,27 @@ export function getRelativeDate(date: string, truncate: boolean = false) {
 
   const daysSince = (new Date().getTime() - new Date(date).getTime()) / (1000 * 3600 * 24);
 
+  let formatter;
+  try {
+    // Attempt to get the user's preferred language from the browser
+    const userLocale = navigator.language;
+    formatter = new Intl.DateTimeFormat(userLocale, {
+      day: "numeric",
+      month: "numeric",
+      year: "numeric",
+    });
+  } catch (e) {
+    // Use the default US format if we can't determine the user's preferred language
+    formatter = new Intl.DateTimeFormat("en-US", {
+      day: "numeric",
+      month: "numeric",
+      year: "numeric",
+    });
+  }
+
   // Show relative time if under 2 weeks, otherwise, use the template below.
   if (daysSince > 14) {
-    content = formatDate(new Date(date), "M/d/yyyy");
+    content = formatter.format(new Date(date));
   }
 
   return content;
@@ -133,7 +151,7 @@ function RecordingRow({
               onClick={e => e.stopPropagation()}
               onChange={toggleChecked}
               checked={selected}
-              className="focus:primaryAccentHover h-4 w-4 rounded border-themeBorder text-primaryAccent"
+              className="focus:primaryAccentHover h-4 w-4 rounded border-inputBorder text-primaryAccent"
             />
           ) : null}
         </div>
@@ -148,7 +166,7 @@ function RecordingRow({
             <div className={`flex flex-col space-y-0.5 overflow-hidden ${styles.recordingTitle}`}>
               <div className="flex items-center space-x-1">
                 {recording.metadata?.test ? (
-                  <TestResult result={recording.metadata.test.result} />
+                  <TestCaseResultIcon result={recording.metadata.test.result} />
                 ) : null}
                 <ReplayTitle title={recording.title} />
               </div>

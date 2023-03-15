@@ -3,7 +3,7 @@ import { ExecutionPoint, Value } from "@replayio/protocol";
 import type { ThreadFront as TF } from "protocol/thread";
 import { ThreadFront } from "protocol/thread";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
-import { getTopFrameAsync } from "replay-next/src/suspense/FrameCache";
+import { topFrameCache } from "replay-next/src/suspense/FrameCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 
@@ -137,7 +137,7 @@ export const { getValueAsync: getActionStateValuesAsync } = createGenericCache<
       return;
     }
 
-    const topFrame = await getTopFrameAsync(pauseId, replayClient);
+    const topFrame = await topFrameCache.readAsync(replayClient, pauseId);
     if (!topFrame) {
       return;
     }
@@ -178,7 +178,7 @@ export const { getValueAsync: getDiffAsync } = createGenericCache<
       return;
     }
 
-    const topFrame = await getTopFrameAsync(pauseId, replayClient);
+    const topFrame = await topFrameCache.readAsync(replayClient, pauseId);
     if (!topFrame) {
       return;
     }

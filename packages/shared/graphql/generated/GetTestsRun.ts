@@ -57,6 +57,7 @@ export interface GetTestsRun_node_Workspace_testRuns {
   mergeTitle: string | null;
   user: string | null;
   date: any | null;
+  mode: string | null;
   stats: GetTestsRun_node_Workspace_testRuns_stats | null;
   recordings: GetTestsRun_node_Workspace_testRuns_recordings | null;
 }

@@ -1,23 +1,13 @@
-import { PointRange } from "@replayio/protocol";
-import {
-  EventHandlerType,
-  ExecutionPoint,
-  Frame,
-  Location,
-  PauseData,
-  PauseId,
-  Value as ProtocolValue,
-  Object as RecordReplayObject,
-} from "@replayio/protocol";
+import { PointDescription, PointRange } from "@replayio/protocol";
+import { EventHandlerType, ExecutionPoint, PauseData } from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 
 import { AnalysisInput, SendCommand, getFunctionBody } from "protocol/evaluation-utils";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { STANDARD_EVENT_CATEGORIES } from "../constants";
-import { createWakeable } from "../utils/suspense";
-import { createGenericCache } from "./createGenericCache";
-import { cachePauseData } from "./PauseCache";
-import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
+import { createInfallibleSuspenseCache } from "../utils/suspense";
+import { getAnalysisCache } from "./AnalysisCache";
 
 export type Event = {
   count: number;
@@ -30,30 +20,18 @@ export type EventCategory = {
   events: Event[];
 };
 
-export type EventLog = {
-  data: {
-    frames: Frame[];
-    objects: RecordReplayObject[];
-  };
-  location: Location[];
-  pauseId: PauseId;
-  point: ExecutionPoint;
-  time: number;
+export type EventLog = PointDescription & {
+  eventType: EventHandlerType;
   type: "EventLog";
-  values: ProtocolValue[];
 };
 
-export const {
-  getValueSuspense: getEventCategoryCountsSuspense,
-  getValueAsync: getEventCategoryCountsAsync,
-  getValueIfCached: getEventCategoryCountsIfCached,
-} = createGenericCache<
-  [client: ReplayClientInterface],
-  [range: PointRange | null],
+export const eventsCache: Cache<
+  [client: ReplayClientInterface, range: PointRange | null],
   EventCategory[]
->(
-  "getEventCategoryCounts",
-  async (range, client) => {
+> = createCache({
+  debugLabel: "Events",
+  getKey: ([client, range]) => (range ? `${range.begin}:${range.end}` : ""),
+  load: async ([client, range]) => {
     const allEvents = await client.getEventCountForTypes(
       Object.values(STANDARD_EVENT_CATEGORIES)
         .map(c => c.events.map(e => e.type))
@@ -70,86 +48,7 @@ export const {
       };
     });
   },
-  range => (range ? `${range.begin}:${range.end}` : "")
-);
-
-let eventTypeToEntryPointMap = new Map<EventHandlerType, Record<EventLog[]>>();
-
-export function getEventTypeEntryPointsSuspense(
-  client: ReplayClientInterface,
-  eventType: EventHandlerType
-): EventLog[] {
-  let record = eventTypeToEntryPointMap.get(eventType);
-  if (record == null) {
-    record = {
-      status: STATUS_PENDING,
-      value: createWakeable<EventLog[]>("getEventTypeEntryPointsSuspense"),
-    };
-
-    eventTypeToEntryPointMap.set(eventType, record);
-
-    fetchEventTypeEntryPoints(client, eventType, record);
-  }
-
-  if (record.status === STATUS_RESOLVED) {
-    return record.value;
-  } else {
-    throw record.value;
-  }
-}
-
-async function fetchEventTypeEntryPoints(
-  client: ReplayClientInterface,
-  eventType: EventHandlerType,
-  record: Record<EventLog[]>
-) {
-  const wakeable = record.value;
-  try {
-    const entryPoints = await client.runAnalysis<EventLog>({
-      effectful: false,
-      eventHandlerEntryPoints: [{ eventType }],
-      mapper: getFunctionBody(eventsMapper),
-    });
-
-    // Pre-cache object previews that came back with our new analysis data.
-    // This will avoid us having to turn around and request them again when rendering the logs.
-    entryPoints.forEach(entryPoint => cachePauseData(client, entryPoint.pauseId, entryPoint.data));
-
-    const eventLogs: EventLog[] = entryPoints.map(entryPoint => ({
-      ...entryPoint,
-      type: "EventLog",
-    }));
-
-    record.status = STATUS_RESOLVED;
-    record.value = eventLogs;
-  } catch (err) {
-    // Handle any analysis errors (such as "too many hits found") by resolving the record with
-    // a dummy `EventLog` entry that will get shown as a single console message at the top of
-    // the list.  That way we at least communicate to the user what happened.
-    // TODO [FE-1257] Show a better indicator that there were too many events found, like an overlay.
-    record.status = STATUS_RESOLVED;
-    record.value = [
-      {
-        data: {
-          frames: [],
-          objects: [],
-        },
-        location: [],
-        pauseId: "",
-        point: "",
-        time: 0,
-        type: "EventLog",
-        values: [
-          {
-            value: `❗Too many messages of type "${eventType}" found!`,
-          },
-        ],
-      },
-    ];
-  } finally {
-    wakeable.resolve(record.value);
-  }
-}
+});
 
 // Variables in scope in an analysis
 declare let sendCommand: SendCommand;
@@ -211,4 +110,53 @@ export function eventsMapper() {
       },
     },
   ];
+}
+function getEventCache(eventType: EventHandlerType) {
+  return getAnalysisCache<EventLog>(
+    {
+      eventTypes: [eventType],
+      mapper: getFunctionBody(eventsMapper),
+    },
+    point => ({ ...point, eventType, type: "EventLog" })
+  );
+}
+
+export function getEventPointsSuspense(
+  client: ReplayClientInterface,
+  eventType: EventHandlerType,
+  range: PointRange
+) {
+  return getEventCache(eventType).getPointsSuspense(client, range);
+}
+
+export function getInfallibleEventPointsSuspense(
+  client: ReplayClientInterface,
+  eventType: EventHandlerType,
+  range: PointRange
+) {
+  return createInfallibleSuspenseCache(getEventCache(eventType).getPointsSuspense)(client, range);
+}
+
+export function getEventPointsAsync(
+  client: ReplayClientInterface,
+  eventType: EventHandlerType,
+  range: PointRange
+) {
+  return getEventCache(eventType).getPointsAsync(client, range);
+}
+
+export function getCachedEventPoints(eventType: EventHandlerType, range: PointRange) {
+  return getEventCache(eventType).getCachedPoints(range);
+}
+
+export function getEventSuspense(eventType: EventHandlerType, point: ExecutionPoint) {
+  return getEventCache(eventType).getResultSuspense(point);
+}
+
+export function getEventAsync(eventType: EventHandlerType, point: ExecutionPoint) {
+  return getEventCache(eventType).getResultAsync(point);
+}
+
+export function getEventIfCached(eventType: EventHandlerType, point: ExecutionPoint) {
+  return getEventCache(eventType).getResultIfCached(point);
 }

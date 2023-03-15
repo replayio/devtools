@@ -22,15 +22,40 @@ function Title({ testRun }: { testRun: TestRun }) {
   );
 }
 
+function getModeIcon(mode: string | null): string[] {
+  switch (mode) {
+    case "diagnostics":
+      return ["biotech", "Diagnostic Mode"];
+    case "stress":
+      return ["repeat", "Stress Test Mode"];
+    case "record-on-retry":
+      return ["repeatone", "Record on Retry Mode"];
+  }
+
+  return [];
+}
+
+export function ModeAttribute({ testRun }: { testRun: TestRun }) {
+  const { mode } = testRun;
+
+  const [modeIcon, modeText] = getModeIcon(mode);
+
+  if (!modeIcon) {
+    return null;
+  }
+
+  return <AttributeContainer icon={modeIcon}>{modeText}</AttributeContainer>;
+}
+
 export function Attributes({ testRun }: { testRun: TestRun }) {
   const duration = getDuration(testRun.recordings!);
   const durationString = getDurationString(duration);
-  const { user, date, mergeId, mergeTitle, branch } = testRun;
+  const { user, date, mergeId, mergeTitle, branch, mode } = testRun;
 
   return (
     <div className="flex flex-row flex-wrap items-center pl-1">
       <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
-      <AttributeContainer icon="person">{user!}</AttributeContainer>
+      {user ? <AttributeContainer icon="person">{user}</AttributeContainer> : null}
       {mergeId && (
         <AttributeContainer title={mergeTitle} icon="merge_type">
           {mergeId}
@@ -39,6 +64,7 @@ export function Attributes({ testRun }: { testRun: TestRun }) {
 
       {!mergeId && branch && <AttributeContainer icon="fork_right">{branch}</AttributeContainer>}
       <AttributeContainer icon="timer">{durationString}</AttributeContainer>
+      <ModeAttribute testRun={testRun} />
     </div>
   );
 }

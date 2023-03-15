@@ -4,7 +4,7 @@ import sortBy from "lodash/sortBy";
 
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
-import { getMappedLocationSuspense } from "replay-next/src/suspense/MappedLocationCache";
+import { mappedLocationCache } from "replay-next/src/suspense/MappedLocationCache";
 import { getBreakpointPositionsSuspense } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 import {
@@ -226,14 +226,11 @@ function getAlternateSourceIdForPositionSuspense(
   // Now we can ask the backend for alternate locations with that line.
   let breakableColumn = breakableLineLocations.columns[0];
 
-  const mappedLocation = getMappedLocationSuspense(
-    {
-      sourceId: source.id,
-      line: breakableLineLocations.line,
-      column: breakableColumn,
-    },
-    client
-  );
+  const mappedLocation = mappedLocationCache.read(client, {
+    sourceId: source.id,
+    line: breakableLineLocations.line,
+    column: breakableColumn,
+  });
   return source.isSourceMapped
     ? getBestNonSourceMappedSourceId(
         sourcesById,

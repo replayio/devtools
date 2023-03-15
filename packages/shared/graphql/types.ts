@@ -103,6 +103,7 @@ export type LocalExperimentalUserSettings = {
   profileWorkerThreads: boolean;
   brokenSourcemapWorkaround: boolean;
   disableRecordingAssetsInDatabase: boolean;
+  reactPanel: boolean;
 };
 
 export type LocalUserSettings = LocalExperimentalUserSettings & {
@@ -233,7 +234,7 @@ export interface RecordingMetadata {
   source?: SourceMetadata;
 }
 
-export type TestResult = "passed" | "failed" | "timedOut";
+export type TestResult = "passed" | "failed" | "timedOut" | "skipped" | "unknown";
 
 // https://github.com/Replayio/replay-cli/blob/main/packages/replay/metadata/test.ts
 export type TestMetadata = {

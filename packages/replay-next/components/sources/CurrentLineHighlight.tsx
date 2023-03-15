@@ -2,7 +2,7 @@ import { Frame, SourceId } from "@replayio/protocol";
 import { Suspense, memo, useContext } from "react";
 
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { getFramesSuspense, getTopFrameSuspense } from "replay-next/src/suspense/FrameCache";
+import { framesCache, topFrameCache } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { SelectedFrameContext } from "../../src/contexts/SelectedFrameContext";
@@ -46,7 +46,7 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
   if (pauseId !== null && frameId !== null) {
     let showHighlight = false;
     // The 95% use case is that we'll be in the top frame. Start by fetching that.
-    const topFrame = getTopFrameSuspense(pauseId, client);
+    const topFrame = topFrameCache.read(client, pauseId);
 
     if (topFrame) {
       // Assuming there's at least a top frame, we can now see _which_ frame we're paused in.
@@ -55,7 +55,7 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
       if (selectedFrame?.frameId !== frameId) {
         // We must not be paused in the top frame. Get _all_ frames and find a match.
         // This is a more expensive request, so only fetch all frames if we have to.
-        const allFrames = getFramesSuspense(pauseId, client);
+        const allFrames = framesCache.read(client, pauseId);
         selectedFrame = allFrames?.find(frame => frame.frameId === frameId);
       }
 

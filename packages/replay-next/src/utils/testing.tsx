@@ -189,7 +189,7 @@ export function createMockReplayClient() {
     findMessages: jest.fn().mockImplementation(async () => ({ messages: [], overflow: false })),
     findNavigationEvents: jest.fn().mockImplementation(async () => []),
     findSources: jest.fn().mockImplementation(async () => []),
-    getAllFrames: jest.fn().mockImplementation(async () => []),
+    getAllFrames: jest.fn().mockImplementation(async () => ({ frames: [], data: {} })),
     getAnnotationKinds: jest.fn().mockImplementation(async () => []),
     getBreakpointPositions: jest.fn().mockImplementation(async () => []),
     getCorrespondingSourceIds: jest.fn().mockImplementation(() => []),

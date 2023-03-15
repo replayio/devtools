@@ -264,7 +264,11 @@ function Actions({ step, selected }: { step: AnnotatedTestStep; selected: boolea
   };
 
   return (
-    <button onClick={onClick} className={`${selected ? "" : "invisible"} group-hover/step:visible`}>
+    <button
+      data-testid="TestSuites-TestCase-TestStepRow-Actions"
+      onClick={onClick}
+      className={`${selected ? "" : "invisible"} group-hover/step:visible`}
+    >
       <div className="flex items-center">
         <MaterialIcon>more_vert</MaterialIcon>
       </div>

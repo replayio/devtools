@@ -108,7 +108,11 @@ function HeaderTitle({
   }, [editState, hasTitle, title]);
 
   if (!canEditTitle) {
-    return <span className={styles.ReadOnlyTitle}>{displayTitle}</span>;
+    return (
+      <span className={styles.ReadOnlyTitle} data-testid="Header-Title">
+        {displayTitle}
+      </span>
+    );
   }
 
   const onKeyDownOrKeyPress = (event: KeyboardEvent) => {
@@ -127,10 +131,11 @@ function HeaderTitle({
     }
   };
   const onBlur = () => {
-    if (editState !== EditState.Active) {
+    const contentEditable = contentEditableRef.current;
+    if (editState !== EditState.Active || !contentEditable) {
       return;
     }
-    const currentValue = contentEditableRef.current!.textContent || "";
+    const currentValue = contentEditable.textContent || "";
 
     setEditState(EditState.Saving);
     updateRecordingTitle(recordingId, currentValue).then(() => {
@@ -140,6 +145,7 @@ function HeaderTitle({
 
   return (
     <span
+      data-testid="Header-Title"
       className={styles.EditableTitle}
       contentEditable
       onBlur={onBlur}

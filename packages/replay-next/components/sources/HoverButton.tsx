@@ -73,17 +73,18 @@ export default function HoverButton({
 
   const [showNag, dismissNag] = useNag(Nag.FIRST_BREAKPOINT_ADD);
 
+  // Don't render a hover button for lines that have no hits at all.
+  if (!lineHitCounts) {
+    return null;
+  }
+
   if (point?.user && point.user.id !== currentUserInfo?.id) {
     return null;
   }
 
   if (isMetaKeyActive) {
-    if (lineHitCounts === null) {
-      return null;
-    }
-
     const [hitPoints, hitPointStatus] =
-      lineHitCounts.count >= TOO_MANY_POINTS_TO_FIND || !focusRange
+      lineHitCounts == null || lineHitCounts.count >= TOO_MANY_POINTS_TO_FIND || !focusRange
         ? [null, null]
         : getHitPointsForLocationSuspense(
             client,
@@ -129,10 +130,6 @@ export default function HoverButton({
     );
   } else {
     const addLogPoint = () => {
-      if (!lineHitCounts) {
-        return;
-      }
-
       const content = getDefaultLogPointContent();
       if (!content) {
         return;

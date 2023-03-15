@@ -12,11 +12,10 @@ import {
   rangesOverlap,
 } from "../utils/range-list";
 import { Subscriber, UnsubscribeFunction } from "./SearchCache";
-import { Thennable } from "./types";
 
 export interface RangeCache<T> {
   getValuesSuspense(client: ReplayClientInterface, range: PointRange): T[];
-  getValuesAsync(client: ReplayClientInterface, range: PointRange): Thennable<T[]> | T[];
+  getValuesAsync(client: ReplayClientInterface, range: PointRange): PromiseLike<T[]> | T[];
   getCachedValues(range: PointRange): T[];
 }
 

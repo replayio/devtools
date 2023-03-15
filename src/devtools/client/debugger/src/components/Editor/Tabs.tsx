@@ -35,12 +35,13 @@ class Tabs extends PureComponent<PropsFromRedux> {
   _draggedSource: SourceDetails | { url: null; id: null } | null = null;
   _draggedSourceIndex: number | null = null;
 
+  sourceTabsRef = React.createRef<HTMLDivElement>();
+
   componentDidUpdate(prevProps: PropsFromRedux) {
     const { selectedSource } = this.props;
 
     if (selectedSource && selectedSource != prevProps.selectedSource) {
-      // @ts-expect-error DOM node stuff
-      const sourceNodes = [...this.refs.sourceTabs.children];
+      const sourceNodes = [...this.sourceTabsRef.current!.children];
       const selectedSourceNode = sourceNodes.find(node => node.classList.contains("active"));
 
       const isSelectedSourceNodeVisible = this.getIsSelectedSourceNodeVisible();
@@ -52,10 +53,9 @@ class Tabs extends PureComponent<PropsFromRedux> {
   }
 
   getIsSelectedSourceNodeVisible() {
-    // @ts-expect-error DOM node stuff
-    const containerNode = this.refs.sourceTabs.parentElement;
-    // @ts-expect-error DOM node stuff
-    const sourceNodes = [...this.refs.sourceTabs.children];
+    const containerNode = this.sourceTabsRef.current!.parentElement!;
+    const sourceNodes = [...this.sourceTabsRef.current!.children];
+
     const selectedSourceNode = sourceNodes.find(node => node.classList.contains("active"));
 
     if (!selectedSourceNode) {
@@ -162,7 +162,7 @@ class Tabs extends PureComponent<PropsFromRedux> {
 
     return (
       <>
-        <div className="source-tabs tab" ref="sourceTabs">
+        <div className="source-tabs tab" ref={this.sourceTabsRef}>
           {toolboxLayout == "ide" && <CommandPaletteButton />}
           {tabSources.map((source, index) => {
             return (

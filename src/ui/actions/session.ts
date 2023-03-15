@@ -15,7 +15,7 @@ import { Recording } from "shared/graphql/types";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import { getRecording } from "ui/hooks/recordings";
-import { getUserSettings } from "ui/hooks/settings";
+import { getFeature, getUserSettings } from "ui/hooks/settings";
 import { getUserId, getUserInfo } from "ui/hooks/users";
 import {
   clearExpectedError,
@@ -168,8 +168,11 @@ export function createSocket(
       }
       ThreadFront.recordingId = recordingId;
 
-      const userSettings = await getUserSettings();
-      const [userInfo, recording] = await Promise.all([getUserInfo(), getRecording(recordingId)]);
+      const [userSettings, userInfo, recording] = await Promise.all([
+        getUserSettings(),
+        getUserInfo(),
+        getRecording(recordingId),
+      ]);
       assert(recording, "failed to load recording");
 
       if (recording.title) {
@@ -196,15 +199,16 @@ export function createSocket(
       }
 
       const experimentalSettings: ExperimentalSettings = {
-        disableScanDataCache: !!features.disableScanDataCache,
+        disableScanDataCache: getFeature("disableScanDataCache"),
         disableCache: !!prefs.disableCache,
-        disableStableQueryCache: !!features.disableStableQueryCache,
-        disableUnstableQueryCache: !features.enableUnstableQueryCache,
+        disableStableQueryCache: getFeature("disableStableQueryCache"),
+        disableUnstableQueryCache: !getFeature("enableUnstableQueryCache"),
         listenForMetrics: !!prefs.listenForMetrics,
-        profileWorkerThreads: !!features.profileWorkerThreads,
-        enableRoutines: !!features.enableRoutines,
-        rerunRoutines: !!features.rerunRoutines,
-        disableRecordingAssetsInDatabase: !!features.disableRecordingAssetsInDatabase,
+        profileWorkerThreads: getFeature("profileWorkerThreads"),
+        enableRoutines: getFeature("enableRoutines"),
+        rerunRoutines: getFeature("rerunRoutines"),
+        disableRecordingAssetsInDatabase: getFeature("disableRecordingAssetsInDatabase"),
+        keepAllTraces: getFeature("keepAllTraces"),
       };
       if (features.newControllerOnRefresh) {
         experimentalSettings.controllerKey = String(Date.now());
@@ -247,17 +251,17 @@ export function createSocket(
         focusRange,
         {
           onEvent: (event: ProtocolEvent) => {
-            if (features.logProtocolEvents) {
+            if (getFeature("logProtocolEvents")) {
               queueAction(eventReceived({ ...event, recordedAt: window.performance.now() }));
             }
           },
           onRequest: (request: CommandRequest) => {
-            if (features.logProtocol) {
+            if (getFeature("logProtocol")) {
               queueAction(requestSent({ ...request, recordedAt: window.performance.now() }));
             }
           },
           onResponse: (response: CommandResponse) => {
-            if (features.logProtocol) {
+            if (getFeature("logProtocol")) {
               const clonedResponse = { ...response, recordedAt: window.performance.now() };
 
               if (isSourceContentsCommandResponse(clonedResponse)) {
@@ -273,7 +277,7 @@ export function createSocket(
             }
           },
           onResponseError: (error: CommandResponse) => {
-            if (features.logProtocol) {
+            if (getFeature("logProtocol")) {
               queueAction(errorReceived({ ...error, recordedAt: window.performance.now() }));
             }
           },
@@ -322,14 +326,15 @@ export function createSocket(
         dispatch(setViewMode("dev"));
       }
 
-      dispatch(onLoadingFinished());
       dispatch(actions.setUploading(null));
       dispatch(actions.setAwaitingSourcemaps(false));
 
       ThreadFront.on("paused", ({ point }) => dispatch(setCurrentPoint(point)));
 
-      await ThreadFront.loadingHasBegun.promise;
-      dispatch(jumpToInitialPausePoint());
+      await ThreadFront.waitForSession();
+      await dispatch(jumpToInitialPausePoint());
+
+      dispatch(actions.setLoadingFinished(true));
 
       if (!focusRegion) {
         const initialFocusRegion = await ThreadFront.initialFocusRegionWaiter.promise;
@@ -349,24 +354,6 @@ export function createSocket(
         );
       }
     }
-    ThreadFront.initializedWaiter.resolve();
-  };
-}
-
-function onLoadingFinished(): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront }) => {
-    await waitForTime(300);
-    async function initThreadFront() {
-      await ThreadFront.waitForSession();
-      await ThreadFront.initializedWaiter.promise;
-      await ThreadFront.ensureAllSources();
-    }
-
-    initThreadFront();
-
-    await ThreadFront.initializedWaiter.promise;
-
-    dispatch(actions.setLoadingFinished(true));
   };
 }
 

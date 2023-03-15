@@ -52,8 +52,7 @@ import { RecordingCapabilities } from "protocol/thread/thread";
 import { binarySearch, compareNumericStrings, defer, waitForTime } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
 import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
-import { insert } from "replay-next/src/utils/array";
-import { areRangesEqual, compareExecutionPoints } from "replay-next/src/utils/time";
+import { areRangesEqual } from "replay-next/src/utils/time";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { isPointInRegions, isRangeInRegions, isTimeInRegions } from "shared/utils/time";
 

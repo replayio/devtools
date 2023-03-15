@@ -1,11 +1,15 @@
 import "ui/setup/dynamic/inspector";
-import classnames from "classnames";
+import { useContext } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import ComputedApp from "devtools/client/inspector/computed/components/ComputedApp";
 import LayoutApp from "devtools/client/inspector/layout/components/LayoutApp";
 import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
 import { RulesApp } from "devtools/client/inspector/rules/components/RulesApp";
+import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
+import { isPointInRegions } from "shared/utils/time";
+import { enterFocusMode } from "ui/actions/timeline";
+import { getLoadedRegions } from "ui/reducers/app";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { ResponsiveTabs, Tab } from "../../shared/components/ResponsiveTabs";
@@ -30,6 +34,20 @@ const availableTabs: readonly InspectorActiveTab[] = [
 export default function InspectorApp() {
   const dispatch = useAppDispatch();
   const activeTab = useAppSelector(state => state.inspector.activeTab);
+  const { executionPoint } = useContext(TimelineContext);
+  const loadedRegions = useAppSelector(getLoadedRegions);
+
+  if (!isPointInRegions(executionPoint, loadedRegions?.loaded ?? [])) {
+    return (
+      <div className="inspector-responsive-container bg-bodyBgcolor p-2">
+        Elements are unavailable because you're paused at a point outside{" "}
+        <span className="cursor-pointer underline" onClick={() => dispatch(enterFocusMode())}>
+          your debugging window
+        </span>
+        .
+      </div>
+    );
+  }
 
   return (
     <div className="inspector-responsive-container theme-body inspector">
@@ -51,7 +69,10 @@ export default function InspectorApp() {
                           borderBottom: "1px solid var(--theme-splitter-color)",
                         }}
                       >
-                        <ResponsiveTabs activeIdx={availableTabs.indexOf(activeTab)}>
+                        <ResponsiveTabs
+                          activeIdx={availableTabs.indexOf(activeTab)}
+                          dataTestId="InspectorTabs"
+                        >
                           {availableTabs.map(panelId => {
                             const isPanelSelected = activeTab === panelId;
                             return (

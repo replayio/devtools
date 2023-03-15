@@ -10,6 +10,10 @@
   margin: 0.5rem;
 }
 
+.CheckboxWrapper input {
+  border: 1px solid var(--input-border);
+}
+
 .Content {
   height: 100%;
   overflow: hidden;
