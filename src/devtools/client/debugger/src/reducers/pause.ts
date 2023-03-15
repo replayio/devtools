@@ -7,8 +7,8 @@ import type { FrameId, Location, PauseId, TimeStampedPoint, Value } from "@repla
 import findLast from "lodash/findLast";
 
 import { compareNumericStrings } from "protocol/utils";
-import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
-import { getFrameStepsAsync } from "replay-next/src/suspense/FrameStepsCache";
+import { framesCache } from "replay-next/src/suspense/FrameCache";
+import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { getPreferredLocation, getSelectedSourceId } from "ui/reducers/sources";
 import { SourceDetails } from "ui/reducers/sources";
@@ -298,15 +298,15 @@ async function getResumePoint(replayClient: ReplayClientInterface, state: UIStat
   if (!executionPoint || !selectedFrameId) {
     return;
   }
-  const frames = await getFramesAsync(selectedFrameId.pauseId, replayClient);
+  const frames = await framesCache.readAsync(replayClient, selectedFrameId.pauseId);
   const frame = frames?.find(frame => frame.frameId === selectedFrameId.frameId);
   if (!frames || !frame || frame === frames[0]) {
     return;
   }
-  const frameSteps = await getFrameStepsAsync(
+  const frameSteps = await frameStepsCache.readAsync(
+    replayClient,
     selectedFrameId.pauseId,
-    selectedFrameId.frameId,
-    replayClient
+    selectedFrameId.frameId
   );
   if (!frameSteps?.length) {
     return;

@@ -30,7 +30,7 @@ import { DownloadCancelledError } from "protocol/screenshot-cache";
 import { ThreadFront } from "protocol/thread";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { waitForTime } from "protocol/utils";
-import { getPointsBoundingTimeAsync } from "replay-next/src/suspense/ExecutionPointsCache";
+import { pointsBoundingTimeCache } from "replay-next/src/suspense/ExecutionPointsCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import { mayClearSelectedStep } from "ui/reducers/reporter";
@@ -549,8 +549,11 @@ export function setFocusRegionFromTimeRange(
     }
 
     const [pointsBoundingBegin, pointsBoundingEnd] = await Promise.all([
-      getPointsBoundingTimeAsync(await clampTime(replayClient, timeRange.begin), replayClient),
-      getPointsBoundingTimeAsync(await clampTime(replayClient, timeRange.end), replayClient),
+      pointsBoundingTimeCache.readAsync(
+        replayClient,
+        await clampTime(replayClient, timeRange.begin)
+      ),
+      pointsBoundingTimeCache.readAsync(replayClient, await clampTime(replayClient, timeRange.end)),
     ]);
     const begin = pointsBoundingBegin.before;
     const end = pointsBoundingEnd.after;

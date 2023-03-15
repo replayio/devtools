@@ -4,7 +4,7 @@ import { ReactNode, Suspense, useContext } from "react";
 
 import { assert } from "protocol/utils";
 import Loader from "replay-next/components/Loader";
-import { getMappedLocationSuspense } from "replay-next/src/suspense/MappedLocationCache";
+import { mappedLocationCache } from "replay-next/src/suspense/MappedLocationCache";
 import { objectPropertyCache } from "replay-next/src/suspense/ObjectPreviews";
 import { getScopeMapSuspense } from "replay-next/src/suspense/ScopeMapCache";
 import { getSourcesByUrlSuspense } from "replay-next/src/suspense/SourcesCache";
@@ -72,7 +72,7 @@ function ErrorFrameRendererSuspends({ frame }: { frame: StackFrame }) {
       line: lineNumber,
       column: columnNumber,
     };
-    const mappedLocation = getMappedLocationSuspense(location, client);
+    const mappedLocation = mappedLocationCache.read(client, location);
     const scopeMap = getScopeMapSuspense(location, client);
     originalFunctionName = scopeMap?.find(mapping => mapping[0] === frame.functionName)?.[1];
     renderedSource = <Source className={styles.Source} locations={mappedLocation} />;

@@ -5,7 +5,7 @@ import type { Location, ObjectPreview, Object as ProtocolObject } from "@replayi
 
 import type { ThreadFront as TF } from "protocol/thread";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
-import { getTopFrameAsync } from "replay-next/src/suspense/FrameCache";
+import { topFrameCache } from "replay-next/src/suspense/FrameCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { getScopeMapAsync } from "replay-next/src/suspense/ScopeMapCache";
@@ -295,7 +295,7 @@ export const {
 >(
   "eventListenerLocationCache",
   async (pauseId, replayEventType, ThreadFront, replayClient, getState) => {
-    const topFrame = await getTopFrameAsync(pauseId, replayClient);
+    const topFrame = await topFrameCache.readAsync(replayClient, pauseId);
 
     if (!topFrame) {
       return;

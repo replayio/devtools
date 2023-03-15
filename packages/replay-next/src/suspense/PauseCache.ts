@@ -13,7 +13,7 @@ import cloneDeep from "lodash/cloneDeep";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createGenericCache } from "./createGenericCache";
-import { cacheFrames } from "./FrameCache";
+import { framesCache } from "./FrameCache";
 import { preCacheObjects } from "./ObjectPreviews";
 import { cacheScope } from "./ScopeCache";
 
@@ -100,7 +100,7 @@ export function cachePauseData(
   if (stack) {
     const frames = sortFramesAndUpdateLocations(client, pauseData.frames || [], stack);
     if (frames) {
-      cacheFrames(frames, pauseId);
+      framesCache.cache(frames, client, pauseId);
     }
   }
   if (pauseData.scopes) {

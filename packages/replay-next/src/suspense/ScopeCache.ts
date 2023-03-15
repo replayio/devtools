@@ -4,7 +4,7 @@ import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createGenericCache } from "./createGenericCache";
-import { getFramesAsync } from "./FrameCache";
+import { framesCache } from "./FrameCache";
 import { cachePauseData } from "./PauseCache";
 
 export interface FrameScopes {
@@ -46,7 +46,7 @@ export const {
 >(
   "ScopeCache: getFrameScopes",
   async (pauseId, frameId, client) => {
-    const frame = (await getFramesAsync(pauseId, client))?.find(
+    const frame = (await framesCache.readAsync(client, pauseId))?.find(
       frame => frame.frameId === frameId
     )!;
     const generatedScopes = await Promise.all(
