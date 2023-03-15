@@ -14,7 +14,7 @@ import hooks from "ui/hooks";
 import { useFeature } from "ui/hooks/settings";
 import { Nag } from "ui/hooks/users";
 import { useTestInfo } from "ui/hooks/useTestInfo";
-import { getFlatEvents } from "ui/reducers/app";
+import { getFilteredEventsForFocusRegion } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -53,7 +53,7 @@ export default function SidePanel() {
   const selectedPrimaryPanel = useInitialPrimaryPanel();
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
-  const events = useAppSelector(getFlatEvents);
+  const events = useAppSelector(getFilteredEventsForFocusRegion);
   const { isAuthenticated } = useAuth0();
   const viewMode = useAppSelector(getViewMode);
   const { nags } = hooks.useGetUserInfo();
