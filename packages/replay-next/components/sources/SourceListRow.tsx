@@ -22,7 +22,8 @@ import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { PointBehaviorsObject } from "replay-next/src/contexts/points/types";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { ParsedToken, StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
+import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
+import { ParsedToken } from "replay-next/src/utils/syntax-parser";
 import {
   LineNumberToHitCountMap,
   POINT_BEHAVIOR_DISABLED,
@@ -105,16 +106,19 @@ const SourceListRow = memo(
 
     const { sourceId } = source;
 
-    const parsedTokensByLine = useSyncExternalStore(
+    let tokens: ParsedToken[] | null = useSyncExternalStore(
       streamingParser.subscribe,
-      () => streamingParser.parsedTokensByLine,
-      () => streamingParser.parsedTokensByLine
+      () => streamingParser.value?.[index] ?? null,
+      () => streamingParser.value?.[index] ?? null
     );
+    if (!syntaxHighlightingEnabled) {
+      tokens = null;
+    }
 
-    const rawTextByLine = useSyncExternalStore(
+    const plainText = useSyncExternalStore(
       streamingParser.subscribe,
-      () => streamingParser.rawTextByLine,
-      () => streamingParser.rawTextByLine
+      () => streamingParser.data?.text[index] ?? null,
+      () => streamingParser.data?.text[index] ?? null
     );
 
     const lineHitCounts = hitCounts?.get(lineNumber) || null;
@@ -124,13 +128,6 @@ const SourceListRow = memo(
       lineNumber,
       source,
     });
-
-    let tokens: ParsedToken[] | null = null;
-    if (syntaxHighlightingEnabled && index < parsedTokensByLine.length) {
-      tokens = parsedTokensByLine[index] ?? null;
-    }
-
-    const plainText = index < rawTextByLine.length ? rawTextByLine[index] : null;
 
     const pointForSuspense = findPointForLocation(pointsForSuspense, sourceId, lineNumber);
     const pointsForLine = findPointsForLocation(pointsForDefaultPriority, sourceId, lineNumber);

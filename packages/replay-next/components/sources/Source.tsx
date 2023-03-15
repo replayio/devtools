@@ -64,7 +64,7 @@ function SourceLoader({
   }
 
   const fileName = getSourceFileName(source);
-  const streamingParser = streamingSyntaxParsingCache.read(streamingSourceContents, fileName);
+  const streamingParser = streamingSyntaxParsingCache.stream(streamingSourceContents, fileName);
   if (streamingParser === null) {
     return null;
   }

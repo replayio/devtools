@@ -7,8 +7,8 @@ import {
   isVisualCommentTypeData,
 } from "replay-next/components/sources/utils/comments";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { ParsedToken, parsedTokensToHtml } from "replay-next/src/suspense/SyntaxParsingCache";
 import { getSourceFileNameFromUrl } from "replay-next/src/utils/source";
+import { ParsedToken, parsedTokensToHtml } from "replay-next/src/utils/syntax-parser";
 
 import styles from "./CommentPreview.module.css";
 

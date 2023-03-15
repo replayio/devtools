@@ -1,9 +1,7 @@
 import { Suspense } from "react";
 
-import {
-  parsedTokensToHtml,
-  syntaxParsingCache,
-} from "replay-next/src/suspense/SyntaxParsingCache";
+import { parse } from "replay-next/src/suspense/SyntaxParsingCache";
+import { parsedTokensToHtml } from "replay-next/src/utils/syntax-parser";
 
 import Loader from "../Loader";
 import styles from "./SyntaxHighlightedLine.module.css";
@@ -23,7 +21,7 @@ export default function SyntaxHighlightedLine({ className = "", code, fileExtens
 }
 
 function SyntaxHighlightedLineSuspends({ code, className = "", fileExtension = ".js" }: Props) {
-  const tokens = syntaxParsingCache.read(code, fileExtension);
+  const tokens = parse(code, fileExtension);
   const html = parsedTokensToHtml(tokens?.[0] ?? []);
 
   return (
