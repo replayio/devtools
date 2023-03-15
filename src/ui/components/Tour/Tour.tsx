@@ -83,28 +83,37 @@ const Tour: React.FC = () => {
               <div className={styles.intro}>
                 {showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
                   <>
-                    <div className={styles.h1}>Our time traveling console is 🔥</div>
+                    <div className={styles.h1}>Time travel 🚀</div>
                     <p>Look underneath the video and introduce yourself to the Replay console.</p>
                     <p>
                       Hover over the lines in the console and you’ll see a fast-forward button.
-                      Click it!
+                      Click it to time travel!
                     </p>
                   </>
                 )}
 
                 {!showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
                   <>
-                    <div className={styles.h1}>One-click logs</div>
-                    <p>Now click the plus button on a line of code to set a print statement. 🧐</p>
-                    <p>This is where it gets interesting!</p>
+                    <div className={styles.h1}>
+                      One-click logs
+                      <svg className={styles.logPoint} viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+                      </svg>
+                    </div>
+                    <p>
+                      Now click the plus button on a line of code to set a print statement. Watch
+                      this!
+                    </p>
                   </>
                 )}
 
                 {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && (
                   <>
-                    <div className={styles.h1}>One-click logs</div>
+                    <div className={styles.h1}>One-click logs 🦄</div>
                     <p>You can pass anything you want here, including objects and variables.</p>
-                    <p>Later we can even show you how to add a unicorn. 🦄</p>
+                    <p>Later we can even show you how to add a unicorn.</p>
+                    <p>Type something here and hit enter.</p>
                   </>
                 )}
 
@@ -143,7 +152,7 @@ const Tour: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="absolute bottom-28 w-full">
+      <div className="absolute bottom-28 p-2">
         {isNewUser && (
           <div className="relative bottom-0">
             <img src="/images/illustrations/larry_wave.png" className="z-1 w-full" />
