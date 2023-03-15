@@ -119,11 +119,11 @@ const Tour: React.FC = () => {
 
                 {hasCompletedTour && (
                   <>
-                    <div className={styles.h1}>Cool, eh?</div>
+                    <div className={styles.h1}>Cool, eh? 🤯</div>
                     <p>Take a look at the console.</p>
                     <p>
                       Replay just re-ran your recording and retroactively added your print statement
-                      each time that line of code was called! 🤯
+                      each time that line of code was called!
                     </p>
                     <p>
                       We call this our "ah-ha moment," and Replay is full of them. Happy exploring!
