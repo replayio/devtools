@@ -154,7 +154,7 @@ const Tour: React.FC = () => {
       </div>
       <div className="absolute bottom-28 p-2">
         {isNewUser && (
-          <div className="relative bottom-0">
+          <div className="relative -bottom-2">
             <img src="/images/illustrations/larry_wave.png" className="z-1 w-full" />
           </div>
         )}
