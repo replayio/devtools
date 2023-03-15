@@ -61,7 +61,7 @@ export default function Realistic() {
 
   useEffect(() => {
     fire();
-  }, []);
+  }, [fire, makeShot]);
 
   return (
     <>
