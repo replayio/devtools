@@ -1,59 +1,48 @@
 import { Frame, FrameId, PauseId } from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 
 import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
 
-import { createGenericCache } from "./createGenericCache";
 import { cachePauseData, sortFramesAndUpdateLocations } from "./PauseCache";
 
-export const {
-  getValueSuspense: getFramesSuspense,
-  getValueAsync: getFramesAsync,
-  getValueIfCached: getFramesIfCached,
-  addValue: cacheFrames,
-} = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [pauseId: PauseId],
+export const framesCache: Cache<
+  [replayClient: ReplayClientInterface, pauseId: PauseId],
   Frame[] | undefined
->(
-  "FrameCache: getFrames",
-  async (pauseId, client): Promise<Frame[] | undefined> => {
+> = createCache({
+  debugLabel: "FramesCache",
+  getKey: ([client, pauseId]) => pauseId,
+  load: async ([client, pauseId]) => {
     const framesResult = await client.getAllFrames(pauseId);
     await client.waitForLoadedSources();
     cachePauseData(client, pauseId, framesResult.data, framesResult.frames);
-    const cached: { value: Frame[] | undefined } | undefined = getFramesIfCached(pauseId);
+    const cached = framesCache.getValueIfCached(client, pauseId);
     assert(cached, `Frames for pause ${pauseId} not found in cache`);
-    return cached.value;
+    return cached;
   },
-  pauseId => pauseId
-);
+});
 
 export function getFrameSuspense(
   replayClient: ReplayClientInterface,
   pauseId: PauseId,
   frameId: FrameId
 ) {
-  const frames = getFramesSuspense(pauseId, replayClient);
+  const frames = framesCache.read(replayClient, pauseId);
   return frames?.find(frame => frame.frameId === frameId);
 }
 
-export const {
-  getValueSuspense: getTopFrameSuspense,
-  getValueAsync: getTopFrameAsync,
-  getValueIfCached: getTopFrameIfCached,
-} = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [pauseId: PauseId],
+export const topFrameCache: Cache<
+  [replayClient: ReplayClientInterface, pauseId: PauseId],
   Frame | undefined
->(
-  "FrameCache: getTopFrame",
-  async (pauseId, client) => {
+> = createCache({
+  debugLabel: "TopFrame",
+  getKey: ([client, pauseId]) => pauseId,
+  load: async ([client, pauseId]) => {
     // In most cases, we probably already have a full set of frames cached for this pause ID.
     // Try to use the first frame from there if possible.
-    const existingCachedFrames = getFramesIfCached(pauseId);
-
-    if (existingCachedFrames?.value) {
-      return existingCachedFrames.value[0];
+    const existingCachedFrames = framesCache.getValueIfCached(client, pauseId);
+    if (existingCachedFrames) {
+      return existingCachedFrames[0];
     }
 
     // Otherwise, we'll use a lighter-weight `Pause.getTopFrame` request. The object
@@ -80,5 +69,4 @@ export const {
     assert(topFrame, `Top frame for pause ${pauseId} not found in cache`);
     return topFrame;
   },
-  pauseId => pauseId
-);
+});

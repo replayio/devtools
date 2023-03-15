@@ -10,10 +10,10 @@ import { getSelectedFrameId, getThreadContext } from "devtools/client/debugger/s
 import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import Services from "devtools/shared/services";
+import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { useGetFrameSteps } from "replay-next/src/suspense/FrameStepsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { useGetFrames } from "ui/suspense/frameCache";
 import { trackEvent } from "ui/utils/telemetry";
 
 const { appinfo } = Services;
@@ -74,7 +74,9 @@ export default function CommandBar() {
   const replayClient = useContext(ReplayClientContext);
   const cx = useAppSelector(getThreadContext);
   const selectedFrameId = useAppSelector(getSelectedFrameId);
-  const frames = useGetFrames(replayClient, selectedFrameId?.pauseId);
+  const frames = selectedFrameId?.pauseId
+    ? framesCache.getValueIfCached(replayClient, selectedFrameId?.pauseId)
+    : undefined;
   const frameSteps = useGetFrameSteps(
     replayClient,
     selectedFrameId?.pauseId,
@@ -115,7 +117,7 @@ export default function CommandBar() {
   }, [cx, dispatch]);
 
   const hasFramePositions = !!frameSteps.value?.length;
-  const isPaused = !!frames.value?.length;
+  const isPaused = frames && frames.length > 0;
   const disabled = !isPaused || !hasFramePositions;
   const disabledTooltip = !isPaused
     ? "Stepping is disabled until you're paused at a point"

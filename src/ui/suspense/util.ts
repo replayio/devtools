@@ -1,6 +1,6 @@
 import { PauseId, TimeStampedPointRange } from "@replayio/protocol";
 
-import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
+import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { getFrameStepsSuspense } from "replay-next/src/suspense/FrameStepsCache";
 import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
@@ -15,7 +15,7 @@ export function getAsyncParentPauseIdSuspense(
   loadedRegions: TimeStampedPointRange[]
 ): PauseId | null | undefined {
   while (asyncIndex > 0) {
-    const frames = getFramesSuspense(pauseId, replayClient)!;
+    const frames = framesCache.read(replayClient, pauseId)!;
     if (!frames?.length) {
       return;
     }
