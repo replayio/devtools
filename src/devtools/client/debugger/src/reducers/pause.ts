@@ -8,7 +8,7 @@ import findLast from "lodash/findLast";
 
 import { compareNumericStrings } from "protocol/utils";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
-import { getFrameStepsAsync } from "replay-next/src/suspense/FrameStepsCache";
+import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { getPreferredLocation, getSelectedSourceId } from "ui/reducers/sources";
 import { SourceDetails } from "ui/reducers/sources";
@@ -303,10 +303,10 @@ async function getResumePoint(replayClient: ReplayClientInterface, state: UIStat
   if (!frames || !frame || frame === frames[0]) {
     return;
   }
-  const frameSteps = await getFrameStepsAsync(
+  const frameSteps = await frameStepsCache.readAsync(
+    replayClient,
     selectedFrameId.pauseId,
-    selectedFrameId.frameId,
-    replayClient
+    selectedFrameId.frameId
   );
   if (!frameSteps?.length) {
     return;

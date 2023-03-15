@@ -3,6 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import React, { useContext, useEffect } from "react";
+import { useImperativeCacheValue } from "suspense";
 
 import actions from "devtools/client/debugger/src/actions/index";
 import CommandBarButton from "devtools/client/debugger/src/components/shared/Button/CommandBarButton";
@@ -11,7 +12,7 @@ import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import Services from "devtools/shared/services";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
-import { useGetFrameSteps } from "replay-next/src/suspense/FrameStepsCache";
+import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
@@ -73,15 +74,17 @@ function formatKey(action: string) {
 export default function CommandBar() {
   const replayClient = useContext(ReplayClientContext);
   const cx = useAppSelector(getThreadContext);
-  const selectedFrameId = useAppSelector(getSelectedFrameId);
-  const frames = selectedFrameId?.pauseId
-    ? framesCache.getValueIfCached(replayClient, selectedFrameId?.pauseId)
-    : undefined;
-  const frameSteps = useGetFrameSteps(
+  const { frameId: selectedFrameId, pauseId: selectedPauseId } =
+    useAppSelector(getSelectedFrameId) ?? {};
+
+  const { value: frames } = useImperativeCacheValue(framesCache, replayClient, selectedPauseId);
+  const { value: frameSteps } = useImperativeCacheValue(
+    frameStepsCache,
     replayClient,
-    selectedFrameId?.pauseId,
-    selectedFrameId?.frameId
+    selectedPauseId,
+    selectedFrameId
   );
+
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -116,7 +119,7 @@ export default function CommandBar() {
     };
   }, [cx, dispatch]);
 
-  const hasFramePositions = !!frameSteps.value?.length;
+  const hasFramePositions = frameSteps && frameSteps.length > 0;
   const isPaused = frames && frames.length > 0;
   const disabled = !isPaused || !hasFramePositions;
   const disabledTooltip = !isPaused
