@@ -61,8 +61,8 @@ export default function InspectorApp() {
             <div className="devtools-inspector-tab-panel">
               <div id="inspector-sidebar-container">
                 <div id="inspector-sidebar">
-                  <div className="devtools-sidebar-tabs tabs">
-                    <div>
+                  <div className="devtools-sidebar-tabs">
+                    <div className="tabs">
                       <nav
                         className="tabs-navigation"
                         style={{
@@ -84,8 +84,8 @@ export default function InspectorApp() {
                           })}
                         </ResponsiveTabs>
                       </nav>
-                      <div>
-                        <div className="tab-panel-box panels" role="tabpanel">
+                      <div className="panels">
+                        <div className="tab-panel-box" role="tabpanel">
                           {activeTab === "computedview" && <ComputedApp />}
                           {activeTab === "eventsview" && <EventListenersApp />}
                           {activeTab === "layoutview" && (
