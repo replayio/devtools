@@ -12,18 +12,9 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
-import { Nag } from "ui/hooks/users";
-import { useTestInfo } from "ui/hooks/useTestInfo";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { PrimaryPanelName } from "ui/state/layout";
-import { useGetFrames } from "ui/suspense/frameCache";
-import {
-  shouldShowBreakpointAdd,
-  shouldShowBreakpointEdit,
-  shouldShowConsoleNavigate,
-  shouldShowTour,
-} from "ui/utils/onboarding";
 // TODO [ryanjduffy]: Refactor shared styling more completely
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -165,8 +156,6 @@ export default function Toolbar() {
   const { value: logProtocol } = useFeature("logProtocol");
   const { value: showReactPanel } = useFeature("reactPanel");
   const [sidePanelCollapsed, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
-  const { nags } = hooks.useGetUserInfo();
-  const showTour = shouldShowTour(nags);
 
   useEffect(() => {
     if (!loading && comments.length > 0) {
@@ -202,15 +191,6 @@ export default function Toolbar() {
   return (
     <div className="toolbox-toolbar-container flex flex-col items-center justify-between py-1">
       <div id="toolbox-toolbar">
-        {recording?.metadata?.test?.runner?.name !== "cypress" && showTour ? (
-          <ToolbarButton
-            icon="school"
-            name="tour"
-            label="Replay Tour"
-            onClick={handleButtonClick}
-          />
-        ) : null}
-
         {recording?.metadata?.test?.runner?.name == "cypress" ? (
           <ToolbarButton
             icon="cypress"
@@ -226,7 +206,6 @@ export default function Toolbar() {
             onClick={handleButtonClick}
           />
         )}
-
         <ToolbarButton
           icon="forum"
           label="Comments"
