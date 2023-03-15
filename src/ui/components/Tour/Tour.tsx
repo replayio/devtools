@@ -61,96 +61,84 @@ const Tour: React.FC = () => {
 
   const { dismissTourNag } = useNagDismissal();
 
-  console.log("showDevtoolsNag:", showDevtoolsNag);
-  console.log("showConsoleNavigate:", showConsoleNavigate);
-  console.log("showBreakpointAdd:", showBreakpointAdd);
-  console.log("showBreakpointEdit:", showBreakpointEdit);
-
   return (
     <div className={styles.TourBoxWrapper}>
       <div className={styles.TourBoxGradient}>
         <div className={styles.TourBox}>
           <div className="p-3">
             {isNewUser ? (
-              <>
-                <div className={styles.intro}>
-                  <p className={styles.h1}>Hello and welcome!</p>
-                  {typeOfReplay === "events" ? (
-                    <>
-                      <p>
-                        Replay is the first time-travel enabled DevTools. It’s designed to be
-                        familiar, futuristic, and fun :)
-                      </p>
-                      <p>To get started, click on DevTools in the top right.</p>
-                    </>
-                  ) : null}
-                </div>
-              </>
+              <div className={styles.intro}>
+                <p className={styles.h1}>Hello and welcome!</p>
+                {typeOfReplay === "events" ? (
+                  <>
+                    <p>
+                      Replay is the first time-travel enabled DevTools. It’s designed to be
+                      familiar, futuristic, and fun :)
+                    </p>
+                    <p>To get started, click on DevTools in the top right.</p>
+                  </>
+                ) : null}
+              </div>
             ) : (
-              <>
-                <div className={styles.intro}>
-                  {showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
-                    <>
-                      <div className={styles.h1}>Our time traveling console is 🔥</div>
-                      <p>Look underneath the video and introduce yourself to the Replay console.</p>
-                      <p>
-                        Hover over the lines in the console and you’ll see a fast-forward button.
-                        Click it!
-                      </p>
-                    </>
-                  )}
+              <div className={styles.intro}>
+                {showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
+                  <>
+                    <div className={styles.h1}>Our time traveling console is 🔥</div>
+                    <p>Look underneath the video and introduce yourself to the Replay console.</p>
+                    <p>
+                      Hover over the lines in the console and you’ll see a fast-forward button.
+                      Click it!
+                    </p>
+                  </>
+                )}
 
-                  {!showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
-                    <>
-                      <div className={styles.h1}>One-click logs</div>
-                      <p>
-                        Now click the plus button on a line of code to set a print statement. 🧐
-                      </p>
-                      <p>This is where it gets interesting!</p>
-                    </>
-                  )}
+                {!showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
+                  <>
+                    <div className={styles.h1}>One-click logs</div>
+                    <p>Now click the plus button on a line of code to set a print statement. 🧐</p>
+                    <p>This is where it gets interesting!</p>
+                  </>
+                )}
 
-                  {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && (
-                    <>
-                      <div className={styles.h1}>One-click logs</div>
-                      <p>You can pass anything you want here, including objects and variables.</p>
-                      <p>Later we can even show you how to add a unicorn. 🦄</p>
-                    </>
-                  )}
+                {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && (
+                  <>
+                    <div className={styles.h1}>One-click logs</div>
+                    <p>You can pass anything you want here, including objects and variables.</p>
+                    <p>Later we can even show you how to add a unicorn. 🦄</p>
+                  </>
+                )}
 
-                  {hasCompletedTour && (
-                    <>
-                      <div className={styles.h1}>Cool, eh?</div>
-                      <p>Take a look at the console.</p>
-                      <p>
-                        Replay just re-ran your recording and retroactively added your print
-                        statement each time that line of code was called! 🤯
-                      </p>
-                      <p>
-                        We call this our "ah-ha moment," and Replay is full of them. Happy
-                        exploring!
-                      </p>
-                      <p className="mt-20">
-                        <a
-                          href="#"
-                          onClick={e => {
-                            e.stopPropagation();
-                            setShowConfetti(true);
-                            setTimeout(() => {
-                              setShowConfetti(false);
-                              dismissTourNag();
-                            }, 2500);
-                          }}
-                          className="hover:cursor-hand whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg"
-                        >
-                          Thanks, please dismiss!
-                        </a>
-                        {showConfetti ? <Confetti /> : null}
-                      </p>
-                    </>
-                  )}
-                </div>
-              </>
+                {hasCompletedTour && (
+                  <>
+                    <div className={styles.h1}>Cool, eh?</div>
+                    <p>Take a look at the console.</p>
+                    <p>
+                      Replay just re-ran your recording and retroactively added your print statement
+                      each time that line of code was called! 🤯
+                    </p>
+                    <p>
+                      We call this our "ah-ha moment," and Replay is full of them. Happy exploring!
+                    </p>
+                    <p className="mt-20">
+                      <a
+                        href="#"
+                        onClick={e => {
+                          e.stopPropagation();
+                          setShowConfetti(true);
+                          setTimeout(() => {
+                            setShowConfetti(false);
+                            dismissTourNag();
+                          }, 2500);
+                        }}
+                        className="hover:cursor-hand whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg"
+                      >
+                        Thanks, please dismiss!
+                      </a>
+                      {showConfetti ? <Confetti /> : null}
+                    </p>
+                  </>
+                )}
+              </div>
             )}
           </div>
         </div>

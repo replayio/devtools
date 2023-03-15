@@ -6,7 +6,6 @@ import Accordion from "devtools/client/debugger/src/components/shared/Accordion"
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { setViewMode } from "ui/actions/layout";
 import Events from "ui/components/Events";
-import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
 import LoginButton from "ui/components/LoginButton";
 import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -57,7 +56,6 @@ export default function SidePanel() {
   const { isAuthenticated } = useAuth0();
   const viewMode = useAppSelector(getViewMode);
   const { nags } = hooks.useGetUserInfo();
-  const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
   const dispatch = useAppDispatch();
   const dismissNag = hooks.useDismissNag();
   const handleToggle = async (mode: ViewMode) => {
