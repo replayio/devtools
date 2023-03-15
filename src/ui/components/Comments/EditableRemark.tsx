@@ -1,6 +1,6 @@
 import { SerializedEditorState } from "lexical";
 import { MouseEventHandler, useState } from "react";
-
+import emoji from 'node-emoji';
 import CommentEditor from "replay-next/components/lexical/CommentEditor";
 import useCommentContextMenu from "ui/components/Comments/useCommentContextMenu";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -55,8 +55,8 @@ export default function EditableRemark({
     setIsPending(true);
     setIsEditing(false);
 
-    const string = JSON.stringify(editorState);
-
+    const string = emoji.emojify(JSON.stringify(editorState));
+    
     if (type === "comment") {
       await updateComment(remarkId, string, true, (remark as Comment).position);
     } else {
