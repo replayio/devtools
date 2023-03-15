@@ -1,5 +1,6 @@
 import { PointDescription, PointRange } from "@replayio/protocol";
 import { EventHandlerType, ExecutionPoint, PauseData } from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 
 import { AnalysisInput, SendCommand, getFunctionBody } from "protocol/evaluation-utils";
 import { ReplayClientInterface } from "shared/client/types";
@@ -7,7 +8,6 @@ import { ReplayClientInterface } from "shared/client/types";
 import { STANDARD_EVENT_CATEGORIES } from "../constants";
 import { createInfallibleSuspenseCache } from "../utils/suspense";
 import { getAnalysisCache } from "./AnalysisCache";
-import { createGenericCache } from "./createGenericCache";
 
 export type Event = {
   count: number;
@@ -25,17 +25,13 @@ export type EventLog = PointDescription & {
   type: "EventLog";
 };
 
-export const {
-  getValueSuspense: getEventCategoryCountsSuspense,
-  getValueAsync: getEventCategoryCountsAsync,
-  getValueIfCached: getEventCategoryCountsIfCached,
-} = createGenericCache<
-  [client: ReplayClientInterface],
-  [range: PointRange | null],
+export const eventsCache: Cache<
+  [client: ReplayClientInterface, range: PointRange | null],
   EventCategory[]
->(
-  "getEventCategoryCounts",
-  async (range, client) => {
+> = createCache({
+  debugLabel: "Events",
+  getKey: ([client, range]) => (range ? `${range.begin}:${range.end}` : ""),
+  load: async ([client, range]) => {
     const allEvents = await client.getEventCountForTypes(
       Object.values(STANDARD_EVENT_CATEGORIES)
         .map(c => c.events.map(e => e.type))
@@ -52,8 +48,7 @@ export const {
       };
     });
   },
-  range => (range ? `${range.begin}:${range.end}` : "")
-);
+});
 
 // Variables in scope in an analysis
 declare let sendCommand: SendCommand;
