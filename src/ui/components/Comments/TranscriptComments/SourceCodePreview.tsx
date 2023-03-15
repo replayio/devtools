@@ -10,8 +10,8 @@ import {
 import { isSourceCodeCommentTypeData } from "replay-next/components/sources/utils/comments";
 import Tooltip from "replay-next/components/Tooltip";
 import useTooltip from "replay-next/src/hooks/useTooltip";
-import { ParsedToken, parsedTokensToHtml } from "replay-next/src/suspense/SyntaxParsingCache";
 import { getSourceFileNameFromUrl } from "replay-next/src/utils/source";
+import { ParsedToken, parsedTokensToHtml } from "replay-next/src/utils/syntax-parser";
 import { replayClient } from "shared/client/ReplayClientContext";
 import { CommentSourceLocation } from "shared/graphql/types";
 import { setViewMode } from "ui/actions/layout";

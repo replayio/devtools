@@ -1,13 +1,14 @@
 import { SourceId } from "@replayio/protocol";
 
+import { assert } from "protocol/utils";
 import {
   getSourceAsync,
   getStreamingSourceContentsAsync,
 } from "replay-next/src/suspense/SourcesCache";
 import { streamingSyntaxParsingCache } from "replay-next/src/suspense/SyntaxParsingCache";
-import { ParsedToken } from "replay-next/src/suspense/SyntaxParsingCache";
 import { getBase64Png } from "replay-next/src/utils/canvas";
 import { getSourceFileName } from "replay-next/src/utils/source";
+import { ParsedToken } from "replay-next/src/utils/syntax-parser";
 import { ReplayClientInterface } from "shared/client/types";
 
 export enum CanonicalRequestType {
@@ -89,26 +90,28 @@ export async function createTypeDataForSourceCodeComment(
   // Secondary label is used to store the syntax-highlighted markup for the line
   const streamingSource = await getStreamingSourceContentsAsync(replayClient, sourceId);
   if (streamingSource != null) {
-    const parsedSource = await streamingSyntaxParsingCache.readAsync(streamingSource, fileName);
+    const parsedSource = streamingSyntaxParsingCache.stream(streamingSource, fileName);
     if (parsedSource != null) {
-      if (parsedSource.rawTextByLine.length < lineNumber) {
+      if (parsedSource.data?.text.length ?? 0 < lineNumber) {
         // If the streaming source hasn't finished loading yet, wait for it to load;
         // Note that it's important to check raw lines as parsed lines may be clipped
         // if the source is larger than the parser has been configured to handle.
         await new Promise<void>(resolve => {
           parsedSource.subscribe(() => {
-            if (parsedSource.rawTextByLine.length >= lineNumber) {
+            if (parsedSource.data?.text.length ?? 0 >= lineNumber) {
               resolve();
             }
           });
         });
       }
 
-      rawText = parsedSource.rawTextByLine[lineNumber - 1];
+      assert(parsedSource.data && parsedSource.value);
+
+      rawText = parsedSource.data.text[lineNumber - 1];
       if (rawText.length <= maxTextLength) {
         // If the raw text is longer than the max length, we can't safely use the parsed tokens.
-        if (parsedSource.parsedTokensByLine.length >= lineNumber) {
-          parsedTokens = parsedSource.parsedTokensByLine[lineNumber - 1] ?? null;
+        if (parsedSource.value.length >= lineNumber) {
+          parsedTokens = parsedSource.value[lineNumber - 1];
         }
       } else {
         rawText = rawText.substring(0, maxTextLength);
