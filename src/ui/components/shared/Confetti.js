@@ -63,9 +63,5 @@ export default function Realistic() {
     fire();
   }, [fire, makeShot]);
 
-  return (
-    <>
-      <ReactCanvasConfetti refConfetti={getInstance} style={canvasStyles} />
-    </>
-  );
+  return <ReactCanvasConfetti refConfetti={getInstance} style={canvasStyles} />;
 }
