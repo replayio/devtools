@@ -7,7 +7,7 @@ import {
 } from "@replayio/protocol";
 import classNames from "classnames";
 import classnames from "classnames";
-import React, { ReactNode, useRef, useState } from "react";
+import React, { ReactNode, useState } from "react";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
@@ -15,20 +15,16 @@ import { getFunctionBody } from "protocol/evaluation-utils";
 import type { ThreadFront as TF } from "protocol/thread";
 import { RecordingTarget } from "protocol/thread/thread";
 import Icon from "replay-next/components/Icon";
+import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { EventLog, eventsMapper } from "replay-next/src/suspense/EventsCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
-import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import type { UIThunkAction } from "ui/actions";
-import {
-  SEARCHABLE_EVENT_TYPES,
-  getEventListenerLocationAsync,
-  removeEventListenerLocationEntry,
-} from "ui/actions/event-listeners";
+import { SEARCHABLE_EVENT_TYPES, getEventListenerLocationAsync } from "ui/actions/event-listeners";
 import { setViewMode } from "ui/actions/layout";
 import useEventContextMenu from "ui/components/Events/useEventContextMenu";
 import { getLoadedRegions } from "ui/reducers/app";
@@ -219,10 +215,8 @@ function jumpToClickEventFunctionLocation(
         // TODO This sequence of logic could probably be cached too.
         // Not immediately critical, because the individual calls are cached.
 
-        const [breakablePositions, breakablePositionsByLine] = await getBreakpointPositionsAsync(
-          functionSourceLocation.sourceId,
-          replayClient
-        );
+        const [breakablePositions, breakablePositionsByLine] =
+          await breakpointPositionsCache.readAsync(replayClient, functionSourceLocation.sourceId);
 
         // Since we're doing these checks without knowing the end of the function
         // (due to parsing concerns), let's find all breakable positions on this line and the next 2.

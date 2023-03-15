@@ -23,9 +23,9 @@ import {
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/analysisManager";
 import { ReplayClientInterface } from "shared/client/types";
 
+import { breakpointPositionsCache } from "./BreakpointPositionsCache";
 import { createGenericRangeCache } from "./createGenericRangeCache";
 import { cachePauseData } from "./PauseCache";
-import { getBreakpointPositionsAsync } from "./SourcesCache";
 
 export type RemoteAnalysisResult = {
   data: { frames: Frame[]; objects: ProtocolObject[]; scopes: Scope[] };
@@ -98,7 +98,9 @@ function createCache<T extends { point: ExecutionPoint }>(
         : undefined;
       if (locations) {
         await Promise.all(
-          locations.map(location => getBreakpointPositionsAsync(location.location.sourceId, client))
+          locations.map(location =>
+            breakpointPositionsCache.readAsync(client, location.location.sourceId)
+          )
         );
       }
 

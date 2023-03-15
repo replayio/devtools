@@ -1,5 +1,5 @@
 import { ProtocolMessage } from "replay-next/src/suspense/MessagesCache";
-import { getSourceIfAlreadyLoaded } from "replay-next/src/suspense/SourcesCache";
+import { getSourceIfCached } from "replay-next/src/suspense/SourcesCache";
 
 // Messages with pages that match this expression are internal Firefox errors and we should not display them.
 const FIREFOX_INTERNAL_REGEX = /resource:\/\/\/modules\/\S+\.jsm/;
@@ -22,7 +22,7 @@ export function isInNodeModules(message: ProtocolMessage): boolean {
     let returnValue = false;
     if (topFrame) {
       const sourceId = topFrame.location?.[0].sourceId;
-      const source = sourceId ? getSourceIfAlreadyLoaded(sourceId) : null;
+      const source = sourceId ? getSourceIfCached(sourceId) : null;
       if (source) {
         returnValue = !!(source.url?.includes("node_modules") || source.url?.includes("unpkg.com"));
 

@@ -5,7 +5,7 @@ import { isBowerComponent, isModuleFromCdn, isNodeModule } from "replay-next/src
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createGenericCache } from "./createGenericCache";
-import { getSourcesAsync } from "./SourcesCache";
+import { sourcesCache } from "./SourcesCache";
 
 // TODO Create a generic cache variant that
 // (1) supports streaming data and
@@ -135,7 +135,7 @@ async function initializeSourceIds(client: ReplayClientInterface) {
   sourceIdsWithNodeModules = [];
   sourceIdsWithoutNodeModules = [];
 
-  const sources = await getSourcesAsync(client);
+  const sources = await sourcesCache.readAsync(client);
 
   // Insert sources in order so that original sources are first.
   const compareSources = (a: SourceId, b: SourceId) => {
