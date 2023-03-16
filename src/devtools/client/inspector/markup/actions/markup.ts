@@ -10,11 +10,7 @@ import type { UIStore, UIThunkAction } from "ui/actions";
 import { isInspectorSelected } from "ui/reducers/app";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
 import { UIState } from "ui/state";
-import {
-  getBoxModelAsync,
-  getNodeDataAsync,
-  getNodeEventListenersAsync,
-} from "ui/suspense/nodeCaches";
+import { boxModelCache, nodeDataCache, nodeEventListenersCache } from "ui/suspense/nodeCaches";
 import { boundingRectCache, computedStyleCache } from "ui/suspense/styleCaches";
 
 import {
@@ -107,12 +103,12 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
         if (latestSelectedNodeId) {
           dispatch(selectionChanged(false));
         } else {
-          const [rootNode] = await getNodeDataAsync(
-            originalPauseId!,
-            { type: "document" },
+          const [rootNode] = await nodeDataCache.readAsync(
             protocolClient,
             replayClient,
-            ThreadFront.sessionId!
+            ThreadFront.sessionId!,
+            originalPauseId!,
+            { type: "document" }
           );
 
           if (!rootNode || ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
@@ -120,12 +116,12 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
           }
 
           const selectedNodeId = getSelectedDomNodeId(getState());
-          const [defaultNode] = await getNodeDataAsync(
-            originalPauseId!,
-            { type: "querySelector", nodeId: rootNode.objectId, selector: "body" },
+          const [defaultNode] = await nodeDataCache.readAsync(
             protocolClient,
             replayClient,
-            ThreadFront.sessionId!
+            ThreadFront.sessionId!,
+            originalPauseId!,
+            { type: "querySelector", nodeId: rootNode.objectId, selector: "body" }
           );
 
           if (
@@ -178,12 +174,12 @@ export function newRoot(): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
     const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
 
-    const [rootNodeData] = await getNodeDataAsync(
-      originalPauseId,
-      { type: "document" },
+    const [rootNodeData] = await nodeDataCache.readAsync(
       protocolClient,
       replayClient,
-      ThreadFront.sessionId!
+      ThreadFront.sessionId!,
+      originalPauseId,
+      { type: "document" }
     );
 
     if (!rootNodeData || ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
@@ -301,12 +297,12 @@ export function expandNode(
 
       const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
 
-      const childNodes = await getNodeDataAsync(
-        originalPauseId,
-        { type: "childNodes", nodeId },
+      const childNodes = await nodeDataCache.readAsync(
         protocolClient,
         replayClient,
-        ThreadFront.sessionId!
+        ThreadFront.sessionId!,
+        originalPauseId,
+        { type: "childNodes", nodeId }
       );
 
       if (ThreadFront.currentPauseIdUnsafe !== originalPauseId) {
@@ -392,12 +388,12 @@ export function selectNode(nodeId: string, reason?: SelectionReason): UIThunkAct
   return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
     // Ensure we have the data loaded
     const originalPauseId = await ThreadFront.getCurrentPauseId(replayClient);
-    const nodes = await getNodeDataAsync(
-      originalPauseId,
-      { type: "parentNodes", nodeId },
+    const nodes = await nodeDataCache.readAsync(
       protocolClient,
       replayClient,
-      ThreadFront.sessionId!
+      ThreadFront.sessionId!,
+      originalPauseId,
+      { type: "parentNodes", nodeId }
     );
 
     if (nodes.length && ThreadFront.currentPauseIdUnsafe === originalPauseId) {
@@ -607,11 +603,11 @@ export function highlightNodes(
 
       const boxModels = await Promise.all(
         nodeIds.map(async nodeId => {
-          const boxModel = await getBoxModelAsync(
-            pauseId!,
-            nodeId,
+          const boxModel = await boxModelCache.readAsync(
             protocolClient,
-            ThreadFront.sessionId!
+            ThreadFront.sessionId!,
+            pauseId!,
+            nodeId
           );
           return boxModel;
         })
@@ -647,15 +643,15 @@ export const searchDOM = (query: string): UIThunkAction<Promise<ProtocolObject[]
     const pauseIdBefore = state.pause.id;
     const sessionId = state.app.sessionId;
 
-    const results = await getNodeDataAsync(
+    const results = await nodeDataCache.readAsync(
+      protocolClient,
+      replayClient,
+      sessionId!,
       pauseIdBefore!,
       {
         type: "searchDOM",
         query,
-      },
-      protocolClient,
-      replayClient,
-      sessionId!
+      }
     );
 
     return results;
@@ -687,7 +683,7 @@ async function convertNode(
   const [nodeObject, computedStyle, eventListeners] = await Promise.all([
     objectCache.readAsync(replayClient, pauseId, nodeId, "canOverflow"),
     computedStyleCache.readAsync(client, sessionId, pauseId, nodeId),
-    getNodeEventListenersAsync(pauseId, nodeId, client, replayClient, sessionId),
+    nodeEventListenersCache.readAsync(client, replayClient, sessionId, pauseId, nodeId),
   ]);
 
   const node = nodeObject?.preview?.node;
