@@ -153,8 +153,9 @@ function SourceRenderer({
     <div
       className={styles.Source}
       data-test-id={`Source-${source.sourceId}`}
-      data-test-source-id={source.sourceId}
       data-test-name="Source"
+      data-test-num-lines={streamingSourceContents.lineCount}
+      data-test-source-id={source.sourceId}
       onMouseEnter={trackMouseHover}
     >
       <div className={styles.SourceList} onMouseMove={onMouseMove} ref={sourceRef}>

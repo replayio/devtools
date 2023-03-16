@@ -40,6 +40,7 @@ import {
   verifyCurrentSearchResult,
   verifyHitPointButtonsEnabled,
   verifyLogPointStep,
+  waitForSourceContentsToStream,
 } from "./utils/source";
 import testSetup from "./utils/testSetup";
 
@@ -53,6 +54,10 @@ test.beforeEach(async ({ page }) => {
 
   await page.goto(getTestUrl("source-and-console"));
   await openSourceFile(page, sourceId);
+
+  // Wait for source contents to finish streaming (loading and parsing)
+  await waitForSourceContentsToStream(page, sourceId);
+  await goToLine(page, sourceId, 1);
 });
 
 test("should not allow saving log points with invalid content", async ({ page }) => {
