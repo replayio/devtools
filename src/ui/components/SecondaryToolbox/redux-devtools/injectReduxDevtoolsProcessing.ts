@@ -1,8 +1,8 @@
 import { ExecutionPoint, Value } from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 
 import type { ThreadFront as TF } from "protocol/thread";
 import { ThreadFront } from "protocol/thread";
-import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { topFrameCache } from "replay-next/src/suspense/FrameCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
@@ -125,13 +125,13 @@ async function evaluateNoArgsFunction(
 // Cache this at the module level, because the backend records all evaluations
 // applied to a given pause in a session. So, we only need to do this once for
 // a given Pause, and we want to retain the info even if the RDT component unmounts.
-export const { getValueAsync: getActionStateValuesAsync } = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [point: ExecutionPoint, time: number],
+export const actionStateValuesCache: Cache<
+  [replayClient: ReplayClientInterface, point: ExecutionPoint, time: number],
   ReduxActionStateValues | undefined
->(
-  "reduxDevtools: getActionStateValues",
-  async (point, time, replayClient) => {
+> = createCache({
+  debugLabel: "ActionStateValues",
+  getKey: ([replayClient, point, time]) => point,
+  load: async ([replayClient, point, time]) => {
     const pauseId = await pauseIdCache.readAsync(replayClient, point, time);
     if (!pauseId) {
       return;
@@ -163,16 +163,15 @@ export const { getValueAsync: getActionStateValuesAsync } = createGenericCache<
       return result;
     }
   },
-  point => point
-);
+});
 
-export const { getValueAsync: getDiffAsync } = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [point: ExecutionPoint, time: number],
+export const diffCache: Cache<
+  [replayClient: ReplayClientInterface, point: ExecutionPoint, time: number],
   Delta | undefined
->(
-  "reduxDevtools: getDiff",
-  async (point, time, replayClient) => {
+> = createCache({
+  debugLabel: "Diff",
+  getKey: ([replayClient, point, time]) => point,
+  load: async ([replayClient, point, time]) => {
     const pauseId = await pauseIdCache.readAsync(replayClient, point, time);
     if (!pauseId) {
       return;
@@ -204,5 +203,4 @@ export const { getValueAsync: getDiffAsync } = createGenericCache<
       return diff;
     }
   },
-  point => point
-);
+});
