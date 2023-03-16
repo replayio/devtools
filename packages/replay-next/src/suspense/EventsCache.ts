@@ -1,31 +1,20 @@
-import { PointRange } from "@replayio/protocol";
-import {
-  EventHandlerType,
-  ExecutionPoint,
-  Frame,
-  Location,
-  PauseData,
-  PauseId,
-  Value as ProtocolValue,
-  Object as RecordReplayObject,
-} from "@replayio/protocol";
+import { PointDescription, PointRange } from "@replayio/protocol";
+import { EventHandlerType, ExecutionPoint, PauseData } from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 import isEmpty from "lodash/isEmpty";
-import size from "lodash/size";
 import without from "lodash/without";
 
 import { AnalysisInput, SendCommand, getFunctionBody } from "protocol/evaluation-utils";
-import { ThreadFront } from 'protocol/thread';
-import { RecordingTarget } from "protocol/thread/thread";
 import { ReplayClientInterface } from "shared/client/types";
 
-import { EventCategory, STANDARD_EVENT_CATEGORIES } from "../constants";
-import { groupEntries } from "../utils/group";
-import { createWakeable } from "../utils/suspense";
-import { createGenericCache } from "./createGenericCache";
-import { cachePauseData } from "./PauseCache";
-import { Record as WakeableRecord, STATUS_PENDING, STATUS_RESOLVED, Wakeable } from "./types";
+import { STANDARD_EVENT_CATEGORIES } from "../constants";
+import { createInfallibleSuspenseCache } from "../utils/suspense";
+import { getAnalysisCache } from "./AnalysisCache";
+import { RecordingTarget } from 'protocol/thread/thread';
+import { ThreadFront } from 'protocol/thread';
+import { groupEntries } from '../utils/group';
 
-export type EventCounter = {
+export type Event = {
   count: number;
   label: string;
   type: EventHandlerType;
@@ -35,31 +24,147 @@ export type EventCounter = {
   rawEventTypes: string[];
 };
 
-export type EventCategoryWithCount = {
+export type EventCategory = {
   category: string;
-  events: EventCounter[];
+  events: Event[];
 };
 
-export type EventLog = {
-  data: {
-    frames: Frame[];
-    objects: RecordReplayObject[];
-  };
-  location: Location[];
-  pauseId: PauseId;
-  point: ExecutionPoint;
-  time: number;
+export type EventLog = PointDescription & {
+  eventType: EventHandlerType;
   type: "EventLog";
-  values: ProtocolValue[];
 };
 
 type EventCategoriesByEvent = Record<string, string>;
 type EventCategoriesByEventAndTarget = Record<string, Record<string, string>>;
-
 let recordingTarget: RecordingTarget | null = null;
-let eventTypeToEntryPointMap = new Map<EventHandlerType, WakeableRecord<EventLog[]>>();
-let eventCategoryCounts: EventCategoryWithCount[] | null = null;
-let inProgressEventCategoryCountsWakeable: Wakeable<EventCategoryWithCount[]> | null = null;
+
+export const eventsCache: Cache<
+  [client: ReplayClientInterface, range: PointRange | null],
+  EventCategory[]
+> = createCache({
+  debugLabel: "Events",
+  getKey: ([client, range]) => (range ? `${range.begin}:${range.end}` : ""),
+  load: async ([client, range]) => {
+    const allEvents = await client.getAllEventHandlerCounts(
+      range
+    );
+    return countEvents(allEvents);
+  },
+});
+
+// Variables in scope in an analysis
+declare let sendCommand: SendCommand;
+declare let input: AnalysisInput;
+
+export function eventsMapper() {
+  const finalData: Required<PauseData> = { frames: [], scopes: [], objects: [] };
+  function addPauseData({ frames, scopes, objects }: PauseData) {
+    finalData.frames.push(...(frames || []));
+    finalData.scopes.push(...(scopes || []));
+    finalData.objects.push(...(objects || []));
+  }
+
+  const { time, pauseId, point } = input;
+  const { frame, data } = sendCommand("Pause.getTopFrame", {});
+  addPauseData(data);
+  const { frameId, location } = finalData.frames.find(f => f.frameId == frame)!;
+
+  // Retrieve protocol value details on the stack frame's arguments
+  const { result } = sendCommand("Pause.evaluateInFrame", {
+    frameId,
+    expression: "[...arguments]",
+  });
+  const values = [];
+  addPauseData(result.data);
+
+  if (result.exception) {
+    values.push(result.exception);
+  } else {
+    // We got back an array of arguments. The protocol requires that we ask for each
+    // array index's contents separately, which is annoying.
+    const { object } = result.returned!;
+    const { result: lengthResult } = sendCommand("Pause.getObjectProperty", {
+      object: object!,
+      name: "length",
+    });
+    addPauseData(lengthResult.data);
+    const length = lengthResult.returned!.value;
+    for (let i = 0; i < length; i++) {
+      const { result: elementResult } = sendCommand("Pause.getObjectProperty", {
+        object: object!,
+        name: i.toString(),
+      });
+      values.push(elementResult.returned);
+      addPauseData(elementResult.data);
+    }
+  }
+
+  return [
+    {
+      key: point,
+      value: {
+        time,
+        pauseId,
+        point,
+        location,
+        values,
+        data: finalData,
+      },
+    },
+  ];
+}
+function getEventCache(eventType: EventHandlerType) {
+  return getAnalysisCache<EventLog>(
+    {
+      eventTypes: [eventType],
+      mapper: getFunctionBody(eventsMapper),
+    },
+    point => ({ ...point, eventType, type: "EventLog" })
+  );
+}
+
+export function getEventPointsSuspense(
+  client: ReplayClientInterface,
+  eventType: EventHandlerType,
+  range: PointRange
+) {
+  return getEventCache(eventType).getPointsSuspense(client, range);
+}
+
+export function getInfallibleEventPointsSuspense(
+  client: ReplayClientInterface,
+  eventType: EventHandlerType,
+  range: PointRange
+) {
+  return createInfallibleSuspenseCache(getEventCache(eventType).getPointsSuspense)(client, range);
+}
+
+export function getEventPointsAsync(
+  client: ReplayClientInterface,
+  eventType: EventHandlerType,
+  range: PointRange
+) {
+  return getEventCache(eventType).getPointsAsync(client, range);
+}
+
+export function getCachedEventPoints(eventType: EventHandlerType, range: PointRange) {
+  return getEventCache(eventType).getCachedPoints(range);
+}
+
+export function getEventSuspense(eventType: EventHandlerType, point: ExecutionPoint) {
+  return getEventCache(eventType).getResultSuspense(point);
+}
+
+export function getEventAsync(eventType: EventHandlerType, point: ExecutionPoint) {
+  return getEventCache(eventType).getResultAsync(point);
+}
+
+export function getEventIfCached(eventType: EventHandlerType, point: ExecutionPoint) {
+  return getEventCache(eventType).getResultIfCached(point);
+}
+
+
+
 
 /**
  * Encode a Chromium event type, based on its category and non-unique event type.
@@ -81,120 +186,6 @@ function makeChromiumEventType(nonUniqueEventType: string, category?: string) {
 function decodeChromiumEventType(rawEventType: string) {
   const [nonUniqueEventType, eventTargetName] = rawEventType.split(",", 2);
   return [nonUniqueEventType, eventTargetName];
-}
-
-export const {
-  getValueSuspense: getEventCategoryCountsSuspense,
-  getValueAsync: getEventCategoryCountsAsync,
-  getValueIfCached: getEventCategoryCountsIfCached,
-} = createGenericCache<
-  [client: ReplayClientInterface],
-  [range: PointRange | null],
-  EventCategory[]
->(
-  "getEventCategoryCounts",
-  async (range, client) => {
-    const pendingEventCategoryCounts: EventCategoryWithCount[] = [];
-    const eventCountsRaw = await client.getAllEventHandlerCounts(range);
-    eventCategoryCounts = await countEvents(eventCountsRaw);
-    inProgressEventCategoryCountsWakeable!.resolve(pendingEventCategoryCounts);
-    inProgressEventCategoryCountsWakeable = null;
-
-    // TODO: fix this mess
-    const allEvents = await client.getEventCountForTypes(
-      Object.values(STANDARD_EVENT_CATEGORIES)
-        .map(c => c.events.map(e => e.type))
-        .flat(),
-      range
-    );
-    return Object.values(STANDARD_EVENT_CATEGORIES).map(category => {
-      return {
-        ...category,
-        events: category.events.map(eventType => ({
-          ...eventType,
-          count: allEvents[eventType.type],
-        })),
-      };
-    });
-  },
-  range => (range ? `${range.begin}:${range.end}` : "")
-);
-
-
-export function getEventTypeEntryPointsSuspense(
-  client: ReplayClientInterface,
-  eventType: EventHandlerType
-): EventLog[] {
-  let record = eventTypeToEntryPointMap.get(eventType);
-  if (record == null) {
-    record = {
-      status: STATUS_PENDING,
-      value: createWakeable<EventLog[]>("getEventTypeEntryPointsSuspense"),
-    };
-
-    eventTypeToEntryPointMap.set(eventType, record);
-
-    fetchEventTypeEntryPoints(client, eventType, record);
-  }
-
-  if (record.status === STATUS_RESOLVED) {
-    return record.value;
-  } else {
-    throw record.value;
-  }
-}
-
-async function fetchEventTypeEntryPoints(
-  client: ReplayClientInterface,
-  eventType: EventHandlerType,
-  record: WakeableRecord<EventLog[]>
-) {
-  const wakeable = record.value;
-  try {
-    const entryPoints = await client.runAnalysis<EventLog>({
-      effectful: false,
-      eventHandlerEntryPoints: [{ eventType }],
-      mapper: getFunctionBody(eventsMapper),
-    });
-
-    // Pre-cache object previews that came back with our new analysis data.
-    // This will avoid us having to turn around and request them again when rendering the logs.
-    entryPoints.forEach(entryPoint => cachePauseData(client, entryPoint.pauseId, entryPoint.data));
-
-    const eventLogs: EventLog[] = entryPoints.map(entryPoint => ({
-      ...entryPoint,
-      type: "EventLog",
-    }));
-
-    record.status = STATUS_RESOLVED;
-    record.value = eventLogs;
-  } catch (err) {
-    // Handle any analysis errors (such as "too many hits found") by resolving the record with
-    // a dummy `EventLog` entry that will get shown as a single console message at the top of
-    // the list.  That way we at least communicate to the user what happened.
-    // TODO [FE-1257] Show a better indicator that there were too many events found, like an overlay.
-    record.status = STATUS_RESOLVED;
-    record.value = [
-      {
-        data: {
-          frames: [],
-          objects: [],
-        },
-        location: [],
-        pauseId: "",
-        point: "",
-        time: 0,
-        type: "EventLog",
-        values: [
-          {
-            value: `❗Too many messages of type "${eventType}" found!`,
-          },
-        ],
-      },
-    ];
-  } finally {
-    wakeable.resolve(record.value);
-  }
 }
 
 async function getRecordingTarget() {
@@ -219,7 +210,7 @@ async function countEvents(eventCountsRaw: Record<string, number>) {
   return result;
 }
 
-type CountEventsFunction = (eventCountsRaw: Record<string, number>) => EventCategoryWithCount[];
+type CountEventsFunction = (eventCountsRaw: Record<string, number>) => EventCategory[];
 
 const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
   gecko(eventCountsRaw: Record<string, number>) {
@@ -291,8 +282,8 @@ const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
       };
     });
 
-    if (size(normalizedEventCounts)) {
-      // add "unknown" category
+    if (!isEmpty(normalizedEventCounts)) {
+      // there are still unsorted events: add "unknown" category
       result.push({
         category: "unknown",
         events: Object.entries(normalizedEventCounts).map(([type, countEntry]) => ({
@@ -402,66 +393,4 @@ function makeChromiumEventCategoriesByEventAndTarget(): EventCategoriesByEventAn
       ];
     })
   );
-}
-
-// Variables in scope in an analysis
-declare let sendCommand: SendCommand;
-declare let input: AnalysisInput;
-
-export function eventsMapper() {
-  const finalData: Required<PauseData> = { frames: [], scopes: [], objects: [] };
-  function addPauseData({ frames, scopes, objects }: PauseData) {
-    finalData.frames.push(...(frames || []));
-    finalData.scopes.push(...(scopes || []));
-    finalData.objects.push(...(objects || []));
-  }
-
-  const { time, pauseId, point } = input;
-  const { frame, data } = sendCommand("Pause.getTopFrame", {});
-  addPauseData(data);
-  const { frameId, location } = finalData.frames.find(f => f.frameId == frame)!;
-
-  // Retrieve protocol value details on the stack frame's arguments
-  const { result } = sendCommand("Pause.evaluateInFrame", {
-    frameId,
-    expression: "[...arguments]",
-  });
-  const values = [];
-  addPauseData(result.data);
-
-  if (result.exception) {
-    values.push(result.exception);
-  } else {
-    // We got back an array of arguments. The protocol requires that we ask for each
-    // array index's contents separately, which is annoying.
-    const { object } = result.returned!;
-    const { result: lengthResult } = sendCommand("Pause.getObjectProperty", {
-      object: object!,
-      name: "length",
-    });
-    addPauseData(lengthResult.data);
-    const length = lengthResult.returned!.value;
-    for (let i = 0; i < length; i++) {
-      const { result: elementResult } = sendCommand("Pause.getObjectProperty", {
-        object: object!,
-        name: i.toString(),
-      });
-      values.push(elementResult.returned);
-      addPauseData(elementResult.data);
-    }
-  }
-
-  return [
-    {
-      key: point,
-      value: {
-        time,
-        pauseId,
-        point,
-        location,
-        values,
-        data: finalData,
-      },
-    },
-  ];
 }
