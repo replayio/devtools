@@ -8,7 +8,7 @@ import { createGenericCache } from "replay-next/src/suspense/createGenericCache"
 import { topFrameCache } from "replay-next/src/suspense/FrameCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
-import { getScopeMapAsync } from "replay-next/src/suspense/ScopeMapCache";
+import { scopeMapCache } from "replay-next/src/suspense/ScopeMapCache";
 import { ReplayClientInterface } from "shared/client/types";
 import {
   SourceDetails,
@@ -97,9 +97,9 @@ export const formatEventListener = async (
     locationUrl = functionLocation?.length > 0 ? sourcesById[location.sourceId]?.url : undefined;
   }
 
-  const scopeMap = await getScopeMapAsync(
-    getGeneratedLocation(sourcesById, functionLocation),
-    replayClient
+  const scopeMap = await scopeMapCache.readAsync(
+    replayClient,
+    getGeneratedLocation(sourcesById, functionLocation)
   );
   const originalFunctionName = scopeMap?.find(mapping => mapping[0] === functionName)?.[1];
 
