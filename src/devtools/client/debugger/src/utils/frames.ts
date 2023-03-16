@@ -1,8 +1,7 @@
 import { PauseId } from "@replayio/protocol";
 
-import { ThreadFront } from "protocol/thread/thread";
 import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
-import { getPauseIdForExecutionPointIfCached } from "replay-next/src/suspense/PauseCache";
+import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { SourcesState } from "ui/reducers/sources";
 import { getPauseFramesIfCached } from "ui/suspense/frameCache";
 
@@ -38,7 +37,11 @@ export function getAllCachedPauseFrames(
     if (!steps || steps.length === 0) {
       break;
     }
-    const asyncParentPauseId = getPauseIdForExecutionPointIfCached(steps[0].point)?.value;
+    const asyncParentPauseId = pauseIdCache.getValueIfCached(
+      null as any,
+      steps[0].point,
+      steps[0].time
+    );
     if (!asyncParentPauseId || asyncParentPauseId === pauseId) {
       break;
     }

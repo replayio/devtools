@@ -19,7 +19,7 @@ import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPos
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { EventLog, eventsMapper } from "replay-next/src/suspense/EventsCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
-import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
+import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
@@ -194,7 +194,7 @@ function jumpToClickEventFunctionLocation(
         return "no_hits";
       }
 
-      const pauseId = await getPauseIdAsync(
+      const pauseId = await pauseIdCache.readAsync(
         replayClient,
         nextClickEvent.point,
         nextClickEvent.time

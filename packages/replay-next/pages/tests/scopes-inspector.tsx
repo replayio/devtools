@@ -5,7 +5,7 @@ import ScopesInspector from "replay-next/components/inspector/ScopesInspector";
 import Loader from "replay-next/components/Loader";
 import { getClosestPointForTimeSuspense } from "replay-next/src/suspense/ExecutionPointsCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
-import { evaluateSuspense, getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
+import { pauseEvaluationsCache, pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import createTest from "./utils/createTest";
@@ -30,23 +30,23 @@ function Suspender() {
 
   const time = 1000;
   const point = getClosestPointForTimeSuspense(replayClient, time);
-  const pauseId = getPauseIdSuspense(replayClient, point, time);
+  const pauseId = pauseIdCache.read(replayClient, point, time);
 
   // This code is roughly approximating the shape of data from the Scopes panel.
 
-  const { returned: globalValue } = evaluateSuspense(
+  const { returned: globalValue } = pauseEvaluationsCache.read(
+    replayClient,
     pauseId,
     null,
     "globalValues",
-    undefined,
-    replayClient
+    undefined
   );
-  const { returned: windowValue } = evaluateSuspense(
+  const { returned: windowValue } = pauseEvaluationsCache.read(
+    replayClient,
     pauseId,
     null,
     "window",
-    undefined,
-    replayClient
+    undefined
   );
 
   const globalClientValue = objectCache.read(replayClient, pauseId, globalValue?.object!, "full");

@@ -18,7 +18,7 @@ import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
-import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
+import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { UIThunkAction } from "ui/actions";
@@ -205,7 +205,7 @@ function findQueuedRendersForRange(
       const scheduleUpdateHitPointsToCheck = scheduleUpdateHitPoints.slice(0, 200);
       const queuedRendersPromise = Promise.all(
         scheduleUpdateHitPointsToCheck.map(async (hitPoint): Promise<ReactQueuedRenderDetails> => {
-          const pauseId = await getPauseIdAsync(replayClient, hitPoint.point, hitPoint.time);
+          const pauseId = await pauseIdCache.readAsync(replayClient, hitPoint.point, hitPoint.time);
 
           const pauseFrames =
             (await getPauseFramesAsync(replayClient, pauseId, sourcesState)) ?? [];

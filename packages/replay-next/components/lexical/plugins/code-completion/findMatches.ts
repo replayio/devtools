@@ -10,7 +10,7 @@ import {
 import { getPauseAndFrameIdSuspends } from "replay-next/components/sources/utils/getPauseAndFrameId";
 import { getFrameSuspense } from "replay-next/src/suspense/FrameCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
-import { evaluateSuspense } from "replay-next/src/suspense/PauseCache";
+import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { frameScopesCache } from "replay-next/src/suspense/ScopeCache";
 import { ReplayClientInterface } from "shared/client/types";
 
@@ -110,8 +110,13 @@ function fetchQueryData(
   if (pauseId) {
     if (queryScope) {
       // Evaluate the properties of an object (queryScope)
-      const maybeObjectId = evaluateSuspense(pauseId, frameId, queryScope, undefined, replayClient)
-        ?.returned?.object;
+      const maybeObjectId = pauseEvaluationsCache.read(
+        replayClient,
+        pauseId,
+        frameId,
+        queryScope,
+        undefined
+      )?.returned?.object;
       if (maybeObjectId) {
         const { preview } = objectCache.read(
           replayClient,

@@ -4,7 +4,7 @@ import type { ThreadFront as TF } from "protocol/thread";
 import { ThreadFront } from "protocol/thread";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { topFrameCache } from "replay-next/src/suspense/FrameCache";
-import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
+import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 import type { Delta } from "./JSONDiff";
@@ -132,7 +132,7 @@ export const { getValueAsync: getActionStateValuesAsync } = createGenericCache<
 >(
   "reduxDevtools: getActionStateValues",
   async (point, time, replayClient) => {
-    const pauseId = await getPauseIdAsync(replayClient, point, time);
+    const pauseId = await pauseIdCache.readAsync(replayClient, point, time);
     if (!pauseId) {
       return;
     }
@@ -173,7 +173,7 @@ export const { getValueAsync: getDiffAsync } = createGenericCache<
 >(
   "reduxDevtools: getDiff",
   async (point, time, replayClient) => {
-    const pauseId = await getPauseIdAsync(replayClient, point, time);
+    const pauseId = await pauseIdCache.readAsync(replayClient, point, time);
     if (!pauseId) {
       return;
     }

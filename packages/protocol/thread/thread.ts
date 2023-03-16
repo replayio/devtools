@@ -9,7 +9,6 @@
 
 import {
   Annotation,
-  BreakpointId,
   ExecutionPoint,
   Frame,
   FrameId,
@@ -35,11 +34,7 @@ import {
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
-import {
-  cachePauseData,
-  getPauseIdForExecutionPointIfCached,
-} from "replay-next/src/suspense/PauseCache";
-import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
+import { cachePauseData, pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { areRangesEqual } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import type { Features } from "ui/utils/prefs";
@@ -202,14 +197,16 @@ class _ThreadFront {
    */
   get currentPauseIdUnsafe() {
     return (
-      this.currentPauseId ?? getPauseIdForExecutionPointIfCached(this.currentPoint)?.value ?? null
+      this.currentPauseId ??
+      pauseIdCache.getValueIfCached(null as any, this.currentPoint, this.currentTime) ??
+      null
     );
   }
 
   async getCurrentPauseId(replayClient: ReplayClientInterface): Promise<PauseId> {
     return (
       this.currentPauseId ??
-      (await getPauseIdAsync(replayClient, this.currentPoint, this.currentTime))
+      (await pauseIdCache.readAsync(replayClient, this.currentPoint, this.currentTime))
     );
   }
 
