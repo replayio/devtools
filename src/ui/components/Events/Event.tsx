@@ -24,7 +24,7 @@ import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import type { UIThunkAction } from "ui/actions";
-import { SEARCHABLE_EVENT_TYPES, getEventListenerLocationAsync } from "ui/actions/event-listeners";
+import { SEARCHABLE_EVENT_TYPES, eventListenerLocationCache } from "ui/actions/event-listeners";
 import { setViewMode } from "ui/actions/layout";
 import useEventContextMenu from "ui/components/Events/useEventContextMenu";
 import { getLoadedRegions } from "ui/reducers/app";
@@ -208,12 +208,12 @@ function jumpToClickEventFunctionLocation(
       // If we did have a click event, timewarp to that click's point
       onSeek(nextClickEvent.point, nextClickEvent.time);
 
-      const functionSourceLocation = await getEventListenerLocationAsync(
-        pauseId,
-        event.kind as SEARCHABLE_EVENT_TYPES,
+      const functionSourceLocation = await eventListenerLocationCache.readAsync(
         ThreadFront,
         replayClient,
-        getState
+        getState,
+        pauseId,
+        event.kind as SEARCHABLE_EVENT_TYPES
       );
 
       if (functionSourceLocation) {
