@@ -16,9 +16,9 @@ import { AnalysisInput, getFunctionBody } from "protocol/evaluation-utils";
 import Icon from "replay-next/components/Icon";
 import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
-import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { UIThunkAction } from "ui/actions";
 import { IGNORABLE_PARTIAL_SOURCE_URLS } from "ui/actions/event-listeners";
@@ -96,7 +96,7 @@ function findQueuedRendersForRange(
 
       const [symbols, breakablePositionsResult] = await Promise.all([
         getSymbolsAsync(reactDomSource.id, allSources, replayClient),
-        getBreakpointPositionsAsync(reactDomSource.id, replayClient),
+        breakpointPositionsCache.readAsync(replayClient, reactDomSource.id),
       ]);
 
       if (!symbols) {

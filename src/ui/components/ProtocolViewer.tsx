@@ -18,13 +18,13 @@ import { CommandResponse } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import Loader from "replay-next/components/Loader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import {
   AnalysisResult,
   getLogPointAnalysisResultAsync,
 } from "replay-next/src/suspense/LogPointAnalysisCache";
-import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import Icon from "ui/components/shared/Icon";
@@ -508,9 +508,9 @@ const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericC
       return NO_PROTOCOL_MESSAGES;
     }
 
-    const [breakablePositionsSorted] = await getBreakpointPositionsAsync(
-      sessionSource.id,
-      replayClient
+    const [breakablePositionsSorted] = await breakpointPositionsCache.readAsync(
+      replayClient,
+      sessionSource.id
     );
     const symbols = await getSymbolsAsync(sessionSource.id, sourceDetails, replayClient);
 

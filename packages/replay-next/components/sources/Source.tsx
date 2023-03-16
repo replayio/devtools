@@ -6,7 +6,7 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import {
   StreamingSourceContents,
-  getStreamingSourceContentsSuspense,
+  streamingSourceContentsCache,
 } from "replay-next/src/suspense/SourcesCache";
 import {
   StreamingParser,
@@ -58,7 +58,7 @@ function SourceLoader({
 }) {
   const client = useContext(ReplayClientContext);
 
-  const streamingSourceContents = getStreamingSourceContentsSuspense(client, source.sourceId);
+  const streamingSourceContents = streamingSourceContentsCache.read(client, source.sourceId);
   if (source === null) {
     return null;
   }

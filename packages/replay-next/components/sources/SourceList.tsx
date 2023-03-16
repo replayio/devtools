@@ -11,6 +11,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { VariableSizeList as List, ListOnItemsRenderedProps } from "react-window";
+import { useImperativeCacheValue } from "suspense";
 
 import { findPointForLocation } from "replay-next/components/sources/utils/points";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
@@ -19,10 +20,12 @@ import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import {
   BreakpointPositionsResult,
+  breakpointPositionsCache,
+} from "replay-next/src/suspense/BreakpointPositionsCache";
+import {
   StreamingSourceContents,
   getCachedMinMaxSourceHitCounts,
-  useGetBreakablePositions,
-  useGetSourceHitCounts,
+  sourceHitCountsCache,
 } from "replay-next/src/suspense/SourcesCache";
 import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -96,16 +99,18 @@ export default function SourceList({
   // but neither should actually _block_ us from showing source text.
   // Fetch those in the background via the caches,
   // and re-render once that data is available.
-  const { value: hitCounts = null } = useGetSourceHitCounts(
+  const { value: hitCounts = null } = useImperativeCacheValue(
+    sourceHitCountsCache,
     client,
     sourceId,
     visibleLines ?? NO_SOURCE_LOCATIONS,
     focusRange
   );
 
-  const { value: breakablePositionsValue = NO_BREAKABLE_POSITIONS } = useGetBreakablePositions(
-    sourceId,
-    client
+  const { value: breakablePositionsValue = NO_BREAKABLE_POSITIONS } = useImperativeCacheValue(
+    breakpointPositionsCache,
+    client,
+    sourceId
   );
   const [, breakablePositionsByLine] = breakablePositionsValue;
 

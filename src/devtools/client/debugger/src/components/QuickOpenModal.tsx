@@ -7,9 +7,8 @@ import fuzzyAldrin from "fuzzaldrin-plus";
 import debounce from "lodash/debounce";
 import React, { Component } from "react";
 import { ConnectedProps, connect } from "react-redux";
-import { STATUS_RESOLVED } from "suspense";
 
-import { getSourceContentsStatus } from "replay-next/src/suspense/SourcesCache";
+import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
 import { setViewMode } from "ui/actions/layout";
 import { getViewMode } from "ui/reducers/layout";
 import {
@@ -308,8 +307,14 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
     const { selectedSource, setQuickOpenQuery } = this.props;
     setQuickOpenQuery(e.target.value);
 
-    const selectedContentLoaded =
-      selectedSource && getSourceContentsStatus(selectedSource.id) === STATUS_RESOLVED;
+    let selectedContentLoaded = false;
+    if (selectedSource) {
+      const streaming = streamingSourceContentsCache.getValueIfCached(
+        null as any,
+        selectedSource.id
+      );
+      selectedContentLoaded = streaming?.complete === true;
+    }
     const noSource = !selectedSource || !selectedContentLoaded;
 
     if ((noSource && this.isFunctionQuery()) || this.isGotoQuery()) {

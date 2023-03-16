@@ -7,7 +7,7 @@ import Loader from "replay-next/components/Loader";
 import { mappedLocationCache } from "replay-next/src/suspense/MappedLocationCache";
 import { objectPropertyCache } from "replay-next/src/suspense/ObjectPreviews";
 import { getScopeMapSuspense } from "replay-next/src/suspense/ScopeMapCache";
-import { getSourcesByUrlSuspense } from "replay-next/src/suspense/SourcesCache";
+import { sourcesByUrlCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Source from "./Source";
@@ -58,7 +58,7 @@ function ErrorFrameRendererSuspends({ frame }: { frame: StackFrame }) {
   const { lineNumber, columnNumber, fileName } = frame;
   const client = useContext(ReplayClientContext);
 
-  const sourcesByUrl = getSourcesByUrlSuspense(client);
+  const sourcesByUrl = sourcesByUrlCache.read(client);
   let sources = fileName ? sourcesByUrl.get(fileName) || [] : [];
   // Ignore original and pretty-printed sources because we're looking
   // for a source that the browser actually executed
