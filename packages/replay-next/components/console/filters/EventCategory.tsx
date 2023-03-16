@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import { Badge } from "design";
 import Expandable from "replay-next/components/Expandable";
-import type { EventCategory } from "replay-next/src/suspense/EventsCache";
+import type { EventCategory as EventCategoryType } from "replay-next/src/suspense/EventsCache";
 
 import EventType from "./EventType";
 import styles from "./EventCategory.module.css";
@@ -13,7 +13,7 @@ export default function EventCategory({
   filterByText,
 }: {
   disabled: boolean;
-  eventCategory: EventCategory;
+  eventCategory: EventCategoryType;
   filterByText: string;
 }) {
   const [eventsWithHits, totalHitCount] = useMemo(() => {
