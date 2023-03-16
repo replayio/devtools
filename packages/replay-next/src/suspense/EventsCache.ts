@@ -319,7 +319,10 @@ function lookupChromiumEventCategory(
   let category: string = "";
   if (eventTargetName) {
     // 1. try to look up by targetName
-    category = chromiumEventCategoriesByEventAndTarget[eventTypeRaw]?.[normalizeEventTargetName(eventTargetName)];
+    category =
+      chromiumEventCategoriesByEventAndTarget[eventTypeRaw]?.[
+        normalizeEventTargetName(eventTargetName)
+      ];
   }
   if (!category) {
     // 2. try to look up default
@@ -376,10 +379,10 @@ function makeChromiumEventCategoriesByEventAndTarget(): EventCategoriesByEventAn
     }
     return category.events.map(
       evt =>
-        [evt.type, eventTargets.map(target => [normalizeEventTargetName(target), category.category])] as [
-          string,
-          [string, string][]
-        ]
+        [
+          evt.type,
+          eventTargets.map(target => [normalizeEventTargetName(target), category.category]),
+        ] as [string, [string, string][]]
     );
   }).filter(Boolean) as [string, [string, string][]][];
 
