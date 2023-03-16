@@ -149,12 +149,16 @@ function SourceRenderer({
     setHoveredState(null);
   };
 
+  // TODO Once source and syntax parsing caches have been converted to "suspense" package
+  // we can replace data-test-num-lines attribute with data-test-state="loading" | "loaded" | "parsed"
+  // This will simplify e2e test logic
   return (
     <div
       className={styles.Source}
       data-test-id={`Source-${source.sourceId}`}
-      data-test-source-id={source.sourceId}
       data-test-name="Source"
+      data-test-num-lines={streamingSourceContents.lineCount}
+      data-test-source-id={source.sourceId}
       onMouseEnter={trackMouseHover}
     >
       <div className={styles.SourceList} onMouseMove={onMouseMove} ref={sourceRef}>

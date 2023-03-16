@@ -252,17 +252,35 @@ export async function focusOnSource(page: Page) {
   await expect(sourcesRoot).toBeFocused();
 }
 
-function getNextHitPointButton(page: Page, lineNumber: number): Locator {
-  const pointPanelLocator = getPointPanelLocator(page, lineNumber);
-  return pointPanelLocator.locator(`[data-test-name="NextHitPointButton"]`);
-}
-
 export function getLogPointPanelConditionTypeAhead(page: Page): Locator {
   return page.locator('[data-test-name="PointPanel-ConditionInput-CodeTypeAhead"]');
 }
 
 export function getLogPointPanelContentTypeAhead(page: Page): Locator {
   return page.locator('[data-test-name="PointPanel-ContentInput-CodeTypeAhead"]');
+}
+
+function getNextHitPointButton(page: Page, lineNumber: number): Locator {
+  const pointPanelLocator = getPointPanelLocator(page, lineNumber);
+  return pointPanelLocator.locator(`[data-test-name="NextHitPointButton"]`);
+}
+
+async function getNumLines(page: Page, sourceId: string): Promise<number> {
+  const sourceLocator = getSourceLocator(page, sourceId);
+  await expect(sourceLocator).toBeVisible();
+
+  let numLines: number | undefined;
+
+  await waitFor(async () => {
+    const attribute = await sourceLocator.getAttribute("data-test-num-lines");
+
+    numLines = parseInt(attribute!, 10);
+    if (isNaN(numLines)) {
+      throw Error(`Waiting for source ${sourceId} to have a num-lines attribute`);
+    }
+  });
+
+  return numLines!;
 }
 
 function getPreviousHitPointButton(page: Page, lineNumber: number): Locator {
@@ -581,8 +599,6 @@ export async function openSourceFile(page: Page, sourceId: string) {
 
     await page.locator(`[data-test-id="SourceExplorerSource-${sourceId}"]`).click();
   }
-
-  await expect(getSourceLocator(page, sourceId)).toBeVisible();
 }
 
 export async function removeBreakPoint(
@@ -961,6 +977,24 @@ export async function verifyLogPointStep(
     const actualStatus = `${currentStep}/${denominator}`;
 
     expect(actualStatus).toBe(expectedStatus);
+  });
+}
+
+export async function waitForSourceContentsToStream(page: Page, sourceId: string) {
+  const sourceLocator = getSourceLocator(page, sourceId);
+  await expect(sourceLocator).toBeVisible();
+
+  const numLines = await getNumLines(page, sourceId);
+  await goToLine(page, sourceId, numLines);
+
+  const lastLine = page.locator('[data-test-name="SourceLine"]').last();
+  await lastLine.isVisible();
+
+  await waitFor(async () => {
+    const state = await lastLine.getAttribute("data-test-state");
+    if (state !== "parsed") {
+      throw Error(`Waiting for line ${numLines} to be parsed but is "${state}"`);
+    }
   });
 }
 

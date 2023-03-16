@@ -371,11 +371,19 @@ const SourceListRow = memo(
       }
     }
 
+    let testState = "loading";
+    if (tokens !== null) {
+      testState = "parsed";
+    } else if (plainText !== null) {
+      testState = "loaded";
+    }
+
     return (
       <div
         className={styles.Row}
         data-test-id={`SourceLine-${lineNumber}`}
         data-test-name="SourceLine"
+        data-test-state={testState}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         style={{
