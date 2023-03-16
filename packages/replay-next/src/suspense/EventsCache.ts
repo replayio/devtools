@@ -298,6 +298,10 @@ const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
   },
 };
 
+function normalizeEventTargetName(name: string) {
+  return name.toLowerCase();
+}
+
 /**
  * Find category for raw chromium event input string.
  *
@@ -315,7 +319,7 @@ function lookupChromiumEventCategory(
   let category: string = "";
   if (eventTargetName) {
     // 1. try to look up by targetName
-    category = chromiumEventCategoriesByEventAndTarget[eventTypeRaw]?.[eventTargetName];
+    category = chromiumEventCategoriesByEventAndTarget[eventTypeRaw]?.[normalizeEventTargetName(eventTargetName)];
   }
   if (!category) {
     // 2. try to look up default
@@ -372,7 +376,7 @@ function makeChromiumEventCategoriesByEventAndTarget(): EventCategoriesByEventAn
     }
     return category.events.map(
       evt =>
-        [evt.type, eventTargets.map(target => [target.toLowerCase(), category.category])] as [
+        [evt.type, eventTargets.map(target => [normalizeEventTargetName(target), category.category])] as [
           string,
           [string, string][]
         ]
