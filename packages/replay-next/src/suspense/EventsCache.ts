@@ -93,8 +93,14 @@ export const {
   EventCategory[]
 >(
   "getEventCategoryCounts",
-  // TODO fix this absolute mess
   async (range, client) => {
+    const pendingEventCategoryCounts: EventCategoryWithCount[] = [];
+    const eventCountsRaw = await client.getAllEventHandlerCounts(range);
+    eventCategoryCounts = await countEvents(eventCountsRaw);
+    inProgressEventCategoryCountsWakeable!.resolve(pendingEventCategoryCounts);
+    inProgressEventCategoryCountsWakeable = null;
+
+    // TODO: fix this mess
     const allEvents = await client.getEventCountForTypes(
       Object.values(STANDARD_EVENT_CATEGORIES)
         .map(c => c.events.map(e => e.type))
@@ -136,16 +142,6 @@ export function getEventTypeEntryPointsSuspense(
   } else {
     throw record.value;
   }
-}
-
-async function fetchEventCategoryCounts(client: ReplayClientInterface) {
-  const pendingEventCategoryCounts: EventCategoryWithCount[] = [];
-
-  const eventCountsRaw = await client.getAllEventHandlerCounts();
-  eventCategoryCounts = await countEvents(eventCountsRaw);
-
-  inProgressEventCategoryCountsWakeable!.resolve(pendingEventCategoryCounts);
-  inProgressEventCategoryCountsWakeable = null;
 }
 
 async function fetchEventTypeEntryPoints(

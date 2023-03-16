@@ -169,7 +169,7 @@ export interface ReplayClientInterface {
     eventTypes: EventHandlerType[],
     focusRange: PointRange | null
   ): Promise<Record<string, number>>;
-  getAllEventHandlerCounts(): Promise<Record<string, number>>;
+  getAllEventHandlerCounts(range: PointRange | null): Promise<Record<string, number>>;
   getFrameSteps(pauseId: PauseId, frameId: FrameId): Promise<PointDescription[]>;
   getMappedLocation(location: Location): Promise<MappedLocation>;
   getObjectWithPreview(
