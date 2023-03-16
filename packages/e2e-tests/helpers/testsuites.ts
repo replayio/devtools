@@ -23,3 +23,7 @@ export async function getTestCaseSections(row: Locator) {
 export async function getTestCaseSteps(row: Locator) {
   return row.locator('[data-test-id="TestSuites-TestCase-TestStepRow"]');
 }
+
+export async function getSelectedTestCase(row: Pick<Locator, "locator">) {
+  return row.locator("[data-test-id=TestSuite-TestCase]");
+}
