@@ -15,7 +15,7 @@ import { ReplayClientInterface } from "shared/client/types";
 import { createGenericCache } from "./createGenericCache";
 import { framesCache } from "./FrameCache";
 import { preCacheObjects } from "./ObjectPreviews";
-import { cacheScope } from "./ScopeCache";
+import { scopesCache } from "./ScopeCache";
 
 const {
   getValueSuspense: getPauseIdForExecutionPointSuspense,
@@ -105,7 +105,7 @@ export function cachePauseData(
   }
   if (pauseData.scopes) {
     for (const scope of pauseData.scopes) {
-      cacheScope(scope, pauseId, scope.scopeId);
+      scopesCache.cache(scope, client, pauseId, scope.scopeId);
     }
   }
 }
