@@ -42,7 +42,7 @@ export default function Realistic() {
 
     makeShot(0.35, {
       spread: 100,
-      decay: 0.91,
+      decay: 0.9,
       scalar: 0.8,
     });
 
