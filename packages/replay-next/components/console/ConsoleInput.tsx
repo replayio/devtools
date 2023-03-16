@@ -36,11 +36,13 @@ export default function ConsoleInput({ inputRef }: { inputRef?: RefObject<Impera
     return (
       <div className={styles.FallbackState}>
         <Icon className={styles.Icon} type="terminal-prompt" />
+        <span>
         Input disabled because you're paused at a point outside{" "}
         <span className="cursor-pointer underline" onClick={enterFocusMode}>
           your debugging window
         </span>
         .
+        </span>
       </div>
     );
   }
