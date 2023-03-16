@@ -5,10 +5,13 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  white-space: normal;
 }
 .Sources:focus {
   outline: none;
 }
+
+
 
 .Tabs {
   display: flex;
