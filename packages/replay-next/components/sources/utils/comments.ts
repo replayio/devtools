@@ -91,13 +91,13 @@ export async function createTypeDataForSourceCodeComment(
   const streamingSource = streamingSourceContentsCache.read(replayClient, sourceId);
   const parsedSource = await streamingSyntaxParsingCache.stream(streamingSource, fileName);
   if (parsedSource != null) {
-    if (parsedSource.data?.text.length ?? 0 < lineNumber) {
+    if ((parsedSource.data?.text.length ?? 0) < lineNumber) {
       // If the streaming source hasn't finished loading yet, wait for it to load;
       // Note that it's important to check raw lines as parsed lines may be clipped
       // if the source is larger than the parser has been configured to handle.
       await new Promise<void>(resolve => {
         parsedSource.subscribe(() => {
-          if (parsedSource.data?.text.length ?? 0 >= lineNumber) {
+          if ((parsedSource.data?.text.length ?? 0) >= lineNumber) {
             resolve();
           }
         });
