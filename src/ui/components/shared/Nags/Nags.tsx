@@ -32,7 +32,7 @@ function NagHat({
     <div
       className={classNames(
         NAG_HAT_CLASS,
-        "flex hidden select-none items-center space-x-2 py-1 px-2 leading-tight text-white"
+        "flex select-none items-center space-x-2 py-1 px-2 leading-tight text-white"
       )}
       style={{
         boxShadow: "rgb(184 0 89 / 50%) 0px 0px 4px inset",
@@ -72,8 +72,8 @@ export function ConsoleNag() {
 
   return (
     <NagHat
-      mainText="Console time-travel:"
-      subText="Try clicking on the arrow buttons in the console to jump forward or backward in time"
+      mainText="How to time travel, step one:"
+      subText="Fast-forward or rewind by hovering on a line in the console"
       nagType={Nag.FIRST_CONSOLE_NAVIGATE}
     />
   );
