@@ -149,6 +149,9 @@ function SourceRenderer({
     setHoveredState(null);
   };
 
+  // TODO Once source and syntax parsing caches have been converted to "suspense" package
+  // we can replace data-test-num-lines attribute with data-test-state="loading" | "loaded" | "parsed"
+  // This will simplify e2e test logic
   return (
     <div
       className={styles.Source}
