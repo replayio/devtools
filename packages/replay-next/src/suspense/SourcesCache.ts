@@ -390,6 +390,17 @@ export async function getSourceAsync(
   return sources.find(source => source.sourceId === sourceId) ?? null;
 }
 
+// TODO Remove this in favor of useStreamingValue()
+// once streamingSourceContentsCache has been migrated to "suspense"
+export function getSourceContentsSuspense(replayClient: ReplayClientInterface, sourceId: SourceId) {
+  const streaming = streamingSourceContentsCache.read(replayClient, sourceId);
+  if (streaming.complete) {
+    return streaming.contents;
+  } else {
+    throw streaming.resolver;
+  }
+}
+
 export function getSourceIfCached(sourceId: SourceId): ProtocolSource | null {
   const sources = sourcesCache.getValueIfCached(null as any);
   if (sources) {

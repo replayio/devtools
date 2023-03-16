@@ -1,5 +1,6 @@
+import { Cache, createCache } from "suspense";
+
 import type { SymbolDeclarations } from "devtools/client/debugger/src/reducers/ast";
-import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { SourceDetails } from "ui/reducers/sources";
@@ -26,17 +27,13 @@ function urlToContentType(fileName: string): string {
   }
 }
 
-export const {
-  getValueAsync: getSymbolsAsync,
-  getStatus: getSymbolsStatus,
-  getValueSuspense: getSymbolsSuspense,
-} = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [sourceId: string, sourceDetails: SourceDetails[]],
+export const sourceSymbolsCache: Cache<
+  [replayClient: ReplayClientInterface, sourceId: string, sourceDetails: SourceDetails[]],
   SymbolDeclarations | undefined
->(
-  "sourceSymbolsCache",
-  async (sourceId, sourceDetails, replayClient) => {
+> = createCache({
+  debugLabel: "SourceSymbols",
+  getKey: ([replayClient, sourceId, sourceDetails]) => sourceId,
+  load: async ([replayClient, sourceId, sourceDetails]) => {
     const { parser } = await import("devtools/client/debugger/src/utils/bootstrap");
     const streaming = streamingSourceContentsCache.read(replayClient, sourceId);
     await streaming.resolver;
@@ -56,17 +53,4 @@ export const {
     const symbols = (await parser.getSymbols(sourceId)) as SymbolDeclarations;
     return symbols;
   },
-  sourceId => sourceId
-);
-
-export const { getValueAsync: getSourceLinesAsync, getValueSuspense: getSourceLinesSuspense } =
-  createGenericCache<[replayClient: ReplayClientInterface], [sourceId: string], string[]>(
-    "sourceLinesCache",
-    async (sourceId, replayClient) => {
-      const streaming = streamingSourceContentsCache.read(replayClient, sourceId);
-      await streaming.resolver;
-
-      return streaming.contents?.split("\n") ?? [];
-    },
-    sourceId => sourceId
-  );
+});

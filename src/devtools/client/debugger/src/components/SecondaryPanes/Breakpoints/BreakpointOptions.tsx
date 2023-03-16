@@ -2,9 +2,9 @@ import React, { Suspense, useContext, useMemo } from "react";
 
 import Loader from "replay-next/components/Loader";
 import SyntaxHighlightedLine from "replay-next/components/sources/SyntaxHighlightedLine";
+import { getSourceContentsSuspense } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
-import { getSourceLinesSuspense } from "ui/suspense/sourceCaches";
 
 import styles from "./BreakpointOptions.module.css";
 
@@ -17,19 +17,21 @@ function BreakpointLineContents({ breakpoint }: BreakpointProps) {
   const replayClient = useContext(ReplayClientContext);
   const { sourceId } = breakpoint.location;
 
-  const sourceLines = getSourceLinesSuspense(sourceId, replayClient);
+  // TODO use useStreamingValue() for this
+  // once streamingSourceContentsCache has been migrated to "suspense"
+  const sourceContents = getSourceContentsSuspense(replayClient, sourceId);
 
   const snippet = useMemo(() => {
     const { column, line } = breakpoint.location;
-    let snippet = "";
 
+    const sourceLines = sourceContents?.split("\n") ?? [];
     if (sourceLines.length > 0) {
       const lineText = sourceLines[line - 1];
       return lineText.slice(column, column! + 100).trim();
     }
 
-    return snippet;
-  }, [sourceLines, breakpoint]);
+    return "";
+  }, [sourceContents, breakpoint]);
 
   if (!snippet) {
     return null;
