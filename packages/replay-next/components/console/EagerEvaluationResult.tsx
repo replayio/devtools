@@ -4,7 +4,7 @@ import { ReactNode, Suspense, useContext } from "react";
 import Inspector from "replay-next/components/inspector";
 import ClientValueValueRenderer from "replay-next/components/inspector/values/ClientValueValueRenderer";
 import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
-import { evaluateSuspense } from "replay-next/src/suspense/PauseCache";
+import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { primitiveToClientValue } from "replay-next/src/utils/protocol";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -55,7 +55,7 @@ function EagerEvaluationResultSuspends({
 }) {
   const client = useContext(ReplayClientContext);
 
-  const result = evaluateSuspense(pauseId, frameId, expression, cacheKey, client);
+  const result = pauseEvaluationsCache.read(client, pauseId, frameId, expression, cacheKey);
   const { exception, returned } = result;
 
   let children: ReactNode | null = null;

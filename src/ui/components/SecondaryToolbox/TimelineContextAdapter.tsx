@@ -10,7 +10,6 @@ import React, {
 } from "react";
 
 import { TimelineContext, TimelineContextType } from "replay-next/src/contexts/TimelineContext";
-import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { seek } from "ui/actions/timeline";
 import { getCurrentPoint } from "ui/reducers/app";

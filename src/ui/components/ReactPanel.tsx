@@ -18,7 +18,8 @@ import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
-import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
+import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
+import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { UIThunkAction } from "ui/actions";
 import { IGNORABLE_PARTIAL_SOURCE_URLS } from "ui/actions/event-listeners";
@@ -31,7 +32,7 @@ import {
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
-import { getSourceLinesAsync, getSymbolsAsync } from "ui/suspense/sourceCaches";
+import { sourceSymbolsCache } from "ui/suspense/sourceCaches";
 
 import { JumpToCodeStatus, findFirstBreakablePositionForFunction } from "./Events/Event";
 import MaterialIcon from "./shared/MaterialIcon";
@@ -95,7 +96,7 @@ function findQueuedRendersForRange(
       }
 
       const [symbols, breakablePositionsResult] = await Promise.all([
-        getSymbolsAsync(reactDomSource.id, allSources, replayClient),
+        sourceSymbolsCache.readAsync(replayClient, reactDomSource.id, allSources),
         breakpointPositionsCache.readAsync(replayClient, reactDomSource.id),
       ]);
 
@@ -126,7 +127,9 @@ function findQueuedRendersForRange(
         // we can consistently find the specific minified functions that we care about,
         // across multiple React production builds, without needing to track minified function names.
 
-        const reactDomSourceLines = await getSourceLinesAsync(reactDomSource!.id, replayClient);
+        const streaming = await streamingSourceContentsCache.read(replayClient, reactDomSource!.id);
+        await streaming.resolver;
+        const reactDomSourceLines = streaming.contents!.split("\n");
 
         // A build-extracted React error code
         const MAGIC_SCHEDULE_UPDATE_CONTENTS = "(185)";
@@ -202,7 +205,7 @@ function findQueuedRendersForRange(
       const scheduleUpdateHitPointsToCheck = scheduleUpdateHitPoints.slice(0, 200);
       const queuedRendersPromise = Promise.all(
         scheduleUpdateHitPointsToCheck.map(async (hitPoint): Promise<ReactQueuedRenderDetails> => {
-          const pauseId = await getPauseIdAsync(replayClient, hitPoint.point, hitPoint.time);
+          const pauseId = await pauseIdCache.readAsync(replayClient, hitPoint.point, hitPoint.time);
 
           const pauseFrames =
             (await getPauseFramesAsync(replayClient, pauseId, sourcesState)) ?? [];

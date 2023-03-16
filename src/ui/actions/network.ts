@@ -10,7 +10,7 @@ import {
 import { createFrame } from "devtools/client/debugger/src/client/create";
 import { Context } from "devtools/client/debugger/src/reducers/pause";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
-import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
+import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getRequestById, getSummaryById } from "ui/reducers/network";
@@ -110,7 +110,7 @@ export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
     });
 
     const timeStampedPoint = requestSummary.point;
-    const pauseId = await getPauseIdAsync(
+    const pauseId = await pauseIdCache.readAsync(
       replayClient,
       timeStampedPoint.point,
       timeStampedPoint.time

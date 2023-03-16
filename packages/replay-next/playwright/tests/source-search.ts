@@ -1,7 +1,7 @@
 import { test } from "@playwright/test";
 
 import { getTestUrl, takeScreenshot } from "./utils/general";
-import { addLogPoint, getSourceLineLocator, verifyCurrentSearchResult } from "./utils/source";
+import { verifyCurrentSearchResult } from "./utils/source";
 import {
   clickSearchResultRow,
   getSourceSearchResultsLocator,

@@ -7,7 +7,7 @@ import {
 import { isPromiseLike } from "suspense";
 
 import { topFrameCache } from "replay-next/src/suspense/FrameCache";
-import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
+import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { createFetchAsyncFromFetchSuspense } from "replay-next/src/utils/suspense";
 import { ReplayClientInterface } from "shared/client/types";
 import { isPointInRegions } from "shared/utils/time";
@@ -31,7 +31,7 @@ export function getPauseAndFrameIdSuspends(
   let pauseId: PauseId | null = null;
 
   try {
-    pauseId = getPauseIdSuspense(replayClient, executionPoint, time);
+    pauseId = pauseIdCache.read(replayClient, executionPoint, time);
 
     const topFrame = topFrameCache.read(replayClient, pauseId);
     frameId = topFrame?.frameId ?? null;

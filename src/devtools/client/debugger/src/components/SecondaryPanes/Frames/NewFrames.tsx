@@ -12,7 +12,7 @@ import {
 import { ThreadFront } from "protocol/thread/thread";
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
-import { getPauseIdSuspense, getPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";
+import { getPointAndTimeForPauseId, pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { enterFocusMode } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
@@ -127,15 +127,16 @@ function PauseFrames({
 
   function selectFrame(cx: Context, frame: PauseFrame) {
     if (pauseId !== currentPauseId) {
-      const pointAndTime = getPointAndTimeForPauseId(pauseId);
+      const [point, time] = getPointAndTimeForPauseId(pauseId);
       if (
-        !pointAndTime ||
+        point === null ||
+        time === null ||
         !loadedRegions ||
-        !isPointInRegions(loadedRegions.loaded, pointAndTime.point)
+        !isPointInRegions(loadedRegions.loaded, point)
       ) {
         return;
       }
-      ThreadFront.timeWarpToPause({ ...pointAndTime, pauseId }, true);
+      ThreadFront.timeWarpToPause({ point, time, pauseId }, true);
     }
     dispatch(selectFrameAction(cx, frame));
   }
@@ -211,7 +212,7 @@ function Frames({ panel, point, time }: FramesProps) {
     );
   }
 
-  const pauseId = getPauseIdSuspense(replayClient, point, time);
+  const pauseId = pauseIdCache.read(replayClient, point, time);
 
   return (
     <div className="pane frames" data-test-id="FramesPanel">
