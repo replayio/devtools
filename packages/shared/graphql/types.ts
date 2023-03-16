@@ -6,12 +6,11 @@ export enum Nag {
   FIRST_LOG_IN = "first_log_in",
   FIRST_REPLAY_2 = "first_replay_2",
   VIEW_DEVTOOLS = "view_devtools",
-  FIRST_CONSOLE_NAVIGATE = "first_console_navigate",
   FIRST_BREAKPOINT_EDIT = "first_breakpoint_edit",
   FIRST_BREAKPOINT_ADD = "first_breakpoint_add",
   FIRST_BREAKPOINT_SAVE = "first_breakpoint_save",
+  FIRST_CONSOLE_NAVIGATE = "first_console_navigate",
   DOWNLOAD_REPLAY = "download_replay",
-  DISMISS_TOUR = "dismiss_tour",
 }
 
 export enum EmailSubscription {
