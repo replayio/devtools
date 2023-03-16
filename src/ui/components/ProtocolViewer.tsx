@@ -1,5 +1,5 @@
 import { Tab as HeadlessTab } from "@headlessui/react";
-import { FunctionMatch, Location, PointRange, Value as ProtocolValue } from "@replayio/protocol";
+import { Location, PointRange, Value as ProtocolValue } from "@replayio/protocol";
 import dynamic from "next/dynamic";
 import React, {
   MutableRefObject,
@@ -12,6 +12,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { Cache, createCache } from "suspense";
 
 import { Tab } from "devtools/client/shared/components/ResponsiveTabs";
 import { CommandResponse } from "protocol/socket";
@@ -19,7 +20,6 @@ import { ThreadFront } from "protocol/thread";
 import Loader from "replay-next/components/Loader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
-import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import {
   AnalysisResult,
@@ -495,13 +495,13 @@ interface ProtocolMessageCommon {
   recordedAt: number;
 }
 
-const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [sourceDetails: SourceDetails[], range: PointRange],
+export const recordedProtocolMessagesCache: Cache<
+  [replayClient: ReplayClientInterface, sourceDetails: SourceDetails[], range: PointRange],
   AllProtocolMessages
->(
-  "recordedPotocolMessagesCache",
-  async (sourceDetails, range, replayClient) => {
+> = createCache({
+  debugLabel: "RecordedPotocolMessages",
+  getKey: ([replayClient, sourceDetails, range]) => `${range.begin}-${range.end}`,
+  load: async ([replayClient, sourceDetails, range]) => {
     const sessionSource = sourceDetails.find(source => source.url?.includes("ui/actions/session"));
 
     if (!sessionSource) {
@@ -611,19 +611,17 @@ const { getValueSuspense: getRecordedProtocolMessagesSuspense } = createGenericC
 
     return results;
   },
-  (sourceDetails, range) => `${range.begin}-${range.end}`
-);
+});
 
 function RecordedProtocolMessages({ sourceDetails }: { sourceDetails: SourceDetails[] }) {
   const replayClient = useContext(ReplayClientContext);
   const { range: focusRange } = useContext(FocusContext);
 
   const allProtocolMessages = focusRange
-    ? getRecordedProtocolMessagesSuspense(
-        sourceDetails,
-        { begin: focusRange.begin.point, end: focusRange.end.point },
-        replayClient
-      )
+    ? recordedProtocolMessagesCache.read(replayClient, sourceDetails, {
+        begin: focusRange.begin.point,
+        end: focusRange.end.point,
+      })
     : { errorMap: {}, requestMap: {}, responseMap: {} };
 
   return <ProtocolViewer {...allProtocolMessages} />;
