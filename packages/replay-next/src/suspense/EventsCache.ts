@@ -1,18 +1,18 @@
 import { PointDescription, PointRange } from "@replayio/protocol";
 import { EventHandlerType, ExecutionPoint, PauseData } from "@replayio/protocol";
-import { Cache, createCache } from "suspense";
 import isEmpty from "lodash/isEmpty";
 import without from "lodash/without";
+import { Cache, createCache } from "suspense";
 
 import { AnalysisInput, SendCommand, getFunctionBody } from "protocol/evaluation-utils";
+import { ThreadFront } from "protocol/thread";
+import { RecordingTarget } from "protocol/thread/thread";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { STANDARD_EVENT_CATEGORIES } from "../constants";
+import { groupEntries } from "../utils/group";
 import { createInfallibleSuspenseCache } from "../utils/suspense";
 import { getAnalysisCache } from "./AnalysisCache";
-import { RecordingTarget } from 'protocol/thread/thread';
-import { ThreadFront } from 'protocol/thread';
-import { groupEntries } from '../utils/group';
 
 export type Event = {
   count: number;
@@ -45,9 +45,7 @@ export const eventsCache: Cache<
   debugLabel: "Events",
   getKey: ([client, range]) => (range ? `${range.begin}:${range.end}` : ""),
   load: async ([client, range]) => {
-    const allEvents = await client.getAllEventHandlerCounts(
-      range
-    );
+    const allEvents = await client.getAllEventHandlerCounts(range);
     return countEvents(allEvents);
   },
 });
@@ -162,9 +160,6 @@ export function getEventAsync(eventType: EventHandlerType, point: ExecutionPoint
 export function getEventIfCached(eventType: EventHandlerType, point: ExecutionPoint) {
   return getEventCache(eventType).getResultIfCached(point);
 }
-
-
-
 
 /**
  * Encode a Chromium event type, based on its category and non-unique event type.

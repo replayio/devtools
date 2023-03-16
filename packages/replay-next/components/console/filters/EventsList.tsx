@@ -3,7 +3,7 @@ import { ChangeEvent, Suspense, useContext, useMemo, useState, useTransition } f
 import Loader from "replay-next/components/Loader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { eventsCache } from "replay-next/src/suspense/EventsCache";
-import type { EventCategoryWithCount as EventCategoryType } from "replay-next/src/suspense/EventsCache";
+import type { EventCategory as EventCategoryType } from "replay-next/src/suspense/EventsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import EventCategory from "./EventCategory";
@@ -83,8 +83,9 @@ function EventsListCategories({
           filterByText={filterByText}
         />
       ))}
-      { commonEventCategories.length && otherEventCategories.length && 
-        <hr className="border-splitter" /> }
+      {commonEventCategories.length && otherEventCategories.length && (
+        <hr className="border-splitter" />
+      )}
       {otherEventCategories.map(eventCategory => (
         <EventCategory
           key={eventCategory.category}
