@@ -30,7 +30,7 @@ import { DownloadCancelledError } from "protocol/screenshot-cache";
 import { ThreadFront } from "protocol/thread";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { waitForTime } from "protocol/utils";
-import { getPointsBoundingTimeAsync } from "replay-next/src/suspense/ExecutionPointsCache";
+import { pointsBoundingTimeCache } from "replay-next/src/suspense/ExecutionPointsCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import { mayClearSelectedStep } from "ui/reducers/reporter";
@@ -102,7 +102,7 @@ export async function setupTimeline(store: UIStore) {
   shortcuts.attach(window.document);
 }
 
-export function jumpToInitialPausePoint(): UIThunkAction {
+export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const endpoint = await getEndpoint(replayClient);
     dispatch(pointsReceived([endpoint]));
@@ -126,11 +126,7 @@ export function jumpToInitialPausePoint(): UIThunkAction {
       point = initialPausePoint.point;
       time = initialPausePoint.time;
     }
-    if (isPointInLoadingRegion(state, point)) {
-      ThreadFront.timeWarp(point, time, false);
-    } else {
-      ThreadFront.timeWarp(endpoint.point, endpoint.time, false);
-    }
+    ThreadFront.timeWarp(point, time, false);
   };
 }
 
@@ -259,18 +255,7 @@ export function seek(
     if (pauseId) {
       ThreadFront.timeWarpToPause({ point, time, pauseId }, openSource);
     } else {
-      const regions = getLoadedRegions(getState());
-      const focusRegion = getFocusRegion(getState());
-      const isTimeInLoadedRegion = regions !== null && isTimeInRegions(time, regions.loaded);
-      if (isTimeInLoadedRegion) {
-        ThreadFront.timeWarp(point, time, openSource);
-      } else {
-        // We can't time-wrap in this case because trying to pause outside of a loaded region will throw.
-        // In this case the best we can do is update the current time and the "video" frame.
-        dispatch(setTimelineState({ currentTime: time }));
-        dispatch(setTimelineToTime(time, true));
-        updatePausePointParams({ point, time, focusRegion });
-      }
+      ThreadFront.timeWarp(point, time, openSource);
     }
     return true;
   };
@@ -387,8 +372,7 @@ export function replayPlayback(): UIThunkAction {
   return (dispatch, getState) => {
     const beginTime = 0;
 
-    dispatch(seekToTime(beginTime));
-    dispatch(startPlayback());
+    dispatch(seekToTime(beginTime, true));
   };
 }
 
@@ -565,8 +549,11 @@ export function setFocusRegionFromTimeRange(
     }
 
     const [pointsBoundingBegin, pointsBoundingEnd] = await Promise.all([
-      getPointsBoundingTimeAsync(await clampTime(replayClient, timeRange.begin), replayClient),
-      getPointsBoundingTimeAsync(await clampTime(replayClient, timeRange.end), replayClient),
+      pointsBoundingTimeCache.readAsync(
+        replayClient,
+        await clampTime(replayClient, timeRange.begin)
+      ),
+      pointsBoundingTimeCache.readAsync(replayClient, await clampTime(replayClient, timeRange.end)),
     ]);
     const begin = pointsBoundingBegin.before;
     const end = pointsBoundingEnd.after;

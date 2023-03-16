@@ -4,7 +4,7 @@
 
 import { PauseId } from "@replayio/protocol";
 
-import { getFramesAsync } from "replay-next/src/suspense/FrameCache";
+import { framesCache } from "replay-next/src/suspense/FrameCache";
 import type { UIThunkAction } from "ui/actions";
 import { isPointInLoadingRegion } from "ui/reducers/app";
 import { getSelectedLocation } from "ui/reducers/sources";
@@ -54,7 +54,7 @@ export function paused({
 
     const cx = getThreadContext(getState());
 
-    const frames = await getFramesAsync(pauseId, replayClient);
+    const frames = await framesCache.readAsync(replayClient, pauseId);
     if (!frames?.length) {
       return;
     }

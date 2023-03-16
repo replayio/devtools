@@ -2,8 +2,10 @@ import classnames from "classnames";
 import classNames from "classnames";
 import React, { useContext, useEffect, useState } from "react";
 
+import AccessibleImage from "devtools/client/debugger/src/components/shared/AccessibleImage";
 import { getPauseId } from "devtools/client/debugger/src/selectors";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
+import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -13,7 +15,6 @@ import { useFeature } from "ui/hooks/settings";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { PrimaryPanelName } from "ui/state/layout";
-import { useGetFrames } from "ui/suspense/frameCache";
 // TODO [ryanjduffy]: Refactor shared styling more completely
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -45,6 +46,22 @@ function CypressIcon() {
   );
 }
 
+function ReactIcon() {
+  return (
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 16 16"
+        width="20"
+        height="20"
+        fill="currentColor"
+      >
+        <path d="M8 9.2a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4zM.68 8C.68 8.93 2 9.49 2.7 9.76c1.34.5 3.2.83 5.29.83 2.08 0 3.95-.32 5.3-.83.7-.27 2.02-.83 2.02-1.76S14 6.51 13.3 6.24A15.4 15.4 0 0 0 8 5.41c-2.08 0-3.95.32-5.3.83C2 6.51.69 7.07.69 8zm1.8-2.37C3.9 5.08 5.85 4.75 8 4.75c2.14 0 4.1.33 5.53.88 1 .38 2.45 1.1 2.45 2.37 0 1.26-1.45 2-2.45 2.37-1.43.55-3.39.88-5.53.88s-4.1-.33-5.53-.88C1.47 10 .02 9.27.02 8c0-1.26 1.45-2 2.45-2.37zM4.34 1.66c-.81.47-.63 1.9-.5 2.63.22 1.42.87 3.2 1.92 5a15.4 15.4 0 0 0 3.36 4.17c.59.48 1.73 1.35 2.54.88.81-.47.63-1.89.5-2.63a15.4 15.4 0 0 0-1.92-5 15.4 15.4 0 0 0-3.36-4.17c-.59-.48-1.73-1.35-2.54-.88zm2.95.36c1.2.97 2.45 2.5 3.53 4.35a16.05 16.05 0 0 1 2 5.23c.17 1.06.26 2.68-.83 3.31-1.1.63-2.45-.26-3.28-.93a16.05 16.05 0 0 1-3.53-4.35 16.05 16.05 0 0 1-2-5.23c-.17-1.06-.26-2.68.83-3.31 1.1-.63 2.45.26 3.28.93zM11.66 1.66c-.8-.47-1.95.4-2.54.88A15.4 15.4 0 0 0 5.76 6.7a15.4 15.4 0 0 0-1.93 5c-.12.75-.3 2.17.5 2.64.82.47 1.96-.4 2.55-.88a15.4 15.4 0 0 0 3.36-4.16 15.4 15.4 0 0 0 1.93-5c.12-.75.3-2.17-.5-2.64zm1.16 2.74a16.05 16.05 0 0 1-2 5.23 16.05 16.05 0 0 1-3.53 4.35c-.83.67-2.19 1.56-3.28.93-1.1-.63-1-2.25-.83-3.3.24-1.52.93-3.38 2-5.24a16.05 16.05 0 0 1 3.53-4.35c.83-.67 2.19-1.56 3.28-.93 1.1.63 1 2.25.83 3.3z" />
+      </svg>
+    </div>
+  );
+}
+
 function ToolbarButtonTab({ active }: { active: boolean }) {
   return (
     <div
@@ -55,6 +72,7 @@ function ToolbarButtonTab({ active }: { active: boolean }) {
     />
   );
 }
+
 function ToolbarButton({
   icon,
   label,
@@ -69,21 +87,37 @@ function ToolbarButton({
   showBadge?: boolean;
 }) {
   const selectedPrimaryPanel = useAppSelector(selectors.getSelectedPrimaryPanel);
+  const isActive = selectedPrimaryPanel == name;
+
+  let iconContents: string | JSX.Element = icon;
+
+  switch (icon) {
+    case "cypress": {
+      iconContents = <CypressIcon />;
+      break;
+    }
+    case "react": {
+      iconContents = <ReactIcon />;
+      break;
+    }
+    default:
+      break;
+  }
 
   const imageIcon = (
     <MaterialIcon
       className={classNames("toolbar-panel-icon text-themeToolbarPanelIconColor", name)}
       iconSize="2xl"
     >
-      {icon === "cypress" ? <CypressIcon /> : icon}
+      {iconContents}
     </MaterialIcon>
   );
   return (
     <div className="relative px-2">
-      <ToolbarButtonTab active={selectedPrimaryPanel == name} />
+      <ToolbarButtonTab active={isActive} />
       <div
         className={classnames("toolbar-panel-button", name, {
-          active: selectedPrimaryPanel == name,
+          active: isActive,
         })}
       >
         <IconWithTooltip
@@ -111,8 +145,8 @@ export default function Toolbar() {
   const dispatch = useAppDispatch();
   const replayClient = useContext(ReplayClientContext);
   const pauseId = useAppSelector(getPauseId);
-  const frames = useGetFrames(replayClient, pauseId);
-  const hasFrames = !!frames.value?.length;
+  const frames = pauseId ? framesCache.getValueIfCached(replayClient, pauseId) : undefined;
+  const hasFrames = frames && frames.length > 0;
   const viewMode = useAppSelector(selectors.getViewMode);
   const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
   const [showCommentsBadge, setShowCommentsBadge] = useState(false);
@@ -120,6 +154,7 @@ export default function Toolbar() {
   const { recording } = useGetRecording(recordingId);
   const { comments, loading } = hooks.useGetComments(recordingId);
   const { value: logProtocol } = useFeature("logProtocol");
+  const { value: showReactPanel } = useFeature("reactPanel");
   const [sidePanelCollapsed, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
 
   useEffect(() => {
@@ -194,6 +229,9 @@ export default function Toolbar() {
               showBadge={hasFrames}
               onClick={handleButtonClick}
             />
+            {showReactPanel && (
+              <ToolbarButton icon="react" name="react" label="React" onClick={handleButtonClick} />
+            )}
           </>
         ) : null}
         {logProtocol && viewMode === "dev" ? (

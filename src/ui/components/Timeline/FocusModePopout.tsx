@@ -51,7 +51,8 @@ export default function FocusModePopout() {
 
     const onDocumentKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {
-        case "Enter": {
+        case "Enter":
+        case "NumpadEnter": {
           savePendingChanges();
           break;
         }

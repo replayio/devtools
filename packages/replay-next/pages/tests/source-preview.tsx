@@ -3,7 +3,7 @@ import { Suspense, useContext } from "react";
 import SourcePreviewInspector from "replay-next/components/inspector/SourcePreviewInspector";
 import Loader from "replay-next/components/Loader";
 import { getClosestPointForTimeSuspense } from "replay-next/src/suspense/ExecutionPointsCache";
-import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { evaluateSuspense, getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -31,7 +31,12 @@ function Suspender() {
   const pauseId = getPauseIdSuspense(replayClient, point, time);
   const { returned } = evaluateSuspense(pauseId, null, "globalValues", undefined, replayClient);
 
-  const objectWithPreview = getObjectWithPreviewSuspense(replayClient, pauseId, returned!.object!);
+  const objectWithPreview = objectCache.read(
+    replayClient,
+    pauseId,
+    returned!.object!,
+    "canOverflow"
+  );
   return (
     <>
       {objectWithPreview.preview!.properties!.map(property => (

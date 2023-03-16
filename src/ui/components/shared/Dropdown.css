@@ -39,7 +39,7 @@
   background: var(--menu-bgcolor);
   color: var(--menu-color);
   z-index: var(--z-index-8--dropdown);
-  border: var(--menu-border);
+  border: 1px solid var(--menu-border-color);
 }
 
 .dropdown-container .content.top-right {

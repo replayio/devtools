@@ -78,7 +78,7 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
         disabled={shouldDisableActions}
         value={isSaving ? `Uploading…` : `Save`}
         ref={saveButtonRef}
-        className="mb-8 cursor-pointer rounded-xl bg-primaryAccent py-3.5 px-16 font-bold text-buttontextColor shadow-sm hover:bg-primaryAccentHover focus:border-primaryAccentHover focus:outline-none focus:ring focus:ring-primaryAccentHover"
+        className="mb-8 cursor-pointer rounded-xl bg-primaryAccent py-3.5 px-16 font-bold text-buttontextColor shadow-sm ring-offset-1 hover:bg-primaryAccentHover focus:border-primaryAccent focus:outline-none focus:ring-2 focus:ring-primaryAccent"
       />
     </div>
   );
@@ -201,7 +201,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
                   setIsPublic={setIsPublic}
                 />
                 {isPublic && recording.operations ? (
-                  <div className="border border-textFieldBorder focus:bg-red-500 focus:text-blue-800">
+                  <div className="border border-inputBorder focus:bg-red-500 focus:text-blue-800">
                     <ToggleShowPrivacyButton
                       showPrivacy={showPrivacy}
                       operations={recording.operations}

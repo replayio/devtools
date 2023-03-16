@@ -4,8 +4,8 @@ import { ReactNode, Suspense, useContext } from "react";
 
 import { assert } from "protocol/utils";
 import Loader from "replay-next/components/Loader";
-import { getMappedLocationSuspense } from "replay-next/src/suspense/MappedLocationCache";
-import { getObjectPropertySuspense } from "replay-next/src/suspense/ObjectPreviews";
+import { mappedLocationCache } from "replay-next/src/suspense/MappedLocationCache";
+import { objectPropertyCache } from "replay-next/src/suspense/ObjectPreviews";
 import { getScopeMapSuspense } from "replay-next/src/suspense/ScopeMapCache";
 import { getSourcesByUrlSuspense } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -37,7 +37,7 @@ function ErrorStackRendererSuspends({
   pauseId: PauseId;
 }) {
   const client = useContext(ReplayClientContext);
-  const stack = getObjectPropertySuspense(client, pauseId, errorObjectId, "stack").value;
+  const stack = objectPropertyCache.read(client, pauseId, errorObjectId, "stack")?.value;
   assert(typeof stack === "string", "no stack string found in error object");
   // Handle cases where there is no meaningful stack string;
   if (stack.trim().length === 0) {
@@ -72,7 +72,7 @@ function ErrorFrameRendererSuspends({ frame }: { frame: StackFrame }) {
       line: lineNumber,
       column: columnNumber,
     };
-    const mappedLocation = getMappedLocationSuspense(location, client);
+    const mappedLocation = mappedLocationCache.read(client, location);
     const scopeMap = getScopeMapSuspense(location, client);
     originalFunctionName = scopeMap?.find(mapping => mapping[0] === frame.functionName)?.[1];
     renderedSource = <Source className={styles.Source} locations={mappedLocation} />;

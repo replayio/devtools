@@ -3,7 +3,7 @@ import uniqBy from "lodash/uniqBy";
 
 import { RuleFront } from "devtools/client/inspector/rules/models/fronts/rule";
 import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
-import { getObjectWithPreviewHelper } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 
@@ -33,24 +33,30 @@ export const {
 
     const rulePreviews = await Promise.all(
       uniqueRules.map(async appliedRule => {
-        return getObjectWithPreviewHelper(replayClient, pauseId, appliedRule.rule);
+        return objectCache.readAsync(replayClient, pauseId, appliedRule.rule, "canOverflow");
       })
     );
 
     for (let ruleObject of rulePreviews) {
       if (ruleObject.preview?.rule?.style) {
         stylePromises.push(
-          getObjectWithPreviewHelper(replayClient, pauseId, ruleObject.preview.rule.style)
+          objectCache.readAsync(
+            replayClient,
+            pauseId,
+            ruleObject.preview.rule.style,
+            "canOverflow"
+          ) as Promise<ProtocolObject>
         );
       }
 
       if (ruleObject.preview?.rule?.parentStyleSheet) {
         stylePromises.push(
-          getObjectWithPreviewHelper(
+          objectCache.readAsync(
             replayClient,
             pauseId,
-            ruleObject.preview?.rule?.parentStyleSheet
-          )
+            ruleObject.preview?.rule?.parentStyleSheet,
+            "canOverflow"
+          ) as Promise<ProtocolObject>
         );
       }
     }

@@ -56,7 +56,7 @@ export function FilterDropdown() {
   };
 
   const button = (
-    <div className="flex space-x-2 rounded-md border border-textFieldBorder bg-themeTextFieldBgcolor px-2.5 py-1.5 text-sm text-themeTextFieldColor">
+    <div className="flex space-x-2 rounded-md border border-inputBorder bg-themeTextFieldBgcolor px-2.5 py-1.5 text-sm text-themeTextFieldColor">
       <div className="text-sm">{buttonLabel}</div>
       <div className="material-icons text-sm">expand_more</div>
     </div>

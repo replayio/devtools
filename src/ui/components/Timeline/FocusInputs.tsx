@@ -1,11 +1,6 @@
 import React from "react";
 
-import {
-  exitFocusMode,
-  syncFocusedRegion,
-  updateDisplayedFocusRegion,
-  updateFocusRegionParam,
-} from "ui/actions/timeline";
+import { updateDisplayedFocusRegion } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getFormattedTime, getSecondsFromFormattedTime } from "ui/utils/timeline";
@@ -92,11 +87,19 @@ export default function FocusInputs() {
   } else {
     return (
       <div className={styles.Container}>
-        <span className={styles.CurrentTimeLabel} style={{ width: `${inputSize}ch` }}>
+        <span
+          data-testid="Timeline-CurrentTime"
+          className={styles.CurrentTimeLabel}
+          style={{ width: `${inputSize}ch` }}
+        >
           {formattedCurrentTime}
         </span>
         <span>/</span>
-        <span className={styles.DurationLabel} style={{ width: `${inputSize}ch` }}>
+        <span
+          data-testid="Timeline-DurationTime"
+          className={styles.DurationLabel}
+          style={{ width: `${inputSize}ch` }}
+        >
           {formattedDuration}
         </span>
       </div>

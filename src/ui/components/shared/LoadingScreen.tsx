@@ -1,9 +1,8 @@
-import { Colorway } from "@replayio/overboard";
 import dynamic from "next/dynamic";
 import React, { ReactNode, useEffect, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
-import { getAwaitingSourcemaps, getLoadingFinished, getUploading } from "ui/reducers/app";
+import { getAwaitingSourcemaps, getUploading } from "ui/reducers/app";
 import { UIState } from "ui/state";
 
 import { LoadingTips } from "./LoadingTips";
@@ -87,7 +86,6 @@ function LoadingScreen({
 const connector = connect((state: UIState) => ({
   uploading: getUploading(state),
   awaitingSourcemaps: getAwaitingSourcemaps(state),
-  finished: getLoadingFinished(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

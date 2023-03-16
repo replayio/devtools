@@ -253,6 +253,9 @@ describe("mergeSortedPointLists", () => {
   });
 
   it("will raise an error if things are not sorted", () => {
+    // We expect errors to be logged; don't clutter the console
+    console.error = jest.fn();
+
     expect(() =>
       mergeSortedPointLists([point(7), point(5)], [point(10), point(12)])
     ).toThrowError();

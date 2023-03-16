@@ -28,6 +28,7 @@ export interface GetTestsRunsForWorkspace_node_Workspace_testRuns {
   mergeTitle: string | null;
   user: string | null;
   date: any | null;
+  mode: string | null;
   stats: GetTestsRunsForWorkspace_node_Workspace_testRuns_stats | null;
 }
 
@@ -37,7 +38,9 @@ export interface GetTestsRunsForWorkspace_node_Workspace {
   testRuns: GetTestsRunsForWorkspace_node_Workspace_testRuns[] | null;
 }
 
-export type GetTestsRunsForWorkspace_node = GetTestsRunsForWorkspace_node_Recording | GetTestsRunsForWorkspace_node_Workspace;
+export type GetTestsRunsForWorkspace_node =
+  | GetTestsRunsForWorkspace_node_Recording
+  | GetTestsRunsForWorkspace_node_Workspace;
 
 export interface GetTestsRunsForWorkspace {
   node: GetTestsRunsForWorkspace_node | null;

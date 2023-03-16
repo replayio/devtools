@@ -1,5 +1,5 @@
 import { ExecutionPoint, NodeBounds, ObjectId, Object as ProtocolObject } from "@replayio/protocol";
-import React, { useContext, useMemo } from "react";
+import React, { useContext } from "react";
 import { useEffect, useState } from "react";
 import type { SerializedElement, Store, Wall } from "react-devtools-inline/frontend";
 
@@ -7,18 +7,16 @@ import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ThreadFront } from "protocol/thread";
-import { RecordingCapabilities, RecordingTarget } from "protocol/thread/thread";
+import { RecordingTarget } from "protocol/thread/thread";
 import { compareNumericStrings } from "protocol/utils";
-import {
-  getObjectPropertyHelper,
-  getObjectWithPreviewHelper,
-} from "replay-next/src/suspense/ObjectPreviews";
-import { getRecordingCapabilitiesSuspense } from "replay-next/src/suspense/RecordingCache";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
+import { isPointInRegions } from "shared/utils/time";
 import { UIThunkAction } from "ui/actions";
-import { fetchMouseTargetsForPause } from "ui/actions/app";
+import { fetchMouseTargetsForPause, getLoadedRegions } from "ui/actions/app";
 import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactDevTools";
+import { enterFocusMode } from "ui/actions/timeline";
 import {
   getCurrentPoint,
   getTheme,
@@ -248,10 +246,11 @@ class ReplayWall implements Wall {
         text: expr,
       });
       if (response.returned?.object) {
-        const mapObjData = await getObjectWithPreviewHelper(
+        const mapObjData = await objectCache.readAsync(
           this.replayClient,
           this.pauseId!,
-          response.returned.object
+          response.returned.object,
+          "canOverflow"
         );
 
         mapObjData.preview?.containerEntries?.forEach(entry => {
@@ -313,10 +312,11 @@ class ReplayWall implements Wall {
       });
 
       if (res?.returned?.object) {
-        const componentFunctionPreview = await getObjectWithPreviewHelper(
+        const componentFunctionPreview = await objectCache.readAsync(
           this.replayClient,
           this.pauseId!,
-          res.returned.object
+          res.returned.object,
+          "canOverflow"
         );
         return componentFunctionPreview;
       }
@@ -428,6 +428,7 @@ const nodePickerInstance = new NodePickerClass();
 export default function ReactDevtoolsPanel() {
   const annotations = useAppSelector(getAnnotations);
   const currentPoint = useAppSelector(getCurrentPoint);
+  const loadedRegions = useAppSelector(getLoadedRegions);
   const protocolCheckFailed = useAppSelector(getProtocolCheckFailed);
   const reactInitPoint = useAppSelector(getReactInitPoint);
   const pauseId = useAppSelector(state => state.pause.id);
@@ -495,6 +496,18 @@ export default function ReactDevtoolsPanel() {
 
   function dispatchFetchMouseTargets() {
     return dispatch(fetchMouseTargetsForPause());
+  }
+
+  if (!isPointInRegions(currentPoint, loadedRegions?.loaded ?? [])) {
+    return (
+      <div className="h-full bg-bodyBgcolor p-2">
+        React components are unavailable because you're paused at a point outside{" "}
+        <span className="cursor-pointer underline" onClick={() => dispatch(enterFocusMode())}>
+          your debugging window
+        </span>
+        .
+      </div>
+    );
   }
 
   if (protocolCheckFailed) {

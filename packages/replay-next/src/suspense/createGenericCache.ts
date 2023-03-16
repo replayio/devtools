@@ -1,33 +1,29 @@
 import { useEffect, useRef, useState } from "react";
+import {
+  Deferred,
+  Record,
+  Status,
+  createDeferred,
+  createPendingRecord,
+  createResolvedRecord,
+  isPendingRecord,
+  isPromiseLike,
+  isRejectedRecord,
+  isResolvedRecord,
+  updateRecordToRejected,
+  updateRecordToResolved,
+} from "suspense";
 
 import { handleError } from "protocol/utils";
-import { isThennable } from "shared/proxy/utils";
 
-import { createWakeable } from "../utils/suspense";
-import {
-  Record,
-  STATUS_PENDING,
-  STATUS_REJECTED,
-  STATUS_RESOLVED,
-  Thennable,
-  Wakeable,
-} from "./types";
-
-export { STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED } from "./types";
-
-export type CacheRecordStatus =
-  | typeof STATUS_PENDING
-  | typeof STATUS_RESOLVED
-  | typeof STATUS_REJECTED;
-
-export type SubscribeCallback = (status: CacheRecordStatus | undefined) => void;
+export type SubscribeCallback = (status: Status | undefined) => void;
 export type UnsubscribeFromCacheStatusFunction = () => void;
 
 export interface GenericCache<TExtraParams extends Array<any>, TParams extends Array<any>, TValue> {
   addValue(value: TValue, ...args: TParams): void;
   getCacheKey(...args: TParams): string;
-  getStatus(...args: TParams): CacheRecordStatus | undefined;
-  getValueAsync(...args: [...TParams, ...TExtraParams]): Thennable<TValue> | TValue;
+  getStatus(...args: TParams): Status | undefined;
+  getValueAsync(...args: [...TParams, ...TExtraParams]): PromiseLike<TValue> | TValue;
   getValueIfCached(...args: TParams): { value: TValue } | undefined;
   getValueSuspense(...args: [...TParams, ...TExtraParams]): TValue;
   remove(...args: TParams): void;
@@ -43,7 +39,7 @@ export function createGenericCache<
   TValue
 >(
   debugLabel: string,
-  fetchValue: (...args: [...TParams, ...TExtraParams]) => Thennable<TValue> | TValue,
+  fetchValue: (...args: [...TParams, ...TExtraParams]) => PromiseLike<TValue> | TValue,
   getCacheKey: (...args: TParams) => string
 ): GenericCache<TExtraParams, TParams, TValue> {
   const recordMap = new Map<string, Record<TValue>>();
@@ -54,17 +50,14 @@ export function createGenericCache<
 
     let record = recordMap.get(cacheKey);
     if (!record) {
-      const wakeable = createWakeable<TValue>(`${debugLabel} ${cacheKey}}`);
-      record = {
-        status: STATUS_PENDING,
-        value: wakeable,
-      } as Record<TValue>;
+      const deferred = createDeferred<TValue>(`${debugLabel} ${cacheKey}}`);
+      record = createPendingRecord<TValue>(deferred);
 
       recordMap.set(cacheKey, record);
 
       notifySubscribers(...(args as unknown as TParams));
 
-      fetchAndStoreValue(record, record.value, ...args).catch(handleError);
+      fetchAndStoreValue(record, deferred, ...args).catch(handleError);
     }
 
     return record;
@@ -104,22 +97,22 @@ export function createGenericCache<
 
   async function fetchAndStoreValue(
     record: Record<TValue>,
-    wakeable: Wakeable<TValue>,
+    deferred: Deferred<TValue>,
     ...args: [...TParams, ...TExtraParams]
   ) {
     try {
-      const valueOrThennable = fetchValue(...args);
-      const value = isThennable(valueOrThennable) ? await valueOrThennable : valueOrThennable;
+      const valueOrPromiseLike = fetchValue(...args);
+      const value = isPromiseLike(valueOrPromiseLike)
+        ? await valueOrPromiseLike
+        : valueOrPromiseLike;
 
-      record.status = STATUS_RESOLVED;
-      record.value = value;
+      updateRecordToResolved(record, value);
 
-      wakeable.resolve(value);
+      deferred.resolve(value);
     } catch (error) {
-      record.status = STATUS_REJECTED;
-      record.value = error;
+      updateRecordToRejected(record, error);
 
-      wakeable.reject(error);
+      deferred.reject(error);
     } finally {
       notifySubscribers(...(args as unknown as TParams));
     }
@@ -127,48 +120,47 @@ export function createGenericCache<
 
   function getStatus(...args: TParams) {
     const cacheKey = getCacheKey(...args);
-    return recordMap.get(cacheKey)?.status;
+    return recordMap.get(cacheKey)?.data.status;
   }
 
   return {
     getValueSuspense(...args: [...TParams, ...TExtraParams]): TValue {
       const record = getOrCreateRecord(...args);
-      if (record.status === STATUS_RESOLVED) {
-        return record.value;
-      } else {
-        throw record.value;
+      if (isPendingRecord(record)) {
+        throw record.data.deferred.promise;
+      } else if (isRejectedRecord(record)) {
+        throw record.data.error;
       }
+
+      return record.data.value as TValue;
     },
 
-    getValueAsync(...args: [...TParams, ...TExtraParams]): Thennable<TValue> | TValue {
+    getValueAsync(...args: [...TParams, ...TExtraParams]): PromiseLike<TValue> | TValue {
       const record = getOrCreateRecord(...args);
-      switch (record.status) {
-        case STATUS_PENDING:
-        case STATUS_RESOLVED: {
-          return record.value;
-        }
-        case STATUS_REJECTED: {
-          throw record.value;
-        }
+      if (isPendingRecord(record)) {
+        return record.data.deferred.promise;
+      } else if (isRejectedRecord(record)) {
+        throw record.data.error;
       }
+
+      return record.data.value as TValue;
     },
 
     getValueIfCached(...args: TParams): { value: TValue } | undefined {
       const cacheKey = getCacheKey(...args);
       const record = recordMap.get(cacheKey);
-      switch (record?.status) {
-        case STATUS_RESOLVED: {
-          return { value: record.value };
-        }
-        case STATUS_REJECTED: {
-          throw record.value;
+      if (record) {
+        if (isResolvedRecord(record)) {
+          return { value: record.data.value as TValue };
+        } else if (isRejectedRecord(record)) {
+          throw record.data.error;
         }
       }
     },
 
     addValue(value: TValue, ...args: TParams) {
       const cacheKey = getCacheKey(...args);
-      recordMap.set(cacheKey, { status: STATUS_RESOLVED, value });
+      recordMap.set(cacheKey, createResolvedRecord(value));
     },
 
     getStatus,
@@ -191,7 +183,7 @@ interface HookState<TValue> {
 }
 
 export function createUseGetValue<TParams extends Array<any>, TValue>(
-  getValueAsync: (...args: TParams) => Thennable<TValue> | TValue,
+  getValueAsync: (...args: TParams) => PromiseLike<TValue> | TValue,
   getValueIfCached: (...args: TParams) => { value: TValue } | undefined,
   getCacheKey: (...args: TParams) => string
 ): (...args: TParams) => HookState<TValue> {

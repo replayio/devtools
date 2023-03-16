@@ -6,7 +6,7 @@
 
 import { isFirefox } from "ui/utils/environment";
 
-export function scrollList(resultList, index) {
+export function scrollList(resultList: Record<string, HTMLElement>, index: number) {
   if (!resultList.hasOwnProperty(index)) {
     return;
   }
@@ -30,8 +30,8 @@ export function scrollList(resultList, index) {
   scroll();
 }
 
-function chromeScrollList(elem, index) {
-  const resultsEl = elem.parentNode;
+function chromeScrollList(elem: HTMLElement, index: number) {
+  const resultsEl = elem.parentNode as HTMLElement | null;
 
   if (!resultsEl || resultsEl.children.length === 0) {
     return;

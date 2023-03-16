@@ -33,7 +33,7 @@ export function TextInputCopy({
         className={classNames(
           isLarge ? "text-xl" : "text-sm",
           isCenter ? "text-center" : "",
-          "block w-full rounded-md border border-textFieldBorder bg-themeTextFieldBgcolor px-2.5 py-1.5 text-themeTextFieldColor focus:border-primaryAccent focus:ring-primaryAccent"
+          "block w-full rounded-md border border-inputBorder bg-themeTextFieldBgcolor px-2.5 py-1.5 text-themeTextFieldColor focus:border-primaryAccent focus:ring-primaryAccent"
         )}
         type="text"
         value={text}
@@ -77,7 +77,7 @@ function InvationDomainCheck({ workspace }: { workspace: Workspace }) {
     <div className="flex flex-row items-center space-x-3 px-1.5">
       <input
         id="domain-limited"
-        className="outline-none focus:outline-none"
+        className="border-inputBorder outline-none focus:outline-none"
         type="checkbox"
         disabled={!workspace}
         checked={!!workspace?.isDomainLimitedCode}

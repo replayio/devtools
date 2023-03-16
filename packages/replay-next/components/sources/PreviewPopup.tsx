@@ -1,9 +1,12 @@
-import { Value as ProtocolValue } from "@replayio/protocol";
+import { Value as ProtocolValue, SourceId } from "@replayio/protocol";
 import { RefObject, Suspense, useContext, useEffect, useRef } from "react";
 
 import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
-import { evaluateSuspense } from "replay-next/src/suspense/PauseCache";
+import useLoadedRegions from "replay-next/src/hooks/useRegions";
+import { getFrameSuspense } from "replay-next/src/suspense/FrameCache";
+import { evaluateSuspense, getPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { isPointInRegions } from "shared/utils/time";
 
 import SourcePreviewInspector from "../inspector/SourcePreviewInspector";
 import Popup from "../Popup";
@@ -14,6 +17,7 @@ type Props = {
   containerRef: RefObject<HTMLElement>;
   dismiss: () => void;
   expression: string;
+  sourceId: SourceId;
   target: HTMLElement;
 };
 
@@ -30,9 +34,11 @@ function SuspendingPreviewPopup({
   containerRef,
   dismiss,
   expression,
+  sourceId,
   target,
 }: Props) {
   const client = useContext(ReplayClientContext);
+  const loadedRegions = useLoadedRegions(client);
 
   const popupRef = useRef<HTMLDivElement>(null);
 
@@ -42,9 +48,14 @@ function SuspendingPreviewPopup({
 
   let value: ProtocolValue | null = null;
   if (frameId !== null && pauseId !== null) {
-    const result = evaluateSuspense(pauseId, frameId, expression, undefined, client);
-
-    value = result.returned || null;
+    const pointAndTime = getPointAndTimeForPauseId(pauseId);
+    if (pointAndTime && isPointInRegions(pointAndTime.point, loadedRegions?.loaded ?? [])) {
+      const frame = getFrameSuspense(client, pauseId, frameId);
+      if (frame?.location.some(location => location.sourceId === sourceId)) {
+        const result = evaluateSuspense(pauseId, frameId, expression, undefined, client);
+        value = result.returned || null;
+      }
+    }
   }
 
   useEffect(() => {

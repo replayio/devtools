@@ -203,13 +203,39 @@ export async function openAppliedRulesTab(page: Page) {
 }
 
 export async function openComputedPropertiesTab(page: Page): Promise<void> {
-  const locator = page.locator("#computedview-tab");
-  await locator.waitFor();
-  await locator.click();
+  await openSelectedElementTab(page, "computedview-tab");
 }
 
 export async function openElementsPanel(page: Page): Promise<void> {
   await page.locator('[data-test-id="PanelButton-inspector"]').click();
+}
+
+async function openSelectedElementTab(page: Page, tabId: string): Promise<void> {
+  await debugPrint(page, `Opening "${tabId} tab in Elements panel`, "openSelectedElementTab");
+
+  let tabLocator = page.locator(`#${tabId}`);
+
+  // When there are too many tabs to render visibly,
+  // some are hidden within a dropdown menu.
+  const dropDownLocator = page.locator(
+    '[data-test-id="InspectorTabs"] [data-test-name="ResponsiveTabsDropDownButton"]'
+  );
+  if (await dropDownLocator.isVisible()) {
+    await dropDownLocator.click();
+
+    // Note we need to scope this query because tab ids are not unique :(
+    const possibleTabLocator = page.locator(
+      `[data-test-name="ResponsiveTabsDropDownItem"] #${tabId}`
+    );
+    if (await possibleTabLocator.isVisible()) {
+      // If the specific tab we're looking for is in this dropdown,
+      // click it instead of the (hidden) tab in the main toolbar.
+      tabLocator = possibleTabLocator;
+    }
+  }
+
+  await tabLocator.isVisible();
+  await tabLocator.click({ force: true });
 }
 
 export async function searchElementsPanel(page: Page, searchText: string): Promise<void> {

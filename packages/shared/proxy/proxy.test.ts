@@ -236,7 +236,7 @@ describe("proxy", () => {
             "baz": 3,
             "foo": 1,
           },
-          "thennable": null,
+          "thenable": null,
         },
       ]
     `);
@@ -289,7 +289,7 @@ describe("proxy", () => {
             "baz": "sanitized",
             "foo": 1,
           },
-          "thennable": null,
+          "thenable": null,
         },
       ]
     `);
@@ -335,7 +335,7 @@ describe("proxy", () => {
             "baz": "sanitized",
             "foo": 1,
           },
-          "thennable": null,
+          "thenable": null,
         },
       ]
     `);
@@ -387,7 +387,7 @@ describe("proxy", () => {
             "baz": "sanitized",
             "foo": 1,
           },
-          "thennable": Promise {},
+          "thenable": Promise {},
         },
       ]
     `);

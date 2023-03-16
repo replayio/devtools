@@ -97,7 +97,6 @@ const noCallerStackTracesForErrorCodes = new Set<ProtocolError>([
   ProtocolError.GraphicsUnavailableAtPoint,
   ProtocolError.InternalError,
   ProtocolError.InvalidRecording,
-  ProtocolError.RecordingUnloaded,
   ProtocolError.SessionCreationFailure,
   ProtocolError.SessionDestroyed,
   ProtocolError.ServiceUnavailable,
@@ -134,6 +133,7 @@ export type ExperimentalSettings = {
   rerunRoutines?: boolean;
   profileWorkerThreads?: boolean;
   disableRecordingAssetsInDatabase?: boolean;
+  keepAllTraces?: boolean;
 };
 
 type SessionCallbacks = {

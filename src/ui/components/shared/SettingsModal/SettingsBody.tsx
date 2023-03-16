@@ -8,7 +8,7 @@ interface SettingsBodyProps<T extends string, P extends Record<string, unknown>>
 }
 
 function SettingsBodyWrapper({ children }: { children: (React.ReactChild | null)[] }) {
-  return <main className="flex w-full flex-col overflow-hidden p-8 pr-2 text-sm">{children}</main>;
+  return <main className="flex w-full flex-col overflow-hidden p-8 text-sm">{children}</main>;
 }
 
 export function SettingsHeader({ children }: { children: React.ReactNode }) {

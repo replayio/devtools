@@ -60,6 +60,7 @@ function ContextMenu({
 
   return (
     <div
+      data-testid="TestSuites-ContextMenu"
       className={styles.ContextMenu}
       ref={ref}
       style={{

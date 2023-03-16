@@ -33,9 +33,12 @@ export function TestCase({ test }: { test: TestItem }) {
   const testStartTime = test.relativeStartTime || 0;
   const testEndTime = testStartTime + (test.duration || 0);
 
-  const onFocus = useCallback(() => {
+  const onFocus = useCallback(async () => {
     if (testEndTime > testStartTime) {
-      dispatch(
+      // This method makes an API request to convert time range to point range.
+      // Wait for it to finish before calling syncFocusedRegion below,
+      // or we may end up syncing the wrong range.
+      await dispatch(
         setFocusRegionFromTimeRange({
           begin: testStartTime,
           end: testEndTime,
@@ -78,19 +81,37 @@ export function TestCase({ test }: { test: TestItem }) {
     <TestCaseContext.Provider
       value={{ startTime: testStartTime, endTime: testEndTime, onReplay, onPlayFromHere, test }}
     >
-      <div className="flex flex-col" data-test-id="TestSuite-TestCaseRow">
+      <div className="flex flex-col" data-test-id="TestSuite-TestCase">
         <TestSteps test={test} />
       </div>
     </TestCaseContext.Provider>
   );
 }
 
-export function Status({ result }: { result: TestResult }) {
-  return (
-    <Icon
-      filename={result === "passed" ? "testsuites-success" : "testsuites-fail"}
-      size="small"
-      className={result === "passed" ? styles.SuccessIcon : styles.ErrorIcon}
-    />
-  );
+export function TestCaseResultIcon({
+  result,
+  ...rest
+}: { result: TestResult } & Omit<React.ComponentProps<typeof Icon>, "filename">) {
+  const props: React.ComponentProps<typeof Icon> = {
+    size: "small",
+    filename: "",
+  };
+
+  switch (result) {
+    case "skipped":
+    case "unknown":
+      props.filename = "testsuites-skip";
+      props.className = styles.SkippedIcon;
+      break;
+    case "passed":
+      props.filename = "testsuites-success";
+      props.className = styles.SuccessIcon;
+      break;
+    default:
+      props.filename = "testsuites-fail";
+      props.className = styles.ErrorIcon;
+      break;
+  }
+
+  return <Icon {...props} {...rest} />;
 }

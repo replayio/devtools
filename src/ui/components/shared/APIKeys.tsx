@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { ApiKey, ApiKeyResponse, ApiKeyScope } from "shared/graphql/types";
 
+import { Button, DisabledButton, PrimaryButton } from "./Button";
 import { useConfirm } from "./Confirm";
 import TextInput from "./Forms/TextInput";
 import MaterialIcon from "./MaterialIcon";
@@ -24,7 +25,7 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
     <>
       <div className="flex items-center justify-between space-x-3">
         <div className="w-0 flex-auto">
-          <div className="flex h-9 w-full items-center rounded-md border border-textFieldBorder bg-themeTextFieldBgcolor px-2.5 text-themeTextFieldColor text-primaryAccent">
+          <div className="flex h-9 w-full items-center rounded-md border border-inputBorder bg-themeTextFieldBgcolor px-2.5 text-themeTextFieldColor text-primaryAccent">
             <input
               readOnly
               value={keyValue}
@@ -51,7 +52,7 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
           Done
         </button>
       </div>
-      <div className="flex items-center rounded-md border border-textFieldBorder bg-red-100 p-2.5 text-red-800">
+      <div className="flex items-center rounded-md border border-inputBorder bg-red-100 p-2.5 text-red-800">
         Make sure to copy your API key now. You won{"'"}t be able to see it again!
       </div>
     </>
@@ -74,7 +75,7 @@ function ApiKeyList({ apiKeys, onDelete }: { apiKeys: ApiKey[]; onDelete: (id: s
               ? `(${apiKey.recordingCount} / ${apiKey.maxRecordings} recordings)`
               : `(${apiKey.recordingCount} recordings)`;
           return (
-            <div className="flex flex-row items-center py-1.5" key={apiKey.id}>
+            <div className="flex flex-row items-center py-1.5 pr-4" key={apiKey.id}>
               <span className="flex-auto" data-private>
                 {apiKey.label}
                 <span className="ml-2 text-bodySubColor">{usage}</span>
@@ -174,17 +175,12 @@ export default function APIKeys({
                   ref={labelRef}
                   value={label}
                 />
-                <button
-                  type="submit"
-                  disabled={!canSubmit}
-                  className={`inline-flex items-center rounded-md border border-transparent bg-primaryAccent px-2.5 py-1.5 font-medium leading-4 text-buttontextColor shadow-sm focus:outline-none ${
-                    canSubmit
-                      ? "hover:bg-primaryAccentHover focus:bg-primaryAccentHover"
-                      : "opacity-60"
-                  }`}
-                >
-                  Add
-                </button>
+
+                {canSubmit ? (
+                  <PrimaryButton color="blue">Add</PrimaryButton>
+                ) : (
+                  <DisabledButton>Add</DisabledButton>
+                )}
               </fieldset>
               {scopes && scopes.length > 1 ? (
                 <fieldset className="w-full">
@@ -193,6 +189,7 @@ export default function APIKeys({
                     <label key={scope} className="mx-1.5 inline-block space-x-1.5">
                       <input
                         type="checkbox"
+                        className="border-inputBorder"
                         onChange={e =>
                           selectScopes(current => {
                             if ((e.target as HTMLInputElement).checked) {
@@ -208,7 +205,7 @@ export default function APIKeys({
                     </label>
                   ))}
                   {selectedScopes.length === 0 ? (
-                    <div className="mt-2.5 flex items-center rounded-md border border-textFieldBorder bg-red-100 p-2.5">
+                    <div className="mt-2.5 flex items-center rounded-md border border-inputBorder bg-red-100 p-2.5">
                       At least one permission must be selected.
                     </div>
                   ) : null}

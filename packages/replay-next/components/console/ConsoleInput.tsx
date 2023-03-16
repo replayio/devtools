@@ -11,6 +11,7 @@ import Icon from "replay-next/components/Icon";
 import CodeEditor, { ImperativeHandle } from "replay-next/components/lexical/CodeEditor";
 import Loader from "replay-next/components/Loader";
 import { getPauseAndFrameIdAsync } from "replay-next/components/sources/utils/getPauseAndFrameId";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { NewTerminalExpression, TerminalContext } from "replay-next/src/contexts/TerminalContext";
@@ -18,6 +19,7 @@ import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import useLoadedRegions from "replay-next/src/hooks/useRegions";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
+import { isPointInRegions } from "shared/utils/time";
 
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
 import EagerEvaluationResult from "./EagerEvaluationResult";
@@ -25,7 +27,24 @@ import useTerminalHistory from "./hooks/useTerminalHistory";
 import styles from "./ConsoleInput.module.css";
 
 export default function ConsoleInput({ inputRef }: { inputRef?: RefObject<ImperativeHandle> }) {
+  const replayClient = useContext(ReplayClientContext);
+  const loadedRegions = useLoadedRegions(replayClient);
   const { executionPoint } = useContext(TimelineContext);
+  const { enterFocusMode } = useContext(FocusContext);
+
+  if (!isPointInRegions(executionPoint, loadedRegions?.loaded ?? [])) {
+    return (
+      <div className={styles.FallbackState}>
+        <Icon className={styles.Icon} type="terminal-prompt" />
+        Input disabled because you're paused at a point outside{" "}
+        <span className="cursor-pointer underline" onClick={enterFocusMode}>
+          your debugging window
+        </span>
+        .
+      </div>
+    );
+  }
+
   return (
     <ErrorBoundary resetKey={executionPoint} fallback={<ErrorFallback />}>
       <Suspense fallback={<Loader />}>

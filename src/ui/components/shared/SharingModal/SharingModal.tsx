@@ -108,7 +108,7 @@ function CollaboratorsSection({
           <div>
             <div className="mb-2 font-bold">Team</div>
 
-            <div className="rounded-md border border border-transparent bg-themeTextFieldBgcolor p-2 hover:bg-themeTextFieldBgcolorHover">
+            <div className="rounded-md border border border-inputBorder bg-themeTextFieldBgcolor p-2 hover:bg-themeTextFieldBgcolorHover">
               <PrivacyDropdown recording={recording} />
             </div>
 

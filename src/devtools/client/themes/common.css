@@ -302,6 +302,16 @@ checkbox:-moz-focusring {
   outline: none;
 }
 
+input[type="checkbox"] {
+  appearance: none;
+}
+
+input[type="checkbox"]:checked,
+input[type="checkbox"]:checked:hover {
+  background-color: var(--primary-accent);
+  border-radius: 0.25rem;
+}
+
 /* Tab and button of toolbox does not need to display outline */
 
 .devtools-button:-moz-focusring,
@@ -563,8 +573,10 @@ checkbox:-moz-focusring {
 }
 
 .devtools-searchinput .textbox-input::placeholder,
-.devtools-filterinput .textbox-input::placeholder {
+.devtools-filterinput .textbox-input::placeholder,
+input::placeholder {
   font-style: normal;
+  color: var(--theme-text-field-placeholder-color);
 }
 
 .devtools-textinput:focus,

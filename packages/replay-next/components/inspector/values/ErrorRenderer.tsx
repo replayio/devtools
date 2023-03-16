@@ -1,10 +1,7 @@
 import { Object as ProtocolObject } from "@replayio/protocol";
 import { useContext } from "react";
 
-import {
-  getObjectPropertyHelper,
-  getObjectPropertySuspense,
-} from "replay-next/src/suspense/ObjectPreviews";
+import { objectPropertyCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 
@@ -29,12 +26,16 @@ export default function ErrorRenderer({ object, pauseId }: ObjectPreviewRenderer
   if (messageProperty) {
     // Handle cases where `error.message` is actually a getter
     if (messageProperty.hasOwnProperty("get")) {
-      const getterValue = getObjectPropertySuspense(
+      const getterValue = objectPropertyCache.read(
         replayClient,
         pauseId,
         object.objectId,
         "message"
       );
+
+      if (getterValue == null) {
+        return null;
+      }
 
       errorContent = (
         <ValueRenderer
@@ -71,13 +72,13 @@ export async function errorProtocolObjectToString(
 
   // Handle cases where `error.message` is actually a getter
   if (messageProperty?.hasOwnProperty("get")) {
-    const getterValue = await getObjectPropertyHelper(
+    const getterValue = await objectPropertyCache.readAsync(
       replayClient,
       pauseId,
       protocolObject.objectId,
       "message"
     );
-    value = getterValue.value;
+    value = getterValue?.value;
   }
 
   return messageProperty ? `${className}: ${value}` : className;
