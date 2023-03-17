@@ -37,6 +37,7 @@ import {
   createPauseResult,
   getAllFramesResult,
   getScopeResult,
+  getSourceOutlineResult,
   getTopFrameResult,
   keyboardEvents,
   navigationEvents,
@@ -192,6 +193,7 @@ export interface ReplayClientInterface {
     sourceLocations: SameLineSourceLocations[],
     focusRange: PointRange | null
   ): Promise<LineNumberToHitCountMap>;
+  getSourceOutline(sourceId: SourceId): Promise<getSourceOutlineResult>;
   getTopFrame(pauseId: PauseId): Promise<getTopFrameResult>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   isOriginalSource(sourceId: SourceId): boolean;

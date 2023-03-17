@@ -4144,10 +4144,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/protocol@npm:0.37.0":
-  version: 0.37.0
-  resolution: "@replayio/protocol@npm:0.37.0"
-  checksum: 5f8599c93146e8a98ba7b6d022090012fb762b8bd9a9de0e0dac9306675ad88e878fadb5b4fe26d4a674e2e8021978d67331c6076368e5ac30f8115513a6aa95
+"@replayio/protocol@npm:0.40.0":
+  version: 0.40.0
+  resolution: "@replayio/protocol@npm:0.40.0"
+  checksum: 30b5f73d42913e57b22e13b7d6fc1e0e2e977b6c554aa5dada1a09426ca2b195e1978c682395f7e4068203c5dedf8397da9c6b0e10c67ffb8a9148a5e2aa5c5c
   languageName: node
   linkType: hard
 
@@ -20779,7 +20779,7 @@ __metadata:
     "@recordreplay/sourcemap-upload-cli": ^0.1.1
     "@reduxjs/toolkit": ^1.8.4
     "@replayio/overboard": ^0.4.1
-    "@replayio/protocol": 0.37.0
+    "@replayio/protocol": 0.40.0
     "@replayio/replay": ^0.12.4
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0
