@@ -193,39 +193,43 @@ export function TestStepItem({
   const error = !!(step.error || info.getStepAsserts(step).some(s => !!s.error));
 
   return (
-    <TestStepRow
-      active={state === "paused"}
-      pending={state === "pending"}
-      error={error}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      ref={ref}
-      data-test-id="TestSuites-TestCase-TestStepRow"
-      index={index + 1}
-      progress={displayedProgress}
-    >
-      <button
-        onClick={onClick}
-        onKeyUp={preventClickFromSpaceBar}
-        className="flex w-0 flex-grow items-start space-x-2 text-start"
-        title={`Step ${index + 1}: ${step.name} ${argString || ""}`}
+    <div className="flex-grow-1 flex w-full items-center justify-between">
+      <TestStepRow
+        active={state === "paused"}
+        pending={state === "pending"}
+        error={error}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        ref={ref}
+        data-test-id="TestSuites-TestCase-TestStepRow"
+        index={index + 1}
+        progress={displayedProgress}
       >
-        <div className={`flex-grow break-all font-medium ${state === "paused" ? "font-bold" : ""}`}>
-          {step.parentId ? "- " : ""}{" "}
-          <span className={`${styles.step} ${styles[step.name]}`}>{step.name}</span>
-          <span className="opacity-70">{argString}</span>
-        </div>
-      </button>
-      <React.Suspense>
-        <MatchingElementBadge selected={isSelected} step={step} />
-      </React.Suspense>
-      {step.alias ? (
-        <span className={classNames("alias")} title={`'${argString}' aliased as '${step.alias}'`}>
-          {step.alias}
-        </span>
-      ) : null}
-      <Actions step={step} selected={isSelected} />
-    </TestStepRow>
+        <button
+          onClick={onClick}
+          onKeyUp={preventClickFromSpaceBar}
+          className="flex w-0 flex-grow items-start space-x-2 text-start"
+          title={`Step ${index + 1}: ${step.name} ${argString || ""}`}
+        >
+          <div
+            className={`flex-grow break-all font-medium ${state === "paused" ? "font-bold" : ""}`}
+          >
+            {step.parentId ? <span className="opacity-0">|</span> : ""}{" "}
+            <span className={`${styles.step} ${styles[step.name]}`}>{step.name}</span>
+            <span className="opacity-70">{argString}</span>
+          </div>
+        </button>
+        <React.Suspense>
+          <MatchingElementBadge selected={isSelected} step={step} />
+        </React.Suspense>
+        {step.alias ? (
+          <span className={classNames("alias")} title={`'${argString}' aliased as '${step.alias}'`}>
+            {step.alias}
+          </span>
+        ) : null}
+      </TestStepRow>
+      <Actions step={step} hovered={isSelected} selected={isSelected} />
+    </div>
   );
 }
 
@@ -250,7 +254,15 @@ function MatchingElementBadge({ step, selected }: { step: AnnotatedTestStep; sel
   return <span className={classNames("ElementBadge")}>{count}</span>;
 }
 
-function Actions({ step, selected }: { step: AnnotatedTestStep; selected: boolean }) {
+function Actions({
+  step,
+  hovered,
+  selected,
+}: {
+  step: AnnotatedTestStep;
+  hovered: boolean;
+  selected: boolean;
+}) {
   const { test } = useContext(TestCaseContext);
   const { show } = useContext(TestInfoContextMenuContext);
   const stepActions = useTestStepActions(step);

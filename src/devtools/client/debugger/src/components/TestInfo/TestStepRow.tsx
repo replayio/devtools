@@ -29,7 +29,7 @@ export function TestStepRowBase({
       ref={clientRef}
       className={classnames(
         className,
-        "group/step relative flex items-start gap-1 border-b border-l-2 border-testStepBorder py-2 pl-3 pr-1 font-mono",
+        "group/step relative flex w-full items-start gap-1 border-b border-l-2 border-transparent py-2 pl-3 pr-1 font-mono",
         {
           // border
           [styles.BorderPending]: pending,
