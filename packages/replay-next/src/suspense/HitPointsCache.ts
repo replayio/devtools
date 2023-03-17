@@ -1,7 +1,10 @@
 import { Location, PointRange, TimeStampedPoint } from "@replayio/protocol";
-import { isPromiseLike } from "suspense";
+import { ExecutionPoint } from "@replayio/protocol";
+import sortBy from "lodash/sortBy";
+import { createIntervalCache, isPromiseLike } from "suspense";
 
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/analysisManager";
+import { compareNumericStrings } from "protocol/utils";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { createFetchAsyncFromFetchSuspense } from "replay-next/src/utils/suspense";
 import {
@@ -11,105 +14,110 @@ import {
 } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 
-import { RangeCache, createGenericRangeCache } from "./createGenericRangeCache";
+export const hitPointsCache = createIntervalCache<
+  ExecutionPoint,
+  [replayClient: ReplayClientInterface, location: Location, condition: string | null],
+  TimeStampedPoint
+>({
+  debugLabel: "HitPointsCache",
+  getKey: (replayClient, location, condition) =>
+    `${location.sourceId}:${location.line}:${location.column}:${condition}`,
+  getPointForValue: timeStampedPoint => timeStampedPoint.point,
+  comparePoints: compareNumericStrings,
+  load: async (begin, end, replayClient, location, condition) => {
+    const locations = replayClient.getCorrespondingLocations(location).map(location => ({
+      location,
+    }));
+    await Promise.all(
+      locations.map(location =>
+        breakpointPositionsCache.readAsync(replayClient, location.location.sourceId)
+      )
+    );
 
-const hitPointCaches = new Map<string, RangeCache<TimeStampedPoint>>();
+    let hitPoints: TimeStampedPoint[] = [];
+    let error: any;
 
-function getHitPointsCache(location: Location, condition: string | null) {
-  const key = `${location.sourceId}:${location.line}:${location.column}:${condition}`;
-  if (!hitPointCaches.has(key)) {
-    hitPointCaches.set(key, createHitPointsCache(location, condition));
-  }
-  return hitPointCaches.get(key)!;
-}
+    if (condition) {
+      const mapper = `
+        const { point, time } = input;
+        const { frame: frameId } = sendCommand("Pause.getTopFrame");
 
-function createHitPointsCache(location: Location, condition: string | null) {
-  return createGenericRangeCache<TimeStampedPoint>(
-    async (client, range, cacheValues, cacheError) => {
-      const locations = client.getCorrespondingLocations(location).map(location => ({
-        location,
-      }));
-      await Promise.all(
-        locations.map(location =>
-          breakpointPositionsCache.readAsync(client, location.location.sourceId)
-        )
-      );
+        const { result: conditionResult } = sendCommand(
+          "Pause.evaluateInFrame",
+          { frameId, expression: ${JSON.stringify(condition)}, useOriginalScopes: true }
+        );
 
-      if (condition) {
-        const mapper = `
-          const { point, time } = input;
-          const { frame: frameId } = sendCommand("Pause.getTopFrame");
-
-          const { result: conditionResult } = sendCommand(
-            "Pause.evaluateInFrame",
-            { frameId, expression: ${JSON.stringify(condition)}, useOriginalScopes: true }
-          );
-
-          let result;
-          if (conditionResult.returned) {
-            const { returned } = conditionResult;
-            if ("value" in returned && !returned.value) {
-              result = 0;
-            } else if (!Object.keys(returned).length) {
-              // Undefined.
-              result = 0;
-            } else {
-              result = 1;
-            }
+        let result;
+        if (conditionResult.returned) {
+          const { returned } = conditionResult;
+          if ("value" in returned && !returned.value) {
+            result = 0;
+          } else if (!Object.keys(returned).length) {
+            // Undefined.
+            result = 0;
           } else {
             result = 1;
           }
+        } else {
+          result = 1;
+        }
 
-          return [
-            {
-              key: point,
-              value: {
-                match: result,
-                point,
-                time,
-              },
+        return [
+          {
+            key: point,
+            value: {
+              match: result,
+              point,
+              time,
             },
-          ];
-        `;
+          },
+        ];
+      `;
 
-        await client.streamAnalysis(
-          {
-            effectful: false,
-            locations,
-            mapper,
-            range,
+      await replayClient.streamAnalysis(
+        {
+          effectful: false,
+          locations,
+          mapper,
+          range: { begin, end },
+        },
+        {
+          onResults: results => {
+            hitPoints = hitPoints.concat(
+              results
+                .filter(({ value }) => value.match)
+                .map(({ value: { point, time } }) => ({ point, time }))
+            );
           },
-          {
-            onResults: results => {
-              cacheValues(
-                results
-                  .filter(({ value }) => value.match)
-                  .map(({ value: { point, time } }) => ({ point, time }))
-              );
-            },
-            onError: cacheError,
-          }
-        ).resultsFinished;
-      } else {
-        await client.streamAnalysis(
-          {
-            effectful: false,
-            locations,
-            mapper: "",
-            range,
+          onError: err => (error = err),
+        }
+      ).resultsFinished;
+    } else {
+      await replayClient.streamAnalysis(
+        {
+          effectful: false,
+          locations,
+          mapper: "",
+          range: { begin, end },
+        },
+        {
+          onPoints: pointDescriptions => {
+            hitPoints = hitPoints.concat(
+              pointDescriptions.map(({ point, time }) => ({ point, time }))
+            );
           },
-          {
-            onPoints: pointDescriptions => {
-              cacheValues(pointDescriptions.map(({ point, time }) => ({ point, time })));
-            },
-            onError: cacheError,
-          }
-        ).pointsFinished;
-      }
-    },
-    hitPoint => hitPoint.point
-  );
-}
+          onError: err => (error = err),
+        }
+      ).pointsFinished;
+    }
+
+    if (error) {
+      throw error;
+    }
+    hitPoints = sortBy(hitPoints, hitPoint => BigInt(hitPoint.point));
+    return hitPoints;
+  },
+});
 
 export function getHitPointsForLocationSuspense(
   client: ReplayClientInterface,
@@ -117,11 +125,10 @@ export function getHitPointsForLocationSuspense(
   condition: string | null,
   range: PointRange
 ): HitPointsAndStatusTuple {
-  const { getValuesSuspense } = getHitPointsCache(location, condition);
   let hitPoints: TimeStampedPoint[] = [];
   let status: HitPointStatus = "complete";
   try {
-    hitPoints = getValuesSuspense(client, range);
+    hitPoints = hitPointsCache.read(range.begin, range.end, client, location, condition);
     if (hitPoints.length > MAX_POINTS_FOR_FULL_ANALYSIS) {
       status = "too-many-points-to-run-analysis";
     }

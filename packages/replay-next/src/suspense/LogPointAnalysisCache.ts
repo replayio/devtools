@@ -19,7 +19,7 @@ import {
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createFetchAsyncFromFetchSuspense } from "../utils/suspense";
-import { RemoteAnalysisResult, getAnalysisCache } from "./AnalysisCache";
+import { AnalysisParams, RemoteAnalysisResult, createAnalysisCache } from "./AnalysisCache";
 
 type Value = any;
 
@@ -32,6 +32,22 @@ export type AnalysisResult = {
 };
 
 export type GetAnalysisResult = (timeStampedPoint: TimeStampedPoint) => AnalysisResult | null;
+
+const logPointAnalysisCache = createAnalysisCache<
+  PointDescription,
+  [location: Location, code: string, condition: string | null]
+>("LogPointAnalysisCache", getAnalysisParams, point => point);
+
+function getAnalysisParams(
+  location: Location,
+  code: string,
+  condition: string | null
+): AnalysisParams {
+  return {
+    mapper: createMapperForAnalysis(code, condition),
+    location,
+  };
+}
 
 export function getLogPointAnalysisResultSuspense(
   client: ReplayClientInterface,
@@ -51,15 +67,24 @@ export function getLogPointAnalysisResultSuspense(
       values: localResult,
     };
   } else {
-    const cache = getAnalysisCache<PointDescription>(
-      {
-        mapper: createMapperForAnalysis(code, condition),
-        location,
-      },
-      point => point
+    // the LoggablesContext doesn't call logPointAnalysisCache.pointsCache.read(Async)
+    // because it uses points from the HitPointsCache instead (which is more efficient
+    // as it shares the points with other parts of the UI), so we call it here to ensure
+    // that the analysis is run for the given range
+    logPointAnalysisCache.pointsCache.readAsync(
+      range.begin,
+      range.end,
+      client,
+      location,
+      code,
+      condition
     );
-    cache.getPointsAsync(client, range);
-    const remoteResult = cache.getResultSuspense(point.point);
+    const remoteResult = logPointAnalysisCache.getResultSuspense(
+      point.point,
+      location,
+      code,
+      condition
+    );
     return {
       executionPoint: remoteResult.point,
       isRemote: true,

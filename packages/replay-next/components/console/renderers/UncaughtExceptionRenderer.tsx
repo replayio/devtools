@@ -10,7 +10,7 @@ import Inspector from "replay-next/components/inspector";
 import Loader from "replay-next/components/Loader";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { UncaughtException, getExceptionSuspense } from "replay-next/src/suspense/ExceptionsCache";
+import { UncaughtException, exceptionsCache } from "replay-next/src/suspense/ExceptionsCache";
 import { formatTimestamp } from "replay-next/src/utils/time";
 
 import MessageHoverButton from "../MessageHoverButton";
@@ -96,7 +96,7 @@ function UncaughtExceptionRenderer({
 }
 
 function AnalyzedContent({ uncaughtException }: { uncaughtException: UncaughtException }) {
-  const uncaughtExceptionResult = getExceptionSuspense(uncaughtException.point);
+  const uncaughtExceptionResult = exceptionsCache.getResultSuspense(uncaughtException.point);
 
   const frames = uncaughtExceptionResult.data.frames || EMPTY_ARRAY;
   const showExpandable = frames.length > 0;

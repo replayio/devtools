@@ -8,7 +8,7 @@ import Loader from "replay-next/components/Loader";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { InspectableTimestampedPointContext } from "replay-next/src/contexts/InspectorContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { EventLog, getEventSuspense } from "replay-next/src/suspense/EventsCache";
+import { EventLog, eventsCache } from "replay-next/src/suspense/EventsCache";
 import { formatTimestamp } from "replay-next/src/utils/time";
 
 import MessageHoverButton from "../MessageHoverButton";
@@ -94,7 +94,7 @@ function EventLogRenderer({
 function AnalyzedContent({ eventLog }: { eventLog: EventLog }) {
   const { showTimestamps } = useContext(ConsoleFiltersContext);
 
-  const { pauseId, values } = getEventSuspense(eventLog.eventType, eventLog.point);
+  const { pauseId, values } = eventsCache.getResultSuspense(eventLog.point, eventLog.eventType);
 
   const content =
     values.length > 0
