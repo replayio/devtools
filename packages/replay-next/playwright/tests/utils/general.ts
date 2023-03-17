@@ -30,7 +30,7 @@ export async function awaitNoLoaders(page: Page, scope: Locator | null = null) {
 
     attempts++;
 
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await delay(100);
   }
 
   throw Error("Timed out waiting for loaders to finish");
@@ -169,7 +169,7 @@ export async function takeScreenshot(page: Page, locator: Locator, name: string)
   await delay(1);
 
   if (VISUAL_DEBUG) {
-    await new Promise(resolve => resolve(250));
+    await delay(250);
     return;
   }
 

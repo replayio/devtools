@@ -43,9 +43,9 @@ import styles from "./SourceListRow.module.css";
 
 // Primarily exists as a way for e2e tests to disable syntax highlighting
 // to simulate large files that aren't fully parsed.
-const syntaxHighlightingEnabled =
+const disableSyntaxHighlightingForTests =
   typeof window !== "undefined" &&
-  new URL(window?.location?.href).searchParams.get("disableSyntaxHighlighting") == null;
+  new URL(window?.location?.href).searchParams.get("disableSyntaxHighlighting") != null;
 
 export type ItemData = {
   breakablePositionsByLine: Map<number, SameLineSourceLocations>;
@@ -111,9 +111,6 @@ const SourceListRow = memo(
       () => streamingParser.value?.[index] ?? null,
       () => streamingParser.value?.[index] ?? null
     );
-    if (!syntaxHighlightingEnabled) {
-      tokens = null;
-    }
 
     const plainText = useSyncExternalStore(
       streamingParser.subscribe,
@@ -121,7 +118,23 @@ const SourceListRow = memo(
       () => streamingParser.data?.text[index] ?? null
     );
 
+    let testStateContents = "loading";
+    if (tokens !== null) {
+      testStateContents = "parsed";
+    } else if (plainText !== null) {
+      testStateContents = "loaded";
+    }
+
+    if (disableSyntaxHighlightingForTests) {
+      tokens = null;
+    }
+
     const lineHitCounts = hitCounts?.get(lineNumber) || null;
+
+    let testStateHitCounts = "loading";
+    if (hitCounts !== null) {
+      testStateHitCounts = "loaded";
+    }
 
     const getDefaultLogPointContent = useGetDefaultLogPointContent({
       lineHitCounts,
@@ -371,19 +384,13 @@ const SourceListRow = memo(
       }
     }
 
-    let testState = "loading";
-    if (tokens !== null) {
-      testState = "parsed";
-    } else if (plainText !== null) {
-      testState = "loaded";
-    }
-
     return (
       <div
         className={styles.Row}
+        data-test-hit-counts-state={testStateHitCounts}
+        data-test-contents-state={testStateContents}
         data-test-id={`SourceLine-${lineNumber}`}
         data-test-name="SourceLine"
-        data-test-state={testState}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         style={{
@@ -419,7 +426,7 @@ const SourceListRow = memo(
             </div>
           )}
 
-          <div className={styles.LineSegmentsAndPointPanel}>
+          <div className={styles.LineSegmentsAndPointPanel} data-test-name="SourceLine-Contents">
             {searchResultsForLine?.map((result, resultIndex) => (
               <SearchResultHighlight
                 breakableColumnIndices={breakableColumnIndices}
