@@ -41,7 +41,7 @@ export function TestStepRowBase({
           [styles.TestsuitesErrorColor]: error,
           "bg-testsuitesErrorBgcolor hover:bg-testsuitesErrorBgcolorHover": error && pending,
           "bg-testsuitesErrorBgcolorHover": error && active,
-          "bg-testsuitesActiveBgcolor": active && !error,
+          [styles.TestsuitesActiveBgcolor]: active && !error,
           "bg-testsuitesStepsBgcolor hover:bg-testsuitesStepsBgcolorHover": pending && !error,
           "hover:bg-testsuitesStepsBgcolorHover": !pending && !active && !error,
         }
@@ -50,7 +50,7 @@ export function TestStepRowBase({
       <div title={progress == null ? "" : String(progress)} className="flex h-4 w-4 items-center">
         {progress == null ? null : <ProgressBar progress={progress} error={!!error} />}
       </div>
-      <div className="w-6 text-center opacity-70">{index}</div>
+      <div className="w-5 text-center opacity-70">{index}</div>
       {children}
     </div>
   );

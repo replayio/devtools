@@ -212,11 +212,15 @@ export function TestStepItem({
           title={`Step ${index + 1}: ${step.name} ${argString || ""}`}
         >
           <div
-            className={`flex-grow break-all font-medium ${state === "paused" ? "font-bold" : ""}`}
+            className={`flex flex-grow break-all font-medium ${
+              state === "paused" ? "font-bold" : ""
+            }`}
           >
-            {step.parentId ? <span className="opacity-0">|</span> : ""}{" "}
-            <span className={`${styles.step} ${styles[step.name]}`}>{step.name}</span>
-            <span className="opacity-70">{argString}</span>
+            <div>{step.parentId ? <div className="w-4 opacity-0">|</div> : ""} </div>
+            <div>
+              <span className={`${styles.step} ${styles[step.name]}`}>{step.name}</span>
+              <span className="opacity-70">{argString}</span>
+            </div>
           </div>
         </button>
         <React.Suspense>
