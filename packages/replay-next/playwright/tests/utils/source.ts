@@ -167,12 +167,18 @@ export async function editLogPoint(
   const editButtonLocator = await pointPanelLocator.locator(
     "[data-test-name=PointPanel-EditButton]"
   );
-  const editButtonIsVisible = await editButtonLocator.isVisible();
-  if (editButtonIsVisible) {
-    await debugPrint(page, `Toggling point to be editable`, "editLogPoint");
 
-    await editButtonLocator.click();
-  }
+  // Wait until the edit button is clickable (and we click it) or the log point is editable
+  await waitFor(async () => {
+    const editButtonIsVisible = await editButtonLocator.isVisible();
+    if (editButtonIsVisible) {
+      await editButtonLocator.click();
+    }
+
+    const contentLocator = pointPanelLocator.locator(`[data-test-name=PointPanel-ContentInput]`);
+    const isVisible = await contentLocator.isVisible();
+    expect(isVisible).toBe(true);
+  });
 
   const contentLocator = pointPanelLocator.locator(`[data-test-name=PointPanel-ContentInput]`);
   if (content != null) {
@@ -312,6 +318,15 @@ export function getSourceSearchResultsLabelLocator(page: Page): Locator {
 
 export function getSourceFileNameSearchResultsLocator(page: Page): Locator {
   return page.locator(`[data-test-id="SourceFileNameSearchResults"]`);
+}
+
+export function getSourceLineContentsLocator(
+  page: Page,
+  sourceId: string,
+  lineNumber: number
+): Locator {
+  const lineLocator = getSourceLineLocator(page, sourceId, 20);
+  return lineLocator.locator('[data-test-name="SourceLine-Contents"]');
 }
 
 export function getSourceLineLocator(page: Page, sourceId: string, lineNumber: number): Locator {
@@ -980,6 +995,18 @@ export async function verifyLogPointStep(
   });
 }
 
+export async function waitForSourceLineHitCounts(page: Page, sourceId: string, lineNumber: number) {
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
+  await lineLocator.isVisible();
+
+  await waitFor(async () => {
+    const hitCountsState = await lineLocator.getAttribute("data-test-hit-counts-state");
+    if (hitCountsState !== "loaded") {
+      throw Error(`Waiting for line ${lineNumber} to have hit counts loaded`);
+    }
+  });
+}
+
 export async function waitForSourceContentsToStream(page: Page, sourceId: string) {
   const sourceLocator = getSourceLocator(page, sourceId);
   await expect(sourceLocator).toBeVisible();
@@ -991,9 +1018,9 @@ export async function waitForSourceContentsToStream(page: Page, sourceId: string
   await lastLine.isVisible();
 
   await waitFor(async () => {
-    const state = await lastLine.getAttribute("data-test-state");
-    if (state !== "parsed") {
-      throw Error(`Waiting for line ${numLines} to be parsed but is "${state}"`);
+    const contentsState = await lastLine.getAttribute("data-test-contents-state");
+    if (contentsState !== "parsed") {
+      throw Error(`Waiting for line ${numLines} to be parsed but is "${contentsState}"`);
     }
   });
 }

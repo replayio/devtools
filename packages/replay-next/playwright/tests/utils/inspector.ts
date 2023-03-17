@@ -1,6 +1,6 @@
-import { Locator, Page } from "@playwright/test";
+import { Locator, Page, expect } from "@playwright/test";
 
-import { debugPrint, delay } from "./general";
+import { debugPrint, delay, waitFor } from "./general";
 
 export async function findClientValues(
   page: Page,
@@ -43,28 +43,48 @@ export async function toggleExpandable<T>(
   page: Page,
   options: {
     expanded?: boolean;
+    expandableLocator?: Locator;
     partialText?: string;
     scope?: Locator;
   }
 ): Promise<void> {
-  const { expanded = true, scope = page, partialText } = options;
+  const { expanded: nextExpanded = true, scope = page, partialText } = options;
 
-  const expandable = scope
-    .locator(`[data-test-name="Expandable"]`, { hasText: partialText })
-    .last();
+  let { expandableLocator } = options;
+  if (expandableLocator == null) {
+    expandableLocator = scope
+      .locator(`[data-test-name="Expandable"]`, { hasText: partialText })
+      .last();
+  }
 
-  const isExpanded = await expandable.evaluate(
-    'node => node.getDataAttribute("data-test-state") === "opened"'
-  );
+  // Grab a reference to the specific Expandable we are about to click.
+  // We'll want to verify updated state after the click,
+  // at which point the .last() locator may resolve to a different element.
+  const elementHandle = await expandableLocator.elementHandle();
 
-  if (isExpanded !== expanded) {
-    const actionPrefix = expanded ? "Expanding toggle" : "Collapsing toggle";
+  const prevState = await expandableLocator.getAttribute("data-test-state");
+  const prevExpanded = prevState === "open";
+  if (prevExpanded !== nextExpanded) {
+    const actionPrefix = nextExpanded ? "Expanding toggle" : "Collapsing toggle";
     const action = partialText ? `${actionPrefix} with text "${partialText}"` : actionPrefix;
     await debugPrint(page, action, "toggleExpandable");
 
-    const button = expandable.locator(`[role="button"]`);
+    const button = expandableLocator.locator(`[role="button"]`);
     await button.click();
 
-    await delay();
+    // Wait for element to open/close.
+    const nextState = nextExpanded ? "open" : "closed";
+    await waitFor(async () => {
+      const currentState = await elementHandle?.getAttribute("data-test-state");
+      expect(currentState).toBe(nextState);
+    });
+
+    // If we've opened the expandable, wait for its content to finish loading.
+    if (nextExpanded) {
+      await waitFor(async () => {
+        const html = await elementHandle?.innerHTML();
+        expect(html).not.toMatch(/data-test-name=['"]Loader['"]/);
+      });
+    }
   }
 }
