@@ -145,30 +145,12 @@ export default function CommentEditor({
           // flushSync was called from inside a lifecycle method.
           // React cannot flush when React is already rendering.
           // Consider moving this call to a scheduler task or micro task.
+          debugger
           Promise.resolve().then(() => {
             const editorState = editor.parseEditorState(serializedEditorState);
             editor.setEditorState(editorState);
           });
-          // const editorState = editor.getEditorState()
-          // editorState.read(()=>{
-          //   const texto = $getRoot()
-          //   console.log(texto.__cachedText)
-          // })
-          // debugger
         }
-
-        const separated = serializedEditorState.root.children[0].children[0].text.slice(-2)
-        if(separated[0] == '&'){
-          const styleDefined = parseInt(separated[1])
-          setStyleComment([
-            commentStyle[styleDefined][0],
-            commentStyle[styleDefined][1],
-            commentStyle[styleDefined][2],
-            styleDefined,
-          ]);
-
-        }
-        console.log(separated)
       }
     } catch (error) {
       console.error("Error parsing saved comment state:", serializedEditorState);
@@ -217,65 +199,20 @@ export default function CommentEditor({
     }
   }, []);
 
-  const saveStyle =async (editor: LexicalEditor | null, textContent: string) => {
-    await editor?.update(() => {
-
-      const selection = $getSelection();
-      const i1 = selection?.getNodes()[0]
-      const content = i1?.getTextContent()
-      if(content?.slice(1,2) == "&"){
-        i1?.replace($createTextNode( styleComment[3]+'&'+ content?.slice(2) ))
-      }
-      console.log(i1?.getTextContent())
-
-      // paragraph?.append($createTextNode('&'+styleComment[3] as string))
-
-      // textnode?.setTextContent("ahoy");
-      // console.log(paragraph?.getType());
-      // paragraph?.setTextContent("hola")
-      // texto?.setTextContent('hola')
-      // const awe = content[0].length
-      // if( awe?[0].length  === 1) {
-      //   textNode?.setTextContent(`${styleComment[3]}&_&${content?[1]}`);
-    });
-    debugger
-    return editor;
-  };
+  
 
   const onFormSubmit = useCallback(async (editorState: EditorState) => {
     const { onDelete, onSave } = committedStateRef.current;
     const textContent = serialize(editorState);
     // console.log(serializedEditorState)
-    if (textContent.trim() === "") {
+    if (textContent.trim() === "" && parseInt(textContent[0]) == styleComment[3] ) {
       onDelete();
     } else {
       const editor = editorRef.current;
-
-      // const removeTransform = editor?.registerNodeTransform(ParagraphNode, (paragraph) => {
-      //   const texto = paragraph.getTextContent()
-      //   console.log('logrado', texto)
-      // });
-
       const editor2 = await saveStyle(editor, textContent);
       const newEditorState = editor2?.getEditorState();
-      // })
-      // textNode?.append($createTextNode("dos"))
-      // console.log(textNode)
-
-      //   // text?.split('&')[0].length == 1
-
-      //   const texto = $createTextNode(styleComment[0])
-      //   const styleId = $createParagraphNode()
-      //   styleId.append(texto)
-
-      //   root.append(styleId)
-      //   debugger
-
-      // editor?.update(()=>{
-      // })
-
       // console.log(editorState)
-      onSave(newEditorState.toJSON());
+      onSave(editor.toJSON());
 
       if (editor) {
         editor.setEditable(false);
@@ -307,81 +244,11 @@ export default function CommentEditor({
     }
   }, [onFormSubmit]);
 
-  function handlerStyle(event) {
-    console.log(event.target.parentElement.lastChild);
-    event.target.parentElement.lastChild?.classList?.remove("hidden");
-  }
-  function styleHandlerBlur(event) {
-    event.target.parentElement?.lastChild?.classList?.add("hidden");
-  }
-  const changeStyle: MouseEventHandler = event => {
-    const style = event.target.dataset.style;
-    setStyleComment([
-      commentStyle[style][0],
-      commentStyle[style][1],
-      commentStyle[style][2],
-      style,
-    ]);
-    event.target.parentElement.classList.add("hidden");
-    event.target.parentElement.parentElement.firstChild.classList =
-      styleTagStyle + commentStyle[style][2];
-  };
-  // const styleTagStyle = "flex w-full items-center justify-between py-1 px-3 font-medium border";
-  const styleTagStyle = "flex max-w-fit items-center gap-2 rounded-full px-3 py-1 border";
-  const commentStyle = [
-    ["Bug", "bug_report", " bg-green-100 text-green-600 border-green-600"],
-    ["Breadscrumb", "hdr_strong", " bg-yellow-100 text-yellow-600 border-yellow-600"],
-    ["Question", "question_mark", " bg-red-100 text-red-600 border-red-600"],
-    ["Info", "sms", " bg-gray-50 text-zinc-500 border-gray-400"],
-  ];
-
-  const stateNode = serializedEditorState;
-  
-  const [styleComment, setStyleComment] = useState([
-    commentStyle[3][0],
-    [commentStyle[3][1]],
-    [commentStyle[3][2]],
-    3,
-  ]);
+ 
 
   return (
     <div>
-      <div className="relative mb-1 flex rounded-md text-[.625rem] text-zinc-600">
-        <button disabled={false} type="button" onClick={handlerStyle} className={styleTagStyle + styleComment[2]}>
-          <span>{styleComment[0]}</span>
-          <span className="material-icons-outlined text-sm">{styleComment[1]}</span>
-        </button>
-        <ul className="absolute top-0 z-10  mx-3 flex hidden w-full flex-col justify-center overflow-hidden rounded-md bg-white text-xs shadow-xl">
-          <li
-            className="w-full py-2 text-center hover:bg-gray-100"
-            data-style="0"
-            onClick={changeStyle}
-          >
-            Bug
-          </li>
-          <li
-            className="w-full py-2  text-center hover:bg-gray-100"
-            data-style="1"
-            onClick={changeStyle}
-          >
-            Breadscrumb
-          </li>
-          <li
-            className="w-full py-2  text-center hover:bg-gray-100"
-            data-style="3"
-            onClick={changeStyle}
-          >
-            Info
-          </li>
-          <li
-            className="w-full py-2  text-center hover:bg-gray-100"
-            data-style="2"
-            onClick={changeStyle}
-          >
-            Question
-          </li>
-        </ul>
-      </div>
+      
       <div className={styles.Editor}>
         <LexicalComposer initialConfig={createInitialConfig(markdown, editable)}>
           <LexicalEditorRefSetter editorRef={editorRef} />

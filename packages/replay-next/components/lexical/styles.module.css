@@ -52,3 +52,7 @@
 .LexicalUnderlineStrikethrough {
   text-decoration: underline line-through;
 }
+
+/** PurgeCSS
+  * border-green-600
+*/
