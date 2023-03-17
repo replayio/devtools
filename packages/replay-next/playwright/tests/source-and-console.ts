@@ -302,12 +302,12 @@ test("should remember search results count per source", async ({ page }) => {
   await expect(await resultsLabel.textContent()).toBe("3 of 20 results");
 
   await openSourceFile(page, sourceId);
-  await expect(await resultsLabel.textContent()).toBe("? of 5 results");
+  await waitFor(async () => expect(await resultsLabel.textContent()).toBe("? of 5 results"));
   await goToPreviousSourceSearchResult(page);
   await expect(await resultsLabel.textContent()).toBe("5 of 5 results");
 
   await openSourceFile(page, altSourceId);
-  await expect(await resultsLabel.textContent()).toBe("? of 20 results");
+  await waitFor(async () => expect(await resultsLabel.textContent()).toBe("? of 20 results"));
 
   await clearSearchResult(page);
   await expect(await resultsLabel.isVisible()).toBe(false);
@@ -407,21 +407,22 @@ test("scroll position should be restored when switching between sources", async 
   await openSourceFile(page, sourceId);
   await goToLine(page, sourceId, 77);
   const line77 = getSourceLineLocator(page, sourceId, 77);
-  await expect(await line77.isVisible()).toBe(true);
+  await waitFor(async () => expect(await line77.isVisible()).toBe(true));
 
   // Open source 2 and scroll to the middle
   await openSourceFile(page, altSourceId);
+  await waitForSourceContentsToStream(page, altSourceId);
   await goToLine(page, altSourceId, 100);
   const line100 = getSourceLineLocator(page, altSourceId, 100);
-  await expect(await line100.isVisible()).toBe(true);
+  await waitFor(async () => expect(await line100.isVisible()).toBe(true));
 
   // Switch back and verify that we're still at the bottom of source 1
   await openSourceFile(page, sourceId);
-  await expect(await line77.isVisible()).toBe(true);
+  await waitFor(async () => expect(await line77.isVisible()).toBe(true));
 
   // Switch back and verify that we're still in the middle of source 2
   await openSourceFile(page, altSourceId);
-  await expect(await line100.isVisible()).toBe(true);
+  await waitFor(async () => expect(await line100.isVisible()).toBe(true));
 });
 
 /* TODO – This tests passes in OSX but not in Docker

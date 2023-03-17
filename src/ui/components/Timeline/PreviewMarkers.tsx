@@ -1,11 +1,13 @@
 import type { PointDescription } from "@replayio/protocol";
 import { Suspense, useContext } from "react";
 
+import { binarySearch } from "protocol/utils";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/HitPointsCache";
-import { sourceHitCountsCache } from "replay-next/src/suspense/SourcesCache";
+import { sourceHitCountsCache } from "replay-next/src/suspense/SourceHitCountsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { toPointRange } from "shared/utils/time";
 import { selectors } from "ui/reducers";
 import { useAppSelector } from "ui/setup/hooks";
 
@@ -27,14 +29,20 @@ function PreviewMarkers() {
   let firstColumnWithHitCounts = null;
   if (focusedSourceId !== null && hoveredLineIndex !== null && visibleLines !== null) {
     const hitCounts = sourceHitCountsCache.read(
+      visibleLines?.start.line ?? 0,
+      visibleLines?.end.line ?? 0,
       replayClient,
       focusedSourceId,
-      visibleLines,
-      focusRange
+      focusRange ? toPointRange(focusRange) : null
     );
-    const hitCountsForLine = hitCounts.get(hoveredLineIndex + 1)!;
-    if (hitCountsForLine) {
-      firstColumnWithHitCounts = hitCountsForLine.firstBreakableColumnIndex;
+    const hitCountsForLineIndex = binarySearch(
+      0,
+      hitCounts.length,
+      index => hoveredLineIndex + 1 - hitCounts[index][0]
+    );
+    const hitCountsForLine = hitCounts[hitCountsForLineIndex];
+    if (hitCountsForLine && hitCountsForLine[0] === hoveredLineIndex + 1) {
+      firstColumnWithHitCounts = hitCountsForLine[1].firstBreakableColumnIndex;
     }
   }
 

@@ -15,8 +15,9 @@ import { FixedSizeList as List } from "react-window";
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { sourceHitCountsCache } from "replay-next/src/suspense/SourcesCache";
+import { sourceHitCountsCache } from "replay-next/src/suspense/SourceHitCountsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { toPointRange } from "shared/utils/time";
 import Spinner from "ui/components/shared/Spinner";
 import { SourceDetails, getSelectedSource } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -50,13 +51,25 @@ export function SourceOutline({
 
   const hitCounts =
     selectedSource && visibleLines
-      ? sourceHitCountsCache.read(replayClient, selectedSource.id, visibleLines, focusRange)
+      ? sourceHitCountsCache.read(
+          visibleLines.start.line,
+          visibleLines.end.line,
+          replayClient,
+          selectedSource.id,
+          focusRange ? toPointRange(focusRange) : null
+        )
       : null;
+  const hitCountsMap = useMemo(() => {
+    if (!hitCounts) {
+      return null;
+    }
+    return new Map(hitCounts);
+  }, [hitCounts]);
 
   const [filter, setFilter] = useState("");
   const outlineSymbols = useMemo(
-    () => getOutlineSymbols(symbols, filter, hitCounts),
-    [symbols, filter, hitCounts]
+    () => getOutlineSymbols(symbols, filter, hitCountsMap),
+    [symbols, filter, hitCountsMap]
   );
   const [focusedSymbol, setFocusedSymbol] = useState<ClassDeclaration | FunctionDeclaration | null>(
     null
