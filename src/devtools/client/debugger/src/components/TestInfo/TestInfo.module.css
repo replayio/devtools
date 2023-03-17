@@ -10,6 +10,10 @@
   border-left: 2px solid var(--testsuites-error-border-color);
 }
 
+.TestsuitesActiveBgcolor {
+  background-color: var(--testsuites-active-bgcolor);
+}
+
 .step {
   border-radius: 4px;
   margin-right: 5px;
