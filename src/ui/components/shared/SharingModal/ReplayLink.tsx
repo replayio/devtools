@@ -62,7 +62,7 @@ export function UrlCopy({ url }: { url: string }) {
         className="text-sm"
         type="text"
         value={url}
-        onKeyPress={e => e.preventDefault()}
+        onKeyDown={e => e.preventDefault()}
         onChange={e => e.preventDefault()}
         onClick={onClick}
       />
