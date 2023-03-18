@@ -68,7 +68,7 @@ function SSOLogin({ onLogin }: { onLogin: (connection: string) => void }) {
           className="w-48 flex-grow rounded-md text-black"
           placeholder="user@company.com"
           value={email}
-          onKeyPress={e => (e.key === "Enter" ? onEnterpriseLogin() : null)}
+          onKeyDown={e => (e.key === "Enter" ? onEnterpriseLogin() : null)}
           onChange={e => setEmail(e.currentTarget.value)}
         />
 
