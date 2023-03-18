@@ -33,31 +33,39 @@ function getFiles(dir) {
   }
 }
 
+function getUploadImageUrl(branchName, runId) {
+  return `${visualsUrl}/api/uploadSnapshot?branchName=${branchName}&projectId=${projectId}&runId=${runId}`;
+}
+
 async function uploadImage(file, branchName, runId) {
   const content = fs.readFileSync(file, { encoding: "base64" });
   const image = { content, file };
 
-  let res;
+  const url = getUploadImageUrl(branchName, runId);
 
+  let response;
   try {
-    res = await fetch(
-      `${visualsUrl}/api/uploadSnapshot?branchName=${branchName}&projectId=${projectId}&runId=${runId}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ image }),
-      }
-    );
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ image }),
+    });
 
-    if (res.status !== 200) {
-      return { status: res.status, error: await res.text(), serverError: true, file, content };
+    if (response.status !== 200) {
+      const text = await response.text();
+
+      console.error(`Upload failed with status: ${response.status}: ${text}`);
+
+      return { status: response.status, error: text, serverError: true, file, content };
     }
 
-    return res.json();
-  } catch (e) {
-    return { status: res.status, error: e, serverError: false, file, content };
+    return response.json();
+  } catch (error) {
+    console.error(`Upload failed with status: ${response.status}:`, error);
+
+    return { status: response.status, error, serverError: false, file, content };
   }
 }
 
@@ -81,10 +89,13 @@ async function uploadImage(file, branchName, runId) {
     console.log(`Skipping: No branch found`);
     return;
   }
-  console.log(`Uploading to branch "${branchName}"`);
+
+  console.log(
+    `Uploading images for branch "${branchName}" to:`,
+    getUploadImageUrl(branchName, runId)
+  );
 
   let results = [];
-
   for (const files of chunk(allFiles, 20)) {
     const res = await Promise.all(files.map(file => uploadImage(file, branchName, runId)));
     results.push(...res);
