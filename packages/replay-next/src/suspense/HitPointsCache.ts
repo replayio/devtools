@@ -2,6 +2,7 @@ import { Location, PointRange, TimeStampedPoint } from "@replayio/protocol";
 import { isPromiseLike } from "suspense";
 
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/analysisManager";
+import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { createFetchAsyncFromFetchSuspense } from "replay-next/src/utils/suspense";
 import {
   HitPointStatus,
@@ -11,7 +12,6 @@ import {
 import { ProtocolError, isCommandError } from "shared/utils/error";
 
 import { RangeCache, createGenericRangeCache } from "./createGenericRangeCache";
-import { getBreakpointPositionsAsync } from "./SourcesCache";
 
 const hitPointCaches = new Map<string, RangeCache<TimeStampedPoint>>();
 
@@ -30,7 +30,9 @@ function createHitPointsCache(location: Location, condition: string | null) {
         location,
       }));
       await Promise.all(
-        locations.map(location => getBreakpointPositionsAsync(location.location.sourceId, client))
+        locations.map(location =>
+          breakpointPositionsCache.readAsync(client, location.location.sourceId)
+        )
       );
 
       if (condition) {

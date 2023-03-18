@@ -1,11 +1,11 @@
 import { Location, SearchSourceContentsMatch, SourceId } from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 
 import { insert } from "replay-next/src/utils/array";
 import { isBowerComponent, isModuleFromCdn, isNodeModule } from "replay-next/src/utils/source";
 import { ReplayClientInterface } from "shared/client/types";
 
-import { createGenericCache } from "./createGenericCache";
-import { getSourcesAsync } from "./SourcesCache";
+import { sourcesCache } from "./SourcesCache";
 
 // TODO Create a generic cache variant that
 // (1) supports streaming data and
@@ -47,22 +47,19 @@ export function isSourceSearchResultMatch(
   return result.type === "match";
 }
 
-export const {
-  getValueSuspense: searchSourcesSuspense,
-  getValueAsync: searchSourcesAsync,
-  getValueIfCached: getCachedSourceSearchResults,
-} = createGenericCache<
-  [replayClient: ReplayClientInterface],
-  [query: string, includeNodeModules: boolean, limit?: number],
+export const searchCache: Cache<
+  [replayClient: ReplayClientInterface, query: string, includeNodeModules: boolean, limit?: number],
   StreamingSourceSearchResults
->(
-  "SearchCache: searchSources",
-  async (
-    query: string,
-    includeNodeModules: boolean,
-    limit: number = MAX_SEARCH_RESULTS_TO_DISPLAY,
-    client: ReplayClientInterface
-  ) => {
+> = createCache({
+  debugLabel: "Search",
+  getKey: ([replayClient, query, includeNodeModules, limit = MAX_SEARCH_RESULTS_TO_DISPLAY]) =>
+    `${includeNodeModules}:${limit || "-"}:${query}`,
+  load: async ([
+    replayClient,
+    query,
+    includeNodeModules,
+    limit = MAX_SEARCH_RESULTS_TO_DISPLAY,
+  ]) => {
     const subscribers: Set<Subscriber> = new Set();
 
     const orderedResults: SourceSearchResult[] = [];
@@ -81,7 +78,7 @@ export const {
     };
 
     if (sourceIdsWithNodeModules === null) {
-      await initializeSourceIds(client);
+      await initializeSourceIds(replayClient);
     }
 
     const sourceIds = includeNodeModules ? sourceIdsWithNodeModules! : sourceIdsWithoutNodeModules!;
@@ -92,7 +89,7 @@ export const {
 
     let currentResultLocation: SourceSearchResultLocation | null = null;
 
-    client
+    replayClient
       .searchSources(
         { limit, query, sourceIds },
         (matches: SearchSourceContentsMatch[], didOverflow: boolean) => {
@@ -127,15 +124,13 @@ export const {
 
     return result;
   },
-  (query: string, includeNodeModules: boolean, limit?: number) =>
-    `${includeNodeModules}:${limit || "-"}:${query}`
-);
+});
 
 async function initializeSourceIds(client: ReplayClientInterface) {
   sourceIdsWithNodeModules = [];
   sourceIdsWithoutNodeModules = [];
 
-  const sources = await getSourcesAsync(client);
+  const sources = await sourcesCache.readAsync(client);
 
   // Insert sources in order so that original sources are first.
   const compareSources = (a: SourceId, b: SourceId) => {

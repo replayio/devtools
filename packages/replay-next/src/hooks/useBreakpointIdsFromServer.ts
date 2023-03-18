@@ -2,8 +2,8 @@ import { BreakpointId, Location } from "@replayio/protocol";
 import { useContext, useEffect, useRef } from "react";
 
 import { PointBehaviorsObject } from "replay-next/src/contexts/points/types";
-import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
-import { getSourcesAsync } from "replay-next/src/suspense/SourcesCache";
+import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_ENABLED, Point, PointKey } from "shared/client/types";
 import { ReplayClientInterface } from "shared/client/types";
@@ -40,7 +40,7 @@ export default function useBreakpointIdsFromServer(
           // There's no point (hah!) in restoring breakpoints until after
           // we have sources to work with, and it's also possible that
           // some persisted points have obsolete source IDs.
-          const allSources = await getSourcesAsync(replayClient);
+          const allSources = await sourcesCache.readAsync(replayClient);
 
           const allSourceIds = new Set<string>();
           for (let source of allSources) {
@@ -66,7 +66,7 @@ export default function useBreakpointIdsFromServer(
             if (!sourcesWithFetchedPositions.has(sourceId)) {
               sourcesWithFetchedPositions.add(sourceId);
               // We haven't fetched breakable positions for this yet. Get them.
-              await getBreakpointPositionsAsync(sourceId, client);
+              await breakpointPositionsCache.readAsync(client, sourceId);
             }
 
             // _Now_ we can tell the backend about this breakpoint.

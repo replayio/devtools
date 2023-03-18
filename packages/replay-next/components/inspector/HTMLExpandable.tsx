@@ -50,7 +50,11 @@ export default function HTMLExpandable({
   };
 
   return (
-    <span className={isOpen ? styles.Expanded : styles.Collapsed} data-test-name="Expandable">
+    <span
+      className={isOpen ? styles.Expanded : styles.Collapsed}
+      data-test-name="Expandable"
+      data-test-state={isOpen ? "open" : "closed"}
+    >
       <span
         className={styles.PreviewRow}
         onClick={toggle}

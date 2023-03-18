@@ -1,5 +1,7 @@
 import { Page, test } from "@playwright/test";
 
+import { toggleExpandable } from "replay-next/playwright/tests/utils/inspector";
+
 import { toggleProtocolMessages } from "./utils/console";
 import { getTestUrl, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
@@ -12,7 +14,10 @@ async function inspect(page: Page, partialText: string) {
     .first();
 
   const keyValue = messageItem.locator("[data-test-name=Expandable]").first();
-  await keyValue.click();
+  await toggleExpandable(page, {
+    expanded: true,
+    expandableLocator: keyValue,
+  });
 
   return keyValue;
 }

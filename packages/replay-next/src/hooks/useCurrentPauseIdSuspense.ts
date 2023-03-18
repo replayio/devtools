@@ -5,7 +5,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegions } from "shared/utils/time";
 
 import { TimelineContext } from "../contexts/TimelineContext";
-import { getPauseIdSuspense } from "../suspense/PauseCache";
+import { pauseIdCache } from "../suspense/PauseCache";
 import useLoadedRegions from "./useRegions";
 
 export default function useCurrentPauseIdSuspense(): PauseId | null {
@@ -17,7 +17,7 @@ export default function useCurrentPauseIdSuspense(): PauseId | null {
   // If we are not currently paused at an explicit point, find the nearest point and pause there.
   const isLoaded = loadedRegions !== null && isPointInRegions(executionPoint, loadedRegions.loaded);
   if (isLoaded) {
-    return getPauseIdSuspense(client, executionPoint, time);
+    return pauseIdCache.read(client, executionPoint, time);
   }
 
   return null;

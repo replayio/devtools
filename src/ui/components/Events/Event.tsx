@@ -7,7 +7,8 @@ import {
 } from "@replayio/protocol";
 import classNames from "classnames";
 import classnames from "classnames";
-import React, { ReactNode, useRef, useState } from "react";
+import React, { ReactNode, useState } from "react";
+import { Cache, createCache } from "suspense";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
@@ -15,20 +16,15 @@ import { getFunctionBody } from "protocol/evaluation-utils";
 import type { ThreadFront as TF } from "protocol/thread";
 import { RecordingTarget } from "protocol/thread/thread";
 import Icon from "replay-next/components/Icon";
-import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
+import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { EventLog, eventsMapper } from "replay-next/src/suspense/EventsCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
-import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
-import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
+import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import type { UIThunkAction } from "ui/actions";
-import {
-  SEARCHABLE_EVENT_TYPES,
-  getEventListenerLocationAsync,
-  removeEventListenerLocationEntry,
-} from "ui/actions/event-listeners";
+import { SEARCHABLE_EVENT_TYPES, eventListenerLocationCache } from "ui/actions/event-listeners";
 import { setViewMode } from "ui/actions/layout";
 import useEventContextMenu from "ui/components/Events/useEventContextMenu";
 import { getLoadedRegions } from "ui/reducers/app";
@@ -51,16 +47,22 @@ const EVENTS_FOR_RECORDING_TARGET: Partial<
   // chromium: {},
 };
 
-const { getValueAsync: getNextInteractionEventAsync } = createGenericCache<
-  [replayClient: ReplayClientInterface, ThreadFront: typeof TF],
-  [point: ExecutionPoint, replayEventType: SEARCHABLE_EVENT_TYPES, endTime: number],
+export const nextInteractionEventCache: Cache<
+  [
+    replayClient: ReplayClientInterface,
+    ThreadFront: typeof TF,
+    point: ExecutionPoint,
+    replayEventType: SEARCHABLE_EVENT_TYPES,
+    endTime: number
+  ],
   EventLog | undefined
->(
-  "nextInteractionEventCache",
-  async (point, replayEventType, endTime, replayClient, ThreadFront) => {
+> = createCache({
+  debugLabel: "NextInteractionEvent",
+  getKey: ([replayClient, threadFront, point, replayEventType, endTime]) => point,
+  load: async ([replayClient, threadFront, point, replayEventType, endTime]) => {
     const pointNearEndTime = await replayClient.getPointNearTime(endTime);
 
-    const recordingTarget = await ThreadFront.getRecordingTarget();
+    const recordingTarget = await threadFront.getRecordingTarget();
 
     // Limit to browsers
     if (!["gecko", "chromium"].includes(recordingTarget)) {
@@ -86,8 +88,7 @@ const { getValueAsync: getNextInteractionEventAsync } = createGenericCache<
     entryPoints.sort((a, b) => compareExecutionPoints(a.point, b.point));
     return entryPoints[0];
   },
-  point => point
-);
+});
 
 type EventProps = {
   currentTime: number;
@@ -186,19 +187,19 @@ function jumpToClickEventFunctionLocation(
       // The sidebar event time/point is a fraction earlier than any
       // actual JS that executed in response. Find the next click event
       // within a small time window
-      const nextClickEvent = await getNextInteractionEventAsync(
+      const nextClickEvent = await nextInteractionEventCache.readAsync(
+        replayClient,
+        ThreadFront,
         executionPoint,
         event.kind as SEARCHABLE_EVENT_TYPES,
-        arbitraryEndTime,
-        replayClient,
-        ThreadFront
+        arbitraryEndTime
       );
 
       if (!nextClickEvent) {
         return "no_hits";
       }
 
-      const pauseId = await getPauseIdAsync(
+      const pauseId = await pauseIdCache.readAsync(
         replayClient,
         nextClickEvent.point,
         nextClickEvent.time
@@ -207,22 +208,20 @@ function jumpToClickEventFunctionLocation(
       // If we did have a click event, timewarp to that click's point
       onSeek(nextClickEvent.point, nextClickEvent.time);
 
-      const functionSourceLocation = await getEventListenerLocationAsync(
-        pauseId,
-        event.kind as SEARCHABLE_EVENT_TYPES,
+      const functionSourceLocation = await eventListenerLocationCache.readAsync(
         ThreadFront,
         replayClient,
-        getState
+        getState,
+        pauseId,
+        event.kind as SEARCHABLE_EVENT_TYPES
       );
 
       if (functionSourceLocation) {
         // TODO This sequence of logic could probably be cached too.
         // Not immediately critical, because the individual calls are cached.
 
-        const [breakablePositions, breakablePositionsByLine] = await getBreakpointPositionsAsync(
-          functionSourceLocation.sourceId,
-          replayClient
-        );
+        const [breakablePositions, breakablePositionsByLine] =
+          await breakpointPositionsCache.readAsync(replayClient, functionSourceLocation.sourceId);
 
         // Since we're doing these checks without knowing the end of the function
         // (due to parsing concerns), let's find all breakable positions on this line and the next 2.

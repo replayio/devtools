@@ -2,13 +2,13 @@
 
 import { Dictionary } from "@reduxjs/toolkit";
 import type { Location, ObjectPreview, Object as ProtocolObject } from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 
 import type { ThreadFront as TF } from "protocol/thread";
-import { createGenericCache } from "replay-next/src/suspense/createGenericCache";
-import { getTopFrameAsync } from "replay-next/src/suspense/FrameCache";
+import { topFrameCache } from "replay-next/src/suspense/FrameCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
-import { getScopeMapAsync } from "replay-next/src/suspense/ScopeMapCache";
+import { scopeMapCache } from "replay-next/src/suspense/ScopeMapCache";
 import { ReplayClientInterface } from "shared/client/types";
 import {
   SourceDetails,
@@ -97,9 +97,9 @@ export const formatEventListener = async (
     locationUrl = functionLocation?.length > 0 ? sourcesById[location.sourceId]?.url : undefined;
   }
 
-  const scopeMap = await getScopeMapAsync(
-    getGeneratedLocation(sourcesById, functionLocation),
-    replayClient
+  const scopeMap = await scopeMapCache.readAsync(
+    replayClient,
+    getGeneratedLocation(sourcesById, functionLocation)
   );
   const originalFunctionName = scopeMap?.find(mapping => mapping[0] === functionName)?.[1];
 
@@ -285,24 +285,30 @@ export function shouldIgnoreEventFromSource(sourceDetails?: SourceDetails) {
   return IGNORABLE_PARTIAL_SOURCE_URLS.some(partialUrl => url.includes(partialUrl));
 }
 
-export const {
-  getValueAsync: getEventListenerLocationAsync,
-  remove: removeEventListenerLocationEntry,
-} = createGenericCache<
-  [ThreadFront: typeof TF, replayClient: ReplayClientInterface, getState: () => UIState],
-  [pauseId: string, replayEventType: SEARCHABLE_EVENT_TYPES],
+// TODO This cache looks unsafe because it's not idempotent;
+// it accepts a state getter function but does not reflect the state it reads as part of the cache key.
+export const eventListenerLocationCache: Cache<
+  [
+    ThreadFront: typeof TF,
+    replayClient: ReplayClientInterface,
+    getState: () => UIState,
+    pauseId: string,
+    replayEventType: SEARCHABLE_EVENT_TYPES
+  ],
   Location | undefined
->(
-  "eventListenerLocationCache",
-  async (pauseId, replayEventType, ThreadFront, replayClient, getState) => {
-    const topFrame = await getTopFrameAsync(pauseId, replayClient);
+> = createCache({
+  debugLabel: "EventListenerLocation",
+  getKey: ([threadFront, replayClient, getState, pauseId, replayEventType]) =>
+    `${pauseId}:${replayEventType}`,
+  load: async ([threadFront, replayClient, getState, pauseId, replayEventType]) => {
+    const topFrame = await topFrameCache.readAsync(replayClient, pauseId);
 
     if (!topFrame) {
       return;
     }
     const { frameId } = topFrame;
 
-    await ThreadFront.ensureAllSources();
+    await threadFront.ensureAllSources();
 
     const state = getState();
 
@@ -310,7 +316,7 @@ export const {
 
     // Introspect the event's target DOM node, and find the nearest
     // React event handler if any exists.
-    const res = await ThreadFront.evaluate({
+    const res = await threadFront.evaluate({
       replayClient,
       pauseId,
       text: evaluatedEventMapper,
@@ -375,8 +381,7 @@ export const {
 
     return sourceLocation!;
   },
-  pauseId => pauseId
-);
+});
 
 // Local variables in scope at the time of evaluation
 declare let event: MouseEvent | KeyboardEvent;

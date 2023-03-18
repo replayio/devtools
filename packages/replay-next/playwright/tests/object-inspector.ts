@@ -1,7 +1,9 @@
 import { Page, test } from "@playwright/test";
 
+import { toggleExpandable } from "replay-next/playwright/tests/utils/inspector";
+
 import { filterByText, toggleProtocolMessage, toggleProtocolMessages } from "./utils/console";
-import { getTestUrl, takeScreenshot } from "./utils/general";
+import { getTestUrl, takeScreenshot, waitFor } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
 testSetup("bc6df6be-8305-4e1e-9eda-c1da63ef023d");
@@ -12,7 +14,10 @@ async function inspectAndTakeScreenshotOf(page: Page, partialText: string, scree
     .first();
 
   const keyValue = messageItem.locator("[data-test-name=Expandable]").first();
-  await keyValue.click();
+  await toggleExpandable(page, {
+    expanded: true,
+    expandableLocator: keyValue,
+  });
 
   await takeScreenshot(page, keyValue, screenshotName);
 }

@@ -4,7 +4,7 @@ import SourcePreviewInspector from "replay-next/components/inspector/SourcePrevi
 import Loader from "replay-next/components/Loader";
 import { getClosestPointForTimeSuspense } from "replay-next/src/suspense/ExecutionPointsCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
-import { evaluateSuspense, getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
+import { pauseEvaluationsCache, pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import createTest from "./utils/createTest";
@@ -28,8 +28,14 @@ function Suspender() {
   const replayClient = useContext(ReplayClientContext);
   const time = 1000;
   const point = getClosestPointForTimeSuspense(replayClient, time);
-  const pauseId = getPauseIdSuspense(replayClient, point, time);
-  const { returned } = evaluateSuspense(pauseId, null, "globalValues", undefined, replayClient);
+  const pauseId = pauseIdCache.read(replayClient, point, time);
+  const { returned } = pauseEvaluationsCache.read(
+    replayClient,
+    pauseId,
+    null,
+    "globalValues",
+    undefined
+  );
 
   const objectWithPreview = objectCache.read(
     replayClient,

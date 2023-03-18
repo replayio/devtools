@@ -10,7 +10,7 @@ import {
   VisualCommentTypeData,
   createTypeDataForNetworkRequestComment,
 } from "replay-next/components/sources/utils/comments";
-import { getTopFrameAsync } from "replay-next/src/suspense/FrameCache";
+import { topFrameCache } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { CommentSourceLocation } from "shared/graphql/types";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
@@ -177,7 +177,7 @@ async function getCurrentPauseSourceLocation(
   if (!pauseId) {
     return;
   }
-  const frame = await getTopFrameAsync(pauseId, replayClient);
+  const frame = await topFrameCache.readAsync(replayClient, pauseId);
   if (!frame) {
     return;
   }

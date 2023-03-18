@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { toggleExpandable } from "replay-next/playwright/tests/utils/inspector";
+
 import { openContextMenu, toggleProtocolMessages, verifyConsoleMessage } from "./utils/console";
 import {
   delay,
@@ -20,6 +22,7 @@ import {
   getPointPanelLocator,
   getSearchSourceLocator,
   getSourceFileNameSearchResultsLocator,
+  getSourceLineContentsLocator,
   getSourceLineLocator,
   getSourceLocator,
   getSourceSearchResultsLabelLocator,
@@ -40,6 +43,8 @@ import {
   verifyCurrentSearchResult,
   verifyHitPointButtonsEnabled,
   verifyLogPointStep,
+  waitForSourceContentsToStream,
+  waitForSourceLineHitCounts,
 } from "./utils/source";
 import testSetup from "./utils/testSetup";
 
@@ -53,6 +58,10 @@ test.beforeEach(async ({ page }) => {
 
   await page.goto(getTestUrl("source-and-console"));
   await openSourceFile(page, sourceId);
+
+  // Wait for source contents to finish streaming (loading and parsing)
+  await waitForSourceContentsToStream(page, sourceId);
+  await goToLine(page, sourceId, 1);
 });
 
 test("should not allow saving log points with invalid content", async ({ page }) => {
@@ -123,7 +132,10 @@ test("should run remote analysis for log points", async ({ page }) => {
 
   const message = page.locator("[data-test-name=Message]").first();
   const keyValue = message.locator("[data-test-name=Expandable]");
-  await keyValue.click();
+  await toggleExpandable(page, {
+    expanded: true,
+    expandableLocator: keyValue,
+  });
   await takeScreenshot(page, message, "log-point-analysis-expanded-console");
 });
 
@@ -490,14 +502,15 @@ test("should account for column breakpoints with plain text", async ({ page }) =
 
   await searchSourceText(page, "if (--");
 
-  const lineLocator = getSourceLineLocator(page, sourceId, 20);
-  await takeScreenshot(page, lineLocator, "search-result-highlight-plaintext");
+  await waitForSourceLineHitCounts(page, sourceId, 20);
+  const lineContents = getSourceLineContentsLocator(page, sourceId, 20);
+  await takeScreenshot(page, lineContents, "search-result-highlight-plaintext");
 
   // Add log point panel (which will insert a column breakpoint)
   await addLogPoint(page, { sourceId, lineNumber: 20 });
   await takeScreenshot(
     page,
-    lineLocator,
+    lineContents,
     "search-result-highlight-plaintext-with-column-breakpoint"
   );
 });

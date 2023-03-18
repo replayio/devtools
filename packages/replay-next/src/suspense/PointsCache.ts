@@ -1,26 +1,16 @@
 import { RecordingId } from "@replayio/protocol";
+import { Cache, createCache } from "suspense";
 
 import { Point } from "shared/client/types";
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 import { getPoints as getPointsGraphQL } from "shared/graphql/Points";
 
-import { createGenericCache } from "./createGenericCache";
-
-export const {
-  getValueSuspense: getPointsSuspense,
-  getValueAsync: getPointsAsync,
-  getValueIfCached: getPointsIfCached,
-  addValue: setLatestIDBValue,
-} = createGenericCache<
-  [graphQLClient: GraphQLClientInterface, accessToken: string | null],
-  [recordingId: RecordingId],
+export const pointsCache: Cache<
+  [graphQLClient: GraphQLClientInterface, accessToken: string | null, recordingId: RecordingId],
   Point[]
->(
-  "PointsCache: getPointsGraphQL",
-  async (
-    recordingId: RecordingId,
-    graphQLClient: GraphQLClientInterface,
-    accessToken: string | null
-  ) => await getPointsGraphQL(graphQLClient, recordingId, accessToken),
-  (recordingId: RecordingId) => recordingId
-);
+> = createCache({
+  debugLabel: "Points",
+  getKey: ([graphQLClient, accessToken, recordingId]) => recordingId,
+  load: async ([graphQLClient, accessToken, recordingId]) =>
+    await getPointsGraphQL(graphQLClient, recordingId, accessToken),
+});

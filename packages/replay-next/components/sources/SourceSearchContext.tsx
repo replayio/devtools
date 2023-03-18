@@ -1,7 +1,7 @@
 import { ReactNode, createContext, useContext, useEffect, useMemo } from "react";
 
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { getStreamingSourceContentsHelper } from "replay-next/src/suspense/SourcesCache";
+import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useSourceSearch, { Actions, SetScope, State } from "./hooks/useSourceSearch";
@@ -35,7 +35,7 @@ export function SourceSearchContextRoot({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function updateSourceContents(focusedSourceId: string | null, setScope: SetScope) {
       if (focusedSourceId) {
-        const { resolver } = await getStreamingSourceContentsHelper(client, focusedSourceId);
+        const { resolver } = await streamingSourceContentsCache.read(client, focusedSourceId);
         const { contents: code } = await resolver;
         setScope(focusedSourceId, code || "");
       } else {

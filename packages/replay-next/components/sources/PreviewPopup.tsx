@@ -4,7 +4,10 @@ import { RefObject, Suspense, useContext, useEffect, useRef } from "react";
 import { SelectedFrameContext } from "replay-next/src/contexts/SelectedFrameContext";
 import useLoadedRegions from "replay-next/src/hooks/useRegions";
 import { getFrameSuspense } from "replay-next/src/suspense/FrameCache";
-import { evaluateSuspense, getPointAndTimeForPauseId } from "replay-next/src/suspense/PauseCache";
+import {
+  getPointAndTimeForPauseId,
+  pauseEvaluationsCache,
+} from "replay-next/src/suspense/PauseCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegions } from "shared/utils/time";
 
@@ -48,11 +51,11 @@ function SuspendingPreviewPopup({
 
   let value: ProtocolValue | null = null;
   if (frameId !== null && pauseId !== null) {
-    const pointAndTime = getPointAndTimeForPauseId(pauseId);
-    if (pointAndTime && isPointInRegions(pointAndTime.point, loadedRegions?.loaded ?? [])) {
+    const [point] = getPointAndTimeForPauseId(pauseId);
+    if (point !== null && isPointInRegions(point, loadedRegions?.loaded ?? [])) {
       const frame = getFrameSuspense(client, pauseId, frameId);
       if (frame?.location.some(location => location.sourceId === sourceId)) {
-        const result = evaluateSuspense(pauseId, frameId, expression, undefined, client);
+        const result = pauseEvaluationsCache.read(client, pauseId, frameId, expression, undefined);
         value = result.returned || null;
       }
     }

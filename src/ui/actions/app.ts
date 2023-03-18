@@ -10,7 +10,7 @@ import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 import { getEventsForType } from "ui/reducers/app";
 import { getTheme } from "ui/reducers/app";
 import { Canvas, EventKind, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
-import { getBoundingRectsAsync } from "ui/suspense/nodeCaches";
+import { boundingRectsCache } from "ui/suspense/nodeCaches";
 import { compareBigInt } from "ui/utils/helpers";
 import { getRecordingId } from "ui/utils/recording";
 
@@ -174,7 +174,7 @@ export function fetchMouseTargetsForPause(): UIThunkAction<Promise<NodeBounds[] 
       return;
     }
 
-    return getBoundingRectsAsync(pauseId, protocolClient, sessionId);
+    return boundingRectsCache.readAsync(protocolClient, sessionId, pauseId);
   };
 }
 

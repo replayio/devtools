@@ -20,7 +20,7 @@ import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersCo
 import { InspectableTimestampedPointContext } from "replay-next/src/contexts/InspectorContext";
 import { TerminalExpression } from "replay-next/src/contexts/TerminalContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { evaluateSuspense } from "replay-next/src/suspense/PauseCache";
+import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { primitiveToClientValue } from "replay-next/src/utils/protocol";
 import { formatTimestamp } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -133,12 +133,12 @@ function EvaluatedContent({ terminalExpression }: { terminalExpression: Terminal
 
   // We pass the id of the terminal expression so that each evaluation is cached separately.
   // See FE-1111 for an example of why this is beneficial.
-  const result = evaluateSuspense(
+  const result = pauseEvaluationsCache.read(
+    client,
     pauseId,
     frameId,
     terminalExpression.expression,
-    "" + terminalExpression.id,
-    client
+    "" + terminalExpression.id
   );
   const { exception, returned } = result;
 

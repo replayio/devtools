@@ -1,8 +1,8 @@
 import { PauseId, TimeStampedPointRange } from "@replayio/protocol";
 
-import { getFramesSuspense } from "replay-next/src/suspense/FrameCache";
-import { getFrameStepsSuspense } from "replay-next/src/suspense/FrameStepsCache";
-import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
+import { framesCache } from "replay-next/src/suspense/FrameCache";
+import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
+import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { isPointInRegions } from "ui/utils/timeline";
 
@@ -15,18 +15,18 @@ export function getAsyncParentPauseIdSuspense(
   loadedRegions: TimeStampedPointRange[]
 ): PauseId | null | undefined {
   while (asyncIndex > 0) {
-    const frames = getFramesSuspense(pauseId, replayClient)!;
+    const frames = framesCache.read(replayClient, pauseId)!;
     if (!frames?.length) {
       return;
     }
-    const steps = getFrameStepsSuspense(pauseId, frames[frames.length - 1].frameId, replayClient);
-    if (!steps?.length) {
+    const steps = frameStepsCache.read(replayClient, pauseId, frames[frames.length - 1].frameId);
+    if (!steps || steps.length === 0) {
       return;
     }
     if (!isPointInRegions(loadedRegions, steps[0].point)) {
       return null;
     }
-    const parentPauseId = getPauseIdSuspense(replayClient, steps[0].point, steps[0].time);
+    const parentPauseId = pauseIdCache.read(replayClient, steps[0].point, steps[0].time);
     if (parentPauseId === pauseId) {
       return;
     }
