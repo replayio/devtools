@@ -58,7 +58,6 @@ export default function CommentCard({ comment }: { comment: Comment }) {
 
   const showReplyButton = !isCommentContentEmpty(comment.content);
 
-  
   return (
     <div
       className={classNames(styles.CommentCard, !comment.isPublished && styles.Unpublished)}
@@ -68,7 +67,6 @@ export default function CommentCard({ comment }: { comment: Comment }) {
 
       <div>
         <EditableRemark remark={comment} type="comment" />
-
       </div>
 
       {comment.replies.map(reply => (

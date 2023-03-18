@@ -1,3 +1,4 @@
+import { debug } from "console";
 import { MarkNode } from "@lexical/mark";
 import {
   BOLD_ITALIC_UNDERSCORE,
@@ -50,7 +51,6 @@ import MentionsPlugin from "./plugins/mentions/MentionsPlugin";
 import MentionsTextNode from "./plugins/mentions/MentionsTextNode";
 import { Collaborator } from "./plugins/mentions/types";
 import styles from "./styles.module.css";
-import { debug } from "console";
 
 // The comment editor only supports a subset of markdown formatting.
 const MARKDOWN_TRANSFORMERS = [
@@ -136,29 +136,34 @@ export default function CommentEditor({
     }
   }, [initialValue]);
 
-  const separated = serializedEditorState.root.children[0].children[0].text?.slice(0, 2) || "3&";
+  //Defined
+  const styleTagStyle = "flex max-w-fit items-center gap-2 rounded-full px-3 py-1 border  ";
 
-  const infoStyles = [
+  let separated;
+  serializedEditorState
+    ? (separated = serializedEditorState.root.children[0].children[0].text?.slice(0, 2) || "3&")
+    : (separated = "3&");
+  const styleDefined = separated[1] == "&" ? parseInt(separated[0]) : 3;
+  const commentStyle = [
     ["Bug", "bug_report", styles.bugStyle],
     ["Breadscrumb", "hdr_strong", styles.breadcrumbsStyle],
     ["Question", "question_mark", styles.questionStyle],
     ["Info", "sms", styles.infoStyle],
   ];
-
-  const styleDefined = separated[1] == "&" ? parseInt(separated[0]) : 3;
-
   const [styleComment, setStyleComment] = useState([
-    infoStyles[styleDefined][0],
-    infoStyles[styleDefined][1],
-    infoStyles[styleDefined][2],
+    commentStyle[styleDefined][0],
+    commentStyle[styleDefined][1],
+    commentStyle[styleDefined][2],
     styleDefined,
   ]);
+
+  const [styleChanged, setStyleChanged] = useState(false);
 
   useEffect(() => {
     try {
       if (serializedEditorState) {
         const editor = editorRef.current;
-        if (editor != null) {
+        if (!!editor) {
           // Avoid triggering React warning:
           // flushSync was called from inside a lifecycle method.
           // React cannot flush when React is already rendering.
@@ -240,9 +245,20 @@ export default function CommentEditor({
   }, []);
 
   // Discard pending changes on-blur;
+  //Here I use this to save the style changes because there is not a save button and just obbeys to onBlur
+  //There should be a save button, meanwhile I used this crappy solution
   useEffect(() => {
     const editor = editorRef.current;
     if (editor) {
+      //This is what I changed, if the styles changed with this its send to backend
+      // it is crappy because it calls itself again after done because it changes the state on styleChanged but could not find another solution on time and wanted to finish soon.
+
+      if (styleChanged) {
+        onFormSubmit(editor.getEditorState());
+        setStyleChanged(false);
+        return;
+      }
+
       const onBlurCommand = (event: FocusEvent) => {
         if (event.defaultPrevented) {
           return false;
@@ -259,32 +275,33 @@ export default function CommentEditor({
 
       return editor.registerCommand(BLUR_COMMAND, onBlurCommand, COMMAND_PRIORITY_NORMAL);
     }
-  }, [onFormSubmit, styleComment]);
+  }, [onFormSubmit, styleChanged]);
 
+  // This is to display the select style menu
   const handlerStyle: MouseEventHandler = event => {
     event.currentTarget.parentElement?.lastElementChild?.classList.replace("hidden", "flex");
   };
 
-  // function styleHandlerBlur(event) {
-  //   event.target.parentElement?.lastChild?.classList?.add("hidden");
-  // }
+  //Straighforward change style function
+
   const changeStyle: MouseEventHandler = event => {
-    event.stopPropagation();
     const parent = event.currentTarget.parentElement as HTMLElement;
-    const style = parseInt(event.currentTarget.getAttribute("data-style") as string);
     parent.classList.add("hidden");
+
+    // Each style has an id on its htmlelement dataset so we need it
+    const style = parseInt(event.currentTarget.getAttribute("data-style") as string);
     const children = parent.children;
+
+    // Just selection ui
     [0, 1, 2, 3].forEach(i => {
       children[i].classList.remove("bg-gray-200");
     });
     event.currentTarget.classList.add("bg-gray-200");
 
-    // Save in text Implementation
-
+    // Lexical update of textcontent to save the style selected
     const editor = editorRef.current;
     editor?.update(() => {
-      const selection = $getRoot().getAllTextNodes()[0]
-      console.log(selection)
+      const selection = $getRoot().getAllTextNodes()[0];
       const content = selection.getTextContent();
       if (content?.slice(1, 2) == "&") {
         selection?.setTextContent(style + "&" + content?.slice(2));
@@ -293,26 +310,18 @@ export default function CommentEditor({
       }
     });
 
-    const newBase = [
-      commentStyle[style][0],
-      commentStyle[style][1],
-      commentStyle[style][2],
-      style,
-    ]
+    //Make the changes in state and visually
+    const newBase = [commentStyle[style][0], commentStyle[style][1], commentStyle[style][2], style];
     setStyleComment(newBase);
-    console.log(styleComment)
+
+    //This is for the useffect that submits the change to backend
+    setStyleChanged(true);
   };
-  // const styleTagStyle = "flex w-full items-center justify-between py-1 px-3 font-medium border";
-  const styleTagStyle = "flex max-w-fit items-center gap-2 rounded-full px-3 py-1 border  ";
-  const commentStyle = [
-    ["Bug", "bug_report", styles.bugStyle],
-    ["Breadscrumb", "hdr_strong", styles.breadcrumbsStyle],
-    ["Question", "question_mark", styles.questionStyle],
-    ["Info", "sms", styles.infoStyle],
-  ];
+
+  //Return changed aswell a big dad div was created to wrap everything and have this new style element
 
   return (
-    <div className={styles.Editor}>
+    <div>
       <div className="relative mb-2 flex rounded-md text-[.625rem] text-zinc-600">
         <button
           disabled={false}
@@ -323,30 +332,30 @@ export default function CommentEditor({
           <span>{styleComment[0]}</span>
           <span className="material-icons-outlined text-sm">{styleComment[1]}</span>
         </button>
-        <ul className="absolute top-0 z-10 hidden w-full flex-col justify-center overflow-hidden rounded-md bg-white text-xs shadow-xl">
+        <ul className="absolute top-0 z-10 hidden w-1/2 min-w-fit flex-col justify-center overflow-hidden rounded-md bg-white text-xs shadow-xl">
           <li
-            className="w-full py-2 text-center hover:bg-gray-100"
+            className="w-full py-2 px-4 text-center hover:bg-gray-200"
             data-style="0"
             onClick={changeStyle}
           >
             Bug
           </li>
           <li
-            className="w-full py-2  text-center hover:bg-gray-100"
+            className="w-full py-2 px-4 text-center hover:bg-gray-200"
             data-style="1"
             onClick={changeStyle}
           >
             Breadscrumb
           </li>
           <li
-            className="w-full py-2  text-center hover:bg-gray-100"
+            className="w-full py-2 px-4 text-center hover:bg-gray-200"
             data-style="3"
             onClick={changeStyle}
           >
             Info
           </li>
           <li
-            className="w-full py-2  text-center hover:bg-gray-100"
+            className="w-full py-2 px-4 text-center hover:bg-gray-200"
             data-style="2"
             onClick={changeStyle}
           >
@@ -354,30 +363,32 @@ export default function CommentEditor({
           </li>
         </ul>
       </div>
-      <LexicalComposer initialConfig={createInitialConfig(markdown, editable)}>
-        <LexicalEditorRefSetter editorRef={editorRef} />
-        <>
-          {autoFocus && <AutoFocusPlugin />}
-          <HistoryPlugin externalHistoryState={historyState} />
-          <RichTextPlugin
-            contentEditable={<ContentEditable className={styles.ContentEditable} />}
-            placeholder={<div className={styles.Placeholder}>{placeholder}</div>}
-            ErrorBoundary={LexicalErrorBoundary}
-          />
-          <MarkdownShortcutPlugin transformers={MARKDOWN_TRANSFORMERS} />
-          <FormPlugin onCancel={onFormCancel} onSubmit={onFormSubmit} />
-          <CommentPlugin />
-          <LoomLinkPlugin />
-          <AutoLinkPlugin />
-          {collaborators !== null ? (
-            <MentionsPlugin
-              collaborators={collaborators}
-              dataTestId={dataTestId ? `${dataTestId}-CodeTypeAhead` : undefined}
-              dataTestName={dataTestName ? `${dataTestName}-CodeTypeAhead` : "CodeTypeAhead"}
+      <div className={styles.Editor}>
+        <LexicalComposer initialConfig={createInitialConfig(markdown, editable)}>
+          <LexicalEditorRefSetter editorRef={editorRef} />
+          <>
+            {autoFocus && <AutoFocusPlugin />}
+            <HistoryPlugin externalHistoryState={historyState} />
+            <RichTextPlugin
+              contentEditable={<ContentEditable className={styles.ContentEditable} />}
+              placeholder={<div className={styles.Placeholder}>{placeholder}</div>}
+              ErrorBoundary={LexicalErrorBoundary}
             />
-          ) : null}
-        </>
-      </LexicalComposer>
+            <MarkdownShortcutPlugin transformers={MARKDOWN_TRANSFORMERS} />
+            <FormPlugin onCancel={onFormCancel} onSubmit={onFormSubmit} />
+            <CommentPlugin />
+            <LoomLinkPlugin />
+            <AutoLinkPlugin />
+            {collaborators !== null ? (
+              <MentionsPlugin
+                collaborators={collaborators}
+                dataTestId={dataTestId ? `${dataTestId}-CodeTypeAhead` : undefined}
+                dataTestName={dataTestName ? `${dataTestName}-CodeTypeAhead` : "CodeTypeAhead"}
+              />
+            ) : null}
+          </>
+        </LexicalComposer>
+      </div>
     </div>
   );
 }
