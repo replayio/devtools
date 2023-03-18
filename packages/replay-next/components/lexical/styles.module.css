@@ -53,6 +53,18 @@
   text-decoration: underline line-through;
 }
 
-/** PurgeCSS
-  * border-green-600
-*/
+.bugStyle{
+  @apply bg-green-100 text-green-600 border-green-600 
+}
+
+.breadcrumbsStyle{
+  @apply bg-yellow-100 text-yellow-600 border-yellow-600
+}
+
+.questionStyle{
+  @apply bg-red-100 text-red-600 border-red-600
+}
+
+.infoStyle{
+  @apply bg-gray-50 text-zinc-500 border-zinc-500
+}
