@@ -37,38 +37,6 @@ export default function useNetworkContextMenu({
     dispatch(setFocusRegionBeginTime(beginTime!, true));
   };
 
-  const formatRequestHeadersForCURl = (headers: Header[]) => {
-    let headerString = "";
-    headers.forEach(header => {
-      headerString += ` -H '${header.name}: ${header.value}'`;
-    });
-
-    return headerString;
-  };
-
-  const copyAsCurl = () => {
-    const {
-      values: { url = "" } = {},
-      original: { requestHeaders = [], id = "", hasRequestBody = false } = {},
-    } = row || {};
-
-    let requestBodyForCURL = "";
-    if (hasRequestBody) {
-      const contentType = findHeader(requestHeaders, "content-type") || "unknown";
-      const requestBody = requestBodies[id];
-      const encodedRawBody = BodyPartsToUInt8Array(requestBody ?? [], contentType);
-
-      const decodedRawBody = URLEncodedToPlaintext(RawToUTF8(RawToImageMaybe(encodedRawBody)));
-      requestBodyForCURL = ` --data-raw '${decodedRawBody.content}'`;
-    }
-
-    navigator.clipboard.writeText(
-      `curl '${url}' ${formatRequestHeadersForCURl(requestHeaders)}${requestBodyForCURL}`
-    );
-    onClipboardCopy();
-    setTimeout(() => document.getElementById("showCopied")?.classList?.remove("opacity-100"), 2000);
-    setTimeout(() => document.getElementById("showCopied")?.classList?.add("opacity-0"), 2000);
-  };
 
   return useContextMenu(
     <>
@@ -85,7 +53,7 @@ export default function useNetworkContextMenu({
         </>
       </ContextMenuItem>
 
-      <ContextMenuItem onClick={copyAsCurl}>
+      <ContextMenuItem onClick={onClipboardCopy}>
         <>
           <Icon type="set-focus-end" />
           Copy as CURL

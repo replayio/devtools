@@ -22,6 +22,7 @@ export type NetworkState = {
   requestBodies: Record<string, RequestBodyData[]>;
   requests: RequestInfo[];
   selectedRequestId: string | null;
+  isCopyTriggered: boolean;
 };
 
 const initialState = (): NetworkState => ({
@@ -31,6 +32,7 @@ const initialState = (): NetworkState => ({
   responseBodies: {},
   requestBodies: {},
   selectedRequestId: null,
+  isCopyTriggered: false,
 });
 
 const update = (state: NetworkState = initialState(), action: NetworkAction): NetworkState => {
@@ -142,6 +144,9 @@ export const getRequestById = (state: UIState, id: string) =>
 export const getSelectedResponseBody = (state: UIState) => {
   const requestId = getSelectedRequestId(state);
   return requestId ? getResponseBodies(state)[requestId] : null;
+};
+export const getSelectedRequestBodyForId = (state: UIState, id: string) => {
+  return id ? getRequestBodies(state)[id] : null;
 };
 export const getSelectedRequestBody = (state: UIState) => {
   const requestId = getSelectedRequestId(state);
