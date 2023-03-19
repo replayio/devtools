@@ -36,11 +36,11 @@ Next, download and install the [Replay browser](https://www.replay.io/). The bro
 
 ### Community
 
-Everybody's welcome to join us [on Discord](https://replay.io/discord/), but please read through our [Community Etiquette](https://docs.replay.io/contribute/contributing-to-replay) guidelines first. There we can help you get setup, find your first issue, and chat about the future of DevTools!
+Everybody's welcome to join us [on Discord](https://replay.io/discord/), but please read through our [Community Etiquette](https://docs.replay.io/contribute/contributing-to-replay) guidelines first.
 
 ### Contributing to the project
 
-We encourage everybody to contribute to the project! If you're just getting started we recommend looking through and grabbing [any of these issues](https://github.com/RecordReplay/devtools/issues?q=is%3Aissue+is%3Aopen+label%3A%22Good+first+issue%22). If you have questions, but aren’t sure where to ask them, feel free to post in the [#development](https://discord.com/channels/779097926135054346/795692423513767956) or [#frontend](https://discord.com/channels/779097926135054346/957390059714281482) channels. Please do not "@" or direct message maintainers directly.
+Anyone is welcome to contribute to the project! If you're just getting started we recommend you start by reading the [contributing guide](https://github.com/replayio/devtools/blob/main/docs/contributing.md) and then check out any of the ["good first issues"](https://github.com/RecordReplay/devtools/issues?q=is%3Aissue+is%3Aopen+label%3A%22Good+first+issue%22). If you have questions you can ask in the in the [#development](https://discord.com/channels/779097926135054346/795692423513767956) channel. (Please do not "@" or direct message people with questions though!)
 
 ### Running tests:
 
