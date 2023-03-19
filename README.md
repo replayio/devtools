@@ -40,7 +40,7 @@ Everybody's welcome to join us [on Discord](https://replay.io/discord/), but ple
 
 ### Contributing to the project
 
-Anyone is welcome to contribute to the project! If you're just getting started we recommend you start by reading the [contributing guide](https://github.com/replayio/devtools/blob/main/docs/contributing.md) and then check out any of the ["good first issues"](https://github.com/RecordReplay/devtools/issues?q=is%3Aissue+is%3Aopen+label%3A%22Good+first+issue%22). If you have questions you can ask in the in the [#development](https://discord.com/channels/779097926135054346/795692423513767956) channel. (Please do not "@" or direct message people with questions though!)
+Anyone is welcome to contribute to the project! If you're just getting started we recommend you start by reading the [contributing guide](https://github.com/replayio/devtools/blob/main/docs/contributing.md) and then check out the ["good first issues"](https://github.com/RecordReplay/devtools/issues?q=is%3Aissue+is%3Aopen+label%3A%22Good+first+issue%22). If you have questions you can ask in the in the [#development](https://discord.com/channels/779097926135054346/795692423513767956) channel. (Please do not "@" or direct message people with questions though!)
 
 ### Running tests:
 
