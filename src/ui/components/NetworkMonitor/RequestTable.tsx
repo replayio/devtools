@@ -37,7 +37,6 @@ const RequestTable = ({
 
   const loadedRegions = useAppSelector(getLoadedRegions);
 
-  const [showCopied, setShowCopied] = useState(false);
   const onSeek = (request: RequestSummary) => {
     trackEvent("net_monitor.seek_to_request");
     seek(request.point.point, request.point.time, true);

@@ -1,5 +1,5 @@
 import { Header } from "@replayio/protocol";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Row } from "react-table";
 
 import { fetchRequestBody } from "ui/actions/network";
@@ -19,7 +19,7 @@ export default function useCopyToCliboard(row: Row<RequestSummary>) {
     original: { requestHeaders = [], id = "", hasRequestBody = false } = {},
   } = row || {};
 
-  const [ isCopyTriggered, setIsCopyTriggered ] = useState(false);
+  const [isCopyTriggered, setIsCopyTriggered] = useState(false);
   const requestBody = useAppSelector(state => getSelectedRequestBodyForId(state, id));
   const dispatch = useAppDispatch();
 
@@ -41,6 +41,17 @@ export default function useCopyToCliboard(row: Row<RequestSummary>) {
     setIsCopyTriggered(true);
   };
 
+  useEffect(() => {
+    const fetchBody = async () => {
+      const shouldGetBody = isCopyTriggered && hasRequestBody && !requestBody;
+
+      if (shouldGetBody) {
+        await dispatch(fetchRequestBody(id));
+      }
+    };
+    fetchBody();
+  }, [dispatch, hasRequestBody, id, isCopyTriggered, requestBody]);
+
   if (isCopyTriggered) {
     if (!hasRequestBody) {
       navigator.clipboard.writeText(
@@ -50,7 +61,6 @@ export default function useCopyToCliboard(row: Row<RequestSummary>) {
       isCopied = true;
       shouldShowLoading = false;
       setTimeout(() => setIsCopyTriggered(false), 3000);
-
     } else {
       if (requestBody) {
         const contentType = findHeader(requestHeaders, "content-type") || "unknown";
@@ -65,14 +75,11 @@ export default function useCopyToCliboard(row: Row<RequestSummary>) {
         isCopied = true;
         shouldShowLoading = false;
         setTimeout(() => setIsCopyTriggered(false), 3000);
-
       } else {
         //dispatch to fetch request body
-        dispatch(fetchRequestBody(id));
 
         isCopied = false;
         shouldShowLoading = true;
-
       }
     }
   }

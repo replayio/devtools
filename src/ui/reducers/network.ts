@@ -22,7 +22,6 @@ export type NetworkState = {
   requestBodies: Record<string, RequestBodyData[]>;
   requests: RequestInfo[];
   selectedRequestId: string | null;
-  isCopyTriggered: boolean;
 };
 
 const initialState = (): NetworkState => ({
@@ -32,7 +31,6 @@ const initialState = (): NetworkState => ({
   responseBodies: {},
   requestBodies: {},
   selectedRequestId: null,
-  isCopyTriggered: false,
 });
 
 const update = (state: NetworkState = initialState(), action: NetworkAction): NetworkState => {

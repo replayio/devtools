@@ -3,7 +3,6 @@ import React, { useLayoutEffect, useRef } from "react";
 import { Row } from "react-table";
 
 import useNetworkContextMenu from "ui/components/NetworkMonitor/useNetworkContextMenu";
-import { useAppDispatch } from "ui/setup/hooks";
 
 import useCopyToCliboard from "./useCopyToClipboard";
 import { RequestSummary } from "./utils";
@@ -46,7 +45,12 @@ export const RequestRow = ({
   return (
     <>
       {isCopied || shouldShowLoading ? (
-        <div className={classNames('absolute z-50 grid h-56 grid-cols-1 content-end place-self-center', styles.showCopiedContainer)}>
+        <div
+          className={classNames(
+            "absolute z-50 grid h-56 grid-cols-1 content-end place-self-center",
+            styles.showCopiedContainer
+          )}
+        >
           <div
             id="showCopied"
             className={`mb-1.5 flex shrink rounded-lg bg-black p-1.5 text-center text-white opacity-100 shadow-2xl transition-all duration-700 ease-in-out`}
