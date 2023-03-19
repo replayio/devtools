@@ -10,7 +10,7 @@ import {
 } from "replay-next/components/sources/SourceSearchContext";
 import { KeyboardModifiersContextRoot } from "replay-next/src/contexts/KeyboardModifiersContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { getSource } from "replay-next/src/suspense/SourcesCache";
+import { getSourceSuspends } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { useFeature } from "ui/hooks/settings";
 import { getSelectedLocation, getSelectedLocationHasScrolled } from "ui/reducers/sources";
@@ -58,7 +58,7 @@ function NewSourceAdapter() {
 
     // TRICKY
     // Legacy code passes 1-based line numbers around,
-    // Except when a filed is opened (e.g. by clicking on the file tab) in which cases it passes 0.
+    // Except when a file is opened (e.g. by clicking on the file tab) in which cases it passes 0.
     // We ignore the 0 because it breaks scroll state preservation between tabs.
     const lineNumber = location?.line ?? 0;
     const lineIndex = lineNumber > 0 ? lineNumber - 1 : undefined;
@@ -80,6 +80,13 @@ function NewSourceAdapter() {
       dispatch(setViewport(visibleLines));
     }
   }, [dispatch, visibleLines]);
+
+  useEffect(() => {
+    if (focusedSourceId != null && containerRef.current) {
+      // Focus source viewer whenever we load or switch a source so that CMD+F for "search" works right
+      containerRef.current.focus();
+    }
+  }, [focusedSourceId]);
 
   const onKeyDown = (event: KeyboardEvent) => {
     switch (event.key.toLowerCase()) {
@@ -131,7 +138,7 @@ function NewSourceAdapter() {
     >
       <NewSourceNag />
       {openSourceIds.map(sourceId => {
-        const source = getSource(replayClient, sourceId);
+        const source = getSourceSuspends(replayClient, sourceId);
         return (
           <LazyOffscreen key={sourceId} mode={sourceId === focusedSourceId ? "visible" : "hidden"}>
             <Source source={source!} showColumnBreakpoints={showColumnBreakpoints} />

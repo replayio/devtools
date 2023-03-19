@@ -4,7 +4,7 @@ import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import Loader from "replay-next/components/Loader";
 import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
-import { getCommentListSuspense } from "replay-next/src/suspense/CommentsCache";
+import { commentsCache } from "replay-next/src/suspense/CommentsCache";
 
 import Comment from "./Comment";
 import styles from "./CommentList.module.css";
@@ -14,7 +14,7 @@ import styles from "./CommentList.module.css";
 export default function CommentList() {
   const graphQLClient = useContext(GraphQLClientContext);
   const { accessToken, recordingId } = useContext(SessionContext);
-  const commentList = getCommentListSuspense(recordingId, graphQLClient, accessToken);
+  const commentList = commentsCache.read(graphQLClient, accessToken, recordingId);
 
   return (
     <ErrorBoundary>

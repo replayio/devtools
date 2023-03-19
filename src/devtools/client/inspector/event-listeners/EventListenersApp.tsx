@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import { getPauseId } from "devtools/client/debugger/src/reducers/pause";
 import { getSelectedDomNodeId } from "devtools/client/inspector/markup/reducers/markup";
 import { onViewSourceInDebugger } from "devtools/client/webconsole/actions/toolbox";
-import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import {
   EventListenerWithFunctionInfo,
@@ -60,10 +60,11 @@ export const EventListenersApp = () => {
   }
 
   // Suspend until we have the data for the node, which we _should_
-  const nodeWithPreview = getObjectWithPreviewSuspense(
+  const nodeWithPreview = objectCache.read(
     replayClient,
     pauseId,
-    selectedDomNodeId
+    selectedDomNodeId,
+    "canOverflow"
   ) as NodeWithPreview;
 
   return (

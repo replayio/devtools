@@ -17,6 +17,7 @@ export type PrimaryPanelName =
   | "debugger"
   | "protocol"
   | "search"
+  | "react"
   | ViewerPrimaryPanelName;
 export type SecondaryPanelName =
   | "console"

@@ -4,7 +4,7 @@ import chalk from "chalk";
 import { submitCurrentText as submitCurrentTextLexical, type as typeLexical } from "./lexical";
 import { waitForPaused } from "./pause-information-panel";
 import { Expected, MessageType } from "./types";
-import { debugPrint, toggleExpandable, waitFor } from "./utils";
+import { debugPrint, delay, toggleExpandable, waitFor } from "./utils";
 
 const categoryNames = {
   keyboard: "Keyboard",
@@ -51,6 +51,7 @@ export async function enableConsoleMessageType(
   type: "exceptions" | "logs" | "warnings" | "errors"
 ) {
   const checkbox = getConsoleMessageTypeCheckbox(page, type);
+  await delay(100);
   await checkbox.check();
 }
 

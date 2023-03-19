@@ -9,7 +9,7 @@ export function ProgressBar({ progress, error }: { progress: number; error: bool
       strokeWidth={20}
       styles={buildStyles({
         pathColor: error ? "rgb(239 68 68)" : `var(--focus-mode-loaded-indexed-color)`,
-        trailColor: `var(--circular-progress-bar-trail-color)`,
+        trailColor: `transparent`,
       })}
       value={progress}
     />

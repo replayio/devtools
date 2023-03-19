@@ -25,6 +25,7 @@ export interface SearchResult {
   id: string;
   value: string;
   title: string;
+  secondaryTitle?: string;
   location?: { start: Location; end?: Location };
   icon?: string;
   url?: string;

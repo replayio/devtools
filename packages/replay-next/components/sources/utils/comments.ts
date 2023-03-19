@@ -1,13 +1,14 @@
 import { SourceId } from "@replayio/protocol";
 
+import { assert } from "protocol/utils";
 import {
   getSourceAsync,
-  getStreamingSourceContentsAsync,
+  streamingSourceContentsCache,
 } from "replay-next/src/suspense/SourcesCache";
-import { parseStreamingAsync } from "replay-next/src/suspense/SyntaxParsingCache";
-import { ParsedToken } from "replay-next/src/suspense/SyntaxParsingCache";
+import { streamingSyntaxParsingCache } from "replay-next/src/suspense/SyntaxParsingCache";
 import { getBase64Png } from "replay-next/src/utils/canvas";
 import { getSourceFileName } from "replay-next/src/utils/source";
+import { ParsedToken } from "replay-next/src/utils/syntax-parser";
 import { ReplayClientInterface } from "shared/client/types";
 
 export enum CanonicalRequestType {
@@ -87,32 +88,32 @@ export async function createTypeDataForSourceCodeComment(
   const fileName = source ? getSourceFileName(source) : null;
 
   // Secondary label is used to store the syntax-highlighted markup for the line
-  const streamingSource = await getStreamingSourceContentsAsync(replayClient, sourceId);
-  if (streamingSource != null) {
-    const parsedSource = await parseStreamingAsync(streamingSource, fileName);
-    if (parsedSource != null) {
-      if (parsedSource.rawTextByLine.length < lineNumber) {
-        // If the streaming source hasn't finished loading yet, wait for it to load;
-        // Note that it's important to check raw lines as parsed lines may be clipped
-        // if the source is larger than the parser has been configured to handle.
-        await new Promise<void>(resolve => {
-          parsedSource.subscribe(() => {
-            if (parsedSource.rawTextByLine.length >= lineNumber) {
-              resolve();
-            }
-          });
+  const streamingSource = streamingSourceContentsCache.read(replayClient, sourceId);
+  const parsedSource = await streamingSyntaxParsingCache.stream(streamingSource, fileName);
+  if (parsedSource != null) {
+    if ((parsedSource.data?.text.length ?? 0) < lineNumber) {
+      // If the streaming source hasn't finished loading yet, wait for it to load;
+      // Note that it's important to check raw lines as parsed lines may be clipped
+      // if the source is larger than the parser has been configured to handle.
+      await new Promise<void>(resolve => {
+        parsedSource.subscribe(() => {
+          if ((parsedSource.data?.text.length ?? 0) >= lineNumber) {
+            resolve();
+          }
         });
-      }
+      });
+    }
 
-      rawText = parsedSource.rawTextByLine[lineNumber - 1];
-      if (rawText.length <= maxTextLength) {
-        // If the raw text is longer than the max length, we can't safely use the parsed tokens.
-        if (parsedSource.parsedTokensByLine.length >= lineNumber) {
-          parsedTokens = parsedSource.parsedTokensByLine[lineNumber - 1] ?? null;
-        }
-      } else {
-        rawText = rawText.substring(0, maxTextLength);
+    assert(parsedSource.data && parsedSource.value);
+
+    rawText = parsedSource.data.text[lineNumber - 1];
+    if (rawText.length <= maxTextLength) {
+      // If the raw text is longer than the max length, we can't safely use the parsed tokens.
+      if (parsedSource.value.length >= lineNumber) {
+        parsedTokens = parsedSource.value[lineNumber - 1];
       }
+    } else {
+      rawText = rawText.substring(0, maxTextLength);
     }
   }
 

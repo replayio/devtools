@@ -49,7 +49,7 @@ function UncaughtExceptionRenderer({
     className = `${className} ${styles.Focused}`;
   }
 
-  const locations = uncaughtException.frame!;
+  const locations = uncaughtException.frame ?? null;
 
   return (
     <>
@@ -70,9 +70,13 @@ function UncaughtExceptionRenderer({
         )}
         <Icon className={styles.ErrorIcon} type="error" />
         <span className={styles.Source}>
-          <Suspense fallback={<Loader />}>
-            {locations.length > 0 && <Source locations={locations} />}
-          </Suspense>
+          {locations && locations.length > 0 ? (
+            <Suspense fallback={<Loader />}>
+              <Source locations={locations} />
+            </Suspense>
+          ) : (
+            "Unknown location"
+          )}
         </span>
         <Suspense fallback={<Loader />}>
           <AnalyzedContent uncaughtException={uncaughtException} />

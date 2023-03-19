@@ -16,6 +16,7 @@ function ConsoleProps({ open }: { open: boolean }) {
 
   return (
     <div
+      data-test-id="TestSuite-ConsoleProps"
       className={`flex flex-grow flex-col gap-1 overflow-y-auto p-2 font-mono transition-all  ${
         open ? "visible" : "hidden"
       }`}

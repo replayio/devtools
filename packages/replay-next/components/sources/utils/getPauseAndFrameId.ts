@@ -4,12 +4,12 @@ import {
   loadedRegions as LoadedRegions,
   PauseId,
 } from "@replayio/protocol";
+import { isPromiseLike } from "suspense";
 
-import { getTopFrameSuspense } from "replay-next/src/suspense/FrameCache";
-import { getPauseIdSuspense } from "replay-next/src/suspense/PauseCache";
+import { topFrameCache } from "replay-next/src/suspense/FrameCache";
+import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { createFetchAsyncFromFetchSuspense } from "replay-next/src/utils/suspense";
 import { ReplayClientInterface } from "shared/client/types";
-import { isThennable } from "shared/proxy/utils";
 import { isPointInRegions } from "shared/utils/time";
 
 export function getPauseAndFrameIdSuspends(
@@ -31,16 +31,16 @@ export function getPauseAndFrameIdSuspends(
   let pauseId: PauseId | null = null;
 
   try {
-    pauseId = getPauseIdSuspense(replayClient, executionPoint, time);
+    pauseId = pauseIdCache.read(replayClient, executionPoint, time);
 
-    const topFrame = getTopFrameSuspense(pauseId, replayClient);
+    const topFrame = topFrameCache.read(replayClient, pauseId);
     frameId = topFrame?.frameId ?? null;
-  } catch (errorOrThennable) {
-    if (throwOnFail || isThennable(errorOrThennable)) {
-      throw errorOrThennable;
+  } catch (errorOrThenable) {
+    if (throwOnFail || isPromiseLike(errorOrThenable)) {
+      throw errorOrThenable;
     }
 
-    console.error(errorOrThennable);
+    console.error(errorOrThenable);
   }
 
   return { frameId, pauseId };

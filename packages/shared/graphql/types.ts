@@ -102,6 +102,7 @@ export type LocalExperimentalUserSettings = {
   profileWorkerThreads: boolean;
   brokenSourcemapWorkaround: boolean;
   disableRecordingAssetsInDatabase: boolean;
+  reactPanel: boolean;
 };
 
 export type LocalUserSettings = LocalExperimentalUserSettings & {

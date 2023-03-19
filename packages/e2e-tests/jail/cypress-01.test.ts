@@ -3,6 +3,7 @@ import test, { expect } from "@playwright/test";
 import { startTest } from "../helpers";
 import {
   getCypressLogo,
+  getSelectedTestCase,
   getTestCaseSections,
   getTestCaseSteps,
   getTestRowChevron,
@@ -39,7 +40,7 @@ test(`cypress-01: Test basic cypress reporter functionality`, async ({ page }) =
 
   // can open tests
   await failedRow.click();
-  const selectedRow = await getTestRows(page);
+  const selectedRow = await getSelectedTestCase(page);
   expect(selectedRow).toHaveCount(1);
   const sections = await getTestCaseSections(selectedRow);
   await expect(sections).toHaveCount(2);

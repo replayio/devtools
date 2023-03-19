@@ -31,7 +31,7 @@ pref("devtools.features.disableStableQueryCache", false);
 pref("devtools.features.enableUnstableQueryCache", false);
 pref("devtools.features.enableLargeText", false);
 pref("devtools.features.hitCounts", true);
-pref("devtools.features.logProtocol", false);
+pref("devtools.features.logProtocol", true);
 pref("devtools.features.logProtocolEvents", false);
 pref("devtools.features.newControllerOnRefresh", false);
 pref("devtools.features.originalClassNames", false);
@@ -39,12 +39,14 @@ pref("devtools.features.profileWorkerThreads", false);
 pref("devtools.features.enableRoutines", false);
 pref("devtools.features.rerunRoutines", false);
 pref("devtools.features.protocolTimeline", false);
+pref("devtools.features.reactPanel", false);
 pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.resolveRecording", false);
 pref("devtools.features.chromiumNetMonitor", true);
 pref("devtools.features.chromiumRepaints", false);
 pref("devtools.features.brokenSourcemapWorkaround", true);
 pref("devtools.features.disableRecordingAssetsInDatabase", false);
+pref("devtools.features.keepAllTraces", false);
 
 export const prefs = new PrefsHelper("devtools", {
   colorScheme: ["String", "colorScheme"],
@@ -78,6 +80,7 @@ export const features = new PrefsHelper("devtools.features", {
   originalClassNames: ["Bool", "originalClassNames"],
   profileWorkerThreads: ["Bool", "profileWorkerThreads"],
   protocolTimeline: ["Bool", "protocolTimeline"],
+  reactPanel: ["Bool", "reactPanel"],
   repaintEvaluations: ["Bool", "repaintEvaluations"],
   resolveRecording: ["Bool", "resolveRecording"],
   rerunRoutines: ["Bool", "rerunRoutines"],
@@ -85,6 +88,7 @@ export const features = new PrefsHelper("devtools.features", {
   chromiumRepaints: ["Bool", "chromiumRepaints"],
   brokenSourcemapWorkaround: ["Bool", "brokenSourcemapWorkaround"],
   disableRecordingAssetsInDatabase: ["Bool", "disableRecordingAssetsInDatabase"],
+  keepAllTraces: ["Bool", "keepAllTraces"],
 });
 
 export type Features = typeof features;

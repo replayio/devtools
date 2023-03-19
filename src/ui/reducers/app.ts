@@ -1,6 +1,7 @@
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 
 import { RecordingTarget } from "protocol/thread/thread";
+import { compareExecutionPoints, isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { Workspace } from "shared/graphql/types";
 import { getCurrentTime, getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
@@ -21,12 +22,10 @@ import {
 } from "ui/state/app";
 import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
 import { getSystemColorSchemePreference } from "ui/utils/environment";
-import { compareBigInt } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
 import { isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
 
 export const initialAppState: AppState = {
-  // analysisPoints: {},
   awaitingSourcemaps: false,
   canvas: null,
   currentPoint: null,
@@ -278,27 +277,38 @@ const NO_EVENTS: MouseEvent[] = [];
 export const getEventsForType = (state: UIState, type: string) =>
   state.app.events[type] || NO_EVENTS;
 
-export const getFlatEvents = (state: UIState) => {
-  let events: ReplayEvent[] = [];
-  const focusRegion = getFocusRegion(state);
+export const getSortedEventsForDisplay = createSelector(
+  (state: UIState) => state.app.events,
+  events => {
+    let sortedEvents: ReplayEvent[] = [];
 
-  Object.keys(state.app.events).map(
-    (eventKind: EventKind) => (events = [...events, ...state.app.events[eventKind]])
-  );
+    for (let [eventType, eventsOfType] of Object.entries(events)) {
+      if (["keydown", "keyup"].includes(eventType)) {
+        continue;
+      }
+      sortedEvents = sortedEvents.concat(eventsOfType);
+    }
 
-  const sortedEvents = events.sort((a: ReplayEvent, b: ReplayEvent) =>
-    compareBigInt(BigInt(a.point), BigInt(b.point))
-  );
-  const filteredEventTypes = ["keydown", "keyup"];
-  const filteredEvents = sortedEvents.filter(e => !filteredEventTypes.includes(e.kind));
+    sortedEvents.sort((a, b) => compareExecutionPoints(a.point, b.point));
+    return sortedEvents;
+  }
+);
 
-  // Only show the events in the current focused region
-  return focusRegion
-    ? filteredEvents.filter(
-        e => e.point >= focusRegion.begin.point && e.point < focusRegion.end.point
-      )
-    : filteredEvents;
-};
+export const getFilteredEventsForFocusRegion = createSelector(
+  getFocusRegion,
+  getSortedEventsForDisplay,
+  (focusRegion, sortedEvents) => {
+    if (!focusRegion) {
+      return sortedEvents;
+    }
+
+    const filteredEvents = sortedEvents.filter(e => {
+      return isExecutionPointsWithinRange(e.point, focusRegion.begin.point, focusRegion.end.point);
+    });
+    return filteredEvents;
+  }
+);
+
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;
 export const getIsNodePickerInitializing = (state: UIState) => state.app.isNodePickerInitializing;
 export const getCanvas = (state: UIState) => state.app.canvas;

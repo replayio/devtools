@@ -5,7 +5,7 @@
 import { Frame } from "@replayio/protocol";
 
 import type { ThreadFront as TF } from "protocol/thread";
-import { getSourcesAsync } from "replay-next/src/suspense/SourcesCache";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 import type { UIStore } from "ui/actions";
 import { allSourcesReceived } from "ui/reducers/sources";
@@ -15,7 +15,7 @@ import { paused, resumed } from "../actions/pause";
 let store: UIStore;
 
 async function setupDebugger(ThreadFront: typeof TF, replayClient: ReplayClientInterface) {
-  const sources = await getSourcesAsync(replayClient);
+  const sources = await sourcesCache.readAsync(replayClient);
 
   store.dispatch(allSourcesReceived(sources));
 }

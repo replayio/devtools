@@ -10,7 +10,7 @@ import { Location, MappedLocation, SourceKind, newSource } from "@replayio/proto
 
 import type { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import { assert } from "protocol/utils";
-import { preCacheSources } from "replay-next/src/suspense/SourcesCache";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { UIState } from "ui/state";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 import { newSourcesToCompleteSourceDetails } from "ui/utils/sources";
@@ -38,7 +38,7 @@ export interface MiniSource {
   url?: string;
 }
 
-const sourceDetailsAdapter = createEntityAdapter<SourceDetails>();
+export const sourceDetailsAdapter = createEntityAdapter<SourceDetails>();
 
 export const {
   selectAll: getAllSourceDetails,
@@ -86,7 +86,7 @@ const sourcesSlice = createSlice({
       // Pre-cache source data in the new Suspense cache then so that it can use it for e.g. displaying sources in the Console.
       //
       // TODO [bvaughn] Will the new console code need to add some step similar to newSourcesToCompleteSourceDetails() to map between generated and corresponding sources?
-      preCacheSources(sources);
+      sourcesCache.cache(sources, null as any);
 
       const sourcesByUrl: Record<string, string[]> = {};
 

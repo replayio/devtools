@@ -226,10 +226,6 @@ function _DevTools({
     return <LoadingScreen fallbackMessage="Starting your session..." />;
   }
 
-  if (loadedRegions === null) {
-    return <LoadingScreen fallbackMessage="Loading timeline..." />;
-  }
-
   return (
     <SessionContextAdapter apiKey={apiKey ?? null}>
       <SourcesContextAdapter>

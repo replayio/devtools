@@ -42,15 +42,23 @@ export const filterLoggingInTests = (
 
   beforeEach(function () {
     // @ts-ignore
-    jest.spyOn(console, method).mockImplementation((...args) => {
-      const [message = ""] = args;
-      if (typeof message !== "string") {
-        originalConsoleLog("Message is not a string: ", message);
+    jest.spyOn(console, method).mockImplementation((...args: any[]) => {
+      const arg = args[0];
+
+      let messageString: string | null = null;
+      if (typeof arg === "string") {
+        messageString = arg;
+      } else if (arg != null && typeof arg === "object" && arg.message) {
+        messageString = arg.message;
       } else {
-        const shouldSilence = conditionFilter(message);
-        if (shouldSilence) {
-          return;
-        }
+        try {
+          messageString = JSON.stringify(arg);
+        } catch (error) {}
+      }
+
+      const shouldSilence = messageString != null && conditionFilter(messageString);
+      if (shouldSilence) {
+        return;
       }
 
       originalConsoleLog(...args);
@@ -63,16 +71,22 @@ export const filterLoggingInTests = (
 };
 
 export const filterCommonTestWarnings = () => {
+  // Filter all console.debug logs; they're noisy
+  filterLoggingInTests(() => true, "debug");
+
   // Skip websocket "Socket Open" message
   filterLoggingInTests(
     message =>
       message.includes("Socket Open") || message === "indexed" || message.includes("LoadedRegions")
   );
-  // Skip React 18 "stop using ReactDOM.render" message
+
   filterLoggingInTests(
     message =>
+      // Skip React 18 "stop using ReactDOM.render" message
       message.includes("ReactDOM.render is no longer supported") ||
-      message.includes("Received unknown message"),
+      message.includes("Received unknown message") ||
+      // Skip JSDom package warnings
+      message.includes("HTMLCanvasElement.prototype.getContext"),
     "error"
   );
 };

@@ -1,7 +1,6 @@
 import {
   EntityId,
   EntityState,
-  PayloadAction,
   createEntityAdapter,
   createSelector,
   createSlice,

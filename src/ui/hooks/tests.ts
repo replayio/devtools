@@ -47,6 +47,7 @@ export interface TestRun {
   user: string | null;
   date: string;
   branch: string | null;
+  mode: string | null;
   stats: TestRunStats | null;
   recordings?: Recording[];
   triggerUrl?: string;
@@ -91,6 +92,7 @@ const GET_TEST_RUNS_FOR_WORKSPACE = gql`
           mergeTitle
           user
           date
+          mode
           stats {
             passed
             failed
@@ -140,6 +142,7 @@ const GET_TEST_RUN = gql`
           mergeTitle
           user
           date
+          mode
           stats {
             passed
             failed

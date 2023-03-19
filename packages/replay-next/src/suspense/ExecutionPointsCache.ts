@@ -3,14 +3,12 @@ import {
   getPointsBoundingTimeResult as PointsBoundingTime,
   TimeStampedPoint,
 } from "@replayio/protocol";
+import { Cache, Deferred, createCache, createDeferred } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 
-import { createWakeable } from "../utils/suspense";
 import { isExecutionPointsLessThan } from "../utils/time";
-import { createGenericCache } from "./createGenericCache";
-import { Wakeable } from "./types";
 
 export type CachedPointsForTime = Map<number, ExecutionPoint>;
 type ChangeHandler = (timeStampedPoint: TimeStampedPoint) => void;
@@ -19,7 +17,7 @@ const cachedPointsForTime: CachedPointsForTime = new Map();
 const cachedPointsForTimeChangeHandlers: Set<ChangeHandler> = new Set();
 const sortedExecutionPoints: TimeStampedPoint[] = [];
 const sortedPointsBoundingTimes: PointsBoundingTime[] = [];
-const timeToInFlightRequestMap: Map<number, Wakeable<ExecutionPoint>> = new Map();
+const timeToInFlightRequestMap: Map<number, Deferred<ExecutionPoint>> = new Map();
 const timeToErrorMap: Map<number, any> = new Map();
 
 export function addCachedPointsForTimeListener(handler: ChangeHandler): () => void {
@@ -51,11 +49,11 @@ function callCachedPointsForTimeListeners(time: number, point: ExecutionPoint): 
 async function fetchPointsBoundingTime(
   client: ReplayClientInterface,
   time: number,
-  wakeable: Wakeable<ExecutionPoint>,
+  deferred: Deferred<ExecutionPoint>,
   rethrowError: boolean
 ) {
   try {
-    const pointsBoundingTime = await getPointsBoundingTimeAsync(time, client);
+    const pointsBoundingTime = await pointsBoundingTimeCache.readAsync(client, time);
     const point = getClosestPointInPointsBoundingTime(time, pointsBoundingTime);
 
     // Pre-cache time-to-point match and insert into sorted ExecutionPoints array.
@@ -102,7 +100,7 @@ async function fetchPointsBoundingTime(
       }
     }
 
-    wakeable.resolve(point);
+    deferred.resolve(point);
   } catch (error) {
     if (rethrowError) {
       throw error;
@@ -116,7 +114,7 @@ async function fetchPointsBoundingTime(
       timeToErrorMap.set(time, error);
     }
 
-    wakeable.reject(error);
+    deferred.reject(error);
   } finally {
     timeToInFlightRequestMap.delete(time);
   }
@@ -205,17 +203,17 @@ export function getClosestPointForTimeSuspense(
   }
 
   // Otherwise let's fetch the closest points for this time.
-  let wakeable = timeToInFlightRequestMap.get(time);
-  if (wakeable == null) {
-    wakeable = createWakeable<ExecutionPoint>(`getClosestPointForTimeSuspense time: ${time}`);
+  let deferred = timeToInFlightRequestMap.get(time);
+  if (deferred == null) {
+    deferred = createDeferred<ExecutionPoint>(`getClosestPointForTimeSuspense time: ${time}`);
 
-    timeToInFlightRequestMap.set(time, wakeable);
+    timeToInFlightRequestMap.set(time, deferred);
 
     // Fire and forget for the purposes of Suspense.
-    fetchPointsBoundingTime(client, time, wakeable, false);
+    fetchPointsBoundingTime(client, time, deferred, false);
   }
 
-  throw wakeable;
+  throw deferred.promise;
 }
 
 function getClosestPointInPointsBoundingTime(
@@ -254,7 +252,7 @@ export async function imperativelyGetClosestPointForTime(
     await fetchPointsBoundingTime(
       client,
       time,
-      createWakeable<ExecutionPoint>(`imperativelyGetClosestPointForTime time: ${time}`),
+      createDeferred<ExecutionPoint>(`imperativelyGetClosestPointForTime time: ${time}`),
       true
     );
     return cachedPointsForTime.get(time)!;
@@ -295,12 +293,11 @@ export function preCacheExecutionPointForTime(timeStampedPoint: TimeStampedPoint
   }
 }
 
-export const {
-  getValueSuspense: getPointsBoundingTimeSuspense,
-  getValueAsync: getPointsBoundingTimeAsync,
-  getValueIfCached: getPointsBoundingTimeIfCached,
-} = createGenericCache<[replayClient: ReplayClientInterface], [time: number], PointsBoundingTime>(
-  "PointsCache: getPointsBoundingTime",
-  async (time, client) => client.getPointsBoundingTime(time),
-  time => `${time}`
-);
+export const pointsBoundingTimeCache: Cache<
+  [replayClient: ReplayClientInterface, time: number],
+  PointsBoundingTime
+> = createCache({
+  debugLabel: "PointsBoundingTime",
+  getKey: ([client, time]) => `${time}`,
+  load: async ([client, time]) => client.getPointsBoundingTime(time),
+});
