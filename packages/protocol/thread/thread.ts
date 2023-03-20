@@ -253,7 +253,7 @@ class _ThreadFront {
         recordingCapabilities = {
           supportsEagerEvaluation: true,
           supportsElementsInspector: false,
-          supportsEventTypes: true,
+          supportsEventTypes: false,
           supportsNetworkRequests: true,
           supportsRepaintingGraphics: false,
           supportsPureEvaluation: false,
