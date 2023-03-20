@@ -94,6 +94,7 @@ export default function EditableRemark({
 
   const onContextMenuClick: MouseEventHandler = event => {
     event.stopPropagation();
+
     onContextMenu(event);
   };
 

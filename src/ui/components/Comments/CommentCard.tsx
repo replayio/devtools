@@ -18,7 +18,6 @@ import CommentPreview from "./CommentPreview";
 import CommentReplyButton from "./CommentReplyButton";
 import EditableRemark from "./EditableRemark";
 import ReplyCard from "./ReplyCard";
-import SourceCodePreview from "./TranscriptComments/SourceCodePreview";
 import styles from "./CommentCard.module.css";
 
 export default function CommentCard({ comment }: { comment: Comment }) {
@@ -32,6 +31,7 @@ export default function CommentCard({ comment }: { comment: Comment }) {
 
   const onClick = (event: MouseEvent) => {
     event.stopPropagation();
+
     const openSource = viewMode === "dev";
     dispatch(seekToComment(comment, comment.sourceLocation, openSource));
 
