@@ -1,15 +1,15 @@
 import React, { Suspense, useContext, useMemo } from "react";
+import { useStreamingValue } from "suspense";
 
 import Loader from "replay-next/components/Loader";
 import SyntaxHighlightedLine from "replay-next/components/sources/SyntaxHighlightedLine";
-import { ParsedToken } from "replay-next/src/utils/syntax-parser";
 import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
+import { streamingSyntaxParsingCache } from "replay-next/src/suspense/SyntaxParsingCache";
+import { ParsedToken } from "replay-next/src/utils/syntax-parser";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
-import { streamingSyntaxParsingCache } from "replay-next/src/suspense/SyntaxParsingCache";
 
 import styles from "./BreakpointOptions.module.css";
-import { useStreamingValue } from "suspense";
 
 type BreakpointProps = {
   type: "breakpoint" | "logpoint";
@@ -22,12 +22,12 @@ function BreakpointLineContents({ breakpoint }: BreakpointProps) {
 
   // TODO use useStreamingValue() for this
   // once streamingSourceContentsCache has been migrated to "suspense"
-  const streamingSourceContents = streamingSourceContentsCache.read(replayClient,sourceId);
-  const parsedStream = streamingSyntaxParsingCache.stream(streamingSourceContents,null);
-  const {data, value}= useStreamingValue(parsedStream);
+  const streamingSourceContents = streamingSourceContentsCache.read(replayClient, sourceId);
+  const parsedStream = streamingSyntaxParsingCache.stream(streamingSourceContents, null);
+  const { data, value } = useStreamingValue(parsedStream);
 
   const parsedTokensByLine = value;
-  const rawTextByLine = data?.text;  
+  const rawTextByLine = data?.text;
 
   const { snippet, tokens } = useMemo((): { snippet: string; tokens: ParsedToken[] } => {
     const { column, line } = breakpoint.location;
