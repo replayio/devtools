@@ -1,5 +1,4 @@
 import classNames from "classnames";
-import React, { useState } from "react";
 import { Row, TableInstance } from "react-table";
 
 import { getLoadedRegions } from "ui/reducers/app";
@@ -42,7 +41,6 @@ const RequestTable = ({
     seek(request.point.point, request.point.time, true);
     onRowSelect(request);
   };
-
 
   let inPast = true;
 
