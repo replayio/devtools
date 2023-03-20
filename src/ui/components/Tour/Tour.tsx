@@ -65,7 +65,7 @@ const Tour: React.FC = () => {
     <div className={styles.TourBoxWrapper}>
       <div className={styles.TourBoxGradient}>
         <div className={styles.TourBox}>
-          <div className="p-3">
+          <div className="p-2 pt-3">
             {isNewUser ? (
               <div className={styles.intro}>
                 <p className={styles.h1}>Hello and welcome!</p>
@@ -139,9 +139,9 @@ const Tour: React.FC = () => {
                             dismissTourNag();
                           }, 2500);
                         }}
-                        className="hover:cursor-hand whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg"
+                        className="hover:cursor-hand whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg hover:bg-blue-50"
                       >
-                        Thanks, please dismiss!
+                        Thanks!
                       </a>
                       {showConfetti ? <Confetti /> : null}
                     </p>
@@ -152,9 +152,9 @@ const Tour: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="absolute bottom-28 p-2">
+      <div className="absolute bottom-28 p-3">
         {isNewUser && (
-          <div className="relative -bottom-2">
+          <div className="relative -bottom-3">
             <img src="/images/illustrations/larry_wave.png" className="z-1 w-full" />
           </div>
         )}
