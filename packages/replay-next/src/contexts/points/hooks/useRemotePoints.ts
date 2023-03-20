@@ -1,7 +1,7 @@
 import { RecordingId } from "@replayio/protocol";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
-import { getPointsAsync } from "replay-next/src/suspense/PointsCache";
+import { pointsCache } from "replay-next/src/suspense/PointsCache";
 import { Point } from "shared/client/types";
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 
@@ -20,7 +20,7 @@ export default function useRemotePoints({
 
   useEffect(() => {
     async function fetchRemotePoints() {
-      let points = await getPointsAsync(recordingId, graphQLClient, accessToken);
+      let points = await pointsCache.readAsync(graphQLClient, accessToken, recordingId);
 
       // Shared log points are the primary use case here.
       // Sharing points that are break-only causes a weird UX, so we filter them.

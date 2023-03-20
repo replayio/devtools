@@ -3,12 +3,7 @@ import cloneDeep from "lodash/cloneDeep";
 
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
-import {
-  evaluateAsync,
-  evaluateSuspense,
-  getPauseIdSuspense,
-} from "replay-next/src/suspense/PauseCache";
-import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
+import { pauseEvaluationsCache, pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { AnnotatedTestStep, TestMetadata } from "shared/graphql/types";
 import { gte } from "ui/utils/semver";
@@ -72,7 +67,7 @@ export async function getTestStepSourceLocationAsync(
     const annotation = isChaiAssertion ? step.annotations.start : step?.annotations.enqueue;
 
     if (annotation?.point && annotation.time != null) {
-      const pauseId = await getPauseIdAsync(client, annotation.point, annotation.time);
+      const pauseId = await pauseIdCache.readAsync(client, annotation.point, annotation.time);
       const frames = await framesCache.readAsync(client, pauseId);
 
       if (frames) {
@@ -102,17 +97,17 @@ export function getCypressConsolePropsSuspense(
     return;
   }
 
-  const endPauseId = getPauseIdSuspense(client, point, time);
+  const endPauseId = pauseIdCache.read(client, point, time);
   const frames = framesCache.read(client, endPauseId);
   const callerFrameId = frames?.[1]?.frameId;
 
   if (callerFrameId) {
-    const { returned: logResult } = evaluateSuspense(
+    const { returned: logResult } = pauseEvaluationsCache.read(
+      client,
       endPauseId,
       callerFrameId,
       logVariable,
-      undefined,
-      client
+      undefined
     );
 
     if (logResult?.object) {
@@ -160,19 +155,20 @@ export async function getCypressSubjectNodeIdsAsync(
   const { point, message, time } = step?.annotations.end || {};
 
   let nodeIds: string[] | undefined = undefined;
-  const pauseId = point && time != null ? await getPauseIdAsync(client, point, time) : undefined;
+  const pauseId =
+    point && time != null ? await pauseIdCache.readAsync(client, point, time) : undefined;
   const frames = pauseId ? await framesCache.readAsync(client, pauseId) : undefined;
 
   const callerFrameId = frames?.[1]?.frameId;
   const commandVariable = message?.commandVariable;
 
   if (pauseId && callerFrameId && commandVariable) {
-    const cmdResult = await evaluateAsync(
+    const cmdResult = await pauseEvaluationsCache.readAsync(
+      client,
       pauseId,
       callerFrameId,
       `${commandVariable}.get("subject")`,
-      undefined,
-      client
+      undefined
     );
 
     const cmdObjectId = cmdResult.returned?.object;

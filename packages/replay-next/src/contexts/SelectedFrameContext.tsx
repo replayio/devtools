@@ -18,7 +18,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegions } from "shared/utils/time";
 
 import useLoadedRegions from "../hooks/useRegions";
-import { getPauseIdAsync } from "../suspense/PauseCache";
+import { pauseIdCache } from "../suspense/PauseCache";
 import { TimelineContext } from "./TimelineContext";
 
 export interface PauseAndFrameId {
@@ -87,7 +87,7 @@ function DefaultSelectedFrameContextAdapter() {
     let cancelled = false;
 
     async function getData() {
-      const pauseId = await getPauseIdAsync(client, executionPoint, time);
+      const pauseId = await pauseIdCache.readAsync(client, executionPoint, time);
 
       // Edge case handle an update that rendered while we were awaiting data.
       // In the case we should skip any state update.

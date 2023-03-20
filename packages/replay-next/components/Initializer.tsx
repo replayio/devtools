@@ -13,7 +13,7 @@ import { UserInfo } from "shared/graphql/types";
 import { getCurrentUserInfo } from "shared/graphql/User";
 
 import { SessionContext, SessionContextType } from "../src/contexts/SessionContext";
-import { preCacheSources } from "../src/suspense/SourcesCache";
+import { sourcesCache } from "../src/suspense/SourcesCache";
 import Loader from "./Loader";
 import styles from "./Initializer.module.css";
 
@@ -65,7 +65,7 @@ export default function Initializer({
 
         // The demo doesn't use these directly, but the client throws if they aren't loaded.
         const sources = await client.findSources();
-        preCacheSources(sources);
+        sourcesCache.cache(sources, client);
 
         let currentUserInfo: UserInfo | null = null;
         if (activeAccessToken) {

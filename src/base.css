@@ -12,6 +12,8 @@ body {
 
 * {
   box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: transparent;
 }
 
 .showRedactions[data-private="true"] {

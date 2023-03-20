@@ -10,6 +10,10 @@
   flex-direction: column;
 }
 
+#inspector-sidebar .tabs {
+  height: 100%;
+}
+
 /* Hides the tab strip in the TabBar */
 div[hidetabs="true"] .tabs .tabs-navigation {
   display: none;

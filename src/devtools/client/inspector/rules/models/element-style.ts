@@ -9,7 +9,7 @@ import Services from "devtools/shared/services";
 import { assert } from "protocol/utils";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
-import { getAppliedRulesAsync } from "ui/suspense/styleCaches";
+import { appliedRulesCache } from "ui/suspense/styleCaches";
 
 import { RuleFront } from "./fronts/rule";
 import { StyleFront } from "./fronts/style";
@@ -92,12 +92,12 @@ export default class ElementStyle {
       return;
     }
 
-    const wiredRules = await getAppliedRulesAsync(
-      this.pauseId,
-      this.nodeId,
+    const wiredRules = await appliedRulesCache.readAsync(
       this.client,
       this.replayClient,
-      this.sessionId
+      this.sessionId,
+      this.pauseId,
+      this.nodeId
     );
 
     // Show rules applied to pseudo-elements first.
@@ -156,12 +156,12 @@ export default class ElementStyle {
           }
         }
 
-        const parentApplied = await getAppliedRulesAsync(
-          this.pauseId,
-          parentNodeId,
+        const parentApplied = await appliedRulesCache.readAsync(
           this.client,
           this.replayClient,
-          this.sessionId
+          this.sessionId,
+          this.pauseId,
+          parentNodeId
         );
 
         if (parentApplied === null) {

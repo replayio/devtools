@@ -22,7 +22,8 @@ import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { PointBehaviorsObject } from "replay-next/src/contexts/points/types";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { ParsedToken, StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
+import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
+import { ParsedToken } from "replay-next/src/utils/syntax-parser";
 import {
   LineNumberToHitCountMap,
   POINT_BEHAVIOR_DISABLED,
@@ -42,9 +43,9 @@ import styles from "./SourceListRow.module.css";
 
 // Primarily exists as a way for e2e tests to disable syntax highlighting
 // to simulate large files that aren't fully parsed.
-const syntaxHighlightingEnabled =
+const disableSyntaxHighlightingForTests =
   typeof window !== "undefined" &&
-  new URL(window?.location?.href).searchParams.get("disableSyntaxHighlighting") == null;
+  new URL(window?.location?.href).searchParams.get("disableSyntaxHighlighting") != null;
 
 export type ItemData = {
   breakablePositionsByLine: Map<number, SameLineSourceLocations>;
@@ -105,32 +106,41 @@ const SourceListRow = memo(
 
     const { sourceId } = source;
 
-    const parsedTokensByLine = useSyncExternalStore(
+    let tokens: ParsedToken[] | null = useSyncExternalStore(
       streamingParser.subscribe,
-      () => streamingParser.parsedTokensByLine,
-      () => streamingParser.parsedTokensByLine
+      () => streamingParser.value?.[index] ?? null,
+      () => streamingParser.value?.[index] ?? null
     );
 
-    const rawTextByLine = useSyncExternalStore(
+    const plainText = useSyncExternalStore(
       streamingParser.subscribe,
-      () => streamingParser.rawTextByLine,
-      () => streamingParser.rawTextByLine
+      () => streamingParser.data?.text[index] ?? null,
+      () => streamingParser.data?.text[index] ?? null
     );
+
+    let testStateContents = "loading";
+    if (tokens !== null) {
+      testStateContents = "parsed";
+    } else if (plainText !== null) {
+      testStateContents = "loaded";
+    }
+
+    if (disableSyntaxHighlightingForTests) {
+      tokens = null;
+    }
 
     const lineHitCounts = hitCounts?.get(lineNumber) || null;
+
+    let testStateHitCounts = "loading";
+    if (hitCounts !== null) {
+      testStateHitCounts = "loaded";
+    }
 
     const getDefaultLogPointContent = useGetDefaultLogPointContent({
       lineHitCounts,
       lineNumber,
       source,
     });
-
-    let tokens: ParsedToken[] | null = null;
-    if (syntaxHighlightingEnabled && index < parsedTokensByLine.length) {
-      tokens = parsedTokensByLine[index] ?? null;
-    }
-
-    const plainText = index < rawTextByLine.length ? rawTextByLine[index] : null;
 
     const pointForSuspense = findPointForLocation(pointsForSuspense, sourceId, lineNumber);
     const pointsForLine = findPointsForLocation(pointsForDefaultPriority, sourceId, lineNumber);
@@ -377,6 +387,8 @@ const SourceListRow = memo(
     return (
       <div
         className={styles.Row}
+        data-test-hit-counts-state={testStateHitCounts}
+        data-test-contents-state={testStateContents}
         data-test-id={`SourceLine-${lineNumber}`}
         data-test-name="SourceLine"
         onMouseEnter={onMouseEnter}
@@ -414,7 +426,7 @@ const SourceListRow = memo(
             </div>
           )}
 
-          <div className={styles.LineSegmentsAndPointPanel}>
+          <div className={styles.LineSegmentsAndPointPanel} data-test-name="SourceLine-Contents">
             {searchResultsForLine?.map((result, resultIndex) => (
               <SearchResultHighlight
                 breakableColumnIndices={breakableColumnIndices}

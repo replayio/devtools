@@ -56,7 +56,7 @@ export function NetworkEvent({ request }: { request: RequestSummary }) {
         title={pathname}
       >
         <span
-          className={classNames("mr-2 h-3 w-3 rounded-full", {
+          className={classNames("mr-1 h-3 w-3 rounded-full", {
             "bg-testsuitesErrorBgcolor": error,
             "bg-testsuitesSuccessColor": !!status && status < 400,
           })}

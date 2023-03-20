@@ -6,11 +6,16 @@ DevTools is a React app built with webpack. Here are the steps for getting start
 
 ```bash
 git clone git@github.com:RecordReplay/devtools.git
+
+nvm use
+
+cp .env.sample .env
+
 yarn install
 yarn dev
 ```
 
-Once you see `Compiled succesfully` in your terminal, open your browser and go to [this link](http://localhost:8080/recording/79f0cacd-727b-456d-8970-dbb4866ce6c7).
+Once you see `Compiled successfully` in your terminal, open your browser and go to [this link](http://localhost:8080/recording/79f0cacd-727b-456d-8970-dbb4866ce6c7).
 
 If you have questions, you can always ask in our [#development](https://discord.com/channels/779097926135054346/795692423513767956) Discord channel.
 

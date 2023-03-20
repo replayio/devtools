@@ -18,9 +18,9 @@ import {
   SourceSearchResult,
   StreamingSourceSearchResults,
   isSourceSearchResultLocation,
-  searchSourcesSuspense,
+  searchCache,
 } from "replay-next/src/suspense/SearchCache";
-import { getSourcesSuspense } from "replay-next/src/suspense/SourcesCache";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import ResultsListRow from "./ResultsListRow";
@@ -51,8 +51,8 @@ export default function ResultsList({
     return null;
   }
 
-  const streamingResults = searchSourcesSuspense(query, includeNodeModules, limit, client);
-  const sources = getSourcesSuspense(client);
+  const streamingResults = searchCache.read(client, query, includeNodeModules, limit);
+  const sources = sourcesCache.read(client);
 
   return (
     <StreamingResults

@@ -1,13 +1,11 @@
-import {
-  parsedTokensToHtml,
-  syntaxParsingCache,
-} from "replay-next/src/suspense/SyntaxParsingCache";
+import { parse } from "replay-next/src/suspense/SyntaxParsingCache";
+import { parsedTokensToHtml } from "replay-next/src/utils/syntax-parser";
 
 export default function getExpressionFromString(
   string: string,
   cursorIndex: number
 ): string | null {
-  let parsedTokensByLine = syntaxParsingCache.read(string, ".js");
+  let parsedTokensByLine = parse(string, ".js");
   if (parsedTokensByLine == null || parsedTokensByLine.length === 0) {
     return null;
   }
@@ -86,7 +84,7 @@ export default function getExpressionFromString(
     currentIndex++;
   }
 
-  parsedTokensByLine = syntaxParsingCache.read(expression, ".js");
+  parsedTokensByLine = parse(expression, ".js");
   if (parsedTokensByLine == null || parsedTokensByLine.length === 0) {
     return null;
   } else {

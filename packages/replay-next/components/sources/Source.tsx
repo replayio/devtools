@@ -6,7 +6,7 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import {
   StreamingSourceContents,
-  getStreamingSourceContentsSuspense,
+  streamingSourceContentsCache,
 } from "replay-next/src/suspense/SourcesCache";
 import {
   StreamingParser,
@@ -58,13 +58,13 @@ function SourceLoader({
 }) {
   const client = useContext(ReplayClientContext);
 
-  const streamingSourceContents = getStreamingSourceContentsSuspense(client, source.sourceId);
+  const streamingSourceContents = streamingSourceContentsCache.read(client, source.sourceId);
   if (source === null) {
     return null;
   }
 
   const fileName = getSourceFileName(source);
-  const streamingParser = streamingSyntaxParsingCache.read(streamingSourceContents, fileName);
+  const streamingParser = streamingSyntaxParsingCache.stream(streamingSourceContents, fileName);
   if (streamingParser === null) {
     return null;
   }
@@ -149,12 +149,16 @@ function SourceRenderer({
     setHoveredState(null);
   };
 
+  // TODO Once source and syntax parsing caches have been converted to "suspense" package
+  // we can replace data-test-num-lines attribute with data-test-state="loading" | "loaded" | "parsed"
+  // This will simplify e2e test logic
   return (
     <div
       className={styles.Source}
       data-test-id={`Source-${source.sourceId}`}
-      data-test-source-id={source.sourceId}
       data-test-name="Source"
+      data-test-num-lines={streamingSourceContents.lineCount}
+      data-test-source-id={source.sourceId}
       onMouseEnter={trackMouseHover}
     >
       <div className={styles.SourceList} onMouseMove={onMouseMove} ref={sourceRef}>

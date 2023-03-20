@@ -4,8 +4,8 @@ import sortBy from "lodash/sortBy";
 
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
+import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { mappedLocationCache } from "replay-next/src/suspense/MappedLocationCache";
-import { getBreakpointPositionsSuspense } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 import {
   SourceDetails,
@@ -195,9 +195,9 @@ function getAlternateSourceIdForPositionSuspense(
   position: CursorPosition,
   sourcesById: Dictionary<SourceDetails>
 ) {
-  const [breakablePositions, breakablePositionsByLine] = getBreakpointPositionsSuspense(
-    source.id,
-    client
+  const [breakablePositions, breakablePositionsByLine] = breakpointPositionsCache.read(
+    client,
+    source.id
   );
 
   // We want to find the first breakable line starting from the given cursor location,

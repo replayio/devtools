@@ -51,7 +51,7 @@ import { ThreadFront } from "protocol/thread";
 import { RecordingCapabilities } from "protocol/thread/thread";
 import { binarySearch, compareNumericStrings, defer, waitForTime } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
-import { getBreakpointPositionsAsync } from "replay-next/src/suspense/SourcesCache";
+import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { areRangesEqual } from "replay-next/src/utils/time";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { isPointInRegions, isRangeInRegions, isTimeInRegions } from "shared/utils/time";
@@ -775,7 +775,9 @@ export class ReplayClient implements ReplayClientInterface {
       if (location) {
         locations = this.getCorrespondingLocations(location).map(location => ({ location }));
         await Promise.all(
-          locations.map(location => getBreakpointPositionsAsync(location.location.sourceId, this))
+          locations.map(location =>
+            breakpointPositionsCache.readAsync(this, location.location.sourceId)
+          )
         );
       }
 
