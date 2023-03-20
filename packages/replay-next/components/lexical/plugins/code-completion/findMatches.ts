@@ -9,9 +9,9 @@ import {
 
 import { getPauseAndFrameIdSuspends } from "replay-next/components/sources/utils/getPauseAndFrameId";
 import { getFrameSuspense } from "replay-next/src/suspense/FrameCache";
-import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
-import { evaluateSuspense } from "replay-next/src/suspense/PauseCache";
-import { getFrameScopesSuspense } from "replay-next/src/suspense/ScopeCache";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
+import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
+import { frameScopesCache } from "replay-next/src/suspense/ScopeCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 import findMatchingScopesAndProperties from "./findMatchingScopesAndProperties";
@@ -89,7 +89,7 @@ function fetchQueryData(
   if (frameId && pauseId) {
     frame = getFrameSuspense(replayClient, pauseId, frameId);
 
-    const data = getFrameScopesSuspense(pauseId, frameId, replayClient);
+    const data = frameScopesCache.read(replayClient, pauseId, frameId);
     generatedScopes = data.generatedScopes;
 
     switch (context) {
@@ -110,14 +110,19 @@ function fetchQueryData(
   if (pauseId) {
     if (queryScope) {
       // Evaluate the properties of an object (queryScope)
-      const maybeObjectId = evaluateSuspense(pauseId, frameId, queryScope, undefined, replayClient)
-        ?.returned?.object;
+      const maybeObjectId = pauseEvaluationsCache.read(
+        replayClient,
+        pauseId,
+        frameId,
+        queryScope,
+        undefined
+      )?.returned?.object;
       if (maybeObjectId) {
-        const { preview } = getObjectWithPreviewSuspense(
+        const { preview } = objectCache.read(
           replayClient,
           pauseId,
           maybeObjectId,
-          !PREVIEW_CAN_OVERFLOW
+          PREVIEW_CAN_OVERFLOW ? "canOverflow" : "full"
         );
 
         properties =
@@ -131,11 +136,11 @@ function fetchQueryData(
         let currentPrototypeId = preview?.prototypeId;
         let depth = 0;
         while (currentPrototypeId && depth < MAX_PROTOTYPE_DEPTH) {
-          const { preview: prototypePreview } = getObjectWithPreviewSuspense(
+          const { preview: prototypePreview } = objectCache.read(
             replayClient,
             pauseId,
             currentPrototypeId,
-            !PREVIEW_CAN_OVERFLOW
+            PREVIEW_CAN_OVERFLOW ? "canOverflow" : "full"
           );
 
           const weightedProperties: WeightedProperty[] =
@@ -175,11 +180,11 @@ function fetchQueryData(
       if (generatedScopes && generatedScopes.length > 0) {
         const globalScope = generatedScopes.find(scope => scope.type === "global");
         if (globalScope?.object) {
-          const { preview } = getObjectWithPreviewSuspense(
+          const { preview } = objectCache.read(
             replayClient,
             pauseId,
             globalScope.object,
-            !PREVIEW_CAN_OVERFLOW
+            PREVIEW_CAN_OVERFLOW ? "canOverflow" : "full"
           );
           if (preview?.properties) {
             properties = properties.concat(

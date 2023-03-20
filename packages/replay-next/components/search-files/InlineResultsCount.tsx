@@ -1,10 +1,7 @@
 import { useContext, useSyncExternalStore } from "react";
 
 import Icon from "replay-next/components/Icon";
-import {
-  StreamingSourceSearchResults,
-  searchSourcesSuspense,
-} from "replay-next/src/suspense/SearchCache";
+import { StreamingSourceSearchResults, searchCache } from "replay-next/src/suspense/SearchCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import styles from "./InlineResultsCount.module.css";
@@ -26,7 +23,7 @@ export default function InlineResultsCount({
     return null;
   }
 
-  const streamingResults = searchSourcesSuspense(query, includeNodeModules, limit, client);
+  const streamingResults = searchCache.read(client, query, includeNodeModules, limit);
 
   return <StreamingInlineResultsCount isPending={isPending} streamingResults={streamingResults} />;
 }

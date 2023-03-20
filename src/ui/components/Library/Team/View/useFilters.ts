@@ -45,7 +45,6 @@ export function encodeFilter(str: string) {
       } else {
         const nextWord = peekNextWord(str);
         // const [nextWord] = str.match(/^(\w+)/) || [];
-        console.log(`nw`, str, nextWord);
         encodedStr += nextWord;
         str = str.substring(nextWord.length);
       }

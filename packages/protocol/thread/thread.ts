@@ -9,7 +9,6 @@
 
 import {
   Annotation,
-  BreakpointId,
   ExecutionPoint,
   Frame,
   FrameId,
@@ -21,7 +20,6 @@ import {
   RecordingId,
   RequestEventInfo,
   RequestInfo,
-  SameLineSourceLocations,
   ScreenShot,
   SessionId,
   SourceId,
@@ -36,16 +34,11 @@ import {
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
-import {
-  cachePauseData,
-  getPauseIdForExecutionPointIfCached,
-} from "replay-next/src/suspense/PauseCache";
-import { getPauseIdAsync } from "replay-next/src/suspense/PauseCache";
+import { cachePauseData, pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { areRangesEqual } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import type { Features } from "ui/utils/prefs";
 
-import { MappedLocationCache } from "../mapped-location-cache";
 import { client } from "../socket";
 import { EventEmitter, assert, defer, locationsInclude } from "../utils";
 
@@ -139,10 +132,6 @@ export function setRepaintAfterEvaluationsExperimentalFlag(value: boolean): void
 
 type LoadedRegionListener = (loadedRegions: LoadedRegions) => void;
 class _ThreadFront {
-  // When replaying there is only a single thread currently. Use this thread ID
-  // everywhere needed throughout the devtools client.
-  actor: string = "MainThreadId";
-
   currentPoint: ExecutionPoint = "0";
   currentTime: number = 0;
   private currentPauseId: PauseId | null = null;
@@ -158,44 +147,23 @@ class _ThreadFront {
   recordingCapabilitiesWaiter = defer<RecordingCapabilities>();
   recordingTargetWaiter = defer<RecordingTarget>();
 
-  // Waiter which resolves when the debugger has loaded and we've warped to the endpoint.
-  initializedWaiter = defer<void>();
-
-  // Waiter which resolves when there is at least one loading region
-  loadingHasBegun = defer<void>();
-
   initialFocusRegionWaiter = defer<TimeStampedPointRange>();
 
   // Waiter which resolves when all sources have been loaded.
   private allSourcesWaiter = defer<void>();
-  hasAllSources = false;
 
-  // The following group fo methods is injected by the legacy devtools client.
+  // The following group of methods is injected by the legacy devtools client.
   // By default, they are essentially no-ops (safe to call but useless).
   // They require information from the application's Redux state to be useful.
   getCorrespondingSourceIds = (sourceId: SourceId) => [sourceId];
   isOriginalSource = (_: SourceId) => false;
   isPrettyPrintedSource = (_: SourceId) => false;
 
-  // Map sourceId to breakpoint positions.
-  breakpointPositions = new Map<string, Promise<SameLineSourceLocations[]>>();
-
-  mappedLocations = new MappedLocationCache();
-
   // Points which will be reached when stepping in various directions from a point.
   resumeTargets = new Map<string, PauseDescription>();
 
   // Epoch which invalidates step targets when advanced.
   resumeTargetEpoch = 0;
-
-  // How many in flight commands can change resume targets we get from the server.
-  numPendingInvalidateCommands = 0;
-
-  // Resolve hooks for promises waiting for pending invalidate commands to finish. wai
-  invalidateCommandWaiters: (() => void)[] = [];
-
-  // Map breakpointId to information about the breakpoint, for all installed breakpoints.
-  breakpoints = new Map<BreakpointId, { location: Location }>();
 
   // Wait for all the annotations in the recording.
   private annotationWaiters: Map<string, Promise<findAnnotationsResult>> = new Map();
@@ -229,14 +197,16 @@ class _ThreadFront {
    */
   get currentPauseIdUnsafe() {
     return (
-      this.currentPauseId ?? getPauseIdForExecutionPointIfCached(this.currentPoint)?.value ?? null
+      this.currentPauseId ??
+      pauseIdCache.getValueIfCached(null as any, this.currentPoint, this.currentTime) ??
+      null
     );
   }
 
   async getCurrentPauseId(replayClient: ReplayClientInterface): Promise<PauseId> {
     return (
       this.currentPauseId ??
-      (await getPauseIdAsync(replayClient, this.currentPoint, this.currentTime))
+      (await pauseIdCache.readAsync(replayClient, this.currentPoint, this.currentTime))
     );
   }
 
@@ -322,8 +292,6 @@ class _ThreadFront {
 
       client.Session.addLoadedRegionsListener((loadedRegions: LoadedRegions) => {
         this._mostRecentLoadedRegions = loadedRegions;
-
-        this.loadingHasBegun.resolve();
 
         if (areRangesEqual(loadedRegions.indexed, loadedRegions.loading)) {
           assert(
@@ -536,10 +504,6 @@ class _ThreadFront {
       locationsToSkip,
     }: ResumeOperationParams
   ) {
-    // Don't allow resumes until we've finished loading and did the initial
-    // warp to the endpoint.
-    await this.initializedWaiter.promise;
-
     this.emit("resumed");
 
     const point = selectedPoint || this.currentPoint;

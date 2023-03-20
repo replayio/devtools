@@ -1,9 +1,6 @@
 import { Value as ProtocolValue } from "@replayio/protocol";
 
-import {
-  getObjectThrows,
-  getObjectWithPreviewHelper,
-} from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { protocolValueToClientValue } from "replay-next/src/utils/protocol";
 import { ReplayClientInterface } from "shared/client/types";
 
@@ -28,13 +25,13 @@ export async function loadObjectProperties(
   pauseId: string,
   objectId: string
 ) {
-  const obj = await getObjectWithPreviewHelper(replayClient, pauseId, objectId, true);
+  const obj = await objectCache.readAsync(replayClient, pauseId, objectId, "full");
 
   const properties = obj.preview?.properties ?? [];
   const objectProperties = properties.filter(entry => "object" in entry) ?? [];
 
   const propertyPromises = objectProperties.map(prop =>
-    getObjectWithPreviewHelper(replayClient, pauseId, prop.object!)
+    objectCache.readAsync(replayClient, pauseId, prop.object!, "canOverflow")
   );
 
   await Promise.all(propertyPromises);
@@ -63,7 +60,12 @@ export async function getJSON(
     visitedObjectIds.add(clientObject.objectId!);
 
     await loadObjectProperties(replayClient, pauseId, clientObject.objectId!);
-    const obj = getObjectThrows(pauseId, clientObject.objectId!);
+    const obj = await objectCache.readAsync(
+      replayClient,
+      pauseId,
+      clientObject.objectId!,
+      "canOverflow"
+    );
 
     const properties = obj.preview?.properties ?? [];
 

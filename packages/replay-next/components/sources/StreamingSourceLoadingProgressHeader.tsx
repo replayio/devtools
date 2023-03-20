@@ -11,14 +11,14 @@ export default function StreamingSourceLoadingProgressHeader({
 }) {
   const rawTextPercentage = useSyncExternalStore(
     streamingParser.subscribe,
-    () => streamingParser.rawTextPercentage,
-    () => streamingParser.rawTextPercentage
+    () => streamingParser.data?.progress ?? 0,
+    () => streamingParser.data?.progress ?? 0
   );
 
   const parsedTokensPercentage = useSyncExternalStore(
     streamingParser.subscribe,
-    () => streamingParser.parsedTokensPercentage,
-    () => streamingParser.parsedTokensPercentage
+    () => streamingParser.progress ?? 0,
+    () => streamingParser.progress ?? 0
   );
 
   const loadedProgressBarWidth = Math.round(rawTextPercentage * 100);

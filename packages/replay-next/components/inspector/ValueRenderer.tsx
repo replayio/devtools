@@ -1,10 +1,7 @@
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import { FC, memo, useContext } from "react";
 
-import {
-  getCachedObject,
-  getObjectWithPreviewSuspense,
-} from "replay-next/src/suspense/ObjectPreviews";
+import { getCachedObject, objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useClientValue from "./useClientValue";
@@ -83,7 +80,7 @@ function ValueRenderer({
     // but this is how the old console works and each value renderer should be able to downgrade like this.
     const object =
       getCachedObject(pauseId, clientValue.objectId!) ||
-      getObjectWithPreviewSuspense(client, pauseId, clientValue.objectId!, noOverflow);
+      objectCache.read(client, pauseId, clientValue.objectId!, noOverflow ? "full" : "canOverflow");
 
     if (object == null) {
       throw Error(`Could not find object with ID "${clientValue.objectId}"`);

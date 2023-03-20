@@ -1,7 +1,4 @@
-import { newSource as ProtocolSource } from "@replayio/protocol";
 import memoize from "lodash/memoize";
-
-import { isIndexedSource } from "../suspense/SourcesCache";
 
 interface ParsedURL {
   hash: string;

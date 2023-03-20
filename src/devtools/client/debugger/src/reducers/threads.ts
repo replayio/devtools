@@ -4,8 +4,6 @@
 
 import type { AnyAction } from "@reduxjs/toolkit";
 
-import type { UIState } from "ui/state";
-
 import type { Thread } from "./types";
 
 export interface ThreadsState {

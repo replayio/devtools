@@ -10,7 +10,7 @@ import React, { Component, Suspense, useContext } from "react";
 import ReactTooltip from "react-tooltip";
 
 import { locationsInclude } from "protocol/utils";
-import { getFrameStepsSuspense } from "replay-next/src/suspense/FrameStepsCache";
+import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { actions } from "ui/actions";
 import {
@@ -230,7 +230,7 @@ function FrameTimeline() {
   const source = useAppSelector(getSelectedSource);
   const symbols = useAppSelector(state => (source ? getSymbols(state, source) : null));
   const frameSteps = selectedFrame
-    ? getFrameStepsSuspense(selectedFrame.pauseId, selectedFrame.protocolId, replayClient)
+    ? frameStepsCache.read(replayClient, selectedFrame.pauseId, selectedFrame.protocolId)
     : undefined;
   const dispatch = useAppDispatch();
 

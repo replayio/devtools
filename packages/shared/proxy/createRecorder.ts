@@ -1,5 +1,7 @@
+import { isPromiseLike } from "suspense";
+
 import { Entry, ParamCall } from "./types";
-import { findMatch, isIterator, isThennable } from "./utils";
+import { findMatch, isIterator } from "./utils";
 
 type Options<T> = {
   onAsyncRequestPending?: Function;
@@ -55,7 +57,7 @@ export default function createRecorder<T>(target: T, options?: Options<T>): [T, 
 
         // This gets filled in below
         result: null,
-        thennable: null,
+        thenable: null,
       };
 
       if (paramCalls !== null && paramCalls.length > 0) {
@@ -66,16 +68,16 @@ export default function createRecorder<T>(target: T, options?: Options<T>): [T, 
     }
 
     // Unwrap Promise values
-    if (isThennable(returnValue)) {
+    if (isPromiseLike(returnValue)) {
       entry.isAsync = true;
-      entry.thennable = returnValue;
+      entry.thenable = returnValue;
 
       onAsyncRequestPending();
 
-      const thennable = returnValue;
+      const thenable = returnValue;
 
-      returnValue = thennable.then((resolved: any) => {
-        if (thennable === entry.thennable) {
+      returnValue = thenable.then((resolved: any) => {
+        if (thenable === entry.thenable) {
           // Only the latest request should update the shared entry.
           // For multiple matching calls, the player should always return the latest value.
           entry.result = resolved;
@@ -102,7 +104,7 @@ export default function createRecorder<T>(target: T, options?: Options<T>): [T, 
       if (isGetter) {
         let returnValue = target[prop];
 
-        if (isThennable(returnValue)) {
+        if (isPromiseLike(returnValue)) {
           returnValue = returnValue.then(resolved => sanitizeResult(prop, resolved));
         } else {
           returnValue = sanitizeResult(prop, returnValue);
@@ -138,7 +140,7 @@ export default function createRecorder<T>(target: T, options?: Options<T>): [T, 
               ? (overrides as any)[prop](...args.concat(recorderAPI))
               : target[prop](...args);
 
-          if (isThennable(returnValue)) {
+          if (isPromiseLike(returnValue)) {
             returnValue = returnValue.then(resolved => sanitizeResult(prop, resolved));
           } else {
             returnValue = sanitizeResult(prop, returnValue);

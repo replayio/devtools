@@ -1,10 +1,7 @@
 import { Suspense } from "react";
 
-import {
-  ParsedToken,
-  parse,
-  parsedTokensToHtml,
-} from "replay-next/src/suspense/SyntaxParsingCache";
+import { parse } from "replay-next/src/suspense/SyntaxParsingCache";
+import { parsedTokensToHtml, ParsedToken } from "replay-next/src/utils/syntax-parser";
 
 import Loader from "../Loader";
 import styles from "./SyntaxHighlightedLine.module.css";

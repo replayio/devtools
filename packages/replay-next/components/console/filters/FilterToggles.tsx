@@ -1,5 +1,6 @@
 import camelCase from "lodash/camelCase";
 import React, { ReactNode, Suspense, useContext, useMemo } from "react";
+import { isPromiseLike } from "suspense";
 
 import { Badge, Checkbox } from "design";
 import Icon from "replay-next/components/Icon";
@@ -11,7 +12,6 @@ import { CategoryCounts, getMessagesSuspense } from "replay-next/src/suspense/Me
 import { getRecordingCapabilitiesSuspense } from "replay-next/src/suspense/RecordingCache";
 import { isInNodeModules } from "replay-next/src/utils/messages";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { isThennable } from "shared/proxy/utils";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import { toPointRange } from "shared/utils/time";
 
@@ -83,27 +83,21 @@ export default function FilterToggles() {
       <div className={styles.EmptySpaceFiller} />
       <hr className={styles.Divider} />
 
-      <div className="py-1">
-        <div>
-          <Toggle
-            afterContent={
-              <Suspense fallback={null}>
-                <NodeModulesCount />
-              </Suspense>
-            }
-            checked={showNodeModules}
-            label="Node modules"
-            onChange={showNodeModules => update({ showNodeModules })}
-          />
-        </div>
-        <div className="my-1">
-          <Toggle
-            checked={showTimestamps}
-            label="Timestamps"
-            onChange={showTimestamps => update({ showTimestamps })}
-          />
-        </div>
-      </div>
+      <Toggle
+        afterContent={
+          <Suspense fallback={null}>
+            <NodeModulesCount />
+          </Suspense>
+        }
+        checked={showNodeModules}
+        label="Node modules"
+        onChange={showNodeModules => update({ showNodeModules })}
+      />
+      <Toggle
+        checked={showTimestamps}
+        label="Timestamps"
+        onChange={showTimestamps => update({ showTimestamps })}
+      />
     </div>
   );
 }
@@ -191,7 +185,7 @@ function ExceptionsBadgeSuspends() {
   try {
     getExceptionPointsSuspense(replayClient, toPointRange(focusRange));
   } catch (errorOrPromise) {
-    if (isThennable(errorOrPromise)) {
+    if (isPromiseLike(errorOrPromise)) {
       throw errorOrPromise;
     }
 

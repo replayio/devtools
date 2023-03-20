@@ -8,14 +8,24 @@ import {
   Object as ProtocolObject,
   Scope,
 } from "@replayio/protocol";
+import {
+  PendingRecord,
+  Record,
+  assertPendingRecord,
+  createPendingRecord,
+  createResolvedRecord,
+  isPendingRecord,
+  isRejectedRecord,
+  isResolvedRecord,
+  updateRecordToResolved,
+} from "suspense";
 
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/analysisManager";
 import { ReplayClientInterface } from "shared/client/types";
 
-import { createWakeable } from "../utils/suspense";
+import { breakpointPositionsCache } from "./BreakpointPositionsCache";
 import { createGenericRangeCache } from "./createGenericRangeCache";
 import { cachePauseData } from "./PauseCache";
-import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Thennable } from "./types";
 
 export type RemoteAnalysisResult = {
   data: { frames: Frame[]; objects: ProtocolObject[]; scopes: Scope[] };
@@ -28,10 +38,10 @@ export type RemoteAnalysisResult = {
 
 export interface AnalysisCache<T extends { point: ExecutionPoint }> {
   getPointsSuspense(client: ReplayClientInterface, range: PointRange): T[];
-  getPointsAsync(client: ReplayClientInterface, range: PointRange): Thennable<T[]> | T[];
+  getPointsAsync(client: ReplayClientInterface, range: PointRange): PromiseLike<T[]> | T[];
   getCachedPoints(range: PointRange): T[];
   getResultSuspense(point: ExecutionPoint): RemoteAnalysisResult;
-  getResultAsync(point: ExecutionPoint): Thennable<RemoteAnalysisResult> | RemoteAnalysisResult;
+  getResultAsync(point: ExecutionPoint): PromiseLike<RemoteAnalysisResult> | RemoteAnalysisResult;
   getResultIfCached(point: ExecutionPoint): RemoteAnalysisResult | undefined;
 }
 
@@ -81,10 +91,23 @@ function createCache<T extends { point: ExecutionPoint }>(
     getCachedValues: getCachedPoints,
   } = createGenericRangeCache<T>(
     async (client, range, cacheValues, cacheError) => {
+      const locations = params.location
+        ? client.getCorrespondingLocations(params.location).map(location => ({
+            location,
+          }))
+        : undefined;
+      if (locations) {
+        await Promise.all(
+          locations.map(location =>
+            breakpointPositionsCache.readAsync(client, location.location.sourceId)
+          )
+        );
+      }
+
       let pointsCount = 0;
       await client.streamAnalysis(
         {
-          locations: params.location ? [{ location: params.location }] : undefined,
+          locations,
           eventHandlerEntryPoints: params.eventTypes?.map(eventType => ({ eventType })),
           exceptionPoints: params.exceptions,
           mapper: params.mapper,
@@ -98,18 +121,19 @@ function createCache<T extends { point: ExecutionPoint }>(
           },
           onResults: analysisEntries => {
             for (const analysisEntry of analysisEntries) {
-              const result = analysisEntry.value;
+              const result = analysisEntry.value as RemoteAnalysisResult;
               cachePauseData(client, result.pauseId, result.data);
               const record = results.get(result.point);
               if (record) {
-                record.value.resolve(result);
-                record.status = STATUS_RESOLVED;
-                record.value = result;
+                assertPendingRecord(record);
+
+                const { deferred } = (record as PendingRecord<RemoteAnalysisResult>).data;
+
+                updateRecordToResolved(record, result);
+
+                deferred.resolve(result);
               } else {
-                results.set(result.point, {
-                  status: STATUS_RESOLVED,
-                  value: result,
-                });
+                results.set(result.point, createResolvedRecord<RemoteAnalysisResult>(result));
               }
             }
           },
@@ -127,11 +151,8 @@ function createCache<T extends { point: ExecutionPoint }>(
   function getOrCreateRecord(point: ExecutionPoint) {
     let record = results.get(point);
     if (!record) {
-      const wakeable = createWakeable<RemoteAnalysisResult>("AnalysisCache.getResultSuspense");
-      record = {
-        status: STATUS_PENDING,
-        value: wakeable,
-      };
+      record = createPendingRecord<RemoteAnalysisResult>();
+
       results.set(point, record);
     }
     return record;
@@ -139,26 +160,30 @@ function createCache<T extends { point: ExecutionPoint }>(
 
   function getResultSuspense(point: ExecutionPoint) {
     const record = getOrCreateRecord(point);
-    if (record.status === STATUS_RESOLVED) {
-      return record.value;
-    } else {
-      throw record.value;
+    if (isPendingRecord(record)) {
+      throw record.data.deferred.promise;
+    } else if (isRejectedRecord(record)) {
+      throw record.data.error;
     }
+
+    return record.data.value as RemoteAnalysisResult;
   }
 
   function getResultAsync(point: ExecutionPoint) {
     const record = getOrCreateRecord(point);
-    if (record.status !== STATUS_REJECTED) {
-      return record.value;
-    } else {
-      throw record.value;
+    if (isPendingRecord(record)) {
+      return record.data.deferred.promise;
+    } else if (isRejectedRecord(record)) {
+      throw record.data.error;
     }
+
+    return record.data.value as RemoteAnalysisResult;
   }
 
   function getResultIfCached(point: ExecutionPoint) {
     const record = results.get(point);
-    if (record?.status === STATUS_RESOLVED) {
-      return record.value;
+    if (record && isResolvedRecord(record)) {
+      return record.data.value;
     }
   }
 

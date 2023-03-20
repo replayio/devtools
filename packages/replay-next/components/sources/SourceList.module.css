@@ -1,3 +1,7 @@
+.List {
+  overscroll-behavior: none;
+}
+
 .List > div {
   min-width: var(--longest-line-width);
 }

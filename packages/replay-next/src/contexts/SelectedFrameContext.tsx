@@ -13,12 +13,12 @@ import {
   useState,
 } from "react";
 
-import { getTopFrameAsync } from "replay-next/src/suspense/FrameCache";
+import { topFrameCache } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegions } from "shared/utils/time";
 
 import useLoadedRegions from "../hooks/useRegions";
-import { getPauseIdAsync } from "../suspense/PauseCache";
+import { pauseIdCache } from "../suspense/PauseCache";
 import { TimelineContext } from "./TimelineContext";
 
 export interface PauseAndFrameId {
@@ -87,7 +87,7 @@ function DefaultSelectedFrameContextAdapter() {
     let cancelled = false;
 
     async function getData() {
-      const pauseId = await getPauseIdAsync(client, executionPoint, time);
+      const pauseId = await pauseIdCache.readAsync(client, executionPoint, time);
 
       // Edge case handle an update that rendered while we were awaiting data.
       // In the case we should skip any state update.
@@ -98,7 +98,7 @@ function DefaultSelectedFrameContextAdapter() {
       // TODO
       // Select the top frame by default because the test harness doesn't have a Call Stack UI yet.
       // Note that in the main app, the `SelectedFrameContextAdapter` can pass in _any_ frame ID.
-      const frameId = (await getTopFrameAsync(pauseId, client))?.frameId;
+      const frameId = (await topFrameCache.readAsync(client, pauseId))?.frameId;
 
       const pauseAndFrameId = frameId ? { pauseId, frameId } : null;
       setSelectedPauseAndFrameId(prevPauseAndFrameId => {

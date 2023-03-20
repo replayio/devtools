@@ -4,7 +4,7 @@ import { Suspense, useContext } from "react";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/HitPointsCache";
-import { getSourceHitCountsSuspense } from "replay-next/src/suspense/SourcesCache";
+import { sourceHitCountsCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { selectors } from "ui/reducers";
 import { useAppSelector } from "ui/setup/hooks";
@@ -26,7 +26,7 @@ function PreviewMarkers() {
 
   let firstColumnWithHitCounts = null;
   if (focusedSourceId !== null && hoveredLineIndex !== null && visibleLines !== null) {
-    const hitCounts = getSourceHitCountsSuspense(
+    const hitCounts = sourceHitCountsCache.read(
       replayClient,
       focusedSourceId,
       visibleLines,

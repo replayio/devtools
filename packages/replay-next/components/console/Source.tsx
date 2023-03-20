@@ -2,7 +2,7 @@ import { Location as ProtocolLocation } from "@replayio/protocol";
 import { MouseEvent, useContext } from "react";
 
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
-import { getSource } from "replay-next/src/suspense/SourcesCache";
+import { getSourceSuspends } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import styles from "./Source.module.css";
@@ -22,7 +22,7 @@ export default function Source({
     return null;
   }
 
-  const source = getSource(client, location.sourceId);
+  const source = getSourceSuspends(client, location.sourceId);
   if (source == null) {
     return null;
   }

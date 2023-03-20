@@ -4,8 +4,6 @@ import differenceInMonths from "date-fns/differenceInMonths";
 import differenceInWeeks from "date-fns/differenceInWeeks";
 import differenceInYears from "date-fns/differenceInYears";
 
-import { Comment, Reply } from "ui/state/comments";
-
 export function formatRelativeTime(date: Date) {
   const minutes = differenceInMinutes(Date.now(), date);
   const days = differenceInCalendarDays(Date.now(), date);

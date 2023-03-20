@@ -2,7 +2,11 @@ import { useContext, useMemo, useState } from "react";
 
 import Icon from "replay-next/components/Icon";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { getSourcesToDisplay, isIndexedSource } from "replay-next/src/suspense/SourcesCache";
+import {
+  isIndexedSource,
+  shouldSourceBeDisplayed,
+  sourcesCache,
+} from "replay-next/src/suspense/SourcesCache";
 import { protocolSourcesToSourceTree } from "replay-next/src/utils/protocol";
 import { getSourceFileName } from "replay-next/src/utils/source";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -13,7 +17,7 @@ export default function SourceExplorer() {
   const client = useContext(ReplayClientContext);
   const { openSource } = useContext(SourcesContext);
 
-  const sources = getSourcesToDisplay(client);
+  const sources = sourcesCache.read(client).filter(shouldSourceBeDisplayed);
   const sourceTree = useMemo(() => protocolSourcesToSourceTree(sources), [sources]);
 
   // TODO Select on click, keyboard, expand/collapse folders

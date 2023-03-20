@@ -3,6 +3,7 @@ import { EventMethods, EventParams } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
 
 import { CommandRequest, CommandResponse } from "protocol/socket";
+import { getFeature } from "ui/hooks/settings";
 import { UIState } from "ui/state";
 import { features } from "ui/utils/prefs";
 
@@ -86,7 +87,7 @@ export const { errorReceived, eventReceived, requestSent, responseReceived } =
 export default protocolMessagesSlice.reducer;
 
 export const getProtocolEvents = (_state: UIState) => {
-  if (!features.logProtocolEvents) {
+  if (!getFeature("logProtocolEvents")) {
     console.log("protocol events are disabled");
   }
 

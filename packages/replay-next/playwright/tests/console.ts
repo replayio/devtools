@@ -1,5 +1,7 @@
 import { Page, expect, test } from "@playwright/test";
 
+import { toggleExpandable } from "replay-next/playwright/tests/utils/inspector";
+
 import {
   addTerminalExpression,
   getConsoleInput,
@@ -128,7 +130,10 @@ test("should expand and inspect arrays", async ({ page }) => {
 
   const outer = listItem.locator("[data-test-name=Expandable]", { hasText: "This is a warning" });
   const keyValue = outer.locator("[data-test-name=Expandable]", { hasText: "(3) [" });
-  await keyValue.click();
+  await toggleExpandable(page, {
+    expanded: true,
+    expandableLocator: keyValue,
+  });
   await takeScreenshot(page, listItem, "array-expanded");
 });
 
@@ -141,11 +146,17 @@ test("should expand and inspect objects", async ({ page }) => {
 
   const outer = listItem.locator("[data-test-name=Expandable]", { hasText: "This is an error" });
   const keyValue = outer.locator("[data-test-name=Expandable]", { hasText: "foo" });
-  await keyValue.click();
+  await toggleExpandable(page, {
+    expanded: true,
+    expandableLocator: keyValue,
+  });
   await takeScreenshot(page, listItem, "object-expanded");
 
   const nestedKeyValue = keyValue.locator("[data-test-name=Expandable]", { hasText: "foo" });
-  await nestedKeyValue.click();
+  await toggleExpandable(page, {
+    expanded: true,
+    expandableLocator: nestedKeyValue,
+  });
   await takeScreenshot(page, listItem, "nested-object-expanded");
 });
 

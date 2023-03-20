@@ -11,7 +11,7 @@ import { FC, Fragment, ReactNode, Suspense, useContext, useMemo } from "react";
 
 import Expandable from "replay-next/components/Expandable";
 import Loader from "replay-next/components/Loader";
-import { getObjectWithPreviewSuspense } from "replay-next/src/suspense/ObjectPreviews";
+import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { mergePropertiesAndGetterValues } from "replay-next/src/utils/protocol";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -40,7 +40,7 @@ export default function PropertiesRenderer({
   // If we have an ObjectPreview already, use it.
   // If we just have an Object, then Suspend while we fetch preview data.
   if (object.preview == null || object.preview.overflow) {
-    object = getObjectWithPreviewSuspense(client, pauseId, object.objectId, true);
+    object = objectCache.read(client, pauseId, object.objectId, "full");
   }
 
   const { className, objectId, preview } = object;
@@ -82,7 +82,7 @@ export default function PropertiesRenderer({
   const prototypeId = preview?.prototypeId ?? null;
   let prototype = null;
   if (prototypeId) {
-    prototype = getObjectWithPreviewSuspense(client, pauseId, prototypeId);
+    prototype = objectCache.read(client, pauseId, prototypeId, "canOverflow");
   }
 
   let EntriesRenderer: FC<EntriesRendererProps> = ContainerEntriesRenderer;

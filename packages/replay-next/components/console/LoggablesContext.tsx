@@ -14,11 +14,7 @@ import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { PointInstance } from "replay-next/src/contexts/points/types";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TerminalContext, TerminalExpression } from "replay-next/src/contexts/TerminalContext";
-import {
-  EventLog,
-  getEventPointsSuspense,
-  getInfallibleEventPointsSuspense,
-} from "replay-next/src/suspense/EventsCache";
+import { EventLog, getInfallibleEventPointsSuspense } from "replay-next/src/suspense/EventsCache";
 import {
   UncaughtException,
   getInfallibleExceptionPointsSuspense,
@@ -31,7 +27,6 @@ import { suspendInParallel } from "replay-next/src/utils/suspense";
 import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_ENABLED } from "shared/client/types";
-import { isThennable } from "shared/proxy/utils";
 import { toPointRange } from "shared/utils/time";
 
 export type Loggable =

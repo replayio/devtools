@@ -8,8 +8,7 @@ import debounce from "lodash/debounce";
 import React, { Component } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
-import { STATUS_RESOLVED } from "replay-next/src/suspense/createGenericCache";
-import { getSourceContentsStatus } from "replay-next/src/suspense/SourcesCache";
+import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
 import { setViewMode } from "ui/actions/layout";
 import { getViewMode } from "ui/reducers/layout";
 import {
@@ -45,7 +44,6 @@ import {
   formatSymbols,
   parseLineColumn,
 } from "../utils/quick-open";
-import { scrollList } from "../utils/result-list";
 import Modal from "./shared/Modal";
 import ResultList from "./shared/ResultList";
 import SearchInput from "./shared/SearchInput";
@@ -54,6 +52,10 @@ const maxResults = 100;
 
 const SIZE_BIG = { size: "big" };
 const SIZE_DEFAULT = {};
+
+export type SearchResultWithHighlighting = Omit<SearchResult, "title"> & {
+  title: string | JSX.Element;
+};
 
 function filter(values: SearchResult[], query: string) {
   const preparedQuery = fuzzyAldrin.prepareQuery(query);
@@ -74,6 +76,7 @@ interface QOMState {
 }
 
 export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
+  resultList = React.createRef<ResultList>();
   constructor(props: PropsFromRedux) {
     super(props);
 
@@ -95,12 +98,7 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
   componentDidUpdate(prevProps: PropsFromRedux) {
     const hasChanged = (field: keyof PropsFromRedux) => prevProps[field] !== this.props[field];
 
-    // TODO Replace use of string refs
-    // @ts-expect-error ignore refs
-    if (this.refs.resultList && this.refs.resultList.refs) {
-      // @ts-expect-error ignore refs
-      scrollList(this.refs.resultList.refs, this.state.selectedIndex);
-    }
+    this.resultList.current?.scrollList(this.state.selectedIndex);
 
     if (hasChanged("sourceCount")) {
       // If the source count has changed, we need to update the throttled
@@ -219,13 +217,13 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
 
   updateResults = this.getUpdateResultsCallback();
 
-  setModifier = (item: SearchResult) => {
+  setModifier = (item: SearchResultWithHighlighting) => {
     if (["@", "#", ":"].includes(item.id)) {
       this.props.setQuickOpenQuery(item.id);
     }
   };
 
-  selectResultItem = (e: any, item: SearchResult) => {
+  selectResultItem = (e: any, item: SearchResultWithHighlighting) => {
     if (item == null) {
       return;
     }
@@ -309,8 +307,14 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
     const { selectedSource, setQuickOpenQuery } = this.props;
     setQuickOpenQuery(e.target.value);
 
-    const selectedContentLoaded =
-      selectedSource && getSourceContentsStatus(selectedSource.id) === STATUS_RESOLVED;
+    let selectedContentLoaded = false;
+    if (selectedSource) {
+      const streaming = streamingSourceContentsCache.getValueIfCached(
+        null as any,
+        selectedSource.id
+      );
+      selectedContentLoaded = streaming?.complete === true;
+    }
     const noSource = !selectedSource || !selectedContentLoaded;
 
     if ((noSource && this.isFunctionQuery()) || this.isGotoQuery()) {
@@ -383,7 +387,7 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
     return <div dangerouslySetInnerHTML={{ __html: html }} />;
   }
 
-  highlightMatching = (query: string, results: SearchResult[]) => {
+  highlightMatching = (query: string, results: SearchResult[]): SearchResultWithHighlighting[] => {
     let newQuery = query;
     if (newQuery === "") {
       return results;
@@ -472,7 +476,7 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
             items={items}
             selected={selectedIndex}
             selectItem={this.selectResultItem}
-            ref="resultList"
+            ref={this.resultList}
             expanded={expanded}
             {...(this.isSourceSearch() ? SIZE_BIG : SIZE_DEFAULT)}
           />

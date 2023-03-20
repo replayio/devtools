@@ -5,7 +5,7 @@ import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import Inspector from "replay-next/components/inspector/Inspector";
 import ScopesInspector from "replay-next/components/inspector/ScopesInspector";
 import { getFrameSuspense } from "replay-next/src/suspense/FrameCache";
-import { getFrameScopesSuspense } from "replay-next/src/suspense/ScopeCache";
+import { frameScopesCache } from "replay-next/src/suspense/ScopeCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { enterFocusMode } from "ui/actions/timeline";
 import { Redacted } from "ui/components/Redacted";
@@ -48,7 +48,7 @@ function ScopesRenderer() {
   }
 
   const { scopes: protocolScopes, originalScopesUnavailable } = pickScopes(
-    getFrameScopesSuspense(selectedFrameId.pauseId, selectedFrameId.frameId, replayClient),
+    frameScopesCache.read(replayClient, selectedFrameId.pauseId, selectedFrameId.frameId),
     sourcesState.preferredGeneratedSources
   );
   const scopes = convertScopes(protocolScopes, frame, selectedFrameId.pauseId);
