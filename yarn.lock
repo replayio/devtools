@@ -20314,15 +20314,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:0.0.0-experimental-49f741046-20230305":
-  version: 0.0.0-experimental-49f741046-20230305
-  resolution: "react-dom@npm:0.0.0-experimental-49f741046-20230305"
+"react-dom@https://pkg.csb.dev/facebook/react/commit/69adab62/react-dom/_pkg.tgz":
+  version: 0.0.0-experimental-69adab621-20230321
+  resolution: "react-dom@https://pkg.csb.dev/facebook/react/commit/69adab62/react-dom/_pkg.tgz"
   dependencies:
     loose-envify: ^1.1.0
-    scheduler: 0.0.0-experimental-49f741046-20230305
+    scheduler: "https://pkg.csb.dev/facebook/react/commit/69adab62/scheduler"
   peerDependencies:
-    react: 0.0.0-experimental-49f741046-20230305
-  checksum: 49f59fad0f67ba1ce10a745a9a4e5a5bcb04936e46351e91b3f9768e5961563a72c942c0cdc4d89c2dc87384d9b722b8bf74ffc79a796ae2e51beab93f69ebd9
+    react: 0.0.0-experimental-69adab621-20230321
+  checksum: 478523f4358895a02aab2bf16ccc3dc3210c1e87ce4423868abaa02567955f7dc7e789a133943a7b9333e689ef1b22c4b434dfba93d1a2a9a185cdf382a402d8
   languageName: node
   linkType: hard
 
@@ -20586,12 +20586,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:0.0.0-experimental-49f741046-20230305":
-  version: 0.0.0-experimental-49f741046-20230305
-  resolution: "react@npm:0.0.0-experimental-49f741046-20230305"
+"react@https://pkg.csb.dev/facebook/react/commit/69adab62/react/_pkg.tgz":
+  version: 0.0.0-experimental-69adab621-20230321
+  resolution: "react@https://pkg.csb.dev/facebook/react/commit/69adab62/react/_pkg.tgz"
   dependencies:
     loose-envify: ^1.1.0
-  checksum: 4dd1591cc8c894e39d93c1242f27faf3fdebc149d27a7abdef4ea658e38ad68cae4a21a11c6aa4838cd0866aabb7a3f1edaa65eb3abd2dd7502857adf6201271
+  checksum: 102ea924a85bc5a7370eb33f20aeb52fc109cae4cc4bb73b69d7782e3b53af85bb2a79e578854b7bedd0ec4ad4e86dce4f612d24b97c41759569ea56e8eec540
   languageName: node
   linkType: hard
 
@@ -20893,12 +20893,12 @@ __metadata:
     prop-types: ^15.8.1
     protocol: "workspace:*"
     raw-loader: ^4.0.2
-    react: 0.0.0-experimental-49f741046-20230305
+    react: "https://pkg.csb.dev/facebook/react/commit/69adab62/react/_pkg.tgz"
     react-canvas-confetti: ^1.3.0
     react-circular-progressbar: ^2.0.4
     react-devtools-inline: ^4.24.5
     react-devtools-inline_4_18_0: "npm:react-devtools-inline@4.18.0"
-    react-dom: 0.0.0-experimental-49f741046-20230305
+    react-dom: "https://pkg.csb.dev/facebook/react/commit/69adab62/react-dom/_pkg.tgz"
     react-is: ^18.2.0
     react-json-tree: ^0.18.0
     react-json-view: 1.21.3
@@ -20914,6 +20914,7 @@ __metadata:
     reactjs-popup: ^2.0.5
     replay-next: "workspace:*"
     reselect: ^4.1.5
+    scheduler: "https://pkg.csb.dev/facebook/react/commit/69adab62/scheduler/_pkg.tgz"
     shared: "workspace:*"
     sharp: ^0.30.3
     slugify: ^1.6.5
@@ -21639,12 +21640,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"scheduler@npm:0.0.0-experimental-49f741046-20230305":
-  version: 0.0.0-experimental-49f741046-20230305
-  resolution: "scheduler@npm:0.0.0-experimental-49f741046-20230305"
+"scheduler@https://pkg.csb.dev/facebook/react/commit/69adab62/scheduler/_pkg.tgz":
+  version: 0.0.0-experimental-69adab621-20230321
+  resolution: "scheduler@https://pkg.csb.dev/facebook/react/commit/69adab62/scheduler/_pkg.tgz"
   dependencies:
     loose-envify: ^1.1.0
-  checksum: 1c8eafb273e53fffa660ab1134f3fbe2b3aca650bfd8932271f657d749e91c49bac1e501a345d50da1ddce4387b09fcf2c36ec2c31db2aef9bab7b9c8ba1ea7d
+  checksum: c16def193575adcc7722c986f3b9c9f71d5d8ba994b00a195be08c5f54eac56c376e48d9d5b83e123133c6473e94ab5cdef63c9ff50ae647d20bca0caeeb7bcd
   languageName: node
   linkType: hard
 
