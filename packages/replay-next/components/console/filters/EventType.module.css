@@ -40,9 +40,3 @@
   margin: 0 0.25rem;
   display: inline-block;
 }
-
-.ExceptionsErrorIcon {
-  color: var(--color-error);
-  height: 1rem;
-  width: 1rem;
-}

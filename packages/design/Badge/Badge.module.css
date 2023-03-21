@@ -5,3 +5,8 @@
   font-size: var(--font-size-small);
   background-color: var(--theme-menu-highlight);
 }
+
+.Badge[data-error] {
+  background-color: var(--background-color-error);
+  color: var(--color-error);
+}

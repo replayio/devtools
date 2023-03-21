@@ -58,7 +58,6 @@ export default function EventType({
   let showErrorBadge = false;
   let className = styles.EventType;
   switch (status) {
-    case STATUS_NOT_FOUND:
     case STATUS_PENDING:
       className = styles.EventTypePending;
       break;
@@ -77,7 +76,7 @@ export default function EventType({
 
   return (
     <label
-      className={disabled ? styles.EventTypeDisabled : styles.EventType}
+      className={className}
       data-test-id={`EventTypes-${event.type}`}
       data-test-name="EventTypeToggle"
       onClick={stopPropagation}
@@ -92,14 +91,10 @@ export default function EventType({
         )}
         <span>{event.label}</span>
       </span>
-      {showErrorBadge ? (
-        <span onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-          <Icon className={styles.ExceptionsErrorIcon} type="warning" />
-        </span>
-      ) : (
-        <Badge label={event.count} />
-      )}
-      {tooltip}
+      <span onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+        <Badge label={event.count} showErrorBadge={showErrorBadge} />
+      </span>
+      {showErrorBadge && tooltip}
     </label>
   );
 }
