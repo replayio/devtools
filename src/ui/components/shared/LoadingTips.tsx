@@ -48,13 +48,13 @@ export const LoadingTips: FC = () => {
   const currentTipIdx = Math.floor(seed * TIPS.length);
   const { title, description, icon: Icon } = TIPS[currentTipIdx];
   return (
-    <div className="h-32 w-96 space-y-8">
+    <div className="h-16 w-96 space-y-2">
       <div className="flex max-w-lg items-center space-x-4 rounded-lg bg-loadingBoxes px-8 py-4 align-middle text-bodyColor shadow-sm">
         <div className="h-16 w-16">
           <Icon />
         </div>
         <div className="flex flex-col space-y-2">
-          <div className="text-sm font-bold">{title}</div>
+          <div className="text-xs font-bold">{title}</div>
           <div className="text-xs">{description}</div>
         </div>
       </div>
