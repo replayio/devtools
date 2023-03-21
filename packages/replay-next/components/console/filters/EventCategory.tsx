@@ -8,13 +8,17 @@ import EventType from "./EventType";
 import styles from "./EventCategory.module.css";
 
 export default function EventCategory({
+  defaultOpen,
   disabled,
   eventCategory,
   filterByText,
+  onChange,
 }: {
+  defaultOpen: boolean;
   disabled: boolean;
   eventCategory: EventCategoryType;
   filterByText: string;
+  onChange: (open: boolean) => void;
 }) {
   const [eventsWithHits, totalHitCount] = useMemo(() => {
     let totalHitCount = 0;
@@ -71,6 +75,7 @@ export default function EventCategory({
     return (
       <Expandable
         children={eventsList}
+        defaultOpen={defaultOpen}
         headerClassName={styles.HeaderWrapper}
         header={
           <div
@@ -81,6 +86,7 @@ export default function EventCategory({
             <Badge label={totalHitCount} />
           </div>
         }
+        onChange={onChange}
       />
     );
   }

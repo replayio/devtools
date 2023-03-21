@@ -1,4 +1,12 @@
-import { ChangeEvent, Suspense, useContext, useMemo, useState, useTransition } from "react";
+import {
+  ChangeEvent,
+  Suspense,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
 
 import Loader from "replay-next/components/Loader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
@@ -73,24 +81,40 @@ function EventsListCategories({
     return [commonEventCategories, otherEventCategories];
   }, [eventCategoryCounts]);
 
+  const [eventCategoryExpandedState, setEventCategoryExpandedState] = useState<
+    Map<string, boolean>
+  >(new Map());
+
+  const toggleExpanded = useCallback((category: string, expanded: boolean) => {
+    setEventCategoryExpandedState(prevState => {
+      const cloned = new Map(prevState.entries());
+      cloned.set(category, expanded);
+      return cloned;
+    });
+  }, []);
+
   return (
     <>
       <div className={styles.Header}>Common Events</div>
       {commonEventCategories.map(eventCategory => (
         <EventCategory
           key={eventCategory.category}
+          defaultOpen={eventCategoryExpandedState.get(eventCategory.category) ?? false}
           disabled={isPending}
           eventCategory={eventCategory}
           filterByText={filterByText}
+          onChange={expanded => toggleExpanded(eventCategory.category, expanded)}
         />
       ))}
       <div className={styles.Header}>Other Events</div>
       {otherEventCategories.map(eventCategory => (
         <EventCategory
           key={eventCategory.category}
+          defaultOpen={eventCategoryExpandedState.get(eventCategory.category) ?? false}
           disabled={isPending}
           eventCategory={eventCategory}
           filterByText={filterByText}
+          onChange={expanded => toggleExpanded(eventCategory.category, expanded)}
         />
       ))}
     </>
