@@ -161,7 +161,7 @@ const baseNextConfig = {
       fs: false,
     };
 
-    const reLibrariesWithSourcemaps = /node_modules.+(immer|@reduxjs|react-window).+\.js$/;
+    const reLibrariesWithSourcemaps = /node_modules.+(immer|redux|react).+\.js$/;
 
     config.module.rules.push({
       test: reLibrariesWithSourcemaps,
