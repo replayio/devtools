@@ -146,8 +146,8 @@ export default function ExperimentalSettings({}) {
     update: updateDisableRecordingAssetsInDatabase,
   } = useFeature("disableRecordingAssetsInDatabase");
 
-  const { value: enableIncrementalSnapshots, update: updateEnableIncrementalSnapshots } = useFeature("enableIncrementalSnapshots");
- 
+  const { value: enableIncrementalSnapshots, update: updateEnableIncrementalSnapshots } =
+    useFeature("enableIncrementalSnapshots");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
