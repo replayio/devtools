@@ -210,6 +210,13 @@ export default function Toolbar() {
           />
         ) : null}
 
+        <ToolbarButton
+          icon="school"
+          name="assist"
+          label="Replay Assist"
+          onClick={handleButtonClick}
+        />
+
         {recording?.metadata?.test?.runner?.name == "cypress" ? (
           <ToolbarButton
             icon="cypress"

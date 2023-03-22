@@ -3,6 +3,7 @@ import { ConnectedProps, connect } from "react-redux";
 
 import * as actions from "ui/actions/app";
 import LoginButton from "ui/components/LoginButton";
+import ReplayAssistButton from "ui/components/ReplayAssistButton";
 import Dropdown from "ui/components/shared/Dropdown";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -13,9 +14,10 @@ import ExternalLink from "../shared/ExternalLink";
 
 interface UserOptionsProps extends PropsFromRedux {
   noBrowserItem?: boolean;
+  toggleReplayAssist: () => void;
 }
 
-function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
+function UserOptions({ setModal, noBrowserItem, toggleReplayAssist }: UserOptionsProps) {
   const [expanded, setExpanded] = useState(false);
   const { isAuthenticated } = useAuth0();
 
@@ -67,6 +69,8 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
             <span>Launch Replay</span>
           </button>
         )}
+        <ReplayAssistButton onToggleReplayAssist={toggleReplayAssist} />
+
         <LoginButton />
       </Dropdown>
     </div>

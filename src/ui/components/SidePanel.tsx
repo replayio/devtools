@@ -22,6 +22,7 @@ import { ViewMode } from "ui/state/layout";
 import { shouldShowTour } from "ui/utils/onboarding";
 import useAuth0 from "ui/utils/useAuth0";
 
+import Assist from "./Assist/Assist";
 import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
 import ProtocolViewer from "./ProtocolViewer";
@@ -136,6 +137,7 @@ export default function SidePanel() {
         {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}
         {selectedPrimaryPanel === "comments" && <CommentCardsList />}
         {selectedPrimaryPanel === "tour" && <Tour />}
+        {selectedPrimaryPanel === "assist" && <Assist />}
         {selectedPrimaryPanel === "events" && <EventsPane items={items} />}
         {selectedPrimaryPanel === "cypress" && <TestSuitePanel />}
         {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
