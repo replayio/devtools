@@ -7,6 +7,7 @@ import {
   useState,
   useTransition,
 } from "react";
+import { STATUS_RESOLVED, useCacheStatus } from "suspense";
 
 import Loader from "replay-next/components/Loader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
@@ -60,6 +61,9 @@ function EventsListCategories({
   const pointRange = range ? { begin: range.begin.point, end: range.end.point } : null;
   const eventCategoryCounts = eventCountsCache.read(client, pointRange);
 
+  const status = useCacheStatus(eventCountsCache, client, pointRange);
+  const disabled = isPending || status !== STATUS_RESOLVED;
+
   const [commonEventCategories, otherEventCategories] = useMemo<
     [EventCategoryType[], EventCategoryType[]]
   >(() => {
@@ -100,7 +104,7 @@ function EventsListCategories({
         <EventCategory
           key={eventCategory.category}
           defaultOpen={eventCategoryExpandedState.get(eventCategory.category) ?? false}
-          disabled={isPending}
+          disabled={disabled}
           eventCategory={eventCategory}
           filterByText={filterByText}
           onChange={expanded => toggleExpanded(eventCategory.category, expanded)}
@@ -111,7 +115,7 @@ function EventsListCategories({
         <EventCategory
           key={eventCategory.category}
           defaultOpen={eventCategoryExpandedState.get(eventCategory.category) ?? false}
-          disabled={isPending}
+          disabled={disabled}
           eventCategory={eventCategory}
           filterByText={filterByText}
           onChange={expanded => toggleExpanded(eventCategory.category, expanded)}
