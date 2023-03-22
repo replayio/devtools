@@ -1,5 +1,6 @@
 import React from "react";
 
+import { getFormattedTime } from "shared/utils/time";
 import { getNonLoadingTimeRanges } from "ui/reducers/app";
 import {
   getDisplayedFocusRegion,
@@ -9,14 +10,6 @@ import {
 } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
 import { getVisiblePosition } from "ui/utils/timeline";
-
-const getTimestamp = (time?: number) => {
-  const date = new Date(time || 0);
-  const seconds = date.getSeconds().toString().padStart(2, "0");
-  const minutes = date.getMinutes();
-
-  return `${minutes}:${seconds}`;
-};
 
 export default function Tooltip({ timelineWidth }: { timelineWidth: number }) {
   const hoverTime = useAppSelector(getHoverTime);
@@ -39,7 +32,7 @@ export default function Tooltip({ timelineWidth }: { timelineWidth: number }) {
     displayedFocusRegion &&
     (displayedFocusRegion.begin > hoverTime || displayedFocusRegion.end < hoverTime);
 
-  const timestamp = getTimestamp(hoverTime);
+  const timestamp = getFormattedTime(hoverTime);
   const message =
     isHoveredOnNonLoadingRegion || isHoveredOnUnFocusedRegion
       ? `${timestamp} (Unloaded)`
