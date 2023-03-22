@@ -6,10 +6,12 @@ import { Dictionary } from "@reduxjs/toolkit";
 import fuzzyAldrin from "fuzzaldrin-plus";
 import debounce from "lodash/debounce";
 import React, { Component } from "react";
-import { ConnectedProps, connect } from "react-redux";
+import { useImperativeCacheValue } from "suspense";
 
+import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
-import { setViewMode } from "ui/actions/layout";
+import { replayClient } from "shared/client/ReplayClientContext";
+import { setViewMode as setViewModeAction } from "ui/actions/layout";
 import { getViewMode } from "ui/reducers/layout";
 import {
   SourceDetails,
@@ -18,12 +20,18 @@ import {
   getSourcesLoading,
   getSourcesToDisplayByUrl,
 } from "ui/reducers/sources";
-import type { UIState } from "ui/state";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { ViewMode } from "ui/state/layout";
 import { trackEvent } from "ui/utils/telemetry";
 
 import actions from "../actions";
+import { PartialLocation } from "../actions/sources/select";
 import { getGlobalFunctions, isGlobalFunctionsLoading } from "../reducers/ast";
 import {
+  Context,
+  HighlightedRange,
+  SearchTypes,
+  Tab,
   getContext,
   getQuickOpenEnabled,
   getQuickOpenProject,
@@ -31,9 +39,7 @@ import {
   getQuickOpenType,
   getShowOnlyOpenSources,
   getSourcesForTabs,
-  getSymbols,
   getTabs,
-  isSymbolsLoading,
 } from "../selectors";
 import { memoizeLast } from "../utils/memoizeLast";
 import { basename } from "../utils/path";
@@ -68,16 +74,15 @@ function filter(values: SearchResult[], query: string) {
       })
     : values;
 }
-type PropsFromRedux = ConnectedProps<typeof connector>;
 
 interface QOMState {
   results: SearchResult[] | null;
   selectedIndex: number;
 }
 
-export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
+class QuickOpenModal extends Component<QuickOpenModalProps, QOMState> {
   resultList = React.createRef<ResultList>();
-  constructor(props: PropsFromRedux) {
+  constructor(props: QuickOpenModalProps) {
     super(props);
 
     this.state = {
@@ -95,8 +100,8 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
     this.setState({ results });
   }
 
-  componentDidUpdate(prevProps: PropsFromRedux) {
-    const hasChanged = (field: keyof PropsFromRedux) => prevProps[field] !== this.props[field];
+  componentDidUpdate(prevProps: QuickOpenModalProps) {
+    const hasChanged = (field: keyof QuickOpenModalProps) => prevProps[field] !== this.props[field];
 
     this.resultList.current?.scrollList(this.state.selectedIndex);
 
@@ -486,39 +491,68 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
   }
 }
 
-function mapStateToProps(state: UIState) {
-  const selectedSource = getSelectedSource(state)!;
-  const tabs = getTabs(state);
-  const sourceList = getAllSourceDetails(state);
-  const symbols = getSymbols(state, selectedSource);
-
-  return {
-    cx: getContext(state),
-    sourcesToDisplayByUrl: getSourcesToDisplayByUrl(state),
-    enabled: getQuickOpenEnabled(state),
-    globalFunctions: getGlobalFunctions(state) || [],
-    globalFunctionsLoading: isGlobalFunctionsLoading(state),
-    project: getQuickOpenProject(state),
-    query: getQuickOpenQuery(state),
-    searchType: getQuickOpenType(state),
-    selectedSource,
-    showOnlyOpenSources: getShowOnlyOpenSources(state),
-    sourcesForTabs: getSourcesForTabs(state),
-    sourceCount: sourceList.length,
-    sourcesLoading: getSourcesLoading(state),
-    symbols: formatSymbols(symbols),
-    symbolsLoading: isSymbolsLoading(state, selectedSource),
-    tabs,
-    viewMode: getViewMode(state),
-  };
+interface QuickOpenModalProps {
+  cx: Context;
+  enabled: boolean;
+  globalFunctions: SearchResult[];
+  globalFunctionsLoading: boolean;
+  project: boolean;
+  query: string;
+  searchType: SearchTypes;
+  selectedSource: SourceDetails | null | undefined;
+  showOnlyOpenSources: boolean;
+  sourceCount: number;
+  sourcesForTabs: SourceDetails[];
+  sourcesLoading: boolean;
+  sourcesToDisplayByUrl: ReturnType<typeof getSourcesToDisplayByUrl>;
+  symbols: ReturnType<typeof formatSymbols>;
+  symbolsLoading: boolean;
+  tabs: Tab[];
+  viewMode: ViewMode;
+  closeQuickOpen: () => unknown;
+  highlightLineRange: (range: HighlightedRange) => unknown;
+  selectLocation: (cx: Context, location: PartialLocation, openSource?: boolean) => unknown;
+  setQuickOpenQuery: (query: string) => unknown;
+  setViewMode: (viewMode: ViewMode) => unknown;
 }
 
-const connector = connect(mapStateToProps, {
-  closeQuickOpen: actions.closeQuickOpen,
-  highlightLineRange: actions.highlightLineRange,
-  selectLocation: actions.selectLocation,
-  setQuickOpenQuery: actions.setQuickOpenQuery,
-  setViewMode,
-});
+export default function QuickOpenModalWrapper() {
+  const sourceList = useAppSelector(getAllSourceDetails);
+  const selectedSource = useAppSelector(getSelectedSource);
+  const symbolsCacheValue = useImperativeCacheValue(
+    sourceOutlineCache,
+    replayClient,
+    selectedSource?.id
+  );
+  const dispatch = useAppDispatch();
+  const props: QuickOpenModalProps = {
+    cx: useAppSelector(getContext),
+    enabled: useAppSelector(getQuickOpenEnabled),
+    globalFunctions: useAppSelector(getGlobalFunctions) || [],
+    globalFunctionsLoading: useAppSelector(isGlobalFunctionsLoading),
+    project: useAppSelector(getQuickOpenProject),
+    query: useAppSelector(getQuickOpenQuery),
+    searchType: useAppSelector(getQuickOpenType),
+    selectedSource,
+    showOnlyOpenSources: useAppSelector(getShowOnlyOpenSources),
+    sourceCount: sourceList.length,
+    sourcesForTabs: useAppSelector(getSourcesForTabs),
+    sourcesLoading: useAppSelector(getSourcesLoading),
+    sourcesToDisplayByUrl: useAppSelector(getSourcesToDisplayByUrl),
+    symbols:
+      symbolsCacheValue.status === "resolved"
+        ? formatSymbols(symbolsCacheValue.value)
+        : { functions: [] },
+    symbolsLoading: symbolsCacheValue.status !== "resolved",
+    tabs: useAppSelector(getTabs),
+    viewMode: useAppSelector(getViewMode),
+    closeQuickOpen: () => dispatch(actions.closeQuickOpen()),
+    highlightLineRange: (range: HighlightedRange) => dispatch(actions.highlightLineRange(range)),
+    selectLocation: (cx: Context, location: PartialLocation, openSource?: boolean) =>
+      dispatch(actions.selectLocation(cx, location, openSource)),
+    setQuickOpenQuery: (query: string) => dispatch(actions.setQuickOpenQuery(query)),
+    setViewMode: (viewMode: ViewMode) => dispatch(setViewModeAction(viewMode)),
+  };
 
-export default connector(QuickOpenModal);
+  return <QuickOpenModal {...props} />;
+}
