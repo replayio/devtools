@@ -130,5 +130,5 @@ function transformPoint(point: PointDescription, eventType: EventHandlerType): E
 }
 
 export const getInfallibleEventPointsSuspense = createInfallibleSuspenseCache(
-  eventsCache.pointsCache.read
+  eventsCache.pointsIntervalCache.read
 );
