@@ -7,19 +7,7 @@ import {
   Object as ProtocolObject,
   Scope,
 } from "@replayio/protocol";
-import {
-  IntervalCache,
-  PendingRecord,
-  Record,
-  assertPendingRecord,
-  createIntervalCache,
-  createPendingRecord,
-  createResolvedRecord,
-  isPendingRecord,
-  isRejectedRecord,
-  isResolvedRecord,
-  updateRecordToResolved,
-} from "suspense";
+import { Cache, IntervalCache, createExternallyManagedCache, createIntervalCache } from "suspense";
 
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/analysisManager";
 import { compareNumericStrings } from "protocol/utils";
@@ -38,17 +26,12 @@ export type RemoteAnalysisResult = {
 };
 
 export interface AnalysisCache<T extends { point: ExecutionPoint }, TParams extends any[]> {
-  pointsCache: IntervalCache<
+  pointsIntervalCache: IntervalCache<
     ExecutionPoint,
     [client: ReplayClientInterface, ...params: TParams],
     T
   >;
-  getResultSuspense(point: ExecutionPoint, ...params: TParams): RemoteAnalysisResult;
-  getResultAsync(
-    point: ExecutionPoint,
-    ...params: TParams
-  ): PromiseLike<RemoteAnalysisResult> | RemoteAnalysisResult;
-  getResultIfCached(point: ExecutionPoint, ...params: TParams): RemoteAnalysisResult | undefined;
+  resultsCache: Cache<[executionPoint: ExecutionPoint, ...params: TParams], RemoteAnalysisResult>;
 }
 
 export interface AnalysisParams {
@@ -72,15 +55,6 @@ function getCacheKey(params: AnalysisParams) {
   return cacheKey + params.mapper;
 }
 
-const analysisResultsCaches = new Map<string, Map<ExecutionPoint, Record<RemoteAnalysisResult>>>();
-function getAnalysisResultsCache(params: AnalysisParams) {
-  const key = getCacheKey(params);
-  if (!analysisResultsCaches.has(key)) {
-    analysisResultsCaches.set(key, new Map<ExecutionPoint, Record<RemoteAnalysisResult>>());
-  }
-  return analysisResultsCaches.get(key)!;
-}
-
 export function createAnalysisCache<
   TPoint extends { point: ExecutionPoint },
   TParams extends any[]
@@ -89,19 +63,30 @@ export function createAnalysisCache<
   createAnalysisParams: (...params: TParams) => AnalysisParams,
   transformPoint: (point: PointDescription, ...params: TParams) => TPoint
 ): AnalysisCache<TPoint, TParams> {
-  const pointsCache = createIntervalCache<
+  const resultsCache: Cache<
+    [executionPoint: ExecutionPoint, ...params: TParams],
+    RemoteAnalysisResult
+  > = createExternallyManagedCache({
+    debugLabel: `${debugLabel} Cache`,
+    getKey: ([executionPoint, ...params]) => {
+      const analysisParams = createAnalysisParams(...params);
+      const baseKey = getCacheKey(analysisParams);
+      return `${baseKey}:${executionPoint}`;
+    },
+  });
+
+  const pointsIntervalCache = createIntervalCache<
     ExecutionPoint,
     [client: ReplayClientInterface, ...params: TParams],
     TPoint
   >({
-    debugLabel,
+    debugLabel: `${debugLabel} IntervalCache`,
     getKey: (client, ...params) => getCacheKey(createAnalysisParams(...params)),
     getPointForValue: pointDescription => pointDescription.point,
     comparePoints: compareNumericStrings,
     load: async (begin, end, client, ...paramsWithCacheLoadOptions) => {
       const params = paramsWithCacheLoadOptions.slice(0, -1) as TParams;
       const analysisParams = createAnalysisParams(...params);
-      const results = getAnalysisResultsCache(analysisParams);
       const locations = analysisParams.location
         ? client.getCorrespondingLocations(analysisParams.location).map(location => ({
             location,
@@ -134,18 +119,8 @@ export function createAnalysisCache<
             for (const analysisEntry of analysisEntries) {
               const result = analysisEntry.value as RemoteAnalysisResult;
               cachePauseData(client, result.pauseId, result.data);
-              const record = results.get(result.point);
-              if (record) {
-                assertPendingRecord(record);
 
-                const { deferred } = (record as PendingRecord<RemoteAnalysisResult>).data;
-
-                updateRecordToResolved(record, result);
-
-                deferred.resolve(result);
-              } else {
-                results.set(result.point, createResolvedRecord<RemoteAnalysisResult>(result));
-              }
+              resultsCache.cache(result, result.point, ...params);
             }
           },
           onError: err => (error = err),
@@ -162,51 +137,8 @@ export function createAnalysisCache<
     },
   });
 
-  function getOrCreateRecord(params: AnalysisParams, point: ExecutionPoint) {
-    const results = getAnalysisResultsCache(params);
-    let record = results.get(point);
-    if (!record) {
-      record = createPendingRecord<RemoteAnalysisResult>();
-
-      results.set(point, record);
-    }
-    return record;
-  }
-
-  function getResultSuspense(point: ExecutionPoint, ...params: TParams) {
-    const record = getOrCreateRecord(createAnalysisParams(...params), point);
-    if (isPendingRecord(record)) {
-      throw record.data.deferred.promise;
-    } else if (isRejectedRecord(record)) {
-      throw record.data.error;
-    }
-
-    return record.data.value as RemoteAnalysisResult;
-  }
-
-  function getResultAsync(point: ExecutionPoint, ...params: TParams) {
-    const record = getOrCreateRecord(createAnalysisParams(...params), point);
-    if (isPendingRecord(record)) {
-      return record.data.deferred.promise;
-    } else if (isRejectedRecord(record)) {
-      throw record.data.error;
-    }
-
-    return record.data.value as RemoteAnalysisResult;
-  }
-
-  function getResultIfCached(point: ExecutionPoint, ...params: TParams) {
-    const results = getAnalysisResultsCache(createAnalysisParams(...params));
-    const record = results.get(point);
-    if (record && isResolvedRecord(record)) {
-      return record.data.value;
-    }
-  }
-
   return {
-    pointsCache,
-    getResultSuspense,
-    getResultAsync,
-    getResultIfCached,
+    pointsIntervalCache,
+    resultsCache,
   };
 }

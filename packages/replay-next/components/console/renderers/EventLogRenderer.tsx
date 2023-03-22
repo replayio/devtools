@@ -94,7 +94,7 @@ function EventLogRenderer({
 function AnalyzedContent({ eventLog }: { eventLog: EventLog }) {
   const { showTimestamps } = useContext(ConsoleFiltersContext);
 
-  const { pauseId, values } = eventsCache.getResultSuspense(eventLog.point, eventLog.eventType);
+  const { pauseId, values } = eventsCache.resultsCache.read(eventLog.point, eventLog.eventType);
 
   const content =
     values.length > 0

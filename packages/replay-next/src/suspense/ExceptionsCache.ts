@@ -70,5 +70,5 @@ function transformPoint(pointDescription: PointDescription): UncaughtException {
 }
 
 export const getInfallibleExceptionPointsSuspense = createInfallibleSuspenseCache(
-  exceptionsCache.pointsCache.read
+  exceptionsCache.pointsIntervalCache.read
 );

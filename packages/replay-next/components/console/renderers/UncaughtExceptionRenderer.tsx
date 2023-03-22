@@ -96,7 +96,7 @@ function UncaughtExceptionRenderer({
 }
 
 function AnalyzedContent({ uncaughtException }: { uncaughtException: UncaughtException }) {
-  const uncaughtExceptionResult = exceptionsCache.getResultSuspense(uncaughtException.point);
+  const uncaughtExceptionResult = exceptionsCache.resultsCache.read(uncaughtException.point);
 
   const frames = uncaughtExceptionResult.data.frames || EMPTY_ARRAY;
   const showExpandable = frames.length > 0;

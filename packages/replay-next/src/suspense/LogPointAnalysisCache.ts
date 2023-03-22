@@ -71,7 +71,7 @@ export function getLogPointAnalysisResultSuspense(
     // because it uses points from the HitPointsCache instead (which is more efficient
     // as it shares the points with other parts of the UI), so we call it here to ensure
     // that the analysis is run for the given range
-    logPointAnalysisCache.pointsCache.readAsync(
+    logPointAnalysisCache.pointsIntervalCache.readAsync(
       range.begin,
       range.end,
       client,
@@ -79,7 +79,7 @@ export function getLogPointAnalysisResultSuspense(
       code,
       condition
     );
-    const remoteResult = logPointAnalysisCache.getResultSuspense(
+    const remoteResult = logPointAnalysisCache.resultsCache.read(
       point.point,
       location,
       code,

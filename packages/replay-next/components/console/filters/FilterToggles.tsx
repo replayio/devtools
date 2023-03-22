@@ -182,7 +182,11 @@ function ExceptionsBadgeSuspends() {
   }
 
   try {
-    exceptionsCache.pointsCache.read(focusRange.begin.point, focusRange.end.point, replayClient);
+    exceptionsCache.pointsIntervalCache.read(
+      focusRange.begin.point,
+      focusRange.end.point,
+      replayClient
+    );
   } catch (errorOrPromise) {
     if (isPromiseLike(errorOrPromise)) {
       throw errorOrPromise;
