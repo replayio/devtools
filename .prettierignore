@@ -5,7 +5,6 @@ public
 src/global-css.ts
 
 test/examples
-src/devtools/client/debugger/src/workers/parser/tests/fixtures
 packages/replay-next/playwright/protocol-fixtures/
 src/ui/utils/intercom.ts
 index.html

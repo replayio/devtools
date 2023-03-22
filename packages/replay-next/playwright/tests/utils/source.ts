@@ -1,6 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
+import { getConsoleSearchInput } from "./console";
 import {
   clearTextArea,
   debugPrint,
@@ -251,12 +252,15 @@ export async function addConditional(
 export async function focusOnSource(page: Page) {
   await debugPrint(page, "(Re)focus on Source root", "focusOnSource");
 
+  // wait for the console search input - it has an "autoFocus" attribute which
+  // means it will "steal" the focus when it is first displayed, so we should
+  // wait for that before focusing on anything else
+  await getConsoleSearchInput(page).waitFor();
+
   const sourcesRoot = page.locator('[data-test-id="SourcesRoot"]');
   await expect(sourcesRoot).toBeVisible();
-  await waitFor(async () => {
-    await sourcesRoot.focus();
-    await expect(sourcesRoot).toBeFocused();
-  });
+  await sourcesRoot.focus();
+  await expect(sourcesRoot).toBeFocused();
 }
 
 export function getLogPointPanelConditionTypeAhead(page: Page): Locator {
