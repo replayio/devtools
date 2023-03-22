@@ -7,7 +7,7 @@ import { ReplayClientInterface } from "shared/client/types";
 
 import { STANDARD_EVENT_CATEGORIES } from "../constants";
 import { createInfallibleSuspenseCache } from "../utils/suspense";
-import { getAnalysisCache } from "./AnalysisCache";
+import { AnalysisParams, createAnalysisCache } from "./AnalysisCache";
 
 export type Event = {
   count: number;
@@ -25,7 +25,7 @@ export type EventLog = PointDescription & {
   type: "EventLog";
 };
 
-export const eventsCache: Cache<
+export const eventCountsCache: Cache<
   [client: ReplayClientInterface, range: PointRange | null],
   EventCategory[]
 > = createCache({
@@ -111,52 +111,24 @@ export function eventsMapper() {
     },
   ];
 }
-function getEventCache(eventType: EventHandlerType) {
-  return getAnalysisCache<EventLog>(
-    {
-      eventTypes: [eventType],
-      mapper: getFunctionBody(eventsMapper),
-    },
-    point => ({ ...point, eventType, type: "EventLog" })
-  );
+
+export const eventsCache = createAnalysisCache<EventLog, [EventHandlerType]>(
+  "EventsCache",
+  getAnalysisParams,
+  transformPoint
+);
+
+function getAnalysisParams(eventType: EventHandlerType): AnalysisParams {
+  return {
+    eventTypes: [eventType],
+    mapper: getFunctionBody(eventsMapper),
+  };
 }
 
-export function getEventPointsSuspense(
-  client: ReplayClientInterface,
-  eventType: EventHandlerType,
-  range: PointRange
-) {
-  return getEventCache(eventType).getPointsSuspense(client, range);
+function transformPoint(point: PointDescription, eventType: EventHandlerType): EventLog {
+  return { ...point, eventType, type: "EventLog" };
 }
 
-export function getInfallibleEventPointsSuspense(
-  client: ReplayClientInterface,
-  eventType: EventHandlerType,
-  range: PointRange
-) {
-  return createInfallibleSuspenseCache(getEventCache(eventType).getPointsSuspense)(client, range);
-}
-
-export function getEventPointsAsync(
-  client: ReplayClientInterface,
-  eventType: EventHandlerType,
-  range: PointRange
-) {
-  return getEventCache(eventType).getPointsAsync(client, range);
-}
-
-export function getCachedEventPoints(eventType: EventHandlerType, range: PointRange) {
-  return getEventCache(eventType).getCachedPoints(range);
-}
-
-export function getEventSuspense(eventType: EventHandlerType, point: ExecutionPoint) {
-  return getEventCache(eventType).getResultSuspense(point);
-}
-
-export function getEventAsync(eventType: EventHandlerType, point: ExecutionPoint) {
-  return getEventCache(eventType).getResultAsync(point);
-}
-
-export function getEventIfCached(eventType: EventHandlerType, point: ExecutionPoint) {
-  return getEventCache(eventType).getResultIfCached(point);
-}
+export const getInfallibleEventPointsSuspense = createInfallibleSuspenseCache(
+  eventsCache.pointsIntervalCache.read
+);

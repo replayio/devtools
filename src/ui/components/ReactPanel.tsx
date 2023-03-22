@@ -19,6 +19,7 @@ import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
+import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { UIThunkAction } from "ui/actions";
@@ -32,7 +33,6 @@ import {
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
-import { sourceSymbolsCache } from "ui/suspense/sourceCaches";
 
 import { JumpToCodeStatus, findFirstBreakablePositionForFunction } from "./Events/Event";
 import MaterialIcon from "./shared/MaterialIcon";
@@ -96,7 +96,7 @@ function findQueuedRendersForRange(
       }
 
       const [symbols, breakablePositionsResult] = await Promise.all([
-        sourceSymbolsCache.readAsync(replayClient, reactDomSource.id, allSources),
+        sourceOutlineCache.readAsync(replayClient, reactDomSource.id),
         breakpointPositionsCache.readAsync(replayClient, reactDomSource.id),
       ]);
 
@@ -115,8 +115,8 @@ function findQueuedRendersForRange(
         )!;
         const onCommitRootSymbol = symbols?.functions.find(f => f.name === "onCommitRoot")!;
 
-        scheduleUpdateFiberDeclaration = shouldUpdateFiberSymbol?.location.start;
-        onCommitFiberRootDeclaration = onCommitRootSymbol?.location.start;
+        scheduleUpdateFiberDeclaration = shouldUpdateFiberSymbol?.location.begin;
+        onCommitFiberRootDeclaration = onCommitRootSymbol?.location.begin;
       } else if (reactDomSource.url!.includes(".production")) {
         // HACK We'll do this the hard way! This _should_ work back to React 16.14
         // By careful inspection, we know that every minified version of `scheduleUpdateOnFiber`
@@ -147,7 +147,7 @@ function findQueuedRendersForRange(
               column: scheduleUpdateIndex,
             });
             if (res) {
-              scheduleUpdateFiberDeclaration = res.location.start;
+              scheduleUpdateFiberDeclaration = res.location.begin;
             }
           }
           if (onCommitIndex > -1) {
@@ -156,7 +156,7 @@ function findQueuedRendersForRange(
               column: onCommitIndex,
             });
             if (res) {
-              onCommitFiberRootDeclaration = res.location.start;
+              onCommitFiberRootDeclaration = res.location.begin;
             }
           }
 

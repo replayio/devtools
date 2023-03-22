@@ -72,6 +72,7 @@ export enum Nag {
   FIRST_BREAKPOINT_SAVE = "first_breakpoint_save",
   FIRST_CONSOLE_NAVIGATE = "first_console_navigate",
   DOWNLOAD_REPLAY = "download_replay",
+  DISMISS_TOUR = "dismiss_tour",
 }
 
 // Keeping a list of unused nag types here so we don't accidentally

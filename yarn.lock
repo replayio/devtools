@@ -4144,10 +4144,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/protocol@npm:0.37.0":
-  version: 0.37.0
-  resolution: "@replayio/protocol@npm:0.37.0"
-  checksum: 5f8599c93146e8a98ba7b6d022090012fb762b8bd9a9de0e0dac9306675ad88e878fadb5b4fe26d4a674e2e8021978d67331c6076368e5ac30f8115513a6aa95
+"@replayio/protocol@npm:0.40.0":
+  version: 0.40.0
+  resolution: "@replayio/protocol@npm:0.40.0"
+  checksum: 30b5f73d42913e57b22e13b7d6fc1e0e2e977b6c554aa5dada1a09426ca2b195e1978c682395f7e4068203c5dedf8397da9c6b0e10c67ffb8a9148a5e2aa5c5c
   languageName: node
   linkType: hard
 
@@ -20779,7 +20779,7 @@ __metadata:
     "@recordreplay/sourcemap-upload-cli": ^0.1.1
     "@reduxjs/toolkit": ^1.8.4
     "@replayio/overboard": ^0.4.1
-    "@replayio/protocol": 0.37.0
+    "@replayio/protocol": 0.40.0
     "@replayio/replay": ^0.12.4
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0
@@ -20923,7 +20923,7 @@ __metadata:
     style-loader: ^3.3.1
     stylelint: ^14.16.0
     stylelint-config-prettier: ^9.0.4
-    suspense: ^0.0.26
+    suspense: ^0.0.30
     tailwindcss: ^3.2.4
     ts-node: ^10.7.0
     tsconfig-paths: ^3.14.1
@@ -21278,7 +21278,7 @@ __metadata:
     react-dom: 0.0.0-experimental-e7d0053e6-20220325
     react-virtualized-auto-sizer: ^1.0.7
     shared: "workspace:*"
-    suspense: ^0.0.26
+    suspense: ^0.0.30
     typescript: ^4.6.3
     uuid: ^7.0.3
   languageName: unknown
@@ -23103,16 +23103,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"suspense@npm:^0.0.26":
-  version: 0.0.26
-  resolution: "suspense@npm:0.0.26"
+"suspense@npm:^0.0.30":
+  version: 0.0.30
+  resolution: "suspense@npm:0.0.30"
   dependencies:
     interval-utilities: ^0.0.1
     point-utilities: ^0.0.2
   peerDependencies:
     react: ^18.0.0
     react-dom: ^18.0.0
-  checksum: 2aa4391a0ce2d24907048d4bb4bb8d6ab4a6d650efa452285fa30d664d60dabf80276ffa880452d8e72b965b881876cd07f228d150fa4b10fbe84e2983adcf64
+  checksum: f0d0bf995a49df8795b638ca67140d5d6a623abc8d364a71a534478cf8de10469171e53f9858177edcccac5aba2943e00828a69b0871806bfdd2102c49313d10
   languageName: node
   linkType: hard
 

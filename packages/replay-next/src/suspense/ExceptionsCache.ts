@@ -8,7 +8,7 @@ import {
 } from "protocol/evaluation-utils";
 
 import { createInfallibleSuspenseCache } from "../utils/suspense";
-import { RemoteAnalysisResult, getAnalysisCache } from "./AnalysisCache";
+import { AnalysisParams, RemoteAnalysisResult, createAnalysisCache } from "./AnalysisCache";
 
 export type UncaughtException = PointDescription & {
   type: "UncaughtException";
@@ -54,21 +54,21 @@ function exceptionsMapper(): AnalysisResultWrapper<RemoteAnalysisResult>[] {
   ];
 }
 
-export const {
-  getPointsSuspense: getExceptionPointsSuspense,
-  getPointsAsync: getExceptionPointsAsync,
-  getCachedPoints: getCachedExceptionPoints,
-  getResultSuspense: getExceptionSuspense,
-  getResultAsync: getExceptionAsync,
-  getResultIfCached: getExceptionIfCached,
-} = getAnalysisCache<UncaughtException>(
-  {
-    exceptions: true,
-    mapper: getFunctionBody(exceptionsMapper),
-  },
-  pointDescription => ({ type: "UncaughtException", ...pointDescription })
+export const exceptionsCache = createAnalysisCache<UncaughtException, []>(
+  "ExceptionsCache",
+  () => analysisParams,
+  transformPoint
 );
 
+const analysisParams: AnalysisParams = {
+  exceptions: true,
+  mapper: getFunctionBody(exceptionsMapper),
+};
+
+function transformPoint(pointDescription: PointDescription): UncaughtException {
+  return { type: "UncaughtException", ...pointDescription };
+}
+
 export const getInfallibleExceptionPointsSuspense = createInfallibleSuspenseCache(
-  getExceptionPointsSuspense
+  exceptionsCache.pointsIntervalCache.read
 );

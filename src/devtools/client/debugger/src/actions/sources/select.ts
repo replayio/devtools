@@ -22,7 +22,6 @@ import {
 import { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 
-import { fetchSymbolsForSource } from "../../reducers/ast";
 import { Context } from "../../reducers/pause";
 import { getTabExists } from "../../reducers/tabs";
 import { closeActiveSearch } from "../../reducers/ui";
@@ -182,9 +181,6 @@ export function selectLocation(
       // If there was a navigation while we were loading the loadedSource
       return;
     }
-
-    // Kick off Babel parsing for symbols so that the "Outline" view can display functions
-    dispatch(fetchSymbolsForSource(loadedSource.id));
   };
 }
 

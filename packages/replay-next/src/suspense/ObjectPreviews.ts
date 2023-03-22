@@ -19,9 +19,6 @@ export const objectCache: Cache<
   ],
   Object
 > = createCache({
-  // The protocol only sends objects once per session;
-  // disable weak ref caching to ensure we don't lose data
-  config: { useWeakRef: false },
   debugLabel: "objectCache",
   getKey: ([client, pauseId, objectId, previewLevel]) => `${pauseId}:${objectId}:${previewLevel}`,
   load: async ([client, pauseId, objectId, previewLevel]) => {
@@ -39,9 +36,6 @@ export const objectPropertyCache: Cache<
   [client: ReplayClientInterface, pauseId: PauseId, objectId: ObjectId, propertyName: string],
   ProtocolValue | null
 > = createCache({
-  // The protocol only sends objects once per session;
-  // disable weak ref caching to ensure we don't lose data
-  config: { useWeakRef: false },
   debugLabel: "objectPropertyCache",
   getKey: ([client, pauseId, objectId, propertyName]) => `${pauseId}:${objectId}:${propertyName}`,
   load: async ([client, pauseId, objectId, propertyName]) => {

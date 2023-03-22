@@ -561,6 +561,10 @@ export class ReplayClient implements ReplayClientInterface {
     return hitCounts;
   }
 
+  getSourceOutline(sourceId: SourceId) {
+    return client.Debugger.getSourceOutline({ sourceId }, this.getSessionIdThrows());
+  }
+
   async getBreakpointPositions(
     sourceId: SourceId,
     locationRange: SourceLocationRange | null

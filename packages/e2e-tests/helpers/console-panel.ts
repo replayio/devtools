@@ -51,7 +51,7 @@ export async function enableConsoleMessageType(
   type: "exceptions" | "logs" | "warnings" | "errors"
 ) {
   const checkbox = getConsoleMessageTypeCheckbox(page, type);
-  await delay(100);
+  await delay(500);
   await checkbox.check();
 }
 

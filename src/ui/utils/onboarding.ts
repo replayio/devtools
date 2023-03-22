@@ -35,3 +35,21 @@ export function downloadReplay(nags: Nag[], dismissNag: (nag: Nag) => void): boo
 
   return shouldShowNag(nags, Nag.DOWNLOAD_REPLAY);
 }
+
+export function shouldShowConsoleNavigate(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.FIRST_CONSOLE_NAVIGATE);
+}
+
+export function shouldShowBreakpointAdd(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
+}
+
+export function shouldShowBreakpointEdit(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.FIRST_BREAKPOINT_EDIT);
+}
+
+export function shouldShowTour(nags: Nag[]): boolean {
+  const showTour = shouldShowNag(nags, Nag.DISMISS_TOUR);
+  const showConsoleNavigate = shouldShowConsoleNavigate(nags);
+  return showTour && showConsoleNavigate;
+}

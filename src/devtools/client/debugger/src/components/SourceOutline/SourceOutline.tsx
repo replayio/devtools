@@ -1,4 +1,9 @@
-import { Location } from "@replayio/protocol";
+import {
+  ClassOutline,
+  FunctionOutline,
+  Location,
+  getSourceOutlineResult,
+} from "@replayio/protocol";
 import classnames from "classnames";
 import React, {
   Suspense,
@@ -11,24 +16,25 @@ import React, {
 } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
+import { useImperativeCacheValue } from "suspense";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { sourceHitCountsCache } from "replay-next/src/suspense/SourcesCache";
+import { sourceHitCountsCache } from "replay-next/src/suspense/SourceHitCountsCache";
+import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { toPointRange } from "shared/utils/time";
 import Spinner from "ui/components/shared/Spinner";
 import { SourceDetails, getSelectedSource } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { LoadingStatus } from "ui/utils/LoadingStatus";
 
 import { selectLocation } from "../../actions/sources";
-import { ClassDeclaration, FunctionDeclaration, getSymbols } from "../../reducers/ast";
-import { SymbolEntry, getContext, getCursorPosition } from "../../selectors";
+import { getContext, getCursorPosition } from "../../selectors";
 import { findClosestEnclosedSymbol } from "../../utils/ast";
 import OutlineFilter from "../PrimaryPanes/OutlineFilter";
 import { getOutlineSymbols } from "./getOutlineSymbols";
-import { isFunctionDeclaration } from "./isFunctionSymbol";
+import { isFunctionOutline } from "./isFunctionOutline";
 import { SourceOutlineClass } from "./SourceOutlineClass";
 import { SourceOutlineFunction } from "./SourceOutlineFunction";
 
@@ -39,7 +45,7 @@ export function SourceOutline({
 }: {
   cursorPosition: Location | null;
   selectedSource: SourceDetails | null;
-  symbols: SymbolEntry | null;
+  symbols: getSourceOutlineResult | null;
 }) {
   const dispatch = useAppDispatch();
   const cx = useAppSelector(getContext);
@@ -50,17 +56,27 @@ export function SourceOutline({
 
   const hitCounts =
     selectedSource && visibleLines
-      ? sourceHitCountsCache.read(replayClient, selectedSource.id, visibleLines, focusRange)
+      ? sourceHitCountsCache.read(
+          visibleLines.start.line,
+          visibleLines.end.line,
+          replayClient,
+          selectedSource.id,
+          focusRange ? toPointRange(focusRange) : null
+        )
       : null;
+  const hitCountsMap = useMemo(() => {
+    if (!hitCounts) {
+      return null;
+    }
+    return new Map(hitCounts);
+  }, [hitCounts]);
 
   const [filter, setFilter] = useState("");
   const outlineSymbols = useMemo(
-    () => getOutlineSymbols(symbols, filter, hitCounts),
-    [symbols, filter, hitCounts]
+    () => (symbols ? getOutlineSymbols(symbols, filter, hitCountsMap) : null),
+    [symbols, filter, hitCountsMap]
   );
-  const [focusedSymbol, setFocusedSymbol] = useState<ClassDeclaration | FunctionDeclaration | null>(
-    null
-  );
+  const [focusedSymbol, setFocusedSymbol] = useState<ClassOutline | FunctionOutline | null>(null);
   const listRef = useRef<any>();
 
   const closestSymbolIndex = useMemo(() => {
@@ -83,13 +99,13 @@ export function SourceOutline({
   }, [closestSymbolIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSelectSymbol = useCallback(
-    (symbol: ClassDeclaration | FunctionDeclaration) => {
+    (symbol: ClassOutline | FunctionOutline) => {
       dispatch(
         selectLocation(cx, {
           sourceId: selectedSource!.id,
           sourceUrl: selectedSource!.url!,
-          line: symbol.location.start.line,
-          column: symbol.location.start.column,
+          line: symbol.location.begin.line,
+          column: symbol.location.begin.column,
         })
       );
       setFocusedSymbol(symbol);
@@ -106,7 +122,7 @@ export function SourceOutline({
       }
       return (
         <div style={style}>
-          {isFunctionDeclaration(symbol) ? (
+          {isFunctionOutline(symbol) ? (
             <SourceOutlineFunction
               isFocused={isFocused}
               func={symbol}
@@ -133,7 +149,7 @@ export function SourceOutline({
     );
   }
 
-  if (!symbols || symbols.status === LoadingStatus.LOADING) {
+  if (!symbols) {
     return (
       <div className="flex justify-center p-4">
         <Spinner className="h-4 w-4 animate-spin text-gray-500" />
@@ -183,12 +199,20 @@ export default function SourceOutlineWrapper() {
   // This goofy outer selection is so that SourceOutline.stories can inject fake values.
   const cursorPosition = useAppSelector(getCursorPosition);
   const selectedSource = useAppSelector(getSelectedSource);
-  const symbols = useAppSelector(state =>
-    selectedSource ? getSymbols(state, selectedSource) : null
+  const replayClient = useContext(ReplayClientContext);
+
+  let symbols: getSourceOutlineResult | null = null;
+  const symbolsCacheValue = useImperativeCacheValue(
+    sourceOutlineCache,
+    replayClient,
+    selectedSource?.id
   );
+  if (symbolsCacheValue.status === "resolved") {
+    symbols = symbolsCacheValue.value;
+  }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary key={selectedSource?.id}>
       <Suspense fallback={null}>
         <SourceOutline
           cursorPosition={cursorPosition || null}

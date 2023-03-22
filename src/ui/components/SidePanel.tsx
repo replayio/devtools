@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPanes";
 import Accordion from "devtools/client/debugger/src/components/shared/Accordion";
-import LazyOffscreen from "replay-next/components/LazyOffscreen";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { setViewMode } from "ui/actions/layout";
 import Events from "ui/components/Events";
@@ -20,14 +19,15 @@ import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ViewMode } from "ui/state/layout";
+import { shouldShowTour } from "ui/utils/onboarding";
 import useAuth0 from "ui/utils/useAuth0";
 
 import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
 import ProtocolViewer from "./ProtocolViewer";
-import { ReactPanel } from "./ReactPanel";
 import StatusDropdown from "./shared/StatusDropdown";
 import { TestSuitePanel } from "./TestSuitePanel";
+import Tour from "./Tour/Tour";
 import styles from "src/ui/components/SidePanel.module.css";
 
 function useInitialPrimaryPanel() {
@@ -35,7 +35,9 @@ function useInitialPrimaryPanel() {
   const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
   const info = useTestInfo();
 
-  const initialPrimaryPanel = info.isTestSuiteReplay ? "cypress" : "events";
+  const { nags } = hooks.useGetUserInfo();
+  const showTour = shouldShowTour(nags);
+  const initialPrimaryPanel = info.isTestSuiteReplay ? "cypress" : showTour ? "tour" : "events";
 
   useEffect(() => {
     if (selectedPrimaryPanel == null) {
@@ -95,19 +97,6 @@ export default function SidePanel() {
 
   return (
     <div className="flex w-full flex-col gap-2">
-      {shouldShowDevToolsNag(nags, viewMode) && (
-        <div className={styles.TourBox}>
-          <h2>Welcome to Replay!</h2>
-          <p>To get started, click into DevTools so we can show off some time travel features!</p>
-
-          <button type="button" onClick={() => handleToggle("dev")} style={{ padding: "4px 8px" }}>
-            <div className="mr-1">Open DevTools</div>
-
-            <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
-          </button>
-        </div>
-      )}
-
       {!isAuthenticated && !info.isTestSuiteReplay && (
         <div className={styles.TourBox}>
           <h2>Welcome to Replay!</h2>
@@ -146,13 +135,11 @@ export default function SidePanel() {
         {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}
         {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}
         {selectedPrimaryPanel === "comments" && <CommentCardsList />}
+        {selectedPrimaryPanel === "tour" && <Tour />}
         {selectedPrimaryPanel === "events" && <EventsPane items={items} />}
         {selectedPrimaryPanel === "cypress" && <TestSuitePanel />}
         {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
         {selectedPrimaryPanel === "search" && <SearchFilesReduxAdapter />}
-        <LazyOffscreen mode={selectedPrimaryPanel === "react" ? "visible" : "hidden"}>
-          <ReactPanel />
-        </LazyOffscreen>
       </div>
     </div>
   );
