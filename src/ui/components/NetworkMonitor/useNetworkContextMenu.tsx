@@ -5,16 +5,8 @@ import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem
 import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import Icon from "replay-next/components/Icon";
 import { setFocusRegionBeginTime, setFocusRegionEndTime } from "ui/actions/timeline";
-import { getRequestBodies } from "ui/reducers/network";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-
-import {
-  BodyPartsToUInt8Array,
-  RawToImageMaybe,
-  RawToUTF8,
-  URLEncodedToPlaintext,
-} from "./content";
-import { RequestSummary, findHeader } from "./utils";
+import { useAppDispatch } from "ui/setup/hooks";
+import { RequestSummary } from "./utils";
 
 export default function useNetworkContextMenu({
   row,
@@ -24,7 +16,6 @@ export default function useNetworkContextMenu({
   onClipboardCopy: () => void;
 }) {
   const dispatch = useAppDispatch();
-  const requestBodies = useAppSelector(getRequestBodies);
 
   const beginTime = row.original?.start;
   const endTime = row.original?.end;
@@ -55,7 +46,7 @@ export default function useNetworkContextMenu({
 
       <ContextMenuItem onClick={onClipboardCopy}>
         <>
-          <Icon type="set-focus-end" />
+          <Icon type="copy" />
           Copy as CURL
         </>
       </ContextMenuItem>

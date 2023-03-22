@@ -143,9 +143,8 @@ export const getSelectedResponseBody = (state: UIState) => {
   const requestId = getSelectedRequestId(state);
   return requestId ? getResponseBodies(state)[requestId] : null;
 };
-export const getSelectedRequestBodyForId = (state: UIState, id: string) => {
-  return id ? getRequestBodies(state)[id] : null;
-};
+export const getRequestBodyById = (state: UIState, id: string) => getRequestBodies(state)?.[id] || null;
+
 export const getSelectedRequestBody = (state: UIState) => {
   const requestId = getSelectedRequestId(state);
   return requestId ? getRequestBodies(state)[requestId] : null;

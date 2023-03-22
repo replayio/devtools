@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Row } from "react-table";
 
 import { fetchRequestBody } from "ui/actions/network";
-import { getSelectedRequestBodyForId } from "ui/reducers/network";
+import { getRequestBodyById } from "ui/reducers/network";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import {
@@ -20,7 +20,7 @@ export default function useCopyToCliboard(row: Row<RequestSummary>) {
   } = row || {};
 
   const [isCopyTriggered, setIsCopyTriggered] = useState(false);
-  const requestBody = useAppSelector(state => getSelectedRequestBodyForId(state, id));
+  const requestBody = useAppSelector(state => getRequestBodyById(state, id));
   const dispatch = useAppDispatch();
 
   let isCopied = false;
@@ -76,8 +76,6 @@ export default function useCopyToCliboard(row: Row<RequestSummary>) {
         shouldShowLoading = false;
         setTimeout(() => setIsCopyTriggered(false), 3000);
       } else {
-        //dispatch to fetch request body
-
         isCopied = false;
         shouldShowLoading = true;
       }
