@@ -13,6 +13,7 @@ import {
   URLEncodedToPlaintext,
 } from "./content";
 import { RequestSummary, findHeader } from "./utils";
+
 export default function useCopyToCliboard(row: Row<RequestSummary>) {
   const {
     values: { url = "" } = {},

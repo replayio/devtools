@@ -6,6 +6,7 @@ import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import Icon from "replay-next/components/Icon";
 import { setFocusRegionBeginTime, setFocusRegionEndTime } from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
+
 import { RequestSummary } from "./utils";
 
 export default function useNetworkContextMenu({
@@ -27,7 +28,6 @@ export default function useNetworkContextMenu({
   const setFocusStart = () => {
     dispatch(setFocusRegionBeginTime(beginTime!, true));
   };
-
 
   return useContextMenu(
     <>

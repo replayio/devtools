@@ -92,7 +92,7 @@ export function fetchRequestBody(requestId: RequestId): UIThunkAction {
     let state = getState();
     const sessionId = state.app.sessionId!;
     protocolClient.Network.getRequestBody({ id: requestId, range: { end: 5e9 } }, sessionId);
-  }
+  };
 }
 
 export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {

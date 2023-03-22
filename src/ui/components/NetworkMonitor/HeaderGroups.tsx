@@ -5,7 +5,6 @@ import { Column, HeaderGroup } from "react-table";
 import { RequestSummary } from "./utils";
 import styles from "./RequestTable.module.css";
 
-
 export function HeaderGroups({
   columns,
   headerGroups,
