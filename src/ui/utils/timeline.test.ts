@@ -16,7 +16,6 @@ const focusRegion = (from: number, to: number): FocusRegion => ({
   end: point(to),
 });
 
-
 describe("getSecondsFromFormattedTime", () => {
   it("should parse standalone seconds", () => {
     expect(getSecondsFromFormattedTime("0")).toBe(0);
