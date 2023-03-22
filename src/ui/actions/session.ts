@@ -236,7 +236,7 @@ export function createSocket(
         }
       }
 
-      const focusRegion = getPausePointParams()?.focusRegion;
+      const focusRegion = getPausePointParams().focusRegion;
       const focusRange = focusRegion
         ? {
             begin: focusRegion.begin.time,

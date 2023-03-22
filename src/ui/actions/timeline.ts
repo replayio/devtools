@@ -121,9 +121,10 @@ export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
     }
 
     const initialPausePoint = await getInitialPausePoint(ThreadFront.recordingId!);
-
-    if (initialPausePoint) {
+    if (initialPausePoint?.point) {
       point = initialPausePoint.point;
+    }
+    if (initialPausePoint?.time) {
       time = initialPausePoint.time;
     }
     ThreadFront.timeWarp(point, time, false);
@@ -132,7 +133,7 @@ export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
 
 export async function getInitialPausePoint(recordingId: string) {
   const pausePointParams = getPausePointParams();
-  if (pausePointParams) {
+  if (pausePointParams.point !== null) {
     return pausePointParams;
   }
 
