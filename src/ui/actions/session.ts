@@ -338,8 +338,8 @@ export function createSocket(
       dispatch(actions.setLoadingFinished(true));
 
       if (!focusRegion) {
-        const initialFocusRegion = await ThreadFront.initialFocusRegionWaiter.promise;
-        dispatch(setFocusRegion(initialFocusRegion));
+        const focusWindow = await replayClient.getFocusWindow();
+        dispatch(setFocusRegion(focusWindow));
       }
     } catch (e: any) {
       const currentError = getUnexpectedError(getState());

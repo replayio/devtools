@@ -26,7 +26,6 @@ import {
   SourceKind,
   SourceLocation,
   TimeStamp,
-  TimeStampedPointRange,
   Value,
   findAnnotationsResult,
   requestBodyData,
@@ -146,8 +145,6 @@ class _ThreadFront {
   // Waiter which resolves with the target used to create the recording.
   recordingCapabilitiesWaiter = defer<RecordingCapabilities>();
   recordingTargetWaiter = defer<RecordingTarget>();
-
-  initialFocusRegionWaiter = defer<TimeStampedPointRange>();
 
   // Waiter which resolves when all sources have been loaded.
   private allSourcesWaiter = defer<void>();
@@ -298,7 +295,6 @@ class _ThreadFront {
             loadedRegions.loading.length === 1,
             "there should be exactly one initially loaded region"
           );
-          this.initialFocusRegionWaiter.resolve(loadedRegions.loading[0]);
         }
         this._loadedRegionsListeners.forEach(callback => callback(loadedRegions));
       });
