@@ -1,23 +1,23 @@
 .AssistBoxWrapper {
   position: relative;
   background: linear-gradient(323deg, rgba(226, 85, 215, 0.497), rgba(79, 205, 230, 0.777));
+  height: 100vh;
 }
 
 .AssistBoxGradient {
   background: linear-gradient(323deg, rgba(241, 108, 229, 0.897), rgba(49, 189, 216, 0.736));
   background-size: 400% 400%;
-
   -webkit-animation: GradientWave 24s ease infinite;
   -moz-animation: GradientWave 24s ease infinite;
   animation: GradientWave 24s ease infinite;
-
   position: relative;
+  height: 100vh;
 }
 
 .AssistBox {
   color: #fff;
   padding: 0.5rem;
-  height: 100vh;
+  height: 100%;
 }
 
 .h1 {
@@ -37,7 +37,6 @@
   font-size: 18px;
   font-weight: 300;
   margin-bottom: 1rem;
-  height: 100%;
   opacity: 0;
   animation: fadeDrop 0.5s ease-out 0.2s forwards;
 }
@@ -71,23 +70,37 @@
   font-weight: 300;
 }
 
-.Icon {
-  height: 18px;
-  margin-right: 0.25rem;
-  color: #068;
+.stepIcon {
+  height: 20px;
+}
+
+.AssistBoxInternal {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
 }
 
 .checklist {
   font-size: 16px;
-  height: 200px;
+  height: 100%;
+  flex: 1;
+  overflow-y: auto;
 }
 
-.checklist li {
-  padding: 0.5rem;
+.checklist div {
+  display: flex;
+  align-items: center;
+  padding: 0.2rem;
+  padding-left: 0.4rem;
   border-radius: 3rem;
+  margin-bottom: 1px;
 }
 
-.checklist li:hover {
+.checklist div.selectedItem {
+  background-color: rgba(255, 255, 255, 0.198);
+}
+
+.checklist div:hover {
   background-color: rgba(255, 255, 255, 0.198);
   cursor: pointer;
 }
@@ -149,4 +162,42 @@
   100% {
     background-position: 58% 0%;
   }
+}
+.secondColumn {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.videoWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.clickInfoWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba;
+}
+
+.videoWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.clickInfoWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  width: 100%;
+}
+
+.clickInfo {
+  font-size: 18px;
+  color: #fff;
 }

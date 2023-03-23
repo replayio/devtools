@@ -39,6 +39,7 @@ const useNagDismissal = () => {
 };
 
 const Tour: React.FC = () => {
+  const [selectedItem, setSelectedItem] = useState(1);
   const { nags } = hooks.useGetUserInfo();
   const viewMode = useAppSelector(getViewMode);
   const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
@@ -52,48 +53,87 @@ const Tour: React.FC = () => {
 
   const info = useTestInfo();
 
+  const [videoUrl, setVideoUrl] = useState("/images/tour/consoleupdate.gif");
+
+  const handleClick = (index: number) => {
+    setSelectedItem(index);
+    // Set the URL of the video to be displayed based on the clicked index
+    if (index === 0) {
+      setVideoUrl("/images/tour/video1.gif");
+    } else if (index === 1) {
+      setVideoUrl("/images/tour/video2.gif");
+    } else if (index === 2) {
+      setVideoUrl("/images/tour/video3.gif");
+    }
+  };
+
+  const getItemStyle = (index: number) => {
+    return selectedItem === index ? styles.selectedItem : "";
+  };
+
+  const renderVideoPlaceholder = () => {
+    if (selectedItem >= 0) {
+      return <div>Video #{selectedItem + 1} would go here</div>;
+    }
+    return null;
+  };
+
+  const renderClickInfo = () => {
+    if (selectedItem >= 0) {
+      return <div className={styles.clickInfo}>You clicked on {checklistItems[selectedItem]}</div>;
+    }
+    return null;
+  };
+
+  // Hard-coded checklist items
+  const checklistItems = [
+    { label: "Open DevTools", videoUrl: "/images/tour/video1.gif" },
+    { label: "Time travel in the console", videoUrl: "/images/tour/video2.gif" },
+    { label: "Magic print statements", videoUrl: "/images/tour/video3.gif" },
+    { label: "Add a comment", videoUrl: "/images/tour/video4.gif" },
+    { label: "... to a line of code", videoUrl: "/images/tour/video5.gif" },
+    { label: "... to a network request", videoUrl: "/images/tour/video6.gif" },
+    { label: "... to a print statement", videoUrl: "/images/tour/video7.gif" },
+    { label: "Jump to code", videoUrl: "/images/tour/video8.gif" },
+    { label: "Add a unicorn badge", videoUrl: "/images/tour/video9.gif" },
+    { label: "Record a replay", videoUrl: "/images/tour/video10.gif" },
+    { label: "Explore sources", videoUrl: "/images/tour/video11.gif" },
+    { label: "Search source text", videoUrl: "/images/tour/video12.gif" },
+    { label: "Quick-open a file", videoUrl: "/images/tour/video13.gif" },
+    { label: "Launch command palette", videoUrl: "/images/tour/video14.gif" },
+    { label: "Jump to an event", videoUrl: "/images/tour/video15.gif" },
+    { label: "Inspect an element", videoUrl: "/images/tour/video16.gif" },
+    { label: "Inspect a component", videoUrl: "/images/tour/video17.gif" },
+    { label: "Use Focus Mode", videoUrl: "/images/tour/video18.gif" },
+  ];
+
   return (
     <div className={styles.AssistBoxWrapper}>
       <div className={styles.AssistBoxGradient}>
         <div className={styles.AssistBox}>
           <div className="p-0 pt-3">
-            <h1 className={styles.h1}>Replay Assist</h1>
-
-            <ul className={styles.checklist}>
-              <li>Open DevTools</li>
-              <li>Time travel in the console</li>
-              <li>Magic print statements</li>
-              <li>Add a comment </li>
-              <li>... to a line of code</li>
-              <li>... to a network request</li>
-              <li>... to a print statement</li>
-              <li>Jump to code</li>
-              <li>Add a unicorn badge</li>
-              <li>Record a replay</li>
-              <li>Explore sources</li>
-              <li>Search source text</li>
-              <li>Quick-open a file</li>
-              <li>Launch command palette</li>
-              <li>Jump to an event</li>
-              <li>Inspect an element</li>
-              <li>Inspect a component</li>
-              <li>Use Focus Mode</li>
-            </ul>
+            <div className={styles.AssistBoxInternal}>
+              <div className={styles.checklist}>
+                {checklistItems.map((item, index) => (
+                  <div
+                    key={index}
+                    className={`flex ${getItemStyle(index)} ${styles.checklistItem}`}
+                    onClick={() => handleClick(index)}
+                  >
+                    <Icon
+                      className={styles.stepIcon}
+                      type={index % 3 === 0 ? "checked-rounded" : "unchecked-rounded"}
+                    />
+                    <span className="ml-2">{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="absolute bottom-28 p-3">
-        {1 == 1 && <img src="/images/tour/fast-forward.gif" className={styles.videoExample} />}
-
-        {!showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
-          <img src="/images/tour/addlogs.gif" className={styles.videoExample} />
-        )}
-
-        {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && (
-          <img src="/images/tour/editlogs.gif" className={styles.videoExample} />
-        )}
-
-        {1 != 1 && <img src="/images/tour/consoleupdate.gif" className={styles.videoExample} />}
+        <div className="absolute bottom-32 w-full px-2">
+          <img src={videoUrl} className={styles.videoExample} />
+        </div>
       </div>
     </div>
   );
