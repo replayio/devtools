@@ -31,6 +31,10 @@ import { ThreadFront } from "protocol/thread";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { waitForTime } from "protocol/utils";
 import { pointsBoundingTimeCache } from "replay-next/src/suspense/ExecutionPointsCache";
+import {
+  isExecutionPointsGreaterThan,
+  isExecutionPointsLessThan,
+} from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import { mayClearSelectedStep } from "ui/reducers/reporter";
@@ -48,6 +52,7 @@ import {
   getZoomRegion,
   pointsReceived,
   setDisplayedFocusRegion,
+  setFocusRegion,
   setPlaybackPrecachedTime,
 } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
@@ -666,7 +671,7 @@ export function setFocusRegionEndTime(end: number, sync: boolean): UIThunkAction
     await dispatch(updateDisplayedFocusRegion({ begin, end }));
 
     if (sync) {
-      dispatch(syncFocusedRegion());
+      await dispatch(syncFocusedRegion());
       dispatch(updateFocusRegionParam());
     }
   };
@@ -687,22 +692,38 @@ export function setFocusRegionBeginTime(
     await dispatch(updateDisplayedFocusRegion({ begin, end }));
 
     if (sync) {
-      dispatch(syncFocusedRegion());
+      await dispatch(syncFocusedRegion());
       dispatch(updateFocusRegionParam());
     }
   };
 }
 
 export function syncFocusedRegion(): UIThunkAction {
-  return async (_dispatch, getState, { replayClient }) => {
+  return async (dispatch, getState, { replayClient }) => {
     const state = getState();
     const focusRegion = getFocusRegion(state) as FocusRegion;
     const zoomTime = getZoomRegion(state);
 
-    replayClient.requestFocusRange({
+    const window = await replayClient.requestFocusRange({
       begin: focusRegion ? focusRegion.begin.time : zoomTime.beginTime,
       end: focusRegion ? focusRegion.end.time : zoomTime.endTime,
     });
+
+    // If the actual region that's focused is smaller than the requested region,
+    // refine the local focus region to stay in sync.
+    // Note this may result in the current time/point being outside of the focus region.
+    if (focusRegion) {
+      if (
+        isExecutionPointsGreaterThan(window.begin.point, focusRegion.begin.point) ||
+        isExecutionPointsLessThan(window.end.point, focusRegion.end.point)
+      ) {
+        dispatch(setFocusRegion(window));
+      }
+    } else {
+      if (window.begin.time > zoomTime.beginTime || window.end.time < zoomTime.endTime) {
+        dispatch(setFocusRegion(window));
+      }
+    }
   };
 }
 
