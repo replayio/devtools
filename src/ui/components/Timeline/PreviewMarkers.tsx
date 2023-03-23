@@ -26,7 +26,7 @@ function PreviewMarkersSuspends() {
   const hoveredItem = useAppSelector(selectors.getHoveredItem);
   const timelineDimensions = useAppSelector(selectors.getTimelineDimensions);
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
-  const hoveredEvent = useAppSelector(selectors.getHoveredEvent);
+  const markTimeStampedPoint = useAppSelector(selectors.getMarkTimeStampedPoint);
 
   const replayClient = useContext(ReplayClientContext);
 
@@ -72,14 +72,14 @@ function PreviewMarkersSuspends() {
         )
       : [null, null];
 
-  const showHitPointMakers =
+  const showHitPointMarkers =
     hitPoints != null &&
     hitPointStatus !== "too-many-points-to-run-analysis" &&
     hitPointStatus !== "too-many-points-to-find";
 
   return (
     <div className="preview-markers-container">
-      {showHitPointMakers &&
+      {showHitPointMarkers &&
         hitPoints.map((point: PointDescription, index: number) => {
           const isPrimaryHighlighted = hoveredItem?.point === point.point;
 
@@ -97,10 +97,10 @@ function PreviewMarkersSuspends() {
           );
         })}
 
-      {hoveredEvent && (
+      {markTimeStampedPoint && (
         <Marker
-          point={hoveredEvent.point}
-          time={hoveredEvent.time}
+          point={markTimeStampedPoint.point}
+          time={markTimeStampedPoint.time}
           currentTime={currentTime}
           isPrimaryHighlighted={false}
           zoomRegion={zoomRegion}
