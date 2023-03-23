@@ -196,6 +196,7 @@ export function createMockReplayClient() {
     getCorrespondingLocations: jest.fn().mockImplementation(() => []),
     getEventCountForTypes: jest.fn().mockImplementation(async () => {}),
     getEventCountForType: jest.fn().mockImplementation(async () => 0),
+    getFocusWindow: jest.fn().mockImplementation(async () => ({})),
     getFrameSteps: jest.fn().mockImplementation(async () => []),
     getHitPointsForLocation: jest.fn().mockImplementation(async () => []),
     getMappedLocation: jest.fn().mockImplementation(async () => []),
