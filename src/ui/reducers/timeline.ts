@@ -12,7 +12,7 @@ function initialTimelineState(): TimelineState {
   return {
     allPaintsReceived: false,
     currentTime: 0,
-    focusRegion: getPausePointParams()?.focusRegion || null,
+    focusRegion: getPausePointParams().focusRegion,
     focusRegionBackup: null,
     displayedFocusRegion: null,
     hoverTime: null,
