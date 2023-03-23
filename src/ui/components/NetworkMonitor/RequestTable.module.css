@@ -122,8 +122,3 @@ table.requests {
 .seekBadge:is(:hover, :focus-visible) .verbose {
   display: block;
 }
-
-.showCopiedContainer {
-  top: 50%;
-  right: 50%;
-}

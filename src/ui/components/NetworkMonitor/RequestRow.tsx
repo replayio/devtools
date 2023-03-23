@@ -3,8 +3,6 @@ import React, { useLayoutEffect, useRef } from "react";
 import { Row } from "react-table";
 
 import useNetworkContextMenu from "ui/components/NetworkMonitor/useNetworkContextMenu";
-
-import useCopyToCliboard from "./useCopyToClipboard";
 import { RequestSummary } from "./utils";
 import styles from "./RequestTable.module.css";
 
@@ -12,6 +10,7 @@ export const RequestRow = ({
   currentTime,
   isFirstInFuture,
   isInLoadedRegion,
+  onClipboardCopy,
   isInPast,
   isSelected,
   onClick,
@@ -21,6 +20,7 @@ export const RequestRow = ({
   currentTime: number;
   isFirstInFuture: boolean;
   isInLoadedRegion: boolean;
+  onClipboardCopy: (row: Row<RequestSummary>) => void;
   isInPast: boolean;
   isSelected: boolean;
   onClick: (row: RequestSummary) => void;
@@ -39,28 +39,11 @@ export const RequestRow = ({
     prevIsSelectedRef.current = isSelected;
   }, [isSelected]);
 
-  const { shouldShowLoading, isCopied, onClipboardCopy } = useCopyToCliboard(row);
   const { contextMenu, onContextMenu } = useNetworkContextMenu({ row, onClipboardCopy });
   const { key: rowKey, ...rowProps } = row.getRowProps();
 
   return (
     <>
-      {isCopied || shouldShowLoading ? (
-        <div
-          className={classNames(
-            "absolute z-50 grid h-56 grid-cols-1 content-end place-self-center",
-            styles.showCopiedContainer
-          )}
-        >
-          <div
-            id="showCopied"
-            className={`mb-1.5 flex shrink rounded-lg bg-black p-1.5 text-center text-white opacity-100 shadow-2xl transition-all duration-700 ease-in-out`}
-          >
-            {shouldShowLoading ? "Copying to clipboard" : "Copied to clipboard"}
-          </div>
-        </div>
-      ) : null}
-
       <div
         key={rowKey}
         className={classNames(styles.row, {

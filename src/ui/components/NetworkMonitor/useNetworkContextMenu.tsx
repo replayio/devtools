@@ -1,4 +1,3 @@
-import { Header } from "@replayio/protocol";
 import { Row } from "react-table";
 
 import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
@@ -14,7 +13,7 @@ export default function useNetworkContextMenu({
   onClipboardCopy,
 }: {
   row: Row<RequestSummary>;
-  onClipboardCopy: () => void;
+  onClipboardCopy: (row: Row<RequestSummary>) => void;
 }) {
   const dispatch = useAppDispatch();
 
@@ -44,7 +43,7 @@ export default function useNetworkContextMenu({
         </>
       </ContextMenuItem>
 
-      <ContextMenuItem onClick={onClipboardCopy}>
+      <ContextMenuItem onClick={() => onClipboardCopy(row)}>
         <>
           <Icon type="copy" />
           Copy as CURL
