@@ -1,5 +1,7 @@
 import { Location, TimeRange, TimeStampedPoint } from "@replayio/protocol";
 
+import { ReplayEvent } from "ui/state/app";
+
 export interface ZoomRegion {
   endTime: number;
   beginTime: number;
@@ -15,6 +17,7 @@ export interface TimelineState {
   allPaintsReceived: boolean;
   currentTime: number;
   hoveredItem: HoveredItem | null;
+  hoveredEvent: ReplayEvent | null;
   hoverTime: number | null;
   focusRegion: FocusRegion | null;
   focusRegionBackup: FocusRegion | null;

@@ -62,7 +62,7 @@ import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { ThunkExtraArgs } from "ui/utils/thunk";
-import { isTimeInRegions, rangeForFocusRegion } from "ui/utils/timeline";
+import { rangeForFocusRegion } from "ui/utils/timeline";
 
 import {
   setFocusRegion as newFocusRegion,
@@ -70,7 +70,6 @@ import {
   setPlaybackStalled,
   setTimelineState,
 } from "../reducers/timeline";
-import { getLoadedRegions, isPointInLoadingRegion } from "./app";
 import type { UIStore, UIThunkAction } from "./index";
 
 const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;

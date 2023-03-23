@@ -4,6 +4,7 @@ import sortBy from "lodash/sortBy";
 
 import { MAX_FOCUS_REGION_DURATION } from "ui/actions/timeline";
 import { UIState } from "ui/state";
+import { ReplayEvent } from "ui/state/app";
 import { FocusRegion, HoveredItem, TimelineState } from "ui/state/timeline";
 import { getPausePointParams } from "ui/utils/environment";
 import { mergeSortedPointLists } from "ui/utils/timeline";
@@ -15,8 +16,9 @@ function initialTimelineState(): TimelineState {
     focusRegion: getPausePointParams().focusRegion,
     focusRegionBackup: null,
     displayedFocusRegion: null,
-    hoverTime: null,
+    hoveredEvent: null,
     hoveredItem: null,
+    hoverTime: null,
     playback: null,
     playbackFocusRegion: false,
     playbackPrecachedTime: 0,
@@ -46,6 +48,9 @@ const timelineSlice = createSlice({
     },
     setPlaybackStalled(state, action: PayloadAction<boolean>) {
       state.stalled = action.payload;
+    },
+    setHoveredEvent(state, action: PayloadAction<ReplayEvent | null>) {
+      state.hoveredEvent = action.payload;
     },
     setHoveredItem(state, action: PayloadAction<HoveredItem | null>) {
       state.hoveredItem = action.payload;
@@ -91,6 +96,7 @@ const lessThan = (a: number, b: number) => b - a > EPSILON;
 export const {
   allPaintsReceived,
   setDragging,
+  setHoveredEvent,
   setHoveredItem,
   setPlaybackPrecachedTime,
   setPlaybackFocusRegion,
@@ -114,6 +120,7 @@ export const isPlaying = (state: UIState) => state.timeline.playback !== null;
 export const isPlaybackStalled = (state: UIState) => state.timeline.stalled;
 export const getRecordingDuration = (state: UIState) => state.timeline.recordingDuration;
 export const getTimelineDimensions = (state: UIState) => state.timeline.timelineDimensions;
+export const getHoveredEvent = (state: UIState) => state.timeline.hoveredEvent;
 export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;
 export const getPaints = (state: UIState) => state.timeline.paints;
 export const getPoints = (state: UIState) => state.timeline.points;

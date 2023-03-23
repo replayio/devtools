@@ -3,27 +3,26 @@ import React from "react";
 import { selectors } from "ui/reducers";
 import { useAppSelector } from "ui/setup/hooks";
 import { ReplayEvent } from "ui/state/app";
+import { getVisiblePosition } from "ui/utils/timeline";
 
-import Marker from "./Marker";
+import styles from "./EventMarker.module.css";
 
-// TODO This component doesn't appear to be used right now?
-export default function EventMarker({ event, isPrimaryHighlighted }: EventMarkerProps) {
+export default function EventMarker({ event }: { event: ReplayEvent }) {
+  const { time } = event;
+
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
-  const currentTime = useAppSelector(selectors.getCurrentTime);
-  const overlayWidth = useAppSelector(selectors.getTimelineDimensions).width;
+
+  const offsetPercent = getVisiblePosition({ time, zoom: zoomRegion }) * 100;
+  if (offsetPercent < 0 || offsetPercent > 100) {
+    return null;
+  }
+
   return (
-    <Marker
-      point={event.point}
-      time={event.time}
-      currentTime={currentTime}
-      isPrimaryHighlighted={isPrimaryHighlighted}
-      zoomRegion={zoomRegion}
-      overlayWidth={overlayWidth}
+    <div
+      className={styles.EventMarker}
+      style={{
+        left: `${offsetPercent}%`,
+      }}
     />
   );
 }
-
-type EventMarkerProps = {
-  event: ReplayEvent;
-  isPrimaryHighlighted: boolean;
-};
