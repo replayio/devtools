@@ -611,11 +611,11 @@ export class ReplayClient implements ReplayClientInterface {
     return mappedLocation;
   }
 
-  async requestFocusRange(range: TimeRange): Promise<requestFocusRangeResult> {
+  async requestFocusRange(range: TimeRange): Promise<TimeStampedPointRange> {
     const sessionId = this.getSessionIdThrows();
-    const result = await client.Session.requestFocusRange({ range }, sessionId);
+    const { window } = await client.Session.requestFocusRange({ range }, sessionId);
 
-    return result;
+    return window;
   }
 
   isOriginalSource(sourceId: SourceId): boolean {
