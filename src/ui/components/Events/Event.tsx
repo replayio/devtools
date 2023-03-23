@@ -29,6 +29,7 @@ import { setViewMode } from "ui/actions/layout";
 import useEventContextMenu from "ui/components/Events/useEventContextMenu";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getViewMode } from "ui/reducers/layout";
+import { setMarkTimeStampPoint } from "ui/reducers/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
 import { ReplayEvent } from "ui/state/app";
 
@@ -347,6 +348,19 @@ export default React.memo(function Event({
     jumpButtonText = "Loading...";
   }
 
+  const onMouseEnter = () => {
+    dispatch(
+      setMarkTimeStampPoint({
+        point: event.point,
+        time: event.time,
+      })
+    );
+  };
+
+  const onMouseLeave = () => {
+    dispatch(setMarkTimeStampPoint(null));
+  };
+
   return (
     <>
       <div
@@ -357,6 +371,8 @@ export default React.memo(function Event({
         onClick={onClickSeek}
         onContextMenu={onContextMenu}
         onKeyDown={onKeyDown}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
       >
         <div className="flex flex-row items-center space-x-2 overflow-hidden">
           <MaterialIcon iconSize="xl">{icon}</MaterialIcon>

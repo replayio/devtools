@@ -8,7 +8,6 @@ import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { setViewMode } from "ui/actions/layout";
 import Events from "ui/components/Events";
 import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
-import LoginButton from "ui/components/LoginButton";
 import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
