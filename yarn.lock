@@ -4144,24 +4144,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/protocol@npm:0.40.0":
-  version: 0.40.0
-  resolution: "@replayio/protocol@npm:0.40.0"
-  checksum: 30b5f73d42913e57b22e13b7d6fc1e0e2e977b6c554aa5dada1a09426ca2b195e1978c682395f7e4068203c5dedf8397da9c6b0e10c67ffb8a9148a5e2aa5c5c
-  languageName: node
-  linkType: hard
-
-"@replayio/protocol@npm:^0.32.2":
-  version: 0.32.2
-  resolution: "@replayio/protocol@npm:0.32.2"
-  checksum: 26c76597dad8dd01498ef3ab2e7fd01a7031a63acf1dd405e821143a60c4e288d14bcb4a56c3858fef8ea2d29de3e52a57fea2287571a91595ab0e79f221fe88
-  languageName: node
-  linkType: hard
-
-"@replayio/protocol@npm:^0.32.3":
-  version: 0.32.3
-  resolution: "@replayio/protocol@npm:0.32.3"
-  checksum: f8d6469ba734f654ce2c1a34552ccc24082f252b5b688848393b06821ac0cb8bd512802686c08321a05993906f7f77d77a15e09fb5750652f471de02fce9b90a
+"@replayio/protocol@npm:^0.41.0":
+  version: 0.41.0
+  resolution: "@replayio/protocol@npm:0.41.0"
+  checksum: ae67ac38e5eccedaf5c55f41b2bca1a5d5657e93fd335e7249a44771dd1bc8902d1a79e873082ed3ad26f10c1d2ddd9340aec86a6d4f640f5002a8b693c2727e
   languageName: node
   linkType: hard
 
@@ -17153,7 +17139,7 @@ __metadata:
   resolution: "markerikson-stack-client-prototype-227d06@workspace:packages/markerikson-stack-client-prototype"
   dependencies:
     "@codemirror/lang-javascript": ^6.0.2
-    "@replayio/protocol": ^0.32.2
+    "@replayio/protocol": ^0.41.0
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
     "@uiw/react-codemirror": ^4.11.4
@@ -20779,7 +20765,7 @@ __metadata:
     "@recordreplay/sourcemap-upload-cli": ^0.1.1
     "@reduxjs/toolkit": ^1.8.4
     "@replayio/overboard": ^0.4.1
-    "@replayio/protocol": 0.40.0
+    "@replayio/protocol": ^0.41.0
     "@replayio/replay": ^0.12.4
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0
@@ -21257,7 +21243,7 @@ __metadata:
     "@lezer/common_replay_next": "npm:@lezer/common@1.0.1"
     "@lezer/highlight_replay_next": "npm:@lezer/highlight@1.1.1"
     "@playwright/test": ^1.23.1
-    "@replayio/protocol": ^0.32.3
+    "@replayio/protocol": ^0.41.0
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
     "@types/uuid": ^7.0.3

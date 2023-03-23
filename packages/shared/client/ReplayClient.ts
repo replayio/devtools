@@ -380,6 +380,12 @@ export class ReplayClient implements ReplayClientInterface {
     return Object.fromEntries(counts.map(({ type, count }) => [type, count]));
   }
 
+  async getFocusWindow(): Promise<TimeStampedPointRange> {
+    const sessionId = this.getSessionIdThrows();
+    const { window } = await client.Session.getFocusWindow({}, sessionId);
+    return window;
+  }
+
   async getFrameSteps(pauseId: PauseId, frameId: FrameId): Promise<PointDescription[]> {
     const sessionId = this.getSessionIdThrows();
     const { steps } = await client.Pause.getFrameSteps({ frameId }, sessionId, pauseId);
@@ -605,11 +611,11 @@ export class ReplayClient implements ReplayClientInterface {
     return mappedLocation;
   }
 
-  async requestFocusRange(range: TimeRange): Promise<requestFocusRangeResult> {
+  async requestFocusRange(range: TimeRange): Promise<TimeStampedPointRange> {
     const sessionId = this.getSessionIdThrows();
-    const result = await client.Session.requestFocusRange({ range }, sessionId);
+    const { window } = await client.Session.requestFocusRange({ range }, sessionId);
 
-    return result;
+    return window;
   }
 
   isOriginalSource(sourceId: SourceId): boolean {
