@@ -11,7 +11,7 @@ import { trackEvent } from "ui/utils/telemetry";
 
 import Event from "./Event";
 
-function CurrentTimeLine({ isActive }: { isActive: boolean }) {
+export function CurrentTimeLine({ isActive }: { isActive: boolean }) {
   return (
     <div
       className={classNames("m-0", isActive ? "bg-secondaryAccent" : "bg-transparent")}
