@@ -29,11 +29,7 @@ import {
 import { StreamingSourceContents } from "replay-next/src/suspense/SourcesCache";
 import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import {
-  POINT_BEHAVIOR_DISABLED,
-  POINT_BEHAVIOR_ENABLED,
-  SourceLocationRange,
-} from "shared/client/types";
+import { POINT_BEHAVIOR_DISABLED, POINT_BEHAVIOR_ENABLED } from "shared/client/types";
 import { toPointRange } from "shared/utils/time";
 
 import useFontBasedListMeasurements from "./hooks/useFontBasedListMeasurements";
@@ -82,6 +78,8 @@ export default function SourceList({
     visibleLines,
   } = useContext(SourcesContext);
 
+  const hasMountedRef = useRef<boolean>(false);
+
   const { lineHeight, pointPanelHeight, pointPanelWithConditionalHeight } =
     useFontBasedListMeasurements(listRef);
 
@@ -117,9 +115,21 @@ export default function SourceList({
   );
   const [, breakablePositionsByLine] = breakablePositionsValue;
 
+  useLayoutEffect(
+    () => () => {
+      // The Offscreen API cleans up layout effects when hiding views.
+      // For our purposes, that's the same as an "unmount".
+      hasMountedRef.current = false;
+    },
+    []
+  );
+
   useEffect(() => {
     const focusedSourceId = focusedSource?.sourceId ?? null;
     const startLineIndex = focusedSource?.startLineIndex ?? null;
+
+    const hasMounted = hasMountedRef.current;
+    hasMountedRef.current = true;
 
     if (pendingFocusUpdate === false || startLineIndex === null || focusedSourceId === null) {
       return;
@@ -132,7 +142,9 @@ export default function SourceList({
 
     const list = listRef.current;
     if (list) {
-      list.scrollToItem(startLineIndex, "smart");
+      // If this source has just been opened, try center-aligning the focused line.
+      // Otherwise use react-window's "smart" scroll, which will mimic how VS Code works.
+      list.scrollToItem(startLineIndex, hasMounted ? "smart" : "center");
 
       // Important!
       // Don't mark the update processed until we have actually scrolled to the line.
