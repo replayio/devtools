@@ -1,7 +1,6 @@
 import { MouseEvent, useLayoutEffect, useRef, useState } from "react";
 
 import { seekToTime, setTimelineToTime, stopPlayback } from "ui/actions/timeline";
-import EventMarker from "ui/components/Timeline/EventMarker";
 import { selectors } from "ui/reducers";
 import {
   isPlaying as isPlayingSelector,
@@ -33,7 +32,6 @@ export type EditMode = {
 export default function Timeline() {
   const dispatch = useAppDispatch();
   const hoverTime = useAppSelector(selectors.getHoverTime);
-  const hoveredEvent = useAppSelector(selectors.getHoveredEvent);
   const timelineDimensions = useAppSelector(selectors.getTimelineDimensions);
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
   const isPlaying = useAppSelector(isPlayingSelector);
@@ -140,7 +138,6 @@ export default function Timeline() {
               <ProgressBars />
               <PreviewMarkers />
               <Comments />
-              {hoveredEvent && <EventMarker event={hoveredEvent} />}
               <NonLoadingRegions />
               <UnfocusedRegion />
               {showLoadingProgress && <LoadingProgressBars />}
