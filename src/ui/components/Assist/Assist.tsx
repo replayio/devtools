@@ -146,6 +146,7 @@ const Tour: React.FC = () => {
       <div className={styles.AssistBoxGradient}>
         <div className={styles.AssistBox}>
           <div className="p-0 pt-3">
+            <div className={styles.h1}>Replay Assist</div>
             <div className={styles.AssistBoxInternal}>
               <div className={styles.checklist}>
                 {checklistItems.map((item, index) => (

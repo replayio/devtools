@@ -26,10 +26,9 @@
   font-size: 22px;
   font-weight: 500;
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-  padding-bottom: 1rem;
   display: flex;
   align-items: center;
-  padding: 4px 0 24px 8px;
+  padding: 0px 0 16px 8px;
 }
 
 .intro {
