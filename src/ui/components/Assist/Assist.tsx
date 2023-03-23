@@ -57,13 +57,47 @@ const Tour: React.FC = () => {
 
   const handleClick = (index: number) => {
     setSelectedItem(index);
-    // Set the URL of the video to be displayed based on the clicked index
+
     if (index === 0) {
-      setVideoUrl("/images/tour/video1.gif");
+      setVideoUrl("/images/tour/consoleupdate.gif");
     } else if (index === 1) {
-      setVideoUrl("/images/tour/video2.gif");
+      setVideoUrl("/images/tour/focusmode.gif");
     } else if (index === 2) {
-      setVideoUrl("/images/tour/video3.gif");
+      setVideoUrl("/images/tour/consoleupdate.gif");
+    } else if (index === 3) {
+      setVideoUrl("/images/tour/focusmode.gif");
+    } else if (index === 4) {
+      setVideoUrl("/images/tour/consoleupdate.gif");
+    } else if (index === 5) {
+      setVideoUrl("/images/tour/focusmode.gif");
+    } else if (index === 6) {
+      setVideoUrl("/images/tour/consoleupdate.gif");
+    } else if (index === 7) {
+      setVideoUrl("/images/tour/focusmode.gif");
+    } else if (index === 8) {
+      setVideoUrl("/images/tour/consoleupdate.gif");
+    } else if (index === 9) {
+      setVideoUrl("/images/tour/focusmode.gif");
+    } else if (index === 10) {
+      setVideoUrl("/images/tour/consoleupdate.gif");
+    } else if (index === 11) {
+      setVideoUrl("/images/tour/focusmode.gif");
+    } else if (index === 12) {
+      setVideoUrl("/images/tour/consoleupdate.gif");
+    } else if (index === 13) {
+      setVideoUrl("/images/tour/focusmode.gif");
+    } else if (index === 14) {
+      setVideoUrl("/images/tour/consoleupdate.gif");
+    } else if (index === 15) {
+      setVideoUrl("/images/tour/consoleupdate.gif");
+    } else if (index === 16) {
+      setVideoUrl("/images/tour/focusmode.gif");
+    } else if (index === 17) {
+      setVideoUrl("/images/tour/focusmode.gif");
+    } else if (index === 18) {
+      setVideoUrl("/images/tour/focusmode.gif");
+    } else if (index === 19) {
+      setVideoUrl("/images/tour/consoleupdate.gif");
     }
   };
 
