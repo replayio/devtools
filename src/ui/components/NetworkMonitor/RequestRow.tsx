@@ -3,6 +3,7 @@ import React, { useLayoutEffect, useRef } from "react";
 import { Row } from "react-table";
 
 import useNetworkContextMenu from "ui/components/NetworkMonitor/useNetworkContextMenu";
+
 import { RequestSummary } from "./utils";
 import styles from "./RequestTable.module.css";
 
