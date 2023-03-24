@@ -89,6 +89,7 @@ const HttpBody = ({
       <ReactJson
         style={{ backgroundColor: "none" }}
         theme={theme == "light" ? "rjv-default" : "tube"}
+        name={false}
         src={displayable.content}
         shouldCollapse={false}
         displayDataTypes={false}
