@@ -36,7 +36,7 @@ export function LoadingScreenTemplate({
 
   return (
     <BubbleViewportWrapper>
-      <div className="relative flex w-96 flex-col items-center space-y-1 rounded-lg bg-loadingBoxes p-8 py-12 shadow-sm">
+      <div className="relative flex w-96 flex-col items-center space-y-1 rounded-lg bg-loadingBoxes p-4 py-12 shadow-sm">
         <div className="flex flex-col items-center space-y-8">
           <div className="h-32 w-32" onClick={changeHoverboardColor}>
             <Hoverboard color={hoverboardColor} />
@@ -44,7 +44,6 @@ export function LoadingScreenTemplate({
           {children}
         </div>
       </div>
-      {showTips ? <LoadingTips /> : null}
     </BubbleViewportWrapper>
   );
 }
