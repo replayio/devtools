@@ -157,7 +157,7 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
     );
   }
 
-  const preloadIcons = () => (
+  const preloadIcons = (
     <div style={{ display: "none" }}>
       <MaterialIcon>globe</MaterialIcon>
       <MaterialIcon>group</MaterialIcon>
@@ -168,7 +168,7 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
 
   return (
     <>
-      {preloadIcons()}
+      {preloadIcons}
       <PortalDropdown
         buttonContent={<DropdownButton>{summary}</DropdownButton>}
         buttonStyle={"overflow-hidden"}
