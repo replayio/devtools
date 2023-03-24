@@ -8,7 +8,6 @@ import { isTimeInRegions } from "ui/utils/timeline";
 
 import { HeaderGroups } from "./HeaderGroups";
 import { RequestRow } from "./RequestRow";
-import useCopyToCliboard from "./useCopyToClipboard";
 import { RequestSummary } from "./utils";
 import styles from "./RequestTable.module.css";
 
@@ -36,7 +35,6 @@ const RequestTable = ({
   const { columns, getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = table;
 
   const loadedRegions = useAppSelector(getLoadedRegions);
-  const { shouldShowLoading, isCopied, onClipboardCopy } = useCopyToCliboard();
 
   const onSeek = (request: RequestSummary) => {
     trackEvent("net_monitor.seek_to_request");
@@ -53,17 +51,6 @@ const RequestTable = ({
         className={classNames("flex h-full w-full flex-col overflow-x-auto", styles.request)}
         {...getTableProps()}
       >
-        {isCopied || shouldShowLoading ? (
-          <div className="absolute z-50 grid h-56 grid-cols-1 content-end place-self-center">
-            <div
-              id="showCopied"
-              className={`mb-1.5 flex shrink rounded-lg bg-black p-1.5 text-center text-white opacity-100 shadow-2xl transition-all duration-700 ease-in-out`}
-            >
-              {`${shouldShowLoading ? "Copying" : "Copied"} to clipboard`}
-            </div>
-          </div>
-        ) : null}
-
         <HeaderGroups columns={columns as any} headerGroups={headerGroups} />
 
         <div className="relative w-fit min-w-full overflow-y-auto" {...getTableBodyProps()}>
@@ -94,7 +81,6 @@ const RequestTable = ({
                 key={row.getRowProps().key}
                 onClick={onRowSelect}
                 onSeek={onSeek}
-                onClipboardCopy={onClipboardCopy}
                 row={row}
               />
             );

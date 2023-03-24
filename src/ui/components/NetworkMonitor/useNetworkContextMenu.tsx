@@ -4,18 +4,15 @@ import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem
 import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import Icon from "replay-next/components/Icon";
 import { setFocusRegionBeginTime, setFocusRegionEndTime } from "ui/actions/timeline";
+import useCopyAsCURL from "ui/components/NetworkMonitor/useCopyAsCURL";
 import { useAppDispatch } from "ui/setup/hooks";
 
 import { RequestSummary } from "./utils";
 
-export default function useNetworkContextMenu({
-  row,
-  onClipboardCopy,
-}: {
-  row: Row<RequestSummary>;
-  onClipboardCopy: (row: Row<RequestSummary>) => void;
-}) {
+export default function useNetworkContextMenu({ row }: { row: Row<RequestSummary> }) {
   const dispatch = useAppDispatch();
+
+  const { copy: copyAsCURL, state } = useCopyAsCURL(row);
 
   const beginTime = row.original?.start;
   const endTime = row.original?.end;
@@ -43,7 +40,7 @@ export default function useNetworkContextMenu({
         </>
       </ContextMenuItem>
 
-      <ContextMenuItem onClick={() => onClipboardCopy(row)}>
+      <ContextMenuItem disabled={state !== "ready"} onClick={copyAsCURL}>
         <>
           <Icon type="copy" />
           Copy as CURL
