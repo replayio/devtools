@@ -1,7 +1,8 @@
 import React, { FC, useState } from "react";
 import { useDispatch } from "react-redux";
 
-import { toggleReplayAssist } from "ui/actions/app"; // Make sure to import this action
+import { setSelectedPrimaryPanel } from "ui/actions/layout";
+import { toggleReplayAssist } from "ui/reducers/app"; // Make sure to import this action
 import useAuth0 from "ui/utils/useAuth0";
 
 const ReplayAssistButton: FC = () => {
@@ -24,6 +25,11 @@ const ReplayAssistButton: FC = () => {
         onChange={() => {
           setShouldShowReplayAssist(!shouldShowReplayAssist);
           dispatch(toggleReplayAssist());
+          if (shouldShowReplayAssist) {
+            dispatch(setSelectedPrimaryPanel("events"));
+          } else {
+            dispatch(setSelectedPrimaryPanel("assist"));
+          }
         }}
       />
       <span>Replay Assist</span>
