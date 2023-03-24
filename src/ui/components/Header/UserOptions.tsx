@@ -41,6 +41,19 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
     setModal("settings");
   };
 
+  const preloadIcons = () => (
+    <div style={{ display: "none" }}>
+      <Icon filename="docs" className="bg-iconColor" />
+      <Icon filename="help" className="bg-iconColor" />
+      <Icon filename="settings" className="bg-iconColor" />
+      <Icon filename="replay-logo" className="bg-iconColor" />
+    </div>
+  );
+
+  {
+    preloadIcons();
+  }
+
   return (
     <div className="user-options text-blue-400">
       <Dropdown
