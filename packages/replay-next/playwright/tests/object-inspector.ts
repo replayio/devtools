@@ -184,17 +184,20 @@ test("should properly bucket properties for an overflowing array", async ({ page
 
   await inspectAndTakeScreenshotOf(page, "overflowingArray", "overflowing-array-expanded");
 
-  const firstBucket = await page.locator('[data-test-name="ExpandablePreview"]', {
-    hasText: "[0 … 99]",
+  await toggleExpandable(page, {
+    partialText: "[0 … 99]",
+    expanded: true,
   });
-  await firstBucket.click();
   await takeScreenshotOfMessages(page, "overflowing-array-first-bucket-expanded");
 
-  await firstBucket.click();
-  const secondBucket = await page.locator('[data-test-name="ExpandablePreview"]', {
-    hasText: "[100 … 105]",
+  await toggleExpandable(page, {
+    partialText: "[0 … 99]",
+    expanded: false,
   });
-  await secondBucket.click();
+  await toggleExpandable(page, {
+    partialText: "[100 … 105]",
+    expanded: true,
+  });
   await takeScreenshotOfMessages(page, "overflowing-array-second-bucket-expanded");
 });
 

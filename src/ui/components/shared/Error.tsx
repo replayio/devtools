@@ -151,18 +151,20 @@ function Error({ error }: ErrorProps) {
   const { action, message, content } = error;
 
   return (
-    <Dialog showFooterLinks={true} showIllustration={true}>
-      <DialogTitle>{message}</DialogTitle>
-      {content && <DialogDescription>{content}</DialogDescription>}
-      {action ? (
-        <DialogActions>
-          <ActionButton
-            action={action}
-            onAction={"onAction" in error ? error.onAction : undefined}
-          />
-        </DialogActions>
-      ) : null}
-    </Dialog>
+    <div data-testid="Error">
+      <Dialog showFooterLinks={true} showIllustration={true}>
+        <DialogTitle>{message}</DialogTitle>
+        {content && <DialogDescription>{content}</DialogDescription>}
+        {action ? (
+          <DialogActions>
+            <ActionButton
+              action={action}
+              onAction={"onAction" in error ? error.onAction : undefined}
+            />
+          </DialogActions>
+        ) : null}
+      </Dialog>
+    </div>
   );
 }
 

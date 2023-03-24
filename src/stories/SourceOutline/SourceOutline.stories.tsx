@@ -2,7 +2,6 @@ import { Meta, Story } from "@storybook/react";
 import React, { ComponentProps } from "react";
 
 import { SourceOutline } from "devtools/client/debugger/src/components/SourceOutline/SourceOutline";
-import { SymbolDeclarations } from "devtools/client/debugger/src/reducers/ast";
 
 import symbols from "../fixtures/symbols";
 import "devtools/client/debugger/src/components/shared/PreviewFunction.css";
@@ -33,9 +32,5 @@ Basic.args = {
     id: "pp123",
     url: "pretty-source.js",
   },
-  symbols: {
-    id: "some-source-id",
-    status: "loaded" as any,
-    symbols: symbols as unknown as SymbolDeclarations,
-  },
+  symbols,
 };

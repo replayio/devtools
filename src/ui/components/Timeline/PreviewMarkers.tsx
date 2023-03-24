@@ -1,21 +1,32 @@
 import type { PointDescription } from "@replayio/protocol";
 import { Suspense, useContext } from "react";
 
+import { binarySearch } from "protocol/utils";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/HitPointsCache";
-import { sourceHitCountsCache } from "replay-next/src/suspense/SourcesCache";
+import { sourceHitCountsCache } from "replay-next/src/suspense/SourceHitCountsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { toPointRange } from "shared/utils/time";
 import { selectors } from "ui/reducers";
 import { useAppSelector } from "ui/setup/hooks";
 
 import Marker from "./Marker";
 
-function PreviewMarkers() {
+export default function PreviewMarkers() {
+  return (
+    <Suspense fallback={null}>
+      <PreviewMarkersSuspends />
+    </Suspense>
+  );
+}
+
+function PreviewMarkersSuspends() {
   const currentTime = useAppSelector(selectors.getCurrentTime);
   const hoveredItem = useAppSelector(selectors.getHoveredItem);
   const timelineDimensions = useAppSelector(selectors.getTimelineDimensions);
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
+  const markTimeStampedPoint = useAppSelector(selectors.getMarkTimeStampedPoint);
 
   const replayClient = useContext(ReplayClientContext);
 
@@ -27,14 +38,20 @@ function PreviewMarkers() {
   let firstColumnWithHitCounts = null;
   if (focusedSourceId !== null && hoveredLineIndex !== null && visibleLines !== null) {
     const hitCounts = sourceHitCountsCache.read(
+      visibleLines?.start.line ?? 0,
+      visibleLines?.end.line ?? 0,
       replayClient,
       focusedSourceId,
-      visibleLines,
-      focusRange
+      focusRange ? toPointRange(focusRange) : null
     );
-    const hitCountsForLine = hitCounts.get(hoveredLineIndex + 1)!;
-    if (hitCountsForLine) {
-      firstColumnWithHitCounts = hitCountsForLine.firstBreakableColumnIndex;
+    const hitCountsForLineIndex = binarySearch(
+      0,
+      hitCounts.length,
+      index => hoveredLineIndex + 1 - hitCounts[index][0]
+    );
+    const hitCountsForLine = hitCounts[hitCountsForLineIndex];
+    if (hitCountsForLine && hitCountsForLine[0] === hoveredLineIndex + 1) {
+      firstColumnWithHitCounts = hitCountsForLine[1].firstBreakableColumnIndex;
     }
   }
 
@@ -55,40 +72,41 @@ function PreviewMarkers() {
         )
       : [null, null];
 
-  if (
-    hitPointStatus === "too-many-points-to-run-analysis" ||
-    hitPointStatus === "too-many-points-to-find" ||
-    hitPoints == null
-  ) {
-    return null;
-  }
+  const showHitPointMarkers =
+    hitPoints != null &&
+    hitPointStatus !== "too-many-points-to-run-analysis" &&
+    hitPointStatus !== "too-many-points-to-find";
 
   return (
     <div className="preview-markers-container">
-      {hitPoints.map((point: PointDescription, index: number) => {
-        const isPrimaryHighlighted = hoveredItem?.point === point.point;
+      {showHitPointMarkers &&
+        hitPoints.map((point: PointDescription, index: number) => {
+          const isPrimaryHighlighted = hoveredItem?.point === point.point;
 
-        return (
-          <Marker
-            key={index}
-            point={point.point}
-            time={point.time}
-            location={point.frame?.[0]}
-            currentTime={currentTime}
-            isPrimaryHighlighted={isPrimaryHighlighted}
-            zoomRegion={zoomRegion}
-            overlayWidth={timelineDimensions.width}
-          />
-        );
-      })}
+          return (
+            <Marker
+              key={index}
+              point={point.point}
+              time={point.time}
+              location={point.frame?.[0]}
+              currentTime={currentTime}
+              isPrimaryHighlighted={isPrimaryHighlighted}
+              zoomRegion={zoomRegion}
+              overlayWidth={timelineDimensions.width}
+            />
+          );
+        })}
+
+      {markTimeStampedPoint && (
+        <Marker
+          point={markTimeStampedPoint.point}
+          time={markTimeStampedPoint.time}
+          currentTime={currentTime}
+          isPrimaryHighlighted={false}
+          zoomRegion={zoomRegion}
+          overlayWidth={timelineDimensions.width}
+        />
+      )}
     </div>
-  );
-}
-
-export default function ToggleWidgetButtonSuspenseWrapper() {
-  return (
-    <Suspense fallback={null}>
-      <PreviewMarkers />
-    </Suspense>
   );
 }

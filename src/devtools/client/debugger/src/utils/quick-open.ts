@@ -3,13 +3,17 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { Dictionary } from "@reduxjs/toolkit";
-import type { FunctionMatch, Location } from "@replayio/protocol";
+import type {
+  FunctionMatch,
+  FunctionOutline,
+  Location,
+  getSourceOutlineResult,
+} from "@replayio/protocol";
 
 import { truncate as truncateText } from "replay-next/src/utils/text";
 import { SourceDetails } from "ui/reducers/sources";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 
-import { FunctionDeclaration, SymbolEntry } from "../reducers/ast";
 import { SearchTypes } from "../reducers/quick-open";
 import { memoizeLast } from "./memoizeLast";
 import { getSourceClassnames, getTruncatedFileName } from "./source";
@@ -79,11 +83,11 @@ function formatSourceForList(source: SourceDetails, tabUrls: Set<string>) {
   };
 }
 
-export function formatSymbol(symbol: FunctionDeclaration) {
+export function formatSymbol(symbol: FunctionOutline) {
   return {
-    id: `${symbol.name}:${symbol.location.start.line}`,
+    id: `${symbol.name}:${symbol.location.begin.line}`,
     title: symbol.name,
-    subtitle: `${symbol.location.start.line}`,
+    subtitle: `${symbol.location.begin.line}`,
     value: symbol.name,
     location: symbol.location,
   };
@@ -117,13 +121,13 @@ export function formatProjectFunctions(
 
 const NO_FUNCTIONS_FOUND = { functions: [] };
 
-export const formatSymbols = memoizeLast((symbolsEntry: SymbolEntry | null) => {
-  if (symbolsEntry?.status !== LoadingStatus.LOADED || !symbolsEntry?.symbols!.functions) {
+export const formatSymbols = memoizeLast((symbols: getSourceOutlineResult | null) => {
+  if (!symbols) {
     return NO_FUNCTIONS_FOUND;
   }
 
   return {
-    functions: symbolsEntry.symbols!.functions.map(formatSymbol),
+    functions: symbols.functions.map(formatSymbol),
   };
 });
 

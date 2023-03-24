@@ -37,6 +37,7 @@ import {
   createPauseResult,
   getAllFramesResult,
   getScopeResult,
+  getSourceOutlineResult,
   getTopFrameResult,
   keyboardEvents,
   navigationEvents,
@@ -157,6 +158,7 @@ export interface ReplayClientInterface {
   }>;
   findNavigationEvents(onKeyboardEvents: (events: navigationEvents) => void): Promise<void>;
   findSources(): Promise<Source[]>;
+  getAllEventHandlerCounts(range: PointRange | null): Promise<Record<string, number>>;
   getAllFrames(pauseId: PauseId): Promise<getAllFramesResult>;
   getAnnotationKinds(): Promise<string[]>;
   getBreakpointPositions(
@@ -169,7 +171,7 @@ export interface ReplayClientInterface {
     eventTypes: EventHandlerType[],
     focusRange: PointRange | null
   ): Promise<Record<string, number>>;
-  getAllEventHandlerCounts(range: PointRange | null): Promise<Record<string, number>>;
+  getFocusWindow(): Promise<TimeStampedPointRange>;
   getFrameSteps(pauseId: PauseId, frameId: FrameId): Promise<PointDescription[]>;
   getMappedLocation(location: Location): Promise<MappedLocation>;
   getObjectWithPreview(
@@ -193,11 +195,12 @@ export interface ReplayClientInterface {
     sourceLocations: SameLineSourceLocations[],
     focusRange: PointRange | null
   ): Promise<LineNumberToHitCountMap>;
+  getSourceOutline(sourceId: SourceId): Promise<getSourceOutlineResult>;
   getTopFrame(pauseId: PauseId): Promise<getTopFrameResult>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   isOriginalSource(sourceId: SourceId): boolean;
   isPrettyPrintedSource(sourceId: SourceId): boolean;
-  requestFocusRange(range: TimeRange): Promise<requestFocusRangeResult>;
+  requestFocusRange(range: TimeRange): Promise<TimeStampedPointRange>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;
   repaintGraphics(pauseId: PauseId): Promise<repaintGraphicsResult>;
   runAnalysis<Result>(analysisParams: RunAnalysisParams): Promise<Result[]>;

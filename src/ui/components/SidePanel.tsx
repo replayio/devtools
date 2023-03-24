@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react";
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import SecondaryPanes from "devtools/client/debugger/src/components/SecondaryPanes";
 import Accordion from "devtools/client/debugger/src/components/shared/Accordion";
+import LazyOffscreen from "replay-next/components/LazyOffscreen";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { setViewMode } from "ui/actions/layout";
 import Events from "ui/components/Events";
 import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
-import LoginButton from "ui/components/LoginButton";
 import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
@@ -25,6 +25,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
 import ProtocolViewer from "./ProtocolViewer";
+import { ReactPanel } from "./ReactPanel";
 import StatusDropdown from "./shared/StatusDropdown";
 import { TestSuitePanel } from "./TestSuitePanel";
 import Tour from "./Tour/Tour";
@@ -140,6 +141,9 @@ export default function SidePanel() {
         {selectedPrimaryPanel === "cypress" && <TestSuitePanel />}
         {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
         {selectedPrimaryPanel === "search" && <SearchFilesReduxAdapter />}
+        <LazyOffscreen mode={selectedPrimaryPanel === "react" ? "visible" : "hidden"}>
+          <ReactPanel />
+        </LazyOffscreen>
       </div>
     </div>
   );

@@ -14,11 +14,14 @@ export interface FocusRegion {
 export interface TimelineState {
   allPaintsReceived: boolean;
   currentTime: number;
-  hoveredItem: HoveredItem | null;
-  hoverTime: number | null;
+  displayedFocusRegion: TimeRange | null;
+  dragging: boolean;
   focusRegion: FocusRegion | null;
   focusRegionBackup: FocusRegion | null;
-  displayedFocusRegion: TimeRange | null;
+  hoveredItem: HoveredItem | null;
+  hoverTime: number | null;
+  markTimeStampedPoint: TimeStampedPoint | null;
+  paints: TimeStampedPoint[];
   playback: {
     beginTime: number;
     beginDate: number;
@@ -26,7 +29,6 @@ export interface TimelineState {
   } | null;
   playbackFocusRegion: boolean;
   playbackPrecachedTime: number;
-  paints: TimeStampedPoint[];
   points: TimeStampedPoint[];
   recordingDuration: number | null;
   shouldAnimate: boolean;
@@ -34,7 +36,6 @@ export interface TimelineState {
   stalled?: boolean;
   timelineDimensions: { width: number; left: number; top: number };
   zoomRegion: ZoomRegion;
-  dragging: boolean;
 }
 
 export interface HoveredItem {

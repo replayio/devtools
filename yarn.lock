@@ -4144,24 +4144,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/protocol@npm:0.38.0":
-  version: 0.38.0
-  resolution: "@replayio/protocol@npm:0.38.0"
-  checksum: 8a1f12681a74712b9209f0317ad1966dd4808b67db26ff61dbced5063183cfed83c8212c5960509af5daa8970dcd67d60b9f6c72e44993948cb7ae07e60fc1c6
-  languageName: node
-  linkType: hard
-
-"@replayio/protocol@npm:^0.32.2":
-  version: 0.32.2
-  resolution: "@replayio/protocol@npm:0.32.2"
-  checksum: 26c76597dad8dd01498ef3ab2e7fd01a7031a63acf1dd405e821143a60c4e288d14bcb4a56c3858fef8ea2d29de3e52a57fea2287571a91595ab0e79f221fe88
-  languageName: node
-  linkType: hard
-
-"@replayio/protocol@npm:^0.32.3":
-  version: 0.32.3
-  resolution: "@replayio/protocol@npm:0.32.3"
-  checksum: f8d6469ba734f654ce2c1a34552ccc24082f252b5b688848393b06821ac0cb8bd512802686c08321a05993906f7f77d77a15e09fb5750652f471de02fce9b90a
+"@replayio/protocol@npm:^0.41.0":
+  version: 0.41.0
+  resolution: "@replayio/protocol@npm:0.41.0"
+  checksum: ae67ac38e5eccedaf5c55f41b2bca1a5d5657e93fd335e7249a44771dd1bc8902d1a79e873082ed3ad26f10c1d2ddd9340aec86a6d4f640f5002a8b693c2727e
   languageName: node
   linkType: hard
 
@@ -17153,7 +17139,7 @@ __metadata:
   resolution: "markerikson-stack-client-prototype-227d06@workspace:packages/markerikson-stack-client-prototype"
   dependencies:
     "@codemirror/lang-javascript": ^6.0.2
-    "@replayio/protocol": ^0.32.2
+    "@replayio/protocol": ^0.41.0
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
     "@uiw/react-codemirror": ^4.11.4
@@ -20779,7 +20765,7 @@ __metadata:
     "@recordreplay/sourcemap-upload-cli": ^0.1.1
     "@reduxjs/toolkit": ^1.8.4
     "@replayio/overboard": ^0.4.1
-    "@replayio/protocol": 0.38.0
+    "@replayio/protocol": ^0.41.0
     "@replayio/replay": ^0.12.4
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0
@@ -20923,7 +20909,7 @@ __metadata:
     style-loader: ^3.3.1
     stylelint: ^14.16.0
     stylelint-config-prettier: ^9.0.4
-    suspense: ^0.0.26
+    suspense: ^0.0.30
     tailwindcss: ^3.2.4
     ts-node: ^10.7.0
     tsconfig-paths: ^3.14.1
@@ -21257,7 +21243,7 @@ __metadata:
     "@lezer/common_replay_next": "npm:@lezer/common@1.0.1"
     "@lezer/highlight_replay_next": "npm:@lezer/highlight@1.1.1"
     "@playwright/test": ^1.23.1
-    "@replayio/protocol": ^0.32.3
+    "@replayio/protocol": ^0.41.0
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
     "@types/uuid": ^7.0.3
@@ -21278,7 +21264,7 @@ __metadata:
     react-dom: 0.0.0-experimental-e7d0053e6-20220325
     react-virtualized-auto-sizer: ^1.0.7
     shared: "workspace:*"
-    suspense: ^0.0.26
+    suspense: ^0.0.30
     typescript: ^4.6.3
     uuid: ^7.0.3
   languageName: unknown
@@ -23103,16 +23089,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"suspense@npm:^0.0.26":
-  version: 0.0.26
-  resolution: "suspense@npm:0.0.26"
+"suspense@npm:^0.0.30":
+  version: 0.0.30
+  resolution: "suspense@npm:0.0.30"
   dependencies:
     interval-utilities: ^0.0.1
     point-utilities: ^0.0.2
   peerDependencies:
     react: ^18.0.0
     react-dom: ^18.0.0
-  checksum: 2aa4391a0ce2d24907048d4bb4bb8d6ab4a6d650efa452285fa30d664d60dabf80276ffa880452d8e72b965b881876cd07f228d150fa4b10fbe84e2983adcf64
+  checksum: f0d0bf995a49df8795b638ca67140d5d6a623abc8d364a71a534478cf8de10469171e53f9858177edcccac5aba2943e00828a69b0871806bfdd2102c49313d10
   languageName: node
   linkType: hard
 
