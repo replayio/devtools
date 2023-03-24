@@ -1,6 +1,5 @@
 import { RequestBodyData } from "@replayio/protocol";
 import { useState } from "react";
-import { Row } from "react-table";
 
 import { fetchRequestBody } from "ui/actions/network";
 import { getRequestBodyById } from "ui/reducers/network";
@@ -17,7 +16,7 @@ import { RequestSummary, findHeader } from "./utils";
 type State = "ready" | "loading" | "complete" | "error";
 
 export default function useCopyAsCURL(
-  row: Row<RequestSummary>,
+  requestSummary: RequestSummary,
   resetAfterDelay: number = 2_500
 ): {
   copy: () => void;
@@ -26,22 +25,22 @@ export default function useCopyAsCURL(
   const dispatch = useAppDispatch();
   const store = useAppStore();
 
-  let requestBody = useAppSelector(state => getRequestBodyById(state, row.id));
+  let requestBody = useAppSelector(state => getRequestBodyById(state, requestSummary.id));
 
   const [state, setState] = useState<State>("ready");
 
   const copy = async () => {
     try {
-      if (row.original.hasRequestBody && requestBody == null) {
+      if (requestSummary.hasRequestBody && requestBody == null) {
         setState("loading");
 
-        await dispatch(fetchRequestBody(row.id));
+        await dispatch(fetchRequestBody(requestSummary.id));
 
         const state = store.getState();
-        requestBody = getRequestBodyById(state, row.id);
+        requestBody = getRequestBodyById(state, requestSummary.id);
       }
 
-      const text = formatText(row, requestBody);
+      const text = formatText(requestSummary, requestBody);
       navigator.clipboard.writeText(text);
 
       setState("complete");
@@ -57,11 +56,8 @@ export default function useCopyAsCURL(
   return { copy, state };
 }
 
-function formatText(row: Row<RequestSummary>, requestBody: RequestBodyData[] | null) {
-  const {
-    values: { url = "" } = {},
-    original: { requestHeaders = [], hasRequestBody = false } = {},
-  } = row;
+function formatText(requestSummary: RequestSummary, requestBody: RequestBodyData[] | null) {
+  const { hasRequestBody, requestHeaders, url } = requestSummary;
 
   const headersString = requestHeaders.map(({ name, value }) => `-H '${name}: ${value}'`).join(" ");
 

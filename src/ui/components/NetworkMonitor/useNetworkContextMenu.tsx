@@ -12,7 +12,7 @@ import { RequestSummary } from "./utils";
 export default function useNetworkContextMenu({ row }: { row: Row<RequestSummary> }) {
   const dispatch = useAppDispatch();
 
-  const { copy: copyAsCURL, state } = useCopyAsCURL(row);
+  const { copy: copyAsCURL, state } = useCopyAsCURL(row.original);
 
   const beginTime = row.original?.start;
   const endTime = row.original?.end;
