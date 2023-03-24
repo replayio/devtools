@@ -1,0 +1,18 @@
+
+<div id="divvy">Hello World!</div>
+<script>
+
+function recordingFinished() {
+  console.log("ExampleFinished");
+}
+
+const divvy = document.getElementById("divvy");
+divvy.addEventListener("click", e => {
+  divvy.innerText = "Goodbye World!";
+  window.setTimeout(recordingFinished);
+});
+
+window.setTimeout(() => {
+  divvy.click();
+});
+</script>
