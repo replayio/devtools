@@ -112,12 +112,14 @@ const Tour: React.FC = () => {
     return null;
   };
 
+  /*
   const renderClickInfo = () => {
     if (selectedItem >= 0) {
       return <div className={styles.clickInfo}>You clicked on {checklistItems[selectedItem]}</div>;
     }
     return null;
   };
+  */
 
   // Hard-coded checklist items
   const checklistItems = [
