@@ -38,12 +38,13 @@ export const RequestRow = ({
     prevIsSelectedRef.current = isSelected;
   }, [isSelected]);
 
-  const { contextMenu, onContextMenu } = useNetworkContextMenu(row);
+  const { contextMenu, onContextMenu } = useNetworkContextMenu({ row });
+  const { key: rowKey, ...rowProps } = row.getRowProps();
 
   return (
     <>
       <div
-        key={row.getRowProps().key}
+        key={rowKey}
         className={classNames(styles.row, {
           [styles.current]: isFirstInFuture,
           [styles.selected]: isSelected,
@@ -56,7 +57,7 @@ export const RequestRow = ({
         tabIndex={0}
         data-testid="NetworkMonitor-RequestTable-RequestRow"
       >
-        <div {...row.getRowProps()}>
+        <div {...rowProps}>
           {row.original.triggerPoint && row.original.triggerPoint.time !== currentTime && (
             <button
               className={classNames(styles.seekBadge, "shadow-md")}
