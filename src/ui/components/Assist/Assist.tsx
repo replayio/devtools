@@ -16,10 +16,25 @@ import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ViewMode } from "ui/state/layout";
 import {
+  shouldShowAddComment,
+  shouldShowAddCommentToLine,
+  shouldShowAddCommentToNetworkRequest,
+  shouldShowAddCommentToPrintStatement,
+  shouldShowAddUnicornBadge,
   shouldShowBreakpointAdd,
   shouldShowBreakpointEdit,
   shouldShowConsoleNavigate,
+  shouldShowExploreSources,
+  shouldShowInspectComponent,
+  shouldShowInspectElement,
+  shouldShowJumpToCode,
+  shouldShowJumpToEvent,
+  shouldShowLaunchCommandPalette,
+  shouldShowQuickOpenFile,
+  shouldShowRecordReplay,
+  shouldShowSearchSourceText,
   shouldShowTour,
+  shouldShowUseFocusMode,
 } from "ui/utils/onboarding";
 
 import styles from "./Assist.module.css";
@@ -38,24 +53,45 @@ const useNagDismissal = () => {
   return { dismissTourNag };
 };
 
-const Tour: React.FC = () => {
+const Assist: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState(1);
   const { nags } = hooks.useGetUserInfo();
   const viewMode = useAppSelector(getViewMode);
   const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
-
   const showConsoleNavigate = shouldShowConsoleNavigate(nags);
   const showBreakpointAdd = shouldShowBreakpointAdd(nags);
   const showBreakpointEdit = shouldShowBreakpointEdit(nags);
-  const showTour = shouldShowTour(nags);
+
+  const showAddComment = shouldShowAddComment(nags);
+  const showAddCommentToLine = shouldShowAddCommentToLine(nags);
+  const showAddCommentToNetworkRequest = shouldShowAddCommentToNetworkRequest(nags);
+  const showAddCommentToPrintStatement = shouldShowAddCommentToPrintStatement(nags);
+  const showJumpToCode = shouldShowJumpToCode(nags);
+  const showAddUnicornBadge = shouldShowAddUnicornBadge(nags);
+  const showRecordReplay = shouldShowRecordReplay(nags);
+  const showExploreSources = shouldShowExploreSources(nags);
+  const showSearchSourceText = shouldShowSearchSourceText(nags);
+  const showQuickOpenFile = shouldShowQuickOpenFile(nags);
+  const showLaunchCommandPalette = shouldShowLaunchCommandPalette(nags);
+  const showJumpToEvent = shouldShowJumpToEvent(nags);
+  const showInspectElement = shouldShowInspectElement(nags);
+  const showInspectComponent = shouldShowInspectComponent(nags);
+  const showUseFocusMode = shouldShowUseFocusMode(nags);
 
   const [showConfetti, setShowConfetti] = useState(false);
 
   const info = useTestInfo();
 
   const [videoUrl, setVideoUrl] = useState(
-    "https://website-git-master-recordreplay.vercel.app/assist/consoleupdate.gif"
+    "https://website-git-master-recordreplay.vercel.app/assist/time_travel_in_console.gif"
   );
+
+  const renderCheckmarkIcon = (completed: boolean | undefined) => {
+    if (completed === false) {
+      return "checked-rounded";
+    }
+    return "unchecked-rounded";
+  };
 
   const handleClick = (index: number) => {
     setSelectedItem(index);
@@ -135,79 +171,95 @@ const Tour: React.FC = () => {
   };
   */
 
+  console.log("showConsoleNavigate: ", showConsoleNavigate);
+  console.log("showBreakpointEdit: ", showBreakpointEdit);
+
   // Hard-coded checklist items
   const checklistItems = [
     {
-      label: "Open DevTools",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video1.gif",
-    },
-    {
       label: "Time travel in the console",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video2.gif",
+      completed: showConsoleNavigate,
     },
     {
       label: "Magic print statements",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video3.gif",
+      completed: showBreakpointEdit,
     },
     {
       label: "Add a comment",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video4.gif",
+      completed: showAddComment,
     },
     {
       label: "... to a line of code",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video5.gif",
+      completed: showAddCommentToLine,
     },
     {
       label: "... to a network request",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video6.gif",
+      completed: showAddCommentToNetworkRequest,
     },
     {
       label: "... to a print statement",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video7.gif",
+      completed: showAddCommentToPrintStatement,
     },
     {
-      label: "Jump to code",
+      label: "Jump to code ⚙️",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video8.gif",
+      completed: showJumpToCode,
     },
     {
       label: "Add a unicorn badge",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video9.gif",
+      completed: showAddUnicornBadge,
     },
     {
       label: "Record a replay",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video10.gif",
+      completed: showRecordReplay,
     },
     {
       label: "Explore sources",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video11.gif",
+      completed: showExploreSources,
     },
     {
       label: "Search source text",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video12.gif",
+      completed: showSearchSourceText,
     },
     {
       label: "Quick-open a file",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video13.gif",
+      completed: showQuickOpenFile,
     },
     {
       label: "Launch command palette",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video14.gif",
+      completed: showLaunchCommandPalette,
     },
     {
-      label: "Jump to an event",
+      label: "Jump to event",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video15.gif",
+      completed: showJumpToEvent,
     },
     {
-      label: "Inspect an element",
+      label: "Inspect element",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video16.gif",
+      completed: showInspectElement,
     },
     {
-      label: "Inspect a component",
+      label: "Inspect component",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video17.gif",
+      completed: showInspectComponent,
     },
     {
-      label: "Use Focus Mode",
+      label: "Use focus mode",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video18.gif",
+      completed: showUseFocusMode,
     },
   ];
 
@@ -225,10 +277,8 @@ const Tour: React.FC = () => {
                     className={`flex ${getItemStyle(index)} ${styles.checklistItem}`}
                     onClick={() => handleClick(index)}
                   >
-                    <Icon
-                      className={styles.stepIcon}
-                      type={index % 3 === 0 ? "checked-rounded" : "unchecked-rounded"}
-                    />
+                    <Icon className={styles.stepIcon} type={renderCheckmarkIcon(item.completed)} />
+
                     <span className="ml-2">{item.label}</span>
                   </div>
                 ))}
@@ -244,4 +294,4 @@ const Tour: React.FC = () => {
   );
 };
 
-export default Tour;
+export default Assist;

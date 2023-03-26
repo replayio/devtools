@@ -38,7 +38,30 @@ export default function MessageHoverButton({
   time: number;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
-  const [_, dismissNag] = useNag(Nag.FIRST_CONSOLE_NAVIGATE);
+  const [consoleNavigateState, dismissFirstConsoleNavigateNag] = useNag(Nag.FIRST_CONSOLE_NAVIGATE);
+  const [breakpointEditState, dismissFirstBreakpointEditNag] = useNag(Nag.FIRST_BREAKPOINT_EDIT);
+  const [addCommentState, dismissAddCommentNag] = useNag(Nag.ADD_COMMENT);
+  const [addCommentToLineState, dismissAddCommentToLineNag] = useNag(Nag.ADD_COMMENT_TO_LINE);
+  const [addCommentToNetworkRequestState, dismissAddCommentToNetworkRequestNag] = useNag(
+    Nag.ADD_COMMENT_TO_NETWORK_REQUEST
+  );
+  const [addCommentToPrintStatementState, dismissAddCommentToPrintStatementNag] = useNag(
+    Nag.ADD_COMMENT_TO_PRINT_STATEMENT
+  );
+  const [jumpToCodeState, dismissJumpToCodeNag] = useNag(Nag.JUMP_TO_CODE);
+  const [addUnicornBadgeState, dismissAddUnicornBadgeNag] = useNag(Nag.ADD_UNICORN_BADGE);
+  const [recordReplayState, dismissRecordReplayNag] = useNag(Nag.RECORD_REPLAY);
+  const [exploreSourcesState, dismissExploreSourcesNag] = useNag(Nag.EXPLORE_SOURCES);
+  const [searchSourceTextState, dismissSearchSourceTextNag] = useNag(Nag.SEARCH_SOURCE_TEXT);
+  const [quickOpenFileState, dismissQuickOpenFileNag] = useNag(Nag.QUICK_OPEN_FILE);
+  const [launchCommandPaletteState, dismissLaunchCommandPaletteNag] = useNag(
+    Nag.LAUNCH_COMMAND_PALETTE
+  );
+  const [jumpToEventState, dismissJumpToEventNag] = useNag(Nag.JUMP_TO_EVENT);
+  const [inspectElementState, dismissInspectElementNag] = useNag(Nag.INSPECT_ELEMENT);
+  const [inspectComponentState, dismissInspectComponentNag] = useNag(Nag.INSPECT_COMPONENT);
+  const [useFocusModeState, dismissUseFocusModeNag] = useNag(Nag.USE_FOCUS_MODE);
+
   const [isHovered, setIsHovered] = useState(false);
 
   const { inspectFunctionDefinition, showCommentsPanel } = useContext(InspectorContext);
@@ -116,7 +139,24 @@ export default function MessageHoverButton({
         inspectFunctionDefinition([location]);
       }
 
-      dismissNag();
+      dismissFirstConsoleNavigateNag();
+      dismissFirstBreakpointEditNag();
+
+      dismissAddCommentNag();
+      dismissAddCommentToLineNag();
+      dismissAddCommentToNetworkRequestNag();
+      dismissAddCommentToPrintStatementNag();
+      dismissJumpToCodeNag();
+      dismissAddUnicornBadgeNag();
+      dismissRecordReplayNag();
+      dismissExploreSourcesNag();
+      dismissSearchSourceTextNag();
+      dismissQuickOpenFileNag();
+      dismissLaunchCommandPaletteNag();
+      dismissJumpToEventNag();
+      dismissInspectElementNag();
+      dismissInspectComponentNag();
+      dismissUseFocusModeNag();
     };
 
     const label =
