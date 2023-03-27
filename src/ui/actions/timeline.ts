@@ -4,7 +4,6 @@ import {
   FocusWindowRequestBias,
   PauseId,
   ScreenShot,
-  FocusWindowRequest as TimeRange,
   TimeStampedPoint,
 } from "@replayio/protocol";
 import clamp from "lodash/clamp";
@@ -50,7 +49,7 @@ import {
   setPlaybackPrecachedTime,
 } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
-import { FocusRegion, HoveredItem, PlaybackOptions } from "ui/state/timeline";
+import { FocusRegion, HoveredItem, PlaybackOptions, TimeRange } from "ui/state/timeline";
 import {
   encodeObjectToURL,
   getPausePointParams,
