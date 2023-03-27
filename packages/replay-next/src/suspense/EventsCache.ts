@@ -1,13 +1,12 @@
-import { PointDescription, PointRange } from "@replayio/protocol";
-import { EventHandlerType, ExecutionPoint, PauseData } from "@replayio/protocol";
+import { PointDescription, PointRange, PointSelector } from "@replayio/protocol";
+import { EventHandlerType } from "@replayio/protocol";
 import { Cache, createCache } from "suspense";
 
-import { AnalysisInput, SendCommand, getFunctionBody } from "protocol/evaluation-utils";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { STANDARD_EVENT_CATEGORIES } from "../constants";
 import { createInfallibleSuspenseCache } from "../utils/suspense";
-import { AnalysisParams, createAnalysisCache } from "./AnalysisCache";
+import { createAnalysisCache } from "./AnalysisCache";
 
 export type Event = {
   count: number;
@@ -50,85 +49,30 @@ export const eventCountsCache: Cache<
   },
 });
 
-// Variables in scope in an analysis
-declare let sendCommand: SendCommand;
-declare let input: AnalysisInput;
-
-export function eventsMapper() {
-  const finalData: Required<PauseData> = { frames: [], scopes: [], objects: [] };
-  function addPauseData({ frames, scopes, objects }: PauseData) {
-    finalData.frames.push(...(frames || []));
-    finalData.scopes.push(...(scopes || []));
-    finalData.objects.push(...(objects || []));
-  }
-
-  const { time, pauseId, point } = input;
-  const { frame, data } = sendCommand("Pause.getTopFrame", {});
-  addPauseData(data);
-  const { frameId, location } = finalData.frames.find(f => f.frameId == frame)!;
-
-  // Retrieve protocol value details on the stack frame's arguments
-  const { result } = sendCommand("Pause.evaluateInFrame", {
-    frameId,
-    expression: "[...arguments]",
-  });
-  const values = [];
-  addPauseData(result.data);
-
-  if (result.exception) {
-    values.push(result.exception);
-  } else {
-    // We got back an array of arguments. The protocol requires that we ask for each
-    // array index's contents separately, which is annoying.
-    const { object } = result.returned!;
-    const { result: lengthResult } = sendCommand("Pause.getObjectProperty", {
-      object: object!,
-      name: "length",
-    });
-    addPauseData(lengthResult.data);
-    const length = lengthResult.returned!.value;
-    for (let i = 0; i < length; i++) {
-      const { result: elementResult } = sendCommand("Pause.getObjectProperty", {
-        object: object!,
-        name: i.toString(),
-      });
-      values.push(elementResult.returned);
-      addPauseData(elementResult.data);
-    }
-  }
-
-  return [
-    {
-      key: point,
-      value: {
-        time,
-        pauseId,
-        point,
-        location,
-        values,
-        data: finalData,
-      },
-    },
-  ];
-}
-
 export const eventsCache = createAnalysisCache<EventLog, [EventHandlerType]>(
   "EventsCache",
-  getAnalysisParams,
+  eventType => eventType,
+  (client, begin, end, eventType) =>
+    client.findPoints(createPointSelector(eventType), { begin, end }),
+  (points, eventType) => {
+    return {
+      selector: createPointSelector(eventType),
+      expression: "[...arguments]",
+      frameIndex: 0,
+      fullPropertyPreview: true,
+    };
+  },
   transformPoint
 );
 
-function getAnalysisParams(eventType: EventHandlerType): AnalysisParams {
-  return {
-    eventTypes: [eventType],
-    mapper: getFunctionBody(eventsMapper),
-  };
+export const getInfallibleEventPointsSuspense = createInfallibleSuspenseCache(
+  eventsCache.pointsIntervalCache.read
+);
+
+function createPointSelector(eventType: EventHandlerType): PointSelector {
+  return { kind: "event-handlers", eventType };
 }
 
 function transformPoint(point: PointDescription, eventType: EventHandlerType): EventLog {
   return { ...point, eventType, type: "EventLog" };
 }
-
-export const getInfallibleEventPointsSuspense = createInfallibleSuspenseCache(
-  eventsCache.pointsIntervalCache.read
-);

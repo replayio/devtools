@@ -1,5 +1,5 @@
+import { resourceLimits } from "worker_threads";
 import {
-  AnalysisEntry,
   BreakpointId,
   Result as EvaluationResult,
   ExecutionPoint,
@@ -14,10 +14,13 @@ import {
   PauseData,
   PauseId,
   PointDescription,
+  PointLimits,
   PointRange,
+  PointSelector,
   getPointsBoundingTimeResult as PointsBoundingTime,
   RecordingId,
   Result,
+  RunEvaluationResult,
   SameLineSourceLocations,
   ScopeId,
   SearchSourceContentsMatch,
@@ -29,13 +32,16 @@ import {
   TimeStampedPointRange,
   VariableMapping,
   createPauseResult,
+  findPointsResults,
   functionsMatches,
   getAllFramesResult,
+  getExceptionValueResult,
   getScopeResult,
   getTopFrameResult,
   keyboardEvents,
   navigationEvents,
   repaintGraphicsResult,
+  runEvaluationResults,
   searchSourceContentsMatches,
   sourceContentsChunk,
   sourceContentsInfo,
@@ -43,14 +49,12 @@ import {
 import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
 
-import analysisManager, { AnalysisParams } from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
-import { client, initSocket } from "protocol/socket";
+import { addEventListener, client, initSocket, removeEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { RecordingCapabilities } from "protocol/thread/thread";
 import { binarySearch, compareNumericStrings, defer, waitForTime } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
-import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { areRangesEqual } from "replay-next/src/utils/time";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { isPointInRegions, isRangeInRegions, isTimeInRegions } from "shared/utils/time";
@@ -59,7 +63,6 @@ import {
   LineNumberToHitCountMap,
   ReplayClientEvents,
   ReplayClientInterface,
-  RunAnalysisParams,
   SourceLocationRange,
 } from "./types";
 
@@ -82,13 +85,14 @@ export class ReplayClient implements ReplayClientInterface {
 
   private sessionWaiter = defer<SessionId>();
 
+  private nextFindPointsId = 1;
+  private nextRunEvaluationId = 1;
+
   constructor(dispatchURL: string, threadFront: typeof ThreadFront) {
     this._dispatchURL = dispatchURL;
     this._threadFront = threadFront;
 
     this._threadFront.listenForLoadChanges(this._onLoadChanges);
-
-    analysisManager.init();
   }
 
   private getSessionIdThrows(): SessionId {
@@ -328,6 +332,31 @@ export class ReplayClient implements ReplayClientInterface {
     client.Session.removeNavigationEventsListener(onNavigationEvents);
   }
 
+  async findPoints(
+    pointSelector: PointSelector,
+    pointLimits?: PointLimits
+  ): Promise<PointDescription[]> {
+    const points: PointDescription[] = [];
+    const sessionId = this.getSessionIdThrows();
+    const findPointsId = String(this.nextFindPointsId++);
+    function onPoints(results: findPointsResults) {
+      if (results.findPointsId === findPointsId) {
+        points.push(...results.points);
+      }
+    }
+
+    await this._waitForRangeToBeLoaded(
+      pointLimits?.begin && pointLimits.end
+        ? { begin: pointLimits.begin, end: pointLimits.end }
+        : null
+    );
+
+    addEventListener("Session.findPointsResults", onPoints);
+    await client.Session.findPoints({ pointSelector, pointLimits, findPointsId }, sessionId);
+    removeEventListener("Session.findPointsResults", onPoints);
+    return points;
+  }
+
   async findSources(): Promise<Source[]> {
     const sources: Source[] = [];
 
@@ -377,6 +406,11 @@ export class ReplayClient implements ReplayClientInterface {
         sessionId
       );
     return Object.fromEntries(counts.map(({ type, count }) => [type, count]));
+  }
+
+  getExceptionValue(pauseId: PauseId): Promise<getExceptionValueResult> {
+    const sessionId = this.getSessionIdThrows();
+    return client.Pause.getExceptionValue({}, sessionId, pauseId);
   }
 
   async getFocusWindow(): Promise<TimeStampedPointRange> {
@@ -472,6 +506,15 @@ export class ReplayClient implements ReplayClientInterface {
     const sessionId = this.getSessionIdThrows();
     const { map } = await client.Debugger.getScopeMap({ location }, sessionId);
     return map;
+  }
+
+  async mapExpressionToGeneratedScope(expression: string, location: Location): Promise<string> {
+    const sessionId = this.getSessionIdThrows();
+    const result = await client.Debugger.mapExpressionToGeneratedScope(
+      { expression, location },
+      sessionId
+    );
+    return result.expression;
   }
 
   async getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint> {
@@ -761,76 +804,43 @@ export class ReplayClient implements ReplayClientInterface {
     }
   }
 
-  async runAnalysis<Result>(params: RunAnalysisParams): Promise<Result[]> {
-    // Don't try to run analysis in unloaded regions.
-    // The result might be invalid (and may get cached by a Suspense caller).
-    await this._waitForRangeToBeLoaded(params.range || null);
-
-    return new Promise<Result[]>(async (resolve, reject) => {
-      const results: Result[] = [];
-
-      const { location, ...rest } = params;
-
-      let locations;
-      if (location) {
-        locations = this.getCorrespondingLocations(location).map(location => ({ location }));
-        await Promise.all(
-          locations.map(location =>
-            breakpointPositionsCache.readAsync(this, location.location.sourceId)
-          )
-        );
+  async runEvaluation(
+    opts: {
+      selector: PointSelector;
+      expression: string;
+      frameIndex?: number;
+      fullPropertyPreview?: boolean;
+      limits?: PointLimits;
+    },
+    onResults: (results: RunEvaluationResult[]) => void
+  ): Promise<void> {
+    const sessionId = this.getSessionIdThrows();
+    const runEvaluationId = String(this.nextRunEvaluationId++);
+    function onResultsWrapper(results: runEvaluationResults) {
+      if (results.runEvaluationId === runEvaluationId) {
+        onResults(results.results);
       }
-
-      const analysisParams = {
-        ...rest,
-        locations,
-      };
-
-      try {
-        await analysisManager.runAnalysis(analysisParams, {
-          onAnalysisError: (error: unknown) => {
-            reject(error);
-          },
-          onAnalysisResults: analysisEntries => {
-            results.push(...analysisEntries.map(entry => entry.value));
-          },
-        });
-
-        resolve(results);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-
-  streamAnalysis(
-    params: AnalysisParams,
-    handlers: {
-      onPoints?: (points: PointDescription[]) => void;
-      onResults?: (results: AnalysisEntry[]) => void;
-      onError?: (error: any) => void;
     }
-  ): { pointsFinished: Promise<void>; resultsFinished: Promise<void> } {
-    let resolvePointsFinished!: () => void;
-    const pointsFinished = new Promise<void>(resolve => (resolvePointsFinished = resolve));
-    let resolveResultsFinished!: () => void;
-    const resultsFinished = new Promise<void>(resolve => (resolveResultsFinished = resolve));
 
-    this._waitForRangeToBeLoaded(params.range || null).then(() =>
-      analysisManager.runAnalysis(params, {
-        onAnalysisPoints: handlers.onPoints,
-        onAnalysisResults: handlers.onResults,
-        onAnalysisError: error => {
-          resolvePointsFinished();
-          resolveResultsFinished();
-          handlers.onError?.(error);
-        },
-        onPointsFinished: resolvePointsFinished,
-        onFinished: resolveResultsFinished,
-      })
+    await this._waitForRangeToBeLoaded(
+      opts.limits?.begin && opts.limits.end
+        ? { begin: opts.limits.begin, end: opts.limits.end }
+        : null
     );
 
-    return { pointsFinished, resultsFinished };
+    addEventListener("Session.runEvaluationResults", onResultsWrapper);
+    await client.Session.runEvaluation(
+      {
+        expression: opts.expression,
+        frameIndex: opts.frameIndex,
+        fullReturnedPropertyPreview: opts.fullPropertyPreview,
+        pointLimits: opts.limits,
+        pointSelector: opts.selector,
+        runEvaluationId,
+      },
+      sessionId
+    );
+    removeEventListener("Session.runEvaluationResults", onResultsWrapper);
   }
 
   async streamSourceContents(
