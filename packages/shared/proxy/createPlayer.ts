@@ -1,3 +1,5 @@
+import { assert } from "protocol/utils";
+
 import { Entry } from "./types";
 import { findMatch, isIterator } from "./utils";
 
@@ -43,13 +45,21 @@ export default function createPlayer<T>(entries: Entry[], options?: Options<T>):
           const logEntry = findMatch(entries, prop, args);
 
           if (logEntry != null) {
-            const { isAsync, paramCalls, result } = logEntry;
+            const { isAsync, paramCalls, result, error } = logEntry;
 
             if (paramCalls) {
               paramCalls.forEach(call => {
                 const callback = args[call[0]];
                 callback(...call[1]);
               });
+            }
+
+            if (error) {
+              assert(error instanceof Error);
+              if (isAsync) {
+                return Promise.reject(error);
+              }
+              throw error;
             }
 
             return isAsync ? Promise.resolve(result) : result;

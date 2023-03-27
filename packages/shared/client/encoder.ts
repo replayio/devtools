@@ -5,6 +5,11 @@ function reviver(_: string, value: any) {
         return new Map(value.value);
       case "Set":
         return new Set(value.value);
+      case "Error":
+        const error = new Error(value.message);
+        error.name = value.name;
+        (error as any).code = value.code;
+        return error;
     }
   }
   return value;
@@ -20,6 +25,15 @@ function replacer(_: string, value: any): any {
     return {
       dataType: "Set",
       value: [...value],
+    };
+  } else if (value instanceof Error) {
+    return {
+      dataType: "Error",
+      value: {
+        name: value.name,
+        message: value.message,
+        code: (value as any).code,
+      },
     };
   } else {
     return value;
