@@ -1,4 +1,9 @@
-import { FocusWindowRequest as FocusWindow, Location, TimeStampedPoint } from "@replayio/protocol";
+import { Location, TimeStampedPoint } from "@replayio/protocol";
+
+export interface TimeRange {
+  begin: number;
+  end: number;
+}
 
 export interface ZoomRegion {
   endTime: number;
