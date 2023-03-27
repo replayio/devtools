@@ -40,7 +40,7 @@ export default function MessageHoverButton({
   const ref = useRef<HTMLButtonElement>(null);
   const [consoleNavigateState, dismissFirstConsoleNavigateNag] = useNag(Nag.FIRST_CONSOLE_NAVIGATE);
   const [breakpointEditState, dismissFirstBreakpointEditNag] = useNag(Nag.FIRST_BREAKPOINT_EDIT);
-  const [addCommentState, dismissAddCommentNag] = useNag(Nag.ADD_COMMENT);
+
   const [addCommentToLineState, dismissAddCommentToLineNag] = useNag(Nag.ADD_COMMENT_TO_LINE);
   const [addCommentToNetworkRequestState, dismissAddCommentToNetworkRequestNag] = useNag(
     Nag.ADD_COMMENT_TO_NETWORK_REQUEST
@@ -48,7 +48,7 @@ export default function MessageHoverButton({
   const [addCommentToPrintStatementState, dismissAddCommentToPrintStatementNag] = useNag(
     Nag.ADD_COMMENT_TO_PRINT_STATEMENT
   );
-  const [jumpToCodeState, dismissJumpToCodeNag] = useNag(Nag.JUMP_TO_CODE);
+
   const [addUnicornBadgeState, dismissAddUnicornBadgeNag] = useNag(Nag.ADD_UNICORN_BADGE);
   const [recordReplayState, dismissRecordReplayNag] = useNag(Nag.RECORD_REPLAY);
   const [exploreSourcesState, dismissExploreSourcesNag] = useNag(Nag.EXPLORE_SOURCES);
@@ -142,11 +142,10 @@ export default function MessageHoverButton({
       dismissFirstConsoleNavigateNag();
       dismissFirstBreakpointEditNag();
 
-      dismissAddCommentNag();
       dismissAddCommentToLineNag();
       dismissAddCommentToNetworkRequestNag();
       dismissAddCommentToPrintStatementNag();
-      dismissJumpToCodeNag();
+
       dismissAddUnicornBadgeNag();
       dismissRecordReplayNag();
       dismissExploreSourcesNag();
