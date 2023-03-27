@@ -212,7 +212,7 @@ const Assist: React.FC = () => {
       completed: showJumpToCode,
     },
     {
-      label: "Add a unicorn badge ⚙️",
+      label: "Add a unicorn badge ✅",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video9.gif",
       completed: showAddUnicornBadge,
     },
