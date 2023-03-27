@@ -171,23 +171,38 @@ const Assist: React.FC = () => {
   };
   */
 
-  console.log("showConsoleNavigate: ", showConsoleNavigate);
-  console.log("showBreakpointEdit: ", showBreakpointEdit);
+  console.log("still need to navigate a console: ", showConsoleNavigate);
+  console.log("still need to edit a breakpoint: ", showBreakpointEdit);
+  console.log("still need to AddComment: ", showAddComment);
+  console.log("still need to AddCommentToLine: ", showAddCommentToLine);
+  console.log("still need to AddCommentToNetworkRequest: ", showAddCommentToNetworkRequest);
+  console.log("still need to AddCommentToPrintStatement: ", showAddCommentToPrintStatement);
+  console.log("still need to JumpToCode: ", showJumpToCode);
+  console.log("still need to AddUnicornBadge: ", showAddUnicornBadge);
+  console.log("still need to RecordReplay: ", showRecordReplay);
+  console.log("still need to ExploreSources: ", showExploreSources);
+  console.log("still need to SearchSourceText: ", showSearchSourceText);
+  console.log("still need to QuickOpenFile: ", showQuickOpenFile);
+  console.log("still need to LaunchCommandPalette: ", showLaunchCommandPalette);
+  console.log("still need to JumpToEvent: ", showJumpToEvent);
+  console.log("still need to InspectElement: ", showInspectElement);
+  console.log("still need to InspectComponent: ", showInspectComponent);
+  console.log("still need to UseFocusMode: ", showUseFocusMode);
 
   // Hard-coded checklist items
   const checklistItems = [
     {
-      label: "Time travel in the console",
+      label: "Time travel in the console ✅",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video2.gif",
       completed: showConsoleNavigate,
     },
     {
-      label: "Magic print statements",
+      label: "Magic print statements ✅",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video3.gif",
       completed: showBreakpointEdit,
     },
     {
-      label: "Add a comment",
+      label: "Add a comment ✅",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video4.gif",
       completed: showAddComment,
     },
