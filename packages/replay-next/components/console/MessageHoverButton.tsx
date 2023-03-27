@@ -53,13 +53,10 @@ export default function MessageHoverButton({
   const [exploreSourcesState, dismissExploreSourcesNag] = useNag(Nag.EXPLORE_SOURCES);
   const [searchSourceTextState, dismissSearchSourceTextNag] = useNag(Nag.SEARCH_SOURCE_TEXT);
   const [quickOpenFileState, dismissQuickOpenFileNag] = useNag(Nag.QUICK_OPEN_FILE);
-  const [launchCommandPaletteState, dismissLaunchCommandPaletteNag] = useNag(
-    Nag.LAUNCH_COMMAND_PALETTE
-  );
+
   const [jumpToEventState, dismissJumpToEventNag] = useNag(Nag.JUMP_TO_EVENT);
   const [inspectElementState, dismissInspectElementNag] = useNag(Nag.INSPECT_ELEMENT);
   const [inspectComponentState, dismissInspectComponentNag] = useNag(Nag.INSPECT_COMPONENT);
-  const [useFocusModeState, dismissUseFocusModeNag] = useNag(Nag.USE_FOCUS_MODE);
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -149,11 +146,9 @@ export default function MessageHoverButton({
       dismissExploreSourcesNag();
       dismissSearchSourceTextNag();
       dismissQuickOpenFileNag();
-      dismissLaunchCommandPaletteNag();
       dismissJumpToEventNag();
       dismissInspectElementNag();
       dismissInspectComponentNag();
-      dismissUseFocusModeNag();
     };
 
     const label =

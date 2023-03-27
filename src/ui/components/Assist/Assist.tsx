@@ -216,6 +216,17 @@ const Assist: React.FC = () => {
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video9.gif",
       completed: showAddUnicornBadge,
     },
+
+    {
+      label: "Use focus mode ✅",
+      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video18.gif",
+      completed: showUseFocusMode,
+    },
+    {
+      label: "Launch command palette ✅",
+      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video14.gif",
+      completed: showLaunchCommandPalette,
+    },
     {
       label: "Record a replay",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video10.gif",
@@ -237,11 +248,6 @@ const Assist: React.FC = () => {
       completed: showQuickOpenFile,
     },
     {
-      label: "Launch command palette",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video14.gif",
-      completed: showLaunchCommandPalette,
-    },
-    {
       label: "Jump to event",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video15.gif",
       completed: showJumpToEvent,
@@ -255,11 +261,6 @@ const Assist: React.FC = () => {
       label: "Inspect component",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video17.gif",
       completed: showInspectComponent,
-    },
-    {
-      label: "Use focus mode",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video18.gif",
-      completed: showUseFocusMode,
     },
   ];
 
