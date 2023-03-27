@@ -77,8 +77,7 @@ import {
 } from "../reducers/timeline";
 import type { UIStore, UIThunkAction } from "./index";
 
-const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
-const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
+const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.3;
 export const MAX_FOCUS_REGION_DURATION = 60_000;
 
 export async function setupTimeline(store: UIStore) {
@@ -734,22 +733,25 @@ export function enterFocusMode(): UIThunkAction {
     const state = getState();
     const currentTime = getCurrentTime(state);
     const focusRegion = getFocusRegion(state);
+    const zoomRegion = getZoomRegion(state);
 
+    // If there's no focus range, or it's the full recording,
+    // shrink it to ~30% of the overall recording and center it around the current time.
     let displayedFocusRegion: TimeRange;
-    if (focusRegion) {
-      displayedFocusRegion = { begin: focusRegion.begin.time, end: focusRegion.end.time };
-    } else {
-      const zoomRegion = getZoomRegion(state);
-
-      const focusWindowSize = Math.min(
-        (zoomRegion.endTime - zoomRegion.beginTime) * DEFAULT_FOCUS_WINDOW_PERCENTAGE,
-        DEFAULT_FOCUS_WINDOW_MAX_LENGTH
-      );
+    if (
+      focusRegion == null ||
+      (focusRegion.begin.time === zoomRegion.beginTime &&
+        focusRegion.end.time === zoomRegion.endTime)
+    ) {
+      const focusWindowSize =
+        (zoomRegion.endTime - zoomRegion.beginTime) * DEFAULT_FOCUS_WINDOW_PERCENTAGE;
 
       displayedFocusRegion = {
         begin: Math.max(zoomRegion.beginTime, currentTime - focusWindowSize / 2),
         end: Math.min(zoomRegion.endTime, currentTime + focusWindowSize / 2),
       };
+    } else {
+      displayedFocusRegion = { begin: focusRegion.begin.time, end: focusRegion.end.time };
     }
 
     dispatch(updateDisplayedFocusRegion(displayedFocusRegion));
