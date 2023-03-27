@@ -1,8 +1,7 @@
 import {
   ExecutionPoint,
   Location,
-  KeyboardEvent as ReplayKeyboardEvent,
-  MouseEvent as ReplayMouseEvent,
+  PointDescription,
   SameLineSourceLocations,
   TimeStampedPoint,
 } from "@replayio/protocol";
@@ -12,12 +11,10 @@ import { Cache, createCache } from "suspense";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
-import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
-import { getFunctionBody } from "protocol/evaluation-utils";
 import type { ThreadFront as TF } from "protocol/thread";
 import { RecordingTarget } from "protocol/thread/thread";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
-import { EventLog, eventsMapper } from "replay-next/src/suspense/EventsCache";
+import { eventPointsCache } from "replay-next/src/suspense/EventsCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
@@ -60,7 +57,7 @@ export const nextInteractionEventCache: Cache<
     replayEventType: SEARCHABLE_EVENT_TYPES,
     endTime: number
   ],
-  EventLog | undefined
+  PointDescription | undefined
 > = createCache({
   debugLabel: "NextInteractionEvent",
   getKey: ([replayClient, threadFront, point, replayEventType, endTime]) => point,
@@ -80,17 +77,12 @@ export const nextInteractionEventCache: Cache<
       return;
     }
 
-    const entryPoints = await replayClient.runAnalysis<EventLog>({
-      effectful: false,
-      eventHandlerEntryPoints: [{ eventType }],
-      mapper: getFunctionBody(eventsMapper),
-      range: {
-        begin: point,
-        end: pointNearEndTime.point,
-      },
-    });
-
-    entryPoints.sort((a, b) => compareExecutionPoints(a.point, b.point));
+    const entryPoints = await eventPointsCache.readAsync(
+      point,
+      pointNearEndTime.point,
+      replayClient,
+      eventType
+    );
     return entryPoints[0];
   },
 });

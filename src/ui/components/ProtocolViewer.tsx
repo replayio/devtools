@@ -22,7 +22,7 @@ import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import {
-  AnalysisResult,
+  LogPointAnalysisResult,
   getLogPointAnalysisResultAsync,
 } from "replay-next/src/suspense/LogPointAnalysisCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
@@ -565,7 +565,7 @@ export const recordedProtocolMessagesCache: Cache<
               )
             )
           )
-        ).filter(b => !!b) as AnalysisResult[];
+        ).filter(b => !!b) as LogPointAnalysisResult[];
 
         // For every analysis result, download the entire event object
         // as a real JS object, and add the relevant timestamp
