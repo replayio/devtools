@@ -49,7 +49,6 @@ export default function MessageHoverButton({
     Nag.ADD_COMMENT_TO_PRINT_STATEMENT
   );
 
-  const [addUnicornBadgeState, dismissAddUnicornBadgeNag] = useNag(Nag.ADD_UNICORN_BADGE);
   const [recordReplayState, dismissRecordReplayNag] = useNag(Nag.RECORD_REPLAY);
   const [exploreSourcesState, dismissExploreSourcesNag] = useNag(Nag.EXPLORE_SOURCES);
   const [searchSourceTextState, dismissSearchSourceTextNag] = useNag(Nag.SEARCH_SOURCE_TEXT);
@@ -146,7 +145,6 @@ export default function MessageHoverButton({
       dismissAddCommentToNetworkRequestNag();
       dismissAddCommentToPrintStatementNag();
 
-      dismissAddUnicornBadgeNag();
       dismissRecordReplayNag();
       dismissExploreSourcesNag();
       dismissSearchSourceTextNag();

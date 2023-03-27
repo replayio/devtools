@@ -1,7 +1,9 @@
 import { MouseEvent, useContext, useState } from "react";
 
 import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
+import { useNag } from "replay-next/src/hooks/useNag";
 import { Badge, Point } from "shared/client/types";
+import { Nag } from "shared/graphql/types";
 
 import Icon from "../../Icon";
 import { getBadgeStyleVars } from "../utils/getBadgeStyleVars";
@@ -22,8 +24,11 @@ export default function BadgePicker({
   const { editPointBadge } = useContext(PointsContext);
 
   const [state, setState] = useState<State>("initial");
-
+  const [addUnicornBadgeState, dismissAddUnicornBadgeNag] = useNag(Nag.ADD_UNICORN_BADGE);
   const toggle = (badge: Badge | null) => {
+    if (badge === "unicorn") {
+      dismissAddUnicornBadgeNag();
+    }
     editPointBadge(point.key, badge);
     setState("closed");
   };

@@ -207,27 +207,12 @@ const Assist: React.FC = () => {
       completed: showAddComment,
     },
     {
-      label: "... to a line of code",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video5.gif",
-      completed: showAddCommentToLine,
-    },
-    {
-      label: "... to a network request",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video6.gif",
-      completed: showAddCommentToNetworkRequest,
-    },
-    {
-      label: "... to a print statement",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video7.gif",
-      completed: showAddCommentToPrintStatement,
-    },
-    {
-      label: "Jump to code ⚙️",
+      label: "Jump to code ✅",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video8.gif",
       completed: showJumpToCode,
     },
     {
-      label: "Add a unicorn badge",
+      label: "Add a unicorn badge ⚙️",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video9.gif",
       completed: showAddUnicornBadge,
     },
@@ -247,7 +232,7 @@ const Assist: React.FC = () => {
       completed: showSearchSourceText,
     },
     {
-      label: "Quick-open a file",
+      label: "Quick-open a file ☠️",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video13.gif",
       completed: showQuickOpenFile,
     },
