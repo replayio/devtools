@@ -15,6 +15,8 @@ type BreakpointProps = {
   breakpoint: Point;
 };
 
+const EMPTY_ARRAY: any[] = [];
+
 function BreakpointLineContents({ breakpoint }: BreakpointProps) {
   const replayClient = useContext(ReplayClientContext);
   const { sourceId } = breakpoint.location;
@@ -23,7 +25,7 @@ function BreakpointLineContents({ breakpoint }: BreakpointProps) {
   const { data, value } = useStreamingValue(parsedStream);
 
   const parsedTokensByLine = value;
-  const plainTextByLine = data!.plainText;
+  const plainTextByLine = data?.plainText ?? EMPTY_ARRAY;
 
   const { snippet, tokens } = useMemo((): { snippet: string; tokens: ParsedToken[] } => {
     const { column, line } = breakpoint.location;
