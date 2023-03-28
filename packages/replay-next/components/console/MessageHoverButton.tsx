@@ -39,23 +39,12 @@ export default function MessageHoverButton({
 }) {
   const ref = useRef<HTMLButtonElement>(null);
   const [consoleNavigateState, dismissFirstConsoleNavigateNag] = useNag(Nag.FIRST_CONSOLE_NAVIGATE);
-  const [breakpointEditState, dismissFirstBreakpointEditNag] = useNag(Nag.FIRST_BREAKPOINT_EDIT);
 
-  const [addCommentToLineState, dismissAddCommentToLineNag] = useNag(Nag.ADD_COMMENT_TO_LINE);
-  const [addCommentToNetworkRequestState, dismissAddCommentToNetworkRequestNag] = useNag(
-    Nag.ADD_COMMENT_TO_NETWORK_REQUEST
-  );
-  const [addCommentToPrintStatementState, dismissAddCommentToPrintStatementNag] = useNag(
-    Nag.ADD_COMMENT_TO_PRINT_STATEMENT
-  );
-
-  const [recordReplayState, dismissRecordReplayNag] = useNag(Nag.RECORD_REPLAY);
-
+  /*
+  todo: clean these out
   const [searchSourceTextState, dismissSearchSourceTextNag] = useNag(Nag.SEARCH_SOURCE_TEXT);
   const [quickOpenFileState, dismissQuickOpenFileNag] = useNag(Nag.QUICK_OPEN_FILE);
-
-  const [inspectElementState, dismissInspectElementNag] = useNag(Nag.INSPECT_ELEMENT);
-  const [inspectComponentState, dismissInspectComponentNag] = useNag(Nag.INSPECT_COMPONENT);
+  */
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -134,17 +123,10 @@ export default function MessageHoverButton({
         inspectFunctionDefinition([location]);
       }
 
+      /*
       dismissFirstConsoleNavigateNag();
-      dismissFirstBreakpointEditNag();
-
-      dismissAddCommentToLineNag();
-      dismissAddCommentToNetworkRequestNag();
-      dismissAddCommentToPrintStatementNag();
-
       dismissQuickOpenFileNag();
-
-      dismissInspectElementNag();
-      dismissInspectComponentNag();
+      */
     };
 
     const label =
