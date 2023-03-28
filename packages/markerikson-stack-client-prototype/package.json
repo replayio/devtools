@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.0.2",
-    "@replayio/protocol": "^0.41.0",
+    "@replayio/protocol": "^0.43.0",
     "@uiw/react-codemirror": "^4.11.4",
     "lodash": "^4.17.21",
     "next": "^12.1.6",
