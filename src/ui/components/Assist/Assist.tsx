@@ -174,9 +174,6 @@ const Assist: React.FC = () => {
   console.log("still need to navigate a console: ", showConsoleNavigate);
   console.log("still need to edit a breakpoint: ", showBreakpointEdit);
   console.log("still need to AddComment: ", showAddComment);
-  console.log("still need to AddCommentToLine: ", showAddCommentToLine);
-  console.log("still need to AddCommentToNetworkRequest: ", showAddCommentToNetworkRequest);
-  console.log("still need to AddCommentToPrintStatement: ", showAddCommentToPrintStatement);
   console.log("still need to JumpToCode: ", showJumpToCode);
   console.log("still need to AddUnicornBadge: ", showAddUnicornBadge);
   console.log("still need to RecordReplay: ", showRecordReplay);
