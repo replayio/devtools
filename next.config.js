@@ -99,6 +99,15 @@ const baseNextConfig = {
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     config.plugins.push(new RetryChunkLoadPlugin({ retryDelay: 1000, maxRetries: 2 }));
 
+    // Slim down the Sentry bundle slightly:
+    // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/tree-shaking/
+    config.plugins.push(
+      new webpack.DefinePlugin({
+        __SENTRY_DEBUG__: false,
+        __SENTRY_TRACING__: false,
+      })
+    );
+
     // Check for circular imports and throw errors, but only if the
     // env variable is set.  Should only be true if manually defined
     // in a local dev environment.
@@ -132,21 +141,6 @@ const baseNextConfig = {
     // Allow CSS imported from `node_modules`, to work around an error
     // from importing `<Editor>` from `@redux-devtools/ui`
     patchWebpackConfig(config, { isServer });
-
-    // handles build error from webpack/runtime/compat
-    // https://github.com/vercel/next.js/issues/25484
-    if (isServer) {
-      config.optimization.splitChunks = {
-        cacheGroups: {
-          commons: {
-            name: "commons",
-            chunks: "initial",
-            minChunks: 20,
-            priority: 20,
-          },
-        },
-      };
-    }
 
     config.resolve.fallback = {
       fs: false,
