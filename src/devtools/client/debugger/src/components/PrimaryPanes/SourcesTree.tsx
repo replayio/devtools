@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useEffect } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { focusItem, setExpandedState } from "devtools/client/debugger/src/actions/source-tree";
@@ -77,7 +77,6 @@ const connector = connect(mapStateToProps, {
 
 export type PropsFromRedux = ConnectedProps<typeof connector> & {
   expanded: Set<unknown>;
-  nag: Nag;
 };
 
 interface STState {
@@ -311,5 +310,15 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
   }
 }
 
-const WrappedSourcesTree = NagDismiss(SourcesTree, Nag.EXPLORE_SOURCES);
+const WrappedSourcesTree = (props: PropsFromRedux) => {
+  const [, dismissExploreSourcesNag] = useNag(Nag.EXPLORE_SOURCES);
+
+  useEffect(() => {
+    dismissExploreSourcesNag();
+  }, []);
+
+  // Directly pass the props down to SourcesTree without destructuring
+  return <SourcesTree {...props} />;
+};
+
 export default connector(WrappedSourcesTree);
