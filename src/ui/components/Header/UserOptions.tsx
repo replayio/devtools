@@ -41,7 +41,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
     setModal("settings");
   };
 
-  const preloadIcons = () => (
+  const preloadIcons = (
     <div style={{ display: "none" }}>
       <Icon filename="docs" className="bg-iconColor" />
       <Icon filename="help" className="bg-iconColor" />
@@ -50,39 +50,38 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
     </div>
   );
 
-  {
-    preloadIcons();
-  }
-
   return (
-    <div className="user-options text-blue-400">
-      <Dropdown
-        buttonContent={<MaterialIcon iconSize="xl">more_horiz</MaterialIcon>}
-        setExpanded={setExpanded}
-        expanded={expanded}
-        orientation="bottom"
-      >
-        <button className="row group" onClick={onDocsClick}>
-          <Icon filename="docs" className="bg-iconColor" />
-          <span>Docs</span>
-        </button>
-        <ExternalLink className="row group" href="https://discord.gg/n2dTK6kcRX">
-          <Icon filename="help" className="bg-iconColor" />
-          <span>Chat with us</span>
-        </ExternalLink>
-        <button className="row group" onClick={onSettingsClick}>
-          <Icon filename="settings" className="bg-iconColor" />
-          <span>Settings</span>
-        </button>
-        {window.__IS_RECORD_REPLAY_RUNTIME__ || noBrowserItem ? null : (
-          <button className="row group" onClick={onLaunchClick}>
-            <Icon filename="replay-logo" className="bg-iconColor" />
-            <span>Launch Replay</span>
+    <>
+      {preloadIcons}
+      <div className="user-options text-blue-400">
+        <Dropdown
+          buttonContent={<MaterialIcon iconSize="xl">more_horiz</MaterialIcon>}
+          setExpanded={setExpanded}
+          expanded={expanded}
+          orientation="bottom"
+        >
+          <button className="row group" onClick={onDocsClick}>
+            <Icon filename="docs" className="bg-iconColor" />
+            <span>Docs</span>
           </button>
-        )}
-        <LoginButton />
-      </Dropdown>
-    </div>
+          <ExternalLink className="row group" href="https://discord.gg/n2dTK6kcRX">
+            <Icon filename="help" className="bg-iconColor" />
+            <span>Chat with us</span>
+          </ExternalLink>
+          <button className="row group" onClick={onSettingsClick}>
+            <Icon filename="settings" className="bg-iconColor" />
+            <span>Settings</span>
+          </button>
+          {window.__IS_RECORD_REPLAY_RUNTIME__ || noBrowserItem ? null : (
+            <button className="row group" onClick={onLaunchClick}>
+              <Icon filename="replay-logo" className="bg-iconColor" />
+              <span>Launch Replay</span>
+            </button>
+          )}
+          <LoginButton />
+        </Dropdown>
+      </div>
+    </>
   );
 }
 
