@@ -50,11 +50,10 @@ export default function MessageHoverButton({
   );
 
   const [recordReplayState, dismissRecordReplayNag] = useNag(Nag.RECORD_REPLAY);
-  const [exploreSourcesState, dismissExploreSourcesNag] = useNag(Nag.EXPLORE_SOURCES);
+
   const [searchSourceTextState, dismissSearchSourceTextNag] = useNag(Nag.SEARCH_SOURCE_TEXT);
   const [quickOpenFileState, dismissQuickOpenFileNag] = useNag(Nag.QUICK_OPEN_FILE);
 
-  const [jumpToEventState, dismissJumpToEventNag] = useNag(Nag.JUMP_TO_EVENT);
   const [inspectElementState, dismissInspectElementNag] = useNag(Nag.INSPECT_ELEMENT);
   const [inspectComponentState, dismissInspectComponentNag] = useNag(Nag.INSPECT_COMPONENT);
 
@@ -142,11 +141,8 @@ export default function MessageHoverButton({
       dismissAddCommentToNetworkRequestNag();
       dismissAddCommentToPrintStatementNag();
 
-      dismissRecordReplayNag();
-      dismissExploreSourcesNag();
-      dismissSearchSourceTextNag();
       dismissQuickOpenFileNag();
-      dismissJumpToEventNag();
+
       dismissInspectElementNag();
       dismissInspectComponentNag();
     };

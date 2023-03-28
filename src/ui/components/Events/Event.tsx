@@ -285,10 +285,13 @@ export default React.memo(function Event({
   const { icon } = getReplayEvent(kind);
   const [jumpToCodeStatus, setJumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
   const [jumpToCodeState, dismissJumpToCodeNag] = useNag(Nag.JUMP_TO_CODE);
+  const [jumpToEventState, dismissJumpToEventNag] = useNag(Nag.JUMP_TO_EVENT);
+
   const onKeyDown = (e: React.KeyboardEvent) => e.key === " " && e.preventDefault();
 
   const onClickSeek = () => {
     onSeek(point, time);
+    dismissJumpToEventNag(); // Replay Assist
   };
 
   const onClickJumpToCode = async (e: React.MouseEvent) => {

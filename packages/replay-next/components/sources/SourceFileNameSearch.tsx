@@ -1,12 +1,16 @@
 import { ChangeEvent, KeyboardEvent, RefObject, useContext, useEffect, useRef } from "react";
 
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { useNag } from "replay-next/src/hooks/useNag";
 import { getSourceFileName } from "replay-next/src/utils/source";
+import { Nag } from "shared/graphql/types";
 
 import Icon from "../Icon";
 import { Result as SearchResult } from "./hooks/useSourceFileNameSearch";
 import { SourceFileNameSearchContext } from "./SourceFileNameSearchContext";
 import styles from "./SourceFileNameSearch.module.css";
+
+const [searchSourceTextState, dismissSearchSourceTextNag] = useNag(Nag.SEARCH_SOURCE_TEXT);
 
 export default function SourceFileNameSearch({
   containerRef,
