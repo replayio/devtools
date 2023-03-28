@@ -210,7 +210,7 @@ function Header({ toggleReplayAssist }: HeaderProps) {
       <Links recordingTarget={recordingTarget} />
     </div>
   );
-
-  const ConnectedHeader = connector(Header);
-  export default ConnectedHeader;
 }
+
+const ConnectedHeader = connector(Header);
+export default ConnectedHeader;
