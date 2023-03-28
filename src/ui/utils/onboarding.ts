@@ -48,12 +48,6 @@ export function shouldShowBreakpointEdit(nags: Nag[]): boolean {
   return shouldShowNag(nags, Nag.FIRST_BREAKPOINT_EDIT);
 }
 
-export function shouldShowTour(nags: Nag[]): boolean {
-  const showTour = shouldShowNag(nags, Nag.DISMISS_TOUR);
-  const showConsoleNavigate = shouldShowConsoleNavigate(nags);
-  return showTour && showConsoleNavigate;
-}
-
 export function shouldShowAddComment(nags: Nag[]): boolean {
   return shouldShowNag(nags, Nag.ADD_COMMENT);
 }
@@ -112,4 +106,10 @@ export function shouldShowInspectComponent(nags: Nag[]): boolean {
 
 export function shouldShowUseFocusMode(nags: Nag[]): boolean {
   return shouldShowNag(nags, Nag.USE_FOCUS_MODE);
+}
+
+export function shouldShowTour(nags: Nag[]): boolean {
+  const showTour = shouldShowNag(nags, Nag.DISMISS_TOUR);
+  const showConsoleNavigate = shouldShowConsoleNavigate(nags);
+  return showTour && showConsoleNavigate && shouldShowBreakpointAdd(nags);
 }
