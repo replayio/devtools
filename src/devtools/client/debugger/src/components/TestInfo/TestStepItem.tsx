@@ -1,11 +1,15 @@
 import classNamesBind from "classnames/bind";
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
+import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { highlightNodes, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { setHighlightedNodesLoading } from "devtools/client/inspector/markup/reducers/markup";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { AnnotatedTestStep } from "shared/graphql/types";
 import { seek, seekToTime, setTimelineToPauseTime, setTimelineToTime } from "ui/actions/timeline";
+import { jumpToClickEventFunctionLocation } from "ui/components/Events/Event";
+import { PointWithEventType } from "ui/components/Events/Event";
+import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getStepRanges, useStepState } from "ui/hooks/useStepState";
 import { useTestInfo } from "ui/hooks/useTestInfo";
@@ -81,10 +85,12 @@ export function TestStepItem({
   const isPlaying = useAppSelector(isPlayingSelector);
   const currentTime = useAppSelector(getCurrentTime);
   const selectedStep = useAppSelector(getSelectedStep);
+  const executionPoint = useAppSelector(getExecutionPoint);
   const dispatch = useAppDispatch();
   const state = useStepState(step);
   const actions = useTestStepActions(step);
   const info = useTestInfo();
+  const [jumpToCodeStatus, setJumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
 
   const onClick = useCallback(async () => {
     const { timeRange, pointRange } = getStepRanges(step);
@@ -156,6 +162,38 @@ export function TestStepItem({
     dispatch(unhighlightNode());
   };
 
+  const onJumpToClickEvent = async () => {
+    const onSeek = (point: string, time: number) => dispatch(seek(point, time, true));
+    // We only support clicks and keypress events for now.
+    // The rendering logic has limited the button display
+
+    const cypressStepTypesToEventTypes = {
+      click: "mousedown",
+      type: "keypress",
+    } as const;
+    const eventKind =
+      cypressStepTypesToEventTypes[step.name as keyof typeof cypressStepTypesToEventTypes];
+
+    if (!eventKind) {
+      // Shouldn't happen - the rendering logic _should_ make sure the step matches
+      return;
+    }
+
+    const eventPoint: PointWithEventType = { ...step.annotations.start!, kind: eventKind };
+
+    setJumpToCodeStatus("loading");
+    const result = await dispatch(jumpToClickEventFunctionLocation(eventPoint, onSeek));
+    setJumpToCodeStatus(result);
+
+    if (result === "not_loaded") {
+      // Clear this out after a few seconds since the user could change focus.
+      // Simpler than trying to watch the focus region change over time.
+      setTimeout(() => {
+        setJumpToCodeStatus("not_checked");
+      }, 5000);
+    }
+  };
+
   useEffect(() => {
     if (
       !isPlaying &&
@@ -191,6 +229,17 @@ export function TestStepItem({
     (step.duration === 1 && state === "paused") || progress == 100 ? 0 : progress;
   const isSelected = selectedStep?.id === id;
   const error = !!(step.error || info.getStepAsserts(step).some(s => !!s.error));
+
+  // TODO This is very Cypress-specific. Playwright steps have a `name` like `locator.click("blah")`.
+  // We only care about click events and keyboard events. Keyboard events appear to be a "type" command,
+  // as in "type this text into the input".
+  let shouldShowJumpToCode = false;
+  if ("category" in step) {
+    shouldShowJumpToCode =
+      "category" in step &&
+      step.category === "command" &&
+      (step.name === "click" || step.name === "type");
+  }
 
   return (
     <div className="flex-grow-1 flex w-full items-center justify-between">
@@ -233,6 +282,14 @@ export function TestStepItem({
         ) : null}
       </TestStepRow>
       <Actions step={step} hovered={isSelected} selected={isSelected} />
+      {shouldShowJumpToCode ? (
+        <JumpToCodeButton
+          onClick={onJumpToClickEvent}
+          status={jumpToCodeStatus}
+          currentExecutionPoint={executionPoint}
+          targetExecutionPoint={step.annotations.start!.point}
+        />
+      ) : null}
     </div>
   );
 }

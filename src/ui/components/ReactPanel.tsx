@@ -40,6 +40,7 @@ import { ReplayClientInterface } from "shared/client/types";
 import { UIThunkAction } from "ui/actions";
 import { IGNORABLE_PARTIAL_SOURCE_URLS } from "ui/actions/event-listeners";
 import { seek } from "ui/actions/timeline";
+import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
 import {
   SourceDetails,
   SourcesState,
@@ -51,7 +52,7 @@ import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
 
-import { JumpToCodeStatus, findFirstBreakablePositionForFunction } from "./Events/Event";
+import { findFirstBreakablePositionForFunction } from "./Events/Event";
 import MaterialIcon from "./shared/MaterialIcon";
 import styles from "./Events/Event.module.css";
 
@@ -385,9 +386,6 @@ function ReactQueuedRenderListItem({
   const dispatch = useAppDispatch();
   const { userPauseFrame, point, time } = renderDetails;
   const isPaused = time === currentTime && executionPoint === point;
-  const [isHovered, setIsHovered] = useState(false);
-  const cx = useAppSelector(getThreadContext);
-
   const [jumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
 
   if (!userPauseFrame) {
@@ -406,41 +404,11 @@ function ReactQueuedRenderListItem({
     dispatch(jumpToTimeAndLocationForQueuedRender(userPauseFrame, hitPoint, "timeOnly", onSeek));
   };
 
-  const onClickJumpToCode = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-
+  const onClickJumpToCode = async () => {
     dispatch(
       jumpToTimeAndLocationForQueuedRender(userPauseFrame, hitPoint, "timeAndLocation", onSeek)
     );
   };
-
-  const timeLabel =
-    executionPoint === null || isExecutionPointsGreaterThan(point, executionPoint)
-      ? "fast-forward"
-      : "rewind";
-
-  const jumpToCodeButtonAvailable =
-    jumpToCodeStatus === "not_checked" || jumpToCodeStatus === "found";
-
-  const jumpToCodeButtonClassname = classnames(
-    "transition-width flex items-center justify-center rounded-full  duration-100 ease-out h-6",
-    {
-      "bg-primaryAccent": jumpToCodeButtonAvailable,
-      "bg-gray-400 cursor-default": !jumpToCodeButtonAvailable,
-      "px-2 shadow-sm": isHovered,
-      "w-6": !isHovered,
-    }
-  );
-
-  const onJumpButtonMouseEnter = (e: React.MouseEvent) => {
-    setIsHovered(true);
-  };
-
-  const onJumpButtonMouseLeave = (e: React.MouseEvent) => {
-    setIsHovered(false);
-  };
-
-  let jumpButtonText = "Jump to code";
 
   let eventType = "react";
   if (renderDetails.pauseFrames.some(frame => frame.source?.url?.includes("react-redux"))) {
@@ -468,17 +436,12 @@ function ReactQueuedRenderListItem({
         </div>
         <div className="flex space-x-2 opacity-0 group-hover:opacity-100">
           {
-            <div
-              onClick={jumpToCodeButtonAvailable ? onClickJumpToCode : undefined}
-              onMouseEnter={onJumpButtonMouseEnter}
-              onMouseLeave={onJumpButtonMouseLeave}
-              className={jumpToCodeButtonClassname}
-            >
-              <div className="flex items-center space-x-1">
-                {isHovered && <span className="truncate text-white ">{jumpButtonText}</span>}
-                <Icon type={timeLabel} className="w-3.5 text-white" />
-              </div>
-            </div>
+            <JumpToCodeButton
+              onClick={onClickJumpToCode}
+              status={jumpToCodeStatus}
+              currentExecutionPoint={executionPoint}
+              targetExecutionPoint={renderDetails.point}
+            />
           }
         </div>
       </div>
