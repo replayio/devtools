@@ -123,6 +123,7 @@ export default function MessageHoverButton({
         inspectFunctionDefinition([location]);
       }
 
+      dismissFirstConsoleNavigateNag();
       /*
       dismissFirstConsoleNavigateNag();
       dismissQuickOpenFileNag();

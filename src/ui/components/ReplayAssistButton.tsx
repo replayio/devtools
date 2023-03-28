@@ -1,8 +1,8 @@
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
-import { toggleReplayAssist } from "ui/reducers/app"; // Make sure to import this action
+import { toggleReplayAssist } from "ui/reducers/app";
 import useAuth0 from "ui/utils/useAuth0";
 
 const ReplayAssistButton: FC = () => {
@@ -10,6 +10,17 @@ const ReplayAssistButton: FC = () => {
   const [shouldShowReplayAssist, setShouldShowReplayAssist] = useState(false);
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const storedValue = localStorage.getItem("replayAssistEnabled");
+    if (storedValue) {
+      setShouldShowReplayAssist(JSON.parse(storedValue));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("replayAssistEnabled", JSON.stringify(shouldShowReplayAssist));
+  }, [shouldShowReplayAssist]);
 
   if (!isAuthenticated) {
     return null;
@@ -23,9 +34,10 @@ const ReplayAssistButton: FC = () => {
         id="replay-assist-checkbox"
         checked={shouldShowReplayAssist}
         onChange={() => {
-          setShouldShowReplayAssist(!shouldShowReplayAssist);
+          const newValue = !shouldShowReplayAssist;
+          setShouldShowReplayAssist(newValue);
           dispatch(toggleReplayAssist());
-          if (shouldShowReplayAssist) {
+          if (!newValue) {
             dispatch(setSelectedPrimaryPanel("events"));
           } else {
             dispatch(setSelectedPrimaryPanel("assist"));

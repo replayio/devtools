@@ -26,7 +26,7 @@ import { prefs } from "ui/utils/prefs";
 import { isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
 
 export const initialAppState: AppState = {
-  assist: false,
+  assist: true,
   awaitingSourcemaps: false,
   canvas: null,
   currentPoint: null,

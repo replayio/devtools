@@ -224,7 +224,7 @@ const Assist: React.FC = () => {
       completed: showLaunchCommandPalette,
     },
     {
-      label: "Record a replay",
+      label: "Record a replay 💀",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video10.gif",
       completed: showRecordReplay,
     },

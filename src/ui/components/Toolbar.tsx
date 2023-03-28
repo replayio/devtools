@@ -213,7 +213,7 @@ export default function Toolbar() {
           />
         ) : null}
 
-        {showReplayAssist ? (
+        {!showReplayAssist ? (
           <ToolbarButton
             icon="school"
             name="assist"
