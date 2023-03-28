@@ -1,10 +1,8 @@
-// Dependencies
 import React, { Component } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { focusItem, setExpandedState } from "devtools/client/debugger/src/actions/source-tree";
 import { selectSource } from "devtools/client/debugger/src/actions/sources/select";
-// Selectors
 import { getContext } from "devtools/client/debugger/src/reducers/pause";
 import {
   getExpandedState,
@@ -24,7 +22,6 @@ import {
 import type { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 
-// Utils
 import {
   SourcesMap,
   createTree,
@@ -36,7 +33,6 @@ import {
 } from "../../utils/sources-tree";
 import { TreeDirectory, TreeNode } from "../../utils/sources-tree/types";
 import ManagedTree from "../shared/ManagedTree";
-// Components
 import SourcesTreeItem from "./SourcesTreeItem";
 
 type $FixTypeLater = any;
@@ -79,7 +75,10 @@ const connector = connect(mapStateToProps, {
   focusItem,
 });
 
-type PropsFromRedux = ConnectedProps<typeof connector>;
+export type PropsFromRedux = ConnectedProps<typeof connector> & {
+  expanded: Set<unknown>;
+  nag: Nag;
+};
 
 interface STState {
   uncollapsedTree: TreeDirectory;
@@ -91,21 +90,33 @@ interface STState {
 
 class SourcesTree extends Component<PropsFromRedux, STState> {
   constructor(props: PropsFromRedux) {
-    super(props);
-    const { sources } = this.props;
+    const updatedProps = {
+      ...props,
+      cx: { navigateCounter: 0 },
+      sourcesLoading: false,
+      shownSource: null,
+      selectedSource: null,
+      focused: null,
+      sources: {},
+      sourceCount: 0,
+    };
+
+    super(updatedProps);
+
+    const { sources } = updatedProps;
 
     const state = createTree({
       sources: sources as SourcesMap,
     }) as STState;
 
-    if (props.shownSource) {
-      const listItems = getDirectories(props.shownSource, state.sourceTree as TreeDirectory);
+    if (updatedProps.shownSource) {
+      const listItems = getDirectories(updatedProps.shownSource, state.sourceTree as TreeDirectory);
       state.listItems = listItems;
     }
 
-    if (props.selectedSource) {
+    if (updatedProps.selectedSource) {
       const highlightItems = getDirectories(
-        props.selectedSource,
+        updatedProps.selectedSource,
         state.sourceTree as TreeDirectory
       );
       state.highlightItems = highlightItems;
@@ -300,4 +311,5 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
   }
 }
 
-export default connector(NagDismiss(SourcesTree, Nag.EXPLORE_SOURCES));
+const WrappedSourcesTree = NagDismiss(SourcesTree, Nag.EXPLORE_SOURCES);
+export default connector(WrappedSourcesTree);
