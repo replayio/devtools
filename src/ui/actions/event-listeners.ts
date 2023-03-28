@@ -7,7 +7,7 @@ import { Cache, createCache } from "suspense";
 import type { ThreadFront as TF } from "protocol/thread";
 import { topFrameCache } from "replay-next/src/suspense/FrameCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
-import { cachePauseData } from "replay-next/src/suspense/PauseCache";
+import { cachePauseData, updateMappedLocation } from "replay-next/src/suspense/PauseCache";
 import { scopeMapCache } from "replay-next/src/suspense/ScopeMapCache";
 import { ReplayClientInterface } from "shared/client/types";
 import {
@@ -88,6 +88,8 @@ export const formatEventListener = async (
   framework?: string
 ) => {
   const { functionLocation, functionName = "", functionParameterNames = [] } = fnPreview;
+
+  updateMappedLocation(replayClient, functionLocation);
 
   let location: Location | undefined = undefined;
   let locationUrl: string | undefined = undefined;
