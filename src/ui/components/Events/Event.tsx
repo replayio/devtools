@@ -4,6 +4,7 @@ import {
   KeyboardEvent as ReplayKeyboardEvent,
   MouseEvent as ReplayMouseEvent,
   SameLineSourceLocations,
+  TimeStampedPoint,
 } from "@replayio/protocol";
 import classnames from "classnames";
 import React, { ReactNode, useState } from "react";
@@ -11,6 +12,7 @@ import { Cache, createCache } from "suspense";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
+import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { getFunctionBody } from "protocol/evaluation-utils";
 import type { ThreadFront as TF } from "protocol/thread";
 import { RecordingTarget } from "protocol/thread/thread";
@@ -34,6 +36,10 @@ import { ReplayEvent } from "ui/state/app";
 import MaterialIcon from "../shared/MaterialIcon";
 import { getReplayEvent } from "./eventKinds";
 import styles from "./Event.module.css";
+
+export interface PointWithEventType extends TimeStampedPoint {
+  kind: "keypress" | "mousedown";
+}
 
 const EVENTS_FOR_RECORDING_TARGET: Partial<
   Record<RecordingTarget, Record<SEARCHABLE_EVENT_TYPES, string>>
@@ -145,8 +151,8 @@ This requires stringing together a series of assumptions and special cases:
 We _could_ do more analysis and find the nearest time where the first breakable location
 inside that function is running, then seek to that point in time, but skipping for now.
 */
-function jumpToClickEventFunctionLocation(
-  event: ReplayMouseEvent | ReplayKeyboardEvent,
+export function jumpToClickEventFunctionLocation(
+  event: PointWithEventType,
   onSeek: (point: ExecutionPoint, time: number) => void
 ): UIThunkAction<Promise<JumpToCodeStatus>> {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
@@ -286,7 +292,9 @@ export default React.memo(function Event({
 
     if (event.kind === "mousedown" || event.kind === "keypress") {
       setJumpToCodeStatus("loading");
-      const result = await dispatch(jumpToClickEventFunctionLocation(event, onSeek));
+      const result = await dispatch(
+        jumpToClickEventFunctionLocation(event as PointWithEventType, onSeek)
+      );
 
       setJumpToCodeStatus(result);
       if (result === "not_loaded") {

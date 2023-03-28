@@ -279,6 +279,8 @@ export const IGNORABLE_PARTIAL_SOURCE_URLS = [
   "webpack:///src/sandbox/",
   "webpack:///sandpack-core/",
   "webpack:////home/circleci/codesandbox-client",
+  // or Cypress
+  "__cypress/runner/",
 ];
 
 export function shouldIgnoreEventFromSource(sourceDetails?: SourceDetails) {
