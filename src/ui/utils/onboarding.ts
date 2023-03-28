@@ -79,7 +79,7 @@ export function shouldShowAddUnicornBadge(nags: Nag[]): boolean {
 }
 
 export function shouldShowRecordReplay(nags: Nag[]): boolean {
-  return shouldShowNag(nags, Nag.RECORD_REPLAY);
+  return shouldShowNag(nags, Nag.FIRST_REPLAY_2);
 }
 
 export function shouldShowExploreSources(nags: Nag[]): boolean {

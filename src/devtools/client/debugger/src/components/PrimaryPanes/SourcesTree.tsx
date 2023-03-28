@@ -1,9 +1,3 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
-//
-
 // Dependencies
 import React, { Component } from "react";
 import { ConnectedProps, connect } from "react-redux";
@@ -17,6 +11,9 @@ import {
   getFocusedSourceItem,
 } from "devtools/client/debugger/src/reducers/source-tree";
 import { getShownSource } from "devtools/client/debugger/src/reducers/ui";
+import { useNag } from "replay-next/src/hooks/useNag";
+import { Nag } from "shared/graphql/types";
+import NagDismiss from "ui/components/NagDismiss";
 import {
   SourceDetails,
   getSelectedSource,
@@ -303,4 +300,4 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
   }
 }
 
-export default connector(SourcesTree);
+export default connector(NagDismiss(SourcesTree, Nag.EXPLORE_SOURCES));
