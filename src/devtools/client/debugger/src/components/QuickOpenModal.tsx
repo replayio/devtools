@@ -314,10 +314,7 @@ class QuickOpenModal extends Component<QuickOpenModalProps, QOMState> {
 
     let selectedContentLoaded = false;
     if (selectedSource) {
-      const streaming = streamingSourceContentsCache.getValueIfCached(
-        null as any,
-        selectedSource.id
-      );
+      const streaming = streamingSourceContentsCache.stream(replayClient, selectedSource.id);
       selectedContentLoaded = streaming?.complete === true;
     }
     const noSource = !selectedSource || !selectedContentLoaded;

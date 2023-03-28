@@ -9,9 +9,9 @@ import {
   useContext,
   useMemo,
   useState,
-  useSyncExternalStore,
 } from "react";
 import { areEqual } from "react-window";
+import { useStreamingValue } from "suspense";
 
 import useGetDefaultLogPointContent from "replay-next/components/sources/hooks/useGetDefaultLogPointContent";
 import SearchResultHighlight from "replay-next/components/sources/SearchResultHighlight";
@@ -106,17 +106,11 @@ const SourceListRow = memo(
 
     const { sourceId } = source;
 
-    let tokens: ParsedToken[] | null = useSyncExternalStore(
-      streamingParser.subscribe,
-      () => streamingParser.value?.[index] ?? null,
-      () => streamingParser.value?.[index] ?? null
-    );
+    const { data: streamingData, value: streamingValue } = useStreamingValue(streamingParser);
 
-    const plainText = useSyncExternalStore(
-      streamingParser.subscribe,
-      () => streamingParser.data?.text[index] ?? null,
-      () => streamingParser.data?.text[index] ?? null
-    );
+    const plainText = streamingData?.plainText[index] ?? null;
+
+    let tokens: ParsedToken[] | null = streamingValue?.[index] ?? null;
 
     let testStateContents = "loading";
     if (tokens !== null) {
