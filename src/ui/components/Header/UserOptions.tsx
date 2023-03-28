@@ -69,7 +69,7 @@ function UserOptions({ setModal, noBrowserItem, toggleReplayAssist }: UserOption
             <span>Launch Replay</span>
           </button>
         )}
-        <ReplayAssistButton onToggleReplayAssist={toggleReplayAssist} />
+        <ReplayAssistButton />
 
         <LoginButton />
       </Dropdown>
