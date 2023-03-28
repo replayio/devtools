@@ -234,7 +234,7 @@ export function TestStepItem({
   // We only care about click events and keyboard events. Keyboard events appear to be a "type" command,
   // as in "type this text into the input".
   let shouldShowJumpToCode = false;
-  if ("category" in step) {
+  if ("category" in step && step.annotations.start) {
     shouldShowJumpToCode =
       "category" in step &&
       step.category === "command" &&
