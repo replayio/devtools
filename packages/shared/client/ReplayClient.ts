@@ -24,7 +24,7 @@ import {
   SessionId,
   newSource as Source,
   SourceId,
-  TimeRange,
+  FocusWindowRequest as TimeRange,
   TimeStampedPoint,
   TimeStampedPointRange,
   VariableMapping,

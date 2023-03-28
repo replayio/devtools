@@ -1,4 +1,4 @@
-import { Location, TimeRange, TimeStampedPoint } from "@replayio/protocol";
+import { FocusWindowRequest as FocusWindow, Location, TimeStampedPoint } from "@replayio/protocol";
 
 export interface ZoomRegion {
   endTime: number;
@@ -14,7 +14,7 @@ export interface FocusRegion {
 export interface TimelineState {
   allPaintsReceived: boolean;
   currentTime: number;
-  displayedFocusRegion: TimeRange | null;
+  displayedFocusRegion: FocusWindow | null;
   dragging: boolean;
   focusRegion: FocusRegion | null;
   focusRegionBackup: FocusRegion | null;

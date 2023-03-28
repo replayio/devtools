@@ -3,7 +3,7 @@ import {
   ExecutionPoint,
   PauseId,
   ScreenShot,
-  TimeRange,
+  FocusWindowRequest as TimeRange,
   TimeStampedPoint,
 } from "@replayio/protocol";
 import clamp from "lodash/clamp";
