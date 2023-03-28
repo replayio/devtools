@@ -30,7 +30,7 @@ import {
   newSource as Source,
   SourceId,
   SourceLocation,
-  TimeRange,
+  FocusWindowRequest as TimeRange,
   TimeStampedPoint,
   TimeStampedPointRange,
   VariableMapping,
@@ -42,7 +42,6 @@ import {
   keyboardEvents,
   navigationEvents,
   repaintGraphicsResult,
-  requestFocusRangeResult,
 } from "@replayio/protocol";
 
 import { AnalysisParams } from "protocol/analysisManager";

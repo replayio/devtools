@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { TimeRange, TimeStampedPoint } from "@replayio/protocol";
+import { FocusWindowRequest as FocusWindow, TimeStampedPoint } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 
 import { MAX_FOCUS_REGION_DURATION } from "ui/actions/timeline";
@@ -63,7 +63,7 @@ const timelineSlice = createSlice({
     setFocusRegion(state, action: PayloadAction<FocusRegion | null>) {
       state.focusRegion = action.payload;
     },
-    setDisplayedFocusRegion(state, action: PayloadAction<TimeRange | null>) {
+    setDisplayedFocusRegion(state, action: PayloadAction<FocusWindow | null>) {
       state.displayedFocusRegion = action.payload;
     },
     pointsReceived(state, action: PayloadAction<TimeStampedPoint[]>) {
