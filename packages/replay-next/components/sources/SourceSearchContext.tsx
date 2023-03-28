@@ -36,9 +36,12 @@ export function SourceSearchContextRoot({ children }: { children: ReactNode }) {
     async function updateSourceContents(focusedSourceId: string | null, setScope: SetScope) {
       if (focusedSourceId) {
         const streaming = streamingSourceContentsCache.stream(client, focusedSourceId);
+        if (!streaming.complete) {
+          // It may take a while to stream this code, so update the search scope beforehand.
+          setScope(focusedSourceId, "");
+        }
         await streaming.resolver;
-        const code = streaming.value;
-        setScope(focusedSourceId, code || "");
+        setScope(focusedSourceId, streaming.value!);
       } else {
         setScope(null, "");
       }
