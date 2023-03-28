@@ -6,7 +6,7 @@ import {
   TimeStampedPointRange,
 } from "@replayio/protocol";
 import classnames from "classnames";
-import { ReactNode, useContext, useEffect, useState } from "react";
+import { ReactNode, useContext, useState } from "react";
 import {
   Cache,
   StreamingCache,
@@ -25,7 +25,6 @@ import {
 import type { AstPosition } from "devtools/client/debugger/src/selectors";
 import { findClosestofSymbol } from "devtools/client/debugger/src/utils/ast";
 import { simplifyDisplayName } from "devtools/client/debugger/src/utils/pause/frames/displayName";
-import { AnalysisInput, getFunctionBody } from "protocol/evaluation-utils";
 import Icon from "replay-next/components/Icon";
 import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
@@ -222,12 +221,10 @@ const queuedRendersStreamingCache: StreamingCache<
         // across multiple React production builds, without needing to track minified function names.
         // TODO Rethink this one React has sourcemaps
 
-        const streaming = await streamingSourceContentsCache.readAsync(
-          replayClient,
-          reactDomSource!.id
-        );
+        const streaming = streamingSourceContentsCache.stream(replayClient, reactDomSource!.id);
         await streaming.resolver;
-        const reactDomSourceLines = streaming.contents!.split("\n");
+
+        const reactDomSourceLines = streaming.value!.split("\n");
 
         // A build-extracted React error code
         const MAGIC_SCHEDULE_UPDATE_CONTENTS = "(185)";

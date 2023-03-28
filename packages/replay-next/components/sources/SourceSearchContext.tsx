@@ -35,8 +35,9 @@ export function SourceSearchContextRoot({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function updateSourceContents(focusedSourceId: string | null, setScope: SetScope) {
       if (focusedSourceId) {
-        const { resolver } = await streamingSourceContentsCache.read(client, focusedSourceId);
-        const { contents: code } = await resolver;
+        const streaming = streamingSourceContentsCache.stream(client, focusedSourceId);
+        await streaming.resolver;
+        const code = streaming.value;
         setScope(focusedSourceId, code || "");
       } else {
         setScope(null, "");
