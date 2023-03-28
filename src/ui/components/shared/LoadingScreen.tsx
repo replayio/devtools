@@ -5,7 +5,6 @@ import { ConnectedProps, connect } from "react-redux";
 import { getAwaitingSourcemaps, getUploading } from "ui/reducers/app";
 import { UIState } from "ui/state";
 
-import { LoadingTips } from "./LoadingTips";
 import { BubbleViewportWrapper } from "./Viewport";
 
 const colorOptions: Array<"blue" | "green" | "red"> = ["blue", "green", "red"];
@@ -15,13 +14,7 @@ const Hoverboard = dynamic(() => import("./Hoverboard"), {
   loading: () => <div />,
 });
 
-export function LoadingScreenTemplate({
-  children,
-  showTips = true,
-}: {
-  children?: ReactNode;
-  showTips?: boolean;
-}) {
+export function LoadingScreenTemplate({ children }: { children?: ReactNode }) {
   const [hoverboardColor, setHoverboardColor] = useState(colorOptions[2]);
 
   const changeHoverboardColor = () => {
@@ -76,7 +69,7 @@ function LoadingScreen({
   }, [fallbackMessage, stalledTimeout]);
 
   return (
-    <LoadingScreenTemplate showTips={true}>
+    <LoadingScreenTemplate>
       <span className="text-sm">{stalled ? "Reticulating splines..." : waitingForMessage}</span>
     </LoadingScreenTemplate>
   );
