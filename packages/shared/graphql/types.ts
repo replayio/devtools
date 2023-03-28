@@ -14,8 +14,6 @@ export enum Nag {
   DISMISS_TOUR = "dismiss_tour",
   ADD_COMMENT = "add_comment",
   ADD_COMMENT_TO_LINE = "add_comment_to_line",
-  ADD_COMMENT_TO_NETWORK_REQUEST = "add_comment_to_network_request",
-  ADD_COMMENT_TO_PRINT_STATEMENT = "add_comment_to_print_statement",
   JUMP_TO_CODE = "jump_to_code",
   ADD_UNICORN_BADGE = "add_unicorn_badge",
   RECORD_REPLAY = "record_replay",
@@ -33,6 +31,8 @@ export enum EmailSubscription {
   COLLABORATOR_REQUEST = "collaborator_request",
   REPLAY_COMMENT = "replay_comment",
   NEW_TEAM_INVITE = "new_team_invite",
+  ADD_COMMENT_TO_NETWORK_REQUEST = "add_comment_to_network_request",
+  ADD_COMMENT_TO_PRINT_STATEMENT = "add_comment_to_print_statement",
 }
 
 export interface User {

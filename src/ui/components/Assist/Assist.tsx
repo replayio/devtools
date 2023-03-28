@@ -61,7 +61,6 @@ const Assist: React.FC = () => {
   const showConsoleNavigate = shouldShowConsoleNavigate(nags);
   const showBreakpointAdd = shouldShowBreakpointAdd(nags);
   const showBreakpointEdit = shouldShowBreakpointEdit(nags);
-
   const showAddComment = shouldShowAddComment(nags);
   const showAddCommentToLine = shouldShowAddCommentToLine(nags);
   const showAddCommentToNetworkRequest = shouldShowAddCommentToNetworkRequest(nags);
