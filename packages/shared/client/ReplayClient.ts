@@ -36,7 +36,6 @@ import {
   keyboardEvents,
   navigationEvents,
   repaintGraphicsResult,
-  requestFocusRangeResult,
   searchSourceContentsMatches,
   sourceContentsChunk,
   sourceContentsInfo,
