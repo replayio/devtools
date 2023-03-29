@@ -47,7 +47,6 @@ pref("devtools.features.chromiumRepaints", false);
 pref("devtools.features.brokenSourcemapWorkaround", true);
 pref("devtools.features.disableRecordingAssetsInDatabase", false);
 pref("devtools.features.keepAllTraces", false);
-pref("devtools.features.enableIncrementalSnapshots", false);
 
 export const prefs = new PrefsHelper("devtools", {
   colorScheme: ["String", "colorScheme"],
@@ -90,7 +89,6 @@ export const features = new PrefsHelper("devtools.features", {
   brokenSourcemapWorkaround: ["Bool", "brokenSourcemapWorkaround"],
   disableRecordingAssetsInDatabase: ["Bool", "disableRecordingAssetsInDatabase"],
   keepAllTraces: ["Bool", "keepAllTraces"],
-  enableIncrementalSnapshots: ["Bool", "enableIncrementalSnapshots"],
 });
 
 export type Features = typeof features;

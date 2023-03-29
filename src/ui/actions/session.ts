@@ -209,7 +209,6 @@ export function createSocket(
         rerunRoutines: getFeature("rerunRoutines"),
         disableRecordingAssetsInDatabase: getFeature("disableRecordingAssetsInDatabase"),
         keepAllTraces: getFeature("keepAllTraces"),
-        enableIncrementalSnapshots: getFeature("enableIncrementalSnapshots"),
       };
       if (features.newControllerOnRefresh) {
         experimentalSettings.controllerKey = String(Date.now());
@@ -237,7 +236,7 @@ export function createSocket(
         }
       }
 
-      const focusRegion = getPausePointParams().focusRegion;
+      const focusRegion = getPausePointParams()?.focusRegion;
       const focusRange = focusRegion
         ? {
             begin: focusRegion.begin.time,
@@ -338,8 +337,8 @@ export function createSocket(
       dispatch(actions.setLoadingFinished(true));
 
       if (!focusRegion) {
-        const focusWindow = await replayClient.getFocusWindow();
-        dispatch(setFocusRegion(focusWindow));
+        const initialFocusRegion = await ThreadFront.initialFocusRegionWaiter.promise;
+        dispatch(setFocusRegion(initialFocusRegion));
       }
     } catch (e: any) {
       const currentError = getUnexpectedError(getState());

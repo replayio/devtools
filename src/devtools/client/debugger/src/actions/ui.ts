@@ -98,9 +98,9 @@ export function flashLineRange(location: HighlightedRange): UIThunkAction {
 
 export function copyToClipboard(source: SourceDetails): UIThunkAction {
   return (dispatch, getState, { replayClient }) => {
-    const streaming = streamingSourceContentsCache.stream(replayClient, source.id);
+    const streaming = streamingSourceContentsCache.getValueIfCached(replayClient, source.id);
     if (streaming?.complete) {
-      copyTextToClipboard(streaming.value!);
+      copyTextToClipboard(streaming.contents!);
     }
   };
 }

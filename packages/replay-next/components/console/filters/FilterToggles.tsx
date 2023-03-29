@@ -7,12 +7,13 @@ import Icon from "replay-next/components/Icon";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
-import { exceptionsCache } from "replay-next/src/suspense/ExceptionsCache";
+import { getExceptionPointsSuspense } from "replay-next/src/suspense/ExceptionsCache";
 import { CategoryCounts, getMessagesSuspense } from "replay-next/src/suspense/MessagesCache";
 import { getRecordingCapabilitiesSuspense } from "replay-next/src/suspense/RecordingCache";
 import { isInNodeModules } from "replay-next/src/utils/messages";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ProtocolError, isCommandError } from "shared/utils/error";
+import { toPointRange } from "shared/utils/time";
 
 import EventsList from "./EventsList";
 import styles from "./FilterToggles.module.css";
@@ -182,11 +183,7 @@ function ExceptionsBadgeSuspends() {
   }
 
   try {
-    exceptionsCache.pointsIntervalCache.read(
-      focusRange.begin.point,
-      focusRange.end.point,
-      replayClient
-    );
+    getExceptionPointsSuspense(replayClient, toPointRange(focusRange));
   } catch (errorOrPromise) {
     if (isPromiseLike(errorOrPromise)) {
       throw errorOrPromise;

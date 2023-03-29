@@ -86,6 +86,7 @@
     "resolveJsonModule": true
   },
   "exclude": [
+    "src/devtools/client/debugger/src/workers/parser/tests/fixtures/scopes/*",
     "node_modules",
 
     // exclude Cypress from root typechecking to avoid conflicts with globals

@@ -3,20 +3,12 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { AnyAction, PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type {
-  FrameId,
-  Location,
-  PauseId,
-  SourceLocation,
-  TimeStampedPoint,
-  Value,
-} from "@replayio/protocol";
+import type { FrameId, Location, PauseId, TimeStampedPoint, Value } from "@replayio/protocol";
 import findLast from "lodash/findLast";
 
 import { compareNumericStrings } from "protocol/utils";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
-import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { getPreferredLocation, getSelectedSourceId } from "ui/reducers/sources";
 import { SourceDetails } from "ui/reducers/sources";
@@ -24,6 +16,8 @@ import { getContextFromAction } from "ui/setup/redux/middleware/context";
 import type { UIState } from "ui/state";
 import { features } from "ui/utils/prefs";
 import { ThunkExtraArgs } from "ui/utils/thunk";
+
+import { getSymbolEntryForSource } from "./ast";
 
 export interface Context {
   navigateCounter: number;
@@ -115,7 +109,7 @@ export const executeCommandOperation = createAsyncThunk<
   const state = getState();
   const loadedRegions = getLoadedRegions(state)!;
   const sourceId = getSelectedSourceId(state);
-  const symbols = sourceId ? await sourceOutlineCache.readAsync(replayClient, sourceId) : undefined;
+  const symbols = sourceId ? getSymbolEntryForSource(state, sourceId) : undefined;
   const nextPoint = await getResumePoint(replayClient, state, command);
 
   const resp = await ThreadFront[command]({
@@ -127,7 +121,7 @@ export const executeCommandOperation = createAsyncThunk<
       // see SCS-172
       features.brokenSourcemapWorkaround &&
       (command === "stepOver" || command === "reverseStepOver")
-        ? (symbols?.functions.map(f => f.body).filter(Boolean) as SourceLocation[])
+        ? symbols?.symbols?.functionBodyLocations
         : undefined,
   });
   if (!resp?.frame) {

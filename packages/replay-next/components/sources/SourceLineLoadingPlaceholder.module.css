@@ -1,11 +1,11 @@
 .Shimmer {
   display: inline-block;
-  height: 0.5rem;
-  background-color: var(--chrome);
+  height: 1rem;
+  background-color: var(--background-color-contrast-3);
   border-radius: 0.25rem;
 
   animation-name: shimmer;
-  animation-duration: 2s;
+  animation-duration: 1s;
   animation-iteration-count: infinite;
 }
 

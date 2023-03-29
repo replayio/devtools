@@ -39,8 +39,8 @@ describe("Redux timeline state", () => {
       dispatch(actions.toggleFocusMode());
       expect(getDisplayedFocusRegion(store.getState())).toMatchInlineSnapshot(`
         Object {
-          "begin": 67.5,
-          "end": 82.5,
+          "begin": 70,
+          "end": 80,
         }
       `);
     });

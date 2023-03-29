@@ -73,6 +73,21 @@ export enum Nag {
   FIRST_CONSOLE_NAVIGATE = "first_console_navigate",
   DOWNLOAD_REPLAY = "download_replay",
   DISMISS_TOUR = "dismiss_tour",
+  ADD_COMMENT = "add_comment",
+  ADD_COMMENT_TO_LINE = "add_comment_to_line",
+  ADD_COMMENT_TO_NETWORK_REQUEST = "add_comment_to_network_request",
+  ADD_COMMENT_TO_PRINT_STATEMENT = "add_comment_to_print_statement",
+  JUMP_TO_CODE = "jump_to_code",
+  ADD_UNICORN_BADGE = "add_unicorn_badge",
+  RECORD_REPLAY = "record_replay",
+  EXPLORE_SOURCES = "explore_sources",
+  SEARCH_SOURCE_TEXT = "search_source_text",
+  QUICK_OPEN_FILE = "quick_open_file",
+  LAUNCH_COMMAND_PALETTE = "launch_command_palette",
+  JUMP_TO_EVENT = "jump_to_event",
+  INSPECT_ELEMENT = "inspect_element",
+  INSPECT_COMPONENT = "inspect_component",
+  USE_FOCUS_MODE = "use_focus_mode",
 }
 
 // Keeping a list of unused nag types here so we don't accidentally

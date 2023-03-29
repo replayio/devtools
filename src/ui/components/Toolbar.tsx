@@ -157,6 +157,9 @@ export default function Toolbar() {
   const hasFrames = frames && frames.length > 0;
   const viewMode = useAppSelector(selectors.getViewMode);
   const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
+
+  const showReplayAssist = useAppSelector(selectors.getReplayAssist);
+
   const [showCommentsBadge, setShowCommentsBadge] = useState(false);
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
@@ -206,6 +209,15 @@ export default function Toolbar() {
             icon="school"
             name="tour"
             label="Replay Tour"
+            onClick={handleButtonClick}
+          />
+        ) : null}
+
+        {!showReplayAssist ? (
+          <ToolbarButton
+            icon="school"
+            name="assist"
+            label="Replay Assist"
             onClick={handleButtonClick}
           />
         ) : null}

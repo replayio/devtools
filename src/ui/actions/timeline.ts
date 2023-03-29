@@ -3,7 +3,7 @@ import {
   ExecutionPoint,
   PauseId,
   ScreenShot,
-  FocusWindowRequest as TimeRange,
+  TimeRange,
   TimeStampedPoint,
 } from "@replayio/protocol";
 import clamp from "lodash/clamp";
@@ -31,10 +31,6 @@ import { ThreadFront } from "protocol/thread";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { waitForTime } from "protocol/utils";
 import { pointsBoundingTimeCache } from "replay-next/src/suspense/ExecutionPointsCache";
-import {
-  isExecutionPointsGreaterThan,
-  isExecutionPointsLessThan,
-} from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import { mayClearSelectedStep } from "ui/reducers/reporter";
@@ -52,7 +48,6 @@ import {
   getZoomRegion,
   pointsReceived,
   setDisplayedFocusRegion,
-  setFocusRegion,
   setPlaybackPrecachedTime,
 } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
@@ -67,7 +62,7 @@ import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { ThunkExtraArgs } from "ui/utils/thunk";
-import { rangeForFocusRegion } from "ui/utils/timeline";
+import { isTimeInRegions, rangeForFocusRegion } from "ui/utils/timeline";
 
 import {
   setFocusRegion as newFocusRegion,
@@ -75,9 +70,11 @@ import {
   setPlaybackStalled,
   setTimelineState,
 } from "../reducers/timeline";
+import { getLoadedRegions, isPointInLoadingRegion } from "./app";
 import type { UIStore, UIThunkAction } from "./index";
 
-const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.3;
+const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
+const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
 export const MAX_FOCUS_REGION_DURATION = 60_000;
 
 export async function setupTimeline(store: UIStore) {
@@ -124,10 +121,9 @@ export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
     }
 
     const initialPausePoint = await getInitialPausePoint(ThreadFront.recordingId!);
-    if (initialPausePoint?.point) {
+
+    if (initialPausePoint) {
       point = initialPausePoint.point;
-    }
-    if (initialPausePoint?.time) {
       time = initialPausePoint.time;
     }
     ThreadFront.timeWarp(point, time, false);
@@ -136,7 +132,7 @@ export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
 
 export async function getInitialPausePoint(recordingId: string) {
   const pausePointParams = getPausePointParams();
-  if (pausePointParams.point !== null) {
+  if (pausePointParams) {
     return pausePointParams;
   }
 
@@ -670,7 +666,7 @@ export function setFocusRegionEndTime(end: number, sync: boolean): UIThunkAction
     await dispatch(updateDisplayedFocusRegion({ begin, end }));
 
     if (sync) {
-      await dispatch(syncFocusedRegion());
+      dispatch(syncFocusedRegion());
       dispatch(updateFocusRegionParam());
     }
   };
@@ -691,38 +687,22 @@ export function setFocusRegionBeginTime(
     await dispatch(updateDisplayedFocusRegion({ begin, end }));
 
     if (sync) {
-      await dispatch(syncFocusedRegion());
+      dispatch(syncFocusedRegion());
       dispatch(updateFocusRegionParam());
     }
   };
 }
 
 export function syncFocusedRegion(): UIThunkAction {
-  return async (dispatch, getState, { replayClient }) => {
+  return async (_dispatch, getState, { replayClient }) => {
     const state = getState();
     const focusRegion = getFocusRegion(state) as FocusRegion;
     const zoomTime = getZoomRegion(state);
 
-    const window = await replayClient.requestFocusRange({
+    replayClient.requestFocusRange({
       begin: focusRegion ? focusRegion.begin.time : zoomTime.beginTime,
       end: focusRegion ? focusRegion.end.time : zoomTime.endTime,
     });
-
-    // If the actual region that's focused is smaller than the requested region,
-    // refine the local focus region to stay in sync.
-    // Note this may result in the current time/point being outside of the focus region.
-    if (focusRegion) {
-      if (
-        isExecutionPointsGreaterThan(window.begin.point, focusRegion.begin.point) ||
-        isExecutionPointsLessThan(window.end.point, focusRegion.end.point)
-      ) {
-        dispatch(setFocusRegion(window));
-      }
-    } else {
-      if (window.begin.time > zoomTime.beginTime || window.end.time < zoomTime.endTime) {
-        dispatch(setFocusRegion(window));
-      }
-    }
   };
 }
 
@@ -733,25 +713,22 @@ export function enterFocusMode(): UIThunkAction {
     const state = getState();
     const currentTime = getCurrentTime(state);
     const focusRegion = getFocusRegion(state);
-    const zoomRegion = getZoomRegion(state);
 
-    // If there's no focus range, or it's the full recording,
-    // shrink it to ~30% of the overall recording and center it around the current time.
     let displayedFocusRegion: TimeRange;
-    if (
-      focusRegion == null ||
-      (focusRegion.begin.time === zoomRegion.beginTime &&
-        focusRegion.end.time === zoomRegion.endTime)
-    ) {
-      const focusWindowSize =
-        (zoomRegion.endTime - zoomRegion.beginTime) * DEFAULT_FOCUS_WINDOW_PERCENTAGE;
+    if (focusRegion) {
+      displayedFocusRegion = { begin: focusRegion.begin.time, end: focusRegion.end.time };
+    } else {
+      const zoomRegion = getZoomRegion(state);
+
+      const focusWindowSize = Math.min(
+        (zoomRegion.endTime - zoomRegion.beginTime) * DEFAULT_FOCUS_WINDOW_PERCENTAGE,
+        DEFAULT_FOCUS_WINDOW_MAX_LENGTH
+      );
 
       displayedFocusRegion = {
         begin: Math.max(zoomRegion.beginTime, currentTime - focusWindowSize / 2),
         end: Math.min(zoomRegion.endTime, currentTime + focusWindowSize / 2),
       };
-    } else {
-      displayedFocusRegion = { begin: focusRegion.begin.time, end: focusRegion.end.time };
     }
 
     dispatch(updateDisplayedFocusRegion(displayedFocusRegion));

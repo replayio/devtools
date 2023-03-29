@@ -80,11 +80,6 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     description: "Enable experimental React render details panel",
     key: "reactPanel",
   },
-  {
-    label: "Enable Incremental Snapshots",
-    description: "Enable using diffs between snapshots",
-    key: "enableIncrementalSnapshots",
-  },
 ];
 
 const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [];
@@ -146,9 +141,6 @@ export default function ExperimentalSettings({}) {
     update: updateDisableRecordingAssetsInDatabase,
   } = useFeature("disableRecordingAssetsInDatabase");
 
-  const { value: enableIncrementalSnapshots, update: updateEnableIncrementalSnapshots } =
-    useFeature("enableIncrementalSnapshots");
-
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
@@ -174,8 +166,6 @@ export default function ExperimentalSettings({}) {
       updateDisableRecordingAssetsInDatabase(!disableRecordingAssetsInDatabase);
     } else if (key === "reactPanel") {
       updateReactPanel(!reactPanel);
-    } else if (key === "enableIncrementalSnapshots") {
-      updateEnableIncrementalSnapshots(!enableIncrementalSnapshots);
     }
   };
 
@@ -186,7 +176,6 @@ export default function ExperimentalSettings({}) {
     disableScanDataCache,
     disableStableQueryCache,
     enableColumnBreakpoints,
-    enableIncrementalSnapshots,
     enableUnstableQueryCache,
     enableRoutines,
     rerunRoutines,

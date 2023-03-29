@@ -1,6 +1,6 @@
 import { ExecutionPoint, TimeStampedPointRange } from "@replayio/protocol";
 
-import { getFormattedTime, isRangeInRegions } from "./time";
+import { isRangeInRegions } from "./time";
 
 describe("time util", () => {
   describe("isRangeInRegions", () => {
@@ -80,30 +80,5 @@ describe("time util", () => {
         isRangeInRegions(createRange("5", 2, "10", 15), quadruplesToRanges("0", 0, "10", 10))
       ).toBe(false);
     });
-  });
-});
-
-describe("getFormattedTime", () => {
-  it("should properly format time with milliseconds", () => {
-    expect(getFormattedTime(0, true)).toBe("0:00.000");
-    expect(getFormattedTime(1_000, true)).toBe("0:01.000");
-    expect(getFormattedTime(1_234, true)).toBe("0:01.234");
-    expect(getFormattedTime(30_000, true)).toBe("0:30.000");
-    expect(getFormattedTime(60_000, true)).toBe("1:00.000");
-    expect(getFormattedTime(60_001, true)).toBe("1:00.001");
-    expect(getFormattedTime(61_000, true)).toBe("1:01.000");
-    expect(getFormattedTime(12_345, true)).toBe("0:12.345");
-    expect(getFormattedTime(120_500, true)).toBe("2:00.500");
-  });
-
-  it("should properly format time without milliseconds", () => {
-    expect(getFormattedTime(0, false)).toBe("0:00");
-    expect(getFormattedTime(1_000, false)).toBe("0:01");
-    expect(getFormattedTime(1_499, false)).toBe("0:01");
-    expect(getFormattedTime(1_500, false)).toBe("0:02");
-    expect(getFormattedTime(58_900, false)).toBe("0:59");
-    expect(getFormattedTime(59_900, false)).toBe("1:00");
-    expect(getFormattedTime(60_000, false)).toBe("1:00");
-    expect(getFormattedTime(120_500, false)).toBe("2:01");
   });
 });

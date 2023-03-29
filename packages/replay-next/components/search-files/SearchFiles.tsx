@@ -9,6 +9,8 @@ import {
 } from "react";
 
 import { Checkbox } from "design";
+import { useNag } from "replay-next/src/hooks/useNag";
+import { Nag } from "shared/graphql/types";
 
 import Icon from "../Icon";
 import InlineResultsCount from "./InlineResultsCount";
@@ -22,6 +24,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
   const [queryForDisplay, setQueryForDisplay] = useState("");
   const [queryForSuspense, setQueryForSuspense] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [searchSourceTextState, dismissSearchSourceTextNag] = useNag(Nag.SEARCH_SOURCE_TEXT);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -44,6 +47,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
   };
 
   useEffect(() => {
+    dismissSearchSourceTextNag();
     const onShowGlobalSearch = () => {
       inputRef.current?.focus();
     };

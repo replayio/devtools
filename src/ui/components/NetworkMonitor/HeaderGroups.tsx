@@ -5,6 +5,11 @@ import { Column, HeaderGroup } from "react-table";
 import { RequestSummary } from "./utils";
 import styles from "./RequestTable.module.css";
 
+interface MenuLocation {
+  x: number;
+  y: number;
+}
+
 export function HeaderGroups({
   columns,
   headerGroups,
@@ -12,6 +17,7 @@ export function HeaderGroups({
   columns: Column[];
   headerGroups: HeaderGroup<RequestSummary>[];
 }) {
+  const [menuLocation, setMenuLocation] = useState<MenuLocation>();
   return (
     <div className="border-b border-splitter bg-toolbarBackground">
       {headerGroups.map((headerGroup: HeaderGroup<RequestSummary>) => {
@@ -26,7 +32,7 @@ export function HeaderGroups({
               const { key, ...columnProps } = column.getHeaderProps();
               const isLastColumn = index === headerGroup.headers.length - 1;
               return (
-                <div key={key} className={classNames("p-1", styles[column.id])} {...columnProps}>
+                <div className={classNames("p-1", styles[column.id])} {...columnProps} key={key}>
                   {column.render("Header")}
                   {!isLastColumn ? (
                     <div

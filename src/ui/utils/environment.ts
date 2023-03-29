@@ -1,5 +1,5 @@
 import { MockedResponse } from "@apollo/client/testing";
-import { ExecutionPoint, TimeStampedPointRange } from "@replayio/protocol";
+import { TimeStampedPointRange } from "@replayio/protocol";
 
 import { injectCustomSocketSendMessageForTesting } from "protocol/socket";
 
@@ -104,32 +104,22 @@ export function getFocusRegion() {
   return focusRegionParam ? (decodeBase64FromURL(focusRegionParam) as TimeStampedPointRange) : null;
 }
 
-export function getPausePointParams(): {
-  focusRegion: TimeStampedPointRange | null;
-  point: ExecutionPoint | null;
-  time: number | null;
-} {
+export function getPausePointParams() {
   const url = getURL();
 
   const pointParam = url.searchParams.get("point");
-  const point = pointParam ? `${pointParam}` : null;
+  const point = `${pointParam}`;
 
-  let time: number | null = null;
   const timeParam = url.searchParams.get("time");
-  if (timeParam) {
-    const maybeTime = +timeParam;
-    if (!isNaN(maybeTime)) {
-      time = maybeTime;
-    }
-  }
+  const time = timeParam ? +timeParam : 0;
 
   const focusRegion = getFocusRegion();
 
-  if (time != null && point != null) {
-    return { focusRegion, point, time };
-  } else {
-    return { focusRegion, point: null, time: null };
+  if (pointParam && timeParam) {
+    return { point, time, focusRegion };
   }
+
+  return null;
 }
 
 export function getParams() {

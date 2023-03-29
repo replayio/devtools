@@ -18,7 +18,7 @@ export const SourceOutlineFunction = React.memo(function OutlineFunction({
   return (
     <li
       className={classnames("outline-list__element cursor-pointer", {
-        indent: !!func.className,
+        indent: !!func.klass,
         focused: isFocused,
       })}
       onClick={onSelect ? () => onSelect(func) : undefined}

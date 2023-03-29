@@ -1,8 +1,8 @@
-import { ClassOutline, FunctionOutline } from "@replayio/protocol";
 import classnames from "classnames";
 import React from "react";
 
-import { isFunctionOutline } from "./isFunctionOutline";
+import { ClassDeclaration, FunctionDeclaration } from "../../reducers/ast";
+import { isFunctionDeclaration } from "./isFunctionSymbol";
 import { SourceOutlineFunction } from "./SourceOutlineFunction";
 
 export const SourceOutlineClass = React.memo(function OutlineClassFunctions({
@@ -10,9 +10,9 @@ export const SourceOutlineClass = React.memo(function OutlineClassFunctions({
   isFocused,
   onSelect,
 }: {
-  klass: ClassOutline;
+  klass: ClassDeclaration;
   isFocused: boolean;
-  onSelect: (klass: ClassOutline | FunctionOutline) => void;
+  onSelect: (klass: ClassDeclaration | FunctionDeclaration) => void;
 }) {
   return (
     <li className="outline-list__class  mb-2" key={klass.name}>
@@ -20,7 +20,7 @@ export const SourceOutlineClass = React.memo(function OutlineClassFunctions({
         className={classnames("cursor-pointer", { focused: isFocused })}
         onClick={() => onSelect(klass)}
       >
-        {isFunctionOutline(klass) ? (
+        {isFunctionDeclaration(klass) ? (
           <SourceOutlineFunction func={klass} isFocused={false} />
         ) : (
           <div>

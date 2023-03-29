@@ -2,7 +2,6 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 
 import { ExperimentalUserSettings } from "shared/graphql/types";
-import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import { useGetTeamRouteParams, useRedirectToTeam } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
 import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
@@ -57,11 +56,7 @@ export default function LibraryLoader() {
   const { loading: userInfoLoading, ...userInfo } = hooks.useGetUserInfo();
 
   if (userSettingsLoading || userInfoLoading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <LibrarySpinner />
-      </div>
-    );
+    return <LoadingScreen fallbackMessage="Reloading team details..." />;
   }
 
   return <Library userSettings={userSettings} userInfo={userInfo} />;
@@ -92,11 +87,7 @@ function Library({
   }, [teamId, isValidTeamId, redirectToTeam]);
 
   if (!teamId) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <LibrarySpinner />
-      </div>
-    );
+    return <LoadingScreen fallbackMessage="Loading team information..." />;
   }
 
   return (

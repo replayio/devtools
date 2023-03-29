@@ -1,9 +1,11 @@
 import { RecordingId } from "@replayio/protocol";
 import { ClipboardEvent, KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
+import { ConnectedProps, connect } from "react-redux";
 
 import { RecordingTarget } from "protocol/thread/thread";
 import { Recording } from "shared/graphql/types";
 import { selectAll } from "shared/utils/selection";
+import { toggleReplayAssist } from "ui/actions/app";
 import { getRecordingTarget } from "ui/actions/app";
 import Avatar from "ui/components/Avatar";
 import UserOptions from "ui/components/Header/UserOptions";
@@ -19,6 +21,12 @@ import useAuth0 from "ui/utils/useAuth0";
 import { RecordingTrialEnd } from "./RecordingTrialEnd";
 import ShareButton from "./ShareButton";
 import styles from "./Header.module.css";
+
+const mapDispatchToProps = { toggleReplayAssist };
+
+const connector = connect(null, mapDispatchToProps);
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
 
 function pasteText(event: ClipboardEvent) {
   event.preventDefault();
@@ -62,7 +70,7 @@ function Links({ recordingTarget }: { recordingTarget: RecordingTarget | null })
       {showShareButton ? <ShareButton /> : null}
       <Avatars recordingId={recordingId} />
       {showViewToggle && <ViewToggle />}
-      <UserOptions />
+      <UserOptions toggleReplayAssist={toggleReplayAssist} />
     </div>
   );
 }
@@ -161,7 +169,9 @@ function HeaderTitle({
   );
 }
 
-export default function Header() {
+interface HeaderProps extends PropsFromRedux {}
+
+function Header({ toggleReplayAssist }: HeaderProps) {
   const recordingTarget = useAppSelector(getRecordingTarget);
   const { isAuthenticated } = useAuth0();
   const recordingId = hooks.useGetRecordingId();
@@ -201,3 +211,6 @@ export default function Header() {
     </div>
   );
 }
+
+const ConnectedHeader = connector(Header);
+export default ConnectedHeader;

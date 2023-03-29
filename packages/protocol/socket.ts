@@ -5,11 +5,11 @@ import {
   CommandResult,
   EventMethods,
   EventParams,
-  FocusWindowRequest as FocusWindow,
   PauseId,
   PointDescription,
   ProtocolClient,
   SessionId,
+  TimeRange,
   analysisPoints,
   analysisResult,
 } from "@replayio/protocol";
@@ -134,7 +134,6 @@ export type ExperimentalSettings = {
   profileWorkerThreads?: boolean;
   disableRecordingAssetsInDatabase?: boolean;
   keepAllTraces?: boolean;
-  enableIncrementalSnapshots?: boolean;
 };
 
 type SessionCallbacks = {
@@ -168,7 +167,7 @@ export async function createSession(
   recordingId: string,
   loadPoint: string | undefined,
   experimentalSettings: ExperimentalSettings,
-  focusWindow: FocusWindow | undefined,
+  focusWindow: TimeRange | undefined,
   sessionCallbacks: SessionCallbacks
 ) {
   const { sessionId } = await sendMessage("Recording.createSession", {

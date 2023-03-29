@@ -1,7 +1,6 @@
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 
-import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import { setLoadingFinished } from "ui/reducers/app";
 import { useAppDispatch } from "ui/setup/hooks";
 import useAuth0 from "ui/utils/useAuth0";
@@ -32,9 +31,5 @@ export default function Account() {
     return <Login returnToPath={window.location.pathname + window.location.search} />;
   }
 
-  return (
-    <div className="flex h-screen w-full items-center justify-center">
-      <LibrarySpinner />
-    </div>
-  );
+  return <LoadingScreen fallbackMessage="Loading account details..." />;
 }

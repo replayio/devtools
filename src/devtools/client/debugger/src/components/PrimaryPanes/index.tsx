@@ -1,13 +1,10 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
-//
-
 import classnames from "classnames";
-import React from "react";
+import React, { useEffect } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+// Add the necessary imports for nag functionality
+import { useNag } from "replay-next/src/hooks/useNag";
+import { Nag } from "shared/graphql/types";
 import { useFeature } from "ui/hooks/settings";
 import { UIState } from "ui/state";
 
@@ -25,6 +22,13 @@ function PrimaryPanes(props: PropsFromRedux) {
     useDebuggerPrefs("outline-expanded");
   const { value: sourcesCollapsed } = useDebuggerPrefs("sources-collapsed");
   const { value: enableLargeText } = useFeature("enableLargeText");
+
+  // Add the useNag hook and useEffect block
+  const [, dismissInspectElementNag] = useNag(Nag.INSPECT_ELEMENT);
+
+  useEffect(() => {
+    dismissInspectElementNag();
+  }, []);
 
   return (
     <Accordion>

@@ -1,11 +1,4 @@
-import { SourceId } from "@replayio/protocol";
-import {
-  newSource as ProtocolSource,
-  SourceLocation,
-  getSourceOutlineResult,
-} from "@replayio/protocol";
-
-import { assert } from "protocol/utils";
+import { newSource as ProtocolSource } from "@replayio/protocol";
 
 import { isIndexedSource } from "../suspense/SourcesCache";
 
@@ -68,47 +61,4 @@ export function isNodeModule(source?: ProtocolSource): boolean {
   }
 
   return source.url.includes("node_modules");
-}
-
-export function isSourceMappedSource(sourceId: SourceId, sources: ProtocolSource[]): boolean {
-  const source = sources.find(source => source.sourceId === sourceId);
-  assert(source, `Source ${sourceId} not found`);
-  if (source.kind === "sourceMapped") {
-    return true;
-  }
-  if (source.kind === "prettyPrinted" && source.generatedSourceIds?.length) {
-    return isSourceMappedSource(source.generatedSourceIds[0], sources);
-  }
-  return false;
-}
-
-export function findFunctionNameForLocation(
-  location: SourceLocation,
-  sourceOutline: getSourceOutlineResult
-) {
-  let foundFunctionName: string | undefined;
-  let foundFunctionBegin: SourceLocation | undefined;
-  for (const functionOutline of sourceOutline.functions) {
-    const functionBegin = functionOutline.body || functionOutline.location.begin;
-    const functionEnd = functionOutline.location.end;
-    if (
-      isLocationBefore(functionBegin, location) &&
-      isLocationBefore(location, functionEnd) &&
-      (!foundFunctionBegin || isLocationBefore(foundFunctionBegin, functionBegin))
-    ) {
-      foundFunctionName = functionOutline.name;
-      foundFunctionBegin = functionBegin;
-    }
-  }
-  return foundFunctionName;
-}
-
-export function isLocationBefore(a: SourceLocation, b: SourceLocation) {
-  if (a.line < b.line) {
-    return true;
-  } else if (a.line > b.line) {
-    return false;
-  } else {
-    return a.column <= b.column;
-  }
 }

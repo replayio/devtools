@@ -2,6 +2,8 @@ import { SerializedEditorState } from "lexical";
 import { MouseEventHandler, useState } from "react";
 
 import CommentEditor from "replay-next/components/lexical/CommentEditor";
+import { useNag } from "replay-next/src/hooks/useNag";
+import { Nag } from "shared/graphql/types";
 import useCommentContextMenu from "ui/components/Comments/useCommentContextMenu";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useUpdateComment, useUpdateCommentReply } from "ui/hooks/comments/comments";
@@ -50,6 +52,13 @@ export default function EditableRemark({
   const discardPendingChanges = () => {
     setIsEditing(false);
   };
+
+  const handleSaveChanges = (editorState: SerializedEditorState) => {
+    saveChanges(editorState);
+    dismissAddCommentNag();
+  };
+
+  const [addCommentState, dismissAddCommentNag] = useNag(Nag.ADD_COMMENT);
 
   const saveChanges = async (editorState: SerializedEditorState) => {
     setIsPending(true);
@@ -102,7 +111,7 @@ export default function EditableRemark({
     deleteRemark: deleteRemark,
     editRemark: startEditing,
     remark: remark,
-    saveRemark: saveChanges,
+    saveRemark: handleSaveChanges,
     type: type,
   });
 
@@ -133,7 +142,7 @@ export default function EditableRemark({
           initialValue={content}
           onCancel={discardPendingChanges}
           onDelete={deleteRemark}
-          onSave={saveChanges}
+          onSave={handleSaveChanges} // Replace 'saveChanges' with 'handleSaveChanges'
           placeholder={type === "reply" ? "Write a reply..." : "Type a comment"}
         />
       </div>

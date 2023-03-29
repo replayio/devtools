@@ -1,4 +1,4 @@
-import { FocusWindowRequest as FocusWindow, Location, TimeStampedPoint } from "@replayio/protocol";
+import { Location, TimeRange, TimeStampedPoint } from "@replayio/protocol";
 
 export interface ZoomRegion {
   endTime: number;
@@ -14,14 +14,11 @@ export interface FocusRegion {
 export interface TimelineState {
   allPaintsReceived: boolean;
   currentTime: number;
-  displayedFocusRegion: FocusWindow | null;
-  dragging: boolean;
-  focusRegion: FocusRegion | null;
-  focusRegionBackup: FocusRegion | null;
   hoveredItem: HoveredItem | null;
   hoverTime: number | null;
-  markTimeStampedPoint: TimeStampedPoint | null;
-  paints: TimeStampedPoint[];
+  focusRegion: FocusRegion | null;
+  focusRegionBackup: FocusRegion | null;
+  displayedFocusRegion: TimeRange | null;
   playback: {
     beginTime: number;
     beginDate: number;
@@ -29,6 +26,7 @@ export interface TimelineState {
   } | null;
   playbackFocusRegion: boolean;
   playbackPrecachedTime: number;
+  paints: TimeStampedPoint[];
   points: TimeStampedPoint[];
   recordingDuration: number | null;
   shouldAnimate: boolean;
@@ -36,6 +34,7 @@ export interface TimelineState {
   stalled?: boolean;
   timelineDimensions: { width: number; left: number; top: number };
   zoomRegion: ZoomRegion;
+  dragging: boolean;
 }
 
 export interface HoveredItem {

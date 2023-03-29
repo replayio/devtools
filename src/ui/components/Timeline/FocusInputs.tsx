@@ -1,10 +1,9 @@
 import React from "react";
 
-import { getFormattedTime } from "shared/utils/time";
 import { updateDisplayedFocusRegion } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { getSecondsFromFormattedTime } from "ui/utils/timeline";
+import { getFormattedTime, getSecondsFromFormattedTime } from "ui/utils/timeline";
 
 import EditableTimeInput from "./EditableTimeInput";
 import styles from "./FocusInputs.module.css";

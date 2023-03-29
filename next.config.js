@@ -97,6 +97,15 @@ const baseNextConfig = {
    * ) => import('webpack').Configuration}
    */
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    const entry = config.entry;
+    config.entry = () => {
+      return entry().then(e => ({
+        ...e,
+        parserWorker: "./src/devtools/client/debugger/src/workers/parser/worker",
+        searchWorker: "./src/devtools/client/debugger/src/workers/search/worker",
+      }));
+    };
+
     config.plugins.push(new RetryChunkLoadPlugin({ retryDelay: 1000, maxRetries: 2 }));
 
     // Check for circular imports and throw errors, but only if the

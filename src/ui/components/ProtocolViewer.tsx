@@ -25,7 +25,6 @@ import {
   AnalysisResult,
   getLogPointAnalysisResultAsync,
 } from "replay-next/src/suspense/LogPointAnalysisCache";
-import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import Icon from "ui/components/shared/Icon";
@@ -45,6 +44,7 @@ import {
 } from "ui/reducers/protocolMessages";
 import { SourceDetails, getAllSourceDetails } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
+import { sourceSymbolsCache } from "ui/suspense/sourceCaches";
 import { getJSON } from "ui/utils/objectFetching";
 import { formatDuration, formatTimestamp } from "ui/utils/time";
 
@@ -512,7 +512,11 @@ export const recordedProtocolMessagesCache: Cache<
       replayClient,
       sessionSource.id
     );
-    const symbols = await sourceOutlineCache.readAsync(replayClient, sessionSource.id);
+    const symbols = await sourceSymbolsCache.readAsync(
+      replayClient,
+      sessionSource.id,
+      sourceDetails
+    );
 
     const mapNamesToCallbackNames: Record<keyof AllProtocolMessages, string> = {
       requestMap: "onRequest",
@@ -531,11 +535,11 @@ export const recordedProtocolMessagesCache: Cache<
           return;
         }
 
-        const { begin, end } = functionEntry.location;
+        const { start, end } = functionEntry.location;
 
         // There should be a breakable position starting on the next line
         const firstBreakablePosition = breakablePositionsSorted.find(
-          bp => bp.line > begin.line && bp.line < end.line
+          bp => bp.line > start.line && bp.line < end.line
         );
 
         if (!firstBreakablePosition) {

@@ -1,10 +1,8 @@
 import React, { Suspense, useContext, useMemo } from "react";
-import { useStreamingValue } from "suspense";
 
 import Loader from "replay-next/components/Loader";
 import SyntaxHighlightedLine from "replay-next/components/sources/SyntaxHighlightedLine";
-import { streamingSyntaxParsingCache } from "replay-next/src/suspense/SyntaxParsingCache";
-import { ParsedToken } from "replay-next/src/utils/syntax-parser";
+import { getSourceContentsSuspense } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 
@@ -15,43 +13,31 @@ type BreakpointProps = {
   breakpoint: Point;
 };
 
-const EMPTY_ARRAY: any[] = [];
-
 function BreakpointLineContents({ breakpoint }: BreakpointProps) {
   const replayClient = useContext(ReplayClientContext);
   const { sourceId } = breakpoint.location;
 
-  const parsedStream = streamingSyntaxParsingCache.stream(replayClient, sourceId, null);
-  const { data, value } = useStreamingValue(parsedStream);
+  // TODO use useStreamingValue() for this
+  // once streamingSourceContentsCache has been migrated to "suspense"
+  const sourceContents = getSourceContentsSuspense(replayClient, sourceId);
 
-  const parsedTokensByLine = value;
-  const plainTextByLine = data?.plainText ?? EMPTY_ARRAY;
-
-  const { snippet, tokens } = useMemo((): { snippet: string; tokens: ParsedToken[] } => {
+  const snippet = useMemo(() => {
     const { column, line } = breakpoint.location;
-    let snippet = "";
-    let tokens: ParsedToken[] = [];
 
-    if (plainTextByLine && plainTextByLine[line - 1]) {
-      const lineText = plainTextByLine[line - 1];
-      snippet = lineText.slice(column, column! + 100).trim();
+    const sourceLines = sourceContents?.split("\n") ?? [];
+    if (sourceLines.length > 0) {
+      const lineText = sourceLines[line - 1];
+      return lineText.slice(column, column! + 100).trim();
     }
 
-    if (parsedTokensByLine && parsedTokensByLine[line - 1]) {
-      const lineTokens = parsedTokensByLine[line - 1];
-      tokens = lineTokens.slice(
-        lineTokens.findIndex(parsedToken => parsedToken.columnIndex === column)
-      );
-    }
+    return "";
+  }, [sourceContents, breakpoint]);
 
-    return { snippet, tokens };
-  }, [plainTextByLine, parsedTokensByLine, breakpoint]);
-
-  if (!snippet || !tokens) {
+  if (!snippet) {
     return null;
   }
 
-  return <SyntaxHighlightedLine code={snippet} tokens={tokens} />;
+  return <SyntaxHighlightedLine code={snippet} />;
 }
 
 export default function BreakpointOptions({ breakpoint, type }: BreakpointProps) {

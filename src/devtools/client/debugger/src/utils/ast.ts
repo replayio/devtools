@@ -3,35 +3,42 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 // Check whether location A starts after location B
-import type {
-  ClassOutline,
-  FunctionOutline,
-  SourceLocation,
-  SourceLocationRange,
-  getSourceOutlineResult,
-} from "@replayio/protocol";
+import type { SourceLocation } from "@replayio/protocol";
 
-import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
+import { getSymbolEntryForSource } from "devtools/client/debugger/src/reducers/ast";
 import { UIThunkAction } from "ui/actions";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
 
-export function positionAfter(a: SourceLocationRange, b: SourceLocationRange) {
+import {
+  ClassDeclaration,
+  FunctionDeclaration,
+  SymbolDeclarations,
+  SymbolEntry,
+} from "../reducers/ast";
+
+export interface PositionRange {
+  start: SourceLocation;
+  end: SourceLocation;
+}
+
+export function positionAfter(a: PositionRange, b: PositionRange) {
   return (
-    a.begin.line > b.begin.line ||
-    (a.begin.line === b.begin.line && a.begin.column > b.begin.column)
+    a.start.line > b.start.line ||
+    (a.start.line === b.start.line && a.start.column > b.start.column)
   );
 }
 
-export function containsPosition(a: SourceLocationRange, b: SourceLocation) {
+export function containsPosition(a: PositionRange, b: SourceLocation) {
   const bColumn = b.column || 0;
   const startsBefore =
-    a.begin.line < b.line || (a.begin.line === b.line && a.begin.column <= bColumn);
+    a.start.line < b.line || (a.start.line === b.line && a.start.column <= bColumn);
   const endsAfter = a.end.line > b.line || (a.end.line === b.line && a.end.column >= bColumn);
 
   return startsBefore && endsAfter;
 }
 
 export function findClosestofSymbol(
-  declarations: (FunctionOutline | ClassOutline)[],
+  declarations: (FunctionDeclaration | ClassDeclaration)[],
   location: SourceLocation
 ) {
   if (!declarations) {
@@ -55,29 +62,26 @@ export function findClosestofSymbol(
     }
 
     // If two symbols enclose the location, get the closer symbol
-    if (found.location.begin.line > currNode.location.begin.line) {
+    if (found.location.start.line > currNode.location.start.line) {
       return found;
     }
     if (
-      found.location.begin.line === currNode.location.begin.line &&
-      found.location.begin.column > currNode.location.begin.column
+      found.location.start.line === currNode.location.start.line &&
+      found.location.start.column > currNode.location.start.column
     ) {
       return found;
     }
 
     return currNode;
-  }, null as (FunctionOutline | ClassOutline) | null);
+  }, null as (FunctionDeclaration | ClassDeclaration) | null);
 }
 
-export function findClosestFunction(
-  symbolsEntry: getSourceOutlineResult | null,
-  location: SourceLocation
-) {
-  if (!symbolsEntry) {
+export function findClosestFunction(symbolsEntry: SymbolEntry, location: SourceLocation) {
+  if (!symbolsEntry || symbolsEntry.status !== LoadingStatus.LOADED) {
     return null;
   }
 
-  return findClosestofSymbol(symbolsEntry.functions, location);
+  return findClosestofSymbol(symbolsEntry.symbols!.functions, location);
 }
 
 export function findClosestFunctionNameThunk(
@@ -85,33 +89,32 @@ export function findClosestFunctionNameThunk(
   location: SourceLocation
 ): UIThunkAction<string | null> {
   return (dispatch, getState) => {
-    const symbols = sourceOutlineCache.getValueIfCached(null as any, sourceId);
+    // Quirky but legal: use a thunk for a one-shot selection
+    // without subscribing to the store directly
+    const symbols = getSymbolEntryForSource(getState(), sourceId);
 
     const closestFunction = symbols ? findClosestFunction(symbols, location) : null;
     return closestFunction?.name ?? null;
   };
 }
 
-export function findClosestClass(
-  symbolsEntry: getSourceOutlineResult | null,
-  location: SourceLocation
-) {
-  if (!symbolsEntry) {
+export function findClosestClass(symbolsEntry: SymbolEntry, location: SourceLocation) {
+  if (!symbolsEntry || symbolsEntry.status !== LoadingStatus.LOADED) {
     return null;
   }
 
-  return findClosestofSymbol(symbolsEntry.classes, location);
+  return findClosestofSymbol(symbolsEntry.symbols!.classes, location);
 }
 
 export function findClosestEnclosedSymbol(
-  symbolsEntry: getSourceOutlineResult | null,
+  symbolsEntry: SymbolEntry | null,
   location: SourceLocation
 ) {
-  let classes: ClassOutline[] = [];
-  let functions: FunctionOutline[] = [];
+  let classes: ClassDeclaration[] = [];
+  let functions: FunctionDeclaration[] = [];
 
-  if (symbolsEntry) {
-    ({ classes, functions } = symbolsEntry);
+  if (symbolsEntry && symbolsEntry.status === LoadingStatus.LOADED) {
+    ({ classes, functions } = symbolsEntry.symbols!);
   }
 
   return findClosestofSymbol([...functions, ...classes], location);

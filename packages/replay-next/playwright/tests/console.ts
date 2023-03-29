@@ -17,7 +17,14 @@ import {
   toggleSideMenu,
   verifyTypeAheadContainsSuggestions,
 } from "./utils/console";
-import { delay, getElementCount, getTestUrl, stopHovering, takeScreenshot } from "./utils/general";
+import {
+  delay,
+  getCommandKey,
+  getElementCount,
+  getTestUrl,
+  stopHovering,
+  takeScreenshot,
+} from "./utils/general";
 import testSetup from "./utils/testSetup";
 
 testSetup("4ccc9f9f-f0d3-4418-ac21-1b316e462a44");
@@ -591,16 +598,4 @@ test("should support setting focus range via the context menu", async ({ page })
   // Give the UI time to settle.
   await expect(messageLocator(page, "console-log", "This is a trace")).toBeHidden();
   await takeScreenshot(page, list, "context-menu-focus-after-end");
-});
-
-test("should refine string tokens to avoid unnecessarily escaping quotation marks", async ({
-  page,
-}) => {
-  await setup(page, false);
-
-  await page.fill("[data-test-id=ConsoleTerminalInput]", `"a\\"b" + 123 + 'c\\'c' + true`);
-  await page.keyboard.press("Enter"); // Submit expression
-
-  const newListItem = await locateMessage(page, "terminal-expression");
-  await takeScreenshot(page, newListItem, "terminal-expression-with-refined-string-tokens");
 });

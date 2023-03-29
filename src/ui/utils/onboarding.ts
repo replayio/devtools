@@ -48,8 +48,68 @@ export function shouldShowBreakpointEdit(nags: Nag[]): boolean {
   return shouldShowNag(nags, Nag.FIRST_BREAKPOINT_EDIT);
 }
 
+export function shouldShowAddComment(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.ADD_COMMENT);
+}
+
+export function shouldShowAddCommentToLine(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.ADD_COMMENT_TO_LINE);
+}
+
+export function shouldShowAddCommentToNetworkRequest(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.ADD_COMMENT_TO_NETWORK_REQUEST);
+}
+
+export function shouldShowAddCommentToPrintStatement(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.ADD_COMMENT_TO_PRINT_STATEMENT);
+}
+
+export function shouldShowJumpToCode(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.JUMP_TO_CODE);
+}
+
+export function shouldShowAddUnicornBadge(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.ADD_UNICORN_BADGE);
+}
+
+export function shouldShowRecordReplay(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.FIRST_REPLAY_2);
+}
+
+export function shouldShowExploreSources(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.EXPLORE_SOURCES);
+}
+
+export function shouldShowSearchSourceText(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.SEARCH_SOURCE_TEXT);
+}
+
+export function shouldShowQuickOpenFile(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.QUICK_OPEN_FILE);
+}
+
+export function shouldShowLaunchCommandPalette(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.LAUNCH_COMMAND_PALETTE);
+}
+
+export function shouldShowJumpToEvent(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.JUMP_TO_EVENT);
+}
+
+export function shouldShowInspectElement(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.INSPECT_ELEMENT);
+}
+
+export function shouldShowInspectComponent(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.INSPECT_COMPONENT);
+}
+
+export function shouldShowUseFocusMode(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.USE_FOCUS_MODE);
+}
+
 export function shouldShowTour(nags: Nag[]): boolean {
   const showTour = shouldShowNag(nags, Nag.DISMISS_TOUR);
   const showConsoleNavigate = shouldShowConsoleNavigate(nags);
-  return showTour && showConsoleNavigate;
+  return showTour && showConsoleNavigate && shouldShowBreakpointAdd(nags);
 }

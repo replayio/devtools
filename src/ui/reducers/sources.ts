@@ -277,19 +277,10 @@ export function getPreferredLocation(sources: SourcesState, locations: MappedLoc
   );
   const preferredLocation = locations.find(l => l.sourceId == sourceId);
   assert(preferredLocation, "no preferred location found");
-
-  const correspondingSources = getCorrespondingSourceIdsFromSourcesState(
-    sources,
-    preferredLocation.sourceId
-  );
-  const assertion = preferredLocation.sourceId === correspondingSources[0];
-
   assert(
-    assertion,
-    `location.sourceId should be updated to the first corresponding sourceId: ${JSON.stringify({
-      preferredLocation,
-      correspondingSources,
-    })}`
+    preferredLocation.sourceId ===
+      getCorrespondingSourceIdsFromSourcesState(sources, preferredLocation.sourceId)[0],
+    "location.sourceId should be updated to the first corresponding sourceId"
   );
   return preferredLocation;
 }

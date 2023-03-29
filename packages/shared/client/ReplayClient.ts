@@ -24,7 +24,7 @@ import {
   SessionId,
   newSource as Source,
   SourceId,
-  FocusWindowRequest as TimeRange,
+  TimeRange,
   TimeStampedPoint,
   TimeStampedPointRange,
   VariableMapping,
@@ -380,12 +380,6 @@ export class ReplayClient implements ReplayClientInterface {
     return Object.fromEntries(counts.map(({ type, count }) => [type, count]));
   }
 
-  async getFocusWindow(): Promise<TimeStampedPointRange> {
-    const sessionId = this.getSessionIdThrows();
-    const { window } = await client.Session.getFocusWindow({}, sessionId);
-    return window;
-  }
-
   async getFrameSteps(pauseId: PauseId, frameId: FrameId): Promise<PointDescription[]> {
     const sessionId = this.getSessionIdThrows();
     const { steps } = await client.Pause.getFrameSteps({ frameId }, sessionId, pauseId);
@@ -567,10 +561,6 @@ export class ReplayClient implements ReplayClientInterface {
     return hitCounts;
   }
 
-  getSourceOutline(sourceId: SourceId) {
-    return client.Debugger.getSourceOutline({ sourceId }, this.getSessionIdThrows());
-  }
-
   async getBreakpointPositions(
     sourceId: SourceId,
     locationRange: SourceLocationRange | null
@@ -611,11 +601,11 @@ export class ReplayClient implements ReplayClientInterface {
     return mappedLocation;
   }
 
-  async requestFocusRange(range: TimeRange): Promise<TimeStampedPointRange> {
+  async requestFocusRange(range: TimeRange): Promise<requestFocusRangeResult> {
     const sessionId = this.getSessionIdThrows();
-    const { window } = await client.Session.requestFocusRange({ range }, sessionId);
+    const result = await client.Session.requestFocusRange({ range }, sessionId);
 
-    return window;
+    return result;
   }
 
   isOriginalSource(sourceId: SourceId): boolean {

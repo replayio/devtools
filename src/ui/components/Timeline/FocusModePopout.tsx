@@ -1,5 +1,7 @@
 import React, { useEffect } from "react";
 
+import { useNag } from "replay-next/src/hooks/useNag";
+import { Nag } from "shared/graphql/types";
 import { exitFocusMode, syncFocusedRegion, updateFocusRegionParam } from "ui/actions/timeline";
 import {
   getFocusRegionBackup,
@@ -15,6 +17,8 @@ import Icon from "../shared/Icon";
 import styles from "./FocusModePopout.module.css";
 
 export default function FocusModePopout() {
+  const [useFocusModeState, dismissUseFocusModeNag] = useNag(Nag.USE_FOCUS_MODE);
+
   const showFocusModeControls = useAppSelector(getShowFocusModeControls);
 
   const dispatch = useAppDispatch();
@@ -48,6 +52,7 @@ export default function FocusModePopout() {
     if (!showFocusModeControls) {
       return;
     }
+    dismissUseFocusModeNag();
 
     const onDocumentKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {

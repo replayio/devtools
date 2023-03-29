@@ -10,6 +10,7 @@ import debounce from "lodash/debounce";
 import { setupSourcesListeners } from "devtools/client/debugger/src/actions/sources";
 import * as dbgClient from "devtools/client/debugger/src/client";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
+import { bootstrapWorkers } from "devtools/client/debugger/src/utils/bootstrap";
 import { setupDebuggerHelper } from "devtools/client/debugger/src/utils/dbg";
 import { setupBoxModel } from "devtools/client/inspector/boxmodel/actions/box-model";
 import { setupMarkup } from "devtools/client/inspector/markup/actions/markup";
@@ -166,6 +167,8 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     protocolMessages: protocolMessages,
     ...debuggerReducers,
   };
+
+  bootstrapWorkers();
 
   const extraThunkArgs: ThunkExtraArgs = {
     ThreadFront,

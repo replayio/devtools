@@ -1,7 +1,7 @@
 import { SourceId } from "@replayio/protocol";
 import escapeRegExp from "lodash/escapeRegExp";
 import isEqual from "lodash/isEqual";
-import { useCallback, useContext, useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { findInsertIndex } from "replay-next/src/utils/array";
@@ -125,40 +125,23 @@ export default function useSourceSearch(
     onChangeDispatching
   );
 
-  const { search: dispatchSearch } = dispatch;
-
-  const memoizedSearch = useCallback(
-    (query: string) => dispatchSearch(query, modifiers),
-    [dispatchSearch, modifiers]
-  );
-
-  const memoizedSetModifiers = useCallback(
-    (newModifiers: SearchModifiers) => {
-      if (isEqual(modifiers, newModifiers)) {
-        return;
-      }
-
-      setModifiers(newModifiers);
-      dispatchSearch(state.query, newModifiers);
-    },
-    [dispatchSearch, modifiers, state.query]
-  );
-
-  const memoizedSetScope = useCallback(
-    (sourceId: SourceId | null, code: string) => {
-      setScope({ code, sourceId });
-    },
-    [setScope]
-  );
-
   const memoizedActions = useMemo<Actions>(
     () => ({
       ...dispatch,
-      search: memoizedSearch,
-      setModifiers: memoizedSetModifiers,
-      setScope: memoizedSetScope,
+      search: (query: string) => dispatch.search(query, modifiers),
+      setModifiers: (newModifiers: SearchModifiers) => {
+        if (isEqual(modifiers, newModifiers)) {
+          return;
+        }
+
+        setModifiers(newModifiers);
+        dispatch.search(state.query, newModifiers);
+      },
+      setScope: (sourceId: SourceId | null, code: string) => {
+        setScope({ code, sourceId });
+      },
     }),
-    [dispatch, memoizedSearch, memoizedSetModifiers, memoizedSetScope]
+    [dispatch, modifiers, state.query]
   );
   const memoizedState = useMemo<State>(() => ({ ...state, modifiers }), [state, modifiers]);
 

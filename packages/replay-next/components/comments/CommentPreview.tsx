@@ -34,7 +34,7 @@ export default function CommentPreview({
         columnIndex={typeData.columnIndex}
         lineNumber={typeData.lineNumber}
         parsedTokens={typeData.parsedTokens}
-        rawText={typeData.plainText}
+        rawText={typeData.rawText}
         sourceId={typeData.sourceId}
         sourceUrl={typeData.sourceUrl}
       />

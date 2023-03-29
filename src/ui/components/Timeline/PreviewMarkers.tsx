@@ -13,20 +13,11 @@ import { useAppSelector } from "ui/setup/hooks";
 
 import Marker from "./Marker";
 
-export default function PreviewMarkers() {
-  return (
-    <Suspense fallback={null}>
-      <PreviewMarkersSuspends />
-    </Suspense>
-  );
-}
-
-function PreviewMarkersSuspends() {
+function PreviewMarkers() {
   const currentTime = useAppSelector(selectors.getCurrentTime);
   const hoveredItem = useAppSelector(selectors.getHoveredItem);
   const timelineDimensions = useAppSelector(selectors.getTimelineDimensions);
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
-  const markTimeStampedPoint = useAppSelector(selectors.getMarkTimeStampedPoint);
 
   const replayClient = useContext(ReplayClientContext);
 
@@ -72,41 +63,40 @@ function PreviewMarkersSuspends() {
         )
       : [null, null];
 
-  const showHitPointMarkers =
-    hitPoints != null &&
-    hitPointStatus !== "too-many-points-to-run-analysis" &&
-    hitPointStatus !== "too-many-points-to-find";
+  if (
+    hitPointStatus === "too-many-points-to-run-analysis" ||
+    hitPointStatus === "too-many-points-to-find" ||
+    hitPoints == null
+  ) {
+    return null;
+  }
 
   return (
     <div className="preview-markers-container">
-      {showHitPointMarkers &&
-        hitPoints.map((point: PointDescription, index: number) => {
-          const isPrimaryHighlighted = hoveredItem?.point === point.point;
+      {hitPoints.map((point: PointDescription, index: number) => {
+        const isPrimaryHighlighted = hoveredItem?.point === point.point;
 
-          return (
-            <Marker
-              key={index}
-              point={point.point}
-              time={point.time}
-              location={point.frame?.[0]}
-              currentTime={currentTime}
-              isPrimaryHighlighted={isPrimaryHighlighted}
-              zoomRegion={zoomRegion}
-              overlayWidth={timelineDimensions.width}
-            />
-          );
-        })}
-
-      {markTimeStampedPoint && (
-        <Marker
-          point={markTimeStampedPoint.point}
-          time={markTimeStampedPoint.time}
-          currentTime={currentTime}
-          isPrimaryHighlighted={false}
-          zoomRegion={zoomRegion}
-          overlayWidth={timelineDimensions.width}
-        />
-      )}
+        return (
+          <Marker
+            key={index}
+            point={point.point}
+            time={point.time}
+            location={point.frame?.[0]}
+            currentTime={currentTime}
+            isPrimaryHighlighted={isPrimaryHighlighted}
+            zoomRegion={zoomRegion}
+            overlayWidth={timelineDimensions.width}
+          />
+        );
+      })}
     </div>
+  );
+}
+
+export default function ToggleWidgetButtonSuspenseWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <PreviewMarkers />
+    </Suspense>
   );
 }

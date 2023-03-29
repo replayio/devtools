@@ -13,7 +13,7 @@
   height: 1rem;
   margin: 0;
   border-radius: 0.25rem;
-  border-color: var(--checkbox-border);
+  border-color: var(--color-control-border);
   color: var(--color-control-background);
   background-color: currentColor;
   background-size: 100% 100%;

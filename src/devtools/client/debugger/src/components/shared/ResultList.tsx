@@ -42,6 +42,7 @@ export default class ResultList extends Component<ResultListProps> {
     const { selectItem, selected } = this.props;
     const props: React.ComponentPropsWithRef<"li"> = {
       onClick: (event: any) => selectItem(event, item),
+      key: `${item.id}${item.value}${index}`,
       ref: element => {
         // Keep a lookup table of items by index for scrolling
         if (element) {
@@ -60,7 +61,7 @@ export default class ResultList extends Component<ResultListProps> {
     };
 
     return (
-      <li key={`${item.id}${item.value}${index}`} {...props}>
+      <li {...props}>
         {item.icon && (
           <div className="icon">
             <AccessibleImage className={item.icon} />

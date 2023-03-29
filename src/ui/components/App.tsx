@@ -4,7 +4,6 @@ import { ConnectedProps, connect } from "react-redux";
 import QuickOpenModal from "devtools/client/debugger/src/components/QuickOpenModal";
 import { getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
 import { actions } from "ui/actions";
-import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import hooks from "ui/hooks";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
 import { getLoadingFinished, getModal, getTheme } from "ui/reducers/app";
@@ -152,11 +151,7 @@ function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
   }, [theme]);
 
   if (auth.isLoading || userInfo.loading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <LibrarySpinner />
-      </div>
-    );
+    return <LoadingScreen fallbackMessage="Authenticating..." />;
   }
 
   if (

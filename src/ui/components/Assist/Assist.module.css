@@ -1,0 +1,202 @@
+.AssistBoxWrapper {
+  position: relative;
+  background: linear-gradient(323deg, rgba(226, 85, 215, 0.497), rgba(79, 205, 230, 0.777));
+  height: 100vh;
+}
+
+.AssistBoxGradient {
+  background: linear-gradient(323deg, rgba(241, 108, 229, 0.897), rgba(49, 189, 216, 0.736));
+  background-size: 400% 400%;
+  -webkit-animation: GradientWave 24s ease infinite;
+  -moz-animation: GradientWave 24s ease infinite;
+  animation: GradientWave 24s ease infinite;
+  position: relative;
+  height: 100vh;
+}
+
+.AssistBox {
+  color: #fff;
+  padding: 0.5rem;
+  height: 100%;
+}
+
+.h1 {
+  color: #fff;
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  padding: 0px 0 16px 8px;
+}
+
+.intro {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 300;
+  margin-bottom: 1rem;
+  opacity: 0;
+  animation: fadeDrop 0.5s ease-out 0.2s forwards;
+}
+
+.intro p {
+  margin-bottom: 16px;
+  line-height: 120%;
+}
+
+.info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  border-top: 1px solid #fff;
+  font-size: 15px;
+  background-color: #e1f1fb;
+}
+
+.info .text {
+  padding-left: 1rem; /* equivalent to px-4 in Tailwind */
+  padding-right: 1rem; /* equivalent to px-4 in Tailwind */
+  padding-top: 1.5rem; /* equivalent to py-6 in Tailwind */
+  padding-bottom: 1.5rem;
+}
+
+.info .text .header {
+  font-size: 16px;
+  color: #dd4261;
+  margin-bottom: 10px;
+  font-weight: 300;
+}
+
+.stepIcon {
+  height: 20px;
+}
+
+.AssistBoxInternal {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.checklist {
+  font-size: 16px;
+  height: 100%;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.checklist div {
+  display: flex;
+  align-items: center;
+  padding: 0.2rem;
+  padding-left: 0.4rem;
+  border-radius: 3rem;
+  margin-bottom: 1px;
+}
+
+.checklist div.selectedItem {
+  background-color: rgba(255, 255, 255, 0.198);
+}
+
+.checklist div:hover {
+  background-color: rgba(255, 255, 255, 0.198);
+  cursor: pointer;
+}
+
+.videoExample {
+  border-radius: 6px;
+  box-shadow: 0 10px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.logPoint {
+  background-color: #dd4261;
+  border-radius: 6px;
+  height: 20px;
+  width: 20px;
+  margin-left: 7px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes fadeDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@-webkit-keyframes GradientWave {
+  0% {
+    background-position: 58% 0%;
+  }
+  50% {
+    background-position: 43% 100%;
+  }
+  100% {
+    background-position: 58% 0%;
+  }
+}
+@-moz-keyframes GradientWave {
+  0% {
+    background-position: 58% 0%;
+  }
+  50% {
+    background-position: 43% 100%;
+  }
+  100% {
+    background-position: 58% 0%;
+  }
+}
+@keyframes GradientWave {
+  0% {
+    background-position: 58% 0%;
+  }
+  50% {
+    background-position: 43% 100%;
+  }
+  100% {
+    background-position: 58% 0%;
+  }
+}
+.secondColumn {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.videoWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.clickInfoWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba;
+}
+
+.videoWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.clickInfoWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  width: 100%;
+}
+
+.clickInfo {
+  font-size: 18px;
+  color: #fff;
+}

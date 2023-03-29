@@ -160,19 +160,31 @@ const Tour: React.FC = () => {
         )}
 
         {!isNewUser && showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
-          <img src="/images/tour/fast-forward.gif" className={styles.videoExample} />
+          <img
+            src="https://website-git-master-recordreplay.vercel.app/tour/fast-forward.gif"
+            className={styles.videoExample}
+          />
         )}
 
         {!showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
-          <img src="/images/tour/addlogs.gif" className={styles.videoExample} />
+          <img
+            src="https://website-git-master-recordreplay.vercel.app/tour/addlogs.gif"
+            className={styles.videoExample}
+          />
         )}
 
         {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && (
-          <img src="/images/tour/editlogs.gif" className={styles.videoExample} />
+          <img
+            src="https://website-git-master-recordreplay.vercel.app/tour/editlogs.gif"
+            className={styles.videoExample}
+          />
         )}
 
         {hasCompletedTour && (
-          <img src="/images/tour/consoleupdate.gif" className={styles.videoExample} />
+          <img
+            src="https://website-git-master-recordreplay.vercel.app/tour/consoleupdate.gif"
+            className={styles.videoExample}
+          />
         )}
       </div>
     </div>

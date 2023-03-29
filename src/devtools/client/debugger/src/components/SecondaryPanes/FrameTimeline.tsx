@@ -4,19 +4,13 @@
 
 //
 
-import {
-  Location,
-  PointDescription,
-  SourceLocation,
-  getSourceOutlineResult,
-} from "@replayio/protocol";
+import { Location, PointDescription } from "@replayio/protocol";
 import classnames from "classnames";
 import React, { Component, Suspense, useContext } from "react";
 import ReactTooltip from "react-tooltip";
 
 import { locationsInclude } from "protocol/utils";
 import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
-import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { actions } from "ui/actions";
 import {
@@ -31,6 +25,7 @@ import { trackEvent } from "ui/utils/telemetry";
 
 import { PartialLocation } from "../../actions/sources/select";
 import { PauseFrame, getExecutionPoint } from "../../reducers/pause";
+import { SymbolEntry, getSymbols } from "../../selectors";
 import { getSelectedFrameSuspense } from "../../selectors/pause";
 
 function getBoundingClientRect(element?: HTMLElement) {
@@ -51,7 +46,7 @@ interface FrameTimelineProps {
   selectedLocation: PartialLocation | null;
   selectedFrame: PauseFrame | null;
   frameSteps: PointDescription[] | undefined;
-  symbols: getSourceOutlineResult | null;
+  symbols: SymbolEntry | null;
   seek: (point: string, time: number, hasFrames: boolean) => void;
   setPreviewPausedLocation: (location: Location) => void;
   sourcesState: SourcesState;
@@ -110,7 +105,7 @@ class FrameTimelineRenderer extends Component<FrameTimelineProps, FrameTimelineS
 
     // skip over steps that are mapped to the beginning of a function body
     // see SCS-172
-    const bodyLocations = symbols?.functions.map(f => f.body).filter(Boolean) as SourceLocation[];
+    const bodyLocations = symbols?.symbols?.functionBodyLocations;
     if (features.brokenSourcemapWorkaround && bodyLocations) {
       while (adjustedDisplayIndex < numberOfPositions - 2) {
         const location = frameSteps[adjustedDisplayIndex].frame?.find(
@@ -233,7 +228,7 @@ function FrameTimeline() {
   const selectedLocation = useAppSelector(getSelectedLocation);
   const selectedFrame = useAppSelector(state => getSelectedFrameSuspense(replayClient, state));
   const source = useAppSelector(getSelectedSource);
-  const symbols = source ? sourceOutlineCache.read(replayClient, source.id) : null;
+  const symbols = useAppSelector(state => (source ? getSymbols(state, source) : null));
   const frameSteps = selectedFrame
     ? frameStepsCache.read(replayClient, selectedFrame.pauseId, selectedFrame.protocolId)
     : undefined;

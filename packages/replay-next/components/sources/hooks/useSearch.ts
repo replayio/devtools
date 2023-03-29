@@ -271,6 +271,10 @@ export default function useSearch<Item, Result, QueryData = never>(
       dispatch({ type: "updateItems", items });
     }
 
+    if (queryChanged || queryDataChanged) {
+      dispatch({ type: "updateQuery", query: deferredQuery, queryData: deferredQueryData });
+    }
+
     const results = deferredQuery
       ? stableSearch(deferredQuery, items, deferredQueryData)
       : EMPTY_ARRAY;
