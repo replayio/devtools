@@ -1,17 +1,22 @@
-import React, { Component, useEffect } from "react";
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
+
+//
+
+// Dependencies
+import React, { Component } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { focusItem, setExpandedState } from "devtools/client/debugger/src/actions/source-tree";
 import { selectSource } from "devtools/client/debugger/src/actions/sources/select";
+// Selectors
 import { getContext } from "devtools/client/debugger/src/reducers/pause";
 import {
   getExpandedState,
   getFocusedSourceItem,
 } from "devtools/client/debugger/src/reducers/source-tree";
 import { getShownSource } from "devtools/client/debugger/src/reducers/ui";
-import { useNag } from "replay-next/src/hooks/useNag";
-import { Nag } from "shared/graphql/types";
-import NagDismiss from "ui/components/NagDismiss";
 import {
   SourceDetails,
   getSelectedSource,
@@ -22,6 +27,7 @@ import {
 import type { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 
+// Utils
 import {
   SourcesMap,
   createTree,
@@ -33,6 +39,7 @@ import {
 } from "../../utils/sources-tree";
 import { TreeDirectory, TreeNode } from "../../utils/sources-tree/types";
 import ManagedTree from "../shared/ManagedTree";
+// Components
 import SourcesTreeItem from "./SourcesTreeItem";
 
 type $FixTypeLater = any;
@@ -75,9 +82,7 @@ const connector = connect(mapStateToProps, {
   focusItem,
 });
 
-export type PropsFromRedux = ConnectedProps<typeof connector> & {
-  expanded: Set<unknown>;
-};
+type PropsFromRedux = ConnectedProps<typeof connector>;
 
 interface STState {
   uncollapsedTree: TreeDirectory;
@@ -89,33 +94,21 @@ interface STState {
 
 class SourcesTree extends Component<PropsFromRedux, STState> {
   constructor(props: PropsFromRedux) {
-    const updatedProps = {
-      ...props,
-      cx: { navigateCounter: 0 },
-      sourcesLoading: false,
-      shownSource: null,
-      selectedSource: null,
-      focused: null,
-      sources: {},
-      sourceCount: 0,
-    };
-
-    super(updatedProps);
-
-    const { sources } = updatedProps;
+    super(props);
+    const { sources } = this.props;
 
     const state = createTree({
       sources: sources as SourcesMap,
     }) as STState;
 
-    if (updatedProps.shownSource) {
-      const listItems = getDirectories(updatedProps.shownSource, state.sourceTree as TreeDirectory);
+    if (props.shownSource) {
+      const listItems = getDirectories(props.shownSource, state.sourceTree as TreeDirectory);
       state.listItems = listItems;
     }
 
-    if (updatedProps.selectedSource) {
+    if (props.selectedSource) {
       const highlightItems = getDirectories(
-        updatedProps.selectedSource,
+        props.selectedSource,
         state.sourceTree as TreeDirectory
       );
       state.highlightItems = highlightItems;
@@ -310,15 +303,4 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
   }
 }
 
-const WrappedSourcesTree = (props: PropsFromRedux) => {
-  const [, dismissExploreSourcesNag] = useNag(Nag.EXPLORE_SOURCES);
-
-  useEffect(() => {
-    dismissExploreSourcesNag();
-  }, []);
-
-  // Directly pass the props down to SourcesTree without destructuring
-  return <SourcesTree {...props} />;
-};
-
-export default connector(WrappedSourcesTree);
+export default connector(SourcesTree);
