@@ -5,7 +5,7 @@
 //
 
 // Dependencies
-import React, { Component } from "react";
+import React, { Component, useEffect } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { focusItem, setExpandedState } from "devtools/client/debugger/src/actions/source-tree";
@@ -17,6 +17,8 @@ import {
   getFocusedSourceItem,
 } from "devtools/client/debugger/src/reducers/source-tree";
 import { getShownSource } from "devtools/client/debugger/src/reducers/ui";
+import { useNag } from "replay-next/src/hooks/useNag";
+import { Nag } from "shared/graphql/types";
 import {
   SourceDetails,
   getSelectedSource,
@@ -303,4 +305,15 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
   }
 }
 
-export default connector(SourcesTree);
+const WrappedSourcesTree = (props: PropsFromRedux) => {
+  const [, dismissExploreSourcesNag] = useNag(Nag.EXPLORE_SOURCES);
+
+  useEffect(() => {
+    dismissExploreSourcesNag();
+  }, []);
+
+  // Directly pass the props down to SourcesTree without destructuring
+  return <SourcesTree {...props} />;
+};
+
+export default connector(WrappedSourcesTree);
