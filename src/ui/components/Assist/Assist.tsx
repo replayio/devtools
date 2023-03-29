@@ -81,10 +81,6 @@ const Assist: React.FC = () => {
 
   const info = useTestInfo();
 
-  const [videoUrl, setVideoUrl] = useState(
-    "https://website-git-master-recordreplay.vercel.app/assist/time_travel_in_console.gif"
-  );
-
   const renderCheckmarkIcon = (completed: boolean | undefined) => {
     if (completed === false) {
       return "checked-rounded";
@@ -92,73 +88,79 @@ const Assist: React.FC = () => {
     return "unchecked-rounded";
   };
 
-  const handleClick = (index: number) => {
-    setSelectedItem(index);
+  const [stepIndex, setStepIndex] = useState(0);
 
-    if (index === 0) {
-      setVideoUrl("https://website-git-master-recordreplay.vercel.app/assist/open_devtools.gif");
-    } else if (index === 1) {
-      setVideoUrl(
-        "https://website-git-master-recordreplay.vercel.app/assist/time_travel_in_console.gif"
-      );
-    } else if (index === 2) {
-      setVideoUrl(
-        "https://website-git-master-recordreplay.vercel.app/assist/set_print_statement.gif"
-      );
-    } else if (index === 3) {
-      setVideoUrl("https://website-git-master-recordreplay.vercel.app/assist/add_a_comment.gif");
-    } else if (index === 4) {
-      setVideoUrl(
-        "https://website-git-master-recordreplay.vercel.app/assist/add_a_comment_to_code.gif"
-      );
-    } else if (index === 5) {
-      setVideoUrl(
-        "https://website-git-master-recordreplay.vercel.app/assist/add_a_comment_to_network_request.gif"
-      );
-    } else if (index === 6) {
-      setVideoUrl(
-        "https://website-git-master-recordreplay.vercel.app/assist/add_a_comment_to_print_statement.gif"
-      );
-    } else if (index === 7) {
-      setVideoUrl("https://website-git-master-recordreplay.vercel.app/assist/jump_to_code.gif");
-    } else if (index === 8) {
-      setVideoUrl("https://website-git-master-recordreplay.vercel.app/assist/unicorn_badge.gif");
-    } else if (index === 9) {
-      setVideoUrl("https://website-git-master-recordreplay.vercel.app/assist/record_a_replay.gif");
-    } else if (index === 10) {
-      setVideoUrl("https://website-git-master-recordreplay.vercel.app/assist/explore_sources.gif");
-    } else if (index === 11) {
-      setVideoUrl(
-        "https://website-git-master-recordreplay.vercel.app/assist/quick_open_a_file.gif"
-      );
-    } else if (index === 12) {
-      setVideoUrl(
-        "https://website-git-master-recordreplay.vercel.app/assist/launch_command_palette.gif"
-      );
-    } else if (index === 13) {
-      setVideoUrl("https://website-git-master-recordreplay.vercel.app/assist/jump_to_an_event.gif");
-    } else if (index === 14) {
-      setVideoUrl(
-        "https://website-git-master-recordreplay.vercel.app/assist/inspect_an_element.gif"
-      );
-    } else if (index === 15) {
-      setVideoUrl(
-        "https://website-git-master-recordreplay.vercel.app/assist/inspect_an_component.gif"
-      );
-    } else if (index === 16) {
-      setVideoUrl("https://website-git-master-recordreplay.vercel.app/assist/use_focus_mode.gif");
-    }
+  const handleClick = (index: number) => {
+    setStepIndex(index);
+    setSelectedItem(index);
   };
+
+  let videoUrl;
+  switch (stepIndex) {
+    case 0:
+      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/open_devtools.gif";
+      break;
+    case 1:
+      videoUrl =
+        "https://website-git-master-recordreplay.vercel.app/assist/time_travel_in_console.gif";
+      break;
+    case 2:
+      videoUrl =
+        "https://website-git-master-recordreplay.vercel.app/assist/set_print_statement.gif";
+      break;
+    case 3:
+      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/add_a_comment.gif";
+      break;
+    case 4:
+      videoUrl =
+        "https://website-git-master-recordreplay.vercel.app/assist/add_a_comment_to_code.gif";
+      break;
+    case 5:
+      videoUrl =
+        "https://website-git-master-recordreplay.vercel.app/assist/add_a_comment_to_network_request.gif";
+      break;
+    case 6:
+      videoUrl =
+        "https://website-git-master-recordreplay.vercel.app/assist/add_a_comment_to_print_statement.gif";
+      break;
+    case 7:
+      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/jump_to_code.gif";
+      break;
+    case 8:
+      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/unicorn_badge.gif";
+      break;
+    case 9:
+      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/record_a_replay.gif";
+      break;
+    case 10:
+      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/explore_sources.gif";
+      break;
+    case 11:
+      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/quick_open_a_file.gif";
+      break;
+    case 12:
+      videoUrl =
+        "https://website-git-master-recordreplay.vercel.app/assist/launch_command_palette.gif";
+      break;
+    case 13:
+      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/jump_to_an_event.gif";
+      break;
+    case 14:
+      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/inspect_an_element.gif";
+      break;
+    case 15:
+      videoUrl =
+        "https://website-git-master-recordreplay.vercel.app/assist/inspect_an_component.gif";
+      break;
+    case 16:
+      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/use_focus_mode.gif";
+      break;
+    default:
+      videoUrl = ""; // or provide a default video URL if necessary
+  }
 
   const getItemStyle = (index: number) => {
     return selectedItem === index ? styles.selectedItem : "";
-  };
-
-  const renderVideoPlaceholder = () => {
-    if (selectedItem >= 0) {
-      return <div>Video #{selectedItem + 1} would go here</div>;
-    }
-    return null;
   };
 
   console.log("still need to navigate a console: ", showConsoleNavigate);
