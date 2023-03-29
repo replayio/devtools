@@ -284,8 +284,8 @@ export default React.memo(function Event({
   const label = getEventLabel(event);
   const { icon } = getReplayEvent(kind);
   const [jumpToCodeStatus, setJumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
-  const [jumpToCodeState, dismissJumpToCodeNag] = useNag(Nag.JUMP_TO_CODE);
-  const [jumpToEventState, dismissJumpToEventNag] = useNag(Nag.JUMP_TO_EVENT);
+  const [, dismissJumpToCodeNag] = useNag(Nag.JUMP_TO_CODE);
+  const [, dismissJumpToEventNag] = useNag(Nag.JUMP_TO_EVENT);
 
   const onKeyDown = (e: React.KeyboardEvent) => e.key === " " && e.preventDefault();
 

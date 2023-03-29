@@ -58,7 +58,7 @@ export default function EditableRemark({
     dismissAddCommentNag();
   };
 
-  const [addCommentState, dismissAddCommentNag] = useNag(Nag.ADD_COMMENT);
+  const [, dismissAddCommentNag] = useNag(Nag.ADD_COMMENT);
 
   const saveChanges = async (editorState: SerializedEditorState) => {
     setIsPending(true);
@@ -142,7 +142,7 @@ export default function EditableRemark({
           initialValue={content}
           onCancel={discardPendingChanges}
           onDelete={deleteRemark}
-          onSave={handleSaveChanges} // Replace 'saveChanges' with 'handleSaveChanges'
+          onSave={handleSaveChanges}
           placeholder={type === "reply" ? "Write a reply..." : "Type a comment"}
         />
       </div>
