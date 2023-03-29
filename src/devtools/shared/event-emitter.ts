@@ -49,6 +49,7 @@ export class EventEmitter implements EmitterTarget {
     }
 
     if (!(eventListeners in target)) {
+      // @ts-ignore TS is being too strict here
       target[eventListeners] = new Map();
     }
 
@@ -103,7 +104,6 @@ export class EventEmitter implements EmitterTarget {
         // So we iterate all the listeners to check if any of them is a wrapper to
         // the `listener` given.
         for (const value of listenersForType.values()) {
-          // @ts-expect-error who knows
           if (onceOriginalListener in value && value[onceOriginalListener] === listener) {
             listenersForType.delete(value);
             break;
