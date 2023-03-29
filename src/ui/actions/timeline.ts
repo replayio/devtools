@@ -1,6 +1,7 @@
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
 import {
   ExecutionPoint,
+  FocusWindowRequestBias,
   PauseId,
   ScreenShot,
   FocusWindowRequest as TimeRange,
@@ -701,11 +702,21 @@ export function syncFocusedRegion(): UIThunkAction {
   return async (dispatch, getState, { replayClient }) => {
     const state = getState();
     const focusRegion = getFocusRegion(state) as FocusRegion;
+    const currentTime = getCurrentTime(state);
     const zoomTime = getZoomRegion(state);
 
+    const begin = focusRegion ? focusRegion.begin.time : zoomTime.beginTime;
+    const end = focusRegion ? focusRegion.end.time : zoomTime.endTime;
+
+    let bias: FocusWindowRequestBias | undefined;
+    if (currentTime >= begin && currentTime <= end) {
+      bias = currentTime - begin < end - currentTime ? "begin" : "end";
+    }
+
     const window = await replayClient.requestFocusRange({
-      begin: focusRegion ? focusRegion.begin.time : zoomTime.beginTime,
-      end: focusRegion ? focusRegion.end.time : zoomTime.endTime,
+      begin,
+      bias,
+      end,
     });
 
     // If the actual region that's focused is smaller than the requested region,
