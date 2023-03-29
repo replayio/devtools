@@ -282,13 +282,15 @@ export function TestStepItem({
         ) : null}
       </TestStepRow>
       <Actions step={step} hovered={isSelected} selected={isSelected} />
-      {shouldShowJumpToCode ? (
-        <JumpToCodeButton
-          onClick={onJumpToClickEvent}
-          status={jumpToCodeStatus}
-          currentExecutionPoint={executionPoint}
-          targetExecutionPoint={step.annotations.start!.point}
-        />
+      {shouldShowJumpToCode && isSelected ? (
+        <div className="absolute right-9">
+          <JumpToCodeButton
+            onClick={onJumpToClickEvent}
+            status={jumpToCodeStatus}
+            currentExecutionPoint={executionPoint}
+            targetExecutionPoint={step.annotations.start!.point}
+          />
+        </div>
       ) : null}
     </div>
   );
