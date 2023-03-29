@@ -4,14 +4,15 @@ import {
   KeyboardEvent as ReplayKeyboardEvent,
   MouseEvent as ReplayMouseEvent,
   SameLineSourceLocations,
+  TimeStampedPoint,
 } from "@replayio/protocol";
-import classNames from "classnames";
 import classnames from "classnames";
 import React, { ReactNode, useState } from "react";
 import { Cache, createCache } from "suspense";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
+import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { getFunctionBody } from "protocol/evaluation-utils";
 import type { ThreadFront as TF } from "protocol/thread";
 import { RecordingTarget } from "protocol/thread/thread";
@@ -21,7 +22,6 @@ import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPos
 import { EventLog, eventsMapper } from "replay-next/src/suspense/EventsCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
-import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import { Nag } from "shared/graphql/types";
@@ -29,14 +29,20 @@ import type { UIThunkAction } from "ui/actions";
 import { SEARCHABLE_EVENT_TYPES, eventListenerLocationCache } from "ui/actions/event-listeners";
 import { setViewMode } from "ui/actions/layout";
 import useEventContextMenu from "ui/components/Events/useEventContextMenu";
+import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getViewMode } from "ui/reducers/layout";
+import { setMarkTimeStampPoint } from "ui/reducers/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
 import { ReplayEvent } from "ui/state/app";
 
 import MaterialIcon from "../shared/MaterialIcon";
 import { getReplayEvent } from "./eventKinds";
 import styles from "./Event.module.css";
+
+export interface PointWithEventType extends TimeStampedPoint {
+  kind: "keypress" | "mousedown";
+}
 
 const EVENTS_FOR_RECORDING_TARGET: Partial<
   Record<RecordingTarget, Record<SEARCHABLE_EVENT_TYPES, string>>
@@ -115,14 +121,6 @@ export const getEventLabel = (event: ReplayEvent) => {
   return label;
 };
 
-export type JumpToCodeFailureReason = "not_loaded" | "no_hits";
-export type JumpToCodeStatus = JumpToCodeFailureReason | "not_checked" | "loading" | "found";
-
-export const errorMessages: Record<JumpToCodeFailureReason, string> = {
-  not_loaded: "Not loaded",
-  no_hits: "No results",
-};
-
 /*
 Jump to the function location that ran for a given info sidebar event list item,
 such as "Click" or "Key Press: L"
@@ -156,8 +154,8 @@ This requires stringing together a series of assumptions and special cases:
 We _could_ do more analysis and find the nearest time where the first breakable location
 inside that function is running, then seek to that point in time, but skipping for now.
 */
-function jumpToClickEventFunctionLocation(
-  event: ReplayMouseEvent | ReplayKeyboardEvent,
+export function jumpToClickEventFunctionLocation(
+  event: PointWithEventType,
   onSeek: (point: ExecutionPoint, time: number) => void
 ): UIThunkAction<Promise<JumpToCodeStatus>> {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
@@ -280,7 +278,6 @@ export default React.memo(function Event({
   const dispatch = useAppDispatch();
   const { kind, point, time } = event;
   const isPaused = time === currentTime && executionPoint === point;
-  const [isHovered, setIsHovered] = useState(false);
   const label = getEventLabel(event);
   const { icon } = getReplayEvent(kind);
   const [jumpToCodeStatus, setJumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
@@ -294,16 +291,16 @@ export default React.memo(function Event({
     dismissJumpToEventNag(); // Replay Assist
   };
 
-  const onClickJumpToCode = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-
+  const onClickJumpToCode = async () => {
     // Seek to the sidebar event timestamp right away.
     // That way we're at least _close_ to the right time
     onSeek(point, time);
 
     if (event.kind === "mousedown" || event.kind === "keypress") {
       setJumpToCodeStatus("loading");
-      const result = await dispatch(jumpToClickEventFunctionLocation(event, onSeek));
+      const result = await dispatch(
+        jumpToClickEventFunctionLocation(event as PointWithEventType, onSeek)
+      );
 
       setJumpToCodeStatus(result);
       if (result === "not_loaded") {
@@ -321,50 +318,31 @@ export default React.memo(function Event({
 
   const { contextMenu, onContextMenu } = useEventContextMenu(event);
 
-  const timeLabel =
-    executionPoint === null || isExecutionPointsGreaterThan(event.point, executionPoint)
-      ? "fast-forward"
-      : "rewind";
-
-  const jumpToCodeButtonAvailable =
-    jumpToCodeStatus === "not_checked" || jumpToCodeStatus === "found";
-
-  const jumpToCodeButtonClassname = classnames(
-    "transition-width flex items-center justify-center rounded-full  duration-100 ease-out h-6",
-    {
-      "bg-primaryAccent": jumpToCodeButtonAvailable,
-      "bg-gray-400 cursor-default": !jumpToCodeButtonAvailable,
-      "px-2 shadow-sm": isHovered,
-      "w-6": !isHovered,
-    }
-  );
-
-  const onJumpButtonMouseEnter = (e: React.MouseEvent) => {
-    setIsHovered(true);
+  const onMouseEnter = () => {
+    dispatch(
+      setMarkTimeStampPoint({
+        point: event.point,
+        time: event.time,
+      })
+    );
   };
 
-  const onJumpButtonMouseLeave = (e: React.MouseEvent) => {
-    setIsHovered(false);
+  const onMouseLeave = () => {
+    dispatch(setMarkTimeStampPoint(null));
   };
-
-  let jumpButtonText = "Jump to code";
-
-  if (jumpToCodeStatus in errorMessages) {
-    jumpButtonText = errorMessages[jumpToCodeStatus as JumpToCodeFailureReason];
-  } else if (jumpToCodeStatus === "loading") {
-    jumpButtonText = "Loading...";
-  }
 
   return (
     <>
       <div
-        className={classNames(styles.eventRow, "group block w-full", {
+        className={classnames(styles.eventRow, "group block w-full", {
           "text-lightGrey": currentTime < time,
           "font-semibold text-primaryAccent": isPaused,
         })}
         onClick={onClickSeek}
         onContextMenu={onContextMenu}
         onKeyDown={onKeyDown}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
       >
         <div className="flex flex-row items-center space-x-2 overflow-hidden">
           <MaterialIcon iconSize="xl">{icon}</MaterialIcon>
@@ -372,17 +350,12 @@ export default React.memo(function Event({
         </div>
         <div className="flex space-x-2 opacity-0 group-hover:opacity-100">
           {event.kind === "mousedown" || event.kind === "keypress" ? (
-            <div
-              onClick={jumpToCodeButtonAvailable ? onClickJumpToCode : undefined}
-              onMouseEnter={onJumpButtonMouseEnter}
-              onMouseLeave={onJumpButtonMouseLeave}
-              className={jumpToCodeButtonClassname}
-            >
-              <div className="flex items-center space-x-1">
-                {isHovered && <span className="truncate text-white ">{jumpButtonText}</span>}
-                <Icon type={timeLabel} className="w-3.5 text-white" />
-              </div>
-            </div>
+            <JumpToCodeButton
+              onClick={onClickJumpToCode}
+              status={jumpToCodeStatus}
+              currentExecutionPoint={executionPoint}
+              targetExecutionPoint={event.point}
+            />
           ) : null}
         </div>
       </div>

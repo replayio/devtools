@@ -112,6 +112,7 @@ export type LocalExperimentalUserSettings = {
   consoleFilterDrawerDefaultsToOpen: boolean;
   disableStableQueryCache: boolean;
   enableColumnBreakpoints: boolean;
+  enableIncrementalSnapshots: boolean;
   enableUnstableQueryCache: boolean;
   enableRoutines: boolean;
   rerunRoutines: boolean;
@@ -316,6 +317,7 @@ export type AnnotatedTestStep = TestStep & {
   absoluteEndTime: number;
   index: number;
   annotations: Annotations;
+  category?: string;
 };
 
 type Annotations = {

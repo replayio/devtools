@@ -7,7 +7,6 @@ import {
   PointRange,
   TimeStampedPoint,
 } from "@replayio/protocol";
-import jsTokens from "js-tokens";
 import { Cache, createCache } from "suspense";
 
 import {
@@ -16,10 +15,11 @@ import {
   SendCommand,
   getFunctionBody,
 } from "protocol/evaluation-utils";
+import { parse } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createFetchAsyncFromFetchSuspense } from "../utils/suspense";
-import { RemoteAnalysisResult, getAnalysisCache } from "./AnalysisCache";
+import { AnalysisParams, RemoteAnalysisResult, createAnalysisCache } from "./AnalysisCache";
 
 type Value = any;
 
@@ -32,6 +32,22 @@ export type AnalysisResult = {
 };
 
 export type GetAnalysisResult = (timeStampedPoint: TimeStampedPoint) => AnalysisResult | null;
+
+const logPointAnalysisCache = createAnalysisCache<
+  PointDescription,
+  [location: Location, code: string, condition: string | null]
+>("LogPointAnalysisCache", getAnalysisParams, point => point);
+
+function getAnalysisParams(
+  location: Location,
+  code: string,
+  condition: string | null
+): AnalysisParams {
+  return {
+    mapper: createMapperForAnalysis(code, condition),
+    location,
+  };
+}
 
 export function getLogPointAnalysisResultSuspense(
   client: ReplayClientInterface,
@@ -51,15 +67,24 @@ export function getLogPointAnalysisResultSuspense(
       values: localResult,
     };
   } else {
-    const cache = getAnalysisCache<PointDescription>(
-      {
-        mapper: createMapperForAnalysis(code, condition),
-        location,
-      },
-      point => point
+    // the LoggablesContext doesn't call logPointAnalysisCache.pointsCache.read(Async)
+    // because it uses points from the HitPointsCache instead (which is more efficient
+    // as it shares the points with other parts of the UI), so we call it here to ensure
+    // that the analysis is run for the given range
+    logPointAnalysisCache.pointsIntervalCache.readAsync(
+      range.begin,
+      range.end,
+      client,
+      location,
+      code,
+      condition
     );
-    cache.getPointsAsync(client, range);
-    const remoteResult = cache.getResultSuspense(point.point);
+    const remoteResult = logPointAnalysisCache.resultsCache.read(
+      point.point,
+      location,
+      code,
+      condition
+    );
     return {
       executionPoint: remoteResult.point,
       isRemote: true,
@@ -79,48 +104,29 @@ export function canRunLocalAnalysis(code: string, condition: string | null): boo
     return false;
   }
 
-  const tokens = jsTokens(code);
-  // @ts-ignore
-  for (let token of tokens) {
-    switch (token.type) {
-      case "IdentifierName": {
-        switch (token.value) {
-          case "false":
-          case "Infinity":
-          case "NaN":
-          case "null":
-          case "true":
-          case "undefined": {
-            // Supported
-            break;
-          }
-          default: {
-            return false;
-          }
-        }
-        break;
-      }
-      case "Punctuator": {
-        switch (token.value) {
-          case ",": {
-            // Supported
-            break;
-          }
-          default: {
-            return false;
+  const tokens = parse(code, "fake.js");
+  if (tokens.length > 0) {
+    const firstLineTokens = tokens[0];
+    for (let token of firstLineTokens) {
+      const { types, value } = token;
+      if (types && types.length > 0) {
+        const type = types[0];
+        switch (type) {
+          case "variableName":
+          case "variableName2": {
+            switch (value) {
+              case "false":
+              case "Infinity":
+              case "NaN":
+              case "null":
+              case "true":
+              case "undefined":
+                break;
+              default:
+                return false;
+            }
           }
         }
-        break;
-      }
-      case "NoSubstitutionTemplate":
-      case "NumericLiteral":
-      case "StringLiteral":
-      case "WhiteSpace": {
-        // supported
-        break;
-      }
-      default: {
-        return false;
       }
     }
   }

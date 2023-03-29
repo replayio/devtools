@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { TimeRange, TimeStampedPoint } from "@replayio/protocol";
+import { FocusWindowRequest as FocusWindow, TimeStampedPoint } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 
 import { MAX_FOCUS_REGION_DURATION } from "ui/actions/timeline";
@@ -12,11 +12,12 @@ function initialTimelineState(): TimelineState {
   return {
     allPaintsReceived: false,
     currentTime: 0,
-    focusRegion: getPausePointParams()?.focusRegion || null,
+    focusRegion: getPausePointParams().focusRegion,
     focusRegionBackup: null,
     displayedFocusRegion: null,
-    hoverTime: null,
     hoveredItem: null,
+    markTimeStampedPoint: null,
+    hoverTime: null,
     playback: null,
     playbackFocusRegion: false,
     playbackPrecachedTime: 0,
@@ -47,6 +48,9 @@ const timelineSlice = createSlice({
     setPlaybackStalled(state, action: PayloadAction<boolean>) {
       state.stalled = action.payload;
     },
+    setMarkTimeStampPoint(state, action: PayloadAction<TimeStampedPoint | null>) {
+      state.markTimeStampedPoint = action.payload;
+    },
     setHoveredItem(state, action: PayloadAction<HoveredItem | null>) {
       state.hoveredItem = action.payload;
     },
@@ -59,7 +63,7 @@ const timelineSlice = createSlice({
     setFocusRegion(state, action: PayloadAction<FocusRegion | null>) {
       state.focusRegion = action.payload;
     },
-    setDisplayedFocusRegion(state, action: PayloadAction<TimeRange | null>) {
+    setDisplayedFocusRegion(state, action: PayloadAction<FocusWindow | null>) {
       state.displayedFocusRegion = action.payload;
     },
     pointsReceived(state, action: PayloadAction<TimeStampedPoint[]>) {
@@ -92,6 +96,7 @@ export const {
   allPaintsReceived,
   setDragging,
   setHoveredItem,
+  setMarkTimeStampPoint,
   setPlaybackPrecachedTime,
   setPlaybackFocusRegion,
   setPlaybackStalled,
@@ -114,6 +119,7 @@ export const isPlaying = (state: UIState) => state.timeline.playback !== null;
 export const isPlaybackStalled = (state: UIState) => state.timeline.stalled;
 export const getRecordingDuration = (state: UIState) => state.timeline.recordingDuration;
 export const getTimelineDimensions = (state: UIState) => state.timeline.timelineDimensions;
+export const getMarkTimeStampedPoint = (state: UIState) => state.timeline.markTimeStampedPoint;
 export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;
 export const getPaints = (state: UIState) => state.timeline.paints;
 export const getPoints = (state: UIState) => state.timeline.points;

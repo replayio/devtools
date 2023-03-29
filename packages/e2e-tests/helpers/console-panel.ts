@@ -50,9 +50,14 @@ export async function enableConsoleMessageType(
   page: Page,
   type: "exceptions" | "logs" | "warnings" | "errors"
 ) {
+  // Use checkbox.click() rather than checkbox.check()
+  // because the latter wil sometimes fail prematurely if the checkbox state doesn't change quickly enough
+  // Note this requires us to verify the initial state of the checkbox before clicking
   const checkbox = getConsoleMessageTypeCheckbox(page, type);
-  await delay(500);
-  await checkbox.check();
+  const isChecked = await checkbox.isChecked();
+  if (!isChecked) {
+    await checkbox.click({ timeout: 500 });
+  }
 }
 
 export async function executeTerminalExpression(
