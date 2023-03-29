@@ -158,7 +158,7 @@ export default function Toolbar() {
   const viewMode = useAppSelector(selectors.getViewMode);
   const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
 
-  const showReplayAssist = useAppSelector(selectors.getReplayAssist);
+  const [showReplayAssist, _] = useLocalStorage<boolean>(`Replay:replayAssistEnabled`, false);
 
   const [showCommentsBadge, setShowCommentsBadge] = useState(false);
   const recordingId = useGetRecordingId();
@@ -213,7 +213,7 @@ export default function Toolbar() {
           />
         ) : null}
 
-        {!showReplayAssist ? (
+        {showReplayAssist ? (
           <ToolbarButton
             icon="school"
             name="assist"
