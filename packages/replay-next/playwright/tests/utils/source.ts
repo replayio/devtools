@@ -1,6 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
+import { getConsoleSearchInput } from "./console";
 import {
   clearTextArea,
   debugPrint,
@@ -251,9 +252,13 @@ export async function addConditional(
 export async function focusOnSource(page: Page) {
   await debugPrint(page, "(Re)focus on Source root", "focusOnSource");
 
+  // wait for the console search input - it has an "autoFocus" attribute which
+  // means it will "steal" the focus when it is first displayed, so we should
+  // wait for that before focusing on anything else
+  await getConsoleSearchInput(page).waitFor();
+
   const sourcesRoot = page.locator('[data-test-id="SourcesRoot"]');
   await expect(sourcesRoot).toBeVisible();
-  await delay(100);
   await sourcesRoot.focus();
   await expect(sourcesRoot).toBeFocused();
 }
@@ -269,24 +274,6 @@ export function getLogPointPanelContentTypeAhead(page: Page): Locator {
 function getNextHitPointButton(page: Page, lineNumber: number): Locator {
   const pointPanelLocator = getPointPanelLocator(page, lineNumber);
   return pointPanelLocator.locator(`[data-test-name="NextHitPointButton"]`);
-}
-
-async function getNumLines(page: Page, sourceId: string): Promise<number> {
-  const sourceLocator = getSourceLocator(page, sourceId);
-  await expect(sourceLocator).toBeVisible();
-
-  let numLines: number | undefined;
-
-  await waitFor(async () => {
-    const attribute = await sourceLocator.getAttribute("data-test-num-lines");
-
-    numLines = parseInt(attribute!, 10);
-    if (isNaN(numLines)) {
-      throw Error(`Waiting for source ${sourceId} to have a num-lines attribute`);
-    }
-  });
-
-  return numLines!;
 }
 
 function getPreviousHitPointButton(page: Page, lineNumber: number): Locator {
@@ -1011,16 +998,10 @@ export async function waitForSourceContentsToStream(page: Page, sourceId: string
   const sourceLocator = getSourceLocator(page, sourceId);
   await expect(sourceLocator).toBeVisible();
 
-  const numLines = await getNumLines(page, sourceId);
-  await goToLine(page, sourceId, numLines);
-
-  const lastLine = page.locator('[data-test-name="SourceLine"]').last();
-  await lastLine.isVisible();
-
   await waitFor(async () => {
-    const contentsState = await lastLine.getAttribute("data-test-contents-state");
-    if (contentsState !== "parsed") {
-      throw Error(`Waiting for line ${numLines} to be parsed but is "${contentsState}"`);
+    const status = await sourceLocator.getAttribute("data-test-source-status");
+    if (status !== "resolved") {
+      throw Error(`Waiting for source to be "resolved" but is "${status}"`);
     }
   });
 }

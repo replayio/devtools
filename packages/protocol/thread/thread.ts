@@ -26,7 +26,6 @@ import {
   SourceKind,
   SourceLocation,
   TimeStamp,
-  TimeStampedPointRange,
   Value,
   findAnnotationsResult,
   requestBodyData,
@@ -37,7 +36,6 @@ import groupBy from "lodash/groupBy";
 import { cachePauseData, pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { areRangesEqual } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
-import type { Features } from "ui/utils/prefs";
 
 import { client } from "../socket";
 import { EventEmitter, assert, defer, locationsInclude } from "../utils";
@@ -103,6 +101,10 @@ export enum RecordingTarget {
   unknown = "unknown",
 }
 
+interface ReplayAppFeatures {
+  chromiumRepaints?: boolean;
+}
+
 function getRecordingTarget(buildId: string): RecordingTarget {
   if (buildId.includes("gecko")) {
     return RecordingTarget.gecko;
@@ -146,8 +148,6 @@ class _ThreadFront {
   // Waiter which resolves with the target used to create the recording.
   recordingCapabilitiesWaiter = defer<RecordingCapabilities>();
   recordingTargetWaiter = defer<RecordingTarget>();
-
-  initialFocusRegionWaiter = defer<TimeStampedPointRange>();
 
   // Waiter which resolves when all sources have been loaded.
   private allSourcesWaiter = defer<void>();
@@ -210,7 +210,7 @@ class _ThreadFront {
     );
   }
 
-  async setSessionId(sessionId: SessionId, features: Partial<Features>) {
+  async setSessionId(sessionId: SessionId, features: Partial<ReplayAppFeatures>) {
     this.sessionId = sessionId;
     assert(sessionId, "there should be a sessionId");
     this.sessionWaiter.resolve(sessionId);
@@ -298,7 +298,6 @@ class _ThreadFront {
             loadedRegions.loading.length === 1,
             "there should be exactly one initially loaded region"
           );
-          this.initialFocusRegionWaiter.resolve(loadedRegions.loading[0]);
         }
         this._loadedRegionsListeners.forEach(callback => callback(loadedRegions));
       });

@@ -88,7 +88,12 @@ export function LoggablesContextRoot({
     return suspendInParallel(
       ...eventTypesToLoad.map(
         eventType => () =>
-          getInfallibleEventPointsSuspense(client, eventType, toPointRange(focusRange)) ?? []
+          getInfallibleEventPointsSuspense(
+            focusRange.begin.point,
+            focusRange.end.point,
+            client,
+            eventType
+          ) ?? []
       )
     ).flat();
   }, [client, eventTypesToLoad, focusRange]);
@@ -138,7 +143,8 @@ export function LoggablesContextRoot({
   let exceptions: UncaughtException[] = EMPTY_ARRAY;
   if (focusRange && showExceptions) {
     exceptions =
-      getInfallibleExceptionPointsSuspense(client, toPointRange(focusRange)) ?? EMPTY_ARRAY;
+      getInfallibleExceptionPointsSuspense(focusRange.begin.point, focusRange.end.point, client) ??
+      EMPTY_ARRAY;
   }
 
   const pointInstances = useMemo<PointInstance[]>(() => {

@@ -10,7 +10,7 @@ export default function ConsoleActionsRow({
   setMenuValueHasBeenToggled,
 }: {
   clearConsoleEvaluations: () => void;
-  consoleEvaluationsCount: Number;
+  consoleEvaluationsCount: number;
   isMenuOpen: boolean;
   setIsMenuOpen: (value: boolean) => void;
   setMenuValueHasBeenToggled: (value: boolean) => void;

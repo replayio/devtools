@@ -159,6 +159,12 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
 
   return (
     <>
+      <div style={{ display: "none" }}>
+        <MaterialIcon>globe</MaterialIcon>
+        <MaterialIcon>group</MaterialIcon>
+        <MaterialIcon>lock</MaterialIcon>
+        <MaterialIcon>expand_more</MaterialIcon>
+      </div>
       <PortalDropdown
         buttonContent={<DropdownButton>{summary}</DropdownButton>}
         buttonStyle={"overflow-hidden"}

@@ -6,8 +6,9 @@ import { assert } from "protocol/utils";
 import Loader from "replay-next/components/Loader";
 import { mappedLocationCache } from "replay-next/src/suspense/MappedLocationCache";
 import { objectPropertyCache } from "replay-next/src/suspense/ObjectPreviews";
-import { scopeMapCache } from "replay-next/src/suspense/ScopeMapCache";
-import { sourcesByUrlCache } from "replay-next/src/suspense/SourcesCache";
+import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
+import { sourcesByUrlCache, sourcesCache } from "replay-next/src/suspense/SourcesCache";
+import { findFunctionNameForLocation, isSourceMappedSource } from "replay-next/src/utils/source";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Source from "./Source";
@@ -73,8 +74,14 @@ function ErrorFrameRendererSuspends({ frame }: { frame: StackFrame }) {
       column: columnNumber,
     };
     const mappedLocation = mappedLocationCache.read(client, location);
-    const scopeMap = scopeMapCache.read(client, location);
-    originalFunctionName = scopeMap?.find(mapping => mapping[0] === frame.functionName)?.[1];
+    const preferredLocation = client.getPreferredLocation(mappedLocation);
+    if (
+      preferredLocation &&
+      isSourceMappedSource(preferredLocation.sourceId, sourcesCache.read(client))
+    ) {
+      const sourceOutline = sourceOutlineCache.read(client, preferredLocation.sourceId);
+      originalFunctionName = findFunctionNameForLocation(preferredLocation, sourceOutline);
+    }
     renderedSource = <Source className={styles.Source} locations={mappedLocation} />;
   } else {
     // this shouldn't happen but we provide a fallback just in case

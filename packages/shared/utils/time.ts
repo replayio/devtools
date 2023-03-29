@@ -4,9 +4,9 @@ export function isRangeInRegions(
   range: TimeStampedPointRange | PointRange,
   regions: TimeStampedPointRange[]
 ): boolean {
-  let beginPointBigInt: BigInt | null = null;
+  let beginPointBigInt: bigint | null = null;
   let beginTime: number | null = null;
-  let endPointBigInt: BigInt | null = null;
+  let endPointBigInt: bigint | null = null;
   let endTime: number | null = null;
 
   if (isTimeStampedPointRange(range)) {
@@ -78,5 +78,31 @@ export function toPointRange(range: TimeStampedPointRange | PointRange): PointRa
       begin: range.begin.point,
       end: range.end.point,
     };
+  }
+}
+
+// Format a time value to mm:ss
+export function getFormattedTime(time: number, showMilliseconds: boolean = false) {
+  const date = new Date(time);
+  let minutes = date.getUTCMinutes();
+  let seconds = date.getUTCSeconds();
+  const milliseconds = date.getUTCMilliseconds();
+
+  if (!showMilliseconds) {
+    if (milliseconds >= 500) {
+      seconds++;
+    }
+    if (seconds >= 60) {
+      seconds = 0;
+      minutes++;
+    }
+  }
+
+  if (showMilliseconds) {
+    return `${minutes}:${seconds.toString().padStart(2, "0")}.${milliseconds
+      .toString()
+      .padStart(3, "0")}`;
+  } else {
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   }
 }

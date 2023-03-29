@@ -157,6 +157,7 @@ export const partialRequestsToCompleteSummaries = (
       const response = r.events.response;
       const requestDone = r.events["request-done"];
       const documentType = response ? getDocumentType(response.event.responseHeaders) : undefined;
+
       return {
         cause: request.event.requestCause,
         documentType,
@@ -179,7 +180,7 @@ export const partialRequestsToCompleteSummaries = (
         start: request.time,
         status: response?.event.responseStatus,
         triggerPoint: r.triggerPoint,
-        type: REQUEST_TYPES[request.event.requestCause || ""] || CanonicalRequestType.OTHER,
+        type: REQUEST_TYPES[request.event.requestCause || ""] ?? CanonicalRequestType.OTHER,
         url: request.event.requestUrl,
       };
     })

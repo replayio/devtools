@@ -2,10 +2,11 @@ import { newSource as ProtocolSource } from "@replayio/protocol";
 import debounce from "lodash/debounce";
 import { MouseEvent, Suspense, useContext, useLayoutEffect, useRef, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
+import { useStreamingValue } from "suspense";
 
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import {
-  StreamingSourceContents,
+  StreamingSourceContentsValue,
   streamingSourceContentsCache,
 } from "replay-next/src/suspense/SourcesCache";
 import {
@@ -58,16 +59,13 @@ function SourceLoader({
 }) {
   const client = useContext(ReplayClientContext);
 
-  const streamingSourceContents = streamingSourceContentsCache.read(client, source.sourceId);
   if (source === null) {
     return null;
   }
 
+  const streamingSourceContents = streamingSourceContentsCache.stream(client, source.sourceId);
   const fileName = getSourceFileName(source);
-  const streamingParser = streamingSyntaxParsingCache.stream(streamingSourceContents, fileName);
-  if (streamingParser === null) {
-    return null;
-  }
+  const streamingParser = streamingSyntaxParsingCache.stream(client, source.sourceId, fileName);
 
   return (
     <SourceRenderer
@@ -88,7 +86,7 @@ function SourceRenderer({
   showColumnBreakpoints: boolean;
   source: ProtocolSource;
   streamingParser: StreamingParser;
-  streamingSourceContents: StreamingSourceContents;
+  streamingSourceContents: StreamingSourceContentsValue;
 }) {
   const { trackEventOnce } = useContext(SessionContext);
   const [hoveredState, setHoveredState] = useState<HoveredState | null>(null);
@@ -103,6 +101,8 @@ function SourceRenderer({
   );
 
   const sourceRef = useRef<HTMLDivElement>(null);
+
+  const { status } = useStreamingValue(streamingParser);
 
   const trackMouseHover = () => {
     // Analytics for onboarding
@@ -149,15 +149,12 @@ function SourceRenderer({
     setHoveredState(null);
   };
 
-  // TODO Once source and syntax parsing caches have been converted to "suspense" package
-  // we can replace data-test-num-lines attribute with data-test-state="loading" | "loaded" | "parsed"
-  // This will simplify e2e test logic
   return (
     <div
       className={styles.Source}
       data-test-id={`Source-${source.sourceId}`}
       data-test-name="Source"
-      data-test-num-lines={streamingSourceContents.lineCount}
+      data-test-source-status={status}
       data-test-source-id={source.sourceId}
       onMouseEnter={trackMouseHover}
     >
@@ -169,13 +166,15 @@ function SourceRenderer({
               showColumnBreakpoints={showColumnBreakpoints}
               source={source}
               streamingParser={streamingParser}
-              streamingSourceContents={streamingSourceContents}
               width={width}
             />
           )}
         </AutoSizer>
 
-        <StreamingSourceLoadingProgressHeader streamingParser={streamingParser} />
+        <StreamingSourceLoadingProgressHeader
+          streamingParser={streamingParser}
+          streamingSourceContents={streamingSourceContents}
+        />
       </div>
       {hoveredState ? (
         <PreviewPopup

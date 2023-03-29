@@ -11,7 +11,7 @@ import { trackEvent } from "ui/utils/telemetry";
 
 import Event from "./Event";
 
-function CurrentTimeLine({ isActive }: { isActive: boolean }) {
+export function CurrentTimeLine({ isActive }: { isActive: boolean }) {
   return (
     <div
       className={classNames("m-0", isActive ? "bg-secondaryAccent" : "bg-transparent")}
@@ -38,14 +38,14 @@ function Events() {
   if (events.length > 0) {
     return (
       <div className="bg-bodyBgcolor py-1.5 text-xs">
-        {events.map((e, i) => {
+        {events.map((event, index) => {
           return (
-            <div key={e.point}>
-              <CurrentTimeLine isActive={currentEventIndex === i} />
+            <div key={event.point}>
+              <CurrentTimeLine isActive={currentEventIndex === index} />
               <div className="px-1.5">
                 <Event
                   onSeek={onSeek}
-                  event={e}
+                  event={event}
                   currentTime={currentTime}
                   executionPoint={executionPoint!}
                 />

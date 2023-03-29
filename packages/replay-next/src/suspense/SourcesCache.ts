@@ -1,14 +1,17 @@
-import { SourceId, TimeStampedPointRange } from "@replayio/protocol";
 import {
-  PointRange,
   ContentType as ProtocolContentType,
   newSource as ProtocolSource,
   SourceId as ProtocolSourceId,
 } from "@replayio/protocol";
-import { Cache, createCache, createSingleEntryCache } from "suspense";
+import {
+  Cache,
+  StreamingCache,
+  StreamingValue,
+  createSingleEntryCache,
+  createStreamingCache,
+} from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
-import { toPointRange } from "shared/utils/time";
 
 export type ProtocolSourceContents = {
   contents: string;
@@ -20,28 +23,14 @@ export type IndexedSource = ProtocolSource & {
   doesContentHashChange: boolean;
 };
 
-export type StreamSubscriber = () => void;
-export type UnsubscribeFromStream = () => void;
-
-export type StreamingSourceContents = {
-  codeUnitCount: number | null;
-  complete: boolean;
-  contents: string | null;
-  contentType: ProtocolContentType | null;
-  lineCount: number | null;
-  resolver: Promise<StreamingSourceContents>;
-  sourceId: ProtocolSourceId;
-  subscribe(subscriber: StreamSubscriber): UnsubscribeFromStream;
-};
-
 export const sourcesCache: Cache<[client: ReplayClientInterface], ProtocolSource[]> =
   createSingleEntryCache({
     debugLabel: "Sources",
     load: async ([client]) => {
       const protocolSources = await client.findSources();
 
-      const urlToFirstSource: Map<SourceId, ProtocolSource> = new Map();
-      const urlsThatChange: Set<SourceId> = new Set();
+      const urlToFirstSource: Map<ProtocolSourceId, ProtocolSource> = new Map();
+      const urlsThatChange: Set<ProtocolSourceId> = new Set();
 
       protocolSources.forEach(source => {
         const { contentHash, kind, sourceId, url } = source;
@@ -108,99 +97,63 @@ export const sourcesByUrlCache: Cache<
   },
 });
 
-export const streamingSourceContentsCache: Cache<
-  [client: ReplayClientInterface, sourceId: SourceId],
-  StreamingSourceContents
-> = createCache({
+type StreamingSourceContentsParams = [client: ReplayClientInterface, sourceId: ProtocolSourceId];
+type StreamingSourceContentsData = {
+  codeUnitCount: number;
+  contentType: ProtocolContentType;
+  lineCount: number;
+};
+
+export type StreamingSourceContentsCache = StreamingCache<
+  StreamingSourceContentsParams,
+  string,
+  StreamingSourceContentsData
+>;
+
+export type StreamingSourceContentsValue = StreamingValue<string, StreamingSourceContentsData>;
+
+export const streamingSourceContentsCache = createStreamingCache<
+  StreamingSourceContentsParams,
+  string,
+  StreamingSourceContentsData
+>({
   debugLabel: "StreamingSourceContents",
-  getKey: ([client, sourceId]) => sourceId,
-  load: ([client, sourceId]) => {
+  getKey: (client, sourceId) => sourceId,
+  load: async ({ update, reject, resolve }, client, sourceId) => {
     try {
-      let notifyResolver: (streamingSourceContents: StreamingSourceContents) => void;
-      const resolver = new Promise<StreamingSourceContents>(resolve => {
-        notifyResolver = resolve;
-      });
-
-      const subscribers: Set<StreamSubscriber> = new Set();
-      const streamingSourceContents: StreamingSourceContents = {
-        codeUnitCount: null,
-        complete: false,
-        contents: null,
-        contentType: null,
-        lineCount: null,
-        resolver,
-        sourceId,
-        subscribe(subscriber: StreamSubscriber) {
-          subscribers.add(subscriber);
-          return () => {
-            subscribers.delete(subscriber);
-          };
-        },
-      };
-
-      const notifySubscribers = () => {
-        subscribers.forEach(subscriber => subscriber());
-      };
+      let data: StreamingSourceContentsData | null = null;
+      let contents: string = "";
 
       // Fire and forget; data streams in.
-      client
-        .streamSourceContents(
-          sourceId,
-          ({ codeUnitCount, contentType, lineCount }) => {
-            streamingSourceContents.codeUnitCount = codeUnitCount;
-            streamingSourceContents.contentType = contentType;
-            streamingSourceContents.lineCount = lineCount;
-            notifySubscribers();
-          },
-          ({ chunk }) => {
-            if (streamingSourceContents.contents === null) {
-              streamingSourceContents.contents = chunk;
-            } else {
-              streamingSourceContents.contents += chunk;
-            }
+      await client.streamSourceContents(
+        sourceId,
+        ({ codeUnitCount, contentType, lineCount }) => {
+          data = { codeUnitCount, contentType, lineCount };
+          update("", 0, data);
+        },
+        ({ chunk }) => {
+          contents += chunk;
 
-            const isComplete =
-              streamingSourceContents.contents.length === streamingSourceContents.codeUnitCount;
-            if (isComplete) {
-              streamingSourceContents.complete = true;
-            }
+          update(contents, contents.length / data!.codeUnitCount, data!);
+        }
+      );
 
-            notifySubscribers();
-          }
-        )
-        .then(() => {
-          subscribers.clear();
-
-          notifyResolver(streamingSourceContents);
-        });
-
-      return streamingSourceContents;
+      resolve();
     } catch (error) {
-      throw error;
+      reject(error);
     }
   },
 });
 
 export async function getSourceAsync(
   client: ReplayClientInterface,
-  sourceId: SourceId
+  sourceId: ProtocolSourceId
 ): Promise<ProtocolSource | null> {
   const sources = await sourcesCache.readAsync(client);
   return sources.find(source => source.sourceId === sourceId) ?? null;
 }
 
-// TODO Remove this in favor of useStreamingValue()
-// once streamingSourceContentsCache has been migrated to "suspense"
-export function getSourceContentsSuspense(replayClient: ReplayClientInterface, sourceId: SourceId) {
-  const streaming = streamingSourceContentsCache.read(replayClient, sourceId);
-  if (streaming.complete) {
-    return streaming.contents;
-  } else {
-    throw streaming.resolver;
-  }
-}
-
-export function getSourceIfCached(sourceId: SourceId): ProtocolSource | null {
+export function getSourceIfCached(sourceId: ProtocolSourceId): ProtocolSource | null {
   const sources = sourcesCache.getValueIfCached(null as any);
   if (sources) {
     return sources.find(source => source.sourceId === sourceId) ?? null;
@@ -210,7 +163,7 @@ export function getSourceIfCached(sourceId: SourceId): ProtocolSource | null {
 
 export function getSourceSuspends(
   client: ReplayClientInterface,
-  sourceId: SourceId
+  sourceId: ProtocolSourceId
 ): ProtocolSource | null {
   const sources = sourcesCache.read(client);
   return sources.find(source => source.sourceId === sourceId) ?? null;
