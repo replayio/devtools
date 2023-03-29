@@ -224,7 +224,7 @@ const Assist: React.FC = () => {
       completed: showLaunchCommandPalette,
     },
     {
-      label: "Record a replay 💀",
+      label: "Record a replay",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video10.gif",
       completed: showRecordReplay,
     },
@@ -237,11 +237,6 @@ const Assist: React.FC = () => {
       label: "Search source text 💀",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video12.gif",
       completed: showSearchSourceText,
-    },
-    {
-      label: "Quick-open a file 💀",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video13.gif",
-      completed: showQuickOpenFile,
     },
     {
       label: "Jump to event",

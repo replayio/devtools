@@ -125,7 +125,6 @@ export default function MessageHoverButton({
 
       dismissFirstConsoleNavigateNag();
       /*
-      dismissFirstConsoleNavigateNag();
       dismissQuickOpenFileNag();
       */
     };
