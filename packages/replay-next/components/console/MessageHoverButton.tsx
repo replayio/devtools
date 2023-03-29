@@ -38,13 +38,7 @@ export default function MessageHoverButton({
   time: number;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
-  const [consoleNavigateState, dismissFirstConsoleNavigateNag] = useNag(Nag.FIRST_CONSOLE_NAVIGATE);
-
-  /*
-  todo: clean these out
-  const [searchSourceTextState, dismissSearchSourceTextNag] = useNag(Nag.SEARCH_SOURCE_TEXT);
-  const [quickOpenFileState, dismissQuickOpenFileNag] = useNag(Nag.QUICK_OPEN_FILE);
-  */
+  const [, dismissFirstConsoleNavigateNag] = useNag(Nag.FIRST_CONSOLE_NAVIGATE);
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -124,9 +118,6 @@ export default function MessageHoverButton({
       }
 
       dismissFirstConsoleNavigateNag();
-      /*
-      dismissQuickOpenFileNag();
-      */
     };
 
     const label =

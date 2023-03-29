@@ -161,15 +161,6 @@ const Assist: React.FC = () => {
     return null;
   };
 
-  /*
-  const renderClickInfo = () => {
-    if (selectedItem >= 0) {
-      return <div className={styles.clickInfo}>You clicked on {checklistItems[selectedItem]}</div>;
-    }
-    return null;
-  };
-  */
-
   console.log("still need to navigate a console: ", showConsoleNavigate);
   console.log("still need to edit a breakpoint: ", showBreakpointEdit);
   console.log("still need to AddComment: ", showAddComment);

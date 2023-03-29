@@ -10,8 +10,6 @@ import { Result as SearchResult } from "./hooks/useSourceFileNameSearch";
 import { SourceFileNameSearchContext } from "./SourceFileNameSearchContext";
 import styles from "./SourceFileNameSearch.module.css";
 
-const [searchSourceTextState, dismissSearchSourceTextNag] = useNag(Nag.SEARCH_SOURCE_TEXT);
-
 export default function SourceFileNameSearch({
   containerRef,
   inputRef,
