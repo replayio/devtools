@@ -234,7 +234,7 @@ const Assist: React.FC = () => {
       completed: showExploreSources,
     },
     {
-      label: "Search source text 💀",
+      label: "Search source text",
       videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video12.gif",
       completed: showSearchSourceText,
     },
