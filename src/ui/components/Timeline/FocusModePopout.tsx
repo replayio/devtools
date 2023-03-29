@@ -17,7 +17,7 @@ import Icon from "../shared/Icon";
 import styles from "./FocusModePopout.module.css";
 
 export default function FocusModePopout() {
-  const [useFocusModeState, dismissUseFocusModeNag] = useNag(Nag.USE_FOCUS_MODE);
+  const [, dismissUseFocusModeNag] = useNag(Nag.USE_FOCUS_MODE);
 
   const showFocusModeControls = useAppSelector(getShowFocusModeControls);
 
