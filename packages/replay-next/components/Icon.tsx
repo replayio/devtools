@@ -36,6 +36,7 @@ export default function Icon({
     | "error"
     | "fast-forward"
     | "file"
+    | "filter"
     | "folder"
     | "invisible"
     | "invoke-getter"
@@ -55,6 +56,8 @@ export default function Icon({
     | "set-focus-end"
     | "set-focus-start"
     | "share"
+    | "sort"
+    | "sort-ascending"
     | "source-explorer"
     | "spinner"
     | "terminal-prompt"
@@ -207,6 +210,11 @@ export default function Icon({
       path =
         "M6 22q-.825 0-1.412-.587Q4 20.825 4 20V4q0-.825.588-1.413Q5.175 2 6 2h8l6 6v12q0 .825-.587 1.413Q18.825 22 18 22Zm7-13V4H6v16h12V9ZM6 4v5-5 16V4Z";
       break;
+    case "filter":
+      // path = "M6,13H18V11H6M3,6V8H21V6M10,18H14V16H10V18Z";
+      path =
+        "M12 18.88A1 1 0 0 1 11.71 19.71A1 1 0 0 1 10.3 19.71L6.3 15.71A1 1 0 0 1 6 14.87V9.75L1.21 3.62A1 1 0 0 1 1.38 2.22A1 1 0 0 1 2 2H16A1 1 0 0 1 16.62 2.22A1 1 0 0 1 16.79 3.62L12 9.75V18.88M4 4L8 9.06V14.58L10 16.58V9.05L14 4M13 16L18 21L23 16Z";
+      break;
     case "folder":
       path =
         "M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z";
@@ -312,6 +320,12 @@ export default function Icon({
     case "share":
       path =
         "M12,1L8,5H11V14H13V5H16M18,23H6C4.89,23 4,22.1 4,21V9A2,2 0 0,1 6,7H9V9H6V21H18V9H15V7H18A2,2 0 0,1 20,9V21A2,2 0 0,1 18,23Z";
+      break;
+    case "sort":
+      path = "M3,13H15V11H3M3,6V8H21V6M3,18H9V16H3V18Z";
+      break;
+    case "sort-ascending":
+      path = "M19 17H22L18 21L14 17H17V3H19M2 17H12V19H2M6 5V7H2V5M2 11H9V13H2V11Z";
       break;
     case "source-explorer":
       path =

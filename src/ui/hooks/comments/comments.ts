@@ -1,5 +1,6 @@
 import { ApolloError, gql, useMutation, useQuery } from "@apollo/client";
 import { RecordingId } from "@replayio/protocol";
+import { useMemo } from "react";
 
 import { GetComments, GetCommentsVariables } from "shared/graphql/generated/GetComments";
 import {
@@ -31,22 +32,25 @@ export function useGetComments(recordingId: RecordingId): {
     console.error("Apollo error while fetching comments:", error);
   }
 
-  let comments = (data?.recording?.comments ?? []).map(comment => ({
-    ...comment,
-    recordingId,
-    replies: comment.replies.map(reply => ({
-      ...reply,
+  const comments = useMemo(() => {
+    return (data?.recording?.comments ?? []).map(comment => ({
+      ...comment,
       recordingId,
-      parentId: comment.id,
-      hasFrames: comment.hasFrames,
-      sourceLocation: comment.sourceLocation,
-      time: comment.time,
-      point: comment.point,
-      position: comment.position,
-      type: null,
-      typeData: null,
-    })),
-  }));
+      replies: comment.replies.map(reply => ({
+        ...reply,
+        recordingId,
+        parentId: comment.id,
+        hasFrames: comment.hasFrames,
+        sourceLocation: comment.sourceLocation,
+        time: comment.time,
+        point: comment.point,
+        position: comment.position,
+        type: null,
+        typeData: null,
+      })),
+    }));
+  }, [data, recordingId]);
+
   return { comments, loading, error };
 }
 
