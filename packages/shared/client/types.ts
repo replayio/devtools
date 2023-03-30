@@ -157,6 +157,7 @@ export interface ReplayClientInterface {
   }>;
   findNavigationEvents(onKeyboardEvents: (events: navigationEvents) => void): Promise<void>;
   findSources(): Promise<Source[]>;
+  getAllEventHandlerCounts(range: PointRange | null): Promise<Record<string, number>>;
   getAllFrames(pauseId: PauseId): Promise<getAllFramesResult>;
   getAnnotationKinds(): Promise<string[]>;
   getBreakpointPositions(
