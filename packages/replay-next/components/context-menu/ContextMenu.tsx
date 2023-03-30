@@ -46,7 +46,7 @@ export default function ContextMenu({
         setOffsets(newOffsets);
       }
     }
-  });
+  }, [offsets, pageX, pageY]);
 
   const onClick = () => {
     hide();

@@ -1,6 +1,7 @@
 import { MouseEvent, useLayoutEffect, useRef, useState } from "react";
 
 import { seekToTime, setTimelineToTime, stopPlayback } from "ui/actions/timeline";
+import useTimelineContextMenu from "ui/components/Timeline/useTimelineContextMenu";
 import { selectors } from "ui/reducers";
 import {
   isPlaying as isPlayingSelector,
@@ -43,6 +44,8 @@ export default function Timeline() {
 
   const [editMode, setEditMode] = useState<EditMode | null>(null);
   const [showLoadingProgress, setShowLoadingProgress] = useState<boolean>(false);
+
+  const { contextMenu, onContextMenu } = useTimelineContextMenu();
 
   useLayoutEffect(() => {
     const progressBar = progressBarRef.current;
@@ -132,7 +135,7 @@ export default function Timeline() {
           onMouseMove={onMouseMove}
           onMouseUp={onMouseUp}
         >
-          <div className="progress-bar-stack">
+          <div className="progress-bar-stack" onContextMenu={onContextMenu}>
             <ProtocolTimeline />
             <div className="progress-bar" ref={progressBarRef}>
               <ProgressBars />
@@ -151,6 +154,7 @@ export default function Timeline() {
 
         <Capsule setShowLoadingProgress={setShowLoadingProgress} />
       </div>
+      {contextMenu}
     </>
   );
 }
