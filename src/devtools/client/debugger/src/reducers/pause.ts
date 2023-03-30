@@ -188,18 +188,17 @@ const pauseSlice = createSlice({
       state.selectedFrameId = frame ? { pauseId: frame.pauseId, frameId: frame.protocolId } : null;
       state.threadcx.pauseCounter++;
       state.pausePreviewLocation = null;
-      if (
-        time &&
-        state.pauseHistoryIndex === state.pauseHistory.length - 1 &&
-        state.pauseHistory[state.pauseHistory.length - 1]?.time !== time
-      ) {
-        state.pauseHistory.push({
-          pauseId: id,
-          time,
-          executionPoint,
-          hasFrames: !!frame,
-        });
-        state.pauseHistoryIndex++;
+      if (time) {
+        const filteredPauses = state.pauseHistory.filter(pause => pause.time === time);
+        if (!filteredPauses.length) {
+          state.pauseHistory.push({
+            pauseId: id,
+            time,
+            executionPoint,
+            hasFrames: !!frame,
+          });
+          state.pauseHistoryIndex++;
+        }
       }
     },
     pauseHistoryDecremented(state) {

@@ -309,7 +309,7 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       dispatch(setToolboxLayout("left"));
     } else if (key === "pin_to_bottom_right") {
       dispatch(setToolboxLayout("ide"));
-    } else if (key === "jump_to_previous_pause") {
+    } else if (key === "jump_to_last_pause") {
       dispatch(jumpToLastPause());
     } else if (key === "jump_to_next_pause") {
       dispatch(jumpToNextPause());

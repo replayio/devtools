@@ -138,14 +138,14 @@ function KeyboardShortcuts({
       }
     };
 
-    const OverRiddenJumpToLastPause = (e: KeyboardEvent) => {
+    const jumpToLastPauseWrapper = (e: KeyboardEvent) => {
       if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
         jumpToLastPause();
       }
     };
 
-    const OverRiddenJumpToNextPause = (e: KeyboardEvent) => {
+    const jumpToNextPauseWrapper = (e: KeyboardEvent) => {
       if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
         jumpToNextPause();
@@ -168,8 +168,8 @@ function KeyboardShortcuts({
       // Can pre-fill the dialog with specific filter prefixes
       "CmdOrCtrl+Shift+O": toggleFunctionQuickOpenModal,
       "CmdOrCtrl+O": toggleProjectFunctionQuickOpenModal,
-      "CmdOrCtrl+[": OverRiddenJumpToLastPause,
-      "CmdOrCtrl+]": OverRiddenJumpToNextPause,
+      "CmdOrCtrl+[": jumpToLastPauseWrapper,
+      "CmdOrCtrl+]": jumpToNextPauseWrapper,
       "~": toggleProtocolTimeline,
 
       Escape: closeOpenModalsOnEscape,
