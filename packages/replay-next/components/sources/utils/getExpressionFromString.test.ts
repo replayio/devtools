@@ -182,6 +182,13 @@ describe("getExpressionFromString", () => {
     expect(getExpressionHelper("const foo = bar[baz|];")).toBe("bar[baz]");
   });
 
+  // FE-1368
+  it("should properly handle negation operator", () => {
+    expect(getExpressionHelper("if (!f|oo) {")).toBe("foo");
+    expect(getExpressionHelper("if (!fo|o) {")).toBe("foo");
+    expect(getExpressionHelper("if (!foo|) {")).toBe("foo");
+  });
+
   describe("minified/mangled code", () => {
     it("keywords", () => {
       expect(getExpressionHelper('!fu|nction(){"use strict";var e={4:function(e,t,n)')).toBe(

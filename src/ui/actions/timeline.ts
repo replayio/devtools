@@ -1,9 +1,10 @@
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
 import {
   ExecutionPoint,
+  FocusWindowRequestBias,
   PauseId,
   ScreenShot,
-  TimeRange,
+  FocusWindowRequest as TimeRange,
   TimeStampedPoint,
 } from "@replayio/protocol";
 import clamp from "lodash/clamp";
@@ -77,8 +78,7 @@ import {
 } from "../reducers/timeline";
 import type { UIStore, UIThunkAction } from "./index";
 
-const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
-const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
+const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.3;
 export const MAX_FOCUS_REGION_DURATION = 60_000;
 
 export async function setupTimeline(store: UIStore) {
@@ -220,6 +220,22 @@ export function setTimelineToPauseTime(
   };
 }
 
+export function getUrlParams({
+  focusRegion,
+  point,
+  time,
+}: {
+  focusRegion: FocusRegion | null;
+  point: ExecutionPoint;
+  time: number;
+}) {
+  return {
+    point,
+    time: `${time}`,
+    focusRegion: encodeFocusRegion(focusRegion),
+  };
+}
+
 export function updatePausePointParams({
   point,
   time,
@@ -229,11 +245,7 @@ export function updatePausePointParams({
   time: number;
   focusRegion: FocusRegion | null;
 }) {
-  const params: { point: string; time: string; focusRegion?: string } = {
-    point,
-    time: `${time}`,
-    focusRegion: encodeFocusRegion(focusRegion),
-  };
+  const params = getUrlParams({ focusRegion, point, time });
   updateUrlWithParams(params);
 }
 
@@ -666,7 +678,7 @@ export function setFocusRegionEndTime(end: number, sync: boolean): UIThunkAction
 
     // If this is the first time the user is focusing, begin at the beginning of the recording (or zoom region).
     // Let the focus action/reducer will handle cropping for us.
-    const begin = focusRegion?.begin.time || 0;
+    const begin = focusRegion?.begin.time ?? 0;
 
     await dispatch(updateDisplayedFocusRegion({ begin, end }));
 
@@ -687,7 +699,7 @@ export function setFocusRegionBeginTime(
 
     // If this is the first time the user is focusing, extend to the end of the recording (or zoom region).
     // Let the focus action/reducer will handle cropping for us.
-    const end = focusRegion?.end.time || Number.POSITIVE_INFINITY;
+    const end = focusRegion?.end.time ?? Number.POSITIVE_INFINITY;
 
     await dispatch(updateDisplayedFocusRegion({ begin, end }));
 
@@ -702,11 +714,21 @@ export function syncFocusedRegion(): UIThunkAction {
   return async (dispatch, getState, { replayClient }) => {
     const state = getState();
     const focusRegion = getFocusRegion(state) as FocusRegion;
+    const currentTime = getCurrentTime(state);
     const zoomTime = getZoomRegion(state);
 
+    const begin = focusRegion ? focusRegion.begin.time : zoomTime.beginTime;
+    const end = focusRegion ? focusRegion.end.time : zoomTime.endTime;
+
+    let bias: FocusWindowRequestBias | undefined;
+    if (currentTime >= begin && currentTime <= end) {
+      bias = currentTime - begin < end - currentTime ? "begin" : "end";
+    }
+
     const window = await replayClient.requestFocusRange({
-      begin: focusRegion ? focusRegion.begin.time : zoomTime.beginTime,
-      end: focusRegion ? focusRegion.end.time : zoomTime.endTime,
+      begin,
+      bias,
+      end,
     });
 
     // If the actual region that's focused is smaller than the requested region,
@@ -734,22 +756,25 @@ export function enterFocusMode(): UIThunkAction {
     const state = getState();
     const currentTime = getCurrentTime(state);
     const focusRegion = getFocusRegion(state);
+    const zoomRegion = getZoomRegion(state);
 
+    // If there's no focus range, or it's the full recording,
+    // shrink it to ~30% of the overall recording and center it around the current time.
     let displayedFocusRegion: TimeRange;
-    if (focusRegion) {
-      displayedFocusRegion = { begin: focusRegion.begin.time, end: focusRegion.end.time };
-    } else {
-      const zoomRegion = getZoomRegion(state);
-
-      const focusWindowSize = Math.min(
-        (zoomRegion.endTime - zoomRegion.beginTime) * DEFAULT_FOCUS_WINDOW_PERCENTAGE,
-        DEFAULT_FOCUS_WINDOW_MAX_LENGTH
-      );
+    if (
+      focusRegion == null ||
+      (focusRegion.begin.time === zoomRegion.beginTime &&
+        focusRegion.end.time === zoomRegion.endTime)
+    ) {
+      const focusWindowSize =
+        (zoomRegion.endTime - zoomRegion.beginTime) * DEFAULT_FOCUS_WINDOW_PERCENTAGE;
 
       displayedFocusRegion = {
         begin: Math.max(zoomRegion.beginTime, currentTime - focusWindowSize / 2),
         end: Math.min(zoomRegion.endTime, currentTime + focusWindowSize / 2),
       };
+    } else {
+      displayedFocusRegion = { begin: focusRegion.begin.time, end: focusRegion.end.time };
     }
 
     dispatch(updateDisplayedFocusRegion(displayedFocusRegion));

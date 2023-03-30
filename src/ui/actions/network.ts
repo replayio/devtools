@@ -87,6 +87,14 @@ export function hideRequestDetails() {
   };
 }
 
+export function fetchRequestBody(requestId: RequestId): UIThunkAction {
+  return async function (dispatch, getState, { ThreadFront, protocolClient, replayClient }) {
+    let state = getState();
+    const sessionId = state.app.sessionId!;
+    protocolClient.Network.getRequestBody({ id: requestId, range: { end: 5e9 } }, sessionId);
+  };
+}
+
 export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, protocolClient, replayClient }) => {
     let state = getState();

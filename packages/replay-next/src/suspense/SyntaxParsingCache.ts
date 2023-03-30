@@ -1,10 +1,14 @@
 import { ContentType, SourceId } from "@replayio/protocol";
-import { createStreamingCache } from "suspense";
+import { StreamingCacheLoadOptions, createStreamingCache } from "suspense";
 
 import { assert } from "protocol/utils";
+import {
+  StreamingSourceContentsValue,
+  streamingSourceContentsCache,
+} from "replay-next/src/suspense/SourcesCache";
+import { ReplayClientInterface } from "shared/client/types";
 
 import { ParsedToken, createIncrementalParser } from "../utils/syntax-parser";
-import { StreamingSourceContents } from "./SourcesCache";
 
 const parseCache = new Map<string, ParsedToken[][]>();
 
@@ -23,102 +27,108 @@ export function parse(code: string, fileName: string) {
 
 export type StreamingParser = ReturnType<typeof streamingSyntaxParsingCache.stream>;
 
+type StreamingParserAdditionalData = {
+  lineCount: number;
+  plainText: string[];
+};
+
 interface StreamingParserInternalState {
-  totalLength: number | null;
-  rawText: string[];
-  rawProgress: number;
-  parsedTokens: ParsedToken[][];
-  parsedProgress: number;
-  update: (parsedTokens: ParsedToken[][], progress: number, rawText: RawText) => void;
-  resolve: () => void;
+  data: StreamingParserAdditionalData;
+  loadOptions: StreamingCacheLoadOptions<ParsedToken[][], StreamingParserAdditionalData>;
+  progress: number;
+  streaming: StreamingSourceContentsValue;
+  value: ParsedToken[][];
 }
 
 const internalParserStates = new Map<SourceId, StreamingParserInternalState>();
 
-interface RawText {
-  text: string[];
-  progress: number;
-}
-
 export const streamingSyntaxParsingCache = createStreamingCache<
-  [source: StreamingSourceContents, fileName: string | null],
+  [client: ReplayClientInterface, sourceId: SourceId, fileName: string | null],
   ParsedToken[][],
-  RawText
+  StreamingParserAdditionalData
 >({
   debugLabel: "StreamingParser",
-  getKey: source => source.sourceId,
-  load: ({ update, resolve }, source, fileName) => {
-    const sourceId = source.sourceId;
+  getKey: (client, sourceId) => sourceId,
+  load: async (loadOptions, client, sourceId, fileName) => {
     assert(!internalParserStates.has(sourceId));
+
+    const streaming = streamingSourceContentsCache.stream(client, sourceId);
+
     const state: StreamingParserInternalState = {
-      totalLength: source.codeUnitCount,
-      rawText: [],
-      rawProgress: 0,
-      parsedTokens: [],
-      parsedProgress: 0,
-      update,
-      resolve,
+      data: {
+        lineCount: 0,
+        plainText: [],
+      },
+      loadOptions,
+      progress: 0,
+      streaming,
+      value: [],
     };
+
     internalParserStates.set(sourceId, state);
 
     const message: PrepareRequest = {
       type: "prepare",
       sourceId,
       fileName,
-      contentType: source.contentType,
+      contentType: streaming.data?.contentType,
     };
+
     postWorkerMessage(message);
 
     let processedLength = 0;
+
     function processChunk() {
-      if (!source.contents) {
+      if (!streaming.data || !streaming.value) {
         return;
       }
 
-      state.totalLength = source.codeUnitCount;
-
-      const chunk = source.contents.slice(processedLength);
+      const chunk = streaming.value.slice(processedLength);
 
       const lines = chunk.split(/\r\n?|\n|\u2028|\u2029/);
-      lines[0] = state.rawText.pop() + lines[0];
-      state.rawText = state.rawText.concat(lines);
-      state.rawProgress = source.contents.length / source.codeUnitCount!;
-      update(state.parsedTokens, state.parsedProgress, {
-        text: state.rawText,
-        progress: state.rawProgress,
-      });
+      if (state.data.plainText.length > 0) {
+        lines[0] = state.data.plainText.pop() + lines[0];
+      }
 
-      const message: ParseRequest = {
+      state.data.lineCount = streaming.data.lineCount;
+      state.data.plainText = state.data.plainText.concat(lines);
+
+      loadOptions.update(state.value, state.progress, state.data);
+
+      postWorkerMessage({
         type: "parse",
         sourceId,
         chunk,
-        isLastChunk: source.complete,
-      };
-      postWorkerMessage(message);
+        isLastChunk: streaming.complete,
+      } as ParseRequest);
 
       processedLength += chunk.length;
     }
 
-    source.subscribe(processChunk);
+    const unsubscribe = streaming.subscribe(processChunk);
 
-    if (source.lineCount !== null) {
+    if (streaming.data?.lineCount !== null) {
       processChunk();
     }
+
+    await streaming.resolver;
+
+    unsubscribe();
   },
 });
 
 export interface PrepareRequest {
   type: "prepare";
-  sourceId: SourceId;
-  fileName: string | null;
   contentType?: ContentType | null;
+  fileName: string | null;
+  sourceId: SourceId;
 }
 
 export interface ParseRequest {
   type: "parse";
-  sourceId: SourceId;
   chunk: string;
   isLastChunk: boolean;
+  sourceId: SourceId;
 }
 
 export interface ParseResponse {
@@ -129,25 +139,31 @@ export interface ParseResponse {
 
 let worker: Worker | undefined;
 function postWorkerMessage(message: PrepareRequest | ParseRequest) {
+  const state = internalParserStates.get(message.sourceId);
+  assert(state);
+
   if (!worker) {
     // @ts-ignore
     worker = new Worker(new URL("./SyntaxParsingCacheWorker", import.meta.url));
     worker.onmessage = handleParseResponse;
   }
+
   worker.postMessage(message);
 }
 
 function handleParseResponse({ data }: MessageEvent<ParseResponse>) {
   const state = internalParserStates.get(data.sourceId);
-  assert(state);
-  state.parsedTokens = state.parsedTokens.concat(data.parsedTokens);
-  state.parsedProgress = data.totalParsedLength / state.totalLength!;
-  state.update(state.parsedTokens, state.parsedProgress, {
-    text: state.rawText,
-    progress: state.rawProgress,
-  });
-  if (state.parsedProgress === 1) {
-    state.resolve();
-    internalParserStates.delete(data.sourceId);
+  if (state) {
+    assert(state.streaming.data);
+
+    state.value = state.value.concat(data.parsedTokens);
+    state.progress = data.totalParsedLength / state.streaming.data.codeUnitCount;
+    state.loadOptions.update(state.value, state.progress, state.data);
+
+    if (state.streaming.complete && state.progress === 1) {
+      internalParserStates.delete(data.sourceId);
+
+      state.loadOptions.resolve();
+    }
   }
 }

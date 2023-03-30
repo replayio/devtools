@@ -11,7 +11,11 @@ import {
   useSyncExternalStore,
 } from "react";
 import { VariableSizeList as List, ListOnItemsRenderedProps } from "react-window";
-import { useImperativeCacheValue, useImperativeIntervalCacheValues } from "suspense";
+import {
+  useImperativeCacheValue,
+  useImperativeIntervalCacheValues,
+  useStreamingValue,
+} from "suspense";
 
 import { findPointForLocation } from "replay-next/components/sources/utils/points";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
@@ -26,7 +30,7 @@ import {
   getCachedMinMaxSourceHitCounts,
   sourceHitCountsCache,
 } from "replay-next/src/suspense/SourceHitCountsCache";
-import { StreamingSourceContents } from "replay-next/src/suspense/SourcesCache";
+import { StreamingSourceContentsValue } from "replay-next/src/suspense/SourcesCache";
 import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_DISABLED, POINT_BEHAVIOR_ENABLED } from "shared/client/types";
@@ -45,14 +49,12 @@ export default function SourceList({
   showColumnBreakpoints,
   source,
   streamingParser,
-  streamingSourceContents,
   width,
 }: {
   height: number;
   showColumnBreakpoints: boolean;
   source: ProtocolSource;
   streamingParser: StreamingParser;
-  streamingSourceContents: StreamingSourceContents;
   width: number;
 }) {
   const { sourceId } = source;
@@ -83,11 +85,8 @@ export default function SourceList({
   const { lineHeight, pointPanelHeight, pointPanelWithConditionalHeight } =
     useFontBasedListMeasurements(listRef);
 
-  const lineCount = useSyncExternalStore(
-    streamingSourceContents.subscribe,
-    () => streamingSourceContents.lineCount,
-    () => streamingSourceContents.lineCount
-  );
+  const { data } = useStreamingValue(streamingParser);
+  const lineCount = data?.lineCount ?? 0;
 
   // Both hit counts and breakable positions are key info,
   // but neither should actually _block_ us from showing source text.

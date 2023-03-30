@@ -1,7 +1,6 @@
 import classnames from "classnames";
 import React, { forwardRef } from "react";
 
-import { ProgressBar } from "./ProgressBar";
 import styles from "./TestInfo.module.css";
 
 interface TestStepRowProps {
@@ -47,9 +46,6 @@ export function TestStepRowBase({
         }
       )}
     >
-      <div title={progress == null ? "" : String(progress)} className="flex h-4 w-4 items-center">
-        {progress == null ? null : <ProgressBar progress={progress} error={!!error} />}
-      </div>
       <div className="w-5 text-center opacity-70">{index}</div>
       {children}
     </div>

@@ -4,9 +4,9 @@ export function isRangeInRegions(
   range: TimeStampedPointRange | PointRange,
   regions: TimeStampedPointRange[]
 ): boolean {
-  let beginPointBigInt: BigInt | null = null;
+  let beginPointBigInt: bigint | null = null;
   let beginTime: number | null = null;
-  let endPointBigInt: BigInt | null = null;
+  let endPointBigInt: bigint | null = null;
   let endTime: number | null = null;
 
   if (isTimeStampedPointRange(range)) {

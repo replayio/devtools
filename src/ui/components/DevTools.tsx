@@ -46,7 +46,7 @@ import LoadingScreen from "./shared/LoadingScreen";
 import ReplayLogo from "./shared/ReplayLogo";
 import SidePanel from "./SidePanel";
 import SourcesContextAdapter from "./SourcesContextAdapter";
-import Timeline from "./Timeline";
+import Timeline from "./Timeline/Timeline";
 import Toolbar from "./Toolbar";
 import Video from "./Video";
 

@@ -36,7 +36,6 @@ import groupBy from "lodash/groupBy";
 import { cachePauseData, pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { areRangesEqual } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
-import type { Features } from "ui/utils/prefs";
 
 import { client } from "../socket";
 import { EventEmitter, assert, defer, locationsInclude } from "../utils";
@@ -100,6 +99,10 @@ export enum RecordingTarget {
   chromium = "chromium",
   node = "node",
   unknown = "unknown",
+}
+
+interface ReplayAppFeatures {
+  chromiumRepaints?: boolean;
 }
 
 function getRecordingTarget(buildId: string): RecordingTarget {
@@ -207,7 +210,7 @@ class _ThreadFront {
     );
   }
 
-  async setSessionId(sessionId: SessionId, features: Partial<Features>) {
+  async setSessionId(sessionId: SessionId, features: Partial<ReplayAppFeatures>) {
     this.sessionId = sessionId;
     assert(sessionId, "there should be a sessionId");
     this.sessionWaiter.resolve(sessionId);

@@ -342,7 +342,9 @@ const RequestDetails = ({
       </RequestDetailsTabs>
       <div className={classNames("requestDetails relative", styles.requestDetails)}>
         <div>
-          <AddNetworkRequestCommentButton request={request} className="absolute top-1 right-1" />
+          <div className="absolute top-1 right-1">
+            <AddNetworkRequestCommentButton request={request} />
+          </div>
           {activeTab === "headers" && <HeadersPanel request={request} />}
           {activeTab === "cookies" && <Cookies request={request} />}
           {activeTab === "response" && <ResponseBody request={request} />}

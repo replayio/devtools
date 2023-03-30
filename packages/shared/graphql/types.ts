@@ -302,6 +302,7 @@ export type AnnotatedTestStep = TestStep & {
   absoluteEndTime: number;
   index: number;
   annotations: Annotations;
+  category?: string;
 };
 
 type Annotations = {

@@ -9,14 +9,15 @@ import {
   useContext,
   useMemo,
   useState,
-  useSyncExternalStore,
 } from "react";
 import { areEqual } from "react-window";
+import { useStreamingValue } from "suspense";
 
 import useGetDefaultLogPointContent from "replay-next/components/sources/hooks/useGetDefaultLogPointContent";
 import SearchResultHighlight from "replay-next/components/sources/SearchResultHighlight";
 import { SourceSearchContext } from "replay-next/components/sources/SourceSearchContext";
 import useSourceContextMenu from "replay-next/components/sources/useSourceContextMenu";
+import { getClassNames, isTokenInspectable } from "replay-next/components/sources/utils/tokens";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { PointBehaviorsObject } from "replay-next/src/contexts/points/types";
@@ -106,17 +107,11 @@ const SourceListRow = memo(
 
     const { sourceId } = source;
 
-    let tokens: ParsedToken[] | null = useSyncExternalStore(
-      streamingParser.subscribe,
-      () => streamingParser.value?.[index] ?? null,
-      () => streamingParser.value?.[index] ?? null
-    );
+    const { data: streamingData, value: streamingValue } = useStreamingValue(streamingParser);
 
-    const plainText = useSyncExternalStore(
-      streamingParser.subscribe,
-      () => streamingParser.data?.text[index] ?? null,
-      () => streamingParser.data?.text[index] ?? null
-    );
+    const plainText = streamingData?.plainText[index] ?? null;
+
+    let tokens: ParsedToken[] | null = streamingValue?.[index] ?? null;
 
     let testStateContents = "loading";
     if (tokens !== null) {
@@ -485,29 +480,12 @@ SourceListRow.displayName = "SourceListRow";
 export default SourceListRow;
 
 function renderToken(token: ParsedToken, key?: any): ReactElement {
-  let inspectable = token.types
-    ? token.types.some(type => {
-        switch (type) {
-          case "definition":
-          case "local":
-          case "propertyName":
-          case "typeName":
-          case "variableName":
-          case "variableName2":
-            return true;
-        }
-        return false;
-      })
-    : false;
-
-  let className = undefined;
-  if (token.types) {
-    className = token.types.map(type => `tok-${type}`).join(" ");
-  }
+  const classNames = getClassNames(token);
+  const inspectable = isTokenInspectable(token);
 
   return (
     <span
-      className={className}
+      className={classNames.join(" ")}
       data-column-index={token.columnIndex}
       data-inspectable-token={inspectable || undefined}
       key={key}

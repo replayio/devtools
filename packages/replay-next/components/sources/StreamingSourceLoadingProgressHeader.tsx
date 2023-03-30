@@ -1,25 +1,19 @@
-import { useSyncExternalStore } from "react";
+import { useStreamingValue } from "suspense";
 
+import { StreamingSourceContentsValue } from "replay-next/src/suspense/SourcesCache";
 import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 
 import styles from "./StreamingSourceLoadingProgressHeader.module.css";
 
 export default function StreamingSourceLoadingProgressHeader({
   streamingParser,
+  streamingSourceContents,
 }: {
   streamingParser: StreamingParser;
+  streamingSourceContents: StreamingSourceContentsValue;
 }) {
-  const rawTextPercentage = useSyncExternalStore(
-    streamingParser.subscribe,
-    () => streamingParser.data?.progress ?? 0,
-    () => streamingParser.data?.progress ?? 0
-  );
-
-  const parsedTokensPercentage = useSyncExternalStore(
-    streamingParser.subscribe,
-    () => streamingParser.progress ?? 0,
-    () => streamingParser.progress ?? 0
-  );
+  const { progress: rawTextPercentage = 0 } = useStreamingValue(streamingSourceContents);
+  const { progress: parsedTokensPercentage = 0 } = useStreamingValue(streamingParser);
 
   const loadedProgressBarWidth = Math.round(rawTextPercentage * 100);
   const parsedTokensPercentageBarWidth = Math.round(parsedTokensPercentage * 100);

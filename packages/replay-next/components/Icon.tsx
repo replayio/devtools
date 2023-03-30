@@ -310,7 +310,8 @@ export default function Icon({
       );
       break;
     case "share":
-      path = "M2.01 21L23 12 2.01 3 2 10l15 2-15 2z";
+      path =
+        "M12,1L8,5H11V14H13V5H16M18,23H6C4.89,23 4,22.1 4,21V9A2,2 0 0,1 6,7H9V9H6V21H18V9H15V7H18A2,2 0 0,1 20,9V21A2,2 0 0,1 18,23Z";
       break;
     case "source-explorer":
       path =

@@ -33,7 +33,7 @@ export default function SourceCodePreview({ comment }: { comment: Comment }) {
         columnIndex={typeData.columnIndex}
         lineNumber={typeData.lineNumber}
         parsedTokens={typeData.parsedTokens}
-        rawText={typeData.rawText}
+        rawText={typeData.plainText}
         sourceId={typeData.sourceId}
         sourceUrl={typeData.sourceUrl}
       />
@@ -101,7 +101,7 @@ function LegacySourceCodePreview({
         columnIndex={typeData.columnIndex}
         lineNumber={typeData.lineNumber}
         parsedTokens={typeData.parsedTokens}
-        rawText={typeData.rawText}
+        rawText={typeData.plainText}
         sourceId={typeData.sourceId}
         sourceUrl={typeData.sourceUrl}
       />

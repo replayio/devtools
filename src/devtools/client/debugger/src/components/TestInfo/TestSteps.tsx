@@ -275,7 +275,7 @@ function TestSection({
       ) : null}
       {events.map(({ event: s, type, time }, i) =>
         type === "step" ? (
-          <>
+          <React.Fragment key={s.id}>
             <TestStepItem
               step={s}
               key={s.id}
@@ -289,7 +289,7 @@ function TestSection({
               autoSelect={s.id === autoSelectId}
             />
             {s.error ? <TestError error={s.error!} /> : null}
-          </>
+          </React.Fragment>
         ) : type === "network" ? (
           <NetworkEvent key={s.id} request={s} />
         ) : (

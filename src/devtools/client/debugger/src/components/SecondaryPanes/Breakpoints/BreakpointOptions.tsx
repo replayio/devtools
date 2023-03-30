@@ -3,7 +3,6 @@ import { useStreamingValue } from "suspense";
 
 import Loader from "replay-next/components/Loader";
 import SyntaxHighlightedLine from "replay-next/components/sources/SyntaxHighlightedLine";
-import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
 import { streamingSyntaxParsingCache } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ParsedToken } from "replay-next/src/utils/syntax-parser";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -16,26 +15,25 @@ type BreakpointProps = {
   breakpoint: Point;
 };
 
+const EMPTY_ARRAY: any[] = [];
+
 function BreakpointLineContents({ breakpoint }: BreakpointProps) {
   const replayClient = useContext(ReplayClientContext);
   const { sourceId } = breakpoint.location;
 
-  // TODO use useStreamingValue() for this
-  // once streamingSourceContentsCache has been migrated to "suspense"
-  const streamingSourceContents = streamingSourceContentsCache.read(replayClient, sourceId);
-  const parsedStream = streamingSyntaxParsingCache.stream(streamingSourceContents, null);
+  const parsedStream = streamingSyntaxParsingCache.stream(replayClient, sourceId, null);
   const { data, value } = useStreamingValue(parsedStream);
 
   const parsedTokensByLine = value;
-  const rawTextByLine = data?.text;
+  const plainTextByLine = data?.plainText ?? EMPTY_ARRAY;
 
   const { snippet, tokens } = useMemo((): { snippet: string; tokens: ParsedToken[] } => {
     const { column, line } = breakpoint.location;
     let snippet = "";
     let tokens: ParsedToken[] = [];
 
-    if (rawTextByLine && rawTextByLine[line - 1]) {
-      const lineText = rawTextByLine[line - 1];
+    if (plainTextByLine && plainTextByLine[line - 1]) {
+      const lineText = plainTextByLine[line - 1];
       snippet = lineText.slice(column, column! + 100).trim();
     }
 
@@ -47,7 +45,7 @@ function BreakpointLineContents({ breakpoint }: BreakpointProps) {
     }
 
     return { snippet, tokens };
-  }, [rawTextByLine, parsedTokensByLine, breakpoint]);
+  }, [plainTextByLine, parsedTokensByLine, breakpoint]);
 
   if (!snippet || !tokens) {
     return null;
