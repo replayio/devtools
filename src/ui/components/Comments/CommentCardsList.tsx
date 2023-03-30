@@ -3,8 +3,7 @@ import React, { useContext, useMemo, useRef } from "react";
 
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import CommentCard from "ui/components/Comments/CommentCard";
-import CommentFilterMenu from "ui/components/Comments/CommentFilterMenu";
-import CommentSortByMenu from "ui/components/Comments/CommentSortByMenu";
+import CommentDropDownMenu from "ui/components/Comments/CommentDropDownMenu";
 import useUserCommentPreferences from "ui/components/Comments/useUserCommentPreferences";
 import LoginButton from "ui/components/LoginButton";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -80,8 +79,7 @@ export default function CommentCardsList() {
     <div className={styles.Sidebar}>
       <div className={styles.Toolbar}>
         <div className={styles.ToolbarHeader}>Comments</div>
-        <CommentFilterMenu />
-        <CommentSortByMenu />
+        <CommentDropDownMenu />
       </div>
       <div className={styles.List}>{content}</div>
     </div>
