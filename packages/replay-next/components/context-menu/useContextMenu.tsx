@@ -8,12 +8,13 @@ export default function useContextMenu(
   options: {
     dataTestId?: string;
     dataTestName?: string;
+    onContextMenuEvent?: (event: MouseEvent) => void;
   } = {}
 ): {
   contextMenu: ReactNode | null;
   onContextMenu: (event: MouseEvent) => void;
 } {
-  const { dataTestId, dataTestName } = options;
+  const { dataTestId, dataTestName, onContextMenuEvent } = options;
 
   const [contextMenuEvent, setContextMenuEvent] = useState<MouseEvent | null>(null);
 
@@ -26,6 +27,10 @@ export default function useContextMenu(
     }
 
     event.preventDefault();
+
+    if (typeof onContextMenuEvent === "function") {
+      onContextMenuEvent(event);
+    }
 
     setContextMenuEvent(event);
   };

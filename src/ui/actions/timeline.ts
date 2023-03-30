@@ -220,6 +220,22 @@ export function setTimelineToPauseTime(
   };
 }
 
+export function getUrlParams({
+  focusRegion,
+  point,
+  time,
+}: {
+  focusRegion: FocusRegion | null;
+  point: ExecutionPoint;
+  time: number;
+}) {
+  return {
+    point,
+    time: `${time}`,
+    focusRegion: encodeFocusRegion(focusRegion),
+  };
+}
+
 export function updatePausePointParams({
   point,
   time,
@@ -229,11 +245,7 @@ export function updatePausePointParams({
   time: number;
   focusRegion: FocusRegion | null;
 }) {
-  const params: { point: string; time: string; focusRegion?: string } = {
-    point,
-    time: `${time}`,
-    focusRegion: encodeFocusRegion(focusRegion),
-  };
+  const params = getUrlParams({ focusRegion, point, time });
   updateUrlWithParams(params);
 }
 
@@ -666,7 +678,7 @@ export function setFocusRegionEndTime(end: number, sync: boolean): UIThunkAction
 
     // If this is the first time the user is focusing, begin at the beginning of the recording (or zoom region).
     // Let the focus action/reducer will handle cropping for us.
-    const begin = focusRegion?.begin.time || 0;
+    const begin = focusRegion?.begin.time ?? 0;
 
     await dispatch(updateDisplayedFocusRegion({ begin, end }));
 
@@ -687,7 +699,7 @@ export function setFocusRegionBeginTime(
 
     // If this is the first time the user is focusing, extend to the end of the recording (or zoom region).
     // Let the focus action/reducer will handle cropping for us.
-    const end = focusRegion?.end.time || Number.POSITIVE_INFINITY;
+    const end = focusRegion?.end.time ?? Number.POSITIVE_INFINITY;
 
     await dispatch(updateDisplayedFocusRegion({ begin, end }));
 
