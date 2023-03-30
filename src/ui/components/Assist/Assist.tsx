@@ -98,62 +98,40 @@ const Assist: React.FC = () => {
   let videoUrl;
   switch (stepIndex) {
     case 0:
-      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/open_devtools.gif";
+      videoUrl = "https://vercel.replay.io/assist/time_travel_in_console.gif";
       break;
     case 1:
-      videoUrl =
-        "https://website-git-master-recordreplay.vercel.app/assist/time_travel_in_console.gif";
+      videoUrl = "https://vercel.replay.io/assist/set_print_statement.gif";
       break;
     case 2:
-      videoUrl =
-        "https://website-git-master-recordreplay.vercel.app/assist/set_print_statement.gif";
+      videoUrl = "https://vercel.replay.io/assist/launch_command_palette.gif";
       break;
     case 3:
-      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/add_a_comment.gif";
+      videoUrl = "https://vercel.replay.io/assist/explore_sources.gif";
       break;
     case 4:
-      videoUrl =
-        "https://website-git-master-recordreplay.vercel.app/assist/add_a_comment_to_code.gif";
+      videoUrl = "https://vercel.replay.io/assist/quick_open_a_file.gif";
       break;
     case 5:
-      videoUrl =
-        "https://website-git-master-recordreplay.vercel.app/assist/add_a_comment_to_network_request.gif";
+      videoUrl = "https://vercel.replay.io/assist/jump_to_an_event.gif";
       break;
     case 6:
-      videoUrl =
-        "https://website-git-master-recordreplay.vercel.app/assist/add_a_comment_to_print_statement.gif";
+      videoUrl = "https://vercel.replay.io/assist/jump_to_code.gif";
       break;
     case 7:
-      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/jump_to_code.gif";
+      videoUrl = "https://vercel.replay.io/assist/add_a_comment.gif";
       break;
     case 8:
-      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/unicorn_badge.gif";
+      videoUrl = "https://vercel.replay.io/assist/unicorn_badge.gif";
       break;
     case 9:
-      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/record_a_replay.gif";
+      videoUrl = "https://vercel.replay.io/assist/use_focus_mode.gif";
       break;
     case 10:
-      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/explore_sources.gif";
+      videoUrl = "https://vercel.replay.io/assist/record_a_replay.gif";
       break;
     case 11:
-      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/quick_open_a_file.gif";
-      break;
-    case 12:
-      videoUrl =
-        "https://website-git-master-recordreplay.vercel.app/assist/launch_command_palette.gif";
-      break;
-    case 13:
-      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/jump_to_an_event.gif";
-      break;
-    case 14:
-      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/inspect_an_element.gif";
-      break;
-    case 15:
-      videoUrl =
-        "https://website-git-master-recordreplay.vercel.app/assist/inspect_an_component.gif";
-      break;
-    case 16:
-      videoUrl = "https://website-git-master-recordreplay.vercel.app/assist/use_focus_mode.gif";
+      videoUrl = "https://vercel.replay.io/assist/inspect_an_element.gif";
       break;
     default:
       videoUrl = ""; // or provide a default video URL if necessary
@@ -182,63 +160,62 @@ const Assist: React.FC = () => {
   const checklistItems = [
     {
       label: "Time travel in the console",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video2.gif",
+      videoUrl: "https://vercel.replay.io/assist/video2.gif",
       completed: showConsoleNavigate,
     },
     {
-      label: "Magic print statements",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video3.gif",
+      label: "Set a print statement",
+      videoUrl: "https://vercel.replay.io/assist/video3.gif",
       completed: showBreakpointEdit,
     },
     {
-      label: "Add a comment",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video4.gif",
-      completed: showAddComment,
-    },
-    {
-      label: "Jump to code",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video8.gif",
-      completed: showJumpToCode,
-    },
-    {
-      label: "Add a unicorn badge",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video9.gif",
-      completed: showAddUnicornBadge,
-    },
-
-    {
-      label: "Use focus mode",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video18.gif",
-      completed: showUseFocusMode,
-    },
-    {
       label: "Launch command palette",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video14.gif",
+      videoUrl: "https://vercel.replay.io/assist/video14.gif",
       completed: showLaunchCommandPalette,
     },
     {
-      label: "Record a replay",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video10.gif",
-      completed: showRecordReplay,
-    },
-    {
       label: "Explore sources",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video11.gif",
+      videoUrl: "https://vercel.replay.io/assist/video11.gif",
       completed: showExploreSources,
     },
     {
       label: "Search source text",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video12.gif",
+      videoUrl: "https://vercel.replay.io/assist/video12.gif",
       completed: showSearchSourceText,
     },
     {
       label: "Jump to event",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video15.gif",
+      videoUrl: "https://vercel.replay.io/assist/video15.gif",
       completed: showJumpToEvent,
     },
     {
+      label: "Jump to code",
+      videoUrl: "https://vercel.replay.io/assist/video8.gif",
+      completed: showJumpToCode,
+    },
+    {
+      label: "Add a comment",
+      videoUrl: "https://vercel.replay.io/assist/video4.gif",
+      completed: showAddComment,
+    },
+    {
+      label: "Add a unicorn badge",
+      videoUrl: "https://vercel.replay.io/assist/video9.gif",
+      completed: showAddUnicornBadge,
+    },
+    {
+      label: "Use focus mode",
+      videoUrl: "https://vercel.replay.io/assist/video18.gif",
+      completed: showUseFocusMode,
+    },
+    {
+      label: "Record a replay",
+      videoUrl: "https://vercel.replay.io/assist/video10.gif",
+      completed: showRecordReplay,
+    },
+    {
       label: "Inspect element",
-      videoUrl: "https://website-git-master-recordreplay.vercel.app/assist/video16.gif",
+      videoUrl: "https://vercel.replay.io/assist/video16.gif",
       completed: showInspectElement,
     },
   ];
