@@ -29,7 +29,15 @@ export default function CommentCardsList() {
     const filteredComments =
       filter === null
         ? comments
-        : comments.filter(comment => comment.user?.id === currentUserInfo?.id);
+        : currentUserInfo === null
+        ? []
+        : comments.filter(comment => {
+            if (comment.user?.id === currentUserInfo.id) {
+              return true;
+            } else {
+              return comment.replies.some(reply => reply.user?.id === currentUserInfo.id);
+            }
+          });
 
     const sortByArray =
       sortBy === "created-at"
