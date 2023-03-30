@@ -17,6 +17,7 @@ import useGetDefaultLogPointContent from "replay-next/components/sources/hooks/u
 import SearchResultHighlight from "replay-next/components/sources/SearchResultHighlight";
 import { SourceSearchContext } from "replay-next/components/sources/SourceSearchContext";
 import useSourceContextMenu from "replay-next/components/sources/useSourceContextMenu";
+import { getClassNames, isTokenInspectable } from "replay-next/components/sources/utils/tokens";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { PointBehaviorsObject } from "replay-next/src/contexts/points/types";
@@ -479,29 +480,12 @@ SourceListRow.displayName = "SourceListRow";
 export default SourceListRow;
 
 function renderToken(token: ParsedToken, key?: any): ReactElement {
-  let inspectable = token.types
-    ? token.types.some(type => {
-        switch (type) {
-          case "definition":
-          case "local":
-          case "propertyName":
-          case "typeName":
-          case "variableName":
-          case "variableName2":
-            return true;
-        }
-        return false;
-      })
-    : false;
-
-  let className = undefined;
-  if (token.types) {
-    className = token.types.map(type => `tok-${type}`).join(" ");
-  }
+  const classNames = getClassNames(token);
+  const inspectable = isTokenInspectable(token);
 
   return (
     <span
-      className={className}
+      className={classNames.join(" ")}
       data-column-index={token.columnIndex}
       data-inspectable-token={inspectable || undefined}
       key={key}
