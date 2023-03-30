@@ -1,41 +1,24 @@
-import { useCallback } from "react";
+import { useMemo } from "react";
 
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 
 type Filter = "current-user" | null;
 type SortBy = "created-at" | "recording-time";
 
-export type UserCommentPreferences = {
-  filter: Filter;
-  sortBy: SortBy;
-};
-
-export default function useUserCommentPreferences(): UserCommentPreferences & {
-  setFilter(value: Filter): void;
-  setSortBy(value: SortBy): void;
-} {
-  const [value, setValue] = useLocalStorage<UserCommentPreferences>("Replay:CommentPreferences", {
-    filter: null,
-    sortBy: "recording-time",
-  });
-
-  const setFilter = useCallback(
-    (newFilter: Filter) => {
-      setValue({ ...value, filter: newFilter });
-    },
-    [setValue, value]
+export default function useUserCommentPreferences() {
+  const [filter, setFilter] = useLocalStorage<Filter>("Replay:CommentPreferences:Filter", null);
+  const [sortBy, setSortBy] = useLocalStorage<SortBy>(
+    "Replay:CommentPreferences:sortBy",
+    "recording-time"
   );
 
-  const setSortBy = useCallback(
-    (newSortBy: SortBy) => {
-      setValue({ ...value, sortBy: newSortBy });
-    },
-    [setValue, value]
+  return useMemo(
+    () => ({
+      filter,
+      setFilter,
+      setSortBy,
+      sortBy,
+    }),
+    [filter, setFilter, setSortBy, sortBy]
   );
-
-  return {
-    ...value,
-    setFilter,
-    setSortBy,
-  };
 }
