@@ -1,7 +1,11 @@
 import test, { expect } from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
-import { addEventListenerLogpoints, findConsoleMessage } from "../helpers/console-panel";
+import {
+  addEventListenerLogpoints,
+  expandConsoleMessage,
+  findConsoleMessage,
+} from "../helpers/console-panel";
 
 // This test file is identical to `logpoints-03.test`, except for the example filename
 // and the event type string. We've copy-pasted it to simplify getting _any_ E2E test working.
@@ -15,7 +19,9 @@ test(`logpoints-03_chromium: should display event properties in the console`, as
   // However, the E2E test helpers _do_ need this pattern to determine what categories to expand.
   await addEventListenerLogpoints(page, [{ eventType: "click", categoryKey: "mouse" }]);
 
-  const message = await findConsoleMessage(page, "MouseEvent", "event");
+  const message = await findConsoleMessage(page, "PointerEvent", "event");
+
+  expandConsoleMessage(message);
 
   await expect(message).toContainText('type: "click"');
   await expect(message).toContainText("target: <div");
