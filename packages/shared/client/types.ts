@@ -45,7 +45,7 @@ import {
 } from "@replayio/protocol";
 
 import { AnalysisParams } from "protocol/analysisManager";
-import { RecordingCapabilities } from "protocol/thread/thread";
+import { RecordingCapabilities, RecordingTarget } from "protocol/thread/thread";
 
 export type LogEntry = {
   args: any[];
@@ -184,6 +184,7 @@ export interface ReplayClientInterface {
   getPreferredLocation(locations: Location[]): Location | null;
   getRecordingCapabilities(): Promise<RecordingCapabilities>;
   getRecordingId(): RecordingId | null;
+  getRecordingTarget(): Promise<RecordingTarget>;
   getScope(pauseId: PauseId, scopeId: ScopeId): Promise<getScopeResult>;
   getScopeMap(location: Location): Promise<VariableMapping[] | undefined>;
   getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;

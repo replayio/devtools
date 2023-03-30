@@ -47,7 +47,7 @@ import analysisManager, { AnalysisParams } from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
-import { RecordingCapabilities } from "protocol/thread/thread";
+import { RecordingCapabilities, RecordingTarget } from "protocol/thread/thread";
 import { binarySearch, compareNumericStrings, defer, waitForTime } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
@@ -153,6 +153,10 @@ export class ReplayClient implements ReplayClientInterface {
 
   async getRecordingCapabilities(): Promise<RecordingCapabilities> {
     return this._threadFront.getRecordingCapabilities();
+  }
+
+  async getRecordingTarget(): Promise<RecordingTarget> {
+    return this._threadFront.getRecordingTarget();
   }
 
   async createPause(executionPoint: ExecutionPoint): Promise<createPauseResult> {

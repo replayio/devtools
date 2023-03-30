@@ -219,6 +219,7 @@ export function createMockReplayClient() {
       supportsPureEvaluation: false,
     })),
     getRecordingId: jest.fn().mockImplementation(async () => "fake-recording-id"),
+    getRecordingTarget: jest.fn().mockImplementation(async () => "gecko"),
     getScope: jest.fn().mockImplementation(async () => {}),
     getScopeMap: jest.fn().mockImplementation(async () => {}),
     getSessionEndpoint: jest.fn().mockImplementation(async () => ({
