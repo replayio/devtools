@@ -48,7 +48,7 @@ export default function CommentDropDownMenu() {
             className={styles.Icon}
             type={sortBy === "created-at" ? "checked-rounded" : "unchecked-rounded"}
           />
-          Created at
+          Creation date
         </>
       </ContextMenuItem>
     </>
