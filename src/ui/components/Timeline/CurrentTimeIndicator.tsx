@@ -4,7 +4,7 @@ import { selectors } from "ui/reducers";
 import { useAppSelector } from "ui/setup/hooks";
 import { getVisiblePosition } from "ui/utils/timeline";
 
-import { EditMode } from ".";
+import { EditMode } from "./Timeline";
 
 export default function CurrentTimeIndicator({ editMode }: { editMode: EditMode | null }) {
   const currentTime = useAppSelector(selectors.getCurrentTime);

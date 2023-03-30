@@ -137,7 +137,7 @@ export function getParams() {
   return { q: url.searchParams.get("q") };
 }
 
-export function updateUrlWithParams(params: Record<string, string | null | undefined>) {
+export function getUrlString(params: Record<string, string | null | undefined>) {
   const url = new URL(window.location.toString());
 
   Object.entries(params).forEach(([key, value]) => {
@@ -146,7 +146,13 @@ export function updateUrlWithParams(params: Record<string, string | null | undef
     }
   });
 
-  window.history.replaceState({}, "", url.toString());
+  return url.toString();
+}
+
+export function updateUrlWithParams(params: Record<string, string | null | undefined>) {
+  const urlString = getUrlString(params);
+
+  window.history.replaceState({}, "", urlString);
 }
 
 export function getLoginReferrerParam() {

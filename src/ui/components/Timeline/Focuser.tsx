@@ -6,7 +6,7 @@ import { selectors } from "ui/reducers";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPositionFromTime, getTimeFromPosition } from "ui/utils/timeline";
 
-import { EditMode } from ".";
+import { EditMode } from "./Timeline";
 
 function stopEvent(event: MouseEvent) {
   event.preventDefault();

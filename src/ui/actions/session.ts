@@ -337,8 +337,12 @@ export function createSocket(
 
       dispatch(actions.setLoadingFinished(true));
 
-      if (!focusRegion) {
-        const focusWindow = await replayClient.getFocusWindow();
+      const focusWindow = await replayClient.getFocusWindow();
+      if (
+        !focusRegion ||
+        focusRegion.begin.point !== focusWindow.begin.point ||
+        focusRegion.end.point !== focusWindow.end.point
+      ) {
         dispatch(setFocusRegion(focusWindow));
       }
     } catch (e: any) {
