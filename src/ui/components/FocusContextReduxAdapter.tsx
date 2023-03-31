@@ -1,7 +1,6 @@
 import { PropsWithChildren, useCallback, useEffect, useMemo, useState, useTransition } from "react";
 
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { Range } from "replay-next/src/types";
 import { enterFocusMode, setFocusRegionFromTimeRange } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";

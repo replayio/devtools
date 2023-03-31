@@ -48,7 +48,14 @@ export default function ContextMenu({
     }
   }, [offsets, pageX, pageY]);
 
-  const onClick = () => {
+  const onClick = (event: MouseEvent) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
     hide();
   };
 

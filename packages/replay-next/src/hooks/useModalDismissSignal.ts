@@ -22,6 +22,10 @@ export default function useModalDismissSignal(
     };
 
     const handleMouseEvent = (event: MouseEvent) => {
+      if (event.defaultPrevented) {
+        return;
+      }
+
       if (!element.contains(event.target as Node)) {
         event.preventDefault();
         event.stopPropagation();
