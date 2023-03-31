@@ -1,12 +1,16 @@
 import classNames from "classnames";
-import { MouseEvent } from "react";
+import { MouseEvent, useContext } from "react";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import { isSourceCodeCommentTypeData } from "replay-next/components/sources/utils/comments";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { isPointInRegion } from "shared/utils/time";
 import { seekToComment } from "ui/actions/comments";
 import { setViewMode } from "ui/actions/layout";
+import useUserCommentPreferences from "ui/components/Comments/useUserCommentPreferences";
 import { getViewMode } from "ui/reducers/layout";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -21,6 +25,9 @@ import ReplyCard from "./ReplyCard";
 import styles from "./CommentCard.module.css";
 
 export default function CommentCard({ comment }: { comment: Comment }) {
+  const { rangeForDisplay: focusRange } = useContext(FocusContext);
+  const { currentUserInfo } = useContext(SessionContext);
+
   const currentTime = useAppSelector(getCurrentTime);
   const executionPoint = useAppSelector(getExecutionPoint);
   const viewMode = useAppSelector(getViewMode);
@@ -28,6 +35,8 @@ export default function CommentCard({ comment }: { comment: Comment }) {
 
   const context = useAppSelector(getThreadContext);
   const dispatch = useAppDispatch();
+
+  const { filter } = useUserCommentPreferences();
 
   const onClick = (event: MouseEvent) => {
     event.stopPropagation();
@@ -58,9 +67,20 @@ export default function CommentCard({ comment }: { comment: Comment }) {
 
   const showReplyButton = !isCommentContentEmpty(comment.content);
 
+  let replies = comment.replies;
+  if (filter === "current-user") {
+    replies = replies.filter(reply => reply.user?.id === currentUserInfo?.id);
+  }
+
+  const isFocused = focusRange == null || isPointInRegion(comment.point, focusRange);
+
   return (
     <div
-      className={classNames(styles.CommentCard, !comment.isPublished && styles.Unpublished)}
+      className={classNames(
+        styles.CommentCard,
+        !comment.isPublished && styles.Unpublished,
+        isFocused || styles.UnfocusedDimmed
+      )}
       onClick={onClick}
     >
       {isPaused && <div className={styles.PausedOverlay} />}
@@ -69,7 +89,7 @@ export default function CommentCard({ comment }: { comment: Comment }) {
 
       <EditableRemark remark={comment} type="comment" />
 
-      {comment.replies.map(reply => (
+      {replies.map(reply => (
         <ReplyCard key={reply.id} reply={reply} />
       ))}
 
