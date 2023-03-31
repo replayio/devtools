@@ -24,7 +24,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
   const [queryForDisplay, setQueryForDisplay] = useState("");
   const [queryForSuspense, setQueryForSuspense] = useState("");
   const [isPending, startTransition] = useTransition();
-  const [searchSourceTextState, dismissSearchSourceTextNag] = useNag(Nag.SEARCH_SOURCE_TEXT);
+  const [, dismissSearchSourceTextNag] = useNag(Nag.SEARCH_SOURCE_TEXT);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
