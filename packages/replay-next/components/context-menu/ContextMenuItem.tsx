@@ -15,18 +15,20 @@ export default function ContextMenuItem({
   dataTestName?: string;
   dataTestState?: string;
   disabled?: boolean;
-  onClick?: () => void;
+  onClick?: (event: MouseEvent) => void;
 }) {
   const onClick = (event: MouseEvent) => {
     if (event.defaultPrevented) {
       return;
     }
 
-    event.preventDefault();
-
     if (!disabled) {
       if (onClickProp) {
-        onClickProp();
+        onClickProp(event);
+
+        if (event.defaultPrevented) {
+          return;
+        }
       }
     }
   };

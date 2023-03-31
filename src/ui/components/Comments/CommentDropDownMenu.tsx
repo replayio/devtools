@@ -1,3 +1,5 @@
+import { MouseEvent } from "react";
+
 import ContextMenuCategory from "replay-next/components/context-menu/ContextMenuCategory";
 import ContextMenuDivider from "replay-next/components/context-menu/ContextMenuDivider";
 import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
@@ -7,13 +9,22 @@ import useUserCommentPreferences from "ui/components/Comments/useUserCommentPref
 
 import styles from "./CommentDropDownMenu.module.css";
 
+function createClickHandler(callback: () => void): (event: MouseEvent) => void {
+  return (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    callback();
+  };
+}
+
 export default function CommentDropDownMenu() {
   const { filter, setFilter, setSortBy, sortBy } = useUserCommentPreferences();
 
   const { contextMenu, onContextMenu: onClick } = useContextMenu(
     <>
       <ContextMenuCategory>Show</ContextMenuCategory>
-      <ContextMenuItem onClick={() => setFilter(null)}>
+      <ContextMenuItem onClick={createClickHandler(() => setFilter(null))}>
         <>
           <Icon
             className={styles.Icon}
@@ -22,7 +33,7 @@ export default function CommentDropDownMenu() {
           All comments
         </>
       </ContextMenuItem>
-      <ContextMenuItem onClick={() => setFilter("current-user")}>
+      <ContextMenuItem onClick={createClickHandler(() => setFilter("current-user"))}>
         <>
           <Icon
             className={styles.Icon}
@@ -33,7 +44,7 @@ export default function CommentDropDownMenu() {
       </ContextMenuItem>
       <ContextMenuDivider />
       <ContextMenuCategory>Sort by</ContextMenuCategory>
-      <ContextMenuItem onClick={() => setSortBy("recording-time")}>
+      <ContextMenuItem onClick={createClickHandler(() => setSortBy("recording-time"))}>
         <>
           <Icon
             className={styles.Icon}
@@ -42,7 +53,7 @@ export default function CommentDropDownMenu() {
           Recording time
         </>
       </ContextMenuItem>
-      <ContextMenuItem onClick={() => setSortBy("created-at")}>
+      <ContextMenuItem onClick={createClickHandler(() => setSortBy("created-at"))}>
         <>
           <Icon
             className={styles.Icon}
