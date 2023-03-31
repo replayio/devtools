@@ -1,18 +1,28 @@
 import React, { FC, useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
+import { UIThunkAction } from "ui/actions";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
-import { toggleReplayAssist } from "ui/reducers/app";
+import { getReplayAssist, toggleReplayAssist } from "ui/reducers/app";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import useAuth0 from "ui/utils/useAuth0";
+
+function toggleAndShowAssistPanel(): UIThunkAction {
+  return (dispatch, getState) => {
+    dispatch(toggleReplayAssist());
+    const newValue = getReplayAssist(getState());
+    if (!newValue) {
+      dispatch(setSelectedPrimaryPanel("events"));
+    } else {
+      dispatch(setSelectedPrimaryPanel("assist"));
+    }
+  };
+}
 
 const ReplayAssistButton: FC = () => {
   const { isAuthenticated } = useAuth0();
-  const dispatch = useDispatch();
-  const [shouldShowReplayAssist, setShouldShowReplayAssist] = useLocalStorage<boolean>(
-    `Replay:replayAssistEnabled`,
-    false
-  );
+  const dispatch = useAppDispatch();
+  const shouldShowReplayAssist = useAppSelector(getReplayAssist);
 
   if (!isAuthenticated) {
     return null;
@@ -26,14 +36,7 @@ const ReplayAssistButton: FC = () => {
         id="replay-assist-checkbox"
         checked={shouldShowReplayAssist}
         onChange={() => {
-          const newValue = !shouldShowReplayAssist;
-          setShouldShowReplayAssist(newValue);
-          dispatch(toggleReplayAssist());
-          if (!newValue) {
-            dispatch(setSelectedPrimaryPanel("events"));
-          } else {
-            dispatch(setSelectedPrimaryPanel("assist"));
-          }
+          dispatch(toggleAndShowAssistPanel());
         }}
       />
       <span>Replay Assist</span>

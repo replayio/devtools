@@ -86,7 +86,7 @@ export interface LoadedRegions {
 
 export interface AppState {
   mode: AppMode;
-  assist: boolean;
+  showReplayAssist: boolean;
   awaitingSourcemaps: boolean;
   canvas: Canvas | null;
   defaultSettingsTab: SettingsTabTitle;

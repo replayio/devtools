@@ -85,6 +85,12 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     description: "Enable using diffs between snapshots",
     key: "enableIncrementalSnapshots",
   },
+  {
+    label: "Enable Replay Assist",
+    description:
+      "Replay Assist is a tool that shows off Replay's best features, with animated gifs explaining how to use them.",
+    key: "replayAssist",
+  },
 ];
 
 const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [];
@@ -140,6 +146,7 @@ export default function ExperimentalSettings({}) {
   const { value: enableRoutines, update: updateEnableRoutines } = useFeature("enableRoutines");
   const { value: rerunRoutines, update: updatererunRoutines } = useFeature("rerunRoutines");
   const { value: reactPanel, update: updateReactPanel } = useFeature("reactPanel");
+  const { value: replayAssist, update: updateReplayAssist } = useFeature("replayAssist");
 
   const {
     value: disableRecordingAssetsInDatabase,
@@ -176,6 +183,8 @@ export default function ExperimentalSettings({}) {
       updateReactPanel(!reactPanel);
     } else if (key === "enableIncrementalSnapshots") {
       updateEnableIncrementalSnapshots(!enableIncrementalSnapshots);
+    } else if (key === "replayAssist") {
+      updateReplayAssist(!replayAssist);
     }
   };
 
@@ -193,6 +202,7 @@ export default function ExperimentalSettings({}) {
     profileWorkerThreads,
     disableRecordingAssetsInDatabase,
     reactPanel,
+    replayAssist,
   };
 
   const settings = { ...userSettings, ...localSettings };

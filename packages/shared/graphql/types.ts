@@ -120,6 +120,7 @@ export type LocalExperimentalUserSettings = {
   brokenSourcemapWorkaround: boolean;
   disableRecordingAssetsInDatabase: boolean;
   reactPanel: boolean;
+  replayAssist: boolean;
 };
 
 export type LocalUserSettings = LocalExperimentalUserSettings & {

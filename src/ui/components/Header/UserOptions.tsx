@@ -7,6 +7,7 @@ import ReplayAssistButton from "ui/components/ReplayAssistButton";
 import Dropdown from "ui/components/shared/Dropdown";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { useFeature } from "ui/hooks/settings";
 import { trackEvent } from "ui/utils/telemetry";
 import useAuth0 from "ui/utils/useAuth0";
 
@@ -19,6 +20,7 @@ interface UserOptionsProps extends PropsFromRedux {
 function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   const [expanded, setExpanded] = useState(false);
   const { isAuthenticated } = useAuth0();
+  const { value: showReplayAssist } = useFeature("replayAssist");
 
   const onDocsClick: React.MouseEventHandler = event => {
     trackEvent("user_options.select_docs");
@@ -75,7 +77,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
               <span>Launch Replay</span>
             </button>
           )}
-          <ReplayAssistButton />
+          {showReplayAssist && <ReplayAssistButton />}
           <LoginButton />
         </Dropdown>
       </div>

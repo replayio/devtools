@@ -14,6 +14,7 @@ import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
 import { Nag } from "ui/hooks/users";
 import { useTestInfo } from "ui/hooks/useTestInfo";
+import { getReplayAssist } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { PrimaryPanelName } from "ui/state/layout";
@@ -158,8 +159,6 @@ export default function Toolbar() {
   const viewMode = useAppSelector(selectors.getViewMode);
   const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
 
-  const [showReplayAssist, _] = useLocalStorage<boolean>(`Replay:replayAssistEnabled`, false);
-
   const [showCommentsBadge, setShowCommentsBadge] = useState(false);
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
@@ -200,6 +199,8 @@ export default function Toolbar() {
       togglePanel();
     }
   };
+
+  const showReplayAssist = useAppSelector(getReplayAssist);
 
   return (
     <div className="toolbox-toolbar-container flex flex-col items-center justify-between py-1">
