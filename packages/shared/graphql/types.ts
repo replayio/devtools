@@ -242,12 +242,19 @@ export type TestMetadata = {
   result: TestResult;
   title: string;
   version: number;
+  hooks?: HookItem[];
   tests?: TestItem[];
   run?: { id: string; title?: string };
   runner?: { name: string; version: string; plugin: string };
   path?: string[];
   file?: string;
 };
+
+export interface HookItem {
+  title: string;
+  path: string[];
+  steps?: TestStep[];
+}
 
 export type TestItem = {
   title: string;

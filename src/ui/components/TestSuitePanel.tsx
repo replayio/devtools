@@ -28,6 +28,7 @@ import styles from "./SidePanel.module.css";
 // we can use those instead
 function maybeCorrectTestTimes(recording: Recording | void, annotations: Annotation[] | null) {
   const testCases = recording?.metadata?.test?.tests;
+
   return (
     testCases?.map((t, i) => ({
       ...t,
@@ -80,6 +81,8 @@ export function TestSuitePanel() {
     [recording, annotations]
   );
 
+  const hooks = recording?.metadata?.test?.hooks;
+
   const onReset = () => {
     dispatch(setSelectedTest(null));
     dispatch(setSelectedStep(null));
@@ -123,7 +126,7 @@ export function TestSuitePanel() {
         <TestRunAttributes workspaceId={workspaceId} testRunId={info.testRunId} />
       ) : null}
       {!info.loading ? (
-        <TestInfo testCases={testCases} />
+        <TestInfo hooks={hooks} testCases={testCases} />
       ) : (
         <div className="flex flex-grow flex-col overflow-hidden">
           <div className="flex flex-grow flex-col space-y-1 overflow-auto px-4">Loading...</div>

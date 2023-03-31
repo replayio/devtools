@@ -1,7 +1,7 @@
 import classNamesBind from "classnames/bind";
 import React, { useEffect, useRef } from "react";
 
-import { TestItem } from "shared/graphql/types";
+import { HookItem, TestItem } from "shared/graphql/types";
 import { useTestInfo } from "ui/hooks/useTestInfo";
 import { getSelectedTest } from "ui/reducers/reporter";
 import { setPlaybackFocusRegion } from "ui/reducers/timeline";
@@ -18,7 +18,13 @@ import styles from "./TestInfo.module.css";
 
 const classNames = classNamesBind.bind(styles);
 
-export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
+export default function TestInfo({
+  hooks,
+  testCases,
+}: {
+  hooks?: HookItem[];
+  testCases: TestItem[];
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
   const selectedTest = useAppSelector(getSelectedTest);
@@ -55,7 +61,7 @@ export default function TestInfo({ testCases }: { testCases: TestItem[] }) {
         <div className="relative flex flex-grow flex-col space-y-1 overflow-auto border-t border-splitter px-2 pt-3">
           {missingSteps ? <MissingSteps /> : null}
           {selectedTest == null ? (
-            <TestCaseTree testCases={testCases} />
+            <TestCaseTree hooks={hooks} testCases={testCases} />
           ) : (
             <TestCase test={testCases[selectedTest]} />
           )}
