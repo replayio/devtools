@@ -14,10 +14,9 @@ import ExternalLink from "../shared/ExternalLink";
 
 interface UserOptionsProps extends PropsFromRedux {
   noBrowserItem?: boolean;
-  toggleReplayAssist: () => void;
 }
 
-function UserOptions({ setModal, noBrowserItem, toggleReplayAssist }: UserOptionsProps) {
+function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   const [expanded, setExpanded] = useState(false);
   const { isAuthenticated } = useAuth0();
 
