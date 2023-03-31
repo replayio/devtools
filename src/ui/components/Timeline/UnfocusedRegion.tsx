@@ -5,16 +5,15 @@ import { useAppSelector } from "ui/setup/hooks";
 import { getVisiblePosition } from "ui/utils/timeline";
 
 export default function UnfocusedRegion() {
-  const displayedFocusRegion = useAppSelector(selectors.getDisplayedFocusRegion);
   const focusRegion = useAppSelector(selectors.getFocusRegion);
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
 
-  if (!displayedFocusRegion && !focusRegion) {
+  if (!focusRegion) {
     return null;
   }
 
-  const beginTime = displayedFocusRegion?.begin ?? focusRegion!.begin.time;
-  const endTime = displayedFocusRegion?.end ?? focusRegion!.end.time;
+  const beginTime = focusRegion!.begin.time;
+  const endTime = focusRegion!.end.time;
   const duration = zoomRegion.endTime - zoomRegion.beginTime;
 
   const start = getVisiblePosition({ time: beginTime, zoom: zoomRegion }) * 100;

@@ -1,6 +1,12 @@
 import { MouseEvent, useLayoutEffect, useRef, useState } from "react";
 
-import { seekToTime, setTimelineToTime, stopPlayback } from "ui/actions/timeline";
+import { throttle } from "shared/utils/function";
+import {
+  seekToTime,
+  setTimelineToTime,
+  stopPlayback,
+  updateFocusRegion,
+} from "ui/actions/timeline";
 import useTimelineContextMenu from "ui/components/Timeline/useTimelineContextMenu";
 import { selectors } from "ui/reducers";
 import {
@@ -9,6 +15,7 @@ import {
   setTimelineState,
 } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { AppDispatch } from "ui/setup/store";
 import { getTimeFromPosition } from "ui/utils/timeline";
 
 import Comments from "../Comments";
@@ -121,7 +128,7 @@ export default function Timeline() {
 
   return (
     <>
-      <FocusModePopout />
+      <FocusModePopout updateFocusRegionThrottled={updateFocusRegionThrottled} />
       <div className="timeline">
         <div className="commands">
           <PlayPauseButton />
@@ -145,7 +152,11 @@ export default function Timeline() {
               <UnfocusedRegion />
               {showLoadingProgress && <LoadingProgressBars />}
               <CurrentTimeIndicator editMode={editMode} />
-              <Focuser editMode={editMode} setEditMode={setEditMode} />
+              <Focuser
+                editMode={editMode}
+                setEditMode={setEditMode}
+                updateFocusRegionThrottled={updateFocusRegionThrottled}
+              />
             </div>
           </div>
 
@@ -158,3 +169,7 @@ export default function Timeline() {
     </>
   );
 }
+
+const updateFocusRegionThrottled = throttle((dispatch: AppDispatch, begin: number, end: number) => {
+  return dispatch(updateFocusRegion({ begin, end }));
+}, 250);

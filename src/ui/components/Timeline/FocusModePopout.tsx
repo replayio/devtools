@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 
+import { DebouncedOrThrottledFunction } from "shared/utils/function";
 import { exitFocusMode, syncFocusedRegion, updateFocusRegionParam } from "ui/actions/timeline";
 import {
   getFocusRegionBackup,
@@ -8,13 +9,20 @@ import {
   setFocusRegion,
 } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { AppDispatch } from "ui/setup/store";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { PrimaryButton, SecondaryButton } from "../shared/Button";
 import Icon from "../shared/Icon";
 import styles from "./FocusModePopout.module.css";
 
-export default function FocusModePopout() {
+export default function FocusModePopout({
+  updateFocusRegionThrottled,
+}: {
+  updateFocusRegionThrottled: DebouncedOrThrottledFunction<
+    (dispatch: AppDispatch, begin: number, end: number) => void
+  >;
+}) {
   const showFocusModeControls = useAppSelector(getShowFocusModeControls);
 
   const dispatch = useAppDispatch();
@@ -24,6 +32,10 @@ export default function FocusModePopout() {
   const hideModal = () => dispatch(exitFocusMode());
 
   const discardPendingChanges = (isImplicit: boolean) => {
+    if (updateFocusRegionThrottled.hasPending()) {
+      updateFocusRegionThrottled.cancel();
+    }
+
     dispatch(setFocusRegion(focusRegionBackup));
     dispatch(syncFocusedRegion());
 
@@ -35,7 +47,11 @@ export default function FocusModePopout() {
 
     hideModal();
   };
-  const savePendingChanges = () => {
+  const savePendingChanges = async () => {
+    if (updateFocusRegionThrottled.hasPending()) {
+      await updateFocusRegionThrottled.flush();
+    }
+
     dispatch(syncFocusedRegion());
     dispatch(updateFocusRegionParam());
     trackEvent("timeline.save_focus");
