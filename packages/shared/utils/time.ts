@@ -45,13 +45,13 @@ export function isRangeInRegions(
   return true;
 }
 
-export function isPointInRegions(point: ExecutionPoint, regions: TimeStampedPointRange[]): boolean {
+export function isPointInRegion(point: ExecutionPoint, range: TimeStampedPointRange): boolean {
   const pointNumber = BigInt(point);
-  return (
-    regions.find(
-      ({ begin, end }) => pointNumber >= BigInt(begin.point) && pointNumber <= BigInt(end.point)
-    ) != null
-  );
+  return pointNumber >= BigInt(range.begin.point) && pointNumber <= BigInt(range.end.point);
+}
+
+export function isPointInRegions(point: ExecutionPoint, regions: TimeStampedPointRange[]): boolean {
+  return regions.some(range => isPointInRegion(point, range));
 }
 
 export function isPointRange(range: TimeStampedPointRange | PointRange): range is PointRange {

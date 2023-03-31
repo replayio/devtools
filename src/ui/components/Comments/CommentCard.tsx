@@ -5,7 +5,9 @@ import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import { isSourceCodeCommentTypeData } from "replay-next/components/sources/utils/comments";
+import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { isPointInRegion } from "shared/utils/time";
 import { seekToComment } from "ui/actions/comments";
 import { setViewMode } from "ui/actions/layout";
 import useUserCommentPreferences from "ui/components/Comments/useUserCommentPreferences";
@@ -23,6 +25,7 @@ import ReplyCard from "./ReplyCard";
 import styles from "./CommentCard.module.css";
 
 export default function CommentCard({ comment }: { comment: Comment }) {
+  const { rangeForDisplay: focusRange } = useContext(FocusContext);
   const { currentUserInfo } = useContext(SessionContext);
 
   const currentTime = useAppSelector(getCurrentTime);
@@ -69,9 +72,15 @@ export default function CommentCard({ comment }: { comment: Comment }) {
     replies = replies.filter(reply => reply.user?.id === currentUserInfo?.id);
   }
 
+  const shouldDim = focusRange != null && !isPointInRegion(comment.point, focusRange);
+
   return (
     <div
-      className={classNames(styles.CommentCard, !comment.isPublished && styles.Unpublished)}
+      className={classNames(
+        styles.CommentCard,
+        !comment.isPublished && styles.Unpublished,
+        shouldDim && styles.Dimmed
+      )}
       onClick={onClick}
     >
       {isPaused && <div className={styles.PausedOverlay} />}
