@@ -42,7 +42,7 @@ const nodePickerInstance = new NodePickerClass();
 
 export function NodePicker() {
   const dispatch = useAppDispatch();
-  const [inspectElementState, dismissInspectElementNag] = useNag(Nag.INSPECT_ELEMENT); // Replay Assist
+  const [, dismissInspectElementNag] = useNag(Nag.INSPECT_ELEMENT); // Replay Assist
 
   // Contrast with the React DevTools instance of the picker
   const [globalNodePickerActive, setGlobalNodePickerActive] = useState(false);
