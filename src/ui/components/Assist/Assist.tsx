@@ -95,138 +95,82 @@ const Assist: React.FC = () => {
     setSelectedItem(index);
   };
 
-  let videoUrl;
-  switch (stepIndex) {
-    case 0:
-      videoUrl = "https://vercel.replay.io/assist/time_travel_in_console.gif";
-      break;
-    case 1:
-      videoUrl = "https://vercel.replay.io/assist/set_print_statement.gif";
-      break;
-    case 2:
-      videoUrl = "https://vercel.replay.io/assist/launch_command_palette.gif";
-      break;
-    case 3:
-      videoUrl = "https://vercel.replay.io/assist/explore_sources.gif";
-      break;
-    case 4:
-      videoUrl = "https://vercel.replay.io/assist/quick_open_a_file.gif";
-      break;
-    case 5:
-      videoUrl = "https://vercel.replay.io/assist/jump_to_an_event.gif";
-      break;
-    case 6:
-      videoUrl = "https://vercel.replay.io/assist/jump_to_code.gif";
-      break;
-    case 7:
-      videoUrl = "https://vercel.replay.io/assist/add_a_comment.gif";
-      break;
-    case 8:
-      videoUrl = "https://vercel.replay.io/assist/unicorn_badge.gif";
-      break;
-    case 9:
-      videoUrl = "https://vercel.replay.io/assist/use_focus_mode.gif";
-      break;
-    case 10:
-      videoUrl = "https://vercel.replay.io/assist/record_a_replay.gif";
-      break;
-    case 11:
-      videoUrl = "https://vercel.replay.io/assist/inspect_an_element.gif";
-      break;
-    default:
-      videoUrl = ""; // or provide a default video URL if necessary
-  }
-
   const getItemStyle = (index: number) => {
     return selectedItem === index ? styles.selectedItem : "";
   };
 
-  console.log("still need to navigate a console: ", showConsoleNavigate);
-  console.log("still need to edit a breakpoint: ", showBreakpointEdit);
-  console.log("still need to AddComment: ", showAddComment);
-  console.log("still need to JumpToCode: ", showJumpToCode);
-  console.log("still need to AddUnicornBadge: ", showAddUnicornBadge);
-  console.log("still need to RecordReplay: ", showRecordReplay);
-  console.log("still need to ExploreSources: ", showExploreSources);
-  console.log("still need to SearchSourceText: ", showSearchSourceText);
-  console.log("still need to QuickOpenFile: ", showQuickOpenFile);
-  console.log("still need to LaunchCommandPalette: ", showLaunchCommandPalette);
-  console.log("still need to JumpToEvent: ", showJumpToEvent);
-  console.log("still need to InspectElement: ", showInspectElement);
-  console.log("still need to InspectComponent: ", showInspectComponent);
-  console.log("still need to UseFocusMode: ", showUseFocusMode);
-
-  // Hard-coded checklist items
-  const checklistItems = [
+  const updatedChecklistItems = [
     {
       label: "Time travel in the console",
-      videoUrl: "https://vercel.replay.io/assist/video2.gif",
       completed: showConsoleNavigate,
+      videoUrl: "https://vercel.replay.io/assist/time_travel_in_console.gif",
     },
     {
       label: "Set a print statement",
-      videoUrl: "https://vercel.replay.io/assist/video3.gif",
       completed: showBreakpointEdit,
+      videoUrl: "https://vercel.replay.io/assist/set_print_statement.gif",
     },
     {
       label: "Launch command palette",
-      videoUrl: "https://vercel.replay.io/assist/video14.gif",
       completed: showLaunchCommandPalette,
+      videoUrl: "https://vercel.replay.io/assist/launch_command_palette.gif",
     },
     {
       label: "Explore sources",
-      videoUrl: "https://vercel.replay.io/assist/video11.gif",
       completed: showExploreSources,
+      videoUrl: "https://vercel.replay.io/assist/explore_sources.gif",
     },
     {
       label: "Search source text",
-      videoUrl: "https://vercel.replay.io/assist/video12.gif",
       completed: showSearchSourceText,
+      videoUrl: "https://vercel.replay.io/assist/search_source_text.gif",
     },
     {
       label: "Jump to event",
-      videoUrl: "https://vercel.replay.io/assist/video15.gif",
       completed: showJumpToEvent,
+      videoUrl: "https://vercel.replay.io/assist/jump_to_event.gif",
     },
     {
       label: "Jump to code",
-      videoUrl: "https://vercel.replay.io/assist/video8.gif",
       completed: showJumpToCode,
+      videoUrl: "https://vercel.replay.io/assist/jump_to_code.gif",
     },
     {
       label: "Add a comment",
-      videoUrl: "https://vercel.replay.io/assist/video4.gif",
       completed: showAddComment,
+      videoUrl: "https://vercel.replay.io/assist/add_a_comment.gif",
     },
     {
       label: "Add a unicorn badge",
-      videoUrl: "https://vercel.replay.io/assist/video9.gif",
       completed: showAddUnicornBadge,
+      videoUrl: "https://vercel.replay.io/assist/unicorn_badge.gif",
     },
     {
       label: "Use focus mode",
-      videoUrl: "https://vercel.replay.io/assist/video18.gif",
       completed: showUseFocusMode,
+      videoUrl: "https://vercel.replay.io/assist/use_focus_mode.gif",
     },
     {
       label: "Record a replay",
-      videoUrl: "https://vercel.replay.io/assist/video10.gif",
       completed: showRecordReplay,
+      videoUrl: "https://vercel.replay.io/assist/record_a_replay.gif",
     },
     {
       label: "Inspect element",
-      videoUrl: "https://vercel.replay.io/assist/video16.gif",
       completed: showInspectElement,
+      videoUrl: "https://vercel.replay.io/assist/inspect_element.gif",
     },
   ];
 
   useEffect(() => {
-    const firstUnselectedIndex = checklistItems.findIndex(item => !item.completed);
+    const firstUnselectedIndex = updatedChecklistItems.findIndex(item => !item.completed);
     if (firstUnselectedIndex !== -1) {
       setSelectedItem(firstUnselectedIndex);
       setStepIndex(firstUnselectedIndex);
     }
   }, []);
+
+  const videoUrl = updatedChecklistItems[stepIndex].videoUrl;
 
   return (
     <div className={styles.AssistBoxWrapper}>
@@ -236,7 +180,7 @@ const Assist: React.FC = () => {
             <div className={styles.h1}>Replay Assist</div>
             <div className={styles.AssistBoxInternal}>
               <div className={styles.checklist}>
-                {checklistItems.map((item, index) => (
+                {updatedChecklistItems.map((item, index) => (
                   <div
                     key={index}
                     className={`flex ${getItemStyle(index)} ${styles.checklistItem}`}
