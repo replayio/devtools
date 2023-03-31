@@ -1,8 +1,7 @@
 import classNames from "classnames";
-import { MouseEvent, useContext } from "react";
+import { MouseEvent, memo, useContext } from "react";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
-import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import { isSourceCodeCommentTypeData } from "replay-next/components/sources/utils/comments";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
@@ -12,7 +11,6 @@ import { seekToComment } from "ui/actions/comments";
 import { setViewMode } from "ui/actions/layout";
 import useUserCommentPreferences from "ui/components/Comments/useUserCommentPreferences";
 import { getViewMode } from "ui/reducers/layout";
-import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Comment } from "ui/state/comments";
 import { isCommentContentEmpty } from "ui/utils/comments";
@@ -24,14 +22,19 @@ import EditableRemark from "./EditableRemark";
 import ReplyCard from "./ReplyCard";
 import styles from "./CommentCard.module.css";
 
-export default function CommentCard({ comment }: { comment: Comment }) {
+export type PauseOverlayPosition = "after" | "at" | "before";
+
+function CommentCard({
+  comment,
+  pauseOverlayPosition,
+}: {
+  comment: Comment;
+  pauseOverlayPosition: PauseOverlayPosition | null;
+}) {
   const { rangeForDisplay: focusRange } = useContext(FocusContext);
   const { currentUserInfo } = useContext(SessionContext);
 
-  const currentTime = useAppSelector(getCurrentTime);
-  const executionPoint = useAppSelector(getExecutionPoint);
   const viewMode = useAppSelector(getViewMode);
-  const isPaused = currentTime === comment.time && executionPoint === comment.point;
 
   const context = useAppSelector(getThreadContext);
   const dispatch = useAppDispatch();
@@ -81,9 +84,13 @@ export default function CommentCard({ comment }: { comment: Comment }) {
         !comment.isPublished && styles.Unpublished,
         isFocused || styles.UnfocusedDimmed
       )}
+      data-test-name="CommentCard"
+      data-test-comment-time={comment.time}
       onClick={onClick}
     >
-      {isPaused && <div className={styles.PausedOverlay} />}
+      {pauseOverlayPosition !== null && (
+        <div className={styles.PausedOverlay} data-position={pauseOverlayPosition} />
+      )}
 
       <CommentPreview comment={comment} onClick={onPreviewClick} />
 
@@ -96,4 +103,11 @@ export default function CommentCard({ comment }: { comment: Comment }) {
       {showReplyButton && <CommentReplyButton comment={comment} />}
     </div>
   );
+}
+
+const MemoizedCommentCard = memo(CommentCard);
+export default MemoizedCommentCard;
+
+export function getCommentTimeFromElement(element: Element) {
+  return parseInt(element.getAttribute("data-test-comment-time") ?? "", 10);
 }

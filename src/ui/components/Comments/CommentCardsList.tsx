@@ -1,13 +1,15 @@
 import lodashSortBy from "lodash/sortBy";
-import React, { useContext, useMemo, useRef } from "react";
+import { ReactNode, useContext, useMemo } from "react";
 
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
-import CommentCard from "ui/components/Comments/CommentCard";
+import CommentCard, { PauseOverlayPosition } from "ui/components/Comments/CommentCard";
 import CommentDropDownMenu from "ui/components/Comments/CommentDropDownMenu";
 import useUserCommentPreferences from "ui/components/Comments/useUserCommentPreferences";
 import LoginButton from "ui/components/LoginButton";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
+import { getCurrentTime, isPlaying as isPlayingSelector } from "ui/reducers/timeline";
+import { useAppSelector } from "ui/setup/hooks";
 import { Comment } from "ui/state/comments";
 import useAuth0 from "ui/utils/useAuth0";
 
@@ -24,6 +26,13 @@ export default function CommentCardsList() {
   const { filter, sortBy } = useUserCommentPreferences();
 
   const { isAuthenticated } = useAuth0();
+
+  const currentTime = useAppSelector(getCurrentTime);
+  const isPlaying = useAppSelector(isPlayingSelector);
+
+  // We don't render this indicator during playback–
+  // so we can avoid breaking memoization below unnecessarily by referencing it.
+  const showPauseOverlayAtTime = isPlaying ? null : currentTime;
 
   const displayedComments = useMemo(() => {
     let filteredComments = comments;
@@ -57,7 +66,34 @@ export default function CommentCardsList() {
 
   const content = useMemo(() => {
     if (displayedComments.length > 0) {
-      return displayedComments.map(comment => <CommentCard key={comment.id} comment={comment} />);
+      let hasShownPauseOverlay = false;
+
+      const renderedComments: ReactNode[] = [];
+      displayedComments.forEach((comment, index) => {
+        let pauseOverlayPosition: PauseOverlayPosition | null = null;
+        if (showPauseOverlayAtTime !== null && !hasShownPauseOverlay) {
+          if (comment.time >= showPauseOverlayAtTime) {
+            hasShownPauseOverlay = true;
+            if (showPauseOverlayAtTime === comment.time) {
+              pauseOverlayPosition = "at";
+            } else {
+              pauseOverlayPosition = "before";
+            }
+          } else if (index === displayedComments.length - 1) {
+            hasShownPauseOverlay = true;
+            pauseOverlayPosition = "after";
+          }
+        }
+
+        renderedComments.push(
+          <CommentCard
+            key={comment.id}
+            comment={comment}
+            pauseOverlayPosition={pauseOverlayPosition}
+          />
+        );
+      });
+      return renderedComments;
     } else {
       return (
         <div className={styles.NoComments}>
@@ -79,7 +115,7 @@ export default function CommentCardsList() {
         </div>
       );
     }
-  }, [displayedComments, isAuthenticated]);
+  }, [displayedComments, isAuthenticated, showPauseOverlayAtTime]);
 
   if (loading || auth.isLoading || recording.loading) {
     return null;
