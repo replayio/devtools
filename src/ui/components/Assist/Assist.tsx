@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Icon from "replay-next/components/Icon";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
@@ -54,7 +54,7 @@ const useNagDismissal = () => {
 };
 
 const Assist: React.FC = () => {
-  const [selectedItem, setSelectedItem] = useState(1);
+  const [selectedItem, setSelectedItem] = useState(2);
   const { nags } = hooks.useGetUserInfo();
   const viewMode = useAppSelector(getViewMode);
   const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
@@ -219,6 +219,14 @@ const Assist: React.FC = () => {
       completed: showInspectElement,
     },
   ];
+
+  useEffect(() => {
+    const firstUnselectedIndex = checklistItems.findIndex(item => !item.completed);
+    if (firstUnselectedIndex !== -1) {
+      setSelectedItem(firstUnselectedIndex);
+      setStepIndex(firstUnselectedIndex);
+    }
+  }, []);
 
   return (
     <div className={styles.AssistBoxWrapper}>
