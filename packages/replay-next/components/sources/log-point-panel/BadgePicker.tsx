@@ -24,7 +24,7 @@ export default function BadgePicker({
   const { editPointBadge } = useContext(PointsContext);
 
   const [state, setState] = useState<State>("initial");
-  const [addUnicornBadgeState, dismissAddUnicornBadgeNag] = useNag(Nag.ADD_UNICORN_BADGE);
+  const [, dismissAddUnicornBadgeNag] = useNag(Nag.ADD_UNICORN_BADGE);
   const toggle = (badge: Badge | null) => {
     if (badge === "unicorn") {
       dismissAddUnicornBadgeNag();

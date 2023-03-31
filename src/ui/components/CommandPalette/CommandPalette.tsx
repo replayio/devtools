@@ -119,9 +119,7 @@ function CommandPalette({
   const [activeIndex, setActiveIndex] = useState(0);
   const shownCommands = getShownCommands(searchString);
 
-  const [launchCommandPaletteState, dismissLaunchCommandPaletteNag] = useNag(
-    Nag.LAUNCH_COMMAND_PALETTE
-  );
+  const [, dismissLaunchCommandPaletteNag] = useNag(Nag.LAUNCH_COMMAND_PALETTE);
 
   useEffect(() => {
     dismissLaunchCommandPaletteNag();

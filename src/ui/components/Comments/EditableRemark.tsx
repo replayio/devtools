@@ -142,7 +142,7 @@ export default function EditableRemark({
           initialValue={content}
           onCancel={discardPendingChanges}
           onDelete={deleteRemark}
-          onSave={handleSaveChanges} // Replace 'saveChanges' with 'handleSaveChanges'
+          onSave={handleSaveChanges}
           placeholder={type === "reply" ? "Write a reply..." : "Type a comment"}
         />
       </div>
