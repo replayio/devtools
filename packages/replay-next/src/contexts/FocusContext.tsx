@@ -49,6 +49,7 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
   };
   const [range, setRange] = useState<TimeStampedPointRange | null>(initialRange);
   const [deferredRange, setDeferredRange] = useState<TimeStampedPointRange | null>(initialRange);
+  const [focusRangeInitialized, setFocusRangeInitialized] = useState(false);
 
   // Using a deferred values enables the focus UI to update quickly,
   // and the slower operation of Suspending to load points to be deferred.
@@ -72,8 +73,9 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
       return;
     }
 
-    const timeoutId = setTimeout(() => {
-      client.requestFocusRange({ begin: range.begin.time, end: range.end.time });
+    const timeoutId = setTimeout(async () => {
+      await client.requestFocusRange({ begin: range.begin.time, end: range.end.time });
+      setFocusRangeInitialized(true);
     }, FOCUS_DEBOUNCE_DURATION);
 
     return () => {
@@ -132,5 +134,9 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
     [deferredRange, isTransitionPending, range, updateFocusRange]
   );
 
-  return <FocusContext.Provider value={focusContext}>{children}</FocusContext.Provider>;
+  return (
+    <FocusContext.Provider value={focusContext}>
+      {focusRangeInitialized ? children : null}
+    </FocusContext.Provider>
+  );
 }
