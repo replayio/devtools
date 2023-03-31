@@ -15,9 +15,6 @@
 .UnfocusedDimmed {
   opacity: 0.5;
 }
-.UnfocusedHidden {
-  display: none;
-}
 
 .PausedOverlay {
   position: absolute;

@@ -19,8 +19,7 @@ function createClickHandler(callback: () => void): (event: MouseEvent) => void {
 }
 
 export default function CommentDropDownMenu() {
-  const { filter, hideUnfocused, setFilter, setHideUnfocused, setSortBy, sortBy } =
-    useUserCommentPreferences();
+  const { filter, setFilter, setSortBy, sortBy } = useUserCommentPreferences();
 
   const { contextMenu, onContextMenu: onClick } = useContextMenu(
     <>
@@ -58,16 +57,6 @@ export default function CommentDropDownMenu() {
           type={sortBy === "created-at" ? "radio-selected" : "radio-unselected"}
         />
         Creation date
-      </ContextMenuItem>
-      <ContextMenuDivider />
-      <ContextMenuCategory>Focus mode</ContextMenuCategory>
-      <ContextMenuItem onClick={createClickHandler(() => setHideUnfocused(!hideUnfocused))}>
-        <Icon
-          className={styles.Icon}
-          data-selected={hideUnfocused || undefined}
-          type={hideUnfocused ? "checked-rounded" : "unchecked-rounded"}
-        />{" "}
-        Hide unfocused?
       </ContextMenuItem>
     </>
   );
