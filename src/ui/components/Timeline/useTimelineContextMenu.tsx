@@ -16,7 +16,7 @@ import {
   getUrlParams,
   seekToTime,
   syncFocusedRegion,
-  updateDisplayedFocusRegion,
+  updateFocusRegion,
 } from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
 import { getUrlString } from "ui/utils/environment";
@@ -62,7 +62,7 @@ export default function useTimelineContextMenu() {
     let end = focusEndTime ?? duration;
     end = Math.min(end, currentTime + MAX_FOCUS_REGION_DURATION);
 
-    await dispatch(updateDisplayedFocusRegion({ begin: currentTime, end }));
+    await dispatch(updateFocusRegion({ begin: currentTime, end }));
     dispatch(syncFocusedRegion());
   };
 
@@ -70,7 +70,7 @@ export default function useTimelineContextMenu() {
     let begin = focusBeginTime ?? 0;
     begin = Math.max(begin, currentTime - MAX_FOCUS_REGION_DURATION);
 
-    await dispatch(updateDisplayedFocusRegion({ begin, end: currentTime }));
+    await dispatch(updateFocusRegion({ begin, end: currentTime }));
     dispatch(syncFocusedRegion());
   };
 

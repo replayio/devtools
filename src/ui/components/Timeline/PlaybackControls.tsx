@@ -6,12 +6,12 @@ import { trackEvent } from "ui/utils/telemetry";
 export default function PlayPauseButton() {
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(selectors.getCurrentTime);
-  const displayedFocusRegion = useAppSelector(selectors.getDisplayedFocusRegion);
+  const focusRegion = useAppSelector(selectors.getFocusRegion);
   const playback = useAppSelector(selectors.getPlayback);
   const recordingDuration = useAppSelector(selectors.getRecordingDuration);
 
-  const isAtEnd = displayedFocusRegion
-    ? currentTime === displayedFocusRegion.end
+  const isAtEnd = focusRegion
+    ? currentTime === focusRegion.end.time
     : currentTime == recordingDuration;
 
   let onClick;

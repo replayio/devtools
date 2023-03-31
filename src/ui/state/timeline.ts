@@ -14,7 +14,6 @@ export interface FocusRegion {
 export interface TimelineState {
   allPaintsReceived: boolean;
   currentTime: number;
-  displayedFocusRegion: FocusWindow | null;
   dragging: boolean;
   focusRegion: FocusRegion | null;
   focusRegionBackup: FocusRegion | null;
