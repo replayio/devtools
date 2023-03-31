@@ -12,6 +12,10 @@
   background-color: var(--theme-base-90);
 }
 
+.Dimmed {
+  opacity: 0.5;
+}
+
 .PausedOverlay {
   position: absolute;
   top: 0;
