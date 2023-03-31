@@ -1,8 +1,8 @@
 import classNames from "classnames";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-import { updateDisplayedFocusRegion } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
+import { AppDispatch } from "ui/setup";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPositionFromTime, getTimeFromPosition } from "ui/utils/timeline";
 
@@ -16,23 +16,40 @@ function stopEvent(event: MouseEvent) {
 type Props = {
   editMode: EditMode | null;
   setEditMode: React.Dispatch<React.SetStateAction<EditMode | null>>;
+  updateFocusRegionThrottled: (dispatch: AppDispatch, begin: number, end: number) => void;
 };
 
-export default function ConditionalFocuser({ editMode, setEditMode }: Props) {
-  const displayedFocusRegion = useAppSelector(selectors.getDisplayedFocusRegion);
+export default function ConditionalFocuser({
+  editMode,
+  setEditMode,
+  updateFocusRegionThrottled,
+}: Props) {
+  const focusRegion = useAppSelector(selectors.getFocusRegion);
   const showFocusModeControls = useAppSelector(selectors.getShowFocusModeControls);
 
-  if (!displayedFocusRegion || !showFocusModeControls) {
+  if (!focusRegion || !showFocusModeControls) {
     return null;
   }
 
-  return <Focuser editMode={editMode} setEditMode={setEditMode} />;
+  return (
+    <Focuser
+      editMode={editMode}
+      setEditMode={setEditMode}
+      updateFocusRegionThrottled={updateFocusRegionThrottled}
+    />
+  );
 }
 
-function Focuser({ editMode, setEditMode }: Props) {
+function Focuser({ editMode, setEditMode, updateFocusRegionThrottled }: Props) {
   const dispatch = useAppDispatch();
-  const displayedFocusRegion = useAppSelector(selectors.getDisplayedFocusRegion);
+  const focusRegion = useAppSelector(selectors.getFocusRegion)!;
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
+
+  // Mirror focus state so we can re-render immediately and dispatch throttled Redux updates
+  const [displayedFocusRegion, setDisplayedFocusRegion] = useState({
+    beginTime: focusRegion?.begin.time ?? zoomRegion.beginTime,
+    endTime: focusRegion?.end.time ?? zoomRegion.endTime,
+  });
 
   const containerRef = useRef<HTMLDivElement>(null);
   const draggableAreaRef = useRef<HTMLDivElement>(null);
@@ -40,7 +57,7 @@ function Focuser({ editMode, setEditMode }: Props) {
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || !displayedFocusRegion || !editMode) {
+    if (!container || !focusRegion || !editMode) {
       return;
     }
 
@@ -78,8 +95,8 @@ function Focuser({ editMode, setEditMode }: Props) {
           container.getBoundingClientRect(),
           zoomRegion
         );
-        const beginTime = displayedFocusRegion.begin;
-        const endTime = displayedFocusRegion.end;
+        const beginTime = focusRegion.begin.time;
+        const endTime = focusRegion.end.time;
 
         switch (editMode.type) {
           case "drag": {
@@ -97,39 +114,15 @@ function Focuser({ editMode, setEditMode }: Props) {
               newEndTime = zoomRegion.endTime;
             }
 
-            dispatch(
-              updateDisplayedFocusRegion(
-                {
-                  begin: newBeginTime,
-                  end: newEndTime,
-                },
-                true
-              )
-            );
+            updateDisplayedFocusRegion(newBeginTime, newEndTime);
             break;
           }
           case "resize-end": {
-            dispatch(
-              updateDisplayedFocusRegion(
-                {
-                  begin: beginTime,
-                  end: mouseTime,
-                },
-                true
-              )
-            );
+            updateDisplayedFocusRegion(beginTime, mouseTime);
             break;
           }
           case "resize-start": {
-            dispatch(
-              updateDisplayedFocusRegion(
-                {
-                  begin: mouseTime,
-                  end: endTime,
-                },
-                true
-              )
-            );
+            updateDisplayedFocusRegion(mouseTime, endTime);
             break;
           }
         }
@@ -177,6 +170,11 @@ function Focuser({ editMode, setEditMode }: Props) {
       }
     };
 
+    const updateDisplayedFocusRegion = (beginTime: number, endTime: number) => {
+      setDisplayedFocusRegion({ beginTime, endTime });
+      updateFocusRegionThrottled(dispatch, beginTime, endTime);
+    };
+
     document.addEventListener("click", onDocumentClick, true);
     document.addEventListener("mousemove", onDocumentMouseMove, true);
     document.addEventListener("mouseleave", onDocumentMouseLeave, true);
@@ -190,7 +188,7 @@ function Focuser({ editMode, setEditMode }: Props) {
     };
   });
 
-  if (!displayedFocusRegion) {
+  if (!focusRegion) {
     return null;
   }
 
@@ -204,8 +202,8 @@ function Focuser({ editMode, setEditMode }: Props) {
   const setEditModeToResizeEnd = () => setEditMode({ type: "resize-end" });
   const setEditModeToResizeStart = () => setEditMode({ type: "resize-start" });
 
-  const left = getPositionFromTime(displayedFocusRegion.begin, zoomRegion);
-  const right = getPositionFromTime(displayedFocusRegion.end, zoomRegion);
+  const left = getPositionFromTime(displayedFocusRegion.beginTime, zoomRegion);
+  const right = getPositionFromTime(displayedFocusRegion.endTime, zoomRegion);
 
   return (
     <div className="relative top-0 left-0 h-full w-full" ref={containerRef}>

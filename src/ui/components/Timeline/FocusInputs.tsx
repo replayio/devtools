@@ -1,7 +1,7 @@
 import React from "react";
 
 import { getFormattedTime } from "shared/utils/time";
-import { updateDisplayedFocusRegion } from "ui/actions/timeline";
+import { updateFocusRegion } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getSecondsFromFormattedTime } from "ui/utils/timeline";
@@ -12,7 +12,7 @@ import styles from "./FocusInputs.module.css";
 export default function FocusInputs() {
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(selectors.getCurrentTime);
-  const displayedFocusRegion = useAppSelector(selectors.getDisplayedFocusRegion);
+  const focusRegion = useAppSelector(selectors.getFocusRegion);
   const showFocusModeControls = useAppSelector(selectors.getShowFocusModeControls);
   const recordingDuration = useAppSelector(selectors.getRecordingDuration);
 
@@ -22,9 +22,9 @@ export default function FocusInputs() {
   // Avoid layout shift; keep input size consistent when focus mode toggles.
   const inputSize = formattedDuration.length;
 
-  if (showFocusModeControls && displayedFocusRegion !== null) {
-    const formattedEndTime = getFormattedTime(displayedFocusRegion.end);
-    const formattedBeginTime = getFormattedTime(displayedFocusRegion.begin);
+  if (showFocusModeControls && focusRegion !== null) {
+    const formattedEndTime = getFormattedTime(focusRegion.end.time);
+    const formattedBeginTime = getFormattedTime(focusRegion.begin.time);
 
     const validateAndSaveBeginTime = async (pending: string) => {
       try {
@@ -33,10 +33,10 @@ export default function FocusInputs() {
           // If the new end time is less than the current start time, the user is probably trying to move the whole range.
           // We can simplify this operation by resetting both the start and end time to the same value.
           const newEndTime =
-            newBeginTime <= displayedFocusRegion.end ? displayedFocusRegion.end : newBeginTime;
+            newBeginTime <= focusRegion.end.time ? focusRegion.end.time : newBeginTime;
 
           await dispatch(
-            updateDisplayedFocusRegion({
+            updateFocusRegion({
               begin: newBeginTime,
               end: newEndTime,
             })
@@ -53,10 +53,10 @@ export default function FocusInputs() {
           // If the new start time is greater than the current end time, the user is probably trying to move the whole range.
           // We can simplify this operation by resetting both the start and end time to the same value.
           const newBeginTime =
-            newEndTime >= displayedFocusRegion.begin ? displayedFocusRegion.begin : newEndTime;
+            newEndTime >= focusRegion.begin.time ? focusRegion.begin.time : newEndTime;
 
           await dispatch(
-            updateDisplayedFocusRegion({
+            updateFocusRegion({
               begin: newBeginTime,
               end: newEndTime,
             })
