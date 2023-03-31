@@ -3,13 +3,13 @@ import React, { FC, useEffect, useState } from "react";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { UIThunkAction } from "ui/actions";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
-import { getReplayAssist, toggleReplayAssist } from "ui/reducers/app";
+import { getReplayAssist, replayAssistToggled } from "ui/reducers/app";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import useAuth0 from "ui/utils/useAuth0";
 
 function toggleAndShowAssistPanel(): UIThunkAction {
   return (dispatch, getState) => {
-    dispatch(toggleReplayAssist());
+    dispatch(replayAssistToggled());
     const newValue = getReplayAssist(getState());
     if (!newValue) {
       dispatch(setSelectedPrimaryPanel("events"));

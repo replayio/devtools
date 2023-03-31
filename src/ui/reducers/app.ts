@@ -61,7 +61,7 @@ const appSlice = createSlice({
   name: "app",
   initialState: initialAppState,
   reducers: {
-    toggleReplayAssist(state) {
+    replayAssistToggled(state) {
       state.showReplayAssist = !state.showReplayAssist;
     },
     setMouseTargetsLoading(state, action: PayloadAction<boolean>) {
@@ -166,7 +166,7 @@ const appSlice = createSlice({
 });
 
 export const {
-  toggleReplayAssist,
+  replayAssistToggled,
   clearExpectedError,
   setAppMode,
   setAwaitingSourcemaps,
