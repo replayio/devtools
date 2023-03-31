@@ -285,7 +285,7 @@ export default function useSearch<Item, Result, QueryData = never>(
           index = results.indexOf(prevItem);
         }
 
-        if (index < 0) {
+        if (index < 0 && queryChanged) {
           index = findInitialIndex(results);
         }
       }
