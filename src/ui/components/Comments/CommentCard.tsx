@@ -28,6 +28,8 @@ export default function CommentCard({ comment }: { comment: Comment }) {
   const { rangeForDisplay: focusRange } = useContext(FocusContext);
   const { currentUserInfo } = useContext(SessionContext);
 
+  const { hideUnfocused } = useUserCommentPreferences();
+
   const currentTime = useAppSelector(getCurrentTime);
   const executionPoint = useAppSelector(getExecutionPoint);
   const viewMode = useAppSelector(getViewMode);
@@ -72,14 +74,18 @@ export default function CommentCard({ comment }: { comment: Comment }) {
     replies = replies.filter(reply => reply.user?.id === currentUserInfo?.id);
   }
 
-  const shouldDim = focusRange != null && !isPointInRegion(comment.point, focusRange);
+  const isFocused = focusRange == null || isPointInRegion(comment.point, focusRange);
+  let focusedClassName = "";
+  if (!isFocused) {
+    focusedClassName = hideUnfocused ? styles.UnfocusedHidden : styles.UnfocusedDimmed;
+  }
 
   return (
     <div
       className={classNames(
         styles.CommentCard,
         !comment.isPublished && styles.Unpublished,
-        shouldDim && styles.Dimmed
+        focusedClassName
       )}
       onClick={onClick}
     >

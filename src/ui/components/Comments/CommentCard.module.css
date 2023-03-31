@@ -12,8 +12,11 @@
   background-color: var(--theme-base-90);
 }
 
-.Dimmed {
+.UnfocusedDimmed {
   opacity: 0.5;
+}
+.UnfocusedHidden {
+  display: none;
 }
 
 .PausedOverlay {

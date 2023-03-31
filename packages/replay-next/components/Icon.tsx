@@ -1,4 +1,4 @@
-import { CSSProperties, ReactNode } from "react";
+import { CSSProperties, HTMLAttributes, ReactNode } from "react";
 
 import styles from "./Icon.module.css";
 
@@ -6,6 +6,7 @@ export default function Icon({
   className = styles.DefaultIcon,
   style,
   type,
+  ...rest
 }: {
   className?: string;
   type:
@@ -48,6 +49,8 @@ export default function Icon({
     | "prompt"
     | "protocol"
     | "protocol-viewer"
+    | "radio-selected"
+    | "radio-unselected"
     | "remove"
     | "remove-alternate"
     | "rewind"
@@ -69,7 +72,7 @@ export default function Icon({
     | "visible"
     | "warning";
   style?: CSSProperties;
-}) {
+} & HTMLAttributes<SVGElement>) {
   let path: ReactNode = null;
   switch (type) {
     case "add":
@@ -263,6 +266,14 @@ export default function Icon({
       path =
         "M7.77 6.76L6.23 5.48.82 12l5.41 6.52 1.54-1.28L3.42 12l4.35-5.24zM7 13h2v-2H7v2zm10-2h-2v2h2v-2zm-6 2h2v-2h-2v2zm6.77-7.52l-1.54 1.28L20.58 12l-4.35 5.24 1.54 1.28L23.18 12l-5.41-6.52z";
       break;
+    case "radio-selected":
+      path =
+        "M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7Z";
+      break;
+    case "radio-unselected":
+      path =
+        "M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
+      break;
     case "remove":
       path = "M19 13H5v-2h14v2z";
       break;
@@ -379,7 +390,7 @@ export default function Icon({
   }
 
   return (
-    <svg className={className} style={style} viewBox="0 0 24 24" fill="currentColor">
+    <svg className={className} style={style} viewBox="0 0 24 24" fill="currentColor" {...rest}>
       <path d="M0 0h24v24H0z" fill="none" />
       {path}
     </svg>

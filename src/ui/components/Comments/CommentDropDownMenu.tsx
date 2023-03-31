@@ -19,48 +19,55 @@ function createClickHandler(callback: () => void): (event: MouseEvent) => void {
 }
 
 export default function CommentDropDownMenu() {
-  const { filter, setFilter, setSortBy, sortBy } = useUserCommentPreferences();
+  const { filter, hideUnfocused, setFilter, setHideUnfocused, setSortBy, sortBy } =
+    useUserCommentPreferences();
 
   const { contextMenu, onContextMenu: onClick } = useContextMenu(
     <>
-      <ContextMenuCategory>Show</ContextMenuCategory>
+      <ContextMenuCategory>Show comments by</ContextMenuCategory>
       <ContextMenuItem onClick={createClickHandler(() => setFilter(null))}>
-        <>
-          <Icon
-            className={styles.Icon}
-            type={filter === null ? "checked-rounded" : "unchecked-rounded"}
-          />{" "}
-          All comments
-        </>
+        <Icon
+          className={styles.Icon}
+          data-selected={filter === null || undefined}
+          type={filter === null ? "radio-selected" : "radio-unselected"}
+        />{" "}
+        Everyone
       </ContextMenuItem>
       <ContextMenuItem onClick={createClickHandler(() => setFilter("current-user"))}>
-        <>
-          <Icon
-            className={styles.Icon}
-            type={filter === "current-user" ? "checked-rounded" : "unchecked-rounded"}
-          />
-          My comments
-        </>
+        <Icon
+          className={styles.Icon}
+          data-selected={filter === "current-user" || undefined}
+          type={filter === "current-user" ? "radio-selected" : "radio-unselected"}
+        />
+        Only me
       </ContextMenuItem>
       <ContextMenuDivider />
       <ContextMenuCategory>Sort by</ContextMenuCategory>
       <ContextMenuItem onClick={createClickHandler(() => setSortBy("recording-time"))}>
-        <>
-          <Icon
-            className={styles.Icon}
-            type={sortBy === "recording-time" ? "checked-rounded" : "unchecked-rounded"}
-          />{" "}
-          Recording time
-        </>
+        <Icon
+          className={styles.Icon}
+          data-selected={sortBy === "recording-time" || undefined}
+          type={sortBy === "recording-time" ? "radio-selected" : "radio-unselected"}
+        />{" "}
+        Recording time
       </ContextMenuItem>
       <ContextMenuItem onClick={createClickHandler(() => setSortBy("created-at"))}>
-        <>
-          <Icon
-            className={styles.Icon}
-            type={sortBy === "created-at" ? "checked-rounded" : "unchecked-rounded"}
-          />
-          Creation date
-        </>
+        <Icon
+          className={styles.Icon}
+          data-selected={sortBy === "created-at" || undefined}
+          type={sortBy === "created-at" ? "radio-selected" : "radio-unselected"}
+        />
+        Creation date
+      </ContextMenuItem>
+      <ContextMenuDivider />
+      <ContextMenuCategory>Focus mode</ContextMenuCategory>
+      <ContextMenuItem onClick={createClickHandler(() => setHideUnfocused(!hideUnfocused))}>
+        <Icon
+          className={styles.Icon}
+          data-selected={hideUnfocused || undefined}
+          type={hideUnfocused ? "checked-rounded" : "unchecked-rounded"}
+        />{" "}
+        Hide unfocused?
       </ContextMenuItem>
     </>
   );

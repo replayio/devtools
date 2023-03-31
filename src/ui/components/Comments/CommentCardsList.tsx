@@ -26,18 +26,20 @@ export default function CommentCardsList() {
   const { isAuthenticated } = useAuth0();
 
   const displayedComments = useMemo(() => {
-    const filteredComments =
-      filter === null
-        ? comments
-        : currentUserInfo === null
-        ? []
-        : comments.filter(comment => {
-            if (comment.user?.id === currentUserInfo.id) {
-              return true;
-            } else {
-              return comment.replies.some(reply => reply.user?.id === currentUserInfo.id);
-            }
-          });
+    let filteredComments = comments;
+    if (filter !== null) {
+      if (currentUserInfo === null) {
+        filteredComments = [];
+      } else {
+        filteredComments = comments.filter(comment => {
+          if (comment.user?.id === currentUserInfo.id) {
+            return true;
+          } else {
+            return comment.replies.some(reply => reply.user?.id === currentUserInfo.id);
+          }
+        });
+      }
+    }
 
     const sortByArray =
       sortBy === "created-at"
