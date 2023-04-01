@@ -26,17 +26,17 @@
   right: 0;
   height: 2px;
 }
-.PausedOverlay[data-position="at"] {
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 2px;
-}
 .PausedOverlay[data-position="before"] {
   top: 0;
   left: 0;
   right: 0;
   height: 2px;
+}
+.PausedOverlay[data-position="current"] {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
 }
 
 .CommentCard :global(code) {

@@ -22,7 +22,7 @@ import EditableRemark from "./EditableRemark";
 import ReplyCard from "./ReplyCard";
 import styles from "./CommentCard.module.css";
 
-export type PauseOverlayPosition = "after" | "at" | "before";
+export type PauseOverlayPosition = "after" | "before" | "current";
 
 function CommentCard({
   comment,

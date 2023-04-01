@@ -75,7 +75,7 @@ export default function CommentCardsList() {
           if (comment.time >= showPauseOverlayAtTime) {
             hasShownPauseOverlay = true;
             if (showPauseOverlayAtTime === comment.time) {
-              pauseOverlayPosition = "at";
+              pauseOverlayPosition = "current";
             } else {
               pauseOverlayPosition = "before";
             }
