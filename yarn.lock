@@ -16381,24 +16381,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"launchdarkly-js-client-sdk@npm:^2.21.0":
-  version: 2.22.1
-  resolution: "launchdarkly-js-client-sdk@npm:2.22.1"
+"launchdarkly-js-client-sdk@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "launchdarkly-js-client-sdk@npm:3.1.2"
   dependencies:
-    escape-string-regexp: ^1.0.5
-    launchdarkly-js-sdk-common: 3.6.0
-  checksum: fbec5cdb7ca73d353260a2a67ebfa960805ea233eba018645ec29d107219f7f117fccb84ded881736b635ddd74cad8c0acbd9ee70682f1250031a3d48c8e6bbc
+    escape-string-regexp: ^4.0.0
+    launchdarkly-js-sdk-common: 5.0.3
+  checksum: 7e9045d91c8a6c7ce64ab1a36633479633dc67ec3f3695373807816050d260d9329280c622fe4c6cc7c50db7e37616d711947028508f04ce68d91d996ab360dc
   languageName: node
   linkType: hard
 
-"launchdarkly-js-sdk-common@npm:3.6.0":
-  version: 3.6.0
-  resolution: "launchdarkly-js-sdk-common@npm:3.6.0"
+"launchdarkly-js-sdk-common@npm:5.0.3":
+  version: 5.0.3
+  resolution: "launchdarkly-js-sdk-common@npm:5.0.3"
   dependencies:
     base64-js: ^1.3.0
     fast-deep-equal: ^2.0.1
-    uuid: ^3.3.2
-  checksum: 3694aac635ffc6e8f6c9292950795accbcd0283a9a6ea1a4f79bdc05c74725befaf648db1ca52c43c6fee94dcbce1af3c2dbdbf09666d34c380762920481c505
+    uuid: ^8.0.0
+  checksum: 69f03217e1810f4a8a1d7f72035022902b96aa0fe4b6a45fe29b9430120a7becdb3540c3a0ffcf2044f88d62aaebef9bc1bb068a59ddc1cacfd447be988aa97f
   languageName: node
   linkType: hard
 
@@ -20687,7 +20687,7 @@ __metadata:
     jest-environment-jsdom: ^28.0.2
     jest-in-case: ^1.0.2
     jwt-decode: ^3.1.2
-    launchdarkly-js-client-sdk: ^2.21.0
+    launchdarkly-js-client-sdk: ^3.1.2
     lexical: ^0.6.5
     lodash: ^4.17.21
     logrocket: ^2.2.1
@@ -24286,7 +24286,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^8.3.2":
+"uuid@npm:^8.0.0, uuid@npm:^8.3.2":
   version: 8.3.2
   resolution: "uuid@npm:8.3.2"
   bin:
