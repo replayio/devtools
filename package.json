@@ -45,7 +45,7 @@
     "@replayio/protocol": "^0.43.0",
     "@sentry/react": "^7.9.0",
     "@sentry/tracing": "^7.9.0",
-    "@stripe/react-stripe-js": "^1.7.0",
+    "@stripe/react-stripe-js": "^2.1.0",
     "@stripe/stripe-js": "^1.26.0",
     "@svgr/webpack": "^6.2.1",
     "classnames": "^2.3.1",

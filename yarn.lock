@@ -5452,16 +5452,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stripe/react-stripe-js@npm:^1.7.0":
-  version: 1.8.1
-  resolution: "@stripe/react-stripe-js@npm:1.8.1"
+"@stripe/react-stripe-js@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@stripe/react-stripe-js@npm:2.1.0"
   dependencies:
     prop-types: ^15.7.2
   peerDependencies:
-    "@stripe/stripe-js": ^1.26.0
+    "@stripe/stripe-js": ^1.44.1
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 0a7a5743a4efcffe6f6067d3b097fe1b77de26ab790ea3ad26ea9b06ec2b3abda1f66e5433ae47e9fab1d6c43bce5e3f7b08bd5c4882616109aad9334ada4085
+  checksum: ae5a26e44bd43bcb36ea7d578a2fe0920e75eb46f6f942eae88c3758cb8328a70f891d3a492760d3e6021e7dd93b0d4e4e279ffe169cfa671049c690c210fba0
   languageName: node
   linkType: hard
 
@@ -20606,7 +20606,7 @@ __metadata:
     "@storybook/builder-webpack5": ^6.4.21
     "@storybook/manager-webpack5": ^6.4.20
     "@storybook/react": ^6.5.9
-    "@stripe/react-stripe-js": ^1.7.0
+    "@stripe/react-stripe-js": ^2.1.0
     "@stripe/stripe-js": ^1.26.0
     "@svgr/webpack": ^6.2.1
     "@tailwindcss/forms": ^0.5.0
