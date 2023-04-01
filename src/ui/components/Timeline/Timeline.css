@@ -224,6 +224,7 @@
   top: 50%;
   transform: translate(-50%, -50%);
   cursor: grab;
+  z-index: var(--z-index-1--timeline-current-indicator);
 }
 
 .timeline .progress-line-paused-edit-mode-active {

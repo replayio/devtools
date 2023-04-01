@@ -17,12 +17,26 @@
 }
 
 .PausedOverlay {
+  background-color: var(--secondary-accent);
   position: absolute;
+}
+.PausedOverlay[data-position="after"] {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+.PausedOverlay[data-position="before"] {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+.PausedOverlay[data-position="current"] {
   top: 0;
   bottom: 0;
   left: 0;
   width: 2px;
-  background-color: var(--secondary-accent);
 }
 
 .CommentCard :global(code) {

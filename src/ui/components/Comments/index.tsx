@@ -1,5 +1,5 @@
 import sortBy from "lodash/sortBy";
-import React, { useMemo } from "react";
+import React, { ReactNode, useMemo } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { useGetComments } from "ui/hooks/comments/comments";
@@ -23,7 +23,7 @@ function Comments({ hoveredItem }: PropsFromRedux) {
   }
 
   return (
-    <div className="comments-container">
+    <>
       {sortedComments.map((comment, index) => {
         const isPrimaryHighlighted = hoveredItem?.point === comment.point;
         return (
@@ -35,7 +35,7 @@ function Comments({ hoveredItem }: PropsFromRedux) {
           />
         );
       })}
-    </div>
+    </>
   );
 }
 

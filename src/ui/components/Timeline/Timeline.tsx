@@ -147,11 +147,13 @@ export default function Timeline() {
             <div className="progress-bar" ref={progressBarRef}>
               <ProgressBars />
               <PreviewMarkers />
-              <Comments />
+              <div className="comments-container">
+                <Comments />
+                <CurrentTimeIndicator editMode={editMode} />
+              </div>
               <NonLoadingRegions />
               <UnfocusedRegion />
               {showLoadingProgress && <LoadingProgressBars />}
-              <CurrentTimeIndicator editMode={editMode} />
               <Focuser
                 editMode={editMode}
                 setEditMode={setEditMode}
