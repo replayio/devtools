@@ -39,7 +39,7 @@ function CommentCard({
   const context = useAppSelector(getThreadContext);
   const dispatch = useAppDispatch();
 
-  const { filter } = useUserCommentPreferences();
+  const { filter, showPreview } = useUserCommentPreferences();
 
   const onClick = (event: MouseEvent) => {
     event.stopPropagation();
@@ -92,7 +92,7 @@ function CommentCard({
         <div className={styles.PausedOverlay} data-position={pauseOverlayPosition} />
       )}
 
-      <CommentPreview comment={comment} onClick={onPreviewClick} />
+      {showPreview && <CommentPreview comment={comment} onClick={onPreviewClick} />}
 
       <EditableRemark remark={comment} type="comment" />
 

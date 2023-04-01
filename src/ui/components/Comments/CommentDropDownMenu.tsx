@@ -19,7 +19,8 @@ function createClickHandler(callback: () => void): (event: MouseEvent) => void {
 }
 
 export default function CommentDropDownMenu() {
-  const { filter, setFilter, setSortBy, sortBy } = useUserCommentPreferences();
+  const { filter, showPreview, setFilter, setShowPreview, setSortBy, sortBy } =
+    useUserCommentPreferences();
 
   const { contextMenu, onContextMenu: onClick } = useContextMenu(
     <>
@@ -57,6 +58,15 @@ export default function CommentDropDownMenu() {
           type={sortBy === "created-at" ? "radio-selected" : "radio-unselected"}
         />
         Creation date
+      </ContextMenuItem>
+      <ContextMenuDivider />
+      <ContextMenuItem onClick={createClickHandler(() => setShowPreview(!showPreview))}>
+        <Icon
+          className={styles.Icon}
+          data-selected={showPreview || undefined}
+          type={showPreview ? "checked-rounded" : "unchecked-rounded"}
+        />
+        Show preview?
       </ContextMenuItem>
     </>
   );
