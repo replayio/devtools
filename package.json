@@ -123,7 +123,7 @@
     "@replayio/replay": "^0.12.4",
     "@storybook/addon-actions": "^6.4.20",
     "@storybook/addon-essentials": "^6.5.9",
-    "@storybook/addon-links": "^6.4.20",
+    "@storybook/addon-links": "^6.5.16",
     "@storybook/addon-postcss": "^2.0.0",
     "@storybook/builder-webpack5": "^6.4.21",
     "@storybook/manager-webpack5": "^6.4.20",
