@@ -7,6 +7,10 @@ type SortBy = "created-at" | "recording-time";
 
 export default function useUserCommentPreferences() {
   const [filter, setFilter] = useLocalStorage<Filter>("Replay:CommentPreferences:Filter", null);
+  const [showPreview, setShowPreview] = useLocalStorage<boolean>(
+    "Replay:CommentPreferences:ShowPreview",
+    true
+  );
   const [sortBy, setSortBy] = useLocalStorage<SortBy>(
     "Replay:CommentPreferences:sortBy",
     "recording-time"
@@ -16,9 +20,11 @@ export default function useUserCommentPreferences() {
     () => ({
       filter,
       setFilter,
+      setShowPreview,
       setSortBy,
+      showPreview,
       sortBy,
     }),
-    [filter, setFilter, setSortBy, sortBy]
+    [filter, setFilter, setShowPreview, setSortBy, showPreview, sortBy]
   );
 }
