@@ -652,7 +652,7 @@ export const RecordedAppProtocolViewer = React.forwardRef(function RecordedAppPr
     );
   }
 
-  return <div>{content}</div>;
+  return content;
 });
 
 type ProtocolViewerTabs = "live" | "recorded";
