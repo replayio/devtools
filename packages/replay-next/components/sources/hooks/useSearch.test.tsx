@@ -23,10 +23,7 @@ function stableFindInitialIndex(): number {
 function stableSearch(query: string, items: Item[], caseSensitive: QueryData | null = false) {
   const needle = caseSensitive ? query : query.toLowerCase();
   return items.filter(item => {
-    if (!caseSensitive) {
-      item.toLowerCase();
-    }
-    return item.includes(needle);
+    return caseSensitive ? item.includes(needle) : item.toLowerCase().includes(needle);
   });
 }
 
@@ -203,7 +200,7 @@ describe("useSearch", () => {
       expect(stableSearchMock).toHaveBeenCalledTimes(2);
     });
 
-    it("should re-run stale searches when scopes change", async () => {
+    it("should re-run stale searches when scopes change but should not select a default result", async () => {
       const scopeAId = "scope-a";
       const scopeBId = "scope-b";
       const scopeAItems = ["bob", "charles", "greg", "stan"];
@@ -211,15 +208,41 @@ describe("useSearch", () => {
 
       render(scopeAItems, scopeAId);
       search("a");
+      expect(currentState?.index).toBe(0);
       expect(currentState?.results).toEqual(["charles", "stan"]);
 
       render(scopeBItems, scopeBId);
       expect(currentState?.results).toEqual(["alice", "mary", "sally"]);
       search("ar");
+      expect(currentState?.index).toBe(0);
       expect(currentState?.results).toEqual(["mary"]);
 
       render(scopeAItems, scopeAId);
+      expect(currentState?.index).toBe(-1);
       expect(currentState?.results).toEqual(["charles"]);
+    });
+
+    it("should not select a default result when items change after a scope change", async () => {
+      const scopeAId = "scope-a";
+      const scopeBId = "scope-b";
+      const scopeAItems = ["bob", "charles", "greg", "stan"];
+      const scopeBItems = ["alice", "mary", "sally"];
+
+      render(scopeAItems, scopeAId);
+      search("a");
+      expect(currentState?.index).toBe(0);
+
+      // Simulate scope changing while items are still loading.
+      render([], scopeBId);
+      expect(currentState?.index).toBe(-1);
+
+      // At this point, items loading it should not select a default result.
+      render(scopeBItems, scopeBId);
+      expect(currentState?.index).toBe(-1);
+
+      // A default result should only be selected when the user explicitly chooses to increment.
+      goToNext();
+      expect(currentState?.index).toBe(0);
     });
   });
 
@@ -242,24 +265,35 @@ describe("useSearch", () => {
       expect(currentState?.results).toEqual(["bar", "baz"]);
     });
 
-    it("should (only) re-run search when query or queryData changes", async () => {
+    it("should re-run search only when query or queryData changes", async () => {
       render(DEFAULT_ITEMS);
+      expect(currentState?.index).toBe(-1);
       expect(stableSearchMock).toHaveBeenCalledTimes(0);
 
-      search("b");
+      search("B");
+      expect(currentState?.index).toBe(0);
       expect(stableSearchMock).toHaveBeenCalledTimes(1);
 
       render(DEFAULT_ITEMS);
       expect(stableSearchMock).toHaveBeenCalledTimes(1);
 
-      search("ba");
+      search("BA");
+      expect(currentState?.index).toBe(0);
       expect(stableSearchMock).toHaveBeenCalledTimes(2);
 
-      search("ba", true);
+      search("BA", true);
+      expect(currentState?.results).toEqual([]);
+      expect(currentState?.index).toBe(-1);
       expect(stableSearchMock).toHaveBeenCalledTimes(3);
 
       render(DEFAULT_ITEMS);
+      expect(currentState?.results).toEqual([]);
+      expect(currentState?.index).toBe(-1);
       expect(stableSearchMock).toHaveBeenCalledTimes(3);
+
+      search("BA");
+      expect(currentState?.index).toBe(0);
+      expect(stableSearchMock).toHaveBeenCalledTimes(4);
     });
   });
 });
