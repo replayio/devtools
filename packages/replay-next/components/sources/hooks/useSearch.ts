@@ -285,7 +285,9 @@ export default function useSearch<Item, Result, QueryData = never>(
           index = results.indexOf(prevItem);
         }
 
-        if (index < 0) {
+        // This code may run if items change (e.g. as items stream in)
+        // but we should only re-compute an initial index if the query (or query criteria) have changed.
+        if (index < 0 && (queryChanged || queryDataChanged)) {
           index = findInitialIndex(results);
         }
       }
