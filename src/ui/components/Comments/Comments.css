@@ -2,8 +2,9 @@
   position: absolute;
   pointer-events: none;
   width: 100%;
-  top: 9px; /* Arbitrary value to push the markers away from the bottom of the overlay container */
-  height: 17px; /* Corresponds with the height of the comment marker */
+  top: 50%;
+  transform: translate(0, -50%);
+  height: 15px;
   z-index: var(--z-index-1--timeline-comment);
 }
 
@@ -15,6 +16,8 @@
   width: 15px;
   height: 15px;
   position: absolute;
+  top: 50%;
+  transform: translate(0, -50%);
   outline: none;
   background-color: var(--primary-accent);
   border-radius: 8px;

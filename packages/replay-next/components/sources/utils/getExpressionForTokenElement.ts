@@ -1,7 +1,13 @@
+import { getTokenTypeFromClassName } from "replay-next/components/sources/utils/tokens";
+
 export default function getExpressionForTokenElement(
   rowElement: HTMLElement,
   tokenElement: HTMLElement
 ): string | null {
+  if (!tokenElement.hasAttribute("data-inspectable-token")) {
+    return null;
+  }
+
   if (tokenElement.tagName === "PRE") {
     return null;
   }
@@ -19,31 +25,39 @@ export default function getExpressionForTokenElement(
   const children = Array.from(rowElement.childNodes);
 
   let expression = tokenElement.textContent!;
-  let currentTokenElement = tokenElement;
-  while (currentTokenElement != null) {
-    const index = children.indexOf(currentTokenElement);
-    if (index < 1) {
-      break;
-    }
+  let index = children.indexOf(tokenElement) - 1;
+  outer: while (index >= 0) {
+    const currentTokenElement = children[index] as HTMLElement;
+    const tokenType = getTokenTypeFromClassName(currentTokenElement.className);
+    const code = currentTokenElement.textContent;
 
-    currentTokenElement = children[index - 1] as HTMLElement;
     if (currentTokenElement.nodeName === "#text") {
       break;
     } else {
-      const textContent = currentTokenElement.textContent;
+      const textContent = code;
       if (textContent === null || textContent.trim() === "") {
         break;
       }
     }
 
-    if (currentTokenElement.className !== "tok-punctuation") {
-      expression = currentTokenElement.textContent + expression;
+    switch (tokenType) {
+      case "operator":
+      case "punctuation":
+        if (code !== ".") {
+          break outer;
+        }
+      case "propertyName":
+      case "variableName":
+      case "variableName2":
+        break;
+      default:
+        break outer;
     }
 
-    if (currentTokenElement.textContent !== ".") {
-      break;
-    }
+    expression = code + expression;
+
+    index--;
   }
 
-  return expression.startsWith(".") ? expression.slice(1) : expression;
+  return expression;
 }

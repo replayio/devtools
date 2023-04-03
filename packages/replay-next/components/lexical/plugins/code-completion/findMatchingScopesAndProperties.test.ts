@@ -133,4 +133,13 @@ describe("findMatches", () => {
       "fooBarBaz",
     ]);
   });
+
+  // FE-1169
+  it("should de-duplicate matches", () => {
+    const properties = createPropertiesFromNames("foo:0", "foo:1", "fooBar:1");
+    const scopes = createScopesFromNames();
+
+    expect(findMatches("array", null, scopes, properties)).toEqual(["foo", "fooBar"]);
+    expect(findMatches("array", "foo", scopes, properties)).toEqual(["foo", "fooBar"]);
+  });
 });

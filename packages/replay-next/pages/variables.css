@@ -106,8 +106,9 @@
   --z-index-8: 80;
   --z-index-9: 90;
   --z-index-10: 100;
+  --z-index-1--timeline-current-indicator: var(--z-index-1);
   --z-index-1--timeline-comment: var(--z-index-1);
-  --z-index-1--paused-comment: var(--z-index-1);
+  --z-index-1--paused-comment: var(--z-index-2);
   --z-index-1--paused-message: var(--z-index-1);
   --z-index-1--comment-container: var(--z-index-1);
   --z-index-1--tooltip: var(--z-index-1);
