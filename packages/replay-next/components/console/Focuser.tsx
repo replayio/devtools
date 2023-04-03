@@ -11,7 +11,7 @@ import styles from "./Focuser.module.css";
 
 export default function Focuser() {
   const { duration } = useContext(SessionContext);
-  const { rangeForDisplay, update } = useContext(FocusContext);
+  const { rangeForDisplay, updateForTimelineImprecise: update } = useContext(FocusContext);
 
   const begin = rangeForDisplay === null ? 0 : rangeForDisplay.begin.time / duration;
   const end = rangeForDisplay === null ? 1 : rangeForDisplay.end.time / duration;

@@ -55,7 +55,7 @@ describe("Focuser", () => {
 
   it("should allow the focus region to be toggled on and off", async () => {
     const {
-      focusContext: { update },
+      focusContext: { updateForTimelineImprecise },
     } = await renderFocused(<Focuser />, {
       focusContext: {
         range: null,
@@ -66,10 +66,10 @@ describe("Focuser", () => {
       },
     });
 
-    expect(update).not.toHaveBeenCalled();
+    expect(updateForTimelineImprecise).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByText("Focus off"));
 
-    expect(update).toHaveBeenCalledWith([0, 60_000], false);
+    expect(updateForTimelineImprecise).toHaveBeenCalledWith([0, 60_000], false);
   });
 });

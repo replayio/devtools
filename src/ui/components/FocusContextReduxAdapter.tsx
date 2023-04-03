@@ -1,7 +1,8 @@
+import { TimeStampedPointRange } from "@replayio/protocol";
 import { PropsWithChildren, useCallback, useEffect, useMemo, useState, useTransition } from "react";
 
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { Range } from "replay-next/src/types";
+import { TimeRange } from "replay-next/src/types";
 import { enterFocusMode, setFocusRegionFromTimeRange } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getFocusRegion } from "ui/reducers/timeline";
@@ -25,7 +26,23 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
   }, [focusRegion, loadedRegions]);
 
   const update = useCallback(
-    (value: Range | null, _: boolean) => {
+    (value: TimeStampedPointRange | null, _: boolean) => {
+      dispatch(
+        setFocusRegionFromTimeRange(
+          value !== null
+            ? {
+                begin: value.begin.time,
+                end: value.end.time,
+              }
+            : null
+        )
+      );
+    },
+    [dispatch]
+  );
+
+  const updateForTimelineImprecise = useCallback(
+    (value: TimeRange | null, _: boolean) => {
       dispatch(
         setFocusRegionFromTimeRange(
           value !== null
@@ -49,8 +66,9 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
       range: deferredFocusRegion ? rangeForFocusRegion(deferredFocusRegion) : null,
       rangeForDisplay: focusRegion ? rangeForFocusRegion(focusRegion) : null,
       update,
+      updateForTimelineImprecise,
     };
-  }, [deferredFocusRegion, dispatch, isPending, focusRegion, update]);
+  }, [deferredFocusRegion, dispatch, isPending, focusRegion, update, updateForTimelineImprecise]);
 
   return <FocusContext.Provider value={context}>{children}</FocusContext.Provider>;
 }
