@@ -643,7 +643,7 @@ export const RecordedAppProtocolViewer = React.forwardRef(function RecordedAppPr
   if (sourceDetails.length === 0) {
     content = <i>Loading sources...</i>;
   } else if (!isRecordingOfReplay) {
-    content = <span className="text-base">Not a recording of Replay</span>;
+    content = <h3 className={styles.Header}>Not a recording of Replay</h3>;
   } else {
     content = (
       <Suspense fallback={<Loader />}>
