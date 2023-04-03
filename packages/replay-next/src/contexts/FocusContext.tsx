@@ -122,8 +122,10 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
       if (value) {
         const [timeBegin, timeEnd] = value;
 
-        const pointBegin = await imperativelyGetClosestPointForTime(client, timeBegin);
-        const pointEnd = await imperativelyGetClosestPointForTime(client, timeEnd);
+        const [pointBegin, pointEnd] = await Promise.all([
+          imperativelyGetClosestPointForTime(client, timeBegin),
+          imperativelyGetClosestPointForTime(client, timeEnd),
+        ]);
 
         updateFocusRange(
           {
