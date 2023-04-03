@@ -8,7 +8,11 @@ import Icon from "replay-next/components/Icon";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
-import { getLoggableTime, isPointInstance } from "replay-next/src/utils/loggables";
+import {
+  getLoggableExecutionPoint,
+  getLoggableTime,
+  isPointInstance,
+} from "replay-next/src/utils/loggables";
 import { Badge, POINT_BEHAVIOR_DISABLED_TEMPORARILY } from "shared/client/types";
 
 import { Loggable } from "./LoggablesContext";
@@ -19,20 +23,38 @@ const BADGES: Badge[] = ["green", "yellow", "orange", "purple"];
 export default function useConsoleContextMenu(loggable: Loggable) {
   const { rangeForDisplay, update } = useContext(FocusContext);
   const { editPointBadge, editPointBehavior } = useContext(PointsContext);
-  const { currentUserInfo, duration } = useContext(SessionContext);
+  const { currentUserInfo, duration, endpoint } = useContext(SessionContext);
 
   const setFocusBegin = () => {
-    const begin = getLoggableTime(loggable);
-    const end = rangeForDisplay !== null ? rangeForDisplay.end.time : duration;
-
-    update([begin, end], true);
+    update(
+      {
+        begin: {
+          point: getLoggableExecutionPoint(loggable),
+          time: getLoggableTime(loggable),
+        },
+        end: rangeForDisplay?.end ?? {
+          point: endpoint,
+          time: duration,
+        },
+      },
+      true
+    );
   };
 
   const setFocusEnd = () => {
-    const end = getLoggableTime(loggable);
-    const begin = rangeForDisplay !== null ? rangeForDisplay.begin.time : 0;
-
-    update([begin, end], true);
+    update(
+      {
+        begin: rangeForDisplay?.begin ?? {
+          point: "0",
+          time: 0,
+        },
+        end: {
+          point: getLoggableExecutionPoint(loggable),
+          time: getLoggableTime(loggable),
+        },
+      },
+      true
+    );
   };
 
   const setBadge = (badge: Badge | null) => {
