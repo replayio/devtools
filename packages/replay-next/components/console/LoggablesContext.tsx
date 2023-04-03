@@ -226,17 +226,26 @@ export function LoggablesContextRoot({
   useLayoutEffect(() => {
     const list = messageListRef.current;
     if (list !== null) {
-      list.childNodes.forEach((node: ChildNode) => {
-        const element = node as HTMLElement;
+      const filter = () => {
+        list.childNodes.forEach((node: ChildNode) => {
+          const element = node as HTMLElement;
 
-        if (element.hasAttribute("data-search-index")) {
-          const textContent = element.textContent?.toLocaleLowerCase();
-          const matches = textContent?.includes(filterByLowerCaseText);
+          if (element.hasAttribute("data-search-index")) {
+            const textContent = element.textContent?.toLocaleLowerCase();
+            const matches = textContent?.includes(filterByLowerCaseText);
 
-          // HACK Style must be compatible with the visibility check in useConsoleSearchDOM()
-          element.style.display = matches ? "inherit" : "none";
-        }
-      });
+            // HACK Style must be compatible with the visibility check in useConsoleSearchDOM()
+            element.style.display = matches ? "inherit" : "none";
+          }
+        });
+      };
+
+      const observer = new MutationObserver(filter);
+      observer.observe(list, { childList: true, subtree: true });
+
+      filter();
+
+      return () => observer.disconnect();
     }
   }, [filterByLowerCaseText, messageListRef, sortedLoggables]);
 
