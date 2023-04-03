@@ -50,6 +50,6 @@ export function shouldShowBreakpointEdit(nags: Nag[]): boolean {
 
 export function shouldShowTour(nags: Nag[]): boolean {
   const showTour = shouldShowNag(nags, Nag.DISMISS_TOUR);
-  const showConsoleNavigate = shouldShowConsoleNavigate(nags);
-  return showTour && showConsoleNavigate;
+  const showBreakpointEdit = shouldShowBreakpointEdit(nags);
+  return showTour && showBreakpointEdit;
 }
