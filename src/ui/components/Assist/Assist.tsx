@@ -128,7 +128,7 @@ const Assist: React.FC = () => {
     {
       label: "Jump to event",
       completed: showJumpToEvent,
-      videoUrl: "https://vercel.replay.io/assist/jump_to_event.gif",
+      videoUrl: "https://vercel.replay.io/assist/jump_to_an_event.gif",
     },
     {
       label: "Jump to code",
@@ -158,7 +158,7 @@ const Assist: React.FC = () => {
     {
       label: "Inspect element",
       completed: showInspectElement,
-      videoUrl: "https://vercel.replay.io/assist/inspect_element.gif",
+      videoUrl: "https://vercel.replay.io/assist/inspect_an_element.gif",
     },
   ];
 
