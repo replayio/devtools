@@ -13,6 +13,7 @@ import {
 } from "ui/actions/app";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
 import useVideoCommentTool from "ui/components/useVideoCommentTool";
+import useVideoContextMenu from "ui/components/useVideoContextMenu";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { getPlayback, isPlaybackStalled } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
@@ -51,6 +52,8 @@ export default function Video() {
     canvasRef,
     recordingId: recordingId!,
   });
+
+  const { contextMenu, onContextMenu } = useVideoContextMenu({ canvasRef });
 
   useEffect(() => {
     installObserver();
@@ -106,12 +109,14 @@ export default function Video() {
       <canvas
         id="graphics"
         onClick={onClick}
+        onContextMenu={onContextMenu}
         onMouseDown={onMouseDown}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         onMouseMove={onMouseMove}
         ref={canvasRef}
       />
+      {contextMenu}
       {showCommentTool ? (
         <CommentsOverlay>
           {showSpinner && (
