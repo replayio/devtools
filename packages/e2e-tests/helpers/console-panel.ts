@@ -16,15 +16,23 @@ const categoryNames = {
 
 type CategoryKey = keyof typeof categoryNames;
 
-export async function addEventListenerLogpoints(page: Page, eventTypes: string[]): Promise<void> {
+export interface EventListenerEntry {
+  eventType: string;
+  categoryKey: string;
+}
+
+export async function addEventListenerLogpoints(
+  page: Page,
+  eventEntries: EventListenerEntry[]
+): Promise<void> {
   await toggleSideFilters(page, true);
 
-  for (let eventType of eventTypes) {
-    const [, categoryKey, eventName] = eventType.split(".");
+  for (let eventEntry of eventEntries) {
+    const { categoryKey, eventType } = eventEntry;
 
     await debugPrint(
       page,
-      `Adding event type "${chalk.bold(eventName)}" in category "${chalk.bold(categoryKey)}"`,
+      `Adding event type "${chalk.bold(eventType)}" in category "${chalk.bold(categoryKey)}"`,
       "addEventListenerLogpoints"
     );
 
