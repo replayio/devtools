@@ -8,26 +8,23 @@ export default function useContextMenu(
   options: {
     dataTestId?: string;
     dataTestName?: string;
-    onContextMenuEvent?: (event: MouseEvent) => void;
-    onHide?: (event: MouseEvent) => void | Promise<void>;
+    onHide?: () => void | Promise<void>;
     onShow?: (event: MouseEvent) => void | Promise<void>;
   } = {}
 ): {
   contextMenu: ReactNode | null;
   onContextMenu: (event: MouseEvent) => void;
 } {
-  const { dataTestId, dataTestName, onContextMenuEvent, onHide, onShow } = options;
+  const { dataTestId, dataTestName, onHide, onShow } = options;
 
   const committedValuesRef = useRef<{
-    onContextMenuEvent?: (event: MouseEvent) => void;
-    onHide?: (event: MouseEvent) => void | Promise<void>;
+    onHide?: () => void | Promise<void>;
     onShow?: (event: MouseEvent) => void | Promise<void>;
-  }>({ onContextMenuEvent, onHide, onShow });
+  }>({ onHide, onShow });
 
   const [contextMenuEvent, setContextMenuEvent] = useState<MouseEvent | null>(null);
 
   useEffect(() => {
-    committedValuesRef.current.onContextMenuEvent = onContextMenuEvent;
     committedValuesRef.current.onHide = onHide;
     committedValuesRef.current.onShow = onShow;
   });
@@ -42,10 +39,6 @@ export default function useContextMenu(
 
     event.preventDefault();
 
-    if (typeof onContextMenuEvent === "function") {
-      onContextMenuEvent(event);
-    }
-
     if (typeof onShow === "function") {
       onShow(event);
     }
@@ -59,7 +52,7 @@ export default function useContextMenu(
     setContextMenuEvent(null);
 
     if (typeof onHide === "function") {
-      onHide(contextMenuEvent);
+      onHide();
     }
   }, []);
 

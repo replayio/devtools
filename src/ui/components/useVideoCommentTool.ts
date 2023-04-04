@@ -76,7 +76,7 @@ export default function useVideoCommentTool({
   return { onClick, onMouseEnter, onMouseLeave, onMouseMove, tooltip };
 }
 
-function mouseEventCanvasPosition(event: MouseEvent): { x: number; y: number } {
+export function mouseEventCanvasPosition(event: MouseEvent): { x: number; y: number } {
   const canvas = document.getElementById("graphics");
   const bounds = canvas!.getBoundingClientRect();
 
