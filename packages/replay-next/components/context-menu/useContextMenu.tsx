@@ -1,4 +1,4 @@
-import { MouseEvent, ReactNode, useCallback, useMemo, useState } from "react";
+import { MouseEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import ContextMenu from "./ContextMenu";
 import { ContextMenuContext, ContextMenuContextType } from "./ContextMenuContext";
@@ -9,14 +9,28 @@ export default function useContextMenu(
     dataTestId?: string;
     dataTestName?: string;
     onContextMenuEvent?: (event: MouseEvent) => void;
+    onHide?: (event: MouseEvent) => void | Promise<void>;
+    onShow?: (event: MouseEvent) => void | Promise<void>;
   } = {}
 ): {
   contextMenu: ReactNode | null;
   onContextMenu: (event: MouseEvent) => void;
 } {
-  const { dataTestId, dataTestName, onContextMenuEvent } = options;
+  const { dataTestId, dataTestName, onContextMenuEvent, onHide, onShow } = options;
+
+  const committedValuesRef = useRef<{
+    onContextMenuEvent?: (event: MouseEvent) => void;
+    onHide?: (event: MouseEvent) => void | Promise<void>;
+    onShow?: (event: MouseEvent) => void | Promise<void>;
+  }>({ onContextMenuEvent, onHide, onShow });
 
   const [contextMenuEvent, setContextMenuEvent] = useState<MouseEvent | null>(null);
+
+  useEffect(() => {
+    committedValuesRef.current.onContextMenuEvent = onContextMenuEvent;
+    committedValuesRef.current.onHide = onHide;
+    committedValuesRef.current.onShow = onShow;
+  });
 
   const context = useMemo<ContextMenuContextType>(() => ({ contextMenuEvent }), [contextMenuEvent]);
 
@@ -32,10 +46,22 @@ export default function useContextMenu(
       onContextMenuEvent(event);
     }
 
+    if (typeof onShow === "function") {
+      onShow(event);
+    }
+
     setContextMenuEvent(event);
   };
 
-  const hideContextMenu = useCallback(() => setContextMenuEvent(null), []);
+  const hideContextMenu = useCallback(() => {
+    const { onHide } = committedValuesRef.current;
+
+    setContextMenuEvent(null);
+
+    if (typeof onHide === "function") {
+      onHide(contextMenuEvent);
+    }
+  }, []);
 
   let contextMenu = null;
   if (contextMenuEvent) {
