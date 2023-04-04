@@ -32,19 +32,6 @@ import {
 
 import styles from "./Assist.module.css";
 
-const useNagDismissal = () => {
-  const dismissNag = useDismissNag();
-  const dispatch = useAppDispatch();
-  const info = useTestInfo();
-
-  const dismissTourNag = () => {
-    const initialPrimaryPanel = "events";
-    dispatch(setSelectedPrimaryPanel(initialPrimaryPanel));
-    dismissNag(Nag.DISMISS_TOUR);
-  };
-
-  return { dismissTourNag };
-};
 
 const Assist: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState(2);
