@@ -52,7 +52,7 @@ function KeyboardShortcuts({
   toggleThemeAction,
   toggleQuickOpen,
   closeOpenModalsOnEscape,
-  jumpToLastPause,
+  jumpToPreviousPause,
   jumpToNextPause,
 }: PropsFromRedux) {
   const recordingId = useGetRecordingId();
@@ -138,10 +138,10 @@ function KeyboardShortcuts({
       }
     };
 
-    const jumpToLastPauseWrapper = (e: KeyboardEvent) => {
+    const jumpToPreviousPauseWrapper = (e: KeyboardEvent) => {
       if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
-        jumpToLastPause();
+        jumpToPreviousPause();
       }
     };
 
@@ -168,7 +168,7 @@ function KeyboardShortcuts({
       // Can pre-fill the dialog with specific filter prefixes
       "CmdOrCtrl+Shift+O": toggleFunctionQuickOpenModal,
       "CmdOrCtrl+O": toggleProjectFunctionQuickOpenModal,
-      "CmdOrCtrl+[": jumpToLastPauseWrapper,
+      "CmdOrCtrl+[": jumpToPreviousPauseWrapper,
       "CmdOrCtrl+]": jumpToNextPauseWrapper,
       "~": toggleProtocolTimeline,
 
@@ -191,7 +191,7 @@ function KeyboardShortcuts({
     closeOpenModalsOnEscape,
     createFrameComment,
     recordingId,
-    jumpToLastPause,
+    jumpToPreviousPause,
     jumpToNextPause,
   ]);
 
@@ -225,7 +225,7 @@ const connector = connect(
     toggleThemeAction: actions.toggleTheme,
     toggleQuickOpen,
     closeOpenModalsOnEscape,
-    jumpToLastPause: actions.jumpToLastPause,
+    jumpToPreviousPause: actions.jumpToPreviousPause,
     jumpToNextPause: actions.jumpToNextPause,
   }
 );

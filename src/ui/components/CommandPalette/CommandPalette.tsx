@@ -45,7 +45,7 @@ export type CommandKey =
   | "toggle_dark_mode"
   | "toggle_edit_focus"
   | "jump_to_next_pause"
-  | "jump_to_last_pause";
+  | "jump_to_previous_pause";
 
 const COMMANDS: readonly Command[] = [
   { key: "open_console", label: "Open Console" },

@@ -4,7 +4,7 @@ import { seek } from "ui/actions/timeline";
 import { pauseHistoryDecremented, pauseHistoryIncremented } from "../../reducers/pause";
 import { getPauseHistory, getPauseHistoryIndex } from "../../selectors";
 
-export function jumpToLastPause(): UIThunkAction {
+export function jumpToPreviousPause(): UIThunkAction {
   return (dispatch, getState) => {
     const pauseHistory = getPauseHistory(getState());
     const pauseHistoryIndex = getPauseHistoryIndex(getState());

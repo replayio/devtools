@@ -14,4 +14,4 @@ export { resumed } from "../../reducers/pause";
 export { paused } from "./paused";
 export { selectFrame } from "./selectFrame";
 export * from "./previewPausedLocation";
-export { jumpToNextPause, jumpToLastPause } from "./jumps";
+export { jumpToNextPause, jumpToPreviousPause } from "./jumps";
