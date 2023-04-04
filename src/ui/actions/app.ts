@@ -2,10 +2,10 @@ import { KeyboardEvent, NodeBounds } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
-import { shallowEqual } from "devtools/client/debugger/src/utils/compare";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { ReplayClientInterface } from "shared/client/types";
+import { shallowEqual } from "shared/utils/compare";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 import { getEventsForType } from "ui/reducers/app";
 import { getTheme } from "ui/reducers/app";
