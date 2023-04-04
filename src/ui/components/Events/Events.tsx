@@ -1,10 +1,11 @@
 import classNames from "classnames";
 import sortedLastIndex from "lodash/sortedLastIndex";
-import React from "react";
+import { memo, useMemo } from "react";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { getFilteredEventsForFocusRegion } from "ui/actions/app";
 import { seek } from "ui/actions/timeline";
+import useEventsPreferences from "ui/components/Events/useEventsPreferences";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
@@ -26,19 +27,41 @@ function Events() {
   const executionPoint = useAppSelector(getExecutionPoint);
   const events = useAppSelector(getFilteredEventsForFocusRegion);
 
+  const { filters } = useEventsPreferences();
+
+  const filteredEvents = useMemo(
+    () =>
+      events.filter(event => {
+        switch (event.kind) {
+          case "keydown":
+          case "keyup":
+          case "keypress":
+            return filters.keyboard !== false;
+          case "mousedown":
+            return filters.mouse !== false;
+          case "navigation":
+            return filters.navigation !== false;
+        }
+
+        return true;
+      }),
+    [events, filters]
+  );
+
   const onSeek = (point: string, time: number) => {
     trackEvent("events_timeline.select");
     dispatch(seek(point, time, false));
   };
 
   const currentEventIndex = sortedLastIndex(
-    events.map(e => e.time),
+    filteredEvents.map(event => event.time),
     currentTime
   );
-  if (events.length > 0) {
+
+  if (filteredEvents.length > 0) {
     return (
       <div className="bg-bodyBgcolor py-1.5 text-xs">
-        {events.map((event, index) => {
+        {filteredEvents.map((event, index) => {
           return (
             <div key={event.point}>
               <CurrentTimeLine isActive={currentEventIndex === index} />
@@ -53,7 +76,9 @@ function Events() {
             </div>
           );
         })}
-        <CurrentTimeLine isActive={currentEventIndex === events.length && !!events.length} />
+        <CurrentTimeLine
+          isActive={currentEventIndex === filteredEvents.length && !!filteredEvents.length}
+        />
       </div>
     );
   } else {
@@ -61,4 +86,4 @@ function Events() {
   }
 }
 
-export default React.memo(Events);
+export default memo(Events);
