@@ -13,3 +13,7 @@
 .Icon[data-selected] {
   color: var(--color-link);
 }
+
+.Checkbox {
+  gap: 1ch;
+}

@@ -1,10 +1,10 @@
 import { MouseEvent, useMemo, useTransition } from "react";
 
+import { Badge, Checkbox } from "design";
 import ContextMenuCategory from "replay-next/components/context-menu/ContextMenuCategory";
 import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
 import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import Icon from "replay-next/components/Icon";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getFilteredEventsForFocusRegion } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 
@@ -77,7 +77,7 @@ export default function EventsDropDownMenu() {
   return (
     <>
       <button className={styles.DropDownButton} onClick={onClickWrapper}>
-        <Icon className={styles.DropDownIcon} type="dots" />
+        <Icon className={styles.Icon} type="dots" />
       </button>
       {contextMenu}
     </>
@@ -89,19 +89,7 @@ function EventTypeContextMenuItem({ category, count }: { category: FiltersKey; c
   const [isPending, startTransition] = useTransition();
 
   const enabled = filters[category] !== false;
-
-  let icon = null;
-  switch (category) {
-    case "keyboard":
-      icon = "keyboard";
-      break;
-    case "mouse":
-      icon = "ads_click";
-      break;
-    case "navigation":
-      icon = "navigation";
-      break;
-  }
+  const checked = enabled && count > 0;
 
   return (
     <ContextMenuItem
@@ -116,15 +104,8 @@ function EventTypeContextMenuItem({ category, count }: { category: FiltersKey; c
       )}
     >
       <div className={styles.MenuItem}>
-        <MaterialIcon
-          className={styles.MenuItemIcon}
-          data-selected={(enabled && count > 0) || undefined}
-          iconSize="xl"
-        >
-          {icon!}
-        </MaterialIcon>
-        {category}
-        {count > 0 && <div className={styles.Count}>({count})</div>}
+        <Checkbox className={styles.Checkbox} label={category} checked={checked} />
+        {count > 0 && <Badge label={count} />}
       </div>
     </ContextMenuItem>
   );

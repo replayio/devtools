@@ -6,29 +6,23 @@
   cursor: pointer;
 }
 
-.DropDownIcon {
+.Icon {
   height: 1rem;
   width: 1rem;
+  flex: 0 0 auto;
+}
+.Icon[data-selected] {
+  color: var(--color-link);
 }
 
 .MenuItem {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 1ch;
   text-transform: capitalize;
 }
 
-.MenuItemIcon {
-  height: 1rem;
-  width: 1.25rem;
-  transform: scale(0.9);
-  opacity: 0.5;
-}
-.MenuItemIcon[data-selected] {
-  color: var(--color-link);
-  opacity: 1;
-}
-
-.Count {
-  color: var(--color-dim);
+.Checkbox {
+  gap: 1ch;
 }
