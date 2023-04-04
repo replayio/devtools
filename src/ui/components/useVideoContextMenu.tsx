@@ -14,7 +14,6 @@ import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { fetchMouseTargetsForPause } from "ui/actions/app";
 import { createFrameComment } from "ui/actions/comments";
 import { setSelectedPanel, setViewMode } from "ui/actions/layout";
-import { mouseEventCanvasPosition as getPositionForAddingComment } from "ui/components/useVideoCommentTool";
 import { useAppDispatch } from "ui/setup/hooks";
 import { getMouseTarget } from "ui/suspense/nodeCaches";
 import { mouseEventCanvasPosition as getPositionForInspectingElement } from "ui/utils/nodePicker";
@@ -112,4 +111,16 @@ export default function useVideoContextMenu({
       onShow,
     }
   );
+}
+
+function getPositionForAddingComment(event: MouseEvent): { x: number; y: number } {
+  const canvas = document.getElementById("graphics");
+  const bounds = canvas!.getBoundingClientRect();
+
+  const scale = bounds.width / canvas!.offsetWidth;
+
+  return {
+    x: (event.clientX - bounds.left) / scale,
+    y: (event.clientY - bounds.top) / scale,
+  };
 }
