@@ -51,24 +51,17 @@ const Assist: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState(2);
   const { nags } = hooks.useGetUserInfo();
   const viewMode = useAppSelector(getViewMode);
-  const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
   const showConsoleNavigate = shouldShowConsoleNavigate(nags);
-  const showBreakpointAdd = shouldShowBreakpointAdd(nags);
   const showBreakpointEdit = shouldShowBreakpointEdit(nags);
   const showAddComment = shouldShowAddComment(nags);
-  const showAddCommentToLine = shouldShowAddCommentToLine(nags);
-  const showAddCommentToNetworkRequest = shouldShowAddCommentToNetworkRequest(nags);
-  const showAddCommentToPrintStatement = shouldShowAddCommentToPrintStatement(nags);
   const showJumpToCode = shouldShowJumpToCode(nags);
   const showAddUnicornBadge = shouldShowAddUnicornBadge(nags);
   const showRecordReplay = shouldShowRecordReplay(nags);
   const showExploreSources = shouldShowExploreSources(nags);
   const showSearchSourceText = shouldShowSearchSourceText(nags);
-  const showQuickOpenFile = shouldShowQuickOpenFile(nags);
   const showLaunchCommandPalette = shouldShowLaunchCommandPalette(nags);
   const showJumpToEvent = shouldShowJumpToEvent(nags);
   const showInspectElement = shouldShowInspectElement(nags);
-  const showInspectComponent = shouldShowInspectComponent(nags);
   const showUseFocusMode = shouldShowUseFocusMode(nags);
 
   const [showConfetti, setShowConfetti] = useState(false);
