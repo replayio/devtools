@@ -172,7 +172,7 @@ const pauseSlice = createSlice({
         why?: string;
         executionPoint: string;
         // used by the legacy Messages reducer
-        time?: number;
+        time: number;
       }>
     ) {
       const { id, frame, why, executionPoint, time } = action.payload;
@@ -188,17 +188,15 @@ const pauseSlice = createSlice({
       state.selectedFrameId = frame ? { pauseId: frame.pauseId, frameId: frame.protocolId } : null;
       state.threadcx.pauseCounter++;
       state.pausePreviewLocation = null;
-      if (time) {
-        const filteredPauses = state.pauseHistory.filter(pause => pause.time === time);
-        if (!filteredPauses.length) {
-          state.pauseHistory.push({
-            pauseId: id,
-            time,
-            executionPoint,
-            hasFrames: !!frame,
-          });
-          state.pauseHistoryIndex++;
-        }
+      if (state.pauseHistory[state.pauseHistoryIndex]?.executionPoint !== executionPoint) {
+        state.pauseHistory = state.pauseHistory.slice(0, state.pauseHistoryIndex + 1);
+        state.pauseHistory.push({
+          pauseId: id,
+          time,
+          executionPoint,
+          hasFrames: !!frame,
+        });
+        state.pauseHistoryIndex++;
       }
     },
     pauseHistoryDecremented(state) {
@@ -242,11 +240,6 @@ const pauseSlice = createSlice({
     },
     resumed(state) {
       Object.assign(state, resumedPauseState);
-      if (state.pauseHistoryIndex !== state.pauseHistory.length - 1) {
-        while (state.pauseHistoryIndex !== state.pauseHistory.length - 1) {
-          state.pauseHistory.pop();
-        }
-      }
       state.threadcx.isPaused = false;
     },
   },

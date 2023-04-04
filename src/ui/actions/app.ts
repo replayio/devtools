@@ -1,7 +1,10 @@
 import { KeyboardEvent, NodeBounds } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
-import { jumpToPreviousPause, jumpToNextPause } from "devtools/client/debugger/src/actions/pause/jumps";
+import {
+  jumpToNextPause,
+  jumpToPreviousPause,
+} from "devtools/client/debugger/src/actions/pause/jumps";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { shallowEqual } from "devtools/client/debugger/src/utils/compare";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
