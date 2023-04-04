@@ -5,7 +5,6 @@ import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { setViewMode } from "ui/actions/layout";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import Events from "ui/components/Events";
-import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
 import Confetti from "ui/components/shared//Confetti";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
