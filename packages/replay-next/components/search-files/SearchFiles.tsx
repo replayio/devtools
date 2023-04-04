@@ -56,7 +56,7 @@ export default function SearchFiles({ limit }: { limit?: number }) {
     return () => {
       window.removeEventListener(SHOW_GLOBAL_SEARCH_EVENT_TYPE, onShowGlobalSearch);
     };
-  }, []);
+  }, [dismissSearchSourceTextNag]);
 
   return (
     <div className={styles.SearchFiles}>
