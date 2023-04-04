@@ -9,7 +9,7 @@ test(`logpoints-03: should display event properties in the console`, async ({ pa
   await startTest(page, url);
   await openDevToolsTab(page);
 
-  await addEventListenerLogpoints(page, ["event.mouse.click"]);
+  await addEventListenerLogpoints(page, [{ eventType: "event.mouse.click", categoryKey: "mouse" }]);
 
   const message = await findConsoleMessage(page, "MouseEvent", "event");
 

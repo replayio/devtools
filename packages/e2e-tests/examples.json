@@ -4,6 +4,7 @@
   "doc_control_flow.html": "8b024e1a-1e84-4424-97bd-3c2c528642fd",
   "doc_debugger_statements.html": "31dc0307-dfd6-4497-b4c9-11f12d6fa995",
   "doc_events.html": "318c599b-7e5f-4dd5-a34b-0ffb37101e44",
+  "doc_events_chromium.html": "7678facf-3eca-4bb6-95d0-8c836362d0e5",
   "doc_exceptions.html": "11d683a6-30bb-46c2-ab55-f8d990bffa9e",
   "doc_exceptions_bundle.html": "d0282dfc-b7ca-42d8-ab51-f634904623e8",
   "doc_inspector_basic.html": "b0365205-092c-4057-98f0-1ad5143ebbd1",
@@ -33,5 +34,6 @@
   "node/run_worker.js": "b41107df-8d0e-488f-bad3-a7d26c183043",
   "node/spawn.js": "c9d0539d-fde0-4949-a9f7-acdb5b56d4a6",
   "log_points_and_block_scope.html": "ad8f5490-0b9f-4488-bd3c-4f2824bc21ce",
-  "cypress/doc_inspector_styles": "aa6201d2-1e83-408b-8247-cf3d26ac421a"
+  "cypress/doc_inspector_styles": "aa6201d2-1e83-408b-8247-cf3d26ac421a",
+  "doc_minified_chromium.html": "5cdb2ffe-beff-4d35-9689-9242bd277f2d"
 }

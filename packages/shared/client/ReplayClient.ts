@@ -47,7 +47,7 @@ import analysisManager, { AnalysisParams } from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
-import { RecordingCapabilities } from "protocol/thread/thread";
+import { RecordingCapabilities, RecordingTarget } from "protocol/thread/thread";
 import { binarySearch, compareNumericStrings, defer, waitForTime } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
@@ -153,6 +153,10 @@ export class ReplayClient implements ReplayClientInterface {
 
   async getRecordingCapabilities(): Promise<RecordingCapabilities> {
     return this._threadFront.getRecordingCapabilities();
+  }
+
+  async getRecordingTarget(): Promise<RecordingTarget> {
+    return this._threadFront.getRecordingTarget();
   }
 
   async createPause(executionPoint: ExecutionPoint): Promise<createPauseResult> {
@@ -371,12 +375,21 @@ export class ReplayClient implements ReplayClientInterface {
     range: PointRange | null
   ): Promise<Record<string, number>> {
     const sessionId = this.getSessionIdThrows();
-    const { counts }: { counts: { type: string; count: number }[] } =
-      await client.Debugger.getEventHandlerCounts(
-        { eventTypes, range: range ?? undefined },
-        sessionId
-      );
+    const { counts } = await client.Debugger.getEventHandlerCounts(
+      { eventTypes, range: range ?? undefined },
+      sessionId
+    );
     return Object.fromEntries(counts.map(({ type, count }) => [type, count]));
+  }
+
+  async getAllEventHandlerCounts(range: PointRange | null): Promise<Record<string, number>> {
+    const sessionId = this.getSessionIdThrows();
+    const { counts } = await client.Debugger.getAllEventHandlerCounts(
+      { range: range ?? undefined },
+      sessionId
+    );
+    const countsObject = Object.fromEntries(counts.map(({ type, count }) => [type, count]));
+    return countsObject;
   }
 
   async getFocusWindow(): Promise<TimeStampedPointRange> {
