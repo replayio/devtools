@@ -39,7 +39,7 @@ function CypressIcon() {
       viewBox="0 0 256 256"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-full"
+      className="h-full w-full"
     >
       <path
         d="M128 2C197.645 2 254 58.3555 254 128C254 197.645 197.645 254 128 254C58.3555 254 2 197.645 2 128C2 58.3555 58.3555 2 128 2Z"
@@ -138,7 +138,7 @@ function ToolbarButton({
       </div>
       {showBadge ? (
         <div
-          className="absolute w-2 h-2 rounded-full bg-secondaryAccent"
+          className="absolute h-2 w-2 rounded-full bg-secondaryAccent"
           style={{
             // FE-1096 Aiming for pixel perfect badge alignment over icons with inconsistent shapes
             right: name === "comments" ? ".9rem" : "1em",
@@ -203,7 +203,7 @@ export default function Toolbar() {
   const showReplayAssist = useAppSelector(getReplayAssist);
 
   return (
-    <div className="flex flex-col items-center justify-between py-1 toolbox-toolbar-container">
+    <div className="toolbox-toolbar-container flex flex-col items-center justify-between py-1">
       <div id="toolbox-toolbar">
         {recording?.metadata?.test?.runner?.name !== "cypress" && showTour ? (
           <ToolbarButton

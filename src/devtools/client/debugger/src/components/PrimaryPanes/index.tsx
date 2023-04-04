@@ -28,7 +28,7 @@ function PrimaryPanes(props: PropsFromRedux) {
 
   useEffect(() => {
     dismissInspectElementNag();
-  }, []);
+  }, [dismissInspectElementNag]);
 
   return (
     <Accordion>
