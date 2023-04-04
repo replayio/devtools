@@ -73,7 +73,13 @@ export default function useVideoCommentTool({
     dispatch(addVideoComment(recordingId, isAuthenticated, event, showCommentsPanel));
   };
 
-  return { onClick, onMouseEnter, onMouseLeave, onMouseMove, tooltip };
+  return {
+    onClick,
+    onMouseEnter,
+    onMouseLeave,
+    onMouseMove,
+    tooltip: isAuthenticated ? tooltip : null,
+  };
 }
 
 export function mouseEventCanvasPosition(event: MouseEvent): { x: number; y: number } {
