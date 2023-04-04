@@ -12,11 +12,10 @@ import {
   getVideoUrl,
 } from "ui/actions/app";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
-import useVideoCommentTool from "ui/components/useVideoCommentTool";
+import useVideoContextMenu from "ui/components/useVideoContextMenu";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { getPlayback, isPlaybackStalled } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
-import { getRecordingId } from "ui/utils/recording";
 
 import ReplayLogo from "./shared/ReplayLogo";
 import Spinner from "./shared/Spinner";
@@ -33,24 +32,13 @@ export default function Video() {
   const stalled = useAppSelector(isPlaybackStalled);
   const mouseTargetsLoading = useAppSelector(getAreMouseTargetsLoading);
   const highlightedNodesLoading = useAppSelector(getHighlightedNodesLoading);
-  const recordingId = useAppSelector(getRecordingId);
 
   const isPaused = !playback;
   const isNodeTarget = recordingTarget == "node";
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const {
-    onClick: onVideoCommentClick,
-    onMouseEnter,
-    onMouseLeave,
-    onMouseMove,
-    tooltip,
-  } = useVideoCommentTool({
-    areMouseTargetsLoading: mouseTargetsLoading,
-    canvasRef,
-    recordingId: recordingId!,
-  });
+  const { contextMenu, onContextMenu } = useVideoContextMenu({ canvasRef });
 
   useEffect(() => {
     installObserver();
@@ -84,11 +72,12 @@ export default function Video() {
   };
 
   const onClick = (e: React.MouseEvent) => {
+    // User was trying to select something from the video preview, not add a comment
     if (isNodePickerActive || isNodePickerInitializing) {
       return;
     }
 
-    onVideoCommentClick(e);
+    onContextMenu(e);
   };
 
   const showCommentTool =
@@ -106,12 +95,11 @@ export default function Video() {
       <canvas
         id="graphics"
         onClick={onClick}
+        onContextMenu={onContextMenu}
         onMouseDown={onMouseDown}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-        onMouseMove={onMouseMove}
         ref={canvasRef}
       />
+      {contextMenu}
       {showCommentTool ? (
         <CommentsOverlay>
           {showSpinner && (
@@ -121,7 +109,6 @@ export default function Video() {
           )}
         </CommentsOverlay>
       ) : null}
-      {showCommentTool && tooltip}
       {isNodePickerInitializing ? <Tooltip label="Loading…" targetID="video" /> : null}
       {panel === "cypress" && <CypressToggler />}
       <div id="highlighter-root">

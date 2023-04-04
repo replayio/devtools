@@ -27,7 +27,7 @@ export default function useTimelineContextMenu() {
   const { rangeForDisplay: focusRegion } = useContext(FocusContext);
   const { showCommentsPanel } = useContext(InspectorContext);
   const replayClient = useContext(ReplayClientContext);
-  const { duration, recordingId } = useContext(SessionContext);
+  const { accessToken, duration, recordingId } = useContext(SessionContext);
 
   const dispatch = useAppDispatch();
 
@@ -37,7 +37,7 @@ export default function useTimelineContextMenu() {
   const focusEndTime = focusRegion?.end.time;
   const currentTime = relativePosition * duration;
 
-  const onContextMenuEvent = (event: MouseEvent) => {
+  const onShow = (event: MouseEvent) => {
     const timeline = event.currentTarget as HTMLDivElement;
     const rect = timeline.getBoundingClientRect();
 
@@ -85,12 +85,14 @@ export default function useTimelineContextMenu() {
 
   return useContextMenu(
     <>
-      <ContextMenuItem onClick={addComment}>
-        <>
-          <Icon className={styles.SmallerIcon} type="comment" />
-          Add a comment here
-        </>
-      </ContextMenuItem>
+      {accessToken !== null && (
+        <ContextMenuItem onClick={addComment}>
+          <>
+            <Icon className={styles.SmallerIcon} type="comment" />
+            Add a comment here
+          </>
+        </ContextMenuItem>
+      )}
       <ContextMenuItem onClick={shareReplay}>
         <>
           <Icon className={styles.SmallerIcon} type="copy" />
@@ -119,6 +121,6 @@ export default function useTimelineContextMenu() {
         </>
       </ContextMenuItem>
     </>,
-    { onContextMenuEvent }
+    { onShow }
   );
 }
