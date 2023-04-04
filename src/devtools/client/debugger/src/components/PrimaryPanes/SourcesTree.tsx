@@ -310,7 +310,7 @@ const WrappedSourcesTree = (props: PropsFromRedux) => {
 
   useEffect(() => {
     dismissExploreSourcesNag();
-  }, []);
+  }, [dismissExploreSourcesNag]);
 
   // Directly pass the props down to SourcesTree without destructuring
   return <SourcesTree {...props} />;

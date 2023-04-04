@@ -29,10 +29,10 @@ const ReplayAssistButton: FC = () => {
   }
 
   return (
-    <div className="row row-flat rounded-none border-t border-b">
+    <div className="border-t border-b rounded-none row row-flat">
       <input
         type="checkbox"
-        className="rounded-sm border-gray-400"
+        className="border-gray-400 rounded-sm"
         id="replay-assist-checkbox"
         checked={shouldShowReplayAssist}
         onChange={() => {

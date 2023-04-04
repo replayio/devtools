@@ -75,8 +75,6 @@ const Assist: React.FC = () => {
     return "unchecked-rounded";
   };
 
-  const [stepIndex, setStepIndex] = useState(0);
-
   const handleClick = (index: number) => {
     setStepIndex(index);
     setSelectedItem(index);
@@ -149,13 +147,7 @@ const Assist: React.FC = () => {
     },
   ];
 
-  useEffect(() => {
-    const firstUnselectedIndex = updatedChecklistItems.findIndex(item => !item.completed);
-    if (firstUnselectedIndex !== -1) {
-      setSelectedItem(firstUnselectedIndex);
-      setStepIndex(firstUnselectedIndex);
-    }
-  }, []);
+  const [stepIndex, setStepIndex] = useState(0);
 
   const videoUrl = updatedChecklistItems[stepIndex].videoUrl;
 
@@ -182,7 +174,7 @@ const Assist: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="absolute bottom-32 w-full px-2">
+        <div className="absolute w-full px-2 bottom-32">
           <img src={videoUrl} className={styles.videoExample} />
         </div>
       </div>

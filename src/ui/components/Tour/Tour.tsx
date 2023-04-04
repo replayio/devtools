@@ -136,7 +136,7 @@ const Tour: React.FC = () => {
                             dismissTourNag();
                           }, 2500);
                         }}
-                        className="hover:cursor-hand whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg hover:bg-blue-50"
+                        className="px-3 py-1 font-medium bg-white rounded-lg shadow-lg hover:cursor-hand whitespace-nowrap text-primaryAccent hover:bg-blue-50"
                       >
                         Thanks!
                       </a>
@@ -149,37 +149,31 @@ const Tour: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="absolute bottom-28 p-3">
+      <div className="absolute p-3 bottom-28">
         {isNewUser && (
           <div className="relative -bottom-3">
-            <img src="/images/illustrations/larry_wave.png" className="z-1 w-full" />
+            <img src="/images/illustrations/larry_wave.png" className="w-full z-1" />
           </div>
         )}
 
         {!isNewUser && showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
           <img
-            src="https://website-git-master-recordreplay.vercel.app/tour/fast-forward.gif"
+            src="https://vercel.replay.io/tour/fast-forward.gif"
             className={styles.videoExample}
           />
         )}
 
         {!showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
-          <img
-            src="https://website-git-master-recordreplay.vercel.app/tour/addlogs.gif"
-            className={styles.videoExample}
-          />
+          <img src="https://vercel.replay.io/tour/addlogs.gif" className={styles.videoExample} />
         )}
 
         {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && (
-          <img
-            src="https://website-git-master-recordreplay.vercel.app/tour/editlogs.gif"
-            className={styles.videoExample}
-          />
+          <img src="https://vercel.replay.io/tour/editlogs.gif" className={styles.videoExample} />
         )}
 
         {hasCompletedTour && (
           <img
-            src="https://website-git-master-recordreplay.vercel.app/tour/consoleupdate.gif"
+            src="https://vercel.replay.io/tour/consoleupdate.gif"
             className={styles.videoExample}
           />
         )}

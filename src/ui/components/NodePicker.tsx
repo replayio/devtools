@@ -1,6 +1,6 @@
 import { NodeBounds } from "@replayio/protocol";
 import classnames from "classnames";
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 import {
   highlightNode,
