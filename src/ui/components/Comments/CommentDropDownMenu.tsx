@@ -1,5 +1,6 @@
 import { MouseEvent } from "react";
 
+import { Checkbox } from "design";
 import ContextMenuCategory from "replay-next/components/context-menu/ContextMenuCategory";
 import ContextMenuDivider from "replay-next/components/context-menu/ContextMenuDivider";
 import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
@@ -61,12 +62,7 @@ export default function CommentDropDownMenu() {
       </ContextMenuItem>
       <ContextMenuDivider />
       <ContextMenuItem onClick={createClickHandler(() => setShowPreview(!showPreview))}>
-        <Icon
-          className={styles.Icon}
-          data-selected={showPreview || undefined}
-          type={showPreview ? "checked-rounded" : "unchecked-rounded"}
-        />
-        Show preview?
+        <Checkbox checked={showPreview} className={styles.Checkbox} label="Show preview?" />
       </ContextMenuItem>
     </>
   );
