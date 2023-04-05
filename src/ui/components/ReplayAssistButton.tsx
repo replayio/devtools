@@ -1,16 +1,15 @@
-import React, { FC, useEffect, useState } from "react";
+import { FC } from "react";
 
-import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { UIThunkAction } from "ui/actions";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
-import { getReplayAssist, replayAssistToggled } from "ui/reducers/app";
+import { replayAssistToggled, showReplayAssist as showReplayAssistSelector } from "ui/reducers/app";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import useAuth0 from "ui/utils/useAuth0";
 
 function toggleAndShowAssistPanel(): UIThunkAction {
   return (dispatch, getState) => {
     dispatch(replayAssistToggled());
-    const newValue = getReplayAssist(getState());
+    const newValue = showReplayAssistSelector(getState());
     if (!newValue) {
       dispatch(setSelectedPrimaryPanel("events"));
     } else {
@@ -22,19 +21,19 @@ function toggleAndShowAssistPanel(): UIThunkAction {
 const ReplayAssistButton: FC = () => {
   const { isAuthenticated } = useAuth0();
   const dispatch = useAppDispatch();
-  const shouldShowReplayAssist = useAppSelector(getReplayAssist);
+  const showReplayAssist = useAppSelector(showReplayAssistSelector);
 
   if (!isAuthenticated) {
     return null;
   }
 
   return (
-    <div className="border-t border-b rounded-none row row-flat">
+    <div className="row row-flat rounded-none border-t border-b">
       <input
         type="checkbox"
-        className="border-gray-400 rounded-sm"
+        className="rounded-sm border-gray-400"
         id="replay-assist-checkbox"
-        checked={shouldShowReplayAssist}
+        checked={showReplayAssist}
         onChange={() => {
           dispatch(toggleAndShowAssistPanel());
         }}

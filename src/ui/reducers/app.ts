@@ -199,7 +199,7 @@ export default appSlice.reducer;
 const getSelectedPanel = (state: UIState) => state.layout.selectedPanel;
 const getViewMode = (state: UIState) => state.layout.viewMode;
 
-export const getReplayAssist = (state: UIState) => state.app.showReplayAssist;
+export const showReplayAssist = (state: UIState) => state.app.showReplayAssist;
 
 export const getTheme = (state: UIState) =>
   state.app.theme === "system" ? getSystemColorSchemePreference() : state.app.theme;
