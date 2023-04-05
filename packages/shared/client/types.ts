@@ -1,10 +1,10 @@
 import {
+  AnalysisEntry,
   BreakpointId,
   ContentType,
   Result as EvaluationResult,
   EventHandlerType,
   ExecutionPoint,
-  FocusWindowRequest,
   FrameId,
   FunctionMatch,
   KeyboardEvent,
@@ -19,13 +19,10 @@ import {
   PauseData,
   PauseId,
   PointDescription,
-  PointLimits,
   PointRange,
-  PointSelector,
   getPointsBoundingTimeResult as PointsBoundingTime,
   RecordingId,
   Result,
-  RunEvaluationResult,
   SameLineSourceLocations,
   ScopeId,
   SearchSourceContentsMatch,
@@ -33,12 +30,12 @@ import {
   newSource as Source,
   SourceId,
   SourceLocation,
+  FocusWindowRequest as TimeRange,
   TimeStampedPoint,
   TimeStampedPointRange,
   VariableMapping,
   createPauseResult,
   getAllFramesResult,
-  getExceptionValueResult,
   getScopeResult,
   getSourceOutlineResult,
   getTopFrameResult,
@@ -47,6 +44,7 @@ import {
   repaintGraphicsResult,
 } from "@replayio/protocol";
 
+import { AnalysisParams } from "protocol/analysisManager";
 import { RecordingCapabilities, RecordingTarget } from "protocol/thread/thread";
 
 export type LogEntry = {
@@ -124,6 +122,8 @@ export type PointBehavior = {
   shouldLog: POINT_BEHAVIOR;
 };
 
+export type RunAnalysisParams = Omit<AnalysisParams, "locations"> & { location?: Location };
+
 export type ReplayClientEvents = "loadedRegionsChange";
 
 export type HitPointStatus =
@@ -156,7 +156,6 @@ export interface ReplayClientInterface {
     overflow: boolean;
   }>;
   findNavigationEvents(onKeyboardEvents: (events: navigationEvents) => void): Promise<void>;
-  findPoints(selector: PointSelector, limits?: PointLimits): Promise<PointDescription[]>;
   findSources(): Promise<Source[]>;
   getAllEventHandlerCounts(range: PointRange | null): Promise<Record<string, number>>;
   getAllFrames(pauseId: PauseId): Promise<getAllFramesResult>;
@@ -171,7 +170,6 @@ export interface ReplayClientInterface {
     eventTypes: EventHandlerType[],
     focusRange: PointRange | null
   ): Promise<Record<string, number>>;
-  getExceptionValue(pauseId: PauseId): Promise<getExceptionValueResult>;
   getFocusWindow(): Promise<TimeStampedPointRange>;
   getFrameSteps(pauseId: PauseId, frameId: FrameId): Promise<PointDescription[]>;
   getMappedLocation(location: Location): Promise<MappedLocation>;
@@ -202,20 +200,10 @@ export interface ReplayClientInterface {
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   isOriginalSource(sourceId: SourceId): boolean;
   isPrettyPrintedSource(sourceId: SourceId): boolean;
-  mapExpressionToGeneratedScope(expression: string, location: Location): Promise<string>;
-  requestFocusRange(range: FocusWindowRequest): Promise<TimeStampedPointRange>;
+  requestFocusRange(range: TimeRange): Promise<TimeStampedPointRange>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;
   repaintGraphics(pauseId: PauseId): Promise<repaintGraphicsResult>;
-  runEvaluation(
-    opts: {
-      selector: PointSelector;
-      expression: string;
-      frameIndex?: number;
-      fullPropertyPreview?: boolean;
-      limits?: PointLimits;
-    },
-    onResults: (results: RunEvaluationResult[]) => void
-  ): Promise<void>;
+  runAnalysis<Result>(analysisParams: RunAnalysisParams): Promise<Result[]>;
   searchFunctions(
     opts: {
       query: string;
@@ -231,6 +219,14 @@ export interface ReplayClientInterface {
     },
     onMatches: (matches: SearchSourceContentsMatch[], didOverflow: boolean) => void
   ): Promise<void>;
+  streamAnalysis(
+    params: AnalysisParams,
+    handlers: {
+      onPoints?: (points: PointDescription[]) => void;
+      onResults?: (results: AnalysisEntry[]) => void;
+      onError?: (error: any) => void;
+    }
+  ): { pointsFinished: Promise<void>; resultsFinished: Promise<void> };
   streamSourceContents(
     sourceId: SourceId,
     onSourceContentsInfo: ({

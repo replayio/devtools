@@ -7,7 +7,6 @@ import {
   PauseData,
   PauseId,
   Result,
-  TimeStampedPoint,
 } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
 import { Cache, createCache } from "suspense";
@@ -38,10 +37,6 @@ export const pauseIdCache: Cache<
     return pauseId;
   },
 });
-
-export function setPointAndTimeForPauseId(pauseId: PauseId, timeStampedPoint: TimeStampedPoint) {
-  pauseIdToPointAndTimeMap.set(pauseId, [timeStampedPoint.point, timeStampedPoint.time]);
-}
 
 export function getPointAndTimeForPauseId(
   pauseId: PauseId
