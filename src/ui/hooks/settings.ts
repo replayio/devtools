@@ -16,10 +16,6 @@ import {
   UpdateUserDefaultWorkspaceVariables,
 } from "shared/graphql/generated/UpdateUserDefaultWorkspace";
 import {
-  UpdateUserSettingsEventLink,
-  UpdateUserSettingsEventLinkVariables,
-} from "shared/graphql/generated/UpdateUserSettingsEventLink";
-import {
   UpdateUserSettingsLogRocket,
   UpdateUserSettingsLogRocketVariables,
 } from "shared/graphql/generated/UpdateUserSettingsLogRocket";

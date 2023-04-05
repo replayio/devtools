@@ -71,6 +71,10 @@
   top: 48px;
 }
 
+.dropdown-container .row-flat {
+  border-radius: 0;
+}
+
 .dropdown-container .row.clickable {
   padding: 0px;
 }
