@@ -53,7 +53,7 @@ export default function EditableRemark({
     setIsEditing(false);
   };
 
-  const [addCommentState, dismissAddCommentNag] = useNag(Nag.ADD_COMMENT);
+  const [, dismissAddCommentNag] = useNag(Nag.ADD_COMMENT);
 
   const saveChanges = async (editorState: SerializedEditorState) => {
     setIsPending(true);
