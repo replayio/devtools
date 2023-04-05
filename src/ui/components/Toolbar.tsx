@@ -11,6 +11,7 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
+import { showReplayAssist as showReplayAssistSelector } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { PrimaryPanelName } from "ui/state/layout";
@@ -161,6 +162,8 @@ export default function Toolbar() {
   const { nags } = hooks.useGetUserInfo();
   const showTour = shouldShowTour(nags);
 
+  const showReplayAssist = useAppSelector(showReplayAssistSelector);
+
   useEffect(() => {
     if (!loading && comments.length > 0) {
       setShowCommentsBadge(true);
@@ -204,7 +207,7 @@ export default function Toolbar() {
           />
         ) : null}
 
-        {replayAssistExperimentEnabled ? (
+        {replayAssistExperimentEnabled && showReplayAssist ? (
           <ToolbarButton
             icon="school"
             name="assist"

@@ -18,7 +18,7 @@ interface UserOptionsProps extends PropsFromRedux {
 
 function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   const [expanded, setExpanded] = useState(false);
-  const { value: showReplayAssist } = useFeature("replayAssist");
+  const { value: replayAssistExperimentEnabled } = useFeature("replayAssist");
 
   const onDocsClick: React.MouseEventHandler = event => {
     trackEvent("user_options.select_docs");
@@ -75,7 +75,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
               <span>Launch Replay</span>
             </button>
           )}
-          {showReplayAssist && <ReplayAssistButton />}
+          {replayAssistExperimentEnabled && <ReplayAssistButton />}
           <LoginButton />
         </Dropdown>
       </div>
