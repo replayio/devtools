@@ -53,11 +53,6 @@ export default function EditableRemark({
     setIsEditing(false);
   };
 
-  const handleSaveChanges = (editorState: SerializedEditorState) => {
-    saveChanges(editorState);
-    dismissAddCommentNag();
-  };
-
   const [addCommentState, dismissAddCommentNag] = useNag(Nag.ADD_COMMENT);
 
   const saveChanges = async (editorState: SerializedEditorState) => {
@@ -72,6 +67,7 @@ export default function EditableRemark({
       await updateCommentReply(remarkId, string, true);
     }
 
+    dismissAddCommentNag();
     setIsPending(false);
   };
 
@@ -111,7 +107,7 @@ export default function EditableRemark({
     deleteRemark: deleteRemark,
     editRemark: startEditing,
     remark: remark,
-    saveRemark: handleSaveChanges,
+    saveRemark: saveChanges,
     type: type,
   });
 
@@ -142,7 +138,7 @@ export default function EditableRemark({
           initialValue={content}
           onCancel={discardPendingChanges}
           onDelete={deleteRemark}
-          onSave={handleSaveChanges}
+          onSave={saveChanges}
           placeholder={type === "reply" ? "Write a reply..." : "Type a comment"}
         />
       </div>
