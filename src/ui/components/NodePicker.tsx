@@ -7,6 +7,8 @@ import {
   selectNode,
   unhighlightNode,
 } from "devtools/client/inspector/markup/actions/markup";
+import { useNag } from "replay-next/src/hooks/useNag";
+import { Nag } from "shared/graphql/types";
 import {
   fetchMouseTargetsForPause,
   loadMouseTargets,
@@ -40,6 +42,7 @@ const nodePickerInstance = new NodePickerClass();
 
 export function NodePicker() {
   const dispatch = useAppDispatch();
+  const [, dismissInspectElementNag] = useNag(Nag.INSPECT_ELEMENT); // Replay Assist
 
   // Contrast with the React DevTools instance of the picker
   const [globalNodePickerActive, setGlobalNodePickerActive] = useState(false);
@@ -63,6 +66,7 @@ export function NodePicker() {
     dispatch(setIsNodePickerActive(true));
     dispatch(loadMouseTargets());
     dispatch(setSelectedPanel("inspector"));
+    dismissInspectElementNag(); // Replay Assist
   }
 
   const handleNodeSelected = useCallback(

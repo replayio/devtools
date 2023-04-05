@@ -2,7 +2,6 @@ import classnames from "classnames";
 import classNames from "classnames";
 import React, { useContext, useEffect, useState } from "react";
 
-import AccessibleImage from "devtools/client/debugger/src/components/shared/AccessibleImage";
 import { getPauseId } from "devtools/client/debugger/src/selectors";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
@@ -12,17 +11,11 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
-import { Nag } from "ui/hooks/users";
-import { useTestInfo } from "ui/hooks/useTestInfo";
+import { showReplayAssist as showReplayAssistSelector } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { PrimaryPanelName } from "ui/state/layout";
-import {
-  shouldShowBreakpointAdd,
-  shouldShowBreakpointEdit,
-  shouldShowConsoleNavigate,
-  shouldShowTour,
-} from "ui/utils/onboarding";
+import { shouldShowTour } from "ui/utils/onboarding";
 // TODO [ryanjduffy]: Refactor shared styling more completely
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -157,15 +150,19 @@ export default function Toolbar() {
   const hasFrames = frames && frames.length > 0;
   const viewMode = useAppSelector(selectors.getViewMode);
   const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
+
   const [showCommentsBadge, setShowCommentsBadge] = useState(false);
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   const { comments, loading } = hooks.useGetComments(recordingId);
-  const { value: logProtocol } = useFeature("logProtocol");
-  const { value: showReactPanel } = useFeature("reactPanel");
+  const { value: logProtocolExperimentEnabled } = useFeature("logProtocol");
+  const { value: reactPanelExperimentEnabled } = useFeature("reactPanel");
+  const { value: replayAssistExperimentEnabled } = useFeature("replayAssist");
   const [sidePanelCollapsed, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
   const { nags } = hooks.useGetUserInfo();
   const showTour = shouldShowTour(nags);
+
+  const showReplayAssist = useAppSelector(showReplayAssistSelector);
 
   useEffect(() => {
     if (!loading && comments.length > 0) {
@@ -210,6 +207,15 @@ export default function Toolbar() {
           />
         ) : null}
 
+        {replayAssistExperimentEnabled && showReplayAssist ? (
+          <ToolbarButton
+            icon="school"
+            name="assist"
+            label="Replay Assist"
+            onClick={handleButtonClick}
+          />
+        ) : null}
+
         {recording?.metadata?.test?.runner?.name == "cypress" ? (
           <ToolbarButton
             icon="cypress"
@@ -248,12 +254,12 @@ export default function Toolbar() {
               showBadge={hasFrames}
               onClick={handleButtonClick}
             />
-            {showReactPanel && (
+            {reactPanelExperimentEnabled && (
               <ToolbarButton icon="react" name="react" label="React" onClick={handleButtonClick} />
             )}
           </>
         ) : null}
-        {logProtocol && viewMode === "dev" ? (
+        {logProtocolExperimentEnabled && viewMode === "dev" ? (
           <ToolbarButton icon="code" label="Protocol" name="protocol" onClick={handleButtonClick} />
         ) : null}
         <div className="grow"></div>

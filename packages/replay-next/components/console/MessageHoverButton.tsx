@@ -38,7 +38,8 @@ export default function MessageHoverButton({
   time: number;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
-  const [_, dismissNag] = useNag(Nag.FIRST_CONSOLE_NAVIGATE);
+  const [, dismissFirstConsoleNavigateNag] = useNag(Nag.FIRST_CONSOLE_NAVIGATE);
+
   const [isHovered, setIsHovered] = useState(false);
 
   const { inspectFunctionDefinition, showCommentsPanel } = useContext(InspectorContext);
@@ -116,7 +117,7 @@ export default function MessageHoverButton({
         inspectFunctionDefinition([location]);
       }
 
-      dismissNag();
+      dismissFirstConsoleNavigateNag();
     };
 
     const label =
