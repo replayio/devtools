@@ -1,7 +1,5 @@
 import { isPromiseLike } from "suspense";
 
-import { assert } from "protocol/utils";
-
 import { Entry, ParamCall } from "./types";
 import { findMatch, isIterator } from "./utils";
 
@@ -78,40 +76,20 @@ export default function createRecorder<T>(target: T, options?: Options<T>): [T, 
 
       const thenable = returnValue;
 
-      returnValue = thenable.then(
-        (resolved: any) => {
-          if (thenable === entry.thenable) {
-            // Only the latest request should update the shared entry.
-            // For multiple matching calls, the player should always return the latest value.
-            entry.result = resolved;
-          }
-
-          onAsyncRequestResolved();
-          onEntriesChanged(entry);
-
-          return resolved;
-        },
-        (error: any) => {
-          assert(error instanceof Error);
-
-          if (thenable === entry.thenable) {
-            // Only the latest request should update the shared entry.
-            // For multiple matching calls, the player should always return the latest value.
-            entry.error = error;
-          }
-
-          onAsyncRequestResolved();
-          onEntriesChanged(entry);
-
-          return error;
+      returnValue = thenable.then((resolved: any) => {
+        if (thenable === entry.thenable) {
+          // Only the latest request should update the shared entry.
+          // For multiple matching calls, the player should always return the latest value.
+          entry.result = resolved;
         }
-      );
+
+        onAsyncRequestResolved();
+        onEntriesChanged(entry);
+
+        return resolved;
+      });
     } else {
-      if (returnValue instanceof Error) {
-        entry.error = returnValue;
-      } else {
-        entry.result = returnValue;
-      }
+      entry.result = returnValue;
 
       onEntriesChanged(entry);
     }
@@ -157,20 +135,14 @@ export default function createRecorder<T>(target: T, options?: Options<T>): [T, 
             },
           };
 
-          let returnValue: any;
-          try {
-            returnValue =
-              overrides && overrides.hasOwnProperty(prop)
-                ? (overrides as any)[prop](...args.concat(recorderAPI))
-                : target[prop](...args);
-          } catch (error) {
-            assert(error instanceof Error);
-            returnValue = error;
-          }
+          let returnValue =
+            overrides && overrides.hasOwnProperty(prop)
+              ? (overrides as any)[prop](...args.concat(recorderAPI))
+              : target[prop](...args);
 
           if (isPromiseLike(returnValue)) {
             returnValue = returnValue.then(resolved => sanitizeResult(prop, resolved));
-          } else if (!(returnValue instanceof Error)) {
+          } else {
             returnValue = sanitizeResult(prop, returnValue);
           }
 
@@ -184,11 +156,7 @@ export default function createRecorder<T>(target: T, options?: Options<T>): [T, 
 
           recordEntryWhenReady();
 
-          if (returnValue instanceof Error) {
-            throw returnValue;
-          } else {
-            return returnValue;
-          }
+          return returnValue;
         };
       }
     },

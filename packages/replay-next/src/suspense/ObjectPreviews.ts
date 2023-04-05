@@ -1,5 +1,4 @@
 import {
-  NamedValue,
   Object,
   ObjectId,
   ObjectPreviewLevel,
@@ -7,8 +6,6 @@ import {
   Value as ProtocolValue,
 } from "@replayio/protocol";
 import { Cache, createCache } from "suspense";
-
-import { assert } from "protocol/utils";
 
 import { ReplayClientInterface } from "../../../shared/client/types";
 import { cachePauseData } from "./PauseCache";
@@ -42,24 +39,6 @@ export const objectPropertyCache: Cache<
   debugLabel: "objectPropertyCache",
   getKey: ([client, pauseId, objectId, propertyName]) => `${pauseId}:${objectId}:${propertyName}`,
   load: async ([client, pauseId, objectId, propertyName]) => {
-    const cachedObject = objectCache.getValueIfCached(
-      null as any,
-      pauseId,
-      objectId,
-      "canOverflow"
-    );
-    if (cachedObject) {
-      assert(cachedObject.preview);
-      const getterValue = cachedObject.preview.getterValues?.find(v => v.name === propertyName);
-      if (getterValue) {
-        return removeName(getterValue);
-      }
-      const property = cachedObject.preview.properties?.find(p => p.name === propertyName);
-      if (property) {
-        return removeName(property);
-      }
-    }
-
     const { data, returned } = await client.getObjectProperty(objectId, pauseId, propertyName);
 
     cachePauseData(client, pauseId, data);
@@ -99,9 +78,4 @@ export function preCacheObject(pauseId: PauseId, object: Object): void {
       objectCache.cache(object, null as any, pauseId, objectId, "full");
     }
   }
-}
-
-function removeName(namedValue: NamedValue): ProtocolValue {
-  const { name, ...value } = namedValue;
-  return value;
 }

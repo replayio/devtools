@@ -1,8 +1,8 @@
 import {
+  AnalysisEntry,
   BreakpointId,
   Result as EvaluationResult,
   ExecutionPoint,
-  FocusWindowRequest,
   FrameId,
   FunctionMatch,
   loadedRegions as LoadedRegions,
@@ -14,33 +14,28 @@ import {
   PauseData,
   PauseId,
   PointDescription,
-  PointPageLimits,
   PointRange,
-  PointSelector,
   getPointsBoundingTimeResult as PointsBoundingTime,
   RecordingId,
   Result,
-  RunEvaluationResult,
   SameLineSourceLocations,
   ScopeId,
   SearchSourceContentsMatch,
   SessionId,
   newSource as Source,
   SourceId,
+  FocusWindowRequest as TimeRange,
   TimeStampedPoint,
   TimeStampedPointRange,
   VariableMapping,
   createPauseResult,
-  findPointsResults,
   functionsMatches,
   getAllFramesResult,
-  getExceptionValueResult,
   getScopeResult,
   getTopFrameResult,
   keyboardEvents,
   navigationEvents,
   repaintGraphicsResult,
-  runEvaluationResults,
   searchSourceContentsMatches,
   sourceContentsChunk,
   sourceContentsInfo,
@@ -48,26 +43,25 @@ import {
 import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
 
+import analysisManager, { AnalysisParams } from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
-import { addEventListener, client, initSocket, removeEventListener } from "protocol/socket";
+import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { RecordingCapabilities, RecordingTarget } from "protocol/thread/thread";
 import { binarySearch, compareNumericStrings, defer, waitForTime } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
+import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { areRangesEqual } from "replay-next/src/utils/time";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
-import { ProtocolError, commandError, isCommandError } from "shared/utils/error";
 import { isPointInRegions, isRangeInRegions, isTimeInRegions } from "shared/utils/time";
 
 import {
   LineNumberToHitCountMap,
   ReplayClientEvents,
   ReplayClientInterface,
+  RunAnalysisParams,
   SourceLocationRange,
 } from "./types";
-
-export const MAX_POINTS_TO_FIND = 10_000;
-export const MAX_POINTS_TO_RUN_EVALUATION = 200;
 
 const STREAMING_THROTTLE_DURATION = 100;
 
@@ -88,14 +82,13 @@ export class ReplayClient implements ReplayClientInterface {
 
   private sessionWaiter = defer<SessionId>();
 
-  private nextFindPointsId = 1;
-  private nextRunEvaluationId = 1;
-
   constructor(dispatchURL: string, threadFront: typeof ThreadFront) {
     this._dispatchURL = dispatchURL;
     this._threadFront = threadFront;
 
     this._threadFront.listenForLoadChanges(this._onLoadChanges);
+
+    analysisManager.init();
   }
 
   private getSessionIdThrows(): SessionId {
@@ -339,58 +332,6 @@ export class ReplayClient implements ReplayClientInterface {
     client.Session.removeNavigationEventsListener(onNavigationEvents);
   }
 
-  async findPoints(
-    pointSelector: PointSelector,
-    pointLimits?: PointPageLimits
-  ): Promise<PointDescription[]> {
-    const points: PointDescription[] = [];
-    const sessionId = this.getSessionIdThrows();
-    const findPointsId = String(this.nextFindPointsId++);
-    pointLimits = pointLimits ? { ...pointLimits } : {};
-    if (!pointLimits.maxCount) {
-      pointLimits.maxCount = MAX_POINTS_TO_FIND;
-    }
-
-    await this._waitForRangeToBeLoaded(
-      pointLimits?.begin && pointLimits.end
-        ? { begin: pointLimits.begin, end: pointLimits.end }
-        : null
-    );
-
-    function onPoints(results: findPointsResults) {
-      if (results.findPointsId === findPointsId) {
-        points.push(...results.points);
-      }
-    }
-
-    addEventListener("Session.findPointsResults", onPoints);
-
-    let result;
-    try {
-      result = await client.Session.findPoints(
-        { pointSelector, pointLimits, findPointsId },
-        sessionId
-      );
-    } catch (error) {
-      //TODO remove this workaround when BAC-3017 is fixed
-      if (isCommandError(error, ProtocolError.InternalError)) {
-        throw commandError("Too many points", ProtocolError.TooManyPoints);
-      }
-      throw error;
-    } finally {
-      removeEventListener("Session.findPointsResults", onPoints);
-    }
-
-    if (result.pointPage.hasPrevious || result.pointPage.hasNext) {
-      throw commandError("Too many points", ProtocolError.TooManyPoints);
-    }
-
-    removeEventListener("Session.findPointsResults", onPoints);
-
-    points.sort((a, b) => compareNumericStrings(a.point, b.point));
-    return points;
-  }
-
   async findSources(): Promise<Source[]> {
     const sources: Source[] = [];
 
@@ -449,11 +390,6 @@ export class ReplayClient implements ReplayClientInterface {
     );
     const countsObject = Object.fromEntries(counts.map(({ type, count }) => [type, count]));
     return countsObject;
-  }
-
-  getExceptionValue(pauseId: PauseId): Promise<getExceptionValueResult> {
-    const sessionId = this.getSessionIdThrows();
-    return client.Pause.getExceptionValue({}, sessionId, pauseId);
   }
 
   async getFocusWindow(): Promise<TimeStampedPointRange> {
@@ -549,15 +485,6 @@ export class ReplayClient implements ReplayClientInterface {
     const sessionId = this.getSessionIdThrows();
     const { map } = await client.Debugger.getScopeMap({ location }, sessionId);
     return map;
-  }
-
-  async mapExpressionToGeneratedScope(expression: string, location: Location): Promise<string> {
-    const sessionId = this.getSessionIdThrows();
-    const result = await client.Debugger.mapExpressionToGeneratedScope(
-      { expression, location },
-      sessionId
-    );
-    return result.expression;
   }
 
   async getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint> {
@@ -696,7 +623,7 @@ export class ReplayClient implements ReplayClientInterface {
     return mappedLocation;
   }
 
-  async requestFocusRange(range: FocusWindowRequest): Promise<TimeStampedPointRange> {
+  async requestFocusRange(range: TimeRange): Promise<TimeStampedPointRange> {
     const sessionId = this.getSessionIdThrows();
     const { window } = await client.Session.requestFocusRange({ range }, sessionId);
 
@@ -847,57 +774,76 @@ export class ReplayClient implements ReplayClientInterface {
     }
   }
 
-  async runEvaluation(
-    opts: {
-      selector: PointSelector;
-      expression: string;
-      frameIndex?: number;
-      fullPropertyPreview?: boolean;
-      limits?: PointPageLimits;
-    },
-    onResults: (results: RunEvaluationResult[]) => void
-  ): Promise<void> {
-    const sessionId = this.getSessionIdThrows();
-    const runEvaluationId = String(this.nextRunEvaluationId++);
-    const pointLimits: PointPageLimits = opts.limits ? { ...opts.limits } : {};
-    if (!pointLimits.maxCount) {
-      pointLimits.maxCount = MAX_POINTS_TO_RUN_EVALUATION;
-    }
+  async runAnalysis<Result>(params: RunAnalysisParams): Promise<Result[]> {
+    // Don't try to run analysis in unloaded regions.
+    // The result might be invalid (and may get cached by a Suspense caller).
+    await this._waitForRangeToBeLoaded(params.range || null);
 
-    await this._waitForRangeToBeLoaded(
-      pointLimits.begin && pointLimits.end
-        ? { begin: pointLimits.begin, end: pointLimits.end }
-        : null
+    return new Promise<Result[]>(async (resolve, reject) => {
+      const results: Result[] = [];
+
+      const { location, ...rest } = params;
+
+      let locations;
+      if (location) {
+        locations = this.getCorrespondingLocations(location).map(location => ({ location }));
+        await Promise.all(
+          locations.map(location =>
+            breakpointPositionsCache.readAsync(this, location.location.sourceId)
+          )
+        );
+      }
+
+      const analysisParams = {
+        ...rest,
+        locations,
+      };
+
+      try {
+        await analysisManager.runAnalysis(analysisParams, {
+          onAnalysisError: (error: unknown) => {
+            reject(error);
+          },
+          onAnalysisResults: analysisEntries => {
+            results.push(...analysisEntries.map(entry => entry.value));
+          },
+        });
+
+        resolve(results);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  streamAnalysis(
+    params: AnalysisParams,
+    handlers: {
+      onPoints?: (points: PointDescription[]) => void;
+      onResults?: (results: AnalysisEntry[]) => void;
+      onError?: (error: any) => void;
+    }
+  ): { pointsFinished: Promise<void>; resultsFinished: Promise<void> } {
+    let resolvePointsFinished!: () => void;
+    const pointsFinished = new Promise<void>(resolve => (resolvePointsFinished = resolve));
+    let resolveResultsFinished!: () => void;
+    const resultsFinished = new Promise<void>(resolve => (resolveResultsFinished = resolve));
+
+    this._waitForRangeToBeLoaded(params.range || null).then(() =>
+      analysisManager.runAnalysis(params, {
+        onAnalysisPoints: handlers.onPoints,
+        onAnalysisResults: handlers.onResults,
+        onAnalysisError: error => {
+          resolvePointsFinished();
+          resolveResultsFinished();
+          handlers.onError?.(error);
+        },
+        onPointsFinished: resolvePointsFinished,
+        onFinished: resolveResultsFinished,
+      })
     );
 
-    function onResultsWrapper(results: runEvaluationResults) {
-      if (results.runEvaluationId === runEvaluationId) {
-        onResults(results.results);
-      }
-    }
-
-    addEventListener("Session.runEvaluationResults", onResultsWrapper);
-
-    let result;
-    try {
-      result = await client.Session.runEvaluation(
-        {
-          expression: opts.expression,
-          frameIndex: opts.frameIndex,
-          fullReturnedPropertyPreview: opts.fullPropertyPreview,
-          pointLimits,
-          pointSelector: opts.selector,
-          runEvaluationId,
-        },
-        sessionId
-      );
-    } finally {
-      removeEventListener("Session.runEvaluationResults", onResultsWrapper);
-    }
-
-    if (result.pointPage.hasPrevious || result.pointPage.hasNext) {
-      throw commandError("Too many points", ProtocolError.TooManyPoints);
-    }
+    return { pointsFinished, resultsFinished };
   }
 
   async streamSourceContents(

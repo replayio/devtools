@@ -10,14 +10,8 @@ import Inspector from "replay-next/components/inspector";
 import Loader from "replay-next/components/Loader";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import {
-  UncaughtException,
-  exceptionValueCache,
-  exceptionsCache,
-} from "replay-next/src/suspense/ExceptionsCache";
-import { framesCache } from "replay-next/src/suspense/FrameCache";
+import { UncaughtException, exceptionsCache } from "replay-next/src/suspense/ExceptionsCache";
 import { formatTimestamp } from "replay-next/src/utils/time";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
@@ -102,21 +96,31 @@ function UncaughtExceptionRenderer({
 }
 
 function AnalyzedContent({ uncaughtException }: { uncaughtException: UncaughtException }) {
-  const client = useContext(ReplayClientContext);
-  const { pauseId } = exceptionsCache.resultsCache.read(uncaughtException.point);
-  const exceptionValue = exceptionValueCache.read(client, pauseId);
-  const frames = framesCache.read(client, pauseId) ?? [];
+  const uncaughtExceptionResult = exceptionsCache.resultsCache.read(uncaughtException.point);
+
+  const frames = uncaughtExceptionResult.data.frames || EMPTY_ARRAY;
   const showExpandable = frames.length > 0;
 
-  const primaryContent = exceptionValue ? (
-    <span className={styles.LogContents} data-test-name="LogContents">
-      <Suspense fallback={<Loader />}>
-        <Inspector context="console" pauseId={pauseId} protocolValue={exceptionValue} />
-      </Suspense>
-    </span>
-  ) : (
-    <>" "</>
-  );
+  const argumentValues = uncaughtExceptionResult.values || EMPTY_ARRAY;
+  const primaryContent =
+    argumentValues.length > 0 ? (
+      <span className={styles.LogContents} data-test-name="LogContents">
+        <Suspense fallback={<Loader />}>
+          {argumentValues.map((argumentValue: ProtocolValue, index: number) => (
+            <Fragment key={index}>
+              <Inspector
+                context="console"
+                pauseId={uncaughtExceptionResult.pauseId}
+                protocolValue={argumentValue}
+              />
+              {index < argumentValues.length - 1 && " "}
+            </Fragment>
+          ))}
+        </Suspense>
+      </span>
+    ) : (
+      <>" "</>
+    );
 
   return showExpandable ? (
     <Expandable
