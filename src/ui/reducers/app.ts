@@ -62,8 +62,8 @@ const appSlice = createSlice({
   name: "app",
   initialState: initialAppState,
   reducers: {
-    replayAssistToggled(state) {
-      state.showReplayAssist = !state.showReplayAssist;
+    setShowReplayAssist(state, action: PayloadAction<boolean>) {
+      state.showReplayAssist = action.payload;
     },
     setMouseTargetsLoading(state, action: PayloadAction<boolean>) {
       state.mouseTargetsLoading = action.payload;
@@ -167,7 +167,6 @@ const appSlice = createSlice({
 });
 
 export const {
-  replayAssistToggled,
   clearExpectedError,
   setAppMode,
   setAwaitingSourcemaps,
@@ -187,6 +186,7 @@ export const {
   setRecordingTarget,
   setRecordingWorkspace,
   setSessionId,
+  setShowReplayAssist,
   setTrialExpired,
   setUnexpectedError,
   setUploading,

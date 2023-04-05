@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 
 import Icon from "replay-next/components/Icon";
 import hooks from "ui/hooks";
-import { useTestInfo } from "ui/hooks/useTestInfo";
-import { getViewMode } from "ui/reducers/layout";
 import {
   shouldShowAddComment,
   shouldShowAddUnicornBadge,
@@ -16,7 +14,6 @@ import {
   shouldShowLaunchCommandPalette,
   shouldShowRecordReplay,
   shouldShowSearchSourceText,
-  shouldShowTour,
   shouldShowUseFocusMode,
 } from "ui/utils/onboarding";
 
@@ -118,8 +115,6 @@ const Assist: React.FC = () => {
   const [stepIndex, setStepIndex] = useState(0);
   const selectedItem = updatedChecklistItems[stepIndex];
 
-  const videoUrl = updatedChecklistItems[stepIndex].videoUrl;
-
   return (
     <div className={styles.AssistBoxWrapper}>
       <div className={styles.AssistBoxGradient}>
@@ -144,7 +139,7 @@ const Assist: React.FC = () => {
           </div>
         </div>
         <div className="absolute bottom-32 w-full px-2">
-          <img src={videoUrl} className={styles.videoExample} />
+          <img src={selectedItem.videoUrl} className={styles.videoExample} />
         </div>
       </div>
     </div>
