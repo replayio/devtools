@@ -84,7 +84,7 @@ export const nextInteractionEventCache: Cache<
       point,
       pointNearEndTime.point,
       replayClient,
-      eventType
+      [eventType]
     );
     return entryPoints[0];
   },
