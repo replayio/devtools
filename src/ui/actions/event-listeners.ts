@@ -283,10 +283,13 @@ export const IGNORABLE_PARTIAL_SOURCE_URLS = [
   "__cypress/runner/",
 ];
 
-export function shouldIgnoreEventFromSource(sourceDetails?: SourceDetails) {
+export function shouldIgnoreEventFromSource(
+  sourceDetails?: SourceDetails,
+  ignorableURLS = IGNORABLE_PARTIAL_SOURCE_URLS
+) {
   const url = sourceDetails?.url ?? "";
 
-  return IGNORABLE_PARTIAL_SOURCE_URLS.some(partialUrl => url.includes(partialUrl));
+  return ignorableURLS.some(partialUrl => url.includes(partialUrl));
 }
 
 // TODO This cache looks unsafe because it's not idempotent;

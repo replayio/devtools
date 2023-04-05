@@ -23,12 +23,17 @@ import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import { Nag } from "shared/graphql/types";
 import type { UIThunkAction } from "ui/actions";
-import { SEARCHABLE_EVENT_TYPES, eventListenerLocationCache } from "ui/actions/event-listeners";
+import {
+  SEARCHABLE_EVENT_TYPES,
+  eventListenerLocationCache,
+  shouldIgnoreEventFromSource,
+} from "ui/actions/event-listeners";
 import { setViewMode } from "ui/actions/layout";
 import useEventContextMenu from "ui/components/Events/useEventContextMenu";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getViewMode } from "ui/reducers/layout";
+import { SourcesState, getPreferredLocation } from "ui/reducers/sources";
 import { setMarkTimeStampPoint } from "ui/reducers/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
 import { ReplayEvent } from "ui/state/app";
@@ -51,6 +56,10 @@ const EVENTS_FOR_RECORDING_TARGET: Partial<
   // TODO [FE-1178] Fill in Chromium event types here?
   // chromium: {},
 };
+const USER_INTERACTION_IGNORABLE_URLS = [
+  // _Never_ treat Cypress events as user interactions
+  "__cypress/runner/",
+];
 
 export const nextInteractionEventCache: Cache<
   [
@@ -58,13 +67,14 @@ export const nextInteractionEventCache: Cache<
     ThreadFront: typeof TF,
     point: ExecutionPoint,
     replayEventType: SEARCHABLE_EVENT_TYPES,
-    endTime: number
+    endTime: number,
+    sourcesState: SourcesState
   ],
   PointDescription | undefined
 > = createCache({
   debugLabel: "NextInteractionEvent",
   getKey: ([replayClient, threadFront, point, replayEventType, endTime]) => point,
-  load: async ([replayClient, threadFront, point, replayEventType, endTime]) => {
+  load: async ([replayClient, threadFront, point, replayEventType, endTime, sourcesState]) => {
     const pointNearEndTime = await replayClient.getPointNearTime(endTime);
 
     const recordingTarget = await threadFront.getRecordingTarget();
@@ -86,7 +96,22 @@ export const nextInteractionEventCache: Cache<
       replayClient,
       [eventType]
     );
-    return entryPoints[0];
+
+    const firstSuitableHandledEvent = entryPoints.find(ep => {
+      if (ep.frame?.length) {
+        const preferredLocation = getPreferredLocation(sourcesState, ep.frame);
+        const matchingSource = sourcesState.sourceDetails.entities[preferredLocation.sourceId];
+        console.log("Entry point source: ", {
+          url: matchingSource?.url,
+          matchingSource,
+          preferredLocation,
+        });
+
+        // Find the first event that seems useful to jump to
+        return !shouldIgnoreEventFromSource(matchingSource, USER_INTERACTION_IGNORABLE_URLS);
+      }
+    });
+    return firstSuitableHandledEvent;
   },
 });
 
@@ -152,6 +177,7 @@ export function jumpToClickEventFunctionLocation(
 ): UIThunkAction<Promise<JumpToCodeStatus>> {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const { point: executionPoint, time } = event;
+    const sourcesState = getState().sources;
 
     try {
       // Actual browser click events get recorded a fraction later then the
@@ -184,7 +210,8 @@ export function jumpToClickEventFunctionLocation(
         ThreadFront,
         executionPoint,
         event.kind as SEARCHABLE_EVENT_TYPES,
-        arbitraryEndTime
+        arbitraryEndTime,
+        sourcesState
       );
 
       if (!nextClickEvent) {
