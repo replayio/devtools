@@ -7,6 +7,5 @@ export type Entry = {
   paramCalls?: ParamCall[];
   prop: string;
   result: any;
-  error?: any;
   thenable: any | null;
 };
