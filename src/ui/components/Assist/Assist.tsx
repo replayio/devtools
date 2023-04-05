@@ -1,19 +1,9 @@
 import React, { useEffect, useState } from "react";
 
 import Icon from "replay-next/components/Icon";
-import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
-import { setViewMode } from "ui/actions/layout";
-import { setSelectedPrimaryPanel } from "ui/actions/layout";
-import Events from "ui/components/Events";
-import Confetti from "ui/components/shared//Confetti";
 import hooks from "ui/hooks";
-import { Nag } from "ui/hooks/users";
-import { useDismissNag } from "ui/hooks/users";
-import { UserInfo } from "ui/hooks/users";
 import { useTestInfo } from "ui/hooks/useTestInfo";
 import { getViewMode } from "ui/reducers/layout";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { ViewMode } from "ui/state/layout";
 import {
   shouldShowAddComment,
   shouldShowAddUnicornBadge,
@@ -33,9 +23,7 @@ import {
 import styles from "./Assist.module.css";
 
 const Assist: React.FC = () => {
-  const [selectedItem, setSelectedItem] = useState(2);
   const { nags } = hooks.useGetUserInfo();
-  const viewMode = useAppSelector(getViewMode);
   const showConsoleNavigate = shouldShowConsoleNavigate(nags);
   const showBreakpointEdit = shouldShowBreakpointEdit(nags);
   const showAddComment = shouldShowAddComment(nags);
@@ -49,10 +37,6 @@ const Assist: React.FC = () => {
   const showInspectElement = shouldShowInspectElement(nags);
   const showUseFocusMode = shouldShowUseFocusMode(nags);
 
-  const [showConfetti, setShowConfetti] = useState(false);
-
-  const info = useTestInfo();
-
   const renderCheckmarkIcon = (completed: boolean | undefined) => {
     if (completed === false) {
       return "checked-rounded";
@@ -62,11 +46,10 @@ const Assist: React.FC = () => {
 
   const handleClick = (index: number) => {
     setStepIndex(index);
-    setSelectedItem(index);
   };
 
   const getItemStyle = (index: number) => {
-    return selectedItem === index ? styles.selectedItem : "";
+    return stepIndex === index ? styles.selectedItem : "";
   };
 
   const updatedChecklistItems = [
@@ -133,6 +116,7 @@ const Assist: React.FC = () => {
   ];
 
   const [stepIndex, setStepIndex] = useState(0);
+  const selectedItem = updatedChecklistItems[stepIndex];
 
   const videoUrl = updatedChecklistItems[stepIndex].videoUrl;
 
@@ -159,7 +143,7 @@ const Assist: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="absolute bottom-32 w-full px-2">
+        <div className="absolute w-full px-2 bottom-32">
           <img src={videoUrl} className={styles.videoExample} />
         </div>
       </div>
