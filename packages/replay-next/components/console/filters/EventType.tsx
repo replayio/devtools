@@ -18,8 +18,14 @@ export default function EventType({
 }) {
   const { eventTypesForDisplay: eventTypes, update } = useContext(ConsoleFiltersContext);
 
-  const checked = eventTypes[event.type] === true;
-  const toggle = () => update({ eventTypes: { [event.type]: !checked } });
+  const checked = eventTypes[event.rawEventTypes[0]] === true;
+  const newChecked = !checked;
+  const toggle = () =>
+    update({
+      eventTypes: Object.fromEntries(
+        event.rawEventTypes.map(rawEventType => [rawEventType, newChecked])
+      ),
+    });
 
   const stopPropagation = (event: MouseEvent) => {
     event.stopPropagation();

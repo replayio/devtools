@@ -106,14 +106,8 @@ export default function useSearchDOM<Item>(
     []
   );
 
-  const externalState = useMemo<State<Item>>(
-    () => ({
-      index: state.index,
-      query: state.query,
-      results: state.results,
-    }),
-    [state]
-  );
+  // For the moment, these values are equal.
+  const externalState = state;
 
   return [externalState, actions];
 }

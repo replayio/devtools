@@ -112,6 +112,7 @@ export async function renderFocused(
     range: null,
     rangeForDisplay: null,
     update: jest.fn(),
+    updateForTimelineImprecise: jest.fn(),
     ...options?.focusContext,
   };
 
@@ -195,6 +196,7 @@ export function createMockReplayClient() {
     getCorrespondingSourceIds: jest.fn().mockImplementation(() => []),
     getCorrespondingLocations: jest.fn().mockImplementation(() => []),
     getEventCountForTypes: jest.fn().mockImplementation(async () => {}),
+    getAllEventHandlerCounts: jest.fn().mockImplementation(async () => {}),
     getEventCountForType: jest.fn().mockImplementation(async () => 0),
     getFocusWindow: jest.fn().mockImplementation(async () => ({})),
     getFrameSteps: jest.fn().mockImplementation(async () => []),
@@ -217,6 +219,7 @@ export function createMockReplayClient() {
       supportsPureEvaluation: false,
     })),
     getRecordingId: jest.fn().mockImplementation(async () => "fake-recording-id"),
+    getRecordingTarget: jest.fn().mockImplementation(async () => "gecko"),
     getScope: jest.fn().mockImplementation(async () => {}),
     getScopeMap: jest.fn().mockImplementation(async () => {}),
     getSessionEndpoint: jest.fn().mockImplementation(async () => ({

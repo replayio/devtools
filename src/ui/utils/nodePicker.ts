@@ -36,7 +36,7 @@ export class NodePicker {
   }
 
   private onMouseMove = async (e: MouseEvent) => {
-    const pos = this.mouseEventCanvasPosition(e);
+    const pos = mouseEventCanvasPosition(e, this.canvas);
     const opts = this.opts;
     let nodeBounds: NodeBounds | null = null;
     if (pos) {
@@ -61,7 +61,7 @@ export class NodePicker {
     e.preventDefault();
     const opts = this.opts;
     this.disable();
-    const pos = this.mouseEventCanvasPosition(e);
+    const pos = mouseEventCanvasPosition(e, this.canvas);
     let nodeBounds: NodeBounds | null = null;
     if (pos) {
       if (opts?.onCheckNodeBounds) {
@@ -70,32 +70,36 @@ export class NodePicker {
     }
     opts?.onPicked(nodeBounds ? nodeBounds.node : null);
   };
+}
 
-  // Get the x/y coordinate of a mouse event wrt the recording's DOM.
-  private mouseEventCanvasPosition(e: MouseEvent) {
-    if (!this.canvas) {
-      return undefined;
-    }
-    const bounds = this.canvas.getBoundingClientRect();
-    if (
-      e.clientX < bounds.left ||
-      e.clientX > bounds.right ||
-      e.clientY < bounds.top ||
-      e.clientY > bounds.bottom
-    ) {
-      // Not in the canvas.
-      return undefined;
-    }
-
-    const scale = bounds.width / this.canvas.offsetWidth;
-    const pixelRatio = getDevicePixelRatio();
-    if (!pixelRatio) {
-      return undefined;
-    }
-
-    return {
-      x: (e.clientX - bounds.left) / scale / pixelRatio,
-      y: (e.clientY - bounds.top) / scale / pixelRatio,
-    };
+// Get the x/y coordinate of a mouse event wrt the recording's DOM.
+export function mouseEventCanvasPosition(
+  event: MouseEvent,
+  canvas: HTMLElement | null
+): { x: number; y: number } | undefined {
+  if (!canvas) {
+    return undefined;
   }
+
+  const bounds = canvas.getBoundingClientRect();
+  if (
+    event.clientX < bounds.left ||
+    event.clientX > bounds.right ||
+    event.clientY < bounds.top ||
+    event.clientY > bounds.bottom
+  ) {
+    // Not in the canvas.
+    return undefined;
+  }
+
+  const scale = bounds.width / canvas.offsetWidth;
+  const pixelRatio = getDevicePixelRatio();
+  if (!pixelRatio) {
+    return undefined;
+  }
+
+  return {
+    x: (event.clientX - bounds.left) / scale / pixelRatio,
+    y: (event.clientY - bounds.top) / scale / pixelRatio,
+  };
 }

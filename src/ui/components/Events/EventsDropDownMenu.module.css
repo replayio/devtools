@@ -1,0 +1,28 @@
+.DropDownButton {
+  background: none;
+  border: none;
+  outline: none;
+  flex: 0 0 1rem;
+  cursor: pointer;
+}
+
+.Icon {
+  height: 1rem;
+  width: 1rem;
+  flex: 0 0 auto;
+}
+.Icon[data-selected] {
+  color: var(--color-link);
+}
+
+.MenuItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+  text-transform: capitalize;
+}
+
+.Checkbox {
+  gap: 1ch;
+}

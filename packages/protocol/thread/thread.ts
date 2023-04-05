@@ -227,7 +227,7 @@ class _ThreadFront {
         recordingCapabilities = {
           supportsEagerEvaluation: false,
           supportsElementsInspector: true,
-          supportsEventTypes: false,
+          supportsEventTypes: true,
           supportsNetworkRequests: false,
           supportsRepaintingGraphics: features.chromiumRepaints ?? false,
           supportsPureEvaluation: false,
@@ -250,7 +250,7 @@ class _ThreadFront {
         recordingCapabilities = {
           supportsEagerEvaluation: true,
           supportsElementsInspector: false,
-          supportsEventTypes: true,
+          supportsEventTypes: false,
           supportsNetworkRequests: true,
           supportsRepaintingGraphics: false,
           supportsPureEvaluation: false,

@@ -76,3 +76,9 @@
 .TourBox p {
   font-size: var(--font-size-regular);
 }
+
+.EventsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
