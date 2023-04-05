@@ -143,7 +143,7 @@ const Assist: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="absolute w-full px-2 bottom-32">
+        <div className="absolute bottom-32 w-full px-2">
           <img src={videoUrl} className={styles.videoExample} />
         </div>
       </div>

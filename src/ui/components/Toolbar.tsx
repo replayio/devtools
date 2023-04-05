@@ -2,7 +2,6 @@ import classnames from "classnames";
 import classNames from "classnames";
 import React, { useContext, useEffect, useState } from "react";
 
-import AccessibleImage from "devtools/client/debugger/src/components/shared/AccessibleImage";
 import { getPauseId } from "devtools/client/debugger/src/selectors";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
@@ -12,18 +11,11 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
-import { Nag } from "ui/hooks/users";
-import { useTestInfo } from "ui/hooks/useTestInfo";
 import { getReplayAssist } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { PrimaryPanelName } from "ui/state/layout";
-import {
-  shouldShowBreakpointAdd,
-  shouldShowBreakpointEdit,
-  shouldShowConsoleNavigate,
-  shouldShowTour,
-} from "ui/utils/onboarding";
+import { shouldShowTour } from "ui/utils/onboarding";
 // TODO [ryanjduffy]: Refactor shared styling more completely
 import { trackEvent } from "ui/utils/telemetry";
 
