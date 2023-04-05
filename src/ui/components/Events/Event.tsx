@@ -60,7 +60,6 @@ const EVENTS_FOR_RECORDING_TARGET: Partial<
     mousedown: { categoryKey: "Mouse", eventType: "event.mouse.click" },
     keypress: { categoryKey: "Keyboard", eventType: "event.keyboard.keypress" },
   },
-  // TODO [FE-1178] Fill in Chromium event types here?
   chromium: {
     mousedown: { categoryKey: "Mouse", eventType: "click" },
     keypress: { categoryKey: "Keyboard", eventType: "keypress" },
@@ -126,7 +125,6 @@ export const nextInteractionEventCache: Cache<
     if (!eventTypesToQuery.length) {
       return;
     }
-
 
     const entryPoints = await eventPointsCache.readAsync(
       point,

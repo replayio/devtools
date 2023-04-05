@@ -518,33 +518,7 @@ function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
 
       return res;
     } else {
-      // TODO Semi-debug logging of the arguments. Hopefully can be removed soon.
-      throw new Error(
-        `no event found! eventClass: ${
-          injectedValues.EVENT_CLASS_NAMES
-        }, args: ${injectedValues.args.map(arg => {
-          switch (typeof arg) {
-            case "string":
-              return `'${arg}'`;
-            case "number":
-            case "boolean":
-              return arg;
-            case "object": {
-              if (arg instanceof Event) {
-                return JSON.stringify({
-                  type: arg.type,
-                  target: (arg.target as HTMLElement)?.nodeName,
-                });
-              } else if (arg instanceof HTMLElement) {
-                return `<${arg.nodeName} />`;
-              }
-              return typeof arg;
-            }
-            default:
-              return typeof arg;
-          }
-        })}`
-      );
+      throw new Error(`no event found! eventClass: ${injectedValues.EVENT_CLASS_NAMES}`);
     }
   }
 

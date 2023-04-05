@@ -12,6 +12,7 @@ import { STANDARD_EVENT_CATEGORIES } from "../constants";
 import { groupEntries } from "../utils/group";
 import { createInfallibleSuspenseCache } from "../utils/suspense";
 import { createAnalysisCache } from "./AnalysisCache";
+import { updateMappedLocation } from "./PauseCache";
 
 export type Event = {
   count: number;
@@ -58,8 +59,15 @@ export const eventPointsCache = createIntervalCache<
   getKey: (client, eventTypes) => eventTypes.join(),
   getPointForValue: pointDescription => pointDescription.point,
   comparePoints: compareNumericStrings,
-  load: (begin, end, client, eventTypes) =>
-    client.findPoints(createPointSelector(eventTypes), { begin, end }),
+  load: async (begin, end, client, eventTypes) => {
+    const points = await client.findPoints(createPointSelector(eventTypes), { begin, end });
+    points.forEach(p => {
+      if (p?.frame?.length) {
+        updateMappedLocation(client, p.frame);
+      }
+    });
+    return points;
+  },
 });
 
 export const eventsCache = createAnalysisCache<EventLog, [EventHandlerType]>(
