@@ -11,7 +11,6 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
-import { showReplayAssist as showReplayAssistSelector } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { PrimaryPanelName } from "ui/state/layout";
@@ -155,8 +154,9 @@ export default function Toolbar() {
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   const { comments, loading } = hooks.useGetComments(recordingId);
-  const { value: logProtocol } = useFeature("logProtocol");
-  const { value: showReactPanel } = useFeature("reactPanel");
+  const { value: logProtocolExperimentEnabled } = useFeature("logProtocol");
+  const { value: reactPanelExperimentEnabled } = useFeature("reactPanel");
+  const { value: replayAssistExperimentEnabled } = useFeature("replayAssist");
   const [sidePanelCollapsed, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
   const { nags } = hooks.useGetUserInfo();
   const showTour = shouldShowTour(nags);
@@ -192,8 +192,6 @@ export default function Toolbar() {
     }
   };
 
-  const showReplayAssist = useAppSelector(showReplayAssistSelector);
-
   return (
     <div className="toolbox-toolbar-container flex flex-col items-center justify-between py-1">
       <div id="toolbox-toolbar">
@@ -206,7 +204,7 @@ export default function Toolbar() {
           />
         ) : null}
 
-        {showReplayAssist ? (
+        {replayAssistExperimentEnabled ? (
           <ToolbarButton
             icon="school"
             name="assist"
@@ -253,12 +251,12 @@ export default function Toolbar() {
               showBadge={hasFrames}
               onClick={handleButtonClick}
             />
-            {showReactPanel && (
+            {reactPanelExperimentEnabled && (
               <ToolbarButton icon="react" name="react" label="React" onClick={handleButtonClick} />
             )}
           </>
         ) : null}
-        {logProtocol && viewMode === "dev" ? (
+        {logProtocolExperimentEnabled && viewMode === "dev" ? (
           <ToolbarButton icon="code" label="Protocol" name="protocol" onClick={handleButtonClick} />
         ) : null}
         <div className="grow"></div>

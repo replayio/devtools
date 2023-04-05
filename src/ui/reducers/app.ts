@@ -3,6 +3,7 @@ import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 import { RecordingTarget } from "protocol/thread/thread";
 import { compareExecutionPoints, isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { Workspace } from "shared/graphql/types";
+import { getFeature } from "ui/hooks/settings";
 import { getCurrentTime, getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import {
@@ -26,7 +27,7 @@ import { prefs } from "ui/utils/prefs";
 import { isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
 
 export const initialAppState: AppState = {
-  showReplayAssist: true,
+  showReplayAssist: false,
   awaitingSourcemaps: false,
   canvas: null,
   currentPoint: null,
