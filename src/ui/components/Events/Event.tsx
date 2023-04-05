@@ -224,9 +224,6 @@ export function jumpToClickEventFunctionLocation(
         nextClickEvent.time
       );
 
-      // If we did have a click event, timewarp to that click's point
-      onSeek(nextClickEvent.point, nextClickEvent.time);
-
       const functionSourceLocation = await eventListenerLocationCache.readAsync(
         ThreadFront,
         replayClient,
