@@ -16,7 +16,7 @@ import { RecordingTarget } from "protocol/thread/thread";
 import Icon from "replay-next/components/Icon";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
-import { eventPointsCache } from "replay-next/src/suspense/EventsCache";
+import { eventCountsCache, eventPointsCache } from "replay-next/src/suspense/EventsCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { compareExecutionPoints } from "replay-next/src/utils/time";
@@ -46,15 +46,25 @@ export interface PointWithEventType extends TimeStampedPoint {
   kind: "keypress" | "mousedown";
 }
 
+type EventCategories = "Mouse" | "Keyboard";
+
+export interface EventListenerEntry {
+  eventType: string;
+  categoryKey: EventCategories;
+}
+
 const EVENTS_FOR_RECORDING_TARGET: Partial<
-  Record<RecordingTarget, Record<SEARCHABLE_EVENT_TYPES, string>>
+  Record<RecordingTarget, Record<SEARCHABLE_EVENT_TYPES, EventListenerEntry>>
 > = {
   gecko: {
-    mousedown: "event.mouse.click",
-    keypress: "event.keyboard.keypress",
+    mousedown: { categoryKey: "Mouse", eventType: "event.mouse.click" },
+    keypress: { categoryKey: "Keyboard", eventType: "event.keyboard.keypress" },
   },
   // TODO [FE-1178] Fill in Chromium event types here?
-  // chromium: {},
+  chromium: {
+    mousedown: { categoryKey: "Mouse", eventType: "click" },
+    keypress: { categoryKey: "Keyboard", eventType: "keypress" },
+  },
 };
 const USER_INTERACTION_IGNORABLE_URLS = [
   // _Never_ treat Cypress events as user interactions
@@ -84,17 +94,45 @@ export const nextInteractionEventCache: Cache<
       return;
     }
 
-    const eventType = EVENTS_FOR_RECORDING_TARGET[recordingTarget]?.[replayEventType];
+    let eventTypesToQuery: string[] = [];
 
-    if (!eventType) {
+    const initialEventType = EVENTS_FOR_RECORDING_TARGET[recordingTarget]?.[replayEventType];
+
+    if (!initialEventType) {
       return;
     }
+
+    if (recordingTarget === "gecko") {
+      // For Firefox, we can use that event string as-is
+      eventTypesToQuery.push(initialEventType.eventType);
+    } else if (recordingTarget === "chromium") {
+      // Now we get to do this the hard way.
+      // Chromium sends back a bunch of different types of events.  For example, a "click" event
+      // could be `"click,DIV"`, `"click,BUTTON"`, `"click,BODY"`, etc.
+      // We apparently need to add _all_ of those to this analysis for it to work.
+      const eventCounts = await eventCountsCache.readAsync(replayClient, null);
+
+      const categoryEntry = eventCounts.find(e => e.category === initialEventType.categoryKey);
+      if (!categoryEntry) {
+        return;
+      }
+      const eventsForType = categoryEntry.events.find(e => e.label === initialEventType.eventType);
+      if (!eventsForType) {
+        return;
+      }
+      eventTypesToQuery = eventsForType.rawEventTypes;
+    }
+
+    if (!eventTypesToQuery.length) {
+      return;
+    }
+
 
     const entryPoints = await eventPointsCache.readAsync(
       point,
       pointNearEndTime.point,
       replayClient,
-      [eventType]
+      eventTypesToQuery
     );
 
     const firstSuitableHandledEvent = entryPoints.find(ep => {
