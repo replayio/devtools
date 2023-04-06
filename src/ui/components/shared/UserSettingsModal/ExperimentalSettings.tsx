@@ -95,7 +95,7 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     label: "Disable Concurrent Controller Loading",
     description: "Disable loading regions concurrently at controller startup",
     key: "disableConcurrentControllerLoading",
-  }
+  },
 ];
 
 const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [];
@@ -161,7 +161,10 @@ export default function ExperimentalSettings({}) {
   const { value: enableIncrementalSnapshots, update: updateEnableIncrementalSnapshots } =
     useFeature("enableIncrementalSnapshots");
 
-  const { value: disableConcurrentControllerLoading, update: updateDisableConcurrentControllerLoading } = useFeature("disableConcurrentControllerLoading");
+  const {
+    value: disableConcurrentControllerLoading,
+    update: updateDisableConcurrentControllerLoading,
+  } = useFeature("disableConcurrentControllerLoading");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
