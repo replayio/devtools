@@ -12,6 +12,7 @@ import { STANDARD_EVENT_CATEGORIES } from "../constants";
 import { groupEntries } from "../utils/group";
 import { createInfallibleSuspenseCache } from "../utils/suspense";
 import { createAnalysisCache } from "./AnalysisCache";
+import { updateMappedLocation } from "./PauseCache";
 
 export type Event = {
   count: number;
@@ -51,24 +52,31 @@ export const eventCountsCache: Cache<
 
 export const eventPointsCache = createIntervalCache<
   ExecutionPoint,
-  [client: ReplayClientInterface, eventType: EventHandlerType],
+  [client: ReplayClientInterface, eventTypes: EventHandlerType[]],
   PointDescription
 >({
   debugLabel: "EventPoints",
-  getKey: (client, eventType) => eventType,
+  getKey: (client, eventTypes) => eventTypes.join(),
   getPointForValue: pointDescription => pointDescription.point,
   comparePoints: compareNumericStrings,
-  load: (begin, end, client, eventType) =>
-    client.findPoints(createPointSelector(eventType), { begin, end }),
+  load: async (begin, end, client, eventTypes) => {
+    const points = await client.findPoints(createPointSelector(eventTypes), { begin, end });
+    points.forEach(p => {
+      if (p?.frame?.length) {
+        updateMappedLocation(client, p.frame);
+      }
+    });
+    return points;
+  },
 });
 
 export const eventsCache = createAnalysisCache<EventLog, [EventHandlerType]>(
   "Events",
   eventType => eventType,
-  (client, begin, end, eventType) => eventPointsCache.readAsync(begin, end, client, eventType),
+  (client, begin, end, eventType) => eventPointsCache.readAsync(begin, end, client, [eventType]),
   (client, points, eventType) => {
     return {
-      selector: createPointSelector(eventType),
+      selector: createPointSelector([eventType]),
       expression: "[...arguments]",
       frameIndex: 0,
     };
@@ -76,8 +84,8 @@ export const eventsCache = createAnalysisCache<EventLog, [EventHandlerType]>(
   transformPoint
 );
 
-function createPointSelector(eventType: EventHandlerType): PointSelector {
-  return { kind: "event-handlers", eventTypes: [eventType] };
+function createPointSelector(eventTypes: EventHandlerType[]): PointSelector {
+  return { kind: "event-handlers", eventTypes };
 }
 
 function transformPoint(point: PointDescription, eventType: EventHandlerType): EventLog {

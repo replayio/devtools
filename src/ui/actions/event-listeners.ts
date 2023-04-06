@@ -8,6 +8,7 @@ import type { ThreadFront as TF } from "protocol/thread";
 import { topFrameCache } from "replay-next/src/suspense/FrameCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData, updateMappedLocation } from "replay-next/src/suspense/PauseCache";
+import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { scopeMapCache } from "replay-next/src/suspense/ScopeMapCache";
 import { ReplayClientInterface } from "shared/client/types";
 import {
@@ -267,9 +268,9 @@ const REACT_EVENT_PROPS: Record<SEARCHABLE_EVENT_TYPES, string[]> = {
   keypress: ["onChange", "onKeyPress"],
 };
 
-const EVENT_CLASS_FOR_EVENT_TYPE: Record<SEARCHABLE_EVENT_TYPES, string> = {
-  mousedown: "MouseEvent",
-  keypress: "InputEvent",
+const EVENT_CLASS_FOR_EVENT_TYPE: Record<SEARCHABLE_EVENT_TYPES, string[]> = {
+  mousedown: ["MouseEvent"],
+  keypress: ["InputEvent", "KeyboardEvent"],
 };
 
 export const IGNORABLE_PARTIAL_SOURCE_URLS = [
@@ -283,10 +284,13 @@ export const IGNORABLE_PARTIAL_SOURCE_URLS = [
   "__cypress/runner/",
 ];
 
-export function shouldIgnoreEventFromSource(sourceDetails?: SourceDetails) {
+export function shouldIgnoreEventFromSource(
+  sourceDetails?: SourceDetails,
+  ignorableURLS = IGNORABLE_PARTIAL_SOURCE_URLS
+) {
   const url = sourceDetails?.url ?? "";
 
-  return IGNORABLE_PARTIAL_SOURCE_URLS.some(partialUrl => url.includes(partialUrl));
+  return ignorableURLS.some(partialUrl => url.includes(partialUrl));
 }
 
 // TODO This cache looks unsafe because it's not idempotent;
@@ -320,13 +324,12 @@ export const eventListenerLocationCache: Cache<
 
     // Introspect the event's target DOM node, and find the nearest
     // React event handler if any exists.
-    const res = await threadFront.evaluate({
+    const res = await pauseEvaluationsCache.readAsync(
       replayClient,
       pauseId,
-      text: evaluatedEventMapper,
       frameId,
-      pure: false,
-    });
+      evaluatedEventMapper
+    );
 
     let sourceLocation: Location | undefined;
     const sourcesById = getSourceDetailsEntities(state);
@@ -393,7 +396,7 @@ declare let event: MouseEvent | KeyboardEvent;
 interface InjectedValues {
   $REACT_16_EVENT_LISTENER_PROP_KEY: string;
   $REACT_17_18_EVENT_LISTENER_PROP_KEY: string;
-  EVENT_CLASS_NAME: string;
+  EVENT_CLASS_NAMES: string[];
   possibleReactPropNames: string[];
   args: any[];
 }
@@ -414,16 +417,20 @@ interface EventMapperResult {
 
 function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
   const reactEventPropNames = REACT_EVENT_PROPS[eventType];
-  const eventClassName = EVENT_CLASS_FOR_EVENT_TYPE[eventType];
+  const eventClassNames = EVENT_CLASS_FOR_EVENT_TYPE[eventType];
 
   // This will became evaluated JS code
-
   function findEventTargetAndHandler(injectedValues: InjectedValues) {
-    // One of the args should be a browser event
-    const targetEventClass = window[injectedValues.EVENT_CLASS_NAME as any] as any;
-    const matchingEvent = injectedValues.args.find(
-      a => typeof a === "object" && a instanceof targetEventClass
-    );
+    // One of the args should be a browser event. There could be multiple event class types we're looking for,
+    // such as `MouseEvent` or `InputEvent`, so loop over the args _and_ the class names.
+    const eventArgs = injectedValues.args.filter(a => typeof a === "object" && a instanceof Event);
+    const matchingEvent = eventArgs.find(a => {
+      const matchesEventType = injectedValues.EVENT_CLASS_NAMES.some(eventClassName => {
+        const eventClass: any = window[eventClassName as any];
+        return a instanceof eventClass;
+      });
+      return matchesEventType;
+    });
 
     if (matchingEvent) {
       const searchedNodes: SearchedNode[] = [];
@@ -510,6 +517,8 @@ function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
       }
 
       return res;
+    } else {
+      throw new Error(`no event found! eventClass: ${injectedValues.EVENT_CLASS_NAMES}`);
     }
   }
 
@@ -517,7 +526,7 @@ function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
     (${findEventTargetAndHandler})({
       $REACT_16_EVENT_LISTENER_PROP_KEY: "${REACT_16_EVENT_LISTENER_PROP_KEY}",
       $REACT_17_18_EVENT_LISTENER_PROP_KEY: "${REACT_17_18_EVENT_LISTENER_PROP_KEY}",
-      EVENT_CLASS_NAME: "${eventClassName}",
+      EVENT_CLASS_NAMES: ${JSON.stringify(eventClassNames)},
       possibleReactPropNames: ${JSON.stringify(reactEventPropNames)},
       
       // Outer body runs in scope of the "current" event handler.
