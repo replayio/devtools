@@ -371,12 +371,6 @@ export class ReplayClient implements ReplayClientInterface {
         { pointSelector, pointLimits, findPointsId },
         sessionId
       );
-    } catch (error) {
-      //TODO remove this workaround when BAC-3017 is fixed
-      if (isCommandError(error, ProtocolError.InternalError)) {
-        throw commandError("Too many points", ProtocolError.TooManyPoints);
-      }
-      throw error;
     } finally {
       removeEventListener("Session.findPointsResults", onPoints);
     }
@@ -388,8 +382,6 @@ export class ReplayClient implements ReplayClientInterface {
     ) {
       throw commandError("Too many points", ProtocolError.TooManyPoints);
     }
-
-    removeEventListener("Session.findPointsResults", onPoints);
 
     points.sort((a, b) => compareNumericStrings(a.point, b.point));
     return points;
