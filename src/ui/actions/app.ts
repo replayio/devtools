@@ -1,6 +1,10 @@
 import { KeyboardEvent, NodeBounds } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
+import {
+  jumpToNextPause,
+  jumpToPreviousPause,
+} from "devtools/client/debugger/src/actions/pause/jumps";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
@@ -308,6 +312,10 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       dispatch(setToolboxLayout("left"));
     } else if (key === "pin_to_bottom_right") {
       dispatch(setToolboxLayout("ide"));
+    } else if (key === "jump_to_previous_pause") {
+      dispatch(jumpToPreviousPause());
+    } else if (key === "jump_to_next_pause") {
+      dispatch(jumpToNextPause());
     }
     // else if (key === "copy_points") {
     //   dispatch(copyBreakpointsToClipboard());

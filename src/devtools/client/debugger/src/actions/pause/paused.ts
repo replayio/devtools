@@ -30,7 +30,7 @@ export function paused({
   executionPoint: string;
   openSource: boolean;
   frame?: $FixTypeLater;
-  time?: number;
+  time: number;
 }): UIThunkAction {
   return async function (dispatch, getState, { ThreadFront, replayClient }) {
     dispatch(pauseRequestedAt());

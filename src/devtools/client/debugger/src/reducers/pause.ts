@@ -29,6 +29,13 @@ export interface Context {
   navigateCounter: number;
 }
 
+interface PauseHistoryData {
+  pauseId: string;
+  time: number;
+  executionPoint: string;
+  hasFrames: boolean;
+}
+
 export interface ThreadContext {
   isPaused: boolean;
   navigateCounter: number;
@@ -68,6 +75,8 @@ export interface PauseState {
   executionPoint: string | null;
   command: string | null;
   replayFramePositions?: { positions: UnknownPosition[] } | null;
+  pauseHistory: PauseHistoryData[];
+  pauseHistoryIndex: number;
 }
 
 export type ValidCommand =
@@ -103,6 +112,8 @@ const initialState: PauseState = {
   pausePreviewLocation: null,
   ...resumedPauseState,
   command: null,
+  pauseHistory: [],
+  pauseHistoryIndex: -1,
 };
 
 export const executeCommandOperation = createAsyncThunk<
@@ -161,10 +172,10 @@ const pauseSlice = createSlice({
         why?: string;
         executionPoint: string;
         // used by the legacy Messages reducer
-        time?: number;
+        time: number;
       }>
     ) {
-      const { id, frame, why, executionPoint } = action.payload;
+      const { id, frame, why, executionPoint, time } = action.payload;
       Object.assign(state, {
         pauseErrored: false,
         pauseLoading: false,
@@ -177,6 +188,22 @@ const pauseSlice = createSlice({
       state.selectedFrameId = frame ? { pauseId: frame.pauseId, frameId: frame.protocolId } : null;
       state.threadcx.pauseCounter++;
       state.pausePreviewLocation = null;
+      if (state.pauseHistory[state.pauseHistoryIndex]?.executionPoint !== executionPoint) {
+        state.pauseHistory = state.pauseHistory.slice(0, state.pauseHistoryIndex + 1);
+        state.pauseHistory.push({
+          pauseId: id,
+          time,
+          executionPoint,
+          hasFrames: !!frame,
+        });
+        state.pauseHistoryIndex++;
+      }
+    },
+    pauseHistoryDecremented(state) {
+      state.pauseHistoryIndex--;
+    },
+    pauseHistoryIncremented(state) {
+      state.pauseHistoryIndex++;
     },
     pauseCreationFailed(state, action: PayloadAction<string>) {
       const executionPoint = action.payload;
@@ -251,6 +278,8 @@ export const {
   previewLocationCleared,
   previewLocationUpdated,
   resumed,
+  pauseHistoryDecremented,
+  pauseHistoryIncremented,
 } = pauseSlice.actions;
 
 // Copied to avoid import
@@ -296,6 +325,12 @@ export function getPauseErrored(state: UIState) {
 
 export function getPausePreviewLocation(state: UIState) {
   return state.pause.pausePreviewLocation;
+}
+export function getPauseHistory(state: UIState) {
+  return state.pause.pauseHistory;
+}
+export function getPauseHistoryIndex(state: UIState) {
+  return state.pause.pauseHistoryIndex;
 }
 
 async function getResumePoint(replayClient: ReplayClientInterface, state: UIState, type: string) {

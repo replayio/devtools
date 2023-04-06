@@ -45,7 +45,9 @@ export type CommandKey =
   | "show_replay_info"
   | "show_sharing"
   | "toggle_dark_mode"
-  | "toggle_edit_focus";
+  | "toggle_edit_focus"
+  | "jump_to_next_pause"
+  | "jump_to_previous_pause";
 
 const COMMANDS: readonly Command[] = [
   { key: "open_console", label: "Open Console" },
