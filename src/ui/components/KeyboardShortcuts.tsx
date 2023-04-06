@@ -52,6 +52,8 @@ function KeyboardShortcuts({
   toggleThemeAction,
   toggleQuickOpen,
   closeOpenModalsOnEscape,
+  jumpToPreviousPause,
+  jumpToNextPause,
 }: PropsFromRedux) {
   const recordingId = useGetRecordingId();
   const { isAuthenticated } = useAuth0();
@@ -136,6 +138,20 @@ function KeyboardShortcuts({
       }
     };
 
+    const jumpToPreviousPauseWrapper = (e: KeyboardEvent) => {
+      if (!e.target || !isEditableElement(e.target)) {
+        e.preventDefault();
+        jumpToPreviousPause();
+      }
+    };
+
+    const jumpToNextPauseWrapper = (e: KeyboardEvent) => {
+      if (!e.target || !isEditableElement(e.target)) {
+        e.preventDefault();
+        jumpToNextPause();
+      }
+    };
+
     const shortcuts: Record<string, (e: KeyboardEvent) => void> = {
       "CmdOrCtrl+Shift+F": openFullTextSearch,
       "CmdOrCtrl+K": togglePalette,
@@ -152,7 +168,8 @@ function KeyboardShortcuts({
       // Can pre-fill the dialog with specific filter prefixes
       "CmdOrCtrl+Shift+O": toggleFunctionQuickOpenModal,
       "CmdOrCtrl+O": toggleProjectFunctionQuickOpenModal,
-
+      "CmdOrCtrl+[": jumpToPreviousPauseWrapper,
+      "CmdOrCtrl+]": jumpToNextPauseWrapper,
       "~": toggleProtocolTimeline,
 
       Escape: closeOpenModalsOnEscape,
@@ -174,6 +191,8 @@ function KeyboardShortcuts({
     closeOpenModalsOnEscape,
     createFrameComment,
     recordingId,
+    jumpToPreviousPause,
+    jumpToNextPause,
   ]);
 
   useEffect(() => {
@@ -206,6 +225,8 @@ const connector = connect(
     toggleThemeAction: actions.toggleTheme,
     toggleQuickOpen,
     closeOpenModalsOnEscape,
+    jumpToPreviousPause: actions.jumpToPreviousPause,
+    jumpToNextPause: actions.jumpToNextPause,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
