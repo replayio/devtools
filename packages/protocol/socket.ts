@@ -135,6 +135,7 @@ export type ExperimentalSettings = {
   disableRecordingAssetsInDatabase?: boolean;
   keepAllTraces?: boolean;
   enableIncrementalSnapshots?: boolean;
+  disableConcurrentControllerLoading?: boolean;
 };
 
 type SessionCallbacks = {
