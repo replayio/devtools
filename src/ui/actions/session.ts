@@ -210,6 +210,7 @@ export function createSocket(
         disableRecordingAssetsInDatabase: getFeature("disableRecordingAssetsInDatabase"),
         keepAllTraces: getFeature("keepAllTraces"),
         enableIncrementalSnapshots: getFeature("enableIncrementalSnapshots"),
+        disableConcurrentControllerLoading: getFeature("disableConcurrentControllerLoading"),
       };
       if (features.newControllerOnRefresh) {
         experimentalSettings.controllerKey = String(Date.now());

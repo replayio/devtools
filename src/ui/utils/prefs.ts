@@ -48,6 +48,7 @@ pref("devtools.features.brokenSourcemapWorkaround", true);
 pref("devtools.features.disableRecordingAssetsInDatabase", false);
 pref("devtools.features.keepAllTraces", false);
 pref("devtools.features.enableIncrementalSnapshots", false);
+pref("devtools.features.disableConcurrentControllerLoading", false);
 pref("devtools.features.replayAssist", false);
 
 export const prefs = new PrefsHelper("devtools", {
@@ -92,6 +93,7 @@ export const features = new PrefsHelper("devtools.features", {
   disableRecordingAssetsInDatabase: ["Bool", "disableRecordingAssetsInDatabase"],
   keepAllTraces: ["Bool", "keepAllTraces"],
   enableIncrementalSnapshots: ["Bool", "enableIncrementalSnapshots"],
+  disableConcurrentControllerLoading: ["Bool", "disableConcurrentControllerLoading"],
   replayAssist: ["Bool", "replayAssist"],
 });
 

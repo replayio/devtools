@@ -119,6 +119,7 @@ export type LocalExperimentalUserSettings = {
   profileWorkerThreads: boolean;
   brokenSourcemapWorkaround: boolean;
   disableRecordingAssetsInDatabase: boolean;
+  disableConcurrentControllerLoading: boolean;
   reactPanel: boolean;
   replayAssist: boolean;
 };
