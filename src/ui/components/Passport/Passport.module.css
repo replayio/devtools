@@ -28,7 +28,7 @@
   display: flex;
   flex-wrap: wrap;
   height: 100vh;
-  padding-bottom: 400px;
+  padding-bottom: 340px;
 }
 
 .checklistItem {
@@ -43,12 +43,17 @@
   margin-bottom: 30%;
 }
 
-.checklist div.selectedItem {
-  background-color: rgba(255, 255, 255, 0.198);
+.checklist div.selectedItem img {
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+}
+
+.checklist div img:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
 }
 
 .checklist div:hover {
-  background-color: rgba(255, 255, 255, 0.198);
   cursor: pointer;
 }
 
