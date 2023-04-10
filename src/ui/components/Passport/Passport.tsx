@@ -35,6 +35,8 @@ const Passport: React.FC = () => {
   const showInspectElement = shouldShowInspectElement(nags);
   const showUseFocusMode = shouldShowUseFocusMode(nags);
 
+  const [videoVisible, setVideoVisible] = useState(false);
+
   const getImageName = (label: string, completed: boolean) => {
     const baseName = label.toLowerCase().replace(/ /g, "_");
     return completed ? `${baseName}-default.svg` : `${baseName}-complete.svg`;
@@ -61,7 +63,7 @@ const Passport: React.FC = () => {
     {
       label: "Tour Grad",
       completed: showTour,
-      videoUrl: "https://vercel.replay.io/assist/tour_grad.gif",
+      videoUrl: "https://vercel.replay.io/assist/set_print_statement.gif",
     },
     {
       label: "Time travel in the console",
@@ -132,6 +134,8 @@ const Passport: React.FC = () => {
         <div className={styles.AssistBox}>
           <div className={styles.AssistBoxInternal}>
             <div className={styles.checklist}>
+              <img src={`/images/passport/passportHeader.svg`} className={`my-3 w-full px-8`} />
+
               {updatedChecklistItems.map((item, index) => (
                 <div
                   key={index}
@@ -146,7 +150,7 @@ const Passport: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="absolute bottom-32 hidden w-full px-2">
+        <div className="absolute bottom-32 w-full px-2">
           <img src={selectedItem.videoUrl} className={styles.videoExample} />
         </div>
       </div>
