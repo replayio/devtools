@@ -83,19 +83,25 @@ const Passport: React.FC = () => {
     },
 
     {
+      label: "Search source text",
+      completed: showSearchSourceText,
+      videoUrl: "https://vercel.replay.io/assist/search_source_text.gif",
+    },
+    {
       label: "Jump to code",
       completed: showJumpToCode,
       videoUrl: "https://vercel.replay.io/assist/jump_to_code.gif",
+    },
+
+    {
+      label: "Launch command palette",
+      completed: showLaunchCommandPalette,
+      videoUrl: "https://vercel.replay.io/assist/launch_command_palette.gif",
     },
     {
       label: "Explore sources",
       completed: showExploreSources,
       videoUrl: "https://vercel.replay.io/assist/explore_sources.gif",
-    },
-    {
-      label: "Search source text",
-      completed: showSearchSourceText,
-      videoUrl: "https://vercel.replay.io/assist/search_source_text.gif",
     },
     {
       label: "Jump to event",
@@ -109,19 +115,15 @@ const Passport: React.FC = () => {
     },
 
     {
-      label: "Use focus mode",
-      completed: showUseFocusMode,
-      videoUrl: "https://vercel.replay.io/assist/use_focus_mode.gif",
-    },
-    {
-      label: "Launch command palette",
-      completed: showLaunchCommandPalette,
-      videoUrl: "https://vercel.replay.io/assist/launch_command_palette.gif",
-    },
-    {
       label: "Inspect element",
       completed: showInspectElement,
       videoUrl: "https://vercel.replay.io/assist/inspect_an_element.gif",
+    },
+
+    {
+      label: "Use focus mode",
+      completed: showUseFocusMode,
+      videoUrl: "https://vercel.replay.io/assist/use_focus_mode.gif",
     },
   ];
 
@@ -134,7 +136,7 @@ const Passport: React.FC = () => {
         <div className={styles.AssistBox}>
           <div className={styles.AssistBoxInternal}>
             <div className={styles.checklist}>
-              <img src={`/images/passport/passportHeader.svg`} className={`my-3 w-full px-8`} />
+              <img src={`/images/passport/passportHeader.svg`} className={`my-3 w-full px-3`} />
 
               {updatedChecklistItems.map((item, index) => (
                 <div
