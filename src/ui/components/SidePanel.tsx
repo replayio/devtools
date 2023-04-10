@@ -24,6 +24,7 @@ import useAuth0 from "ui/utils/useAuth0";
 
 import CommentCardsList from "./Comments/CommentCardsList";
 import ReplayInfo from "./Events/ReplayInfo";
+import Passport from "./Passport/Passport";
 import ProtocolViewer from "./ProtocolViewer";
 import { ReactPanel } from "./ReactPanel";
 import StatusDropdown from "./shared/StatusDropdown";
@@ -137,6 +138,7 @@ export default function SidePanel() {
         {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}
         {selectedPrimaryPanel === "comments" && <CommentCardsList />}
         {selectedPrimaryPanel === "tour" && <Tour />}
+        {selectedPrimaryPanel === "assist" && <Passport />}
         {selectedPrimaryPanel === "events" && <EventsPane items={items} />}
         {selectedPrimaryPanel === "cypress" && <TestSuitePanel />}
         {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}
