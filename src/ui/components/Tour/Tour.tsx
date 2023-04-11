@@ -21,10 +21,9 @@ import styles from "./Tour.module.css";
 const useNagDismissal = () => {
   const dismissNag = useDismissNag();
   const dispatch = useAppDispatch();
-  const info = useTestInfo();
 
   const dismissTourNag = () => {
-    const initialPrimaryPanel = "events";
+    const initialPrimaryPanel = "assist";
     dispatch(setSelectedPrimaryPanel(initialPrimaryPanel));
     dismissNag(Nag.DISMISS_TOUR);
   };
@@ -117,12 +116,10 @@ const Tour: React.FC = () => {
                     <p>Take a look at the console.</p>
                     <p>
                       Replay just re-ran your recording and retroactively added your print statement
-                      each time that line of code was called!
+                      each time that line of code was called. This is a <b>huge</b> time saver.
                     </p>
-                    <p>
-                      We call this our "ah-ha moment," and Replay is full of them. Happy exploring!
-                    </p>
-                    <p className="mt-20">
+                    <p>And with that, you've graduated from the tour. Happy exploring!</p>
+                    <p className="mt-16">
                       <a
                         href="#"
                         onClick={e => {
@@ -135,7 +132,7 @@ const Tour: React.FC = () => {
                         }}
                         className="hover:cursor-hand whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg hover:bg-blue-50"
                       >
-                        Thanks!
+                        Ready for my passport!
                       </a>
                       {showConfetti ? <Confetti /> : null}
                     </p>
