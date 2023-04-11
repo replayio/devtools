@@ -253,7 +253,7 @@ const Passport: React.FC = () => {
             className={styles.largeCompletedImage}
             style={{
               zIndex: 0,
-              opacity: 0.35,
+              opacity: 0.25,
               bottom: `${randomPosition.bottom}px`,
               right: `${randomPosition.right}%`,
               transform: `rotate(${randomRotation}deg)`,
