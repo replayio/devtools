@@ -209,9 +209,9 @@ export default function Toolbar() {
 
         {replayAssistExperimentEnabled && showReplayAssist ? (
           <ToolbarButton
-            icon="school"
+            icon="menu_book"
             name="assist"
-            label="Replay Assist"
+            label="Replay Passport"
             onClick={handleButtonClick}
           />
         ) : null}
