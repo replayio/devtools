@@ -137,81 +137,87 @@ const Passport: React.FC = () => {
 
   const updatedChecklistItems = [
     {
+      label: "Completed the tour",
+      completed: showConsoleNavigate,
+      videoUrl: "https://vercel.replay.io/passport/time_travel_in_console.gif",
+      imageBaseName: "tour_grad",
+    },
+    {
       label: "Time travel in the console",
       completed: showConsoleNavigate,
-      videoUrl: "https://vercel.replay.io/assist/time_travel_in_console.gif",
+      videoUrl: "https://vercel.replay.io/passport/time_travel_in_console.gif",
       imageBaseName: "time_travel_in_the_console",
     },
     {
       label: "Set a print statement",
       completed: showBreakpointEdit,
-      videoUrl: "https://vercel.replay.io/assist/set_print_statement.gif",
+      videoUrl: "https://vercel.replay.io/passport/set_print_statement.gif",
       imageBaseName: "set_a_print_statement",
     },
     {
       label: "Launch command palette",
       completed: showLaunchCommandPalette,
-      videoUrl: "https://vercel.replay.io/assist/launch_command_palette.gif",
+      videoUrl: "https://vercel.replay.io/passport/launch_command_palette.gif",
       imageBaseName: "launch_command_palette",
     },
     {
       label: "Explore sources",
       completed: showExploreSources,
-      videoUrl: "https://vercel.replay.io/assist/explore_sources.gif",
+      videoUrl: "https://vercel.replay.io/passport/explore_sources.gif",
       imageBaseName: "explore_sources",
     },
     {
       label: "Search source text",
       completed: showSearchSourceText,
-      videoUrl: "https://vercel.replay.io/assist/search_source_text.gif",
+      videoUrl: "https://vercel.replay.io/passport/search_source_text.gif",
       imageBaseName: "search_source_text",
     },
     {
       label: "Jump to event",
       completed: showJumpToEvent,
-      videoUrl: "https://vercel.replay.io/assist/jump_to_an_event.gif",
+      videoUrl: "https://vercel.replay.io/passport/jump_to_an_event.gif",
       imageBaseName: "jump_to_event",
     },
     {
       label: "Jump to code",
       completed: showJumpToCode,
-      videoUrl: "https://vercel.replay.io/assist/jump_to_code.gif",
+      videoUrl: "https://vercel.replay.io/passport/jump_to_code.gif",
       imageBaseName: "jump_to_code",
     },
     {
       label: "Add a comment",
       completed: showAddComment,
-      videoUrl: "https://vercel.replay.io/assist/add_a_comment.gif",
+      videoUrl: "https://vercel.replay.io/passport/add_a_comment.gif",
       imageBaseName: "add_a_comment",
     },
     {
       label: "Add a unicorn badge",
       completed: showAddUnicornBadge,
-      videoUrl: "https://vercel.replay.io/assist/unicorn_badge.gif",
+      videoUrl: "https://vercel.replay.io/passport/unicorn_badge.gif",
       imageBaseName: "add_a_unicorn_badge",
     },
     {
       label: "Use focus mode",
       completed: showUseFocusMode,
-      videoUrl: "https://vercel.replay.io/assist/use_focus_mode.gif",
+      videoUrl: "https://vercel.replay.io/passport/use_focus_mode.gif",
       imageBaseName: "use_focus_mode",
     },
     {
       label: "Record a replay",
       completed: showRecordReplay,
-      videoUrl: "https://vercel.replay.io/assist/record_a_replay.gif",
+      videoUrl: "https://vercel.replay.io/passport/record_a_replay.gif",
       imageBaseName: "record_a_replay",
     },
     {
       label: "Inspect element",
       completed: showInspectElement,
-      videoUrl: "https://vercel.replay.io/assist/inspect_an_element.gif",
+      videoUrl: "https://vercel.replay.io/passport/inspect_an_element.gif",
       imageBaseName: "inspect_element",
     },
   ];
 
   const selectedItem = updatedChecklistItems[stepIndex];
-  const randomPosition = useRandomPosition([225, 410], [-27, 15], [stepIndex]);
+  const randomPosition = useRandomPosition([225, 410], [-35, 7], [stepIndex]);
   const randomRotation = useRandomRotation([-30, 30], [stepIndex]);
 
   return (
