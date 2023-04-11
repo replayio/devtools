@@ -660,24 +660,9 @@ export class ReplayClient implements ReplayClientInterface {
     const begin = locationRange ? locationRange.start : undefined;
     const end = locationRange ? locationRange.end : undefined;
 
-    let lineLocations: SameLineSourceLocations[] | null = null;
-
-    // Breakpoint positions must be loaded for all sources,
-    // else future API calls for things like hit counts will fail with "invalid location"
-    // See BAC-2370
-    const correspondingSourceIds = this.getCorrespondingSourceIds(sourceId);
-    await Promise.all(
-      correspondingSourceIds.map(async currentSourceId => {
-        const { lineLocations: currentLineLocations } =
-          await client.Debugger.getPossibleBreakpoints(
-            { sourceId: currentSourceId, begin, end },
-            sessionId
-          );
-
-        if (currentSourceId === sourceId) {
-          lineLocations = currentLineLocations;
-        }
-      })
+    let { lineLocations } = await client.Debugger.getPossibleBreakpoints(
+      { sourceId: sourceId, begin, end },
+      sessionId
     );
 
     // Ensure breakpoint positions are sorted by line ascending
