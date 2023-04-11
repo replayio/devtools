@@ -182,7 +182,6 @@ const Passport: React.FC = () => {
       videoUrl: "https://vercel.replay.io/assist/inspect_an_element.gif",
       imageBaseName: "inspect_element",
     },
-    ˇ,
   ];
 
   const selectedItem = updatedChecklistItems[stepIndex];
