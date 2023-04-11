@@ -172,7 +172,7 @@ function SecondaryToolbox({
   const { value: chromiumNetMonitorEnabled } = useFeature("chromiumNetMonitor");
 
   const kindsSet = new Set(annotationKinds);
-  const hasReactComponents = kindsSet.has("react-devtools-hook");
+  const hasReactComponents = kindsSet.has("react-devtools-bridge");
   const hasReduxAnnotations = kindsSet.has("redux-devtools-data");
 
   useLayoutEffect(() => {

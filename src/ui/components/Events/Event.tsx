@@ -137,11 +137,6 @@ export const nextInteractionEventCache: Cache<
       if (ep.frame?.length) {
         const preferredLocation = getPreferredLocation(sourcesState, ep.frame);
         const matchingSource = sourcesState.sourceDetails.entities[preferredLocation.sourceId];
-        console.log("Entry point source: ", {
-          url: matchingSource?.url,
-          matchingSource,
-          preferredLocation,
-        });
 
         // Find the first event that seems useful to jump to
         return !shouldIgnoreEventFromSource(matchingSource, USER_INTERACTION_IGNORABLE_URLS);
