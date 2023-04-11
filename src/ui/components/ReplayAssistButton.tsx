@@ -31,7 +31,7 @@ export default function ReplayAssistButton() {
         checked={showReplayAssist}
         onChange={onChange}
       />
-      <span>Replay Assist</span>
+      <span>Replay Passport</span>
     </div>
   );
 }
