@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Icon from "replay-next/components/Icon";
 import hooks from "ui/hooks";
@@ -73,6 +73,32 @@ const Passport: React.FC = () => {
   const showInspectElement = shouldShowInspectElement(nags);
   const showUseFocusMode = shouldShowUseFocusMode(nags);
   const [stepIndex, setStepIndex] = useState(0);
+
+  const videoExampleRef = useRef<HTMLDivElement>(null);
+  const [videoHeight, setVideoHeight] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (videoExampleRef.current) {
+      const videoHeight = videoExampleRef.current.offsetHeight;
+      setVideoHeight(videoHeight);
+    }
+  }, [videoExampleRef]);
+
+  useEffect(() => {
+    const updateHeight = () => {
+      if (videoExampleRef.current) {
+        const videoHeight = videoExampleRef.current.offsetHeight;
+        setVideoHeight(videoHeight);
+        console.log("Updating", videoHeight);
+      }
+    };
+
+    window.addEventListener("resize", updateHeight);
+
+    return () => {
+      window.removeEventListener("resize", updateHeight);
+    };
+  }, []);
 
   const renderCheckmarkIcon = (completed: boolean | undefined) => {
     if (completed === false) {
@@ -185,8 +211,8 @@ const Passport: React.FC = () => {
   ];
 
   const selectedItem = updatedChecklistItems[stepIndex];
-  const randomPosition = useRandomPosition([225, 410], [-45, 10], [stepIndex]);
-  const randomRotation = useRandomRotation([-20, 20], [stepIndex]);
+  const randomPosition = useRandomPosition([225, 410], [-27, 15], [stepIndex]);
+  const randomRotation = useRandomRotation([-30, 30], [stepIndex]);
 
   return (
     <div className={styles.AssistBoxWrapper}>
@@ -194,28 +220,53 @@ const Passport: React.FC = () => {
         <div className={styles.AssistBox}>
           <div className="p-0 pt-3">
             <img src={`/images/passport/passportHeader.svg`} className={`mb-5 w-full px-1`} />
-            <div className={styles.AssistBoxInternal}>
-              <div className={styles.checklist}>
-                {updatedChecklistItems.map((item, index) => (
-                  <div
-                    key={index}
-                    className={`flex ${getItemStyle(index)} ${styles.checklistItem}`}
-                    onClick={() => handleClick(index)}
-                  >
-                    <Icon className={styles.stepIcon} type={renderCheckmarkIcon(item.completed)} />
+            <div
+              className={styles.AssistBoxInternal}
+              style={{
+                height: videoHeight !== null ? `calc(100vh - 200px - ${videoHeight}px)` : "100%",
+              }}
+            >
+              <div className={styles.checklistContainer}>
+                <div className={styles.checklist}>
+                  {updatedChecklistItems.map((item, index) => (
+                    <div
+                      key={index}
+                      className={`flex ${getItemStyle(index)} ${styles.checklistItem}`}
+                      onClick={() => handleClick(index)}
+                    >
+                      <Icon
+                        className={styles.stepIcon}
+                        type={renderCheckmarkIcon(item.completed)}
+                      />
 
-                    <span className="ml-2">{item.label}</span>
-                  </div>
-                ))}
+                      <span className="ml-2">{item.label}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
-        {renderCompletedImage(selectedItem.completed, selectedItem.imageBaseName) && (
+        {renderCompletedImage(selectedItem.completed, selectedItem.imageBaseName, 0, 30) && (
           <img
-            src={renderCompletedImage(selectedItem.completed, selectedItem.imageBaseName)}
+            src={renderCompletedImage(selectedItem.completed, selectedItem.imageBaseName, 0, 30)}
             className={styles.largeCompletedImage}
             style={{
+              zIndex: 0,
+              opacity: 0.35,
+              bottom: `${randomPosition.bottom}px`,
+              right: `${randomPosition.right}%`,
+              transform: `rotate(${randomRotation}deg)`,
+            }}
+          />
+        )}
+        {renderCompletedImage(selectedItem.completed, selectedItem.imageBaseName, 100, 50) && (
+          <img
+            src={renderCompletedImage(selectedItem.completed, selectedItem.imageBaseName, 100, 50)}
+            className={styles.largeCompletedImage}
+            style={{
+              zIndex: 100,
+              opacity: 0.04,
               bottom: `${randomPosition.bottom}px`,
               right: `${randomPosition.right}%`,
               transform: `rotate(${randomRotation}deg)`,
@@ -223,7 +274,7 @@ const Passport: React.FC = () => {
           />
         )}
         <div className={styles.videoExampleWrapper}>
-          <img src={selectedItem.videoUrl} className={styles.videoExample} />
+          <img src={selectedItem.videoUrl} className={styles.videoExample} ref={videoExampleRef} />
         </div>
       </div>
     </div>
