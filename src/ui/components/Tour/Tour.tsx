@@ -4,6 +4,7 @@ import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
 import Confetti from "ui/components/shared//Confetti";
 import hooks from "ui/hooks";
+import { useFeature } from "ui/hooks/settings";
 import { Nag } from "ui/hooks/users";
 import { useDismissNag } from "ui/hooks/users";
 import { useTestInfo } from "ui/hooks/useTestInfo";
@@ -17,6 +18,8 @@ import {
 } from "ui/utils/onboarding";
 
 import styles from "./Tour.module.css";
+
+import { useReplayPassport } from "packages/replay-next/src/contexts/ReplayPassportContext.tsx";
 
 const useNagDismissal = () => {
   const dismissNag = useDismissNag();
@@ -32,6 +35,7 @@ const useNagDismissal = () => {
 };
 
 const Tour: React.FC = () => {
+  const { update: setShowPassport } = useFeature("showPassport");
   const { nags } = hooks.useGetUserInfo();
   const viewMode = useAppSelector(getViewMode);
   const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
@@ -39,7 +43,6 @@ const Tour: React.FC = () => {
   const showConsoleNavigate = shouldShowConsoleNavigate(nags);
   const showBreakpointAdd = shouldShowBreakpointAdd(nags);
   const showBreakpointEdit = shouldShowBreakpointEdit(nags);
-  const showTour = shouldShowTour(nags);
 
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -82,6 +85,24 @@ const Tour: React.FC = () => {
                       Hover over the lines in the console and you’ll see a fast-forward button.
                       Click it to time travel!
                     </p>
+                    <p className="mt-16">
+                      <a
+                        href="#"
+                        onClick={e => {
+                          e.stopPropagation();
+                          setShowConfetti(true);
+                          setShowPassport(true);
+                          setTimeout(() => {
+                            setShowConfetti(false);
+                            dismissTourNag();
+                          }, 2400);
+                        }}
+                        className="px-3 py-1 font-medium bg-white rounded-lg shadow-lg hover:cursor-hand whitespace-nowrap text-primaryAccent hover:bg-blue-50"
+                      >
+                        Ready for my passport!
+                      </a>
+                      {showConfetti ? <Confetti /> : null}
+                    </p>
                   </>
                 )}
 
@@ -122,12 +143,13 @@ const Tour: React.FC = () => {
                         onClick={e => {
                           e.stopPropagation();
                           setShowConfetti(true);
+                          setShowPassport(true);
                           setTimeout(() => {
                             setShowConfetti(false);
                             dismissTourNag();
                           }, 2500);
                         }}
-                        className="hover:cursor-hand whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg hover:bg-blue-50"
+                        className="px-3 py-1 font-medium bg-white rounded-lg shadow-lg hover:cursor-hand whitespace-nowrap text-primaryAccent hover:bg-blue-50"
                       >
                         Ready for my passport!
                       </a>
@@ -140,10 +162,10 @@ const Tour: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="absolute bottom-28 p-3">
+      <div className="absolute p-3 bottom-28">
         {isNewUser && (
           <div className="relative -bottom-3">
-            <img src="/images/illustrations/larry_wave.png" className="z-1 w-full" />
+            <img src="/images/illustrations/larry_wave.png" className="w-full z-1" />
           </div>
         )}
 
