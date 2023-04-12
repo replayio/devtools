@@ -199,7 +199,7 @@ const Passport: React.FC = () => {
         </div>
         {selectedItem.completed && (
           <img
-            src={`/images/passport/${selectedItem.imageBaseName}-complete.svg`}
+            src={`/images/passport/${selectedItem.imageBaseName}-complete.png`}
             className={styles.largeCompletedImage}
             style={{
               zIndex: 0,
