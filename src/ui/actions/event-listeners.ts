@@ -66,13 +66,14 @@ export type NodeWithPreview = DeepRequired<
 >;
 
 export const isFunctionPreview = (obj?: ObjectPreview): obj is FunctionPreview => {
-  return (
-    !!obj && "functionName" in obj && "functionLocation" in obj && "functionParameterNames" in obj
-  );
+  return !!obj && "functionName" in obj && "functionLocation" in obj;
 };
 
 export const isFunctionWithPreview = (obj: ProtocolObject): obj is FunctionWithPreview => {
-  return obj.className === "Function" && isFunctionPreview(obj.preview);
+  return (
+    (obj.className === "Function" || obj.className === "AsyncFunction") &&
+    isFunctionPreview(obj.preview)
+  );
 };
 
 export const REACT_16_EVENT_LISTENER_PROP_KEY = "__reactEventHandlers$";
@@ -347,12 +348,17 @@ export const eventListenerLocationCache: Cache<
       if (handlerProp) {
         // If it did find a React prop function, get its
         // preview and format it so we know the preferred location.
-        const onClickPreview = (await objectCache.readAsync(
+        const onClickPreview = await objectCache.readAsync(
           replayClient,
           pauseId,
           handlerProp.object!,
-          "canOverflow"
-        )) as FunctionWithPreview;
+          "full"
+        );
+
+        if (!onClickPreview || !isFunctionPreview(onClickPreview.preview)) {
+          // TODO [RUN-1709] Chrome does not format function previews correctly
+          return undefined;
+        }
 
         const formattedEventListener = await formatEventListener(
           replayClient,
@@ -394,6 +400,7 @@ export const eventListenerLocationCache: Cache<
 declare let event: MouseEvent | KeyboardEvent;
 
 interface InjectedValues {
+  eventType: SEARCHABLE_EVENT_TYPES;
   $REACT_16_EVENT_LISTENER_PROP_KEY: string;
   $REACT_17_18_EVENT_LISTENER_PROP_KEY: string;
   EVENT_CLASS_NAMES: string[];
@@ -413,6 +420,7 @@ interface EventMapperResult {
   handlerProp?: Function;
   handlerNode?: HTMLElement;
   searchedNodes: SearchedNode[];
+  clickWasInsideSubmitButton?: boolean;
 }
 
 function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
@@ -456,6 +464,8 @@ function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
         return tokens.join("").toLowerCase();
       }
 
+      let clickWasInsideSubmitButton = false;
+
       // Search the event target node and all of its ancestors
       // for React internal props data, and specifically look
       // for the nearest node with a relevant React event handler prop if any.
@@ -466,6 +476,16 @@ function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
           name: stringifyNode(currentNode),
         };
         searchedNodes.push(searchedNode);
+
+        const currentNodeName = currentNode.nodeName.toLowerCase();
+
+        if (
+          injectedValues.eventType === "mousedown" &&
+          currentNodeName === "button" &&
+          (currentNode as HTMLButtonElement).type === "submit"
+        ) {
+          clickWasInsideSubmitButton = true;
+        }
 
         const keys = Object.keys(currentNode);
         const reactPropsKey = keys.find(key => {
@@ -493,8 +513,12 @@ function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
 
           // `<input>` tags often have an `onChange` prop, including checkboxes;
           // _If_ the original target DOM node is an input, add that to the list of prop names.
-          if (currentNode === startingNode && currentNode.nodeName.toLowerCase() === "input") {
+          if (currentNode === startingNode && currentNodeName === "input") {
             possibleReactPropNames = possibleReactPropNames.concat("onChange");
+          }
+
+          if (clickWasInsideSubmitButton && currentNodeName === "form") {
+            possibleReactPropNames = possibleReactPropNames.concat("onSubmit");
           }
 
           searchedNode.searchPropKeys = possibleReactPropNames;
@@ -516,6 +540,7 @@ function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
         currentNode = (currentNode!.parentNode as HTMLElement)!;
       }
 
+      res.clickWasInsideSubmitButton = clickWasInsideSubmitButton;
       return res;
     } else {
       throw new Error(`no event found! eventClass: ${injectedValues.EVENT_CLASS_NAMES}`);
@@ -524,6 +549,7 @@ function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
 
   const evaluatedEventMapperBody = `
     (${findEventTargetAndHandler})({
+      eventType: "${eventType}",
       $REACT_16_EVENT_LISTENER_PROP_KEY: "${REACT_16_EVENT_LISTENER_PROP_KEY}",
       $REACT_17_18_EVENT_LISTENER_PROP_KEY: "${REACT_17_18_EVENT_LISTENER_PROP_KEY}",
       EVENT_CLASS_NAMES: ${JSON.stringify(eventClassNames)},
