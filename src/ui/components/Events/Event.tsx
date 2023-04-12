@@ -412,7 +412,7 @@ export default React.memo(function Event({
 });
 
 const Label = ({ children }: { children: ReactNode }) => (
-  <div className="overflow-hidden font-normal whitespace-pre overflow-ellipsis">{children}</div>
+  <div className="overflow-hidden overflow-ellipsis whitespace-pre font-normal">{children}</div>
 );
 
 export function findFirstBreakablePositionForFunction(
