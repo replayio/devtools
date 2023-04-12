@@ -203,16 +203,6 @@ export default function Toolbar() {
             onClick={handleButtonClick}
           />
         ) : null}
-
-        {showPassport ? (
-          <ToolbarButton
-            icon="menu_book"
-            name="assist"
-            label="Replay Passport"
-            onClick={handleButtonClick}
-          />
-        ) : null}
-
         {showPassport ? (
           <ToolbarButton
             icon="menu_book"
