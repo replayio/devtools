@@ -14,12 +14,22 @@ export default function useModalDismissSignal(
 
     const handleKeyboardEvent = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+
         dismissCallback();
       }
     };
 
     const handleMouseEvent = (event: MouseEvent) => {
+      if (event.defaultPrevented) {
+        return;
+      }
+
       if (!element.contains(event.target as Node)) {
+        event.preventDefault();
+        event.stopPropagation();
+
         dismissCallback();
       }
     };
@@ -39,6 +49,7 @@ export default function useModalDismissSignal(
       if (dismissOnClickOutside) {
         ownerDocument.addEventListener("click", handleMouseEvent, true);
         ownerDocument.addEventListener("contextmenu", handleMouseEvent, true);
+        ownerDocument.addEventListener("mousedown", handleMouseEvent, true);
         ownerDocument.addEventListener("scroll", dismissCallback, true);
       }
     }, 0);
@@ -52,6 +63,7 @@ export default function useModalDismissSignal(
         ownerDocument.removeEventListener("keydown", handleKeyboardEvent);
         ownerDocument.removeEventListener("click", handleMouseEvent, true);
         ownerDocument.removeEventListener("contextmenu", handleMouseEvent, true);
+        ownerDocument.removeEventListener("mousedown", handleMouseEvent, true);
         ownerDocument.removeEventListener("scroll", dismissCallback, true);
       }
     };

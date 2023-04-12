@@ -1,10 +1,10 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { FocusWindowRequest as FocusWindow, TimeStampedPoint } from "@replayio/protocol";
+import { TimeStampedPoint } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 
 import { MAX_FOCUS_REGION_DURATION } from "ui/actions/timeline";
 import { UIState } from "ui/state";
-import { FocusRegion, HoveredItem, TimelineState } from "ui/state/timeline";
+import { FocusRegion, HoveredItem, TimeRange, TimelineState } from "ui/state/timeline";
 import { getPausePointParams } from "ui/utils/environment";
 import { mergeSortedPointLists } from "ui/utils/timeline";
 
@@ -14,7 +14,6 @@ function initialTimelineState(): TimelineState {
     currentTime: 0,
     focusRegion: getPausePointParams().focusRegion,
     focusRegionBackup: null,
-    displayedFocusRegion: null,
     hoveredItem: null,
     markTimeStampedPoint: null,
     hoverTime: null,
@@ -63,9 +62,6 @@ const timelineSlice = createSlice({
     setFocusRegion(state, action: PayloadAction<FocusRegion | null>) {
       state.focusRegion = action.payload;
     },
-    setDisplayedFocusRegion(state, action: PayloadAction<FocusWindow | null>) {
-      state.displayedFocusRegion = action.payload;
-    },
     pointsReceived(state, action: PayloadAction<TimeStampedPoint[]>) {
       const mutablePoints = [...state.points];
       state.points = mergeSortedPointLists(
@@ -101,7 +97,6 @@ export const {
   setPlaybackFocusRegion,
   setPlaybackStalled,
   setFocusRegion,
-  setDisplayedFocusRegion,
   setTimelineState,
   pointsReceived,
   paintsReceived,
@@ -137,11 +132,10 @@ export const getBasicProcessingProgress = (state: UIState) => {
 export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
 export const getPlaybackFocusRegion = (state: UIState) => state.timeline.playbackFocusRegion;
 export const getFocusRegion = (state: UIState) => state.timeline.focusRegion;
-export const getDisplayedFocusRegion = (state: UIState) => state.timeline.displayedFocusRegion;
 export const isMaximumFocusRegion = (state: UIState) => {
-  const focusRegion = state.timeline.displayedFocusRegion;
+  const focusRegion = getFocusRegion(state);
   if (focusRegion) {
-    const duration = focusRegion.end - focusRegion.begin;
+    const duration = focusRegion.end.time - focusRegion.begin.time;
     // JavaScript floating point numbers are not precise enough,
     // so in order to avoid occasional flickers from rounding errors, fuzz it a bit.
     return duration + 0.1 >= MAX_FOCUS_REGION_DURATION;

@@ -7,6 +7,8 @@ import {
   useTransition,
 } from "react";
 
+import { shallowEqual } from "shared/utils/compare";
+
 import { localStorageGetItem, localStorageSetItem } from "../utils/storage";
 
 function manuallyTriggerStorageEvent() {
@@ -61,7 +63,14 @@ export default function useLocalStorage<T>(
       const newValue = localStorageGetItem(key);
       if (newValue != null) {
         startTransition(() => {
-          setValue(JSON.parse(newValue));
+          setValue(prevValue => {
+            const newParsed = JSON.parse(newValue);
+            if (!shallowEqual(prevValue, newParsed)) {
+              return newParsed;
+            } else {
+              return prevValue;
+            }
+          });
         });
       }
     };

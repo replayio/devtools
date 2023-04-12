@@ -28,17 +28,23 @@ export default function useLogPointPanelContextMenu({
   toggleShouldLog: () => void;
 }) {
   const { rangeForDisplay, update } = useContext(FocusContext);
-  const { duration } = useContext(SessionContext);
+  const { duration, endpoint } = useContext(SessionContext);
 
   const setFocusBegin = () => {
     if (currentHitPoint == null) {
       return;
     }
 
-    const begin = currentHitPoint.time;
-    const end = rangeForDisplay !== null ? rangeForDisplay.end.time : duration;
-
-    update([begin, end], true);
+    update(
+      {
+        begin: currentHitPoint,
+        end: rangeForDisplay?.end ?? {
+          point: endpoint,
+          time: duration,
+        },
+      },
+      true
+    );
   };
 
   const setFocusEnd = () => {
@@ -46,10 +52,16 @@ export default function useLogPointPanelContextMenu({
       return;
     }
 
-    const end = currentHitPoint.time;
-    const begin = rangeForDisplay !== null ? rangeForDisplay.begin.time : 0;
-
-    update([begin, end], true);
+    update(
+      {
+        begin: rangeForDisplay?.begin ?? {
+          point: "0",
+          time: 0,
+        },
+        end: currentHitPoint,
+      },
+      true
+    );
   };
 
   return useContextMenu(

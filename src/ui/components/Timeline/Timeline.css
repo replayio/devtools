@@ -9,6 +9,8 @@
   padding: 10px 12px 12px 6px;
   align-items: center;
   user-select: none;
+
+  --timeline-size: 5px;
 }
 
 .theme-light .timeline,
@@ -94,8 +96,8 @@
 
 .timeline .commands > button {
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
+  padding: var(--timeline-size);
+  border-radius: var(--timeline-size);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -137,7 +139,7 @@
 .timeline .progress-line,
 .breakpoint-navigation-timeline .progress-line {
   width: 0%;
-  height: 4px;
+  height: var(--timeline-size);
   background-color: var(--primary-accent);
   position: absolute;
   pointer-events: none;
@@ -145,11 +147,11 @@
   margin-bottom: auto;
   top: 0;
   bottom: 0;
-  border-radius: 4px;
+  border-radius: var(--timeline-size);
 }
 
 .timeline .overlay-container:hover .progress-line {
-  height: 5px;
+  height: var(--timeline-size);
 }
 
 .timeline .progress-line.full,
@@ -170,8 +172,8 @@
 .timeline .unloaded-regions,
 .timeline .unfocused-regions-container,
 .breakpoint-navigation-timeline .unloaded-regions {
-  height: 5px;
-  border-radius: 5px;
+  height: var(--timeline-size);
+  border-radius: var(--timeline-size);
   position: absolute;
   margin-top: auto;
   margin-bottom: auto;
@@ -212,7 +214,7 @@
 
 .timeline .zoomboundary {
   padding-top: 7px;
-  padding-right: 4px;
+  padding-right: 0.25rem;
 }
 
 .timeline .progress-line-paused-edit-mode-active,
@@ -224,6 +226,7 @@
   top: 50%;
   transform: translate(-50%, -50%);
   cursor: grab;
+  z-index: var(--z-index-1--timeline-current-indicator);
 }
 
 .timeline .progress-line-paused-edit-mode-active {

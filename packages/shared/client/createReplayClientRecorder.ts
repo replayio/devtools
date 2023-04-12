@@ -1,13 +1,13 @@
 import {
-  AnalysisEntry,
-  PointDescription,
+  PointLimits,
+  PointSelector,
+  RunEvaluationResult,
   SearchSourceContentsMatch,
   SourceId,
   sourceContentsChunk,
   sourceContentsInfo,
 } from "@replayio/protocol";
 
-import { AnalysisParams } from "protocol/analysisManager";
 import createRecorder, { RecorderAPI } from "shared/proxy/createRecorder";
 import { Entry } from "shared/proxy/types";
 
@@ -64,6 +64,30 @@ export default function createReplayClientRecorder(
     return args;
   }
 
+  async function runEvaluation(
+    options: {
+      selector: PointSelector;
+      expression: string;
+      frameIndex?: number;
+      fullPropertyPreview?: boolean;
+      limits?: PointLimits;
+    },
+    onResults: (results: RunEvaluationResult[]) => void
+  ) {
+    const recorderAPI = arguments[arguments.length - 1] as RecorderAPI;
+    const flushRecord = recorderAPI.holdUntil();
+
+    const onResultsWrapper = (results: RunEvaluationResult[]) => {
+      recorderAPI.callParamWithArgs(1, results);
+      onResults(results);
+    };
+
+    await replayClient.runEvaluation(options, onResultsWrapper);
+
+    // Let the Proxy know that all events are complete and it's safe to write the entry.
+    flushRecord();
+  }
+
   async function searchSources(
     options: { limit: number; query: string; sourceIds: SourceId[] },
     onMatches: (matches: SearchSourceContentsMatch[], didOverflow: boolean) => void
@@ -110,64 +134,12 @@ export default function createReplayClientRecorder(
     flushRecord();
   }
 
-  function streamAnalysis(
-    params: AnalysisParams,
-    handlers: {
-      onPoints?: (points: PointDescription[]) => void;
-      onResults?: (results: AnalysisEntry[]) => void;
-      onError?: (error: any) => void;
-    }
-  ) {
-    const recorderAPI = arguments[arguments.length - 1] as RecorderAPI;
-    const flushRecord = recorderAPI.holdUntil();
-    const { onPoints, onResults, onError } = handlers;
-
-    const onPointsWrapper = onPoints
-      ? (points: PointDescription[]) => {
-          recorderAPI.callParamWithArgs(0, points);
-          onPoints?.(points);
-        }
-      : undefined;
-
-    const onResultsWrapper = onResults
-      ? (results: AnalysisEntry[]) => {
-          recorderAPI.callParamWithArgs(1, results);
-          onResults?.(results);
-        }
-      : undefined;
-
-    const onErrorWrapper = onError
-      ? (error: any) => {
-          recorderAPI.callParamWithArgs(2, error);
-          onError?.(error);
-        }
-      : undefined;
-
-    const { pointsFinished, resultsFinished } = replayClient.streamAnalysis(params, {
-      onPoints: onPointsWrapper,
-      onResults: onResultsWrapper,
-      onError: onErrorWrapper,
-    });
-
-    onAsyncRequestPending();
-
-    resultsFinished.then(() => {
-      onAsyncRequestResolved();
-      flushRecord();
-    });
-
-    return {
-      pointsFinished,
-      resultsFinished,
-    };
-  }
-
   const [proxyReplayClient] = createRecorder<ReplayClientInterface>(replayClient, {
     onAsyncRequestPending,
     onAsyncRequestResolved,
     onEntriesChanged,
     sanitizeArgs,
-    overrides: { searchSources, streamAnalysis, streamSourceContents },
+    overrides: { runEvaluation, searchSources, streamSourceContents },
   });
 
   return proxyReplayClient;

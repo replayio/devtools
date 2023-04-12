@@ -6,8 +6,8 @@ import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { useFeature } from "ui/hooks/settings";
 import { trackEvent } from "ui/utils/telemetry";
-import useAuth0 from "ui/utils/useAuth0";
 
 import ExternalLink from "../shared/ExternalLink";
 
@@ -17,7 +17,6 @@ interface UserOptionsProps extends PropsFromRedux {
 
 function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   const [expanded, setExpanded] = useState(false);
-  const { isAuthenticated } = useAuth0();
   const onDocsClick: React.MouseEventHandler = event => {
     trackEvent("user_options.select_docs");
     const docsUrl = `https://docs.replay.io`;
@@ -48,7 +47,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
         <Icon filename="settings" className="bg-iconColor" />
         <Icon filename="replay-logo" className="bg-iconColor" />
       </div>
-      <div className="user-options text-blue-400">
+      <div className="text-blue-400 user-options">
         <Dropdown
           buttonContent={<MaterialIcon iconSize="xl">more_horiz</MaterialIcon>}
           setExpanded={setExpanded}

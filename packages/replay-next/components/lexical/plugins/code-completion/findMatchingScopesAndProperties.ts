@@ -46,7 +46,8 @@ export default function findMatchingScopesAndProperties(
     names = names.filter(name => name.match(IdentifierRegex));
   }
 
-  return names;
+  // De-duplicate matches with the same name but different distance weights.
+  return names === null ? names : Array.from(new Set(names));
 }
 
 function flatten(properties: WeightedProperty[] | null): string[] {

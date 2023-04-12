@@ -2,6 +2,8 @@ import { SerializedEditorState } from "lexical";
 import { MouseEventHandler, useState } from "react";
 
 import CommentEditor from "replay-next/components/lexical/CommentEditor";
+import { useNag } from "replay-next/src/hooks/useNag";
+import { Nag } from "shared/graphql/types";
 import useCommentContextMenu from "ui/components/Comments/useCommentContextMenu";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useUpdateComment, useUpdateCommentReply } from "ui/hooks/comments/comments";
@@ -51,6 +53,8 @@ export default function EditableRemark({
     setIsEditing(false);
   };
 
+  const [, dismissAddCommentNag] = useNag(Nag.ADD_COMMENT);
+
   const saveChanges = async (editorState: SerializedEditorState) => {
     setIsPending(true);
     setIsEditing(false);
@@ -63,6 +67,7 @@ export default function EditableRemark({
       await updateCommentReply(remarkId, string, true);
     }
 
+    dismissAddCommentNag();
     setIsPending(false);
   };
 

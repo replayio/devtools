@@ -18,7 +18,7 @@ import {
   imperativelyGetClosestPointForTime,
   preCacheExecutionPointForTime,
 } from "../suspense/ExecutionPointsCache";
-import { Range } from "../types";
+import { TimeRange } from "../types";
 import { SessionContext } from "./SessionContext";
 
 const FOCUS_DEBOUNCE_DURATION = 250;
@@ -30,7 +30,13 @@ export type FocusContextType = {
   isTransitionPending: boolean;
   range: TimeStampedPointRange | null;
   rangeForDisplay: TimeStampedPointRange | null;
-  update: (value: Range | null, debounce: boolean) => void;
+
+  // Set focus window to a range of execution points (or null to clear).
+  update: (value: TimeStampedPointRange | null, debounce: boolean) => void;
+
+  // Set focus window to a range of times (or null to clear).
+  // Note this value is imprecise and should only be used by the Timeline focuser UI.
+  updateForTimelineImprecise: (value: TimeRange | null, debounce: boolean) => void;
 };
 
 export const FocusContext = createContext<FocusContextType>(null as any);
@@ -49,6 +55,7 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
   };
   const [range, setRange] = useState<TimeStampedPointRange | null>(initialRange);
   const [deferredRange, setDeferredRange] = useState<TimeStampedPointRange | null>(initialRange);
+  const [focusRangeInitialized, setFocusRangeInitialized] = useState(false);
 
   // Using a deferred values enables the focus UI to update quickly,
   // and the slower operation of Suspending to load points to be deferred.
@@ -72,8 +79,9 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
       return;
     }
 
-    const timeoutId = setTimeout(() => {
-      client.requestFocusRange({ begin: range.begin.time, end: range.end.time });
+    const timeoutId = setTimeout(async () => {
+      await client.requestFocusRange({ begin: range.begin.time, end: range.end.time });
+      setFocusRangeInitialized(true);
     }, FOCUS_DEBOUNCE_DURATION);
 
     return () => {
@@ -92,33 +100,45 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
   }, [loadedRegions]);
 
   const updateFocusRange = useCallback(
-    async (value: Range | null, debounce: boolean) => {
-      let newRange: TimeStampedPointRange | null = null;
-      if (value) {
-        const [timeBegin, timeEnd] = value;
-        const pointBegin = await imperativelyGetClosestPointForTime(client, timeBegin);
-        const pointEnd = await imperativelyGetClosestPointForTime(client, timeEnd);
-
-        newRange = {
-          begin: { point: pointBegin, time: timeBegin },
-          end: { point: pointEnd, time: timeEnd },
-        };
-      }
-
-      setRange(newRange);
+    async (range: TimeStampedPointRange | null, debounce: boolean) => {
+      setRange(range);
 
       // Focus values may change rapidly (e.g. during a click-and-drag)
       // In this case, React's default high/low priority split is helpful, but we can do more.
       // Debouncing a little before starting the transition helps avoid sending a lot of unused requests to the backend.
       if (debounce) {
-        debouncedSetDeferredRange(newRange);
+        debouncedSetDeferredRange(range);
       } else {
         startTransition(() => {
-          setDeferredRange(newRange);
+          setDeferredRange(range);
         });
       }
     },
-    [client, debouncedSetDeferredRange]
+    [debouncedSetDeferredRange]
+  );
+
+  const updateForTimelineImprecise = useCallback(
+    async (value: TimeRange | null, debounce: boolean) => {
+      if (value) {
+        const [timeBegin, timeEnd] = value;
+
+        const [pointBegin, pointEnd] = await Promise.all([
+          imperativelyGetClosestPointForTime(client, timeBegin),
+          imperativelyGetClosestPointForTime(client, timeEnd),
+        ]);
+
+        updateFocusRange(
+          {
+            begin: { point: pointBegin, time: timeBegin },
+            end: { point: pointEnd, time: timeEnd },
+          },
+          debounce
+        );
+      } else {
+        updateFocusRange(null, debounce);
+      }
+    },
+    [client, updateFocusRange]
   );
 
   const focusContext = useMemo<FocusContextType>(
@@ -128,9 +148,14 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
       rangeForDisplay: range,
       range: deferredRange,
       update: updateFocusRange,
+      updateForTimelineImprecise,
     }),
-    [deferredRange, isTransitionPending, range, updateFocusRange]
+    [deferredRange, isTransitionPending, range, updateFocusRange, updateForTimelineImprecise]
   );
 
-  return <FocusContext.Provider value={focusContext}>{children}</FocusContext.Provider>;
+  return (
+    <FocusContext.Provider value={focusContext}>
+      {focusRangeInitialized ? children : null}
+    </FocusContext.Provider>
+  );
 }

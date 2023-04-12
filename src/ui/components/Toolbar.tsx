@@ -2,7 +2,6 @@ import classnames from "classnames";
 import classNames from "classnames";
 import React, { useContext, useEffect, useState } from "react";
 
-import AccessibleImage from "devtools/client/debugger/src/components/shared/AccessibleImage";
 import { getPauseId } from "devtools/client/debugger/src/selectors";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
@@ -12,17 +11,10 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
-import { Nag } from "ui/hooks/users";
-import { useTestInfo } from "ui/hooks/useTestInfo";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { PrimaryPanelName } from "ui/state/layout";
-import {
-  shouldShowBreakpointAdd,
-  shouldShowBreakpointEdit,
-  shouldShowConsoleNavigate,
-  shouldShowTour,
-} from "ui/utils/onboarding";
+import { shouldShowTour } from "ui/utils/onboarding";
 // TODO [ryanjduffy]: Refactor shared styling more completely
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -38,7 +30,7 @@ function CypressIcon() {
       viewBox="0 0 256 256"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="h-full w-full"
+      className="w-full h-full"
     >
       <path
         d="M128 2C197.645 2 254 58.3555 254 128C254 197.645 197.645 254 128 254C58.3555 254 2 197.645 2 128C2 58.3555 58.3555 2 128 2Z"
@@ -137,7 +129,7 @@ function ToolbarButton({
       </div>
       {showBadge ? (
         <div
-          className="absolute h-2 w-2 rounded-full bg-secondaryAccent"
+          className="absolute w-2 h-2 rounded-full bg-secondaryAccent"
           style={{
             // FE-1096 Aiming for pixel perfect badge alignment over icons with inconsistent shapes
             right: name === "comments" ? ".9rem" : "1em",
@@ -157,12 +149,13 @@ export default function Toolbar() {
   const hasFrames = frames && frames.length > 0;
   const viewMode = useAppSelector(selectors.getViewMode);
   const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
+
   const [showCommentsBadge, setShowCommentsBadge] = useState(false);
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   const { comments, loading } = hooks.useGetComments(recordingId);
-  const { value: logProtocol } = useFeature("logProtocol");
-  const { value: showReactPanel } = useFeature("reactPanel");
+  const { value: logProtocolExperimentEnabled } = useFeature("logProtocol");
+  const { value: reactPanelExperimentEnabled } = useFeature("reactPanel");
   const { value: showPassport } = useFeature("showPassport");
   const [sidePanelCollapsed, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
   const { nags } = hooks.useGetUserInfo();
@@ -200,13 +193,22 @@ export default function Toolbar() {
   };
 
   return (
-    <div className="toolbox-toolbar-container flex flex-col items-center justify-between py-1">
+    <div className="flex flex-col items-center justify-between py-1 toolbox-toolbar-container">
       <div id="toolbox-toolbar">
         {recording?.metadata?.test?.runner?.name !== "cypress" && showTour ? (
           <ToolbarButton
             icon="school"
             name="tour"
             label="Replay Tour"
+            onClick={handleButtonClick}
+          />
+        ) : null}
+
+        {showPassport ? (
+          <ToolbarButton
+            icon="menu_book"
+            name="assist"
+            label="Replay Passport"
             onClick={handleButtonClick}
           />
         ) : null}
@@ -257,12 +259,12 @@ export default function Toolbar() {
               showBadge={hasFrames}
               onClick={handleButtonClick}
             />
-            {showReactPanel && (
+            {reactPanelExperimentEnabled && (
               <ToolbarButton icon="react" name="react" label="React" onClick={handleButtonClick} />
             )}
           </>
         ) : null}
-        {logProtocol && viewMode === "dev" ? (
+        {logProtocolExperimentEnabled && viewMode === "dev" ? (
           <ToolbarButton icon="code" label="Protocol" name="protocol" onClick={handleButtonClick} />
         ) : null}
         <div className="grow"></div>

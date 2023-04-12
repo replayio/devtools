@@ -16,7 +16,6 @@ import { setupMarkup } from "devtools/client/inspector/markup/actions/markup";
 import * as inspectorReducers from "devtools/client/inspector/reducers";
 import { setupRules } from "devtools/client/inspector/rules/actions/rules";
 import { setupNetwork } from "devtools/client/webconsole/actions/network";
-import { setPointsReceivedCallback as setAnalysisPointsReceivedCallback } from "protocol/analysisManager";
 import { Canvas, setAllPaintsReceivedCallback, setupGraphics } from "protocol/graphics";
 import {
   setMouseDownEventsCallback,
@@ -33,6 +32,7 @@ import { assert } from "protocol/utils";
 import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { POINTS_DATABASE } from "replay-next/src/contexts/points/constants";
 import { IDBOptions } from "replay-next/src/hooks/useIndexedDB";
+import { setPointsReceivedCallback as setAnalysisPointsReceivedCallback } from "replay-next/src/suspense/AnalysisCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 import { UIStore, actions } from "ui/actions";

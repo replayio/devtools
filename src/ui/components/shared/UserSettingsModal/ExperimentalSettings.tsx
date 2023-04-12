@@ -154,6 +154,11 @@ export default function ExperimentalSettings({}) {
   const { value: enableIncrementalSnapshots, update: updateEnableIncrementalSnapshots } =
     useFeature("enableIncrementalSnapshots");
 
+  const {
+    value: disableConcurrentControllerLoading,
+    update: updateDisableConcurrentControllerLoading,
+  } = useFeature("disableConcurrentControllerLoading");
+
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
@@ -199,6 +204,7 @@ export default function ExperimentalSettings({}) {
     rerunRoutines,
     profileWorkerThreads,
     disableRecordingAssetsInDatabase,
+    disableConcurrentControllerLoading,
     reactPanel,
   };
 

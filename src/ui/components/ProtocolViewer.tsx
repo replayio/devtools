@@ -22,7 +22,7 @@ import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import {
-  AnalysisResult,
+  LogPointAnalysisResult,
   getLogPointAnalysisResultAsync,
 } from "replay-next/src/suspense/LogPointAnalysisCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
@@ -565,7 +565,7 @@ export const recordedProtocolMessagesCache: Cache<
               )
             )
           )
-        ).filter(b => !!b) as AnalysisResult[];
+        ).filter(b => !!b) as LogPointAnalysisResult[];
 
         // For every analysis result, download the entire event object
         // as a real JS object, and add the relevant timestamp
@@ -641,18 +641,24 @@ export const RecordedAppProtocolViewer = React.forwardRef(function RecordedAppPr
   let content: React.ReactNode;
 
   if (sourceDetails.length === 0) {
-    content = <i>Loading sources...</i>;
+    content = <h3 className={styles.Header}>Loading sources...</h3>;
   } else if (!isRecordingOfReplay) {
-    content = <span className="text-base">Not a recording of Replay</span>;
+    content = <h3 className={styles.Header}>Not a recording of Replay</h3>;
   } else {
     content = (
-      <Suspense fallback={<Loader />}>
+      <Suspense
+        fallback={
+          <h3 className={styles.Header}>
+            <Loader />
+          </h3>
+        }
+      >
         <RecordedProtocolMessages sourceDetails={sourceDetails} />
       </Suspense>
     );
   }
 
-  return <div>{content}</div>;
+  return content;
 });
 
 type ProtocolViewerTabs = "live" | "recorded";

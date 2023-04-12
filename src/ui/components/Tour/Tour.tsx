@@ -94,10 +94,7 @@ const Tour: React.FC = () => {
                         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
                       </svg>
                     </div>
-                    <p>
-                      Now click the plus button on a line of code to set a print statement. Watch
-                      this!
-                    </p>
+                    <p>Now click the plus button on a line of code to set a print statement.</p>
                   </>
                 )}
 
@@ -151,19 +148,25 @@ const Tour: React.FC = () => {
         )}
 
         {!isNewUser && showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
-          <img src="/images/tour/fast-forward.gif" className={styles.videoExample} />
+          <img
+            src="https://vercel.replay.io/tour/fast-forward.gif"
+            className={styles.videoExample}
+          />
         )}
 
         {!showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
-          <img src="/images/tour/addlogs.gif" className={styles.videoExample} />
+          <img src="https://vercel.replay.io/tour/addlogs.gif" className={styles.videoExample} />
         )}
 
         {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && (
-          <img src="/images/tour/editlogs.gif" className={styles.videoExample} />
+          <img src="https://vercel.replay.io/tour/editlogs.gif" className={styles.videoExample} />
         )}
 
         {hasCompletedTour && (
-          <img src="/images/tour/consoleupdate.gif" className={styles.videoExample} />
+          <img
+            src="https://vercel.replay.io/tour/consoleupdate.gif"
+            className={styles.videoExample}
+          />
         )}
       </div>
     </div>

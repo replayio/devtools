@@ -1,9 +1,11 @@
 import { filter } from "fuzzaldrin-plus";
 import clamp from "lodash/clamp";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
+import { useNag } from "replay-next/src/hooks/useNag";
 import { ExperimentalUserSettings } from "shared/graphql/types";
+import { Nag } from "shared/graphql/types";
 import { actions } from "ui/actions";
 import hooks from "ui/hooks";
 import { selectors } from "ui/reducers";
@@ -43,7 +45,9 @@ export type CommandKey =
   | "show_replay_info"
   | "show_sharing"
   | "toggle_dark_mode"
-  | "toggle_edit_focus";
+  | "toggle_edit_focus"
+  | "jump_to_next_pause"
+  | "jump_to_previous_pause";
 
 const COMMANDS: readonly Command[] = [
   { key: "open_console", label: "Open Console" },
@@ -116,6 +120,12 @@ function CommandPalette({
   const [searchString, setSearchString] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const shownCommands = getShownCommands(searchString);
+
+  const [, dismissLaunchCommandPaletteNag] = useNag(Nag.LAUNCH_COMMAND_PALETTE);
+
+  useEffect(() => {
+    dismissLaunchCommandPaletteNag();
+  }, [dismissLaunchCommandPaletteNag]);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchString(e.target.value);

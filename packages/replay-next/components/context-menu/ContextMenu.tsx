@@ -1,9 +1,12 @@
-import { MouseEvent, ReactNode, useRef } from "react";
+import { MouseEvent, ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import useModalDismissSignal from "replay-next/src/hooks/useModalDismissSignal";
 
 import styles from "./ContextMenu.module.css";
+
+// TODO Should we be using clientX/clientY instead?
+// I guess it doesn't matter since Replay doesn't scroll.
 
 export default function ContextMenu({
   children,
@@ -22,9 +25,37 @@ export default function ContextMenu({
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
+  const [offsets, setOffsets] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
   useModalDismissSignal(ref, hide, true);
 
-  const onClick = () => {
+  useLayoutEffect(() => {
+    const contextMenu = ref.current;
+    if (contextMenu) {
+      const rect = contextMenu.getBoundingClientRect();
+
+      let newOffsets = { ...offsets };
+      if (pageX + rect.width > window.innerWidth) {
+        newOffsets.x = 0 - rect.width;
+      }
+      if (pageY + rect.height > window.innerHeight) {
+        newOffsets.y = 0 - rect.height;
+      }
+
+      if (newOffsets.x !== offsets.x || newOffsets.y !== offsets.y) {
+        setOffsets(newOffsets);
+      }
+    }
+  }, [offsets, pageX, pageY]);
+
+  const onClick = (event: MouseEvent) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
     hide();
   };
 
@@ -40,8 +71,8 @@ export default function ContextMenu({
         data-test-name={dataTestName}
         ref={ref}
         style={{
-          left: pageX,
-          top: pageY,
+          left: pageX + offsets.x,
+          top: pageY + offsets.y,
         }}
       >
         {children}

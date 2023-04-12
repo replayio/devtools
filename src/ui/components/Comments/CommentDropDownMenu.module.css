@@ -1,0 +1,19 @@
+.Button {
+  background: none;
+  border: none;
+  outline: none;
+  flex: 0 0 1rem;
+  cursor: pointer;
+}
+
+.Icon {
+  height: 1rem;
+  width: 1rem;
+}
+.Icon[data-selected] {
+  color: var(--color-link);
+}
+
+.Checkbox {
+  gap: 1ch;
+}

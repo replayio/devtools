@@ -283,6 +283,15 @@ test("should be filterable", async ({ page }) => {
 
   await page.fill("[data-test-id=ConsoleFilterInput]", "zzz");
   await takeScreenshot(page, consoleRoot, "filtered-no-results");
+
+  // Seeking to a message should not break the filter
+  await page.fill("[data-test-id=ConsoleFilterInput]", " a ");
+  await seekToMessage(page, await locateMessage(page, "console-log", "This is a trace"));
+  await delay();
+  await takeScreenshot(page, consoleRoot, "filtered-three-results-after-seeking-to-last-message");
+  await seekToMessage(page, await locateMessage(page, "console-log", "This is a log"));
+  await delay();
+  await takeScreenshot(page, consoleRoot, "filtered-three-results-after-seeking-to-first-message");
 });
 
 test("should log events in the console", async ({ page }) => {

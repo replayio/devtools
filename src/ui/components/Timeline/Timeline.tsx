@@ -1,6 +1,13 @@
 import { MouseEvent, useLayoutEffect, useRef, useState } from "react";
 
-import { seekToTime, setTimelineToTime, stopPlayback } from "ui/actions/timeline";
+import { throttle } from "shared/utils/function";
+import {
+  seekToTime,
+  setTimelineToTime,
+  stopPlayback,
+  updateFocusRegion,
+} from "ui/actions/timeline";
+import useTimelineContextMenu from "ui/components/Timeline/useTimelineContextMenu";
 import { selectors } from "ui/reducers";
 import {
   isPlaying as isPlayingSelector,
@@ -8,6 +15,7 @@ import {
   setTimelineState,
 } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { AppDispatch } from "ui/setup/store";
 import { getTimeFromPosition } from "ui/utils/timeline";
 
 import Comments from "../Comments";
@@ -43,6 +51,8 @@ export default function Timeline() {
 
   const [editMode, setEditMode] = useState<EditMode | null>(null);
   const [showLoadingProgress, setShowLoadingProgress] = useState<boolean>(false);
+
+  const { contextMenu, onContextMenu } = useTimelineContextMenu();
 
   useLayoutEffect(() => {
     const progressBar = progressBarRef.current;
@@ -118,7 +128,7 @@ export default function Timeline() {
 
   return (
     <>
-      <FocusModePopout />
+      <FocusModePopout updateFocusRegionThrottled={updateFocusRegionThrottled} />
       <div className="timeline">
         <div className="commands">
           <PlayPauseButton />
@@ -132,17 +142,23 @@ export default function Timeline() {
           onMouseMove={onMouseMove}
           onMouseUp={onMouseUp}
         >
-          <div className="progress-bar-stack">
+          <div className="progress-bar-stack" onContextMenu={onContextMenu}>
             <ProtocolTimeline />
             <div className="progress-bar" ref={progressBarRef}>
               <ProgressBars />
               <PreviewMarkers />
-              <Comments />
+              <div className="comments-container">
+                <Comments />
+                <CurrentTimeIndicator editMode={editMode} />
+              </div>
               <NonLoadingRegions />
               <UnfocusedRegion />
               {showLoadingProgress && <LoadingProgressBars />}
-              <CurrentTimeIndicator editMode={editMode} />
-              <Focuser editMode={editMode} setEditMode={setEditMode} />
+              <Focuser
+                editMode={editMode}
+                setEditMode={setEditMode}
+                updateFocusRegionThrottled={updateFocusRegionThrottled}
+              />
             </div>
           </div>
 
@@ -151,6 +167,11 @@ export default function Timeline() {
 
         <Capsule setShowLoadingProgress={setShowLoadingProgress} />
       </div>
+      {contextMenu}
     </>
   );
 }
+
+const updateFocusRegionThrottled = throttle((dispatch: AppDispatch, begin: number, end: number) => {
+  return dispatch(updateFocusRegion({ begin, end }));
+}, 250);

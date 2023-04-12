@@ -3,15 +3,30 @@ import { ExecutionPoint, Location } from "@replayio/protocol";
 import { Point as PointData } from "shared/client/types";
 
 export enum Nag {
+  ADD_COMMENT = "add_comment",
+  ADD_COMMENT_TO_LINE = "add_comment_to_line",
+  ADD_COMMENT_TO_NETWORK_REQUEST = "add_comment_to_network_request",
+  ADD_COMMENT_TO_PRINT_STATEMENT = "add_comment_to_print_statement",
+  ADD_UNICORN_BADGE = "add_unicorn_badge",
+  DISMISS_TOUR = "dismiss_tour",
+  DOWNLOAD_REPLAY = "download_replay",
+  EXPLORE_SOURCES = "explore_sources",
+  FIRST_BREAKPOINT_ADD = "first_breakpoint_add",
+  FIRST_BREAKPOINT_EDIT = "first_breakpoint_edit",
+  FIRST_BREAKPOINT_SAVE = "first_breakpoint_save",
+  FIRST_CONSOLE_NAVIGATE = "first_console_navigate",
   FIRST_LOG_IN = "first_log_in",
   FIRST_REPLAY_2 = "first_replay_2",
+  INSPECT_COMPONENT = "inspect_component",
+  INSPECT_ELEMENT = "inspect_element",
+  JUMP_TO_CODE = "jump_to_code",
+  JUMP_TO_EVENT = "jump_to_event",
+  LAUNCH_COMMAND_PALETTE = "launch_command_palette",
+  QUICK_OPEN_FILE = "quick_open_file",
+  RECORD_REPLAY = "record_replay",
+  SEARCH_SOURCE_TEXT = "search_source_text",
+  USE_FOCUS_MODE = "use_focus_mode",
   VIEW_DEVTOOLS = "view_devtools",
-  FIRST_CONSOLE_NAVIGATE = "first_console_navigate",
-  FIRST_BREAKPOINT_EDIT = "first_breakpoint_edit",
-  FIRST_BREAKPOINT_ADD = "first_breakpoint_add",
-  FIRST_BREAKPOINT_SAVE = "first_breakpoint_save",
-  DOWNLOAD_REPLAY = "download_replay",
-  DISMISS_TOUR = "dismiss_tour",
 }
 
 export enum EmailSubscription {
@@ -104,6 +119,7 @@ export type LocalExperimentalUserSettings = {
   profileWorkerThreads: boolean;
   brokenSourcemapWorkaround: boolean;
   disableRecordingAssetsInDatabase: boolean;
+  disableConcurrentControllerLoading: boolean;
   reactPanel: boolean;
 };
 

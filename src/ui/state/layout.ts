@@ -10,7 +10,7 @@ export type LayoutState = {
 };
 
 export type ViewMode = "dev" | "non-dev";
-export const VIEWER_PANELS = ["cypress", "tour", "events", "comments"] as const;
+export const VIEWER_PANELS = ["cypress", "tour", "assist", "events", "comments"] as const;
 type ViewerPrimaryPanelName = typeof VIEWER_PANELS[number];
 export type PrimaryPanelName =
   | "explorer"

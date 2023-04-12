@@ -146,10 +146,11 @@ const baseNextConfig = {
       fs: false,
     };
 
-    const reLibrariesWithSourcemaps = /node_modules.+(immer|@reduxjs|react-window).+\.js$/;
+    const sourceMapRegExp =
+      /node_modules.+(immer|@reduxjs|react-resizable-panels|react-window|suspense).+\.js$/;
 
     config.module.rules.push({
-      test: reLibrariesWithSourcemaps,
+      test: sourceMapRegExp,
       enforce: "pre",
       use: ["source-map-loader"],
     });
