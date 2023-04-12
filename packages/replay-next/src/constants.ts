@@ -1,6 +1,6 @@
 import { EventHandlerType } from "@replayio/protocol";
 
-import { RecordingTarget } from "protocol/thread/thread";
+import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 
 export type EventCategory = {
   category: string;

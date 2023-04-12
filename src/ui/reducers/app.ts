@@ -1,9 +1,8 @@
 import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
 
-import { RecordingTarget } from "protocol/thread/thread";
+import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 import { compareExecutionPoints, isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { Workspace } from "shared/graphql/types";
-import { getFeature } from "ui/hooks/settings";
 import { getCurrentTime, getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import {

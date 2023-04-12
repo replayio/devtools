@@ -7,9 +7,9 @@ import Icon from "replay-next/components/Icon";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { exceptionsCache } from "replay-next/src/suspense/ExceptionsCache";
 import { CategoryCounts, getMessagesSuspense } from "replay-next/src/suspense/MessagesCache";
-import { getRecordingCapabilitiesSuspense } from "replay-next/src/suspense/RecordingCache";
 import { isInNodeModules } from "replay-next/src/utils/messages";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ProtocolError, isCommandError } from "shared/utils/error";
@@ -29,7 +29,7 @@ export default function FilterToggles() {
   } = useContext(ConsoleFiltersContext);
 
   const replayClient = useContext(ReplayClientContext);
-  const recordingCapabilities = getRecordingCapabilitiesSuspense(replayClient);
+  const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
 
   return (
     <div className={styles.Filters} data-test-id="ConsoleFilterToggles">

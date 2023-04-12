@@ -51,7 +51,6 @@ import uniqueId from "lodash/uniqueId";
 // eslint-disable-next-line no-restricted-imports
 import { addEventListener, client, initSocket, removeEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
-import { RecordingCapabilities, RecordingTarget } from "protocol/thread/thread";
 import { binarySearch, compareNumericStrings, defer, waitForTime } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
 import { areRangesEqual } from "replay-next/src/utils/time";
@@ -158,12 +157,10 @@ export class ReplayClient implements ReplayClientInterface {
     await client.Debugger.removeBreakpoint({ breakpointId }, sessionId);
   }
 
-  async getRecordingCapabilities(): Promise<RecordingCapabilities> {
-    return this._threadFront.getRecordingCapabilities();
-  }
-
-  async getRecordingTarget(): Promise<RecordingTarget> {
-    return this._threadFront.getRecordingTarget();
+  async getBuildId(): Promise<string> {
+    const sessionId = await this.waitForSession();
+    const { buildId } = await client.Session.getBuildId({}, sessionId);
+    return buildId;
   }
 
   async createPause(executionPoint: ExecutionPoint): Promise<createPauseResult> {
@@ -234,7 +231,7 @@ export class ReplayClient implements ReplayClientInterface {
 
     this._sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
-    this._threadFront.setSessionId(sessionId, {});
+    this._threadFront.setSessionId(sessionId);
 
     return sessionId;
   }

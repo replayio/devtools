@@ -1,7 +1,7 @@
 import { Page } from "@playwright/test";
 import chalk from "chalk";
 
-import { RecordingTarget } from "protocol/thread/thread";
+import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 
 import { debugPrint } from "./utils";
 
@@ -9,10 +9,7 @@ const exampleRecordings = require("../examples.json");
 
 export async function getRecordingTarget(page: Page): Promise<RecordingTarget> {
   return page.evaluate(async () => {
-    // @ts-ignore
-    const app = window.app as any;
-    const target = await app.threadFront.getRecordingTarget();
-    return target;
+    return (window as any).app.store.getState().app.recordingTarget;
   });
 }
 

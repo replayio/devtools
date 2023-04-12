@@ -7,8 +7,8 @@ import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ThreadFront } from "protocol/thread";
-import { RecordingTarget } from "protocol/thread/thread";
 import { compareNumericStrings } from "protocol/utils";
+import { RecordingTarget, recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
@@ -202,7 +202,7 @@ class ReplayWall implements Wall {
 
   private async ensureReactDevtoolsBackendLoaded() {
     if (this.recordingTarget === null) {
-      this.recordingTarget = await ThreadFront.getRecordingTarget();
+      this.recordingTarget = await recordingTargetCache.readAsync(this.replayClient);
     }
 
     if (this.recordingTarget === "chromium") {
@@ -398,7 +398,7 @@ async function loadReactDevToolsInlineModuleFromProtocol(
   // Default assume that it's a recent recording
   let backendBridgeProtocolVersion = 2;
 
-  const recordingTarget = await ThreadFront.getRecordingTarget();
+  const recordingTarget = await recordingTargetCache.readAsync(replayClient);
 
   if (recordingTarget === "gecko") {
     // For Gecko recordings, introspect the page to determine what RDT version was used

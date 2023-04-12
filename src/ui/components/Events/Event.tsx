@@ -12,14 +12,12 @@ import { Cache, createCache } from "suspense";
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import type { ThreadFront as TF } from "protocol/thread";
-import { RecordingTarget } from "protocol/thread/thread";
-import Icon from "replay-next/components/Icon";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
+import { RecordingTarget, recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { eventCountsCache, eventPointsCache } from "replay-next/src/suspense/EventsCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
-import { compareExecutionPoints } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 import { Nag } from "shared/graphql/types";
 import type { UIThunkAction } from "ui/actions";
@@ -87,7 +85,7 @@ export const nextInteractionEventCache: Cache<
   load: async ([replayClient, threadFront, point, replayEventType, endTime, sourcesState]) => {
     const pointNearEndTime = await replayClient.getPointNearTime(endTime);
 
-    const recordingTarget = await threadFront.getRecordingTarget();
+    const recordingTarget = await recordingTargetCache.readAsync(replayClient);
 
     // Limit to browsers
     if (!["gecko", "chromium"].includes(recordingTarget)) {

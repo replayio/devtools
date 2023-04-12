@@ -13,8 +13,9 @@ import React, {
 import { ImperativePanelHandle } from "react-resizable-panels";
 
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
-import { RecordingCapabilities } from "protocol/thread/thread";
 import LazyOffscreen from "replay-next/components/LazyOffscreen";
+import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
+import { RecordingCapabilities } from "replay-next/src/suspense/BuildIdCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { setSelectedPanel } from "ui/actions/layout";
 import { useFeature } from "ui/hooks/settings";
@@ -30,7 +31,6 @@ import { Redacted } from "../Redacted";
 import Loader from "../shared/Loader";
 import ReplayLogo from "../shared/ReplayLogo";
 import WaitForReduxSlice from "../WaitForReduxSlice";
-import { getRecordingCapabilitiesSuspense } from "./getRecordingCapabilities";
 import NewConsoleRoot from "./NewConsole";
 import SourcesTabLabel from "./SourcesTabLabel";
 import { ShowVideoButton } from "./ToolboxButton";
@@ -168,7 +168,7 @@ function SecondaryToolbox({
   const dispatch = useAppDispatch();
   const replayClient = useContext(ReplayClientContext);
 
-  const recordingCapabilities = getRecordingCapabilitiesSuspense();
+  const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
   const { value: chromiumNetMonitorEnabled } = useFeature("chromiumNetMonitor");
 
   const kindsSet = new Set(annotationKinds);

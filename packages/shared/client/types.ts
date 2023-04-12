@@ -47,8 +47,6 @@ import {
   repaintGraphicsResult,
 } from "@replayio/protocol";
 
-import { RecordingCapabilities, RecordingTarget } from "protocol/thread/thread";
-
 export type LogEntry = {
   args: any[];
   isAsync: boolean;
@@ -165,6 +163,7 @@ export interface ReplayClientInterface {
     sourceId: SourceId,
     range: SourceLocationRange | null
   ): Promise<SameLineSourceLocations[]>;
+  getBuildId(): Promise<string>;
   getCorrespondingLocations(location: Location): Location[];
   getCorrespondingSourceIds(sourceId: SourceId): SourceId[];
   getEventCountForTypes(
@@ -184,9 +183,7 @@ export interface ReplayClientInterface {
   getPointNearTime(time: number): Promise<TimeStampedPoint>;
   getPointsBoundingTime(time: number): Promise<PointsBoundingTime>;
   getPreferredLocation(locations: Location[]): Location | null;
-  getRecordingCapabilities(): Promise<RecordingCapabilities>;
   getRecordingId(): RecordingId | null;
-  getRecordingTarget(): Promise<RecordingTarget>;
   getScope(pauseId: PauseId, scopeId: ScopeId): Promise<getScopeResult>;
   getScopeMap(location: Location): Promise<VariableMapping[] | undefined>;
   getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
