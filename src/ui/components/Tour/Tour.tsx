@@ -129,7 +129,7 @@ const Tour: React.FC = () => {
                             dismissTourNag();
                           }, 2500);
                         }}
-                        className="px-3 py-1 font-medium bg-white rounded-lg shadow-lg hover:cursor-hand whitespace-nowrap text-primaryAccent hover:bg-blue-50"
+                        className="hover:cursor-hand whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg hover:bg-blue-50"
                       >
                         Ready for my passport!
                       </a>
@@ -142,10 +142,10 @@ const Tour: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="absolute p-3 bottom-28">
+      <div className="absolute bottom-28 p-3">
         {isNewUser && (
           <div className="relative -bottom-3">
-            <img src="/images/illustrations/larry_wave.png" className="w-full z-1" />
+            <img src="/images/illustrations/larry_wave.png" className="z-1 w-full" />
           </div>
         )}
 
