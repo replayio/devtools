@@ -10,7 +10,7 @@ import React, { ReactNode, useEffect, useState } from "react";
 import { Provider } from "react-redux";
 
 import { SystemProvider } from "design";
-import { setRepaintAfterEvaluationsExperimentalFlag } from "protocol/thread/thread";
+import { setFeatures } from "protocol/thread/thread";
 import { ApolloWrapper } from "ui/components/ApolloWrapper";
 import _App from "ui/components/App";
 import ErrorBoundary from "ui/components/ErrorBoundary";
@@ -34,9 +34,8 @@ if (isMock()) {
 }
 
 // Expose app feature flags to the protocol through an app-agnostic API.
-if (features.repaintEvaluations) {
-  setRepaintAfterEvaluationsExperimentalFlag(true);
-}
+setFeatures(features);
+
 interface AuthProps {
   apiKey?: string;
 }

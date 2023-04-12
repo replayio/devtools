@@ -1,7 +1,7 @@
 import { RecordingId } from "@replayio/protocol";
 import { ClipboardEvent, KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
 
-import { RecordingTarget } from "protocol/thread/thread";
+import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 import { Recording } from "shared/graphql/types";
 import { selectAll } from "shared/utils/selection";
 import { getRecordingTarget } from "ui/actions/app";

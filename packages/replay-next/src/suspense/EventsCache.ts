@@ -4,8 +4,8 @@ import isEmpty from "lodash/isEmpty";
 import without from "lodash/without";
 import { Cache, createCache, createIntervalCache } from "suspense";
 
-import type { RecordingTarget } from "protocol/thread/thread";
 import { compareNumericStrings } from "protocol/utils";
+import { RecordingTarget, recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { STANDARD_EVENT_CATEGORIES } from "../constants";
@@ -46,7 +46,7 @@ export const eventCountsCache: Cache<
   getKey: ([client, range]) => (range ? `${range.begin}:${range.end}` : ""),
   load: async ([client, range]) => {
     const allEvents = await client.getAllEventHandlerCounts(range);
-    const recordingTarget = await client.getRecordingTarget();
+    const recordingTarget = await recordingTargetCache.readAsync(client);
     return countEvents(allEvents, recordingTarget);
   },
 });

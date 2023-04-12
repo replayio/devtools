@@ -3,6 +3,7 @@ import { ProtocolClient, Object as ProtocolObject } from "@replayio/protocol";
 import { paused } from "devtools/client/debugger/src/reducers/pause";
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { Deferred, assert, defer } from "protocol/utils";
+import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
@@ -583,7 +584,7 @@ export function highlightNodes(
   duration?: number
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, protocolClient, replayClient }) => {
-    const recordingCapabilities = await ThreadFront.getRecordingCapabilities();
+    const recordingCapabilities = await recordingCapabilitiesCache.readAsync(replayClient);
     if (!recordingCapabilities.supportsRepaintingGraphics) {
       return;
     }

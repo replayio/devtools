@@ -33,6 +33,7 @@ import {
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
+import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { cachePauseData, pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { areRangesEqual } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
@@ -84,40 +85,6 @@ type FindTargetCommand = (
   sessionId: SessionId
 ) => Promise<FindTargetResult>;
 
-export type RecordingCapabilities = {
-  supportsEagerEvaluation: boolean;
-  supportsElementsInspector: boolean;
-  supportsEventTypes: boolean;
-  supportsNetworkRequests: boolean;
-  supportsRepaintingGraphics: boolean;
-  supportsPureEvaluation: boolean;
-};
-
-// Target applications which can create recordings.
-export enum RecordingTarget {
-  gecko = "gecko",
-  chromium = "chromium",
-  node = "node",
-  unknown = "unknown",
-}
-
-interface ReplayAppFeatures {
-  chromiumRepaints?: boolean;
-}
-
-function getRecordingTarget(buildId: string): RecordingTarget {
-  if (buildId.includes("gecko")) {
-    return RecordingTarget.gecko;
-  }
-  if (buildId.includes("chromium")) {
-    return RecordingTarget.chromium;
-  }
-  if (buildId.includes("node")) {
-    return RecordingTarget.node;
-  }
-  return RecordingTarget.unknown;
-}
-
 type ThreadFrontEvent = "paused" | "resumed";
 
 declare global {
@@ -127,9 +94,16 @@ declare global {
 }
 
 // Temporary experimental feature flag
-let repaintAfterEvaluationsExperimentalFlag: boolean = false;
-export function setRepaintAfterEvaluationsExperimentalFlag(value: boolean): void {
-  repaintAfterEvaluationsExperimentalFlag = value;
+interface Features {
+  chromiumRepaints: boolean;
+  repaintEvaluations: boolean;
+}
+export let features: Features = {
+  chromiumRepaints: false,
+  repaintEvaluations: false,
+};
+export function setFeatures(f: Features): void {
+  features = f;
 }
 
 type LoadedRegionListener = (loadedRegions: LoadedRegions) => void;
@@ -144,10 +118,6 @@ class _ThreadFront {
   // Waiter for the associated session ID.
   sessionId: SessionId | null = null;
   sessionWaiter = defer<SessionId>();
-
-  // Waiter which resolves with the target used to create the recording.
-  recordingCapabilitiesWaiter = defer<RecordingCapabilities>();
-  recordingTargetWaiter = defer<RecordingTarget>();
 
   // Waiter which resolves when all sources have been loaded.
   private allSourcesWaiter = defer<void>();
@@ -210,68 +180,12 @@ class _ThreadFront {
     );
   }
 
-  async setSessionId(sessionId: SessionId, features: Partial<ReplayAppFeatures>) {
+  async setSessionId(sessionId: SessionId) {
     this.sessionId = sessionId;
     assert(sessionId, "there should be a sessionId");
     this.sessionWaiter.resolve(sessionId);
     // This helps when trying to debug logRocket sessions and the like
     console.debug({ sessionId });
-
-    const { buildId } = await client.Session.getBuildId({}, sessionId);
-
-    const recordingTarget = getRecordingTarget(buildId);
-
-    let recordingCapabilities: RecordingCapabilities;
-    switch (recordingTarget) {
-      case "chromium": {
-        recordingCapabilities = {
-          supportsEagerEvaluation: false,
-          supportsElementsInspector: true,
-          supportsEventTypes: true,
-          supportsNetworkRequests: false,
-          supportsRepaintingGraphics: features.chromiumRepaints ?? false,
-          supportsPureEvaluation: false,
-        };
-
-        break;
-      }
-      case "gecko": {
-        recordingCapabilities = {
-          supportsEagerEvaluation: true,
-          supportsElementsInspector: true,
-          supportsEventTypes: true,
-          supportsNetworkRequests: true,
-          supportsRepaintingGraphics: true,
-          supportsPureEvaluation: true,
-        };
-        break;
-      }
-      case "node": {
-        recordingCapabilities = {
-          supportsEagerEvaluation: true,
-          supportsElementsInspector: false,
-          supportsEventTypes: false,
-          supportsNetworkRequests: true,
-          supportsRepaintingGraphics: false,
-          supportsPureEvaluation: false,
-        };
-        break;
-      }
-      case "unknown":
-      default: {
-        recordingCapabilities = {
-          supportsEagerEvaluation: false,
-          supportsElementsInspector: false,
-          supportsEventTypes: false,
-          supportsNetworkRequests: false,
-          supportsRepaintingGraphics: false,
-          supportsPureEvaluation: false,
-        };
-      }
-    }
-
-    this.recordingCapabilitiesWaiter.resolve(recordingCapabilities);
-    this.recordingTargetWaiter.resolve(recordingTarget);
   }
 
   waitForSession() {
@@ -352,14 +266,6 @@ class _ThreadFront {
     return client.Authentication.setAccessToken({ accessToken });
   }
 
-  getRecordingCapabilities(): Promise<RecordingCapabilities> {
-    return this.recordingCapabilitiesWaiter.promise;
-  }
-
-  getRecordingTarget(): Promise<RecordingTarget> {
-    return this.recordingTargetWaiter.promise;
-  }
-
   timeWarp(point: ExecutionPoint, time: number, openSource: boolean, frame?: Frame) {
     this.currentPoint = point;
     this.currentTime = time;
@@ -404,7 +310,7 @@ class _ThreadFront {
     if (!pauseId) {
       pauseId = await this.getCurrentPauseId(replayClient);
     }
-    const abilities = await this.recordingCapabilitiesWaiter.promise;
+    const abilities = await recordingCapabilitiesCache.readAsync(replayClient);
     const { result } = frameId
       ? await client.Pause.evaluateInFrame(
           {
@@ -426,7 +332,7 @@ class _ThreadFront {
         );
     cachePauseData(replayClient, pauseId, result.data);
 
-    if (repaintAfterEvaluationsExperimentalFlag) {
+    if (features.repaintEvaluations) {
       const { repaint } = await import("protocol/graphics");
       // Fire and forget
       repaint(true);

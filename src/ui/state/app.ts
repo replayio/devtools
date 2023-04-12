@@ -9,7 +9,7 @@ import {
   TimeStampedPointRange,
 } from "@replayio/protocol";
 
-import type { RecordingTarget } from "protocol/thread/thread";
+import type { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 import { Workspace } from "shared/graphql/types";
 
 import { Reply } from "./comments";

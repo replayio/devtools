@@ -2,12 +2,16 @@
 import { MouseEvent, PaintPoint, ScreenShot, TimeStampedPoint } from "@replayio/protocol";
 import maxBy from "lodash/maxBy";
 
+import {
+  recordingCapabilitiesCache,
+  recordingTargetCache,
+} from "replay-next/src/suspense/BuildIdCache";
 import { replayClient } from "shared/client/ReplayClientContext";
 
 import { repaintGraphics } from "./repainted-graphics-cache";
 import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
 import { ThreadFront } from "./thread";
-import { Deferred, assert, binarySearch, defer } from "./utils";
+import { assert, binarySearch, defer } from "./utils";
 
 const MINIMUM_VIDEO_CONTENT = 5000;
 
@@ -177,7 +181,7 @@ export function setupGraphics() {
     client.Session.findMouseEvents({}, sessionId);
     client.Session.addMouseEventsListener(({ events }) => onMouseEvents(events));
 
-    const recordingTarget = await ThreadFront.recordingTargetWaiter.promise;
+    const recordingTarget = await recordingTargetCache.readAsync(replayClient);
     if (recordingTarget === "node") {
       // Make sure we never wait for any paints when trying to do things like playback
       setHasAllPaintPoints(true);
@@ -214,7 +218,7 @@ export function setupGraphics() {
 }
 
 export async function fetchScreenshotForPause(pauseId: string, force = false) {
-  const recordingCapabilities = await ThreadFront.getRecordingCapabilities();
+  const recordingCapabilities = await recordingCapabilitiesCache.readAsync(replayClient);
   if (!recordingCapabilities.supportsRepaintingGraphics) {
     return;
   }

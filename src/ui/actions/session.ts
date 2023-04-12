@@ -10,7 +10,8 @@ import {
   createSession,
 } from "protocol/socket";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
-import { assert, waitForTime } from "protocol/utils";
+import { assert } from "protocol/utils";
+import { recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { Recording } from "shared/graphql/types";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
@@ -319,8 +320,8 @@ export function createSocket(
       });
 
       window.sessionId = sessionId;
-      ThreadFront.setSessionId(sessionId, features);
-      const recordingTarget = await ThreadFront.recordingTargetWaiter.promise;
+      ThreadFront.setSessionId(sessionId);
+      const recordingTarget = await recordingTargetCache.readAsync(replayClient);
       dispatch(actions.setRecordingTarget(recordingTarget));
 
       // We don't want to show the non-dev version of the app for node replays.

@@ -1,5 +1,7 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useContext, useState } from "react";
 
+import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { setToolboxLayout } from "ui/actions/layout";
 import { getToolboxLayout } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -8,7 +10,6 @@ import { ToolboxLayout } from "ui/state/layout";
 import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
 import Icon from "../shared/Icon";
 import PortalDropdown from "../shared/PortalDropdown";
-import { getRecordingCapabilitiesSuspense } from "./getRecordingCapabilities";
 
 const LAYOUT_ICONS = {
   bottom: "dock-bottom",
@@ -62,12 +63,13 @@ function LayoutOption({
 }
 
 export default function ToolboxOptions() {
+  const replayClient = useContext(ReplayClientContext);
   const toolboxLayout = useAppSelector(getToolboxLayout);
   const [expanded, setExpanded] = useState(false);
   const button = <Icon filename={LAYOUT_ICONS[toolboxLayout]} className="bg-iconColor" />;
   const collapseDropdown = () => setExpanded(false);
 
-  const recordingCapabilities = getRecordingCapabilitiesSuspense();
+  const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
 
   let layoutOptions: ReactNode = null;
 
