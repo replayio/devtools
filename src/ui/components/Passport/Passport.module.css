@@ -1,16 +1,16 @@
-.AssistBoxWrapper {
+.PassportBoxWrapper {
   position: relative;
   background-image: url(/images/passport/passportBG.png);
   height: 100vh;
 }
 
-.AssistBox {
+.PassportBox {
   color: #2177cf;
   padding: 0.5rem;
   height: 100%;
 }
 
-.AssistBoxInternal {
+.PassportBoxInternal {
   display: flex;
   flex-direction: row;
 }

@@ -335,7 +335,7 @@ export default React.memo(function Event({
 
   const onClickSeek = () => {
     onSeek(point, time);
-    dismissJumpToEventNag(); // Replay Assist
+    dismissJumpToEventNag(); // Replay Passport
   };
 
   const onClickJumpToCode = async () => {
@@ -359,7 +359,7 @@ export default React.memo(function Event({
       }
     }
 
-    // update Replay Assist
+    // update Replay Passport
     dismissJumpToCodeNag();
   };
 
@@ -412,7 +412,7 @@ export default React.memo(function Event({
 });
 
 const Label = ({ children }: { children: ReactNode }) => (
-  <div className="overflow-hidden overflow-ellipsis whitespace-pre font-normal">{children}</div>
+  <div className="overflow-hidden font-normal whitespace-pre overflow-ellipsis">{children}</div>
 );
 
 export function findFirstBreakablePositionForFunction(

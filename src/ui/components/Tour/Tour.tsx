@@ -24,7 +24,7 @@ const useNagDismissal = () => {
   const dispatch = useAppDispatch();
 
   const dismissTourNag = () => {
-    const initialPrimaryPanel = "assist";
+    const initialPrimaryPanel = "passport";
     dispatch(setSelectedPrimaryPanel(initialPrimaryPanel));
     dismissNag(Nag.DISMISS_TOUR);
   };
@@ -67,7 +67,7 @@ const Tour: React.FC = () => {
                   <>
                     <p>
                       Replay is the first time-travel enabled DevTools. It’s designed to be
-                      familiar, futuristic, and fun :)
+                      familiar, futuristic, and fun.
                     </p>
                     <p>To get started, click on DevTools in the top right.</p>
                   </>
@@ -78,10 +78,10 @@ const Tour: React.FC = () => {
                 {showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
                   <>
                     <div className={styles.h1}>Time travel 🚀</div>
-                    <p>Look underneath the video and introduce yourself to the Replay console.</p>
+                    <p>Look underneath the video to find the Replay console.</p>
                     <p>
-                      Hover over the lines in the console and you’ll see a fast-forward button.
-                      Click it to time travel!
+                      Hover over the console and you’ll see a fast-forward button. Click it to time
+                      travel!
                     </p>
                   </>
                 )}
@@ -110,14 +110,14 @@ const Tour: React.FC = () => {
 
                 {hasCompletedTour && (
                   <>
-                    <div className={styles.h1}>Cool, eh? 🤯</div>
+                    <div className={styles.h1}>Check it out!</div>
                     <p>Take a look at the console.</p>
                     <p>
                       Replay just re-ran your recording and retroactively added your print statement
-                      each time that line of code was called. This is a <b>huge</b> time saver.
+                      each time that line of code was called. 🤯
                     </p>
                     <p>And with that, you've graduated from the tour. Happy exploring!</p>
-                    <p className="mt-16">
+                    <p className="mt-8">
                       <a
                         href="#"
                         onClick={e => {
@@ -129,12 +129,22 @@ const Tour: React.FC = () => {
                             dismissTourNag();
                           }, 2500);
                         }}
-                        className="hover:cursor-hand whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg hover:bg-blue-50"
+                        className="px-3 py-1 font-medium bg-white rounded-lg shadow-lg hover:cursor-hand whitespace-nowrap text-primaryAccent hover:bg-blue-50"
                       >
-                        Ready for my passport!
+                        Thanks!
                       </a>
                       {showConfetti ? <Confetti /> : null}
                     </p>
+                    <img
+                      src={`/images/passport/tour_grad-default.png`}
+                      className={styles.largeCompletedImage}
+                      style={{
+                        zIndex: 0,
+                        opacity: 0.75,
+                        bottom: `300px`,
+                        transform: `rotate(14deg)`,
+                      }}
+                    />
                   </>
                 )}
               </div>
@@ -142,10 +152,10 @@ const Tour: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="absolute bottom-28 p-3">
+      <div className="absolute p-3 bottom-28">
         {isNewUser && (
           <div className="relative -bottom-3">
-            <img src="/images/illustrations/larry_wave.png" className="z-1 w-full" />
+            <img src="/images/illustrations/larry_wave.png" className="w-full z-1" />
           </div>
         )}
 

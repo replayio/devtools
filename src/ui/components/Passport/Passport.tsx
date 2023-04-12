@@ -165,13 +165,13 @@ const Passport: React.FC = () => {
   };
 
   return (
-    <div className={styles.AssistBoxWrapper}>
-      <div className={styles.AssistBoxGradient}>
-        <div className={styles.AssistBox}>
+    <div className={styles.PassportBoxWrapper}>
+      <div className={styles.PassportBoxGradient}>
+        <div className={styles.PassportBox}>
           <div className="p-0 pt-3">
             <img src={`/images/passport/passportHeader.svg`} className={`mb-5 w-full px-1`} />
             <div
-              className={styles.AssistBoxInternal}
+              className={styles.PassportBoxInternal}
               style={{
                 height: videoHeight !== null ? `calc(100vh - 200px - ${videoHeight}px)` : "100%",
               }}

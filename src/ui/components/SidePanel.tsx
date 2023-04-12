@@ -95,7 +95,7 @@ export default function SidePanel() {
   const info = useTestInfo();
 
   return (
-    <div className="flex w-full flex-col gap-2">
+    <div className="flex flex-col w-full gap-2">
       {!isAuthenticated && !info.isTestSuiteReplay && (
         <div className={styles.TourBox}>
           <h2>Welcome to Replay!</h2>
@@ -130,12 +130,12 @@ export default function SidePanel() {
         </div>
       )}
 
-      <div className="h-0 w-full flex-grow overflow-hidden rounded-lg bg-bodyBgcolor text-xs">
+      <div className="flex-grow w-full h-0 overflow-hidden text-xs rounded-lg bg-bodyBgcolor">
         {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}
         {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}
         {selectedPrimaryPanel === "comments" && <CommentCardsList />}
         {selectedPrimaryPanel === "tour" && <Tour />}
-        {selectedPrimaryPanel === "assist" && <Passport />}
+        {selectedPrimaryPanel === "passport" && <Passport />}
         {selectedPrimaryPanel === "events" && <EventsPane items={items} />}
         {selectedPrimaryPanel === "cypress" && <TestSuitePanel />}
         {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}

@@ -42,7 +42,7 @@ const nodePickerInstance = new NodePickerClass();
 
 export function NodePicker() {
   const dispatch = useAppDispatch();
-  const [, dismissInspectElementNag] = useNag(Nag.INSPECT_ELEMENT); // Replay Assist
+  const [, dismissInspectElementNag] = useNag(Nag.INSPECT_ELEMENT); // Replay Passport
 
   // Contrast with the React DevTools instance of the picker
   const [globalNodePickerActive, setGlobalNodePickerActive] = useState(false);
@@ -66,7 +66,7 @@ export function NodePicker() {
     dispatch(setIsNodePickerActive(true));
     dispatch(loadMouseTargets());
     dispatch(setSelectedPanel("inspector"));
-    dismissInspectElementNag(); // Replay Assist
+    dismissInspectElementNag(); // Replay Passport
   }
 
   const handleNodeSelected = useCallback(
