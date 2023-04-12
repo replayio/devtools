@@ -19,33 +19,6 @@ import {
 
 import styles from "./Passport.module.css";
 
-const useRandomPosition = (bottomRange: [number, number], rightRange: [number, number]) => {
-  const initialState = useCallback(() => {
-    const randomBottom = Math.floor(
-      Math.random() * (bottomRange[1] - bottomRange[0]) + bottomRange[0]
-    );
-    const randomRight = Math.floor(Math.random() * (rightRange[1] - rightRange[0]) + rightRange[0]);
-    return { bottom: randomBottom, right: randomRight };
-  }, [bottomRange, rightRange]);
-
-  const [position, setPosition] = useState(initialState);
-
-  return position;
-};
-
-const useRandomRotation = (rotationRange: [number, number]) => {
-  const initialState = useCallback(() => {
-    const randomRotation = Math.floor(
-      Math.random() * (rotationRange[1] - rotationRange[0]) + rotationRange[0]
-    );
-    return randomRotation;
-  }, [rotationRange]);
-
-  const [rotation, setRotation] = useState(initialState);
-
-  return rotation;
-};
-
 const Passport: React.FC = () => {
   const { nags } = hooks.useGetUserInfo();
   const showConsoleNavigate = shouldShowConsoleNavigate(nags);
@@ -88,130 +61,105 @@ const Passport: React.FC = () => {
     };
   }, []);
 
+  const getItemStyle = (index: number) => {
+    if (index === stepIndex) {
+      return styles.selectedItem;
+    }
+    return "";
+  };
   const renderCheckmarkIcon = (completed: boolean | undefined) => {
-    if (completed === false) {
+    if (completed === true) {
       return "checked-rounded";
     }
     return "unchecked-rounded";
   };
 
-  const renderCompletedImage = (
-    completed: boolean | undefined,
-    imageBaseName: string,
-    zIndex: number,
-    opacity: number
-  ) => {
-    if (completed !== true) {
-      return `/images/passport/${imageBaseName}-complete.svg`;
-    }
-    return undefined;
-  };
-
-  const getImageName = (label: string, completed: boolean) => {
-    const baseName = label.toLowerCase().replace(/ /g, "_");
-    return completed ? `${baseName}-default.svg` : `${baseName}-complete.svg`;
-  };
-
-  const renderItemImage = (label: string, completed: boolean) => (
-    <img
-      src={`/images/passport/${getImageName(label, completed)}`}
-      alt={label}
-      className={`absolute top-0 left-0 w-full ${styles.itemImage}`}
-    />
-  );
-
   const handleClick = (index: number) => {
     setStepIndex(index);
-  };
-
-  const getItemStyle = (index: number) => {
-    return stepIndex === index ? styles.selectedItem : "";
   };
 
   const updatedChecklistItems = [
     {
       label: "Completed the tour",
-      completed: showConsoleNavigate,
+      completed: !showConsoleNavigate,
       videoUrl: "https://vercel.replay.io/passport/time_travel_in_console.gif",
       imageBaseName: "tour_grad",
     },
     {
       label: "Time travel in the console",
-      completed: showConsoleNavigate,
+      completed: !showConsoleNavigate,
       videoUrl: "https://vercel.replay.io/passport/time_travel_in_console.gif",
       imageBaseName: "time_travel_in_the_console",
     },
     {
       label: "Set a print statement",
-      completed: showBreakpointEdit,
+      completed: !showBreakpointEdit,
       videoUrl: "https://vercel.replay.io/passport/set_print_statement.gif",
       imageBaseName: "set_a_print_statement",
     },
     {
       label: "Launch command palette",
-      completed: showLaunchCommandPalette,
+      completed: !showLaunchCommandPalette,
       videoUrl: "https://vercel.replay.io/passport/launch_command_palette.gif",
       imageBaseName: "launch_command_palette",
     },
     {
       label: "Explore sources",
-      completed: showExploreSources,
+      completed: !showExploreSources,
       videoUrl: "https://vercel.replay.io/passport/explore_sources.gif",
       imageBaseName: "explore_sources",
     },
     {
       label: "Search source text",
-      completed: showSearchSourceText,
+      completed: !showSearchSourceText,
       videoUrl: "https://vercel.replay.io/passport/search_source_text.gif",
       imageBaseName: "search_source_text",
     },
     {
       label: "Jump to event",
-      completed: showJumpToEvent,
+      completed: !showJumpToEvent,
       videoUrl: "https://vercel.replay.io/passport/jump_to_an_event.gif",
       imageBaseName: "jump_to_event",
     },
     {
       label: "Jump to code",
-      completed: showJumpToCode,
+      completed: !showJumpToCode,
       videoUrl: "https://vercel.replay.io/passport/jump_to_code.gif",
       imageBaseName: "jump_to_code",
     },
     {
       label: "Add a comment",
-      completed: showAddComment,
+      completed: !showAddComment,
       videoUrl: "https://vercel.replay.io/passport/add_a_comment.gif",
       imageBaseName: "add_a_comment",
     },
     {
       label: "Add a unicorn badge",
-      completed: showAddUnicornBadge,
+      completed: !showAddUnicornBadge,
       videoUrl: "https://vercel.replay.io/passport/unicorn_badge.gif",
       imageBaseName: "add_a_unicorn_badge",
     },
     {
       label: "Use focus mode",
-      completed: showUseFocusMode,
+      completed: !showUseFocusMode,
       videoUrl: "https://vercel.replay.io/passport/use_focus_mode.gif",
       imageBaseName: "use_focus_mode",
     },
     {
       label: "Record a replay",
-      completed: showRecordReplay,
+      completed: !showRecordReplay,
       videoUrl: "https://vercel.replay.io/passport/record_a_replay.gif",
       imageBaseName: "record_a_replay",
     },
     {
       label: "Inspect element",
-      completed: showInspectElement,
+      completed: !showInspectElement,
       videoUrl: "https://vercel.replay.io/passport/inspect_an_element.gif",
       imageBaseName: "inspect_element",
     },
   ];
 
   const selectedItem = updatedChecklistItems[stepIndex];
-  const randomPosition = useRandomPosition([225, 410], [-35, 7]);
-  const randomRotation = useRandomRotation([-30, 30]);
 
   return (
     <div className={styles.AssistBoxWrapper}>
@@ -246,29 +194,15 @@ const Passport: React.FC = () => {
             </div>
           </div>
         </div>
-        {renderCompletedImage(selectedItem.completed, selectedItem.imageBaseName, 0, 30) && (
+        {selectedItem.completed && (
           <img
-            src={renderCompletedImage(selectedItem.completed, selectedItem.imageBaseName, 0, 30)}
+            src={`/images/passport/${selectedItem.imageBaseName}-complete.svg`}
             className={styles.largeCompletedImage}
             style={{
               zIndex: 0,
               opacity: 0.25,
-              bottom: `${randomPosition.bottom}px`,
-              right: `${randomPosition.right}%`,
-              transform: `rotate(${randomRotation}deg)`,
-            }}
-          />
-        )}
-        {renderCompletedImage(selectedItem.completed, selectedItem.imageBaseName, 100, 50) && (
-          <img
-            src={renderCompletedImage(selectedItem.completed, selectedItem.imageBaseName, 100, 50)}
-            className={styles.largeCompletedImage}
-            style={{
-              zIndex: 100,
-              opacity: 0.04,
-              bottom: `${randomPosition.bottom}px`,
-              right: `${randomPosition.right}%`,
-              transform: `rotate(${randomRotation}deg)`,
+              bottom: "240px",
+              right: "-25px",
             }}
           />
         )}
