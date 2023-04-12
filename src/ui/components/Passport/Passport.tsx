@@ -211,12 +211,7 @@ const Passport: React.FC = () => {
           />
         )}
         <div className={styles.videoExampleWrapper}>
-          <img
-            src={selectedItem.videoUrl}
-            alt=""
-            className={styles.videoExample}
-            ref={videoExampleRef}
-          />
+          <img src={selectedItem.videoUrl} className={styles.videoExample} ref={videoExampleRef} />
         </div>
       </div>
     </div>
