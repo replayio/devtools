@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import Icon from "replay-next/components/Icon";
 import hooks from "ui/hooks";
@@ -19,41 +19,37 @@ import {
 
 import styles from "./Passport.module.css";
 
-const useRandomPosition = (
-  bottomRange: [number, number],
-  rightRange: [number, number],
-  deps: any[]
-) => {
-  const initialState = () => {
+const useRandomPosition = (bottomRange: [number, number], rightRange: [number, number]) => {
+  const initialState = useCallback(() => {
     const randomBottom = Math.floor(
       Math.random() * (bottomRange[1] - bottomRange[0]) + bottomRange[0]
     );
     const randomRight = Math.floor(Math.random() * (rightRange[1] - rightRange[0]) + rightRange[0]);
     return { bottom: randomBottom, right: randomRight };
-  };
+  }, [bottomRange, rightRange]);
 
   const [position, setPosition] = useState(initialState);
 
   useEffect(() => {
     setPosition(initialState());
-  }, deps);
+  }, [initialState]);
 
   return position;
 };
 
-const useRandomRotation = (rotationRange: [number, number], deps: any[]) => {
-  const initialState = () => {
+const useRandomRotation = (rotationRange: [number, number]) => {
+  const initialState = useCallback(() => {
     const randomRotation = Math.floor(
       Math.random() * (rotationRange[1] - rotationRange[0]) + rotationRange[0]
     );
     return randomRotation;
-  };
+  }, [rotationRange]);
 
   const [rotation, setRotation] = useState(initialState());
 
   useEffect(() => {
     setRotation(initialState());
-  }, deps);
+  }, [initialState]);
 
   return rotation;
 };
@@ -74,7 +70,7 @@ const Passport: React.FC = () => {
   const showUseFocusMode = shouldShowUseFocusMode(nags);
   const [stepIndex, setStepIndex] = useState(0);
 
-  const videoExampleRef = useRef<HTMLDivElement>(null);
+  const videoExampleRef = useRef<HTMLImageElement>(null);
   const [videoHeight, setVideoHeight] = useState<number | null>(null);
 
   useEffect(() => {
@@ -116,7 +112,7 @@ const Passport: React.FC = () => {
     if (completed !== true) {
       return `/images/passport/${imageBaseName}-complete.svg`;
     }
-    return null;
+    return undefined;
   };
 
   const getImageName = (label: string, completed: boolean) => {
@@ -222,8 +218,8 @@ const Passport: React.FC = () => {
   ];
 
   const selectedItem = updatedChecklistItems[stepIndex];
-  const randomPosition = useRandomPosition([225, 410], [-35, 7], [stepIndex]);
-  const randomRotation = useRandomRotation([-30, 30], [stepIndex]);
+  const randomPosition = useRandomPosition([225, 410], [-35, 7]);
+  const randomRotation = useRandomRotation([-30, 30]);
 
   return (
     <div className={styles.AssistBoxWrapper}>
@@ -285,7 +281,12 @@ const Passport: React.FC = () => {
           />
         )}
         <div className={styles.videoExampleWrapper}>
-          <img src={selectedItem.videoUrl} className={styles.videoExample} ref={videoExampleRef} />
+          <img
+            src={selectedItem.videoUrl}
+            alt=""
+            className={styles.videoExample}
+            ref={videoExampleRef}
+          />
         </div>
       </div>
     </div>
