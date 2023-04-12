@@ -1,20 +1,14 @@
 import React, { useState } from "react";
 
-import Icon from "replay-next/components/Icon";
-import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
-import { setViewMode } from "ui/actions/layout";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
-import Events from "ui/components/Events";
 import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
 import Confetti from "ui/components/shared//Confetti";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { useDismissNag } from "ui/hooks/users";
-import { UserInfo } from "ui/hooks/users";
 import { useTestInfo } from "ui/hooks/useTestInfo";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { ViewMode } from "ui/state/layout";
 import {
   shouldShowBreakpointAdd,
   shouldShowBreakpointEdit,
@@ -27,10 +21,9 @@ import styles from "./Tour.module.css";
 const useNagDismissal = () => {
   const dismissNag = useDismissNag();
   const dispatch = useAppDispatch();
-  const info = useTestInfo();
 
   const dismissTourNag = () => {
-    const initialPrimaryPanel = "events";
+    const initialPrimaryPanel = "assist";
     dispatch(setSelectedPrimaryPanel(initialPrimaryPanel));
     dismissNag(Nag.DISMISS_TOUR);
   };
@@ -120,12 +113,10 @@ const Tour: React.FC = () => {
                     <p>Take a look at the console.</p>
                     <p>
                       Replay just re-ran your recording and retroactively added your print statement
-                      each time that line of code was called!
+                      each time that line of code was called. This is a <b>huge</b> time saver.
                     </p>
-                    <p>
-                      We call this our "ah-ha moment," and Replay is full of them. Happy exploring!
-                    </p>
-                    <p className="mt-20">
+                    <p>And with that, you've graduated from the tour. Happy exploring!</p>
+                    <p className="mt-16">
                       <a
                         href="#"
                         onClick={e => {
@@ -138,7 +129,7 @@ const Tour: React.FC = () => {
                         }}
                         className="hover:cursor-hand whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg hover:bg-blue-50"
                       >
-                        Thanks!
+                        Ready for my passport!
                       </a>
                       {showConfetti ? <Confetti /> : null}
                     </p>

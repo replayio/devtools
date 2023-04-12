@@ -49,7 +49,7 @@ pref("devtools.features.disableRecordingAssetsInDatabase", false);
 pref("devtools.features.keepAllTraces", false);
 pref("devtools.features.enableIncrementalSnapshots", false);
 pref("devtools.features.disableConcurrentControllerLoading", false);
-pref("devtools.features.replayAssist", false);
+pref("devtools.features.showPassport", false);
 
 export const prefs = new PrefsHelper("devtools", {
   colorScheme: ["String", "colorScheme"],
@@ -94,7 +94,7 @@ export const features = new PrefsHelper("devtools.features", {
   keepAllTraces: ["Bool", "keepAllTraces"],
   enableIncrementalSnapshots: ["Bool", "enableIncrementalSnapshots"],
   disableConcurrentControllerLoading: ["Bool", "disableConcurrentControllerLoading"],
-  replayAssist: ["Bool", "replayAssist"],
+  showPassport: ["Bool", "showPassport"],
 });
 
 export type Features = typeof features;

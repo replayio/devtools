@@ -11,7 +11,6 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
-import { showReplayAssist as showReplayAssistSelector } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { PrimaryPanelName } from "ui/state/layout";
@@ -31,7 +30,7 @@ function CypressIcon() {
       viewBox="0 0 256 256"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="h-full w-full"
+      className="w-full h-full"
     >
       <path
         d="M128 2C197.645 2 254 58.3555 254 128C254 197.645 197.645 254 128 254C58.3555 254 2 197.645 2 128C2 58.3555 58.3555 2 128 2Z"
@@ -130,7 +129,7 @@ function ToolbarButton({
       </div>
       {showBadge ? (
         <div
-          className="absolute h-2 w-2 rounded-full bg-secondaryAccent"
+          className="absolute w-2 h-2 rounded-full bg-secondaryAccent"
           style={{
             // FE-1096 Aiming for pixel perfect badge alignment over icons with inconsistent shapes
             right: name === "comments" ? ".9rem" : "1em",
@@ -157,12 +156,10 @@ export default function Toolbar() {
   const { comments, loading } = hooks.useGetComments(recordingId);
   const { value: logProtocolExperimentEnabled } = useFeature("logProtocol");
   const { value: reactPanelExperimentEnabled } = useFeature("reactPanel");
-  const { value: replayAssistExperimentEnabled } = useFeature("replayAssist");
+  const { value: showPassport } = useFeature("showPassport");
   const [sidePanelCollapsed, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
   const { nags } = hooks.useGetUserInfo();
   const showTour = shouldShowTour(nags);
-
-  const showReplayAssist = useAppSelector(showReplayAssistSelector);
 
   useEffect(() => {
     if (!loading && comments.length > 0) {
@@ -196,7 +193,7 @@ export default function Toolbar() {
   };
 
   return (
-    <div className="toolbox-toolbar-container flex flex-col items-center justify-between py-1">
+    <div className="flex flex-col items-center justify-between py-1 toolbox-toolbar-container">
       <div id="toolbox-toolbar">
         {recording?.metadata?.test?.runner?.name !== "cypress" && showTour ? (
           <ToolbarButton
@@ -207,15 +204,23 @@ export default function Toolbar() {
           />
         ) : null}
 
-        {replayAssistExperimentEnabled && showReplayAssist ? (
+        {showPassport ? (
           <ToolbarButton
-            icon="school"
+            icon="menu_book"
             name="assist"
-            label="Replay Assist"
+            label="Replay Passport"
             onClick={handleButtonClick}
           />
         ) : null}
 
+        {showPassport ? (
+          <ToolbarButton
+            icon="menu_book"
+            name="assist"
+            label="Replay Passport"
+            onClick={handleButtonClick}
+          />
+        ) : null}
         {recording?.metadata?.test?.runner?.name == "cypress" ? (
           <ToolbarButton
             icon="cypress"
