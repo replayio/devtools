@@ -47,7 +47,7 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
         <Icon filename="settings" className="bg-iconColor" />
         <Icon filename="replay-logo" className="bg-iconColor" />
       </div>
-      <div className="text-blue-400 user-options">
+      <div className="user-options text-blue-400">
         <Dropdown
           buttonContent={<MaterialIcon iconSize="xl">more_horiz</MaterialIcon>}
           setExpanded={setExpanded}

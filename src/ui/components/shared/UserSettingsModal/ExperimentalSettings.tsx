@@ -216,7 +216,7 @@ export default function ExperimentalSettings({}) {
 
   return (
     <div className="space-y-6 overflow-auto">
-      <div className="flex flex-col p-1 space-y-2">
+      <div className="flex flex-col space-y-2 p-1">
         {EXPERIMENTAL_SETTINGS.map(setting => (
           <Experiment
             onChange={onChange}
@@ -227,7 +227,7 @@ export default function ExperimentalSettings({}) {
         ))}
         {RISKY_EXPERIMENTAL_SETTINGS.length > 0 && (
           <div>
-            <div className="flex items-center my-4 ">
+            <div className="my-4 flex items-center ">
               <Icon
                 filename="warning"
                 className="mr-2"
