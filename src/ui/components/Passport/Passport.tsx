@@ -160,6 +160,9 @@ const Passport: React.FC = () => {
   ];
 
   const selectedItem = updatedChecklistItems[stepIndex];
+  const rand = (min: number, max: number) => {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  };
 
   return (
     <div className={styles.AssistBoxWrapper}>
@@ -201,8 +204,9 @@ const Passport: React.FC = () => {
             style={{
               zIndex: 0,
               opacity: 0.25,
-              bottom: "240px",
-              right: "-25px",
+              bottom: `${rand(220, 320)}px`,
+              right: `${rand(-50, 0)}px`,
+              transform: `rotate(${rand(-20, 20)}deg)`,
             }}
           />
         )}
