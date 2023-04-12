@@ -11,7 +11,7 @@
     "test:chromium": "playwright test --project chromium --reporter=@replayio/playwright/reporter,line",
     "test:replay-chromium": "playwright test --project replay-chromium --reporter=@replayio/playwright/reporter,line",
     "test:debug": "playwright test --workers 1 --headed",
-    "test:install": "playwright install",
+    "test:install": "RECORD_REPLAY_CHROMIUM_DOWNLOAD_FILE=linux-chromium-20230412-1b88de936c07-4857f15a9288-buildkite.tar.xz playwright install",
     "ts-node": "ts-node --project ../../tsconfig.json"
   },
   "author": "",
