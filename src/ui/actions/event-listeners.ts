@@ -355,8 +355,9 @@ export const eventListenerLocationCache: Cache<
           "full"
         );
 
+        // As of RUN-1709 Chromium _should_ be sending back previews with function locations,
+        // but doesn't hurt to double-check.
         if (!onClickPreview || !isFunctionPreview(onClickPreview.preview)) {
-          // TODO [RUN-1709] Chrome does not format function previews correctly
           return undefined;
         }
 
