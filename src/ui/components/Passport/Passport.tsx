@@ -30,10 +30,6 @@ const useRandomPosition = (bottomRange: [number, number], rightRange: [number, n
 
   const [position, setPosition] = useState(initialState);
 
-  useEffect(() => {
-    setPosition(initialState());
-  }, [initialState]);
-
   return position;
 };
 
@@ -45,11 +41,7 @@ const useRandomRotation = (rotationRange: [number, number]) => {
     return randomRotation;
   }, [rotationRange]);
 
-  const [rotation, setRotation] = useState(initialState());
-
-  useEffect(() => {
-    setRotation(initialState());
-  }, [initialState]);
+  const [rotation, setRotation] = useState(initialState);
 
   return rotation;
 };

@@ -83,24 +83,6 @@ const Tour: React.FC = () => {
                       Hover over the lines in the console and you’ll see a fast-forward button.
                       Click it to time travel!
                     </p>
-                    <p className="mt-16">
-                      <a
-                        href="#"
-                        onClick={e => {
-                          e.stopPropagation();
-                          setShowConfetti(true);
-                          setShowPassport(true);
-                          setTimeout(() => {
-                            setShowConfetti(false);
-                            dismissTourNag();
-                          }, 2400);
-                        }}
-                        className="px-3 py-1 font-medium bg-white rounded-lg shadow-lg hover:cursor-hand whitespace-nowrap text-primaryAccent hover:bg-blue-50"
-                      >
-                        Ready for my passport!
-                      </a>
-                      {showConfetti ? <Confetti /> : null}
-                    </p>
                   </>
                 )}
 
