@@ -107,8 +107,13 @@ const Passport: React.FC = () => {
     return "unchecked-rounded";
   };
 
-  const renderCompletedImage = (completed: boolean | undefined, imageBaseName: string) => {
-    if (completed != true) {
+  const renderCompletedImage = (
+    completed: boolean | undefined,
+    imageBaseName: string,
+    zIndex: number,
+    opacity: number
+  ) => {
+    if (completed !== true) {
       return `/images/passport/${imageBaseName}-complete.svg`;
     }
     return null;
