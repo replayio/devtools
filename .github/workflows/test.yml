@@ -86,6 +86,8 @@ jobs:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
       - name: Install Replay Playwright
         run: npx @replayio/playwright install
+        env:
+          RECORD_REPLAY_CHROMIUM_DOWNLOAD_FILE: "linux-chromium-20230412-1b88de936c07-4857f15a9288-buildkite.tar.xz"
       - uses: replayio/action-playwright@main
         with:
           command: npx playwright test --shard ${{ matrix.shard }}/10 --reporter=@replayio/playwright/reporter,line tests/*.ts
