@@ -17,6 +17,7 @@ export const scopesCache: Cache<
   [replayClient: ReplayClientInterface, pauseId: PauseId, scopeId: ScopeId],
   Scope
 > = createCache({
+  config: { immutable: true },
   debugLabel: "Scopes",
   getKey: ([replayClient, pauseId, scopeId]) => `${pauseId}:${scopeId}`,
   load: async ([replayClient, pauseId, scopeId]) => {
@@ -37,6 +38,7 @@ export const frameScopesCache: Cache<
   [replayClient: ReplayClientInterface, pauseId: PauseId, frameId: FrameId],
   FrameScopes
 > = createCache({
+  config: { immutable: true },
   debugLabel: "FrameScopes",
   getKey: ([replayClient, pauseId, frameId]) => `${pauseId}:${frameId}`,
   load: async ([replayClient, pauseId, frameId]) => {

@@ -306,6 +306,7 @@ export const eventListenerLocationCache: Cache<
   ],
   Location | undefined
 > = createCache({
+  config: { immutable: true },
   debugLabel: "EventListenerLocation",
   getKey: ([threadFront, replayClient, getState, pauseId, replayEventType]) =>
     `${pauseId}:${replayEventType}`,

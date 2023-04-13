@@ -9,6 +9,7 @@ export const pointsCache: Cache<
   [graphQLClient: GraphQLClientInterface, accessToken: string | null, recordingId: RecordingId],
   Point[]
 > = createCache({
+  config: { immutable: true },
   debugLabel: "Points",
   getKey: ([graphQLClient, accessToken, recordingId]) => recordingId,
   load: async ([graphQLClient, accessToken, recordingId]) =>

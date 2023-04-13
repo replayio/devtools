@@ -143,6 +143,7 @@ export function canRunLocalAnalysis(code: string, condition: string | null): boo
 }
 
 export const localAnalysisCache: Cache<[code: string], any[]> = createCache({
+  config: { immutable: true },
   debugLabel: "localAnalysisCache",
   getKey: ([code]) => code,
   load: async ([code]) =>

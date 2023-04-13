@@ -22,6 +22,7 @@ export const objectCache: Cache<
   ],
   Object
 > = createCache({
+  config: { immutable: true },
   debugLabel: "objectCache",
   getKey: ([client, pauseId, objectId, previewLevel]) => `${pauseId}:${objectId}:${previewLevel}`,
   load: async ([client, pauseId, objectId, previewLevel]) => {
@@ -39,6 +40,7 @@ export const objectPropertyCache: Cache<
   [client: ReplayClientInterface, pauseId: PauseId, objectId: ObjectId, propertyName: string],
   ProtocolValue | null
 > = createCache({
+  config: { immutable: true },
   debugLabel: "objectPropertyCache",
   getKey: ([client, pauseId, objectId, propertyName]) => `${pauseId}:${objectId}:${propertyName}`,
   load: async ([client, pauseId, objectId, propertyName]) => {

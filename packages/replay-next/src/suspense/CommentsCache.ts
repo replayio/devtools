@@ -9,6 +9,7 @@ export const commentsCache: Cache<
   [graphQLClient: GraphQLClientInterface, accessToken: string | null, recordingId: RecordingId],
   Comment[]
 > = createCache({
+  config: { immutable: true },
   debugLabel: "CommentsGraphQL",
   getKey: ([graphQLClient, accessToken, recordingId]) => recordingId,
   load: async ([graphQLClient, accessToken, recordingId]) =>

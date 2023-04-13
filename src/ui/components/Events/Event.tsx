@@ -81,6 +81,7 @@ export const nextInteractionEventCache: Cache<
   ],
   PointDescription | undefined
 > = createCache({
+  config: { immutable: true },
   debugLabel: "NextInteractionEvent",
   getKey: ([replayClient, threadFront, point, replayEventType, endTime]) => point,
   load: async ([replayClient, threadFront, point, replayEventType, endTime, sourcesState]) => {

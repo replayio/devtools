@@ -7,6 +7,7 @@ export const sourceOutlineCache = createCache<
   [replayClient: ReplayClientInterface, sourceId: SourceId | undefined],
   getSourceOutlineResult
 >({
+  config: { immutable: true },
   debugLabel: "sourceOutlineCache",
   getKey: ([replayClient, sourceId]) => sourceId ?? "",
   load: ([replayClient, sourceId]) =>

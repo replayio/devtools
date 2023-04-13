@@ -22,6 +22,7 @@ export const appliedRulesCache: Cache<
   ],
   WiredAppliedRule[]
 > = createCache({
+  config: { immutable: true },
   debugLabel: "AppliedRules",
   getKey: ([protocolClient, replayClient, sessionId, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
   load: async ([protocolClient, replayClient, sessionId, pauseId, nodeId]) => {
@@ -85,6 +86,7 @@ export const computedStyleCache: Cache<
   [client: ProtocolClient, sessionId: string, pauseId: PauseId, nodeId: string],
   Map<string, string> | undefined
 > = createCache({
+  config: { immutable: true },
   debugLabel: "ComputedStyle",
   getKey: ([protocolClient, sessionId, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
   load: async ([protocolClient, sessionId, pauseId, nodeId]) => {
@@ -113,6 +115,7 @@ export const boundingRectCache: Cache<
   [protocolClient: ProtocolClient, sessionId: string, pauseId: PauseId, nodeId: string],
   DOMRect | undefined
 > = createCache({
+  config: { immutable: true },
   debugLabel: "BoundingRect",
   getKey: ([protocolClient, sessionId, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
   load: async ([protocolClient, sessionId, pauseId, nodeId]) => {

@@ -53,6 +53,7 @@ export const nodeDataCache: Cache<
   ],
   ProtocolObject[]
 > = createCache({
+  config: { immutable: true },
   debugLabel: "NodeData",
   getKey: ([protocolClient, replayClient, sessionId, pauseId, options]) => {
     let typeKey = "";
@@ -180,6 +181,7 @@ export const nodeEventListenersCache: Cache<
   ],
   EventListener[] | undefined
 > = createCache({
+  config: { immutable: true },
   debugLabel: "NodeEventListeners",
   getKey: ([protocolClient, replayClient, sessionId, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
   load: async ([protocolClient, replayClient, sessionId, pauseId, nodeId]) => {
@@ -200,6 +202,7 @@ export const boundingRectsCache: Cache<
   [protocolClient: ProtocolClient, sessionId: string, pauseId: PauseId],
   NodeBounds[]
 > = createCache({
+  config: { immutable: true },
   debugLabel: "BoundingRects",
   getKey: ([protocolClient, sessionId, pauseId]) => pauseId,
   load: async ([protocolClient, sessionId, pauseId]) => {
@@ -212,6 +215,7 @@ export const boxModelCache: Cache<
   [protocolClient: ProtocolClient, sessionId: string, pauseId: PauseId, nodeId: string],
   BoxModel
 > = createCache({
+  config: { immutable: true },
   debugLabel: "BoxModel",
   getKey: ([protocolClient, sessionId, pauseId, nodeId]) => `${pauseId}:${nodeId}`,
   load: async ([protocolClient, sessionId, pauseId, nodeId]) => {
