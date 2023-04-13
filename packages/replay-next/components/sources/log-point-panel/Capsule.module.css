@@ -47,6 +47,7 @@
   border: none;
   appearance: none;
   font-size: inherit;
+  text-align: right;
 
   /* Even if all text is deleted, don't shrink smaller than a single digit */
   min-width: 1;
