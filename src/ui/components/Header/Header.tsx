@@ -1,5 +1,6 @@
 import { RecordingId } from "@replayio/protocol";
 import { ClipboardEvent, KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
+import { createSingleEntryCache } from "suspense";
 
 import { RecordingTarget } from "protocol/thread/thread";
 import { Recording } from "shared/graphql/types";
@@ -161,7 +162,10 @@ function HeaderTitle({
   );
 }
 
+const dummyCache = createSingleEntryCache<[], string>({ load: () => "Hi" });
+
 export default function Header() {
+  dummyCache.read();
   const recordingTarget = useAppSelector(getRecordingTarget);
   const { isAuthenticated } = useAuth0();
   const recordingId = hooks.useGetRecordingId();
