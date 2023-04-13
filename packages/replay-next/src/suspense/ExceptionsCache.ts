@@ -34,6 +34,7 @@ export const exceptionValueCache = createCache<
   [client: ReplayClientInterface, pauseId: PauseId],
   Value | undefined
 >({
+  config: { immutable: true },
   debugLabel: "ExceptionValueCache",
   getKey: ([client, pauseId]) => pauseId,
   load: async ([client, pauseId]) => {

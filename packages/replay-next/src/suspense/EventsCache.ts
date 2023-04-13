@@ -41,6 +41,7 @@ export const eventCountsCache: Cache<
   [client: ReplayClientInterface, range: PointRange | null],
   EventCategory[]
 > = createCache({
+  config: { immutable: true },
   debugLabel: "EventCounts",
   getKey: ([client, range]) => (range ? `${range.begin}:${range.end}` : ""),
   load: async ([client, range]) => {

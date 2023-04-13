@@ -10,6 +10,7 @@ export const frameStepsCache: Cache<
   [replayClient: ReplayClientInterface, pauseId: PauseId, frameId: FrameId],
   PointDescription[] | undefined
 > = createCache({
+  config: { immutable: true },
   debugLabel: "frameStepsCache",
   getKey: ([client, pauseId, frameId]) => `${pauseId}:${frameId}`,
   load: async ([client, pauseId, frameId]) => {
