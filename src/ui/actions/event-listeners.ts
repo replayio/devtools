@@ -485,7 +485,7 @@ function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
           currentNodeName === "button" &&
           (currentNode as HTMLButtonElement).type === "submit"
         ) {
-          clickWasInsideSubmitButton = true;
+          res.clickWasInsideSubmitButton = true;
         }
 
         const keys = Object.keys(currentNode);
@@ -510,16 +510,16 @@ function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
           // whereas some other element might have "onKeyPress".
           let handler = undefined;
           let name: string | undefined = undefined;
-          let possibleReactPropNames = injectedValues.possibleReactPropNames;
+          const possibleReactPropNames = injectedValues.possibleReactPropNames.slice();
 
           // `<input>` tags often have an `onChange` prop, including checkboxes;
           // _If_ the original target DOM node is an input, add that to the list of prop names.
           if (currentNode === startingNode && currentNodeName === "input") {
-            possibleReactPropNames = possibleReactPropNames.concat("onChange");
+            possibleReactPropNames.push("onChange");
           }
 
-          if (clickWasInsideSubmitButton && currentNodeName === "form") {
-            possibleReactPropNames = possibleReactPropNames.concat("onSubmit");
+          if (res.clickWasInsideSubmitButton && currentNodeName === "form") {
+            possibleReactPropNames.push("onSubmit");
           }
 
           searchedNode.searchPropKeys = possibleReactPropNames;
@@ -541,7 +541,6 @@ function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
         currentNode = (currentNode!.parentNode as HTMLElement)!;
       }
 
-      res.clickWasInsideSubmitButton = clickWasInsideSubmitButton;
       return res;
     } else {
       throw new Error(`no event found! eventClass: ${injectedValues.EVENT_CLASS_NAMES}`);
