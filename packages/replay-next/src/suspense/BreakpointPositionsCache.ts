@@ -15,6 +15,7 @@ export const breakpointPositionsCache: Cache<
   [replayClient: ReplayClientInterface, sourceId: ProtocolSourceId],
   BreakpointPositionsResult
 > = createCache({
+  config: { immutable: true },
   debugLabel: "BreakpointPositions",
   getKey: ([client, sourceId]) => sourceId,
   load: async ([client, sourceId]) => {

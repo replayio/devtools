@@ -7,6 +7,7 @@ export const mappedExpressionCache = createCache<
   [client: ReplayClientInterface, expression: string, location: Location],
   string
 >({
+  config: { immutable: true },
   debugLabel: "MappedExpressionCache",
   getKey: ([client, expression, location]) =>
     `${location.sourceId}:${location.line}:${location.column}:${expression}`,

@@ -129,6 +129,7 @@ export const actionStateValuesCache: Cache<
   [replayClient: ReplayClientInterface, point: ExecutionPoint, time: number],
   ReduxActionStateValues | undefined
 > = createCache({
+  config: { immutable: true },
   debugLabel: "ActionStateValues",
   getKey: ([replayClient, point, time]) => point,
   load: async ([replayClient, point, time]) => {
@@ -169,6 +170,7 @@ export const diffCache: Cache<
   [replayClient: ReplayClientInterface, point: ExecutionPoint, time: number],
   Delta | undefined
 > = createCache({
+  config: { immutable: true },
   debugLabel: "Diff",
   getKey: ([replayClient, point, time]) => point,
   load: async ([replayClient, point, time]) => {

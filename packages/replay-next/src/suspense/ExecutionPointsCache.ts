@@ -297,6 +297,7 @@ export const pointsBoundingTimeCache: Cache<
   [replayClient: ReplayClientInterface, time: number],
   PointsBoundingTime
 > = createCache({
+  config: { immutable: true },
   debugLabel: "PointsBoundingTime",
   getKey: ([client, time]) => `${time}`,
   load: async ([client, time]) => client.getPointsBoundingTime(time),

@@ -60,13 +60,7 @@ export default function Capsule({
   //
   // To prevent re-layout when stepping between the latter two states,
   // pre-calculate the max width of the capsule (e.g. "10/10").
-  const minLabelWidthCh = useMemo(() => {
-    if (tooManyPointsToFind) {
-      return "10k+".length;
-    } else {
-      return `${hitPoints.length}/${hitPoints.length}`.length;
-    }
-  }, [hitPoints.length, tooManyPointsToFind]);
+  const numeratorMinWidth = tooManyPointsToFind ? `10k+`.length : `${hitPoints.length}`.length;
 
   const badgeStyle = getBadgeStyleVars(point.badge);
 
@@ -148,9 +142,6 @@ export default function Capsule({
           className={styles.Label}
           data-test-state={tooManyPointsToFind ? "too-many-points" : "valid"}
           onClick={onLabelClick}
-          style={{
-            minWidth: minLabelWidthCh,
-          }}
         >
           <input
             className={styles.CurrentIndex}
@@ -169,7 +160,8 @@ export default function Capsule({
             ref={inputRef}
             size={`${hitPoints.length}`.length}
             style={{
-              width: `${inputDefaultValue.length}ch`,
+              maxWidth: `${numeratorMinWidth}ch`,
+              minWidth: `${numeratorMinWidth}ch`,
             }}
             type={tooManyPointsToFind ? "text" : "number"}
           />

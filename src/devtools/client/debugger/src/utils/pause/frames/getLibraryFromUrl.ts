@@ -110,6 +110,10 @@ const libraryMap = [
     label: "NextJS",
     pattern: /[\._]next(?!\/static\/chunks\/pages\/)/i,
   },
+  {
+    label: "Cypress",
+    pattern: /cypress_runner/i,
+  },
   // FB's internal ReactDOM filename
   {
     label: "React",

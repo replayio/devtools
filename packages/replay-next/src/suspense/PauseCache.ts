@@ -24,6 +24,7 @@ export const pauseIdCache: Cache<
   [replayClient: ReplayClientInterface, executionPoint: ExecutionPoint, time: number],
   PauseId
 > = createCache({
+  config: { immutable: true },
   debugLabel: "PauseIdForExecutionPoint",
   getKey: ([replayClient, executionPoint, time]) => `${executionPoint}:${time}`,
   load: async ([replayClient, executionPoint, time]) => {
@@ -59,6 +60,7 @@ export const pauseEvaluationsCache: Cache<
   ],
   Omit<Result, "data">
 > = createCache({
+  config: { immutable: true },
   debugLabel: "PauseEvaluations",
   getKey: ([replayClient, pauseId, frameId, expression, uid = ""]) =>
     `${pauseId}:${frameId}:${expression}:${uid}`,

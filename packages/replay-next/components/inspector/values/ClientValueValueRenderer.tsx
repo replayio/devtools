@@ -6,7 +6,7 @@ import styles from "./shared.module.css";
 
 type ValueType = ClientValue["type"];
 
-const previewTypeToClassname: Partial<Record<ValueType, string>> = {
+const previewTypeToClassName: Partial<Record<ValueType, string>> = {
   bigint: styles.BigInt,
   boolean: styles.Boolean,
   nan: styles.NaN,
@@ -35,9 +35,9 @@ export default function ClientValueValueRenderer({
   context: "console" | "default" | "nested";
   disableExpandStringToggle?: boolean;
 }) {
-  //We'll let the child `<Expandable>` tell us when it's expanded
+  // We'll let the child `<Expandable>` tell us when it's expanded
   const [isStringExpanded, setIsStringExpanded] = useState(false);
-  const className = previewTypeToClassname[clientValue.type];
+  const className = previewTypeToClassName[clientValue.type];
 
   const [formattedValue, needsExpandStringToggle] = useMemo(() => {
     let preview = clientValue.preview;

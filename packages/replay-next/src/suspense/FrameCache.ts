@@ -10,6 +10,7 @@ export const framesCache: Cache<
   [replayClient: ReplayClientInterface, pauseId: PauseId],
   Frame[] | undefined
 > = createCache({
+  config: { immutable: true },
   debugLabel: "FramesCache",
   getKey: ([client, pauseId]) => pauseId,
   load: async ([client, pauseId]) => {
@@ -35,6 +36,7 @@ export const topFrameCache: Cache<
   [replayClient: ReplayClientInterface, pauseId: PauseId],
   Frame | undefined
 > = createCache({
+  config: { immutable: true },
   debugLabel: "TopFrame",
   getKey: ([client, pauseId]) => pauseId,
   load: async ([client, pauseId]) => {

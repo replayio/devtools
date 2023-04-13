@@ -10,6 +10,7 @@
 .Symbol,
 .Undefined {
   display: inline;
+  white-space: pre-wrap;
 }
 .BigInt {
   color: var(--value-type-bigint);

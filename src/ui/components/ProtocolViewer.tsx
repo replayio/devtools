@@ -499,6 +499,7 @@ export const recordedProtocolMessagesCache: Cache<
   [replayClient: ReplayClientInterface, sourceDetails: SourceDetails[], range: PointRange],
   AllProtocolMessages
 > = createCache({
+  config: { immutable: true },
   debugLabel: "RecordedPotocolMessages",
   getKey: ([replayClient, sourceDetails, range]) => `${range.begin}-${range.end}`,
   load: async ([replayClient, sourceDetails, range]) => {

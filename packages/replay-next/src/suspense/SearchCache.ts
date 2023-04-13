@@ -51,6 +51,7 @@ export const searchCache: Cache<
   [replayClient: ReplayClientInterface, query: string, includeNodeModules: boolean, limit?: number],
   StreamingSourceSearchResults
 > = createCache({
+  config: { immutable: true },
   debugLabel: "Search",
   getKey: ([replayClient, query, includeNodeModules, limit = MAX_SEARCH_RESULTS_TO_DISPLAY]) =>
     `${includeNodeModules}:${limit || "-"}:${query}`,
