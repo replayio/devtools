@@ -1,6 +1,7 @@
 .PassportBoxWrapper {
   position: relative;
   background-image: url(/images/passport/passportBG.png);
+  background-repeat: repeat; /* Add this line */
   height: 100vh;
 }
 
