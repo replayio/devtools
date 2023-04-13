@@ -11,6 +11,7 @@ import React, {
   useState,
 } from "react";
 import { ImperativePanelHandle } from "react-resizable-panels";
+import { createSingleEntryCache } from "suspense";
 
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
 import { RecordingCapabilities } from "protocol/thread/thread";
@@ -155,6 +156,8 @@ export default function SecondaryToolboxSuspenseWrapper({
   );
 }
 
+const dummyCache = createSingleEntryCache<[], string>({ load: () => "Hi" });
+
 function SecondaryToolbox({
   videoPanelCollapsed,
   videoPanelRef,
@@ -162,6 +165,14 @@ function SecondaryToolbox({
   videoPanelCollapsed: Boolean;
   videoPanelRef: RefObject<ImperativePanelHandle>;
 }) {
+  try {
+    console.log("reading value from dummy cache");
+    const dummyValue = dummyCache.read();
+    console.log(`dummy cache returned "${dummyValue}"`);
+  } catch (error) {
+    console.error("WAT?", error);
+  }
+
   const selectedPanel = useAppSelector(getSelectedPanel);
   const toolboxLayout = useAppSelector(getToolboxLayout);
   const [annotationKinds, setAnnotationKinds] = useState<string[]>([]);
