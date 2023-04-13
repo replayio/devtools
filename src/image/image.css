@@ -22,6 +22,10 @@
 .img.choo {
   background-image: url(~devtools/client/debugger/images/sources/choo.svg) !important;
 }
+.img.cypress {
+  background-image: url(~devtools/client/debugger/images/sources/cypress.svg) !important;
+  background-color: transparent !important;
+}
 .img.dojo {
   background-image: url(~devtools/client/debugger/images/sources/dojo.svg) !important;
 }
