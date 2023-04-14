@@ -2,8 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import React, { useContext, useEffect } from "react";
-import { useImperativeCacheValue } from "suspense";
+import React, { Suspense, useContext, useDeferredValue, useEffect } from "react";
 
 import actions from "devtools/client/debugger/src/actions/index";
 import CommandBarButton from "devtools/client/debugger/src/components/shared/Button/CommandBarButton";
@@ -14,6 +13,7 @@ import Services from "devtools/shared/services";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { frameStepsCache } from "replay-next/src/suspense/FrameStepsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import Loader from "ui/components/shared/Loader";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -71,19 +71,48 @@ function formatKey(action: string) {
   return formatKeyShortcut(key);
 }
 
-export default function CommandBar() {
+function useFramesAndFrameSteps() {
   const replayClient = useContext(ReplayClientContext);
-  const cx = useAppSelector(getThreadContext);
   const { frameId: selectedFrameId, pauseId: selectedPauseId } =
     useAppSelector(getSelectedFrameId) ?? {};
 
-  const { value: frames } = useImperativeCacheValue(framesCache, replayClient, selectedPauseId);
-  const { value: frameSteps } = useImperativeCacheValue(
-    frameStepsCache,
-    replayClient,
-    selectedPauseId,
-    selectedFrameId
+  // This hook fetches Frames and frame-steps using Suspense.
+  // Each time the current Pause ID or Frame ID changes,
+  // the component will "suspend" to fetch new frame data.
+  // Components should avoid suspending during a high priority update though,
+  // because React will show the component's fallback UI until the data is ready
+  // (and this can be pretty jarring).
+  // The useDeferredValue() hook is used to avoid suspending during a high priority update.
+  // If the Pause ID or Frame ID changes during a high-priority update,
+  // useDeferredValue() will return the previous value instead
+  // allowing this component to avoid suspending during that update.
+  // It will then schedule a lower priority "transition" update with the new value,
+  // which React will run in the background (without committing or showing the fallback UI)
+  // until the new frame data has been loaded.
+  const deferredFrameId = useDeferredValue(selectedFrameId);
+  const deferredPauseId = useDeferredValue(selectedPauseId);
+
+  const frames = deferredPauseId ? framesCache.read(replayClient, deferredPauseId) : undefined;
+  const frameSteps =
+    deferredFrameId && deferredPauseId
+      ? frameStepsCache.read(replayClient, deferredPauseId, deferredFrameId)
+      : undefined;
+
+  return { frames, frameSteps };
+}
+
+export default function CommandBar() {
+  return (
+    <Suspense fallback={<Loader />}>
+      <CommandBarSuspends />
+    </Suspense>
   );
+}
+
+function CommandBarSuspends() {
+  const cx = useAppSelector(getThreadContext);
+
+  const { frames, frameSteps } = useFramesAndFrameSteps();
 
   const dispatch = useAppDispatch();
 
