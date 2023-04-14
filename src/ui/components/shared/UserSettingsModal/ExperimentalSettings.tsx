@@ -86,12 +86,6 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableIncrementalSnapshots",
   },
   {
-    label: "Enable Replay Assist",
-    description:
-      "Replay Assist is a tool that shows off Replay's best features, with animated gifs explaining how to use them.",
-    key: "replayAssist",
-  },
-  {
     label: "Disable Concurrent Controller Loading",
     description: "Disable loading regions concurrently at controller startup",
     key: "disableConcurrentControllerLoading",
@@ -151,7 +145,6 @@ export default function ExperimentalSettings({}) {
   const { value: enableRoutines, update: updateEnableRoutines } = useFeature("enableRoutines");
   const { value: rerunRoutines, update: updatererunRoutines } = useFeature("rerunRoutines");
   const { value: reactPanel, update: updateReactPanel } = useFeature("reactPanel");
-  const { value: replayAssist, update: updateReplayAssist } = useFeature("replayAssist");
 
   const {
     value: disableRecordingAssetsInDatabase,
@@ -193,8 +186,6 @@ export default function ExperimentalSettings({}) {
       updateReactPanel(!reactPanel);
     } else if (key === "enableIncrementalSnapshots") {
       updateEnableIncrementalSnapshots(!enableIncrementalSnapshots);
-    } else if (key === "replayAssist") {
-      updateReplayAssist(!replayAssist);
     } else if (key === "disableConcurrentControllerLoading") {
       updateDisableConcurrentControllerLoading(!disableConcurrentControllerLoading);
     }
@@ -215,7 +206,6 @@ export default function ExperimentalSettings({}) {
     disableRecordingAssetsInDatabase,
     disableConcurrentControllerLoading,
     reactPanel,
-    replayAssist,
   };
 
   const settings = { ...userSettings, ...localSettings };

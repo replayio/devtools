@@ -11,7 +11,6 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
-import { showReplayAssist as showReplayAssistSelector } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { PrimaryPanelName } from "ui/state/layout";
@@ -157,12 +156,10 @@ export default function Toolbar() {
   const { comments, loading } = hooks.useGetComments(recordingId);
   const { value: logProtocolExperimentEnabled } = useFeature("logProtocol");
   const { value: reactPanelExperimentEnabled } = useFeature("reactPanel");
-  const { value: replayAssistExperimentEnabled } = useFeature("replayAssist");
+  const { value: showPassport } = useFeature("showPassport");
   const [sidePanelCollapsed, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
   const { nags } = hooks.useGetUserInfo();
   const showTour = shouldShowTour(nags);
-
-  const showReplayAssist = useAppSelector(showReplayAssistSelector);
 
   useEffect(() => {
     if (!loading && comments.length > 0) {
@@ -206,16 +203,14 @@ export default function Toolbar() {
             onClick={handleButtonClick}
           />
         ) : null}
-
-        {replayAssistExperimentEnabled && showReplayAssist ? (
+        {showPassport ? (
           <ToolbarButton
-            icon="school"
-            name="assist"
-            label="Replay Assist"
+            icon="menu_book"
+            name="passport"
+            label="Replay Passport"
             onClick={handleButtonClick}
           />
         ) : null}
-
         {recording?.metadata?.test?.runner?.name == "cypress" ? (
           <ToolbarButton
             icon="cypress"

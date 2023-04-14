@@ -27,7 +27,6 @@ import { prefs } from "ui/utils/prefs";
 import { isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
 
 export const initialAppState: AppState = {
-  showReplayAssist: false,
   awaitingSourcemaps: false,
   canvas: null,
   currentPoint: null,
@@ -62,9 +61,6 @@ const appSlice = createSlice({
   name: "app",
   initialState: initialAppState,
   reducers: {
-    setShowReplayAssist(state, action: PayloadAction<boolean>) {
-      state.showReplayAssist = action.payload;
-    },
     setMouseTargetsLoading(state, action: PayloadAction<boolean>) {
       state.mouseTargetsLoading = action.payload;
     },
@@ -186,7 +182,6 @@ export const {
   setRecordingTarget,
   setRecordingWorkspace,
   setSessionId,
-  setShowReplayAssist,
   setTrialExpired,
   setUnexpectedError,
   setUploading,
@@ -199,8 +194,6 @@ export default appSlice.reducer;
 // Copied from ./layout to avoid circles
 const getSelectedPanel = (state: UIState) => state.layout.selectedPanel;
 const getViewMode = (state: UIState) => state.layout.viewMode;
-
-export const showReplayAssist = (state: UIState) => state.app.showReplayAssist;
 
 export const getTheme = (state: UIState) =>
   state.app.theme === "system" ? getSystemColorSchemePreference() : state.app.theme;

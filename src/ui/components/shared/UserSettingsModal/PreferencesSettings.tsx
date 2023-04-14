@@ -115,6 +115,7 @@ function UiPreferences() {
   const { value: defaultMode, update: updateDefaultMode } = useStringPref("defaultMode");
   const [showHitCounts, setShowHitCounts] = useLocalStorage<boolean>(`Replay:ShowHitCounts`, true);
   const { value: enableLargeText, update: updateEnableLargeText } = useFeature("enableLargeText");
+  const { value: showPassport, update: updateShowPassport } = useFeature("showPassport");
 
   const setSelected = (value: AppTheme) => {
     dispatch(updateTheme(value));
@@ -173,6 +174,19 @@ function UiPreferences() {
           onChange={() => updateEnableLargeText(!enableLargeText)}
         />
         <div>Enable large text for Editor</div>
+      </label>
+
+      <label
+        className="flex cursor-pointer items-center space-x-2 p-1"
+        data-private
+        htmlFor="show-passport"
+      >
+        <Checkbox
+          id="show-passport"
+          checked={showPassport}
+          onChange={() => updateShowPassport(!showPassport)}
+        />
+        <div>Show Replay Passport</div>
       </label>
     </div>
   );

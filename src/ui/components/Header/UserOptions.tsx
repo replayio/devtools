@@ -3,7 +3,6 @@ import { ConnectedProps, connect } from "react-redux";
 
 import * as actions from "ui/actions/app";
 import LoginButton from "ui/components/LoginButton";
-import ReplayAssistButton from "ui/components/ReplayAssistButton";
 import Dropdown from "ui/components/shared/Dropdown";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -18,8 +17,6 @@ interface UserOptionsProps extends PropsFromRedux {
 
 function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   const [expanded, setExpanded] = useState(false);
-  const { value: replayAssistExperimentEnabled } = useFeature("replayAssist");
-
   const onDocsClick: React.MouseEventHandler = event => {
     trackEvent("user_options.select_docs");
     const docsUrl = `https://docs.replay.io`;
@@ -75,7 +72,6 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
               <span>Launch Replay</span>
             </button>
           )}
-          {replayAssistExperimentEnabled && <ReplayAssistButton />}
           <LoginButton />
         </Dropdown>
       </div>

@@ -121,7 +121,6 @@ export type LocalExperimentalUserSettings = {
   disableRecordingAssetsInDatabase: boolean;
   disableConcurrentControllerLoading: boolean;
   reactPanel: boolean;
-  replayAssist: boolean;
 };
 
 export type LocalUserSettings = LocalExperimentalUserSettings & {

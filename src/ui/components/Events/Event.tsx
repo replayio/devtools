@@ -336,7 +336,7 @@ export default React.memo(function Event({
 
   const onClickSeek = () => {
     onSeek(point, time);
-    dismissJumpToEventNag(); // Replay Assist
+    dismissJumpToEventNag(); // Replay Passport
   };
 
   const onClickJumpToCode = async () => {
@@ -360,7 +360,7 @@ export default React.memo(function Event({
       }
     }
 
-    // update Replay Assist
+    // update Replay Passport
     dismissJumpToCodeNag();
   };
 

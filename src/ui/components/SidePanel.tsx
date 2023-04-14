@@ -19,10 +19,10 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { shouldShowTour } from "ui/utils/onboarding";
 import useAuth0 from "ui/utils/useAuth0";
 
-import Assist from "./Assist/Assist";
 import CommentCardsList from "./Comments/CommentCardsList";
 import EventsDropDownMenu from "./Events/EventsDropDownMenu";
 import ReplayInfo from "./Events/ReplayInfo";
+import Passport from "./Passport/Passport";
 import ProtocolViewer from "./ProtocolViewer";
 import { ReactPanel } from "./ReactPanel";
 import StatusDropdown from "./shared/StatusDropdown";
@@ -135,7 +135,7 @@ export default function SidePanel() {
         {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}
         {selectedPrimaryPanel === "comments" && <CommentCardsList />}
         {selectedPrimaryPanel === "tour" && <Tour />}
-        {selectedPrimaryPanel === "assist" && <Assist />}
+        {selectedPrimaryPanel === "passport" && <Passport />}
         {selectedPrimaryPanel === "events" && <EventsPane items={items} />}
         {selectedPrimaryPanel === "cypress" && <TestSuitePanel />}
         {selectedPrimaryPanel === "protocol" && <ProtocolViewer />}

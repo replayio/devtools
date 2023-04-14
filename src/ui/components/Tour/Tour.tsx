@@ -1,20 +1,15 @@
 import React, { useState } from "react";
 
-import Icon from "replay-next/components/Icon";
-import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
-import { setViewMode } from "ui/actions/layout";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
-import Events from "ui/components/Events";
 import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
 import Confetti from "ui/components/shared//Confetti";
 import hooks from "ui/hooks";
+import { useFeature } from "ui/hooks/settings";
 import { Nag } from "ui/hooks/users";
 import { useDismissNag } from "ui/hooks/users";
-import { UserInfo } from "ui/hooks/users";
 import { useTestInfo } from "ui/hooks/useTestInfo";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { ViewMode } from "ui/state/layout";
 import {
   shouldShowBreakpointAdd,
   shouldShowBreakpointEdit,
@@ -27,10 +22,9 @@ import styles from "./Tour.module.css";
 const useNagDismissal = () => {
   const dismissNag = useDismissNag();
   const dispatch = useAppDispatch();
-  const info = useTestInfo();
 
   const dismissTourNag = () => {
-    const initialPrimaryPanel = "events";
+    const initialPrimaryPanel = "passport";
     dispatch(setSelectedPrimaryPanel(initialPrimaryPanel));
     dismissNag(Nag.DISMISS_TOUR);
   };
@@ -39,6 +33,7 @@ const useNagDismissal = () => {
 };
 
 const Tour: React.FC = () => {
+  const { update: setShowPassport } = useFeature("showPassport");
   const { nags } = hooks.useGetUserInfo();
   const viewMode = useAppSelector(getViewMode);
   const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
@@ -46,7 +41,6 @@ const Tour: React.FC = () => {
   const showConsoleNavigate = shouldShowConsoleNavigate(nags);
   const showBreakpointAdd = shouldShowBreakpointAdd(nags);
   const showBreakpointEdit = shouldShowBreakpointEdit(nags);
-  const showTour = shouldShowTour(nags);
 
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -73,7 +67,7 @@ const Tour: React.FC = () => {
                   <>
                     <p>
                       Replay is the first time-travel enabled DevTools. It’s designed to be
-                      familiar, futuristic, and fun :)
+                      familiar, futuristic, and fun.
                     </p>
                     <p>To get started, click on DevTools in the top right.</p>
                   </>
@@ -84,10 +78,10 @@ const Tour: React.FC = () => {
                 {showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
                   <>
                     <div className={styles.h1}>Time travel 🚀</div>
-                    <p>Look underneath the video and introduce yourself to the Replay console.</p>
+                    <p>Look underneath the video to find the Replay console.</p>
                     <p>
-                      Hover over the lines in the console and you’ll see a fast-forward button.
-                      Click it to time travel!
+                      Hover over the console and you’ll see a fast-forward button. Click it to time
+                      travel!
                     </p>
                   </>
                 )}
@@ -116,21 +110,20 @@ const Tour: React.FC = () => {
 
                 {hasCompletedTour && (
                   <>
-                    <div className={styles.h1}>Cool, eh? 🤯</div>
+                    <div className={styles.h1}>Check it out!</div>
                     <p>Take a look at the console.</p>
                     <p>
                       Replay just re-ran your recording and retroactively added your print statement
-                      each time that line of code was called!
+                      each time that line of code was called. 🤯
                     </p>
-                    <p>
-                      We call this our "ah-ha moment," and Replay is full of them. Happy exploring!
-                    </p>
-                    <p className="mt-20">
+                    <p>And with that, you've graduated from the tour. Happy exploring!</p>
+                    <p className="mt-8">
                       <a
                         href="#"
                         onClick={e => {
                           e.stopPropagation();
                           setShowConfetti(true);
+                          setShowPassport(true);
                           setTimeout(() => {
                             setShowConfetti(false);
                             dismissTourNag();
@@ -142,6 +135,16 @@ const Tour: React.FC = () => {
                       </a>
                       {showConfetti ? <Confetti /> : null}
                     </p>
+                    <img
+                      src={`/images/passport/tour_grad-default.png`}
+                      className={styles.largeCompletedImage}
+                      style={{
+                        zIndex: 0,
+                        opacity: 0.75,
+                        bottom: `300px`,
+                        transform: `rotate(14deg)`,
+                      }}
+                    />
                   </>
                 )}
               </div>
