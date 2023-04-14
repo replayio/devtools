@@ -19,7 +19,7 @@ import {
 
 import styles from "./Passport.module.css";
 
-const Passport: React.FC = () => {
+const Passport = () => {
   const { nags } = hooks.useGetUserInfo();
   const showConsoleNavigate = shouldShowConsoleNavigate(nags);
   const showBreakpointEdit = shouldShowBreakpointEdit(nags);
