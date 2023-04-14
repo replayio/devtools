@@ -341,7 +341,8 @@ export async function waitForPaused(page: Page, line?: number): Promise<void> {
     const scopeBlocks = scopesPanel.locator('[data-test-name="Expandable"]');
     const [numFrames, numScopes] = await Promise.all([frameListItems.count(), scopeBlocks.count()]);
 
-    expect(numFrames > 0 && numScopes > 0).toBe(true);
+    expect(numFrames).toBeGreaterThan(0);
+    expect(numScopes).toBeGreaterThan(0);
   });
 
   if (line) {
