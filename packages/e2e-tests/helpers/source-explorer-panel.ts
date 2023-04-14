@@ -54,6 +54,7 @@ export async function openSource(page: Page, url: string): Promise<void> {
       foundSource = true;
 
       // We found the source; open it and then bail.
+      await item.scrollIntoViewIfNeeded();
       await item.click();
 
       break;
@@ -79,9 +80,14 @@ export async function openSource(page: Page, url: string): Promise<void> {
 
 export async function openSourceExplorerPanel(page: Page): Promise<void> {
   const pane = getSourcesPane(page);
-  let isVisible = await pane.isVisible(); // await isSidePaneVisible(pane);
 
+  const isVisible = await pane.isVisible();
   if (!isVisible) {
-    return page.locator('[data-test-name="ToolbarButton-SourceExplorer"]').click();
+    const button = page.locator('[data-test-name="ToolbarButton-SourceExplorer"]');
+    await button.click();
+
+    await waitFor(async () => {
+      await expect(await pane.isVisible()).toBe(true);
+    });
   }
 }
