@@ -17,8 +17,7 @@
 }
 
 .checklist {
-  border-top: 1px solid #07115b27;
-  padding-top: 20px;
+  padding: 6px 0 12px;
   font-size: 16px;
   height: 100%;
   flex: 1;
@@ -81,4 +80,19 @@
   height: calc(100%);
   overflow-y: auto;
   width: 100%;
+}
+
+.stepIcon {
+  display: inline-block;
+  vertical-align: middle;
+  /* Add other properties as needed */
+}
+
+.ml2 {
+  margin-left: 0.5rem;
+}
+
+.sectionTitle {
+  font-weight: 600;
+  font-size: 130%;
 }
