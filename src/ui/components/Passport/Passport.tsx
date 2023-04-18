@@ -30,11 +30,8 @@ const Passport = () => {
   const showInspectElement = shouldShowInspectElement(nags);
   const showUseFocusMode = shouldShowUseFocusMode(nags);
   const [selectedIndices, setSelectedIndices] = useState({ sectionIndex: 0, itemIndex: 0 });
-  const stepNames: ("step-one" | "step-two" | "step-three")[] = [
-    "step-one",
-    "step-two",
-    "step-three",
-  ];
+  const stepNames = ["step-one", "step-two", "step-three"] as const;
+  type StepNames = typeof stepNames[number];
 
   const videoExampleRef = useRef<HTMLImageElement>(null);
   const [videoHeight, setVideoHeight] = useState<number | null>(null);
