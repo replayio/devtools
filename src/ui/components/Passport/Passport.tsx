@@ -163,10 +163,7 @@ const Passport = () => {
     return (
       <div className={styles.section}>
         <div className={`flex ${styles.headerItem}`}>
-          <Icon
-            className={styles.stepIcon}
-            type={`step-${["one", "two", "three"][sectionIndex]}`}
-          />
+          <Icon className={styles.stepIcon} type={`step-${["one", "two", "three"]}`} />
           <span className={`${styles.ml2}`}>{section.title}</span>
         </div>
         <div className={styles.checklist}>
