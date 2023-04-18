@@ -30,7 +30,11 @@ const Passport = () => {
   const showInspectElement = shouldShowInspectElement(nags);
   const showUseFocusMode = shouldShowUseFocusMode(nags);
   const [selectedIndices, setSelectedIndices] = useState({ sectionIndex: 0, itemIndex: 0 });
-  const stepNames = ["step-one", "step-two", "step-three"];
+  const stepNames: ("step-one" | "step-two" | "step-three")[] = [
+    "step-one",
+    "step-two",
+    "step-three",
+  ];
 
   const videoExampleRef = useRef<HTMLImageElement>(null);
   const [videoHeight, setVideoHeight] = useState<number | null>(null);
@@ -139,7 +143,7 @@ const Passport = () => {
     },
   ];
 
-  const sections = [
+  const sections: Section[] = [
     {
       title: "Basics",
       items: timeTravelItems,
@@ -154,24 +158,33 @@ const Passport = () => {
     },
   ];
 
+  interface ItemType {
+    label: string;
+    completed: boolean;
+    videoUrl: string;
+    imageBaseName: string;
+  }
+
+  interface Section {
+    title: string;
+    items: ItemType[];
+  }
+
   const selectedItem = sections[selectedIndices.sectionIndex].items[selectedIndices.itemIndex];
 
   const rand = (min: number, max: number) => {
     return Math.floor(Math.random() * (max - min + 1) + min);
   };
 
-  const renderSection = (section: any, sectionIndex: number) => {
+  const renderSection = (section: Section, sectionIndex: number) => {
     return (
       <div className={styles.section}>
         <div className={`flex ${styles.headerItem}`}>
-          <Icon
-            className={styles.stepIcon}
-            type={`step-${sectionIndex === 0 ? "one" : sectionIndex === 1 ? "two" : "three"}`}
-          />
+          <Icon className={styles.stepIcon} type={stepNames[sectionIndex]} />
           <span className={`${styles.ml2}`}>{section.title}</span>
         </div>
         <div className={styles.checklist}>
-          {section.items.map((item: any, itemIndex: number) => (
+          {section.items.map((item: ItemType, itemIndex: number) => (
             <div
               key={itemIndex}
               className={`flex ${getItemStyle(sectionIndex, itemIndex)} ${styles.checklistItem}`}
