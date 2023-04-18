@@ -1,3 +1,4 @@
+import classnames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 
 import Icon from "replay-next/components/Icon";
@@ -17,7 +18,10 @@ import {
 
 import styles from "./Passport.module.css";
 
+const stepNames = ["step-one", "step-two", "step-three"] as const;
+
 const Passport = () => {
+  const [selectedIndices, setSelectedIndices] = useState({ sectionIndex: 0, itemIndex: 0 });
   const { nags } = hooks.useGetUserInfo();
   const showConsoleNavigate = shouldShowConsoleNavigate(nags);
   const showBreakpointEdit = shouldShowBreakpointEdit(nags);
@@ -29,8 +33,7 @@ const Passport = () => {
   const showJumpToEvent = shouldShowJumpToEvent(nags);
   const showInspectElement = shouldShowInspectElement(nags);
   const showUseFocusMode = shouldShowUseFocusMode(nags);
-  const [selectedIndices, setSelectedIndices] = useState({ sectionIndex: 0, itemIndex: 0 });
-  const stepNames = ["step-one", "step-two", "step-three"] as const;
+
   type StepNames = typeof stepNames[number];
 
   const videoExampleRef = useRef<HTMLImageElement>(null);
@@ -176,7 +179,7 @@ const Passport = () => {
   const renderSection = (section: Section, sectionIndex: number) => {
     return (
       <div className={styles.section}>
-        <div className={`flex ${styles.headerItem}`}>
+        <div className={classnames("flex", styles.headerItem)}>
           <Icon className={styles.stepIcon} type={stepNames[sectionIndex]} />
           <span className={`${styles.ml2}`}>{section.title}</span>
         </div>
@@ -188,7 +191,7 @@ const Passport = () => {
               onClick={() => handleClick(sectionIndex, itemIndex)}
             >
               <Icon className={styles.stepIcon} type={renderCheckmarkIcon(item.completed)} />
-              <span className={`${styles.ml2}`}>{item.label}</span>
+              <span className={styles.ml2}>{item.label}</span>
             </div>
           ))}
         </div>
