@@ -452,18 +452,6 @@ class _ThreadFront {
     return this._resumeOperation(client.Debugger.findStepOutTarget, params);
   }
 
-  async findNetworkRequests(
-    onRequestsReceived: (data: { requests: RequestInfo[]; events: RequestEventInfo[] }) => void,
-    onResponseBodyData: (body: responseBodyData) => void,
-    onRequestBodyData: (body: requestBodyData) => void
-  ) {
-    const sessionId = await this.waitForSession();
-    client.Network.addRequestsListener(onRequestsReceived);
-    client.Network.addResponseBodyDataListener(onResponseBodyData);
-    client.Network.addRequestBodyDataListener(onRequestBodyData);
-    await client.Network.findRequests({}, sessionId);
-  }
-
   // Replace the sourceId in a location with the first corresponding sourceId
   updateLocation(location: Location) {
     location.sourceId = this.getCorrespondingSourceIds(location.sourceId)[0];
