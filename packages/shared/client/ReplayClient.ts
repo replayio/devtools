@@ -19,6 +19,8 @@ import {
   PointSelector,
   getPointsBoundingTimeResult as PointsBoundingTime,
   RecordingId,
+  RequestEventInfo,
+  RequestInfo,
   Result,
   RunEvaluationResult,
   SameLineSourceLocations,
@@ -40,6 +42,8 @@ import {
   keyboardEvents,
   navigationEvents,
   repaintGraphicsResult,
+  requestBodyData,
+  responseBodyData,
   runEvaluationResults,
   searchSourceContentsMatches,
   sourceContentsChunk,
@@ -334,6 +338,18 @@ export class ReplayClient implements ReplayClientInterface {
     client.Session.addNavigationEventsListener(onNavigationEvents);
     await client.Session.findNavigationEvents({}, sessionId!);
     client.Session.removeNavigationEventsListener(onNavigationEvents);
+  }
+
+  async findNetworkRequests(
+    onRequestsReceived: (data: { requests: RequestInfo[]; events: RequestEventInfo[] }) => void,
+    onResponseBodyData: (body: responseBodyData) => void,
+    onRequestBodyData: (body: requestBodyData) => void
+  ) {
+    const sessionId = await this.waitForSession();
+    client.Network.addRequestsListener(onRequestsReceived);
+    client.Network.addResponseBodyDataListener(onResponseBodyData);
+    client.Network.addRequestBodyDataListener(onRequestBodyData);
+    await client.Network.findRequests({}, sessionId);
   }
 
   async findPoints(

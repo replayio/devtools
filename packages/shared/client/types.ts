@@ -24,6 +24,8 @@ import {
   PointSelector,
   getPointsBoundingTimeResult as PointsBoundingTime,
   RecordingId,
+  RequestEventInfo,
+  RequestInfo,
   Result,
   RunEvaluationResult,
   SameLineSourceLocations,
@@ -45,6 +47,8 @@ import {
   keyboardEvents,
   navigationEvents,
   repaintGraphicsResult,
+  requestBodyData,
+  responseBodyData,
 } from "@replayio/protocol";
 
 export type LogEntry = {
@@ -154,6 +158,11 @@ export interface ReplayClientInterface {
     overflow: boolean;
   }>;
   findNavigationEvents(onKeyboardEvents: (events: navigationEvents) => void): Promise<void>;
+  findNetworkRequests(
+    onRequestsReceived: (data: { requests: RequestInfo[]; events: RequestEventInfo[] }) => void,
+    onResponseBodyData: (body: responseBodyData) => void,
+    onRequestBodyData: (body: requestBodyData) => void
+  ): Promise<void>;
   findPoints(selector: PointSelector, limits?: PointLimits): Promise<PointDescription[]>;
   findSources(): Promise<Source[]>;
   getAllEventHandlerCounts(range: PointRange | null): Promise<Record<string, number>>;

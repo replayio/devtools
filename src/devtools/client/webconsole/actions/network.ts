@@ -1,6 +1,6 @@
-import { RequestEventInfo, RequestInfo, responseBodyData } from "@replayio/protocol";
+import { RequestEventInfo, RequestInfo } from "@replayio/protocol";
 
-import type { ThreadFront as ThreadFrontType } from "protocol/thread";
+import { ReplayClientInterface } from "shared/client/types";
 import { UIStore, UIThunkAction } from "ui/actions";
 import {
   networkRequestsLoaded,
@@ -9,10 +9,8 @@ import {
   newResponseBodyParts,
 } from "ui/actions/network";
 
-let onResponseBodyPart: (responseBodyParts: responseBodyData) => void;
-
-export const setupNetwork = async (store: UIStore, ThreadFront: typeof ThreadFrontType) => {
-  await ThreadFront.findNetworkRequests(
+export const setupNetwork = async (store: UIStore, replayClient: ReplayClientInterface) => {
+  await replayClient.findNetworkRequests(
     async data => store.dispatch(onNetworkRequestsThunk(data)),
     async data => store.dispatch(newResponseBodyParts(data)),
     async data => store.dispatch(newRequestBodyParts(data))
