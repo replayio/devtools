@@ -2,7 +2,7 @@ import test from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
 import { executeAndVerifyTerminalExpression } from "../helpers/console-panel";
-import { reverseStepOver, rewindToLine, stepOver } from "../helpers/pause-information-panel";
+import { reverseStepOver, rewind, stepOver } from "../helpers/pause-information-panel";
 import { clickSourceTreeNode } from "../helpers/source-explorer-panel";
 import { addBreakpoint } from "../helpers/source-panel";
 
@@ -19,7 +19,7 @@ test("stepping-01: Test basic step-over/back functionality", async ({ page }) =>
 
   // Pause on line 20
   await addBreakpoint(page, { lineNumber: 20, url });
-  await rewindToLine(page);
+  await rewind(page);
 
   // Should get ten when evaluating number.
   await executeAndVerifyTerminalExpression(page, "number", "10");
