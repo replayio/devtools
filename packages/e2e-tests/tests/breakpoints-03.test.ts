@@ -2,7 +2,7 @@ import test from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
 import { executeAndVerifyTerminalExpression } from "../helpers/console-panel";
-import { resumeToLine, rewindToLine } from "../helpers/pause-information-panel";
+import { resumeToLine, rewind, rewindToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint, removeBreakpoint } from "../helpers/source-panel";
 
 const url = "doc_rr_basic.html";
@@ -17,7 +17,7 @@ test(`breakpoints-03: Test stepping forward through breakpoints when rewound bef
   // Rewind to when the point was hit
   await rewindToLine(page, { lineNumber: 9 });
   // Rewind further (past the first hit)
-  await rewindToLine(page);
+  await rewind(page);
 
   await removeBreakpoint(page, { lineNumber: 9, url });
 

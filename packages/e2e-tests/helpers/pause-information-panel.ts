@@ -212,9 +212,9 @@ export async function rewind(page: Page) {
 export async function rewindToLine(
   page: Page,
   options: {
-    lineNumber?: number;
+    lineNumber: number;
     url?: string;
-  } = {}
+  }
 ): Promise<void> {
   const { url = null, lineNumber = null } = options;
 
@@ -333,17 +333,23 @@ export async function waitForPaused(page: Page, line?: number): Promise<void> {
 
   await openPauseInformationPanel(page);
 
-  await waitFor(async () => {
-    const scopesPanel = getScopesPanel(page);
-    const framesPanel = getFramesPanel(page);
+  await waitFor(
+    async () => {
+      const scopesPanel = getScopesPanel(page);
+      const framesPanel = getFramesPanel(page);
 
-    const frameListItems = framesPanel.locator(".frame");
-    const scopeBlocks = scopesPanel.locator('[data-test-name="Expandable"]');
-    const [numFrames, numScopes] = await Promise.all([frameListItems.count(), scopeBlocks.count()]);
+      const frameListItems = framesPanel.locator(".frame");
+      const scopeBlocks = scopesPanel.locator('[data-test-name="Expandable"]');
+      const [numFrames, numScopes] = await Promise.all([
+        frameListItems.count(),
+        scopeBlocks.count(),
+      ]);
 
-    expect(numFrames).toBeGreaterThan(0);
-    expect(numScopes).toBeGreaterThan(0);
-  });
+      expect(numFrames).toBeGreaterThan(0);
+      expect(numScopes).toBeGreaterThan(0);
+    },
+    { timeout: 10_000 }
+  );
 
   if (line) {
     await waitFor(async () => {
