@@ -30,6 +30,7 @@ const Passport = () => {
   const showInspectElement = shouldShowInspectElement(nags);
   const showUseFocusMode = shouldShowUseFocusMode(nags);
   const [selectedIndices, setSelectedIndices] = useState({ sectionIndex: 0, itemIndex: 0 });
+  const stepNames = ["step-one", "step-two", "step-three"];
 
   const videoExampleRef = useRef<HTMLImageElement>(null);
   const [videoHeight, setVideoHeight] = useState<number | null>(null);
@@ -163,7 +164,10 @@ const Passport = () => {
     return (
       <div className={styles.section}>
         <div className={`flex ${styles.headerItem}`}>
-          <Icon className={styles.stepIcon} type={`step-${["one", "two", "three"]}`} />
+          <Icon
+            className={styles.stepIcon}
+            type={`step-${sectionIndex === 0 ? "one" : sectionIndex === 1 ? "two" : "three"}`}
+          />
           <span className={`${styles.ml2}`}>{section.title}</span>
         </div>
         <div className={styles.checklist}>
