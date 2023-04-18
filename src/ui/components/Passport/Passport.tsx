@@ -11,6 +11,7 @@ import {
   shouldShowJumpToCode,
   shouldShowJumpToEvent,
   shouldShowSearchSourceText,
+  shouldShowShareNag,
   shouldShowUseFocusMode,
 } from "ui/utils/onboarding";
 
@@ -24,6 +25,7 @@ const Passport = () => {
   const showJumpToCode = shouldShowJumpToCode(nags);
   const showAddUnicornBadge = shouldShowAddUnicornBadge(nags);
   const showSearchSourceText = shouldShowSearchSourceText(nags);
+  const showShareNag = shouldShowShareNag(nags);
   const showJumpToEvent = shouldShowJumpToEvent(nags);
   const showInspectElement = shouldShowInspectElement(nags);
   const showUseFocusMode = shouldShowUseFocusMode(nags);
@@ -128,19 +130,25 @@ const Passport = () => {
       videoUrl: "https://vercel.replay.io/passport/add_a_comment.gif",
       imageBaseName: "add_a_comment",
     },
+    {
+      label: "Share",
+      completed: !showShareNag,
+      videoUrl: "https://vercel.replay.io/passport/share.gif",
+      imageBaseName: "share",
+    },
   ];
 
   const sections = [
     {
-      title: "BASICS",
+      title: "Basics",
       items: timeTravelItems,
     },
     {
-      title: "ADVANCED",
+      title: "Advanced",
       items: powerToolsItems,
     },
     {
-      title: "COLLABORATION",
+      title: "Collaboration",
       items: multiplayerItems,
     },
   ];
@@ -154,7 +162,10 @@ const Passport = () => {
   const renderSection = (section: any, sectionIndex: number) => {
     return (
       <div className={styles.section}>
-        <div className={styles.sectionTitle}>{section.title}</div>
+        <div className={`flex ${styles.headerItem}`}>
+          <Icon className={styles.stepIcon} type={`step-${sectionIndex + 1}`} />
+          <span className={`${styles.ml2}`}>{section.title}</span>
+        </div>
         <div className={styles.checklist}>
           {section.items.map((item: any, itemIndex: number) => (
             <div
