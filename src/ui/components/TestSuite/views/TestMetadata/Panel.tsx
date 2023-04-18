@@ -2,6 +2,7 @@ import { Suspense } from "react";
 
 import { assert } from "protocol/utils";
 import Loader from "replay-next/components/Loader";
+import { SourceMetadata } from "shared/graphql/types";
 import { getFormattedTime } from "shared/utils/time";
 import { getTruncatedRelativeDate } from "ui/components/Library/Team/View/Recordings/RecordingListItem/RecordingListItem";
 import LabeledIcon from "ui/components/TestSuite/components/LabeledIcon";
@@ -39,10 +40,9 @@ function PanelSuspends({
   const testMetadata = TestMetadataCache.read(recordingId);
 
   const sourceMetadata = recording.metadata?.source;
-  assert(sourceMetadata != null);
-
-  const user = sourceMetadata.trigger?.user;
-  const { branch, merge } = sourceMetadata;
+  if (!sourceMetadata) {
+    console.warn("Missing source metadata");
+  }
 
   const { duration, hasMissingSteps, resultCounts, runner, title } = testMetadata;
 
@@ -75,13 +75,7 @@ function PanelSuspends({
             icon="schedule"
             label={getTruncatedRelativeDate(recording.date)}
           />
-          {user && <LabeledIcon className={styles.Attribute} icon="person" label={user} />}
-          {merge?.id == null && branch && (
-            <LabeledIcon className={styles.Attribute} icon="fork_right" label={branch} />
-          )}
-          {merge?.id && (
-            <LabeledIcon className={styles.Attribute} icon="merge_type" label={merge.id} />
-          )}
+          {sourceMetadata && <SourceMetadata sourceMetadata={sourceMetadata} />}
           <LabeledIcon className={styles.Attribute} icon="timer" label={durationString} />
         </div>
       </div>
@@ -89,6 +83,22 @@ function PanelSuspends({
         {hasMissingSteps && <MissingStepsBanner testRunnerName={testRunnerName} />}
         <TestItemTree selectTestItem={selectTestItem} />
       </div>
+    </>
+  );
+}
+
+function SourceMetadata({ sourceMetadata }: { sourceMetadata: SourceMetadata }) {
+  const user = sourceMetadata.trigger?.user;
+
+  const { branch, merge } = sourceMetadata;
+
+  return (
+    <>
+      {user && <LabeledIcon className={styles.Attribute} icon="person" label={user} />}
+      {merge?.id == null && branch && (
+        <LabeledIcon className={styles.Attribute} icon="fork_right" label={branch} />
+      )}
+      {merge?.id && <LabeledIcon className={styles.Attribute} icon="merge_type" label={merge.id} />}
     </>
   );
 }
