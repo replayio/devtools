@@ -1,0 +1,23 @@
+.Row {
+  border-left: 2px solid var(--testsuites-error-border-color);
+  padding-left: 2rem;
+}
+
+.Header {
+  display: flex;
+  align-content: center;
+  gap: 1ch;
+  color: var(--testsuites-error-color);
+}
+
+.Icon {
+  width: 1rem;
+  height: 1rem;
+  background-color: var(--testsuites-error-color);
+}
+
+.Error {
+  font-family: var(--font-family-monospace);
+  color: var(--testsuites-error-color);
+  margin-top: 0.75rem;
+}

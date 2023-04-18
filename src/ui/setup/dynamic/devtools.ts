@@ -38,7 +38,6 @@ import { ReplayClientInterface } from "shared/client/types";
 import { UIStore, actions } from "ui/actions";
 import { setCanvas } from "ui/actions/app";
 import { setupReactDevTools } from "ui/actions/reactDevTools";
-import { setupReporter } from "ui/actions/reporter";
 import { precacheScreenshots } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import app, { loadReceivedEvents, setVideoUrl } from "ui/reducers/app";
@@ -215,7 +214,6 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   setupGraphics();
   setupNetwork(store, replayClient);
   setupReactDevTools(store, ThreadFront);
-  setupReporter(store, ThreadFront);
   setupBoxModel(store, startAppListening);
   setupRules(store, startAppListening);
   setupGetPreferredLocation(store);

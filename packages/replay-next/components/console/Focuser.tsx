@@ -18,14 +18,14 @@ export default function Focuser() {
 
   const toggleFocus = () => {
     if (rangeForDisplay === null) {
-      update([begin * duration, end * duration], false);
+      update([begin * duration, end * duration], { debounce: false });
     } else {
-      update(null, false);
+      update(null, { debounce: false });
     }
   };
 
   const onSliderChange = (newStart: number, newEnd: number) => {
-    update([newStart * duration, newEnd * duration], true);
+    update([newStart * duration, newEnd * duration], { debounce: true });
   };
 
   return (

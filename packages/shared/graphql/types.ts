@@ -1,6 +1,4 @@
-import { ExecutionPoint, Location } from "@replayio/protocol";
-
-import { Point as PointData } from "shared/client/types";
+import { ExecutionPoint } from "@replayio/protocol";
 
 export enum Nag {
   ADD_COMMENT = "add_comment",
@@ -274,6 +272,13 @@ export type TestItem = {
   duration?: number;
   steps?: TestStep[];
   id?: string;
+
+  // Describes the path, or scope, of a test (the code in the it() block)
+  // which includes the runtime, file path, describe block(s), and the test title itself
+  //
+  // TODO Ideally this attribute would be split into more meaningful fields by the plug-in;
+  // as it is the TestMetadataCache has to do some weird processing to extract meaningful data from this array.
+  // https://discord.com/channels/779097926135054346/1093222080427868273/1093560145931419721
   path?: string[];
   error?: TestItemError;
 };
@@ -300,6 +305,8 @@ export interface Annotation {
   message: CypressAnnotationMessage;
 }
 
+export type TestStepHook = "beforeAll" | "beforeEach" | "afterAll" | "afterEach";
+
 export type TestStep = {
   args?: any[];
   name: string;
@@ -309,7 +316,7 @@ export type TestStep = {
   parentId?: string;
   alias?: string;
   error?: TestItemError;
-  hook?: "beforeEach" | "afterEach";
+  hook?: TestStepHook;
   commandId?: string;
   assertIds?: string[];
 };
@@ -322,7 +329,7 @@ export type AnnotatedTestStep = TestStep & {
   category?: string;
 };
 
-type Annotations = {
+export type Annotations = {
   start?: Annotation;
   end?: Annotation;
   enqueue?: Annotation;

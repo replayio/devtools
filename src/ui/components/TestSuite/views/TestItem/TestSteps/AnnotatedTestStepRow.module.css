@@ -1,0 +1,67 @@
+.Row {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+}
+
+.Badge,
+.SelectedBadge {
+  padding: 0 0.25rem;
+  border-radius: 0.25rem;
+}
+.Badge {
+  background-color: var(--testsuites-capsule-alias-bgcolor);
+  color: var(--testsuites-capsule-alias-color);
+}
+.SelectedBadge {
+  background-color: var(--testsuites-capsule-alias-selected-bgcolor);
+  color: var(--testsuites-capsule-alias-selected-color);
+}
+
+.Number {
+  color: var(--color-dim);
+}
+
+.Name[data-name="assert"] {
+  padding: 0 0.25rem;
+  border-radius: 0.25rem;
+}
+
+.Row[data-status="error"] .Args {
+  color: var(--testsuites-error-color);
+}
+
+.Row[data-status="error"] .Name[data-name="assert"] {
+  background-color: var(--testsuites-capsule-error-bgcolor);
+  color: var(--testsuites-capsule-error-color);
+}
+
+.Row[data-status="success"] .Name[data-name="assert"] {
+  background-color: var(--testsuites-capsule-success-bgcolor);
+  color: var(--testsuites-capsule-success-color);
+}
+
+.Text {
+  flex: 1;
+}
+
+.Name {
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+.Args {
+  color: var(--color-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+.JumpToCodeButton {
+  position: absolute;
+  right: 0;
+}

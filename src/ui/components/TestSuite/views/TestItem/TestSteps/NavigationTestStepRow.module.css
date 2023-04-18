@@ -1,0 +1,13 @@
+.Indented {
+  padding-left: 2rem;
+}
+.Text {
+  flex: 1;
+}
+
+.Name {
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}

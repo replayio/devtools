@@ -1,0 +1,10 @@
+.Banner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  background-color: var(--testsuites-aside-background-color);
+  border: 2px solid var(--testsuites-aside-border-color);
+  color: var(--testsuites-aside-color);
+}

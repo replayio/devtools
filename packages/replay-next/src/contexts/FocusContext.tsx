@@ -1,4 +1,4 @@
-import { TimeStampedPointRange } from "@replayio/protocol";
+import { FocusWindowRequestBias, TimeStampedPointRange } from "@replayio/protocol";
 import {
   PropsWithChildren,
   createContext,
@@ -23,6 +23,12 @@ import { SessionContext } from "./SessionContext";
 
 const FOCUS_DEBOUNCE_DURATION = 250;
 
+export type UpdateOptions = {
+  bias?: FocusWindowRequestBias;
+  debounce: boolean;
+  sync?: boolean;
+};
+
 export type FocusContextType = {
   // Focus is about to be updated as part of a transition;
   // UI that consumes the focus for Suspense purposes may wish want reflect the temporary pending state.
@@ -32,11 +38,11 @@ export type FocusContextType = {
   rangeForDisplay: TimeStampedPointRange | null;
 
   // Set focus window to a range of execution points (or null to clear).
-  update: (value: TimeStampedPointRange | null, debounce: boolean) => void;
+  update: (value: TimeStampedPointRange | null, options: UpdateOptions) => Promise<void>;
 
   // Set focus window to a range of times (or null to clear).
   // Note this value is imprecise and should only be used by the Timeline focuser UI.
-  updateForTimelineImprecise: (value: TimeRange | null, debounce: boolean) => void;
+  updateForTimelineImprecise: (value: TimeRange | null, options: UpdateOptions) => Promise<void>;
 };
 
 export const FocusContext = createContext<FocusContextType>(null as any);
@@ -53,6 +59,7 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
     begin: { point: "0", time: 0 },
     end: { point: endpoint, time: duration },
   };
+  const [bias, setBias] = useState<FocusWindowRequestBias | undefined>(undefined);
   const [range, setRange] = useState<TimeStampedPointRange | null>(initialRange);
   const [deferredRange, setDeferredRange] = useState<TimeStampedPointRange | null>(initialRange);
   const [focusRangeInitialized, setFocusRangeInitialized] = useState(false);
@@ -80,14 +87,14 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
     }
 
     const timeoutId = setTimeout(async () => {
-      await client.requestFocusRange({ begin: range.begin.time, end: range.end.time });
+      await client.requestFocusRange({ begin: range.begin.time, end: range.end.time, bias });
       setFocusRangeInitialized(true);
     }, FOCUS_DEBOUNCE_DURATION);
 
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [client, duration, range]);
+  }, [bias, client, duration, range]);
 
   // Feed loaded regions into the time-to-execution-point cache in case we need them later.
   useEffect(() => {
@@ -100,7 +107,10 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
   }, [loadedRegions]);
 
   const updateFocusRange = useCallback(
-    async (range: TimeStampedPointRange | null, debounce: boolean) => {
+    async (range: TimeStampedPointRange | null, options: UpdateOptions) => {
+      const { bias, debounce, sync } = options;
+
+      setBias(bias);
       setRange(range);
 
       // Focus values may change rapidly (e.g. during a click-and-drag)
@@ -113,12 +123,16 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
           setDeferredRange(range);
         });
       }
+
+      // Sync is a no-op
     },
     [debouncedSetDeferredRange]
   );
 
   const updateForTimelineImprecise = useCallback(
-    async (value: TimeRange | null, debounce: boolean) => {
+    async (value: TimeRange | null, options: UpdateOptions) => {
+      const { bias, debounce, sync } = options;
+
       if (value) {
         const [timeBegin, timeEnd] = value;
 
@@ -132,10 +146,10 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
             begin: { point: pointBegin, time: timeBegin },
             end: { point: pointEnd, time: timeEnd },
           },
-          debounce
+          { bias, debounce, sync }
         );
       } else {
-        updateFocusRange(null, debounce);
+        updateFocusRange(null, { bias, debounce, sync });
       }
     },
     [client, updateFocusRange]

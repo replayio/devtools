@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 
-import { CypressToggler } from "devtools/client/debugger/src/components/TestInfo/CypressToggler";
 import { PreviewNodeHighlighter } from "devtools/client/inspector/markup/components/PreviewNodeHighlighter";
 import { getHighlightedNodesLoading } from "devtools/client/inspector/markup/selectors/markup";
 import { installObserver, refreshGraphics } from "protocol/graphics";
@@ -12,6 +11,7 @@ import {
   getVideoUrl,
 } from "ui/actions/app";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
+import ToggleButton from "ui/components/TestSuite/views/Toggle/ToggleButton";
 import useVideoContextMenu from "ui/components/useVideoContextMenu";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { getPlayback, isPlaybackStalled } from "ui/reducers/timeline";
@@ -110,7 +110,7 @@ export default function Video() {
         </CommentsOverlay>
       ) : null}
       {isNodePickerInitializing ? <Tooltip label="Loading…" targetID="video" /> : null}
-      {panel === "cypress" && <CypressToggler />}
+      {panel === "cypress" && <ToggleButton />}
       <div id="highlighter-root">
         {highlightedNodeIds?.map(nodeId => (
           <PreviewNodeHighlighter key={nodeId} nodeId={nodeId} />

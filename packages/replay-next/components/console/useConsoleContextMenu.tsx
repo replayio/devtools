@@ -37,7 +37,7 @@ export default function useConsoleContextMenu(loggable: Loggable) {
           time: duration,
         },
       },
-      true
+      { debounce: true }
     );
   };
 
@@ -53,7 +53,7 @@ export default function useConsoleContextMenu(loggable: Loggable) {
           time: getLoggableTime(loggable),
         },
       },
-      true
+      { debounce: true }
     );
   };
 

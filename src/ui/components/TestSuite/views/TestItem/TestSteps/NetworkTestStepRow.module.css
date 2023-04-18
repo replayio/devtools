@@ -1,0 +1,25 @@
+.Indented {
+  padding-left: 2rem;
+}
+
+.Token {
+  color: var(--color-dim);
+  line-height: 1rem;
+}
+
+.StatusBadge {
+  display: inline-block;
+  border-radius: 0.75rem;
+  height: 0.75rem;
+  width: 0.75rem;
+}
+.StatusBadge[data-status-badge="error"] {
+  background-color: var(--testsuites-error-color);
+}
+.StatusBadge[data-status-badge="success"] {
+  background-color: var(--testsuites-success-color);
+}
+
+.Text {
+  flex: 1;
+}

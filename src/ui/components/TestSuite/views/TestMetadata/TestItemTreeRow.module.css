@@ -1,0 +1,46 @@
+.Row {
+  display: flex;
+  gap: 1ch;
+  cursor: pointer;
+  transition: opacity 0.18s ease-out;
+}
+.Row[data-is-pending] {
+  opacity: 0.5;
+}
+
+.Status {
+  flex: 0 0 auto;
+}
+
+.Title {
+  flex: 0 1 auto;
+}
+.Row:hover .Title {
+  text-decoration: underline;
+}
+
+.Chevron {
+  flex: 0 0 auto;
+  visibility: hidden;
+}
+.Row:hover .Chevron {
+  visibility: visible;
+}
+
+.Column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.Error {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-family: var(--font-family-monospace);
+  background-color: var(--testsuites-error-bgcolor);
+  color: var(--testsuites-error-color);
+}
+
+.ErrorTitle {
+  font-weight: bold;
+}

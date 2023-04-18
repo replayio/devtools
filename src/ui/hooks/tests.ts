@@ -3,15 +3,9 @@ import orderBy from "lodash/orderBy";
 
 import { assert } from "protocol/utils";
 import {
-  GetTest,
-  GetTestVariables,
   GetTest_node_Workspace_tests,
   GetTest_node_Workspace_tests_recordings,
 } from "shared/graphql/generated/GetTest";
-import {
-  GetTestsForWorkspace,
-  GetTestsForWorkspaceVariables,
-} from "shared/graphql/generated/GetTestsForWorkspace";
 import {
   GetTestsRun,
   GetTestsRunVariables,
@@ -26,17 +20,11 @@ import {
 import { Recording } from "shared/graphql/types";
 import { WorkspaceId } from "ui/state/app";
 
-export interface Test {
-  title: string | null;
-  path: string[] | null;
-  date: string;
-  recordings: Recording[];
-}
-
 export interface TestRunStats {
   passed: number | null;
   failed: number | null;
 }
+
 export interface TestRun {
   id: string | null;
   title: string | null;
@@ -127,7 +115,7 @@ const GET_TEST = gql`
   }
 `;
 
-const GET_TEST_RUN = gql`
+export const GET_TEST_RUN = gql`
   query GetTestsRun($workspaceId: ID!, $id: String!) {
     node(id: $workspaceId) {
       ... on Workspace {
@@ -184,26 +172,6 @@ function unwrapRecordingsData(
   }));
 }
 
-export function useGetTestForWorkspace(
-  path: string[],
-  workspaceId: string
-): { test: Test | null; loading: boolean } {
-  const serializedPath = encodeURIComponent(JSON.stringify(path));
-  const { data, loading } = useQuery<GetTest, GetTestVariables>(GET_TEST, {
-    variables: { path: serializedPath, workspaceId },
-  });
-
-  if (loading || !data?.node) {
-    return { test: null, loading };
-  }
-  assert("tests" in data.node, "No tests in GetTest response");
-
-  return {
-    test: convertTest(data.node.tests?.[0]),
-    loading,
-  };
-}
-
 export function useGetTestRunForWorkspace(
   workspaceId: string,
   testRunId: string
@@ -224,30 +192,6 @@ export function useGetTestRunForWorkspace(
 
   return {
     testRun: convertTestRun(testRun),
-    loading,
-  };
-}
-
-export function useGetTestsForWorkspace(workspaceId: WorkspaceId): {
-  tests: Test[] | null;
-  loading: boolean;
-} {
-  const { data, loading } = useQuery<GetTestsForWorkspace, GetTestsForWorkspaceVariables>(
-    GET_TESTS_FOR_WORKSPACE,
-    {
-      variables: { workspaceId },
-    }
-  );
-
-  if (loading || !data?.node || !("tests" in data.node) || !data.node.tests) {
-    return { tests: null, loading };
-  }
-
-  const tests = data.node.tests.map(test => convertTest(test)!);
-  const sortedTests = orderBy(tests, ["date"], ["desc"]);
-
-  return {
-    tests: sortedTests,
     loading,
   };
 }

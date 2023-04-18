@@ -1,0 +1,17 @@
+.DropDownButton {
+  flex: 0 0 0.5rem;
+  width: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.Icon {
+  height: 1rem;
+  width: 1rem;
+  flex: 0 0 auto;
+}

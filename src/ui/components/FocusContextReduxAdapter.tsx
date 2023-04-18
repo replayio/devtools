@@ -1,9 +1,14 @@
 import { TimeStampedPointRange } from "@replayio/protocol";
 import { PropsWithChildren, useCallback, useEffect, useMemo, useState, useTransition } from "react";
 
-import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { FocusContext, UpdateOptions } from "replay-next/src/contexts/FocusContext";
 import { TimeRange } from "replay-next/src/types";
-import { enterFocusMode, setFocusRegionFromTimeRange } from "ui/actions/timeline";
+import {
+  enterFocusMode,
+  setFocusRegionFromTimeRange,
+  syncFocusedRegion,
+  updateFocusRegionParam,
+} from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -26,8 +31,10 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
   }, [focusRegion, loadedRegions]);
 
   const update = useCallback(
-    (value: TimeStampedPointRange | null, _: boolean) => {
-      dispatch(
+    async (value: TimeStampedPointRange | null, options: UpdateOptions) => {
+      const { sync } = options;
+
+      await dispatch(
         setFocusRegionFromTimeRange(
           value !== null
             ? {
@@ -37,13 +44,20 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
             : null
         )
       );
+
+      if (sync) {
+        await dispatch(syncFocusedRegion());
+        dispatch(updateFocusRegionParam());
+      }
     },
     [dispatch]
   );
 
   const updateForTimelineImprecise = useCallback(
-    (value: TimeRange | null, _: boolean) => {
-      dispatch(
+    async (value: TimeRange | null, options: UpdateOptions) => {
+      const { sync } = options;
+
+      await dispatch(
         setFocusRegionFromTimeRange(
           value !== null
             ? {
@@ -53,6 +67,11 @@ export default function FocusContextReduxAdapter({ children }: PropsWithChildren
             : null
         )
       );
+
+      if (sync) {
+        await dispatch(syncFocusedRegion());
+        dispatch(updateFocusRegionParam());
+      }
     },
     [dispatch]
   );

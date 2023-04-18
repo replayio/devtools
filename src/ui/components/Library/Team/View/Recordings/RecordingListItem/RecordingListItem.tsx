@@ -4,8 +4,8 @@ import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import React from "react";
 import LazyLoad from "react-lazyload";
 
-import { TestCaseResultIcon } from "devtools/client/debugger/src/components/TestInfo/TestCase";
 import { Recording } from "shared/graphql/types";
+import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIcon";
 import hooks from "ui/hooks";
 import { useGetUserPermissions } from "ui/hooks/users";
 import { getDisplayedUrl } from "ui/utils/environment";
@@ -166,7 +166,7 @@ function RecordingRow({
             <div className={`flex flex-col space-y-0.5 overflow-hidden ${styles.recordingTitle}`}>
               <div className="flex items-center space-x-1">
                 {recording.metadata?.test ? (
-                  <TestCaseResultIcon result={recording.metadata.test.result} />
+                  <TestResultIcon result={recording.metadata.test.result} />
                 ) : null}
                 <ReplayTitle title={recording.title} />
               </div>

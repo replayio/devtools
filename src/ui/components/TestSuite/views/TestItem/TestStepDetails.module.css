@@ -1,0 +1,19 @@
+.Message {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  color: var(--color-dim);
+  padding: 0 0.75rem;
+}
+
+.Container {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0.75rem 0.75rem;
+  font-family: var(--font-family-monospace);
+}

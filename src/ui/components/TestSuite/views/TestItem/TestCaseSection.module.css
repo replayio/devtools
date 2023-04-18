@@ -1,0 +1,7 @@
+.Title {
+  font-size: var(--font-size-small);
+  color: var(--color-dimmer);
+  text-transform: uppercase;
+  font-weight: bold;
+  line-height: 2rem;
+}

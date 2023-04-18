@@ -19,7 +19,7 @@
 .ToolbarHeader {
   flex: 1 1 auto;
   font-size: 15px;
-  line-height: 19px;
+  line-height: 1.25rem;
   font-weight: 400;
   color: var(--body-color);
   overflow: hidden;
