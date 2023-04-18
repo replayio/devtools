@@ -32,10 +32,6 @@ export const TestItemsCache = createSingleEntryCache<
     const { tests: testItems = [] } = testMetadata;
 
     const startAnnotations = annotations.filter(({ message }) => message.event === "test:start");
-    assert(
-      startAnnotations.length === testItems.length,
-      `Expected test items count (${testItems.length}) to match start annotations count (${startAnnotations.length})`
-    );
 
     return testItems.map((testItem, index) => {
       const { path = [], steps = [], ...rest } = testItem;
@@ -72,7 +68,9 @@ export const TestItemsCache = createSingleEntryCache<
 
       // Test item start times are unreliable.
       // If we have the reporter annotations, use their start time instead.
-      const relativeStartTime = startAnnotations[index].time;
+      const relativeStartTime = startAnnotations[index]
+        ? startAnnotations[index].time
+        : testItem.relativeStartTime ?? 0;
 
       const testItemAnnotations: ProcessedTestItemAnnotations = {
         end: Array.from(endMap.values()),
@@ -87,9 +85,13 @@ export const TestItemsCache = createSingleEntryCache<
       // * a path name
       // * 0 or more describe() block titles
       // * an it() block title
+      //
+      // HACK For some tests (Playwright ones at least) the Path only contains the first 3 entries (no title)
       const [_, runtime, filePath, ...scopePath] = path;
-      const title = scopePath.pop();
-      assert(title === testItem.title, "Test item title does not match path");
+      if (scopePath.length > 0) {
+        const title = scopePath.pop();
+        assert(title === testItem.title, "Test item title does not match path");
+      }
 
       const sections = createSections(
         relativeStartTime,

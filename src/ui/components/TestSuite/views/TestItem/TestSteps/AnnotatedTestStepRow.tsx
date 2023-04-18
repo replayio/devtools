@@ -53,14 +53,14 @@ export default memo(function AnnotatedTestStepRow({
           <Badge testStep={testStep} position={position} />
         </Suspense>
       )}
-      {position === "current" && (
+      {position === "current" && annotations.start && (
         <div className={styles.JumpToCodeButton}>
           <JumpToCodeButton
             currentExecutionPoint={executionPoint}
             disabled={disabled}
             onClick={onClick}
             status="not_checked"
-            targetExecutionPoint={annotations.start!.point}
+            targetExecutionPoint={annotations.start.point}
           />
         </div>
       )}
