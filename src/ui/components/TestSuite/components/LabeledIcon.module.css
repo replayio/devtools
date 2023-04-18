@@ -1,0 +1,18 @@
+.LabeledIcon {
+  display: inline-flex;
+  align-items: center;
+  gap: 1ch;
+  overflow: hidden;
+}
+
+.Icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.Label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  white-space: nowrap;
+}

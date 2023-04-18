@@ -1,0 +1,66 @@
+.Header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--theme-border);
+}
+
+.SummaryRow {
+  width: 100%;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+}
+
+.Title {
+  flex: 1 1 auto;
+  font-size: var(--font-size-large);
+  color: var(--body-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  white-space: nowrap;
+}
+
+.ResultIconAndLabel {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+}
+
+.ResultIconAndLabel[data-status="failed"] {
+  color: var(--testsuites-error-icon-bgcolor);
+}
+.ResultIconAndLabel[data-status="passed"] {
+  color: var(--testsuites-success-color);
+}
+.ResultIconAndLabel[data-status="skipped"] {
+  color: var(--testsuites-skipped-color);
+}
+
+.Attributes {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  overflow: hidden;
+  gap: 0.25rem;
+}
+
+.Attribute {
+  margin-right: 1ch;
+}
+.Attribute:last-of-type {
+  margin-right: 0;
+}
+
+.TreeContainer {
+  flex: 0 1 auto;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  gap: 0.5rem;
+}

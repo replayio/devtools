@@ -1,0 +1,47 @@
+.Row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  gap: 1ch;
+  font-family: var(--font-family-monospace);
+  cursor: pointer;
+  transition: opacity 0.18s ease-out;
+  border-left: 2px solid transparent;
+  background-color: var(--row-background-color);
+  color: var(--row-color);
+}
+.Row:hover {
+  background-color: var(--row-background-color-hover);
+}
+.Row[data-is-pending] {
+  opacity: 0.5;
+}
+.Row,
+.Row[data-status="success"] {
+  --row-background-color: var(--testsuites-steps-bgcolor);
+  --row-background-color-hover: var(--testsuites-steps-bgcolor-hover);
+  --row-color: var(--color-default);
+}
+.Row[data-status="error"] {
+  --border-left-color: var(--testsuites-error-border-color);
+  --row-background-color: var(--testsuites-error-bgcolor-hover);
+  --row-background-color-hover: var(--testsuites-error-bgcolor-hover);
+  --row-color: var(--testsuites-error-color);
+}
+.Row[data-status="success"][data-position="before"],
+.Row[data-type="navigation"][data-position="before"],
+.Row[data-type="network"][data-position="before"] {
+  --border-left-color: var(--primary-accent);
+}
+.Row[data-status="success"][data-position="current"],
+.Row[data-type="navigation"][data-position="current"],
+.Row[data-type="network"][data-position="current"] {
+  --border-left-color: var(--primary-accent);
+  --row-background-color: var(--testsuites-active-bgcolor);
+  --row-background-color-hover: var(--testsuites-active-bgcolor);
+}
+
+.Row[data-position="before"],
+.Row[data-position="current"] {
+  border-left-color: var(--border-left-color);
+}

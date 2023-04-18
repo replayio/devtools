@@ -1,7 +1,7 @@
 import { RefObject, useState } from "react";
 import { VariableSizeList as List } from "react-window";
 
-import useClassListObserver from "./useClassListObserver";
+import useClassListObserver from "../../../src/hooks/useClassListObserver";
 
 type Measurements = {
   lineHeight: number;

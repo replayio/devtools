@@ -1,0 +1,23 @@
+.SuccessIcon {
+  background-color: var(--testsuites-success-color);
+}
+
+.SuccessText {
+  color: var(--testsuites-success-color);
+}
+
+.ErrorIcon {
+  background-color: var(--testsuites-error-icon-bgcolor);
+}
+
+.ErrorText {
+  color: var(--testsuites-error-color);
+}
+
+.SkippedIcon {
+  background-color: var(--testsuites-skipped-color);
+}
+
+.SkippedText {
+  color: var(--testsuites-skipped-color);
+}

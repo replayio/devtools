@@ -1,0 +1,18 @@
+.Tree {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.Tree[data-nested] {
+  padding-left: 0.75rem;
+}
+
+.List {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-left: 0.75rem;
+}
+
+.Scope {
+}

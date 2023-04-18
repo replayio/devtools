@@ -1,6 +1,5 @@
 import {
   ExecutionPoint,
-  FocusWindowRequest as FocusWindow,
   FocusWindowRequestBias,
   PauseId,
   ScreenShot,
@@ -32,7 +31,6 @@ import { waitForTime } from "protocol/utils";
 import { pointsBoundingTimeCache } from "replay-next/src/suspense/ExecutionPointsCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { getFirstComment } from "ui/hooks/comments/comments";
-import { mayClearSelectedStep } from "ui/reducers/reporter";
 import {
   getCurrentTime,
   getFocusRegion,
@@ -48,7 +46,6 @@ import {
   setFocusRegion,
   setPlaybackPrecachedTime,
 } from "ui/reducers/timeline";
-import { UIState } from "ui/state";
 import { FocusRegion, HoveredItem, PlaybackOptions, TimeRange } from "ui/state/timeline";
 import {
   encodeObjectToURL,
@@ -59,7 +56,6 @@ import {
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
-import { ThunkExtraArgs } from "ui/utils/thunk";
 import { rangeForFocusRegion } from "ui/utils/timeline";
 
 import {
@@ -259,7 +255,6 @@ export function seek(
   pauseId?: PauseId
 ): UIThunkAction<boolean> {
   return (dispatch, getState, { ThreadFront }) => {
-    dispatch(mayClearSelectedStep({ point, time }));
     dispatch(framePositionsCleared());
     if (pauseId) {
       ThreadFront.timeWarpToPause({ point, time, pauseId }, openSource);

@@ -6,12 +6,13 @@ import Accordion from "devtools/client/debugger/src/components/shared/Accordion"
 import LazyOffscreen from "replay-next/components/LazyOffscreen";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import Events from "ui/components/Events";
-import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
 import SearchFilesReduxAdapter from "ui/components/SearchFilesReduxAdapter";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import TestSuitePanel from "ui/components/TestSuite";
+import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 import hooks from "ui/hooks";
+import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
-import { useTestInfo } from "ui/hooks/useTestInfo";
 import { getFilteredEventsForFocusRegion } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { getViewMode } from "ui/reducers/layout";
@@ -26,18 +27,19 @@ import Passport from "./Passport/Passport";
 import ProtocolViewer from "./ProtocolViewer";
 import { ReactPanel } from "./ReactPanel";
 import StatusDropdown from "./shared/StatusDropdown";
-import { TestSuitePanel } from "./TestSuitePanel";
 import Tour from "./Tour/Tour";
 import styles from "src/ui/components/SidePanel.module.css";
 
 function useInitialPrimaryPanel() {
   const dispatch = useAppDispatch();
   const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
-  const info = useTestInfo();
+  const recordingId = useGetRecordingId();
+  const { recording } = useGetRecording(recordingId);
 
   const { nags } = hooks.useGetUserInfo();
   const showTour = shouldShowTour(nags);
-  const initialPrimaryPanel = info.isTestSuiteReplay ? "cypress" : showTour ? "tour" : "events";
+  const initialPrimaryPanel =
+    recording && isTestSuiteReplay(recording) ? "cypress" : showTour ? "tour" : "events";
 
   useEffect(() => {
     if (selectedPrimaryPanel == null) {
@@ -57,9 +59,6 @@ export default function SidePanel() {
   const { isAuthenticated } = useAuth0();
   const viewMode = useAppSelector(getViewMode);
   const { nags } = hooks.useGetUserInfo();
-  const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
-  const dispatch = useAppDispatch();
-  const dismissNag = hooks.useDismissNag();
 
   const launchQuickstart = (url: string) => {
     window.open(url, "_blank");
@@ -92,11 +91,13 @@ export default function SidePanel() {
     });
   }
 
-  const info = useTestInfo();
+  const recordingId = useGetRecordingId();
+  const { recording } = useGetRecording(recordingId);
+  const testSuite = recording && isTestSuiteReplay(recording);
 
   return (
     <div className="flex w-full flex-col gap-2">
-      {!isAuthenticated && !info.isTestSuiteReplay && (
+      {!isAuthenticated && !testSuite && (
         <div className={styles.TourBox}>
           <h2>Welcome to Replay!</h2>
           <p>Just getting started with time travel debugging? Check out our docs!</p>
@@ -112,7 +113,7 @@ export default function SidePanel() {
         </div>
       )}
 
-      {!isAuthenticated && info.isTestSuiteReplay && (
+      {!isAuthenticated && testSuite && (
         <div className={styles.TourBox}>
           <h2>Welcome! 👋</h2>
           <p>We've written some docs to get the most out of Replay test suites. Check them out!</p>

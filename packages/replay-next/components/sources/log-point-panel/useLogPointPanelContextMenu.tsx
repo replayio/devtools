@@ -43,7 +43,9 @@ export default function useLogPointPanelContextMenu({
           time: duration,
         },
       },
-      true
+      {
+        debounce: true,
+      }
     );
   };
 
@@ -60,7 +62,7 @@ export default function useLogPointPanelContextMenu({
         },
         end: currentHitPoint,
       },
-      true
+      { debounce: true }
     );
   };
 

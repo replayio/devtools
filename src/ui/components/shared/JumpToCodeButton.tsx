@@ -14,16 +14,18 @@ export const errorMessages: Record<JumpToCodeFailureReason, string> = {
 };
 
 interface JumpToCodeButtonProps {
-  status: JumpToCodeStatus;
-  onClick: () => void;
   currentExecutionPoint: ExecutionPoint | null;
+  disabled?: boolean;
+  onClick: () => void;
+  status: JumpToCodeStatus;
   targetExecutionPoint: ExecutionPoint;
 }
 
 export function JumpToCodeButton({
-  status,
-  onClick,
   currentExecutionPoint,
+  disabled = false,
+  onClick,
+  status,
   targetExecutionPoint,
 }: JumpToCodeButtonProps) {
   const [isHovered, setIsHovered] = useState(false);
@@ -37,6 +39,7 @@ export function JumpToCodeButton({
       "bg-gray-400 ": !jumpToCodeButtonAvailable,
       "px-2 shadow-sm": isHovered,
       "w-6": !isHovered,
+      "opacity-5": disabled,
     }
   );
 
