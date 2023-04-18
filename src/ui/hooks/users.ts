@@ -86,6 +86,7 @@ export enum Nag {
   QUICK_OPEN_FILE = "quick_open_file",
   RECORD_REPLAY = "record_replay",
   SEARCH_SOURCE_TEXT = "search_source_text",
+  SHARE = "share",
   USE_FOCUS_MODE = "use_focus_mode",
   VIEW_DEVTOOLS = "view_devtools",
 }

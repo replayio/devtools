@@ -84,6 +84,10 @@ export function shouldShowSearchSourceText(nags: Nag[]): boolean {
   return shouldShowNag(nags, Nag.SEARCH_SOURCE_TEXT);
 }
 
+export function shouldShowShareNag(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.SHARE);
+}
+
 export function shouldShowQuickOpenFile(nags: Nag[]): boolean {
   return shouldShowNag(nags, Nag.QUICK_OPEN_FILE);
 }

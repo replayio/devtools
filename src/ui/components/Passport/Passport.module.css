@@ -1,12 +1,13 @@
 .PassportBoxWrapper {
   position: relative;
+  background-color: powderblue;
   background-image: url(/images/passport/passportBG.png);
   background-repeat: repeat; /* Add this line */
   height: 100vh;
 }
 
 .PassportBox {
-  color: #2177cf;
+  color: #4584e1;
   padding: 0.5rem;
   height: 100%;
 }
@@ -16,16 +17,20 @@
   flex-direction: row;
 }
 
+.sectionsContainer {
+  width: 100%;
+}
+
 .checklist {
-  border-top: 1px solid #07115b27;
-  padding-top: 20px;
+  padding: 6px 0 12px;
   font-size: 16px;
   height: 100%;
   flex: 1;
   overflow-y: auto;
 }
 
-.checklist div {
+.checklistItem,
+.headerItem {
   display: flex;
   align-items: center;
   padding: 0.2rem;
@@ -35,12 +40,21 @@
   z-index: 1000;
 }
 
-.checklistItem {
-  z-index: 1000;
+.checklistItem:hover {
+  background-color: rgba(63, 150, 238, 0.15);
+  cursor: pointer;
 }
 
-.checklist div.selectedItem,
-.checklist div.selectedItem:hover {
+.headerItem {
+  font-weight: 600;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.checklistItem.selectedItem,
+.checklistItem.selectedItem:hover {
   background-color: rgba(63, 150, 238, 0.4);
   z-index: 1000;
 }
@@ -81,4 +95,14 @@
   height: calc(100%);
   overflow-y: auto;
   width: 100%;
+}
+
+.stepIcon {
+  display: inline-block;
+  vertical-align: middle;
+  /* Add other properties as needed */
+}
+
+.ml2 {
+  margin-left: 0.5rem;
 }
