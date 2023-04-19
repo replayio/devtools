@@ -90,8 +90,8 @@ function getRecordingCapabilities(buildId: string) {
         supportsEagerEvaluation: false,
         supportsElementsInspector: false,
         supportsEventTypes: false,
-        supportsNetworkRequests: false,
-        supportsRepaintingGraphics: false,
+        supportsNetworkRequests: true,
+        supportsRepaintingGraphics: true,
         supportsPureEvaluation: false,
       };
     }
