@@ -80,7 +80,12 @@ const Tour: React.FC = () => {
     <div className={styles.intro}>
       <div className={styles.h1}>Time travel 🚀</div>
       <p>In DevTools, look underneath the video to find the Replay console.</p>
-      <p>Hover over the console and you’ll see a fast-forward button. Click it to time travel!</p>
+      <p>
+        Hover over the console and you’ll see fast-forward and rewind buttons appear on the left.
+      </p>
+      <p>
+        <em>Click on one to time travel!</em>
+      </p>
     </div>
   );
 
