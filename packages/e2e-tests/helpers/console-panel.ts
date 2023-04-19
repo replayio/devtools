@@ -321,19 +321,12 @@ export async function verifyEvaluationResult(
 export async function verifyExpectedCount(locator: Locator, expectedCount?: number) {
   if (expectedCount != null) {
     // Verify a specific number of messages
-    await waitFor(
-      async () => {
-        const count = await locator.count();
-        if (count !== expectedCount) {
-          throw `Expected ${expectedCount} messages, but found ${count}`;
-        }
-      },
-      {
-        // For console log points, it can take quite a while for the messages to finish
-        // eval-ing their expressions, so this needs to be much longer than in production.
-        timeout: process.env.BACKEND_CI ? 60_000 : undefined,
+    await waitFor(async () => {
+      const count = await locator.count();
+      if (count !== expectedCount) {
+        throw `Expected ${expectedCount} messages, but found ${count}`;
       }
-    );
+    });
   } else {
     // Or just verify that there was at least one
     const message = locator.first();
