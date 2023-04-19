@@ -78,7 +78,7 @@ const Tour: React.FC = () => {
                   {viewMode === "non-dev" ? (
                     <>
                       <div className={styles.h1}>Oh, hi again!</div>
-                      <p>To continue, please click the DevTools toggle at the top left.</p>
+                      <p>To continue, please click the DevTools toggle at the top right.</p>
                     </>
                   ) : (
                     <>
@@ -134,7 +134,7 @@ const Tour: React.FC = () => {
                                   dismissTourNag();
                                 }, 2500);
                               }}
-                              className="hover:cursor-hand z-100 relative whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg hover:bg-blue-50"
+                              className="hover:cursor-hand relative whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg hover:bg-blue-50"
                             >
                               Thanks!
                             </a>
@@ -160,7 +160,7 @@ const Tour: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="absolute bottom-28 z-10 p-3">
+      <div className="absolute bottom-28 p-3">
         {isNewUser || viewMode === "non-dev" ? (
           <div className="relative -bottom-3">
             <img src="/images/illustrations/larry_wave.png" className="z-1 w-full" />
