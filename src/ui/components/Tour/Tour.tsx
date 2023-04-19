@@ -3,18 +3,18 @@ import React, { useState } from "react";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
 import Confetti from "ui/components/shared//Confetti";
+import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 import hooks from "ui/hooks";
+import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
 import { Nag } from "ui/hooks/users";
 import { useDismissNag } from "ui/hooks/users";
-import { useTestInfo } from "ui/hooks/useTestInfo";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import {
   shouldShowBreakpointAdd,
   shouldShowBreakpointEdit,
   shouldShowConsoleNavigate,
-  shouldShowTour,
 } from "ui/utils/onboarding";
 
 import styles from "./Tour.module.css";
@@ -44,14 +44,14 @@ const Tour: React.FC = () => {
 
   const [showConfetti, setShowConfetti] = useState(false);
 
-  const info = useTestInfo();
-
   const isNewUser =
     showDevtoolsNag && showConsoleNavigate && showBreakpointAdd && showBreakpointEdit;
   const hasCompletedTour =
     !showDevtoolsNag && !showConsoleNavigate && !showBreakpointAdd && !showBreakpointEdit;
 
-  const typeOfReplay = info.isTestSuiteReplay ? "cypress" : "events";
+  const recordingId = useGetRecordingId();
+  const { recording } = useGetRecording(recordingId);
+  const typeOfReplay = recording && isTestSuiteReplay(recording) ? "cypress" : "events";
 
   const { dismissTourNag } = useNagDismissal();
 
