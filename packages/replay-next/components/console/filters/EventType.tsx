@@ -1,10 +1,5 @@
-import { MouseEvent, useCallback, useContext, useMemo, useSyncExternalStore } from "react";
-import {
-  STATUS_NOT_FOUND,
-  STATUS_PENDING,
-  STATUS_REJECTED,
-  useIntervalCacheStatus,
-} from "suspense";
+import { MouseEvent, useContext } from "react";
+import { STATUS_PENDING, STATUS_REJECTED, useIntervalCacheStatus } from "suspense";
 
 import { Badge, Checkbox } from "design";
 import Icon from "replay-next/components/Icon";
