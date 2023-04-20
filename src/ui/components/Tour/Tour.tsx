@@ -2,7 +2,6 @@ import React, { useState } from "react";
 
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
-import Confetti from "ui/components/shared//Confetti";
 import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
@@ -145,11 +144,7 @@ const Tour: React.FC = () => {
     <img src="https://vercel.replay.io/tour/editlogs.gif" className={styles.videoExample} />
   );
 
-  const CompletedTour: React.FC<CompletedTourProps> = ({
-    setShowConfetti,
-    setShowPassport,
-    dismissTourNag,
-  }) => (
+  const CompletedTour: React.FC<CompletedTourProps> = ({ setShowPassport, dismissTourNag }) => (
     <div className={styles.intro}>
       <div className={styles.h1}>Check the console! 😎</div>
       <p>Take a look at the console.</p>
@@ -163,10 +158,8 @@ const Tour: React.FC = () => {
           href="#"
           onClick={e => {
             e.stopPropagation();
-            setShowConfetti(true);
             setShowPassport(true);
             setTimeout(() => {
-              setShowConfetti(false);
               dismissTourNag();
             }, 2500);
           }}
@@ -174,7 +167,6 @@ const Tour: React.FC = () => {
         >
           Thanks!
         </a>
-        {showConfetti ? <Confetti /> : null}
       </p>
       <img
         src={`/images/passport/tour_grad-default.png`}
@@ -214,7 +206,6 @@ const Tour: React.FC = () => {
                     {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && editLogs}
                     {hasCompletedTour && (
                       <CompletedTour
-                        setShowConfetti={setShowConfetti}
                         setShowPassport={setShowPassport}
                         dismissTourNag={dismissTourNag}
                       />
