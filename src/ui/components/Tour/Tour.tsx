@@ -40,7 +40,6 @@ interface HelloAgainProps {
 }
 
 interface CompletedTourProps {
-  setShowConfetti: React.Dispatch<React.SetStateAction<boolean>>;
   setShowPassport: (newValue: boolean) => void;
   dismissTourNag: () => void;
 }
@@ -54,8 +53,6 @@ const Tour: React.FC = () => {
   const showConsoleNavigate = shouldShowConsoleNavigate(nags);
   const showBreakpointAdd = shouldShowBreakpointAdd(nags);
   const showBreakpointEdit = shouldShowBreakpointEdit(nags);
-
-  const [showConfetti, setShowConfetti] = useState(false);
 
   const isNewUser =
     showDevtoolsNag && showConsoleNavigate && showBreakpointAdd && showBreakpointEdit;
