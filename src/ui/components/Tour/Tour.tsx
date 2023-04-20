@@ -69,7 +69,7 @@ const Tour: React.FC = () => {
 
   const { dismissTourNag } = useNagDismissal();
 
-  const Intro: React.FC<IntroProps> = ({ typeOfReplay }) => (
+  const intro = (
     <div className={styles.intro}>
       <p className={styles.h1}>Hello and welcome!</p>
       {typeOfReplay === "events" ? (
@@ -83,14 +83,14 @@ const Tour: React.FC = () => {
     </div>
   );
 
-  const HelloAgain: React.FC<HelloAgainProps> = ({ typeOfReplay }) => (
+  const helloAgain = (
     <div className={styles.intro}>
       <p className={styles.h1}>Hello again!</p>
       <p>To continue, please click the DevTools toggle at the top right.</p>
     </div>
   );
 
-  const TimeTravel = () => (
+  const timeTravel = (
     <div className={styles.intro}>
       <div className={styles.h1}>Time travel 🚀</div>
       <p>In DevTools, look underneath the video to find the Replay console.</p>
@@ -107,14 +107,7 @@ const Tour: React.FC = () => {
     <img src="https://vercel.replay.io/tour/fast-forward.gif" className={styles.videoExample} />
   );
 
-  const SkippedTimeTravel = () => (
-    <div className={styles.intro}>
-      <div className={styles.h1}>You skipped Time Travel</div>
-      <p>To continue, please use the fast-forward or rewind buttons in the Replay console.</p>
-    </div>
-  );
-
-  const OneClickLogs = () => (
+  const oneClickLogs = (
     <div className={styles.intro}>
       <div className={styles.h1}>
         One-click logs
@@ -138,9 +131,9 @@ const Tour: React.FC = () => {
     <img src="https://vercel.replay.io/tour/addlogs.gif" className={styles.videoExample} />
   );
 
-  const EditLogs = () => (
+  const editLogs = (
     <div className={styles.intro}>
-      <div className={styles.h1}>One-click logs 🦄</div>
+      <div className={styles.h1}>Pass anything! 🦄</div>
       <p>You can pass anything you want into print statements, including objects and variables.</p>
       <p>
         <em>Type something, then hit enter or click the check button.</em>
@@ -158,7 +151,7 @@ const Tour: React.FC = () => {
     dismissTourNag,
   }) => (
     <div className={styles.intro}>
-      <div className={styles.h1}>Check it out!</div>
+      <div className={styles.h1}>Check the console! 😎</div>
       <p>Take a look at the console.</p>
       <p>
         Replay just re-ran your recording and retroactively added your print statement each time
@@ -206,20 +199,19 @@ const Tour: React.FC = () => {
         <div className={styles.TourBox}>
           <div className="p-2 pt-3">
             {isNewUser ? (
-              <Intro typeOfReplay={typeOfReplay} />
+              intro
             ) : (
               <>
                 {viewMode === "non-dev" ? (
-                  <HelloAgain typeOfReplay={typeOfReplay} />
+                  helloAgain
                 ) : (
                   <>
-                    {showConsoleNavigate && <TimeTravel />}
-                    {!showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
-                      <OneClickLogs />
-                    )}
-                    {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && (
-                      <EditLogs />
-                    )}
+                    {showConsoleNavigate && timeTravel}
+                    {!showConsoleNavigate &&
+                      showBreakpointAdd &&
+                      showBreakpointEdit &&
+                      oneClickLogs}
+                    {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && editLogs}
                     {hasCompletedTour && (
                       <CompletedTour
                         setShowConfetti={setShowConfetti}
