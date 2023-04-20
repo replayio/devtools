@@ -128,7 +128,9 @@ const Tour: React.FC = () => {
         Now a file should be open in the Source Viewer. (If not, you can open a file by pressing
         command-P or clicking Sources Explorer from the left-nav)
       </p>
-      <p>Click the plus button on a line of code to set a print statement.</p>
+      <p>
+        <em>Click the plus button on a line of code to set a print statement.</em>
+      </p>
     </div>
   );
 
