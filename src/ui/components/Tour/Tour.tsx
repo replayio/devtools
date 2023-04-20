@@ -93,6 +93,13 @@ const Tour: React.FC = () => {
     <img src="https://vercel.replay.io/tour/fast-forward.gif" className={styles.videoExample} />
   );
 
+  const SkippedTimeTravel = () => (
+    <div className={styles.intro}>
+      <div className={styles.h1}>You skipped Time Travel</div>
+      <p>To continue, please use the fast-forward or rewind buttons in the Replay console.</p>
+    </div>
+  );
+
   const OneClickLogs = () => (
     <div className={styles.intro}>
       <div className={styles.h1}>
@@ -118,7 +125,7 @@ const Tour: React.FC = () => {
   const EditLogs = () => (
     <div className={styles.intro}>
       <div className={styles.h1}>One-click logs 🦄</div>
-      <p>You can pass anything you want here, including objects and variables.</p>
+      <p>You can pass anything you want into print statements, including objects and variables.</p>
       <p>
         <em>Type something, then hit enter or click the check button.</em>
       </p>
@@ -186,9 +193,7 @@ const Tour: React.FC = () => {
                   <HelloAgain typeOfReplay={typeOfReplay} />
                 ) : (
                   <>
-                    {showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
-                      <TimeTravel />
-                    )}
+                    {showConsoleNavigate && <TimeTravel />}
                     {!showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && (
                       <OneClickLogs />
                     )}
