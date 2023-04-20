@@ -11,7 +11,7 @@ export function command(cx: ThreadContext, type: ValidCommand): UIThunkAction {
     if (!type) {
       return;
     }
-    dispatch(executeCommandOperation({ cx, command: type }));
+    await dispatch(executeCommandOperation({ cx, command: type }));
   };
 }
 

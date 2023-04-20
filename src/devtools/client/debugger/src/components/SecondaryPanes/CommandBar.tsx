@@ -2,7 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import React, { Suspense, useContext, useDeferredValue, useEffect } from "react";
+import { FrameId, PauseId } from "@replayio/protocol";
+import React, { Suspense, useContext, useDeferredValue, useEffect, useState } from "react";
 
 import actions from "devtools/client/debugger/src/actions/index";
 import CommandBarButton from "devtools/client/debugger/src/components/shared/Button/CommandBarButton";
@@ -71,10 +72,11 @@ function formatKey(action: string) {
   return formatKeyShortcut(key);
 }
 
-function useFramesAndFrameSteps() {
+function useFramesAndFrameSteps(
+  selectedFrameId: FrameId | undefined,
+  selectedPauseId: PauseId | undefined
+) {
   const replayClient = useContext(ReplayClientContext);
-  const { frameId: selectedFrameId, pauseId: selectedPauseId } =
-    useAppSelector(getSelectedFrameId) ?? {};
 
   // This hook fetches Frames and frame-steps using Suspense.
   // Each time the current Pause ID or Frame ID changes,
@@ -112,7 +114,12 @@ export default function CommandBar() {
 function CommandBarSuspends() {
   const cx = useAppSelector(getThreadContext);
 
-  const { frames, frameSteps } = useFramesAndFrameSteps();
+  const [disableRewindResume, setDisableRewindResume] = useState(false);
+
+  const { frameId: selectedFrameId, pauseId: selectedPauseId } =
+    useAppSelector(getSelectedFrameId) ?? {};
+
+  const { frames, frameSteps } = useFramesAndFrameSteps(selectedFrameId, selectedPauseId);
 
   const dispatch = useAppDispatch();
 
@@ -155,13 +162,17 @@ function CommandBarSuspends() {
     ? "Stepping is disabled until you're paused at a point"
     : "Stepping is disabled because there are too many steps in the current frame";
 
-  function onRewind() {
+  async function onRewind() {
     trackEvent("debugger.rewind");
-    dispatch(actions.rewind(cx));
+    setDisableRewindResume(true);
+    await dispatch(actions.rewind(cx));
+    setDisableRewindResume(false);
   }
-  function onResume() {
+  async function onResume() {
     trackEvent("debugger.resume");
-    dispatch(actions.resume(cx));
+    setDisableRewindResume(true);
+    await dispatch(actions.resume(cx));
+    setDisableRewindResume(false);
   }
   function onReverseStepOver() {
     trackEvent("debugger.reverse_step_over");
@@ -183,14 +194,14 @@ function CommandBarSuspends() {
   return (
     <div className="command-bar">
       <CommandBarButton
-        disabled={disabled}
+        disabled={disableRewindResume}
         key="rewind"
         onClick={onRewind}
         tooltip="Rewind Execution"
         type="rewind"
       />
       <CommandBarButton
-        disabled={disabled}
+        disabled={disableRewindResume}
         key="resume"
         onClick={onResume}
         tooltip={`Resume ${formatKey("resume")}`}
