@@ -27,9 +27,39 @@ export default function FilterToggles() {
     showWarnings,
     update,
   } = useContext(ConsoleFiltersContext);
-
+  const { trackEvent } = useContext(SessionContext);
   const replayClient = useContext(ReplayClientContext);
   const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
+
+  const onShowErrorsChange = (showErrors: boolean) => {
+    trackEvent("console.settings.toggle_errors");
+    update({ showErrors });
+  };
+
+  const onShowExceptionsChange = (showExceptions: boolean) => {
+    trackEvent("console.settings.toggle_log_exceptions");
+    update({ showExceptions });
+  };
+
+  const onShowLogsChange = (showLogs: boolean) => {
+    trackEvent("console.settings.toggle_logs");
+    update({ showLogs });
+  };
+
+  const onShowNodeModulesChange = (showNodeModules: boolean) => {
+    trackEvent("console.settings.toggle_node_modules");
+    update({ showNodeModules });
+  };
+
+  const onShowTimestampsChange = (showTimestamps: boolean) => {
+    trackEvent("console.settings.toggle_timestamp");
+    update({ showTimestamps });
+  };
+
+  const onShowWarningsChange = (showWarnings: boolean) => {
+    trackEvent("console.settings.toggle_warnings");
+    update({ showWarnings });
+  };
 
   return (
     <div className={styles.Filters} data-test-id="ConsoleFilterToggles">
@@ -41,7 +71,7 @@ export default function FilterToggles() {
         }
         checked={showExceptions}
         label="Exceptions"
-        onChange={showExceptions => update({ showExceptions })}
+        onChange={onShowExceptionsChange}
       />
       <Toggle
         afterContent={
@@ -51,7 +81,7 @@ export default function FilterToggles() {
         }
         checked={showLogs}
         label="Logs"
-        onChange={showLogs => update({ showLogs })}
+        onChange={onShowLogsChange}
       />
       <Toggle
         afterContent={
@@ -61,7 +91,7 @@ export default function FilterToggles() {
         }
         checked={showWarnings}
         label="Warnings"
-        onChange={showWarnings => update({ showWarnings })}
+        onChange={onShowWarningsChange}
       />
       <Toggle
         afterContent={
@@ -71,7 +101,7 @@ export default function FilterToggles() {
         }
         checked={showErrors}
         label="Errors"
-        onChange={showErrors => update({ showErrors })}
+        onChange={onShowErrorsChange}
       />
       {recordingCapabilities.supportsEventTypes && (
         <>
@@ -90,13 +120,9 @@ export default function FilterToggles() {
         }
         checked={showNodeModules}
         label="Node modules"
-        onChange={showNodeModules => update({ showNodeModules })}
+        onChange={onShowNodeModulesChange}
       />
-      <Toggle
-        checked={showTimestamps}
-        label="Timestamps"
-        onChange={showTimestamps => update({ showTimestamps })}
-      />
+      <Toggle checked={showTimestamps} label="Timestamps" onChange={onShowTimestampsChange} />
     </div>
   );
 }

@@ -11,6 +11,7 @@ import { STATUS_RESOLVED, useCacheStatus } from "suspense";
 
 import Loader from "replay-next/components/Loader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { eventCountsCache } from "replay-next/src/suspense/EventsCache";
 import type { EventCategory as EventCategoryType } from "replay-next/src/suspense/EventsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -19,11 +20,15 @@ import EventCategory from "./EventCategory";
 import styles from "./EventsList.module.css";
 
 export default function EventsList() {
+  const { trackEvent } = useContext(SessionContext);
+
   const [filterByDisplayText, setFilterByDisplayText] = useState("");
   const [filterByText, setFilterByText] = useState("");
   const [isPending, startTransition] = useTransition();
 
   const onFilterTextChange = (event: ChangeEvent<HTMLInputElement>) => {
+    trackEvent("console.events.search");
+
     const newFilterByText = event.currentTarget.value;
     setFilterByDisplayText(newFilterByText);
     startTransition(() => {
@@ -58,6 +63,8 @@ function EventsListCategories({
 }) {
   const client = useContext(ReplayClientContext);
   const { range } = useContext(FocusContext);
+  const { trackEvent } = useContext(SessionContext);
+
   const pointRange = range ? { begin: range.begin.point, end: range.end.point } : null;
   const eventCategoryCounts = eventCountsCache.read(client, pointRange);
 
@@ -107,7 +114,10 @@ function EventsListCategories({
           disabled={disabled}
           eventCategory={eventCategory}
           filterByText={filterByText}
-          onChange={expanded => toggleExpanded(eventCategory.category, expanded)}
+          onChange={expanded => {
+            trackEvent("console.events.category_toggle");
+            toggleExpanded(eventCategory.category, expanded);
+          }}
         />
       ))}
       <div className={styles.Header}>Other Events</div>
@@ -118,7 +128,10 @@ function EventsListCategories({
           disabled={disabled}
           eventCategory={eventCategory}
           filterByText={filterByText}
-          onChange={expanded => toggleExpanded(eventCategory.category, expanded)}
+          onChange={expanded => {
+            trackEvent("console.events.category_toggle");
+            toggleExpanded(eventCategory.category, expanded);
+          }}
         />
       ))}
     </>

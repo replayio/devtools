@@ -1,5 +1,7 @@
 import { MutableRefObject, useContext, useState } from "react";
 
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
+
 import Icon from "../Icon";
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
 import styles from "./ConsoleSearch.module.css";
@@ -14,10 +16,12 @@ export default function ConsoleSearch({
   searchInputRef: MutableRefObject<HTMLInputElement | null>;
 }) {
   const [searchState, searchActions] = useContext(ConsoleSearchContext);
+  const { trackEvent } = useContext(SessionContext);
 
   const [inputFocused, setInputFocused] = useState(false);
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    trackEvent("console.search.start");
     searchActions.search(event.currentTarget.value);
   };
 
