@@ -182,8 +182,15 @@ function CommandBarSuspends() {
 
   return (
     <div className="command-bar">
-      <CommandBarButton key="rewind" onClick={onRewind} tooltip="Rewind Execution" type="rewind" />
       <CommandBarButton
+        disabled={disabled}
+        key="rewind"
+        onClick={onRewind}
+        tooltip="Rewind Execution"
+        type="rewind"
+      />
+      <CommandBarButton
+        disabled={disabled}
         key="resume"
         onClick={onResume}
         tooltip={`Resume ${formatKey("resume")}`}
