@@ -1,6 +1,6 @@
 import { Location, PointRange, TimeStampedPoint } from "@replayio/protocol";
 import { ExecutionPoint } from "@replayio/protocol";
-import { createIntervalCache, isPromiseLike } from "suspense";
+import { isPromiseLike } from "suspense";
 
 import { compareNumericStrings } from "protocol/utils";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
@@ -13,10 +13,11 @@ import {
 } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 
+import { createFocusIntervalCache } from "./FocusIntervalCache";
 import { mappedExpressionCache } from "./MappedExpressionCache";
 import { cachePauseData, setPointAndTimeForPauseId } from "./PauseCache";
 
-export const hitPointsCache = createIntervalCache<
+export const hitPointsCache = createFocusIntervalCache<
   ExecutionPoint,
   [replayClient: ReplayClientInterface, location: Location, condition: string | null],
   TimeStampedPoint

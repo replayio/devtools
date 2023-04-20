@@ -1,10 +1,12 @@
 import { ExecutionPoint, PauseId, PointDescription, TimeStampedPoint } from "@replayio/protocol";
 import { PointSelector, Value } from "@replayio/protocol";
-import { Cache, IntervalCache, createExternallyManagedCache, createIntervalCache } from "suspense";
+import { Cache, IntervalCache, createExternallyManagedCache } from "suspense";
 
 import { compareNumericStrings } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
+import { ProtocolError, isCommandError } from "shared/utils/error";
 
+import { createFocusIntervalCache } from "./FocusIntervalCache";
 import { objectPropertyCache } from "./ObjectPreviews";
 import { cachePauseData, setPointAndTimeForPauseId } from "./PauseCache";
 
@@ -60,7 +62,7 @@ export function createAnalysisCache<
     },
   });
 
-  const pointsIntervalCache = createIntervalCache<
+  const pointsIntervalCache = createFocusIntervalCache<
     ExecutionPoint,
     [client: ReplayClientInterface, ...params: TParams],
     TPoint
@@ -76,59 +78,66 @@ export function createAnalysisCache<
 
       const evaluationParams = await createEvaluationParams(client, points, ...params);
 
-      client.runEvaluation(
-        {
-          selector: evaluationParams.selector,
-          expression: evaluationParams.expression,
-          frameIndex: evaluationParams.frameIndex,
-          fullPropertyPreview: true,
-          limits: { begin, end },
-        },
-        async results => {
-          for (const result of results) {
-            setPointAndTimeForPauseId(result.pauseId, result.point);
-            cachePauseData(client, result.pauseId, result.data);
+      client
+        .runEvaluation(
+          {
+            selector: evaluationParams.selector,
+            expression: evaluationParams.expression,
+            frameIndex: evaluationParams.frameIndex,
+            fullPropertyPreview: true,
+            limits: { begin, end },
+          },
+          async results => {
+            for (const result of results) {
+              setPointAndTimeForPauseId(result.pauseId, result.point);
+              cachePauseData(client, result.pauseId, result.data);
 
-            let values: Value[] = [];
-            if (result.exception) {
-              values.push(result.exception);
-            } else if (result.returned?.object) {
-              const length =
-                (
-                  await objectPropertyCache.readAsync(
-                    client,
-                    result.pauseId,
-                    result.returned.object,
-                    "length"
-                  )
-                )?.value ?? 0;
-              const promises = [];
-              for (let i = 0; i < length; i++) {
-                promises.push(
-                  objectPropertyCache.readAsync(
-                    client,
-                    result.pauseId,
-                    result.returned.object,
-                    String(i)
-                  )
-                );
+              let values: Value[] = [];
+              if (result.exception) {
+                values.push(result.exception);
+              } else if (result.returned?.object) {
+                const length =
+                  (
+                    await objectPropertyCache.readAsync(
+                      client,
+                      result.pauseId,
+                      result.returned.object,
+                      "length"
+                    )
+                  )?.value ?? 0;
+                const promises = [];
+                for (let i = 0; i < length; i++) {
+                  promises.push(
+                    objectPropertyCache.readAsync(
+                      client,
+                      result.pauseId,
+                      result.returned.object,
+                      String(i)
+                    )
+                  );
+                }
+                values = (await Promise.all(promises)).filter(value => !!value) as Value[];
               }
-              values = (await Promise.all(promises)).filter(value => !!value) as Value[];
-            }
 
-            resultsCache.cache(
-              {
-                pauseId: result.pauseId,
-                point: result.point.point,
-                time: result.point.time,
-                values,
-              },
-              result.point.point,
-              ...params
-            );
+              resultsCache.cache(
+                {
+                  pauseId: result.pauseId,
+                  point: result.point.point,
+                  time: result.point.time,
+                  values,
+                },
+                result.point.point,
+                ...params
+              );
+            }
           }
-        }
-      );
+        )
+        .catch(error => {
+          if (isCommandError(error, ProtocolError.FocusWindowChange)) {
+            pointsIntervalCache.evict(client, ...params);
+          }
+          throw error;
+        });
 
       return points.map(point => transformPoint(point, ...params));
     },

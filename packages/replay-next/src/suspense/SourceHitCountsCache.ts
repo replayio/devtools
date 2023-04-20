@@ -1,11 +1,11 @@
 import { PointRange, SourceId, TimeStampedPointRange } from "@replayio/protocol";
-import { createIntervalCache } from "suspense";
 
 import { LineHitCounts, ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import { toPointRange } from "shared/utils/time";
 
 import { breakpointPositionsCache } from "./BreakpointPositionsCache";
+import { createFocusIntervalCache } from "./FocusIntervalCache";
 
 type MinMaxHitCountTuple = [minHitCount: number, maxHitCount: number];
 
@@ -21,7 +21,7 @@ function getKey(
   return focusRange ? `${sourceId}:${focusRange.begin}-${focusRange.end}` : sourceId;
 }
 
-export const sourceHitCountsCache = createIntervalCache<
+export const sourceHitCountsCache = createFocusIntervalCache<
   number,
   [replayClient: ReplayClientInterface, sourceId: SourceId, focusRange: PointRange | null],
   [number, LineHitCounts]
