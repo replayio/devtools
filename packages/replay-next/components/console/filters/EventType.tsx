@@ -7,6 +7,7 @@ import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersCo
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import useTooltip from "replay-next/src/hooks/useTooltip";
 import { Event, eventsCache } from "replay-next/src/suspense/EventsCache";
+import { MAX_POINTS_TO_RUN_EVALUATION } from "shared/client/ReplayClient";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import styles from "./EventType.module.css";
@@ -50,7 +51,7 @@ export default function EventType({
     event.stopPropagation();
   };
 
-  let showErrorBadge = false;
+  let showErrorBadge = checked && event.count > MAX_POINTS_TO_RUN_EVALUATION;
   let className = styles.EventType;
   switch (status) {
     case STATUS_PENDING:
