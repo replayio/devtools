@@ -2,16 +2,18 @@ import { ExecutionPoint, PointDescription, PointRange, PointSelector } from "@re
 import { EventHandlerType } from "@replayio/protocol";
 import isEmpty from "lodash/isEmpty";
 import without from "lodash/without";
-import { Cache, createCache, createIntervalCache } from "suspense";
+import { Cache, createCache } from "suspense";
 
 import { compareNumericStrings } from "protocol/utils";
 import { RecordingTarget, recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { ReplayClientInterface } from "shared/client/types";
+import { ProtocolError, isCommandError } from "shared/utils/error";
 
 import { STANDARD_EVENT_CATEGORIES } from "../constants";
 import { groupEntries } from "../utils/group";
 import { createInfallibleSuspenseCache } from "../utils/suspense";
 import { createAnalysisCache } from "./AnalysisCache";
+import { createFocusIntervalCache } from "./FocusIntervalCache";
 import { updateMappedLocation } from "./PauseCache";
 
 export type Event = {
@@ -45,13 +47,20 @@ export const eventCountsCache: Cache<
   debugLabel: "EventCounts",
   getKey: ([client, range]) => (range ? `${range.begin}:${range.end}` : ""),
   load: async ([client, range]) => {
-    const allEvents = await client.getAllEventHandlerCounts(range);
-    const recordingTarget = await recordingTargetCache.readAsync(client);
-    return countEvents(allEvents, recordingTarget);
+    try {
+      const allEvents = await client.getAllEventHandlerCounts(range);
+      const recordingTarget = await recordingTargetCache.readAsync(client);
+      return countEvents(allEvents, recordingTarget);
+    } catch (error) {
+      if (isCommandError(error, ProtocolError.FocusWindowChange)) {
+        eventCountsCache.abort(client, range);
+      }
+      throw error;
+    }
   },
 });
 
-export const eventPointsCache = createIntervalCache<
+export const eventPointsCache = createFocusIntervalCache<
   ExecutionPoint,
   [client: ReplayClientInterface, eventTypes: EventHandlerType[]],
   PointDescription

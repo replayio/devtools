@@ -20,6 +20,7 @@ export enum ProtocolError {
   SessionDestroyed = 66,
   TooManyLocationsToPerformAnalysis = 67,
   SessionCreationFailure = 72,
+  FocusWindowChange = 76,
 }
 
 export const commandError = (message: string, code: number): CommandError => {
