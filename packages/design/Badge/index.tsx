@@ -1,7 +1,17 @@
-import * as React from "react";
+import { ReactNode } from "react";
 
 import styles from "./Badge.module.css";
 
-export function Badge({ label }: { label: React.ReactNode }) {
-  return <div className={styles.Badge}>{label}</div>;
+export function Badge({
+  label,
+  showErrorBadge = false,
+}: {
+  label: ReactNode;
+  showErrorBadge?: boolean;
+}) {
+  return (
+    <div className={styles.Badge} data-error={showErrorBadge || undefined}>
+      {label}
+    </div>
+  );
 }

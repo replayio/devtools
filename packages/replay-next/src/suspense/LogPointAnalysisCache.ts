@@ -74,7 +74,7 @@ export function getLogPointAnalysisResultSuspense(
       values: localResult,
     };
   } else {
-    // the LoggablesContext doesn't call logPointAnalysisCache.pointsCache.read(Async)
+    // the LoggablesContext doesn't call logPointAnalysisCache.pointsIntervalCache.read(Async)
     // because it uses points from the HitPointsCache instead (which is more efficient
     // as it shares the points with other parts of the UI), so we call it here to ensure
     // that the analysis is run for the given range

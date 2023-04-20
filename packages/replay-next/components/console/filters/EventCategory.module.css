@@ -4,6 +4,9 @@
   grid-template-columns: auto min-content;
   gap: 0.25rem;
 }
+.Header[data-disabled] {
+  opacity: 0.5;
+}
 
 .HeaderWrapper {
   display: flex;

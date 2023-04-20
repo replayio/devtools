@@ -388,11 +388,7 @@ export class ReplayClient implements ReplayClientInterface {
       removeEventListener("Session.findPointsResults", onPoints);
     }
 
-    //TODO use pointPage.hasNext/hasPrevious when BAC-3052 is fixed
-    if (
-      (pointLimits.begin && result.pointPage.begin !== pointLimits.begin) ||
-      (pointLimits.end && result.pointPage.end !== pointLimits.end)
-    ) {
+    if (result.pointPage.hasPrevious || result.pointPage.hasNext) {
       throw commandError("Too many points", ProtocolError.TooManyPoints);
     }
 
@@ -889,11 +885,7 @@ export class ReplayClient implements ReplayClientInterface {
       removeEventListener("Session.runEvaluationResults", onResultsWrapper);
     }
 
-    //TODO use pointPage.hasNext/hasPrevious when BAC-3052 is fixed
-    if (
-      (pointLimits.begin && result.pointPage.begin !== pointLimits.begin) ||
-      (pointLimits.end && result.pointPage.end !== pointLimits.end)
-    ) {
+    if (result.pointPage.hasPrevious || result.pointPage.hasNext) {
       throw commandError("Too many points", ProtocolError.TooManyPoints);
     }
   }

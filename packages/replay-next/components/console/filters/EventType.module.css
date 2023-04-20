@@ -1,12 +1,21 @@
 .EventType,
-.EventTypeDisabled {
+.EventTypeDisabled,
+.EventTypePending,
+.EventTypeRejected {
   display: grid;
   grid-template-columns: min-content auto min-content;
   gap: 1ch;
   align-items: center;
+  transition: 200ms opacity;
 }
 .EventTypeDisabled {
   opacity: 0.5;
+}
+.EventTypePending {
+  opacity: 0.5;
+}
+.EventTypeRejected {
+  color: var(--color-error);
 }
 
 .Checkbox {
