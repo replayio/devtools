@@ -32,6 +32,20 @@ const useNagDismissal = () => {
   return { dismissTourNag };
 };
 
+interface IntroProps {
+  typeOfReplay: string;
+}
+
+interface HelloAgainProps {
+  typeOfReplay: string;
+}
+
+interface CompletedTourProps {
+  setShowConfetti: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowPassport: (newValue: boolean) => void;
+  dismissTourNag: () => void;
+}
+
 const Tour: React.FC = () => {
   const { update: setShowPassport } = useFeature("showPassport");
   const { nags } = hooks.useGetUserInfo();
@@ -55,7 +69,7 @@ const Tour: React.FC = () => {
 
   const { dismissTourNag } = useNagDismissal();
 
-  const Intro = ({ typeOfReplay }) => (
+  const Intro: React.FC<IntroProps> = ({ typeOfReplay }) => (
     <div className={styles.intro}>
       <p className={styles.h1}>Hello and welcome!</p>
       {typeOfReplay === "events" ? (
@@ -69,7 +83,7 @@ const Tour: React.FC = () => {
     </div>
   );
 
-  const HelloAgain = ({ typeOfReplay }) => (
+  const HelloAgain: React.FC<HelloAgainProps> = ({ typeOfReplay }) => (
     <div className={styles.intro}>
       <p className={styles.h1}>Hello again!</p>
       <p>To continue, please click the DevTools toggle at the top right.</p>
@@ -136,7 +150,11 @@ const Tour: React.FC = () => {
     <img src="https://vercel.replay.io/tour/editlogs.gif" className={styles.videoExample} />
   );
 
-  const CompletedTour = ({ setShowConfetti, setShowPassport, dismissTourNag }) => (
+  const CompletedTour: React.FC<CompletedTourProps> = ({
+    setShowConfetti,
+    setShowPassport,
+    dismissTourNag,
+  }) => (
     <div className={styles.intro}>
       <div className={styles.h1}>Check it out!</div>
       <p>Take a look at the console.</p>
