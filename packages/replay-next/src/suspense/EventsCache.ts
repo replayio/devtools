@@ -166,10 +166,12 @@ const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
     const chromiumEventCategoriesByEventDefault = makeChromiumEventCategoriesByEventDefault();
     const chromiumEventCategoriesByEventAndTarget = makeChromiumEventCategoriesByEventAndTarget();
     const normalizedEventCounts: {
-      [key: string]: {
-        count: number;
-        rawEventTypes: string[];
-      };
+      [key: string]:
+        | {
+            count: number;
+            rawEventTypes: string[];
+          }
+        | undefined;
     } = {};
     Object.entries(eventCountsRaw).forEach(([eventInputRaw, count]) => {
       const [eventTypeRaw, eventTargetName] = decodeChromiumEventType(eventInputRaw);
@@ -198,7 +200,10 @@ const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
         ...category,
         events: category.events.map(event => {
           const type = makeChromiumEventType(event.type, category.category);
-          const countEntry = normalizedEventCounts[type];
+          const countEntry = normalizedEventCounts[type] ?? {
+            count: 0,
+            rawEventTypes: [],
+          };
           delete normalizedEventCounts[type];
           return {
             ...event,
@@ -212,16 +217,21 @@ const CountEvents: Partial<Record<RecordingTarget, CountEventsFunction>> = {
       // there are still unsorted events: add "unknown" category
       result.push({
         category: "unknown",
-        events: Object.entries(normalizedEventCounts).map(([type, countEntry]) => ({
-          type,
-          label: `${type} (${countEntry.rawEventTypes
-            .map(eventInputRaw => {
-              const [, eventTargetName] = decodeChromiumEventType(eventInputRaw);
-              return eventTargetName;
-            })
-            .join(", ")})`,
-          ...countEntry,
-        })),
+        events: Object.entries(normalizedEventCounts).map(([type, countEntry]) => {
+          const count = countEntry?.count ?? 0;
+          const rawEventTypes = countEntry?.rawEventTypes ?? [];
+          return {
+            count,
+            label: `${type} (${rawEventTypes
+              .map(eventInputRaw => {
+                const [, eventTargetName] = decodeChromiumEventType(eventInputRaw);
+                return eventTargetName;
+              })
+              .join(", ")})`,
+            rawEventTypes,
+            type,
+          };
+        }),
       });
     }
 
