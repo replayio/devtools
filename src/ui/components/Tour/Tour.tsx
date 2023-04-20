@@ -2,7 +2,6 @@ import React, { useState } from "react";
 
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
-import Confetti from "ui/components/shared//Confetti";
 import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 import hooks from "ui/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
@@ -41,7 +40,6 @@ interface HelloAgainProps {
 }
 
 interface CompletedTourProps {
-  setShowConfetti: React.Dispatch<React.SetStateAction<boolean>>;
   setShowPassport: (newValue: boolean) => void;
   dismissTourNag: () => void;
 }
@@ -55,8 +53,6 @@ const Tour: React.FC = () => {
   const showConsoleNavigate = shouldShowConsoleNavigate(nags);
   const showBreakpointAdd = shouldShowBreakpointAdd(nags);
   const showBreakpointEdit = shouldShowBreakpointEdit(nags);
-
-  const [showConfetti, setShowConfetti] = useState(false);
 
   const isNewUser =
     showDevtoolsNag && showConsoleNavigate && showBreakpointAdd && showBreakpointEdit;
@@ -145,13 +141,9 @@ const Tour: React.FC = () => {
     <img src="https://vercel.replay.io/tour/editlogs.gif" className={styles.videoExample} />
   );
 
-  const CompletedTour: React.FC<CompletedTourProps> = ({
-    setShowConfetti,
-    setShowPassport,
-    dismissTourNag,
-  }) => (
+  const CompletedTour: React.FC<CompletedTourProps> = ({ setShowPassport, dismissTourNag }) => (
     <div className={styles.intro}>
-      <div className={styles.h1}>Check the console! 😎</div>
+      <div className={styles.h1}>😎</div>
       <p>Take a look at the console.</p>
       <p>
         Replay just re-ran your recording and retroactively added your print statement each time
@@ -163,18 +155,15 @@ const Tour: React.FC = () => {
           href="#"
           onClick={e => {
             e.stopPropagation();
-            setShowConfetti(true);
             setShowPassport(true);
             setTimeout(() => {
-              setShowConfetti(false);
               dismissTourNag();
-            }, 2500);
+            }, 200);
           }}
           className="hover:cursor-hand whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg hover:bg-blue-50"
         >
           Thanks!
         </a>
-        {showConfetti ? <Confetti /> : null}
       </p>
       <img
         src={`/images/passport/tour_grad-default.png`}
@@ -214,7 +203,6 @@ const Tour: React.FC = () => {
                     {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && editLogs}
                     {hasCompletedTour && (
                       <CompletedTour
-                        setShowConfetti={setShowConfetti}
                         setShowPassport={setShowPassport}
                         dismissTourNag={dismissTourNag}
                       />
