@@ -1,6 +1,11 @@
 import { ExecutionPoint, PauseId, PointDescription, TimeStampedPoint } from "@replayio/protocol";
 import { PointSelector, Value } from "@replayio/protocol";
-import { Cache, IntervalCache, createExternallyManagedCache } from "suspense";
+import {
+  Cache,
+  ExternallyManagedCache,
+  IntervalCache,
+  createExternallyManagedCache,
+} from "suspense";
 
 import { compareNumericStrings } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
@@ -29,7 +34,10 @@ export interface AnalysisCache<T extends { point: ExecutionPoint }, TParams exte
     [client: ReplayClientInterface, ...params: TParams],
     T
   >;
-  resultsCache: Cache<[executionPoint: ExecutionPoint, ...params: TParams], RemoteAnalysisResult>;
+  resultsCache: ExternallyManagedCache<
+    [executionPoint: ExecutionPoint, ...params: TParams],
+    RemoteAnalysisResult
+  >;
 }
 
 export function createAnalysisCache<
@@ -51,7 +59,7 @@ export function createAnalysisCache<
   ) => AnalysisParams | Promise<AnalysisParams>,
   transformPoint: (point: PointDescription, ...params: TParams) => TPoint
 ): AnalysisCache<TPoint, TParams> {
-  const resultsCache: Cache<
+  const resultsCache: ExternallyManagedCache<
     [executionPoint: ExecutionPoint, ...params: TParams],
     RemoteAnalysisResult
   > = createExternallyManagedCache({
@@ -119,7 +127,7 @@ export function createAnalysisCache<
                 values = (await Promise.all(promises)).filter(value => !!value) as Value[];
               }
 
-              resultsCache.cache(
+              resultsCache.cacheValue(
                 {
                   pauseId: result.pauseId,
                   point: result.point.point,
