@@ -146,7 +146,7 @@ const Tour: React.FC = () => {
 
   const CompletedTour: React.FC<CompletedTourProps> = ({ setShowPassport, dismissTourNag }) => (
     <div className={styles.intro}>
-      <div className={styles.h1}>Check the console! 😎</div>
+      <div className={styles.h1}>😎</div>
       <p>Take a look at the console.</p>
       <p>
         Replay just re-ran your recording and retroactively added your print statement each time
@@ -161,7 +161,7 @@ const Tour: React.FC = () => {
             setShowPassport(true);
             setTimeout(() => {
               dismissTourNag();
-            }, 2500);
+            }, 200);
           }}
           className="hover:cursor-hand whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg hover:bg-blue-50"
         >

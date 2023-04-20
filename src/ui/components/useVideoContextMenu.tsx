@@ -11,6 +11,8 @@ import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import { createTypeDataForVisualComment } from "replay-next/components/sources/utils/comments";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { useNag } from "replay-next/src/hooks/useNag";
+import { Nag } from "shared/graphql/types";
 import { fetchMouseTargetsForPause } from "ui/actions/app";
 import { createFrameComment } from "ui/actions/comments";
 import { setSelectedPanel, setViewMode } from "ui/actions/layout";
@@ -58,7 +60,9 @@ export default function useVideoContextMenu({
     }
   };
 
+  const [, dismissInspectElementNag] = useNag(Nag.INSPECT_ELEMENT); // Replay Passport
   const inspectElement = () => {
+    dismissInspectElementNag();
     const nodeId = mouseEventDataRef.current.targetNodeId;
     if (nodeId !== null) {
       dispatch(setViewMode("dev"));
