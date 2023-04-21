@@ -16,6 +16,8 @@ test(`breakpoints-05: Test interaction of breakpoints with debugger statements`,
   await startTest(page, url);
   await openDevToolsTab(page);
   await openPauseInformationPanel(page);
+  // wait for the recording to be fully loaded
+  await page.locator('[data-test-id="FocusInputs"]').waitFor();
 
   // Without any breakpoints, this test should rewind to the closest debugger statement.
   await rewindToLine(page, { lineNumber: 9 });
