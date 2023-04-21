@@ -103,6 +103,7 @@ export const TestItemsCache = createSingleEntryCache<
 
       // Although TestItem has an "error" field,
       // the TestStep error has more information (and is formatted in a better way for display)
+      // so we should use that instead (if it exists).
       let error: TestItemError | undefined = undefined;
       let testItemDuration = 0;
       steps.forEach(step => {
@@ -111,6 +112,9 @@ export const TestItemsCache = createSingleEntryCache<
           error = step.error;
         }
       });
+      if (error === undefined) {
+        error = testItem.error;
+      }
 
       return {
         ...rest,
