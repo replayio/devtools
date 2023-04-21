@@ -177,7 +177,7 @@ function PanelSuspends({
           </div>
         </div>
       </div>
-      <div className={styles.Body}>
+      <div className={styles.Body} data-test-id="TestItemPanelBody">
         <PanelGroup autoSaveId="TestItemPanel" direction="vertical">
           <ResizablePanel className={styles.TestStepsPanel} collapsible>
             <div className={styles.TestStepsContainer}>
