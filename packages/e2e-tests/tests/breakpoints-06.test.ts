@@ -15,7 +15,7 @@ test(`breakpoints-06: Test log point in a sourcemapped file`, async ({ page }) =
   await openDevToolsTab(page);
 
   // Log point added to line 15 should map to line 15
-  await addLogpoint(page, { lineNumber: 15, url: "bundle_input.js" });
+  await addLogpoint(page, { lineNumber: 15, url: "bundle_input.js", waitForSourceOutline: true });
   await checkMessageLocation(page, "bar 15", "bundle_input.js:15");
 
   // Log point added to line 17 should map to line 17

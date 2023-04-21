@@ -159,9 +159,10 @@ export async function addLogpoint(
     content?: string;
     url?: string;
     saveAfterEdit?: boolean;
+    waitForSourceOutline?: boolean;
   }
 ): Promise<void> {
-  const { lineNumber, url } = options;
+  const { lineNumber, url, waitForSourceOutline } = options;
 
   await debugPrint(
     page,
@@ -174,6 +175,9 @@ export async function addLogpoint(
   if (url) {
     await openSourceExplorerPanel(page);
     await openSource(page, url);
+  }
+  if (waitForSourceOutline) {
+    await page.locator(".outline-list").waitFor();
   }
 
   const line = await getSourceLine(page, lineNumber);

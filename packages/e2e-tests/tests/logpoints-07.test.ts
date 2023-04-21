@@ -21,7 +21,7 @@ test(`logpoints-07: should use the correct scope in auto-complete`, async ({ pag
   let url = "App.js";
   let lineNumber = 17;
 
-  await addLogpoint(page, { lineNumber, url });
+  await addLogpoint(page, { lineNumber, url, waitForSourceOutline: true });
   await warpToMessage(page, "update", lineNumber);
 
   // Log point should use original source (since we're viewing it)
