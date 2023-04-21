@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import { v4 as uuid } from "uuid";
 
 import { TrackEvent } from "replay-next/src/contexts/SessionContext";
-import { POINT_BEHAVIOR_DISABLED, Point, PointBehavior, PointKey } from "shared/client/types";
+import { POINT_BEHAVIOR_DISABLED, Point, PointBehavior } from "shared/client/types";
 import { GraphQLClientInterface } from "shared/graphql/GraphQLClient";
 import { addPoint as addPointGraphQL } from "shared/graphql/Points";
 import { UserInfo } from "shared/graphql/types";

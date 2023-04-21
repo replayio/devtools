@@ -4,13 +4,13 @@ import { MouseEvent } from "react";
 import AccessibleImage from "../AccessibleImage";
 
 export default function CommandBarButton({
-  disabled = false,
+  disabled,
   disabledTooltip = "",
   onClick,
   tooltip,
   type,
 }: {
-  disabled?: boolean;
+  disabled: boolean;
   disabledTooltip?: string;
   onClick: (event: MouseEvent) => void;
   tooltip: string;

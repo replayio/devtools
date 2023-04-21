@@ -184,18 +184,26 @@ export async function resumeToLine(
   }
 }
 
+export async function clickCommandBarButton(page: Page, title: string): Promise<void> {
+  await debugPrint(page, title, "clickCommandBarButton");
+
+  await openPauseInformationPanel(page);
+
+  const button = page.locator(`[title="${title}"]`);
+  await button.isEnabled();
+  await button.click();
+}
+
 export async function reverseStepOver(page: Page): Promise<void> {
   await debugPrint(page, "Reverse step over", "reverseStepOver");
 
-  await openPauseInformationPanel(page);
-  await page.locator('[title="Reverse Step Over"]').click();
+  await clickCommandBarButton(page, "Reverse Step Over");
 }
 
 export async function reverseStepOverToLine(page: Page, line: number) {
   await debugPrint(page, `Reverse step over to line ${chalk.bold(line)}`, "reverseStepOverToLine");
 
-  await openPauseInformationPanel(page);
-  await page.locator('[title="Reverse Step Over"]').click();
+  await clickCommandBarButton(page, "Reverse Step Over");
 
   await waitForPaused(page, line);
 }
@@ -203,10 +211,7 @@ export async function reverseStepOverToLine(page: Page, line: number) {
 export async function rewind(page: Page) {
   await debugPrint(page, "Rewinding", "rewind");
 
-  await openPauseInformationPanel(page);
-
-  const button = page.locator('[title="Rewind Execution"]');
-  await button.click();
+  await clickCommandBarButton(page, "Rewind Execution");
 }
 
 export async function rewindToLine(
@@ -224,11 +229,8 @@ export async function rewindToLine(
     await openSource(page, url);
   }
 
-  await openPauseInformationPanel(page);
-
   while (true) {
-    const button = page.locator('[title="Rewind Execution"]');
-    await button.click();
+    await clickCommandBarButton(page, "Rewind Execution");
 
     if (lineNumber === null) {
       return;
@@ -256,8 +258,7 @@ export async function selectFrame(page: Page, index: number): Promise<void> {
 export async function stepInToLine(page: Page, line: number) {
   await debugPrint(page, `Step in to line ${chalk.bold(line)}`, "stepInToLine");
 
-  await openPauseInformationPanel(page);
-  await page.locator('[title="Step In"]').click();
+  await clickCommandBarButton(page, "Step In");
 
   await waitForPaused(page, line);
 }
@@ -265,8 +266,7 @@ export async function stepInToLine(page: Page, line: number) {
 export async function stepOutToLine(page: Page, line: number) {
   await debugPrint(page, `Step out to line ${chalk.bold(line)}`, "stepOutToLine");
 
-  await openPauseInformationPanel(page);
-  await page.locator('[title="Step Out"]').click();
+  await clickCommandBarButton(page, "Step Out");
 
   await waitForPaused(page, line);
 }
@@ -274,8 +274,7 @@ export async function stepOutToLine(page: Page, line: number) {
 export async function stepOverToLine(page: Page, line: number) {
   await debugPrint(page, `Step over to line ${chalk.bold(line)}`, "stepOverToLine");
 
-  await openPauseInformationPanel(page);
-  await page.locator('[title="Step Over"]').click();
+  await clickCommandBarButton(page, "Step Over");
 
   await waitForPaused(page, line);
 }
@@ -283,8 +282,7 @@ export async function stepOverToLine(page: Page, line: number) {
 export async function stepOver(page: Page): Promise<void> {
   await debugPrint(page, "Step over", "stepOver");
 
-  await openPauseInformationPanel(page);
-  await page.locator('[title="Step Over"]').click();
+  await clickCommandBarButton(page, "Step Over");
 }
 
 export async function verifyFramesCount(page: Page, expectedCount: number) {
