@@ -22,7 +22,7 @@ export const RequestRow = ({
   isInLoadedRegion: boolean;
   isInPast: boolean;
   isSelected: boolean;
-  onClick: (row: RequestSummary) => void;
+  onClick: (row: RequestSummary, event: React.MouseEvent) => void;
   onSeek: (row: RequestSummary) => void;
   row: Row<RequestSummary>;
 }) => {
@@ -51,7 +51,7 @@ export const RequestRow = ({
           [styles.future]: !isInPast,
           [styles.unloaded]: !isInLoadedRegion,
         })}
-        onClick={() => onClick(row.original)}
+        onClick={event => onClick(row.original, event)}
         onContextMenu={onContextMenu}
         ref={ref}
         tabIndex={0}

@@ -1,6 +1,8 @@
 import classNames from "classnames";
 import { Row, TableInstance } from "react-table";
 
+import { useNag } from "replay-next/src/hooks/useNag";
+import { Nag } from "shared/graphql/types";
 import { getLoadedRegions } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
@@ -27,7 +29,7 @@ const RequestTable = ({
   data: RequestSummary[];
   filteredAfterCount: number;
   filteredBeforeCount: number;
-  onRowSelect: (request: RequestSummary) => void;
+  onRowSelect: (request: RequestSummary, event: React.MouseEvent) => void;
   seek: (point: string, time: number, openSource: boolean, pauseId?: string | undefined) => boolean;
   selectedRequest?: RequestSummary;
   table: TableInstance<RequestSummary>;
@@ -44,6 +46,8 @@ const RequestTable = ({
 
   let inPast = true;
 
+  const [, dismissInspectElementNag] = useNag(Nag.USE_FOCUS_MODE); //
+
   return (
     <div className={classNames("no-scrollbar min-w-full bg-bodyBgcolor", className)}>
       {/* Relative here helps with when the timeline goes past the last request*/}
@@ -53,7 +57,7 @@ const RequestTable = ({
       >
         <HeaderGroups columns={columns as any} headerGroups={headerGroups} />
 
-        <div className="relative w-fit min-w-full overflow-y-auto" {...getTableBodyProps()}>
+        <div className="relative min-w-full overflow-y-auto w-fit" {...getTableBodyProps()}>
           {filteredBeforeCount > 0 && (
             <div className={styles.banner}>{filteredBeforeCount} requests filtered before</div>
           )}
@@ -79,7 +83,10 @@ const RequestTable = ({
                 isInPast={inPast}
                 isSelected={selectedRequest?.id === row.original.id}
                 key={row.getRowProps().key}
-                onClick={onRowSelect}
+                onClick={(request, event) => {
+                  dismissInspectElementNag();
+                  onRowSelect(request, event);
+                }}
                 onSeek={onSeek}
                 row={row}
               />
