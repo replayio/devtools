@@ -63,7 +63,6 @@ export type UserInfo = {
   features: { library: boolean };
 };
 
-
 export enum Nag {
   ADD_COMMENT = "add_comment",
   ADD_COMMENT_TO_LINE = "add_comment_to_line",
@@ -90,7 +89,7 @@ export enum Nag {
   SEARCH_SOURCE_TEXT = "search_source_text",
   SHARE = "share",
   VIEW_DEVTOOLS = "view_devtools",
-  USE_FOCUS_MODE = "use_focus_mode"
+  USE_FOCUS_MODE = "use_focus_mode",
 }
 
 // Keeping a list of unused nag types here so we don't accidentally

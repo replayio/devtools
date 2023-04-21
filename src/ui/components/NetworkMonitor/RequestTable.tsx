@@ -63,7 +63,7 @@ const RequestTable = ({
       >
         <HeaderGroups columns={columns as any} headerGroups={headerGroups} />
 
-        <div className="relative min-w-full overflow-y-auto w-fit" {...getTableBodyProps()}>
+        <div className="relative w-fit min-w-full overflow-y-auto" {...getTableBodyProps()}>
           {filteredBeforeCount > 0 && (
             <div className={styles.banner}>{filteredBeforeCount} requests filtered before</div>
           )}
