@@ -8,8 +8,9 @@ import {
 } from "suspense";
 
 import { compareNumericStrings } from "protocol/utils";
+import { MAX_POINTS_TO_RUN_EVALUATION } from "shared/client/ReplayClient";
 import { ReplayClientInterface } from "shared/client/types";
-import { ProtocolError, isCommandError } from "shared/utils/error";
+import { ProtocolError, commandError, isCommandError } from "shared/utils/error";
 
 import { createFocusIntervalCache } from "./FocusIntervalCache";
 import { objectPropertyCache } from "./ObjectPreviews";
@@ -83,6 +84,10 @@ export function createAnalysisCache<
       const params = paramsWithCacheLoadOptions.slice(0, -1) as TParams;
       const points = await findPoints(client, begin, end, ...params);
       onPointsReceived?.(points);
+
+      if (points.length > MAX_POINTS_TO_RUN_EVALUATION) {
+        throw commandError("Too many points to run evaluation", ProtocolError.TooManyPoints);
+      }
 
       const evaluationParams = await createEvaluationParams(client, points, ...params);
 
