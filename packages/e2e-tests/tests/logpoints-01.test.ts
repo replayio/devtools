@@ -53,5 +53,5 @@ test(`logpoints-01: log-points appear in the correct order and allow time warpin
   await executeAndVerifyTerminalExpression(page, "number", 5);
   await reverseStepOverToLine(page, 19);
 
-  await resumeToLine(page, { lineNumber: 20 });
+  await resumeToLine(page, 20);
 });

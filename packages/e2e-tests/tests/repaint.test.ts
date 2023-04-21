@@ -14,7 +14,7 @@ test("repaint: repaints the screen screen when stepping over code that modifies 
   await openDevToolsTab(page);
 
   await addBreakpoint(page, { lineNumber: 50, url });
-  await rewindToLine(page, { lineNumber: 50, url });
+  await rewindToLine(page, 50);
 
   const prevDataUrl = await getCanvasDataUrl(page);
 

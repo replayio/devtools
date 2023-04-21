@@ -17,8 +17,8 @@ test(`breakpoints-04: catch, finally, generators, and async/await`, async ({ pag
   await resumeToBreakpoint(page, 20);
   await resumeToBreakpoint(page, 32);
   await resumeToBreakpoint(page, 27);
-  await resumeToLine(page, { lineNumber: 32 });
-  await resumeToLine(page, { lineNumber: 27 });
+  await resumeToLine(page, 32);
+  await resumeToLine(page, 27);
   await resumeToBreakpoint(page, 42);
   await resumeToBreakpoint(page, 44);
   await resumeToBreakpoint(page, 50);
@@ -28,11 +28,11 @@ test(`breakpoints-04: catch, finally, generators, and async/await`, async ({ pag
 
   async function rewindToBreakpoint(page: Page, lineNumber: number) {
     await addBreakpoint(page, { lineNumber, url });
-    await rewindToLine(page, { lineNumber });
+    await rewindToLine(page, lineNumber);
   }
 
   async function resumeToBreakpoint(page: Page, lineNumber: number) {
     await addBreakpoint(page, { lineNumber, url });
-    await resumeToLine(page, { lineNumber });
+    await resumeToLine(page, lineNumber);
   }
 });

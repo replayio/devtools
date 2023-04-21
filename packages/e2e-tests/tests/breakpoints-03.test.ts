@@ -15,15 +15,15 @@ test(`breakpoints-03: Test stepping forward through breakpoints when rewound bef
 
   await addBreakpoint(page, { lineNumber: 9, url });
   // Rewind to when the point was hit
-  await rewindToLine(page, { lineNumber: 9 });
+  await rewindToLine(page, 9);
   // Rewind further (past the first hit)
   await rewind(page);
 
   await removeBreakpoint(page, { lineNumber: 9, url });
 
   await addBreakpoint(page, { lineNumber: 21, url });
-  await resumeToLine(page, { lineNumber: 21 });
+  await resumeToLine(page, 21);
   await executeAndVerifyTerminalExpression(page, "number", "1");
-  await resumeToLine(page, { lineNumber: 21 });
+  await resumeToLine(page, 21);
   await executeAndVerifyTerminalExpression(page, "number", "2");
 });

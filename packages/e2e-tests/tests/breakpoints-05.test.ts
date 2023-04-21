@@ -20,15 +20,15 @@ test(`breakpoints-05: Test interaction of breakpoints with debugger statements`,
   await page.locator('[data-test-id="FocusInputs"]').waitFor();
 
   // Without any breakpoints, this test should rewind to the closest debugger statement.
-  await rewindToLine(page, { lineNumber: 9 });
+  await rewindToLine(page, 9);
 
   // Without a breakpoints being the next nearest thing, we should rewind to it.
   await addBreakpoint(page, {
     lineNumber: 8,
     url,
   });
-  await rewindToLine(page, { lineNumber: 8 });
-  await resumeToLine(page, { lineNumber: 9 });
+  await rewindToLine(page, 8);
+  await resumeToLine(page, 9);
 
   // Without any breakpoints (again), we should rewind to debugger statements.
   await removeBreakpoint(page, {
@@ -36,6 +36,6 @@ test(`breakpoints-05: Test interaction of breakpoints with debugger statements`,
     url,
   });
 
-  await rewindToLine(page, { lineNumber: 7 });
-  await resumeToLine(page, { lineNumber: 9 });
+  await rewindToLine(page, 7);
+  await resumeToLine(page, 9);
 });

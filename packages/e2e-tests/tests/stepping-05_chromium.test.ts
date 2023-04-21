@@ -23,12 +23,12 @@ test(`stepping-05_chromium: Test stepping in pretty-printed code`, async ({ page
   await openDevToolsTab(page);
 
   await addBreakpoint(page, { url: "bundle_input.js", lineNumber: 4 });
-  await rewindToLine(page, { lineNumber: 4 });
+  await rewindToLine(page, 4);
   await stepInToLine(page, 1);
 
   // Add a breakpoint in minified.html and resume to there
   await addBreakpoint(page, { url, lineNumber: 8 });
-  await resumeToLine(page, { lineNumber: 8 });
+  await resumeToLine(page, 8);
   await stepOverToLine(page, 8);
 
   // TODO Stepping here hangs

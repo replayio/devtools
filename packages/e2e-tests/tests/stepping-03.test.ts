@@ -25,7 +25,7 @@ test(`stepping-03: Stepping past the beginning or end of a frame should act like
 
   await addBreakpoint(page, { lineNumber: 20, url });
 
-  await rewindToLine(page, { lineNumber: 20 });
+  await rewindToLine(page, 20);
   await executeAndVerifyTerminalExpression(page, "number", "10");
   await reverseStepOverToLine(page, 19);
   await reverseStepOverToLine(page, 11);

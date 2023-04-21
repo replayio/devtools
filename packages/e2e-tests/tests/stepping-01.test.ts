@@ -23,7 +23,7 @@ test("stepping-01: Test basic step-over/back functionality", async ({ page }) =>
 
   // Pause on line 20
   await addBreakpoint(page, { lineNumber: 20, url });
-  await rewindToLine(page, { lineNumber: 20 });
+  await rewindToLine(page, 20);
 
   // Should get ten when evaluating number.
   await executeAndVerifyTerminalExpression(page, "number", "10");
