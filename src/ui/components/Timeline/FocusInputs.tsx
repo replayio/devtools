@@ -68,7 +68,7 @@ export default function FocusInputs() {
     };
 
     return (
-      <div className={styles.Container}>
+      <div className={styles.Container} data-test-id="FocusInputs">
         <EditableTimeInput
           className="text-right"
           dataTestId="FocusStartTimeInput"
@@ -87,7 +87,7 @@ export default function FocusInputs() {
     );
   } else {
     return (
-      <div className={styles.Container}>
+      <div className={styles.Container} data-test-id="FocusInputs">
         <span
           data-testid="Timeline-CurrentTime"
           className={styles.CurrentTimeLabel}
