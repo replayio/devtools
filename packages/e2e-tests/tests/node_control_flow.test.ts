@@ -7,7 +7,7 @@ import { addBreakpoint } from "../helpers/source-panel";
 
 async function resumeToBreakpoint(page: Page, line: number) {
   await addBreakpoint(page, { url: "control_flow.js", lineNumber: line });
-  await resumeToLine(page, { lineNumber: line });
+  await resumeToLine(page, line);
 }
 
 test("node_control_flow: catch, finally, generators, and async/await", async ({ page }) => {
@@ -18,7 +18,7 @@ test("node_control_flow: catch, finally, generators, and async/await", async ({ 
 
   await openSource(page, "control_flow.js");
 
-  await rewindToLine(page, { lineNumber: 84 });
+  await rewindToLine(page, 84);
 
   await resumeToBreakpoint(page, 10);
   await resumeToBreakpoint(page, 12);
@@ -27,8 +27,8 @@ test("node_control_flow: catch, finally, generators, and async/await", async ({ 
   await resumeToBreakpoint(page, 32);
   await resumeToBreakpoint(page, 27);
 
-  await resumeToLine(page, { lineNumber: 32 });
-  await resumeToLine(page, { lineNumber: 27 });
+  await resumeToLine(page, 32);
+  await resumeToLine(page, 27);
 
   await resumeToBreakpoint(page, 42);
   await resumeToBreakpoint(page, 44);

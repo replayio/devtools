@@ -13,24 +13,22 @@ test(`breakpoints-01: Test basic breakpoint functionality`, async ({ page }) => 
 
   await addBreakpoint(page, { lineNumber: 21, url });
 
-  await rewindToLine(page, {
-    lineNumber: 21,
-  });
+  await rewindToLine(page, 21);
   await executeAndVerifyTerminalExpression(page, "number", "10");
-  await rewindToLine(page, { lineNumber: 21 });
+  await rewindToLine(page, 21);
   await executeAndVerifyTerminalExpression(page, "number", "9");
-  await rewindToLine(page, { lineNumber: 21 });
+  await rewindToLine(page, 21);
   await executeAndVerifyTerminalExpression(page, "number", "8");
-  await rewindToLine(page, { lineNumber: 21 });
+  await rewindToLine(page, 21);
   await executeAndVerifyTerminalExpression(page, "number", "7");
-  await rewindToLine(page, { lineNumber: 21 });
+  await rewindToLine(page, 21);
   await executeAndVerifyTerminalExpression(page, "number", "6");
-  await resumeToLine(page, { lineNumber: 21 });
+  await resumeToLine(page, 21);
   await executeAndVerifyTerminalExpression(page, "number", "7");
-  await resumeToLine(page, { lineNumber: 21 });
+  await resumeToLine(page, 21);
   await executeAndVerifyTerminalExpression(page, "number", "8");
-  await resumeToLine(page, { lineNumber: 21 });
+  await resumeToLine(page, 21);
   await executeAndVerifyTerminalExpression(page, "number", "9");
-  await resumeToLine(page, { lineNumber: 21 });
+  await resumeToLine(page, 21);
   await executeAndVerifyTerminalExpression(page, "number", "10");
 });

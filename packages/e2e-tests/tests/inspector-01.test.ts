@@ -29,7 +29,7 @@ test("inspector-01: Test that scopes are rerendered", async ({ page }) => {
   await node.waitFor();
 
   await addBreakpoint(page, { url: "doc_inspector_basic.html", lineNumber: 9 });
-  await rewindToLine(page, { lineNumber: 9 });
+  await rewindToLine(page, 9);
 
   node = await getElementsRowWithText(page, '<div id="maindiv" style="color: red"');
   await node.waitFor();

@@ -4,7 +4,6 @@ import chalk from "chalk";
 
 import { POINT_BEHAVIOR_DISABLED_TEMPORARILY, POINT_BEHAVIOR_ENABLED } from "shared/client/types";
 
-import { openSource } from "./source-explorer-panel";
 import { Expected } from "./types";
 import { debugPrint, forEach, toggleExpandable, waitFor } from "./utils";
 
@@ -149,39 +148,12 @@ export async function openScopeBlocks(page: Page, text: string): Promise<void> {
   });
 }
 
-export async function resumeToLine(
-  page: Page,
-  options: {
-    lineNumber: number;
-    url?: string;
-  }
-): Promise<void> {
-  const { url = null, lineNumber } = options;
+export async function resumeToLine(page: Page, line: number): Promise<void> {
+  await debugPrint(page, `Resuming to line ${chalk.bold(line)}`, "resumeToLine");
 
-  await debugPrint(
-    page,
-    `Resuming to line ${chalk.bold(url ? `${url}:${lineNumber}` : lineNumber)}`,
-    "resumeToLine"
-  );
+  await clickCommandBarButton(page, "Resume F8");
 
-  if (url !== null) {
-    await openSource(page, url);
-  }
-
-  await openPauseInformationPanel(page);
-
-  while (true) {
-    const button = page.locator('[title^="Resume"]');
-    await button.click();
-
-    const { lineNumber: selectedLineNumber } = await getCurrentCallStackFrameInfo(page);
-
-    if (selectedLineNumber === null) {
-      throw Error(`Unable to resume to line ${lineNumber}`);
-    } else if (lineNumber === selectedLineNumber) {
-      return;
-    }
-  }
+  await waitForPaused(page, line);
 }
 
 export async function clickCommandBarButton(page: Page, title: string): Promise<void> {
@@ -214,36 +186,12 @@ export async function rewind(page: Page) {
   await clickCommandBarButton(page, "Rewind Execution");
 }
 
-export async function rewindToLine(
-  page: Page,
-  options: {
-    lineNumber: number;
-    url?: string;
-  }
-): Promise<void> {
-  const { url = null, lineNumber = null } = options;
+export async function rewindToLine(page: Page, line: number): Promise<void> {
+  await debugPrint(page, `Rewinding to line ${chalk.bold(line)}`, "rewindToLine");
 
-  await debugPrint(page, `Rewinding to line ${chalk.bold(lineNumber)}`, "rewindToLine");
+  await clickCommandBarButton(page, "Rewind Execution");
 
-  if (url !== null) {
-    await openSource(page, url);
-  }
-
-  while (true) {
-    await clickCommandBarButton(page, "Rewind Execution");
-
-    if (lineNumber === null) {
-      return;
-    } else {
-      const { lineNumber: selectedLineNumber } = await getCurrentCallStackFrameInfo(page);
-
-      if (selectedLineNumber === null) {
-        throw Error(`Unable to rewind to line ${lineNumber}`);
-      } else if (lineNumber === selectedLineNumber) {
-        return;
-      }
-    }
-  }
+  await waitForPaused(page, line);
 }
 
 export async function selectFrame(page: Page, index: number): Promise<void> {

@@ -24,9 +24,9 @@ test(`console_warp-01: should support warping to console messages`, async ({ pag
   await executeAndVerifyTerminalExpression(page, "number", 5);
 
   await addBreakpoint(page, { lineNumber: 12, url });
-  await rewindToLine(page, { lineNumber: 12, url });
+  await rewindToLine(page, 12);
   await executeAndVerifyTerminalExpression(page, "number", 4);
-  await resumeToLine(page, { lineNumber: 12, url });
+  await resumeToLine(page, 12);
   await executeAndVerifyTerminalExpression(page, "number", 5);
 
   // This error message has different text on gecko vs. chromium.

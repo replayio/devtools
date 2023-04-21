@@ -28,9 +28,9 @@ test(`breakpoints-07: rewind and seek using command bar and console messages`, a
   await addLogpoint(page, { lineNumber: 5, url: "bundle_input.js" });
 
   // Verify that the command bar can be used to fast forward and rewind to log points.
-  await rewindToLine(page, { lineNumber: 5 });
+  await rewindToLine(page, 5);
   await verifyLogpointStep(page, "2/2", { lineNumber: 5 });
-  await rewindToLine(page, { lineNumber: 5 });
+  await rewindToLine(page, 5);
   await verifyLogpointStep(page, "1/2", { lineNumber: 5 });
 
   await closeSource(page, "bundle_input.js");

@@ -30,7 +30,7 @@ test(`object_preview-03: Test previews when switching between frames and steppin
   const target = await getRecordingTarget(page);
 
   await addBreakpoint(page, { lineNumber: 17, url });
-  await rewindToLine(page, { lineNumber: 17, url });
+  await rewindToLine(page, 17);
 
   await expandAllScopesBlocks(page);
 

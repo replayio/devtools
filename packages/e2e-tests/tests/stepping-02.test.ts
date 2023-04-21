@@ -24,7 +24,7 @@ test("stepping-02: Test fixes for some simple stepping bugs", async ({ page }) =
   await clickSourceTreeNode(page, url);
 
   await addBreakpoint(page, { lineNumber: 21, url });
-  await rewindToLine(page, { lineNumber: 21 });
+  await rewindToLine(page, 21);
 
   await stepInToLine(page, 24);
   await stepOverToLine(page, 25);

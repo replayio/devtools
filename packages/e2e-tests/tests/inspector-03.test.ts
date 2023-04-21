@@ -24,7 +24,7 @@ test("inspector-03: Test that styles for elements can be viewed", async ({ page 
   await checkComputedStyle(page, "background-color", "rgb(0, 0, 255)");
 
   await addBreakpoint(page, { url: "doc_inspector_styles.html", lineNumber: 11 });
-  await rewindToLine(page, { lineNumber: 11 });
+  await rewindToLine(page, 11);
 
   await selectElementsRowWithText(page, "maindiv");
   await checkComputedStyle(page, "background-color", "rgb(255, 0, 0)");

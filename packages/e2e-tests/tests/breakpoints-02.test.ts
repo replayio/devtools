@@ -15,7 +15,7 @@ test(`breakpoints-02: Test unhandled divergence while evaluating at a breakpoint
 
   await addBreakpoint(page, { lineNumber: 21, url });
 
-  await rewindToLine(page, { lineNumber: 21 });
+  await rewindToLine(page, 21);
 
   await executeAndVerifyTerminalExpression(page, "number", "10");
   await executeAndVerifyTerminalExpression(
