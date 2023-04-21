@@ -23,14 +23,6 @@ test(`console_warp-01: should support warping to console messages`, async ({ pag
   await warpToMessage(page, "Number 5", 19);
   await executeAndVerifyTerminalExpression(page, "number", 5);
 
-  const target = await getRecordingTarget(page);
-  if (target == "gecko") {
-    // Initially we are paused inside the 'new Error()' call on line 19. The
-    // first reverse step takes us to the start of that line.
-    await reverseStepOverToLine(page, 19);
-  }
-
-  await reverseStepOverToLine(page, 18);
   await addBreakpoint(page, { lineNumber: 12, url });
   await rewindToLine(page, { lineNumber: 12, url });
   await executeAndVerifyTerminalExpression(page, "number", 4);
@@ -38,6 +30,7 @@ test(`console_warp-01: should support warping to console messages`, async ({ pag
   await executeAndVerifyTerminalExpression(page, "number", 5);
 
   // This error message has different text on gecko vs. chromium.
+  const target = await getRecordingTarget(page);
   const errorText =
     target == "gecko" ? "window.foo is undefined" : "Cannot set property 'bar' of undefined";
   await warpToMessage(page, errorText);

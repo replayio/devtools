@@ -17,7 +17,7 @@ import { addBreakpoint } from "../helpers/source-panel";
 
 const url = "doc_minified_chromium.html";
 
-test(`stepping-05: Test stepping in pretty-printed code`, async ({ page }) => {
+test(`stepping-05_chromium: Test stepping in pretty-printed code`, async ({ page }) => {
   page.setDefaultTimeout(120000);
   await startTest(page, url);
   await openDevToolsTab(page);
