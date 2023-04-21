@@ -27,7 +27,9 @@ export default function TestCaseSection({
 
   return (
     <>
-      <div className={styles.Title}>{title}</div>
+      <div className={styles.Title} data-test-name="TestCaseSection">
+        {title}
+      </div>
       {testSteps.map((testStep, index) => (
         <TestCaseSectionRow
           key={index}

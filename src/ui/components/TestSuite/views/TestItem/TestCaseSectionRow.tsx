@@ -78,6 +78,7 @@ export function TestCaseSectionRow({
       data-position={position}
       data-status={status}
       data-type={testStep.type}
+      data-test-name="TestCaseSectionRow"
       onClick={() => startTransition(() => selectTestStep(testStep))}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
