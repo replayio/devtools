@@ -41,12 +41,18 @@ const RequestTable = ({
   const onSeek = (request: RequestSummary) => {
     trackEvent("net_monitor.seek_to_request");
     seek(request.point.point, request.point.time, true);
-    onRowSelect(request);
+    const syntheticEvent = new MouseEvent("click", {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      button: 0,
+    });
+    onRowSelect(request, syntheticEvent as unknown as React.MouseEvent<Element, MouseEvent>);
   };
 
   let inPast = true;
 
-  const [, dismissInspectElementNag] = useNag(Nag.USE_FOCUS_MODE); //
+  const [, dismissInspectNetworkRequestNag] = useNag(Nag.INSPECT_NETWORK_REQUEST);
 
   return (
     <div className={classNames("no-scrollbar min-w-full bg-bodyBgcolor", className)}>
@@ -84,7 +90,8 @@ const RequestTable = ({
                 isSelected={selectedRequest?.id === row.original.id}
                 key={row.getRowProps().key}
                 onClick={(request, event) => {
-                  dismissInspectElementNag();
+                  dismissInspectNetworkRequestNag();
+                  console.log("calling");
                   onRowSelect(request, event);
                 }}
                 onSeek={onSeek}
