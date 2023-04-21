@@ -1,4 +1,7 @@
+import { useContext } from "react";
+
 import Icon from "replay-next/components/Icon";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 
 import styles from "./ConsoleActionsRow.module.css";
 
@@ -15,6 +18,8 @@ export default function ConsoleActionsRow({
   setIsMenuOpen: (value: boolean) => void;
   setMenuValueHasBeenToggled: (value: boolean) => void;
 }) {
+  const { trackEvent } = useContext(SessionContext);
+
   return (
     <div className={styles.ConsoleActions}>
       <button
@@ -37,7 +42,11 @@ export default function ConsoleActionsRow({
         <button
           className={styles.DeleteTerminalExpressionButton}
           data-test-id="ClearConsoleEvaluationsButton"
-          onClick={clearConsoleEvaluations}
+          onClick={() => {
+            trackEvent("console.clear_messages");
+
+            clearConsoleEvaluations();
+          }}
           title="Clear console evaluations"
         >
           <Icon className={styles.DeleteTerminalExpressionIcon} type="delete" />

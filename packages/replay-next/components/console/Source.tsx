@@ -2,6 +2,7 @@ import { Location as ProtocolLocation } from "@replayio/protocol";
 import { MouseEvent, useContext } from "react";
 
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { getSourceSuspends } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -16,6 +17,7 @@ export default function Source({
 }) {
   const { inspectFunctionDefinition } = useContext(InspectorContext);
   const client = useContext(ReplayClientContext);
+  const { trackEvent } = useContext(SessionContext);
 
   const location = client.getPreferredLocation(locations);
   if (location == null) {
@@ -32,6 +34,8 @@ export default function Source({
   const openSource = (event: MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
+
+    trackEvent("console.select_source");
 
     if (inspectFunctionDefinition !== null) {
       inspectFunctionDefinition([location]);

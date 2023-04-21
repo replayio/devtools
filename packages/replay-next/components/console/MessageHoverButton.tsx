@@ -43,7 +43,7 @@ export default function MessageHoverButton({
   const [isHovered, setIsHovered] = useState(false);
 
   const { inspectFunctionDefinition, showCommentsPanel } = useContext(InspectorContext);
-  const { accessToken, recordingId } = useContext(SessionContext);
+  const { accessToken, recordingId, trackEvent } = useContext(SessionContext);
   const graphQLClient = useContext(GraphQLClientContext);
   const { executionPoint: currentExecutionPoint, update } = useContext(TimelineContext);
   const { canShowConsoleAndSources } = useContext(LayoutContext);
@@ -59,10 +59,12 @@ export default function MessageHoverButton({
   let button = null;
   if (isCurrentlyPausedAt) {
     if (showAddCommentButton && accessToken && location !== null) {
-      const addCommentTransition = () => {
+      const onClick = () => {
         if (location === null) {
           return;
         }
+
+        trackEvent("console.add_comment");
 
         startTransition(async () => {
           if (showCommentsPanel !== null) {
@@ -95,7 +97,7 @@ export default function MessageHoverButton({
           className={styles.AddCommentButton}
           data-test-id="AddCommentButton"
           disabled={isPending}
-          onClick={addCommentTransition}
+          onClick={onClick}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           ref={ref}
@@ -109,6 +111,9 @@ export default function MessageHoverButton({
     const onClick = (event: MouseEvent) => {
       event.preventDefault();
       event.stopPropagation();
+
+      trackEvent("console.seek");
+      trackEvent("console.select_source");
 
       // we only want to open the source if this doesn't hide the console
       update(time, executionPoint, canShowConsoleAndSources);
