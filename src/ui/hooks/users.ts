@@ -88,8 +88,8 @@ export enum Nag {
   RECORD_REPLAY = "record_replay",
   SEARCH_SOURCE_TEXT = "search_source_text",
   SHARE = "share",
-  VIEW_DEVTOOLS = "view_devtools",
   USE_FOCUS_MODE = "use_focus_mode",
+  VIEW_DEVTOOLS = "view_devtools",
 }
 
 // Keeping a list of unused nag types here so we don't accidentally
