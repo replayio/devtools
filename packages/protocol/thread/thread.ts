@@ -129,12 +129,6 @@ class _ThreadFront {
   isOriginalSource = (_: SourceId) => false;
   isPrettyPrintedSource = (_: SourceId) => false;
 
-  // Points which will be reached when stepping in various directions from a point.
-  resumeTargets = new Map<string, PauseDescription>();
-
-  // Epoch which invalidates step targets when advanced.
-  resumeTargetEpoch = 0;
-
   // Wait for all the annotations in the recording.
   private annotationWaiters: Map<string, Promise<findAnnotationsResult>> = new Map();
   private annotationCallbacks: Map<string, ((annotations: Annotation[]) => void)[]> = new Map();
@@ -360,22 +354,13 @@ class _ThreadFront {
     await this.ensureAllSources();
 
     while (true) {
-      // Check already-known resume targets.
-      const key = `${point}:${findTargetCommand.name}`;
-      let target = this.resumeTargets.get(key);
-
-      if (!target) {
-        const epoch = this.resumeTargetEpoch;
-        try {
-          const resp = await findTargetCommand({ point }, this.sessionId);
-          target = resp.target;
-          if (epoch == this.resumeTargetEpoch) {
-            this.updateMappedLocation(target.frame);
-            this.resumeTargets.set(key, target);
-          }
-        } catch {
-          return null;
-        }
+      let target: PauseDescription;
+      try {
+        const resp = await findTargetCommand({ point }, this.sessionId);
+        target = resp.target;
+        this.updateMappedLocation(target.frame);
+      } catch {
+        return null;
       }
 
       if (
