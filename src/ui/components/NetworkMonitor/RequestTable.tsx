@@ -29,7 +29,7 @@ const RequestTable = ({
   data: RequestSummary[];
   filteredAfterCount: number;
   filteredBeforeCount: number;
-  onRowSelect: (request: RequestSummary, event: React.MouseEvent) => void;
+  onRowSelect: (request: RequestSummary) => void;
   seek: (point: string, time: number, openSource: boolean, pauseId?: string | undefined) => boolean;
   selectedRequest?: RequestSummary;
   table: TableInstance<RequestSummary>;
@@ -41,13 +41,7 @@ const RequestTable = ({
   const onSeek = (request: RequestSummary) => {
     trackEvent("net_monitor.seek_to_request");
     seek(request.point.point, request.point.time, true);
-    const syntheticEvent = new MouseEvent("click", {
-      bubbles: true,
-      cancelable: true,
-      view: window,
-      button: 0,
-    });
-    onRowSelect(request, syntheticEvent as unknown as React.MouseEvent<Element, MouseEvent>);
+    onRowSelect(request);
   };
 
   let inPast = true;
@@ -89,10 +83,10 @@ const RequestTable = ({
                 isInPast={inPast}
                 isSelected={selectedRequest?.id === row.original.id}
                 key={row.getRowProps().key}
-                onClick={(request, event) => {
+                onClick={request => {
                   dismissInspectNetworkRequestNag();
                   console.log("calling");
-                  onRowSelect(request, event);
+                  onRowSelect(request);
                 }}
                 onSeek={onSeek}
                 row={row}
