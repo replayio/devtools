@@ -1,4 +1,4 @@
-import { ExecutionPoint, PointRange, TimeStampedPointRange } from "@replayio/protocol";
+import { ExecutionPoint, TimeStampedPointRange } from "@replayio/protocol";
 import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 import differenceInMinutes from "date-fns/differenceInMinutes";
 import differenceInMonths from "date-fns/differenceInMonths";
@@ -6,11 +6,6 @@ import differenceInWeeks from "date-fns/differenceInWeeks";
 import differenceInYears from "date-fns/differenceInYears";
 import padStart from "lodash/padStart";
 import prettyMilliseconds from "pretty-ms";
-
-const collator = new Intl.Collator("en", {
-  numeric: true,
-  sensitivity: "base",
-});
 
 export function areRangesEqual(
   prevRanges: Array<TimeStampedPointRange>,
@@ -24,7 +19,7 @@ export function areRangesEqual(
 }
 
 export function compareExecutionPoints(a: ExecutionPoint, b: ExecutionPoint): number {
-  return collator.compare(a, b);
+  return Number(BigInt(a) - BigInt(b));
 }
 
 export function isExecutionPointsGreaterThan(a: ExecutionPoint, b: ExecutionPoint): boolean {
