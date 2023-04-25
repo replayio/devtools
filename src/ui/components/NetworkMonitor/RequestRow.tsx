@@ -22,7 +22,7 @@ export const RequestRow = ({
   isInLoadedRegion: boolean;
   isInPast: boolean;
   isSelected: boolean;
-  onClick: (row: RequestSummary, event: React.MouseEvent) => void;
+  onClick: (row: RequestSummary) => void;
   onSeek: (row: RequestSummary) => void;
   row: Row<RequestSummary>;
 }) => {
