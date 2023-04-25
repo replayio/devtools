@@ -51,7 +51,7 @@ export const RequestRow = ({
           [styles.future]: !isInPast,
           [styles.unloaded]: !isInLoadedRegion,
         })}
-        onClick={event => onClick(row.original, event)}
+        onClick={() => onClick(row.original)}
         onContextMenu={onContextMenu}
         ref={ref}
         tabIndex={0}

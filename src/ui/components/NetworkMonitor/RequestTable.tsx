@@ -85,7 +85,6 @@ const RequestTable = ({
                 key={row.getRowProps().key}
                 onClick={request => {
                   dismissInspectNetworkRequestNag();
-                  console.log("calling");
                   onRowSelect(request);
                 }}
                 onSeek={onSeek}
