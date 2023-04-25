@@ -3,7 +3,7 @@ import { IntervalCache } from "suspense";
 
 import { LineHitCounts, ReplayClientInterface, SourceLocationRange } from "shared/client/types";
 
-import { createMockReplayClient } from "../utils/testing";
+import { MockReplayClientInterface, createMockReplayClient } from "../utils/testing";
 
 const DEFAULT_SOURCE_ID = "fake-source-id";
 const DEFAULT_FOCUS_RANGE = {
@@ -12,7 +12,7 @@ const DEFAULT_FOCUS_RANGE = {
 };
 
 describe("SourceHitCountsCache", () => {
-  let mockClient: { [key: string]: jest.Mock };
+  let mockClient: MockReplayClientInterface;
   let replayClient: ReplayClientInterface;
 
   let sourceHitCountsCache: IntervalCache<
@@ -22,7 +22,7 @@ describe("SourceHitCountsCache", () => {
   >;
 
   beforeEach(() => {
-    mockClient = createMockReplayClient() as any;
+    mockClient = createMockReplayClient();
     replayClient = mockClient as any as ReplayClientInterface;
 
     // Clear and recreate cached data between tests.

@@ -174,5 +174,29 @@ export function setupWindow(): void {
 // This mock client is mostly useless by itself,
 // but its methods can be overridden individually (or observed/inspected) by test code.
 export function createMockReplayClient() {
-  return mock<ReplayClientInterface>();
+  const mockClient = mock<ReplayClientInterface>();
+  mockClient.addEventListener.mockImplementation(() => {});
+  mockClient.createPause.mockImplementation(async () => ({
+    data: {},
+    pauseId: "fake",
+  }));
+  mockClient.getAllFrames.mockImplementation(async () => ({ frames: [], data: {} }));
+  mockClient.getBreakpointPositions.mockImplementation(async () => []);
+  mockClient.getPointsBoundingTime.mockImplementation(async time => ({
+    before: { point: String(time), time },
+    after: { point: String(time), time },
+  }));
+  mockClient.getPointNearTime.mockImplementation(async time => ({ point: String(time), time })),
+    mockClient.getSessionEndpoint.mockImplementation(async () => ({
+      point: "1000",
+      time: 1000,
+    }));
+  mockClient.findKeyboardEvents.mockImplementation(async () => {});
+  mockClient.findNavigationEvents.mockImplementation(async () => {});
+  mockClient.findSources.mockImplementation(async () => []);
+  mockClient.removeEventListener.mockImplementation(() => {});
+
+  return mockClient;
 }
+
+export type MockReplayClientInterface = ReturnType<typeof createMockReplayClient>;
