@@ -28,7 +28,6 @@ export const sourceHitCountsCache = createFocusIntervalCache<
 >({
   debugLabel: "SourceHitCountsCache",
   getPointForValue: ([line]) => line,
-  comparePoints: (a, b) => a - b,
   getKey,
   load: async (begin, end, client, sourceId, focusRange) => {
     try {

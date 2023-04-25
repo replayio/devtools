@@ -126,8 +126,8 @@ export const nextInteractionEventCache: Cache<
     }
 
     const entryPoints = await eventPointsCache.readAsync(
-      point,
-      pointNearEndTime.point,
+      BigInt(point),
+      BigInt(pointNearEndTime.point),
       replayClient,
       eventTypesToQuery
     );
