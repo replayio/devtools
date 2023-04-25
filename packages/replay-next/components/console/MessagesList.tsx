@@ -1,4 +1,11 @@
-import { ForwardedRef, MutableRefObject, ReactNode, forwardRef, useContext, useMemo } from "react";
+import React, {
+  ForwardedRef,
+  MutableRefObject,
+  ReactNode,
+  forwardRef,
+  useContext,
+  useMemo,
+} from "react";
 
 import Icon from "replay-next/components/Icon";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
@@ -18,7 +25,7 @@ import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegions } from "shared/utils/time";
 
-import ErrorBoundary from "../ErrorBoundary";
+import _ErrorBoundary from "../ErrorBoundary";
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
 import CurrentTimeIndicator from "./CurrentTimeIndicator";
 import { Loggable, LoggablesContext } from "./LoggablesContext";
@@ -31,6 +38,18 @@ import styles from "./MessagesList.module.css";
 import rendererStyles from "./renderers/shared.module.css";
 
 type CurrentTimeIndicatorPlacement = Loggable | "begin" | "end";
+
+const ErrorBoundary = ({ children }: { children: ReactNode }) => (
+  <_ErrorBoundary
+    fallback={
+      <div className={rendererStyles.Row}>
+        <div className={rendererStyles.ErrorBoundaryFallback}>Something went wrong.</div>
+      </div>
+    }
+  >
+    {children}
+  </_ErrorBoundary>
+);
 
 // This is an approximation of the console; the UI isn't meant to be the focus of this branch.
 // The primary purpose of this component is to showcase:
@@ -99,48 +118,60 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
     if (isLoaded) {
       if (isEventLog(loggable)) {
         listItems.push(
-          <EventLogRenderer
-            key={index}
-            index={index}
-            isFocused={loggable === currentSearchResult}
-            eventLog={loggable}
-          />
+          <ErrorBoundary key={`event-${loggable.eventType}-${loggable.point}`}>
+            <EventLogRenderer
+              key={index}
+              index={index}
+              isFocused={loggable === currentSearchResult}
+              eventLog={loggable}
+            />
+          </ErrorBoundary>
         );
       } else if (isPointInstance(loggable)) {
         listItems.push(
-          <LogPointRenderer
-            key={index}
-            index={index}
-            isFocused={loggable === currentSearchResult}
-            logPointInstance={loggable}
-          />
+          <ErrorBoundary
+            key={`logpoint-${loggable.point.key}-${loggable.timeStampedHitPoint.point}`}
+          >
+            <LogPointRenderer
+              key={index}
+              index={index}
+              isFocused={loggable === currentSearchResult}
+              logPointInstance={loggable}
+            />
+          </ErrorBoundary>
         );
       } else if (isProtocolMessage(loggable)) {
         listItems.push(
-          <MessageRenderer
-            key={index}
-            index={index}
-            isFocused={loggable === currentSearchResult}
-            message={loggable}
-          />
+          <ErrorBoundary key={`message-${loggable.point.point}`}>
+            <MessageRenderer
+              key={index}
+              index={index}
+              isFocused={loggable === currentSearchResult}
+              message={loggable}
+            />
+          </ErrorBoundary>
         );
       } else if (isTerminalExpression(loggable)) {
         listItems.push(
-          <TerminalExpressionRenderer
-            key={index}
-            index={index}
-            isFocused={loggable === currentSearchResult}
-            terminalExpression={loggable}
-          />
+          <ErrorBoundary key={`evaluation-${loggable.id}`}>
+            <TerminalExpressionRenderer
+              key={index}
+              index={index}
+              isFocused={loggable === currentSearchResult}
+              terminalExpression={loggable}
+            />
+          </ErrorBoundary>
         );
       } else if (isUncaughtException(loggable)) {
         listItems.push(
-          <UncaughtExceptionRenderer
-            key={index}
-            index={index}
-            isFocused={loggable === currentSearchResult}
-            uncaughtException={loggable}
-          />
+          <ErrorBoundary key={`exception-${loggable.point}`}>
+            <UncaughtExceptionRenderer
+              key={loggable.point}
+              index={index}
+              isFocused={loggable === currentSearchResult}
+              uncaughtException={loggable}
+            />
+          </ErrorBoundary>
         );
       } else {
         throw Error("Unsupported loggable type");
@@ -184,18 +215,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
         ref={forwardedRef as MutableRefObject<HTMLDivElement>}
         role="list"
       >
-        {listItems.map((item, index) => (
-          <ErrorBoundary
-            key={index}
-            fallback={
-              <div className={rendererStyles.Row}>
-                <div className={rendererStyles.ErrorBoundaryFallback}>Something went wrong.</div>
-              </div>
-            }
-          >
-            {item}
-          </ErrorBoundary>
-        ))}
+        {listItems}
       </div>
       {countAfter > 0 && (
         <div className={styles.CountRow}>
