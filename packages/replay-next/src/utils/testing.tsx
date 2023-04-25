@@ -1,5 +1,6 @@
 import { RenderResult, act, render as rtlRender } from "@testing-library/react";
 import fetch from "isomorphic-fetch";
+import { mock } from "jest-mock-extended";
 import { ReactNode } from "react";
 
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -173,70 +174,29 @@ export function setupWindow(): void {
 // This mock client is mostly useless by itself,
 // but its methods can be overridden individually (or observed/inspected) by test code.
 export function createMockReplayClient() {
-  return {
-    get loadedRegions() {
-      return null;
-    },
-    addEventListener: jest.fn(),
-    breakpointAdded: jest.fn(),
-    breakpointRemoved: jest.fn(),
-    configure: jest.fn().mockImplementation(async () => {}),
-    createPause: jest.fn().mockImplementation(async () => ({
-      frames: [],
-      data: {},
-    })),
-    evaluateExpression: jest.fn().mockImplementation(async () => ({ data: {} })),
-    findKeyboardEvents: jest.fn().mockImplementation(async () => []),
-    findMessages: jest.fn().mockImplementation(async () => ({ messages: [], overflow: false })),
-    findNavigationEvents: jest.fn().mockImplementation(async () => []),
-    findNetworkRequests: jest.fn().mockImplementation(async () => undefined),
-    findPoints: jest.fn().mockImplementation(async () => []),
-    findSources: jest.fn().mockImplementation(async () => []),
-    getAllFrames: jest.fn().mockImplementation(async () => ({ frames: [], data: {} })),
-    getAnnotationKinds: jest.fn().mockImplementation(async () => []),
-    getBuildId: jest.fn().mockImplementation(async () => ""),
-    getBreakpointPositions: jest.fn().mockImplementation(async () => []),
-    getCorrespondingSourceIds: jest.fn().mockImplementation(() => []),
-    getCorrespondingLocations: jest.fn().mockImplementation(() => []),
-    getEventCountForTypes: jest.fn().mockImplementation(async () => {}),
-    getAllEventHandlerCounts: jest.fn().mockImplementation(async () => {}),
-    getEventCountForType: jest.fn().mockImplementation(async () => 0),
-    getExceptionValue: jest.fn().mockImplementation(async () => ({})),
-    getFocusWindow: jest.fn().mockImplementation(async () => ({})),
-    getFrameSteps: jest.fn().mockImplementation(async () => []),
-    getHitPointsForLocation: jest.fn().mockImplementation(async () => []),
-    getMappedLocation: jest.fn().mockImplementation(async () => []),
-    getObjectWithPreview: jest.fn().mockImplementation(async () => ({})),
-    getObjectProperty: jest.fn().mockImplementation(async () => ({})),
-    getPointNearTime: jest.fn().mockImplementation(async () => ({ point: "0", time: 0 })),
-    getPointsBoundingTime: jest.fn().mockImplementation(async time => ({
-      before: { point: String(time), time },
-      after: { point: String(time), time },
-    })),
-    getPreferredLocation: jest.fn().mockImplementation(async () => ({})),
-    getRecordingId: jest.fn().mockImplementation(async () => "fake-recording-id"),
-    getScope: jest.fn().mockImplementation(async () => {}),
-    getScopeMap: jest.fn().mockImplementation(async () => {}),
-    getSessionEndpoint: jest.fn().mockImplementation(async () => ({
+  const mockClient = mock<ReplayClientInterface>();
+  mockClient.addEventListener.mockImplementation(() => {});
+  mockClient.createPause.mockImplementation(async () => ({
+    data: {},
+    pauseId: "fake",
+  }));
+  mockClient.getAllFrames.mockImplementation(async () => ({ frames: [], data: {} }));
+  mockClient.getBreakpointPositions.mockImplementation(async () => []);
+  mockClient.getPointsBoundingTime.mockImplementation(async time => ({
+    before: { point: String(time), time },
+    after: { point: String(time), time },
+  }));
+  mockClient.getPointNearTime.mockImplementation(async time => ({ point: String(time), time })),
+    mockClient.getSessionEndpoint.mockImplementation(async () => ({
       point: "1000",
       time: 1000,
-    })),
-    getSessionId: jest.fn().mockImplementation(async () => "fake-session-id"),
-    getSourceHitCounts: jest.fn().mockImplementation(async () => new Map()),
-    getSourceOutline: jest.fn().mockImplementation(async () => {}),
-    getTopFrame: jest.fn().mockImplementation(async () => undefined),
-    initialize: jest.fn().mockImplementation(async () => {}),
-    isOriginalSource: jest.fn().mockImplementation(async () => false),
-    isPrettyPrintedSource: jest.fn().mockImplementation(async () => false),
-    mapExpressionToGeneratedScope: jest.fn().mockImplementation(async () => ""),
-    requestFocusRange: jest.fn().mockImplementation(async () => {}),
-    removeEventListener: jest.fn(),
-    repaintGraphics: jest.fn().mockImplementation(async () => {}),
-    runEvaluation: jest.fn().mockImplementation(async () => {}),
-    searchFunctions: jest.fn().mockImplementation(async () => {}),
-    searchSources: jest.fn().mockImplementation(async () => {}),
-    streamSourceContents: jest.fn().mockImplementation(async () => {}),
-    waitForLoadedSources: jest.fn().mockImplementation(async () => undefined),
-    waitForTimeToBeLoaded: jest.fn().mockImplementation(async () => undefined),
-  };
+    }));
+  mockClient.findKeyboardEvents.mockImplementation(async () => {});
+  mockClient.findNavigationEvents.mockImplementation(async () => {});
+  mockClient.findSources.mockImplementation(async () => []);
+  mockClient.removeEventListener.mockImplementation(() => {});
+
+  return mockClient;
 }
+
+export type MockReplayClientInterface = ReturnType<typeof createMockReplayClient>;
