@@ -36,6 +36,12 @@
 .Input p {
   margin: 0;
 }
+.Input[data-disabled-reason="loading"] {
+  opacity: 0.5;
+}
+.Input[data-disabled-reason="not-focused"] {
+  color: var(--color-error);
+}
 
 .Icon {
   flex: 0 0 0.75rem;
@@ -54,4 +60,9 @@
   background-color: var(--background-color-error);
   border-top: 1px solid var(--border-color-error);
   color: var(--color-error);
+}
+
+.DisabledMessage {
+  text-decoration: underline;
+  cursor: pointer;
 }

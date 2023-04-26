@@ -3,6 +3,7 @@ import { Fragment, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { Suspense, memo, useContext } from "react";
 
+import { ProtocolMessage } from "replay-next/components/console/LoggablesContext";
 import useConsoleContextMenu from "replay-next/components/console/useConsoleContextMenu";
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import Expandable from "replay-next/components/Expandable";
@@ -12,7 +13,6 @@ import Loader from "replay-next/components/Loader";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { InspectableTimestampedPointContext } from "replay-next/src/contexts/InspectorContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { ProtocolMessage } from "replay-next/src/suspense/MessagesCache";
 import { protocolValueToClientValue } from "replay-next/src/utils/protocol";
 import { formatTimestamp } from "replay-next/src/utils/time";
 

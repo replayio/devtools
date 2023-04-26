@@ -253,84 +253,80 @@ export class ReplayClient implements ReplayClientInterface {
     this._injectedGetPreferredLocation = getPreferredLocation;
   }
 
-  async findMessages(focusRange: TimeStampedPointRange | null): Promise<{
+  async findMessages(onMessage?: (message: Message) => void): Promise<{
     messages: Message[];
     overflow: boolean;
   }> {
     const sessionId = this.getSessionIdThrows();
 
-    if (focusRange !== null) {
-      // We *only* care about loaded regions when calling `findMessagesInRange`.
-      // Calling `findMessages` is always safe and always returns the console
-      // messages for all parts of the recording, regardless of what is
-      // currently loading or loaded. The reason we sometimes use
-      // `findMessagesInRange` is because `findMessages` can overflow (if the
-      // replay contains more than 1,000 console messages). In that case, we
-      // might be able to fetch all of the console messages for a particular
-      // section by using `findMessagesInRange`, but it requires sending
-      // manifests to a running process, so it will only work in loaded regions.
+    const sortedMessages: Message[] = [];
 
-      // It would be better if `findMessagesInRange` either errored when the
-      // requested range could not be returned, or returned the boundaries of
-      // what it *did* successfully load (see BAC-2536), but right now it will
-      // just silently return a subset of messages. Given that we are extra
-      // careful here not to to fetch messages in unloaded regions because the
-      // result might be invalid (and may get cached by a Suspense caller).
-      await this._waitForRangeToBeLoaded(focusRange);
+    // TODO This won't work if there are ever overlapping requests.
+    // Do we need to implement some kind of locking mechanism to ensure only one read is going at a time?
+    client.Console.addNewMessageListener(({ message }) => {
+      if (onMessage) {
+        onMessage(message);
+      }
 
-      const response = await client.Console.findMessagesInRange(
-        { range: { begin: focusRange.begin.point, end: focusRange.end.point } },
-        sessionId
-      );
+      const newMessagePoint = message.point.point;
 
-      // Messages aren't guaranteed to arrive sorted, but unsorted messages aren't that useful to work with.
-      // So sort them before returning.
-      const sortedMessages = response.messages.sort((messageA: Message, messageB: Message) => {
-        const pointA = messageA.point.point;
-        const pointB = messageB.point.point;
-        return compareNumericStrings(pointA, pointB);
-      });
+      // Messages may arrive out of order so let's sort them as we get them.
+      let lowIndex = 0;
+      let highIndex = sortedMessages.length;
+      while (lowIndex < highIndex) {
+        let middleIndex = (lowIndex + highIndex) >>> 1;
+        const message = sortedMessages[middleIndex];
 
-      return {
-        messages: sortedMessages,
-        overflow: response.overflow == true,
-      };
-    } else {
-      const sortedMessages: Message[] = [];
-
-      // TODO This won't work if there are every overlapping requests.
-      // Do we need to implement some kind of locking mechanism to ensure only one read is going at a time?
-      client.Console.addNewMessageListener(({ message }) => {
-        const newMessagePoint = message.point.point;
-
-        // Messages may arrive out of order so let's sort them as we get them.
-        let lowIndex = 0;
-        let highIndex = sortedMessages.length;
-        while (lowIndex < highIndex) {
-          let middleIndex = (lowIndex + highIndex) >>> 1;
-          const message = sortedMessages[middleIndex];
-
-          if (compareNumericStrings(message.point.point, newMessagePoint)) {
-            lowIndex = middleIndex + 1;
-          } else {
-            highIndex = middleIndex;
-          }
+        if (compareNumericStrings(message.point.point, newMessagePoint)) {
+          lowIndex = middleIndex + 1;
+        } else {
+          highIndex = middleIndex;
         }
+      }
 
-        const insertAtIndex = lowIndex;
+      const insertAtIndex = lowIndex;
 
-        sortedMessages.splice(insertAtIndex, 0, message);
-      });
+      sortedMessages.splice(insertAtIndex, 0, message);
+    });
 
-      const response = await client.Console.findMessages({}, sessionId);
+    const response = await client.Console.findMessages({}, sessionId);
 
-      client.Console.removeNewMessageListener();
+    client.Console.removeNewMessageListener();
 
-      return {
-        messages: sortedMessages,
-        overflow: response.overflow == true,
-      };
-    }
+    return {
+      messages: sortedMessages,
+      overflow: response.overflow == true,
+    };
+  }
+
+  async findMessagesInRange(pointRange: PointRange): Promise<{
+    messages: Message[];
+    overflow: boolean;
+  }> {
+    const sessionId = this.getSessionIdThrows();
+
+    // It is important to wait until the range is fully loaded before requesting messages.
+    // It would be better if findMessagesInRange errored when the requested range could not be returned,
+    // or returned the boundaries of what it did successfully load (see BAC-2536),
+    // but right now it will just silently return a subset of messages.
+    // Given that we are extra careful here not to to fetch messages in unloaded regions
+    // because the result might be invalid (and may get cached by a Suspense caller).
+    await this._waitForRangeToBeLoaded(pointRange);
+
+    const response = await client.Console.findMessagesInRange({ range: pointRange }, sessionId);
+
+    // Messages aren't guaranteed to arrive sorted, but unsorted messages aren't that useful to work with.
+    // So sort them before returning.
+    const sortedMessages = response.messages.sort((messageA: Message, messageB: Message) => {
+      const pointA = messageA.point.point;
+      const pointB = messageB.point.point;
+      return compareNumericStrings(pointA, pointB);
+    });
+
+    return {
+      messages: sortedMessages,
+      overflow: response.overflow == true,
+    };
   }
 
   async findNavigationEvents(onNavigationEvents: (events: navigationEvents) => void) {
