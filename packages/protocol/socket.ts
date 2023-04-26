@@ -234,7 +234,8 @@ export async function sendMessage<M extends CommandMethods>(
   method: M,
   params: CommandParams<M>,
   sessionId?: SessionId,
-  pauseId?: PauseId
+  pauseId?: PauseId,
+  noCallerStackTrace = false
 ): Promise<CommandResult<M>> {
   const id = gNextMessageId++;
   const msg: CommandRequest = { id, method, params, pauseId, sessionId };
@@ -268,6 +269,7 @@ export async function sendMessage<M extends CommandMethods>(
       finalMessage = `${message} (request: ${method}, ${JSON.stringify(params)})`;
     }
     if (
+      !noCallerStackTrace &&
       !noCallerStackTracesForErrorCodes.has(code) &&
       !(code === ProtocolError.CommandFailed && noCallerStackTracesForFailedCommands.has(method))
     ) {
