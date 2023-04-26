@@ -320,6 +320,7 @@ export function createSocket(
       });
 
       window.sessionId = sessionId;
+      replayClient.configure(sessionId);
       ThreadFront.setSessionId(sessionId);
       const recordingTarget = await recordingTargetCache.readAsync(replayClient);
       dispatch(actions.setRecordingTarget(recordingTarget));

@@ -18,7 +18,6 @@ import {
   useGetRecordingId,
   useSubscribeRecording,
 } from "ui/hooks/recordings";
-import useConfigureReplayClientInterop from "ui/hooks/useReplayClient";
 import setupDevtools, { migratePerRecordingPersistedSettings } from "ui/setup/dynamic/devtools";
 import { useAppDispatch, useAppStore } from "ui/setup/hooks";
 import { isTest } from "ui/utils/environment";
@@ -138,7 +137,6 @@ function RecordingPage({
   const [recording, setRecording] = useState<RecordingInfo | null>();
   const [uploadComplete, setUploadComplete] = useState(false);
 
-  useConfigureReplayClientInterop();
   const replayClient = useContext(ReplayClientContext);
 
   useEffect(() => {
