@@ -34,8 +34,8 @@ const logPointAnalysisCache = createAnalysisCache<
     `${location.sourceId}:${location.line}:${location.column}:${code}:${condition}`,
   async (client, begin, end, location, code, condition) => {
     const pointDescriptions = await hitPointsCache.readAsync(
-      begin,
-      end,
+      BigInt(begin),
+      BigInt(end),
       client,
       location,
       condition
@@ -79,8 +79,8 @@ export function getLogPointAnalysisResultSuspense(
     // as it shares the points with other parts of the UI), so we call it here to ensure
     // that the analysis is run for the given range
     logPointAnalysisCache.pointsIntervalCache.readAsync(
-      range.begin,
-      range.end,
+      BigInt(range.begin),
+      BigInt(range.end),
       client,
       location,
       code,

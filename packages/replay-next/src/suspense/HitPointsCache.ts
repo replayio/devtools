@@ -1,9 +1,8 @@
 import { Location, PointRange, TimeStampedPoint } from "@replayio/protocol";
-import { ExecutionPoint } from "@replayio/protocol";
 import { isPromiseLike } from "suspense";
 
-import { compareNumericStrings } from "protocol/utils";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
+import { compareNumericStrings } from "replay-next/src/utils/string";
 import { createFetchAsyncFromFetchSuspense } from "replay-next/src/utils/suspense";
 import { MAX_POINTS_TO_RUN_EVALUATION } from "shared/client/ReplayClient";
 import {
@@ -13,12 +12,11 @@ import {
 } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 
-import { createFocusIntervalCache } from "./FocusIntervalCache";
+import { createFocusIntervalCacheForExecutionPoints } from "./FocusIntervalCache";
 import { mappedExpressionCache } from "./MappedExpressionCache";
 import { cachePauseData, setPointAndTimeForPauseId } from "./PauseCache";
 
-export const hitPointsCache = createFocusIntervalCache<
-  ExecutionPoint,
+export const hitPointsCache = createFocusIntervalCacheForExecutionPoints<
   [replayClient: ReplayClientInterface, location: Location, condition: string | null],
   TimeStampedPoint
 >({
@@ -26,7 +24,6 @@ export const hitPointsCache = createFocusIntervalCache<
   getKey: (replayClient, location, condition) =>
     `${location.sourceId}:${location.line}:${location.column}:${condition}`,
   getPointForValue: timeStampedPoint => timeStampedPoint.point,
-  comparePoints: compareNumericStrings,
   load: async (begin, end, replayClient, location, condition) => {
     const locations = replayClient.getCorrespondingLocations(location);
     await Promise.all(
@@ -83,7 +80,13 @@ export function getHitPointsForLocationSuspense(
   let hitPoints: TimeStampedPoint[] = [];
   let status: HitPointStatus = "complete";
   try {
-    hitPoints = hitPointsCache.read(range.begin, range.end, client, location, condition);
+    hitPoints = hitPointsCache.read(
+      BigInt(range.begin),
+      BigInt(range.end),
+      client,
+      location,
+      condition
+    );
     if (hitPoints.length > MAX_POINTS_TO_RUN_EVALUATION) {
       status = "too-many-points-to-run-analysis";
     }

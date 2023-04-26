@@ -1,10 +1,9 @@
-import { ExecutionPoint, PointDescription, PointRange, PointSelector } from "@replayio/protocol";
+import { PointDescription, PointRange, PointSelector } from "@replayio/protocol";
 import { EventHandlerType } from "@replayio/protocol";
 import isEmpty from "lodash/isEmpty";
 import without from "lodash/without";
 import { Cache, createCache } from "suspense";
 
-import { compareNumericStrings } from "protocol/utils";
 import { RecordingTarget, recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
@@ -13,7 +12,7 @@ import { STANDARD_EVENT_CATEGORIES } from "../constants";
 import { groupEntries } from "../utils/group";
 import { createInfallibleSuspenseCache } from "../utils/suspense";
 import { createAnalysisCache } from "./AnalysisCache";
-import { createFocusIntervalCache } from "./FocusIntervalCache";
+import { createFocusIntervalCacheForExecutionPoints } from "./FocusIntervalCache";
 import { updateMappedLocation } from "./PauseCache";
 
 export type Event = {
@@ -60,15 +59,13 @@ export const eventCountsCache: Cache<
   },
 });
 
-export const eventPointsCache = createFocusIntervalCache<
-  ExecutionPoint,
+export const eventPointsCache = createFocusIntervalCacheForExecutionPoints<
   [client: ReplayClientInterface, eventTypes: EventHandlerType[]],
   PointDescription
 >({
   debugLabel: "EventPoints",
   getKey: (client, eventTypes) => eventTypes.join(),
   getPointForValue: pointDescription => pointDescription.point,
-  comparePoints: compareNumericStrings,
   load: async (begin, end, client, eventTypes) => {
     const points = await client.findPoints(createPointSelector(eventTypes), { begin, end });
     points.forEach(p => {
@@ -83,7 +80,8 @@ export const eventPointsCache = createFocusIntervalCache<
 export const eventsCache = createAnalysisCache<EventLog, [EventHandlerType]>(
   "Events",
   eventType => eventType,
-  (client, begin, end, eventType) => eventPointsCache.readAsync(begin, end, client, [eventType]),
+  (client, begin, end, eventType) =>
+    eventPointsCache.readAsync(BigInt(begin), BigInt(end), client, [eventType]),
   (client, points, eventType) => {
     return {
       selector: createPointSelector([eventType]),

@@ -209,8 +209,8 @@ function ExceptionsBadgeSuspends() {
 
   try {
     exceptionsCache.pointsIntervalCache.read(
-      focusRange.begin.point,
-      focusRange.end.point,
+      BigInt(focusRange.begin.point),
+      BigInt(focusRange.end.point),
       replayClient
     );
   } catch (errorOrPromise) {

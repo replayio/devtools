@@ -1,18 +1,12 @@
 import { ExecutionPoint, PauseId, PointDescription, TimeStampedPoint } from "@replayio/protocol";
 import { PointSelector, Value } from "@replayio/protocol";
-import {
-  Cache,
-  ExternallyManagedCache,
-  IntervalCache,
-  createExternallyManagedCache,
-} from "suspense";
+import { ExternallyManagedCache, IntervalCache, createExternallyManagedCache } from "suspense";
 
-import { compareNumericStrings } from "protocol/utils";
 import { MAX_POINTS_TO_RUN_EVALUATION } from "shared/client/ReplayClient";
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, commandError, isCommandError } from "shared/utils/error";
 
-import { createFocusIntervalCache } from "./FocusIntervalCache";
+import { createFocusIntervalCacheForExecutionPoints } from "./FocusIntervalCache";
 import { objectPropertyCache } from "./ObjectPreviews";
 import { cachePauseData, setPointAndTimeForPauseId } from "./PauseCache";
 
@@ -31,7 +25,7 @@ export interface RemoteAnalysisResult {
 
 export interface AnalysisCache<T extends { point: ExecutionPoint }, TParams extends any[]> {
   pointsIntervalCache: IntervalCache<
-    ExecutionPoint,
+    bigint,
     [client: ReplayClientInterface, ...params: TParams],
     T
   >;
@@ -71,15 +65,13 @@ export function createAnalysisCache<
     },
   });
 
-  const pointsIntervalCache = createFocusIntervalCache<
-    ExecutionPoint,
+  const pointsIntervalCache = createFocusIntervalCacheForExecutionPoints<
     [client: ReplayClientInterface, ...params: TParams],
     TPoint
   >({
     debugLabel: `${debugLabel} IntervalCache`,
     getKey: (client, ...params) => getKey(...params),
     getPointForValue: pointDescription => pointDescription.point,
-    comparePoints: compareNumericStrings,
     load: async (begin, end, client, ...paramsWithCacheLoadOptions) => {
       const params = paramsWithCacheLoadOptions.slice(0, -1) as TParams;
       const points = await findPoints(client, begin, end, ...params);

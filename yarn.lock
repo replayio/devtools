@@ -7830,6 +7830,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"array-sorting-utilities@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "array-sorting-utilities@npm:0.0.1"
+  checksum: 70ed530aabfac49eee000cb2ffa1f5320c0d634975e36c607ce18b607d01d50083e8acd58976446a925b48ce1d106ed894ba3671ba51dcf5478889272977f5ce
+  languageName: node
+  linkType: hard
+
 "array-union@npm:^1.0.2":
   version: 1.0.2
   resolution: "array-union@npm:1.0.2"
@@ -18043,6 +18050,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-interval-tree@npm:^2.1.2":
+  version: 2.1.2
+  resolution: "node-interval-tree@npm:2.1.2"
+  dependencies:
+    shallowequal: ^1.1.0
+  checksum: 1b77d7a0729778551951e4de3ceb786fb034485c24cb3c50729eb321f27a74c1e189ddf137ea74db580daaa18a540a7659953cdf1008d7e22568d355db3fee56
+  languageName: node
+  linkType: hard
+
 "node-libs-browser@npm:^2.2.1":
   version: 2.2.1
   resolution: "node-libs-browser@npm:2.2.1"
@@ -20751,7 +20767,7 @@ __metadata:
     style-loader: ^3.3.1
     stylelint: ^14.16.0
     stylelint-config-prettier: ^9.0.4
-    suspense: ^0.0.34
+    suspense: ^0.0.37
     tailwindcss: ^3.2.4
     ts-node: ^10.7.0
     tsconfig-paths: ^3.14.1
@@ -21106,7 +21122,7 @@ __metadata:
     react-dom: 0.0.0-experimental-e7d0053e6-20220325
     react-virtualized-auto-sizer: ^1.0.7
     shared: "workspace:*"
-    suspense: ^0.0.34
+    suspense: ^0.0.37
     typescript: 5.0.2
     uuid: ^7.0.3
   languageName: unknown
@@ -21788,6 +21804,13 @@ __metadata:
   dependencies:
     kind-of: ^6.0.2
   checksum: 39b3dd9630a774aba288a680e7d2901f5c0eae7b8387fc5c8ea559918b29b3da144b7bdb990d7ccd9e11be05508ac9e459ce51d01fd65e583282f6ffafcba2e7
+  languageName: node
+  linkType: hard
+
+"shallowequal@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "shallowequal@npm:1.1.0"
+  checksum: f4c1de0837f106d2dbbfd5d0720a5d059d1c66b42b580965c8f06bb1db684be8783538b684092648c981294bf817869f743a066538771dbecb293df78f765e00
   languageName: node
   linkType: hard
 
@@ -22917,16 +22940,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"suspense@npm:^0.0.34":
-  version: 0.0.34
-  resolution: "suspense@npm:0.0.34"
+"suspense@npm:^0.0.37":
+  version: 0.0.37
+  resolution: "suspense@npm:0.0.37"
   dependencies:
+    array-sorting-utilities: ^0.0.1
     interval-utilities: ^0.0.1
+    node-interval-tree: ^2.1.2
     point-utilities: ^0.0.2
   peerDependencies:
     react: ^18.0.0
     react-dom: ^18.0.0
-  checksum: 040acff94585985fe329aaeeeb701e2a9ac73c03f674f7fbeefb80e0fe80efe7622703cc7f660fbf20c7c6feaa97b4e95a0539831c3117d203936eaf05c7d7e6
+  checksum: 83a619853471fcb3cf4d03ac3cfb665aaba9c6615491c57110a08128e28edf0da39872673ab25565bd938e278e6e36185fccd08730748d49e563e236cb6945c8
   languageName: node
   linkType: hard
 

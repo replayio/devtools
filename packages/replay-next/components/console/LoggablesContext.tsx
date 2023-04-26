@@ -65,7 +65,6 @@ export function LoggablesContextRoot({
     showNodeModules,
     showWarnings,
   } = useContext(ConsoleFiltersContext);
-
   const { range: focusRange } = useContext(FocusContext);
   const { endpoint } = useContext(SessionContext);
 
@@ -89,8 +88,8 @@ export function LoggablesContextRoot({
       ...eventTypesToLoad.map(
         eventType => () =>
           getInfallibleEventPointsSuspense(
-            focusRange.begin.point,
-            focusRange.end.point,
+            BigInt(focusRange.begin.point),
+            BigInt(focusRange.end.point),
             client,
             eventType
           ) ?? []
@@ -142,9 +141,13 @@ export function LoggablesContextRoot({
   // We may suspend based on this value, so let's this value changes at sync priority,
   let exceptions: UncaughtException[] = EMPTY_ARRAY;
   if (focusRange && showExceptions) {
+    // TODO [FE-1311] This isn't a safe time to suspend either; there are hooks below
     exceptions =
-      getInfallibleExceptionPointsSuspense(focusRange.begin.point, focusRange.end.point, client) ??
-      EMPTY_ARRAY;
+      getInfallibleExceptionPointsSuspense(
+        BigInt(focusRange.begin.point),
+        BigInt(focusRange.end.point),
+        client
+      ) ?? EMPTY_ARRAY;
   }
 
   const pointInstances = useMemo<PointInstance[]>(() => {
