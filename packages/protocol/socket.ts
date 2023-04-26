@@ -94,6 +94,8 @@ if (typeof window !== "undefined") {
 
 const noCallerStackTracesForErrorCodes = new Set<ProtocolError>([
   ProtocolError.CommandFailed,
+  ProtocolError.DocumentIsUnavailable,
+  ProtocolError.FocusWindowChange,
   ProtocolError.GraphicsUnavailableAtPoint,
   ProtocolError.InternalError,
   ProtocolError.InvalidRecording,
@@ -101,6 +103,7 @@ const noCallerStackTracesForErrorCodes = new Set<ProtocolError>([
   ProtocolError.SessionDestroyed,
   ProtocolError.ServiceUnavailable,
   ProtocolError.TimedOut,
+  ProtocolError.TooManyGeneratedLocations,
   ProtocolError.TooManyPoints,
   ProtocolError.UnknownBuild,
   ProtocolError.UnknownSession,
