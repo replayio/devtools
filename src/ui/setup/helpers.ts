@@ -40,7 +40,7 @@ export async function setupAppHelper(store: UIStore) {
     replaySession,
     client,
     sendMessage: (cmd, args = {}, pauseId) =>
-      sendMessage(cmd, args, window.sessionId, pauseId as any),
+      sendMessage(cmd, args, window.sessionId, pauseId as any, true),
     releaseSession: () => client.Recording.releaseSession({ sessionId: window.sessionId }),
     dumpPrefs: () =>
       JSON.stringify({ features: features.toJSON(), prefs: prefs.toJSON() }, null, 2),
