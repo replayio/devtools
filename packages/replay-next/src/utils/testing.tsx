@@ -186,12 +186,17 @@ export function createMockReplayClient() {
     before: { point: String(time), time },
     after: { point: String(time), time },
   }));
-  mockClient.getPointNearTime.mockImplementation(async time => ({ point: String(time), time })),
-    mockClient.getSessionEndpoint.mockImplementation(async () => ({
-      point: "1000",
-      time: 1000,
-    }));
+  mockClient.getPointNearTime.mockImplementation(async time => ({ point: String(time), time }));
+  mockClient.getSessionEndpoint.mockImplementation(async () => ({
+    point: "1000",
+    time: 1000,
+  }));
   mockClient.findKeyboardEvents.mockImplementation(async () => {});
+  mockClient.findMessages.mockImplementation(async () => ({ messages: [], overflow: false }));
+  mockClient.findMessagesInRange.mockImplementation(async () => ({
+    messages: [],
+    overflow: false,
+  }));
   mockClient.findNavigationEvents.mockImplementation(async () => {});
   mockClient.findSources.mockImplementation(async () => []);
   mockClient.removeEventListener.mockImplementation(() => {});

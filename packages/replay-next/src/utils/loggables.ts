@@ -1,11 +1,11 @@
 import { ExecutionPoint } from "@replayio/protocol";
 
 import { Loggable } from "replay-next/components/console/LoggablesContext";
+import { ProtocolMessage } from "replay-next/components/console/LoggablesContext";
 import { PointInstance } from "replay-next/src/contexts/points/types";
 import { TerminalExpression } from "replay-next/src/contexts/TerminalContext";
 import { EventLog } from "replay-next/src/suspense/EventsCache";
 import { UncaughtException } from "replay-next/src/suspense/ExceptionsCache";
-import { ProtocolMessage } from "replay-next/src/suspense/MessagesCache";
 
 import { compareExecutionPoints } from "./time";
 

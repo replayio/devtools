@@ -1,6 +1,5 @@
 import { ExecutionPoint } from "@replayio/protocol";
 import {
-  ComparisonFunction,
   GetPointForValue,
   IntervalCache,
   IntervalCacheLoadOptions,

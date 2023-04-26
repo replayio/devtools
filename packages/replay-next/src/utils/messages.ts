@@ -1,4 +1,4 @@
-import { ProtocolMessage } from "replay-next/src/suspense/MessagesCache";
+import { ProtocolMessage } from "replay-next/components/console/LoggablesContext";
 import { getSourceIfCached } from "replay-next/src/suspense/SourcesCache";
 
 // Messages with pages that match this expression are internal Firefox errors and we should not display them.

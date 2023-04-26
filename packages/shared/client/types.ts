@@ -153,7 +153,11 @@ export interface ReplayClientInterface {
     frameId: FrameId | null
   ): Promise<EvaluationResult>;
   findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void): Promise<void>;
-  findMessages(focusRange: TimeStampedPointRange | null): Promise<{
+  findMessages(onMessage?: (message: Message) => void): Promise<{
+    messages: Message[];
+    overflow: boolean;
+  }>;
+  findMessagesInRange(focusRange: PointRange): Promise<{
     messages: Message[];
     overflow: boolean;
   }>;

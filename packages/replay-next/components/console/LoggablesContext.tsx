@@ -1,4 +1,4 @@
-import { EventHandlerType } from "@replayio/protocol";
+import { EventHandlerType, Message } from "@replayio/protocol";
 import {
   MutableRefObject,
   ReactNode,
@@ -12,15 +12,14 @@ import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersCo
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { PointInstance } from "replay-next/src/contexts/points/types";
-import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TerminalContext, TerminalExpression } from "replay-next/src/contexts/TerminalContext";
+import { useStreamingMessages } from "replay-next/src/hooks/useStreamingMessages";
 import { EventLog, getInfallibleEventPointsSuspense } from "replay-next/src/suspense/EventsCache";
 import {
   UncaughtException,
   getInfallibleExceptionPointsSuspense,
 } from "replay-next/src/suspense/ExceptionsCache";
 import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/HitPointsCache";
-import { ProtocolMessage, getMessagesSuspense } from "replay-next/src/suspense/MessagesCache";
 import { loggableSort } from "replay-next/src/utils/loggables";
 import { isInNodeModules } from "replay-next/src/utils/messages";
 import { suspendInParallel } from "replay-next/src/utils/suspense";
@@ -28,6 +27,10 @@ import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_ENABLED } from "shared/client/types";
 import { toPointRange } from "shared/utils/time";
+
+export type ProtocolMessage = Message & {
+  type: "ProtocolMessage";
+};
 
 export type Loggable =
   | EventLog
@@ -53,6 +56,35 @@ export function LoggablesContextRoot({
   children: ReactNode;
   messageListRef: MutableRefObject<HTMLElement | null>;
 }) {
+  const { messages } = useStreamingMessages();
+
+  const protocolMessages = useMemo<ProtocolMessage[]>(
+    () =>
+      messages.map(message => ({
+        ...message,
+        type: "ProtocolMessage",
+      })),
+    [messages]
+  );
+
+  return (
+    <LoggablesContextInner
+      children={children}
+      messageListRef={messageListRef}
+      messages={protocolMessages}
+    />
+  );
+}
+
+function LoggablesContextInner({
+  children,
+  messageListRef,
+  messages,
+}: {
+  children: ReactNode;
+  messageListRef: MutableRefObject<HTMLElement | null>;
+  messages: ProtocolMessage[];
+}) {
   const client = useContext(ReplayClientContext);
   const { pointBehaviorsForSuspense: pointBehaviors, pointsForSuspense: points } =
     useContext(PointsContext);
@@ -66,7 +98,6 @@ export function LoggablesContextRoot({
     showWarnings,
   } = useContext(ConsoleFiltersContext);
   const { range: focusRange } = useContext(FocusContext);
-  const { endpoint } = useContext(SessionContext);
 
   // Find the set of event type handlers we should be displaying in the console.
   const eventTypesToLoad = useMemo<EventHandlerType[]>(() => {
@@ -96,8 +127,6 @@ export function LoggablesContextRoot({
       )
     ).flat();
   }, [client, eventTypesToLoad, focusRange]);
-
-  const { messages } = getMessagesSuspense(client, focusRange, endpoint);
 
   // Pre-filter in-focus messages by non text based search criteria.
   const preFilteredMessages = useMemo<ProtocolMessage[]>(() => {
@@ -141,7 +170,7 @@ export function LoggablesContextRoot({
   // We may suspend based on this value, so let's this value changes at sync priority,
   let exceptions: UncaughtException[] = EMPTY_ARRAY;
   if (focusRange && showExceptions) {
-    // TODO [FE-1311] This isn't a safe time to suspend either; there are hooks below
+    // TODO This isn't a safe time to suspend; there are hooks below
     exceptions =
       getInfallibleExceptionPointsSuspense(
         BigInt(focusRange.begin.point),
@@ -160,6 +189,7 @@ export function LoggablesContextRoot({
     points.forEach(point => {
       const pointBehavior = pointBehaviors[point.key];
       if (pointBehavior?.shouldLog === POINT_BEHAVIOR_ENABLED) {
+        // TODO This isn't a safe time to suspend (inside of useMemo())
         const [hitPoints, status] = getHitPointsForLocationSuspense(
           client,
           point.location,

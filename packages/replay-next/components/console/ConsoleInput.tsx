@@ -32,17 +32,33 @@ export default function ConsoleInput({ inputRef }: { inputRef?: RefObject<Impera
   const { executionPoint } = useContext(TimelineContext);
   const { enterFocusMode } = useContext(FocusContext);
 
-  if (!isPointInRegions(executionPoint, loadedRegions?.loaded ?? [])) {
+  let disabledMessage = null;
+  let disabledReason = undefined;
+  if (!isPointInRegions(executionPoint, loadedRegions?.loading ?? [])) {
+    disabledReason = "not-focused";
+    disabledMessage = (
+      <>
+        Paused outside of the{" "}
+        <span className={styles.DisabledMessage} onClick={enterFocusMode}>
+          debugging window
+        </span>
+      </>
+    );
+  } else if (!isPointInRegions(executionPoint, loadedRegions?.loaded ?? [])) {
+    disabledReason = "loading";
+    disabledMessage = <>Disabled while loading</>;
+  }
+
+  if (disabledMessage) {
     return (
-      <div className={styles.FallbackState}>
-        <Icon className={styles.Icon} type="terminal-prompt" />
-        <div>
-          Input disabled because you're paused at a point outside{" "}
-          <span className="cursor-pointer underline" onClick={enterFocusMode}>
-            your debugging window
-          </span>
-          .
+      <div className={styles.Container}>
+        <div className={styles.PromptRow}>
+          <Icon className={styles.Icon} type="terminal-prompt" />
+          <div className={styles.Input} data-disabled-reason={disabledReason}>
+            {disabledMessage}
+          </div>
         </div>
+        <div className={styles.ResultRow}> </div>
       </div>
     );
   }

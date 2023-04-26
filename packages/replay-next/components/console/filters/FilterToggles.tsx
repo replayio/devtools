@@ -1,5 +1,6 @@
+import { ErrorBoundary } from "@sentry/react";
 import camelCase from "lodash/camelCase";
-import React, { ReactNode, Suspense, useContext, useMemo } from "react";
+import React, { PropsWithChildren, ReactNode, Suspense, useContext, useMemo } from "react";
 import { isPromiseLike } from "suspense";
 
 import { Badge, Checkbox } from "design";
@@ -7,9 +8,10 @@ import Icon from "replay-next/components/Icon";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { useStreamingMessages } from "replay-next/src/hooks/useStreamingMessages";
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { exceptionsCache } from "replay-next/src/suspense/ExceptionsCache";
-import { CategoryCounts, getMessagesSuspense } from "replay-next/src/suspense/MessagesCache";
+import { CategoryCounts } from "replay-next/src/suspense/MessagesCache";
 import { isInNodeModules } from "replay-next/src/utils/messages";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ProtocolError, isCommandError } from "shared/utils/error";
@@ -27,8 +29,9 @@ export default function FilterToggles() {
     showWarnings,
     update,
   } = useContext(ConsoleFiltersContext);
-  const { trackEvent } = useContext(SessionContext);
   const replayClient = useContext(ReplayClientContext);
+  const { trackEvent } = useContext(SessionContext);
+
   const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
 
   const onShowErrorsChange = (showErrors: boolean) => {
@@ -75,9 +78,11 @@ export default function FilterToggles() {
       />
       <Toggle
         afterContent={
-          <Suspense fallback={null}>
-            <ToggleCategoryCount category="logs" />
-          </Suspense>
+          <CountErrorBoundary>
+            <Suspense fallback={null}>
+              <ToggleCategoryCount category="logs" />
+            </Suspense>
+          </CountErrorBoundary>
         }
         checked={showLogs}
         label="Logs"
@@ -85,9 +90,11 @@ export default function FilterToggles() {
       />
       <Toggle
         afterContent={
-          <Suspense fallback={null}>
-            <ToggleCategoryCount category="warnings" />
-          </Suspense>
+          <CountErrorBoundary>
+            <Suspense fallback={null}>
+              <ToggleCategoryCount category="warnings" />
+            </Suspense>
+          </CountErrorBoundary>
         }
         checked={showWarnings}
         label="Warnings"
@@ -95,9 +102,11 @@ export default function FilterToggles() {
       />
       <Toggle
         afterContent={
-          <Suspense fallback={null}>
-            <ToggleCategoryCount category="errors" />
-          </Suspense>
+          <CountErrorBoundary>
+            <Suspense fallback={null}>
+              <ToggleCategoryCount category="errors" />
+            </Suspense>
+          </CountErrorBoundary>
         }
         checked={showErrors}
         label="Errors"
@@ -114,9 +123,11 @@ export default function FilterToggles() {
 
       <Toggle
         afterContent={
-          <Suspense fallback={null}>
-            <NodeModulesCount />
-          </Suspense>
+          <CountErrorBoundary>
+            <Suspense fallback={null}>
+              <NodeModulesCount />
+            </Suspense>
+          </CountErrorBoundary>
         }
         checked={showNodeModules}
         label="Node modules"
@@ -153,21 +164,25 @@ function Toggle({
   );
 }
 
+function CountErrorBoundary({ children }: PropsWithChildren) {
+  return (
+    <ErrorBoundary
+      fallback={
+        <span title="Something went wrong loading message counts.">
+          <Icon className={styles.ExceptionsErrorIcon} type="warning" />
+        </span>
+      }
+    >
+      {children}
+    </ErrorBoundary>
+  );
+}
+
 function ToggleCategoryCount({ category }: { category: keyof CategoryCounts }) {
-  const { range: focusRange } = useContext(FocusContext);
-  const client = useContext(ReplayClientContext);
-  const { endpoint } = useContext(SessionContext);
+  const { messageMetadata } = useStreamingMessages();
 
-  const { didError, categoryCounts } = getMessagesSuspense(client, focusRange, endpoint);
-  const count = categoryCounts[category];
-
-  if (didError) {
-    return (
-      <span title="Something went wrong loading message counts.">
-        <Icon className={styles.ExceptionsErrorIcon} type="warning" />
-      </span>
-    );
-  } else if (count > 0) {
+  const count = messageMetadata.categoryCounts[category];
+  if (count > 0) {
     return <Badge label={count} />;
   } else {
     return null;
@@ -175,23 +190,13 @@ function ToggleCategoryCount({ category }: { category: keyof CategoryCounts }) {
 }
 
 function NodeModulesCount() {
-  const client = useContext(ReplayClientContext);
-  const { range } = useContext(FocusContext);
-  const { endpoint } = useContext(SessionContext);
-
-  const { didError, messages } = getMessagesSuspense(client, range, endpoint);
+  const { messages } = useStreamingMessages();
 
   const count = useMemo(() => {
     return messages ? messages.filter(message => isInNodeModules(message)).length : 0;
   }, [messages]);
 
-  if (didError) {
-    return (
-      <span title="Something went wrong loading message counts.">
-        <Icon className={styles.ExceptionsErrorIcon} type="warning" />
-      </span>
-    );
-  } else if (count > 0) {
+  if (count > 0) {
     return <Badge label={count} />;
   } else {
     return null;

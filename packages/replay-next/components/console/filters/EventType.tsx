@@ -4,8 +4,7 @@ import { STATUS_PENDING, STATUS_REJECTED, useIntervalCacheStatus } from "suspens
 import { Badge, Checkbox } from "design";
 import Icon from "replay-next/components/Icon";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
-import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { useCurrentFocusPointRange } from "replay-next/src/hooks/useCurrentFocusPointRange";
 import useTooltip from "replay-next/src/hooks/useTooltip";
 import { Event, eventsCache } from "replay-next/src/suspense/EventsCache";
 import { MAX_POINTS_TO_RUN_EVALUATION } from "shared/client/ReplayClient";
@@ -23,14 +22,14 @@ export default function EventType({
   event: Event;
 }) {
   const { eventTypesForDisplay: eventTypes, update } = useContext(ConsoleFiltersContext);
-  const { range: focusRange } = useContext(FocusContext);
   const client = useContext(ReplayClientContext);
-  const { endpoint } = useContext(SessionContext);
+
+  const focusPointRange = useCurrentFocusPointRange();
 
   const status = useIntervalCacheStatus(
     eventsCache.pointsIntervalCache,
-    BigInt(focusRange?.begin.point ?? "0"),
-    BigInt(focusRange?.end.point ?? endpoint),
+    BigInt(focusPointRange.begin),
+    BigInt(focusPointRange.end),
     client,
     event.type
   );
