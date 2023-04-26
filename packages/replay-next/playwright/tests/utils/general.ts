@@ -9,7 +9,7 @@ import {
 } from "@playwright/test";
 import chalk from "chalk";
 
-const { HOST, RECORD_PROTOCOL_DATA, VISUAL_DEBUG, VISUALS } = process.env;
+const { HOST, VISUAL_DEBUG, WRITE_SNAPSHOT_IMAGE_FILES } = process.env;
 
 const SCREENSHOT_OPTIONS: LocatorScreenshotOptions & PageScreenshotOptions = {
   animations: "disabled",
@@ -77,14 +77,11 @@ export async function getElementCount(page: Page, queryString: string): Promise<
 }
 
 export function getTestUrl(testRoute: string, additionalQueryParams: string[] = []): string {
-  const { debug, fixtureDataPath, record, recordingId } = global as any;
+  const { debug, record, recordingId } = global as any;
 
   const host = HOST || "localhost";
 
   const queryParams: string[] = [`host=${host}`];
-  if (fixtureDataPath) {
-    queryParams.push(`fixtureDataPath=${fixtureDataPath}`);
-  }
   if (debug) {
     queryParams.push("debug");
   }
@@ -156,12 +153,6 @@ export async function stopHovering(page: Page): Promise<void> {
 }
 
 export async function takeScreenshot(page: Page, locator: Locator, name: string): Promise<void> {
-  if (RECORD_PROTOCOL_DATA) {
-    // We aren't visually debugging; we're just recording snapshot data.
-    // Skip this method to make the tests run faster.
-    return;
-  }
-
   // Make sure any suspended components finish loading data before taking the screenshot.
   await awaitNoLoaders(page, locator);
   // dark screenshots (which are taken first) seemed to be flakier than the light ones,
@@ -180,7 +171,7 @@ export async function takeScreenshot(page: Page, locator: Locator, name: string)
   await page.emulateMedia({ colorScheme: "dark" });
   const screenshotDark = await takeScreenshotHelper(page, locator);
 
-  if (VISUALS) {
+  if (WRITE_SNAPSHOT_IMAGE_FILES) {
     const darkDir = path.join(__dirname, `../../visuals/`, "dark");
     fs.mkdirSync(darkDir, { recursive: true });
     fs.writeFileSync(path.join(darkDir, name), screenshotDark);
@@ -191,7 +182,7 @@ export async function takeScreenshot(page: Page, locator: Locator, name: string)
 
   await page.emulateMedia({ colorScheme: "light" });
   const screenshotLight = await takeScreenshotHelper(page, locator);
-  if (VISUALS) {
+  if (WRITE_SNAPSHOT_IMAGE_FILES) {
     const lightDir = path.join(__dirname, `../../visuals/`, "light");
     fs.mkdirSync(lightDir, { recursive: true });
     fs.writeFileSync(path.join(lightDir, name), screenshotLight);

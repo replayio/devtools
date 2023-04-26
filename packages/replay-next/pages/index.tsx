@@ -1,4 +1,4 @@
-import React, { Suspense, useCallback, useContext, useMemo, useSyncExternalStore } from "react";
+import React, { Suspense, useCallback } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import CommentList from "replay-next/components/comments/CommentList";
@@ -22,9 +22,6 @@ import { TerminalContextRoot } from "replay-next/src/contexts/TerminalContext";
 import { TimelineContextRoot } from "replay-next/src/contexts/TimelineContext";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import usePreferredColorScheme from "replay-next/src/hooks/usePreferredColorScheme";
-import createReplayClientRecorder from "shared/client/createReplayClientRecorder";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { hasFlag } from "shared/utils/url";
 
 import styles from "./index.module.css";
 
@@ -32,26 +29,12 @@ import styles from "./index.module.css";
 // where React keeps quickly retrying after an error is thrown, rather than rendering an error boundary.
 // Filed https://github.com/facebook/react/issues/24634
 
-const recordData = hasFlag("record");
-
 type Panel = "comments" | "protocol-viewer" | "search" | "sources";
 
 export default function HomePage({ apiKey }: { apiKey?: string }) {
   // TODO As we finalize the client implementation to interface with Replay backend,
   // we can inject a wrapper here that also reports cache hits and misses to this UI in a debug panel.
 
-  // TODO wat
-  const recordFlag = useSyncExternalStore(
-    () => () => {},
-    () => new URL(window.location.href).searchParams.has("record"),
-    () => false
-  );
-
-  // Used to record mock data for e2e tests when a URL parameter is present:
-  const client = useContext(ReplayClientContext);
-  const replayClientRecorder = useMemo(() => {
-    return recordFlag ? createReplayClientRecorder(client) : client;
-  }, [client, recordFlag]);
   const [panel, setPanel, isPending] = useLocalStorage<Panel>("bvaughn:panel", "sources", true);
 
   const showCommentsPanel = useCallback(() => setPanel("comments"), [setPanel]);
@@ -59,7 +42,7 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
 
   usePreferredColorScheme();
 
-  const content = (
+  return (
     <Initializer accessToken={apiKey || null}>
       <KeyboardModifiersContextRoot>
         <SourcesContextRoot>
@@ -175,14 +158,4 @@ export default function HomePage({ apiKey }: { apiKey?: string }) {
       </KeyboardModifiersContextRoot>
     </Initializer>
   );
-
-  if (recordData) {
-    return (
-      <ReplayClientContext.Provider value={replayClientRecorder}>
-        {content}
-      </ReplayClientContext.Provider>
-    );
-  } else {
-    return content;
-  }
 }

@@ -10,8 +10,7 @@
   "scripts": {
     "playwright:install": "playwright install chromium",
     "test": "playwright test tests",
-    "test:update-fixture-data": "RECORD_PROTOCOL_DATA=true yarn test",
-    "test:visual": "PWDEBUG=console VISUAL_DEBUG=true yarn test",
-    "visuals": "VISUALS=true playwright test tests"
+    "test:debug": "PWDEBUG=console VISUAL_DEBUG=true yarn test",
+    "test:write-snapshot-image-files": "WRITE_SNAPSHOT_IMAGE_FILES=true playwright test tests"
   }
 }
