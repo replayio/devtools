@@ -6,11 +6,11 @@ import usePreferredColorScheme from "replay-next/src/hooks/usePreferredColorSche
 import { getFlag } from "shared/utils/url";
 
 export default function createTest(Component: FunctionComponent<any>, defaultRecordingId: string) {
-  usePreferredColorScheme();
-
   const recordingId = getFlag("recordingId") || defaultRecordingId;
 
   return function Test() {
+    usePreferredColorScheme();
+
     return (
       <ErrorBoundary>
         <Suspense fallback="Loading...">
