@@ -24,7 +24,7 @@ export async function focus(page: Page, selector: string) {
 }
 
 export async function hideTypeAheadSuggestions(page: Page, selector: string) {
-  const list = page.locator('[data-test-name="CodeTypeAhead"]');
+  const list = page.locator('[data-test-name$="CodeTypeAhead"]');
 
   if (await list.isVisible()) {
     const input = page.locator(selector);
