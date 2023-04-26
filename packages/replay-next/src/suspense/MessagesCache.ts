@@ -189,6 +189,9 @@ export const streamingMessagesCache = createStreamingCache<
         unsubscribe();
         unsubscribe = null;
 
+        // If this cache is re-running after the streaming API has already resolved,
+        // the on-change subscription won't have fired;
+        // in that we should process any pending/missed messages before continuing.
         processPendingMessages();
       }
 
