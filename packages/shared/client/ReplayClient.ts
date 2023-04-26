@@ -565,7 +565,8 @@ export class ReplayClient implements ReplayClientInterface {
     return result.expression;
   }
 
-  async getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint> {
+  async getSessionEndpoint(): Promise<TimeStampedPoint> {
+    const sessionId = this.getSessionIdThrows();
     const { endpoint } = await client.Session.getEndpoint({}, sessionId);
     return endpoint;
   }

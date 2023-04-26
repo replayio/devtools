@@ -14,7 +14,7 @@ export default async function asyncInitializeClient(replayClient: ReplayClientIn
   }
 
   const sessionId = await replayClient.initialize(recordingId, accessToken);
-  const endpoint = await replayClient.getSessionEndpoint(sessionId);
+  const endpoint = await replayClient.getSessionEndpoint();
   console.log("Loaded session: ", sessionId);
 
   // The demo doesn't use these directly, but the client throws if they aren't loaded.

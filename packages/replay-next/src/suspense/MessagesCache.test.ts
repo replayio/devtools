@@ -66,7 +66,7 @@ describe("MessagesCache", () => {
     // Clear and recreate cached data between tests.
     const module = require("./MessagesCache");
     getMessagesSuspense = module.getMessagesSuspense;
-    endpoint = (await mockClient.getSessionEndpoint("")).point;
+    endpoint = (await mockClient.getSessionEndpoint()).point;
   });
 
   afterEach(() => {

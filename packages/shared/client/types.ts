@@ -195,7 +195,7 @@ export interface ReplayClientInterface {
   getRecordingId(): RecordingId | null;
   getScope(pauseId: PauseId, scopeId: ScopeId): Promise<getScopeResult>;
   getScopeMap(location: Location): Promise<VariableMapping[] | undefined>;
-  getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
+  getSessionEndpoint(): Promise<TimeStampedPoint>;
   getSessionId(): SessionId | null;
   getSourceHitCounts(
     sourceId: SourceId,
