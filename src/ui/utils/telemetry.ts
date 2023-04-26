@@ -21,12 +21,16 @@ export function setupTelemetry() {
     "Response not successful: Received status code 401",
     "NetworkError: Load failed",
     "3000ms timeout exceeded",
+    "Failed to fetch",
     // error messages from the backend
     "The session is unknown or has been destroyed",
     "The session was destroyed while the command was in progress",
     "Internal error",
     "Failed to perform command",
     "Operation timed out",
+    "The focus range was changed while the command was in progress",
+    // expected error from ReplayClient
+    "Too many points",
     // sporadic error from an apollo dependency
     "already recomputing",
     // sporadic error from asyncStorage, only happens in Mobile Safari

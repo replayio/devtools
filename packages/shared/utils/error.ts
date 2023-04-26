@@ -18,6 +18,7 @@ export enum ProtocolError {
   UnknownSession = 59,
   GraphicsUnavailableAtPoint = 65,
   SessionDestroyed = 66,
+  TooManyGeneratedLocations = 61,
   TooManyLocationsToPerformAnalysis = 67,
   SessionCreationFailure = 72,
   FocusWindowChange = 76,
