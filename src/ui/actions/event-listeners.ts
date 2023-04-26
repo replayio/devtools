@@ -162,7 +162,7 @@ export function getNodeEventListeners(
           replayClient,
           pauseId!,
           listener.handler,
-          "none"
+          "canOverflow"
         ) as FunctionWithPreview;
 
         return formatEventListener(
