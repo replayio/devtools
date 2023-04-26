@@ -55,10 +55,13 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
   // Changing the focus range may cause us to suspend (while fetching new info from the backend).
   // Wrapping it in a transition enables us to show the older set of messages (in a pending state) while new data loads.
   // This is less jarring than the alternative of unmounting all messages and rendering a fallback loader.
-  const initialRange: TimeStampedPointRange = {
-    begin: { point: "0", time: 0 },
-    end: { point: endpoint, time: duration },
-  };
+  const initialRange: TimeStampedPointRange = useMemo(
+    () => ({
+      begin: { point: "0", time: 0 },
+      end: { point: endpoint, time: duration },
+    }),
+    [endpoint, duration]
+  );
   const [bias, setBias] = useState<FocusWindowRequestBias | undefined>(undefined);
   const [range, setRange] = useState<TimeStampedPointRange | null>(initialRange);
   const [deferredRange, setDeferredRange] = useState<TimeStampedPointRange | null>(initialRange);
@@ -81,7 +84,7 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
 
   // Refine the loaded ranges based on the focus window.
   useEffect(() => {
-    if (range === null) {
+    if (range === null || range === initialRange) {
       return;
     }
 
@@ -92,7 +95,7 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [bias, client, duration, range]);
+  }, [bias, client, duration, initialRange, range]);
 
   // Feed loaded regions into the time-to-execution-point cache in case we need them later.
   useEffect(() => {

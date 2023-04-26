@@ -3,7 +3,8 @@ import {
   getPointsBoundingTimeResult as PointsBoundingTime,
   TimeStampedPoint,
 } from "@replayio/protocol";
-import { Cache, Deferred, createCache, createDeferred } from "suspense";
+import clamp from "lodash/clamp";
+import { Cache, Deferred, createCache, createDeferred, createSingleEntryCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
@@ -293,6 +294,15 @@ export function preCacheExecutionPointForTime(timeStampedPoint: TimeStampedPoint
   }
 }
 
+export const sessionEndPointCache = createSingleEntryCache<
+  [replayClient: ReplayClientInterface],
+  TimeStampedPoint
+>({
+  config: { immutable: true },
+  debugLabel: "SessionEndPointCache",
+  load: ([client]) => client.getSessionEndpoint(),
+});
+
 export const pointsBoundingTimeCache: Cache<
   [replayClient: ReplayClientInterface, time: number],
   PointsBoundingTime
@@ -300,5 +310,8 @@ export const pointsBoundingTimeCache: Cache<
   config: { immutable: true },
   debugLabel: "PointsBoundingTime",
   getKey: ([client, time]) => `${time}`,
-  load: async ([client, time]) => client.getPointsBoundingTime(time),
+  load: async ([client, time]) => {
+    const endpoint = await sessionEndPointCache.readAsync(client);
+    return client.getPointsBoundingTime(clamp(time, 0, endpoint.time));
+  },
 });

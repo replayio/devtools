@@ -1,10 +1,4 @@
-import {
-  ExecutionPoint,
-  FocusWindowRequestBias,
-  PauseId,
-  ScreenShot,
-  TimeStampedPoint,
-} from "@replayio/protocol";
+import { ExecutionPoint, FocusWindowRequestBias, PauseId, ScreenShot } from "@replayio/protocol";
 import clamp from "lodash/clamp";
 
 import { framePositionsCleared, resumed } from "devtools/client/debugger/src/reducers/pause";
@@ -28,7 +22,10 @@ import { DownloadCancelledError } from "protocol/screenshot-cache";
 import { ThreadFront } from "protocol/thread";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { waitForTime } from "protocol/utils";
-import { pointsBoundingTimeCache } from "replay-next/src/suspense/ExecutionPointsCache";
+import {
+  pointsBoundingTimeCache,
+  sessionEndPointCache,
+} from "replay-next/src/suspense/ExecutionPointsCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import {
@@ -96,7 +93,7 @@ export async function setupTimeline(store: UIStore) {
 
 export function jumpToInitialPausePoint(): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
-    const endpoint = await getEndpoint(replayClient);
+    const endpoint = await sessionEndPointCache.readAsync(replayClient);
     dispatch(pointsReceived([endpoint]));
     let { point, time } = endpoint;
 
@@ -292,16 +289,8 @@ export function seekToTime(targetTime: number, autoPlay?: boolean): UIThunkActio
   };
 }
 
-let endpointPromise: Promise<TimeStampedPoint> | undefined;
-function getEndpoint(client: ReplayClientInterface) {
-  if (!endpointPromise) {
-    endpointPromise = client.getSessionEndpoint(client.getSessionId()!);
-  }
-  return endpointPromise;
-}
-
 async function clampTime(client: ReplayClientInterface, time: number) {
-  const endpoint = await getEndpoint(client);
+  const endpoint = await sessionEndPointCache.readAsync(client);
   return clamp(time, 0, endpoint.time);
 }
 
@@ -553,11 +542,8 @@ export function setFocusRegionFromTimeRange(
     }
 
     const [pointsBoundingBegin, pointsBoundingEnd] = await Promise.all([
-      pointsBoundingTimeCache.readAsync(
-        replayClient,
-        await clampTime(replayClient, timeRange.begin)
-      ),
-      pointsBoundingTimeCache.readAsync(replayClient, await clampTime(replayClient, timeRange.end)),
+      pointsBoundingTimeCache.readAsync(replayClient, timeRange.begin),
+      pointsBoundingTimeCache.readAsync(replayClient, timeRange.end),
     ]);
     const begin = pointsBoundingBegin.before;
     const end = pointsBoundingEnd.after;
