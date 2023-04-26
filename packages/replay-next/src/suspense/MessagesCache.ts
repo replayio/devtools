@@ -65,7 +65,7 @@ const findMessagesStreamingCache = createStreamingCache<
     let messages: Message[] = [];
 
     try {
-      const { overflow } = await client.findMessages(message => {
+      const onMessage = (message: Message) => {
         cachePauseData(client, message.pauseId, message.data);
 
         if (signal.aborted) {
@@ -75,11 +75,19 @@ const findMessagesStreamingCache = createStreamingCache<
         messages = messages.concat(message);
 
         update(messages);
+      };
 
-        return true;
-      });
+      const { messages: returnedMessages, overflow } = await client.findMessages(onMessage);
 
       if (!signal.aborted) {
+        // TODO [FE-1433]
+        // JSON proxy system doesn't support APIs with callbacks (like findMessages)
+        // For now, our screenshot tests will fail without this workaround.
+        // We should remove this once the proxy system has been disabled.
+        if (messages.length === 0) {
+          returnedMessages.forEach(onMessage);
+        }
+
         update(messages, undefined, { overflow });
         resolve();
       }
