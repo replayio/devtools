@@ -80,6 +80,7 @@ export enum Nag {
   FIRST_REPLAY_2 = "first_replay_2",
   INSPECT_COMPONENT = "inspect_component",
   INSPECT_ELEMENT = "inspect_element",
+  INSPECT_NETWORK_REQUEST = "inspect_network_request",
   JUMP_TO_CODE = "jump_to_code",
   JUMP_TO_EVENT = "jump_to_event",
   LAUNCH_COMMAND_PALETTE = "launch_command_palette",

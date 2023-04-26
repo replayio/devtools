@@ -1,6 +1,8 @@
 import classNames from "classnames";
 import { Row, TableInstance } from "react-table";
 
+import { useNag } from "replay-next/src/hooks/useNag";
+import { Nag } from "shared/graphql/types";
 import { getLoadedRegions } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
@@ -44,6 +46,8 @@ const RequestTable = ({
 
   let inPast = true;
 
+  const [, dismissInspectNetworkRequestNag] = useNag(Nag.INSPECT_NETWORK_REQUEST);
+
   return (
     <div className={classNames("no-scrollbar min-w-full bg-bodyBgcolor", className)}>
       {/* Relative here helps with when the timeline goes past the last request*/}
@@ -79,7 +83,10 @@ const RequestTable = ({
                 isInPast={inPast}
                 isSelected={selectedRequest?.id === row.original.id}
                 key={row.getRowProps().key}
-                onClick={onRowSelect}
+                onClick={request => {
+                  dismissInspectNetworkRequestNag();
+                  onRowSelect(request);
+                }}
                 onSeek={onSeek}
                 row={row}
               />

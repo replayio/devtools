@@ -9,6 +9,7 @@ import {
   shouldShowBreakpointEdit,
   shouldShowConsoleNavigate,
   shouldShowInspectElement,
+  shouldShowInspectNetworkRequest,
   shouldShowJumpToCode,
   shouldShowJumpToEvent,
   shouldShowSearchSourceText,
@@ -32,10 +33,10 @@ const Passport = () => {
   const showShareNag = shouldShowShareNag(nags);
   const showJumpToEvent = shouldShowJumpToEvent(nags);
   const showInspectElement = shouldShowInspectElement(nags);
+  const showInspectNetworkRequest = shouldShowInspectNetworkRequest(nags);
   const showUseFocusMode = shouldShowUseFocusMode(nags);
 
   type StepNames = typeof stepNames[number];
-
   const videoExampleRef = useRef<HTMLImageElement>(null);
   const [videoHeight, setVideoHeight] = useState<number | null>(null);
 
@@ -107,6 +108,12 @@ const Passport = () => {
       completed: !showInspectElement,
       videoUrl: "https://vercel.replay.io/passport/inspect_an_element.gif",
       imageBaseName: "inspect_element",
+    },
+    {
+      label: "Inspect network request",
+      completed: !showInspectNetworkRequest,
+      videoUrl: "https://vercel.replay.io/passport/inspect_a_network_request.gif",
+      imageBaseName: "inspect_network_request",
     },
     {
       label: "Add a unicorn badge",

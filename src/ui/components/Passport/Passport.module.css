@@ -1,8 +1,8 @@
 .PassportBoxWrapper {
   position: relative;
-  background-color: powderblue;
+  background-color: #dde7ef;
   background-image: url(/images/passport/passportBG.png);
-  background-repeat: repeat; /* Add this line */
+  background-repeat: repeat;
   height: 100vh;
 }
 
@@ -100,7 +100,6 @@
 .stepIcon {
   display: inline-block;
   vertical-align: middle;
-  /* Add other properties as needed */
 }
 
 .ml2 {
