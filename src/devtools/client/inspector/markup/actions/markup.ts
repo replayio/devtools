@@ -643,12 +643,15 @@ export const searchDOM = (query: string): UIThunkAction<Promise<ProtocolObject[]
     const state = getState();
     const pauseIdBefore = state.pause.id;
     const sessionId = state.app.sessionId;
+    if (!sessionId || !pauseIdBefore) {
+      return [];
+    }
 
     const results = await nodeDataCache.readAsync(
       protocolClient,
       replayClient,
-      sessionId!,
-      pauseIdBefore!,
+      sessionId,
+      pauseIdBefore,
       {
         type: "searchDOM",
         query,
