@@ -23,7 +23,6 @@ import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { parse } from "replay-next/src/suspense/SyntaxParsingCache";
 import { primitiveToClientValue } from "replay-next/src/utils/protocol";
-import { ParsedToken, parsedTokensToHtml } from "replay-next/src/utils/syntax-parser";
 import { formatTimestamp } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -45,9 +44,6 @@ function TerminalExpressionRenderer({
   const { contextMenu, onContextMenu } = useConsoleContextMenu(terminalExpression);
 
   const [isHovered, setIsHovered] = useState(false);
-
-  // Reformat expressions to remove unnecessary quotation marks.
-  const expression = useMemo(() => terminalExpression.expression, [terminalExpression.expression]);
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -130,19 +126,23 @@ function SyntaxHighlightedExpression({
 }: {
   terminalExpression: TerminalExpression;
 }) {
-  const parsed = parse(terminalExpression.expression, "js");
-
-  let tokens: ParsedToken[] = [];
-  if (parsed && parsed.length > 0) {
-    tokens = parsed[0].map(formatExpressionToken);
-  }
+  const parsedTokens = parse(terminalExpression.expression, "js");
+  const formattedTokens = useMemo(
+    () => parsedTokens.map(tokens => tokens.map(formatExpressionToken)),
+    [parsedTokens]
+  );
 
   return (
-    <SyntaxHighlightedLine
-      code={terminalExpression.expression}
-      fileExtension="js"
-      tokens={tokens}
-    />
+    <div className={styles.TerminalExpressionLines}>
+      {formattedTokens.map((tokens, index) => (
+        <SyntaxHighlightedLine
+          code={terminalExpression.expression}
+          fileExtension="js"
+          key={index}
+          tokens={tokens}
+        />
+      ))}
+    </div>
   );
 }
 
