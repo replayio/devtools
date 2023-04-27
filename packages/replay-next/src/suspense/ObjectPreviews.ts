@@ -6,6 +6,7 @@ import {
   PauseId,
   Value as ProtocolValue,
 } from "@replayio/protocol";
+import * as Sentry from "@sentry/react";
 import { Cache, createCache } from "suspense";
 
 import { assert } from "protocol/utils";
@@ -32,7 +33,12 @@ export const objectCache: Cache<
 
     // cachePauseData() calls preCacheObjects()
     // so the object should be in the cache now
-    return objectCache.getValue(client, pauseId, objectId, previewLevel);
+    try {
+      return objectCache.getValue(client, pauseId, objectId, previewLevel);
+    } catch (error) {
+      Sentry.captureException(error, { extra: { objectId, previewLevel, data } });
+      throw error;
+    }
   },
 });
 
