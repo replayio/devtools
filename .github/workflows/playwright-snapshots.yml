@@ -18,6 +18,10 @@ env:
 jobs:
   run_tests:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     steps:
       - name: Print job info
         run: |
@@ -59,8 +63,11 @@ jobs:
       - name: Wait until server is up
         run: npx wait-on --timeout=60000 http-get://localhost:3000
       - name: Run playwright tests
-        run: yarn test:write-snapshot-image-files --reporter @replayio/playwright/reporter,line
-        working-directory: packages/replay-next/playwright  
+        run: yarn test:ci --reporter @replayio/playwright/reporter,line
+        working-directory: packages/replay-next/playwright
+        env:
+          SHARD: ${{ matrix.shard }}
+          SHARDS: 10
       - name: Upload results
         if: always()
         run: ./uploadSnapshots.js
