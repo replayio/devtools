@@ -8,6 +8,7 @@ on:
 env:
   RECORD_REPLAY_API_KEY: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
   RECORD_REPLAY_METADATA_TEST_SUITE: E2E Tests
+  RECORD_REPLAY_CHROMIUM_DOWNLOAD_FILE: linux-chromium-20230501-d0c445eef422-037131bfb590-buildkite.tar.xz
 
 jobs:
   download-browser:
