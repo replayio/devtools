@@ -16,6 +16,7 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { createEmptyHistoryState } from "@lexical/react/LexicalHistoryPlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import * as Sentry from "@sentry/react";
 import {
   $createParagraphNode,
   $getRoot,
@@ -133,23 +134,23 @@ export default function CommentEditor({
   }, [initialValue]);
 
   useEffect(() => {
-    try {
-      if (serializedEditorState) {
-        const editor = editorRef.current;
-        if (editor != null) {
-          // Avoid triggering React warning:
-          // flushSync was called from inside a lifecycle method.
-          // React cannot flush when React is already rendering.
-          // Consider moving this call to a scheduler task or micro task.
-          Promise.resolve().then(() => {
+    if (serializedEditorState) {
+      const editor = editorRef.current;
+      if (editor != null) {
+        // Avoid triggering React warning:
+        // flushSync was called from inside a lifecycle method.
+        // React cannot flush when React is already rendering.
+        // Consider moving this call to a scheduler task or micro task.
+        Promise.resolve().then(() => {
+          try {
             const editorState = editor.parseEditorState(serializedEditorState);
             editor.setEditorState(editorState);
-          });
-        }
+          } catch (error) {
+            console.error("Error parsing saved comment state:", serializedEditorState, error);
+            Sentry.captureException(error, { extra: { serializedEditorState } });
+          }
+        });
       }
-    } catch (error) {
-      console.error("Error parsing saved comment state:", serializedEditorState);
-      console.error(error);
     }
   }, [editorRef, serializedEditorState]);
 
