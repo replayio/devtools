@@ -1,3 +1,4 @@
+import Head from "next/head";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 import {
@@ -216,15 +217,11 @@ function _DevTools({
     }
   }, [loadingFinished, trackLoadingIdleTime, sessionId]);
 
-  useEffect(() => {
-    if (recording?.title && document.title !== recording.title) {
-      document.title = recording.title;
-    }
-  }, [recording]);
-
   if (!loadingFinished) {
     return <LoadingScreen fallbackMessage="Loading..." />;
   }
+
+  const title = recording?.title;
 
   return (
     <SessionContextAdapter apiKey={apiKey ?? null}>
@@ -238,6 +235,11 @@ function _DevTools({
                     <ExpandablesContextRoot>
                       <LayoutContextAdapter>
                         <KeyModifiers>
+                          {title && (
+                            <Head>
+                              <title>{title}</title>
+                            </Head>
+                          )}
                           <Header />
                           <Body />
                           {showCommandPalette ? <CommandPaletteModal /> : null}

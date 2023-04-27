@@ -176,9 +176,6 @@ export function createSocket(
       ]);
       assert(recording, "failed to load recording");
 
-      if (recording.title) {
-        document.title = recording.title;
-      }
       if (recording.workspace) {
         dispatch(actions.setRecordingWorkspace(recording.workspace));
       }
