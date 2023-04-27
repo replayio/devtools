@@ -19,7 +19,7 @@ import {
 
 import styles from "./Passport.module.css";
 
-const stepNames = ["step-one", "step-two", "step-three"] as const;
+const stepNames = ["step-one", "step-two", "step-three", "step-four"] as const;
 
 const Passport = () => {
   const [selectedIndices, setSelectedIndices] = useState({ sectionIndex: 0, itemIndex: 0 });
@@ -89,7 +89,7 @@ const Passport = () => {
       imageBaseName: "time_travel_in_the_console",
     },
     {
-      label: "Set a print statement",
+      label: "Add a console log",
       completed: !showBreakpointEdit,
       videoUrl: "https://vercel.replay.io/passport/set_print_statement.gif",
       imageBaseName: "set_a_print_statement",
@@ -102,19 +102,22 @@ const Passport = () => {
     },
   ];
 
-  const powerToolsItems = [
+  const inspectionItems = [
     {
-      label: "Inspect element",
+      label: "Inspect UI elements",
       completed: !showInspectElement,
       videoUrl: "https://vercel.replay.io/passport/inspect_an_element.gif",
       imageBaseName: "inspect_element",
     },
     {
-      label: "Inspect network request",
+      label: "Inspect network requests",
       completed: !showInspectNetworkRequest,
       videoUrl: "https://vercel.replay.io/passport/inspect_a_network_request.gif",
       imageBaseName: "inspect_network_request",
     },
+  ];
+
+  const swissArmyItems = [
     {
       label: "Add a unicorn badge",
       completed: !showAddUnicornBadge,
@@ -128,7 +131,7 @@ const Passport = () => {
       imageBaseName: "search_source_text",
     },
     {
-      label: "Use focus mode",
+      label: "Set a focus window",
       completed: !showUseFocusMode,
       videoUrl: "https://vercel.replay.io/passport/use_focus_mode.gif",
       imageBaseName: "use_focus_mode",
@@ -152,15 +155,19 @@ const Passport = () => {
 
   const sections: Section[] = [
     {
-      title: "Basics",
+      title: "TIME TRAVEL",
       items: timeTravelItems,
     },
     {
-      title: "Advanced",
-      items: powerToolsItems,
+      title: "INFRARED INSPECTION",
+      items: inspectionItems,
     },
     {
-      title: "Collaboration",
+      title: "SWISS ARMY KNIFE",
+      items: swissArmyItems,
+    },
+    {
+      title: "MULTIPLAYER",
       items: multiplayerItems,
     },
   ];
