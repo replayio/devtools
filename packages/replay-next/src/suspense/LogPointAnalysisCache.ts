@@ -112,27 +112,24 @@ export function canRunLocalAnalysis(code: string, condition: string | null): boo
     return false;
   }
 
-  const tokens = parse(code, "fake.js");
-  if (tokens.length > 0) {
-    const firstLineTokens = tokens[0];
-    for (let token of firstLineTokens) {
-      const { types, value } = token;
-      if (types && types.length > 0) {
-        const type = types[0];
-        switch (type) {
-          case "variableName":
-          case "variableName2": {
-            switch (value) {
-              case "false":
-              case "Infinity":
-              case "NaN":
-              case "null":
-              case "true":
-              case "undefined":
-                break;
-              default:
-                return false;
-            }
+  const tokens = parse(code, "fake.js").flat();
+  for (let token of tokens) {
+    const { types, value } = token;
+    if (types && types.length > 0) {
+      const type = types[0];
+      switch (type) {
+        case "variableName":
+        case "variableName2": {
+          switch (value) {
+            case "false":
+            case "Infinity":
+            case "NaN":
+            case "null":
+            case "true":
+            case "undefined":
+              break;
+            default:
+              return false;
           }
         }
       }
@@ -166,7 +163,7 @@ export const localAnalysisCache: Cache<[code: string], any[]> = createCache({
         clearTimeout(timeoutID);
       });
       worker.addEventListener("error", event => {
-        reject(event.message);
+        reject(new Error(event.message));
         clearTimeout(timeoutID);
       });
       worker.postMessage("start");
