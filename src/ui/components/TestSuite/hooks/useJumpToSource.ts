@@ -6,6 +6,7 @@ import { getContext } from "devtools/client/debugger/src/selectors";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Annotations } from "shared/graphql/types";
 import { setViewMode } from "ui/actions/layout";
+import { seek } from "ui/actions/timeline";
 import { TestStepSourceLocationCache } from "ui/components/TestSuite/suspense/TestStepSourceLocationCache";
 import { ProcessedTestMetadata, ProcessedTestStep } from "ui/components/TestSuite/types";
 import { setSourcesUserActionPending } from "ui/reducers/sources";
@@ -52,10 +53,12 @@ export function useJumpToSource({
 
       let location;
       if (isPromiseLike(locationPromise)) {
-        let location = await awaitWithTimeout(locationPromise);
-        if (location === AwaitTimeout) {
+        let awaitedLocation = await awaitWithTimeout(locationPromise, 3000);
+        if (awaitedLocation === AwaitTimeout) {
           dispatch(setSourcesUserActionPending(true));
           location = await locationPromise;
+        } else {
+          location = awaitedLocation;
         }
       } else {
         location = locationPromise;
@@ -63,6 +66,12 @@ export function useJumpToSource({
 
       if (location) {
         dispatch(selectLocation(context, location));
+      }
+
+      if (testStep.metadata.range.beginPoint && testStep.metadata.range.beginTime) {
+        dispatch(
+          seek(testStep.metadata.range.beginPoint, testStep.metadata.range.beginTime, false)
+        );
       }
     }
 
