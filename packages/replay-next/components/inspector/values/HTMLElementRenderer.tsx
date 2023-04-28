@@ -7,14 +7,13 @@ import {
   InspectorContext,
 } from "replay-next/src/contexts/InspectorContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
+import { clientValueCache, objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import {
   Value as ClientValue,
   filterNonEnumerableProperties,
 } from "replay-next/src/utils/protocol";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import useClientValue from "../useClientValue";
 import ClientValueValueRenderer from "./ClientValueValueRenderer";
 import { ObjectPreviewRendererProps } from "./types";
 import styles from "./shared.module.css";
@@ -128,7 +127,8 @@ function HTMLAttributeRenderer({
   pauseId: PauseId;
   protocolValue: ProtocolValue;
 }) {
-  const clientValue = useClientValue(protocolValue, pauseId);
+  const client = useContext(ReplayClientContext);
+  const clientValue = clientValueCache.read(client, pauseId, protocolValue);
 
   return (
     <span className={styles.HtmlAttribute}>

@@ -1,7 +1,6 @@
 import { Value as ProtocolValue } from "@replayio/protocol";
 
-import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
-import { protocolValueToClientValue } from "replay-next/src/utils/protocol";
+import { clientValueCache, objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 
 // like JSON, but including `undefined`
@@ -49,7 +48,7 @@ export async function getJSON(
   value: ProtocolValue,
   visitedObjectIds = new Set<string>()
 ): Promise<JSONishValue> {
-  const clientObject = protocolValueToClientValue(pauseId, value);
+  const clientObject = await clientValueCache.readAsync(replayClient, pauseId, value);
 
   if (clientObject.objectId) {
     if (visitedObjectIds.has(clientObject.objectId!)) {

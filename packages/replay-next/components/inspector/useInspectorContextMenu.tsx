@@ -21,7 +21,7 @@ export default function useInspectorContextMenu({
 }) {
   const client = useContext(ReplayClientContext);
 
-  const label = protocolValueToCopyLabel(protocolValue, pauseId) || "value";
+  const label = protocolValueToCopyLabel(client, protocolValue, pauseId) || "value";
 
   const onCopyValue = async () => {
     const valueToCopy = await protocolValueToText(client, protocolValue, pauseId);

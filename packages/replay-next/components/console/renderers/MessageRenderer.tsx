@@ -13,8 +13,9 @@ import Loader from "replay-next/components/Loader";
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { InspectableTimestampedPointContext } from "replay-next/src/contexts/InspectorContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { protocolValueToClientValue } from "replay-next/src/utils/protocol";
+import { clientValueCache } from "replay-next/src/suspense/ObjectPreviews";
 import { formatTimestamp } from "replay-next/src/utils/time";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import ErrorStackRenderer from "../ErrorStackRenderer";
 import MessageHoverButton from "../MessageHoverButton";
@@ -39,6 +40,7 @@ function MessageRenderer({
 
   const [isHovered, setIsHovered] = useState(false);
 
+  const client = useContext(ReplayClientContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
@@ -100,7 +102,7 @@ function MessageRenderer({
     argumentValues.length > 0 ? (
       <Suspense fallback={<Loader />}>
         {argumentValues.map((argumentValue: ProtocolValue, index: number) => {
-          const clientValue = protocolValueToClientValue(message.pauseId, argumentValue);
+          const clientValue = clientValueCache.read(client, message.pauseId, argumentValue);
           return (
             <Fragment key={index}>
               {clientValue.type === "error" && argumentValue.object ? (

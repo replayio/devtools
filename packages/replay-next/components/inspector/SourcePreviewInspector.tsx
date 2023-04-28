@@ -3,11 +3,10 @@ import { ForwardedRef, Suspense, forwardRef, useContext } from "react";
 
 import Inspector from "replay-next/components/inspector";
 import Loader from "replay-next/components/Loader";
-import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
+import { clientValueCache, objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import PropertiesRenderer from "./PropertiesRenderer";
-import useClientValue from "./useClientValue";
 import styles from "./SourcePreviewInspector.module.css";
 
 type Props = {
@@ -20,7 +19,8 @@ export default forwardRef<HTMLDivElement, Props>(function SourcePreviewInspector
   { className = "", pauseId, protocolValue }: Props,
   ref: ForwardedRef<HTMLDivElement>
 ) {
-  const clientValue = useClientValue(protocolValue, pauseId);
+  const client = useContext(ReplayClientContext);
+  const clientValue = clientValueCache.read(client, pauseId, protocolValue);
   switch (clientValue.type) {
     case "array":
     case "function":
@@ -72,7 +72,7 @@ function ObjectWrapper({
   protocolValue: ProtocolValue;
 }) {
   const client = useContext(ReplayClientContext);
-  const clientValue = useClientValue(protocolValue, pauseId);
+  const clientValue = clientValueCache.read(client, pauseId, protocolValue);
 
   const { name, objectId, type } = clientValue;
 

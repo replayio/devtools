@@ -4,12 +4,11 @@ import { MouseEvent, ReactNode, Suspense, useContext, useState } from "react";
 
 import Expandable from "replay-next/components/Expandable";
 import Loader from "replay-next/components/Loader";
-import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
+import { clientValueCache, objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import HTMLExpandable from "./HTMLExpandable";
 import PropertiesRenderer from "./PropertiesRenderer";
-import useClientValue from "./useClientValue";
 import ValueRenderer from "./ValueRenderer";
 import styles from "./KeyValueRenderer.module.css";
 
@@ -46,10 +45,10 @@ export default function KeyValueRenderer({
   protocolValue,
 }: Props) {
   const client = useContext(ReplayClientContext);
-  const clientValue = useClientValue(protocolValue, pauseId);
 
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const clientValue = clientValueCache.read(client, pauseId, protocolValue);
   const { objectId, name, type } = clientValue;
 
   let objectWithPreview: ProtocolObject | null = null;

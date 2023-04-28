@@ -1,10 +1,13 @@
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import { FC, memo, useContext } from "react";
 
-import { getCachedObject, objectCache } from "replay-next/src/suspense/ObjectPreviews";
+import {
+  clientValueCache,
+  getCachedObject,
+  objectCache,
+} from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import useClientValue from "./useClientValue";
 import ArrayRenderer from "./values/ArrayRenderer";
 import ClientValueValueRenderer from "./values/ClientValueValueRenderer";
 import DateRenderer from "./values/DateRenderer";
@@ -35,7 +38,7 @@ function ValueRenderer({
   protocolValue: ProtocolValue;
 }) {
   const client = useContext(ReplayClientContext);
-  const clientValue = useClientValue(protocolValue, pauseId);
+  const clientValue = clientValueCache.read(client, pauseId, protocolValue);
 
   // TODO (inspector) Handle getters – Lazily fetch values only after user input.
   let ObjectPreviewRenderer: FC<ObjectPreviewRendererProps> | null = null;
