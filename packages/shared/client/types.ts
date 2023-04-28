@@ -30,6 +30,7 @@ import {
   RunEvaluationResult,
   SameLineSourceLocations,
   ScopeId,
+  ScreenShot,
   SearchSourceContentsMatch,
   SessionId,
   newSource as Source,
@@ -199,6 +200,7 @@ export interface ReplayClientInterface {
   getRecordingId(): RecordingId | null;
   getScope(pauseId: PauseId, scopeId: ScopeId): Promise<getScopeResult>;
   getScopeMap(location: Location): Promise<VariableMapping[] | undefined>;
+  getScreenshot(point: ExecutionPoint): Promise<ScreenShot>;
   getSessionEndpoint(): Promise<TimeStampedPoint>;
   getSessionId(): SessionId | null;
   getSourceHitCounts(

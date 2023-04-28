@@ -15,10 +15,8 @@ import {
   paintGraphics,
   previousPaintEvent,
   repaintAtPause,
-  screenshotCache,
   timeIsBeyondKnownPaints,
 } from "protocol/graphics";
-import { DownloadCancelledError } from "protocol/screenshot-cache";
 import { ThreadFront } from "protocol/thread";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { waitForTime } from "protocol/utils";
@@ -26,6 +24,7 @@ import {
   pointsBoundingTimeCache,
   sessionEndPointCache,
 } from "replay-next/src/suspense/ExecutionPointsCache";
+import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { ReplayClientInterface } from "shared/client/types";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import {
@@ -174,9 +173,7 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
 
       paintGraphics(screen, mouse);
     } catch (error) {
-      if (!(error instanceof DownloadCancelledError)) {
-        console.error(error);
-      }
+      console.error(error);
     }
   };
 }
@@ -814,8 +811,9 @@ export function precacheScreenshots(beginTime: number): UIThunkAction {
         return;
       }
 
-      const paintHash = gPaintPoints[index].paintHash;
-      if (!screenshotCache.hasScreenshot(paintHash)) {
+      const paintPoint = gPaintPoints[index];
+      // the client isn't used in the cache key, so it's OK to pass a dummy value here
+      if (!screenshotCache.getValueIfCached(null as any, paintPoint.point, paintPoint.paintHash)) {
         const graphicsPromise = getGraphicsAtTime(time, true);
 
         const precachedTime = Math.max(time - SNAP_TIME_INTERVAL, beginTime);

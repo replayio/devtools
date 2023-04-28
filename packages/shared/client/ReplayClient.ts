@@ -25,6 +25,7 @@ import {
   RunEvaluationResult,
   SameLineSourceLocations,
   ScopeId,
+  ScreenShot,
   SearchSourceContentsMatch,
   SessionId,
   newSource as Source,
@@ -550,6 +551,15 @@ export class ReplayClient implements ReplayClientInterface {
     const sessionId = this.getSessionIdThrows();
     const { map } = await client.Debugger.getScopeMap({ location }, sessionId);
     return map;
+  }
+
+  async getScreenshot(point: ExecutionPoint): Promise<ScreenShot> {
+    const sessionId = this.getSessionIdThrows();
+    const { screen } = await client.Graphics.getPaintContents(
+      { point, mimeType: "image/jpeg" },
+      sessionId
+    );
+    return screen;
   }
 
   async mapExpressionToGeneratedScope(expression: string, location: Location): Promise<string> {
