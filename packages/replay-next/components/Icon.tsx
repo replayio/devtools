@@ -63,6 +63,7 @@ export default function Icon({
     | "step-one"
     | "step-two"
     | "step-three"
+    | "step-four"
     | "spinner"
     | "terminal-prompt"
     | "terminal-result"
