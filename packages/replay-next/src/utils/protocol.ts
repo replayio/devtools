@@ -1,6 +1,5 @@
 import {
   NamedValue,
-  PropertyConfigurationFlags,
   NamedValue as ProtocolNamedValue,
   ObjectId as ProtocolObjectId,
   PauseId as ProtocolPauseId,
@@ -8,6 +7,8 @@ import {
   newSource as ProtocolSource,
   Value as ProtocolValue,
 } from "@replayio/protocol";
+
+import { ReplayClientInterface } from "shared/client/types";
 
 import { objectCache } from "../suspense/ObjectPreviews";
 
@@ -92,10 +93,11 @@ function isProtocolProperty(
 // This utility function maps from one ot the other.
 //
 // See https://linear.app/replay/issue/BAC-1808
-export function protocolValueToClientValue(
+export async function protocolValueToClientValue(
+  client: ReplayClientInterface,
   pauseId: ProtocolPauseId,
   protocolValue: ProtocolValue | ProtocolNamedValue | ProtocolProperty
-): Value {
+): Promise<Value> {
   const name = protocolValue.hasOwnProperty("name")
     ? (protocolValue as ProtocolNamedValue).name
     : null;
@@ -161,8 +163,7 @@ export function protocolValueToClientValue(
     }
 
     if (objectId) {
-      // The "client" param isn't used for reading cached values
-      const object = objectCache.getValue(null as any, pauseId, objectId, "none");
+      const object = await objectCache.readAsync(client, pauseId, objectId, "none");
       const className = object.className;
 
       let preview: string | undefined;

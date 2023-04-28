@@ -4,6 +4,7 @@ import {
   ObjectId,
   ObjectPreviewLevel,
   PauseId,
+  Property,
   Value as ProtocolValue,
 } from "@replayio/protocol";
 import * as Sentry from "@sentry/react";
@@ -12,6 +13,7 @@ import { Cache, createCache } from "suspense";
 import { assert } from "protocol/utils";
 
 import { ReplayClientInterface } from "../../../shared/client/types";
+import { Value as ClientValue, protocolValueToClientValue } from "../utils/protocol";
 import { cachePauseData } from "./PauseCache";
 
 export const objectCache: Cache<
@@ -113,3 +115,18 @@ function removeName(namedValue: NamedValue): ProtocolValue {
   const { name, ...value } = namedValue;
   return value;
 }
+
+export const clientValueCache = createCache<
+  [
+    client: ReplayClientInterface,
+    pauseId: PauseId,
+    protocolValue: ProtocolValue | NamedValue | Property
+  ],
+  ClientValue
+>({
+  config: { immutable: true },
+  debugLabel: "clientValueCache",
+  getKey: ([client, pauseId, protocolValue]) => `${pauseId}:${JSON.stringify(protocolValue)}`,
+  load: ([client, pauseId, protocolValue]) =>
+    protocolValueToClientValue(client, pauseId, protocolValue),
+});

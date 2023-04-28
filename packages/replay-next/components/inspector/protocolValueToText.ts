@@ -8,11 +8,8 @@ import {
 import { errorProtocolObjectToString } from "replay-next/components/inspector/values/ErrorRenderer";
 import { functionProtocolObjectToString } from "replay-next/components/inspector/values/FunctionRenderer";
 import { regExpProtocolObjectToString } from "replay-next/components/inspector/values/RegExpRenderer";
-import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
-import {
-  filterNonEnumerableProperties,
-  protocolValueToClientValue,
-} from "replay-next/src/utils/protocol";
+import { clientValueCache, objectCache } from "replay-next/src/suspense/ObjectPreviews";
+import { filterNonEnumerableProperties } from "replay-next/src/utils/protocol";
 import { ReplayClientInterface } from "shared/client/types";
 
 const MAX_DEPTH_TO_COPY = 5;
@@ -39,7 +36,7 @@ async function protocolValueToTextHelper(
     return '"[[ Truncated ]]"';
   }
 
-  const clientValue = protocolValueToClientValue(pauseId, protocolValue);
+  const clientValue = await clientValueCache.readAsync(client, pauseId, protocolValue);
 
   const { objectId, type } = clientValue;
 
@@ -131,7 +128,7 @@ async function protocolValueToTextHelper(
                 const mappedAttributes = [];
                 if (properties.length > 0) {
                   for (const property of properties) {
-                    const clientValue = protocolValueToClientValue(pauseId, property);
+                    const clientValue = await clientValueCache.readAsync(client, pauseId, property);
 
                     mappedAttributes.push(`${clientValue.name}="${clientValue.preview ?? ""}"`);
                   }

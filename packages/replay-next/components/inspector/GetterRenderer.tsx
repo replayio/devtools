@@ -17,12 +17,15 @@ import {
 import Expandable from "replay-next/components/Expandable";
 import Icon from "replay-next/components/Icon";
 import Loader from "replay-next/components/Loader";
-import { objectCache, objectPropertyCache } from "replay-next/src/suspense/ObjectPreviews";
-import { Value as ClientValue, protocolValueToClientValue } from "replay-next/src/utils/protocol";
+import {
+  clientValueCache,
+  objectCache,
+  objectPropertyCache,
+} from "replay-next/src/suspense/ObjectPreviews";
+import { Value as ClientValue } from "replay-next/src/utils/protocol";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import PropertiesRenderer from "./PropertiesRenderer";
-import useClientValue from "./useClientValue";
 import ValueRenderer from "./ValueRenderer";
 import styles from "./GetterRenderer.module.css";
 
@@ -38,22 +41,20 @@ export default function GetterRenderer({
   protocolProperty: ProtocolProperty;
 }) {
   const client = useContext(ReplayClientContext);
-  const clientValue = useClientValue(protocolProperty, pauseId);
-
-  const { name } = clientValue;
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [invokeGetter, setInvokeGetter] = useState(false);
 
+  const getterClientValueRef = useRef<ClientValue | null>(null);
+
+  const { name } = clientValueCache.read(client, pauseId, protocolProperty);
   const getterValue = invokeGetter
     ? objectPropertyCache.read(client, pauseId, parentObjectId, name!)
     : null;
 
-  const getterClientValueRef = useRef<ClientValue>(null);
   if (getterClientValueRef.current === null && getterValue != null) {
-    // @ts-ignore
-    getterClientValueRef.current = protocolValueToClientValue(pauseId, getterValue);
+    getterClientValueRef.current = clientValueCache.read(client, pauseId, getterValue);
   }
 
   const getterClientValue = getterClientValueRef.current;
