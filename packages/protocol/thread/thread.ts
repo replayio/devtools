@@ -351,6 +351,16 @@ class _ThreadFront {
     }: ResumeOperationParams & { point: ExecutionPoint }
   ) {
     assert(this.sessionId, "no sessionId");
+
+    if (
+      loadedRegions.loaded.every(
+        region =>
+          BigInt(point) < BigInt(region.begin.point) || BigInt(point) > BigInt(region.end.point)
+      )
+    ) {
+      return null;
+    }
+
     await this.ensureAllSources();
 
     while (true) {
