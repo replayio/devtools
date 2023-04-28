@@ -6,16 +6,12 @@ import {
   recordingCapabilitiesCache,
   recordingTargetCache,
 } from "replay-next/src/suspense/BuildIdCache";
+import { screenshotCache } from "replay-next/src/suspense/ScreenshotCache";
 import { replayClient } from "shared/client/ReplayClientContext";
 
 import { repaintGraphics } from "./repainted-graphics-cache";
-import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
 import { ThreadFront } from "./thread";
 import { assert, binarySearch, defer } from "./utils";
-
-const MINIMUM_VIDEO_CONTENT = 5000;
-
-export const screenshotCache = new ScreenshotCache();
 
 const repaintedScreenshots: Map<string, ScreenShot> = new Map();
 
@@ -189,18 +185,7 @@ export function setupGraphics() {
   });
 
   ThreadFront.on("paused", async ({ point, time }) => {
-    let screen: ScreenShot | undefined;
-    let mouse: MouseAndClickPosition | undefined;
-    try {
-      const rv = await getGraphicsAtTime(time);
-      screen = rv.screen;
-      mouse = rv.mouse;
-    } catch (err) {
-      if (err instanceof DownloadCancelledError) {
-        return;
-      }
-      throw err;
-    }
+    const { screen, mouse } = await getGraphicsAtTime(time);
 
     if (point !== ThreadFront.currentPoint) {
       return;
@@ -351,7 +336,8 @@ export function getDevicePixelRatio() {
 //////////////////////////////
 
 function addScreenShot(screenShot: ScreenShot) {
-  screenshotCache.addScreenshot(screenShot);
+  // the point isn't used in the cache key, so it's OK to pass a dummy value here
+  screenshotCache.cache(screenShot, replayClient, "", screenShot.hash);
 }
 
 // How recently a click must have occurred for it to be drawn.
@@ -380,9 +366,7 @@ export async function getGraphicsAtTime(
     return {};
   }
 
-  const screenPromise = forPlayback
-    ? screenshotCache.getScreenshotForPlayback(point, paintHash)
-    : screenshotCache.getScreenshotForPreview(point, paintHash);
+  const screenPromise = screenshotCache.readAsync(replayClient, point, paintHash);
 
   const screen = await screenPromise;
 
