@@ -163,7 +163,15 @@ export const localAnalysisCache: Cache<[code: string], any[]> = createCache({
         clearTimeout(timeoutID);
       });
       worker.addEventListener("error", event => {
-        reject(new Error(event.message));
+        reject(
+          new Error(
+            `Received error "${
+              event.message
+            }" from worker while evaluating "${escapedCode}" (${JSON.stringify(
+              [...escapedCode].map(char => char.codePointAt(0))
+            )})`
+          )
+        );
         clearTimeout(timeoutID);
       });
       worker.postMessage("start");
