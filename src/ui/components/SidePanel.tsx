@@ -15,7 +15,6 @@ import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
 import { getFilteredEventsForFocusRegion } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
-import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { shouldShowTour } from "ui/utils/onboarding";
 import useAuth0 from "ui/utils/useAuth0";
@@ -57,8 +56,6 @@ export default function SidePanel() {
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
   const events = useAppSelector(getFilteredEventsForFocusRegion);
   const { isAuthenticated } = useAuth0();
-  const viewMode = useAppSelector(getViewMode);
-  const { nags } = hooks.useGetUserInfo();
 
   const launchQuickstart = (url: string) => {
     window.open(url, "_blank");
