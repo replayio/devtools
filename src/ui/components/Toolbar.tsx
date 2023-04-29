@@ -211,13 +211,22 @@ export default function Toolbar() {
             onClick={handleButtonClick}
           />
         ) : null}
-        {recording?.metadata?.test?.runner?.name == "cypress" ? (
-          <ToolbarButton
-            icon="cypress"
-            label="Cypress Panel"
-            name="cypress"
-            onClick={handleButtonClick}
-          />
+        {recording?.metadata?.test?.runner ? (
+          recording?.metadata?.test?.runner?.name === "cypress" ? (
+            <ToolbarButton
+              icon="cypress"
+              label="Cypress Panel"
+              name="cypress"
+              onClick={handleButtonClick}
+            />
+          ) : (
+            <ToolbarButton
+              icon="folder"
+              label="Test Info"
+              name="cypress"
+              onClick={handleButtonClick}
+            />
+          )
         ) : (
           <ToolbarButton
             icon="info"
