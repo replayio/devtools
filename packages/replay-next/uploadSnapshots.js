@@ -56,14 +56,14 @@ async function uploadImage(file, branchName, runId) {
     if (response.status !== 200) {
       const text = await response.text();
 
-      console.error(`Upload failed with status: ${response.status}: ${text}`);
+      console.error(`Upload failed\n  status: ${response.status}\n  url: ${url}\n  error: ${text}`);
 
       return { status: response.status, error: text, serverError: true, file, content };
     }
 
     return response.json();
   } catch (error) {
-    console.error(`Upload failed with status: ${response.status}:`, error);
+    console.error(`Upload failed\n  status: ${response.status}\n  url: ${url}\n  error:`, error);
 
     return { status: response.status, error, serverError: false, file, content };
   }
