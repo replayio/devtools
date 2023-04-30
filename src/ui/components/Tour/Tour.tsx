@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
@@ -141,42 +141,47 @@ const Tour: React.FC = () => {
     <img src="https://vercel.replay.io/tour/editlogs.gif" className={styles.videoExample} />
   );
 
-  const CompletedTour: React.FC<CompletedTourProps> = ({ setShowPassport, dismissTourNag }) => (
-    <div className={styles.intro}>
-      <div className={styles.h1}>😎</div>
-      <p>Take a look at the console.</p>
-      <p>
-        Replay just re-ran your recording and retroactively added your print statement each time
-        that line of code was called. 🤯
-      </p>
-      <p>And with that, you've graduated. Happy exploring!</p>
-      <p className="mt-8">
-        <a
-          href="#"
-          onClick={e => {
-            e.stopPropagation();
-            setShowPassport(true);
-            setTimeout(() => {
-              dismissTourNag();
-            }, 200);
+  const CompletedTour: React.FC<CompletedTourProps> = ({ setShowPassport, dismissTourNag }) => {
+    useEffect(() => {
+      setShowPassport(true);
+    }, [setShowPassport]);
+
+    return (
+      <div className={styles.intro}>
+        <div className={styles.h1}>😎</div>
+        <p>Take a look at the console.</p>
+        <p>
+          Replay just re-ran your recording and retroactively added your print statement each time
+          that line of code was called. 🤯
+        </p>
+        <p>And with that, you've graduated. Happy exploring!</p>
+        <p className="mt-8">
+          <a
+            href="#"
+            onClick={e => {
+              e.stopPropagation();
+              setTimeout(() => {
+                dismissTourNag();
+              }, 200);
+            }}
+            className="hover:cursor-hand whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg hover:bg-blue-50"
+          >
+            Thanks!
+          </a>
+        </p>
+        <img
+          src={`/images/passport/tour_grad-default.png`}
+          className={styles.largeCompletedImage}
+          style={{
+            zIndex: 0,
+            opacity: 0.75,
+            bottom: `300px`,
+            transform: `rotate(14deg)`,
           }}
-          className="hover:cursor-hand whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg hover:bg-blue-50"
-        >
-          Thanks!
-        </a>
-      </p>
-      <img
-        src={`/images/passport/tour_grad-default.png`}
-        className={styles.largeCompletedImage}
-        style={{
-          zIndex: 0,
-          opacity: 0.75,
-          bottom: `300px`,
-          transform: `rotate(14deg)`,
-        }}
-      />
-    </div>
-  );
+        />
+      </div>
+    );
+  };
 
   const CompletedTourGif = () => (
     <img src="https://vercel.replay.io/tour/consoleupdate.gif" className={styles.videoExample} />
