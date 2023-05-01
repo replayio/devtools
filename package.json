@@ -167,7 +167,7 @@
     "circular-dependency-plugin": "^5.2.2",
     "comlink": "^4.3.1",
     "css-loader": "^6.7.1",
-    "eslint": "^8.13.0",
+    "eslint": "^8.39.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^2.7.1",
