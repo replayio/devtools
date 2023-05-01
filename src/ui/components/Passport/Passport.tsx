@@ -190,6 +190,10 @@ const Passport = () => {
     return Math.floor(Math.random() * (max - min + 1) + min);
   };
 
+  const [randomBottom, setRandomBottom] = useState(rand(220, 320));
+  const [randomRight, setRandomRight] = useState(rand(-50, 0));
+  const [randomRotation, setRandomRotation] = useState(rand(-20, 20));
+
   const renderSection = (section: Section, sectionIndex: number) => {
     return (
       <div className={styles.section}>
@@ -212,6 +216,12 @@ const Passport = () => {
       </div>
     );
   };
+
+  useEffect(() => {
+    setRandomBottom(rand(220, 320));
+    setRandomRight(rand(-50, 0));
+    setRandomRotation(rand(-20, 20));
+  }, [selectedItem.completed]);
 
   return (
     <div className={styles.PassportBoxWrapper}>
@@ -242,9 +252,9 @@ const Passport = () => {
             style={{
               zIndex: 0,
               opacity: 0.25,
-              bottom: `${rand(220, 320)}px`,
-              right: `${rand(-50, 0)}px`,
-              transform: `rotate(${rand(-20, 20)}deg)`,
+              bottom: `${randomBottom}px`,
+              right: `${randomRight}px`,
+              transform: `rotate(${randomRotation}deg)`,
             }}
           />
         )}
