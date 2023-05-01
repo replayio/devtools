@@ -97,7 +97,7 @@
     "replay-next": "workspace:*",
     "reselect": "^4.1.5",
     "shared": "workspace:*",
-    "slugify": "^1.6.5",
+    "slugify": "^1.6.6",
     "suspense": "^0.0.37"
   },
   "devDependencies": {
