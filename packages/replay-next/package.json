@@ -36,7 +36,7 @@
     "jest": "^28.0.2",
     "jest-environment-jsdom": "^28.0.2",
     "node-fetch": "^2.0.0",
-    "playwright-chromium": "^1.23.1",
+    "playwright-chromium": "^1.33.0",
     "typescript": "5.0.2"
   },
   "scripts": {
