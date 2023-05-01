@@ -6305,7 +6305,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*, @types/react@npm:^18.0.12":
+"@types/react@npm:*":
   version: 18.0.12
   resolution: "@types/react@npm:18.0.12"
   dependencies:
@@ -6313,6 +6313,17 @@ __metadata:
     "@types/scheduler": "*"
     csstype: ^3.0.2
   checksum: 526ea13b3adf7fe4b475e55b7426510a7861ef2910664a9014ef42cba0c699d5167dc378eb161e2ec26c07a3b6fde9b6bdcbbb6f4b5580612246bc289395ef03
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:^18.2.0":
+  version: 18.2.0
+  resolution: "@types/react@npm:18.2.0"
+  dependencies:
+    "@types/prop-types": "*"
+    "@types/scheduler": "*"
+    csstype: ^3.0.2
+  checksum: db3d92b423150222a666329f7aa3023e3e942044700557b8a7d161530847e621aec9f56c9e7f71761b06dd164c8a7b17ad52355863efe80963dffa5537e8e5fd
   languageName: node
   linkType: hard
 
@@ -17069,7 +17080,7 @@ __metadata:
     lodash: ^4.17.21
     next: ^13.2
     protocol: "workspace:*"
-    react: 0.0.0-experimental-e7d0053e6-20220325
+    react: 18.2.0
     react-dom: 0.0.0-experimental-e7d0053e6-20220325
     replay-next: "workspace:*"
     shared: "*"
@@ -20430,12 +20441,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:0.0.0-experimental-49f741046-20230305":
-  version: 0.0.0-experimental-49f741046-20230305
-  resolution: "react@npm:0.0.0-experimental-49f741046-20230305"
+"react@npm:18.2.0":
+  version: 18.2.0
+  resolution: "react@npm:18.2.0"
   dependencies:
     loose-envify: ^1.1.0
-  checksum: 4dd1591cc8c894e39d93c1242f27faf3fdebc149d27a7abdef4ea658e38ad68cae4a21a11c6aa4838cd0866aabb7a3f1edaa65eb3abd2dd7502857adf6201271
+  checksum: 88e38092da8839b830cda6feef2e8505dec8ace60579e46aa5490fc3dc9bba0bd50336507dc166f43e3afc1c42939c09fe33b25fae889d6f402721dcd78fca1b
   languageName: node
   linkType: hard
 
@@ -20654,7 +20665,7 @@ __metadata:
     "@types/logrocket-react": ^3.0.0
     "@types/mixpanel-browser": ^2.35.6
     "@types/node": ^18.0.0
-    "@types/react": ^18.0.12
+    "@types/react": ^18.2.0
     "@types/react-devtools-inline": ^4.24.3
     "@types/react-dom": ^18.0.5
     "@types/react-lazyload": ^3.2.0
@@ -20737,7 +20748,7 @@ __metadata:
     prop-types: ^15.8.1
     protocol: "workspace:*"
     raw-loader: ^4.0.2
-    react: 0.0.0-experimental-49f741046-20230305
+    react: 18.2.0
     react-canvas-confetti: ^1.3.0
     react-circular-progressbar: ^2.0.4
     react-devtools-inline: ^4.24.5
@@ -21118,7 +21129,7 @@ __metadata:
     playwright-chromium: ^1.23.1
     pretty-ms: ^7.0.1
     protocol: "workspace:*"
-    react: 0.0.0-experimental-e7d0053e6-20220325
+    react: 18.2.0
     react-dom: 0.0.0-experimental-e7d0053e6-20220325
     react-virtualized-auto-sizer: ^1.0.7
     shared: "workspace:*"
