@@ -8,10 +8,12 @@ import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
+import { useNag } from "replay-next/src/hooks/useNag";
 import { RecordingTarget, recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
+import { Nag } from "shared/graphql/types";
 import { isPointInRegions } from "shared/utils/time";
 import { UIThunkAction } from "ui/actions";
 import { fetchMouseTargetsForPause, getLoadedRegions } from "ui/actions/app";
@@ -73,6 +75,7 @@ class ReplayWall implements Wall {
     private unhighlightNode: () => void,
     private fetchMouseTargetsForPause: () => Promise<NodeBounds[] | undefined>,
     private replayClient: ReplayClientInterface,
+    private dismissInspectComponentNag: () => void,
     private pauseId: string | undefined
   ) {}
 
@@ -102,6 +105,8 @@ class ReplayWall implements Wall {
     try {
       switch (event) {
         case "inspectElement": {
+          // Passport onboarding
+          this.dismissInspectComponentNag();
           if (this.inspectedElements.has(payload.id) && !payload.path) {
             // this element has been inspected before, the frontend asks to inspect it again
             // to see if there are any changes - in Replay there won't be any so we can send
@@ -348,6 +353,7 @@ function createReactDevTools(
   unhighlightNode: () => void,
   fetchMouseTargetsForPause: () => Promise<NodeBounds[] | undefined>,
   replayClient: ReplayClientInterface,
+  dismissInspectComponentNag: () => void,
   pauseId: string | undefined
 ) {
   const { createBridge, createStore, initialize } = reactDevToolsInlineModule;
@@ -362,6 +368,7 @@ function createReactDevTools(
     unhighlightNode,
     fetchMouseTargetsForPause,
     replayClient,
+    dismissInspectComponentNag,
     pauseId
   );
   const bridge = createBridge(target, wall);
@@ -432,6 +439,7 @@ export default function ReactDevtoolsPanel() {
   const protocolCheckFailed = useAppSelector(getProtocolCheckFailed);
   const reactInitPoint = useAppSelector(getReactInitPoint);
   const pauseId = useAppSelector(state => state.pause.id);
+  const [, dismissInspectComponentNag] = useNag(Nag.INSPECT_COMPONENT);
 
   const dispatch = useAppDispatch();
 
@@ -559,6 +567,7 @@ export default function ReactDevtoolsPanel() {
     dispatchUnhighlightNode,
     dispatchFetchMouseTargets,
     replayClient,
+    dismissInspectComponentNag,
     pauseId
   );
 
