@@ -115,6 +115,12 @@ const Passport = () => {
       videoUrl: "https://vercel.replay.io/passport/inspect_a_network_request.gif",
       imageBaseName: "inspect_network_request",
     },
+    {
+      label: "Jump to code",
+      completed: !showJumpToCode,
+      videoUrl: "https://vercel.replay.io/passport/jump_to_code.gif",
+      imageBaseName: "jump_to_code",
+    },
   ];
 
   const swissArmyItems = [
