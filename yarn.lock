@@ -2852,6 +2852,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lexical/list@npm:0.10.0":
+  version: 0.10.0
+  resolution: "@lexical/list@npm:0.10.0"
+  dependencies:
+    "@lexical/utils": 0.10.0
+  peerDependencies:
+    lexical: 0.10.0
+  checksum: 27bcd138eae4f17bb40c313989158c34e1ba789982c84639c5e3c2bdf7f532b1b18c35366af886a4bcccf21df1d86de457bb8111d59218a83850fa40ced6ae2f
+  languageName: node
+  linkType: hard
+
 "@lexical/list@npm:0.6.5":
   version: 0.6.5
   resolution: "@lexical/list@npm:0.6.5"
@@ -2863,7 +2874,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lexical/mark@npm:0.6.5, @lexical/mark@npm:^0.6.5":
+"@lexical/mark@npm:0.6.5":
   version: 0.6.5
   resolution: "@lexical/mark@npm:0.6.5"
   dependencies:
@@ -2871,6 +2882,17 @@ __metadata:
   peerDependencies:
     lexical: 0.6.5
   checksum: 1f0b76a201bb8faf35cbf6ebc638e48eca18cebb91d0d7c6e214de540c6d84bfca627f25d3de74e8629aa9adf1aaf5ea541ced933cef1889c16a87e399bda000
+  languageName: node
+  linkType: hard
+
+"@lexical/mark@npm:^0.10.0":
+  version: 0.10.0
+  resolution: "@lexical/mark@npm:0.10.0"
+  dependencies:
+    "@lexical/utils": 0.10.0
+  peerDependencies:
+    lexical: 0.10.0
+  checksum: ad6bed6dbcd60afd8187d7f42febf010736ab9064e541d55e2a8ed3fde50c0b799305b7922160a7b6c1cb20b4566ffc5293153b5d815bd396e4140d89598c902
   languageName: node
   linkType: hard
 
@@ -2962,12 +2984,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lexical/selection@npm:0.10.0":
+  version: 0.10.0
+  resolution: "@lexical/selection@npm:0.10.0"
+  peerDependencies:
+    lexical: 0.10.0
+  checksum: 6a0d6af76c8572c148c7f5d5017ec044a1caf634afdacd5c9d651202ccc8fa7911dd15590f917f4573f503ddcf1ec2892acf8f3fc35fb3b207e75f39aca91f86
+  languageName: node
+  linkType: hard
+
 "@lexical/selection@npm:0.6.5":
   version: 0.6.5
   resolution: "@lexical/selection@npm:0.6.5"
   peerDependencies:
     lexical: 0.6.5
   checksum: f8041f99806d147d1a23adfd87170074490d5ff7e73b7753c21d54d0190e01da8b5f7f36f1941ef58252c68a6819547004cb789141b41d86b60cfe51f675e1ae
+  languageName: node
+  linkType: hard
+
+"@lexical/table@npm:0.10.0":
+  version: 0.10.0
+  resolution: "@lexical/table@npm:0.10.0"
+  dependencies:
+    "@lexical/utils": 0.10.0
+  peerDependencies:
+    lexical: 0.10.0
+  checksum: 9cd018ce3f67e524f6e02c7ccae70993d24742788fa02fac3ac5939b25e7918fe854b6dd820ff3b3a9ed315f099d94aed1060f7d634064c744c3da6fea54252d
   languageName: node
   linkType: hard
 
@@ -2988,6 +3030,19 @@ __metadata:
   peerDependencies:
     lexical: 0.6.5
   checksum: 72f807bff0765c1d68b17719c53ad8b900f7bcdba8aaea83c40dba12d5b2ff49952e119fdb4b2c729e6b4261530b9a085cfcb1178d16f68da3a4318dd44a3dbc
+  languageName: node
+  linkType: hard
+
+"@lexical/utils@npm:0.10.0":
+  version: 0.10.0
+  resolution: "@lexical/utils@npm:0.10.0"
+  dependencies:
+    "@lexical/list": 0.10.0
+    "@lexical/selection": 0.10.0
+    "@lexical/table": 0.10.0
+  peerDependencies:
+    lexical: 0.10.0
+  checksum: 5a57f134e6be65ce1243dd096c40168a54126f2f55ac8d44d1c2ad59e86ea5a2672591c8f1dd906f296de14beb556986aab9bbc06f58e4cdb8e2bfc460a18d24
   languageName: node
   linkType: hard
 
@@ -20616,7 +20671,7 @@ __metadata:
     "@jest/console": ^28.0.2
     "@jridgewell/trace-mapping": ^0.3.14
     "@lexical/link": ^0.6.5
-    "@lexical/mark": ^0.6.5
+    "@lexical/mark": ^0.10.0
     "@lexical/react": ^0.6.5
     "@next/bundle-analyzer": ^12.2.0
     "@recordreplay/playwright": ^1.18.3

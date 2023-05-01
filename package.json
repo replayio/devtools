@@ -38,7 +38,7 @@
     "@headlessui/react": "^1.4.3",
     "@heroicons/react": "^1.0.6",
     "@lexical/link": "^0.6.5",
-    "@lexical/mark": "^0.6.5",
+    "@lexical/mark": "^0.10.0",
     "@lexical/react": "^0.6.5",
     "@reduxjs/toolkit": "^1.8.4",
     "@replayio/overboard": "^0.4.1",
