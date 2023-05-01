@@ -164,7 +164,7 @@ const Tour: React.FC = () => {
                 dismissTourNag();
               }, 200);
             }}
-            className="hover:cursor-hand whitespace-nowrap rounded-lg bg-white px-3 py-1 font-medium text-primaryAccent shadow-lg hover:bg-blue-50"
+            className="px-3 py-1 font-medium bg-white rounded-lg shadow-lg hover:cursor-hand whitespace-nowrap text-primaryAccent hover:bg-blue-50"
           >
             Thanks!
           </a>
@@ -216,10 +216,10 @@ const Tour: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="absolute bottom-28 p-3">
+      <div className="absolute p-3 bottom-28">
         {(isNewUser || viewMode === "non-dev") && (
           <div className="relative -bottom-3">
-            <img src="/images/illustrations/larry_wave.png" className="z-1 w-full" />
+            <img src="/images/illustrations/larry_wave.png" className="w-full z-1" />
           </div>
         )}
         {!isNewUser && viewMode !== "non-dev" && (
@@ -228,9 +228,8 @@ const Tour: React.FC = () => {
 
             {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && <EditLogsGif />}
 
-            {!showConsoleNavigate && showBreakpointAdd && !showBreakpointEdit && (
-              <OneClickLogsGif />
-            )}
+            {!showConsoleNavigate && showBreakpointAdd && <OneClickLogsGif />}
+
             {hasCompletedTour && <CompletedTourGif />}
           </>
         )}
