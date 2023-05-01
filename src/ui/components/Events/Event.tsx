@@ -73,18 +73,16 @@ export const nextInteractionEventCache: Cache<
     replayClient: ReplayClientInterface,
     ThreadFront: typeof TF,
     point: ExecutionPoint,
+    end: TimeStampedPoint,
     replayEventType: SEARCHABLE_EVENT_TYPES,
-    endTime: number,
     sourcesState: SourcesState
   ],
   PointDescription | undefined
 > = createCache({
   config: { immutable: true },
   debugLabel: "NextInteractionEvent",
-  getKey: ([replayClient, threadFront, point, replayEventType, endTime]) => point,
-  load: async ([replayClient, threadFront, point, replayEventType, endTime, sourcesState]) => {
-    const pointNearEndTime = await replayClient.getPointNearTime(endTime);
-
+  getKey: ([replayClient, threadFront, point, end, replayEventType]) => point,
+  load: async ([replayClient, threadFront, point, end, replayEventType, sourcesState]) => {
     const recordingTarget = await recordingTargetCache.readAsync(replayClient);
 
     // Limit to browsers
@@ -127,7 +125,7 @@ export const nextInteractionEventCache: Cache<
 
     const entryPoints = await eventPointsCache.readAsync(
       BigInt(point),
-      BigInt(pointNearEndTime.point),
+      BigInt(end.point),
       replayClient,
       eventTypesToQuery
     );
@@ -202,8 +200,9 @@ We _could_ do more analysis and find the nearest time where the first breakable 
 inside that function is running, then seek to that point in time, but skipping for now.
 */
 export function jumpToClickEventFunctionLocation(
+  onSeek: (point: ExecutionPoint, time: number) => void,
   event: PointWithEventType,
-  onSeek: (point: ExecutionPoint, time: number) => void
+  end?: TimeStampedPoint
 ): UIThunkAction<Promise<JumpToCodeStatus>> {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const { point: executionPoint, time } = event;
@@ -214,12 +213,18 @@ export function jumpToClickEventFunctionLocation(
       // "mouse events" used by the sidebar.
       // Look for the next click event within a short timeframe after the "mouse event".
       // Yes, this is hacky, but it does seem pretty consistent.
-      const arbitraryEndTime = time + 200;
+      if (!end) {
+        const arbitraryEndTime = time + 500;
+        const pointNearEndTime = await replayClient.getPointNearTime(arbitraryEndTime);
+        end = pointNearEndTime;
+      }
+      const actualEnd = end!;
+
       const loadedRegions = getLoadedRegions(getState());
 
       // Safety check: don't ask for points if this time isn't loaded
       const isEndTimeInLoadedRegion = loadedRegions?.loaded.some(
-        region => region.begin.time <= arbitraryEndTime && region.end.time >= arbitraryEndTime
+        region => region.begin.time <= actualEnd.time && region.end.time >= actualEnd.time
       );
 
       if (!isEndTimeInLoadedRegion) {
@@ -239,8 +244,8 @@ export function jumpToClickEventFunctionLocation(
         replayClient,
         ThreadFront,
         executionPoint,
+        actualEnd,
         event.kind as SEARCHABLE_EVENT_TYPES,
-        arbitraryEndTime,
         sourcesState
       );
 
@@ -287,12 +292,11 @@ export function jumpToClickEventFunctionLocation(
         if (nextBreakablePosition) {
           // We think we know the first position _inside_ the function.
           // Run analysis to find the next time this position got hit.
-          const pointNearEndTime = await replayClient.getPointNearTime(arbitraryEndTime);
           const [hitPoints] = await getHitPointsForLocationAsync(
             replayClient,
             nextBreakablePosition,
             null,
-            { begin: executionPoint, end: pointNearEndTime.point }
+            { begin: executionPoint, end: end.point }
           );
 
           const [firstHitPoint] = hitPoints;
@@ -344,8 +348,9 @@ export default React.memo(function Event({
 
     if (event.kind === "mousedown" || event.kind === "keypress") {
       setJumpToCodeStatus("loading");
+      // We don't have a good idea what the end time is - use a guesstimate internally
       const result = await dispatch(
-        jumpToClickEventFunctionLocation(event as PointWithEventType, onSeek)
+        jumpToClickEventFunctionLocation(onSeek, event as PointWithEventType)
       );
 
       setJumpToCodeStatus(result);
