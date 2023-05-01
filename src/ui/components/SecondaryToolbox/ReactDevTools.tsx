@@ -38,10 +38,7 @@ import { NodePicker as NodePickerClass, NodePickerOpts } from "ui/utils/nodePick
 import { getJSON } from "ui/utils/objectFetching";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 
-import {
-  injectReactDevtoolsBackend,
-  logWindowMessages,
-} from "./react-devtools/injectReactDevtoolsBackend";
+import { injectReactDevtoolsBackend } from "./react-devtools/injectReactDevtoolsBackend";
 
 type ReactDevToolsInlineModule = typeof import("react-devtools-inline/frontend");
 
@@ -211,30 +208,27 @@ class ReplayWall implements Wall {
     }
 
     if (this.recordingTarget === "chromium") {
-      await injectReactDevtoolsBackend(ThreadFront, this.replayClient);
+      const pauseId = await ThreadFront.getCurrentPauseId(this.replayClient);
+      await injectReactDevtoolsBackend(this.replayClient, pauseId);
     }
   }
 
   // send a request to the backend in the recording and the reply to the frontend
   private async sendRequest(event: string, payload: any) {
-    try {
-      const response = await ThreadFront.evaluate({
-        replayClient: this.replayClient,
-        text: ` window.__RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("${event}", ${JSON.stringify(
-          payload
-        )})`,
-      });
+    const response = await ThreadFront.evaluate({
+      replayClient: this.replayClient,
+      text: ` window.__RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("${event}", ${JSON.stringify(
+        payload
+      )})`,
+    });
 
-      if (response.returned) {
-        const result: any = await getJSON(this.replayClient, this.pauseId!, response.returned);
+    if (response.returned) {
+      const result: any = await getJSON(this.replayClient, this.pauseId!, response.returned);
 
-        if (result) {
-          this._listener?.({ event: result.event, payload: result.data });
-        }
-        return result;
+      if (result) {
+        this._listener?.({ event: result.event, payload: result.data });
       }
-    } finally {
-      await logWindowMessages(ThreadFront, this.replayClient);
+      return result;
     }
   }
 

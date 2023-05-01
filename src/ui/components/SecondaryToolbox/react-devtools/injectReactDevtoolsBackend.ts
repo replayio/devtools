@@ -1,6 +1,4 @@
-import type { FiberRootNode } from "react-devtools-inline/frontend";
-
-import type { ThreadFront as TF } from "protocol/thread";
+import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 // Cache this at the module level, because the backend records all evaluations
@@ -11,7 +9,6 @@ const pausesWithDevtoolsInjected = new Set<string>();
 declare global {
   interface Window {
     __REACT_DEVTOOLS_SAVED_RENDERERS__: any[];
-    savedOperations: number[][];
     evaluationLogs: string[];
     logMessage: (message: string) => void;
     __REACT_DEVTOOLS_STUB_FIBER_ROOTS: Record<string, Set<any>>;
@@ -22,10 +19,9 @@ declare global {
   }
 }
 
-function mutateWindowForSetup() {
+function installReactDevToolsIntoPause() {
   // Create placeholders for our poor man's debug logging and the saved React tree operations
   window.evaluationLogs = [];
-  window.savedOperations = [];
   window.logMessage = function (message) {
     window.evaluationLogs.push(message);
   };
@@ -34,14 +30,12 @@ function mutateWindowForSetup() {
   // The RDT types say it's non-optional, so ignore the TS error
   // @ts-ignore
   delete window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
-}
 
-function getMessages() {
-  // Get the log messages for debugging
-  return JSON.stringify({ messages: window.evaluationLogs });
-}
+  // Evaluate the actual RDT hook installation file, so that this pause
+  // has the initial RDT infrastructure available
+  // @ts-ignore
+  INSTALL_HOOK_PLACEHOLDER();
 
-function copyMountedRoots() {
   // The only time we have access to the React root objects is when `onCommitFiberRoot` gets called.
   // Our Chromium fork specifically captures all those and saves them.
   // As part of the setup process, we have to copy those root references over to the real RDT
@@ -54,9 +48,12 @@ function copyMountedRoots() {
       hookRoots.add(root);
     }
   }
-}
 
-function injectExistingRenderers() {
+  // Evaluate the actual RDT backend logic file, so that the rest of the
+  // RDT logic is installed in this pause.
+  // @ts-ignore
+  DEVTOOLS_PLACEHOLDER();
+
   window.__REACT_DEVTOOLS_SAVED_RENDERERS__.forEach(renderer => {
     window.logMessage("Injecting renderer");
     // Similarly, we need to take the real renderer references, and attach them
@@ -80,30 +77,10 @@ function injectExistingRenderers() {
   }
 }
 
-async function evaluateNoArgsFunction(
-  ThreadFront: typeof TF,
-  replayClient: ReplayClientInterface,
-  fn: Function
-) {
-  return await ThreadFront.evaluate({
-    replayClient,
-    text: `(${fn})()`,
-  });
-}
-
-export async function logWindowMessages(
-  ThreadFront: typeof TF,
-  replayClient: ReplayClientInterface
-) {
-  const messages = await evaluateNoArgsFunction(ThreadFront, replayClient, getMessages);
-  // console.log("Evaluation messages: ", JSON.parse(messages?.returned?.value ?? "null").messages);
-}
-
 export async function injectReactDevtoolsBackend(
-  ThreadFront: typeof TF,
-  replayClient: ReplayClientInterface
+  replayClient: ReplayClientInterface,
+  pauseId?: string
 ) {
-  const pauseId = await ThreadFront.getCurrentPauseId(replayClient);
   if (!pauseId || pausesWithDevtoolsInjected.has(pauseId)) {
     return;
   }
@@ -113,19 +90,9 @@ export async function injectReactDevtoolsBackend(
   const injectGlobalHookSource = require("./installHook.raw.js").default;
   const reactDevtoolsBackendSource = require("./react_devtools_backend.raw.js").default;
 
-  await evaluateNoArgsFunction(ThreadFront, replayClient, mutateWindowForSetup);
-  await ThreadFront.evaluate({
-    replayClient,
-    pauseId,
-    text: injectGlobalHookSource,
-  });
+  const expression = `(${installReactDevToolsIntoPause})()`
+    .replace("INSTALL_HOOK_PLACEHOLDER", `(${injectGlobalHookSource})`)
+    .replace("DEVTOOLS_PLACEHOLDER", `(${reactDevtoolsBackendSource})`);
 
-  await evaluateNoArgsFunction(ThreadFront, replayClient, copyMountedRoots);
-
-  await ThreadFront.evaluate({
-    replayClient,
-    text: reactDevtoolsBackendSource,
-  });
-
-  await evaluateNoArgsFunction(ThreadFront, replayClient, injectExistingRenderers);
+  const evalRes = await pauseEvaluationsCache.readAsync(replayClient, pauseId, null, expression);
 }
