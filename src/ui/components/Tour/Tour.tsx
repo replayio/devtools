@@ -201,16 +201,7 @@ const Tour: React.FC = () => {
                 ) : (
                   <>
                     {showConsoleNavigate && timeTravel}
-                    {!showConsoleNavigate &&
-                      showBreakpointAdd &&
-                      showBreakpointEdit &&
-                      oneClickLogs}
-
-                    {!showConsoleNavigate &&
-                      showBreakpointAdd &&
-                      !showBreakpointEdit &&
-                      oneClickLogs}
-
+                    {!showConsoleNavigate && showBreakpointAdd && oneClickLogs}
                     {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && editLogs}
                     {hasCompletedTour && (
                       <CompletedTour
@@ -234,14 +225,12 @@ const Tour: React.FC = () => {
         {!isNewUser && viewMode !== "non-dev" && (
           <>
             {showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && <TimeTravelGif />}
-            {!showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && <OneClickLogsGif />}
 
             {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && <EditLogsGif />}
 
             {!showConsoleNavigate && showBreakpointAdd && !showBreakpointEdit && (
               <OneClickLogsGif />
             )}
-
             {hasCompletedTour && <CompletedTourGif />}
           </>
         )}
