@@ -150,7 +150,7 @@
     "@types/react-dom": "^18.0.5",
     "@types/react-lazyload": "^3.2.0",
     "@types/react-router-dom": "^5.1.7",
-    "@types/react-table": "^7.7.10",
+    "@types/react-table": "^7.7.14",
     "@types/react-transition-group": "^4.4.5",
     "@types/react-virtualized-auto-sizer": "^1.0.1",
     "@types/react-window": "^1.8.5",
