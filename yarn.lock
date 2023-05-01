@@ -5808,10 +5808,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/canvas-confetti@npm:1.4.2":
-  version: 1.4.2
-  resolution: "@types/canvas-confetti@npm:1.4.2"
-  checksum: 68327c85bec9f507a8002bf7bc57d8e1850816e91460c8d0c340ae7a06a782839c016b82e5b4adf5ff52fe96af94853c9a25e17bd317524d377ccdc0e00e8d9c
+"@types/canvas-confetti@npm:1.6.0":
+  version: 1.6.0
+  resolution: "@types/canvas-confetti@npm:1.6.0"
+  checksum: e1bd2bc81e4d6ec6241982a4087ed90a3c21f858390dda7cb68e8aeb1df5573fc7c263ea4272397d2b39f0e78dcd192e8ba4a93c182ff29f80ea74073aaee496
   languageName: node
   linkType: hard
 
@@ -9111,10 +9111,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"canvas-confetti@npm:1.5.1":
-  version: 1.5.1
-  resolution: "canvas-confetti@npm:1.5.1"
-  checksum: e5932e34261615d629aac24aebad0472dd01c6cc3a3d6460ef37ab81eb533a2fdcec1cd842fcad6275f907fe378fc71cc90c91e1f997df63b0865ec2d5783ad8
+"canvas-confetti@npm:1.6.0":
+  version: 1.6.0
+  resolution: "canvas-confetti@npm:1.6.0"
+  checksum: be19e3be736ab28aa8af7b53cba9f4146f5714edadbf4d5a7d7b1899914dc59a8ac5574260fe6b7d9995c51df5787b0b707adfbb72dbacbc61fc03f9f2b25291
   languageName: node
   linkType: hard
 
@@ -20091,15 +20091,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-canvas-confetti@npm:^1.3.0":
-  version: 1.3.0
-  resolution: "react-canvas-confetti@npm:1.3.0"
+"react-canvas-confetti@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "react-canvas-confetti@npm:1.4.0"
   dependencies:
-    "@types/canvas-confetti": 1.4.2
-    canvas-confetti: 1.5.1
+    "@types/canvas-confetti": 1.6.0
+    canvas-confetti: 1.6.0
   peerDependencies:
     react: "*"
-  checksum: 95a50e5c1e57f04d3b6bdc15e3bdba87cb005273b37f614daa8f19e3dafb0fdd6feb1b9966e7de1061706befe8183bf9343dfc48ce4823bb3263aa5f0f63bc2b
+  checksum: 3501cdb8c1c7c2ea80578a35622a442142b504df9f9d48ce21724a22577e0aa92a5552aed8896729b95692c1dfac86d55e8628af7682d0de52e93788e331ccc8
   languageName: node
   linkType: hard
 
@@ -20738,7 +20738,7 @@ __metadata:
     protocol: "workspace:*"
     raw-loader: ^4.0.2
     react: 0.0.0-experimental-49f741046-20230305
-    react-canvas-confetti: ^1.3.0
+    react-canvas-confetti: ^1.4.0
     react-circular-progressbar: ^2.0.4
     react-devtools-inline: ^4.24.5
     react-devtools-inline_4_18_0: "npm:react-devtools-inline@4.18.0"
