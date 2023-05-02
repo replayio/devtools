@@ -10,6 +10,7 @@ import {
   shouldShowConsoleNavigate,
   shouldShowInspectElement,
   shouldShowInspectNetworkRequest,
+  shouldShowInspectReactComponent,
   shouldShowJumpToCode,
   shouldShowJumpToEvent,
   shouldShowSearchSourceText,
@@ -34,6 +35,7 @@ const Passport = () => {
   const showJumpToEvent = shouldShowJumpToEvent(nags);
   const showInspectElement = shouldShowInspectElement(nags);
   const showInspectNetworkRequest = shouldShowInspectNetworkRequest(nags);
+  const showInspectReactComponent = shouldShowInspectReactComponent(nags);
   const showUseFocusMode = shouldShowUseFocusMode(nags);
 
   type StepNames = typeof stepNames[number];
@@ -114,6 +116,12 @@ const Passport = () => {
       completed: !showInspectNetworkRequest,
       videoUrl: "https://vercel.replay.io/passport/inspect_a_network_request.gif",
       imageBaseName: "inspect_network_request",
+    },
+    {
+      label: "Inspect React components",
+      completed: !showInspectReactComponent,
+      videoUrl: "https://vercel.replay.io/passport/inspect_a_react_component.gif",
+      imageBaseName: "inspect_react_component",
     },
     {
       label: "Jump to code",

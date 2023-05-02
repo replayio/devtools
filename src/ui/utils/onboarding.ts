@@ -116,6 +116,10 @@ export function shouldShowInspectNetworkRequest(nags: Nag[]): boolean {
   return shouldShowNag(nags, Nag.INSPECT_NETWORK_REQUEST);
 }
 
+export function shouldShowInspectReactComponent(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.INSPECT_COMPONENT);
+}
+
 export function shouldShowTour(nags: Nag[]): boolean {
   const showTour = shouldShowNag(nags, Nag.DISMISS_TOUR);
   const showBreakpointEdit = shouldShowBreakpointEdit(nags);
