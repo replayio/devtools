@@ -115,6 +115,9 @@ export function canRunLocalAnalysis(code: string, condition: string | null): boo
   const tokens = parse(code, "fake.js").flat();
   for (let token of tokens) {
     const { types, value } = token;
+    if (value === "this") {
+      return false;
+    }
     if (types && types.length > 0) {
       const type = types[0];
       switch (type) {
