@@ -121,7 +121,7 @@ const Passport = () => {
       label: "Inspect React components",
       completed: !showInspectReactComponent,
       videoUrl: "https://vercel.replay.io/passport/inspect_a_network_request.gif",
-      imageBaseName: "inspect_network_request",
+      imageBaseName: "inspect_react_component",
     },
     {
       label: "Jump to code",
