@@ -18,7 +18,7 @@ import {
   OnboardingModalContainer,
 } from "../Onboarding/index";
 
-export const REPLAY_DEMO_URL = "https://static.replay.io/demo/";
+export const REPLAY_DEMO_URL = "https://first.replay.io/";
 export const REPLAY_LIBRARY_URL = "https://app.replay.io/";
 
 function FirstReplayModal({ hideModal }: PropsFromRedux) {
