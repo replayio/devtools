@@ -19,6 +19,7 @@
 
 .sectionsContainer {
   width: 100%;
+  overflow-x: hidden;
 }
 
 .checklist {
@@ -27,6 +28,7 @@
   height: 100%;
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .checklistItem,
@@ -38,6 +40,9 @@
   border-radius: 3rem;
   margin-bottom: 1px;
   z-index: 1000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .checklistItem:hover {
@@ -66,12 +71,14 @@
 
 .stepIcon {
   height: 20px;
+  flex-shrink: 0;
 }
 
 .videoExample {
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
   z-index: 100;
+  width: 100%;
 }
 
 .videoExampleWrapper {
@@ -80,6 +87,7 @@
   width: 100%;
   padding-left: 3px;
   padding-right: 3px;
+  z-index: 1001;
 }
 
 .largeCompletedImage {
