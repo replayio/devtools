@@ -76,27 +76,18 @@ function getFiles(dir) {
   try {
     for (let index = 0; index < files.length; index++) {
       const file = files[index];
-
       const base64 = fs.readFileSync(file, { encoding: "base64" });
 
       console.log(`Upload file "${file}" with data: ${base64}`);
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ image: { base64, file } }),
-      });
+      try {
+        await uploadImage({ base64, file, url });
+      } catch (error) {
+        console.error(error);
+        console.log(`Retrying upload for file "${file}"`);
 
-      if (response.status !== 200) {
-        const text = await response.text();
-
-        console.error(
-          `Upload failed (server error)\n  url: ${url}\n  status: ${response.status}\n  response: ${text}`
-        );
-
-        caughtError = new Error(`Upload failed (server error) for file "${file}"`);
+        // Retry a failed upload before giving up
+        await uploadImage({ base64, file, url });
       }
     }
   } catch (error) {
@@ -109,3 +100,23 @@ function getFiles(dir) {
     process.exit(1);
   }
 })();
+
+async function uploadImage({ base64, file, url }) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ image: { base64, file } }),
+  });
+
+  if (response.status !== 200) {
+    const text = await response.text();
+
+    console.error(
+      `Upload failed (server error)\n  url: ${url}\n  status: ${response.status}\n  response: ${text}`
+    );
+
+    throw new Error(`Upload failed (server error) for file "${file}"`);
+  }
+}
