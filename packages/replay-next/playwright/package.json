@@ -10,7 +10,7 @@
   "scripts": {
     "playwright:install": "playwright install chromium",
     "test": "playwright test tests",
-    "test:debug": "PWDEBUG=console VISUAL_DEBUG=true yarn test",
-    "test:write-snapshot-image-files": "WRITE_SNAPSHOT_IMAGE_FILES=true playwright test tests"
+    "test:ci": "WRITE_SNAPSHOT_IMAGE_FILES=true playwright test tests --shard=$SHARD/$SHARDS",
+    "test:debug": "PWDEBUG=console VISUAL_DEBUG=true yarn test"
   }
 }

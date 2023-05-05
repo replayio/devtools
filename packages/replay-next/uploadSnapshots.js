@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 
 "use strict";
+
 const github = require("@actions/github");
 const fs = require("fs");
 const fetch = require("node-fetch");
-const chunk = require("lodash/chunk");
 
-const projectId = "dcb5df26-b418-4fe2-9bdf-5a838e604ec4";
-const visualsUrl = "https://replay-visuals.vercel.app";
+// Upload snapshots to Delta
+// https://github.com/replayio/delta/blob/main/pages/api/uploadSnapshots.ts
+
+const visualsUrl = "https://delta.replay.io";
+const projectSlug = "replay";
 
 function getFiles(dir) {
   try {
@@ -33,15 +36,51 @@ function getFiles(dir) {
   }
 }
 
-function getUploadImageUrl(branchName, runId) {
-  return `${visualsUrl}/api/uploadSnapshot?branchName=${branchName}&projectId=${projectId}&runId=${runId}`;
-}
+(async () => {
+  const dir = "./playwright/visuals";
+  const files = getFiles(dir);
+  if (files.length == 0) {
+    console.error(`Skipping: No files found in ${dir}`);
+    process.exit(1);
+  } else {
+    console.log(`Found ${files.length} files`);
+  }
 
-async function uploadImage(file, branchName, runId) {
-  const content = fs.readFileSync(file, { encoding: "base64" });
-  const image = { content, file };
+  const branchName =
+    github.context.payload.pull_request?.head?.ref ||
+    github.context.payload.repository?.default_branch;
+  if (!branchName) {
+    console.error(`Skipping: No branch found`);
+    process.exit(1);
+  }
 
-  const url = getUploadImageUrl(branchName, runId);
+  const actor = github.context.actor;
+  const owner = github.context.repo.owner;
+  const runId = github.context.runId;
+  if (!actor || !owner || !runId) {
+    console.error(`Missing at least one required parameter:`, { actor, owner, runId });
+    process.exit(1);
+  }
+
+  const params = {
+    actor,
+    branchName,
+    owner,
+    projectSlug,
+    runId,
+  };
+
+  const url = `${visualsUrl}/api/uploadSnapshots?${Object.entries(params).reduce(
+    (string, [key, value]) => (string += `${key}=${value}&`),
+    ""
+  )}`;
+
+  console.log(`Uploading images to: ${url}`);
+
+  const images = files.map(file => {
+    const base64 = fs.readFileSync(file, { encoding: "base64" });
+    return { base64, file };
+  });
 
   let response;
   try {
@@ -50,78 +89,24 @@ async function uploadImage(file, branchName, runId) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ image }),
+      body: JSON.stringify({ images }),
     });
 
+    const json = await response.json();
+
     if (response.status !== 200) {
-      const text = await response.text();
+      console.error(
+        `Upload failed (server error)\n  url: ${url}\n  status: ${response.status}\n  response:`,
+        JSON.stringify(json, null, 2)
+      );
 
-      console.error(`Upload failed with status: ${response.status}: ${text}`);
-
-      return { status: response.status, error: text, serverError: true, file, content };
+      process.exit(1);
     }
 
-    return response.json();
+    return json;
   } catch (error) {
-    console.error(`Upload failed with status: ${response.status}:`, error);
+    console.error(`Upload failed (client error)\n  url: ${url}\n  error:`, error);
 
-    return { status: response.status, error, serverError: false, file, content };
-  }
-}
-
-(async () => {
-  const dir = "./playwright/visuals";
-  const allFiles = getFiles(dir);
-
-  if (allFiles.length == 0) {
-    console.log(`Skipping: No files found in ${dir}`);
-    process.exit(1);
-  } else {
-    console.log(`Found ${allFiles.length} files`);
-  }
-
-  const branchName =
-    github.context.payload.pull_request?.head?.ref ||
-    github.context.payload.repository?.default_branch;
-  const runId = github.context.runId;
-
-  if (!branchName) {
-    console.log(`Skipping: No branch found`);
-    return;
-  }
-
-  console.log(
-    `Uploading images for branch "${branchName}" to:`,
-    getUploadImageUrl(branchName, runId)
-  );
-
-  let results = [];
-  for (const files of chunk(allFiles, 20)) {
-    const res = await Promise.all(files.map(file => uploadImage(file, branchName, runId)));
-    results.push(...res);
-  }
-
-  const passed = results.filter(r => r.data);
-  const failed = results.filter(r => r.error);
-
-  console.log(`${passed.length} passed snapshots`);
-  console.log(
-    passed
-      .map(r => `${r.data?.file}\t${r.data?.status}\tprimary_changed:${r.data?.primary_changed}`)
-      .join("\n")
-  );
-
-  console.log(`${failed.length} failed snapshots`);
-  console.log(
-    failed.map(
-      r =>
-        `${r.file} - ${r.serverError ? "server-error" : "client-error"} - ${JSON.stringify(
-          r.error
-        )} -- ${r.content}`
-    )
-  );
-
-  if (failed.length > 0) {
     process.exit(1);
   }
 })();
