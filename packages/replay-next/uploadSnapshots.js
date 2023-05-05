@@ -62,15 +62,10 @@ function getFiles(dir) {
     process.exit(1);
   }
 
-  // If the PR number is available, pass it to Delta
-  // this will save Delta from having to make an API request to fetch it
-  const prNumber = github.context.payload.pull_request?.number;
-
   const params = {
     actor,
     branchName,
     owner,
-    prNumber,
     projectSlug,
     runId,
   };
