@@ -103,7 +103,7 @@ function getFiles(dir) {
       process.exit(1);
     }
 
-    return response.json();
+    return json;
   } catch (error) {
     console.error(`Upload failed (client error)\n  url: ${url}\n  error:`, error);
 
