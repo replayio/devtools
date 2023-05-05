@@ -83,6 +83,7 @@ function getFiles(dir) {
   });
 
   let response;
+  let responseText;
   try {
     response = await fetch(url, {
       method: "POST",
@@ -92,7 +93,9 @@ function getFiles(dir) {
       body: JSON.stringify({ images }),
     });
 
-    const json = await response.json();
+    responseText = await response.text();
+
+    const json = JSON.parse(responseText);
 
     if (response.status !== 200) {
       console.error(
@@ -105,7 +108,11 @@ function getFiles(dir) {
 
     return json;
   } catch (error) {
-    console.error(`Upload failed (client error)\n  url: ${url}\n  error:`, error);
+    console.error(
+      `Upload failed (client error)\n  url: ${url}\n  error:`,
+      error,
+      `\n  response text: ${responseText}`
+    );
 
     process.exit(1);
   }
