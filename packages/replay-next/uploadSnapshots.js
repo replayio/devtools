@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 
 "use strict";
+
 const github = require("@actions/github");
 const fs = require("fs");
 const fetch = require("node-fetch");
-const chunk = require("lodash/chunk");
 
-const projectId = "dcb5df26-b418-4fe2-9bdf-5a838e604ec4";
-const visualsUrl = "https://replay-visuals.vercel.app";
+// Upload snapshots to Delta
+// https://github.com/replayio/delta/blob/main/pages/api/uploadSnapshot.ts
+
+const visualsUrl = "https://delta.replay.io";
+const projectSlug = "replay";
 
 function getFiles(dir) {
   try {
@@ -33,95 +36,87 @@ function getFiles(dir) {
   }
 }
 
-function getUploadImageUrl(branchName, runId) {
-  return `${visualsUrl}/api/uploadSnapshot?branchName=${branchName}&projectId=${projectId}&runId=${runId}`;
-}
-
-async function uploadImage(file, branchName, runId) {
-  const content = fs.readFileSync(file, { encoding: "base64" });
-  const image = { content, file };
-
-  const url = getUploadImageUrl(branchName, runId);
-
-  let response;
-  try {
-    response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ image }),
-    });
-
-    if (response.status !== 200) {
-      const text = await response.text();
-
-      console.error(`Upload failed with status: ${response.status}: ${text}`);
-
-      return { status: response.status, error: text, serverError: true, file, content };
-    }
-
-    return response.json();
-  } catch (error) {
-    console.error(`Upload failed with status: ${response.status}:`, error);
-
-    return { status: response.status, error, serverError: false, file, content };
-  }
-}
-
 (async () => {
   const dir = "./playwright/visuals";
-  const allFiles = getFiles(dir);
-
-  if (allFiles.length == 0) {
-    console.log(`Skipping: No files found in ${dir}`);
+  const files = getFiles(dir);
+  if (files.length == 0) {
+    console.error(`Skipping: No files found in ${dir}`);
     process.exit(1);
   } else {
-    console.log(`Found ${allFiles.length} files`);
+    console.log(`Found ${files.length} files`);
   }
 
+  const actor = github.context.actor;
   const branchName =
     github.context.payload.pull_request?.head?.ref ||
     github.context.payload.repository?.default_branch;
+  const owner = github.context.repo.owner;
   const runId = github.context.runId;
-
-  if (!branchName) {
-    console.log(`Skipping: No branch found`);
-    return;
+  if (!actor || !branchName || !owner || !runId) {
+    console.error(`Missing at least one required parameter:`, { actor, branchName, owner, runId });
+    process.exit(1);
   }
 
-  console.log(
-    `Uploading images for branch "${branchName}" to:`,
-    getUploadImageUrl(branchName, runId)
-  );
+  const params = {
+    actor,
+    branchName,
+    owner,
+    projectSlug,
+    runId,
+  };
 
-  let results = [];
-  for (const files of chunk(allFiles, 20)) {
-    const res = await Promise.all(files.map(file => uploadImage(file, branchName, runId)));
-    results.push(...res);
+  const url = `${visualsUrl}/api/uploadSnapshot?${Object.entries(params).reduce(
+    (string, [key, value]) => (string += `${key}=${value}&`),
+    ""
+  )}`;
+
+  console.log(`Uploading images to: ${url}`);
+
+  let caughtError;
+  try {
+    for (let index = 0; index < files.length; index++) {
+      const file = files[index];
+      const base64 = fs.readFileSync(file, { encoding: "base64" });
+
+      console.log(`Upload file "${file}" with data: ${base64}`);
+
+      try {
+        await uploadImage({ base64, file, url });
+      } catch (error) {
+        console.error(error);
+        console.log(`Retrying upload for file "${file}"`);
+
+        // Retry a failed upload before giving up
+        await uploadImage({ base64, file, url });
+      }
+    }
+  } catch (error) {
+    caughtError = error;
   }
 
-  const passed = results.filter(r => r.data);
-  const failed = results.filter(r => r.error);
+  if (caughtError) {
+    console.error(`Upload failed (client error)\n  url: ${url}\n  error:`, caughtError);
 
-  console.log(`${passed.length} passed snapshots`);
-  console.log(
-    passed
-      .map(r => `${r.data?.file}\t${r.data?.status}\tprimary_changed:${r.data?.primary_changed}`)
-      .join("\n")
-  );
-
-  console.log(`${failed.length} failed snapshots`);
-  console.log(
-    failed.map(
-      r =>
-        `${r.file} - ${r.serverError ? "server-error" : "client-error"} - ${JSON.stringify(
-          r.error
-        )} -- ${r.content}`
-    )
-  );
-
-  if (failed.length > 0) {
     process.exit(1);
   }
 })();
+
+async function uploadImage({ base64, file, url }) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ image: { base64, file } }),
+  });
+
+  if (response.status !== 200) {
+    const text = await response.text();
+
+    console.error(
+      `Upload failed (server error)\n  url: ${url}\n  status: ${response.status}\n  response: ${text}`
+    );
+
+    throw new Error(`Upload failed (server error) for file "${file}"`);
+  }
+}
