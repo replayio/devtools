@@ -6,6 +6,8 @@ import * as dbgActions from "devtools/client/debugger/src/actions/ui";
 import { getActiveSearch, getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
 import { SHOW_GLOBAL_SEARCH_EVENT_TYPE } from "replay-next/components/search-files/SearchFiles";
 import { createTypeDataForVisualComment } from "replay-next/components/sources/utils/comments";
+import { useNag } from "replay-next/src/hooks/useNag";
+import { Nag } from "shared/graphql/types";
 import { UIThunkAction } from "ui/actions";
 import { actions } from "ui/actions";
 import { useGetRecordingId } from "ui/hooks/recordings";
@@ -57,6 +59,14 @@ function KeyboardShortcuts({
 }: PropsFromRedux) {
   const recordingId = useGetRecordingId();
   const { isAuthenticated } = useAuth0();
+  const [, dismissUseFocusModeNag] = useNag(Nag.FIND_FILE);
+  const handleToggleQuickOpenModal = (e: KeyboardEvent, query = "", project = false) => {
+    dismissUseFocusModeNag();
+
+    e.preventDefault();
+    e.stopPropagation();
+    toggleQuickOpen(query, project);
+  };
   const { value: protocolTimeline, update: updateProtocolTimeline } =
     useFeature("protocolTimeline");
   const globalKeyboardShortcuts = useMemo(() => {
@@ -162,9 +172,9 @@ function KeyboardShortcuts({
       "Shift+F": toggleEditFocusMode,
 
       // Quick Open-related toggles
-      "CmdOrCtrl+Shift+P": toggleQuickOpenModal,
+      "CmdOrCtrl+Shift+P": handleToggleQuickOpenModal,
       // We apparently accept this with or without a Shift key currently
-      "CmdOrCtrl+P": toggleQuickOpenModal,
+      "CmdOrCtrl+P": handleToggleQuickOpenModal,
       // Can pre-fill the dialog with specific filter prefixes
       "CmdOrCtrl+Shift+O": toggleFunctionQuickOpenModal,
       "CmdOrCtrl+O": toggleProjectFunctionQuickOpenModal,

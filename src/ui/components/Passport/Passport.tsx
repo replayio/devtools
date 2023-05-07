@@ -153,7 +153,7 @@ const Passport = () => {
       imageBaseName: "use_focus_mode",
     },
     {
-      label: "FIND FILE",
+      label: "Go to file (cmd-p)",
       completed: !showFindFile,
       videoUrl: "https://vercel.replay.io/passport/find_file.gif",
       imageBaseName: "find_file",
