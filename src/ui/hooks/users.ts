@@ -78,6 +78,7 @@ export enum Nag {
   FIRST_CONSOLE_NAVIGATE = "first_console_navigate",
   FIRST_LOG_IN = "first_log_in",
   FIRST_REPLAY_2 = "first_replay_2",
+  FIND_FILE = "find_file",
   INSPECT_COMPONENT = "inspect_component",
   INSPECT_ELEMENT = "inspect_element",
   INSPECT_NETWORK_REQUEST = "inspect_network_request",
