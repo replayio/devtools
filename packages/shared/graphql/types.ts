@@ -9,7 +9,6 @@ export enum Nag {
   DISMISS_TOUR = "dismiss_tour",
   DOWNLOAD_REPLAY = "download_replay",
   EXPLORE_SOURCES = "explore_sources",
-  FIND_FILE = "find_file",
   FIRST_BREAKPOINT_ADD = "first_breakpoint_add",
   FIRST_BREAKPOINT_EDIT = "first_breakpoint_edit",
   FIRST_BREAKPOINT_SAVE = "first_breakpoint_save",
