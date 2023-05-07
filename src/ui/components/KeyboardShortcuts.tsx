@@ -90,7 +90,7 @@ function KeyboardShortcuts({
     };
 
     const toggleFunctionQuickOpenModal = (e: KeyboardEvent) => {
-      toggleQuickOpenModal(e, "@");
+      handleToggleQuickOpenModal(e, "@");
     };
 
     const togglePalette = (e: KeyboardEvent) => {
@@ -106,14 +106,7 @@ function KeyboardShortcuts({
     };
 
     const toggleProjectFunctionQuickOpenModal = (e: KeyboardEvent) => {
-      toggleQuickOpenModal(e, "@", true);
-    };
-
-    const toggleQuickOpenModal = (e: KeyboardEvent, query = "", project = false) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      toggleQuickOpen(query, project);
+      handleToggleQuickOpenModal(e, "@", true);
     };
 
     const addComment = async (e: KeyboardEvent) => {
