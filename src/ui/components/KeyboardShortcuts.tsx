@@ -6,6 +6,8 @@ import * as dbgActions from "devtools/client/debugger/src/actions/ui";
 import { getActiveSearch, getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
 import { SHOW_GLOBAL_SEARCH_EVENT_TYPE } from "replay-next/components/search-files/SearchFiles";
 import { createTypeDataForVisualComment } from "replay-next/components/sources/utils/comments";
+import { useNag } from "replay-next/src/hooks/useNag";
+import { Nag } from "shared/graphql/types";
 import { UIThunkAction } from "ui/actions";
 import { actions } from "ui/actions";
 import { useGetRecordingId } from "ui/hooks/recordings";
@@ -99,11 +101,13 @@ function KeyboardShortcuts({
       toggleQuickOpenModal(e, "@", true);
     };
 
+    const [, dismissUseFocusModeNag] = useNag(Nag.USE_FOCUS_MODE);
+
     const toggleQuickOpenModal = (e: KeyboardEvent, query = "", project = false) => {
       e.preventDefault();
       e.stopPropagation();
 
-      toggleQuickOpen(query, project);
+      toggleQuickOpen(query, project, dismissUseFocusModeNag);
     };
 
     const addComment = async (e: KeyboardEvent) => {

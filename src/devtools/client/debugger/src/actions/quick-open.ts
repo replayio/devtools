@@ -3,7 +3,8 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { UIThunkAction } from "ui/actions";
-
+import { useNag } from "replay-next/src/hooks/useNag";
+import { Nag } from "shared/graphql/types";
 import { fetchGlobalFunctions } from "../reducers/ast";
 import {
   closeQuickOpen,
@@ -39,10 +40,14 @@ export function openQuickOpen(
 export function toggleQuickOpen(
   query = "",
   project = false,
-  showOnlyOpenSources = false
+  showOnlyOpenSources = false,
+  dismissUseFocusModeNag: () => void
 ): UIThunkAction {
   return (dispatch, getState) => {
     const quickOpenEnabled = getQuickOpenEnabled(getState());
+    const [, dismissUseFocusModeNag] = useNag(Nag.USE_FOCUS_MODE);
+    console.log("YARRRRRR");
+    dismissUseFocusModeNag();
 
     if (quickOpenEnabled) {
       dispatch(closeQuickOpen());
