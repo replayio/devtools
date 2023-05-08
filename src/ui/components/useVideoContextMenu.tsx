@@ -15,7 +15,9 @@ import { Nag } from "shared/graphql/types";
 import { fetchMouseTargetsForPause } from "ui/actions/app";
 import { createFrameComment } from "ui/actions/comments";
 import { setSelectedPanel, setViewMode } from "ui/actions/layout";
-import { useAppDispatch } from "ui/setup/hooks";
+import { stopPlayback } from "ui/actions/timeline";
+import { isPlaying as isPlayingSelector } from "ui/reducers/timeline";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getMouseTarget } from "ui/suspense/nodeCaches";
 import { mouseEventCanvasPosition as getPositionForInspectingElement } from "ui/utils/nodePicker";
 
@@ -28,6 +30,7 @@ export default function useVideoContextMenu({
   const { accessToken, recordingId } = useContext(SessionContext);
 
   const dispatch = useAppDispatch();
+  const isPlaying = useAppSelector(isPlayingSelector);
 
   const mouseEventDataRef = useRef<{
     pageX: number | null;
@@ -80,6 +83,10 @@ export default function useVideoContextMenu({
   };
 
   const onShow = async (event: UIEvent) => {
+    if (isPlaying) {
+      dispatch(stopPlayback());
+    }
+
     if (assertMouseEvent(event)) {
       const canvas = canvasRef.current;
       assert(canvas !== null);
