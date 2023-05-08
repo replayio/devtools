@@ -20,9 +20,7 @@ import { useImperativeCacheValue } from "suspense";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import { sourceHitCountsCache } from "replay-next/src/suspense/SourceHitCountsCache";
-import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
+import { outlineHitCountsCache } from "replay-next/src/suspense/OutlineHitCountsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { toPointRange } from "shared/utils/time";
 import Spinner from "ui/components/shared/Spinner";
@@ -50,31 +48,10 @@ export function SourceOutline({
   const dispatch = useAppDispatch();
   const cx = useAppSelector(getContext);
 
-  const replayClient = useContext(ReplayClientContext);
-  const { range: focusRange } = useContext(FocusContext);
-  const { visibleLines } = useContext(SourcesContext);
-
-  const hitCounts =
-    selectedSource && visibleLines
-      ? sourceHitCountsCache.read(
-          visibleLines.start.line,
-          visibleLines.end.line,
-          replayClient,
-          selectedSource.id,
-          focusRange ? toPointRange(focusRange) : null
-        )
-      : null;
-  const hitCountsMap = useMemo(() => {
-    if (!hitCounts) {
-      return null;
-    }
-    return new Map(hitCounts);
-  }, [hitCounts]);
-
   const [filter, setFilter] = useState("");
   const outlineSymbols = useMemo(
-    () => (symbols ? getOutlineSymbols(symbols, filter, hitCountsMap) : null),
-    [symbols, filter, hitCountsMap]
+    () => (symbols ? getOutlineSymbols(symbols, filter) : null),
+    [symbols, filter]
   );
   const [focusedSymbol, setFocusedSymbol] = useState<ClassOutline | FunctionOutline | null>(null);
   const listRef = useRef<any>();
@@ -200,12 +177,14 @@ export default function SourceOutlineWrapper() {
   const cursorPosition = useAppSelector(getCursorPosition);
   const selectedSource = useAppSelector(getSelectedSource);
   const replayClient = useContext(ReplayClientContext);
+  const { range: focusRange } = useContext(FocusContext);
 
   let symbols: getSourceOutlineResult | null = null;
   const symbolsCacheValue = useImperativeCacheValue(
-    sourceOutlineCache,
+    outlineHitCountsCache,
     replayClient,
-    selectedSource?.id
+    selectedSource?.id,
+    focusRange ? toPointRange(focusRange) : null
   );
   if (symbolsCacheValue.status === "resolved") {
     symbols = symbolsCacheValue.value;

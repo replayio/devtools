@@ -1,6 +1,7 @@
 import { PointRange, SourceId, TimeStampedPointRange } from "@replayio/protocol";
 
-import { LineHitCounts, ReplayClientInterface } from "shared/client/types";
+import { binarySearch } from "protocol/utils";
+import { LineHitCounts, LineNumberToHitCountMap, ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import { toPointRange } from "shared/utils/time";
 
@@ -32,14 +33,61 @@ export const sourceHitCountsCache = createFocusIntervalCache<
   load: async (begin, end, client, sourceId, focusRange) => {
     try {
       const [locations] = await breakpointPositionsCache.readAsync(client, sourceId);
-      const hitCounts = await client.getSourceHitCounts(
-        sourceId,
-        {
-          start: { line: begin, column: 0 },
-          end: { line: end, column: Number.MAX_SAFE_INTEGER },
-        },
-        locations,
-        focusRange
+
+      // Note that since this is a sorted array, we can do better than a plain .filter() for performance.
+      const startIndex = binarySearch(
+        0,
+        locations.length,
+        (index: number) => begin - locations[index].line
+      );
+      const stopIndex = binarySearch(
+        startIndex,
+        locations.length,
+        (index: number) => end - locations[index].line
+      );
+
+      const firstColumnLocations = locations.slice(startIndex, stopIndex + 1).map(location => ({
+        ...location,
+        columns: location.columns.slice(0, 1),
+      }));
+      const correspondingSourceIds = client.getCorrespondingSourceIds(sourceId);
+
+      const hitCounts: LineNumberToHitCountMap = new Map();
+
+      await Promise.all(
+        correspondingSourceIds.map(async sourceId => {
+          const protocolHitCounts = await client.getSourceHitCounts(
+            sourceId,
+            firstColumnLocations,
+            focusRange
+          );
+
+          const lines: Set<number> = new Set();
+
+          // Sum hits across corresponding sources,
+          // But only record the first column's hits for any given line in a source.
+          protocolHitCounts.forEach(({ hits, location }) => {
+            const { line } = location;
+            if (!lines.has(line)) {
+              lines.add(line);
+
+              const previous = hitCounts.get(line) || 0;
+              if (previous) {
+                hitCounts.set(line, {
+                  count: previous.count + hits,
+                  firstBreakableColumnIndex: previous.firstBreakableColumnIndex,
+                });
+              } else {
+                hitCounts.set(line, {
+                  count: hits,
+                  firstBreakableColumnIndex: location.column,
+                });
+              }
+            }
+          });
+
+          return hitCounts;
+        })
       );
 
       // Refine cached min-max hit count as we load more information about a source.
