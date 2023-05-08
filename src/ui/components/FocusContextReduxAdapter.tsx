@@ -1,5 +1,5 @@
 import { TimeStampedPointRange } from "@replayio/protocol";
-import { PropsWithChildren, useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import { PropsWithChildren, useCallback, useDeferredValue, useMemo } from "react";
 
 import { FocusContext, UpdateOptions } from "replay-next/src/contexts/FocusContext";
 import { TimeRange } from "replay-next/src/types";
@@ -9,26 +9,17 @@ import {
   syncFocusedRegion,
   updateFocusRegionParam,
 } from "ui/actions/timeline";
-import { getLoadedRegions } from "ui/reducers/app";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { FocusRegion } from "ui/state/timeline";
 import { rangeForFocusRegion } from "ui/utils/timeline";
 
 // Adapter that reads focus region (from Redux) and passes it to the FocusContext.
 export default function FocusContextReduxAdapter({ children }: PropsWithChildren) {
   const dispatch = useAppDispatch();
-  const loadedRegions = useAppSelector(getLoadedRegions);
   const focusRegion = useAppSelector(getFocusRegion);
 
-  const [isPending, startTransition] = useTransition();
-  const [deferredFocusRegion, setDeferredFocusRegion] = useState<FocusRegion | null>(focusRegion);
-
-  useEffect(() => {
-    startTransition(() => {
-      setDeferredFocusRegion(focusRegion);
-    });
-  }, [focusRegion, loadedRegions]);
+  const deferredFocusRegion = useDeferredValue(focusRegion);
+  const isPending = deferredFocusRegion !== focusRegion;
 
   const update = useCallback(
     async (value: TimeStampedPointRange | null, options: UpdateOptions) => {
