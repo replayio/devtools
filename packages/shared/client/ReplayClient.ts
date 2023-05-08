@@ -583,85 +583,16 @@ export class ReplayClient implements ReplayClientInterface {
 
   async getSourceHitCounts(
     sourceId: SourceId,
-    locationRange: SourceLocationRange,
-    sortedSourceLocations: SameLineSourceLocations[],
+    locations: SameLineSourceLocations[],
     focusRange: PointRange | null
-  ): Promise<LineNumberToHitCountMap> {
+  ) {
     const sessionId = this.getSessionIdThrows();
-
-    // Don't try to fetch hit counts in unloaded regions.
-    // The result might be invalid (and may get cached by a Suspense caller).
     await this._waitForRangeToBeLoaded(focusRange);
-
-    // The protocol returns possible breakpoints for the entire source,
-    // but for large sources this can result in "too many locations" to run hit counts.
-    // To avoid this, we limit the number of lines we request hit count information for.
-    //
-    // Note that since this is a sorted array, we can do better than a plain .filter() for performance.
-    const startLine = locationRange.start.line;
-    const startIndex = binarySearch(
-      0,
-      sortedSourceLocations.length,
-      (index: number) => startLine - sortedSourceLocations[index].line
+    const { hits } = await client.Debugger.getHitCounts(
+      { sourceId, locations, maxHits: TOO_MANY_POINTS_TO_FIND, range: focusRange || undefined },
+      sessionId
     );
-    const endLine = locationRange.end.line;
-    const stopIndex = binarySearch(
-      startIndex,
-      sortedSourceLocations.length,
-      (index: number) => endLine - sortedSourceLocations[index].line
-    );
-
-    const firstColumnLocations = sortedSourceLocations
-      .slice(startIndex, stopIndex + 1)
-      .map(location => ({
-        ...location,
-        columns: location.columns.slice(0, 1),
-      }));
-    const correspondingSourceIds = this.getCorrespondingSourceIds(sourceId);
-
-    const hitCounts: LineNumberToHitCountMap = new Map();
-
-    await Promise.all(
-      correspondingSourceIds.map(async sourceId => {
-        const { hits: protocolHitCounts } = await client.Debugger.getHitCounts(
-          {
-            sourceId,
-            locations: firstColumnLocations,
-            maxHits: TOO_MANY_POINTS_TO_FIND,
-            range: focusRange || undefined,
-          },
-          sessionId
-        );
-
-        const lines: Set<number> = new Set();
-
-        // Sum hits across corresponding sources,
-        // But only record the first column's hits for any given line in a source.
-        protocolHitCounts.forEach(({ hits, location }) => {
-          const { line } = location;
-          if (!lines.has(line)) {
-            lines.add(line);
-
-            const previous = hitCounts.get(line) || 0;
-            if (previous) {
-              hitCounts.set(line, {
-                count: previous.count + hits,
-                firstBreakableColumnIndex: previous.firstBreakableColumnIndex,
-              });
-            } else {
-              hitCounts.set(line, {
-                count: hits,
-                firstBreakableColumnIndex: location.column,
-              });
-            }
-          }
-        });
-
-        return hitCounts;
-      })
-    );
-
-    return hitCounts;
+    return hits;
   }
 
   getSourceOutline(sourceId: SourceId) {

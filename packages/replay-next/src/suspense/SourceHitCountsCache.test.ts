@@ -1,4 +1,4 @@
-import { PointRange, SourceId } from "@replayio/protocol";
+import { HitCount, PointRange, SameLineSourceLocations, SourceId } from "@replayio/protocol";
 import { IntervalCache } from "suspense";
 
 import { LineHitCounts, ReplayClientInterface, SourceLocationRange } from "shared/client/types";
@@ -36,32 +36,32 @@ describe("SourceHitCountsCache", () => {
   });
 
   describe("getSourceHitCounts", () => {
-    function makeLocationRange(
+    function makeLocations(
       startLineNumber: number,
       endLineNumber: number
-    ): SourceLocationRange {
-      return {
-        start: {
-          line: startLineNumber,
-          column: 0,
-        },
-        end: {
-          line: endLineNumber,
-          column: Number.MAX_SAFE_INTEGER,
-        },
-      };
+    ): SameLineSourceLocations[] {
+      const sourceLocations: SameLineSourceLocations[] = [];
+      for (let line = startLineNumber; line <= endLineNumber; line++) {
+        sourceLocations.push({ line, columns: [0] });
+      }
+      return sourceLocations;
     }
 
     beforeEach(() => {
-      mockClient.getSourceHitCounts.mockImplementation((_, locationRange, __, focusRange) => {
-        const hitCounts = new Map();
-        for (
-          let lineNumber = locationRange.start.line;
-          lineNumber <= locationRange.end.line;
-          lineNumber++
-        ) {
-          const count = focusRange != null ? lineNumber * 20 : lineNumber * 10;
-          hitCounts.set(lineNumber, { count });
+      mockClient.getBreakpointPositions.mockImplementation(() => {
+        return Promise.resolve(makeLocations(1, 6));
+      });
+      mockClient.getCorrespondingSourceIds.mockImplementation(sourceId => [sourceId]);
+      mockClient.getSourceHitCounts.mockImplementation((sourceId, sourceLocations, focusRange) => {
+        const hitCounts: HitCount[] = [];
+        for (const sourceLocation of sourceLocations) {
+          const hits = focusRange != null ? sourceLocation.line * 20 : sourceLocation.line * 10;
+          const location = {
+            sourceId,
+            line: sourceLocation.line,
+            column: sourceLocation.columns[0],
+          };
+          hitCounts.push({ location, hits });
         }
         return Promise.resolve(hitCounts);
       });
@@ -121,8 +121,7 @@ describe("SourceHitCountsCache", () => {
       expect(mockClient.getSourceHitCounts).toHaveBeenCalledTimes(1);
       expect(mockClient.getSourceHitCounts).toHaveBeenCalledWith(
         "fake-source-id",
-        makeLocationRange(1, 2),
-        [],
+        makeLocations(1, 2),
         null
       );
 
@@ -136,8 +135,7 @@ describe("SourceHitCountsCache", () => {
       expect(mockClient.getSourceHitCounts).toHaveBeenCalledTimes(2);
       expect(mockClient.getSourceHitCounts).toHaveBeenCalledWith(
         "fake-source-id",
-        makeLocationRange(2, 4),
-        [],
+        makeLocations(2, 4),
         null
       );
 

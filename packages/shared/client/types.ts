@@ -7,6 +7,7 @@ import {
   FocusWindowRequest,
   FrameId,
   FunctionMatch,
+  HitCount,
   KeyboardEvent,
   loadedRegions as LoadedRegions,
   Location,
@@ -205,10 +206,9 @@ export interface ReplayClientInterface {
   getSessionId(): SessionId | null;
   getSourceHitCounts(
     sourceId: SourceId,
-    locationRange: SourceLocationRange,
-    sourceLocations: SameLineSourceLocations[],
+    locations: SameLineSourceLocations[],
     focusRange: PointRange | null
-  ): Promise<LineNumberToHitCountMap>;
+  ): Promise<HitCount[]>;
   getSourceOutline(sourceId: SourceId): Promise<getSourceOutlineResult>;
   getTopFrame(pauseId: PauseId): Promise<getTopFrameResult>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
