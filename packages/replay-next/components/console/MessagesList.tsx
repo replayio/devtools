@@ -1,16 +1,8 @@
-import React, {
-  ForwardedRef,
-  MutableRefObject,
-  ReactNode,
-  forwardRef,
-  useContext,
-  useMemo,
-} from "react";
+import { ForwardedRef, MutableRefObject, ReactNode, forwardRef, useContext, useMemo } from "react";
 
 import Icon from "replay-next/components/Icon";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import useLoadedRegions from "replay-next/src/hooks/useRegions";
 import { useStreamingMessages } from "replay-next/src/hooks/useStreamingMessages";
 import {
   getLoggableExecutionPoint,
@@ -21,8 +13,6 @@ import {
   isUncaughtException,
 } from "replay-next/src/utils/loggables";
 import { isExecutionPointsLessThan } from "replay-next/src/utils/time";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { isPointInRegions } from "shared/utils/time";
 
 import _ErrorBoundary from "../ErrorBoundary";
 import { ConsoleSearchContext } from "./ConsoleSearchContext";
@@ -58,11 +48,8 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
   const { isTransitionPending: isFocusTransitionPending, range: focusRange } =
     useContext(FocusContext);
   const loggables = useContext(LoggablesContext);
-  const replayClient = useContext(ReplayClientContext);
   const [searchState] = useContext(ConsoleSearchContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
-
-  const loadedRegions = useLoadedRegions(replayClient);
 
   // The Console should render a line indicating the current execution point.
   // This point might match multiple logs– or it might be between logs, or after the last log, etc.
@@ -105,71 +92,63 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
       listItems.push(currentTimeIndicator);
     }
 
-    const loggableExecutionPoint = getLoggableExecutionPoint(loggable);
-    const isLoaded =
-      loadedRegions !== null && isPointInRegions(loggableExecutionPoint, loadedRegions.loaded);
-
-    if (isLoaded) {
-      if (isEventLog(loggable)) {
-        listItems.push(
-          <ErrorBoundary key={`event-${loggable.eventType}-${loggable.point}`}>
-            <EventLogRenderer
-              key={index}
-              index={index}
-              isFocused={loggable === currentSearchResult}
-              eventLog={loggable}
-            />
-          </ErrorBoundary>
-        );
-      } else if (isPointInstance(loggable)) {
-        listItems.push(
-          <ErrorBoundary
-            key={`logpoint-${loggable.point.key}-${loggable.timeStampedHitPoint.point}`}
-          >
-            <LogPointRenderer
-              key={index}
-              index={index}
-              isFocused={loggable === currentSearchResult}
-              logPointInstance={loggable}
-            />
-          </ErrorBoundary>
-        );
-      } else if (isProtocolMessage(loggable)) {
-        listItems.push(
-          <ErrorBoundary key={`message-${loggable.point.point}`}>
-            <MessageRenderer
-              key={index}
-              index={index}
-              isFocused={loggable === currentSearchResult}
-              message={loggable}
-            />
-          </ErrorBoundary>
-        );
-      } else if (isTerminalExpression(loggable)) {
-        listItems.push(
-          <ErrorBoundary key={`evaluation-${loggable.id}`}>
-            <TerminalExpressionRenderer
-              key={index}
-              index={index}
-              isFocused={loggable === currentSearchResult}
-              terminalExpression={loggable}
-            />
-          </ErrorBoundary>
-        );
-      } else if (isUncaughtException(loggable)) {
-        listItems.push(
-          <ErrorBoundary key={`exception-${loggable.point}`}>
-            <UncaughtExceptionRenderer
-              key={loggable.point}
-              index={index}
-              isFocused={loggable === currentSearchResult}
-              uncaughtException={loggable}
-            />
-          </ErrorBoundary>
-        );
-      } else {
-        throw Error("Unsupported loggable type");
-      }
+    if (isEventLog(loggable)) {
+      listItems.push(
+        <ErrorBoundary key={`event-${loggable.eventType}-${loggable.point}`}>
+          <EventLogRenderer
+            key={index}
+            index={index}
+            isFocused={loggable === currentSearchResult}
+            eventLog={loggable}
+          />
+        </ErrorBoundary>
+      );
+    } else if (isPointInstance(loggable)) {
+      listItems.push(
+        <ErrorBoundary key={`logpoint-${loggable.point.key}-${loggable.timeStampedHitPoint.point}`}>
+          <LogPointRenderer
+            key={index}
+            index={index}
+            isFocused={loggable === currentSearchResult}
+            logPointInstance={loggable}
+          />
+        </ErrorBoundary>
+      );
+    } else if (isProtocolMessage(loggable)) {
+      listItems.push(
+        <ErrorBoundary key={`message-${loggable.point.point}`}>
+          <MessageRenderer
+            key={index}
+            index={index}
+            isFocused={loggable === currentSearchResult}
+            message={loggable}
+          />
+        </ErrorBoundary>
+      );
+    } else if (isTerminalExpression(loggable)) {
+      listItems.push(
+        <ErrorBoundary key={`evaluation-${loggable.id}`}>
+          <TerminalExpressionRenderer
+            key={index}
+            index={index}
+            isFocused={loggable === currentSearchResult}
+            terminalExpression={loggable}
+          />
+        </ErrorBoundary>
+      );
+    } else if (isUncaughtException(loggable)) {
+      listItems.push(
+        <ErrorBoundary key={`exception-${loggable.point}`}>
+          <UncaughtExceptionRenderer
+            key={loggable.point}
+            index={index}
+            isFocused={loggable === currentSearchResult}
+            uncaughtException={loggable}
+          />
+        </ErrorBoundary>
+      );
+    } else {
+      throw Error("Unsupported loggable type");
     }
   });
   if (currentTimeIndicatorPlacement === "end") {
