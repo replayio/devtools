@@ -183,7 +183,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
         </div>
       )}
       <div
-        className={isTransitionPending ? styles.ContainerPending : styles.Container}
+        className={styles.Container}
         data-test-name="Messages"
         ref={forwardedRef as MutableRefObject<HTMLDivElement>}
         role="list"

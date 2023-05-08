@@ -1,5 +1,4 @@
-.Container,
-.ContainerPending {
+.Container {
   flex: 1 1 auto;
   position: relative;
   overflow-y: auto;
@@ -14,12 +13,8 @@
   /* Account for -1px margin-top offset of rows (to align top/bottom borders) */
   padding-top: 1px;
 }
-.ContainerPending {
-  opacity: 0.5;
-}
 
-.Container:focus,
-.ContainerPending:focus {
+.Container:focus {
   outline: none;
 }
 
