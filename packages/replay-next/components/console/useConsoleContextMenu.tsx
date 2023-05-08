@@ -1,9 +1,7 @@
 import { useContext } from "react";
+import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import { scrollCurrentTimeIndicatorIntoView } from "replay-next/components/console/CurrentTimeIndicator";
-import ContextMenuDivider from "replay-next/components/context-menu/ContextMenuDivider";
-import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
-import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import Icon from "replay-next/components/Icon";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
@@ -79,13 +77,13 @@ export default function useConsoleContextMenu(loggable: Loggable) {
 
   return useContextMenu(
     <>
-      <ContextMenuItem dataTestId="ConsoleContextMenu-SetFocusStartButton" onClick={setFocusBegin}>
+      <ContextMenuItem dataTestId="ConsoleContextMenu-SetFocusStartButton" onSelect={setFocusBegin}>
         <>
           <Icon type="set-focus-start" />
           Set focus start
         </>
       </ContextMenuItem>
-      <ContextMenuItem dataTestId="ConsoleContextMenu-SetFocusEndButton" onClick={setFocusEnd}>
+      <ContextMenuItem dataTestId="ConsoleContextMenu-SetFocusEndButton" onSelect={setFocusEnd}>
         <>
           <Icon type="set-focus-end" />
           Set focus end
@@ -97,7 +95,7 @@ export default function useConsoleContextMenu(loggable: Loggable) {
           <ContextMenuDivider />
           <ContextMenuItem
             dataTestId="ConsoleContextMenu-ToggleLoggingButton"
-            onClick={disableLogging}
+            onSelect={disableLogging}
           >
             <>
               <Icon className={styles.SmallerIcon} type="toggle-off" />
@@ -108,27 +106,27 @@ export default function useConsoleContextMenu(loggable: Loggable) {
             <div
               className={styles.UnicornBadge}
               data-test-id="ConsoleContextMenu-Badge-unicorn"
-              onClick={() => setBadge("unicorn")}
+              onSelect={() => setBadge("unicorn")}
             />
             {BADGES.map(badge => (
               <div
                 key={badge}
                 className={styles.ColorBadge}
                 data-test-id={`ConsoleContextMenu-Badge-${badge}`}
-                onClick={() => setBadge(badge)}
+                onSelect={() => setBadge(badge)}
                 style={{
                   // @ts-ignore
                   "--badge-color": `var(--badge-${badge}-color)`,
                 }}
               />
             ))}
-            <div className={styles.ColorBadgeClear} onClick={() => setBadge(null)} />
+            <div className={styles.ColorBadgeClear} onSelect={() => setBadge(null)} />
           </ContextMenuItem>
         </>
       )}
 
       <ContextMenuDivider />
-      <ContextMenuItem dataTestId="ConsoleContextMenu-ScrollToPauseButton" onClick={scrollToPause}>
+      <ContextMenuItem dataTestId="ConsoleContextMenu-ScrollToPauseButton" onSelect={scrollToPause}>
         <>
           <Icon className={styles.SmallerIcon} type="console" />
           Scroll to pause

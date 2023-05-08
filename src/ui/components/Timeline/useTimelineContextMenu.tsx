@@ -1,8 +1,11 @@
-import { MouseEvent, useContext, useState } from "react";
+import { MouseEvent, UIEvent, useContext, useState } from "react";
+import {
+  ContextMenuDivider,
+  ContextMenuItem,
+  assertMouseEvent,
+  useContextMenu,
+} from "use-context-menu";
 
-import ContextMenuDivider from "replay-next/components/context-menu/ContextMenuDivider";
-import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
-import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import Icon from "replay-next/components/Icon";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { createTypeDataForVisualComment } from "replay-next/components/sources/utils/comments";
@@ -37,11 +40,13 @@ export default function useTimelineContextMenu() {
   const focusEndTime = focusRegion?.end.time;
   const currentTime = relativePosition * duration;
 
-  const onShow = (event: MouseEvent) => {
+  const onShow = (event: UIEvent) => {
     const timeline = event.currentTarget as HTMLDivElement;
     const rect = timeline.getBoundingClientRect();
 
-    setRelativePosition((event.pageX - rect.left) / rect.width);
+    if (assertMouseEvent(event)) {
+      setRelativePosition((event.pageX - rect.left) / rect.width);
+    }
   };
 
   const addComment = async () => {
@@ -86,14 +91,14 @@ export default function useTimelineContextMenu() {
   return useContextMenu(
     <>
       {accessToken !== null && (
-        <ContextMenuItem onClick={addComment}>
+        <ContextMenuItem onSelect={addComment}>
           <>
             <Icon className={styles.SmallerIcon} type="comment" />
             Add a comment here
           </>
         </ContextMenuItem>
       )}
-      <ContextMenuItem onClick={shareReplay}>
+      <ContextMenuItem onSelect={shareReplay}>
         <>
           <Icon className={styles.SmallerIcon} type="copy" />
           Copy URL at this time
@@ -103,7 +108,7 @@ export default function useTimelineContextMenu() {
       <ContextMenuItem
         dataTestId="ConsoleContextMenu-SetFocusStartButton"
         disabled={focusEndTime != null && currentTime >= focusEndTime}
-        onClick={setFocusBegin}
+        onSelect={setFocusBegin}
       >
         <>
           <Icon type="set-focus-start" />
@@ -113,7 +118,7 @@ export default function useTimelineContextMenu() {
       <ContextMenuItem
         dataTestId="ConsoleContextMenu-SetFocusEndButton"
         disabled={focusBeginTime != null && currentTime <= focusBeginTime}
-        onClick={setFocusEnd}
+        onSelect={setFocusEnd}
       >
         <>
           <Icon type="set-focus-end" />
@@ -121,6 +126,6 @@ export default function useTimelineContextMenu() {
         </>
       </ContextMenuItem>
     </>,
-    { onShow }
+    { onShow, requireClickToShow: true }
   );
 }

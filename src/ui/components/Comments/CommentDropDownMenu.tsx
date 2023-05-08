@@ -1,17 +1,19 @@
-import { MouseEvent } from "react";
+import { UIEvent } from "react";
+import {
+  ContextMenuCategory,
+  ContextMenuDivider,
+  ContextMenuItem,
+  useContextMenu,
+} from "use-context-menu";
 
 import { Checkbox } from "design";
-import ContextMenuCategory from "replay-next/components/context-menu/ContextMenuCategory";
-import ContextMenuDivider from "replay-next/components/context-menu/ContextMenuDivider";
-import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
-import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import Icon from "replay-next/components/Icon";
 import useUserCommentPreferences from "ui/components/Comments/useUserCommentPreferences";
 
 import styles from "./CommentDropDownMenu.module.css";
 
-function createClickHandler(callback: () => void): (event: MouseEvent) => void {
-  return (event: MouseEvent) => {
+function createSelectHandler(callback: () => void): (event: UIEvent) => void {
+  return (event: UIEvent) => {
     event.preventDefault();
     event.stopPropagation();
 
@@ -26,7 +28,7 @@ export default function CommentDropDownMenu() {
   const { contextMenu, onContextMenu: onClick } = useContextMenu(
     <>
       <ContextMenuCategory>Show comments by</ContextMenuCategory>
-      <ContextMenuItem onClick={createClickHandler(() => setFilter(null))}>
+      <ContextMenuItem onSelect={createSelectHandler(() => setFilter(null))}>
         <Icon
           className={styles.Icon}
           data-selected={filter === null || undefined}
@@ -34,7 +36,7 @@ export default function CommentDropDownMenu() {
         />{" "}
         Everyone
       </ContextMenuItem>
-      <ContextMenuItem onClick={createClickHandler(() => setFilter("current-user"))}>
+      <ContextMenuItem onSelect={createSelectHandler(() => setFilter("current-user"))}>
         <Icon
           className={styles.Icon}
           data-selected={filter === "current-user" || undefined}
@@ -44,7 +46,7 @@ export default function CommentDropDownMenu() {
       </ContextMenuItem>
       <ContextMenuDivider />
       <ContextMenuCategory>Sort by</ContextMenuCategory>
-      <ContextMenuItem onClick={createClickHandler(() => setSortBy("recording-time"))}>
+      <ContextMenuItem onSelect={createSelectHandler(() => setSortBy("recording-time"))}>
         <Icon
           className={styles.Icon}
           data-selected={sortBy === "recording-time" || undefined}
@@ -52,7 +54,7 @@ export default function CommentDropDownMenu() {
         />{" "}
         Recording time
       </ContextMenuItem>
-      <ContextMenuItem onClick={createClickHandler(() => setSortBy("created-at"))}>
+      <ContextMenuItem onSelect={createSelectHandler(() => setSortBy("created-at"))}>
         <Icon
           className={styles.Icon}
           data-selected={sortBy === "created-at" || undefined}
@@ -61,7 +63,7 @@ export default function CommentDropDownMenu() {
         Creation date
       </ContextMenuItem>
       <ContextMenuDivider />
-      <ContextMenuItem onClick={createClickHandler(() => setShowPreview(!showPreview))}>
+      <ContextMenuItem onSelect={createSelectHandler(() => setShowPreview(!showPreview))}>
         <Checkbox checked={showPreview} className={styles.Checkbox} label="Show preview?" />
       </ContextMenuItem>
     </>

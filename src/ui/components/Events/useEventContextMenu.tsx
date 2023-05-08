@@ -1,6 +1,5 @@
-import ContextMenuDivider from "replay-next/components/context-menu/ContextMenuDivider";
-import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
-import useContextMenu from "replay-next/components/context-menu/useContextMenu";
+import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context-menu";
+
 import Icon from "replay-next/components/Icon";
 import { copyToClipboard as copyTextToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { setFocusRegionBeginTime, setFocusRegionEndTime } from "ui/actions/timeline";
@@ -28,17 +27,17 @@ export default function useEventContextMenu(event: ReplayEvent) {
     <>
       {event.kind === "navigation" && (
         <>
-          <ContextMenuItem onClick={onCopyUrl}>Copy this URL</ContextMenuItem>
+          <ContextMenuItem onSelect={onCopyUrl}>Copy this URL</ContextMenuItem>
           <ContextMenuDivider />
         </>
       )}
-      <ContextMenuItem dataTestId="ConsoleContextMenu-SetFocusStartButton" onClick={setFocusStart}>
+      <ContextMenuItem dataTestId="ConsoleContextMenu-SetFocusStartButton" onSelect={setFocusStart}>
         <>
           <Icon type="set-focus-start" />
           Set focus start
         </>
       </ContextMenuItem>
-      <ContextMenuItem dataTestId="ConsoleContextMenu-SetFocusEndButton" onClick={setFocusEnd}>
+      <ContextMenuItem dataTestId="ConsoleContextMenu-SetFocusEndButton" onSelect={setFocusEnd}>
         <>
           <Icon type="set-focus-end" />
           Set focus end

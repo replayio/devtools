@@ -4,9 +4,8 @@ import {
   Value as ProtocolValue,
 } from "@replayio/protocol";
 import { useContext } from "react";
+import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
-import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
-import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import protocolValueToCopyLabel from "replay-next/components/inspector/protocolValueToCopyLabel";
 import protocolValueToText from "replay-next/components/inspector/protocolValueToText";
 import { copyToClipboard as copyTextToClipboard } from "replay-next/components/sources/utils/clipboard";
@@ -32,7 +31,7 @@ export default function useInspectorContextMenu({
 
   return useContextMenu(
     <>
-      <ContextMenuItem onClick={onCopyValue}>Copy {label}</ContextMenuItem>
+      <ContextMenuItem onSelect={onCopyValue}>Copy {label}</ContextMenuItem>
     </>
   );
 }

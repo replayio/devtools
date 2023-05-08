@@ -1,9 +1,7 @@
-import { MouseEvent, useMemo, useTransition } from "react";
+import { MouseEvent, UIEvent, useMemo, useTransition } from "react";
+import { ContextMenuCategory, ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import { Badge, Checkbox } from "design";
-import ContextMenuCategory from "replay-next/components/context-menu/ContextMenuCategory";
-import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
-import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import Icon from "replay-next/components/Icon";
 import { getFilteredEventsForFocusRegion } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
@@ -11,8 +9,8 @@ import { useAppSelector } from "ui/setup/hooks";
 import useEventsPreferences, { FiltersKey } from "./useEventsPreferences";
 import styles from "./EventsDropDownMenu.module.css";
 
-function createClickHandler(callback: () => void): (event: MouseEvent) => void {
-  return (event: MouseEvent) => {
+function createSelectHandler(callback: () => void): (event: UIEvent) => void {
+  return (event: UIEvent) => {
     event.preventDefault();
     event.stopPropagation();
 
@@ -94,7 +92,7 @@ function EventTypeContextMenuItem({ category, count }: { category: FiltersKey; c
   return (
     <ContextMenuItem
       disabled={count === 0 || isPending}
-      onClick={createClickHandler(() =>
+      onSelect={createSelectHandler(() =>
         startTransition(() => {
           setFilters(prevFilters => ({
             ...prevFilters,

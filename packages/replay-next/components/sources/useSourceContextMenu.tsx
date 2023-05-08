@@ -1,9 +1,7 @@
 import { SourceId } from "@replayio/protocol";
 import { unstable_useCacheRefresh as useCacheRefresh, useContext, useTransition } from "react";
+import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context-menu";
 
-import ContextMenuDivider from "replay-next/components/context-menu/ContextMenuDivider";
-import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
-import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 import {
   COMMENT_TYPE_SOURCE_CODE,
@@ -71,18 +69,19 @@ export default function useSourceContextMenu({
     <>
       {accessToken !== null && (
         <>
-          <ContextMenuItem disabled={isPending} onClick={addComment}>
+          <ContextMenuItem disabled={isPending} onSelect={addComment}>
             Add comment to line {lineNumber}
           </ContextMenuItem>
           <ContextMenuDivider />
         </>
       )}
-      <ContextMenuItem disabled={disableCopySourceUri} onClick={copySourceUri}>
+      <ContextMenuItem disabled={disableCopySourceUri} onSelect={copySourceUri}>
         Copy source URI
       </ContextMenuItem>
-      <ContextMenuItem onClick={() => setShowHitCounts(!showHitCounts)}>
+      <ContextMenuItem onSelect={() => setShowHitCounts(!showHitCounts)}>
         {showHitCounts ? "Hide" : "Show"} hit counts
       </ContextMenuItem>
-    </>
+    </>,
+    { requireClickToShow: true }
   );
 }
