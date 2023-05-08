@@ -1,15 +1,12 @@
 import { useContext } from "react";
+import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
-import ContextMenuDivider from "replay-next/components/context-menu/ContextMenuDivider";
-import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
-import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import Icon from "replay-next/components/Icon";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { getFrameStepForFrameLocation } from "replay-next/src/suspense/FrameStepsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { setFocusRegionBeginTime, setFocusRegionEndTime } from "ui/actions/timeline";
-import { seek } from "ui/actions/timeline";
+import { seek, setFocusRegionBeginTime, setFocusRegionEndTime } from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
 
 interface StackFrameContextMenuOptions {
@@ -67,25 +64,25 @@ export function useStackFrameContextMenu({
 
     frameDependentContextMenus = (
       <>
-        <ContextMenuItem dataTestId="CallStackContextMenu-CopySourceUri" onClick={copySourceUri}>
+        <ContextMenuItem dataTestId="CallStackContextMenu-CopySourceUri" onSelect={copySourceUri}>
           <>
             <Icon type="copy" />
             Copy source URI
           </>
         </ContextMenuItem>
-        <ContextMenuItem dataTestId="CallStackContextMenu-CopyStackTrace" onClick={setFocusStart}>
+        <ContextMenuItem dataTestId="CallStackContextMenu-CopyStackTrace" onSelect={setFocusStart}>
           <>
             <Icon type="set-focus-start" />
             Set focus start at frame
           </>
         </ContextMenuItem>
-        <ContextMenuItem dataTestId="CallStackContextMenu-CopyStackTrace" onClick={setFocusEnd}>
+        <ContextMenuItem dataTestId="CallStackContextMenu-CopyStackTrace" onSelect={setFocusEnd}>
           <>
             <Icon type="set-focus-end" />
             Set focus end at frame
           </>
         </ContextMenuItem>
-        <ContextMenuItem dataTestId="CallStackContextMenu-CopyStackTrace" onClick={jumpToFrame}>
+        <ContextMenuItem dataTestId="CallStackContextMenu-CopyStackTrace" onSelect={jumpToFrame}>
           <>
             <Icon type="view-function-source" />
             Jump to frame
@@ -101,14 +98,14 @@ export function useStackFrameContextMenu({
       {frameDependentContextMenus}
       <ContextMenuItem
         dataTestId="CallStackContextMenu-ToggleFrameworkGrouping"
-        onClick={toggleFrameworkGrouping}
+        onSelect={toggleFrameworkGrouping}
       >
         <>
           <div className="h-6 w-6" />
           {frameworkGroupingOn ? "Disable" : "Enable"} framework grouping
         </>
       </ContextMenuItem>
-      <ContextMenuItem dataTestId="CallStackContextMenu-CopyStackTrace" onClick={copyStackTrace}>
+      <ContextMenuItem dataTestId="CallStackContextMenu-CopyStackTrace" onSelect={copyStackTrace}>
         <>
           <Icon type="copy" />
           Copy stack trace

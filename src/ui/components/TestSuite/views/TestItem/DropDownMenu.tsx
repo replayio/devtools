@@ -1,6 +1,6 @@
+import { ContextMenuItem, useContextMenu } from "use-context-menu";
+
 import { assert } from "protocol/utils";
-import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
-import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import Icon from "replay-next/components/Icon";
 import { TestItem } from "shared/graphql/types";
 import { startPlayback } from "ui/actions/timeline";
@@ -57,7 +57,7 @@ function JumpToSourceMenuItem({
   const { disabled, onClick } = useJumpToSource({ testMetadata, testStep });
 
   return (
-    <ContextMenuItem disabled={disabled} onClick={onClick}>
+    <ContextMenuItem disabled={disabled} onSelect={onClick}>
       <MaterialIcon>code</MaterialIcon>
       Jump to source
     </ContextMenuItem>
@@ -100,7 +100,7 @@ function PlayFromHereMenuItem({
   };
 
   return (
-    <ContextMenuItem disabled={disabled} onClick={playFromHere}>
+    <ContextMenuItem disabled={disabled} onSelect={playFromHere}>
       <MaterialIcon>play_circle</MaterialIcon>
       Play from here
     </ContextMenuItem>
@@ -142,7 +142,7 @@ function PlayToHereMenuItem({
   };
 
   return (
-    <ContextMenuItem disabled={disabled} onClick={playToHere}>
+    <ContextMenuItem disabled={disabled} onSelect={playToHere}>
       <MaterialIcon>play_circle</MaterialIcon>
       Play to here
     </ContextMenuItem>
@@ -153,7 +153,7 @@ function ShowAfterMenuItem({ testStep }: { testStep: ProcessedTestStep }) {
   const { disabled, onClick } = useShowTestStepBoundary({ boundary: "after", testStep });
 
   return (
-    <ContextMenuItem disabled={disabled} onClick={onClick}>
+    <ContextMenuItem disabled={disabled} onSelect={onClick}>
       <MaterialIcon>arrow_forward</MaterialIcon>
       Show after
     </ContextMenuItem>
@@ -164,7 +164,7 @@ function ShowBeforeMenuItem({ testStep }: { testStep: ProcessedTestStep }) {
   const { disabled, onClick } = useShowTestStepBoundary({ boundary: "before", testStep });
 
   return (
-    <ContextMenuItem disabled={disabled} onClick={onClick}>
+    <ContextMenuItem disabled={disabled} onSelect={onClick}>
       <MaterialIcon>arrow_back</MaterialIcon>
       Show before
     </ContextMenuItem>

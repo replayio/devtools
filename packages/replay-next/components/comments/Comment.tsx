@@ -259,7 +259,7 @@ function DeleteWithConfirmationButton({
 
     return (
       <>
-        <button className={styles.Button} disabled={disabled} onClick={cancel} title="Cancel">
+        <button className={styles.Button} disabled={disabled} onSelect={cancel} title="Cancel">
           <Icon className={styles.Icon} type="cancel" />
         </button>
         <button

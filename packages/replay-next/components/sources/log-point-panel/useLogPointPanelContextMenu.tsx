@@ -1,9 +1,7 @@
 import { TimeStampedPoint } from "@replayio/protocol";
 import { useContext } from "react";
+import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context-menu";
 
-import ContextMenuDivider from "replay-next/components/context-menu/ContextMenuDivider";
-import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
-import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import Icon from "replay-next/components/Icon";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
@@ -72,7 +70,7 @@ export default function useLogPointPanelContextMenu({
         dataTestName="ContextMenuItem-ToggleConditional"
         dataTestState={hasConditional ? "true" : "false"}
         disabled={!editable}
-        onClick={toggleConditional}
+        onSelect={toggleConditional}
       >
         <>
           <Icon className={styles.SmallerIcon} type="conditional" />
@@ -82,7 +80,7 @@ export default function useLogPointPanelContextMenu({
       <ContextMenuItem
         dataTestName="ContextMenuItem-ToggleEnabled"
         dataTestState={shouldLog ? "true" : "false"}
-        onClick={toggleShouldLog}
+        onSelect={toggleShouldLog}
       >
         <>
           <Icon className={styles.SmallerIcon} type={shouldLog ? "toggle-off" : "toggle-on"} />
@@ -90,13 +88,13 @@ export default function useLogPointPanelContextMenu({
         </>
       </ContextMenuItem>
       <ContextMenuDivider />
-      <ContextMenuItem disabled={currentHitPoint == null} onClick={setFocusBegin}>
+      <ContextMenuItem disabled={currentHitPoint == null} onSelect={setFocusBegin}>
         <>
           <Icon type="set-focus-start" />
           Set focus start
         </>
       </ContextMenuItem>
-      <ContextMenuItem disabled={currentHitPoint == null} onClick={setFocusEnd}>
+      <ContextMenuItem disabled={currentHitPoint == null} onSelect={setFocusEnd}>
         <>
           <Icon type="set-focus-end" />
           Set focus end

@@ -1,7 +1,6 @@
 import { Row } from "react-table";
+import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
-import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
-import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import Icon from "replay-next/components/Icon";
 import { setFocusRegionBeginTime, setFocusRegionEndTime } from "ui/actions/timeline";
 import useCopyAsCURL from "ui/components/NetworkMonitor/useCopyAsCURL";
@@ -27,20 +26,20 @@ export default function useNetworkContextMenu({ row }: { row: Row<RequestSummary
 
   return useContextMenu(
     <>
-      <ContextMenuItem disabled={beginTime == null} onClick={setFocusStart}>
+      <ContextMenuItem disabled={beginTime == null} onSelect={setFocusStart}>
         <>
           <Icon type="set-focus-start" />
           Set focus start
         </>
       </ContextMenuItem>
-      <ContextMenuItem disabled={endTime == null} onClick={setFocusEnd}>
+      <ContextMenuItem disabled={endTime == null} onSelect={setFocusEnd}>
         <>
           <Icon type="set-focus-end" />
           Set focus end
         </>
       </ContextMenuItem>
 
-      <ContextMenuItem disabled={state !== "ready"} onClick={copyAsCURL}>
+      <ContextMenuItem disabled={state !== "ready"} onSelect={copyAsCURL}>
         <>
           <Icon type="copy" />
           Copy as CURL

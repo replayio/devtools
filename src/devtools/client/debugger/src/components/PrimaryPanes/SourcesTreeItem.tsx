@@ -5,10 +5,9 @@
 //
 
 import classnames from "classnames";
-import React, { Component, useLayoutEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef } from "react";
+import { ContextMenuItem, useContextMenu } from "use-context-menu";
 
-import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
-import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import Icon from "replay-next/components/Icon";
 import { copyToClipboard } from "replay-next/components/sources/utils/clipboard";
 import { Redacted } from "ui/components/Redacted";
@@ -90,13 +89,13 @@ function useSourceTreeItemContextMenu({
     };
     menuItems = (
       <>
-        <ContextMenuItem dataTestId="SourceTreeItemContextMenu-ExpandAll" onClick={expandAll}>
+        <ContextMenuItem dataTestId="SourceTreeItemContextMenu-ExpandAll" onSelect={expandAll}>
           <>
             <Icon type="chevron-down" />
             Expand all
           </>
         </ContextMenuItem>
-        <ContextMenuItem dataTestId="SourceTreeItemContextMenu-CollapseAll" onClick={collapseAll}>
+        <ContextMenuItem dataTestId="SourceTreeItemContextMenu-CollapseAll" onSelect={collapseAll}>
           <>
             <Icon type="chevron-right" />
             Collapse all
@@ -118,7 +117,7 @@ function useSourceTreeItemContextMenu({
         menuItems = (
           <ContextMenuItem
             dataTestId="SourceTreeItemContextMenu-CopySourceUri"
-            onClick={copySourceUri}
+            onSelect={copySourceUri}
           >
             <>
               <Icon type="copy" />

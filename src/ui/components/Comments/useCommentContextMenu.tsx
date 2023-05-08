@@ -1,9 +1,7 @@
 import { SerializedEditorState } from "lexical";
 import { ReactNode, useContext } from "react";
+import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context-menu";
 
-import ContextMenuDivider from "replay-next/components/context-menu/ContextMenuDivider";
-import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
-import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import Icon from "replay-next/components/Icon";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { setFocusRegionBeginTime, setFocusRegionEndTime } from "ui/actions/timeline";
@@ -69,19 +67,19 @@ export default function useCommentContextMenu({
   const contextMenuItems: ReactNode[] = [];
   if (isCurrentUserAuthor) {
     contextMenuItems.push(
-      <ContextMenuItem key="edit" onClick={editRemark}>
+      <ContextMenuItem key="edit" onSelect={editRemark}>
         Edit comment
       </ContextMenuItem>
     );
     contextMenuItems.push(
-      <ContextMenuItem key="delete" onClick={confirmDelete}>
+      <ContextMenuItem key="delete" onSelect={confirmDelete}>
         {type === "comment" ? "Delete comment and replies" : "Delete comment"}
       </ContextMenuItem>
     );
   }
   if (!remark.isPublished) {
     contextMenuItems.push(
-      <ContextMenuItem key="publish" onClick={publishRemark}>
+      <ContextMenuItem key="publish" onSelect={publishRemark}>
         Publish comment
       </ContextMenuItem>
     );
@@ -91,7 +89,7 @@ export default function useCommentContextMenu({
   }
 
   contextMenuItems.push(
-    <ContextMenuItem key="focusStart" onClick={setFocusStart}>
+    <ContextMenuItem key="focusStart" onSelect={setFocusStart}>
       <>
         <Icon type="set-focus-start" />
         Set focus start
@@ -100,7 +98,7 @@ export default function useCommentContextMenu({
   );
 
   contextMenuItems.push(
-    <ContextMenuItem key="focusEnd" onClick={setFocusEnd}>
+    <ContextMenuItem key="focusEnd" onSelect={setFocusEnd}>
       <>
         <Icon type="set-focus-end" />
         Set focus end

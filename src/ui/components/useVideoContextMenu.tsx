@@ -1,4 +1,5 @@
-import { MouseEvent, RefObject, useContext, useRef } from "react";
+import { MouseEvent, RefObject, UIEvent, useContext, useRef } from "react";
+import { ContextMenuItem, assertMouseEvent, useContextMenu } from "use-context-menu";
 
 import {
   highlightNode,
@@ -6,8 +7,6 @@ import {
   unhighlightNode,
 } from "devtools/client/inspector/markup/actions/markup";
 import { assert } from "protocol/utils";
-import ContextMenuItem from "replay-next/components/context-menu/ContextMenuItem";
-import useContextMenu from "replay-next/components/context-menu/useContextMenu";
 import { createTypeDataForVisualComment } from "replay-next/components/sources/utils/comments";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
@@ -80,39 +79,42 @@ export default function useVideoContextMenu({
     dispatch(unhighlightNode());
   };
 
-  const onShow = async (event: MouseEvent) => {
-    const canvas = canvasRef.current;
-    assert(canvas !== null);
+  const onShow = async (event: UIEvent) => {
+    if (assertMouseEvent(event)) {
+      const canvas = canvasRef.current;
+      assert(canvas !== null);
 
-    // Data needed for adding a comment:
-    mouseEventDataRef.current.pageX = event.pageX;
-    mouseEventDataRef.current.pageY = event.pageY;
-    mouseEventDataRef.current.position = getPositionForAddingComment(event);
+      // Data needed for adding a comment:
+      mouseEventDataRef.current.pageX = event.pageX;
+      mouseEventDataRef.current.pageY = event.pageY;
+      mouseEventDataRef.current.position = getPositionForAddingComment(event);
 
-    // Data needed for inspecting an element:
+      // Data needed for inspecting an element:
 
-    const position = getPositionForInspectingElement(event.nativeEvent, canvas);
-    if (position != null) {
-      const { x, y } = position;
+      const position = getPositionForInspectingElement(event.nativeEvent, canvas);
+      if (position != null) {
+        const { x, y } = position;
 
-      const boundingRects = await dispatch(fetchMouseTargetsForPause());
-      const target = getMouseTarget(boundingRects ?? [], x, y);
-      const targetNodeId = target?.node ?? null;
-      mouseEventDataRef.current.targetNodeId = targetNodeId;
-      if (targetNodeId !== null) {
-        dispatch(highlightNode(targetNodeId));
+        const boundingRects = await dispatch(fetchMouseTargetsForPause());
+        const target = getMouseTarget(boundingRects ?? [], x, y);
+        const targetNodeId = target?.node ?? null;
+        mouseEventDataRef.current.targetNodeId = targetNodeId;
+        if (targetNodeId !== null) {
+          dispatch(highlightNode(targetNodeId));
+        }
       }
     }
   };
 
   return useContextMenu(
     <>
-      <ContextMenuItem onClick={inspectElement}>Inspect element</ContextMenuItem>
-      {accessToken !== null && <ContextMenuItem onClick={addComment}>Add comment</ContextMenuItem>}
+      <ContextMenuItem onSelect={inspectElement}>Inspect element</ContextMenuItem>
+      {accessToken !== null && <ContextMenuItem onSelect={addComment}>Add comment</ContextMenuItem>}
     </>,
     {
       onHide,
       onShow,
+      requireClickToShow: true,
     }
   );
 }
