@@ -59,9 +59,9 @@ function KeyboardShortcuts({
 }: PropsFromRedux) {
   const recordingId = useGetRecordingId();
   const { isAuthenticated } = useAuth0();
-  const [, dismissUseFocusModeNag] = useNag(Nag.FIND_FILE);
-  const handleToggleQuickOpenModal = (e: KeyboardEvent, query = "", project = false) => {
-    dismissUseFocusModeNag();
+  const [, dismissFindFileNag] = useNag(Nag.FIND_FILE);
+  const toggleQuickOpenModal = (e: KeyboardEvent, query = "", project = false) => {
+    dismissFindFileNag();
 
     e.preventDefault();
     e.stopPropagation();
@@ -90,7 +90,7 @@ function KeyboardShortcuts({
     };
 
     const toggleFunctionQuickOpenModal = (e: KeyboardEvent) => {
-      handleToggleQuickOpenModal(e, "@");
+      toggleQuickOpenModal(e, "@");
     };
 
     const togglePalette = (e: KeyboardEvent) => {
@@ -106,7 +106,7 @@ function KeyboardShortcuts({
     };
 
     const toggleProjectFunctionQuickOpenModal = (e: KeyboardEvent) => {
-      handleToggleQuickOpenModal(e, "@", true);
+      toggleQuickOpenModal(e, "@", true);
     };
 
     const addComment = async (e: KeyboardEvent) => {
@@ -165,9 +165,9 @@ function KeyboardShortcuts({
       "Shift+F": toggleEditFocusMode,
 
       // Quick Open-related toggles
-      "CmdOrCtrl+Shift+P": handleToggleQuickOpenModal,
+      "CmdOrCtrl+Shift+P": toggleQuickOpenModal,
       // We apparently accept this with or without a Shift key currently
-      "CmdOrCtrl+P": handleToggleQuickOpenModal,
+      "CmdOrCtrl+P": toggleQuickOpenModal,
       // Can pre-fill the dialog with specific filter prefixes
       "CmdOrCtrl+Shift+O": toggleFunctionQuickOpenModal,
       "CmdOrCtrl+O": toggleProjectFunctionQuickOpenModal,
