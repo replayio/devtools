@@ -6,12 +6,14 @@ let count = 0;
 
 function checkUrl() {
   http
-    .get("http://localhost:3000", res => {
-      if (res.statusCode === 200) {
+    .get("http://localhost:3000", async response => {
+      if (response.statusCode === 200) {
         console.log("URL is available");
         process.exit(0);
       } else {
-        console.log(`URL returned status code ${res.statusCode}`);
+        console.log(`URL returned status code ${response.statusCode}`);
+        const text = response.text();
+        console.log(text);
       }
     })
     .on("error", err => {
