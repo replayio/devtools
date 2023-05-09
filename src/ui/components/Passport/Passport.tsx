@@ -207,7 +207,7 @@ const Passport = () => {
     completed: boolean;
     videoUrl: string;
     imageBaseName: string;
-    docsLink: string;
+    docsLink?: string;
   }
 
   interface Section {
