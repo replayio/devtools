@@ -198,6 +198,7 @@ function KeyboardShortcuts({
     recordingId,
     jumpToPreviousPause,
     jumpToNextPause,
+    dismissFindFileNag,
   ]);
 
   useEffect(() => {
