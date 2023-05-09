@@ -1,5 +1,4 @@
 import {
-  AnalysisEntry,
   CommandMethods,
   CommandParams,
   CommandResult,
@@ -10,8 +9,6 @@ import {
   PointDescription,
   ProtocolClient,
   SessionId,
-  analysisPoints,
-  analysisResult,
 } from "@replayio/protocol";
 import { captureException } from "@sentry/react";
 
@@ -150,14 +147,7 @@ type SessionCallbacks = {
   onSocketClose: (willClose: boolean) => void;
 };
 
-type AnalysisCallbacks = {
-  onCreate: (command: CommandResult<"Analysis.createAnalysis">) => void;
-  onEvent: (points: PointDescription[]) => void;
-  onResults: (results: AnalysisEntry[]) => void;
-};
-
 let gSessionCallbacks: SessionCallbacks | undefined;
-export let gAnalysisCallbacks: Map<string, AnalysisCallbacks> = new Map();
 
 export function setSessionCallbacks(sessionCallbacks: SessionCallbacks) {
   if (gSessionCallbacks !== undefined) {
@@ -309,39 +299,19 @@ export function addEventListener<M extends EventMethods>(
   event: M,
   handler: (params: EventParams<M>) => void
 ) {
-  if (event === "Analysis.analysisPoints") {
-    gEventListeners.set(event, ({ analysisId, points }: analysisPoints) => {
-      const callbacks = gAnalysisCallbacks.get(analysisId);
-      if (callbacks) {
-        callbacks.onEvent(points);
-      } else {
-        handler({ analysisId, points });
-      }
-    });
-  } else if (event === "Analysis.analysisResult") {
-    gEventListeners.set(event, ({ analysisId, results }: analysisResult) => {
-      const callbacks = gAnalysisCallbacks.get(analysisId);
-      if (callbacks) {
-        callbacks.onResults(results);
-      } else {
-        handler({ analysisId, results });
-      }
-    });
-  } else {
-    if (!gEventToCallbacksMap.has(event)) {
-      gEventToCallbacksMap.set(event, []);
-    }
+  if (!gEventToCallbacksMap.has(event)) {
+    gEventToCallbacksMap.set(event, []);
+  }
 
-    gEventToCallbacksMap.get(event)!.push(handler);
+  gEventToCallbacksMap.get(event)!.push(handler);
 
-    if (!gEventListeners.has(event)) {
-      gEventListeners.set(event, data => {
-        const callbacks = gEventToCallbacksMap.get(event)!;
-        callbacks.forEach(callback => {
-          callback(data);
-        });
+  if (!gEventListeners.has(event)) {
+    gEventListeners.set(event, data => {
+      const callbacks = gEventToCallbacksMap.get(event)!;
+      callbacks.forEach(callback => {
+        callback(data);
       });
-    }
+    });
   }
 }
 
@@ -349,33 +319,23 @@ export function removeEventListener<M extends EventMethods>(
   event: M,
   handler?: (params: EventParams<M>) => void
 ) {
-  switch (event) {
-    case "Analysis.analysisPoints":
-    case "Analysis.analysisResult": {
-      gEventListeners.delete(event);
-      break;
-    }
-    default: {
-      if (handler != null) {
-        const handlers = gEventToCallbacksMap.get(event);
-        if (handlers != null) {
-          const index = handlers.indexOf(handler);
-          if (index >= 0) {
-            handlers.splice(index, 1);
-          }
-        }
-
-        if (handlers == null || handlers.length === 0) {
-          gEventListeners.delete(event);
-        }
-      } else {
-        gEventListeners.delete(event);
-
-        if (gEventToCallbacksMap.has(event)) {
-          gEventToCallbacksMap.delete(event);
-        }
+  if (handler != null) {
+    const handlers = gEventToCallbacksMap.get(event);
+    if (handlers != null) {
+      const index = handlers.indexOf(handler);
+      if (index >= 0) {
+        handlers.splice(index, 1);
       }
-      break;
+    }
+
+    if (handlers == null || handlers.length === 0) {
+      gEventListeners.delete(event);
+    }
+  } else {
+    gEventListeners.delete(event);
+
+    if (gEventToCallbacksMap.has(event)) {
+      gEventToCallbacksMap.delete(event);
     }
   }
 }
