@@ -60,13 +60,7 @@ function KeyboardShortcuts({
   const recordingId = useGetRecordingId();
   const { isAuthenticated } = useAuth0();
   const [, dismissFindFileNag] = useNag(Nag.FIND_FILE);
-  const toggleQuickOpenModal = (e: KeyboardEvent, query = "", project = false) => {
-    dismissFindFileNag();
 
-    e.preventDefault();
-    e.stopPropagation();
-    toggleQuickOpen(query, project);
-  };
   const { value: protocolTimeline, update: updateProtocolTimeline } =
     useFeature("protocolTimeline");
   const globalKeyboardShortcuts = useMemo(() => {
@@ -91,6 +85,14 @@ function KeyboardShortcuts({
 
     const toggleFunctionQuickOpenModal = (e: KeyboardEvent) => {
       toggleQuickOpenModal(e, "@");
+    };
+
+    const toggleQuickOpenModal = (e: KeyboardEvent, query = "", project = false) => {
+      dismissFindFileNag();
+
+      e.preventDefault();
+      e.stopPropagation();
+      toggleQuickOpen(query, project);
     };
 
     const togglePalette = (e: KeyboardEvent) => {
