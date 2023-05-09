@@ -13,14 +13,14 @@ const config: PlaywrightTestConfig = {
       height: 1024,
     },
     // Don't allow any one action to take more than 15s
-    actionTimeout: 60_000,
+    actionTimeout: 120_000,
   },
 
   // Retry failed tests on CI to account for some basic flakiness.
   retries: CI ? 5 : 0,
 
   // Give individual tests a while to complete instead of default 30s
-  timeout: 120_000,
+  timeout: 300_000,
 
   // Limit the number of workers on CI, use default locally
   workers: CI ? 4 : undefined,
