@@ -108,6 +108,10 @@ export function shouldShowInspectComponent(nags: Nag[]): boolean {
   return shouldShowNag(nags, Nag.INSPECT_COMPONENT);
 }
 
+export function shouldShowFindFile(nags: Nag[]): boolean {
+  return shouldShowNag(nags, Nag.FIND_FILE);
+}
+
 export function shouldShowUseFocusMode(nags: Nag[]): boolean {
   return shouldShowNag(nags, Nag.USE_FOCUS_MODE);
 }

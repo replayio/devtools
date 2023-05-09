@@ -6,6 +6,8 @@ import * as dbgActions from "devtools/client/debugger/src/actions/ui";
 import { getActiveSearch, getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
 import { SHOW_GLOBAL_SEARCH_EVENT_TYPE } from "replay-next/components/search-files/SearchFiles";
 import { createTypeDataForVisualComment } from "replay-next/components/sources/utils/comments";
+import { useNag } from "replay-next/src/hooks/useNag";
+import { Nag } from "shared/graphql/types";
 import { UIThunkAction } from "ui/actions";
 import { actions } from "ui/actions";
 import { useGetRecordingId } from "ui/hooks/recordings";
@@ -57,6 +59,8 @@ function KeyboardShortcuts({
 }: PropsFromRedux) {
   const recordingId = useGetRecordingId();
   const { isAuthenticated } = useAuth0();
+  const [, dismissFindFileNag] = useNag(Nag.FIND_FILE);
+
   const { value: protocolTimeline, update: updateProtocolTimeline } =
     useFeature("protocolTimeline");
   const globalKeyboardShortcuts = useMemo(() => {
@@ -83,6 +87,14 @@ function KeyboardShortcuts({
       toggleQuickOpenModal(e, "@");
     };
 
+    const toggleQuickOpenModal = (e: KeyboardEvent, query = "", project = false) => {
+      dismissFindFileNag();
+
+      e.preventDefault();
+      e.stopPropagation();
+      toggleQuickOpen(query, project);
+    };
+
     const togglePalette = (e: KeyboardEvent) => {
       e.preventDefault();
       trackEvent("key_shortcut.show_command_palette");
@@ -97,13 +109,6 @@ function KeyboardShortcuts({
 
     const toggleProjectFunctionQuickOpenModal = (e: KeyboardEvent) => {
       toggleQuickOpenModal(e, "@", true);
-    };
-
-    const toggleQuickOpenModal = (e: KeyboardEvent, query = "", project = false) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      toggleQuickOpen(query, project);
     };
 
     const addComment = async (e: KeyboardEvent) => {
@@ -193,6 +198,7 @@ function KeyboardShortcuts({
     recordingId,
     jumpToPreviousPause,
     jumpToNextPause,
+    dismissFindFileNag,
   ]);
 
   useEffect(() => {

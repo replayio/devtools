@@ -8,6 +8,7 @@ import {
   shouldShowAddUnicornBadge,
   shouldShowBreakpointEdit,
   shouldShowConsoleNavigate,
+  shouldShowFindFile,
   shouldShowInspectElement,
   shouldShowInspectNetworkRequest,
   shouldShowInspectReactComponent,
@@ -25,17 +26,18 @@ const stepNames = ["step-one", "step-two", "step-three", "step-four"] as const;
 const Passport = () => {
   const [selectedIndices, setSelectedIndices] = useState({ sectionIndex: 0, itemIndex: 0 });
   const { nags } = hooks.useGetUserInfo();
-  const showConsoleNavigate = shouldShowConsoleNavigate(nags);
-  const showBreakpointEdit = shouldShowBreakpointEdit(nags);
   const showAddComment = shouldShowAddComment(nags);
-  const showJumpToCode = shouldShowJumpToCode(nags);
   const showAddUnicornBadge = shouldShowAddUnicornBadge(nags);
-  const showSearchSourceText = shouldShowSearchSourceText(nags);
-  const showShareNag = shouldShowShareNag(nags);
-  const showJumpToEvent = shouldShowJumpToEvent(nags);
+  const showBreakpointEdit = shouldShowBreakpointEdit(nags);
+  const showConsoleNavigate = shouldShowConsoleNavigate(nags);
+  const showFindFile = shouldShowFindFile(nags);
   const showInspectElement = shouldShowInspectElement(nags);
   const showInspectNetworkRequest = shouldShowInspectNetworkRequest(nags);
   const showInspectReactComponent = shouldShowInspectReactComponent(nags);
+  const showJumpToCode = shouldShowJumpToCode(nags);
+  const showJumpToEvent = shouldShowJumpToEvent(nags);
+  const showSearchSourceText = shouldShowSearchSourceText(nags);
+  const showShareNag = shouldShowShareNag(nags);
   const showUseFocusMode = shouldShowUseFocusMode(nags);
 
   type StepNames = typeof stepNames[number];
@@ -149,6 +151,12 @@ const Passport = () => {
       completed: !showUseFocusMode,
       videoUrl: "https://vercel.replay.io/passport/use_focus_mode.gif",
       imageBaseName: "use_focus_mode",
+    },
+    {
+      label: "Go to file (cmd-p)",
+      completed: !showFindFile,
+      videoUrl: "https://vercel.replay.io/passport/find_file.gif",
+      imageBaseName: "find_file",
     },
   ];
 
