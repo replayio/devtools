@@ -1683,15 +1683,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.18.6":
-  version: 7.18.9
-  resolution: "@babel/runtime@npm:7.18.9"
-  dependencies:
-    regenerator-runtime: ^0.13.4
-  checksum: 36dd736baba7164e82b3cc9d43e081f0cb2d05ff867ad39cac515d99546cee75b7f782018b02a3dcf5f2ef3d27f319faa68965fdfec49d4912c60c6002353a2e
-  languageName: node
-  linkType: hard
-
 "@babel/runtime@npm:^7.20.6":
   version: 7.20.7
   resolution: "@babel/runtime@npm:7.20.7"
@@ -1783,18 +1774,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/commands@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@codemirror/commands@npm:6.0.0"
-  dependencies:
-    "@codemirror/language": ^6.0.0
-    "@codemirror/state": ^6.0.0
-    "@codemirror/view": ^6.0.0
-    "@lezer/common": ^1.0.0
-  checksum: 5b3bac420635316f9fb324e38b76a281a4d1425f80e6a5e66a34cf1508414e5d182f494e3c30936b27f86aa67403c1af4137bca5df0f0e53b2a4baa49a25caf2
-  languageName: node
-  linkType: hard
-
 "@codemirror/lang-css@npm:^6.0.0":
   version: 6.0.0
   resolution: "@codemirror/lang-css@npm:6.0.0"
@@ -1835,21 +1814,6 @@ __metadata:
     "@lezer/common": ^1.0.0
     "@lezer/javascript": ^1.0.0
   checksum: 7101ff1cc2c275b4e19626ffeba7bdff7799d2ed7d3a7d6cbc03d61035930c49d8b800c7ba3658f17c69e264b78f0ee32fb5633fe088711e4dd3847f11c5d928
-  languageName: node
-  linkType: hard
-
-"@codemirror/lang-javascript@npm:^6.0.2":
-  version: 6.0.2
-  resolution: "@codemirror/lang-javascript@npm:6.0.2"
-  dependencies:
-    "@codemirror/autocomplete": ^6.0.0
-    "@codemirror/language": ^6.0.0
-    "@codemirror/lint": ^6.0.0
-    "@codemirror/state": ^6.0.0
-    "@codemirror/view": ^6.0.0
-    "@lezer/common": ^1.0.0
-    "@lezer/javascript": ^1.0.0
-  checksum: a63058e6970a54779c945eccc2d5a88ccda5bcd3049dd18cd787e684414861a7f1d78097115eadc155bf0a199a1d8770e1538daf976cdcd5641348cf174101e6
   languageName: node
   linkType: hard
 
@@ -1902,17 +1866,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/search@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@codemirror/search@npm:6.0.0"
-  dependencies:
-    "@codemirror/state": ^6.0.0
-    "@codemirror/view": ^6.0.0
-    crelt: ^1.0.5
-  checksum: e40b55f1ff1287a8b5b321f633bff638c9d4a411ada524b36b275344a13f9f4a66b7c5176d8a142a6a7761d1591d18dc535c88897f30b9885508a2890162fc72
-  languageName: node
-  linkType: hard
-
 "@codemirror/state@npm:^6.0.0":
   version: 6.0.0
   resolution: "@codemirror/state@npm:6.0.0"
@@ -1924,18 +1877,6 @@ __metadata:
   version: 6.1.2
   resolution: "@codemirror/state@npm:6.1.2"
   checksum: 7eda4b3eb6a777fecaa5a62e95a162aa163ccff01913d21a88d1157247390d9b57e6bcf54738be0b98aff8ba3a6ec3cb7aeb3b9714b019cb6c05242da9d9fdfe
-  languageName: node
-  linkType: hard
-
-"@codemirror/theme-one-dark@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@codemirror/theme-one-dark@npm:6.0.0"
-  dependencies:
-    "@codemirror/language": ^6.0.0
-    "@codemirror/state": ^6.0.0
-    "@codemirror/view": ^6.0.0
-    "@lezer/highlight": ^1.0.0
-  checksum: 916f23e3ce0e003224e4bcee209ebcae57eb620c942adb180d7e0a1a0f2091bb042723d07cbd855c7016cb86fae66aa374de115001dcbe3d033f86c1624c3f9b
   languageName: node
   linkType: hard
 
@@ -4053,10 +3994,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/protocol@npm:^0.45.0":
-  version: 0.45.0
-  resolution: "@replayio/protocol@npm:0.45.0"
-  checksum: 48fe4e367fd976616a8bdc5e650377fbbae0b50609821e0439b53be7c343e5edb06769bcb86a38aa53a3af2706a59f193f869074b3098ee118e9064be2345804
+"@replayio/protocol@npm:^0.50.0":
+  version: 0.50.0
+  resolution: "@replayio/protocol@npm:0.50.0"
+  checksum: 04144053427aca9e119787f28fb384ddbc8ed42338b311313ca2b9a9aff5cd2627cb3ed091e03a409daad3186633e9f77c86f57539c295d40f9e7745ab0968bb
   languageName: node
   linkType: hard
 
@@ -6549,48 +6490,6 @@ __metadata:
     "@typescript-eslint/types": 5.38.1
     eslint-visitor-keys: ^3.3.0
   checksum: 01c83a42900f8ab721bd0857abcc000a15183eb26d2d61cceeaef018a83a91325f48c0112d4356383c41dce23174a305bb3352af4705a61d1da46f8ac0e88340
-  languageName: node
-  linkType: hard
-
-"@uiw/codemirror-extensions-basic-setup@npm:4.11.4":
-  version: 4.11.4
-  resolution: "@uiw/codemirror-extensions-basic-setup@npm:4.11.4"
-  dependencies:
-    "@codemirror/autocomplete": ^6.0.0
-    "@codemirror/commands": ^6.0.0
-    "@codemirror/language": ^6.0.0
-    "@codemirror/lint": ^6.0.0
-    "@codemirror/search": ^6.0.0
-    "@codemirror/state": ^6.0.0
-    "@codemirror/view": ^6.0.0
-  peerDependencies:
-    "@codemirror/autocomplete": ">=6.0.0"
-    "@codemirror/commands": ">=6.0.0"
-    "@codemirror/language": ">=6.0.0"
-    "@codemirror/lint": ">=6.0.0"
-    "@codemirror/search": ">=6.0.0"
-    "@codemirror/state": ">=6.0.0"
-    "@codemirror/view": ">=6.0.0"
-  checksum: c66398c31a13d7e44a8cdd4ffc2eac0ef641278e49bb6df4b2cffd03a0030854c2db80ca617087cb29a2ea68cb26fddff7872ff15c5e0d37249a8ef48ca7a0e0
-  languageName: node
-  linkType: hard
-
-"@uiw/react-codemirror@npm:^4.11.4":
-  version: 4.11.4
-  resolution: "@uiw/react-codemirror@npm:4.11.4"
-  dependencies:
-    "@babel/runtime": ^7.18.6
-    "@codemirror/theme-one-dark": ^6.0.0
-    "@uiw/codemirror-extensions-basic-setup": 4.11.4
-    codemirror: ^6.0.0
-  peerDependencies:
-    "@babel/runtime": ">=7.11.0"
-    "@codemirror/theme-one-dark": ">=6.0.0"
-    "@codemirror/view": ">=6.0.0"
-    codemirror: ">=6.0.0"
-    react: ">=16.8.0"
-    react-dom: ">=16.8.0"
-  checksum: 884fd978a33d40c8e01f9f598e452945a7741ce96e99a081761eb0f8be6d23f840b25eda7fc9b0e5bddb393dad65bf83d378c5c1a8a343fadbb75f804bbac6f0
   languageName: node
   linkType: hard
 
@@ -9654,21 +9553,6 @@ __metadata:
   version: 1.1.0
   resolution: "code-point-at@npm:1.1.0"
   checksum: 17d5666611f9b16d64fdf48176d9b7fb1c7d1c1607a189f7e600040a11a6616982876af148230336adb7d8fe728a559f743a4e29db3747e3b1a32fa7f4529681
-  languageName: node
-  linkType: hard
-
-"codemirror@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "codemirror@npm:6.0.0"
-  dependencies:
-    "@codemirror/autocomplete": ^6.0.0
-    "@codemirror/commands": ^6.0.0
-    "@codemirror/language": ^6.0.0
-    "@codemirror/lint": ^6.0.0
-    "@codemirror/search": ^6.0.0
-    "@codemirror/state": ^6.0.0
-    "@codemirror/view": ^6.0.0
-  checksum: 42fb2b5ac5d4b8616a733de5efd7913764c1d13dcc27f732af5ed5e98f657a53ab5549437b53d73ed89d004423141ee65612a5e54c451538ef6d75afed4cd3e2
   languageName: node
   linkType: hard
 
@@ -17055,28 +16939,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"markerikson-stack-client-prototype-227d06@workspace:packages/markerikson-stack-client-prototype":
-  version: 0.0.0-use.local
-  resolution: "markerikson-stack-client-prototype-227d06@workspace:packages/markerikson-stack-client-prototype"
-  dependencies:
-    "@codemirror/lang-javascript": ^6.0.2
-    "@replayio/protocol": ^0.45.0
-    "@testing-library/jest-dom": ^5.16.3
-    "@testing-library/react": ^13.2.0
-    "@uiw/react-codemirror": ^4.11.4
-    jest: ^28.0.2
-    jest-environment-jsdom: ^28.0.2
-    lodash: ^4.17.21
-    next: ^13.2
-    protocol: "workspace:*"
-    react: 0.0.0-experimental-e7d0053e6-20220325
-    react-dom: 0.0.0-experimental-e7d0053e6-20220325
-    replay-next: "workspace:*"
-    shared: "*"
-    typescript: 5.0.2
-  languageName: unknown
-  linkType: soft
-
 "matcher@npm:^3.0.0":
   version: 3.0.0
   resolution: "matcher@npm:3.0.0"
@@ -20623,7 +20485,7 @@ __metadata:
     "@recordreplay/sourcemap-upload-cli": ^0.1.1
     "@reduxjs/toolkit": ^1.8.4
     "@replayio/overboard": ^0.4.1
-    "@replayio/protocol": ^0.45.0
+    "@replayio/protocol": ^0.50.0
     "@replayio/replay": ^0.12.4
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0
@@ -21102,7 +20964,7 @@ __metadata:
     "@lezer/common_replay_next": "npm:@lezer/common@1.0.1"
     "@lezer/highlight_replay_next": "npm:@lezer/highlight@1.1.1"
     "@playwright/test": ^1.23.1
-    "@replayio/protocol": ^0.45.0
+    "@replayio/protocol": ^0.50.0
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
     "@types/uuid": ^7.0.3
@@ -21816,7 +21678,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"shared@*, shared@workspace:*, shared@workspace:packages/shared":
+"shared@workspace:*, shared@workspace:packages/shared":
   version: 0.0.0-use.local
   resolution: "shared@workspace:packages/shared"
   languageName: unknown

@@ -385,7 +385,7 @@ export class ReplayClient implements ReplayClientInterface {
       removeEventListener("Session.findPointsResults", onPoints);
     }
 
-    if (result.pointPage.hasPrevious || result.pointPage.hasNext) {
+    if (result.pointPage.hasNext) {
       throw commandError("Too many points", ProtocolError.TooManyPoints);
     }
 
@@ -823,7 +823,7 @@ export class ReplayClient implements ReplayClientInterface {
       removeEventListener("Session.runEvaluationResults", onResultsWrapper);
     }
 
-    if (result.pointPage.hasPrevious || result.pointPage.hasNext) {
+    if (result.pointPage.hasNext) {
       throw commandError("Too many points", ProtocolError.TooManyPoints);
     }
   }

@@ -10,6 +10,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
       newSourcesToCompleteSourceDetails([
         {
           contentHash: "contentHash#1",
+          contentId: "contentHash#1",
           kind: "scriptSource",
           sourceId: "1",
           url: "/index.js",
@@ -18,6 +19,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
     ).toEqual({
       "1": {
         contentHash: "contentHash#1",
+        contentId: "contentHash#1",
         correspondingSourceIds: ["1"],
         generated: [],
         generatedFrom: [],
@@ -36,12 +38,14 @@ describe("newSourcesToCompleteSourceDetails", () => {
       newSourcesToCompleteSourceDetails([
         {
           contentHash: "contentHash#1",
+          contentId: "contentHash#1",
           kind: "scriptSource",
           sourceId: "1",
           url: "/index.js",
         },
         {
           contentHash: "contentHash#o1",
+          contentId: "contentHash#o1",
           kind: "sourceMapped",
           sourceId: "o1",
           generatedSourceIds: ["1"],
@@ -51,6 +55,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
     ).toEqual({
       "1": {
         contentHash: "contentHash#1",
+        contentId: "contentHash#1",
         correspondingSourceIds: ["1"],
         generated: [],
         generatedFrom: ["o1"],
@@ -63,6 +68,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
       },
       o1: {
         contentHash: "contentHash#o1",
+        contentId: "contentHash#o1",
         correspondingSourceIds: ["o1"],
         generated: ["1"],
         generatedFrom: [],
@@ -81,11 +87,13 @@ describe("newSourcesToCompleteSourceDetails", () => {
       newSourcesToCompleteSourceDetails([
         {
           contentHash: "contentHash#1",
+          contentId: "contentHash#1",
           kind: "scriptSource",
           sourceId: "1",
           url: "/index.js",
         },
         {
+          contentId: "contentHash#1-pp",
           generatedSourceIds: ["1"],
           kind: "prettyPrinted",
           sourceId: "pp1",
@@ -95,6 +103,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
     ).toEqual({
       "1": {
         contentHash: "contentHash#1",
+        contentId: "contentHash#1",
         correspondingSourceIds: ["1"],
         generated: [],
         generatedFrom: ["pp1"],
@@ -107,6 +116,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
       },
       pp1: {
         contentHash: "contentHash#1",
+        contentId: "contentHash#1-pp",
         correspondingSourceIds: ["pp1"],
         generated: ["1"],
         generatedFrom: [],
@@ -125,24 +135,28 @@ describe("newSourcesToCompleteSourceDetails", () => {
       newSourcesToCompleteSourceDetails([
         {
           contentHash: "contentHash#1",
+          contentId: "contentHash#1",
           kind: "scriptSource",
           sourceId: "1",
           url: "/index.js",
         },
         {
           contentHash: "contentHash#o1",
+          contentId: "contentHash#o1",
           generatedSourceIds: ["1"],
           kind: "sourceMapped",
           sourceId: "o1",
           url: "/src/index.ts",
         },
         {
+          contentId: "contentHash#1-pp",
           generatedSourceIds: ["1"],
           kind: "prettyPrinted",
           sourceId: "pp1",
           url: "/src/index.js",
         },
         {
+          contentId: "contentHash#o1-pp",
           generatedSourceIds: ["o1"],
           kind: "prettyPrinted",
           sourceId: "ppo1",
@@ -152,6 +166,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
     ).toEqual({
       "1": {
         contentHash: "contentHash#1",
+        contentId: "contentHash#1",
         correspondingSourceIds: ["1"],
         generated: [],
         generatedFrom: ["o1", "pp1"],
@@ -164,6 +179,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
       },
       o1: {
         contentHash: "contentHash#o1",
+        contentId: "contentHash#o1",
         correspondingSourceIds: ["o1"],
         generated: ["1"],
         generatedFrom: ["ppo1"],
@@ -176,6 +192,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
       },
       pp1: {
         contentHash: "contentHash#1",
+        contentId: "contentHash#1-pp",
         correspondingSourceIds: ["pp1"],
         generated: ["1"],
         generatedFrom: [],
@@ -188,6 +205,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
       },
       ppo1: {
         contentHash: "contentHash#o1",
+        contentId: "contentHash#o1-pp",
         correspondingSourceIds: ["ppo1"],
         generated: ["o1"],
         generatedFrom: [],
@@ -206,6 +224,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
       newSourcesToCompleteSourceDetails([
         {
           contentHash: "contentHash#h1",
+          contentId: "contentHash#h1",
           kind: "html",
           sourceId: "h1",
           generatedSourceIds: ["2"],
@@ -213,6 +232,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
         },
         {
           contentHash: "contentHash#2",
+          contentId: "contentHash#2",
           kind: "inlineScript",
           sourceId: "2",
           url: "/index.html",
@@ -221,6 +241,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
     ).toEqual({
       "2": {
         contentHash: "contentHash#2",
+        contentId: "contentHash#2",
         correspondingSourceIds: ["2"],
         generated: [],
         generatedFrom: ["h1"],
@@ -233,6 +254,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
       },
       h1: {
         contentHash: "contentHash#h1",
+        contentId: "contentHash#h1",
         correspondingSourceIds: ["h1"],
         generated: ["2"],
         generatedFrom: [],
@@ -252,12 +274,14 @@ it("can link corresponding sources", () => {
     newSourcesToCompleteSourceDetails([
       {
         contentHash: "contentHash",
+        contentId: "contentHash",
         kind: "html",
         sourceId: "h1",
         url: "/index.html",
       },
       {
         contentHash: "contentHash",
+        contentId: "contentHash",
         kind: "html",
         sourceId: "h2",
         url: "/index.html",
@@ -266,6 +290,7 @@ it("can link corresponding sources", () => {
   ).toEqual({
     h1: {
       contentHash: "contentHash",
+      contentId: "contentHash",
       correspondingSourceIds: ["h1", "h2"],
       generated: [],
       generatedFrom: [],
@@ -278,6 +303,7 @@ it("can link corresponding sources", () => {
     },
     h2: {
       contentHash: "contentHash",
+      contentId: "contentHash",
       correspondingSourceIds: ["h1", "h2"],
       generated: [],
       generatedFrom: [],
@@ -296,11 +322,13 @@ it("is not fooled by pretty-printed sources with missing contentHashes", () => {
     newSourcesToCompleteSourceDetails([
       {
         contentHash: "contentHash#h1",
+        contentId: "contentHash#h1",
         kind: "html",
         sourceId: "h1",
         url: "/index.html",
       },
       {
+        contentId: "contentHash#h1-pp",
         generatedSourceIds: ["h1"],
         kind: "prettyPrinted",
         sourceId: "pph1",
@@ -308,11 +336,13 @@ it("is not fooled by pretty-printed sources with missing contentHashes", () => {
       },
       {
         contentHash: "contentHash#h2",
+        contentId: "contentHash#h2",
         kind: "html",
         sourceId: "h2",
         url: "/index.html",
       },
       {
+        contentId: "contentHash#h2-pp",
         kind: "prettyPrinted",
         generatedSourceIds: ["h2"],
         sourceId: "pph2",
@@ -322,6 +352,7 @@ it("is not fooled by pretty-printed sources with missing contentHashes", () => {
   ).toEqual({
     h1: {
       contentHash: "contentHash#h1",
+      contentId: "contentHash#h1",
       correspondingSourceIds: ["h1"],
       generated: [],
       generatedFrom: ["pph1"],
@@ -334,6 +365,7 @@ it("is not fooled by pretty-printed sources with missing contentHashes", () => {
     },
     h2: {
       contentHash: "contentHash#h2",
+      contentId: "contentHash#h2",
       correspondingSourceIds: ["h2"],
       generated: [],
       generatedFrom: ["pph2"],
@@ -346,6 +378,7 @@ it("is not fooled by pretty-printed sources with missing contentHashes", () => {
     },
     pph1: {
       contentHash: "contentHash#h1",
+      contentId: "contentHash#h1-pp",
       correspondingSourceIds: ["pph1"],
       generated: ["h1"],
       generatedFrom: [],
@@ -358,6 +391,7 @@ it("is not fooled by pretty-printed sources with missing contentHashes", () => {
     },
     pph2: {
       contentHash: "contentHash#h2",
+      contentId: "contentHash#h2-pp",
       correspondingSourceIds: ["pph2"],
       generated: ["h2"],
       generatedFrom: [],

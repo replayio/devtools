@@ -42,8 +42,7 @@ export const outlineHitCountsCache: Cache<
 
     const locations: SameLineSourceLocations[] = [];
     for (const functionOutline of functions) {
-      //TODO update @replayio/protocol
-      const location: SourceLocation | undefined = (functionOutline as any).breakpointLocation;
+      const location = functionOutline.breakpointLocation;
       if (location) {
         locations.push({ line: location.line, columns: [location.column] });
       }
@@ -65,8 +64,7 @@ export const outlineHitCountsCache: Cache<
     );
 
     const functionsWithHitCounts = functions.map(functionOutline => {
-      //TODO update @replayio/protocol
-      const location: SourceLocation | undefined = (functionOutline as any).breakpointLocation;
+      const location = functionOutline.breakpointLocation;
       let hits = 0;
       if (location) {
         const locationKey = `${location.line}:${location.column}`;

@@ -139,6 +139,7 @@ export function createSource({
   url?: string;
 }): SourceTuple {
   const value: newSource = {
+    contentId: sourceId,
     generatedSourceIds,
     kind,
     sourceId,
