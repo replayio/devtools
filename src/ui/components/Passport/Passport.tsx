@@ -253,7 +253,7 @@ const Passport = () => {
                     className={styles.docsIcon}
                     onClick={e => {
                       e.stopPropagation();
-                      handleDocsClick(item.docsLink);
+                      handleDocsClick(item.docsLink ?? "");
                     }}
                   >
                     <div className="flex items-center space-x-1">
