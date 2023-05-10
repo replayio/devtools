@@ -10,10 +10,12 @@ export async function quickOpen(page: Page, url: string): Promise<void> {
 
   await debugPrint(page, `Filtering files by "${chalk.bold(url)}"`, "quickOpen");
   await page.keyboard.type(url);
-  await page.waitForSelector(`[data-test-id="QuickOpenResultsList"]:has-text("${url}")`);
+  const sourceRow = await page.waitForSelector(
+    `[data-test-id="QuickOpenResultsList"]:has-text("${url}")`
+  );
 
   await debugPrint(page, `Opening file "${chalk.bold(url)}"`, "quickOpen");
-  await page.keyboard.press("Enter");
+  sourceRow.click();
   await page.waitForSelector(`[data-test-name="Source-${url}"]`);
   await page.waitForSelector(`[data-test-name="Source"]`);
 }
