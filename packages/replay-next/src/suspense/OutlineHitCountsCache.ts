@@ -4,21 +4,21 @@ import {
   PointRange,
   SameLineSourceLocations,
   SourceId,
-  SourceLocation,
 } from "@replayio/protocol";
 import { Cache, createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
+import { ProtocolError, isCommandError } from "shared/utils/error";
 
 import { sourceOutlineCache } from "./SourceOutlineCache";
 
-export interface FunctionOutlineWithHitCounts extends FunctionOutline {
-  hits: number;
+export interface FunctionOutlineWithHitCount extends FunctionOutline {
+  hits?: number;
 }
 
 export interface SourceOutlineWithHitCounts {
   classes: ClassOutline[];
-  functions: FunctionOutlineWithHitCounts[];
+  functions: FunctionOutlineWithHitCount[];
 }
 
 export const outlineHitCountsCache: Cache<
@@ -53,22 +53,28 @@ export const outlineHitCountsCache: Cache<
     const hitCountsByLocationKey = new Map<string, number>();
     await Promise.all(
       correspondingSourceIds.map(async sourceId => {
-        const hitCounts = await replayClient.getSourceHitCounts(sourceId, locations, focusRange);
+        try {
+          const hitCounts = await replayClient.getSourceHitCounts(sourceId, locations, focusRange);
 
-        hitCounts.forEach(({ hits, location }) => {
-          const locationKey = `${location.line}:${location.column}`;
-          const previous = hitCountsByLocationKey.get(locationKey) ?? 0;
-          hitCountsByLocationKey.set(locationKey, previous + hits);
-        });
+          hitCounts.forEach(({ hits, location }) => {
+            const locationKey = `${location.line}:${location.column}`;
+            const previous = hitCountsByLocationKey.get(locationKey) ?? 0;
+            hitCountsByLocationKey.set(locationKey, previous + hits);
+          });
+        } catch (error) {
+          if (!isCommandError(error, ProtocolError.TooManyLocations)) {
+            throw error;
+          }
+        }
       })
     );
 
     const functionsWithHitCounts = functions.map(functionOutline => {
       const location = functionOutline.breakpointLocation;
-      let hits = 0;
+      let hits: number | undefined = undefined;
       if (location) {
         const locationKey = `${location.line}:${location.column}`;
-        hits = hitCountsByLocationKey.get(locationKey) ?? 0;
+        hits = hitCountsByLocationKey.get(locationKey);
       }
       return Object.assign({}, functionOutline, { hits });
     });

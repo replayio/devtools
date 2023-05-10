@@ -1,16 +1,17 @@
-import { ClassOutline, FunctionOutline, getSourceOutlineResult } from "@replayio/protocol";
+import { ClassOutline, FunctionOutline } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 import keyBy from "lodash/keyBy";
 
-import { fuzzySearch } from "../../utils/function";
+import {
+  FunctionOutlineWithHitCount,
+  SourceOutlineWithHitCounts,
+} from "replay-next/src/suspense/OutlineHitCountsCache";
 
-export type FunctionDeclarationHits = FunctionOutline & {
-  hits?: number;
-};
+import { fuzzySearch } from "../../utils/function";
 
 export type HitCount = number;
 
-export function getOutlineSymbols(symbols: null | getSourceOutlineResult, filter: string) {
+export function getOutlineSymbols(symbols: SourceOutlineWithHitCounts, filter: string) {
   if (!symbols) {
     return null;
   }
@@ -25,7 +26,7 @@ export function getOutlineSymbols(symbols: null | getSourceOutlineResult, filter
 
   const functionsByClass = groupBy(filteredFunctions, func => func.className || "");
 
-  return classes.reduce((funcs: Array<ClassOutline | FunctionOutline>, classSymbol) => {
+  return classes.reduce((funcs: Array<ClassOutline | FunctionOutlineWithHitCount>, classSymbol) => {
     if (classSymbol.name) {
       const classFuncs = functionsByClass[classSymbol.name];
       if (classFuncs?.length > 0) {

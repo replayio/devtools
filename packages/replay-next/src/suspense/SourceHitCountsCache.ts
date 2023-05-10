@@ -104,7 +104,7 @@ export const sourceHitCountsCache = createFocusIntervalCache<
       return [...hitCounts.entries()];
     } catch (error) {
       if (
-        !isCommandError(error, ProtocolError.TooManyLocationsToPerformAnalysis) &&
+        !isCommandError(error, ProtocolError.TooManyLocations) &&
         !isCommandError(error, ProtocolError.LinkerDoesNotSupportAction)
       ) {
         throw error;
