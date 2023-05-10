@@ -63,7 +63,7 @@ jobs:
         run: yarn dev &
         working-directory: packages/replay-next
       - name: Wait until server is up
-        run: npx wait-on --timeout=60000 http-get://localhost:3000
+        run: npx wait-on --timeout=60000 http-get://127.0.0.1:3000
       - name: Run playwright tests
         run: yarn test:ci --reporter @replayio/playwright/reporter,line
         working-directory: packages/replay-next/playwright
