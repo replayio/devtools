@@ -20,7 +20,10 @@ import { useImperativeCacheValue } from "suspense";
 
 import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
-import { outlineHitCountsCache } from "replay-next/src/suspense/OutlineHitCountsCache";
+import {
+  SourceOutlineWithHitCounts,
+  outlineHitCountsCache,
+} from "replay-next/src/suspense/OutlineHitCountsCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { toPointRange } from "shared/utils/time";
 import Spinner from "ui/components/shared/Spinner";
@@ -43,7 +46,7 @@ export function SourceOutline({
 }: {
   cursorPosition: Location | null;
   selectedSource: SourceDetails | null;
-  symbols: getSourceOutlineResult | null;
+  symbols: SourceOutlineWithHitCounts | null;
 }) {
   const dispatch = useAppDispatch();
   const cx = useAppSelector(getContext);
@@ -179,7 +182,7 @@ export default function SourceOutlineWrapper() {
   const replayClient = useContext(ReplayClientContext);
   const { range: focusRange } = useContext(FocusContext);
 
-  let symbols: getSourceOutlineResult | null = null;
+  let symbols: SourceOutlineWithHitCounts | null = null;
   const symbolsCacheValue = useImperativeCacheValue(
     outlineHitCountsCache,
     replayClient,

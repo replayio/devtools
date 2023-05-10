@@ -1,10 +1,10 @@
 import classnames from "classnames";
 import React from "react";
 
+import { FunctionOutlineWithHitCount } from "replay-next/src/suspense/OutlineHitCountsCache";
 import { Redacted } from "ui/components/Redacted";
 
 import PreviewFunction from "../shared/PreviewFunction";
-import { FunctionDeclarationHits } from "./getOutlineSymbols";
 
 export const SourceOutlineFunction = React.memo(function OutlineFunction({
   isFocused,
@@ -12,8 +12,8 @@ export const SourceOutlineFunction = React.memo(function OutlineFunction({
   onSelect,
 }: {
   isFocused: boolean;
-  func: FunctionDeclarationHits;
-  onSelect?: (func: FunctionDeclarationHits) => void;
+  func: FunctionOutlineWithHitCount;
+  onSelect?: (func: FunctionOutlineWithHitCount) => void;
 }) {
   return (
     <li
