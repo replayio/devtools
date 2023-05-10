@@ -261,7 +261,8 @@ export async function sendMessage<M extends CommandMethods>(
     if (
       !noCallerStackTrace &&
       !noCallerStackTracesForErrorCodes.has(code) &&
-      !(code === ProtocolError.CommandFailed && noCallerStackTracesForFailedCommands.has(method))
+      !(code === ProtocolError.CommandFailed && noCallerStackTracesForFailedCommands.has(method)) &&
+      !(code === ProtocolError.TooManyLocations && method === "Debugger.getHitCounts")
     ) {
       captureException(callerStackTrace, { extra: { code, message, method, params } });
     }
