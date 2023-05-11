@@ -44,10 +44,9 @@ const projectSlug = "replay";
     },
   });
 
-  const text = await response.text();
-  console.log(`Response: ${text}`);
-
   if (response.status !== 200) {
+    const text = await response.text();
+
     console.error(
       `Status check failed (server error)\n  url: ${url}\n  status: ${response.status}\n  response: ${text}`
     );
