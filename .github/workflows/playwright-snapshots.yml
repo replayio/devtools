@@ -52,6 +52,11 @@ jobs:
         run: yarn install
         shell: bash
         working-directory: packages/replay-next
+      - name: Install workflow script dependencies
+        if: always()
+        run: yarn install
+        shell: bash
+        working-directory: packages/delta
       - name: Install Playwright packages
         run: yarn install
         shell: bash
@@ -74,7 +79,7 @@ jobs:
       - name: Upload results
         if: always()
         run: ./uploadSnapshots.js
-        working-directory: packages/replay-next
+        working-directory: packages/delta
       - name: Upload Replays
         if: always()
         uses: replayio/action-upload@v0.4.7
@@ -89,23 +94,10 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-      # Get the yarn cache path.
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
-      - name: Restore yarn cache
-        uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: |
-            ${{ steps.yarn-cache-dir-path.outputs.dir }}
-            **/node_modules
-          key: yarn-cache-folder-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: "yarn-cache-folder-"
-      - name: Install packages
+      - name: Install workflow script dependencies
         run: yarn install
         shell: bash
-        working-directory: packages/replay-next
+        working-directory: packages/delta
       - name: Update check
         run: ./updateCheck.js
-        working-directory: packages/replay-next
+        working-directory: packages/delta

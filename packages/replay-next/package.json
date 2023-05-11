@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@actions/github": "^5.1.1",
     "@codemirror/lang-html": "^6.1.2",
     "@codemirror/lang-javascript_replay_next": "npm:@codemirror/lang-javascript@6.1.0",
     "@codemirror/lang-json": "^6.0.0",
@@ -36,7 +35,6 @@
     "@types/uuid": "^7.0.3",
     "jest": "^28.0.2",
     "jest-environment-jsdom": "^28.0.2",
-    "node-fetch": "^2.0.0",
     "playwright-chromium": "^1.23.1",
     "typescript": "5.0.2"
   },
@@ -46,5 +44,9 @@
     "start": "next start",
     "test": "jest",
     "lint": "next lint"
-  }
+  },
+  "main": "jest.config.js",
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
