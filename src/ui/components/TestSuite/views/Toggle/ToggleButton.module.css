@@ -23,10 +23,15 @@
   padding: 0.5rem 1rem;
   font-size: 0.75em;
   color: var(--tab-standard-color);
+  margin-right: 0.25rem;
+}
+
+.ToggleButton:last-child {
+  margin-right: 0;
 }
 
 .Active {
-  background: var(--testsuites-steps-bgcolor);
+  background: var(--testsuites-steps-toggle-bgcolor);
   color: var(--tab-selected-color);
   font-weight: 400;
 }
