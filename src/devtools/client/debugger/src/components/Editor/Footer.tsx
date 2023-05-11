@@ -22,7 +22,7 @@ function SourceFooter() {
   return (
     <div className="source-footer-wrapper">
       <div className="source-footer">
-        <ErrorBoundary>
+        <ErrorBoundary fallback={<div className="error">An error occurred while replaying</div>}>
           <Suspense>
             <SourcemapToggleSuspends cursorPosition={cursorPosition} />
             <SourcemapVisualizerLinkSuspends cursorPosition={cursorPosition} />
