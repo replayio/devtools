@@ -17,6 +17,7 @@ env:
 
 jobs:
   run_tests:
+    name: "Playwright Snapshots: Run tests"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -74,10 +75,6 @@ jobs:
         if: always()
         run: ./uploadSnapshots.js
         working-directory: packages/replay-next
-      - name: Update check
-        if: always()
-        run: ./updateCheck.js
-        working-directory: packages/replay-next
       - name: Upload Replays
         if: always()
         uses: replayio/action-upload@v0.4.7
@@ -85,3 +82,30 @@ jobs:
           api-key: rwk_4mEiT150uOHyLQiQvZfPZiNjmBe4NrOXOm9yG9nS794
           filter: ${{ 'function($v) { $v.metadata.test.result = "failed" }' }}
           public: true
+  update_check:
+    name: "Playwright Snapshots: Update check status"
+    runs-on: ubuntu-latest
+    needs: [run_tests]
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      # Get the yarn cache path.
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+      - name: Restore yarn cache
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            **/node_modules
+          key: yarn-cache-folder-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: "yarn-cache-folder-"
+      - name: Install packages
+        run: yarn install
+        shell: bash
+        working-directory: packages/replay-next
+      - name: Update check
+        run: ./updateCheck.js
+        working-directory: packages/replay-next
