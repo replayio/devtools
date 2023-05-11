@@ -1,0 +1,8 @@
+{
+  "name": "delta",
+  "packageManager": "yarn@3.2.1",
+  "devDependencies": {
+    "@actions/github": "^5.1.1",
+    "node-fetch": "^2.0.0"
+  }
+}

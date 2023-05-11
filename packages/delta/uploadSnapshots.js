@@ -37,7 +37,7 @@ function getFiles(dir) {
 }
 
 (async () => {
-  const dir = "./playwright/visuals";
+  const dir = "../replay-next/playwright/visuals";
   const files = getFiles(dir);
   if (files.length == 0) {
     console.error(`Skipping: No files found in ${dir}`);
