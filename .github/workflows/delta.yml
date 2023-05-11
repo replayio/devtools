@@ -1,4 +1,4 @@
-name: "Playwright Snapshots"
+name: "Delta"
 
 on:
   push:
@@ -52,11 +52,6 @@ jobs:
         run: yarn install
         shell: bash
         working-directory: packages/replay-next
-      - name: Install workflow script dependencies
-        if: always()
-        run: yarn install
-        shell: bash
-        working-directory: packages/delta
       - name: Install Playwright packages
         run: yarn install
         shell: bash
@@ -79,7 +74,7 @@ jobs:
       - name: Upload results
         if: always()
         run: ./uploadSnapshots.js
-        working-directory: packages/delta
+        working-directory: packages/replay-next
       - name: Upload Replays
         if: always()
         uses: replayio/action-upload@v0.4.7
@@ -87,17 +82,3 @@ jobs:
           api-key: rwk_4mEiT150uOHyLQiQvZfPZiNjmBe4NrOXOm9yG9nS794
           filter: ${{ 'function($v) { $v.metadata.test.result = "failed" }' }}
           public: true
-  update_check:
-    name: "Update check status"
-    runs-on: ubuntu-latest
-    needs: [run_tests]
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v2
-      - name: Install workflow script dependencies
-        run: yarn install
-        shell: bash
-        working-directory: packages/delta
-      - name: Update check
-        run: ./updateCheck.js
-        working-directory: packages/delta
