@@ -30,8 +30,8 @@ import {
   POINT_BEHAVIOR_DISABLED,
   POINT_BEHAVIOR_DISABLED_TEMPORARILY,
   POINT_BEHAVIOR_ENABLED,
-  Point,
 } from "shared/client/types";
+import { Point } from "shared/client/types";
 
 import ColumnBreakpointMarker from "./ColumnBreakpointMarker";
 import CurrentLineHighlight from "./CurrentLineHighlight";
@@ -71,7 +71,7 @@ const SourceListRow = memo(
     const { currentUserInfo } = useContext(SessionContext);
     const { setCursorLocation } = useContext(SourcesContext);
     const { isTransitionPending: isFocusRangePending } = useContext(FocusContext);
-    const { addPoint, deletePoints, editPendingPoint, editPointBehavior } =
+    const { addPoint, deletePoints, editPendingPointText, editPointBehavior } =
       useContext(PointsContext);
     const [searchState] = useContext(SourceSearchContext);
 
@@ -444,7 +444,7 @@ const SourceListRow = memo(
                   addPoint={addPoint}
                   buttonClassName={styles.HoverButton}
                   deletePoints={deletePoints}
-                  editPendingPoint={editPendingPoint}
+                  editPendingPointText={editPendingPointText}
                   editPointBehavior={editPointBehavior}
                   iconClassName={styles.HoverButtonIcon}
                   lineHitCounts={lineHitCounts}

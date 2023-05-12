@@ -9,7 +9,7 @@ import { KeyboardModifiersContext } from "replay-next/src/contexts/KeyboardModif
 import {
   AddPoint,
   DeletePoints,
-  EditPendingPoint,
+  EditPendingPointText,
   EditPointBehavior,
 } from "replay-next/src/contexts/points/types";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
@@ -38,7 +38,7 @@ export default function HoverButton({
   addPoint,
   buttonClassName,
   deletePoints,
-  editPendingPoint,
+  editPendingPointText,
   editPointBehavior,
   iconClassName,
   lineHitCounts,
@@ -50,7 +50,7 @@ export default function HoverButton({
   addPoint: AddPoint;
   buttonClassName: string;
   deletePoints: DeletePoints;
-  editPendingPoint: EditPendingPoint;
+  editPendingPointText: EditPendingPointText;
   editPointBehavior: EditPointBehavior;
   iconClassName: string;
   lineHitCounts: LineHitCounts | null;
@@ -144,7 +144,7 @@ export default function HoverButton({
       };
 
       if (point) {
-        editPendingPoint(point.key, { content });
+        editPendingPointText(point.key, { content });
         editPointBehavior(
           point.key,
           { shouldLog: POINT_BEHAVIOR_ENABLED },

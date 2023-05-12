@@ -120,11 +120,11 @@ function PointPanelWithHitPoints({
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
   const {
-    discardPendingPoint,
-    editPendingPoint,
+    discardPendingPointText,
+    editPendingPointText,
     editPointBehavior,
     pointBehaviorsForDefaultPriority: pointBehaviors,
-    savePendingPoint,
+    savePendingPointText,
   } = useContext(PointsContext);
   const client = useContext(ReplayClientContext);
   const { accessToken, currentUserInfo, recordingId, trackEvent } = useContext(SessionContext);
@@ -189,12 +189,12 @@ function PointPanelWithHitPoints({
     }
 
     if (hasCondition) {
-      editPendingPoint(key, { condition: null });
+      editPendingPointText(key, { condition: null });
     } else {
       if (!isEditing) {
         startEditing("condition");
       }
-      editPendingPoint(key, { condition: "" });
+      editPendingPointText(key, { condition: "" });
     }
   };
 
@@ -261,23 +261,23 @@ function PointPanelWithHitPoints({
 
   const onCancel = () => {
     setIsEditing(false);
-    discardPendingPoint(key);
+    discardPendingPointText(key);
   };
 
   const onEditableContentChange = (newContent: string) => {
     trackEvent("breakpoint.set_log");
-    editPendingPoint(key, { content: newContent });
+    editPendingPointText(key, { content: newContent });
   };
 
   const onEditableConditionChange = (newCondition: string) => {
     trackEvent("breakpoint.set_condition");
-    editPendingPoint(key, { condition: newCondition });
+    editPendingPointText(key, { condition: newCondition });
   };
 
   const onSubmit = () => {
     if (isConditionValid && isContentValid) {
       setIsEditing(false);
-      savePendingPoint(key);
+      savePendingPointText(key);
       dismissEditBreakpointNag();
     }
   };

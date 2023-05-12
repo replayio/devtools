@@ -16,7 +16,7 @@ export default function useDeletePoints({
   graphQLClient,
   setLocalPoints,
   setLocalPointBehaviors,
-  setPendingPoints,
+  setPendingPointText,
   setRemotePoints,
   trackEvent,
 }: {
@@ -25,7 +25,9 @@ export default function useDeletePoints({
   graphQLClient: GraphQLClientInterface;
   setLocalPoints: SetLocalPoints;
   setLocalPointBehaviors: SetLocalPointBehaviors;
-  setPendingPoints: Dispatch<SetStateAction<Map<PointKey, Pick<Point, "condition" | "content">>>>;
+  setPendingPointText: Dispatch<
+    SetStateAction<Map<PointKey, Pick<Point, "condition" | "content">>>
+  >;
   setRemotePoints: Dispatch<SetStateAction<Point[]>>;
   trackEvent: TrackEvent;
 }): DeletePoints {
@@ -52,7 +54,7 @@ export default function useDeletePoints({
       });
 
       // Delete pending point text edits
-      setPendingPoints(prev => {
+      setPendingPointText(prev => {
         const cloned = new Map(prev.entries());
         keys.forEach(key => cloned.delete(key));
         return cloned;
@@ -89,7 +91,7 @@ export default function useDeletePoints({
       graphQLClient,
       setLocalPoints,
       setLocalPointBehaviors,
-      setPendingPoints,
+      setPendingPointText,
       setRemotePoints,
       trackEvent,
     ]

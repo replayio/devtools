@@ -3,38 +3,40 @@ import { Dispatch, SetStateAction, useCallback } from "react";
 import { Point, PointKey } from "shared/client/types";
 
 import { CommittedValuesRef } from "../PointsContext";
-import { EditPendingPoint } from "../types";
+import { EditPendingPointText } from "../types";
 
-export default function useEditPendingPoint({
+export default function useEditPendingPointText({
   committedValuesRef,
-  setPendingPoints,
+  setPendingPointText,
 }: {
   committedValuesRef: CommittedValuesRef;
-  setPendingPoints: Dispatch<SetStateAction<Map<PointKey, Pick<Point, "condition" | "content">>>>;
-}): EditPendingPoint {
-  return useCallback<EditPendingPoint>(
+  setPendingPointText: Dispatch<
+    SetStateAction<Map<PointKey, Pick<Point, "condition" | "content">>>
+  >;
+}): EditPendingPointText {
+  return useCallback<EditPendingPointText>(
     (key: PointKey, partialPoint: Partial<Pick<Point, "condition" | "content">>) => {
-      const { pendingPoints, points } = committedValuesRef.current;
-      const prevPendingPoint = pendingPoints.get(key);
+      const { pendingPointText, points } = committedValuesRef.current;
+      const prevPendingPoint = pendingPointText.get(key);
       const prevSavedPoint = points.find(point => point.key === key);
 
-      const point: Point = {
+      const pendingPoint: Point = {
         ...(prevSavedPoint as Point),
         ...prevPendingPoint,
         ...partialPoint,
       };
 
-      setPendingPoints(prev => {
+      setPendingPointText(prev => {
         const cloned = new Map(prev.entries());
         // Store only the Point attributes that this hook is concerned with;
         // other attributes may be stale
         cloned.set(key, {
-          condition: point.condition,
-          content: point.content,
+          condition: pendingPoint.condition,
+          content: pendingPoint.content,
         });
         return cloned;
       });
     },
-    [committedValuesRef, setPendingPoints]
+    [committedValuesRef, setPendingPointText]
   );
 }
