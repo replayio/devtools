@@ -284,11 +284,11 @@ const Passport = () => {
 
   return (
     <div className={`${styles.PassportBoxWrapper} flex h-screen flex-col`}>
-      <div class="my-2 p-2">
+      <div className="my-2 p-2">
         <img src={`/images/passport/passportHeader.svg`} className={`w-full px-1`} />
       </div>
-      <div class="flex-grow overflow-auto">
-        <div class="p-2">
+      <div className="flex-grow overflow-auto">
+        <div className="p-2">
           <div className={styles.sectionsContainer}>
             {sections.map((section, sectionIndex) => (
               <React.Fragment key={sectionIndex}>
@@ -299,7 +299,7 @@ const Passport = () => {
         </div>
       </div>
 
-      <div class="p-1">
+      <div className="p-1">
         <img
           src={selectedItem.videoUrl}
           className={`${styles.videoExample} w-full object-cover`}
