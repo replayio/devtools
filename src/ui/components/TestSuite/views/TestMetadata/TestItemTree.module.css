@@ -1,18 +1,35 @@
 .Tree {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
 }
 .Tree[data-nested] {
-  padding-left: 0.75rem;
 }
 
 .List {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  padding-left: 0.75rem;
 }
 
 .Scope {
+}
+
+/* Hierarchy styles */
+
+.Tree > .Tree {
+  font-size: 16px;
+}
+
+.Tree > .Tree > .Tree {
+  color: var(--body-color);
+  font-size: 13px;
+}
+
+.Tree > .Tree > .Tree > DIV {
+  font-size: var(--font-size-small);
+  color: var(--theme-base-60);
+  text-transform: uppercase;
+  font-weight: bold;
+  line-height: 2rem;
+  margin-top: 0.75rem;
 }
