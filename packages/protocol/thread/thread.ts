@@ -18,8 +18,6 @@ import {
   PauseDescription,
   PauseId,
   RecordingId,
-  RequestEventInfo,
-  RequestInfo,
   ScreenShot,
   SessionId,
   SourceId,
@@ -28,8 +26,6 @@ import {
   TimeStamp,
   Value,
   findAnnotationsResult,
-  requestBodyData,
-  responseBodyData,
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
@@ -39,7 +35,7 @@ import { areRangesEqual } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { client } from "../socket";
-import { EventEmitter, assert, defer, locationsInclude } from "../utils";
+import { EventEmitter, assert, defer } from "../utils";
 
 export interface RecordingDescription {
   duration: TimeStamp;
@@ -339,112 +335,6 @@ class _ThreadFront {
     } else {
       return { exception: null, returned: null };
     }
-  }
-
-  private async _findResumeTarget(
-    findTargetCommand: FindTargetCommand,
-    {
-      point,
-      loadedRegions,
-      sourceId,
-      locationsToSkip,
-    }: ResumeOperationParams & { point: ExecutionPoint }
-  ) {
-    assert(this.sessionId, "no sessionId");
-
-    if (
-      loadedRegions.loaded.every(
-        region =>
-          BigInt(point) < BigInt(region.begin.point) || BigInt(point) > BigInt(region.end.point)
-      )
-    ) {
-      return null;
-    }
-
-    await this.ensureAllSources();
-
-    while (true) {
-      let target: PauseDescription;
-      try {
-        const resp = await findTargetCommand({ point }, this.sessionId);
-        target = resp.target;
-        this.updateMappedLocation(target.frame);
-      } catch {
-        return null;
-      }
-
-      if (
-        loadedRegions.loaded.every(
-          region =>
-            BigInt(target!.point) < BigInt(region.begin.point) ||
-            BigInt(target!.point) > BigInt(region.end.point)
-        )
-      ) {
-        return null;
-      }
-
-      if (locationsToSkip) {
-        const location = target.frame?.find(location => location.sourceId === sourceId);
-        if (location && locationsInclude(locationsToSkip, location)) {
-          point = target.point;
-          continue;
-        }
-      }
-
-      return target;
-    }
-  }
-
-  private async _resumeOperation(
-    command: FindTargetCommand,
-    {
-      point: selectedPoint,
-      sourceId: selectedSourceId,
-      loadedRegions,
-      locationsToSkip,
-    }: ResumeOperationParams
-  ) {
-    this.emit("resumed");
-
-    const point = selectedPoint || this.currentPoint;
-    const resumeTarget = await this._findResumeTarget(command, {
-      point,
-      loadedRegions,
-      sourceId: selectedSourceId,
-      locationsToSkip,
-    });
-
-    if (resumeTarget) {
-      const { point, time, frame } = resumeTarget!;
-      this.timeWarp(point, time, !!frame);
-    } else {
-      this.emit("paused", {
-        point: this.currentPoint,
-        time: this.currentTime,
-        openSource: true,
-      });
-    }
-
-    return resumeTarget;
-  }
-
-  rewind(params: ResumeOperationParams) {
-    return this._resumeOperation(client.Debugger.findRewindTarget, params);
-  }
-  resume(params: ResumeOperationParams) {
-    return this._resumeOperation(client.Debugger.findResumeTarget, params);
-  }
-  reverseStepOver(params: ResumeOperationParams) {
-    return this._resumeOperation(client.Debugger.findReverseStepOverTarget, params);
-  }
-  stepOver(params: ResumeOperationParams) {
-    return this._resumeOperation(client.Debugger.findStepOverTarget, params);
-  }
-  stepIn(params: ResumeOperationParams) {
-    return this._resumeOperation(client.Debugger.findStepInTarget, params);
-  }
-  stepOut(params: ResumeOperationParams) {
-    return this._resumeOperation(client.Debugger.findStepOutTarget, params);
   }
 
   // Replace the sourceId in a location with the first corresponding sourceId

@@ -18,6 +18,7 @@ import {
   ObjectId,
   ObjectPreviewLevel,
   PauseData,
+  PauseDescription,
   PauseId,
   PointDescription,
   PointLimits,
@@ -170,6 +171,12 @@ export interface ReplayClientInterface {
     onRequestBodyData: (body: requestBodyData) => void
   ): Promise<void>;
   findPoints(selector: PointSelector, limits?: PointLimits): Promise<PointDescription[]>;
+  findRewindTarget(point: ExecutionPoint): Promise<PauseDescription>;
+  findResumeTarget(point: ExecutionPoint): Promise<PauseDescription>;
+  findStepInTarget(point: ExecutionPoint): Promise<PauseDescription>;
+  findStepOutTarget(point: ExecutionPoint): Promise<PauseDescription>;
+  findStepOverTarget(point: ExecutionPoint): Promise<PauseDescription>;
+  findReverseStepOverTarget(point: ExecutionPoint): Promise<PauseDescription>;
   findSources(): Promise<Source[]>;
   getAllEventHandlerCounts(range: PointRange | null): Promise<Record<string, number>>;
   getAllFrames(pauseId: PauseId): Promise<getAllFramesResult>;

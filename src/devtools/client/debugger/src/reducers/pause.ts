@@ -23,6 +23,7 @@ import { SourceDetails } from "ui/reducers/sources";
 import { getContextFromAction } from "ui/setup/redux/middleware/context";
 import type { UIState } from "ui/state";
 import { features } from "ui/utils/prefs";
+import { resumeOperations } from "ui/utils/resumeOperations";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 
 export interface Context {
@@ -129,7 +130,7 @@ export const executeCommandOperation = createAsyncThunk<
   const symbols = sourceId ? await sourceOutlineCache.readAsync(replayClient, sourceId) : undefined;
   const nextPoint = await getResumePoint(replayClient, state, command);
 
-  const resp = await ThreadFront[command]({
+  const resp = await resumeOperations[command](replayClient, {
     point: nextPoint,
     sourceId,
     loadedRegions,
