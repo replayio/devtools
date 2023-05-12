@@ -283,49 +283,28 @@ const Passport = () => {
   }, [selectedItem.completed]);
 
   return (
-    <div className={styles.PassportBoxWrapper}>
-      <div className={styles.PassportBoxGradient}>
-        <div className={styles.PassportBox}>
-          <div className="p-0 pt-3">
-            <img src={`/images/passport/passportHeader.svg`} className={`mb-5 w-full px-1`} />
-            <div
-              className={styles.PassportBoxInternal}
-              style={{
-                height: videoHeight !== null ? `calc(100vh - 200px - ${videoHeight}px)` : "100%",
-              }}
-            >
-              <div className={styles.sectionsContainer}>
-                {sections.map((section, sectionIndex) => (
-                  <React.Fragment key={sectionIndex}>
-                    {renderSection(section, sectionIndex)}
-                  </React.Fragment>
-                ))}
-              </div>
-            </div>
+    <div className={`${styles.PassportBoxWrapper} flex h-screen flex-col`}>
+      <div class="my-2 p-2">
+        <img src={`/images/passport/passportHeader.svg`} className={`w-full px-1`} />
+      </div>
+      <div class="flex-grow overflow-auto">
+        <div class="p-2">
+          <div className={styles.sectionsContainer}>
+            {sections.map((section, sectionIndex) => (
+              <React.Fragment key={sectionIndex}>
+                {renderSection(section, sectionIndex)}
+              </React.Fragment>
+            ))}
           </div>
         </div>
-        {selectedItem.completed && (
-          <img
-            src={`/images/passport/${selectedItem.imageBaseName}-complete.png`}
-            className={styles.largeCompletedImage}
-            style={{
-              zIndex: 0,
-              opacity: 0.25,
-              bottom: `${randomBottom}px`,
-              right: `${randomRight}px`,
-              transform: `rotate(${randomRotation}deg)`,
-            }}
-          />
-        )}
-        <div className={styles.videoExampleWrapper}>
-          <div style={{ position: "relative" }}>
-            <img
-              src={selectedItem.videoUrl}
-              className={styles.videoExample}
-              ref={videoExampleRef}
-            />
-          </div>
-        </div>
+      </div>
+
+      <div class="p-1">
+        <img
+          src={selectedItem.videoUrl}
+          className={`${styles.videoExample} w-full object-cover`}
+          ref={videoExampleRef}
+        />
       </div>
     </div>
   );
