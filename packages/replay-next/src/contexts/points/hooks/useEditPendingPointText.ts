@@ -28,7 +28,12 @@ export default function useEditPendingPointText({
 
       setPendingPointText(prev => {
         const cloned = new Map(prev.entries());
-        cloned.set(key, pendingPoint);
+        // Store only the Point attributes that this hook is concerned with;
+        // other attributes may be stale
+        cloned.set(key, {
+          condition: pendingPoint.condition,
+          content: pendingPoint.content,
+        });
         return cloned;
       });
     },
