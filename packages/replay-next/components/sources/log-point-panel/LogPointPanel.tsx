@@ -308,6 +308,7 @@ function PointPanelWithHitPoints({
             <div
               className={isConditionValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}
               data-logging-disabled={!shouldLog || !editable || undefined}
+              data-test-name="PointPanel-ConditionalWrapper"
               onClick={
                 showTooManyPointsMessage && editable ? undefined : () => startEditing("condition")
               }
@@ -382,6 +383,7 @@ function PointPanelWithHitPoints({
           <div
             className={isContentValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}
             data-logging-disabled={!shouldLog || !editable || undefined}
+            data-test-name="PointPanel-ContentWrapper"
             onClick={
               showTooManyPointsMessage && editable ? undefined : () => startEditing("content")
             }

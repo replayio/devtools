@@ -50,6 +50,7 @@ export default function BadgePicker({
     <div className={styles.BadgePicker} data-invalid={invalid || undefined}>
       <button
         className={styles.BadgePickerButton}
+        data-test-id={`BadgeButtonButton-${point.location.line}`}
         data-test-name={isOpen ? "BadgeButtonButton-default" : "BadgePickerButton"}
         data-test-state={point.badge || "default"}
         disabled={disabled}
@@ -64,11 +65,36 @@ export default function BadgePicker({
       {isInitial || (
         <div className={isOpen ? styles.BadgePickerOpen : styles.BadgePickerClosed} key={state}>
           <div className={styles.BadgePickerPopOut} data-test-name="BadgePickerPopout">
-            <BadgePickerButton currentBadge={point.badge} targetBadge="unicorn" toggle={toggle} />
-            <BadgePickerButton currentBadge={point.badge} targetBadge="green" toggle={toggle} />
-            <BadgePickerButton currentBadge={point.badge} targetBadge="yellow" toggle={toggle} />
-            <BadgePickerButton currentBadge={point.badge} targetBadge="orange" toggle={toggle} />
-            <BadgePickerButton currentBadge={point.badge} targetBadge="purple" toggle={toggle} />
+            <BadgePickerButton
+              currentBadge={point.badge}
+              lineNumber={point.location.line}
+              targetBadge="unicorn"
+              toggle={toggle}
+            />
+            <BadgePickerButton
+              currentBadge={point.badge}
+              lineNumber={point.location.line}
+              targetBadge="green"
+              toggle={toggle}
+            />
+            <BadgePickerButton
+              currentBadge={point.badge}
+              lineNumber={point.location.line}
+              targetBadge="yellow"
+              toggle={toggle}
+            />
+            <BadgePickerButton
+              currentBadge={point.badge}
+              lineNumber={point.location.line}
+              targetBadge="orange"
+              toggle={toggle}
+            />
+            <BadgePickerButton
+              currentBadge={point.badge}
+              lineNumber={point.location.line}
+              targetBadge="purple"
+              toggle={toggle}
+            />
           </div>
         </div>
       )}
@@ -78,10 +104,12 @@ export default function BadgePicker({
 
 function BadgePickerButton({
   currentBadge,
+  lineNumber,
   targetBadge,
   toggle,
 }: {
   currentBadge: Badge | null;
+  lineNumber: number;
   targetBadge: Badge | null;
   toggle: (badge: Badge) => void;
 }) {
@@ -98,6 +126,7 @@ function BadgePickerButton({
       className={`${styles.BadgePickerButton} ${
         currentBadge === targetBadge ? styles.BadgePickerButtonCurrent : ""
       }`}
+      data-test-id={`BadgeButtonButton-${lineNumber}-${targetBadge || "default"}`}
       data-test-name={`BadgeButtonButton-${targetBadge || "default"}`}
       onClick={onClick}
     >

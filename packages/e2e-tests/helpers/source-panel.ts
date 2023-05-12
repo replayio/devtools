@@ -1,6 +1,8 @@
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
+import { Badge } from "shared/client/types";
+
 import { type as typeLexical } from "./lexical";
 import { openPauseInformationPanel } from "./pause-information-panel";
 import { openSource, openSourceExplorerPanel } from "./source-explorer-panel";
@@ -39,10 +41,50 @@ export async function addBreakpoint(
   await waitForBreakpoint(page, options);
 }
 
-export async function addConditional(
+export async function editBadge(
   page: Page,
   options: {
-    condition?: string;
+    badge: Badge | null;
+    lineNumber: number;
+  }
+) {
+  const { badge, lineNumber } = options;
+
+  await debugPrint(
+    page,
+    `Setting log-point badge "${chalk.bold(badge || "default")}"`,
+    "editBadge"
+  );
+
+  const line = await getSourceLine(page, lineNumber);
+  const badgePicker = await line.locator('[data-test-name="BadgePickerPopout"]');
+  const isBadgePickerOpen = await badgePicker.isVisible();
+  if (!isBadgePickerOpen) {
+    // HACK Work around Playwright "subtree intercepts pointer events" issue with Lexical
+    await page.evaluate(lineNumber => {
+      const button = document.querySelector(
+        `[data-test-id="BadgeButtonButton-${lineNumber}"]`
+      ) as HTMLButtonElement;
+      button.click();
+    }, lineNumber);
+  }
+
+  // HACK Work around Playwright "subtree intercepts pointer events" issue with Lexical
+  await page.evaluate(
+    ([lineNumber, badge]) => {
+      const button = document.querySelector(
+        `[data-test-id="BadgeButtonButton-${lineNumber}-${badge}"]`
+      ) as HTMLButtonElement;
+      button.click();
+    },
+    [lineNumber, badge]
+  );
+}
+
+export async function editConditional(
+  page: Page,
+  options: {
+    condition: string;
     lineNumber: number;
   }
 ) {
@@ -52,20 +94,18 @@ export async function addConditional(
   });
 
   const { condition, lineNumber } = options;
-  if (condition != null) {
-    await debugPrint(
-      page,
-      `Setting log point condition to "${chalk.bold(condition)}"`,
-      "addConditional"
-    );
+  await debugPrint(
+    page,
+    `Setting log-point condition to "${chalk.bold(condition)}"`,
+    "addConditional"
+  );
 
-    await typeLexical(
-      page,
-      `${getSourceLineSelector(lineNumber)} [data-test-name="PointPanel-ConditionInput"]`,
-      condition,
-      false
-    );
-  }
+  await typeLexical(
+    page,
+    `${getSourceLineSelector(lineNumber)} [data-test-name="PointPanel-ConditionInput"]`,
+    condition,
+    false
+  );
 }
 
 export async function jumpToLogPointHit(
@@ -210,6 +250,7 @@ export async function closeSource(page: Page, url: string): Promise<void> {
 export async function editLogPoint(
   page: Page,
   options: {
+    badge?: Badge | null;
     content?: string;
     condition?: string;
     lineNumber: number;
@@ -217,7 +258,7 @@ export async function editLogPoint(
     url?: string;
   }
 ) {
-  const { condition, content, lineNumber, saveAfterEdit = true, url } = options;
+  const { badge, condition, content, lineNumber, saveAfterEdit = true, url } = options;
 
   await debugPrint(
     page,
@@ -227,35 +268,37 @@ export async function editLogPoint(
     "editLogPoint"
   );
 
-  if (condition != null || content != null) {
-    const line = await getSourceLine(page, lineNumber);
+  const line = await getSourceLine(page, lineNumber);
 
+  if (badge !== undefined) {
+    await editBadge(page, { badge, lineNumber });
+  }
+
+  if (condition != null) {
+    await editConditional(page, { condition, lineNumber });
+  }
+
+  if (content != null) {
     const isEditing = await line.locator('[data-lexical-editor="true"]').isVisible();
     if (!isEditing) {
       await line.locator('[data-test-name="PointPanel-EditButton"]').click();
     }
 
-    if (condition != null) {
-      await addConditional(page, { condition, lineNumber });
-    }
+    await debugPrint(page, `Setting log-point content "${chalk.bold(content)}"`, "addLogpoint");
 
-    if (content != null) {
-      await debugPrint(page, `Setting log-point content "${chalk.bold(content)}"`, "addLogpoint");
+    await typeLexical(
+      page,
+      `${getSourceLineSelector(lineNumber)} [data-test-name="PointPanel-ContentInput"]`,
+      content,
+      false
+    );
+  }
 
-      await typeLexical(
-        page,
-        `${getSourceLineSelector(lineNumber)} [data-test-name="PointPanel-ContentInput"]`,
-        content,
-        false
-      );
-    }
-
-    if (saveAfterEdit) {
-      const saveButton = line.locator('[data-test-name="PointPanel-SaveButton"]');
-      await expect(saveButton).toBeEnabled();
-      await saveButton.click();
-      await saveButton.waitFor({ state: "detached" });
-    }
+  if (saveAfterEdit) {
+    const saveButton = line.locator('[data-test-name="PointPanel-SaveButton"]');
+    await expect(saveButton).toBeEnabled();
+    await saveButton.click();
+    await saveButton.waitFor({ state: "detached" });
   }
 }
 
@@ -663,7 +706,45 @@ export async function verifyLogpointStep(
     expect(actualStatus).toBe(expectedStatus);
   });
 }
+export async function verifyLogPointPanelContent(
+  page: Page,
+  options: {
+    badge?: Badge | null;
+    content?: string;
+    condition?: string;
+    lineNumber: number;
+    url?: string;
+  }
+) {
+  const { badge, condition, content, lineNumber, url } = options;
 
+  await debugPrint(
+    page,
+    url
+      ? `Verifying (pending) log-point at ${chalk.bold(`${url}:${lineNumber}`)}`
+      : `Verifying (pending) log-point at ${chalk.bold(`${lineNumber}`)}`,
+    "verifyLogPoint"
+  );
+
+  const line = await getSourceLine(page, lineNumber);
+
+  if (badge !== undefined) {
+    const button = await line.locator('[data-test-name="BadgePickerButton"]');
+    await expect(await button.getAttribute("data-test-state")).toBe(
+      badge === null ? "default" : badge
+    );
+  }
+
+  if (condition != null) {
+    const input = await line.locator('[data-test-name="PointPanel-ConditionalWrapper"]');
+    await expect(await input.textContent()).toBe(condition);
+  }
+
+  if (content != null) {
+    const input = await line.locator('[data-test-name="PointPanel-ContentWrapper"]');
+    await expect(await input.textContent()).toBe(content);
+  }
+}
 // TODO [FE-626] Rewrite this helper to reduce complexity.
 export async function waitForSelectedSource(page: Page, url: string) {
   await waitFor(async () => {
