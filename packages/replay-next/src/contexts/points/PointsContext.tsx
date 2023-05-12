@@ -207,7 +207,6 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   const editPointBadge = useCallback<EditPointBadge>(
     (key: PointKey, badge: Badge | null) => {
       saveLocalAndRemotePoints(key, { badge });
-      setPendingPointText;
     },
     [saveLocalAndRemotePoints]
   );
