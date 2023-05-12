@@ -12,6 +12,7 @@ import {
   ObjectId,
   ObjectPreviewLevel,
   PauseData,
+  PauseDescription,
   PauseId,
   PointDescription,
   PointPageLimits,
@@ -391,6 +392,42 @@ export class ReplayClient implements ReplayClientInterface {
 
     points.sort((a, b) => compareNumericStrings(a.point, b.point));
     return points;
+  }
+
+  async findRewindTarget(point: ExecutionPoint): Promise<PauseDescription> {
+    const sessionId = this.getSessionIdThrows();
+    const { target } = await client.Debugger.findRewindTarget({ point }, sessionId);
+    return target;
+  }
+
+  async findResumeTarget(point: ExecutionPoint): Promise<PauseDescription> {
+    const sessionId = this.getSessionIdThrows();
+    const { target } = await client.Debugger.findResumeTarget({ point }, sessionId);
+    return target;
+  }
+
+  async findStepInTarget(point: ExecutionPoint): Promise<PauseDescription> {
+    const sessionId = this.getSessionIdThrows();
+    const { target } = await client.Debugger.findStepInTarget({ point }, sessionId);
+    return target;
+  }
+
+  async findStepOutTarget(point: ExecutionPoint): Promise<PauseDescription> {
+    const sessionId = this.getSessionIdThrows();
+    const { target } = await client.Debugger.findStepOutTarget({ point }, sessionId);
+    return target;
+  }
+
+  async findStepOverTarget(point: ExecutionPoint): Promise<PauseDescription> {
+    const sessionId = this.getSessionIdThrows();
+    const { target } = await client.Debugger.findStepOverTarget({ point }, sessionId);
+    return target;
+  }
+
+  async findReverseStepOverTarget(point: ExecutionPoint): Promise<PauseDescription> {
+    const sessionId = this.getSessionIdThrows();
+    const { target } = await client.Debugger.findReverseStepOverTarget({ point }, sessionId);
+    return target;
   }
 
   async findSources(): Promise<Source[]> {
