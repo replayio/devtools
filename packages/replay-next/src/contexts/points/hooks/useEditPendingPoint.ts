@@ -3,35 +3,33 @@ import { Dispatch, SetStateAction, useCallback } from "react";
 import { Point, PointKey } from "shared/client/types";
 
 import { CommittedValuesRef } from "../PointsContext";
-import { EditPendingPointText } from "../types";
+import { EditPendingPoint } from "../types";
 
-export default function useEditPendingPointText({
+export default function useEditPendingPoint({
   committedValuesRef,
-  setPendingPointText,
+  setPendingPoints,
 }: {
   committedValuesRef: CommittedValuesRef;
-  setPendingPointText: Dispatch<
-    SetStateAction<Map<PointKey, Pick<Point, "condition" | "content">>>
-  >;
-}): EditPendingPointText {
-  return useCallback<EditPendingPointText>(
+  setPendingPoints: Dispatch<SetStateAction<Map<PointKey, Pick<Point, "condition" | "content">>>>;
+}): EditPendingPoint {
+  return useCallback<EditPendingPoint>(
     (key: PointKey, partialPoint: Partial<Pick<Point, "condition" | "content">>) => {
-      const { pendingPointText, points } = committedValuesRef.current;
-      const prevPendingPoint = pendingPointText.get(key);
+      const { pendingPoints, points } = committedValuesRef.current;
+      const prevPendingPoint = pendingPoints.get(key);
       const prevSavedPoint = points.find(point => point.key === key);
 
-      const pendingPoint: Point = {
+      const point: Point = {
         ...(prevSavedPoint as Point),
         ...prevPendingPoint,
         ...partialPoint,
       };
 
-      setPendingPointText(prev => {
+      setPendingPoints(prev => {
         const cloned = new Map(prev.entries());
-        cloned.set(key, pendingPoint);
+        cloned.set(key, point);
         return cloned;
       });
     },
-    [committedValuesRef, setPendingPointText]
+    [committedValuesRef, setPendingPoints]
   );
 }

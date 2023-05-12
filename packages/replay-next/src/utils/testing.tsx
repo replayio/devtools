@@ -129,15 +129,15 @@ export async function renderFocused(
     addPoint: jest.fn(),
     pointsTransitionPending: false,
     deletePoints: jest.fn(),
-    discardPendingPointText: jest.fn(),
-    editPendingPointText: jest.fn(),
+    discardPendingPoint: jest.fn(),
+    editPendingPoint: jest.fn(),
     editPointBadge: jest.fn(),
     editPointBehavior: jest.fn(),
     pointBehaviorsForSuspense: {},
     pointBehaviorsForDefaultPriority: {},
     pointsForSuspense: [],
     pointsForDefaultPriority: [],
-    savePendingPointText: jest.fn(),
+    savePendingPoint: jest.fn(),
     ...options?.pointsContext,
   };
 

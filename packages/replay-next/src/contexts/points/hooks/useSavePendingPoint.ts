@@ -1,34 +1,31 @@
 import { Dispatch, SetStateAction, useCallback } from "react";
 
-import { pointEquals } from "protocol/execution-point-utils";
 import { SetLocalPointBehaviors } from "replay-next/src/contexts/points/hooks/useLocalPointBehaviors";
 import { POINT_BEHAVIOR_ENABLED, Point, PointKey } from "shared/client/types";
 
 import { CommittedValuesRef } from "../PointsContext";
-import { SaveLocalAndRemotePoints, SaveOrDiscardPendingText } from "../types";
+import { SaveLocalAndRemotePoints, SaveOrDiscardPending } from "../types";
 
-export default function useSavePendingPointText({
+export default function useSavePendingPoint({
   committedValuesRef,
   saveLocalAndRemotePoints,
-  setPendingPointText,
+  setPendingPoints,
   setPointBehaviors,
 }: {
   committedValuesRef: CommittedValuesRef;
   saveLocalAndRemotePoints: SaveLocalAndRemotePoints;
-  setPendingPointText: Dispatch<
-    SetStateAction<Map<PointKey, Pick<Point, "condition" | "content">>>
-  >;
+  setPendingPoints: Dispatch<SetStateAction<Map<PointKey, Pick<Point, "condition" | "content">>>>;
   setPointBehaviors: SetLocalPointBehaviors;
 }) {
-  return useCallback<SaveOrDiscardPendingText>(
+  return useCallback<SaveOrDiscardPending>(
     (key: PointKey) => {
-      const { pendingPointText } = committedValuesRef.current;
-      const pendingPoint = pendingPointText.get(key);
+      const { pendingPoints } = committedValuesRef.current;
+      const pendingPoint = pendingPoints.get(key);
       if (pendingPoint) {
         saveLocalAndRemotePoints(key, pendingPoint);
       }
 
-      setPendingPointText(prev => {
+      setPendingPoints(prev => {
         const cloned = new Map(prev.entries());
         cloned.delete(key);
         return cloned;
@@ -45,6 +42,6 @@ export default function useSavePendingPointText({
         };
       });
     },
-    [committedValuesRef, saveLocalAndRemotePoints, setPendingPointText, setPointBehaviors]
+    [committedValuesRef, saveLocalAndRemotePoints, setPendingPoints, setPointBehaviors]
   );
 }

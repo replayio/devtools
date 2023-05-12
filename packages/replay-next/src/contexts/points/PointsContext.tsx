@@ -20,21 +20,21 @@ import useBreakpointIdsFromServer from "../../hooks/useBreakpointIdsFromServer";
 import { SessionContext } from "../SessionContext";
 import useAddPoint from "./hooks/useAddPoint";
 import useDeletePoints from "./hooks/useDeletePoints";
-import useDiscardPendingPointText from "./hooks/useDiscardPendingPointText";
-import useEditPendingPointText from "./hooks/useEditPendingPointText";
+import useDiscardPendingPoint from "./hooks/useDiscardPendingPoint";
+import useEditPendingPoint from "./hooks/useEditPendingPoint";
 import useEditPointBehavior from "./hooks/useEditPointBehavior";
 import useLocalPointBehaviors from "./hooks/useLocalPointBehaviors";
 import useLocalPoints from "./hooks/useLocalPoints";
-import useSavePendingPointText from "./hooks/useSavePendingPointText";
+import useSavePendingPoint from "./hooks/useSavePendingPoint";
 import {
   AddPoint,
   DeletePoints,
-  EditPendingPointText,
+  EditPendingPoint,
   EditPointBadge,
   EditPointBehavior,
   PointBehaviorsObject,
   SaveLocalAndRemotePoints,
-  SaveOrDiscardPendingText,
+  SaveOrDiscardPending,
 } from "./types";
 
 export type PointsContextType = {
@@ -72,16 +72,16 @@ export type PointsContextType = {
   // They must be explicitly saved or discarded once editing has finished.
   // Changes update SourceList points at normal priority (for editing UI)
   // but do not update Console points until/unless they are explicitly saved.
-  discardPendingPointText: SaveOrDiscardPendingText;
-  editPendingPointText: EditPendingPointText;
-  savePendingPointText: SaveOrDiscardPendingText;
+  discardPendingPoint: SaveOrDiscardPending;
+  editPendingPoint: EditPendingPoint;
+  savePendingPoint: SaveOrDiscardPending;
 };
 
 export const PointsContext = createContext<PointsContextType>(null as any);
 
 export type CommittedValuesRef = {
   current: {
-    pendingPointText: Map<PointKey, Pick<Point, "condition" | "content">>;
+    pendingPoints: Map<PointKey, Pick<Point, "condition" | "content">>;
     points: Point[];
     pointBehaviors: PointBehaviorsObject;
   };
@@ -121,7 +121,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     deferredPoints !== savedPoints || deferredPointBehaviors !== localPointBehaviors;
 
   // Pending point text edits go here until they're either saved or discarded.
-  const [pendingPointText, setPendingPointText] = useState<
+  const [pendingPoints, setPendingPoints] = useState<
     Map<PointKey, Pick<Point, "condition" | "content">>
   >(new Map());
 
@@ -130,7 +130,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   const pointForDefaultPriority = useMemo<Point[]>(
     () =>
       savedPoints.map(point => {
-        const partialPoint = pendingPointText.get(point.key);
+        const partialPoint = pendingPoints.get(point.key);
         if (partialPoint) {
           return {
             ...point,
@@ -140,17 +140,17 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
           return point;
         }
       }),
-    [pendingPointText, savedPoints]
+    [pendingPoints, savedPoints]
   );
 
   // Track the latest committed values for e.g. the editPointBadge function.
   const committedValuesRef = useRef<CommittedValuesRef["current"]>({
-    pendingPointText: new Map(),
+    pendingPoints: new Map(),
     points: [],
     pointBehaviors: {},
   });
   useEffect(() => {
-    committedValuesRef.current.pendingPointText = pendingPointText;
+    committedValuesRef.current.pendingPoints = pendingPoints;
     committedValuesRef.current.pointBehaviors = localPointBehaviors;
     committedValuesRef.current.points = savedPoints;
   });
@@ -171,7 +171,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     graphQLClient,
     setLocalPoints,
     setLocalPointBehaviors,
-    setPendingPointText,
+    setPendingPoints,
     setRemotePoints,
     trackEvent,
   });
@@ -217,16 +217,16 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     trackEvent,
   });
 
-  const editPendingPointText = useEditPendingPointText({
+  const editPendingPoint = useEditPendingPoint({
     committedValuesRef,
-    setPendingPointText,
+    setPendingPoints,
   });
 
-  const discardPendingPointText = useDiscardPendingPointText({ setPendingPointText });
-  const savePendingPointText = useSavePendingPointText({
+  const discardPendingPoint = useDiscardPendingPoint({ setPendingPoints });
+  const savePendingPoint = useSavePendingPoint({
     committedValuesRef,
     saveLocalAndRemotePoints,
-    setPendingPointText,
+    setPendingPoints,
     setPointBehaviors: setLocalPointBehaviors,
   });
 
@@ -236,8 +236,8 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     () => ({
       addPoint,
       deletePoints,
-      discardPendingPointText,
-      editPendingPointText,
+      discardPendingPoint,
+      editPendingPoint,
       editPointBadge,
       editPointBehavior,
       pointBehaviorsForSuspense: deferredPointBehaviors,
@@ -245,21 +245,21 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       pointsForSuspense: deferredPoints,
       pointsForDefaultPriority: pointForDefaultPriority,
       pointsTransitionPending,
-      savePendingPointText,
+      savePendingPoint,
     }),
     [
       addPoint,
       deferredPointBehaviors,
       deferredPoints,
       deletePoints,
-      discardPendingPointText,
-      editPendingPointText,
+      discardPendingPoint,
+      editPendingPoint,
       editPointBadge,
       editPointBehavior,
       localPointBehaviors,
       pointForDefaultPriority,
       pointsTransitionPending,
-      savePendingPointText,
+      savePendingPoint,
     ]
   );
 
