@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import Icon from "replay-next/components/Icon";
 import hooks from "ui/hooks";
@@ -44,27 +44,22 @@ const Passport = () => {
   const videoExampleRef = useRef<HTMLImageElement>(null);
   const [videoHeight, setVideoHeight] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (videoExampleRef.current) {
-      const videoHeight = videoExampleRef.current.offsetHeight;
-      setVideoHeight(videoHeight);
+  useLayoutEffect(() => {
+    const videoExample = videoExampleRef.current;
+    if (videoExample) {
+      const updateHeight = () => {
+        setVideoHeight(videoExample.offsetHeight);
+      };
+
+      // Set initial height
+      updateHeight();
+
+      window.addEventListener("resize", updateHeight);
+
+      return () => {
+        window.removeEventListener("resize", updateHeight);
+      };
     }
-  }, [videoExampleRef]);
-
-  useEffect(() => {
-    const updateHeight = () => {
-      if (videoExampleRef.current) {
-        const videoHeight = videoExampleRef.current.offsetHeight;
-        setVideoHeight(videoHeight);
-        console.log("Updating", videoHeight);
-      }
-    };
-
-    window.addEventListener("resize", updateHeight);
-
-    return () => {
-      window.removeEventListener("resize", updateHeight);
-    };
   }, []);
 
   const getItemStyle = (sectionIndex: number, itemIndex: number) => {
