@@ -17,5 +17,5 @@
   color: var(--theme-base-60);
   text-transform: uppercase;
   font-weight: bold;
-  line-height: 2rem;
+  margin-bottom: 0.5rem;
 }
