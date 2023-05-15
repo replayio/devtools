@@ -1,20 +1,9 @@
 .PassportBoxWrapper {
   position: relative;
-  background-color: #dde7ef;
   background-image: url(/images/passport/passportBG.png);
   background-repeat: repeat;
   height: 100vh;
-}
-
-.PassportBox {
   color: #4584e1;
-  padding: 0.5rem;
-  height: 100%;
-}
-
-.PassportBoxInternal {
-  display: flex;
-  flex-direction: row;
 }
 
 .sectionsContainer {
@@ -81,15 +70,7 @@
   border-bottom-right-radius: 6px;
   z-index: 100;
   width: 100%;
-}
-
-.videoExampleWrapper {
-  position: absolute;
-  bottom: 117px;
-  width: 100%;
-  padding-left: 3px;
-  padding-right: 3px;
-  z-index: 1001;
+  margin-bottom: 115px;
 }
 
 .largeCompletedImage {
