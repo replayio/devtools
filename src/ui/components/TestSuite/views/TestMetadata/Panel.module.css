@@ -18,7 +18,6 @@
   flex: 1 1 auto;
   font-size: var(--font-size-large);
   color: var(--body-color);
-  overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-all;
   white-space: nowrap;
