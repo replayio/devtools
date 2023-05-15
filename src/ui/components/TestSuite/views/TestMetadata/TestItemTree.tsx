@@ -57,29 +57,28 @@ function TestTree({
 }) {
   const testTree = useMemo(() => createTestTree(testItems), [testItems]);
 
-  return <TreeRenderer isTopScope={true} selectTestItem={selectTestItem} testTree={testTree} />;
+  return <TreeRenderer selectTestItem={selectTestItem} testTree={testTree} />;
 }
 
 function TreeRenderer({
-  isTopScope = false,
+  isNested = false,
   scope = null,
   selectTestItem,
   testTree,
 }: {
-  isTopScope?: boolean;
+  isNested?: boolean;
   scope?: string | null;
   selectTestItem: (testItem: ProcessedTestItem) => void;
   testTree: TestTree;
 }) {
-  const className = scope ? styles.TreeNested : styles.Tree;
-  const scopeClassName = isTopScope ? styles.TopScope : styles.Scope;
+  const parentScope = scope;
   return (
-    <div className={className} data-nested={!!scope}>
-      {scope !== null && <div className={scopeClassName}>{scope}</div>}
+    <div className={styles.Tree} data-nested={isNested || undefined}>
+      {scope !== null && <div className={styles.Scope}>{scope}</div>}
       {Object.keys(testTree.scopes).map(scope => (
         <TreeRenderer
           key={scope}
-          isTopScope={false}
+          isNested={isNested || !!parentScope}
           scope={scope}
           selectTestItem={selectTestItem}
           testTree={testTree.scopes[scope]}
