@@ -142,6 +142,8 @@ const Passport = () => {
       completed: !showJumpToCode,
       videoUrl: "https://vercel.replay.io/passport/jump_to_code.gif",
       imageBaseName: "jump_to_code",
+      docsLink:
+        "https://www.notion.so/replayio/Debugging-1c18f02c9f1d455188e3f202ef5f5c08?pvs=4#5df63e4995a749eab6a04e266db98df0",
     },
   ];
 
@@ -151,6 +153,8 @@ const Passport = () => {
       completed: !showAddUnicornBadge,
       videoUrl: "https://vercel.replay.io/passport/unicorn_badge.gif",
       imageBaseName: "add_a_unicorn_badge",
+      docsLink:
+        "https://www.notion.so/replayio/Print-statements-1dcf7c3a8414423aab122ea7c4a41661#d8499325adf64254b4c918bc5725129c",
     },
     {
       label: "Search source text",
@@ -158,7 +162,7 @@ const Passport = () => {
       videoUrl: "https://vercel.replay.io/passport/search_source_text.gif",
       imageBaseName: "search_source_text",
       docsLink:
-        "https://www.notion.so/replayio/Search-4bd72377ac3d498d96bb7bcb33722a75?pvs=4#167521cd6a0f44dabc257eb3fd8ca48b",
+        "https://www.notion.so/replayio/Search-4bd72377ac3d498d96bb7bcb33722a75?pvs=4#e81fec2cb83d44e3be5f5bfadd39ecce",
     },
     {
       label: "Set a focus window",
@@ -172,6 +176,8 @@ const Passport = () => {
       completed: !showFindFile,
       videoUrl: "https://vercel.replay.io/passport/find_file.gif",
       imageBaseName: "find_file",
+      docsLink:
+        "https://www.notion.so/replayio/Search-4bd72377ac3d498d96bb7bcb33722a75?pvs=4#167521cd6a0f44dabc257eb3fd8ca48b",
     },
   ];
 
@@ -188,6 +194,8 @@ const Passport = () => {
       completed: !showShareNag,
       videoUrl: "https://vercel.replay.io/passport/share.gif",
       imageBaseName: "share",
+      docsLink:
+        "https://www.notion.so/replayio/Collaboration-cf60f297c0c742f6a2345e5f8cd56ed8?pvs=4#a102e5081a6e449ab793cf63c1a99163",
     },
   ];
 
