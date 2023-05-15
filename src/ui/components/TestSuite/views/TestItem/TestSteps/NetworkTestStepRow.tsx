@@ -1,6 +1,8 @@
 import { memo } from "react";
 
+import { setSelectedPanel } from "ui/actions/layout";
 import { NetworkTestStep } from "ui/components/TestSuite/types";
+import { useAppDispatch } from "ui/setup/hooks";
 
 import styles from "./NetworkTestStepRow.module.css";
 
@@ -10,6 +12,8 @@ export default memo(function NetworkTestStepRow({
   networkTestStep: NetworkTestStep;
 }) {
   const { method, status, url } = networkTestStep.data;
+
+  const dispatch = useAppDispatch();
 
   let statusBadge: string | null = null;
   if (status != null) {
@@ -22,8 +26,12 @@ export default memo(function NetworkTestStepRow({
 
   const pathname = new URL(url).pathname;
 
+  const showNetworkPanel = () => {
+    dispatch(setSelectedPanel("network"));
+  };
+
   return (
-    <div className={styles.Indented}>
+    <div className={styles.Indented} onClick={showNetworkPanel}>
       <div className={styles.Text}>
         {statusBadge !== null && (
           <>
