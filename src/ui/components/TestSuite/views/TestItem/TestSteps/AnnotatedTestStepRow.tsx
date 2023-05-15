@@ -5,8 +5,7 @@ import Loader from "replay-next/components/Loader";
 import useSuspendAfterMount from "replay-next/src/hooks/useSuspendAfterMount";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { seek } from "ui/actions/timeline";
-import { jumpToClickEventFunctionLocation } from "ui/components/Events/Event";
-import { PointWithEventType } from "ui/components/Events/Event";
+import { PointWithEventType, jumpToClickEventFunctionLocation } from "ui/components/Events/Event";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
 import { useJumpToSource } from "ui/components/TestSuite/hooks/useJumpToSource";
 import { getConsolePropsCountSuspense } from "ui/components/TestSuite/suspense/consoleProps";
@@ -27,9 +26,13 @@ export default memo(function AnnotatedTestStepRow({
 }) {
   const { annotations, args, error, index, name } = testStep.data;
 
+  const isCurrent = position === "current";
+
   const dispatch = useAppDispatch();
   const executionPoint = useAppSelector(getExecutionPoint);
   const [jumpToCodeStatus, setJumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
+
+  const [isHovered, setIsHovered] = useState(false);
 
   const argsString = useMemo(() => {
     if (args) {
@@ -83,11 +86,13 @@ export default memo(function AnnotatedTestStepRow({
   // We only care about click events and keyboard events. Keyboard events appear to be a "type" command,
   // as in "type this text into the input".
   let shouldShowJumpToCode = false;
-  if ("category" in testStep.data) {
-    shouldShowJumpToCode =
-      "category" in testStep.data &&
-      testStep.data.category === "command" &&
-      (testStep.data.name === "click" || testStep.data.name === "type");
+  if (isHovered || isCurrent) {
+    if ("category" in testStep.data) {
+      shouldShowJumpToCode =
+        "category" in testStep.data &&
+        testStep.data.category === "command" &&
+        (testStep.data.name === "click" || testStep.data.name === "type");
+    }
   }
 
   return (
@@ -95,6 +100,8 @@ export default memo(function AnnotatedTestStepRow({
       className={styles.Row}
       data-status={error ? "error" : "success"}
       onClick={jumpToTestSourceDisabled ? undefined : onClickJumpToTestSource}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <div className={styles.Text}>
         <span className={styles.Number}>{index + 1}</span>{" "}
@@ -110,7 +117,7 @@ export default memo(function AnnotatedTestStepRow({
           <Badge testStep={testStep} position={position} />
         </Suspense>
       )}
-      {position === "current" && shouldShowJumpToCode && annotations.start && (
+      {shouldShowJumpToCode && annotations.start && (
         <div className={styles.JumpToCodeButton}>
           <JumpToCodeButton
             currentExecutionPoint={executionPoint}
