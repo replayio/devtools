@@ -231,8 +231,13 @@ export async function addLogpoint(
     await toggle.click({ force: true });
   }
 
+  const saveAfterEdit =
+    options.saveAfterEdit !== undefined
+      ? options.saveAfterEdit
+      : options.condition !== undefined || options.content !== undefined;
+
   await waitForLogpoint(page, options);
-  await editLogPoint(page, options);
+  await editLogPoint(page, { ...options, saveAfterEdit });
 }
 
 export async function closeSource(page: Page, url: string): Promise<void> {
@@ -254,11 +259,11 @@ export async function editLogPoint(
     content?: string;
     condition?: string;
     lineNumber: number;
-    saveAfterEdit?: boolean;
+    saveAfterEdit: boolean;
     url?: string;
   }
 ) {
-  const { badge, condition, content, lineNumber, saveAfterEdit = true, url } = options;
+  const { badge, condition, content, lineNumber, saveAfterEdit, url } = options;
 
   await debugPrint(
     page,

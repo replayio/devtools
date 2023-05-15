@@ -48,7 +48,7 @@ test(`logpoints-06: should be temporarily disabled`, async ({ page }) => {
   await verifyConsoleMessage(page, MESSAGE, "log-point", 0);
 
   // Editing and saving should re-enable the log point
-  await editLogPoint(page, { content: `"${MESSAGE}"`, lineNumber, url });
+  await editLogPoint(page, { content: `"${MESSAGE}"`, lineNumber, url, saveAfterEdit: true });
   await verifyConsoleMessage(page, MESSAGE, "log-point", 1);
 
   // Now disable and re-enable the log point using the context menu
