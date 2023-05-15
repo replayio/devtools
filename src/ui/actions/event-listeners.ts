@@ -21,6 +21,12 @@ import {
 } from "ui/reducers/sources";
 import { UIState } from "ui/state";
 
+import {
+  InteractionEventKind,
+  REACT_16_EVENT_LISTENER_PROP_KEY,
+  REACT_17_18_EVENT_LISTENER_PROP_KEY,
+} from "./eventListeners/constants";
+import { createReactEventMapper } from "./eventListeners/evaluationMappers";
 import { UIThunkAction } from "./index";
 
 export type FunctionPreview = Required<
@@ -75,9 +81,6 @@ export const isFunctionWithPreview = (obj: ProtocolObject): obj is FunctionWithP
     isFunctionPreview(obj.preview)
   );
 };
-
-export const REACT_16_EVENT_LISTENER_PROP_KEY = "__reactEventHandlers$";
-export const REACT_17_18_EVENT_LISTENER_PROP_KEY = "__reactProps$";
 
 export type FormattedEventListener = Awaited<ReturnType<typeof formatEventListener>>;
 
@@ -263,19 +266,6 @@ export function getNodeEventListeners(
   };
 }
 
-export type SEARCHABLE_EVENT_TYPES = "mousedown" | "keypress";
-
-const REACT_EVENT_PROPS: Record<SEARCHABLE_EVENT_TYPES, string[]> = {
-  mousedown: ["onClick"],
-  // Users may have added `onChange` to an <input>, or `onkeyPress` to other elements
-  keypress: ["onChange", "onKeyPress"],
-};
-
-const EVENT_CLASS_FOR_EVENT_TYPE: Record<SEARCHABLE_EVENT_TYPES, string[]> = {
-  mousedown: ["MouseEvent"],
-  keypress: ["InputEvent", "KeyboardEvent"],
-};
-
 export const IGNORABLE_PARTIAL_SOURCE_URLS = [
   // Don't jump into React internals
   "react-dom",
@@ -304,7 +294,7 @@ export const eventListenerLocationCache: Cache<
     replayClient: ReplayClientInterface,
     getState: () => UIState,
     pauseId: string,
-    replayEventType: SEARCHABLE_EVENT_TYPES
+    replayEventType: InteractionEventKind
   ],
   Location | undefined
 > = createCache({
@@ -399,170 +389,3 @@ export const eventListenerLocationCache: Cache<
     return sourceLocation!;
   },
 });
-
-// Local variables in scope at the time of evaluation
-declare let event: MouseEvent | KeyboardEvent;
-
-interface InjectedValues {
-  eventType: SEARCHABLE_EVENT_TYPES;
-  $REACT_16_EVENT_LISTENER_PROP_KEY: string;
-  $REACT_17_18_EVENT_LISTENER_PROP_KEY: string;
-  EVENT_CLASS_NAMES: string[];
-  possibleReactPropNames: string[];
-  args: any[];
-}
-
-interface SearchedNode {
-  name: string;
-  searchPropKeys?: string[];
-  propKeys?: string[];
-}
-
-interface EventMapperResult {
-  target: HTMLElement;
-  fieldName?: string;
-  handlerProp?: Function;
-  handlerNode?: HTMLElement;
-  searchedNodes: SearchedNode[];
-  clickWasInsideSubmitButton?: boolean;
-}
-
-function createReactEventMapper(eventType: SEARCHABLE_EVENT_TYPES) {
-  const reactEventPropNames = REACT_EVENT_PROPS[eventType];
-  const eventClassNames = EVENT_CLASS_FOR_EVENT_TYPE[eventType];
-
-  // This will became evaluated JS code
-  function findEventTargetAndHandler(injectedValues: InjectedValues) {
-    // One of the args should be a browser event. There could be multiple event class types we're looking for,
-    // such as `MouseEvent` or `InputEvent`, so loop over the args _and_ the class names.
-    const eventArgs = injectedValues.args.filter(a => typeof a === "object" && a instanceof Event);
-    const matchingEvent = eventArgs.find(a => {
-      const matchesEventType = injectedValues.EVENT_CLASS_NAMES.some(eventClassName => {
-        const eventClass: any = window[eventClassName as any];
-        return a instanceof eventClass;
-      });
-      return matchesEventType;
-    });
-
-    if (matchingEvent) {
-      const searchedNodes: SearchedNode[] = [];
-      const res: EventMapperResult = {
-        target: event.target as HTMLElement,
-        searchedNodes,
-      };
-
-      // Debugging: trace nodes we've looked at, like `"input#id.classname"`
-      function stringifyNode(node: HTMLElement) {
-        const tokens = [node.nodeName];
-
-        if (node.id) {
-          tokens.push("#" + node.id);
-        }
-
-        if (typeof node.className === "string") {
-          for (let className of node.className.split(" ")) {
-            tokens.push("." + className);
-          }
-        }
-
-        return tokens.join("").toLowerCase();
-      }
-
-      let clickWasInsideSubmitButton = false;
-
-      // Search the event target node and all of its ancestors
-      // for React internal props data, and specifically look
-      // for the nearest node with a relevant React event handler prop if any.
-      const startingNode = event.target as HTMLElement;
-      let currentNode = startingNode;
-      while (currentNode) {
-        const searchedNode: SearchedNode = {
-          name: stringifyNode(currentNode),
-        };
-        searchedNodes.push(searchedNode);
-
-        const currentNodeName = currentNode.nodeName.toLowerCase();
-
-        if (
-          injectedValues.eventType === "mousedown" &&
-          currentNodeName === "button" &&
-          (currentNode as HTMLButtonElement).type === "submit"
-        ) {
-          res.clickWasInsideSubmitButton = true;
-        }
-
-        const keys = Object.keys(currentNode);
-        const reactPropsKey = keys.find(key => {
-          return (
-            key.startsWith(injectedValues.$REACT_16_EVENT_LISTENER_PROP_KEY) ||
-            key.startsWith(injectedValues.$REACT_17_18_EVENT_LISTENER_PROP_KEY)
-          );
-        });
-
-        if (reactPropsKey) {
-          let props: Record<string, Function> = {};
-          if (reactPropsKey in currentNode) {
-            // @ts-ignore
-            props = currentNode[reactPropsKey];
-            searchedNode.propKeys = Object.keys(props);
-          }
-
-          // Depending on the type of event, there could be different
-          // React event handler prop names in use.
-          // For example, an input is likely to have "onChange",
-          // whereas some other element might have "onKeyPress".
-          let handler = undefined;
-          let name: string | undefined = undefined;
-          const possibleReactPropNames = injectedValues.possibleReactPropNames.slice();
-
-          // `<input>` tags often have an `onChange` prop, including checkboxes;
-          // _If_ the original target DOM node is an input, add that to the list of prop names.
-          if (currentNode === startingNode && currentNodeName === "input") {
-            possibleReactPropNames.push("onChange");
-          }
-
-          if (res.clickWasInsideSubmitButton && currentNodeName === "form") {
-            possibleReactPropNames.push("onSubmit");
-          }
-
-          searchedNode.searchPropKeys = possibleReactPropNames;
-
-          for (let possibleReactProp of possibleReactPropNames) {
-            if (possibleReactProp in props) {
-              handler = props[possibleReactProp];
-              name = possibleReactProp;
-            }
-          }
-
-          if (handler) {
-            res.handlerProp = handler;
-            res.handlerNode = currentNode as HTMLElement;
-            res.fieldName = name;
-            break;
-          }
-        }
-        currentNode = (currentNode!.parentNode as HTMLElement)!;
-      }
-
-      return res;
-    } else {
-      throw new Error(`no event found! eventClass: ${injectedValues.EVENT_CLASS_NAMES}`);
-    }
-  }
-
-  const evaluatedEventMapperBody = `
-    (${findEventTargetAndHandler})({
-      eventType: "${eventType}",
-      $REACT_16_EVENT_LISTENER_PROP_KEY: "${REACT_16_EVENT_LISTENER_PROP_KEY}",
-      $REACT_17_18_EVENT_LISTENER_PROP_KEY: "${REACT_17_18_EVENT_LISTENER_PROP_KEY}",
-      EVENT_CLASS_NAMES: ${JSON.stringify(eventClassNames)},
-      possibleReactPropNames: ${JSON.stringify(reactEventPropNames)},
-      
-      // Outer body runs in scope of the "current" event handler.
-      // Grab the event handler's arguments.
-      args: [...arguments]
-    })
-  `;
-
-  return evaluatedEventMapperBody;
-}

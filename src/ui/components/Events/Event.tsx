@@ -22,10 +22,10 @@ import { ReplayClientInterface } from "shared/client/types";
 import { Nag } from "shared/graphql/types";
 import type { UIThunkAction } from "ui/actions";
 import {
-  SEARCHABLE_EVENT_TYPES,
   eventListenerLocationCache,
   shouldIgnoreEventFromSource,
 } from "ui/actions/event-listeners";
+import { InteractionEventKind } from "ui/actions/eventListeners/constants";
 import { setViewMode } from "ui/actions/layout";
 import useEventContextMenu from "ui/components/Events/useEventContextMenu";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
@@ -52,7 +52,7 @@ export interface EventListenerEntry {
 }
 
 const EVENTS_FOR_RECORDING_TARGET: Partial<
-  Record<RecordingTarget, Record<SEARCHABLE_EVENT_TYPES, EventListenerEntry>>
+  Record<RecordingTarget, Record<InteractionEventKind, EventListenerEntry>>
 > = {
   gecko: {
     mousedown: { categoryKey: "Mouse", eventType: "event.mouse.click" },
@@ -74,7 +74,7 @@ export const nextInteractionEventCache: Cache<
     ThreadFront: typeof TF,
     point: ExecutionPoint,
     end: TimeStampedPoint,
-    replayEventType: SEARCHABLE_EVENT_TYPES,
+    replayEventType: InteractionEventKind,
     sourcesState: SourcesState
   ],
   PointDescription | undefined
@@ -245,7 +245,7 @@ export function jumpToClickEventFunctionLocation(
         ThreadFront,
         executionPoint,
         actualEnd,
-        event.kind as SEARCHABLE_EVENT_TYPES,
+        event.kind as InteractionEventKind,
         sourcesState
       );
 
@@ -264,7 +264,7 @@ export function jumpToClickEventFunctionLocation(
         replayClient,
         getState,
         pauseId,
-        event.kind as SEARCHABLE_EVENT_TYPES
+        event.kind as InteractionEventKind
       );
 
       if (functionSourceLocation) {
