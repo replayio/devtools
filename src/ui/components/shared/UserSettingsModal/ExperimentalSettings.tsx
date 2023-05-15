@@ -1,9 +1,8 @@
-import React from "react";
-
 import { CombinedExperimentalUserSettings } from "shared/graphql/types";
 import Icon from "ui/components/shared/Icon";
 import hooks from "ui/hooks";
 import { useFeature } from "ui/hooks/settings";
+import { UserInfo, getUserInfo } from "ui/hooks/users";
 
 import { CheckboxRow } from "./CheckboxRow";
 
@@ -11,6 +10,7 @@ type ExperimentalKey = keyof CombinedExperimentalUserSettings;
 interface ExperimentalSetting {
   label: string;
   description: string;
+  internal?: boolean;
   key: ExperimentalKey;
 }
 
@@ -24,17 +24,20 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     label: "Profile Source Worker",
     description:
       "Record a performance profile of the source worker and send it to Replay to help diagnose performance issues",
+    internal: true,
     key: "profileWorkerThreads",
   },
   {
     label: "Enable query-level caching for unstable request types",
     description:
       "Allow the backend to return previously generated responses without re-running the request",
+    internal: true,
     key: "enableUnstableQueryCache",
   },
   {
     label: "Disable query-level caching for stable request types",
     description: "Disable caching of previously generated responses",
+    internal: true,
     key: "disableStableQueryCache",
   },
   {
@@ -52,6 +55,7 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
   {
     label: "Disable scan data cache",
     description: "Do not cache the results of indexing the recording",
+    internal: true,
     key: "disableScanDataCache",
   },
   {
@@ -67,12 +71,14 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
   {
     label: "Retry backend processing routines",
     description: "Always re-run routines instead of using cached results",
+    internal: true,
     key: "rerunRoutines",
   },
   {
     label: "Disable tracking recording assets in the database",
     description:
       "Disable writing to and reading from the backend database when storing or retrieving recording assets",
+    internal: true,
     key: "disableRecordingAssetsInDatabase",
   },
   {
@@ -88,6 +94,7 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
   {
     label: "Disable Concurrent Controller Loading",
     description: "Disable loading regions concurrently at controller startup",
+    internal: true,
     key: "disableConcurrentControllerLoading",
   },
 ];
@@ -95,15 +102,22 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
 const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [];
 
 function Experiment({
-  setting,
-  onChange,
   checked,
+  onChange,
+  setting,
+  userInfo,
 }: {
-  setting: ExperimentalSetting;
   checked: boolean;
   onChange: (key: ExperimentalKey, value: any) => void;
+  setting: ExperimentalSetting;
+  userInfo: UserInfo;
 }) {
-  const { label, key, description } = setting;
+  const { description, internal, label, key } = setting;
+
+  if (internal && !userInfo.internal) {
+    return null;
+  }
+
   return (
     <CheckboxRow
       id={key}
@@ -117,6 +131,8 @@ function Experiment({
 
 export default function ExperimentalSettings({}) {
   const { userSettings, loading } = hooks.useGetUserSettings();
+
+  const userInfo = hooks.useGetUserInfo();
 
   // TODO: This is bad and should be updated with a better generalized hook
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
@@ -219,10 +235,11 @@ export default function ExperimentalSettings({}) {
       <div className="flex flex-col space-y-2 p-1">
         {EXPERIMENTAL_SETTINGS.map(setting => (
           <Experiment
-            onChange={onChange}
-            key={setting.key}
-            setting={setting}
             checked={!!settings[setting.key]}
+            key={setting.key}
+            onChange={onChange}
+            setting={setting}
+            userInfo={userInfo}
           />
         ))}
         {RISKY_EXPERIMENTAL_SETTINGS.length > 0 && (
@@ -237,10 +254,11 @@ export default function ExperimentalSettings({}) {
             </div>
             {RISKY_EXPERIMENTAL_SETTINGS.map(setting => (
               <Experiment
+                checked={!!settings[setting.key]}
                 onChange={onChange}
                 key={setting.key}
                 setting={setting}
-                checked={!!settings[setting.key]}
+                userInfo={userInfo}
               />
             ))}
           </div>
