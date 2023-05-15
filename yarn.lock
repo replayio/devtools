@@ -20184,13 +20184,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-resizable-panels@npm:^0.0.36":
-  version: 0.0.36
-  resolution: "react-resizable-panels@npm:0.0.36"
+"react-resizable-panels@npm:^0.0.45":
+  version: 0.0.45
+  resolution: "react-resizable-panels@npm:0.0.45"
   peerDependencies:
     react: ^16.14.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0
-  checksum: 166083b04e0e85298f562ba8982bcd70bf97521469ea26c3bf6e2ac9a1302f01f1236ad2fbdbcdc1d32203dd322a92ff31999dac3b54ff5313f528e811b4b055
+  checksum: fab2ae429678c3653b469814d1eafffa70568494b9fd7e90ff8e75d938d754d0ed52df408a2e55f6489bb15dedf02a51dd60b1d8bd5ad93592102844126f27a7
   languageName: node
   linkType: hard
 
@@ -20611,7 +20611,7 @@ __metadata:
     react-lazyload: ^3.2.0
     react-merge-refs: ^1.1.0
     react-redux: ^8.0.2
-    react-resizable-panels: ^0.0.36
+    react-resizable-panels: ^0.0.45
     react-table: ^7.7.0
     react-tooltip: ^4.5.1
     react-transition-group: ^4.4.2
