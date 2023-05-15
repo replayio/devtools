@@ -40,7 +40,7 @@ export function createReactEventMapper(eventType: InteractionEventKind) {
   const reactEventPropNames = REACT_EVENT_PROPS[eventType];
   const eventClassNames = EVENT_CLASS_FOR_EVENT_TYPE[eventType];
 
-  // This will became evaluated JS code
+  // This will become evaluated JS code in the paused browser
   function findEventTargetAndHandler(injectedValues: InjectedValues) {
     // Debugging: trace nodes we've looked at, like `"input#id.classname"`
     function stringifyNode(node: HTMLElement) {

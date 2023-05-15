@@ -1,125 +1,21 @@
 // Routines for finding framework-specific event listeners within a pause.
 
-import { Dictionary } from "@reduxjs/toolkit";
-import type { Location, ObjectPreview, Object as ProtocolObject } from "@replayio/protocol";
-import { Cache, createCache } from "suspense";
-
-import type { ThreadFront as TF } from "protocol/thread";
-import { topFrameCache } from "replay-next/src/suspense/FrameCache";
-import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
-import { cachePauseData, updateMappedLocation } from "replay-next/src/suspense/PauseCache";
-import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
-import { scopeMapCache } from "replay-next/src/suspense/ScopeMapCache";
+import { cachePauseData } from "replay-next/src/suspense/PauseCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
-import { ReplayClientInterface } from "shared/client/types";
-import {
-  SourceDetails,
-  SourcesState,
-  getGeneratedLocation,
-  getPreferredLocation,
-  getSourceDetailsEntities,
-} from "ui/reducers/sources";
-import { UIState } from "ui/state";
+import { getSourceDetailsEntities } from "ui/reducers/sources";
 
 import {
-  InteractionEventKind,
   REACT_16_EVENT_LISTENER_PROP_KEY,
   REACT_17_18_EVENT_LISTENER_PROP_KEY,
 } from "./eventListeners/constants";
-import { createReactEventMapper } from "./eventListeners/evaluationMappers";
+import {
+  EventListenerWithFunctionInfo,
+  FormattedEventListener,
+  FunctionWithPreview,
+  NodeWithPreview,
+  formatEventListener,
+} from "./eventListeners/eventListenerUtils";
 import { UIThunkAction } from "./index";
-
-export type FunctionPreview = Required<
-  Pick<ObjectPreview, "functionName" | "functionLocation" | "functionParameterNames">
->;
-
-export interface EventListenerWithFunctionInfo {
-  type: string;
-  capture: boolean;
-  functionName: string;
-  locationUrl?: string;
-  location?: Location;
-  functionParameterNames: string[];
-  framework?: string;
-}
-
-export type FunctionWithPreview = Omit<ProtocolObject, "preview"> & {
-  preview: FunctionPreview;
-};
-
-// TS magic: https://stackoverflow.com/a/57837897/62937
-type DeepRequired<T, P extends string[]> = T extends object
-  ? Omit<T, Extract<keyof T, P[0]>> &
-      Required<{
-        [K in Extract<keyof T, P[0]>]: NonNullable<DeepRequired<T[K], ShiftUnion<P>>>;
-      }>
-  : T;
-
-// Analogues to array.prototype.shift
-export type Shift<T extends any[]> = ((...t: T) => any) extends (
-  first: any,
-  ...rest: infer Rest
-) => any
-  ? Rest
-  : never;
-
-// use a distributed conditional type here
-type ShiftUnion<T> = T extends any[] ? Shift<T> : never;
-
-export type NodeWithPreview = DeepRequired<
-  ProtocolObject,
-  ["preview", "node"] | ["preview", "getterValues"]
->;
-
-export const isFunctionPreview = (obj?: ObjectPreview): obj is FunctionPreview => {
-  return !!obj && "functionName" in obj && "functionLocation" in obj;
-};
-
-export const isFunctionWithPreview = (obj: ProtocolObject): obj is FunctionWithPreview => {
-  return (
-    (obj.className === "Function" || obj.className === "AsyncFunction") &&
-    isFunctionPreview(obj.preview)
-  );
-};
-
-export type FormattedEventListener = Awaited<ReturnType<typeof formatEventListener>>;
-
-export const formatEventListener = async (
-  replayClient: ReplayClientInterface,
-  listener: { type: string; capture: boolean },
-  fnPreview: FunctionWithPreview["preview"],
-  sourcesState: SourcesState,
-  sourcesById: Dictionary<SourceDetails>,
-  framework?: string
-) => {
-  const { functionLocation, functionName = "", functionParameterNames = [] } = fnPreview;
-
-  const sources = await sourcesByIdCache.readAsync(replayClient);
-  updateMappedLocation(sources, functionLocation);
-
-  let location: Location | undefined = undefined;
-  let locationUrl: string | undefined = undefined;
-  if (functionLocation) {
-    location = getPreferredLocation(sourcesState, functionLocation);
-
-    locationUrl = functionLocation?.length > 0 ? sourcesById[location.sourceId]?.url : undefined;
-  }
-
-  const scopeMap = await scopeMapCache.readAsync(
-    replayClient,
-    getGeneratedLocation(sourcesById, functionLocation)
-  );
-  const originalFunctionName = scopeMap?.find(mapping => mapping[0] === functionName)?.[1];
-
-  return {
-    ...listener,
-    location,
-    locationUrl,
-    functionName: originalFunctionName || functionName,
-    functionParameterNames,
-    framework,
-  };
-};
 
 const eventListenersCacheByPause = new Map<string, Map<string, EventListenerWithFunctionInfo[]>>();
 
@@ -128,7 +24,7 @@ const eventListenersCacheByPause = new Map<string, Map<string, EventListenerWith
 export function getNodeEventListeners(
   nodeId: string,
   pauseId?: string
-): UIThunkAction<Promise<EventListenerWithFunctionInfo[]>> {
+): UIThunkAction<Promise<FormattedEventListener[]>> {
   return async (dispatch, getState, { ThreadFront, protocolClient, replayClient, objectCache }) => {
     if (!pauseId) {
       pauseId = await ThreadFront.getCurrentPauseId(replayClient);
@@ -160,7 +56,7 @@ export function getNodeEventListeners(
     cachePauseData(replayClient, sources, pauseId, data);
 
     // Reformat those entries to add location/name/params data
-    const formattedListenerEntries = await Promise.all(
+    const initialEventListenerEntries = await Promise.all(
       listeners.map(listener => {
         // TODO These entries exist in current testing, but what's fetching them earlier?
         const listenerHandler = objectCache.getValue(
@@ -172,13 +68,16 @@ export function getNodeEventListeners(
 
         return formatEventListener(
           replayClient,
-          listener,
+          listener.type,
           listenerHandler.preview,
-          state.sources,
-          sourcesById
+          state.sources
         );
       })
     );
+
+    const formattedListenerEntries = initialEventListenerEntries.filter(
+      Boolean
+    ) as FormattedEventListener[];
 
     // Next, we want to find "framework listeners". As currently implemented,
     // this is really just finding React `onThing` events.
@@ -245,18 +144,21 @@ export function getNodeEventListeners(
               // Add an entry like `{name: "onClick", location, locationUrl}
               return formatEventListener(
                 replayClient,
-                { type: obj.name, capture: false },
+                obj.name,
                 obj.value.preview,
                 state.sources,
-                sourcesById,
                 // We're only finding React-specific event handlers atm
                 "react"
               );
             })
         );
 
+        const onlyValidListeners = formattedFrameworkListeners.filter(
+          Boolean
+        ) as FormattedEventListener[];
+
         // Merge the React event entries into the list of all event listeners
-        formattedListenerEntries.push(...formattedFrameworkListeners);
+        formattedListenerEntries.push(...onlyValidListeners);
       }
     }
 
@@ -265,127 +167,3 @@ export function getNodeEventListeners(
     return formattedListenerEntries;
   };
 }
-
-export const IGNORABLE_PARTIAL_SOURCE_URLS = [
-  // Don't jump into React internals
-  "react-dom",
-  // or CodeSandbox
-  "webpack:///src/sandbox/",
-  "webpack:///sandpack-core/",
-  "webpack:////home/circleci/codesandbox-client",
-  // or Cypress
-  "__cypress/runner/",
-];
-
-export function shouldIgnoreEventFromSource(
-  sourceDetails?: SourceDetails,
-  ignorableURLS = IGNORABLE_PARTIAL_SOURCE_URLS
-) {
-  const url = sourceDetails?.url ?? "";
-
-  return ignorableURLS.some(partialUrl => url.includes(partialUrl));
-}
-
-// TODO This cache looks unsafe because it's not idempotent;
-// it accepts a state getter function but does not reflect the state it reads as part of the cache key.
-export const eventListenerLocationCache: Cache<
-  [
-    ThreadFront: typeof TF,
-    replayClient: ReplayClientInterface,
-    getState: () => UIState,
-    pauseId: string,
-    replayEventType: InteractionEventKind
-  ],
-  Location | undefined
-> = createCache({
-  config: { immutable: true },
-  debugLabel: "EventListenerLocation",
-  getKey: ([threadFront, replayClient, getState, pauseId, replayEventType]) =>
-    `${pauseId}:${replayEventType}`,
-  load: async ([threadFront, replayClient, getState, pauseId, replayEventType]) => {
-    const topFrame = await topFrameCache.readAsync(replayClient, pauseId);
-
-    if (!topFrame) {
-      return;
-    }
-    const { frameId } = topFrame;
-
-    await threadFront.ensureAllSources();
-
-    const state = getState();
-
-    const evaluatedEventMapper = createReactEventMapper(replayEventType);
-
-    // Introspect the event's target DOM node, and find the nearest
-    // React event handler if any exists.
-    const res = await pauseEvaluationsCache.readAsync(
-      replayClient,
-      pauseId,
-      frameId,
-      evaluatedEventMapper
-    );
-
-    let sourceLocation: Location | undefined;
-    const sourcesById = getSourceDetailsEntities(state);
-
-    if (res.returned?.object) {
-      const preview = await objectCache.readAsync(
-        replayClient,
-        pauseId,
-        res.returned.object,
-        "canOverflow"
-      );
-      // The evaluation may have found a React prop function somewhere.
-      const handlerProp = preview?.preview?.properties?.find(p => p.name === "handlerProp");
-
-      if (handlerProp) {
-        // If it did find a React prop function, get its
-        // preview and format it so we know the preferred location.
-        const onClickPreview = await objectCache.readAsync(
-          replayClient,
-          pauseId,
-          handlerProp.object!,
-          "full"
-        );
-
-        // As of RUN-1709 Chromium _should_ be sending back previews with function locations,
-        // but doesn't hurt to double-check.
-        if (!onClickPreview || !isFunctionPreview(onClickPreview.preview)) {
-          return undefined;
-        }
-
-        const formattedEventListener = await formatEventListener(
-          replayClient,
-          { type: "onClick", capture: false },
-          onClickPreview.preview,
-          state.sources,
-          sourcesById,
-          "react"
-        );
-
-        sourceLocation = formattedEventListener.location;
-      }
-    } else if (res.exception?.object) {
-      const error = await objectCache.readAsync(
-        replayClient,
-        pauseId,
-        res.exception.object,
-        "canOverflow"
-      );
-      console.error("Error fetching event listener location: ", error);
-    }
-
-    if (!sourceLocation) {
-      // Otherwise, use the location from the actual JS event handler.
-      sourceLocation = getPreferredLocation(state.sources, topFrame.location);
-      const sourceDetails = sourcesById[sourceLocation.sourceId];
-
-      if (shouldIgnoreEventFromSource(sourceDetails)) {
-        // Intentionally _don't_ jump to into specific ignorable libraries, like React
-        sourceLocation = undefined;
-      }
-    }
-
-    return sourceLocation!;
-  },
-});

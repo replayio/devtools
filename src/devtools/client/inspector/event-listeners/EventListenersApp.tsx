@@ -5,11 +5,11 @@ import { getSelectedDomNodeId } from "devtools/client/inspector/markup/reducers/
 import { onViewSourceInDebugger } from "devtools/client/webconsole/actions/toolbox";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { getNodeEventListeners } from "ui/actions/event-listeners";
 import {
   EventListenerWithFunctionInfo,
   NodeWithPreview,
-  getNodeEventListeners,
-} from "ui/actions/event-listeners";
+} from "ui/actions/eventListeners/eventListenerUtils";
 import { useAppDispatch } from "ui/setup/hooks";
 import { useAppSelector } from "ui/setup/hooks";
 
@@ -87,14 +87,7 @@ export const EventListenersApp = () => {
               <ExpandableItem header={header}>
                 {listeners.map(
                   (
-                    {
-                      functionName,
-                      functionParameterNames,
-                      locationUrl,
-                      location,
-                      capture,
-                      framework,
-                    },
+                    { functionName, functionParameterNames, locationUrl, location, framework },
                     i
                   ) => {
                     return (
@@ -131,10 +124,6 @@ export const EventListenersApp = () => {
                         }
                       >
                         <div className="pl-4">
-                          <div className="theme-fg-color3">
-                            useCapture:{" "}
-                            <span className="theme-fg-color1">{capture ? "true" : "false"}</span>
-                          </div>
                           <div>
                             <span className="theme-fg-color3">handler: </span>
                             <span
