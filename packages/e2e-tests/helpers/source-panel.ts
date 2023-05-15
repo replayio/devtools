@@ -279,7 +279,9 @@ export async function editLogPoint(
   }
 
   if (content != null) {
-    const isEditing = await line.locator('[data-lexical-editor="true"]').isVisible();
+    const isEditing = await line
+      .locator('[data-test-name="PointPanel-ContentWrapper"] [data-lexical-editor="true"]')
+      .isVisible();
     if (!isEditing) {
       await line.locator('[data-test-name="PointPanel-EditButton"]').click();
     }
