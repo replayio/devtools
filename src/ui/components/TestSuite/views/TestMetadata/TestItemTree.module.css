@@ -9,27 +9,13 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  margin-bottom: 30px;
 }
 
 .Scope {
-}
-
-/* Hierarchy styles */
-
-.Tree > .Tree {
-  font-size: 16px;
-}
-
-.Tree > .Tree > .Tree {
-  color: var(--body-color);
-  font-size: 13px;
-}
-
-.Tree > .Tree > .Tree > DIV {
-  font-size: var(--font-size-small);
+  font-size: var(--font-size-medium);
   color: var(--theme-base-60);
   text-transform: uppercase;
   font-weight: bold;
   line-height: 2rem;
-  margin-top: 0.75rem;
 }
