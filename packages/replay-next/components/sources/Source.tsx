@@ -1,4 +1,3 @@
-import { newSource as ProtocolSource } from "@replayio/protocol";
 import debounce from "lodash/debounce";
 import { MouseEvent, Suspense, useContext, useLayoutEffect, useRef, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -6,6 +5,7 @@ import { useStreamingValue } from "suspense";
 
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import {
+  Source as SourceDetails,
   StreamingSourceContentsValue,
   streamingSourceContentsCache,
 } from "replay-next/src/suspense/SourcesCache";
@@ -40,7 +40,7 @@ export default function Source({
   source,
   showColumnBreakpoints,
 }: {
-  source: ProtocolSource;
+  source: SourceDetails;
   showColumnBreakpoints: boolean;
 }) {
   return (
@@ -54,7 +54,7 @@ function SourceLoader({
   source,
   showColumnBreakpoints,
 }: {
-  source: ProtocolSource;
+  source: SourceDetails;
   showColumnBreakpoints: boolean;
 }) {
   const client = useContext(ReplayClientContext);
@@ -84,7 +84,7 @@ function SourceRenderer({
   streamingSourceContents,
 }: {
   showColumnBreakpoints: boolean;
-  source: ProtocolSource;
+  source: SourceDetails;
   streamingParser: StreamingParser;
   streamingSourceContents: StreamingSourceContentsValue;
 }) {

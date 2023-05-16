@@ -8,6 +8,8 @@ import {
 
 import { ThreadFront } from "protocol/thread";
 import { locationsInclude } from "protocol/utils";
+import { updateMappedLocation } from "replay-next/src/suspense/PauseCache";
+import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 export interface ResumeOperationParams {
@@ -44,14 +46,14 @@ async function findResumeTarget(
     return null;
   }
 
-  await ThreadFront.ensureAllSources();
+  const sources = await sourcesByIdCache.readAsync(client);
 
   while (true) {
     let target: PauseDescription;
     try {
       target = await client[findTargetCommand](point);
       if (target.frame) {
-        ThreadFront.updateMappedLocation(target.frame);
+        updateMappedLocation(sources, target.frame);
       }
     } catch {
       return null;

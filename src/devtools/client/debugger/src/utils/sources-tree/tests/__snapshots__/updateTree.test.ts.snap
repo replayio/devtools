@@ -20,7 +20,7 @@ Object {
               "contents": Array [
                 Object {
                   "contents": Object {
-                    "contentHash": "https://codesandbox.io/static/js/sandbox.js",
+                    "contentId": "https://codesandbox.io/static/js/sandbox.js",
                     "id": "https://codesandbox.io/static/js/sandbox.js",
                     "url": "https://codesandbox.io/static/js/sandbox.js",
                   },
@@ -30,7 +30,7 @@ Object {
                 },
                 Object {
                   "contents": Object {
-                    "contentHash": "https://codesandbox.io/static/js/vendors.js",
+                    "contentId": "https://codesandbox.io/static/js/vendors.js",
                     "id": "https://codesandbox.io/static/js/vendors.js",
                     "url": "https://codesandbox.io/static/js/vendors.js",
                   },
@@ -57,7 +57,7 @@ Object {
       "contents": Array [
         Object {
           "contents": Object {
-            "contentHash": "replay-content:///react-devtools-hook-script",
+            "contentId": "replay-content:///react-devtools-hook-script",
             "id": "replay-content:///react-devtools-hook-script",
             "url": "replay-content:///react-devtools-hook-script",
           },
@@ -74,7 +74,7 @@ Object {
       "contents": Array [
         Object {
           "contents": Object {
-            "contentHash": "(index)",
+            "contentId": "(index)",
             "id": "(index)",
             "url": "https://something.com/(index)",
           },
@@ -88,7 +88,7 @@ Object {
               "contents": Array [
                 Object {
                   "contents": Object {
-                    "contentHash": "node_modules/react-redux/es/index.js",
+                    "contentId": "node_modules/react-redux/es/index.js",
                     "id": "node_modules/react-redux/es/index.js",
                     "url": "https://something.com/node_modules/react-redux/es/index.js",
                   },
@@ -98,7 +98,7 @@ Object {
                 },
                 Object {
                   "contents": Object {
-                    "contentHash": "node_modules/react-redux/es/types.js",
+                    "contentId": "node_modules/react-redux/es/types.js",
                     "id": "node_modules/react-redux/es/types.js",
                     "url": "https://something.com/node_modules/react-redux/es/types.js",
                   },
@@ -115,7 +115,7 @@ Object {
               "contents": Array [
                 Object {
                   "contents": Object {
-                    "contentHash": "node_modules/redux/es/redux.js",
+                    "contentId": "node_modules/redux/es/redux.js",
                     "id": "node_modules/redux/es/redux.js",
                     "url": "https://something.com/node_modules/redux/es/redux.js",
                   },
@@ -139,7 +139,7 @@ Object {
               "contents": Array [
                 Object {
                   "contents": Object {
-                    "contentHash": "src/app/hooks.ts",
+                    "contentId": "src/app/hooks.ts",
                     "id": "src/app/hooks.ts",
                     "url": "https://something.com/src/app/hooks.ts",
                   },
@@ -149,7 +149,7 @@ Object {
                 },
                 Object {
                   "contents": Object {
-                    "contentHash": "src/app/store.ts",
+                    "contentId": "src/app/store.ts",
                     "id": "src/app/store.ts",
                     "url": "https://something.com/src/app/store.ts",
                   },
@@ -166,7 +166,7 @@ Object {
               "contents": Array [
                 Object {
                   "contents": Object {
-                    "contentHash": "src/features/counter/Counter.tsx",
+                    "contentId": "src/features/counter/Counter.tsx",
                     "id": "src/features/counter/Counter.tsx",
                     "url": "https://something.com/src/features/counter/Counter.tsx",
                   },
@@ -176,7 +176,7 @@ Object {
                 },
                 Object {
                   "contents": Object {
-                    "contentHash": "src/features/counter/counterAPI.ts",
+                    "contentId": "src/features/counter/counterAPI.ts",
                     "id": "src/features/counter/counterAPI.ts",
                     "url": "https://something.com/src/features/counter/counterAPI.ts",
                   },
@@ -186,7 +186,7 @@ Object {
                 },
                 Object {
                   "contents": Object {
-                    "contentHash": "src/features/counter/counterSlice.ts",
+                    "contentId": "src/features/counter/counterSlice.ts",
                     "id": "src/features/counter/counterSlice.ts",
                     "url": "https://something.com/src/features/counter/counterSlice.ts",
                   },
@@ -205,7 +205,7 @@ Object {
                   "contents": Array [
                     Object {
                       "contents": Object {
-                        "contentHash": "src/features2/todos/todos.ts?1",
+                        "contentId": "src/features2/todos/todos.ts?1",
                         "id": "src/features2/todos/todos.ts?1",
                         "url": "https://something.com/src/features2/todos/todos.ts?1",
                       },
@@ -215,7 +215,7 @@ Object {
                     },
                     Object {
                       "contents": Object {
-                        "contentHash": "src/features2/todos/todos.ts?2",
+                        "contentId": "src/features2/todos/todos.ts?2",
                         "id": "src/features2/todos/todos.ts?2",
                         "url": "https://something.com/src/features2/todos/todos.ts?2",
                       },
@@ -237,7 +237,7 @@ Object {
               "contents": Array [
                 Object {
                   "contents": Object {
-                    "contentHash": "https://something.com/src/features3/todos/todos.ts",
+                    "contentId": "https://something.com/src/features3/todos/todos.ts",
                     "id": "src/features3/todos/todos.ts?3",
                     "url": "https://something.com/src/features3/todos/todos.ts?3",
                   },
@@ -256,7 +256,7 @@ Object {
                   "contents": Array [
                     Object {
                       "contents": Object {
-                        "contentHash": "https://something.com/src/features4/todos/todos.ts",
+                        "contentId": "https://something.com/src/features4/todos/todos.ts",
                         "id": "src/features4/todos/todos.ts?number=5&duplicate=true",
                         "url": "https://something.com/src/features4/todos/todos.ts?number=5&duplicate=true",
                       },
@@ -266,7 +266,7 @@ Object {
                     },
                     Object {
                       "contents": Object {
-                        "contentHash": "src/features4/todos/todos.ts?number=6&duplicate=false",
+                        "contentId": "src/features4/todos/todos.ts?number=6&duplicate=false",
                         "id": "src/features4/todos/todos.ts?number=6&duplicate=false",
                         "url": "https://something.com/src/features4/todos/todos.ts?number=6&duplicate=false",
                       },
@@ -286,7 +286,7 @@ Object {
             },
             Object {
               "contents": Object {
-                "contentHash": "src/App.tsx",
+                "contentId": "src/App.tsx",
                 "id": "src/App.tsx",
                 "url": "https://something.com/src/App.tsx",
               },
@@ -296,7 +296,7 @@ Object {
             },
             Object {
               "contents": Object {
-                "contentHash": "src/index.tsx",
+                "contentId": "src/index.tsx",
                 "id": "src/index.tsx",
                 "url": "https://something.com/src/index.tsx",
               },
@@ -322,7 +322,7 @@ Object {
               "contents": Array [
                 Object {
                   "contents": Object {
-                    "contentHash": "webpack:////home/circleci/codesandbox-client/node_modules/core-js/fn/array/includes.js",
+                    "contentId": "webpack:////home/circleci/codesandbox-client/node_modules/core-js/fn/array/includes.js",
                     "id": "webpack:////home/circleci/codesandbox-client/node_modules/core-js/fn/array/includes.js",
                     "url": "webpack:////home/circleci/codesandbox-client/node_modules/core-js/fn/array/includes.js",
                   },
@@ -344,7 +344,7 @@ Object {
           "contents": Array [
             Object {
               "contents": Object {
-                "contentHash": "webpack://BrowserFS/webpack/bootstrap",
+                "contentId": "webpack://BrowserFS/webpack/bootstrap",
                 "id": "webpack://BrowserFS/webpack/bootstrap",
                 "url": "webpack://BrowserFS/webpack/bootstrap",
               },

@@ -2,17 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
 import flatten from "lodash/flatten";
 import times from "lodash/times";
 import zip from "lodash/zip";
 import React, { Component } from "react";
 
 import { RedactedSpan } from "ui/components/Redacted";
-import { getPreferredLocation } from "ui/utils/preferredLocation";
-
-const IGNORED_SOURCE_URLS = ["debugger eval code"];
 
 export default class PreviewFunction extends Component {
   renderFunctionName(func) {
@@ -38,29 +33,7 @@ export default class PreviewFunction extends Component {
       </span>
     ));
 
-    // $FlowIgnore
     return flatten(zip(params, commas));
-  }
-
-  jumpToDefinitionButton(func) {
-    if (!func.functionLocation) {
-      return null;
-    }
-
-    const location = getPreferredLocation(func.mappedFunctionLocation());
-    const locationURL = location ? this.props.sourcesById[location.sourceId]?.url : undefined;
-
-    if (location && locationURL && !IGNORED_SOURCE_URLS.includes(locationURL)) {
-      const lastIndex = locationURL.lastIndexOf("/");
-
-      return (
-        <button
-          className="jump-definition"
-          draggable="false"
-          title={`${locationURL.slice(lastIndex + 1)}:${location.line}`}
-        />
-      );
-    }
   }
 
   render() {
@@ -71,7 +44,6 @@ export default class PreviewFunction extends Component {
         <span className="paren">(</span>
         {this.renderParams(func)}
         <span className="paren">)</span>
-        {this.jumpToDefinitionButton(func)}
       </RedactedSpan>
     );
   }

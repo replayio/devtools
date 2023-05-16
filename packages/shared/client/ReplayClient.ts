@@ -56,20 +56,14 @@ import uniqueId from "lodash/uniqueId";
 
 // eslint-disable-next-line no-restricted-imports
 import { addEventListener, client, initSocket, removeEventListener } from "protocol/socket";
-import { ThreadFront } from "protocol/thread";
-import { binarySearch, compareNumericStrings, defer, waitForTime } from "protocol/utils";
+import { compareNumericStrings, defer, waitForTime } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
 import { areRangesEqual } from "replay-next/src/utils/time";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
-import { ProtocolError, commandError, isCommandError } from "shared/utils/error";
+import { ProtocolError, commandError } from "shared/utils/error";
 import { isPointInRegions, isRangeInRegions, isTimeInRegions } from "shared/utils/time";
 
-import {
-  LineNumberToHitCountMap,
-  ReplayClientEvents,
-  ReplayClientInterface,
-  SourceLocationRange,
-} from "./types";
+import { ReplayClientEvents, ReplayClientInterface, SourceLocationRange } from "./types";
 
 export const MAX_POINTS_TO_FIND = 10_000;
 export const MAX_POINTS_TO_RUN_EVALUATION = 200;
@@ -80,27 +74,25 @@ const STREAMING_THROTTLE_DURATION = 100;
 // Should we force serialization?
 // Should we cancel in-flight requests and start new ones?
 
-type GetPreferredLocation = (locations: Location[]) => Location | null;
-
 export class ReplayClient implements ReplayClientInterface {
   private _dispatchURL: string;
   private _eventHandlers: Map<ReplayClientEvents, Function[]> = new Map();
-  private _injectedGetPreferredLocation: GetPreferredLocation | null = null;
   private _loadedRegions: LoadedRegions | null = null;
   private _recordingId: RecordingId | null = null;
   private _sessionId: SessionId | null = null;
-  private _threadFront: typeof ThreadFront;
 
   private sessionWaiter = defer<SessionId>();
 
   private nextFindPointsId = 1;
   private nextRunEvaluationId = 1;
 
-  constructor(dispatchURL: string, threadFront: typeof ThreadFront) {
+  constructor(dispatchURL: string) {
     this._dispatchURL = dispatchURL;
-    this._threadFront = threadFront;
 
-    this._threadFront.listenForLoadChanges(this._onLoadChanges);
+    this.waitForSession().then(sessionId => {
+      client.Session.addLoadedRegionsListener(this._onLoadChanges);
+      client.Session.listenForLoadChanges({}, sessionId);
+    });
   }
 
   private getSessionIdThrows(): SessionId {
@@ -136,26 +128,18 @@ export class ReplayClient implements ReplayClientInterface {
     handlers.push(handler);
   }
 
-  async breakpointAdded(location: Location, condition: string | null): Promise<BreakpointId[]> {
+  async breakpointAdded(location: Location, condition: string | null): Promise<BreakpointId> {
     const sessionId = this.getSessionIdThrows();
 
-    const correspondingLocations = this.getCorrespondingLocations(location);
-
-    const breakpointIds: BreakpointId[] = await Promise.all(
-      correspondingLocations.map(async location => {
-        const { breakpointId } = await client.Debugger.setBreakpoint(
-          {
-            condition: condition || undefined,
-            location,
-          },
-          sessionId
-        );
-
-        return breakpointId;
-      })
+    const { breakpointId } = await client.Debugger.setBreakpoint(
+      {
+        condition: condition || undefined,
+        location,
+      },
+      sessionId
     );
 
-    return breakpointIds;
+    return breakpointId;
   }
 
   async breakpointRemoved(breakpointId: BreakpointId): Promise<void> {
@@ -237,7 +221,6 @@ export class ReplayClient implements ReplayClientInterface {
 
     this._sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
-    this._threadFront.setSessionId(sessionId);
 
     return sessionId;
   }
@@ -247,12 +230,6 @@ export class ReplayClient implements ReplayClientInterface {
     client.Session.addKeyboardEventsListener(onKeyboardEvents);
     await client.Session.findKeyboardEvents({}, sessionId!);
     client.Session.removeKeyboardEventsListener(onKeyboardEvents);
-  }
-
-  // Allows legacy app to inject Redux source/location data into the client.
-  // TODO [bvaughn] This is a stop-gap; we should move this logic into the new architecture somehow.
-  injectGetPreferredLocation(getPreferredLocation: GetPreferredLocation) {
-    this._injectedGetPreferredLocation = getPreferredLocation;
   }
 
   async findMessages(onMessage?: (message: Message) => void): Promise<{
@@ -445,8 +422,6 @@ export class ReplayClient implements ReplayClientInterface {
     await client.Debugger.findSources({}, sessionId);
     client.Debugger.removeNewSourceListener(newSourceListener);
 
-    this._threadFront.markSourcesLoaded();
-
     return sources;
   }
 
@@ -552,28 +527,6 @@ export class ReplayClient implements ReplayClientInterface {
     return result;
   }
 
-  getCorrespondingLocations(location: Location): Location[] {
-    const { column, line, sourceId } = location;
-    const sourceIds = this.getCorrespondingSourceIds(sourceId);
-    return sourceIds.map(sourceId => ({
-      column,
-      line,
-      sourceId,
-    }));
-  }
-
-  getCorrespondingSourceIds(sourceId: SourceId): SourceId[] {
-    return this._threadFront.getCorrespondingSourceIds(sourceId);
-  }
-
-  getPreferredLocation(locations: Location[]): Location | null {
-    if (this._injectedGetPreferredLocation != null) {
-      return this._injectedGetPreferredLocation(locations);
-    }
-
-    return locations[0] || null;
-  }
-
   getRecordingId(): RecordingId | null {
     return this._recordingId;
   }
@@ -666,14 +619,6 @@ export class ReplayClient implements ReplayClientInterface {
     const { window } = await client.Session.requestFocusRange({ range }, sessionId);
 
     return window;
-  }
-
-  isOriginalSource(sourceId: SourceId): boolean {
-    return this._threadFront.isOriginalSource(sourceId);
-  }
-
-  isPrettyPrintedSource(sourceId: SourceId): boolean {
-    return this._threadFront.isPrettyPrintedSource(sourceId);
   }
 
   removeEventListener(type: ReplayClientEvents, handler: Function): void {
@@ -996,10 +941,6 @@ export class ReplayClient implements ReplayClientInterface {
 
       checkLoaded();
     });
-  }
-
-  async waitForLoadedSources(): Promise<void> {
-    await this._threadFront.ensureAllSources();
   }
 
   _dispatchEvent(type: ReplayClientEvents, ...args: any[]): void {

@@ -7,6 +7,7 @@ import { ProtocolError, commandError } from "shared/utils/error";
 import { createInfallibleSuspenseCache } from "../utils/suspense";
 import { createAnalysisCache } from "./AnalysisCache";
 import { cachePauseData } from "./PauseCache";
+import { sourcesByIdCache } from "./SourcesCache";
 
 export type UncaughtException = PointDescription & {
   type: "UncaughtException";
@@ -39,7 +40,8 @@ export const exceptionValueCache = createCache<
   getKey: ([client, pauseId]) => pauseId,
   load: async ([client, pauseId]) => {
     const result = await client.getExceptionValue(pauseId);
-    cachePauseData(client, pauseId, result.data);
+    const sources = await sourcesByIdCache.readAsync(client);
+    cachePauseData(client, sources, pauseId, result.data);
     return result.exception;
   },
 });

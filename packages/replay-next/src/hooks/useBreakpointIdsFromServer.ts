@@ -3,10 +3,12 @@ import { useContext, useEffect, useRef } from "react";
 
 import { PointBehaviorsObject } from "replay-next/src/contexts/points/types";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
-import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
+import { sourcesByIdCache, sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_ENABLED, Point, PointKey } from "shared/client/types";
 import { ReplayClientInterface } from "shared/client/types";
+
+import { getCorrespondingLocations } from "../utils/sources";
 
 // Breakpoints must be synced with the server so the stepping controls will work.
 export default function useBreakpointIdsFromServer(
@@ -77,7 +79,7 @@ export default function useBreakpointIdsFromServer(
                 sourceId,
               };
 
-              client.breakpointAdded(location, point.condition).then(serverKeys => {
+              breakpointAdded(client, location, point.condition).then(serverKeys => {
                 pointKeyToBreakpointKeyMap.set(key, serverKeys);
               });
             }
@@ -106,13 +108,13 @@ export default function useBreakpointIdsFromServer(
             const prevPoint = prevPoints.find(({ key }) => key === point.key);
             if (prevPoint == null) {
               if (pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED) {
-                client.breakpointAdded(location, point.condition).then(serverKeys => {
+                breakpointAdded(client, location, point.condition).then(serverKeys => {
                   pointKeyToBreakpointKeyMap.set(key, serverKeys);
                 });
               }
             } else if (prevPointBehavior?.shouldBreak !== pointBehavior?.shouldBreak) {
               if (pointBehavior?.shouldBreak === POINT_BEHAVIOR_ENABLED) {
-                client.breakpointAdded(location, point.condition).then(serverKeys => {
+                breakpointAdded(client, location, point.condition).then(serverKeys => {
                   pointKeyToBreakpointKeyMap.set(key, serverKeys);
                 });
               } else {
@@ -146,4 +148,17 @@ export default function useBreakpointIdsFromServer(
 
     setUpBreakpoints();
   }, [client, deletePoints, pointBehaviors, points, replayClient]);
+}
+
+async function breakpointAdded(
+  replayClient: ReplayClientInterface,
+  location: Location,
+  condition: string | null
+): Promise<BreakpointId[]> {
+  const sources = await sourcesByIdCache.readAsync(replayClient);
+  const correspondingLocations = getCorrespondingLocations(sources, location);
+
+  return await Promise.all(
+    correspondingLocations.map(async location => replayClient.breakpointAdded(location, condition))
+  );
 }

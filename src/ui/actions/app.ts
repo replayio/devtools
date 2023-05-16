@@ -1,4 +1,4 @@
-import { KeyboardEvent, NodeBounds } from "@replayio/protocol";
+import { KeyboardEvent, NodeBounds, loadedRegions } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
 import {
@@ -107,10 +107,10 @@ export async function setupApp(
 
   checkLoadingStatus();
 
-  ThreadFront.listenForLoadChanges(parameters => {
+  replayClient.addEventListener("loadedRegionsChange", (loadedRegions: loadedRegions) => {
     lastLoadChangeUpdateTime = now();
 
-    store.dispatch(setLoadedRegions(parameters));
+    store.dispatch(setLoadedRegions(loadedRegions));
   });
 }
 

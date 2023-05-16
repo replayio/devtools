@@ -11,6 +11,7 @@ import { Cache, createCache } from "suspense";
 
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
+import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 type NodeFetchOptions =
@@ -156,7 +157,8 @@ export const nodeDataCache: Cache<
     }
 
     if (pauseData) {
-      cachePauseData(replayClient, pauseId, pauseData);
+      const sources = await sourcesByIdCache.readAsync(replayClient);
+      cachePauseData(replayClient, sources, pauseId, pauseData);
     }
 
     if (!nodeIds.length) {
@@ -192,7 +194,8 @@ export const nodeEventListenersCache: Cache<
       sessionId,
       pauseId
     );
-    cachePauseData(replayClient, pauseId, data);
+    const sources = await sourcesByIdCache.readAsync(replayClient);
+    cachePauseData(replayClient, sources, pauseId, data);
 
     return listeners;
   },

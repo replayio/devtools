@@ -2,10 +2,16 @@ import { Location, SearchSourceContentsMatch, SourceId } from "@replayio/protoco
 import { Cache, createCache } from "suspense";
 
 import { insert } from "replay-next/src/utils/array";
-import { isBowerComponent, isModuleFromCdn, isNodeModule } from "replay-next/src/utils/source";
+import {
+  isBowerComponent,
+  isModuleFromCdn,
+  isNodeModule,
+  isSourceMappedSource,
+} from "replay-next/src/utils/source";
 import { ReplayClientInterface } from "shared/client/types";
 
-import { sourcesCache } from "./SourcesCache";
+import { getCorrespondingSourceIds } from "../utils/sources";
+import { sourcesByIdCache } from "./SourcesCache";
 
 // TODO Create a generic cache variant that
 // (1) supports streaming data and
@@ -131,12 +137,12 @@ async function initializeSourceIds(client: ReplayClientInterface) {
   sourceIdsWithNodeModules = [];
   sourceIdsWithoutNodeModules = [];
 
-  const sources = await sourcesCache.readAsync(client);
+  const sources = await sourcesByIdCache.readAsync(client);
 
   // Insert sources in order so that original sources are first.
   const compareSources = (a: SourceId, b: SourceId) => {
-    const aIsOriginal = client.isOriginalSource(a);
-    const bIsOriginal = client.isOriginalSource(b);
+    const aIsOriginal = isSourceMappedSource(a, sources);
+    const bIsOriginal = isSourceMappedSource(b, sources);
     if (aIsOriginal === bIsOriginal) {
       return 0;
     } else if (aIsOriginal) {
@@ -148,8 +154,8 @@ async function initializeSourceIds(client: ReplayClientInterface) {
 
   const minifiedSources = new Set<SourceId>();
   sources.forEach(source => {
-    if (source.kind === "prettyPrinted" && source.generatedSourceIds?.length) {
-      minifiedSources.add(source.generatedSourceIds[0]);
+    if (source.kind === "prettyPrinted" && source.generated.length) {
+      minifiedSources.add(source.generated[0]);
     }
   });
 
@@ -160,7 +166,7 @@ async function initializeSourceIds(client: ReplayClientInterface) {
       return;
     }
 
-    const correspondingSourceId = client.getCorrespondingSourceIds(source.sourceId)[0];
+    const correspondingSourceId = getCorrespondingSourceIds(sources, source.sourceId)[0];
     if (correspondingSourceId !== sourceId) {
       return;
     }

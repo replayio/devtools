@@ -7,6 +7,7 @@ import {
   PauseData,
   PauseId,
   Result,
+  SourceId,
   TimeStampedPoint,
 } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
@@ -14,9 +15,11 @@ import { Cache, createCache } from "suspense";
 
 import { ReplayClientInterface } from "shared/client/types";
 
+import { getCorrespondingSourceIds } from "../utils/sources";
 import { framesCache } from "./FrameCache";
 import { preCacheObjects } from "./ObjectPreviews";
 import { scopesCache } from "./ScopeCache";
+import { Source, sourcesByIdCache } from "./SourcesCache";
 
 const pauseIdToPointAndTimeMap: Map<PauseId, [ExecutionPoint, number]> = new Map();
 
@@ -32,9 +35,9 @@ export const pauseIdCache: Cache<
 
     pauseIdToPointAndTimeMap.set(pauseId, [executionPoint, time]);
 
-    await replayClient.waitForLoadedSources();
+    const sources = await sourcesByIdCache.readAsync(replayClient);
 
-    cachePauseData(replayClient, pauseId, data, stack);
+    cachePauseData(replayClient, sources, pauseId, data, stack);
 
     return pauseId;
   },
@@ -66,14 +69,15 @@ export const pauseEvaluationsCache: Cache<
     `${pauseId}:${frameId}:${expression}:${uid}`,
   load: async ([replayClient, pauseId, frameId, expression, uid = ""]) => {
     const result = await replayClient.evaluateExpression(pauseId, expression, frameId);
-    await replayClient.waitForLoadedSources();
-    cachePauseData(replayClient, pauseId, result.data);
+    const sources = await sourcesByIdCache.readAsync(replayClient);
+    cachePauseData(replayClient, sources, pauseId, result.data);
     return { exception: result.exception, failed: result.failed, returned: result.returned };
   },
 });
 
 export function cachePauseData(
   client: ReplayClientInterface,
+  sources: Map<SourceId, Source>,
   pauseId: PauseId,
   pauseData: PauseData,
   stack?: CallStack
@@ -82,7 +86,7 @@ export function cachePauseData(
     preCacheObjects(pauseId, pauseData.objects);
   }
   if (stack) {
-    const frames = sortFramesAndUpdateLocations(client, pauseData.frames || [], stack);
+    const frames = sortFramesAndUpdateLocations(sources, pauseData.frames || [], stack);
     if (frames) {
       framesCache.cache(frames, client, pauseId);
     }
@@ -95,7 +99,7 @@ export function cachePauseData(
 }
 
 export function sortFramesAndUpdateLocations(
-  client: ReplayClientInterface,
+  sources: Map<SourceId, Source>,
   rawFrames: Frame[],
   stack: FrameId[]
 ) {
@@ -103,9 +107,9 @@ export function sortFramesAndUpdateLocations(
   if (frames.every(frame => !!frame)) {
     const updatedFrames = frames.map(frame => cloneDeep(frame!));
     for (const frame of updatedFrames) {
-      updateMappedLocation(client, frame.location);
+      updateMappedLocation(sources, frame.location);
       if (frame!.functionLocation) {
-        updateMappedLocation(client, frame.functionLocation);
+        updateMappedLocation(sources, frame.functionLocation);
       }
     }
     return updatedFrames;
@@ -113,10 +117,10 @@ export function sortFramesAndUpdateLocations(
 }
 
 export function updateMappedLocation(
-  client: ReplayClientInterface,
+  sources: Map<SourceId, Source>,
   mappedLocation: MappedLocation
 ) {
   for (const location of mappedLocation) {
-    location.sourceId = client.getCorrespondingSourceIds(location.sourceId)[0];
+    location.sourceId = getCorrespondingSourceIds(sources, location.sourceId)[0];
   }
 }

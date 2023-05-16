@@ -170,10 +170,10 @@ function PointPanelWithHitPoints({
   let source = getSourceSuspends(client, location.sourceId);
   if (source?.kind === "prettyPrinted") {
     assert(
-      source.generatedSourceIds,
+      source.generated.length > 0,
       `pretty-printed source ${location.sourceId} has no generatedSourceIds`
     );
-    source = getSourceSuspends(client, source.generatedSourceIds[0]);
+    source = getSourceSuspends(client, source.generated[0]);
   }
   const context =
     source?.kind === "sourceMapped" ? "logpoint-original-source" : "logpoint-generated-source";

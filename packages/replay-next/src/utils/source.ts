@@ -1,18 +1,10 @@
-import { SourceId } from "@replayio/protocol";
-import {
-  newSource as ProtocolSource,
-  SourceLocation,
-  getSourceOutlineResult,
-} from "@replayio/protocol";
+import { SourceId, SourceLocation, getSourceOutlineResult } from "@replayio/protocol";
 
 import { assert } from "protocol/utils";
 
-import { isIndexedSource } from "../suspense/SourcesCache";
+import { Source } from "../suspense/SourcesCache";
 
-export function getSourceFileName(
-  source: ProtocolSource,
-  appendIndex: boolean = false
-): string | null {
+export function getSourceFileName(source: Source, appendIndex: boolean = false): string | null {
   const { url } = source;
   if (!url) {
     return null;
@@ -21,11 +13,9 @@ export function getSourceFileName(
   let fileName = getSourceFileNameFromUrl(url);
 
   if (appendIndex) {
-    if (isIndexedSource(source)) {
-      const { contentHashIndex, doesContentHashChange } = source;
-      if (doesContentHashChange) {
-        fileName = `${fileName} (${contentHashIndex + 1})`;
-      }
+    const { contentIdIndex, doesContentIdChange } = source;
+    if (doesContentIdChange) {
+      fileName = `${fileName} (${contentIdIndex + 1})`;
     }
   }
 
@@ -41,7 +31,7 @@ export function getSourceFileNameFromUrl(url: string): string | null {
   return fileName || null;
 }
 
-export function isBowerComponent(source: ProtocolSource): boolean {
+export function isBowerComponent(source: Source): boolean {
   if (!source?.url) {
     return false;
   }
@@ -49,7 +39,7 @@ export function isBowerComponent(source: ProtocolSource): boolean {
   return source.url.includes("bower_components");
 }
 
-export function isModuleFromCdn(source?: ProtocolSource): boolean {
+export function isModuleFromCdn(source?: Source): boolean {
   if (!source?.url) {
     return false;
   }
@@ -62,7 +52,7 @@ export function isModuleFromCdn(source?: ProtocolSource): boolean {
   );
 }
 
-export function isNodeModule(source?: ProtocolSource): boolean {
+export function isNodeModule(source?: Source): boolean {
   if (!source?.url) {
     return false;
   }
@@ -70,16 +60,10 @@ export function isNodeModule(source?: ProtocolSource): boolean {
   return source.url.includes("node_modules");
 }
 
-export function isSourceMappedSource(sourceId: SourceId, sources: ProtocolSource[]): boolean {
-  const source = sources.find(source => source.sourceId === sourceId);
+export function isSourceMappedSource(sourceId: SourceId, sources: Map<SourceId, Source>): boolean {
+  const source = sources.get(sourceId);
   assert(source, `Source ${sourceId} not found`);
-  if (source.kind === "sourceMapped") {
-    return true;
-  }
-  if (source.kind === "prettyPrinted" && source.generatedSourceIds?.length) {
-    return isSourceMappedSource(source.generatedSourceIds[0], sources);
-  }
-  return false;
+  return source.isSourceMapped;
 }
 
 export function findFunctionNameForLocation(

@@ -6,6 +6,7 @@ import { ReplayClientInterface } from "shared/client/types";
 
 import { framesCache } from "./FrameCache";
 import { cachePauseData } from "./PauseCache";
+import { sourcesByIdCache } from "./SourcesCache";
 
 export interface FrameScopes {
   frameLocation: MappedLocation;
@@ -22,9 +23,9 @@ export const scopesCache: Cache<
   getKey: ([replayClient, pauseId, scopeId]) => `${pauseId}:${scopeId}`,
   load: async ([replayClient, pauseId, scopeId]) => {
     const result = await replayClient.getScope(pauseId, scopeId);
-    await replayClient.waitForLoadedSources();
 
-    cachePauseData(replayClient, pauseId, result.data);
+    const sources = await sourcesByIdCache.readAsync(replayClient);
+    cachePauseData(replayClient, sources, pauseId, result.data);
 
     // Caching PauseData should also cache values in this cache
     const cached = scopesCache.getValueIfCached(replayClient, pauseId, scopeId);

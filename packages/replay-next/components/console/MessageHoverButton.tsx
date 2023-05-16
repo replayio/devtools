@@ -17,8 +17,11 @@ import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientCont
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { LayoutContext } from "replay-next/src/contexts/LayoutContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useNag } from "replay-next/src/hooks/useNag";
+import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
+import { getPreferredLocation } from "replay-next/src/utils/sources";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { addComment as addCommentGraphQL } from "shared/graphql/Comments";
@@ -54,7 +57,13 @@ export default function MessageHoverButton({
   const isCurrentlyPausedAt = currentExecutionPoint === executionPoint;
 
   const client = useContext(ReplayClientContext);
-  const location = locations ? client.getPreferredLocation(locations) : null;
+  const { preferredGeneratedSourceIds } = useContext(SourcesContext);
+
+  const sourcesById = sourcesByIdCache.getValueIfCached(client);
+  const location =
+    locations && sourcesById
+      ? getPreferredLocation(sourcesById, preferredGeneratedSourceIds, locations)
+      : null;
 
   let button = null;
   if (isCurrentlyPausedAt) {

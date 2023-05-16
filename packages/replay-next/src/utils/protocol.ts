@@ -4,13 +4,13 @@ import {
   ObjectId as ProtocolObjectId,
   PauseId as ProtocolPauseId,
   Property as ProtocolProperty,
-  newSource as ProtocolSource,
   Value as ProtocolValue,
 } from "@replayio/protocol";
 
 import { ReplayClientInterface } from "shared/client/types";
 
 import { objectCache } from "../suspense/ObjectPreviews";
+import { Source } from "../suspense/SourcesCache";
 
 type ValueType =
   | "array"
@@ -326,13 +326,13 @@ type SourceNode =
   | { type: "origin"; origin: string }
   | {
       type: "source";
-      source: ProtocolSource;
+      source: Source;
       path: string;
     };
 
 type SourceTree = SourceNode[];
 
-export function protocolSourcesToSourceTree(sources: ProtocolSource[]): SourceTree {
+export function sourcesToSourceTree(sources: Source[]): SourceTree {
   const sourceTree: SourceTree = [];
 
   let protocol: string | null = null;

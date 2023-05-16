@@ -14,6 +14,7 @@ import { createInfallibleSuspenseCache } from "../utils/suspense";
 import { createAnalysisCache } from "./AnalysisCache";
 import { createFocusIntervalCacheForExecutionPoints } from "./FocusIntervalCache";
 import { updateMappedLocation } from "./PauseCache";
+import { sourcesByIdCache } from "./SourcesCache";
 
 export type Event = {
   count: number;
@@ -68,9 +69,10 @@ export const eventPointsCache = createFocusIntervalCacheForExecutionPoints<
   getPointForValue: pointDescription => pointDescription.point,
   load: async (begin, end, client, eventTypes) => {
     const points = await client.findPoints(createPointSelector(eventTypes), { begin, end });
+    const sources = await sourcesByIdCache.readAsync(client);
     points.forEach(p => {
       if (p?.frame?.length) {
-        updateMappedLocation(client, p.frame);
+        updateMappedLocation(sources, p.frame);
       }
     });
     return points;

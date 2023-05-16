@@ -3,6 +3,11 @@ import { Suspense, memo, useContext } from "react";
 
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { framesCache, topFrameCache } from "replay-next/src/suspense/FrameCache";
+import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
+import {
+  getCorrespondingLocations,
+  getCorrespondingSourceIds,
+} from "replay-next/src/utils/sources";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { SelectedFrameContext } from "../../src/contexts/SelectedFrameContext";
@@ -59,13 +64,14 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
         selectedFrame = allFrames?.find(frame => frame.frameId === frameId);
       }
 
-      const correspondingSourceIds = client.getCorrespondingSourceIds(sourceId);
+      const sources = sourcesByIdCache.read(client);
+      const correspondingSourceIds = getCorrespondingSourceIds(sources, sourceId);
 
       // Assuming we found a frame, check to see if there's a matching location for the frame.
       // If so, we should show the highlight line.
       showHighlight = !!selectedFrame?.location.find(location => {
         if (correspondingSourceIds.includes(location.sourceId)) {
-          const correspondingLocations = client.getCorrespondingLocations(location);
+          const correspondingLocations = getCorrespondingLocations(sources, location);
           return (
             correspondingLocations.findIndex(
               correspondingLocation =>

@@ -1,4 +1,3 @@
-import { newSource as ProtocolSource } from "@replayio/protocol";
 import debounce from "lodash/debounce";
 import {
   CSSProperties,
@@ -30,7 +29,7 @@ import {
   getCachedMinMaxSourceHitCounts,
   sourceHitCountsCache,
 } from "replay-next/src/suspense/SourceHitCountsCache";
-import { StreamingSourceContentsValue } from "replay-next/src/suspense/SourcesCache";
+import { Source } from "replay-next/src/suspense/SourcesCache";
 import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { POINT_BEHAVIOR_DISABLED, POINT_BEHAVIOR_ENABLED } from "shared/client/types";
@@ -53,7 +52,7 @@ export default function SourceList({
 }: {
   height: number;
   showColumnBreakpoints: boolean;
-  source: ProtocolSource;
+  source: Source;
   streamingParser: StreamingParser;
   width: number;
 }) {

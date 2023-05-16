@@ -186,7 +186,7 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
 
     if (item.type === "source" && source) {
       // Probably overkill
-      return `${source.url!}${source.contentHash || ""}${source.id}`;
+      return `${source.url!}${source.contentId || ""}${source.id}`;
     }
 
     return path;

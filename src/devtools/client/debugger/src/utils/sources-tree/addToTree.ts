@@ -141,7 +141,7 @@ function addSourceToNode(node: TreeNode, url: ParsedUrl, source: SourceDetails) 
         // We've found a potentially duplicated file with multiple versions.
         // _If_ the contents are identical, do nothing - no reason to show them separately.
 
-        if (node.contents.contentHash === source.contentHash) {
+        if (node.contents.contentId === source.contentId) {
           // The return value gets assigned as the _new_ `node.contents`,
           // so return the existing source entry to leave things unchanged.
           return node.contents;
@@ -162,9 +162,7 @@ function addSourceToNode(node: TreeNode, url: ParsedUrl, source: SourceDetails) 
       case "multiSource": {
         // We might also have an existing entry for this content hash here.
         // Similar to the single case, skip adding the new one if there's a collision.
-        if (
-          node.contents.find(childNode => childNode.contents.contentHash === source.contentHash)
-        ) {
+        if (node.contents.find(childNode => childNode.contents.contentId === source.contentId)) {
           return node.contents;
         }
 

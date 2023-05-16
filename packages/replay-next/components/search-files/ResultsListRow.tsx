@@ -1,4 +1,3 @@
-import { newSource as Source } from "@replayio/protocol";
 import { CSSProperties, memo, useContext, useMemo } from "react";
 import { areEqual } from "react-window";
 
@@ -13,6 +12,7 @@ import {
   isSourceSearchResultLocation,
   isSourceSearchResultMatch,
 } from "replay-next/src/suspense/SearchCache";
+import { Source } from "replay-next/src/suspense/SourcesCache";
 import { getSourceFileName } from "replay-next/src/utils/source";
 import { getRelativePathWithoutFile } from "replay-next/src/utils/url";
 

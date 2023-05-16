@@ -1,21 +1,22 @@
-import { newSource as ProtocolSource, SourceId } from "@replayio/protocol";
+import { SourceId } from "@replayio/protocol";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import { useContext, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { Source } from "replay-next/src/suspense/SourcesCache";
 import { getSourceFileName } from "replay-next/src/utils/source";
 
 import useSearch from "./useSearch";
 import type { Actions as SearchActions, State as SearchState } from "./useSearch";
 
-export type Item = ProtocolSource;
+export type Item = Source;
 export type Result = {
   characterIndices: number[];
-  source: ProtocolSource;
+  source: Source;
   weight: number;
 };
 
-function search(query: string, sources: ProtocolSource[]): Result[] {
+function search(query: string, sources: Source[]): Result[] {
   const needle = query.toLocaleLowerCase();
   const results: Result[] = [];
 
@@ -69,7 +70,7 @@ function search(query: string, sources: ProtocolSource[]): Result[] {
 }
 
 export type Actions = SearchActions & {
-  setSources: (sources: ProtocolSource[]) => void;
+  setSources: (sources: Source[]) => void;
 };
 
 export type GoToLineState = {
@@ -85,9 +86,9 @@ export default function useSourceFileNameSearch(): [State, Actions] {
 
   const focusedSourceIdRef = useRef<SourceId | null>(null);
 
-  const [sources, setSources] = useState<ProtocolSource[]>([]);
+  const [sources, setSources] = useState<Source[]>([]);
 
-  const [state, dispatch] = useSearch<ProtocolSource, Result>(sources, search);
+  const [state, dispatch] = useSearch<Source, Result>(sources, search);
   const [goToLineState, setGoToLineState] = useState<GoToLineState>({
     goToLineMode: false,
     goToLineNumber: null,

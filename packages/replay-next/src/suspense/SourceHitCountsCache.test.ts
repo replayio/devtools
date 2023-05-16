@@ -51,7 +51,6 @@ describe("SourceHitCountsCache", () => {
       mockClient.getBreakpointPositions.mockImplementation(() => {
         return Promise.resolve(makeLocations(1, 6));
       });
-      mockClient.getCorrespondingSourceIds.mockImplementation(sourceId => [sourceId]);
       mockClient.getSourceHitCounts.mockImplementation((sourceId, sourceLocations, focusRange) => {
         const hitCounts: HitCount[] = [];
         for (const sourceLocation of sourceLocations) {

@@ -53,7 +53,6 @@ import timeline, {
 } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import { UnexpectedError } from "ui/state/app";
-import { setupGetPreferredLocation } from "ui/utils/preferredLocation";
 import type { ThunkExtraArgs } from "ui/utils/thunk";
 
 import { startAppListening } from "../listenerMiddleware";
@@ -216,7 +215,6 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   setupReactDevTools(store, ThreadFront);
   setupBoxModel(store, startAppListening);
   setupRules(store, startAppListening);
-  setupGetPreferredLocation(store);
 
   // Add protocol event listeners for things that the Redux store needs to stay in sync with.
   // TODO We should revisit this as part of a larger architectural redesign (#6932).

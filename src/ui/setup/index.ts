@@ -1,4 +1,4 @@
-import { loadedRegions as LoadedRegions, Location, SourceId } from "@replayio/protocol";
+import { loadedRegions as LoadedRegions } from "@replayio/protocol";
 
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
 import { EMPTY_TABS } from "devtools/client/debugger/src/reducers/tabs";
@@ -7,7 +7,7 @@ import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFilte
 import { POINTS_DATABASE } from "replay-next/src/contexts/points/constants";
 import { preloadIDBInitialValues } from "replay-next/src/hooks/useIndexedDB";
 import { preCacheExecutionPointForTime } from "replay-next/src/suspense/ExecutionPointsCache";
-import { ReplayClient } from "shared/client/ReplayClient";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { replayClient } from "shared/client/ReplayClientContext";
 import { Recording } from "shared/graphql/types";
 import { UIStore } from "ui/actions";
@@ -16,20 +16,12 @@ import { getUserSettings } from "ui/hooks/settings";
 import { getUserInfo } from "ui/hooks/users";
 import { getTheme, initialAppState } from "ui/reducers/app";
 import { syncInitialLayoutState } from "ui/reducers/layout";
-import {
-  SourcesState,
-  getCorrespondingSourceIds,
-  getSourceDetails,
-  initialState as initialSourcesState,
-  isOriginalSource,
-  isPrettyPrintedSource,
-} from "ui/reducers/sources";
+import { SourcesState, initialState as initialSourcesState } from "ui/reducers/sources";
 import { ReplaySession, getReplaySession } from "ui/setup/prefs";
 import type { LayoutState } from "ui/state/layout";
 import { setUserInBrowserPrefs } from "ui/utils/browser";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
 import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
-import { getPreferredLocation } from "ui/utils/preferredLocation";
 import { getRecordingId } from "ui/utils/recording";
 import { setTelemetryContext, setupTelemetry } from "ui/utils/telemetry";
 import { trackEvent } from "ui/utils/telemetry";
@@ -152,7 +144,7 @@ export async function bootstrapApp() {
   }
 
   // Listen for changes in loaded regions and pre-caches the points.
-  ThreadFront.listenForLoadChanges((loadedRegions: LoadedRegions) => {
+  replayClient.addEventListener("loadedRegionsChange", (loadedRegions: LoadedRegions) => {
     loadedRegions.indexed.forEach(({ begin, end }) => {
       preCacheExecutionPointForTime(begin);
       preCacheExecutionPointForTime(end);
@@ -167,22 +159,7 @@ export async function bootstrapApp() {
     });
   });
 
-  // Wire up new Console and Object Inspector to the Redux logic for preferred source.
-  (replayClient as ReplayClient).injectGetPreferredLocation(
-    (locations: Location[]) => getPreferredLocation(locations) || null
-  );
-
-  ThreadFront.getCorrespondingSourceIds = (sourceId: SourceId) => {
-    return getCorrespondingSourceIds(store.getState(), sourceId);
-  };
-  ThreadFront.isOriginalSource = (sourceId: SourceId) => {
-    const sourceDetails = getSourceDetails(store.getState(), sourceId);
-    return sourceDetails != null && isOriginalSource(sourceDetails);
-  };
-  ThreadFront.isPrettyPrintedSource = (sourceId: SourceId) => {
-    const sourceDetails = getSourceDetails(store.getState(), sourceId);
-    return sourceDetails != null && isPrettyPrintedSource(sourceDetails);
-  };
+  Promise.resolve(sourcesCache.readAsync(replayClient)).then(() => ThreadFront.markSourcesLoaded());
 
   setupTelemetry();
   setupDOMHelpers();
