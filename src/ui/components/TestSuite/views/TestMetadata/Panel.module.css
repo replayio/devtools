@@ -22,6 +22,7 @@
   text-overflow: ellipsis;
   word-break: break-all;
   white-space: nowrap;
+  line-height: 120%;
 }
 
 .ResultIconAndLabel {
