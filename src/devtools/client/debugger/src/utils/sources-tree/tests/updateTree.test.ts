@@ -66,7 +66,7 @@ describe("updateTree", () => {
     return {
       id: path,
       url: reIsFullURL.test(path) ? path : `https://something.com/${path}`,
-      contentHash: path,
+      contentId: path,
     } as SourceDetails;
   });
 
@@ -79,7 +79,7 @@ describe("updateTree", () => {
       url,
       // Fake a content hash by using the URL minus the query params,
       // which will fake a content hash collision
-      contentHash: urlObj.href,
+      contentId: urlObj.href,
     } as SourceDetails;
   });
 
@@ -92,7 +92,7 @@ describe("updateTree", () => {
       url,
       // Fake a content hash by using the URL minus the query params,
       // which will fake a content hash collision
-      contentHash: path.includes("duplicate=true") ? urlObj.href : path,
+      contentId: path.includes("duplicate=true") ? urlObj.href : path,
     } as SourceDetails;
   });
 

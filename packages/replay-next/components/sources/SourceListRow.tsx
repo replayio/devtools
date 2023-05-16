@@ -1,4 +1,4 @@
-import { newSource as ProtocolSource, SameLineSourceLocations } from "@replayio/protocol";
+import { SameLineSourceLocations } from "@replayio/protocol";
 import {
   CSSProperties,
   MouseEvent,
@@ -23,6 +23,7 @@ import { PointsContext } from "replay-next/src/contexts/points/PointsContext";
 import { PointBehaviorsObject } from "replay-next/src/contexts/points/types";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { Source } from "replay-next/src/suspense/SourcesCache";
 import { StreamingParser } from "replay-next/src/suspense/SyntaxParsingCache";
 import { ParsedToken } from "replay-next/src/utils/syntax-parser";
 import {
@@ -62,7 +63,7 @@ export type ItemData = {
   pointBehaviors: PointBehaviorsObject;
   showColumnBreakpoints: boolean;
   showHitCounts: boolean;
-  source: ProtocolSource;
+  source: Source;
   streamingParser: StreamingParser;
 };
 

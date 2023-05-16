@@ -4,11 +4,13 @@ import { ReactNode, Suspense, useContext } from "react";
 
 import { assert } from "protocol/utils";
 import Loader from "replay-next/components/Loader";
+import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { mappedLocationCache } from "replay-next/src/suspense/MappedLocationCache";
 import { objectPropertyCache } from "replay-next/src/suspense/ObjectPreviews";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
-import { sourcesByUrlCache, sourcesCache } from "replay-next/src/suspense/SourcesCache";
+import { sourcesByIdCache, sourcesByUrlCache } from "replay-next/src/suspense/SourcesCache";
 import { findFunctionNameForLocation, isSourceMappedSource } from "replay-next/src/utils/source";
+import { getPreferredLocation } from "replay-next/src/utils/sources";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Source from "./Source";
@@ -58,13 +60,15 @@ function ErrorStackRendererSuspends({
 function ErrorFrameRendererSuspends({ frame }: { frame: StackFrame }) {
   const { lineNumber, columnNumber, fileName } = frame;
   const client = useContext(ReplayClientContext);
+  const { preferredGeneratedSourceIds } = useContext(SourcesContext);
 
   const sourcesByUrl = sourcesByUrlCache.read(client);
   let sources = fileName ? sourcesByUrl.get(fileName) || [] : [];
   // Ignore original and pretty-printed sources because we're looking
   // for a source that the browser actually executed
-  sources = sources.filter(source => !source.generatedSourceIds?.length);
+  sources = sources.filter(source => !source.generated.length);
 
+  const sourcesById = sourcesByIdCache.read(client);
   let originalFunctionName: string | undefined = undefined;
   let renderedSource: ReactNode;
   if (sources.length >= 1 && lineNumber !== undefined && columnNumber !== undefined) {
@@ -74,11 +78,12 @@ function ErrorFrameRendererSuspends({ frame }: { frame: StackFrame }) {
       column: columnNumber,
     };
     const mappedLocation = mappedLocationCache.read(client, location);
-    const preferredLocation = client.getPreferredLocation(mappedLocation);
-    if (
-      preferredLocation &&
-      isSourceMappedSource(preferredLocation.sourceId, sourcesCache.read(client))
-    ) {
+    const preferredLocation = getPreferredLocation(
+      sourcesById,
+      preferredGeneratedSourceIds,
+      mappedLocation
+    );
+    if (preferredLocation && isSourceMappedSource(preferredLocation.sourceId, sourcesById)) {
       const sourceOutline = sourceOutlineCache.read(client, preferredLocation.sourceId);
       originalFunctionName = findFunctionNameForLocation(preferredLocation, sourceOutline);
     }

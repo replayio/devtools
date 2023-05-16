@@ -2,13 +2,10 @@ import { useContext, useMemo, useState } from "react";
 
 import Icon from "replay-next/components/Icon";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
-import {
-  isIndexedSource,
-  shouldSourceBeDisplayed,
-  sourcesCache,
-} from "replay-next/src/suspense/SourcesCache";
-import { protocolSourcesToSourceTree } from "replay-next/src/utils/protocol";
+import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
+import { sourcesToSourceTree } from "replay-next/src/utils/protocol";
 import { getSourceFileName } from "replay-next/src/utils/source";
+import { shouldSourceBeDisplayed } from "replay-next/src/utils/sources";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import styles from "./SourceExplorer.module.css";
@@ -18,7 +15,7 @@ export default function SourceExplorer() {
   const { openSource } = useContext(SourcesContext);
 
   const sources = sourcesCache.read(client).filter(shouldSourceBeDisplayed);
-  const sourceTree = useMemo(() => protocolSourcesToSourceTree(sources), [sources]);
+  const sourceTree = useMemo(() => sourcesToSourceTree(sources), [sources]);
 
   // TODO Select on click, keyboard, expand/collapse folders
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
@@ -59,10 +56,8 @@ export default function SourceExplorer() {
               const source = node.source;
               const { sourceId } = source;
 
-              if (isIndexedSource(source)) {
-                if (!source.doesContentHashChange && source.contentHashIndex > 0) {
-                  return null;
-                }
+              if (!source.doesContentIdChange && source.contentIdIndex > 0) {
+                return null;
               }
 
               return (

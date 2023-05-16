@@ -146,7 +146,7 @@ export interface SourceLocationRange {
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;
   addEventListener(type: ReplayClientEvents, handler: Function): void;
-  breakpointAdded(location: Location, condition: string | null): Promise<BreakpointId[]>;
+  breakpointAdded(location: Location, condition: string | null): Promise<BreakpointId>;
   breakpointRemoved(breakpointId: BreakpointId): Promise<void>;
   configure(sessionId: string): void;
   createPause(executionPoint: ExecutionPoint): Promise<createPauseResult>;
@@ -186,8 +186,6 @@ export interface ReplayClientInterface {
     range: SourceLocationRange | null
   ): Promise<SameLineSourceLocations[]>;
   getBuildId(): Promise<string>;
-  getCorrespondingLocations(location: Location): Location[];
-  getCorrespondingSourceIds(sourceId: SourceId): SourceId[];
   getEventCountForTypes(
     eventTypes: EventHandlerType[],
     focusRange: PointRange | null
@@ -204,7 +202,6 @@ export interface ReplayClientInterface {
   getObjectProperty(objectId: ObjectId, pauseId: PauseId, propertyName: string): Promise<Result>;
   getPointNearTime(time: number): Promise<TimeStampedPoint>;
   getPointsBoundingTime(time: number): Promise<PointsBoundingTime>;
-  getPreferredLocation(locations: Location[]): Location | null;
   getRecordingId(): RecordingId | null;
   getScope(pauseId: PauseId, scopeId: ScopeId): Promise<getScopeResult>;
   getScopeMap(location: Location): Promise<VariableMapping[] | undefined>;
@@ -219,8 +216,6 @@ export interface ReplayClientInterface {
   getSourceOutline(sourceId: SourceId): Promise<getSourceOutlineResult>;
   getTopFrame(pauseId: PauseId): Promise<getTopFrameResult>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
-  isOriginalSource(sourceId: SourceId): boolean;
-  isPrettyPrintedSource(sourceId: SourceId): boolean;
   mapExpressionToGeneratedScope(expression: string, location: Location): Promise<string>;
   requestFocusRange(range: FocusWindowRequest): Promise<TimeStampedPointRange>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;
@@ -265,6 +260,5 @@ export interface ReplayClientInterface {
     }) => void,
     onSourceContentsChunk: ({ chunk, sourceId }: { chunk: string; sourceId: SourceId }) => void
   ): Promise<void>;
-  waitForLoadedSources(): Promise<void>;
   waitForTimeToBeLoaded(time: number): Promise<void>;
 }

@@ -1,4 +1,3 @@
-import { newSource as Source } from "@replayio/protocol";
 import {
   CSSProperties,
   useCallback,
@@ -20,7 +19,7 @@ import {
   isSourceSearchResultLocation,
   searchCache,
 } from "replay-next/src/suspense/SearchCache";
-import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
+import { Source, sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import ResultsListRow from "./ResultsListRow";

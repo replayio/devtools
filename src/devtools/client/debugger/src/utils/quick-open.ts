@@ -169,10 +169,10 @@ export function formatSources(
     }
     const sourceToDisplay = sourcesToDisplayByUrl[url]!;
 
-    if (seenContentHashes.has(sourceToDisplay.contentHash!)) {
+    if (seenContentHashes.has(sourceToDisplay.contentId)) {
       continue;
     }
-    seenContentHashes.add(sourceToDisplay.contentHash!);
+    seenContentHashes.add(sourceToDisplay.contentId);
     formattedSources.push(formatSourceForList(sourceToDisplay, tabUrls));
   }
 

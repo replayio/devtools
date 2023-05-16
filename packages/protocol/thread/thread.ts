@@ -13,15 +13,12 @@ import {
   Frame,
   FrameId,
   loadedRegions as LoadedRegions,
-  Location,
-  MappedLocation,
   PauseDescription,
   PauseId,
   RecordingId,
   ScreenShot,
   SessionId,
   SourceId,
-  SourceKind,
   SourceLocation,
   TimeStamp,
   Value,
@@ -31,6 +28,7 @@ import groupBy from "lodash/groupBy";
 
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { cachePauseData, pauseIdCache } from "replay-next/src/suspense/PauseCache";
+import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { areRangesEqual } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 
@@ -48,13 +46,6 @@ export interface Pause {
   point: ExecutionPoint;
   time: number;
   pauseId: PauseId | null;
-}
-
-export interface Source {
-  kind: SourceKind;
-  url?: string;
-  generatedSourceIds?: SourceId[];
-  contentHash?: string;
 }
 
 export interface PauseEventArgs {
@@ -118,13 +109,6 @@ class _ThreadFront {
   // Waiter which resolves when all sources have been loaded.
   private allSourcesWaiter = defer<void>();
 
-  // The following group of methods is injected by the legacy devtools client.
-  // By default, they are essentially no-ops (safe to call but useless).
-  // They require information from the application's Redux state to be useful.
-  getCorrespondingSourceIds = (sourceId: SourceId) => [sourceId];
-  isOriginalSource = (_: SourceId) => false;
-  isPrettyPrintedSource = (_: SourceId) => false;
-
   // Wait for all the annotations in the recording.
   private annotationWaiters: Map<string, Promise<findAnnotationsResult>> = new Map();
   private annotationCallbacks: Map<string, ((annotations: Annotation[]) => void)[]> = new Map();
@@ -180,38 +164,6 @@ class _ThreadFront {
 
   waitForSession() {
     return this.sessionWaiter.promise;
-  }
-
-  private _listeningForLoadChanges: boolean = false;
-  private _loadedRegionsListeners: LoadedRegionListener[] = [];
-  private _mostRecentLoadedRegions: LoadedRegions | null = null;
-
-  async listenForLoadChanges(listener: LoadedRegionListener) {
-    this._loadedRegionsListeners.push(listener);
-
-    if (!this._listeningForLoadChanges) {
-      this._listeningForLoadChanges = true;
-
-      const sessionId = await this.waitForSession();
-
-      client.Session.addLoadedRegionsListener((loadedRegions: LoadedRegions) => {
-        this._mostRecentLoadedRegions = loadedRegions;
-
-        if (areRangesEqual(loadedRegions.indexed, loadedRegions.loading)) {
-          assert(
-            loadedRegions.loading.length === 1,
-            "there should be exactly one initially loaded region"
-          );
-        }
-        this._loadedRegionsListeners.forEach(callback => callback(loadedRegions));
-      });
-
-      client.Session.listenForLoadChanges({}, sessionId);
-    } else {
-      if (this._mostRecentLoadedRegions !== null) {
-        listener(this._mostRecentLoadedRegions);
-      }
-    }
   }
 
   async getAnnotations(onAnnotations: (annotations: Annotation[]) => void, kind?: string) {
@@ -320,7 +272,8 @@ class _ThreadFront {
           this.sessionId!,
           pauseId
         );
-    cachePauseData(replayClient, pauseId, result.data);
+    const sources = await sourcesByIdCache.readAsync(replayClient);
+    cachePauseData(replayClient, sources, pauseId, result.data);
 
     if (features.repaintEvaluations) {
       const { repaint } = await import("protocol/graphics");
@@ -334,21 +287,6 @@ class _ThreadFront {
       return { exception: result.exception as unknown as Value, returned: null };
     } else {
       return { exception: null, returned: null };
-    }
-  }
-
-  // Replace the sourceId in a location with the first corresponding sourceId
-  updateLocation(location: Location) {
-    location.sourceId = this.getCorrespondingSourceIds(location.sourceId)[0];
-  }
-
-  // Replace all sourceIds in a mapped location with the first corresponding sourceId
-  updateMappedLocation(mappedLocation: MappedLocation | undefined) {
-    if (!mappedLocation) {
-      return;
-    }
-    for (const location of mappedLocation) {
-      this.updateLocation(location);
     }
   }
 }

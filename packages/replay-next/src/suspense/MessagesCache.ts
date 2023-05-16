@@ -13,6 +13,7 @@ import {
 import type { ReplayClientInterface } from "shared/client/types";
 
 import { cachePauseData } from "./PauseCache";
+import { sourcesByIdCache } from "./SourcesCache";
 
 export type CategoryCounts = {
   errors: number;
@@ -65,8 +66,9 @@ const findMessagesStreamingCache = createStreamingCache<
     let messages: Message[] = [];
 
     try {
+      const sources = await sourcesByIdCache.readAsync(client);
       const { overflow } = await client.findMessages(message => {
-        cachePauseData(client, message.pauseId, message.data);
+        cachePauseData(client, sources, message.pauseId, message.data);
 
         if (signal.aborted) {
           return false;

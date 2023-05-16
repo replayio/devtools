@@ -6,28 +6,15 @@ import {
   createSelector,
   createSlice,
 } from "@reduxjs/toolkit";
-import { Location, MappedLocation, SourceKind, newSource } from "@replayio/protocol";
+import { Location, MappedLocation } from "@replayio/protocol";
 
 import type { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import { assert } from "protocol/utils";
-import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
+import { Source } from "replay-next/src/suspense/SourcesCache";
 import { UIState } from "ui/state";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
-import { newSourcesToCompleteSourceDetails } from "ui/utils/sources";
 
-export interface SourceDetails {
-  isSourceMapped: boolean;
-  contentHash?: string;
-  correspondingSourceIds: string[];
-  generated: string[];
-  generatedFrom: string[];
-  id: string;
-  kind: SourceKind;
-  prettyPrinted?: string;
-  prettyPrintedFrom?: string;
-  url?: string;
-  // TODO stableId: string;
-}
+export type SourceDetails = Source;
 
 /**
  * Both `Source` and `SourceDetails` have `{id, url?}`,
@@ -76,17 +63,11 @@ const sourcesSlice = createSlice({
   name: "sources",
   initialState,
   reducers: {
-    allSourcesReceived: (state, action: PayloadAction<newSource[]>) => {
+    allSourcesReceived: (state, action: PayloadAction<SourceDetails[]>) => {
       const sources = action.payload;
       state.allSourcesReceived = true;
 
-      sourceDetailsAdapter.addMany(state.sourceDetails, newSourcesToCompleteSourceDetails(sources));
-
-      // The backend doesn't send the same source twice, nor should we request them twice (since it wastes bytes).
-      // Pre-cache source data in the new Suspense cache then so that it can use it for e.g. displaying sources in the Console.
-      //
-      // TODO [bvaughn] Will the new console code need to add some step similar to newSourcesToCompleteSourceDetails() to map between generated and corresponding sources?
-      sourcesCache.cache(sources, null as any);
+      sourceDetailsAdapter.addMany(state.sourceDetails, sources);
 
       const sourcesByUrl: Record<string, string[]> = {};
 

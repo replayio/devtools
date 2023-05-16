@@ -1,7 +1,6 @@
-import { newSource as ProtocolSource } from "@replayio/protocol";
 import { ReactNode, createContext, useContext, useEffect, useMemo } from "react";
 
-import { sourcesCache } from "replay-next/src/suspense/SourcesCache";
+import { Source, sourcesCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useSourceFileNameSearch, { Actions, State } from "./hooks/useSourceFileNameSearch";
@@ -17,7 +16,7 @@ export function SourceFileNameSearchContextRoot({ children }: { children: ReactN
 
   // Keep source search state in sync with the focused source.
   useEffect(() => {
-    async function updateSources(setSources: (sources: ProtocolSource[]) => void) {
+    async function updateSources(setSources: (sources: Source[]) => void) {
       const sources = await sourcesCache.readAsync(client);
       setSources(sources);
     }

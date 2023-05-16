@@ -1,7 +1,7 @@
-import { newSource as ProtocolSource } from "@replayio/protocol";
 import { useContext } from "react";
 
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
+import { Source } from "replay-next/src/suspense/SourcesCache";
 import { LineHitCounts } from "shared/client/types";
 
 export default function useGetDefaultLogPointContent({
@@ -11,7 +11,7 @@ export default function useGetDefaultLogPointContent({
 }: {
   lineHitCounts: LineHitCounts | null;
   lineNumber: number;
-  source: ProtocolSource;
+  source: Source;
 }): () => string | null {
   const { findClosestFunctionName } = useContext(SourcesContext);
 

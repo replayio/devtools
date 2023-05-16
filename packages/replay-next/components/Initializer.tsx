@@ -13,7 +13,6 @@ import { UserInfo } from "shared/graphql/types";
 import { getCurrentUserInfo } from "shared/graphql/User";
 
 import { SessionContext, SessionContextType } from "../src/contexts/SessionContext";
-import { sourcesCache } from "../src/suspense/SourcesCache";
 import Loader from "./Loader";
 import styles from "./Initializer.module.css";
 
@@ -62,10 +61,6 @@ export default function Initializer({
 
         const sessionId = await client.initialize(activeRecordingId, activeAccessToken);
         const endpoint = await client.getSessionEndpoint();
-
-        // The demo doesn't use these directly, but the client throws if they aren't loaded.
-        const sources = await client.findSources();
-        sourcesCache.cache(sources, client);
 
         let currentUserInfo: UserInfo | null = null;
         if (activeAccessToken) {

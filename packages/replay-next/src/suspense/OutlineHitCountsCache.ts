@@ -10,7 +10,9 @@ import { Cache, createCache } from "suspense";
 import { ReplayClientInterface } from "shared/client/types";
 import { ProtocolError, isCommandError } from "shared/utils/error";
 
+import { getCorrespondingSourceIds } from "../utils/sources";
 import { sourceOutlineCache } from "./SourceOutlineCache";
+import { sourcesByIdCache } from "./SourcesCache";
 
 export interface FunctionOutlineWithHitCount extends FunctionOutline {
   hits?: number;
@@ -48,7 +50,8 @@ export const outlineHitCountsCache: Cache<
       }
     }
 
-    const correspondingSourceIds = replayClient.getCorrespondingSourceIds(sourceId);
+    const sources = await sourcesByIdCache.readAsync(replayClient);
+    const correspondingSourceIds = getCorrespondingSourceIds(sources, sourceId);
 
     const hitCountsByLocationKey = new Map<string, number>();
     await Promise.all(

@@ -5,8 +5,10 @@ import { LineHitCounts, LineNumberToHitCountMap, ReplayClientInterface } from "s
 import { ProtocolError, isCommandError } from "shared/utils/error";
 import { toPointRange } from "shared/utils/time";
 
+import { getCorrespondingSourceIds } from "../utils/sources";
 import { breakpointPositionsCache } from "./BreakpointPositionsCache";
 import { createFocusIntervalCache } from "./FocusIntervalCache";
+import { sourcesByIdCache } from "./SourcesCache";
 
 type MinMaxHitCountTuple = [minHitCount: number, maxHitCount: number];
 
@@ -50,7 +52,8 @@ export const sourceHitCountsCache = createFocusIntervalCache<
         ...location,
         columns: location.columns.slice(0, 1),
       }));
-      const correspondingSourceIds = client.getCorrespondingSourceIds(sourceId);
+      const sources = await sourcesByIdCache.readAsync(client);
+      const correspondingSourceIds = getCorrespondingSourceIds(sources, sourceId);
 
       const hitCounts: LineNumberToHitCountMap = new Map();
 

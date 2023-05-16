@@ -5,6 +5,7 @@ import { Cache, createCache } from "suspense";
 import { RuleFront } from "devtools/client/inspector/rules/models/fronts/rule";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData } from "replay-next/src/suspense/PauseCache";
+import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 
 export interface WiredAppliedRule {
@@ -34,7 +35,8 @@ export const appliedRulesCache: Cache<
 
     const uniqueRules = uniqBy(rules, rule => `${rule.rule}|${rule.pseudoElement}`);
 
-    cachePauseData(replayClient, pauseId, data);
+    const sources = await sourcesByIdCache.readAsync(replayClient);
+    cachePauseData(replayClient, sources, pauseId, data);
 
     const stylePromises: Promise<ProtocolObject>[] = [];
 

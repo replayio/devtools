@@ -52,6 +52,7 @@ type SourcesContextType = {
   // In order to avoid triggering too many updates though (e.g. while scrolling),
   // these lines are automatically batched into buckets of 100.
   visibleLines: SourceLocationRange | null;
+  preferredGeneratedSourceIds: SourceId[];
 };
 
 export type OpenSourcesState = {
@@ -332,12 +333,14 @@ const defaultSelectLocation = () => {};
 export type SourcesContextRootProps = PropsWithChildren<{
   findClosestFunctionName?: FindClosestFunctionName;
   selectLocation?: SelectLocationFunction;
+  preferredGeneratedSourceIds?: SourceId[];
 }>;
 
 export function SourcesContextRoot({
   children,
   findClosestFunctionName = defaultFindClosestFunctionByName,
   selectLocation = defaultSelectLocation,
+  preferredGeneratedSourceIds = [],
 }: SourcesContextRootProps) {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
@@ -445,6 +448,7 @@ export function SourcesContextRoot({
       setHoveredLocation,
       setVisibleLines,
       findClosestFunctionName,
+      preferredGeneratedSourceIds,
     }),
     [
       closeSource,
@@ -456,6 +460,7 @@ export function SourcesContextRoot({
       setVisibleLines,
       state,
       findClosestFunctionName,
+      preferredGeneratedSourceIds,
     ]
   );
 

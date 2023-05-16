@@ -10,6 +10,7 @@ import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { cachePauseData, updateMappedLocation } from "replay-next/src/suspense/PauseCache";
 import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
 import { scopeMapCache } from "replay-next/src/suspense/ScopeMapCache";
+import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
 import { ReplayClientInterface } from "shared/client/types";
 import {
   SourceDetails,
@@ -19,7 +20,6 @@ import {
   getSourceDetailsEntities,
 } from "ui/reducers/sources";
 import { UIState } from "ui/state";
-import { getJSON } from "ui/utils/objectFetching";
 
 import { UIThunkAction } from "./index";
 
@@ -91,7 +91,8 @@ export const formatEventListener = async (
 ) => {
   const { functionLocation, functionName = "", functionParameterNames = [] } = fnPreview;
 
-  updateMappedLocation(replayClient, functionLocation);
+  const sources = await sourcesByIdCache.readAsync(replayClient);
+  updateMappedLocation(sources, functionLocation);
 
   let location: Location | undefined = undefined;
   let locationUrl: string | undefined = undefined;
@@ -152,7 +153,8 @@ export function getNodeEventListeners(
       pauseId
     );
 
-    cachePauseData(replayClient, pauseId, data);
+    const sources = await sourcesByIdCache.readAsync(replayClient);
+    cachePauseData(replayClient, sources, pauseId, data);
 
     // Reformat those entries to add location/name/params data
     const formattedListenerEntries = await Promise.all(

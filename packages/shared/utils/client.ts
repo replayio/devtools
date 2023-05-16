@@ -1,4 +1,3 @@
-import { ThreadFront } from "protocol/thread";
 import { ReplayClient } from "shared/client/ReplayClient";
 import { ReplayClientInterface } from "shared/client/types";
 
@@ -16,5 +15,5 @@ if (typeof window !== "undefined") {
 }
 
 export function createReplayClientForProduction(): ReplayClientInterface {
-  return new ReplayClient(DISPATCH_URL, ThreadFront);
+  return new ReplayClient(DISPATCH_URL);
 }

@@ -5,7 +5,11 @@ import { PartialLocation, selectLocation } from "devtools/client/debugger/src/ac
 import { getContext } from "devtools/client/debugger/src/selectors";
 import { findClosestFunctionNameThunk } from "devtools/client/debugger/src/utils/ast";
 import { SourcesContextRoot } from "replay-next/src/contexts/SourcesContext";
-import { clearSelectedLocation, getSelectedLocation } from "ui/reducers/sources";
+import {
+  clearSelectedLocation,
+  getPreferredGeneratedSources,
+  getSelectedLocation,
+} from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 // Relays information about the active source from Redux to the newer SourcesContext.
@@ -14,6 +18,7 @@ export default function SourcesContextWrapper({ children }: PropsWithChildren) {
   const dispatch = useAppDispatch();
   const selectedLocation = useAppSelector(getSelectedLocation);
   const cx = useAppSelector(getContext);
+  const preferredGeneratedSourceIds = useAppSelector(getPreferredGeneratedSources);
 
   const findClosestFunctionName = useCallback(
     (sourceId: string, location: SourceLocation) => {
@@ -46,6 +51,7 @@ export default function SourcesContextWrapper({ children }: PropsWithChildren) {
     <SourcesContextRoot
       findClosestFunctionName={findClosestFunctionName}
       selectLocation={selectLocationWrapper}
+      preferredGeneratedSourceIds={preferredGeneratedSourceIds}
     >
       {children}
     </SourcesContextRoot>
