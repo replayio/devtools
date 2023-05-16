@@ -43,13 +43,13 @@ function useInitialPrimaryPanel() {
 
   let initialPrimaryPanel: string;
   if (recording && isTestSuiteReplay(recording)) {
-    initialPrimaryPanel = "cypress";
+    initialPrimaryPanel = "cypress" as PrimaryPanelName;
   } else if (showTour) {
-    initialPrimaryPanel = "tour";
+    initialPrimaryPanel = "tour" as PrimaryPanelName;
   } else if (!isAuthenticated && comments.length > 0) {
-    initialPrimaryPanel = "comments";
+    initialPrimaryPanel = "comments" as PrimaryPanelName;
   } else {
-    initialPrimaryPanel = "events";
+    initialPrimaryPanel = "events" as PrimaryPanelName;
   }
 
   useEffect(() => {
