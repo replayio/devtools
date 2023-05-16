@@ -41,14 +41,16 @@ function useInitialPrimaryPanel() {
 
   const { comments } = hooks.useGetComments(recordingId);
 
-  const initialPrimaryPanel =
-    recording && isTestSuiteReplay(recording)
-      ? "cypress"
-      : showTour
-      ? "tour"
-      : !isAuthenticated && comments.length > 0
-      ? "comments"
-      : "events";
+  let initialPrimaryPanel;
+  if (recording && isTestSuiteReplay(recording)) {
+    initialPrimaryPanel = "cypress";
+  } else if (showTour) {
+    initialPrimaryPanel = "tour";
+  } else if (!isAuthenticated && comments.length > 0) {
+    initialPrimaryPanel = "comments";
+  } else {
+    initialPrimaryPanel = "events";
+  }
 
   useEffect(() => {
     if (selectedPrimaryPanel == null) {
