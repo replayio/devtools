@@ -1,9 +1,12 @@
 import { Page } from "@playwright/test";
 import chalk from "chalk";
+import dotenv from "dotenv";
 
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 
 import { debugPrint } from "./utils";
+
+dotenv.config({ path: "../../.env" });
 
 const exampleRecordings = require("../examples.json");
 
@@ -34,10 +37,14 @@ export async function openViewerTab(page: Page) {
   await tab.click();
 }
 
-export async function startTest(page: Page, example: string) {
+export async function startTest(page: Page, example: string, apiKey?: string) {
   const recordingId = exampleRecordings[example];
   const base = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080";
-  const url = `${base}/recording/${recordingId}?e2e=1`;
+
+  let url = `${base}/recording/${recordingId}?e2e=1`;
+  if (apiKey) {
+    url += `&apiKey=${apiKey}`;
+  }
 
   await debugPrint(page, `Navigating to ${chalk.bold(url)}`, "startTest");
 
