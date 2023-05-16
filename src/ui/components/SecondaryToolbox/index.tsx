@@ -11,6 +11,7 @@ import React, {
   useState,
 } from "react";
 import { ImperativePanelHandle } from "react-resizable-panels";
+import { useImperativeCacheValue } from "suspense";
 
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
 import LazyOffscreen from "replay-next/components/LazyOffscreen";
@@ -22,6 +23,7 @@ import { useFeature } from "ui/hooks/settings";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { SecondaryPanelName, ToolboxLayout } from "ui/state/layout";
+import { REACT_ANNOTATIONS_KIND, annotationKindsCache } from "ui/suspense/annotationsCaches";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { selectors } from "../../reducers";
@@ -164,30 +166,30 @@ function SecondaryToolbox({
 }) {
   const selectedPanel = useAppSelector(getSelectedPanel);
   const toolboxLayout = useAppSelector(getToolboxLayout);
-  const [annotationKinds, setAnnotationKinds] = useState<string[]>([]);
   const dispatch = useAppDispatch();
   const replayClient = useContext(ReplayClientContext);
+  // Don't suspend when waiting for annotations to load
+  const { status: annotationCacheStatus, value: annotationKinds } = useImperativeCacheValue(
+    annotationKindsCache,
+    replayClient
+  );
 
   const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
   const { value: chromiumNetMonitorEnabled } = useFeature("chromiumNetMonitor");
 
-  const kindsSet = new Set(annotationKinds);
-  const hasReactComponents = kindsSet.has("react-devtools-bridge");
-  const hasReduxAnnotations = kindsSet.has("redux-devtools-data");
+  let hasReactComponents = false;
+  let hasReduxAnnotations = false;
+
+  if (annotationCacheStatus === "resolved") {
+    hasReactComponents = annotationKinds.has(REACT_ANNOTATIONS_KIND);
+    hasReduxAnnotations = annotationKinds.has("redux-devtools-data");
+  }
 
   useLayoutEffect(() => {
     if (selectedPanel === "react-components" && !hasReactComponents) {
       dispatch(setSelectedPanel("console"));
     }
   }, [selectedPanel, hasReactComponents, dispatch]);
-
-  useEffect(() => {
-    async function fetchKinds() {
-      const kinds = await replayClient.getAnnotationKinds();
-      setAnnotationKinds(kinds);
-    }
-    fetchKinds();
-  }, [replayClient]);
 
   return (
     <div className={classnames(`secondary-toolbox rounded-lg`)}>

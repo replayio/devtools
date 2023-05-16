@@ -2,6 +2,7 @@ import { ExecutionPoint, NodeBounds, ObjectId, Object as ProtocolObject } from "
 import React, { useContext } from "react";
 import { useEffect, useState } from "react";
 import type { SerializedElement, Store, Wall } from "react-devtools-inline/frontend";
+import { useImperativeCacheValue } from "suspense";
 
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
@@ -17,7 +18,6 @@ import { Nag } from "shared/graphql/types";
 import { isPointInRegions } from "shared/utils/time";
 import { UIThunkAction } from "ui/actions";
 import { fetchMouseTargetsForPause, getLoadedRegions } from "ui/actions/app";
-import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactDevTools";
 import { enterFocusMode } from "ui/actions/timeline";
 import {
   getCurrentPoint,
@@ -25,14 +25,10 @@ import {
   setIsNodePickerActive,
   setIsNodePickerInitializing,
 } from "ui/reducers/app";
-import {
-  getAnnotations,
-  getProtocolCheckFailed,
-  getReactInitPoint,
-} from "ui/reducers/reactDevTools";
 import { getPreferredLocation } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { Annotation } from "ui/state/reactDevTools";
+import { ParsedReactDevToolsAnnotation } from "ui/suspense/annotationsCaches";
+import { reactDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
 import { getMouseTarget } from "ui/suspense/nodeCaches";
 import { NodePicker as NodePickerClass, NodePickerOpts } from "ui/utils/nodePicker";
 import { getJSON } from "ui/utils/objectFetching";
@@ -67,9 +63,9 @@ class ReplayWall implements Wall {
     private enablePicker: (opts: NodeOptsWithoutBounds) => void,
     private initializePicker: () => void,
     private disablePicker: () => void,
-    private onShutdown: () => void,
     private highlightNode: (nodeId: string) => void,
     private unhighlightNode: () => void,
+    private setProtocolCheckFailed: (failed: boolean) => void,
     private fetchMouseTargetsForPause: () => Promise<NodeBounds[] | undefined>,
     private replayClient: ReplayClientInterface,
     private dismissInspectComponentNag: () => void,
@@ -91,8 +87,8 @@ class ReplayWall implements Wall {
   }
 
   // send an annotation from the backend in the recording to the frontend
-  sendAnnotation(annotation: Annotation) {
-    this._listener?.(annotation);
+  sendAnnotation(message: ParsedReactDevToolsAnnotation["contents"]) {
+    this._listener?.(message);
   }
 
   // called by the frontend to send a request to the backend
@@ -129,7 +125,7 @@ class ReplayWall implements Wall {
           const response = await this.sendRequest(event, payload);
           if (response === undefined) {
             trackEvent("error.reactdevtools.set_protocol_failed");
-            setProtocolCheckFailed();
+            this.setProtocolCheckFailed(true);
           }
           break;
         }
@@ -337,14 +333,14 @@ function jumpToComponentPreferredSource(componentPreview: ProtocolObject): UIThu
 
 function createReactDevTools(
   reactDevToolsInlineModule: ReactDevToolsInlineModule,
-  annotations: Annotation[],
+  annotations: ParsedReactDevToolsAnnotation[],
   currentPoint: ExecutionPoint,
   enablePicker: (opts: NodeOptsWithoutBounds) => void,
   initializePicker: () => void,
   disablePicker: () => void,
-  onShutdown: () => void,
   highlightNode: (nodeId: string) => void,
   unhighlightNode: () => void,
+  setProtocolCheckFailed: (failed: boolean) => void,
   fetchMouseTargetsForPause: () => Promise<NodeBounds[] | undefined>,
   replayClient: ReplayClientInterface,
   dismissInspectComponentNag: () => void,
@@ -357,9 +353,9 @@ function createReactDevTools(
     enablePicker,
     initializePicker,
     disablePicker,
-    onShutdown,
     highlightNode,
     unhighlightNode,
+    setProtocolCheckFailed,
     fetchMouseTargetsForPause,
     replayClient,
     dismissInspectComponentNag,
@@ -373,9 +369,9 @@ function createReactDevTools(
   wall.store = store as StoreWithInternals;
   const ReactDevTools = initialize(target, { bridge, store });
 
-  for (const { message, point } of annotations) {
-    if (message.event === "operations" && compareNumericStrings(point, currentPoint) <= 0) {
-      wall.sendAnnotation(message);
+  for (const { contents, point } of annotations) {
+    if (contents.event === "operations" && compareNumericStrings(point, currentPoint) <= 0) {
+      wall.sendAnnotation(contents);
     }
   }
 
@@ -427,13 +423,14 @@ async function loadReactDevToolsInlineModuleFromProtocol(
 const nodePickerInstance = new NodePickerClass();
 
 export default function ReactDevtoolsPanel() {
-  const annotations = useAppSelector(getAnnotations);
   const currentPoint = useAppSelector(getCurrentPoint);
   const loadedRegions = useAppSelector(getLoadedRegions);
-  const protocolCheckFailed = useAppSelector(getProtocolCheckFailed);
-  const reactInitPoint = useAppSelector(getReactInitPoint);
   const pauseId = useAppSelector(state => state.pause.id);
   const [, dismissInspectComponentNag] = useNag(Nag.INSPECT_COMPONENT);
+  const [protocolCheckFailed, setProtocolCheckFailed] = useState(false);
+  const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
+    reactDevToolsAnnotationsCache
+  );
 
   const dispatch = useAppDispatch();
 
@@ -443,6 +440,9 @@ export default function ReactDevtoolsPanel() {
   // Once we've obtained the protocol version, we'll dynamically load the correct module/version.
   const [reactDevToolsInlineModule, setReactDevToolsInlineModule] =
     useState<ReactDevToolsInlineModule | null>(null);
+
+  const annotations: ParsedReactDevToolsAnnotation[] =
+    annotationsStatus === "resolved" ? parsedAnnotations : [];
 
   // Try to load the DevTools module whenever the current point changes.
   // Eventually we'll reach a point that has the DevTools protocol embedded.
@@ -483,11 +483,6 @@ export default function ReactDevtoolsPanel() {
     dispatch(setIsNodePickerInitializing(false));
   }
 
-  function onShutdown() {
-    sendTelemetryEvent("react-devtools-shutdown");
-    dispatch(setHasReactComponents(false));
-  }
-
   function dispatchHighlightNode(nodeId: string) {
     dispatch(highlightNode(nodeId));
   }
@@ -524,6 +519,9 @@ export default function ReactDevtoolsPanel() {
     );
   }
 
+  const firstOperation = annotations.find(annotation => annotation.contents.event == "operations");
+  const reactInitPoint = firstOperation?.point ?? null;
+
   const isReactDevToolsReady = reactDevToolsInlineModule !== null;
   const isReady =
     isReactDevToolsReady &&
@@ -556,9 +554,9 @@ export default function ReactDevtoolsPanel() {
     enablePicker,
     initializePicker,
     disablePicker,
-    onShutdown,
     dispatchHighlightNode,
     dispatchUnhighlightNode,
+    setProtocolCheckFailed,
     dispatchFetchMouseTargets,
     replayClient,
     dismissInspectComponentNag,
