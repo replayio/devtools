@@ -16,6 +16,7 @@ import { useFeature } from "ui/hooks/settings";
 import { getFilteredEventsForFocusRegion } from "ui/reducers/app";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { PrimaryPanelName } from "ui/state/layout";
 import { shouldShowTour } from "ui/utils/onboarding";
 import useAuth0 from "ui/utils/useAuth0";
 
@@ -41,15 +42,15 @@ function useInitialPrimaryPanel() {
 
   const { comments } = hooks.useGetComments(recordingId);
 
-  let initialPrimaryPanel: string;
+  let initialPrimaryPanel: PrimaryPanelName;
   if (recording && isTestSuiteReplay(recording)) {
-    initialPrimaryPanel = "cypress" as PrimaryPanelName;
+    initialPrimaryPanel = "cypress";
   } else if (showTour) {
-    initialPrimaryPanel = "tour" as PrimaryPanelName;
+    initialPrimaryPanel = "tour";
   } else if (!isAuthenticated && comments.length > 0) {
-    initialPrimaryPanel = "comments" as PrimaryPanelName;
+    initialPrimaryPanel = "comments";
   } else {
-    initialPrimaryPanel = "events" as PrimaryPanelName;
+    initialPrimaryPanel = "events";
   }
 
   useEffect(() => {
