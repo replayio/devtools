@@ -41,7 +41,7 @@ function useInitialPrimaryPanel() {
 
   const { comments } = hooks.useGetComments(recordingId);
 
-  let initialPrimaryPanel;
+  let initialPrimaryPanel: string;
   if (recording && isTestSuiteReplay(recording)) {
     initialPrimaryPanel = "cypress";
   } else if (showTour) {
