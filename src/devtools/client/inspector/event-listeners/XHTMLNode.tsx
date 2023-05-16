@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 
-import { NodeWithPreview } from "ui/actions/event-listeners";
+import { NodeWithPreview } from "ui/actions/eventListeners/eventListenerUtils";
 
 type XHTMLNodeProps = {
   node: NodeWithPreview;

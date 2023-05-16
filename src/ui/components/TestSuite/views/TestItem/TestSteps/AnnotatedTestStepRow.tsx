@@ -4,8 +4,11 @@ import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import Loader from "replay-next/components/Loader";
 import useSuspendAfterMount from "replay-next/src/hooks/useSuspendAfterMount";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import {
+  PointWithEventType,
+  jumpToClickEventFunctionLocation,
+} from "ui/actions/eventListeners/jumpToCode";
 import { seek } from "ui/actions/timeline";
-import { PointWithEventType, jumpToClickEventFunctionLocation } from "ui/components/Events/Event";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
 import { useJumpToSource } from "ui/components/TestSuite/hooks/useJumpToSource";
 import { getConsolePropsCountSuspense } from "ui/components/TestSuite/suspense/consoleProps";

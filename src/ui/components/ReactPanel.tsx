@@ -1,6 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import {
   ExecutionPoint,
+  FunctionOutline,
   Location,
   TimeStampedPoint,
   TimeStampedPointRange,
@@ -22,10 +23,7 @@ import {
   getExecutionPoint,
   getThreadContext,
 } from "devtools/client/debugger/src/reducers/pause";
-import type { AstPosition } from "devtools/client/debugger/src/selectors";
-import { findClosestofSymbol } from "devtools/client/debugger/src/utils/ast";
 import { simplifyDisplayName } from "devtools/client/debugger/src/utils/pause/frames/displayName";
-import Icon from "replay-next/components/Icon";
 import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
@@ -34,11 +32,11 @@ import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPoints
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { streamingSourceContentsCache } from "replay-next/src/suspense/SourcesCache";
-import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 import { UIThunkAction } from "ui/actions";
-import { IGNORABLE_PARTIAL_SOURCE_URLS } from "ui/actions/event-listeners";
+import { IGNORABLE_PARTIAL_SOURCE_URLS } from "ui/actions/eventListeners/eventListenerUtils";
+import { findFunctionOutlineForLocation } from "ui/actions/eventListeners/jumpToCode";
 import { seek } from "ui/actions/timeline";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
 import {
@@ -52,7 +50,6 @@ import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getPauseFramesAsync } from "ui/suspense/frameCache";
 
-import { findFirstBreakablePositionForFunction } from "./Events/Event";
 import MaterialIcon from "./shared/MaterialIcon";
 import styles from "./Events/Event.module.css";
 
@@ -201,8 +198,8 @@ const queuedRendersStreamingCache: StreamingCache<
 
       const [breakablePositions, breakablePositionsByLine] = breakablePositionsResult;
 
-      let scheduleUpdateFiberDeclaration: AstPosition | undefined;
-      let onCommitFiberRootDeclaration: AstPosition | undefined;
+      let scheduleUpdateFiberDeclaration: FunctionOutline | undefined;
+      let onCommitFiberRootDeclaration: FunctionOutline | undefined;
 
       if (reactDomSource.url!.includes(".development")) {
         const shouldUpdateFiberSymbol = symbols?.functions.find(
@@ -210,8 +207,8 @@ const queuedRendersStreamingCache: StreamingCache<
         )!;
         const onCommitRootSymbol = symbols?.functions.find(f => f.name === "onCommitRoot")!;
 
-        scheduleUpdateFiberDeclaration = shouldUpdateFiberSymbol?.location.begin;
-        onCommitFiberRootDeclaration = onCommitRootSymbol?.location.begin;
+        scheduleUpdateFiberDeclaration = shouldUpdateFiberSymbol;
+        onCommitFiberRootDeclaration = onCommitRootSymbol;
       } else if (reactDomSource.url!.includes(".production")) {
         // HACK We'll do this the hard way! This _should_ work back to React 16.14
         // By careful inspection, we know that every minified version of `scheduleUpdateOnFiber`
@@ -239,6 +236,14 @@ const queuedRendersStreamingCache: StreamingCache<
           const scheduleUpdateIndex = line.indexOf(MAGIC_SCHEDULE_UPDATE_CONTENTS);
           const onCommitIndex = line.indexOf(MAGIC_ON_COMMIT_ROOT_CONTENTS);
           if (scheduleUpdateIndex > -1) {
+            scheduleUpdateFiberDeclaration = findFunctionOutlineForLocation(
+              {
+                line: lineZeroIndex + 1,
+                column: scheduleUpdateIndex,
+              },
+              symbols
+            );
+            /*
             const res = findClosestofSymbol(symbols.functions, {
               line: lineZeroIndex + 1,
               column: scheduleUpdateIndex,
@@ -246,15 +251,16 @@ const queuedRendersStreamingCache: StreamingCache<
             if (res) {
               scheduleUpdateFiberDeclaration = res.location.begin;
             }
+            */
           }
           if (onCommitIndex > -1) {
-            const res = findClosestofSymbol(symbols.functions, {
-              line: lineZeroIndex + 1,
-              column: onCommitIndex,
-            });
-            if (res) {
-              onCommitFiberRootDeclaration = res.location.begin;
-            }
+            onCommitFiberRootDeclaration = findFunctionOutlineForLocation(
+              {
+                line: lineZeroIndex + 1,
+                column: scheduleUpdateIndex,
+              },
+              symbols
+            );
           }
 
           if (scheduleUpdateFiberDeclaration && onCommitFiberRootDeclaration) {
@@ -263,32 +269,31 @@ const queuedRendersStreamingCache: StreamingCache<
         }
       }
 
-      if (!scheduleUpdateFiberDeclaration || !onCommitFiberRootDeclaration) {
+      if (
+        !scheduleUpdateFiberDeclaration?.breakpointLocation ||
+        !onCommitFiberRootDeclaration?.breakpointLocation
+      ) {
         return;
       }
 
-      const firstScheduleUpdateFiberPosition = findFirstBreakablePositionForFunction(
-        { ...scheduleUpdateFiberDeclaration, sourceId: reactDomSource.id },
-        breakablePositionsByLine
-      );
-      const firstOnCommitRootPosition = findFirstBreakablePositionForFunction(
-        { ...onCommitFiberRootDeclaration, sourceId: reactDomSource.id },
-        breakablePositionsByLine
-      );
+      const firstScheduleUpdateFiberPosition = scheduleUpdateFiberDeclaration.breakpointLocation;
+
+      const firstOnCommitRootPosition = onCommitFiberRootDeclaration.breakpointLocation;
+
       if (!firstScheduleUpdateFiberPosition || !firstOnCommitRootPosition) {
         return;
       }
 
       const scheduleFiberUpdatePromise = getHitPointsForLocationAsync(
         replayClient,
-        firstScheduleUpdateFiberPosition,
+        { ...firstScheduleUpdateFiberPosition, sourceId: reactDomSource.id },
         null,
         { begin: range.begin.point, end: range.end.point }
       );
 
       const onCommitFiberHitsPromise = getHitPointsForLocationAsync(
         replayClient,
-        firstOnCommitRootPosition,
+        { ...firstOnCommitRootPosition, sourceId: reactDomSource.id },
         null,
         { begin: range.begin.point, end: range.end.point }
       );
