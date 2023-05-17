@@ -82,7 +82,7 @@ const Passport = () => {
 
   const timeTravelItems = [
     {
-      label: "Time travel in the console",
+      label: "Console time travel",
       completed: !showConsoleNavigate,
       videoUrl: "https://vercel.replay.io/passport/time_travel_in_console.gif",
       imageBaseName: "time_travel_in_the_console",

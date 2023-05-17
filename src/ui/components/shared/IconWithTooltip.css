@@ -31,4 +31,5 @@
 
 .icon-tooltip {
   font-size: var(--font-size-large);
+  z-index: 5000;
 }
