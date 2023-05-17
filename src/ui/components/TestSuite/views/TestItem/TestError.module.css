@@ -1,6 +1,7 @@
 .Row {
   border-left: 2px solid var(--testsuites-error-border-color);
-  padding-left: 2rem;
+  padding-left: 0.75rem;
+  padding-top: 0.5rem;
 }
 
 .Header {
