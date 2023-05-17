@@ -14,7 +14,7 @@ import { openSource } from "../helpers/source-explorer-panel";
 // TODO [SCS-1066] Share recordings between other tests
 const url = "authenticated_comments_2.html";
 
-test(`comments-02: Test shared comments and replies`, async ({ page }) => {
+test(`authenticated-comments-02: Test shared comments and replies`, async ({ page }) => {
   await startTest(page, url, process.env.E2E_USER_1_API_KEY);
   await openDevToolsTab(page);
   await openSource(page, url);
