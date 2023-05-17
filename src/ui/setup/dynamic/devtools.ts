@@ -217,10 +217,12 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   setupBoxModel(store, startAppListening);
   setupRules(store, startAppListening);
 
-  // Precache annotations
-  annotationKindsCache.readAsync(replayClient);
-  reactDevToolsAnnotationsCache.readAsync();
-  eventListenersJumpLocationsCache.readAsync();
+  ThreadFront.waitForSession().then(() => {
+    // Precache annotations
+    annotationKindsCache.prefetch(replayClient);
+    reactDevToolsAnnotationsCache.prefetch();
+    eventListenersJumpLocationsCache.prefetch();
+  });
 
   // Add protocol event listeners for things that the Redux store needs to stay in sync with.
   // TODO We should revisit this as part of a larger architectural redesign (#6932).
