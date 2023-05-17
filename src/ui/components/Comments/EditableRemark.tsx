@@ -120,20 +120,23 @@ export default function EditableRemark({
         </div>
         <div className={styles.Time}>{formatRelativeTime(new Date(remark.createdAt))}</div>
 
-        <MaterialIcon
-          className={styles.Icon}
-          disabled={isPending}
-          outlined
+        <button
+          className={styles.ContextMenuButton}
+          data-test-name="ContextMenuButton"
           onClick={onContextMenuClick}
         >
-          more_vert
-        </MaterialIcon>
+          <MaterialIcon className={styles.Icon} disabled={isPending} outlined>
+            more_vert
+          </MaterialIcon>
+        </button>
       </div>
 
       <div className={classNames.join(" ")} onDoubleClick={onDoubleClick}>
         <CommentEditor
           autoFocus={isEditing}
           collaborators={collaborators}
+          dataTestId={remark.id ? `CommentInput-${remark.id}` : undefined}
+          dataTestName="CommentInput"
           editable={isEditing && !isPending}
           initialValue={content}
           onCancel={discardPendingChanges}

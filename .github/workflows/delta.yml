@@ -69,6 +69,8 @@ jobs:
         run: yarn test:ci --reporter @replayio/playwright/reporter,line
         working-directory: packages/replay-next/playwright
         env:
+          API_KEY_1: ${{ secrets.E2E_USER_1_API_KEY }}
+          API_KEY_2: ${{ secrets.E2E_USER_2_API_KEY }}
           SHARD: ${{ matrix.shard }}
           SHARDS: 10
       - name: Upload results

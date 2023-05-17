@@ -48,7 +48,12 @@ export default function CommentReplyButton({ comment }: { comment: Comment }) {
 
   return (
     <div className={styles.Row}>
-      <button className={styles.Button} disabled={isPending} onClick={addReply}>
+      <button
+        className={styles.Button}
+        data-test-name="CommentReplyButton"
+        disabled={isPending}
+        onClick={addReply}
+      >
         Reply
       </button>
 

@@ -10,7 +10,7 @@
   "scripts": {
     "playwright:install": "playwright install chromium",
     "test": "playwright test tests",
-    "test:ci": "WRITE_SNAPSHOT_IMAGE_FILES=true playwright test tests --shard=$SHARD/$SHARDS",
+    "test:ci": "E2E_USER_1_API_KEY=$API_KEY_1 E2E_USER_2_API_KEY=$API_KEY_2 WRITE_SNAPSHOT_IMAGE_FILES=true playwright test tests --shard=$SHARD/$SHARDS",
     "test:debug": "PWDEBUG=console VISUAL_DEBUG=true yarn test"
   }
 }
