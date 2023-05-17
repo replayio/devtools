@@ -36,7 +36,6 @@ const DownloadReplayPromptModal = React.lazy(
   () => import("./shared/OnboardingModal/DownloadReplayPromptModal")
 );
 const SourcemapSetupModal = React.lazy(() => import("./shared/Modals/SourcemapSetupModal"));
-const SingleInviteModal = React.lazy(() => import("./shared/OnboardingModal/SingleInviteModal"));
 const FirstReplayModal = React.lazy(() => import("./shared/FirstReplayModal"));
 
 function AppModal({ hideModal, modal }: { hideModal: () => void; modal: ModalType }) {
