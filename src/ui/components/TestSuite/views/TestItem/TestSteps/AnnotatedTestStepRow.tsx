@@ -1,13 +1,12 @@
 import { Suspense, memo, useContext, useMemo, useState } from "react";
+import { useImperativeCacheValue } from "suspense";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import Loader from "replay-next/components/Loader";
 import useSuspendAfterMount from "replay-next/src/hooks/useSuspendAfterMount";
+import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import {
-  PointWithEventType,
-  jumpToClickEventFunctionLocation,
-} from "ui/actions/eventListeners/jumpToCode";
+import { jumpToKnownEventListenerHit } from "ui/actions/eventListeners/jumpToCode";
 import { seek } from "ui/actions/timeline";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
 import { useJumpToSource } from "ui/components/TestSuite/hooks/useJumpToSource";
@@ -15,8 +14,17 @@ import { getConsolePropsCountSuspense } from "ui/components/TestSuite/suspense/c
 import { AnnotatedTestStep, ProcessedTestMetadata } from "ui/components/TestSuite/types";
 import { Position } from "ui/components/TestSuite/views/TestItem/types";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { ParsedJumpToCodeAnnotation } from "ui/suspense/annotationsCaches";
+import { eventListenersJumpLocationsCache } from "ui/suspense/annotationsCaches";
 
 import styles from "./AnnotatedTestStepRow.module.css";
+
+const NO_ANNOTATIONS: ParsedJumpToCodeAnnotation[] = [];
+
+const cypressStepTypesToEventTypes = {
+  click: "mousedown",
+  type: "keypress",
+} as const;
 
 export default memo(function AnnotatedTestStepRow({
   position,
@@ -29,11 +37,11 @@ export default memo(function AnnotatedTestStepRow({
 }) {
   const { annotations, args, error, index, name } = testStep.data;
 
-  const isCurrent = position === "current";
-
   const dispatch = useAppDispatch();
   const executionPoint = useAppSelector(getExecutionPoint);
-  const [jumpToCodeStatus, setJumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
+  const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
+    eventListenersJumpLocationsCache
+  );
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -49,54 +57,69 @@ export default memo(function AnnotatedTestStepRow({
     testStep,
   });
 
+  const jumpToCodeAnnotations: ParsedJumpToCodeAnnotation[] =
+    annotationsStatus === "resolved" ? parsedAnnotations : NO_ANNOTATIONS;
+
+  const jumpToCodeEntriesPerEvent = useMemo(() => {
+    const jumpToCodeEntriesByPoint: Record<string, ParsedJumpToCodeAnnotation> = {};
+
+    for (const jumpToCodeAnnotation of jumpToCodeAnnotations) {
+      jumpToCodeEntriesByPoint[jumpToCodeAnnotation.point] = jumpToCodeAnnotation;
+    }
+
+    return jumpToCodeEntriesByPoint;
+  }, [jumpToCodeAnnotations]);
+
+  const [canShowJumpToCode, jumpToCodeAnnotation] = useMemo(() => {
+    let canShowJumpToCode = false;
+    let jumpToCodeAnnotation: ParsedJumpToCodeAnnotation | undefined = undefined;
+
+    if ("category" in testStep.data) {
+      // TODO This is very Cypress-specific. Playwright steps have a `name` like `locator.click("blah")`.
+      // We only care about click events and keyboard events. Keyboard events appear to be a "type" command,
+      // as in "type this text into the input".
+      canShowJumpToCode =
+        "category" in testStep.data &&
+        testStep.data.category === "command" &&
+        (testStep.data.name === "click" || testStep.data.name === "type");
+
+      if (canShowJumpToCode) {
+        const eventKind =
+          cypressStepTypesToEventTypes[
+            testStep.data.name as keyof typeof cypressStepTypesToEventTypes
+          ];
+
+        const { start, end } = annotations;
+
+        if (eventKind && start && end) {
+          jumpToCodeAnnotation = jumpToCodeAnnotations.find(a =>
+            isExecutionPointsWithinRange(a.point, start.point, end.point)
+          );
+        }
+      }
+    }
+
+    return [canShowJumpToCode, jumpToCodeAnnotation] as const;
+  }, [jumpToCodeAnnotations, testStep.data, annotations]);
+
   const onJumpToClickEvent = async () => {
     const onSeek = (point: string, time: number) => dispatch(seek(point, time, true));
     // We only support clicks and keypress events for now.
     // The rendering logic has limited the button display
 
-    const cypressStepTypesToEventTypes = {
-      click: "mousedown",
-      type: "keypress",
-    } as const;
-    const eventKind =
-      cypressStepTypesToEventTypes[testStep.data.name as keyof typeof cypressStepTypesToEventTypes];
-
-    const { start, end } = annotations;
-
-    if (!eventKind || !start) {
-      // Shouldn't happen - the rendering logic _should_ make sure the step matches
+    if (!jumpToCodeAnnotation) {
       return;
     }
 
-    const eventPoint: PointWithEventType = { ...start, kind: eventKind };
-
-    setJumpToCodeStatus("loading");
-    const result = await dispatch(jumpToClickEventFunctionLocation(onSeek, eventPoint, end));
-    setJumpToCodeStatus(result);
-
-    if (result === "not_loaded") {
-      // Clear this out after a few seconds since the user could change focus.
-      // Simpler than trying to watch the focus region change over time.
-      setTimeout(() => {
-        setJumpToCodeStatus("not_checked");
-      }, 5000);
-    }
+    dispatch(jumpToKnownEventListenerHit(onSeek, jumpToCodeAnnotation));
   };
 
   const showBadge = testStep.data.name === "get";
 
-  // TODO This is very Cypress-specific. Playwright steps have a `name` like `locator.click("blah")`.
-  // We only care about click events and keyboard events. Keyboard events appear to be a "type" command,
-  // as in "type this text into the input".
-  let shouldShowJumpToCode = false;
-  if (isHovered || isCurrent) {
-    if ("category" in testStep.data) {
-      shouldShowJumpToCode =
-        "category" in testStep.data &&
-        testStep.data.category === "command" &&
-        (testStep.data.name === "click" || testStep.data.name === "type");
-    }
-  }
+  const isCurrent = position === "current";
+  const shouldShowJumpToCode = (isHovered || isCurrent) && canShowJumpToCode;
+
+  const jumpToCodeStatus: JumpToCodeStatus = !!jumpToCodeAnnotation ? "found" : "no_hits";
 
   return (
     <div
