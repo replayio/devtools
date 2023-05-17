@@ -80,5 +80,5 @@ jobs:
         uses: replayio/action-upload@v0.4.7
         with:
           api-key: rwk_4mEiT150uOHyLQiQvZfPZiNjmBe4NrOXOm9yG9nS794
-          filter: ${{ 'function($v) { $v.metadata.test.result = "failed" }' }}
+          filter: ${{ 'function($v, $i, $a) { $v.metadata.test.result = "failed" and $count($a[metadata.test.file = $v.metadata.test.file and metadata.test.result = "passed"]) = 0 }' }}
           public: true
