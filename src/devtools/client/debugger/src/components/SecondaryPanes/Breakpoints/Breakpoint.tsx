@@ -197,7 +197,11 @@ class Breakpoint extends PureComponent<BreakpointProps> {
         <BreakpointOptions breakpoint={point} type={type} />
         {this.renderSourceLocation()}
         {editable ? (
-          <CloseButton handleClick={onCloseButtonClick} tooltip={"Remove this breakpoint"} />
+          <CloseButton
+            dataTestName="RemoveBreakpointButton"
+            handleClick={onCloseButtonClick}
+            tooltip={"Remove this breakpoint"}
+          />
         ) : (
           <AvatarImage
             className={styles.CreatedByAvatar}

@@ -1,4 +1,4 @@
-import test from "@playwright/test";
+import test, { Page } from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
 import {
@@ -14,46 +14,72 @@ import { openSource } from "../helpers/source-explorer-panel";
 // TODO [SCS-1066] Share recordings between other tests
 const url = "authenticated_comments_2.html";
 
-test(`authenticated-comments-02: Test shared comments and replies`, async ({ page }) => {
-  await startTest(page, url, process.env.E2E_USER_1_API_KEY);
+async function load(page: Page, apiKey: string) {
+  await startTest(page, url, apiKey);
+
   await openDevToolsTab(page);
   await openSource(page, url);
+}
 
-  // Clean up from previous tests
-  // TODO [SCS-1066] Ideally we would create a fresh recording for each test run
-  await deleteAllComments(page);
+test(`authenticated-comments-02: Test shared comments and replies`, async ({ browser }) => {
+  let pageOne: Page;
+  let pageTwo: Page;
 
-  await addSourceComment(page, {
-    text: "This is a test comment from user 1",
-    lineNumber: 3,
-    url,
-  });
+  {
+    console.log("User 1: Add comment");
 
-  // Switch to user 2
-  await startTest(page, url, process.env.E2E_USER_2_API_KEY);
-  await openDevToolsTab(page);
-  await openSource(page, url);
+    // User 1
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await load(page, process.env.E2E_USER_1_API_KEY as string);
 
-  const commentLocator = await getComments(page, {
-    text: "This is a test comment from user 1",
-    type: "source-code",
-  });
+    // Clean up from previous tests
+    // TODO [SCS-1066] Ideally we would create a fresh recording for each test run
+    await deleteAllComments(page);
 
-  await replyToComment(page, commentLocator, {
-    text: "This is a reply from user 2",
-    url,
-  });
+    await addSourceComment(page, {
+      text: "This is a test comment from user 1",
+      lineNumber: 3,
+      url,
+    });
 
-  // Switch back to user 1
-  await startTest(page, url, process.env.E2E_USER_1_API_KEY);
-  await openDevToolsTab(page);
-  await openSource(page, url);
+    pageOne = page;
+  }
 
-  // Verify reply is visible
-  const replyLocator = await getComments(page, {
-    text: "This is a reply from user 2",
-    type: "source-code",
-  });
+  {
+    console.log("User 2: Reply to comment");
 
-  await deleteAllComments(page);
+    // User 2
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await load(page, process.env.E2E_USER_2_API_KEY as string);
+
+    const commentLocator = await getComments(page, {
+      text: "This is a test comment from user 1",
+      type: "source-code",
+    });
+
+    await replyToComment(page, commentLocator, {
+      text: "This is a reply from user 2",
+      url,
+    });
+
+    pageTwo = page;
+  }
+
+  {
+    console.log("User 1: View reply (and delete comment)");
+
+    // User 1
+    const page = pageOne;
+    await page.reload();
+
+    // Verify reply is visible
+    await getComments(page, {
+      text: "This is a reply from user 2",
+      type: "source-code",
+    });
+
+    await deleteAllComments(page);
+  }
 });

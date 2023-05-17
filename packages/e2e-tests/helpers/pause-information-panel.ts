@@ -357,6 +357,15 @@ export function findPoints(
   return page.locator(selectorCriteria.join(""));
 }
 
+export async function isPointEditable(pointLocator: Locator) {
+  const editButton = pointLocator.locator('[data-test-name="RemoveBreakpointButton"]');
+  return (await editButton.count()) > 0;
+}
+
+export async function removePoint(pointLocator: Locator) {
+  await pointLocator.locator('[data-test-name="RemoveBreakpointButton"]').first().click();
+}
+
 export async function togglePoint(page: Page, pointLocator: Locator, enabled: boolean) {
   const targetState = enabled ? POINT_BEHAVIOR_ENABLED : POINT_BEHAVIOR_DISABLED_TEMPORARILY;
   const toggle = pointLocator.locator('[data-test-name="BreakpointToggle"]');

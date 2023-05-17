@@ -164,6 +164,8 @@ export async function getComments(
     "getComments"
   );
 
+  await showCommentsPanel(page);
+
   const textSelector = text ? `:has-text("${text}")` : "";
   const typeSelector = type ? `[data-test-comment-type="${type}"]` : "[data-test-comment-type]";
 

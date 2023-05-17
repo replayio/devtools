@@ -4,7 +4,7 @@ import chalk from "chalk";
 import { submitCurrentText as submitCurrentTextLexical, type as typeLexical } from "./lexical";
 import { waitForPaused } from "./pause-information-panel";
 import { Expected, MessageType } from "./types";
-import { debugPrint, delay, toggleExpandable, waitFor } from "./utils";
+import { debugPrint, toggleExpandable, waitFor } from "./utils";
 
 const categoryNames = {
   keyboard: "Keyboard",
@@ -54,16 +54,48 @@ export function getConsoleMessageTypeCheckbox(
   return page.locator(`input#FilterToggle-${type}`);
 }
 
+export async function disableConsoleMessageType(
+  page: Page,
+  type: "exceptions" | "logs" | "warnings" | "errors"
+) {
+  await toggleConsoleMessageType(page, type, false);
+}
+
+export async function disableAllConsoleMessageTypes(page: Page) {
+  await toggleConsoleMessageType(page, "exceptions", false);
+  await toggleConsoleMessageType(page, "logs", false);
+  await toggleConsoleMessageType(page, "warnings", false);
+  await toggleConsoleMessageType(page, "errors", false);
+}
+
 export async function enableConsoleMessageType(
   page: Page,
   type: "exceptions" | "logs" | "warnings" | "errors"
 ) {
+  await toggleConsoleMessageType(page, type, true);
+}
+
+export async function enableAllConsoleMessageTypes(page: Page) {
+  await toggleConsoleMessageType(page, "exceptions", true);
+  await toggleConsoleMessageType(page, "logs", true);
+  await toggleConsoleMessageType(page, "warnings", true);
+  await toggleConsoleMessageType(page, "errors", true);
+}
+
+export async function toggleConsoleMessageType(
+  page: Page,
+  type: "exceptions" | "logs" | "warnings" | "errors",
+  enabled: boolean
+) {
+  await openConsolePanel(page);
+  await toggleSideFilters(page, true);
+
   // Use checkbox.click() rather than checkbox.check()
   // because the latter wil sometimes fail prematurely if the checkbox state doesn't change quickly enough
   // Note this requires us to verify the initial state of the checkbox before clicking
   const checkbox = getConsoleMessageTypeCheckbox(page, type);
   const isChecked = await checkbox.isChecked();
-  if (!isChecked) {
+  if (isChecked !== enabled) {
     await checkbox.click({ timeout: 500 });
   }
 }

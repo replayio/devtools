@@ -4,7 +4,7 @@ import chalk from "chalk";
 import { Badge } from "shared/client/types";
 
 import { type as typeLexical } from "./lexical";
-import { openPauseInformationPanel } from "./pause-information-panel";
+import { findPoints, openPauseInformationPanel, removePoint } from "./pause-information-panel";
 import { openSource, openSourceExplorerPanel } from "./source-explorer-panel";
 import { clearTextArea, debugPrint, delay, getCommandKey, mapLocators, waitFor } from "./utils";
 import { openDevToolsTab } from ".";
@@ -424,31 +424,24 @@ export async function openLogPointPanelContextMenu(
 export async function removeAllBreakpoints(page: Page): Promise<void> {
   await debugPrint(page, `Removing all breakpoints for the current source`, "removeBreakpoint");
 
-  while (true) {
-    const breakpoint = page.locator(".editor.new-breakpoint");
-    const count = await breakpoint.count();
-    if (count > 0) {
-      await breakpoint.click();
-    } else {
-      return;
-    }
+  await openPauseInformationPanel(page);
+  const points = await findPoints(page, "breakpoint");
+  const count = await points.count();
+  for (let index = count - 1; index >= 0; index--) {
+    const point = points.nth(index);
+    await removePoint(point);
   }
 }
 
 export async function removeAllLogpoints(page: Page): Promise<void> {
-  await debugPrint(page, `Removing all logpoints for the current source`, "removeAllLogpoints");
+  await debugPrint(page, `Removing all breakpoints for the current source`, "removeBreakpoint");
 
-  while (true) {
-    const panels = page.locator(".breakpoint-panel");
-    const count = await panels.count();
-    if (count > 0) {
-      const panel = panels.first();
-      await panel.hover();
-
-      await page.locator('[data-test-id="ToggleLogpointButton"]').click();
-    } else {
-      return;
-    }
+  await openPauseInformationPanel(page);
+  const points = await findPoints(page, "logpoint");
+  const count = await points.count();
+  for (let index = count - 1; index >= 0; index--) {
+    const point = points.nth(index);
+    await removePoint(point);
   }
 }
 
@@ -515,11 +508,8 @@ export async function removeLogPoint(
   );
 
   await openDevToolsTab(page);
-
-  if (url) {
-    await openSourceExplorerPanel(page);
-    await openSource(page, url);
-  }
+  await openSourceExplorerPanel(page);
+  await openSource(page, url);
 
   const line = await getSourceLine(page, lineNumber);
   const numberLocator = line.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
