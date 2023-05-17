@@ -79,7 +79,7 @@ function AppModal({ hideModal, modal }: { hideModal: () => void; modal: ModalTyp
       return <OnboardingModal />;
     }
     case "single-invite": {
-      return <SingleInviteModal />;
+      return <OnboardingModal />;
     }
     case "browser-launch": {
       return <LaunchBrowserModal />;

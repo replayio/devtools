@@ -12,10 +12,7 @@ const slides = [
     header: "Welcome to Replay! 👋",
     content: (
       <>
-        <div className="pb-6 text-lg">{`We're glad you're here! This is how to get started:`}</div>
-        <li className="pb-1.5 text-lg">{`In the Replay browser, open a website in a new tab`}</li>
-        <li className="pb-1.5 text-lg">{`Press the blue record button to record, press again to stop`}</li>
-        <li className="pb-1.5 text-lg">{`And with that, you'll have recorded your first replay :)`}</li>
+        <div className="pb-6 text-lg">{`This is your library, where replays from your team live. Click on one to view it, or click "Launch Replay" at the top right to record your own.`}</div>
       </>
     ),
   },
