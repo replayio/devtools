@@ -3,7 +3,7 @@
   flex-direction: row;
   overflow: hidden;
   gap: 1ch;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0.25rem;
   cursor: pointer;
 }
 .Point[data-test-state="paused"] {
