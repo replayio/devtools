@@ -22,7 +22,7 @@ test("should add true/false keywords to the list of suggestions", async ({ page 
   await delay(100);
 
   await page.fill("[data-test-id=ConsoleTerminalInput]", "tr");
-  await verifyTypeAheadContainsSuggestions(page, "true");
+  await verifyTypeAheadContainsSuggestions(page, "thisisgonnafail");
 
   await page.fill("[data-test-id=ConsoleTerminalInput]", "fa");
   await verifyTypeAheadContainsSuggestions(page, "false");
