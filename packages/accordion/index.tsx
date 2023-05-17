@@ -53,7 +53,7 @@ function ResizeHandle({
   return (
     <div
       className={classNames(
-        "absolute w-full border-splitter hover:border-blue-400",
+        "absolute w-full border-chrome hover:border-blue-400",
         isResizing ? "border-blue-400" : ""
       )}
       style={{

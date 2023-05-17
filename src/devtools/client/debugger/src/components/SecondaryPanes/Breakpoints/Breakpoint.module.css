@@ -4,6 +4,7 @@
   overflow: hidden;
   gap: 1ch;
   padding: 0.25rem 0.5em;
+  cursor: pointer;
 }
 .Point[data-test-state="paused"] {
   background-color: var(--background-color-current-execution-point);
@@ -11,9 +12,6 @@
 
 .Location {
   color: var(--theme-comment);
-}
-.Point:hover .Location {
-  display: none;
 }
 
 .CreatedByAvatar {

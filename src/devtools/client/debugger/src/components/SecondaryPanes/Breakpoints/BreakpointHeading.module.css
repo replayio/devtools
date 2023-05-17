@@ -4,7 +4,7 @@
   width: 100%;
   font-size: var(font-size-regular);
   line-height: 1rem;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0.36rem;
   justify-content: space-between;
   background-color: var(--theme-toolbar-background);
   color: var(--theme-text-color-strong);
