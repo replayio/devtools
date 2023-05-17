@@ -237,6 +237,26 @@ export default function CommentEditor({
     }
   }, [onFormSubmit]);
 
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (editor) {
+      const element = editor.getRootElement();
+      if (element) {
+        if (dataTestId) {
+          element.setAttribute("data-test-id", dataTestId);
+        } else {
+          element.removeAttribute("data-test-id");
+        }
+
+        if (dataTestName) {
+          element.setAttribute("data-test-name", dataTestName);
+        } else {
+          element.removeAttribute("data-test-name");
+        }
+      }
+    }
+  }, [editorRef, dataTestId, dataTestName]);
+
   return (
     <div className={styles.Editor}>
       <LexicalComposer initialConfig={createInitialConfig(markdown, editable)}>

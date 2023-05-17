@@ -122,7 +122,7 @@ export default function CommentCardsList() {
   }
 
   return (
-    <div className={styles.Sidebar}>
+    <div className={styles.Sidebar} data-test-name="CommentCardList">
       <div className={styles.Toolbar}>
         <div className={styles.ToolbarHeader}>Comments</div>
         <CommentDropDownMenu />

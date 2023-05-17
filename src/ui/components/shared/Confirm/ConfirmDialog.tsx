@@ -13,6 +13,8 @@ import {
 
 export type ConfirmOptions = {
   acceptLabel: string;
+  dataTestId?: string;
+  dataTestName?: string;
   declineLabel?: string;
   description?: string;
   isDestructive?: boolean;
@@ -26,6 +28,8 @@ type PropTypes = ConfirmOptions & DialogPropTypes;
 export const ConfirmDialog = ({
   acceptLabel,
   className,
+  dataTestId,
+  dataTestName,
   declineLabel = "Cancel",
   description,
   message,
@@ -50,6 +54,8 @@ export const ConfirmDialog = ({
     <Dialog
       {...props}
       className={className}
+      dataTestId={dataTestId}
+      dataTestName={dataTestName}
       onKeyUp={evt => {
         if (evt.key === "Escape") {
           evt.stopPropagation();
@@ -61,11 +67,19 @@ export const ConfirmDialog = ({
       <DialogTitle>{message}</DialogTitle>
       {description && <DialogDescription>{description}</DialogDescription>}
       <DialogActions>
-        <SecondaryButton color="blue" className="mx-3 flex-1 justify-center" onClick={onDecline}>
+        <SecondaryButton
+          color="blue"
+          className="mx-3 flex-1 justify-center"
+          dataTestId={dataTestId ? `${dataTestId}-DeclineButton` : undefined}
+          dataTestName={dataTestName ? `${dataTestName}-DeclineButton` : undefined}
+          onClick={onDecline}
+        >
           {declineLabel}
         </SecondaryButton>
         <Button
           className="mx-2 flex-1 justify-center"
+          dataTestId={dataTestId ? `${dataTestId}-ConfirmButton` : undefined}
+          dataTestName={dataTestName ? `${dataTestName}-ConfirmButton` : undefined}
           color={isDestructive ? "pink" : "blue"}
           onClick={onAccept}
           ref={primaryButtonRef}

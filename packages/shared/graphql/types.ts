@@ -63,6 +63,7 @@ export interface CommentSourceLocation {
   sourceId: string;
 }
 
+// TODO Keep in sync with e2e-tests/helpers/comments
 export type CommentType = "source-code" | "network-request" | "visual";
 
 interface Remark {

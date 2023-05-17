@@ -68,3 +68,10 @@
 .Icon {
   color: rgb(156 163 175 / var(--tw-text-opacity));
 }
+
+.ContextMenuButton {
+  padding: 0;
+  border: none;
+  background: none;
+  outline: none;
+}

@@ -53,7 +53,7 @@ function handleAuthError() {
 
 function AppUtilities({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const { isAuthenticated, getAccessTokenSilently, error } = useAuth0();
+  const { getAccessTokenSilently, isAuthenticated } = useAuth0();
 
   _handleAuthError = async () => {
     // This handler attempts to handle the scenario in which the frontend and

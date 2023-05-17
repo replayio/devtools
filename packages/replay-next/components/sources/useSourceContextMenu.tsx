@@ -69,7 +69,11 @@ export default function useSourceContextMenu({
     <>
       {accessToken !== null && (
         <>
-          <ContextMenuItem disabled={isPending} onSelect={addComment}>
+          <ContextMenuItem
+            dataTestName="ContextMenuItem-AddComment"
+            disabled={isPending}
+            onSelect={addComment}
+          >
             Add comment to line {lineNumber}
           </ContextMenuItem>
           <ContextMenuDivider />
@@ -82,6 +86,10 @@ export default function useSourceContextMenu({
         {showHitCounts ? "Hide" : "Show"} hit counts
       </ContextMenuItem>
     </>,
-    { requireClickToShow: true }
+    {
+      requireClickToShow: true,
+      dataTestId: `ContextMenu-Source-${lineNumber}`,
+      dataTestName: "ContextMenu-Source",
+    }
   );
 }

@@ -3,6 +3,7 @@ import jwt_decode from "jwt-decode";
 import React, { ReactNode } from "react";
 
 import { Deferred, assert, defer } from "protocol/utils";
+import { isTest } from "ui/utils/environment";
 
 import { getAuthClientId, getAuthHost } from "./auth";
 import { listenForAccessToken } from "./browser";
@@ -49,13 +50,17 @@ class TokenManager {
   private listeners: TokenListener[] = [];
 
   constructor() {
-    // if (isTest()) {
-    //   this.currentState = {
-    //     loading: false,
-    //     token: "E2E-TEST-TOKEN",
-    //   };
-    //   this.deferredState.resolve(this.currentState);
-    // }
+    if (isTest()) {
+      const url = new URL(window.location.href);
+      const apiKey = url.searchParams.get("apiKey");
+      if (apiKey) {
+        this.currentState = {
+          loading: false,
+          token: apiKey,
+        };
+        this.deferredState.resolve(this.currentState);
+      }
+    }
 
     if (typeof window !== "undefined") {
       listenForAccessToken(token => {

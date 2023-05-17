@@ -184,7 +184,7 @@ function _DevTools({
 
   useEffect(() => {
     let token: Promise<TokenState | void> = Promise.resolve();
-    if (isAuthenticated && !isTest()) {
+    if (isAuthenticated) {
       token = tokenManager.getToken();
     }
 

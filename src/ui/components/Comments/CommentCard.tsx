@@ -84,8 +84,10 @@ function CommentCard({
         !comment.isPublished && styles.Unpublished,
         isFocused || styles.UnfocusedDimmed
       )}
+      data-test-comment-id={comment.id}
+      data-test-comment-type={comment.type}
+      data-test-id={`CommentCard-${comment.id}`}
       data-test-name="CommentCard"
-      data-test-comment-time={comment.time}
       onClick={onClick}
     >
       {pauseOverlayPosition !== null && (
@@ -107,7 +109,3 @@ function CommentCard({
 
 const MemoizedCommentCard = memo(CommentCard);
 export default MemoizedCommentCard;
-
-export function getCommentTimeFromElement(element: Element) {
-  return parseInt(element.getAttribute("data-test-comment-time") ?? "", 10);
-}

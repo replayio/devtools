@@ -100,6 +100,46 @@ jobs:
           INPUT_STRIPE: ${{ matrix.shard }}/10
           RECORD_REPLAY_WEBHOOK_URL: ${{ secrets.RECORD_REPLAY_WEBHOOK_URL }}
           RECORD_REPLAY_TEST_METRICS: 1
+  authenticated-e2etest:
+    name: Authenticated end-to-end tests (${{ matrix.shard }})
+    runs-on: ubuntu-latest
+    needs: [preview-branch, generate-test-run-id]
+    strategy:
+      # GH cancels other matrixed jobs by default if one fails. We want all E2E jobs to complete.
+      fail-fast: false
+      matrix:
+        shard: ["1"]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      # Get the yarn cache path.
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+      - name: Restore yarn cache
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            **/node_modules
+          key: yarn-cache-folder-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
+          restore-keys: "yarn-cache-folder-"
+      # Actually install packages with Yarn
+      - name: Install packages
+        run: yarn install
+        env:
+          YARN_CHECKSUM_BEHAVIOR: "update"
+      - name: Run tests
+        run: CHROMIUM_ONLY=1 E2E_USER_1_API_KEY=${{ secrets.E2E_USER_1_API_KEY }} E2E_USER_2_API_KEY=${{ secrets.E2E_USER_2_API_KEY }} npx playwright test --shard $INPUT_STRIPE authenticated/*.ts
+        working-directory: ./packages/e2e-tests
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
+          INPUT_STRIPE: ${{ matrix.shard }}/1
   e2etest-jail:
     name: End-to-end tests - Jail
     runs-on: ubuntu-latest

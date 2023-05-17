@@ -85,28 +85,35 @@ export const Button = forwardRef<
     size: ButtonSizes;
     style: ButtonStyles;
   }
->(({ size, children, dataTestId, style, color, className, onClick = () => {}, type }, ref) => {
-  const buttonClasses = getButtonClasses(color, style, size);
+>(
+  (
+    { size, children, dataTestId, dataTestName, style, color, className, onClick = () => {}, type },
+    ref
+  ) => {
+    const buttonClasses = getButtonClasses(color, style, size);
 
-  return (
-    <button
-      onClick={onClick}
-      data-test-id={dataTestId}
-      disabled={style === "disabled"}
-      className={classNames(buttonClasses, className)}
-      ref={ref}
-      type={type}
-    >
-      {children}
-    </button>
-  );
-});
+    return (
+      <button
+        onClick={onClick}
+        data-test-id={dataTestId}
+        data-test-name={dataTestName}
+        disabled={style === "disabled"}
+        className={classNames(buttonClasses, className)}
+        ref={ref}
+        type={type}
+      >
+        {children}
+      </button>
+    );
+  }
+);
 Button.displayName = "Button";
 
 interface ButtonProps {
   children?: React.ReactNode;
   className?: string;
   dataTestId?: string;
+  dataTestName?: string;
   onClick?: () => void;
   type?: "button" | "submit";
 }

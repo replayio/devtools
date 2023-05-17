@@ -43,6 +43,7 @@ export default function useCommentContextMenu({
 
     confirmDestructive({
       acceptLabel: "Delete comment",
+      dataTestName: "ConfirmDialog-DeleteComment",
       description: `${deleteDescription}`,
       message: "Are you sure?",
     }).then(async confirmed => {
@@ -67,12 +68,16 @@ export default function useCommentContextMenu({
   const contextMenuItems: ReactNode[] = [];
   if (isCurrentUserAuthor) {
     contextMenuItems.push(
-      <ContextMenuItem key="edit" onSelect={editRemark}>
+      <ContextMenuItem dataTestName="ContextMenuItem-EditComment" key="edit" onSelect={editRemark}>
         Edit comment
       </ContextMenuItem>
     );
     contextMenuItems.push(
-      <ContextMenuItem key="delete" onSelect={confirmDelete}>
+      <ContextMenuItem
+        dataTestName="ContextMenuItem-DeleteComment"
+        key="delete"
+        onSelect={confirmDelete}
+      >
         {type === "comment" ? "Delete comment and replies" : "Delete comment"}
       </ContextMenuItem>
     );
@@ -106,5 +111,7 @@ export default function useCommentContextMenu({
     </ContextMenuItem>
   );
 
-  return useContextMenu(contextMenuItems);
+  return useContextMenu(contextMenuItems, {
+    dataTestName: "ContextMenu-Comment",
+  });
 }

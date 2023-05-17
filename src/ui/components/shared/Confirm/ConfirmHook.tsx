@@ -32,6 +32,7 @@ export const useConfirm = () => {
     (options: Omit<ConfirmOptions, "onAccept" | "onDecline">): Promise<boolean> => {
       return new Promise(resolve => {
         showConfirmation({
+          dataTestName: "ConfirmDialog",
           ...options,
           onAccept: () => resolve(true),
           onDecline: () => resolve(false),

@@ -4,12 +4,16 @@ import React, { HTMLProps } from "react";
 import ReplayLogo from "./ReplayLogo";
 
 export type DialogPropTypes = HTMLProps<HTMLDivElement> & { showFooterLinks?: boolean } & {
+  dataTestId?: string;
+  dataTestName?: string;
   showIllustration?: boolean;
 };
 
 export function Dialog({
   children,
   className,
+  dataTestId,
+  dataTestName,
   showFooterLinks,
   showIllustration,
   ...props
@@ -19,6 +23,8 @@ export function Dialog({
       <div
         {...props}
         className={classNames("dialog flex flex-col items-center", className)}
+        data-test-id={dataTestId}
+        data-test-name={dataTestName}
         role="dialog"
         style={{ animation: "linearFadeIn ease 200ms", width: 400 }}
       >
