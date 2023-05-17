@@ -28,7 +28,7 @@
   padding-left: 0.4rem;
   border-radius: 3rem;
   margin-bottom: 1px;
-  z-index: 10;
+  z-index: var(--z-index-1);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -57,7 +57,7 @@
 .checklistItem.selectedItem,
 .checklistItem.selectedItem:hover {
   background-color: rgba(63, 150, 238, 0.4);
-  z-index: 10;
+  z-index: var(--z-index-1);
 }
 
 .stepIcon {
@@ -68,7 +68,7 @@
 .videoExample {
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
-  z-index: 5;
+  z-index: var(--z-index-1);
   width: 100%;
   margin-bottom: 115px;
 }
@@ -77,7 +77,7 @@
   width: 190px;
   height: auto;
   position: absolute;
-  z-index: 0;
+  z-index: var(--z-index-1);
   opacity: 30%;
   pointer-events: none;
 }
