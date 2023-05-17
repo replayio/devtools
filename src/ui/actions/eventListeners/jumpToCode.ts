@@ -13,7 +13,6 @@ import { Cache, createCache } from "suspense";
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import type { ThreadFront as TF } from "protocol/thread";
-import { breakpointPositionsCache } from "replay-next/src/suspense/BreakpointPositionsCache";
 import { RecordingTarget, recordingTargetCache } from "replay-next/src/suspense/BuildIdCache";
 import { eventCountsCache, eventPointsCache } from "replay-next/src/suspense/EventsCache";
 import { topFrameCache } from "replay-next/src/suspense/FrameCache";
@@ -37,6 +36,7 @@ import { getLoadedRegions } from "ui/reducers/app";
 import { getViewMode } from "ui/reducers/layout";
 import { SourcesState, getPreferredLocation, getSourceDetailsEntities } from "ui/reducers/sources";
 import { UIState } from "ui/state";
+import { ParsedJumpToCodeAnnotation } from "ui/suspense/annotationsCaches";
 
 import { createReactEventMapper } from "./evaluationMappers";
 
@@ -425,4 +425,21 @@ export function findFunctionOutlineForLocation(
     }
   }
   return foundFunctionOutline;
+}
+
+export function jumpToKnownEventListenerHit(
+  onSeek: (point: ExecutionPoint, time: number) => void,
+  jumpToCodeDetails: ParsedJumpToCodeAnnotation
+): UIThunkAction<Promise<void>> {
+  return async (dispatch, getState) => {
+    const cx = getThreadContext(getState());
+
+    const { eventListener, listenerPoint } = jumpToCodeDetails;
+    const { location, firstBreakablePosition } = eventListener;
+
+    // Open the source file and jump to the found position.
+    // This is either the function definition itself, or the first position _inside_ the function.
+    dispatch(selectLocation(cx, firstBreakablePosition));
+    onSeek(listenerPoint.point, listenerPoint.time);
+  };
 }

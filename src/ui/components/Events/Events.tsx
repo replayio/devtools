@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import sortedLastIndex from "lodash/sortedLastIndex";
-import { memo, useMemo } from "react";
+import { memo, useContext, useMemo } from "react";
+import { useImperativeCacheValue } from "suspense";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { getFilteredEventsForFocusRegion } from "ui/actions/app";
@@ -8,6 +9,8 @@ import { seek } from "ui/actions/timeline";
 import useEventsPreferences from "ui/components/Events/useEventsPreferences";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { ParsedJumpToCodeAnnotation } from "ui/suspense/annotationsCaches";
+import { eventListenersJumpLocationsCache } from "ui/suspense/annotationsCaches";
 import { trackEvent } from "ui/utils/telemetry";
 
 import Event from "./Event";
@@ -21,11 +24,17 @@ export function CurrentTimeLine({ isActive }: { isActive: boolean }) {
   );
 }
 
+const NO_ANNOTATIONS: ParsedJumpToCodeAnnotation[] = [];
+
 function Events() {
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(getCurrentTime);
   const executionPoint = useAppSelector(getExecutionPoint);
   const events = useAppSelector(getFilteredEventsForFocusRegion);
+
+  const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
+    eventListenersJumpLocationsCache
+  );
 
   const { filters } = useEventsPreferences();
 
@@ -47,6 +56,19 @@ function Events() {
       }),
     [events, filters]
   );
+
+  const jumpToCodeAnnotations: ParsedJumpToCodeAnnotation[] =
+    annotationsStatus === "resolved" ? parsedAnnotations : NO_ANNOTATIONS;
+
+  const jumpToCodeEntriesPerEvent = useMemo(() => {
+    const jumpToCodeEntriesByPoint: Record<string, ParsedJumpToCodeAnnotation> = {};
+
+    for (const jumpToCodeAnnotation of jumpToCodeAnnotations) {
+      jumpToCodeEntriesByPoint[jumpToCodeAnnotation.point] = jumpToCodeAnnotation;
+    }
+
+    return jumpToCodeEntriesByPoint;
+  }, [jumpToCodeAnnotations]);
 
   const onSeek = (point: string, time: number) => {
     trackEvent("events_timeline.select");
@@ -71,6 +93,7 @@ function Events() {
                   event={event}
                   currentTime={currentTime}
                   executionPoint={executionPoint!}
+                  jumpToCodeAnnotation={jumpToCodeEntriesPerEvent[event.point]}
                 />
               </div>
             </div>

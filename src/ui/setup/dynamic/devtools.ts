@@ -51,7 +51,11 @@ import timeline, {
 } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import { UnexpectedError } from "ui/state/app";
-import { annotationKindsCache, reactDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
+import {
+  annotationKindsCache,
+  eventListenersJumpLocationsCache,
+  reactDevToolsAnnotationsCache,
+} from "ui/suspense/annotationsCaches";
 import type { ThunkExtraArgs } from "ui/utils/thunk";
 
 import { startAppListening } from "../listenerMiddleware";
@@ -216,6 +220,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   // Precache annotations
   annotationKindsCache.readAsync(replayClient);
   reactDevToolsAnnotationsCache.readAsync();
+  eventListenersJumpLocationsCache.readAsync();
 
   // Add protocol event listeners for things that the Redux store needs to stay in sync with.
   // TODO We should revisit this as part of a larger architectural redesign (#6932).
