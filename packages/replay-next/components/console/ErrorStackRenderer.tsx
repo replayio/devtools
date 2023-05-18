@@ -10,7 +10,7 @@ import { objectPropertyCache } from "replay-next/src/suspense/ObjectPreviews";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { sourcesByIdCache, sourcesByUrlCache } from "replay-next/src/suspense/SourcesCache";
 import { findFunctionNameForLocation, isSourceMappedSource } from "replay-next/src/utils/source";
-import { getPreferredLocation } from "replay-next/src/utils/sources";
+import { getPreferredLocationWorkaround } from "replay-next/src/utils/sources";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Source from "./Source";
@@ -78,7 +78,7 @@ function ErrorFrameRendererSuspends({ frame }: { frame: StackFrame }) {
       column: columnNumber,
     };
     const mappedLocation = mappedLocationCache.read(client, location);
-    const preferredLocation = getPreferredLocation(
+    const preferredLocation = getPreferredLocationWorkaround(
       sourcesById,
       preferredGeneratedSourceIds,
       mappedLocation

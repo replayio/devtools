@@ -111,6 +111,21 @@ export function getPreferredLocation(
   return preferredLocation;
 }
 
+export function getPreferredLocationWorkaround(
+  sourcesById: Map<SourceId, Source>,
+  preferredGeneratedSourceIds: SourceId[],
+  locations: MappedLocation
+) {
+  // TODO [FE-1508] another hack: the new console doesn't update sourceIds in locations
+  // to their first corresponding sourceId, which getPreferredLocation
+  // subsequently complains about
+  const correspondingLocations = locations.map(location => ({
+    ...location,
+    sourceId: getCorrespondingSourceIds(sourcesById, location.sourceId)[0],
+  }));
+  return getPreferredLocation(sourcesById, preferredGeneratedSourceIds, correspondingLocations);
+}
+
 export function getAlternateSourceId(
   sourcesById: Map<SourceId, Source>,
   sourceIds: SourceId[],
