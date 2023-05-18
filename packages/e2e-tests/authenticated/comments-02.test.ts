@@ -2,7 +2,7 @@ import test, { Page } from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
 import {
-  addSourceComment,
+  addSourceCodeComment,
   deleteAllComments,
   getComments,
   replyToComment,
@@ -21,7 +21,7 @@ async function load(page: Page, apiKey: string) {
   await openSource(page, url);
 }
 
-test(`authenticated-comments-02: Test shared comments and replies`, async ({ browser }) => {
+test(`authenticated/comments-02: Test shared comments and replies`, async ({ browser }) => {
   let pageOne: Page;
   let pageTwo: Page;
 
@@ -37,7 +37,7 @@ test(`authenticated-comments-02: Test shared comments and replies`, async ({ bro
     // TODO [SCS-1066] Ideally we would create a fresh recording for each test run
     await deleteAllComments(page);
 
-    await addSourceComment(page, {
+    await addSourceCodeComment(page, {
       text: "This is a test comment from user 1",
       lineNumber: 3,
       url,

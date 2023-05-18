@@ -34,8 +34,6 @@ export async function debugPrint(page: Page | null, message: string, scope?: str
 // This helper can be useful when debugging tests but should not be used in committed tests.
 // (In other words, don't commit code that relies on this in order to work.)
 export function delay(timeout: number) {
-  debugPrint(null, `Delaying for ${chalk.bold(timeout)}ms`, "delay");
-
   return new Promise(resolve => setTimeout(resolve, timeout));
 }
 

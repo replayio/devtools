@@ -112,6 +112,7 @@ export default function useCommentContextMenu({
   );
 
   return useContextMenu(contextMenuItems, {
+    dataTestId: `ContextMenu-Comment-${remark.id}`,
     dataTestName: "ContextMenu-Comment",
   });
 }

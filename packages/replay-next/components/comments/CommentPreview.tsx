@@ -157,6 +157,8 @@ function VisualPreview({
   return (
     <div
       className={styles.OuterImageContainer}
+      data-test-name="CommentPreview-TogglePreviewButton"
+      data-test-preview-state={showPreview ? "visible" : "hidden"}
       onClick={onClick}
       title={showPreview ? "Hide preview" : "Show preview"}
     >

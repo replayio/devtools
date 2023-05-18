@@ -39,6 +39,7 @@ export default function Icon({
     | "fast-forward"
     | "file"
     | "folder"
+    | "inspect"
     | "invisible"
     | "invoke-getter"
     | "menu-closed"
@@ -222,6 +223,10 @@ export default function Icon({
     case "folder":
       path =
         "M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z";
+      break;
+    case "inspect":
+      path =
+        "M8.5,22H3.7l-1.4-1.5V3.8l1.3-1.5h17.2l1,1.5v4.9h-1.3V4.3l-0.4-0.6H4.2L3.6,4.3V20l0.7,0.7h4.2V22z M23,13.9l-4.6,3.6l4.6,4.6l-1.1,1.1l-4.7-4.4l-3.3,4.4l-3.2-12.3L23,13.9z";
       break;
     case "invisible":
       path =

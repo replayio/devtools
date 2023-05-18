@@ -27,7 +27,7 @@ async function load(page: Page, apiKey: string) {
   await disableAllConsoleMessageTypes(page);
 }
 
-test(`authenticated-logpoints-01: Shared logpoints functionality`, async ({ browser }) => {
+test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({ browser }) => {
   let pageOne: Page;
   let pageTwo: Page;
 

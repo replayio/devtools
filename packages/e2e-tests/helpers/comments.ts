@@ -4,6 +4,7 @@ import chalk from "chalk";
 import { selectContextMenuItem } from "./context-menu";
 import { confirmDialog } from "./dialog";
 import { clearText, focus, isEditable, type as typeText } from "./lexical";
+import { findNetworkRequestRow } from "./network-panel";
 import { openSource } from "./source-explorer-panel";
 import { getSourceLine } from "./source-panel";
 import { debugPrint, waitFor } from "./utils";
@@ -16,7 +17,84 @@ type CommentType =
   // This is a special type that is used to indicate that the comment is a reply to another comment
   | "reply";
 
-export async function addSourceComment(
+async function addCommentHelper(
+  page: Page,
+  createComment: () => Promise<void>,
+  type: CommentType,
+  text: string
+): Promise<void> {
+  await showCommentsPanel(page);
+
+  // Get initial ids
+  const idsBefore = await getCommentIds(page, { type });
+
+  await createComment();
+
+  // Wait for new comment to be added
+  const commentsLocator = await getComments(page, { type });
+  await waitFor(async () => await expect(await commentsLocator.count()).toBe(idsBefore.size + 1));
+
+  // Get updated ids
+  const idsAfter = await getCommentIds(page, { type });
+
+  // Find ID of new comment
+  idsBefore.forEach(id => idsAfter.delete(id));
+  expect(idsAfter.size).toBe(1);
+
+  const id = Array.from(idsAfter.values())[0];
+
+  const lexicalSelector = `[data-test-id="CommentInput-${id}"]`;
+  await focus(page, lexicalSelector);
+  await typeText(page, lexicalSelector, text, true);
+
+  await expect(await isEditable(page, lexicalSelector)).toBe(false);
+}
+
+export async function addNetworkRequestComment(
+  page: Page,
+  options: {
+    method: string;
+    name: string;
+    status: number;
+    text: string;
+  }
+) {
+  const { name, method, status, text } = options;
+
+  await debugPrint(
+    page,
+    `Adding network request comment ${chalk.bold(method)} request ${chalk.bold(
+      name
+    )} with status ${chalk.bold(status)}`,
+    "addNetworkRequestComment"
+  );
+
+  await addCommentHelper(
+    page,
+    async () => {
+      const rowLocator = await findNetworkRequestRow(page, {
+        method,
+        name,
+        status,
+      });
+      await rowLocator.click({ button: "right" });
+
+      await selectContextMenuItem(page, {
+        contextMenuItemTestName: "ContextMenuItem-AddComment",
+        contextMenuTestName: `ContextMenu-NetworkRequest`,
+      });
+    },
+    "network-request",
+    text
+  );
+
+  const commentLocator = await getComments(page, { text, type: "network-request" });
+  await expect(await commentLocator.count()).toBe(1);
+
+  return commentLocator;
+}
+
+export async function addSourceCodeComment(
   page: Page,
   options: {
     lineNumber: number;
@@ -28,41 +106,69 @@ export async function addSourceComment(
 
   await debugPrint(
     page,
-    `Adding Source comment to ${chalk.bold(`${url}:${lineNumber}`)} with text "${chalk.bold(
+    `Adding Source code comment to ${chalk.bold(`${url}:${lineNumber}`)} with text "${chalk.bold(
       text
     )}"`,
-    "addSourceComment"
+    "addSourceCodeComment"
   );
 
   await openSource(page, url);
 
-  const lineLocator = await getSourceLine(page, lineNumber);
-  await lineLocator.click({ button: "right" });
+  await addCommentHelper(
+    page,
+    async () => {
+      const lineLocator = await getSourceLine(page, lineNumber);
+      await lineLocator.click({ button: "right" });
 
-  const idsBefore = await getCommentIds(page, { type: "source-code" });
-
-  await selectContextMenuItem(page, {
-    contextMenuItemTestName: "ContextMenuItem-AddComment",
-    contextMenuTestId: `ContextMenu-Source-${lineNumber}`,
-  });
-
-  // Wait for new comment to be added
-  const commentsLocator = await getComments(page, { type: "source-code" });
-  await waitFor(async () => await expect(await commentsLocator.count()).toBe(idsBefore.size + 1));
-
-  // Find ID of new comment
-  const idsAfter = await getCommentIds(page, { type: "source-code" });
-  idsBefore.forEach(id => idsAfter.delete(id));
-  expect(idsAfter.size).toBe(1);
-
-  const id = Array.from(idsAfter.values())[0];
-  const lexicalSelector = `[data-test-id="CommentInput-${id}"]`;
-  await focus(page, lexicalSelector);
-  await typeText(page, lexicalSelector, text, true);
-
-  await expect(await isEditable(page, lexicalSelector)).toBe(false);
+      await selectContextMenuItem(page, {
+        contextMenuItemTestName: "ContextMenuItem-AddComment",
+        contextMenuTestId: `ContextMenu-Source-${lineNumber}`,
+      });
+    },
+    "source-code",
+    text
+  );
 
   const commentLocator = await getComments(page, { text, type: "source-code" });
+  await expect(await commentLocator.count()).toBe(1);
+
+  return commentLocator;
+}
+
+export async function addVisualComment(
+  page: Page,
+  options: {
+    text: string;
+    x: number;
+    y: number;
+  }
+) {
+  const { text, x, y } = options;
+
+  await debugPrint(
+    page,
+    `Adding visual comment at coordinates ${chalk.bold(`${x}, ${y}`)} with text "${chalk.bold(
+      text
+    )}"`,
+    "addVisualComment"
+  );
+
+  await addCommentHelper(
+    page,
+    async () => {
+      const canvasLocator = page.locator("canvas#graphics");
+      await canvasLocator.click({ position: { x, y } });
+
+      await selectContextMenuItem(page, {
+        contextMenuItemTestName: "ContextMenuItem-AddComment",
+        contextMenuTestId: "ContextMenu-Video",
+      });
+    },
+    "visual",
+    text
+  );
+
+  const commentLocator = await getComments(page, { text, type: "visual" });
   await expect(await commentLocator.count()).toBe(1);
 
   return commentLocator;
@@ -71,14 +177,20 @@ export async function addSourceComment(
 export async function deleteAllComments(page: Page) {
   await showCommentsPanel(page);
 
-  const comments = await getComments(page, { type: "source-code" });
-  const count = await comments.count();
+  const types: CommentType[] = ["network-request", "source-code", "visual"];
 
-  await debugPrint(page, `Deleting all ${chalk.bold(count)} comments`, "deleteAllComments");
+  for (let index = 0; index < types.length; index++) {
+    const type = types[index];
 
-  for (let index = count - 1; index >= 0; index--) {
-    const commentLocator = comments.nth(index);
-    await deleteComment(page, commentLocator);
+    const comments = await getComments(page, { type });
+    const count = await comments.count();
+
+    await debugPrint(page, `Deleting all ${chalk.bold(count)} comments`, "deleteAllComments");
+
+    for (let index = count - 1; index >= 0; index--) {
+      const commentLocator = comments.nth(index);
+      await deleteComment(page, commentLocator);
+    }
   }
 }
 
@@ -88,11 +200,13 @@ export async function deleteComment(page: Page, commentLocator: Locator) {
   const button = commentLocator.locator('[data-test-name="ContextMenuButton"]').first();
   await button.click();
 
-  await debugPrint(page, `Deleting comment`, "deleteComment");
+  const id = (await commentLocator.getAttribute("data-test-comment-id")) as string;
+
+  await debugPrint(page, `Deleting comment ${chalk.bold(id)}`, "deleteComment");
 
   await selectContextMenuItem(page, {
     contextMenuItemTestName: "ContextMenuItem-DeleteComment",
-    contextMenuTestName: "ContextMenu-Comment",
+    contextMenuTestId: `ContextMenu-Comment-${id}`,
   });
 
   await confirmDialog(page, { dialogTestName: "ConfirmDialog-DeleteComment" });
@@ -101,7 +215,13 @@ export async function deleteComment(page: Page, commentLocator: Locator) {
 export async function editComment(page: Page, commentLocator: Locator, options: { text: string }) {
   const { text } = options;
 
-  await debugPrint(page, `Edit comment to contain text "${chalk.bold(text)}"`, "editComment");
+  const id = (await commentLocator.getAttribute("data-test-comment-id")) as string;
+
+  await debugPrint(
+    page,
+    `Edit comment ${chalk.bold(id)} to contain text "${chalk.bold(text)}"`,
+    "editComment"
+  );
 
   await showCommentsPanel(page);
 
@@ -110,10 +230,9 @@ export async function editComment(page: Page, commentLocator: Locator, options: 
 
   await selectContextMenuItem(page, {
     contextMenuItemTestName: "ContextMenuItem-EditComment",
-    contextMenuTestName: "ContextMenu-Comment",
+    contextMenuTestId: `ContextMenu-Comment-${id}`,
   });
 
-  const id = (await commentLocator.getAttribute("data-test-comment-id")) as string;
   const lexicalSelector = `[data-test-id="CommentInput-${id}"]`;
 
   await focus(page, lexicalSelector);
@@ -209,4 +328,20 @@ export async function showCommentsPanel(page: Page): Promise<void> {
   if (!isVisible) {
     await page.locator('[data-test-name="ToolbarButton-Comments"]').click();
   }
+}
+
+export async function toggleCommentPreview(page: Page, commentLocator: Locator, visible: boolean) {
+  await debugPrint(page, "Showing comment preview", "showCommentPreview");
+
+  const button = commentLocator.locator('[data-test-name="CommentPreview-TogglePreviewButton"]');
+
+  await expect(await button.getAttribute("data-test-preview-state")).toBe(
+    visible ? "hidden" : "visible"
+  );
+
+  await button.click();
+
+  await expect(await button.getAttribute("data-test-preview-state")).toBe(
+    visible ? "visible" : "hidden"
+  );
 }
