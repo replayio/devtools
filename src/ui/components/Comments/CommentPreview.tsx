@@ -21,7 +21,7 @@ export default function CommentPreview({
 }) {
   if (comment.sourceLocation || isSourceCodeCommentTypeData(comment.type, comment.typeData)) {
     return (
-      <div className={styles.Preview} onClick={onClick}>
+      <div className={styles.Preview} data-test-name="CommentPreview" onClick={onClick}>
         <SourceCodePreview comment={comment} />
       </div>
     );
@@ -30,7 +30,7 @@ export default function CommentPreview({
     isNetworkRequestCommentTypeData(comment.type, comment.typeData)
   ) {
     return (
-      <div className={styles.Preview} onClick={onClick}>
+      <div className={styles.Preview} data-test-name="CommentPreview" onClick={onClick}>
         <NetworkRequestPreview comment={comment} />
       </div>
     );
@@ -40,7 +40,7 @@ export default function CommentPreview({
     isVisualCommentTypeData(comment.type, comment.typeData)
   ) {
     return (
-      <div className={styles.Preview}>
+      <div className={styles.Preview} data-test-name="CommentPreview">
         <VisualPreview comment={comment} />
       </div>
     );

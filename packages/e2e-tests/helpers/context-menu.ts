@@ -1,7 +1,7 @@
 import { Locator, Page } from "@playwright/test";
 
 export async function selectContextMenuItem(
-  page: Page,
+  scope: Page | Locator,
   options: {
     contextMenuItemTestId?: string;
     contextMenuItemTestName?: string;
@@ -20,15 +20,15 @@ export async function selectContextMenuItem(
 
   let contextMenuLocator: Locator;
   if (contextMenuTestId) {
-    contextMenuLocator = page.locator(`[data-test-id="${contextMenuTestId}"]`);
+    contextMenuLocator = scope.locator(`[data-test-id="${contextMenuTestId}"]`);
   } else if (contextMenuTestName) {
-    contextMenuLocator = page.locator(`[data-test-name="${contextMenuTestName}"]`);
+    contextMenuLocator = scope.locator(`[data-test-name="${contextMenuTestName}"]`);
   } else if (contextMenuItemText) {
-    contextMenuLocator = page.locator(
+    contextMenuLocator = scope.locator(
       `[data-test-name="ContextMenu"]:has-text("${contextMenuItemText}")`
     );
   } else {
-    contextMenuLocator = page.locator('[data-test-name="ContextMenu"]');
+    contextMenuLocator = scope.locator('[data-test-name="ContextMenu"]');
   }
 
   let contextMenuItemLocator: Locator;

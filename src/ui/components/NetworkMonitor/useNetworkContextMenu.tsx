@@ -1,20 +1,40 @@
+import { unstable_useCacheRefresh as useCacheRefresh, useContext, useTransition } from "react";
 import { Row } from "react-table";
-import { ContextMenuItem, useContextMenu } from "use-context-menu";
+import { ContextMenuDivider, ContextMenuItem, useContextMenu } from "use-context-menu";
 
 import Icon from "replay-next/components/Icon";
+import {
+  COMMENT_TYPE_NETWORK_REQUEST,
+  createTypeDataForNetworkRequestComment,
+} from "replay-next/components/sources/utils/comments";
+import { GraphQLClientContext } from "replay-next/src/contexts/GraphQLClientContext";
+import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { addComment as addCommentGraphQL } from "shared/graphql/Comments";
 import { setFocusRegionBeginTime, setFocusRegionEndTime } from "ui/actions/timeline";
 import useCopyAsCURL from "ui/components/NetworkMonitor/useCopyAsCURL";
 import { useAppDispatch } from "ui/setup/hooks";
 
 import { RequestSummary } from "./utils";
+import styles from "./NetworkContextMenu.module.css";
 
 export default function useNetworkContextMenu({ row }: { row: Row<RequestSummary> }) {
+  const graphQLClient = useContext(GraphQLClientContext);
+  const { showCommentsPanel } = useContext(InspectorContext);
+  const { accessToken, recordingId } = useContext(SessionContext);
+
   const dispatch = useAppDispatch();
 
-  const { copy: copyAsCURL, state } = useCopyAsCURL(row.original);
+  const [isPending, startTransition] = useTransition();
+  const invalidateCache = useCacheRefresh();
 
-  const beginTime = row.original?.start;
-  const endTime = row.original?.end;
+  const requestSummary = row.original;
+  requestSummary.status;
+
+  const { copy: copyAsCURL, state } = useCopyAsCURL(requestSummary);
+
+  const beginTime = requestSummary.start;
+  const endTime = requestSummary.end;
 
   const setFocusEnd = () => {
     dispatch(setFocusRegionEndTime(endTime!, true));
@@ -22,6 +42,35 @@ export default function useNetworkContextMenu({ row }: { row: Row<RequestSummary
 
   const setFocusStart = () => {
     dispatch(setFocusRegionBeginTime(beginTime!, true));
+  };
+
+  const addComment = () => {
+    startTransition(async () => {
+      if (showCommentsPanel !== null) {
+        showCommentsPanel();
+      }
+
+      const typeData = await createTypeDataForNetworkRequestComment(
+        requestSummary.id,
+        requestSummary.method,
+        requestSummary.name,
+        requestSummary.status ?? null,
+        beginTime,
+        requestSummary.type
+      );
+
+      await addCommentGraphQL(graphQLClient, accessToken!, recordingId, {
+        content: "",
+        hasFrames: true,
+        isPublished: false,
+        point: requestSummary.triggerPoint?.point,
+        time: requestSummary.triggerPoint?.time,
+        type: COMMENT_TYPE_NETWORK_REQUEST,
+        typeData,
+      });
+
+      invalidateCache();
+    });
   };
 
   return useContextMenu(
@@ -38,13 +87,30 @@ export default function useNetworkContextMenu({ row }: { row: Row<RequestSummary
           Set focus end
         </>
       </ContextMenuItem>
-
+      <ContextMenuDivider />
+      {accessToken !== null && (
+        <>
+          <ContextMenuItem
+            dataTestName="ContextMenuItem-AddComment"
+            disabled={isPending}
+            onSelect={addComment}
+          >
+            <>
+              <Icon className={styles.CommentIcon} type="comment" />
+              Add comment
+            </>
+          </ContextMenuItem>
+        </>
+      )}
       <ContextMenuItem disabled={state !== "ready"} onSelect={copyAsCURL}>
         <>
           <Icon type="copy" />
           Copy as CURL
         </>
       </ContextMenuItem>
-    </>
+    </>,
+    {
+      dataTestName: "ContextMenu-NetworkRequest",
+    }
   );
 }

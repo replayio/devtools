@@ -7,6 +7,7 @@ import {
   unhighlightNode,
 } from "devtools/client/inspector/markup/actions/markup";
 import { assert } from "protocol/utils";
+import Icon from "replay-next/components/Icon";
 import { createTypeDataForVisualComment } from "replay-next/components/sources/utils/comments";
 import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
@@ -20,6 +21,8 @@ import { isPlaying as isPlayingSelector } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getMouseTarget } from "ui/suspense/nodeCaches";
 import { mouseEventCanvasPosition as getPositionForInspectingElement } from "ui/utils/nodePicker";
+
+import styles from "./VideoContextMenu.module.css";
 
 export default function useVideoContextMenu({
   canvasRef,
@@ -115,10 +118,24 @@ export default function useVideoContextMenu({
 
   return useContextMenu(
     <>
-      <ContextMenuItem onSelect={inspectElement}>Inspect element</ContextMenuItem>
-      {accessToken !== null && <ContextMenuItem onSelect={addComment}>Add comment</ContextMenuItem>}
+      <ContextMenuItem onSelect={inspectElement}>
+        <>
+          <Icon className={styles.Icon} type="inspect" />
+          Inspect element
+        </>
+      </ContextMenuItem>
+      {accessToken !== null && (
+        <ContextMenuItem dataTestName="ContextMenuItem-AddComment" onSelect={addComment}>
+          <>
+            <Icon className={styles.Icon} type="comment" />
+            Add comment
+          </>
+        </ContextMenuItem>
+      )}
     </>,
     {
+      dataTestName: "ContextMenu-Video",
+      dataTestId: "ContextMenu-Video",
       onHide,
       onShow,
       requireClickToShow: true,

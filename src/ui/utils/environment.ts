@@ -42,6 +42,10 @@ export function getTest() {
   return getURL().searchParams.get("test");
 }
 
+export function hasApiKey() {
+  return !!getURL().searchParams.get("apiKey");
+}
+
 // Return whether we are running one of the tests in our e2e test suite.
 // We will be connected to a live backend and testing debugging features.
 export function isE2ETest() {
