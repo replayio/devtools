@@ -21,7 +21,7 @@ import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useNag } from "replay-next/src/hooks/useNag";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
-import { getPreferredLocation } from "replay-next/src/utils/sources";
+import { getPreferredLocationWorkaround } from "replay-next/src/utils/sources";
 import { isExecutionPointsGreaterThan } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { addComment as addCommentGraphQL } from "shared/graphql/Comments";
@@ -62,7 +62,7 @@ export default function MessageHoverButton({
   const sourcesById = sourcesByIdCache.getValueIfCached(client);
   const location =
     locations && sourcesById
-      ? getPreferredLocation(sourcesById, preferredGeneratedSourceIds, locations)
+      ? getPreferredLocationWorkaround(sourcesById, preferredGeneratedSourceIds, locations)
       : null;
 
   let button = null;
