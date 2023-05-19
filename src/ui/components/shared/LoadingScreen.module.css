@@ -3,9 +3,6 @@
   display: flex;
   width: 24rem;
   flex-direction: column;
-  align-items: center;
-  padding: 1rem 1rem 3rem;
-  margin: 0.25rem;
 }
 
 .hoverboardWrapper {
