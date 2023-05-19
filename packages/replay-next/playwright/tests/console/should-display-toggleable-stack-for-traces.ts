@@ -7,14 +7,14 @@ import { setup } from "./shared";
 
 beforeEach();
 
-test("should display toggleable stack for traces", async ({ page }) => {
+test("should display toggleable stack for traces", async ({ page }, testInfo) => {
   await setup(page);
   await toggleProtocolMessage(page, "logs", true);
 
   const listItem = await locateMessage(page, "console-log", "This is a trace");
-  await takeScreenshot(page, listItem, "trace-stack-collapsed");
+  await takeScreenshot(page, testInfo, listItem, "trace-stack-collapsed");
 
   const toggle = listItem.locator("[role=button]", { hasText: "This is a trace" });
   await toggle.click();
-  await takeScreenshot(page, listItem, "trace-stack-expanded");
+  await takeScreenshot(page, testInfo, listItem, "trace-stack-expanded");
 });

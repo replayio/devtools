@@ -1,4 +1,3 @@
-import "../currentTestInfoWatcher";
 import { test } from "@playwright/test";
 
 import { getTestUrl } from "../utils/general";
@@ -9,7 +8,7 @@ import { sourceId } from "./shared";
 export function beforeEach(recordingId = "c9fffa00-ac71-48bc-adb2-52ae81588e85") {
   testSetup(recordingId);
 
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page }, testInfo) => {
     page.setDefaultTimeout(5000);
 
     await page.goto(getTestUrl("source-and-console"));

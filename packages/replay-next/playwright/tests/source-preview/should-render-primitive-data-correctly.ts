@@ -5,9 +5,9 @@ import { takeScreenshotHelper } from "./shared";
 
 beforeEach();
 
-test("should render primitive data correctly", async ({ page }) => {
-  await takeScreenshotHelper(page, "bigInt", "bigint");
-  await takeScreenshotHelper(page, "string", "string");
-  await takeScreenshotHelper(page, "number", "number");
-  await takeScreenshotHelper(page, "boolean", "boolean");
+test("should render primitive data correctly", async ({ page }, testInfo) => {
+  await takeScreenshotHelper(page, testInfo, "bigInt", "bigint");
+  await takeScreenshotHelper(page, testInfo, "string", "string");
+  await takeScreenshotHelper(page, testInfo, "number", "number");
+  await takeScreenshotHelper(page, testInfo, "boolean", "boolean");
 });

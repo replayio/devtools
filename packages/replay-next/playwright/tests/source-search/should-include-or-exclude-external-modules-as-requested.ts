@@ -10,7 +10,7 @@ import { beforeEach } from "./beforeEach";
 
 beforeEach();
 
-test("should include or exclude external modules as requested", async ({ page }) => {
+test("should include or exclude external modules as requested", async ({ page }, testInfo) => {
   await toggleIncludeNodeModulesCheckbox(page, false);
   await searchSources(page, "react");
   await verifySourceSearchSummary(page, "4 results");

@@ -7,7 +7,7 @@ import { verifyContextMenuCopy } from "./shared";
 
 beforeEach();
 
-test("should copy primitive client values", async ({ page }) => {
+test("should copy primitive client values", async ({ page }, testInfo) => {
   await verifyContextMenuCopy(
     page,
     findClientValues,

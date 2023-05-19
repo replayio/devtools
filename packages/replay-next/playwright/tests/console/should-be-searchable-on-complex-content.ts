@@ -7,7 +7,7 @@ import { setup } from "./shared";
 
 beforeEach();
 
-test("should be searchable on complex content", async ({ page }) => {
+test("should be searchable on complex content", async ({ page }, testInfo) => {
   await setup(page, true);
 
   // Can't search without a Pause so let's ensure there is one.
@@ -18,8 +18,8 @@ test("should be searchable on complex content", async ({ page }) => {
   await page.fill("[data-test-id=ConsoleSearchInput]", "(3) [1, 2, 3]");
 
   const consoleRoot = page.locator("[data-test-id=ConsoleRoot]");
-  await takeScreenshot(page, consoleRoot, "searchable-complex-array-preview");
+  await takeScreenshot(page, testInfo, consoleRoot, "searchable-complex-array-preview");
 
   await page.fill("[data-test-id=ConsoleSearchInput]", "number: 123, string:");
-  await takeScreenshot(page, consoleRoot, "searchable-complex-object-preview");
+  await takeScreenshot(page, testInfo, consoleRoot, "searchable-complex-object-preview");
 });

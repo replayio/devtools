@@ -5,6 +5,6 @@ import { inspectAndTakeScreenshotOf } from "./shared";
 
 beforeEach();
 
-test("should render and inspect a Proxy", async ({ page }) => {
-  await inspectAndTakeScreenshotOf(page, "proxy", "render-proxy");
+test("should render and inspect a Proxy", async ({ page }, testInfo) => {
+  await inspectAndTakeScreenshotOf(page, testInfo, "proxy", "render-proxy");
 });

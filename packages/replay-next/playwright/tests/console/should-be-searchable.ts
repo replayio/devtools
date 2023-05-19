@@ -7,7 +7,7 @@ import { setup } from "./shared";
 
 beforeEach();
 
-test("should be searchable", async ({ page }) => {
+test("should be searchable", async ({ page }, testInfo) => {
   await setup(page, true);
 
   // Can't search without a Pause so let's ensure there is one.
@@ -18,21 +18,26 @@ test("should be searchable", async ({ page }) => {
   await page.fill("[data-test-id=ConsoleSearchInput]", " an ");
 
   const consoleRoot = page.locator("[data-test-id=ConsoleRoot]");
-  await takeScreenshot(page, consoleRoot, "searchable-single-result");
+  await takeScreenshot(page, testInfo, consoleRoot, "searchable-single-result");
 
   await page.fill("[data-test-id=ConsoleSearchInput]", " a ");
-  await takeScreenshot(page, consoleRoot, "searchable-result-1-of-3");
+  await takeScreenshot(page, testInfo, consoleRoot, "searchable-result-1-of-3");
 
   await page.click("[data-test-id=ConsoleSearchGoToNextButton]");
   await page.click("[data-test-id=ConsoleSearchGoToNextButton]");
-  await takeScreenshot(page, consoleRoot, "searchable-result-3-of-3");
+  await takeScreenshot(page, testInfo, consoleRoot, "searchable-result-3-of-3");
 
   await page.click("[data-test-id=ConsoleSearchGoToPreviousButton]");
-  await takeScreenshot(page, consoleRoot, "searchable-result-2-of-3");
+  await takeScreenshot(page, testInfo, consoleRoot, "searchable-result-2-of-3");
 
   // Changes to filters should also update search results
   await page.fill("[data-test-id=ConsoleFilterInput]", "warning");
 
   const searchResultsLabel = page.locator("[data-test-id=SearchResultsLabel]");
-  await takeScreenshot(page, searchResultsLabel, "searchable-result-updated-after-filter");
+  await takeScreenshot(
+    page,
+    testInfo,
+    searchResultsLabel,
+    "searchable-result-updated-after-filter"
+  );
 });

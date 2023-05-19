@@ -6,9 +6,9 @@ import { inspectAndTakeScreenshotOf, takeScreenshotOfMessages } from "./shared";
 
 beforeEach();
 
-test("should render and inspect objects", async ({ page }) => {
+test("should render and inspect objects", async ({ page }, testInfo) => {
   await filterByText(page, "filter_object");
 
-  await takeScreenshotOfMessages(page, "rendered-objects");
-  await inspectAndTakeScreenshotOf(page, "objectSimple", "render-and-inspect-object");
+  await takeScreenshotOfMessages(page, testInfo, "rendered-objects");
+  await inspectAndTakeScreenshotOf(page, testInfo, "objectSimple", "render-and-inspect-object");
 });

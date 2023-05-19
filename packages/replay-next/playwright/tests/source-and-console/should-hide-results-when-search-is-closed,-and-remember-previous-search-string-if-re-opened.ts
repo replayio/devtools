@@ -16,7 +16,7 @@ beforeEach();
 
 test("should hide results when search is closed, and remember previous search string if re-opened", async ({
   page,
-}) => {
+}, testInfo) => {
   await openSourceFile(page, sourceId);
   const sourceSearchLocator = getSearchSourceLocator(page);
   await expect(sourceSearchLocator).not.toBeVisible();
@@ -24,7 +24,7 @@ test("should hide results when search is closed, and remember previous search st
   await verifyCurrentSearchResult(page, { fileName: "source-and-console.html", lineNumber: 17 });
 
   const sourceLocator = getSourceLocator(page, sourceId);
-  await takeScreenshot(page, sourceLocator, "source-search-highlights");
+  await takeScreenshot(page, testInfo, sourceLocator, "source-search-highlights");
 
   await page.keyboard.press("Escape");
   await expect(sourceSearchLocator).not.toBeVisible();
@@ -33,5 +33,5 @@ test("should hide results when search is closed, and remember previous search st
   await typeCommandKey(page, "f");
 
   await verifyCurrentSearchResult(page, { fileName: "source-and-console.html", lineNumber: 17 });
-  await takeScreenshot(page, sourceLocator, "source-search-highlights");
+  await takeScreenshot(page, testInfo, sourceLocator, "source-search-highlights");
 });

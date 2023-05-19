@@ -5,11 +5,10 @@ import {
   LocatorScreenshotOptions,
   Page,
   PageScreenshotOptions,
+  TestInfo,
   expect,
 } from "@playwright/test";
 import chalk from "chalk";
-
-import { getCurrentTestInfo } from "replay-next/playwright/tests/currentTestInfoWatcher";
 
 const { HOST, VISUAL_DEBUG, WRITE_SNAPSHOT_IMAGE_FILES } = process.env;
 
@@ -153,7 +152,12 @@ export async function stopHovering(page: Page): Promise<void> {
   await page.mouse.move(0, 0);
 }
 
-export async function takeScreenshot(page: Page, locator: Locator, name: string): Promise<void> {
+export async function takeScreenshot(
+  page: Page,
+  testInfo: TestInfo,
+  locator: Locator,
+  name: string
+): Promise<void> {
   // Make sure any suspended components finish loading data before taking the screenshot.
   await awaitNoLoaders(page, locator);
   // dark screenshots (which are taken first) seemed to be flakier than the light ones,
@@ -174,24 +178,21 @@ export async function takeScreenshot(page: Page, locator: Locator, name: string)
 
   let baseDir = path.join(__dirname, `../../visuals/`);
   if (WRITE_SNAPSHOT_IMAGE_FILES) {
-    const testInfo = getCurrentTestInfo();
-    if (testInfo) {
-      // from e.g. "tests/console/should-display-list-of-messages.ts/..."
-      // to e.g. "console/should-display-list-of-messages/..."
-      const titlePath = testInfo.titlePath[0];
-      const parsed = path.parse(titlePath);
+    // from e.g. "tests/console/should-display-list-of-messages.ts/..."
+    // to e.g. "console/should-display-list-of-messages/..."
+    const titlePath = testInfo.titlePath[0];
+    const parsed = path.parse(titlePath);
 
-      baseDir = path.join(
-        __dirname,
-        "..",
-        "..",
-        "visuals",
-        // Remove "tests" base directory
-        parsed.dir.split(path.delimiter).slice(1).join(path.delimiter),
-        // Exclude file extension from top directory name
-        parsed.name
-      );
-    }
+    baseDir = path.join(
+      __dirname,
+      "..",
+      "..",
+      "visuals",
+      // Remove "tests" base directory
+      parsed.dir.split(path.delimiter).slice(1).join(path.delimiter),
+      // Exclude file extension from top directory name
+      parsed.name
+    );
   }
 
   if (WRITE_SNAPSHOT_IMAGE_FILES) {

@@ -7,7 +7,9 @@ import { setup } from "./shared";
 
 beforeEach();
 
-test("should suggest type-ahead options from prototype objects as well", async ({ page }) => {
+test("should suggest type-ahead options from prototype objects as well", async ({
+  page,
+}, testInfo) => {
   await setup(page);
   await toggleProtocolMessage(page, "logs", true);
 
@@ -22,6 +24,7 @@ test("should suggest type-ahead options from prototype objects as well", async (
   const newListItem = await locateMessage(page, "terminal-expression");
   await takeScreenshot(
     page,
+    testInfo,
     newListItem,
     "terminal-expression-at-execution-point-with-parent-property"
   );

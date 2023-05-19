@@ -8,7 +8,7 @@ import { sourceId } from "./shared";
 
 beforeEach();
 
-test("should overflow long log point text (without wrapping)", async ({ page }) => {
+test("should overflow long log point text (without wrapping)", async ({ page }, testInfo) => {
   await toggleProtocolMessages(page, false);
   await addLogPoint(page, {
     sourceId,
@@ -17,10 +17,20 @@ test("should overflow long log point text (without wrapping)", async ({ page }) 
     saveAfterEdit: false,
   });
   const logPointPanel = getPointPanelLocator(page, 13);
-  await takeScreenshot(page, logPointPanel, "log-point-panel-with-long-text-in-edit-mode");
+  await takeScreenshot(
+    page,
+    testInfo,
+    logPointPanel,
+    "log-point-panel-with-long-text-in-edit-mode"
+  );
 
   const saveButton = logPointPanel.locator('[data-test-name="PointPanel-SaveButton"]');
   await saveButton.click({ force: true });
 
-  await takeScreenshot(page, logPointPanel, "log-point-panel-with-long-text-in-read-only-mode");
+  await takeScreenshot(
+    page,
+    testInfo,
+    logPointPanel,
+    "log-point-panel-with-long-text-in-read-only-mode"
+  );
 });

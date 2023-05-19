@@ -12,7 +12,7 @@ import { setup } from "./shared";
 
 beforeEach();
 
-test("should escape object expressions in terminal expressions", async ({ page }) => {
+test("should escape object expressions in terminal expressions", async ({ page }, testInfo) => {
   await setup(page);
 
   await toggleProtocolMessage(page, "logs", true);
@@ -29,5 +29,5 @@ test("should escape object expressions in terminal expressions", async ({ page }
   await page.keyboard.press("Enter");
 
   const list = page.locator("[data-test-name=Messages]");
-  await takeScreenshot(page, list, "auto-escaped-terminal-expressions");
+  await takeScreenshot(page, testInfo, list, "auto-escaped-terminal-expressions");
 });

@@ -6,9 +6,14 @@ import { inspectAndTakeScreenshotOf, takeScreenshotOfMessages } from "./shared";
 
 beforeEach();
 
-test("should render and inspect functions", async ({ page }) => {
+test("should render and inspect functions", async ({ page }, testInfo) => {
   await filterByText(page, "function");
 
-  await takeScreenshotOfMessages(page, "render-functions");
-  await inspectAndTakeScreenshotOf(page, "regularFunction", "render-and-inspect-function");
+  await takeScreenshotOfMessages(page, testInfo, "render-functions");
+  await inspectAndTakeScreenshotOf(
+    page,
+    testInfo,
+    "regularFunction",
+    "render-and-inspect-function"
+  );
 });

@@ -7,14 +7,14 @@ import { setup } from "./shared";
 
 beforeEach();
 
-test("should hide node_modules (and unpkg) if toggled", async ({ page }) => {
+test("should hide node_modules (and unpkg) if toggled", async ({ page }, testInfo) => {
   await setup(page, false);
   await toggleProtocolMessage(page, "warnings", true);
   await toggleProtocolMessage(page, "nodeModules", true);
 
   const list = page.locator("[data-test-name=Messages]");
-  await takeScreenshot(page, list, "filtered-all-warnings");
+  await takeScreenshot(page, testInfo, list, "filtered-all-warnings");
 
   await toggleProtocolMessage(page, "nodeModules", false);
-  await takeScreenshot(page, list, "filtered-all-warnings-no-node-modules");
+  await takeScreenshot(page, testInfo, list, "filtered-all-warnings-no-node-modules");
 });

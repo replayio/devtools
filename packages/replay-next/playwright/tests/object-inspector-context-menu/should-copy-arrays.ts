@@ -7,7 +7,7 @@ import { verifyContextMenuCopy } from "./shared";
 
 beforeEach();
 
-test("should copy arrays", async ({ page }) => {
+test("should copy arrays", async ({ page }, testInfo) => {
   await verifyContextMenuCopy(page, findKeyValues, "emptyArray", "[]", "Copy array", "[]");
 
   await verifyContextMenuCopy(

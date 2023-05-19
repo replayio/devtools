@@ -8,16 +8,21 @@ import { inspectAndTakeScreenshotOf, takeScreenshotOfMessages } from "./shared";
 
 beforeEach();
 
-test("should properly bucket properties for an overflowing array", async ({ page }) => {
+test("should properly bucket properties for an overflowing array", async ({ page }, testInfo) => {
   await filterByText(page, "overflowingArray");
 
-  await inspectAndTakeScreenshotOf(page, "overflowingArray", "overflowing-array-expanded");
+  await inspectAndTakeScreenshotOf(
+    page,
+    testInfo,
+    "overflowingArray",
+    "overflowing-array-expanded"
+  );
 
   await toggleExpandable(page, {
     partialText: "[0 … 99]",
     expanded: true,
   });
-  await takeScreenshotOfMessages(page, "overflowing-array-first-bucket-expanded");
+  await takeScreenshotOfMessages(page, testInfo, "overflowing-array-first-bucket-expanded");
 
   await toggleExpandable(page, {
     partialText: "[0 … 99]",
@@ -27,5 +32,5 @@ test("should properly bucket properties for an overflowing array", async ({ page
     partialText: "[100 … 105]",
     expanded: true,
   });
-  await takeScreenshotOfMessages(page, "overflowing-array-second-bucket-expanded");
+  await takeScreenshotOfMessages(page, testInfo, "overflowing-array-second-bucket-expanded");
 });

@@ -45,7 +45,7 @@ export default function testSetup(defaultRecordingId: string): void {
     global.recordingId = recordingId;
   });
 
-  test.afterEach(async ({ page }) => {
+  test.afterEach(async ({ page }, testInfo) => {
     const nextErrorDialog = await page.locator("nextjs-portal");
     const count = await nextErrorDialog.count();
     if (count !== 0) {

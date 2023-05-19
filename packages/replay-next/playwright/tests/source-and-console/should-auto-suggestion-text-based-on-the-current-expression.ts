@@ -14,7 +14,7 @@ import { sourceId } from "./shared";
 
 beforeEach();
 
-test("should auto-suggestion text based on the current expression", async ({ page }) => {
+test("should auto-suggestion text based on the current expression", async ({ page }, testInfo) => {
   await toggleProtocolMessages(page, false);
   await addLogPoint(page, { sourceId, lineNumber: 28 });
 
@@ -25,12 +25,12 @@ test("should auto-suggestion text based on the current expression", async ({ pag
 
   const autoCompleteList = getPointPanelContentAutoCompleteListLocator(page, 28);
   await waitFor(async () => expect(await autoCompleteList.isVisible()).toBe(true));
-  await takeScreenshot(page, autoCompleteList, "log-point-auto-complete-list-window");
+  await takeScreenshot(page, testInfo, autoCompleteList, "log-point-auto-complete-list-window");
 
   // Select the 1st suggestion in the list: window
   await page.keyboard.press("Enter");
   const pointPanelLocator = getPointPanelLocator(page, 28);
-  await takeScreenshot(page, pointPanelLocator, "log-point-auto-complete-text-window");
+  await takeScreenshot(page, testInfo, pointPanelLocator, "log-point-auto-complete-text-window");
 
   await editLogPoint(page, {
     sourceId,
@@ -39,9 +39,14 @@ test("should auto-suggestion text based on the current expression", async ({ pag
     saveAfterEdit: false,
   });
   await waitFor(async () => expect(await autoCompleteList.isVisible()).toBe(true));
-  await takeScreenshot(page, autoCompleteList, "log-point-auto-complete-list-window.loc");
+  await takeScreenshot(page, testInfo, autoCompleteList, "log-point-auto-complete-list-window.loc");
 
   // Select the 1st suggestion in the list: location
   await page.keyboard.press("Enter");
-  await takeScreenshot(page, pointPanelLocator, "log-point-auto-complete-text-window.location");
+  await takeScreenshot(
+    page,
+    testInfo,
+    pointPanelLocator,
+    "log-point-auto-complete-text-window.location"
+  );
 });

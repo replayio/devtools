@@ -12,7 +12,7 @@ import { verifyClipboardText, verifyContextMenuCopy } from "./shared";
 
 beforeEach();
 
-test("should copy deep objects and their nested properties", async ({ page }) => {
+test("should copy deep objects and their nested properties", async ({ page }, testInfo) => {
   // Verify a deep object that gets truncated
   await verifyContextMenuCopy(
     page,

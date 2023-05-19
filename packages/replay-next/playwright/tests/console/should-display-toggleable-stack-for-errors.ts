@@ -7,14 +7,14 @@ import { setup } from "./shared";
 
 beforeEach();
 
-test("should display toggleable stack for errors", async ({ page }) => {
+test("should display toggleable stack for errors", async ({ page }, testInfo) => {
   await setup(page);
   await toggleProtocolMessage(page, "errors", true);
 
   const listItem = await locateMessage(page, "console-error", "This is an error");
-  await takeScreenshot(page, listItem, "error-stack-collapsed");
+  await takeScreenshot(page, testInfo, listItem, "error-stack-collapsed");
 
   const toggle = listItem.locator("[role=button]", { hasText: "This is an error" });
   await toggle.click();
-  await takeScreenshot(page, listItem, "error-stack-expanded");
+  await takeScreenshot(page, testInfo, listItem, "error-stack-expanded");
 });

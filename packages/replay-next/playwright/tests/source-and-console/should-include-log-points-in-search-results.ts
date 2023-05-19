@@ -7,10 +7,10 @@ import { sourceId } from "./shared";
 
 beforeEach();
 
-test("should include log points in search results", async ({ page }) => {
+test("should include log points in search results", async ({ page }, testInfo) => {
   await addLogPoint(page, { sourceId, lineNumber: 13 });
 
   await page.fill("[data-test-id=ConsoleSearchInput]", "stack");
   const messages = page.locator("[data-test-name=Messages]");
-  await takeScreenshot(page, messages, "log-point-highlighted-as-search-result");
+  await takeScreenshot(page, testInfo, messages, "log-point-highlighted-as-search-result");
 });

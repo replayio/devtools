@@ -10,15 +10,15 @@ import { sourceId } from "./shared";
 
 beforeEach();
 
-test("should run remote analysis for log points", async ({ page }) => {
+test("should run remote analysis for log points", async ({ page }, testInfo) => {
   await toggleProtocolMessages(page, false);
   await addLogPoint(page, { sourceId, lineNumber: 13, content: "printError" });
 
   const sourceRoot = page.locator("[data-test-id=SourcesRoot]");
-  await takeScreenshot(page, sourceRoot, "log-point-analysis-source");
+  await takeScreenshot(page, testInfo, sourceRoot, "log-point-analysis-source");
 
   const messages = page.locator("[data-test-name=Messages]");
-  await takeScreenshot(page, messages, "log-point-analysis-console");
+  await takeScreenshot(page, testInfo, messages, "log-point-analysis-console");
 
   const message = page.locator("[data-test-name=Message]").first();
   const keyValue = message.locator("[data-test-name=Expandable]");
@@ -26,5 +26,5 @@ test("should run remote analysis for log points", async ({ page }) => {
     expanded: true,
     expandableLocator: keyValue,
   });
-  await takeScreenshot(page, message, "log-point-analysis-expanded-console");
+  await takeScreenshot(page, testInfo, message, "log-point-analysis-expanded-console");
 });

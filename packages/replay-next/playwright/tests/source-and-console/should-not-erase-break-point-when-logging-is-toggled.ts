@@ -7,11 +7,16 @@ import { sourceId } from "./shared";
 
 beforeEach();
 
-test("should not erase break point when logging is toggled", async ({ page }) => {
+test("should not erase break point when logging is toggled", async ({ page }, testInfo) => {
   const sourceLine = getSourceLineLocator(page, sourceId, 13);
   await addBreakPoint(page, { sourceId, lineNumber: 13 });
   await addLogPoint(page, { sourceId, lineNumber: 13 });
-  await takeScreenshot(page, sourceLine, "source-line-with-break-point-and-log-point-content");
+  await takeScreenshot(
+    page,
+    testInfo,
+    sourceLine,
+    "source-line-with-break-point-and-log-point-content"
+  );
   await removeLogPoint(page, { sourceId, lineNumber: 13 });
-  await takeScreenshot(page, sourceLine, "source-line-with-break-point-only-content");
+  await takeScreenshot(page, testInfo, sourceLine, "source-line-with-break-point-only-content");
 });

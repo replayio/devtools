@@ -6,7 +6,7 @@ import { setup } from "./shared";
 
 beforeEach();
 
-test("should re-focus the search input when CMD+F is used again", async ({ page }) => {
+test("should re-focus the search input when CMD+F is used again", async ({ page }, testInfo) => {
   await setup(page);
 
   await showSearchInput(page);

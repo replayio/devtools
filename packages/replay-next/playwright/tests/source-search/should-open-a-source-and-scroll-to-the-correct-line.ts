@@ -12,7 +12,7 @@ import { beforeEach } from "./beforeEach";
 
 beforeEach();
 
-test("should open a source and scroll to the correct line", async ({ page }) => {
+test("should open a source and scroll to the correct line", async ({ page }, testInfo) => {
   await toggleIncludeNodeModulesCheckbox(page, true);
   await searchSources(page, "function t");
   await verifySourceSearchSummary(page, "3 results");

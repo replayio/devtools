@@ -1,7 +1,7 @@
 /* TODO – This tests passes in OSX but not in Docker
 test("should update the current time when the log point timeline is clicked", async ({
   page,
-}) => {
+}, testInfo) => {
   const lineNumber = 52;
 
   await addLogPoint(page, { lineNumber, sourceId });

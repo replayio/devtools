@@ -10,7 +10,7 @@ import { beforeEach } from "./beforeEach";
 
 beforeEach();
 
-test("display an overflow message", async ({ page }) => {
+test("display an overflow message", async ({ page }, testInfo) => {
   await toggleIncludeNodeModulesCheckbox(page, true);
   await searchSources(page, "e");
   await verifySourceSearchSummary(page, "first 50 results");

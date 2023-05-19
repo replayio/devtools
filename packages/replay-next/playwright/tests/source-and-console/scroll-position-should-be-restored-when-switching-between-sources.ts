@@ -12,7 +12,9 @@ import { altSourceId, sourceId } from "./shared";
 
 beforeEach();
 
-test("scroll position should be restored when switching between sources", async ({ page }) => {
+test("scroll position should be restored when switching between sources", async ({
+  page,
+}, testInfo) => {
   // Scroll to the bottom of source 1
   await openSourceFile(page, sourceId);
   await goToLine(page, sourceId, 77);

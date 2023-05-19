@@ -23,14 +23,14 @@ import { setup } from "./shared";
 
 beforeEach("27a42866-ffd6-4f74-8813-c4feb2b78b6c");
 
-test("should show error object stacks by default", async ({ page }) => {
+test("should show error object stacks by default", async ({ page }, testInfo) => {
   await setup(page);
   await toggleProtocolMessage(page, "errors", true);
 
   const listItem = await locateMessage(page, "console-error", "This is an error object");
-  await takeScreenshot(page, listItem, "error-object-stack");
+  await takeScreenshot(page, testInfo, listItem, "error-object-stack");
 
   const toggle = listItem.locator("[role=button]", { hasText: "This is an error object" });
   await toggle.click();
-  await takeScreenshot(page, listItem, "error-object-stack-expanded");
+  await takeScreenshot(page, testInfo, listItem, "error-object-stack-expanded");
 });

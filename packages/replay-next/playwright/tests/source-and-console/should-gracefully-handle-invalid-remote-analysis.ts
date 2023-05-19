@@ -8,10 +8,10 @@ import { sourceId } from "./shared";
 
 beforeEach();
 
-test("should gracefully handle invalid remote analysis", async ({ page }) => {
+test("should gracefully handle invalid remote analysis", async ({ page }, testInfo) => {
   await toggleProtocolMessages(page, false);
   await addLogPoint(page, { content: "z", sourceId, lineNumber: 13 });
 
   const message = page.locator("[data-test-name=Message]").first();
-  await takeScreenshot(page, message, "log-point-invalid-remote-analysis-console");
+  await takeScreenshot(page, testInfo, message, "log-point-invalid-remote-analysis-console");
 });
