@@ -61,22 +61,22 @@ function LoadingScreen({
 
   const [message, setMessage] = useState(fallbackMessage);
 
-  const changeMessage = () => {
+  const changeMessage = useCallback(() => {
     const randomIndex = Math.floor(Math.random() * phrases.length);
     setMessage(phrases[randomIndex]);
-  };
+  }, [phrases]);
 
   useEffect(() => {
     const phraseTimeout = setTimeout(changeMessage, 5000);
     return () => clearTimeout(phraseTimeout);
-  }, []);
+  }, [changeMessage]);
 
   useEffect(() => {
     const stalledTimeoutId = setTimeout(() => {
       setMessage(longWaitMessage);
     }, stalledTimeout);
     return () => clearTimeout(stalledTimeoutId);
-  }, []);
+  }, [stalledTimeout]);
 
   const waitingForMessage =
     awaitingSourcemaps || uploading ? (
