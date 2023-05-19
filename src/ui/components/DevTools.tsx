@@ -217,7 +217,7 @@ function _DevTools({
     }
   }, [loadingFinished, trackLoadingIdleTime, sessionId]);
 
-  if (1 == 1) {
+  if (!loadingFinished) {
     return <LoadingScreen fallbackMessage="Loading..." />;
   }
 
