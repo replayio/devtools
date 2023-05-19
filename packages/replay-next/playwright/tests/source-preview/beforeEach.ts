@@ -1,3 +1,4 @@
+import "../currentTestInfoWatcher";
 import { test } from "@playwright/test";
 
 import { getTestUrl } from "../utils/general";

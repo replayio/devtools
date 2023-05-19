@@ -9,6 +9,8 @@ import {
 } from "@playwright/test";
 import chalk from "chalk";
 
+import { getCurrentTestInfo } from "replay-next/playwright/tests/currentTestInfoWatcher";
+
 const { HOST, VISUAL_DEBUG, WRITE_SNAPSHOT_IMAGE_FILES } = process.env;
 
 const SCREENSHOT_OPTIONS: LocatorScreenshotOptions & PageScreenshotOptions = {
@@ -39,7 +41,6 @@ export async function awaitNoLoaders(page: Page, scope: Locator | null = null) {
 // Other test utils can use this to print formatted status messages that help visually monitor test progress.
 export async function debugPrint(page: Page | null, message: string, scope?: string) {
   console.log("        ", chalk.green(message), scope ? chalk.dim(` (${scope})`) : "");
-
   if (page !== null) {
     await page.evaluate(
       ({ message, scope }) => {
@@ -171,8 +172,30 @@ export async function takeScreenshot(page: Page, locator: Locator, name: string)
   await page.emulateMedia({ colorScheme: "dark" });
   const screenshotDark = await takeScreenshotHelper(page, locator);
 
+  let baseDir = path.join(__dirname, `../../visuals/`);
   if (WRITE_SNAPSHOT_IMAGE_FILES) {
-    const darkDir = path.join(__dirname, `../../visuals/`, "dark");
+    const testInfo = getCurrentTestInfo();
+    if (testInfo) {
+      // from e.g. "tests/console/should-display-list-of-messages.ts/..."
+      // to e.g. "console/should-display-list-of-messages/..."
+      const titlePath = testInfo.titlePath[0];
+      const parsed = path.parse(titlePath);
+
+      baseDir = path.join(
+        __dirname,
+        "..",
+        "..",
+        "visuals",
+        // Remove "tests" base directory
+        parsed.dir.split(path.delimiter).slice(1).join(path.delimiter),
+        // Exclude file extension from top directory name
+        parsed.name
+      );
+    }
+  }
+
+  if (WRITE_SNAPSHOT_IMAGE_FILES) {
+    const darkDir = path.join(baseDir, "dark");
     fs.mkdirSync(darkDir, { recursive: true });
     fs.writeFileSync(path.join(darkDir, name), screenshotDark);
     expect(screenshotDark).not.toBeNull();
@@ -183,7 +206,7 @@ export async function takeScreenshot(page: Page, locator: Locator, name: string)
   await page.emulateMedia({ colorScheme: "light" });
   const screenshotLight = await takeScreenshotHelper(page, locator);
   if (WRITE_SNAPSHOT_IMAGE_FILES) {
-    const lightDir = path.join(__dirname, `../../visuals/`, "light");
+    const lightDir = path.join(baseDir, "light");
     fs.mkdirSync(lightDir, { recursive: true });
     fs.writeFileSync(path.join(lightDir, name), screenshotLight);
     expect(screenshotLight).not.toBeNull();

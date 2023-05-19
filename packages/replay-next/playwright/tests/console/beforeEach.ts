@@ -1,3 +1,4 @@
+import "../currentTestInfoWatcher";
 import { test } from "@playwright/test";
 
 import testSetup from "../utils/testSetup";
