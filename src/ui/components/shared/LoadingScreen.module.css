@@ -1,0 +1,39 @@
+.loadingScreenWrapper {
+  position: relative;
+  display: flex;
+  width: 24rem;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 1rem 3rem;
+  margin: 0.25rem;
+}
+
+.hoverboardWrapper {
+  height: 8rem;
+  width: 8rem;
+  cursor: pointer;
+}
+
+.messageWrapper {
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.messageWrapper a {
+  text-decoration: underline;
+}
+
+.messageWrapper a:hover {
+  color: rgb(80, 202, 255);
+}
+
+.viewportWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  margin: 0.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
