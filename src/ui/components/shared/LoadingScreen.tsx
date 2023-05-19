@@ -29,16 +29,18 @@ export function LoadingScreenTemplate({ children }: { children?: ReactNode }) {
   }, [hoverboardColor]);
 
   return (
-    <BubbleViewportWrapper className={styles.viewportWrapper}>
-      <div className={styles.loadingScreenWrapper}>
-        <div className="flex flex-col items-center space-y-2">
-          <div className={styles.hoverboardWrapper} onClick={changeHoverboardColor}>
-            <Hoverboard color={hoverboardColor} />
+    <div className={styles.loadingScreenWrapper}>
+      <BubbleViewportWrapper>
+        <div className={styles.loadingScreenWrapper}>
+          <div className="flex flex-col items-center space-y-2">
+            <div className={styles.hoverboardWrapper} onClick={changeHoverboardColor}>
+              <Hoverboard color={hoverboardColor} />
+            </div>
+            {children}
           </div>
-          {children}
         </div>
-      </div>
-    </BubbleViewportWrapper>
+      </BubbleViewportWrapper>
+    </div>
   );
 }
 
