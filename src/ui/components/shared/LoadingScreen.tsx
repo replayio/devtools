@@ -18,15 +18,15 @@ const Hoverboard = dynamic(() => import("./Hoverboard"), {
 export function LoadingScreenTemplate({ children }: { children?: ReactNode }) {
   const [hoverboardColor, setHoverboardColor] = useState(colorOptions[2]);
 
-  const changeHoverboardColor = () => {
+  const changeHoverboardColor = useCallback(() => {
     const randomIndex = Math.floor(Math.random() * colorOptions.length);
     setHoverboardColor(colorOptions[randomIndex]);
-  };
+  }, []);
 
   useEffect(() => {
-    const interval = setInterval(changeHoverboardColor, 5_000);
-    return () => clearInterval(interval);
-  }, [hoverboardColor]);
+    const timeoutId = setTimeout(changeHoverboardColor, 5000);
+    return () => clearTimeout(timeoutId);
+  }, [changeHoverboardColor]);
 
   return (
     <div className={styles.loadingScreenWrapper}>
