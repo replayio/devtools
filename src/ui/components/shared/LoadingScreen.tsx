@@ -69,16 +69,9 @@ function LoadingScreen({
       const randomIndex = Math.floor(Math.random() * phrases.length);
       setMessage(phrases[randomIndex]);
     };
-
     const phraseTimeout = setTimeout(changeMessage, 5000);
-
     return () => clearTimeout(phraseTimeout);
   }, []);
-
-  useEffect(() => {
-    const phraseTimeout = setTimeout(changeMessage, 5000);
-    return () => clearTimeout(phraseTimeout);
-  }, [changeMessage]);
 
   useEffect(() => {
     const stalledTimeoutId = setTimeout(() => {
