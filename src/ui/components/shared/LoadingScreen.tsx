@@ -44,20 +44,21 @@ export function LoadingScreenTemplate({ children }: { children?: ReactNode }) {
   );
 }
 
+const phrases = [
+  "Tuning the flux capacitor...",
+  "Prepping DeLorean for time travel...",
+  "Revving up to 88 miles per hour...",
+  "Gathering 1.21 gigawatts of power...",
+  "Ensuring temporal paradox safeguards...",
+  "Being careful not to mess up your timeline...",
+];
+
 function LoadingScreen({
   uploading,
   awaitingSourcemaps,
   fallbackMessage,
   stalledTimeout = 15000,
 }: PropsFromRedux & { fallbackMessage: string; stalledTimeout?: number }) {
-  const phrases = [
-    "Tuning the flux capacitor...",
-    "Prepping DeLorean for time travel...",
-    "Revving up to 88 miles per hour...",
-    "Gathering 1.21 gigawatts of power...",
-    "Ensuring temporal paradox safeguards...",
-    "Being careful not to mess up your timeline...",
-  ];
   const longWaitMessage =
     "<div><p>This is taking longer than expected.</p><p><a href='http://replay.io/discord' target='discord'>Contact us on Discord</a></p>";
 
@@ -82,11 +83,10 @@ function LoadingScreen({
 
   const waitingForMessage =
     awaitingSourcemaps || uploading ? (
-      <span>Uploading {Math.round(uploading?.amount || 0)}Mb</span>
+      <span>Uploading {Math.round(uploading?.amount ? Number(uploading.amount) : 0)}Mb</span>
     ) : (
       <span dangerouslySetInnerHTML={{ __html: message }}></span>
     );
-
   return (
     <LoadingScreenTemplate>
       <span className={styles.messageWrapper} dangerouslySetInnerHTML={{ __html: message }}></span>
