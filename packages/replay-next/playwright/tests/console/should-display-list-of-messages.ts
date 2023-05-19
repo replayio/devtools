@@ -7,7 +7,7 @@ import { setup } from "./shared";
 
 beforeEach();
 
-test("should display list of messages", async ({ page }) => {
+test("should display list of messages", async ({ page }, testInfo) => {
   await setup(page, true);
 
   const list = page.locator("[data-test-name=Messages]");
@@ -17,8 +17,8 @@ test("should display list of messages", async ({ page }) => {
   await expect(list).toContainText("Uncaught exception");
   await toggleProtocolMessage(page, "timestamps", false);
 
-  await takeScreenshot(page, list, "message-list");
+  await takeScreenshot(page, testInfo, list, "message-list");
 
   await toggleProtocolMessage(page, "timestamps", true);
-  await takeScreenshot(page, list, "message-list-with-timestamps");
+  await takeScreenshot(page, testInfo, list, "message-list-with-timestamps");
 });

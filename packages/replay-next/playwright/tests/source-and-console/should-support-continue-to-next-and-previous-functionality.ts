@@ -1,6 +1,6 @@
 /* TODO
    Make this test pass in Docker; it passes in OSX (headless or regular Chrome)
-test("should support continue to next and previous functionality", async ({ page }) => {
+test("should support continue to next and previous functionality", async ({ page }, testInfo) =>  {
   // Continue to next should be enabled initially;
   // Continue to previous should not be.
   await expect(await isContinueToNextButtonEnabled(page, sourceId, 14)).toBe(true);

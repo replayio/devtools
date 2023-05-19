@@ -7,7 +7,7 @@ import { verifyContextMenuCopy } from "./shared";
 
 beforeEach();
 
-test("should copy html elements and text", async ({ page }) => {
+test("should copy html elements and text", async ({ page }, testInfo) => {
   await verifyContextMenuCopy(
     page,
     findKeyValues,

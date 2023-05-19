@@ -6,8 +6,8 @@ import { takeScreenshotOfMessages } from "./shared";
 
 beforeEach();
 
-test("should render dates", async ({ page }) => {
+test("should render dates", async ({ page }, testInfo) => {
   await filterByText(page, "date");
 
-  await takeScreenshotOfMessages(page, "render-dates");
+  await takeScreenshotOfMessages(page, testInfo, "render-dates");
 });

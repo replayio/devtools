@@ -7,11 +7,11 @@ import { sourceId } from "./shared";
 
 beforeEach();
 
-test("should support break points", async ({ page }) => {
+test("should support break points", async ({ page }, testInfo) => {
   const sourceLine = getSourceLineLocator(page, sourceId, 13);
-  await takeScreenshot(page, sourceLine, "source-line-no-breakpoint");
+  await takeScreenshot(page, testInfo, sourceLine, "source-line-no-breakpoint");
   await addBreakPoint(page, { sourceId, lineNumber: 13 });
-  await takeScreenshot(page, sourceLine, "source-line-with-breakpoint");
+  await takeScreenshot(page, testInfo, sourceLine, "source-line-with-breakpoint");
   await removeBreakPoint(page, { sourceId, lineNumber: 13 });
-  await takeScreenshot(page, sourceLine, "source-line-no-breakpoint");
+  await takeScreenshot(page, testInfo, sourceLine, "source-line-no-breakpoint");
 });

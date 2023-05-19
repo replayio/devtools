@@ -12,7 +12,7 @@ import { setup } from "./shared";
 
 beforeEach();
 
-test("should add true/false keywords to the list of suggestions", async ({ page }) => {
+test("should add true/false keywords to the list of suggestions", async ({ page }, testInfo) => {
   await setup(page);
   await toggleProtocolMessage(page, "logs", true);
 

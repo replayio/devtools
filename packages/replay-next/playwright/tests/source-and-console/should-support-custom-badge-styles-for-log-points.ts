@@ -8,7 +8,7 @@ import { sourceId } from "./shared";
 
 beforeEach();
 
-test("should support custom badge styles for log points", async ({ page }) => {
+test("should support custom badge styles for log points", async ({ page }, testInfo) => {
   await addLogPoint(page, { sourceId, lineNumber: 13 });
 
   await toggleProtocolMessages(page, false);
@@ -17,9 +17,9 @@ test("should support custom badge styles for log points", async ({ page }) => {
 
   await openContextMenu(page, message);
   await page.click("[data-test-id=ConsoleContextMenu-Badge-yellow]");
-  await takeScreenshot(page, message, "log-point-message-with-yellow-badge");
+  await takeScreenshot(page, testInfo, message, "log-point-message-with-yellow-badge");
 
   await openContextMenu(page, message);
   await page.click("[data-test-id=ConsoleContextMenu-Badge-unicorn]");
-  await takeScreenshot(page, message, "log-point-message-with-unicorn-badge");
+  await takeScreenshot(page, testInfo, message, "log-point-message-with-unicorn-badge");
 });

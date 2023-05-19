@@ -10,7 +10,7 @@ import { beforeEach } from "./beforeEach";
 
 beforeEach();
 
-test("should reset collapsed state if search changes", async ({ page }) => {
+test("should reset collapsed state if search changes", async ({ page }, testInfo) => {
   await toggleIncludeNodeModulesCheckbox(page, true);
   await searchSources(page, "function t");
   await verifyVisibleResultsCount(page, 6);

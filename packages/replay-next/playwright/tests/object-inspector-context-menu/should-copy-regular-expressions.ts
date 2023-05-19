@@ -7,7 +7,7 @@ import { verifyContextMenuCopy } from "./shared";
 
 beforeEach();
 
-test("should copy regular expressions", async ({ page }) => {
+test("should copy regular expressions", async ({ page }, testInfo) => {
   await verifyContextMenuCopy(
     page,
     findKeyValues,

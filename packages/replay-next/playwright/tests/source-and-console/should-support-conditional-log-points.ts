@@ -8,14 +8,14 @@ import { sourceId } from "./shared";
 
 beforeEach();
 
-test("should support conditional log points", async ({ page }) => {
+test("should support conditional log points", async ({ page }, testInfo) => {
   await toggleProtocolMessages(page, false);
   await addLogPoint(page, { sourceId, lineNumber: 28 });
 
   const messages = page.locator("[data-test-name=Messages]");
 
   await editLogPoint(page, { sourceId, lineNumber: 28, content: `"logsToPrint", logsToPrint` });
-  await takeScreenshot(page, messages, "log-point-multi-hits-console");
+  await takeScreenshot(page, testInfo, messages, "log-point-multi-hits-console");
 
   await editLogPoint(page, {
     sourceId,
@@ -23,5 +23,5 @@ test("should support conditional log points", async ({ page }) => {
     content: `"logsToPrint", logsToPrint`,
     condition: "logsToPrint <= 5",
   });
-  await takeScreenshot(page, messages, "log-point-multi-hits-with-conditional-console");
+  await takeScreenshot(page, testInfo, messages, "log-point-multi-hits-with-conditional-console");
 });

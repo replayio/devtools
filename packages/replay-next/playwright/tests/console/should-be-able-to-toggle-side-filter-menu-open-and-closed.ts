@@ -6,7 +6,7 @@ import { setup } from "./shared";
 
 beforeEach();
 
-test("should be able to toggle side filter menu open and closed", async ({ page }) => {
+test("should be able to toggle side filter menu open and closed", async ({ page }, testInfo) => {
   await setup(page, false);
 
   // The filters menu should be open by default.

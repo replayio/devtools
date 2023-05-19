@@ -7,7 +7,7 @@ import { verifyContextMenuCopy } from "./shared";
 
 beforeEach();
 
-test("should copy sets", async ({ page }) => {
+test("should copy sets", async ({ page }, testInfo) => {
   await verifyContextMenuCopy(page, findKeyValues, "emptySet", "Set(0)", "Copy set", "[]");
 
   await verifyContextMenuCopy(

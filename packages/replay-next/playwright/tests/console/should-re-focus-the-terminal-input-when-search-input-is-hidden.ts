@@ -11,7 +11,9 @@ import { setup } from "./shared";
 
 beforeEach();
 
-test("should re-focus the terminal input when search input is hidden", async ({ page }) => {
+test("should re-focus the terminal input when search input is hidden", async ({
+  page,
+}, testInfo) => {
   await setup(page);
 
   const consoleInput = getConsoleInput(page);

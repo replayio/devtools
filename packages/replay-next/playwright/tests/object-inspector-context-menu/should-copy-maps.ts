@@ -7,7 +7,7 @@ import { verifyContextMenuCopy } from "./shared";
 
 beforeEach();
 
-test("should copy maps", async ({ page }) => {
+test("should copy maps", async ({ page }, testInfo) => {
   await verifyContextMenuCopy(page, findKeyValues, "emptyMap", "Map(0)", "Copy map", "[]");
 
   await verifyContextMenuCopy(

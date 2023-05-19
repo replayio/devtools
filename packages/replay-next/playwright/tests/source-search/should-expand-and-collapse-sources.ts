@@ -13,17 +13,23 @@ import { beforeEach } from "./beforeEach";
 
 beforeEach();
 
-test("should expand and collapse sources", async ({ page }) => {
+test("should expand and collapse sources", async ({ page }, testInfo) => {
   await toggleIncludeNodeModulesCheckbox(page, true);
   await searchSources(page, "function t");
   await verifySourceSearchSummary(page, "3 results");
   await verifyVisibleResultsCount(page, 6);
-  await takeScreenshot(page, getSourceSearchResultsLocator(page), "3-search-results-in-3-sources");
+  await takeScreenshot(
+    page,
+    testInfo,
+    getSourceSearchResultsLocator(page),
+    "3-search-results-in-3-sources"
+  );
 
   await toggleSearchResultsForFileName(page, false, { sourceId: "2" });
   await verifyVisibleResultsCount(page, 5);
   await takeScreenshot(
     page,
+    testInfo,
     getSourceSearchResultsLocator(page),
     "3-search-results-in-3-sources-1st-source-collapsed"
   );
@@ -33,6 +39,7 @@ test("should expand and collapse sources", async ({ page }) => {
   await verifyVisibleResultsCount(page, 3);
   await takeScreenshot(
     page,
+    testInfo,
     getSourceSearchResultsLocator(page),
     "3-search-results-in-3-sources-all-sources-collapsed"
   );
@@ -41,6 +48,7 @@ test("should expand and collapse sources", async ({ page }) => {
   await verifyVisibleResultsCount(page, 4);
   await takeScreenshot(
     page,
+    testInfo,
     getSourceSearchResultsLocator(page),
     "3-search-results-in-3-sources-last-two-sources-collapsed"
   );
@@ -49,5 +57,10 @@ test("should expand and collapse sources", async ({ page }) => {
   await toggleSearchResultsForFileName(page, true, { sourceId: "1" });
   await verifySourceSearchSummary(page, "3 results");
   await verifyVisibleResultsCount(page, 6);
-  await takeScreenshot(page, getSourceSearchResultsLocator(page), "3-search-results-in-3-sources");
+  await takeScreenshot(
+    page,
+    testInfo,
+    getSourceSearchResultsLocator(page),
+    "3-search-results-in-3-sources"
+  );
 });

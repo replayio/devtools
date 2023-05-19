@@ -1,4 +1,4 @@
-import { Page, test } from "@playwright/test";
+import { Page, TestInfo, test } from "@playwright/test";
 
 import { toggleExpandable } from "replay-next/playwright/tests/utils/inspector";
 
@@ -21,11 +21,12 @@ export async function inspect(page: Page, partialText: string) {
 
 export async function inspectAndTakeScreenshotOf(
   page: Page,
+  testInfo: TestInfo,
   partialText: string,
   screenshotName: string
 ) {
   const keyValue = await inspect(page, partialText);
-  await takeScreenshot(page, keyValue, screenshotName);
+  await takeScreenshot(page, testInfo, keyValue, screenshotName);
 }
 
 test.beforeEach(async ({ page }) => {

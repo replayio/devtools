@@ -13,7 +13,7 @@ import { setup } from "./shared";
 
 beforeEach();
 
-test("should show a button to clear terminal expressions", async ({ page }) => {
+test("should show a button to clear terminal expressions", async ({ page }, testInfo) => {
   await setup(page);
 
   await toggleProtocolMessage(page, "logs", true);

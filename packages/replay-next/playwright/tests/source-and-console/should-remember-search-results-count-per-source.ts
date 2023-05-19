@@ -14,7 +14,7 @@ import { altSourceId, sourceId } from "./shared";
 
 beforeEach();
 
-test("should remember search results count per source", async ({ page }) => {
+test("should remember search results count per source", async ({ page }, testInfo) => {
   await openSourceFile(page, sourceId);
   const resultsLabel = getSourceSearchResultsLabelLocator(page);
   await searchSourceText(page, "function");

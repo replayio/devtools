@@ -7,7 +7,7 @@ import { setup } from "./shared";
 
 beforeEach();
 
-test("should support seeking to a message execution point", async ({ page }) => {
+test("should support seeking to a message execution point", async ({ page }, testInfo) => {
   await setup(page);
   await toggleProtocolMessage(page, "logs", true);
 
@@ -16,10 +16,10 @@ test("should support seeking to a message execution point", async ({ page }) => 
   // Fast-forward
   const laterListItem = await locateMessage(page, "console-log", "This is a trace");
   await seekToMessage(page, laterListItem);
-  await takeScreenshot(page, list, "message-list-seek-to-later-message");
+  await takeScreenshot(page, testInfo, list, "message-list-seek-to-later-message");
 
   // Rewind
   const earlierListItem = await locateMessage(page, "console-log", "This is a log");
   await seekToMessage(page, earlierListItem);
-  await takeScreenshot(page, list, "message-list-seek-to-earlier-message");
+  await takeScreenshot(page, testInfo, list, "message-list-seek-to-earlier-message");
 });

@@ -9,7 +9,7 @@ beforeEach();
 
 test("should show the context menu on top of other messages and the current time indicator", async ({
   page,
-}) => {
+}, testInfo) => {
   await setup(page, true);
 
   const list = page.locator("[data-test-name=Messages]");
@@ -19,11 +19,11 @@ test("should show the context menu on top of other messages and the current time
 
   listItem = await locateMessage(page, "console-log", "This is a log");
   await openContextMenu(page, listItem);
-  await takeScreenshot(page, list, "context-menu-position-one");
+  await takeScreenshot(page, testInfo, list, "context-menu-position-one");
 
   await page.keyboard.press("Escape");
 
   listItem = await locateMessage(page, "console-error", "This is an error");
   await openContextMenu(page, listItem);
-  await takeScreenshot(page, list, "context-menu-position-two");
+  await takeScreenshot(page, testInfo, list, "context-menu-position-two");
 });

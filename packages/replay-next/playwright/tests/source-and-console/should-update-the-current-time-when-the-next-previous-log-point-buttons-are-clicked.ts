@@ -14,7 +14,7 @@ beforeEach();
 
 test("should update the current time when the next/previous log point buttons are clicked", async ({
   page,
-}) => {
+}, testInfo) => {
   const lineNumber = 18;
 
   await addLogPoint(page, { lineNumber, sourceId });

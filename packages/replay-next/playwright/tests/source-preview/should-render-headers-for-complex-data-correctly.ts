@@ -5,13 +5,13 @@ import { takeScreenshotHelper } from "./shared";
 
 beforeEach();
 
-test("should render headers for complex data correctly", async ({ page }) => {
-  await takeScreenshotHelper(page, "ƒ SomeFunction()", "function");
-  await takeScreenshotHelper(page, "Array(3)", "array");
-  await takeScreenshotHelper(page, `bar: "abc"`, "object");
-  await takeScreenshotHelper(page, "Map(2)", "map");
-  await takeScreenshotHelper(page, "Set(2)", "set");
-  await takeScreenshotHelper(page, "HTMLUListElementPrototype", "html-element");
-  await takeScreenshotHelper(page, "#text", "html-text");
-  await takeScreenshotHelper(page, "/abc/g", "regexp");
+test("should render headers for complex data correctly", async ({ page }, testInfo) => {
+  await takeScreenshotHelper(page, testInfo, "ƒ SomeFunction()", "function");
+  await takeScreenshotHelper(page, testInfo, "Array(3)", "array");
+  await takeScreenshotHelper(page, testInfo, `bar: "abc"`, "object");
+  await takeScreenshotHelper(page, testInfo, "Map(2)", "map");
+  await takeScreenshotHelper(page, testInfo, "Set(2)", "set");
+  await takeScreenshotHelper(page, testInfo, "HTMLUListElementPrototype", "html-element");
+  await takeScreenshotHelper(page, testInfo, "#text", "html-text");
+  await takeScreenshotHelper(page, testInfo, "/abc/g", "regexp");
 });

@@ -5,6 +5,6 @@ import { inspectAndTakeScreenshotOf } from "./shared";
 
 beforeEach();
 
-test("should render and inspect a Promise", async ({ page }) => {
-  await inspectAndTakeScreenshotOf(page, "promise", "render-promise");
+test("should render and inspect a Promise", async ({ page }, testInfo) => {
+  await inspectAndTakeScreenshotOf(page, testInfo, "promise", "render-promise");
 });

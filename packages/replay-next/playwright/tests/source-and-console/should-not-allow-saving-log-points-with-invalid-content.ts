@@ -7,8 +7,8 @@ import { sourceId } from "./shared";
 
 beforeEach();
 
-test("should not allow saving log points with invalid content", async ({ page }) => {
+test("should not allow saving log points with invalid content", async ({ page }, testInfo) => {
   await addLogPoint(page, { sourceId, lineNumber: 13, content: "'1" });
   const pointPanelLocator = getPointPanelLocator(page, 13);
-  await takeScreenshot(page, pointPanelLocator, "point-panel-invalid-content");
+  await takeScreenshot(page, testInfo, pointPanelLocator, "point-panel-invalid-content");
 });

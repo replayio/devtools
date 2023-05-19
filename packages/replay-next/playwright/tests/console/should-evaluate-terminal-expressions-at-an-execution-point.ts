@@ -7,7 +7,7 @@ import { setup } from "./shared";
 
 beforeEach();
 
-test("should evaluate terminal expressions at an execution point", async ({ page }) => {
+test("should evaluate terminal expressions at an execution point", async ({ page }, testInfo) => {
   await setup(page);
   await toggleProtocolMessage(page, "logs", true);
 
@@ -20,5 +20,5 @@ test("should evaluate terminal expressions at an execution point", async ({ page
   await page.keyboard.press("Enter"); // Submit expression
 
   const newListItem = await locateMessage(page, "terminal-expression");
-  await takeScreenshot(page, newListItem, "terminal-expression-at-execution-point");
+  await takeScreenshot(page, testInfo, newListItem, "terminal-expression-at-execution-point");
 });

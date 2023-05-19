@@ -1,4 +1,3 @@
-import "../currentTestInfoWatcher";
 import { test } from "@playwright/test";
 
 import { toggleProtocolMessage, toggleProtocolMessages } from "../utils/console";

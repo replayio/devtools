@@ -7,7 +7,7 @@ import { verifyContextMenuCopy } from "./shared";
 
 beforeEach();
 
-test("should copy objects", async ({ page }) => {
+test("should copy objects", async ({ page }, testInfo) => {
   await verifyContextMenuCopy(page, findKeyValues, "filter_objectEmpty", "{}", "Copy object", "{}");
 
   await verifyContextMenuCopy(

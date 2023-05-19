@@ -7,11 +7,11 @@ import { sourceId } from "./shared";
 
 beforeEach();
 
-test("should support jumping to a line in the active source file", async ({ page }) => {
+test("should support jumping to a line in the active source file", async ({ page }, testInfo) => {
   await openSourceFile(page, sourceId);
   await goToLine(page, sourceId, 77);
   const sourceLocator = getSourceLocator(page, sourceId);
-  await takeScreenshot(page, sourceLocator, "go-to-last-line");
+  await takeScreenshot(page, testInfo, sourceLocator, "go-to-last-line");
   await goToLine(page, sourceId, 1);
-  await takeScreenshot(page, sourceLocator, "go-to-first-line");
+  await takeScreenshot(page, testInfo, sourceLocator, "go-to-first-line");
 });

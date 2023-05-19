@@ -8,7 +8,7 @@ import { sourceId } from "./shared";
 
 beforeEach();
 
-test("should run local analysis for log points", async ({ page }) => {
+test("should run local analysis for log points", async ({ page }, testInfo) => {
   await toggleProtocolMessages(page, false);
   await addLogPoint(page, {
     sourceId,
@@ -17,5 +17,5 @@ test("should run local analysis for log points", async ({ page }) => {
   });
   await verifyConsoleMessage(page, "local 123 true", "log-point", 1);
   const message = page.locator("[data-test-name=Message]").first();
-  await takeScreenshot(page, message, "log-point-local-analysis");
+  await takeScreenshot(page, testInfo, message, "log-point-local-analysis");
 });

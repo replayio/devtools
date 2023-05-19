@@ -6,8 +6,8 @@ import { takeScreenshotOfMessages } from "./shared";
 
 beforeEach();
 
-test("should render errors", async ({ page }) => {
+test("should render errors", async ({ page }, testInfo) => {
   await filterByText(page, "error");
 
-  await takeScreenshotOfMessages(page, "render-errors");
+  await takeScreenshotOfMessages(page, testInfo, "render-errors");
 });

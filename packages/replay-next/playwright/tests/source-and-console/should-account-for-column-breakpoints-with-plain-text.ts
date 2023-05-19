@@ -13,7 +13,7 @@ import { sourceId } from "./shared";
 
 beforeEach();
 
-test("should account for column breakpoints with plain text", async ({ page }) => {
+test("should account for column breakpoints with plain text", async ({ page }, testInfo) => {
   await page.goto(getTestUrl("source-and-console", ["disableSyntaxHighlighting"]));
   await openSourceFile(page, sourceId);
 
@@ -21,12 +21,13 @@ test("should account for column breakpoints with plain text", async ({ page }) =
 
   await waitForSourceLineHitCounts(page, sourceId, 20);
   const lineContents = getSourceLineContentsLocator(page, sourceId, 20);
-  await takeScreenshot(page, lineContents, "search-result-highlight-plaintext");
+  await takeScreenshot(page, testInfo, lineContents, "search-result-highlight-plaintext");
 
   // Add log point panel (which will insert a column breakpoint)
   await addLogPoint(page, { sourceId, lineNumber: 20 });
   await takeScreenshot(
     page,
+    testInfo,
     lineContents,
     "search-result-highlight-plaintext-with-column-breakpoint"
   );
