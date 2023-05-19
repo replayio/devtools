@@ -1,5 +1,5 @@
 import dynamic from "next/dynamic";
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import { ConnectedProps, connect } from "react-redux";
 
 import { getAwaitingSourcemaps, getUploading } from "ui/reducers/app";
@@ -66,7 +66,7 @@ function LoadingScreen({
   const changeMessage = useCallback(() => {
     const randomIndex = Math.floor(Math.random() * phrases.length);
     setMessage(phrases[randomIndex]);
-  }, [phrases]);
+  }, []);
 
   useEffect(() => {
     const phraseTimeout = setTimeout(changeMessage, 5000);
