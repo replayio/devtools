@@ -64,9 +64,15 @@ function LoadingScreen({
 
   const [message, setMessage] = useState(fallbackMessage);
 
-  const changeMessage = useCallback(() => {
-    const randomIndex = Math.floor(Math.random() * phrases.length);
-    setMessage(phrases[randomIndex]);
+  useEffect(() => {
+    const changeMessage = () => {
+      const randomIndex = Math.floor(Math.random() * phrases.length);
+      setMessage(phrases[randomIndex]);
+    };
+
+    const phraseTimeout = setTimeout(changeMessage, 5000);
+
+    return () => clearTimeout(phraseTimeout);
   }, []);
 
   useEffect(() => {

@@ -24,7 +24,7 @@
 }
 
 .messageWrapper a:hover {
-  color: rgb(80, 202, 255);
+  color: var(--primary-accent);
 }
 
 .viewportWrapper {
