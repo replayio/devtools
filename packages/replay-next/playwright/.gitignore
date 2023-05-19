@@ -4,3 +4,4 @@ cache_buster
 playwright-report*
 snapshots/tests
 test-results
+visuals
