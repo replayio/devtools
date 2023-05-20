@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import fs from "fs";
 import path from "path";
 import {
@@ -169,50 +170,48 @@ export async function takeScreenshot(
     return;
   }
 
-  if (!name.endsWith(".png")) {
-    name += ".png";
+  const imageFilenameWithoutExtension = name.endsWith(".png") ? name.slice(0, -4) : name;
+  const imageFilename = `${imageFilenameWithoutExtension}.png`;
+
+  let baseDir = path.join(__dirname, `../../visuals/`);
+  if (WRITE_SNAPSHOT_IMAGE_FILES) {
+    // Ensure tests that have screenshots with the same name don't interfere with each other.
+    const sha = createHash("sha256").update(testInfo.titlePath[0]).digest("hex");
+
+    baseDir = path.join(__dirname, "..", "..", "visuals", sha, imageFilenameWithoutExtension);
+
+    fs.mkdirSync(baseDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(baseDir, `metadata.json`),
+      JSON.stringify(
+        {
+          imageFilename,
+          testFilename: testInfo.titlePath[0],
+          testName: testInfo.title,
+        },
+        null,
+        2
+      ),
+      { encoding: "utf-8" }
+    );
   }
 
   await page.emulateMedia({ colorScheme: "dark" });
   const screenshotDark = await takeScreenshotHelper(page, locator);
-
-  let baseDir = path.join(__dirname, `../../visuals/`);
+  expect(screenshotDark).not.toBeNull();
   if (WRITE_SNAPSHOT_IMAGE_FILES) {
-    // from e.g. "tests/console/should-display-list-of-messages.ts/..."
-    // to e.g. "console/should-display-list-of-messages/..."
-    const titlePath = testInfo.titlePath[0];
-    const parsed = path.parse(titlePath);
-
-    baseDir = path.join(
-      __dirname,
-      "..",
-      "..",
-      "visuals",
-      // Remove "tests" base directory
-      parsed.dir.split(path.delimiter).slice(1).join(path.delimiter),
-      // Exclude file extension from top directory name
-      parsed.name
-    );
-  }
-
-  if (WRITE_SNAPSHOT_IMAGE_FILES) {
-    const darkDir = path.join(baseDir, "dark");
-    fs.mkdirSync(darkDir, { recursive: true });
-    fs.writeFileSync(path.join(darkDir, name), screenshotDark);
-    expect(screenshotDark).not.toBeNull();
+    fs.writeFileSync(path.join(baseDir, "dark.png"), screenshotDark, { encoding: "base64" });
   } else {
-    expect(screenshotDark).toMatchSnapshot(["dark", name]);
+    expect(screenshotDark).toMatchSnapshot(["dark", imageFilename]);
   }
 
   await page.emulateMedia({ colorScheme: "light" });
   const screenshotLight = await takeScreenshotHelper(page, locator);
+  expect(screenshotLight).not.toBeNull();
   if (WRITE_SNAPSHOT_IMAGE_FILES) {
-    const lightDir = path.join(baseDir, "light");
-    fs.mkdirSync(lightDir, { recursive: true });
-    fs.writeFileSync(path.join(lightDir, name), screenshotLight);
-    expect(screenshotLight).not.toBeNull();
+    fs.writeFileSync(path.join(baseDir, "light.png"), screenshotLight, { encoding: "base64" });
   } else {
-    expect(screenshotLight).toMatchSnapshot(["light", name]);
+    expect(screenshotLight).toMatchSnapshot(["light", imageFilename]);
   }
 }
 

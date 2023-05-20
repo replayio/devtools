@@ -82,11 +82,14 @@ export default function Expandable({
 
         const newIsOpen = !isOpen;
 
-        onChange(newIsOpen);
-        setIsOpen(newIsOpen);
-        if (persistenceKey !== undefined) {
-          persistIsExpanded(persistenceKey, newIsOpen);
-        }
+        // In case this change triggers a re-render that suspends, it should be in a transition.
+        startTransition(() => {
+          onChange(newIsOpen);
+          setIsOpen(newIsOpen);
+          if (persistenceKey !== undefined) {
+            persistIsExpanded(persistenceKey, newIsOpen);
+          }
+        });
         break;
     }
   };
