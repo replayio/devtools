@@ -44,11 +44,6 @@ Anyone is welcome to contribute to the project! If you're just getting started w
 
 ### Running tests:
 
-To run the end-to-end tests make sure that devtools is running locally on port 8080 and run:
-
-```
-node test/run.js [--pattern pat]
-```
 
 To run the mock tests:
 

@@ -31,6 +31,7 @@ import { Redacted } from "../Redacted";
 import Loader from "../shared/Loader";
 import ReplayLogo from "../shared/ReplayLogo";
 import WaitForReduxSlice from "../WaitForReduxSlice";
+import { ApplicationPanel } from "./Application";
 import NewConsoleRoot from "./NewConsole";
 import SourcesTabLabel from "./SourcesTabLabel";
 import { ShowVideoButton } from "./ToolboxButton";
@@ -101,6 +102,8 @@ const PanelButtons: FC<PanelButtonsProps> = ({
       {(chromiumNetMonitorEnabled || supportsNetworkRequests) && (
         <PanelButton panel="network">Network</PanelButton>
       )}
+
+      {true && <PanelButton panel="application">Application</PanelButton>}
     </div>
   );
 };
@@ -227,6 +230,10 @@ function SecondaryToolbox({
         </Panel>
         <Panel isActive={selectedPanel === "debugger"}>
           <EditorPane />
+        </Panel>
+
+        <Panel isActive={selectedPanel === "application"}>
+          <ApplicationPanel />
         </Panel>
       </Redacted>
     </div>
