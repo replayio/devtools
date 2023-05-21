@@ -16,7 +16,7 @@ test("should log events in the console", async ({ page }, testInfo) => {
   const listItem = await locateMessage(page, "event", "MouseEvent");
   await takeScreenshot(page, testInfo, listItem, "event-types-mouse-click");
 
-  await toggleProtocolMessage(page, "timestamps", true);
+  await toggleProtocolMessage(page, "timestamps", false);
   await takeScreenshot(page, testInfo, listItem, "event-types-mouse-click-with-timestamps");
 
   const keyValue = listItem.locator("[data-test-name=KeyValue]", { hasText: "MouseEvent" });
