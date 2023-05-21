@@ -3,47 +3,42 @@
 "use strict";
 
 const github = require("@actions/github");
-const fs = require("fs");
+const { readdirSync, readFileSync, statSync } = require("fs");
 const fetch = require("node-fetch");
+const { join } = require("path");
 
 // Upload snapshots to Delta
-// https://github.com/replayio/delta/blob/main/pages/api/uploadSnapshot.ts
+// https://github.com/replayio/delta/blob/main/pages/api/uploadSnapshotVariants.ts
 
-const visualsUrl = "https://delta.replay.io";
 const projectSlug = "replay";
+const visualsBaseDir = join(__dirname, "playwright", "visuals");
+const visualsUrl = "https://delta.replay.io";
 
-function getFiles(dir) {
-  try {
-    const files = fs.readdirSync(dir);
-
-    const allFiles = [];
-
-    files.forEach(file => {
-      const stats = fs.statSync(`${dir}/${file}`);
-
-      if (stats.isDirectory()) {
-        allFiles.push(...getFiles(`${dir}/${file}`));
-      } else {
-        if (file !== ".DS_Store") {
-          allFiles.push(`${dir}/${file}`);
+function getSnapshotDirs() {
+  const snapshotDirs = [];
+  readdirSync(visualsBaseDir).forEach(entry => {
+    const stats = statSync(join(visualsBaseDir, entry));
+    if (stats.isDirectory()) {
+      const testDir = join(visualsBaseDir, entry);
+      readdirSync(testDir).forEach(entry => {
+        const stats = statSync(join(testDir, entry));
+        if (stats.isDirectory()) {
+          snapshotDirs.push(join(testDir, entry));
         }
-      }
-    });
+      });
+    }
+  });
 
-    return allFiles;
-  } catch (e) {
-    return [];
-  }
+  return snapshotDirs;
 }
 
 (async () => {
-  const dir = "./playwright/visuals";
-  const files = getFiles(dir);
-  if (files.length == 0) {
-    console.error(`Skipping: No files found in ${dir}`);
+  const snapshotDirs = getSnapshotDirs();
+  if (snapshotDirs.length == 0) {
+    console.error(`Skipping: No files found in ${visualsBaseDir}`);
     process.exit(1);
   } else {
-    console.log(`Found ${files.length} files`);
+    console.log(`Found ${snapshotDirs.length} snapshots`);
   }
 
   const actor = github.context.actor;
@@ -65,58 +60,57 @@ function getFiles(dir) {
     runId,
   };
 
-  const url = `${visualsUrl}/api/uploadSnapshot?${Object.entries(params).reduce(
+  const url = `${visualsUrl}/api/uploadSnapshotVariants?${Object.entries(params).reduce(
     (string, [key, value]) => (string += `${key}=${value}&`),
     ""
   )}`;
 
   console.log(`Uploading images to: ${url}`);
 
-  let caughtError;
   try {
-    for (let index = 0; index < files.length; index++) {
-      const file = files[index];
-      const base64 = fs.readFileSync(file, { encoding: "base64" });
-
-      console.log(`Upload file "${file}" with data: ${base64}`);
+    for (let index = 0; index < snapshotDirs.length; index++) {
+      const snapshotDir = snapshotDirs[index];
+      const metadata = readFileSync(join(snapshotDir, "metadata.json"), { encoding: "utf-8" });
+      const metadataJSON = JSON.parse(metadata);
+      const variants = {
+        dark: readFileSync(join(snapshotDir, "dark.png"), { encoding: "base64" }),
+        light: readFileSync(join(snapshotDir, "light.png"), {
+          encoding: "base64",
+        }),
+      };
 
       try {
-        await uploadImage({ base64, file, url });
+        await uploadSnapshot({ metadata: metadataJSON, url, variants });
       } catch (error) {
         console.error(error);
-        console.log(`Retrying upload for file "${file}"`);
+        console.log(`Retrying upload for file "${metadata.fileName}"`);
 
         // Retry a failed upload before giving up
-        await uploadImage({ base64, file, url });
+        await uploadSnapshot({ metadata: metadataJSON, url, variants });
       }
     }
   } catch (error) {
-    caughtError = error;
-  }
-
-  if (caughtError) {
-    console.error(`Upload failed (client error)\n  url: ${url}\n  error:`, caughtError);
-
+    console.error(`Upload failed (client error)\n`, error);
     process.exit(1);
   }
 })();
 
-async function uploadImage({ base64, file, url }) {
+async function uploadSnapshot({ metadata, url, variants }) {
+  console.group(`uploadSnapshot()`);
+  console.log(metadata);
+  console.log(variants);
+  console.groupEnd();
+
   const response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ image: { base64, file } }),
+    body: JSON.stringify({ metadata, variants }),
   });
-
   if (response.status !== 200) {
     const text = await response.text();
-
-    console.error(
-      `Upload failed (server error)\n  url: ${url}\n  status: ${response.status}\n  response: ${text}`
-    );
-
-    throw new Error(`Upload failed (server error) for file "${file}"`);
+    console.error(`Upload failed (server status ${response.status})\n${text}`);
+    process.exit(1);
   }
 }
