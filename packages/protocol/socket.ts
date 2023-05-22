@@ -134,7 +134,7 @@ export type ExperimentalSettings = {
   profileWorkerThreads?: boolean;
   disableRecordingAssetsInDatabase?: boolean;
   keepAllTraces?: boolean;
-  enableIncrementalSnapshots?: boolean;
+  disableIncrementalSnapshots?: boolean;
   disableConcurrentControllerLoading?: boolean;
 };
 
