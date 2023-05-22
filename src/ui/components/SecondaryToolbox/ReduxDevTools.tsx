@@ -1,39 +1,23 @@
 import { ExecutionPoint } from "@replayio/protocol";
 import classnames from "classnames";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
+import { useImperativeCacheValue } from "suspense";
 
-import { ThreadFront } from "protocol/thread";
+import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
 
-import type { ReduxActionAnnotation } from "./redux-devtools/redux-annotations";
-import { processReduxAnnotations } from "./redux-devtools/redux-annotations";
+import { ReduxActionAnnotation } from "./redux-devtools/redux-annotations";
 import { ReduxDevToolsContents } from "./redux-devtools/ReduxDevToolsContents";
 import styles from "./ReduxDevTools.module.css";
 
 export const ReduxDevToolsPanel = () => {
-  const [reduxAnnotations, setReduxAnnotations] = useState<ReduxActionAnnotation[]>([]);
   const [selectedPoint, setSelectedPoint] = useState<ExecutionPoint | null>(null);
-  const isStrictEffectsSecondRenderRef = useRef(false);
 
-  useEffect(() => {
-    // React will double-run effects in dev. Avoid trying to subscribe twice,
-    // as `socket.ts` throws errors if you call `getAnnotations()` more than once.
-    if (isStrictEffectsSecondRenderRef.current) {
-      return;
-    }
+  const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
+    reduxDevToolsAnnotationsCache
+  );
 
-    isStrictEffectsSecondRenderRef.current = true;
-
-    // We only show this panel if we know that Redux annotations exist already
-    ThreadFront.getAnnotations(annotations => {
-      if (annotations.length) {
-        // Pre-process Redux annotations by parsing the string messages,
-        // then add them to the state array and pass down via context.
-        setReduxAnnotations(prevAnnotations =>
-          prevAnnotations.concat(processReduxAnnotations(annotations))
-        );
-      }
-    }, "redux-devtools-data");
-  }, []);
+  const reduxAnnotations: ReduxActionAnnotation[] =
+    annotationsStatus === "resolved" ? parsedAnnotations : [];
 
   // TODO Right now we're going to show _all_ actions in the list.
   // This could be a very long list, and the user may have intended

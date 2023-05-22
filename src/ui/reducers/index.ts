@@ -6,7 +6,6 @@ import app, * as appSelectors from "./app";
 import layout, * as layoutSelectors from "./layout";
 import network, * as networkSelectors from "./network";
 import protocolMessages from "./protocolMessages";
-import reactDevTools, * as reactDevToolsSelectors from "./reactDevTools";
 import { selectors as sourcesSelectors } from "./sources";
 import timeline, * as timelineSelectors from "./timeline";
 
@@ -15,7 +14,6 @@ export const reducers = {
   timeline,
   network,
   protocolMessages: protocolMessages,
-  reactDevTools,
   layout,
   ...debuggerReducers,
   ...inspectorReducers,
@@ -26,7 +24,6 @@ export const selectors = {
   ...debuggerSelectors,
   ...layoutSelectors,
   ...networkSelectors,
-  ...reactDevToolsSelectors,
   ...timelineSelectors,
   ...sourcesSelectors,
 };

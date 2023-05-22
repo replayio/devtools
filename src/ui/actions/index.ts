@@ -12,12 +12,10 @@ import * as commentsActions from "./comments";
 import * as layoutActions from "./layout";
 import { LayoutAction } from "./layout";
 import { NetworkAction } from "./network";
-import * as reactDevToolsActions from "./reactDevTools";
-import { ReactDevToolsAction } from "./reactDevTools";
 import * as sessionActions from "./session";
 import * as timelineActions from "./timeline";
 
-export type UIAction = LayoutAction | NetworkAction | ReactDevToolsAction | QuickOpenActions;
+export type UIAction = LayoutAction | NetworkAction | QuickOpenActions;
 
 export type UIThunkAction<TReturn = void> = ThunkAction<
   TReturn,
@@ -35,7 +33,6 @@ export const actions = {
   ...commentsActions,
   ...debuggerActions,
   ...layoutActions,
-  ...reactDevToolsActions,
   ...sessionActions,
   ...timelineActions,
   ...markupActions,

@@ -37,13 +37,11 @@ import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 import { UIStore, actions } from "ui/actions";
 import { setCanvas } from "ui/actions/app";
-import { setupReactDevTools } from "ui/actions/reactDevTools";
 import { precacheScreenshots } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import app, { loadReceivedEvents, setVideoUrl } from "ui/reducers/app";
 import network from "ui/reducers/network";
 import protocolMessages from "ui/reducers/protocolMessages";
-import reactDevTools from "ui/reducers/reactDevTools";
 import reporter from "ui/reducers/reporter";
 import timeline, {
   allPaintsReceived,
@@ -53,6 +51,11 @@ import timeline, {
 } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import { UnexpectedError } from "ui/state/app";
+import {
+  annotationKindsCache,
+  eventListenersJumpLocationsCache,
+  reactDevToolsAnnotationsCache,
+} from "ui/suspense/annotationsCaches";
 import type { ThunkExtraArgs } from "ui/utils/thunk";
 
 import { startAppListening } from "../listenerMiddleware";
@@ -158,7 +161,6 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   const reducers = {
     app,
     network,
-    reactDevTools,
     reporter,
     timeline,
     protocolMessages: protocolMessages,
@@ -212,9 +214,15 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   setupTimeline(store);
   setupGraphics();
   setupNetwork(store, replayClient);
-  setupReactDevTools(store, ThreadFront);
   setupBoxModel(store, startAppListening);
   setupRules(store, startAppListening);
+
+  ThreadFront.waitForSession().then(() => {
+    // Precache annotations
+    annotationKindsCache.prefetch(replayClient);
+    reactDevToolsAnnotationsCache.prefetch();
+    eventListenersJumpLocationsCache.prefetch();
+  });
 
   // Add protocol event listeners for things that the Redux store needs to stay in sync with.
   // TODO We should revisit this as part of a larger architectural redesign (#6932).

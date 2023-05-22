@@ -6,12 +6,14 @@ import { Nag } from "shared/graphql/types";
 import {
   PointWithEventType,
   jumpToClickEventFunctionLocation,
+  jumpToKnownEventListenerHit,
 } from "ui/actions/eventListeners/jumpToCode";
 import useEventContextMenu from "ui/components/Events/useEventContextMenu";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
 import { setMarkTimeStampPoint } from "ui/reducers/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
 import { ReplayEvent } from "ui/state/app";
+import { ParsedJumpToCodeAnnotation } from "ui/suspense/annotationsCaches";
 
 import MaterialIcon from "../shared/MaterialIcon";
 import { getReplayEvent } from "./eventKinds";
@@ -21,6 +23,7 @@ type EventProps = {
   currentTime: number;
   event: ReplayEvent;
   executionPoint: string;
+  jumpToCodeAnnotation?: ParsedJumpToCodeAnnotation;
   onSeek: (point: string, time: number) => void;
 };
 
@@ -45,13 +48,13 @@ export default React.memo(function Event({
   executionPoint,
   event,
   onSeek,
+  jumpToCodeAnnotation,
 }: EventProps) {
   const dispatch = useAppDispatch();
   const { kind, point, time } = event;
   const isPaused = time === currentTime && executionPoint === point;
   const label = getEventLabel(event);
   const { icon } = getReplayEvent(kind);
-  const [jumpToCodeStatus, setJumpToCodeStatus] = useState<JumpToCodeStatus>("not_checked");
   const [, dismissJumpToCodeNag] = useNag(Nag.JUMP_TO_CODE);
   const [, dismissJumpToEventNag] = useNag(Nag.JUMP_TO_EVENT);
 
@@ -65,24 +68,7 @@ export default React.memo(function Event({
   const onClickJumpToCode = async () => {
     // Seek to the sidebar event timestamp right away.
     // That way we're at least _close_ to the right time
-    onSeek(point, time);
-
-    if (event.kind === "mousedown" || event.kind === "keypress") {
-      setJumpToCodeStatus("loading");
-      // We don't have a good idea what the end time is - use a guesstimate internally
-      const result = await dispatch(
-        jumpToClickEventFunctionLocation(onSeek, event as PointWithEventType)
-      );
-
-      setJumpToCodeStatus(result);
-      if (result === "not_loaded") {
-        // Clear this out after a few seconds since the user could change focus.
-        // Simpler than trying to watch the focus region change over time.
-        setTimeout(() => {
-          setJumpToCodeStatus("not_checked");
-        }, 5000);
-      }
-    }
+    dispatch(jumpToKnownEventListenerHit(onSeek, jumpToCodeAnnotation!));
 
     // update Replay Passport
     dismissJumpToCodeNag();
@@ -103,6 +89,23 @@ export default React.memo(function Event({
     dispatch(setMarkTimeStampPoint(null));
   };
 
+  let renderedJumpToCodeButton: React.ReactNode = null;
+
+  if (event.kind === "mousedown" || event.kind === "keypress") {
+    // The backend routine only saves annotations for actual hits.
+    // If there's no annotation, we know there's no hits.
+    const jumpToCodeStatus: JumpToCodeStatus = !!jumpToCodeAnnotation ? "found" : "no_hits";
+
+    renderedJumpToCodeButton = (
+      <JumpToCodeButton
+        onClick={onClickJumpToCode}
+        status={jumpToCodeStatus}
+        currentExecutionPoint={executionPoint}
+        targetExecutionPoint={event.point}
+      />
+    );
+  }
+
   return (
     <>
       <div
@@ -121,14 +124,7 @@ export default React.memo(function Event({
           <Label>{label}</Label>
         </div>
         <div className="flex space-x-2 opacity-0 group-hover:opacity-100">
-          {event.kind === "mousedown" || event.kind === "keypress" ? (
-            <JumpToCodeButton
-              onClick={onClickJumpToCode}
-              status={jumpToCodeStatus}
-              currentExecutionPoint={executionPoint}
-              targetExecutionPoint={event.point}
-            />
-          ) : null}
+          {renderedJumpToCodeButton}
         </div>
       </div>
       {contextMenu}
