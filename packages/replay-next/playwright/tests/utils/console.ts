@@ -213,6 +213,23 @@ export async function toggleProtocolMessage(page: Page, name: ToggleName, on: bo
 
     await page.click(`[data-test-id="FilterToggle-${name}"]`);
   }
+
+  // Wait for Console to update with new filter value
+  await waitFor(async () => {
+    const messageList = page.locator('[data-test-name="Messages"]');
+    const value = await messageList.getAttribute(`data-test-state-${name}`);
+    if (on) {
+      expect(value).not.toBeNull();
+    } else {
+      expect(value).toBeNull();
+    }
+  });
+
+  // Wait for messages within the Console to fully load
+  await waitFor(async () => {
+    const messageList = page.locator('[data-test-name="Messages"]');
+    await expect(await messageList.locator('[data-test-name="Loader"]').count()).toBe(0);
+  });
 }
 
 export async function verifyConsoleMessage(

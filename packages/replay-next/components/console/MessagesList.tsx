@@ -1,6 +1,7 @@
 import { ForwardedRef, MutableRefObject, ReactNode, forwardRef, useContext, useMemo } from "react";
 
 import Icon from "replay-next/components/Icon";
+import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useStreamingMessages } from "replay-next/src/hooks/useStreamingMessages";
@@ -45,8 +46,9 @@ const ErrorBoundary = ({ children }: { children: ReactNode }) => (
 // 1. Using React Suspense (and Suspense caches) for just-in-time loading of Protocol data
 // 2. Using an injected ReplayClientInterface to enable easy testing/mocking
 function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement> }) {
-  const { isTransitionPending: isFocusTransitionPending, range: focusRange } =
-    useContext(FocusContext);
+  const { showErrors, showExceptions, showLogs, showNodeModules, showTimestamps, showWarnings } =
+    useContext(ConsoleFiltersContext);
+  const { isTransitionPending: isFocusTransitionPending } = useContext(FocusContext);
   const loggables = useContext(LoggablesContext);
   const [searchState] = useContext(ConsoleSearchContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
@@ -184,6 +186,12 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
       )}
       <div
         className={styles.Container}
+        data-test-state-errors={showErrors ? true : undefined}
+        data-test-state-exceptions={showExceptions ? true : undefined}
+        data-test-state-logs={showLogs ? true : undefined}
+        data-test-state-nodeModules={showNodeModules ? true : undefined}
+        data-test-state-timestamps={showTimestamps ? true : undefined}
+        data-test-state-warnings={showWarnings ? true : undefined}
         data-test-name="Messages"
         ref={forwardedRef as MutableRefObject<HTMLDivElement>}
         role="list"
