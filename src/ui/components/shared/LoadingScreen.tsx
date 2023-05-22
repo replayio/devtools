@@ -24,8 +24,8 @@ export function LoadingScreenTemplate({ children }: { children?: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const timeoutId = setTimeout(changeHoverboardColor, 5000);
-    return () => clearTimeout(timeoutId);
+    const timeoutId = setInterval(changeHoverboardColor, 5000);
+    return () => clearInterval(timeoutId);
   }, [changeHoverboardColor]);
 
   return (
@@ -70,11 +70,14 @@ function LoadingScreen({
       setMessage(phrases[randomIndex]);
     };
     const phraseTimeout = setTimeout(changeMessage, 5000);
+    // swap to cutesy phrase after 5 seconds
+    // note: this should only be called a single time
     return () => clearTimeout(phraseTimeout);
   }, []);
 
   useEffect(() => {
     const stalledTimeoutId = setTimeout(() => {
+      // after 15 seconds, switch to stalled message
       setMessage(longWaitMessage);
     }, stalledTimeout);
     return () => clearTimeout(stalledTimeoutId);
