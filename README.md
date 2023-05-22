@@ -44,7 +44,6 @@ Anyone is welcome to contribute to the project! If you're just getting started w
 
 ### Running tests:
 
-
 To run the mock tests:
 
 ```
