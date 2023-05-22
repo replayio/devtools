@@ -335,7 +335,7 @@ const RequestDetails = ({
   }
 
   return (
-    <div className="no-scrollbar h-full w-full overflow-y-scroll border-l border-themeBorder bg-bodyBgcolor">
+    <div className="no-scrollbar h-full w-full overflow-y-scroll bg-bodyBgcolor">
       <RequestDetailsTabs>
         <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
         <CloseButton buttonClass="mr-2" handleClick={closePanel} tooltip={"Close tab"} />
