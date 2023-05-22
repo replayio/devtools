@@ -20,8 +20,12 @@ export async function addTerminalExpression(page: Page, text: string): Promise<v
 export async function filterByText(page: Page, text: string) {
   await page.fill("[data-test-id=ConsoleFilterInput]", text);
 
-  // Give filter time to be applied
-  await delay();
+  // Wait for Console to apply new filter text
+  await waitFor(async () => {
+    const messageList = page.locator('[data-test-name="Messages"]');
+    const value = await messageList.getAttribute(`data-test-state-filterByText`);
+    expect(value).toBe(text);
+  });
 }
 
 export async function findConsoleMessage(
