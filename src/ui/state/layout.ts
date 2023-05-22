@@ -20,6 +20,7 @@ export type PrimaryPanelName =
   | "react"
   | ViewerPrimaryPanelName;
 export type SecondaryPanelName =
+  | "application"
   | "console"
   | "inspector"
   | "network"
