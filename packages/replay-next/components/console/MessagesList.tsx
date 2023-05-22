@@ -46,8 +46,15 @@ const ErrorBoundary = ({ children }: { children: ReactNode }) => (
 // 1. Using React Suspense (and Suspense caches) for just-in-time loading of Protocol data
 // 2. Using an injected ReplayClientInterface to enable easy testing/mocking
 function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement> }) {
-  const { showErrors, showExceptions, showLogs, showNodeModules, showTimestamps, showWarnings } =
-    useContext(ConsoleFiltersContext);
+  const {
+    filterByText,
+    showErrors,
+    showExceptions,
+    showLogs,
+    showNodeModules,
+    showTimestamps,
+    showWarnings,
+  } = useContext(ConsoleFiltersContext);
   const { isTransitionPending: isFocusTransitionPending } = useContext(FocusContext);
   const loggables = useContext(LoggablesContext);
   const [searchState] = useContext(ConsoleSearchContext);
@@ -188,6 +195,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
         className={styles.Container}
         data-test-state-errors={showErrors ? true : undefined}
         data-test-state-exceptions={showExceptions ? true : undefined}
+        data-test-state-filterByText={filterByText}
         data-test-state-logs={showLogs ? true : undefined}
         data-test-state-nodeModules={showNodeModules ? true : undefined}
         data-test-state-timestamps={showTimestamps ? true : undefined}
