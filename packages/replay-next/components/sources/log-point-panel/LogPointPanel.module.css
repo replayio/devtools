@@ -57,18 +57,16 @@
   align-items: center;
   gap: 1ch;
 }
-.ContentWrapper[data-logging-disabled] {
-  background-color: var(--point-panel-input-disabled-background-color);
-}
-.ContentWrapper:hover {
+.ContentWrapper[data-state-editable="true"]:hover {
   border-color: var(--point-panel-input-border-color-hover);
-}
-.ContentWrapper[data-logging-disabled] {
-  border-color: var(--point-panel-input-border-color);
 }
 .Panel[data-test-state="edit"] .ContentWrapper:focus,
 .Panel[data-test-state="edit"] .ContentWrapper:focus-within {
   border-color: var(--point-panel-input-border-color-focus);
+}
+.ContentWrapper[data-state-logging-enabled="false"] {
+  background-color: var(--point-panel-input-disabled-background-color);
+  border-color: var(--point-panel-input-border-color);
 }
 
 .ContentWrapperInvalid {
@@ -100,11 +98,12 @@
   flex-direction: row;
   align-items: center;
 
-  cursor: text;
-
   /* Firefox fixes */
   scrollbar-width: thin;
   scrollbar-color: var(--scroll-thumb-color) transparent;
+}
+.ContentWrapper[data-state-editable="true"] {
+  cursor: text;
 }
 .Content::-webkit-scrollbar {
   height: 0.5rem;
@@ -118,22 +117,27 @@
 
 .EditButton,
 .RemoveConditionalButton,
-.SaveButton {
+.SaveButton,
+.ToggleVisibilityButton {
   background: none;
   border: none;
   margin: 0;
   cursor: pointer;
+}
+.EditButton {
+  cursor: inherit;
 }
 .EditButton[data-invalid],
 .EditButton:disabled,
 .RemoveConditionalButton[data-invalid],
 .RemoveConditionalButton:disabled,
 .SaveButton[data-invalid],
-.SaveButton:disabled {
+.SaveButton:disabled .ToggleVisibilityButton:disabled {
   cursor: default;
 }
 
-.EditButton {
+.EditButton,
+.ToggleVisibilityButton {
   flex-grow: 0;
   flex-shrink: 0;
   display: flex;
@@ -142,7 +146,9 @@
   line-height: 1.5rem;
   color: var(--point-panel-input-edit-button-color);
 }
-.ContentWrapper:hover .EditButton {
+.ContentWrapper[data-state-editable="true"]:hover .EditButton,
+.EditButton:hover,
+.ToggleVisibilityButton:hover {
   color: var(--point-panel-input-edit-button-color-hover);
 }
 
@@ -164,7 +170,8 @@
   height: 1rem;
 }
 
-.EditButtonIcon {
+.EditButtonIcon,
+.ToggleVisibilityButtonIcon {
   height: 1rem;
   width: 1rem;
 }

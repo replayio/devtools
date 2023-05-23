@@ -1,5 +1,6 @@
 import { TimeStampedPoint } from "@replayio/protocol";
 import {
+  MouseEvent,
   Suspense,
   unstable_useCacheRefresh as useCacheRefresh,
   useContext,
@@ -208,6 +209,13 @@ function PointPanelWithHitPoints({
     );
   };
 
+  const onClickEyeIcon = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    toggleShouldLog();
+  };
+
   let showTooManyPointsMessage = false;
   switch (hitPointStatus) {
     case "too-many-points-to-find":
@@ -307,7 +315,8 @@ function PointPanelWithHitPoints({
           <div className={styles.EditableContentWrapperRow}>
             <div
               className={isConditionValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}
-              data-logging-disabled={!shouldLog || !editable || undefined}
+              data-state-editable={editable}
+              data-state-logging-enabled={shouldLog}
               data-test-name="PointPanel-ConditionalWrapper"
               onClick={
                 showTooManyPointsMessage && editable ? undefined : () => startEditing("condition")
@@ -382,7 +391,8 @@ function PointPanelWithHitPoints({
         ) : (
           <div
             className={isContentValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}
-            data-logging-disabled={!shouldLog || !editable || undefined}
+            data-state-editable={editable}
+            data-state-logging-enabled={shouldLog}
             data-test-name="PointPanel-ContentWrapper"
             onClick={
               showTooManyPointsMessage && editable ? undefined : () => startEditing("content")
@@ -423,27 +433,27 @@ function PointPanelWithHitPoints({
                 <div className={styles.Content}>
                   <SyntaxHighlightedLine code={content} />
                 </div>
-                {editable ? (
-                  <button
-                    className={styles.EditButton}
-                    disabled={isPending}
-                    data-test-name="PointPanel-EditButton"
-                  >
-                    <Icon
-                      className={styles.EditButtonIcon}
-                      type={shouldLog ? "edit" : "toggle-off"}
-                    />
-                  </button>
-                ) : (
-                  <div className={styles.DisabledIconAndAvatar}>
-                    {shouldLog || <Icon className={styles.EditButtonIcon} type="toggle-off" />}
-                    <AvatarImage
-                      className={styles.CreatedByAvatar}
-                      src={user?.picture || undefined}
-                      title={user?.name || undefined}
-                    />
-                  </div>
-                )}
+                <div className={styles.DisabledIconAndAvatar}>
+                  {shouldLog || (
+                    <button className={styles.ToggleVisibilityButton} onClick={onClickEyeIcon}>
+                      <Icon className={styles.ToggleVisibilityButtonIcon} type="toggle-off" />
+                    </button>
+                  )}
+                  {editable && (
+                    <button
+                      className={styles.EditButton}
+                      data-test-name="PointPanel-EditButton"
+                      disabled={isPending}
+                    >
+                      <Icon className={styles.EditButtonIcon} type="edit" />
+                    </button>
+                  )}
+                  <AvatarImage
+                    className={styles.CreatedByAvatar}
+                    src={user?.picture || undefined}
+                    title={user?.name || undefined}
+                  />
+                </div>
               </>
             )}
           </div>
