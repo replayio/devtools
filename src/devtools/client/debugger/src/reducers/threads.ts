@@ -13,21 +13,19 @@ export interface ThreadsState {
   traits: Record<string, unknown>;
 }
 
-export function initialThreadsState(): ThreadsState {
-  return {
-    threads: [],
-    mainThread: {
-      actor: "",
-      url: "",
-      type: "mainThread",
-      name: "",
-    },
-    traits: {},
-    isWebExtension: false,
-  };
-}
+const initialState: ThreadsState = {
+  threads: [],
+  mainThread: {
+    actor: "",
+    url: "",
+    type: "mainThread",
+    name: "",
+  },
+  traits: {},
+  isWebExtension: false,
+};
 
-export default function update(state = initialThreadsState(), action: AnyAction) {
+export default function update(state = initialState, action: AnyAction) {
   switch (action.type) {
     case "CONNECT":
       return {

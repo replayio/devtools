@@ -35,22 +35,20 @@ export interface UISliceState {
   highlightedLineRange?: HighlightedRange;
 }
 
-export const createUIState = (): UISliceState => ({
-  selectedPrimaryPaneTab: "sources",
-  activeSearch: null,
-  fullTextSearchQuery: "",
-  fullTextSearchFocus: false,
-  shownSource: null,
-  sourcesCollapsed: prefs.sourcesCollapsed as boolean,
-  frameworkGroupingOn: prefs.frameworkGroupingOn as boolean,
-  highlightedLineRange: undefined,
-  viewport: null,
-  cursorPosition: null,
-});
-
 const uiSlice = createSlice({
   name: "debuggerUI",
-  initialState: createUIState,
+  initialState: (): UISliceState => ({
+    selectedPrimaryPaneTab: "sources",
+    activeSearch: null,
+    fullTextSearchQuery: "",
+    fullTextSearchFocus: false,
+    shownSource: null,
+    sourcesCollapsed: prefs.sourcesCollapsed as boolean,
+    frameworkGroupingOn: prefs.frameworkGroupingOn as boolean,
+    highlightedLineRange: undefined,
+    viewport: null,
+    cursorPosition: null,
+  }),
   reducers: {
     toggleActiveSearch(state, action: PayloadAction<ActiveSearchType | null>) {
       state.activeSearch = action.payload;

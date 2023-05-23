@@ -1,7 +1,14 @@
 // Side-effectful import, has to be imported before event-listeners
 // Ordering matters here
 import "devtools/client/inspector/prefs";
-import { ActionCreatorWithoutPayload } from "@reduxjs/toolkit";
+import {
+  ActionCreator,
+  ActionCreatorWithNonInferrablePayload,
+  ActionCreatorWithOptionalPayload,
+  ActionCreatorWithPayload,
+  ActionCreatorWithPreparedPayload,
+  ActionCreatorWithoutPayload,
+} from "@reduxjs/toolkit";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { MouseEvent, TimeStampedPoint, sessionError, uploadedData } from "@replayio/protocol";
 import { IDBPDatabase, openDB } from "idb";
@@ -63,6 +70,16 @@ import { AppStore, extendStore } from "../store";
 
 const { setupApp, setupTimeline } = actions;
 
+type NoArgsFunction = (arg: void) => any;
+
+type RTKActionCreator =
+  | ActionCreatorWithNonInferrablePayload
+  | ActionCreatorWithOptionalPayload<any>
+  | ActionCreatorWithPayload<any>
+  | ActionCreatorWithPreparedPayload<any, any>
+  | ActionCreatorWithoutPayload
+  | NoArgsFunction;
+
 declare global {
   interface Window {
     hasAlreadyBootstrapped: boolean;
@@ -70,7 +87,17 @@ declare global {
   interface AppHelpers {
     threadFront?: typeof ThreadFront;
     actions?: ResolveThunks<typeof actions>;
-    selectors?: BoundSelectors;
+    /**
+     * Strictly speaking, all selectors in this object have been "bound" so that
+     * the initial `state` arg is already being passed in. This allows us to call
+     * them as `window.app.selectors.getSomething()` and not have to call `store.getState()`.
+     * But, as of RTK 1.9.x, `tsc` crashes when I try to remove the `state` arg from
+     * the type of the params, so the selector types here are slightly a lie.
+     *
+     * We don't ever call these directly inside the codebase anyway, they're solely meant
+     * for manual debugging in the console. So, this is more of a "these exist" thing.
+     */
+    selectors?: ObjectOfJustSelectorsHopefully;
     debugger?: any;
 
     PointsContext?: any;
@@ -385,24 +412,17 @@ type SelectorsObject = typeof selectors;
 // We expect that all Redux selectors take `state` as the first arg
 type ReduxSelectorFunction = ((state: UIState, ...any: any[]) => any) | ((state: UIState) => any);
 
+type SelectorsObjectWithoutActionCreators = {
+  [key in keyof SelectorsObject as SelectorsObject[key] extends RTKActionCreator
+    ? never
+    : key]: SelectorsObject[key];
+};
+
 // Do TS type transforms to extract "an object with just Redux selectors"
 type ObjectOfJustSelectorsHopefully = Pick<
-  SelectorsObject,
-  KeysAssignableToType<SelectorsObject, ReduxSelectorFunction>
+  SelectorsObjectWithoutActionCreators,
+  KeysAssignableToType<SelectorsObjectWithoutActionCreators, ReduxSelectorFunction>
 >;
-
-type SelectorWithoutStateArg<T extends ReduxSelectorFunction> = (
-  ...args: Tail<Parameters<T>>
-) => ReturnType<T>;
-
-// When we "bind" the selectors, we automatically pass in `state` as the first arg.
-// Create TS types that reflect that by removing the first arg from the type signature,
-// but still expect any other parameters.
-export type BoundSelectors = {
-  [key in keyof ObjectOfJustSelectorsHopefully]: SelectorWithoutStateArg<
-    ObjectOfJustSelectorsHopefully[key]
-  >;
-};
 
 export function bindSelectors(store: UIStore, selectors: Partial<ObjectOfJustSelectorsHopefully>) {
   // NOTE: While the object is named `selectors`, our use of `export * from someSlice`
@@ -411,14 +431,14 @@ export function bindSelectors(store: UIStore, selectors: Partial<ObjectOfJustSel
   // I've attempted to get TS to accept that this is valid.
   return Object.entries(selectors).reduce((bound, [key, originalSelector]) => {
     // @ts-expect-error
-    bound[key as keyof BoundSelectors] = (...args: any[]) =>
+    bound[key as keyof ObjectOfJustSelectorsHopefully] = (...args2: any[]) =>
       // @ts-expect-error
-      originalSelector(store.getState(), ...args);
+      originalSelector(store.getState(), ...args2);
     return bound;
-  }, {} as BoundSelectors);
+  }, {} as ObjectOfJustSelectorsHopefully);
 }
 
-export type UnknownFunction = (...args: any[]) => any;
+export type UnknownFunction = (...args3: any[]) => any;
 
 type KeysAssignableToType<O extends object, T> = {
   [K in keyof O]-?: O[K] extends T ? K : never;
@@ -428,13 +448,13 @@ export type Tail<A> = A extends [any, ...infer Rest] ? Rest : never;
 
 // Stolen from React-Redux. Cuts out the "returns a thunk function"
 // part of a thunk action creator to reflect how it works when dispatched.
-export type InferThunkActionCreatorType<TActionCreator extends (...args: any[]) => any> =
-  TActionCreator extends (...args: infer TParams) => (...args: any[]) => infer TReturn
-    ? (...args: TParams) => TReturn
+export type InferThunkActionCreatorType<TActionCreator extends (...args4: any[]) => any> =
+  TActionCreator extends (...args5: infer TParams) => (...args6: any[]) => infer TReturn
+    ? (...args7: TParams) => TReturn
     : TActionCreator;
 
 export type HandleThunkActionCreator<TActionCreator> = TActionCreator extends (
-  ...args: any[]
+  ...args8: any[]
 ) => any
   ? InferThunkActionCreatorType<TActionCreator>
   : TActionCreator;

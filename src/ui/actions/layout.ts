@@ -35,7 +35,8 @@ export type LayoutAction =
   | SetShowCommandPaletteAction
   | SetToolboxLayoutAction
   | SetViewModeAction
-  | DismissLocalNagAction;
+  | DismissLocalNagAction
+  | Action<"debuggerUI/sourcesDisplayed">;
 
 export function setShowCommandPalette(value: boolean): SetShowCommandPaletteAction {
   return { type: "set_show_command_palette", value };
