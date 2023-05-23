@@ -41,6 +41,11 @@ module.exports = {
       ...config.resolve.modules,
     ];
 
+    config.resolve.fallback = {
+      stream: false,
+      zlib: false,
+    };
+
     config.externals = [
       ...(config.externals || []),
       function ({ context, request }, callback) {
