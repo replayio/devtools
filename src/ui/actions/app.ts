@@ -182,7 +182,7 @@ export function fetchMouseTargetsForPause(): UIThunkAction<Promise<NodeBounds[] 
 }
 
 export function loadMouseTargets(): UIThunkAction<Promise<NodeBounds[] | undefined>> {
-  return async (dispatch) => {
+  return async dispatch => {
     dispatch(setMouseTargetsLoading(true));
     const boundingRects = await dispatch(fetchMouseTargetsForPause());
     dispatch(setMouseTargetsLoading(false));
