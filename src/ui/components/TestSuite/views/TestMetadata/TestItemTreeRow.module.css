@@ -3,7 +3,7 @@
   gap: 1ch;
   cursor: pointer;
   transition: opacity 0.18s ease-out;
-  overflow: hidden;
+  overflow-x: hidden;
   overflow-wrap: anywhere;
 }
 
