@@ -47,7 +47,7 @@ pref("devtools.features.chromiumRepaints", false);
 pref("devtools.features.brokenSourcemapWorkaround", true);
 pref("devtools.features.disableRecordingAssetsInDatabase", false);
 pref("devtools.features.keepAllTraces", false);
-pref("devtools.features.enableIncrementalSnapshots", false);
+pref("devtools.features.disableIncrementalSnapshots", false);
 pref("devtools.features.disableConcurrentControllerLoading", false);
 pref("devtools.features.showPassport", false);
 
@@ -92,7 +92,7 @@ export const features = new PrefsHelper("devtools.features", {
   brokenSourcemapWorkaround: ["Bool", "brokenSourcemapWorkaround"],
   disableRecordingAssetsInDatabase: ["Bool", "disableRecordingAssetsInDatabase"],
   keepAllTraces: ["Bool", "keepAllTraces"],
-  enableIncrementalSnapshots: ["Bool", "enableIncrementalSnapshots"],
+  disableIncrementalSnapshots: ["Bool", "disableIncrementalSnapshots"],
   disableConcurrentControllerLoading: ["Bool", "disableConcurrentControllerLoading"],
   showPassport: ["Bool", "showPassport"],
 });

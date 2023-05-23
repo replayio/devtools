@@ -207,7 +207,7 @@ export function createSocket(
         rerunRoutines: getFeature("rerunRoutines"),
         disableRecordingAssetsInDatabase: getFeature("disableRecordingAssetsInDatabase"),
         keepAllTraces: getFeature("keepAllTraces"),
-        enableIncrementalSnapshots: getFeature("enableIncrementalSnapshots"),
+        disableIncrementalSnapshots: getFeature("disableIncrementalSnapshots"),
         disableConcurrentControllerLoading: getFeature("disableConcurrentControllerLoading"),
       };
       if (features.newControllerOnRefresh) {

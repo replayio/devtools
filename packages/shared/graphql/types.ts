@@ -114,7 +114,7 @@ export type LocalExperimentalUserSettings = {
   consoleFilterDrawerDefaultsToOpen: boolean;
   disableStableQueryCache: boolean;
   enableColumnBreakpoints: boolean;
-  enableIncrementalSnapshots: boolean;
+  disableIncrementalSnapshots: boolean;
   enableUnstableQueryCache: boolean;
   enableRoutines: boolean;
   rerunRoutines: boolean;

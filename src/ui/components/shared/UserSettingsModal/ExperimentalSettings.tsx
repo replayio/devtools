@@ -87,9 +87,9 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "reactPanel",
   },
   {
-    label: "Enable Incremental Snapshots",
-    description: "Enable using diffs between snapshots",
-    key: "enableIncrementalSnapshots",
+    label: "Disable using incremental snapshots",
+    description: "Disable using diffs between snapshots",
+    key: "disableIncrementalSnapshots",
   },
   {
     label: "Disable Concurrent Controller Loading",
@@ -167,8 +167,8 @@ export default function ExperimentalSettings({}) {
     update: updateDisableRecordingAssetsInDatabase,
   } = useFeature("disableRecordingAssetsInDatabase");
 
-  const { value: enableIncrementalSnapshots, update: updateEnableIncrementalSnapshots } =
-    useFeature("enableIncrementalSnapshots");
+  const { value: disableIncrementalSnapshots, update: updateDisableIncrementalSnapshots } =
+    useFeature("disableIncrementalSnapshots");
 
   const {
     value: disableConcurrentControllerLoading,
@@ -200,8 +200,8 @@ export default function ExperimentalSettings({}) {
       updateDisableRecordingAssetsInDatabase(!disableRecordingAssetsInDatabase);
     } else if (key === "reactPanel") {
       updateReactPanel(!reactPanel);
-    } else if (key === "enableIncrementalSnapshots") {
-      updateEnableIncrementalSnapshots(!enableIncrementalSnapshots);
+    } else if (key === "disableIncrementalSnapshots") {
+      updateDisableIncrementalSnapshots(!disableIncrementalSnapshots);
     } else if (key === "disableConcurrentControllerLoading") {
       updateDisableConcurrentControllerLoading(!disableConcurrentControllerLoading);
     }
@@ -214,7 +214,7 @@ export default function ExperimentalSettings({}) {
     disableScanDataCache,
     disableStableQueryCache,
     enableColumnBreakpoints,
-    enableIncrementalSnapshots,
+    disableIncrementalSnapshots,
     enableUnstableQueryCache,
     enableRoutines,
     rerunRoutines,
