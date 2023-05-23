@@ -3,7 +3,10 @@
   gap: 1ch;
   cursor: pointer;
   transition: opacity 0.18s ease-out;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
+
 .Row[data-is-pending] {
   opacity: 0.5;
 }
