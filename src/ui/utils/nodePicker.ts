@@ -3,7 +3,9 @@ import { NodeBounds } from "@replayio/protocol";
 import { getDevicePixelRatio } from "protocol/graphics";
 
 export interface NodePickerOpts {
+  name: string;
   onHovering?: (nodeId: string | null) => void;
+  onClickOutsideCanvas?: () => void;
   onPicked: (nodeId: string | null) => void;
   onHighlightNode: (nodeId: string) => void;
   onUnhighlightNode: () => void;
@@ -23,6 +25,7 @@ export class NodePicker {
     if (this.canvas) {
       this.canvas.addEventListener("mousemove", this.onMouseMove);
       this.canvas.addEventListener("click", this.onMouseClick);
+      document.addEventListener("click", this.onDocumentClicked);
     }
   }
 
@@ -30,6 +33,8 @@ export class NodePicker {
     if (this.canvas) {
       this.canvas.removeEventListener("mousemove", this.onMouseMove);
       this.canvas.removeEventListener("click", this.onMouseClick);
+      document.removeEventListener("click", this.onDocumentClicked);
+      this.opts?.onUnhighlightNode();
     }
     this.opts = undefined;
     this.hoveredNodeId = undefined;
@@ -69,6 +74,18 @@ export class NodePicker {
       }
     }
     opts?.onPicked(nodeBounds ? nodeBounds.node : null);
+  };
+
+  private onDocumentClicked = (event: MouseEvent) => {
+    if (event.defaultPrevented) {
+      return;
+    }
+
+    if (this.canvas) {
+      if (!this.canvas.contains(event.target as Node)) {
+        this.opts?.onClickOutsideCanvas?.();
+      }
+    }
   };
 }
 
