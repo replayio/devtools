@@ -51,7 +51,10 @@ export function OnboardingContent({
   children: React.ReactChild | (React.ReactChild | null)[];
 }) {
   return (
-    <div className="relative flex flex-col items-center space-y-4 text-bodyColor">{children}</div>
+    <div className="relative flex flex-col items-center space-y-4 text-white">
+      <ReplayLogo size="md" />
+      {children}
+    </div>
   );
 }
 
@@ -60,7 +63,7 @@ export function OnboardingHeader({ children }: { children: string }) {
 }
 
 export function OnboardingBody({ children }: { children: string | ReactNode }) {
-  return <div className="mx-10 text-center">{children}</div>;
+  return <div className="mx-10 pb-6 text-center">{children}</div>;
 }
 
 export function OnboardingActions({

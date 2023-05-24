@@ -1,0 +1,29 @@
+.container {
+  pointer-events: none;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: black;
+  background-image: url("/images/stars-background.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  color: #fff;
+}
+
+.bottom {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 30%;
+}
+
+.pinkGrid {
+  background: black;
+  background-image: url("/images/pink-grid.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
+}
