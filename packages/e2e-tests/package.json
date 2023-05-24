@@ -23,7 +23,7 @@
     "@replayio/playwright": "^0.3.20",
     "cli-spinners": "^2.7.0",
     "cypress": "^12.5.1",
-    "log-update": "^4",
+    "log-update": "^5.0.1",
     "playwright": "^1.25.1",
     "ts-node": "^10.7.0",
     "yargs": "^17.6.0"
