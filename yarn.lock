@@ -5760,12 +5760,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/classnames@npm:^2.2.11":
-  version: 2.3.0
-  resolution: "@types/classnames@npm:2.3.0"
+"@types/classnames@npm:^2.3.1":
+  version: 2.3.1
+  resolution: "@types/classnames@npm:2.3.1"
   dependencies:
     classnames: "*"
-  checksum: e1bd6de60fc5e4ead601838078b10f378d6a66ad21112922856de59a1f450b1361f597aa3ca34f2cc33bc030f950112872fddfde43c5189bec89737a8b237f24
+  checksum: 09a17ea08fcb83380921efdfdac94cfa162f87025cae0bf6f4ba508c2fa5f436459ce7612905a3f968fdddb68c03b8e6ff08e762ed2d0c110c5c4fceb244dc55
   languageName: node
   linkType: hard
 
@@ -6094,10 +6094,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^18.16.14":
-  version: 18.16.14
-  resolution: "@types/node@npm:18.16.14"
-  checksum: c11cb3c787236414efe58240ae71854971592554d82ff9d201876ce7cafd51c37aaa001c63602d002e8238614d7331bd6d48ac4c1c0caa826799980b6846fb08
+"@types/node@npm:^20.2.3":
+  version: 20.2.3
+  resolution: "@types/node@npm:20.2.3"
+  checksum: 576065e8fc1fa45798c8f59a6bf809169582d04abc2e25fab1a048ffc734975b9992ae31be0d960cf705a21fb37112f7fcde11aa322beddf7491e73d5a5a988c
   languageName: node
   linkType: hard
 
@@ -20574,7 +20574,7 @@ __metadata:
     "@testing-library/react": ^14.0.0
     "@testing-library/user-event": ^14.4.3
     "@trunkio/launcher": ^1.0.5
-    "@types/classnames": ^2.2.11
+    "@types/classnames": ^2.3.1
     "@types/cookie": ^0.4.1
     "@types/d3-interpolate": ^3.0.1
     "@types/escape-html": ^1.0.1
@@ -20585,7 +20585,7 @@ __metadata:
     "@types/lodash": ^4.14.181
     "@types/logrocket-react": ^3.0.0
     "@types/mixpanel-browser": ^2.35.6
-    "@types/node": ^18.16.14
+    "@types/node": ^20.2.3
     "@types/react": ^18.0.12
     "@types/react-devtools-inline": ^4.24.3
     "@types/react-dom": ^18.0.5
