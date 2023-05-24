@@ -136,3 +136,5 @@ export async function waitFor(
     }
   }
 }
+
+export const getElementClasses = (loc: Locator) => loc.evaluate(el => Array.from(el.classList));

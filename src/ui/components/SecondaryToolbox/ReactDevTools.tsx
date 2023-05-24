@@ -1,5 +1,5 @@
 import { ExecutionPoint, NodeBounds, ObjectId, Object as ProtocolObject } from "@replayio/protocol";
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import { useEffect, useState } from "react";
 import type { SerializedElement, Store, Wall } from "react-devtools-inline/frontend";
 import { useImperativeCacheValue } from "suspense";
@@ -22,8 +22,9 @@ import { enterFocusMode } from "ui/actions/timeline";
 import {
   getCurrentPoint,
   getTheme,
-  setIsNodePickerActive,
-  setIsNodePickerInitializing,
+  nodePickerDisabled,
+  nodePickerInitializing,
+  nodePickerReady,
 } from "ui/reducers/app";
 import { getPreferredLocation } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -89,6 +90,11 @@ class ReplayWall implements Wall {
   // send an annotation from the backend in the recording to the frontend
   sendAnnotation(message: ParsedReactDevToolsAnnotation["contents"]) {
     this._listener?.(message);
+  }
+
+  internalDisablePicker() {
+    this.disablePicker();
+    this._listener?.({ event: "stopInspectingNative", payload: true });
   }
 
   // called by the frontend to send a request to the backend
@@ -164,14 +170,14 @@ class ReplayWall implements Wall {
           const boundingRects = await this.fetchMouseTargetsForPause();
 
           if (!boundingRects?.length) {
-            this.disablePicker();
-            this._listener?.({ event: "stopInspectingNative", payload: true });
+            this.internalDisablePicker();
             break;
           }
 
           const nodeToElementId = await this.mapNodesToElements();
 
           this.enablePicker({
+            name: "reactComponent",
             onHovering: nodeId => {
               const elementId = nodeId && nodeToElementId.get(nodeId);
               elementId && this._listener?.({ event: "selectFiber", payload: elementId });
@@ -181,6 +187,11 @@ class ReplayWall implements Wall {
             },
             onHighlightNode: this.highlightNode,
             onUnhighlightNode: this.unhighlightNode,
+            onClickOutsideCanvas: () => {
+              // Need to both cancel the Redux logic _and_
+              // tell the RDT component to stop inspecting
+              this.internalDisablePicker();
+            },
             enabledNodeIds: [...nodeToElementId.keys()],
           });
 
@@ -456,43 +467,61 @@ export default function ReactDevtoolsPanel() {
       );
     }
   });
+
+  const {
+    dispatchHighlightNode,
+    dispatchUnhighlightNode,
+    dispatchFetchMouseTargets,
+    initializePicker,
+    enablePicker,
+    disablePicker,
+  } = useMemo(() => {
+    function dispatchHighlightNode(nodeId: string) {
+      dispatch(highlightNode(nodeId));
+    }
+
+    function dispatchUnhighlightNode() {
+      dispatch(unhighlightNode());
+    }
+
+    function dispatchFetchMouseTargets() {
+      return dispatch(fetchMouseTargetsForPause());
+    }
+
+    function enablePicker(opts: NodeOptsWithoutBounds) {
+      dispatch(nodePickerReady("reactComponent"));
+
+      const actualOpts: NodePickerOpts = {
+        ...opts,
+        onCheckNodeBounds: async (x, y, nodeIds) => {
+          const boundingRects = await dispatchFetchMouseTargets();
+          return getMouseTarget(boundingRects ?? [], x, y, nodeIds);
+        },
+      };
+      nodePickerInstance.enable(actualOpts);
+    }
+
+    function initializePicker() {
+      dispatch(nodePickerInitializing("reactComponent"));
+    }
+
+    function disablePicker() {
+      nodePickerInstance.disable();
+      dispatch(nodePickerDisabled());
+    }
+
+    return {
+      dispatchHighlightNode,
+      dispatchUnhighlightNode,
+      dispatchFetchMouseTargets,
+      initializePicker,
+      enablePicker,
+      disablePicker,
+    };
+  }, [dispatch]);
+
   if (currentPoint === null) {
     return null;
-  }
-
-  function enablePicker(opts: NodeOptsWithoutBounds) {
-    dispatch(setIsNodePickerActive(true));
-    dispatch(setIsNodePickerInitializing(false));
-
-    const actualOpts: NodePickerOpts = {
-      ...opts,
-      onCheckNodeBounds: async (x, y, nodeIds) => {
-        const boundingRects = await dispatchFetchMouseTargets();
-        return getMouseTarget(boundingRects ?? [], x, y, nodeIds);
-      },
-    };
-    nodePickerInstance.enable(actualOpts);
-  }
-  function initializePicker() {
-    dispatch(setIsNodePickerActive(false));
-    dispatch(setIsNodePickerInitializing(true));
-  }
-  function disablePicker() {
-    nodePickerInstance.disable();
-    dispatch(setIsNodePickerActive(false));
-    dispatch(setIsNodePickerInitializing(false));
-  }
-
-  function dispatchHighlightNode(nodeId: string) {
-    dispatch(highlightNode(nodeId));
-  }
-
-  function dispatchUnhighlightNode() {
-    dispatch(unhighlightNode());
-  }
-
-  function dispatchFetchMouseTargets() {
-    return dispatch(fetchMouseTargetsForPause());
   }
 
   if (!isPointInRegions(currentPoint, loadedRegions?.loaded ?? [])) {

@@ -15,6 +15,7 @@ import {
   LoadedRegions,
   ModalOptionsType,
   ModalType,
+  NodePickerType,
   ReplayEvent,
   SettingsTabTitle,
   UnexpectedError,
@@ -33,8 +34,8 @@ export const initialAppState: AppState = {
   displayedLoadingProgress: null,
   events: {},
   expectedError: null,
-  isNodePickerActive: false,
-  isNodePickerInitializing: false,
+  activeNodePicker: null,
+  nodePickerStatus: "disabled",
   loadedRegions: null,
   loading: 4,
   loadingFinished: false,
@@ -131,11 +132,18 @@ const appSlice = createSlice({
       // Load multiple event types into state at once
       Object.assign(state.events, action.payload);
     },
-    setIsNodePickerActive(state, action: PayloadAction<boolean>) {
-      state.isNodePickerActive = action.payload;
+    nodePickerInitializing(state, action: PayloadAction<NodePickerType>) {
+      state.activeNodePicker = action.payload;
+      state.nodePickerStatus = "initializing";
     },
-    setIsNodePickerInitializing(state, action: PayloadAction<boolean>) {
-      state.isNodePickerInitializing = action.payload;
+    nodePickerReady(state, action: PayloadAction<NodePickerType>) {
+      if (state.activeNodePicker === action.payload && state.nodePickerStatus === "initializing") {
+        state.nodePickerStatus = "active";
+      }
+    },
+    nodePickerDisabled(state) {
+      state.activeNodePicker = null;
+      state.nodePickerStatus = "disabled";
     },
     setCanvas(state, action: PayloadAction<Canvas>) {
       state.canvas = action.payload;
@@ -171,8 +179,9 @@ export const {
   setDisplayedLoadingProgress,
   loadReceivedEvents,
   setExpectedError,
-  setIsNodePickerActive,
-  setIsNodePickerInitializing,
+  nodePickerDisabled,
+  nodePickerInitializing,
+  nodePickerReady,
   setLoadedRegions,
   setLoadingFinished,
   setLoadingStatusSlow,
@@ -309,8 +318,9 @@ export const getFilteredEventsForFocusRegion = createSelector(
   }
 );
 
-export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;
-export const getIsNodePickerInitializing = (state: UIState) => state.app.isNodePickerInitializing;
+export const getIsNodePickerActive = (state: UIState) => state.app.nodePickerStatus === "active";
+export const getIsNodePickerInitializing = (state: UIState) =>
+  state.app.nodePickerStatus === "initializing";
 export const getCanvas = (state: UIState) => state.app.canvas;
 export const getVideoUrl = (state: UIState) => state.app.videoUrl;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
