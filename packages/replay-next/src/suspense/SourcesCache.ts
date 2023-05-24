@@ -51,10 +51,28 @@ export const sourcesCache: Cache<[client: ReplayClientInterface], Source[]> =
   });
 
 // sources with the same key will be grouped as corresponding sources
-const keyForSource = (source: ProtocolSource) => `${source.kind}:${source.url}:${source.contentId}`;
+const keyForSource = (source: ProtocolSource, sources: Map<ProtocolSourceId, ProtocolSource>) => {
+  const { sourceId, kind, url, generatedSourceIds } = source;
+
+  let contentHash = source.contentHash;
+  if (kind === "prettyPrinted") {
+    assert(
+      generatedSourceIds?.length === 1,
+      `pretty-printed source ${sourceId} should have exactly one generated source`
+    );
+    const minifiedSource = sources.get(generatedSourceIds[0]);
+    assert(minifiedSource, `couldn't find minified source for ${sourceId}`);
+    contentHash = minifiedSource.contentHash;
+  }
+  assert(contentHash, `couldn't determine contentHash for ${sourceId}`);
+
+  return `${kind}:${url}:${contentHash}`;
+};
 
 function processSources(protocolSources: ProtocolSource[]): Source[] {
-  const protocolSourcesById = new Map<ProtocolSourceId, ProtocolSource>();
+  const protocolSourcesById = new Map<ProtocolSourceId, ProtocolSource>(
+    protocolSources.map(source => [source.sourceId, source])
+  );
   const corresponding = new ArrayMap<string, ProtocolSourceId>();
   // the newSource objects link original to generated sources, here we collect the links in the other direction
   const original = new ArrayMap<ProtocolSourceId, ProtocolSourceId>();
@@ -66,9 +84,8 @@ function processSources(protocolSources: ProtocolSource[]): Source[] {
 
   protocolSources.forEach(source => {
     const { contentId, generatedSourceIds, kind, sourceId, url } = source;
-    const key = keyForSource(source);
+    const key = keyForSource(source, protocolSourcesById);
 
-    protocolSourcesById.set(sourceId, source);
     corresponding.add(key, sourceId);
 
     for (const generatedSourceId of generatedSourceIds || []) {
@@ -100,7 +117,7 @@ function processSources(protocolSources: ProtocolSource[]): Source[] {
 
   return protocolSources.map(source => {
     const { contentId, generatedSourceIds, kind, sourceId, url } = source;
-    const key = keyForSource(source);
+    const key = keyForSource(source, protocolSourcesById);
 
     let contentIdIndex = 0;
     let doesContentIdChange = false;
