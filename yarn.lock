@@ -6174,12 +6174,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.0.5":
+"@types/react-dom@npm:^18.0.0":
   version: 18.0.5
   resolution: "@types/react-dom@npm:18.0.5"
   dependencies:
     "@types/react": "*"
   checksum: cd48b81950f499b52a3f0c08261f00046f9b7c96699fa249c9664e257e820daf6ecac815cd1028cebc9d105094adc39d047d1efd79214394b8b2d515574c0787
+  languageName: node
+  linkType: hard
+
+"@types/react-dom@npm:^18.2.4":
+  version: 18.2.4
+  resolution: "@types/react-dom@npm:18.2.4"
+  dependencies:
+    "@types/react": "*"
+  checksum: 8301f35cf1cbfec8c723e9477aecf87774e3c168bd457d353b23c45064737213d3e8008b067c6767b7b08e4f2b3823ee239242a6c225fc91e7f8725ef8734124
   languageName: node
   linkType: hard
 
@@ -6201,7 +6210,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-router-dom@npm:^5.1.7":
+"@types/react-router-dom@npm:^5.3.3":
   version: 5.3.3
   resolution: "@types/react-router-dom@npm:5.3.3"
   dependencies:
@@ -20588,9 +20597,9 @@ __metadata:
     "@types/node": ^20.2.3
     "@types/react": ^18.0.12
     "@types/react-devtools-inline": ^4.24.3
-    "@types/react-dom": ^18.0.5
+    "@types/react-dom": ^18.2.4
     "@types/react-lazyload": ^3.2.0
-    "@types/react-router-dom": ^5.1.7
+    "@types/react-router-dom": ^5.3.3
     "@types/react-table": ^7.7.10
     "@types/react-transition-group": ^4.4.5
     "@types/react-virtualized-auto-sizer": ^1.0.1
