@@ -33,7 +33,7 @@ export function OnboardingContentWrapper({
     <div
       className={classNames(
         "relative m-4 flex flex-col items-center rounded-xl bg-loadingBoxes p-9 text-xl text-bodyColor shadow-md",
-        overlay ? "max-w-sm space-y-8" : "max-w-2xl space-y-12",
+        overlay ? "max-w-sm space-y-8" : "max-w-2xl space-y-6",
         {
           "rounded-lg bg-opacity-80": overlay,
         }
