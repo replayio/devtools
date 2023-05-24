@@ -6,7 +6,7 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import styles from "../../../../Library.module.css";
 
-function ViewReplay({ passed, recordingId }: { passed: boolean; recordingId: RecordingId }) {
+function ViewReplay({ label, recordingId }: { label: string; recordingId: RecordingId }) {
   return (
     <Link
       href={`/recording/${recordingId}`}
@@ -17,12 +17,14 @@ function ViewReplay({ passed, recordingId }: { passed: boolean; recordingId: Rec
         iconSize="2xl"
         outlined
         className={
-          passed
+          label == "Passed"
             ? "text-[#219653] group-hover:text-[green-500]"
+            : label == "Flaky"
+            ? "text-[#FDBA00] group-hover:text-[yellow-500]"
             : "text-[#EB5757] group-hover:text-red-500"
         }
       >
-        {passed ? "play_circle" : "play_circle_filled"}
+        {["passed", "flaky"].includes(label) ? "play_circle" : "play_circle_filled"}
       </MaterialIcon>
     </Link>
   );
@@ -57,7 +59,7 @@ function Comments({ recording }: { recording: Recording }) {
   );
 }
 
-export function TestResultListItem({ recording }: { recording: Recording }) {
+export function TestResultListItem({ label, recording }: { label: string; recording: Recording }) {
   const { metadata } = recording;
   const passed = metadata?.test?.result === "passed";
   const recordingId = recording.id;
@@ -72,7 +74,7 @@ export function TestResultListItem({ recording }: { recording: Recording }) {
         target="_blank"
         rel="noopener noreferrer"
       >
-        <ViewReplay passed={passed} recordingId={recordingId} />
+        <ViewReplay label={label} recordingId={recordingId} />
         <Title recording={recording} />
       </Link>
       <Comments recording={recording} />
