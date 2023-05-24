@@ -72,7 +72,7 @@ const Tour: React.FC = () => {
         <>
           <p>Replay is the first time-travel enabled DevTools. Let's get started!</p>
           <p>
-            <em>Click on DevTools in the top right.</em>
+            <div className={styles.stepCallout}>Click on DevTools in the top right.</div>
           </p>
         </>
       ) : null}
@@ -91,10 +91,9 @@ const Tour: React.FC = () => {
       <div className={styles.h1}>Time travel 🚀</div>
       <p>In DevTools, look underneath the video to find the Replay console.</p>
       <p>
-        Hover over the console and you’ll see fast-forward and rewind buttons appear on the left.
-      </p>
-      <p>
-        <em>Click on one to time travel!</em>
+        <div className={styles.stepCallout}>
+          Hover in the console and click a button to time travel!
+        </div>
       </p>
     </div>
   );
@@ -118,7 +117,9 @@ const Tour: React.FC = () => {
         command-P or clicking Sources Explorer from the left-nav)
       </p>
       <p>
-        <em>Click the plus button on a line of code to set a print statement.</em>
+        <div className={styles.stepCallout}>
+          Click the plus button on a line of code to set a print statement.
+        </div>
       </p>
     </div>
   );
@@ -132,7 +133,9 @@ const Tour: React.FC = () => {
       <div className={styles.h1}>Pass anything! 🦄</div>
       <p>You can pass anything you want into print statements, including objects and variables.</p>
       <p>
-        <em>Type something, then hit enter or click the check button.</em>
+        <div className={styles.stepCallout}>
+          Type something, then hit enter or click the check button.
+        </div>
       </p>
     </div>
   );
@@ -148,7 +151,7 @@ const Tour: React.FC = () => {
 
     return (
       <div className={styles.intro}>
-        <div className={styles.h1}>😎</div>
+        <div className={styles.h1}>All done 😎</div>
         <p>Take a look at the console.</p>
         <p>
           Replay just re-ran your recording and retroactively added your print statement each time
