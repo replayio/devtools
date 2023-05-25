@@ -7,7 +7,18 @@ import styles from "./ToggleButton.module.css";
 
 export default function ToggleButton() {
   const testStep = useAppSelector(getSelectedTestStep);
-  if (testStep === null) {
+
+  // Definitely don't show the toggle button for network or navigation steps,
+  // as we know these have a 0 duration.
+  if (testStep === null || testStep.type === "network" || testStep.type === "navigation") {
+    return null;
+  }
+
+  // Now that we're confident in the data TS type, double-check in case any
+  // other test step somehow has a 0 duration
+  const { duration = 0 } = testStep.data;
+
+  if (duration === 0) {
     return null;
   }
 
