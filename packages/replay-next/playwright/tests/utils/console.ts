@@ -1,5 +1,6 @@
 import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
+import { Status } from "suspense";
 
 import { debugPrint, delay, getCommandKey, getElementCount, waitFor } from "./general";
 import { Expected, MessageType } from "./types";
@@ -18,6 +19,9 @@ export async function addTerminalExpression(page: Page, text: string): Promise<v
 }
 
 export async function filterByText(page: Page, text: string) {
+  // Wait for Console messages to finish loading before proceeding
+  await waitForMessageStatus(page);
+
   await page.fill("[data-test-id=ConsoleFilterInput]", text);
 
   // Wait for Console to apply new filter text
@@ -146,6 +150,9 @@ export function messageLocator(
 }
 
 export async function searchByText(page: Page, text: string) {
+  // Wait for Console messages to finish loading before proceeding
+  await waitForMessageStatus(page);
+
   await page.fill("[data-test-id=ConsoleSearchInput]", text);
 
   // Wait for Console to apply new filter text
@@ -296,4 +303,12 @@ export async function verifyTypeAheadContainsSuggestions(page: Page, ...suggesti
       return expect(allTextContents).toContain(suggestion);
     });
   }
+}
+
+export async function waitForMessageStatus(page: Page, status: Status = "resolved") {
+  await waitFor(async () => {
+    const messageList = page.locator('[data-test-name="Messages"]');
+    const value = await messageList.getAttribute(`data-test-state-cacheStreamingStatus`);
+    expect(value).toBe(status);
+  });
 }
