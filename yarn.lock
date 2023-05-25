@@ -13030,6 +13030,7 @@ __metadata:
     cypress: ^12.5.1
     log-update: ^4
     playwright: ^1.25.1
+    strip-ansi: ^6.0.0
     ts-node: ^10.7.0
     yargs: ^17.6.0
   languageName: unknown
