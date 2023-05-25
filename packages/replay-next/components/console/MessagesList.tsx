@@ -5,7 +5,6 @@ import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersCo
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { useStreamingMessages } from "replay-next/src/hooks/useStreamingMessages";
-import { streamingMessagesCache } from "replay-next/src/suspense/MessagesCache";
 import {
   getLoggableExecutionPoint,
   isEventLog,
@@ -57,11 +56,9 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
     showWarnings,
   } = useContext(ConsoleFiltersContext);
   const { isTransitionPending: isFocusTransitionPending } = useContext(FocusContext);
-  const loggables = useContext(LoggablesContext);
+  const { loggables, streamingStatus } = useContext(LoggablesContext);
   const [searchState] = useContext(ConsoleSearchContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
-
-  const stream = useStreamingMessages();
 
   // The Console should render a line indicating the current execution point.
   // This point might match multiple logs– or it might be between logs, or after the last log, etc.
@@ -202,7 +199,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
         data-test-state-logs={showLogs ? true : undefined}
         data-test-state-nodeModules={showNodeModules ? true : undefined}
         data-test-state-searchByText={searchState.query}
-        data-test-state-cacheStreamingStatus={stream.status}
+        data-test-state-cacheStreamingStatus={streamingStatus}
         data-test-state-timestamps={showTimestamps ? true : undefined}
         data-test-state-warnings={showWarnings ? true : undefined}
         data-test-name="Messages"
