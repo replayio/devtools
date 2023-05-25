@@ -8,7 +8,8 @@ import { TeamContext } from "../../TeamContextRoot";
 
 type TestRunsContextType = {
   focusId: string;
-  testRuns: TestRun[] | null;
+  loading: boolean;
+  testRuns: TestRun[];
 };
 
 export const TestRunsContext = createContext<TestRunsContextType>(null as any);
@@ -17,7 +18,7 @@ export function TestRunsContainer({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { focusId } = useGetTeamRouteParams();
   const { teamId } = useContext(TeamContext);
-  const { testRuns } = useGetTestRunsForWorkspace(teamId);
+  const { loading, testRuns } = useGetTestRunsForWorkspace(teamId);
 
   // Initialize the focused test run to the first/most recent test run in the list
   useEffect(() => {
@@ -27,6 +28,8 @@ export function TestRunsContainer({ children }: { children: ReactNode }) {
   }, [router, testRuns, focusId, teamId]);
 
   return (
-    <TestRunsContext.Provider value={{ focusId, testRuns }}>{children}</TestRunsContext.Provider>
+    <TestRunsContext.Provider value={{ focusId, loading, testRuns }}>
+      {children}
+    </TestRunsContext.Provider>
   );
 }

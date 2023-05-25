@@ -1,5 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import orderBy from "lodash/orderBy";
+import { useMemo } from "react";
 
 import { assert } from "protocol/utils";
 import {
@@ -212,9 +213,10 @@ function convertTest(test: GetTest_node_Workspace_tests | undefined) {
 }
 
 export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
-  testRuns: TestRun[] | null;
+  testRuns: TestRun[];
   loading: boolean;
 } {
+  // TODO [FE-1530] Pagination test runs from GraphQL
   const { data, loading } = useQuery<GetTestsRunsForWorkspace, GetTestsRunsForWorkspaceVariables>(
     GET_TEST_RUNS_FOR_WORKSPACE,
     {
@@ -222,18 +224,20 @@ export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
     }
   );
 
-  if (loading || !data?.node) {
-    return { testRuns: null, loading };
-  }
-  assert("testRuns" in data.node, "No testRuns in GetTestsRun response");
+  return useMemo(() => {
+    if (loading || !data?.node) {
+      return { testRuns: [], loading };
+    }
+    assert("testRuns" in data.node, "No testRuns in GetTestsRun response");
 
-  const testRuns = data.node.testRuns?.map(testRun => convertTestRun(testRun)!);
-  const sortedTestRuns = orderBy(testRuns, "date", "desc");
+    const testRuns = data.node.testRuns?.map(testRun => convertTestRun(testRun)!);
+    const sortedTestRuns = orderBy(testRuns, "date", "desc");
 
-  return {
-    testRuns: sortedTestRuns,
-    loading,
-  };
+    return {
+      testRuns: sortedTestRuns,
+      loading,
+    };
+  }, [data, loading]);
 }
 
 function convertTestRun(
