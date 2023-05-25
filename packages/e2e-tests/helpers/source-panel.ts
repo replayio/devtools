@@ -3,7 +3,7 @@ import chalk from "chalk";
 
 import { Badge } from "shared/client/types";
 
-import { type as typeLexical } from "./lexical";
+import { hideTypeAheadSuggestions, type as typeLexical } from "./lexical";
 import { findPoints, openPauseInformationPanel, removePoint } from "./pause-information-panel";
 import { openSource, openSourceExplorerPanel } from "./source-explorer-panel";
 import { clearTextArea, debugPrint, delay, getCommandKey, mapLocators, waitFor } from "./utils";
@@ -283,6 +283,10 @@ export async function editLogPoint(
     await editConditional(page, { condition, lineNumber });
   }
 
+  const selector = `${getSourceLineSelector(
+    lineNumber
+  )} [data-test-name="PointPanel-ContentInput"]`;
+
   if (content != null) {
     const isEditing = await line
       .locator('[data-test-name="PointPanel-ContentWrapper"] [data-lexical-editor="true"]')
@@ -293,15 +297,14 @@ export async function editLogPoint(
 
     await debugPrint(page, `Setting log-point content "${chalk.bold(content)}"`, "addLogpoint");
 
-    await typeLexical(
-      page,
-      `${getSourceLineSelector(lineNumber)} [data-test-name="PointPanel-ContentInput"]`,
-      content,
-      false
-    );
+    await typeLexical(page, selector, content, false);
   }
 
   if (saveAfterEdit) {
+    // The typeahead popup sometimes sticks around and overlaps the save button.
+    // Ensure it goes away.
+    await hideTypeAheadSuggestions(page, selector);
+
     const saveButton = line.locator('[data-test-name="PointPanel-SaveButton"]');
     await expect(saveButton).toBeEnabled();
     await saveButton.click();

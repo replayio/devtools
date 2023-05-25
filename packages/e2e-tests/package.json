@@ -29,6 +29,7 @@
     "yargs": "^17.6.0"
   },
   "dependencies": {
-    "chalk": "^4"
+    "chalk": "^4",
+    "strip-ansi": "^6.0.0"
   }
 }
