@@ -54,12 +54,16 @@ function JumpToSourceMenuItem({
   testMetadata: ProcessedTestMetadata;
   testStep: ProcessedTestStep;
 }) {
-  const { disabled, onClick } = useJumpToSource({ testMetadata, testStep });
+  const { disabled, onClick } = useJumpToSource({
+    testMetadata,
+    testStep,
+    openSourceAutomatically: true,
+  });
 
   return (
     <ContextMenuItem disabled={disabled} onSelect={onClick}>
       <MaterialIcon>code</MaterialIcon>
-      Jump to source
+      Jump to test source
     </ContextMenuItem>
   );
 }

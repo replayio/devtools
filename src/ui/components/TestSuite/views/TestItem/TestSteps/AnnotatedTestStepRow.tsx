@@ -14,6 +14,7 @@ import { useJumpToSource } from "ui/components/TestSuite/hooks/useJumpToSource";
 import { getConsolePropsCountSuspense } from "ui/components/TestSuite/suspense/consoleProps";
 import { AnnotatedTestStep, ProcessedTestMetadata } from "ui/components/TestSuite/types";
 import { Position } from "ui/components/TestSuite/views/TestItem/types";
+import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ParsedJumpToCodeAnnotation } from "ui/suspense/annotationsCaches";
 import { eventListenersJumpLocationsCache } from "ui/suspense/annotationsCaches";
@@ -77,6 +78,7 @@ export default memo(function AnnotatedTestStepRow({
 
   const dispatch = useAppDispatch();
   const executionPoint = useAppSelector(getExecutionPoint);
+  const viewMode = useAppSelector(getViewMode);
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
     eventListenersJumpLocationsCache
   );
@@ -93,6 +95,7 @@ export default memo(function AnnotatedTestStepRow({
   const { disabled: jumpToTestSourceDisabled, onClick: onClickJumpToTestSource } = useJumpToSource({
     testMetadata,
     testStep,
+    openSourceAutomatically: viewMode === "dev",
   });
 
   const jumpToCodeAnnotations: ParsedJumpToCodeAnnotation[] =
