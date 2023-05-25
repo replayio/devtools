@@ -84,7 +84,7 @@ function AppModal({ hideModal, modal }: { hideModal: () => void; modal: ModalTyp
       return <LaunchBrowserModal />;
     }
     case "first-replay": {
-      return <OnboardingModal />;
+      return <FirstReplayModal />;
     }
     case "download-replay": {
       return <DownloadReplayPromptModal />;
