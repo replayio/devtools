@@ -57,7 +57,7 @@ function Status({ failCount }: { failCount: number }) {
   );
 }
 
-export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClick: () => void }) {
+export function TestRunListItem({ testRun }: { testRun: TestRun }) {
   const { focusId } = useContext(TestRunsContext);
   const { teamId } = useContext(TeamContext);
   const failCount = testRun.stats?.failed || 0;
@@ -71,7 +71,6 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
       }     
       ${isSelected ? styles.libraryRowSelected : ""}
       `}
-      onClick={onClick}
     >
       <Status failCount={failCount} />
       <div className="flex flex-grow flex-col space-y-1 overflow-hidden">
