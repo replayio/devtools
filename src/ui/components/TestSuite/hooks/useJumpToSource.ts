@@ -16,9 +16,11 @@ import { AwaitTimeout, awaitWithTimeout } from "ui/utils/awaitWithTimeout";
 export function useJumpToSource({
   testMetadata,
   testStep,
+  openSourceAutomatically = false,
 }: {
   testMetadata: ProcessedTestMetadata;
   testStep: ProcessedTestStep;
+  openSourceAutomatically: boolean;
 }) {
   const replayClient = useContext(ReplayClientContext);
 
@@ -42,7 +44,9 @@ export function useJumpToSource({
   }
 
   const onClick = async () => {
-    dispatch(setViewMode("dev"));
+    if (openSourceAutomatically) {
+      dispatch(setViewMode("dev"));
+    }
 
     if (testMetadata && testStep.type === "step") {
       const locationPromise = TestStepSourceLocationCache.readAsync(
@@ -65,7 +69,7 @@ export function useJumpToSource({
       }
 
       if (location) {
-        dispatch(selectLocation(context, location));
+        dispatch(selectLocation(context, location, openSourceAutomatically));
       }
 
       if (testStep.metadata.range.beginPoint && testStep.metadata.range.beginTime) {

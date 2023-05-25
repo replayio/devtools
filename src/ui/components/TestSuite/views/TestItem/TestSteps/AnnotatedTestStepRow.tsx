@@ -6,6 +6,7 @@ import Loader from "replay-next/components/Loader";
 import useSuspendAfterMount from "replay-next/src/hooks/useSuspendAfterMount";
 import { isExecutionPointsWithinRange } from "replay-next/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { Annotations } from "shared/graphql/types";
 import { jumpToKnownEventListenerHit } from "ui/actions/eventListeners/jumpToCode";
 import { seek } from "ui/actions/timeline";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
@@ -13,6 +14,7 @@ import { useJumpToSource } from "ui/components/TestSuite/hooks/useJumpToSource";
 import { getConsolePropsCountSuspense } from "ui/components/TestSuite/suspense/consoleProps";
 import { AnnotatedTestStep, ProcessedTestMetadata } from "ui/components/TestSuite/types";
 import { Position } from "ui/components/TestSuite/views/TestItem/types";
+import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ParsedJumpToCodeAnnotation } from "ui/suspense/annotationsCaches";
 import { eventListenersJumpLocationsCache } from "ui/suspense/annotationsCaches";
@@ -25,6 +27,43 @@ const cypressStepTypesToEventTypes = {
   click: "mousedown",
   type: "keypress",
 } as const;
+
+function findJumpToCodeDetailsIfAvailable(
+  testMetadata: ProcessedTestMetadata,
+  testStep: AnnotatedTestStep,
+  testStepAnnotations: Annotations,
+  jumpToCodeAnnotations: ParsedJumpToCodeAnnotation[]
+) {
+  let canShowJumpToCode = false;
+  let jumpToCodeAnnotation: ParsedJumpToCodeAnnotation | undefined = undefined;
+
+  if (testMetadata.runner?.name === "cypress" && "category" in testStep.data) {
+    // TODO This is very Cypress-specific. Playwright steps have a `name` like `locator.click("blah")`.
+    // We only care about click events and keyboard events. Keyboard events appear to be a "type" command,
+    // as in "type this text into the input".
+    canShowJumpToCode =
+      "category" in testStep.data &&
+      testStep.data.category === "command" &&
+      (testStep.data.name === "click" || testStep.data.name === "type");
+
+    if (canShowJumpToCode) {
+      const eventKind =
+        cypressStepTypesToEventTypes[
+          testStep.data.name as keyof typeof cypressStepTypesToEventTypes
+        ];
+
+      const { start, end } = testStepAnnotations;
+
+      if (eventKind && start && end) {
+        jumpToCodeAnnotation = jumpToCodeAnnotations.find(a =>
+          isExecutionPointsWithinRange(a.point, start.point, end.point)
+        );
+      }
+    }
+  }
+
+  return [canShowJumpToCode, jumpToCodeAnnotation] as const;
+}
 
 export default memo(function AnnotatedTestStepRow({
   position,
@@ -39,6 +78,7 @@ export default memo(function AnnotatedTestStepRow({
 
   const dispatch = useAppDispatch();
   const executionPoint = useAppSelector(getExecutionPoint);
+  const viewMode = useAppSelector(getViewMode);
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
     eventListenersJumpLocationsCache
   );
@@ -55,52 +95,20 @@ export default memo(function AnnotatedTestStepRow({
   const { disabled: jumpToTestSourceDisabled, onClick: onClickJumpToTestSource } = useJumpToSource({
     testMetadata,
     testStep,
+    openSourceAutomatically: viewMode === "dev",
   });
 
   const jumpToCodeAnnotations: ParsedJumpToCodeAnnotation[] =
     annotationsStatus === "resolved" ? parsedAnnotations : NO_ANNOTATIONS;
 
-  const jumpToCodeEntriesPerEvent = useMemo(() => {
-    const jumpToCodeEntriesByPoint: Record<string, ParsedJumpToCodeAnnotation> = {};
-
-    for (const jumpToCodeAnnotation of jumpToCodeAnnotations) {
-      jumpToCodeEntriesByPoint[jumpToCodeAnnotation.point] = jumpToCodeAnnotation;
-    }
-
-    return jumpToCodeEntriesByPoint;
-  }, [jumpToCodeAnnotations]);
-
   const [canShowJumpToCode, jumpToCodeAnnotation] = useMemo(() => {
-    let canShowJumpToCode = false;
-    let jumpToCodeAnnotation: ParsedJumpToCodeAnnotation | undefined = undefined;
-
-    if ("category" in testStep.data) {
-      // TODO This is very Cypress-specific. Playwright steps have a `name` like `locator.click("blah")`.
-      // We only care about click events and keyboard events. Keyboard events appear to be a "type" command,
-      // as in "type this text into the input".
-      canShowJumpToCode =
-        "category" in testStep.data &&
-        testStep.data.category === "command" &&
-        (testStep.data.name === "click" || testStep.data.name === "type");
-
-      if (canShowJumpToCode) {
-        const eventKind =
-          cypressStepTypesToEventTypes[
-            testStep.data.name as keyof typeof cypressStepTypesToEventTypes
-          ];
-
-        const { start, end } = annotations;
-
-        if (eventKind && start && end) {
-          jumpToCodeAnnotation = jumpToCodeAnnotations.find(a =>
-            isExecutionPointsWithinRange(a.point, start.point, end.point)
-          );
-        }
-      }
-    }
-
-    return [canShowJumpToCode, jumpToCodeAnnotation] as const;
-  }, [jumpToCodeAnnotations, testStep.data, annotations]);
+    return findJumpToCodeDetailsIfAvailable(
+      testMetadata,
+      testStep,
+      annotations,
+      jumpToCodeAnnotations
+    );
+  }, [jumpToCodeAnnotations, testStep, annotations, testMetadata]);
 
   const onJumpToClickEvent = async () => {
     const onSeek = (point: string, time: number) => dispatch(seek(point, time, true));
