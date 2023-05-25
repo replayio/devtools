@@ -7,6 +7,7 @@ import {
   useLayoutEffect,
   useMemo,
 } from "react";
+import { Status } from "suspense";
 
 import { ConsoleFiltersContext } from "replay-next/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
@@ -39,7 +40,10 @@ export type Loggable =
   | TerminalExpression
   | UncaughtException;
 
-export const LoggablesContext = createContext<Loggable[]>(null as any);
+export const LoggablesContext = createContext<{
+  loggables: Loggable[];
+  streamingStatus: Status;
+}>(null as any);
 
 // A "loggable" is anything that can be logged to the Console:
 // * Messages logged to the Console API (e.g. console.log) while a recording is in progress.
@@ -56,7 +60,7 @@ export function LoggablesContextRoot({
   children: ReactNode;
   messageListRef: MutableRefObject<HTMLElement | null>;
 }) {
-  const { messages } = useStreamingMessages();
+  const { messages, status } = useStreamingMessages();
 
   const protocolMessages = useMemo<ProtocolMessage[]>(
     () =>
@@ -72,6 +76,7 @@ export function LoggablesContextRoot({
       children={children}
       messageListRef={messageListRef}
       messages={protocolMessages}
+      streamingStatus={status}
     />
   );
 }
@@ -80,10 +85,12 @@ function LoggablesContextInner({
   children,
   messageListRef,
   messages,
+  streamingStatus,
 }: {
   children: ReactNode;
   messageListRef: MutableRefObject<HTMLElement | null>;
   messages: ProtocolMessage[];
+  streamingStatus: Status;
 }) {
   const client = useContext(ReplayClientContext);
   const { pointBehaviorsForSuspense: pointBehaviors, pointsForSuspense: points } =
@@ -252,6 +259,14 @@ function LoggablesContextInner({
     sortedTerminalExpressions,
   ]);
 
+  const context = useMemo(
+    () => ({
+      loggables: sortedLoggables,
+      streamingStatus,
+    }),
+    [sortedLoggables, streamingStatus]
+  );
+
   const filterByLowerCaseText = filterByText.toLocaleLowerCase();
 
   // We leverage the DOM for display text filtering because it more closely mimics the browser's built in find-in-page functionality.
@@ -282,5 +297,5 @@ function LoggablesContextInner({
     }
   }, [filterByLowerCaseText, messageListRef, sortedLoggables]);
 
-  return <LoggablesContext.Provider value={sortedLoggables}>{children}</LoggablesContext.Provider>;
+  return <LoggablesContext.Provider value={context}>{children}</LoggablesContext.Provider>;
 }

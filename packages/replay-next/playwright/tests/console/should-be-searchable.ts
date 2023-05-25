@@ -1,6 +1,12 @@
 import { test } from "@playwright/test";
 
-import { locateMessage, seekToMessage, showSearchInput } from "../utils/console";
+import {
+  filterByText,
+  locateMessage,
+  searchByText,
+  seekToMessage,
+  showSearchInput,
+} from "../utils/console";
 import { takeScreenshot } from "../utils/general";
 import { beforeEach } from "./beforeEach";
 import { setup } from "./shared";
@@ -15,12 +21,12 @@ test("should be searchable", async ({ page }, testInfo) => {
 
   await showSearchInput(page);
 
-  await page.fill("[data-test-id=ConsoleSearchInput]", " an ");
+  await searchByText(page, " an ");
 
   const consoleRoot = page.locator("[data-test-id=ConsoleRoot]");
   await takeScreenshot(page, testInfo, consoleRoot, "searchable-single-result");
 
-  await page.fill("[data-test-id=ConsoleSearchInput]", " a ");
+  await searchByText(page, " a ");
   await takeScreenshot(page, testInfo, consoleRoot, "searchable-result-1-of-3");
 
   await page.click("[data-test-id=ConsoleSearchGoToNextButton]");
@@ -31,7 +37,7 @@ test("should be searchable", async ({ page }, testInfo) => {
   await takeScreenshot(page, testInfo, consoleRoot, "searchable-result-2-of-3");
 
   // Changes to filters should also update search results
-  await page.fill("[data-test-id=ConsoleFilterInput]", "warning");
+  await filterByText(page, "warning");
 
   const searchResultsLabel = page.locator("[data-test-id=SearchResultsLabel]");
   await takeScreenshot(

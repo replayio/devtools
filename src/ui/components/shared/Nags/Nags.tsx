@@ -62,7 +62,7 @@ export function EditorNag() {
 }
 
 export function ConsoleNag() {
-  const loggables = useContext(LoggablesContext);
+  const { loggables } = useContext(LoggablesContext);
 
   // Don't show the console nag that directs the user to click on one of the console messages
   // if there aren't any console messages to begin with.

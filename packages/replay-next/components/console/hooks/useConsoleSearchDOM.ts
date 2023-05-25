@@ -56,7 +56,7 @@ export default function useConsoleSearchDOM(
   searchInputRef: MutableRefObject<HTMLInputElement | null>,
   defaultVisible: boolean = true
 ): [State, Actions] {
-  const loggables = useContext(LoggablesContext);
+  const { loggables } = useContext(LoggablesContext);
 
   const [state, dispatch] = useSearchDOM<Loggable>(loggables, search, listRef);
   const [visible, setVisible] = useState<boolean>(defaultVisible);
