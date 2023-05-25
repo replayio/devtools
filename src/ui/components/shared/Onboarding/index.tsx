@@ -32,14 +32,14 @@ export function OnboardingContentWrapper({
   return (
     <div
       className={classNames(
-        "relative m-4 flex flex-col items-center rounded-xl bg-loadingBoxes p-9 text-xl text-bodyColor shadow-md",
+        "relative m-4 flex flex-col items-center rounded-xl bg-gray-900 p-9 text-xl text-white shadow-md",
         overlay ? "max-w-sm space-y-8" : "max-w-2xl space-y-6",
         {
           "rounded-lg bg-opacity-80": overlay,
         }
       )}
     >
-      {noLogo ? null : <img src="/images/logo.svg" className="h-24 w-full" />}
+      {noLogo ? null : <img src="/images/logo.svg" className="h-16 w-full" />}
       {children}
     </div>
   );
