@@ -145,6 +145,17 @@ export function messageLocator(
   });
 }
 
+export async function searchByText(page: Page, text: string) {
+  await page.fill("[data-test-id=ConsoleSearchInput]", text);
+
+  // Wait for Console to apply new filter text
+  await waitFor(async () => {
+    const messageList = page.locator('[data-test-name="Messages"]');
+    const value = await messageList.getAttribute(`data-test-state-searchByText`);
+    expect(value).toBe(text);
+  });
+}
+
 export async function seekToMessage(page: Page, messageListItem: Locator) {
   await debugPrint(
     page,

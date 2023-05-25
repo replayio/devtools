@@ -198,6 +198,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
         data-test-state-filterByText={filterByText}
         data-test-state-logs={showLogs ? true : undefined}
         data-test-state-nodeModules={showNodeModules ? true : undefined}
+        data-test-state-searchByText={searchState.query}
         data-test-state-timestamps={showTimestamps ? true : undefined}
         data-test-state-warnings={showWarnings ? true : undefined}
         data-test-name="Messages"
