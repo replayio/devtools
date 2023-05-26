@@ -1,38 +1,76 @@
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
+import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
+import { FixedSizeList, ListChildComponentProps } from "react-window";
 
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import { TestRunListItem } from "ui/components/Library/Team/View/TestRuns/TestRunListItem";
 import { SecondaryButton } from "ui/components/shared/Button";
+import { TestRun } from "ui/hooks/tests";
 
 import { TestRunsContext } from "./TestRunsContextRoot";
 
 const PAGE_SIZE = 50;
+const ROW_HEIGHT = 70;
+
+type ItemData = {
+  countToRender: number;
+  loadMore: () => void;
+  testRuns: TestRun[];
+};
 
 export function TestRunList() {
-  const [countToRender, setCountToRender] = useState(PAGE_SIZE);
   const { loading, testRuns } = useContext(TestRunsContext);
+  const [countToRender, setCountToRender] = useState(PAGE_SIZE);
 
-  const hasMore = countToRender < testRuns.length;
-  const loadMore = () => {
-    setCountToRender(Math.min(countToRender + PAGE_SIZE, testRuns.length));
-  };
+  const itemData = useMemo<ItemData>(
+    () => ({
+      countToRender,
+      loadMore: () => setCountToRender(countToRender + PAGE_SIZE),
+      testRuns,
+    }),
+    [countToRender, testRuns]
+  );
 
   if (loading) {
     return <LibrarySpinner />;
   }
 
+  const itemCount = Math.min(countToRender + 1, testRuns.length);
+
   return (
-    <div className="no-scrollbar m-4 flex flex-grow flex-col space-y-0 overflow-auto rounded-t-xl text-sm">
-      {testRuns.slice(0, countToRender).map(testRun => (
-        <TestRunListItem key={testRun.id} testRun={testRun} />
-      ))}
-      {hasMore && (
-        <div className="flex justify-center p-4">
-          <SecondaryButton className="" color="blue" onClick={loadMore}>
-            Show More
-          </SecondaryButton>
-        </div>
+    <ReactVirtualizedAutoSizer>
+      {({ height, width }) => (
+        <FixedSizeList
+          children={TestRunListRow}
+          className="no-scrollbar text-sm"
+          height={height}
+          itemCount={itemCount}
+          itemData={itemData}
+          itemSize={ROW_HEIGHT}
+          width={width}
+        />
       )}
+    </ReactVirtualizedAutoSizer>
+  );
+}
+
+function TestRunListRow({ data, index, style }: ListChildComponentProps<ItemData>) {
+  const { countToRender, loadMore, testRuns } = data;
+
+  if (index === countToRender) {
+    return (
+      <div className="flex justify-center p-4" style={style}>
+        <SecondaryButton className="" color="blue" onClick={loadMore}>
+          Show More
+        </SecondaryButton>
+      </div>
+    );
+  }
+
+  const testRun = testRuns[index];
+  return (
+    <div style={style}>
+      <TestRunListItem testRun={testRun} />
     </div>
   );
 }
