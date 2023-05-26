@@ -18,11 +18,11 @@ export function FilterBar() {
     }
   };
 
-  const showFilterInput = ["recordings", "results"].includes(view);
+  const showFilterInput = view === "recordings";
 
   return (
     <div className="relative flex flex-grow items-center space-x-3">
-      <FilterDropdown />
+      {showFilterInput ? <FilterDropdown /> : null}
       {showFilterInput ? (
         <div className="flex flex-grow">
           <TextInput
