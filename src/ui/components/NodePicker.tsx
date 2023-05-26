@@ -12,7 +12,9 @@ import { Nag } from "shared/graphql/types";
 import {
   fetchMouseTargetsForPause,
   loadMouseTargets,
-  setIsNodePickerActive,
+  nodePickerDisabled,
+  nodePickerInitializing,
+  nodePickerReady,
   setMouseTargetsLoading,
 } from "ui/actions/app";
 import { setSelectedPanel } from "ui/actions/layout";
@@ -23,14 +25,6 @@ import { NodePicker as NodePickerClass } from "ui/utils/nodePicker";
 interface Position {
   x: number;
   y: number;
-}
-
-declare global {
-  interface Window {
-    // Used in the test harness for picking a node.
-    // Assigned in a `useLayoutEffect` further below.
-    gNodePicker: GlobalNodePickerTestMethods;
-  }
 }
 
 interface GlobalNodePickerTestMethods {
@@ -49,7 +43,9 @@ export function NodePicker() {
 
   const nodePickerRemoveTime = useRef<number | undefined>(undefined);
 
-  async function clickNodePickerButton() {
+  async function clickNodePickerButton(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
     if (globalNodePickerActive) {
       // The node picker mousedown listener will take care of deactivation.
       return;
@@ -63,8 +59,9 @@ export function NodePicker() {
     }
 
     setGlobalNodePickerActive(true);
-    dispatch(setIsNodePickerActive(true));
-    dispatch(loadMouseTargets());
+    dispatch(nodePickerInitializing("domElement"));
+    await dispatch(loadMouseTargets());
+    dispatch(nodePickerReady("domElement"));
     dispatch(setSelectedPanel("inspector"));
     dismissInspectElementNag(); // Replay Passport
   }
@@ -97,7 +94,15 @@ export function NodePicker() {
 
   useLayoutEffect(() => {
     if (globalNodePickerActive) {
+      function disableNodePicker() {
+        nodePickerInstance.disable();
+        setGlobalNodePickerActive(false);
+        dispatch(nodePickerDisabled());
+        dispatch(setMouseTargetsLoading(false));
+      }
+
       nodePickerInstance.enable({
+        name: "domElement",
         onHighlightNode(nodeId) {
           dispatch(highlightNode(nodeId));
         },
@@ -113,28 +118,20 @@ export function NodePicker() {
             dispatch(unhighlightNode());
           }
 
-          setGlobalNodePickerActive(false);
-          dispatch(setIsNodePickerActive(false));
-          dispatch(setMouseTargetsLoading(false));
+          disableNodePicker();
         },
         onCheckNodeBounds: async (x, y, nodeIds) => {
           const boundingRects = await dispatch(fetchMouseTargetsForPause());
           return getMouseTarget(boundingRects ?? [], x, y, nodeIds);
+        },
+        onClickOutsideCanvas() {
+          disableNodePicker();
         },
       });
     } else {
       nodePickerInstance.disable();
     }
   }, [globalNodePickerActive, dispatch, handleNodeSelected]);
-
-  useLayoutEffect(() => {
-    // TODO Get rid of these globals and do DOM node checks in the test harness
-    // Save these globally so that the test harness can use them
-    window.gNodePicker = {
-      clickNodePickerButton,
-      nodePickerMouseClickInCanvas,
-    };
-  });
 
   return (
     <button

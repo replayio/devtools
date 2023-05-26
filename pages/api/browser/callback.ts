@@ -1,8 +1,8 @@
 import jwtDecode from "jwt-decode";
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import { recordData as recordTelemetryData } from "replay-next/src/utils/telemetry";
 import { getAuthClientId, getAuthHost } from "ui/utils/auth";
-import { pingTelemetry } from "ui/utils/replay-telemetry";
 
 // patch in node-fetch for pingTelemetry without adding it to the FE bundle
 globalThis.fetch = globalThis.fetch || require("node-fetch");
@@ -131,7 +131,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     const decodedToken = jwtDecode<{ sub: string }>(token.access_token);
     const authId = decodedToken.sub;
-    pingTelemetry("devtools-auth", {
+    recordTelemetryData("devtools-auth", {
       origin: "browser",
       authRequestId: id,
       // Auth0 protects this value in its logs and only reveals the last 3
@@ -145,7 +145,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   } catch (e: any) {
     console.error(e);
 
-    pingTelemetry("devtools-api-browser-callback", { message: e.message, code: e.code });
+    recordTelemetryData("devtools-api-browser-callback", { message: e.message, code: e.code });
     redirectToError(
       res,
       e instanceof AuthError ? e.message : "Unexpected error logging in. Please try again."

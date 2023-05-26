@@ -71,14 +71,14 @@ jobs:
         env:
           SHARD: ${{ matrix.shard }}
           SHARDS: 10
-      - name: Upload results
-        if: always()
-        run: ./uploadSnapshots.js
-        working-directory: packages/replay-next
-      - name: Upload Replays
+      - name: Upload Replay recordings
         if: always()
         uses: replayio/action-upload@v0.4.7
         with:
           api-key: rwk_4mEiT150uOHyLQiQvZfPZiNjmBe4NrOXOm9yG9nS794
-          filter: ${{ 'function($v, $i, $a) { $v.metadata.test.result = "failed" and $count($a[metadata.test.file = $v.metadata.test.file and metadata.test.result = "passed"]) = 0 }' }}
+          filter: ${{ 'function() { true }' }}
           public: true
+      - name: Upload snapshot images and metadata
+        if: always()
+        run: ./uploadSnapshots.js
+        working-directory: packages/replay-next

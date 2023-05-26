@@ -1,10 +1,10 @@
 .TourBoxWrapper {
   position: relative;
-  background: linear-gradient(323deg, rgba(226, 85, 215, 0.497), rgba(79, 205, 230, 0.777));
+  background: linear-gradient(323deg, rgba(48, 3, 45, 0.497), rgba(0, 108, 129, 0.777));
 }
 
 .TourBoxGradient {
-  background: linear-gradient(323deg, rgba(241, 108, 229, 0.897), rgba(49, 189, 216, 0.736));
+  background: linear-gradient(323deg, rgba(117, 2, 107, 0.897), rgba(1, 52, 62, 0.736));
   background-size: 400% 400%;
 
   -webkit-animation: GradientWave 12s ease infinite;
@@ -18,6 +18,13 @@
   color: #fff;
   padding: 0.5rem;
   height: 100vh;
+}
+
+.stepCallout {
+  border: 1px solid #fff;
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 0.5em 0.5em;
+  border-radius: 4px;
 }
 
 .h1 {

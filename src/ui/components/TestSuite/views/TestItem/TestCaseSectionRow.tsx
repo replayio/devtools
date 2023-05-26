@@ -80,7 +80,9 @@ export function TestCaseSectionRow({
       data-type={testStep.type}
       data-test-name="TestCaseSectionRow"
       onClick={() => {
-        selectTestStep(testStep);
+        startTransition(() => {
+          selectTestStep(testStep);
+        });
       }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}

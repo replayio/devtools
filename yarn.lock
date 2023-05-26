@@ -13030,6 +13030,7 @@ __metadata:
     cypress: ^12.5.1
     log-update: ^4
     playwright: ^1.25.1
+    strip-ansi: ^6.0.0
     ts-node: ^10.7.0
     yargs: ^17.6.0
   languageName: unknown
@@ -20634,7 +20635,7 @@ __metadata:
     ts-node: ^10.7.0
     tsconfig-paths: ^3.14.1
     typescript: ^5.0.4
-    use-context-menu: ^0.4.5
+    use-context-menu: ^0.4.7
     utf-8-validate: ^5.0.8
     uuid: ^7.0.3
     v8-to-istanbul: ^9.0.1
@@ -24058,16 +24059,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-context-menu@npm:^0.4.5":
-  version: 0.4.5
-  resolution: "use-context-menu@npm:0.4.5"
-  peerDependencies:
-    react: ^16 || ^17 || ^18
-    react-dom: ^16 || ^17 || ^18
-  checksum: 321967ece6a2c56b2042264215ae1ca64aba12589a350a214be0fb2e7b56b3cc69e41cf75ec66e3a7689206786e3d794041d11f7ce52a337b8d842cdf78699dd
-  languageName: node
-  linkType: hard
-
 "use-context-menu@npm:^0.4.6":
   version: 0.4.6
   resolution: "use-context-menu@npm:0.4.6"
@@ -24075,6 +24066,16 @@ __metadata:
     react: ^16 || ^17 || ^18
     react-dom: ^16 || ^17 || ^18
   checksum: fbca11237313897381edabc14412da4feb80bcc07d3e416b8f49c936cf7fe0965e9382fe50e3c2a586d16039679aa52d3063d8d2a980a2760102eb5fe7eb8e09
+  languageName: node
+  linkType: hard
+
+"use-context-menu@npm:^0.4.7":
+  version: 0.4.7
+  resolution: "use-context-menu@npm:0.4.7"
+  peerDependencies:
+    react: ^16 || ^17 || ^18
+    react-dom: ^16 || ^17 || ^18
+  checksum: 36f80163268aff8b7e064244d17f16d3ec68e7c35c29ced408062e95336bac426c543a68c8941547993f4d75da0d5fc38ace8c9088162d8fcf3449ffdcfc58b3
   languageName: node
   linkType: hard
 

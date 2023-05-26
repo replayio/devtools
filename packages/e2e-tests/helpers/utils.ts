@@ -1,5 +1,6 @@
 import { Locator, Page } from "@playwright/test";
 import chalk from "chalk";
+import stripAnsi from "strip-ansi";
 
 export function getCommandKey() {
   const macOS = process.platform === "darwin";
@@ -19,14 +20,18 @@ export async function clearTextArea(page: Page, textArea: Locator) {
 
 // Other test utils can use this to print formatted status messages that help visually monitor test progress.
 export async function debugPrint(page: Page | null, message: string, scope?: string) {
-  console.log("      ", message, scope ? chalk.dim(`(${scope})`) : "");
+  const formattedScope = scope ? `(${scope})` : "";
+  console.log("      ", message, formattedScope ? chalk.dim(formattedScope) : "");
 
   if (page !== null) {
+    // Strip out all ANSI escape codes when we log this inside the browser.
+    // Otherwise, the console messages in the recording are hard to read.
+    const plainMessage = stripAnsi(message);
     await page.evaluate(
       ({ message, scope }) => {
-        console.log(`${message} %c${scope || ""}`, "color: #999;");
+        console.log(`${message} ${scope}`);
       },
-      { message, scope }
+      { message: plainMessage, scope: formattedScope }
     );
   }
 }
@@ -136,3 +141,5 @@ export async function waitFor(
     }
   }
 }
+
+export const getElementClasses = (loc: Locator) => loc.evaluate(el => Array.from(el.classList));

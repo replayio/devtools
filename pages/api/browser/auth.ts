@@ -1,9 +1,9 @@
 import cookie from "cookie";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import { pingTelemetry } from "ui/utils/replay-telemetry";
+import { recordData as recordTelemetryData } from "replay-next/src/utils/telemetry";
 
-// patch in node-fetch for pingTelemetry without adding it to the FE bundle
+// patch in node-fetch for recordTelemetryData without adding it to the FE bundle
 globalThis.fetch = globalThis.fetch || require("node-fetch");
 
 const getQueryValue = (query: string | string[]) => (Array.isArray(query) ? query[0] : query);
@@ -76,7 +76,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   } catch (e: any) {
     console.error(e);
 
-    pingTelemetry("devtools-api-browser-auth", { error: e.message });
+    recordTelemetryData("devtools-api-browser-auth", { error: e.message });
 
     res.statusCode = 500;
     res.send("");

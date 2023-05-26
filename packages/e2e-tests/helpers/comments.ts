@@ -323,6 +323,8 @@ export async function replyToComment(
 }
 
 export async function showCommentsPanel(page: Page): Promise<void> {
+  await page.locator('[data-test-name="ToolbarButton-Comments"]').waitFor();
+
   const commentsPanelLocator = page.locator('[data-test-name="CommentCardList"]');
   let isVisible = await commentsPanelLocator.isVisible();
   if (!isVisible) {

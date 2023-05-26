@@ -1,13 +1,13 @@
-import { Frame, Location } from "@replayio/protocol";
-import { createCache } from "suspense";
+import { Location } from "@replayio/protocol";
 
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
+import { createCacheWithTelemetry } from "replay-next/src/utils/suspense";
 import { ReplayClientInterface } from "shared/client/types";
 import { AnnotatedTestStep, ProcessedTestMetadata } from "ui/components/TestSuite/types";
 import { gte } from "ui/utils/semver";
 
-export const TestStepSourceLocationCache = createCache<
+export const TestStepSourceLocationCache = createCacheWithTelemetry<
   [client: ReplayClientInterface, testMetadata: ProcessedTestMetadata, testStep: AnnotatedTestStep],
   Location | undefined
 >({

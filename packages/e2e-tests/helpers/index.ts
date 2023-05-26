@@ -58,4 +58,5 @@ export async function startTest(page: Page, example: string, apiKey?: string) {
     await page.locator('[data-test-id="ViewToggle-Viewer"]').waitFor();
     await page.locator('[data-test-id="ViewToggle-DevTools"]').waitFor();
   }
+  await page.locator('[data-panel-id="Panel-SidePanel"]').waitFor();
 }

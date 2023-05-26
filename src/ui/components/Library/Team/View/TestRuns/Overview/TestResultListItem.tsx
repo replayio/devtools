@@ -1,11 +1,9 @@
 import { RecordingId } from "@replayio/protocol";
 import Link from "next/link";
-import { useContext } from "react";
 
 import { Recording } from "shared/graphql/types";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
-import { TeamContext } from "../../../TeamContextRoot";
 import styles from "../../../../Library.module.css";
 
 function ViewReplay({ passed, recordingId }: { passed: boolean; recordingId: RecordingId }) {
@@ -59,20 +57,6 @@ function Comments({ recording }: { recording: Recording }) {
   );
 }
 
-function FilterByTestButton({ recording }: { recording: Recording }) {
-  const { teamId } = useContext(TeamContext);
-  const path = JSON.stringify(recording.metadata?.test?.path || []);
-
-  return (
-    <Link
-      href={`/team/${teamId}/results?q=test-path:${path}`}
-      className="max-w-min overflow-hidden overflow-ellipsis whitespace-pre p-2 text-left opacity-0 hover:bg-gray-200 hover:underline group-hover:opacity-100"
-    >
-      <MaterialIcon>filter_alt</MaterialIcon>
-    </Link>
-  );
-}
-
 export function TestResultListItem({ recording }: { recording: Recording }) {
   const { metadata } = recording;
   const passed = metadata?.test?.result === "passed";
@@ -92,7 +76,6 @@ export function TestResultListItem({ recording }: { recording: Recording }) {
         <Title recording={recording} />
       </Link>
       <Comments recording={recording} />
-      <FilterByTestButton recording={recording} />
     </div>
   );
 }

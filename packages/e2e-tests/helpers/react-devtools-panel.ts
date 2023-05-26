@@ -1,15 +1,32 @@
 import { Locator, Page, expect } from "@playwright/test";
 
-import { waitFor } from "./utils";
+import { getElementClasses, waitFor } from "./utils";
 
 export async function checkInspectedItemValue(item: Locator, expectedValue: string) {
   const value = await getInspectedItemValue(item);
   expect(value).toBe(expectedValue);
 }
 
+export function getComponentPickerButton(page: Page) {
+  return page.locator(
+    "[data-react-devtools-portal-root] div[class^=SearchInput] button[class^=Toggle]"
+  );
+}
+
+export async function isComponentPickerEnabled(componentPicker: Locator) {
+  const classes = await getElementClasses(componentPicker);
+  return classes.some(c => c.startsWith("ToggleOn"));
+}
+
 export async function enableComponentPicker(page: Page) {
-  await page.locator("[data-react-devtools-portal-root] [class^=ToggleOff]").click();
-  await page.locator("[data-react-devtools-portal-root] [class^=ToggleOn]").waitFor();
+  const componentPicker = getComponentPickerButton(page);
+  if (await isComponentPickerEnabled(componentPicker)) {
+    await componentPicker.click();
+  }
+  await componentPicker.click();
+  await waitFor(async () => expect(await isComponentPickerEnabled(componentPicker)).toBe(true));
+
+  return componentPicker;
 }
 
 export function getInspectedItem(page: Page, kind: "Props" | "Hooks", name: string) {

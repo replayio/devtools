@@ -1,6 +1,6 @@
 import { RecordingId } from "@replayio/protocol";
-import { createSingleEntryCache } from "suspense";
 
+import { createSingleEntryCacheWithTelemetry } from "replay-next/src/utils/suspense";
 import { RecordingCache } from "ui/components/TestSuite/suspense/RecordingCache";
 import {
   ProcessedTestMetadata,
@@ -10,11 +10,11 @@ import validateTestMetadata from "ui/components/TestSuite/utils/validateTestMeta
 
 // Processes TestMetadata into a format more usable by the TestSuite UI.
 // This cache depends on only Recording data (from GraphQL) and should load quickly.
-export const TestMetadataCache = createSingleEntryCache<
+export const TestMetadataCache = createSingleEntryCacheWithTelemetry<
   [recordingId: RecordingId],
   ProcessedTestMetadata
 >({
-  debugLabel: "ProcessedTestMetadata",
+  debugLabel: "TestMetadataCache",
   load: async ([recordingId]) => {
     const recording = await RecordingCache.readAsync(recordingId);
     const testMetadata = validateTestMetadata(recording);

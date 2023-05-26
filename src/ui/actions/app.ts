@@ -23,7 +23,6 @@ import {
   getLoadingStatusSlow,
   loadReceivedEvents,
   setCanvas as setCanvasAction,
-  setIsNodePickerActive,
   setLoadedRegions,
   setLoadingStatusSlow,
   setModal,
@@ -182,14 +181,12 @@ export function fetchMouseTargetsForPause(): UIThunkAction<Promise<NodeBounds[] 
   };
 }
 
-export function loadMouseTargets(): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
+export function loadMouseTargets(): UIThunkAction<Promise<NodeBounds[] | undefined>> {
+  return async dispatch => {
     dispatch(setMouseTargetsLoading(true));
     const boundingRects = await dispatch(fetchMouseTargetsForPause());
     dispatch(setMouseTargetsLoading(false));
-    if (boundingRects?.length) {
-      dispatch(setIsNodePickerActive(true));
-    }
+    return boundingRects;
   };
 }
 

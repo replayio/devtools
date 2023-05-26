@@ -1,5 +1,3 @@
-import "../src/global-css";
-import "../src/test-prep";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Store } from "@reduxjs/toolkit";
 import type { AppContext, AppProps } from "next/app";
@@ -8,9 +6,12 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { ReactNode, useEffect, useState } from "react";
 import { Provider } from "react-redux";
+import "../src/global-css";
+import "../src/test-prep";
 
 import { SystemProvider } from "design";
 import { setFeatures } from "protocol/thread/thread";
+import { recordData as recordTelemetryData } from "replay-next/src/utils/telemetry";
 import { ApolloWrapper } from "ui/components/ApolloWrapper";
 import _App from "ui/components/App";
 import ErrorBoundary from "ui/components/ErrorBoundary";
@@ -21,12 +22,11 @@ import { bootstrapApp } from "ui/setup";
 import { configureMockEnvironmentForTesting, isMock } from "ui/utils/environment";
 import { useLaunchDarkly } from "ui/utils/launchdarkly";
 import { features } from "ui/utils/prefs";
-import { pingTelemetry } from "ui/utils/replay-telemetry";
 import { InstallRouteListener } from "ui/utils/routeListener";
 import tokenManager from "ui/utils/tokenManager";
 
-import "../src/base.css";
 import useAuthTelemetry from "ui/hooks/useAuthTelemetry";
+import "../src/base.css";
 
 if (isMock()) {
   // If this is an end to end test, bootstrap the mock environment.
@@ -65,10 +65,10 @@ function AppUtilities({ children }: { children: ReactNode }) {
     }
 
     try {
-      pingTelemetry("devtools-auth-error-refresh");
+      recordTelemetryData("devtools-auth-error-refresh");
       await getAccessTokenSilently({ ignoreCache: true });
     } catch {
-      pingTelemetry("devtools-auth-error-refresh-fail");
+      recordTelemetryData("devtools-auth-error-refresh-fail");
       const returnToPath = window.location.pathname + window.location.search;
       router.push({ pathname: "/login", query: { returnTo: returnToPath } });
     }

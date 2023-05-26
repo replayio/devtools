@@ -84,6 +84,9 @@ export interface LoadedRegions {
   indexed: TimeStampedPointRange[];
 }
 
+export type NodePickerType = "reactComponent" | "domElement";
+export type NodePickerStatus = "disabled" | "initializing" | "active";
+
 export interface AppState {
   mode: AppMode;
   awaitingSourcemaps: boolean;
@@ -92,8 +95,8 @@ export interface AppState {
   displayedLoadingProgress: number | null;
   events: Events;
   expectedError: ExpectedError | null;
-  isNodePickerActive: boolean;
-  isNodePickerInitializing: boolean;
+  activeNodePicker: NodePickerType | null;
+  nodePickerStatus: NodePickerStatus;
   loadedRegions: LoadedRegions | null;
   loading: number;
   loadingFinished: boolean;

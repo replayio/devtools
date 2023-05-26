@@ -6,6 +6,7 @@ const github = require("@actions/github");
 const { readdirSync, readFileSync, statSync } = require("fs");
 const fetch = require("node-fetch");
 const { join } = require("path");
+const { listAllRecordings } = require("@replayio/replay");
 
 // Upload snapshots to Delta
 // https://github.com/replayio/delta/blob/main/pages/api/uploadSnapshotVariants.ts
@@ -33,6 +34,35 @@ function getSnapshotDirs() {
 }
 
 (async () => {
+  // Get all recently uploaded recording data
+  const recordings = listAllRecordings({
+    all: true,
+  });
+
+  console.group(`Found ${recordings.length} recordings`);
+  console.log(recordings);
+  console.groupEnd();
+
+  const testNameToRecordingId = {};
+  const findRecordingByTestName = testName => {
+    if (testNameToRecordingId[testName] !== undefined) {
+      return testNameToRecordingId[testName];
+    }
+
+    for (let index = 0; index < recordings.length; index++) {
+      const recording = recordings[index];
+      if (recording.metadata.title === testName) {
+        testNameToRecordingId[testName] = recording.id;
+
+        return recording.id;
+      }
+    }
+
+    testNameToRecordingId[testName] = null;
+
+    return null;
+  };
+
   const snapshotDirs = getSnapshotDirs();
   if (snapshotDirs.length == 0) {
     console.error(`Skipping: No files found in ${visualsBaseDir}`);
@@ -79,14 +109,34 @@ function getSnapshotDirs() {
         }),
       };
 
+      // Use the test file name to find the matching Replay recording id
+      // e.g. http://admin.replay.io/recordings/83218988-15da-4f02-9045-9ed0d658ea7b
+      const recordingId = findRecordingByTestName(metadataJSON.testName);
+
+      console.log(`Found recording ${recordingId} for test "${metadataJSON.testName}"}`);
+
       try {
-        await uploadSnapshot({ metadata: metadataJSON, url, variants });
+        await uploadSnapshot({
+          metadata: {
+            ...metadataJSON,
+            recordingId,
+          },
+          url,
+          variants,
+        });
       } catch (error) {
         console.error(error);
         console.log(`Retrying upload for file "${metadata.fileName}"`);
 
         // Retry a failed upload before giving up
-        await uploadSnapshot({ metadata: metadataJSON, url, variants });
+        await uploadSnapshot({
+          metadata: {
+            ...metadataJSON,
+            recordingId,
+          },
+          url,
+          variants,
+        });
       }
     }
   } catch (error) {
