@@ -39,7 +39,7 @@ function FirstReplayModal({ hideModal }: PropsFromRedux) {
 
   return (
     <OnboardingModalContainer>
-      <OnboardingContentWrapper noLogo>
+      <OnboardingContentWrapper>
         <OnboardingContent>
           <OnboardingHeader>{`Let's time travel`}</OnboardingHeader>
           <OnboardingBody>
