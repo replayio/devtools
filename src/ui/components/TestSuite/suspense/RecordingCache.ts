@@ -6,7 +6,7 @@ import { Recording } from "shared/graphql/types";
 import { getRecording } from "ui/hooks/recordings";
 
 export const RecordingCache = createSingleEntryCache<[recordingId: RecordingId], Recording>({
-  debugLabel: "TestCache",
+  debugLabel: "RecordingCache",
   load: async ([recordingId]) => {
     const recording = await getRecording(recordingId);
 

@@ -14,7 +14,7 @@ export const TestMetadataCache = createSingleEntryCacheWithTelemetry<
   [recordingId: RecordingId],
   ProcessedTestMetadata
 >({
-  debugLabel: "ProcessedTestMetadata",
+  debugLabel: "TestMetadataCache",
   load: async ([recordingId]) => {
     const recording = await RecordingCache.readAsync(recordingId);
     const testMetadata = validateTestMetadata(recording);

@@ -5,7 +5,7 @@ import { createSingleEntryCacheWithTelemetry } from "replay-next/src/utils/suspe
 import { Annotation } from "shared/graphql/types";
 
 export const AnnotationsCache = createSingleEntryCacheWithTelemetry<[], Annotation[]>({
-  debugLabel: "Annotations",
+  debugLabel: "AnnotationsCache",
   load: async () => {
     await ThreadFront.ensureAllSources();
 
