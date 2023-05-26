@@ -87,7 +87,7 @@ const Passport = () => {
       videoUrl: "https://vercel.replay.io/passport/time_travel_in_console.gif",
       imageBaseName: "time_travel_in_the_console",
       docsLink:
-        "https://www.notion.so/replayio/Navigate-in-the-console-3b732260a9254c20b43d213c4a93c9de?pvs=4",
+        "https://replayio.notion.site/Navigate-in-the-console-3b732260a9254c20b43d213c4a93c9de?pvs=4",
       blurb: "Look for the blue button in the console.",
     },
     {
@@ -96,7 +96,7 @@ const Passport = () => {
       videoUrl: "https://vercel.replay.io/passport/set_print_statement.gif",
       imageBaseName: "set_a_print_statement",
       docsLink:
-        "https://www.notion.so/replayio/Adding-print-statements-18a7d1f85b434706b46af0a8d5d298fe?pvs=4",
+        "https://replayio.notion.site/Adding-print-statements-18a7d1f85b434706b46af0a8d5d298fe?pvs=4",
       blurb: "When looking at a source, click the plus sign.",
     },
     {
@@ -104,8 +104,7 @@ const Passport = () => {
       completed: !showJumpToEvent,
       videoUrl: "https://vercel.replay.io/passport/jump_to_an_event.gif",
       imageBaseName: "jump_to_event",
-      docsLink:
-        "https://www.notion.so/replayio/Jump-to-event-199d592b0ff1458bac0f27a7c2a9f78d?pvs=4",
+      docsLink: "https://replayio.notion.site/Jump-to-event-199d592b0ff1458bac0f27a7c2a9f78d?pvs=4",
       blurb: "Click the info icon on the left nav to see all events in your replay.",
     },
   ];
@@ -117,7 +116,7 @@ const Passport = () => {
       videoUrl: "https://vercel.replay.io/passport/inspect_an_element.gif",
       imageBaseName: "inspect_element",
       docsLink:
-        "https://www.notion.so/replayio/Inspect-UI-elements-5dcab655fe7343a798f3adacbaf937fc?pvs=4",
+        "https://replayio.notion.site/Inspect-UI-elements-5dcab655fe7343a798f3adacbaf937fc?pvs=4",
       blurb: "Look for the elements tab to the right of the console.",
     },
     {
@@ -126,7 +125,7 @@ const Passport = () => {
       videoUrl: "https://vercel.replay.io/passport/inspect_a_network_request.gif",
       imageBaseName: "inspect_network_request",
       docsLink:
-        "https://www.notion.so/replayio/Inspect-network-elements-f3e47ee936324fef92fe555c9de6567d?pvs=4",
+        "https://replayio.notion.site/Inspect-network-elements-f3e47ee936324fef92fe555c9de6567d?pvs=4",
       blurb: "Network requests is to the right of the console and elements tabs.",
     },
     {
@@ -135,7 +134,7 @@ const Passport = () => {
       videoUrl: "https://vercel.replay.io/passport/inspect_a_react_component.gif",
       imageBaseName: "inspect_react_component",
       docsLink:
-        "https://www.notion.so/replayio/Inspect-React-elements-5e4ae5b2a8fb4b6bba8ca5167ce94eb0?pvs=4",
+        "https://replayio.notion.site/Inspect-React-elements-5e4ae5b2a8fb4b6bba8ca5167ce94eb0?pvs=4",
       blurb: "The React tab is in the same area as console, elements, and network events.",
     },
     {
@@ -143,8 +142,7 @@ const Passport = () => {
       completed: !showJumpToCode,
       videoUrl: "https://vercel.replay.io/passport/jump_to_code.gif",
       imageBaseName: "jump_to_code",
-      docsLink:
-        "https://www.notion.so/replayio/Jump-to-code-45026e5087014475a52dc4a8024dc850?pvs=4",
+      docsLink: "https://replayio.notion.site/Jump-to-code-45026e5087014475a52dc4a8024dc850?pvs=4",
       blurb: "Click the info icon on the left nav, then look for the blue button.",
     },
   ];
@@ -155,7 +153,7 @@ const Passport = () => {
       completed: !showAddUnicornBadge,
       videoUrl: "https://vercel.replay.io/passport/unicorn_badge.gif",
       imageBaseName: "add_a_unicorn_badge",
-      docsLink: "https://www.notion.so/replayio/Add-a-badge-c50800e3065c4c2d9ad7b16449d0a8a1?pvs=4",
+      docsLink: "https://replayio.notion.site/Add-a-badge-c50800e3065c4c2d9ad7b16449d0a8a1?pvs=4",
       blurb: "When setting a print statement, click the gray circle to the left.",
     },
     {
@@ -164,7 +162,7 @@ const Passport = () => {
       videoUrl: "https://vercel.replay.io/passport/search_source_text.gif",
       imageBaseName: "search_source_text",
       docsLink:
-        "https://www.notion.so/replayio/Search-source-text-869e0205b8b14f94b3f15020fc4bf0f9?pvs=4",
+        "https://replayio.notion.site/Search-source-text-869e0205b8b14f94b3f15020fc4bf0f9?pvs=4",
       blurb: "Click the magnifying glass icon in the left nav.",
     },
     {
@@ -173,7 +171,7 @@ const Passport = () => {
       videoUrl: "https://vercel.replay.io/passport/use_focus_mode.gif",
       imageBaseName: "use_focus_mode",
       docsLink:
-        "https://www.notion.so/replayio/Set-a-focus-window-2409a0207b2449e6baf162f27ce37b35?pvs=4",
+        "https://replayio.notion.site/Set-a-focus-window-2409a0207b2449e6baf162f27ce37b35?pvs=4",
       blurb: "Look for the focus icon in the bottom right corner.",
     },
     {
@@ -181,7 +179,7 @@ const Passport = () => {
       completed: !showFindFile,
       videoUrl: "https://vercel.replay.io/passport/find_file.gif",
       imageBaseName: "find_file",
-      docsLink: "https://www.notion.so/replayio/Go-to-file-4e867dc10f7d4db3be78e9bfc53c97f9?pvs=4",
+      docsLink: "https://replayio.notion.site/Go-to-file-4e867dc10f7d4db3be78e9bfc53c97f9?pvs=4",
       blurb: "Press command-P on your keyboard.",
     },
   ];
@@ -192,8 +190,7 @@ const Passport = () => {
       completed: !showAddComment,
       videoUrl: "https://vercel.replay.io/passport/add_a_comment.gif",
       imageBaseName: "add_a_comment",
-      docsLink:
-        "https://www.notion.so/replayio/Add-a-comment-1b042007d9874ad6880af1dea7dd1e42?pvs=4",
+      docsLink: "https://replayio.notion.site/Add-a-comment-1b042007d9874ad6880af1dea7dd1e42?pvs=4",
       blurb:
         "Click in the video region to set a comment. It's also possible to add comments to console logs, print statements, and network monitor requests.",
     },
@@ -202,7 +199,7 @@ const Passport = () => {
       completed: !showShareNag,
       videoUrl: "https://vercel.replay.io/passport/share.gif",
       imageBaseName: "share",
-      docsLink: "https://www.notion.so/replayio/Share-7ecdd5ce6c36456bb1354540656f6799?pvs=4",
+      docsLink: "https://replayio.notion.site/Share-7ecdd5ce6c36456bb1354540656f6799?pvs=4",
       blurb: "Click the blue share button at the top of the app.",
     },
   ];
