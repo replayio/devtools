@@ -19,6 +19,7 @@ pref("devtools.sidePanelSize", "240px");
 pref("devtools.theme", "system");
 pref("devtools.toolbox-size", "50%");
 pref("devtools.consoleFilterDrawerExpanded", true);
+pref("devtools.logTelemetry", false);
 
 // app features
 pref("devtools.features.basicProcessingLoadingBar", false);
@@ -64,6 +65,7 @@ export const prefs = new PrefsHelper("devtools", {
   theme: ["String", "theme"],
   toolboxSize: ["String", "toolbox-size"],
   consoleFilterDrawerExpanded: ["Bool", "consoleFilterDrawerExpanded"],
+  logTelemetry: ["Bool", "logTelemetry"],
 });
 
 export const features = new PrefsHelper("devtools.features", {

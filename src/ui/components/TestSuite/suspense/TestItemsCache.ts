@@ -15,6 +15,7 @@ import {
   ProcessedTestStep,
 } from "ui/components/TestSuite/types";
 import validateTestMetadata from "ui/components/TestSuite/utils/validateTestMetadata";
+import { pingTelemetry } from "ui/utils/replay-telemetry";
 
 // Processes TestItems into a format more usable by the TestSuite UI.
 // This cache depends on both Recording (from GraphQL) and annotations data (from the Replay protocol) and may load slowly.
@@ -24,6 +25,7 @@ export const TestItemsCache = createSingleEntryCache<
 >({
   debugLabel: "ProcessedTestItem",
   load: async ([recordingId, requestInfo, requestEventInfo]) => {
+    const startTime = Date.now();
     const recording = await RecordingCache.readAsync(recordingId);
     const testMetadata = validateTestMetadata(recording);
 
@@ -33,7 +35,7 @@ export const TestItemsCache = createSingleEntryCache<
 
     const startAnnotations = annotations.filter(({ message }) => message.event === "test:start");
 
-    return testItems.map((testItem, index) => {
+    const testItemResults = testItems.map((testItem, index) => {
       const { path = [], steps = [], ...rest } = testItem;
 
       const endMap = new Map<string, Annotation>();
@@ -128,6 +130,12 @@ export const TestItemsCache = createSingleEntryCache<
         scopePath,
       };
     });
+
+    pingTelemetry("TestItemsCacheLoad", {
+      duration: Date.now() - startTime,
+      recordingId,
+    });
+    return testItemResults;
   },
 });
 

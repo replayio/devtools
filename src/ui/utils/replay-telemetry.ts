@@ -1,6 +1,12 @@
+import { prefs } from "./prefs";
+
 export async function pingTelemetry(event: string, tags: any = {}) {
   if (process.env.NODE_ENV === "development" && !process.env.NEXT_PUBLIC_RECORD_REPLAY_TELEMETRY) {
     return;
+  }
+
+  if (prefs.logTelemetry) {
+    console.log(`Telemetry ${event}`, tags);
   }
 
   try {
