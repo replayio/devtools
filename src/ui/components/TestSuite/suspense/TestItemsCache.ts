@@ -1,9 +1,9 @@
 import assert from "assert";
 import { RecordingId, RequestEventInfo, RequestInfo } from "@replayio/protocol";
-import { createSingleEntryCache } from "suspense";
 
 import { findInsertIndex } from "replay-next/src/utils/array";
 import { compareNumericStrings } from "replay-next/src/utils/string";
+import { createSingleEntryCacheWithTelemetry } from "replay-next/src/utils/suspense";
 import { Annotation, TestItemError, TestStep, TestStepHook } from "shared/graphql/types";
 import { partialRequestsToCompleteSummaries } from "ui/components/NetworkMonitor/utils";
 import { AnnotationsCache } from "ui/components/TestSuite/suspense/AnnotationsCache";
@@ -18,7 +18,7 @@ import validateTestMetadata from "ui/components/TestSuite/utils/validateTestMeta
 
 // Processes TestItems into a format more usable by the TestSuite UI.
 // This cache depends on both Recording (from GraphQL) and annotations data (from the Replay protocol) and may load slowly.
-export const TestItemsCache = createSingleEntryCache<
+export const TestItemsCache = createSingleEntryCacheWithTelemetry<
   [recordingId: RecordingId, requestInfo: RequestInfo[], requestEventInfo: RequestEventInfo[]],
   ProcessedTestItem[]
 >({

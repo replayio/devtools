@@ -1,13 +1,13 @@
 import { AppState, Auth0Context, Auth0ContextInterface, Auth0Provider } from "@auth0/auth0-react";
 import jwt_decode from "jwt-decode";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 
 import { Deferred, assert, defer } from "protocol/utils";
+import { recordData as recordTelemetryData } from "replay-next/src/utils/telemetry";
 import { isTest } from "ui/utils/environment";
 
 import { getAuthClientId, getAuthHost } from "./auth";
 import { listenForAccessToken } from "./browser";
-import { pingTelemetry } from "./replay-telemetry";
 
 const domain = getAuthHost();
 const audience = "https://api.replay.io";
@@ -75,7 +75,7 @@ class TokenManager {
       if (accessToken) {
         const decodedToken = jwt_decode<{ sub: string }>(accessToken);
         const authId = decodedToken.sub;
-        pingTelemetry("devtools-auth", {
+        recordTelemetryData("devtools-auth", {
           origin: "app",
           authId,
         });

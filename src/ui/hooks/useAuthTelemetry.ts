@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { pingTelemetry } from "ui/utils/replay-telemetry";
+import { recordData as recordTelemetryData } from "replay-next/src/utils/telemetry";
 
 export default function useAuthTelemetry() {
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function useAuthTelemetry() {
         }
       }
 
-      pingTelemetry("auth-initial-state", {
+      recordTelemetryData("auth-initial-state", {
         isAuthenticated,
         authId: auth0Obj?.body?.decodedToken?.user?.sub,
         hasRefreshToken: !!auth0Obj?.body?.refresh_token,
