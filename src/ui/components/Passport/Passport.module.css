@@ -74,7 +74,7 @@
 }
 
 .largeCompletedImage {
-  width: 190px;
+  width: 120px;
   height: auto;
   position: absolute;
   z-index: var(--z-index-1);
@@ -107,5 +107,18 @@
 }
 
 .checklist div.docsIcon:hover {
+  color: #2257a7;
+}
+
+.blurbContainer {
+  padding: 12px;
+  color: #4e4e4e;
+}
+
+.blurbContainer a {
+  text-decoration: underline;
+}
+
+.blurbContainer a:hover {
   color: #2257a7;
 }
