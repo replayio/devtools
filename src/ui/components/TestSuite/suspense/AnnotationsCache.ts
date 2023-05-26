@@ -1,11 +1,10 @@
-import { createSingleEntryCache } from "suspense";
-
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 import { insert } from "replay-next/src/utils/array";
+import { createSingleEntryCacheWithTelemetry } from "replay-next/src/utils/suspense";
 import { Annotation } from "shared/graphql/types";
 
-export const AnnotationsCache = createSingleEntryCache<[], Annotation[]>({
+export const AnnotationsCache = createSingleEntryCacheWithTelemetry<[], Annotation[]>({
   debugLabel: "Annotations",
   load: async () => {
     await ThreadFront.ensureAllSources();
