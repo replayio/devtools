@@ -1,8 +1,50 @@
-import { isPromiseLike } from "suspense";
+import { Cache, CreateCacheOptions, createCache, isPromiseLike } from "suspense";
+
+import { log as logTelemetry } from "./telemetry";
 
 type AnyFunction<ReturnType> = (...args: any[]) => ReturnType;
 
 let MAX_LOOP_COUNT = 1_000;
+
+export function createCacheWithTelemetry<Params extends Array<any>, Value>(
+  options: Omit<CreateCacheOptions<Params, Value>, "debugLabel"> & {
+    debugLabel: string;
+  }
+): Cache<Params, Value> {
+  const { debugLabel, load, ...rest } = options;
+
+  return createCache({
+    ...rest,
+    debugLabel,
+    load: async (params, loadOptions) => {
+      const startTime = Date.now();
+      const result = await load(params, loadOptions);
+      const stopTime = Date.now();
+
+      // Fire and forget telemetry (if enabled)
+      logTelemetry(stopTime - startTime, {
+        label: debugLabel,
+        params,
+        type: "suspense-cache",
+      });
+
+      return result;
+    },
+  });
+}
+
+const key = Symbol.for("createSingleEntryCache").toString();
+
+export function createSingleEntryCacheWithTelemetry<Params extends Array<any>, Value>(
+  options: Omit<CreateCacheOptions<Params, Value>, "debugLabel" | "getKey"> & {
+    debugLabel: string;
+  }
+): Cache<Params, Value> {
+  return createCacheWithTelemetry<Params, Value>({
+    getKey: () => key,
+    ...options,
+  });
+}
 
 export function createFetchAsyncFromFetchSuspense<TParams extends Array<any>, TValue>(
   suspenseCache: (...params: TParams) => TValue
