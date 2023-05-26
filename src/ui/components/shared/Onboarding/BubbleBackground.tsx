@@ -1,9 +1,13 @@
 import React from "react";
 
+import styles from "./BubbleBackground.module.css";
+
 export default function BubbleBackground() {
   return (
-    <div className="pointer-events-none absolute h-full w-full">
-      <div className="h-full bg-themeBase-95"></div>
+    <div className={styles.container}>
+      <div className={styles.bottom}>
+        <div className={styles.pinkGrid}></div>
+      </div>
     </div>
   );
 }
