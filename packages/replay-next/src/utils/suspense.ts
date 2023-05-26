@@ -26,7 +26,6 @@ export function createCacheWithTelemetry<Params extends Array<any>, Value>(
         duration: stopTime - startTime,
         label: debugLabel,
         params,
-        type: "suspense-cache",
       });
 
       return result;
