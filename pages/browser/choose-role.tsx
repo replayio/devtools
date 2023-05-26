@@ -33,8 +33,8 @@ export default function ImportSettings() {
 
   return (
     <OnboardingModalContainer>
-      <OnboardingContentWrapper>
-        <OnboardingHeader>What's your role?</OnboardingHeader>
+      <OnboardingContentWrapper noLogo>
+        <OnboardingHeader>Hey, what's your role?</OnboardingHeader>
         <OnboardingBody>(So our tutorial can be relevant to you)</OnboardingBody>
         <OnboardingActions>
           <button

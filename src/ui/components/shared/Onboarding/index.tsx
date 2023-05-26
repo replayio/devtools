@@ -33,7 +33,7 @@ export function OnboardingContentWrapper({
     <div
       className={classNames(
         "relative m-4 flex flex-col items-center rounded-xl bg-gray-900 p-9 text-xl text-white shadow-md",
-        overlay ? "max-w-sm space-y-8" : "max-w-2xl space-y-6",
+        overlay ? "max-w-sm space-y-8" : "max-w-xl space-y-3",
         {
           "rounded-lg bg-opacity-80": overlay,
         }
@@ -52,7 +52,7 @@ export function OnboardingContent({
 }) {
   return (
     <div className="relative flex flex-col items-center space-y-4 text-white">
-      <ReplayLogo size="md" />
+      <ReplayLogo size="md" color="white" />
       {children}
     </div>
   );
