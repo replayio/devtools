@@ -11,10 +11,7 @@ export function TestRunOverviewContent() {
   const { testRun } = useContext(TestRunOverviewContext);
 
   return (
-    <div
-      className={`m-4 ml-0 flex flex-col overflow-hidden rounded-xl text-sm shadow-lg ${styles.runOverview}`}
-      style={{ width: "50rem" }}
-    >
+    <div className={`flex h-full flex-col text-sm ${styles.runOverview}`}>
       {testRun ? (
         <>
           <RunSummary testRun={testRun} />
