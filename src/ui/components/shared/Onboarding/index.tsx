@@ -32,14 +32,14 @@ export function OnboardingContentWrapper({
   return (
     <div
       className={classNames(
-        "relative m-4 flex flex-col items-center rounded-xl bg-gray-900 p-9 text-xl text-white shadow-md",
-        overlay ? "max-w-sm space-y-8" : "max-w-xl space-y-3",
+        "relative m-4 flex flex-col items-center rounded-xl bg-loadingBoxes p-9 text-xl text-bodyColor shadow-md",
+        overlay ? "max-w-sm space-y-8" : "max-w-2xl space-y-12",
         {
           "rounded-lg bg-opacity-80": overlay,
         }
       )}
     >
-      {noLogo ? null : <img src="/images/logo.svg" className="h-16 w-full" />}
+      {noLogo ? null : <img src="/images/logo.svg" className="h-24 w-full" />}
       {children}
     </div>
   );
@@ -51,10 +51,7 @@ export function OnboardingContent({
   children: React.ReactChild | (React.ReactChild | null)[];
 }) {
   return (
-    <div className="relative flex flex-col items-center space-y-4 text-white">
-      <ReplayLogo size="md" color="white" />
-      {children}
-    </div>
+    <div className="relative flex flex-col items-center space-y-4 text-bodyColor">{children}</div>
   );
 }
 
@@ -63,7 +60,7 @@ export function OnboardingHeader({ children }: { children: string }) {
 }
 
 export function OnboardingBody({ children }: { children: string | ReactNode }) {
-  return <div className="mx-10 pb-6 text-center">{children}</div>;
+  return <div className="mx-10 text-center">{children}</div>;
 }
 
 export function OnboardingActions({

@@ -33,9 +33,11 @@ export default function ImportSettings() {
 
   return (
     <OnboardingModalContainer>
-      <OnboardingContentWrapper noLogo>
-        <OnboardingHeader>Hey, what's your role?</OnboardingHeader>
-        <OnboardingBody>(So our tutorial can be relevant to you)</OnboardingBody>
+      <OnboardingContentWrapper>
+        <OnboardingContent>
+          <OnboardingHeader>What's your role?</OnboardingHeader>
+          <OnboardingBody>So our tutorial can be relevant to you!</OnboardingBody>
+        </OnboardingContent>
         <OnboardingActions>
           <button
             className={getButtonClasses("blue", "primary", "2xl")}
