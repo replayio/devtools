@@ -1,12 +1,12 @@
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 
+import { recordData as recordTelemetryData } from "replay-next/src/utils/telemetry";
 import { Recording } from "shared/graphql/types";
 import { skipTelemetry } from "ui/utils/environment";
 
 import { initializeMixpanel, trackMixpanelEvent } from "./mixpanel";
 import { prefs } from "./prefs";
-import { pingTelemetry } from "./replay-telemetry";
 
 const timings: Record<string, number> = {};
 
@@ -119,7 +119,7 @@ export function sendTelemetryEvent(event: string, tags: any = {}) {
     return;
   }
 
-  pingTelemetry(event, { ...tags, user: telemetryUser });
+  recordTelemetryData(event, { ...tags, user: telemetryUser });
 }
 
 export function trackTiming(event: string, properties: any = {}) {

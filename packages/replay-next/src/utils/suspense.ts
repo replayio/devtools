@@ -1,6 +1,6 @@
 import { Cache, CreateCacheOptions, createCache, isPromiseLike } from "suspense";
 
-import { log as logTelemetry } from "./telemetry";
+import { recordData as recordTelemetryData } from "./telemetry";
 
 type AnyFunction<ReturnType> = (...args: any[]) => ReturnType;
 
@@ -22,7 +22,8 @@ export function createCacheWithTelemetry<Params extends Array<any>, Value>(
       const stopTime = Date.now();
 
       // Fire and forget telemetry (if enabled)
-      logTelemetry(stopTime - startTime, {
+      recordTelemetryData("suspense-cache-load", {
+        duration: stopTime - startTime,
         label: debugLabel,
         params,
         type: "suspense-cache",

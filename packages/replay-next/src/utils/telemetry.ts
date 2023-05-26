@@ -1,4 +1,4 @@
-export async function log(duration: number, data: Object): Promise<void> {
+export async function recordData(event: string, tags?: Object): Promise<void> {
   if (process.env.NODE_ENV !== "development" || process.env.NEXT_PUBLIC_RECORD_REPLAY_TELEMETRY) {
     try {
       const response = await fetch("https://telemetry.replay.io/", {
@@ -7,8 +7,8 @@ export async function log(duration: number, data: Object): Promise<void> {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          duration,
-          ...data,
+          event,
+          ...tags,
         }),
       });
 
