@@ -246,7 +246,6 @@ const Passport = () => {
     return Math.floor(Math.random() * (max - min + 1) + min);
   };
 
-  const [randomTop, setRandomTop] = useState(rand(0, 20));
   const [randomRight, setRandomRight] = useState(rand(-50, 0));
   const [randomRotation, setRandomRotation] = useState(rand(-20, 20));
 
@@ -279,7 +278,6 @@ const Passport = () => {
   };
 
   useEffect(() => {
-    setRandomTop(rand(220, 320));
     setRandomRight(rand(-50, 0));
     setRandomRotation(rand(-20, 20));
   }, [selectedItem.completed]);
