@@ -4,6 +4,6 @@ import DownloadReplayModal from "./DownloadReplayModal";
 
 export default function DownloadReplayPromptModal() {
   return (
-    <DownloadReplayModal>{`To start making recordings, please download the Replay browser.`}</DownloadReplayModal>
+    <DownloadReplayModal>{`To start making recordings, you'll have to download the Replay browser.`}</DownloadReplayModal>
   );
 }

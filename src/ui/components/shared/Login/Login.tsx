@@ -104,12 +104,10 @@ function LoginMessaging() {
 
   return (
     <>
-      {isTeamMemberInvite() ? (
-        <h1 className="text-center text-2xl font-extrabold">Almost there!</h1>
-      ) : null}
-      <div className="space-y-4 self-start text-center text-base">
+      {isTeamMemberInvite() ? <h1 className="text-2xl font-extrabold">Almost there!</h1> : null}
+      <div className="space-y-4 self-start text-base">
         {isTeamMemberInvite() ? (
-          <p>To join your team, please sign in.</p>
+          <p>In order to join your team, we first need you to sign in.</p>
         ) : (
           <>
             <div className="text-center">

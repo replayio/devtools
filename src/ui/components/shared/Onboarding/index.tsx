@@ -64,7 +64,7 @@ export function OnboardingHeader({ children }: { children: string }) {
 }
 
 export function OnboardingBody({ children }: { children: string | ReactNode }) {
-  return <div className="mx-10 pb-6 text-center">{children}</div>;
+  return <div className="mx-10 text-center">{children}</div>;
 }
 
 export function OnboardingActions({
