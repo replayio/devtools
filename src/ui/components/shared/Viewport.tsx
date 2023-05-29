@@ -31,13 +31,14 @@ export function DefaultViewportWrapper({
   footer?: ReactNode;
 }) {
   return (
-    <FullViewportWrapper style={{ background: "orange" }}>
+    <FullViewportWrapper>
       <ModalBackground />
       <div className="relative space-y-4">{children}</div>
       {footer}
     </FullViewportWrapper>
   );
 }
+
 export function BlankViewportWrapper({ children }: { children?: ReactNode }) {
   return <FullViewportWrapper style={{ background: "white" }}>{children}</FullViewportWrapper>;
 }

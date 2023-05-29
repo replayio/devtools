@@ -1,11 +1,11 @@
 .container {
-  border: 10px solid red;
   pointer-events: none;
   position: absolute;
   height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
-  background: linear-gradient(to bottom, #081120 0%, #152746 50%, black 100%);
-  color: #d7d7db;
+  background: var(--chrome);
+  color: var(--body-color);
+  padding: 20px;
 }

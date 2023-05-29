@@ -21,7 +21,7 @@ function LaunchBrowser({
 
   return (
     <section className="relative m-auto w-full max-w-xl overflow-hidden rounded-lg bg-modalBgcolor text-sm text-bodyColor shadow-lg">
-      <div className="flex flex-col items-center space-y-9 p-12">
+      <div className="flex flex-col items-center space-y-9 p-6">
         <div className="place-content-center space-y-3">
           <img className="mx-auto h-12 w-12" src="/images/logo.svg" />
         </div>
@@ -33,7 +33,7 @@ function LaunchBrowser({
             </p>
             {children}
           </div>
-          <div className="w-full border-b border-gray-200" />
+          <div className="w-full" />
           <div className="flex flex-row text-xs text-gray-500">
             <p>
               {`Don't have Replay yet? Download it on `}

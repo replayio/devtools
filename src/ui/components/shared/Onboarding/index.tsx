@@ -15,6 +15,7 @@ import { PrimaryLgButton } from "../Button";
 import Modal from "../NewModal";
 import ReplayLogo from "../ReplayLogo";
 import ModalBackground from "./ModalBackground";
+import styles from "./Onboarding.module.css";
 
 const OnboardingContext = React.createContext({ theme: "dark" });
 
@@ -32,14 +33,14 @@ export function OnboardingContentWrapper({
   return (
     <div
       className={classNames(
-        "relative m-4 flex flex-col items-center rounded-xl bg-gray-900 p-9 text-xl text-white shadow-md",
+        styles.onboardingLogin,
         overlay ? "max-w-sm space-y-8" : "max-w-xl space-y-3",
         {
           "rounded-lg bg-opacity-80": overlay,
         }
       )}
     >
-      {noLogo ? null : <img src="/images/logo.svg" className="h-16 w-full" />}
+      {noLogo ? null : <ReplayLogo size="md" color="white" />}
       {children}
     </div>
   );
@@ -51,7 +52,7 @@ export function OnboardingContent({
   children: React.ReactChild | (React.ReactChild | null)[];
 }) {
   return (
-    <div className="relative flex flex-col items-center space-y-4 bg-orange-500 text-white">
+    <div className={styles.onboardingContent}>
       <ReplayLogo size="md" color="white" />
       {children}
     </div>
@@ -128,15 +129,7 @@ export function OnboardingButton({
   disabled?: boolean;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={classNames(
-        className,
-        "max-w-max items-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 font-medium text-white shadow-sm hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
-      )}
-    >
+    <button type="button" onClick={onClick} disabled={disabled}>
       {children}
     </button>
   );
@@ -154,7 +147,7 @@ export function OnboardingModalContainer({
 }) {
   return (
     <OnboardingContext.Provider value={{ theme }}>
-      <div className={classNames("fixed z-50 grid h-full w-full bg-black text-white")}>
+      <div className={styles.modalContainer}>
         <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
           {children}
         </Modal>
