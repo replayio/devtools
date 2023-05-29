@@ -1,8 +1,8 @@
 import React from "react";
 
-import styles from "./BubbleBackground.module.css";
+import styles from "./ModalBackground.module.css";
 
-export default function BubbleBackground() {
+export default function ModalBackground() {
   return (
     <div className={styles.container}>
       <div className={styles.bottom}>

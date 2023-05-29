@@ -14,7 +14,7 @@ import { actions } from "ui/actions";
 import { PrimaryLgButton } from "../Button";
 import Modal from "../NewModal";
 import ReplayLogo from "../ReplayLogo";
-import BubbleBackground from "./BubbleBackground";
+import ModalBackground from "./ModalBackground";
 
 const OnboardingContext = React.createContext({ theme: "dark" });
 
@@ -51,7 +51,7 @@ export function OnboardingContent({
   children: React.ReactChild | (React.ReactChild | null)[];
 }) {
   return (
-    <div className="relative flex flex-col items-center space-y-4 text-white">
+    <div className="relative flex flex-col items-center space-y-4 bg-orange-500 text-white">
       <ReplayLogo size="md" color="white" />
       {children}
     </div>
@@ -155,7 +155,6 @@ export function OnboardingModalContainer({
   return (
     <OnboardingContext.Provider value={{ theme }}>
       <div className={classNames("fixed z-50 grid h-full w-full bg-black text-white")}>
-        <BubbleBackground />
         <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
           {children}
         </Modal>

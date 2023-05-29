@@ -1,13 +1,13 @@
 import React from "react";
 
 import { LaunchBrowser } from "ui/components/shared/LaunchBrowserModal";
-import { BubbleViewportWrapper } from "ui/components/shared/Viewport";
+import { DefaultViewportWrapper } from "ui/components/shared/Viewport";
 
 const BrowserAuth = () => {
   const library = "replay:open";
 
   return (
-    <BubbleViewportWrapper>
+    <DefaultViewportWrapper>
       <LaunchBrowser path={library}>
         <p>You have successfully logged into the Replay Browser. You may close this window.</p>
         <p className="text-center">
@@ -19,7 +19,7 @@ const BrowserAuth = () => {
           </a>
         </p>
       </LaunchBrowser>
-    </BubbleViewportWrapper>
+    </DefaultViewportWrapper>
   );
 };
 

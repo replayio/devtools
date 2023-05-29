@@ -11,7 +11,7 @@ import { decodeWorkspaceId } from "ui/utils/workspace";
 import Icon from "../shared/Icon";
 import LoadingScreen from "../shared/LoadingScreen";
 import ReplayLogo from "../shared/ReplayLogo";
-import { BubbleViewportWrapper } from "../shared/Viewport";
+import { DefaultViewportWrapper } from "../shared/Viewport";
 import { MY_LIBRARY } from "./libraryConstants";
 import { Privacy, ToggleShowPrivacyButton } from "./Privacy";
 import ReplayTitle from "./ReplayTitle";
@@ -175,7 +175,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
   }
 
   return (
-    <BubbleViewportWrapper>
+    <DefaultViewportWrapper>
       <div className="flex flex-col items-center">
         <UploadRecordingTrialEnd {...{ selectedWorkspaceId, workspaces }} />
         <form className="relative flex flex-col items-center overflow-auto" onSubmit={onSubmit}>
@@ -223,6 +223,6 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
           <Actions onDiscard={onDiscard} status={status} />
         </form>
       </div>
-    </BubbleViewportWrapper>
+    </DefaultViewportWrapper>
   );
 }

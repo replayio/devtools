@@ -4,7 +4,7 @@ import { useAcceptTOS } from "ui/hooks/users";
 
 import { PrimaryButton } from "./shared/Button";
 import ExternalLink from "./shared/ExternalLink";
-import { BubbleViewportWrapper } from "./shared/Viewport";
+import { DefaultViewportWrapper } from "./shared/Viewport";
 
 export const LATEST_TOS_VERSION = 1;
 
@@ -14,7 +14,7 @@ export default function TOSScreen() {
   const handleAccept = () => acceptTOS({ variables: { version: LATEST_TOS_VERSION } });
 
   return (
-    <BubbleViewportWrapper>
+    <DefaultViewportWrapper>
       <div
         className="relative flex flex-col items-center space-y-6 rounded-lg bg-white p-9 text-base shadow-xl"
         style={{ width: "520px" }}
@@ -60,6 +60,6 @@ export default function TOSScreen() {
           I’ve read and accept the terms of service
         </PrimaryButton>
       </div>
-    </BubbleViewportWrapper>
+    </DefaultViewportWrapper>
   );
 }
