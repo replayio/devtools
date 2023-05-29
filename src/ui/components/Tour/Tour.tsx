@@ -56,8 +56,7 @@ const Tour: React.FC = () => {
 
   const isNewUser =
     showDevtoolsNag && showConsoleNavigate && showBreakpointAdd && showBreakpointEdit;
-  const hasCompletedTour =
-    !showDevtoolsNag && !showConsoleNavigate && !showBreakpointAdd && !showBreakpointEdit;
+  const hasCompletedTour = !showBreakpointEdit;
 
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
@@ -203,9 +202,16 @@ const Tour: React.FC = () => {
                   helloAgain
                 ) : (
                   <>
-                    {showConsoleNavigate && timeTravel}
-                    {!showConsoleNavigate && showBreakpointAdd && oneClickLogs}
-                    {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && editLogs}
+                    {!hasCompletedTour && (
+                      <>
+                        {showConsoleNavigate && timeTravel}
+                        {!showConsoleNavigate && showBreakpointAdd && oneClickLogs}
+                        {!showConsoleNavigate &&
+                          !showBreakpointAdd &&
+                          showBreakpointEdit &&
+                          editLogs}
+                      </>
+                    )}
                     {hasCompletedTour && (
                       <CompletedTour
                         setShowPassport={setShowPassport}
@@ -227,12 +233,15 @@ const Tour: React.FC = () => {
         )}
         {!isNewUser && viewMode !== "non-dev" && (
           <>
-            {showConsoleNavigate && showBreakpointAdd && showBreakpointEdit && <TimeTravelGif />}
-
-            {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && <EditLogsGif />}
-
-            {!showConsoleNavigate && showBreakpointAdd && <OneClickLogsGif />}
-
+            {!hasCompletedTour && ( // some people jump to the final step of the tour, so this lets them
+              <>
+                {showConsoleNavigate && <TimeTravelGif />}
+                {!showConsoleNavigate && !showBreakpointAdd && showBreakpointEdit && (
+                  <EditLogsGif />
+                )}
+                {!showConsoleNavigate && showBreakpointAdd && <OneClickLogsGif />}
+              </>
+            )}
             {hasCompletedTour && <CompletedTourGif />}
           </>
         )}
