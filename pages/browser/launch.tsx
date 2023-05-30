@@ -1,13 +1,13 @@
 import React from "react";
 
 import { LaunchBrowser } from "ui/components/shared/LaunchBrowserModal";
-import { BubbleViewportWrapper } from "ui/components/shared/Viewport";
+import { DefaultViewportWrapper } from "ui/components/shared/Viewport";
 
 const BrowserLaunch = () => {
   const library = "replay:library";
 
   return (
-    <BubbleViewportWrapper>
+    <DefaultViewportWrapper>
       <LaunchBrowser path={library}>
         <p className="text-center">
           <a
@@ -18,7 +18,7 @@ const BrowserLaunch = () => {
           </a>
         </p>
       </LaunchBrowser>
-    </BubbleViewportWrapper>
+    </DefaultViewportWrapper>
   );
 };
 

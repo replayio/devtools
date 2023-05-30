@@ -5,7 +5,7 @@ import { ConnectedProps, connect } from "react-redux";
 import { getAwaitingSourcemaps, getUploading } from "ui/reducers/app";
 import { UIState } from "ui/state";
 
-import { BubbleViewportWrapper } from "./Viewport";
+import { DefaultViewportWrapper } from "./Viewport";
 import styles from "./LoadingScreen.module.css";
 
 const colorOptions: Array<"blue" | "green" | "red"> = ["blue", "green", "red"];
@@ -30,7 +30,7 @@ export function LoadingScreenTemplate({ children }: { children?: ReactNode }) {
 
   return (
     <div className={styles.loadingScreenWrapper}>
-      <BubbleViewportWrapper>
+      <DefaultViewportWrapper>
         <div className={styles.loadingScreenWrapper}>
           <div className="flex flex-col items-center space-y-2">
             <div className={styles.hoverboardWrapper} onClick={changeHoverboardColor}>
@@ -39,7 +39,7 @@ export function LoadingScreenTemplate({ children }: { children?: ReactNode }) {
             {children}
           </div>
         </div>
-      </BubbleViewportWrapper>
+      </DefaultViewportWrapper>
     </div>
   );
 }

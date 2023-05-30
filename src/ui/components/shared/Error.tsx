@@ -16,7 +16,7 @@ import { getRecordingId } from "ui/utils/recording";
 
 import { PrimaryButton } from "./Button";
 import { Dialog, DialogActions, DialogDescription, DialogLogo, DialogTitle } from "./Dialog";
-import { BubbleViewportWrapper } from "./Viewport";
+import { DefaultViewportWrapper } from "./Viewport";
 
 export function PopupBlockedError() {
   return (
@@ -170,17 +170,17 @@ function Error({ error }: ErrorProps) {
 
 function ExpectedErrorScreen({ error }: { error: ExpectedError }) {
   return (
-    <BubbleViewportWrapper>
+    <DefaultViewportWrapper>
       <Error error={error} />
-    </BubbleViewportWrapper>
+    </DefaultViewportWrapper>
   );
 }
 
 function UnexpectedErrorScreen({ error }: { error: UnexpectedError }) {
   return (
-    <BubbleViewportWrapper>
+    <DefaultViewportWrapper>
       <Error error={error} />
-    </BubbleViewportWrapper>
+    </DefaultViewportWrapper>
   );
 }
 

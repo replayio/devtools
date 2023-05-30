@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React, { CSSProperties, ReactNode } from "react";
 
-import BubbleBackground from "./Onboarding/BubbleBackground";
+import ModalBackground from "./Onboarding/ModalBackground";
 
 function FullViewportWrapper({
   children,
@@ -23,7 +23,7 @@ function FullViewportWrapper({
   );
 }
 
-export function BubbleViewportWrapper({
+export function DefaultViewportWrapper({
   children,
   footer,
 }: {
@@ -31,13 +31,14 @@ export function BubbleViewportWrapper({
   footer?: ReactNode;
 }) {
   return (
-    <FullViewportWrapper style={{ background: "#f3f3f4" }}>
-      <BubbleBackground />
+    <FullViewportWrapper>
+      <ModalBackground />
       <div className="relative space-y-4">{children}</div>
       {footer}
     </FullViewportWrapper>
   );
 }
+
 export function BlankViewportWrapper({ children }: { children?: ReactNode }) {
   return <FullViewportWrapper style={{ background: "white" }}>{children}</FullViewportWrapper>;
 }
