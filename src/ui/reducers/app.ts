@@ -249,7 +249,7 @@ export const getIndexedProgress = createSelector(getLoadedRegions, regions => {
     return totalTime + end.time - begin.time;
   }, 0);
 
-  return totalIndexedTime / totalLoadingTime;
+  return totalIndexedTime ? 1 : 0;
 });
 
 export const getIsIndexed = createSelector(getIndexedProgress, progress => progress === 1);
