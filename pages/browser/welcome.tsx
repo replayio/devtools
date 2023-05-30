@@ -16,17 +16,14 @@ export default function WelcomeToReplay() {
 
   return (
     <OnboardingModalContainer>
-      <OnboardingContentWrapper>
-        <OnboardingContent>
-          <OnboardingHeader>{`Welcome to Replay`}</OnboardingHeader>
-          <OnboardingBody>{`Replay lets you record bugs and replay them with time-travel enabled browser DevTools.`}</OnboardingBody>
-        </OnboardingContent>
-        <OnboardingActions>
-          <Link href="/login?returnTo=/browser/choose-role" className={classes}>
-            Get Started
-          </Link>
-        </OnboardingActions>
-      </OnboardingContentWrapper>
+      <OnboardingContent>
+        <OnboardingHeader>{`Hello, I'm the Replay Browser`}</OnboardingHeader>
+        <OnboardingBody>{`Replay lets you record bugs and replay them with time-travel enabled browser DevTools.`}</OnboardingBody>
+
+        <Link href="/login?returnTo=/browser/choose-role" className={classes}>
+          Get Started
+        </Link>
+      </OnboardingContent>
     </OnboardingModalContainer>
   );
 }
