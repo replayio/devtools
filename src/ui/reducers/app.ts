@@ -222,11 +222,14 @@ export const getIndexedAndLoadedRegions = createSelector(getLoadedRegions, loade
   return overlap(loadedRegions.indexed, loadedRegions.loaded);
 });
 
-// Calculates the percentage of loading regions that have been loaded and indexed.
+// Returns 1 if we have loaded at least one section of the recording. This method has been changed
+// many times and this latest version is really a temporary change while the backend team decides
+// whether to pull out `indexed` and `loaded` events completely in exchange for something more
+// meaningful. We want the client to start sending requests earlier so that we can better gauge
+// how we should change our loading algorithms, and we also want users to feel free to interact
+// with the recording as long as we're somewhat close to being able to respond to their requests.
 //
-// For example:
-// If 80% of the regions have been indexed and 50% have been loaded, this method would return 0.65.
-// If 100% of the regions have been indexed and 50% have been loaded, this method would return 0.75.
+// See https://github.com/replayio/devtools/pull/9268 for more discussion.
 export const getIndexedProgress = createSelector(getLoadedRegions, regions => {
   if (!regions) {
     return 0;
@@ -245,11 +248,7 @@ export const getIndexedProgress = createSelector(getLoadedRegions, regions => {
     return 0;
   }
 
-  const totalIndexedTime = indexed.reduce((totalTime, { begin, end }) => {
-    return totalTime + end.time - begin.time;
-  }, 0);
-
-  return totalIndexedTime / totalLoadingTime;
+  return indexed.find(({ begin, end }) => end.time - begin.time > 0) ? 1 : 0;
 });
 
 export const getIsIndexed = createSelector(getIndexedProgress, progress => progress === 1);
