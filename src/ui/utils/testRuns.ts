@@ -1,4 +1,3 @@
-import assert from "assert";
 import orderBy from "lodash/orderBy";
 
 import { Recording } from "shared/graphql/types";
@@ -19,7 +18,8 @@ function testFailed(recording: Recording) {
   );
 }
 
-export function groupRecordings(recordings: Recording[] | undefined) {
+export function groupRecordings(recordings: Recording[]) {
+  console.log("groupRecordings:", recordings.length);
   const passedRecordings: RecordingGroup = {
     count: 0,
     fileNameToRecordings: {},
@@ -51,11 +51,8 @@ export function groupRecordings(recordings: Recording[] | undefined) {
     const recordings = recordingsMap[file];
 
     const didAnyTestPass = recordings.some(testPassed);
-    console.log("group:", file, "->", didAnyTestPass, "->", recordings);
 
     for (const recording of recordings) {
-      console.log("fileName:", recording);
-
       if (testPassed(recording)) {
         if (passedRecordings.fileNameToRecordings[file]) {
           passedRecordings.fileNameToRecordings[file].push(recording);

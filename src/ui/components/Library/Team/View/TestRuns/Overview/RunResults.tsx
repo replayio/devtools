@@ -11,8 +11,9 @@ import styles from "../../../../Library.module.css";
 export function RunResults() {
   const testRun = useContext(TestRunOverviewContext).testRun!;
 
+  // TODO Don't keep re-computing this; it's expensive
   const { passedRecordings, failedRecordings, flakyRecordings } = useMemo(
-    () => groupRecordings(testRun.recordings),
+    () => groupRecordings(testRun.recordings ?? []),
     [testRun.recordings]
   );
 

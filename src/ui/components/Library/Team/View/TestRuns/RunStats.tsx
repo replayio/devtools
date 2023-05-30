@@ -13,8 +13,9 @@ function Pill({ styles, value }: { styles: string; value: number }) {
   );
 }
 export function RunStats({ testRun }: { testRun: TestRun }) {
+  // TODO Don't keep re-computing this; it's expensive
   const { passedRecordings, failedRecordings, flakyRecordings } = useMemo(
-    () => groupRecordings(testRun.recordings),
+    () => groupRecordings(testRun.recordings ?? []),
     [testRun.recordings]
   );
 
