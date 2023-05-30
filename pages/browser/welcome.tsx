@@ -18,7 +18,7 @@ export default function WelcomeToReplay() {
     <OnboardingModalContainer>
       <OnboardingContent>
         <OnboardingHeader>{`Hello, I'm the Replay Browser`}</OnboardingHeader>
-        <OnboardingBody>{`Nice to meet you! I'm going to save you and your team a whole lot of time.`}</OnboardingBody>
+        <OnboardingBody>{`Replay lets you record bugs and replay them with time-travel enabled browser DevTools.`}</OnboardingBody>
 
         <Link href="/login?returnTo=/browser/choose-role" className={classes}>
           Get Started
