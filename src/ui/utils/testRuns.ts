@@ -1,6 +1,12 @@
+import assert from "assert";
 import orderBy from "lodash/orderBy";
 
 import { Recording } from "shared/graphql/types";
+
+export type RecordingGroup = {
+  count: number;
+  fileNameToRecordings: { [fileName: string]: Recording[] };
+};
 
 function testPassed(recording: Recording) {
   return recording.metadata?.test?.result === "passed";
@@ -14,9 +20,19 @@ function testFailed(recording: Recording) {
 }
 
 export function groupRecordings(recordings: Recording[] | undefined) {
-  const passedRecordings: Recording[] = [];
-  const failedRecordings: Recording[] = [];
-  const flakyRecordings: Recording[] = [];
+  const passedRecordings: RecordingGroup = {
+    count: 0,
+    fileNameToRecordings: {},
+  };
+  const failedRecordings: RecordingGroup = {
+    count: 0,
+    fileNameToRecordings: {},
+  };
+  const flakyRecordings: RecordingGroup = {
+    count: 0,
+    fileNameToRecordings: {},
+  };
+
   const sortedRecordings = orderBy(recordings, "date", "desc");
 
   const recordingsMap = sortedRecordings.reduce((acc, recording) => {
@@ -33,20 +49,36 @@ export function groupRecordings(recordings: Recording[] | undefined) {
 
   for (const file in recordingsMap) {
     const recordings = recordingsMap[file];
-    if (recordings.length > 1) {
-      for (const recording of recordings) {
-        if (testPassed(recording)) {
-          passedRecordings.push(recording);
-        } else if (testFailed(recording)) {
-          flakyRecordings.push(recording);
-        }
-      }
-    } else {
-      const recording = recordings[0];
+
+    const didAnyTestPass = recordings.some(testPassed);
+    console.log("group:", file, "->", didAnyTestPass, "->", recordings);
+
+    for (const recording of recordings) {
+      console.log("fileName:", recording);
+
       if (testPassed(recording)) {
-        passedRecordings.push(recording);
+        if (passedRecordings.fileNameToRecordings[file]) {
+          passedRecordings.fileNameToRecordings[file].push(recording);
+        } else {
+          passedRecordings.count++;
+          passedRecordings.fileNameToRecordings[file] = [recording];
+        }
       } else if (testFailed(recording)) {
-        failedRecordings.push(recording);
+        if (didAnyTestPass) {
+          if (flakyRecordings.fileNameToRecordings[file]) {
+            flakyRecordings.fileNameToRecordings[file].push(recording);
+          } else {
+            flakyRecordings.count++;
+            flakyRecordings.fileNameToRecordings[file] = [recording];
+          }
+        } else {
+          if (failedRecordings.fileNameToRecordings[file]) {
+            failedRecordings.fileNameToRecordings[file].push(recording);
+          } else {
+            failedRecordings.count++;
+            failedRecordings.fileNameToRecordings[file] = [recording];
+          }
+        }
       }
     }
   }

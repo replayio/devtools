@@ -2,7 +2,7 @@ import { useContext, useMemo, useState } from "react";
 
 import { Recording } from "shared/graphql/types";
 import Icon from "ui/components/shared/Icon";
-import { groupRecordings } from "ui/utils/testRuns";
+import { RecordingGroup, groupRecordings } from "ui/utils/testRuns";
 
 import { TestResultListItem } from "./TestResultListItem";
 import { TestRunOverviewContext } from "./TestRunOverviewContainerContextType";
@@ -18,25 +18,25 @@ export function RunResults() {
 
   return (
     <div className="no-scrollbar flex flex-col overflow-y-auto">
-      <TestStatusGroup recordings={failedRecordings} label="Failed" />
-      <TestStatusGroup recordings={flakyRecordings} label="Flaky" />
-      <TestStatusGroup recordings={passedRecordings} label="Passed" />
+      <TestStatusGroup label="Failed" recordingGroup={failedRecordings} />
+      <TestStatusGroup label="Flaky" recordingGroup={flakyRecordings} />
+      <TestStatusGroup label="Passed" recordingGroup={passedRecordings} />
     </div>
   );
 }
 
-function TestStatusGroup({ recordings, label }: { recordings: Recording[]; label: string }) {
+function TestStatusGroup({
+  label,
+  recordingGroup,
+}: {
+  label: string;
+  recordingGroup: RecordingGroup;
+}) {
   const [expanded, setExpanded] = useState(true);
-  const count = recordings.length;
+  const count = recordingGroup.count;
   if (count == 0) {
     return null;
   }
-
-  const sortedRecordings = recordings.sort((a, b) =>
-    (a.metadata?.test?.file || 0) > (b.metadata?.test?.file || 0) ? 1 : -1
-  );
-
-  console.log("TestStatusGroup", label);
 
   return (
     <div className="flex flex-col">
@@ -57,8 +57,21 @@ function TestStatusGroup({ recordings, label }: { recordings: Recording[]; label
           />
         </div>
       </div>
-      {expanded &&
-        sortedRecordings.map(r => <TestResultListItem recording={r} key={r.id} label={label} />)}
+      {expanded && <Expanded label={label} recordingGroup={recordingGroup} />}
     </div>
   );
+}
+
+function Expanded({ label, recordingGroup }: { label: string; recordingGroup: RecordingGroup }) {
+  const recordings = useMemo(() => {
+    const recordings: Recording[] = [];
+    for (let fileName in recordingGroup.fileNameToRecordings) {
+      recordings.push(...recordingGroup.fileNameToRecordings[fileName]);
+    }
+    return recordings;
+  }, [recordingGroup]);
+
+  return recordings.map(recording => (
+    <TestResultListItem key={recording.id} label={label} recording={recording} />
+  )) as any;
 }

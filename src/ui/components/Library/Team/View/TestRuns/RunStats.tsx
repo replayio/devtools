@@ -18,16 +18,15 @@ export function RunStats({ testRun }: { testRun: TestRun }) {
     [testRun.recordings]
   );
 
-  const passed = passedRecordings.length;
-  const failed = failedRecordings.length;
-  const flakyCount = flakyRecordings.length;
+  const passed = passedRecordings.count;
+  const failed = failedRecordings.count;
+  const flakyCount = flakyRecordings.count;
 
   return (
     <div className="flex shrink space-x-2">
       {failed > 0 && <Pill styles="text-chrome bg-[#EB5757]" value={failed} />}
       {flakyCount > 0 && <Pill styles="text-chrome bg-[#FDBA00]" value={flakyCount} />}
-
-      {failed == 0 && passed > 0 && (
+      {passed > 0 && (
         <Pill styles="border border-[#219653] border-2 text-[#219653]" value={passed} />
       )}
     </div>

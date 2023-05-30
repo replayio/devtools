@@ -60,6 +60,7 @@ function Status({ failCount }: { failCount: number }) {
 export function TestRunListItem({ testRun }: { testRun: TestRun }) {
   const { focusId } = useContext(TestRunsContext);
   const { teamId } = useContext(TeamContext);
+  // TODO Don't count flakes
   const failCount = testRun.stats?.failed || 0;
   const isSelected = focusId === testRun.id;
 
