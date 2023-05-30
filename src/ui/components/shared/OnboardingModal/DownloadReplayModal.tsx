@@ -32,7 +32,7 @@ function InitialScreen({
       <OnboardingBody>{children}</OnboardingBody>
       <OnboardingActions>
         <SecondaryLgButton color="blue" onClick={onSkipToLibrary}>
-          Skip
+          Go to your Library
         </SecondaryLgButton>
         <PrimaryLgButton color="blue" onClick={onNext}>
           {`Download Replay`}
