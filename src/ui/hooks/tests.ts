@@ -3,10 +3,7 @@ import orderBy from "lodash/orderBy";
 import { useMemo } from "react";
 
 import { assert } from "protocol/utils";
-import {
-  GetTest_node_Workspace_tests,
-  GetTest_node_Workspace_tests_recordings,
-} from "shared/graphql/generated/GetTest";
+import { GetTest_node_Workspace_tests_recordings } from "shared/graphql/generated/GetTest";
 import {
   GetTestsRun,
   GetTestsRunVariables,
@@ -42,30 +39,6 @@ export interface TestRun {
   triggerUrl?: string;
 }
 
-const GET_TESTS_FOR_WORKSPACE = gql`
-  query GetTestsForWorkspace($workspaceId: ID!) {
-    node(id: $workspaceId) {
-      ... on Workspace {
-        id
-        tests {
-          title
-          path
-          recordings {
-            edges {
-              node {
-                uuid
-                duration
-                createdAt
-                metadata
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
 const GET_TEST_RUNS_FOR_WORKSPACE = gql`
   query GetTestsRunsForWorkspace($workspaceId: ID!) {
     node(id: $workspaceId) {
@@ -85,30 +58,6 @@ const GET_TEST_RUNS_FOR_WORKSPACE = gql`
           stats {
             passed
             failed
-          }
-        }
-      }
-    }
-  }
-`;
-
-const GET_TEST = gql`
-  query GetTest($workspaceId: ID!, $path: String!) {
-    node(id: $workspaceId) {
-      ... on Workspace {
-        id
-        tests(path: $path) {
-          title
-          path
-          recordings {
-            edges {
-              node {
-                uuid
-                duration
-                createdAt
-                metadata
-              }
-            }
           }
         }
       }
@@ -194,21 +143,6 @@ export function useGetTestRunForWorkspace(
   return {
     testRun: convertTestRun(testRun),
     loading,
-  };
-}
-
-function convertTest(test: GetTest_node_Workspace_tests | undefined) {
-  if (!test) {
-    return null;
-  }
-  const recordings = unwrapRecordingsData(test.recordings);
-  const sortedRecordings = orderBy(recordings, "date", "desc");
-  const firstRecording = sortedRecordings[0];
-
-  return {
-    ...test,
-    date: firstRecording.date,
-    recordings: sortedRecordings,
   };
 }
 
