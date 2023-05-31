@@ -20,6 +20,13 @@ import { WorkspaceId } from "ui/state/app";
 
 export type TestRunMode = "diagnostics" | "record-on-retry" | "stress";
 export type TestRunBranchStatus = "closed" | "merged" | "open";
+export type TestRunSourceMetadata = {
+  branchName: string;
+  branchStatus: TestRunBranchStatus;
+  commitId: string;
+  triggerUrl: string | null;
+  user: string;
+};
 
 export interface TestRun {
   date: string;
@@ -33,14 +40,8 @@ export interface TestRun {
     };
     recordings: Recording[];
   };
-  source: {
-    branchName: string;
-    branchStatus: TestRunBranchStatus;
-    commitId: string;
-    commitTitle: string;
-    triggerUrl: string | null;
-    user: string;
-  };
+  source: TestRunSourceMetadata | null;
+  title: string;
 }
 
 const GET_TEST_RUNS_FOR_WORKSPACE = gql`
@@ -201,15 +202,12 @@ export function convertLegacyTestRunToNewFormat(testRun: unknown): TestRun {
     legacyTestRun;
 
   // Verify expected data; if any of these are missing, we can't reliably migrate the data
-  assert(branch != null, "Expected legacy TestRun data to have a branch");
-  assert(commitId != null, "Expected legacy TestRun data to have a commit id");
   assert(date != null, "Expected legacy TestRun data to have a data");
   assert(id != null, "Expected legacy TestRun data to have a identifier");
   assert(
     stats != null && stats.failed != null && stats.passed != null,
     "Expected legacy TestRun data to have pass/fail stats"
   );
-  assert(user != null, "Expected legacy TestRun data to have a user");
 
   const recordings =
     "recordings" in legacyTestRun ? unwrapRecordingsData(legacyTestRun.recordings) : [];
@@ -223,7 +221,18 @@ export function convertLegacyTestRunToNewFormat(testRun: unknown): TestRun {
   const branchStatus = mergeId != null ? "merged" : "open";
 
   // TODO [FE-1543] Some data doesn't have a title, so use a fallback for now
-  const commitTitleWithFallback = commitTitle || mergeTitle || title || "Tests";
+  const titleWithFallback = commitTitle || mergeTitle || title || "Tests";
+
+  let source: TestRunSourceMetadata | null = null;
+  if (branch && commitId && user) {
+    source = {
+      branchName: branch,
+      branchStatus,
+      commitId,
+      triggerUrl,
+      user,
+    };
+  }
 
   return {
     date,
@@ -237,14 +246,8 @@ export function convertLegacyTestRunToNewFormat(testRun: unknown): TestRun {
       },
       recordings: sortedRecordings,
     },
-    source: {
-      branchName: branch,
-      branchStatus,
-      commitId,
-      commitTitle: commitTitleWithFallback,
-      triggerUrl,
-      user,
-    },
+    source,
+    title: titleWithFallback,
   };
 }
 

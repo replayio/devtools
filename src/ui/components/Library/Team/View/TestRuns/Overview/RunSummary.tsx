@@ -11,12 +11,10 @@ import { RunStats } from "../RunStats";
 import { getDuration } from "../utils";
 
 function Title({ testRun }: { testRun: TestRun }) {
-  const commitTitle = testRun.source.commitTitle;
-
   return (
     <div className="flex flex-row items-center space-x-2 overflow-hidden">
       <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-medium">
-        {commitTitle}
+        {testRun.title}
       </div>
     </div>
   );
@@ -45,48 +43,61 @@ export function ModeAttribute({ testRun }: { testRun: TestRun }) {
 }
 
 export function Attributes({ testRun }: { testRun: TestRun }) {
-  const { date, results, source } = testRun;
+  const { date, results, source, title } = testRun;
   const { recordings } = results;
-  const { branchName, branchStatus, commitTitle, user } = source;
 
   const duration = getDuration(recordings);
   const durationString = getDurationString(duration);
 
-  return (
-    <div className="flex flex-row flex-wrap items-center pl-1">
-      <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
-      {user ? <AttributeContainer icon="person">{user}</AttributeContainer> : null}
+  if (source) {
+    const { branchName, branchStatus, user } = source;
 
-      {branchStatus === "open" ? (
-        <AttributeContainer maxWidth="160px" icon="fork_right">
-          {branchName}
-        </AttributeContainer>
-      ) : (
-        <AttributeContainer title={commitTitle} icon="merge_type">
-          {branchStatus}
-        </AttributeContainer>
-      )}
-      <AttributeContainer icon="timer">{durationString}</AttributeContainer>
-      <ModeAttribute testRun={testRun} />
-    </div>
-  );
+    return (
+      <div className="flex flex-row flex-wrap items-center pl-1">
+        <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
+        {user ? <AttributeContainer icon="person">{user}</AttributeContainer> : null}
+        {branchStatus === "open" ? (
+          <AttributeContainer maxWidth="160px" icon="fork_right">
+            {branchName}
+          </AttributeContainer>
+        ) : (
+          <AttributeContainer title={title} icon="merge_type">
+            {branchStatus}
+          </AttributeContainer>
+        )}
+        <AttributeContainer icon="timer">{durationString}</AttributeContainer>
+        <ModeAttribute testRun={testRun} />
+      </div>
+    );
+  } else {
+    return (
+      <div className="flex flex-row flex-wrap items-center pl-1">
+        <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
+      </div>
+    );
+  }
 }
 
 function RunnerLink({ testRun }: { testRun: TestRun }) {
-  const { triggerUrl } = testRun.source;
-  if (!triggerUrl) {
+  if (!testRun?.source?.triggerUrl) {
     return null;
   }
 
   return (
-    <Link href={triggerUrl} target="_blank" rel="noreferrer noopener" className="hover:underline">
+    <Link
+      href={testRun.source.triggerUrl}
+      target="_blank"
+      rel="noreferrer noopener"
+      className="hover:underline"
+    >
       <span>View run in GitHub</span>
     </Link>
   );
 }
 
 export function RunSummary({ testRun }: { testRun: TestRun }) {
-  const { commitTitle } = testRun.source;
+  const { title } = testRun;
+
   return (
     <div className="mb-2 flex flex-col space-y-2 border-b border-themeBorder p-4">
       <div className="flex flex-row justify-between">
@@ -97,8 +108,8 @@ export function RunSummary({ testRun }: { testRun: TestRun }) {
         <Attributes testRun={testRun} />
         <RunnerLink testRun={testRun} />
       </div>
-      {commitTitle ? (
-        <div className="flex flex-row items-center justify-between text-xs">{commitTitle}</div>
+      {title ? (
+        <div className="flex flex-row items-center justify-between text-xs">{title}</div>
       ) : null}
     </div>
   );

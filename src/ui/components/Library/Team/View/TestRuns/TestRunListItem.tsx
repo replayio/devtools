@@ -13,7 +13,7 @@ import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "../../../Library.module.css";
 
 function Title({ testRun }: { testRun: TestRun }) {
-  const title = testRun.source.commitTitle;
+  const title = testRun.title;
 
   // TODO: This should be done in CSS.
   const formatted = title.length > 80 ? title.slice(0, 80) + "..." : title;
@@ -26,25 +26,33 @@ function Title({ testRun }: { testRun: TestRun }) {
 }
 
 function Attributes({ testRun }: { testRun: TestRun }) {
-  const { date, source } = testRun;
-  const { branchName, branchStatus, commitTitle, user } = source;
+  const { date, source, title } = testRun;
+  if (source) {
+    const { branchName, branchStatus, user } = source;
 
-  return (
-    <div className={`flex flex-row items-center text-xs font-light`}>
-      <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
-      <AttributeContainer icon="person">{user || ""}</AttributeContainer>
-      {branchStatus === "open" ? (
-        <AttributeContainer maxWidth="160px" icon="fork_right">
-          {branchName}
-        </AttributeContainer>
-      ) : (
-        <AttributeContainer title={commitTitle} icon="merge_type">
-          {branchStatus}
-        </AttributeContainer>
-      )}
-      <ModeAttribute testRun={testRun} />
-    </div>
-  );
+    return (
+      <div className="flex flex-row items-center text-xs font-light">
+        <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
+        <AttributeContainer icon="person">{user}</AttributeContainer>
+        {branchStatus === "open" ? (
+          <AttributeContainer maxWidth="160px" icon="fork_right">
+            {branchName}
+          </AttributeContainer>
+        ) : (
+          <AttributeContainer title={title} icon="merge_type">
+            {branchStatus}
+          </AttributeContainer>
+        )}
+        <ModeAttribute testRun={testRun} />
+      </div>
+    );
+  } else {
+    return (
+      <div className="flex flex-row items-center text-xs font-light">
+        <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
+      </div>
+    );
+  }
 }
 
 function Status({ failCount }: { failCount: number }) {
