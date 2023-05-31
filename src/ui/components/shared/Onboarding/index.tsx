@@ -141,9 +141,7 @@ export function OnboardingModalContainer({
 }: {
   children: React.ReactNode;
   theme?: "dark" | "light";
-  visualTreatment?: string;
 }) {
-  const themeClass = visualTreatment ? styles[visualTreatment] : "";
   return (
     <OnboardingContext.Provider value={{ theme }}>
       <div className={classNames(styles.modalContainer, themeClass)}>
