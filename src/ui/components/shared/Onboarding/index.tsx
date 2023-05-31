@@ -63,6 +63,10 @@ export function OnboardingHeader({ children }: { children: string }) {
   return <div className="text-3xl font-extrabold">{children}</div>;
 }
 
+export function OnboardingBackgroundStars({ children }: { children: string }) {
+  return <div className={styles.stars}>{children}</div>;
+}
+
 export function OnboardingBody({ children }: { children: string | ReactNode }) {
   return <div className="mx-10 text-center">{children}</div>;
 }
@@ -138,16 +142,16 @@ export function OnboardingButton({
 export function OnboardingModalContainer({
   children,
   theme = "dark",
+  visualTreatment,
 }: {
   children: React.ReactNode;
-  // For randomizing some background elements as controlled by progress
-  // on the parent component, e.g. circles/bubbles that change on click
-  randomNumber?: number;
   theme?: "dark" | "light";
+  visualTreatment?: string;
 }) {
+  const themeClass = visualTreatment ? styles[visualTreatment] : "";
   return (
     <OnboardingContext.Provider value={{ theme }}>
-      <div className={styles.modalContainer}>
+      <div className={classNames(styles.modalContainer, themeClass)}>
         <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
           {children}
         </Modal>

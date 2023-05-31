@@ -32,3 +32,48 @@
   box-shadow: 0px 12px 16px rgba(0, 0, 0, 0.5);
   border: 1px solid #ffffff18;
 }
+
+.grid .modalContainer {
+  border: 20px solid red;
+}
+
+.grid .onboardingContent {
+  align-items: flex-start;
+  margin-top: -50%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  border-radius: 20px;
+  padding: 3rem 1rem;
+}
+
+.grid::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
+  background-image: url("/images/grid.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: bottom;
+}
+
+.stars {
+  background-image: url("/images/stars.png");
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-color: #091c41;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.stars .modalContainer {
+  background: transparent;
+}
