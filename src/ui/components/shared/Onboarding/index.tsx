@@ -143,7 +143,7 @@ export function OnboardingModalContainer({
 }) {
   return (
     <OnboardingContext.Provider value={{ theme }}>
-      <div className={classNames(styles.modalContainer, themeClass)}>
+      <div className={styles.modalContainer}>
         <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
           {children}
         </Modal>
