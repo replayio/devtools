@@ -137,7 +137,6 @@ export function OnboardingButton({
 export function OnboardingModalContainer({
   children,
   theme = "dark",
-  visualTreatment,
 }: {
   children: React.ReactNode;
   theme?: "dark" | "light";
