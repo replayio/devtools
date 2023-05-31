@@ -156,8 +156,6 @@ export class ReplayClient implements ReplayClientInterface {
   async createPause(executionPoint: ExecutionPoint): Promise<createPauseResult> {
     const sessionId = this.getSessionIdThrows();
 
-    await this._waitForPointToBeLoaded(executionPoint);
-
     const response = await client.Session.createPause({ point: executionPoint }, sessionId);
 
     return response;
@@ -284,14 +282,6 @@ export class ReplayClient implements ReplayClientInterface {
   }> {
     const sessionId = this.getSessionIdThrows();
 
-    // It is important to wait until the range is fully loaded before requesting messages.
-    // It would be better if findMessagesInRange errored when the requested range could not be returned,
-    // or returned the boundaries of what it did successfully load (see BAC-2536),
-    // but right now it will just silently return a subset of messages.
-    // Given that we are extra careful here not to to fetch messages in unloaded regions
-    // because the result might be invalid (and may get cached by a Suspense caller).
-    await this._waitForRangeToBeLoaded(pointRange);
-
     const response = await client.Console.findMessagesInRange({ range: pointRange }, sessionId);
 
     // Messages aren't guaranteed to arrive sorted, but unsorted messages aren't that useful to work with.
@@ -338,12 +328,6 @@ export class ReplayClient implements ReplayClientInterface {
     if (!pointLimits.maxCount) {
       pointLimits.maxCount = MAX_POINTS_TO_FIND;
     }
-
-    await this._waitForRangeToBeLoaded(
-      pointLimits.begin && pointLimits.end
-        ? { begin: pointLimits.begin, end: pointLimits.end }
-        : null
-    );
 
     function onPoints(results: findPointsResults) {
       if (results.findPointsId === findPointsId) {
@@ -577,7 +561,6 @@ export class ReplayClient implements ReplayClientInterface {
     focusRange: PointRange | null
   ) {
     const sessionId = this.getSessionIdThrows();
-    await this._waitForRangeToBeLoaded(focusRange);
     const { hits } = await client.Debugger.getHitCounts(
       { sourceId, locations, maxHits: TOO_MANY_POINTS_TO_FIND, range: focusRange || undefined },
       sessionId
@@ -774,12 +757,6 @@ export class ReplayClient implements ReplayClientInterface {
       pointLimits.maxCount = MAX_POINTS_TO_RUN_EVALUATION;
     }
 
-    await this._waitForRangeToBeLoaded(
-      pointLimits.begin && pointLimits.end
-        ? { begin: pointLimits.begin, end: pointLimits.end }
-        : null
-    );
-
     function onResultsWrapper(results: runEvaluationResults) {
       if (results.runEvaluationId === runEvaluationId) {
         onResults(results.results);
@@ -869,78 +846,6 @@ export class ReplayClient implements ReplayClientInterface {
       client.Debugger.removeSourceContentsChunkListener(onSourceContentsChunkWrapper);
       client.Debugger.removeSourceContentsInfoListener(onSourceContentsInfoWrapper);
     }
-  }
-
-  async _waitForPointToBeLoaded(point: ExecutionPoint): Promise<void> {
-    return new Promise(resolve => {
-      const checkLoaded = () => {
-        const loadedRegions = this.loadedRegions;
-        let isLoaded = false;
-        if (loadedRegions !== null) {
-          isLoaded = isPointInRegions(point, loadedRegions.loaded);
-        }
-
-        if (isLoaded) {
-          resolve();
-
-          this.removeEventListener("loadedRegionsChange", checkLoaded);
-        }
-      };
-
-      this.addEventListener("loadedRegionsChange", checkLoaded);
-
-      checkLoaded();
-    });
-  }
-
-  async _waitForRangeToBeLoaded(
-    focusRange: TimeStampedPointRange | PointRange | null
-  ): Promise<void> {
-    return new Promise(resolve => {
-      const checkLoaded = () => {
-        const loadedRegions = this.loadedRegions;
-        let isLoaded = false;
-        if (loadedRegions !== null && loadedRegions.loading.length > 0) {
-          if (focusRange !== null) {
-            isLoaded = isRangeInRegions(focusRange, loadedRegions.indexed);
-          } else {
-            isLoaded = areRangesEqual(loadedRegions.indexed, loadedRegions.loading);
-          }
-        }
-
-        if (isLoaded) {
-          resolve();
-
-          this.removeEventListener("loadedRegionsChange", checkLoaded);
-        }
-      };
-
-      this.addEventListener("loadedRegionsChange", checkLoaded);
-
-      checkLoaded();
-    });
-  }
-
-  async waitForTimeToBeLoaded(time: number): Promise<void> {
-    return new Promise(resolve => {
-      const checkLoaded = () => {
-        const loadedRegions = this.loadedRegions;
-        let isLoaded = false;
-        if (loadedRegions !== null) {
-          isLoaded = isTimeInRegions(time, loadedRegions.loaded);
-        }
-
-        if (isLoaded) {
-          resolve();
-
-          this.removeEventListener("loadedRegionsChange", checkLoaded);
-        }
-      };
-
-      this.addEventListener("loadedRegionsChange", checkLoaded);
-
-      checkLoaded();
-    });
   }
 
   _dispatchEvent(type: ReplayClientEvents, ...args: any[]): void {

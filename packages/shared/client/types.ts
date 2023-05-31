@@ -260,5 +260,4 @@ export interface ReplayClientInterface {
     }) => void,
     onSourceContentsChunk: ({ chunk, sourceId }: { chunk: string; sourceId: SourceId }) => void
   ): Promise<void>;
-  waitForTimeToBeLoaded(time: number): Promise<void>;
 }
