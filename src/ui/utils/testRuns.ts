@@ -19,7 +19,6 @@ function testFailed(recording: Recording) {
 }
 
 export function groupRecordings(recordings: Recording[]) {
-  console.log("groupRecordings:", recordings.length);
   const passedRecordings: RecordingGroup = {
     count: 0,
     fileNameToRecordings: {},

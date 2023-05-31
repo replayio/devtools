@@ -18,23 +18,27 @@ import {
 import { Recording } from "shared/graphql/types";
 import { WorkspaceId } from "ui/state/app";
 
+export type TestRunMode = "diagnostics" | "record-on-retry" | "stress";
+export type TestRunBranchStatus = "closed" | "merged" | "open";
+
 export interface TestRun {
   date: string;
   id: string;
-  mode: "diagnostics" | "record-on-retry" | "stress";
+  mode: TestRunMode | null;
   results: {
     counts: {
       failed: number;
+      flaky: number;
       passed: number;
     };
     recordings: Recording[];
   };
   source: {
     branchName: string;
-    branchStatus: "closed" | "merged" | "open";
+    branchStatus: TestRunBranchStatus;
     commitId: string;
     commitTitle: string;
-    triggerUrl: string;
+    triggerUrl: string | null;
     user: string;
   };
 }
@@ -54,7 +58,6 @@ const GET_TEST_RUNS_FOR_WORKSPACE = gql`
           mergeTitle
           user
           date
-          mode
           stats {
             passed
             failed
@@ -80,7 +83,6 @@ export const GET_TEST_RUN = gql`
           mergeTitle
           user
           date
-          mode
           stats {
             passed
             failed
@@ -164,7 +166,17 @@ export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
     }
     assert("testRuns" in data.node, "No testRuns in GetTestsRun response");
 
-    const testRuns = data.node.testRuns?.map(convertLegacyTestRunToNewFormat);
+    const testRuns: TestRun[] = [];
+
+    // Convert legacy test runs; filter out ones with invalid data
+    data.node.testRuns?.forEach(legacyTestRun => {
+      try {
+        testRuns.push(convertLegacyTestRunToNewFormat(legacyTestRun));
+      } catch (error) {
+        // Filter out and ignore data that's too old or corrupt to defined the required fields
+      }
+    });
+
     const sortedTestRuns = orderBy(testRuns, "date", "desc");
 
     return {
@@ -185,42 +197,51 @@ export function convertLegacyTestRunToNewFormat(testRun: unknown): TestRun {
     | GetTestsRun_node_Workspace_testRuns
     | GetTestsRunsForWorkspace_node_Workspace_testRuns;
 
-  const { branch, commitId, commitTitle, date, id, mergeId, mode, stats, user } = legacyTestRun;
+  const { branch, commitId, commitTitle, date, id, mergeId, mergeTitle, mode, stats, title, user } =
+    legacyTestRun;
 
   // Verify expected data; if any of these are missing, we can't reliably migrate the data
-  assert(branch != null);
-  assert(commitId != null);
-  assert(commitTitle != null);
-  assert(date != null);
-  assert(id != null);
-  assert(mode != null);
-  assert(stats != null && stats.failed != null && stats.passed != null);
-  assert(user != null);
+  assert(branch != null, "Expected legacy TestRun data to have a branch");
+  assert(commitId != null, "Expected legacy TestRun data to have a commit id");
+  assert(date != null, "Expected legacy TestRun data to have a data");
+  assert(id != null, "Expected legacy TestRun data to have a identifier");
+  assert(
+    stats != null && stats.failed != null && stats.passed != null,
+    "Expected legacy TestRun data to have pass/fail stats"
+  );
+  assert(user != null, "Expected legacy TestRun data to have a user");
 
   const recordings =
     "recordings" in legacyTestRun ? unwrapRecordingsData(legacyTestRun.recordings) : [];
   const sortedRecordings = orderBy(recordings, "date", "desc");
-  const firstRecording = sortedRecordings[0];
 
-  const triggerUrl = firstRecording.metadata?.source?.trigger?.url;
-  assert(triggerUrl);
+  const firstRecording = sortedRecordings[0];
+  const triggerUrl = firstRecording?.metadata?.source?.trigger?.url ?? null;
+
+  // TODO [FE-1543] Frontend can't distinguish between "merged" and "closed"
+  // This should be stored in the data by the backend, in response to the GitHub webhook
+  const branchStatus = mergeId != null ? "merged" : "open";
+
+  // TODO [FE-1543] Some data doesn't have a title, so use a fallback for now
+  const commitTitleWithFallback = commitTitle || mergeTitle || title || "Tests";
 
   return {
     date,
     id,
-    mode: mode as TestRun["mode"],
+    mode: mode ? (mode as TestRunMode) : null,
     results: {
       counts: {
         failed: stats.failed,
+        flaky: 0, // TODO [FE-1543] Add this once it's available in GraphQL
         passed: stats.passed,
       },
       recordings: sortedRecordings,
     },
     source: {
       branchName: branch,
-      branchStatus: mergeId != null ? "closed" : "open",
+      branchStatus,
       commitId,
-      commitTitle,
+      commitTitle: commitTitleWithFallback,
       triggerUrl,
       user,
     },

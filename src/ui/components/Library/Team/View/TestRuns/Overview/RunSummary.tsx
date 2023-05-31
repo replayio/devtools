@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { TestRun } from "ui/hooks/tests";
+import { TestRun, TestRunMode } from "ui/hooks/tests";
 
 import {
   getDurationString,
@@ -22,7 +22,7 @@ function Title({ testRun }: { testRun: TestRun }) {
   );
 }
 
-function getModeIcon(mode: TestRun["mode"]): string[] {
+function getModeIcon(mode: TestRunMode): string[] {
   switch (mode) {
     case "diagnostics":
       return ["biotech", "Diagnostic Mode"];
@@ -35,6 +35,9 @@ function getModeIcon(mode: TestRun["mode"]): string[] {
 
 export function ModeAttribute({ testRun }: { testRun: TestRun }) {
   const { mode } = testRun;
+  if (!mode) {
+    return null;
+  }
 
   const [modeIcon, modeText] = getModeIcon(mode);
 
@@ -71,6 +74,10 @@ export function Attributes({ testRun }: { testRun: TestRun }) {
 
 function RunnerLink({ testRun }: { testRun: TestRun }) {
   const { triggerUrl } = testRun.source;
+  if (!triggerUrl) {
+    return null;
+  }
+
   return (
     <Link href={triggerUrl} target="_blank" rel="noreferrer noopener" className="hover:underline">
       <span>View run in GitHub</span>

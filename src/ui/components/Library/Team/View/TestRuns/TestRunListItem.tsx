@@ -81,11 +81,6 @@ export function TestRunListItem({ testRun }: { testRun: TestRun }) {
           <RunStats testRun={testRun} />
         </div>
         <Attributes testRun={testRun} />
-        {testRun.source.commitTitle ? (
-          <div className="flex flex-row items-center justify-between text-xs">
-            {testRun.source.commitTitle}
-          </div>
-        ) : null}
       </div>
     </Link>
   );
