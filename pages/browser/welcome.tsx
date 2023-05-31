@@ -27,6 +27,9 @@ export default function WelcomeToReplay() {
           </Link>
         </OnboardingContent>
       </OnboardingModalContainer>
+      <div className={styles.bottom}>
+        <div className={styles.grid}></div>
+      </div>
     </div>
   );
 }

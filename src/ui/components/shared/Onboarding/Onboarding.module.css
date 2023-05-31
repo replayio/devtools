@@ -33,33 +33,20 @@
   border: 1px solid #ffffff18;
 }
 
-.grid .modalContainer {
-  border: 20px solid red;
-}
-
-.grid .onboardingContent {
-  align-items: flex-start;
-  margin-top: -50%;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  border-radius: 20px;
-  padding: 3rem 1rem;
-}
-
-.grid::after {
-  content: "";
-  position: absolute;
+.bottom {
+  position: fixed;
   bottom: 0;
-  left: 0;
   width: 100%;
-  height: 40%;
+  height: 30%;
+}
+
+.grid {
+  background: #0e1c3f;
   background-image: url("/images/grid.png");
-  background-size: cover;
+  background-size: 100% 100%;
   background-repeat: no-repeat;
-  background-position: bottom;
+  width: 100%;
+  height: 100%;
 }
 
 .stars {
