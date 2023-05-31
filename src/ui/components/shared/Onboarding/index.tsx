@@ -14,7 +14,6 @@ import { actions } from "ui/actions";
 import { PrimaryLgButton } from "../Button";
 import Modal from "../NewModal";
 import ReplayLogo from "../ReplayLogo";
-import ModalBackground from "./ModalBackground";
 import styles from "./Onboarding.module.css";
 
 const OnboardingContext = React.createContext({ theme: "dark" });
@@ -140,9 +139,6 @@ export function OnboardingModalContainer({
   theme = "dark",
 }: {
   children: React.ReactNode;
-  // For randomizing some background elements as controlled by progress
-  // on the parent component, e.g. circles/bubbles that change on click
-  randomNumber?: number;
   theme?: "dark" | "light";
 }) {
   return (
