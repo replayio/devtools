@@ -14,7 +14,6 @@ import { actions } from "ui/actions";
 import { PrimaryLgButton } from "../Button";
 import Modal from "../NewModal";
 import ReplayLogo from "../ReplayLogo";
-import ModalBackground from "./ModalBackground";
 import styles from "./Onboarding.module.css";
 
 const OnboardingContext = React.createContext({ theme: "dark" });
@@ -61,10 +60,6 @@ export function OnboardingContent({
 
 export function OnboardingHeader({ children }: { children: string }) {
   return <div className="text-3xl font-extrabold">{children}</div>;
-}
-
-export function OnboardingBackgroundStars({ children }: { children: string }) {
-  return <div className={styles.stars}>{children}</div>;
 }
 
 export function OnboardingBody({ children }: { children: string | ReactNode }) {

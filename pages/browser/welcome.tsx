@@ -3,7 +3,6 @@ import React from "react";
 
 import { getButtonClasses } from "ui/components/shared/Button";
 import {
-  OnboardingBackgroundStars,
   OnboardingBody,
   OnboardingContent,
   OnboardingHeader,
