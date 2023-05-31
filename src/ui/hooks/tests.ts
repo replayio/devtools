@@ -18,25 +18,25 @@ import {
 import { Recording } from "shared/graphql/types";
 import { WorkspaceId } from "ui/state/app";
 
-export interface TestRunStats {
-  passed: number | null;
-  failed: number | null;
-}
-
 export interface TestRun {
-  id: string | null;
-  title: string | null;
-  commitTitle: string | null;
-  commitId: string | null;
-  mergeTitle: string | null;
-  mergeId: string | null;
-  user: string | null;
   date: string;
-  branch: string | null;
-  mode: string | null;
-  stats: TestRunStats | null;
-  recordings?: Recording[];
-  triggerUrl?: string;
+  id: string;
+  mode: "diagnostics" | "record-on-retry" | "stress";
+  results: {
+    counts: {
+      failed: number;
+      passed: number;
+    };
+    recordings: Recording[];
+  };
+  source: {
+    branchName: string;
+    branchStatus: "closed" | "merged" | "open";
+    commitId: string;
+    commitTitle: string;
+    triggerUrl: string;
+    user: string;
+  };
 }
 
 const GET_TEST_RUNS_FOR_WORKSPACE = gql`
@@ -141,7 +141,7 @@ export function useGetTestRunForWorkspace(
   const testRun = data.node.testRuns?.[0];
 
   return {
-    testRun: convertTestRun(testRun),
+    testRun: testRun ? convertLegacyTestRunToNewFormat(testRun) : null,
     loading,
   };
 }
@@ -164,7 +164,7 @@ export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
     }
     assert("testRuns" in data.node, "No testRuns in GetTestsRun response");
 
-    const testRuns = data.node.testRuns?.map(testRun => convertTestRun(testRun)!);
+    const testRuns = data.node.testRuns?.map(convertLegacyTestRunToNewFormat);
     const sortedTestRuns = orderBy(testRuns, "date", "desc");
 
     return {
@@ -174,22 +174,59 @@ export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
   }, [data, loading]);
 }
 
-function convertTestRun(
-  testRun:
-    | GetTestsRun_node_Workspace_testRuns
-    | GetTestsRunsForWorkspace_node_Workspace_testRuns
-    | undefined
-): TestRun | null {
-  if (!testRun) {
-    return null;
+// TODO [FE-1419] Remove this eventually (when we drop support for legacy data format)
+export function convertLegacyTestRunToNewFormat(testRun: unknown): TestRun {
+  // If data from GraphQL is already in the new format, skip the conversion
+  if (isTestRun(testRun)) {
+    return testRun;
   }
-  const recordings = "recordings" in testRun ? unwrapRecordingsData(testRun.recordings) : [];
+
+  const legacyTestRun = testRun as
+    | GetTestsRun_node_Workspace_testRuns
+    | GetTestsRunsForWorkspace_node_Workspace_testRuns;
+
+  const { branch, commitId, commitTitle, date, id, mergeId, mode, stats, user } = legacyTestRun;
+
+  // Verify expected data; if any of these are missing, we can't reliably migrate the data
+  assert(branch != null);
+  assert(commitId != null);
+  assert(commitTitle != null);
+  assert(date != null);
+  assert(id != null);
+  assert(mode != null);
+  assert(stats != null && stats.failed != null && stats.passed != null);
+  assert(user != null);
+
+  const recordings =
+    "recordings" in legacyTestRun ? unwrapRecordingsData(legacyTestRun.recordings) : [];
   const sortedRecordings = orderBy(recordings, "date", "desc");
   const firstRecording = sortedRecordings[0];
 
+  const triggerUrl = firstRecording.metadata?.source?.trigger?.url;
+  assert(triggerUrl);
+
   return {
-    ...testRun,
-    recordings,
-    triggerUrl: firstRecording?.metadata?.source?.trigger?.url,
+    date,
+    id,
+    mode: mode as TestRun["mode"],
+    results: {
+      counts: {
+        failed: stats.failed,
+        passed: stats.passed,
+      },
+      recordings: sortedRecordings,
+    },
+    source: {
+      branchName: branch,
+      branchStatus: mergeId != null ? "closed" : "open",
+      commitId,
+      commitTitle,
+      triggerUrl,
+      user,
+    },
   };
+}
+
+function isTestRun(testRun: any): testRun is TestRun {
+  return "results" in testRun;
 }

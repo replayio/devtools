@@ -2,7 +2,6 @@ import Link from "next/link";
 import { useContext } from "react";
 
 import Icon from "ui/components/shared/Icon";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { TestRun } from "ui/hooks/tests";
 
 import { TeamContext } from "../../TeamContextRoot";
@@ -14,7 +13,8 @@ import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "../../../Library.module.css";
 
 function Title({ testRun }: { testRun: TestRun }) {
-  const title = testRun.commitTitle || "Unknown";
+  const title = testRun.source.commitTitle;
+
   // TODO: This should be done in CSS.
   const formatted = title.length > 80 ? title.slice(0, 80) + "..." : title;
 
@@ -26,20 +26,20 @@ function Title({ testRun }: { testRun: TestRun }) {
 }
 
 function Attributes({ testRun }: { testRun: TestRun }) {
-  const { mergeId, mergeTitle, user, date, branch } = testRun;
+  const { date, source } = testRun;
+  const { branchName, branchStatus, commitTitle, user } = source;
 
   return (
     <div className={`flex flex-row items-center text-xs font-light`}>
       <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
       <AttributeContainer icon="person">{user || ""}</AttributeContainer>
-      {mergeId && (
-        <AttributeContainer title={mergeTitle} icon="merge_type">
-          {mergeId}
-        </AttributeContainer>
-      )}
-      {!mergeId && (
+      {branchStatus === "open" ? (
         <AttributeContainer maxWidth="160px" icon="fork_right">
-          {branch || ""}
+          {branchName}
+        </AttributeContainer>
+      ) : (
+        <AttributeContainer title={commitTitle} icon="merge_type">
+          {branchStatus}
         </AttributeContainer>
       )}
       <ModeAttribute testRun={testRun} />
@@ -60,8 +60,9 @@ function Status({ failCount }: { failCount: number }) {
 export function TestRunListItem({ testRun }: { testRun: TestRun }) {
   const { focusId } = useContext(TestRunsContext);
   const { teamId } = useContext(TeamContext);
+
   // TODO Don't count flakes
-  const failCount = testRun.stats?.failed || 0;
+  const failCount = testRun.results.counts.failed;
   const isSelected = focusId === testRun.id;
 
   return (
@@ -69,7 +70,7 @@ export function TestRunListItem({ testRun }: { testRun: TestRun }) {
       href={`/team/${teamId}/runs/${testRun.id}`}
       className={`flex cursor-pointer flex-row space-x-3 rounded-sm border-b border-chrome bg-themeBase-100 px-3 py-3 ${
         styles.libraryRow
-      }     
+      }
       ${isSelected ? styles.libraryRowSelected : ""}
       `}
     >
@@ -80,8 +81,10 @@ export function TestRunListItem({ testRun }: { testRun: TestRun }) {
           <RunStats testRun={testRun} />
         </div>
         <Attributes testRun={testRun} />
-        {testRun.title ? (
-          <div className="flex flex-row items-center justify-between text-xs">{testRun.title}</div>
+        {testRun.source.commitTitle ? (
+          <div className="flex flex-row items-center justify-between text-xs">
+            {testRun.source.commitTitle}
+          </div>
         ) : null}
       </div>
     </Link>

@@ -13,8 +13,8 @@ export function RunResults() {
 
   // TODO Don't keep re-computing this; it's expensive
   const { passedRecordings, failedRecordings, flakyRecordings } = useMemo(
-    () => groupRecordings(testRun.recordings ?? []),
-    [testRun.recordings]
+    () => groupRecordings(testRun.results.recordings),
+    [testRun.results.recordings]
   );
 
   return (

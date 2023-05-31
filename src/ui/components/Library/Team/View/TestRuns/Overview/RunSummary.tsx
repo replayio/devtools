@@ -11,18 +11,18 @@ import { RunStats } from "../RunStats";
 import { getDuration } from "../utils";
 
 function Title({ testRun }: { testRun: TestRun }) {
-  const title = testRun?.commitTitle;
+  const commitTitle = testRun.source.commitTitle;
 
   return (
     <div className="flex flex-row items-center space-x-2 overflow-hidden">
       <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-medium">
-        {title}
+        {commitTitle}
       </div>
     </div>
   );
 }
 
-function getModeIcon(mode: string | null): string[] {
+function getModeIcon(mode: TestRun["mode"]): string[] {
   switch (mode) {
     case "diagnostics":
       return ["biotech", "Diagnostic Mode"];
@@ -31,8 +31,6 @@ function getModeIcon(mode: string | null): string[] {
     case "record-on-retry":
       return ["repeatone", "Record on Retry Mode"];
   }
-
-  return [];
 }
 
 export function ModeAttribute({ testRun }: { testRun: TestRun }) {
@@ -40,29 +38,31 @@ export function ModeAttribute({ testRun }: { testRun: TestRun }) {
 
   const [modeIcon, modeText] = getModeIcon(mode);
 
-  if (!modeIcon) {
-    return null;
-  }
-
   return <AttributeContainer icon={modeIcon}>{modeText}</AttributeContainer>;
 }
 
 export function Attributes({ testRun }: { testRun: TestRun }) {
-  const duration = getDuration(testRun.recordings!);
+  const { date, results, source } = testRun;
+  const { recordings } = results;
+  const { branchName, branchStatus, commitTitle, user } = source;
+
+  const duration = getDuration(recordings);
   const durationString = getDurationString(duration);
-  const { user, date, mergeId, mergeTitle, branch, mode } = testRun;
 
   return (
     <div className="flex flex-row flex-wrap items-center pl-1">
       <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
       {user ? <AttributeContainer icon="person">{user}</AttributeContainer> : null}
-      {mergeId && (
-        <AttributeContainer title={mergeTitle} icon="merge_type">
-          {mergeId}
+
+      {branchStatus === "open" ? (
+        <AttributeContainer maxWidth="160px" icon="fork_right">
+          {branchName}
+        </AttributeContainer>
+      ) : (
+        <AttributeContainer title={commitTitle} icon="merge_type">
+          {branchStatus}
         </AttributeContainer>
       )}
-
-      {!mergeId && branch && <AttributeContainer icon="fork_right">{branch}</AttributeContainer>}
       <AttributeContainer icon="timer">{durationString}</AttributeContainer>
       <ModeAttribute testRun={testRun} />
     </div>
@@ -70,12 +70,7 @@ export function Attributes({ testRun }: { testRun: TestRun }) {
 }
 
 function RunnerLink({ testRun }: { testRun: TestRun }) {
-  const { triggerUrl } = testRun;
-
-  if (!triggerUrl) {
-    return null;
-  }
-
+  const { triggerUrl } = testRun.source;
   return (
     <Link href={triggerUrl} target="_blank" rel="noreferrer noopener" className="hover:underline">
       <span>View run in GitHub</span>
@@ -84,6 +79,7 @@ function RunnerLink({ testRun }: { testRun: TestRun }) {
 }
 
 export function RunSummary({ testRun }: { testRun: TestRun }) {
+  const { commitTitle } = testRun.source;
   return (
     <div className="mb-2 flex flex-col space-y-2 border-b border-themeBorder p-4">
       <div className="flex flex-row justify-between">
@@ -94,8 +90,8 @@ export function RunSummary({ testRun }: { testRun: TestRun }) {
         <Attributes testRun={testRun} />
         <RunnerLink testRun={testRun} />
       </div>
-      {testRun.title ? (
-        <div className="flex flex-row items-center justify-between text-xs">{testRun.title}</div>
+      {commitTitle ? (
+        <div className="flex flex-row items-center justify-between text-xs">{commitTitle}</div>
       ) : null}
     </div>
   );
