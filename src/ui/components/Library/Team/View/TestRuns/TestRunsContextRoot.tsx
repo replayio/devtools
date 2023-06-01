@@ -22,8 +22,8 @@ export function TestRunsContainer({ children }: { children: ReactNode }) {
 
   // Initialize the focused test run to the first/most recent test run in the list
   useEffect(() => {
-    if (testSuiteRuns?.length && !focusId) {
-      router.push(`/team/${teamId}/runs/${testSuiteRuns[0]?.id}`);
+    if (testSuiteRuns.length > 0 && !focusId) {
+      router.push(`/team/${teamId}/runs/${testSuiteRuns[0].id}`);
     }
   }, [router, testSuiteRuns, focusId, teamId]);
 

@@ -79,7 +79,7 @@ export function Attributes({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
 }
 
 function RunnerLink({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
-  if (!testSuiteRun?.source?.triggerUrl) {
+  if (!testSuiteRun.source?.triggerUrl) {
     return null;
   }
 
