@@ -9049,10 +9049,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"case-anything@npm:^2.1.10":
-  version: 2.1.10
-  resolution: "case-anything@npm:2.1.10"
-  checksum: eff2769d7da178115be8ac2617ccbb850664ffd36f0a897e000d9dd5a64300141128f6a8fe024bd98ec63cc9173a72c1426bbcaac328c8a44109ce15f7c14a5e
+"case-anything@npm:^2.1.13":
+  version: 2.1.13
+  resolution: "case-anything@npm:2.1.13"
+  checksum: c39c69d7e418337b6006a9692f13c2b257e907e867149a102e9beb7e9d2d52da14e754da1f4e4ce82a866d86d93047e522f64360bda54e7d7c308f4cdd736c3d
   languageName: node
   linkType: hard
 
@@ -10705,7 +10705,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "design@workspace:packages/design"
   dependencies:
-    case-anything: ^2.1.10
+    case-anything: ^2.1.13
     classnames: "*"
     figma-tools: ^0.4.0
     nanospinner: ^1.1.0
