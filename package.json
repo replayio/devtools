@@ -164,7 +164,7 @@
     "babel-loader": "^8.2.4",
     "babel-plugin-add-react-displayname": "^0.0.5",
     "babel-plugin-transform-import-meta": "^2.1.1",
-    "bufferutil": "^4.0.6",
+    "bufferutil": "^4.0.7",
     "circular-dependency-plugin": "^5.2.2",
     "comlink": "^4.3.1",
     "css-loader": "^6.7.1",
