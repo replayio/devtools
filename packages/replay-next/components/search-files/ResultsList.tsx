@@ -262,8 +262,8 @@ function StreamingResults({
         </div>
       )}
       <div className={styles.List}>
-        <AutoSizer>
-          {({ height, width }) => (
+        <AutoSizer
+          children={({ height, width }) => (
             <List
               className={styles.List}
               height={height}
@@ -277,7 +277,7 @@ function StreamingResults({
               {ResultsListRow}
             </List>
           )}
-        </AutoSizer>
+        />
       </div>
     </div>
   );

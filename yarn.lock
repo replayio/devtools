@@ -20185,13 +20185,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-resizable-panels@npm:^0.0.45":
-  version: 0.0.45
-  resolution: "react-resizable-panels@npm:0.0.45"
+"react-resizable-panels@npm:^0.0.48":
+  version: 0.0.48
+  resolution: "react-resizable-panels@npm:0.0.48"
   peerDependencies:
     react: ^16.14.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0
-  checksum: fab2ae429678c3653b469814d1eafffa70568494b9fd7e90ff8e75d938d754d0ed52df408a2e55f6489bb15dedf02a51dd60b1d8bd5ad93592102844126f27a7
+  checksum: dbc4ef9ac6a1b74a95bb81185b6bffbf8f1f1ab544090383e766e065979258bdafcf4485bd5507a5fd247eb02e6d060bcc05765c0e12c0ff47c4800a2cc3d7bb
   languageName: node
   linkType: hard
 
@@ -20260,23 +20260,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-virtualized-auto-sizer@npm:^1.0.6":
-  version: 1.0.6
-  resolution: "react-virtualized-auto-sizer@npm:1.0.6"
-  peerDependencies:
-    react: ^15.3.0 || ^16.0.0-alpha || ^17.0.0
-    react-dom: ^15.3.0 || ^16.0.0-alpha || ^17.0.0
-  checksum: 81270e9d328e9b779515f42b6aa8dea2f21097f69fc776906d6b7d31ada03706d34408a6318baf59531f180402fbf74fdb9928ab65d53442a134b7ee5ba01265
-  languageName: node
-  linkType: hard
-
-"react-virtualized-auto-sizer@npm:^1.0.7":
-  version: 1.0.7
-  resolution: "react-virtualized-auto-sizer@npm:1.0.7"
+"react-virtualized-auto-sizer@npm:^1.0.19":
+  version: 1.0.19
+  resolution: "react-virtualized-auto-sizer@npm:1.0.19"
   peerDependencies:
     react: ^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc
     react-dom: ^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc
-  checksum: 7f2f013c422771828c6613c7890f792aa90a033ea2b41c489c67ca2c6793eefa94d25232c1050fdf69cdd626fad9e3821c5003d45fa6fc831184cd09232023c2
+  checksum: daafcd099e8d375efef72914e83a7904d4303b62b093af8e322c036463598e61a9c2b18c82a602e62e69ecf581d3c02c8a67a4165bc1b23de61e94674f681cb1
   languageName: node
   linkType: hard
 
@@ -20612,11 +20602,11 @@ __metadata:
     react-lazyload: ^3.2.0
     react-merge-refs: ^1.1.0
     react-redux: ^8.0.2
-    react-resizable-panels: ^0.0.45
+    react-resizable-panels: ^0.0.48
     react-table: ^7.7.0
     react-tooltip: ^4.5.1
     react-transition-group: ^4.4.2
-    react-virtualized-auto-sizer: ^1.0.6
+    react-virtualized-auto-sizer: ^1.0.19
     react-window: ^1.8.8
     reactjs-popup: ^2.0.5
     replay-next: "workspace:*"
@@ -20630,12 +20620,12 @@ __metadata:
     style-loader: ^3.3.1
     stylelint: ^14.16.0
     stylelint-config-prettier: ^9.0.4
-    suspense: ^0.0.37
+    suspense: ^0.0.38
     tailwindcss: ^3.2.4
     ts-node: ^10.7.0
     tsconfig-paths: ^3.14.1
     typescript: ^5.0.4
-    use-context-menu: ^0.4.7
+    use-context-menu: ^0.4.10
     utf-8-validate: ^5.0.8
     uuid: ^7.0.3
     v8-to-istanbul: ^9.0.1
@@ -20984,11 +20974,11 @@ __metadata:
     protocol: "workspace:*"
     react: 0.0.0-experimental-e7d0053e6-20220325
     react-dom: 0.0.0-experimental-e7d0053e6-20220325
-    react-virtualized-auto-sizer: ^1.0.7
+    react-virtualized-auto-sizer: ^1.0.19
     shared: "workspace:*"
-    suspense: ^0.0.37
+    suspense: ^0.0.38
     typescript: 5.0.2
-    use-context-menu: ^0.4.6
+    use-context-menu: ^0.4.10
     uuid: ^7.0.3
   languageName: unknown
   linkType: soft
@@ -22805,9 +22795,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"suspense@npm:^0.0.37":
-  version: 0.0.37
-  resolution: "suspense@npm:0.0.37"
+"suspense@npm:^0.0.38":
+  version: 0.0.38
+  resolution: "suspense@npm:0.0.38"
   dependencies:
     array-sorting-utilities: ^0.0.1
     interval-utilities: ^0.0.1
@@ -22816,7 +22806,7 @@ __metadata:
   peerDependencies:
     react: ^18.0.0
     react-dom: ^18.0.0
-  checksum: 83a619853471fcb3cf4d03ac3cfb665aaba9c6615491c57110a08128e28edf0da39872673ab25565bd938e278e6e36185fccd08730748d49e563e236cb6945c8
+  checksum: e11e6d4e2b5e2c62bfc9905f4fa0e52e5c4ed02cf8f2f81f558bc63b2c9e18eb356a3382acfb6499dcf03caf04bd76d4cc20011f6a5afb19fe300e1209aa8e7d
   languageName: node
   linkType: hard
 
@@ -24059,23 +24049,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-context-menu@npm:^0.4.6":
-  version: 0.4.6
-  resolution: "use-context-menu@npm:0.4.6"
+"use-context-menu@npm:^0.4.10":
+  version: 0.4.10
+  resolution: "use-context-menu@npm:0.4.10"
   peerDependencies:
-    react: ^16 || ^17 || ^18
-    react-dom: ^16 || ^17 || ^18
-  checksum: fbca11237313897381edabc14412da4feb80bcc07d3e416b8f49c936cf7fe0965e9382fe50e3c2a586d16039679aa52d3063d8d2a980a2760102eb5fe7eb8e09
-  languageName: node
-  linkType: hard
-
-"use-context-menu@npm:^0.4.7":
-  version: 0.4.7
-  resolution: "use-context-menu@npm:0.4.7"
-  peerDependencies:
-    react: ^16 || ^17 || ^18
-    react-dom: ^16 || ^17 || ^18
-  checksum: 36f80163268aff8b7e064244d17f16d3ec68e7c35c29ced408062e95336bac426c543a68c8941547993f4d75da0d5fc38ace8c9088162d8fcf3449ffdcfc58b3
+    react: ^16.14.0 || ^17 || ^18
+    react-dom: ^16.14.0 || ^17 || ^18
+  checksum: 7d6732b86efe75d164a998ecaaec261d3e73b991de62ba0af68241aef4fe7b6c4e35956a144f71b963f1333e6a53353f947fbeed36016c6ba57f758b2ed6cd5c
   languageName: node
   linkType: hard
 

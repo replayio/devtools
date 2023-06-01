@@ -38,8 +38,8 @@ export function TestRunList() {
   const itemCount = Math.min(countToRender + 1, testRuns.length);
 
   return (
-    <ReactVirtualizedAutoSizer>
-      {({ height, width }) => (
+    <ReactVirtualizedAutoSizer
+      children={({ height, width }) => (
         <FixedSizeList
           children={TestRunListRow}
           className="no-scrollbar text-sm"
@@ -50,7 +50,7 @@ export function TestRunList() {
           width={width}
         />
       )}
-    </ReactVirtualizedAutoSizer>
+    />
   );
 }
 
