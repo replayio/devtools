@@ -1,6 +1,7 @@
 import test, { Page, expect } from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
+import { E2E_USER_1_API_KEY, E2E_USER_2_API_KEY } from "../helpers/authentication";
 import { disableAllConsoleMessageTypes, verifyConsoleMessage } from "../helpers/console-panel";
 import {
   findPoints,
@@ -37,7 +38,7 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({ brow
     // User 1
     const context = await browser.newContext();
     const page = await context.newPage();
-    await load(page, process.env.E2E_USER_1_API_KEY as string);
+    await load(page, E2E_USER_1_API_KEY);
 
     // Clean up from previous tests
     // TODO [SCS-1066] Ideally we would create a fresh recording for each test run
@@ -61,7 +62,7 @@ test(`authenticated/logpoints-01: Shared logpoints functionality`, async ({ brow
     // User 2
     const context = await browser.newContext();
     const page = await context.newPage();
-    await load(page, process.env.E2E_USER_2_API_KEY as string);
+    await load(page, E2E_USER_2_API_KEY);
 
     const locator = await findPoints(page, "logpoint", { lineNumber });
 
