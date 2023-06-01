@@ -20139,10 +20139,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-merge-refs@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "react-merge-refs@npm:1.1.0"
-  checksum: 90884352999002d868ab9f1bcfe3222fb0f2178ed629f1da7e98e5a9b02a2c96b4aa72800db92aabd69d2483211b4be57a2088e89a11a0b660e7ada744d4ddf7
+"react-merge-refs@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "react-merge-refs@npm:2.0.2"
+  checksum: 64758870d79ad52e6666d1d30cdecd5a72722edfd5c89808b41acdbd81a039f0c78b8b576f7ae247010468fc45cb57dd31f402693c64224439dbe0127f4389f3
   languageName: node
   linkType: hard
 
@@ -20610,7 +20610,7 @@ __metadata:
     react-json-tree: ^0.18.0
     react-json-view: 1.21.3
     react-lazyload: ^3.2.0
-    react-merge-refs: ^1.1.0
+    react-merge-refs: ^2.0.2
     react-redux: ^8.0.2
     react-resizable-panels: ^0.0.45
     react-table: ^7.7.0
