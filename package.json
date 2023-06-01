@@ -95,7 +95,7 @@
     "react-window": "^1.8.8",
     "reactjs-popup": "^2.0.5",
     "replay-next": "workspace:*",
-    "reselect": "^4.1.5",
+    "reselect": "^4.1.8",
     "shared": "workspace:*",
     "slugify": "^1.6.5",
     "suspense": "^0.0.37",
