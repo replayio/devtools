@@ -76,7 +76,7 @@ export function TestRunListItem({ testSuiteRun }: { testSuiteRun: TestSuiteRun }
   return (
     <Link
       href={`/team/${teamId}/runs/${testSuiteRun.id}`}
-      className={`flex cursor-pointer flex-row space-x-3 rounded-sm border-b border-chrome bg-themeBase-100 px-3 py-3 ${
+      className={`flex h-full cursor-pointer flex-row items-center space-x-3 rounded-sm border-b border-chrome bg-themeBase-100 px-3 ${
         styles.libraryRow
       }
       ${isSelected ? styles.libraryRowSelected : ""}
