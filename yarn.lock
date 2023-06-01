@@ -5650,12 +5650,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@trunkio/launcher@npm:^1.0.5":
-  version: 1.1.1
-  resolution: "@trunkio/launcher@npm:1.1.1"
+"@trunkio/launcher@npm:^1.2.4":
+  version: 1.2.4
+  resolution: "@trunkio/launcher@npm:1.2.4"
   bin:
     trunk: trunk
-  checksum: 5f7f98aeb2b82cc202497e33635265cc1566a74895cf5199c8e8e97b8409221b51983a49a4ba20508563fc1b93f5e03fac6bcb05fac4444780cb9ec85989371a
+  checksum: 62c9060fc50b3ec7d4c93fff1f80f81695b2de002c8242b928e3112ad776a67f0913d23d9d7568b6a6dc70de13b42091b7ab9b15cbc9ad81427c28c59adc0caf
   languageName: node
   linkType: hard
 
@@ -20504,7 +20504,7 @@ __metadata:
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.3.0
     "@testing-library/user-event": ^14.1.0
-    "@trunkio/launcher": ^1.0.5
+    "@trunkio/launcher": ^1.2.4
     "@types/classnames": ^2.2.11
     "@types/cookie": ^0.4.1
     "@types/d3-interpolate": ^3.0.1
