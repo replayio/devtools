@@ -20988,7 +20988,7 @@ __metadata:
     shared: "workspace:*"
     suspense: ^0.0.37
     typescript: 5.0.2
-    use-context-menu: ^0.4.6
+    use-context-menu: ^0.4.7
     uuid: ^7.0.3
   languageName: unknown
   linkType: soft
@@ -24056,16 +24056,6 @@ __metadata:
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
   checksum: f771cbadfdc91e03b7ab9eb32d0fc0cc647755711801bf507e891ad38c4bbc5f02b2509acadf9c965ec9c5f2f642fd33bdfdfb17b0873c4ad0a9b1f5e5e724bf
-  languageName: node
-  linkType: hard
-
-"use-context-menu@npm:^0.4.6":
-  version: 0.4.6
-  resolution: "use-context-menu@npm:0.4.6"
-  peerDependencies:
-    react: ^16 || ^17 || ^18
-    react-dom: ^16 || ^17 || ^18
-  checksum: fbca11237313897381edabc14412da4feb80bcc07d3e416b8f49c936cf7fe0965e9382fe50e3c2a586d16039679aa52d3063d8d2a980a2760102eb5fe7eb8e09
   languageName: node
   linkType: hard
 
