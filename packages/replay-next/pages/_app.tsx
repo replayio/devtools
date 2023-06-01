@@ -3,6 +3,7 @@ import NextApp from "next/app";
 import Head from "next/head";
 
 import ErrorBoundary from "../components/ErrorBoundary";
+import "use-context-menu/styles.css";
 import "./global.css";
 import "./variables.css";
 // Used by syntax highlighter

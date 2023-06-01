@@ -4,6 +4,7 @@ import "tailwindcss/tailwind.css";
 import "devtools/client/debugger/src/components/variables.css";
 import "replay-next/pages/variables.css";
 import "devtools/client/themes/variables.css";
+import "use-context-menu/styles.css";
 
 /////////////////// here be dragons ... ////////////////////
 import "devtools/client/debugger/src/components/A11yIntention.css";

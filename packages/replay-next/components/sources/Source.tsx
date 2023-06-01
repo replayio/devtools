@@ -159,8 +159,8 @@ function SourceRenderer({
       onMouseEnter={trackMouseHover}
     >
       <div className={styles.SourceList} onMouseMove={onMouseMove} ref={sourceRef}>
-        <AutoSizer>
-          {({ height, width }) => (
+        <AutoSizer
+          children={({ height, width }) => (
             <SourceList
               height={height}
               showColumnBreakpoints={showColumnBreakpoints}
@@ -169,7 +169,7 @@ function SourceRenderer({
               width={width}
             />
           )}
-        </AutoSizer>
+        />
 
         <StreamingSourceLoadingProgressHeader
           streamingParser={streamingParser}

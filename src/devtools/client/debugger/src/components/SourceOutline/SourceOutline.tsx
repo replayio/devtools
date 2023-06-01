@@ -152,8 +152,8 @@ export function SourceOutline({
     <div className={classnames("flex h-full flex-col space-y-2")}>
       <OutlineFilter filter={filter} updateFilter={setFilter} />
       <div className="outline-list flex-grow">
-        <AutoSizer>
-          {({ height, width }) => {
+        <AutoSizer
+          children={({ height, width }) => {
             const list = (
               <List
                 innerElementType="ol"
@@ -169,7 +169,7 @@ export function SourceOutline({
 
             return list;
           }}
-        </AutoSizer>
+        />
       </div>
     </div>
   );
