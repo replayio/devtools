@@ -117,7 +117,7 @@
     "@babel/types": "^7.14.8",
     "@bcoe/v8-coverage": "^0.2.3",
     "@jest/console": "^28.0.2",
-    "@jridgewell/trace-mapping": "^0.3.14",
+    "@jridgewell/trace-mapping": "^0.3.18",
     "@next/bundle-analyzer": "^12.2.0",
     "@recordreplay/playwright": "^1.18.3",
     "@recordreplay/sourcemap-upload-cli": "^0.1.1",
