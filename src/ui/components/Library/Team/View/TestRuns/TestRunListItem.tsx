@@ -83,7 +83,7 @@ export function TestRunListItem({ testSuiteRun }: { testSuiteRun: TestSuiteRun }
       `}
     >
       <Status failCount={failCount} />
-      <div className="flex flex-grow flex-col space-y-1 overflow-hidden">
+      <div className="flex h-full flex-grow flex-col justify-evenly overflow-hidden">
         <div className="flex flex-row justify-between space-x-3">
           <Title testSuiteRun={testSuiteRun} />
           <RunStats testSuiteRun={testSuiteRun} />
