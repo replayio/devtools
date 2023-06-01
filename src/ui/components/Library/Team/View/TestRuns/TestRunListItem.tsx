@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useContext } from "react";
 
 import Icon from "ui/components/shared/Icon";
-import { TestRun } from "ui/hooks/tests";
+import { TestSuiteRun } from "ui/hooks/tests";
 
 import { TeamContext } from "../../TeamContextRoot";
 import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/RecordingListItem";
@@ -12,8 +12,8 @@ import { RunStats } from "./RunStats";
 import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "../../../Library.module.css";
 
-function Title({ testRun }: { testRun: TestRun }) {
-  const title = testRun.title;
+function Title({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
+  const title = testSuiteRun.title;
 
   // TODO: This should be done in CSS.
   const formatted = title.length > 80 ? title.slice(0, 80) + "..." : title;
@@ -25,8 +25,8 @@ function Title({ testRun }: { testRun: TestRun }) {
   );
 }
 
-function Attributes({ testRun }: { testRun: TestRun }) {
-  const { date, source, title } = testRun;
+function Attributes({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
+  const { date, source, title } = testSuiteRun;
   if (source) {
     const { branchName, branchStatus, user } = source;
 
@@ -43,7 +43,7 @@ function Attributes({ testRun }: { testRun: TestRun }) {
             {branchStatus}
           </AttributeContainer>
         )}
-        <ModeAttribute testRun={testRun} />
+        <ModeAttribute testSuiteRun={testSuiteRun} />
       </div>
     );
   } else {
@@ -65,17 +65,17 @@ function Status({ failCount }: { failCount: number }) {
   );
 }
 
-export function TestRunListItem({ testRun }: { testRun: TestRun }) {
+export function TestRunListItem({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
   const { focusId } = useContext(TestRunsContext);
   const { teamId } = useContext(TeamContext);
 
   // TODO Don't count flakes
-  const failCount = testRun.results.counts.failed;
-  const isSelected = focusId === testRun.id;
+  const failCount = testSuiteRun.results.counts.failed;
+  const isSelected = focusId === testSuiteRun.id;
 
   return (
     <Link
-      href={`/team/${teamId}/runs/${testRun.id}`}
+      href={`/team/${teamId}/runs/${testSuiteRun.id}`}
       className={`flex cursor-pointer flex-row space-x-3 rounded-sm border-b border-chrome bg-themeBase-100 px-3 py-3 ${
         styles.libraryRow
       }
@@ -85,10 +85,10 @@ export function TestRunListItem({ testRun }: { testRun: TestRun }) {
       <Status failCount={failCount} />
       <div className="flex flex-grow flex-col space-y-1 overflow-hidden">
         <div className="flex flex-row justify-between space-x-3">
-          <Title testRun={testRun} />
-          <RunStats testRun={testRun} />
+          <Title testSuiteRun={testSuiteRun} />
+          <RunStats testSuiteRun={testSuiteRun} />
         </div>
-        <Attributes testRun={testRun} />
+        <Attributes testSuiteRun={testSuiteRun} />
       </div>
     </Link>
   );

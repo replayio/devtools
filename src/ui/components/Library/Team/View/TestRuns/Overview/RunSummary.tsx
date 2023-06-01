@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { TestRun, TestRunMode } from "ui/hooks/tests";
+import { TestSuiteRun, TestSuiteRunMode } from "ui/hooks/tests";
 
 import {
   getDurationString,
@@ -10,17 +10,17 @@ import { AttributeContainer } from "../AttributeContainer";
 import { RunStats } from "../RunStats";
 import { getDuration } from "../utils";
 
-function Title({ testRun }: { testRun: TestRun }) {
+function Title({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
   return (
     <div className="flex flex-row items-center space-x-2 overflow-hidden">
       <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-medium">
-        {testRun.title}
+        {testSuiteRun.title}
       </div>
     </div>
   );
 }
 
-function getModeIcon(mode: TestRunMode): string[] {
+function getModeIcon(mode: TestSuiteRunMode): string[] {
   switch (mode) {
     case "diagnostics":
       return ["biotech", "Diagnostic Mode"];
@@ -31,8 +31,8 @@ function getModeIcon(mode: TestRunMode): string[] {
   }
 }
 
-export function ModeAttribute({ testRun }: { testRun: TestRun }) {
-  const { mode } = testRun;
+export function ModeAttribute({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
+  const { mode } = testSuiteRun;
   if (!mode) {
     return null;
   }
@@ -42,8 +42,8 @@ export function ModeAttribute({ testRun }: { testRun: TestRun }) {
   return <AttributeContainer icon={modeIcon}>{modeText}</AttributeContainer>;
 }
 
-export function Attributes({ testRun }: { testRun: TestRun }) {
-  const { date, results, source, title } = testRun;
+export function Attributes({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
+  const { date, results, source, title } = testSuiteRun;
   const { recordings } = results;
 
   const duration = getDuration(recordings);
@@ -66,7 +66,7 @@ export function Attributes({ testRun }: { testRun: TestRun }) {
           </AttributeContainer>
         )}
         <AttributeContainer icon="timer">{durationString}</AttributeContainer>
-        <ModeAttribute testRun={testRun} />
+        <ModeAttribute testSuiteRun={testSuiteRun} />
       </div>
     );
   } else {
@@ -78,14 +78,14 @@ export function Attributes({ testRun }: { testRun: TestRun }) {
   }
 }
 
-function RunnerLink({ testRun }: { testRun: TestRun }) {
-  if (!testRun?.source?.triggerUrl) {
+function RunnerLink({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
+  if (!testSuiteRun?.source?.triggerUrl) {
     return null;
   }
 
   return (
     <Link
-      href={testRun.source.triggerUrl}
+      href={testSuiteRun.source.triggerUrl}
       target="_blank"
       rel="noreferrer noopener"
       className="hover:underline"
@@ -95,18 +95,18 @@ function RunnerLink({ testRun }: { testRun: TestRun }) {
   );
 }
 
-export function RunSummary({ testRun }: { testRun: TestRun }) {
-  const { title } = testRun;
+export function RunSummary({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
+  const { title } = testSuiteRun;
 
   return (
     <div className="mb-2 flex flex-col space-y-2 border-b border-themeBorder p-4">
       <div className="flex flex-row justify-between">
-        <Title testRun={testRun} />
-        <RunStats testRun={testRun} />
+        <Title testSuiteRun={testSuiteRun} />
+        <RunStats testSuiteRun={testSuiteRun} />
       </div>
       <div className="flex flex-row items-center justify-between text-xs">
-        <Attributes testRun={testRun} />
-        <RunnerLink testRun={testRun} />
+        <Attributes testSuiteRun={testSuiteRun} />
+        <RunnerLink testSuiteRun={testSuiteRun} />
       </div>
       {title ? (
         <div className="flex flex-row items-center justify-between text-xs">{title}</div>

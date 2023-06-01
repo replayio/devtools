@@ -18,20 +18,20 @@ import {
 import { Recording } from "shared/graphql/types";
 import { WorkspaceId } from "ui/state/app";
 
-export type TestRunMode = "diagnostics" | "record-on-retry" | "stress";
-export type TestRunBranchStatus = "closed" | "merged" | "open";
-export type TestRunSourceMetadata = {
+export type TestSuiteRunMode = "diagnostics" | "record-on-retry" | "stress";
+export type TestSuiteRunBranchStatus = "closed" | "merged" | "open";
+export type TestSuiteRunSourceMetadata = {
   branchName: string;
-  branchStatus: TestRunBranchStatus;
+  branchStatus: TestSuiteRunBranchStatus;
   commitId: string;
   triggerUrl: string | null;
   user: string;
 };
 
-export interface TestRun {
+export interface TestSuiteRun {
   date: string;
   id: string;
-  mode: TestRunMode | null;
+  mode: TestSuiteRunMode | null;
   results: {
     counts: {
       failed: number;
@@ -40,7 +40,7 @@ export interface TestRun {
     };
     recordings: Recording[];
   };
-  source: TestRunSourceMetadata | null;
+  source: TestSuiteRunSourceMetadata | null;
   title: string;
 }
 
@@ -127,30 +127,30 @@ function unwrapRecordingsData(
 
 export function useGetTestRunForWorkspace(
   workspaceId: string,
-  testRunId: string
+  testSuiteRunId: string
 ): {
-  testRun: TestRun | null;
+  testSuiteRun: TestSuiteRun | null;
   loading: boolean;
 } {
   const { data, loading } = useQuery<GetTestsRun, GetTestsRunVariables>(GET_TEST_RUN, {
-    variables: { id: testRunId, workspaceId },
+    variables: { id: testSuiteRunId, workspaceId },
   });
 
   if (loading || !data?.node) {
-    return { testRun: null, loading };
+    return { testSuiteRun: null, loading };
   }
-  assert("testRuns" in data.node, "No testRuns in GetTestsRun response");
+  assert("testRuns" in data.node, "No results in GetTestsRun response");
 
-  const testRun = data.node.testRuns?.[0];
+  const testSuiteRun = data.node.testRuns?.[0];
 
   return {
-    testRun: testRun ? convertLegacyTestRunToNewFormat(testRun) : null,
+    testSuiteRun: testSuiteRun ? convertLegacyTestRunToNewFormat(testSuiteRun) : null,
     loading,
   };
 }
 
 export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
-  testRuns: TestRun[];
+  testSuiteRuns: TestSuiteRun[];
   loading: boolean;
 } {
   // TODO [FE-1530] Pagination test runs from GraphQL
@@ -163,38 +163,38 @@ export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
 
   return useMemo(() => {
     if (loading || !data?.node) {
-      return { testRuns: [], loading };
+      return { testSuiteRuns: [], loading };
     }
     assert("testRuns" in data.node, "No testRuns in GetTestsRun response");
 
-    const testRuns: TestRun[] = [];
+    const testSuiteRuns: TestSuiteRun[] = [];
 
     // Convert legacy test runs; filter out ones with invalid data
-    data.node.testRuns?.forEach(legacyTestRun => {
+    data.node.testRuns?.forEach(legacyTestSuiteRun => {
       try {
-        testRuns.push(convertLegacyTestRunToNewFormat(legacyTestRun));
+        testSuiteRuns.push(convertLegacyTestRunToNewFormat(legacyTestSuiteRun));
       } catch (error) {
         // Filter out and ignore data that's too old or corrupt to defined the required fields
       }
     });
 
-    const sortedTestRuns = orderBy(testRuns, "date", "desc");
+    const sortedTestSuiteRuns = orderBy(testSuiteRuns, "date", "desc");
 
     return {
-      testRuns: sortedTestRuns,
+      testSuiteRuns: sortedTestSuiteRuns,
       loading,
     };
   }, [data, loading]);
 }
 
 // TODO [FE-1419] Remove this eventually (when we drop support for legacy data format)
-export function convertLegacyTestRunToNewFormat(testRun: unknown): TestRun {
+export function convertLegacyTestRunToNewFormat(testSuiteRun: unknown): TestSuiteRun {
   // If data from GraphQL is already in the new format, skip the conversion
-  if (isTestRun(testRun)) {
-    return testRun;
+  if (isTestSuiteRun(testSuiteRun)) {
+    return testSuiteRun;
   }
 
-  const legacyTestRun = testRun as
+  const legacyTestRun = testSuiteRun as
     | GetTestsRun_node_Workspace_testRuns
     | GetTestsRunsForWorkspace_node_Workspace_testRuns;
 
@@ -223,7 +223,7 @@ export function convertLegacyTestRunToNewFormat(testRun: unknown): TestRun {
   // TODO [FE-1543] Some data doesn't have a title, so use a fallback for now
   const titleWithFallback = commitTitle || mergeTitle || title || "Tests";
 
-  let source: TestRunSourceMetadata | null = null;
+  let source: TestSuiteRunSourceMetadata | null = null;
   if (branch && commitId && user) {
     source = {
       branchName: branch,
@@ -237,7 +237,7 @@ export function convertLegacyTestRunToNewFormat(testRun: unknown): TestRun {
   return {
     date,
     id,
-    mode: mode ? (mode as TestRunMode) : null,
+    mode: mode ? (mode as TestSuiteRunMode) : null,
     results: {
       counts: {
         failed: stats.failed,
@@ -251,6 +251,6 @@ export function convertLegacyTestRunToNewFormat(testRun: unknown): TestRun {
   };
 }
 
-function isTestRun(testRun: any): testRun is TestRun {
-  return "results" in testRun;
+function isTestSuiteRun(testSuiteRun: any): testSuiteRun is TestSuiteRun {
+  return "results" in testSuiteRun;
 }
