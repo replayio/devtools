@@ -37,7 +37,9 @@ export const pauseIdCache: Cache<
 
     const sources = await sourcesByIdCache.readAsync(replayClient);
 
-    cachePauseData(replayClient, sources, pauseId, data, stack);
+    if (data) {
+      cachePauseData(replayClient, sources, pauseId, data, stack);
+    }
 
     return pauseId;
   },
