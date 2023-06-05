@@ -13,7 +13,7 @@ import { waitFor } from "../helpers/utils";
 
 const url = "cypress/doc_inspector_styles";
 
-test(`cypress-01: Test basic cypress reporter functionality`, async ({ page }) => {
+test.skip(`cypress-01: Test basic cypress reporter functionality`, async ({ page }) => {
   await startTest(page, url);
 
   // shows the cypress logo

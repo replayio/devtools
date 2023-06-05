@@ -1,5 +1,23 @@
 import { Locator, Page } from "@playwright/test";
 
+import { clearTextArea, debugPrint, delay, getCommandKey, mapLocators, waitFor } from "./utils";
+
+export function getTestSuitePanel(page: Page) {
+  return page.locator(`[data-test-name="TestSuitePanel"]`);
+}
+
+export async function openCypressTestPanel(page: Page): Promise<void> {
+  // Only click if it's not already open; clicking again will collapse the side bar.
+  const pane = getTestSuitePanel(page);
+
+  let isVisible = await pane.isVisible({ timeout: 15000 });
+  debugPrint(page, "Test panel visible: " + isVisible);
+
+  if (!isVisible) {
+    await page.locator('[data-test-name="ToolbarButton-CypressPanel"]').click();
+  }
+}
+
 export async function getTestRows(page: Page) {
   return page.locator('[data-test-name="TestItemTreeRow"]');
 }

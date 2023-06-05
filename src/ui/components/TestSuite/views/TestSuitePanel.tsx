@@ -18,7 +18,7 @@ export default function TestSuitePanel() {
   }
 
   return (
-    <div className={styles.Panel}>
+    <div className={styles.Panel} data-test-name="TestSuitePanel">
       {testRecording === null ? <GroupTestCasesPanel /> : <TestRecordingPanel />}
     </div>
   );
