@@ -79,7 +79,11 @@ export function getConsolePropsSuspense(client: ReplayClientInterface, step: Ann
         }
       }
     }
-  } catch {}
+  } catch (error) {
+    // TODO [FE-1555] RUN currently throws in some cases;
+    // degrade gracefully in this case by just disabling the details panel
+    console.error(error);
+  }
 
   return {
     consoleProps: undefined,
