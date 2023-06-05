@@ -52,6 +52,8 @@ import timeline, {
 import { UIState } from "ui/state";
 import { UnexpectedError } from "ui/state/app";
 import {
+  REACT_ANNOTATIONS_KIND,
+  REDUX_ANNOTATIONS_KIND,
   annotationKindsCache,
   eventListenersJumpLocationsCache,
   reactDevToolsAnnotationsCache,
@@ -219,7 +221,8 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
 
   ThreadFront.waitForSession().then(() => {
     // Precache annotations
-    annotationKindsCache.prefetch(replayClient);
+    annotationKindsCache.prefetch(replayClient, REACT_ANNOTATIONS_KIND);
+    annotationKindsCache.prefetch(replayClient, REDUX_ANNOTATIONS_KIND);
     reactDevToolsAnnotationsCache.prefetch();
     eventListenersJumpLocationsCache.prefetch();
   });

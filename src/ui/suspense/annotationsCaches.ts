@@ -1,5 +1,6 @@
 import { Annotation, TimeStampedPoint } from "@replayio/protocol";
-import { createSingleEntryCache } from "suspense";
+import { Kind } from "graphql";
+import { Cache, createCache, createSingleEntryCache } from "suspense";
 
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
@@ -34,16 +35,14 @@ export const REACT_ANNOTATIONS_KIND = "react-devtools-bridge";
 export const REDUX_ANNOTATIONS_KIND = "redux-devtools-data";
 export const JUMP_ANNOTATION_KIND = "event-listeners-jump-location";
 
-export const annotationKindsCache = createSingleEntryCache<
-  [replayClient: ReplayClientInterface],
-  Set<string>
->({
-  debugLabel: "Annotations",
-  load: async ([replayClient]) => {
-    const annotationKinds = await replayClient.getAnnotationKinds();
-
-    const kindsSet = new Set<string>(annotationKinds);
-    return kindsSet;
+export const annotationKindsCache: Cache<
+  [replayClient: ReplayClientInterface, kind: string],
+  boolean
+> = createCache({
+  debugLabel: "AnnotationKinds",
+  getKey: ([replayClient, kind]) => kind,
+  load: async ([replayClient, kind]) => {
+    return replayClient.hasAnnotationKind(kind);
   },
 });
 
@@ -57,7 +56,7 @@ export const reactDevToolsAnnotationsCache = createSingleEntryCache<
 
     await ThreadFront.getAnnotations(annotations => {
       receivedAnnotations.push(...annotations);
-    }, "react-devtools-bridge");
+    }, REACT_ANNOTATIONS_KIND);
 
     receivedAnnotations.sort((a1, a2) => compareNumericStrings(a1.point, a2.point));
 

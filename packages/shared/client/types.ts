@@ -215,6 +215,7 @@ export interface ReplayClientInterface {
   ): Promise<HitCount[]>;
   getSourceOutline(sourceId: SourceId): Promise<getSourceOutlineResult>;
   getTopFrame(pauseId: PauseId): Promise<getTopFrameResult>;
+  hasAnnotationKind(kind: string): Promise<boolean>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   mapExpressionToGeneratedScope(expression: string, location: Location): Promise<string>;
   requestFocusRange(range: FocusWindowRequest): Promise<TimeStampedPointRange>;
