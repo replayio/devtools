@@ -42,7 +42,7 @@
     "@lexical/react": "^0.6.5",
     "@reduxjs/toolkit": "^1.8.4",
     "@replayio/overboard": "^0.4.1",
-    "@replayio/protocol": "^0.50.0",
+    "@replayio/protocol": "^0.53.0",
     "@sentry/react": "^7.9.0",
     "@sentry/tracing": "^7.9.0",
     "@stripe/react-stripe-js": "^1.7.0",
