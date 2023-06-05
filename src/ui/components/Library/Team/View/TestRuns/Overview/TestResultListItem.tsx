@@ -32,6 +32,7 @@ function ViewReplay({ label, recordingId }: { label: string; recordingId: Record
 
 function Title({ recording }: { recording: Recording }) {
   const errorMsg = recording.metadata?.test?.tests
+    // @ts-ignore TODO [FE-1419] Remove this once recording.metadata.test is typed again
     ?.map(test => test.error?.message)
     .filter(Boolean)[0];
 

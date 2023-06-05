@@ -14,7 +14,6 @@ import { InspectorState } from "devtools/client/inspector/reducers";
 import { RulesState } from "devtools/client/inspector/rules/reducers/rules";
 import { NetworkState } from "ui/reducers/network";
 import { ProtocolMessagesState } from "ui/reducers/protocolMessages";
-import { ReporterState } from "ui/reducers/reporter";
 import type { SourcesState as NewSourcesState } from "ui/reducers/sources";
 
 import { AppState } from "./app";
@@ -39,7 +38,6 @@ export interface UIState {
   protocolMessages: ProtocolMessagesState;
   quickOpen: QuickOpenState;
   reactDevTools: ReactDevToolsState;
-  reporter: ReporterState;
   rules: RulesState;
   sourceTree: SourceTreeState;
   tabs: TabsState;

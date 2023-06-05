@@ -1,29 +1,30 @@
 import { useTransition } from "react";
 
+import { TestRecording } from "shared/test-suites/types";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIcon";
-import { ProcessedTestItem } from "ui/components/TestSuite/types";
 
-import styles from "./TestItemTreeRow.module.css";
+import styles from "./TestRecordingTreeRow.module.css";
 
-export default function TestItemTreeRow({
+export default function TestRecordingTreeRow({
   onClick: onClickProp,
-  testItem,
+  testRecording,
 }: {
   onClick: () => void;
-  testItem: ProcessedTestItem;
+  testRecording: TestRecording;
 }) {
   const [isPending, startTransition] = useTransition();
 
   const onClick = () => startTransition(onClickProp);
 
-  const { error, result, scopePath, title } = testItem;
+  const { error, result, source } = testRecording;
+  const { title } = source;
 
   return (
     <li
       className={styles.Row}
       data-is-pending={isPending || undefined}
-      data-test-name="TestItemTreeRow"
+      data-test-name="TestRecordingTreeRow"
       onClick={onClick}
     >
       <TestResultIcon result={result} />

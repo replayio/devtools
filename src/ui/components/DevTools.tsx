@@ -17,6 +17,7 @@ import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import usePreferredFontSize from "replay-next/src/hooks/usePreferredFontSize";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
 import TerminalContextAdapter from "ui/components/SecondaryToolbox/TerminalContextAdapter";
+import { TestSuiteContextRoot } from "ui/components/TestSuite/views/TetSuiteContext";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
@@ -24,7 +25,6 @@ import { useUserIsAuthor } from "ui/hooks/users";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
-import { isTest } from "ui/utils/environment";
 import {
   endUploadWaitTracking,
   maybeSetGuestMixpanelContext,
@@ -229,27 +229,29 @@ function _DevTools({
         <FocusContextReduxAdapter>
           <PointsContextRoot>
             <TimelineContextAdapter>
-              <SelectedFrameContextRoot SelectedFrameContextAdapter={SelectedFrameContextAdapter}>
-                <TerminalContextAdapter>
-                  <InspectorContextReduxAdapter>
-                    <ExpandablesContextRoot>
-                      <LayoutContextAdapter>
-                        <KeyModifiers>
-                          {title && (
-                            <Head>
-                              <title>{title}</title>
-                            </Head>
-                          )}
-                          <Header />
-                          <Body />
-                          {showCommandPalette ? <CommandPaletteModal /> : null}
-                          <KeyboardShortcuts />
-                        </KeyModifiers>
-                      </LayoutContextAdapter>
-                    </ExpandablesContextRoot>
-                  </InspectorContextReduxAdapter>
-                </TerminalContextAdapter>
-              </SelectedFrameContextRoot>
+              <TestSuiteContextRoot>
+                <SelectedFrameContextRoot SelectedFrameContextAdapter={SelectedFrameContextAdapter}>
+                  <TerminalContextAdapter>
+                    <InspectorContextReduxAdapter>
+                      <ExpandablesContextRoot>
+                        <LayoutContextAdapter>
+                          <KeyModifiers>
+                            {title && (
+                              <Head>
+                                <title>{title}</title>
+                              </Head>
+                            )}
+                            <Header />
+                            <Body />
+                            {showCommandPalette ? <CommandPaletteModal /> : null}
+                            <KeyboardShortcuts />
+                          </KeyModifiers>
+                        </LayoutContextAdapter>
+                      </ExpandablesContextRoot>
+                    </InspectorContextReduxAdapter>
+                  </TerminalContextAdapter>
+                </SelectedFrameContextRoot>
+              </TestSuiteContextRoot>
             </TimelineContextAdapter>
           </PointsContextRoot>
         </FocusContextReduxAdapter>

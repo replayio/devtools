@@ -12,12 +12,12 @@ export async function getTestRowChevron(row: Locator) {
   return row.locator(":scope", { hasText: "chevron_right" });
 }
 
-export async function getTestCaseSections(row: Locator) {
-  return row.locator('[data-test-name="TestCaseSection"]');
+export async function getTestSections(row: Locator) {
+  return row.locator('[data-test-name="TestSection"]');
 }
 
 export async function getTestCaseSteps(row: Locator) {
-  return row.locator('[data-test-name="TestCaseSectionRow"]');
+  return row.locator('[data-test-name="TestSectionRow"]');
 }
 
 export async function getSelectedTestCase(row: Pick<Locator, "locator">) {

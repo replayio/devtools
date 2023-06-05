@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { TestSuiteRun } from "ui/hooks/tests";
+import { TestSuite } from "shared/test-suites/types";
 import { groupRecordings } from "ui/utils/testRuns";
 
 function Pill({ styles, value }: { styles: string; value: number }) {
@@ -12,11 +12,11 @@ function Pill({ styles, value }: { styles: string; value: number }) {
     </div>
   );
 }
-export function RunStats({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
+export function RunStats({ testSuite }: { testSuite: TestSuite }) {
   // TODO Don't keep re-computing this; it's expensive
   const { passedRecordings, failedRecordings, flakyRecordings } = useMemo(
-    () => groupRecordings(testSuiteRun.results.recordings),
-    [testSuiteRun.results.recordings]
+    () => groupRecordings(testSuite.results.recordings),
+    [testSuite.results.recordings]
   );
 
   const passed = passedRecordings.count;

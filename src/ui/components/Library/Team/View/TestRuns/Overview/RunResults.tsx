@@ -9,12 +9,12 @@ import { TestRunOverviewContext } from "./TestRunOverviewContainerContextType";
 import styles from "../../../../Library.module.css";
 
 export function RunResults() {
-  const testSuiteRun = useContext(TestRunOverviewContext).testSuiteRun!;
+  const testSuite = useContext(TestRunOverviewContext).testSuite!;
 
   // TODO Don't keep re-computing this; it's expensive
   const { passedRecordings, failedRecordings, flakyRecordings } = useMemo(
-    () => groupRecordings(testSuiteRun.results.recordings),
-    [testSuiteRun.results.recordings]
+    () => groupRecordings(testSuite.results.recordings),
+    [testSuite.results.recordings]
   );
 
   return (

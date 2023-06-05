@@ -1,21 +1,22 @@
 .Tree {
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
 }
 .Tree[data-nested] {
+  margin-left: 1rem;
 }
 
 .List {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-left: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .Scope {
   font-size: var(--font-size-medium);
   color: var(--theme-base-60);
-  text-transform: uppercase;
   font-weight: bold;
-  margin-bottom: 0.5rem;
 }

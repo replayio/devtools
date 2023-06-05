@@ -1,4 +1,5 @@
 type ComparisonFunction<T> = (a: T, b: T) => number;
+type SliceCompareFunction<ItemType, TargetType> = (item: ItemType, target: TargetType) => number;
 
 function compareBigInt(a: string, b: string): number {
   const difference = BigInt(a) - BigInt(b);
@@ -98,6 +99,39 @@ export function findInsertIndex<T>(
   return lowIndex;
 }
 
+export function findSliceIndices<ItemType, TargetType>(
+  sortedItems: ItemType[],
+  beginTarget: TargetType,
+  endTarget: TargetType,
+  compareFunction: SliceCompareFunction<ItemType, TargetType>
+): [beginIndex: number, endIndex: number] {
+  let beginIndex = -1;
+  let endIndex = -1;
+
+  // TODO [FE-1419] Replace this with a binary search
+  for (let index = 0; index < sortedItems.length; index++) {
+    const currentItem = sortedItems[index];
+    const value = compareFunction(currentItem, beginTarget);
+    if (value >= 0) {
+      beginIndex = index;
+      break;
+    }
+  }
+
+  // TODO [FE-1419] Replace this with a binary search
+  for (let index = beginIndex; index < sortedItems.length; index++) {
+    const currentItem = sortedItems[index];
+    const value = compareFunction(currentItem, endTarget);
+    if (value <= 0) {
+      endIndex = index;
+    } else {
+      break;
+    }
+  }
+
+  return [beginIndex, endIndex];
+}
+
 export function insert<T>(
   sortedItems: T[],
   item: T,
@@ -112,4 +146,24 @@ export function insert<T>(
 
 export function insertString(sortedItems: string[], item: string): string[] {
   return insert<string>(sortedItems, item, (a, b) => a.localeCompare(b));
+}
+
+export function slice<ItemType, TargetType>(
+  sortedItems: ItemType[],
+  beginTarget: TargetType,
+  endTarget: TargetType,
+  compareFunction: SliceCompareFunction<ItemType, TargetType>
+): ItemType[] {
+  const [beginIndex, endIndex] = findSliceIndices(
+    sortedItems,
+    beginTarget,
+    endTarget,
+    compareFunction
+  );
+
+  if (beginIndex < 0 && endIndex < 0) {
+    return [];
+  }
+
+  return sortedItems.slice(beginIndex, endIndex + 1);
 }

@@ -6,6 +6,7 @@ import { getPauseId } from "devtools/client/debugger/src/selectors";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { GroupedTestCases, IncrementalGroupedTestCases } from "shared/test-suites/types";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
@@ -230,10 +231,20 @@ export default function Toolbar() {
     }
   };
 
+  // TODO [FE-1419] Remove IncrementalGroupedTestCases type cast once that's the default Recording metadata.test type
+  let testRunner = null;
+  if (recording?.metadata?.test) {
+    testRunner =
+      testRunner ??
+      (recording?.metadata?.test as any as IncrementalGroupedTestCases)?.environment?.testRunner
+        ?.name ??
+      null;
+  }
+
   return (
     <div className="toolbox-toolbar-container flex flex-col items-center justify-between py-1">
       <div id="toolbox-toolbar">
-        {recording?.metadata?.test?.runner?.name !== "cypress" && showTour ? (
+        {testRunner !== "cypress" && showTour ? (
           <ToolbarButton
             icon="school"
             name="tour"
@@ -249,8 +260,8 @@ export default function Toolbar() {
             onClick={handleButtonClick}
           />
         ) : null}
-        {recording?.metadata?.test?.runner ? (
-          recording?.metadata?.test?.runner?.name === "cypress" ? (
+        {testRunner !== null ? (
+          testRunner === "cypress" ? (
             <ToolbarButton
               icon="cypress"
               label="Cypress Panel"
