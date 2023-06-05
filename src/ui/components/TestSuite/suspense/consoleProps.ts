@@ -35,49 +35,51 @@ export function getConsolePropsSuspense(client: ReplayClientInterface, step: Ann
   }
 
   const endPauseId = pauseIdCache.read(client, point, time);
-  const frames = framesCache.read(client, endPauseId);
-  const callerFrameId = frames?.[1]?.frameId;
+  try {
+    const frames = framesCache.read(client, endPauseId);
+    const callerFrameId = frames?.[1]?.frameId;
 
-  if (callerFrameId) {
-    const { returned: logResult } = pauseEvaluationsCache.read(
-      client,
-      endPauseId,
-      callerFrameId,
-      logVariable,
-      undefined
-    );
-
-    if (logResult?.object) {
-      const logObject = objectCache.read(client, endPauseId, logResult.object, "canOverflow");
-      const consolePropsProperty = logObject.preview?.properties?.find(
-        ({ name }) => name === "consoleProps"
+    if (callerFrameId) {
+      const { returned: logResult } = pauseEvaluationsCache.read(
+        client,
+        endPauseId,
+        callerFrameId,
+        logVariable,
+        undefined
       );
 
-      if (consolePropsProperty?.object) {
-        const consoleProps = objectCache.read(
-          client,
-          endPauseId,
-          consolePropsProperty.object,
-          "full"
+      if (logResult?.object) {
+        const logObject = objectCache.read(client, endPauseId, logResult.object, "canOverflow");
+        const consolePropsProperty = logObject.preview?.properties?.find(
+          ({ name }) => name === "consoleProps"
         );
 
-        const sanitized = cloneDeep(consoleProps);
-        if (sanitized?.preview?.properties) {
-          sanitized.preview.properties = sanitized.preview.properties.filter(
-            ({ name }) => name !== "Snapshot"
+        if (consolePropsProperty?.object) {
+          const consoleProps = objectCache.read(
+            client,
+            endPauseId,
+            consolePropsProperty.object,
+            "full"
           );
 
-          // suppress the prototype entry in the properties output
-          sanitized.preview.prototypeId = undefined;
-        }
+          const sanitized = cloneDeep(consoleProps);
+          if (sanitized?.preview?.properties) {
+            sanitized.preview.properties = sanitized.preview.properties.filter(
+              ({ name }) => name !== "Snapshot"
+            );
 
-        return {
-          consoleProps: sanitized,
-          pauseId: endPauseId,
-        };
+            // suppress the prototype entry in the properties output
+            sanitized.preview.prototypeId = undefined;
+          }
+
+          return {
+            consoleProps: sanitized,
+            pauseId: endPauseId,
+          };
+        }
       }
     }
-  }
+  } catch {}
 
   return {
     consoleProps: undefined,
