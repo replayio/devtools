@@ -1,6 +1,9 @@
 import Link from "next/link";
+import { useContext } from "react";
 
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TestSuite, TestSuiteMode } from "shared/test-suites/types";
+import { RecordingCache } from "ui/components/TestSuite/suspense/RecordingCache";
 
 import {
   getDurationString,
@@ -43,26 +46,32 @@ export function ModeAttribute({ testSuite }: { testSuite: TestSuite }) {
 }
 
 export function Attributes({ testSuite }: { testSuite: TestSuite }) {
-  const { date, results, source, title } = testSuite;
+  const { recordingId } = useContext(SessionContext);
+
+  const { date, results, title } = testSuite;
   const { recordings } = results;
 
   const duration = getDuration(recordings);
   const durationString = getDurationString(duration);
 
+  const recording = RecordingCache.read(recordingId);
+  const source = recording.metadata?.source;
   if (source) {
-    const { branchName, branchStatus, user } = source;
+    const { branch = "branch", merge, trigger } = source;
 
     return (
       <div className="flex flex-row flex-wrap items-center pl-1">
         <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
-        {user ? <AttributeContainer icon="person">{user}</AttributeContainer> : null}
-        {branchStatus === "open" ? (
+        {trigger?.user ? (
+          <AttributeContainer icon="person">{trigger.user}</AttributeContainer>
+        ) : null}
+        {merge != null ? (
           <AttributeContainer maxWidth="160px" icon="fork_right">
-            {branchName}
+            {branch}
           </AttributeContainer>
         ) : (
           <AttributeContainer title={title} icon="merge_type">
-            {branchStatus}
+            {branch}
           </AttributeContainer>
         )}
         <AttributeContainer icon="timer">{durationString}</AttributeContainer>

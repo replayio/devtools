@@ -10,11 +10,11 @@ export type TestSuiteMode = "diagnostics" | "record-on-retry" | "stress";
 export type TestSuiteBranchStatus = "closed" | "merged" | "open";
 
 export type TestSuiteSourceMetadata = {
-  branchName: string;
+  branchName: string | null;
   branchStatus: TestSuiteBranchStatus;
   commitId: string;
   triggerUrl: string | null;
-  user: string;
+  user: string | null;
 };
 
 // A TestSuite is a group of tests that were run together
@@ -48,8 +48,6 @@ export interface GroupedTestCases {
   // Not accurate enough to use for setting focus region in DevTools
   approximateDuration: number;
 
-  date: string;
-
   // Environment that generated the test results
   environment: {
     // Plug-in/integration errors (e.g. missing steps, no steps, mismatched annotations)
@@ -70,23 +68,23 @@ export interface GroupedTestCases {
     };
   };
 
-  // Relative path to source file
-  filePath: string;
-
   // Summarizes result of the test run
   resultCounts: Record<TestResult, number>;
 
   // Version for test metadata/schema
   schemaVersion: SemVer;
 
-  source: TestSuiteSourceMetadata | null;
+  source: {
+    // Relative path to source file
+    filePath: string;
+
+    // Only available for Playwright tests
+    title: string | null;
+  };
 
   // If a test fails, it may be executed multiple times (e.g. retries);
   // each of these attempts is tracked in the testRecordings array
   testRecordings: TestRecording[];
-
-  // Only available for Playwright tests
-  title: string | null;
 }
 
 // Describes an individual test:
@@ -229,7 +227,7 @@ type IncrementalUserActionEvent = Omit<UserActionEvent, "data" | "timeStampedPoi
 };
 
 export type IncrementalGroupedTestCases = Omit<GroupedTestCases, "testRecordings"> & {
-  testRecordings: IncrementalTestRecording[];
+  tests: IncrementalTestRecording[];
 };
 
 export type LegacyTestSuite =

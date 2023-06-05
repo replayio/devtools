@@ -1,5 +1,7 @@
 import { ExecutionPoint } from "@replayio/protocol";
 
+import { IncrementalGroupedTestCases } from "shared/test-suites/types";
+
 export enum Nag {
   ADD_COMMENT = "add_comment",
   ADD_COMMENT_TO_LINE = "add_comment_to_line",
@@ -249,7 +251,7 @@ export interface Recording {
 }
 
 export interface RecordingMetadata {
-  test?: any; // TODO [Fe-1419]
+  test?: IncrementalGroupedTestCases;
   source?: SourceMetadata;
 }
 

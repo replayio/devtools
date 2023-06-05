@@ -5,7 +5,10 @@ import React from "react";
 import LazyLoad from "react-lazyload";
 
 import { Recording } from "shared/graphql/types";
-import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIcon";
+import {
+  TestResultIcon,
+  getResultFromResultCounts,
+} from "ui/components/TestSuite/components/TestResultIcon";
 import hooks from "ui/hooks";
 import { useGetUserPermissions } from "ui/hooks/users";
 import { getDisplayedUrl } from "ui/utils/environment";
@@ -166,7 +169,9 @@ function RecordingRow({
             <div className={`flex flex-col space-y-0.5 overflow-hidden ${styles.recordingTitle}`}>
               <div className="flex items-center space-x-1">
                 {recording.metadata?.test ? (
-                  <TestResultIcon result={recording.metadata.test.result} />
+                  <TestResultIcon
+                    result={getResultFromResultCounts(recording.metadata.test.resultCounts)}
+                  />
                 ) : null}
                 <ReplayTitle title={recording.title} />
               </div>
@@ -188,9 +193,9 @@ function RecordingRow({
                 <div className="overflow-hidden overflow-ellipsis whitespace-pre font-light text-gray-400">
                   {getDisplayedUrl(recording.url)}
                 </div>
-                {recording.metadata?.test?.file ? (
+                {recording.metadata?.test?.source.filePath ? (
                   <div className="overflow-hidden overflow-ellipsis whitespace-pre font-light text-gray-400">
-                    {recording.metadata.test.file}
+                    {recording.metadata.test.source.filePath}
                   </div>
                 ) : null}
               </div>

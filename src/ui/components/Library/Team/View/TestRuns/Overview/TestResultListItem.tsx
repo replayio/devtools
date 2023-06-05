@@ -39,8 +39,8 @@ function Title({ recording }: { recording: Recording }) {
   return (
     <div className="flex flex-grow flex-row items-center space-x-4 overflow-hidden hover:cursor-pointer">
       <div className="flex flex-grow flex-col overflow-hidden">
-        {recording.metadata?.test?.title}
-        <div className="text-xs text-bodySubColor">{recording.metadata?.test?.file}</div>
+        {recording.metadata?.test?.source.title}
+        <div className="text-xs text-bodySubColor">{recording.metadata?.test?.source.filePath}</div>
         {errorMsg ? <div className="text-xs text-bodySubColor">{errorMsg}</div> : null}
       </div>
     </div>

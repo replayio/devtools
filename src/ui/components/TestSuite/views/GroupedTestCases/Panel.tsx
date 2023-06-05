@@ -1,11 +1,12 @@
 import assert from "assert";
 import { useContext, useMemo } from "react";
 
-import { TestSuiteSourceMetadata } from "shared/test-suites/types";
+import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { getFormattedTime } from "shared/utils/time";
 import { getTruncatedRelativeDate } from "ui/components/Library/Team/View/Recordings/RecordingListItem/RecordingListItem";
 import LabeledIcon from "ui/components/TestSuite/components/LabeledIcon";
 import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIcon";
+import { RecordingCache } from "ui/components/TestSuite/suspense/RecordingCache";
 import { formatTitle } from "ui/components/TestSuite/utils/formatTitle";
 import { createTestTree } from "ui/components/TestSuite/views/GroupedTestCases/createTestTree";
 import { TestRecordingTree } from "ui/components/TestSuite/views/GroupedTestCases/TestRecordingTree";
@@ -14,15 +15,18 @@ import { TestSuiteContext } from "ui/components/TestSuite/views/TetSuiteContext"
 import styles from "./Panel.module.css";
 
 export default function Panel() {
+  const { recordingId } = useContext(SessionContext);
   const { groupedTestCases } = useContext(TestSuiteContext);
   assert(groupedTestCases != null);
 
-  const { approximateDuration, date, filePath, resultCounts, source, testRecordings, title } =
-    groupedTestCases;
+  const { approximateDuration, resultCounts, source, testRecordings } = groupedTestCases;
+  const { filePath, title } = source;
 
   const durationString = getFormattedTime(approximateDuration);
 
   const testTree = useMemo(() => createTestTree(testRecordings), [testRecordings]);
+
+  const recording = RecordingCache.read(recordingId);
 
   return (
     <>
@@ -47,9 +51,9 @@ export default function Panel() {
           <LabeledIcon
             className={styles.Attribute}
             icon="schedule"
-            label={getTruncatedRelativeDate(date)}
+            label={getTruncatedRelativeDate(recording.date)}
           />
-          {source && <Source source={source} />}
+          <Source />
           <LabeledIcon className={styles.Attribute} icon="timer" label={durationString} />
         </div>
       </div>
@@ -60,16 +64,26 @@ export default function Panel() {
   );
 }
 
-function Source({ source }: { source: TestSuiteSourceMetadata }) {
-  const { branchName, branchStatus, user } = source;
+function Source() {
+  const { recordingId } = useContext(SessionContext);
+
+  const recording = RecordingCache.read(recordingId);
+  const source = recording.metadata?.source;
+  if (source == null) {
+    return null;
+  }
+
+  const { branch = "branch", merge, trigger } = source;
 
   return (
     <>
-      {user && <LabeledIcon className={styles.Attribute} icon="person" label={user} />}
-      {branchStatus === "open" ? (
-        <LabeledIcon className={styles.Attribute} icon="fork_right" label={branchName} />
+      {trigger?.user && (
+        <LabeledIcon className={styles.Attribute} icon="person" label={trigger.user} />
+      )}
+      {merge != null ? (
+        <LabeledIcon className={styles.Attribute} icon="fork_right" label={branch} />
       ) : (
-        <LabeledIcon className={styles.Attribute} icon="merge_type" label={branchStatus} />
+        <LabeledIcon className={styles.Attribute} icon="merge_type" label={branch} />
       )}
     </>
   );

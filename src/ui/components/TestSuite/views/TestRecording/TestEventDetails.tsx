@@ -49,7 +49,7 @@ function UserActionEventDetails({
   );
 
   if (status === STATUS_PENDING) {
-    return <LoadingInProgress/>;
+    return <LoadingInProgress />;
   } else if (value?.props == null || value?.pauseId == null) {
     return <LoadingFailedMessage />;
   }

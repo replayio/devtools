@@ -16,7 +16,7 @@ export async function convertIncrementalGroupedTestCasesToFullGroupedTestCases(
   replayClient: ReplayClientInterface
 ): Promise<GroupedTestCases> {
   if (isIncrementalGroupedTestCases(groupedTestCases)) {
-    const { testRecordings: partialTestRecordings, ...rest } = groupedTestCases;
+    const { tests: partialTestRecordings, ...rest } = groupedTestCases;
 
     const annotations = await AnnotationsCache.readAsync();
 

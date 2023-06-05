@@ -13,7 +13,7 @@ export const TestStepSourceLocationCache = createCacheWithTelemetry<
 >({
   debugLabel: "TestStepSourceLocationCache",
   getKey: ([client, groupedTestCases, testEvent]) =>
-    `${groupedTestCases.title}:${testEvent.data.id}`,
+    `${groupedTestCases.source.title}:${testEvent.data.id}`,
   load: async ([client, groupedTestCases, testEvent]) => {
     const runner = groupedTestCases.environment.testRunner.name;
     const runnerVersion = groupedTestCases.environment.testRunner.version;
