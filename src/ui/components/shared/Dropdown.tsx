@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import React, { ReactNode } from "react";
 
 export interface DropdownProps {
@@ -32,9 +33,15 @@ export default function Dropdown({
       {expanded ? (
         <div className="dropdown-container">
           <div className="mask" onClick={() => setExpanded(false)} />
-          <div className={`content ${position}`} style={orientations[orientation]}>
+          <motion.div
+            initial={{ scale: 0.8 }}
+            animate={{ scale: [0.8, 1.05, 1] }}
+            transition={{ duration: 0.17, ease: "easeInOut" }}
+            className={`content ${position}`}
+            style={orientations[orientation]}
+          >
             {children}
-          </div>
+          </motion.div>
         </div>
       ) : null}
     </div>

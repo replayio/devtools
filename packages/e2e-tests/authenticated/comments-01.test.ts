@@ -1,6 +1,7 @@
 import test from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
+import { E2E_USER_1_API_KEY } from "../helpers/authentication";
 import {
   addSourceCodeComment,
   deleteAllComments,
@@ -17,7 +18,7 @@ const url = "authenticated_comments_1.html";
 test(`authenticated/comments-01: Test add, edit, and delete comment functionality`, async ({
   page,
 }) => {
-  await startTest(page, url, process.env.E2E_USER_1_API_KEY);
+  await startTest(page, url, E2E_USER_1_API_KEY);
   await openDevToolsTab(page);
   await openSource(page, url);
 

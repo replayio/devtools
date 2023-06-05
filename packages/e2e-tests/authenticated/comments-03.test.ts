@@ -1,6 +1,7 @@
 import test, { expect } from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
+import { E2E_USER_1_API_KEY } from "../helpers/authentication";
 import {
   addNetworkRequestComment,
   addSourceCodeComment,
@@ -17,7 +18,7 @@ import { openSource } from "../helpers/source-explorer-panel";
 const url = "authenticated_comments_3.html";
 
 test(`authenticated/comments-03: Comment previews`, async ({ page }) => {
-  await startTest(page, url, process.env.E2E_USER_1_API_KEY);
+  await startTest(page, url, E2E_USER_1_API_KEY);
   await openDevToolsTab(page);
 
   // Clean up from previous tests

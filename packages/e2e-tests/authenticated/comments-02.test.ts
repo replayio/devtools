@@ -1,6 +1,7 @@
 import test, { Page } from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
+import { E2E_USER_1_API_KEY, E2E_USER_2_API_KEY } from "../helpers/authentication";
 import {
   addSourceCodeComment,
   deleteAllComments,
@@ -31,7 +32,7 @@ test(`authenticated/comments-02: Test shared comments and replies`, async ({ bro
     // User 1
     const context = await browser.newContext();
     const page = await context.newPage();
-    await load(page, process.env.E2E_USER_1_API_KEY as string);
+    await load(page, E2E_USER_1_API_KEY);
 
     // Clean up from previous tests
     // TODO [SCS-1066] Ideally we would create a fresh recording for each test run
@@ -52,7 +53,7 @@ test(`authenticated/comments-02: Test shared comments and replies`, async ({ bro
     // User 2
     const context = await browser.newContext();
     const page = await context.newPage();
-    await load(page, process.env.E2E_USER_2_API_KEY as string);
+    await load(page, E2E_USER_2_API_KEY);
 
     const commentLocator = await getComments(page, {
       text: "This is a test comment from user 1",

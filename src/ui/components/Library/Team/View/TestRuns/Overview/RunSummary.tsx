@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { TestRun } from "ui/hooks/tests";
+import { TestSuiteRun, TestSuiteRunMode } from "ui/hooks/tests";
 
 import {
   getDurationString,
@@ -10,19 +10,17 @@ import { AttributeContainer } from "../AttributeContainer";
 import { RunStats } from "../RunStats";
 import { getDuration } from "../utils";
 
-function Title({ testRun }: { testRun: TestRun }) {
-  const title = testRun?.commitTitle;
-
+function Title({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
   return (
     <div className="flex flex-row items-center space-x-2 overflow-hidden">
       <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-medium">
-        {title}
+        {testSuiteRun.title}
       </div>
     </div>
   );
 }
 
-function getModeIcon(mode: string | null): string[] {
+function getModeIcon(mode: TestSuiteRunMode): string[] {
   switch (mode) {
     case "diagnostics":
       return ["biotech", "Diagnostic Mode"];
@@ -31,71 +29,87 @@ function getModeIcon(mode: string | null): string[] {
     case "record-on-retry":
       return ["repeatone", "Record on Retry Mode"];
   }
-
-  return [];
 }
 
-export function ModeAttribute({ testRun }: { testRun: TestRun }) {
-  const { mode } = testRun;
-
-  const [modeIcon, modeText] = getModeIcon(mode);
-
-  if (!modeIcon) {
+export function ModeAttribute({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
+  const { mode } = testSuiteRun;
+  if (!mode) {
     return null;
   }
+
+  const [modeIcon, modeText] = getModeIcon(mode);
 
   return <AttributeContainer icon={modeIcon}>{modeText}</AttributeContainer>;
 }
 
-export function Attributes({ testRun }: { testRun: TestRun }) {
-  const duration = getDuration(testRun.recordings!);
+export function Attributes({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
+  const { date, results, source, title } = testSuiteRun;
+  const { recordings } = results;
+
+  const duration = getDuration(recordings);
   const durationString = getDurationString(duration);
-  const { user, date, mergeId, mergeTitle, branch, mode } = testRun;
 
-  return (
-    <div className="flex flex-row flex-wrap items-center pl-1">
-      <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
-      {user ? <AttributeContainer icon="person">{user}</AttributeContainer> : null}
-      {mergeId && (
-        <AttributeContainer title={mergeTitle} icon="merge_type">
-          {mergeId}
-        </AttributeContainer>
-      )}
+  if (source) {
+    const { branchName, branchStatus, user } = source;
 
-      {!mergeId && branch && <AttributeContainer icon="fork_right">{branch}</AttributeContainer>}
-      <AttributeContainer icon="timer">{durationString}</AttributeContainer>
-      <ModeAttribute testRun={testRun} />
-    </div>
-  );
+    return (
+      <div className="flex flex-row flex-wrap items-center pl-1">
+        <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
+        {user ? <AttributeContainer icon="person">{user}</AttributeContainer> : null}
+        {branchStatus === "open" ? (
+          <AttributeContainer maxWidth="160px" icon="fork_right">
+            {branchName}
+          </AttributeContainer>
+        ) : (
+          <AttributeContainer title={title} icon="merge_type">
+            {branchStatus}
+          </AttributeContainer>
+        )}
+        <AttributeContainer icon="timer">{durationString}</AttributeContainer>
+        <ModeAttribute testSuiteRun={testSuiteRun} />
+      </div>
+    );
+  } else {
+    return (
+      <div className="flex flex-row flex-wrap items-center pl-1">
+        <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
+      </div>
+    );
+  }
 }
 
-function RunnerLink({ testRun }: { testRun: TestRun }) {
-  const { triggerUrl } = testRun;
-
-  if (!triggerUrl) {
+function RunnerLink({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
+  if (!testSuiteRun.source?.triggerUrl) {
     return null;
   }
 
   return (
-    <Link href={triggerUrl} target="_blank" rel="noreferrer noopener" className="hover:underline">
+    <Link
+      href={testSuiteRun.source.triggerUrl}
+      target="_blank"
+      rel="noreferrer noopener"
+      className="hover:underline"
+    >
       <span>View run in GitHub</span>
     </Link>
   );
 }
 
-export function RunSummary({ testRun }: { testRun: TestRun }) {
+export function RunSummary({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
+  const { title } = testSuiteRun;
+
   return (
     <div className="mb-2 flex flex-col space-y-2 border-b border-themeBorder p-4">
       <div className="flex flex-row justify-between">
-        <Title testRun={testRun} />
-        <RunStats testRun={testRun} />
+        <Title testSuiteRun={testSuiteRun} />
+        <RunStats testSuiteRun={testSuiteRun} />
       </div>
       <div className="flex flex-row items-center justify-between text-xs">
-        <Attributes testRun={testRun} />
-        <RunnerLink testRun={testRun} />
+        <Attributes testSuiteRun={testSuiteRun} />
+        <RunnerLink testSuiteRun={testSuiteRun} />
       </div>
-      {testRun.title ? (
-        <div className="flex flex-row items-center justify-between text-xs">{testRun.title}</div>
+      {title ? (
+        <div className="flex flex-row items-center justify-between text-xs">{title}</div>
       ) : null}
     </div>
   );

@@ -139,7 +139,7 @@ jobs:
         run: npx @replayio/playwright install
       - uses: replayio/action-playwright@main
         with:
-          command: E2E_USER_1_API_KEY=${{ secrets.E2E_USER_1_API_KEY }} E2E_USER_2_API_KEY=${{ secrets.E2E_USER_2_API_KEY }} npx playwright test --shard ${{ matrix.shard }}/1 --reporter=@replayio/playwright/reporter,line authenticated/*.ts
+          command: npx playwright test --shard ${{ matrix.shard }}/1 --reporter=@replayio/playwright/reporter,line authenticated/*.ts
           working-directory: ./packages/e2e-tests
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
           public: true

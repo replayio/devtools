@@ -3,10 +3,7 @@ import orderBy from "lodash/orderBy";
 import { useMemo } from "react";
 
 import { assert } from "protocol/utils";
-import {
-  GetTest_node_Workspace_tests,
-  GetTest_node_Workspace_tests_recordings,
-} from "shared/graphql/generated/GetTest";
+import { GetTest_node_Workspace_tests_recordings } from "shared/graphql/generated/GetTest";
 import {
   GetTestsRun,
   GetTestsRunVariables,
@@ -21,50 +18,31 @@ import {
 import { Recording } from "shared/graphql/types";
 import { WorkspaceId } from "ui/state/app";
 
-export interface TestRunStats {
-  passed: number | null;
-  failed: number | null;
-}
+export type TestSuiteRunMode = "diagnostics" | "record-on-retry" | "stress";
+export type TestSuiteRunBranchStatus = "closed" | "merged" | "open";
+export type TestSuiteRunSourceMetadata = {
+  branchName: string;
+  branchStatus: TestSuiteRunBranchStatus;
+  commitId: string;
+  triggerUrl: string | null;
+  user: string;
+};
 
-export interface TestRun {
-  id: string | null;
-  title: string | null;
-  commitTitle: string | null;
-  commitId: string | null;
-  mergeTitle: string | null;
-  mergeId: string | null;
-  user: string | null;
+export interface TestSuiteRun {
   date: string;
-  branch: string | null;
-  mode: string | null;
-  stats: TestRunStats | null;
-  recordings?: Recording[];
-  triggerUrl?: string;
+  id: string;
+  mode: TestSuiteRunMode | null;
+  results: {
+    counts: {
+      failed: number;
+      flaky: number;
+      passed: number;
+    };
+    recordings: Recording[];
+  };
+  source: TestSuiteRunSourceMetadata | null;
+  title: string;
 }
-
-const GET_TESTS_FOR_WORKSPACE = gql`
-  query GetTestsForWorkspace($workspaceId: ID!) {
-    node(id: $workspaceId) {
-      ... on Workspace {
-        id
-        tests {
-          title
-          path
-          recordings {
-            edges {
-              node {
-                uuid
-                duration
-                createdAt
-                metadata
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
 
 const GET_TEST_RUNS_FOR_WORKSPACE = gql`
   query GetTestsRunsForWorkspace($workspaceId: ID!) {
@@ -81,34 +59,9 @@ const GET_TEST_RUNS_FOR_WORKSPACE = gql`
           mergeTitle
           user
           date
-          mode
           stats {
             passed
             failed
-          }
-        }
-      }
-    }
-  }
-`;
-
-const GET_TEST = gql`
-  query GetTest($workspaceId: ID!, $path: String!) {
-    node(id: $workspaceId) {
-      ... on Workspace {
-        id
-        tests(path: $path) {
-          title
-          path
-          recordings {
-            edges {
-              node {
-                uuid
-                duration
-                createdAt
-                metadata
-              }
-            }
           }
         }
       }
@@ -131,7 +84,6 @@ export const GET_TEST_RUN = gql`
           mergeTitle
           user
           date
-          mode
           stats {
             passed
             failed
@@ -175,45 +127,30 @@ function unwrapRecordingsData(
 
 export function useGetTestRunForWorkspace(
   workspaceId: string,
-  testRunId: string
+  testSuiteRunId: string
 ): {
-  testRun: TestRun | null;
+  testSuiteRun: TestSuiteRun | null;
   loading: boolean;
 } {
   const { data, loading } = useQuery<GetTestsRun, GetTestsRunVariables>(GET_TEST_RUN, {
-    variables: { id: testRunId, workspaceId },
+    variables: { id: testSuiteRunId, workspaceId },
   });
 
   if (loading || !data?.node) {
-    return { testRun: null, loading };
+    return { testSuiteRun: null, loading };
   }
-  assert("testRuns" in data.node, "No testRuns in GetTestsRun response");
+  assert("testRuns" in data.node, "No results in GetTestsRun response");
 
-  const testRun = data.node.testRuns?.[0];
+  const testSuiteRun = data.node.testRuns?.[0];
 
   return {
-    testRun: convertTestRun(testRun),
+    testSuiteRun: testSuiteRun ? convertLegacyTestRunToNewFormat(testSuiteRun) : null,
     loading,
   };
 }
 
-function convertTest(test: GetTest_node_Workspace_tests | undefined) {
-  if (!test) {
-    return null;
-  }
-  const recordings = unwrapRecordingsData(test.recordings);
-  const sortedRecordings = orderBy(recordings, "date", "desc");
-  const firstRecording = sortedRecordings[0];
-
-  return {
-    ...test,
-    date: firstRecording.date,
-    recordings: sortedRecordings,
-  };
-}
-
 export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
-  testRuns: TestRun[];
+  testSuiteRuns: TestSuiteRun[];
   loading: boolean;
 } {
   // TODO [FE-1530] Pagination test runs from GraphQL
@@ -226,36 +163,94 @@ export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
 
   return useMemo(() => {
     if (loading || !data?.node) {
-      return { testRuns: [], loading };
+      return { testSuiteRuns: [], loading };
     }
     assert("testRuns" in data.node, "No testRuns in GetTestsRun response");
 
-    const testRuns = data.node.testRuns?.map(testRun => convertTestRun(testRun)!);
-    const sortedTestRuns = orderBy(testRuns, "date", "desc");
+    const testSuiteRuns: TestSuiteRun[] = [];
+
+    // Convert legacy test runs; filter out ones with invalid data
+    data.node.testRuns?.forEach(legacyTestSuiteRun => {
+      try {
+        testSuiteRuns.push(convertLegacyTestRunToNewFormat(legacyTestSuiteRun));
+      } catch (error) {
+        // Filter out and ignore data that's too old or corrupt to defined the required fields
+      }
+    });
+
+    const sortedTestSuiteRuns = orderBy(testSuiteRuns, "date", "desc");
 
     return {
-      testRuns: sortedTestRuns,
+      testSuiteRuns: sortedTestSuiteRuns,
       loading,
     };
   }, [data, loading]);
 }
 
-function convertTestRun(
-  testRun:
-    | GetTestsRun_node_Workspace_testRuns
-    | GetTestsRunsForWorkspace_node_Workspace_testRuns
-    | undefined
-): TestRun | null {
-  if (!testRun) {
-    return null;
+// TODO [FE-1419] Remove this eventually (when we drop support for legacy data format)
+export function convertLegacyTestRunToNewFormat(testSuiteRun: unknown): TestSuiteRun {
+  // If data from GraphQL is already in the new format, skip the conversion
+  if (isTestSuiteRun(testSuiteRun)) {
+    return testSuiteRun;
   }
-  const recordings = "recordings" in testRun ? unwrapRecordingsData(testRun.recordings) : [];
+
+  const legacyTestRun = testSuiteRun as
+    | GetTestsRun_node_Workspace_testRuns
+    | GetTestsRunsForWorkspace_node_Workspace_testRuns;
+
+  const { branch, commitId, commitTitle, date, id, mergeId, mergeTitle, mode, stats, title, user } =
+    legacyTestRun;
+
+  // Verify expected data; if any of these are missing, we can't reliably migrate the data
+  assert(date != null, "Expected legacy TestRun data to have a data");
+  assert(id != null, "Expected legacy TestRun data to have a identifier");
+  assert(
+    stats != null && stats.failed != null && stats.passed != null,
+    "Expected legacy TestRun data to have pass/fail stats"
+  );
+
+  const recordings =
+    "recordings" in legacyTestRun ? unwrapRecordingsData(legacyTestRun.recordings) : [];
   const sortedRecordings = orderBy(recordings, "date", "desc");
+
   const firstRecording = sortedRecordings[0];
+  const triggerUrl = firstRecording?.metadata?.source?.trigger?.url ?? null;
+
+  // TODO [FE-1543] Frontend can't distinguish between "merged" and "closed"
+  // This should be stored in the data by the backend, in response to the GitHub webhook
+  const branchStatus = mergeId != null ? "merged" : "open";
+
+  // TODO [FE-1543] Some data doesn't have a title, so use a fallback for now
+  const titleWithFallback = commitTitle || mergeTitle || title || "Tests";
+
+  let source: TestSuiteRunSourceMetadata | null = null;
+  if (branch && commitId && user) {
+    source = {
+      branchName: branch,
+      branchStatus,
+      commitId,
+      triggerUrl,
+      user,
+    };
+  }
 
   return {
-    ...testRun,
-    recordings,
-    triggerUrl: firstRecording?.metadata?.source?.trigger?.url,
+    date,
+    id,
+    mode: mode ? (mode as TestSuiteRunMode) : null,
+    results: {
+      counts: {
+        failed: stats.failed,
+        flaky: 0, // TODO [FE-1543] Add this once it's available in GraphQL
+        passed: stats.passed,
+      },
+      recordings: sortedRecordings,
+    },
+    source,
+    title: titleWithFallback,
   };
+}
+
+function isTestSuiteRun(testSuiteRun: any): testSuiteRun is TestSuiteRun {
+  return "results" in testSuiteRun;
 }
