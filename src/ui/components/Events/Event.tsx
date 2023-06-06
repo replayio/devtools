@@ -118,6 +118,7 @@ export default React.memo(function Event({
         onKeyDown={onKeyDown}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
+        data-test-name="Event"
       >
         <div className="flex flex-row items-center space-x-2 overflow-hidden">
           <MaterialIcon iconSize="xl">{icon}</MaterialIcon>

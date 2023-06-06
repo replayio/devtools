@@ -1,6 +1,9 @@
 import { Locator, Page } from "@playwright/test";
+import axios from "axios";
 import chalk from "chalk";
 import stripAnsi from "strip-ansi";
+
+import config from "../config";
 
 export function getCommandKey() {
   const macOS = process.platform === "darwin";
@@ -143,3 +146,22 @@ export async function waitFor(
 }
 
 export const getElementClasses = (loc: Locator) => loc.evaluate(el => Array.from(el.classList));
+
+export async function resetTestUser(email: string) {
+  const variables = { email, secret: process.env.AUTOMATED_TEST_SECRET };
+
+  return axios({
+    url: config.graphqlUrl,
+    method: "POST",
+    data: {
+      query: `
+        mutation resetTestUser($email: String!, $secret: String!) {
+          resetTestUser(input: { email: $email, secret: $secret }) {
+            success
+          }
+        }
+      `,
+      variables,
+    },
+  });
+}
