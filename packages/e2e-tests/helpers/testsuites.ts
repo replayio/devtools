@@ -11,7 +11,6 @@ export async function openCypressTestPanel(page: Page): Promise<void> {
   const pane = getTestSuitePanel(page);
 
   let isVisible = await pane.isVisible({ timeout: 15000 });
-  debugPrint(page, "Test panel visible: " + isVisible);
 
   if (!isVisible) {
     await page.locator('[data-test-name="ToolbarButton-CypressPanel"]').click();
@@ -40,4 +39,20 @@ export async function getTestCaseSteps(row: Locator) {
 
 export async function getSelectedTestCase(row: Pick<Locator, "locator">) {
   return row.locator('[data-test-id="TestItemPanelBody"]');
+}
+
+export function getTestSuiteResult(page: Page) {
+  return page.locator('[data-test-name="TestSuiteResult"]');
+}
+
+export function getTestSuiteResultsPassedCount(page: Page) {
+  return page.locator('[data-test-name="TestSuiteResultsPassedCount"]');
+}
+
+export function getTestSuiteResultsFailedCount(page: Page) {
+  return page.locator('[data-test-name="TestSuiteResultsFailedCount"]');
+}
+
+export function getTestSuiteResultsSkippedCount(page: Page) {
+  return page.locator('[data-test-name="TestSuiteResultsSkippedCount"]');
 }

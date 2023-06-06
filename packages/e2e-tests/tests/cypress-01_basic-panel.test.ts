@@ -16,11 +16,17 @@ import {
   getTestRowChevron,
   getTestRows,
   getTestSuitePanel,
+  getTestSuiteResultsFailedCount,
+  getTestSuiteResultsPassedCount,
+  getTestSuiteResultsSkippedCount,
   openCypressTestPanel,
 } from "../helpers/testsuites";
-import { delay, waitFor } from "../helpers/utils";
+import { debugPrint, delay, waitFor } from "../helpers/utils";
 
-const url = "cypress-realworld/bankaccounts.spec.js";
+const url = "flake/adding-spec.ts";
+
+// cypress-realworld/bankaccounts.spec.js
+// flake adding-spec: 970e87d2-7eb0-4c16-9763-eaa2144c06b7
 
 test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
   await startTest(page, url);
@@ -36,7 +42,7 @@ test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
   // has 4 tests
   const rows = await getTestRows(page);
   await waitFor(async () => {
-    await expect(rows).toHaveCount(4);
+    await expect(rows).toHaveCount(9);
   });
 
   const firstTest = rows.first();
@@ -47,12 +53,26 @@ test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
   await firstTest.hover();
   await chevron.isVisible();
 
+  // This recording has 8 passing, 1 failing, 0 skipped tests
+  const passedCountText = await getTestSuiteResultsPassedCount(page).textContent();
+  expect(passedCountText.trim()).toBe("8");
+
+  const failedCountText = await getTestSuiteResultsFailedCount(page).textContent();
+  expect(failedCountText.trim()).toBe("1");
+
+  const skippedCount = getTestSuiteResultsSkippedCount(page);
+  expect(await skippedCount.isVisible()).toBe(false);
+
   // can open tests
   await firstTest.click();
   const selectedRow = await getSelectedTestCase(page);
   expect(selectedRow).toHaveCount(1);
+
   const sections = await getTestCaseSections(selectedRow);
   await expect(sections).toHaveCount(2);
+
   const steps = await getTestCaseSteps(selectedRow);
-  await expect(steps).toHaveCount(61);
+  // 2 steps in `beforeEach`
+  // 14 steps in `test`, + 4 details
+  await expect(steps).toHaveCount(20);
 });
