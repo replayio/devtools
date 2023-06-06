@@ -9,8 +9,8 @@ export default memo(function NavigationTestStepRow({
 }: {
   navigationTestStep: NavigationTestStep;
 }) {
-  let url = navigationTestStep.data.url;
-  let displayUrl = url.length > 250 ? url.slice(0, 250) + "..." : url;
+  let url = navigationTestStep.data.url || "";
+  let displayUrl = url.length > 500 ? url.slice(0, 500) + "..." : url;
 
   return (
     <div className={styles.Indented}>
