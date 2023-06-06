@@ -195,8 +195,8 @@ export interface NetworkRequestEvent {
 
 export type TestEvent = UserActionEvent | NavigationEvent | NetworkRequestEvent;
 
-// TODO [FE-1419] Nail down this type
 export type TestError = {
+  name: string;
   message: string;
 };
 
