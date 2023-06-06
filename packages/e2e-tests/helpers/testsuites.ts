@@ -45,11 +45,11 @@ export function getTestSections(row: Locator) {
   return getByTestName(row, "TestSection");
 }
 
-export function getTestCaseSteps(row: Locator) {
+export function getTestCaseSteps(row: Page | Locator) {
   return getByTestName(row, "TestSectionRow");
 }
 
-export function getSelectedTestCase(row: Locator) {
+export function getSelectedTestCase(row: Page | Locator) {
   return row.locator('[data-test-id="TestRecordingPanelBody"]');
 }
 
@@ -87,4 +87,11 @@ export function getTestSuiteDuration(page: Page) {
 
 export function getTestSuiteBranch(page: Page) {
   return getByTestName(page, "TestSuiteBranch");
+}
+
+export function getErrorRows(page: Page) {
+  const steps = getTestCaseSteps(page);
+  return steps.filter({
+    has: page.locator(`[data-status="error"]`),
+  });
 }

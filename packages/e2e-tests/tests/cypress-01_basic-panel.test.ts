@@ -10,6 +10,7 @@ import {
 import { clickSourceTreeNode } from "../helpers/source-explorer-panel";
 import { addBreakpoint } from "../helpers/source-panel";
 import {
+  getErrorRows,
   getSelectedTestCase,
   getTestCaseSteps,
   getTestRecordingBackButton,
@@ -116,4 +117,11 @@ test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
     expect(secondRecordingTreesCount).toBeGreaterThanOrEqual(1);
     expect(initialRecordingTreesCount).toBe(secondRecordingTreesCount);
   });
+
+  // Can show error rows
+  await rows.filter({ hasText: "should fail on this test" }).first().click();
+  const errorRows = getErrorRows(page);
+  expect(await errorRows.count()).toBe(1);
+  const text = await errorRows.first().textContent();
+  expect(text).toMatch(/Sorry, something went wrong/);
 });
