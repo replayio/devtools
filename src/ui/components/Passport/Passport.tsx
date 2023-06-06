@@ -264,6 +264,8 @@ const Passport = () => {
               className={`flex ${getItemStyle(sectionIndex, itemIndex)} ${styles.checklistItem}`}
               onClick={() => handleClick(sectionIndex, itemIndex)}
               style={{ position: "relative" }}
+              data-test-name="PassportItem"
+              data-test-completed={item.completed}
             >
               <Icon className={styles.stepIcon} type={renderCheckmarkIcon(item.completed)} />
               <span className={styles.ml2}>{item.label}</span>
