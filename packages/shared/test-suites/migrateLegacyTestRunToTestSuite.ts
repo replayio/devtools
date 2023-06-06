@@ -16,7 +16,7 @@ import {
 } from "shared/test-suites/types";
 
 // TODO [SCS-1109] Remove this eventually (when we drop support for legacy data format)
-export function convertLegacyTestRunToTestSuite(
+export function migrateLegacyTestRunToTestSuite(
   testSuite:
     | GetTestsRun_node_Workspace_testRuns
     | GetTestsRunsForWorkspace_node_Workspace_testRuns

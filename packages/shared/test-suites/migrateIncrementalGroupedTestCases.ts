@@ -9,9 +9,9 @@ import {
 } from "shared/test-suites/types";
 import { AnnotationsCache } from "ui/components/TestSuite/suspense/AnnotationsCache";
 
-import { convertIncrementalTestRecordingToFullRecordedTest } from "./convertIncrementalTestRecordingToFullRecordedTest";
+import { migrateIncrementalTestRecording } from "./migrateIncrementalTestRecording";
 
-export async function convertIncrementalGroupedTestCasesToFullGroupedTestCases(
+export async function migrateIncrementalGroupedTestCases(
   groupedTestCases: IncrementalGroupedTestCases | GroupedTestCases,
   replayClient: ReplayClientInterface
 ): Promise<GroupedTestCases> {
@@ -42,11 +42,7 @@ export async function convertIncrementalGroupedTestCasesToFullGroupedTestCases(
       const legacyTest = partialTestRecordings[index];
       const annotations = annotationsByTest[index];
 
-      const test = await convertIncrementalTestRecordingToFullRecordedTest(
-        legacyTest,
-        annotations,
-        replayClient
-      );
+      const test = await migrateIncrementalTestRecording(legacyTest, annotations, replayClient);
 
       testRecordings.push(test);
     }

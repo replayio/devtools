@@ -24,7 +24,7 @@ import {
   isTest,
 } from "./types";
 
-export async function convertIncrementalTestRecordingToFullRecordedTest(
+export async function migrateIncrementalTestRecording(
   testRecording: IncrementalTestRecording | TestRecording,
   annotations: Annotation[],
   replayClient: ReplayClientInterface

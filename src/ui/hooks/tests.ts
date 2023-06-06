@@ -8,7 +8,7 @@ import {
   GetTestsRunsForWorkspace,
   GetTestsRunsForWorkspaceVariables,
 } from "shared/graphql/generated/GetTestsRunsForWorkspace";
-import { convertLegacyTestRunToTestSuite } from "shared/test-suites/convertLegacyTestRunToTestSuite";
+import { migrateLegacyTestRunToTestSuite } from "shared/test-suites/migrateLegacyTestRunToTestSuite";
 import { TestSuite } from "shared/test-suites/types";
 import { WorkspaceId } from "ui/state/app";
 
@@ -96,7 +96,7 @@ export function useGetTestRunForWorkspace(
   const testSuite = data.node.testRuns?.[0];
 
   return {
-    testSuite: testSuite ? convertLegacyTestRunToTestSuite(testSuite) : null,
+    testSuite: testSuite ? migrateLegacyTestRunToTestSuite(testSuite) : null,
     loading,
   };
 }
@@ -124,7 +124,7 @@ export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
     // Convert legacy test runs; filter out ones with invalid data
     data.node.testRuns?.forEach(legacyTestSuite => {
       try {
-        testSuites.push(convertLegacyTestRunToTestSuite(legacyTestSuite));
+        testSuites.push(migrateLegacyTestRunToTestSuite(legacyTestSuite));
       } catch (error) {
         // Filter out and ignore data that's too old or corrupt to defined the required fields
       }
