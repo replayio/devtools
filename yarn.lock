@@ -6264,13 +6264,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/semver@npm:^7.5.0":
-  version: 7.5.0
-  resolution: "@types/semver@npm:7.5.0"
-  checksum: 0a64b9b9c7424d9a467658b18dd70d1d781c2d6f033096a6e05762d20ebbad23c1b69b0083b0484722aabf35640b78ccc3de26368bcae1129c87e9df028a22e2
-  languageName: node
-  linkType: hard
-
 "@types/sinonjs__fake-timers@npm:8.1.1":
   version: 8.1.1
   resolution: "@types/sinonjs__fake-timers@npm:8.1.1"
@@ -9762,6 +9755,13 @@ __metadata:
   version: 1.0.1
   resolution: "commondir@npm:1.0.1"
   checksum: 59715f2fc456a73f68826285718503340b9f0dd89bfffc42749906c5cf3d4277ef11ef1cca0350d0e79204f00f1f6d83851ececc9095dc88512a697ac0b9bdcb
+  languageName: node
+  linkType: hard
+
+"compare-versions@npm:^6.0.0-rc.1":
+  version: 6.0.0-rc.1
+  resolution: "compare-versions@npm:6.0.0-rc.1"
+  checksum: ada8d19dab267ef432e7aea91ff7b4422284e3b44245a4d7b4caaf1353d0279e5f17b3767050e06a9cf84670120d19b427b5191b71b7284a125482fcd1eda789
   languageName: node
   linkType: hard
 
@@ -20523,7 +20523,6 @@ __metadata:
     "@types/react-transition-group": ^4.4.5
     "@types/react-virtualized-auto-sizer": ^1.0.1
     "@types/react-window": ^1.8.5
-    "@types/semver": ^7.5.0
     "@types/styled-components": ^5.1.25
     "@types/uuid": ^7.0.3
     "@typescript-eslint/parser": ^5.38.1
@@ -20537,6 +20536,7 @@ __metadata:
     circular-dependency-plugin: ^5.2.2
     classnames: ^2.3.1
     comlink: ^4.3.1
+    compare-versions: ^6.0.0-rc.1
     cookie: ^0.4.2
     css-loader: ^6.7.1
     date-fns: ^2.28.0
@@ -20619,7 +20619,6 @@ __metadata:
     reactjs-popup: ^2.0.5
     replay-next: "workspace:*"
     reselect: ^4.1.5
-    semver: ^7.5.1
     shared: "workspace:*"
     sharp: ^0.30.3
     slugify: ^1.6.5
@@ -21465,17 +21464,6 @@ __metadata:
   bin:
     semver: bin/semver.js
   checksum: ba9c7cbbf2b7884696523450a61fee1a09930d888b7a8d7579025ad93d459b2d1949ee5bbfeb188b2be5f4ac163544c5e98491ad6152df34154feebc2cc337c1
-  languageName: node
-  linkType: hard
-
-"semver@npm:^7.5.1":
-  version: 7.5.1
-  resolution: "semver@npm:7.5.1"
-  dependencies:
-    lru-cache: ^6.0.0
-  bin:
-    semver: bin/semver.js
-  checksum: d16dbedad53c65b086f79524b9ef766bf38670b2395bdad5c957f824dcc566b624988013564f4812bcace3f9d405355c3635e2007396a39d1bffc71cfec4a2fc
   languageName: node
   linkType: hard
 

@@ -1,5 +1,5 @@
 import { Location } from "@replayio/protocol";
-import { gte } from "semver";
+import { compare } from "compare-versions";
 
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
@@ -28,7 +28,7 @@ export const TestStepSourceLocationCache = createCacheWithTelemetry<
       const frames = await framesCache.readAsync(client, pauseId);
 
       if (frames) {
-        if (gte(runnerVersion, "8.0.0")) {
+        if (compare(runnerVersion, "8.0.0", ">=")) {
           // find the cypress marker frame
           const markerFrameIndex = frames.findIndex(
             (f: any, i: any, l: any) => f.functionName === "__stackReplacementMarker"

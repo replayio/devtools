@@ -1,9 +1,11 @@
 import { ExecutionPoint, TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
-import { SemVer, major } from "semver";
+import { satisfies } from "compare-versions";
 
 import { GetTestsRun_node_Workspace_testRuns } from "shared/graphql/generated/GetTestsRun";
 import { GetTestsRunsForWorkspace_node_Workspace_testRuns } from "shared/graphql/generated/GetTestsRunsForWorkspace";
 import { Recording } from "shared/graphql/types";
+
+export type SemVer = string;
 
 export type TestSuiteMode = "diagnostics" | "record-on-retry" | "stress";
 
@@ -247,7 +249,7 @@ export function isIncrementalIncrementalTestRecording(
 export function isIncrementalGroupedTestCases(
   value: IncrementalGroupedTestCases | GroupedTestCases
 ): value is IncrementalGroupedTestCases {
-  return major(value.schemaVersion) === 2;
+  return satisfies(value.schemaVersion, "~2.0.0");
 }
 
 export function isLegacyTestSuite(
@@ -277,7 +279,7 @@ export function isTestSuite(testSuite: LegacyTestSuite | TestSuite): testSuite i
 export function isGroupedTestCases(
   value: IncrementalGroupedTestCases | GroupedTestCases
 ): value is GroupedTestCases {
-  return major(value.schemaVersion) === 3;
+  return satisfies(value.schemaVersion, "~3.0.0");
 }
 
 export function isUserActionEvent(value: TestEvent): value is UserActionEvent {
