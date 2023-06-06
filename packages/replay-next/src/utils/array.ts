@@ -108,24 +108,77 @@ export function findSliceIndices<ItemType, TargetType>(
   let beginIndex = -1;
   let endIndex = -1;
 
-  // TODO [FE-1419] Replace this with a binary search
-  for (let index = 0; index < sortedItems.length; index++) {
-    const currentItem = sortedItems[index];
+  let lowIndex = 0;
+  let highIndex = sortedItems.length - 1;
+
+  while (lowIndex <= highIndex) {
+    const middleIndex = (lowIndex + highIndex) >>> 1;
+    const currentItem = sortedItems[middleIndex];
     const value = compareFunction(currentItem, beginTarget);
-    if (value >= 0) {
-      beginIndex = index;
+    if (value === 0) {
+      beginIndex = middleIndex;
       break;
+    } else if (value > 0) {
+      if (middleIndex - 1 > lowIndex) {
+        highIndex = middleIndex - 1;
+      } else {
+        const peekItem = sortedItems[lowIndex];
+        const peekValue = compareFunction(peekItem, beginTarget);
+        if (peekValue >= 0) {
+          beginIndex = lowIndex;
+        }
+        break;
+      }
+    } else {
+      if (middleIndex + 1 < highIndex) {
+        lowIndex = middleIndex + 1;
+      } else {
+        const peekItem = sortedItems[highIndex];
+        const peekValue = compareFunction(peekItem, beginTarget);
+        if (peekValue >= 0) {
+          beginIndex = highIndex;
+        }
+        break;
+      }
     }
   }
 
-  // TODO [FE-1419] Replace this with a binary search
-  for (let index = beginIndex; index < sortedItems.length; index++) {
-    const currentItem = sortedItems[index];
+  if (beginIndex < 0) {
+    return [-1, -1];
+  }
+
+  lowIndex = beginIndex;
+  highIndex = sortedItems.length - 1;
+
+  while (lowIndex <= highIndex) {
+    const middleIndex = (lowIndex + highIndex) >>> 1;
+    const currentItem = sortedItems[middleIndex];
     const value = compareFunction(currentItem, endTarget);
-    if (value <= 0) {
-      endIndex = index;
-    } else {
+    if (value === 0) {
+      endIndex = middleIndex;
       break;
+    } else if (value > 0) {
+      if (middleIndex - 1 > lowIndex) {
+        highIndex = middleIndex - 1;
+      } else {
+        const peekItem = sortedItems[lowIndex];
+        const peekValue = compareFunction(peekItem, endTarget);
+        if (peekValue <= 0) {
+          endIndex = lowIndex;
+        }
+        break;
+      }
+    } else {
+      if (middleIndex + 1 < highIndex) {
+        lowIndex = middleIndex + 1;
+      } else {
+        const peekItem = sortedItems[highIndex];
+        const peekValue = compareFunction(peekItem, endTarget);
+        if (peekValue <= 0) {
+          endIndex = highIndex;
+        }
+        break;
+      }
     }
   }
 
