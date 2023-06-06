@@ -1,14 +1,6 @@
-import test, { Locator, Page, expect } from "@playwright/test";
+import test, { expect } from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
-import { executeAndVerifyTerminalExpression } from "../helpers/console-panel";
-import {
-  reverseStepOverToLine,
-  rewindToLine,
-  stepOverToLine,
-} from "../helpers/pause-information-panel";
-import { clickSourceTreeNode } from "../helpers/source-explorer-panel";
-import { addBreakpoint } from "../helpers/source-panel";
 import {
   getErrorRows,
   getSelectedTestCase,
@@ -31,9 +23,6 @@ import {
 import { debugPrint, delay, waitFor } from "../helpers/utils";
 
 const url = "flake/adding-spec.ts";
-
-// cypress-realworld/bankaccounts.spec.js
-// flake adding-spec: 970e87d2-7eb0-4c16-9763-eaa2144c06b7
 
 test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
   await startTest(page, url);
