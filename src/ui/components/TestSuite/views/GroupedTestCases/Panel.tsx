@@ -68,9 +68,15 @@ export default function Panel() {
             className={styles.Attribute}
             icon="schedule"
             label={getTruncatedRelativeDate(recording.date)}
+            dataTestName="TestSuiteDate"
           />
           <Source />
-          <LabeledIcon className={styles.Attribute} icon="timer" label={durationString} />
+          <LabeledIcon
+            className={styles.Attribute}
+            icon="timer"
+            label={durationString}
+            dataTestName="TestSuiteDuration"
+          />
         </div>
       </div>
       {errors.map((error, index) => (
@@ -118,12 +124,27 @@ function Source() {
   return (
     <>
       {trigger?.user && (
-        <LabeledIcon className={styles.Attribute} icon="person" label={trigger.user} />
+        <LabeledIcon
+          className={styles.Attribute}
+          icon="person"
+          label={trigger.user}
+          dataTestName="TestSuiteUser"
+        />
       )}
       {merge != null ? (
-        <LabeledIcon className={styles.Attribute} icon="fork_right" label={branch} />
+        <LabeledIcon
+          className={styles.Attribute}
+          icon="fork_right"
+          label={branch}
+          dataTestName="TestSuiteBranch"
+        />
       ) : (
-        <LabeledIcon className={styles.Attribute} icon="merge_type" label={branch} />
+        <LabeledIcon
+          className={styles.Attribute}
+          icon="merge_type"
+          label={branch}
+          dataTestName="TestSuiteBranch"
+        />
       )}
     </>
   );

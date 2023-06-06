@@ -72,3 +72,19 @@ export function getTestSuiteResultsSkippedCount(page: Page) {
 export function getTestRecordingBackButton(page: Page) {
   return getByTestName(page, "TestRecordingBackButton");
 }
+
+export function getTestSuiteDate(page: Page) {
+  return getByTestName(page, "TestSuiteDate");
+}
+
+export function getTestSuiteUser(page: Page) {
+  return getByTestName(page, "TestSuiteUser");
+}
+
+export function getTestSuiteDuration(page: Page) {
+  return getByTestName(page, "TestSuiteDuration");
+}
+
+export function getTestSuiteBranch(page: Page) {
+  return getByTestName(page, "TestSuiteBranch");
+}

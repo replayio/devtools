@@ -17,10 +17,14 @@ import {
   getTestRowChevron,
   getTestRows,
   getTestSections,
+  getTestSuiteBranch,
+  getTestSuiteDate,
+  getTestSuiteDuration,
   getTestSuitePanel,
   getTestSuiteResultsFailedCount,
   getTestSuiteResultsPassedCount,
   getTestSuiteResultsSkippedCount,
+  getTestSuiteUser,
   openCypressTestPanel,
 } from "../helpers/testsuites";
 import { debugPrint, delay, waitFor } from "../helpers/utils";
@@ -73,6 +77,16 @@ test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
 
   const skippedCount = getTestSuiteResultsSkippedCount(page);
   expect(await skippedCount.isVisible()).toBe(false);
+
+  // Test suite metadata
+
+  // Relative date will always change, so just check that it exists
+  // Also, these icons have hidden text content.
+  // Simplest way to check is just see if the text exists at the end
+  expect(await getTestSuiteDate(page).textContent()).toMatch(/ ago$/);
+  expect(await getTestSuiteUser(page).textContent()).toMatch(/ryanjduffy$/);
+  expect(await getTestSuiteBranch(page).textContent()).toMatch(/ryan\/metadata-v2$/);
+  expect(await getTestSuiteDuration(page).textContent()).toMatch(/0\:15$/);
 
   // can open tests
   await firstTest.click();
