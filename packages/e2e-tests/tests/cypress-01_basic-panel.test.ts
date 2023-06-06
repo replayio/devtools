@@ -60,10 +60,10 @@ test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
 
   // This recording has 8 passing, 1 failing, 0 skipped tests
   const passedCountText = await getTestSuiteResultsPassedCount(page).textContent();
-  expect(passedCountText.trim()).toBe("8");
+  expect(passedCountText?.trim()).toBe("8");
 
   const failedCountText = await getTestSuiteResultsFailedCount(page).textContent();
-  expect(failedCountText.trim()).toBe("1");
+  expect(failedCountText?.trim()).toBe("1");
 
   const skippedCount = getTestSuiteResultsSkippedCount(page);
   expect(await skippedCount.isVisible()).toBe(false);
