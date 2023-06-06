@@ -23,7 +23,11 @@ import { useFeature } from "ui/hooks/settings";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { SecondaryPanelName, ToolboxLayout } from "ui/state/layout";
-import { REACT_ANNOTATIONS_KIND, annotationKindsCache } from "ui/suspense/annotationsCaches";
+import {
+  REACT_ANNOTATIONS_KIND,
+  REDUX_ANNOTATIONS_KIND,
+  annotationKindsCache,
+} from "ui/suspense/annotationsCaches";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { selectors } from "../../reducers";
@@ -169,33 +173,32 @@ function SecondaryToolbox({
   const dispatch = useAppDispatch();
   const replayClient = useContext(ReplayClientContext);
   // Don't suspend when waiting for annotations to load
-  const { status: annotationCacheStatus, value: annotationKinds } = useImperativeCacheValue(
+  const { value: hasReactAnnotations = false } = useImperativeCacheValue(
     annotationKindsCache,
-    replayClient
+    replayClient,
+    REACT_ANNOTATIONS_KIND
+  );
+
+  const { value: hasReduxAnnotations = false } = useImperativeCacheValue(
+    annotationKindsCache,
+    replayClient,
+    REDUX_ANNOTATIONS_KIND
   );
 
   const recordingCapabilities = recordingCapabilitiesCache.read(replayClient);
   const { value: chromiumNetMonitorEnabled } = useFeature("chromiumNetMonitor");
 
-  let hasReactComponents = false;
-  let hasReduxAnnotations = false;
-
-  if (annotationCacheStatus === "resolved") {
-    hasReactComponents = annotationKinds.has(REACT_ANNOTATIONS_KIND);
-    hasReduxAnnotations = annotationKinds.has("redux-devtools-data");
-  }
-
   useLayoutEffect(() => {
-    if (selectedPanel === "react-components" && !hasReactComponents) {
+    if (selectedPanel === "react-components" && !hasReactAnnotations) {
       dispatch(setSelectedPanel("console"));
     }
-  }, [selectedPanel, hasReactComponents, dispatch]);
+  }, [selectedPanel, hasReactAnnotations, dispatch]);
 
   return (
     <div className={classnames(`secondary-toolbox rounded-lg`)}>
       <header className="secondary-toolbox-header">
         <PanelButtons
-          hasReactComponents={hasReactComponents}
+          hasReactComponents={hasReactAnnotations}
           hasReduxAnnotations={hasReduxAnnotations}
           recordingCapabilities={recordingCapabilities}
           toolboxLayout={toolboxLayout}

@@ -31,15 +31,9 @@ export const pauseIdCache: Cache<
   debugLabel: "PauseIdForExecutionPoint",
   getKey: ([replayClient, executionPoint, time]) => `${executionPoint}:${time}`,
   load: async ([replayClient, executionPoint, time]) => {
-    const { data, pauseId, stack } = await replayClient.createPause(executionPoint);
+    const { pauseId } = await replayClient.createPause(executionPoint);
 
     pauseIdToPointAndTimeMap.set(pauseId, [executionPoint, time]);
-
-    const sources = await sourcesByIdCache.readAsync(replayClient);
-
-    if (data) {
-      cachePauseData(replayClient, sources, pauseId, data, stack);
-    }
 
     return pauseId;
   },

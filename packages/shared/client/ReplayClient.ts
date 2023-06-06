@@ -437,6 +437,12 @@ export class ReplayClient implements ReplayClientInterface {
     return result;
   }
 
+  async hasAnnotationKind(kind: string): Promise<boolean> {
+    const sessionId = this.getSessionIdThrows();
+    const { hasKind } = await client.Session.hasAnnotationKind({ kind }, sessionId);
+    return hasKind;
+  }
+
   async getAnnotationKinds(): Promise<string[]> {
     const sessionId = this.getSessionIdThrows();
     const { kinds } = await client.Session.getAnnotationKinds({}, sessionId);
