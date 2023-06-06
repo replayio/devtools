@@ -5,7 +5,7 @@ import Icon from "replay-next/components/Icon";
 import { TestEvent, TestSectionName, getExecutionPoint, getTime } from "shared/test-suites/types";
 import { setTimelineToTime } from "ui/actions/timeline";
 import { useTestEventContextMenu } from "ui/components/TestSuite/views/TestRecording/useTestEventContextMenu";
-import { TestSuiteContext } from "ui/components/TestSuite/views/TetSuiteContext";
+import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 import { useAppDispatch } from "ui/setup/hooks";
 
 import NavigationEventRow from "./TestRecordingEvents/NavigationEventRow";

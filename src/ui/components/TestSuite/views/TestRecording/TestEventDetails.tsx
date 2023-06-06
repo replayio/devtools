@@ -7,7 +7,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isUserActionEvent } from "shared/test-suites/types";
 import ErrorBoundary from "ui/components/ErrorBoundary";
 import { TestEventDetailsCache } from "ui/components/TestSuite/suspense/TestEventDetailsCache";
-import { TestSuiteContext } from "ui/components/TestSuite/views/TetSuiteContext";
+import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
 import styles from "./TestEventDetails.module.css";
 

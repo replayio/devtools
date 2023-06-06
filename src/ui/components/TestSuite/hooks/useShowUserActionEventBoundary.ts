@@ -16,15 +16,15 @@ export function useShowUserActionEventBoundary({
 
   const dispatch = useAppDispatch();
 
-  const timeSTampedPoint =
+  const timeStampedPoint =
     boundary === "before"
       ? userActionEvent.timeStampedPointRange.begin
       : userActionEvent.timeStampedPointRange.end;
 
-  const disabled = timeSTampedPoint.point === currentPoint;
+  const disabled = timeStampedPoint.point === currentPoint;
 
   const onClick = () => {
-    dispatch(seek(timeSTampedPoint.point, timeSTampedPoint.time, false));
+    dispatch(seek(timeStampedPoint.point, timeStampedPoint.time, false));
   };
 
   return { disabled, onClick };

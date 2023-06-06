@@ -238,7 +238,7 @@ export type LegacyTestSuite =
 
 // Type checkers
 
-export function isIncrementalIncrementalTestRecording(
+export function isIncrementalTestRecording(
   value: IncrementalTestRecording | TestRecording
 ): value is IncrementalTestRecording {
   // TimeStampedPointRange comes from annotations data;

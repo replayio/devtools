@@ -14,7 +14,7 @@ import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIco
 import { TestError } from "ui/components/TestSuite/views/TestRecording/TestError";
 import TestEventDetails from "ui/components/TestSuite/views/TestRecording/TestEventDetails";
 import TestSection from "ui/components/TestSuite/views/TestRecording/TestSection";
-import { TestSuiteContext } from "ui/components/TestSuite/views/TetSuiteContext";
+import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
 import styles from "./Panel.module.css";
 

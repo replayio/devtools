@@ -1,7 +1,7 @@
 import { useContext } from "react";
 
 import Loader from "replay-next/components/Loader";
-import { TestSuiteContext } from "ui/components/TestSuite/views/TetSuiteContext";
+import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
 import GroupTestCasesPanel from "./GroupedTestCases";
 import TestRecordingPanel from "./TestRecording";

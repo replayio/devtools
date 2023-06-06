@@ -20,7 +20,7 @@ import {
   TestRecording,
   TestSectionName,
   getExecutionPoint,
-  isIncrementalIncrementalTestRecording,
+  isIncrementalTestRecording,
   isTest,
 } from "./types";
 
@@ -29,7 +29,7 @@ export async function migrateIncrementalTestRecording(
   annotations: Annotation[],
   replayClient: ReplayClientInterface
 ): Promise<TestRecording> {
-  if (isIncrementalIncrementalTestRecording(testRecording)) {
+  if (isIncrementalTestRecording(testRecording)) {
     const { error, events: partialEvents, result, source } = testRecording;
 
     const events: TestRecording["events"] = {

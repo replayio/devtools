@@ -19,7 +19,7 @@ import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToC
 import { useJumpToSource } from "ui/components/TestSuite/hooks/useJumpToSource";
 import { TestEventDetailsCache } from "ui/components/TestSuite/suspense/TestEventDetailsCache";
 import { Position } from "ui/components/TestSuite/views/TestRecording/types";
-import { TestSuiteContext } from "ui/components/TestSuite/views/TetSuiteContext";
+import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 import { getViewMode } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import {

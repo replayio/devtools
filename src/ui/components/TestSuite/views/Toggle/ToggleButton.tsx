@@ -2,7 +2,7 @@ import { useContext } from "react";
 
 import { UserActionEvent, isUserActionEvent } from "shared/test-suites/types";
 import { useShowUserActionEventBoundary } from "ui/components/TestSuite/hooks/useShowUserActionEventBoundary";
-import { TestSuiteContext } from "ui/components/TestSuite/views/TetSuiteContext";
+import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
 import styles from "./ToggleButton.module.css";
 

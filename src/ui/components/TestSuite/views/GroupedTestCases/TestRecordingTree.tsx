@@ -2,7 +2,7 @@ import { useContext } from "react";
 
 import TestRecordingTreeRow from "ui/components/TestSuite/views/GroupedTestCases/TestRecordingTreeRow";
 import { TestTree } from "ui/components/TestSuite/views/GroupedTestCases/types";
-import { TestSuiteContext } from "ui/components/TestSuite/views/TetSuiteContext";
+import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
 import styles from "./TestRecordingTree.module.css";
 

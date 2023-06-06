@@ -10,7 +10,7 @@ import { RecordingCache } from "ui/components/TestSuite/suspense/RecordingCache"
 import { formatTitle } from "ui/components/TestSuite/utils/formatTitle";
 import { createTestTree } from "ui/components/TestSuite/views/GroupedTestCases/createTestTree";
 import { TestRecordingTree } from "ui/components/TestSuite/views/GroupedTestCases/TestRecordingTree";
-import { TestSuiteContext } from "ui/components/TestSuite/views/TetSuiteContext";
+import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
 import styles from "./Panel.module.css";
 
