@@ -214,7 +214,7 @@ export function slice<ItemType, TargetType>(
     compareFunction
   );
 
-  if (beginIndex < 0 && endIndex < 0) {
+  if (beginIndex < 0 || endIndex < 0) {
     return [];
   }
 
