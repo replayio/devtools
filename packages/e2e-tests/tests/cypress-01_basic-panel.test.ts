@@ -12,6 +12,8 @@ import { addBreakpoint } from "../helpers/source-panel";
 import {
   getSelectedTestCase,
   getTestCaseSteps,
+  getTestRecordingBackButton,
+  getTestRecordingTrees,
   getTestRowChevron,
   getTestRows,
   getTestSections,
@@ -39,8 +41,17 @@ test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
   const isVisible = await testPanel.isVisible();
   expect(isVisible).toBe(true);
 
+  // These are nested, but at least one should exist
+  // on the test suites panel
+  let initialRecordingTreesCount = 0;
+  const initialRecordingTrees = getTestRecordingTrees(page);
+  await waitFor(async () => {
+    initialRecordingTreesCount = await initialRecordingTrees.count();
+    expect(initialRecordingTreesCount).toBeGreaterThanOrEqual(1);
+  });
+
   // has 4 tests
-  const rows = await getTestRows(page);
+  const rows = getTestRows(page);
   await waitFor(async () => {
     await expect(rows).toHaveCount(9);
   });
@@ -48,7 +59,7 @@ test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
   const firstTest = rows.first();
 
   // displays the nav chevron on hover
-  const chevron = await getTestRowChevron(firstTest);
+  const chevron = getTestRowChevron(firstTest);
   await chevron.isHidden();
   await firstTest.hover();
   await chevron.isVisible();
@@ -65,14 +76,30 @@ test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
 
   // can open tests
   await firstTest.click();
-  const selectedRow = await getSelectedTestCase(page);
+  const selectedRow = getSelectedTestCase(page);
   expect(selectedRow).toHaveCount(1);
 
-  const sections = await getTestSections(selectedRow);
+  // This recording has a "beforeEach" and a body,
+  // but not "after" hooks
+  const sections = getTestSections(selectedRow);
   await expect(sections).toHaveCount(2);
+  // These are CSS-transformed to uppercase
+  expect(await sections.nth(0).textContent()).toMatch(/before each/i);
+  expect(await sections.nth(1).textContent()).toMatch(/test body/i);
 
-  const steps = await getTestCaseSteps(selectedRow);
+  const steps = getTestCaseSteps(selectedRow);
   // TODO This seems wrong - previous UI + recording had 20 steps
   // but let's go with this for now
   await expect(steps).toHaveCount(18);
+
+  const backButton = getTestRecordingBackButton(page);
+  await backButton.click();
+
+  // Check if we're back on the main tests panel
+  const secondRecordingTrees = getTestRecordingTrees(page);
+  await waitFor(async () => {
+    const secondRecordingTreesCount = await secondRecordingTrees.count();
+    expect(secondRecordingTreesCount).toBeGreaterThanOrEqual(1);
+    expect(initialRecordingTreesCount).toBe(secondRecordingTreesCount);
+  });
 });
