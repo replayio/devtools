@@ -39,14 +39,26 @@ export default function Panel() {
           <div className={styles.Title} title={title ?? filePath}>
             {formatTitle(title ?? filePath)}
           </div>
-          <div className={styles.ResultIconAndLabel} data-status="passed">
+          <div
+            className={styles.ResultIconAndLabel}
+            data-status="passed"
+            data-test-name="TestSuiteResultsPassedCount"
+          >
             <TestResultIcon result="passed" /> {resultCounts.passed}
           </div>
-          <div className={styles.ResultIconAndLabel} data-status="failed">
+          <div
+            className={styles.ResultIconAndLabel}
+            data-status="failed"
+            data-test-name="TestSuiteResultsFailedCount"
+          >
             <TestResultIcon result="failed" /> {resultCounts.failed}
           </div>
           {resultCounts.skipped > 0 && (
-            <div className={styles.ResultIconAndLabel} data-status="skipped">
+            <div
+              className={styles.ResultIconAndLabel}
+              data-status="skipped"
+              data-test-name="TestSuiteResultsSkippedCount"
+            >
               <TestResultIcon result="skipped" /> {resultCounts.skipped}
             </div>
           )}

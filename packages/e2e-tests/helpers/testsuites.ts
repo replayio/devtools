@@ -10,7 +10,8 @@ export async function openCypressTestPanel(page: Page): Promise<void> {
   // Only click if it's not already open; clicking again will collapse the side bar.
   const pane = getTestSuitePanel(page);
 
-  let isVisible = await pane.isVisible({ timeout: 15000 });
+  let isVisible = await pane.isVisible();
+  debugPrint(page, "Initial panel visible: " + isVisible);
 
   if (!isVisible) {
     await page.locator('[data-test-name="ToolbarButton-CypressPanel"]').click();
@@ -18,7 +19,7 @@ export async function openCypressTestPanel(page: Page): Promise<void> {
 }
 
 export async function getTestRows(page: Page) {
-  return page.locator('[data-test-name="TestItemTreeRow"]');
+  return page.locator('[data-test-name="TestRecordingTreeRow"]');
 }
 
 export async function getCypressLogo(page: Page) {
@@ -38,7 +39,7 @@ export async function getTestCaseSteps(row: Locator) {
 }
 
 export async function getSelectedTestCase(row: Pick<Locator, "locator">) {
-  return row.locator('[data-test-id="TestItemPanelBody"]');
+  return row.locator('[data-test-id="TestRecordingPanelBody"]');
 }
 
 export function getTestSuiteResult(page: Page) {
