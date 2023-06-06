@@ -1,5 +1,6 @@
 import assert from "assert";
 import {
+  ExecutionPoint,
   RequestEvent,
   RequestOpenEvent,
   RequestResponseEvent,
@@ -212,19 +213,32 @@ export async function convertIncrementalTestRecordingToFullRecordedTest(
       });
     }
 
+    // Finds the section that contains a given point
+    // defaults to the main (test body) section if no matches found
+    const findSection = (point: ExecutionPoint) => {
+      const sections = Object.values(events);
+      for (let index = sections.length - 1; index >= 0; index--) {
+        const events = sections[index];
+        const firstEvent = events[0];
+        if (firstEvent && comparePoints(getExecutionPoint(firstEvent), point) <= 0) {
+          return events;
+        }
+      }
+      return events.main;
+    };
+
     const networkRequestEvents = await processNetworkData(replayClient, beginPoint, endPoint);
     // Now that section boundaries have been defined by user-actions,
     // merge in navigation and network events.
-    //
-    // TODO [FE-1419] Insert events into the right test section (not just main)
-    // What we should do here is: insert into the closest non-empty section with an execution point <= the current point
     navigationEvents.forEach(navigationEvent => {
-      insert(events.main, navigationEvent, (a, b) =>
+      const events = findSection(navigationEvent.timeStampedPoint.point);
+      insert(events, navigationEvent, (a, b) =>
         comparePoints(getExecutionPoint(a), getExecutionPoint(b))
       );
     });
     networkRequestEvents.forEach(networkRequestEvent => {
-      insert(events.main, networkRequestEvent, (a, b) =>
+      const events = findSection(networkRequestEvent.timeStampedPoint.point);
+      insert(events, networkRequestEvent, (a, b) =>
         comparePoints(getExecutionPoint(a), getExecutionPoint(b))
       );
     });
