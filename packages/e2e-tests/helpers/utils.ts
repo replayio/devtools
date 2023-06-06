@@ -147,6 +147,10 @@ export async function waitFor(
 
 export const getElementClasses = (loc: Locator) => loc.evaluate(el => Array.from(el.classList));
 
+export const getByTestName = (parent: Page | Locator, testName: string) => {
+  return parent.locator(`[data-test-name="${testName}"]`);
+};
+
 export async function resetTestUser(email: string) {
   const variables = { email, secret: process.env.AUTOMATED_TEST_SECRET };
 

@@ -1,9 +1,17 @@
 import { Locator, Page } from "@playwright/test";
 
-import { clearTextArea, debugPrint, delay, getCommandKey, mapLocators, waitFor } from "./utils";
+import {
+  clearTextArea,
+  debugPrint,
+  delay,
+  getByTestName,
+  getCommandKey,
+  mapLocators,
+  waitFor,
+} from "./utils";
 
 export function getTestSuitePanel(page: Page) {
-  return page.locator(`[data-test-name="TestSuitePanel"]`);
+  return getByTestName(page, "TestSuitePanel");
 }
 
 export async function openCypressTestPanel(page: Page): Promise<void> {
@@ -11,49 +19,56 @@ export async function openCypressTestPanel(page: Page): Promise<void> {
   const pane = getTestSuitePanel(page);
 
   let isVisible = await pane.isVisible();
-  debugPrint(page, "Initial panel visible: " + isVisible);
 
   if (!isVisible) {
-    await page.locator('[data-test-name="ToolbarButton-CypressPanel"]').click();
+    await getByTestName(page, "ToolbarButton-CypressPanel").click();
   }
 }
 
-export async function getTestRows(page: Page) {
-  return page.locator('[data-test-name="TestRecordingTreeRow"]');
+export function getTestRows(page: Page) {
+  return getByTestName(page, "TestRecordingTreeRow");
 }
 
-export async function getCypressLogo(page: Page) {
-  return page.locator('[data-test-name="ToolbarButton-CypressPanel"]');
+export function getCypressLogo(page: Page) {
+  return getByTestName(page, "ToolbarButton-CypressPanel");
 }
 
-export async function getTestRowChevron(row: Locator) {
+export function getTestRowChevron(row: Locator) {
   return row.locator(":scope", { hasText: "chevron_right" });
 }
 
-export async function getTestSections(row: Locator) {
-  return row.locator('[data-test-name="TestSection"]');
+export function getTestRecordingTrees(page: Page) {
+  return getByTestName(page, "TestRecordingTree");
 }
 
-export async function getTestCaseSteps(row: Locator) {
-  return row.locator('[data-test-name="TestSectionRow"]');
+export function getTestSections(row: Locator) {
+  return getByTestName(row, "TestSection");
 }
 
-export async function getSelectedTestCase(row: Pick<Locator, "locator">) {
+export function getTestCaseSteps(row: Locator) {
+  return getByTestName(row, "TestSectionRow");
+}
+
+export function getSelectedTestCase(row: Locator) {
   return row.locator('[data-test-id="TestRecordingPanelBody"]');
 }
 
 export function getTestSuiteResult(page: Page) {
-  return page.locator('[data-test-name="TestSuiteResult"]');
+  return getByTestName(page, "TestSuiteResult");
 }
 
 export function getTestSuiteResultsPassedCount(page: Page) {
-  return page.locator('[data-test-name="TestSuiteResultsPassedCount"]');
+  return getByTestName(page, "TestSuiteResultsPassedCount");
 }
 
 export function getTestSuiteResultsFailedCount(page: Page) {
-  return page.locator('[data-test-name="TestSuiteResultsFailedCount"]');
+  return getByTestName(page, "TestSuiteResultsFailedCount");
 }
 
 export function getTestSuiteResultsSkippedCount(page: Page) {
-  return page.locator('[data-test-name="TestSuiteResultsSkippedCount"]');
+  return getByTestName(page, "TestSuiteResultsSkippedCount");
+}
+
+export function getTestRecordingBackButton(page: Page) {
+  return getByTestName(page, "TestRecordingBackButton");
 }
