@@ -15,7 +15,7 @@ import {
   isTestSuite,
 } from "shared/test-suites/types";
 
-// TODO [FE-1419] Remove this eventually (when we drop support for legacy data format)
+// TODO [SCS-1109] Remove this eventually (when we drop support for legacy data format)
 export function convertLegacyTestRunToTestSuite(
   testSuite:
     | GetTestsRun_node_Workspace_testRuns
