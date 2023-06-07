@@ -38,8 +38,9 @@ export function TestSuiteContextRoot({ children }: PropsWithChildren) {
   useEffect(() => {
     async function fetchGroupedTestCases() {
       const groupedTestCases = await TestSuiteCache.readAsync(replayClient, recordingId);
-
-      setGroupedTestCases(groupedTestCases);
+      if (groupedTestCases != null) {
+        setGroupedTestCases(groupedTestCases);
+      }
     }
 
     fetchGroupedTestCases();

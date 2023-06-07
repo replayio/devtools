@@ -33,16 +33,16 @@ export function groupRecordings(recordings: Recording[]) {
 
   const sortedRecordings = orderBy(recordings, "date", "desc");
 
-  const recordingsMap = sortedRecordings.reduce((acc, recording) => {
-    const filePath = recording.metadata?.test?.source.filePath;
+  const recordingsMap = sortedRecordings.reduce((accumulated, recording) => {
+    const filePath = recording.metadata?.test?.source?.filePath;
     if (!filePath) {
-      return acc;
+      return accumulated;
     }
-    if (!acc[filePath]) {
-      acc[filePath] = [];
+    if (!accumulated[filePath]) {
+      accumulated[filePath] = [];
     }
-    acc[filePath].push(recording);
-    return acc;
+    accumulated[filePath].push(recording);
+    return accumulated;
   }, {} as Record<string, Recording[]>);
 
   for (const filePath in recordingsMap) {

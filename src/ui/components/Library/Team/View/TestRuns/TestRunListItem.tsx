@@ -1,10 +1,8 @@
 import Link from "next/link";
 import { useContext } from "react";
 
-import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TestSuite } from "shared/test-suites/types";
 import Icon from "ui/components/shared/Icon";
-import { RecordingCache } from "ui/components/TestSuite/suspense/RecordingCache";
 
 import { TeamContext } from "../../TeamContextRoot";
 import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/RecordingListItem";
@@ -28,26 +26,22 @@ function Title({ testSuite }: { testSuite: TestSuite }) {
 }
 
 function Attributes({ testSuite }: { testSuite: TestSuite }) {
-  const { date, title } = testSuite;
+  const { date, source, title } = testSuite;
 
-  const { recordingId } = useContext(SessionContext);
-
-  const recording = RecordingCache.read(recordingId);
-  const source = recording.metadata?.source;
   if (source) {
-    const { branch = "branch", merge, trigger } = source;
+    const { branchName, branchStatus, user } = source;
 
     return (
       <div className="flex flex-row items-center text-xs font-light">
         <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
-        {trigger?.user && <AttributeContainer icon="person">{trigger.user}</AttributeContainer>}
-        {merge != null ? (
+        {user && <AttributeContainer icon="person">{user}</AttributeContainer>}
+        {branchStatus === "open" ? (
           <AttributeContainer maxWidth="160px" icon="fork_right">
-            {branch}
+            {branchName || "branch"}
           </AttributeContainer>
         ) : (
           <AttributeContainer title={title} icon="merge_type">
-            {branch}
+            {branchStatus}
           </AttributeContainer>
         )}
         <ModeAttribute testSuite={testSuite} />

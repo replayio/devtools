@@ -34,11 +34,16 @@ function Title({ recording }: { recording: Recording }) {
   const match = recording.metadata?.test?.tests.find(test => test.error);
   const errorMsg = match?.error?.message;
 
+  const source = recording.metadata?.test?.source;
+  if (source == null) {
+    return null;
+  }
+
   return (
     <div className="flex flex-grow flex-row items-center space-x-4 overflow-hidden hover:cursor-pointer">
       <div className="flex flex-grow flex-col overflow-hidden">
-        {recording.metadata?.test?.source.title}
-        <div className="text-xs text-bodySubColor">{recording.metadata?.test?.source.filePath}</div>
+        {source.title}
+        <div className="text-xs text-bodySubColor">{source.filePath}</div>
         {errorMsg ? <div className="text-xs text-bodySubColor">{errorMsg}</div> : null}
       </div>
     </div>

@@ -124,6 +124,16 @@ export async function migrateIncrementalTestRecording(
         assert(command, `Test event must have "command" property`);
         assert(id, `Test event must have "id" property`);
 
+        // The client does not show certain types of chained events in the list
+        // they clutter without adding much value
+        if (parentId !== null) {
+          switch (command.name) {
+            case "as":
+            case "then":
+              return null;
+          }
+        }
+
         const annotations = userActionEventIdToAnnotations[id];
 
         assert(annotations != null, `Missing annotations for test event ${id}`);
@@ -285,6 +295,8 @@ async function processNetworkData(
     };
   } = {};
 
+  // Filter by RequestInfo (because they have execution points)
+  // then map RequestInfo to RequestEventInfo using ids
   const [beginIndex, endIndex] = findSliceIndices(
     requestInfo,
     begin.point,

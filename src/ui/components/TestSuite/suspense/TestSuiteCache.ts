@@ -6,14 +6,18 @@ import { ReplayClientInterface } from "shared/client/types";
 import { migrateIncrementalGroupedTestCases } from "shared/test-suites/migrateIncrementalGroupedTestCases";
 import { GroupedTestCases } from "shared/test-suites/types";
 import { RecordingCache } from "ui/components/TestSuite/suspense/RecordingCache";
+import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 
 export const TestSuiteCache = createSingleEntryCacheWithTelemetry<
   [replayClient: ReplayClientInterface, recordingId: RecordingId],
-  GroupedTestCases
+  GroupedTestCases | null
 >({
   debugLabel: "TestSuiteCache",
   load: async ([replayClient, recordingId]) => {
     const recording = await RecordingCache.readAsync(recordingId);
+    if (!isTestSuiteReplay(recording)) {
+      return null;
+    }
 
     const metadata = recording.metadata;
     assert(metadata != null);
