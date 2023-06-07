@@ -9,7 +9,7 @@ export default memo(function NavigationTestStepRow({
 }: {
   navigationTestStep: NavigationTestStep;
 }) {
-  function truncateMiddle(string, maxLength = 250, separator = "...") {
+  function truncateMiddle(string: string, maxLength = 250, separator = "...") {
     if (string.length > maxLength) {
       const charIndex = (maxLength - separator.length) / 2;
       return (
@@ -19,6 +19,7 @@ export default memo(function NavigationTestStepRow({
 
     return string;
   }
+
   let url = navigationTestStep.data.url || "";
   let displayUrl = truncateMiddle(url);
 
