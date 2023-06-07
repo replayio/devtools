@@ -2,6 +2,7 @@ import { RecordingId } from "@replayio/protocol";
 import Link from "next/link";
 
 import { Recording } from "shared/graphql/types";
+import { isIncrementalGroupedTestCases, isLegacyTestMetadata } from "shared/test-suites/types";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import styles from "../../../../Library.module.css";
@@ -31,12 +32,22 @@ function ViewReplay({ label, recordingId }: { label: string; recordingId: Record
 }
 
 function Title({ recording }: { recording: Recording }) {
-  const match = recording.metadata?.test?.tests.find(test => test.error);
-  const errorMsg = match?.error?.message;
+  const testMetadata = recording.metadata?.test;
+  if (testMetadata == null || isLegacyTestMetadata(testMetadata)) {
+    return null;
+  }
 
-  const source = recording.metadata?.test?.source;
+  const source = testMetadata.source;
   if (source == null) {
     return null;
+  }
+
+  let errorMessage: string | undefined;
+  if (isIncrementalGroupedTestCases(testMetadata)) {
+    errorMessage = testMetadata.tests.find(test => test.error)?.error?.message;
+  } else {
+    errorMessage = testMetadata.testRecordings.find(testRecording => testRecording.error)?.error
+      ?.message;
   }
 
   return (
@@ -44,7 +55,7 @@ function Title({ recording }: { recording: Recording }) {
       <div className="flex flex-grow flex-col overflow-hidden">
         {source.title}
         <div className="text-xs text-bodySubColor">{source.filePath}</div>
-        {errorMsg ? <div className="text-xs text-bodySubColor">{errorMsg}</div> : null}
+        {errorMessage ? <div className="text-xs text-bodySubColor">{errorMessage}</div> : null}
       </div>
     </div>
   );

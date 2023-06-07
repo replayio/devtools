@@ -1,10 +1,10 @@
 import { RecordingId } from "@replayio/protocol";
-import formatDate from "date-fns/format";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import React from "react";
 import LazyLoad from "react-lazyload";
 
 import { Recording } from "shared/graphql/types";
+import { isLegacyTestMetadata } from "shared/test-suites/types";
 import {
   TestResultIcon,
   getResultFromResultCounts,
@@ -142,6 +142,8 @@ function RecordingRow({
     return null;
   }
 
+  const testMetadata = recording.metadata?.test;
+
   return (
     <RowWrapper recording={recording} isEditing={isEditing} onClick={toggleChecked}>
       <div
@@ -168,11 +170,9 @@ function RecordingRow({
 
             <div className={`flex flex-col space-y-0.5 overflow-hidden ${styles.recordingTitle}`}>
               <div className="flex items-center space-x-1">
-                {recording.metadata?.test ? (
-                  <TestResultIcon
-                    result={getResultFromResultCounts(recording.metadata.test.resultCounts)}
-                  />
-                ) : null}
+                {testMetadata != null && !isLegacyTestMetadata(testMetadata) && (
+                  <TestResultIcon result={getResultFromResultCounts(testMetadata.resultCounts)} />
+                )}
                 <ReplayTitle title={recording.title} />
               </div>
               <div className="flex flex-row space-x-4 font-light text-gray-400">
@@ -193,11 +193,11 @@ function RecordingRow({
                 <div className="overflow-hidden overflow-ellipsis whitespace-pre font-light text-gray-400">
                   {getDisplayedUrl(recording.url)}
                 </div>
-                {recording.metadata?.test?.source.filePath ? (
+                {testMetadata != null && !isLegacyTestMetadata(testMetadata) && (
                   <div className="overflow-hidden overflow-ellipsis whitespace-pre font-light text-gray-400">
-                    {recording.metadata.test.source.filePath}
+                    {testMetadata.source.filePath}
                   </div>
-                ) : null}
+                )}
               </div>
             </div>
           </div>

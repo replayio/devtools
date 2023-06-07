@@ -1,6 +1,7 @@
 import orderBy from "lodash/orderBy";
 
 import { Recording } from "shared/graphql/types";
+import { isLegacyTestMetadata } from "shared/test-suites/types";
 
 export type RecordingGroup = {
   count: number;
@@ -8,13 +9,23 @@ export type RecordingGroup = {
 };
 
 function testPassed(recording: Recording) {
-  const { passed = 0 } = recording.metadata?.test?.resultCounts ?? {};
-  return !testFailed(recording) && passed > 0;
+  const testMetadata = recording.metadata?.test;
+  if (testMetadata == null || isLegacyTestMetadata(testMetadata)) {
+    return false;
+  } else {
+    const { passed = 0 } = testMetadata.resultCounts;
+    return !testFailed(recording) && passed > 0;
+  }
 }
 
 function testFailed(recording: Recording) {
-  const { failed = 0, timedOut = 0 } = recording.metadata?.test?.resultCounts ?? {};
-  return failed > 0 || timedOut > 0;
+  const testMetadata = recording.metadata?.test;
+  if (testMetadata == null || isLegacyTestMetadata(testMetadata)) {
+    return false;
+  } else {
+    const { failed = 0, timedOut = 0 } = testMetadata.resultCounts ?? {};
+    return failed > 0 || timedOut > 0;
+  }
 }
 
 export function groupRecordings(recordings: Recording[]) {
@@ -34,7 +45,12 @@ export function groupRecordings(recordings: Recording[]) {
   const sortedRecordings = orderBy(recordings, "date", "desc");
 
   const recordingsMap = sortedRecordings.reduce((accumulated, recording) => {
-    const filePath = recording.metadata?.test?.source?.filePath;
+    const testMetadata = recording.metadata?.test;
+    if (testMetadata == null || isLegacyTestMetadata(testMetadata)) {
+      return accumulated;
+    }
+
+    const filePath = testMetadata.source?.filePath;
     if (!filePath) {
       return accumulated;
     }

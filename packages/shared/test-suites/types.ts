@@ -3,7 +3,7 @@ import { satisfies } from "compare-versions";
 
 import { GetTestsRun_node_Workspace_testRuns } from "shared/graphql/generated/GetTestsRun";
 import { GetTestsRunsForWorkspace_node_Workspace_testRuns } from "shared/graphql/generated/GetTestsRunsForWorkspace";
-import { Recording } from "shared/graphql/types";
+import { LegacyTestMetadata, Recording } from "shared/graphql/types";
 
 export type SemVer = string;
 
@@ -247,9 +247,17 @@ export function isIncrementalTestRecording(
 }
 
 export function isIncrementalGroupedTestCases(
-  value: IncrementalGroupedTestCases | GroupedTestCases
+  value: LegacyTestMetadata | IncrementalGroupedTestCases | GroupedTestCases
 ): value is IncrementalGroupedTestCases {
-  return satisfies(value.schemaVersion, "~2.0.0");
+  const schemaVersion = (value as any).schemaVersion;
+  return schemaVersion != null && satisfies(schemaVersion, "~2.0.0");
+}
+
+export function isLegacyTestMetadata(
+  value: LegacyTestMetadata | IncrementalGroupedTestCases | GroupedTestCases
+): value is LegacyTestMetadata {
+  const version = (value as any).version;
+  return version != null && version === 1;
 }
 
 export function isLegacyTestSuite(
@@ -277,9 +285,10 @@ export function isTestSuite(testSuite: LegacyTestSuite | TestSuite): testSuite i
 }
 
 export function isGroupedTestCases(
-  value: IncrementalGroupedTestCases | GroupedTestCases
+  value: LegacyTestMetadata | IncrementalGroupedTestCases | GroupedTestCases
 ): value is GroupedTestCases {
-  return satisfies(value.schemaVersion, "~3.0.0");
+  const schemaVersion = (value as any).schemaVersion;
+  return schemaVersion != null && satisfies(schemaVersion, "~3.0.0");
 }
 
 export function isUserActionEvent(value: TestEvent): value is UserActionEvent {
