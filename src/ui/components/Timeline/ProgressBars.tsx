@@ -30,8 +30,14 @@ export default function ProgressBars() {
       <div
         className="progress-line preview-min"
         style={{ width: `${clamp(Math.min(hoverPercent, precachedPercent), 0, 100)}%` }}
+        data-hover-value={hoverPercent}
       />
-      <div className="progress-line" style={{ width: `${clamp(percent, 0, 100)}%` }} />
+      <div
+        className="progress-line"
+        data-test-name="current-progress"
+        style={{ width: `${clamp(percent, 0, 100)}%` }}
+        data-current-progress-value={percent}
+      />
     </>
   );
 }

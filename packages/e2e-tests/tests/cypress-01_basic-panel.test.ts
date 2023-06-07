@@ -44,7 +44,7 @@ test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
     expect(initialRecordingTreesCount).toBeGreaterThanOrEqual(1);
   });
 
-  // has 4 tests
+  // has 9 tests
   const rows = getTestRows(page);
   await waitFor(async () => {
     await expect(rows).toHaveCount(9);
