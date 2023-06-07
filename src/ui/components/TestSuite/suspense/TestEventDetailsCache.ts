@@ -18,7 +18,7 @@ export const TestEventDetailsCache = createCache<
   Type
 >({
   debugLabel: "TestEventDetailsCache",
-  getKey: ([client, timeStampedPoint, variable]) => `${timeStampedPoint}:${variable}`,
+  getKey: ([client, timeStampedPoint, variable]) => `${timeStampedPoint.point}:${variable}`,
   load: async ([client, timeStampedPoint, variable]) => {
     const endPauseId = await pauseIdCache.readAsync(
       client,
