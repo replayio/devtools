@@ -70,6 +70,10 @@ export interface GroupedTestCases {
     };
   };
 
+  // High level summary of tests within this recording
+  // based on same data as contained in the resultCounts map below
+  result: TestResult;
+
   // Summarizes result of the test run
   resultCounts: Record<TestResult, number>;
 

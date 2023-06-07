@@ -31,21 +31,3 @@ export function TestResultIcon({
 
   return <Icon size="small" {...rest} className={className} filename={filename} />;
 }
-
-export function getResultFromResultCounts(
-  resultCounts: IncrementalGroupedTestCases["resultCounts"]
-): TestResult {
-  const { failed, passed, skipped, timedOut } = resultCounts;
-
-  if (failed > 0) {
-    return "failed";
-  } else if (timedOut > 0) {
-    return "timedOut";
-  } else if (skipped > 0) {
-    return "skipped";
-  } else if (passed > 0) {
-    return "passed";
-  } else {
-    return "unknown";
-  }
-}

@@ -5,10 +5,7 @@ import LazyLoad from "react-lazyload";
 
 import { Recording } from "shared/graphql/types";
 import { isLegacyTestMetadata } from "shared/test-suites/types";
-import {
-  TestResultIcon,
-  getResultFromResultCounts,
-} from "ui/components/TestSuite/components/TestResultIcon";
+import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIcon";
 import hooks from "ui/hooks";
 import { useGetUserPermissions } from "ui/hooks/users";
 import { getDisplayedUrl } from "ui/utils/environment";
@@ -171,7 +168,7 @@ function RecordingRow({
             <div className={`flex flex-col space-y-0.5 overflow-hidden ${styles.recordingTitle}`}>
               <div className="flex items-center space-x-1">
                 {testMetadata != null && !isLegacyTestMetadata(testMetadata) && (
-                  <TestResultIcon result={getResultFromResultCounts(testMetadata.resultCounts)} />
+                  <TestResultIcon result={testMetadata.result} />
                 )}
                 <ReplayTitle title={recording.title} />
               </div>
