@@ -33,7 +33,7 @@ const initialState = (): NetworkState => ({
   selectedRequestId: null,
 });
 
-// TODO Replace with networkRequestsCache
+// TODO [FE-1553] Replace with networkRequestsCache
 
 const update = (state: NetworkState = initialState(), action: NetworkAction): NetworkState => {
   switch (action.type) {

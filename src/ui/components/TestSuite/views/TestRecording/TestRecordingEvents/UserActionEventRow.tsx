@@ -91,27 +91,51 @@ export default memo(function UserActionEventRow({
     dispatch(jumpToKnownEventListenerHit(onSeek, jumpToCodeAnnotation));
   };
 
-  const showBadge = command.name === "get" && userActionEvent.data.result != null;
-
   const isCurrent = position === "current";
-  const shouldShowJumpToCode = (isHovered || isCurrent) && canShowJumpToCode;
+  const showBadge = isCurrent && command.name === "get" && userActionEvent.data.result != null;
+  const showJumpToCode = (isHovered || isCurrent) && canShowJumpToCode;
 
   const jumpToCodeStatus: JumpToCodeStatus = !!jumpToCodeAnnotation ? "found" : "no_hits";
 
-  const index = useMemo(() => {
-    return testRecording.events[testSectionName].filter(isUserActionEvent).indexOf(userActionEvent);
+  const eventNumber = useMemo(() => {
+    if (userActionEvent.data.parentId !== null) {
+      return null;
+    }
+
+    let eventNumber = 0;
+
+    const events = testRecording.events[testSectionName];
+    for (let index = 0; index < events.length; index++) {
+      const event = events[index];
+      if (isUserActionEvent(event)) {
+        if (event.data.parentId === null) {
+          eventNumber++;
+        }
+
+        if (event === userActionEvent) {
+          return eventNumber;
+        }
+      }
+    }
+
+    return null;
   }, [testRecording, testSectionName, userActionEvent]);
 
   return (
     <div
       className={styles.Row}
+      data-chained-event={userActionEvent.data.parentId !== null || undefined}
       data-status={error ? "error" : "success"}
       onClick={jumpToTestSourceDisabled ? undefined : onClickJumpToTestSource}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className={styles.Text}>
-        <span className={styles.Number}>{index + 1}</span>{" "}
+        {eventNumber != null ? (
+          <span className={styles.Number}>{eventNumber}</span>
+        ) : (
+          <span className={styles.ChainedEvent}>.</span>
+        )}
         <span
           className={`${styles.Name} ${styles.Name}`}
           data-name={command.name}
@@ -132,7 +156,7 @@ export default memo(function UserActionEventRow({
           />
         </Suspense>
       )}
-      {shouldShowJumpToCode && (
+      {showJumpToCode && (
         <div className={styles.JumpToCodeButton}>
           <JumpToCodeButton
             currentExecutionPoint={executionPoint}

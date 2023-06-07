@@ -1,4 +1,4 @@
-import { Frame, PauseId, TimeStampedPoint } from "@replayio/protocol";
+import { Frame, PauseId, Object as ProtocolObject, TimeStampedPoint } from "@replayio/protocol";
 import cloneDeep from "lodash/cloneDeep";
 import { createCache } from "suspense";
 
@@ -6,12 +6,11 @@ import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { pauseEvaluationsCache, pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { ReplayClientInterface } from "shared/client/types";
-import { UserActionEvent } from "shared/test-suites/types";
 
 export type Type = {
   count: number | null;
   pauseId: PauseId;
-  props: Object | null;
+  props: ProtocolObject | null;
 };
 
 export const TestEventDetailsCache = createCache<
