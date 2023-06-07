@@ -9,8 +9,18 @@ export default memo(function NavigationTestStepRow({
 }: {
   navigationTestStep: NavigationTestStep;
 }) {
+  function truncateMiddle(string, maxLength = 250, separator = "...") {
+    if (string.length > maxLength) {
+      const charIndex = (maxLength - separator.length) / 2;
+      return (
+        string.slice(0, Math.ceil(charIndex)) + separator + string.slice(0 - Math.ceil(charIndex))
+      );
+    }
+
+    return string;
+  }
   let url = navigationTestStep.data.url || "";
-  let displayUrl = url.length > 250 ? url.slice(0, 250) + "..." : url;
+  let displayUrl = truncateMiddle(url);
 
   return (
     <div className={styles.Indented}>
