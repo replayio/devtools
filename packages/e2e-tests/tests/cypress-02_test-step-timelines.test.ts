@@ -20,7 +20,11 @@ import {
   getTestSuiteUser,
   openCypressTestPanel,
 } from "../helpers/testsuites";
-import { getTimelineCurrentHoverPercent, getTimelineCurrentPercent } from "../helpers/timeline";
+import {
+  getTimelineCurrentHoverPercent,
+  getTimelineCurrentPercent,
+  waitForTimelineAdvanced,
+} from "../helpers/timeline";
 import { debugPrint, delay, waitFor } from "../helpers/utils";
 
 const url = "flake/adding-spec.ts";
@@ -85,15 +89,7 @@ test("cypress-02: Test Step timeline behavior", async ({ page }) => {
   // Do just a few of these
   for (let i = 0; i < Math.min(5, numClickableSteps); i++) {
     await clickableSteps.nth(i).click();
-    let currentPercent = 0;
-    await waitFor(async () => {
-      currentPercent = await getTimelineCurrentPercent(page);
-
-      expect(currentPercent).toBeGreaterThan(0);
-      expect(currentPercent).toBeGreaterThan(prevPercent);
-    });
-
-    prevPercent = currentPercent;
+    prevPercent = await waitForTimelineAdvanced(page, prevPercent);
   }
 
   // Clicking in viewer mode shouldn't switch to DevTools mode

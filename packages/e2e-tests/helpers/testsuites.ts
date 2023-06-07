@@ -95,3 +95,7 @@ export function getErrorRows(page: Page) {
     has: page.locator(`[data-status="error"]`),
   });
 }
+
+export function getTestStepBeforeAfterButtons(page: Page) {
+  return getByTestName(page, "TestBeforeAfter");
+}
