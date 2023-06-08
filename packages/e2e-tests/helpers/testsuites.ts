@@ -1,4 +1,4 @@
-import { Locator, Page } from "@playwright/test";
+import { Locator, Page, expect } from "@playwright/test";
 
 import {
   clearTextArea,
@@ -98,4 +98,69 @@ export function getErrorRows(page: Page) {
 
 export function getTestStepBeforeAfterButtons(page: Page) {
   return getByTestName(page, "TestBeforeAfter");
+}
+
+export function getUserActionEventDetails(page: Page) {
+  return getByTestName(page, "UserActionEventDetails");
+}
+
+export async function getKeyValueEntry(
+  locator: Locator,
+  header: string
+): Promise<Locator | undefined> {
+  const keyValues = getByTestName(locator, "KeyValue");
+  const numItems = await keyValues.count();
+  const reHeader = new RegExp(`^${header}`, "i");
+  for (let i = 0; i < numItems; i++) {
+    const keyValueLocator = keyValues.nth(i);
+    const headerText = await getKeyValueEntryHeader(keyValueLocator);
+    if (!headerText) {
+      return undefined;
+    }
+    if (reHeader.test(headerText)) {
+      return keyValueLocator;
+    }
+  }
+
+  return undefined;
+}
+
+export async function getKeyValueEntryHeader(locator: Locator) {
+  const headerField = getByTestName(locator, "KeyValue-Header").first();
+  return headerField.textContent();
+}
+
+export async function getKeyValueEntryValue(locator: Locator) {
+  const valueField = getByTestName(locator, "ClientValue").first();
+  // Complex values like objects or DOM nodes do not have
+  // a "ClientValue" section. Skip those.
+  if (await valueField.isVisible()) {
+    return valueField.textContent();
+  }
+  return "";
+}
+
+export async function getDetailsPaneContents(
+  detailsPane: Locator
+): Promise<Record<string, string>> {
+  const keyValues = getByTestName(detailsPane, "KeyValue");
+  await waitFor(async () => {
+    expect(await detailsPane.isVisible()).toBe(true);
+    const numKeyValues = await keyValues.count();
+    expect(numKeyValues).toBeGreaterThan(0);
+  });
+
+  const detailsContents: Record<string, string> = {};
+
+  const numKeyValues = await keyValues.count();
+  for (let i = 0; i < numKeyValues; i++) {
+    const keyValueLocator = keyValues.nth(i);
+    const header = await getKeyValueEntryHeader(keyValueLocator);
+    const value = await getKeyValueEntryValue(keyValueLocator);
+    if (header != null && value != null) {
+      detailsContents[header] = value;
+    }
+  }
+
+  return detailsContents;
 }

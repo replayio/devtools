@@ -3,31 +3,17 @@ import test, { expect } from "@playwright/test";
 import { isViewerTabActive, openDevToolsTab, openViewerTab, startTest } from "../helpers";
 import { closeSource, getSelectedLineNumber, waitForSelectedSource } from "../helpers/source-panel";
 import {
-  getErrorRows,
+  getDetailsPaneContents,
   getSelectedTestCase,
   getTestCaseSteps,
-  getTestRecordingBackButton,
-  getTestRecordingTrees,
-  getTestRowChevron,
   getTestRows,
-  getTestSections,
   getTestStepBeforeAfterButtons,
-  getTestSuiteBranch,
-  getTestSuiteDate,
-  getTestSuiteDuration,
   getTestSuitePanel,
-  getTestSuiteResultsFailedCount,
-  getTestSuiteResultsPassedCount,
-  getTestSuiteResultsSkippedCount,
-  getTestSuiteUser,
+  getUserActionEventDetails,
   openCypressTestPanel,
 } from "../helpers/testsuites";
-import {
-  getTimelineCurrentHoverPercent,
-  getTimelineCurrentPercent,
-  waitForTimelineAdvanced,
-} from "../helpers/timeline";
-import { debugPrint, delay, waitFor } from "../helpers/utils";
+import { waitForTimelineAdvanced } from "../helpers/timeline";
+import { getByTestName, waitFor } from "../helpers/utils";
 
 const url = "flake/adding-spec.ts";
 
@@ -48,10 +34,10 @@ test("cypress-03: Test Step interactions", async ({ page }) => {
     await expect(rows).toHaveCount(9);
   });
 
-  const trimTest = rows.filter({ hasText: /trim/ }).first();
+  const addTodosTest = rows.filter({ hasText: "should allow me to add todo items" }).first();
 
   // can open tests
-  await trimTest.click();
+  await addTodosTest.click();
   const selectedRow = getSelectedTestCase(page);
   expect(selectedRow).toHaveCount(1);
 
@@ -86,11 +72,13 @@ test("cypress-03: Test Step interactions", async ({ page }) => {
 
   const afterButton = beforeAfterButtons.locator("button", { hasText: "After" }).first();
 
+  // Clicking "After" changes the current time
   await afterButton.click();
   prevPercent = await waitForTimelineAdvanced(page, prevPercent);
 
   const networkStep = steps.filter({ hasText: /localhost/ }).first();
   await networkStep.click();
+  // Buttons get hidden for network request steps
   await waitFor(async () => {
     expect(await beforeAfterButtons.isVisible()).toBe(false);
   });
@@ -110,7 +98,7 @@ test("cypress-03: Test Step interactions", async ({ page }) => {
   // Should highlight the line with this step
   await waitFor(async () => {
     const lineNumber = await getSelectedLineNumber(page, false);
-    expect(lineNumber).toBe(84);
+    expect(lineNumber).toBe(30);
   });
 
   const firstEq = clickableSteps.filter({ hasText: /eq/ }).first();
@@ -122,6 +110,37 @@ test("cypress-03: Test Step interactions", async ({ page }) => {
   // Should highlight the new step's line
   await waitFor(async () => {
     const lineNumber = await getSelectedLineNumber(page, false);
-    expect(lineNumber).toBe(89);
+    expect(lineNumber).toBe(31);
   });
+
+  // Clicking each step should change the details pane
+  await firstGet.click();
+  const detailsPane = getUserActionEventDetails(page);
+
+  const firstGetDetails = await getDetailsPaneContents(detailsPane);
+  expect(firstGetDetails).toBeTruthy();
+  expect(firstGetDetails["Command"]).toBe(`"get"`);
+  expect(firstGetDetails["Selector"]).toBe(`".new-todo"`);
+
+  await steps.nth(3).click();
+  const firstTypeDetails = await getDetailsPaneContents(detailsPane);
+  expect(firstTypeDetails).toBeTruthy();
+  expect(firstTypeDetails["Command"]).toBe(`"type"`);
+  expect(firstTypeDetails["Typed"]).toMatch("buy some cheese");
+
+  await steps.nth(4).click();
+  // Network request entry, no details
+  await waitFor(async () => {
+    expect(await detailsPane.isVisible()).toBe(false);
+    const message = getByTestName(page, "TestEventDetailsMessage");
+    const messageContents = await message.textContent();
+    expect(messageContents).toMatch("Select an action above to view its details");
+  });
+
+  // Next chained entry should have details
+  await steps.nth(5).click();
+  const secondTypeDetails = await getDetailsPaneContents(detailsPane);
+  expect(secondTypeDetails).toBeTruthy();
+  expect(secondTypeDetails["Command"]).toBe(`"type"`);
+  expect(secondTypeDetails["Typed"]).toMatch("{enter}");
 });
