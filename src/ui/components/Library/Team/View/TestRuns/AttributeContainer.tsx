@@ -13,7 +13,7 @@ export function AttributeContainer({
 }) {
   return (
     <div
-      className={`mr-4 flex items-start space-x-1 overflow-hidden text-ellipsis`}
+      className="flex items-start space-x-1 overflow-hidden text-ellipsis"
       title={title || children}
     >
       <div className="w-4">{icon ? <MaterialIcon>{icon}</MaterialIcon> : null}</div>

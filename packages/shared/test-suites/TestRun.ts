@@ -20,7 +20,7 @@ export namespace TestRunV1 {
 export namespace TestRunV2 {
   export type TestSuiteMode = "diagnostics" | "record-on-retry" | "stress";
 
-  export type TestSuiteBranchStatus = "closed" | "merged" | "open";
+  export type TestSuiteBranchStatus = "closed" | "merged" | "open" | "primary";
 
   export type TestSuiteSourceMetadata = {
     branchName: string | null;
@@ -53,8 +53,10 @@ export namespace TestRunV2 {
 export type AnyTestSuite = TestRunV1.TestSuite | TestRunV2.TestSuite;
 
 // Export the latest version of types (for convenience)
+export type TestSuiteBranchStatus = TestRunV2.TestSuiteBranchStatus;
 export type TestSuite = TestRunV2.TestSuite;
 export type TestSuiteMode = TestRunV2.TestSuiteMode;
+export type TestSuiteSourceMetadata = TestRunV2.TestSuiteSourceMetadata;
 
 export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
   if (isTestSuiteV2(testSuite)) {
@@ -81,7 +83,15 @@ export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
 
   // TODO [FE-1543] Frontend can't distinguish between "merged" and "closed"
   // This should be stored in the data by the backend, in response to the GitHub webhook
-  const branchStatus = mergeId != null ? "merged" : "open";
+  let branchStatus: TestSuiteBranchStatus = mergeId != null ? "merged" : "open";
+
+  // This is a little hacky, but it's our best way to roughly detect the "primary" branch
+  switch (branch) {
+    case "main":
+    case "master":
+      branchStatus = "primary";
+      break;
+  }
 
   // TODO [FE-1543] Some data doesn't have a title, so use a fallback for now
   const titleWithFallback = commitTitle || mergeTitle || title || "Tests";

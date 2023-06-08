@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useContext } from "react";
 
 import { TestSuite } from "shared/test-suites/TestRun";
+import { BranchStatus } from "ui/components/Library/Team/View/TestRuns/BranchStatus";
 import Icon from "ui/components/shared/Icon";
 
 import { TeamContext } from "../../TeamContextRoot";
@@ -32,24 +33,16 @@ function Attributes({ testSuite }: { testSuite: TestSuite }) {
     const { branchName, branchStatus, user } = source;
 
     return (
-      <div className="flex flex-row items-center text-xs font-light">
+      <div className="flex flex-row items-center gap-4 text-xs font-light">
         <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
         {user && <AttributeContainer icon="person">{user}</AttributeContainer>}
-        {branchStatus === "open" ? (
-          <AttributeContainer maxWidth="160px" icon="fork_right">
-            {branchName || "branch"}
-          </AttributeContainer>
-        ) : (
-          <AttributeContainer title={title} icon="merge_type">
-            {branchStatus}
-          </AttributeContainer>
-        )}
+        <BranchStatus branchName={branchName} branchStatus={branchStatus} title={title} />
         <ModeAttribute testSuite={testSuite} />
       </div>
     );
   } else {
     return (
-      <div className="flex flex-row items-center text-xs font-light">
+      <div className="flex flex-row items-center gap-4 text-xs font-light">
         <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
       </div>
     );

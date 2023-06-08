@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { TestSuite, TestSuiteMode } from "shared/test-suites/TestRun";
+import { BranchStatus } from "ui/components/Library/Team/View/TestRuns/BranchStatus";
 
 import {
   getDurationString,
@@ -53,25 +54,17 @@ export function Attributes({ testSuite }: { testSuite: TestSuite }) {
     const { branchName, branchStatus, user } = source;
 
     return (
-      <div className="flex flex-row flex-wrap items-center pl-1">
+      <div className="flex flex-row flex-wrap items-center gap-4 pl-1">
         <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
         {user ? <AttributeContainer icon="person">{user}</AttributeContainer> : null}
-        {branchStatus === "open" ? (
-          <AttributeContainer maxWidth="160px" icon="fork_right">
-            {branchName || "branch"}
-          </AttributeContainer>
-        ) : (
-          <AttributeContainer title={title} icon="merge_type">
-            {branchStatus}
-          </AttributeContainer>
-        )}
+        <BranchStatus branchName={branchName} branchStatus={branchStatus} title={title} />
         <AttributeContainer icon="timer">{durationString}</AttributeContainer>
         <ModeAttribute testSuite={testSuite} />
       </div>
     );
   } else {
     return (
-      <div className="flex flex-row flex-wrap items-center pl-1">
+      <div className="flex flex-row flex-wrap items-center gap-2 pl-1">
         <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
       </div>
     );
