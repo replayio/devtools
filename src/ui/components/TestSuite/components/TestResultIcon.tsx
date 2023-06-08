@@ -1,7 +1,6 @@
 import { ComponentProps } from "react";
 
 import { TestResult } from "shared/graphql/types";
-import { IncrementalGroupedTestCases } from "shared/test-suites/types";
 import Icon from "ui/components/shared/Icon";
 
 import styles from "./TestResultIcon.module.css";

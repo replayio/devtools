@@ -2,7 +2,7 @@ import { useContext, useMemo, useState } from "react";
 import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
-import { TestSuite } from "shared/test-suites/types";
+import { TestSuite } from "shared/test-suites/TestRun";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import { TestRunListItem } from "ui/components/Library/Team/View/TestRuns/TestRunListItem";
 import { SecondaryButton } from "ui/components/shared/Button";

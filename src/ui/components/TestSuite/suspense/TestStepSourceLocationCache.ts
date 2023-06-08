@@ -5,7 +5,7 @@ import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { createCacheWithTelemetry } from "replay-next/src/utils/suspense";
 import { ReplayClientInterface } from "shared/client/types";
-import { GroupedTestCases, UserActionEvent } from "shared/test-suites/types";
+import { GroupedTestCases, UserActionEvent } from "shared/test-suites/RecordingTestMetadata";
 
 export const TestStepSourceLocationCache = createCacheWithTelemetry<
   [client: ReplayClientInterface, groupedTestCases: GroupedTestCases, testEvent: UserActionEvent],

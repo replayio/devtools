@@ -8,21 +8,56 @@ import {
 } from "shared/graphql/generated/GetTestsRun";
 import { GetTestsRunsForWorkspace_node_Workspace_testRuns } from "shared/graphql/generated/GetTestsRunsForWorkspace";
 import { Recording } from "shared/graphql/types";
-import {
-  TestSuite,
-  TestSuiteMode,
-  TestSuiteSourceMetadata,
-  isTestSuite,
-} from "shared/test-suites/types";
 
-// TODO [SCS-1109] Remove this eventually (when we drop support for legacy data format)
-export function migrateLegacyTestRunToTestSuite(
-  testSuite:
+// This type is supported, but must be converted to version 2 format before use
+export namespace TestRunV1 {
+  export type TestSuite =
     | GetTestsRun_node_Workspace_testRuns
-    | GetTestsRunsForWorkspace_node_Workspace_testRuns
-    | TestSuite
-): TestSuite {
-  if (isTestSuite(testSuite)) {
+    | GetTestsRunsForWorkspace_node_Workspace_testRuns;
+}
+
+// This type is supported, but must be converted to version 2 format before use
+export namespace TestRunV2 {
+  export type TestSuiteMode = "diagnostics" | "record-on-retry" | "stress";
+
+  export type TestSuiteBranchStatus = "closed" | "merged" | "open";
+
+  export type TestSuiteSourceMetadata = {
+    branchName: string | null;
+    branchStatus: TestSuiteBranchStatus;
+    commitId: string;
+    triggerUrl: string | null;
+    user: string | null;
+  };
+
+  // A Test Suite is a group of tests that were run together
+  // Typically these are "triggered" by CI (e.g. GitHub Workflow)
+  export interface TestSuite {
+    date: string;
+    id: string;
+    mode: TestSuiteMode | null;
+    results: {
+      counts: {
+        failed: number;
+        flaky: number;
+        passed: number;
+      };
+      recordings: Recording[];
+    };
+    source: TestSuiteSourceMetadata | null;
+    title: string;
+  }
+}
+
+// Export the union version of types (for type checker functions)
+export type AnyTestSuite = TestRunV1.TestSuite | TestRunV2.TestSuite;
+
+// Export the latest version of types (for convenience)
+export type TestSuite = TestRunV2.TestSuite;
+export type TestSuiteMode = TestRunV2.TestSuiteMode;
+
+export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
+  if (isTestSuiteV2(testSuite)) {
     // If data from GraphQL is already in the new format, skip the conversion
     return testSuite;
   }
@@ -51,7 +86,7 @@ export function migrateLegacyTestRunToTestSuite(
   // TODO [FE-1543] Some data doesn't have a title, so use a fallback for now
   const titleWithFallback = commitTitle || mergeTitle || title || "Tests";
 
-  let source: TestSuiteSourceMetadata | null = null;
+  let source: TestRunV2.TestSuiteSourceMetadata | null = null;
   if (branch && commitId && user) {
     source = {
       branchName: branch,
@@ -65,7 +100,7 @@ export function migrateLegacyTestRunToTestSuite(
   return {
     date,
     id,
-    mode: mode ? (mode as TestSuiteMode) : null,
+    mode: mode ? (mode as TestRunV2.TestSuiteMode) : null,
     results: {
       counts: {
         failed: stats.failed,
@@ -93,4 +128,12 @@ function unwrapRecordingsData(
     id: edge.node.uuid,
     date: edge.node.createdAt,
   }));
+}
+
+export function isTestSuiteV1(testSuite: AnyTestSuite): testSuite is TestRunV1.TestSuite {
+  return !isTestSuiteV2(testSuite);
+}
+
+export function isTestSuiteV2(testSuite: AnyTestSuite): testSuite is TestRunV2.TestSuite {
+  return "results" in testSuite;
 }

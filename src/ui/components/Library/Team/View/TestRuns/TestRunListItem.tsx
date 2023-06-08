@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useContext } from "react";
 
-import { TestSuite } from "shared/test-suites/types";
+import { TestSuite } from "shared/test-suites/TestRun";
 import Icon from "ui/components/shared/Icon";
 
 import { TeamContext } from "../../TeamContextRoot";

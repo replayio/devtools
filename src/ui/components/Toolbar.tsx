@@ -5,7 +5,7 @@ import { getPauseId } from "devtools/client/debugger/src/selectors";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { framesCache } from "replay-next/src/suspense/FrameCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { isLegacyGroupedTestCases } from "shared/test-suites/types";
+import { isGroupedTestCasesV1 } from "shared/test-suites/RecordingTestMetadata";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
@@ -233,7 +233,7 @@ export default function Toolbar() {
   const testMetadata = recording?.metadata?.test;
 
   let testRunner = null;
-  if (testMetadata && !isLegacyGroupedTestCases(testMetadata)) {
+  if (testMetadata && !isGroupedTestCasesV1(testMetadata)) {
     testRunner = testMetadata.environment.testRunner.name;
   }
 

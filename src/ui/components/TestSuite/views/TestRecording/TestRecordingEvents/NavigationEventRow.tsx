@@ -1,6 +1,6 @@
 import { memo } from "react";
 
-import { NavigationEvent } from "shared/test-suites/types";
+import { NavigationEvent } from "shared/test-suites/RecordingTestMetadata";
 
 import styles from "./NavigationEventRow.module.css";
 

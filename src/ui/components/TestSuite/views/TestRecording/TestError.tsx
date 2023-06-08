@@ -1,4 +1,4 @@
-import { TestError as TestErrorType } from "shared/test-suites/types";
+import { TestError as TestErrorType } from "shared/test-suites/RecordingTestMetadata";
 import Icon from "ui/components/shared/Icon";
 
 import styles from "./TestError.module.css";

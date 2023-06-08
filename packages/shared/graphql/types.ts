@@ -1,10 +1,6 @@
 import { ExecutionPoint } from "@replayio/protocol";
 
-import {
-  GroupedTestCases,
-  IncrementalGroupedTestCases,
-  LegacyGroupedTestCases,
-} from "shared/test-suites/types";
+import { AnyGroupedTestCases } from "shared/test-suites/RecordingTestMetadata";
 
 export enum Nag {
   ADD_COMMENT = "add_comment",
@@ -255,7 +251,7 @@ export interface Recording {
 }
 
 export interface RecordingMetadata {
-  test?: LegacyGroupedTestCases | IncrementalGroupedTestCases | GroupedTestCases;
+  test?: AnyGroupedTestCases;
   source?: SourceMetadata;
 }
 

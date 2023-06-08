@@ -1,4 +1,4 @@
-import { TestEvent, TestSectionName } from "shared/test-suites/types";
+import { TestEvent, TestSectionName } from "shared/test-suites/RecordingTestMetadata";
 import { TestSectionRow } from "ui/components/TestSuite/views/TestRecording/TestSectionRow";
 
 import styles from "./TestSection.module.css";

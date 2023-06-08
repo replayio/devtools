@@ -1,7 +1,7 @@
 import { useContext } from "react";
 
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { UserActionEvent } from "shared/test-suites/types";
+import { UserActionEvent } from "shared/test-suites/RecordingTestMetadata";
 import { seek } from "ui/actions/timeline";
 import { useAppDispatch } from "ui/setup/hooks";
 

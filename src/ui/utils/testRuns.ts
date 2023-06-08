@@ -2,10 +2,9 @@ import orderBy from "lodash/orderBy";
 
 import { Recording } from "shared/graphql/types";
 import {
-  isGroupedTestCases,
-  isIncrementalGroupedTestCases,
-  isLegacyGroupedTestCases,
-} from "shared/test-suites/types";
+  getGroupedTestCasesFilePath,
+  isGroupedTestCasesV1,
+} from "shared/test-suites/RecordingTestMetadata";
 
 export type RecordingGroup = {
   count: number;
@@ -16,7 +15,7 @@ function testPassed(recording: Recording) {
   const testMetadata = recording.metadata?.test;
   if (testMetadata == null) {
     return false;
-  } else if (isLegacyGroupedTestCases(testMetadata)) {
+  } else if (isGroupedTestCasesV1(testMetadata)) {
     return testMetadata.result === "passed";
   } else {
     const { passed = 0 } = testMetadata.resultCounts;
@@ -28,7 +27,7 @@ function testFailed(recording: Recording) {
   const testMetadata = recording.metadata?.test;
   if (testMetadata == null) {
     return false;
-  } else if (isLegacyGroupedTestCases(testMetadata)) {
+  } else if (isGroupedTestCasesV1(testMetadata)) {
     return testMetadata.result === "failed" || testMetadata.result === "timedOut";
   } else {
     const { failed = 0, timedOut = 0 } = testMetadata.resultCounts ?? {};
@@ -58,11 +57,7 @@ export function groupRecordings(recordings: Recording[]) {
       return accumulated;
     }
 
-    const filePath = isIncrementalGroupedTestCases(testMetadata)
-      ? testMetadata.source?.path
-      : isGroupedTestCases(testMetadata)
-      ? testMetadata.source?.filePath
-      : testMetadata.file;
+    const filePath = getGroupedTestCasesFilePath(testMetadata);
     if (!filePath) {
       return accumulated;
     }

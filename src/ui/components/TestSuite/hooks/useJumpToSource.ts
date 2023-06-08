@@ -4,7 +4,11 @@ import { isPromiseLike } from "suspense";
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getContext } from "devtools/client/debugger/src/selectors";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { GroupedTestCases, TestEvent, TestRecording } from "shared/test-suites/types";
+import {
+  GroupedTestCases,
+  TestEvent,
+  TestRecording,
+} from "shared/test-suites/RecordingTestMetadata";
 import { setViewMode } from "ui/actions/layout";
 import { seek } from "ui/actions/timeline";
 import { TestStepSourceLocationCache } from "ui/components/TestSuite/suspense/TestStepSourceLocationCache";

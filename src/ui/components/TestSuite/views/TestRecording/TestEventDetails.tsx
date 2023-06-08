@@ -4,7 +4,7 @@ import { STATUS_PENDING, useImperativeCacheValue } from "suspense";
 
 import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { isUserActionEvent } from "shared/test-suites/types";
+import { isUserActionTestEvent } from "shared/test-suites/RecordingTestMetadata";
 import ErrorBoundary from "ui/components/ErrorBoundary";
 import { TestEventDetailsCache } from "ui/components/TestSuite/suspense/TestEventDetailsCache";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
@@ -16,7 +16,7 @@ export default function TestEventDetails({ collapsed }: { collapsed: boolean }) 
 
   if (collapsed) {
     return null;
-  } else if (testEvent == null || !isUserActionEvent(testEvent)) {
+  } else if (testEvent == null || !isUserActionTestEvent(testEvent)) {
     return <SelectionPrompt />;
   } else if (testEvent.data.result == null) {
     return <LoadingFailedMessage />;

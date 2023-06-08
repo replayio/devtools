@@ -2,7 +2,12 @@ import { ReactNode, useContext, useTransition } from "react";
 
 import { comparePoints } from "protocol/execution-point-utils";
 import Icon from "replay-next/components/Icon";
-import { TestEvent, TestSectionName, getExecutionPoint, getTime } from "shared/test-suites/types";
+import {
+  TestEvent,
+  TestSectionName,
+  getTestEventExecutionPoint,
+  getTestEventTime,
+} from "shared/test-suites/RecordingTestMetadata";
 import { setTimelineToTime } from "ui/actions/timeline";
 import { useTestEventContextMenu } from "ui/components/TestSuite/views/TestRecording/useTestEventContextMenu";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
@@ -35,7 +40,10 @@ export function TestSectionRow({
       position = "current";
     } else {
       position =
-        comparePoints(getExecutionPoint(testEvent), getExecutionPoint(selectedTestEvent)) <= 0
+        comparePoints(
+          getTestEventExecutionPoint(testEvent),
+          getTestEventExecutionPoint(selectedTestEvent)
+        ) <= 0
           ? "before"
           : "after";
     }
@@ -66,7 +74,7 @@ export function TestSectionRow({
 
   const onMouseEnter = async () => {
     if (selectedTestEvent !== testEvent) {
-      dispatch(setTimelineToTime(getTime(testEvent)));
+      dispatch(setTimelineToTime(getTestEventTime(testEvent)));
     }
   };
 

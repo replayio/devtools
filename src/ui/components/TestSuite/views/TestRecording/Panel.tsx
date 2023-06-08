@@ -8,7 +8,12 @@ import {
 } from "react-resizable-panels";
 
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
-import { TestEvent, TestSectionName, getExecutionPoint, getTime } from "shared/test-suites/types";
+import {
+  TestEvent,
+  TestSectionName,
+  getTestEventExecutionPoint,
+  getTestEventTime,
+} from "shared/test-suites/RecordingTestMetadata";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIcon";
 import { TestError } from "ui/components/TestSuite/views/TestRecording/TestError";
@@ -45,7 +50,7 @@ export default function Panel() {
       setTestEvent(testEvent);
 
       if (testEvent !== null) {
-        update(getTime(testEvent), getExecutionPoint(testEvent), false);
+        update(getTestEventTime(testEvent), getTestEventExecutionPoint(testEvent), false);
       }
     },
     [setTestEvent, update]

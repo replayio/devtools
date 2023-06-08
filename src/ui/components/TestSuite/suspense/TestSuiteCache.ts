@@ -3,8 +3,11 @@ import { RecordingId } from "@replayio/protocol";
 
 import { createSingleEntryCacheWithTelemetry } from "replay-next/src/utils/suspense";
 import { ReplayClientInterface } from "shared/client/types";
-import { migrateIncrementalGroupedTestCases } from "shared/test-suites/migrateIncrementalGroupedTestCases";
-import { GroupedTestCases, isLegacyGroupedTestCases } from "shared/test-suites/types";
+import {
+  GroupedTestCases,
+  convertGroupedTestCases,
+  isGroupedTestCasesV1,
+} from "shared/test-suites/RecordingTestMetadata";
 import { RecordingCache } from "ui/components/TestSuite/suspense/RecordingCache";
 import { isTestSuiteReplay } from "ui/components/TestSuite/utils/isTestSuiteReplay";
 
@@ -24,12 +27,12 @@ export const TestSuiteCache = createSingleEntryCacheWithTelemetry<
     assert(metadata.test != null);
 
     const testMetadata = metadata.test;
-    if (isLegacyGroupedTestCases(testMetadata)) {
+    if (isGroupedTestCasesV1(testMetadata)) {
       return null;
     }
 
     // Migrate intermediate test data to the final format used by the client
-    const groupedTestCases = await migrateIncrementalGroupedTestCases(testMetadata, replayClient);
+    const groupedTestCases = await convertGroupedTestCases(testMetadata, replayClient);
 
     return groupedTestCases;
   },

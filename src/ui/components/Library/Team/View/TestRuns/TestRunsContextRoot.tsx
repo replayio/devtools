@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { ReactNode, createContext, useContext, useEffect } from "react";
 
-import { TestSuite } from "shared/test-suites/types";
+import { TestSuite } from "shared/test-suites/TestRun";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 import { useGetTestRunsForWorkspace } from "ui/hooks/tests";
 

@@ -1,4 +1,4 @@
-import { TestRecording } from "shared/test-suites/types";
+import { TestRecording } from "shared/test-suites/RecordingTestMetadata";
 import { TestTree } from "ui/components/TestSuite/views/GroupedTestCases/types";
 
 export function createTestTree(testRecordings: TestRecording[]): TestTree {

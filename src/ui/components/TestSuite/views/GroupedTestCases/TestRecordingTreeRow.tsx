@@ -1,6 +1,6 @@
 import { useTransition } from "react";
 
-import { TestRecording } from "shared/test-suites/types";
+import { TestRecording } from "shared/test-suites/RecordingTestMetadata";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIcon";
 

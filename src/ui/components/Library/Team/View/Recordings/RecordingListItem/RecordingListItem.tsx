@@ -4,7 +4,10 @@ import React from "react";
 import LazyLoad from "react-lazyload";
 
 import { Recording } from "shared/graphql/types";
-import { isIncrementalGroupedTestCases, isLegacyGroupedTestCases } from "shared/test-suites/types";
+import {
+  isGroupedTestCasesV1,
+  isGroupedTestCasesV2,
+} from "shared/test-suites/RecordingTestMetadata";
 import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIcon";
 import hooks from "ui/hooks";
 import { useGetUserPermissions } from "ui/hooks/users";
@@ -167,7 +170,7 @@ function RecordingRow({
 
             <div className={`flex flex-col space-y-0.5 overflow-hidden ${styles.recordingTitle}`}>
               <div className="flex items-center space-x-1">
-                {testMetadata != null && !isLegacyGroupedTestCases(testMetadata) && (
+                {testMetadata != null && !isGroupedTestCasesV1(testMetadata) && (
                   <TestResultIcon result={testMetadata.result} />
                 )}
                 <ReplayTitle title={recording.title} />
@@ -190,9 +193,9 @@ function RecordingRow({
                 <div className="overflow-hidden overflow-ellipsis whitespace-pre font-light text-gray-400">
                   {getDisplayedUrl(recording.url)}
                 </div>
-                {testMetadata != null && !isLegacyGroupedTestCases(testMetadata) && (
+                {testMetadata != null && !isGroupedTestCasesV1(testMetadata) && (
                   <div className="overflow-hidden overflow-ellipsis whitespace-pre font-light text-gray-400">
-                    {isIncrementalGroupedTestCases(testMetadata)
+                    {isGroupedTestCasesV2(testMetadata)
                       ? testMetadata.source.path
                       : testMetadata.source.filePath}
                   </div>

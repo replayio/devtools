@@ -1,6 +1,6 @@
 import { memo } from "react";
 
-import { NetworkRequestEvent } from "shared/test-suites/types";
+import { NetworkRequestEvent } from "shared/test-suites/RecordingTestMetadata";
 import { setSelectedPanel } from "ui/actions/layout";
 import { useAppDispatch } from "ui/setup/hooks";
 

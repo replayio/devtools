@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { TestSuite, TestSuiteMode } from "shared/test-suites/types";
+import { TestSuite, TestSuiteMode } from "shared/test-suites/TestRun";
 
 import {
   getDurationString,

@@ -1,6 +1,6 @@
 import { ReactNode, createContext, useContext } from "react";
 
-import { TestSuite } from "shared/test-suites/types";
+import { TestSuite } from "shared/test-suites/TestRun";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 import { useGetTestRunForWorkspace } from "ui/hooks/tests";
 

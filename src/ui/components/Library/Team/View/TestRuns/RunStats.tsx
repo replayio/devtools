@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { TestSuite } from "shared/test-suites/types";
+import { TestSuite } from "shared/test-suites/TestRun";
 import { groupRecordings } from "ui/utils/testRuns";
 
 function Pill({ styles, value }: { styles: string; value: number }) {

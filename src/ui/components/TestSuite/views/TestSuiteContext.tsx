@@ -12,7 +12,11 @@ import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { GroupedTestCases, TestEvent, TestRecording } from "shared/test-suites/types";
+import {
+  GroupedTestCases,
+  TestEvent,
+  TestRecording,
+} from "shared/test-suites/RecordingTestMetadata";
 import { TestSuiteCache } from "ui/components/TestSuite/suspense/TestSuiteCache";
 
 type TestSuiteContextType = {

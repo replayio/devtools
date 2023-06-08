@@ -11,8 +11,8 @@ import {
   GroupedTestCases,
   TestSectionName,
   UserActionEvent,
-  isUserActionEvent,
-} from "shared/test-suites/types";
+  isUserActionTestEvent,
+} from "shared/test-suites/RecordingTestMetadata";
 import { jumpToKnownEventListenerHit } from "ui/actions/eventListeners/jumpToCode";
 import { seek } from "ui/actions/timeline";
 import { JumpToCodeButton, JumpToCodeStatus } from "ui/components/shared/JumpToCodeButton";
@@ -107,7 +107,7 @@ export default memo(function UserActionEventRow({
     const events = testRecording.events[testSectionName];
     for (let index = 0; index < events.length; index++) {
       const event = events[index];
-      if (isUserActionEvent(event)) {
+      if (isUserActionTestEvent(event)) {
         if (event.data.parentId === null) {
           eventNumber++;
         }

@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { UserActionEvent, isUserActionEvent } from "shared/test-suites/types";
+import { UserActionEvent, isUserActionTestEvent } from "shared/test-suites/RecordingTestMetadata";
 import { useShowUserActionEventBoundary } from "ui/components/TestSuite/hooks/useShowUserActionEventBoundary";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
@@ -10,7 +10,7 @@ export default function ToggleButton() {
   const { testEvent } = useContext(TestSuiteContext);
 
   // Only show the hover button for user-action events
-  if (testEvent === null || !isUserActionEvent(testEvent)) {
+  if (testEvent === null || !isUserActionTestEvent(testEvent)) {
     return null;
   }
 

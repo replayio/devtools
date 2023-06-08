@@ -1,4 +1,4 @@
-import { TestRecording } from "shared/test-suites/types";
+import { TestRecording } from "shared/test-suites/RecordingTestMetadata";
 
 export type TestTree = {
   scopes: { [name: string]: TestTree };

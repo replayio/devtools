@@ -5,10 +5,10 @@ import { assert } from "protocol/utils";
 import {
   TestEvent,
   UserActionEvent,
-  getExecutionPoint,
-  getTime,
-  isUserActionEvent,
-} from "shared/test-suites/types";
+  getTestEventExecutionPoint,
+  getTestEventTime,
+  isUserActionTestEvent,
+} from "shared/test-suites/RecordingTestMetadata";
 import { startPlayback } from "ui/actions/timeline";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useJumpToSource } from "ui/components/TestSuite/hooks/useJumpToSource";
@@ -19,11 +19,11 @@ import { useAppDispatch } from "ui/setup/hooks";
 export function useTestEventContextMenu(testEvent: TestEvent) {
   const { contextMenu, onContextMenu } = useContextMenu(
     <>
-      {isUserActionEvent(testEvent) && <JumpToSourceMenuItem userActionEvent={testEvent} />}
+      {isUserActionTestEvent(testEvent) && <JumpToSourceMenuItem userActionEvent={testEvent} />}
       <PlayToHereMenuItem testEvent={testEvent} />
       <PlayFromHereMenuItem testEvent={testEvent} />
-      {isUserActionEvent(testEvent) && <ShowBeforeMenuItem userActionEvent={testEvent} />}
-      {isUserActionEvent(testEvent) && <ShowAfterMenuItem userActionEvent={testEvent} />}
+      {isUserActionTestEvent(testEvent) && <ShowBeforeMenuItem userActionEvent={testEvent} />}
+      {isUserActionTestEvent(testEvent) && <ShowAfterMenuItem userActionEvent={testEvent} />}
     </>
   );
 
@@ -67,8 +67,8 @@ function PlayFromHereMenuItem({ testEvent }: { testEvent: TestEvent }) {
 
     dispatch(
       startPlayback({
-        beginPoint: getExecutionPoint(testEvent),
-        beginTime: getTime(testEvent),
+        beginPoint: getTestEventExecutionPoint(testEvent),
+        beginTime: getTestEventTime(testEvent),
         endPoint: testRecording.timeStampedPointRange.end.point,
         endTime: testRecording.timeStampedPointRange.end.time,
       })
@@ -97,8 +97,8 @@ function PlayToHereMenuItem({ testEvent }: { testEvent: TestEvent }) {
       startPlayback({
         beginPoint: testRecording.timeStampedPointRange.begin.point,
         beginTime: testRecording.timeStampedPointRange.begin.time,
-        endPoint: getExecutionPoint(testEvent),
-        endTime: getTime(testEvent),
+        endPoint: getTestEventExecutionPoint(testEvent),
+        endTime: getTestEventTime(testEvent),
       })
     );
   };

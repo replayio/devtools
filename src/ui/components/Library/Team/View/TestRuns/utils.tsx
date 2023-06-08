@@ -1,10 +1,10 @@
 import { Recording } from "shared/graphql/types";
-import { isLegacyGroupedTestCases } from "shared/test-suites/types";
+import { isGroupedTestCasesV1 } from "shared/test-suites/RecordingTestMetadata";
 
 export function getDuration(recordings: Recording[]) {
   return recordings.reduce<number>((accumulated, recording) => {
     const testMetadata = recording.metadata?.test;
-    if (testMetadata == null || isLegacyGroupedTestCases(testMetadata)) {
+    if (testMetadata == null || isGroupedTestCasesV1(testMetadata)) {
       return accumulated;
     }
 
