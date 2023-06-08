@@ -469,10 +469,7 @@ export async function convertTestRecording(
         let viewSourceTimeStampedPoint: TimeStampedPoint | null = null;
 
         const isChaiAssertion = command.name === "assert";
-        console.groupCollapsed(`Test event ${id}`);
-        console.log(JSON.stringify(partialTestEvent, null, 2));
-        console.log(JSON.stringify(annotations, null, 2));
-        console.groupEnd();
+        // TODO [FE-1419] name === "assert" && !annotations.enqueue;
 
         annotations.forEach(annotation => {
           switch (annotation.message.event) {
@@ -487,13 +484,6 @@ export async function convertTestRecording(
                 time: annotation.time,
               };
               resultVariable = annotation.message.logVariable ?? null;
-
-              if (isChaiAssertion) {
-                viewSourceTimeStampedPoint = {
-                  point: annotation.point,
-                  time: annotation.time,
-                };
-              }
               break;
             }
             case "step:enqueue": {
@@ -510,6 +500,13 @@ export async function convertTestRecording(
                 point: annotation.point,
                 time: annotation.time,
               };
+
+              if (isChaiAssertion) {
+                viewSourceTimeStampedPoint = {
+                  point: annotation.point,
+                  time: annotation.time,
+                };
+              }
               break;
             }
           }

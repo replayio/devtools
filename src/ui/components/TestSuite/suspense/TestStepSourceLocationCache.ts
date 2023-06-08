@@ -42,6 +42,7 @@ export const TestStepSourceLocationCache = createCacheWithTelemetry<
             const userFrames = frames?.slice(0, markerFrameIndex).reverse();
 
             const isChaiAssertion = testEvent.data.command.name === "assert";
+            // TODO [FE-1419] const isChaiAssertion = testStep.data.name === "assert" && !annotations?.enqueue;
 
             const frame = userFrames.find((f, i, l) => {
               if (isChaiAssertion) {

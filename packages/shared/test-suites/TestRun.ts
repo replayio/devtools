@@ -20,12 +20,13 @@ export namespace TestRunV1 {
 export namespace TestRunV2 {
   export type TestSuiteMode = "diagnostics" | "record-on-retry" | "stress";
 
-  export type TestSuiteBranchStatus = "closed" | "merged" | "open" | "primary";
-
   export type TestSuiteSourceMetadata = {
     branchName: string | null;
-    branchStatus: TestSuiteBranchStatus;
     commitId: string;
+    isPrimaryBranch: boolean;
+    prNumber: number | null;
+    prTitle: string | null;
+    repository: string | null;
     triggerUrl: string | null;
     user: string | null;
   };
@@ -53,7 +54,6 @@ export namespace TestRunV2 {
 export type AnyTestSuite = TestRunV1.TestSuite | TestRunV2.TestSuite;
 
 // Export the latest version of types (for convenience)
-export type TestSuiteBranchStatus = TestRunV2.TestSuiteBranchStatus;
 export type TestSuite = TestRunV2.TestSuite;
 export type TestSuiteMode = TestRunV2.TestSuiteMode;
 export type TestSuiteSourceMetadata = TestRunV2.TestSuiteSourceMetadata;
@@ -64,8 +64,20 @@ export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
     return testSuite;
   }
 
-  const { branch, commitId, commitTitle, date, id, mergeId, mergeTitle, mode, stats, title, user } =
-    testSuite;
+  const {
+    branch,
+    commitId,
+    commitTitle,
+    date,
+    id,
+    mergeId,
+    mergeTitle,
+    mode,
+    repository,
+    stats,
+    title,
+    user,
+  } = testSuite;
 
   // Verify expected data; if any of these are missing, we can't reliably migrate the data
   assert(date != null, "Expected legacy TestRun data to have a data");
@@ -81,27 +93,32 @@ export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
   const firstRecording = sortedRecordings[0];
   const triggerUrl = firstRecording?.metadata?.source?.trigger?.url ?? null;
 
-  // TODO [FE-1543] Frontend can't distinguish between "merged" and "closed"
-  // This should be stored in the data by the backend, in response to the GitHub webhook
-  let branchStatus: TestSuiteBranchStatus = mergeId != null ? "merged" : "open";
-
   // This is a little hacky, but it's our best way to roughly detect the "primary" branch
+  let isPrimaryBranch = false;
   switch (branch) {
     case "main":
     case "master":
-      branchStatus = "primary";
+      isPrimaryBranch = true;
       break;
   }
 
+  const prNumber = mergeId != null ? parseInt(mergeId) : null;
+  const prTitle = mergeTitle ?? null;
+
   // TODO [FE-1543] Some data doesn't have a title, so use a fallback for now
   const titleWithFallback = commitTitle || mergeTitle || title || "Tests";
+  // TODO Title should be shown if available (primary title?)
+  // TODO Add secondary title
 
   let source: TestRunV2.TestSuiteSourceMetadata | null = null;
   if (branch && commitId && user) {
     source = {
       branchName: branch,
-      branchStatus,
       commitId,
+      isPrimaryBranch,
+      prNumber: prNumber && !isNaN(prNumber) ? prNumber : null,
+      prTitle,
+      repository,
       triggerUrl,
       user,
     };

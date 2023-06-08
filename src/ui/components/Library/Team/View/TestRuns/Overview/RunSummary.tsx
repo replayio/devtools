@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { TestSuite, TestSuiteMode } from "shared/test-suites/TestRun";
-import { BranchStatus } from "ui/components/Library/Team/View/TestRuns/BranchStatus";
+import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
 
 import {
   getDurationString,
@@ -51,13 +51,13 @@ export function Attributes({ testSuite }: { testSuite: TestSuite }) {
   const durationString = getDurationString(duration);
 
   if (source) {
-    const { branchName, branchStatus, user } = source;
+    const { branchName, isPrimaryBranch, user } = source;
 
     return (
       <div className="flex flex-row flex-wrap items-center gap-4 pl-1">
         <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
         {user ? <AttributeContainer icon="person">{user}</AttributeContainer> : null}
-        <BranchStatus branchName={branchName} branchStatus={branchStatus} title={title} />
+        <BranchIcon branchName={branchName} isPrimaryBranch={isPrimaryBranch} title={title} />
         <AttributeContainer icon="timer">{durationString}</AttributeContainer>
         <ModeAttribute testSuite={testSuite} />
       </div>

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useContext } from "react";
 
 import { TestSuite } from "shared/test-suites/TestRun";
-import { BranchStatus } from "ui/components/Library/Team/View/TestRuns/BranchStatus";
+import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
 import Icon from "ui/components/shared/Icon";
 
 import { TeamContext } from "../../TeamContextRoot";
@@ -30,13 +30,13 @@ function Attributes({ testSuite }: { testSuite: TestSuite }) {
   const { date, source, title } = testSuite;
 
   if (source) {
-    const { branchName, branchStatus, user } = source;
+    const { branchName, isPrimaryBranch, user } = source;
 
     return (
       <div className="flex flex-row items-center gap-4 text-xs font-light">
         <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
         {user && <AttributeContainer icon="person">{user}</AttributeContainer>}
-        <BranchStatus branchName={branchName} branchStatus={branchStatus} title={title} />
+        <BranchIcon branchName={branchName} isPrimaryBranch={isPrimaryBranch} title={title} />
         <ModeAttribute testSuite={testSuite} />
       </div>
     );

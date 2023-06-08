@@ -58,6 +58,7 @@ export interface GetTestsRun_node_Workspace_testRuns {
   user: string | null;
   date: any | null;
   mode: string | null;
+  repository: string | null;
   stats: GetTestsRun_node_Workspace_testRuns_stats | null;
   recordings: GetTestsRun_node_Workspace_testRuns_recordings | null;
 }

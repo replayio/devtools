@@ -26,6 +26,7 @@ export interface GetTestsRunsForWorkspace_node_Workspace_testRuns {
   commitTitle: string | null;
   mergeId: string | null;
   mergeTitle: string | null;
+  repository: string | null;
   user: string | null;
   date: any | null;
   mode: string | null;
