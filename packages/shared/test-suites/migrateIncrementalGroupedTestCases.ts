@@ -16,7 +16,7 @@ export async function migrateIncrementalGroupedTestCases(
   replayClient: ReplayClientInterface
 ): Promise<GroupedTestCases> {
   if (isIncrementalGroupedTestCases(groupedTestCases)) {
-    const { tests: partialTestRecordings, ...rest } = groupedTestCases;
+    const { source, tests: partialTestRecordings, ...rest } = groupedTestCases;
 
     const annotations = await AnnotationsCache.readAsync();
 
@@ -49,7 +49,11 @@ export async function migrateIncrementalGroupedTestCases(
 
     return {
       ...rest,
-      testRecordings: testRecordings,
+      source: {
+        filePath: source.path,
+        title: source.title,
+      },
+      testRecordings,
     };
   } else if (isGroupedTestCases(groupedTestCases)) {
     return groupedTestCases;

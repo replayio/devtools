@@ -4,7 +4,7 @@ import React from "react";
 import LazyLoad from "react-lazyload";
 
 import { Recording } from "shared/graphql/types";
-import { isLegacyTestMetadata } from "shared/test-suites/types";
+import { isIncrementalGroupedTestCases, isLegacyTestMetadata } from "shared/test-suites/types";
 import { TestResultIcon } from "ui/components/TestSuite/components/TestResultIcon";
 import hooks from "ui/hooks";
 import { useGetUserPermissions } from "ui/hooks/users";
@@ -192,7 +192,9 @@ function RecordingRow({
                 </div>
                 {testMetadata != null && !isLegacyTestMetadata(testMetadata) && (
                   <div className="overflow-hidden overflow-ellipsis whitespace-pre font-light text-gray-400">
-                    {testMetadata.source.filePath}
+                    {isIncrementalGroupedTestCases(testMetadata)
+                      ? testMetadata.source.path
+                      : testMetadata.source.filePath}
                   </div>
                 )}
               </div>

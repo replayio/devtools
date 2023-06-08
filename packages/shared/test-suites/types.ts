@@ -232,7 +232,11 @@ type IncrementalUserActionEvent = Omit<UserActionEvent, "data" | "timeStampedPoi
   };
 };
 
-export type IncrementalGroupedTestCases = Omit<GroupedTestCases, "testRecordings"> & {
+export type IncrementalGroupedTestCases = Omit<GroupedTestCases, "source" | "testRecordings"> & {
+  source: {
+    path: string;
+    title: string | null;
+  };
   tests: IncrementalTestRecording[];
 };
 

@@ -37,24 +37,25 @@ function Title({ recording }: { recording: Recording }) {
     return null;
   }
 
-  const source = testMetadata.source;
-  if (source == null) {
-    return null;
-  }
-
-  let errorMessage: string | undefined;
+  let errorMessage;
+  let filePath;
+  let title;
   if (isIncrementalGroupedTestCases(testMetadata)) {
     errorMessage = testMetadata.tests.find(test => test.error)?.error?.message;
+    filePath = testMetadata.source.path;
+    title = testMetadata.source.title;
   } else {
     errorMessage = testMetadata.testRecordings.find(testRecording => testRecording.error)?.error
       ?.message;
+    filePath = testMetadata.source.filePath;
+    title = testMetadata.source.title;
   }
 
   return (
     <div className="flex flex-grow flex-row items-center space-x-4 overflow-hidden hover:cursor-pointer">
       <div className="flex flex-grow flex-col overflow-hidden">
-        {source.title}
-        <div className="text-xs text-bodySubColor">{source.filePath}</div>
+        {title}
+        <div className="text-xs text-bodySubColor">{filePath}</div>
         {errorMessage ? <div className="text-xs text-bodySubColor">{errorMessage}</div> : null}
       </div>
     </div>

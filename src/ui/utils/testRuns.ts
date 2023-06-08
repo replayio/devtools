@@ -1,7 +1,7 @@
 import orderBy from "lodash/orderBy";
 
 import { Recording } from "shared/graphql/types";
-import { isLegacyTestMetadata } from "shared/test-suites/types";
+import { isIncrementalGroupedTestCases, isLegacyTestMetadata } from "shared/test-suites/types";
 
 export type RecordingGroup = {
   count: number;
@@ -50,7 +50,9 @@ export function groupRecordings(recordings: Recording[]) {
       return accumulated;
     }
 
-    const filePath = testMetadata.source?.filePath;
+    const filePath = isIncrementalGroupedTestCases(testMetadata)
+      ? testMetadata.source?.path
+      : testMetadata.source?.filePath;
     if (!filePath) {
       return accumulated;
     }
