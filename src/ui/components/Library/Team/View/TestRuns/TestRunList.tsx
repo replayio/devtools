@@ -2,10 +2,10 @@ import { useContext, useMemo, useState } from "react";
 import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
+import { TestSuite } from "shared/test-suites/TestRun";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import { TestRunListItem } from "ui/components/Library/Team/View/TestRuns/TestRunListItem";
 import { SecondaryButton } from "ui/components/shared/Button";
-import { TestSuiteRun } from "ui/hooks/tests";
 
 import { TestRunsContext } from "./TestRunsContextRoot";
 
@@ -15,27 +15,27 @@ const ROW_HEIGHT = 70;
 type ItemData = {
   countToRender: number;
   loadMore: () => void;
-  testSuiteRuns: TestSuiteRun[];
+  testSuites: TestSuite[];
 };
 
 export function TestRunList() {
-  const { loading, testSuiteRuns } = useContext(TestRunsContext);
+  const { loading, testSuites } = useContext(TestRunsContext);
   const [countToRender, setCountToRender] = useState(PAGE_SIZE);
 
   const itemData = useMemo<ItemData>(
     () => ({
       countToRender,
       loadMore: () => setCountToRender(countToRender + PAGE_SIZE),
-      testSuiteRuns,
+      testSuites,
     }),
-    [countToRender, testSuiteRuns]
+    [countToRender, testSuites]
   );
 
   if (loading) {
     return <LibrarySpinner />;
   }
 
-  const itemCount = Math.min(countToRender + 1, testSuiteRuns.length);
+  const itemCount = Math.min(countToRender + 1, testSuites.length);
 
   return (
     <ReactVirtualizedAutoSizer
@@ -55,7 +55,7 @@ export function TestRunList() {
 }
 
 function TestRunListRow({ data, index, style }: ListChildComponentProps<ItemData>) {
-  const { countToRender, loadMore, testSuiteRuns } = data;
+  const { countToRender, loadMore, testSuites } = data;
 
   if (index === countToRender) {
     return (
@@ -67,10 +67,10 @@ function TestRunListRow({ data, index, style }: ListChildComponentProps<ItemData
     );
   }
 
-  const testSuiteRun = testSuiteRuns[index];
+  const testSuite = testSuites[index];
   return (
     <div style={style}>
-      <TestRunListItem testSuiteRun={testSuiteRun} />
+      <TestRunListItem testSuite={testSuite} />
     </div>
   );
 }

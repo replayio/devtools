@@ -2,6 +2,10 @@ import { RecordingId } from "@replayio/protocol";
 import Link from "next/link";
 
 import { Recording } from "shared/graphql/types";
+import {
+  isGroupedTestCasesV1,
+  isGroupedTestCasesV2,
+} from "shared/test-suites/RecordingTestMetadata";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import styles from "../../../../Library.module.css";
@@ -31,16 +35,35 @@ function ViewReplay({ label, recordingId }: { label: string; recordingId: Record
 }
 
 function Title({ recording }: { recording: Recording }) {
-  const errorMsg = recording.metadata?.test?.tests
-    ?.map(test => test.error?.message)
-    .filter(Boolean)[0];
+  const testMetadata = recording.metadata?.test;
+  if (testMetadata == null) {
+    return null;
+  }
+
+  let errorMessage;
+  let filePath;
+  let title;
+  if (isGroupedTestCasesV1(testMetadata)) {
+    errorMessage = testMetadata.tests?.find(test => test.error)?.error?.message;
+    filePath = testMetadata.file;
+    title = testMetadata.title;
+  } else if (isGroupedTestCasesV2(testMetadata)) {
+    errorMessage = testMetadata.tests.find(test => test.error)?.error?.message;
+    filePath = testMetadata.source.path;
+    title = testMetadata.source.title;
+  } else {
+    errorMessage = testMetadata.testRecordings.find(testRecording => testRecording.error)?.error
+      ?.message;
+    filePath = testMetadata.source.filePath;
+    title = testMetadata.source.title;
+  }
 
   return (
     <div className="flex flex-grow flex-row items-center space-x-4 overflow-hidden hover:cursor-pointer">
       <div className="flex flex-grow flex-col overflow-hidden">
-        {recording.metadata?.test?.title}
-        <div className="text-xs text-bodySubColor">{recording.metadata?.test?.file}</div>
-        {errorMsg ? <div className="text-xs text-bodySubColor">{errorMsg}</div> : null}
+        {title}
+        <div className="text-xs text-bodySubColor">{filePath}</div>
+        {errorMessage ? <div className="text-xs text-bodySubColor">{errorMessage}</div> : null}
       </div>
     </div>
   );

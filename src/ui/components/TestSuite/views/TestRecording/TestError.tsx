@@ -1,9 +1,9 @@
-import { TestItemError } from "shared/graphql/types";
+import { TestError as TestErrorType } from "shared/test-suites/RecordingTestMetadata";
 import Icon from "ui/components/shared/Icon";
 
 import styles from "./TestError.module.css";
 
-export function TestError({ error }: { error: TestItemError }) {
+export function TestError({ error }: { error: TestErrorType }) {
   return (
     <div className={styles.Row}>
       <div>

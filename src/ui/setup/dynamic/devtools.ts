@@ -42,7 +42,6 @@ import { selectors } from "ui/reducers";
 import app, { loadReceivedEvents, setVideoUrl } from "ui/reducers/app";
 import network from "ui/reducers/network";
 import protocolMessages from "ui/reducers/protocolMessages";
-import reporter from "ui/reducers/reporter";
 import timeline, {
   allPaintsReceived,
   paintsReceived,
@@ -163,7 +162,6 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   const reducers = {
     app,
     network,
-    reporter,
     timeline,
     protocolMessages: protocolMessages,
     ...debuggerReducers,

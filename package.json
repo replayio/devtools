@@ -49,6 +49,7 @@
     "@stripe/stripe-js": "^1.26.0",
     "@svgr/webpack": "^6.2.1",
     "classnames": "^2.3.1",
+    "compare-versions": "^6.0.0-rc.1",
     "cookie": "^0.4.2",
     "date-fns": "^2.28.0",
     "design": "workspace:*",

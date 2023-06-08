@@ -5,6 +5,9 @@
   align-items: center;
   position: relative;
 }
+.Row[data-chained-event] {
+  margin-left: 2ch;
+}
 
 .Badge,
 .SelectedBadge {
@@ -22,11 +25,16 @@
 
 .Number {
   color: var(--color-dim);
+  margin-right: 1ch;
 }
 
 .Name[data-name="assert"] {
   padding: 0 0.25rem;
   border-radius: 0.25rem;
+}
+
+.ChainedEvent {
+  color: var(--color-dim);
 }
 
 .Row[data-status="error"] .Args {

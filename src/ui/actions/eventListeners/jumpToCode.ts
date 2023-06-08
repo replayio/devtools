@@ -1,4 +1,3 @@
-import { Dictionary } from "@reduxjs/toolkit";
 import {
   ExecutionPoint,
   FunctionOutline,
@@ -18,8 +17,7 @@ import { eventCountsCache, eventPointsCache } from "replay-next/src/suspense/Eve
 import { topFrameCache } from "replay-next/src/suspense/FrameCache";
 import { getHitPointsForLocationAsync } from "replay-next/src/suspense/HitPointsCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
-import { pauseEvaluationsCache } from "replay-next/src/suspense/PauseCache";
-import { pauseIdCache } from "replay-next/src/suspense/PauseCache";
+import { pauseEvaluationsCache, pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { sourceOutlineCache } from "replay-next/src/suspense/SourceOutlineCache";
 import { isLocationBefore } from "replay-next/src/utils/source";
 import { ReplayClientInterface } from "shared/client/types";

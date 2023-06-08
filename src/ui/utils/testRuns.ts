@@ -1,6 +1,10 @@
 import orderBy from "lodash/orderBy";
 
 import { Recording } from "shared/graphql/types";
+import {
+  getGroupedTestCasesFilePath,
+  isGroupedTestCasesV1,
+} from "shared/test-suites/RecordingTestMetadata";
 
 export type RecordingGroup = {
   count: number;
@@ -8,14 +12,27 @@ export type RecordingGroup = {
 };
 
 function testPassed(recording: Recording) {
-  return recording.metadata?.test?.result === "passed";
+  const testMetadata = recording.metadata?.test;
+  if (testMetadata == null) {
+    return false;
+  } else if (isGroupedTestCasesV1(testMetadata)) {
+    return testMetadata.result === "passed";
+  } else {
+    const { passed = 0 } = testMetadata.resultCounts;
+    return !testFailed(recording) && passed > 0;
+  }
 }
 
 function testFailed(recording: Recording) {
-  return (
-    recording.metadata?.test?.result &&
-    ["failed", "timedOut"].includes(recording.metadata?.test?.result)
-  );
+  const testMetadata = recording.metadata?.test;
+  if (testMetadata == null) {
+    return false;
+  } else if (isGroupedTestCasesV1(testMetadata)) {
+    return testMetadata.result === "failed" || testMetadata.result === "timedOut";
+  } else {
+    const { failed = 0, timedOut = 0 } = testMetadata.resultCounts ?? {};
+    return failed > 0 || timedOut > 0;
+  }
 }
 
 export function groupRecordings(recordings: Recording[]) {
@@ -34,45 +51,50 @@ export function groupRecordings(recordings: Recording[]) {
 
   const sortedRecordings = orderBy(recordings, "date", "desc");
 
-  const recordingsMap = sortedRecordings.reduce((acc, recording) => {
-    const file = recording.metadata?.test?.file;
-    if (!file) {
-      return acc;
+  const recordingsMap = sortedRecordings.reduce((accumulated, recording) => {
+    const testMetadata = recording.metadata?.test;
+    if (testMetadata == null) {
+      return accumulated;
     }
-    if (!acc[file]) {
-      acc[file] = [];
+
+    const filePath = getGroupedTestCasesFilePath(testMetadata);
+    if (!filePath) {
+      return accumulated;
     }
-    acc[file].push(recording);
-    return acc;
+    if (!accumulated[filePath]) {
+      accumulated[filePath] = [];
+    }
+    accumulated[filePath].push(recording);
+    return accumulated;
   }, {} as Record<string, Recording[]>);
 
-  for (const file in recordingsMap) {
-    const recordings = recordingsMap[file];
+  for (const filePath in recordingsMap) {
+    const recordings = recordingsMap[filePath];
 
     const didAnyTestPass = recordings.some(testPassed);
 
     for (const recording of recordings) {
       if (testPassed(recording)) {
-        if (passedRecordings.fileNameToRecordings[file]) {
-          passedRecordings.fileNameToRecordings[file].push(recording);
+        if (passedRecordings.fileNameToRecordings[filePath]) {
+          passedRecordings.fileNameToRecordings[filePath].push(recording);
         } else {
           passedRecordings.count++;
-          passedRecordings.fileNameToRecordings[file] = [recording];
+          passedRecordings.fileNameToRecordings[filePath] = [recording];
         }
       } else if (testFailed(recording)) {
         if (didAnyTestPass) {
-          if (flakyRecordings.fileNameToRecordings[file]) {
-            flakyRecordings.fileNameToRecordings[file].push(recording);
+          if (flakyRecordings.fileNameToRecordings[filePath]) {
+            flakyRecordings.fileNameToRecordings[filePath].push(recording);
           } else {
             flakyRecordings.count++;
-            flakyRecordings.fileNameToRecordings[file] = [recording];
+            flakyRecordings.fileNameToRecordings[filePath] = [recording];
           }
         } else {
-          if (failedRecordings.fileNameToRecordings[file]) {
-            failedRecordings.fileNameToRecordings[file].push(recording);
+          if (failedRecordings.fileNameToRecordings[filePath]) {
+            failedRecordings.fileNameToRecordings[filePath].push(recording);
           } else {
             failedRecordings.count++;
-            failedRecordings.fileNameToRecordings[file] = [recording];
+            failedRecordings.fileNameToRecordings[filePath] = [recording];
           }
         }
       }

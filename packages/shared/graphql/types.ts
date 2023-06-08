@@ -1,5 +1,7 @@
 import { ExecutionPoint } from "@replayio/protocol";
 
+import { AnyGroupedTestCases } from "shared/test-suites/RecordingTestMetadata";
+
 export enum Nag {
   ADD_COMMENT = "add_comment",
   ADD_COMMENT_TO_LINE = "add_comment_to_line",
@@ -249,50 +251,19 @@ export interface Recording {
 }
 
 export interface RecordingMetadata {
-  test?: TestMetadata;
+  test?: AnyGroupedTestCases;
   source?: SourceMetadata;
 }
 
 export type TestResult = "passed" | "failed" | "timedOut" | "skipped" | "unknown";
 
-// https://github.com/Replayio/replay-cli/blob/main/packages/replay/metadata/test.ts
-export type TestMetadata = {
-  result: TestResult;
-  title: string;
-  version: number;
-  tests?: TestItem[];
-  run?: { id: string; title?: string };
-  runner?: { name: string; version: string; plugin: string };
-  path?: string[];
-  file?: string;
-};
-
-export type TestItem = {
-  title: string;
-  relativePath?: string;
-  result: TestResult;
-  relativeStartTime?: number;
-  duration?: number;
-  steps?: TestStep[];
-  id?: string;
-
-  // Describes the path, or scope, of a test (the code in the it() block)
-  // which includes the runtime, file path, describe block(s), and the test title itself
-  //
-  // TODO Ideally this attribute would be split into more meaningful fields by the plug-in;
-  // as it is the TestMetadataCache has to do some weird processing to extract meaningful data from this array.
-  // https://discord.com/channels/779097926135054346/1093222080427868273/1093560145931419721
-  path?: string[];
-  error?: TestItemError;
-};
-
-export type TestItemError = {
-  message: string;
-  line?: number;
-  column?: number;
-};
-
-type TestEvents = "test:start" | "step:end" | "step:enqueue" | "step:start" | "event:navigation";
+type TestEvents =
+  | "event:navigation"
+  | "step:end"
+  | "step:enqueue"
+  | "step:start"
+  | "test:end"
+  | "test:start";
 
 export type CypressAnnotationMessage = {
   event: TestEvents;
@@ -307,36 +278,6 @@ export interface Annotation {
   time: number;
   message: CypressAnnotationMessage;
 }
-
-export type TestStepHook = "beforeAll" | "beforeEach" | "afterAll" | "afterEach";
-
-export type TestStep = {
-  args?: any[];
-  name: string;
-  duration: number;
-  relativeStartTime?: number;
-  id: string;
-  parentId?: string;
-  alias?: string;
-  error?: TestItemError;
-  hook?: TestStepHook;
-  commandId?: string;
-  assertIds?: string[];
-};
-
-export type AnnotatedTestStep = TestStep & {
-  absoluteStartTime: number;
-  absoluteEndTime: number;
-  index: number;
-  annotations: Annotations;
-  category?: string;
-};
-
-export type Annotations = {
-  start?: Annotation;
-  end?: Annotation;
-  enqueue?: Annotation;
-};
 
 // https://github.com/Replayio/replay-cli/blob/main/packages/replay/metadata/source.ts
 

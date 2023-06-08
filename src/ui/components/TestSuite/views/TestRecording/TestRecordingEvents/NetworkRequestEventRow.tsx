@@ -1,23 +1,24 @@
 import { memo } from "react";
 
+import { NetworkRequestEvent } from "shared/test-suites/RecordingTestMetadata";
 import { setSelectedPanel } from "ui/actions/layout";
-import { NetworkTestStep } from "ui/components/TestSuite/types";
 import { useAppDispatch } from "ui/setup/hooks";
 
-import styles from "./NetworkTestStepRow.module.css";
+import styles from "./NetworkRequestEventRow.module.css";
 
-export default memo(function NetworkTestStepRow({
-  networkTestStep,
+export default memo(function NetworkRequestEventRow({
+  networkRequestEvent,
 }: {
-  networkTestStep: NetworkTestStep;
+  networkRequestEvent: NetworkRequestEvent;
 }) {
-  const { method, status, url } = networkTestStep.data;
+  const { request, response } = networkRequestEvent.data;
+  const { method, url } = request;
 
   const dispatch = useAppDispatch();
 
   let statusBadge: string | null = null;
-  if (status != null) {
-    if (status >= 400) {
+  if (response != null) {
+    if (response.status >= 400) {
       statusBadge = "error";
     } else {
       statusBadge = "success";
@@ -39,9 +40,9 @@ export default memo(function NetworkTestStepRow({
           </>
         )}
         <span className={styles.Token}>{method}</span>{" "}
-        {status && (
+        {response && (
           <>
-            <span className={styles.Token}>{status}</span>{" "}
+            <span className={styles.Token}>{response.status}</span>{" "}
           </>
         )}
         <span className={styles.Token}>{pathname}</span>

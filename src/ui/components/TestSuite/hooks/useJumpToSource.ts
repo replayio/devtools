@@ -4,22 +4,27 @@ import { isPromiseLike } from "suspense";
 import { selectLocation } from "devtools/client/debugger/src/actions/sources";
 import { getContext } from "devtools/client/debugger/src/selectors";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { Annotations } from "shared/graphql/types";
+import {
+  GroupedTestCases,
+  TestEvent,
+  TestRecording,
+} from "shared/test-suites/RecordingTestMetadata";
 import { setViewMode } from "ui/actions/layout";
 import { seek } from "ui/actions/timeline";
 import { TestStepSourceLocationCache } from "ui/components/TestSuite/suspense/TestStepSourceLocationCache";
-import { ProcessedTestMetadata, ProcessedTestStep } from "ui/components/TestSuite/types";
 import { setSourcesUserActionPending } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { AwaitTimeout, awaitWithTimeout } from "ui/utils/awaitWithTimeout";
 
 export function useJumpToSource({
-  testMetadata,
-  testStep,
+  groupedTestCases,
+  testEvent,
+  testRecording,
   openSourceAutomatically = false,
 }: {
-  testMetadata: ProcessedTestMetadata;
-  testStep: ProcessedTestStep;
+  groupedTestCases: GroupedTestCases;
+  testEvent: TestEvent;
+  testRecording: TestRecording;
   openSourceAutomatically: boolean;
 }) {
   const replayClient = useContext(ReplayClientContext);
@@ -27,20 +32,16 @@ export function useJumpToSource({
   const dispatch = useAppDispatch();
   const context = useAppSelector(getContext);
 
-  let annotations: Annotations | undefined = undefined;
   let disabled = true;
   let name: string | undefined = undefined;
-  if (testStep.type === "step") {
-    const { runner } = testMetadata;
+  if (testEvent.type === "user-action") {
+    const { testRunner } = groupedTestCases.environment;
 
-    annotations = testStep.data.annotations;
-    name = testStep.data.name;
+    name = testEvent.data.command.name;
 
-    const cypressVersion = runner?.name === "cypress" ? runner?.version : undefined;
-    const isChaiAssertion = name === "assert" && !annotations.enqueue;
-    const annotation = isChaiAssertion ? annotations.start : annotations.enqueue;
+    const cypressVersion = testRunner.name === "cypress" ? testRunner.version : undefined;
 
-    disabled = !cypressVersion || !annotation;
+    disabled = !cypressVersion;
   }
 
   const onClick = async () => {
@@ -48,11 +49,11 @@ export function useJumpToSource({
       dispatch(setViewMode("dev"));
     }
 
-    if (testMetadata && testStep.type === "step") {
+    if (testRecording && testEvent.type === "user-action") {
       const locationPromise = TestStepSourceLocationCache.readAsync(
         replayClient,
-        testMetadata,
-        testStep
+        groupedTestCases,
+        testEvent
       );
 
       let location;
@@ -72,10 +73,9 @@ export function useJumpToSource({
         dispatch(selectLocation(context, location, openSourceAutomatically));
       }
 
-      if (testStep.metadata.range.beginPoint && testStep.metadata.range.beginTime) {
-        dispatch(
-          seek(testStep.metadata.range.beginPoint, testStep.metadata.range.beginTime, false)
-        );
+      const timeStampedPoint = testEvent.timeStampedPointRange.begin;
+      if (timeStampedPoint.point && timeStampedPoint.time) {
+        dispatch(seek(timeStampedPoint.point, timeStampedPoint.time, false));
       }
     }
 

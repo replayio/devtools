@@ -1,39 +1,39 @@
-import { useShowTestStepBoundary } from "ui/components/TestSuite/hooks/useShowTestStepBoundary";
-import { ProcessedTestStep } from "ui/components/TestSuite/types";
-import { getSelectedTestStep } from "ui/reducers/reporter";
-import { useAppSelector } from "ui/setup/hooks";
+import { useContext } from "react";
+
+import { UserActionEvent, isUserActionTestEvent } from "shared/test-suites/RecordingTestMetadata";
+import { useShowUserActionEventBoundary } from "ui/components/TestSuite/hooks/useShowUserActionEventBoundary";
+import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
 import styles from "./ToggleButton.module.css";
 
 export default function ToggleButton() {
-  const testStep = useAppSelector(getSelectedTestStep);
+  const { testEvent } = useContext(TestSuiteContext);
 
-  // Definitely don't show the toggle button for network or navigation steps,
-  // as we know these have a 0 duration.
-  if (testStep === null || testStep.type === "network" || testStep.type === "navigation") {
+  // Only show the hover button for user-action events
+  if (testEvent === null || !isUserActionTestEvent(testEvent)) {
     return null;
   }
 
-  // Now that we're confident in the data TS type, double-check in case any
-  // other test step somehow has a 0 duration
-  const { duration = 0 } = testStep.data;
-
-  if (duration === 0) {
+  const { timeStampedPointRange } = testEvent;
+  if (timeStampedPointRange.begin.point === timeStampedPointRange.end.point) {
     return null;
   }
 
-  return <ToggleButtonInner testStep={testStep} />;
+  return <ToggleButtonInner userActionEvent={testEvent} />;
 }
 
-function ToggleButtonInner({ testStep }: { testStep: ProcessedTestStep }) {
-  const { disabled: disabledShowAfter, onClick: onClickShowAfter } = useShowTestStepBoundary({
-    boundary: "after",
-    testStep,
-  });
-  const { disabled: disabledShowBefore, onClick: onClickShowBefore } = useShowTestStepBoundary({
-    boundary: "before",
-    testStep,
-  });
+function ToggleButtonInner({ userActionEvent }: { userActionEvent: UserActionEvent }) {
+  const { disabled: disabledShowAfter, onClick: onClickShowAfter } = useShowUserActionEventBoundary(
+    {
+      boundary: "after",
+      userActionEvent,
+    }
+  );
+  const { disabled: disabledShowBefore, onClick: onClickShowBefore } =
+    useShowUserActionEventBoundary({
+      boundary: "before",
+      userActionEvent,
+    });
 
   return (
     <div className={styles.ToggleWrapper}>
