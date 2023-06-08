@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from "react";
+import { ReactElement, useContext, useMemo, useState } from "react";
 
 import { Recording } from "shared/graphql/types";
 import Icon from "ui/components/shared/Icon";
@@ -42,7 +42,7 @@ function TestStatusGroup({
   return (
     <div className="flex flex-col">
       <div
-        className={` top-0 flex grow flex-row p-2 pl-4 font-medium hover:cursor-pointer ${styles.libraryRowHeader}`}
+        className={`top-0 flex grow flex-row p-2 pl-4 font-medium hover:cursor-pointer ${styles.libraryRowHeader}`}
         onClick={() => setExpanded(!expanded)}
       >
         <div className="grow">
@@ -58,21 +58,30 @@ function TestStatusGroup({
           />
         </div>
       </div>
-      {expanded && <Expanded label={label} recordingGroup={recordingGroup} />}
+      {expanded && <TestStatusGroupExpanded label={label} recordingGroup={recordingGroup} />}
     </div>
   );
 }
 
-function Expanded({ label, recordingGroup }: { label: string; recordingGroup: RecordingGroup }) {
-  const recordings = useMemo(() => {
-    const recordings: Recording[] = [];
-    for (let fileName in recordingGroup.fileNameToRecordings) {
-      recordings.push(...recordingGroup.fileNameToRecordings[fileName]);
-    }
-    return recordings;
-  }, [recordingGroup]);
-
-  return recordings.map(recording => (
-    <TestResultListItem key={recording.id} label={label} recording={recording} />
+function TestStatusGroupExpanded({
+  label,
+  recordingGroup,
+}: {
+  label: string;
+  recordingGroup: RecordingGroup;
+}) {
+  const entries = Array.from(Object.entries(recordingGroup.fileNameToRecordings));
+  return entries.map(([fileName, recordings]) => (
+    <TestFileGroup key={fileName} label={label} recordings={recordings} />
   )) as any;
+}
+
+function TestFileGroup({ label, recordings }: { label: string; recordings: Recording[] }) {
+  return (
+    <>
+      {recordings.map(recording => (
+        <TestResultListItem key={recording.id} label={label} recording={recording} />
+      ))}
+    </>
+  );
 }

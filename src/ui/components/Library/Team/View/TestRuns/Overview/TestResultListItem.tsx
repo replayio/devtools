@@ -14,7 +14,7 @@ function ViewReplay({ label, recordingId }: { label: string; recordingId: Record
   return (
     <Link
       href={`/recording/${recordingId}`}
-      className="group flex cursor-pointer items-center justify-center transition"
+      className="flex cursor-pointer items-center justify-center transition"
       onClick={e => e.stopPropagation()}
     >
       <MaterialIcon
@@ -40,31 +40,23 @@ function Title({ recording }: { recording: Recording }) {
     return null;
   }
 
-  let errorMessage;
   let filePath;
   let title;
   if (isGroupedTestCasesV1(testMetadata)) {
-    errorMessage = testMetadata.tests?.find(test => test.error)?.error?.message;
     filePath = testMetadata.file;
     title = testMetadata.title;
   } else if (isGroupedTestCasesV2(testMetadata)) {
-    errorMessage = testMetadata.tests.find(test => test.error)?.error?.message;
     filePath = testMetadata.source.path;
     title = testMetadata.source.title;
   } else {
-    errorMessage = testMetadata.testRecordings.find(testRecording => testRecording.error)?.error
-      ?.message;
     filePath = testMetadata.source.filePath;
     title = testMetadata.source.title;
   }
 
   return (
-    <div className="flex flex-grow flex-row items-center space-x-4 overflow-hidden hover:cursor-pointer">
-      <div className="flex flex-grow flex-col overflow-hidden">
-        {title}
-        <div className="text-xs text-bodySubColor">{filePath}</div>
-        {errorMessage ? <div className="text-xs text-bodySubColor">{errorMessage}</div> : null}
-      </div>
+    <div className="flex shrink grow flex-col truncate">
+      <div className="block truncate">{title}</div>
+      <div className="truncate truncate text-xs text-bodySubColor">{filePath}</div>
     </div>
   );
 }
@@ -86,19 +78,15 @@ export function TestResultListItem({ label, recording }: { label: string; record
   const recordingId = recording.id;
 
   return (
-    <div
-      className={`group flex grow flex-row items-center p-4 transition duration-150 ${styles.libraryRow}`}
+    <Link
+      href={`/recording/${recordingId}`}
+      className={`flex w-full flex-grow cursor-pointer flex-row items-center justify-center gap-2 truncate px-4 py-2 transition duration-150 ${styles.libraryRow}`}
+      target="_blank"
+      rel="noopener noreferrer"
     >
-      <Link
-        href={`/recording/${recordingId}`}
-        className="group flex flex-grow cursor-pointer items-center justify-center gap-4 transition"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <ViewReplay label={label} recordingId={recordingId} />
-        <Title recording={recording} />
-        <Comments recording={recording} />
-      </Link>
-    </div>
+      <ViewReplay label={label} recordingId={recordingId} />
+      <Title recording={recording} />
+      <Comments recording={recording} />
+    </Link>
   );
 }

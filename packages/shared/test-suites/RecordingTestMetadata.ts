@@ -469,6 +469,10 @@ export async function convertTestRecording(
         let viewSourceTimeStampedPoint: TimeStampedPoint | null = null;
 
         const isChaiAssertion = command.name === "assert";
+        console.groupCollapsed(`Test event ${id}`);
+        console.log(JSON.stringify(partialTestEvent, null, 2));
+        console.log(JSON.stringify(annotations, null, 2));
+        console.groupEnd();
 
         annotations.forEach(annotation => {
           switch (annotation.message.event) {
@@ -511,12 +515,14 @@ export async function convertTestRecording(
           }
         });
 
-        assert(beginPoint !== null, `Missing "step:start" annotation for test event`);
-        assert(endPoint !== null, `Missing "step:end" annotation for test event`);
-        assert(resultPoint !== null, `Missing "step:end" annotation for test event`);
+        assert(beginPoint !== null, `Missing "step:start" annotation for test event ${id}`);
+        assert(endPoint !== null, `Missing "step:end" annotation for test event ${id}`);
+        assert(resultPoint !== null, `Missing "step:end" annotation for test event ${id}`);
         assert(
           viewSourceTimeStampedPoint !== null,
-          `Missing ${isChaiAssertion ? "step:start" : "step:enqueue"} annotation for test event`
+          `Missing ${
+            isChaiAssertion ? "step:start" : "step:enqueue"
+          } annotation for test event ${id}`
         );
 
         testEvents.push({
