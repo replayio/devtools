@@ -214,8 +214,6 @@ export function createSocket(
         experimentalSettings.controllerKey = String(Date.now());
       }
 
-      const loadPoint = new URL(window.location.href).searchParams.get("point") || undefined;
-
       const queuedActions: Array<Action | UIThunkAction> = [];
       let flushTimeoutId: NodeJS.Timeout | null = null;
 
@@ -246,7 +244,7 @@ export function createSocket(
 
       const sessionId = await createSession(
         recordingId,
-        loadPoint,
+        undefined,
         experimentalSettings,
         focusRange,
         {
