@@ -81,7 +81,8 @@ export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
 
   // TODO [FE-1543] Frontend can't distinguish between "merged" and "closed"
   // This should be stored in the data by the backend, in response to the GitHub webhook
-  const branchStatus = mergeId != null ? "merged" : "open";
+  // TODO [FE-1567] Hack around invalid backend test run data ("false" instead of null)
+  const branchStatus = mergeId != null && mergeId !== "false" ? "merged" : "open";
 
   // TODO [FE-1543] Some data doesn't have a title, so use a fallback for now
   const titleWithFallback = commitTitle || mergeTitle || title || "Tests";
