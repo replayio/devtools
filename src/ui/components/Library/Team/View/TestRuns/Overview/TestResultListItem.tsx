@@ -2,7 +2,7 @@ import { RecordingId } from "@replayio/protocol";
 import Link from "next/link";
 
 import { Recording } from "shared/graphql/types";
-import { isIncrementalGroupedTestCases, isLegacyTestMetadata } from "shared/test-suites/types";
+import { isIncrementalGroupedTestCases, isLegacyGroupedTestCases } from "shared/test-suites/types";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import styles from "../../../../Library.module.css";
@@ -33,7 +33,7 @@ function ViewReplay({ label, recordingId }: { label: string; recordingId: Record
 
 function Title({ recording }: { recording: Recording }) {
   const testMetadata = recording.metadata?.test;
-  if (testMetadata == null || isLegacyTestMetadata(testMetadata)) {
+  if (testMetadata == null || isLegacyGroupedTestCases(testMetadata)) {
     return null;
   }
 

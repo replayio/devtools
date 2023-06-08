@@ -3,7 +3,7 @@ import { satisfies } from "compare-versions";
 
 import { GetTestsRun_node_Workspace_testRuns } from "shared/graphql/generated/GetTestsRun";
 import { GetTestsRunsForWorkspace_node_Workspace_testRuns } from "shared/graphql/generated/GetTestsRunsForWorkspace";
-import { LegacyTestMetadata, Recording } from "shared/graphql/types";
+import { Recording } from "shared/graphql/types";
 
 export type SemVer = string;
 
@@ -244,6 +244,45 @@ export type LegacyTestSuite =
   | GetTestsRun_node_Workspace_testRuns
   | GetTestsRunsForWorkspace_node_Workspace_testRuns;
 
+// Legacy types aren't supported anymore
+
+export type LegacyGroupedTestCases = {
+  file?: string;
+  path?: string[];
+  result: TestResult;
+  run?: { id: string; title?: string };
+  runner?: { name: string; version: string; plugin: string };
+  tests?: LegacyTestItem[];
+  title: string;
+  version: 1;
+};
+
+export type LegacyTestItem = {
+  duration?: number;
+  error?: any;
+  id?: string;
+  path?: string[];
+  relativePath?: string;
+  relativeStartTime?: number;
+  result: TestResult;
+  steps?: LegacyTestStep[];
+  title: string;
+};
+
+export type LegacyTestStep = {
+  alias?: string;
+  args?: any[];
+  assertIds?: string[];
+  commandId?: string;
+  error?: any;
+  duration: number;
+  hook?: "beforeAll" | "beforeEach" | "afterAll" | "afterEach";
+  id: string;
+  name: string;
+  parentId?: string;
+  relativeStartTime?: number;
+};
+
 // Type checkers
 
 export function isIncrementalTestRecording(
@@ -255,15 +294,15 @@ export function isIncrementalTestRecording(
 }
 
 export function isIncrementalGroupedTestCases(
-  value: LegacyTestMetadata | IncrementalGroupedTestCases | GroupedTestCases
+  value: LegacyGroupedTestCases | IncrementalGroupedTestCases | GroupedTestCases
 ): value is IncrementalGroupedTestCases {
   const schemaVersion = (value as any).schemaVersion;
   return schemaVersion != null && satisfies(schemaVersion, "~2.0.0");
 }
 
-export function isLegacyTestMetadata(
-  value: LegacyTestMetadata | IncrementalGroupedTestCases | GroupedTestCases
-): value is LegacyTestMetadata {
+export function isLegacyGroupedTestCases(
+  value: LegacyGroupedTestCases | IncrementalGroupedTestCases | GroupedTestCases
+): value is LegacyGroupedTestCases {
   const version = (value as any).version;
   return version != null && version === 1;
 }
@@ -293,7 +332,7 @@ export function isTestSuite(testSuite: LegacyTestSuite | TestSuite): testSuite i
 }
 
 export function isGroupedTestCases(
-  value: LegacyTestMetadata | IncrementalGroupedTestCases | GroupedTestCases
+  value: LegacyGroupedTestCases | IncrementalGroupedTestCases | GroupedTestCases
 ): value is GroupedTestCases {
   const schemaVersion = (value as any).schemaVersion;
   return schemaVersion != null && satisfies(schemaVersion, "~3.0.0");

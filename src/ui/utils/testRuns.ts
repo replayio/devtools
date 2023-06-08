@@ -1,7 +1,11 @@
 import orderBy from "lodash/orderBy";
 
 import { Recording } from "shared/graphql/types";
-import { isIncrementalGroupedTestCases, isLegacyTestMetadata } from "shared/test-suites/types";
+import {
+  isGroupedTestCases,
+  isIncrementalGroupedTestCases,
+  isLegacyGroupedTestCases,
+} from "shared/test-suites/types";
 
 export type RecordingGroup = {
   count: number;
@@ -10,8 +14,10 @@ export type RecordingGroup = {
 
 function testPassed(recording: Recording) {
   const testMetadata = recording.metadata?.test;
-  if (testMetadata == null || isLegacyTestMetadata(testMetadata)) {
+  if (testMetadata == null) {
     return false;
+  } else if (isLegacyGroupedTestCases(testMetadata)) {
+    return testMetadata.result === "passed";
   } else {
     const { passed = 0 } = testMetadata.resultCounts;
     return !testFailed(recording) && passed > 0;
@@ -20,8 +26,10 @@ function testPassed(recording: Recording) {
 
 function testFailed(recording: Recording) {
   const testMetadata = recording.metadata?.test;
-  if (testMetadata == null || isLegacyTestMetadata(testMetadata)) {
+  if (testMetadata == null) {
     return false;
+  } else if (isLegacyGroupedTestCases(testMetadata)) {
+    return testMetadata.result === "failed" || testMetadata.result === "timedOut";
   } else {
     const { failed = 0, timedOut = 0 } = testMetadata.resultCounts ?? {};
     return failed > 0 || timedOut > 0;
@@ -46,13 +54,15 @@ export function groupRecordings(recordings: Recording[]) {
 
   const recordingsMap = sortedRecordings.reduce((accumulated, recording) => {
     const testMetadata = recording.metadata?.test;
-    if (testMetadata == null || isLegacyTestMetadata(testMetadata)) {
+    if (testMetadata == null) {
       return accumulated;
     }
 
     const filePath = isIncrementalGroupedTestCases(testMetadata)
       ? testMetadata.source?.path
-      : testMetadata.source?.filePath;
+      : isGroupedTestCases(testMetadata)
+      ? testMetadata.source?.filePath
+      : testMetadata.file;
     if (!filePath) {
       return accumulated;
     }
