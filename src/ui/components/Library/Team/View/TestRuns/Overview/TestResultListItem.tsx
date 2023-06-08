@@ -36,14 +36,18 @@ function ViewReplay({ label, recordingId }: { label: string; recordingId: Record
 
 function Title({ recording }: { recording: Recording }) {
   const testMetadata = recording.metadata?.test;
-  if (testMetadata == null || isGroupedTestCasesV1(testMetadata)) {
+  if (testMetadata == null) {
     return null;
   }
 
   let errorMessage;
   let filePath;
   let title;
-  if (isGroupedTestCasesV2(testMetadata)) {
+  if (isGroupedTestCasesV1(testMetadata)) {
+    errorMessage = testMetadata.tests?.find(test => test.error)?.error?.message;
+    filePath = testMetadata.file;
+    title = testMetadata.title;
+  } else if (isGroupedTestCasesV2(testMetadata)) {
     errorMessage = testMetadata.tests.find(test => test.error)?.error?.message;
     filePath = testMetadata.source.path;
     title = testMetadata.source.title;
