@@ -9,6 +9,7 @@ import type {
   PauseData,
   PauseId,
   PointDescription,
+  Source,
   SourceId,
   SourceKind,
   TimeStampedPoint,
@@ -16,6 +17,7 @@ import type {
   Value,
   loadedRegions,
   newSource,
+  newSources,
 } from "@replayio/protocol";
 
 export const DEFAULT_SOURCE_ID = "fake-source-id";
@@ -126,6 +128,7 @@ export function createPointDescription({
 }
 
 export type SourceTuple = ["Debugger.newSource", newSource];
+export type SourcesTuple = ["Debugger.newSources", newSources];
 
 export function createSource({
   generatedSourceIds,
@@ -138,7 +141,7 @@ export function createSource({
   sourceId?: SourceId;
   url?: string;
 }): SourceTuple {
-  const value: newSource = {
+  const value: Source = {
     contentId: sourceId,
     generatedSourceIds,
     kind,

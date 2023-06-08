@@ -2,7 +2,7 @@ import {
   Location,
   MappedLocation,
   ContentType as ProtocolContentType,
-  newSource as ProtocolSource,
+  Source as ProtocolSource,
   SourceId as ProtocolSourceId,
   SourceKind as ProtocolSourceKind,
   SourceId,
@@ -74,7 +74,7 @@ function processSources(protocolSources: ProtocolSource[]): Source[] {
     protocolSources.map(source => [source.sourceId, source])
   );
   const corresponding = new ArrayMap<string, ProtocolSourceId>();
-  // the newSource objects link original to generated sources, here we collect the links in the other direction
+  // the ProtocolSource objects link original to generated sources, here we collect the links in the other direction
   const original = new ArrayMap<ProtocolSourceId, ProtocolSourceId>();
   // same as above, but only for the links from pretty-printed to minified sources
   const prettyPrinted = new Map<ProtocolSourceId, ProtocolSourceId>();
