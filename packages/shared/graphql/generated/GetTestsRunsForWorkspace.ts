@@ -15,6 +15,7 @@ export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_stats {
   __typename: "TestRunStats";
   passed: number | null;
   failed: number | null;
+  flaky: number | null;
 }
 
 export interface GetTestsRunsForWorkspace_node_Workspace_testRuns {

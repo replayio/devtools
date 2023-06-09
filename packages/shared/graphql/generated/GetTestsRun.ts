@@ -15,6 +15,7 @@ export interface GetTestsRun_node_Workspace_testRuns_stats {
   __typename: "TestRunStats";
   passed: number | null;
   failed: number | null;
+  flaky: number | null;
 }
 
 export interface GetTestsRun_node_Workspace_testRuns_recordings_edges_node_comments_user {

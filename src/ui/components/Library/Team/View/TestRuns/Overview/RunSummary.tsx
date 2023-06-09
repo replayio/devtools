@@ -118,7 +118,6 @@ function RunnerLink({ testSuite }: { testSuite: TestSuite }) {
 }
 
 export function RunSummary({ testSuite }: { testSuite: TestSuite }) {
-  console.log(testSuite);
   return (
     <div className="mb-2 flex flex-col space-y-2 border-b border-themeBorder p-4">
       <div className="flex flex-row justify-between">

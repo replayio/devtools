@@ -130,7 +130,7 @@ export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
     results: {
       counts: {
         failed: stats.failed,
-        flaky: 0, // TODO [FE-1543] Add this once it's available in GraphQL
+        flaky: stats.flaky ?? 0,
         passed: stats.passed,
       },
       recordings: sortedRecordings,
