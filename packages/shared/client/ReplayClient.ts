@@ -437,8 +437,8 @@ export class ReplayClient implements ReplayClientInterface {
     const newSourceListener = (source: Source) => {
       sources.push(source);
     };
-    const newSourcesListener = ({ sources }: newSources) => {
-      for (const source of sources) {
+    const newSourcesListener = ({ sources: sourcesList }: newSources) => {
+      for (const source of sourcesList) {
         sources.push(source);
       }
     };
