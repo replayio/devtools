@@ -110,7 +110,11 @@ export function TestSectionRow({
     >
       {child}
       {position === "current" && (
-        <button className={styles.DropDownButton} onClick={onContextMenu}>
+        <button
+          className={styles.DropDownButton}
+          onClick={onContextMenu}
+          data-test-name="TestSectionRowMenuButton"
+        >
           <Icon className={styles.Icon} type="dots" />
         </button>
       )}
