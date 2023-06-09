@@ -13,9 +13,9 @@ export interface GetTestsRun_node_Recording {
 
 export interface GetTestsRun_node_Workspace_testRuns_stats {
   __typename: "TestRunStats";
-  passed: number | null;
   failed: number | null;
   flaky: number | null;
+  passed: number | null;
 }
 
 export interface GetTestsRun_node_Workspace_testRuns_recordings_edges_node_comments_user {
@@ -56,10 +56,10 @@ export interface GetTestsRun_node_Workspace_testRuns {
   commitTitle: string | null;
   mergeId: string | null;
   mergeTitle: string | null;
-  user: string | null;
-  date: any | null;
   mode: string | null;
   repository: string | null;
+  user: string | null;
+  date: any | null;
   stats: GetTestsRun_node_Workspace_testRuns_stats | null;
   recordings: GetTestsRun_node_Workspace_testRuns_recordings | null;
 }
