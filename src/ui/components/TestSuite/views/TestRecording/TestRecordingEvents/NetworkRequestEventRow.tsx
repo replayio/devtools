@@ -2,6 +2,7 @@ import { memo } from "react";
 
 import { NetworkRequestEvent } from "shared/test-suites/RecordingTestMetadata";
 import { setSelectedPanel } from "ui/actions/layout";
+import { selectAndFetchRequest } from "ui/actions/network";
 import { useAppDispatch } from "ui/setup/hooks";
 
 import styles from "./NetworkRequestEventRow.module.css";
@@ -12,7 +13,7 @@ export default memo(function NetworkRequestEventRow({
   networkRequestEvent: NetworkRequestEvent;
 }) {
   const { request, response } = networkRequestEvent.data;
-  const { method, url } = request;
+  const { id, method, url } = request;
 
   const dispatch = useAppDispatch();
 
@@ -29,6 +30,7 @@ export default memo(function NetworkRequestEventRow({
 
   const showNetworkPanel = () => {
     dispatch(setSelectedPanel("network"));
+    dispatch(selectAndFetchRequest(id));
   };
 
   return (
