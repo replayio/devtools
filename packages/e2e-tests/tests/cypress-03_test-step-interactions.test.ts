@@ -39,7 +39,10 @@ test("cypress-03: Test Step interactions", async ({ page }) => {
   // can open tests
   await addTodosTest.click();
   const selectedRow = getSelectedTestCase(page);
-  expect(selectedRow).toHaveCount(1);
+  await waitFor(async () => {
+    expect(await selectedRow.isVisible()).toBe(true);
+    expect(selectedRow).toHaveCount(1);
+  });
 
   const steps = getTestCaseSteps(selectedRow);
 

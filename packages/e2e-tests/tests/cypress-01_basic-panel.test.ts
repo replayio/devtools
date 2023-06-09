@@ -81,7 +81,10 @@ test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
   // can open tests
   await firstTest.click();
   const selectedRow = getSelectedTestCase(page);
-  expect(selectedRow).toHaveCount(1);
+  await waitFor(async () => {
+    expect(await selectedRow.isVisible()).toBe(true);
+    expect(selectedRow).toHaveCount(1);
+  });
 
   // This recording has a "beforeEach" and a body,
   // but not "after" hooks

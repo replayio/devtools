@@ -51,7 +51,10 @@ test("cypress-02: Test Step timeline behavior", async ({ page }) => {
   // can open tests
   await firstTest.click();
   const selectedRow = getSelectedTestCase(page);
-  expect(selectedRow).toHaveCount(1);
+  await waitFor(async () => {
+    expect(await selectedRow.isVisible()).toBe(true);
+    expect(selectedRow).toHaveCount(1);
+  });
 
   const steps = getTestCaseSteps(selectedRow);
 
