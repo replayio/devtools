@@ -2,6 +2,7 @@ import assert from "assert";
 import {
   ExecutionPoint,
   RequestEvent,
+  RequestId,
   RequestOpenEvent,
   RequestResponseEvent,
   TimeStampedPoint,
@@ -251,6 +252,7 @@ export namespace RecordingTestMetadataV3 {
     // Data needed to render this event
     data: {
       request: {
+        id: RequestId;
         method: string;
         url: string;
       };
@@ -671,6 +673,7 @@ async function processNetworkData(
     return {
       data: {
         request: {
+          id: processedNetworkData.id,
           method: processedNetworkData.request.requestMethod,
           url: processedNetworkData.request.requestUrl,
         },
