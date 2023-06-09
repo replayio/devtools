@@ -72,16 +72,25 @@ function TestStatusGroupExpanded({
 }) {
   const entries = Array.from(Object.entries(recordingGroup.fileNameToRecordings));
   return entries.map(([fileName, recordings]) => (
-    <TestFileGroup key={fileName} label={label} recordings={recordings} />
+    <TestFileGroup key={fileName} fileName={fileName} label={label} recordings={recordings} />
   )) as any;
 }
 
-function TestFileGroup({ label, recordings }: { label: string; recordings: Recording[] }) {
-  return (
-    <>
-      {recordings.map(recording => (
-        <TestResultListItem key={recording.id} label={label} recording={recording} />
-      ))}
-    </>
-  );
+function TestFileGroup({
+  fileName,
+  label,
+  recordings,
+}: {
+  fileName: string;
+  label: string;
+  recordings: Recording[];
+}) {
+  return recordings.map((recording, index) => (
+    <TestResultListItem
+      key={recording.id}
+      label={label}
+      recording={recording}
+      secondaryBadgeCount={index > 0 ? index + 1 : null}
+    />
+  )) as any;
 }
