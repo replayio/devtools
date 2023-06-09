@@ -304,7 +304,7 @@ export async function convertGroupedTestCases(
   } else if (isGroupedTestCasesV2(groupedTestCases)) {
     const { source, tests: partialTestRecordings, ...rest } = groupedTestCases;
 
-    const annotations = await AnnotationsCache.readAsync();
+    const annotations = await AnnotationsCache.readAsync(replayClient);
 
     // Annotations for the entire recording (which may include more than one test)
     // we need to splice only the appropriate subset for each test.

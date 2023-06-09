@@ -47,6 +47,7 @@ export default memo(function UserActionEventRow({
 }) {
   const { command, error } = userActionEvent.data;
 
+  const client = useContext(ReplayClientContext);
   const { groupedTestCases, testRecording } = useContext(TestSuiteContext);
   assert(groupedTestCases != null);
   assert(testRecording != null);
@@ -55,7 +56,8 @@ export default memo(function UserActionEventRow({
   const executionPoint = useAppSelector(getExecutionPoint);
   const viewMode = useAppSelector(getViewMode);
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
-    eventListenersJumpLocationsCache
+    eventListenersJumpLocationsCache,
+    client
   );
 
   const [isHovered, setIsHovered] = useState(false);

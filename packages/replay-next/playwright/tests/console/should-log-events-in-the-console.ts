@@ -21,6 +21,11 @@ test("should log events in the console", async ({ page }, testInfo) => {
 
   const keyValue = listItem.locator("[data-test-name=KeyValue]", { hasText: "MouseEvent" });
   await keyValue.click();
+  // wait for the event properties to be loaded
+  await listItem
+    .locator('[data-test-name="ExpandableChildren"] [data-test-name="KeyValue"]')
+    .first()
+    .waitFor();
   await takeScreenshot(
     page,
     testInfo,

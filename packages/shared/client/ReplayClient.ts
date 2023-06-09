@@ -34,6 +34,7 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
   VariableMapping,
+  annotations,
   createPauseResult,
   findPointsResults,
   functionsMatches,
@@ -56,13 +57,18 @@ import uniqueId from "lodash/uniqueId";
 
 // eslint-disable-next-line no-restricted-imports
 import { addEventListener, client, initSocket, removeEventListener } from "protocol/socket";
-import { compareNumericStrings, defer, waitForTime } from "protocol/utils";
+import { assert, compareNumericStrings, defer, waitForTime } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { ProtocolError, commandError } from "shared/utils/error";
 import { isPointInRegion, isRangeInRegions } from "shared/utils/time";
 
-import { ReplayClientEvents, ReplayClientInterface, SourceLocationRange } from "./types";
+import {
+  AnnotationListener,
+  ReplayClientEvents,
+  ReplayClientInterface,
+  SourceLocationRange,
+} from "./types";
 
 export const MAX_POINTS_TO_FIND = 10_000;
 export const MAX_POINTS_TO_RUN_EVALUATION = 200;
@@ -87,12 +93,15 @@ export class ReplayClient implements ReplayClientInterface {
   private nextFindPointsId = 1;
   private nextRunEvaluationId = 1;
 
+  private annotationListeners = new Map<string, AnnotationListener>();
+
   constructor(dispatchURL: string) {
     this._dispatchURL = dispatchURL;
 
     this.waitForSession().then(sessionId => {
       client.Session.addLoadedRegionsListener(this._onLoadChanges);
       client.Session.listenForLoadChanges({}, sessionId);
+      client.Session.addAnnotationsListener(this.onAnnotations);
     });
   }
 
@@ -226,6 +235,13 @@ export class ReplayClient implements ReplayClientInterface {
     this.getFocusWindow();
 
     return sessionId;
+  }
+
+  async findAnnotations(kind: string, listener: AnnotationListener) {
+    const sessionId = this.getSessionIdThrows();
+    assert(!this.annotationListeners.has(kind), `Annotations of kind ${kind} requested twice`);
+    this.annotationListeners.set(kind, listener);
+    await client.Session.findAnnotations({ kind }, sessionId);
   }
 
   async findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void) {
@@ -944,6 +960,14 @@ export class ReplayClient implements ReplayClientInterface {
     this._loadedRegions = loadedRegions;
 
     this._dispatchEvent("loadedRegionsChange", loadedRegions);
+  };
+
+  private onAnnotations = (annotations: annotations) => {
+    for (const annotation of annotations.annotations) {
+      const listener = this.annotationListeners.get(annotation.kind);
+      assert(listener, `No listener for annotations of kind ${annotation.kind}`);
+      listener(annotation);
+    }
   };
 }
 

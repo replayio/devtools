@@ -1,29 +1,28 @@
-import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 import { insert } from "replay-next/src/utils/array";
 import { createSingleEntryCacheWithTelemetry } from "replay-next/src/utils/suspense";
+import { ReplayClientInterface } from "shared/client/types";
 import { Annotation } from "shared/graphql/types";
 
-export const AnnotationsCache = createSingleEntryCacheWithTelemetry<[], Annotation[]>({
+export const AnnotationsCache = createSingleEntryCacheWithTelemetry<
+  [client: ReplayClientInterface],
+  Annotation[]
+>({
   debugLabel: "AnnotationsCache",
-  load: async () => {
-    await ThreadFront.ensureAllSources();
-
+  load: async ([client]) => {
     const sortedAnnotations: Annotation[] = [];
 
-    await ThreadFront.getAnnotations(partialAnnotations => {
-      partialAnnotations.forEach(annotation => {
-        const processedAnnotation = {
-          point: annotation.point,
-          time: annotation.time,
-          message: parseContents(annotation.contents),
-        };
+    await client.findAnnotations("replay-cypress", annotation => {
+      const processedAnnotation = {
+        point: annotation.point,
+        time: annotation.time,
+        message: parseContents(annotation.contents),
+      };
 
-        insert(sortedAnnotations, processedAnnotation, (a, b) =>
-          compareNumericStrings(a.point, b.point)
-        );
-      });
-    }, "replay-cypress");
+      insert(sortedAnnotations, processedAnnotation, (a, b) =>
+        compareNumericStrings(a.point, b.point)
+      );
+    });
 
     return sortedAnnotations;
   },

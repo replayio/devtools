@@ -221,8 +221,8 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     // Precache annotations
     annotationKindsCache.prefetch(replayClient, REACT_ANNOTATIONS_KIND);
     annotationKindsCache.prefetch(replayClient, REDUX_ANNOTATIONS_KIND);
-    reactDevToolsAnnotationsCache.prefetch();
-    eventListenersJumpLocationsCache.prefetch();
+    reactDevToolsAnnotationsCache.prefetch(replayClient);
+    eventListenersJumpLocationsCache.prefetch(replayClient);
   });
 
   // Add protocol event listeners for things that the Redux store needs to stay in sync with.

@@ -4,6 +4,7 @@ import { memo, useContext, useMemo } from "react";
 import { useImperativeCacheValue } from "suspense";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { getFilteredEventsForFocusRegion } from "ui/actions/app";
 import { seek } from "ui/actions/timeline";
 import useEventsPreferences from "ui/components/Events/useEventsPreferences";
@@ -27,13 +28,15 @@ export function CurrentTimeLine({ isActive }: { isActive: boolean }) {
 const NO_ANNOTATIONS: ParsedJumpToCodeAnnotation[] = [];
 
 function Events() {
+  const client = useContext(ReplayClientContext);
   const dispatch = useAppDispatch();
   const currentTime = useAppSelector(getCurrentTime);
   const executionPoint = useAppSelector(getExecutionPoint);
   const events = useAppSelector(getFilteredEventsForFocusRegion);
 
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
-    eventListenersJumpLocationsCache
+    eventListenersJumpLocationsCache,
+    client
   );
 
   const { filters } = useEventsPreferences();
