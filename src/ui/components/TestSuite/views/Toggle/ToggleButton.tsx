@@ -15,7 +15,10 @@ export default function ToggleButton() {
   }
 
   const { timeStampedPointRange } = testEvent;
-  if (timeStampedPointRange.begin.point === timeStampedPointRange.end.point) {
+  if (
+    timeStampedPointRange == null ||
+    timeStampedPointRange.begin.point === timeStampedPointRange.end.point
+  ) {
     return null;
   }
 

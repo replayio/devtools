@@ -57,13 +57,15 @@ export function TestSuiteContextRoot({ children }: PropsWithChildren) {
       if (testRecording != null) {
         const { timeStampedPointRange } = testRecording;
 
-        await zoom([timeStampedPointRange.begin.time, timeStampedPointRange.end.time], {
-          bias: "begin",
-          debounce: false,
-          sync: true,
-        });
+        if (timeStampedPointRange !== null) {
+          await zoom([timeStampedPointRange.begin.time, timeStampedPointRange.end.time], {
+            bias: "begin",
+            debounce: false,
+            sync: true,
+          });
 
-        seekToTime(timeStampedPointRange.begin.time, timeStampedPointRange.begin.point, false);
+          seekToTime(timeStampedPointRange.begin.time, timeStampedPointRange.begin.point, false);
+        }
       }
     },
     [seekToTime, zoom]

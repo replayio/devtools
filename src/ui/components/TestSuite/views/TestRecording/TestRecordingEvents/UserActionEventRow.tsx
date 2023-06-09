@@ -45,7 +45,8 @@ export default memo(function UserActionEventRow({
   testSectionName: TestSectionName;
   userActionEvent: UserActionEvent;
 }) {
-  const { command, error } = userActionEvent.data;
+  const { data, timeStampedPointRange } = userActionEvent;
+  const { command, error, parentId, result } = data;
 
   const client = useContext(ReplayClientContext);
   const { groupedTestCases, testRecording } = useContext(TestSuiteContext);
@@ -94,13 +95,13 @@ export default memo(function UserActionEventRow({
   };
 
   const isCurrent = position === "current";
-  const showBadge = isCurrent && command.name === "get" && userActionEvent.data.result != null;
+  const showBadge = isCurrent && command.name === "get" && result != null;
   const showJumpToCode = (isHovered || isCurrent) && canShowJumpToCode;
 
   const jumpToCodeStatus: JumpToCodeStatus = !!jumpToCodeAnnotation ? "found" : "no_hits";
 
   const eventNumber = useMemo(() => {
-    if (userActionEvent.data.parentId !== null) {
+    if (parentId !== null) {
       return null;
     }
 
@@ -121,12 +122,12 @@ export default memo(function UserActionEventRow({
     }
 
     return null;
-  }, [testRecording, testSectionName, userActionEvent]);
+  }, [parentId, testRecording, testSectionName, userActionEvent]);
 
   return (
     <div
       className={styles.Row}
-      data-chained-event={userActionEvent.data.parentId !== null || undefined}
+      data-chained-event={parentId !== null || undefined}
       data-status={error ? "error" : "success"}
       onClick={jumpToTestSourceDisabled ? undefined : onClickJumpToTestSource}
       onMouseEnter={() => setIsHovered(true)}
@@ -153,18 +154,18 @@ export default memo(function UserActionEventRow({
         <Suspense fallback={<Loader />}>
           <Badge
             position={position}
-            timeStampedPoint={userActionEvent.data.result!.timeStampedPoint}
-            variable={userActionEvent.data.result!.variable}
+            timeStampedPoint={result!.timeStampedPoint}
+            variable={result!.variable}
           />
         </Suspense>
       )}
-      {showJumpToCode && (
+      {showJumpToCode && timeStampedPointRange !== null && (
         <div className={styles.JumpToCodeButton}>
           <JumpToCodeButton
             currentExecutionPoint={executionPoint}
             onClick={onJumpToClickEvent}
             status={jumpToCodeStatus}
-            targetExecutionPoint={userActionEvent.timeStampedPointRange.begin.point}
+            targetExecutionPoint={timeStampedPointRange.begin.point}
           />
         </div>
       )}
@@ -213,23 +214,26 @@ function findJumpToCodeDetailsIfAvailable(
     const { category, command } = data;
     const { name } = command;
 
-    // TODO This is very Cypress-specific. Playwright steps have a `name` like `locator.click("blah")`.
-    // We only care about click events and keyboard events. Keyboard events appear to be a "type" command,
-    // as in "type this text into the input".
-    canShowJumpToCode = category === "command" && ["click", "type"].includes(name);
+    if (timeStampedPointRange !== null) {
+      // TODO This is very Cypress-specific.
+      // Playwright steps have a `name` like `locator.click("blah")`.
+      // We only care about click events and keyboard events. Keyboard events appear to be a "type" command,
+      // as in "type this text into the input".
+      canShowJumpToCode = category === "command" && ["click", "type"].includes(name);
 
-    if (canShowJumpToCode) {
-      const eventKind =
-        cypressStepTypesToEventTypes[name as keyof typeof cypressStepTypesToEventTypes];
+      if (canShowJumpToCode) {
+        const eventKind =
+          cypressStepTypesToEventTypes[name as keyof typeof cypressStepTypesToEventTypes];
 
-      if (eventKind) {
-        jumpToCodeAnnotation = jumpToCodeAnnotations.find(a =>
-          isExecutionPointsWithinRange(
-            a.point,
-            timeStampedPointRange.begin.point,
-            timeStampedPointRange.end.point
-          )
-        );
+        if (eventKind) {
+          jumpToCodeAnnotation = jumpToCodeAnnotations.find(a =>
+            isExecutionPointsWithinRange(
+              a.point,
+              timeStampedPointRange.begin.point,
+              timeStampedPointRange.end.point
+            )
+          );
+        }
       }
     }
   }
