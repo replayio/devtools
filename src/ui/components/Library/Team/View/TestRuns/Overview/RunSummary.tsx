@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import Icon from "replay-next/components/Icon";
 import { TestSuite, TestSuiteMode } from "shared/test-suites/TestRun";
 import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
 
@@ -13,9 +14,12 @@ import { getDuration } from "../utils";
 
 function Title({ testSuite }: { testSuite: TestSuite }) {
   return (
-    <div className="flex flex-row items-center space-x-2 overflow-hidden">
+    <div className="flex flex-col overflow-hidden">
       <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-medium">
-        {testSuite.title}
+        {testSuite.primaryTitle}
+      </div>
+      <div className="text overflow-hidden overflow-ellipsis whitespace-nowrap font-medium text-bodySubColor">
+        {testSuite.secondaryTitle}
       </div>
     </div>
   );
@@ -44,7 +48,7 @@ export function ModeAttribute({ testSuite }: { testSuite: TestSuite }) {
 }
 
 export function Attributes({ testSuite }: { testSuite: TestSuite }) {
-  const { date, results, source, title } = testSuite;
+  const { date, results, source, primaryTitle: title } = testSuite;
   const { recordings } = results;
 
   const duration = getDuration(recordings);
@@ -71,6 +75,30 @@ export function Attributes({ testSuite }: { testSuite: TestSuite }) {
   }
 }
 
+function PullRequestLink({ testSuite }: { testSuite: TestSuite }) {
+  const { source } = testSuite;
+  if (!source) {
+    return null;
+  }
+
+  const { prNumber, repository } = source;
+  if (!prNumber || !repository) {
+    return null;
+  }
+
+  return (
+    <Link
+      href={`https://github.com/${repository}/pull/${prNumber}`}
+      target="_blank"
+      rel="noreferrer noopener"
+      className="flex flex-row items-center gap-1 hover:underline"
+    >
+      <Icon className="h-4 w-4" type="open" />
+      <span>PR {prNumber}</span>
+    </Link>
+  );
+}
+
 function RunnerLink({ testSuite }: { testSuite: TestSuite }) {
   if (!testSuite.source?.triggerUrl) {
     return null;
@@ -81,29 +109,28 @@ function RunnerLink({ testSuite }: { testSuite: TestSuite }) {
       href={testSuite.source.triggerUrl}
       target="_blank"
       rel="noreferrer noopener"
-      className="hover:underline"
+      className="flex flex-row items-center gap-1 hover:underline"
     >
-      <span>View run in GitHub</span>
+      <Icon className="h-4 w-4" type="open" />
+      <span>Workflow</span>
     </Link>
   );
 }
 
 export function RunSummary({ testSuite }: { testSuite: TestSuite }) {
-  const { title } = testSuite;
-
+  console.log(testSuite);
   return (
     <div className="mb-2 flex flex-col space-y-2 border-b border-themeBorder p-4">
       <div className="flex flex-row justify-between">
         <Title testSuite={testSuite} />
         <RunStats testSuite={testSuite} />
       </div>
-      <div className="flex flex-row items-center justify-between text-xs">
+      <div className="flex w-full flex-row items-center gap-4 text-xs">
         <Attributes testSuite={testSuite} />
+        <div className="grow" />
+        <PullRequestLink testSuite={testSuite} />
         <RunnerLink testSuite={testSuite} />
       </div>
-      {title ? (
-        <div className="flex flex-row items-center justify-between text-xs">{title}</div>
-      ) : null}
     </div>
   );
 }

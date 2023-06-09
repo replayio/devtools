@@ -37,6 +37,7 @@ export namespace TestRunV2 {
     date: string;
     id: string;
     mode: TestSuiteMode | null;
+    primaryTitle: string;
     results: {
       counts: {
         failed: number;
@@ -45,8 +46,8 @@ export namespace TestRunV2 {
       };
       recordings: Recording[];
     };
+    secondaryTitle: string | null;
     source: TestSuiteSourceMetadata | null;
-    title: string;
   }
 }
 
@@ -105,10 +106,7 @@ export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
   const prNumber = mergeId != null ? parseInt(mergeId) : null;
   const prTitle = mergeTitle ?? null;
 
-  // TODO [FE-1543] Some data doesn't have a title, so use a fallback for now
-  const titleWithFallback = commitTitle || mergeTitle || title || "Tests";
-  // TODO Title should be shown if available (primary title?)
-  // TODO Add secondary title
+  const titleWithFallback = commitTitle || mergeTitle || "Tests";
 
   let source: TestRunV2.TestSuiteSourceMetadata | null = null;
   if (branch && commitId && user) {
@@ -128,6 +126,7 @@ export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
     date,
     id,
     mode: mode ? (mode as TestRunV2.TestSuiteMode) : null,
+    primaryTitle: titleWithFallback,
     results: {
       counts: {
         failed: stats.failed,
@@ -136,8 +135,8 @@ export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
       },
       recordings: sortedRecordings,
     },
+    secondaryTitle: title,
     source,
-    title: titleWithFallback,
   };
 }
 
