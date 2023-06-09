@@ -1,4 +1,5 @@
 import {
+  Annotation,
   BreakpointId,
   ContentType,
   Result as EvaluationResult,
@@ -143,6 +144,8 @@ export interface SourceLocationRange {
   end: SourceLocation;
 }
 
+export type AnnotationListener = (annotation: Annotation) => void;
+
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;
   addEventListener(type: ReplayClientEvents, handler: Function): void;
@@ -155,6 +158,7 @@ export interface ReplayClientInterface {
     expression: string,
     frameId: FrameId | null
   ): Promise<EvaluationResult>;
+  findAnnotations(kind: string, listener: AnnotationListener): Promise<void>;
   findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void): Promise<void>;
   findMessages(onMessage?: (message: Message) => void): Promise<{
     messages: Message[];

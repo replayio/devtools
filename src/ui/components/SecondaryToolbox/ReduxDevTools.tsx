@@ -1,8 +1,9 @@
 import { ExecutionPoint } from "@replayio/protocol";
 import classnames from "classnames";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useImperativeCacheValue } from "suspense";
 
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { reduxDevToolsAnnotationsCache } from "ui/suspense/annotationsCaches";
 
 import { ReduxActionAnnotation } from "./redux-devtools/redux-annotations";
@@ -10,10 +11,12 @@ import { ReduxDevToolsContents } from "./redux-devtools/ReduxDevToolsContents";
 import styles from "./ReduxDevTools.module.css";
 
 export const ReduxDevToolsPanel = () => {
+  const client = useContext(ReplayClientContext);
   const [selectedPoint, setSelectedPoint] = useState<ExecutionPoint | null>(null);
 
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
-    reduxDevToolsAnnotationsCache
+    reduxDevToolsAnnotationsCache,
+    client
   );
 
   const reduxAnnotations: ReduxActionAnnotation[] =
