@@ -129,7 +129,7 @@ export type PointBehavior = {
   shouldLog: POINT_BEHAVIOR;
 };
 
-export type ReplayClientEvents = "loadedRegionsChange";
+export type ReplayClientEvents = "focusRangeChange" | "loadedRegionsChange";
 
 export type HitPointStatus =
   | "complete"
@@ -261,5 +261,4 @@ export interface ReplayClientInterface {
     }) => void,
     onSourceContentsChunk: ({ chunk, sourceId }: { chunk: string; sourceId: SourceId }) => void
   ): Promise<void>;
-  waitForTimeToBeLoaded(time: number): Promise<void>;
 }
