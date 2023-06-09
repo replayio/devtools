@@ -196,6 +196,8 @@ jobs:
           RECORD_REPLAY_METADATA_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           RECORD_REPLAY_TEST_METRICS: 1
+      - run: npx @replayio/replay ls --json --all
+        shell: bash
   mock-test:
     name: Mock Tests
     runs-on: macos-latest

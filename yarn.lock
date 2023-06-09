@@ -3979,9 +3979,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/playwright@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "@replayio/playwright@npm:1.0.0"
+"@replayio/playwright@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@replayio/playwright@npm:1.0.1"
   dependencies:
     "@replayio/replay": ^0.12.12
     "@replayio/test-utils": ^1.0.0
@@ -3990,7 +3990,7 @@ __metadata:
     "@playwright/test": 1.19.x
   bin:
     replayio-playwright: bin/replayio-playwright.js
-  checksum: c53e659106255134a3ff2b2420d438d261bc2e21b1214ba25369b572e7cfff24a0e03d777e35ca76f883d4fa95cb3037cdfd6b5869f9d8173dca4a3a5b9b6304
+  checksum: 06fe657d8cce1b5d309ee815dce107eaec808635418d1d0fdcbd7e4b678dc0e1dd8031b5a3af1a9b117a19ae6670d8896a842935ec2270eb2346591998e1e609
   languageName: node
   linkType: hard
 
@@ -13077,7 +13077,7 @@ __metadata:
     "@playwright/test": ^1.25.1
     "@recordreplay/playwright": ^1.18.3
     "@replayio/cypress": ^0.5.0
-    "@replayio/playwright": ^1.0.0
+    "@replayio/playwright": ^1.0.1
     chalk: ^4
     cli-spinners: ^2.7.0
     cypress: ^12.5.1
