@@ -42,21 +42,17 @@ export function TestResultListItem({
 
   label = label.toLowerCase();
 
-  let bgColor;
-  let bgColorHover;
+  let color;
   switch (label) {
     case "failed":
-      bgColor = "#EB5757";
-      bgColorHover = "red-500";
+      color = "#EB5757";
       break;
     case "flaky":
-      bgColor = "#FDBA00";
-      bgColorHover = "yellow-500";
+      color = "#FDBA00";
       break;
     case "passed":
     default:
-      bgColor = "#219653";
-      bgColorHover = "green-500";
+      color = "#219653";
       break;
   }
 
@@ -69,19 +65,11 @@ export function TestResultListItem({
     >
       <div className="flex flex-row items-center gap-1">
         {secondaryBadgeCount != null && <Icon className="ml-2 h-4 w-4" type="arrow-nested" />}
-        <Link
-          href={`/recording/${recording.id}`}
-          className=" flex cursor-pointer items-center justify-center transition"
-          onClick={e => e.stopPropagation()}
-        >
-          <MaterialIcon
-            iconSize="2xl"
-            outlined
-            className={`text-[${bgColor}] group-hover:text-[${bgColorHover}]`}
-          >
+        <div className=" flex cursor-pointer items-center justify-center transition">
+          <MaterialIcon iconSize="2xl" outlined style={{ color }}>
             {["passed", "flaky"].includes(label) ? "play_circle" : "play_circle_filled"}
           </MaterialIcon>
-        </Link>
+        </div>
       </div>
       <div className="flex shrink grow flex-col truncate">
         <div className="block truncate">{title || "Test"}</div>
