@@ -27,6 +27,10 @@ export function basicMessageHandlers(): MockHandlerRecord {
       h.emitEvent("Debugger.newSource", params);
       return {};
     },
+    "Debugger.newSources": (params: any, h: MockHandlerHelpers) => {
+      h.emitEvent("Debugger.newSources", params);
+      return {};
+    },
     "Graphics.findPaints": () => ({}),
     "Graphics.getDevicePixelRatio": () => ({ ratio: 1 }),
     "Graphics.getPlaybackVideo": () => ({}),

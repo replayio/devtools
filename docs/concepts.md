@@ -274,7 +274,7 @@ When a recording is opened, the frontend loads all javascript sources in that re
 
 The [`SourceKind`](https://static.replay.io/protocol/tot/Debugger/#type-SourceKind) specifies where a source came from.
 
-The [`newSource`](https://static.replay.io/protocol/tot/Debugger/#event-newSource) events from the backend include the list of generated sources for every original source. This information is used to pick the sources that are shown to the user: Replay always tries to show an original source and may offer a generated source as an alternate that the user can switch to using the toggle at the bottom of the editor.
+The [`newSources`](https://static.replay.io/protocol/tot/Debugger/#event-newSources) events from the backend include the list of generated sources for every original source. This information is used to pick the sources that are shown to the user: Replay always tries to show an original source and may offer a generated source as an alternate that the user can switch to using the toggle at the bottom of the editor.
 
 #### Managing Corresponding / Duplicate Sources
 

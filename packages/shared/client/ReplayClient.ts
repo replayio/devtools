@@ -29,7 +29,7 @@ import {
   ScreenShot,
   SearchSourceContentsMatch,
   SessionId,
-  newSource as Source,
+  Source,
   SourceId,
   TimeStampedPoint,
   TimeStampedPointRange,
@@ -44,6 +44,7 @@ import {
   getTopFrameResult,
   keyboardEvents,
   navigationEvents,
+  newSources,
   repaintGraphicsResult,
   requestBodyData,
   responseBodyData,
@@ -436,10 +437,17 @@ export class ReplayClient implements ReplayClientInterface {
     const newSourceListener = (source: Source) => {
       sources.push(source);
     };
+    const newSourcesListener = ({ sources }: newSources) => {
+      for (const source of sources) {
+        sources.push(source);
+      }
+    };
 
     client.Debugger.addNewSourceListener(newSourceListener);
+    client.Debugger.addNewSourcesListener(newSourcesListener);
     await client.Debugger.findSources({}, sessionId);
     client.Debugger.removeNewSourceListener(newSourceListener);
+    client.Debugger.removeNewSourcesListener(newSourcesListener);
 
     return sources;
   }
