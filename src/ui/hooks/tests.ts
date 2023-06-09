@@ -24,11 +24,14 @@ const GET_TEST_RUNS_FOR_WORKSPACE = gql`
           commitTitle
           mergeId
           mergeTitle
+          mode
+          repository
           user
           date
           stats {
-            passed
             failed
+            flaky
+            passed
           }
         }
       }
@@ -49,11 +52,14 @@ export const GET_TEST_RUN = gql`
           commitTitle
           mergeId
           mergeTitle
+          mode
+          repository
           user
           date
           stats {
-            passed
             failed
+            flaky
+            passed
           }
           recordings {
             edges {

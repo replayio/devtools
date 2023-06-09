@@ -2,11 +2,15 @@ import Link from "next/link";
 import { useContext } from "react";
 
 import { TestSuite } from "shared/test-suites/TestRun";
-import { BranchStatus } from "ui/components/Library/Team/View/TestRuns/BranchStatus";
+import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
+import { getDuration } from "ui/components/Library/Team/View/TestRuns/utils";
 import Icon from "ui/components/shared/Icon";
 
 import { TeamContext } from "../../TeamContextRoot";
-import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/RecordingListItem";
+import {
+  getDurationString,
+  getTruncatedRelativeDate,
+} from "../Recordings/RecordingListItem/RecordingListItem";
 import { AttributeContainer } from "./AttributeContainer";
 import { ModeAttribute } from "./Overview/RunSummary";
 import { RunStats } from "./RunStats";
@@ -14,7 +18,7 @@ import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "../../../Library.module.css";
 
 function Title({ testSuite }: { testSuite: TestSuite }) {
-  const title = testSuite.title;
+  const title = testSuite.primaryTitle;
 
   // TODO: This should be done in CSS.
   const formatted = title.length > 80 ? title.slice(0, 80) + "..." : title;
@@ -27,16 +31,25 @@ function Title({ testSuite }: { testSuite: TestSuite }) {
 }
 
 function Attributes({ testSuite }: { testSuite: TestSuite }) {
-  const { date, source, title } = testSuite;
+  const { date, results, source, primaryTitle } = testSuite;
+  const { recordings } = results;
 
   if (source) {
-    const { branchName, branchStatus, user } = source;
+    const { branchName, isPrimaryBranch, user } = source;
+
+    const duration = getDuration(recordings);
+    const durationString = getDurationString(duration);
 
     return (
       <div className="flex flex-row items-center gap-4 text-xs font-light">
         <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
         {user && <AttributeContainer icon="person">{user}</AttributeContainer>}
-        <BranchStatus branchName={branchName} branchStatus={branchStatus} title={title} />
+        <BranchIcon
+          branchName={branchName}
+          isPrimaryBranch={isPrimaryBranch}
+          title={primaryTitle}
+        />
+        <AttributeContainer icon="timer">{durationString}</AttributeContainer>
         <ModeAttribute testSuite={testSuite} />
       </div>
     );

@@ -469,6 +469,7 @@ export async function convertTestRecording(
         let viewSourceTimeStampedPoint: TimeStampedPoint | null = null;
 
         const isChaiAssertion = command.name === "assert";
+        // TODO [FE-1419] name === "assert" && !annotations.enqueue;
 
         annotations.forEach(annotation => {
           switch (annotation.message.event) {
@@ -483,13 +484,6 @@ export async function convertTestRecording(
                 time: annotation.time,
               };
               resultVariable = annotation.message.logVariable ?? null;
-
-              if (isChaiAssertion) {
-                viewSourceTimeStampedPoint = {
-                  point: annotation.point,
-                  time: annotation.time,
-                };
-              }
               break;
             }
             case "step:enqueue": {
@@ -506,17 +500,26 @@ export async function convertTestRecording(
                 point: annotation.point,
                 time: annotation.time,
               };
+
+              if (isChaiAssertion) {
+                viewSourceTimeStampedPoint = {
+                  point: annotation.point,
+                  time: annotation.time,
+                };
+              }
               break;
             }
           }
         });
 
-        assert(beginPoint !== null, `Missing "step:start" annotation for test event`);
-        assert(endPoint !== null, `Missing "step:end" annotation for test event`);
-        assert(resultPoint !== null, `Missing "step:end" annotation for test event`);
+        assert(beginPoint !== null, `Missing "step:start" annotation for test event ${id}`);
+        assert(endPoint !== null, `Missing "step:end" annotation for test event ${id}`);
+        assert(resultPoint !== null, `Missing "step:end" annotation for test event ${id}`);
         assert(
           viewSourceTimeStampedPoint !== null,
-          `Missing ${isChaiAssertion ? "step:start" : "step:enqueue"} annotation for test event`
+          `Missing ${
+            isChaiAssertion ? "step:start" : "step:enqueue"
+          } annotation for test event ${id}`
         );
 
         testEvents.push({
