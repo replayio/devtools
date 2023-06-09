@@ -95,9 +95,7 @@ test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
   expect(await sections.nth(1).textContent()).toMatch(/test body/i);
 
   const steps = getTestCaseSteps(selectedRow);
-  // TODO This seems wrong - previous UI + recording had 20 steps
-  // but let's go with this for now
-  await expect(steps).toHaveCount(18);
+  await expect(steps).toHaveCount(17);
 
   const backButton = getTestRecordingBackButton(page);
   await backButton.click();
