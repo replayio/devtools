@@ -1,4 +1,4 @@
-import { findIndex, findIndexBigInt, findIndexString, insert, insertString } from "./array";
+import { findIndex, findIndexBigInt, findIndexString, insert, insertString, slice } from "./array";
 
 describe("array utils", () => {
   describe("findIndex", () => {
@@ -87,6 +87,42 @@ describe("array utils", () => {
       expect(findIndexBigInt(bigints, "5000000000000000000000000000000000", false)).toBe(2);
       expect(findIndexBigInt(bigints, "13000000000000000000000000000000000", false)).toBe(4);
       expect(findIndexBigInt(bigints, "25000000000000000000000000000000000", false)).toBe(4);
+    });
+  });
+
+  describe("slice", () => {
+    const compare = (a: number, b: number) => {
+      return a - b;
+    };
+
+    it("should handle empty arrays", () => {
+      expect(slice([], 0, 5, compare)).toEqual([]);
+    });
+
+    it("should handle arrays with no values in range", () => {
+      expect(slice([1], 5, 7, compare)).toEqual([]);
+      expect(slice([9], 5, 7, compare)).toEqual([]);
+      expect(slice([1, 2], 5, 7, compare)).toEqual([]);
+      expect(slice([8, 9], 5, 7, compare)).toEqual([]);
+      expect(slice([1, 2, 3], 5, 7, compare)).toEqual([]);
+      expect(slice([7, 8, 9], 5, 6, compare)).toEqual([]);
+    });
+
+    it("should handle arrays with all values in range", () => {
+      expect(slice([4], 1, 10, compare)).toEqual([4]);
+      expect(slice([4, 6], 1, 10, compare)).toEqual([4, 6]);
+      expect(slice([4, 6, 7], 1, 10, compare)).toEqual([4, 6, 7]);
+    });
+
+    it("should handle arrays with partial values in range", () => {
+      expect(slice([1, 2], 0, 1, compare)).toEqual([1]);
+      expect(slice([4, 5], 5, 7, compare)).toEqual([5]);
+      expect(slice([1, 2, 3], 0, 1, compare)).toEqual([1]);
+      expect(slice([3, 4, 5], 5, 8, compare)).toEqual([5]);
+      expect(slice([1, 2, 3, 4, 5, 6, 7, 8, 9], 0, 3, compare)).toEqual([1, 2, 3]);
+      expect(slice([1, 2, 3, 4, 5, 6, 7, 8, 9], 5, 6, compare)).toEqual([5, 6]);
+      expect(slice([1, 2, 3, 4, 5, 6, 7, 8, 9], 5, 5, compare)).toEqual([5]);
+      expect(slice([1, 2, 3, 4, 5, 6, 7, 8, 9], 8, 15, compare)).toEqual([8, 9]);
     });
   });
 

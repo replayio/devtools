@@ -34,6 +34,7 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
   VariableMapping,
+  annotations,
   createPauseResult,
   findPointsResults,
   functionsMatches,
@@ -57,14 +58,18 @@ import uniqueId from "lodash/uniqueId";
 
 // eslint-disable-next-line no-restricted-imports
 import { addEventListener, client, initSocket, removeEventListener } from "protocol/socket";
-import { compareNumericStrings, defer, waitForTime } from "protocol/utils";
+import { assert, compareNumericStrings, defer, waitForTime } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
-import { areRangesEqual } from "replay-next/src/utils/time";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { ProtocolError, commandError } from "shared/utils/error";
-import { isPointInRegions, isRangeInRegions, isTimeInRegions } from "shared/utils/time";
+import { isPointInRegion, isRangeInRegions } from "shared/utils/time";
 
-import { ReplayClientEvents, ReplayClientInterface, SourceLocationRange } from "./types";
+import {
+  AnnotationListener,
+  ReplayClientEvents,
+  ReplayClientInterface,
+  SourceLocationRange,
+} from "./types";
 
 export const MAX_POINTS_TO_FIND = 10_000;
 export const MAX_POINTS_TO_RUN_EVALUATION = 200;
@@ -84,8 +89,12 @@ export class ReplayClient implements ReplayClientInterface {
 
   private sessionWaiter = defer<SessionId>();
 
+  private focusRange: TimeStampedPointRange | null = null;
+
   private nextFindPointsId = 1;
   private nextRunEvaluationId = 1;
+
+  private annotationListeners = new Map<string, AnnotationListener>();
 
   constructor(dispatchURL: string) {
     this._dispatchURL = dispatchURL;
@@ -93,6 +102,7 @@ export class ReplayClient implements ReplayClientInterface {
     this.waitForSession().then(sessionId => {
       client.Session.addLoadedRegionsListener(this._onLoadChanges);
       client.Session.listenForLoadChanges({}, sessionId);
+      client.Session.addAnnotationsListener(this.onAnnotations);
     });
   }
 
@@ -110,6 +120,7 @@ export class ReplayClient implements ReplayClientInterface {
   configure(sessionId: string): void {
     this._sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
+    this.getFocusWindow();
   }
 
   waitForSession() {
@@ -157,7 +168,7 @@ export class ReplayClient implements ReplayClientInterface {
   async createPause(executionPoint: ExecutionPoint): Promise<createPauseResult> {
     const sessionId = this.getSessionIdThrows();
 
-    await this._waitForPointToBeLoaded(executionPoint);
+    await this.waitForPointToBeInFocusRange(executionPoint);
 
     const response = await client.Session.createPause({ point: executionPoint }, sessionId);
 
@@ -222,8 +233,16 @@ export class ReplayClient implements ReplayClientInterface {
 
     this._sessionId = sessionId;
     this.sessionWaiter.resolve(sessionId);
+    this.getFocusWindow();
 
     return sessionId;
+  }
+
+  async findAnnotations(kind: string, listener: AnnotationListener) {
+    const sessionId = this.getSessionIdThrows();
+    assert(!this.annotationListeners.has(kind), `Annotations of kind ${kind} requested twice`);
+    this.annotationListeners.set(kind, listener);
+    await client.Session.findAnnotations({ kind }, sessionId);
   }
 
   async findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void) {
@@ -291,7 +310,7 @@ export class ReplayClient implements ReplayClientInterface {
     // but right now it will just silently return a subset of messages.
     // Given that we are extra careful here not to to fetch messages in unloaded regions
     // because the result might be invalid (and may get cached by a Suspense caller).
-    await this._waitForRangeToBeLoaded(pointRange);
+    await this.waitForRangeToBeInFocusRange(pointRange);
 
     const response = await client.Console.findMessagesInRange({ range: pointRange }, sessionId);
 
@@ -340,7 +359,7 @@ export class ReplayClient implements ReplayClientInterface {
       pointLimits.maxCount = MAX_POINTS_TO_FIND;
     }
 
-    await this._waitForRangeToBeLoaded(
+    await this.waitForRangeToBeInFocusRange(
       pointLimits.begin && pointLimits.end
         ? { begin: pointLimits.begin, end: pointLimits.end }
         : null
@@ -487,6 +506,8 @@ export class ReplayClient implements ReplayClientInterface {
   async getFocusWindow(): Promise<TimeStampedPointRange> {
     const sessionId = this.getSessionIdThrows();
     const { window } = await client.Session.getFocusWindow({}, sessionId);
+    this.focusRange = window;
+    this._dispatchEvent("focusRangeChange", window);
     return window;
   }
 
@@ -591,7 +612,7 @@ export class ReplayClient implements ReplayClientInterface {
     focusRange: PointRange | null
   ) {
     const sessionId = this.getSessionIdThrows();
-    await this._waitForRangeToBeLoaded(focusRange);
+    await this.waitForRangeToBeInFocusRange(focusRange);
     const { hits } = await client.Debugger.getHitCounts(
       { sourceId, locations, maxHits: TOO_MANY_POINTS_TO_FIND, range: focusRange || undefined },
       sessionId
@@ -631,7 +652,8 @@ export class ReplayClient implements ReplayClientInterface {
   async requestFocusRange(range: FocusWindowRequest): Promise<TimeStampedPointRange> {
     const sessionId = this.getSessionIdThrows();
     const { window } = await client.Session.requestFocusRange({ range }, sessionId);
-
+    this.focusRange = window;
+    this._dispatchEvent("focusRangeChange", window);
     return window;
   }
 
@@ -788,7 +810,7 @@ export class ReplayClient implements ReplayClientInterface {
       pointLimits.maxCount = MAX_POINTS_TO_RUN_EVALUATION;
     }
 
-    await this._waitForRangeToBeLoaded(
+    await this.waitForRangeToBeInFocusRange(
       pointLimits.begin && pointLimits.end
         ? { begin: pointLimits.begin, end: pointLimits.end }
         : null
@@ -885,75 +907,51 @@ export class ReplayClient implements ReplayClientInterface {
     }
   }
 
-  async _waitForPointToBeLoaded(point: ExecutionPoint): Promise<void> {
+  async waitForPointToBeInFocusRange(point: ExecutionPoint): Promise<void> {
     return new Promise(resolve => {
-      const checkLoaded = () => {
-        const loadedRegions = this.loadedRegions;
-        let isLoaded = false;
-        if (loadedRegions !== null) {
-          isLoaded = isPointInRegions(point, loadedRegions.loaded);
+      const checkFocusRange = () => {
+        let isInFocusRange = false;
+        if (this.focusRange !== null) {
+          isInFocusRange = isPointInRegion(point, this.focusRange);
         }
 
-        if (isLoaded) {
+        if (isInFocusRange) {
           resolve();
 
-          this.removeEventListener("loadedRegionsChange", checkLoaded);
+          this.removeEventListener("focusRangeChange", checkFocusRange);
         }
       };
 
-      this.addEventListener("loadedRegionsChange", checkLoaded);
+      this.addEventListener("focusRangeChange", checkFocusRange);
 
-      checkLoaded();
+      checkFocusRange();
     });
   }
 
-  async _waitForRangeToBeLoaded(
-    focusRange: TimeStampedPointRange | PointRange | null
+  async waitForRangeToBeInFocusRange(
+    range: TimeStampedPointRange | PointRange | null
   ): Promise<void> {
+    if (range === null) {
+      return Promise.resolve();
+    }
+
     return new Promise(resolve => {
-      const checkLoaded = () => {
-        const loadedRegions = this.loadedRegions;
-        let isLoaded = false;
-        if (loadedRegions !== null && loadedRegions.loading.length > 0) {
-          if (focusRange !== null) {
-            isLoaded = isRangeInRegions(focusRange, loadedRegions.indexed);
-          } else {
-            isLoaded = areRangesEqual(loadedRegions.indexed, loadedRegions.loading);
-          }
+      const checkFocusRange = () => {
+        let isInFocusRange = false;
+        if (this.focusRange !== null) {
+          isInFocusRange = isRangeInRegions(range, [this.focusRange]);
         }
 
-        if (isLoaded) {
+        if (isInFocusRange) {
           resolve();
 
-          this.removeEventListener("loadedRegionsChange", checkLoaded);
+          this.removeEventListener("focusRangeChange", checkFocusRange);
         }
       };
 
-      this.addEventListener("loadedRegionsChange", checkLoaded);
+      this.addEventListener("focusRangeChange", checkFocusRange);
 
-      checkLoaded();
-    });
-  }
-
-  async waitForTimeToBeLoaded(time: number): Promise<void> {
-    return new Promise(resolve => {
-      const checkLoaded = () => {
-        const loadedRegions = this.loadedRegions;
-        let isLoaded = false;
-        if (loadedRegions !== null) {
-          isLoaded = isTimeInRegions(time, loadedRegions.loaded);
-        }
-
-        if (isLoaded) {
-          resolve();
-
-          this.removeEventListener("loadedRegionsChange", checkLoaded);
-        }
-      };
-
-      this.addEventListener("loadedRegionsChange", checkLoaded);
-
-      checkLoaded();
+      checkFocusRange();
     });
   }
 
@@ -970,6 +968,14 @@ export class ReplayClient implements ReplayClientInterface {
     this._loadedRegions = loadedRegions;
 
     this._dispatchEvent("loadedRegionsChange", loadedRegions);
+  };
+
+  private onAnnotations = (annotations: annotations) => {
+    for (const annotation of annotations.annotations) {
+      const listener = this.annotationListeners.get(annotation.kind);
+      assert(listener, `No listener for annotations of kind ${annotation.kind}`);
+      listener(annotation);
+    }
   };
 }
 

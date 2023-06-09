@@ -1,4 +1,5 @@
 import {
+  Annotation,
   BreakpointId,
   ContentType,
   Result as EvaluationResult,
@@ -129,7 +130,7 @@ export type PointBehavior = {
   shouldLog: POINT_BEHAVIOR;
 };
 
-export type ReplayClientEvents = "loadedRegionsChange";
+export type ReplayClientEvents = "focusRangeChange" | "loadedRegionsChange";
 
 export type HitPointStatus =
   | "complete"
@@ -143,6 +144,8 @@ export interface SourceLocationRange {
   end: SourceLocation;
 }
 
+export type AnnotationListener = (annotation: Annotation) => void;
+
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;
   addEventListener(type: ReplayClientEvents, handler: Function): void;
@@ -155,6 +158,7 @@ export interface ReplayClientInterface {
     expression: string,
     frameId: FrameId | null
   ): Promise<EvaluationResult>;
+  findAnnotations(kind: string, listener: AnnotationListener): Promise<void>;
   findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void): Promise<void>;
   findMessages(onMessage?: (message: Message) => void): Promise<{
     messages: Message[];
@@ -261,5 +265,4 @@ export interface ReplayClientInterface {
     }) => void,
     onSourceContentsChunk: ({ chunk, sourceId }: { chunk: string; sourceId: SourceId }) => void
   ): Promise<void>;
-  waitForTimeToBeLoaded(time: number): Promise<void>;
 }

@@ -10,7 +10,8 @@
   background-color: var(--row-background-color);
   color: var(--row-color);
 }
-.Row:hover {
+.Row:hover,
+.Row[data-context-menu-active] {
   background-color: var(--row-background-color-hover);
 }
 .Row[data-is-pending] {
@@ -44,4 +45,22 @@
 .Row[data-position="before"],
 .Row[data-position="current"] {
   border-left-color: var(--border-left-color);
+}
+
+.DropDownButton {
+  flex: 0 0 0.5rem;
+  width: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.Icon {
+  height: 1rem;
+  width: 1rem;
+  flex: 0 0 auto;
 }

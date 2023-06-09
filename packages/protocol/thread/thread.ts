@@ -8,39 +8,22 @@
 // helps with adapting the devtools to the WRP.
 
 import {
-  Annotation,
   ExecutionPoint,
   Frame,
   FrameId,
-  loadedRegions as LoadedRegions,
-  PauseDescription,
   PauseId,
   RecordingId,
-  ScreenShot,
   SessionId,
-  SourceId,
-  SourceLocation,
-  TimeStamp,
   Value,
-  findAnnotationsResult,
 } from "@replayio/protocol";
-import groupBy from "lodash/groupBy";
 
 import { recordingCapabilitiesCache } from "replay-next/src/suspense/BuildIdCache";
 import { cachePauseData, pauseIdCache } from "replay-next/src/suspense/PauseCache";
 import { sourcesByIdCache } from "replay-next/src/suspense/SourcesCache";
-import { areRangesEqual } from "replay-next/src/utils/time";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { client } from "../socket";
 import { EventEmitter, assert, defer } from "../utils";
-
-export interface RecordingDescription {
-  duration: TimeStamp;
-  length?: number;
-  lastScreen?: ScreenShot;
-  commandLineArguments?: string[];
-}
 
 export interface Pause {
   point: ExecutionPoint;
@@ -54,31 +37,7 @@ export interface PauseEventArgs {
   openSource: boolean;
 }
 
-export interface ResumeOperationParams {
-  point?: ExecutionPoint;
-  loadedRegions: LoadedRegions;
-  sourceId?: SourceId;
-  locationsToSkip?: SourceLocation[];
-}
-
-interface FindTargetParameters {
-  point: ExecutionPoint;
-}
-interface FindTargetResult {
-  target: PauseDescription;
-}
-type FindTargetCommand = (
-  p: FindTargetParameters,
-  sessionId: SessionId
-) => Promise<FindTargetResult>;
-
 type ThreadFrontEvent = "paused" | "resumed";
-
-declare global {
-  interface Window {
-    Test?: any;
-  }
-}
 
 // Temporary experimental feature flag
 interface Features {
@@ -93,7 +52,6 @@ export function setFeatures(f: Features): void {
   features = f;
 }
 
-type LoadedRegionListener = (loadedRegions: LoadedRegions) => void;
 class _ThreadFront {
   currentPoint: ExecutionPoint = "0";
   currentTime: number = 0;
@@ -109,31 +67,11 @@ class _ThreadFront {
   // Waiter which resolves when all sources have been loaded.
   private allSourcesWaiter = defer<void>();
 
-  // Wait for all the annotations in the recording.
-  private annotationWaiters: Map<string, Promise<findAnnotationsResult>> = new Map();
-  private annotationCallbacks: Map<string, ((annotations: Annotation[]) => void)[]> = new Map();
-
   // added by EventEmitter.decorate(ThreadFront)
   eventListeners!: Map<ThreadFrontEvent, ((value?: any) => void)[]>;
   on!: (name: ThreadFrontEvent, handler: (value?: any) => void) => void;
   off!: (name: ThreadFrontEvent, handler: (value?: any) => void) => void;
   emit!: (name: ThreadFrontEvent, value?: any) => void;
-
-  constructor() {
-    client.Session.addAnnotationsListener(({ annotations }: { annotations: Annotation[] }) => {
-      const byKind = groupBy(annotations, "kind");
-      Object.keys(byKind).forEach(kind => {
-        const callbacks = this.annotationCallbacks.get(kind);
-        if (callbacks) {
-          callbacks.forEach(c => c(byKind[kind]));
-        }
-        const forAll = this.annotationCallbacks.get("all");
-        if (forAll) {
-          forAll.forEach(c => c(byKind[kind]));
-        }
-      });
-    });
-  }
 
   /**
    * This may be null if the pauseId for the current execution point hasn't been
@@ -164,36 +102,6 @@ class _ThreadFront {
 
   waitForSession() {
     return this.sessionWaiter.promise;
-  }
-
-  async getAnnotations(onAnnotations: (annotations: Annotation[]) => void, kind?: string) {
-    const sessionId = await this.waitForSession();
-    if (!kind) {
-      kind = "all";
-    }
-
-    if (!this.annotationCallbacks.has(kind)) {
-      this.annotationCallbacks.set(kind, [onAnnotations]);
-    } else {
-      this.annotationCallbacks.get(kind)!.push(onAnnotations);
-    }
-    if (kind) {
-      if (!this.annotationWaiters.has(kind)) {
-        this.annotationWaiters.set(
-          kind,
-          new Promise(async (resolve, reject) => {
-            try {
-              const rv: Annotation[] = [];
-              await client.Session.findAnnotations(kind === "all" ? {} : { kind }, sessionId);
-              resolve(rv);
-            } catch (e) {
-              reject(e);
-            }
-          })
-        );
-      }
-      return this.annotationWaiters.get(kind)!;
-    }
   }
 
   _accessToken: string | null = null;

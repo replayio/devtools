@@ -434,13 +434,15 @@ async function loadReactDevToolsInlineModuleFromProtocol(
 const nodePickerInstance = new NodePickerClass();
 
 export default function ReactDevtoolsPanel() {
+  const client = useContext(ReplayClientContext);
   const currentPoint = useAppSelector(getCurrentPoint);
   const loadedRegions = useAppSelector(getLoadedRegions);
   const pauseId = useAppSelector(state => state.pause.id);
   const [, dismissInspectComponentNag] = useNag(Nag.INSPECT_COMPONENT);
   const [protocolCheckFailed, setProtocolCheckFailed] = useState(false);
   const { status: annotationsStatus, value: parsedAnnotations } = useImperativeCacheValue(
-    reactDevToolsAnnotationsCache
+    reactDevToolsAnnotationsCache,
+    client
   );
 
   const dispatch = useAppDispatch();

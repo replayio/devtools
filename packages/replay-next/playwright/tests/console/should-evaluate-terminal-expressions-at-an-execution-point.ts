@@ -1,7 +1,7 @@
 import { test } from "@playwright/test";
 
 import { locateMessage, seekToMessage, toggleProtocolMessage } from "../utils/console";
-import { delay, takeScreenshot } from "../utils/general";
+import { takeScreenshot } from "../utils/general";
 import { beforeEach } from "./beforeEach";
 import { setup } from "./shared";
 
@@ -15,7 +15,7 @@ test("should evaluate terminal expressions at an execution point", async ({ page
   await seekToMessage(page, listItem);
 
   await page.fill("[data-test-id=ConsoleTerminalInput]", "location.hre");
-  await delay(500); // HACK Give the type-ahead data time to load
+  await page.waitForSelector('[data-test-id="ConsoleTerminalInput-CodeTypeAhead"]');
   await page.keyboard.press("Enter"); // Accept "href" suggestion
   await page.keyboard.press("Enter"); // Submit expression
 

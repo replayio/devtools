@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from "react";
+import { ReactElement, useContext, useMemo, useState } from "react";
 
 import { Recording } from "shared/graphql/types";
 import Icon from "ui/components/shared/Icon";
@@ -9,12 +9,12 @@ import { TestRunOverviewContext } from "./TestRunOverviewContainerContextType";
 import styles from "../../../../Library.module.css";
 
 export function RunResults() {
-  const testSuiteRun = useContext(TestRunOverviewContext).testSuiteRun!;
+  const testSuite = useContext(TestRunOverviewContext).testSuite!;
 
   // TODO Don't keep re-computing this; it's expensive
   const { passedRecordings, failedRecordings, flakyRecordings } = useMemo(
-    () => groupRecordings(testSuiteRun.results.recordings),
-    [testSuiteRun.results.recordings]
+    () => groupRecordings(testSuite.results.recordings),
+    [testSuite.results.recordings]
   );
 
   return (
@@ -42,7 +42,7 @@ function TestStatusGroup({
   return (
     <div className="flex flex-col">
       <div
-        className={` top-0 flex grow flex-row p-2 pl-4 font-medium hover:cursor-pointer ${styles.libraryRowHeader}`}
+        className={`top-0 flex grow flex-row p-2 pl-4 font-medium hover:cursor-pointer ${styles.libraryRowHeader}`}
         onClick={() => setExpanded(!expanded)}
       >
         <div className="grow">
@@ -58,21 +58,39 @@ function TestStatusGroup({
           />
         </div>
       </div>
-      {expanded && <Expanded label={label} recordingGroup={recordingGroup} />}
+      {expanded && <TestStatusGroupExpanded label={label} recordingGroup={recordingGroup} />}
     </div>
   );
 }
 
-function Expanded({ label, recordingGroup }: { label: string; recordingGroup: RecordingGroup }) {
-  const recordings = useMemo(() => {
-    const recordings: Recording[] = [];
-    for (let fileName in recordingGroup.fileNameToRecordings) {
-      recordings.push(...recordingGroup.fileNameToRecordings[fileName]);
-    }
-    return recordings;
-  }, [recordingGroup]);
+function TestStatusGroupExpanded({
+  label,
+  recordingGroup,
+}: {
+  label: string;
+  recordingGroup: RecordingGroup;
+}) {
+  const entries = Array.from(Object.entries(recordingGroup.fileNameToRecordings));
+  return entries.map(([fileName, recordings]) => (
+    <TestFileGroup key={fileName} fileName={fileName} label={label} recordings={recordings} />
+  )) as any;
+}
 
-  return recordings.map(recording => (
-    <TestResultListItem key={recording.id} label={label} recording={recording} />
+function TestFileGroup({
+  fileName,
+  label,
+  recordings,
+}: {
+  fileName: string;
+  label: string;
+  recordings: Recording[];
+}) {
+  return recordings.map((recording, index) => (
+    <TestResultListItem
+      key={recording.id}
+      label={label}
+      recording={recording}
+      secondaryBadgeCount={index > 0 ? index + 1 : null}
+    />
   )) as any;
 }

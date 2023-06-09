@@ -47,16 +47,16 @@ export const annotationKindsCache: Cache<
 });
 
 export const reactDevToolsAnnotationsCache = createSingleEntryCache<
-  [],
+  [client: ReplayClientInterface],
   ParsedReactDevToolsAnnotation[]
 >({
   debugLabel: "ReactDevToolsAnnotations",
-  load: async () => {
+  load: async ([client]) => {
     const receivedAnnotations: Annotation[] = [];
 
-    await ThreadFront.getAnnotations(annotations => {
-      receivedAnnotations.push(...annotations);
-    }, REACT_ANNOTATIONS_KIND);
+    await client.findAnnotations(REACT_ANNOTATIONS_KIND, annotation => {
+      receivedAnnotations.push(annotation);
+    });
 
     receivedAnnotations.sort((a1, a2) => compareNumericStrings(a1.point, a2.point));
 
@@ -72,14 +72,17 @@ export const reactDevToolsAnnotationsCache = createSingleEntryCache<
   },
 });
 
-export const reduxDevToolsAnnotationsCache = createSingleEntryCache<[], ReduxActionAnnotation[]>({
+export const reduxDevToolsAnnotationsCache = createSingleEntryCache<
+  [client: ReplayClientInterface],
+  ReduxActionAnnotation[]
+>({
   debugLabel: "ReduxDevToolsAnnotations",
-  load: async () => {
+  load: async ([client]) => {
     const receivedAnnotations: Annotation[] = [];
 
-    await ThreadFront.getAnnotations(annotations => {
-      receivedAnnotations.push(...annotations);
-    }, REDUX_ANNOTATIONS_KIND);
+    await client.findAnnotations(REDUX_ANNOTATIONS_KIND, annotation => {
+      receivedAnnotations.push(annotation);
+    });
 
     receivedAnnotations.sort((a1, a2) => compareNumericStrings(a1.point, a2.point));
 
@@ -90,16 +93,16 @@ export const reduxDevToolsAnnotationsCache = createSingleEntryCache<[], ReduxAct
 });
 
 export const eventListenersJumpLocationsCache = createSingleEntryCache<
-  [],
+  [client: ReplayClientInterface],
   ParsedJumpToCodeAnnotation[]
 >({
   debugLabel: "EventListenersJumpLocations",
-  load: async () => {
+  load: async ([client]) => {
     const receivedAnnotations: Annotation[] = [];
 
-    await ThreadFront.getAnnotations(annotations => {
-      receivedAnnotations.push(...annotations);
-    }, JUMP_ANNOTATION_KIND);
+    await client.findAnnotations(JUMP_ANNOTATION_KIND, annotation => {
+      receivedAnnotations.push(annotation);
+    });
 
     receivedAnnotations.sort((a1, a2) => compareNumericStrings(a1.point, a2.point));
 

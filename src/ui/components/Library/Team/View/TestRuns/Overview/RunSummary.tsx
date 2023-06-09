@@ -1,6 +1,8 @@
 import Link from "next/link";
 
-import { TestSuiteRun, TestSuiteRunMode } from "ui/hooks/tests";
+import Icon from "replay-next/components/Icon";
+import { TestSuite, TestSuiteMode } from "shared/test-suites/TestRun";
+import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
 
 import {
   getDurationString,
@@ -10,17 +12,20 @@ import { AttributeContainer } from "../AttributeContainer";
 import { RunStats } from "../RunStats";
 import { getDuration } from "../utils";
 
-function Title({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
+function Title({ testSuite }: { testSuite: TestSuite }) {
   return (
-    <div className="flex flex-row items-center space-x-2 overflow-hidden">
+    <div className="flex flex-col overflow-hidden">
       <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-medium">
-        {testSuiteRun.title}
+        {testSuite.primaryTitle}
+      </div>
+      <div className="text overflow-hidden overflow-ellipsis whitespace-nowrap font-medium text-bodySubColor">
+        {testSuite.secondaryTitle}
       </div>
     </div>
   );
 }
 
-function getModeIcon(mode: TestSuiteRunMode): string[] {
+function getModeIcon(mode: TestSuiteMode): string[] {
   switch (mode) {
     case "diagnostics":
       return ["biotech", "Diagnostic Mode"];
@@ -31,8 +36,8 @@ function getModeIcon(mode: TestSuiteRunMode): string[] {
   }
 }
 
-export function ModeAttribute({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
-  const { mode } = testSuiteRun;
+export function ModeAttribute({ testSuite }: { testSuite: TestSuite }) {
+  const { mode } = testSuite;
   if (!mode) {
     return null;
   }
@@ -42,75 +47,89 @@ export function ModeAttribute({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) 
   return <AttributeContainer icon={modeIcon}>{modeText}</AttributeContainer>;
 }
 
-export function Attributes({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
-  const { date, results, source, title } = testSuiteRun;
+export function Attributes({ testSuite }: { testSuite: TestSuite }) {
+  const { date, results, source, primaryTitle: title } = testSuite;
   const { recordings } = results;
 
   const duration = getDuration(recordings);
   const durationString = getDurationString(duration);
 
   if (source) {
-    const { branchName, branchStatus, user } = source;
+    const { branchName, isPrimaryBranch, user } = source;
 
     return (
-      <div className="flex flex-row flex-wrap items-center pl-1">
+      <div className="flex flex-row flex-wrap items-center gap-4 pl-1">
         <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
         {user ? <AttributeContainer icon="person">{user}</AttributeContainer> : null}
-        {branchStatus === "open" ? (
-          <AttributeContainer maxWidth="160px" icon="fork_right">
-            {branchName}
-          </AttributeContainer>
-        ) : (
-          <AttributeContainer title={title} icon="merge_type">
-            {branchStatus}
-          </AttributeContainer>
-        )}
+        <BranchIcon branchName={branchName} isPrimaryBranch={isPrimaryBranch} title={title} />
         <AttributeContainer icon="timer">{durationString}</AttributeContainer>
-        <ModeAttribute testSuiteRun={testSuiteRun} />
+        <ModeAttribute testSuite={testSuite} />
       </div>
     );
   } else {
     return (
-      <div className="flex flex-row flex-wrap items-center pl-1">
+      <div className="flex flex-row flex-wrap items-center gap-2 pl-1">
         <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
       </div>
     );
   }
 }
 
-function RunnerLink({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
-  if (!testSuiteRun.source?.triggerUrl) {
+function PullRequestLink({ testSuite }: { testSuite: TestSuite }) {
+  const { source } = testSuite;
+  if (!source) {
+    return null;
+  }
+
+  const { prNumber, repository } = source;
+  if (!prNumber || !repository) {
     return null;
   }
 
   return (
     <Link
-      href={testSuiteRun.source.triggerUrl}
+      href={`https://github.com/${repository}/pull/${prNumber}`}
       target="_blank"
       rel="noreferrer noopener"
-      className="hover:underline"
+      className="flex flex-row items-center gap-1 hover:underline"
     >
-      <span>View run in GitHub</span>
+      <Icon className="h-4 w-4" type="open" />
+      <span>PR {prNumber}</span>
     </Link>
   );
 }
 
-export function RunSummary({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
-  const { title } = testSuiteRun;
+function RunnerLink({ testSuite }: { testSuite: TestSuite }) {
+  if (!testSuite.source?.triggerUrl) {
+    return null;
+  }
 
+  return (
+    <Link
+      href={testSuite.source.triggerUrl}
+      target="_blank"
+      rel="noreferrer noopener"
+      className="flex flex-row items-center gap-1 hover:underline"
+    >
+      <Icon className="h-4 w-4" type="open" />
+      <span>Workflow</span>
+    </Link>
+  );
+}
+
+export function RunSummary({ testSuite }: { testSuite: TestSuite }) {
   return (
     <div className="mb-2 flex flex-col space-y-2 border-b border-themeBorder p-4">
       <div className="flex flex-row justify-between">
-        <Title testSuiteRun={testSuiteRun} />
-        <RunStats testSuiteRun={testSuiteRun} />
+        <Title testSuite={testSuite} />
+        <RunStats testSuite={testSuite} />
       </div>
-      <div className="flex flex-row items-center justify-between text-xs">
-        <Attributes testSuiteRun={testSuiteRun} />
-        <RunnerLink testSuiteRun={testSuiteRun} />
+      <div className="flex w-full flex-row items-center gap-4 text-xs">
+        <Attributes testSuite={testSuite} />
+        <div className="grow" />
+        <PullRequestLink testSuite={testSuite} />
+        <RunnerLink testSuite={testSuite} />
       </div>
-      {title ? (
-        <div className="flex flex-row items-center justify-between text-xs">{title}</div>
-      ) : null}
     </div>
   );
 }

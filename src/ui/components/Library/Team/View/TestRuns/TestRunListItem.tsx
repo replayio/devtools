@@ -1,19 +1,24 @@
 import Link from "next/link";
 import { useContext } from "react";
 
+import { TestSuite } from "shared/test-suites/TestRun";
+import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
+import { getDuration } from "ui/components/Library/Team/View/TestRuns/utils";
 import Icon from "ui/components/shared/Icon";
-import { TestSuiteRun } from "ui/hooks/tests";
 
 import { TeamContext } from "../../TeamContextRoot";
-import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/RecordingListItem";
+import {
+  getDurationString,
+  getTruncatedRelativeDate,
+} from "../Recordings/RecordingListItem/RecordingListItem";
 import { AttributeContainer } from "./AttributeContainer";
 import { ModeAttribute } from "./Overview/RunSummary";
 import { RunStats } from "./RunStats";
 import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "../../../Library.module.css";
 
-function Title({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
-  const title = testSuiteRun.title;
+function Title({ testSuite }: { testSuite: TestSuite }) {
+  const title = testSuite.primaryTitle;
 
   // TODO: This should be done in CSS.
   const formatted = title.length > 80 ? title.slice(0, 80) + "..." : title;
@@ -25,30 +30,32 @@ function Title({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
   );
 }
 
-function Attributes({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
-  const { date, source, title } = testSuiteRun;
+function Attributes({ testSuite }: { testSuite: TestSuite }) {
+  const { date, results, source, primaryTitle } = testSuite;
+  const { recordings } = results;
+
   if (source) {
-    const { branchName, branchStatus, user } = source;
+    const { branchName, isPrimaryBranch, user } = source;
+
+    const duration = getDuration(recordings);
+    const durationString = getDurationString(duration);
 
     return (
-      <div className="flex flex-row items-center text-xs font-light">
+      <div className="flex flex-row items-center gap-4 text-xs font-light">
         <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
-        <AttributeContainer icon="person">{user}</AttributeContainer>
-        {branchStatus === "open" ? (
-          <AttributeContainer maxWidth="160px" icon="fork_right">
-            {branchName}
-          </AttributeContainer>
-        ) : (
-          <AttributeContainer title={title} icon="merge_type">
-            {branchStatus}
-          </AttributeContainer>
-        )}
-        <ModeAttribute testSuiteRun={testSuiteRun} />
+        {user && <AttributeContainer icon="person">{user}</AttributeContainer>}
+        <BranchIcon
+          branchName={branchName}
+          isPrimaryBranch={isPrimaryBranch}
+          title={primaryTitle}
+        />
+        <AttributeContainer icon="timer">{durationString}</AttributeContainer>
+        <ModeAttribute testSuite={testSuite} />
       </div>
     );
   } else {
     return (
-      <div className="flex flex-row items-center text-xs font-light">
+      <div className="flex flex-row items-center gap-4 text-xs font-light">
         <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
       </div>
     );
@@ -65,17 +72,17 @@ function Status({ failCount }: { failCount: number }) {
   );
 }
 
-export function TestRunListItem({ testSuiteRun }: { testSuiteRun: TestSuiteRun }) {
+export function TestRunListItem({ testSuite }: { testSuite: TestSuite }) {
   const { focusId } = useContext(TestRunsContext);
   const { teamId } = useContext(TeamContext);
 
   // TODO Don't count flakes
-  const failCount = testSuiteRun.results.counts.failed;
-  const isSelected = focusId === testSuiteRun.id;
+  const failCount = testSuite.results.counts.failed;
+  const isSelected = focusId === testSuite.id;
 
   return (
     <Link
-      href={`/team/${teamId}/runs/${testSuiteRun.id}`}
+      href={`/team/${teamId}/runs/${testSuite.id}`}
       className={`flex h-full cursor-pointer flex-row items-center space-x-3 rounded-sm border-b border-chrome bg-themeBase-100 px-3 ${
         styles.libraryRow
       }
@@ -85,10 +92,10 @@ export function TestRunListItem({ testSuiteRun }: { testSuiteRun: TestSuiteRun }
       <Status failCount={failCount} />
       <div className="flex h-full flex-grow flex-col justify-evenly overflow-hidden">
         <div className="flex flex-row justify-between space-x-3">
-          <Title testSuiteRun={testSuiteRun} />
-          <RunStats testSuiteRun={testSuiteRun} />
+          <Title testSuite={testSuite} />
+          <RunStats testSuite={testSuite} />
         </div>
-        <Attributes testSuiteRun={testSuiteRun} />
+        <Attributes testSuite={testSuite} />
       </div>
     </Link>
   );

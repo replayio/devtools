@@ -42,7 +42,6 @@ import { selectors } from "ui/reducers";
 import app, { loadReceivedEvents, setVideoUrl } from "ui/reducers/app";
 import network from "ui/reducers/network";
 import protocolMessages from "ui/reducers/protocolMessages";
-import reporter from "ui/reducers/reporter";
 import timeline, {
   allPaintsReceived,
   paintsReceived,
@@ -163,7 +162,6 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   const reducers = {
     app,
     network,
-    reporter,
     timeline,
     protocolMessages: protocolMessages,
     ...debuggerReducers,
@@ -223,8 +221,8 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     // Precache annotations
     annotationKindsCache.prefetch(replayClient, REACT_ANNOTATIONS_KIND);
     annotationKindsCache.prefetch(replayClient, REDUX_ANNOTATIONS_KIND);
-    reactDevToolsAnnotationsCache.prefetch();
-    eventListenersJumpLocationsCache.prefetch();
+    reactDevToolsAnnotationsCache.prefetch(replayClient);
+    eventListenersJumpLocationsCache.prefetch(replayClient);
   });
 
   // Add protocol event listeners for things that the Redux store needs to stay in sync with.

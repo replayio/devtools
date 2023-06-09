@@ -1,15 +1,16 @@
 import { useRouter } from "next/router";
 import { ReactNode, createContext, useContext, useEffect } from "react";
 
+import { TestSuite } from "shared/test-suites/TestRun";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
-import { TestSuiteRun, useGetTestRunsForWorkspace } from "ui/hooks/tests";
+import { useGetTestRunsForWorkspace } from "ui/hooks/tests";
 
 import { TeamContext } from "../../TeamContextRoot";
 
 type TestRunsContextType = {
   focusId: string;
   loading: boolean;
-  testSuiteRuns: TestSuiteRun[];
+  testSuites: TestSuite[];
 };
 
 export const TestRunsContext = createContext<TestRunsContextType>(null as any);
@@ -18,17 +19,17 @@ export function TestRunsContainer({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { focusId } = useGetTeamRouteParams();
   const { teamId } = useContext(TeamContext);
-  const { loading, testSuiteRuns } = useGetTestRunsForWorkspace(teamId);
+  const { loading, testSuites } = useGetTestRunsForWorkspace(teamId);
 
   // Initialize the focused test run to the first/most recent test run in the list
   useEffect(() => {
-    if (testSuiteRuns.length > 0 && !focusId) {
-      router.push(`/team/${teamId}/runs/${testSuiteRuns[0].id}`);
+    if (testSuites.length > 0 && !focusId) {
+      router.push(`/team/${teamId}/runs/${testSuites[0].id}`);
     }
-  }, [router, testSuiteRuns, focusId, teamId]);
+  }, [router, testSuites, focusId, teamId]);
 
   return (
-    <TestRunsContext.Provider value={{ focusId, loading, testSuiteRuns }}>
+    <TestRunsContext.Provider value={{ focusId, loading, testSuites }}>
       {children}
     </TestRunsContext.Provider>
   );
