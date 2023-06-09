@@ -50,7 +50,11 @@ export default function Panel() {
       setTestEvent(testEvent);
 
       if (testEvent !== null) {
-        update(getTestEventTime(testEvent), getTestEventExecutionPoint(testEvent), false);
+        const executionPoint = getTestEventExecutionPoint(testEvent);
+        const time = getTestEventTime(testEvent);
+        if (executionPoint !== null && time !== null) {
+          update(time, executionPoint, false);
+        }
       }
     },
     [setTestEvent, update]

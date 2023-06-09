@@ -62,15 +62,21 @@ function PlayFromHereMenuItem({ testEvent }: { testEvent: TestEvent }) {
 
   const dispatch = useAppDispatch();
 
+  const beginPoint = getTestEventExecutionPoint(testEvent);
+  const endTimeStampedPoint = testRecording.timeStampedPointRange?.end ?? null;
+  if (beginPoint == null || endTimeStampedPoint == null) {
+    return null;
+  }
+
   const playFromHere = () => {
     setTestEvent(testEvent);
 
     dispatch(
       startPlayback({
-        beginPoint: getTestEventExecutionPoint(testEvent),
+        beginPoint,
         beginTime: getTestEventTime(testEvent),
-        endPoint: testRecording.timeStampedPointRange.end.point,
-        endTime: testRecording.timeStampedPointRange.end.time,
+        endPoint: endTimeStampedPoint.point,
+        endTime: endTimeStampedPoint.time,
       })
     );
   };
@@ -90,14 +96,20 @@ function PlayToHereMenuItem({ testEvent }: { testEvent: TestEvent }) {
 
   const dispatch = useAppDispatch();
 
+  const beginTimeStampedPoint = testRecording.timeStampedPointRange?.begin ?? null;
+  const endPoint = getTestEventExecutionPoint(testEvent);
+  if (beginTimeStampedPoint == null || endPoint == null) {
+    return null;
+  }
+
   const playToHere = async () => {
     setTestEvent(testEvent);
 
     dispatch(
       startPlayback({
-        beginPoint: testRecording.timeStampedPointRange.begin.point,
-        beginTime: testRecording.timeStampedPointRange.begin.time,
-        endPoint: getTestEventExecutionPoint(testEvent),
+        beginPoint: beginTimeStampedPoint.point,
+        beginTime: beginTimeStampedPoint.time,
+        endPoint,
         endTime: getTestEventTime(testEvent),
       })
     );

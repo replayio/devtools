@@ -1,3 +1,4 @@
+import assert from "assert";
 import { Location } from "@replayio/protocol";
 import { compare } from "compare-versions";
 
@@ -20,6 +21,8 @@ export const TestStepSourceLocationCache = createCacheWithTelemetry<
 
     if (runner === "cypress" && runnerVersion) {
       const { viewSourceTimeStampedPoint } = testEvent.data;
+      assert(viewSourceTimeStampedPoint !== null);
+
       const pauseId = await pauseIdCache.readAsync(
         client,
         viewSourceTimeStampedPoint.point,
