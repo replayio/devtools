@@ -5,7 +5,7 @@ import { Status } from "suspense";
 import { debugPrint, delay, getCommandKey, getElementCount, waitFor } from "./general";
 import { Expected, MessageType } from "./types";
 
-type ToggleName = "errors" | "exceptions" | "logs" | "node-modules" | "timestamps" | "warnings";
+type ToggleName = "errors" | "exceptions" | "logs" | "nodeModules" | "timestamps" | "warnings";
 
 export async function addTerminalExpression(page: Page, text: string): Promise<void> {
   await debugPrint(page, `Adding terminal expression "${chalk.bold(text)}"`, "addTerminalMessage");
@@ -239,7 +239,8 @@ export async function toggleProtocolMessage(page: Page, name: ToggleName, on: bo
   // Wait for Console to update with new filter value
   await waitFor(async () => {
     const messageList = page.locator('[data-test-name="Messages"]');
-    const value = await messageList.getAttribute(`data-test-state-${name}`);
+    const attributeName = name === "nodeModules" ? "node-modules" : name;
+    const value = await messageList.getAttribute(`data-test-state-${attributeName}`);
     if (on) {
       expect(value).not.toBeNull();
     } else {

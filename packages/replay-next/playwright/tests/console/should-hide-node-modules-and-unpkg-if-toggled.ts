@@ -10,11 +10,11 @@ beforeEach();
 test("should hide node_modules (and unpkg) if toggled", async ({ page }, testInfo) => {
   await setup(page, false);
   await toggleProtocolMessage(page, "warnings", true);
-  await toggleProtocolMessage(page, "node-modules", true);
+  await toggleProtocolMessage(page, "nodeModules", true);
 
   const list = page.locator("[data-test-name=Messages]");
   await takeScreenshot(page, testInfo, list, "filtered-all-warnings");
 
-  await toggleProtocolMessage(page, "node-modules", false);
+  await toggleProtocolMessage(page, "nodeModules", false);
   await takeScreenshot(page, testInfo, list, "filtered-all-warnings-no-node-modules");
 });
