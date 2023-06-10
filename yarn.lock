@@ -20065,6 +20065,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-error-boundary@npm:^4.0.10":
+  version: 4.0.10
+  resolution: "react-error-boundary@npm:4.0.10"
+  dependencies:
+    "@babel/runtime": ^7.12.5
+  peerDependencies:
+    react: ">=16.13.1"
+  checksum: 4ad4864d2a5fc2264a24d03e83176e6a70d7adbe3c1edbdc5b0bd452a695104bc59456e23b5aea1b9729220672fe46614221daa8b3bd59327968d4aa7eb8bc71
+  languageName: node
+  linkType: hard
+
 "react-inspector@npm:^5.1.0":
   version: 5.1.1
   resolution: "react-inspector@npm:5.1.1"
@@ -20192,13 +20203,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-resizable-panels@npm:^0.0.48":
-  version: 0.0.48
-  resolution: "react-resizable-panels@npm:0.0.48"
+"react-resizable-panels@npm:^0.0.50":
+  version: 0.0.50
+  resolution: "react-resizable-panels@npm:0.0.50"
   peerDependencies:
     react: ^16.14.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0
-  checksum: dbc4ef9ac6a1b74a95bb81185b6bffbf8f1f1ab544090383e766e065979258bdafcf4485bd5507a5fd247eb02e6d060bcc05765c0e12c0ff47c4800a2cc3d7bb
+  checksum: 8c871f9a34bc03b0f5076f9f8a28d3e1065193b4fa2676207909723141d7f0aceff8db1aad247320da9562a605fd40bccb9a1ee6fb221eedfb6d558c375fac41
   languageName: node
   linkType: hard
 
@@ -20604,13 +20615,14 @@ __metadata:
     react-devtools-inline: ^4.24.5
     react-devtools-inline_4_18_0: "npm:react-devtools-inline@4.18.0"
     react-dom: 0.0.0-experimental-49f741046-20230305
+    react-error-boundary: ^4.0.10
     react-is: ^18.2.0
     react-json-tree: ^0.18.0
     react-json-view: 1.21.3
     react-lazyload: ^3.2.0
     react-merge-refs: ^1.1.0
     react-redux: ^8.0.2
-    react-resizable-panels: ^0.0.48
+    react-resizable-panels: ^0.0.50
     react-table: ^7.7.0
     react-tooltip: ^4.5.1
     react-transition-group: ^4.4.2
