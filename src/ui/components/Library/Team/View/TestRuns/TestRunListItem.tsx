@@ -63,13 +63,21 @@ function Attributes({ testSuite }: { testSuite: TestSuite }) {
 }
 
 function Status({ failCount }: { failCount: number }) {
-  return (
-    <Icon
-      filename={failCount > 0 ? "testsuites-fail" : "testsuites-success"}
-      size="medium"
-      className={failCount > 0 ? "bg-[#EB5757]" : "bg-[#219653]"}
-    />
-  );
+  if (failCount > 0) {
+    return (
+      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[#EB5757] text-xs font-bold text-chrome">
+        {failCount}
+      </div>
+    );
+  } else {
+    return (
+      <Icon
+        filename={failCount > 0 ? "testsuites-fail" : "testsuites-success"}
+        size="medium"
+        className={failCount > 0 ? "bg-[#EB5757]" : "bg-[#219653]"}
+      />
+    );
+  }
 }
 
 export function TestRunListItem({ testSuite }: { testSuite: TestSuite }) {
