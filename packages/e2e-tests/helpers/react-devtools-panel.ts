@@ -31,7 +31,7 @@ export async function enableComponentPicker(page: Page) {
 
 export function getInspectedItem(page: Page, kind: "Props" | "Hooks", name: string) {
   return page.locator(
-    `[data-testname="InspectedElement${kind}Tree"] [class^=Item]:has([class^=Name]:text-is("${name}"))`
+    `[data-test-name="InspectedElement${kind}Tree"] [class^=Item]:has([class^=Name]:text-is("${name}"))`
   );
 }
 

@@ -109,7 +109,7 @@ function HeaderTitle({
 
   if (!canEditTitle) {
     return (
-      <span className={styles.ReadOnlyTitle} data-testid="Header-Title">
+      <span className={styles.ReadOnlyTitle} data-test-id="Header-Title">
         {displayTitle}
       </span>
     );
@@ -145,7 +145,7 @@ function HeaderTitle({
 
   return (
     <span
-      data-testid="Header-Title"
+      data-test-id="Header-Title"
       className={styles.EditableTitle}
       contentEditable
       onBlur={onBlur}

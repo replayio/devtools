@@ -55,7 +55,7 @@ export const RequestRow = ({
         onContextMenu={onContextMenu}
         ref={ref}
         tabIndex={0}
-        data-testid="NetworkMonitor-RequestTable-RequestRow"
+        data-test-id="NetworkMonitor-RequestTable-RequestRow"
       >
         <div {...rowProps}>
           {row.original.triggerPoint && row.original.triggerPoint.time !== currentTime && (

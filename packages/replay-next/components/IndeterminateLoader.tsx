@@ -10,7 +10,7 @@ export function IndeterminateProgressBar() {
 
 export default function IndeterminateLoader() {
   return (
-    <div className={styles.Loader} data-testid="indeterminate-loader">
+    <div className={styles.Loader} data-test-id="indeterminate-loader">
       <IndeterminateProgressBar />
       <div className={styles.LoadingLabel}>Loading...</div>
     </div>

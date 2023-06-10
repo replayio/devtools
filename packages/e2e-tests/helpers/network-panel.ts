@@ -21,7 +21,7 @@ export async function findNetworkRequestRow(
 
   await debugPrint(page, `Finding network request row`, "findNetworkRequestRow");
 
-  let selector = '[data-testid="NetworkMonitor-RequestTable-RequestRow"]';
+  let selector = '[data-test-id="NetworkMonitor-RequestTable-RequestRow"]';
   [domain, name, method, status, type].forEach(value => {
     if (value !== undefined) {
       selector += `:has-text("${value}")`;

@@ -44,7 +44,7 @@ function Nodes(props: MarkupProps & PropsFromRedux) {
   }
 
   return (
-    <ul aria-dropeffect="none" role="tree" tabIndex={0} ref={ref} data-testid="Inspector-Nodes">
+    <ul aria-dropeffect="none" role="tree" tabIndex={0} ref={ref} data-test-id="Inspector-Nodes">
       {node.children.map(nodeId => (
         <Node key={nodeId} nodeId={nodeId} />
       ))}

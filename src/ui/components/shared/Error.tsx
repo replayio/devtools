@@ -151,7 +151,7 @@ function Error({ error }: ErrorProps) {
   const { action, message, content } = error;
 
   return (
-    <div data-testid="Error">
+    <div data-test-id="Error">
       <Dialog showFooterLinks={true} showIllustration={true}>
         <DialogTitle>{message}</DialogTitle>
         {content && <DialogDescription>{content}</DialogDescription>}

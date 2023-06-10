@@ -27,7 +27,7 @@ export default function LoadingProgressBar({ initialProgress = 0 }) {
   return (
     <div
       className="loading-progress-bar z-10"
-      data-testid="loading-progress-bar"
+      data-test-id="loading-progress-bar"
       style={{ width: `${displayedProgress}%` }}
     />
   );
