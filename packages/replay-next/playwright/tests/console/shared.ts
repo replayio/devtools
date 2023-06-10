@@ -8,7 +8,7 @@ export async function setup(page: Page, toggleState: boolean | null = null) {
 
   if (typeof toggleState === "boolean") {
     await toggleProtocolMessages(page, toggleState);
-    await toggleProtocolMessage(page, "nodeModules", toggleState);
+    await toggleProtocolMessage(page, "node-modules", toggleState);
   }
 
   await toggleProtocolMessage(page, "timestamps", false);

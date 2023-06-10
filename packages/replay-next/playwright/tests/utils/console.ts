@@ -5,7 +5,7 @@ import { Status } from "suspense";
 import { debugPrint, delay, getCommandKey, getElementCount, waitFor } from "./general";
 import { Expected, MessageType } from "./types";
 
-type ToggleName = "errors" | "exceptions" | "logs" | "nodeModules" | "timestamps" | "warnings";
+type ToggleName = "errors" | "exceptions" | "logs" | "node-modules" | "timestamps" | "warnings";
 
 export async function addTerminalExpression(page: Page, text: string): Promise<void> {
   await debugPrint(page, `Adding terminal expression "${chalk.bold(text)}"`, "addTerminalMessage");

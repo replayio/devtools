@@ -12,7 +12,7 @@ test("should remember filter toggle preferences between reloads", async ({ page 
 
   // Toggle everything off and screenshot
   await toggleProtocolMessages(page, false);
-  await toggleProtocolMessage(page, "nodeModules", false);
+  await toggleProtocolMessage(page, "node-modules", false);
   await toggleProtocolMessage(page, "timestamps", false);
   let filters = page.locator("[data-test-id=ConsoleFilterToggles]");
   await takeScreenshot(page, testInfo, filters, "initial-side-filter-values");
@@ -24,7 +24,7 @@ test("should remember filter toggle preferences between reloads", async ({ page 
 
   // Toggle everything on and screenshot
   await toggleProtocolMessages(page, true);
-  await toggleProtocolMessage(page, "nodeModules", true);
+  await toggleProtocolMessage(page, "node-modules", true);
   await toggleProtocolMessage(page, "timestamps", true);
   await takeScreenshot(page, testInfo, filters, "updated-side-filter-values");
 
