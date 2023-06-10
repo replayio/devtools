@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 import { replayPlayback, startPlayback, stopPlayback } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -37,10 +39,18 @@ export default function PlayPauseButton() {
   }
 
   return (
-    <button className="relative" onClick={onClick}>
-      <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
-        <img className="m-auto h-6 w-6" src={icon} />
-      </div>
-    </button>
+    <div
+      className="mx-1.5 flex flex-row"
+      style={{ width: "32px", height: "32px" }}
+      onClick={onClick}
+    >
+      <motion.img
+        className="m-auto h-6 w-6 rounded-full hover:cursor-pointer"
+        src={icon}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 1.0, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
+        transition={{ duration: 0.05 }}
+      />
+    </div>
   );
 }

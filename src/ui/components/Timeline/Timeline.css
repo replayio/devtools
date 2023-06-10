@@ -36,7 +36,7 @@
 }
 
 .timeline > *:not(:last-child) {
-  margin-right: 8px;
+  margin-right: 4px;
 }
 
 .timeline .commands :focus:not(:focus-visible) {
