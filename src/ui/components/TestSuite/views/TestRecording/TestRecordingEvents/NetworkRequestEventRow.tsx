@@ -1,5 +1,6 @@
 import { memo } from "react";
 
+import { truncateMiddle } from "replay-next/src/utils/string";
 import { NetworkRequestEvent } from "shared/test-suites/RecordingTestMetadata";
 import { setSelectedPanel } from "ui/actions/layout";
 import { selectAndFetchRequest } from "ui/actions/network";
@@ -33,6 +34,8 @@ export default memo(function NetworkRequestEventRow({
     dispatch(selectAndFetchRequest(id));
   };
 
+  const formattedPathname = truncateMiddle(pathname, 150);
+
   return (
     <div className={styles.Indented} onClick={showNetworkPanel}>
       <div className={styles.Text}>
@@ -43,7 +46,7 @@ export default memo(function NetworkRequestEventRow({
             <span className={styles.Token}>{response.status}</span>{" "}
           </>
         )}
-        <span className={styles.Token}>{pathname}</span>
+        <span className={styles.Token}>{formattedPathname}</span>
       </div>
     </div>
   );
