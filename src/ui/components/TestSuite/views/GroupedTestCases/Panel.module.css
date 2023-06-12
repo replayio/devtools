@@ -65,3 +65,17 @@
   overflow: auto;
   gap: 0.5rem;
 }
+
+.Error {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--theme-border);
+  background-color: var(--background-color-warning);
+  color: var(--color-warning);
+}
+
+.ErrorLink {
+  text-decoration: underline;
+}
+.ErrorLink:hover {
+  text-decoration: none;
+}
