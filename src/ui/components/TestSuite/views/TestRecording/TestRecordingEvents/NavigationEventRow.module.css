@@ -3,6 +3,7 @@
 }
 .Text {
   flex: 1;
+  color: var(--color-dim);
 }
 
 .Name {
@@ -10,4 +11,5 @@
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-word;
+  color: var(--color-link);
 }

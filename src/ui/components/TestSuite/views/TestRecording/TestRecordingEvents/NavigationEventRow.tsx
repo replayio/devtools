@@ -12,7 +12,7 @@ export default memo(function NavigationEventRow({
   return (
     <div className={styles.Indented}>
       <div className={styles.Text}>
-        <span className={styles.Name}>{navigationEvent.data.url}</span>
+        Opened <span className={styles.Name}>{navigationEvent.data.url}</span>
       </div>
     </div>
   );
