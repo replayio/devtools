@@ -1,7 +1,8 @@
 import assert from "assert";
-import { useContext, useMemo } from "react";
+import { useContext, useEffect, useMemo } from "react";
 
 import { SessionContext } from "replay-next/src/contexts/SessionContext";
+import { GroupedTestCases, TestEnvironmentError } from "shared/test-suites/RecordingTestMetadata";
 import { getFormattedTime } from "shared/utils/time";
 import { getTruncatedRelativeDate } from "ui/components/Library/Team/View/Recordings/RecordingListItem/RecordingListItem";
 import LabeledIcon from "ui/components/TestSuite/components/LabeledIcon";
@@ -11,6 +12,7 @@ import { formatTitle } from "ui/components/TestSuite/utils/formatTitle";
 import { createTestTree } from "ui/components/TestSuite/views/GroupedTestCases/createTestTree";
 import { TestRecordingTree } from "ui/components/TestSuite/views/GroupedTestCases/TestRecordingTree";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
+import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 import styles from "./Panel.module.css";
 
@@ -19,7 +21,9 @@ export default function Panel() {
   const { groupedTestCases } = useContext(TestSuiteContext);
   assert(groupedTestCases != null);
 
-  const { approximateDuration, resultCounts, source, testRecordings } = groupedTestCases;
+  const { approximateDuration, environment, resultCounts, source, testRecordings } =
+    groupedTestCases;
+  const { errors } = environment;
   const { filePath, title } = source;
 
   const durationString = getFormattedTime(approximateDuration);
@@ -57,10 +61,34 @@ export default function Panel() {
           <LabeledIcon className={styles.Attribute} icon="timer" label={durationString} />
         </div>
       </div>
+      {errors.map((error, index) => (
+        <EnvironmentError error={error} key={index} />
+      ))}
       <div className={styles.TreeContainer}>
         <TestRecordingTree testTree={testTree} />
       </div>
     </>
+  );
+}
+
+function EnvironmentError({ error }: { error: TestEnvironmentError }) {
+  const { recordingId } = useContext(SessionContext);
+
+  useEffect(() => {
+    sendTelemetryEvent("TestSuites-environment-error", {
+      error,
+      recordingId,
+    });
+  }, [error, recordingId]);
+
+  return (
+    <div className={styles.Error}>
+      Something went wrong (error code <strong>{error.code}</strong>).{" "}
+      <a className={styles.ErrorLink} href="http://replay.io/discord" target="discord">
+        Contact us on Discord
+      </a>
+      .
+    </div>
   );
 }
 

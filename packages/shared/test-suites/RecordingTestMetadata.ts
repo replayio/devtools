@@ -115,6 +115,13 @@ export namespace RecordingTestMetadataV3 {
 
   export type TestSectionName = "afterAll" | "afterEach" | "beforeAll" | "beforeEach" | "main";
 
+  export type TestEnvironmentError = {
+    code: number;
+    detail: string | null;
+    name: string;
+    message: string;
+  };
+
   export interface GroupedTestCases {
     // Safe to use for display on Library page
     // Not accurate enough to use for setting focus region in DevTools
@@ -124,12 +131,7 @@ export namespace RecordingTestMetadataV3 {
     environment: {
       // Plug-in/integration errors (e.g. missing steps, no steps, mismatched annotations)
       // Empty array means there were no errors
-      errors: Array<{
-        code: number;
-        detail: string | null;
-        name: string;
-        message: string;
-      }>;
+      errors: Array<TestEnvironmentError>;
 
       pluginVersion: SemVer;
 
@@ -290,6 +292,7 @@ export type AnyTestRecording =
 
 // Export the latest version of types (for convenience)
 export type GroupedTestCases = RecordingTestMetadataV3.GroupedTestCases;
+export type TestEnvironmentError = RecordingTestMetadataV3.TestEnvironmentError;
 export type NavigationEvent = RecordingTestMetadataV3.NavigationEvent;
 export type NetworkRequestEvent = RecordingTestMetadataV3.NetworkRequestEvent;
 export type TestError = RecordingTestMetadataV3.TestError;
