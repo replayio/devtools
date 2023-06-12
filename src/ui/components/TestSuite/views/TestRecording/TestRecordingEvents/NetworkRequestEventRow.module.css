@@ -19,6 +19,9 @@
 .StatusBadge[data-status-badge="success"] {
   background-color: var(--testsuites-success-color);
 }
+.StatusBadge[data-status-badge="unresolved"] {
+  background-color: var(--testsuites-unresolved-color);
+}
 
 .Text {
   flex: 1;
