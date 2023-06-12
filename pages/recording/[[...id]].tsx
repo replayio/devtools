@@ -160,12 +160,14 @@ function RecordingPage({
 
       setRecording(rec);
 
-      if (rec.metadata?.test && !rec.workspace?.isTest) {
+      const isTestReplay = rec.metadata?.test && rec.metadata?.source;
+
+      if (isTestReplay && !rec.workspace?.isTest) {
         setExpectedError({
           content: "This recording is not available.",
           message: "The recording must belong to a test suite",
         });
-      } else if (!rec.metadata?.test && rec.workspace?.isTest) {
+      } else if (!isTestReplay && rec.workspace?.isTest) {
         setExpectedError({
           content: "This recording is not available.",
           message: "The recording cannot be in a test suite",
