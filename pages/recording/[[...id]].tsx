@@ -154,9 +154,27 @@ function RecordingPage({
     async function getRecording() {
       await setupDevtools(store, replayClient);
       const rec = await getAccessibleRecording(recordingId);
+      if (!rec) {
+        return;
+      }
+
       setRecording(rec);
 
-      if (rec?.metadata?.test) {
+      const isTestReplay = rec.metadata?.test && rec.metadata?.source;
+
+      if (isTestReplay && !rec.workspace?.isTest) {
+        setExpectedError({
+          content: "This recording is not available.",
+          message: "The recording must belong to a test suite",
+        });
+      } else if (!isTestReplay && rec.workspace?.isTest) {
+        setExpectedError({
+          content: "This recording is not available.",
+          message: "The recording cannot be in a test suite",
+        });
+      }
+
+      if (rec.metadata?.test) {
         trackEvent("session_start.test");
       }
 

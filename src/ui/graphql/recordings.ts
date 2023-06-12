@@ -76,6 +76,7 @@ export const GET_RECORDING = gql`
         id
         name
         hasPaymentMethod
+        isTest
         subscription {
           status
           trialEnds
