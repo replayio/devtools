@@ -1,4 +1,4 @@
-import { ReactNode, useContext, useTransition } from "react";
+import { ReactNode, useContext, useMemo, useTransition } from "react";
 
 import { comparePoints } from "protocol/execution-point-utils";
 import Icon from "replay-next/components/Icon";
@@ -26,7 +26,11 @@ export function TestSectionRow({
   testEvent: TestEvent;
   testSectionName: TestSectionName;
 }) {
-  const { testEvent: selectedTestEvent, setTestEvent } = useContext(TestSuiteContext);
+  const {
+    setTestEvent,
+    testEvent: selectedTestEvent,
+    testRecording,
+  } = useContext(TestSuiteContext);
 
   const dispatch = useAppDispatch();
 
@@ -34,20 +38,22 @@ export function TestSectionRow({
 
   const { contextMenu, onContextMenu } = useTestEventContextMenu(testEvent);
 
-  let position: Position = "after";
-  if (selectedTestEvent) {
-    if (selectedTestEvent === testEvent) {
-      position = "current";
-    } else {
-      position =
-        comparePoints(
-          getTestEventExecutionPoint(testEvent),
-          getTestEventExecutionPoint(selectedTestEvent)
-        ) <= 0
-          ? "before"
-          : "after";
+  const position = useMemo(() => {
+    let position: Position = "after";
+    if (selectedTestEvent) {
+      if (selectedTestEvent === testEvent) {
+        position = "current";
+      } else {
+        // Compare using indices rather than execution points
+        // because Playwright tests don't have annotations (or execution points)
+        const index = testRecording!.events[testSectionName].indexOf(testEvent);
+        const selectedIndex = testRecording!.events[testSectionName].indexOf(selectedTestEvent);
+        position = index < selectedIndex ? "before" : "after";
+      }
     }
-  }
+
+    return position;
+  }, [selectedTestEvent, testEvent, testRecording, testSectionName]);
 
   let child: ReactNode;
   let status;

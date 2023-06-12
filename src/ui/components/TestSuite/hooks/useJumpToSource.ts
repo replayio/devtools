@@ -8,6 +8,7 @@ import {
   GroupedTestCases,
   TestEvent,
   TestRecording,
+  isUserActionTestEvent,
 } from "shared/test-suites/RecordingTestMetadata";
 import { setViewMode } from "ui/actions/layout";
 import { seek } from "ui/actions/timeline";
@@ -49,7 +50,12 @@ export function useJumpToSource({
       dispatch(setViewMode("dev"));
     }
 
-    if (testRecording && testEvent.type === "user-action") {
+    if (testRecording && isUserActionTestEvent(testEvent)) {
+      const { timeStampedPointRange } = testEvent;
+      if (timeStampedPointRange === null) {
+        return;
+      }
+
       const locationPromise = TestStepSourceLocationCache.readAsync(
         replayClient,
         groupedTestCases,
@@ -73,7 +79,7 @@ export function useJumpToSource({
         dispatch(selectLocation(context, location, openSourceAutomatically));
       }
 
-      const timeStampedPoint = testEvent.timeStampedPointRange.begin;
+      const timeStampedPoint = timeStampedPointRange.begin;
       if (timeStampedPoint.point && timeStampedPoint.time) {
         dispatch(seek(timeStampedPoint.point, timeStampedPoint.time, false));
       }

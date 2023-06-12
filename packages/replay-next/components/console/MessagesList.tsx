@@ -195,11 +195,11 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
         className={styles.Container}
         data-test-state-errors={showErrors ? true : undefined}
         data-test-state-exceptions={showExceptions ? true : undefined}
-        data-test-state-filterByText={filterByText}
+        data-test-state-filter-by-text={filterByText}
         data-test-state-logs={showLogs ? true : undefined}
-        data-test-state-nodeModules={showNodeModules ? true : undefined}
-        data-test-state-searchByText={searchState.query}
-        data-test-state-cacheStreamingStatus={streamingStatus}
+        data-test-state-node-modules={showNodeModules ? true : undefined}
+        data-test-state-search-by-text={searchState.query}
+        data-test-state-cache-streaming-status={streamingStatus}
         data-test-state-timestamps={showTimestamps ? true : undefined}
         data-test-state-warnings={showWarnings ? true : undefined}
         data-test-name="Messages"

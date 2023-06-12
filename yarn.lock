@@ -3994,10 +3994,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/protocol@npm:^0.53.0":
-  version: 0.53.0
-  resolution: "@replayio/protocol@npm:0.53.0"
-  checksum: 37f4532b4d27f59b71bfd51b4005383db8a590ede5d8501d0b656fb66f2396ab4108065d8b6ac8e2bea0fe50d3d2a15a21e6237d57dbbd3095bc3ca11414b38a
+"@replayio/protocol@npm:^0.54.0":
+  version: 0.54.0
+  resolution: "@replayio/protocol@npm:0.54.0"
+  checksum: 595a235105492fe47d655c32a2d8318e9ae29e012985dc93ddcaf985dffbebdc26d8ddb0c9221667e2024afab26d429779af3113449dda287324a74d5e886441
   languageName: node
   linkType: hard
 
@@ -20111,6 +20111,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-error-boundary@npm:^4.0.10":
+  version: 4.0.10
+  resolution: "react-error-boundary@npm:4.0.10"
+  dependencies:
+    "@babel/runtime": ^7.12.5
+  peerDependencies:
+    react: ">=16.13.1"
+  checksum: 4ad4864d2a5fc2264a24d03e83176e6a70d7adbe3c1edbdc5b0bd452a695104bc59456e23b5aea1b9729220672fe46614221daa8b3bd59327968d4aa7eb8bc71
+  languageName: node
+  linkType: hard
+
 "react-inspector@npm:^5.1.0":
   version: 5.1.1
   resolution: "react-inspector@npm:5.1.1"
@@ -20238,13 +20249,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-resizable-panels@npm:^0.0.48":
-  version: 0.0.48
-  resolution: "react-resizable-panels@npm:0.0.48"
+"react-resizable-panels@npm:^0.0.50":
+  version: 0.0.50
+  resolution: "react-resizable-panels@npm:0.0.50"
   peerDependencies:
     react: ^16.14.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0
-  checksum: dbc4ef9ac6a1b74a95bb81185b6bffbf8f1f1ab544090383e766e065979258bdafcf4485bd5507a5fd247eb02e6d060bcc05765c0e12c0ff47c4800a2cc3d7bb
+  checksum: 8c871f9a34bc03b0f5076f9f8a28d3e1065193b4fa2676207909723141d7f0aceff8db1aad247320da9562a605fd40bccb9a1ee6fb221eedfb6d558c375fac41
   languageName: node
   linkType: hard
 
@@ -20529,7 +20540,7 @@ __metadata:
     "@recordreplay/sourcemap-upload-cli": ^0.1.1
     "@reduxjs/toolkit": ^1.8.4
     "@replayio/overboard": ^0.4.1
-    "@replayio/protocol": ^0.53.0
+    "@replayio/protocol": ^0.54.0
     "@replayio/replay": ^0.12.4
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0
@@ -20650,13 +20661,14 @@ __metadata:
     react-devtools-inline: ^4.24.5
     react-devtools-inline_4_18_0: "npm:react-devtools-inline@4.18.0"
     react-dom: 0.0.0-experimental-49f741046-20230305
+    react-error-boundary: ^4.0.10
     react-is: ^18.2.0
     react-json-tree: ^0.18.0
     react-json-view: 1.21.3
     react-lazyload: ^3.2.0
     react-merge-refs: ^1.1.0
     react-redux: ^8.0.2
-    react-resizable-panels: ^0.0.48
+    react-resizable-panels: ^0.0.50
     react-table: ^7.7.0
     react-tooltip: ^4.5.1
     react-transition-group: ^4.4.2
@@ -20674,7 +20686,7 @@ __metadata:
     style-loader: ^3.3.1
     stylelint: ^14.16.0
     stylelint-config-prettier: ^9.0.4
-    suspense: ^0.0.38
+    suspense: ^0.0.39
     tailwindcss: ^3.2.4
     ts-node: ^10.7.0
     tsconfig-paths: ^3.14.1
@@ -21009,7 +21021,7 @@ __metadata:
     "@lezer/common_replay_next": "npm:@lezer/common@1.0.1"
     "@lezer/highlight_replay_next": "npm:@lezer/highlight@1.1.1"
     "@playwright/test": ^1.23.1
-    "@replayio/protocol": ^0.53.0
+    "@replayio/protocol": ^0.54.0
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
     "@types/uuid": ^7.0.3
@@ -21030,7 +21042,7 @@ __metadata:
     react-dom: 0.0.0-experimental-e7d0053e6-20220325
     react-virtualized-auto-sizer: ^1.0.19
     shared: "workspace:*"
-    suspense: ^0.0.38
+    suspense: ^0.0.39
     typescript: 5.0.2
     use-context-menu: ^0.4.10
     uuid: ^7.0.3
@@ -22849,9 +22861,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"suspense@npm:^0.0.38":
-  version: 0.0.38
-  resolution: "suspense@npm:0.0.38"
+"suspense@npm:^0.0.39":
+  version: 0.0.39
+  resolution: "suspense@npm:0.0.39"
   dependencies:
     array-sorting-utilities: ^0.0.1
     interval-utilities: ^0.0.1
@@ -22860,7 +22872,7 @@ __metadata:
   peerDependencies:
     react: ^18.0.0
     react-dom: ^18.0.0
-  checksum: e11e6d4e2b5e2c62bfc9905f4fa0e52e5c4ed02cf8f2f81f558bc63b2c9e18eb356a3382acfb6499dcf03caf04bd76d4cc20011f6a5afb19fe300e1209aa8e7d
+  checksum: 9dabe251bf2b51a43a28f7979f60ed280be32141764270b50883453ad19ccddb2bd6d0d509aa5e9d738d9407aebf4011bb7b3ea17ebaf750a226463034d7aaaf
   languageName: node
   linkType: hard
 

@@ -1,4 +1,4 @@
-import { newSource } from "@replayio/protocol";
+import { Source } from "@replayio/protocol";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
@@ -54,19 +54,24 @@ async function loadSourceMap(
     }
     const { sessionId } = await client.Recording.createSession({ recordingId });
 
-    const sources: Map<string, newSource> = new Map();
-    client.Debugger.addNewSourceListener(newSource => {
-      sources.set(newSource.sourceId, newSource);
+    const sourcesMap: Map<string, Source> = new Map();
+    client.Debugger.addNewSourceListener(source => {
+      sourcesMap.set(source.sourceId, source);
+    });
+    client.Debugger.addNewSourcesListener(({ sources }) => {
+      for (const source of sources) {
+        sourcesMap.set(source.sourceId, source);
+      }
     });
     await client.Debugger.findSources({}, sessionId);
-    let originalSource = sources.get(sourceId);
+    let originalSource = sourcesMap.get(sourceId);
     let generatedSourceId = originalSource?.generatedSourceIds?.[0];
 
     if (!originalSource || !generatedSourceId) {
       return { error: "Source not found" };
     }
 
-    let generatedSource = sources.get(generatedSourceId)!;
+    let generatedSource = sourcesMap.get(generatedSourceId)!;
     assert(generatedSource, "referenced source should exist");
 
     // Traverse the source chain until we find the original source whose
@@ -77,7 +82,7 @@ async function loadSourceMap(
     while (generatedSource.generatedSourceIds?.length) {
       originalSource = generatedSource;
       generatedSourceId = originalSource.generatedSourceIds![0];
-      const newGeneratedSource = sources.get(generatedSourceId)!;
+      const newGeneratedSource = sourcesMap.get(generatedSourceId)!;
       assert(newGeneratedSource, "referenced source should exist");
       generatedSource = newGeneratedSource;
     }

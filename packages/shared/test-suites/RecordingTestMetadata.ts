@@ -2,6 +2,7 @@ import assert from "assert";
 import {
   ExecutionPoint,
   RequestEvent,
+  RequestId,
   RequestOpenEvent,
   RequestResponseEvent,
   TimeStampedPoint,
@@ -195,8 +196,8 @@ export namespace RecordingTestMetadataV3 {
     };
 
     // Defines the precise boundaries of the test run (including beforeEach and afterEach blocks);
-    // this value comes from annotation data
-    timeStampedPointRange: TimeStampedPointRange;
+    // this value comes from annotation data and so is only available for Cypress tests (for now)
+    timeStampedPointRange: TimeStampedPointRange | null;
   }
 
   export interface UserActionEvent {
@@ -217,6 +218,7 @@ export namespace RecordingTestMetadataV3 {
       // Used to associate chained commands
       parentId: string | null;
 
+      // This value comes from annotations and so is only avaiable for Cypress tests (for now)
       result: {
         timeStampedPoint: TimeStampedPoint;
         variable: string;
@@ -226,11 +228,13 @@ export namespace RecordingTestMetadataV3 {
       // for example, before/after actions have different scopes
       scope: string[] | null;
 
-      viewSourceTimeStampedPoint: TimeStampedPoint;
+      // This value comes from annotations and so is only avaiable for Cypress tests (for now)
+      viewSourceTimeStampedPoint: TimeStampedPoint | null;
     };
 
     // Precisely defines the start/stop execution points (and times) for the action
-    timeStampedPointRange: TimeStampedPointRange;
+    // This value comes from annotations and so is only avaiable for Cypress tests (for now)
+    timeStampedPointRange: TimeStampedPointRange | null;
 
     type: "user-action";
   }
@@ -251,6 +255,7 @@ export namespace RecordingTestMetadataV3 {
     // Data needed to render this event
     data: {
       request: {
+        id: RequestId;
         method: string;
         url: string;
       };
@@ -293,61 +298,7 @@ export type TestRecording = RecordingTestMetadataV3.TestRecording;
 export type TestSectionName = RecordingTestMetadataV3.TestSectionName;
 export type UserActionEvent = RecordingTestMetadataV3.UserActionEvent;
 
-export async function convertGroupedTestCases(
-  groupedTestCases:
-    | RecordingTestMetadataV2.GroupedTestCases
-    | RecordingTestMetadataV3.GroupedTestCases,
-  replayClient: ReplayClientInterface
-): Promise<RecordingTestMetadataV3.GroupedTestCases> {
-  if (isGroupedTestCasesV3(groupedTestCases)) {
-    return groupedTestCases;
-  } else if (isGroupedTestCasesV2(groupedTestCases)) {
-    const { source, tests: partialTestRecordings, ...rest } = groupedTestCases;
-
-    const annotations = await AnnotationsCache.readAsync(replayClient);
-
-    // Annotations for the entire recording (which may include more than one test)
-    // we need to splice only the appropriate subset for each test.
-    const annotationsByTest: Annotation[][] = annotations.reduce(
-      (accumulated: Annotation[][], annotation: Annotation) => {
-        if (annotation.message.event === "test:start") {
-          accumulated.push([annotation]);
-        } else {
-          accumulated[accumulated.length - 1].push(annotation);
-        }
-
-        return accumulated;
-      },
-      []
-    );
-
-    // GroupedTestCasesV2 and GroupedTestCases types are the same,
-    // except for annotation data inside of their recorded tests
-    let testRecordings: RecordingTestMetadataV3.TestRecording[] = [];
-    for (let index = 0; index < partialTestRecordings.length; index++) {
-      const legacyTest = partialTestRecordings[index];
-      const annotations = annotationsByTest[index];
-
-      const test = await convertTestRecording(legacyTest, annotations, replayClient);
-
-      testRecordings.push(test);
-    }
-
-    return {
-      ...rest,
-      source: {
-        filePath: source.path,
-        title: source.title,
-      },
-      testRecordings,
-    };
-  } else {
-    // This function does not support the legacy (v1) metadata format
-    throw Error(`Unsupported legacy data format`);
-  }
-}
-
-export async function convertTestRecording(
+export async function convertCypressTestRecording(
   testRecording: RecordingTestMetadataV2.TestRecording | RecordingTestMetadataV3.TestRecording,
   annotations: Annotation[],
   replayClient: ReplayClientInterface
@@ -374,6 +325,7 @@ export async function convertTestRecording(
     // (and also find the navigation and test start/end annotations)–
     // then we can iterate over the user-action events.
     const userActionEventIdToAnnotations: Record<string, Annotation[]> = {};
+
     for (let index = 0; index < annotations.length; index++) {
       const annotation = annotations[index];
       switch (annotation.message.event) {
@@ -557,7 +509,7 @@ export async function convertTestRecording(
       for (let index = sections.length - 1; index >= 0; index--) {
         const events = sections[index];
         const firstEvent = events[0];
-        if (firstEvent && comparePoints(getTestEventExecutionPoint(firstEvent), point) <= 0) {
+        if (firstEvent && comparePoints(getTestEventExecutionPoint(firstEvent)!, point) <= 0) {
           return events;
         }
       }
@@ -570,13 +522,13 @@ export async function convertTestRecording(
     navigationEvents.forEach(navigationEvent => {
       const events = findSection(navigationEvent.timeStampedPoint.point);
       insert(events, navigationEvent, (a, b) =>
-        comparePoints(getTestEventExecutionPoint(a), getTestEventExecutionPoint(b))
+        comparePoints(getTestEventExecutionPoint(a)!, getTestEventExecutionPoint(b)!)
       );
     });
     networkRequestEvents.forEach(networkRequestEvent => {
       const events = findSection(networkRequestEvent.timeStampedPoint.point);
       insert(events, networkRequestEvent, (a, b) =>
-        comparePoints(getTestEventExecutionPoint(a), getTestEventExecutionPoint(b))
+        comparePoints(getTestEventExecutionPoint(a)!, getTestEventExecutionPoint(b)!)
       );
     });
 
@@ -589,6 +541,163 @@ export async function convertTestRecording(
         begin: beginPoint,
         end: endPoint,
       },
+    };
+  } else if (isTestRecordingV3(testRecording)) {
+    return testRecording;
+  } else {
+    // This function does not support the legacy TestItem format
+    throw Error(`Unsupported legacy TestItem value`);
+  }
+}
+
+export async function convertGroupedTestCases(
+  groupedTestCases:
+    | RecordingTestMetadataV2.GroupedTestCases
+    | RecordingTestMetadataV3.GroupedTestCases,
+  replayClient: ReplayClientInterface
+): Promise<RecordingTestMetadataV3.GroupedTestCases> {
+  if (isGroupedTestCasesV3(groupedTestCases)) {
+    return groupedTestCases;
+  } else if (isGroupedTestCasesV2(groupedTestCases)) {
+    const { environment, source, tests: partialTestRecordings, ...rest } = groupedTestCases;
+    switch (environment.testRunner.name) {
+      case "cypress": {
+        const annotations = await AnnotationsCache.readAsync(replayClient);
+
+        // Annotations for the entire recording (which may include more than one test)
+        // we need to splice only the appropriate subset for each test.
+        const annotationsByTest: Annotation[][] = annotations.reduce(
+          (accumulated: Annotation[][], annotation: Annotation) => {
+            if (annotation.message.event === "test:start") {
+              accumulated.push([annotation]);
+            } else {
+              accumulated[accumulated.length - 1].push(annotation);
+            }
+
+            return accumulated;
+          },
+          []
+        );
+
+        // GroupedTestCasesV2 and GroupedTestCases types are the same,
+        // except for annotation data inside of their recorded tests
+        let testRecordings: RecordingTestMetadataV3.TestRecording[] = [];
+        for (let index = 0; index < partialTestRecordings.length; index++) {
+          const legacyTest = partialTestRecordings[index];
+          const annotations = annotationsByTest[index];
+          const test = await convertCypressTestRecording(legacyTest, annotations, replayClient);
+
+          testRecordings.push(test);
+        }
+
+        return {
+          ...rest,
+          environment,
+          source: {
+            filePath: source.path,
+            title: source.title,
+          },
+          testRecordings,
+        };
+      }
+      case "playwright": {
+        let testRecordings: RecordingTestMetadataV3.TestRecording[] = [];
+        for (let index = 0; index < partialTestRecordings.length; index++) {
+          const legacyTest = partialTestRecordings[index];
+          const test = await convertPlaywrightTestRecording(legacyTest);
+
+          testRecordings.push(test);
+        }
+
+        return {
+          ...rest,
+          environment,
+          source: {
+            filePath: source.path,
+            title: source.title,
+          },
+          testRecordings,
+        };
+      }
+      default: {
+        throw Error(`Unsupported test runner: ${environment.testRunner.name}`);
+      }
+    }
+  } else {
+    // This function does not support the legacy (v1) metadata format
+    throw Error(`Unsupported legacy data format`);
+  }
+}
+
+export async function convertPlaywrightTestRecording(
+  testRecording: RecordingTestMetadataV2.TestRecording | RecordingTestMetadataV3.TestRecording
+): Promise<RecordingTestMetadataV3.TestRecording> {
+  if (isTestRecordingV2(testRecording)) {
+    const { error, events: partialEvents, result, source } = testRecording;
+
+    const events: RecordingTestMetadataV3.TestRecording["events"] = {
+      afterAll: [],
+      afterEach: [],
+      beforeAll: [],
+      beforeEach: [],
+      main: [],
+    };
+
+    for (let sectionName in partialEvents) {
+      const testEvents = events[sectionName as RecordingTestMetadataV3.TestSectionName];
+
+      const partialTestEvents =
+        partialEvents[sectionName as RecordingTestMetadataV3.TestSectionName];
+      partialTestEvents.forEach(partialTestEvent => {
+        const {
+          category,
+          command,
+          error = null,
+          id,
+          parentId = null,
+          scope = null,
+        } = partialTestEvent.data;
+
+        assert(category, `Test event must have "category" property`);
+        assert(command, `Test event must have "command" property`);
+        assert(id, `Test event must have "id" property`);
+
+        // The client does not show certain types of chained events in the list
+        // they clutter without adding much value
+        if (parentId !== null) {
+          switch (command.name) {
+            case "as":
+            case "then":
+              return null;
+          }
+        }
+
+        testEvents.push({
+          data: {
+            category: category,
+            command: {
+              arguments: command.arguments,
+              name: command.name,
+            },
+            error,
+            id,
+            parentId,
+            result: null,
+            scope,
+            viewSourceTimeStampedPoint: null,
+          },
+          timeStampedPointRange: null,
+          type: "user-action",
+        });
+      });
+    }
+
+    return {
+      error,
+      events,
+      result,
+      source,
+      timeStampedPointRange: null,
     };
   } else if (isTestRecordingV3(testRecording)) {
     return testRecording;
@@ -671,6 +780,7 @@ async function processNetworkData(
     return {
       data: {
         request: {
+          id: processedNetworkData.id,
           method: processedNetworkData.request.requestMethod,
           url: processedNetworkData.request.requestUrl,
         },
@@ -698,19 +808,19 @@ export function getGroupedTestCasesFilePath(groupedTestCases: AnyGroupedTestCase
 
 export function getTestEventExecutionPoint(
   testEvent: RecordingTestMetadataV3.TestEvent
-): ExecutionPoint {
+): ExecutionPoint | null {
   if (isNavigationTestEvent(testEvent) || isNetworkRequestTestEvent(testEvent)) {
     return testEvent.timeStampedPoint.point;
   } else {
-    return testEvent.timeStampedPointRange.begin.point;
+    return testEvent.timeStampedPointRange ? testEvent.timeStampedPointRange.begin.point : null;
   }
 }
 
-export function getTestEventTime(testEvent: RecordingTestMetadataV3.TestEvent): number {
+export function getTestEventTime(testEvent: RecordingTestMetadataV3.TestEvent): number | null {
   if (isNavigationTestEvent(testEvent) || isNetworkRequestTestEvent(testEvent)) {
     return testEvent.timeStampedPoint.time;
   } else {
-    return testEvent.timeStampedPointRange.begin.time;
+    return testEvent.timeStampedPointRange ? testEvent.timeStampedPointRange.begin.time : null;
   }
 }
 
@@ -758,7 +868,7 @@ export function isTestRecordingV2(
 ): value is RecordingTestMetadataV2.TestRecording {
   // TimeStampedPointRange comes from annotations data;
   // if this is missing, the client needs to manually merge
-  return "events" in value && !("timeStampedPointRange" in value);
+  return !("type" in value);
 }
 
 export function isTestRecordingV3(

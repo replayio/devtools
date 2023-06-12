@@ -16,9 +16,23 @@ env:
   RECORD_REPLAY_METADATA_TEST_RUN_TITLE: Snapshot Tests
 
 jobs:
+  generate-test-run-id:
+    name: Generate Test Run ID
+    runs-on: ubuntu-latest
+    steps:
+      - run: yarn add uuid
+        shell: sh
+      - uses: actions/github-script@v6
+        id: uuid
+        with:
+          result-encoding: string
+          script: return require("uuid").v4()
+    outputs:
+      testRunId: ${{ steps.uuid.outputs.result }}
   run_tests:
     name: "Run tests"
     runs-on: ubuntu-latest
+    needs: [generate-test-run-id]
     strategy:
       fail-fast: false
       matrix:
@@ -71,6 +85,7 @@ jobs:
         env:
           SHARD: ${{ matrix.shard }}
           SHARDS: 10
+          RECORD_REPLAY_METADATA_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
       - name: Upload Replay recordings
         if: always()
         uses: replayio/action-upload@v0.4.7

@@ -36,7 +36,7 @@ import {
   ScreenShot,
   SearchSourceContentsMatch,
   SessionId,
-  newSource as Source,
+  Source,
   SourceId,
   SourceLocation,
   TimeStampedPoint,

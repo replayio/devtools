@@ -27,7 +27,7 @@ export async function filterByText(page: Page, text: string) {
   // Wait for Console to apply new filter text
   await waitFor(async () => {
     const messageList = page.locator('[data-test-name="Messages"]');
-    const value = await messageList.getAttribute(`data-test-state-filterByText`);
+    const value = await messageList.getAttribute(`data-test-state-filter-by-text`);
     expect(value).toBe(text);
   });
 }
@@ -158,7 +158,7 @@ export async function searchByText(page: Page, text: string) {
   // Wait for Console to apply new filter text
   await waitFor(async () => {
     const messageList = page.locator('[data-test-name="Messages"]');
-    const value = await messageList.getAttribute(`data-test-state-searchByText`);
+    const value = await messageList.getAttribute(`data-test-state-search-by-text`);
     expect(value).toBe(text);
   });
 }
@@ -239,7 +239,8 @@ export async function toggleProtocolMessage(page: Page, name: ToggleName, on: bo
   // Wait for Console to update with new filter value
   await waitFor(async () => {
     const messageList = page.locator('[data-test-name="Messages"]');
-    const value = await messageList.getAttribute(`data-test-state-${name}`);
+    const attributeName = name === "nodeModules" ? "node-modules" : name;
+    const value = await messageList.getAttribute(`data-test-state-${attributeName}`);
     if (on) {
       expect(value).not.toBeNull();
     } else {
@@ -308,7 +309,7 @@ export async function verifyTypeAheadContainsSuggestions(page: Page, ...suggesti
 export async function waitForMessageStatus(page: Page, status: Status = "resolved") {
   await waitFor(async () => {
     const messageList = page.locator('[data-test-name="Messages"]');
-    const value = await messageList.getAttribute(`data-test-state-cacheStreamingStatus`);
+    const value = await messageList.getAttribute(`data-test-state-cache-streaming-status`);
     expect(value).toBe(status);
   });
 }

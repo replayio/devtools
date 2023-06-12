@@ -3,7 +3,7 @@ import { gql } from "@apollo/client";
 
 import { ThreadFront } from "protocol/thread";
 import { Recording } from "shared/graphql/types";
-import { LoadedRegionsTuple, MessageTuple, SourceTuple } from "shared/utils/testing";
+import { LoadedRegionsTuple, MessageTuple, SourceTuple, SourcesTuple } from "shared/utils/testing";
 import { UIStore } from "ui/actions";
 import { convertRecording } from "ui/hooks/recordings";
 import { getMockEnvironmentForTesting } from "ui/utils/environment";
@@ -79,7 +79,7 @@ export async function loadFixtureData(
   return { graphqlMocks, recording, sessionId, store };
 }
 
-type Tuple = LoadedRegionsTuple | MessageTuple | SourceTuple;
+type Tuple = LoadedRegionsTuple | MessageTuple | SourcesTuple | SourceTuple;
 
 export async function sendValuesToMockEnvironment(...values: Array<Tuple>) {
   const mockEnvironment = await getMockEnvironmentForTesting();
@@ -105,6 +105,15 @@ export async function sendValuesToMockEnvironment(...values: Array<Tuple>) {
         );
         break;
       case "Debugger.newSource":
+        mockEnvironment.sendSocketMessage(
+          JSON.stringify({
+            method,
+            params: value,
+            sessionId: DEFAULT_SESSION_ID,
+          })
+        );
+        break;
+      case "Debugger.newSources":
         mockEnvironment.sendSocketMessage(
           JSON.stringify({
             method,
