@@ -24,3 +24,12 @@ export function stringify(value: any, space?: string | number): string {
     space
   );
 }
+
+export function truncateMiddle(value: string, maxLength = 250, separator = "...") {
+  if (value.length > maxLength) {
+    const charIndex = (maxLength - separator.length) / 2;
+    return value.slice(0, Math.ceil(charIndex)) + separator + value.slice(0 - Math.ceil(charIndex));
+  }
+
+  return value;
+}
