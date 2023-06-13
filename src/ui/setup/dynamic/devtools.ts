@@ -213,7 +213,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   await setupApp(store, ThreadFront, replayClient);
   setupTimeline(store);
   setupGraphics();
-  setupNetwork(store, replayClient);
+  setupNetwork(replayClient);
   setupBoxModel(store, startAppListening);
   setupRules(store, startAppListening);
 

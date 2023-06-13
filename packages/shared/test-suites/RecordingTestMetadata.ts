@@ -723,7 +723,10 @@ async function processNetworkData(
   begin: TimeStampedPoint,
   end: TimeStampedPoint
 ): Promise<RecordingTestMetadataV3.NetworkRequestEvent[]> {
-  const { ids, records } = await networkRequestsCache.readAsync(replayClient);
+  const stream = networkRequestsCache.stream(replayClient);
+  await stream.resolver;
+  const records = stream.data!;
+  const ids = stream.value!;
 
   // Filter by RequestInfo (because they have execution points)
   // then map RequestInfo to RequestEventInfo using ids
