@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import Link from "next/link";
 
 import Icon from "replay-next/components/Icon";
@@ -65,15 +66,22 @@ export function TestResultListItem({
     >
       <div className="flex flex-row items-center gap-1">
         {secondaryBadgeCount != null && <Icon className="ml-2 h-4 w-4" type="arrow-nested" />}
-        <div className=" flex cursor-pointer items-center justify-center transition">
-          <MaterialIcon iconSize="2xl" outlined style={{ color }}>
-            {["passed", "flaky"].includes(label) ? "play_circle" : "play_circle_filled"}
-          </MaterialIcon>
+        <div className="flex cursor-pointer items-center justify-center transition ">
+          <motion.div
+            className="m-auto h-6 w-6 rounded-full hover:cursor-pointer"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 1.0, boxShadow: "0px 0px 1px rgba(0,0,0,0.2)" }}
+            transition={{ duration: 0.05 }}
+          >
+            <MaterialIcon iconSize="2xl" outlined style={{ color }}>
+              {["passed", "flaky"].includes(label) ? "play_circle" : "play_circle_filled"}
+            </MaterialIcon>
+          </motion.div>
         </div>
       </div>
       <div className="flex shrink grow flex-col truncate">
         <div className="block truncate">{title || "Test"}</div>
-        <div className="truncate truncate text-xs text-bodySubColor">{filePath}</div>
+        <div className="truncate text-xs text-bodySubColor">{filePath}</div>
       </div>
       {numComments > 0 && (
         <div className="align-items-center flex shrink-0 flex-row space-x-1 text-gray-600">
