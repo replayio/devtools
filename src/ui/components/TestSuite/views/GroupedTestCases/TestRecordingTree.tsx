@@ -19,7 +19,11 @@ export function TestRecordingTree({
 
   const parentScope = scope;
   return (
-    <div className={styles.Tree} data-nested={isNested || undefined}>
+    <div
+      className={styles.Tree}
+      data-nested={isNested || undefined}
+      data-test-name="TestRecordingTree"
+    >
       {scope !== null && <div className={styles.Scope}>{scope}</div>}
       {Object.keys(testTree.scopes).map(scope => (
         <TestRecordingTree

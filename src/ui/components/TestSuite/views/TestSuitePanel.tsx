@@ -11,14 +11,14 @@ export default function TestSuitePanel() {
   const { groupedTestCases, testRecording } = useContext(TestSuiteContext);
   if (groupedTestCases == null) {
     return (
-      <div className={styles.Loading}>
+      <div className={styles.Loading} data-test-name="TestSuitePanel">
         <Loader />
       </div>
     );
   }
 
   return (
-    <div className={styles.Panel}>
+    <div className={styles.Panel} data-test-name="TestSuitePanel">
       {testRecording === null ? <GroupTestCasesPanel /> : <TestRecordingPanel />}
     </div>
   );

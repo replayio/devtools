@@ -6,7 +6,15 @@ import { Badge } from "shared/client/types";
 import { hideTypeAheadSuggestions, type as typeLexical } from "./lexical";
 import { findPoints, openPauseInformationPanel, removePoint } from "./pause-information-panel";
 import { openSource, openSourceExplorerPanel } from "./source-explorer-panel";
-import { clearTextArea, debugPrint, delay, getCommandKey, mapLocators, waitFor } from "./utils";
+import {
+  clearTextArea,
+  debugPrint,
+  delay,
+  getByTestName,
+  getCommandKey,
+  mapLocators,
+  waitFor,
+} from "./utils";
 import { openDevToolsTab } from ".";
 
 export async function addBreakpoint(
@@ -366,28 +374,32 @@ export async function verifyLogPointContentTypeAheadSuggestions(
   }
 }
 
-export async function getSelectedLineNumber(page: Page): Promise<number | null> {
-  let currentLineLocator = null;
+export async function getSelectedLineNumber(
+  page: Page,
+  lineIsCurrentPoint: boolean
+): Promise<number | null> {
+  const highlightLineTestName = lineIsCurrentPoint
+    ? "CurrentExecutionPointLineHighlight"
+    : "ViewSourceHighlight";
 
-  const lineLocator = page.locator(`[data-test-id^=SourceLine`);
-  for (let index = 0; index < (await lineLocator.count()); index++) {
-    const line = lineLocator.nth(index);
-    const currentHighlight = lineLocator.locator(
-      '[data-test-name="CurrentExecutionPointLineHighlight"]'
-    );
-    if (await currentHighlight.isVisible()) {
-      currentLineLocator = line;
-      break;
-    }
-  }
+  const lineLocator = page.locator(`[data-test-id^=SourceLine]`, {
+    has: getByTestName(page, highlightLineTestName),
+  });
 
-  if (currentLineLocator === null) {
+  const count = await lineLocator.count();
+
+  if (count === 0) {
     return null;
   }
 
-  const lineNumber = await currentLineLocator.locator(`[data-test-id^="SourceLine-LineNumber"`);
-  const textContent = await lineNumber.textContent();
-  return textContent !== null ? parseInt(textContent, 10) : null;
+  const lineNumberLocator = getByTestName(lineLocator, "SourceRowLineNumber");
+  const textContent = await lineNumberLocator.textContent();
+
+  if (textContent === null) {
+    return null;
+  }
+
+  return parseInt(textContent, 10);
 }
 
 export async function getSourceLine(page: Page, lineNumber: number): Promise<Locator> {

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "downlevelIteration": true,
     "esModuleInterop": true,
     "types": ["cypress"]
   }

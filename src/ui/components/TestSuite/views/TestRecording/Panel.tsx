@@ -126,7 +126,11 @@ export default function Panel() {
     <>
       <div className={styles.Header}>
         <div className={styles.SummaryRow}>
-          <button className={styles.BackButton} onClick={() => setTestRecording(null)}>
+          <button
+            className={styles.BackButton}
+            onClick={() => setTestRecording(null)}
+            data-test-name="TestRecordingBackButton"
+          >
             <MaterialIcon className={styles.Chevron}>chevron_left</MaterialIcon>
           </button>
           <div className={styles.Title} title={testRecording.source.title}>

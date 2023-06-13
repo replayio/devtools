@@ -404,7 +404,7 @@ const SourceListRow = memo(
           onClick={onClick}
         >
           <div className={styles.LineNumber} data-test-id={`SourceLine-LineNumber-${lineNumber}`}>
-            {lineNumber}
+            <span data-test-name="SourceRowLineNumber">{lineNumber}</span>
             <div
               className={styles.BreakpointToggle}
               data-test-name="BreakpointToggle"

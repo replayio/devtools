@@ -80,6 +80,7 @@ export function JumpToCodeButton({
       onMouseEnter={onJumpButtonMouseEnter}
       onMouseLeave={onJumpButtonMouseLeave}
       className={jumpToCodeButtonClassname}
+      data-test-name="JumpToCode"
     >
       <div className="flex items-center space-x-1">
         {isHovered && <span className="truncate text-white ">{jumpButtonText}</span>}

@@ -3779,27 +3779,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:^1.23.1":
-  version: 1.23.1
-  resolution: "@playwright/test@npm:1.23.1"
+"@playwright/test@npm:^1.35.0":
+  version: 1.35.0
+  resolution: "@playwright/test@npm:1.35.0"
   dependencies:
     "@types/node": "*"
-    playwright-core: 1.23.1
+    fsevents: 2.3.2
+    playwright-core: 1.35.0
+  dependenciesMeta:
+    fsevents:
+      optional: true
   bin:
     playwright: cli.js
-  checksum: 27fc6b4424dfb0f0dfaaecb01a33bf77c0f95e6a1e635fe85dd4ad36e5053afdbe4ad1de4be1c5705e482451b43f7ddacf667f6c5b70ab5f8e32c30110211c29
-  languageName: node
-  linkType: hard
-
-"@playwright/test@npm:^1.25.1":
-  version: 1.26.1
-  resolution: "@playwright/test@npm:1.26.1"
-  dependencies:
-    "@types/node": "*"
-    playwright-core: 1.26.1
-  bin:
-    playwright: cli.js
-  checksum: 872bc58dfa8f8a94547b69aaf7e88178213e2201a17aced1b425ef6b13bdd2b53e7274ae8f7ca57dfc189b214be5da5e3290f80b03e5bf5bdc4f3ff0ccd38375
+  checksum: c63a281d8711ec817906d7618563709842aaa013ac02919bb7bbef7f7162d4ace0fc1351c6aac94a8957df4d107b38440e55488e99455a07f55e1ace6bb07959
   languageName: node
   linkType: hard
 
@@ -13004,6 +12996,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fsevents@npm:2.3.2, fsevents@npm:^2.1.2, fsevents@npm:^2.3.2, fsevents@npm:~2.3.2":
+  version: 2.3.2
+  resolution: "fsevents@npm:2.3.2"
+  dependencies:
+    node-gyp: latest
+  checksum: 97ade64e75091afee5265e6956cb72ba34db7819b4c3e94c431d4be2b19b8bb7a2d4116da417950c3425f17c8fe693d25e20212cac583ac1521ad066b77ae31f
+  conditions: os=darwin
+  languageName: node
+  linkType: hard
+
 "fsevents@npm:^1.2.7":
   version: 1.2.13
   resolution: "fsevents@npm:1.2.13"
@@ -13015,12 +13017,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fsevents@npm:^2.1.2, fsevents@npm:^2.3.2, fsevents@npm:~2.3.2":
+"fsevents@patch:fsevents@2.3.2#~builtin<compat/fsevents>, fsevents@patch:fsevents@^2.1.2#~builtin<compat/fsevents>, fsevents@patch:fsevents@^2.3.2#~builtin<compat/fsevents>, fsevents@patch:fsevents@~2.3.2#~builtin<compat/fsevents>":
   version: 2.3.2
-  resolution: "fsevents@npm:2.3.2"
+  resolution: "fsevents@patch:fsevents@npm%3A2.3.2#~builtin<compat/fsevents>::version=2.3.2&hash=18f3a7"
   dependencies:
     node-gyp: latest
-  checksum: 97ade64e75091afee5265e6956cb72ba34db7819b4c3e94c431d4be2b19b8bb7a2d4116da417950c3425f17c8fe693d25e20212cac583ac1521ad066b77ae31f
   conditions: os=darwin
   languageName: node
   linkType: hard
@@ -13031,15 +13032,6 @@ __metadata:
   dependencies:
     bindings: ^1.5.0
     nan: ^2.12.1
-  conditions: os=darwin
-  languageName: node
-  linkType: hard
-
-"fsevents@patch:fsevents@^2.1.2#~builtin<compat/fsevents>, fsevents@patch:fsevents@^2.3.2#~builtin<compat/fsevents>, fsevents@patch:fsevents@~2.3.2#~builtin<compat/fsevents>":
-  version: 2.3.2
-  resolution: "fsevents@patch:fsevents@npm%3A2.3.2#~builtin<compat/fsevents>::version=2.3.2&hash=18f3a7"
-  dependencies:
-    node-gyp: latest
   conditions: os=darwin
   languageName: node
   linkType: hard
@@ -13074,7 +13066,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "functional-tests@workspace:packages/e2e-tests"
   dependencies:
-    "@playwright/test": ^1.25.1
+    "@playwright/test": ^1.35.0
     "@recordreplay/playwright": ^1.18.3
     "@replayio/cypress": ^0.5.0
     "@replayio/playwright": ^1.0.1
@@ -13082,7 +13074,6 @@ __metadata:
     cli-spinners: ^2.7.0
     cypress: ^12.5.1
     log-update: ^4
-    playwright: ^1.25.1
     strip-ansi: ^6.0.0
     ts-node: ^10.7.0
     yargs: ^17.6.0
@@ -19033,52 +19024,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-chromium@npm:^1.23.1":
-  version: 1.29.0
-  resolution: "playwright-chromium@npm:1.29.0"
-  dependencies:
-    playwright-core: 1.29.0
+"playwright-core@npm:1.35.0":
+  version: 1.35.0
+  resolution: "playwright-core@npm:1.35.0"
   bin:
-    playwright: cli.js
-  checksum: 4e4e93289a17360dcc9e6285b580ccf69173be22b236c517b275be9eac5018cac92bae0e6c6cb3d56d774d4bbb0d205621fa91baadbfbff38abaacf9d5b381d8
-  languageName: node
-  linkType: hard
-
-"playwright-core@npm:1.23.1":
-  version: 1.23.1
-  resolution: "playwright-core@npm:1.23.1"
-  bin:
-    playwright: cli.js
-  checksum: 1e6a3a7a9aaee1864b22195c7fef52b6980fcafc6d667749737455360a44a182a7035f12bfd76f298f957d1b99550420a8748f6a473ceeacf2cb2db42beb9be0
-  languageName: node
-  linkType: hard
-
-"playwright-core@npm:1.26.1":
-  version: 1.26.1
-  resolution: "playwright-core@npm:1.26.1"
-  bin:
-    playwright: cli.js
-  checksum: 6347224c28c1ec21d49b659ae35452955e2d8a8ff7aa578f0a0dbb1eccfbcea97e7400446335e966c2a1cbb356381d78131ea65e4a2f19a3eccfb58d33aed0ca
-  languageName: node
-  linkType: hard
-
-"playwright-core@npm:1.29.0":
-  version: 1.29.0
-  resolution: "playwright-core@npm:1.29.0"
-  bin:
-    playwright: cli.js
-  checksum: 5e4b690b0b449ed27ab7f7d7c9bf778db53e6c6b37a8e7258fb070fe6e96f147ad5d66221a3953c9e4d0b2044b701c493d7a0708d7bdb6486e38a3518f62fdce
-  languageName: node
-  linkType: hard
-
-"playwright@npm:^1.25.1":
-  version: 1.26.1
-  resolution: "playwright@npm:1.26.1"
-  dependencies:
-    playwright-core: 1.26.1
-  bin:
-    playwright: cli.js
-  checksum: 42af6e949af68dec3327d5cce2e7f2f0d6d175528ba983b9b76f8f21995ae223f901d672799e655446b71ec5d19223464f7c587d3f569312a452718cbf8a706a
+    playwright-core: cli.js
+  checksum: e23050c9de128e02b16ffbeb1adaca6dddd85a6fd581e71da38947f66b3c910504d628285340e3d6de8c099a488ab9dad14241aefe615f65c01a5a3e3b6e633d
   languageName: node
   linkType: hard
 
@@ -21020,7 +20971,7 @@ __metadata:
     "@codemirror/state_replay_next": "npm:@codemirror/state@6.1.2"
     "@lezer/common_replay_next": "npm:@lezer/common@1.0.1"
     "@lezer/highlight_replay_next": "npm:@lezer/highlight@1.1.1"
-    "@playwright/test": ^1.23.1
+    "@playwright/test": ^1.35.0
     "@replayio/protocol": ^0.54.0
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
@@ -21035,7 +20986,6 @@ __metadata:
     lodash: ^4.17.21
     next: ^13.2
     node-fetch: ^2.0.0
-    playwright-chromium: ^1.23.1
     pretty-ms: ^7.0.1
     protocol: "workspace:*"
     react: 0.0.0-experimental-e7d0053e6-20220325

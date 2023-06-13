@@ -30,6 +30,7 @@ const config: FullConfig = {
   },
   testDir: __dirname,
   testMatch: ["tests/**/*.ts"],
+  testIgnore: ["tests/**/beforeEach.ts", "tests/**/shared.ts", "tests/utils/*"],
   timeout: 30_000,
 };
 

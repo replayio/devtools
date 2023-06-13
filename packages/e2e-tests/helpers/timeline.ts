@@ -1,7 +1,7 @@
-import { Locator, Page } from "@playwright/test";
+import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
-import { debugPrint } from "./utils";
+import { debugPrint, getByTestName, waitFor } from "./utils";
 
 export async function clearFocusRange(page: Page): Promise<void> {
   await debugPrint(page, `Clearing focus range`, "clearFocusRange");
@@ -91,4 +91,35 @@ export async function setFocusRangeStartTime(page: Page, timeString: string): Pr
   await input.focus();
   await clearTimeInput(page, input);
   await input.fill(timeString);
+}
+
+export function getTimeline(page: Page) {
+  return page.locator(".timeline .progress-bar");
+}
+
+export async function getTimelineCurrentHoverPercent(page: Page) {
+  const timeline = getTimeline(page);
+  const previewLine = timeline.locator(".progress-line.preview-min");
+  // 0..100, not 0..1
+  const previewLinePercent = Number(await previewLine.getAttribute("data-hover-value"));
+  return previewLinePercent;
+}
+
+export async function getTimelineCurrentPercent(page: Page) {
+  const progressLine = getByTestName(page, "current-progress");
+  // 0..100, not 0..1
+  const percent = Number(await progressLine.getAttribute("data-current-progress-value"));
+  return percent;
+}
+
+export async function waitForTimelineAdvanced(page: Page, prevPercent: number) {
+  let currentPercent = 0;
+  await waitFor(async () => {
+    currentPercent = await getTimelineCurrentPercent(page);
+
+    expect(currentPercent).toBeGreaterThan(0);
+    expect(currentPercent).toBeGreaterThan(prevPercent);
+  });
+
+  return currentPercent;
 }

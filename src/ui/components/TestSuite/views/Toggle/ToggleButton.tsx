@@ -39,7 +39,7 @@ function ToggleButtonInner({ userActionEvent }: { userActionEvent: UserActionEve
     });
 
   return (
-    <div className={styles.ToggleWrapper}>
+    <div className={styles.ToggleWrapper} data-test-name="ToggleBeforeAfterEventButton">
       <div className={styles.ToggleContainer}>
         <Button onClick={onClickShowBefore} active={disabledShowBefore}>
           Before

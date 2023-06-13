@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 
 import { RecordingTarget } from "replay-next/src/suspense/BuildIdCache";
 
-import { debugPrint } from "./utils";
+import { debugPrint, getElementClasses } from "./utils";
 
 dotenv.config({ path: "../../.env" });
 
@@ -22,19 +22,35 @@ export async function openDevToolsTab(page: Page) {
   await header.waitFor();
 
   // The DevTools tab won't exist if it's a Node recording.
-  const tab = page.locator('[data-test-id="ViewToggle-DevTools"]');
+  const tab = getDevToolsTab(page);
   if (await tab.isVisible()) {
     await tab.click();
   }
 }
+
+export const getDevToolsTab = (page: Page) => page.locator('[data-test-id="ViewToggle-DevTools"]');
+
+export const getViewerTab = (page: Page) => page.locator('[data-test-id="ViewToggle-Viewer"]');
 
 export async function openViewerTab(page: Page) {
   // Wait for the page to load enough that it's safe to continue.
   const header = page.locator('[data-test-name="Header"]');
   await header.waitFor();
 
-  const tab = page.locator('[data-test-id="ViewToggle-Viewer"]');
+  const tab = getViewerTab(page);
   await tab.click();
+}
+
+export async function isViewerTabActive(page: Page) {
+  const tab = getViewerTab(page);
+  const classes = await getElementClasses(tab);
+  return classes.includes("active");
+}
+
+export async function isDevToolsTabActive(page: Page) {
+  const tab = getDevToolsTab(page);
+  const classes = await getElementClasses(tab);
+  return classes.includes("active");
 }
 
 export async function startTest(page: Page, example: string, apiKey?: string) {

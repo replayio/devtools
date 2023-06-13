@@ -33,6 +33,8 @@ const NO_ANNOTATIONS: ParsedJumpToCodeAnnotation[] = [];
 
 const cypressStepTypesToEventTypes = {
   click: "mousedown",
+  check: "mousedown",
+  uncheck: "mousedown",
   type: "keypress",
 } as const;
 
@@ -219,7 +221,8 @@ function findJumpToCodeDetailsIfAvailable(
       // Playwright steps have a `name` like `locator.click("blah")`.
       // We only care about click events and keyboard events. Keyboard events appear to be a "type" command,
       // as in "type this text into the input".
-      canShowJumpToCode = category === "command" && ["click", "type"].includes(name);
+      canShowJumpToCode =
+        category === "command" && ["click", "type", "check", "uncheck"].includes(name);
 
       if (canShowJumpToCode) {
         const eventKind =

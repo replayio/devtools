@@ -55,20 +55,32 @@ function UserActionEventDetails({
   }
 
   return (
-    <div className={styles.Container}>
+    <div className={styles.Container} data-test-name="UserActionEventDetails">
       <PropertiesRenderer pauseId={value.pauseId} object={value.props} />
     </div>
   );
 }
 
 function LoadingFailedMessage() {
-  return <div className={styles.Message}>Unable to retrieve details for this step</div>;
+  return (
+    <div className={styles.Message} data-test-name="TestEventDetailsMessage">
+      Unable to retrieve details for this step
+    </div>
+  );
 }
 
 function LoadingInProgress() {
-  return <div className={styles.Message}>Loading...</div>;
+  return (
+    <div className={styles.Message} data-test-name="TestEventDetailsMessage">
+      Loading...
+    </div>
+  );
 }
 
 function SelectionPrompt() {
-  return <div className={styles.Message}>Select an action above to view its details</div>;
+  return (
+    <div className={styles.Message} data-test-name="TestEventDetailsMessage">
+      Select an action above to view its details
+    </div>
+  );
 }
