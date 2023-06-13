@@ -51,16 +51,14 @@ export default function Source({
     }
   };
 
-  const sourceString = `${fileName}:${location.line}`;
-
   return (
     <span
       className={`${styles.Source} ${className}`}
       data-test-name="Console-Source"
       onClick={openSource}
-      title={sourceString}
+      title={`${fileName ?? "unknown"}:${location.line}`}
     >
-      {sourceString}
+      {fileName ?? <span className={styles.UnknownSourceLabel}>unknown</span>}:{location.line}
     </span>
   );
 }

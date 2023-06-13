@@ -18,17 +18,14 @@ export default function SearchFilesReduxAdapter() {
     if (focusedSource != null) {
       const { mode, startLineIndex, sourceId } = focusedSource;
       if (mode === "search-result") {
-        const url = sourcesById[sourceId]?.url;
-        if (url) {
-          dispatch(
-            onViewSourceInDebugger({
-              url,
-              sourceId,
-              line: startLineIndex !== null ? startLineIndex + 1 : undefined,
-              column: 0,
-            })
-          );
-        }
+        dispatch(
+          onViewSourceInDebugger({
+            column: 0,
+            line: startLineIndex !== null ? startLineIndex + 1 : undefined,
+            openSource: true,
+            sourceId,
+          })
+        );
       }
     }
   }, [dispatch, focusedSource, sourcesById]);

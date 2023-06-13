@@ -5,3 +5,8 @@
   text-align: right;
   color: var(--color-default);
 }
+
+.UnknownSourceLabel {
+  text-decoration: underline;
+  color: var(--color-dim);
+}
