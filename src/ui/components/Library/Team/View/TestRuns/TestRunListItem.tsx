@@ -3,14 +3,10 @@ import { useContext } from "react";
 
 import { TestSuite } from "shared/test-suites/TestRun";
 import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
-import { getDuration } from "ui/components/Library/Team/View/TestRuns/utils";
 import Icon from "ui/components/shared/Icon";
 
 import { TeamContext } from "../../TeamContextRoot";
-import {
-  getDurationString,
-  getTruncatedRelativeDate,
-} from "../Recordings/RecordingListItem/RecordingListItem";
+import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/RecordingListItem";
 import { AttributeContainer } from "./AttributeContainer";
 import { ModeAttribute } from "./Overview/RunSummary";
 import { RunStats } from "./RunStats";
@@ -31,14 +27,10 @@ function Title({ testSuite }: { testSuite: TestSuite }) {
 }
 
 function Attributes({ testSuite }: { testSuite: TestSuite }) {
-  const { date, results, source, primaryTitle } = testSuite;
-  const { recordings } = results;
+  const { date, source, primaryTitle } = testSuite;
 
   if (source) {
     const { branchName, isPrimaryBranch, user } = source;
-
-    const duration = getDuration(recordings);
-    const durationString = getDurationString(duration);
 
     return (
       <div className="flex flex-row items-center gap-4 text-xs font-light">
@@ -49,7 +41,6 @@ function Attributes({ testSuite }: { testSuite: TestSuite }) {
           isPrimaryBranch={isPrimaryBranch}
           title={primaryTitle}
         />
-        <AttributeContainer icon="timer">{durationString}</AttributeContainer>
         <ModeAttribute testSuite={testSuite} />
       </div>
     );
