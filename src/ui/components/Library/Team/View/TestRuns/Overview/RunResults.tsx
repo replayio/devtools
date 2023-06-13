@@ -70,8 +70,14 @@ function TestStatusGroupExpanded({
   label: string;
   recordingGroup: RecordingGroup;
 }) {
-  const entries = Array.from(Object.entries(recordingGroup.fileNameToRecordings));
-  return entries.map(([fileName, recordings]) => (
+  const sortedEntries = useMemo(() => {
+    const entries = Array.from(Object.entries(recordingGroup.fileNameToRecordings));
+    // Sort by filename ascending
+    entries.sort((a, b) => a[0].localeCompare(b[0]));
+    return entries;
+  }, [recordingGroup.fileNameToRecordings]);
+
+  return sortedEntries.map(([fileName, recordings]) => (
     <TestFileGroup key={fileName} fileName={fileName} label={label} recordings={recordings} />
   )) as any;
 }
