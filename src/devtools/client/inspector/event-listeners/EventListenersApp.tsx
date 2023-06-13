@@ -103,13 +103,12 @@ export const EventListenersApp = () => {
                                   title="Open in Debugger"
                                   onClick={() => {
                                     dispatch(
-                                      onViewSourceInDebugger(
-                                        {
-                                          ...location,
-                                          url: locationUrl,
-                                        },
-                                        true
-                                      )
+                                      onViewSourceInDebugger({
+                                        column: location.column,
+                                        line: location.line,
+                                        openSource: true,
+                                        sourceId: location.sourceId,
+                                      })
                                     );
                                   }}
                                 >

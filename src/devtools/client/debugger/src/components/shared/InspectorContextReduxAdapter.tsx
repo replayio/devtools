@@ -4,7 +4,7 @@ import {
   PauseId,
   Value as ProtocolValue,
 } from "@replayio/protocol";
-import React, { ReactNode, useCallback, useMemo } from "react";
+import { ReactNode, useCallback, useMemo } from "react";
 
 import { selectNode } from "devtools/client/inspector/markup/actions/markup";
 import { onViewSourceInDebugger } from "devtools/client/webconsole/actions";
@@ -13,12 +13,10 @@ import { InspectorContext } from "replay-next/src/contexts/InspectorContext";
 import useLocalStorage from "replay-next/src/hooks/useLocalStorage";
 import { setSelectedPanel, setSelectedPrimaryPanel } from "ui/actions/layout";
 import { sidePanelStorageKey } from "ui/components/DevTools";
-import { getSourceDetailsEntities } from "ui/reducers/sources";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useAppDispatch } from "ui/setup/hooks";
 
 // Adapter that connects inspect-function and inspect-html-element actions with Redux.
 export default function InspectorContextReduxAdapter({ children }: { children: ReactNode }) {
-  const sourcesById = useAppSelector(getSourceDetailsEntities);
   const dispatch = useAppDispatch();
   const [, setSidePanelCollapsed] = useLocalStorage(sidePanelStorageKey, false);
 
@@ -26,20 +24,18 @@ export default function InspectorContextReduxAdapter({ children }: { children: R
     (mappedLocation: MappedLocation) => {
       const location = mappedLocation.length > 0 ? mappedLocation[mappedLocation.length - 1] : null;
       if (location) {
-        const url = sourcesById[location.sourceId]?.url;
-        if (url) {
-          dispatch(
-            onViewSourceInDebugger({
-              url,
-              sourceId: location.sourceId,
-              line: location.line,
-              column: location.column,
-            })
-          );
-        }
+        const sourceId = location.sourceId;
+        dispatch(
+          onViewSourceInDebugger({
+            column: location.column,
+            line: location.line,
+            openSource: true,
+            sourceId,
+          })
+        );
       }
     },
-    [sourcesById, dispatch]
+    [dispatch]
   );
 
   const showCommentsPanel = useCallback(() => {

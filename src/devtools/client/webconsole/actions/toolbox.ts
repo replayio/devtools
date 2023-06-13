@@ -8,27 +8,23 @@ import { selectSource } from "devtools/client/debugger/src/actions/sources";
 import { showSource } from "devtools/client/debugger/src/actions/ui";
 import { getContext } from "devtools/client/debugger/src/selectors";
 import type { UIThunkAction } from "ui/actions";
-import { getSourceDetails, getSourceToDisplayForUrl } from "ui/reducers/sources";
 
-export function onViewSourceInDebugger(
-  frame: { sourceId?: string; url: string; line?: number; column: number },
-  openSource = true
-): UIThunkAction {
+export function onViewSourceInDebugger({
+  column,
+  line,
+  openSource,
+  sourceId,
+}: {
+  column?: number;
+  line?: number;
+  openSource: boolean;
+  sourceId: string;
+}): UIThunkAction {
   return async (dispatch, getState) => {
-    const cx = getContext(getState());
-    const source = frame.sourceId
-      ? getSourceDetails(getState(), frame.sourceId)
-      : getSourceToDisplayForUrl(getState(), frame.url!);
-    if (source) {
-      dispatch(showSource(cx, source.id, openSource));
-      await dispatch(
-        selectSource(
-          cx,
-          source.id,
-          { sourceId: source.id, line: frame.line, column: frame.column },
-          openSource
-        )
-      );
-    }
+    const state = getContext(getState());
+
+    dispatch(showSource(state, sourceId, openSource));
+
+    await dispatch(selectSource(state, sourceId, { column, line, sourceId }, openSource));
   };
 }
