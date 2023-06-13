@@ -1,11 +1,13 @@
 import { Locator, Page, expect } from "@playwright/test";
 
+import { getKeyValueEntryHeader, getKeyValueEntryValue } from "./object-inspector";
 import {
   clearTextArea,
   debugPrint,
   delay,
   getByTestName,
   getCommandKey,
+  locatorTextToNumber,
   mapLocators,
   waitFor,
 } from "./utils";
@@ -57,16 +59,16 @@ export function getTestSuiteResult(page: Page) {
   return getByTestName(page, "TestSuiteResult");
 }
 
-export function getTestSuiteResultsPassedCount(page: Page) {
-  return getByTestName(page, "TestSuiteResultsPassedCount");
+export async function getTestSuiteResultsPassedCount(page: Page): Promise<number | null> {
+  return locatorTextToNumber(getByTestName(page, "TestSuiteResultsPassedCount"));
 }
 
-export function getTestSuiteResultsFailedCount(page: Page) {
-  return getByTestName(page, "TestSuiteResultsFailedCount");
+export function getTestSuiteResultsFailedCount(page: Page): Promise<number | null> {
+  return locatorTextToNumber(getByTestName(page, "TestSuiteResultsFailedCount"));
 }
 
 export function getTestSuiteResultsSkippedCount(page: Page) {
-  return getByTestName(page, "TestSuiteResultsSkippedCount");
+  return locatorTextToNumber(getByTestName(page, "TestSuiteResultsSkippedCount"));
 }
 
 export function getTestRecordingBackButton(page: Page) {
@@ -97,47 +99,11 @@ export function getErrorRows(page: Page) {
 }
 
 export function getTestStepBeforeAfterButtons(page: Page) {
-  return getByTestName(page, "TestBeforeAfter");
+  return getByTestName(page, "ToggleBeforeAfterEventButton");
 }
 
 export function getUserActionEventDetails(page: Page) {
   return getByTestName(page, "UserActionEventDetails");
-}
-
-export async function getKeyValueEntry(
-  locator: Locator,
-  header: string
-): Promise<Locator | undefined> {
-  const keyValues = getByTestName(locator, "KeyValue");
-  const numItems = await keyValues.count();
-  const reHeader = new RegExp(`^${header}`, "i");
-  for (let i = 0; i < numItems; i++) {
-    const keyValueLocator = keyValues.nth(i);
-    const headerText = await getKeyValueEntryHeader(keyValueLocator);
-    if (!headerText) {
-      return undefined;
-    }
-    if (reHeader.test(headerText)) {
-      return keyValueLocator;
-    }
-  }
-
-  return undefined;
-}
-
-export async function getKeyValueEntryHeader(locator: Locator) {
-  const headerField = getByTestName(locator, "KeyValue-Header").first();
-  return headerField.textContent();
-}
-
-export async function getKeyValueEntryValue(locator: Locator) {
-  const valueField = getByTestName(locator, "ClientValue").first();
-  // Complex values like objects or DOM nodes do not have
-  // a "ClientValue" section. Skip those.
-  if (await valueField.isVisible()) {
-    return valueField.textContent();
-  }
-  return "";
 }
 
 export async function getDetailsPaneContents(

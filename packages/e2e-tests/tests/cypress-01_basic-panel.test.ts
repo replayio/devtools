@@ -59,14 +59,14 @@ test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
   await chevron.isVisible();
 
   // This recording has 8 passing, 1 failing, 0 skipped tests
-  const passedCountText = await getTestSuiteResultsPassedCount(page).textContent();
-  expect(passedCountText?.trim()).toBe("8");
+  const passedCount = await getTestSuiteResultsPassedCount(page);
+  expect(passedCount).toBe(8);
 
-  const failedCountText = await getTestSuiteResultsFailedCount(page).textContent();
-  expect(failedCountText?.trim()).toBe("1");
+  const failedCount = await getTestSuiteResultsFailedCount(page);
+  expect(failedCount).toBe(1);
 
-  const skippedCount = getTestSuiteResultsSkippedCount(page);
-  expect(await skippedCount.isVisible()).toBe(false);
+  const skippedCount = await getTestSuiteResultsSkippedCount(page);
+  expect(skippedCount).toBe(null);
 
   // Test suite metadata
 
@@ -111,7 +111,9 @@ test("cypress-01: Basic Test Suites panel functionality", async ({ page }) => {
   // Can show error rows
   await rows.filter({ hasText: "should fail on this test" }).first().click();
   const errorRows = getErrorRows(page);
-  expect(await errorRows.count()).toBe(1);
+  await waitFor(async () => {
+    expect(await errorRows.count()).toBe(1);
+  });
   const text = await errorRows.first().textContent();
   expect(text).toMatch(/Sorry, something went wrong/);
 });

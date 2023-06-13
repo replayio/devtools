@@ -39,6 +39,7 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
         <div
           className={styles.CurrentExecutionPoint}
           data-test-name="CurrentExecutionPointLineHighlight"
+          data-test-type="preview-location"
         />
       );
     }
@@ -88,6 +89,7 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
         <div
           className={styles.CurrentExecutionPoint}
           data-test-name="CurrentExecutionPointLineHighlight"
+          data-test-type="view-source"
         />
       );
     }
@@ -110,6 +112,7 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
               <div
                 className={styles.CurrentSearchResult}
                 data-test-name="CurrentSearchResultHighlight"
+                data-test-type="search-result"
               />
             );
           }
