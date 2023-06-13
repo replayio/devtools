@@ -4,7 +4,7 @@ import React, { ReactNode, useEffect, useMemo, useState } from "react";
 
 import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
 import PanelTabs from "devtools/client/shared/components/PanelTabs";
-import { hideRequestDetails, selectAndFetchRequest } from "ui/actions/network";
+import { hideRequestDetails, selectNetworkRequest } from "ui/actions/network";
 import { getLoadedRegions } from "ui/reducers/app";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { isPointInRegions } from "ui/utils/timeline";
@@ -287,12 +287,12 @@ const RequestDetails = ({
       switch (event.key) {
         case "ArrowUp": {
           event.preventDefault();
-          previousRequestId !== null && dispatch(selectAndFetchRequest(previousRequestId));
+          previousRequestId !== null && dispatch(selectNetworkRequest(previousRequestId));
           break;
         }
         case "ArrowDown": {
           event.preventDefault();
-          nextRequestId !== null && dispatch(selectAndFetchRequest(nextRequestId));
+          nextRequestId !== null && dispatch(selectNetworkRequest(nextRequestId));
           break;
         }
       }

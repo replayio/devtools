@@ -1,9 +1,8 @@
 import { RequestBodyData } from "@replayio/protocol";
-import { useState } from "react";
+import { useContext, useState } from "react";
 
-import { fetchRequestBody } from "ui/actions/network";
-import { getRequestBodyById } from "ui/reducers/network";
-import { useAppDispatch, useAppSelector, useAppStore } from "ui/setup/hooks";
+import { networkRequestBodyCache } from "replay-next/src/suspense/NetworkRequestsCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import {
   BodyPartsToUInt8Array,
@@ -22,25 +21,20 @@ export default function useCopyAsCURL(
   copy: () => void;
   state: State;
 } {
-  const dispatch = useAppDispatch();
-  const store = useAppStore();
-
-  let requestBody = useAppSelector(state => getRequestBodyById(state, requestSummary.id));
+  const replayClient = useContext(ReplayClientContext);
 
   const [state, setState] = useState<State>("ready");
 
   const copy = async () => {
     try {
-      if (requestSummary.hasRequestBody && requestBody == null) {
-        setState("loading");
+      setState("loading");
 
-        await dispatch(fetchRequestBody(requestSummary.id));
-
-        const state = store.getState();
-        requestBody = getRequestBodyById(state, requestSummary.id);
-      }
+      const stream = networkRequestBodyCache.stream(replayClient, requestSummary.id);
+      await stream.resolver;
+      const requestBody = stream.value!;
 
       const text = formatText(requestSummary, requestBody);
+
       navigator.clipboard.writeText(text);
 
       setState("complete");

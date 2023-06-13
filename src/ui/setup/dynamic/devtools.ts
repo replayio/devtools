@@ -1,8 +1,7 @@
+import "devtools/client/inspector/prefs";
 // Side-effectful import, has to be imported before event-listeners
 // Ordering matters here
-import "devtools/client/inspector/prefs";
-import { ActionCreatorWithoutPayload } from "@reduxjs/toolkit";
-import { bindActionCreators } from "@reduxjs/toolkit";
+import { ActionCreatorWithoutPayload, bindActionCreators } from "@reduxjs/toolkit";
 import { MouseEvent, TimeStampedPoint, sessionError, uploadedData } from "@replayio/protocol";
 import { IDBPDatabase, openDB } from "idb";
 import debounce from "lodash/debounce";
@@ -15,15 +14,16 @@ import { setupBoxModel } from "devtools/client/inspector/boxmodel/actions/box-mo
 import { setupMarkup } from "devtools/client/inspector/markup/actions/markup";
 import * as inspectorReducers from "devtools/client/inspector/reducers";
 import { setupRules } from "devtools/client/inspector/rules/actions/rules";
-import { setupNetwork } from "devtools/client/webconsole/actions/network";
-import { Canvas, setAllPaintsReceivedCallback, setupGraphics } from "protocol/graphics";
 import {
+  Canvas,
+  setAllPaintsReceivedCallback,
   setMouseDownEventsCallback,
   setPausedonPausedAtTimeCallback,
   setPlaybackStatusCallback,
   setPointsReceivedCallback,
   setRefreshGraphicsCallback,
   setVideoUrlCallback,
+  setupGraphics,
 } from "protocol/graphics";
 // eslint-disable-next-line no-restricted-imports
 import { addEventListener, initSocket, client as protocolClient } from "protocol/socket";
@@ -33,6 +33,7 @@ import { CONSOLE_SETTINGS_DATABASE } from "replay-next/src/contexts/ConsoleFilte
 import { POINTS_DATABASE } from "replay-next/src/contexts/points/constants";
 import { IDBOptions } from "replay-next/src/hooks/useIndexedDB";
 import { setPointsReceivedCallback as setAnalysisPointsReceivedCallback } from "replay-next/src/suspense/AnalysisCache";
+import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCache";
 import { objectCache } from "replay-next/src/suspense/ObjectPreviews";
 import { ReplayClientInterface } from "shared/client/types";
 import { UIStore, actions } from "ui/actions";
@@ -213,9 +214,10 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   await setupApp(store, ThreadFront, replayClient);
   setupTimeline(store);
   setupGraphics();
-  setupNetwork(replayClient);
   setupBoxModel(store, startAppListening);
   setupRules(store, startAppListening);
+
+  networkRequestsCache.prefetch(replayClient);
 
   ThreadFront.waitForSession().then(() => {
     // Precache annotations

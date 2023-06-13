@@ -1,4 +1,4 @@
-import { RequestEventInfo, RequestInfo } from "@replayio/protocol";
+import { RequestId } from "@replayio/protocol";
 import { useMemo } from "react";
 import {
   TableInstance,
@@ -8,12 +8,14 @@ import {
   useTable,
 } from "react-table";
 
+import { NetworkRequestsCacheData } from "replay-next/src/suspense/NetworkRequestsCache";
+
 import { CanonicalRequestType, RequestSummary, partialRequestsToCompleteSummaries } from "./utils";
 
 export default function Table({
   children,
-  events,
-  requests,
+  ids,
+  records,
   types,
   ...props
 }: {
@@ -21,8 +23,8 @@ export default function Table({
     data: RequestSummary[];
     table: TableInstance<RequestSummary>;
   }) => JSX.Element;
-  events: RequestEventInfo[];
-  requests: RequestInfo[];
+  ids: RequestId[];
+  records: NetworkRequestsCacheData["records"];
   types: Set<CanonicalRequestType>;
 }) {
   const columns = useMemo(
@@ -66,8 +68,8 @@ export default function Table({
     []
   );
   const data = useMemo(
-    () => partialRequestsToCompleteSummaries(requests, events, types),
-    [events, requests, types]
+    () => partialRequestsToCompleteSummaries(ids, records, types),
+    [ids, records, types]
   );
   const defaultColumn = useMemo(
     () => ({

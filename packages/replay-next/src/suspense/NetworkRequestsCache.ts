@@ -1,8 +1,16 @@
 import {
   ExecutionPoint,
   RequestBodyData,
-  RequestEvent,
+  RequestBodyEvent,
+  RequestDestinationEvent,
+  RequestDoneEvent,
+  RequestFailedEvent,
   RequestId,
+  RequestOpenEvent,
+  RequestRawHeaderEvent,
+  RequestResponseBodyEvent,
+  RequestResponseEvent,
+  RequestResponseRawHeaderEvent,
   ResponseBodyData,
   TimeStampedPoint,
 } from "@replayio/protocol";
@@ -14,7 +22,17 @@ import { ReplayClientInterface } from "shared/client/types";
 
 export type NetworkRequestsData = {
   id: RequestId;
-  requestEvents: RequestEvent[];
+  events: {
+    bodyEvent: RequestBodyEvent | null;
+    destinationEvent: RequestDestinationEvent | null;
+    doneEvent: RequestDoneEvent | null;
+    failedEvent: RequestFailedEvent | null;
+    openEvent: RequestOpenEvent | null;
+    rawHeaderEvent: RequestRawHeaderEvent | null;
+    responseBodyEvent: RequestResponseBodyEvent | null;
+    responseEvent: RequestResponseEvent | null;
+    responseRawHeaderEvent: RequestResponseRawHeaderEvent | null;
+  };
   timeStampedPoint: TimeStampedPoint;
   triggerPoint?: TimeStampedPoint;
 };
@@ -55,7 +73,17 @@ export const networkRequestsCache = createStreamingCache<
 
         records[id] = {
           id,
-          requestEvents: [],
+          events: {
+            bodyEvent: null,
+            destinationEvent: null,
+            doneEvent: null,
+            failedEvent: null,
+            openEvent: null,
+            rawHeaderEvent: null,
+            responseBodyEvent: null,
+            responseEvent: null,
+            responseRawHeaderEvent: null,
+          },
           requestBodyData: null,
           responseBodyData: null,
           timeStampedPoint: {
@@ -67,7 +95,27 @@ export const networkRequestsCache = createStreamingCache<
       });
 
       data.events.forEach(({ id, event }) => {
-        records[id].requestEvents.push(event);
+        const events = records[id].events;
+        switch (event.kind) {
+          case "request":
+            events.openEvent = event;
+            break;
+          case "request-body":
+            events.bodyEvent = event;
+            break;
+          case "request-destination":
+            events.destinationEvent = event;
+            break;
+          case "request-done":
+            events.doneEvent = event;
+            break;
+          case "request-failed":
+            events.failedEvent = event;
+            break;
+          case "request-raw-headers":
+            events.rawHeaderEvent = event;
+            break;
+        }
       });
 
       update(ids, undefined, records);
@@ -79,7 +127,7 @@ export const networkRequestsCache = createStreamingCache<
 
 export const networkRequestBodyCache = createStreamingCache<
   [replayClient: ReplayClientInterface, requestId: RequestId],
-  RequestBodyData[] | null
+  RequestBodyData[]
 >({
   debugLabel: "NetworkRequestBodyCache",
   getKey: (replayClient, requestId) => requestId,
@@ -100,7 +148,7 @@ export const networkRequestBodyCache = createStreamingCache<
 
 export const networkResponseBodyCache = createStreamingCache<
   [replayClient: ReplayClientInterface, requestId: RequestId],
-  ResponseBodyData[] | null
+  ResponseBodyData[]
 >({
   debugLabel: "NetworkResponseBodyCache",
   getKey: (replayClient, requestId) => requestId,

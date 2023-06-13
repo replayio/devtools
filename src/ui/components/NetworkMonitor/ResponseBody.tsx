@@ -1,8 +1,6 @@
 import { ResponseBodyData } from "@replayio/protocol";
-import React from "react";
 
-import { getSelectedResponseBody } from "ui/reducers/network";
-import { useAppSelector } from "ui/setup/hooks";
+import { useNetworkResponseBody } from "replay-next/src/hooks/useNetworkResponseBody";
 
 import HttpBody from "./HttpBody";
 import { RequestSummary, findHeader } from "./utils";
@@ -29,14 +27,13 @@ export function _ResponseBody({
   );
 }
 
-const ResponseBody = ({ request }: { request?: RequestSummary }) => {
-  const responseBodyParts = useAppSelector(getSelectedResponseBody);
-
-  if (!request || !responseBodyParts) {
+function ResponseBody({ request }: { request: RequestSummary }) {
+  const responseBody = useNetworkResponseBody(request.id);
+  if (!responseBody) {
     return null;
   }
 
-  return <_ResponseBody request={request} responseBodyParts={responseBodyParts} />;
-};
+  return <_ResponseBody request={request} responseBodyParts={responseBody} />;
+}
 
 export default ResponseBody;

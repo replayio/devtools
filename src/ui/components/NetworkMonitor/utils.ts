@@ -3,7 +3,7 @@ import {
   RequestBodyEvent,
   RequestDoneEvent,
   RequestEventInfo,
-  RequestInfo,
+  RequestId,
   RequestOpenEvent,
   RequestResponseBodyEvent,
   RequestResponseEvent,
@@ -11,7 +11,8 @@ import {
 } from "@replayio/protocol";
 import keyBy from "lodash/keyBy";
 
-import { compareNumericStrings } from "protocol/utils";
+import { assert, compareNumericStrings } from "protocol/utils";
+import { NetworkRequestsCacheData } from "replay-next/src/suspense/NetworkRequestsCache";
 
 export enum CanonicalRequestType {
   CSS,
@@ -108,15 +109,6 @@ export const eventsToMap = (events: RequestEventInfo[]): Partial<RequestEventMap
   return keyBy(events, e => e.event.kind);
 };
 
-export const eventsByRequestId = (
-  events: RequestEventInfo[]
-): Record<string, RequestEventInfo[]> => {
-  return events.reduce((acc: Record<string, RequestEventInfo[]>, eventInfo) => {
-    acc[eventInfo.id] = [eventInfo, ...(acc[eventInfo.id] || [])];
-    return acc;
-  }, {});
-};
-
 const host = (url: string): string => new URL(url).host;
 const name = (url: string): string =>
   new URL(url).pathname
@@ -144,44 +136,41 @@ const getDocumentType = (headers: Header[]): string => {
 };
 
 export const partialRequestsToCompleteSummaries = (
-  requests: RequestInfo[],
-  events: RequestEventInfo[],
+  ids: RequestId[],
+  records: NetworkRequestsCacheData["records"],
   types: Set<CanonicalRequestType>
 ): RequestSummary[] => {
-  const eventsMap = eventsByRequestId(events);
-  const summaries = requests
-    .map((r: RequestInfo) => ({ ...r, events: eventsToMap(eventsMap[r.id]) }))
-    .filter((r): r is RequestInfo & { events: RequestEventMap } => !!r.events.request)
-    .map((r: RequestInfo & { events: RequestEventMap }) => {
-      const request = r.events.request;
-      const response = r.events.response;
-      const requestDone = r.events["request-done"];
-      const documentType = response ? getDocumentType(response.event.responseHeaders) : undefined;
+  const summaries = ids
+    .map(id => records[id])
+    .filter(record => record.events.openEvent)
+    .map(record => {
+      const { bodyEvent, doneEvent, openEvent, responseBodyEvent, responseEvent } = record.events;
+
+      assert(openEvent);
+
+      console.log(record.events);
 
       return {
-        cause: request.event.requestCause,
-        documentType,
-        domain: host(request.event.requestUrl),
-        firstByte: response?.time,
-        end: requestDone?.time,
-        hasResponseBody: Boolean(r.events["response-body"]),
-        hasRequestBody: Boolean(r.events["request-body"]),
-        id: r.id,
-        method: request.event.requestMethod,
-        name: name(request.event.requestUrl),
-        path: path(request.event.requestUrl),
-        point: {
-          point: r.point,
-          time: r.time,
-        },
-        queryParams: queryParams(request.event.requestUrl),
-        requestHeaders: request.event.requestHeaders,
-        responseHeaders: response?.event.responseHeaders || [],
-        start: request.time,
-        status: response?.event.responseStatus,
-        triggerPoint: r.triggerPoint,
-        type: REQUEST_TYPES[request.event.requestCause || ""] ?? CanonicalRequestType.OTHER,
-        url: request.event.requestUrl,
+        cause: openEvent.requestCause,
+        documentType: responseEvent ? getDocumentType(responseEvent.responseHeaders) : undefined,
+        domain: host(openEvent.requestUrl),
+        firstByte: (responseEvent as any)?.time,
+        end: (doneEvent as any)?.time,
+        hasResponseBody: responseBodyEvent !== null,
+        hasRequestBody: bodyEvent !== null,
+        id: record.id,
+        method: openEvent.requestMethod,
+        name: name(openEvent.requestUrl),
+        path: path(openEvent.requestUrl),
+        point: record.timeStampedPoint,
+        queryParams: queryParams(openEvent.requestUrl),
+        requestHeaders: openEvent.requestHeaders,
+        responseHeaders: responseEvent?.responseHeaders || [],
+        start: record.timeStampedPoint.time,
+        status: responseEvent?.responseStatus,
+        triggerPoint: record.triggerPoint,
+        type: REQUEST_TYPES[openEvent.requestCause || ""] ?? CanonicalRequestType.OTHER,
+        url: openEvent.requestUrl,
       };
     })
     .filter(row => types.size === 0 || types.has(row.type));

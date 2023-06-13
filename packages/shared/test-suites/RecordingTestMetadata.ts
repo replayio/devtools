@@ -710,14 +710,6 @@ export async function convertPlaywrightTestRecording(
   }
 }
 
-function isRequestOpenEvent(value: RequestEvent): value is RequestOpenEvent {
-  return value.kind === "request";
-}
-
-function isRequestResponseEvent(value: RequestEvent): value is RequestResponseEvent {
-  return value.kind === "response";
-}
-
 async function processNetworkData(
   replayClient: ReplayClientInterface,
   begin: TimeStampedPoint,
@@ -740,23 +732,20 @@ async function processNetworkData(
   }
 
   return ids.slice(beginIndex, endIndex).map(id => {
-    const { requestEvents, timeStampedPoint } = records[id];
+    const { events, timeStampedPoint } = records[id];
 
-    const requestOpenEvent = requestEvents.find(isRequestOpenEvent);
-    assert(requestOpenEvent != null, `Missing RequestOpenEvent for network request ${id}`);
-
-    const requestResponseEvent = requestEvents.find(isRequestResponseEvent);
+    assert(events.openEvent != null, `Missing RequestOpenEvent for network request ${id}`);
 
     return {
       data: {
         request: {
           id,
-          method: requestOpenEvent.requestMethod,
-          url: requestOpenEvent.requestUrl,
+          method: events.openEvent.requestMethod,
+          url: events.openEvent.requestUrl,
         },
-        response: requestResponseEvent
+        response: events.responseEvent
           ? {
-              status: requestResponseEvent.responseStatus,
+              status: events.responseEvent.responseStatus,
             }
           : null,
       },

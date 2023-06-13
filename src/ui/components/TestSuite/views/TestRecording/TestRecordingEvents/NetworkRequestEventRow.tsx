@@ -3,7 +3,7 @@ import { memo } from "react";
 import { truncateMiddle } from "replay-next/src/utils/string";
 import { NetworkRequestEvent } from "shared/test-suites/RecordingTestMetadata";
 import { setSelectedPanel } from "ui/actions/layout";
-import { selectAndFetchRequest } from "ui/actions/network";
+import { selectNetworkRequest } from "ui/actions/network";
 import { useAppDispatch } from "ui/setup/hooks";
 
 import styles from "./NetworkRequestEventRow.module.css";
@@ -31,7 +31,7 @@ export default memo(function NetworkRequestEventRow({
 
   const showNetworkPanel = () => {
     dispatch(setSelectedPanel("network"));
-    dispatch(selectAndFetchRequest(id));
+    dispatch(selectNetworkRequest(id));
   };
 
   const formattedPathname = truncateMiddle(pathname, 150);
