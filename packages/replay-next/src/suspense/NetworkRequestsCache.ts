@@ -1,19 +1,29 @@
 import {
+  ExecutionPoint,
   RequestBodyData,
-  RequestEventInfo,
-  RequestInfo,
+  RequestEvent,
+  RequestId,
   ResponseBodyData,
+  TimeStampedPoint,
 } from "@replayio/protocol";
 import { createCache } from "suspense";
 
-import { compareExecutionPoints } from "replay-next/src/utils/time";
+import { comparePoints } from "protocol/execution-point-utils";
+import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
 
+export type NetworkRequestsData = {
+  id: RequestId;
+  requestEvents: RequestEvent[];
+  requestBodyData: RequestBodyData | null;
+  responseBodyData: ResponseBodyData | null;
+  timeStampedPoint: TimeStampedPoint;
+  triggerPoint?: TimeStampedPoint;
+};
+
 export type NetworkRequestsCacheData = {
-  requestEventInfo: RequestEventInfo[];
-  requestInfo: RequestInfo[];
-  responseBodyData: ResponseBodyData[];
-  requestBodyData: RequestBodyData[];
+  ids: RequestId[];
+  records: Record<RequestId, NetworkRequestsData>;
 };
 
 export const networkRequestsCache = createCache<
@@ -22,29 +32,76 @@ export const networkRequestsCache = createCache<
 >({
   debugLabel: "NetworkRequestsCache",
   load: async ([replayClient]) => {
-    const requestEventInfo: RequestEventInfo[] = [];
-    const requestInfo: RequestInfo[] = [];
-    const responseBodyData: ResponseBodyData[] = [];
-    const requestBodyData: RequestBodyData[] = [];
+    const records: Record<RequestId, NetworkRequestsData> = {};
+    const ids: RequestId[] = [];
+
+    let previousExecutionPoint: ExecutionPoint | null = null;
+    let requestBodyIndex = 0;
+    let responseBodyIndex = 0;
 
     await replayClient.findNetworkRequests(
       function onRequestsReceived(data) {
-        requestEventInfo.push(...data.events);
-        requestInfo.push(...data.requests);
+        data.requests.forEach(({ id, point, time, triggerPoint }) => {
+          assert(
+            previousExecutionPoint === null || comparePoints(previousExecutionPoint, point) <= 0,
+            "Requests should be in order"
+          );
+
+          previousExecutionPoint = point;
+
+          ids.push(id);
+
+          records[id] = {
+            id,
+            requestEvents: [],
+            requestBodyData: null,
+            responseBodyData: null,
+            timeStampedPoint: {
+              point,
+              time,
+            },
+            triggerPoint,
+          } as NetworkRequestsData;
+        });
+
+        data.events.forEach(({ id, event }) => {
+          records[id].requestEvents.push(event);
+        });
       },
       function onResponseBodyData(data) {
-        responseBodyData.push(...data.parts);
+        data.parts.forEach(responseBodyData => {
+          const id = ids[responseBodyIndex];
+
+          records[id].responseBodyData = responseBodyData;
+
+          responseBodyIndex++;
+        });
       },
       function onRequestBodyData(data) {
-        requestBodyData.push(...data.parts);
+        data.parts.forEach(requestBodyData => {
+          const id = ids[requestBodyIndex];
+
+          records[id].requestBodyData = requestBodyData;
+
+          requestBodyIndex++;
+        });
       }
     );
 
+    console.log(
+      JSON.stringify(
+        {
+          ids,
+          records,
+        },
+        null,
+        2
+      )
+    );
+
     return {
-      requestEventInfo: requestEventInfo.sort((a, b) => a.time - b.time),
-      requestBodyData,
-      requestInfo: requestInfo.sort((a, b) => compareExecutionPoints(a.point, b.point)),
-      responseBodyData,
+      ids,
+      records,
     };
   },
 });

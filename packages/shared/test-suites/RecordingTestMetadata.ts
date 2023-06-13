@@ -723,77 +723,41 @@ async function processNetworkData(
   begin: TimeStampedPoint,
   end: TimeStampedPoint
 ): Promise<RecordingTestMetadataV3.NetworkRequestEvent[]> {
-  const { requestEventInfo, requestInfo } = await networkRequestsCache.readAsync(replayClient);
-
-  const idToProcessedNetworkData: {
-    [id: string]: {
-      id: string;
-      request: RequestOpenEvent | null;
-      response: RequestResponseEvent | null;
-      timestampedPoint: TimeStampedPoint;
-    };
-  } = {};
+  const { ids, records } = await networkRequestsCache.readAsync(replayClient);
 
   // Filter by RequestInfo (because they have execution points)
   // then map RequestInfo to RequestEventInfo using ids
-  const [beginIndex, endIndex] = findSliceIndices(
-    requestInfo,
-    begin.point,
-    end.point,
-    (item, point) => comparePoints(item.point, point)
-  );
+  const [beginIndex, endIndex] = findSliceIndices(ids, begin.point, end.point, (id, point) => {
+    const requestData = records[id];
+    return comparePoints(requestData.timeStampedPoint.point, point);
+  });
 
-  if (beginIndex >= 0 && endIndex >= 0) {
-    // Network events are for the entire recording (which may include more than one test)
-    // we need to splice only the appropriate subset for each test.
-    for (let index = beginIndex; index <= endIndex; index++) {
-      const { id, point, time } = requestInfo[index];
-      idToProcessedNetworkData[id] = {
-        id,
-        request: null,
-        response: null,
-        timestampedPoint: {
-          point,
-          time,
-        },
-      };
-    }
-
-    // Network responses may be processed after a test has finished,
-    // so we should continue iterating past the end time.
-    for (let index = beginIndex; index < requestEventInfo.length; index++) {
-      const { event, id } = requestEventInfo[index];
-      const processedNetworkData = idToProcessedNetworkData[id];
-      if (processedNetworkData != null) {
-        if (isRequestOpenEvent(event)) {
-          processedNetworkData.request = event;
-        } else if (isRequestResponseEvent(event)) {
-          processedNetworkData.response = event;
-        }
-      }
-    }
+  if (beginIndex < 0 || endIndex < 0) {
+    return [];
   }
 
-  return Object.values(idToProcessedNetworkData).map(processedNetworkData => {
-    assert(
-      processedNetworkData.request !== null,
-      `Missing request for network event ${processedNetworkData.id}`
-    );
+  return ids.slice(beginIndex, endIndex).map(id => {
+    const { requestEvents, timeStampedPoint } = records[id];
+
+    const requestOpenEvent = requestEvents.find(isRequestOpenEvent);
+    assert(requestOpenEvent != null, `Missing RequestOpenEvent for network request ${id}`);
+
+    const requestResponseEvent = requestEvents.find(isRequestResponseEvent);
 
     return {
       data: {
         request: {
-          id: processedNetworkData.id,
-          method: processedNetworkData.request.requestMethod,
-          url: processedNetworkData.request.requestUrl,
+          id,
+          method: requestOpenEvent.requestMethod,
+          url: requestOpenEvent.requestUrl,
         },
-        response: processedNetworkData.response
+        response: requestResponseEvent
           ? {
-              status: processedNetworkData.response.responseStatus,
+              status: requestResponseEvent.responseStatus,
             }
           : null,
       },
-      timeStampedPoint: processedNetworkData.timestampedPoint,
+      timeStampedPoint,
       type: "network-request",
     };
   });
