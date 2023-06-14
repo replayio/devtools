@@ -1,4 +1,4 @@
-import { ReactNode, useContext, useMemo, useState } from "react";
+import { unstable_Offscreen as Offscreen, ReactNode, useContext, useMemo, useState } from "react";
 
 import Icon from "replay-next/components/Icon";
 import {
@@ -107,8 +107,8 @@ function FileNodeRenderer({
         <div className="truncate">{name}</div>
         {!expanded && <div className="text-xs text-bodySubColor">({recordings.length} tests)</div>}
       </div>
-      {expanded &&
-        recordings.map(recording => (
+      <Offscreen mode={expanded ? "visible" : "hidden"}>
+        {recordings.map(recording => (
           <TestResultListItem
             depth={depth + 1}
             key={recording.id}
@@ -117,6 +117,7 @@ function FileNodeRenderer({
             secondaryBadgeCount={/* index > 0 ? index + 1 : null */ null}
           />
         ))}
+      </Offscreen>
     </>
   );
 }
@@ -166,8 +167,8 @@ function PathNodeRenderer({
           )}
         </div>
       )}
-      {expanded &&
-        children.map((childNode, index) => {
+      <Offscreen mode={expanded ? "visible" : "hidden"}>
+        {children.map((childNode, index) => {
           if (isPathNode(childNode)) {
             return (
               <PathNodeRenderer depth={depth + 1} key={index} label={label} pathNode={childNode} />
@@ -178,6 +179,7 @@ function PathNodeRenderer({
             );
           }
         })}
+      </Offscreen>
     </>
   );
 }
