@@ -1,7 +1,7 @@
 import assert from "assert";
 import { TimeStampedPoint } from "@replayio/protocol";
 import { Suspense, memo, useContext, useMemo, useState } from "react";
-import { useImperativeCacheValue } from "suspense";
+import { STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from "suspense";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import Loader from "replay-next/components/Loader";
@@ -80,7 +80,7 @@ export default memo(function UserActionEventRow({
   });
 
   const jumpToCodeAnnotations: ParsedJumpToCodeAnnotation[] =
-    annotationsStatus === "resolved" ? parsedAnnotations : NO_ANNOTATIONS;
+    annotationsStatus === STATUS_RESOLVED ? parsedAnnotations : NO_ANNOTATIONS;
 
   const [canShowJumpToCode, jumpToCodeAnnotation] = findJumpToCodeDetailsIfAvailable(
     groupedTestCases,
@@ -100,7 +100,10 @@ export default memo(function UserActionEventRow({
   const showBadge = isCurrent && command.name === "get" && result != null;
   const showJumpToCode = (isHovered || isCurrent) && canShowJumpToCode;
 
-  const jumpToCodeStatus: JumpToCodeStatus = !!jumpToCodeAnnotation ? "found" : "no_hits";
+  let jumpToCodeStatus: JumpToCodeStatus = "loading";
+  if (annotationsStatus !== STATUS_PENDING) {
+    jumpToCodeStatus = !!jumpToCodeAnnotation ? "found" : "no_hits";
+  }
 
   const eventNumber = useMemo(() => {
     if (parentId !== null) {

@@ -24,6 +24,7 @@ type EventProps = {
   event: ReplayEvent;
   executionPoint: string;
   jumpToCodeAnnotation?: ParsedJumpToCodeAnnotation;
+  jumpToCodeLoadingStatus: "loading" | "complete";
   onSeek: (point: string, time: number) => void;
 };
 
@@ -49,6 +50,7 @@ export default React.memo(function Event({
   event,
   onSeek,
   jumpToCodeAnnotation,
+  jumpToCodeLoadingStatus,
 }: EventProps) {
   const dispatch = useAppDispatch();
   const { kind, point, time } = event;
@@ -94,7 +96,13 @@ export default React.memo(function Event({
   if (event.kind === "mousedown" || event.kind === "keypress") {
     // The backend routine only saves annotations for actual hits.
     // If there's no annotation, we know there's no hits.
-    const jumpToCodeStatus: JumpToCodeStatus = !!jumpToCodeAnnotation ? "found" : "no_hits";
+    const annotationsLoading = jumpToCodeLoadingStatus === "loading";
+    const hasJumpToCodeAnnotation = !!jumpToCodeAnnotation;
+    const jumpToCodeStatus: JumpToCodeStatus = annotationsLoading
+      ? "loading"
+      : hasJumpToCodeAnnotation
+      ? "found"
+      : "no_hits";
 
     renderedJumpToCodeButton = (
       <JumpToCodeButton

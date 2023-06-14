@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import sortedLastIndex from "lodash/sortedLastIndex";
 import { memo, useContext, useMemo } from "react";
-import { useImperativeCacheValue } from "suspense";
+import { STATUS_PENDING, STATUS_RESOLVED, useImperativeCacheValue } from "suspense";
 
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -61,7 +61,7 @@ function Events() {
   );
 
   const jumpToCodeAnnotations: ParsedJumpToCodeAnnotation[] =
-    annotationsStatus === "resolved" ? parsedAnnotations : NO_ANNOTATIONS;
+    annotationsStatus === STATUS_RESOLVED ? parsedAnnotations : NO_ANNOTATIONS;
 
   const jumpToCodeEntriesPerEvent = useMemo(() => {
     const jumpToCodeEntriesByPoint: Record<string, ParsedJumpToCodeAnnotation> = {};
@@ -97,6 +97,9 @@ function Events() {
                   currentTime={currentTime}
                   executionPoint={executionPoint!}
                   jumpToCodeAnnotation={jumpToCodeEntriesPerEvent[event.point]}
+                  jumpToCodeLoadingStatus={
+                    annotationsStatus === STATUS_PENDING ? "loading" : "complete"
+                  }
                 />
               </div>
             </div>
