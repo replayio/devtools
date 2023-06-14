@@ -130,6 +130,15 @@ export const networkRequestsCache = createStreamingCache<
           case "request-raw-headers":
             events.rawHeaderEvent = event;
             break;
+          case "response":
+            events.responseEvent = event;
+            break;
+          case "response-body":
+            events.responseBodyEvent = event;
+            break;
+          case "response-raw-headers":
+            events.responseRawHeaderEvent = event;
+            break;
         }
       });
 

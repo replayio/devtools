@@ -148,8 +148,6 @@ export const partialRequestsToCompleteSummaries = (
 
       assert(openEvent);
 
-      console.log(record.events);
-
       return {
         cause: openEvent.requestCause,
         documentType: responseEvent ? getDocumentType(responseEvent.responseHeaders) : undefined,
