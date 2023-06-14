@@ -111,7 +111,7 @@ export function bootstrapStore(initialState: Partial<UIState>) {
 
       return updatedMiddlewareArray as typeof originalMiddlewareArray;
     },
-    devTools: process.env.NODE_ENV === "production" ? false : reduxDevToolsOptions,
+    devTools: reduxDevToolsOptions,
   });
 
   return store;
