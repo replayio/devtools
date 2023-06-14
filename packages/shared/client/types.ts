@@ -27,8 +27,13 @@ import {
   PointSelector,
   getPointsBoundingTimeResult as PointsBoundingTime,
   RecordingId,
+  RequestBodyData,
+  requestBodyData as RequestBodyDataEvent,
   RequestEventInfo,
+  RequestId,
   RequestInfo,
+  ResponseBodyData,
+  responseBodyData as ResponseBodyDataEvent,
   Result,
   RunEvaluationResult,
   SameLineSourceLocations,
@@ -51,8 +56,6 @@ import {
   keyboardEvents,
   navigationEvents,
   repaintGraphicsResult,
-  requestBodyData,
-  responseBodyData,
 } from "@replayio/protocol";
 
 export type LogEntry = {
@@ -170,10 +173,11 @@ export interface ReplayClientInterface {
   }>;
   findNavigationEvents(onKeyboardEvents: (events: navigationEvents) => void): Promise<void>;
   findNetworkRequests(
-    onRequestsReceived: (data: { requests: RequestInfo[]; events: RequestEventInfo[] }) => void,
-    onResponseBodyData: (body: responseBodyData) => void,
-    onRequestBodyData: (body: requestBodyData) => void
-  ): Promise<void>;
+    onRequestsReceived?: (data: { requests: RequestInfo[]; events: RequestEventInfo[] }) => void
+  ): Promise<{
+    events: RequestEventInfo[];
+    requests: RequestInfo[];
+  }>;
   findPoints(selector: PointSelector, limits?: PointLimits): Promise<PointDescription[]>;
   findRewindTarget(point: ExecutionPoint): Promise<PauseDescription>;
   findResumeTarget(point: ExecutionPoint): Promise<PauseDescription>;
@@ -207,6 +211,14 @@ export interface ReplayClientInterface {
   getPointNearTime(time: number): Promise<TimeStampedPoint>;
   getPointsBoundingTime(time: number): Promise<PointsBoundingTime>;
   getRecordingId(): RecordingId | null;
+  getNetworkRequestBody(
+    requestId: RequestId,
+    onRequestBodyData?: (event: RequestBodyDataEvent) => void
+  ): Promise<RequestBodyData[]>;
+  getNetworkResponseBody(
+    requestId: RequestId,
+    onResponseBodyData?: (data: ResponseBodyDataEvent) => void
+  ): Promise<ResponseBodyData[]>;
   getScope(pauseId: PauseId, scopeId: ScopeId): Promise<getScopeResult>;
   getScopeMap(location: Location): Promise<VariableMapping[] | undefined>;
   getScreenshot(point: ExecutionPoint): Promise<ScreenShot>;

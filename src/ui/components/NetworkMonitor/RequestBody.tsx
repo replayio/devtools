@@ -1,15 +1,19 @@
-import React from "react";
-
-import { getSelectedRequestBody } from "ui/reducers/network";
-import { useAppSelector } from "ui/setup/hooks";
+import { useNetworkRequestBody } from "replay-next/src/hooks/useNetworkRequestBody";
 
 import HttpBody from "./HttpBody";
 import { RequestSummary, findHeader } from "./utils";
 
-const RequestBody = ({ request }: { request: RequestSummary | undefined }) => {
-  const requestBody = useAppSelector(getSelectedRequestBody);
+export default function RequestBodyWrapper({ request }: { request: RequestSummary | undefined }) {
+  if (!request) {
+    return null;
+  }
 
-  if (!request || !requestBody) {
+  return <RequestBody request={request} />;
+}
+
+function RequestBody({ request }: { request: RequestSummary }) {
+  const requestBody = useNetworkRequestBody(request.id);
+  if (!requestBody) {
     return null;
   }
 
@@ -25,6 +29,4 @@ const RequestBody = ({ request }: { request: RequestSummary | undefined }) => {
       </div>
     </>
   );
-};
-
-export default RequestBody;
+}

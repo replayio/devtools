@@ -1,40 +1,80 @@
-import React, { useEffect, useRef, useState } from "react";
-import { ConnectedProps, connect } from "react-redux";
+import { RequestId } from "@replayio/protocol";
+import { useMemo, useRef, useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { useStreamingValue } from "suspense";
 
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import IndeterminateLoader from "replay-next/components/IndeterminateLoader";
-import { actions } from "ui/actions";
-import { hideRequestDetails, selectAndFetchRequest } from "ui/actions/network";
-import { getFocusedEvents, getFocusedRequests, getSelectedRequestId } from "ui/reducers/network";
-import { getCurrentTime } from "ui/reducers/timeline";
+import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCache";
+import {
+  isExecutionPointsGreaterThan,
+  isExecutionPointsLessThan,
+} from "replay-next/src/utils/time";
+import { replayClient } from "shared/client/ReplayClientContext";
+import { hideRequestDetails, selectNetworkRequest } from "ui/actions/network";
+import { seek } from "ui/actions/timeline";
+import { FilterLayout } from "ui/components/NetworkMonitor/FilterLayout";
+import RequestDetails from "ui/components/NetworkMonitor/RequestDetails";
+import RequestTable from "ui/components/NetworkMonitor/RequestTable";
+import Table from "ui/components/NetworkMonitor/Table";
+import { getSelectedRequestId } from "ui/reducers/network";
+import { getCurrentTime, getFocusRegion } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { UIState } from "ui/state";
 import { timeMixpanelEvent } from "ui/utils/mixpanel";
 import { trackEvent } from "ui/utils/telemetry";
 
-import { FilterLayout } from "./FilterLayout";
-import RequestDetails from "./RequestDetails";
-import RequestTable from "./RequestTable";
-import Table from "./Table";
 import { CanonicalRequestType, RequestSummary } from "./utils";
 
-export const NetworkMonitor = ({
-  currentTime,
-  cx,
-  events,
-  loading,
-  requests,
-  requestsAfterFilterCount,
-  requestsBeforeFilterCount,
-  seek,
-}: PropsFromRedux) => {
-  const selectedRequestId = useAppSelector(getSelectedRequestId);
+export default function NetworkMonitor() {
   const dispatch = useAppDispatch();
+
+  const currentTime = useAppSelector(getCurrentTime);
+  const context = useAppSelector(getThreadContext);
+  const focusRegion = useAppSelector(getFocusRegion);
+
+  const selectedRequestId = useAppSelector(getSelectedRequestId);
   const [types, setTypes] = useState<Set<CanonicalRequestType>>(new Set([]));
-  const [vert, setVert] = useState<boolean>(false);
 
   const container = useRef<HTMLDivElement>(null);
+
+  const stream = networkRequestsCache.stream(replayClient);
+  const { complete, data: records = {}, value: ids = [] } = useStreamingValue(stream);
+
+  const { countAfter, countBefore, filteredIds } = useMemo(() => {
+    if (focusRegion === null) {
+      return {
+        countAfter: 0,
+        countBefore: 0,
+        filteredIds: ids,
+      };
+    }
+
+    const filteredIds: RequestId[] = [];
+
+    let countBefore = 0;
+    let countAfter = 0;
+
+    if (records != null) {
+      for (const id of ids) {
+        const record = records[id];
+        const point = record.timeStampedPoint.point;
+
+        if (isExecutionPointsLessThan(point, focusRegion.begin.point)) {
+          countBefore++;
+        } else if (isExecutionPointsGreaterThan(point, focusRegion.end.point)) {
+          countAfter++;
+        } else {
+          filteredIds.push(id);
+        }
+      }
+    }
+
+    return {
+      countAfter,
+      countBefore,
+      filteredIds,
+    };
+  }, [focusRegion, ids, records]);
 
   const toggleType = (type: CanonicalRequestType) => {
     dispatch(hideRequestDetails());
@@ -50,26 +90,7 @@ export const NetworkMonitor = ({
     setTypes(newTypes);
   };
 
-  let resizeObserver = useRef(
-    new ResizeObserver(() => setVert((container.current?.offsetWidth || 0) > 700))
-  );
-
-  useEffect(() => {
-    const observer = resizeObserver.current;
-    const splitBoxContainer = container.current;
-
-    if (splitBoxContainer) {
-      observer.observe(splitBoxContainer);
-    }
-
-    return () => {
-      if (splitBoxContainer) {
-        observer.unobserve(splitBoxContainer);
-      }
-    };
-  }, []);
-
-  if (loading) {
+  if (!complete) {
     timeMixpanelEvent("net_monitor.open_network_monitor");
     return <IndeterminateLoader />;
   }
@@ -77,7 +98,7 @@ export const NetworkMonitor = ({
   trackEvent("net_monitor.open_network_monitor");
 
   return (
-    <Table events={events} requests={requests} types={types}>
+    <Table ids={filteredIds} records={records} types={types}>
       {({ table, data }: { table: any; data: RequestSummary[] }) => {
         let selectedRequest;
         let previousRequestId = null;
@@ -110,13 +131,13 @@ export const NetworkMonitor = ({
                       table={table}
                       currentTime={currentTime}
                       data={data}
-                      filteredAfterCount={requestsAfterFilterCount}
-                      filteredBeforeCount={requestsBeforeFilterCount}
+                      filteredAfterCount={countAfter}
+                      filteredBeforeCount={countBefore}
                       onRowSelect={row => {
                         trackEvent("net_monitor.select_request_row");
-                        dispatch(selectAndFetchRequest(row.id));
+                        dispatch(selectNetworkRequest(row.id));
                       }}
-                      seek={seek}
+                      seek={(...args) => dispatch(seek(...args))}
                       selectedRequest={selectedRequest}
                     />
                   </Panel>
@@ -126,7 +147,7 @@ export const NetworkMonitor = ({
                       <Panel defaultSize={50}>
                         {selectedRequest ? (
                           <RequestDetails
-                            cx={cx}
+                            cx={context}
                             request={selectedRequest}
                             previousRequestId={previousRequestId}
                             nextRequestId={nextRequestId}
@@ -145,27 +166,4 @@ export const NetworkMonitor = ({
       }}
     </Table>
   );
-};
-
-const connector = connect(
-  (state: UIState) => {
-    const [requests, requestsBeforeFilterCount, requestsAfterFilterCount] =
-      getFocusedRequests(state);
-
-    return {
-      currentTime: getCurrentTime(state),
-      cx: getThreadContext(state),
-      events: getFocusedEvents(state),
-      loading: state.network.loading,
-      requests,
-      requestsAfterFilterCount,
-      requestsBeforeFilterCount,
-    };
-  },
-  {
-    seek: actions.seek,
-  }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(NetworkMonitor);
+}

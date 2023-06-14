@@ -20,8 +20,14 @@ import {
   PointSelector,
   getPointsBoundingTimeResult as PointsBoundingTime,
   RecordingId,
+  RequestBodyData,
+  requestBodyData as RequestBodyDataEvent,
   RequestEventInfo,
+  RequestId,
   RequestInfo,
+  requests as Requests,
+  ResponseBodyData,
+  responseBodyData as ResponseBodyDataEvent,
   Result,
   RunEvaluationResult,
   SameLineSourceLocations,
@@ -46,8 +52,6 @@ import {
   navigationEvents,
   newSources,
   repaintGraphicsResult,
-  requestBodyData,
-  responseBodyData,
   runEvaluationResults,
   searchSourceContentsMatches,
   sourceContentsChunk,
@@ -335,16 +339,42 @@ export class ReplayClient implements ReplayClientInterface {
     client.Session.removeNavigationEventsListener(onNavigationEvents);
   }
 
-  async findNetworkRequests(
-    onRequestsReceived: (data: { requests: RequestInfo[]; events: RequestEventInfo[] }) => void,
-    onResponseBodyData: (body: responseBodyData) => void,
-    onRequestBodyData: (body: requestBodyData) => void
-  ) {
+  _findNetworkRequestsCalled: boolean = false;
+
+  async findNetworkRequests(onRequestsReceived?: (requests: Requests) => void): Promise<{
+    events: RequestEventInfo[];
+    requests: RequestInfo[];
+  }> {
+    // HACK
+    // Calling this method more than once is unsafe;
+    // the protocol API is not stateful and relies on a global event listener.
+    // This relies on an in-memory caching layer (likely a Suspense cache).
+    assert(
+      this._findNetworkRequestsCalled === false,
+      "findNetworkRequests should only be called once"
+    );
+
+    this._findNetworkRequestsCalled = true;
+
     const sessionId = await this.waitForSession();
-    client.Network.addRequestsListener(onRequestsReceived);
-    client.Network.addResponseBodyDataListener(onResponseBodyData);
-    client.Network.addRequestBodyDataListener(onRequestBodyData);
+
+    const events: RequestEventInfo[] = [];
+    const requests: RequestInfo[] = [];
+
+    const listener = (data: Requests) => {
+      onRequestsReceived?.(data);
+
+      events.push(...data.events);
+      requests.push(...data.requests);
+    };
+
+    client.Network.addRequestsListener(listener);
+
     await client.Network.findRequests({}, sessionId);
+
+    client.Network.removeRequestsListener(listener);
+
+    return { events, requests };
   }
 
   async findPoints(
@@ -456,6 +486,56 @@ export class ReplayClient implements ReplayClientInterface {
     const sessionId = this.getSessionIdThrows();
     const result = await client.Pause.getAllFrames({}, sessionId, pauseId);
     return result;
+  }
+
+  async getNetworkRequestBody(
+    requestId: RequestId,
+    onRequestBodyData?: (event: RequestBodyDataEvent) => void
+  ): Promise<RequestBodyData[]> {
+    const sessionId = await this.waitForSession();
+
+    const data: RequestBodyData[] = [];
+
+    const listener = (event: RequestBodyDataEvent) => {
+      if (event.id === requestId) {
+        onRequestBodyData?.(event);
+
+        data.push(...event.parts);
+      }
+    };
+
+    client.Network.addRequestBodyDataListener(listener);
+
+    await client.Network.getRequestBody({ id: requestId }, sessionId);
+
+    client.Network.removeRequestBodyDataListener(listener);
+
+    return data;
+  }
+
+  async getNetworkResponseBody(
+    requestId: RequestId,
+    onResponseBodyData?: (data: ResponseBodyDataEvent) => void
+  ): Promise<ResponseBodyData[]> {
+    const sessionId = await this.waitForSession();
+
+    const data: ResponseBodyData[] = [];
+
+    const listener = (event: ResponseBodyDataEvent) => {
+      if (event.id === requestId) {
+        onResponseBodyData?.(event);
+
+        data.push(...event.parts);
+      }
+    };
+
+    client.Network.addResponseBodyDataListener(listener);
+
+    await client.Network.getResponseBody({ id: requestId }, sessionId);
+
+    client.Network.removeResponseBodyDataListener(listener);
+
+    return data;
   }
 
   async getTopFrame(pauseId: PauseId): Promise<getTopFrameResult> {
