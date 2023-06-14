@@ -76,7 +76,7 @@ function TestStatusGroupExpanded({
 }) {
   const tree = useFileNameTree(recordingGroup);
 
-  return <PathNodeRenderer depth={0} label={label} pathNode={tree} />;
+  return <PathNodeRenderer depth={1} label={label} pathNode={tree} />;
 }
 
 function FileNodeRenderer({
@@ -148,6 +148,9 @@ function PathNodeRenderer({
         >
           <Icon className="h-5 w-5" type={expanded ? "folder-open" : "folder-closed"} />
           {pathName}
+          {!expanded && (
+            <div className="text-xs text-bodySubColor">({pathNode.nestedRecordingCount} tests)</div>
+          )}
         </div>
       )}
       {expanded &&

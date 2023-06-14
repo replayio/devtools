@@ -19,6 +19,7 @@ export function useFileNameTree(recordingGroup: RecordingGroup) {
   const tree = useMemo<Tree>(() => {
     const root: Tree = {
       children: {},
+      nestedRecordingCount: 0,
       pathName: null,
       type: "path",
     };
@@ -27,6 +28,8 @@ export function useFileNameTree(recordingGroup: RecordingGroup) {
       const recordings = fileNameToRecordings[fileName];
 
       const parts = fileName.split("/");
+
+      const ancestors: PathNode[] = [root];
 
       let currentNode: PathNode = root;
       for (let index = 0; index < parts.length - 1; index++) {
@@ -38,10 +41,13 @@ export function useFileNameTree(recordingGroup: RecordingGroup) {
         } else {
           currentNode = currentNode.children[part] = {
             children: {},
+            nestedRecordingCount: 0,
             pathName: part,
             type: "path",
           };
         }
+
+        ancestors.push(currentNode);
       }
 
       const part = parts[parts.length - 1];
@@ -56,6 +62,10 @@ export function useFileNameTree(recordingGroup: RecordingGroup) {
         };
       }
       node.recordings.push(...recordings);
+
+      ancestors.forEach(ancestor => {
+        ancestor.nestedRecordingCount += recordings.length;
+      });
     }
 
     return root;
@@ -71,6 +81,7 @@ export type PathNode = {
   children: {
     [name: string]: TreeNode;
   };
+  nestedRecordingCount: number;
   pathName: string | null;
   type: "path";
 };
