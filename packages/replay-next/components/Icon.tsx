@@ -33,6 +33,8 @@ export type IconType =
   | "fast-forward"
   | "file"
   | "folder"
+  | "folder-closed"
+  | "folder-open"
   | "inspect"
   | "invisible"
   | "invoke-getter"
@@ -230,8 +232,13 @@ export default function Icon({
         "M6 22q-.825 0-1.412-.587Q4 20.825 4 20V4q0-.825.588-1.413Q5.175 2 6 2h8l6 6v12q0 .825-.587 1.413Q18.825 22 18 22Zm7-13V4H6v16h12V9ZM6 4v5-5 16V4Z";
       break;
     case "folder":
+    case "folder-closed":
       path =
-        "M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z";
+        "M20,18H4V8H20M20,6H12L10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6Z";
+      break;
+    case "folder-open":
+      path =
+        "M6.1,10L4,18V8H21A2,2 0 0,0 19,6H12L10,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H19C19.9,20 20.7,19.4 20.9,18.5L23.2,10H6.1M19,18H6L7.6,12H20.6L19,18Z";
       break;
     case "inspect":
       path =
