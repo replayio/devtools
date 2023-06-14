@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from "react";
+import { ReactNode, useContext, useMemo, useState } from "react";
 
 import Icon from "replay-next/components/Icon";
 import {
@@ -88,7 +88,7 @@ function FileNodeRenderer({
   label: string;
   fileNode: FileNode;
 }) {
-  const { fileName, recordings } = fileNode;
+  const { name, recordings } = fileNode;
 
   const [expanded, setExpanded] = useState(true);
 
@@ -97,14 +97,14 @@ function FileNodeRenderer({
   return (
     <>
       <div
-        className={`flex cursor-pointer items-center gap-2 py-2 ${styles.libraryRow}`}
+        className={`flex cursor-pointer items-center gap-2 truncate py-2 pr-4 ${styles.libraryRow}`}
         onClick={onClick}
         style={{
           paddingLeft: `${depth * 1}rem`,
         }}
       >
-        <Icon className="h-5 w-5" type="file" />
-        <div>{fileName}</div>
+        <Icon className="h-5 w-5 shrink-0" type="file" />
+        <div className="truncate">{name}</div>
         {!expanded && <div className="text-xs text-bodySubColor">({recordings.length} tests)</div>}
       </div>
       {expanded &&
@@ -130,31 +130,44 @@ function PathNodeRenderer({
   label: string;
   pathNode: PathNode;
 }) {
-  const { children, pathName } = pathNode;
+  const { children, name, pathNames } = pathNode;
 
   const [expanded, setExpanded] = useState(true);
 
   const onClick = () => setExpanded(!expanded);
 
+  const formattedNames: ReactNode[] = [];
+  pathNames.forEach((pathName, index) => {
+    if (index > 0) {
+      formattedNames.push(
+        <div key={`${index}-separator`} className="text-xs text-bodySubColor">
+          /
+        </div>
+      );
+    }
+
+    formattedNames.push(<div key={index}>{pathName}</div>);
+  });
+
   return (
     <>
-      {pathName && (
+      {name && (
         <div
-          className={`flex cursor-pointer items-center gap-2 py-2 ${styles.libraryRow}`}
+          className={`flex cursor-pointer items-center gap-2 truncate py-2 pr-4 ${styles.libraryRow}`}
           onClick={onClick}
           style={{
             paddingLeft: `${depth * 1}rem`,
           }}
         >
-          <Icon className="h-5 w-5" type={expanded ? "folder-open" : "folder-closed"} />
-          {pathName}
+          <Icon className="h-5 w-5 shrink-0" type={expanded ? "folder-open" : "folder-closed"} />
+          <div className="flex items-center gap-1 truncate">{formattedNames}</div>
           {!expanded && (
             <div className="text-xs text-bodySubColor">({pathNode.nestedRecordingCount} tests)</div>
           )}
         </div>
       )}
       {expanded &&
-        Array.from(Object.values(children)).map((childNode, index) => {
+        children.map((childNode, index) => {
           if (isPathNode(childNode)) {
             return (
               <PathNodeRenderer depth={depth + 1} key={index} label={label} pathNode={childNode} />
