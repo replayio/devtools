@@ -47,12 +47,14 @@ export function OnboardingContentWrapper({
 
 export function OnboardingContent({
   children,
+  noLogo,
 }: {
   children: React.ReactChild | (React.ReactChild | null)[];
+  noLogo?: boolean;
 }) {
   return (
     <div className={styles.onboardingContent}>
-      <ReplayLogo size="md" color="white" />
+      {noLogo ? null : <ReplayLogo size="md" color="white" />}
       {children}
     </div>
   );
