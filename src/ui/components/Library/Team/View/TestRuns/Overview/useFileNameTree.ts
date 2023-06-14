@@ -5,18 +5,20 @@ import { insert, insertString } from "replay-next/src/utils/array";
 import { Recording } from "shared/graphql/types";
 import { RecordingGroup } from "ui/utils/testRuns";
 
-export function useFileNameTree(recordingGroup: RecordingGroup) {
+export function useFileNameTree(recordingGroup: RecordingGroup, filterByText: string = "") {
   const { fileNameToRecordings } = recordingGroup;
+  console.log(`useFileNameTree() "${filterByText}"`);
 
-  const sortedFileNames = useMemo(() => {
-    const fileNames: string[] = [];
-    for (let fileName in fileNameToRecordings) {
-      insertString(fileNames, fileName);
-    }
-    return fileNames;
-  }, [fileNameToRecordings]);
+  filterByText = filterByText.toLowerCase();
 
   const tree = useMemo<Tree>(() => {
+    const sortedFileNames: string[] = [];
+    for (let fileName in fileNameToRecordings) {
+      if (filterByText === "" || fileName.toLowerCase().includes(filterByText)) {
+        insertString(sortedFileNames, fileName);
+      }
+    }
+
     const root: Tree = {
       children: [],
       name: "",
@@ -116,7 +118,7 @@ export function useFileNameTree(recordingGroup: RecordingGroup) {
     }
 
     return root;
-  }, [fileNameToRecordings, sortedFileNames]);
+  }, [fileNameToRecordings, filterByText]);
 
   return tree;
 }
