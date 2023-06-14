@@ -76,7 +76,7 @@ Basic.args = {
     name: "613b96978e0f48b736fbb935_SpaceGrotesk-Bold.woff2",
     point: { point: "1947111322047004550402308086694092", time: 984 },
     queryParams: [],
-    triggerPoint: undefined,
+    triggerPoint: null,
     status: 200,
     start: 984,
     type: CanonicalRequestType.FETCH_XHR,

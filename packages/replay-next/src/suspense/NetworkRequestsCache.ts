@@ -34,7 +34,7 @@ export type NetworkRequestsData = {
     responseRawHeaderEvent: RequestResponseRawHeaderEvent | null;
   };
   timeStampedPoint: TimeStampedPoint;
-  triggerPoint?: TimeStampedPoint;
+  triggerPoint: TimeStampedPoint | null;
 };
 
 export type NetworkRequestsCacheData = {
@@ -60,17 +60,8 @@ export const networkRequestsCache = createStreamingCache<
 
     let previousExecutionPoint: ExecutionPoint | null = null;
 
-    await replayClient.findNetworkRequests(function onRequestsReceived(data) {
-      data.requests.forEach(({ id, point, time, triggerPoint }) => {
-        assert(
-          previousExecutionPoint === null || comparePoints(previousExecutionPoint, point) <= 0,
-          "Requests should be in order"
-        );
-
-        previousExecutionPoint = point;
-
-        ids.push(id);
-
+    const getOrCreateRecord = (id: RequestId) => {
+      if (records[id] == null) {
         records[id] = {
           id,
           events: {
@@ -86,16 +77,40 @@ export const networkRequestsCache = createStreamingCache<
           },
           requestBodyData: null,
           responseBodyData: null,
-          timeStampedPoint: {
-            point,
-            time,
-          },
-          triggerPoint,
+          // assert() this is filled in before returning
+          timeStampedPoint: null as any,
+          triggerPoint: null,
         } as NetworkRequestsData;
+      }
+
+      return records[id];
+    };
+
+    await replayClient.findNetworkRequests(function onRequestsReceived(data) {
+      // From the protocol docs:
+      // There is no guarantee that request information will be available before the request event info,
+      // so all temporal combinations should be supported when processing this data.
+      data.requests.forEach(({ id, point, time, triggerPoint }) => {
+        assert(
+          previousExecutionPoint === null || comparePoints(previousExecutionPoint, point) <= 0,
+          "Requests should be in order"
+        );
+
+        previousExecutionPoint = point;
+
+        ids.push(id);
+
+        const record = getOrCreateRecord(id);
+        record.timeStampedPoint = {
+          point,
+          time,
+        };
+        record.triggerPoint = triggerPoint ?? null;
       });
 
       data.events.forEach(({ id, event }) => {
-        const events = records[id].events;
+        const record = getOrCreateRecord(id);
+        const events = record.events;
         switch (event.kind) {
           case "request":
             events.openEvent = event;
@@ -120,6 +135,12 @@ export const networkRequestsCache = createStreamingCache<
 
       update(ids, undefined, records);
     });
+
+    // Verify that all required fields were eventually filled in
+    for (let id in records) {
+      const record = records[id];
+      assert(record.timeStampedPoint !== null);
+    }
 
     resolve();
   },

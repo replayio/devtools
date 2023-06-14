@@ -41,7 +41,7 @@ export type RequestSummary = {
   name: string;
   point: TimeStampedPoint;
   queryParams: [string, string][];
-  triggerPoint: TimeStampedPoint | undefined;
+  triggerPoint: TimeStampedPoint | null;
   requestHeaders: Header[];
   responseHeaders: Header[];
   start: number;
