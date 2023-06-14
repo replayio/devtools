@@ -45,7 +45,7 @@ type SlideBodyProps = PropsFromRedux & {
 function IntroPage({ onSkipToDownload, onNext, organization }: SlideBodyProps) {
   return (
     <>
-      <OnboardingContent>
+      <OnboardingContent noLogo>
         <OnboardingHeader>{`Hello there!`}</OnboardingHeader>
         <OnboardingBody>
           {`Welcome to Replay, the new way to record, replay, and debug web applications`}
