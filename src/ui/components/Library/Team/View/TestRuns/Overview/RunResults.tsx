@@ -1,7 +1,12 @@
-import { ReactElement, useContext, useMemo, useState } from "react";
+import { unstable_Offscreen as Offscreen, ReactNode, useContext, useMemo, useState } from "react";
 
-import { Recording } from "shared/graphql/types";
-import Icon from "ui/components/shared/Icon";
+import Icon from "replay-next/components/Icon";
+import {
+  FileNode,
+  PathNode,
+  isPathNode,
+  useFileNameTree,
+} from "ui/components/Library/Team/View/TestRuns/Overview/useFileNameTree";
 import { RecordingGroup, groupRecordings } from "ui/utils/testRuns";
 
 import { TestResultListItem } from "./TestResultListItem";
@@ -50,11 +55,10 @@ function TestStatusGroup({
         </div>
         <div className="flex">
           <Icon
-            filename="chevron"
             className={`${
-              expanded ? "bg-iconColor" : "rotate-90"
-            } rotate duration-140 bg-iconColor transition ease-out`}
-            size="small"
+              expanded ? "" : "rotate-90"
+            } rotate duration-140 h-4 w-4 transition ease-out`}
+            type="chevron-down"
           />
         </div>
       </div>
@@ -70,33 +74,112 @@ function TestStatusGroupExpanded({
   label: string;
   recordingGroup: RecordingGroup;
 }) {
-  const sortedEntries = useMemo(() => {
-    const entries = Array.from(Object.entries(recordingGroup.fileNameToRecordings));
-    // Sort by filename ascending
-    entries.sort((a, b) => a[0].localeCompare(b[0]));
-    return entries;
-  }, [recordingGroup.fileNameToRecordings]);
+  const tree = useFileNameTree(recordingGroup);
 
-  return sortedEntries.map(([fileName, recordings]) => (
-    <TestFileGroup key={fileName} fileName={fileName} label={label} recordings={recordings} />
-  )) as any;
+  return <PathNodeRenderer depth={1} label={label} pathNode={tree} />;
 }
 
-function TestFileGroup({
-  fileName,
+function FileNodeRenderer({
+  depth,
   label,
-  recordings,
+  fileNode,
 }: {
-  fileName: string;
+  depth: number;
   label: string;
-  recordings: Recording[];
+  fileNode: FileNode;
 }) {
-  return recordings.map((recording, index) => (
-    <TestResultListItem
-      key={recording.id}
-      label={label}
-      recording={recording}
-      secondaryBadgeCount={index > 0 ? index + 1 : null}
-    />
-  )) as any;
+  const { name, recordings } = fileNode;
+
+  const [expanded, setExpanded] = useState(true);
+
+  const onClick = () => setExpanded(!expanded);
+
+  return (
+    <>
+      <div
+        className={`flex cursor-pointer items-center gap-2 truncate py-2 pr-4 ${styles.libraryRow}`}
+        onClick={onClick}
+        style={{
+          paddingLeft: `${depth * 1}rem`,
+        }}
+      >
+        <Icon className="h-5 w-5 shrink-0" type="file" />
+        <div className="truncate">{name}</div>
+        {!expanded && <div className="text-xs text-bodySubColor">({recordings.length} tests)</div>}
+      </div>
+      <Offscreen mode={expanded ? "visible" : "hidden"}>
+        {recordings.map(recording => (
+          <TestResultListItem
+            depth={depth + 1}
+            key={recording.id}
+            label={label}
+            recording={recording}
+            secondaryBadgeCount={/* index > 0 ? index + 1 : null */ null}
+          />
+        ))}
+      </Offscreen>
+    </>
+  );
+}
+
+function PathNodeRenderer({
+  depth,
+  label,
+  pathNode,
+}: {
+  depth: number;
+  label: string;
+  pathNode: PathNode;
+}) {
+  const { children, name, pathNames } = pathNode;
+
+  const [expanded, setExpanded] = useState(true);
+
+  const onClick = () => setExpanded(!expanded);
+
+  const formattedNames: ReactNode[] = [];
+  pathNames.forEach((pathName, index) => {
+    if (index > 0) {
+      formattedNames.push(
+        <div key={`${index}-separator`} className="text-xs text-bodySubColor">
+          /
+        </div>
+      );
+    }
+
+    formattedNames.push(<div key={index}>{pathName}</div>);
+  });
+
+  return (
+    <>
+      {name && (
+        <div
+          className={`flex cursor-pointer items-center gap-2 truncate py-2 pr-4 ${styles.libraryRow}`}
+          onClick={onClick}
+          style={{
+            paddingLeft: `${depth * 1}rem`,
+          }}
+        >
+          <Icon className="h-5 w-5 shrink-0" type={expanded ? "folder-open" : "folder-closed"} />
+          <div className="flex items-center gap-1 truncate">{formattedNames}</div>
+          {!expanded && (
+            <div className="text-xs text-bodySubColor">({pathNode.nestedRecordingCount} tests)</div>
+          )}
+        </div>
+      )}
+      <Offscreen mode={expanded ? "visible" : "hidden"}>
+        {children.map((childNode, index) => {
+          if (isPathNode(childNode)) {
+            return (
+              <PathNodeRenderer depth={depth + 1} key={index} label={label} pathNode={childNode} />
+            );
+          } else {
+            return (
+              <FileNodeRenderer depth={depth + 1} key={index} label={label} fileNode={childNode} />
+            );
+          }
+        })}
+      </Offscreen>
+    </>
+  );
 }
