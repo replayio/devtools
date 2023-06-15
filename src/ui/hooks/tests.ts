@@ -8,7 +8,7 @@ import {
   GetTestsRunsForWorkspace,
   GetTestsRunsForWorkspaceVariables,
 } from "shared/graphql/generated/GetTestsRunsForWorkspace";
-import { GroupedTestCases, convertTestSuite } from "shared/test-suites/TestRun";
+import { Summary, convertSummary } from "shared/test-suites/TestRun";
 import { WorkspaceId } from "ui/state/app";
 
 const GET_TEST_RUNS_FOR_WORKSPACE = gql`
@@ -84,31 +84,31 @@ export const GET_TEST_RUN = gql`
 
 export function useGetTestRunForWorkspace(
   workspaceId: string,
-  groupedTestCasesId: string
+  summaryId: string
 ): {
-  groupedTestCases: GroupedTestCases | null;
+  summary: Summary | null;
   loading: boolean;
 } {
   const { data, loading } = useQuery<GetTestsRun, GetTestsRunVariables>(GET_TEST_RUN, {
-    variables: { id: groupedTestCasesId, workspaceId },
+    variables: { id: summaryId, workspaceId },
   });
 
   if (loading || !data?.node) {
-    return { groupedTestCases: null, loading };
+    return { summary: null, loading };
   }
   assert("testRuns" in data.node, "No results in GetTestsRun response");
 
-  const groupedTestCases = data.node.testRuns?.[0];
+  const summary = data.node.testRuns?.[0];
 
   return {
-    groupedTestCases: groupedTestCases ? convertTestSuite(groupedTestCases) : null,
+    summary: summary ? convertSummary(summary) : null,
     loading,
   };
 }
 
 export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
-  groupedTestCases: GroupedTestCases[];
   loading: boolean;
+  summaries: Summary[];
 } {
   // TODO [FE-1530] Pagination test runs from GraphQL
   const { data, loading } = useQuery<GetTestsRunsForWorkspace, GetTestsRunsForWorkspaceVariables>(
@@ -120,26 +120,26 @@ export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
 
   return useMemo(() => {
     if (loading || !data?.node) {
-      return { groupedTestCases: [], loading };
+      return { summaries: [], loading };
     }
     assert("testRuns" in data.node, "No testRuns in GetTestsRun response");
 
-    const groupedTestCases: GroupedTestCases[] = [];
+    const summaries: Summary[] = [];
 
     // Convert legacy test runs; filter out ones with invalid data
-    data.node.testRuns?.forEach(legacyData => {
+    data.node.testRuns?.forEach(legacySummary => {
       try {
-        groupedTestCases.push(convertTestSuite(legacyData));
+        summaries.push(convertSummary(legacySummary));
       } catch (error) {
         // Filter out and ignore data that's too old or corrupt to defined the required fields
       }
     });
 
-    const sortedTestSuite = orderBy(groupedTestCases, "date", "desc");
+    const sortedSummaries = orderBy(summaries, "date", "desc");
 
     return {
-      groupedTestCases: sortedTestSuite,
       loading,
+      summaries: sortedSummaries,
     };
   }, [data, loading]);
 }

@@ -11,7 +11,7 @@ import { Recording } from "shared/graphql/types";
 
 // This type is supported, but must be converted to version 2 format before use
 export namespace TestRunV1 {
-  export type GroupedTestCases =
+  export type Summary =
     | GetTestsRun_node_Workspace_testRuns
     | GetTestsRunsForWorkspace_node_Workspace_testRuns;
 }
@@ -33,7 +33,7 @@ export namespace TestRunV2 {
     user: string | null;
   };
 
-  export interface GroupedTestCases {
+  export interface Summary {
     date: string;
     id: string;
     mode: Mode | null;
@@ -50,17 +50,17 @@ export namespace TestRunV2 {
 }
 
 // Export the union version of types (for type checker functions)
-export type AnyGroupedTestCases = TestRunV1.GroupedTestCases | TestRunV2.GroupedTestCases;
+export type AnySummary = TestRunV1.Summary | TestRunV2.Summary;
 
 // Export the latest version of types (for convenience)
-export type GroupedTestCases = TestRunV2.GroupedTestCases;
+export type Summary = TestRunV2.Summary;
 export type Mode = TestRunV2.Mode;
 export type SourceMetadata = TestRunV2.SourceMetadata;
 
-export function convertTestSuite(testSuite: AnyGroupedTestCases): TestRunV2.GroupedTestCases {
-  if (isTestSuiteV2(testSuite)) {
+export function convertSummary(summary: AnySummary): TestRunV2.Summary {
+  if (isTestRunV2(summary)) {
     // If data from GraphQL is already in the new format, skip the conversion
-    return testSuite;
+    return summary;
   }
 
   const {
@@ -76,7 +76,7 @@ export function convertTestSuite(testSuite: AnyGroupedTestCases): TestRunV2.Grou
     stats,
     title,
     user,
-  } = testSuite;
+  } = summary;
 
   // Verify expected data; if any of these are missing, we can't reliably migrate the data
   assert(date != null, "Expected legacy TestRun data to have a data");
@@ -86,7 +86,7 @@ export function convertTestSuite(testSuite: AnyGroupedTestCases): TestRunV2.Grou
     "Expected legacy TestRun data to have pass/fail stats"
   );
 
-  const recordings = "recordings" in testSuite ? unwrapRecordingsData(testSuite.recordings) : [];
+  const recordings = "recordings" in summary ? unwrapRecordingsData(summary.recordings) : [];
   const sortedRecordings = orderBy(recordings, "date", "desc");
 
   const firstRecording = sortedRecordings[0];
@@ -151,8 +151,8 @@ function unwrapRecordingsData(
   }));
 }
 
-export function getTestRunTitle(groupedTestCases: AnyGroupedTestCases): string {
-  if (isTestSuiteV1(groupedTestCases)) {
+export function getTestRunTitle(groupedTestCases: AnySummary): string {
+  if (isTestRunV1(groupedTestCases)) {
     const { commitTitle, mergeTitle } = groupedTestCases;
     if (commitTitle) {
       return commitTitle;
@@ -174,14 +174,10 @@ export function getTestRunTitle(groupedTestCases: AnyGroupedTestCases): string {
   return "Test";
 }
 
-export function isTestSuiteV1(
-  testSuite: AnyGroupedTestCases
-): testSuite is TestRunV1.GroupedTestCases {
-  return !isTestSuiteV2(testSuite);
+export function isTestRunV1(summary: AnySummary): summary is TestRunV1.Summary {
+  return !isTestRunV2(summary);
 }
 
-export function isTestSuiteV2(
-  testSuite: AnyGroupedTestCases
-): testSuite is TestRunV2.GroupedTestCases {
-  return "results" in testSuite;
+export function isTestRunV2(summary: AnySummary): summary is TestRunV2.Summary {
+  return "results" in summary;
 }

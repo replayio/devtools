@@ -1,6 +1,6 @@
 import { ReactNode, createContext, useContext } from "react";
 
-import { GroupedTestCases } from "shared/test-suites/TestRun";
+import { Summary } from "shared/test-suites/TestRun";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 import { useGetTestRunForWorkspace } from "ui/hooks/tests";
 
@@ -8,7 +8,7 @@ import { TeamContext } from "../../../TeamContextRoot";
 import { TestRunsContext } from "../TestRunsContextRoot";
 
 type TestRunOverviewContainerContextType = {
-  groupedTestCases: GroupedTestCases | null;
+  summary: Summary | null;
   view: string;
 };
 
@@ -20,10 +20,10 @@ export function TestRunOverviewContainer({ children }: { children: ReactNode }) 
   const { view } = useGetTeamRouteParams();
   const { teamId } = useContext(TeamContext);
   const { focusId } = useContext(TestRunsContext);
-  const { groupedTestCases } = useGetTestRunForWorkspace(teamId, focusId);
+  const { summary } = useGetTestRunForWorkspace(teamId, focusId);
 
   return (
-    <TestRunOverviewContext.Provider value={{ groupedTestCases, view }}>
+    <TestRunOverviewContext.Provider value={{ summary, view }}>
       {children}
     </TestRunOverviewContext.Provider>
   );

@@ -2,7 +2,7 @@ import { useContext, useMemo, useState } from "react";
 import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
-import { GroupedTestCases } from "shared/test-suites/TestRun";
+import { Summary } from "shared/test-suites/TestRun";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import { TestRunListItem } from "ui/components/Library/Team/View/TestRuns/TestRunListItem";
 import { SecondaryButton } from "ui/components/shared/Button";
@@ -14,28 +14,28 @@ const ROW_HEIGHT = 70;
 
 type ItemData = {
   countToRender: number;
-  groupedTestCases: GroupedTestCases[];
   loadMore: () => void;
+  summaries: Summary[];
 };
 
 export function TestRunList() {
-  const { groupedTestCases, loading } = useContext(TestRunsContext);
+  const { loading, summaries } = useContext(TestRunsContext);
   const [countToRender, setCountToRender] = useState(PAGE_SIZE);
 
   const itemData = useMemo<ItemData>(
     () => ({
       countToRender,
-      groupedTestCases,
       loadMore: () => setCountToRender(countToRender + PAGE_SIZE),
+      summaries,
     }),
-    [countToRender, groupedTestCases]
+    [countToRender, summaries]
   );
 
   if (loading) {
     return <LibrarySpinner />;
   }
 
-  const itemCount = Math.min(countToRender + 1, groupedTestCases.length);
+  const itemCount = Math.min(countToRender + 1, summaries.length);
 
   return (
     <ReactVirtualizedAutoSizer
@@ -55,7 +55,7 @@ export function TestRunList() {
 }
 
 function TestRunListRow({ data, index, style }: ListChildComponentProps<ItemData>) {
-  const { countToRender, loadMore, groupedTestCases } = data;
+  const { countToRender, loadMore, summaries: summary } = data;
 
   if (index === countToRender) {
     return (
@@ -69,7 +69,7 @@ function TestRunListRow({ data, index, style }: ListChildComponentProps<ItemData
 
   return (
     <div style={style}>
-      <TestRunListItem groupedTestCases={groupedTestCases[index]} />
+      <TestRunListItem summary={summary[index]} />
     </div>
   );
 }

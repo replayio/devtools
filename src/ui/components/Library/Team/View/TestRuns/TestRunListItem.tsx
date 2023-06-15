@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useContext } from "react";
 
-import { GroupedTestCases, getTestRunTitle } from "shared/test-suites/TestRun";
+import { Summary, getTestRunTitle } from "shared/test-suites/TestRun";
 import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
 import Icon from "ui/components/shared/Icon";
 
@@ -13,8 +13,8 @@ import { RunStats } from "./RunStats";
 import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "../../../Library.module.css";
 
-function Title({ groupedTestCases }: { groupedTestCases: GroupedTestCases }) {
-  const title = getTestRunTitle(groupedTestCases);
+function Title({ summary }: { summary: Summary }) {
+  const title = getTestRunTitle(summary);
 
   // TODO: This should be done in CSS.
   const formatted = title.length > 80 ? title.slice(0, 80) + "..." : title;
@@ -26,10 +26,10 @@ function Title({ groupedTestCases }: { groupedTestCases: GroupedTestCases }) {
   );
 }
 
-function Attributes({ groupedTestCases }: { groupedTestCases: GroupedTestCases }) {
-  const { date, source } = groupedTestCases;
+function Attributes({ summary }: { summary: Summary }) {
+  const { date, source } = summary;
 
-  const title = getTestRunTitle(groupedTestCases);
+  const title = getTestRunTitle(summary);
 
   if (source) {
     const { branchName, isPrimaryBranch, user } = source;
@@ -39,7 +39,7 @@ function Attributes({ groupedTestCases }: { groupedTestCases: GroupedTestCases }
         <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
         {user && <AttributeContainer icon="person">{user}</AttributeContainer>}
         <BranchIcon branchName={branchName} isPrimaryBranch={isPrimaryBranch} title={title} />
-        <ModeAttribute groupedTestCases={groupedTestCases} />
+        <ModeAttribute summary={summary} />
       </div>
     );
   } else {
@@ -69,17 +69,17 @@ function Status({ failCount }: { failCount: number }) {
   }
 }
 
-export function TestRunListItem({ groupedTestCases }: { groupedTestCases: GroupedTestCases }) {
+export function TestRunListItem({ summary }: { summary: Summary }) {
   const { focusId } = useContext(TestRunsContext);
   const { teamId } = useContext(TeamContext);
 
   // TODO Don't count flakes
-  const failCount = groupedTestCases.results.counts.failed;
-  const isSelected = focusId === groupedTestCases.id;
+  const failCount = summary.results.counts.failed;
+  const isSelected = focusId === summary.id;
 
   return (
     <Link
-      href={`/team/${teamId}/runs/${groupedTestCases.id}`}
+      href={`/team/${teamId}/runs/${summary.id}`}
       className={`flex h-full cursor-pointer flex-row items-center space-x-3 rounded-sm border-b border-chrome bg-themeBase-100 px-3 ${
         styles.libraryRow
       }
@@ -89,10 +89,10 @@ export function TestRunListItem({ groupedTestCases }: { groupedTestCases: Groupe
       <Status failCount={failCount} />
       <div className="flex h-full flex-grow flex-col justify-evenly overflow-hidden">
         <div className="flex flex-row justify-between space-x-3">
-          <Title groupedTestCases={groupedTestCases} />
-          <RunStats groupedTestCases={groupedTestCases} />
+          <Title summary={summary} />
+          <RunStats summary={summary} />
         </div>
-        <Attributes groupedTestCases={groupedTestCases} />
+        <Attributes summary={summary} />
       </div>
     </Link>
   );

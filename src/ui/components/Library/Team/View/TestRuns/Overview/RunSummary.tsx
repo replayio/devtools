@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import Icon from "replay-next/components/Icon";
-import { GroupedTestCases, Mode, getTestRunTitle } from "shared/test-suites/TestRun";
+import { Mode, Summary, getTestRunTitle } from "shared/test-suites/TestRun";
 import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
 
 import {
@@ -23,8 +23,8 @@ function getModeIcon(mode: Mode): string[] {
   }
 }
 
-export function ModeAttribute({ groupedTestCases }: { groupedTestCases: GroupedTestCases }) {
-  const { mode } = groupedTestCases;
+export function ModeAttribute({ summary }: { summary: Summary }) {
+  const { mode } = summary;
   if (!mode) {
     return null;
   }
@@ -34,8 +34,8 @@ export function ModeAttribute({ groupedTestCases }: { groupedTestCases: GroupedT
   return <AttributeContainer icon={modeIcon}>{modeText}</AttributeContainer>;
 }
 
-export function Attributes({ groupedTestCases }: { groupedTestCases: GroupedTestCases }) {
-  const { date, results, source } = groupedTestCases;
+export function Attributes({ summary }: { summary: Summary }) {
+  const { date, results, source } = summary;
   const { recordings } = results;
 
   const duration = getDuration(recordings);
@@ -51,10 +51,10 @@ export function Attributes({ groupedTestCases }: { groupedTestCases: GroupedTest
         <BranchIcon
           branchName={branchName}
           isPrimaryBranch={isPrimaryBranch}
-          title={getTestRunTitle(groupedTestCases)}
+          title={getTestRunTitle(summary)}
         />
         <AttributeContainer icon="timer">{durationString}</AttributeContainer>
-        <ModeAttribute groupedTestCases={groupedTestCases} />
+        <ModeAttribute summary={summary} />
       </div>
     );
   } else {
@@ -66,8 +66,8 @@ export function Attributes({ groupedTestCases }: { groupedTestCases: GroupedTest
   }
 }
 
-function PullRequestLink({ groupedTestCases }: { groupedTestCases: GroupedTestCases }) {
-  const { source } = groupedTestCases;
+function PullRequestLink({ summary }: { summary: Summary }) {
+  const { source } = summary;
   if (!source) {
     return null;
   }
@@ -90,14 +90,14 @@ function PullRequestLink({ groupedTestCases }: { groupedTestCases: GroupedTestCa
   );
 }
 
-function RunnerLink({ groupedTestCases }: { groupedTestCases: GroupedTestCases }) {
-  if (!groupedTestCases.source?.triggerUrl) {
+function RunnerLink({ summary }: { summary: Summary }) {
+  if (!summary.source?.triggerUrl) {
     return null;
   }
 
   return (
     <Link
-      href={groupedTestCases.source.triggerUrl}
+      href={summary.source.triggerUrl}
       target="_blank"
       rel="noreferrer noopener"
       className="flex flex-row items-center gap-1 hover:underline"
@@ -108,16 +108,16 @@ function RunnerLink({ groupedTestCases }: { groupedTestCases: GroupedTestCases }
   );
 }
 
-export function RunSummary({ groupedTestCases }: { groupedTestCases: GroupedTestCases }) {
-  const { source } = groupedTestCases;
+export function RunSummary({ summary }: { summary: Summary }) {
+  const { source } = summary;
 
   return (
     <div className="flex flex-col gap-1 border-b border-themeBorder p-4">
       <div className="flex flex-row items-center justify-between gap-1">
         <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-medium">
-          {getTestRunTitle(groupedTestCases)}
+          {getTestRunTitle(summary)}
         </div>
-        <RunStats groupedTestCases={groupedTestCases} />
+        <RunStats summary={summary} />
       </div>
       {source?.groupLabel && (
         <div className="text overflow-hidden overflow-ellipsis whitespace-nowrap font-medium text-bodySubColor">
@@ -125,10 +125,10 @@ export function RunSummary({ groupedTestCases }: { groupedTestCases: GroupedTest
         </div>
       )}
       <div className="mt-1 flex w-full flex-row items-center gap-4 text-xs">
-        <Attributes groupedTestCases={groupedTestCases} />
+        <Attributes summary={summary} />
         <div className="grow" />
-        <PullRequestLink groupedTestCases={groupedTestCases} />
-        <RunnerLink groupedTestCases={groupedTestCases} />
+        <PullRequestLink summary={summary} />
+        <RunnerLink summary={summary} />
       </div>
     </div>
   );
