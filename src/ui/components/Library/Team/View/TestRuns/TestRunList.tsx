@@ -14,6 +14,7 @@ const ROW_HEIGHT = 70;
 
 type ItemData = {
   countToRender: number;
+  filterByText: string;
   loadMore: () => void;
   summaries: Summary[];
 };
@@ -58,10 +59,11 @@ export function TestRunList({
   const itemData = useMemo<ItemData>(
     () => ({
       countToRender,
+      filterByText,
       loadMore: () => setCountToRender(countToRender + PAGE_SIZE),
       summaries: filteredSummaries,
     }),
-    [countToRender, filteredSummaries]
+    [countToRender, filterByText, filteredSummaries]
   );
 
   if (loading) {
@@ -88,7 +90,7 @@ export function TestRunList({
 }
 
 function TestRunListRow({ data, index, style }: ListChildComponentProps<ItemData>) {
-  const { countToRender, loadMore, summaries: summary } = data;
+  const { countToRender, filterByText, loadMore, summaries: summary } = data;
 
   if (index === countToRender) {
     return (
@@ -102,7 +104,7 @@ function TestRunListRow({ data, index, style }: ListChildComponentProps<ItemData
 
   return (
     <div style={style}>
-      <TestRunListItem summary={summary[index]} />
+      <TestRunListItem filterByText={filterByText} summary={summary[index]} />
     </div>
   );
 }
