@@ -2,7 +2,7 @@ import { useContext, useMemo, useState } from "react";
 import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
-import { Summary } from "shared/test-suites/TestRun";
+import { Summary, getTestRunTitle } from "shared/test-suites/TestRun";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import { TestRunListItem } from "ui/components/Library/Team/View/TestRuns/TestRunListItem";
 import { SecondaryButton } from "ui/components/shared/Button";
@@ -18,24 +18,57 @@ type ItemData = {
   summaries: Summary[];
 };
 
-export function TestRunList() {
+export function TestRunList({
+  filterByText,
+  mode,
+}: {
+  filterByText: string;
+  mode: "all" | "failed";
+}) {
   const { loading, summaries } = useContext(TestRunsContext);
   const [countToRender, setCountToRender] = useState(PAGE_SIZE);
+
+  const filteredSummaries = useMemo(() => {
+    let filteredSummaries = summaries;
+
+    if (mode === "failed") {
+      filteredSummaries = filteredSummaries.filter(summary => summary.results.counts.failed > 0);
+    }
+
+    if (filterByText !== "") {
+      const lowerCaseText = filterByText.toLowerCase();
+
+      filteredSummaries = filteredSummaries.filter(summary => {
+        const branchName = summary.source?.branchName ?? "";
+        const user = summary.source?.user ?? "";
+
+        const title = getTestRunTitle(summary);
+
+        return (
+          branchName.toLowerCase().includes(lowerCaseText) ||
+          user.toLowerCase().includes(lowerCaseText) ||
+          title.toLowerCase().includes(lowerCaseText)
+        );
+      });
+    }
+
+    return filteredSummaries;
+  }, [filterByText, mode, summaries]);
 
   const itemData = useMemo<ItemData>(
     () => ({
       countToRender,
       loadMore: () => setCountToRender(countToRender + PAGE_SIZE),
-      summaries,
+      summaries: filteredSummaries,
     }),
-    [countToRender, summaries]
+    [countToRender, filteredSummaries]
   );
 
   if (loading) {
     return <LibrarySpinner />;
   }
 
-  const itemCount = Math.min(countToRender + 1, summaries.length);
+  const itemCount = Math.min(countToRender + 1, filteredSummaries.length);
 
   return (
     <ReactVirtualizedAutoSizer
