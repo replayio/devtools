@@ -50,6 +50,11 @@ const baseNextConfig = {
         destination: "/recording/:id",
         permanent: true,
       },
+      {
+        source: "/r/:id",
+        destination: "/recording/:id",
+        permanent: true,
+      },
     ];
   },
 
