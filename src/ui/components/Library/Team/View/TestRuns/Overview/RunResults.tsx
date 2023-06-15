@@ -1,4 +1,12 @@
-import { unstable_Offscreen as Offscreen, ReactNode, useContext, useMemo, useState } from "react";
+import {
+  unstable_Offscreen as Offscreen,
+  ReactNode,
+  memo,
+  useContext,
+  useDeferredValue,
+  useMemo,
+  useState,
+} from "react";
 
 import Icon from "replay-next/components/Icon";
 import {
@@ -13,8 +21,14 @@ import { TestResultListItem } from "./TestResultListItem";
 import { TestRunOverviewContext } from "./TestRunOverviewContainerContextType";
 import styles from "../../../../Library.module.css";
 
+// TODO [FE-1583] Memoize things better
+
 export function RunResults() {
   const testSuite = useContext(TestRunOverviewContext).testSuite!;
+
+  // TODO [FE-1583] Debounce and useTransition ?
+  const [filterByText, setFilterByText] = useState("");
+  const filterByTextDeferred = useDeferredValue(filterByText);
 
   // TODO Don't keep re-computing this; it's expensive
   const { passedRecordings, failedRecordings, flakyRecordings } = useMemo(
@@ -23,22 +37,50 @@ export function RunResults() {
   );
 
   return (
-    <div className="no-scrollbar flex flex-col overflow-y-auto">
-      <TestStatusGroup label="Failed" recordingGroup={failedRecordings} />
-      <TestStatusGroup label="Flaky" recordingGroup={flakyRecordings} />
-      <TestStatusGroup label="Passed" recordingGroup={passedRecordings} />
-    </div>
+    <>
+      <div className="mb-2 border-b border-themeBorder">
+        <input
+          className="w-full appearance-none border-none bg-bodyBgcolor py-2 px-4 text-sm focus:bg-chrome focus:outline-none focus:ring-0"
+          onChange={event => setFilterByText(event.currentTarget.value)}
+          placeholder="Filter tests"
+          type="text"
+          value={filterByText}
+        />
+      </div>
+      <div className="no-scrollbar flex flex-col overflow-y-auto">
+        <TestStatusGroup
+          filterByText={filterByTextDeferred}
+          label="Failed"
+          recordingGroup={failedRecordings}
+        />
+        <TestStatusGroup
+          filterByText={filterByTextDeferred}
+          label="Flaky"
+          recordingGroup={flakyRecordings}
+        />
+        <TestStatusGroup
+          filterByText={filterByTextDeferred}
+          label="Passed"
+          recordingGroup={passedRecordings}
+        />
+      </div>
+    </>
   );
 }
 
 function TestStatusGroup({
+  filterByText,
   label,
   recordingGroup,
 }: {
+  filterByText: string;
   label: string;
   recordingGroup: RecordingGroup;
 }) {
   const [expanded, setExpanded] = useState(true);
+
+  const tree = useFileNameTree(recordingGroup, filterByText);
+
   const count = recordingGroup.count;
   if (count == 0) {
     return null;
@@ -62,29 +104,21 @@ function TestStatusGroup({
           />
         </div>
       </div>
-      {expanded && <TestStatusGroupExpanded label={label} recordingGroup={recordingGroup} />}
+      <Offscreen mode={expanded ? "visible" : "hidden"}>
+        <PathNodeRenderer depth={1} filterByText={filterByText} label={label} pathNode={tree} />
+      </Offscreen>
     </div>
   );
 }
 
-function TestStatusGroupExpanded({
-  label,
-  recordingGroup,
-}: {
-  label: string;
-  recordingGroup: RecordingGroup;
-}) {
-  const tree = useFileNameTree(recordingGroup);
-
-  return <PathNodeRenderer depth={1} label={label} pathNode={tree} />;
-}
-
-function FileNodeRenderer({
+const FileNodeRenderer = memo(function FileNodeRenderer({
   depth,
+  filterByText,
   label,
   fileNode,
 }: {
   depth: number;
+  filterByText: string;
   label: string;
   fileNode: FileNode;
 }) {
@@ -97,7 +131,7 @@ function FileNodeRenderer({
   return (
     <>
       <div
-        className={`flex cursor-pointer items-center gap-2 truncate py-2 pr-4 ${styles.libraryRow}`}
+        className={`flex cursor-pointer items-center gap-2 truncate  py-2  pr-4 ${styles.libraryRow}`}
         onClick={onClick}
         style={{
           paddingLeft: `${depth * 1}rem`,
@@ -120,14 +154,16 @@ function FileNodeRenderer({
       </Offscreen>
     </>
   );
-}
+});
 
 function PathNodeRenderer({
   depth,
+  filterByText,
   label,
   pathNode,
 }: {
   depth: number;
+  filterByText: string;
   label: string;
   pathNode: PathNode;
 }) {
@@ -171,11 +207,23 @@ function PathNodeRenderer({
         {children.map((childNode, index) => {
           if (isPathNode(childNode)) {
             return (
-              <PathNodeRenderer depth={depth + 1} key={index} label={label} pathNode={childNode} />
+              <PathNodeRenderer
+                depth={depth + 1}
+                filterByText={filterByText}
+                key={index}
+                label={label}
+                pathNode={childNode}
+              />
             );
           } else {
             return (
-              <FileNodeRenderer depth={depth + 1} key={index} label={label} fileNode={childNode} />
+              <FileNodeRenderer
+                depth={depth + 1}
+                filterByText={filterByText}
+                key={index}
+                label={label}
+                fileNode={childNode}
+              />
             );
           }
         })}
