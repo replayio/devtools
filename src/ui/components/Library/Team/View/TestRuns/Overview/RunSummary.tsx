@@ -12,19 +12,6 @@ import { AttributeContainer } from "../AttributeContainer";
 import { RunStats } from "../RunStats";
 import { getDuration } from "../utils";
 
-function Title({ testSuite }: { testSuite: TestSuite }) {
-  return (
-    <div className="flex flex-col overflow-hidden">
-      <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-medium">
-        {testSuite.primaryTitle}
-      </div>
-      <div className="text overflow-hidden overflow-ellipsis whitespace-nowrap font-medium text-bodySubColor">
-        {testSuite.secondaryTitle}
-      </div>
-    </div>
-  );
-}
-
 function getModeIcon(mode: TestSuiteMode): string[] {
   switch (mode) {
     case "diagnostics":
@@ -58,7 +45,7 @@ export function Attributes({ testSuite }: { testSuite: TestSuite }) {
     const { branchName, isPrimaryBranch, user } = source;
 
     return (
-      <div className="flex flex-row flex-wrap items-center gap-4 pl-1">
+      <div className="flex flex-row flex-wrap items-center gap-4">
         <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
         {user ? <AttributeContainer icon="person">{user}</AttributeContainer> : null}
         <BranchIcon branchName={branchName} isPrimaryBranch={isPrimaryBranch} title={title} />
@@ -119,12 +106,17 @@ function RunnerLink({ testSuite }: { testSuite: TestSuite }) {
 
 export function RunSummary({ testSuite }: { testSuite: TestSuite }) {
   return (
-    <div className="flex flex-col space-y-2 border-b border-themeBorder p-4">
-      <div className="flex flex-row justify-between">
-        <Title testSuite={testSuite} />
+    <div className="flex flex-col gap-1 border-b border-themeBorder p-4">
+      <div className="flex flex-row items-center justify-between gap-1">
+        <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-medium">
+          {testSuite.primaryTitle}
+        </div>
         <RunStats testSuite={testSuite} />
       </div>
-      <div className="flex w-full flex-row items-center gap-4 text-xs">
+      <div className="text overflow-hidden overflow-ellipsis whitespace-nowrap font-medium text-bodySubColor">
+        {testSuite.secondaryTitle}
+      </div>
+      <div className="mt-1 flex w-full flex-row items-center gap-4 text-xs">
         <Attributes testSuite={testSuite} />
         <div className="grow" />
         <PullRequestLink testSuite={testSuite} />
