@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import Icon from "replay-next/components/Icon";
-import { GroupedTestCases, Mode } from "shared/test-suites/TestRun";
+import { GroupedTestCases, Mode, getTestRunTitle } from "shared/test-suites/TestRun";
 import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
 
 import {
@@ -35,7 +35,7 @@ export function ModeAttribute({ groupedTestCases }: { groupedTestCases: GroupedT
 }
 
 export function Attributes({ groupedTestCases }: { groupedTestCases: GroupedTestCases }) {
-  const { date, results, source, primaryTitle: title } = groupedTestCases;
+  const { date, results, source } = groupedTestCases;
   const { recordings } = results;
 
   const duration = getDuration(recordings);
@@ -48,7 +48,11 @@ export function Attributes({ groupedTestCases }: { groupedTestCases: GroupedTest
       <div className="flex flex-row flex-wrap items-center gap-4">
         <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
         {user ? <AttributeContainer icon="person">{user}</AttributeContainer> : null}
-        <BranchIcon branchName={branchName} isPrimaryBranch={isPrimaryBranch} title={title} />
+        <BranchIcon
+          branchName={branchName}
+          isPrimaryBranch={isPrimaryBranch}
+          title={getTestRunTitle(groupedTestCases)}
+        />
         <AttributeContainer icon="timer">{durationString}</AttributeContainer>
         <ModeAttribute groupedTestCases={groupedTestCases} />
       </div>
@@ -105,17 +109,21 @@ function RunnerLink({ groupedTestCases }: { groupedTestCases: GroupedTestCases }
 }
 
 export function RunSummary({ groupedTestCases }: { groupedTestCases: GroupedTestCases }) {
+  const { source } = groupedTestCases;
+
   return (
     <div className="flex flex-col gap-1 border-b border-themeBorder p-4">
       <div className="flex flex-row items-center justify-between gap-1">
         <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-medium">
-          {groupedTestCases.primaryTitle}
+          {getTestRunTitle(groupedTestCases)}
         </div>
         <RunStats groupedTestCases={groupedTestCases} />
       </div>
-      <div className="text overflow-hidden overflow-ellipsis whitespace-nowrap font-medium text-bodySubColor">
-        {groupedTestCases.secondaryTitle}
-      </div>
+      {source?.groupLabel && (
+        <div className="text overflow-hidden overflow-ellipsis whitespace-nowrap font-medium text-bodySubColor">
+          {source.groupLabel}
+        </div>
+      )}
       <div className="mt-1 flex w-full flex-row items-center gap-4 text-xs">
         <Attributes groupedTestCases={groupedTestCases} />
         <div className="grow" />

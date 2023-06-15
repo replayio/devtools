@@ -23,6 +23,8 @@ export namespace TestRunV2 {
   export type SourceMetadata = {
     branchName: string | null;
     commitId: string;
+    commitTitle: string | null;
+    groupLabel: string | null;
     isPrimaryBranch: boolean;
     prNumber: number | null;
     prTitle: string | null;
@@ -35,7 +37,6 @@ export namespace TestRunV2 {
     date: string;
     id: string;
     mode: Mode | null;
-    primaryTitle: string;
     results: {
       counts: {
         failed: number;
@@ -44,7 +45,6 @@ export namespace TestRunV2 {
       };
       recordings: Recording[];
     };
-    secondaryTitle: string | null;
     source: SourceMetadata | null;
   }
 }
@@ -101,19 +101,18 @@ export function convertTestSuite(testSuite: AnyGroupedTestCases): TestRunV2.Grou
       break;
   }
 
-  const prNumber = mergeId != null ? parseInt(mergeId) : null;
-  const prTitle = mergeTitle ?? null;
-
-  const titleWithFallback = commitTitle || mergeTitle || "Tests";
-
   let source: TestRunV2.SourceMetadata | null = null;
   if (branch && commitId && user) {
+    const prNumber = mergeId != null ? parseInt(mergeId) : null;
+
     source = {
       branchName: branch,
       commitId,
+      commitTitle,
+      groupLabel: title,
       isPrimaryBranch,
       prNumber: prNumber && !isNaN(prNumber) ? prNumber : null,
-      prTitle,
+      prTitle: mergeTitle,
       repository,
       triggerUrl,
       user,
@@ -124,7 +123,6 @@ export function convertTestSuite(testSuite: AnyGroupedTestCases): TestRunV2.Grou
     date,
     id,
     mode: mode ? (mode as TestRunV2.Mode) : null,
-    primaryTitle: titleWithFallback,
     results: {
       counts: {
         failed: stats.failed,
@@ -133,7 +131,6 @@ export function convertTestSuite(testSuite: AnyGroupedTestCases): TestRunV2.Grou
       },
       recordings: sortedRecordings,
     },
-    secondaryTitle: title,
     source,
   };
 }
@@ -152,6 +149,29 @@ function unwrapRecordingsData(
     id: edge.node.uuid,
     date: edge.node.createdAt,
   }));
+}
+
+export function getTestRunTitle(groupedTestCases: AnyGroupedTestCases): string {
+  if (isTestSuiteV1(groupedTestCases)) {
+    const { commitTitle, mergeTitle } = groupedTestCases;
+    if (commitTitle) {
+      return commitTitle;
+    } else if (mergeTitle) {
+      return mergeTitle;
+    }
+  } else {
+    const { source } = groupedTestCases;
+    if (source) {
+      const { commitTitle, prTitle } = source;
+      if (commitTitle) {
+        return commitTitle;
+      } else if (prTitle) {
+        return prTitle;
+      }
+    }
+  }
+
+  return "Test";
 }
 
 export function isTestSuiteV1(

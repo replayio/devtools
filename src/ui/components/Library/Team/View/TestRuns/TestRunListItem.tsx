@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useContext } from "react";
 
-import { GroupedTestCases } from "shared/test-suites/TestRun";
+import { GroupedTestCases, getTestRunTitle } from "shared/test-suites/TestRun";
 import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
 import Icon from "ui/components/shared/Icon";
 
@@ -14,7 +14,7 @@ import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "../../../Library.module.css";
 
 function Title({ groupedTestCases }: { groupedTestCases: GroupedTestCases }) {
-  const title = groupedTestCases.primaryTitle;
+  const title = getTestRunTitle(groupedTestCases);
 
   // TODO: This should be done in CSS.
   const formatted = title.length > 80 ? title.slice(0, 80) + "..." : title;
@@ -27,7 +27,9 @@ function Title({ groupedTestCases }: { groupedTestCases: GroupedTestCases }) {
 }
 
 function Attributes({ groupedTestCases }: { groupedTestCases: GroupedTestCases }) {
-  const { date, source, primaryTitle } = groupedTestCases;
+  const { date, source } = groupedTestCases;
+
+  const title = getTestRunTitle(groupedTestCases);
 
   if (source) {
     const { branchName, isPrimaryBranch, user } = source;
@@ -36,11 +38,7 @@ function Attributes({ groupedTestCases }: { groupedTestCases: GroupedTestCases }
       <div className="flex flex-row items-center gap-4 text-xs font-light">
         <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
         {user && <AttributeContainer icon="person">{user}</AttributeContainer>}
-        <BranchIcon
-          branchName={branchName}
-          isPrimaryBranch={isPrimaryBranch}
-          title={primaryTitle}
-        />
+        <BranchIcon branchName={branchName} isPrimaryBranch={isPrimaryBranch} title={title} />
         <ModeAttribute groupedTestCases={groupedTestCases} />
       </div>
     );
