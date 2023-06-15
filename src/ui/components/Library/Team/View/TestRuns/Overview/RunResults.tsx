@@ -21,12 +21,9 @@ import { TestResultListItem } from "./TestResultListItem";
 import { TestRunOverviewContext } from "./TestRunOverviewContainerContextType";
 import styles from "../../../../Library.module.css";
 
-// TODO [FE-1583] Memoize things better
-
 export function RunResults() {
   const testSuite = useContext(TestRunOverviewContext).testSuite!;
 
-  // TODO [FE-1583] Debounce and useTransition ?
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
 
@@ -38,13 +35,18 @@ export function RunResults() {
 
   return (
     <>
-      <div className="mb-2 border-b border-themeBorder">
+      <div className="relative mb-2 border-b border-themeBorder bg-bodyBgcolor p-2">
         <input
-          className="w-full appearance-none border-none bg-bodyBgcolor py-2 px-4 text-sm focus:bg-chrome focus:outline-none focus:ring-0"
+          className="w-full appearance-none rounded border-none bg-gray-900 text-xs focus:outline-none focus:ring"
           onChange={event => setFilterByText(event.currentTarget.value)}
           placeholder="Filter tests"
           type="text"
           value={filterByText}
+        />
+
+        <Icon
+          className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 opacity-50"
+          type="search"
         />
       </div>
       <div className="no-scrollbar flex flex-col overflow-y-auto">
