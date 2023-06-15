@@ -2,10 +2,10 @@ import { TimeStampedPoint } from "@replayio/protocol";
 import { useContext } from "react";
 import { STATUS_PENDING, useImperativeCacheValue } from "suspense";
 
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import PropertiesRenderer from "replay-next/components/inspector/PropertiesRenderer";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isUserActionTestEvent } from "shared/test-suites/RecordingTestMetadata";
-import ErrorBoundary from "ui/components/ErrorBoundary";
 import { TestEventDetailsCache } from "ui/components/TestSuite/suspense/TestEventDetailsCache";
 import { TestSuiteContext } from "ui/components/TestSuite/views/TestSuiteContext";
 
