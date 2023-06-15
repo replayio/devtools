@@ -39,7 +39,7 @@ export function RunResults() {
     <>
       <div className="relative mb-2 border-b border-themeBorder bg-bodyBgcolor p-2">
         <input
-          className="w-full appearance-none rounded border-none bg-gray-900 text-xs focus:outline-none focus:ring"
+          className="w-full appearance-none rounded border-none bg-black bg-opacity-10 text-xs focus:outline-none focus:ring focus:ring-primaryAccent"
           onChange={event => setFilterByText(event.currentTarget.value)}
           placeholder="Filter tests"
           type="text"
