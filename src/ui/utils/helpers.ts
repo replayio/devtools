@@ -36,7 +36,7 @@ export function isValidTeamName(name: string) {
 }
 
 function validateShortUUID(str: string) {
-  const translator = shortUUID()
+  const translator = shortUUID();
   let uuid = null;
 
   try {

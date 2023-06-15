@@ -1,10 +1,10 @@
+import shortUUID from "short-uuid";
 import slugify from "slugify";
 
 import { Recording } from "shared/graphql/types";
 
 import { usesWindow } from "../../ssr";
 import { SLUG_SEPARATOR, extractIdAndSlug } from "./helpers";
-import shortUUID from "short-uuid";
 
 const WARNING_MS = 60 * 2 * 1000;
 export const showDurationWarning = (recording: Recording) =>
@@ -21,7 +21,7 @@ export function getRecordingURL(recording: Recording): string {
 
 export function getShortenedRecordingURL(recording: Recording): string {
   let id = recording.id;
-  const translator = shortUUID()
+  const translator = shortUUID();
   const shortId = translator.fromUUID(id);
 
   return `/r/${shortId}`;
