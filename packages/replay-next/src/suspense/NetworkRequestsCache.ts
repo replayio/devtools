@@ -4,8 +4,10 @@ import {
   RequestBodyEvent,
   RequestDestinationEvent,
   RequestDoneEvent,
+  RequestEventInfo,
   RequestFailedEvent,
   RequestId,
+  RequestInfo,
   RequestOpenEvent,
   RequestRawHeaderEvent,
   RequestResponseBodyEvent,
@@ -55,13 +57,24 @@ export const networkRequestsCache = createStreamingCache<
   ) => {
     const { update, resolve } = options;
 
-    const records: Record<RequestId, NetworkRequestsData> = {};
     const ids: RequestId[] = [];
+    const records: Record<RequestId, NetworkRequestsData> = {};
 
     let previousExecutionPoint: ExecutionPoint | null = null;
 
-    const getOrCreateRecord = (id: RequestId) => {
-      if (records[id] == null) {
+    // Use the createOnRequestsReceived() adapter to ensure that RequestInfo objects
+    // are always received before any associated RequestEventInfo objects
+    const onRequestsReceived = createOnRequestsReceived(function onRequestsReceived(data) {
+      data.requests.forEach(({ id, point, time, triggerPoint }) => {
+        assert(
+          previousExecutionPoint === null || comparePoints(previousExecutionPoint, point) <= 0,
+          "Requests should be in order"
+        );
+
+        previousExecutionPoint = point;
+
+        ids.push(id);
+
         records[id] = {
           id,
           events: {
@@ -77,39 +90,16 @@ export const networkRequestsCache = createStreamingCache<
           },
           requestBodyData: null,
           responseBodyData: null,
-          // assert() this is filled in before returning
-          timeStampedPoint: null as any,
-          triggerPoint: null,
+          timeStampedPoint: {
+            point,
+            time,
+          },
+          triggerPoint: triggerPoint ?? null,
         } as NetworkRequestsData;
-      }
-
-      return records[id];
-    };
-
-    await replayClient.findNetworkRequests(function onRequestsReceived(data) {
-      // From the protocol docs:
-      // There is no guarantee that request information will be available before the request event info,
-      // so all temporal combinations should be supported when processing this data.
-      data.requests.forEach(({ id, point, time, triggerPoint }) => {
-        assert(
-          previousExecutionPoint === null || comparePoints(previousExecutionPoint, point) <= 0,
-          "Requests should be in order"
-        );
-
-        previousExecutionPoint = point;
-
-        ids.push(id);
-
-        const record = getOrCreateRecord(id);
-        record.timeStampedPoint = {
-          point,
-          time,
-        };
-        record.triggerPoint = triggerPoint ?? null;
       });
 
       data.events.forEach(({ id, event }) => {
-        const record = getOrCreateRecord(id);
+        const record = records[id];
         const events = record.events;
         switch (event.kind) {
           case "request":
@@ -145,11 +135,9 @@ export const networkRequestsCache = createStreamingCache<
       update(ids, undefined, records);
     });
 
-    // Verify that all required fields were eventually filled in
-    for (let id in records) {
-      const record = records[id];
-      assert(record.timeStampedPoint !== null);
-    }
+    await replayClient.findNetworkRequests(onRequestsReceived);
+
+    onRequestsReceived.printWarnings();
 
     resolve();
   },
@@ -196,3 +184,62 @@ export const networkResponseBodyCache = createStreamingCache<
     resolve();
   },
 });
+
+type DataEvent = { requests: RequestInfo[]; events: RequestEventInfo[] };
+
+// Regarding the Network.findRequests protocol API, the docs state:
+// There is no guarantee that request information will be available before the request event info,
+// so all temporal combinations should be supported when processing this data.
+//
+// This method ensures that RequestInfo objects are always received before any associated
+// RequestEventInfo objects, to simplify handling that data format.
+function createOnRequestsReceived(onRequestsReceived: (data: DataEvent) => void) {
+  const requestIdSet = new Set<RequestId>();
+  const pendingRequestEventInfoArray: RequestEventInfo[] = [];
+
+  function onRequestsReceivedWrapper(data: DataEvent) {
+    // Track all RequestInfo ids that we've seen
+    data.requests.forEach((requestInfo: RequestInfo) => {
+      requestIdSet.add(requestInfo.id);
+    });
+
+    const events: RequestEventInfo[] = [];
+
+    // Look for previous RequestEventInfos that are now safe to send
+    for (let index = pendingRequestEventInfoArray.length - 1; index >= 0; index--) {
+      const requestEventInfo = pendingRequestEventInfoArray[index];
+      if (requestIdSet.has(requestEventInfo.id)) {
+        events.push(requestEventInfo);
+        pendingRequestEventInfoArray.splice(index, 1);
+      }
+    }
+
+    // Pass along all new RequestEventInfo that are safe to send,
+    // and hold on to the rest for later
+    data.events.forEach(requestEventInfo => {
+      if (requestIdSet.has(requestEventInfo.id)) {
+        events.push(requestEventInfo);
+      } else {
+        pendingRequestEventInfoArray.push(requestEventInfo);
+      }
+    });
+
+    onRequestsReceived({
+      requests: data.requests,
+      events,
+    });
+  }
+
+  onRequestsReceivedWrapper.printWarnings = () => {
+    if (pendingRequestEventInfoArray.length > 0) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn(
+          `${pendingRequestEventInfoArray.length} unhandled RequestEventInfo objects found`
+        );
+        console.warn(pendingRequestEventInfoArray);
+      }
+    }
+  };
+
+  return onRequestsReceivedWrapper;
+}
