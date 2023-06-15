@@ -1,3 +1,5 @@
+import shortUUID from "short-uuid";
+
 export const SLUG_SEPARATOR = "--";
 export function validateEmail(email: string) {
   const re =
@@ -33,14 +35,30 @@ export function isValidTeamName(name: string) {
   return true;
 }
 
+function validateShortUUID(str: string) {
+  const translator = shortUUID()
+  let uuid = null;
+
+  try {
+    uuid = translator.toUUID(str);
+  } catch (e) {
+    console.error(e);
+  }
+
+  return uuid;
+}
+
 export function extractIdAndSlug(params: string | string[] | undefined) {
   const joined = Array.isArray(params) ? params[0] : params;
+  console.log(joined);
 
   let id: string | undefined;
   let slug: string | undefined;
   if (joined) {
     if (validateUUID(joined)) {
       id = joined;
+    } else if (validateShortUUID(joined)) {
+      id = validateShortUUID(joined)!;
     } else {
       const parts = joined.split(SLUG_SEPARATOR);
       if (validateUUID(parts[1])) {
