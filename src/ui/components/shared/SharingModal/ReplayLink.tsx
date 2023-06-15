@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 
 import { Recording } from "shared/graphql/types";
-import { getRecordingURL } from "ui/utils/recording";
+import { getShortenedRecordingURL } from "ui/utils/recording";
 import { trackEvent } from "ui/utils/telemetry";
 
 import Icon from "../../shared/Icon";
@@ -10,7 +10,7 @@ import styles from "./SharingModal.module.css";
 export function CopyButton({ recording }: { recording: Recording }) {
   const [showCopied, setShowCopied] = useState(false);
   const timeoutKey = useRef<NodeJS.Timeout | null>(null);
-  const url = window?.location.origin + getRecordingURL(recording);
+  const url = window?.location.origin + getShortenedRecordingURL(recording);
 
   const onClick = () => {
     navigator.clipboard.writeText(url);
