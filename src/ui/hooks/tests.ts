@@ -8,7 +8,7 @@ import {
   GetTestsRunsForWorkspace,
   GetTestsRunsForWorkspaceVariables,
 } from "shared/graphql/generated/GetTestsRunsForWorkspace";
-import { TestSuite, convertTestSuite } from "shared/test-suites/TestRun";
+import { GroupedTestCases, convertTestSuite } from "shared/test-suites/TestRun";
 import { WorkspaceId } from "ui/state/app";
 
 const GET_TEST_RUNS_FOR_WORKSPACE = gql`
@@ -84,30 +84,30 @@ export const GET_TEST_RUN = gql`
 
 export function useGetTestRunForWorkspace(
   workspaceId: string,
-  testSuiteId: string
+  groupedTestCasesId: string
 ): {
-  testSuite: TestSuite | null;
+  groupedTestCases: GroupedTestCases | null;
   loading: boolean;
 } {
   const { data, loading } = useQuery<GetTestsRun, GetTestsRunVariables>(GET_TEST_RUN, {
-    variables: { id: testSuiteId, workspaceId },
+    variables: { id: groupedTestCasesId, workspaceId },
   });
 
   if (loading || !data?.node) {
-    return { testSuite: null, loading };
+    return { groupedTestCases: null, loading };
   }
   assert("testRuns" in data.node, "No results in GetTestsRun response");
 
-  const testSuite = data.node.testRuns?.[0];
+  const groupedTestCases = data.node.testRuns?.[0];
 
   return {
-    testSuite: testSuite ? convertTestSuite(testSuite) : null,
+    groupedTestCases: groupedTestCases ? convertTestSuite(groupedTestCases) : null,
     loading,
   };
 }
 
 export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
-  testSuites: TestSuite[];
+  groupedTestCases: GroupedTestCases[];
   loading: boolean;
 } {
   // TODO [FE-1530] Pagination test runs from GraphQL
@@ -120,25 +120,25 @@ export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
 
   return useMemo(() => {
     if (loading || !data?.node) {
-      return { testSuites: [], loading };
+      return { groupedTestCases: [], loading };
     }
     assert("testRuns" in data.node, "No testRuns in GetTestsRun response");
 
-    const testSuites: TestSuite[] = [];
+    const groupedTestCases: GroupedTestCases[] = [];
 
     // Convert legacy test runs; filter out ones with invalid data
-    data.node.testRuns?.forEach(legacyTestSuite => {
+    data.node.testRuns?.forEach(legacyData => {
       try {
-        testSuites.push(convertTestSuite(legacyTestSuite));
+        groupedTestCases.push(convertTestSuite(legacyData));
       } catch (error) {
         // Filter out and ignore data that's too old or corrupt to defined the required fields
       }
     });
 
-    const sortedTestSuite = orderBy(testSuites, "date", "desc");
+    const sortedTestSuite = orderBy(groupedTestCases, "date", "desc");
 
     return {
-      testSuites: sortedTestSuite,
+      groupedTestCases: sortedTestSuite,
       loading,
     };
   }, [data, loading]);

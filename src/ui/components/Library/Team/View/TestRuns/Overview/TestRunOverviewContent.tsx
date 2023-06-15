@@ -8,13 +8,13 @@ import { TestRunOverviewContext } from "./TestRunOverviewContainerContextType";
 import styles from "../../../../Library.module.css";
 
 export function TestRunOverviewContent() {
-  const { testSuite } = useContext(TestRunOverviewContext);
+  const { groupedTestCases } = useContext(TestRunOverviewContext);
 
   return (
     <div className={`flex h-full flex-col text-sm ${styles.runOverview}`}>
-      {testSuite ? (
+      {groupedTestCases ? (
         <>
-          <RunSummary testSuite={testSuite} />
+          <RunSummary groupedTestCases={groupedTestCases} />
           <RunResults />
         </>
       ) : (

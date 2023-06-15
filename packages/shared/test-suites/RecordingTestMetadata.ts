@@ -1,10 +1,7 @@
 import assert from "assert";
 import {
   ExecutionPoint,
-  RequestEvent,
   RequestId,
-  RequestOpenEvent,
-  RequestResponseEvent,
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";

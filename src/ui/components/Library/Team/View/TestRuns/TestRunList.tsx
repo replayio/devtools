@@ -2,7 +2,7 @@ import { useContext, useMemo, useState } from "react";
 import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
-import { TestSuite } from "shared/test-suites/TestRun";
+import { GroupedTestCases } from "shared/test-suites/TestRun";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import { TestRunListItem } from "ui/components/Library/Team/View/TestRuns/TestRunListItem";
 import { SecondaryButton } from "ui/components/shared/Button";
@@ -14,28 +14,28 @@ const ROW_HEIGHT = 70;
 
 type ItemData = {
   countToRender: number;
+  groupedTestCases: GroupedTestCases[];
   loadMore: () => void;
-  testSuites: TestSuite[];
 };
 
 export function TestRunList() {
-  const { loading, testSuites } = useContext(TestRunsContext);
+  const { groupedTestCases, loading } = useContext(TestRunsContext);
   const [countToRender, setCountToRender] = useState(PAGE_SIZE);
 
   const itemData = useMemo<ItemData>(
     () => ({
       countToRender,
+      groupedTestCases,
       loadMore: () => setCountToRender(countToRender + PAGE_SIZE),
-      testSuites,
     }),
-    [countToRender, testSuites]
+    [countToRender, groupedTestCases]
   );
 
   if (loading) {
     return <LibrarySpinner />;
   }
 
-  const itemCount = Math.min(countToRender + 1, testSuites.length);
+  const itemCount = Math.min(countToRender + 1, groupedTestCases.length);
 
   return (
     <ReactVirtualizedAutoSizer
@@ -55,7 +55,7 @@ export function TestRunList() {
 }
 
 function TestRunListRow({ data, index, style }: ListChildComponentProps<ItemData>) {
-  const { countToRender, loadMore, testSuites } = data;
+  const { countToRender, loadMore, groupedTestCases } = data;
 
   if (index === countToRender) {
     return (
@@ -67,10 +67,9 @@ function TestRunListRow({ data, index, style }: ListChildComponentProps<ItemData
     );
   }
 
-  const testSuite = testSuites[index];
   return (
     <div style={style}>
-      <TestRunListItem testSuite={testSuite} />
+      <TestRunListItem groupedTestCases={groupedTestCases[index]} />
     </div>
   );
 }

@@ -11,16 +11,16 @@ import { Recording } from "shared/graphql/types";
 
 // This type is supported, but must be converted to version 2 format before use
 export namespace TestRunV1 {
-  export type TestSuite =
+  export type GroupedTestCases =
     | GetTestsRun_node_Workspace_testRuns
     | GetTestsRunsForWorkspace_node_Workspace_testRuns;
 }
 
 // This type is supported, but must be converted to version 2 format before use
 export namespace TestRunV2 {
-  export type TestSuiteMode = "diagnostics" | "record-on-retry" | "stress";
+  export type Mode = "diagnostics" | "record-on-retry" | "stress";
 
-  export type TestSuiteSourceMetadata = {
+  export type SourceMetadata = {
     branchName: string | null;
     commitId: string;
     isPrimaryBranch: boolean;
@@ -31,12 +31,10 @@ export namespace TestRunV2 {
     user: string | null;
   };
 
-  // A Test Suite is a group of tests that were run together
-  // Typically these are "triggered" by CI (e.g. GitHub Workflow)
-  export interface TestSuite {
+  export interface GroupedTestCases {
     date: string;
     id: string;
-    mode: TestSuiteMode | null;
+    mode: Mode | null;
     primaryTitle: string;
     results: {
       counts: {
@@ -47,19 +45,19 @@ export namespace TestRunV2 {
       recordings: Recording[];
     };
     secondaryTitle: string | null;
-    source: TestSuiteSourceMetadata | null;
+    source: SourceMetadata | null;
   }
 }
 
 // Export the union version of types (for type checker functions)
-export type AnyTestSuite = TestRunV1.TestSuite | TestRunV2.TestSuite;
+export type AnyGroupedTestCases = TestRunV1.GroupedTestCases | TestRunV2.GroupedTestCases;
 
 // Export the latest version of types (for convenience)
-export type TestSuite = TestRunV2.TestSuite;
-export type TestSuiteMode = TestRunV2.TestSuiteMode;
-export type TestSuiteSourceMetadata = TestRunV2.TestSuiteSourceMetadata;
+export type GroupedTestCases = TestRunV2.GroupedTestCases;
+export type Mode = TestRunV2.Mode;
+export type SourceMetadata = TestRunV2.SourceMetadata;
 
-export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
+export function convertTestSuite(testSuite: AnyGroupedTestCases): TestRunV2.GroupedTestCases {
   if (isTestSuiteV2(testSuite)) {
     // If data from GraphQL is already in the new format, skip the conversion
     return testSuite;
@@ -108,7 +106,7 @@ export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
 
   const titleWithFallback = commitTitle || mergeTitle || "Tests";
 
-  let source: TestRunV2.TestSuiteSourceMetadata | null = null;
+  let source: TestRunV2.SourceMetadata | null = null;
   if (branch && commitId && user) {
     source = {
       branchName: branch,
@@ -125,7 +123,7 @@ export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
   return {
     date,
     id,
-    mode: mode ? (mode as TestRunV2.TestSuiteMode) : null,
+    mode: mode ? (mode as TestRunV2.Mode) : null,
     primaryTitle: titleWithFallback,
     results: {
       counts: {
@@ -156,10 +154,14 @@ function unwrapRecordingsData(
   }));
 }
 
-export function isTestSuiteV1(testSuite: AnyTestSuite): testSuite is TestRunV1.TestSuite {
+export function isTestSuiteV1(
+  testSuite: AnyGroupedTestCases
+): testSuite is TestRunV1.GroupedTestCases {
   return !isTestSuiteV2(testSuite);
 }
 
-export function isTestSuiteV2(testSuite: AnyTestSuite): testSuite is TestRunV2.TestSuite {
+export function isTestSuiteV2(
+  testSuite: AnyGroupedTestCases
+): testSuite is TestRunV2.GroupedTestCases {
   return "results" in testSuite;
 }
