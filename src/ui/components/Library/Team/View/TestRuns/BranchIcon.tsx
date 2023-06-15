@@ -1,9 +1,11 @@
+import { ReactNode } from "react";
+
 export function BranchIcon({
   branchName = "branch",
   isPrimaryBranch,
   title,
 }: {
-  branchName: string | null;
+  branchName: ReactNode;
   isPrimaryBranch: boolean;
   title: string;
 }) {

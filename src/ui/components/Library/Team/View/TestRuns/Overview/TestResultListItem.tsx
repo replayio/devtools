@@ -7,17 +7,20 @@ import {
   isGroupedTestCasesV1,
   isGroupedTestCasesV2,
 } from "shared/test-suites/RecordingTestMetadata";
+import HighlightedText from "ui/components/Library/Team/View/TestRuns/HighlightedText";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 
 import styles from "../../../../Library.module.css";
 
 export function TestResultListItem({
   depth,
+  filterByText,
   label,
   recording,
   secondaryBadgeCount,
 }: {
   depth: number;
+  filterByText: string;
   label: string;
   recording: Recording;
   secondaryBadgeCount: number | null;
@@ -26,16 +29,21 @@ export function TestResultListItem({
 
   const numComments = comments?.length ?? 0;
 
-  let title;
+  let filePath = "";
+  let title = "";
 
   const testMetadata = metadata?.test;
   if (testMetadata != null) {
     if (isGroupedTestCasesV1(testMetadata)) {
+      console.log(typeof testMetadata.path, testMetadata.path);
+      filePath = testMetadata.path?.[2] ?? "";
       title = testMetadata.title;
     } else if (isGroupedTestCasesV2(testMetadata)) {
-      title = testMetadata.source.title;
+      filePath = testMetadata.source.path;
+      title = testMetadata.source.title || "";
     } else {
-      title = testMetadata.source.title;
+      filePath = testMetadata.source.filePath;
+      title = testMetadata.source.title || "";
     }
   }
 
@@ -82,6 +90,11 @@ export function TestResultListItem({
       </div>
       <div className="flex shrink grow flex-col truncate">
         <div className="block truncate">{title || "Test"}</div>
+        {filePath && (
+          <div className="block truncate text-xs text-gray-600">
+            <HighlightedText haystack={filePath} needle={filterByText} />
+          </div>
+        )}
       </div>
       {numComments > 0 && (
         <div className="align-items-center flex shrink-0 flex-row space-x-1 text-gray-600">

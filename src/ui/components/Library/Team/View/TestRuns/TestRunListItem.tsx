@@ -3,6 +3,7 @@ import { useContext } from "react";
 
 import { Summary, getTestRunTitle } from "shared/test-suites/TestRun";
 import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
+import HighlightedText from "ui/components/Library/Team/View/TestRuns/HighlightedText";
 import Icon from "ui/components/shared/Icon";
 
 import { TeamContext } from "../../TeamContextRoot";
@@ -12,44 +13,6 @@ import { ModeAttribute } from "./Overview/RunSummary";
 import { RunStats } from "./RunStats";
 import { TestRunsContext } from "./TestRunsContextRoot";
 import styles from "../../../Library.module.css";
-
-function Title({ summary }: { summary: Summary }) {
-  const title = getTestRunTitle(summary);
-
-  // TODO: This should be done in CSS.
-  const formatted = title.length > 80 ? title.slice(0, 80) + "..." : title;
-
-  return (
-    <div className="wrap flex shrink grow-0 overflow-hidden text-ellipsis whitespace-nowrap pr-2 font-medium">
-      {formatted}
-    </div>
-  );
-}
-
-function Attributes({ summary }: { summary: Summary }) {
-  const { date, source } = summary;
-
-  const title = getTestRunTitle(summary);
-
-  if (source) {
-    const { branchName, isPrimaryBranch, user } = source;
-
-    return (
-      <div className="flex flex-row items-center gap-4 text-xs font-light">
-        <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
-        {user && <AttributeContainer icon="person">{user}</AttributeContainer>}
-        <BranchIcon branchName={branchName} isPrimaryBranch={isPrimaryBranch} title={title} />
-        <ModeAttribute summary={summary} />
-      </div>
-    );
-  } else {
-    return (
-      <div className="flex flex-row items-center gap-4 text-xs font-light">
-        <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
-      </div>
-    );
-  }
-}
 
 function Status({ failCount }: { failCount: number }) {
   if (failCount > 0) {
@@ -69,13 +32,50 @@ function Status({ failCount }: { failCount: number }) {
   }
 }
 
-export function TestRunListItem({ summary }: { summary: Summary }) {
+export function TestRunListItem({
+  filterByText,
+  summary,
+}: {
+  filterByText: string;
+  summary: Summary;
+}) {
+  const { date, source } = summary;
+
   const { focusId } = useContext(TestRunsContext);
   const { teamId } = useContext(TeamContext);
 
-  // TODO Don't count flakes
+  const title = getTestRunTitle(summary);
+
   const failCount = summary.results.counts.failed;
   const isSelected = focusId === summary.id;
+
+  let attributes;
+  if (source) {
+    const { branchName, isPrimaryBranch, user } = source;
+
+    attributes = (
+      <div className="flex flex-row items-center gap-4 text-xs font-light">
+        <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
+        {user && (
+          <AttributeContainer icon="person">
+            <HighlightedText haystack={user} needle={filterByText} />
+          </AttributeContainer>
+        )}
+        <BranchIcon
+          branchName={<HighlightedText haystack={branchName || ""} needle={filterByText} />}
+          isPrimaryBranch={isPrimaryBranch}
+          title={title}
+        />
+        <ModeAttribute summary={summary} />
+      </div>
+    );
+  } else {
+    attributes = (
+      <div className="flex flex-row items-center gap-4 text-xs font-light">
+        <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
+      </div>
+    );
+  }
 
   return (
     <Link
@@ -89,10 +89,12 @@ export function TestRunListItem({ summary }: { summary: Summary }) {
       <Status failCount={failCount} />
       <div className="flex h-full flex-grow flex-col justify-evenly overflow-hidden">
         <div className="flex flex-row justify-between space-x-3">
-          <Title summary={summary} />
+          <div className="wrap flex shrink grow-0 overflow-hidden text-ellipsis whitespace-nowrap pr-2 font-medium">
+            <HighlightedText haystack={title} needle={filterByText} />
+          </div>
           <RunStats summary={summary} />
         </div>
-        <Attributes summary={summary} />
+        {attributes}
       </div>
     </Link>
   );

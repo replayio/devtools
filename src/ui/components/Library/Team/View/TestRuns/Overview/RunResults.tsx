@@ -149,6 +149,7 @@ const FileNodeRenderer = memo(function FileNodeRenderer({
         {recordings.map(recording => (
           <TestResultListItem
             depth={depth + 1}
+            filterByText={filterByText}
             key={recording.id}
             label={label}
             recording={recording}
