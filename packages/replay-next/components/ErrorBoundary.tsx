@@ -54,7 +54,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
     const { error } = this.state;
 
     if (error !== null) {
-      return fallback != null ? fallback : <DefaultFallback className={fallbackClassName} />;
+      return fallback !== undefined ? fallback : <DefaultFallback className={fallbackClassName} />;
     }
 
     return this.props.children;

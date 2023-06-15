@@ -2,6 +2,7 @@ import type { PointDescription } from "@replayio/protocol";
 import { Suspense, useContext } from "react";
 
 import { binarySearch } from "protocol/utils";
+import ErrorBoundary from "replay-next/components/ErrorBoundary";
 import { FocusContext } from "replay-next/src/contexts/FocusContext";
 import { SourcesContext } from "replay-next/src/contexts/SourcesContext";
 import { getHitPointsForLocationSuspense } from "replay-next/src/suspense/HitPointsCache";
@@ -15,9 +16,11 @@ import Marker from "./Marker";
 
 export default function PreviewMarkers() {
   return (
-    <Suspense fallback={null}>
-      <PreviewMarkersSuspends />
-    </Suspense>
+    <ErrorBoundary fallback={null}>
+      <Suspense fallback={null}>
+        <PreviewMarkersSuspends />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 
