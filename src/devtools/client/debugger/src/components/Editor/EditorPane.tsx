@@ -1,14 +1,12 @@
 import classNames from "classnames";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 
 import { IndeterminateProgressBar } from "replay-next/components/IndeterminateLoader";
-import { setUnexpectedError } from "ui/actions/errors";
-import { ReplayUpdatedError } from "ui/components/ErrorBoundary";
 import { Redacted } from "ui/components/Redacted";
 import { useFeature } from "ui/hooks/settings";
 import { getToolboxLayout } from "ui/reducers/layout";
 import { getSelectedSource, getSourcesUserActionPending } from "ui/reducers/sources";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useAppSelector } from "ui/setup/hooks";
 import useWidthObserver from "ui/utils/useWidthObserver";
 
 import WelcomeBox from "../WelcomeBox";
@@ -17,8 +15,6 @@ import NewSourceAdapter from "./NewSourceAdapter";
 import EditorTabs from "./Tabs";
 
 export const EditorPane = () => {
-  const [loadingEditor, setLoadingEditor] = useState(true);
-  const dispatch = useAppDispatch();
   const toolboxLayout = useAppSelector(getToolboxLayout);
   const selectedSource = useAppSelector(getSelectedSource);
   const sourcesUserActionPending = useAppSelector(getSourcesUserActionPending);
@@ -36,19 +32,6 @@ export const EditorPane = () => {
       root.style.setProperty("--theme-code-font-size", "11px");
     }
   }, [enableLargeText]);
-  useEffect(() => {
-    (async () => {
-      try {
-        setLoadingEditor(false);
-      } catch {
-        dispatch(setUnexpectedError(ReplayUpdatedError));
-      }
-    })();
-  }, [dispatch]);
-
-  if (loadingEditor) {
-    return null;
-  }
 
   return (
     <div

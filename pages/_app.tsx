@@ -1,5 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Store } from "@reduxjs/toolkit";
+import * as Sentry from "@sentry/react";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
 import Head from "next/head";
@@ -12,20 +13,23 @@ import "../src/test-prep";
 import { SystemProvider } from "design";
 import { setFeatures } from "protocol/thread/thread";
 import { recordData as recordTelemetryData } from "replay-next/src/utils/telemetry";
+import { setUnexpectedError } from "ui/actions/errors";
 import { ApolloWrapper } from "ui/components/ApolloWrapper";
 import _App from "ui/components/App";
-import ErrorBoundary from "ui/components/ErrorBoundary";
 import MaintenanceModeScreen from "ui/components/MaintenanceMode";
 import { ConfirmProvider } from "ui/components/shared/Confirm";
+import Error from "ui/components/shared/Error";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
+import useAuthTelemetry from "ui/hooks/useAuthTelemetry";
+import { getUnexpectedError } from "ui/reducers/app";
 import { bootstrapApp } from "ui/setup";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { configureMockEnvironmentForTesting, isMock } from "ui/utils/environment";
 import { useLaunchDarkly } from "ui/utils/launchdarkly";
 import { features } from "ui/utils/prefs";
 import { InstallRouteListener } from "ui/utils/routeListener";
 import tokenManager from "ui/utils/tokenManager";
 
-import useAuthTelemetry from "ui/hooks/useAuthTelemetry";
 import "../src/base.css";
 
 if (isMock()) {
@@ -159,5 +163,37 @@ App.getInitialProps = (appContext: AppContext) => {
 
   return { ...props, ...authProps };
 };
+
+function ErrorBoundary({ children }: { children: ReactNode }) {
+  const unexpectedError = useAppSelector(getUnexpectedError);
+  const dispatch = useAppDispatch();
+
+  const onError = (error: Error) => {
+    if (error.name === "ChunkLoadError") {
+      return dispatch(setUnexpectedError({
+        message: "Replay updated",
+        content: "Replay was updated since you opened it. Please refresh the page.",
+        action: "refresh",
+      }, true));
+    }
+
+    // Otherwise, if it's bubbled up this far, React is crashing anyway.
+    // Let's show the "Oops!" screen and tell the user to refresh.
+
+    dispatch(
+      setUnexpectedError({
+        message: "Unexpected error",
+        content: "Something went wrong, but you can refresh the page to try again.",
+        action: "refresh",
+      })
+    );
+  };
+
+  return (
+    <Sentry.ErrorBoundary onError={onError} fallback={<Error />}>
+      {unexpectedError ? <Error /> : children}
+    </Sentry.ErrorBoundary>
+  );
+}
 
 export default App;
