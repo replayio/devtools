@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import Icon from "replay-next/components/Icon";
-import { TestSuite, TestSuiteMode } from "shared/test-suites/TestRun";
+import { Mode, Summary, getTestRunTitle } from "shared/test-suites/TestRun";
 import { BranchIcon } from "ui/components/Library/Team/View/TestRuns/BranchIcon";
 
 import {
@@ -12,7 +12,7 @@ import { AttributeContainer } from "../AttributeContainer";
 import { RunStats } from "../RunStats";
 import { getDuration } from "../utils";
 
-function getModeIcon(mode: TestSuiteMode): string[] {
+function getModeIcon(mode: Mode): string[] {
   switch (mode) {
     case "diagnostics":
       return ["biotech", "Diagnostic Mode"];
@@ -23,8 +23,8 @@ function getModeIcon(mode: TestSuiteMode): string[] {
   }
 }
 
-export function ModeAttribute({ testSuite }: { testSuite: TestSuite }) {
-  const { mode } = testSuite;
+export function ModeAttribute({ summary }: { summary: Summary }) {
+  const { mode } = summary;
   if (!mode) {
     return null;
   }
@@ -34,8 +34,8 @@ export function ModeAttribute({ testSuite }: { testSuite: TestSuite }) {
   return <AttributeContainer icon={modeIcon}>{modeText}</AttributeContainer>;
 }
 
-export function Attributes({ testSuite }: { testSuite: TestSuite }) {
-  const { date, results, source, primaryTitle: title } = testSuite;
+export function Attributes({ summary }: { summary: Summary }) {
+  const { date, results, source } = summary;
   const { recordings } = results;
 
   const duration = getDuration(recordings);
@@ -48,9 +48,13 @@ export function Attributes({ testSuite }: { testSuite: TestSuite }) {
       <div className="flex flex-row flex-wrap items-center gap-4">
         <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
         {user ? <AttributeContainer icon="person">{user}</AttributeContainer> : null}
-        <BranchIcon branchName={branchName} isPrimaryBranch={isPrimaryBranch} title={title} />
+        <BranchIcon
+          branchName={branchName}
+          isPrimaryBranch={isPrimaryBranch}
+          title={getTestRunTitle(summary)}
+        />
         <AttributeContainer icon="timer">{durationString}</AttributeContainer>
-        <ModeAttribute testSuite={testSuite} />
+        <ModeAttribute summary={summary} />
       </div>
     );
   } else {
@@ -62,8 +66,8 @@ export function Attributes({ testSuite }: { testSuite: TestSuite }) {
   }
 }
 
-function PullRequestLink({ testSuite }: { testSuite: TestSuite }) {
-  const { source } = testSuite;
+function PullRequestLink({ summary }: { summary: Summary }) {
+  const { source } = summary;
   if (!source) {
     return null;
   }
@@ -86,14 +90,14 @@ function PullRequestLink({ testSuite }: { testSuite: TestSuite }) {
   );
 }
 
-function RunnerLink({ testSuite }: { testSuite: TestSuite }) {
-  if (!testSuite.source?.triggerUrl) {
+function RunnerLink({ summary }: { summary: Summary }) {
+  if (!summary.source?.triggerUrl) {
     return null;
   }
 
   return (
     <Link
-      href={testSuite.source.triggerUrl}
+      href={summary.source.triggerUrl}
       target="_blank"
       rel="noreferrer noopener"
       className="flex flex-row items-center gap-1 hover:underline"
@@ -104,23 +108,27 @@ function RunnerLink({ testSuite }: { testSuite: TestSuite }) {
   );
 }
 
-export function RunSummary({ testSuite }: { testSuite: TestSuite }) {
+export function RunSummary({ summary }: { summary: Summary }) {
+  const { source } = summary;
+
   return (
     <div className="flex flex-col gap-1 border-b border-themeBorder p-4">
       <div className="flex flex-row items-center justify-between gap-1">
         <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-medium">
-          {testSuite.primaryTitle}
+          {getTestRunTitle(summary)}
         </div>
-        <RunStats testSuite={testSuite} />
+        <RunStats summary={summary} />
       </div>
-      <div className="text overflow-hidden overflow-ellipsis whitespace-nowrap font-medium text-bodySubColor">
-        {testSuite.secondaryTitle}
-      </div>
+      {source?.groupLabel && (
+        <div className="text overflow-hidden overflow-ellipsis whitespace-nowrap font-medium text-bodySubColor">
+          {source.groupLabel}
+        </div>
+      )}
       <div className="mt-1 flex w-full flex-row items-center gap-4 text-xs">
-        <Attributes testSuite={testSuite} />
+        <Attributes summary={summary} />
         <div className="grow" />
-        <PullRequestLink testSuite={testSuite} />
-        <RunnerLink testSuite={testSuite} />
+        <PullRequestLink summary={summary} />
+        <RunnerLink summary={summary} />
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import { useContext, useMemo, useState } from "react";
 import ReactVirtualizedAutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 
-import { TestSuite } from "shared/test-suites/TestRun";
+import { Summary } from "shared/test-suites/TestRun";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import { TestRunListItem } from "ui/components/Library/Team/View/TestRuns/TestRunListItem";
 import { SecondaryButton } from "ui/components/shared/Button";
@@ -15,27 +15,27 @@ const ROW_HEIGHT = 70;
 type ItemData = {
   countToRender: number;
   loadMore: () => void;
-  testSuites: TestSuite[];
+  summaries: Summary[];
 };
 
 export function TestRunList() {
-  const { loading, testSuites } = useContext(TestRunsContext);
+  const { loading, summaries } = useContext(TestRunsContext);
   const [countToRender, setCountToRender] = useState(PAGE_SIZE);
 
   const itemData = useMemo<ItemData>(
     () => ({
       countToRender,
       loadMore: () => setCountToRender(countToRender + PAGE_SIZE),
-      testSuites,
+      summaries,
     }),
-    [countToRender, testSuites]
+    [countToRender, summaries]
   );
 
   if (loading) {
     return <LibrarySpinner />;
   }
 
-  const itemCount = Math.min(countToRender + 1, testSuites.length);
+  const itemCount = Math.min(countToRender + 1, summaries.length);
 
   return (
     <ReactVirtualizedAutoSizer
@@ -55,7 +55,7 @@ export function TestRunList() {
 }
 
 function TestRunListRow({ data, index, style }: ListChildComponentProps<ItemData>) {
-  const { countToRender, loadMore, testSuites } = data;
+  const { countToRender, loadMore, summaries: summary } = data;
 
   if (index === countToRender) {
     return (
@@ -67,10 +67,9 @@ function TestRunListRow({ data, index, style }: ListChildComponentProps<ItemData
     );
   }
 
-  const testSuite = testSuites[index];
   return (
     <div style={style}>
-      <TestRunListItem testSuite={testSuite} />
+      <TestRunListItem summary={summary[index]} />
     </div>
   );
 }

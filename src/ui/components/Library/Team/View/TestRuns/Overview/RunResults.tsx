@@ -1,3 +1,4 @@
+import assert from "assert";
 import {
   unstable_Offscreen as Offscreen,
   ReactNode,
@@ -22,15 +23,16 @@ import { TestRunOverviewContext } from "./TestRunOverviewContainerContextType";
 import styles from "../../../../Library.module.css";
 
 export function RunResults() {
-  const testSuite = useContext(TestRunOverviewContext).testSuite!;
+  const { summary } = useContext(TestRunOverviewContext);
+  assert(summary !== null);
 
   const [filterByText, setFilterByText] = useState("");
   const filterByTextDeferred = useDeferredValue(filterByText);
 
   // TODO Don't keep re-computing this; it's expensive
   const { passedRecordings, failedRecordings, flakyRecordings } = useMemo(
-    () => groupRecordings(testSuite.results.recordings),
-    [testSuite.results.recordings]
+    () => groupRecordings(summary.results.recordings),
+    [summary.results.recordings]
   );
 
   return (

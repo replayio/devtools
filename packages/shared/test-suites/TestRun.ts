@@ -11,18 +11,20 @@ import { Recording } from "shared/graphql/types";
 
 // This type is supported, but must be converted to version 2 format before use
 export namespace TestRunV1 {
-  export type TestSuite =
+  export type Summary =
     | GetTestsRun_node_Workspace_testRuns
     | GetTestsRunsForWorkspace_node_Workspace_testRuns;
 }
 
 // This type is supported, but must be converted to version 2 format before use
 export namespace TestRunV2 {
-  export type TestSuiteMode = "diagnostics" | "record-on-retry" | "stress";
+  export type Mode = "diagnostics" | "record-on-retry" | "stress";
 
-  export type TestSuiteSourceMetadata = {
+  export type SourceMetadata = {
     branchName: string | null;
     commitId: string;
+    commitTitle: string | null;
+    groupLabel: string | null;
     isPrimaryBranch: boolean;
     prNumber: number | null;
     prTitle: string | null;
@@ -31,13 +33,10 @@ export namespace TestRunV2 {
     user: string | null;
   };
 
-  // A Test Suite is a group of tests that were run together
-  // Typically these are "triggered" by CI (e.g. GitHub Workflow)
-  export interface TestSuite {
+  export interface Summary {
     date: string;
     id: string;
-    mode: TestSuiteMode | null;
-    primaryTitle: string;
+    mode: Mode | null;
     results: {
       counts: {
         failed: number;
@@ -46,23 +45,22 @@ export namespace TestRunV2 {
       };
       recordings: Recording[];
     };
-    secondaryTitle: string | null;
-    source: TestSuiteSourceMetadata | null;
+    source: SourceMetadata | null;
   }
 }
 
 // Export the union version of types (for type checker functions)
-export type AnyTestSuite = TestRunV1.TestSuite | TestRunV2.TestSuite;
+export type AnySummary = TestRunV1.Summary | TestRunV2.Summary;
 
 // Export the latest version of types (for convenience)
-export type TestSuite = TestRunV2.TestSuite;
-export type TestSuiteMode = TestRunV2.TestSuiteMode;
-export type TestSuiteSourceMetadata = TestRunV2.TestSuiteSourceMetadata;
+export type Summary = TestRunV2.Summary;
+export type Mode = TestRunV2.Mode;
+export type SourceMetadata = TestRunV2.SourceMetadata;
 
-export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
-  if (isTestSuiteV2(testSuite)) {
+export function convertSummary(summary: AnySummary): TestRunV2.Summary {
+  if (isTestRunV2(summary)) {
     // If data from GraphQL is already in the new format, skip the conversion
-    return testSuite;
+    return summary;
   }
 
   const {
@@ -78,7 +76,7 @@ export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
     stats,
     title,
     user,
-  } = testSuite;
+  } = summary;
 
   // Verify expected data; if any of these are missing, we can't reliably migrate the data
   assert(date != null, "Expected legacy TestRun data to have a data");
@@ -88,7 +86,7 @@ export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
     "Expected legacy TestRun data to have pass/fail stats"
   );
 
-  const recordings = "recordings" in testSuite ? unwrapRecordingsData(testSuite.recordings) : [];
+  const recordings = "recordings" in summary ? unwrapRecordingsData(summary.recordings) : [];
   const sortedRecordings = orderBy(recordings, "date", "desc");
 
   const firstRecording = sortedRecordings[0];
@@ -103,19 +101,18 @@ export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
       break;
   }
 
-  const prNumber = mergeId != null ? parseInt(mergeId) : null;
-  const prTitle = mergeTitle ?? null;
-
-  const titleWithFallback = commitTitle || mergeTitle || "Tests";
-
-  let source: TestRunV2.TestSuiteSourceMetadata | null = null;
+  let source: TestRunV2.SourceMetadata | null = null;
   if (branch && commitId && user) {
+    const prNumber = mergeId != null ? parseInt(mergeId) : null;
+
     source = {
       branchName: branch,
       commitId,
+      commitTitle,
+      groupLabel: title,
       isPrimaryBranch,
       prNumber: prNumber && !isNaN(prNumber) ? prNumber : null,
-      prTitle,
+      prTitle: mergeTitle,
       repository,
       triggerUrl,
       user,
@@ -125,8 +122,7 @@ export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
   return {
     date,
     id,
-    mode: mode ? (mode as TestRunV2.TestSuiteMode) : null,
-    primaryTitle: titleWithFallback,
+    mode: mode ? (mode as TestRunV2.Mode) : null,
     results: {
       counts: {
         failed: stats.failed,
@@ -135,7 +131,6 @@ export function convertTestSuite(testSuite: AnyTestSuite): TestRunV2.TestSuite {
       },
       recordings: sortedRecordings,
     },
-    secondaryTitle: title,
     source,
   };
 }
@@ -156,10 +151,33 @@ function unwrapRecordingsData(
   }));
 }
 
-export function isTestSuiteV1(testSuite: AnyTestSuite): testSuite is TestRunV1.TestSuite {
-  return !isTestSuiteV2(testSuite);
+export function getTestRunTitle(groupedTestCases: AnySummary): string {
+  if (isTestRunV1(groupedTestCases)) {
+    const { commitTitle, mergeTitle } = groupedTestCases;
+    if (commitTitle) {
+      return commitTitle;
+    } else if (mergeTitle) {
+      return mergeTitle;
+    }
+  } else {
+    const { source } = groupedTestCases;
+    if (source) {
+      const { commitTitle, prTitle } = source;
+      if (commitTitle) {
+        return commitTitle;
+      } else if (prTitle) {
+        return prTitle;
+      }
+    }
+  }
+
+  return "Test";
 }
 
-export function isTestSuiteV2(testSuite: AnyTestSuite): testSuite is TestRunV2.TestSuite {
-  return "results" in testSuite;
+export function isTestRunV1(summary: AnySummary): summary is TestRunV1.Summary {
+  return !isTestRunV2(summary);
+}
+
+export function isTestRunV2(summary: AnySummary): summary is TestRunV2.Summary {
+  return "results" in summary;
 }
