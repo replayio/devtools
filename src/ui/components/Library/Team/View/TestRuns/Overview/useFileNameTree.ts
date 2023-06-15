@@ -7,7 +7,6 @@ import { RecordingGroup } from "ui/utils/testRuns";
 
 export function useFileNameTree(recordingGroup: RecordingGroup, filterByText: string = "") {
   const { fileNameToRecordings } = recordingGroup;
-  console.log(`useFileNameTree() "${filterByText}"`);
 
   filterByText = filterByText.toLowerCase();
 

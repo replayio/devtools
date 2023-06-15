@@ -572,8 +572,11 @@ export async function convertGroupedTestCases(
         const annotationsByTest: Annotation[][] = annotations.reduce(
           (accumulated: Annotation[][], annotation: Annotation) => {
             if (annotation.message.event === "test:start") {
+              // Start a new annotations array for each test
               accumulated.push([annotation]);
-            } else {
+            } else if (accumulated.length > 0) {
+              // Else add new annotations to the current test
+              // (Note some recordings have annotations data before the first "test:start")
               accumulated[accumulated.length - 1].push(annotation);
             }
 
