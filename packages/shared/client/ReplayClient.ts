@@ -60,8 +60,13 @@ import {
 import throttle from "lodash/throttle";
 import uniqueId from "lodash/uniqueId";
 
-// eslint-disable-next-line no-restricted-imports
-import { addEventListener, client, initSocket, removeEventListener } from "protocol/socket";
+import {
+  addEventListener,
+  client,
+  initSocket,
+  removeEventListener,
+  resetSession,
+} from "protocol/socket";
 import { assert, compareNumericStrings, defer, waitForTime } from "protocol/utils";
 import { initProtocolMessagesStore } from "replay-next/components/protocol/ProtocolMessagesStore";
 import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
@@ -242,6 +247,11 @@ export class ReplayClient implements ReplayClientInterface {
     await this.syncFocusWindow();
 
     return sessionId;
+  }
+
+  releaseSession(): void {
+    client.Recording.releaseSession({ sessionId: this.getSessionIdThrows() });
+    resetSession();
   }
 
   async findAnnotations(kind: string, listener: AnnotationListener) {

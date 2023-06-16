@@ -31,3 +31,4 @@ test/.yarn/cache/
 *.mp4
 videos/
 .vercel
+packages/shared/test/fixtures

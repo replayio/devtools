@@ -8,11 +8,11 @@ import {
 import { satisfies } from "compare-versions";
 
 import { comparePoints } from "protocol/execution-point-utils";
+import { AnnotationsCache } from "replay-next/src/suspense/AnnotationsCache";
 import { networkRequestsCache } from "replay-next/src/suspense/NetworkRequestsCache";
 import { findSliceIndices, insert } from "replay-next/src/utils/array";
 import { ReplayClientInterface } from "shared/client/types";
 import { Annotation } from "shared/graphql/types";
-import { AnnotationsCache } from "ui/components/TestSuite/suspense/AnnotationsCache";
 
 export type SemVer = string;
 
@@ -326,6 +326,7 @@ export async function processCypressTestRecording(
     // then we can iterate over the user-action events.
     const userActionEventIdToAnnotations: Record<string, Annotation[]> = {};
 
+    assert(annotations?.length > 0, "Must have at least one annotation");
     for (let index = 0; index < annotations.length; index++) {
       const annotation = annotations[index];
       switch (annotation.message.event) {

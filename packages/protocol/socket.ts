@@ -148,6 +148,10 @@ type SessionCallbacks = {
 
 let gSessionCallbacks: SessionCallbacks | undefined;
 
+export function resetSession() {
+  gSessionCallbacks = undefined;
+}
+
 export function setSessionCallbacks(sessionCallbacks: SessionCallbacks) {
   if (gSessionCallbacks !== undefined) {
     console.error("Session callbacks can only be set once");
@@ -272,7 +276,9 @@ export async function sendMessage<M extends CommandMethods>(
 }
 
 const doSend = makeInfallible(message => {
-  window.performance?.mark(`${message.method}_start`);
+  if (typeof window === "object") {
+    window.performance?.mark(`${message.method}_start`);
+  }
   const stringified = JSON.stringify(message);
   gSentBytes += stringified.length;
 
@@ -354,8 +360,10 @@ function socketDataHandler(data: string) {
     const { method, resolve } = gMessageWaiters.get(msg.id)!;
     gSessionCallbacks?.onResponse(msg);
 
-    window.performance?.mark(`${method}_end`);
-    window.performance?.measure(method, `${method}_start`, `${method}_end`);
+    if (typeof window === "object") {
+      window.performance?.mark(`${method}_end`);
+      window.performance?.measure(method, `${method}_start`, `${method}_end`);
+    }
 
     gMessageWaiters.delete(msg.id);
     resolve(msg);
