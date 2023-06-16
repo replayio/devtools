@@ -298,7 +298,7 @@ export type TestRecording = RecordingTestMetadataV3.TestRecording;
 export type TestSectionName = RecordingTestMetadataV3.TestSectionName;
 export type UserActionEvent = RecordingTestMetadataV3.UserActionEvent;
 
-export async function convertCypressTestRecording(
+export async function processCypressTestRecording(
   testRecording: RecordingTestMetadataV2.TestRecording | RecordingTestMetadataV3.TestRecording,
   annotations: Annotation[],
   replayClient: ReplayClientInterface
@@ -550,7 +550,7 @@ export async function convertCypressTestRecording(
   }
 }
 
-export async function convertGroupedTestCases(
+export async function processGroupedTestCases(
   groupedTestCases:
     | RecordingTestMetadataV2.GroupedTestCases
     | RecordingTestMetadataV3.GroupedTestCases,
@@ -588,7 +588,7 @@ export async function convertGroupedTestCases(
         for (let index = 0; index < partialTestRecordings.length; index++) {
           const legacyTest = partialTestRecordings[index];
           const annotations = annotationsByTest[index];
-          const test = await convertCypressTestRecording(legacyTest, annotations, replayClient);
+          const test = await processCypressTestRecording(legacyTest, annotations, replayClient);
 
           testRecordings.push(test);
         }
@@ -607,7 +607,7 @@ export async function convertGroupedTestCases(
         let testRecordings: RecordingTestMetadataV3.TestRecording[] = [];
         for (let index = 0; index < partialTestRecordings.length; index++) {
           const legacyTest = partialTestRecordings[index];
-          const test = await convertPlaywrightTestRecording(legacyTest);
+          const test = await processPlaywrightTestRecording(legacyTest);
 
           testRecordings.push(test);
         }
@@ -632,7 +632,7 @@ export async function convertGroupedTestCases(
   }
 }
 
-export async function convertPlaywrightTestRecording(
+export async function processPlaywrightTestRecording(
   testRecording: RecordingTestMetadataV2.TestRecording | RecordingTestMetadataV3.TestRecording
 ): Promise<RecordingTestMetadataV3.TestRecording> {
   if (isTestRecordingV2(testRecording)) {

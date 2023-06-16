@@ -1,5 +1,5 @@
-import { GetTestsRun_node_Workspace_testRuns_edges_node } from "shared/graphql/generated/GetTestsRun";
-import { GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node } from "shared/graphql/generated/GetTestsRunsForWorkspace";
+import { GetTestsRun_node_Workspace_testRuns_edges_node as TestRunGraphQL } from "shared/graphql/generated/GetTestsRun";
+import { GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node as TestRunsForWorkspaceGraphQL } from "shared/graphql/generated/GetTestsRunsForWorkspace";
 import { Recording } from "shared/graphql/types";
 import { convertRecording } from "ui/hooks/recordings";
 
@@ -33,20 +33,20 @@ export interface Summary {
   source: SourceMetadata | null;
 }
 
-export function convertSummary(
-  summary:
-    | GetTestsRun_node_Workspace_testRuns_edges_node
-    | GetTestsRunsForWorkspace_node_Workspace_testRuns_edges_node
-): Summary {
+export function processSummary(summary: TestRunGraphQL | TestRunsForWorkspaceGraphQL): Summary {
+  const { mode, results, ...rest } = summary;
+
+  let recordings: Recording[] = [];
+  if ("recordings" in results) {
+    recordings = results.recordings.map(convertRecording);
+  }
+
   return {
-    ...summary,
-    mode: summary.mode as Mode | null,
+    ...rest,
+    mode: mode as Mode | null,
     results: {
-      ...summary.results,
-      recordings:
-        "recordings" in summary.results
-          ? summary.results.recordings.map(rec => convertRecording(rec)!)
-          : [],
+      ...results,
+      recordings,
     },
   };
 }

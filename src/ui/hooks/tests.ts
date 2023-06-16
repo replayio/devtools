@@ -8,7 +8,7 @@ import {
   GetTestsRunsForWorkspace,
   GetTestsRunsForWorkspaceVariables,
 } from "shared/graphql/generated/GetTestsRunsForWorkspace";
-import { Summary, convertSummary } from "shared/test-suites/TestRun";
+import { Summary, processSummary } from "shared/test-suites/TestRun";
 import { WorkspaceId } from "ui/state/app";
 
 const GET_TEST_RUNS_FOR_WORKSPACE = gql`
@@ -117,7 +117,7 @@ export function useGetTestRunForWorkspace(
   const summary = data.node.testRuns?.edges[0]?.node;
 
   return {
-    summary: summary ? convertSummary(summary) : null,
+    summary: summary ? processSummary(summary) : null,
     loading,
   };
 }
@@ -145,7 +145,7 @@ export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
     // Convert legacy test runs; filter out ones with invalid data
     data.node.testRuns?.edges.forEach(({ node: summary }) => {
       try {
-        summaries.push(convertSummary(summary));
+        summaries.push(processSummary(summary));
       } catch (error) {
         // Filter out and ignore data that's too old or corrupt to defined the required fields
       }
