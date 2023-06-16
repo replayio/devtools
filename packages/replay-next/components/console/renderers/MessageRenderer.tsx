@@ -15,7 +15,8 @@ import { InspectableTimestampedPointContext } from "replay-next/src/contexts/Ins
 import { TimelineContext } from "replay-next/src/contexts/TimelineContext";
 import { clientValueCache } from "replay-next/src/suspense/ObjectPreviews";
 import { formatTimestamp } from "replay-next/src/utils/time";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { ReplayClientContext, replayClient } from "shared/client/ReplayClientContext";
+import { ReplayClientInterface } from "shared/client/types";
 
 import ErrorStackRenderer from "../ErrorStackRenderer";
 import MessageHoverButton from "../MessageHoverButton";
@@ -101,33 +102,15 @@ function MessageRenderer({
   const primaryContent =
     argumentValues.length > 0 ? (
       <Suspense fallback={<Loader />}>
-        {argumentValues.map((argumentValue: ProtocolValue, index: number) => {
-          const clientValue = clientValueCache.read(client, message.pauseId, argumentValue);
-          return (
-            <Fragment key={index}>
-              {clientValue.type === "error" && argumentValue.object ? (
-                <>
-                  <Inspector
-                    context="console"
-                    pauseId={message.pauseId}
-                    protocolValue={argumentValue}
-                  />
-                  <ErrorStackRenderer
-                    errorObjectId={argumentValue.object}
-                    pauseId={message.pauseId}
-                  />
-                </>
-              ) : (
-                <Inspector
-                  context="console"
-                  pauseId={message.pauseId}
-                  protocolValue={argumentValue}
-                />
-              )}
-              {index < argumentValues.length - 1 && " "}
-            </Fragment>
-          );
-        })}
+        {argumentValues.map((argumentValue: ProtocolValue, index: number) => (
+          <ArgumentsRendererSuspends
+            argumentValue={argumentValue}
+            client={replayClient}
+            index={index}
+            key={index}
+            message={message}
+          />
+        ))}
       </Suspense>
     ) : (
       " "
@@ -191,6 +174,33 @@ function MessageRenderer({
       </InspectableTimestampedPointContext.Provider>
       {contextMenu}
     </>
+  );
+}
+
+function ArgumentsRendererSuspends({
+  argumentValue,
+  client,
+  index,
+  message,
+}: {
+  argumentValue: ProtocolValue;
+  client: ReplayClientInterface;
+  index: number;
+  message: ProtocolMessage;
+}) {
+  const clientValue = clientValueCache.read(client, message.pauseId, argumentValue);
+  return (
+    <Fragment>
+      {index > 0 && " "}
+      {clientValue.type === "error" && argumentValue.object ? (
+        <>
+          <Inspector context="console" pauseId={message.pauseId} protocolValue={argumentValue} />
+          <ErrorStackRenderer errorObjectId={argumentValue.object} pauseId={message.pauseId} />
+        </>
+      ) : (
+        <Inspector context="console" pauseId={message.pauseId} protocolValue={argumentValue} />
+      )}
+    </Fragment>
   );
 }
 
