@@ -411,8 +411,10 @@ export async function processCypressTestRecording(
         }
 
         const annotations = userActionEventIdToAnnotations[id];
-
-        assert(annotations != null, `Missing annotations for test event (${command.name})`);
+        if (!annotations) {
+          console.warn(`No annotations found for event id: ${id}`);
+          return;
+        }
 
         let beginPoint: TimeStampedPoint | null = null;
         let endPoint: TimeStampedPoint | null = null;
@@ -464,41 +466,41 @@ export async function processCypressTestRecording(
           }
         });
 
-        assert(beginPoint !== null, `Missing "step:start" annotation for test event ${id}`);
-        assert(endPoint !== null, `Missing "step:end" annotation for test event ${id}`);
-        assert(resultPoint !== null, `Missing "step:end" annotation for test event ${id}`);
-        assert(
-          viewSourceTimeStampedPoint !== null,
-          `Missing ${
-            isChaiAssertion ? "step:start" : "step:enqueue"
-          } annotation for test event ${id}`
-        );
-
-        testEvents.push({
-          data: {
-            category: category,
-            command: {
-              arguments: command.arguments,
-              name: command.name,
+        if (beginPoint !== null && endPoint !== null && resultPoint && viewSourceTimeStampedPoint) {
+          testEvents.push({
+            data: {
+              category: category,
+              command: {
+                arguments: command.arguments,
+                name: command.name,
+              },
+              error,
+              id,
+              parentId,
+              result: resultVariable
+                ? {
+                    timeStampedPoint: resultPoint,
+                    variable: resultVariable,
+                  }
+                : null,
+              scope,
+              viewSourceTimeStampedPoint,
             },
-            error,
-            id,
-            parentId,
-            result: resultVariable
-              ? {
-                  timeStampedPoint: resultPoint,
-                  variable: resultVariable,
-                }
-              : null,
-            scope,
-            viewSourceTimeStampedPoint,
-          },
-          timeStampedPointRange: {
-            begin: beginPoint,
-            end: endPoint,
-          },
-          type: "user-action",
-        });
+            timeStampedPointRange: {
+              begin: beginPoint,
+              end: endPoint,
+            },
+            type: "user-action",
+          });
+        } else {
+          console.warn(
+            `Missing annotation data for event id: ${id}`,
+            beginPoint,
+            endPoint,
+            resultPoint,
+            viewSourceTimeStampedPoint
+          );
+        }
       });
     }
 

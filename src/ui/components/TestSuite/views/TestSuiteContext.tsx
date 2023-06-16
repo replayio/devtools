@@ -41,6 +41,8 @@ export function TestSuiteContextRoot({ children }: PropsWithChildren) {
 
   useEffect(() => {
     async function fetchGroupedTestCases() {
+      // do we need a try catch here...
+
       const groupedTestCases = await TestSuiteCache.readAsync(replayClient, recordingId);
       if (groupedTestCases != null) {
         setGroupedTestCases(groupedTestCases);
